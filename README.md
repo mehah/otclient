@@ -1,21 +1,69 @@
-# OTCLient - Redemption
-[![Discord Shield](https://discordapp.com/api/guilds/888062548082061433/widget.png?style=shield)](https://discord.gg/HZN8yJJSyC)
-[![Build - Ubuntu](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml)
-[![Build - Windows](https://github.com/mehah/otclient/actions/workflows/build-windows.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-windows.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+  <img src="https://github.com/mehah/otclient/blob/main/data/images/clienticon.png?raw=true" width="32" alt="logo"/> OTCLient - Redemption
+</p>
 
-#### :heart:  If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
 
-### Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
+## 📋 Table of Contents
 
-#### [Note: for those who are with the walking system stuttering...](https://github.com/mehah/otclient/blob/main/data/setup.otml#L18)
+1. ☑️ [What is otclient?](#whatisotclient)
+2. 🚀 [Features](#features)
+6. <img height="16" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png" alt="Android"> [The Mobile Project](#themobileproject)
+3. 🔨 [Compiling](#compiling)
+4. 🐳 [Docker](#docker)
+5. 🩺 [Need help?](#need-help?)
+6. 📑 [Bugs?](#bugs)
+7. ❤️  [Roadmap](#roadmap)
+8. 💯 [Support Protocol](#supportprotocol)
+9. ©️  [License](#license)
+10. ❤️ [Contributors](#contributors)
 
-### Features
+## <a name="whatisotclient">![Logo](https://raw.githubusercontent.com/mehah/otclient/main/src/otcicon.ico)  What is otclient?</a>
+
+Otclient is an alternative Tibia client for usage with otserv. It aims to be complete and flexible, for that it uses LUA scripting for all game interface functionality and configurations files with a syntax similar to CSS for the client interface design. Otclient works with a modular system, this means that each functionality is a separated module, giving the possibility to users modify and customize anything easily. Users can also create new mods and extend game interface for their own purposes. Otclient is written in C++20 and heavily scripted in lua.
+
+For a server to connect to, you can build your own with the forgottenserver or canary.
+
+> \[!NOTE]
+>
+>Based on [edubart/otclient](https://github.com/edubart/otclient) Rev: [2.760](https://github.com/edubart/otclient/commit/fc39ee4adba8e780a2820bfda66fc942d74cedf4)
+
+## <a name="features">🚀 Features</a>
+Beyond of it's flexibility with scripts, otclient comes with tons of other features that make possible the creation of new client side stuff in otserv that was not possible before. These include, sound system, graphics effects with shaders, modules/addons system, animated textures, styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 2.0 ES engine that make possible to port to mobile platforms. Otclient is also flexible enough to create tibia tools like map editors just using scripts, because it wasn't designed to be just a client, instead otclient was designed to be a combination of a framework and tibia APIs.
 
 - C++20
 - Refactored/Optimized Rendering System
-- Auto Reload Module ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L90))
-- Attached Effects System (to create aura, wings...) (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
+
+- <details>
+   <summary>Auto Reload Module</summary>
+
+   Activate ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L90))
+
+</details>
+
+
+- <details>
+   <summary>Attached Effects System (to create aura, wings...)</summary>
+
+    - Compatible with .Apng
+      - ThingCategoryEffect
+      - ThingCategoryCreature 
+      - ThingExternalTexture: are images in Png | Apng
+
+    - Wiki  
+
+    - Example Code:
+    (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
+    - Example specific settings for lookType X   [outfit_618.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/configs/outfit_618.lua)
+
+      - you have an AttachdEffect X, it has a standard offset, but in the daemon it's all skewed, so you use ThingConfig to adjust the effect specifically for the desired looktype.
+
+</details>
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+| Creature Attached Effect | Light Attached Effect | Creature Particule |
+
+
 - Idle Animation Support
 - Highlight Mouse Target (press shift to select any object)
 - Crosshair
@@ -26,129 +74,232 @@
 - Optimized Terminal
 - Refactored Walk System
 - Support for more mouse buttons, for example 4 and 5
-- Module Controller System ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
+- <details>
+   <summary>Module Controller System</summary>
+
+   a safer way to create modules, without the need to unbind keys, disconnect events, or destroy widgets.
+
+    ([Code example](https://github.com/mehah/otclient/blob/cache-for-all/modules/game_minimap/minimap.lua))
+
+</details>
+
 - Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
-- Client 12.85 ~ 12.92, 13.00 ~ 13.21 support (protobuf)
+- Client 12.85 ~ 12.92, 13.00 ~ 13.32 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
-- Tile Widget
-- Creature Information By UIWidget
+- Negative Offset .dat
+- <details>
+   <summary>Creature Information By UIWidget</summary>
+   
   - to enable: [setup.otml](https://github.com/mehah/otclient/blob/e2c5199e52bd86f573c9bb582d7548cfe7a8b026/data/setup.otml#L20)
   - To style: [modules/game_creatureinformation](https://github.com/mehah/otclient/tree/main/modules/game_creatureinformation)
   - Note: There is a performance degradation compared to direct programming with Draw Pool, by about ~20%, testing was performed with 60 monsters attacking each other.
 
-##### Community (Features)
-- Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol)
+</details>
+
+- Tile Widget [Wiki](https://github.com/mehah/otclient/wiki)
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+|Title Widget| Title Light | Title Attached Effect |
+
+
+
+
+
+
+##### 🙋 Community (Features)
+- Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol) & [@SkullzOTS](https://github.com/SkullzOTS) (Doesn't work with CMAKE)
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+| Interface | Performace | Android |
+
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
-- Support Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS) (Doesn't work with CMAKE)
+
+
+- <details>
+   <summary>Support Discord RPC by @SkullzOTS</summary>
+
+  - by [@SkullzOTS](https://github.com/SkullzOTS)
+
+  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
+
+  - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
+
+</details>
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+| Example interface | Example in game | future discord-game-sdk  |
+
+
 - Action Bar by [@DipSet](https://github.com/Dip-Set1)
 - Access to widget children via widget.childId by [@Hugo0x1337](https://github.com/Hugo0x1337)
 - Shader System Fix (CTRL + Y) by [@FreshyPeshy](https://github.com/FreshyPeshy)
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+| Creature | Map | Mount |
+
 - Refactored Battle Module by [@andersonfaaria](https://github.com/andersonfaaria)
+
 - Health&Mana Circle by [@EgzoT](https://github.com/EgzoT), [@GustavoBlaze](https://github.com/GustavoBlaze), [@Tekadon58](https://github.com/Tekadon58) ([GITHUB Project](https://github.com/EgzoT/-OTClient-Mod-health_and_mana_circle))
 - Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
 - Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) by [@SkullzOTS](https://github.com/SkullzOTS)
-- Encryption System by [@Mrpox](https://github.com/Mrpox) (Note: This implementation is unsafe)
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
+- <details>
+   <summary>Encryption System by [@Mrpox] (Note: This implementation is unsafe)</summary>
+   
+   by [@Mrpox](https://github.com/Mrpox)
+    - To enable just go to [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
   - To enable Encrypting by "--encrypt" change ENABLE_ENCRYPTION_BUILDER to 1 (by [@TheMaoci](https://github.com/TheMaoci)). This allows to remove code of creating encrypted files off the production build
   - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
   - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) file (by [@TheMaoci](https://github.com/TheMaoci))
+
+</details>
+
 - Support HTTP/HTTPS/WS/WSS. by [@alfuveam](https://github.com/alfuveam)
-- Discord RPC by [@SkullzOTS](https://github.com/SkullzOTS)
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
-  - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
-- Client Updater by [@conde2](https://github.com/conde2)
+- <details>
+   <summary>Client Updater by @conde2</summary>
+
+  - by [@conde2](https://github.com/conde2)
   - Paste the API folder in your www folder (https://github.com/mehah/otclient/tree/main/tools/api)
   - Create a folder called "files" in your www folder and paste init.lua, modules, data, and exe files
   - Uncomment and change this line (https://github.com/mehah/otclient/blob/main/init.lua#L6)
-- Colored text [@conde2](https://github.com/conde2)
+
+
+</details>
+
+- <details>
+   <summary>Colored text @conde2</summary>
+
+  - by [@conde2](https://github.com/conde2)
   - widget:setColoredText("{Colored text, #ff00ff} normal text")
-- QR Code support, with auto generate it from string  [@conde2]
+
+</details>
+
+
+- <details>
+   <summary>QR Code support, with auto generate it from string [@conde2]</summary>
+
+  - by [@conde2](https://github.com/conde2)
   - UIQrCode: 
     - code-border: 2
     - code: Hail OTClient Redemption - Conde2 Dev
-- Typing Icon by [@SkullzOTS](https://github.com/SkullzOTS)
+
+</details>
+  
+- <details>
+   <summary>Typing Icon by @SkullzOTS</summary>
+
+  - by [@SkullzOTS](https://github.com/SkullzOTS)
   - To enable just go to [setup.otml](https://github.com/mehah/otclient/blob/main/data/setup.otml) and set draw-typing: true
-- Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)
+
+</details>
+
+- <details>
+   <summary>Smooth Walk Elevation Feature by [@SkullzOTS](https://github.com/SkullzOTS)</summary>
+
+  - by [@SkullzOTS](https://github.com/SkullzOTS)
   - View Feature: [Gyazo](https://i.gyazo.com/af0ed0f15a9e4d67bd4d0b2847bd6be7.gif)
   - To enable just go to [modules/game_features/features.lua](https://github.com/mehah/otclient/blob/main/modules/game_features/features.lua#L5), and uncomment line 5 (g_game.enableFeature(GameSmoothWalkElevation)).
+
+</details>
+
 - Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
 - Tutorial to Use OTC in TFS main [see wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main)
 
+- 3D Sound and Sound Effects! by [@Codinablack](https://github.com/codinablack)
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+| Example1. | Example1 | Example3 |
+
+- <details>
+   <summary>Layout based on tibia 13 by @marcosvf132</summary>
+
+  - by [@marcosvf132](https://github.com/marcosvf132)
+  - Game_shop v8
+  - Minimap WorldTime
+
+    - tfs c++(old): `void ProtocolGame::sendWorldTime()`
+    - tfs lua(new) : `function Player.sendWorldTime(self, time)`
+    - Canary: `void ProtocolGame::sendTibiaTime(int32_t time)`
+
+  - Outfit windows compatible with attachEffect , shader
+    - Canary
+    - 1.4.2 : 
+    - Downgrade :
+  - Calendar
+  - client_bottommenu (activate the array "Services.status" in init.lua)
+
+  put this  
+  `./otclient/tools/api/status.php` in your
+  `C:/UniServerZ/www/api/` 
+
+  if not work try ,active **curl**:
+
+
+
+  ![image](https://github.com/Nottinghster/otclient/assets/114332266/99ad2ce7-d70f-47f4-aa19-083140fb5814)
+
+  ![image](https://github.com/Nottinghster/otclient/assets/114332266/84349388-a458-4eb5-b1d6-cce5693cfd5a)
+
+
+</details>
+
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+| Interface. | In-game | Calendar |
+
+
 ##### Sponsored  (Features)
-- Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
 - Bot V8 | ([@luanluciano93](https://github.com/luanluciano93), [@SkullzOTS](https://github.com/SkullzOTS), [@kokekanon](https://github.com/kokekanon), [@FranciskoKing](https://github.com/FranciskoKing), [@Kizuno18](https://github.com/Kizuno18))
   - Is adapted in 85%
   - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
   - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
+
+- Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
+
+| <img src="https://raw.githubusercontent.com/ivanperez-keera/haskanoid/master/screenshots/android.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://media.giphy.com/media/SsBOvldu1FnSyNZW1z/giphy.gif" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="http://ksaveljev.github.io/2048.gif" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+|-------------------------------------------|---------------|-------------------------|
+| Creature. | Items | UICreature |
+
 
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System
 - Floor Fading
 - Path Finding
-<h2>
-
-```diff
-- Want to help? Just open a PR.
-```
-
-   </h2>
-
-### What is otclient?
-
-Otclient is an alternative Tibia client for usage with otserv. It aims to be complete and flexible,
-for that it uses LUA scripting for all game interface functionality and configurations files with a syntax
-similar to CSS for the client interface design. Otclient works with a modular system, this means
-that each functionality is a separated module, giving the possibility to users modify and customize
-anything easily. Users can also create new mods and extend game interface for their own purposes.
-Otclient is written in C++20 and heavily scripted in lua.
-
-For a server to connect to, you can build your own with the [forgottenserver](https://github.com/otland/forgottenserver)
-or [canary](https://github.com/opentibiabr/canary).
-
-## The Mobile Project
+## <a name="themobileproject"><img height="32" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png" alt="Android"> The Mobile Project </a>
+The Mobile Project
 This is a fork of edubart's otclient. The objective of this fork it's to develop a runnable otclient on mobiles devices.
 
 Tasks that need to do:
-- [X] Compile on Android devices
+- [x] Compile on Android devices
 - [ ] Compile on Apple devices
 - [ ] Adapt the UI reusing the existing lua code
 
 Current compiling tutorials:
 * [Compiling for Android](https://github.com/mehah/otclient/wiki/Compiling-on-Android)
 
-### Where do I download?
 
-Compiled for Windows can be found here (but can be outdated):
-
-- [Windows Builds](https://github.com/mehah/otclient/releases)
-
-**NOTE:** You will need to download spr/dat files on your own and place them in `data/things/VERSION/` (i.e: `data/things/1098/Tibia.spr`)
-
-### Features
-
-Beyond of it's flexibility with scripts, otclient comes with tons of other features that make possible
-the creation of new client side stuff in otserv that was not possible before. These include,
-sound system, graphics effects with shaders, modules/addons system, animated textures,
-styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 2.0 ES engine that make possible
-to port to mobile platforms. Otclient is also flexible enough to
-create tibia tools like map editors just using scripts, because it wasn't designed to be just a
-client, instead otclient was designed to be a combination of a framework and tibia APIs.
-
-### Compiling
+## <a name="compiling">🔨 Compiling</a>
 
 [If you are interested in compiling this project, just go to the wiki.](https://github.com/mehah/otclient/wiki)
 
-### Build and run with Docker
 
-To build the image:
 
-```sh
+## <a name="docker">🐳 Docker</a>
+
+In order to build the app for production, run the following command :
+
+1) To build the image:
+```bash
 docker build -t mehah/otclient .
 ```
-
-To run the built image:
+2) To run the built image:
 
 ```sh
 # Disable access control for the X server.
@@ -165,15 +316,56 @@ docker run -it --rm \
 xhost -
 ```
 
-### Need help?
+
+
+## <a name="need-help?">🩺 Need help?</a>
 
 Try to ask questions in [discord](https://discord.gg/HZN8yJJSyC)
 
-### Bugs
+## <a name="bugs">📑 Bugs?</a>
 
 Have found a bug? Please create an issue in our [bug tracker](https://github.com/mehah/otclient/issues)
 
-### License
+> \[!TIP]
+>
+> if using Nostalrius 7.2, Nekiro TFS-1.5-Downgrades-7.72 OR any protocol below 860 that the walking system is stuttering. set this true.
+https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 
-Otclient is made available under the MIT License, thus this means that you are free
-to do whatever you want, commercial, non-commercial, closed or open.
+## <a name="roadmap">❤️ Roadmap</a>
+
+| TO-DO list            	| Status                            	| PR   	|
+|-----------------------	|-----------------------------------	|------	|
+| Android compatibility 	| ![](https://geps.dev/progress/50) 	| #787 	|
+| Highscore             	| ![](https://geps.dev/progress/20) 	| #787 	|
+| Familiar outfit       	| ![](https://geps.dev/progress/20) 	| #787 	|
+| Cyclopedia            	| ![](https://geps.dev/progress/20) 	| #787 	|
+| Analyzer              	| ![](https://geps.dev/progress/10)   |  #787    	|
+| Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
+| Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
+| Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
+## <a name="supportprotocol">💯 Support Protocol</a>
+
+
+
+
+
+| Protocol / version   	| Description                 	| Required Feature                                    	| Compatibility 	|
+|---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
+| TFS idk (7.72)      	| Downgrade nekiro/Nostalrius 	| idk @siz                                            	| 〰️             	|
+| TFS 0.4 (8.6)       	| RFir3element                	| idk @thalesduarte                                   	| 〰️             	|
+| TFS 1.5 (8.0/ 8.60) 	| Downgrade nekiro /sarah     	| force-new-walking-formula: true                     	| ✅             	|
+| TFS 1.4.2 (10.98)   	| Release Otland              	| default                                             	| ✅             	|
+| TFS 1.6 (13.10)     	| Main repo otland (2024)     	| disable g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
+| Canary 13.22        	|                             	| Assets and Enable HTTP login and port 80            	| ✅             	|
+| Canary 13.32        	|                             	| Assets and  Enable HTTP login and port 80           	| ✅             	|
+
+
+
+## <a name="license">©️ License</a>
+
+Otclient is made available under the MIT License [MIT License](http://opensource.org/licenses/MIT) .thus this means that you are free to do whatever you want, commercial, non-commercial, closed or open
+
+## <a name="contributors">❤️ Contributors</a>
+
+If you are interested in supporting the project, go to this [link](https://www.paypal.com/donate/?business=CV9D5JF8E46LY&no_recurring=0&item_name=Thank+you+very+much+for+your+donation.&currency_code=BRL), any value is great help, thank you.
+
