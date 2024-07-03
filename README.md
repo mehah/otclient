@@ -36,7 +36,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - <details>
    <summary>Auto Reload Module</summary>
 
-   Activate ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L90))
+   Activate `g_modules.enableAutoReload()`  ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L114))
 
 </details>
 
@@ -123,7 +123,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
   - by [@SkullzOTS](https://github.com/SkullzOTS)
 
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/client/config.h), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
+  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
 
   - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
 
@@ -145,16 +145,16 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Refactored Battle Module by [@andersonfaaria](https://github.com/andersonfaaria)
 
 - Health&Mana Circle by [@EgzoT](https://github.com/EgzoT), [@GustavoBlaze](https://github.com/GustavoBlaze), [@Tekadon58](https://github.com/Tekadon58) ([GITHUB Project](https://github.com/EgzoT/-OTClient-Mod-health_and_mana_circle))
-- Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))TF
-- Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) by [@SkullzOTS](https://github.com/SkullzOTS)
+- Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
+- Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/main/data/setup.otml#L24) by [@SkullzOTS](https://github.com/SkullzOTS)
 - <details>
    <summary>Encryption System by [@Mrpox] (Note: This implementation is unsafe)</summary>
    
    by [@Mrpox](https://github.com/Mrpox)
-    - To enable just go to [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
+    - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L33), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
   - To enable Encrypting by "--encrypt" change ENABLE_ENCRYPTION_BUILDER to 1 (by [@TheMaoci](https://github.com/TheMaoci)). This allows to remove code of creating encrypted files off the production build
   - To generate an encryption, just run the client with flag "--encrypt SET_YOUR_PASSWORD_HERE" and don't forget to change the password.
-  - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/cache-for-all/src/client/config.h) file (by [@TheMaoci](https://github.com/TheMaoci))
+  - you can also skip adding password to --encrypt command it automatically will be taken from [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L38) file (by [@TheMaoci](https://github.com/TheMaoci))
 
 </details>
 
@@ -241,9 +241,13 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
     - Canary: `void ProtocolGame::sendTibiaTime(int32_t time)`
 
   - Outfit windows compatible with attachEffect , shader
-    - Canary
+    - Canary : 
     - 1.4.2 : 
+      - https://github.com/kokekanon/TFS-1.4.2-Compatible-Aura-Effect-Wings-Shader-MEHAH/commit/77f80d505b01747a7c519e224d11c124de157a8f
     - Downgrade :
+      - https://github.com/kokekanon/forgottenserver-downgrade/pull/2
+      - https://github.com/kokekanon/forgottenserver-downgrade/pull/7
+      - https://github.com/kokekanon/forgottenserver-downgrade/pull/9
   - Calendar
   - client_bottommenu (activate the array "Services.status" in init.lua)
 
