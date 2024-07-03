@@ -222,7 +222,11 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 | Example 1 | Example 2 | Example 3 |
 |---------|---------|---------|
-| <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/3d%20Sounds/001_example.mp4?raw=true" width="200" controls></video> | <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/3d%20Sounds/002_example.mp4?raw=true" width="200" controls></video> | <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/3d%20Sounds/003_example.mp4?raw=true" width="200" controls></video> |
+| <video src="https://github.com/kokekanon/otclient.readme/assets/114332266/4547907a-8eb9-42f5-b445-901cb5270509" width="200" controls></video> | <video src="https://github.com/kokekanon/otclient.readme/assets/114332266/0bb4739f-e902-4370-85dc-e796564aac8e" width="200" controls></video> | <video src="https://github.com/kokekanon/otclient.readme/assets/114332266/95db3fa1-a793-4ab7-86a3-e21a8543a23c" width="200" controls></video> |
+
+
+
+
 
 
 - <details>
@@ -363,7 +367,7 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 |---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
 | TFS idk (7.72)      	| Downgrade nekiro/Nostalrius 	| idk @siz                                            	| 〰️             	|
 | TFS 0.4 (8.6)       	| RFir3element                	| idk @thalesduarte                                   	| 〰️             	|
-| TFS 1.5 (8.0/ 8.60) 	| Downgrade nekiro /sarah     	| force-new-walking-formula: true                     	| ✅             	|
+| TFS 1.5 (8.0 / 8.60) 	| Downgrade nekiro /sarah     	| force-new-walking-formula: true                     	| ✅             	|
 | TFS 1.4.2 (10.98)   	| Release Otland              	| default                                             	| ✅             	|
 | TFS 1.6 (13.10)     	| Main repo otland (2024)     	| disable g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
 | Canary 13.22        	|                             	| Assets and Enable HTTP login and port 80            	| ✅             	|
