@@ -373,11 +373,11 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 
 | Protocol / version   	| Description                 	| Required Feature                                    	| Compatibility 	|
 |---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
-| TFS idk (7.72)      	| Downgrade nekiro/Nostalrius 	| idk @siz                                            	| 〰️             	|
-| TFS 0.4 (8.6)       	| RFir3element                	| idk @thalesduarte                                   	| 〰️             	|
-| TFS 1.5   (8.0 / 8.60) 	| Downgrade nekiro /sarah     	| force-new-walking-formula: true                     	| ✅             	|
-| TFS 1.4.2 (10.98)   	| Release Otland              	| default                                             	| ✅             	|
-| TFS 1.6 (13.10)     	| Main repo otland (2024)     	| disable g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
+| TFS idk <br> (7.72)      	| Downgrade nekiro/Nostalrius 	| idk @siz                                            	| 〰️             	|
+| TFS 0.4 <br> (8.6)       	| RFir3element                	| idk @thalesduarte                                   	| 〰️             	|
+| TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro /sarah     	| force-new-walking-formula: true                     	| ✅             	|
+| TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
+| TFS 1.6  <br>(13.10)     	| Main repo otland (2024)     	| disable g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
 | Canary 13.22        	|                             	| Assets and Enable HTTP login and port 80            	| ✅             	|
 | Canary 13.32        	|                             	| Assets and  Enable HTTP login and port 80           	| ✅             	|
 
