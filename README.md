@@ -96,7 +96,15 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Client 12.85 ~ 12.92, 13.00 ~ 13.32 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
-- Negative Offset .dat
+
+- <details>
+   <summary>Negative Offset .dat</summary>
+   
+   https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e-ae63-7c4063c5b032
+
+
+</details>
+
 - <details>
    <summary>Creature Information By UIWidget</summary>
    
