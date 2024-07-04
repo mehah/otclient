@@ -104,6 +104,9 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
   - To style: [modules/game_creatureinformation](https://github.com/mehah/otclient/tree/main/modules/game_creatureinformation)
   - Note: There is a performance degradation compared to direct programming with Draw Pool, by about ~20%, testing was performed with 60 monsters attacking each other.
 
+  https://github.com/kokekanon/otclient.readme/assets/114332266/c2567f3f-136e-4e11-964f-3ade89c0056b
+
+
 </details>
 
 - Tile Widget [Wiki](https://github.com/mehah/otclient/wiki)
