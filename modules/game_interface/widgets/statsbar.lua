@@ -196,7 +196,7 @@ function StatsBar.getCurrentStatsBarWithPosition()
     -- It's made this way so we can call the current stats bar without having to use a switch statement.
     -- And if it's necessary to add more stats bars like "largeOnLeft" it will be easier to add them
     -- Without changing this code.
-    if currentStats.dimension == 'hide' and currentStats.placement == 'hide' then
+    if currentStats.dimension == 'hide' or currentStats.placement == 'hide' then
         return nil
     end
     -- -- Get full position as a single string. 
@@ -222,7 +222,7 @@ end
 function StatsBar.getCurrentStatsBar()
     -- This method will return the statsbar based on its placement.
     -- i.e statsBarTop // statsBarBottom
-    if currentStats.dimension == 'hide' and currentStats.placement == 'hide' then
+    if currentStats.dimension == 'hide' or currentStats.placement == 'hide' then
         return nil
     end
     -- -- Get full placement. 
@@ -475,7 +475,13 @@ local function onStatsMousePress(tab, mousePos, mouseButton)
 end
 
 function StatsBar.reloadCurrentTab()
+    if currentStats.dimension == "hide" then
+        return
+    end
+
     local dimension = currentStats.dimension:gsub("^%l", string.upper)
+    
+
     if statsBarsDimensions[dimension] then
         return constructStatsBar(dimension, currentStats.placement)
     else 
