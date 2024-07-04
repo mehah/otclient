@@ -40,7 +40,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
   <summary>Details of optimizations with respect to a Otclient by edubart: </summary>
 
 
-  - C++20 ( v17 , manifest mode (vcpkg.json),  Unity build ) x32 and x64
+  - C++20 ( v17 , Unity build and Manifest Mode (vcpkg.json) ) build in x32 and x64
   - <details>
     <summary>Floor Shadowing</summary>
 
@@ -131,6 +131,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
       - ii ) Video
 
     </details>
+    - updated libraries
 
 
 </details>
