@@ -31,7 +31,7 @@ local function combatEvent()
     elseif g_game.getFightMode() == FightDefensive then
         selectCombat('defense', true)
     end
-   
+
     selectPvp(g_game.getPVPMode() == PVPRedFist, true)
 end
 
@@ -101,7 +101,6 @@ local function onSoulChange(localPlayer, soul)
     if ui.soulAndCapacity and ui.soulAndCapacity.soul then
         ui.soulAndCapacity.soul:setText(soul)
     end
-
 end
 
 local function onFreeCapacityChange(player, freeCapacity)
@@ -153,7 +152,6 @@ local function refreshInventory_panel()
             inventoryEvent(player, i, nil)
         end
     end
-
 end
 
 local function refreshInventorySizes()
@@ -191,21 +189,6 @@ end
 inventoryController = Controller:new()
 inventoryController:setUI('inventory', modules.game_interface.getMainRightPanel())
 
-local inventoryControllerEvents = inventoryController:addEvent(LocalPlayer, {
-    onInventoryChange = inventoryEvent,
-    onSoulChange = onSoulChange,
-    onFreeCapacityChange = onFreeCapacityChange
-})
-
-local inventoryControllerEvents_game = inventoryController:addEvent(g_game, {
-    onWalk = walkEvent,
-    onAutoWalk = walkEvent,
-    onFightModeChange = combatEvent,
-    onChaseModeChange = combatEvent,
-    onSafeFightChange = combatEvent,
-    onPVPModeChange = combatEvent
-})
-
 function inventoryController:onInit()
     refreshInventory_panel()
     local ui = getInventoryUi()
@@ -219,24 +202,21 @@ function inventoryController:onInit()
     })
 end
 
-function inventoryController:onTerminate()
-    inventoryControllerEvents:disconnect()
-    inventoryControllerEvents_game:disconnect()
-end
-
 function inventoryController:onGameStart()
-    inventoryControllerEvents:connect()
-    inventoryControllerEvents:execute('onInventoryChange')
-    inventoryControllerEvents:execute('onSoulChange')
-    inventoryControllerEvents:execute('onFreeCapacityChange')
+    inventoryController:registerEvents(LocalPlayer, {
+        onInventoryChange = inventoryEvent,
+        onSoulChange = onSoulChange,
+        onFreeCapacityChange = onFreeCapacityChange
+    }):execute()
 
-    inventoryControllerEvents_game:connect()
-    inventoryControllerEvents_game:execute('onWalk')
-    inventoryControllerEvents_game:execute('onAutoWalk')
-    inventoryControllerEvents_game:execute('onFightModeChange')
-    inventoryControllerEvents_game:execute('onChaseModeChange')
-    inventoryControllerEvents_game:execute('onSafeFightChange')
-    inventoryControllerEvents_game:execute('onPVPModeChange')
+    inventoryController:registerEvents(g_game, {
+        onWalk = walkEvent,
+        onAutoWalk = walkEvent,
+        onFightModeChange = combatEvent,
+        onChaseModeChange = combatEvent,
+        onSafeFightChange = combatEvent,
+        onPVPModeChange = combatEvent
+    }):execute()
 
     inventoryShrink = g_settings.getBoolean('mainpanel_shrink_inventory')
     refreshInventorySizes()
@@ -248,11 +228,6 @@ function inventoryController:onGameStart()
         inventoryController.ui.onPanel.blessings:hide()
         inventoryController.ui.onPanel.expert:hide()
     end
-end
-
-function inventoryController:onGameEnd()
-    inventoryControllerEvents:disconnect()
-    inventoryControllerEvents_game:disconnect()
 end
 
 function selectPosture(key, ignoreUpdate)
@@ -308,7 +283,7 @@ function selectPvp(pvp, ignoreUpdate)
         end
     else
         ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
-                                ui.pvp.imageClipWidth .. ' 20')
+            ui.pvp.imageClipWidth .. ' 20')
         if not ignoreUpdate then
             g_game.setPVPMode(PVPWhiteHand)
         end
@@ -322,7 +297,6 @@ function changeInventorySize()
     modules.game_mainpanel.reloadMainPanelSizes()
     local player = g_game.getLocalPlayer()
     if player and g_game.isOnline() then
-
         onFreeCapacityChange(player, player:getFreeCapacity())
         onSoulChange(player, player:getSoul())
     end

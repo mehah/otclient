@@ -4,6 +4,16 @@ EventController = {
 }
 
 function EventController:new(actor, events)
+    if actor == nil then
+        error('Actor is null.')
+        return
+    end
+
+    if events == nil then
+        error('Events is null.')
+        return
+    end
+
     local obj = {
         actor = actor,
         events = events,
@@ -19,6 +29,7 @@ function EventController:connect()
         return
     end
     self.connected = true
+
     connect(self.actor, self.events)
 end
 
@@ -31,5 +42,13 @@ function EventController:disconnect()
 end
 
 function EventController:execute(name, ...)
+    if name == nil then
+        for name, act in pairs(self.events) do
+            print(name)
+            act()
+        end
+        return
+    end
+
     self.events[name](...)
 end
