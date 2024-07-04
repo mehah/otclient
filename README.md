@@ -41,97 +41,100 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 
   - C++20 ( v17 , Unity build and Manifest Mode (vcpkg.json) ) build in x32 and x64
-  - <details>
-    <summary>Floor Shadowing</summary>
-
-      - i ) Description
-
-      - ii ) Video
-
-    </details>
 
   - <details>
     <summary>Asynchronous texture loading</summary>
 
-      - i ) Description
+      - **i ) Description**: with this the spr file is not cached, consequently, less ram is consumed.
 
-      - ii ) Video
+      - **ii ) Video**
 
     </details>
 
   - <details>
     <summary>Multi-threading</summary>
 
-      - i ) Description
+      -**i ) Description**:
 
-      - ii ) Video
+    [Main Thread]
+    - Sound
+    - Particles
+    - Load Textures (files)
+    - Windows Events (keyboard, mouse, ...)
+    - Draw texture
+
+    [Thread 2]
+    - Connection
+    - Events (g_dispatcher)
+    - Collect information on what will be drawn on the Map
+
+    [Thread 3]
+    - Collect information on what will be drawn in the UI
+
+
+      - **ii ) Imagen**
 
     </details>
 
   - <details>
     <summary>Less memory usage</summary>
 
-      - i ) Description
+      - **i ) Description**: 
+        ```async autoreload
+        highlightingPtr to stackPos
+        new async dispatcher (using bs thread_pool)
+        optimized updateChildrenIndexStates & updateLayout
+        removed ThingTypePtr
+        scoped object to raw pointer
+        shaderPtr to shaderId
+        and multiple optimizations
+        ```
 
-      - ii ) Video
 
     </details>
 
   - <details>
     <summary>New Lighting System with Fading</summary>
 
-      - i ) Description
-
-      - ii ) Video
-
-    </details>
-
-  - <details>
-    <summary>Anti-Aliasing Mode Options</summary>
-
-      - i ) Description
-
-      - ii ) Video
+      - **i ) Video**
 
     </details>
 
   - <details>
     <summary>Walking System Improvements</summary>
 
-      - i ) Description
-
-      - ii ) Video
+      - **i ) Video**
 
     </details>
 
   
-  - <details>
-    <summary>Supports sequenced packages and compression</summary>
 
-      - i ) Description
+  - Supports sequenced packages and compression
 
-      - ii ) Video
-
-    </details>
-
-  - <details>
-    <summary>Asserts load (Tibia 13)</summary>
-
-      - i ) Description
-
-      - ii ) Video
-
-    </details>
+  - Asserts load (Tibia 13)
 
   - <details>
     <summary>Improvements UIWidgets</summary>
 
-      - i ) Description
+      - **i ) Description:**<br><br>
+      [UIWidget] Improvements in the UI algorithm, with that we had a better performance in >add, remove and reposition widgets, it is possible to see these improvements >through the battle module.<br><br>
+   
 
-      - ii ) Video
+
+
+      - **ii ) Video**
 
     </details>
-    - updated libraries
+  - <details>
+    <summary>Force Effect Optimization</summary>
+
+      - **i ) Description :** will avoid drawing effects on certain occasions
+
+      - **ii ) Video: **
+
+    </details>
+    
+  - updated libraries
 
 
 </details>
@@ -171,7 +174,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 | Creature Attached Effect | Light Attached Effect | Creature Particule |
 
 
-
+- Floor Shadowing
 - Highlight Mouse Target (press shift to select any object)
 - Floor View Mode (Normal, Fade, Locked, Always, Always with transparency)
 - Anti-Aliasing Mode Options (Note: Smooth Retro will consume a little more GPU)
@@ -190,10 +193,24 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Client 12.85 ~ 12.92, 13.00 ~ 13.32 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
-
 - <details>
-   <summary> Support Negative Offset (.dat)</summary>
-   
+    <summary>Anti-Aliasing Mode Options</summary>
+
+      - **i ) Gif**
+
+
+    </details>
+- <details>
+   <summary> Support Negative Offset (.dat)  </summary>
+  
+  - compatible with [ObjectBuilderV0.5.5](https://github.com/punkice3407/ObjectBuilder/releases/tag/v0.5.5)
+  
+   - need enable this feature:
+
+      g_game.enableFeature(GameNegativeOffset)
+     
+   - Video
+
    https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e-ae63-7c4063c5b032
 
 
