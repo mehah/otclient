@@ -49,6 +49,10 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
       - **ii ) Video**
 
+
+      https://github.com/kokekanon/otclient.readme/assets/114332266/f3b7916a-d6ed-46f5-b516-30421de4616d
+
+
     </details>
 
   - <details>
@@ -72,7 +76,8 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
     - Collect information on what will be drawn in the UI
 
 
-      - **ii ) Imagen**
+      - **ii ) Imagen:**
+      ![multinucleo](https://github.com/kokekanon/otclient.readme/assets/114332266/95fb15ac-553f-4eca-937d-8c8f49990f3e)
 
     </details>
 
@@ -97,6 +102,10 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
     <summary>New Lighting System with Fading</summary>
 
       - **i ) Video**
+
+
+      https://github.com/kokekanon/otclient.readme/assets/114332266/de8ffd14-af8c-4cc0-b5b1-2e166243bffc
+
 
     </details>
 
@@ -123,6 +132,10 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 
       - **ii ) Video**
+
+
+      https://github.com/kokekanon/otclient.readme/assets/114332266/eed1464a-ae4d-4cd6-9f22-c719b4f09766
+
 
     </details>
   - <details>
@@ -177,7 +190,6 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Floor Shadowing
 - Highlight Mouse Target (press shift to select any object)
 - Floor View Mode (Normal, Fade, Locked, Always, Always with transparency)
-- Anti-Aliasing Mode Options (Note: Smooth Retro will consume a little more GPU)
 - Floating Effects Option
 - Refactored Walk System
 - Support for more mouse buttons, for example 4 and 5
@@ -195,11 +207,15 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Async Texture Loading
 - <details>
     <summary>Anti-Aliasing Mode Options</summary>
+  - note : (Note: Smooth Retro will consume a little more GPU)
+  
+  - **i ) Gif**
+       ![vvff](https://github.com/kokekanon/otclient.readme/assets/114332266/5a411525-7d5a-4b16-8bb6-2c6462152d39)
 
-      - **i ) Gif**
+     
 
+</details>
 
-    </details>
 - <details>
    <summary> Support Negative Offset (.dat)  </summary>
   
