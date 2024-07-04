@@ -393,8 +393,8 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/kokekanon/otclient.readme/blob/readme3/data/setup.otml#L21)                     	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo otland (2024)     	| g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
-| Canary 13.22        	|                             	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
-| Canary 13.32        	|                             	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
+| Canary 13.22        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
+| Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
 
 
 
