@@ -160,7 +160,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Tibia Theme 1.2 by Zews ([Forum Thread](https://otland.net/threads/otc-tibia-theme-v1-2.230988/))
 - Add option ADJUST_CREATURE_INFORMATION_BASED_ON_CROP_SIZE in [config.h](https://github.com/mehah/otclient/blob/main/data/setup.otml#L24) by [@SkullzOTS](https://github.com/SkullzOTS)
 - <details>
-   <summary>Encryption System by [@Mrpox] (Note: This implementation is unsafe)</summary>
+   <summary>Encryption System by @Mrpox (Note: This implementation is unsafe)</summary>
    
    by [@Mrpox](https://github.com/Mrpox)
     - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L33), set 1 in ENABLE_ENCRYPTION and change password on ENCRYPTION_PASSWORD
@@ -358,7 +358,7 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 
 > \[!TIP]
 >
-> if using Nostalrius 7.2, Nekiro TFS-1.5-Downgrades-7.72 OR any protocol below 860 that the walking system is stuttering. set this true.
+> if using Nostalrius 7.2, Nekiro TFS-1.5-Downgrades-7.72 OR any protocol below 860 that the walking system is **stuttering**. set this to true.
 https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 
 ## <a name="roadmap">❤️ Roadmap</a>
@@ -366,13 +366,12 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
-| Highscore             	| ![](https://geps.dev/progress/20) 	| None	|
-| Familiar outfit       	| ![](https://geps.dev/progress/20) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
-| Cyclopedia            	| ![](https://geps.dev/progress/20) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
-| Analyzer              	| ![](https://geps.dev/progress/10)   |  None    	|
-| Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
-| Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
-| Idk                   	| ![](https://geps.dev/progress/0)   |   #787   	|
+| Highscore             	| ![](https://geps.dev/progress/1) 	| None	|
+| Familiar outfit       	| ![](https://geps.dev/progress/30) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
+| Cyclopedia            	| ![](https://geps.dev/progress/5) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
+| Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
+| next                   	| ![](https://geps.dev/progress/0)   |   None   	|
+
 ## <a name="supportprotocol">💯 Support Protocol</a>
 
 
@@ -381,13 +380,13 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 
 | Protocol / version   	| Description                 	| Required Feature                                    	| Compatibility 	|
 |---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
-| TFS idk <br> (7.72)      	| Downgrade nekiro/Nostalrius 	| idk @siz                                            	| 〰️             	|
-| TFS 0.4 <br> (8.6)       	| Fir3element                	| idk @thalesduarte                                   	| 〰️             	|
-| TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro /sarah     	| force-new-walking-formula: true                     	| ✅             	|
+| TFS idk <br> (7.72)      	| Downgrade nekiro /<br> Nostalrius 	| idk CC: @siz                                            	| 〰️ idk             	|
+| TFS 0.4 <br> (8.6)       	| Fir3element                	| idk CC: @thalesduarte                                   	| 〰️idk             	|
+| TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/kokekanon/otclient.readme/blob/readme3/data/setup.otml#L21)                     	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
-| TFS 1.6  <br>(13.10)     	| Main repo otland (2024)     	| disable g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
-| Canary 13.22        	|                             	| Assets and Enable HTTP login and port 80            	| ✅             	|
-| Canary 13.32        	|                             	| Assets and  Enable HTTP login and port 80           	| ✅             	|
+| TFS 1.6  <br>(13.10)     	| Main repo otland (2024)     	| g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
+| Canary 13.22        	|                             	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
+| Canary 13.32        	|                             	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
 
 
 
