@@ -43,9 +43,7 @@ end
 mapController = Controller:new()
 mapController:setUI('minimap', modules.game_interface.getMainRightPanel())
 
-local mapControllerEvents = mapController:addEvent(LocalPlayer, {
-    onPositionChange = onPositionChange
-})
+
 
 function onChangeWorldTime(hour, minute)
     currentDayTime = {
@@ -96,9 +94,6 @@ function onChangeWorldTime(hour, minute)
 end
 
 function mapController:onInit()
-    mapControllerEvents:connect()
-    mapControllerEvents:execute('onPositionChange')
-
     self.ui.minimapBorder.minimap:getChildById('floorUpButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('floorDownButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('zoomInButton'):hide()
@@ -111,6 +106,10 @@ function mapController:onInit()
 end
 
 function mapController:onGameStart()
+    mapController:registerEvents(LocalPlayer, {
+        onPositionChange = onPositionChange
+    }):execute()
+
     -- Load Map
     g_minimap.clean()
 
@@ -144,7 +143,6 @@ function mapController:onGameEnd()
 end
 
 function mapController:onTerminate()
-    mapControllerEvents:disconnect()
     disconnect(g_game, {
         onChangeWorldTime = onChangeWorldTime
     })
@@ -245,4 +243,5 @@ end
 function getMiniMapUi()
     return mapController.ui.minimapBorder.minimap
 end
+
 -- @ End of Minimap
