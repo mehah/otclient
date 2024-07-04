@@ -10,7 +10,7 @@
 
 ## 📋 Table of Contents
 
-1. ☑️ [What is otclient?](#whatisotclient)
+1. ![Logo](https://raw.githubusercontent.com/mehah/otclient/main/src/otcicon.ico)  [What is otclient?](#whatisotclient)
 2. 🚀 [Features](#features)
 6. <img height="16" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png" alt="Android"> [The Mobile Project](#themobileproject)
 3. 🔨 [Compiling](#compiling)
