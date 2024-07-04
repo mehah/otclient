@@ -1,22 +1,3 @@
-controller = Controller:new()
-
--- uncomment this line to apply an effect on the local player, just for testing purposes.
---[[function controller:onGameStart()
-    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(1))
-    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(2))
-    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(3))
-    g_game.getLocalPlayer():getTile():attachEffect(g_attachedEffects.getById(1))
-    g_game.getLocalPlayer():attachParticleEffect("creature-effect")
-end
-
-function controller:onGameEnd()
-    g_game.getLocalPlayer():clearAttachedEffects()
-end]]
-
-function controller:onTerminate()
-    g_attachedEffects.clear()
-end
-
 local function onAttach(effect, owner)
     local category, thingId = AttachedEffectManager.getDataThing(owner)
     local config = AttachedEffectManager.getConfig(effect:getId(), category, thingId)
@@ -45,16 +26,37 @@ local function onOutfitChange(creature, outfit, oldOutfit)
     end
 end
 
-controller:attachExternalEvent(EventController:new(LocalPlayer, {
-    onOutfitChange = onOutfitChange
-}))
-controller:attachExternalEvent(EventController:new(Creature, {
-    onOutfitChange = onOutfitChange
-}))
-controller:attachExternalEvent(EventController:new(AttachedEffect, {
-    onAttach = onAttach,
-    onDetach = onDetach
-}))
+controller = Controller:new()
+
+function controller:onGameStart()
+    controller:registerEvents(LocalPlayer, {
+        onOutfitChange = onOutfitChange
+    })
+
+    controller:registerEvents(Creature, {
+        onOutfitChange = onOutfitChange
+    })
+
+    controller:registerEvents(AttachedEffect, {
+        onAttach = onAttach,
+        onDetach = onDetach
+    })
+
+    -- uncomment this line to apply an effect on the local player, just for testing purposes.
+    --[[g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(1))
+    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(2))
+    g_game.getLocalPlayer():attachEffect(g_attachedEffects.getById(3))
+    g_game.getLocalPlayer():getTile():attachEffect(g_attachedEffects.getById(1))
+    g_game.getLocalPlayer():attachParticleEffect("creature-effect")]]
+end
+
+function controller:onGameEnd()
+    -- g_game.getLocalPlayer():clearAttachedEffects()
+end
+
+function controller:onTerminate()
+    g_attachedEffects.clear()
+end
 
 -- @ note: sorry, I couldn't find any other way to do it
 function getCategory(id)
@@ -73,7 +75,6 @@ function getName(id)
     else
         return "None"
     end
-
 end
 
 function thingId(id)
@@ -83,4 +84,5 @@ function thingId(id)
         return "None"
     end
 end
+
 -- @
