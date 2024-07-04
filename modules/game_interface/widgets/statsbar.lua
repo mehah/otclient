@@ -480,7 +480,6 @@ function StatsBar.reloadCurrentTab()
     end
 
     local dimension = currentStats.dimension:gsub("^%l", string.upper)
-    
 
     if statsBarsDimensions[dimension] then
         return constructStatsBar(dimension, currentStats.placement)
