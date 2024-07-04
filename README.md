@@ -118,17 +118,17 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 
 ##### 🙋 Community (Features)
-- Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol) & [@SkullzOTS](https://github.com/SkullzOTS) (Doesn't work with CMAKE)
+- Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol) & [@SkullzOTS](https://github.com/SkullzOTS) 
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_ingame.png?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_interface.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/003_patrikq.jpg?raw=true" width="270" alt="Space Invaders" style="max-width: 270px;"> |
 |-------------------------------------------|---------------|-------------------------|
-| Interface | Performace | Android(patrykq) |
+| Interface | Density Pixel | Joystick (patrykq) |
 
 - Support Tibia 12.85/protobuf by [@Nekiro](https://github.com/nekiro)
 
 
 - <details>
-   <summary>Support Discord RPC by @SkullzOTS</summary>
+   <summary>Support Discord RPC by @SkullzOTS (Doesn't work with CMAKE)</summary>
 
   - by [@SkullzOTS](https://github.com/SkullzOTS)
 
@@ -379,7 +379,7 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | Protocol / version   	| Description                 	| Required Feature                                    	| Compatibility 	|
 |---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
 | TFS idk <br> (7.72)      	| Downgrade nekiro/Nostalrius 	| idk @siz                                            	| 〰️             	|
-| TFS 0.4 <br> (8.6)       	| RFir3element                	| idk @thalesduarte                                   	| 〰️             	|
+| TFS 0.4 <br> (8.6)       	| Fir3element                	| idk @thalesduarte                                   	| 〰️             	|
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro /sarah     	| force-new-walking-formula: true                     	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo otland (2024)     	| disable g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
