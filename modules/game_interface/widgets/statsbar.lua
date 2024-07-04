@@ -479,7 +479,7 @@ function StatsBar.reloadCurrentTab()
     if statsBarsDimensions[dimension] then
         return constructStatsBar(dimension, currentStats.placement)
     else 
-        -- print("No stats bars dimensions found: ", dimension, " on reloadCurrentTab()")
+        print("No stats bars dimensions found: ", dimension, " on reloadCurrentTab()")
         return
     end
 end
