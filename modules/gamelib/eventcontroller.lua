@@ -44,7 +44,6 @@ end
 function EventController:execute(name, ...)
     if name == nil then
         for name, act in pairs(self.events) do
-            print(name)
             act()
         end
         return

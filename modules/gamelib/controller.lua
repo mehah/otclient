@@ -166,9 +166,9 @@ function Controller:terminate()
 end
 
 --[[
-    If you register an event within onInit() or in the general scope of the script,
-    the event will be automatically connected at startup and disconnected when it is destroyed.
-    If it is within onGameStart(), the events will be connected when starting the game map and when exiting it.
+    If you register an event in onInit() or in the general scope of the script,
+    the event will be automatically registered at startup and disconnected when the module is destroyed.
+    If it is inside onGameStart(), the events will be connected when entering the game map and disconnected when leaving and also when the module is destroyed.
 ]]
 function Controller:registerEvents(actor, events)
     if self.events[self.currentTypeEvent] == nil then
@@ -217,7 +217,6 @@ function Controller:bindKeyUp(...)
         args = args
     })
 
-    print(args[1], args[2], args[3])
     g_keyboard.bindKeyUp(args[1], args[2], args[3])
 end
 
