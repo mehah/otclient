@@ -35,8 +35,105 @@ For a server to connect to, you can build your own with the forgottenserver or c
 ## <a name="features">🚀 Features</a>
 Beyond of it's flexibility with scripts, otclient comes with tons of other features that make possible the creation of new client side stuff in otserv that was not possible before. These include, sound system, graphics effects with shaders, modules/addons system, animated textures, styleable user interface, transparency, multi language, in game lua terminal, an OpenGL 2.0 ES engine that make possible to port to mobile platforms. Otclient is also flexible enough to create tibia tools like map editors just using scripts, because it wasn't designed to be just a client, instead otclient was designed to be a combination of a framework and tibia APIs.
 
-- C++20
-- Refactored/Optimized Rendering System
+
+- <details>
+  <summary>Details of optimizations with respect to a Otclient by edubart: </summary>
+
+
+  - C++20 ( v17 , manifest mode (vcpkg.json),  Unity build ) x32 and x64
+  - <details>
+    <summary>Floor Shadowing</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>Asynchronous texture loading</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>Multi-threading</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>Less memory usage</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>New Lighting System with Fading</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>Anti-Aliasing Mode Options</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>Walking System Improvements</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  
+  - <details>
+    <summary>Supports sequenced packages and compression</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>Asserts load (Tibia 13)</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+  - <details>
+    <summary>Improvements UIWidgets</summary>
+
+      - i ) Description
+
+      - ii ) Video
+
+    </details>
+
+
+</details>
 
 - <details>
    <summary>Auto Reload Module</summary>
@@ -73,14 +170,11 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 | Creature Attached Effect | Light Attached Effect | Creature Particule |
 
 
-- Idle Animation Support
+
 - Highlight Mouse Target (press shift to select any object)
-- Crosshair
-- Floor Shadowing
 - Floor View Mode (Normal, Fade, Locked, Always, Always with transparency)
 - Anti-Aliasing Mode Options (Note: Smooth Retro will consume a little more GPU)
 - Floating Effects Option
-- Optimized Terminal
 - Refactored Walk System
 - Support for more mouse buttons, for example 4 and 5
 - <details>
@@ -92,13 +186,12 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 
-- Some bugs fixed contained in [edubart/otclient](https://github.com/edubart/otclient)
 - Client 12.85 ~ 12.92, 13.00 ~ 13.32 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
 
 - <details>
-   <summary>Negative Offset .dat</summary>
+   <summary> Support Negative Offset (.dat)</summary>
    
    https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e-ae63-7c4063c5b032
 
@@ -117,6 +210,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 
+- Drawpool 3
 - Tile Widget [Wiki](https://github.com/mehah/otclient/wiki)
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="250" alt="Haskanoid Video" style="max-width:250px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/idk.jpg?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
@@ -393,7 +487,7 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/kokekanon/otclient.readme/blob/readme3/data/setup.otml#L21)                     	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo otland (2024)     	| g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
-| Canary 13.22        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
+| Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
 | Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
 
 
