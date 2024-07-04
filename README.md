@@ -37,7 +37,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 
 - <details>
-  <summary>Details of optimizations with respect to a Otclient by edubart: </summary>
+  <summary>Details of optimizations with respect to OTClient by edubart: </summary>
 
 
   - C++20 ( v17 , Unity build and Manifest Mode (vcpkg.json) ) build in x32 and x64
