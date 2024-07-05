@@ -281,7 +281,7 @@ void Item::setId(uint32_t id)
     // Shader example on only items that can be marketed.
     /*
     if (isMarketable()) {
-        m_shader = g_shaders.getShader("Outfit - Rainbow");
+        m_shaderId = g_shaders.getShader("Outfit - Outline")->getId();
     }
     */
 }

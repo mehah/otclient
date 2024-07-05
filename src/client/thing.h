@@ -167,7 +167,10 @@ public:
     }
 
     void setShader(const std::string_view name);
-    bool hasShader() { return m_shaderId > 0; }
+    uint8_t getShaderId() const { return m_shaderId; }
+    PainterShaderProgramPtr getShader() const;
+
+    bool hasShader() const { return m_shaderId > 0; }
 
     void ungroup() { m_drawConductor.agroup = false; }
 
