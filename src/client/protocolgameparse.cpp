@@ -1525,6 +1525,7 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         uint8_t totalForgeValues = 11;
         if (g_game.getClientVersion() >= 1316) {
             totalForgeValues = 13;
+        }
 
         if (g_game.getFeature(Otc::GameForgeConvergence)) {
             totalForgeValues = totalForgeValues + 2;
