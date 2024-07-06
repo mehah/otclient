@@ -1986,7 +1986,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         msg->getU8();
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    if (g_game.getFeature(Otc::GameExaltationForge)) {
         // forge skill stats
         const uint8_t lastSkill = g_game.getClientVersion() >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
         for (int_fast32_t skill = Otc::Fatal; skill < lastSkill; ++skill) {
@@ -1995,7 +1995,9 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
             m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
             m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
         }
+    }
 
+    if (g_game.getClientVersion() >= 1281) {
         // bonus cap
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
