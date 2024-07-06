@@ -548,7 +548,6 @@ namespace Otc
         GameItemTooltipV8 = 117,
         GameWingsAurasEffectsShader = 118,
         GameForgeConvergence = 119,
-        GameExaltationForge = 120,
         LastGameFeature
     };
 
