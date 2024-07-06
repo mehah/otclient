@@ -1503,8 +1503,13 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         msg->getU8(); // Dust To Sleaver
         msg->getU8(); // Sliver To Core
         msg->getU8(); // Dust Percent Upgrade
-        msg->getU16(); // Max Dust
-        msg->getU16(); // Max Dust Cap
+        if (g_game.getClientVersion() >= 1316) {
+            msg->getU16(); // Max Dust
+            msg->getU16(); // Max Dust Cap
+        } else {
+            msg->getU8(); // Max Dust
+            msg->getU8(); // Max Dust Cap
+        }
         msg->getU8(); // Dust Normal Fusion
         if (g_game.getFeature(Otc::GameForgeConvergence)) {
             msg->getU8(); // Dust Convergence Fusion
@@ -1517,13 +1522,12 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         msg->getU8(); // Chance Improved
         msg->getU8(); // Reduce Tier Loss
     } else {
-        uint8_t totalForgeValues = 13;
-        if (g_game.getFeature(Otc::GameForgeConvergence)) {
-            totalForgeValues++;
-        }
+        uint8_t totalForgeValues = 11;
+        if (g_game.getClientVersion() >= 1316) {
+            totalForgeValues = 13;
 
         if (g_game.getFeature(Otc::GameForgeConvergence)) {
-            totalForgeValues++;
+            totalForgeValues = totalForgeValues + 2;
         }
 
         for (auto i = 1; i <= totalForgeValues; i++) {
@@ -1986,7 +1990,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         msg->getU8();
     }
 
-    if (g_game.getFeature(Otc::GameExaltationForge)) {
+    if (g_game.getClientVersion() >= 1281) {
         // forge skill stats
         const uint8_t lastSkill = g_game.getClientVersion() >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
         for (int_fast32_t skill = Otc::Fatal; skill < lastSkill; ++skill) {
@@ -1995,9 +1999,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
             m_localPlayer->setSkill(static_cast<Otc::Skill>(skill), level, 0);
             m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
         }
-    }
 
-    if (g_game.getClientVersion() >= 1281) {
         // bonus cap
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
