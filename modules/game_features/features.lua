@@ -199,6 +199,10 @@ controller:registerEvents(g_game, {
             g_game.enableFeature(GameThingUpgradeClassification)
         end
 
+        if version >= 1280 then
+            g_game.enableFeature(GameExaltationForge)
+        end
+
         if version >= 1281 then
             g_game.disableFeature(GameEnvironmentEffect)
             g_game.disableFeature(GameItemAnimationPhase)
