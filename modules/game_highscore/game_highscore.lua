@@ -84,8 +84,6 @@ function highscoreController:onInit()
 
     highscoreController.ui:hide()
 
-
- 
     highscoreController:registerEvents(g_game, {
         onProcessHighscores = onProcessHighscores
     })
