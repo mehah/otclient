@@ -307,6 +307,7 @@ private:
     void parseBosstiarySlots(const InputMessagePtr& msg);
     void parseBosstiaryCooldownTimer(const InputMessagePtr& msg);
     void parseBosstiaryEntryChanged(const InputMessagePtr& msg);
+    void parseHighscores(const InputMessagePtr& msg);
 
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);

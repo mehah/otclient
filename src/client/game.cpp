@@ -1710,3 +1710,12 @@ void Game::requestHighscore(uint8_t action, uint8_t category, uint32_t vocation,
         return;
     m_protocolGame->sendHighscoreInfo(action, category, vocation, world, worldType, battlEye, page, totalPages);
 }
+
+void Game::processHighscore(const std::string& serverName, const std::string& world, uint8_t worldType, uint8_t battlEye,
+                            const std::vector<std::tuple<uint32_t, std::string>>& vocations,
+                            const std::vector<std::tuple<uint8_t, std::string>>& categories,
+                            uint16_t page, uint16_t totalPages,
+                            const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, uint32_t entriesTs)
+{
+    g_lua.callGlobalField("g_game", "onProcessHighscores", serverName, world, worldType, battlEye, vocations, categories, page, totalPages, highscores, entriesTs);
+}
