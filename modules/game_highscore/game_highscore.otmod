@@ -1,0 +1,9 @@
+Module
+  name: game_highscore
+  description: game_highscore
+  author: game_highscore
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  scripts: [ game_highscore ]
+  @onLoad: highscoreController:init()
+  @onUnload: highscoreController:terminate()
