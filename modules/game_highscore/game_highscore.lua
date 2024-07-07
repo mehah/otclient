@@ -83,14 +83,12 @@ highscoreController:setUI('game_highscore')
 function highscoreController:onInit()
 
     highscoreController.ui:hide()
-    connect(g_game, {
-        onProcessHighscores = onProcessHighscores
-    })
 
-    --[[  why no work?    
+
+ 
     highscoreController:registerEvents(g_game, {
         onProcessHighscores = onProcessHighscores
-    }):execute()  ]]
+    })
 
     -- @ delete this V
     if devMode then
@@ -116,9 +114,7 @@ function highscoreController:onTerminate()
         ComboWindow = nil
     end
     -- @
-    disconnect(g_game, {
-        onProcessHighscores = onProcessHighscores
-    })
+
 end
 
 function onProcessHighscores(serverName, world, worldType, battlEye, vocations, categories, page, totalInPages,
