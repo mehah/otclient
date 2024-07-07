@@ -1703,3 +1703,10 @@ void Game::stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
         return;
     m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
 }
+
+void Game::requestHighscore(uint8_t action, uint8_t category, uint32_t vocation, const std::string& world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendHighscoreInfo(action, category, vocation, world, worldType, battlEye, page, totalPages);
+}

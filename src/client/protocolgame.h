@@ -131,6 +131,7 @@ public:
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
     void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
+    void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, const std::string& world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
