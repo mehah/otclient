@@ -502,7 +502,7 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
-| Highscore             	| ![](https://geps.dev/progress/1) 	| None	|
+| Highscore             	| ![](https://geps.dev/progress/90) 	| [#809](https://github.com/mehah/otclient/pull/809)	|
 | Familiar outfit       	| ![](https://geps.dev/progress/30) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
 | Cyclopedia            	| ![](https://geps.dev/progress/5) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
@@ -520,7 +520,7 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TFS 0.4 <br> (8.6)       	| Fir3element                	| idk CC: @thalesduarte                                   	| 〰️idk             	|
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/kokekanon/otclient.readme/blob/readme3/data/setup.otml#L21)                     	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
-| TFS 1.6  <br>(13.10)     	| Main repo otland (2024)     	| g_game.disableFeature(GameSequencedPackets) 	| ✅             	|
+| TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki)](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
 | Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
 | Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
 
