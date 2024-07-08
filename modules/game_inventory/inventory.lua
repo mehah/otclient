@@ -203,6 +203,11 @@ function inventoryController:onInit()
     connect(inventoryController.ui.onPanel.pvp, {
         onCheckChange = onSetSafeFight
     })
+
+    connect(inventoryController.ui.onPanel.expert, {
+        onCheckChange = expertMode
+    })
+
 end
 
 function inventoryController:onGameStart()
@@ -311,6 +316,14 @@ end
         end
     end
 end ]]
+
+function expertMode(self, checked)
+    local ui = getInventoryUi()
+
+    ui.whiteDoveBox:setVisible(checked)
+    ui.whiteHandBox:setVisible(checked)
+    ui.yellowHandBox:setVisible(checked)
+    ui.redFistBox:setVisible(checked)
 end
 
 function changeInventorySize()

@@ -1,3 +1,11 @@
+WhiteDoveBox < CombatBox
+  image-source: /images/game/combatmodes/whitedovemode
+WhiteHandBox < CombatBox
+  image-source: /images/game/combatmodes/whitehandmode
+YellowHandBox < CombatBox
+  image-source: /images/game/combatmodes/yellowhandmode
+RedFistBox < CombatBox
+  image-source: /images/game/combatmodes/redfistmode
 
 StandModeBox < UICheckBox
   size: 20 20
@@ -76,7 +84,7 @@ PhantomMiniWindow
       anchors.top: standPosture.bottom
       margin-top: 4
 
-    UIWidget
+    UICheckBox
       id: expert
       image-source: /images/inventory/buttons_general
       image-clip: 0 140 20 20
@@ -101,6 +109,32 @@ PhantomMiniWindow
       margin-top: 4
       phantom: false
       size: 44 21
+
+    WhiteHandBox
+      id: whiteHandBox
+      anchors.right: parent.right
+      anchors.top: pvp.bottom
+      margin-right: 8
+      margin-top: 5
+
+    RedFistBox
+      id: redFistBox
+      anchors.right: whiteHandBox.right
+      anchors.top: whiteHandBox.bottom
+      margin-right: -1
+      margin-right: 0
+
+    WhiteDoveBox
+      id: whiteDoveBox
+      anchors.right: whiteHandBox.left
+      anchors.top: whiteHandBox.top
+      margin-top: 0
+
+    YellowHandBox
+      id: yellowHandBox
+      anchors.right: whiteDoveBox.right
+      anchors.top: whiteDoveBox.bottom
+      margin-right: 0
 
     TopToggleButton
       id: attack
@@ -457,6 +491,8 @@ PhantomMiniWindow
       anchors.bottom: soulAndCapacity.bottom
       phantom: false
       size: 12 12
+      @onClick: |
+        expertMode()
 
     Button
       id: blessings
