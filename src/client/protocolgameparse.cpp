@@ -3704,8 +3704,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
     const uint8_t slot = msg->getU8(); // slot
     const auto state = static_cast<Otc::PreyState_t>(msg->getU8()); // slot state
 
-    const uint32_t nextFreeReroll = 0; // next free roll
-    const uint8_t wildcards = 0; // wildcards
+    uint32_t nextFreeReroll = 0; // next free roll
+    uint8_t wildcards = 0; // wildcards
 
     switch (state) {
         case Otc::PREY_STATE_LOCKED:
