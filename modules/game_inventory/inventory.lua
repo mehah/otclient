@@ -208,6 +208,16 @@ function inventoryController:onInit()
         onCheckChange = expertMode
     })
 
+
+    pvpModeRadioGroup = UIRadioGroup.create()
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteDoveBox)
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteHandBox)
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.yellowHandBox)
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.redFistBox)
+    connect(pvpModeRadioGroup, {
+        onSelectionChange = onSetPVPMode
+    })
+
 end
 
 function inventoryController:onGameStart()
@@ -324,6 +334,26 @@ function expertMode(self, checked)
     ui.whiteHandBox:setVisible(checked)
     ui.yellowHandBox:setVisible(checked)
     ui.redFistBox:setVisible(checked)
+end
+
+function onSetPVPMode(self, selectedPVPButton)
+    if selectedPVPButton == nil then
+        return
+    end
+
+    local buttonId = selectedPVPButton:getId()
+    local pvpMode = PVPWhiteDove
+    if buttonId == 'whiteDoveBox' then
+        pvpMode = PVPWhiteDove
+    elseif buttonId == 'whiteHandBox' then
+        pvpMode = PVPWhiteHand
+    elseif buttonId == 'yellowHandBox' then
+        pvpMode = PVPYellowHand
+    elseif buttonId == 'redFistBox' then
+        pvpMode = PVPRedFist
+    end
+
+    g_game.setPVPMode(pvpMode)
 end
 
 function changeInventorySize()
