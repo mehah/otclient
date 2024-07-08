@@ -365,8 +365,11 @@ void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
     if (color != Color::white)
         m_state.color = color;
 
-    m_oldState = std::move(m_state);
-    m_state = {};
+    if (m_bindedFramebuffers == 0) {
+        m_oldState = std::move(m_state);
+        m_state = {};
+    }
+
     addAction([this, size, frameIndex = m_bindedFramebuffers, drawState = m_state] {
         drawState.execute();
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
@@ -376,9 +379,12 @@ void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
 }
 void DrawPool::releaseFrameBuffer(const Rect& dest)
 {
-    m_state = std::move(m_oldState);
-    m_oldState = {};
-    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+    if (m_bindedFramebuffers == 0) {
+        m_state = std::move(m_oldState);
+        m_oldState = {};
+    }
+
+    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = m_state]() mutable {
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->release();
         drawState.execute();
