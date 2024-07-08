@@ -86,7 +86,8 @@ PhantomMiniWindow
       margin-top: 4
       size: 20 20
 
-    UIWidget
+
+    UICheckBox
       id: pvp
       image-source: /images/inventory/buttons_general
       image-clip: 0 100 44 20
@@ -99,9 +100,7 @@ PhantomMiniWindow
       &imageClipWidth: 44
       margin-top: 4
       phantom: false
-      size: 44 20
-      @onClick: |
-        selectPvp(self:getImageClip().y == 100)
+      size: 44 21
 
     TopToggleButton
       id: attack
