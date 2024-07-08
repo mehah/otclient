@@ -17,13 +17,13 @@ local function walkEvent()
 end
 
 local function combatEvent()
-    local chaseMode = g_game.getChaseMode()
-    if chaseMode == 1 then
-        chaseModeRadioGroup:selectWidget(chaseModeBox, true)
-    else
-        chaseModeRadioGroup:selectWidget(standModeBox, true)
-    end
 
+    if g_game.getChaseMode() == ChaseOpponent then
+        selectPosture('follow', true)
+    else
+        selectPosture('stand', true)
+    end
+    
     if g_game.getFightMode() == FightOffensive then
         selectCombat('attack', true)
     elseif g_game.getFightMode() == FightBalanced then
@@ -171,6 +171,7 @@ local function refreshInventorySizes()
 end
 
 function onSetChaseMode(self, selectedChaseModeButton)
+
     if selectedChaseModeButton == nil then
         return
     end
@@ -179,7 +180,11 @@ function onSetChaseMode(self, selectedChaseModeButton)
 
     if buttonId == 'followPosture' then
         chaseMode = ChaseOpponent
+
+        
     else -- standModeBox
+
+
         chaseMode = DontChase
     end
 
@@ -192,23 +197,24 @@ inventoryController:setUI('inventory', modules.game_interface.getMainRightPanel(
 function inventoryController:onInit()
     refreshInventory_panel()
     local ui = getInventoryUi()
-    standModeBox = ui.standPosture
-    chaseModeBox = ui.followPosture
-    chaseModeRadioGroup = UIRadioGroup.create()
-    chaseModeRadioGroup:addWidget(standModeBox)
-    chaseModeRadioGroup:addWidget(chaseModeBox)
-    connect(chaseModeRadioGroup, {
-        onSelectionChange = onSetChaseMode
-    })
+-- @ chase / stand panel
+-- maximize inventario
+
+-- @ chase / stan panel
+
+-- @ Fight botom
     connect(inventoryController.ui.onPanel.pvp, {
         onCheckChange = onSetSafeFight
     })
+    connect(inventoryController.ui.offPanel.pvp, {
+        onCheckChange = onSetSafeFight
+    })
+-- @
+-- @ Expert Bootom
 
     connect(inventoryController.ui.onPanel.expert, {
         onCheckChange = expertMode
     })
-
-
     pvpModeRadioGroup = UIRadioGroup.create()
     pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteDoveBox)
     pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteHandBox)
@@ -217,6 +223,7 @@ function inventoryController:onInit()
     connect(pvpModeRadioGroup, {
         onSelectionChange = onSetPVPMode
     })
+-- @
 
 end
 
@@ -249,18 +256,13 @@ function inventoryController:onGameStart()
 end
 
 function onSetSafeFight(self, checked)
-
-    local ui = getInventoryUi()
-    if ui.pvp:getImageClip().y == 100 then
-        ui.pvp:setImageClip(
-            ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
-
-    else
-        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
-                                ui.pvp.imageClipWidth .. ' 20')
-
-    end
-
+    if not checked then
+        inventoryController.ui.onPanel.pvp:setChecked(false)
+        inventoryController.ui.offPanel.pvp:setChecked(false)
+      else
+        inventoryController.ui.onPanel.pvp:setChecked(true)  
+        inventoryController.ui.offPanel.pvp:setChecked(true)  
+      end
     g_game.setSafeFight(not checked)
     if not checked then
         g_game.cancelAttack()

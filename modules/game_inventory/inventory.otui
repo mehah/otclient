@@ -6,6 +6,8 @@ YellowHandBox < CombatBox
   image-source: /images/game/combatmodes/yellowhandmode
 RedFistBox < CombatBox
   image-source: /images/game/combatmodes/redfistmode
+SafeFightBox < CombatBox
+  image-source: /images/game/combatmodes/safefight
 
 StandModeBox < UICheckBox
   size: 20 20
@@ -70,20 +72,39 @@ PhantomMiniWindow
       $pressed !disabled:
         image-clip: 12 0 12 12
 
-    StandModeBox
+    TopToggleButton
       id: standPosture
+      image-source: /images/inventory/buttons_general
+      image-clip: 0 0 20 20
       anchors.right: parent.right
       anchors.top: changeSize.top
       margin-right: 7
       size: 20 20
+      @onClick: |
+        selectPosture('stand')
 
-    ChaseModeBox
+      $pressed !disabled:
+        image-clip: 20 0 20 20
+
+      $disabled:
+        image-clip: 20 0 20 20
+
+    TopToggleButton
       id: followPosture
       image-source: /images/inventory/buttons_general
+      image-clip: 0 20 20 20
       anchors.right: standPosture.right
       anchors.top: standPosture.bottom
       margin-top: 4
+      size: 20 20
+      @onClick: |
+        selectPosture('follow')
 
+      $pressed !disabled:
+        image-clip: 20 20 20 20
+
+      $disabled:
+        image-clip: 20 20 20 20
     UICheckBox
       id: expert
       image-source: /images/inventory/buttons_general
@@ -97,18 +118,20 @@ PhantomMiniWindow
 
     UICheckBox
       id: pvp
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 100 44 20
+      image-source: /images/game/combatmodes/onPanel
+      size: 44 21
+      image-clip: 0 0 44 21
+      margin: 2 4
       anchors.right: standPosture.right
       anchors.top: expert.bottom
-      &imageClipCheckedX: 0
-      &imageClipUncheckedX: 0
-      &imageClipCheckedY: 120
-      &imageClipUncheckedY: 100
-      &imageClipWidth: 44
       margin-top: 4
+      margin-right: 0
       phantom: false
       size: 44 21
+
+      $checked:
+        image-clip: 0 20 44 21
+
 
     WhiteHandBox
       id: whiteHandBox
@@ -453,35 +476,46 @@ PhantomMiniWindow
       $disabled:
         image-clip: 20 80 20 20
 
-    StandModeBox
+    TopToggleButton
       id: standPosture
+      image-source: /images/inventory/buttons_general
+      image-clip: 0 0 20 20
       anchors.left: attack.left
       anchors.top: attack.bottom
       margin-top: 4
+      size: 20 20
+      @onClick: |
+        selectPosture('stand')
 
+      $pressed !disabled:
+        image-clip: 20 0 20 20
 
-    ChaseModeBox
+      $disabled:
+        image-clip: 20 0 20 20
+
+    TopToggleButton
       id: followPosture
+      image-source: /images/inventory/buttons_general
+      image-clip: 0 20 20 20
       anchors.left: standPosture.right
       anchors.top: standPosture.top
       margin-left: 1
-
-    UIWidget
-      id: pvp
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 160 20 20
-      anchors.left: followPosture.right
-      anchors.top: standPosture.top
-      &imageClipCheckedX: 20
-      &imageClipUncheckedX: 0
-      &imageClipCheckedY: 160
-      &imageClipUncheckedY: 160
-      &imageClipWidth: 20
-      margin-left: 1
-      phantom: false
       size: 20 20
       @onClick: |
-        selectPvp(self:getImageClip().x == 0)
+        selectPosture('follow')
+
+      $pressed !disabled:
+        image-clip: 20 20 20 20
+
+      $disabled:
+        image-clip: 20 20 20 20
+    SafeFightBox
+      id: pvp
+      anchors.left: followPosture.right
+      anchors.top: standPosture.top
+      margin-left: 1
+      margin-top: 0
+      phantom: false
 
     UIWidget
       id: expert
