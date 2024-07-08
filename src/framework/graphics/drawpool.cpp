@@ -384,7 +384,7 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         m_oldState = {};
     }
 
-    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = m_state]() mutable {
+    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->release();
         drawState.execute();
