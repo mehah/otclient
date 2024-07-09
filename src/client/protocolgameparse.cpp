@@ -274,7 +274,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseRuleViolationCancel(msg);
                     break;
                 case Proto::GameServerRuleViolationLock:
-                    parseRuleViolationLock(msg);
+                    if (g_game.getClientVersion() >= 1310)
+                        parseHighscores(msg);
+                    else
+                        parseRuleViolationLock(msg);
                     break;
                 case Proto::GameServerOpenOwnChannel:
                     parseOpenOwnPrivateChannel(msg);
@@ -4262,4 +4265,68 @@ void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
     }
 
     creature->setTyping(typing);
+}
+
+void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
+{
+    uint8_t isEmpty = msg->getU8();
+    if (isEmpty == 1) {
+        return;
+    }
+
+    msg->getU8(); // skip (0x01)
+    std::string serverName = msg->getString();
+    std::string world = msg->getString();
+    uint8_t worldType = msg->getU8();
+    uint8_t battlEye = msg->getU8();
+    uint8_t sizeVocation = msg->getU8();
+
+    msg->getU32(); // skip 0xFFFFFFFF
+    msg->getString(); // skip "All vocations"
+
+    std::vector<std::tuple<uint32_t, std::string>> vocations;
+    for (uint8_t i = 0; i < sizeVocation - 1; ++i) {
+        uint32_t vocationID = msg->getU32();
+        std::string vocationName = msg->getString();
+        vocations.emplace_back(vocationID, vocationName);
+    }
+
+    msg->getU32(); // skip params.vocation
+    uint8_t sizeCategories = msg->getU8();
+
+
+    std::vector<std::tuple<uint8_t, std::string>> categories;
+    categories.reserve(sizeCategories);
+    for (uint8_t i = 0; i < sizeCategories; ++i) {
+        uint8_t id = msg->getU8();
+        std::string categoryName = msg->getString();
+        categories.emplace_back(id, categoryName);
+    }
+
+    msg->getU8();  // skip params.category
+    uint16_t page = msg->getU16();
+    uint16_t totalPages = msg->getU16();
+    uint8_t sizeEntries = msg->getU8();
+
+
+    std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>> highscores;
+    highscores.reserve(sizeEntries);
+    for (uint8_t i = 0; i < sizeEntries; ++i) {
+        uint32_t rank = msg->getU32();
+        std::string name = msg->getString();
+        std::string title = msg->getString();
+        uint8_t vocation = msg->getU8();
+        std::string world = msg->getString();
+        uint16_t level = msg->getU16();
+        uint8_t isPlayer = msg->getU8();
+        uint64_t points = msg->getU64();
+        highscores.emplace_back(rank, name, title, vocation, world, level, isPlayer, points);
+    }
+
+    msg->getU8(); // skip (0xFF) unknown
+    msg->getU8(); // skip display loyalty title column
+    msg->getU8(); // skip HIGHSCORES_CATEGORIES[params.category].type or 0x00
+    uint32_t entriesTs = msg->getU32(); // last update
+
+    g_game.processHighscore(serverName, world, worldType, battlEye, vocations, categories, page, totalPages, highscores, entriesTs);
 }
