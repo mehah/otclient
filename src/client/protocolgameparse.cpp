@@ -545,7 +545,11 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerBosstiaryCooldownTimer:
                     parseBosstiaryCooldownTimer(msg);
                     break;
+                case Proto::GameServerTakeScreenshot:
+                    parseTakeScreenshot(msg);
+                    break;
 
+                    // OTC custom server communication
                 case Proto::GameServerAttchedEffect:
                     parseAttachedEffect(msg);
                     break;
@@ -4162,6 +4166,12 @@ void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg) {
 
 void ProtocolGame::parseBosstiaryEntryChanged(const InputMessagePtr& msg) {
     msg->getU32(); // bossId
+}
+
+void ProtocolGame::parseTakeScreenshot(const InputMessagePtr& msg) {
+
+    const uint8_t screenshotType = msg->getU8();      //Type id screenshot
+    m_localPlayer->takeScreenshot(screenshotType);
 }
 
 void ProtocolGame::parseAttachedEffect(const InputMessagePtr& msg) {
