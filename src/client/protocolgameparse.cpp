@@ -3704,18 +3704,29 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
     const uint8_t slot = msg->getU8(); // slot
     const auto state = static_cast<Otc::PreyState_t>(msg->getU8()); // slot state
 
+    uint32_t nextFreeReroll = 0; // next free roll
+    uint8_t wildcards = 0; // wildcards
+
     switch (state) {
         case Otc::PREY_STATE_LOCKED:
         {
             const Otc::PreyUnlockState_t unlockState = static_cast<Otc::PreyUnlockState_t>(msg->getU8()); // prey slot unlocked
-            const uint32_t nextFreeReroll = msg->getU32(); // next free roll
-            const uint8_t wildcards = msg->getU8(); // wildcards
+            if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
+                nextFreeReroll = msg->getU32();
+                wildcards = msg->getU8();
+            } else {
+                nextFreeReroll = msg->getU16();
+            }
             return g_lua.callGlobalField("g_game", "onPreyLocked", slot, unlockState, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_INACTIVE:
         {
-            const uint32_t nextFreeReroll = msg->getU32(); // next free roll
-            const uint8_t wildcards = msg->getU8(); // wildcards
+            if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
+                nextFreeReroll = msg->getU32();
+                wildcards = msg->getU8();
+            } else {
+                nextFreeReroll = msg->getU16();
+            }
             return g_lua.callGlobalField("g_game", "onPreyInactive", slot, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_ACTIVE:
@@ -3725,8 +3736,12 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             const uint16_t bonusValue = msg->getU16(); // bonus value
             const uint8_t bonusGrade = msg->getU8(); // bonus grade
             const uint16_t timeLeft = msg->getU16(); // time left
-            const uint32_t nextFreeReroll = msg->getU32(); // next free roll
-            const uint8_t wildcards = msg->getU8(); // wildcards
+            if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
+                nextFreeReroll = msg->getU32();
+                wildcards = msg->getU8();
+            } else {
+                nextFreeReroll = msg->getU16();
+            }
             return g_lua.callGlobalField("g_game", "onPreyActive", slot, monster.name, monster.outfit, bonusType, bonusValue, bonusGrade, timeLeft, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_SELECTION:
@@ -3738,8 +3753,13 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
                 names.push_back(monster.name);
                 outfits.push_back(monster.outfit);
             }
-            const uint32_t nextFreeReroll = msg->getU32(); // next free roll
-            const uint8_t wildcards = msg->getU8(); // wildcards
+
+            if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
+                nextFreeReroll = msg->getU32();
+                wildcards = msg->getU8();
+            } else {
+                nextFreeReroll = msg->getU16();
+            }
             return g_lua.callGlobalField("g_game", "onPreySelection", slot, names, outfits, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_SELECTION_CHANGE_MONSTER:
@@ -3754,8 +3774,13 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
                 names.push_back(monster.name);
                 outfits.push_back(monster.outfit);
             }
-            const uint32_t nextFreeReroll = msg->getU32(); // next free roll
-            const uint8_t wildcards = msg->getU8(); // wildcards
+
+            if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
+                nextFreeReroll = msg->getU32();
+                wildcards = msg->getU8();
+            } else {
+                nextFreeReroll = msg->getU16();
+            }
             return g_lua.callGlobalField("g_game", "onPreySelectionChangeMonster", slot, names, outfits, bonusType, bonusValue, bonusGrade, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_LIST_SELECTION:
@@ -3765,8 +3790,13 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             for (auto i = 0; i < creatures; ++i) {
                 races.push_back(msg->getU16()); // RaceID
             }
-            const uint32_t nextFreeReroll = msg->getU32(); // next free roll
-            const uint8_t wildcards = msg->getU8(); // wildcards
+
+            if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
+                nextFreeReroll = msg->getU32();
+                wildcards = msg->getU8();
+            } else {
+                nextFreeReroll = msg->getU16();
+            }
             return g_lua.callGlobalField("g_game", "onPreyListSelection", slot, races, nextFreeReroll, wildcards);
         }
         case Otc::PREY_STATE_WILDCARD_SELECTION:
@@ -3780,8 +3810,13 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             for (auto i = 0; i < creatures; ++i) {
                 races.push_back(msg->getU16()); // RaceID
             }
-            const uint32_t nextFreeReroll = msg->getU32(); // next free roll
-            const uint8_t wildcards = msg->getU8(); // wildcards
+
+            if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
+                nextFreeReroll = msg->getU32();
+                wildcards = msg->getU8();
+            } else {
+                nextFreeReroll = msg->getU16();
+            }
             return g_lua.callGlobalField("g_game", "onPreyWildcardSelection", slot, races, nextFreeReroll, wildcards);
         }
     }
