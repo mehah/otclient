@@ -124,7 +124,7 @@ public:
         return false;
 #endif
     }
-
+    void doScreenshot(std::string file);
     void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
 
 protected:

@@ -35,6 +35,7 @@
 #include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
 #include "framework/stdext/time.h"
+#include <framework/graphics/image.h>
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
@@ -289,4 +290,41 @@ void GraphicalApplication::setLoadingAsyncTexture(bool v) {
 
     if (m_drawEvents)
         m_drawEvents->onLoadingAsyncTextureChanged(v);
+}
+
+void GraphicalApplication::doScreenshot(std::string file)
+{
+    /*
+    if (g_mainThreadId != std::this_thread::get_id()) {
+            if (&g_mainDispatcher == this && g_mainThreadId == getThreadId()) {
+        g_graphicsDispatcher.addEvent(std::bind(&GraphicalApplication::doScreenshot, this, file));
+        return;
+    }
+
+    */
+
+    if (file.empty()) {
+        file = "screenshot.png";
+    }
+
+    auto resolution = g_graphics.getViewportSize();
+    int width = resolution.width();
+    int height = resolution.height();
+    auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+
+    g_mainDispatcher.addEvent([resolution, pixels, file] {
+        for (int line = 0, h = resolution.height(), w = resolution.width(); line != h / 2; ++line) {
+            std::swap_ranges(
+                pixels->begin() + 4 * w * line,
+                pixels->begin() + 4 * w * (line + 1),
+                pixels->begin() + 4 * w * (h - line - 1));
+        }
+        try {
+            Image image(resolution, 4, pixels->data());
+            image.savePNG(file);
+        } catch (stdext::exception& e) {
+            g_logger.error(std::string("Can't do screenshot: ") + e.what());
+        }
+    });
 }
