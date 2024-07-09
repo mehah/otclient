@@ -43,17 +43,10 @@ void UIItem::drawSelf(DrawPoolType drawPane)
     if (m_itemVisible && m_item) {
         const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
 
-        if (m_item->hasShader() && m_item->getShader()->useFramebuffer()) {
-            g_drawPool.setScaleFactor(getPaddingRect().size().bigger() / static_cast<float>(exactSize));
-            m_item->setColor(m_color);
-            m_item->draw(getPaddingRect().topLeft());
-            g_drawPool.setScaleFactor(1.f);
-        } else {
-            g_drawPool.bindFrameBuffer(exactSize);
-            m_item->setColor(m_color);
-            m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
-            g_drawPool.releaseFrameBuffer(getPaddingRect());
-        }
+        g_drawPool.bindFrameBuffer(exactSize);
+        m_item->setColor(m_color);
+        m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
+        g_drawPool.releaseFrameBuffer(getPaddingRect());
 
         if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
             static const Color STACK_COLOR(231, 231, 231);

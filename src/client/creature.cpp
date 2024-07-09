@@ -114,29 +114,17 @@ void Creature::draw(const Rect& destRect, uint8_t size, bool center)
     if (size > 0)
         frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
 
-    const auto& draw = [&](const Point& p) {
+    g_drawPool.bindFrameBuffer(frameSize); {
+        auto p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
+        if (center)
+            p /= 2;
+
         internalDraw(p);
         if (isMarked())
             internalDraw(p, getMarkedColor());
         else if (isHighlighted())
             internalDraw(p, getHighlightColor());
-    };
-
-    if (hasShader() && getShader()->useFramebuffer()) {
-        g_drawPool.setScaleFactor(destRect.size().bigger() / static_cast<float>(frameSize));
-        auto p = destRect.topLeft();
-        if (center)
-            p += (frameSize / 1.25);
-        draw(p);
-        g_drawPool.setScaleFactor(1.f);
-    } else {
-        g_drawPool.bindFrameBuffer(frameSize); {
-            auto p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
-            if (center)
-                p /= 2;
-            draw(p);
-        } g_drawPool.releaseFrameBuffer(destRect);
-    }
+    } g_drawPool.releaseFrameBuffer(destRect);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags)
