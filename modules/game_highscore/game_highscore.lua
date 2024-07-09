@@ -1,12 +1,6 @@
 -- @ widgets
 local highscoreButton, worldTypeRadioGroup = nil, nil
 
--- @ delete this v
-local ComboWindow
-local devMode = true
-
--- @
-
 -- @ number
 local currentPage, countPages = 0, 0
 local entriesPerPage = 20
@@ -88,12 +82,6 @@ function highscoreController:onInit()
         onProcessHighscores = onProcessHighscores
     })
 
-    -- @ delete this V
-    if devMode then
-        TryInCanary()
-    end
-
-    -- @
 end
 
 function highscoreController:onTerminate()
@@ -105,13 +93,6 @@ function highscoreController:onTerminate()
         worldTypeRadioGroup:destroy()
         worldTypeRadioGroup = nil
     end
-
-    -- @ delete this V
-    if devMode and ComboWindow then
-        ComboWindow:destroy()
-        ComboWindow = nil
-    end
-    -- @
 
 end
 
@@ -195,10 +176,6 @@ end
 function highscoreController:onGameEnd()
     if highscoreController.ui:isVisible() then
         highscoreController.ui:hide()
-    end
-    if ComboWindow then
-        ComboWindow:destroy()
-        ComboWindow = nil
     end
 end
 function hide()
@@ -295,21 +272,6 @@ function highscoreRequest(currentPage, typex)
 
     g_game.requestHighscore(typex, categoryId, id, serverSide.world, serverSide.worldType, serverSide.battlEye,
         currentPage, serverSide.totalInPages)
-    if devMode then
-        local values = {
-            NOMBBRE = "requestHighscore",
-            action = typex,
-            category = categoryId,
-            vocation = id,
-            world = serverSide.world,
-            worldType = serverSide.worldType,
-            battlEye = serverSide.battlEye,
-            page = currentPage,
-            totalInPages = serverSide.totalInPages
-        }
-
-        pdump(values)
-    end
 end
 
 function requestInfo()
@@ -318,90 +280,3 @@ function requestInfo()
         serverSide.worldType, serverSide.battlEye, serverSide.page, serverSide.totalInPages)
 
 end
-
--- @ delete this  V  ( im trying in canary without own server)
-function TryInCanary()
-    local toolsButton = g_ui.createWidget("Button", highscoreController.ui)
-    toolsButton:setText(tr('dev'))
-
-    toolsButton:addAnchor(AnchorLeft, "parent", AnchorLeft)
-    toolsButton:addAnchor(AnchorBottom, "parent", AnchorBottom)
-    toolsButton:setMarginRight(10)
-
-    toolsButton.onClick = function()
-        ComboWindow = g_ui.createWidget("MainWindow", rootWidget)
-        ComboWindow:setText(tr('me trying in canary, without own server jaja'))
-        ComboWindow:setSize("300 320")
-        ComboWindow.onEscape = function()
-            ComboWindow:hide()
-        end
-
-        local function createTextEditWithLabel(parent, id, topMargin, labelText, text)
-            local textEdit = g_ui.createWidget("TextEdit", parent)
-            textEdit:setId(id)
-            textEdit:addAnchor(AnchorTop, 'parent', AnchorTop)
-            textEdit:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-            textEdit:setMarginLeft(10)
-            textEdit:setMarginTop(topMargin)
-            textEdit:setSize("150 20")
-            textEdit:setText(text)
-
-            local label = g_ui.createWidget("Label", parent)
-            label:setColoredText(labelText)
-            label:addAnchor(AnchorLeft, textEdit:getId(), AnchorRight)
-            label:addAnchor(AnchorTop, textEdit:getId(), AnchorTop)
-            label:setMarginLeft(5)
-        end
-
-        createTextEditWithLabel(ComboWindow, "action", 10, "action {addU8, #ff00ff}", 0)
-        createTextEditWithLabel(ComboWindow, "category", 40, tr('category   {addU8, #ff00ff}'), 0)
-        createTextEditWithLabel(ComboWindow, "vocation", 70, tr('vocation   {addU32, #ff00ff} '), 0xFFFFFFFF)
-        createTextEditWithLabel(ComboWindow, "world", 100, tr('world  {addString, #ff00ff}'), "")
-        createTextEditWithLabel(ComboWindow, "worldType", 130, tr('worldType   {addU8, #ff00ff}'), 1)
-        createTextEditWithLabel(ComboWindow, "battlEye", 160, tr('battlEye  {addU8, #ff00ff} '), 1)
-        createTextEditWithLabel(ComboWindow, "page", 190, tr('page  {addU16, #ff00ff} '), 3)
-        createTextEditWithLabel(ComboWindow, "totalInPages", 220, tr('totalInPages {addU8, #ff00ff} '), 20)
-
-        local closeButton = g_ui.createWidget("Button", ComboWindow)
-        closeButton:setText(tr('Close'))
-
-        closeButton:addAnchor(AnchorRight, 'parent', AnchorRight)
-        closeButton:addAnchor(AnchorBottom, 'parent', AnchorBottom)
-        closeButton:setMarginTop(15)
-        closeButton:setMarginRight(5)
-        closeButton.onClick = function()
-            ComboWindow:destroy()
-        end
-        local sendButton = g_ui.createWidget("Button", ComboWindow)
-        sendButton:setText(tr('send'))
-
-        sendButton:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-        sendButton:addAnchor(AnchorBottom, 'parent', AnchorBottom)
-        sendButton:setMarginTop(15)
-        sendButton:setMarginLeft(5)
-        sendButton.onClick = function()
-
-            g_game.requestHighscore(tonumber(ComboWindow.action:getText()), tonumber(ComboWindow.category:getText()),
-                tonumber(ComboWindow.vocation:getText()), ComboWindow.world:getText(),
-                tonumber(ComboWindow.worldType:getText()), tonumber(ComboWindow.battlEye:getText()),
-                tonumber(ComboWindow.page:getText()), tonumber(ComboWindow.totalInPages:getText()))
-
-            local values = {
-                NOMBBRE = "DEV",
-                action = tonumber(ComboWindow.action:getText()),
-                category = tonumber(ComboWindow.category:getText()),
-                vocation = tonumber(ComboWindow.vocation:getText()),
-                world = ComboWindow.world:getText(),
-                worldType = tonumber(ComboWindow.worldType:getText()),
-                battlEye = tonumber(ComboWindow.battlEye:getText()),
-                page = tonumber(ComboWindow.page:getText()),
-                totalInPages = tonumber(ComboWindow.totalInPages:getText())
-            }
-
-            pdump(values)
-
-        end
-    end
-end
-
--- @
