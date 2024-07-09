@@ -1,0 +1,9 @@
+Module
+  name: game_screenshot
+  description: game_screenshot
+  author: game_screenshot
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  scripts: [ game_screenshot ]
+  @onLoad: screenshotController:init()
+  @onUnload: screenshotController:terminate()
