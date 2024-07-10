@@ -234,6 +234,7 @@ namespace Proto
         // 51 - 99
 
         // original tibia ONLY
+        ClientImbuementDurations = 96,
         ClientAutoWalk = 100,
         ClientWalkNorth = 101,
         ClientWalkEast = 102,

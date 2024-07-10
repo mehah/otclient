@@ -3423,22 +3423,30 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
 void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
 {
     const uint8_t itemListSize = msg->getU8(); // amount of items to display
+
+    std::vector<ImbuementTrackerItem> items;
     for (auto itemIndex = 0; itemIndex < itemListSize; ++itemIndex) {
-        msg->getU8(); // item slot id
-        getItem(msg); // imbued item
+        ImbuementTrackerItem item(msg->getU8());
+        item.item = getItem(msg);
 
-        const uint8_t imbuingSlotCount = msg->getU8(); // total amount of imbuing slots on item
-        for (auto imbuIndex = 0; imbuIndex < imbuingSlotCount; ++imbuIndex) {
+        std::map<uint8_t, ImbuementSlot> slots;
+        const uint8_t slotsCount = msg->getU8(); // total amount of imbuing slots on item
+        for (auto slotIndex = 0; slotIndex < slotsCount; ++slotIndex) {
             bool slotImbued = msg->getU8(); // 0 - empty, 1 - imbued
-
+            ImbuementSlot slot(slotIndex);
             if (slotImbued) {
-                msg->getString(); // imbuement name
-                msg->getU16(); // imbuement icon id
-                msg->getU32(); // imbuement duration (NOTE: this is a SIGNED 32-bit variable)
-                msg->getU8(); // decaystate: 0 - paused, 1 - decaying
+                slot.name = msg->getString();
+                slot.iconId = msg->getU16();
+                slot.duration = msg->getU32();
+                slot.state = msg->getU8(); // 0 - paused, 1 - decaying
             }
+            slots.emplace(slotIndex, slot);
         }
+
+        item.slots = slots;
+        items.emplace_back(item);
     }
+    g_lua.callGlobalField("g_game", "onUpdateImbuementTracker", items);
 }
 
 void ProtocolGame::parsePassiveCooldown(const InputMessagePtr& msg)

@@ -241,6 +241,32 @@ int push_luavalue(const Imbuement& i)
     return 1;
 }
 
+int push_luavalue(const ImbuementTrackerItem& i)
+{
+    g_lua.createTable(0, 3);
+    g_lua.pushInteger(i.slot);
+    g_lua.setField("slot");
+    g_lua.pushObject(i.item);
+    g_lua.setField("item");
+    g_lua.createTable(i.slots.size(), 0);
+    for (auto& [id, slot] : i.slots) {
+        g_lua.createTable(0, 5);
+        g_lua.pushInteger(id);
+        g_lua.setField("id");
+        g_lua.pushString(slot.name);
+        g_lua.setField("name");
+        g_lua.pushInteger(slot.iconId);
+        g_lua.setField("iconId");
+        g_lua.pushInteger(slot.duration);
+        g_lua.setField("duration");
+        g_lua.pushBoolean(slot.state);
+        g_lua.setField("state");
+        g_lua.rawSeti(id + 1);
+    }
+    g_lua.setField("slots");
+    return 1;
+}
+
 bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints)
 {
     if (!g_lua.isTable(index))

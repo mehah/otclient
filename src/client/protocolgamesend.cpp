@@ -1154,3 +1154,11 @@ void ProtocolGame::sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t 
     msg->addU8(totalPages);
     send(msg);
 }
+
+void ProtocolGame::sendImbuementDurations(bool isOpen)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientImbuementDurations);
+    msg->addU8(isOpen ? 0x01 : 0x00);
+    send(msg);
+}

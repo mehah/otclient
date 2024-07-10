@@ -1719,3 +1719,10 @@ void Game::processHighscore(const std::string& serverName, const std::string& wo
 {
     g_lua.callGlobalField("g_game", "onProcessHighscores", serverName, world, worldType, battlEye, vocations, categories, page, totalPages, highscores, entriesTs);
 }
+
+void Game::imbuementDurations(bool isOpen)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendImbuementDurations(isOpen);
+}
