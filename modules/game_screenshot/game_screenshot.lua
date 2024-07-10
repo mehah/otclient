@@ -167,7 +167,7 @@ function onScreenShot(type)
     if not optionPanel.Opciones3.enableScreenshots:isChecked() then
         return
     end
-    local name = g_game.getLocalPlayer():getName()
+    local name = g_game.getLocalPlayer():getName() or "player"
     local level = g_game.getLocalPlayer():getLevel() or 1
     for _, evento in ipairs(AutoScreenshotEvents) do
         if evento.id == type and evento.currentBoolean then
