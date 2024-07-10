@@ -43,7 +43,8 @@ local AutoScreenshotEvents = {
 -- LuaFormatter on
 
 -- @ widget
-local evento
+local evento = nil
+local optionPanel = nil
 -- @
 -- @ variables
 local autoScreenshotDirName = "auto_screenshots"
@@ -97,7 +98,7 @@ end
 
 function screenshotController:onGameEnd()
     if g_game.getClientVersion() >= 1310 then
-        modules.client_options.removeTab('Screenshot')
+        destroyOptionsModule()
     end
     if evento then
         removeEvent(evento)
@@ -154,7 +155,11 @@ end
 
 function destroyOptionsModule()
     modules.client_options.removeTab('Screenshot')
-    optionPanel = nil
+    if optionPanel and not optionPanel:isDestroyed() then
+        optionPanel:destroy()
+        optionPanel = nil
+    end
+
 end
 
 function onScreenShot(type)
