@@ -294,15 +294,6 @@ void GraphicalApplication::setLoadingAsyncTexture(bool v) {
 
 void GraphicalApplication::doScreenshot(std::string file)
 {
-    /*
-    if (g_mainThreadId != std::this_thread::get_id()) {
-            if (&g_mainDispatcher == this && g_mainThreadId == getThreadId()) {
-        g_graphicsDispatcher.addEvent(std::bind(&GraphicalApplication::doScreenshot, this, file));
-        return;
-    }
-
-    */
-
     if (file.empty()) {
         file = "screenshot.png";
     }
