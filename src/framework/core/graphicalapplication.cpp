@@ -307,24 +307,67 @@ void GraphicalApplication::doScreenshot(std::string file)
         file = "screenshot.png";
     }
 
-    auto resolution = g_graphics.getViewportSize();
-    int width = resolution.width();
-    int height = resolution.height();
-    auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
-
-    g_mainDispatcher.addEvent([resolution, pixels, file] {
-        for (int line = 0, h = resolution.height(), w = resolution.width(); line != h / 2; ++line) {
-            std::swap_ranges(
-                pixels->begin() + 4 * w * line,
-                pixels->begin() + 4 * w * (line + 1),
-                pixels->begin() + 4 * w * (h - line - 1));
-        }
+    g_mainDispatcher.addEvent([this, file] {
         try {
-            Image image(resolution, 4, pixels->data());
-            image.savePNG(file);
-        } catch (stdext::exception& e) {
-            g_logger.error(std::string("Can't do screenshot: ") + e.what());
+            auto windowSize = g_window.getSize();
+            int width = windowSize.width();
+            int height = windowSize.height();
+
+            g_logger.info(stdext::format("Attempting screenshot of size %dx%d", width, height));
+
+            if (width <= 0 || height <= 0) {
+                throw stdext::exception("Invalid window size");
+            }
+
+            auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glReadBuffer(GL_BACK);
+
+            glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels->data());
+
+            GLenum error = glGetError();
+            if (error != GL_NO_ERROR) {
+                throw stdext::exception(stdext::format("OpenGL error occurred while reading pixels: %d", error));
+            }
+
+            g_asyncDispatcher.submit_task([width, height, pixels, file] {
+                try {
+                    std::vector<uint8_t> flippedPixels(width * height * 4);
+
+                    // Flip the image vertically and set alpha to 255
+                    for (int y = 0; y < height; ++y) {
+                        for (int x = 0; x < width; ++x) {
+                            int srcIndex = (y * width + x) * 4;
+                            int dstIndex = ((height - 1 - y) * width + x) * 4;
+
+                            flippedPixels[dstIndex] = (*pixels)[srcIndex];       // R
+                            flippedPixels[dstIndex + 1] = (*pixels)[srcIndex + 1]; // G
+                            flippedPixels[dstIndex + 2] = (*pixels)[srcIndex + 2]; // B
+                            flippedPixels[dstIndex + 3] = 255;                     // A (set to 255) ALPHA ERROR SOLVE
+                        }
+                    }
+
+                    Image image(Size(width, height), 4, flippedPixels.data());
+                    image.savePNG(file);
+
+                    g_logger.info(stdext::format("Screenshot saved to: %s", file));
+                    g_logger.info(stdext::format("Image size: %d bytes", flippedPixels.size()));
+
+                    // Log some sample pixel values
+                    g_logger.info("Sample pixel values (RGBA):");
+                    for (int i = 0; i < 5; ++i) {
+                        int index = i * width * 4;
+                        g_logger.info(stdext::format("Pixel %d: %d %d %d %d", i,
+                                      flippedPixels[index], flippedPixels[index + 1],
+                                      flippedPixels[index + 2], flippedPixels[index + 3]));
+                    }
+                } catch (const stdext::exception& e) {
+                    g_logger.error(stdext::format("Can't save screenshot: %s", e.what()));
+                }
+            });
+        } catch (const stdext::exception& e) {
+            g_logger.error(stdext::format("Can't capture screenshot: %s", e.what()));
         }
     });
 }
