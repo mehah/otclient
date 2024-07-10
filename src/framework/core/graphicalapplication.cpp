@@ -315,17 +315,10 @@ void GraphicalApplication::doScreenshot(std::string file)
         glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
 
         g_asyncDispatcher.detach_task([resolution, pixels, file] {
-            for (int line = 0, h = resolution.height(), w = resolution.width(); line != h / 2; ++line) {
-                std::swap_ranges(
-                    pixels->begin() + 4 * w * line,
-                    pixels->begin() + 4 * w * (line + 1),
-                    pixels->begin() + 4 * w * (h - line - 1));
-            }
-            for (auto i = 3; i < pixels->size(); i += 4) {
-                (*pixels)[i] = 255; // set alpha to 255
-            }
             try {
                 Image image(resolution, 4, pixels->data());
+                image.flipVertically();
+                image.setOpacity(255);
                 image.savePNG(file);
             } catch (stdext::exception& e) {
                 g_logger.error(std::string("Can't do screenshot: ") + e.what());
