@@ -68,20 +68,20 @@ function screenshotController:onTerminate()
 end
 
 function screenshotController:onGameStart()
-    if g_game.getClientVersion() < 1310 then
+    if g_game.getClientVersion() < 1180 then
         return
     end
     optionPanel = g_ui.loadUI('game_screenshot')
     modules.client_options.addTab('Screenshot', optionPanel, '/images/icons/icon_misc')
 
-    for _, temp in ipairs(AutoScreenshotEvents) do
+    for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
         local label = g_ui.createWidget("ScreenshotType", optionPanel.allCheckBox)
-        local settingKey = temp.label:gsub("%s+", "")
-        local setings = g_settings.getBoolean(settingKey)
-        label.text:setText(temp.label)
-        label.enabled:setChecked(setings)
-        label.enabled:setId(temp.id)
-        temp.currentBoolean = setings
+        local settingKey = screenshotEvent.label:gsub("%s+", "")
+        local settings = g_settings.getBoolean(settingKey) or screenshotEvent.enableDefault
+        label.text:setText(screenshotEvent.label)
+        label.enabled:setChecked(settings)
+        label.enabled:setId(screenshotEvent.id)
+        screenshotEvent.currentBoolean = settings
     end
 
     if not g_resources.directoryExists(autoScreenshotDir) then
@@ -94,16 +94,16 @@ function screenshotController:onGameStart()
 end
 
 function screenshotController:onGameEnd()
-    if g_game.getClientVersion() >= 1310 then
+    if g_game.getClientVersion() >= 1180 then
         destroyOptionsModule()
     end
     if screenshotScheduleEvent then
         removeEvent(screenshotScheduleEvent)
         screenshotScheduleEvent = nil
     end
-    for _, evento in ipairs(AutoScreenshotEvents) do
-        local labelSinEspacios = evento.label:gsub("%s+", "")
-        g_settings.set(labelSinEspacios, evento.currentBoolean)
+    for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
+        local labelScreenshotEvent = screenshotEvent.label:gsub("%s+", "")
+        g_settings.set(labelScreenshotEvent, screenshotEvent.currentBoolean)
     end
 end
 
@@ -112,9 +112,9 @@ function onUICheckBox(widget, checked)
         return
     end
     local id = tonumber(widget:getId())
-    for _, temp in ipairs(AutoScreenshotEvents) do
-        if temp.id == id then
-            temp.currentBoolean = checked
+    for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
+        if screenshotEvent.id == id then
+            screenshotEvent.currentBoolean = checked
             break
         end
     end
@@ -122,20 +122,18 @@ end
 
 -- LuaFormatter off
 function resetValues()
-    for _, evento in ipairs(AutoScreenshotEvents) do
-        local labelSinEspacios = evento.label:gsub("%s+", "")
-        g_settings.set(labelSinEspacios, evento.currentBoolean)
-
+    for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
+        local labelScreenshotEvent = screenshotEvent.label:gsub("%s+", "")
+        g_settings.set(labelScreenshotEvent, screenshotEvent.currentBoolean)
     end
-
-    for _, i in pairs(optionPanel.allCheckBox:getChildren()) do
-        for _, j in pairs(i:getChildren()) do
-            if j:getStyle().__class == 'UICheckBox' then
-                local id = tonumber(j:getId())
+    for _, selectedCheckBox in pairs(optionPanel.allCheckBox:getChildren()) do
+        for _, selectedCheckBoxChildren in pairs(selectedCheckBox:getChildren()) do
+            if selectedCheckBoxChildren:getStyle().__class == 'UICheckBox' then
+                local id = tonumber(selectedCheckBoxChildren:getId())
                 if id then
-                    for _, evento in ipairs(AutoScreenshotEvents) do
-                        if evento.id == id then                
-                            j:setChecked(evento.enableDefault)
+                    for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
+                        if screenshotEvent.id == id then                
+                            selectedCheckBoxChildren:setChecked(screenshotEvent.enableDefault)
                             break
                         end
                     end
@@ -160,9 +158,9 @@ function onScreenShot(type)
     end
     local name = g_game.getLocalPlayer():getName() or "player"
     local level = g_game.getLocalPlayer():getLevel() or 1
-    for _, evento in ipairs(AutoScreenshotEvents) do
-        if evento.id == type and evento.currentBoolean then
-            local screenshotName = name .. level .. "_" .. evento.label:gsub("%s+", "") .. "_" ..
+    for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
+        if screenshotEvent.id == type and screenshotEvent.currentBoolean then
+            local screenshotName = name .. level .. "_" .. screenshotEvent.label:gsub("%s+", "") .. "_" ..
                                        os.date("%Y%m%d%H%M%S") .. ".png"
             takeScreenshot("/" .. autoScreenshotDirName .. "/" .. screenshotName)
             return
@@ -186,6 +184,6 @@ function takeScreenshot(name)
 end
 
 function OpenFolder()
-    local dir = g_resources.getWriteDir():gsub("[/\\]+", "\\") .. autoScreenshotDirName
-    g_platform.openDir(dir)
+    local directory = g_resources.getWriteDir():gsub("[/\\]+", "\\") .. autoScreenshotDirName
+    g_platform.openDir(directory)
 end
