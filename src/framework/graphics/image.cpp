@@ -235,7 +235,7 @@ void Image::flipVertically()
 }
 
 void Image::setOpacity(const uint8_t v) {
-    for (auto i = 3; i < m_pixels.size(); i += 4)
+    for (size_t i = 3, s = m_pixels.size(); i < s; i += 4)
         m_pixels[i] = v;
 }
 
