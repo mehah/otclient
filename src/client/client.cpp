@@ -27,6 +27,7 @@
 #include "minimap.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
+#include "gameconfig.h"
 
 #include <framework/ui/ui.h>
 #include <framework/core/eventdispatcher.h>
@@ -134,36 +135,5 @@ void Client::doMapScreenshot(std::string file)
     if (!m_mapWidget)
         return;
 
-    if (file.empty()) {
-        file = "map_screenshot.png";
-    }
-
-    g_mainDispatcher.addEvent([file, mapRect = m_mapWidget->m_mapRect] {
-        const auto& resolution = mapRect.size();
-        const auto width = resolution.width();
-        const auto height = resolution.height();
-        const auto& pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
-        const auto ajustY = g_graphics.getViewportSize().height() - mapRect.size().height();
-        const auto border = 8;
-
-        glReadPixels(mapRect.x(), mapRect.y() + ajustY - border, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
-
-        g_asyncDispatcher.detach_task([resolution, pixels, file] {
-            for (int line = 0, h = resolution.height(), w = resolution.width(); line != h / 2; ++line) {
-                std::swap_ranges(
-                    pixels->begin() + 4 * w * line,
-                    pixels->begin() + 4 * w * (line + 1),
-                    pixels->begin() + 4 * w * (h - line - 1));
-            }
-            for (auto i = 3; i < pixels->size(); i += 4) {
-                (*pixels)[i] = 255; // set alpha to 255
-            }
-            try {
-                Image image(resolution, 4, pixels->data());
-                image.savePNG(file);
-            } catch (stdext::exception& e) {
-                g_logger.error(std::string("Can't do screenshot: ") + e.what());
-            }
-        });
-    });
+    g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()->doScreenshot(file, g_gameConfig.getSpriteSize() * 3, g_gameConfig.getSpriteSize() * 3);
 }

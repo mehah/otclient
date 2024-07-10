@@ -155,26 +155,21 @@ Size FrameBuffer::getSize()
     return m_texture->getSize();
 }
 
-void FrameBuffer::doScreenshot(std::string file)
+void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_t y)
 {
-    /*
-    if (g_mainThreadId != std::this_thread::get_id()) {
-        g_graphicsDispatcher.addEvent(std::bind(&FrameBuffer::doScreenshot, this, fileName));
-        return;
-    }
-     */
-   
     if (file.empty()) {
         file = "screenshot_map.png";
     }
 
-    g_mainDispatcher.addEvent([this, file] {
+    g_mainDispatcher.addEvent([this, file, x, y] {
         this->internalBind();
-        Size size = this->getSize();
+        Size size = getSize();
+        size.setWidth(size.width() - x);
+        size.setHeight(size.height() - y);
         int width = size.width();
         int height = size.height();
         auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
-        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+        glReadPixels(x / 3, y / 1.5, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
         this->internalRelease();
 
         g_asyncDispatcher.detach_task([size, pixels, file] {
@@ -185,7 +180,7 @@ void FrameBuffer::doScreenshot(std::string file)
                     pixels->begin() + 4 * w * (h - line - 1));
             }
             for (auto i = 3; i < pixels->size(); i += 4) {
-                (*pixels)[i] = 255; 
+                (*pixels)[i] = 255;
             }
             try {
                 Image image(size, 4, pixels->data());
