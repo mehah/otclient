@@ -552,7 +552,6 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseTakeScreenshot(msg);
                     break;
 
-                    // OTC custom server communication
                 case Proto::GameServerAttchedEffect:
                     parseAttachedEffect(msg);
                     break;
@@ -4207,8 +4206,7 @@ void ProtocolGame::parseBosstiaryEntryChanged(const InputMessagePtr& msg) {
 }
 
 void ProtocolGame::parseTakeScreenshot(const InputMessagePtr& msg) {
-
-    const uint8_t screenshotType = msg->getU8();      //Type id screenshot
+    const uint8_t screenshotType = msg->getU8(); 
     m_localPlayer->takeScreenshot(screenshotType);
 }
 

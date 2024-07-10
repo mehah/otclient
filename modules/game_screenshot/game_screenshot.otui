@@ -6,7 +6,7 @@ Panel
     height: 22
 
     OptionCheckBoxMarked
-      id: wtfIsThis
+      id: onlyCaptureGameWindow
       !text: tr('Only Capture Game Window')
       !tooltip: tr('If you check this option, the screenshots will only be taken from\nthe game window instead of the complete client interface. This\nmight improve your game performance, particularly if you have\nticked the Screenshot Backlog option.')
 
@@ -18,11 +18,9 @@ Panel
     height: 22
   
     OptionCheckBoxMarked
-      id: wtfIsThis2
+      id: keepBlacklog
       !text: tr('Keep Blacklog of the Screenshots of the Last 5 Seconds')
       !tooltip: tr('If you check this option, the client takes a screenshot every\nsecond and caches the last 5 of them. Whenever a screenshot is\ntaken either automatically for a selected event or manually using a\nhotkey, also the screenshots of the previous 5 seconds will be\nsaved.\nIf you experience frame stuttering, you should consider disabling\nthis option..')
-
-
 
   SmallReversedQtPanel
     id: Opciones3
@@ -61,14 +59,13 @@ Panel
       flow: true
       fit-children: true
 
-
-      
   Button
     !text: tr('Reset')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     @onClick: modules.game_screenshot.resetValues()
+    
   Button
     !text: tr('Open Screenshots Folder') 
     width: 164
@@ -80,7 +77,6 @@ ScreenshotType < UIWidget
   background-color: alpha
   text-offset: 35 1
   focusable: true
-
   font: verdana-11px-rounded
   text-align: left
 
