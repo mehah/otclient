@@ -321,7 +321,7 @@ void GraphicalApplication::doScreenshot(std::string file)
                     pixels->begin() + 4 * w * (line + 1),
                     pixels->begin() + 4 * w * (h - line - 1));
             }
-            for (int i = 3; i < pixels->size(); i += 4) {
+            for (auto i = 3; i < pixels->size(); i += 4) {
                 (*pixels)[i] = 255; // set alpha to 255
             }
             try {
