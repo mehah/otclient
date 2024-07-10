@@ -1,6 +1,8 @@
 Module
   name: game_screenshot
-  description: game_screenshot
+  description: |
+    https://github.com/opentibiabr/canary/pull/2116/files
+    https://github.com/otland/forgottenserver/pull/4459
   author: game_screenshot
   website: https://github.com/mehah/otclient
   sandboxed: true
