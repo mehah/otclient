@@ -59,7 +59,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         order = DrawOrder::THIRD;
 
     if (m_alwaysGroupDrawings || conductor.agroup) {
-        auto& coords = m_coords.try_emplace(m_state.hash, nullptr).first->second;
+        auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);
             coords = m_objects[order].emplace_back(std::move(state), m_lastCoordBufferSize).coords.get();
@@ -77,7 +77,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& list = m_objects[order];
         if (!list.empty()) {
             auto& prevObj = list.back();
-            if (prevObj.state == m_state) {
+            if (prevObj.state == getCurrentState()) {
                 if (!prevObj.coords)
                     prevObj.addMethod(std::move(method));
                 else if (coordsBuffer)
@@ -127,39 +127,40 @@ void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMod
 }
 
 bool DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord) {
+    auto& state = getCurrentState();
+    state.hash = 0;
+
     { // State Hash
-        m_state.hash = 0;
-
         if (m_bindedFramebuffers)
-            stdext::hash_combine(m_state.hash, m_lastFramebufferId);
+            stdext::hash_combine(state.hash, m_lastFramebufferId);
 
-        if (m_state.blendEquation != BlendEquation::ADD)
-            stdext::hash_combine(m_state.hash, m_state.blendEquation);
+        if (state.blendEquation != BlendEquation::ADD)
+            stdext::hash_combine(state.hash, state.blendEquation);
 
-        if (m_state.compositionMode != CompositionMode::NORMAL)
-            stdext::hash_combine(m_state.hash, m_state.compositionMode);
+        if (state.compositionMode != CompositionMode::NORMAL)
+            stdext::hash_combine(state.hash, state.compositionMode);
 
-        if (m_state.opacity < 1.f)
-            stdext::hash_combine(m_state.hash, m_state.opacity);
+        if (state.opacity < 1.f)
+            stdext::hash_combine(state.hash, state.opacity);
 
-        if (m_state.clipRect.isValid())
-            stdext::hash_union(m_state.hash, m_state.clipRect.hash());
+        if (state.clipRect.isValid())
+            stdext::hash_union(state.hash, state.clipRect.hash());
 
-        if (m_state.shaderProgram)
-            stdext::hash_union(m_state.hash, m_state.shaderProgram->hash());
+        if (state.shaderProgram)
+            stdext::hash_union(state.hash, state.shaderProgram->hash());
 
-        if (m_state.transformMatrix != DEFAULT_MATRIX3)
-            stdext::hash_union(m_state.hash, m_state.transformMatrix.hash());
+        if (state.transformMatrix != DEFAULT_MATRIX3)
+            stdext::hash_union(state.hash, state.transformMatrix.hash());
 
         if (color != Color::white)
-            stdext::hash_union(m_state.hash, color.hash());
+            stdext::hash_union(state.hash, color.hash());
 
         if (texture)
-            stdext::hash_union(m_state.hash, texture->hash());
+            stdext::hash_union(state.hash, texture->hash());
     }
 
     if (hasFrameBuffer()) { // Pool Hash
-        size_t hash = m_state.hash;
+        size_t hash = state.hash;
 
         if (method.type == DrawPool::DrawMethodType::TRIANGLE) {
             if (!method.a.isNull()) stdext::hash_union(hash, method.a.hash());
@@ -184,52 +185,51 @@ bool DrawPool::updateHash(const DrawPool::DrawMethod& method, const TexturePtr& 
 
 DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
 {
-    return PoolState{
-       std::move(m_state.transformMatrix), m_state.opacity,
-       m_state.compositionMode, m_state.blendEquation,
-       std::move(m_state.clipRect), m_state.shaderProgram,
-       std::move(m_state.action), std::move(const_cast<Color&>(color)), texture, m_state.hash
-    };
+    PoolState copy = getCurrentState();
+    copy.texture = texture;
+    if (copy.color != color)
+        copy.color = color;
+    return copy;
 }
 
 void DrawPool::setCompositionMode(const CompositionMode mode, bool onlyOnce)
 {
-    m_state.compositionMode = mode;
+    getCurrentState().compositionMode = mode;
     if (onlyOnce) m_onlyOnceStateFlag |= STATE_COMPOSITE_MODE;
 }
 
 void DrawPool::setBlendEquation(BlendEquation equation, bool onlyOnce)
 {
-    m_state.blendEquation = equation;
+    getCurrentState().blendEquation = equation;
     if (onlyOnce) m_onlyOnceStateFlag |= STATE_BLEND_EQUATION;
 }
 
 void DrawPool::setClipRect(const Rect& clipRect, bool onlyOnce)
 {
-    m_state.clipRect = clipRect;
+    getCurrentState().clipRect = clipRect;
     if (onlyOnce) m_onlyOnceStateFlag |= STATE_CLIP_RECT;
 }
 
 void DrawPool::setOpacity(const float opacity, bool onlyOnce)
 {
-    m_state.opacity = opacity;
+    getCurrentState().opacity = opacity;
     if (onlyOnce) m_onlyOnceStateFlag |= STATE_OPACITY;
 }
 
 void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce, const std::function<void()>& action)
 {
-    if (g_painter->isReplaceColorShader(m_state.shaderProgram))
+    if (g_painter->isReplaceColorShader(getCurrentState().shaderProgram))
         return;
 
     if (shaderProgram) {
         if (!g_painter->isReplaceColorShader(shaderProgram.get()))
             m_shaderRefreshDelay = FPS20;
 
-        m_state.shaderProgram = shaderProgram.get();
-        m_state.action = action;
+        getCurrentState().shaderProgram = shaderProgram.get();
+        getCurrentState().action = action;
     } else {
-        m_state.shaderProgram = nullptr;
-        m_state.action = nullptr;
+        getCurrentState().shaderProgram = nullptr;
+        getCurrentState().action = nullptr;
     }
 
     if (onlyOnce) m_onlyOnceStateFlag |= STATE_SHADER_PROGRAM;
@@ -246,7 +246,7 @@ void DrawPool::resetState()
 
     m_hashCtrl.reset();
 
-    m_state = {};
+    getCurrentState() = {};
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
@@ -272,7 +272,7 @@ void DrawPool::scale(float factor)
         return;
 
     m_scale = factor;
-    m_state.transformMatrix = DEFAULT_MATRIX3 * Matrix3{
+    getCurrentState().transformMatrix = DEFAULT_MATRIX3 * Matrix3{
       factor,   0.0f,  0.0f,
         0.0f, factor,  0.0f,
         0.0f,   0.0f,  1.0f
@@ -287,7 +287,7 @@ void DrawPool::translate(float x, float y)
             0.0f,  0.0f,  1.0f
     };
 
-    m_state.transformMatrix = m_state.transformMatrix * translateMatrix.transposed();
+    getCurrentState().transformMatrix = getCurrentState().transformMatrix * translateMatrix.transposed();
 }
 
 void DrawPool::rotate(float angle)
@@ -298,7 +298,7 @@ void DrawPool::rotate(float angle)
                        0.0f,             0.0f,  1.0f
     };
 
-    m_state.transformMatrix = m_state.transformMatrix * rotationMatrix.transposed();
+    getCurrentState().transformMatrix = getCurrentState().transformMatrix * rotationMatrix.transposed();
 }
 
 void DrawPool::rotate(float x, float y, float angle)
@@ -310,14 +310,14 @@ void DrawPool::rotate(float x, float y, float angle)
 
 void DrawPool::pushTransformMatrix()
 {
-    m_transformMatrixStack.emplace_back(m_state.transformMatrix);
+    m_transformMatrixStack.emplace_back(getCurrentState().transformMatrix);
     assert(m_transformMatrixStack.size() < 100);
 }
 
 void DrawPool::popTransformMatrix()
 {
     assert(!m_transformMatrixStack.empty());
-    m_state.transformMatrix = m_transformMatrixStack.back();
+    getCurrentState().transformMatrix = m_transformMatrixStack.back();
     m_transformMatrixStack.pop_back();
 }
 
@@ -363,12 +363,15 @@ void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
     ++m_lastFramebufferId;
 
     if (color != Color::white)
-        m_state.color = color;
+        getCurrentState().color = color;
 
-    m_oldState = std::move(m_state);
-    m_state = {};
-    addAction([this, size, frameIndex = m_bindedFramebuffers, drawState = m_state] {
-        drawState.execute();
+    nextStateAndReset();
+
+    addAction([this, size, frameIndex = m_bindedFramebuffers] {
+        static const PoolState state;
+
+        state.execute();
+
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->resize(size);
         frame->bind();
@@ -376,9 +379,9 @@ void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
 }
 void DrawPool::releaseFrameBuffer(const Rect& dest)
 {
-    m_state = std::move(m_oldState);
-    m_oldState = {};
-    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = m_state] {
+    backState();
+
+    addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = getCurrentState()] {
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->release();
         drawState.execute();
