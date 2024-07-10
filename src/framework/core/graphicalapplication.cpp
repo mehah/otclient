@@ -333,3 +333,8 @@ void GraphicalApplication::doScreenshot(std::string file)
         });
     });
 }
+
+void GraphicalApplication::doMapScreenshot(std::string fileName)
+{
+    g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()->doScreenshot(fileName);
+}

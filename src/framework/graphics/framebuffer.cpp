@@ -26,6 +26,8 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/graphics/image.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/platform/platformwindow.h>
 
@@ -146,4 +148,51 @@ void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorC
         m_coordsBuffer.clear();
         m_coordsBuffer.addQuad(m_dest, m_src);
     }
+}
+
+Size FrameBuffer::getSize()
+{
+    return m_texture->getSize();
+}
+
+void FrameBuffer::doScreenshot(std::string file)
+{
+    /*
+    if (g_mainThreadId != std::this_thread::get_id()) {
+        g_graphicsDispatcher.addEvent(std::bind(&FrameBuffer::doScreenshot, this, fileName));
+        return;
+    }
+     */
+   
+    if (file.empty()) {
+        file = "screenshot_map.png";
+    }
+
+    g_mainDispatcher.addEvent([this, file] {
+        this->internalBind();
+        Size size = this->getSize();
+        int width = size.width();
+        int height = size.height();
+        auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+        this->internalRelease();
+
+        g_asyncDispatcher.detach_task([size, pixels, file] {
+            for (int line = 0, h = size.height(), w = size.width(); line != h / 2; ++line) {
+                std::swap_ranges(
+                    pixels->begin() + 4 * w * line,
+                    pixels->begin() + 4 * w * (line + 1),
+                    pixels->begin() + 4 * w * (h - line - 1));
+            }
+            for (auto i = 3; i < pixels->size(); i += 4) {
+                (*pixels)[i] = 255; 
+            }
+            try {
+                Image image(size, 4, pixels->data());
+                image.savePNG(file);
+            } catch (stdext::exception& e) {
+                g_logger.error(std::string("Can't do map screenshot: ") + e.what());
+            }
+        });
+    });
 }

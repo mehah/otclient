@@ -124,8 +124,9 @@ public:
         return false;
 #endif
     }
-    void doScreenshot(std::string file);
     void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
+    void doScreenshot(std::string file);
+    void doMapScreenshot(std::string file);
 
 protected:
     void resize(const Size& size);

@@ -83,6 +83,7 @@ function screenshotController:onGameStart()
         label.enabled:setId(screenshotEvent.id)
         screenshotEvent.currentBoolean = settings
     end
+ --   optionPanel:recursiveGetChildById("onlyCaptureGameWindow") miss   g_settings.get / set
 
     if not g_resources.directoryExists(autoScreenshotDir) then
         g_resources.makeDir(autoScreenshotDirName)
@@ -179,7 +180,11 @@ function takeScreenshot(name)
     end
 
     screenshotScheduleEvent = scheduleEvent(function()
-        g_app.doScreenshot(name)
+        if  optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked() then
+            g_app.doMapScreenshot(name)
+        else
+            g_app.doScreenshot(name)
+        end
     end, 50)
 end
 

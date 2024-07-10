@@ -49,6 +49,8 @@ public:
 
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }
     void disableBlend() { m_disableBlend = true; }
+    void doScreenshot(std::string file);
+    Size getSize();
 
 protected:
     Color m_colorClear{ Color::alpha };
