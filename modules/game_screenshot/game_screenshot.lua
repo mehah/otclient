@@ -47,7 +47,7 @@ local evento
 -- @
 -- @ variables
 local autoScreenshotDirName = "auto_screenshots"
-local autoScreenshotDir = g_resources.getWriteDir() .. "/" ..autoScreenshotDirName
+local autoScreenshotDir = g_resources.getWriteDir() .. "/" .. autoScreenshotDirName
 
 -- @
 
@@ -55,6 +55,22 @@ screenshotController = Controller:new()
 
 function screenshotController:onInit()
 
+end
+
+function screenshotController:onTerminate()
+    destroyOptionsModule()
+
+    if evento then
+        removeEvent(evento)
+        evento = nil
+    end
+end
+
+function screenshotController:onGameStart()
+
+    if g_game.getClientVersion() < 1310 then
+        return
+    end
     optionPanel = g_ui.loadUI('game_screenshot')
     modules.client_options.addTab('Screenshot', optionPanel, '/images/icons/icon_health')
 
@@ -77,23 +93,12 @@ function screenshotController:onInit()
     screenshotController:registerEvents(LocalPlayer, {
         onTakeScreenshot = onScreenShot
     })
-
-end
-
-function screenshotController:onTerminate()
-    destroyOptionsModule()
-
-    if evento then
-        removeEvent(evento)
-        evento = nil
-    end
-end
-
-function screenshotController:onGameStart()
-
 end
 
 function screenshotController:onGameEnd()
+    if g_game.getClientVersion() >= 1310 then
+        modules.client_options.removeTab('Screenshot')
+    end
     if evento then
         removeEvent(evento)
         evento = nil
@@ -102,9 +107,13 @@ function screenshotController:onGameEnd()
         local labelSinEspacios = evento.label:gsub("%s+", "")
         g_settings.set(labelSinEspacios, evento.currentBoolean)
     end
+
 end
 
 function onUICheckBox(widget, checked)
+    if not widget then
+        return
+    end
     local id = tonumber(widget:getId())
     for _, temp in ipairs(AutoScreenshotEvents) do
         if temp.id == id then
@@ -160,7 +169,7 @@ function onScreenShot(type)
 
             local screenshotName = name .. level .. "_" .. evento.label:gsub("%s+", "") .. "_" ..
                                        os.date("%Y%m%d%H%M%S") .. ".png"
-            takeScreenshot("/".. autoScreenshotDirName .. "/" .. screenshotName)
+            takeScreenshot("/" .. autoScreenshotDirName .. "/" .. screenshotName)
 
             return
         end
@@ -179,18 +188,12 @@ function takeScreenshot(name)
     end
 
     evento = scheduleEvent(function()
-
-         g_app.doScreenshot(name)
-
-
-
-
+        g_app.doScreenshot(name)
     end, 50)
 end
 
 function OpenFolder()
     local dir = g_resources.getWriteDir():gsub("[/\\]+", "\\") .. autoScreenshotDirName
     g_platform.openDir(dir)
-
 end
 
