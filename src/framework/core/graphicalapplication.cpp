@@ -314,7 +314,7 @@ void GraphicalApplication::doScreenshot(std::string file)
         auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
         glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
 
-         g_asyncDispatcher.detach_task([resolution, pixels, file] {
+        g_asyncDispatcher.detach_task([resolution, pixels, file] {
             for (int line = 0, h = resolution.height(), w = resolution.width(); line != h / 2; ++line) {
                 std::swap_ranges(
                     pixels->begin() + 4 * w * line,
@@ -336,5 +336,5 @@ void GraphicalApplication::doScreenshot(std::string file)
 
 void GraphicalApplication::doMapScreenshot(std::string fileName)
 {
-    g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()->doScreenshot(fileName);
+    if (m_drawEvents) m_drawEvents->doMapScreenshot(fileName);
 }

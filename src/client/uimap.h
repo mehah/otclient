@@ -121,4 +121,6 @@ private:
     uint16_t m_maxZoomIn;
     uint16_t m_maxZoomOut;
     uint16_t m_zoom;
+
+    friend class Client;
 };

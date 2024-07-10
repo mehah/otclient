@@ -44,6 +44,7 @@ public:
     bool isUsingProtobuf() override;
 
     void onLoadingAsyncTextureChanged(bool loadingAsync) override;
+    void doMapScreenshot(std::string fileName) override;
 
     UIMapPtr getMapWidget() { return m_mapWidget; }
 
