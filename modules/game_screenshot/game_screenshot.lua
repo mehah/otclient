@@ -72,7 +72,7 @@ function screenshotController:onGameStart()
         return
     end
     optionPanel = g_ui.loadUI('game_screenshot')
-    modules.client_options.addTab('Screenshot', optionPanel, '/images/icons/icon_health')
+    modules.client_options.addTab('Screenshot', optionPanel, '/images/icons/icon_misc')
 
     for _, temp in ipairs(AutoScreenshotEvents) do
         local label = g_ui.createWidget("ScreenshotType", optionPanel.allCheckBox)
