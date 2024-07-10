@@ -43,7 +43,7 @@ local AutoScreenshotEvents = {
 -- LuaFormatter on
 
 -- @ widget
-local evento = nil
+local screenshotScheduleEvent = nil
 local optionPanel = nil
 -- @
 -- @ variables
@@ -61,14 +61,13 @@ end
 function screenshotController:onTerminate()
     destroyOptionsModule()
 
-    if evento then
-        removeEvent(evento)
-        evento = nil
+    if screenshotScheduleEvent then
+        removeEvent(screenshotScheduleEvent)
+        screenshotScheduleEvent = nil
     end
 end
 
 function screenshotController:onGameStart()
-
     if g_game.getClientVersion() < 1310 then
         return
     end
@@ -83,14 +82,12 @@ function screenshotController:onGameStart()
         label.enabled:setChecked(setings)
         label.enabled:setId(temp.id)
         temp.currentBoolean = setings
-
     end
 
     if not g_resources.directoryExists(autoScreenshotDir) then
         g_resources.makeDir(autoScreenshotDirName)
     end
 
-    -- is g_game or LocalPlayer ?
     screenshotController:registerEvents(LocalPlayer, {
         onTakeScreenshot = onScreenShot
     })
@@ -100,15 +97,14 @@ function screenshotController:onGameEnd()
     if g_game.getClientVersion() >= 1310 then
         destroyOptionsModule()
     end
-    if evento then
-        removeEvent(evento)
-        evento = nil
+    if screenshotScheduleEvent then
+        removeEvent(screenshotScheduleEvent)
+        screenshotScheduleEvent = nil
     end
     for _, evento in ipairs(AutoScreenshotEvents) do
         local labelSinEspacios = evento.label:gsub("%s+", "")
         g_settings.set(labelSinEspacios, evento.currentBoolean)
     end
-
 end
 
 function onUICheckBox(widget, checked)
@@ -122,7 +118,6 @@ function onUICheckBox(widget, checked)
             break
         end
     end
-
 end
 
 -- LuaFormatter off
@@ -139,8 +134,7 @@ function resetValues()
                 local id = tonumber(j:getId())
                 if id then
                     for _, evento in ipairs(AutoScreenshotEvents) do
-                        if evento.id == id then
-        --      hadouken                            
+                        if evento.id == id then                
                             j:setChecked(evento.enableDefault)
                             break
                         end
@@ -149,7 +143,6 @@ function resetValues()
             end
         end
     end
-
 end
 -- LuaFormatter on
 
@@ -159,11 +152,9 @@ function destroyOptionsModule()
         optionPanel:destroy()
         optionPanel = nil
     end
-
 end
 
 function onScreenShot(type)
-
     if not optionPanel.Opciones3.enableScreenshots:isChecked() then
         return
     end
@@ -171,28 +162,25 @@ function onScreenShot(type)
     local level = g_game.getLocalPlayer():getLevel() or 1
     for _, evento in ipairs(AutoScreenshotEvents) do
         if evento.id == type and evento.currentBoolean then
-
             local screenshotName = name .. level .. "_" .. evento.label:gsub("%s+", "") .. "_" ..
                                        os.date("%Y%m%d%H%M%S") .. ".png"
             takeScreenshot("/" .. autoScreenshotDirName .. "/" .. screenshotName)
-
             return
         end
     end
-
 end
-function takeScreenshot(name)
 
+function takeScreenshot(name)
     if not g_game.isOnline() then
         return
     end
 
-    if evento then
-        removeEvent(evento)
-        evento = nil
+    if screenshotScheduleEvent then
+        removeEvent(screenshotScheduleEvent)
+        screenshotScheduleEvent = nil
     end
 
-    evento = scheduleEvent(function()
+    screenshotScheduleEvent = scheduleEvent(function()
         g_app.doScreenshot(name)
     end, 50)
 end
@@ -201,4 +189,3 @@ function OpenFolder()
     local dir = g_resources.getWriteDir():gsub("[/\\]+", "\\") .. autoScreenshotDirName
     g_platform.openDir(dir)
 end
-
