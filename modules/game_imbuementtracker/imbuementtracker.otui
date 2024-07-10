@@ -76,6 +76,8 @@ ImbuementTracker < MiniWindow
   icon: /images/icons/icon-imbuementtracker-widget
   icon-offset: 4 2
   icon-size: 12 12
+  @onOpen: modules.game_imbuementtracker.onMiniWindowOpen()
+  @onClose: modules.game_imbuementtracker.onMiniWindowClose()
 
   UIButton
     id: menuButton

@@ -53,7 +53,7 @@ function initialize()
         onUpdateImbuementTracker = onUpdateImbuementTracker
     })
     
-    imbuementTrackerButton = modules.game_mainpanel.addToggleButton('imbuementTrackerButton', tr('Imbuement Tracker'), '/images/options/button_imbuementtracker', toggle, false, 1)    
+    imbuementTrackerButton = modules.game_mainpanel.addToggleButton('imbuementTrackerButton', tr('Imbuement Tracker'), '/images/options/button_imbuementtracker', toggle)
     imbuementTracker = g_ui.createWidget('ImbuementTracker', modules.game_interface.getRightPanel())
 
     imbuementTracker.menuButton.onClick = function(widget, mousePos, mouseButton)
@@ -74,6 +74,14 @@ function initialize()
     imbuementTracker:moveChildToIndex(imbuementTracker.menuButton, 4)
     imbuementTracker:setup()
     imbuementTracker:hide()
+end
+
+function onMiniWindowOpen()
+    imbuementTrackerButton:setOn(true)
+end
+
+function onMiniWindowClose()
+    imbuementTrackerButton:setOn(false)
 end
 
 function terminate()
