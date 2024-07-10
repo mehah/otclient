@@ -235,6 +235,26 @@ struct Imbuement
     uint32_t protectionCost;
 };
 
+struct ImbuementSlot
+{
+    ImbuementSlot(uint8_t id) : id(id) { }
+
+    uint8_t id;
+    std::string name;
+    uint16_t iconId = 0;
+    uint32_t duration = 0;
+    bool state = false; // paused, running
+};
+
+struct ImbuementTrackerItem
+{
+    ImbuementTrackerItem(uint8_t slot) : slot(slot) { }
+
+    uint8_t slot;
+    ItemPtr item;
+    std::map<uint8_t, ImbuementSlot> slots;
+};
+
 struct MarketData
 {
     std::string name;
