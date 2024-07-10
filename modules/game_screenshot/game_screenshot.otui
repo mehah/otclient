@@ -68,7 +68,7 @@ Panel
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-    @onClick: resetValues()
+    @onClick: modules.game_screenshot.resetValues()
   Button
     !text: tr('Open Screenshots Folder') 
     width: 164
