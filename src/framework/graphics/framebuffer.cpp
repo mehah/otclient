@@ -158,7 +158,7 @@ Size FrameBuffer::getSize()
 void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_t y)
 {
     if (file.empty()) {
-        file = "screenshot_map.png";
+        return;
     }
 
     g_mainDispatcher.addEvent([this, file, x, y] {

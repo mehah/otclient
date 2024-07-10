@@ -135,5 +135,9 @@ void Client::doMapScreenshot(std::string file)
     if (!m_mapWidget)
         return;
 
+    if (file.empty()) {
+        file = "screenshot_map.png";
+    }
+
     g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()->doScreenshot(file, g_gameConfig.getSpriteSize() * 3, g_gameConfig.getSpriteSize() * 3);
 }
