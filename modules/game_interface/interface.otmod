@@ -40,6 +40,7 @@ Module
     - game_stash
     - game_healthcircle
     - game_shop
+    - game_screenshot
     - game_highscore
   @onLoad: init()
   @onUnload: terminate()

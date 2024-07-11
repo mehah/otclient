@@ -226,17 +226,17 @@ bool Image::nextMipmap()
 
 void Image::flipVertically()
 {
-    const uint32_t rowIncrement = m_size.height() * m_bpp;
-    uint8_t* pixelData = m_pixels.data();
-
-    for (int y = 0; y < (getHeight() / 2); ++y) {
-        uint8_t* itr1 = &pixelData[y * rowIncrement];
-        uint8_t* itr2 = &pixelData[(m_size.height() - y - 1) * rowIncrement];
-
-        for (std::size_t x = 0; x < rowIncrement; ++x) {
-            std::swap(*(itr1 + x), *(itr2 + x));
-        }
+    for (int line = 0, h = m_size.height(), w = m_size.width(); line != h / 2; ++line) {
+        std::swap_ranges(
+            m_pixels.begin() + 4 * w * line,
+            m_pixels.begin() + 4 * w * (line + 1),
+            m_pixels.begin() + 4 * w * (h - line - 1));
     }
+}
+
+void Image::setOpacity(const uint8_t v) {
+    for (size_t i = 3, s = m_pixels.size(); i < s; i += 4)
+        m_pixels[i] = v;
 }
 
 void Image::reverseChannels()
@@ -249,8 +249,7 @@ void Image::reverseChannels()
 
 ImagePtr Image::fromQRCode(const std::string& code, int border)
 {
-    try
-    {
+    try {
         QrCode qrCode = QrCode::encodeText(code.c_str(), QrCode::Ecc::MEDIUM);
 
         const auto size = qrCode.getSize();

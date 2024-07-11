@@ -26,6 +26,8 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/graphics/image.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/platform/platformwindow.h>
 
@@ -146,4 +148,43 @@ void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorC
         m_coordsBuffer.clear();
         m_coordsBuffer.addQuad(m_dest, m_src);
     }
+}
+
+Size FrameBuffer::getSize()
+{
+    return m_texture->getSize();
+}
+
+void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_t y)
+{
+    if (file.empty()) {
+        return;
+    }
+
+    g_mainDispatcher.addEvent([this, file, x, y] {
+        internalBind();
+
+        Size size = getSize();
+        size.setWidth(size.width() - x);
+        size.setHeight(size.height() - y);
+
+        const int width = size.width();
+        const int height = size.height();
+        const auto& pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
+
+        glReadPixels(x / 3, y / 1.5, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+
+        internalRelease();
+
+        g_asyncDispatcher.detach_task([size, pixels, file] {
+            try {
+                Image image(size, 4, pixels->data());
+                image.flipVertically();
+                image.setOpacity(255);
+                image.savePNG(file);
+            } catch (stdext::exception& e) {
+                g_logger.error(std::string("Can't do map screenshot: ") + e.what());
+            }
+        });
+    });
 }
