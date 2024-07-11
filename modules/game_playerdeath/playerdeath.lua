@@ -105,14 +105,11 @@ function openWindow(deathType, penalty)
 end
 
 function executeAutoReconnect()
-    if not g_settings.getBoolean('autoReconnect') then
-        return 
-    end
     if deathWindow then
         deathWindow:destroy()
         deathWindow = nil
     end
-
+    g_game.cancelLogin()
     CharacterList.doLogin()
 end
 

@@ -26,20 +26,11 @@ local function tryLogin(charInfo, tries)
 
     if g_game.isOnline() then
         if tries == 1 then
-            if not g_settings.getBoolean('autoReconnect') then
-                g_game.safeLogout()
-                if loginEvent then
-                    removeEvent(loginEvent)
-                    loginEvent = nil
-                end
-            else
-                g_game.cancelLogin()
-                if autoReconnectEvent then
-                    removeEvent(autoReconnectEvent)
-                    autoReconnectEvent = nil
-                end
-            end
-
+            g_game.safeLogout()
+			if loginEvent then
+				removeEvent(loginEvent)
+				loginEvent = nil
+			end
         end
         loginEvent = scheduleEvent(function()
             tryLogin(charInfo, tries + 1)
