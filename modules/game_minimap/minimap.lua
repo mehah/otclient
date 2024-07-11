@@ -4,7 +4,6 @@ local otmm = true
 local oldPos = nil
 local fullscreenWidget
 local virtualFloor = 7
-local dayTimeEvent
 local currentDayTime = {
     h = 12,
     m = 0
@@ -43,28 +42,22 @@ end
 mapController = Controller:new()
 mapController:setUI('minimap', modules.game_interface.getMainRightPanel())
 
-
-
 function onChangeWorldTime(hour, minute)
     currentDayTime = {
         h = hour % 24,
         m = minute
     }
 
-    if dayTimeEvent ~= nil then
-        removeEvent(dayTimeEvent)
-        dayTimeEvent = nil
-    end
-
-    dayTimeEvent = scheduleEvent(function()
+    controller:scheduleEvent(function()
         local nextH = currentDayTime.h
         local nextM = currentDayTime.m + 12
         if nextM >= 60 then
             nextH = nextH + 1
             nextM = nextM - 60
         end
+
         onChangeWorldTime(nextH, nextM)
-    end, 30000)
+    end, 30000, 'dayTime')
 
     local position = math.floor((124 / (24 * 60)) * ((hour * 60) + minute))
     local mainWidth = 31
@@ -99,13 +92,13 @@ function mapController:onInit()
     self.ui.minimapBorder.minimap:getChildById('zoomInButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('zoomOutButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('resetButton'):hide()
-
-    mapController:registerEvents(g_game, {
-        onChangeWorldTime = onChangeWorldTime
-    })
 end
 
 function mapController:onGameStart()
+    mapController:registerEvents(g_game, {
+        onChangeWorldTime = onChangeWorldTime
+    })
+
     mapController:registerEvents(LocalPlayer, {
         onPositionChange = onPositionChange
     }):execute()
@@ -140,10 +133,6 @@ function mapController:onGameEnd()
     end
 
     self.ui.minimapBorder.minimap:save()
-end
-
-function mapController:onTerminate()
-
 end
 
 function zoomIn()
