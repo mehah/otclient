@@ -35,10 +35,7 @@ function init()
 
     cooldownWindow = g_ui.loadUI('cooldown', modules.game_interface.getBottomPanel())
 
-    local console = modules.game_console.consolePanel
-    if console then
-        console:addAnchor(AnchorTop, cooldownWindow:getId(), AnchorBottom)
-    end
+
 
     contentsPanel = cooldownWindow:getChildById('contentsPanel2')
     cooldownPanel = contentsPanel:getChildById('cooldownPanel')
@@ -63,11 +60,7 @@ function terminate()
 
     cooldownWindow:destroy()
     cooldownButton:destroy()
-    local console = modules.game_console.consolePanel
-    if console then
-        console:removeAnchor(AnchorTop)
-        console:fill('parent')
-    end
+
 end
 
 function loadIcon(iconId)
@@ -126,6 +119,10 @@ function toggle()
 end
 
 function online()
+    local console = modules.game_console.consolePanel
+    if console then
+        console:addAnchor(AnchorTop, cooldownWindow:getId(), AnchorBottom)
+    end
     if g_game.getFeature(GameSpellList) then
         cooldownButton:show()
         cooldownButton:setOn(true)
@@ -145,6 +142,11 @@ end
 function offline()
     if g_game.getFeature(GameSpellList) then
         --cooldownWindow:setParent(nil, true)
+        local console = modules.game_console.consolePanel
+        if console then
+            console:removeAnchor(AnchorTop)
+            console:fill('parent')
+        end
     end
 end
 
