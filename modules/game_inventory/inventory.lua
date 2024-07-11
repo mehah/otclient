@@ -249,9 +249,16 @@ function inventoryController:onGameStart()
 
     if g_game.getClientVersion() < 1000 then
         inventoryController.ui.offPanel.blessings:hide()
-        inventoryController.ui.offPanel.expert:hide()
         inventoryController.ui.onPanel.blessings:hide()
+    end
+    
+    if not g_game.getFeature(GamePVPMode) then
+        inventoryController.ui.offPanel.expert:hide()
         inventoryController.ui.onPanel.expert:hide()
+        inventoryController.ui.onPanel.whiteDoveBox:hide()
+        inventoryController.ui.onPanel.whiteHandBox:hide()
+        inventoryController.ui.onPanel.yellowHandBox:hide()
+        inventoryController.ui.onPanel.redFistBox:hide()
     end
 end
 
