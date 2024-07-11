@@ -37,6 +37,15 @@ local function onGameEnd(self)
         self.events[TypeEvent.GAME_INIT] = nil
     end
 
+    local scheduledEventsList = self.scheduledEvents[TypeEvent.GAME_INIT]
+    if scheduledEventsList then
+        for _, eventId in pairs(scheduledEventsList) do
+            removeEvent(eventId)
+        end
+
+        self.scheduledEvents[TypeEvent.GAME_INIT] = nil
+    end
+
     if self.dataUI ~= nil and self.dataUI.onGameStart then
         self.ui:destroy()
         self.ui = nil
@@ -46,6 +55,7 @@ end
 Controller = {
     name = nil,
     events = nil,
+    scheduledEvents = nil,
     ui = nil,
     keyboardEvents = nil,
     attrs = nil,
@@ -58,6 +68,7 @@ function Controller:new()
         name = g_modules.getCurrentModule():getName(),
         currentTypeEvent = TypeEvent.MODULE_INIT,
         events = {},
+        scheduledEvents = {},
         keyboardEvents = {},
         attrs = {},
         opcodes = {}
@@ -150,17 +161,27 @@ function Controller:terminate()
         end
     end
 
+    for type, events in pairs(self.scheduledEvents) do
+        if events ~= nil then
+            for _, eventId in pairs(events) do
+                removeEvent(eventId)
+            end
+        end
+    end
+
     if self.ui ~= nil then
         self.ui:destroy()
     end
 
+    self.ui = nil
+    self.attrs = nil
     self.events = nil
     self.dataUI = nil
-    self.ui = nil
-    self.keyboardEvents = nil
-    self.attrs = nil
     self.opcodes = nil
+    self.keyboardEvents = nil
     self.keyboardAnchor = nil
+    self.scheduledEvents = nil
+
     self.__onGameStart = nil
     self.__onGameEnd = nil
 end
@@ -191,6 +212,55 @@ function Controller:sendExtendedOpcode(opcode, ...)
     if protocol then
         protocol:sendExtendedOpcode(opcode, ...)
     end
+end
+
+local function registerScheduledEvent(controller, fncRef, fnc, delay)
+    local currentType = controller.currentTypeEvent
+    if controller.scheduledEvents[currentType] == nil then
+        controller.scheduledEvents[currentType] = {}
+    end
+
+    local evt = nil
+    local action = function()
+        fnc()
+
+        if fncRef == scheduleEvent then
+            table.removevalue(controller.scheduledEvents[currentType], evt)
+        end
+    end
+
+    evt = fncRef(action, delay)
+    table.insert(controller.scheduledEvents[currentType], evt)
+
+    return evt
+end
+
+function Controller:scheduleEvent(fnc, delay)
+    return registerScheduledEvent(self, scheduleEvent, fnc, delay)
+end
+
+function Controller:cycleEvent(fnc, delay)
+    return registerScheduledEvent(self, cycleEvent, fnc, delay)
+end
+
+function Controller:removeEvent(evt)
+    if self.scheduledEvents then
+        if self.scheduledEvents[TypeEvent.GAME_INIT] then
+            if table.removevalue(self.scheduledEvents[TypeEvent.GAME_INIT], evt) then
+                removeEvent(evt)
+                return
+            end
+        end
+
+        if self.scheduledEvents[TypeEvent.MODULE_INIT] then
+            if table.find(self.scheduledEvents[TypeEvent.MODULE_INIT], evt) then
+                error('It is not possible to remove events registered at controller init.')
+                return
+            end
+        end
+    end
+
+    error('The event was not registered by the controller.')
 end
 
 function Controller:bindKeyDown(...)
