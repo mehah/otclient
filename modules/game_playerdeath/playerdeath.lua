@@ -108,7 +108,7 @@ function scheduleReconnect()
         end
         g_game.cancelLogin()
         CharacterList.doLogin()
-    end, 2000, 'dayTime')
+    end, 2000, 'scheduleAutoReconnect')
 end
 
 

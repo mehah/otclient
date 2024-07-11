@@ -17,7 +17,6 @@ local lastLogout = 0
 
 -- private functions
 local function tryLogin(charInfo, tries)
-    print("tries menor que 50")
     tries = tries or 1
 
     if tries > 50 then
@@ -461,9 +460,9 @@ end
 
 function CharacterList.doLogin()
     if autoReconnectEvent then
-    removeEvent(autoReconnectEvent)
-    autoReconnectEvent = nil
-end
+        removeEvent(autoReconnectEvent)
+        autoReconnectEvent = nil
+    end
     local selected = characterList:getFocusedChild()
     if selected then
         local charInfo = {
@@ -477,8 +476,8 @@ end
             removeEvent(loginEvent)
             loginEvent = nil
         end
-            tryLogin(charInfo)  
-     else
+        tryLogin(charInfo)
+    else
         displayErrorBox(tr('Error'), tr('You must select a character to login!'))
     end
 end
