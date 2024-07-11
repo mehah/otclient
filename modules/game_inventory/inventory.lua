@@ -1,4 +1,3 @@
--- @ Inventory
 local inventoryShrink = false
 local function getInventoryUi()
     if inventoryShrink then
@@ -17,7 +16,6 @@ local function walkEvent()
 end
 
 local function combatEvent()
-
     if g_game.getChaseMode() == ChaseOpponent then
         selectPosture('follow', true)
     else
@@ -31,8 +29,6 @@ local function combatEvent()
     elseif g_game.getFightMode() == FightDefensive then
         selectCombat('defense', true)
     end
-
-    -- selectPvp(g_game.getPVPMode() == PVPRedFist, true)
 end
 
 local function inventoryEvent(player, slot, item, oldItem)
@@ -171,23 +167,17 @@ local function refreshInventorySizes()
 end
 
 function onSetChaseMode(self, selectedChaseModeButton)
-
     if selectedChaseModeButton == nil then
         return
     end
+    
     local buttonId = selectedChaseModeButton:getId()
     local chaseMode
-
     if buttonId == 'followPosture' then
         chaseMode = ChaseOpponent
-
-        
-    else -- standModeBox
-
-
+    else
         chaseMode = DontChase
     end
-
     g_game.setChaseMode(chaseMode)
 end
 
@@ -197,21 +187,13 @@ inventoryController:setUI('inventory', modules.game_interface.getMainRightPanel(
 function inventoryController:onInit()
     refreshInventory_panel()
     local ui = getInventoryUi()
--- @ chase / stand panel
--- maximize inventario
 
--- @ chase / stan panel
-
--- @ Fight botom
     connect(inventoryController.ui.onPanel.pvp, {
         onCheckChange = onSetSafeFight
     })
     connect(inventoryController.ui.offPanel.pvp, {
         onCheckChange = onSetSafeFight
     })
--- @
--- @ Expert Bootom
-
     connect(inventoryController.ui.onPanel.expert, {
         onCheckChange = expertMode
     })
@@ -223,8 +205,6 @@ function inventoryController:onInit()
     connect(pvpModeRadioGroup, {
         onSelectionChange = onSetPVPMode
     })
--- @
-
 end
 
 function inventoryController:onGameStart()
@@ -269,7 +249,6 @@ function inventoryController:onGameStart()
             end
         end
     end
-    
 end
 
 function onSetSafeFight(self, checked)
@@ -329,23 +308,6 @@ function selectCombat(combat, ignoreUpdate)
     end
 end
 
---[[ function selectPvp(pvp, ignoreUpdate)
-    local ui = getInventoryUi()
-    if pvp then
-        ui.pvp:setImageClip(
-            ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
-        if not ignoreUpdate then
-            g_game.setPVPMode(PVPRedFist)
-        end
-    else
-        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
-            ui.pvp.imageClipWidth .. ' 20')
-        if not ignoreUpdate then
-            g_game.setPVPMode(PVPWhiteHand)
-        end
-    end
-end ]]
-
 function expertMode(self, checked)
     local ui = getInventoryUi()
 
@@ -362,6 +324,7 @@ function onSetPVPMode(self, selectedPVPButton)
 
     local buttonId = selectedPVPButton:getId()
     local pvpMode = PVPWhiteDove
+
     if buttonId == 'whiteDoveBox' then
         pvpMode = PVPWhiteDove
     elseif buttonId == 'whiteHandBox' then
@@ -371,7 +334,6 @@ function onSetPVPMode(self, selectedPVPButton)
     elseif buttonId == 'redFistBox' then
         pvpMode = PVPRedFist
     end
-
     g_game.setPVPMode(pvpMode)
 end
 
@@ -390,5 +352,3 @@ end
 function getSlot5()
     return inventoryController.ui.offPanel.shield
 end
-
--- @ End of Inventory
