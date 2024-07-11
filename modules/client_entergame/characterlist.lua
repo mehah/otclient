@@ -17,7 +17,7 @@ local lastLogout = 0
 
 -- private functions
 local function tryLogin(charInfo, tries)
-    print("tanos")
+    print("tries menor que 50")
     tries = tries or 1
 
     if tries > 50 then
@@ -26,11 +26,20 @@ local function tryLogin(charInfo, tries)
 
     if g_game.isOnline() then
         if tries == 1 then
-            g_game.cancelLogin()
-			if loginEvent then
-				removeEvent(loginEvent)
-				loginEvent = nil
-			end
+            if not g_settings.getBoolean('autoReconnect') then
+                g_game.safeLogout()
+                if loginEvent then
+                    removeEvent(loginEvent)
+                    loginEvent = nil
+                end
+            else
+                g_game.cancelLogin()
+                if autoReconnectEvent then
+                    removeEvent(autoReconnectEvent)
+                    autoReconnectEvent = nil
+                end
+            end
+
         end
         loginEvent = scheduleEvent(function()
             tryLogin(charInfo, tries + 1)
@@ -148,7 +157,6 @@ function onGameLoginError(message)
 end
 
 function onGameSessionEnd(reason)
-    print(3333333333)
     scheduleAutoReconnect()
     CharacterList.destroyLoadBox()
     CharacterList.showAgain()
@@ -201,10 +209,7 @@ function CharacterList.init()
     connect(g_game, {
         onLogout = onLogout 
     })
---[[     connect(g_game, {
-        onDeath = onDeath 
-    })
- ]]
+
     if G.characters then
         CharacterList.create(G.characters, G.characterAccount)
     end
@@ -234,9 +239,6 @@ function CharacterList.terminate()
     })
     disconnect(g_game, {
         onLogout = onLogout 
-    })
-    disconnect(g_game, {
-        onDeath = onDeath 
     })
 
 
@@ -467,9 +469,10 @@ function CharacterList.isVisible()
 end
 
 function CharacterList.doLogin()
+    if autoReconnectEvent then
     removeEvent(autoReconnectEvent)
     autoReconnectEvent = nil
-
+end
     local selected = characterList:getFocusedChild()
     if selected then
         local charInfo = {
@@ -483,12 +486,8 @@ function CharacterList.doLogin()
             removeEvent(loginEvent)
             loginEvent = nil
         end
-
-   
             tryLogin(charInfo)  
- 
-
-    else
+     else
         displayErrorBox(tr('Error'), tr('You must select a character to login!'))
     end
 end
@@ -548,7 +547,9 @@ function onLogout()
 end
 
 function scheduleAutoReconnect()
-
+    if not autoReconnectButton or not autoReconnectButton:isOn() then
+        return
+    end
     if lastLogout + 2000 > g_clock.millis() then
         return
     end
@@ -572,8 +573,3 @@ function executeAutoReconnect()
     CharacterList.doLogin()
 end
 
-function onDeath()
-    print("onDeath")
-    scheduleEvent(executeAutoReconnect, 2500)
-
-end
