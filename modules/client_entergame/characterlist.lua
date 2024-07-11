@@ -538,7 +538,7 @@ function onLogout()
 end
 
 function scheduleAutoReconnect()
-    print(g_settings.getBoolean('autoReconnect'))
+
     if not  g_settings.getBoolean('autoReconnect') then
         return
     end
