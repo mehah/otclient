@@ -214,49 +214,64 @@ function Controller:sendExtendedOpcode(opcode, ...)
     end
 end
 
-local function registerScheduledEvent(controller, fncRef, fnc, delay)
+local function registerScheduledEvent(controller, fncRef, fnc, delay, name)
     local currentType = controller.currentTypeEvent
     if controller.scheduledEvents[currentType] == nil then
         controller.scheduledEvents[currentType] = {}
     end
+
+    local _rmvEvent = function()
+        if controller.scheduledEvents[currentType][name] then
+            removeEvent(controller.scheduledEvents[currentType][name])
+            controller.scheduledEvents[currentType][name] = nil
+        end
+    end
+    _rmvEvent()
 
     local evt = nil
     local action = function()
         fnc()
 
         if fncRef == scheduleEvent then
-            table.removevalue(controller.scheduledEvents[currentType], evt)
+            if name then
+                _rmvEvent()
+            else
+                table.removevalue(controller.scheduledEvents[currentType], evt)
+            end
         end
     end
 
     evt = fncRef(action, delay)
-    table.insert(controller.scheduledEvents[currentType], evt)
+
+    if name then
+        controller.scheduledEvents[currentType][name] = evt
+    else
+        table.insert(controller.scheduledEvents[currentType], evt)
+    end
 
     return evt
 end
 
-function Controller:scheduleEvent(fnc, delay)
-    return registerScheduledEvent(self, scheduleEvent, fnc, delay)
+function Controller:scheduleEvent(fnc, delay, name)
+    return registerScheduledEvent(self, scheduleEvent, fnc, delay, name)
 end
 
-function Controller:cycleEvent(fnc, delay)
-    return registerScheduledEvent(self, cycleEvent, fnc, delay)
+function Controller:cycleEvent(fnc, delay, name)
+    return registerScheduledEvent(self, cycleEvent, fnc, delay, name)
 end
 
 function Controller:removeEvent(evt)
-    if self.scheduledEvents then
-        if self.scheduledEvents[TypeEvent.GAME_INIT] then
-            if table.removevalue(self.scheduledEvents[TypeEvent.GAME_INIT], evt) then
-                removeEvent(evt)
-                return
-            end
+    if self.scheduledEvents[TypeEvent.GAME_INIT] then
+        if table.removevalue(self.scheduledEvents[TypeEvent.GAME_INIT], evt) then
+            removeEvent(evt)
+            return
         end
+    end
 
-        if self.scheduledEvents[TypeEvent.MODULE_INIT] then
-            if table.find(self.scheduledEvents[TypeEvent.MODULE_INIT], evt) then
-                error('It is not possible to remove events registered at controller init.')
-                return
-            end
+    if self.scheduledEvents[TypeEvent.MODULE_INIT] then
+        if table.find(self.scheduledEvents[TypeEvent.MODULE_INIT], evt) then
+            error('It is not possible to remove events registered at controller init.')
+            return
         end
     end
 
