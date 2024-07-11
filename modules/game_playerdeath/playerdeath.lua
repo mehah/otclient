@@ -102,3 +102,22 @@ function openWindow(deathType, penalty)
     okButton.onClick = okFunc
     cancelButton.onClick = cancelFunc
 end
+
+function executeAutoReconnect()
+    if deathWindow then
+        deathWindow:destroy()
+        deathWindow = nil
+    end
+
+    CharacterList.doLogin()
+end
+
+function scheduleReconnect()
+    scheduleEvent(executeAutoReconnect, 2000)
+end
+
+function display(deathType, penalty)
+    displayDeadMessage()
+    openWindow(deathType, penalty)
+    scheduleReconnect()
+end

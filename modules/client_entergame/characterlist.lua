@@ -17,6 +17,7 @@ local lastLogout = 0
 
 -- private functions
 local function tryLogin(charInfo, tries)
+    print("tanos")
     tries = tries or 1
 
     if tries > 50 then
@@ -25,7 +26,7 @@ local function tryLogin(charInfo, tries)
 
     if g_game.isOnline() then
         if tries == 1 then
-            g_game.safeLogout()
+            g_game.cancelLogin()
 			if loginEvent then
 				removeEvent(loginEvent)
 				loginEvent = nil
@@ -54,6 +55,10 @@ local function tryLogin(charInfo, tries)
     -- save last used character
     g_settings.set('last-used-character', charInfo.characterName)
     g_settings.set('last-used-world', charInfo.worldName)
+    if autoReconnectEvent then
+        removeEvent(autoReconnectEvent)
+        autoReconnectEvent = nil
+    end
 end
 
 local function updateWait(timeStart, timeEnd)
@@ -143,6 +148,7 @@ function onGameLoginError(message)
 end
 
 function onGameSessionEnd(reason)
+    print(3333333333)
     scheduleAutoReconnect()
     CharacterList.destroyLoadBox()
     CharacterList.showAgain()
@@ -195,7 +201,10 @@ function CharacterList.init()
     connect(g_game, {
         onLogout = onLogout 
     })
-    
+--[[     connect(g_game, {
+        onDeath = onDeath 
+    })
+ ]]
     if G.characters then
         CharacterList.create(G.characters, G.characterAccount)
     end
@@ -226,6 +235,10 @@ function CharacterList.terminate()
     disconnect(g_game, {
         onLogout = onLogout 
     })
+    disconnect(g_game, {
+        onDeath = onDeath 
+    })
+
 
     if charactersWindow then
         characterList = nil
@@ -470,7 +483,11 @@ function CharacterList.doLogin()
             removeEvent(loginEvent)
             loginEvent = nil
         end
-        tryLogin(charInfo)
+
+   
+            tryLogin(charInfo)  
+ 
+
     else
         displayErrorBox(tr('Error'), tr('You must select a character to login!'))
     end
@@ -538,11 +555,13 @@ function scheduleAutoReconnect()
 
     if autoReconnectEvent then
         removeEvent(autoReconnectEvent)
+        autoReconnectEvent = nil
     end
     autoReconnectEvent = scheduleEvent(executeAutoReconnect, 2500)
 end
 
 function executeAutoReconnect()
+    
     if not autoReconnectButton or not autoReconnectButton:isOn() or g_game.isOnline() then
         return
     end
@@ -551,4 +570,10 @@ function executeAutoReconnect()
         errorBox = nil
     end
     CharacterList.doLogin()
+end
+
+function onDeath()
+    print("onDeath")
+    scheduleEvent(executeAutoReconnect, 2500)
+
 end
