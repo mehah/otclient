@@ -48,7 +48,7 @@ function onChangeWorldTime(hour, minute)
         m = minute
     }
 
-    controller:scheduleEvent(function()
+    mapController:scheduleEvent(function()
         local nextH = currentDayTime.h
         local nextM = currentDayTime.m + 12
         if nextM >= 60 then
