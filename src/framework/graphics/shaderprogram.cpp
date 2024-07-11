@@ -25,6 +25,7 @@
 
 #include <framework/core/application.h>
 #include <framework/stdext/hash.h>
+#include <framework/core/eventdispatcher.h>
 
 uint32_t ShaderProgram::m_currentProgram = 0;
 
@@ -40,8 +41,11 @@ ShaderProgram::~ShaderProgram()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
 #endif
-    if (g_graphics.ok())
-        glDeleteProgram(m_programId);
+    if (g_graphics.ok()) {
+        g_mainDispatcher.addEvent([id = m_programId] {
+            glDeleteProgram(id);
+        });
+    }
 }
 
 bool ShaderProgram::addShader(const ShaderPtr& shader)
