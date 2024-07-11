@@ -83,7 +83,8 @@ function screenshotController:onGameStart()
         label.enabled:setId(screenshotEvent.id)
         screenshotEvent.currentBoolean = settings
     end
- --   optionPanel:recursiveGetChildById("onlyCaptureGameWindow") miss   g_settings.get / set
+
+    optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):setChecked(g_settings.getBoolean("onlyCaptureGameWindow"))
 
     if not g_resources.directoryExists(autoScreenshotDir) then
         g_resources.makeDir(autoScreenshotDirName)
@@ -92,10 +93,13 @@ function screenshotController:onGameStart()
     screenshotController:registerEvents(LocalPlayer, {
         onTakeScreenshot = onScreenShot
     })
+    optionPanel:recursiveGetChildById("keepBlacklog"):disable() -- no compatibility 11/07/24
+    
 end
 
 function screenshotController:onGameEnd()
     if g_game.getClientVersion() >= 1180 then
+        g_settings.set("onlyCaptureGameWindow",optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked())
         destroyOptionsModule()
     end
     if screenshotScheduleEvent then

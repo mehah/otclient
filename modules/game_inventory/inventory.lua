@@ -247,12 +247,29 @@ function inventoryController:onGameStart()
     refreshInventorySizes()
     refreshInventory_panel()
 
-    if g_game.getClientVersion() < 1000 then
-        inventoryController.ui.offPanel.blessings:hide()
-        inventoryController.ui.offPanel.expert:hide()
-        inventoryController.ui.onPanel.blessings:hide()
-        inventoryController.ui.onPanel.expert:hide()
+    local elements = {
+        {inventoryController.ui.offPanel.blessings, inventoryController.ui.onPanel.blessings},
+        {inventoryController.ui.offPanel.expert, inventoryController.ui.onPanel.expert},
+        {inventoryController.ui.onPanel.whiteDoveBox},
+        {inventoryController.ui.onPanel.whiteHandBox},
+        {inventoryController.ui.onPanel.yellowHandBox},
+        {inventoryController.ui.onPanel.redFistBox}
+    }
+    
+    local showBlessings = g_game.getClientVersion() >= 1000
+    local showPVPMode = g_game.getFeature(GamePVPMode)
+    
+    for i, elementGroup in ipairs(elements) do
+        local show = (i == 1 and showBlessings) or (i > 1 and showPVPMode)
+        for _, element in ipairs(elementGroup) do
+            if show then
+                element:show()
+            else
+                element:hide()
+            end
+        end
     end
+    
 end
 
 function onSetSafeFight(self, checked)

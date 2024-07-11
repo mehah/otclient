@@ -100,7 +100,7 @@ function mapController:onInit()
     self.ui.minimapBorder.minimap:getChildById('zoomOutButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('resetButton'):hide()
 
-    connect(g_game, {
+    mapController:registerEvents(g_game, {
         onChangeWorldTime = onChangeWorldTime
     })
 end
@@ -143,9 +143,7 @@ function mapController:onGameEnd()
 end
 
 function mapController:onTerminate()
-    disconnect(g_game, {
-        onChangeWorldTime = onChangeWorldTime
-    })
+
 end
 
 function zoomIn()
@@ -173,7 +171,7 @@ function fullscreen()
         minimapWidget:fill('parent')
         mapController.ui:show(true)
         zoom = minimapWidget.zoomMinimap
-        mapController:unbindKeyDown('Escape', fullscreen)
+        g_keyboard.unbindKeyDown('Escape')
         minimapWidget.fullMapView = false
     else
         fullscreenWidget = minimapWidget
@@ -181,7 +179,7 @@ function fullscreen()
         minimapWidget:setParent(modules.game_interface.getRootPanel())
         minimapWidget:fill('parent')
         zoom = minimapWidget.zoomFullmap
-        mapController:bindKeyDown('Escape', fullscreen)
+        g_keyboard.bindKeyDown('Escape', fullscreen)
         minimapWidget.fullMapView = true
     end
 
