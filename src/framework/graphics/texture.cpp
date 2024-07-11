@@ -74,6 +74,16 @@ Texture* Texture::create()
         createTexture();
         uploadPixels(m_image, getProp(Prop::buildMipmaps), getProp(Prop::compress));
         m_image = nullptr;
+
+        if (getProp(Prop::smooth)) {
+            setProp(Prop::smooth, false);
+            setSmooth(true);
+        }
+
+        if (getProp(Prop::repeat)) {
+            setProp(Prop::repeat, false);
+            setRepeat(true);
+        }
     }
 
     return this;
@@ -127,6 +137,8 @@ void Texture::setSmooth(bool smooth)
         return;
 
     setProp(Prop::smooth, smooth);
+    if (!m_id) return;
+
     bind();
     setupFilters();
 }
@@ -137,6 +149,8 @@ void Texture::setRepeat(bool repeat)
         return;
 
     setProp(Prop::repeat, repeat);
+    if (!m_id) return;
+
     bind();
     setupWrap();
 }
