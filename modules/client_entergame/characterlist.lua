@@ -547,7 +547,8 @@ function onLogout()
 end
 
 function scheduleAutoReconnect()
-    if not autoReconnectButton or not autoReconnectButton:isOn() then
+    print(g_settings.getBoolean('autoReconnect'))
+    if not  g_settings.getBoolean('autoReconnect') then
         return
     end
     if lastLogout + 2000 > g_clock.millis() then
@@ -562,10 +563,10 @@ function scheduleAutoReconnect()
 end
 
 function executeAutoReconnect()
-    
-    if not autoReconnectButton or not autoReconnectButton:isOn() or g_game.isOnline() then
+    if not  g_settings.getBoolean('autoReconnect') then
         return
     end
+
     if errorBox then
         errorBox:destroy()
         errorBox = nil

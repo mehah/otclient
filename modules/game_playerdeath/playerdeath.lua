@@ -46,6 +46,7 @@ end
 function display(deathType, penalty)
     displayDeadMessage()
     openWindow(deathType, penalty)
+    scheduleReconnect()
 end
 
 function displayDeadMessage()
@@ -104,6 +105,9 @@ function openWindow(deathType, penalty)
 end
 
 function executeAutoReconnect()
+    if not g_settings.getBoolean('autoReconnect') then
+        return 
+    end
     if deathWindow then
         deathWindow:destroy()
         deathWindow = nil
@@ -113,11 +117,9 @@ function executeAutoReconnect()
 end
 
 function scheduleReconnect()
+    if not g_settings.getBoolean('autoReconnect') then
+        return 
+    end
     scheduleEvent(executeAutoReconnect, 2000)
 end
 
-function display(deathType, penalty)
-    displayDeadMessage()
-    openWindow(deathType, penalty)
-    scheduleReconnect()
-end
