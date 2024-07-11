@@ -140,13 +140,14 @@ function online()
 end
 
 function offline()
+    local console = modules.game_console.consolePanel
+    if console then
+        console:removeAnchor(AnchorTop)
+        console:fill('parent')
+    end
     if g_game.getFeature(GameSpellList) then
         --cooldownWindow:setParent(nil, true)
-        local console = modules.game_console.consolePanel
-        if console then
-            console:removeAnchor(AnchorTop)
-            console:fill('parent')
-        end
+   
     end
 end
 
