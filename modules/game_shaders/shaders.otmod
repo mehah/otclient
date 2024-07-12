@@ -5,5 +5,5 @@ Module
   website:
   scripts: [ shaders.lua ]
   sandboxed: true
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: ShaderController:init()
+  @onUnload: ShaderController:terminate()
