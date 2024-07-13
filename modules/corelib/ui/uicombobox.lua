@@ -191,3 +191,11 @@ end
 function UIComboBox:canMouseScroll()
     return self.mouseScroll
 end
+
+function UIComboBox:HTML_onReadNodes(nodes)
+    for _, el in pairs(nodes) do
+        self:addOption(el:getcontent(), el.attributes.value)
+    end
+
+    return false
+end

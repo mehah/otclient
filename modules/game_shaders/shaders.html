@@ -7,12 +7,16 @@
         width: 200;
         display: none;
     }
+
+    select {
+        margin-bottom: 5;
+    }
 </style>
 
 <uiwidget focusable="false" class="content" anchor="parent" layout="type: verticalBox; fit-children: true">
-    <label style="text-align: center">Shaders Map/Outfit/Mount</label>
-    <br />
-    <combobox id="mapComboBox" onchange="self:onMapComboBoxChange(event)"></combobox>
-    <combobox id="outfitComboBox" onchange="self:onOutfitComboBoxChange(event)"></combobox>
-    <combobox id="mountComboBox" onchange="self:onMountComboBoxChange(event)"></combobox>
+    <label style="text-align: center; margin-top: 10">Shaders Map/Outfit/Mount</label>
+    <hr />
+    <select id="mapComboBox" onchange="self:onMapComboBoxChange(event)"></select>
+    <select id="outfitComboBox" onchange="self:onOutfitComboBoxChange(event)"></select>
+    <select id="mountComboBox" onchange="self:onMountComboBoxChange(event)"></select>
 </uiwidget>

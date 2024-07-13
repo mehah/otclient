@@ -1,18 +1,18 @@
 local OFICIAL_HTML_CSS = {}
 
-local function parseStyleElement(content, cssList)
+local function parseStyleElement(content, cssList, checkExist)
     local css = CssParse.new()
     css:parse(content)
     local data = css:get_objects()
 
     for _, o in ipairs(data) do
         table.insert(cssList, {
-            selector = o.selector:trim(), attrs = o.declarations
+            selector = o.selector:trim(), attrs = o.declarations, checkExist = checkExist
         })
     end
 end
 
-parseStyleElement(g_resources.readFileContents('html.css'), OFICIAL_HTML_CSS)
+parseStyleElement(g_resources.readFileContents('html.css'), OFICIAL_HTML_CSS, false)
 
 local function displayBlock(widget)
     if widget:getAnchoredLayout() then
@@ -48,13 +48,10 @@ local parseStyle = function(widget, el)
     end
 end
 
-
-
 local parseLayout = function(widget, el)
     local layout = parseAttrPropList(el.attributes.layout)
     widget:mergeStyle({ layout = layout })
 end
-
 
 local parseEvents = function(widget, eventName, callStr, controller)
     local event = { target = widget }
@@ -101,12 +98,24 @@ local parseEvents = function(widget, eventName, callStr, controller)
     end
 end
 
+local function translateStyleName(styleName)
+    if styleName == 'select' then
+        return 'combobox'
+    end
+
+    if styleName == 'hr' then
+        return 'HorizontalSeparator'
+    end
+
+    return styleName
+end
+
 local function readNode(el, prevEl, parent, controller)
     local tagName = el.name
 
     local breakLine = tagName:lower() == 'br'
 
-    local styleName = g_ui.getStyleName(tagName)
+    local styleName = g_ui.getStyleName(translateStyleName(tagName))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
 
     el.widget = widget
@@ -147,10 +156,14 @@ local function readNode(el, prevEl, parent, controller)
     end
 
     if #el.nodes > 0 then
-        local prevEl = nil
-        for _, chield in pairs(el.nodes) do
-            readNode(chield, prevEl, widget, controller)
-            prevEl = chield
+        if widget.HTML_onReadNodes and not widget:HTML_onReadNodes(el.nodes) then
+            return
+        else
+            local prevEl = nil
+            for _, chield in pairs(el.nodes) do
+                readNode(chield, prevEl, widget, controller)
+                prevEl = chield
+            end
         end
     else
         widget:setText(el:getcontent())
@@ -173,27 +186,23 @@ local function readNode(el, prevEl, parent, controller)
         end
     end
 
-
-
     return widget
 end
-
 
 function HtmlLoader(path, parent, controller)
     local cssList = {}
     table.insertall(cssList, OFICIAL_HTML_CSS)
 
     local root = HtmlParser.parse(g_resources.readFileContents(path))
-
-    local mainWidget = nil
+    root.widget = nil
     local prevEl = nil
 
     for _, el in pairs(root.nodes) do
         local tagName = el.name
         if tagName == 'style' then
-            parseStyleElement(el:getcontent(), cssList)
+            parseStyleElement(el:getcontent(), cssList, true)
         else
-            mainWidget = readNode(el, prevEl, parent, controller)
+            root.widget = readNode(el, prevEl, parent, controller)
             prevEl = el
         end
     end
@@ -201,7 +210,7 @@ function HtmlLoader(path, parent, controller)
     for _, css in pairs(cssList) do
         local els = root:find(css.selector)
 
-        if #els == 0 then
+        if css.checkExist and #els == 0 then
             pwarning('[' .. path .. '][style] selector(' .. css.selector .. ') no element was found.')
         end
 
@@ -211,7 +220,7 @@ function HtmlLoader(path, parent, controller)
                 if next then
                     displayBlock(next)
                 end
-            elseif el.style and el.style.display == 'none' then
+            elseif css.attrs.display == 'none' then
                 el.widget:setVisible(false)
             end
 
@@ -221,5 +230,5 @@ function HtmlLoader(path, parent, controller)
         end
     end
 
-    return mainWidget, root
+    return root
 end

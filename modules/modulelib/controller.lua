@@ -49,16 +49,15 @@ local function onGameEnd(self)
 end
 
 Controller = {
-    name = nil,
-    events = nil,
-    scheduledEvents = nil,
     ui = nil,
-    html = nil,
-    keyboardEvents = nil,
+    name = nil,
     attrs = nil,
     opcodes = nil,
+    events = nil,
+    htmlRoot = nil,
     keyboardAnchor = nil,
-    scope = nil,
+    scheduledEvents = nil,
+    keyboardEvents = nil
 }
 
 function Controller:new()
@@ -122,11 +121,12 @@ function Controller:loadHtml(path, parent)
         path = path .. '.html'
     end
     self:setUI(path, parent)
-    self.ui, self.html = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
+    self.htmlRoot = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
+    self.ui = self.htmlRoot.widget
 end
 
 function Controller:findElements(query)
-    return self.html and self.html:find(query:trim()) or {}
+    return self.htmlRoot and self.htmlRoot:find(query:trim()) or {}
 end
 
 function Controller:findElement(query)
@@ -222,8 +222,7 @@ function Controller:terminate()
     self.keyboardEvents = nil
     self.keyboardAnchor = nil
     self.scheduledEvents = nil
-    self.html = nil
-    self.scope = nil
+    self.htmlRoot = nil
 
     self.__onGameStart = nil
     self.__onGameEnd = nil
@@ -359,8 +358,4 @@ function Controller:bindKeyPress(...)
         args = args
     })
     g_keyboard.bindKeyPress(args[1], args[2], args[3])
-end
-
-function Controller:scope(fnc)
-    self.scope = fnc
 end

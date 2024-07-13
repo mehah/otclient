@@ -6,3 +6,57 @@ br {
 div {
     display: block;
 }
+
+hr {
+    display: block;
+    margin-top: 8;
+    margin-bottom: 8;
+    height: 1;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    display: block;
+    margin-top: 11;
+    margin-bottom: 11;
+    margin-left: 0;
+    margin-right: 0;
+    text-auto-resize: true;
+}
+
+h1 *,
+h2 *,
+h3 *,
+h4 *,
+h5 *,
+h6 * {
+    font: terminus-14px-bold;
+}
+
+h1 * {
+    font-scale: 2.0;
+}
+
+h2 * {
+    font-scale: 2.0;
+}
+
+h3 * {
+    font-scale: 1;
+}
+
+h4 * {
+    font-scale: 0.8;
+}
+
+h5 * {
+    font-scale: 0.5;
+}
+
+h6 * {
+    font-scale: 0.3;
+}
