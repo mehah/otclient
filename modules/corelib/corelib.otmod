@@ -29,3 +29,6 @@ Module
 
     dofile 'json'
     dofile 'http'
+
+    dofile 'htmlparser'
+    dofile 'luacs'
