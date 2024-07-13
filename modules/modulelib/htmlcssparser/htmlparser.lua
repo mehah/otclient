@@ -27,8 +27,8 @@ local line = debug and function(lvl) return debug.getinfo(lvl or 2).currentline 
 local dbg = opts.debug and function(f, ...) prn("d", f:gsub("#LINE#", str(line(3))), ...) end or noop
 -- }}}
 -- Requires {{{
-local ElementNode = require "htmlparser/ElementNode"
-local voidelements = require "htmlparser/voidelements"
+local ElementNode = require "ElementNode"
+local voidelements = require "voidelements"
 --}}}
 HtmlParser = {}
 local function parse(text, limit) -- {{{

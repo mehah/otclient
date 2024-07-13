@@ -53,6 +53,7 @@ Controller = {
     events = nil,
     scheduledEvents = nil,
     ui = nil,
+    html = nil,
     keyboardEvents = nil,
     attrs = nil,
     opcodes = nil,
@@ -114,9 +115,40 @@ function Controller:init()
     end
 end
 
+function Controller:loadHtml(path, parent)
+    self:setUI(path, parent)
+    self.ui, self.html = HtmlLoader('/' .. self.name .. '/' .. path, parent)
+end
+
+function Controller:findElements(query)
+    return self.html and self.html:select(query) or {}
+end
+
+function Controller:findElement(query)
+    local els = self:findElements(query)
+    return #els > 0 and els[1] or nil
+end
+
+function Controller:findWidgets(query)
+    local els = self:findElements(query)
+
+    local widgets = {}
+    for _, el in pairs(els) do
+        if el.widget then
+            table.insert(widgets, el)
+        end
+    end
+
+    return widgets
+end
+
+function Controller:findWidget(query)
+    local els = self:findWidgets(query)
+    return #els > 0 and els[1] or nil
+end
+
 function Controller:loadUI(name, parent)
     if self.ui then
-        error('The UI has already been created.')
         return
     end
 
@@ -185,6 +217,7 @@ function Controller:terminate()
     self.keyboardEvents = nil
     self.keyboardAnchor = nil
     self.scheduledEvents = nil
+    self.html = nil
 
     self.__onGameStart = nil
     self.__onGameEnd = nil
