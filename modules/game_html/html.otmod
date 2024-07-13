@@ -1,9 +1,0 @@
-Module
-  name: game_html
-  description: Manage map (on game screen) shaders
-  author:
-  website:
-  scripts: [ html ]
-  sandboxed: true
-  @onLoad: HtmlController:init()
-  @onUnload: HtmlController:terminate()

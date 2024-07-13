@@ -42,7 +42,7 @@ local function onGameEnd(self)
         self.scheduledEvents[TypeEvent.GAME_INIT] = nil
     end
 
-    if self.dataUI ~= nil and self.dataUI.onGameStart then
+    if self.dataUI ~= nil and self.dataUI.onGameStart and self.ui then
         self.ui:destroy()
         self.ui = nil
     end
@@ -116,12 +116,16 @@ function Controller:init()
 end
 
 function Controller:loadHtml(path, parent)
+    local suffix = ".html"
+    if path:sub(- #suffix) ~= suffix then
+        path = path .. '.html'
+    end
     self:setUI(path, parent)
     self.ui, self.html = HtmlLoader('/' .. self.name .. '/' .. path, parent)
 end
 
 function Controller:findElements(query)
-    return self.html and self.html:select(query) or {}
+    return self.html and self.html:select(query:trim()) or {}
 end
 
 function Controller:findElement(query)

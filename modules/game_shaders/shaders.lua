@@ -170,7 +170,9 @@ function ShaderController:onGameStart()
         ShaderController.ui:setVisible(not ShaderController.ui:isVisible())
     end)
 
-    self:loadUI('shaders', modules.game_interface.getMapPanel())
+    self:loadHtml('shaders.html', modules.game_interface.getMapPanel())
+    local layout = UIVerticalLayout.create(self.ui)
+    layout:setFitChildren(true)
 
     self.ui:setMarginTop(80)
     self.ui:hide()

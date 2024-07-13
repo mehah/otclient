@@ -7,17 +7,13 @@ local function parseStyleElement(el, cssList)
 
     for _, o in ipairs(data) do
         table.insert(cssList, {
-            selector = o.selector, attrs = o.declarations
+            selector = o.selector:trim(), attrs = o.declarations
         })
     end
 end
 
-local function readNode(el, parent, cssList)
+local function readNode(el, parent)
     local tagName = el.name
-    if tagName == 'style' then
-        parseStyleElement(el, cssList)
-        return
-    end
 
     local isBR = tagName:lower() == 'br'
     if isBR then
@@ -30,19 +26,6 @@ local function readNode(el, parent, cssList)
     widget:setTextAutoResize(true)
 
     el.widget = widget
-
-    if parent then
-        if widget:getChildIndex() == 1 then
-            widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-            widget:addAnchor(AnchorTop, 'parent', AnchorTop)
-        elseif isBR then
-            widget:addAnchor(AnchorLeft, 'prev', AnchorLeft)
-            widget:addAnchor(AnchorTop, 'prev', AnchorBottom)
-        else
-            widget:addAnchor(AnchorLeft, 'prev', AnchorRight)
-            widget:addAnchor(AnchorTop, 'prev', AnchorTop)
-        end
-    end
 
     local parseStyle = function()
         local style = {}
@@ -57,8 +40,11 @@ local function readNode(el, parent, cssList)
         widget:mergeStyle(style)
     end
 
+    local anchor = 'prev'
     for attr, v in pairs(el.attributes) do
-        if attr == 'style' then
+        if attr == 'anchor' then
+            anchor = v
+        elseif attr == 'style' then
             parseStyle()
         elseif attr == 'class' then
             for _, className in pairs(v:split(' ')) do
@@ -79,6 +65,8 @@ local function readNode(el, parent, cssList)
             local method = widget[methodName]
             if method then
                 method(widget, v)
+            else
+                error('[' .. tagName .. '] attribute ' .. attr .. ' not exist.')
             end
         end
     end
@@ -91,6 +79,19 @@ local function readNode(el, parent, cssList)
         widget:setText(el:getcontent())
     end
 
+    if parent then
+        if widget:getChildIndex() == 1 or anchor == 'parent' then
+            widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+            widget:addAnchor(AnchorTop, 'parent', AnchorTop)
+        elseif isBR then
+            widget:addAnchor(AnchorLeft, anchor, AnchorLeft)
+            widget:addAnchor(AnchorTop, anchor, AnchorBottom)
+        else
+            widget:addAnchor(AnchorLeft, anchor, AnchorRight)
+            widget:addAnchor(AnchorTop, anchor, AnchorTop)
+        end
+    end
+
     return widget
 end
 
@@ -101,11 +102,21 @@ function HtmlLoader(path, parent)
 
     local mainWidget = nil
     for _, el in pairs(root.nodes) do
-        mainWidget = readNode(el, parent, cssList)
+        local tagName = el.name
+        if tagName == 'style' then
+            parseStyleElement(el, cssList)
+        else
+            mainWidget = readNode(el, parent)
+        end
     end
 
     for _, css in pairs(cssList) do
         local els = root:select(css.selector)
+
+        if #els == 0 then
+            pwarning('[' .. path .. '][style] selector(' .. css.selector .. ') no element was found.')
+        end
+
         for _, el in pairs(els) do
             if el.widget then
                 el.widget:mergeStyle(css.attrs)
