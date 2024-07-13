@@ -57,7 +57,8 @@ Controller = {
     keyboardEvents = nil,
     attrs = nil,
     opcodes = nil,
-    keyboardAnchor = nil
+    keyboardAnchor = nil,
+    scope = nil,
 }
 
 function Controller:new()
@@ -121,11 +122,11 @@ function Controller:loadHtml(path, parent)
         path = path .. '.html'
     end
     self:setUI(path, parent)
-    self.ui, self.html = HtmlLoader('/' .. self.name .. '/' .. path, parent)
+    self.ui, self.html = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
 end
 
 function Controller:findElements(query)
-    return self.html and self.html:select(query:trim()) or {}
+    return self.html and self.html:find(query:trim()) or {}
 end
 
 function Controller:findElement(query)
@@ -222,6 +223,7 @@ function Controller:terminate()
     self.keyboardAnchor = nil
     self.scheduledEvents = nil
     self.html = nil
+    self.scope = nil
 
     self.__onGameStart = nil
     self.__onGameEnd = nil
@@ -357,4 +359,8 @@ function Controller:bindKeyPress(...)
         args = args
     })
     g_keyboard.bindKeyPress(args[1], args[2], args[3])
+end
+
+function Controller:scope(fnc)
+    self.scope = fnc
 end

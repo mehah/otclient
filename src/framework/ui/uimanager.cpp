@@ -434,6 +434,14 @@ OTMLNodePtr UIManager::getStyle(const std::string_view sn)
     return nullptr;
 }
 
+std::string UIManager::getStyleName(const std::string_view styleName)
+{
+    if (const auto& style = getStyle(styleName))
+        return style->tag();
+    return "";
+}
+
+
 std::string UIManager::getStyleClass(const std::string_view styleName)
 {
     if (const auto& style = getStyle(styleName)) {

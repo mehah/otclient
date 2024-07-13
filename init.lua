@@ -76,6 +76,7 @@ g_modules.discoverModules()
 g_modules.autoLoadModules(99)
 g_modules.ensureModuleLoaded('corelib')
 g_modules.ensureModuleLoaded('gamelib')
+g_modules.ensureModuleLoaded('modulelib')
 g_modules.ensureModuleLoaded("startup")
 
 g_modules.autoLoadModules(999)
@@ -105,7 +106,7 @@ local function loadModules()
     end
 
     -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
-    -- g_modules.enableAutoReload()
+    g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip

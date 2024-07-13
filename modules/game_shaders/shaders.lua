@@ -171,48 +171,40 @@ function ShaderController:onGameStart()
     end)
 
     self:loadHtml('shaders.html', modules.game_interface.getMapPanel())
-    local layout = UIVerticalLayout.create(self.ui)
-    layout:setFitChildren(true)
-
-    self.ui:setMarginTop(80)
-    self.ui:hide()
-
-    local mapComboBox = self.ui:getChildById('mapComboBox')
-    mapComboBox.onOptionChange = function(combobox, option)
-        local map = modules.game_interface.getMapPanel()
-        map:setShader(option)
-
-        local data = combobox:getCurrentOption().data
-        map:setDrawViewportEdge(data.drawViewportEdge == true)
-    end
-
-    local outfitComboBox = self.ui:getChildById('outfitComboBox')
-    outfitComboBox.onOptionChange = function(combobox, option)
-        local player = g_game.getLocalPlayer()
-        if player then
-            player:setShader(option)
-            local data = combobox:getCurrentOption().data
-            player:setDrawOutfitColor(data.drawColor ~= false)
-        end
-    end
-
-    local mountComboBox = self.ui:getChildById('mountComboBox')
-    mountComboBox.onOptionChange = function(combobox, option)
-        local player = g_game.getLocalPlayer()
-        if player then
-            player:setMountShader(option)
-        end
-    end
 
     for _, opts in pairs(MAP_SHADERS) do
-        mapComboBox:addOption(opts.name, opts)
+        self.ui.mapComboBox:addOption(opts.name, opts)
     end
 
     for _, opts in pairs(OUTFIT_SHADERS) do
-        outfitComboBox:addOption(opts.name, opts)
+        self.ui.outfitComboBox:addOption(opts.name, opts)
     end
 
     for _, opts in pairs(MOUNT_SHADERS) do
-        mountComboBox:addOption(opts.name, opts)
+        self.ui.mountComboBox:addOption(opts.name, opts)
+    end
+end
+
+function ShaderController:onMapComboBoxChange(event)
+    local map = modules.game_interface.getMapPanel()
+    map:setShader(event.text)
+
+    local data = event.target:getCurrentOption().data
+    map:setDrawViewportEdge(data.drawViewportEdge == true)
+end
+
+function ShaderController:onOutfitComboBoxChange(event)
+    local player = g_game.getLocalPlayer()
+    if player then
+        player:setShader(event.text)
+        local data = event.target:getCurrentOption().data
+        player:setDrawOutfitColor(data.drawColor ~= false)
+    end
+end
+
+function ShaderController:onMountComboBoxChange(event)
+    local player = g_game.getLocalPlayer()
+    if player then
+        player:setMountShader(event.text)
     end
 end

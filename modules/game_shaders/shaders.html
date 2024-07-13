@@ -2,20 +2,17 @@
     .content {
         border-color: red;
         border-width: 1;
-        margin-top: 30;
+        margin-top: 80;
         margin-left: 5;
         width: 200;
-    }
-
-    label,
-    combobox {
-        display: block;
+        display: none;
     }
 </style>
 
-<uiwidget focusable="false" class="content" anchor="parent">
+<uiwidget focusable="false" class="content" anchor="parent" layout="type: verticalBox; fit-children: true">
     <label style="text-align: center">Shaders Map/Outfit/Mount</label>
-    <combobox id="mapComboBox"></combobox>
-    <combobox id="outfitComboBox"></combobox>
-    <combobox id="mountComboBox"></combobox>
+    <br />
+    <combobox id="mapComboBox" onchange="self:onMapComboBoxChange(event)"></combobox>
+    <combobox id="outfitComboBox" onchange="self:onOutfitComboBoxChange(event)"></combobox>
+    <combobox id="mountComboBox" onchange="self:onMountComboBoxChange(event)"></combobox>
 </uiwidget>

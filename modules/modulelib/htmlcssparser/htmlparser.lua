@@ -164,7 +164,7 @@ local function parse(text, limit) -- {{{
 			"[^>]*>", -- include, but not capture everything up to the next ">"
 			tpos)
 		dbg("[MainLoop]:#LINE# openstart=%s || tpos=%s || name=%s", str(openstart), str(tpos), str(name))
-		-- }}}
+		-- }}})
 		if not name then break end
 		-- Some more vars {{{
 		index = index + 1
@@ -248,6 +248,7 @@ local function parse(text, limit) -- {{{
 
 			if not closing or closing == "" then break end
 
+			closename = closename:lower()
 			tag = table.remove(opentags[closename] or {}) or
 				tag -- kludges for the cases of closing void or non-opened tags
 			closestart = root._text:find("<", closestart)

@@ -128,6 +128,7 @@ function ElementNode:new(index, nameortext, node, descend, openstart, openend)
 		instance.level = node.level
 		table.insert((node.parent and node.parent.nodes or node.nodes), instance) --XXX: see above about heisenbugs
 	end
+
 	return setmetatable(instance, ElementNode.mt)
 end
 
@@ -192,7 +193,7 @@ local function escape(s)
 	return string.gsub(s, "([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%" .. "%1")
 end
 
-local function select(self, s)
+local function find(self, s)
 	if not s or type(s) ~= "string" or s == "" then return Set:new() end
 
 	s = s:lower()
@@ -321,7 +322,7 @@ local function select(self, s)
 
 	for i, q in pairs(splited) do
 		if i > 1 then
-			table.insertall(resultset, select(self, q:gsub("[\n\r]", "")))
+			table.insertall(resultset, find(self, q:gsub("[\n\r]", "")))
 		end
 	end
 
@@ -329,7 +330,7 @@ local function select(self, s)
 	return resultset
 end
 
-function ElementNode:select(s) return select(self, s) end
+function ElementNode:find(s) return find(self, s) end
 
 ElementNode.mt.__call = select
 

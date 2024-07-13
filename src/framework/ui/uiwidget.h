@@ -184,6 +184,15 @@ public:
     Rect getChildrenRect();
     UIAnchorLayoutPtr getAnchoredLayout();
     UIWidgetPtr getRootParent();
+    UIWidgetPtr getNextWidget() {
+        const auto& parent = getParent();
+        return parent && parent->getChildCount() > getChildIndex() ? parent->getChildByIndex(getChildIndex() + 1) : nullptr;
+    }
+    UIWidgetPtr getPrevWidget() {
+        const auto& parent = getParent();
+        return parent && getChildIndex() > 1 ? parent->getChildByIndex(getChildIndex() - 1) : nullptr;
+    }
+
     UIWidgetPtr getChildAfter(const UIWidgetPtr& relativeChild);
     UIWidgetPtr getChildBefore(const UIWidgetPtr& relativeChild);
     UIWidgetPtr getChildById(const std::string_view childId);
