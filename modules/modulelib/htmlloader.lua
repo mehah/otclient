@@ -1,5 +1,3 @@
-local main = nil
-
 local function parseStyleElement(el, cssList)
     local css = CssParse.new()
     css:parse(el:getcontent())
@@ -12,18 +10,40 @@ local function parseStyleElement(el, cssList)
     end
 end
 
-local function readNode(el, parent)
-    local tagName = el.name
+local function displayBlock(widget)
+    widget:addAnchor(AnchorLeft, 'prev', AnchorLeft)
+    widget:addAnchor(AnchorTop, 'prev', AnchorBottom)
+end
 
-    local isBR = tagName:lower() == 'br'
-    if isBR then
-        tagName = 'UIWidget'
+
+local function getNextWidget(widget)
+    local parent = widget:getParent()
+    if parent:getChildCount() > widget:getChildIndex() then
+        return parent:getChildByIndex(widget:getChildIndex() + 1)
     end
 
-    local widget = g_ui.createWidget(tagName, parent or rootWidget)
+    return nil
+end
+
+local function getPrevWidget(widget)
+    local parent = widget:getParent()
+    if widget:getChildIndex() > 1 then
+        return parent:getChildByIndex(widget:getChildIndex() - 1)
+    end
+
+    return nil
+end
+
+local function readNode(el, prevEl, parent)
+    local tagName = el.name
+
+    local breakLine = tagName:lower() == 'br'
+
+    local styleExist = g_ui.getStyle(tagName) ~= nil
+    local widget = g_ui.createWidget(styleExist and tagName or 'UIWidget', parent or rootWidget)
 
     widget:setVisible(true)
-    widget:setTextAutoResize(true)
+    -- widget:setTextAutoResize(true)
 
     el.widget = widget
 
@@ -38,6 +58,7 @@ local function readNode(el, parent)
         end
 
         widget:mergeStyle(style)
+        el.style = style
     end
 
     local anchor = 'prev'
@@ -72,20 +93,25 @@ local function readNode(el, parent)
     end
 
     if #el.nodes > 0 then
+        local prevEl = nil
         for _, chield in pairs(el.nodes) do
-            readNode(chield, widget)
+            readNode(chield, prevEl, widget)
+            prevEl = chield
         end
     else
         widget:setText(el:getcontent())
+    end
+
+    if prevEl then
+        breakLine = prevEl.style and prevEl.style.display == 'block'
     end
 
     if parent then
         if widget:getChildIndex() == 1 or anchor == 'parent' then
             widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
             widget:addAnchor(AnchorTop, 'parent', AnchorTop)
-        elseif isBR then
-            widget:addAnchor(AnchorLeft, anchor, AnchorLeft)
-            widget:addAnchor(AnchorTop, anchor, AnchorBottom)
+        elseif breakLine then
+            displayBlock(widget)
         else
             widget:addAnchor(AnchorLeft, anchor, AnchorRight)
             widget:addAnchor(AnchorTop, anchor, AnchorTop)
@@ -95,18 +121,22 @@ local function readNode(el, parent)
     return widget
 end
 
+
 function HtmlLoader(path, parent)
     local cssList = {}
 
     local root = HtmlParser.parse(g_resources.readFileContents(path))
 
     local mainWidget = nil
+    local prevEl = nil
+
     for _, el in pairs(root.nodes) do
         local tagName = el.name
         if tagName == 'style' then
             parseStyleElement(el, cssList)
         else
-            mainWidget = readNode(el, parent)
+            mainWidget = readNode(el, prevEl, parent)
+            prevEl = el
         end
     end
 
@@ -118,6 +148,13 @@ function HtmlLoader(path, parent)
         end
 
         for _, el in pairs(els) do
+            if css.attrs.display == 'block' then
+                local next = getNextWidget(el.widget)
+                if next then
+                    displayBlock(next)
+                end
+            end
+
             if el.widget then
                 el.widget:mergeStyle(css.attrs)
             end

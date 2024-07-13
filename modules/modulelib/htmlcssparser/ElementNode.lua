@@ -197,6 +197,11 @@ local function select(self, s)
 
 	s = s:lower()
 
+	local splited = s:split(',')
+	if #splited > 1 then
+		s = splited[1]
+	end
+
 	local sets = {
 		[""] = self.deeperelements,
 		["["] = self.deeperattributes,
@@ -313,6 +318,13 @@ local function select(self, s)
 		until true
 	end
 	resultset = resultset:tolist()
+
+	for i, q in pairs(splited) do
+		if i > 1 then
+			table.insertall(resultset, select(self, q:gsub("[\n\r]", "")))
+		end
+	end
+
 	table.sort(resultset, function(a, b) return a.index < b.index end)
 	return resultset
 end
