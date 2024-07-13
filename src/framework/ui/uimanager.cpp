@@ -393,6 +393,10 @@ void UIManager::importStyleFromOTML(const OTMLNodePtr& styleNode)
         style->merge(styleNode);
         style->setTag(name);
         m_styles[name] = style;
+
+        // lowercase cache
+        stdext::tolower(name);
+        m_styles[name] = style;
     }
 }
 
@@ -409,7 +413,7 @@ void UIManager::importStyleFromOTML(const OTMLDocumentPtr& doc)
 
 OTMLNodePtr UIManager::getStyle(const std::string_view sn)
 {
-    const auto* styleName = sn.data();
+    auto styleName = std::string(sn);
     const auto it = m_styles.find(styleName);
     if (it != m_styles.end())
         return m_styles[styleName];
@@ -418,6 +422,10 @@ OTMLNodePtr UIManager::getStyle(const std::string_view sn)
     if (sn.starts_with("UI")) {
         const auto& node = OTMLNode::create(styleName);
         node->writeAt("__class", styleName);
+        m_styles[styleName] = node;
+
+        // lowercase cache
+        stdext::tolower(styleName);
         m_styles[styleName] = node;
 
         return node;

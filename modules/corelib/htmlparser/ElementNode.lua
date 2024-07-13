@@ -91,7 +91,7 @@ ElementNode.mt = { __index = ElementNode }
 function ElementNode:new(index, nameortext, node, descend, openstart, openend)
 	local instance = {
 		index = index,
-		name = nameortext,
+		name = nameortext and nameortext:lower() or nameortext,
 		level = 0,
 		parent = nil,
 		root = nil,
@@ -109,12 +109,6 @@ function ElementNode:new(index, nameortext, node, descend, openstart, openend)
 		deeperids = {},
 		deeperclasses = {}
 	}
-
-	if type(nameortext) == "string" then
-		instance.name = nameortext:lower()
-	end
-	print(instance.name)
-
 	if not node then
 		instance.name = "root"
 		instance.root = instance
@@ -200,6 +194,9 @@ end
 
 local function select(self, s)
 	if not s or type(s) ~= "string" or s == "" then return Set:new() end
+
+	s = s:lower()
+
 	local sets = {
 		[""] = self.deeperelements,
 		["["] = self.deeperattributes,
