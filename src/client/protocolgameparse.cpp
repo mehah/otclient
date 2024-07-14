@@ -1373,6 +1373,7 @@ void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
     std::vector<ItemPtr> items(count);
     for (auto i = 0; i < count; i++) {
         items[i] = getItem(msg);
+    }
 
     g_game.processCounterTrade(name, items);
 }
