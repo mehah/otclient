@@ -12,6 +12,8 @@ hr {
     margin-top: 8;
     margin-bottom: 8;
     height: 1;
+    anchors.left: parent.left;
+    anchors.right: parent.right;
 }
 
 h1,
@@ -42,7 +44,7 @@ h1 * {
 }
 
 h2 * {
-    font-scale: 2.0;
+    font-scale: 1.5;
 }
 
 h3 * {

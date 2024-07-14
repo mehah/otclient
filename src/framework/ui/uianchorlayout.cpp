@@ -225,17 +225,17 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 break;
             case Fw::AnchorTop:
                 if (!verticalMoved) {
-                    newRect.moveTop(point + widget->getMarginTop());
+                    newRect.moveTop(point + (widget->getMarginTop() + hookedWidget->getMarginBottom()));
                     verticalMoved = true;
                 } else
-                    newRect.setTop(point + widget->getMarginTop());
+                    newRect.setTop(point + (widget->getMarginTop() + hookedWidget->getMarginBottom()));
                 break;
             case Fw::AnchorBottom:
                 if (!verticalMoved) {
-                    newRect.moveBottom(point - widget->getMarginBottom());
+                    newRect.moveBottom(point - (widget->getMarginBottom() + hookedWidget->getMarginTop()));
                     verticalMoved = true;
                 } else
-                    newRect.setBottom(point - widget->getMarginBottom());
+                    newRect.setBottom(point - (widget->getMarginBottom() + hookedWidget->getMarginTop()));
                 break;
             default:
                 break;

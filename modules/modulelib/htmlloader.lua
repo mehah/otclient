@@ -135,6 +135,10 @@ function HtmlLoader(path, parent, controller)
                 el.widget:setVisible(false)
             end
 
+            if css.attrs.float == 'right' then
+                el.widget:addAnchor(AnchorRight, 'parent', AnchorLeft)
+            end
+
             if el.widget then
                 el.widget:mergeStyle(css.attrs)
             end

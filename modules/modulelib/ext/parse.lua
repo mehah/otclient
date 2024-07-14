@@ -1,11 +1,13 @@
 local parseAttrPropList = function(str)
     local obj = {}
     for _, style_v in pairs(str:split(';')) do
-        local attr = style_v:split(':')
+        local attr = style_v:trim():split(':')
         local name = attr[1]
-        local value = attr[2]:trim()
-        value = tonumber(value) or value
-        obj[name:trim()] = value
+        if name then
+            local value = attr[2]:trim()
+            value = tonumber(value) or value
+            obj[name:trim()] = value
+        end
     end
     return obj
 end
