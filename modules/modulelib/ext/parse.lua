@@ -13,13 +13,14 @@ local parseAttrPropList = function(str)
 end
 
 local parseStyle = function(widget, el)
-    local style = parseAttrPropList(el.attributes.style)
+    local styleStr = el.attributes.style:trim()
+    if styleStr == '' then
+        return
+    end
+
+    local style = parseAttrPropList(styleStr)
     widget:mergeStyle(style)
     el.style = style
-
-    if el.style.display == 'none' then
-        widget:setVisible(false)
-    end
 end
 
 local parseLayout = function(widget, el)

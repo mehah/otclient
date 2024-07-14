@@ -183,6 +183,7 @@ public:
     Rect getMarginRect();
     Rect getChildrenRect();
     UIAnchorLayoutPtr getAnchoredLayout();
+    bool hasAnchoredLayout() { return getAnchoredLayout() != nullptr; }
     UIWidgetPtr getRootParent();
     UIWidgetPtr getNextWidget() {
         const auto& parent = getParent();

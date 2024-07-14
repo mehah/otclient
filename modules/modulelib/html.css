@@ -9,11 +9,9 @@ div {
 
 hr {
     display: block;
+    height: 1;
     margin-top: 8;
     margin-bottom: 8;
-    height: 1;
-    anchors.left: parent.left;
-    anchors.right: parent.right;
 }
 
 h1,

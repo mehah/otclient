@@ -4,22 +4,73 @@ local parseStyleElement, translateStyleName = dofile('ext/style')
 local parseStyle, parseLayout = dofile('ext/parse')
 local parseEvents = dofile('ext/parseevent')
 
-local function displayBlock(widget)
-    if widget:getAnchoredLayout() then
-        widget:addAnchor(AnchorLeft, 'prev', AnchorLeft)
-        widget:addAnchor(AnchorTop, 'prev', AnchorBottom)
+local function processDisplayStyle(el)
+    print(el.name, el.prev)
+    if el.widget:getChildIndex() == 1 or el.attributes and el.attributes.anchor == 'parent' then
+        el.widget:breakAnchors()
+        el.widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+        el.widget:addAnchor(AnchorTop, 'parent', AnchorTop)
+        return;
+    end
+
+    if not el.style then
+        return
+    end
+
+    if el.widget:hasAnchoredLayout() then
+        -- if el.style.display == 'inline' then
+
+        if el.prev and el.prev.style.display == 'block' then
+            print(el.name)
+            el.widget:addAnchor(AnchorLeft, 'prev', AnchorLeft)
+            el.widget:addAnchor(AnchorTop, 'prev', AnchorBottom)
+        else -- if el.prev.style.display == 'inline' then
+            el.widget:addAnchor(AnchorLeft, 'prev', AnchorRight)
+            el.widget:addAnchor(AnchorTop, 'prev', AnchorTop)
+        end
+    end
+
+    if el.style.display == 'none' then
+        el.widget:setVisible(false)
     end
 end
 
-local function displayInline(widget, anchor)
-    widget:addAnchor(AnchorLeft, anchor, AnchorRight)
-    widget:addAnchor(AnchorTop, anchor, AnchorTop)
+local function processFloatStyle(el)
+    if not el.style or not el.style.float then
+        return
+    end
+
+    if el.style.float == 'right' then
+        local anchor = 'parent'
+        local anchorType = AnchorRight
+        for _, child in pairs(el.parent.nodes) do
+            if child ~= el and child.style and child.style.float == 'right' then
+                anchor = child.widget:getId()
+                anchorType = AnchorLeft
+                break
+            end
+        end
+
+        el.widget:removeAnchor(AnchorLeft)
+        el.widget:addAnchor(AnchorRight, anchor, anchorType)
+    elseif el.style.float == 'left' then
+        local anchor = 'parent'
+        local anchorType = AnchorLeft
+        for _, child in pairs(el.parent.nodes) do
+            if child ~= el and child.style.float == 'right' then
+                anchor = child.widget:getId()
+                anchorType = AnchorRight
+                break
+            end
+        end
+
+        el.widget:removeAnchor(AnchorRight)
+        el.widget:addAnchor(AnchorLeft, anchor, anchorType)
+    end
 end
 
-local function readNode(el, prevEl, parent, controller)
+local function readNode(el, parent, controller)
     local tagName = el.name
-
-    local breakLine = tagName:lower() == 'br'
 
     local styleName = g_ui.getStyleName(translateStyleName(tagName))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
@@ -67,7 +118,8 @@ local function readNode(el, prevEl, parent, controller)
         else
             local prevEl = nil
             for _, chield in pairs(el.nodes) do
-                readNode(chield, prevEl, widget, controller)
+                chield.prev = prevEl
+                readNode(chield, widget, controller)
                 prevEl = chield
             end
         end
@@ -75,24 +127,23 @@ local function readNode(el, prevEl, parent, controller)
         widget:setText(el:getcontent())
     end
 
-    if prevEl and not breakLine then
-        breakLine = prevEl.style and prevEl.style.display == 'block'
-    end
-
     if parent then
-        if widget:getAnchoredLayout() then
-            if widget:getChildIndex() == 1 or anchor == 'parent' then
-                widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-                widget:addAnchor(AnchorTop, 'parent', AnchorTop)
-            elseif breakLine then
-                displayBlock(widget)
-            else
-                displayInline(widget, anchor)
-            end
+        if widget:hasAnchoredLayout() then
+            processDisplayStyle(el, prevEl)
+            processFloatStyle(el)
         end
     end
 
     return widget
+end
+
+local function onProcessCSS(el)
+    if el.name == 'hr' then
+        if el.widget:hasAnchoredLayout() then
+            el.widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+            el.widget:addAnchor(AnchorRight, 'parent', AnchorRight)
+        end
+    end
 end
 
 parseStyleElement(g_resources.readFileContents('html.css'), OFICIAL_HTML_CSS, false)
@@ -106,15 +157,14 @@ function HtmlLoader(path, parent, controller)
     local root = HtmlParser.parse(g_resources.readFileContents(path))
     root.widget = nil
     root.path = path
-    local prevEl = nil
 
     for _, el in pairs(root.nodes) do
         local tagName = el.name
         if tagName == 'style' then
             parseStyleElement(el:getcontent(), cssList, true)
         else
-            root.widget = readNode(el, prevEl, parent, controller)
-            prevEl = el
+            root.widget = readNode(el, parent, controller)
+            el.prev = el
         end
     end
 
@@ -125,23 +175,23 @@ function HtmlLoader(path, parent, controller)
             pwarning('[' .. path .. '][style] selector(' .. css.selector .. ') no element was found.')
         end
 
+        local prevEl = nil
         for _, el in pairs(els) do
-            if css.attrs.display == 'block' then
-                local next = el.widget:getNextWidget()
-                if next then
-                    displayBlock(next)
-                end
-            elseif css.attrs.display == 'none' then
-                el.widget:setVisible(false)
+            if not el.style then
+                el.style = {};
             end
 
-            if css.attrs.float == 'right' then
-                el.widget:addAnchor(AnchorRight, 'parent', AnchorLeft)
-            end
+            table.merge(el.style, css.attrs)
 
+            processDisplayStyle(el, prevEl)
+            processFloatStyle(el)
             if el.widget then
-                el.widget:mergeStyle(css.attrs)
+                el.widget:mergeStyle(el.style)
             end
+
+            onProcessCSS(el)
+
+            prevEl = el
         end
     end
 

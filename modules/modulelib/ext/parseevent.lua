@@ -80,7 +80,6 @@ local parseEvents = function(el, widget, eventName, callStr, controller)
         return
     end
 
-    print(HTML_PATH)
     local trEventName = EVENTS_TRANSLATED[eventName]
     if not trEventName then
         pwarning('[' .. HTML_PATH .. ']:' .. el.name .. ' Event ' .. eventName .. ' does not exist.')
