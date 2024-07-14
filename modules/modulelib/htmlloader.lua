@@ -129,7 +129,7 @@ local function readNode(el, parent, controller)
 
     if parent then
         if widget:hasAnchoredLayout() then
-            processDisplayStyle(el, prevEl)
+            processDisplayStyle(el)
             processFloatStyle(el)
         end
     end
@@ -158,7 +158,10 @@ function HtmlLoader(path, parent, controller)
     root.widget = nil
     root.path = path
 
+    local prevEl = nil
+
     for _, el in pairs(root.nodes) do
+        el.prev = prevEl
         local tagName = el.name
         if tagName == 'style' then
             parseStyleElement(el:getcontent(), cssList, true)
@@ -166,6 +169,7 @@ function HtmlLoader(path, parent, controller)
             root.widget = readNode(el, parent, controller)
             el.prev = el
         end
+        prevEl = el
     end
 
     for _, css in pairs(cssList) do
@@ -183,7 +187,7 @@ function HtmlLoader(path, parent, controller)
 
             table.merge(el.style, css.attrs)
 
-            processDisplayStyle(el, prevEl)
+            processDisplayStyle(el)
             processFloatStyle(el)
             if el.widget then
                 el.widget:mergeStyle(el.style)
