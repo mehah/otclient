@@ -1360,6 +1360,7 @@ void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
     std::vector<ItemPtr> items(count);
     for (auto i = 0; i < count; i++) {
         items[i] = getItem(msg);
+    }
 
     g_game.processOwnTrade(name, items);
 }
@@ -1786,7 +1787,7 @@ void ProtocolGame::parseCreaturesMark(const InputMessagePtr& msg)
             } else {
                 creature->showStaticSquare(Color::from8bit(markType));
             }
-        } else
+        } else {
             creature->addTimedSquare(markType);
         }
     }
