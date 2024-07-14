@@ -335,7 +335,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerMultiUseDelay: // 166
                     parseMultiUseCooldown(msg);
                     break;
-				case Proto::GameServerPlayerModes: // 167
+                case Proto::GameServerPlayerModes: // 167
                     parsePlayerModes(msg);
                     break;
                 case Proto::GameServerSetStoreDeepLink: // 168
@@ -645,7 +645,7 @@ void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
     else
         numViolationReasons = 32;
 
-	for (auto i = 0; i < numViolationReasons; ++i)
+    for (auto i = 0; i < numViolationReasons; ++i)
         actions.push_back(msg->getU8());
 
     g_game.processGMActions(actions);
@@ -1100,7 +1100,7 @@ void ProtocolGame::parseUpdateTile(const InputMessagePtr& msg)
 void ProtocolGame::parseTileAddThing(const InputMessagePtr& msg)
 {
     const auto& pos = getPosition(msg);
-	const uint8_t stackPos = g_game.getClientVersion() >= 841 ? msg->getU8() : -1;
+    const uint8_t stackPos = g_game.getClientVersion() >= 841 ? msg->getU8() : -1;
     const auto& thing = getThing(msg);
 
     g_map.addThing(thing, pos, stackPos);
@@ -1218,7 +1218,7 @@ void ProtocolGame::parseCloseContainer(const InputMessagePtr& msg)
 void ProtocolGame::parseContainerAddItem(const InputMessagePtr& msg)
 {
     const uint8_t containerId = msg->getU8();
-	const uint16_t slot = g_game.getFeature(Otc::GameContainerPagination) ? msg->getU16() : 0;
+    const uint16_t slot = g_game.getFeature(Otc::GameContainerPagination) ? msg->getU16() : 0;
     const auto& item = getItem(msg);
 
     g_game.processContainerAddItem(containerId, item, slot);
@@ -1227,7 +1227,7 @@ void ProtocolGame::parseContainerAddItem(const InputMessagePtr& msg)
 void ProtocolGame::parseContainerUpdateItem(const InputMessagePtr& msg)
 {
     const uint8_t containerId = msg->getU8();
-	const uint16_t slot = g_game.getFeature(Otc::GameContainerPagination) ? msg->getU16() : msg->getU8();
+    const uint16_t slot = g_game.getFeature(Otc::GameContainerPagination) ? msg->getU16() : msg->getU8();
     const auto& item = getItem(msg);
 
     g_game.processContainerUpdateItem(containerId, slot, item);
@@ -1938,15 +1938,15 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 {
     const uint32_t health = g_game.getFeature(Otc::GameDoubleHealth) ? msg->getU32() : msg->getU16();
     const uint32_t maxHealth = g_game.getFeature(Otc::GameDoubleHealth) ? msg->getU32() : msg->getU16();
-	const uint32_t freeCapacity = g_game.getFeature(Otc::GameDoubleFreeCapacity) ? msg->getU32() / 100.f : msg->getU16() / 100.f;
+    const uint32_t freeCapacity = g_game.getFeature(Otc::GameDoubleFreeCapacity) ? msg->getU32() / 100.f : msg->getU16() / 100.f;
 
     uint32_t totalCapacity = 0;
     if (g_game.getClientVersion() < 1281 && g_game.getFeature(Otc::GameTotalCapacity)) {
         totalCapacity = msg->getU32() / 100.f;
     }
 
-	const uint64_t experience = g_game.getFeature(Otc::GameDoubleExperience) ? msg->getU64() : msg->getU32();
-	const uint16_t level = g_game.getFeature(Otc::GameLevelU16) ? msg->getU16() : msg->getU8();
+    const uint64_t experience = g_game.getFeature(Otc::GameDoubleExperience) ? msg->getU64() : msg->getU32();
+    const uint16_t level = g_game.getFeature(Otc::GameLevelU16) ? msg->getU16() : msg->getU8();
     const uint8_t levelPercent = msg->getU8();
 
     if (g_game.getFeature(Otc::GameExperienceBonus)) {
@@ -2303,7 +2303,7 @@ void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
 
     msg->getU32(); // skip params.vocation
 
-	const uint8_t sizeCategories = msg->getU8();
+    const uint8_t sizeCategories = msg->getU8();
     std::vector<std::tuple<uint8_t, std::string>> categories;
     categories.reserve(sizeCategories);
 
@@ -2317,7 +2317,7 @@ void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
     const uint16_t page = msg->getU16();
     const uint16_t totalPages = msg->getU16();
 
-	const uint8_t sizeEntries = msg->getU8();
+    const uint8_t sizeEntries = msg->getU8();
     std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>> highscores;
     highscores.reserve(sizeEntries);
 
