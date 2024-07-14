@@ -5,29 +5,24 @@ local parseStyle, parseLayout = dofile('ext/parse')
 local parseEvents = dofile('ext/parseevent')
 
 local function processDisplayStyle(el)
-    print(el.name, el.prev)
     if el.widget:getChildIndex() == 1 or el.attributes and el.attributes.anchor == 'parent' then
-        el.widget:breakAnchors()
         el.widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
         el.widget:addAnchor(AnchorTop, 'parent', AnchorTop)
         return;
     end
 
-    if not el.style then
-        return
-    end
-
     if el.widget:hasAnchoredLayout() then
-        -- if el.style.display == 'inline' then
-
-        if el.prev and el.prev.style.display == 'block' then
-            print(el.name)
+        if el.prev and el.prev.style and el.prev.style.display == 'block' then
             el.widget:addAnchor(AnchorLeft, 'prev', AnchorLeft)
             el.widget:addAnchor(AnchorTop, 'prev', AnchorBottom)
         else -- if el.prev.style.display == 'inline' then
             el.widget:addAnchor(AnchorLeft, 'prev', AnchorRight)
             el.widget:addAnchor(AnchorTop, 'prev', AnchorTop)
         end
+    end
+
+    if not el.style then
+        return
     end
 
     if el.style.display == 'none' then
