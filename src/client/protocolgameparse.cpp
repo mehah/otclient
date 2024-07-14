@@ -1269,7 +1269,6 @@ void ProtocolGame::parseAddInventoryItem(const InputMessagePtr& msg)
 void ProtocolGame::parseRemoveInventoryItem(const InputMessagePtr& msg)
 {
     const uint8_t slot = msg->getU8();
-
     g_game.processInventoryChange(slot, ItemPtr());
 }
 
