@@ -53,7 +53,7 @@ function initialize()
         onUpdateImbuementTracker = onUpdateImbuementTracker
     })
     
-    imbuementTrackerButton = modules.game_mainpanel.addToggleButton('imbuementTrackerButton', tr('Imbuement Tracker'), '/images/options/button_imbuementtracker', toggle)
+    imbuementTrackerButton = if g_game.getClientVersion() >= 1100 then modules.game_mainpanel.addToggleButton('imbuementTrackerButton', tr('Imbuement Tracker'), '/images/options/button_imbuementtracker', toggle) end
     imbuementTracker = g_ui.createWidget('ImbuementTracker', modules.game_interface.getRightPanel())
 
     imbuementTracker.menuButton.onClick = function(widget, mousePos, mouseButton)
