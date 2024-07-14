@@ -1,6 +1,6 @@
 local OFICIAL_HTML_CSS = {}
 
-local parseStyleElement, translateStyleName = dofile('ext/style')
+local parseStyleElement, translateStyleNameToHTML = dofile('ext/style')
 local parseStyle, parseLayout = dofile('ext/parse')
 local parseEvents = dofile('ext/parseevent')
 
@@ -67,17 +67,16 @@ end
 local function readNode(el, parent, controller)
     local tagName = el.name
 
-    local styleName = g_ui.getStyleName(translateStyleName(tagName))
+    local styleName = g_ui.getStyleName(translateStyleNameToHTML(tagName))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
 
     el.widget = widget
 
-    local anchor = 'prev'
     for attr, v in pairs(el.attributes) do
         if attr:starts('on') then
             parseEvents(el, widget, attr:lower(), v, controller)
         elseif attr == 'anchor' then
-            anchor = v
+            -- ignore
         elseif attr == 'style' then
             parseStyle(widget, el)
         elseif attr == 'layout' then
@@ -119,7 +118,20 @@ local function readNode(el, parent, controller)
             end
         end
     else
-        widget:setText(el:getcontent())
+        local text = el:getcontent()
+        if text then
+            local whiteSpace = el.style and el.style['white-space'] or 'nowrap'
+
+            if whiteSpace == 'normal' then
+                text = text:trim()
+            elseif whiteSpace == 'nowrap' then
+                text = text:gsub("[\n\r]", " ")
+            elseif whiteSpace == 'pre' then
+                -- nothing
+            end
+
+            widget:setText(text)
+        end
     end
 
     if parent then

@@ -10,7 +10,7 @@ local function parseStyleElement(content, cssList, checkExist)
     end
 end
 
-local function translateStyleName(styleName)
+local function translateStyleNameToHTML(styleName)
     if styleName == 'select' then
         return 'combobox'
     end
@@ -22,4 +22,4 @@ local function translateStyleName(styleName)
     return styleName
 end
 
-return parseStyleElement, translateStyleName
+return parseStyleElement, translateStyleNameToHTML

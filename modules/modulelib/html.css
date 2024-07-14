@@ -7,6 +7,12 @@ div {
     display: block;
 }
 
+pre {
+    display: block;
+    white-space: pre;
+    margin: 16 0;
+}
+
 hr {
     display: block;
     height: 1;
