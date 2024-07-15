@@ -1,0 +1,129 @@
+UIWidget
+  anchors.fill: parent
+  visible: false
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+
+    height: 60
+  
+    OptionCheckBox
+      id: enableLights
+      !text: tr('Enable lights')
+
+    OptionScaleScroll
+      id: ambientLight
+      anchors.top: prev.bottom
+      &minimumScrollValue: 0
+      &maximumScrollValue: 100
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('ambientLight')
+        self:setText(string.format('Ambient light: %s%%', value))
+
+    OptionScaleScroll
+      id: shadowFloorIntensity
+      anchors.top: prev.bottom
+      &minimumScrollValue: 0
+      &maximumScrollValue: 100
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('shadowFloorIntensity')
+        self:setText(string.format('Floor Shadowing Intensity: %s%%', value))
+
+    OptionScaleScroll
+      id: floorFading
+      anchors.top: prev.bottom
+      &minimumScrollValue: 0
+      &maximumScrollValue: 1000
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('floorFading')
+        self:setText(tr('Floor Fading: %s ms', value))
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 32
+  
+    Label
+      !text: 'Floor View Mode:'
+      anchors.left: parent.left
+      margin-left: 18
+      color: #c0c0c0ff
+      anchors.verticalCenter: parent.verticalCenter
+
+    QtComboBox
+      id: floorViewMode
+      width: 180
+      margin-left: 10
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      mouse-scroll: false
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionCheckBoxMarked
+      id: drawEffectOnTop
+      !text: tr('Draw Effect On Top')
+      !tooltip: tr('Draw effect after drawing the entire floor.')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: limitVisibleDimension
+      !text: tr('Limit Visible Dimension')
+      !tooltip: tr('The limit is based on your maximum range.')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: floatingEffect
+      !text: 'Draw Floating Effects'
+      
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: setEffectAlphaScroll
+      anchors.fill: parent
+      &minimumScrollValue: 10
+      &maximumScrollValue: 100
+      &scrollSize: 21
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: setMissileAlphaScroll
+      anchors.fill: parent
+      &minimumScrollValue: 10
+      &maximumScrollValue: 100
+      &scrollSize: 21
