@@ -82,6 +82,7 @@ function screenshotController:onGameStart()
         screenshotEvent.currentBoolean = settings
     end
 
+    optionPanel:recursiveGetChildById("enableScreenshots"):setChecked(g_settings.getBoolean("enableScreenshots"))
     optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):setChecked(g_settings.getBoolean("onlyCaptureGameWindow"))
 
     if not g_resources.directoryExists(autoScreenshotDir) then
@@ -99,6 +100,7 @@ end
 function screenshotController:onGameEnd()
     if g_game.getClientVersion() >= 1180 then
         g_settings.set("onlyCaptureGameWindow",optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked())
+        g_settings.set("enableScreenshots",optionPanel:recursiveGetChildById("enableScreenshots"):isChecked())
         destroyOptionsModule()
     end
 
