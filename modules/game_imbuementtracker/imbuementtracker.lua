@@ -188,9 +188,13 @@ function onUpdateImbuementTracker(items)
 end
 
 function onGameStart()
-    g_game.imbuementDurations(imbuementTrackerButton:isOn())
-    imbuementTracker:setupOnStart()
-    loadFilters()
+    if g_game.getClientVersion() >= 1100 then
+        g_game.imbuementDurations(imbuementTrackerButton:isOn())
+        imbuementTracker:setupOnStart()
+        loadFilters()
+    else
+        imbuementTrackerButton:hide()
+    end
 end
 
 function onGameEnd()
