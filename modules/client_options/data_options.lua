@@ -1,7 +1,7 @@
 return {
     vsync                             = {
         value = true,
-        action = function(value, options, controller, panels, extraWidgets, extraWidgets)
+        action = function(value, options, controller, panels, extraWidgets)
             g_window.setVerticalSync(value)
         end
     },
