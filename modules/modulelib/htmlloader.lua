@@ -9,7 +9,7 @@ local function readNode(el, parent, controller)
 
     local styleName = g_ui.getStyleName(translateStyleNameToHTML(tagName))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
-
+    widget:setOnHtml(true)
     el.widget = widget
 
     for attr, v in pairs(el.attributes) do
@@ -34,6 +34,10 @@ local function readNode(el, parent, controller)
             local methodName = ''
             for _, _name in pairs(attr:trim():split('-')) do
                 methodName = methodName .. _name:gsub("^%l", string.upper)
+            end
+
+            if v == '' or v == methodName then
+                v = true
             end
 
             methodName = 'set' .. methodName

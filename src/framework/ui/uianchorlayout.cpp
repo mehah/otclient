@@ -178,12 +178,18 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     auto extraMarginTop = 0;
     auto extraMarginBottom = 0;
 
-    for (const auto& anchor : anchorGroup->getAnchors()) {
-        if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft) {
+    if (widget->isOnHtml()) {
+        for (const auto& anchor : anchorGroup->getAnchors()) {
             if (const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget)) {
-                extraMarginTop += hookedWidget->getMarginBottom();
-                extraMarginBottom += hookedWidget->getMarginTop();
-                break;
+                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft) {
+                    extraMarginTop += hookedWidget->getMarginBottom();
+                    extraMarginBottom += hookedWidget->getMarginTop();
+                    break;
+                } else if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorRight) {
+                    extraMarginTop -= hookedWidget->getMarginTop();
+                    extraMarginBottom -= hookedWidget->getMarginBottom();
+                    break;
+                }
             }
         }
     }

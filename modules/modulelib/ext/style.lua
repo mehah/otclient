@@ -79,6 +79,14 @@ local function translateStyleNameToHTML(styleName)
         return 'HorizontalSeparator'
     end
 
+    if styleName == 'input' then
+        return 'TextEdit'
+    end
+
+    if styleName == 'textarea' then
+        return 'MultilineTextEdit'
+    end
+
     return styleName
 end
 

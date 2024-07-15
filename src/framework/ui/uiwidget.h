@@ -72,7 +72,8 @@ enum FlagProp : uint32_t
     PropImageAutoResize = 1 << 22,
     PropImageIndividualAnimation = 1 << 23,
     PropUpdateChildrenIndexStates = 1 << 24,
-    PropDisableUpdateTemporarily = 1 << 25
+    PropDisableUpdateTemporarily = 1 << 25,
+    PropOnHTML = 1 << 26
 };
 
 // @bindclass
@@ -174,6 +175,9 @@ public:
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
+
+    void setOnHtml(bool v) { setProp(PropOnHTML, v); }
+    bool isOnHtml() { return hasProp(PropOnHTML); }
 
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
