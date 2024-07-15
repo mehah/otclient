@@ -1,4 +1,6 @@
-Panel
+UIWidget
+  anchors.fill: parent
+  visible: false
   SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right
@@ -34,7 +36,7 @@ Panel
       id: enableScreenshots
       !text: tr('Enable Auto Screenshots')
       !tooltip: tr('Enable this option to save screenshots of the most important\nmoments of your Tibia career! Whenever one of the events you\nhave selected takes place, a screenshot will be taken\nautomatically.\n\nThe following events can be selected to trigger an auto screenshot:\n\n- Level Up: Your character has reached the next level\n- Skill Up: You advanced in one of your skills (e.g. Magic Level\nor Sword Fighting)\n- Achievement: You earned an achievement, either while\nplaying or upon login\n- Bestiary Entry Unlocked: You unlocked new information\nabout a creature in the Bestiary\n- Bestiary Entry Completed: You unlocked all information about\na creature in the Bestiary\n- Treasure Found: You received some reward from a container\nfor solving a quest or a riddle\n- Valuable Loot: You just found some loot which you have\nmarked in the Drop Tracker\n- Boss Defeated: You defeated a boss monster, either alone or\ntogether with other players, and are entitled to loot it\n- Death PvE: You were just killed by some creature (PvE)\n- Death PvP: You were just killed by another player (PvP)\n- Player Kill: You defeated another player\n- Player Killer Assist: You assisted the killing of another player\n- Player Attacking: Another player just started to attack you\n- Highest Damage Dealt: You dealt a new all-time high damage\non a foe. To see or reset your current all-time high, check\nthe Impact Analyser\n- Highest Healing Done: You healed someone with a new all-\ntime high healing value. To see or reset your current all-time\nhigh, check the Impact Analyser\n- Low Health: You have reached a threshold of deep red\nhealth Copy')
-      checked: true
+      checked: false
 
     Label
       !text: tr('Select all events that sould trigger auto Screenshots:')
