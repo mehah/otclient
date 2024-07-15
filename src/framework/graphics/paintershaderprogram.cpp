@@ -151,6 +151,7 @@ void PainterShaderProgram::addMultiTexture(const std::string& file)
 
     texture->setSmooth(true);
     texture->setRepeat(true);
+    texture->create();
 
     m_multiTextures.emplace_back(texture);
 }
@@ -162,7 +163,6 @@ void PainterShaderProgram::bindMultiTextures() const
 
     uint_fast8_t i = 1;
     for (const auto& tex : m_multiTextures) {
-        tex->create();
         glActiveTexture(GL_TEXTURE0 + i++);
         glBindTexture(GL_TEXTURE_2D, tex->getId());
     }

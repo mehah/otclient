@@ -74,16 +74,6 @@ Texture* Texture::create()
         createTexture();
         uploadPixels(m_image, getProp(Prop::buildMipmaps), getProp(Prop::compress));
         m_image = nullptr;
-
-        if (getProp(Prop::smooth)) {
-            setProp(Prop::smooth, false);
-            setSmooth(true);
-        }
-
-        if (getProp(Prop::repeat)) {
-            setProp(Prop::repeat, false);
-            setRepeat(true);
-        }
     }
 
     return this;

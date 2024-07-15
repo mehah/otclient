@@ -1,4 +1,4 @@
-ShadersPanel < UIWidget
+UIWidget
   focusable: false
 
   anchors.top: parent.top

@@ -4,10 +4,6 @@ local TypeEvent = {
 }
 
 local function onGameStart(self)
-    if self.dataUI ~= nil and self.dataUI.onGameStart then
-        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, self.dataUI.parent or g_ui.getRootWidget())
-    end
-
     if self.__onGameStart ~= nil then
         self.currentTypeEvent = TypeEvent.GAME_INIT
         addEvent(function()
@@ -79,8 +75,8 @@ function Controller:new()
 end
 
 function Controller:init()
-    if self.dataUI ~= nil and not self.dataUI.onGameStart then
-        self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, self.dataUI.parent or g_ui.getRootWidget())
+    if self.dataUI ~= nil then
+        self:loadUI()
     end
 
     if self.onInit then
@@ -118,17 +114,25 @@ function Controller:init()
     end
 end
 
+function Controller:loadUI(name, parent)
+    if self.ui then
+        error('The UI has already been created.')
+        return
+    end
+
+    if not self.dataUI then
+        self:setUI(name, parent)
+    end
+
+    self.ui = g_ui.loadUI('/' .. self.name .. '/' .. self.dataUI.name, self.dataUI.parent or g_ui.getRootWidget())
+end
+
 function Controller:setKeyboardAnchor(widget)
     self.keyboardAnchor = widget
 end
 
-function Controller:setUI(name, parent, onGameStart)
-    if type(parent) == "boolean" then
-        onGameStart = parent
-        parent = nil
-    end
-
-    self.dataUI = { name = name, parent = parent, onGameStart = onGameStart or false }
+function Controller:setUI(name, parent)
+    self.dataUI = { name = name, parent = parent, onGameStart = self.currentTypeEvent == TypeEvent.GAME_INIT }
 end
 
 function Controller:terminate()
