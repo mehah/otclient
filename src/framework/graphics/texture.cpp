@@ -127,6 +127,8 @@ void Texture::setSmooth(bool smooth)
         return;
 
     setProp(Prop::smooth, smooth);
+    if (!m_id) return;
+
     bind();
     setupFilters();
 }
@@ -137,6 +139,8 @@ void Texture::setRepeat(bool repeat)
         return;
 
     setProp(Prop::repeat, repeat);
+    if (!m_id) return;
+
     bind();
     setupWrap();
 }

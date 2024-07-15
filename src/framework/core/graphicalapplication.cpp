@@ -35,6 +35,7 @@
 #include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
 #include "framework/stdext/time.h"
+#include <framework/graphics/image.h>
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
@@ -289,4 +290,35 @@ void GraphicalApplication::setLoadingAsyncTexture(bool v) {
 
     if (m_drawEvents)
         m_drawEvents->onLoadingAsyncTextureChanged(v);
+}
+
+void GraphicalApplication::doScreenshot(std::string file)
+{
+    if (file.empty()) {
+        file = "screenshot.png";
+    }
+
+    g_mainDispatcher.addEvent([file] {
+        auto resolution = g_graphics.getViewportSize();
+        int width = resolution.width();
+        int height = resolution.height();
+        auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+
+        g_asyncDispatcher.detach_task([resolution, pixels, file] {
+            try {
+                Image image(resolution, 4, pixels->data());
+                image.flipVertically();
+                image.setOpacity(255);
+                image.savePNG(file);
+            } catch (stdext::exception& e) {
+                g_logger.error(std::string("Can't do screenshot: ") + e.what());
+            }
+        });
+    });
+}
+
+void GraphicalApplication::doMapScreenshot(std::string fileName)
+{
+    if (m_drawEvents) m_drawEvents->doMapScreenshot(fileName);
 }

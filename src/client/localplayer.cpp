@@ -481,6 +481,11 @@ void LocalPlayer::setBlessings(uint16_t blessings)
     callLuaField("onBlessingsChange", blessings, oldBlessings);
 }
 
+void LocalPlayer::takeScreenshot(uint8_t type)
+{
+    g_lua.callGlobalField("LocalPlayer", "onTakeScreenshot", type);
+}
+
 void LocalPlayer::setResourceBalance(Otc::ResourceTypes_t type, uint64_t value)
 {
     const uint64_t oldBalance = getResourceBalance(type);

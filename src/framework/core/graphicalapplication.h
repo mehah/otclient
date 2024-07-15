@@ -40,6 +40,7 @@ protected:
     virtual bool isLoadingAsyncTexture() = 0;
     virtual bool isUsingProtobuf() = 0;
     virtual void onLoadingAsyncTextureChanged(bool loadingAsync) = 0;
+    virtual void doMapScreenshot(std::string fileName) = 0;
 
     friend class GraphicalApplication;
 };
@@ -124,8 +125,9 @@ public:
         return false;
 #endif
     }
-
     void setDrawEvents(const ApplicationDrawEventsPtr& drawEvents) { m_drawEvents = drawEvents; }
+    void doScreenshot(std::string file);
+    void doMapScreenshot(std::string file);
 
 protected:
     void resize(const Size& size);

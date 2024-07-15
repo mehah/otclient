@@ -1,4 +1,3 @@
--- @ Inventory
 local inventoryShrink = false
 local function getInventoryUi()
     if inventoryShrink then
@@ -17,13 +16,12 @@ local function walkEvent()
 end
 
 local function combatEvent()
-    local chaseMode = g_game.getChaseMode()
-    if chaseMode == 1 then
-        chaseModeRadioGroup:selectWidget(chaseModeBox, true)
+    if g_game.getChaseMode() == ChaseOpponent then
+        selectPosture('follow', true)
     else
-        chaseModeRadioGroup:selectWidget(standModeBox, true)
+        selectPosture('stand', true)
     end
-
+    
     if g_game.getFightMode() == FightOffensive then
         selectCombat('attack', true)
     elseif g_game.getFightMode() == FightBalanced then
@@ -31,8 +29,6 @@ local function combatEvent()
     elseif g_game.getFightMode() == FightDefensive then
         selectCombat('defense', true)
     end
-
-    selectPvp(g_game.getPVPMode() == PVPRedFist, true)
 end
 
 local function inventoryEvent(player, slot, item, oldItem)
@@ -174,15 +170,14 @@ function onSetChaseMode(self, selectedChaseModeButton)
     if selectedChaseModeButton == nil then
         return
     end
+    
     local buttonId = selectedChaseModeButton:getId()
     local chaseMode
-
     if buttonId == 'followPosture' then
         chaseMode = ChaseOpponent
-    else -- standModeBox
+    else
         chaseMode = DontChase
     end
-
     g_game.setChaseMode(chaseMode)
 end
 
@@ -192,13 +187,23 @@ inventoryController:setUI('inventory', modules.game_interface.getMainRightPanel(
 function inventoryController:onInit()
     refreshInventory_panel()
     local ui = getInventoryUi()
-    standModeBox = ui.standPosture
-    chaseModeBox = ui.followPosture
-    chaseModeRadioGroup = UIRadioGroup.create()
-    chaseModeRadioGroup:addWidget(standModeBox)
-    chaseModeRadioGroup:addWidget(chaseModeBox)
-    connect(chaseModeRadioGroup, {
-        onSelectionChange = onSetChaseMode
+
+    connect(inventoryController.ui.onPanel.pvp, {
+        onCheckChange = onSetSafeFight
+    })
+    connect(inventoryController.ui.offPanel.pvp, {
+        onCheckChange = onSetSafeFight
+    })
+    connect(inventoryController.ui.onPanel.expert, {
+        onCheckChange = expertMode
+    })
+    pvpModeRadioGroup = UIRadioGroup.create()
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteDoveBox)
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteHandBox)
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.yellowHandBox)
+    pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.redFistBox)
+    connect(pvpModeRadioGroup, {
+        onSelectionChange = onSetPVPMode
     })
 end
 
@@ -222,11 +227,41 @@ function inventoryController:onGameStart()
     refreshInventorySizes()
     refreshInventory_panel()
 
-    if g_game.getClientVersion() < 1000 then
-        inventoryController.ui.offPanel.blessings:hide()
-        inventoryController.ui.offPanel.expert:hide()
-        inventoryController.ui.onPanel.blessings:hide()
-        inventoryController.ui.onPanel.expert:hide()
+    local elements = {
+        {inventoryController.ui.offPanel.blessings, inventoryController.ui.onPanel.blessings},
+        {inventoryController.ui.offPanel.expert, inventoryController.ui.onPanel.expert},
+        {inventoryController.ui.onPanel.whiteDoveBox},
+        {inventoryController.ui.onPanel.whiteHandBox},
+        {inventoryController.ui.onPanel.yellowHandBox},
+        {inventoryController.ui.onPanel.redFistBox}
+    }
+    
+    local showBlessings = g_game.getClientVersion() >= 1000
+    local showPVPMode = g_game.getFeature(GamePVPMode)
+    
+    for i, elementGroup in ipairs(elements) do
+        local show = (i == 1 and showBlessings) or (i > 1 and showPVPMode)
+        for _, element in ipairs(elementGroup) do
+            if show then
+                element:show()
+            else
+                element:hide()
+            end
+        end
+    end
+end
+
+function onSetSafeFight(self, checked)
+    if not checked then
+        inventoryController.ui.onPanel.pvp:setChecked(false)
+        inventoryController.ui.offPanel.pvp:setChecked(false)
+      else
+        inventoryController.ui.onPanel.pvp:setChecked(true)  
+        inventoryController.ui.offPanel.pvp:setChecked(true)  
+      end
+    g_game.setSafeFight(not checked)
+    if not checked then
+        g_game.cancelAttack()
     end
 end
 
@@ -273,21 +308,33 @@ function selectCombat(combat, ignoreUpdate)
     end
 end
 
-function selectPvp(pvp, ignoreUpdate)
+function expertMode(self, checked)
     local ui = getInventoryUi()
-    if pvp then
-        ui.pvp:setImageClip(
-            ui.pvp.imageClipCheckedX .. ' ' .. ui.pvp.imageClipCheckedY .. ' ' .. ui.pvp.imageClipWidth .. ' 20')
-        if not ignoreUpdate then
-            g_game.setPVPMode(PVPRedFist)
-        end
-    else
-        ui.pvp:setImageClip(ui.pvp.imageClipUncheckedX .. ' ' .. ui.pvp.imageClipUncheckedY .. ' ' ..
-            ui.pvp.imageClipWidth .. ' 20')
-        if not ignoreUpdate then
-            g_game.setPVPMode(PVPWhiteHand)
-        end
+
+    ui.whiteDoveBox:setVisible(checked)
+    ui.whiteHandBox:setVisible(checked)
+    ui.yellowHandBox:setVisible(checked)
+    ui.redFistBox:setVisible(checked)
+end
+
+function onSetPVPMode(self, selectedPVPButton)
+    if selectedPVPButton == nil then
+        return
     end
+
+    local buttonId = selectedPVPButton:getId()
+    local pvpMode = PVPWhiteDove
+
+    if buttonId == 'whiteDoveBox' then
+        pvpMode = PVPWhiteDove
+    elseif buttonId == 'whiteHandBox' then
+        pvpMode = PVPWhiteHand
+    elseif buttonId == 'yellowHandBox' then
+        pvpMode = PVPYellowHand
+    elseif buttonId == 'redFistBox' then
+        pvpMode = PVPRedFist
+    end
+    g_game.setPVPMode(pvpMode)
 end
 
 function changeInventorySize()
@@ -305,5 +352,3 @@ end
 function getSlot5()
     return inventoryController.ui.offPanel.shield
 end
-
--- @ End of Inventory
