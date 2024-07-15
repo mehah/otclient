@@ -171,19 +171,19 @@ function controller:onInit()
     extraWidgets.audioButton = modules.client_topmenu.addTopRightToggleButton('audioButton', tr('Audio'),
         '/images/topbuttons/button_mute_up', function() toggleOption('enableAudio') end)
 
-    panels.generalPanel = g_ui.loadUI('syles/controls/general',controller.ui.optionsTabContent)
+    panels.generalPanel = g_ui.loadUI('styles/controls/general',controller.ui.optionsTabContent)
 
-    panels.graphicsPanel = g_ui.loadUI('syles/graphics/graphics',controller.ui.optionsTabContent)
-    panels.graphicsEffectsPanel = g_ui.loadUI('syles/graphics/effects',controller.ui.optionsTabContent)
+    panels.graphicsPanel = g_ui.loadUI('styles/graphics/graphics',controller.ui.optionsTabContent)
+    panels.graphicsEffectsPanel = g_ui.loadUI('styles/graphics/effects',controller.ui.optionsTabContent)
     
-    panels.interface = g_ui.loadUI('syles/interface/interface',controller.ui.optionsTabContent)
-    panels.interfaceConsole = g_ui.loadUI('syles/interface/console',controller.ui.optionsTabContent)
-    panels.interfaceHUD = g_ui.loadUI('syles/interface/HUD',controller.ui.optionsTabContent)
+    panels.interface = g_ui.loadUI('styles/interface/interface',controller.ui.optionsTabContent)
+    panels.interfaceConsole = g_ui.loadUI('styles/interface/console',controller.ui.optionsTabContent)
+    panels.interfaceHUD = g_ui.loadUI('styles/interface/HUD',controller.ui.optionsTabContent)
 
-    panels.soundPanel = g_ui.loadUI('syles/sound/audio',controller.ui.optionsTabContent)
+    panels.soundPanel = g_ui.loadUI('styles/sound/audio',controller.ui.optionsTabContent)
     
-    panels.misc = g_ui.loadUI('syles/misc/misc',controller.ui.optionsTabContent)
-    panels.miscHelp = g_ui.loadUI('syles/misc/help',controller.ui.optionsTabContent)
+    panels.misc = g_ui.loadUI('styles/misc/misc',controller.ui.optionsTabContent)
+    panels.miscHelp = g_ui.loadUI('styles/misc/help',controller.ui.optionsTabContent)
    
     self.ui:hide()
 
