@@ -1782,8 +1782,8 @@ void ProtocolGame::parsePlayerInfo(const InputMessagePtr& msg) const
         msg->getU32(); // premium expiration used for premium advertisement
     const uint8_t vocation = msg->getU8(); // vocation
 
-    if (g_game.getClientVersion() >= 1281) {
-        msg->getU8(); // prey enabled
+    if (g_game.getFeature(Otc::GamePrey)) {
+        msg->getU8(); // (bool) prey enabled
     }
 
     const uint16_t spellCount = msg->getU16();
