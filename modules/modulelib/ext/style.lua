@@ -1,11 +1,37 @@
+local function FixSelection(selector)
+    local lastPos = nil
+    while true do
+        local pos = selector:find('%[', lastPos)
+        if not pos then
+            break
+        end
+
+        lastPos = selector:find(']', lastPos)
+
+        local res = nil
+        local cmd = selector:sub(pos + 1, lastPos - 1)
+        local values = cmd:split('=')
+        if #values > 1 then
+            res = '[' .. values[1] .. '="' .. values[2] .. '"]'
+        end
+
+        if res then
+            selector = table.concat { selector:sub(1, pos - 1), res, selector:sub(lastPos + 2) }
+        end
+    end
+
+    return selector
+end
+
 local function parseStyleElement(content, cssList, checkExist)
     local css = CssParse.new()
     css:parse(content)
     local data = css:get_objects()
-
     for _, o in ipairs(data) do
         table.insert(cssList, {
-            selector = o.selector:trim(), attrs = o.declarations, checkExist = checkExist
+            selector = FixSelection(o.selector:trim()),
+            attrs = o.declarations,
+            checkExist = checkExist
         })
     end
 end

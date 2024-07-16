@@ -1,8 +1,9 @@
 local OFICIAL_HTML_CSS = {}
+local IGNORE_ATTR_CHECK = { 'type', 'name' }
 
 local parseStyleElement, processDisplayStyle, processFloatStyle = dofile('ext/style')
 local parseStyle, parseLayout = dofile('ext/parse')
-local parseEvents, registerActionEvents = dofile('ext/parseevent')
+local parseEvents, onCreateWidget, generateRadioGroup = dofile('ext/parseevent')
 local translateStyleName, translateAttribute = dofile('ext/translator')
 
 local function processExpression(content, controller)
@@ -36,12 +37,12 @@ end
 local function readNode(el, parent, controller, watchList)
     local tagName = el.name
 
-    local styleName = g_ui.getStyleName(translateStyleName(tagName))
+    local styleName = g_ui.getStyleName(translateStyleName(tagName, el))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
     widget:setOnHtml(true)
     el.widget = widget
 
-    registerActionEvents(el, widget, controller)
+    onCreateWidget(el, widget, controller)
 
     local hasAttrText = false
 
@@ -108,7 +109,7 @@ local function readNode(el, parent, controller, watchList)
                     watchObj.method = method
                     table.insert(watchList, watchObj)
                 end
-            else
+            elseif not table.contains(IGNORE_ATTR_CHECK, attr, true) then
                 pwarning('[' .. HTML_PATH .. ']:' .. tagName .. ' attribute ' .. attr .. ' not exist.')
             end
         end
@@ -220,11 +221,19 @@ function HtmlLoader(path, parent, controller)
         end
     end
 
-    controller:cycleEvent(function()
-        for _, obj in pairs(watchList) do
-            obj.fnc(obj)
-        end
-    end, 50)
+    local radioGroups = {}
+    local radios = root:find("input[type='radio']")
+    for _, el in pairs(radios) do
+        generateRadioGroup(el, radioGroups, controller)
+    end
+
+    if #watchList > 0 then
+        controller:cycleEvent(function()
+            for _, obj in pairs(watchList) do
+                obj.fnc(obj)
+            end
+        end, 50)
+    end
 
     return root
 end

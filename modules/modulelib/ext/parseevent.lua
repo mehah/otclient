@@ -106,19 +106,42 @@ local parseEvents = function(el, widget, eventName, callStr, controller)
     controller:registerEvents(widget, data)
 end
 
-local registerActionEvents = function(el, widget, controller)
-    if el.attributes['*value'] then
-        local exp = el.attributes['*value']
-
+local onCreateWidget = function(el, widget, controller)
+    local getFncSet = function(exp)
         local f = loadstring('return function(self, value) ' .. exp .. '=value end')
-        f = f()
+        return f()
+    end
 
+    if el.attributes['*checked'] then
+        local set = getFncSet(el.attributes['*checked'])
+        controller:registerEvents(widget, {
+            onCheckChange = function(widget, checked)
+                set(controller, checked)
+            end
+        })
+    end
+
+    if el.attributes['*value'] then
+        local set = getFncSet(el.attributes['*value'])
         controller:registerEvents(widget, {
             onTextChange = function(widget, value)
-                f(controller, value)
+                set(controller, value)
             end
         })
     end
 end
 
-return parseEvents, registerActionEvents
+local generateRadioGroup = function(el, groups, controller)
+    local name = el.attributes.name
+    if not name then
+        return
+    end
+
+    if not groups[name] then
+        groups[name] = UIRadioGroup.create()
+    end
+
+    groups[name]:addWidget(el.widget)
+end
+
+return parseEvents, onCreateWidget, generateRadioGroup

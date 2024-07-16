@@ -1,4 +1,4 @@
-local function translateStyleName(styleName)
+local function translateStyleName(styleName, el)
     if styleName == 'select' then
         return 'combobox'
     end
@@ -8,6 +8,10 @@ local function translateStyleName(styleName)
     end
 
     if styleName == 'input' then
+        if el.attributes['type'] == 'checkbox' or el.attributes['type'] == 'radio' then
+            return 'CheckBox'
+        end
+
         return 'TextEdit'
     end
 

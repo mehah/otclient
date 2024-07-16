@@ -20,7 +20,7 @@ hr {
     margin-bottom: 8;
 }
 
-input[type="password"] {
+input[type=password] {
     text-hidden: true;
 }
 
