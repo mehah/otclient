@@ -42,7 +42,12 @@ local function readNode(el, parent, controller, watchList)
 
             local isExp = methodName:starts('*')
             if isExp then
-                methodName = methodName:sub(2):gsub("^%l", string.upper)
+                local fnc = nil
+                if methodName:lower() == '*if' then
+                    methodName = 'Visible'
+                else
+                    methodName = methodName:sub(2):gsub("^%l", string.upper)
+                end
                 local f = loadstring('return function(self, target) return ' .. v .. ' end')
                 local fnc = f()
                 v = fnc(controller, widget)
@@ -53,7 +58,6 @@ local function readNode(el, parent, controller, watchList)
                     method = nil,
                     fnc = function(self)
                         local value = fnc(controller, widget)
-
                         if value ~= self.res then
                             self.method(self.widget, value)
                             self.res = value
