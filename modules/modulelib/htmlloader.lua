@@ -5,7 +5,7 @@ local parseStyle, parseLayout = dofile('ext/parse')
 local parseEvents = dofile('ext/parseevent')
 local translateStyleNameToHTML, translateAttribute = dofile('ext/translator')
 
-local function processExpression(content)
+local function processExpression(content, controller)
     local lastPos = nil
     while true do
         local pos = content:find('{{', lastPos)
@@ -16,8 +16,16 @@ local function processExpression(content)
         lastPos = content:find('}}', lastPos)
 
         local script = content:sub(pos + 2, lastPos - 1)
-        local f = loadstring('return function(self) return ' .. script .. ' end')
-        local res = f()(controller, event)
+
+        local res = nil
+        if content:sub(pos - 2, pos - 1) == 'tr' then
+            pos = pos - 2
+            res = tr(script)
+        else
+            local f = loadstring('return function(self) return ' .. script .. ' end')
+            res = f()(controller)
+        end
+
         if res then
             content = table.concat { content:sub(1, pos - 1), res, content:sub(lastPos + 2) }
         end
@@ -158,7 +166,7 @@ function HtmlLoader(path, parent, controller)
     local cssList = {}
     table.insertall(cssList, OFICIAL_HTML_CSS)
 
-    local root = HtmlParser.parse(processExpression(io.content(path)))
+    local root = HtmlParser.parse(processExpression(io.content(path), controller))
     root.widget = nil
     root.path = path
 
