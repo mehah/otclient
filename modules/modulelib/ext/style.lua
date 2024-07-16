@@ -84,7 +84,7 @@ local function processFloatStyle(el)
         local anchor = 'parent'
         local anchorType = AnchorLeft
         for _, child in pairs(el.parent.nodes) do
-            if child ~= el and child.style.float == 'right' then
+            if child ~= el and child.style and child.style.float == 'right' then
                 anchor = child.widget:getId()
                 anchorType = AnchorRight
                 break
