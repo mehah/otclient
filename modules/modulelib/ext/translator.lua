@@ -1,4 +1,4 @@
-local function translateStyleNameToHTML(styleName)
+local function translateStyleName(styleName)
     if styleName == 'select' then
         return 'combobox'
     end
@@ -38,4 +38,4 @@ local function translateAttribute(styleName, attr)
     return attr
 end
 
-return translateStyleNameToHTML, translateAttribute
+return translateStyleName, translateAttribute

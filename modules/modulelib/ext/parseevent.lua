@@ -43,38 +43,48 @@ local parseEvents = function(el, widget, eventName, callStr, controller)
 
     if eventName == 'onchange' then
         if widget.__class == 'UIComboBox' then
-            widget.onOptionChange = function(widget, text, data)
-                event.name = 'onOptionChange'
-                event.text = text
-                event.data = data
-                execEventCall()
-            end
+            controller:registerEvents(widget, {
+                onOptionChange = function(widget, text, data)
+                    event.name = 'onOptionChange'
+                    event.text = text
+                    event.data = data
+                    execEventCall()
+                end
+            })
         elseif widget.__class == 'UIRadioGroup' then
-            widget.onSelectionChange = function(widget, selectedWidget, previousSelectedWidget)
-                event.name = 'onSelectionChange'
-                event.selectedWidget = selectedWidget
-                event.previousSelectedWidget = previousSelectedWidget
-                execEventCall()
-            end
+            controller:registerEvents(widget, {
+                onSelectionChange = function(widget, selectedWidget, previousSelectedWidget)
+                    event.name = 'onSelectionChange'
+                    event.selectedWidget = selectedWidget
+                    event.previousSelectedWidget = previousSelectedWidget
+                    execEventCall()
+                end
+            })
         elseif widget.__class == 'UICheckBox' then
-            widget.onCheckChange = function(widget, checked)
-                event.name = 'onCheckChange'
-                event.checked = checked
-                execEventCall()
-            end
+            controller:registerEvents(widget, {
+                onCheckChange = function(widget, checked)
+                    event.name = 'onCheckChange'
+                    event.checked = checked
+                    execEventCall()
+                end
+            })
         elseif widget.__class == 'UIScrollBar' then
-            widget.onValueChange = function(widget, value, delta)
-                event.name = 'onValueChange'
-                event.value = value
-                event.delta = delta
-                execEventCall()
-            end
+            controller:registerEvents(widget, {
+                onValueChange = function(widget, value, delta)
+                    event.name = 'onValueChange'
+                    event.value = value
+                    event.delta = delta
+                    execEventCall()
+                end
+            })
         else
-            widget.onValueChange = function(widget, value)
-                event.name = 'onValueChange'
-                event.value = value
-                execEventCall()
-            end
+            controller:registerEvents(widget, {
+                onValueChange = function(widget, value)
+                    event.name = 'onValueChange'
+                    event.value = value
+                    execEventCall()
+                end
+            })
         end
 
         return
@@ -86,11 +96,29 @@ local parseEvents = function(el, widget, eventName, callStr, controller)
         return
     end
 
-    widget[trEventName] = function(widget, value)
+    local data = {}
+    data[trEventName] = function(widget, value)
         event.name = trEventName
         event.value = value
         execEventCall()
     end
+
+    controller:registerEvents(widget, data)
 end
 
-return parseEvents
+local registerActionEvents = function(el, widget, controller)
+    if el.attributes['*value'] then
+        local exp = el.attributes['*value']
+
+        local f = loadstring('return function(self, value) ' .. exp .. '=value end')
+        f = f()
+
+        controller:registerEvents(widget, {
+            onTextChange = function(widget, value)
+                f(controller, value)
+            end
+        })
+    end
+end
+
+return parseEvents, registerActionEvents

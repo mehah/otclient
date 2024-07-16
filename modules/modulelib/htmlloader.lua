@@ -2,8 +2,8 @@ local OFICIAL_HTML_CSS = {}
 
 local parseStyleElement, processDisplayStyle, processFloatStyle = dofile('ext/style')
 local parseStyle, parseLayout = dofile('ext/parse')
-local parseEvents = dofile('ext/parseevent')
-local translateStyleNameToHTML, translateAttribute = dofile('ext/translator')
+local parseEvents, registerActionEvents = dofile('ext/parseevent')
+local translateStyleName, translateAttribute = dofile('ext/translator')
 
 local function processExpression(content, controller)
     local lastPos = nil
@@ -36,10 +36,12 @@ end
 local function readNode(el, parent, controller, watchList)
     local tagName = el.name
 
-    local styleName = g_ui.getStyleName(translateStyleNameToHTML(tagName))
+    local styleName = g_ui.getStyleName(translateStyleName(tagName))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
     widget:setOnHtml(true)
     el.widget = widget
+
+    registerActionEvents(el, widget, controller)
 
     local hasAttrText = false
 
@@ -152,9 +154,16 @@ local function readNode(el, parent, controller, watchList)
 
     if parent then
         if widget:hasAnchoredLayout() then
+            local isVisible = widget:isVisible()
+            if isVisible then
+                widget:setVisible(false)
+            end
             addEvent(function()
                 processDisplayStyle(el)
                 processFloatStyle(el)
+                if isVisible then
+                    widget:setVisible(true)
+                end
             end)
         end
     end
