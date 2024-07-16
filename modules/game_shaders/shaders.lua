@@ -79,42 +79,6 @@ MOUNT_SHADERS = { {
     frag = 'shaders/fragment/party.frag'
 } }
 
--- Fix for texture offset drawing, adding walking offsets.
-local dirs = {
-    [0] = {
-        x = 0,
-        y = 1
-    },
-    [1] = {
-        x = 1,
-        y = 0
-    },
-    [2] = {
-        x = 0,
-        y = -1
-    },
-    [3] = {
-        x = -1,
-        y = 0
-    },
-    [4] = {
-        x = 1,
-        y = 1
-    },
-    [5] = {
-        x = 1,
-        y = -1
-    },
-    [6] = {
-        x = -1,
-        y = -1
-    },
-    [7] = {
-        x = -1,
-        y = 1
-    }
-}
-
 local function attachShaders()
     local map = modules.game_interface.getMapPanel()
     map:setShader('Default')
