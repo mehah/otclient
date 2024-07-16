@@ -69,7 +69,7 @@ local parseEvents = function(el, widget, eventName, callStr, controller)
                 event.delta = delta
                 execEventCall()
             end
-        elseif widget.__class == 'UISpinBox' then
+        else
             widget.onValueChange = function(widget, value)
                 event.name = 'onValueChange'
                 event.value = value

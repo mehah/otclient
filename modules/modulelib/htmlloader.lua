@@ -44,7 +44,7 @@ local function readNode(el, parent, controller, watchList)
     local hasAttrText = false
 
     for attr, v in pairs(el.attributes) do
-        local attr = translateAttribute(attr)
+        local attr = translateAttribute(styleName, attr)
         if attr:starts('on') then
             parseEvents(el, widget, attr:lower(), v, controller)
         elseif attr == 'anchor' then
@@ -72,19 +72,32 @@ local function readNode(el, parent, controller, watchList)
             if isExp then
                 methodName = methodName:sub(2):gsub("^%l", string.upper)
 
-                local f = loadstring('return function(self, target) return ' .. v .. ' end')
+                local vStr = v
+                local f = loadstring('return function(self, target) return ' .. vStr .. ' end')
                 local fnc = f()
-                v = fnc(controller, widget)
+                v = fnc(controller)
+
+                local updateMethod = nil
+                if methodName == 'Text' then
+                    f = loadstring('return function(self, value) ' .. vStr .. '=value end')
+                    updateMethod = f()
+                end
 
                 watchObj = {
                     widget = widget,
                     res = v,
                     method = nil,
+                    updateMethod = updateMethod,
                     fnc = function(self)
                         local value = fnc(controller, widget)
                         if value ~= self.res then
                             self.method(self.widget, value)
                             self.res = value
+                        elseif updateMethod then
+                            value = widget:getText()
+                            if value ~= self.res then
+                                self.updateMethod(controller, value)
+                            end
                         end
                     end
                 }
@@ -201,6 +214,7 @@ function HtmlLoader(path, parent, controller)
 
             processDisplayStyle(el)
             processFloatStyle(el)
+
             if el.widget then
                 el.widget:mergeStyle(el.style)
             end

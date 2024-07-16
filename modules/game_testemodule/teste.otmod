@@ -1,0 +1,9 @@
+Module
+  name: game_testemodule
+  description: 
+  author:
+  website:
+  scripts: [ testemodule.lua ]
+  sandboxed: true
+  @onLoad: TesteController:init()
+  @onUnload: TesteController:terminate()

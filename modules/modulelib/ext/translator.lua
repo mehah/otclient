@@ -18,13 +18,21 @@ local function translateStyleNameToHTML(styleName)
     return styleName
 end
 
-local function translateAttribute(attr)
+local function translateAttribute(styleName, attr)
     if attr == '*style' then
         return '*mergeStyle'
     end
 
     if attr == '*if' then
         return '*visible'
+    end
+
+    if attr == '*value' then
+        return '*text'
+    end
+
+    if attr == 'value' then
+        return 'text'
     end
 
     return attr
