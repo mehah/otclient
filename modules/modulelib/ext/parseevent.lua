@@ -134,7 +134,7 @@ local onCreateWidget = function(el, widget, controller)
                 })
             else
                 controller:registerEvents(widget, {
-                    onValueChange = function(widget, value)
+                    onTextChange = function(widget, value)
                         set(controller, value)
                     end
                 })
