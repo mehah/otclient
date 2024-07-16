@@ -70,24 +70,6 @@ local function processFloatStyle(el)
     end
 end
 
-local function translateStyleNameToHTML(styleName)
-    if styleName == 'select' then
-        return 'combobox'
-    end
 
-    if styleName == 'hr' then
-        return 'HorizontalSeparator'
-    end
 
-    if styleName == 'input' then
-        return 'TextEdit'
-    end
-
-    if styleName == 'textarea' then
-        return 'MultilineTextEdit'
-    end
-
-    return styleName
-end
-
-return parseStyleElement, translateStyleNameToHTML, processDisplayStyle, processFloatStyle
+return parseStyleElement, processDisplayStyle, processFloatStyle

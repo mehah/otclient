@@ -1,8 +1,9 @@
 local OFICIAL_HTML_CSS = {}
 
-local parseStyleElement, translateStyleNameToHTML, processDisplayStyle, processFloatStyle = dofile('ext/style')
+local parseStyleElement, processDisplayStyle, processFloatStyle = dofile('ext/style')
 local parseStyle, parseLayout = dofile('ext/parse')
 local parseEvents = dofile('ext/parseevent')
+local translateStyleNameToHTML, translateAttribute = dofile('ext/translator')
 
 local function processExpression(content)
     local lastPos = nil
@@ -35,6 +36,7 @@ local function readNode(el, parent, controller, watchList)
     local hasAttrText = false
 
     for attr, v in pairs(el.attributes) do
+        local attr = translateAttribute(attr)
         if attr:starts('on') then
             parseEvents(el, widget, attr:lower(), v, controller)
         elseif attr == 'anchor' then
@@ -51,8 +53,6 @@ local function readNode(el, parent, controller, watchList)
                 end
             end
         else
-            v = tonumber(v) or toboolean(v) or v
-
             local methodName = ''
             for _, _name in pairs(attr:trim():split('-')) do
                 methodName = methodName .. _name:gsub("^%l", string.upper)
@@ -62,11 +62,8 @@ local function readNode(el, parent, controller, watchList)
 
             local isExp = methodName:starts('*')
             if isExp then
-                if methodName:lower() == '*if' then
-                    methodName = 'Visible'
-                else
-                    methodName = methodName:sub(2):gsub("^%l", string.upper)
-                end
+                methodName = methodName:sub(2):gsub("^%l", string.upper)
+
                 local f = loadstring('return function(self, target) return ' .. v .. ' end')
                 local fnc = f()
                 v = fnc(controller, widget)
@@ -86,6 +83,8 @@ local function readNode(el, parent, controller, watchList)
             elseif v == '' or v == methodName then
                 v = true
             end
+
+            v = tonumber(v) or toboolean(v) or v
 
             hasAttrText = methodName == 'Text'
 
