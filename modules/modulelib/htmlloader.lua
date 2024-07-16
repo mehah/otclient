@@ -79,27 +79,15 @@ local function readNode(el, parent, controller, watchList)
                 local fnc = f()
                 v = fnc(controller)
 
-                local updateMethod = nil
-                if methodName == 'Text' then
-                    f = loadstring('return function(self, value) ' .. vStr .. '=value end')
-                    updateMethod = f()
-                end
-
                 watchObj = {
                     widget = widget,
                     res = v,
                     method = nil,
-                    updateMethod = updateMethod,
                     fnc = function(self)
                         local value = fnc(controller, widget)
                         if value ~= self.res then
                             self.method(self.widget, value)
                             self.res = value
-                        elseif updateMethod then
-                            value = widget:getText()
-                            if value ~= self.res then
-                                self.updateMethod(controller, value)
-                            end
                         end
                     end
                 }
