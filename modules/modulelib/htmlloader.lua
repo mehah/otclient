@@ -124,20 +124,21 @@ local function readNode(el, parent, controller, watchList)
             end
         end
     elseif not hasAttrText then
-        local text = el:getcontent()
-        if text then
-            local whiteSpace = el.style and el.style['white-space'] or 'nowrap'
+        addEvent(function()
+            local text = el:getcontent()
+            if text then
+                local whiteSpace = el.style and el.style['white-space'] or 'nowrap'
+                if whiteSpace == 'normal' then
+                    text = text:trim()
+                elseif whiteSpace == 'nowrap' then
+                    text = text:gsub("[\n\r\t]", ""):gsub("  ", "")
+                elseif whiteSpace == 'pre' then
+                    -- nothing
+                end
 
-            if whiteSpace == 'normal' then
-                text = text:trim()
-            elseif whiteSpace == 'nowrap' then
-                text = text:gsub("[\n\r\t]", ""):gsub("  ", "")
-            elseif whiteSpace == 'pre' then
-                -- nothing
+                widget:setText(text)
             end
-
-            widget:setText(text)
-        end
+        end)
     end
 
     if parent then
