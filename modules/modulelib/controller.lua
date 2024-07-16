@@ -140,7 +140,7 @@ function Controller:findWidgets(query)
     local widgets = {}
     for _, el in pairs(els) do
         if el.widget then
-            table.insert(widgets, el)
+            table.insert(widgets, el.widget)
         end
     end
 

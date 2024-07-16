@@ -77,10 +77,18 @@ local parseEvents = function(el, widget, eventName, callStr, controller)
                     execEventCall()
                 end
             })
-        else
+        elseif widget.setValue then
             controller:registerEvents(widget, {
                 onValueChange = function(widget, value)
                     event.name = 'onValueChange'
+                    event.value = value
+                    execEventCall()
+                end
+            })
+        else
+            controller:registerEvents(widget, {
+                onTextChange = function(widget, value)
+                    event.name = 'onTextChange'
                     event.value = value
                     execEventCall()
                 end
