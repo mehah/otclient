@@ -293,7 +293,7 @@ function show()
 
     addEvent(function()
         if not limitedZoom or g_game.isGM() then
-            gameMapPanel:setMaxZoomOut(513)
+            gameMapPanel:setMaxZoomOut(28)
             gameMapPanel:setLimitVisibleRange(false)
         else
             gameMapPanel:setMaxZoomOut(11)
@@ -1233,26 +1233,26 @@ function setupViewMode(mode)
     if mode == 0 then
         gameMapPanel:setKeepAspectRatio(true)
         gameMapPanel:setLimitVisibleRange(false)
-        gameMapPanel:setZoom(11)
+        gameMapPanel:setZoom(28)
         gameMapPanel:setVisibleDimension({
-            width = 15,
-            height = 11
+            width = 27,
+            height = 25
         })
     elseif mode == 1 then
         gameMapPanel:setKeepAspectRatio(false)
         gameMapPanel:setLimitVisibleRange(true)
-        gameMapPanel:setZoom(11)
+        gameMapPanel:setZoom(28)
         gameMapPanel:setVisibleDimension({
-            width = 15,
-            height = 11
+            width = 27,
+            height = 25
         })
     elseif mode == 2 then
         local limit = limitedZoom and not g_game.isGM()
         gameMapPanel:setLimitVisibleRange(limit)
-        gameMapPanel:setZoom(11)
+        gameMapPanel:setZoom(28)
         gameMapPanel:setVisibleDimension({
-            width = 15,
-            height = 11
+            width = 27,
+            height = 25
         })
         gameMapPanel:fill('parent')
         gameRootPanel:fill('parent')
