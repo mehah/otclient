@@ -4,6 +4,26 @@ local parseStyleElement, translateStyleNameToHTML, processDisplayStyle, processF
 local parseStyle, parseLayout = dofile('ext/parse')
 local parseEvents = dofile('ext/parseevent')
 
+local function processExpression(content)
+    local lastPos = nil
+    while true do
+        local pos = content:find('{{', lastPos)
+        if not pos then
+            break
+        end
+
+        lastPos = content:find('}}', lastPos)
+
+        local script = content:sub(pos + 2, lastPos - 1)
+        local f = loadstring('return function(self) return ' .. script .. ' end')
+        local res = f()(controller, event)
+        if res then
+            content = table.concat { content:sub(1, pos - 1), res, content:sub(lastPos + 2) }
+        end
+    end
+    return content
+end
+
 local function readNode(el, parent, controller, watchList)
     local tagName = el.name
 
@@ -42,7 +62,6 @@ local function readNode(el, parent, controller, watchList)
 
             local isExp = methodName:starts('*')
             if isExp then
-                local fnc = nil
                 if methodName:lower() == '*if' then
                     methodName = 'Visible'
                 else
@@ -140,25 +159,7 @@ function HtmlLoader(path, parent, controller)
     local cssList = {}
     table.insertall(cssList, OFICIAL_HTML_CSS)
 
-    local content = io.content(path)
-    local lastPos = nil
-    while true do
-        local pos = content:find('{{', lastPos)
-        if not pos then
-            break
-        end
-
-        lastPos = content:find('}}', lastPos)
-
-        local script = content:sub(pos + 2, lastPos - 1)
-        local f = loadstring('return function(self) return ' .. script .. ' end')
-        local res = f()(controller, event)
-        if res then
-            content = table.concat { content:sub(1, pos - 1), res, content:sub(lastPos + 2) }
-        end
-    end
-
-    local root = HtmlParser.parse(content)
+    local root = HtmlParser.parse(processExpression(io.content(path)))
     root.widget = nil
     root.path = path
 
