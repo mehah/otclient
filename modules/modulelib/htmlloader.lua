@@ -4,13 +4,15 @@ local parseStyleElement, translateStyleNameToHTML, processDisplayStyle, processF
 local parseStyle, parseLayout = dofile('ext/parse')
 local parseEvents = dofile('ext/parseevent')
 
-local function readNode(el, parent, controller)
+local function readNode(el, parent, controller, watchList)
     local tagName = el.name
 
     local styleName = g_ui.getStyleName(translateStyleNameToHTML(tagName))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
     widget:setOnHtml(true)
     el.widget = widget
+
+    local hasAttrText = false
 
     for attr, v in pairs(el.attributes) do
         if attr:starts('on') then
@@ -29,21 +31,50 @@ local function readNode(el, parent, controller)
                 end
             end
         else
-            v = tonumber(v) or v
+            v = tonumber(v) or toboolean(v) or v
 
             local methodName = ''
             for _, _name in pairs(attr:trim():split('-')) do
                 methodName = methodName .. _name:gsub("^%l", string.upper)
             end
 
-            if v == '' or v == methodName then
+            local watchObj = nil
+
+            local isExp = methodName:starts('*')
+            if isExp then
+                methodName = methodName:sub(2):gsub("^%l", string.upper)
+                local f = loadstring('return function(self, target) return ' .. v .. ' end')
+                local fnc = f()
+                v = fnc(controller, widget)
+
+                watchObj = {
+                    widget = widget,
+                    res = v,
+                    method = nil,
+                    fnc = function(self)
+                        local value = fnc(controller, widget)
+
+                        if value ~= self.res then
+                            self.method(self.widget, value)
+                            self.res = value
+                        end
+                    end
+                }
+            elseif v == '' or v == methodName then
                 v = true
             end
+
+            hasAttrText = methodName == 'Text'
 
             methodName = 'set' .. methodName
             local method = widget[methodName]
             if method then
                 method(widget, v)
+
+                if watchObj then
+                    watchObj.method = method
+                    table.insert(watchList, watchObj)
+                end
             else
                 pwarning('[' .. HTML_PATH .. ']:' .. tagName .. ' attribute ' .. attr .. ' not exist.')
             end
@@ -51,17 +82,15 @@ local function readNode(el, parent, controller)
     end
 
     if #el.nodes > 0 then
-        if widget.HTML_onReadNodes and not widget:HTML_onReadNodes(el.nodes) then
-            return
-        else
+        if not widget.HTML_onReadNodes or widget:HTML_onReadNodes(el.nodes) then
             local prevEl = nil
             for _, chield in pairs(el.nodes) do
                 chield.prev = prevEl
-                readNode(chield, widget, controller)
+                readNode(chield, widget, controller, watchList)
                 prevEl = chield
             end
         end
-    else
+    elseif not hasAttrText then
         local text = el:getcontent()
         if text then
             local whiteSpace = el.style and el.style['white-space'] or 'nowrap'
@@ -99,7 +128,7 @@ local function onProcessCSS(el)
     end
 end
 
-parseStyleElement(g_resources.readFileContents('html.css'), OFICIAL_HTML_CSS, false)
+parseStyleElement(io.content('modulelib/html.css'), OFICIAL_HTML_CSS, false)
 
 function HtmlLoader(path, parent, controller)
     HTML_PATH = path
@@ -107,11 +136,30 @@ function HtmlLoader(path, parent, controller)
     local cssList = {}
     table.insertall(cssList, OFICIAL_HTML_CSS)
 
-    local root = HtmlParser.parse(g_resources.readFileContents(path))
+    local content = io.content(path)
+    local lastPos = nil
+    while true do
+        local pos = content:find('{{', lastPos)
+        if not pos then
+            break
+        end
+
+        lastPos = content:find('}}', lastPos)
+
+        local script = content:sub(pos + 2, lastPos - 1)
+        local f = loadstring('return function(self) return ' .. script .. ' end')
+        local res = f()(controller, event)
+        if res then
+            content = table.concat { content:sub(1, pos - 1), res, content:sub(lastPos + 2) }
+        end
+    end
+
+    local root = HtmlParser.parse(content)
     root.widget = nil
     root.path = path
 
     local prevEl = nil
+    local watchList = {}
 
     for _, el in pairs(root.nodes) do
         el.prev = prevEl
@@ -119,7 +167,7 @@ function HtmlLoader(path, parent, controller)
         if tagName == 'style' then
             parseStyleElement(el:getcontent(), cssList, true)
         else
-            root.widget = readNode(el, parent, controller)
+            root.widget = readNode(el, parent, controller, watchList)
             el.prev = el
         end
         prevEl = el
@@ -132,7 +180,6 @@ function HtmlLoader(path, parent, controller)
             pwarning('[' .. path .. '][style] selector(' .. css.selector .. ') no element was found.')
         end
 
-        local prevEl = nil
         for _, el in pairs(els) do
             if not el.style then
                 el.style = {};
@@ -147,10 +194,14 @@ function HtmlLoader(path, parent, controller)
             end
 
             onProcessCSS(el)
-
-            prevEl = el
         end
     end
+
+    controller:cycleEvent(function()
+        for _, obj in pairs(watchList) do
+            obj.fnc(obj)
+        end
+    end, 50)
 
     return root
 end
