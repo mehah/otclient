@@ -35,10 +35,10 @@ local EVENTS_TRANSLATED = {
 }
 
 local parseEvents = function(el, widget, eventName, callStr, controller)
+    local eventCall = loadstring('return function(self, event) ' .. callStr .. ' end')()
     local event = { target = widget }
     local function execEventCall()
-        local f = loadstring('return function(self, event) ' .. callStr .. ' end')
-        f()(controller, event)
+        eventCall(controller, event)
     end
 
     if eventName == 'onchange' then
@@ -109,25 +109,29 @@ end
 local onCreateWidget = function(el, widget, controller)
     local getFncSet = function(exp)
         local f = loadstring('return function(self, value) ' .. exp .. '=value end')
-        return f()
+        return f and f() or nil
     end
 
     if el.attributes['*checked'] then
         local set = getFncSet(el.attributes['*checked'])
-        controller:registerEvents(widget, {
-            onCheckChange = function(widget, checked)
-                set(controller, checked)
-            end
-        })
+        if set then
+            controller:registerEvents(widget, {
+                onCheckChange = function(widget, checked)
+                    set(controller, checked)
+                end
+            })
+        end
     end
 
     if el.attributes['*value'] then
         local set = getFncSet(el.attributes['*value'])
-        controller:registerEvents(widget, {
-            onTextChange = function(widget, value)
-                set(controller, value)
-            end
-        })
+        if set then
+            controller:registerEvents(widget, {
+                onTextChange = function(widget, value)
+                    set(controller, value)
+                end
+            })
+        end
     end
 end
 

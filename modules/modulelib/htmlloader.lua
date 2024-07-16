@@ -1,5 +1,4 @@
 local OFICIAL_HTML_CSS = {}
-local IGNORE_ATTR_CHECK = { 'type', 'name' }
 
 local parseStyleElement, processDisplayStyle, processFloatStyle = dofile('ext/style')
 local parseStyle, parseLayout = dofile('ext/parse')
@@ -100,8 +99,7 @@ local function readNode(el, parent, controller, watchList)
 
             hasAttrText = methodName == 'Text'
 
-            methodName = 'set' .. methodName
-            local method = widget[methodName]
+            local method = widget['set' .. methodName]
             if method then
                 method(widget, v)
 
@@ -109,8 +107,9 @@ local function readNode(el, parent, controller, watchList)
                     watchObj.method = method
                     table.insert(watchList, watchObj)
                 end
-            elseif not table.contains(IGNORE_ATTR_CHECK, attr, true) then
-                pwarning('[' .. HTML_PATH .. ']:' .. tagName .. ' attribute ' .. attr .. ' not exist.')
+            else
+                local _name = string.sub(methodName, 1, 1):lower() .. string.sub(methodName, 2, -1)
+                widget[_name] = v
             end
         end
     end
