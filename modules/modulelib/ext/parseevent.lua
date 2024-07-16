@@ -116,8 +116,8 @@ local onCreateWidget = function(el, widget, controller)
         local set = getFncSet(el.attributes['*checked'])
         if set then
             controller:registerEvents(widget, {
-                onCheckChange = function(widget, checked)
-                    set(controller, checked)
+                onCheckChange = function(widget, value)
+                    set(controller, value)
                 end
             })
         end
@@ -126,11 +126,19 @@ local onCreateWidget = function(el, widget, controller)
     if el.attributes['*value'] then
         local set = getFncSet(el.attributes['*value'])
         if set then
-            controller:registerEvents(widget, {
-                onTextChange = function(widget, value)
-                    set(controller, value)
-                end
-            })
+            if widget.getCurrentOption then
+                controller:registerEvents(widget, {
+                    onOptionChange = function(widget, text, data)
+                        set(controller, data)
+                    end
+                })
+            else
+                controller:registerEvents(widget, {
+                    onValueChange = function(widget, value)
+                        set(controller, value)
+                    end
+                })
+            end
         end
     end
 end

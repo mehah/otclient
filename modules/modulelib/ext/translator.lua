@@ -31,7 +31,7 @@ local function translateAttribute(styleName, attr)
         return '*visible'
     end
 
-    if styleName ~= 'CheckBox' then
+    if styleName ~= 'CheckBox' and styleName ~= 'ComboBox' then
         if attr == '*value' then
             return '*text'
         end
