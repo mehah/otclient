@@ -251,10 +251,14 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 |-------------------------------------------|---------------|-------------------------|
 |Title Attached Effect | Title Widget | Title light |
 
-- html / css system
+- Support HTML/CSS syntax
 
 
 https://github.com/user-attachments/assets/9f20814f-0aed-4b70-8852-334ac745ec11
+
+
+
+https://github.com/user-attachments/assets/3ac8473c-8e90-4639-b815-ef183c7e2adf
 
 
 
