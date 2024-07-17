@@ -1,7 +1,7 @@
 -- @docfuncs @{
 function print(...)
     local msg = ''
-    local args = {...}
+    local args = { ... }
     local appendSpace = #args > 1
     for i, v in ipairs(args) do
         msg = msg .. tostring(v)
@@ -70,7 +70,7 @@ function connect(object, arg1, arg2, arg3)
         if not object[signal] then
             object[signal] = slot
         elseif type(object[signal]) == 'function' then
-            object[signal] = {object[signal]}
+            object[signal] = { object[signal] }
         end
 
         if type(slot) ~= 'function' then
@@ -137,6 +137,7 @@ function newclass(name)
         end
         return instance
     end
+
     class.create = class.internalCreate
     class.__class = name
     class.getClassName = function()
@@ -158,6 +159,7 @@ function extends(base, name)
         end
         return instance
     end
+
     derived.create = derived.internalCreate
     derived.__class = name
     derived.getClassName = function()
@@ -447,4 +449,9 @@ function tdump(title, input)
 
     return dump_str
 end
+
 -- @}
+
+io.content = function(path)
+    return g_resources.readFileContents('/' .. path)
+end

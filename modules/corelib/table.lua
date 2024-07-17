@@ -201,7 +201,6 @@ function table.insertall(t, s)
     for k, v in pairs(s) do
         table.insert(t, v)
     end
-    return res
 end
 
 function table.equals(t, comp)

@@ -512,8 +512,7 @@ opacityScrollbar = nil
 
 function addToOptionsModule()
     -- Add to options module
-    optionPanel = g_ui.loadUI('option_healthcircle')
-    modules.client_options.addTab('HP/MP Circle', optionPanel, '/images/icons/icon_health')
+    optionPanel = g_ui.loadUI('option_healthcircle',modules.client_options:getPanel())
 
     -- UI values
     healthCheckBox = optionPanel:recursiveGetChildById('healthCheckBox')
@@ -563,6 +562,7 @@ function addToOptionsModule()
     distFromCenScrollbar:setValue(distanceFromCenter)
     opacityScrollbar:setText(tr('Opacity') .. ': ' .. opacityCircle)
     opacityScrollbar:setValue(opacityCircle * 100)
+    modules.client_options.addButton("Interface", "HP/MP Circle", optionPanel)
 end
 
 function updateStatsBar()
@@ -595,6 +595,6 @@ function destroyOptionsModule()
     chooseStatsBarDimension = nil
     chooseStatsBarPlacement = nil
 
-    modules.client_options.removeTab('HP/MP Circle')
+    modules.client_options.removeButton("Interface", "HP/MP Circle")
     optionPanel = nil
 end

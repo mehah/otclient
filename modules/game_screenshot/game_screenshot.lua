@@ -43,7 +43,6 @@ local AutoScreenshotEvents = {
 -- LuaFormatter on
 
 -- @ widget
-local screenshotScheduleEvent = nil
 local optionPanel = nil
 -- @
 -- @ variables
@@ -61,18 +60,17 @@ end
 function screenshotController:onTerminate()
     destroyOptionsModule()
 
-    if screenshotScheduleEvent then
-        removeEvent(screenshotScheduleEvent)
-        screenshotScheduleEvent = nil
-    end
+    ScreenshotType = {}
+    checkboxes = {}
+    TypeScreenshots = {}
+    AutoScreenshotEvents = {}
 end
 
 function screenshotController:onGameStart()
     if g_game.getClientVersion() < 1180 then
         return
     end
-    optionPanel = g_ui.loadUI('game_screenshot')
-    modules.client_options.addTab('Screenshot', optionPanel, '/images/icons/icon_misc')
+    optionPanel = g_ui.loadUI('game_screenshot',modules.client_options:getPanel())
 
     for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
         local label = g_ui.createWidget("ScreenshotType", optionPanel.allCheckBox)
@@ -84,6 +82,7 @@ function screenshotController:onGameStart()
         screenshotEvent.currentBoolean = settings
     end
 
+    optionPanel:recursiveGetChildById("enableScreenshots"):setChecked(g_settings.getBoolean("enableScreenshots"))
     optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):setChecked(g_settings.getBoolean("onlyCaptureGameWindow"))
 
     if not g_resources.directoryExists(autoScreenshotDir) then
@@ -94,18 +93,17 @@ function screenshotController:onGameStart()
         onTakeScreenshot = onScreenShot
     })
     optionPanel:recursiveGetChildById("keepBlacklog"):disable() -- no compatibility 11/07/24
-    
+   
+    modules.client_options.addButton("Misc.", "Screenshot", optionPanel)
 end
 
 function screenshotController:onGameEnd()
     if g_game.getClientVersion() >= 1180 then
         g_settings.set("onlyCaptureGameWindow",optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked())
+        g_settings.set("enableScreenshots",optionPanel:recursiveGetChildById("enableScreenshots"):isChecked())
         destroyOptionsModule()
     end
-    if screenshotScheduleEvent then
-        removeEvent(screenshotScheduleEvent)
-        screenshotScheduleEvent = nil
-    end
+
     for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
         local labelScreenshotEvent = screenshotEvent.label:gsub("%s+", "")
         g_settings.set(labelScreenshotEvent, screenshotEvent.currentBoolean)
@@ -150,7 +148,7 @@ end
 -- LuaFormatter on
 
 function destroyOptionsModule()
-    modules.client_options.removeTab('Screenshot')
+    modules.client_options.removeButton("Misc.","Screenshot")
     if optionPanel and not optionPanel:isDestroyed() then
         optionPanel:destroy()
         optionPanel = nil
@@ -178,21 +176,17 @@ function takeScreenshot(name)
         return
     end
 
-    if screenshotScheduleEvent then
-        removeEvent(screenshotScheduleEvent)
-        screenshotScheduleEvent = nil
-    end
-
-    screenshotScheduleEvent = scheduleEvent(function()
+    screenshotController:scheduleEvent(function()
         if  optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked() then
             g_app.doMapScreenshot(name)
         else
             g_app.doScreenshot(name)
         end
-    end, 50)
+    end, 50, 'screenshotScheduleEvent')
 end
 
 function OpenFolder()
     local directory = g_resources.getWriteDir():gsub("[/\\]+", "\\") .. autoScreenshotDirName
     g_platform.openDir(directory)
 end
+
