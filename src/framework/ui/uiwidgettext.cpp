@@ -102,7 +102,7 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 
 void UIWidget::drawText(const Rect& screenCoords)
 {
-    if (m_drawText.empty() || m_color.aF() == 0.f)
+    if (m_drawText.empty() || m_color.aF() == 0.f || !m_font)
         return;
 
     if (screenCoords != m_textCachedScreenCoords) {
@@ -124,7 +124,7 @@ void UIWidget::drawText(const Rect& screenCoords)
     if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
         g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color, m_textDrawConductor);
     } else {
-        auto texture = m_font->getTexture();
+        const auto& texture = m_font->getTexture();
         for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
             g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
         }
