@@ -251,6 +251,11 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 |-------------------------------------------|---------------|-------------------------|
 |Title Attached Effect | Title Widget | Title light |
 
+- html / css system
+
+
+https://github.com/user-attachments/assets/9f20814f-0aed-4b70-8852-334ac745ec11
+
 
 
 
@@ -502,11 +507,14 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
-| Highscore             	| ![](https://geps.dev/progress/90) 	| [#809](https://github.com/mehah/otclient/pull/809)	|
+| Highscore             	| ![](https://geps.dev/progress/100) 	| [#809](https://github.com/mehah/otclient/pull/809)	|
 | Familiar outfit       	| ![](https://geps.dev/progress/30) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
-| Cyclopedia            	| ![](https://geps.dev/progress/5) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
+| Cyclopedia            	| ![](https://geps.dev/progress/50) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
+| Blessing            	| ![](https://geps.dev/progress/1) 	| None	|
+| wheel_of_destiny            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
-| next                   	| ![](https://geps.dev/progress/0)   |   None   	|
+| fix Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
+| Sound tibia 13 | ![](https://geps.dev/progress/0)   |   None   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
 
@@ -520,7 +528,7 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TFS 0.4 <br> (8.6)       	| Fir3element                	| idk CC: @thalesduarte                                   	| 〰️idk             	|
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/kokekanon/otclient.readme/blob/readme3/data/setup.otml#L21)                     	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
-| TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki)](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
+| TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
 | Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
 | Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
 
