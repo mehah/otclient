@@ -72,7 +72,8 @@ enum FlagProp : uint32_t
     PropImageAutoResize = 1 << 22,
     PropImageIndividualAnimation = 1 << 23,
     PropUpdateChildrenIndexStates = 1 << 24,
-    PropDisableUpdateTemporarily = 1 << 25
+    PropDisableUpdateTemporarily = 1 << 25,
+    PropOnHTML = 1 << 26
 };
 
 // @bindclass
@@ -175,6 +176,9 @@ public:
     void setAutoRepeatDelay(int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
 
+    void setOnHtml(bool v) { setProp(PropOnHTML, v); }
+    bool isOnHtml() { return hasProp(PropOnHTML); }
+
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
     bool hasChild(const UIWidgetPtr& child);
@@ -183,7 +187,17 @@ public:
     Rect getMarginRect();
     Rect getChildrenRect();
     UIAnchorLayoutPtr getAnchoredLayout();
+    bool hasAnchoredLayout() { return getAnchoredLayout() != nullptr; }
     UIWidgetPtr getRootParent();
+    UIWidgetPtr getNextWidget() {
+        const auto& parent = getParent();
+        return parent && parent->getChildCount() > getChildIndex() ? parent->getChildByIndex(getChildIndex() + 1) : nullptr;
+    }
+    UIWidgetPtr getPrevWidget() {
+        const auto& parent = getParent();
+        return parent && getChildIndex() > 1 ? parent->getChildByIndex(getChildIndex() - 1) : nullptr;
+    }
+
     UIWidgetPtr getChildAfter(const UIWidgetPtr& relativeChild);
     UIWidgetPtr getChildBefore(const UIWidgetPtr& relativeChild);
     UIWidgetPtr getChildById(const std::string_view childId);

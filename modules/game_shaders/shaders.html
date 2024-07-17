@@ -1,0 +1,22 @@
+<style>
+    .content {
+        border-color: red;
+        border-width: 1;
+        margin-top: 80;
+        margin-left: 5;
+        width: 200;
+        display: none;
+    }
+
+    select {
+        margin-bottom: 5;
+    }
+</style>
+
+<div focusable="false" class="content" anchor="parent" layout="type: verticalBox; fit-children: true">
+    <label style="text-align: center; margin-top: 10">Shaders Map/Outfit/Mount</label>
+    <hr />
+    <select id="mapComboBox" onchange="self:onMapComboBoxChange(event)"></select>
+    <select id="outfitComboBox" onchange="self:onOutfitComboBoxChange(event)"></select>
+    <select id="mountComboBox" onchange="self:onMountComboBoxChange(event)"></select>
+</div>
