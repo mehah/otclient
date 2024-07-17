@@ -54,8 +54,6 @@ local function processDisplayStyle(el)
         return
     end
 
-
-
     if el.style.display == 'none' then
         el.widget:setVisible(false)
     end
