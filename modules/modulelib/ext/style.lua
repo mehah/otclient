@@ -37,14 +37,11 @@ local function parseStyleElement(content, cssList, checkExist)
 end
 
 local function processDisplayStyle(el)
-    if el.widget:getChildIndex() == 1 or el.attributes and el.attributes.anchor == 'parent' then
-        el.widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-        el.widget:addAnchor(AnchorTop, 'parent', AnchorTop)
-        return;
-    end
-
     if el.widget:hasAnchoredLayout() then
-        if el.prev and el.prev.style and el.prev.style.display == 'block' then
+        if el.widget:getChildIndex() == 1 or el.attributes and el.attributes.anchor == 'parent' then
+            el.widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+            el.widget:addAnchor(AnchorTop, 'parent', AnchorTop)
+        elseif el.prev and el.prev.style and el.prev.style.display == 'block' then
             el.widget:addAnchor(AnchorLeft, 'prev', AnchorLeft)
             el.widget:addAnchor(AnchorTop, 'prev', AnchorBottom)
         else -- if el.prev.style.display == 'inline' then
@@ -57,13 +54,15 @@ local function processDisplayStyle(el)
         return
     end
 
+
+
     if el.style.display == 'none' then
         el.widget:setVisible(false)
     end
 end
 
 local function processFloatStyle(el)
-    if not el.style or not el.style.float then
+    if not el.style or not el.style.float or not el.widget:hasAnchoredLayout() then
         return
     end
 

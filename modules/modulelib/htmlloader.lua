@@ -141,22 +141,6 @@ local function readNode(el, parent, controller, watchList)
         end)
     end
 
-    if parent then
-        if widget:hasAnchoredLayout() then
-            local isVisible = widget:isVisible()
-            if isVisible then
-                widget:setVisible(false)
-            end
-            addEvent(function()
-                processDisplayStyle(el)
-                processFloatStyle(el)
-                if isVisible then
-                    widget:setVisible(true)
-                end
-            end)
-        end
-    end
-
     return widget
 end
 
@@ -210,14 +194,9 @@ function HtmlLoader(path, parent, controller)
 
             table.merge(el.style, css.attrs)
 
-            processDisplayStyle(el)
-            processFloatStyle(el)
-
             if el.widget then
                 el.widget:mergeStyle(el.style)
             end
-
-            onProcessCSS(el)
         end
     end
 
@@ -225,6 +204,15 @@ function HtmlLoader(path, parent, controller)
     local radios = root:find("input[type='radio']")
     for _, el in pairs(radios) do
         generateRadioGroup(el, radioGroups, controller)
+    end
+
+    local all = root:find('*')
+    for _, el in pairs(all) do
+        if el.widget then
+            processDisplayStyle(el)
+            processFloatStyle(el)
+            onProcessCSS(el)
+        end
     end
 
     if #watchList > 0 then
