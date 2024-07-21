@@ -130,7 +130,7 @@ function onUpdateBlessDialog(data)
 
     for index, entry in ipairs(data.logs) do
         local row = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory)
-        local date = os.date("%Y-%m-%d, %H:%M:%S", entry.timestam)
+        local date = os.date("%Y-%m-%d, %H:%M:%S", entry.timestamp)
         row:setBackgroundColor(index % 2 == 0 and "#ffffff12" or "#00000012")
         row.rank:setText(date)
         row.name:setText(entry.historyMessage)

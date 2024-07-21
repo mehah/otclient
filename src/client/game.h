@@ -425,6 +425,7 @@ public:
 
     void imbuementDurations(bool isOpen = false);
     void requestBless();
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
