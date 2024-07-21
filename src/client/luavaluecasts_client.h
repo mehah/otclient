@@ -48,3 +48,8 @@ bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints);
 // imbuement
 int push_luavalue(const Imbuement& i);
 int push_luavalue(const ImbuementTrackerItem& i);
+
+// Bless
+int push_luavalue(const BlessData& bless);
+int push_luavalue(const LogData& log);
+int push_luavalue(const BlessDialogData& data);

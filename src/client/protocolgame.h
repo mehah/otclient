@@ -97,6 +97,7 @@ public:
     void sendExcludeFromOwnChannel(const std::string_view name);
     void sendCancelAttackAndFollow();
     void sendRefreshContainer(int containerId);
+    void sendRequestBless();
     void sendRequestOutfit();
     void sendChangeOutfit(const Outfit& outfit);
     void sendTyping(bool typing);

@@ -725,6 +725,13 @@ void ProtocolGame::sendRefreshContainer(int containerId)
     send(msg);
 }
 
+void ProtocolGame::sendRequestBless()
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestBless);
+    send(msg);
+}
+
 void ProtocolGame::sendRequestOutfit()
 {
     const auto& msg = std::make_shared<OutputMessage>();
