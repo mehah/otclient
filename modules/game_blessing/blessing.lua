@@ -106,14 +106,14 @@ function onUpdateBlessDialog(data)
 
     BlessingController.ui.promotionStatus.fightRules:setColoredText(
         "- Depending on the fair fight rules, you will lose between {" .. data.pvpMinXpLoss .. ", #f75f5f} and {" ..
-            data.pvpMaxXpLoss .. "%, #f75f5f} less XP and skill\npoints upon your next PvP death.")
+            data.pvpMaxXpLoss .. "%, #f75f5f} less XP and skill points \nupon your next PvP death.")
 
     BlessingController.ui.promotionStatus.expLoss:setColoredText(
         "- You will lose {" .. data.pveExpLoss .. "%, #f75f5f}% less XP and skill points upon your next PvE death.")
 
     BlessingController.ui.promotionStatus.containerLoss:setColoredText(
         "- There is a {" .. data.equipPvpLoss ..
-            "%, #f75f5f} chance that you will lose your equipped container on your next\ndeath.")
+            "%, #f75f5f} chance that you will lose your equipped container on your next death.")
 
     BlessingController.ui.promotionStatus.equipmentLoss:setColoredText(
         "- There is a {" .. data.equipPveLoss .. "%, #f75f5f} chance that you will lose items upon your next death.")
