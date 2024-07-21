@@ -307,7 +307,7 @@ bool luavalue_cast(int index, std::function<void(Args...)>& func)
                                        "did you forget to hold a reference for that function?", 0);
                 }
             } catch (const LuaException& e) {
-                g_logger.error(stdext::format("lua function callback failed: %s", e.what()));
+                g_logger.fatal(stdext::format("lua function callback failed: %s", e.what()));
             }
         };
         return true;
@@ -341,7 +341,7 @@ luavalue_cast(int index, std::function<Ret(Args...)>& func)
                 throw LuaException("attempt to call an expired lua function from C++,"
                                    "did you forget to hold a reference for that function?", 0);
             } catch (const LuaException& e) {
-                g_logger.error(stdext::format("lua function callback failed: %s", e.what()));
+                g_logger.fatal(stdext::format("lua function callback failed: %s", e.what()));
             }
             return Ret();
         };
