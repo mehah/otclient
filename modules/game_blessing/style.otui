@@ -60,11 +60,12 @@ BlessingButton < UIButton
   image-source: /game_blessing/images/getpremium
   image-clip: 0 0 128 37
   image-border: 3
+  @onClick: modules.game_shop.toggle()
 
   $pressed:
     image-clip: 0 37 128 37
 
-  $disabled:
+  $!on:
     image-clip: 0 74 128 37
   $disabled:
     color: #dfdfdf88

@@ -95,11 +95,13 @@ function onUpdateBlessDialog(data)
     end
 
     if (data.promotion ~= 0) then
+        BlessingController.ui.promotionStatus2.premium_only:setOn(false)
         BlessingController.ui.promotionStatus2.rank:setColoredText(
             "Your character is promoted and your account has Premium\nstatus. As a result, your XP loss is reduced by {30%, #f75f5f}.")
     else
         BlessingController.ui.promotionStatus2.rank:setColoredText(
             "Your character is promoted and your account has Premium\nstatus. As a result, your XP loss is reduced by {0%, #f75f5f}.")
+            BlessingController.ui.promotionStatus2.premium_only:setOn(true)
     end
 
     BlessingController.ui.promotionStatus.fightRules:setColoredText(
