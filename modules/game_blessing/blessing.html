@@ -38,6 +38,7 @@
   .contenedor {
     width: 580;
     display: block;
+    font: verdana-11px-antialised;
   }
 
   .record-blessing {
@@ -45,6 +46,7 @@
     height: 120;
     display: block;
   }
+  
   .mini-panel {
     width: 580;
     height: 300;
@@ -57,6 +59,7 @@
   .data-panel {
     size: 60 20;
     display: flex;
+    text:History;
     image-clip: 0 0 22 23;
     image-border: 3;
     focusable: false;
@@ -68,12 +71,7 @@
 <window id="main" class="blessing-window" text="Blessings">
 
   <minipanel class="mini-panel" text="History" id="blessingHistory" layout="type: verticalBox">
-    <UIWidget class="data-panel" id="testtt">
-      <label style="margin-left: 35;">date</label>
-      <label style="margin-left:140">Event</label>
-    </UIWidget>
 
-    <minipanel layout="type: verticalBox" id="data"></minipanel>
   </minipanel>
 
   <minipanel anchor="parent" class="record-blessing" text="Record of Blessings" id="test"
