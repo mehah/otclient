@@ -52,6 +52,7 @@ function setBlessing()
     ui.blessingHistory:hide()
     ui.historyButton:setText("History")
 end
+
 function toggle()
     if not BlessingController.ui then
         return
@@ -118,10 +119,17 @@ function onUpdateBlessDialog(data)
     BlessingController.ui.promotionStatus.equipmentLoss:setColoredText(
         "- There is a {" .. data.equipPveLoss .. "%, #f75f5f} chance that you will lose items upon your next death.")
 
-    BlessingController.ui.blessingHistory.data:destroyChildren()
+    BlessingController.ui.blessingHistory:destroyChildren()
+
+    local row2 = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory)
+    row2:setBackgroundColor("#363636")
+    row2.rank:setText("date")
+    row2.name:setText("Event")
+    row2.rank:setColor("#c0c0c0")
+    row2.name:setColor("#c0c0c0")
 
     for index, entry in ipairs(data.logs) do
-        local row = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory.data)
+        local row = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory)
         local date = os.date("%Y-%m-%d, %H:%M:%S", entry.timestam)
         row:setBackgroundColor(index % 2 == 0 and "#ffffff12" or "#00000012")
         row.rank:setText(date)

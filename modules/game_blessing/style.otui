@@ -1,7 +1,5 @@
-
 historyData < UIWidget
   height: 16
-
   Label
     anchors.top: parent.top
     anchors.left: parent.left
@@ -26,23 +24,18 @@ historyData < UIWidget
     phantom: true
     margin-left: 5
 
-  
-  
 blessingTEST < UIWidget
   background-color: alpha
   height: 62
   width: 70
   focusable: true
-
   text-align: left
-
   UIWidget
     id: enabled
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     margin-top: -10
     margin-left: 3
-    
   Label
     id: text
     !text: tr('loooooong text')
@@ -61,10 +54,9 @@ BlessingButton < UIButton
   image-clip: 0 0 128 37
   image-border: 3
   @onClick: modules.game_shop.toggle()
-
+  
   $pressed:
     image-clip: 0 37 128 37
-
   $!on:
     image-clip: 0 74 128 37
   $disabled:
