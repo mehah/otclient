@@ -1993,7 +1993,7 @@ function online()
         local tab = addTab('NPCs', false)
         tab.npcChat = true
     end
-    if g_game.getClientVersion() < 862 then
+    if g_game.getClientVersion() < 860 then
         g_keyboard.bindKeyDown('Ctrl+R', openPlayerReportRuleViolationWindow)
     end
     -- open last channels
@@ -2018,7 +2018,7 @@ function online()
 end
 
 function offline()
-    if g_game.getClientVersion() < 862 then
+    if g_game.getClientVersion() < 860 then
         g_keyboard.unbindKeyDown('Ctrl+R')
     end
     clear()

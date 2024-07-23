@@ -2,18 +2,16 @@ controller = Controller:new()
 controller:registerEvents(g_game, {
     onClientVersionChange = function(version)
         -- g_game.enableFeature(GameKeepUnawareTiles)
-        -- g_game.enableFeature(GameSmoothWalkElevation)
-        -- g_game.enableFeature(GameNegativeOffset)
-        -- g_game.enableFeature(GameWingsAurasEffectsShader)
-        
-        g_game.enableFeature(GameFormatCreatureName)
+         g_game.enableFeature(GameSmoothWalkElevation)
+         g_game.enableFeature(GameNegativeOffset)        
+         g_game.enableFeature(GameFormatCreatureName)
 
         if version >= 750 then
             g_game.enableFeature(GameSoul)
         end
 
         if version >= 760 then
-            g_game.enableFeature(GameLevelU16)
+           -- empty
         end
 
         if version >= 770 then
@@ -51,7 +49,18 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 860 then
-            g_game.enableFeature(GameAttackSeq)
+            g_game.enableFeature(GameAttackSeq)            
+            g_game.enableFeature(GameDoubleExperience)            
+            g_game.enableFeature(GamePlayerMounts)            
+            g_game.enableFeature(GameSpritesU32)            
+            g_game.enableFeature(GameDoubleSkills)            
+            g_game.enableFeature(GameIdleAnimations)
+            g_game.enableFeature(GameMagicEffectU16)
+            g_game.enableFeature(GameDistanceEffectU16)            
+            g_game.enableFeature(GameSpritesAlphaChannel)
+
+            
+            g_game.enableFeature(GameWingsAurasEffectsShader)
         end
 
         if version >= 862 then
@@ -59,8 +68,6 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 870 then
-            g_game.enableFeature(GameDoubleExperience)
-            g_game.enableFeature(GamePlayerMounts)
             g_game.enableFeature(GameSpellList)
         end
 
@@ -84,7 +91,6 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 960 then
-            g_game.enableFeature(GameSpritesU32)
             g_game.enableFeature(GameOfflineTrainingTime)
         end
 
@@ -113,7 +119,6 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1035 then
-            g_game.enableFeature(GameDoubleSkills)
             g_game.enableFeature(GameBaseSkillU16)
         end
 
@@ -143,7 +148,7 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1057 then
-            g_game.enableFeature(GameIdleAnimations)
+            -- none
         end
 
         if version >= 1061 then
@@ -229,7 +234,6 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1320 then
-            g_game.enableFeature(GameEffectU16)
             g_game.enableFeature(GameContainerTypes)
             g_game.enableFeature(GameBosstiaryTracker)
             g_game.enableFeature(GamePlayerStateCounter)

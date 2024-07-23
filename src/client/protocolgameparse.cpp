@@ -1841,7 +1841,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
     if (g_game.getFeature(Otc::GameLevelU16))
         level = msg->getU16();
     else
-        level = msg->getU8();
+        level = msg->getU32();
 
     const uint8_t levelPercent = msg->getU8();
 
@@ -1871,7 +1871,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
     }
 
     if (g_game.getClientVersion() < 1281) {
-        const uint8_t magicLevel = msg->getU8();
+        const uint8_t magicLevel = msg->getU32();
 
         uint8_t baseMagicLevel = 0;
         if (g_game.getFeature(Otc::GameSkillsBase))
@@ -1951,7 +1951,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         uint16_t level;
 
         if (g_game.getFeature(Otc::GameDoubleSkills))
-            level = msg->getU16();
+            level = msg->getU32();
         else
             level = msg->getU8();
 
@@ -2095,7 +2095,7 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
 
     uint16_t level = 0;
     if (g_game.getFeature(Otc::GameMessageLevel))
-        level = msg->getU16();
+        level = msg->getU32();
 
     const Otc::MessageMode mode = Proto::translateMessageModeFromServer(msg->getU8());
     uint16_t channelId = 0;
@@ -2368,7 +2368,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
     std::vector<std::tuple<int, std::string, int>> outfitList;
 
     if (g_game.getFeature(Otc::GameNewOutfitProtocol)) {
-        const uint16_t outfitCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
+        const uint16_t outfitCount = msg->getU16();
         for (auto i = 0; i < outfitCount; ++i) {
             uint16_t outfitId = msg->getU16();
             const auto& outfitName = msg->getString();
@@ -2401,7 +2401,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
     std::vector<std::tuple<int, std::string> > mountList;
 
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
-        const uint16_t mountCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
+        const uint16_t mountCount =  msg->getU16();
         for (auto i = 0; i < mountCount; ++i) {
             const uint16_t mountId = msg->getU16(); // mount type
             const auto& mountName = msg->getString(); // mount name
@@ -2435,24 +2435,26 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
 
     std::vector<std::tuple<int, std::string> > wingList;
     std::vector<std::tuple<int, std::string> > auraList;
+    //  we dont use this
     std::vector<std::tuple<int, std::string> > effectList;
     std::vector<std::tuple<int, std::string> > shaderList;
 
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
-        const uint8_t wingCount = msg->getU8();
+        const uint8_t wingCount = msg->getU16();
         for (auto i = 0; i < wingCount; ++i) {
             const uint16_t wingId = msg->getU16();
             const auto& wingName = msg->getString();
             wingList.emplace_back(wingId, wingName);
         }
 
-        const uint8_t auraCount = msg->getU8();
+        const uint8_t auraCount = msg->getU16();
         for (auto i = 0; i < auraCount; ++i) {
             const uint16_t auraId = msg->getU16();
             const auto& auraName = msg->getString();
             auraList.emplace_back(auraId, auraName);
         }
-
+            
+        /* we dont use this
         const uint8_t effectCount = msg->getU8();
         for (auto i = 0; i < effectCount; ++i) {
             const uint16_t effectId = msg->getU16();
@@ -2466,6 +2468,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             const auto& shaderName = msg->getString();
             shaderList.emplace_back(shaderId, shaderName);
         }
+        */
    }
 
     g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList, shaderList);
@@ -2851,12 +2854,14 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, bool parseMount/* = t
         const uint16_t auras = msg->getU16();
         outfit.setAura(auras);
 
-        const uint16_t effects = msg->getU16();
-        outfit.setEffect(effects);
+        // we dont use this
+        //const uint16_t effects = msg->getU16();
+        //outfit.setEffect(effects);
 
-        outfit.setShader(msg->getString());
+        //outfit.setShader(msg->getString());
     }
-
+    uint8_t colorName = msg->getU8();
+ 
     return outfit;
 }
 

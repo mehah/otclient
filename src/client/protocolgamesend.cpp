@@ -53,7 +53,10 @@ void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challeng
     const auto& msg = std::make_shared<OutputMessage>();
 
     msg->addU8(Proto::ClientPendingGame);
-    msg->addU16(g_game.getOs());
+    if (g_platform.isMobile())
+    msg->addU16(0x04);
+    else
+    msg->addU16(0x05);
     msg->addU16(g_game.getProtocolVersion());
 
     if (g_game.getFeature(Otc::GameClientVersion))
@@ -779,8 +782,9 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
         msg->addU16(outfit.getWing());  // wings
         msg->addU16(outfit.getAura());  // auras
-        msg->addU16(outfit.getEffect()); // effects
-        msg->addString(outfit.getShader()); // shader
+        // we dont use this
+        //msg->addU16(outfit.getEffect()); // effects
+        //msg->addString(outfit.getShader()); // shader
     }
 
     send(msg);

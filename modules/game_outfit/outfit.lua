@@ -744,9 +744,11 @@ function onAppearanceChange(widget, selectedWidget)
         showMounts()
         -- numbers
     elseif id == "aura" then
-        showSelectionList(ServerData.auras, tempOutfit.auras, "aura", onAuraSelect)
-    elseif id == "wings" then
-        showSelectionList(ServerData.wings, tempOutfit.wings, "wings", onWingsSelect)
+        showAuras()
+        -- showSelectionList(ServerData.auras, tempOutfit.auras, "aura", onAuraSelect)
+     elseif id == "wings" then
+         showWings()
+         --showSelectionList(ServerData.wings, tempOutfit.wings, "wings", onWingsSelect)
     elseif id == "effects" then
         showSelectionList(ServerData.effects, tempOutfit.effects, "effects", onEffectBarSelect)
         -- strings
@@ -926,6 +928,93 @@ function showMounts()
     window.selectionScroll:show()
     window.listSearch:show()
 end
+
+
+function showAuras()
+    window.presetsList:hide()
+    window.presetsScroll:hide()
+    window.presetButtons:hide()
+  
+    window.selectionList.onChildFocusChange = nil
+    window.selectionList:destroyChildren()
+  
+    local focused = nil
+    do
+      local button = g_ui.createWidget("SelectionButton", window.selectionList)
+      button:setId("0")
+  
+      button.outfit:setOutfit({type = 0})
+      button.name:setText("None")
+      if tempOutfit.aura == 0 then
+        focused = 0
+      end
+    end
+  
+    for _, auraData in ipairs(ServerData.auras) do
+      local button = g_ui.createWidget("SelectionButton", window.selectionList)
+      button:setId(auraData[1])
+  
+      button.outfit:setOutfit({type = auraData[1]})
+      button.name:setText(auraData[2])
+      if tempOutfit.aura == auraData[1] then
+        focused = auraData[1]
+      end
+    end
+  
+    if focused ~= nil then
+      local w = window.selectionList[focused]
+      w:focus()
+      window.selectionList:ensureChildVisible(w, {x = 0, y = 196})
+    end
+  
+    window.selectionList.onChildFocusChange = onAuraSelect
+    window.selectionList:show()
+    window.selectionScroll:show()
+    window.listSearch:show()
+  end
+  
+  function showWings()
+    window.presetsList:hide()
+    window.presetsScroll:hide()
+    window.presetButtons:hide()
+  
+    window.selectionList.onChildFocusChange = nil
+    window.selectionList:destroyChildren()
+  
+    local focused = nil
+    do
+      local button = g_ui.createWidget("SelectionButton", window.selectionList)
+      button:setId("0")
+  
+      button.outfit:setOutfit({type = 0})
+      button.name:setText("None")
+      if tempOutfit.wings == 0 then
+        focused = 0
+      end
+    end
+  
+    for _, wingsData in ipairs(ServerData.wings) do
+      local button = g_ui.createWidget("SelectionButton", window.selectionList)
+      button:setId(wingsData[1])
+  
+      button.outfit:setOutfit({type = wingsData[1]})
+      button.name:setText(wingsData[2])
+      if tempOutfit.wings == wingsData[1] then
+        focused = wingsData[1]
+      end
+    end
+  
+    if focused ~= nil then
+      local w = window.selectionList[focused]
+      w:focus()
+      window.selectionList:ensureChildVisible(w, {x = 0, y = 196})
+    end
+  
+    window.selectionList.onChildFocusChange = onWingsSelect
+    window.selectionList:show()
+    window.selectionScroll:show()
+    window.listSearch:show()
+  end
 
 function showShaders()
     window.presetsList:hide()
@@ -1445,18 +1534,14 @@ function updatePreview()
     if not settings.showMount then
         previewOutfit.mount = 0
     end
-
-    if settings.showAura then
-        attachOrDetachEffect(lastSelectAura, true)
-    else
-        attachOrDetachEffect(lastSelectAura, false)
-    end
-
-    if settings.showWings then
-        attachOrDetachEffect(lastSelectWings, true)
-    else
-        attachOrDetachEffect(lastSelectWings, false)
-    end
+    
+      if not settings.showAura then
+        previewOutfit.aura = 0
+      end
+    
+      if not settings.showWings then
+        previewOutfit.wings = 0
+      end
 
     if settings.effects then
         attachOrDetachEffect(lastSelectEffects, true)
