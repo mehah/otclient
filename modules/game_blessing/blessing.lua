@@ -4,12 +4,12 @@ function BlessingController:onInit()
 end
 
 function BlessingController:onTerminate()
-    self:findWidget("#main"):destroy()
+  --  BlessingController:findWidget("#main"):destroy()
 end
 
 function BlessingController:onGameStart()
     g_ui.importStyle("style.otui")
-    self:loadHtml('blessing.html')
+    BlessingController:loadHtml('blessing.html', g_ui.getRootWidget())
 
     BlessingController:registerEvents(g_game, {
         onUpdateBlessDialog = onUpdateBlessDialog
@@ -119,9 +119,8 @@ function onUpdateBlessDialog(data)
     BlessingController.ui.promotionStatus.equipmentLoss:setColoredText(
         "- There is a {" .. data.equipPveLoss .. "%, #f75f5f} chance that you will lose items upon your next death.")
 
-    BlessingController.ui.blessingHistory:destroyChildren()
-
-    local row2 = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory)
+    BlessingController.ui.blessingHistory:getChildByIndex(1):destroyChildren()
+    local row2 = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory:getChildByIndex(1))
     row2:setBackgroundColor("#363636")
     row2.rank:setText("date")
     row2.name:setText("Event")
@@ -129,7 +128,7 @@ function onUpdateBlessDialog(data)
     row2.name:setColor("#c0c0c0")
 
     for index, entry in ipairs(data.logs) do
-        local row = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory)
+        local row = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory:getChildByIndex(1))
         local date = os.date("%Y-%m-%d, %H:%M:%S", entry.timestamp)
         row:setBackgroundColor(index % 2 == 0 and "#ffffff12" or "#00000012")
         row.rank:setText(date)

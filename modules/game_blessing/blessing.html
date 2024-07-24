@@ -50,28 +50,25 @@
   .mini-panel {
     width: 580;
     height: 300;
-    background-color: #333333;
-    color: #ffffff;
+    background-color: #404040;
+
     margin-bottom: 10;
     display: block;
   }
 
-  .data-panel {
-    size: 60 20;
-    display: flex;
-    text:History;
-    image-clip: 0 0 22 23;
-    image-border: 3;
-    focusable: false;
-    text-offset: 35 0;
-    image-source: /images/ui/button;
-  }
+
 </style>
 
 <window id="main" class="blessing-window" text="Blessings">
 
-  <minipanel class="mini-panel" text="History" id="blessingHistory" layout="type: verticalBox">
+  <minipanel class="mini-panel" text="History" id="blessingHistory" >
+    <UIScrollArea id ="here" layout="type: verticalBox" style="height: 222;width: 570;margin-top:-12;background-color: #404040" >
+<!--      
+    <UIScrollArea id ="here" layout="type: verticalBox" style="height: 222;width: 570;margin-top:-12; vertical-scrollbar: ListBadgeScrollbar" >
+      <VerticalScrollBar  id ="scroll" >
+      </VerticalScrollBar> -->
 
+    </UIScrollArea>
   </minipanel>
 
   <minipanel anchor="parent" class="record-blessing" text="Record of Blessings" id="test"
