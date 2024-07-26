@@ -1,0 +1,12 @@
+UIWidget
+  anchors.fill: parent
+  visible: false
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 22
+
+    OptionCheckBox
+      id: autoChaseOverride
+      !text: tr('Allow auto chase override')
