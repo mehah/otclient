@@ -133,12 +133,4 @@ function parser:parse_declarations(declarations)
   return properties
 end
 
---
-function parser:make_cssom()
-
-end
-
-function parser:apply(DOM)
-end
-
 CssParse = parser

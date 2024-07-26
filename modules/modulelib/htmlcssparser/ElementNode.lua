@@ -155,7 +155,7 @@ function ElementNode:addattribute(k, v)
 		-- class attribute contains "space-separated tokens", each of which we'd like quick access to
 	elseif string.lower(k) == "class" then
 		for class in string.gmatch(v, "%S+") do
-			table.insert(self.classes, class)
+			table.insert(self.classes, class:lower())
 		end
 	end
 end
@@ -331,6 +331,19 @@ local function find(self, s)
 end
 
 function ElementNode:find(s) return find(self, s) end
+
+function ElementNode:findWidgets(s)
+	local els = find(self, s)
+
+	local widgets = {}
+	for _, el in pairs(els) do
+		if el.widget then
+			table.insert(widgets, el.widget)
+		end
+	end
+
+	return widgets
+end
 
 ElementNode.mt.__call = select
 
