@@ -47,6 +47,7 @@ public:
     void importStyleFromOTML(const OTMLNodePtr& styleNode);
     void importStyleFromOTML(const OTMLDocumentPtr& doc);
     OTMLNodePtr getStyle(const std::string_view sn);
+    std::string getStyleName(const std::string_view styleName);
     std::string getStyleClass(const std::string_view styleName);
     OTMLNodePtr findMainWidgetNode(const OTMLDocumentPtr& doc);
 

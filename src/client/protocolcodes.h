@@ -100,6 +100,7 @@ namespace Proto
         GameServerCreateContainer = 112,
         GameServerChangeInContainer = 113,
         GameServerDeleteInContainer = 114,
+        GameServerTakeScreenshot = 117,
         GameServerSetInventory = 120,
         GameServerDeleteInventory = 121,
         GameServerOpenNpcTrade = 122,
@@ -114,6 +115,7 @@ namespace Proto
         GameServerMissleEffect = 133, // Anthem on 13.x
         GameServerItemClasses = 134,
         GameServerTrappers = 135,
+        GameServerCreatureData = 139,
         GameServerCreatureHealth = 140,
         GameServerCreatureLight = 141,
         GameServerCreatureOutfit = 142,
@@ -232,6 +234,7 @@ namespace Proto
         // 51 - 99
 
         // original tibia ONLY
+        ClientImbuementDurations = 96,
         ClientAutoWalk = 100,
         ClientWalkNorth = 101,
         ClientWalkEast = 102,
@@ -289,6 +292,7 @@ namespace Proto
         ClientOpenOwnChannel = 170,
         ClientInviteToOwnChannel = 171,
         ClientExcludeFromOwnChannel = 172,
+        ClientRequestHighscore = 177,
         ClientCancelAttackAndFollow = 190,
         ClientUpdateTile = 201,
         ClientRefreshContainer = 202,

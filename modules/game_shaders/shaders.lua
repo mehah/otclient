@@ -1,5 +1,5 @@
-HOTKEY = 'Ctrl+Y'
-MAP_SHADERS = { {
+local HOTKEY = 'Ctrl+Y'
+local MAP_SHADERS = { {
     name = 'Map - Default',
     frag = nil
 }, {
@@ -79,54 +79,7 @@ MOUNT_SHADERS = { {
     frag = 'shaders/fragment/party.frag'
 } }
 
--- Fix for texture offset drawing, adding walking offsets.
-local dirs = {
-    [0] = {
-        x = 0,
-        y = 1
-    },
-    [1] = {
-        x = 1,
-        y = 0
-    },
-    [2] = {
-        x = 0,
-        y = -1
-    },
-    [3] = {
-        x = -1,
-        y = 0
-    },
-    [4] = {
-        x = 1,
-        y = 1
-    },
-    [5] = {
-        x = 1,
-        y = -1
-    },
-    [6] = {
-        x = -1,
-        y = -1
-    },
-    [7] = {
-        x = -1,
-        y = 1
-    }
-}
-
-shadersPanel = nil
-
-function onWalkEvent()
-    local player = g_game.getLocalPlayer()
-    local dir = g_game.getLastWalkDir()
-    local w = player:getWalkedDistance()
-    w.x = w.x + dirs[dir].x
-    w.y = w.y + dirs[dir].y
-    player:setWalkedDistance(w);
-end
-
-function attachShaders()
+local function attachShaders()
     local map = modules.game_interface.getMapPanel()
     map:setShader('Default')
 
@@ -135,92 +88,87 @@ function attachShaders()
     player:setMountShader('Default')
 end
 
-function init()
-    connect(g_game, {
-        onGameStart = attachShaders
-    })
+local registerShader = function(opts, method)
+    local fragmentShaderPath = resolvepath(opts.frag)
 
-    g_ui.importStyle('shaders.otui')
+    if fragmentShaderPath ~= nil then
+        --  local shader = g_shaders.createShader()
+        g_shaders.createFragmentShader(opts.name, opts.frag, opts.useFramebuffer or false)
 
-    g_keyboard.bindKeyDown(HOTKEY, toggle)
-
-    shadersPanel = g_ui.createWidget('ShadersPanel', modules.game_interface.getMapPanel())
-    shadersPanel:setMarginTop(80)
-    shadersPanel:hide()
-
-    local mapComboBox = shadersPanel:getChildById('mapComboBox')
-    mapComboBox.onOptionChange = function(combobox, option)
-        local map = modules.game_interface.getMapPanel()
-        map:setShader(option)
-
-        local data = combobox:getCurrentOption().data
-        map:setDrawViewportEdge(data.drawViewportEdge == true)
-    end
-
-    local outfitComboBox = shadersPanel:getChildById('outfitComboBox')
-    outfitComboBox.onOptionChange = function(combobox, option)
-        local player = g_game.getLocalPlayer()
-        if player then
-            player:setShader(option)
-            local data = combobox:getCurrentOption().data
-            player:setDrawOutfitColor(data.drawColor ~= false)
+        if opts.tex1 then
+            g_shaders.addMultiTexture(opts.name, opts.tex1)
         end
-    end
-
-    local mountComboBox = shadersPanel:getChildById('mountComboBox')
-    mountComboBox.onOptionChange = function(combobox, option)
-        local player = g_game.getLocalPlayer()
-        if player then
-            player:setMountShader(option)
+        if opts.tex2 then
+            g_shaders.addMultiTexture(opts.name, opts.tex2)
         end
+
+        -- Setup proper uniforms
+        g_shaders[method](opts.name)
     end
+end
 
-    local registerShader = function(opts, method)
-        local fragmentShaderPath = resolvepath(opts.frag)
+ShaderController = Controller:new()
 
-        if fragmentShaderPath ~= nil then
-            --  local shader = g_shaders.createShader()
-            g_shaders.createFragmentShader(opts.name, opts.frag, opts.useFramebuffer or false)
-
-            if opts.tex1 then
-                g_shaders.addMultiTexture(opts.name, opts.tex1)
-            end
-            if opts.tex2 then
-                g_shaders.addMultiTexture(opts.name, opts.tex2)
-            end
-
-            -- Setup proper uniforms
-            g_shaders[method](opts.name)
-        end
-    end
-
+function ShaderController:onInit()
     for _, opts in pairs(MAP_SHADERS) do
         registerShader(opts, 'setupMapShader')
-        mapComboBox:addOption(opts.name, opts)
     end
 
     for _, opts in pairs(OUTFIT_SHADERS) do
         registerShader(opts, 'setupOutfitShader')
-        outfitComboBox:addOption(opts.name, opts)
     end
 
     for _, opts in pairs(MOUNT_SHADERS) do
         registerShader(opts, 'setupMountShader')
-        mountComboBox:addOption(opts.name, opts)
     end
 end
 
-function terminate()
-    disconnect(g_game, {
-        onGameStart = attachShaders
-    })
-
-    g_keyboard.unbindKeyDown(HOTKEY)
-    shadersPanel:destroy()
-    shadersPanel = nil
+function ShaderController:onTerminate()
     g_shaders.clear()
 end
 
-function toggle()
-    shadersPanel:setVisible(not shadersPanel:isVisible())
+function ShaderController:onGameStart()
+    attachShaders()
+
+    self:bindKeyDown(HOTKEY, function()
+        ShaderController.ui:setVisible(not ShaderController.ui:isVisible())
+    end)
+
+    self:loadHtml('shaders.html', modules.game_interface.getMapPanel())
+
+    for _, opts in pairs(MAP_SHADERS) do
+        self.ui.mapComboBox:addOption(opts.name, opts)
+    end
+
+    for _, opts in pairs(OUTFIT_SHADERS) do
+        self.ui.outfitComboBox:addOption(opts.name, opts)
+    end
+
+    for _, opts in pairs(MOUNT_SHADERS) do
+        self.ui.mountComboBox:addOption(opts.name, opts)
+    end
+end
+
+function ShaderController:onMapComboBoxChange(event)
+    local map = modules.game_interface.getMapPanel()
+    map:setShader(event.text)
+
+    local data = event.target:getCurrentOption().data
+    map:setDrawViewportEdge(data.drawViewportEdge == true)
+end
+
+function ShaderController:onOutfitComboBoxChange(event)
+    local player = g_game.getLocalPlayer()
+    if player then
+        player:setShader(event.text)
+        local data = event.target:getCurrentOption().data
+        player:setDrawOutfitColor(data.drawColor ~= false)
+    end
+end
+
+function ShaderController:onMountComboBoxChange(event)
+    local player = g_game.getLocalPlayer()
+    if player then
+        player:setMountShader(event.text)
+    end
 end

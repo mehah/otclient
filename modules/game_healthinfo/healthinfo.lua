@@ -17,11 +17,6 @@ end
 healthManaController = Controller:new()
 healthManaController:setUI('healthinfo', modules.game_interface.getMainRightPanel())
 
-local healthManaControllerEvents = healthManaController:addEvent(LocalPlayer, {
-    onHealthChange = healthManaEvent,
-    onManaChange = healthManaEvent
-})
-
 function healthManaController:onInit()
 end
 
@@ -29,12 +24,10 @@ function healthManaController:onTerminate()
 end
 
 function healthManaController:onGameStart()
-    healthManaControllerEvents:connect()
-    healthManaControllerEvents:execute('onHealthChange')
-    healthManaControllerEvents:execute('onManaChange')
+    healthManaController:registerEvents(LocalPlayer, {
+        onHealthChange = healthManaEvent,
+        onManaChange = healthManaEvent
+    }):execute()
 end
 
-function healthManaController:onGameEnd()
-    healthManaControllerEvents:disconnect()
-end
 -- @ End of Health/Mana

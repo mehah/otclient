@@ -25,10 +25,10 @@
 
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/core/eventdispatcher.h>
 
 Shader::Shader(ShaderType shaderType) : m_shaderId(glCreateShader(static_cast<GLenum>(shaderType))), m_shaderType(shaderType)
 {
-    ;
     if (!m_shaderId)
         g_logger.fatal("Unable to create GL shader");
 }
@@ -38,8 +38,11 @@ Shader::~Shader()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
 #endif
-    if (g_graphics.ok())
-        glDeleteShader(m_shaderId);
+    if (g_graphics.ok()) {
+        g_mainDispatcher.addEvent([id = m_shaderId] {
+            glDeleteShader(id);
+        });
+    }
 }
 
 bool Shader::compileSourceCode(const std::string_view sourceCode) const

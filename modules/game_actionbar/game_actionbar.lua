@@ -89,17 +89,9 @@ function terminate()
 end
 
 function online()
-
-    if g_game.getFeature(GameSpellList) then
-        local console = modules.game_cooldown.cooldownWindow
-        if console then
-            console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
-        end
-    else
-        local console = modules.game_console.consolePanel
-        if console then
-            console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
-        end
+    local console = modules.game_cooldown.cooldownWindow
+    if console then
+        console:addAnchor(AnchorTop, actionBar:getId(), AnchorBottom)
     end
     actionBarPanel:destroyChildren()
     addEvent(function()

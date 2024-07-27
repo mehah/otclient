@@ -4,7 +4,6 @@ PopupMenuButton < UIButton
   text-offset: 4 0
   text-align: left
   font: verdana-11px-rounded
-
   color: white
   background-color: alpha
 

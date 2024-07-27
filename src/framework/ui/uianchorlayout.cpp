@@ -175,6 +175,24 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     Rect newRect = widget->getRect();
     bool verticalMoved = false;
     bool horizontalMoved = false;
+    auto extraMarginTop = 0;
+    auto extraMarginBottom = 0;
+
+    if (widget->isOnHtml()) {
+        for (const auto& anchor : anchorGroup->getAnchors()) {
+            if (const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget)) {
+                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft) {
+                    extraMarginTop += hookedWidget->getMarginBottom();
+                    extraMarginBottom += hookedWidget->getMarginTop();
+                    break;
+                } else if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorRight) {
+                    extraMarginTop -= hookedWidget->getMarginTop();
+                    extraMarginBottom -= hookedWidget->getMarginBottom();
+                    break;
+                }
+            }
+        }
+    }
 
     // calculates new rect based on anchors
     for (const auto& anchor : anchorGroup->getAnchors()) {
@@ -225,17 +243,17 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 break;
             case Fw::AnchorTop:
                 if (!verticalMoved) {
-                    newRect.moveTop(point + widget->getMarginTop());
+                    newRect.moveTop(point + (widget->getMarginTop() + extraMarginTop));
                     verticalMoved = true;
                 } else
-                    newRect.setTop(point + widget->getMarginTop());
+                    newRect.setTop(point + (widget->getMarginTop() + extraMarginTop));
                 break;
             case Fw::AnchorBottom:
                 if (!verticalMoved) {
-                    newRect.moveBottom(point - widget->getMarginBottom());
+                    newRect.moveBottom(point - (widget->getMarginBottom() + extraMarginBottom));
                     verticalMoved = true;
                 } else
-                    newRect.setBottom(point - widget->getMarginBottom());
+                    newRect.setBottom(point - (widget->getMarginBottom() + extraMarginBottom));
                 break;
             default:
                 break;

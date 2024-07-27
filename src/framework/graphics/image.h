@@ -48,6 +48,8 @@ public:
     bool nextMipmap();
 
     void flipVertically();
+    void setOpacity(const uint8_t v);
+
     void reverseChannels(); // argb -> bgra or bgra -> argb
 
     void setPixel(int x, int y, const uint8_t* pixel) {

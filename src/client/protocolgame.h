@@ -131,6 +131,8 @@ public:
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
     void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
+    void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, const std::string& world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
+    void sendImbuementDurations(bool isOpen = false);
 
     // otclient only
     void sendChangeMapAwareRange(int xrange, int yrange);
@@ -209,6 +211,8 @@ private:
     void parseItemClasses(const InputMessagePtr& msg);
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
+    void addCreatureIcon(const InputMessagePtr& msg, const CreaturePtr& creature);
+    void parseCreatureData(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);
     void parseCreatureLight(const InputMessagePtr& msg);
     void parseCreatureOutfit(const InputMessagePtr& msg) const;
@@ -304,6 +308,8 @@ private:
     void parseBosstiarySlots(const InputMessagePtr& msg);
     void parseBosstiaryCooldownTimer(const InputMessagePtr& msg);
     void parseBosstiaryEntryChanged(const InputMessagePtr& msg);
+    void parseTakeScreenshot(const InputMessagePtr& msg);
+    void parseHighscores(const InputMessagePtr& msg);
 
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);
