@@ -2,6 +2,7 @@ local inventoryShrink = false
 local itemSlotsWithDuration = {}
 local updateSlotsDurationEvent = nil
 local DURATION_UPDATE_INTERVAL = 1000
+
 local function getInventoryUi()
     if inventoryShrink then
         return inventoryController.ui.offPanel
@@ -35,7 +36,6 @@ local function stopEvent()
 end
 
 local function updateSlotsDuration()
-    print(2)
     -- @ prevent :
     if not g_game.isOnline() or next(itemSlotsWithDuration) == nil then
         stopEvent()
