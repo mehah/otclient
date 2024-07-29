@@ -96,9 +96,6 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
         local button = g_ui.createWidget("SelectionButton", window.selectionList)
         button:setId("0")
 
-        button.outfit:setOutfit({
-            type = 0
-        })
         button.name:setText("None")
         if tempValue == 0 then
             focused = 0
@@ -1145,9 +1142,7 @@ function showTitle()
         local button = g_ui.createWidget("SelectionButton", window.selectionList)
         button:setId("0")
 
-        button.outfit:setOutfit({
-            type = 0
-        })
+
         button.name:setText("None")
         if tempOutfit.tile == 0 then
             focused = 0

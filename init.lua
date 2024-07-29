@@ -8,19 +8,19 @@ Services = {
     --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
 }
 
---[[ Servers_init = {
-    ["http://ip/login.php"] = {
-        ["port"] = 80,
-        ["protocol"] = 1332,
-        ["httpLogin"] = true
+ Servers_init = {
+    ["127.0.0.1"] = {
+        ["port"] = 7171,
+        ["protocol"] = 860,
+        ["httpLogin"] = false
     },
-    ["ip.net"] = {
+    ["sv.bigot.com.br"] = {
         ["port"] = 7171,
         ["protocol"] = 860,
         ["httpLogin"] = false
     },
 
-} ]]
+}
 
 g_app.setName("OTClient - Redemption");
 g_app.setCompactName("otclient");
@@ -106,7 +106,7 @@ local function loadModules()
     end
 
     -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
-    -- g_modules.enableAutoReload()
+     g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip
