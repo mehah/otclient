@@ -1,49 +1,18 @@
 local OFICIAL_HTML_CSS = {}
 
-local parseStyleElement, processDisplayStyle, processFloatStyle = dofile('ext/style')
-local parseStyle, parseLayout = dofile('ext/parse')
-local parseEvents, onCreateWidget, generateRadioGroup = dofile('ext/parseevent')
+local parseCss, parseAndSetDisplayAttr, parseAndSetFloatStyle = dofile('ext/style')
+local parseStyle, parseLayout, parseExpression = dofile('ext/parse')
+local parseEvents, onCreateWidget, setText, createRadioGroup, afterLoadElement = dofile('ext/parseevent')
 local translateStyleName, translateAttribute = dofile('ext/translator')
 
-local function processExpression(content, controller)
-    local lastPos = nil
-    while true do
-        local pos = content:find('{{', lastPos)
-        if not pos then
-            break
-        end
-
-        lastPos = content:find('}}', lastPos)
-
-        local script = content:sub(pos + 2, lastPos - 1)
-
-        local res = nil
-        if content:sub(pos - 2, pos - 1) == 'tr' then
-            pos = pos - 2
-            res = tr(script)
-        else
-            local f = loadstring('return function(self) return ' .. script .. ' end')
-            res = f()(controller)
-        end
-
-        if res then
-            content = table.concat { content:sub(1, pos - 1), res, content:sub(lastPos + 2) }
-        end
-    end
-    return content
-end
-
 local function readNode(el, parent, controller, watchList)
-    local tagName = el.name
-
-    local styleName = g_ui.getStyleName(translateStyleName(tagName, el))
+    local styleName = g_ui.getStyleName(translateStyleName(el.name, el))
     local widget = g_ui.createWidget(styleName ~= '' and styleName or 'UIWidget', parent or rootWidget)
     widget:setOnHtml(true)
+
     el.widget = widget
 
     onCreateWidget(el, widget, controller)
-
-    local hasAttrText = false
 
     for attr, v in pairs(el.attributes) do
         local attr = translateAttribute(styleName, attr)
@@ -97,9 +66,13 @@ local function readNode(el, parent, controller, watchList)
 
             v = tonumber(v) or toboolean(v) or v
 
-            hasAttrText = methodName == 'Text'
+            local method = nil
+            if methodName == 'Text' then
+                method = function(widget, v) setText(el, v) end
+            else
+                method = widget['set' .. methodName]
+            end
 
-            local method = widget['set' .. methodName]
             if method then
                 method(widget, v)
 
@@ -123,37 +96,14 @@ local function readNode(el, parent, controller, watchList)
                 prevEl = chield
             end
         end
-    elseif not hasAttrText then
-        addEvent(function()
-            local text = el:getcontent()
-            if text then
-                local whiteSpace = el.style and el.style['white-space'] or 'nowrap'
-                if whiteSpace == 'normal' then
-                    text = text:trim()
-                elseif whiteSpace == 'nowrap' then
-                    text = text:gsub("[\n\r\t]", ""):gsub("  ", "")
-                elseif whiteSpace == 'pre' then
-                    -- nothing
-                end
-
-                widget:setText(text)
-            end
-        end)
     end
 
     return widget
 end
 
-local function onProcessCSS(el)
-    if el.name == 'hr' then
-        if el.widget:hasAnchoredLayout() then
-            el.widget:addAnchor(AnchorLeft, 'parent', AnchorLeft)
-            el.widget:addAnchor(AnchorRight, 'parent', AnchorRight)
-        end
-    end
-end
 
-parseStyleElement(io.content('modulelib/html.css'), OFICIAL_HTML_CSS, false)
+
+parseCss(io.content('modulelib/html.css'), OFICIAL_HTML_CSS, false)
 
 function HtmlLoader(path, parent, controller)
     HTML_PATH = path
@@ -161,21 +111,23 @@ function HtmlLoader(path, parent, controller)
     local cssList = {}
     table.insertall(cssList, OFICIAL_HTML_CSS)
 
-    local root = HtmlParser.parse(processExpression(io.content(path), controller))
+    local root = HtmlParser.parse(parseExpression(io.content(path), controller))
     root.widget = nil
     root.path = path
 
-    local prevEl = nil
     local watchList = {}
-
+    local prevEl = nil
     for _, el in pairs(root.nodes) do
         el.prev = prevEl
-        local tagName = el.name
-        if tagName == 'style' then
-            parseStyleElement(el:getcontent(), cssList, true)
+        if el.name == 'style' then
+            parseCss(el:getcontent(), cssList, true)
+        elseif el.name == 'link' then
+            local href = el.attributes.href
+            if href then
+                parseCss(io.content(href), cssList, true)
+            end
         else
             root.widget = readNode(el, parent, controller, watchList)
-            el.prev = el
         end
         prevEl = el
     end
@@ -201,17 +153,18 @@ function HtmlLoader(path, parent, controller)
     end
 
     local radioGroups = {}
-    local radios = root:find("input[type='radio']")
-    for _, el in pairs(radios) do
-        generateRadioGroup(el, radioGroups, controller)
-    end
-
     local all = root:find('*')
-    for _, el in pairs(all) do
+    for i = #all, 1, -1 do
+        local el = all[i]
         if el.widget then
-            processDisplayStyle(el)
-            processFloatStyle(el)
-            onProcessCSS(el)
+            parseAndSetDisplayAttr(el)
+            parseAndSetFloatStyle(el)
+
+            if el.name == 'input' and el.attributes.type == 'radio' then
+                createRadioGroup(el, radioGroups, controller)
+            end
+
+            afterLoadElement(el)
         end
     end
 
