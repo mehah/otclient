@@ -208,7 +208,6 @@ function load(forceDefaults)
     local hotkeySettings = g_settings.getNode('game_hotkeys')
     local hotkeys = {}
 
-
     if not table.empty(hotkeySettings) then
         hotkeys = hotkeySettings
     end
