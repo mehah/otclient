@@ -42,21 +42,22 @@ local function onGameEnd(self)
         self.scheduledEvents[TypeEvent.GAME_INIT] = nil
     end
 
-    if self.dataUI ~= nil and self.dataUI.onGameStart then
+    if self.dataUI ~= nil and self.dataUI.onGameStart and self.ui then
         self.ui:destroy()
         self.ui = nil
     end
 end
 
 Controller = {
-    name = nil,
-    events = nil,
-    scheduledEvents = nil,
     ui = nil,
-    keyboardEvents = nil,
+    name = nil,
     attrs = nil,
     opcodes = nil,
-    keyboardAnchor = nil
+    events = nil,
+    htmlRoot = nil,
+    keyboardAnchor = nil,
+    scheduledEvents = nil,
+    keyboardEvents = nil
 }
 
 function Controller:new()
@@ -114,9 +115,37 @@ function Controller:init()
     end
 end
 
+function Controller:loadHtml(path, parent)
+    local suffix = ".html"
+    if path:sub(- #suffix) ~= suffix then
+        path = path .. suffix
+    end
+
+    self:setUI(path, parent)
+    self.htmlRoot = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
+    self.ui = self.htmlRoot.widget
+end
+
+function Controller:findElements(query)
+    return self.htmlRoot and self.htmlRoot:find(query:trim()) or {}
+end
+
+function Controller:findWidgets(query)
+    return self.htmlRoot and self.htmlRoot:findWidgets(query:trim()) or {}
+end
+
+function Controller:findElement(query)
+    local els = self:findElements(query)
+    return #els > 0 and els[1] or nil
+end
+
+function Controller:findWidget(query)
+    local els = self:findWidgets(query)
+    return #els > 0 and els[1] or nil
+end
+
 function Controller:loadUI(name, parent)
     if self.ui then
-        error('The UI has already been created.')
         return
     end
 
@@ -185,6 +214,7 @@ function Controller:terminate()
     self.keyboardEvents = nil
     self.keyboardAnchor = nil
     self.scheduledEvents = nil
+    self.htmlRoot = nil
 
     self.__onGameStart = nil
     self.__onGameEnd = nil

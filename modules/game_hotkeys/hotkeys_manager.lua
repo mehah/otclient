@@ -59,7 +59,7 @@ boundCombosCallback = {}
 hotkeysList = {}
 disableHotkeysCount = 0
 lastHotkeyTime = g_clock.millis()
-local hotkeysWindowButton = nil 
+local hotkeysWindowButton = nil
 
 -- public functions
 function init()
@@ -202,6 +202,7 @@ function cancel()
 end
 
 function load(forceDefaults)
+    local serverHost = nil
     hotkeysManagerLoaded = false
 
     local hotkeySettings = g_settings.getNode('game_hotkeys')
@@ -211,7 +212,10 @@ function load(forceDefaults)
         hotkeys = hotkeySettings
     end
     if perServer and not table.empty(hotkeys) then
-        hotkeys = hotkeys[G.host]
+        if G.host ~= nil then
+            serverHost = string.gsub(G.host, "^https?://", "")
+            hotkeys = hotkeys[serverHost]
+        end
     end
     if perCharacter and not table.empty(hotkeys) then
         hotkeys = hotkeys[g_game.getCharacterName()]
@@ -257,14 +261,15 @@ function reload()
 end
 
 function save()
+    local serverHost = string.gsub(G.host, "^https?://", "")
     local hotkeySettings = g_settings.getNode('game_hotkeys') or {}
     local hotkeys = hotkeySettings
 
     if perServer then
-        if not hotkeys[G.host] then
-            hotkeys[G.host] = {}
+        if not hotkeys[serverHost] then
+            hotkeys[serverHost] = {}
         end
-        hotkeys = hotkeys[G.host]
+        hotkeys = hotkeys[serverHost]
     end
 
     if perCharacter then

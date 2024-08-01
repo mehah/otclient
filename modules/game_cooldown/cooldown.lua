@@ -277,6 +277,11 @@ function onSpellGroupCooldown(groupId, duration)
 end
 
 function setSpellGroupCooldownsVisible(visible)
+    if not g_game.getFeature(GameSpellList) then
+        cooldownWindow:hide()
+        cooldownWindow:setHeight(10)
+        return
+    end
     if visible then
         cooldownWindow:setHeight(30)
         cooldownWindow:show()
