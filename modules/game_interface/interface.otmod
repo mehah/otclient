@@ -42,5 +42,6 @@ Module
     - game_shop
     - game_screenshot
     - game_highscore
+    - game_store
   @onLoad: init()
   @onUnload: terminate()
