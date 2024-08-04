@@ -72,6 +72,26 @@ PhantomMiniWindow
       $pressed !disabled:
         image-clip: 12 0 12 12
 
+    UIButton
+      id: purseButton
+      image-source: /images/inventory/purse
+      !tooltip: tr('Open purse')
+      anchors.left: backpack.left
+      anchors.bottom: backpack.top   
+      size: 34 12
+      image-clip: 0 0 34 12
+      margin-bottom: 3
+      @onClick: |
+        local purse = g_game.getLocalPlayer():getInventoryItem(InventorySlotPurse)
+        if purse then
+            g_game.use(purse)
+        end
+
+      $on:
+        image-clip: 0 12 34 12
+      $pressed:
+        image-clip: 0 12 34 12
+
     TopToggleButton
       id: standPosture
       image-source: /images/inventory/buttons_general

@@ -1,3 +1,4 @@
+local WATCH_CYCLE_CHECK_MS = 50
 local OFICIAL_HTML_CSS = {}
 
 local parseCss, parseAndSetDisplayAttr, parseAndSetFloatStyle = dofile('ext/style')
@@ -51,6 +52,7 @@ local function readNode(el, parent, controller, watchList)
                 watchObj = {
                     widget = widget,
                     res = v,
+                    el = el,
                     method = nil,
                     fnc = function(self)
                         local value = fnc(controller, widget)
@@ -100,8 +102,6 @@ local function readNode(el, parent, controller, watchList)
 
     return widget
 end
-
-
 
 parseCss(io.content('modulelib/html.css'), OFICIAL_HTML_CSS, false)
 
@@ -169,11 +169,23 @@ function HtmlLoader(path, parent, controller)
     end
 
     if #watchList > 0 then
-        controller:cycleEvent(function()
-            for _, obj in pairs(watchList) do
-                obj.fnc(obj)
+        local event = nil
+        event = controller:cycleEvent(function()
+            table.remove_if(watchList, function(i, obj)
+                local isDestroyed = obj.widget:isDestroyed()
+                if isDestroyed then
+                    obj.el.widget = nil
+                else
+                    obj.fnc(obj)
+                end
+
+                return isDestroyed
+            end)
+
+            if #watchList == 0 then
+                removeEvent(event)
             end
-        end, 50)
+        end, WATCH_CYCLE_CHECK_MS)
     end
 
     return root
