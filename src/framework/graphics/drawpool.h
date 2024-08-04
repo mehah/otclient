@@ -255,8 +255,11 @@ private:
     bool updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord);
     PoolState getState(const TexturePtr& texture, const Color& color);
 
-    float getOpacity() const { return m_state.opacity; }
-    Rect getClipRect() { return m_state.clipRect; }
+    PoolState& getCurrentState() { return m_states[m_lastStateIndex]; }
+    const PoolState& getCurrentState() const { return m_states[m_lastStateIndex]; }
+
+    float getOpacity() const { return getCurrentState().opacity; }
+    Rect getClipRect() { return getCurrentState().clipRect; }
 
     void setCompositionMode(CompositionMode mode, bool onlyOnce = false);
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false);
@@ -264,12 +267,12 @@ private:
     void setOpacity(float opacity, bool onlyOnce = false);
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr);
 
-    void resetOpacity() { m_state.opacity = 1.f; }
-    void resetClipRect() { m_state.clipRect = {}; }
-    void resetShaderProgram() { m_state.shaderProgram = nullptr; m_state.action = nullptr; }
-    void resetCompositionMode() { m_state.compositionMode = CompositionMode::NORMAL; }
-    void resetBlendEquation() { m_state.blendEquation = BlendEquation::ADD; }
-    void resetTransformMatrix() { m_state.transformMatrix = DEFAULT_MATRIX3; }
+    void resetOpacity() { getCurrentState().opacity = 1.f; }
+    void resetClipRect() { getCurrentState().clipRect = {}; }
+    void resetShaderProgram() { getCurrentState().shaderProgram = nullptr; getCurrentState().action = nullptr; }
+    void resetCompositionMode() { getCurrentState().compositionMode = CompositionMode::NORMAL; }
+    void resetBlendEquation() { getCurrentState().blendEquation = BlendEquation::ADD; }
+    void resetTransformMatrix() { getCurrentState().transformMatrix = DEFAULT_MATRIX3; }
 
     void pushTransformMatrix();
     void popTransformMatrix();
@@ -346,6 +349,14 @@ private:
         }
     }
 
+    void nextStateAndReset() {
+        m_states[++m_lastStateIndex] = {};
+    }
+
+    void backState() {
+        --m_lastStateIndex;
+    }
+
     const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
 
     bool m_enabled{ true };
@@ -357,7 +368,8 @@ private:
     uint32_t m_onlyOnceStateFlag{ 0 };
     uint_fast64_t m_lastFramebufferId{ 0 };
 
-    PoolState m_state, m_oldState;
+    PoolState m_states[10];
+    uint_fast8_t m_lastStateIndex{ 0 };
 
     DrawPoolType m_type{ DrawPoolType::LAST };
 

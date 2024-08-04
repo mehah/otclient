@@ -1,0 +1,398 @@
+WorldType < UIWidget
+  background-color: alpha
+  text-offset: 35 1
+  focusable: true
+
+  font: verdana-11px-rounded
+  text-align: left
+
+  CheckBox
+    id: enabled
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 15
+    height: 15
+    margin-top: 2
+    margin-left: 3
+  Label
+    id: text
+    margin-left: 8
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    focusable: false
+
+PlayersTableHeaderColumn < UIWidget
+  image-source: /images/ui/button
+  image-clip: 0 0 22 23
+  image-border: 3
+  focusable: false
+
+HighScoreData < UIWidget
+  height: 16
+
+  Label
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom : parent.bottom
+    id: rank
+    width: 55
+    !text: tr('1')
+    text-align: left
+    color: #dfdfdfcf
+    phantom: false
+    margin-left: 4
+
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.bottom : parent.bottom
+    id: name
+    width: 216
+
+    !text: tr('-')
+    text-align: left
+    color: #dfdfdfcf
+    phantom: true
+    margin-left: 5
+
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.bottom : parent.bottom
+    text-align: center
+    id: voc
+    width: 115
+    !text: tr('-')
+    color: #dfdfdfcf
+    phantom: true
+
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.bottom : parent.bottom
+    id: world
+    width: 98
+    !text: tr('-')
+    text-align: center
+    color: #dfdfdfcf
+    phantom: true
+
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.bottom : parent.bottom
+    id: level
+    width: 65
+    !text: tr('-')
+    text-align: center
+    color: #dfdfdfcf
+    phantom: true
+
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.bottom : parent.bottom
+    text-align: right
+    margin-right: 5
+    id: points
+    color: #dfdfdfcf
+    phantom: true
+
+MainWindow
+  id: highscoresWindow
+  !text: tr('Highscores')
+  size: 698 590
+  text-offset: 0 1
+  @onEscape: modules.game_highscore.hide()
+
+  Panel
+    id: filters
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 125
+    text-offset: 0 -54
+    !text: tr('Highscores Filter')
+    padding-top: 21
+    margin-bottom: 21
+    image-source: /images/ui/window_new
+    image-border: 4
+    color: #BFBFBF
+    font: verdana-11px-monochrome
+
+    Label
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 15
+      !text: tr('Game World:')
+      text-offset: 0 4
+      text-auto-resize: true
+      color: #BFBFBF
+      font: verdana-11px-monochrome
+    
+    ComboBox
+      id: gameWorldBox
+      anchors.top: prev.top
+      anchors.left: prev.right
+      width: 240
+      margin-left: 10
+      &isfilled: false
+
+    Label
+      anchors.top: parent.top
+      anchors.left: prev.right
+      margin-left: 14
+      !text: tr('BattlEye:')
+      text-offset: 0 4
+      text-auto-resize: true
+      color: #BFBFBF
+      font: verdana-11px-monochrome
+    
+    ComboBox
+      id: BattlEyeBox
+      anchors.top: prev.top
+      anchors.left: prev.right
+      width: 240
+      margin-left: 10
+
+      &isfilled: false
+
+
+    Label
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 15
+      margin-top: 25
+      !text: tr('Vocation:')
+      text-offset: 0 4
+      text-auto-resize: true
+      color: #BFBFBF
+      font: verdana-11px-monochrome
+    
+    ComboBox
+      id: vocationBox
+      anchors.top: prev.top
+      anchors.left: prev.right
+      width: 240
+      margin-left: 31
+      &isfilled: false
+
+
+    Label
+      anchors.top: parent.top
+      anchors.left: prev.right
+      margin-left: 14
+      margin-top: 25
+      !text: tr('Category:')
+      text-offset: 0 4
+      text-auto-resize: true
+      color: #BFBFBF
+      font: verdana-11px-monochrome
+    
+    ComboBox
+      id: categoryBox
+      anchors.top: prev.top
+      anchors.left: prev.right
+      width: 240
+      margin-left: 5
+      &isfilled: false
+
+    Label
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-left: 15
+      margin-top: 55
+      !text: tr('World Type:')
+      text-offset: 0 4
+      text-auto-resize: true
+      color: #BFBFBF
+      font: verdana-11px-monochrome
+
+    Panel
+      id: PanelWorld
+      anchors.top: prev.top
+      anchors.left: prev.right
+      anchors.right: next.left
+      height: 60
+      margin-top: 4
+      margin-left: 10
+      &isFilled : false
+
+      layout:
+        type: grid
+        cell-size: 150 20
+        cell-spacing: 1
+        flow: true
+        fit-children: true
+
+    Button
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      width: 70
+      margin-right: 12
+      margin-bottom: 12
+      !text: tr('Submit')
+      @onClick: modules.game_highscore.submit()
+
+  Panel
+    id: data
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 340
+    margin-top: 5
+    padding: 1
+    padding-top: 20
+    border-width: 1
+    border-color: black
+    layout:
+      type: verticalBox
+
+  PlayersTableHeaderColumn
+    anchors.top: data.top
+    anchors.left: data.left
+    size: 60 20
+
+    Label
+      anchors.fill: parent
+      font: verdana-11px-antialised
+      color: #dfdfdf88
+      !text: tr('Rank')
+      text-offset: 5 3
+
+  PlayersTableHeaderColumn
+    anchors.top: data.top
+    anchors.left: prev.right
+    size: 220 20
+
+    Label
+      anchors.fill: parent
+      font: verdana-11px-antialised
+      color: #dfdfdf88
+      !text: tr('Character')
+      text-offset: 5 3
+
+  PlayersTableHeaderColumn
+    anchors.top: data.top
+    anchors.left: prev.right
+    !text: tr('Vocation')
+    size: 116 20
+    font: verdana-11px-antialised
+    color: #dfdfdf88
+
+  PlayersTableHeaderColumn
+    anchors.top: data.top
+    anchors.left: prev.right
+    !text: tr('Game World')  
+    size: 96 20
+    font: verdana-11px-antialised
+    color: #dfdfdf88
+
+  PlayersTableHeaderColumn
+    anchors.top: data.top
+    anchors.left: prev.right
+    !text: tr('Level')  
+    size: 66 20
+    font: verdana-11px-antialised
+    color: #dfdfdf88
+
+  PlayersTableHeaderColumn
+    id: points
+    anchors.top: data.top
+    anchors.left: prev.right
+    anchors.right: data.right
+    height: 20
+
+    Label
+      id: value
+      anchors.top: parent.top
+      anchors.right: parent.right
+      font: verdana-11px-antialised
+      color: #dfdfdf88
+      !text: tr('Points')  
+      margin-right: 6
+      text-offset: 0 3
+
+  Label
+    id: page
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: data.bottom
+    !text: tr('1 / 50')
+    margin-top: 20
+    text-offset: 0 -5
+    text-align: center
+    width: 90
+
+  NextButton
+    id: next
+    anchors.left: prev.right
+    anchors.bottom: prev.bottom
+    @onClick: modules.game_highscore.nextPage()
+    $disabled:
+      opacity: 0.5
+    $!disabled:
+      opacity: 1.0
+
+  NextButton
+    id: nextLast
+    anchors.left: prev.right
+    anchors.top: prev.top
+    margin-left: 5
+    @onClick: modules.game_highscore.nextEndPage()
+    $disabled:
+      opacity: 0.5
+    $!disabled:
+      opacity: 1.0
+
+  Label
+    id: last_update
+    anchors.left: prev.right
+    anchors.top: prev.top
+    !text: tr('Last Update: 9999999 Second Ago')
+    text-align: center
+    text-offset: 10 2
+
+
+  PreviousButton
+    id: prev
+    anchors.right: page.left
+    anchors.top: nextLast.top
+    @onClick: modules.game_highscore.prevPage()
+    $disabled:
+      opacity: 0.5
+    $!disabled:
+      opacity: 1.0
+
+  PreviousButton
+    id: prevLast
+    anchors.right: prev.left
+    anchors.top: prev.top
+    margin-right: 5
+    @onClick: modules.game_highscore.prevEndPage()
+    $disabled:
+      opacity: 0.5
+    $!disabled:
+      opacity: 1.0
+  Button
+    id: ownRankButton
+    anchors.right: prev.left
+    anchors.top: prev.top
+    !text: tr('Show Own Rank')
+    width: 100
+    @onClick: modules.game_highscore.showOwnRank()
+
+
+  HorizontalSeparator
+    id: separator
+    anchors.left: data.left
+    anchors.right: data.right
+    anchors.top: prev.bottom
+    margin-top: 10
+
+  Button
+    anchors.right: separator.right
+    anchors.top: separator.top
+    !text: tr('Close')
+    @onClick: modules.game_highscore.hide()
+    margin-top: 10

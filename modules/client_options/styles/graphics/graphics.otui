@@ -1,0 +1,113 @@
+UIWidget
+  anchors.fill: parent
+  visible: false
+
+  Label
+    !text: 'Antialiasing Mode:'
+    anchors.left: parent.left
+    margin-left: 18
+    color: #c0c0c0ff
+    anchors.top: parent.top
+
+  QtComboBox
+    id: antialiasingMode
+    width: 180
+    margin-left: 10
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    mouse-scroll: false
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: fullscreen
+      !text: 'Full Screen Mode'
+      !tooltip: 'Ctrl+Shift+F'
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 5
+    height:55
+    
+    OptionCheckBoxMarked
+      id: vsync
+      !text: tr('V-Sync')
+      !tooltip: tr('Limits your fps based on monitor refresh rate')
+
+  
+    OptionCheckBoxMarked
+      id: showFps
+      !tooltip: tr('Show frame rate')
+      !text: tr('Show frame rate')
+      anchors.top: prev.bottom
+
+    OptionScaleScroll
+      id: backgroundFrameRate
+      !text: tr('Game framerate limit: %s', 'max')
+      anchors.top: prev.bottom
+      margin-top: 5
+      &minimumScrollValue: 10
+      &maximumScrollValue: 201
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('backgroundFrameRate')
+        local text = value
+        if value <= 0 or value >= 201 then
+          text = 'max'
+        end
+
+        self:setText(tr('Game framerate limit: %s', text))
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: optimizeFps
+      !text: tr('Optimize FPS')
+      !tooltip: tr('Try to optimize when the frame rate is below 60. VISUAL PROBLEMS MAY OCCUR')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: forceEffectOptimization
+      !text: tr('Force Effect Optimization')
+      !tooltip: tr('Will avoid drawing effects on certain occasions.')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBoxMarked
+      id: asyncTxtLoading
+      !text: tr('Async texture loading')
+      !tooltip: tr('This option makes textures load asynchronously and uses less RAM.')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: dontStretchShrink
+      !text: 'Don\'t stretch/shrink Game Window'

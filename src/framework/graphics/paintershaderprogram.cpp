@@ -149,9 +149,9 @@ void PainterShaderProgram::addMultiTexture(const std::string& file)
     if (!texture)
         return;
 
-    texture->create();
     texture->setSmooth(true);
     texture->setRepeat(true);
+    texture->create();
 
     m_multiTextures.emplace_back(texture);
 }

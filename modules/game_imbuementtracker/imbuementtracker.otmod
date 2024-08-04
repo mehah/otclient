@@ -1,0 +1,10 @@
+Module
+  name: game_imbuementtracker
+  description: 
+  author: reyaleman
+  website: https://github.com/reyaleman
+  sandboxed: true
+  dependencies: [ game_imbuing ]
+  scripts: [ imbuementtracker ]
+  @onLoad: initialize()
+  @onUnload: terminate()

@@ -4,7 +4,6 @@ local otmm = true
 local oldPos = nil
 local fullscreenWidget
 local virtualFloor = 7
-local dayTimeEvent
 local currentDayTime = {
     h = 12,
     m = 0
@@ -43,30 +42,22 @@ end
 mapController = Controller:new()
 mapController:setUI('minimap', modules.game_interface.getMainRightPanel())
 
-local mapControllerEvents = mapController:addEvent(LocalPlayer, {
-    onPositionChange = onPositionChange
-})
-
 function onChangeWorldTime(hour, minute)
     currentDayTime = {
         h = hour % 24,
         m = minute
     }
 
-    if dayTimeEvent ~= nil then
-        removeEvent(dayTimeEvent)
-        dayTimeEvent = nil
-    end
-
-    dayTimeEvent = scheduleEvent(function()
+    mapController:scheduleEvent(function()
         local nextH = currentDayTime.h
         local nextM = currentDayTime.m + 12
         if nextM >= 60 then
             nextH = nextH + 1
             nextM = nextM - 60
         end
+
         onChangeWorldTime(nextH, nextM)
-    end, 30000)
+    end, 30000, 'dayTime')
 
     local position = math.floor((124 / (24 * 60)) * ((hour * 60) + minute))
     local mainWidth = 31
@@ -96,21 +87,22 @@ function onChangeWorldTime(hour, minute)
 end
 
 function mapController:onInit()
-    mapControllerEvents:connect()
-    mapControllerEvents:execute('onPositionChange')
-
     self.ui.minimapBorder.minimap:getChildById('floorUpButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('floorDownButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('zoomInButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('zoomOutButton'):hide()
     self.ui.minimapBorder.minimap:getChildById('resetButton'):hide()
-
-    connect(g_game, {
-        onChangeWorldTime = onChangeWorldTime
-    })
 end
 
 function mapController:onGameStart()
+    mapController:registerEvents(g_game, {
+        onChangeWorldTime = onChangeWorldTime
+    })
+
+    mapController:registerEvents(LocalPlayer, {
+        onPositionChange = onPositionChange
+    }):execute()
+
     -- Load Map
     g_minimap.clean()
 
@@ -143,13 +135,6 @@ function mapController:onGameEnd()
     self.ui.minimapBorder.minimap:save()
 end
 
-function mapController:onTerminate()
-    mapControllerEvents:disconnect()
-    disconnect(g_game, {
-        onChangeWorldTime = onChangeWorldTime
-    })
-end
-
 function zoomIn()
     mapController.ui.minimapBorder.minimap:zoomIn()
 end
@@ -175,7 +160,7 @@ function fullscreen()
         minimapWidget:fill('parent')
         mapController.ui:show(true)
         zoom = minimapWidget.zoomMinimap
-        mapController:unbindKeyDown('Escape', fullscreen)
+        g_keyboard.unbindKeyDown('Escape')
         minimapWidget.fullMapView = false
     else
         fullscreenWidget = minimapWidget
@@ -183,7 +168,7 @@ function fullscreen()
         minimapWidget:setParent(modules.game_interface.getRootPanel())
         minimapWidget:fill('parent')
         zoom = minimapWidget.zoomFullmap
-        mapController:bindKeyDown('Escape', fullscreen)
+        g_keyboard.bindKeyDown('Escape', fullscreen)
         minimapWidget.fullMapView = true
     end
 
@@ -245,4 +230,5 @@ end
 function getMiniMapUi()
     return mapController.ui.minimapBorder.minimap
 end
+
 -- @ End of Minimap

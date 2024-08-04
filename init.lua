@@ -42,10 +42,10 @@ g_logger.info(g_app.getName() .. ' ' .. g_app.getVersion() .. ' rev ' .. g_app.g
 
 -- setup lua debugger
 if os.getenv("LOCAL_LUA_DEBUGGER_VSCODE") == "1" then
-  require("lldebugger").start()
-  g_logger.debug("Started LUA debugger.")
+    require("lldebugger").start()
+    g_logger.debug("Started LUA debugger.")
 else
-  g_logger.debug("LUA debugger not started (not launched with VSCode local-lua).")
+    g_logger.debug("LUA debugger not started (not launched with VSCode local-lua).")
 end
 
 -- add data directory to the search path
@@ -76,7 +76,11 @@ g_modules.discoverModules()
 g_modules.autoLoadModules(99)
 g_modules.ensureModuleLoaded('corelib')
 g_modules.ensureModuleLoaded('gamelib')
+g_modules.ensureModuleLoaded('modulelib')
 g_modules.ensureModuleLoaded("startup")
+
+g_modules.autoLoadModules(999)
+g_modules.ensureModuleLoaded('game_shaders') -- pre load
 
 local function loadModules()
     -- client modules 100-499
@@ -100,6 +104,9 @@ local function loadModules()
     if g_resources.fileExists(script) then
         dofile(script)
     end
+
+    -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
+    -- g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip
@@ -109,6 +116,3 @@ if g_app.hasUpdater() then
 end
 
 loadModules()
-
--- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
--- g_modules.enableAutoReload()

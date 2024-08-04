@@ -1,0 +1,105 @@
+ImbuementTrackerMenuOption < ThickCheckBox
+  text-offset: 18 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+ImbuementTrackerMenu < PopupMenu
+  id: imbuementTrackerMenu
+  width: 304
+
+  ImbuementTrackerMenuOption
+    id: showLessThan1h
+    !text: tr('Show imbuements that last less than 1h')
+  
+  ImbuementTrackerMenuOption
+    id: showBetween1hAnd3h
+    !text: tr('Show imbuements that last between 1h and 3h')
+  
+  ImbuementTrackerMenuOption
+    id: showMoreThan3h
+    !text: tr('Show imbuements that last more than 3h')
+  
+  ImbuementTrackerMenuOption
+    id: showNoImbuements
+    !text: tr('Show items with no active imbuement')
+
+ImbuementSlot < Panel
+  image-source: /images/game/imbuing/icons/0
+  image-clip: 0 0 64 64
+  width: 34
+  height: 34
+
+  Label
+    id: duration
+    text-align: center
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    font: verdana-11px-rounded
+    color: #ffff00
+    margin-top: 3
+
+InventoryItem < Panel
+  height: 34
+  margin-top: 3
+  layout: anchor
+
+  Item
+    id: item
+    width: 34
+    height: 34
+    padding: 3
+    anchors.left: parent.left
+    anchors.top: prev.bottom
+    margin-right: 6
+  
+  Panel
+    id: imbuementSlots
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    layout: horizontalBox
+
+ImbuementTracker < MiniWindow
+  id: imbuementTracker
+  !text: tr('Imbuements')
+  icon: /images/icons/icon-imbuementtracker-widget
+  icon-offset: 4 2
+  icon-size: 12 12
+  @onOpen: modules.game_imbuementtracker.onMiniWindowOpen()
+  @onClose: modules.game_imbuementtracker.onMiniWindowClose()
+
+  UIButton
+    id: menuButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 112 0 14 14
+
+    $hover:
+      image-clip: 112 14 14 14
+
+    $pressed:
+      image-clip: 112 28 14 14
+
+    $on:
+      image-clip: 112 0 14 14
+
+  MiniWindowContents
+    id: contentsPanel
+    padding-left: 5
+    padding-right: 5
+    padding-bottom: 3
+    layout: verticalBox

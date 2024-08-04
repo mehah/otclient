@@ -1,7 +1,7 @@
 return {
     vsync                             = {
         value = true,
-        action = function(value, options, controller, panels, extraWidgets, extraWidgets)
+        action = function(value, options, controller, panels, extraWidgets)
             g_window.setVerticalSync(value)
         end
     },
@@ -96,7 +96,7 @@ return {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setDrawLights(value and options.ambientLight.value < 100)
-            panels.graphicsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
+            panels.graphicsEffectsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
         end
     },
     limitVisibleDimension             = {
@@ -114,7 +114,7 @@ return {
     ambientLight                      = {
         value = 0,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsPanel:recursiveGetChildById('ambientLight'):setText(string.format('Ambient light: %s%%', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('ambientLight'):setText(string.format('Ambient light: %s%%', value))
             panels.gameMapPanel:setMinimumAmbientLight(value / 100)
             panels.gameMapPanel:setDrawLights(options.enableLights.value)
         end
@@ -158,13 +158,13 @@ return {
     turnDelay                         = {
         value = 50,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.controlPanel:recursiveGetChildById('turnDelay'):setText(string.format('Turn delay: %sms', value))
+            panels.generalPanel:recursiveGetChildById('turnDelay'):setText(string.format('Turn delay: %sms', value))
         end
     },
     hotkeyDelay                       = {
         value = 70,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.controlPanel:recursiveGetChildById('hotkeyDelay'):setText(string.format('Hotkey delay: %sms', value))
+            panels.generalPanel:recursiveGetChildById('hotkeyDelay'):setText(string.format('Hotkey delay: %sms', value))
         end
     },
     crosshair                         = {
@@ -177,7 +177,7 @@ return {
             end
 
             panels.gameMapPanel:setCrosshairTexture(newValue and crossPath .. newValue or nil)
-            panels.generalPanel:recursiveGetChildById('crosshair'):setCurrentOptionByData(newValue, true)
+            panels.interface:recursiveGetChildById('crosshair'):setCurrentOptionByData(newValue, true)
         end
     },
     enableHighlightMouseTarget        = {
@@ -196,7 +196,7 @@ return {
     shadowFloorIntensity              = {
         value = 30,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsPanel:recursiveGetChildById('shadowFloorIntensity'):setText(string.format(
+            panels.graphicsEffectsPanel:recursiveGetChildById('shadowFloorIntensity'):setText(string.format(
                 'Shadow floor Intensity: %s%%', value))
             panels.gameMapPanel:setShadowFloorIntensity(1 - (value / 100))
         end
@@ -223,16 +223,16 @@ return {
         value = 1,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setFloorViewMode(value)
-            panels.graphicsPanel:recursiveGetChildById('floorViewMode'):setCurrentOptionByData(value, true)
+            panels.graphicsEffectsPanel:recursiveGetChildById('floorViewMode'):setCurrentOptionByData(value, true)
 
             local fadeMode = value == 1
-            panels.graphicsPanel:recursiveGetChildById('floorFading'):setEnabled(fadeMode)
+            panels.graphicsEffectsPanel:recursiveGetChildById('floorFading'):setEnabled(fadeMode)
         end
     },
     floorFading                       = {
         value = 500,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsPanel:recursiveGetChildById('floorFading'):setText(string.format('Floor Fading: %s ms', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('floorFading'):setText(string.format('Floor Fading: %s ms', value))
             panels.gameMapPanel:setFloorFading(tonumber(value))
         end
     },
@@ -242,7 +242,7 @@ return {
             if g_game.isUsingProtobuf() then
                 value = true
             elseif g_app.isEncrypted() then
-                local asyncWidget = panels.generalPanel:recursiveGetChildById('asyncTxtLoading')
+                local asyncWidget = panels.graphicsPanel:recursiveGetChildById('asyncTxtLoading')
                 asyncWidget:setEnabled(false)
                 asyncWidget:setChecked(false)
                 return
@@ -260,7 +260,7 @@ return {
                 value = value / 2
             end
             g_app.setCreatureInformationScale(math.max(value + 0.5, 1))
-            panels.consolePanel:recursiveGetChildById('creatureInformationScale'):setText(string.format(
+            panels.interfaceHUD:recursiveGetChildById('creatureInformationScale'):setText(string.format(
                 'Creature Information Scale: %sx', math.max(value + 0.5, 1)))
         end
     },
@@ -273,7 +273,7 @@ return {
                 value = value / 2
             end
             g_app.setStaticTextScale(math.max(value + 0.5, 1))
-            panels.consolePanel:recursiveGetChildById('staticTextScale'):setText(string.format('Message Scale: %sx',
+            panels.interfaceHUD:recursiveGetChildById('staticTextScale'):setText(string.format('Message Scale: %sx',
                 math.max(value + 0.5, 1)))
         end
     },
@@ -286,7 +286,7 @@ return {
                 value = value / 2
             end
             g_app.setAnimatedTextScale(math.max(value + 0.5, 1))
-            panels.consolePanel:recursiveGetChildById('animatedTextScale'):setText(
+            panels.interfaceHUD:recursiveGetChildById('animatedTextScale'):setText(
                 tr('Animated Message Scale: %sx', math.max(value + 0.5, 1)))
         end
     },
@@ -332,14 +332,14 @@ return {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
             g_client.setEffectAlpha(value / 100)
-            panels.consolePanel:recursiveGetChildById('setEffectAlphaScroll'):setText(tr('Opacity Effect: %s%%', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('setEffectAlphaScroll'):setText(tr('Opacity Effect: %s%%', value))
         end
     },
     setMissileAlphaScroll             = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
             g_client.setMissileAlpha(value / 100)
-            panels.consolePanel:recursiveGetChildById('setMissileAlphaScroll'):setText(tr('Opacity Missile: %s%%', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('setMissileAlphaScroll'):setText(tr('Opacity Missile: %s%%', value))
         end
     },
     distFromCenScrollbar              = {

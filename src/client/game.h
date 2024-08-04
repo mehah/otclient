@@ -385,6 +385,15 @@ public:
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
 
     void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
+    // Highscore related
+    void requestHighscore(uint8_t action, uint8_t category, uint32_t vocation, const std::string& world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
+    void processHighscore(const std::string& serverName, const std::string& world, uint8_t worldType, uint8_t battlEye,
+                            const std::vector<std::tuple<uint32_t, std::string>>& vocations,
+                            const std::vector<std::tuple<uint8_t, std::string>>& categories,
+                            uint16_t page, uint16_t totalPages,
+                            const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, uint32_t entriesTs);
+
+    void imbuementDurations(bool isOpen = false);
 
 protected:
     void enableBotCall() { m_denyBotCall = false; }

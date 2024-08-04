@@ -201,7 +201,6 @@ function table.insertall(t, s)
     for k, v in pairs(s) do
         table.insert(t, v)
     end
-    return res
 end
 
 function table.equals(t, comp)
@@ -309,4 +308,20 @@ function table.decodeStringPairList(l)
         end
     end
     return ret
+end
+
+function table.remove_if(t, fnc)
+    local j, n = 1, #t;
+    for i = 1, n do
+        if not fnc(i, t[i]) then
+            if (i ~= j) then
+                t[j] = t[i];
+                t[i] = nil;
+            end
+            j = j + 1;
+        else
+            t[i] = nil;
+        end
+    end
+    return t;
 end

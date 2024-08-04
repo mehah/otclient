@@ -12,6 +12,7 @@ Module
     - game_mainpanel
     - game_prey
     - game_imbuing
+    - game_imbuementtracker
     - game_hotkeys
     - game_questlog
     - game_textmessage
@@ -39,5 +40,7 @@ Module
     - game_stash
     - game_healthcircle
     - game_shop
+    - game_screenshot
+    - game_highscore
   @onLoad: init()
   @onUnload: terminate()

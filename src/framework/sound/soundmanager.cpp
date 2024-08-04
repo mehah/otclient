@@ -95,6 +95,8 @@ void SoundManager::terminate()
 void SoundManager::poll()
 {
     static ticks_t lastUpdate = 0;
+    static uint_fast8_t soundsErased = 0;
+
     const ticks_t now = g_clock.millis();
 
     if (now - lastUpdate < POLL_DELAY)
@@ -126,9 +128,10 @@ void SoundManager::poll()
 
         source->update();
 
-        if (!source->isPlaying())
+        if (!source->isPlaying()) {
+            ++soundsErased;
             it = m_sources.erase(it);
-        else
+        } else
             ++it;
     }
 
@@ -138,6 +141,12 @@ void SoundManager::poll()
 
     if (m_context) {
         alcProcessContext(m_context);
+    }
+
+    // temp fix for memory leak
+    if (soundsErased > 25) {
+        soundsErased = 0;
+        g_lua.collectGarbage();
     }
 }
 
