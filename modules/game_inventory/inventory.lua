@@ -295,6 +295,7 @@ function inventoryController:onGameStart()
             end
         end
     end
+    inventoryController.ui.onPanel.purseButton:setVisible(g_game.getFeature(GamePurseSlot))
 end
 
 function inventoryController:onGameEnd()
