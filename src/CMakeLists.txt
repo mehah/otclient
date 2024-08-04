@@ -34,6 +34,9 @@ set(CMAKE_VERBOSE_MAKEFILE OFF)
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# Conditional target linking for sound
+set(sound_LIBRARIES "")
+
 # *****************************************************************************
 # Client
 # *****************************************************************************
@@ -218,6 +221,14 @@ if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(VorbisFile REQUIRED)
 	find_package(Vorbis CONFIG REQUIRED)
 	find_package(Ogg CONFIG REQUIRED)
+
+	if(MSVC)
+		set(sound_LIBRARIES "${sound_LIBRARIES} ${VORBISFILE_LIBRARY} ${VORBIS_LIBRARY} ${OGG_LIBRARY} OpenAL::OpenAL")		
+	elseif(ANDROID)
+		set(sound_LIBRARIES "${sound_LIBRARIES} ${OGG_LIBRARY} OpenSLES Vorbis::vorbis Vorbis::vorbisfile")
+	else() # Linux
+		set(sound_LIBRARIES "${sound_LIBRARIES} ${OGG_LIBRARY} OpenAL::OpenAL Vorbis::vorbis Vorbis::vorbisfile")
+	endif()
 endif()
 if(ANDROID)
 	set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
@@ -470,18 +481,15 @@ if(MSVC)
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
 		${STDUUID}
+		${sound_LIBRARIES}
 
 		Threads::Threads
 		GLEW::GLEW
 		asio::asio
-		OpenAL::OpenAL
 		LibLZMA::LibLZMA
 		winmm.lib
 		pugixml::pugixml
@@ -510,18 +518,15 @@ elseif(ANDROID)
 		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
-		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${STDUUID}
 		${MINIZIP_LIBRARY}
+		${sound_LIBRARIES}
 
 		Threads::Threads
 		asio::asio
-		OpenSLES
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		game-activity::game-activity
 		GLESv3
@@ -554,7 +559,6 @@ else() # Linux
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
-		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${STDUUID}
 		${FOUNDATION}
@@ -562,13 +566,11 @@ else() # Linux
 		${OPENSSL_LIBRARY}
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
+		${sound_LIBRARIES}
 
 		Threads::Threads
 		X11::X11
 		asio::asio
-		OpenAL::OpenAL
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
 		ZLIB::ZLIB
