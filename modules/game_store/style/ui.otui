@@ -1,0 +1,238 @@
+StoreFlatPanel < UIWidget
+  phantom: true
+  auto-focus: first
+  image-source: /game_store/images/panel
+  image-border: 3
+
+StoreLightFlatPanel < UIWidget
+  phantom: true
+  auto-focus: first
+  image-source:  /game_store/images/panel_container
+  image-border: 3
+
+StoreButton < UIButton
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 106 23
+  text-offset: 0 0
+  image-source:  /game_store/images/button
+  image-color: #dfdfdf
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+
+  $hover !disabled:
+    image-clip: 0 23 22 23
+
+  $pressed:
+    image-clip: 0 46 22 23
+    text-offset: 1 1
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+
+StoreWindow < UIWindow
+  anchors.centerIn: parent
+  font: verdana-11px-antialised
+  size: 200 200
+  opacity: 1
+  color: #dfdfdf
+  text-offset: 0 6
+  text-align: top
+  image-source:   /game_store/images/window
+  image-border: 6
+  image-border-top: 27
+  padding-top: 36
+  padding-left: 16
+  padding-right: 16
+  padding-bottom: 16
+
+  $disabled:
+    color: #dfdfdf88
+
+  $dragging:
+    opacity: 0.8
+
+StoreFlatLabel < UILabel
+  font: verdana-11px-antialised
+  color: #dfdfdf
+  size: 86 20
+  text-offset: 3 3
+  image-source:  /game_store/images/panel_flat
+  image-border: 1
+
+  $disabled:
+    color: #dfdfdf88
+
+storeCategory < UIWidget
+  size: 180 22
+
+  image-source: /images/game/actionbar/1pixel-down-frame
+  image-border: 5
+  
+  UIWidget
+    id: Button
+    size: 178 20
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 1
+    margin-top: 1
+    image-source: /images/ui/button-grey-up
+    image-border: 5
+    opacity: 1.0
+    $pressed:
+      image-source: /images/ui/button-grey-down
+    $checked:
+      image-source: /images/ui/button-grey-down
+    UIWidget
+      id: Icon
+      size: 13 13
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 10
+      phantom: true
+      $checked:
+        margin-left: 11
+        margin-top: 1
+      $!checked:
+        margin-left: 10
+        margin-top: 0
+    Label
+      id: Title
+      anchors.left: Icon.right
+      anchors.verticalCenter: Icon.verticalCenter
+      margin-left: 10
+      text-align: center
+      text-auto-resize: true
+      !text: tr('General Stats')
+      color: #ffffff
+      font: cipsoftFont
+      $checked:
+        text-offset: 12 10
+      $!checked:
+        text-offset: 0 0
+    UIWidget
+      id: Arrow
+      size: 7 7
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 5
+      phantom: true
+      image-source: /images/ui/icon-arrow7x7-down
+      visible: false
+
+
+
+confirmarSHOP < UIMessageBox
+  icon-rect: 4 4 16 16
+  size: 390 165
+  image-source: /images/ui/window_new
+  image-border: 4
+  image-border-top: 16
+  image-border-bottom: 4
+  &minimizedHeight: 17
+  anchors.centerIn: parent
+  draggable: true
+
+  $on:
+    image-border-bottom: 2
+
+  UIWidget
+    id: miniwindowTopBar
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-right: 3
+    margin-left: 3
+    margin-top: 2
+    height: 18
+    phantom: true
+
+  UIWidget
+    id: miniwindowTopBar2
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-right: 3
+    margin-left: 3
+    margin-top: -67
+    size: 192 70
+    phantom: true
+    image-source:  /game_store/images/dragon
+  Label
+    id: title
+    font: verdana-11px-antialised
+    text-offset: 0 2
+    text-align: top
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    opacity: 0.5
+
+  Label
+    id: content
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    text-wrap: true
+    text-auto-resize: true
+    color: #c0c0c0ff
+    margin-top: 32
+
+  Label
+
+    id: Box
+    size: 200 105
+    anchors.left: parent.left
+    anchors.top: content.bottom
+    margin-left: 10
+    image-source:  /game_store/images/panel_flat
+    image-border: 1
+  Button
+    id: additionalLabel
+    size: 105 105
+    anchors.left: Box.right
+    anchors.top: content.bottom
+    margin-left:16
+    image-source:  /game_store/images/button-blue-down
+    image-border: 1
+    text-wrap: true
+    image-clip: 0 0 98 40
+    $on:
+      image-clip: 0 40 98 40
+    $pressed:
+      image-clip: 0 40 98 40
+    
+
+    UIWidget
+      id: Duration2
+      image-source:  /game_store/images/close
+      anchors.fill: parent
+      phantom: true
+
+  HorizontalSeparator
+    anchors.left: Box.left
+    anchors.right: additionalLabel.right
+    anchors.top: additionalLabel.bottom
+    image-source: /images/ui/horizontal_line_bright
+    height: 1
+    margin-top: 10
+
+  UIWidget
+    id: holder
+    anchors.right: prev.right
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    anchors.bottom: parent.bottom
+    margin-top: 12
+
+BorderBox < UIWidget
+  border-width-top: 1
+  border-color-top: black
+  border-width-left: 1
+  border-color-left: black
+  border-width-bottom: 1
+  border-color-bottom: #747474
+  border-width-right: 1
+  border-color-right: #747474

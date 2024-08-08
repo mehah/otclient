@@ -1,0 +1,370 @@
+Box < UIWidget
+  border-width-top: 1
+  border-color-top: black
+  border-width-left: 1
+  border-color-left: black
+  border-width-bottom: 1
+  border-color-bottom: gray
+  border-width-right: 1
+  border-color-right: gray
+  image-smooth: true
+  image-fixed-ratio: false
+
+HistoryEntry < UIWidget
+  anchors.top: parent.top
+  anchors.right: parent.right
+  margin-right: 8
+  margin-top: 24
+  size: 535 15
+  background-color: #484848
+
+  Label
+    id: historyDate
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 3
+
+  Label
+    id: historyBalance
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 147
+
+  Label
+    id: historyDescription
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 242
+
+RowStore < StoreLightFlatPanel
+  height: 78
+  margin: 2
+  border: 0 white
+
+  $focus:
+    border: 2 white
+
+  Box
+    id: image
+    size: 64 64
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 5 0 0 5
+
+  Label
+    id: lblName
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin: 8 0 0 8
+    text-auto-resize: true
+    text-wrap: true
+  Label
+    id: count
+    anchors.bottom: parent.bottom
+    anchors.left: image.right
+    margin: 0 5 5 0
+    margin-left:22
+    text-align: center
+
+  StoreFlatPanel
+    id: lblPrice
+    size: 104 20
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin: 0 5 5 0
+    text-align: center
+    text-offset: 15 0
+    image-color: #1111118c
+    icon: images/tibiaCoin
+    icon-align: right
+    icon-offset: -2 0
+
+MenuCategoryStore < UIWidget
+  height: 22
+  image-source: images/barra
+  image-border: 5
+  margin: 3
+  image-clip: 0 0 166 22
+  text-align: left
+  text-offset: 25 0
+  text-wrap: true
+  icon-align: left
+  icon-offset: 6 0
+
+  $pressed:
+    text-offset: 25 0
+
+  $focus:
+    image-clip: 0 22 166 22
+
+StoreWindow
+  size: 780 537
+  !text: tr('Store')
+  color: #909090
+  visible: false
+  @onEscape: modules.game_store.toggle()
+
+  StoreButton
+    id: btnClose
+    size: 45 20
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    !text: tr('Close')
+    font: cipsoftFont
+    @onClick: modules.game_store.toggle()
+
+  StoreButton
+    id: btnHistory
+    size: 45 20
+    anchors.bottom: parent.bottom
+    anchors.right: btnClose.left
+    margin-right: 5
+    !text: tr('History')
+    font: cipsoftFont
+    @onClick: modules.game_store.toggleTransferHistory()
+
+  StoreFlatPanel
+    id: lblCoins
+    size: 260 20
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-bottom: 2
+    text-align: left
+    text-offset: 20 0
+    image-color: #1111118c
+    text: 0
+    icon: images/tibiaCoin
+    icon-align: left
+    icon-offset: 5 0
+
+  StoreButton
+    id: btnCoins
+    size: 64 20
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 5
+    margin-bottom: 2
+    !tooltip: tr('get Tibia Coins')
+    image-color: green
+    icon: images/tibiaCoin
+    icon-align: center
+    icon-offset: 10 -1
+    text-offset: -18 0
+    !text: tr('Get')
+    font: cipsoftFont
+    @onClick: modules.game_store.getCoinsWebsite()
+
+    $pressed:
+      text-offset: -18 0
+      icon-offset: 10 0
+
+  StoreButton
+    id: transferPoints
+    anchors.top: btnCoins.top
+    !tooltip: tr('Transfer Coins')
+    anchors.left: btnCoins.right
+    margin-left: 5
+    icon-align: center
+    icon-source: images/iconTransfer
+    size: 64 20
+    @onClick: print("no yet")
+
+  StoreButton
+    id: wtfisthis
+    anchors.top: transferPoints.top
+    !tooltip: tr('Setup up an auction to sell you currents characters.')
+    anchors.left: transferPoints.right
+    margin-left: 5
+    icon-align: center
+    icon-source: images/icon-trade
+    size: 64 20
+    @onClick: print("no yet")
+
+  HorizontalSeparator
+    anchors.bottom: prev.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 8
+
+  UIScrollArea
+    id: listCategory
+    size: 190 450
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: prev.top
+    image-source: images/panel
+    image-border: 3
+    auto-focus: none
+    layout: verticalBox
+    margin-bottom: 8
+    padding: 5
+
+  StoreLightFlatPanel
+    id: panelItem
+    anchors.top: parent.top
+    anchors.left: listCategory.right
+    anchors.right: parent.right
+    anchors.bottom: listCategory.bottom
+    margin-left: 8
+
+    padding: 6
+
+    UIWidget
+      id: comboBoxContainer
+      height: 20
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      layout: horizontalBox
+      margin-right:22
+      QtComboBox
+        id: showAll
+        width: 260
+        height: 20
+        mouse-scroll: false
+
+      QtComboBox
+        id: MostPopularFirst
+        width: 260
+        margin-left: 12
+        height: 20
+        mouse-scroll: false
+
+    UIScrollArea
+      id: listProduct
+      size: 260 407
+      anchors.top: comboBoxContainer.bottom
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      vertical-scrollbar: scrollList
+      image-source: images/panel
+      image-border: 3
+      layout: verticalBox
+      padding: 5
+      margin-top:5
+      auto-focus: none
+    
+    VerticalScrollBar
+      id: scrollList
+      anchors.top: listProduct.top
+      anchors.bottom: listProduct.bottom
+      anchors.left: listProduct.right
+      step: 14
+      pixels-scroll: true
+
+    Label
+      id: lblName
+      anchors.top: comboBoxContainer.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-left: 140
+      text-wrap: true
+      text-auto-resize: true
+      text-align: center
+      text: Prismatic Unicorn
+      margin-top:5
+
+    Box
+      id: image
+      size: 96 96
+      anchors.top: lblName.bottom
+      anchors.left: scrollList.right
+      margin: 8 0 0 8
+
+
+    StoreButton
+      id: btnBuy
+      anchors.top: prev.top
+      anchors.left: prev.right
+      anchors.right: parent.right
+      margin-left: 5
+      !text: tr('Buy')
+      font: cipsoftFont
+      image-color: #75bfff
+
+    StoreFlatPanel
+      id: lblPrice
+      size: 104 20
+      anchors.top: prev.bottom
+      anchors.left: prev.left
+      anchors.right: prev.right
+      margin: 3 1 0 1
+      text-align: center
+      text-offset: -18 0
+      image-color: #1111118c
+      text: 8900
+      icon: images/tibiaCoin
+      icon-align: center
+      icon-offset: 10 0
+
+    StoreFlatLabel
+      id: lblDescription
+      anchors.top: image.bottom
+      anchors.left: scrollList.right
+      anchors.right: parent.right
+      anchors.bottom: scrollList.bottom
+      margin-left: 8
+      margin-top: 7
+      text-auto-resize: true
+      text-wrap: true
+
+  UIWidget
+    id: transferHistory
+    image-source: images/history_container
+    anchors.top: parent.top
+    anchors.right: parent.right
+    visible: false
+
+
+  StoreLightFlatPanel
+    id: HomePanel
+    anchors.top: parent.top
+    anchors.left: listCategory.right
+    anchors.right: parent.right
+    anchors.bottom: listCategory.bottom
+    margin-left: 8
+    padding: 6
+    visible: false
+    UIWidget
+      id: HomeImagen
+      height: 20
+      size: 530 202
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      layout: horizontalBox
+      margin-right:10
+ 
+
+    MiniPanel
+      id:HomeRecentlyAdded
+      anchors.top: HomeImagen.bottom
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      size: 530 407
+      margin-top:10
+      text: Recently Added
+      UIScrollArea
+        id: HomeProductos
+        size: 505 190
+        vertical-scrollbar: scrollList2
+        image-border: 3
+        layout: verticalBox
+        margin-right:10
+
+
+        auto-focus: none
+        anchors.fill: parent
+        layout:
+          type: grid
+          cell-size: 254 94
+          flow: true
+
+      
+      VerticalScrollBar
+        id: scrollList2
+        anchors.top: HomeProductos.top
+        anchors.bottom: HomeProductos.bottom
+        anchors.left: HomeProductos.right
+        step: 14
+        pixels-scroll: true

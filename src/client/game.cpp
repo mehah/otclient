@@ -1455,10 +1455,9 @@ void Game::requestTransactionHistory(int page, int entriesPerPage)
 
 void Game::requestStoreOffers(const std::string_view categoryName, int serviceType)
 {
-    if (!canPerformGameAction())
-        return;
-
+    m_denyBotCall = false;
     m_protocolGame->sendRequestStoreOffers(categoryName, serviceType);
+    m_denyBotCall = true;
 }
 
 void Game::openStore(int serviceType, const std::string_view category)

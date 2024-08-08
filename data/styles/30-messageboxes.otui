@@ -58,3 +58,85 @@ MessageBoxWindow < UIMessageBox
     anchors.top: prev.bottom
     anchors.bottom: parent.bottom
     margin-top: 12
+
+MessageBoxShopWindow < UIMessageBox
+  icon-rect: 4 4 16 16
+  size: 246 116
+  image-source: /images/ui/window_new
+  image-border: 4
+  image-border-top: 16
+  image-border-bottom: 4
+  &minimizedHeight: 17
+  anchors.centerIn: parent
+  draggable: false
+
+  $on:
+    image-border-bottom: 2
+
+  UIWidget
+    id: miniwindowTopBar
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin-right: 3
+    margin-left: 3
+    margin-top: 2
+    height: 18
+    phantom: true
+
+  Label
+    id: title
+    font: verdana-11px-antialised
+    text-offset: 0 2
+    text-align: top
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    opacity: 0.5
+
+  Label
+    id: content
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    text-wrap: true
+    text-auto-resize: true
+    color: #c0c0c0ff
+    margin-top: 32
+
+  UIWidget
+
+    id: Box
+    size: 96 96
+    anchors.left: parent.left
+    anchors.top: content.bottom
+    margin-top: 10
+    margin-left: 10
+    image-source:  /game_store/images/panel_flat
+    image-border: 1
+  Label
+    id: additionalLabel
+    size: 260 96
+    anchors.left: Box.left
+    anchors.top: content.bottom
+    margin-top: 10
+    margin-left: 100
+    image-source:  /game_store/images/panel_flat
+    image-border: 1
+    text-wrap: true
+
+  HorizontalSeparator
+    anchors.left: Box.left
+    anchors.right: additionalLabel.right
+    anchors.top: additionalLabel.bottom
+    image-source: /images/ui/horizontal_line_bright
+    height: 1
+    margin-top: 10
+
+  UIWidget
+    id: holder
+    anchors.right: prev.right
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+    anchors.bottom: parent.bottom
+    margin-top: 12

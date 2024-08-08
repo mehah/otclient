@@ -1,0 +1,50 @@
+Window < UIWindow
+  font: verdana-11px-antialised
+  size: 200 200
+  opacity: 1
+  color: #dfdfdf
+  text-offset: 0 6
+  text-align: top
+  image-source: acceptWindowBody
+  image-border: 5
+  image-border-top: 23
+  image-border-bottom: 31
+  padding: 6
+  padding-top: 25
+
+  $disabled:
+    color: #dfdfdf88
+
+  $dragging:
+    opacity: 0.8
+
+HeadlessWindow < UIWindow
+  image-source: /images/ui/window_headless
+  image-border: 5
+  padding: 5
+
+AcceptWindow < Window
+  anchors.centerIn: parent
+
+ButtonShop < UIButton
+  font: verdana-11px-antialised
+  color: #dfdfdfff
+  size: 92 22
+  text-offset: 0 0
+  image-color: #dfdfdf
+  image-clip: 0 0 24 22
+  image-border: 7
+  padding: 5 10 5 10
+  opacity: 1.0
+
+  $hover !disabled:
+    image-clip: 0 22 24 22
+
+  $pressed:
+    image-clip: 0 44 24 22
+
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+
+  
