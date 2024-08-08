@@ -251,15 +251,18 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 |-------------------------------------------|---------------|-------------------------|
 |Title Attached Effect | Title Widget | Title light |
 
-- Support HTML/CSS syntax
 
+- <details>
+   <summary>Support HTML/CSS syntax</summary>
+  
+  https://github.com/user-attachments/assets/9f20814f-0aed-4b70-8852-334ac745ec11
 
-https://github.com/user-attachments/assets/9f20814f-0aed-4b70-8852-334ac745ec11
-
-
-
-https://github.com/user-attachments/assets/3ac8473c-8e90-4639-b815-ef183c7e2adf
-
+  https://github.com/user-attachments/assets/3ac8473c-8e90-4639-b815-ef183c7e2adf
+  
+  Note: Module example:
+   - [Shader](https://github.com/mehah/otclient/tree/main/modules/game_shaders)
+   - [Blessing](https://github.com/mehah/otclient/pull/825)
+</details>
 
 
 
@@ -427,7 +430,11 @@ https://github.com/user-attachments/assets/3ac8473c-8e90-4639-b815-ef183c7e2adf
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/001_interface.png?raw=true" width="300" alt="Haskanoid Video" style="max-width:300px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/002_ingame.png?raw=true" width="300" alt="Peoplemon by Alex Stuart" style="max-width: 300px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/idk.jpg?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Interface. | In-game | Extended view |
-
+- blessing
+- Screenshot
+- highscores
+- Store
+- Cyclopedia
 
 ##### 💸 Sponsored  (Features)
 - Bot V8 | ([@luanluciano93](https://github.com/luanluciano93), [@SkullzOTS](https://github.com/SkullzOTS), [@kokekanon](https://github.com/kokekanon), [@FranciskoKing](https://github.com/FranciskoKing), [@Kizuno18](https://github.com/Kizuno18))
@@ -447,6 +454,9 @@ https://github.com/user-attachments/assets/3ac8473c-8e90-4639-b815-ef183c7e2adf
 - Lighting System
 - Floor Fading
 - Path Finding
+- game shop module
+- game outfit module
+  
 ## <a name="themobileproject"><img height="32" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png" alt="Android"> The Mobile Project </a>
 The Mobile Project
 This is a fork of edubart's otclient. The objective of this fork it's to develop a runnable otclient on mobiles devices.
@@ -511,13 +521,13 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
-| Highscore             	| ![](https://geps.dev/progress/100) 	| [#809](https://github.com/mehah/otclient/pull/809)	|
 | Familiar outfit       	| ![](https://geps.dev/progress/30) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
-| Cyclopedia            	| ![](https://geps.dev/progress/50) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
-| Blessing            	| ![](https://geps.dev/progress/1) 	| None	|
+| Cyclopedia            	| ![](https://geps.dev/progress/90) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
+| Blessing            	| ![](https://geps.dev/progress/100) 	| [#825](https://github.com/mehah/otclient/pull/825)	|
 | wheel_of_destiny            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
 | fix Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
+| Quickloot | ![](https://geps.dev/progress/30)   |   None   	|
 | Sound tibia 13 | ![](https://geps.dev/progress/0)   |   None   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
@@ -528,13 +538,14 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 
 | Protocol / version   	| Description                 	| Required Feature                                    	| Compatibility 	|
 |---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
-| TFS idk <br> (7.72)      	| Downgrade nekiro /<br> Nostalrius 	| idk CC: @siz                                            	| 〰️ idk             	|
-| TFS 0.4 <br> (8.6)       	| Fir3element                	| idk CC: @thalesduarte                                   	| 〰️idk             	|
+| TFS <br> (7.72)      	| Downgrade nekiro /<br> Nostalrius 	|                                           	| ✅            	|
+| TFS 0.4 <br> (8.6)       	| Fir3element                	|                                  	| ✅             	|
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/kokekanon/otclient.readme/blob/readme3/data/setup.otml#L21)                     	| ✅             	|
-| TFS 1.4.2 <br> (10.98)   	| Release Otland              	| default                                             	| ✅             	|
+| TFS 1.4.2 <br> (10.98)   	| Release Otland              	|                                              	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
 | Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
 | Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
+| Canary 13.40        	| OpenTibiaBr              	|            	| 〰️             	|
 
 
 
