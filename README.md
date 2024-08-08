@@ -109,14 +109,8 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
     </details>
 
-  - <details>
-    <summary>Walking System Improvements</summary>
+  - Walking System Improvements
 
-      - **i ) Video**
-
-    </details>
-
-  
 
   - Supports sequenced packages and compression
 
@@ -142,8 +136,6 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
     <summary>Force Effect Optimization</summary>
 
       - **i ) Description :** will avoid drawing effects on certain occasions
-
-      - **ii ) Video: **
 
     </details>
     
