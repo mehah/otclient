@@ -553,7 +553,7 @@ function scheduleAutoReconnect()
 end
 
 function executeAutoReconnect()
-    if not  g_settings.getBoolean('autoReconnect') then
+    if not g_settings.getBoolean('autoReconnect') then
         return
     end
 
