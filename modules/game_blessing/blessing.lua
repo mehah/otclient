@@ -83,7 +83,6 @@ function show()
 end
 
 function onUpdateBlessDialog(data)
-
     BlessingController.ui.test:destroyChildren()
 
     for i, entry in ipairs(data.blesses) do
@@ -134,5 +133,4 @@ function onUpdateBlessDialog(data)
         row.rank:setText(date)
         row.name:setText(entry.historyMessage)
     end
-
 end
