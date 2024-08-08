@@ -538,7 +538,7 @@ end
 
 function scheduleAutoReconnect()
 
-    if not  g_settings.getBoolean('autoReconnect') then
+    if not g_settings.getBoolean('autoReconnect') then
         return
     end
     if lastLogout + 2000 > g_clock.millis() then
