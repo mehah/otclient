@@ -3495,8 +3495,8 @@ void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
     data.skull = msg->getU8();
     data.aol = msg->getU8();
 
-    uint8_t logCount = msg->getU8();
-    for (uint8_t i = 0; i < logCount; ++i) {
+    const uint8_t logCount = msg->getU8();
+    for (auto i = 0; i < logCount; ++i) {
         LogData log;
         log.timestamp = msg->getU32();
         log.colorMessage = msg->getU8();
