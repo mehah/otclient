@@ -1726,3 +1726,11 @@ void Game::imbuementDurations(bool isOpen)
         return;
     m_protocolGame->sendImbuementDurations(isOpen);
 }
+
+void Game::requestBless()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestBless();
+}
