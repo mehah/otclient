@@ -355,6 +355,24 @@ MainWindow
   //  margin-right: 18
 
   Button
+    id: autoReconnect
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setWidth(140)
+      else
+        self:setWidth(75)
+      end
+    $!on:
+      image-color: red    
+      !text: tr('Auto reconnect: Off')
+
+    $on:
+      !text: tr('Auto reconnect: On')
+      image-color: green
+
+  Button
     id: buttonOk
     !text: tr('Ok')
     width: 64
