@@ -53,6 +53,12 @@ MessageSettings = {
     private = {
         color = TextColors.lightblue,
         screenTarget = 'privateLabel'
+    },
+    loot = {
+        color = TextColors.white,
+        consoleTab = 'Loot',
+        screenTarget = 'highCenterLabel',
+        consoleOption = 'showInfoMessagesInConsole'
     }
 }
 
@@ -67,7 +73,7 @@ MessageTypes = {
     [MessageModes.Status] = MessageSettings.status,
     [MessageModes.Warning] = MessageSettings.centerRed,
     [MessageModes.Look] = MessageSettings.centerGreen,
-    [MessageModes.Loot] = MessageSettings.centerGreen,
+    [MessageModes.Loot] = MessageSettings.loot,
     [MessageModes.Red] = MessageSettings.consoleRed,
     [MessageModes.Blue] = MessageSettings.consoleBlue,
     [MessageModes.PrivateFrom] = MessageSettings.consoleBlue,
@@ -102,6 +108,43 @@ MessageTypes = {
 }
 
 messagesPanel = nil
+
+local listOfValuesByItemId = {
+	["34021"] = 1000001,
+	["36792"] = 100001,
+	["3043"] = 10001,
+	["3415"] = 1001,
+	["3003"] = 51
+}
+
+local function getColorForValue(value)
+    if value >= 1000000 then
+        return TextColors.yellow
+    elseif value >= 100000 then
+        return TextColors.purple
+    elseif value >= 10000 then
+        return TextColors.blue
+    elseif value >= 1000 then
+        return TextColors.green
+    elseif value >= 50 then
+        return TextColors.grey
+    end
+    return TextColors.white
+end
+
+local function applyColorLootMessage(text)
+    local function coloringLootName(match)
+        local id, itemName = match:match("(%d+)|(.+)")
+        if listOfValuesByItemId[id] then
+            local color = getColorForValue(listOfValuesByItemId[id])
+            if color then
+                return "{" .. itemName .. ", " .. color .. "}"
+            end
+        end
+        return itemName
+    end
+    return (text:gsub("{(.-)}", coloringLootName))
+end
 
 function init()
     for messageMode, _ in pairs(MessageTypes) do
@@ -150,8 +193,12 @@ function displayMessage(mode, text)
 
     if msgtype.screenTarget then
         local label = messagesPanel:recursiveGetChildById(msgtype.screenTarget)
-        label:setText(text)
-        label:setColor(msgtype.color)
+        if msgtype == MessageSettings.loot then
+            label:setColoredText(applyColorLootMessage(text))
+        else
+            label:setText(text)
+            label:setColor(msgtype.color)
+        end
         label:setVisible(true)
         removeEvent(label.hideEvent)
         label.hideEvent = scheduleEvent(function()
