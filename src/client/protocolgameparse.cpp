@@ -1283,7 +1283,13 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
         }
     }
 
-    const uint8_t size = msg->getU8();
+    uint16_t size = 0;
+    if (g_game.getClientVersion() >= 1340) {
+        size = msg->getU16();
+    } else {
+        size = msg->getU8();
+    }
+
     for (auto i = -1; ++i < size;) {
         const uint16_t itemId = msg->getU16();
 
