@@ -1156,6 +1156,10 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
             msg->getU8();
         }
     }
+    if (g_game.getClientVersion() >= 1340) {
+        msg->getU8();
+        msg->getU8();
+    }
 
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
 }
@@ -1274,7 +1278,13 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
         }
     }
 
-    const uint8_t size = msg->getU8();
+    uint16_t size = 0;
+    if (g_game.getClientVersion() >= 1334) {
+        size = msg->getU16();
+    } else {
+        size = msg->getU8();
+    }
+
     for (auto i = -1; ++i < size;) {
         const uint16_t itemId = msg->getU16();
 
