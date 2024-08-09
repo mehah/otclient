@@ -1162,9 +1162,8 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
         }else{
             msg->getU8();
         }
-
-
-        msg->getU8();
+        
+        msg->getU8(); // // if (container->getHoldingPlayer()) { // Player holding the item (?)
     }
 
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
