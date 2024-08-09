@@ -1,3 +1,13 @@
+WhiteDoveBox < CombatBox
+  image-source: /images/game/combatmodes/whitedovemode
+WhiteHandBox < CombatBox
+  image-source: /images/game/combatmodes/whitehandmode
+YellowHandBox < CombatBox
+  image-source: /images/game/combatmodes/yellowhandmode
+RedFistBox < CombatBox
+  image-source: /images/game/combatmodes/redfistmode
+SafeFightBox < CombatBox
+  image-source: /images/game/combatmodes/safefight
 
 StandModeBox < UICheckBox
   size: 20 20
@@ -62,21 +72,60 @@ PhantomMiniWindow
       $pressed !disabled:
         image-clip: 12 0 12 12
 
-    StandModeBox
+    UIButton
+      id: purseButton
+      image-source: /images/inventory/purse
+      !tooltip: tr('Open purse')
+      anchors.left: backpack.left
+      anchors.bottom: backpack.top   
+      size: 34 12
+      image-clip: 0 0 34 12
+      margin-bottom: 3
+      @onClick: |
+        local purse = g_game.getLocalPlayer():getInventoryItem(InventorySlotPurse)
+        if purse then
+            g_game.use(purse)
+        end
+
+      $on:
+        image-clip: 0 12 34 12
+      $pressed:
+        image-clip: 0 12 34 12
+
+    TopToggleButton
       id: standPosture
+      image-source: /images/inventory/buttons_general
+      image-clip: 0 0 20 20
       anchors.right: parent.right
       anchors.top: changeSize.top
       margin-right: 7
       size: 20 20
+      @onClick: |
+        selectPosture('stand')
 
-    ChaseModeBox
+      $pressed !disabled:
+        image-clip: 20 0 20 20
+
+      $disabled:
+        image-clip: 20 0 20 20
+
+    TopToggleButton
       id: followPosture
       image-source: /images/inventory/buttons_general
+      image-clip: 0 20 20 20
       anchors.right: standPosture.right
       anchors.top: standPosture.bottom
       margin-top: 4
+      size: 20 20
+      @onClick: |
+        selectPosture('follow')
 
-    UIWidget
+      $pressed !disabled:
+        image-clip: 20 20 20 20
+
+      $disabled:
+        image-clip: 20 20 20 20
+    UICheckBox
       id: expert
       image-source: /images/inventory/buttons_general
       image-clip: 0 140 20 20
@@ -86,22 +135,49 @@ PhantomMiniWindow
       margin-top: 4
       size: 20 20
 
-    UIWidget
+
+    UICheckBox
       id: pvp
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 100 44 20
+      image-source: /images/game/combatmodes/onPanel
+      size: 44 21
+      image-clip: 0 0 44 21
+      margin: 2 4
       anchors.right: standPosture.right
       anchors.top: expert.bottom
-      &imageClipCheckedX: 0
-      &imageClipUncheckedX: 0
-      &imageClipCheckedY: 120
-      &imageClipUncheckedY: 100
-      &imageClipWidth: 44
       margin-top: 4
+      margin-right: 0
       phantom: false
-      size: 44 20
-      @onClick: |
-        selectPvp(self:getImageClip().y == 100)
+      size: 44 21
+
+      $checked:
+        image-clip: 0 20 44 21
+
+
+    WhiteHandBox
+      id: whiteHandBox
+      anchors.right: parent.right
+      anchors.top: pvp.bottom
+      margin-right: 8
+      margin-top: 5
+
+    RedFistBox
+      id: redFistBox
+      anchors.right: whiteHandBox.right
+      anchors.top: whiteHandBox.bottom
+      margin-right: -1
+      margin-right: 0
+
+    WhiteDoveBox
+      id: whiteDoveBox
+      anchors.right: whiteHandBox.left
+      anchors.top: whiteHandBox.top
+      margin-top: 0
+
+    YellowHandBox
+      id: yellowHandBox
+      anchors.right: whiteDoveBox.right
+      anchors.top: whiteDoveBox.bottom
+      margin-right: 0
 
     TopToggleButton
       id: attack
@@ -420,35 +496,46 @@ PhantomMiniWindow
       $disabled:
         image-clip: 20 80 20 20
 
-    StandModeBox
+    TopToggleButton
       id: standPosture
+      image-source: /images/inventory/buttons_general
+      image-clip: 0 0 20 20
       anchors.left: attack.left
       anchors.top: attack.bottom
       margin-top: 4
+      size: 20 20
+      @onClick: |
+        selectPosture('stand')
 
+      $pressed !disabled:
+        image-clip: 20 0 20 20
 
-    ChaseModeBox
+      $disabled:
+        image-clip: 20 0 20 20
+
+    TopToggleButton
       id: followPosture
+      image-source: /images/inventory/buttons_general
+      image-clip: 0 20 20 20
       anchors.left: standPosture.right
       anchors.top: standPosture.top
       margin-left: 1
-
-    UIWidget
-      id: pvp
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 160 20 20
-      anchors.left: followPosture.right
-      anchors.top: standPosture.top
-      &imageClipCheckedX: 20
-      &imageClipUncheckedX: 0
-      &imageClipCheckedY: 160
-      &imageClipUncheckedY: 160
-      &imageClipWidth: 20
-      margin-left: 1
-      phantom: false
       size: 20 20
       @onClick: |
-        selectPvp(self:getImageClip().x == 0)
+        selectPosture('follow')
+
+      $pressed !disabled:
+        image-clip: 20 20 20 20
+
+      $disabled:
+        image-clip: 20 20 20 20
+    SafeFightBox
+      id: pvp
+      anchors.left: followPosture.right
+      anchors.top: standPosture.top
+      margin-left: 1
+      margin-top: 0
+      phantom: false
 
     UIWidget
       id: expert
@@ -458,6 +545,8 @@ PhantomMiniWindow
       anchors.bottom: soulAndCapacity.bottom
       phantom: false
       size: 12 12
+      @onClick: |
+        expertMode()
 
     Button
       id: blessings

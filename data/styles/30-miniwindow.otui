@@ -70,8 +70,8 @@ MiniWindow < UIMiniWindow
 
   UIButton
     id: lockButton
-    anchors.top: minimizeButton.top
-    anchors.right: minimizeButton.left
+    anchors.top: prev.top
+    anchors.right: prev.left
     margin-right: 2
     size: 14 14
     image-source: /images/ui/miniwindow_buttons

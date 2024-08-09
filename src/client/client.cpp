@@ -27,12 +27,14 @@
 #include "minimap.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
+#include "gameconfig.h"
 
 #include <framework/ui/ui.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/shadermanager.h>
+#include <framework/graphics/image.h>
 
 Client g_client;
 
@@ -126,4 +128,16 @@ bool Client::isUsingProtobuf()
 void Client::onLoadingAsyncTextureChanged(bool /*loadingAsync*/)
 {
     g_sprites.reload();
+}
+
+void Client::doMapScreenshot(std::string file)
+{
+    if (!m_mapWidget)
+        return;
+
+    if (file.empty()) {
+        file = "screenshot_map.png";
+    }
+
+    g_drawPool.get(DrawPoolType::MAP)->getFrameBuffer()->doScreenshot(file, g_gameConfig.getSpriteSize() * 3, g_gameConfig.getSpriteSize() * 3);
 }

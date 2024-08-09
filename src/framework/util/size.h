@@ -106,7 +106,11 @@ public:
             }
         }
     }
+
     void scale(int w, int h, Fw::AspectRatioMode mode) { scale(TSize<T>(w, h), mode); }
+
+    T smaller() const { return std::min<T>(ht, wd); }
+    T bigger() const { return std::max<T>(ht, wd); }
 
     float ratio() const { return static_cast<float>(wd) / ht; }
     T area() const { return wd * ht; }

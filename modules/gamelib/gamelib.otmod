@@ -21,7 +21,4 @@ Module
     dofile 'spells'
     dofile 'tile'
 
-    dofile 'eventcontroller'
-    dofile 'controller'
-
     dofiles 'ui'

@@ -839,6 +839,9 @@
     <ClInclude Include="..\src\framework\stdext\time.h">
       <Filter>Header Files\framework\stdext</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\framework\stdext\traits.h">
+      <Filter>Header Files\framework\stdext</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\framework\stdext\types.h">
       <Filter>Header Files\framework\stdext</Filter>
     </ClInclude>
