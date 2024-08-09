@@ -1157,13 +1157,8 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
         }
     }
     if (g_game.getClientVersion() >= 1340) {
-        if (containerItem->isMoveable()) {
-            msg->getU8();
-        }else{
-            msg->getU8();
-        }
-        
-        msg->getU8(); // // if (container->getHoldingPlayer()) { // Player holding the item (?)
+        msg->getU8();
+        msg->getU8();
     }
 
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
