@@ -3363,15 +3363,22 @@ void ProtocolGame::parseExperienceTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
 {
-    msg->getU8(); // quickLootFallbackToMainContainer ? 1 : 0
+    bool quickLootFallbackToMainContainer = msg->getU8() == 1;
     const uint8_t containers = msg->getU8();
+    std::vector<std::tuple<uint8_t, uint16_t, uint16_t>> lootData;
     for (auto i = 0; i < containers; ++i) {
-        msg->getU8(); // category type
-        msg->getU16(); // loot container id
+        uint8_t categoryType = msg->getU8();
+        uint16_t lootContainerId = msg->getU16();
+
+        uint16_t obtainerContainerId = 0;
         if (g_game.getClientVersion() >= 1332) {
-            msg->getU16(); // obtainer container id
+            obtainerContainerId = msg->getU16();
         }
+
+        lootData.emplace_back(categoryType, lootContainerId, obtainerContainerId);
     }
+
+    g_lua.callGlobalField("g_game", "onQuickLootContainers", quickLootFallbackToMainContainer, lootData);
 }
 
 void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
