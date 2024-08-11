@@ -130,6 +130,19 @@ local function setupComboBox()
     floorViewModeCombobox.onOptionChange = function(comboBox, option)
         setOption('floorViewMode', comboBox:getCurrentOption().data)
     end
+
+    if not g_game.isEnabledBotProtection() then
+        local profileCombobox = panels.misc:recursiveGetChildById('profile')
+
+        for i = 1, 10 do
+            profileCombobox:addOption(tostring(i), i)
+        end
+
+        profileCombobox.onOptionChange = function(comboBox, option)
+            setOption('profile', comboBox:getCurrentOption().data)
+        end
+    end
+
 end
 
 local function setup()

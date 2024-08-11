@@ -24,7 +24,7 @@ Panel
 
 local edit = setupUI([[
 Panel
-  height: 150
+  height: 250
 
   Label
     anchors.top: parent.top
@@ -39,7 +39,7 @@ Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 32
+    height: 65
 
   Label
     anchors.top: prev.bottom
@@ -54,7 +54,7 @@ Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 32
+    height: 65
 
   Label
     anchors.top: prev.bottom
@@ -69,7 +69,7 @@ Panel
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 32
+    height: 65
 ]])
 edit:hide()
 

@@ -165,7 +165,7 @@ MainWindow
       anchors.top: prev.bottom
       margin-top: 5
       width: 250
-      @onClick: g_platform.openDir(g_resources.getWriteDir() .. "bot")
+      @onClick: g_platform.openDir(g_resources.getWriteDir():gsub("[/\\]+", "\\") .. "bot")
 
     Label
       margin-top: 5
