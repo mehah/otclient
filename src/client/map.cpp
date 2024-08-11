@@ -1174,6 +1174,7 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
 
 void Map::updateAttachedWidgets(const MapViewPtr& mapView)
 {
+    g_drawPool.select(DrawPoolType::MAP);
     for (const auto& [widget, object] : m_attachedObjectWidgetMap) {
         if (widget->isDestroyed()) {
             continue;
