@@ -118,8 +118,9 @@ end
 function Controller:loadHtml(path, parent)
     local suffix = ".html"
     if path:sub(- #suffix) ~= suffix then
-        path = path .. '.html'
+        path = path .. suffix
     end
+
     self:setUI(path, parent)
     self.htmlRoot = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
     self.ui = self.htmlRoot.widget
@@ -129,22 +130,13 @@ function Controller:findElements(query)
     return self.htmlRoot and self.htmlRoot:find(query:trim()) or {}
 end
 
+function Controller:findWidgets(query)
+    return self.htmlRoot and self.htmlRoot:findWidgets(query:trim()) or {}
+end
+
 function Controller:findElement(query)
     local els = self:findElements(query)
     return #els > 0 and els[1] or nil
-end
-
-function Controller:findWidgets(query)
-    local els = self:findElements(query)
-
-    local widgets = {}
-    for _, el in pairs(els) do
-        if el.widget then
-            table.insert(widgets, el.widget)
-        end
-    end
-
-    return widgets
 end
 
 function Controller:findWidget(query)
