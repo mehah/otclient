@@ -139,7 +139,6 @@ function UIMiniWindowContainer:onDrop(widget, mousePos)
         end
 
         if not g_game.isEnabledBotProtection() then
-            print(widget:getId(), self:getParent():getId())
             if widget:getId() == "botWindow" and
                 (widget:getParent():getId() == "gameLeftPanel" or widget:getParent():getId() == "gameLeftExtraPanel" or
                     widget:getParent():getId() == "gameRightExtraPanel") then
