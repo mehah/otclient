@@ -728,4 +728,21 @@ namespace Otc
         SUPPLY_STASH_ACTION_STOW_STACK = 2,
         SUPPLY_STASH_ACTION_WITHDRAW = 3
     };
+
+    enum GameStoreInfoType_t : uint8_t
+    {
+        SHOW_NONE = 0,
+        SHOW_MOUNT = 1,
+        SHOW_OUTFIT = 2,
+        SHOW_ITEM = 3,
+        SHOW_HIRELING = 4
+    };
+
+    enum GameStoreInfoStatesType_t : uint8_t
+    {
+        STATE_NONE = 0,
+        STATE_NEW = 1,
+        STATE_SALE = 2,
+        STATE_TIMED = 3
+    };
 }

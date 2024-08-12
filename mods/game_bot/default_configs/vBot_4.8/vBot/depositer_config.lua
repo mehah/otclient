@@ -132,5 +132,5 @@ end
 local sellContainer = UI.Container(function(widget, items)
   storage.cavebotSell = items
 end, true)
-sellContainer:setHeight(35)
+sellContainer:setHeight(100)
 sellContainer:setItems(storage.cavebotSell)

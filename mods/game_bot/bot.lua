@@ -255,14 +255,13 @@ function toggle()
   else
     botWindow:open()
     botButton:setOn(true)
-    local interface = modules.game_interface
-    local left = interface:getLeftPanel()
-    left:setWidth(190)
+
     modules.game_interface.checkAndOpenLeftPanel()
   end
 end
 
 function online()
+  botWindow:setupOnStart()
   botButton:show()
   if not modules.client_profiles.ChangedProfile then
     scheduleEvent(refresh, 20)
