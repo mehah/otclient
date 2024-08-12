@@ -349,5 +349,261 @@ int push_luavalue(const BlessDialogData& data) {
     }
     g_lua.setField("logs");
 
+int push_luavalue(const StoreCategory& category) {
+    g_lua.createTable(0, 5);
+    g_lua.pushString(category.name);
+    g_lua.setField("name");
+
+    if (!category.parent.empty()) {
+        g_lua.pushString(category.parent);
+        g_lua.setField("parent");
+    }
+
+    g_lua.pushInteger(category.state);
+    g_lua.setField("state");
+
+    g_lua.createTable(0, category.icons.size());
+    for (size_t i = 0; i < category.icons.size(); ++i) {
+        g_lua.pushString(category.icons[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("icons");
+
+    if (category.parent.empty()) {
+        g_lua.createTable(0, category.subCategories.size());
+        for (size_t i = 0; i < category.subCategories.size(); ++i) {
+            push_luavalue(category.subCategories[i]);
+            g_lua.rawSeti(i + 1);
+        }
+        g_lua.setField("subCategories");
+    } else {
+        g_lua.createTable(0, 0);
+        g_lua.setField("subCategories");
+    }
+
+    return 1;
+}
+
+int push_luavalue(const SubOffer& subOffer) {
+    g_lua.createTable(0, 9);
+    g_lua.pushInteger(subOffer.id);
+    g_lua.setField("id");
+    g_lua.pushInteger(subOffer.count);
+    g_lua.setField("count");
+    g_lua.pushInteger(subOffer.price);
+    g_lua.setField("price");
+    g_lua.pushInteger(subOffer.coinType);
+    g_lua.setField("coinType");
+    g_lua.pushBoolean(subOffer.disabled);
+    g_lua.setField("disabled");
+    if (subOffer.disabled) {
+        g_lua.pushInteger(subOffer.disabledReason);
+        g_lua.setField("disabledReason");
+    }
+    g_lua.pushInteger(subOffer.state);
+    g_lua.setField("state");
+    if (subOffer.state == Otc::GameStoreInfoStatesType_t::STATE_SALE) {
+        g_lua.pushInteger(subOffer.validUntil);
+        g_lua.setField("validUntil");
+        g_lua.pushInteger(subOffer.basePrice);
+        g_lua.setField("basePrice");
+    }
+    return 1;
+}
+
+int push_luavalue(const StoreOffer& offer) {
+    g_lua.createTable(0, 14);
+    g_lua.pushString(offer.name);
+    g_lua.setField("name");
+
+    g_lua.createTable(0, offer.subOffers.size());
+    for (size_t i = 0; i < offer.subOffers.size(); ++i) {
+        push_luavalue(offer.subOffers[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("subOffers");
+
+    g_lua.pushInteger(offer.ofertaid);
+    g_lua.setField("ofertaid");
+    g_lua.pushString(offer.description);
+    g_lua.setField("description");
+    g_lua.pushInteger(offer.type);
+    g_lua.setField("type");
+
+    if (offer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
+        g_lua.pushString(offer.icon);
+        g_lua.setField("icon");
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
+        g_lua.pushInteger(offer.mountId);
+        g_lua.setField("mountId");
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
+        g_lua.pushInteger(offer.itemId);
+        g_lua.setField("itemId");
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
+        g_lua.pushInteger(offer.outfitId);
+        g_lua.setField("outfitId");
+        g_lua.pushInteger(offer.outfitHead);
+        g_lua.setField("outfitHead");
+        g_lua.pushInteger(offer.outfitBody);
+        g_lua.setField("outfitBody");
+        g_lua.pushInteger(offer.outfitLegs);
+        g_lua.setField("outfitLegs");
+        g_lua.pushInteger(offer.outfitFeet);
+        g_lua.setField("outfitFeet");
+    } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_HIRELING) {
+        g_lua.pushInteger(offer.sex);
+        g_lua.setField("sex");
+        g_lua.pushInteger(offer.maleOutfitId);
+        g_lua.setField("maleOutfitId");
+        g_lua.pushInteger(offer.femaleOutfitId);
+        g_lua.setField("femaleOutfitId");
+        g_lua.pushInteger(offer.outfitHead);
+        g_lua.setField("outfitHead");
+        g_lua.pushInteger(offer.outfitBody);
+        g_lua.setField("outfitBody");
+        g_lua.pushInteger(offer.outfitLegs);
+        g_lua.setField("outfitLegs");
+        g_lua.pushInteger(offer.outfitFeet);
+        g_lua.setField("outfitFeet");
+    }
+
+    g_lua.pushInteger(offer.tryOnType);
+    g_lua.setField("tryOnType");
+    g_lua.pushInteger(offer.collection);
+    g_lua.setField("collection");
+    g_lua.pushInteger(offer.popularityScore);
+    g_lua.setField("popularityScore");
+    g_lua.pushInteger(offer.stateNewUntil);
+    g_lua.setField("stateNewUntil");
+    g_lua.pushBoolean(offer.configurable);
+    g_lua.setField("configurable");
+    g_lua.pushInteger(offer.productsCapacity);
+    g_lua.setField("productsCapacity");
+
+    return 1;
+}
+
+int push_luavalue(const HomeOffer& homeOffer) {
+    g_lua.createTable(0, 16);
+    g_lua.pushString(homeOffer.name);
+    g_lua.setField("name");
+    g_lua.pushInteger(homeOffer.unknownByte);
+    g_lua.setField("unknownByte");
+    g_lua.pushInteger(homeOffer.id);
+    g_lua.setField("id");
+    g_lua.pushInteger(homeOffer.unknownU16);
+    g_lua.setField("unknownU16");
+    g_lua.pushInteger(homeOffer.price);
+    g_lua.setField("price");
+    g_lua.pushInteger(homeOffer.coinType);
+    g_lua.setField("coinType");
+    g_lua.pushInteger(homeOffer.disabledReasonIndex);
+    g_lua.setField("disabledReasonIndex");
+    g_lua.pushInteger(homeOffer.unknownByte2);
+    g_lua.setField("unknownByte2");
+    g_lua.pushInteger(homeOffer.type);
+    g_lua.setField("type");
+
+    if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
+        g_lua.pushString(homeOffer.icon);
+        g_lua.setField("icon");
+    } else if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
+        g_lua.pushInteger(homeOffer.mountClientId);
+        g_lua.setField("mountClientId");
+    } else if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
+        g_lua.pushInteger(homeOffer.itemType);
+        g_lua.setField("itemType");
+    } else if (homeOffer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
+        g_lua.pushInteger(homeOffer.sexId);
+        g_lua.setField("sexId");
+        g_lua.createTable(0, 4);
+        g_lua.pushInteger(homeOffer.outfit.lookHead);
+        g_lua.setField("lookHead");
+        g_lua.pushInteger(homeOffer.outfit.lookBody);
+        g_lua.setField("lookBody");
+        g_lua.pushInteger(homeOffer.outfit.lookLegs);
+        g_lua.setField("lookLegs");
+        g_lua.pushInteger(homeOffer.outfit.lookFeet);
+        g_lua.setField("lookFeet");
+        g_lua.setField("outfit");
+    }
+
+    g_lua.pushInteger(homeOffer.tryOnType);
+    g_lua.setField("tryOnType");
+    g_lua.pushInteger(homeOffer.collection);
+    g_lua.setField("collection");
+    g_lua.pushInteger(homeOffer.popularityScore);
+    g_lua.setField("popularityScore");
+    g_lua.pushInteger(homeOffer.stateNewUntil);
+    g_lua.setField("stateNewUntil");
+    g_lua.pushInteger(homeOffer.userConfiguration);
+    g_lua.setField("userConfiguration");
+    g_lua.pushInteger(homeOffer.productsCapacity);
+    g_lua.setField("productsCapacity");
+
+    return 1;
+}
+
+int push_luavalue(const Banner& banner) {
+    g_lua.createTable(0, 5);
+    g_lua.pushString(banner.image);
+    g_lua.setField("image");
+    g_lua.pushInteger(banner.bannerType);
+    g_lua.setField("bannerType");
+    g_lua.pushInteger(banner.offerId);
+    g_lua.setField("offerId");
+    g_lua.pushInteger(banner.unknownByte1);
+    g_lua.setField("unknownByte1");
+    g_lua.pushInteger(banner.unknownByte2);
+    g_lua.setField("unknownByte2");
+    return 1;
+}
+
+int push_luavalue(const StoreData& storeData) {
+    g_lua.createTable(0, 7);
+    g_lua.pushString(storeData.categoryName);
+    g_lua.setField("categoryName");
+    g_lua.pushInteger(storeData.redirectId);
+    g_lua.setField("redirectId");
+
+    g_lua.createTable(0, storeData.disableReasons.size());
+    for (size_t i = 0; i < storeData.disableReasons.size(); ++i) {
+        g_lua.pushString(storeData.disableReasons[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("disableReasons");
+
+    if (storeData.categoryName == "Home") {
+        g_lua.createTable(0, storeData.homeOffers.size());
+        for (size_t i = 0; i < storeData.homeOffers.size(); ++i) {
+            push_luavalue(storeData.homeOffers[i]);
+            g_lua.rawSeti(i + 1);
+        }
+    } else {
+        g_lua.createTable(0, storeData.storeOffers.size());
+        for (size_t i = 0; i < storeData.storeOffers.size(); ++i) {
+            push_luavalue(storeData.storeOffers[i]);
+            g_lua.rawSeti(i + 1);
+        }
+    }
+    g_lua.setField("offers");
+
+    if (storeData.categoryName == "Home") {
+        g_lua.createTable(0, storeData.banners.size());
+        for (size_t i = 0; i < storeData.banners.size(); ++i) {
+            push_luavalue(storeData.banners[i]);
+            g_lua.rawSeti(i + 1);
+        }
+        g_lua.setField("banners");
+
+        g_lua.pushInteger(storeData.bannerDelay);
+        g_lua.setField("bannerDelay");
+    }
+
+    if (storeData.categoryName == "Search") {
+        g_lua.pushBoolean(storeData.tooManyResults);
+        g_lua.setField("tooManyResults");
+    }
+
     return 1;
 }
