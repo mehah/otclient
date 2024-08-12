@@ -10,3 +10,21 @@ UIWidget
     OptionCheckBox
       id: autoChaseOverride
       !text: tr('Allow auto chase override')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 55
+    margin-top: 10
+    Label
+      text: Client user features profile
+    ComboBox
+      id: profile
+      margin-top: 3
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+
+      @onSetup: |
+        self:getParent():setVisible(not g_game.isEnabledBotProtection())
