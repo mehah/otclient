@@ -62,7 +62,7 @@ BlessingButton < UIButton
   image-source: /game_blessing/images/getpremium
   image-clip: 0 0 128 37
   image-border: 3
-  @onClick: modules.game_shop.toggle()
+  @onClick: modules.game_mainpanel.toggleStore()
   
   $pressed:
     image-clip: 0 37 128 37

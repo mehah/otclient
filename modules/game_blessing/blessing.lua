@@ -15,6 +15,7 @@ function BlessingController:onGameStart()
         onUpdateBlessDialog = onUpdateBlessDialog
     })
     BlessingController.ui:hide()
+    BlessingController.ui.minipanel1:setText("Record of Blessings") -- Temp fix html/css system
 end
 
 function BlessingController:onGameEnd()
@@ -37,7 +38,7 @@ end
 
 function setHistory()
     local ui = BlessingController.ui
-    ui.test:hide()
+    ui.minipanel1:hide()
     ui.promotionStatus2:hide()
     ui.promotionStatus:hide()
     ui.blessingHistory:show()
@@ -46,7 +47,7 @@ end
 
 function setBlessing()
     local ui = BlessingController.ui
-    ui.test:show()
+    ui.minipanel1:show()
     ui.promotionStatus2:show()
     ui.promotionStatus:show()
     ui.blessingHistory:hide()
@@ -83,10 +84,9 @@ function show()
 end
 
 function onUpdateBlessDialog(data)
-    BlessingController.ui.test:destroyChildren()
-
+    BlessingController.ui.minipanel1:destroyChildren()
     for i, entry in ipairs(data.blesses) do
-        local label = g_ui.createWidget("blessingTEST", BlessingController.ui.test)
+        local label = g_ui.createWidget("blessingTEST", BlessingController.ui.minipanel1)
         local totalCount = entry.playerBlessCount + entry.store
         label.text:setText(entry.playerBlessCount .. " (" .. entry.store .. ")")
         if totalCount >= 1 then
@@ -95,13 +95,13 @@ function onUpdateBlessDialog(data)
     end
 
     if (data.promotion ~= 0) then
-        BlessingController.ui.promotionStatus2.premium_only:setOn(false)
+        BlessingController.ui.promotionStatus2.premium_only:setOn(true)
         BlessingController.ui.promotionStatus2.rank:setColoredText(
             "Your character is promoted and your account has Premium\nstatus. As a result, your XP loss is reduced by {30%, #f75f5f}.")
     else
         BlessingController.ui.promotionStatus2.rank:setColoredText(
             "Your character is promoted and your account has Premium\nstatus. As a result, your XP loss is reduced by {0%, #f75f5f}.")
-            BlessingController.ui.promotionStatus2.premium_only:setOn(true)
+            BlessingController.ui.promotionStatus2.premium_only:setOn(false)
     end
 
     BlessingController.ui.promotionStatus.fightRules:setColoredText(
@@ -125,6 +125,8 @@ function onUpdateBlessDialog(data)
     row2.name:setText("Event")
     row2.rank:setColor("#c0c0c0")
     row2.name:setColor("#c0c0c0")
+    row2:setBorderColor("#00000077")
+    row2:setBorderWidth(1)
 
     for index, entry in ipairs(data.logs) do
         local row = g_ui.createWidget("historyData", BlessingController.ui.blessingHistory:getChildByIndex(1))
