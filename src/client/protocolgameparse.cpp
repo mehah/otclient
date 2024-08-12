@@ -708,7 +708,7 @@ void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() != 1332) {
+    if (g_game.getClientVersion() <= 1332) {
         parseCoinBalance(msg);
     }
 
@@ -719,7 +719,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
         StoreCategory category;
         category.name = msg->getString();
 
-        if (g_game.getClientVersion() != 1332) {
+        if (g_game.getClientVersion() <= 1332) {
             msg->getString();
         }
 
@@ -814,7 +814,7 @@ void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() == 1332) {
+    if (g_game.getClientVersion() >= 1332) {
 
         msg->getU8();
         const auto& purchaseStatus = msg->getString();
@@ -848,7 +848,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
     std::vector<std::tuple<uint32_t, uint32_t, std::string>> historyData;
 
     for (auto i = -1; ++i < entries;) {
-        if (g_game.getClientVersion() == 1332) {
+        if (g_game.getClientVersion() >= 1332) {
             msg->getU32();
             uint32_t time = msg->getU32();
             msg->getU8();
@@ -874,7 +874,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
 
 void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 {
-    if (g_game.getClientVersion() == 1332) {
+    if (g_game.getClientVersion() >= 1332) {
         StoreData storeData;
         storeData.categoryName = msg->getString();
         storeData.redirectId = msg->getU32();
