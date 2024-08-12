@@ -243,7 +243,7 @@ if true then
       return
     end
     local timer = 0
-    if thing:getId() == 2129 then     -- mwall id
+    if thing:getId() == 2129 or thing:getId() == 2128 then -- mwall id
       timer = 20000                   -- mwall time
     elseif thing:getId() == 2130 then -- wg id
       timer = 45000                   -- wg time
@@ -465,7 +465,10 @@ if true then
         if tile:getText():len() == 0 then
           table.remove(candidates, i)
         end
-        local rune = tile:getText() == "HOLD MW" and 3180 or tile:getText() == "HOLD WG" and 3156
+        local rune = 3180 
+        if tile:getText() == "HOLD WG" then
+          rune = 3156
+        end
         if tile:canShoot() and not isInPz() and tile:isWalkable() and tile:getTopUseThing():getId() ~= 2130 then
           if math.abs(player:getPosition().x - tile:getPosition().x) < 8 and math.abs(player:getPosition().y - tile:getPosition().y) < 6 then
             return useWith(rune, tile:getTopUseThing())
@@ -538,8 +541,7 @@ if true then
   end)
 end
 
-addCheckBox("checkPlayer", "Check Players", true, rightPanel,
-  "Auto look on players and mark level and vocation on character model")
+addCheckBox("checkPlayer", "Check Players", false, rightPanel, "Auto look on players and mark level and vocation on character model")
 if true then
   local found
   local function checkPlayers()

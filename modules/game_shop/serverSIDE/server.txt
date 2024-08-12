@@ -1,0 +1,30 @@
+
+-- Instruction: 
+-- creaturescripts.xml      <event type="extendedopcode" name="Shop" script="shop.lua" />
+-- and in login.lua         player:registerEvent("Shop")
+-- create sql table shop_history
+-- set variables
+-- set up function init(), add there items and categories, follow examples
+-- set up callbacks at the bottom to add player item/outfit/whatever you want
+
+-- add json lib dofile('data/lib/json.lua')  in \data\lib\lib.lua
+
+
+--[[ SQL TABLE
+
+CREATE TABLE `shop_history` (
+  `id` int(11) NOT NULL,
+  `account` int(11) NOT NULL,
+  `player` int(11) NOT NULL,
+  `date` datetime NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `cost` int(11) NOT NULL,
+  `details` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `shop_history`
+  ADD PRIMARY KEY (`id`);
+ALTER TABLE `shop_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+]]--

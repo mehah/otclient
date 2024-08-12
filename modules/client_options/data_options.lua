@@ -357,5 +357,8 @@ return {
             bar:setText(tr('Opacity: %s', bar:recursiveGetChildById('valueBar'):getValue() / 100))
             modules.game_healthcircle.setCircleOpacity(bar:recursiveGetChildById('valueBar'):getValue() / 100)
         end
+    },
+    profile                          = {
+        value = 1,
     }
 }
