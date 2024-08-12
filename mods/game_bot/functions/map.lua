@@ -237,8 +237,13 @@ context.autoWalk = function(destination, maxDist, params)
 end
 
 context.getTileUnderCursor = function()
-  if not modules.game_interface.gameMapPanel.mousePos then return end
-  return modules.game_interface.gameMapPanel:getTile(modules.game_interface.gameMapPanel.mousePos)
+    local mousePosition = g_window.getMousePosition()
+    local clickedWidget = modules.game_interface.getRootPanel():recursiveGetChildByPos(mousePosition, false)
+    if not clickedWidget or clickedWidget.getClassName(clickedWidget) ~= "UIGameMap" then
+        return
+    end
+    local tile = clickedWidget.getTile(clickedWidget, mousePosition)
+  return tile
 end
 
 context.canShoot = function(pos, distance)

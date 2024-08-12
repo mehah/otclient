@@ -43,5 +43,8 @@ Module
     - game_screenshot
     - game_highscore
     - game_blessing
+    - game_store
+    - game_quickloot
+
   @onLoad: init()
   @onUnload: terminate()

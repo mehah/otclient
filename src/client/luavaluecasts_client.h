@@ -53,3 +53,10 @@ int push_luavalue(const ImbuementTrackerItem& i);
 int push_luavalue(const BlessData& bless);
 int push_luavalue(const LogData& log);
 int push_luavalue(const BlessDialogData& data);
+// Store
+int push_luavalue(const StoreCategory& category);
+int push_luavalue(const SubOffer& subOffer);
+int push_luavalue(const StoreOffer& offer);
+int push_luavalue(const HomeOffer& homeOffer);
+int push_luavalue(const Banner& banner);
+int push_luavalue(const StoreData& storeData);
