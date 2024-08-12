@@ -3453,7 +3453,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getFeature(Otc::GameThingClock)) {
         if (item->hasClockExpire() || item->hasExpire() || item->hasExpireStop()) {
-            msg->getU32(); // Item duration (UI)
+            item->setDurationTime(msg->getU32());
             msg->getU8(); // Is brand-new
         }
     }

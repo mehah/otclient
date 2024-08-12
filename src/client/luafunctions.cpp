@@ -687,6 +687,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getCountOrSubType", &Item::getCountOrSubType);
     g_lua.bindClassMemberFunction<Item>("getId", &Item::getId);
     g_lua.bindClassMemberFunction<Item>("getTooltip", &Item::getTooltip);
+    g_lua.bindClassMemberFunction<Item>("getDurationTime", &Item::getDurationTime);
 
     g_lua.bindClassMemberFunction<Item>("isStackable", &Item::isStackable);
     g_lua.bindClassMemberFunction<Item>("isMarketable", &Item::isMarketable);

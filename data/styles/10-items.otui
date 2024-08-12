@@ -177,3 +177,8 @@ MainInventoryItem < UIWidget
     font: verdana-11px-rounded
     border-color: white
     color: white
+	
+    Label
+      id: Duration
+      anchors.fill: parent
+      
