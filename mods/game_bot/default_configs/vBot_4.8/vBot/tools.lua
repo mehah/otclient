@@ -25,7 +25,7 @@ end)
 local moneyContainer = UI.Container(function(widget, items)
   storage.moneyItems = items
 end, true)
-moneyContainer:setHeight(35)
+moneyContainer:setHeight(65)
 moneyContainer:setItems(storage.moneyItems)
 
 UI.Separator()

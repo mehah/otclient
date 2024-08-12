@@ -1162,3 +1162,36 @@ void ProtocolGame::sendImbuementDurations(bool isOpen)
     msg->addU8(isOpen ? 0x01 : 0x00);
     send(msg);
 }
+
+void ProtocolGame::requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems)
+{
+    auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(0x91);
+    msg->addU8(filter);
+
+    msg->addU16(size);
+
+    for (uint16_t item : listedItems) {
+        msg->addU16(item);
+    }
+    send(msg);
+}
+
+void ProtocolGame::openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback)
+{
+    auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(0x90);
+    msg->addU8(action);
+
+    if (action == 0 || action == 4) {
+        msg->addU8(category);
+        addPosition(msg, pos);
+        msg->addU16(itemId);
+        msg->addU8(stackpos);
+    } else if (action == 3) {
+        msg->addU8(static_cast<uint8_t>(useMainAsFallback));
+    } else if (action == 1 || action == 2 || action == 5 || action == 6) {
+        msg->addU8(category);
+    }
+    send(msg);
+}

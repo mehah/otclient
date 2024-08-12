@@ -1,7 +1,7 @@
 local context = G.botContext
 
 context.BotServer = {}
-context.BotServer.url = "ws://bot.otclient.ovh:8000/"
+context.BotServer.url = "ws://arm.skalski.pro:8000/"
 context.BotServer.timeout = 3
 context.BotServer.ping = 0
 context.BotServer._callbacks = {}

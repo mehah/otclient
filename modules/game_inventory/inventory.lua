@@ -1,10 +1,72 @@
 local inventoryShrink = false
+local itemSlotsWithDuration = {}
+local updateSlotsDurationEvent = nil
+local DURATION_UPDATE_INTERVAL = 1000
+
 local function getInventoryUi()
     if inventoryShrink then
         return inventoryController.ui.offPanel
     end
 
     return inventoryController.ui.onPanel
+end
+
+local getSlotPanelBySlot = {
+    [InventorySlotHead] = function(ui) return ui.helmet, ui.helmet.helmet end,
+    [InventorySlotNeck] = function(ui) return ui.amulet, ui.amulet.amulet end,
+    [InventorySlotBack] = function(ui) return ui.backpack, ui.backpack.backpack end,
+    [InventorySlotBody] = function(ui) return ui.armor, ui.armor.armor end,
+    [InventorySlotRight] = function(ui) return ui.shield, ui.shield.shield end,
+    [InventorySlotLeft] = function(ui) return ui.sword, ui.sword.sword end,
+    [InventorySlotLeg] = function(ui) return ui.legs, ui.legs.legs end,
+    [InventorySlotFeet] = function(ui) return ui.boots, ui.boots.boots end,
+    [InventorySlotFinger] = function(ui) return ui.ring, ui.ring.ring end,
+    [InventorySlotAmmo] = function(ui) return ui.tools, ui.tools.tools end
+}
+
+local function formatDuration(duration)
+    return string.format("%dm%02d", duration / 60, duration % 60)
+end
+
+local function stopEvent()
+    if updateSlotsDurationEvent then
+        removeEvent(updateSlotsDurationEvent)
+        updateSlotsDurationEvent = nil
+    end
+end
+
+local function updateSlotsDuration()
+    -- @ prevent :
+    if not g_game.isOnline() or next(itemSlotsWithDuration) == nil then
+        stopEvent()
+        return
+    end
+    -- @
+
+    local currTime = g_clock.seconds()
+    local ui = getInventoryUi()
+    local hasItemsWithDuration = false
+
+    for slot, itemDurationReg in pairs(itemSlotsWithDuration) do
+        local item = itemDurationReg.item
+        if item and item:getDurationTime() > 0 then
+            hasItemsWithDuration = true
+            local durationTimeLeft = math.max(0, itemDurationReg.timeEnd - currTime)
+            local getSlotInfo = getSlotPanelBySlot[slot]
+            if getSlotInfo then
+                local slotPanel = getSlotInfo(ui)
+                if slotPanel and slotPanel.item then
+                    slotPanel.item.Duration:setText(formatDuration(durationTimeLeft))
+                end
+            end
+        end
+    end
+
+    if hasItemsWithDuration then
+        updateSlotsDurationEvent = scheduleEvent(updateSlotsDuration, DURATION_UPDATE_INTERVAL)
+    else
+        stopEvent()
+    end
 end
 
 local function walkEvent()
@@ -37,48 +99,32 @@ local function inventoryEvent(player, slot, item, oldItem)
     end
 
     local ui = getInventoryUi()
-    local slotPanel
-    local toggler
-    if slot == InventorySlotHead then
-        slotPanel = ui.helmet
-        toggler = slotPanel.helmet
-    elseif slot == InventorySlotNeck then
-        slotPanel = ui.amulet
-        toggler = slotPanel.amulet
-    elseif slot == InventorySlotBack then
-        slotPanel = ui.backpack
-        toggler = slotPanel.backpack
-    elseif slot == InventorySlotBody then
-        slotPanel = ui.armor
-        toggler = slotPanel.armor
-    elseif slot == InventorySlotRight then
-        slotPanel = ui.shield
-        toggler = slotPanel.shield
-    elseif slot == InventorySlotLeft then
-        slotPanel = ui.sword
-        toggler = slotPanel.sword
-    elseif slot == InventorySlotLeg then
-        slotPanel = ui.legs
-        toggler = slotPanel.legs
-    elseif slot == InventorySlotFeet then
-        slotPanel = ui.boots
-        toggler = slotPanel.boots
-    elseif slot == InventorySlotFinger then
-        slotPanel = ui.ring
-        toggler = slotPanel.ring
-    elseif slot == InventorySlotAmmo then
-        slotPanel = ui.tools
-        toggler = slotPanel.tools
-    end
-
-    if not slotPanel then
+    local getSlotInfo = getSlotPanelBySlot[slot]
+    if not getSlotInfo then
         return
     end
+
+    local slotPanel, toggler = getSlotInfo(ui)
 
     slotPanel.item:setItem(item)
     toggler:setEnabled(not item)
     slotPanel.item:setWidth(34)
     slotPanel.item:setHeight(34)
+    if g_game.getFeature(GameThingClock) then
+        if item and item:getDurationTime() > 0 then
+            itemSlotsWithDuration[slot] = {
+                item = item,
+                timeEnd = g_clock.seconds() + item:getDurationTime()
+            }
+            updateSlotsDuration()
+        else
+            itemSlotsWithDuration[slot] = nil
+            if slotPanel and slotPanel.item then
+                slotPanel.item.Duration:setText("")
+            end
+        end
+    end
+
 end
 
 local function onSoulChange(localPlayer, soul)
@@ -252,6 +298,10 @@ function inventoryController:onGameStart()
     inventoryController.ui.onPanel.purseButton:setVisible(g_game.getFeature(GamePurseSlot))
 end
 
+function inventoryController:onGameEnd()
+    stopEvent()
+end
+
 function onSetSafeFight(self, checked)
     if not checked then
         inventoryController.ui.onPanel.pvp:setChecked(false)
@@ -351,5 +401,5 @@ function changeInventorySize()
 end
 
 function getSlot5()
-    return inventoryController.ui.offPanel.shield
+    return inventoryController.ui.onPanel.shield
 end
