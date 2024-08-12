@@ -1331,6 +1331,9 @@ function Market.loadMarketItems(category)
         end
     else
         -- loop specific category
+        if not marketItems[category] then
+            return
+        end
         for i = 1, #marketItems[category] do
             local item = marketItems[category][i]
             if isItemValid(item, category, searchFilter) then
