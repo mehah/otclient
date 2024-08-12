@@ -362,6 +362,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "stashWithdraw", &Game::stashWithdraw, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestHighscore", &Game::requestHighscore, &g_game);
     g_lua.bindSingletonFunction("g_game", "imbuementDurations", &Game::imbuementDurations, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestQuickLootBlackWhiteList", &Game::requestQuickLootBlackWhiteList, &g_game);
+    g_lua.bindSingletonFunction("g_game", "openContainerQuickLoot", &Game::openContainerQuickLoot, &g_game);
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
@@ -895,6 +897,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIItem>("getItemId", &UIItem::getItemId);
     g_lua.bindClassMemberFunction<UIItem>("getItemCount", &UIItem::getItemCount);
     g_lua.bindClassMemberFunction<UIItem>("getItemSubType", &UIItem::getItemSubType);
+    g_lua.bindClassMemberFunction<UIItem>("getItemCountOrSubType", &UIItem::getItemCountOrSubType);
     g_lua.bindClassMemberFunction<UIItem>("getItem", &UIItem::getItem);
     g_lua.bindClassMemberFunction<UIItem>("isVirtual", &UIItem::isVirtual);
     g_lua.bindClassMemberFunction<UIItem>("isItemVisible", &UIItem::isItemVisible);

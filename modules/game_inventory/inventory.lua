@@ -401,5 +401,5 @@ function changeInventorySize()
 end
 
 function getSlot5()
-    return inventoryController.ui.offPanel.shield
+    return inventoryController.ui.onPanel.shield
 end

@@ -708,26 +708,63 @@ void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const
 {
-    parseCoinBalance(msg);
+    if (g_game.getClientVersion() != 1332) {
+        parseCoinBalance(msg);
+    }
 
-    const uint8_t categories = msg->getU16();
-    for (auto i = -1; ++i < categories;) {
-        msg->getString(); // category
-        msg->getString(); // description
+    std::vector<StoreCategory> categories;
+    const uint16_t categoryCount = msg->getU16();
 
-        if (g_game.getFeature(Otc::GameIngameStoreHighlights))
-            msg->getU8(); // highlightState
+    for (uint16_t i = 0; i < categoryCount; ++i) {
+        StoreCategory category;
+        category.name = msg->getString();
 
-        std::vector<std::string> icons;
-        const uint8_t iconCount = msg->getU8();
-        for (auto j = -1; ++j < iconCount; ) {
-            icons.push_back(msg->getString());
+        if (g_game.getClientVersion() != 1332) {
+            msg->getString();
         }
 
-        // If this is a valid category name then
-        // the category we just parsed is a child of that
-        msg->getString();
+        if (g_game.getFeature(Otc::GameIngameStoreHighlights)) {
+            category.state = msg->getU8();
+        } else {
+            category.state = 0;
+        }
+
+        const uint8_t iconCount = msg->getU8();
+        for (uint8_t j = 0; j < iconCount; ++j) {
+            category.icons.push_back(msg->getString());
+        }
+
+        category.parent = msg->getString();
+
+        categories.push_back(category);
     }
+
+    if (g_game.getClientVersion() >= 1332) {
+        msg->getU8();
+        msg->getU8();
+    }
+
+    std::vector<StoreCategory> organizedCategories;
+    for (const auto& category : categories) {
+        if (category.parent.empty()) {
+            StoreCategory mainCategory = category;
+            mainCategory.subCategories.clear();
+
+            for (const auto& subCategory : categories) {
+                if (subCategory.parent == category.name) {
+                    mainCategory.subCategories.push_back(subCategory);
+                }
+            }
+
+            organizedCategories.push_back(mainCategory);
+
+            for (const auto& subCategory : mainCategory.subCategories) {
+                organizedCategories.push_back(subCategory);
+            }
+        }
+    }
+
+    g_lua.callGlobalField("g_game", "onParseStoreGetCategories", organizedCategories);
 }
 
 void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg) const
@@ -757,80 +794,264 @@ void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
 {
-    // coin balance can be updating and might not be accurate
-    msg->getU8(); // == 1; // isUpdating
+
+    if (g_game.getClientVersion() >= 1332) {
+        uint8_t action = msg->getU8();
+        if (action == 0) {
+            return;
+        }
+        msg->getU8();
+        msg->getU8(); 
+        uint32_t getTibiaCoins = msg->getU32();
+        uint32_t getTransferableCoins = msg->getU32();
+        msg->getU32(); 
+        g_lua.callGlobalField("g_game", "onParseStoreGetCoin", getTibiaCoins, getTransferableCoins);
+    } else {
+        // coin balance can be updating and might not be accurate
+        msg->getU8(); // == 1; // isUpdating
+    }
 }
 
 void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
 {
-    // not used
-    msg->getU8();
+    if (g_game.getClientVersion() == 1332) {
 
-    const auto& message = msg->getString();
-    const uint32_t coins = msg->getU32();
-    const uint32_t transferableCoins = msg->getU32();
+        msg->getU8();
+        const auto& purchaseStatus = msg->getString();
+        g_lua.callGlobalField("g_game", "onParseStoreGetPurchaseStatus", purchaseStatus);
+    } else {
+        // not used
+        msg->getU8();
 
-    g_logger.info(stdext::format("Purchase Complete: %s\nAvailable coins: %d (transferable: %d)", message, coins, transferableCoins));
+        const auto& message = msg->getString();
+        const uint32_t coins = msg->getU32();
+        const uint32_t transferableCoins = msg->getU32();
+
+        g_logger.info(stdext::format("Purchase Complete: %s\nAvailable coins: %d (transferable: %d)", message, coins, transferableCoins));
+    }
+
 }
 
 void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) const
 {
+    uint32_t currentPage;
+    uint32_t pageCount;
     if (g_game.getClientVersion() <= 1096) {
         msg->getU16(); // currentPage
         msg->getU8(); // hasNextPage (bool)
     } else {
-        msg->getU32(); // currentPage
-        msg->getU32(); // pageCount
+        currentPage = msg->getU32();
+        pageCount = msg->getU32();
     }
 
     const uint8_t entries = msg->getU8();
+    std::vector<std::tuple<uint32_t, uint32_t, std::string>> historyData;
+
     for (auto i = -1; ++i < entries;) {
-        uint16_t time = msg->getU16();
-        uint8_t productType = msg->getU8();
-        uint32_t coinChange = msg->getU32();
-        const auto& productName = msg->getString();
-        g_logger.error(stdext::format("Time %i, type %i, change %i, product name %s", time, productType, coinChange, productName));
+        if (g_game.getClientVersion() == 1332) {
+            msg->getU32();
+            uint32_t time = msg->getU32();
+            msg->getU8();
+            uint32_t amount = (UINT32_MAX -msg->getU32());
+            msg->getU8();
+            const auto& productName = msg->getString();
+            msg->getU8();
+            historyData.emplace_back( time, amount, productName);
+            g_lua.callGlobalField("g_game", "onParseStoreGetHistory", currentPage, pageCount, historyData);
+        } else {
+            const uint8_t entries = msg->getU8();
+            for (auto i = -1; ++i < entries;) {
+                uint16_t time = msg->getU16();
+                uint8_t productType = msg->getU8();
+                uint32_t coinChange = msg->getU32();
+                const auto& productName = msg->getString();
+                g_logger.error(stdext::format("Time %i, type %i, change %i, product name %s", time, productType, coinChange, productName));
+            }
+        }
+     
     }
 }
 
 void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 {
-    msg->getString(); // categoryName
+    if (g_game.getClientVersion() == 1332) {
+        StoreData storeData;
+        storeData.categoryName = msg->getString();
+        storeData.redirectId = msg->getU32();
 
-    const uint16_t offers = msg->getU16();
-    for (auto i = -1; ++i < offers;) {
-        msg->getU32(); // offerId
-        msg->getString(); // offerName
-        msg->getString(); // offerDescription
+        msg->getU8(); // Skip unknown byte
+        msg->getU8(); // Skip unknown byte
+        msg->getU16(); // Skip unknown U16
 
-        msg->getU32(); // price
-        const uint8_t highlightState = msg->getU8();
-        if (highlightState == 2 && g_game.getFeature(Otc::GameIngameStoreHighlights) && g_game.getClientVersion() >= 1097) {
-            msg->getU32(); // saleValidUntilTimestamp
-            msg->getU32(); // basePrice
+        uint16_t disableReasons = msg->getU16();
+        for (uint16_t i = 0; i < disableReasons; ++i) {
+            storeData.disableReasons.push_back(msg->getString());
         }
 
-        const uint8_t disabledState = msg->getU8();
-        if (g_game.getFeature(Otc::GameIngameStoreHighlights) && disabledState == 1) {
-            msg->getString(); // disabledReason
-        }
+        uint16_t offersCount = msg->getU16();
+        if (storeData.categoryName == "Home") {
+            storeData.homeOffers.reserve(offersCount);
+            for (uint16_t i = 0; i < offersCount; ++i) {
+                HomeOffer offer;
+                offer.name = msg->getString();
+                offer.unknownByte = msg->getU8();
+                offer.id = msg->getU32();
+                offer.unknownU16 = msg->getU16();
+                offer.price = msg->getU32();
+                offer.coinType = msg->getU8();
 
-        std::vector<std::string> icons;
-        const uint8_t iconCount = msg->getU8();
-        for (auto j = -1; ++j < iconCount;) {
-            icons.emplace_back(msg->getString());
-        }
+                uint8_t hasDisabledReason = msg->getU8();
+                if (hasDisabledReason == 1) {
+                    msg->skipBytes(1);
+                    offer.disabledReasonIndex = msg->getU16();
+                }
 
-        const uint16_t subOffers = msg->getU16();
-        for (auto j = -1; ++j < subOffers;) {
-            msg->getString(); // name
-            msg->getString(); // description
+                offer.unknownByte2 = msg->getU8();
+                offer.type = msg->getU8();
 
-            const uint8_t subIcons = msg->getU8();
-            for (auto k = -1; ++k < subIcons;) {
-                msg->getString(); // icon
+                if (offer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
+                    offer.icon = msg->getString();
+                } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
+                    offer.mountClientId = msg->getU16();
+                } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
+                    offer.itemType = msg->getU16();
+                } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
+                    offer.sexId = msg->getU16();
+                    offer.outfit.lookHead = msg->getU8();
+                    offer.outfit.lookBody = msg->getU8();
+                    offer.outfit.lookLegs = msg->getU8();
+                    offer.outfit.lookFeet = msg->getU8();
+                }
+
+                offer.tryOnType = msg->getU8();
+                offer.collection = msg->getU16();
+                offer.popularityScore = msg->getU16();
+                offer.stateNewUntil = msg->getU32();
+                offer.userConfiguration = msg->getU8();
+                offer.productsCapacity = msg->getU16();
+
+                storeData.homeOffers.push_back(offer);
             }
-            msg->getString(); // serviceType
+
+            uint8_t bannerCount = msg->getU8();
+            storeData.banners.reserve(bannerCount);
+            for (uint8_t i = 0; i < bannerCount; ++i) {
+                Banner banner;
+                banner.image = msg->getString();
+                banner.bannerType = msg->getU8();
+                banner.offerId = msg->getU32();
+                banner.unknownByte1 = msg->getU8();
+                banner.unknownByte2 = msg->getU8();
+                storeData.banners.push_back(banner);
+            }
+
+            storeData.bannerDelay = msg->getU8();
+
+            g_lua.callGlobalField("g_game", "onParseStoreCreateHome", storeData);
+            return;
+        }
+
+        storeData.storeOffers.reserve(offersCount);
+        for (uint16_t i = 0; i < offersCount; ++i) {
+            StoreOffer offer;
+            offer.name = msg->getString();
+            uint8_t subOffersCount = msg->getU8();
+            offer.subOffers.reserve(subOffersCount);
+
+            for (uint8_t j = 0; j < subOffersCount; ++j) {
+                SubOffer subOffer;
+                subOffer.id = msg->getU32();
+                subOffer.count = msg->getU16();
+                subOffer.price = msg->getU32();
+                subOffer.coinType = msg->getU8();
+                subOffer.disabled = msg->getU8() == 1;
+                if (subOffer.disabled) {
+                    msg->getU8(); // Skip unknown byte
+                    subOffer.disabledReason = msg->getU16();
+                }
+                subOffer.state = msg->getU8();
+                if (subOffer.state == Otc::GameStoreInfoStatesType_t::STATE_SALE) {
+                    subOffer.validUntil = msg->getU32();
+                    subOffer.basePrice = msg->getU32();
+                }
+                offer.subOffers.push_back(subOffer);
+            }
+
+            offer.type = msg->getU8();
+            if (offer.type == Otc::GameStoreInfoType_t::SHOW_NONE) {
+                offer.icon = msg->getString();
+            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_MOUNT) {
+                offer.mountId = msg->getU16();
+            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_ITEM) {
+                offer.itemId = msg->getU16();
+            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_OUTFIT) {
+                offer.outfitId = msg->getU16();
+                offer.outfitHead = msg->getU8();
+                offer.outfitBody = msg->getU8();
+                offer.outfitLegs = msg->getU8();
+                offer.outfitFeet = msg->getU8();
+            } else if (offer.type == Otc::GameStoreInfoType_t::SHOW_HIRELING) {
+                offer.sex = msg->getU8();
+                offer.maleOutfitId = msg->getU16();
+                offer.femaleOutfitId = msg->getU16();
+                offer.outfitHead = msg->getU8();
+                offer.outfitBody = msg->getU8();
+                offer.outfitLegs = msg->getU8();
+                offer.outfitFeet = msg->getU8();
+            }
+
+            offer.tryOnType = msg->getU8();
+            offer.collection = msg->getU16();
+            offer.popularityScore = msg->getU16();
+            offer.stateNewUntil = msg->getU32();
+            offer.configurable = msg->getU8() == 1;
+            offer.productsCapacity = msg->getU16();
+
+            storeData.storeOffers.push_back(offer);
+        }
+
+        if (storeData.categoryName == "Search") {
+            storeData.tooManyResults = msg->getU8() == 1;
+        }
+        g_lua.callGlobalField("g_game", "onParseStoreCreateProducts", storeData);
+    } else {
+        msg->getString(); // categoryName
+
+        const uint16_t offers = msg->getU16();
+        for (auto i = -1; ++i < offers;) {
+            msg->getU32(); // offerId
+            msg->getString(); // offerName
+            msg->getString(); // offerDescription
+
+            msg->getU32(); // price
+            const uint8_t highlightState = msg->getU8();
+            if (highlightState == 2 && g_game.getFeature(Otc::GameIngameStoreHighlights) && g_game.getClientVersion() >= 1097) {
+                msg->getU32(); // saleValidUntilTimestamp
+                msg->getU32(); // basePrice
+            }
+
+            const uint8_t disabledState = msg->getU8();
+            if (g_game.getFeature(Otc::GameIngameStoreHighlights) && disabledState == 1) {
+                msg->getString(); // disabledReason
+            }
+
+            std::vector<std::string> icons;
+            const uint8_t iconCount = msg->getU8();
+            for (auto j = -1; ++j < iconCount;) {
+                icons.emplace_back(msg->getString());
+            }
+
+            const uint16_t subOffers = msg->getU16();
+            for (auto j = -1; ++j < subOffers;) {
+                msg->getString(); // name
+                msg->getString(); // description
+
+                const uint8_t subIcons = msg->getU8();
+                for (auto k = -1; ++k < subIcons;) {
+                    msg->getString(); // icon
+                }
+                msg->getString(); // serviceType
+            }
         }
     }
 }
@@ -3263,8 +3484,9 @@ Position ProtocolGame::getPosition(const InputMessagePtr& msg)
 // 12x
 void ProtocolGame::parseShowDescription(const InputMessagePtr& msg)
 {
-    msg->getU32(); // offerId
-    msg->getString();  // offer description
+    const auto& offerId = msg->getU32();
+    const auto& offerdescription = msg->getString();
+    g_lua.callGlobalField("g_game", "onParseStoreOfferDescriptions", offerId, offerdescription);
 }
 
 void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
@@ -3363,15 +3585,22 @@ void ProtocolGame::parseExperienceTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
 {
-    msg->getU8(); // quickLootFallbackToMainContainer ? 1 : 0
+    bool quickLootFallbackToMainContainer = msg->getU8() == 1;
     const uint8_t containers = msg->getU8();
+    std::vector<std::tuple<uint8_t, uint16_t, uint16_t>> lootData;
     for (auto i = 0; i < containers; ++i) {
-        msg->getU8(); // category type
-        msg->getU16(); // loot container id
+        uint8_t categoryType = msg->getU8();
+        uint16_t lootContainerId = msg->getU16();
+
+        uint16_t obtainerContainerId = 0;
         if (g_game.getClientVersion() >= 1332) {
-            msg->getU16(); // obtainer container id
+            obtainerContainerId = msg->getU16();
         }
+
+        lootData.emplace_back(categoryType, lootContainerId, obtainerContainerId);
     }
+
+    g_lua.callGlobalField("g_game", "onQuickLootContainers", quickLootFallbackToMainContainer, lootData);
 }
 
 void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)

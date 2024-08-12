@@ -79,7 +79,7 @@ UI.Container = function(callback, unique, parent, widget)
     for i, child in ipairs(widget.items:getChildren()) do
       if child:getItemId() >= 100 then
         if not duplicates[child:getItemId()] or not unique then
-          table.insert(items, { id = child:getItemId(), count = child:getItemCount() })
+          table.insert(items, { id = child:getItemId(), count = child:getItemCountOrSubType() })
           duplicates[child:getItemId()] = true
         end
       end
