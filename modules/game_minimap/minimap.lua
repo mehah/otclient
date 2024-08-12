@@ -43,6 +43,14 @@ mapController = Controller:new()
 mapController:setUI('minimap', modules.game_interface.getMainRightPanel())
 
 function onChangeWorldTime(hour, minute)
+--[[ 
+
+check 
+tfs c++ (old) : void ProtocolGame::sendWorldTime()
+tfs lua (new) : function Player.sendWorldTime(self, time)
+Canary: void ProtocolGame::sendTibiaTime(int32_t time)
+ ]]
+
     currentDayTime = {
         h = hour % 24,
         m = minute

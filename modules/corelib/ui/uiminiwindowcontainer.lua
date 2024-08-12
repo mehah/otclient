@@ -138,6 +138,13 @@ function UIMiniWindowContainer:onDrop(widget, mousePos)
             self:addChild(widget)
         end
 
+        if not g_game.isEnabledBotProtection() then
+            if widget:getId() == "botWindow" and
+                (widget:getParent():getId() == "gameLeftPanel" or widget:getParent():getId() == "gameLeftExtraPanel" or
+                    widget:getParent():getId() == "gameRightExtraPanel") then
+                widget:getParent():setWidth(190)
+            end
+        end
         self:fitAll(widget)
         return true
     end

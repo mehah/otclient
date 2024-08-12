@@ -157,6 +157,17 @@ optionsController = Controller:new()
 optionsController:setUI('mainoptionspanel', modules.game_interface.getMainRightPanel())
 
 function optionsController:onInit()
+    createButton_large('Store shop', tr('Store shop'), '/images/options/store_large', toggleStore,
+    false, 8)
+
+end
+
+function toggleStore()
+    if g_game.getFeature(GamePurseSlot) then
+        modules.game_store.toggle()
+    else
+        modules.game_shop.toggle() --game_shopv8
+    end
 end
 
 function optionsController:onTerminate()

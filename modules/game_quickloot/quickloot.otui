@@ -1,0 +1,344 @@
+
+SelectBagButton < UIWidget
+  image-source: /game_quickloot/images/choose
+  image-clip: 0 0 20 20
+  size: 20 20
+  $pressed:
+    image-source: /game_quickloot/images/choose
+    image-clip: 0 0 20 20
+RemoveBagButton < UIWidget
+  image-clip: 0 0 20 20
+  size: 20 20
+  image-source: /game_quickloot/images/remove
+  $pressed:
+    image-clip: 0 20 20 20
+QuicLootIgnoreItem < UIWidget
+  background-color: #484848
+  Label
+    id: label
+    !text: tr('bag')
+    color: #C0C0C0
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    text-auto-resize: true
+    margin-left: 2
+  RemoveBagButton
+    id: removeBag
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 15
+    @onClick: modules.game_quickloot.QuickLoot.clearFilterItem(self)
+  Item
+    id: item
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: removeBag.left
+    margin-right: 5
+    opacity: 1.0
+    $pressed:
+      opacity: 0.5
+QuicklootBagLabel < UIWidget
+  background-color: #484848
+
+  Label
+    id: label
+    !text: tr('Unassigned Loot')
+    color: #C0C0C0
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    text-auto-resize: true
+    margin-left: 2
+  SelectBagButton
+    id: selectBag
+    &click: 6
+    &Select:0
+    &borrar:1
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+
+    @onClick: modules.game_quickloot.QuickLoot.chooseItem(self)
+  RemoveBagButton
+    id: removeBag
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: selectBag.left
+    margin-right: 5
+    &click: 6
+    &Select:0
+    &borrar:1
+    @onClick: modules.game_quickloot.QuickLoot.clearItem(self)
+  Item
+    id: item
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: removeBag.left
+    margin-right: 5
+    opacity: 1.0
+    &click: 6
+    &Select:0
+    &borrar:1
+    @onClick: modules.game_quickloot.QuickLoot.openContainer(self)
+    $pressed:
+      opacity: 0.5
+
+  SelectBagButton
+    id: selectBag2
+    &click: 2
+    &Select:4
+    &borrar:5
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: item.left
+    margin-right: 5
+    @onClick: modules.game_quickloot.QuickLoot.chooseItem(self)
+  RemoveBagButton
+    id: removeBag2
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: selectBag2.left
+    margin-right: 5
+    &click: 2
+    &Select:4
+    &borrar:5
+    @onClick: modules.game_quickloot.QuickLoot.clearItem(self)
+  Item
+    id: item2
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: removeBag2.left
+    margin-right: 5
+    &click: 2
+    &Select:4
+    &borrar:5
+    opacity: 1.0
+    @onClick: modules.game_quickloot.QuickLoot.openContainer(self)
+    $pressed:
+      opacity: 0.5
+Window
+  id: main
+  !text: tr('Manage Containers')
+  color: #C0C0C0
+  size: 700 425
+  anchors.centerIn: parent
+  SmallReversedQtPanel
+    id: fallbackPanel
+    size: 255 20
+    image-border: 15
+    anchors.top: parent.top
+    anchors.left: parent.left
+    
+    OptionCheckBoxMarked
+      id: checkbox
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      margin-left: 5
+      @onCheckChange: QuickLoot.fallback(self, self:isChecked())
+      !text: tr('Use main container as fallback')
+      !tooltip: tr('Tick this check box to loot into your main container if you cannot \nloot into the container for the particular loot category and \nunassigned loot. Note that "Auto-Sort \nPurchases" and "Auto-Sort Stash into Containers" are not afflected by this option.')
+
+  Label
+
+    !text: tr('Loot')
+    color: #C0C0C0
+    anchors.top: fallbackPanel.bottom
+    anchors.left: parent.left
+    margin-left: 85
+
+  Label
+
+    !text: tr('Obtain')
+    color: #C0C0C0
+    margin-right: 15
+    anchors.top: fallbackPanel.bottom
+    anchors.right: fallbackPanel.right
+  ScrollablePanel
+    id: list
+    focusable: false
+    border-width: 1
+    border-color: #00000077
+    background-color: #ffffff11
+    anchors.top: fallbackPanel.bottom
+    anchors.bottom: parent.bottom
+    anchors.left: fallbackPanel.left
+    anchors.right: fallbackPanel.right
+    padding-left: 1
+    padding-top: 1
+    margin-top: 25
+    margin-bottom: 32
+    padding-bottom: 3
+    vertical-scrollbar: scrollbar
+    layout:
+      type: grid
+      cell-size: 240 36
+      cell-spacing: 0
+      flow: true
+  VerticalScrollBar
+    id: scrollbar
+    anchors.top: list.top
+    anchors.bottom: list.bottom
+    anchors.right: list.right
+    step: 48
+    pixels-scroll: true
+  Panel
+    id: filters
+    size: 140 115
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 5
+    anchors.top: fallbackPanel.top
+    anchors.left: list.right
+    margin-left: 5
+    padding: 7
+    image-size: 140 111
+    Label
+      id: label
+      !text: tr('Quick Loot Filter:')
+      color: #C0C0C0
+      anchors.top: parent.top
+      anchors.left: parent.left
+    CheckBox
+      id: skipped
+      image-source: /images/ui/outfits/checkbox_round
+      text-auto-resize: true
+      margin-top: 5
+      anchors.top: label.bottom
+      anchors.left: parent.left
+      text: Skipped Loot
+      color: #C0C0C0
+      width: 84
+      checked: true
+      @onClick: QuickLoot.filter(self, self:isChecked())
+    CheckBox
+      id: accepted
+      image-source: /images/ui/outfits/checkbox_round
+      text-auto-resize: true
+      margin-top: 5
+      anchors.top: skipped.bottom
+      anchors.left: parent.left
+      text: Accepted Loot
+      color: #C0C0C0
+      width: 84
+      @onClick: QuickLoot.filter(self, self:isChecked())
+    QtButton
+      id: clear
+      size: 128 20
+      !text: tr('Clear Skipped Loot List')
+      color: #C0C0C0
+      font: small-9px
+      anchors.top: accepted.bottom
+      anchors.left: parent.left
+      margin-top: 5
+      @onClick: QuickLoot.clearFilterItems()
+    QtButton
+      id: add
+      size: 128 20
+      !text: tr('Add to Skipped Loot List')
+      color: #C0C0C0
+      font: small-9px
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      @onClick: |
+        QuickLoot.hide()
+        modules.game_cyclopedia.toggle()
+        
+  Panel
+    id: information
+    size: 140 115
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 5
+    text-wrap: true
+    color: #C0C0C0
+    text-align: left
+    text-offset: 5 -50
+    !text: tr('Select containers for your loot!\n\nRefine your Quick Looting by setting objects on your skipped loot or accepted loot list!')
+    anchors.top: filters.bottom
+    anchors.bottom: list.bottom
+    anchors.left: filters.left
+    anchors.right: filters.right
+    padding: 7
+
+    Panel
+      id: vipPanel
+      height: 34
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      UIButton
+        id: premium
+        size: 128 37
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        image-source: /game_quickloot/images/getpremium
+        image-clip: 0 0 128 37
+        image-border: 3
+        @onClick: |
+          if g_game.getClientVersion() >= 1332 then
+            modules.game_store.toggle()
+          else
+            modules.game_shop.toggle()
+          end
+
+        $pressed:
+          image-clip: 0 37 128 37
+        $!on:
+          image-clip: 0 74 128 37
+        $disabled:
+          color: #dfdfdf88
+          opacity: 0.8
+      Label
+        id: label
+        !text: tr('Premium')
+        text-auto-resize: true
+        anchors.verticalCenter: premium.verticalCenter
+        anchors.left: premium.right
+        margin-left: 10
+  TextEdit
+    id: search
+    height: 22
+    anchors.left: information.right
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-left: 5
+    @onTextChange: QuickLoot.search(self:getText())
+  RemoveBagButton
+    id: clearSearch
+    anchors.bottom: search.bottom
+    anchors.right: search.right
+    margin-bottom: 1
+    margin-right: 1
+    @onClick: QuickLoot.clearSearch()
+
+  ScrollablePanel
+    id: ignoreList
+    focusable: false
+    anchors.top: search.bottom
+    anchors.bottom: list.bottom
+    anchors.left: search.left
+    anchors.right: clearSearch.right
+    padding-left: 1
+    padding-top: 1
+    margin-top: 5
+    padding-bottom: 3
+    vertical-scrollbar: ignoreScrollbar
+    border-width: 1
+    border-color: #00000077
+    background-color: #414141
+    layout:
+      type: grid
+      cell-size: 244 38
+      cell-spacing: 0
+      flow: true
+    QuicLootIgnoreItem
+  VerticalScrollBar
+    id: ignoreScrollbar
+    anchors.top: ignoreList.top
+    anchors.bottom: ignoreList.bottom
+    anchors.right: ignoreList.right
+    step: 48
+    pixels-scroll: true
+  QtButton
+    size: 43 20
+    !text: tr('Close')
+    color: #C0C0C0
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    @onClick: QuickLoot.toggle()
+  HorizontalSeparator
+    id: separator
+    anchors.bottom: prev.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 6
