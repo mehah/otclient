@@ -910,6 +910,26 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end
     end
 
+    if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+
+        local quickLoot = modules.game_quickloot.QuickLoot
+        menu.addSeparator(menu)
+
+        if lookThing:isContainer() then
+            menu.addOption(menu, tr("Manage Loot Containers"), function()
+                quickLoot.toggle()
+            end)
+        end
+
+        local lootExists = quickLoot.lootExists(lookThing:getId())
+        local optionText = lootExists and "Remove from" or "Add to"
+        local actionFunction = lootExists and quickLoot.removeLootList or quickLoot.addLootList
+
+        menu.addOption(menu, tr(optionText .. " loot list"), function()
+            actionFunction(lookThing:getId())
+        end)
+    end
+
     menu:display(menuPosition)
 end
 

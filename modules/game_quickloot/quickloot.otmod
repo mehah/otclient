@@ -1,0 +1,10 @@
+Module
+  name: game_quickloot
+  description: Quickloot System
+  author: Undefined
+  website: undefined_.
+  sandboxed: true
+  scripts:
+    - quickloot
+  @onLoad: quickLootController:init()
+  @onUnload: quickLootController:terminate()
