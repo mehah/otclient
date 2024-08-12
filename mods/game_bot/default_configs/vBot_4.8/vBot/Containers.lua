@@ -387,7 +387,8 @@ if rootWidget then
         config.height = new.height
     end
 
-    contListWindow:setHeight(config.height or 170)
+    contListWindow:setHeight(250)
+    contListWindow:setWidth(550)
 
     renameContui.editContList.onClick = function(widget)
         contListWindow:show()
@@ -597,7 +598,7 @@ local function properTable(t)
     return r
 end
 
-local mainLoop = macro(150, function(macro)
+local mainLoop = macro(2500, function(macro)
     if not config.sort and not config.purse then return end
 
     local storageVal = config.list
