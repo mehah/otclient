@@ -1,0 +1,9 @@
+Module
+  name: game_store
+  description: game_store
+  author: game_store
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  scripts: [ game_store ]
+  @onLoad: controllerShop:init()
+  @onUnload: controllerShop:terminate()
