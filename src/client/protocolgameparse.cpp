@@ -708,7 +708,7 @@ void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() != 1332) {
+    if (g_game.getClientVersion() <= 1332) {
         parseCoinBalance(msg);
     }
 
@@ -719,7 +719,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
         StoreCategory category;
         category.name = msg->getString();
 
-        if (g_game.getClientVersion() != 1332) {
+        if (g_game.getClientVersion() <= 1332) {
             msg->getString();
         }
 
@@ -814,7 +814,7 @@ void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() == 1332) {
+    if (g_game.getClientVersion() >= 1332) {
 
         msg->getU8();
         const auto& purchaseStatus = msg->getString();
@@ -848,7 +848,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
     std::vector<std::tuple<uint32_t, uint32_t, std::string>> historyData;
 
     for (auto i = -1; ++i < entries;) {
-        if (g_game.getClientVersion() == 1332) {
+        if (g_game.getClientVersion() >= 1332) {
             msg->getU32();
             uint32_t time = msg->getU32();
             msg->getU8();
@@ -874,7 +874,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
 
 void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 {
-    if (g_game.getClientVersion() == 1332) {
+    if (g_game.getClientVersion() >= 1332) {
         StoreData storeData;
         storeData.categoryName = msg->getString();
         storeData.redirectId = msg->getU32();
@@ -1377,6 +1377,10 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
             msg->getU8();
         }
     }
+    if (g_game.getClientVersion() >= 1340) {
+        msg->getU8();
+        msg->getU8();
+    }
 
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
 }
@@ -1495,7 +1499,13 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
         }
     }
 
-    const uint8_t size = msg->getU8();
+    uint16_t size = 0;
+    if (g_game.getClientVersion() >= 1334) {
+        size = msg->getU16();
+    } else {
+        size = msg->getU8();
+    }
+
     for (auto i = -1; ++i < size;) {
         const uint16_t itemId = msg->getU16();
 
@@ -3703,36 +3713,37 @@ void ProtocolGame::parseGameNews(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
 {
-    // parse bless amount
-    const uint8_t totalBless = msg->getU8(); // total bless
+    BlessDialogData data;
 
-    // parse each bless
-    for (auto i = 0; i < totalBless; ++i) {
-        msg->getU16(); // bless bit wise
-        msg->getU8(); // player bless count
-        msg->getU8(); // store?
+    data.totalBless = msg->getU8();
+    for (auto i = 0; i < data.totalBless; ++i) {
+        BlessData bless;
+        bless.blessBitwise = msg->getU16();
+        bless.playerBlessCount = msg->getU8();
+        bless.store = msg->getU8();
+        data.blesses.emplace_back(bless);
     }
 
-    // parse general info
-    msg->getU8(); // premium
-    msg->getU8(); // promotion
-    msg->getU8(); // pvp min xp loss
-    msg->getU8(); // pvp max xp loss
-    msg->getU8(); // pve exp loss
-    msg->getU8(); // equip pvp loss
-    msg->getU8(); // equip pve loss
-    msg->getU8(); // skull
-    msg->getU8(); // aol
+    data.premium = msg->getU8();
+    data.promotion = msg->getU8();
+    data.pvpMinXpLoss = msg->getU8();
+    data.pvpMaxXpLoss = msg->getU8();
+    data.pveExpLoss = msg->getU8();
+    data.equipPvpLoss = msg->getU8();
+    data.equipPveLoss = msg->getU8();
+    data.skull = msg->getU8();
+    data.aol = msg->getU8();
 
-    // parse log
-    const uint8_t logCount = msg->getU8(); // log count
+    const uint8_t logCount = msg->getU8();
     for (auto i = 0; i < logCount; ++i) {
-        msg->getU32(); // timestamp
-        msg->getU8(); // color message (0 = white loss, 1 = red)
-        msg->getString(); // history message
+        LogData log;
+        log.timestamp = msg->getU32();
+        log.colorMessage = msg->getU8();
+        log.historyMessage = msg->getString();
+        data.logs.emplace_back(log);
     }
 
-    // TODO: implement bless dialog usage
+    g_lua.callGlobalField("g_game", "onUpdateBlessDialog", data);
 }
 
 void ProtocolGame::parseRestingAreaState(const InputMessagePtr& msg)
