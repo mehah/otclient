@@ -1726,6 +1726,14 @@ void Game::imbuementDurations(bool isOpen)
     m_protocolGame->sendImbuementDurations(isOpen);
 }
 
+void Game::requestBless()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestBless();
+}
+
 void Game::requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems)
 {
     m_denyBotCall = false;
