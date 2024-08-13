@@ -3704,8 +3704,8 @@ void ProtocolGame::parseGameNews(const InputMessagePtr& msg)
 void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
 {
     BlessDialogData data;
-    data.totalBless = msg->getU8();
 
+    data.totalBless = msg->getU8();
     for (auto i = 0; i < data.totalBless; ++i) {
         BlessData bless;
         bless.blessBitwise = msg->getU16();
