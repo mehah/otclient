@@ -53,6 +53,36 @@ struct UnjustifiedPoints
     uint8_t skullTime;
 };
 
+struct BlessData
+{
+    uint16_t blessBitwise;
+    uint8_t playerBlessCount;
+    uint8_t store;
+};
+
+struct LogData
+{
+    uint32_t timestamp;
+    uint8_t colorMessage;
+    std::string_view historyMessage;
+};
+
+struct BlessDialogData
+{
+    uint8_t totalBless;
+    std::vector<BlessData> blesses;
+    uint8_t premium;
+    uint8_t promotion;
+    uint8_t pvpMinXpLoss;
+    uint8_t pvpMaxXpLoss;
+    uint8_t pveExpLoss;
+    uint8_t equipPvpLoss;
+    uint8_t equipPveLoss;
+    uint8_t skull;
+    uint8_t aol;
+    std::vector<LogData> logs;
+};
+
 using Vip = std::tuple<std::string, uint32_t, std::string, int, bool>;
 
 struct StoreCategory
@@ -483,6 +513,7 @@ public:
                             const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, uint32_t entriesTs);
 
     void imbuementDurations(bool isOpen = false);
+    void requestBless();
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
 

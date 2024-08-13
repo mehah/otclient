@@ -1,0 +1,95 @@
+<style>
+  .blessing-window {
+    width: 615;
+    height: 460;
+    padding-top: 36;
+    padding-left: 16;
+    padding-right: 16;
+    padding-bottom: 16;
+    font: verdana-11px-antialised;
+    opacity: 1;
+    display: block;
+  }
+
+  .promotion-status {
+    width: 583;
+    height: 85;
+    margin-top: 10;
+    display: block;
+  }
+
+  .death-penalty {
+    width: 583;
+    height: 113;
+    margin-top: 10;
+    display: block;
+  }
+
+  .premium-image {
+    margin-top: -10;
+    float: right;
+  }
+
+  .test {
+    display: block;
+    margin-top: 22;
+    width: 580;
+  }
+
+  .contenedor {
+    width: 580;
+    display: block;
+    font: verdana-11px-antialised;
+  }
+
+  .record-blessing {
+    width: 590;
+    height: 120;
+    display: block;
+  }
+  
+  .mini-panel {
+    width: 580;
+    height: 350;
+    background-color: #404040;
+
+    margin-bottom: 10;
+    display: block;
+  }
+</style>
+
+<window id="main" anchor="parent" class="blessing-window" text="Blessings">
+
+  <minipanel class="mini-panel" text="History" id="blessingHistory" >
+    <UIScrollArea id ="here" layout="type: verticalBox" style="border-width: 1;border-color: #00000077;background-color:#ffffff11;height: 320;width: 570;margin-top:-12;background-color: #404040;vertical-scrollbar: ListBadgeScrollbar" >
+<!--      
+    <UIScrollArea id ="here" layout="type: verticalBox" style="height: 222;width: 570;margin-top:-12; vertical-scrollbar: ListBadgeScrollbar" >
+      <VerticalScrollBar  id ="scroll" >
+      </VerticalScrollBar> -->
+
+    </UIScrollArea>
+  </minipanel>
+
+  <minipanel id="minipanel1" anchor="parent" class="record-blessing" text="Record of Blessings"  layout="type: horizontalBox; fit-children: true;cell-size: 88 20;cell-spacing: 1">
+  </minipanel>
+
+  <minipanel class="promotion-status" text="Promotion and Premium Status" id="promotionStatus2">
+    <label id="rank" style="margin-top:12">If your account had Premium status, your XP loss would be 0% lower.</label>
+    <BlessingButton class="premium-image" id="premium_only"></BlessingButton>
+  </minipanel>
+
+  <minipanel class="death-penalty" text="Effect on Death Penalty" id="promotionStatus">
+    <label class="contenedor" id="fightRules">- Depending on the fair fight rules, you will lose between 2% and 1% less
+      XP and skill </br> \n points upon your next PvP death.</label>
+    <label class="contenedor" id="expLoss">- You will lose 3% less XP and skill points upon your next PvE death.</label>
+    <label class="contenedor" id="containerLoss">- There is a 2% chance that you will lose your equipped container on
+      your next\n death.</label>
+    <label class="contenedor" id="equipmentLoss">- There is a 1% chance that you will lose items upon your next
+      death.</label>
+  </minipanel>
+
+  <HorizontalSeparator class="test"></HorizontalSeparator>
+
+  <button style="margin-top:18;margin-left:370" onclick="self:showHistory()" id="historyButton">history</button> <!-- temporal fix -->
+  <button style="margin-top:18" onclick="self:close()">close</button>
+</window>
