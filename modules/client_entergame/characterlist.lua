@@ -14,6 +14,12 @@ local outfitCreatureBox
 local autoReconnectButton
 local autoReconnectEvent
 local lastLogout = 0
+local function removeAutoReconnectEvent() --prevent
+    if autoReconnectEvent then
+        removeEvent(autoReconnectEvent)
+        autoReconnectEvent = nil
+    end
+end
 
 -- private functions
 local function tryLogin(charInfo, tries)
@@ -54,10 +60,7 @@ local function tryLogin(charInfo, tries)
     -- save last used character
     g_settings.set('last-used-character', charInfo.characterName)
     g_settings.set('last-used-world', charInfo.worldName)
-    if autoReconnectEvent then
-        removeEvent(autoReconnectEvent)
-        autoReconnectEvent = nil
-    end
+    removeAutoReconnectEvent()
 end
 
 local function updateWait(timeStart, timeEnd)
@@ -143,11 +146,10 @@ function onGameLoginError(message)
         errorBox = nil
         CharacterList.showAgain()
     end
-    scheduleAutoReconnect()
+
 end
 
 function onGameSessionEnd(reason)
-    scheduleAutoReconnect()
     CharacterList.destroyLoadBox()
     CharacterList.showAgain()
 end
@@ -161,7 +163,6 @@ function onGameConnectionError(message, code)
         errorBox = nil
         CharacterList.showAgain()
     end
-    scheduleAutoReconnect()
 end
 
 function onGameUpdateNeeded(signature)
@@ -369,8 +370,7 @@ function CharacterList.create(characters, account, otui)
         end)
     end
     characterList.onChildFocusChange = function()
-        removeEvent(autoReconnectEvent)
-        autoReconnectEvent = nil
+        removeAutoReconnectEvent()
       end
 
     -- account
@@ -407,6 +407,12 @@ function CharacterList.create(characters, account, otui)
         local autoReconnect = not g_settings.getBoolean('autoReconnect', true)
         autoReconnectButton:setOn(autoReconnect)
         g_settings.set('autoReconnect', autoReconnect)
+        local statusText = autoReconnect and 'Auto reconnect: On' or 'Auto reconnect: off'
+        if not g_game.getFeature(GameEnterGameShowAppearance) then
+            statusText = autoReconnect and 'Auto reconnect:\n On' or 'Auto reconnect:\n off'
+        end
+        
+        autoReconnectButton:setText(statusText)
     end
 end
 
@@ -430,12 +436,16 @@ function CharacterList.show()
 
     local autoReconnect = g_settings.getBoolean('autoReconnect', true)
     autoReconnectButton:setOn(autoReconnect)
+    local reconnectStatus = autoReconnect and "On" or "Off"
+    if not g_game.getFeature(GameEnterGameShowAppearance) then
+        autoReconnectButton:setText('Auto reconnect:\n ' .. reconnectStatus)
+    else
+        autoReconnectButton:setText('Auto reconnect: ' .. reconnectStatus)
+    end
 end
 
 function CharacterList.hide(showLogin)
-    removeEvent(autoReconnectEvent)
-    autoReconnectEvent = nil
-
+    removeAutoReconnectEvent()
     showLogin = showLogin or false
     charactersWindow:hide()
 
@@ -445,9 +455,9 @@ function CharacterList.hide(showLogin)
 end
 
 function CharacterList.showAgain()
-    scheduleAutoReconnect()
     if characterList and characterList:hasChildren() then
         CharacterList.show()
+        scheduleAutoReconnect()
     end
 end
 
@@ -459,10 +469,7 @@ function CharacterList.isVisible()
 end
 
 function CharacterList.doLogin()
-    if autoReconnectEvent then
-        removeEvent(autoReconnectEvent)
-        autoReconnectEvent = nil
-    end
+    removeAutoReconnectEvent()
     local selected = characterList:getFocusedChild()
     if selected then
         local charInfo = {
@@ -537,18 +544,11 @@ function onLogout()
 end
 
 function scheduleAutoReconnect()
-
-    if not g_settings.getBoolean('autoReconnect') then
-        return
-    end
-    if lastLogout + 2000 > g_clock.millis() then
+    if not g_settings.getBoolean('autoReconnect') or lastLogout + 2000 > g_clock.millis() then
         return
     end
 
-    if autoReconnectEvent then
-        removeEvent(autoReconnectEvent)
-        autoReconnectEvent = nil
-    end
+    removeAutoReconnectEvent()
     autoReconnectEvent = scheduleEvent(executeAutoReconnect, 2500)
 end
 
@@ -563,4 +563,3 @@ function executeAutoReconnect()
     end
     CharacterList.doLogin()
 end
-
