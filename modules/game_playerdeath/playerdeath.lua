@@ -98,7 +98,6 @@ function openWindow(deathType, penalty)
 end
 
 function scheduleReconnect()
-    print("playerDeath")
     if not g_settings.getBoolean('autoReconnect') then
         return
     end
