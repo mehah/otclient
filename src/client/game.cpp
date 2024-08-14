@@ -528,6 +528,7 @@ void Game::cancelLogin()
     // send logout even if the game has not started yet, to make sure that the player doesn't stay logged there
     if (m_protocolGame)
         m_protocolGame->sendLogout();
+
     processDisconnect();
     m_denyBotCall = true;
 }
