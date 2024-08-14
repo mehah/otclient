@@ -146,7 +146,6 @@ function onGameLoginError(message)
         errorBox = nil
         CharacterList.showAgain()
     end
-
 end
 
 function onGameSessionEnd(reason)
@@ -232,7 +231,6 @@ function CharacterList.terminate()
         onLogout = onLogout 
     })
 
-
     if charactersWindow then
         characterList = nil
         charactersWindow:destroy()
@@ -265,6 +263,8 @@ function CharacterList.terminate()
         loginEvent = nil
     end
 
+    removeAutoReconnectEvent()
+    
     CharacterList = nil
 end
 
@@ -371,7 +371,7 @@ function CharacterList.create(characters, account, otui)
     end
     characterList.onChildFocusChange = function()
         removeAutoReconnectEvent()
-      end
+    end
 
     -- account
     local status = ''
