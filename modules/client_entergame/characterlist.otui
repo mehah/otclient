@@ -343,16 +343,21 @@ MainWindow
     anchors.bottom: next.top
     margin-bottom: 10
 
-  //CheckBox
-  //  id: charAutoLoginBox
-  //  !text: tr('Auto login')
-  //  !tooltip: tr('Auto login selected character on next charlist load')
-  //  anchors.left: parent.left
-  //  anchors.right: parent.right
-  //  anchors.bottom: next.top
-  //  margin-bottom: 6
-  //  margin-left: 18
-  //  margin-right: 18
+  Button
+    id: autoReconnect
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    @onSetup: |
+      if g_game.getFeature(GameEnterGameShowAppearance) then
+        self:setWidth(140)
+      else
+        self:setWidth(75)
+        self:setFont('small-9px')
+      end
+    $!on:
+      image-color: red    
+    $on:
+      image-color: green
 
   Button
     id: buttonOk
