@@ -25,35 +25,39 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
 
-constexpr uint32_t LUA_TIME = 10 * 60 * 1000; // 10min
+constexpr uint32_t LUA_TIME = 15 * 60 * 1000; // 15min
 constexpr uint32_t TEXTURE_TIME = 30 * 60 * 1000; // 30min
+constexpr uint32_t DRAWPOOL_TIME = 30 * 60 * 1000; // 30min
 constexpr uint32_t THINGTYPE_TIME = 2 * 1000; // 2seg
 
-Timer lua_timer, texture_timer, thingtype_timer;
+Timer lua_timer, texture_timer, drawpool_timer, thingtype_timer;
 
 void GarbageCollection::poll() {
     if (canCheck(lua_timer, LUA_TIME))
-        lua();
+        g_lua.collectGarbage();
 
     if (canCheck(thingtype_timer, THINGTYPE_TIME))
         g_asyncDispatcher.detach_task([] { thingType(); });
 
     if (canCheck(texture_timer, TEXTURE_TIME))
         g_asyncDispatcher.detach_task([] { texture(); });
+
+    if (canCheck(drawpool_timer, DRAWPOOL_TIME))
+        g_mainDispatcher.addEvent([] { drawpoll(); });
 }
 
-void GarbageCollection::lua() {
-    static constexpr uint32_t CHECK_TIME = 10 * 60 * 1000; // waiting time for next check, default 10 min.
-    static Timer timer;
-    g_lua.collectGarbage();
+void GarbageCollection::drawpoll() {
+    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
+        g_drawPool.get(static_cast<DrawPoolType>(i))->resetBuffer();
+    }
 }
 
 void GarbageCollection::texture() {
-    static constexpr uint32_t
-        IDLE_TIME = 20 * 60 * 1000; // Maximum time it can be idle, default 60 seconds.
+    static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
 
     std::vector<std::string> textureRemove;
     std::vector<AnimatedTexturePtr> animatedTextureRemove;

@@ -38,7 +38,7 @@ private:
         return true;
     }
 
-    static void lua();
     static void texture();
+    static void drawpoll();
     static void thingType();
 };

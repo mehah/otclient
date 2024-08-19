@@ -159,6 +159,8 @@ public:
         return m_hashCtrl;
     }
 
+    void resetBuffer() { m_lastCoordBufferSize = 64; }
+
 protected:
 
     enum class DrawMethodType
