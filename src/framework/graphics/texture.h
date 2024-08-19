@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include <framework/core/timer.h>
 
 class Texture
 {
