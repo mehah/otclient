@@ -21,6 +21,7 @@
  */
 
 #include "graphicalapplication.h"
+#include "garbagecollection.h"
 
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
@@ -224,6 +225,8 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
+    GarbageCollection::poll();
+
     Application::poll();
 
 #ifdef FRAMEWORK_SOUND

@@ -22,32 +22,23 @@
 
 #pragma once
 
-#include <framework/core/declarations.h>
-#include "texture.h"
+#include <framework/global.h>
+#include "timer.h"
 
-class TextureManager
+class GarbageCollection
 {
 public:
-    void init();
-    void terminate();
-    void poll();
-
-    void clearCache();
-    void liveReload();
-
-    void preload(const std::string& fileName, bool smooth = true) { getTexture(fileName, smooth); }
-    TexturePtr getTexture(const std::string& fileName, bool smooth = true);
-    const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
-    TexturePtr loadTexture(std::stringstream& file);
+    static void poll();
 
 private:
-    std::unordered_map<std::string, TexturePtr> m_textures;
-    std::vector<AnimatedTexturePtr> m_animatedTextures;
-    TexturePtr m_emptyTexture;
-    ScheduledEventPtr m_liveReloadEvent;
-    std::shared_mutex m_mutex;
+    static bool canCheck(Timer& timer, const uint32_t delay) {
+        if (timer.ticksElapsed() < delay)
+            return false;
+        timer.restart();
+        return true;
+    }
 
-    friend class GarbageCollection;
+    static void texture();
+    static void drawpoll();
+    static void thingType();
 };
-
-extern TextureManager g_textures;
