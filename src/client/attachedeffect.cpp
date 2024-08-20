@@ -25,6 +25,7 @@
 #include "lightview.h"
 
 #include <framework/core/clock.h>
+#include <framework/graphics/texturemanager.h>
 #include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/shadermanager.h>
 
@@ -48,6 +49,16 @@ AttachedEffectPtr AttachedEffect::clone()
     obj->m_frame = 0;
     obj->m_animationTimer.restart();
     obj->m_bounceTimer.restart();
+
+    if (!obj->m_texturePath.empty()) {
+        if (obj->m_texture = g_textures.getTexture(obj->m_texturePath, obj->m_smooth)) {
+            if (obj->m_texture->isAnimatedTexture()) {
+                const auto& animatedTexture = std::static_pointer_cast<AnimatedTexture>(obj->m_texture);
+                animatedTexture->setOnMap(true);
+                animatedTexture->restart();
+            }
+        }
+    }
 
     return obj;
 }
@@ -93,7 +104,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
         if (m_texture) {
             if (drawThing) {
                 const auto& size = (m_size.isUnset() ? m_texture->getSize() : m_size) * g_drawPool.getScaleFactor();
-                const auto& texture = m_texture->get(m_frame, m_animationTimer);
+                const auto& texture = m_texture->isAnimatedTexture() ? std::static_pointer_cast<AnimatedTexture>(m_texture)->get(m_frame, m_animationTimer) : m_texture;
                 const auto& rect = Rect(Point(), texture->getSize());
                 g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
             }
@@ -121,7 +132,8 @@ void AttachedEffect::drawLight(const Point& dest, const LightViewPtr& lightView)
 int AttachedEffect::getCurrentAnimationPhase()
 {
     if (m_texture) {
-        m_texture->get(m_frame, m_animationTimer);
+        if (m_texture->isAnimatedTexture())
+            std::static_pointer_cast<AnimatedTexture>(m_texture)->get(m_frame, m_animationTimer);
         return m_frame;
     }
 

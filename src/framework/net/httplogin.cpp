@@ -195,7 +195,12 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
 }
 
 bool LoginHttp::parseJsonResponse(const std::string& body) {
-    json responseJson = json::parse(body);
+    json responseJson;
+    try {
+        responseJson = json::parse(body);
+    } catch (...) {
+        return false;
+    }
 
     if (!responseJson.contains("session")) {
         return false;
