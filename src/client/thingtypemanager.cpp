@@ -57,35 +57,6 @@ void ThingTypeManager::init()
     m_nullItemType = std::make_shared<ItemType>();
     m_itemTypes.resize(1, m_nullItemType);
 #endif
-
-    // Garbage Collection
-    {
-        static constexpr uint16_t
-            WAITING_TIME = 2 * 1000, // waiting time for next check, default 2 seconds.
-            IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
-            AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
-
-        m_gc.event = g_dispatcher.cycleEvent([&] {
-            if (m_gc.category == ThingLastCategory)
-                m_gc.category = ThingCategoryItem;
-
-            const auto& category = m_thingTypes[m_gc.category];
-
-            const size_t limit = std::min<size_t>(m_gc.index + AMOUNT_PER_CHECK, category.size());
-            while (m_gc.index < limit) {
-                auto& thing = category[m_gc.index];
-                if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
-                    thing->unload();
-                }
-                ++m_gc.index;
-            }
-
-            if (limit == category.size()) {
-                m_gc.index = 0;
-                ++m_gc.category;
-            }
-        }, WAITING_TIME);
-    }
 }
 
 void ThingTypeManager::terminate()
@@ -94,11 +65,6 @@ void ThingTypeManager::terminate()
         m_thingType.clear();
 
     m_nullThingType = nullptr;
-
-    if (m_gc.event) {
-        m_gc.event->cancel();
-        m_gc.event = nullptr;
-    }
 
 #ifdef FRAMEWORK_EDITOR
     m_itemTypes.clear();
@@ -138,16 +104,16 @@ bool ThingTypeManager::loadDat(std::string file)
                 const auto& type = std::make_shared<ThingType>();
                 type->unserialize(id, static_cast<ThingCategory>(category), fin);
                 m_thingTypes[category][id] = type;
-            }
         }
+    }
 
         m_datLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
-    } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
-        return false;
-    }
+} catch (const stdext::exception& e) {
+    g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
+    return false;
+}
 }
 
 bool ThingTypeManager::loadOtml(std::string file)
@@ -179,10 +145,10 @@ bool ThingTypeManager::loadOtml(std::string file)
             }
         }
         return true;
-    } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
-        return false;
-    }
+} catch (const std::exception& e) {
+    g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
+    return false;
+}
 }
 
 bool ThingTypeManager::loadAppearances(const std::string& file)

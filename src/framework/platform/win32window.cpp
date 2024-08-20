@@ -474,7 +474,7 @@ void WIN32Window::resize(const Size& size)
 
 void WIN32Window::show()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         m_hidden = false;
         if (m_maximized)
             ShowWindow(m_window, SW_MAXIMIZE);

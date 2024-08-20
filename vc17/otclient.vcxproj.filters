@@ -561,6 +561,9 @@
     <ClCompile Include="..\src\framework\sound\soundeffect.cpp">
       <Filter>Source Files\framework\sound</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\core\garbagecollection.cpp">
+      <Filter>Source Files\framework\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\framework\config.h">
@@ -1087,6 +1090,9 @@
     </ClInclude>
     <ClInclude Include="..\src\framework\sound\soundeffect.h">
       <Filter>Header Files\framework\sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\core\garbagecollection.h">
+      <Filter>Header Files\framework\core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

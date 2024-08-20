@@ -309,3 +309,19 @@ function table.decodeStringPairList(l)
     end
     return ret
 end
+
+function table.remove_if(t, fnc)
+    local j, n = 1, #t;
+    for i = 1, n do
+        if not fnc(i, t[i]) then
+            if (i ~= j) then
+                t[j] = t[i];
+                t[i] = nil;
+            end
+            j = j + 1;
+        else
+            t[i] = nil;
+        end
+    end
+    return t;
+end

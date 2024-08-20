@@ -67,7 +67,7 @@ int Http::get(const std::string& url, int timeout)
         result->operationId = operationId;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     false, true, result, [&](HttpResult_ptr result) {
+                                                     false, true, result, [this, operationId](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -104,7 +104,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
         result->postData = data;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     isJson, checkContentLength, result, [&](HttpResult_ptr result) {
+                                                     isJson, checkContentLength, result, [this, operationId](HttpResult_ptr result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -437,7 +437,7 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
 
 void HttpSession::on_read(const std::error_code& ec, size_t bytes_transferred)
 {
-    auto on_done_read = [&]() {
+    auto on_done_read = [this]() {
         m_timer.cancel();
         const auto& data = m_response.data();
         m_result->response.append(asio::buffers_begin(data), asio::buffers_end(data));
@@ -558,19 +558,6 @@ void WebsocketSession::start()
         sft->on_resolve(ec, std::move(iterator));
     });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void WebsocketSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator)
 {
