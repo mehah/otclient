@@ -117,6 +117,7 @@ private:
     bool m_canDrawOnUI{ true };
     bool m_disableWalkAnimation{ false };
     bool m_permanent{ false };
+    bool m_smooth = { true };
 
     Outfit m_outfitOwner;
     Light m_light;
@@ -132,6 +133,7 @@ private:
     Otc::Direction m_direction{ Otc::North };
 
     std::array<DirControl, Otc::Direction::NorthWest + 1> m_offsetDirections;
+    std::string m_texturePath;
 
     struct
     {
@@ -141,7 +143,7 @@ private:
     } m_bounce;
 
     PainterShaderProgramPtr m_shader;
-    AnimatedTexturePtr m_texture;
+    TexturePtr m_texture;
 
     std::string m_name;
 
