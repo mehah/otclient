@@ -49,7 +49,7 @@ void AnimatedTexture::buildHardwareMipmaps()
     if (getProp(Prop::hasMipMaps)) return;
     setProp(Prop::hasMipMaps, true);
 
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         for (const auto& frame : m_frames)
             frame->buildHardwareMipmaps();
     });
@@ -58,7 +58,7 @@ void AnimatedTexture::buildHardwareMipmaps()
 void AnimatedTexture::setSmooth(bool smooth)
 {
     setProp(Prop::smooth, smooth);
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this, smooth] {
         for (const auto& frame : m_frames)
             frame->setSmooth(smooth);
     });
@@ -67,7 +67,7 @@ void AnimatedTexture::setSmooth(bool smooth)
 void AnimatedTexture::setRepeat(bool repeat)
 {
     setProp(Prop::repeat, repeat);
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this, repeat] {
         for (const auto& frame : m_frames)
             frame->setRepeat(repeat);
     });

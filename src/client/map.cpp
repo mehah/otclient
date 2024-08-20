@@ -47,7 +47,7 @@ Map g_map;
 
 void Map::init()
 {
-    g_window.addKeyListener([&](const InputEvent& inputEvent) {
+    g_window.addKeyListener([this](const InputEvent& inputEvent) {
         notificateKeyRelease(inputEvent);
     });
 
