@@ -357,7 +357,7 @@ void Game::processCloseChannel(int channelId)
     g_lua.callGlobalField("g_game", "onCloseChannel", channelId);
 }
 
-void Game::processRuleViolationChannel(int channelId)
+void Game::processRuleViolationChannel(const uint16_t channelId)
 {
     g_lua.callGlobalField("g_game", "onRuleViolationChannel", channelId);
 }
@@ -404,12 +404,12 @@ void Game::processRemoveAutomapFlag(const Position& pos, int icon, const std::st
     g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
 }
 
-void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-                                   const std::vector<std::tuple<int, std::string> >& mountList,
-                                   const std::vector<std::tuple<int, std::string> >& wingsList,
-                                   const std::vector<std::tuple<int, std::string> >& aurasList,
-                                   const std::vector<std::tuple<int, std::string> >& effectList,
-                                   const std::vector<std::tuple<int, std::string>>& shaderList)
+void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& mountList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& effectList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& shaderList)
 {
     // create virtual creature outfit
     const auto& virtualOutfitCreature = std::make_shared<Creature>();
