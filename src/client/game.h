@@ -111,7 +111,7 @@ protected:
     static void processCloseChannel(int channelId);
 
     // rule violations
-    static void processRuleViolationChannel(int channelId);
+    static void processRuleViolationChannel(const uint16_t channelId);
     static void processRuleViolationRemove(const std::string_view name);
     static void processRuleViolationCancel(const std::string_view name);
     static void processRuleViolationLock();
@@ -126,12 +126,12 @@ protected:
     static void processRemoveAutomapFlag(const Position& pos, int icon, const std::string_view message);
 
     // outfit
-    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<int, std::string, int> >& outfitList,
-                                 const std::vector<std::tuple<int, std::string> >& mountList,
-                                 const std::vector<std::tuple<int, std::string> >& wingsList,
-                                 const std::vector<std::tuple<int, std::string> >& aurasList,
-                                 const std::vector<std::tuple<int, std::string> >& effectsList,
-                                 const std::vector<std::tuple<int, std::string>>& shaderList );
+    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& mountList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& effectsList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& shaderList);
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items);
