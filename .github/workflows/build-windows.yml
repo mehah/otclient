@@ -1,4 +1,3 @@
----
 name: Build - Windows
 
 on:
@@ -6,73 +5,119 @@ on:
   pull_request:
   push:
     branches:
-      - main
+    - main
+    tags:
+    - 'v*'
 
 env:
   CMAKE_BUILD_PARALLEL_LEVEL: 2
   MAKEFLAGS: '-j 2'
 
 jobs:
-  job:
+  build:
     name: ${{ matrix.os }}-${{ matrix.buildtype }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [windows-2022]
-        buildtype: [windows-release, windows-release-asan, windows-debug]
+        buildtype: [windows-release]
         include:
-          - os: windows-2022
-            triplet: x64-windows
-            packages: >
-              sccache
-
+        - os: windows-2022
+          triplet: x64-windows
+          packages: >
+            sccache #magic___^_^___line
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
+    - name: Checkout repository
+      uses: actions/checkout@main
 
-      - name: CCache
-        uses: hendrikmuhs/ccache-action@main
-        with:
-          max-size: "1G"
-          variant: "sccache"
-          key: ccache-${{ matrix.os }}-${{ matrix.buildtype }}
-          restore-keys: |
-            ccache-${{ matrix.os }}
+    - name: CCache
+      uses: hendrikmuhs/ccache-action@main
+      with:
+        max-size: "1G"
+        variant: "sccache"
+        key: ccache-${{ matrix.os }}-${{ matrix.buildtype }}
+        restore-keys: |
+          ccache-${{ matrix.os }}
 
-      - name: Restore artifacts and install vcpkg
-        id: vcpkg-step
-        run: |
-          $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
-          $vcpkgCommitId=$json.'builtin-baseline'
-          Write-Host "vcpkg commit ID: $vcpkgCommitId"
-          echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
+    - name: Restore artifacts and install vcpkg
+      id: vcpkg-step
+      run: |
+        $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
+        $vcpkgCommitId=$json.'builtin-baseline'
+        Write-Host "vcpkg commit ID: $vcpkgCommitId"
+        echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
 
-      - name: Get vcpkg commit id from vcpkg.json
-        uses: lukka/run-vcpkg@main
-        with:
-          vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
-          vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
+    - name: Get vcpkg commit id from vcpkg.json
+      uses: lukka/run-vcpkg@main
+      with:
+        vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
+        vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
 
-      - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@main
+    - name: Get latest CMake and ninja
+      uses: lukka/get-cmake@main
 
-      - name: Run CMake
-        uses: lukka/run-cmake@main
-        with:
-          configurePreset: ${{ matrix.buildtype }}
-          buildPreset: ${{ matrix.buildtype }}
+    - name: Run CMake
+      uses: lukka/run-cmake@main
+      with:
+        configurePreset: ${{ matrix.buildtype }}
+        buildPreset: ${{ matrix.buildtype }}
 
-      - name: Create and Upload Artifact (exe)
-        uses: actions/upload-artifact@main
-        with:
-          name: otclient-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
-          path: |
-            ${{ github.workspace }}/otclient.exe
+    - name: Create and Upload Artifact (exe)
+      uses: actions/upload-artifact@main
+      with:
+        name: otclient-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
+        path: |
+          ${{ github.workspace }}/otclient.exe
 
-      - name: Create and Upload Artifact (dlls)
-        uses: actions/upload-artifact@main
-        with:
-          name: otclient-dlls-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
-          path: |
-            ${{ github.workspace }}/*.dll
+    - name: Create Temporary Directory
+      run: |
+        $tempDir = "$env:GITHUB_WORKSPACE/tempDir"
+        New-Item -Path $tempDir -ItemType Directory -Force
 
+    - name: Move Files to Temporary Directory
+      run: |
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/data" -Destination "$env:GITHUB_WORKSPACE/tempDir/data" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/mods" -Destination "$env:GITHUB_WORKSPACE/tempDir/mods" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/modules" -Destination "$env:GITHUB_WORKSPACE/tempDir/modules" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/init.lua" -Destination "$env:GITHUB_WORKSPACE/tempDir/init.lua" -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/otclient.exe" -Destination "$env:GITHUB_WORKSPACE/tempDir/otclient.exe" -Force
+
+    - name: Upload Temporary Directory as Artifact
+      uses: actions/upload-artifact@main
+      with:
+        name: release-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
+        path: ${{ github.workspace }}/tempDir.zip
+
+    - name: Compress Temporary Directory
+      run: |
+        Compress-Archive -Path "$env:GITHUB_WORKSPACE/tempDir" -DestinationPath "$env:GITHUB_WORKSPACE/tempDir.zip"
+
+    - name: Create Release
+      id: create_release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/create-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        body: |
+          Automatically generated release for tag ${{ github.ref_name }}.
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+
+    - name: Upload Windows Release Asset
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/tempDir.zip
+        asset_name: release-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}.zip
+        asset_content_type: application/zip
+
+    - name: Clean Up
+      run: |
+        Remove-Item -Path "$env:GITHUB_WORKSPACE/tempDir" -Recurse -Force
+        Remove-Item -Path "$env:GITHUB_WORKSPACE/tempDir.zip" -Force
