@@ -63,6 +63,12 @@ AttachedEffectPtr AttachedEffect::clone()
     return obj;
 }
 
+int getBounce(const AttachedEffect::Bounce bounce, const ticks_t ticks) {
+    const auto minHeight = bounce.minHeight * g_drawPool.getScaleFactor();
+    const auto height = bounce.height * g_drawPool.getScaleFactor();
+    return minHeight + (height - std::abs(height - static_cast<int>(ticks / (bounce.speed / 100.f)) % static_cast<int>(height * 2)));
+}
+
 void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& lightView, const bool drawThing) {
     if (m_transform)
         return;
@@ -85,6 +91,12 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
         if (m_shader) g_drawPool.setShaderProgram(m_shader, true);
         if (m_opacity < 100) g_drawPool.setOpacity(getOpacity(), true);
 
+        const auto scaleFactor = g_drawPool.getScaleFactor();
+
+        if (m_pulse.height > 0 && m_pulse.speed > 0) {
+            g_drawPool.setScaleFactor(scaleFactor + getBounce(m_pulse, m_pulseTimer.ticksElapsed()) / 100.f);
+        }
+
         auto point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
         if (!m_toPoint.isNull()) {
             const float fraction = std::min<float>(m_animationTimer.ticksElapsed() / static_cast<float>(m_duration), 1.f);
@@ -92,10 +104,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
         }
 
         if (m_bounce.height > 0 && m_bounce.speed > 0) {
-            const auto minHeight = m_bounce.minHeight * g_drawPool.getScaleFactor();
-            const auto height = m_bounce.height * g_drawPool.getScaleFactor();
-            const auto pixel = minHeight + (height - std::abs(height - static_cast<int>(m_bounceTimer.ticksElapsed() / (m_bounce.speed / 100.f)) % static_cast<int>(height * 2)));
-            point -= pixel;
+            point -= getBounce(m_bounce, m_bounceTimer.ticksElapsed());
         }
 
         if (lightView && m_light.intensity > 0)
@@ -110,6 +119,10 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
             }
         } else {
             getThingType()->draw(point, 0, m_direction, 0, 0, animation, Color::white, drawThing, lightView, { .order = getDrawOrder() });
+        }
+
+        if (m_pulse.height > 0 && m_pulse.speed > 0) {
+            g_drawPool.setScaleFactor(scaleFactor);
         }
     }
 

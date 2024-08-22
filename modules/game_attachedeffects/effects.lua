@@ -97,7 +97,9 @@ AttachedEffectManager.register(7, 'Pentagram Aura', '/images/game/effects/pentag
 
 AttachedEffectManager.register(8, 'Ki', '/images/game/effects/ki', ThingExternalTexture, {
     size = { 140, 110 },
-    offset = { 60, 75, true }
+    offset = { 60, 75, true },
+    pulse = { 0, 50, 3000 }
+
 })
 
 AttachedEffectManager.register(9, 'Thunder', '/images/game/effects/thunder', ThingExternalTexture, {
