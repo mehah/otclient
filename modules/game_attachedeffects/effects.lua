@@ -5,7 +5,10 @@
         duration, loop, transform, hideOwner, size{width, height}
         offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
         light { color, intensity}, drawOrder(only for tiles),
-        bounce{minHeight, height, speed}
+        bounce{minHeight, height, speed},
+        pulse{minHeight, height, speed},
+        fade{start, end, speed}
+
         onAttach, onDetach
     }
 ]]
@@ -97,7 +100,9 @@ AttachedEffectManager.register(7, 'Pentagram Aura', '/images/game/effects/pentag
 
 AttachedEffectManager.register(8, 'Ki', '/images/game/effects/ki', ThingExternalTexture, {
     size = { 140, 110 },
-    offset = { 60, 75, true }
+    offset = { 60, 75, true },
+    pulse = { 0, 50, 3000 },
+    --fade = { 0, 100, 1000 },
 })
 
 AttachedEffectManager.register(9, 'Thunder', '/images/game/effects/thunder', ThingExternalTexture, {
