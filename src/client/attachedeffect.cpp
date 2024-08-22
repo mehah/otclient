@@ -48,7 +48,9 @@ AttachedEffectPtr AttachedEffect::clone()
 
     obj->m_frame = 0;
     obj->m_animationTimer.restart();
-    obj->m_bounceTimer.restart();
+    obj->m_bounce.timer.restart();
+    obj->m_pulse.timer.restart();
+    obj->m_fade.timer.restart();
 
     if (!obj->m_texturePath.empty()) {
         if (obj->m_texture = g_textures.getTexture(obj->m_texturePath, obj->m_smooth)) {
@@ -94,7 +96,11 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
         const auto scaleFactor = g_drawPool.getScaleFactor();
 
         if (m_pulse.height > 0 && m_pulse.speed > 0) {
-            g_drawPool.setScaleFactor(scaleFactor + getBounce(m_pulse, m_pulseTimer.ticksElapsed()) / 100.f);
+            g_drawPool.setScaleFactor(scaleFactor + getBounce(m_pulse, m_pulse.timer.ticksElapsed()) / 100.f);
+        }
+
+        if (m_fade.height > 0 && m_fade.speed > 0) {
+            g_drawPool.setOpacity(std::clamp<float>(getBounce(m_fade, m_fade.timer.ticksElapsed()) / 100.f, 0, 1.f));
         }
 
         auto point = dest - (dirControl.offset * g_drawPool.getScaleFactor());
@@ -104,7 +110,7 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
         }
 
         if (m_bounce.height > 0 && m_bounce.speed > 0) {
-            point -= getBounce(m_bounce, m_bounceTimer.ticksElapsed());
+            point -= getBounce(m_bounce, m_bounce.timer.ticksElapsed());
         }
 
         if (lightView && m_light.intensity > 0)
@@ -123,6 +129,10 @@ void AttachedEffect::draw(const Point& dest, bool isOnTop, const LightViewPtr& l
 
         if (m_pulse.height > 0 && m_pulse.speed > 0) {
             g_drawPool.setScaleFactor(scaleFactor);
+        }
+
+        if (m_fade.height > 0 && m_fade.speed > 0) {
+            g_drawPool.resetOpacity();
         }
     }
 

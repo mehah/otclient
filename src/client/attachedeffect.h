@@ -72,6 +72,7 @@ public:
 
     void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
     void setPulse(uint8_t minHeight, uint8_t height, uint16_t speed) { m_pulse = { minHeight, height , speed }; }
+    void setFade(uint8_t start, uint8_t end, uint16_t speed) { m_fade = { start, end , speed }; }
 
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
@@ -98,6 +99,7 @@ public:
         uint8_t minHeight{ 0 };
         uint8_t height{ 0 };
         uint16_t speed{ 0 };
+        Timer timer;
     };
 
 private:
@@ -137,8 +139,6 @@ private:
     Size m_size;
 
     Timer m_animationTimer;
-    Timer m_bounceTimer;
-    Timer m_pulseTimer;
 
     Otc::Direction m_direction{ Otc::North };
 
@@ -147,6 +147,7 @@ private:
 
     Bounce m_bounce;
     Bounce m_pulse;
+    Bounce m_fade;
 
     PainterShaderProgramPtr m_shader;
     TexturePtr m_texture;

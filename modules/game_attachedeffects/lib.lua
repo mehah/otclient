@@ -45,6 +45,10 @@ local executeConfig = function(attachedEffect, config)
         attachedEffect:setPulse(config.pulse[1], config.pulse[2], config.pulse[3] or 1000)
     end
 
+    if config.fade then
+        attachedEffect:setFade(config.fade[1], config.fade[2], config.fade[3] or 1000)
+    end
+
     if config.duration ~= nil and config.duration > 0 then
         attachedEffect:setDuration(config.duration)
     end
