@@ -245,11 +245,11 @@ protected:
 
     // outfit
     void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string_view, uint8_t>>& outfitList,
-                                 const std::vector<std::tuple<uint16_t, std::string_view>>& mountList,
-                                 const std::vector<std::tuple<uint16_t, std::string_view>>& wingsList,
-                                 const std::vector<std::tuple<uint16_t, std::string_view>>& aurasList,
-                                 const std::vector<std::tuple<uint16_t, std::string_view>>& effectsList,
-                                 const std::vector<std::tuple<uint16_t, std::string_view>>& shaderList);
+                                const std::vector<std::tuple<uint16_t, std::string_view>>& mountList,
+                                const std::vector<std::tuple<uint16_t, std::string_view>>& wingsList,
+                                const std::vector<std::tuple<uint16_t, std::string_view>>& aurasList,
+                                const std::vector<std::tuple<uint16_t, std::string_view>>& effectsList,
+                                const std::vector<std::tuple<uint16_t, std::string_view>>& shaderList);
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string_view, uint32_t, uint32_t, uint32_t>>& items);
@@ -356,16 +356,16 @@ public:
     void setFightMode(Otc::FightModes fightMode);
     void setSafeFight(bool on);
     void setPVPMode(Otc::PVPModes pvpMode);
-    Otc::ChaseModes getChaseMode() const { return m_chaseMode; }
-    Otc::FightModes getFightMode() const { return m_fightMode; }
-    bool isSafeFight() const { return m_safeFight; }
-    Otc::PVPModes getPVPMode() const { return m_pvpMode; }
+    Otc::ChaseModes getChaseMode() { return m_chaseMode; }
+    Otc::FightModes getFightMode() { return m_fightMode; }
+    bool isSafeFight() { return m_safeFight; }
+    Otc::PVPModes getPVPMode() { return m_pvpMode; }
 
     // pvp related
     void setUnjustifiedPoints(UnjustifiedPoints unjustifiedPoints);
-    UnjustifiedPoints getUnjustifiedPoints() const { return m_unjustifiedPoints; };
+    UnjustifiedPoints getUnjustifiedPoints() { return m_unjustifiedPoints; };
     void setOpenPvpSituations(int openPvpSituations);
-    int getOpenPvpSituations() const { return m_openPvpSituations; }
+    int getOpenPvpSituations() { return m_openPvpSituations; }
 
     // npc trade related
     void inspectNpcTrade(const ItemPtr& item);
@@ -433,15 +433,15 @@ public:
     bool getFeature(Otc::GameFeature feature) { return m_features.test(feature); }
 
     void setProtocolVersion(int version);
-    int getProtocolVersion() const { return m_protocolVersion; }
+    int getProtocolVersion() { return m_protocolVersion; }
 
     bool isUsingProtobuf() { return getProtocolVersion() >= 1281 && !getFeature(Otc::GameLoadSprInsteadProtobuf); }
 
     void setClientVersion(int version);
-    int getClientVersion() const { return m_clientVersion; }
+    int getClientVersion() { return m_clientVersion; }
 
     void setCustomOs(Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
-    Otc::OperatingSystem_t getOs() const;
+    Otc::OperatingSystem_t getOs();
 
     bool canPerformGameAction() const;
     bool checkBotProtection() const;
@@ -453,14 +453,14 @@ public:
 #endif
     }
 
-    bool isOnline() const { return m_online; }
+    bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }
-    bool isDead() const { return m_dead; }
+    bool isDead() { return m_dead; }
     bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
 
-    int getPing() const { return m_ping; }
+    int getPing() { return m_ping; }
     ContainerPtr getContainer(int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }
@@ -471,14 +471,14 @@ public:
     void setCanReportBugs(bool enable) { m_canReportBugs = enable; }
     bool canReportBugs() const { return m_canReportBugs; }
     void setExpertPvpMode(bool enable) { m_expertPvpMode = enable; }
-    bool getExpertPvpMode() const { return m_expertPvpMode; }
+    bool getExpertPvpMode() { return m_expertPvpMode; }
     LocalPlayerPtr getLocalPlayer() { return m_localPlayer; }
     ProtocolGamePtr getProtocolGame() { return m_protocolGame; }
     std::string getCharacterName() { return m_characterName; }
     std::string getWorldName() { return m_worldName; }
     std::vector<uint8_t > getGMActions() { return m_gmActions; }
     bool isGM() { return !m_gmActions.empty(); }
-    Otc::Direction getLastWalkDir() const { return m_lastWalkDir; }
+    Otc::Direction getLastWalkDir() { return m_lastWalkDir; }
 
     std::string formatCreatureName(const std::string_view name);
     int findEmptyContainerId();
@@ -500,7 +500,7 @@ public:
     void closeImbuingWindow();
 
     void enableTileThingLuaCallback(bool value) { m_tileThingsLuaCallback = value; }
-    bool isTileThingLuaCallbackEnabled() const { return m_tileThingsLuaCallback; }
+    bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
 
     void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
     // Highscore related

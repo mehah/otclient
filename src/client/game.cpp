@@ -1618,7 +1618,7 @@ int Game::findEmptyContainerId()
     return id;
 }
 
-Otc::OperatingSystem_t Game::getOs() const 
+Otc::OperatingSystem_t Game::getOs()
 {
     if (m_clientCustomOs > Otc::CLIENTOS_NONE)
         return m_clientCustomOs;

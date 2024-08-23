@@ -876,8 +876,8 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
         msg->getU8(); // Skip unknown byte
         msg->getU16(); // Skip unknown U16
 
-        const uint16_t disableReasonssize = msg->getU16();
-        for (auto i = 0; i < disableReasonssize; ++i) {
+        const uint16_t disableReasonsSize = msg->getU16();
+        for (auto i = 0; i < disableReasonsSize; ++i) {
             storeData.disableReasons.push_back(msg->getString());
         }
 
@@ -1492,7 +1492,7 @@ void ProtocolGame::parsePlayerGoods(const InputMessagePtr& msg) const
         money = g_game.getClientVersion() >= 973 ? msg->getU64() : msg->getU32();
     }
 
-	const uint8_t itemsListSize = g_game.getClientVersion() >= 1334 ? msg->getU16() : msg->getU8();
+    const uint8_t itemsListSize = g_game.getClientVersion() >= 1334 ? msg->getU16() : msg->getU8();
     for (auto i = 0; i < itemsListSize; ++i) {
         const uint16_t itemId = msg->getU16();
         const uint16_t itemAmount = g_game.getFeature(Otc::GameDoubleShopSellAmount) ? msg->getU16() : msg->getU8();
@@ -2181,7 +2181,7 @@ void ProtocolGame::parsePlayerCancelAttack(const InputMessagePtr& msg)
 void ProtocolGame::parsePlayerModes(const InputMessagePtr& msg)
 {
     const auto fightMode = static_cast<Otc::FightModes>(msg->getU8());
-    const auto chaseMode =  static_cast<Otc::ChaseModes>(msg->getU8());
+    const auto chaseMode = static_cast<Otc::ChaseModes>(msg->getU8());
     const bool safeMode = static_cast<bool>(msg->getU8());
     const auto pvpMode = static_cast<Otc::PVPModes>(g_game.getFeature(Otc::GamePVPMode) ? msg->getU8() : 0);
 
@@ -2646,9 +2646,9 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
 void ProtocolGame::parseVipState(const InputMessagePtr& msg)
 {
     const uint32_t id = msg->getU32();
-	const uint32_t status = g_game.getFeature(Otc::GameLoginPending) ? msg->getU8() : 1;
+    const uint32_t status = g_game.getFeature(Otc::GameLoginPending) ? msg->getU8() : 1;
 
-	g_game.processVipStateChange(id, status);
+    g_game.processVipStateChange(id, status);
 }
 
 void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
@@ -2931,7 +2931,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, bool parseMount/* = t
 
     uint16_t lookType = g_game.getFeature(Otc::GameLooktypeU16) ? msg->getU16() : msg->getU8();
 
-	if (lookType != 0) {
+    if (lookType != 0) {
         outfit.setCategory(ThingCategoryCreature);
         const uint8_t head = msg->getU8();
         const uint8_t body = msg->getU8();
@@ -3268,7 +3268,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             }
         }
     } else {
-		throw Exception("ProtocolGame::getCreature: invalid creature opcode");
+        throw Exception("ProtocolGame::getCreature: invalid creature opcode");
     }
 
     return creature;
@@ -3640,7 +3640,7 @@ void ProtocolGame::parsePassiveCooldown(const InputMessagePtr& msg)
 void ProtocolGame::parseClientCheck(const InputMessagePtr& msg)
 {
     const uint32_t size = msg->getU32();
-    for (auto i = 0; i < size; ++i) {
+    for (uint32_t i = 0; i < size; ++i) {
         msg->getU8(); // unknown
     }
 }
@@ -4098,9 +4098,10 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         imbuements.push_back(getImbuementInfo(msg));
     }
 
-    const uint32_t neededItemsSize = msg->getU32(); // needed items size
     std::vector<ItemPtr> needItems;
-    for (auto i = 0; i < neededItemsSize; ++i) {
+
+    const uint32_t neededItemsSize = msg->getU32(); // needed items size
+    for (uint32_t i = 0; i < neededItemsSize; ++i) {
         const uint16_t needItemId = msg->getU16();
         const uint16_t count = msg->getU16();
         const auto& needItem = Item::create(needItemId);
@@ -4180,7 +4181,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
         lastAttribute = Otc::ITEM_DESC_IMBUINGSLOTS;
     }
 
-	if (g_game.getClientVersion() >= 1270) {
+    if (g_game.getClientVersion() >= 1270) {
         lastAttribute = Otc::ITEM_DESC_UPGRADECLASS;
     }
 
@@ -4298,13 +4299,14 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     }
 
     std::vector<MarketOffer> offers;
+
     const uint32_t buyOfferCount = msg->getU32();
-    for (auto i = 0; i < buyOfferCount; ++i) {
+    for (uint32_t i = 0; i < buyOfferCount; ++i) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_BUY, var));
     }
 
     const uint32_t sellOfferCount = msg->getU32();
-    for (auto i = 0; i < sellOfferCount; ++i) {
+    for (uint32_t i = 0; i < sellOfferCount; ++i) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_SELL, var));
     }
     std::vector<std::vector<uint64_t>> intOffers;
