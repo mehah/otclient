@@ -87,11 +87,11 @@ using Vip = std::tuple<std::string, uint32_t, std::string, int, bool>;
 
 struct StoreCategory
 {
-    std::string name;
+    std::string_view name;
     std::vector<StoreCategory> subCategories;
     uint8_t state;
-    std::vector<std::string> icons;
-    std::string parent;
+    std::vector<std::string_view> icons;
+    std::string_view parent;
 };
 
 struct SubOffer
@@ -109,12 +109,12 @@ struct SubOffer
 
 struct StoreOffer
 {
-    std::string name;
+    std::string_view name;
     std::vector<SubOffer> subOffers;
     uint32_t ofertaid;
-    std::string description;
+    std::string_view description;
     uint8_t type;
-    std::string icon;
+    std::string_view icon;
     uint16_t mountId;
     uint16_t itemId;
     uint16_t outfitId;
@@ -131,7 +131,7 @@ struct StoreOffer
 
 struct HomeOffer
 {
-    std::string name;
+    std::string_view name;
     uint8_t unknownByte;
     uint32_t id;
     uint16_t unknownU16;
@@ -140,7 +140,7 @@ struct HomeOffer
     uint16_t disabledReasonIndex;
     uint8_t unknownByte2;
     uint8_t type;
-    std::string icon;
+    std::string_view icon;
     uint16_t mountClientId;
     uint16_t itemType;
     uint16_t sexId;
@@ -155,7 +155,7 @@ struct HomeOffer
 
 struct Banner
 {
-    std::string image;
+    std::string_view image;
     uint8_t bannerType;
     uint32_t offerId;
     uint8_t unknownByte1, unknownByte2;
@@ -163,16 +163,15 @@ struct Banner
 
 struct StoreData
 {
-    std::string categoryName;
+    std::string_view categoryName;
     uint32_t redirectId;
-    std::vector<std::string> disableReasons;
-    std::vector<HomeOffer> homeOffers;  
+    std::vector<std::string_view> disableReasons;
+    std::vector<HomeOffer> homeOffers;
     std::vector<StoreOffer> storeOffers;
     std::vector<Banner> banners;
     uint8_t bannerDelay;
     bool tooManyResults;
 };
-
 
 //@bindsingleton g_game
 class Game
@@ -193,41 +192,41 @@ protected:
     static void processUpdateNeeded(const std::string_view signature);
     static void processLoginError(const std::string_view error);
     static void processLoginAdvice(const std::string_view message);
-    static void processLoginWait(const std::string_view message, int time);
-    static void processSessionEnd(int reason);
+    static void processLoginWait(const std::string_view message, const uint8_t time);
+    static void processSessionEnd(const uint8_t reason);
     static void processLogin();
     void processPendingGame();
     void processEnterGame();
 
     void processGameStart();
     void processGameEnd();
-    void processDeath(int deathType, int penality);
+    void processDeath(const uint8_t deathType, const uint8_t penality);
 
     void processGMActions(const std::vector<uint8_t >& actions);
-    void processInventoryChange(int slot, const ItemPtr& item);
-    void processAttackCancel(uint32_t seq);
-    void processWalkCancel(Otc::Direction direction);
+    void processInventoryChange(const uint8_t slot, const ItemPtr& item);
+    void processAttackCancel(const uint32_t seq);
+    void processWalkCancel(const Otc::Direction direction);
 
-    static void processPlayerHelpers(int helpers);
-    void processPlayerModes(Otc::FightModes fightMode, Otc::ChaseModes chaseMode, bool safeMode, Otc::PVPModes pvpMode);
+    static void processPlayerHelpers(const uint16_t helpers);
+    void processPlayerModes(const Otc::FightModes fightMode, const Otc::ChaseModes chaseMode, const bool safeMode, const Otc::PVPModes pvpMode);
 
     // message related
-    static void processTextMessage(Otc::MessageMode mode, const std::string_view text);
-    static void processTalk(const std::string_view name, int level, Otc::MessageMode mode, const std::string_view text, int channelId, const Position& pos);
+    static void processTextMessage(const Otc::MessageMode mode, const std::string_view text);
+    static void processTalk(const std::string_view name, const uint16_t level, const Otc::MessageMode mode, const std::string_view text, const uint16_t channelId, const Position& pos);
 
     // container related
-    void processOpenContainer(int containerId, const ItemPtr& containerItem, const std::string_view name, int capacity, bool hasParent, const std::vector<ItemPtr>& items, bool isUnlocked, bool hasPages, int containerSize, int firstIndex);
-    void processCloseContainer(int containerId);
-    void processContainerAddItem(int containerId, const ItemPtr& item, int slot);
-    void processContainerUpdateItem(int containerId, int slot, const ItemPtr& item);
-    void processContainerRemoveItem(int containerId, int slot, const ItemPtr& lastItem);
+    void processOpenContainer(const uint8_t containerId, const ItemPtr& containerItem, const std::string_view name, const uint8_t capacity, const bool hasParent, const std::vector<ItemPtr>& items, const bool isUnlocked, const bool hasPages, const uint16_t containerSize, const uint16_t firstIndex);
+    void processCloseContainer(const uint8_t containerId);
+    void processContainerAddItem(const uint8_t containerId, const ItemPtr& item, const uint16_t slot);
+    void processContainerUpdateItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& item);
+    void processContainerRemoveItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& lastItem);
 
     // channel related
-    static void processChannelList(const std::vector<std::tuple<int, std::string> >& channelList);
-    static void processOpenChannel(int channelId, const std::string_view name);
+    static void processChannelList(const std::vector<std::tuple<uint16_t, std::string_view>>& channelList);
+    static void processOpenChannel(const uint16_t channelId, const std::string_view name);
     static void processOpenPrivateChannel(const std::string_view name);
-    static void processOpenOwnPrivateChannel(int channelId, const std::string_view name);
-    static void processCloseChannel(int channelId);
+    static void processOpenOwnPrivateChannel(const uint16_t channelId, const std::string_view name);
+    static void processCloseChannel(const uint16_t channelId);
 
     // rule violations
     static void processRuleViolationChannel(const uint16_t channelId);
@@ -236,25 +235,25 @@ protected:
     static void processRuleViolationLock();
 
     // vip related
-    void processVipAdd(uint32_t id, const std::string_view name, uint32_t status, const std::string_view description, int iconId, bool notifyLogin);
-    void processVipStateChange(uint32_t id, uint32_t status);
+    void processVipAdd(const uint32_t id, const std::string_view name, const uint32_t status, const std::string_view description, const uint32_t iconId, const bool notifyLogin);
+    void processVipStateChange(const uint32_t id, const uint32_t status);
 
     // tutorial hint
-    static void processTutorialHint(int id);
+    static void processTutorialHint(const uint8_t id);
     static void processAddAutomapFlag(const Position& pos, int icon, const std::string_view message);
-    static void processRemoveAutomapFlag(const Position& pos, int icon, const std::string_view message);
+    static void processRemoveAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message);
 
     // outfit
-    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
-                                 const std::vector<std::tuple<uint16_t, std::string>>& mountList,
-                                 const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
-                                 const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
-                                 const std::vector<std::tuple<uint16_t, std::string>>& effectsList,
-                                 const std::vector<std::tuple<uint16_t, std::string>>& shaderList);
+    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string_view, uint8_t>>& outfitList,
+                                 const std::vector<std::tuple<uint16_t, std::string_view>>& mountList,
+                                 const std::vector<std::tuple<uint16_t, std::string_view>>& wingsList,
+                                 const std::vector<std::tuple<uint16_t, std::string_view>>& aurasList,
+                                 const std::vector<std::tuple<uint16_t, std::string_view>>& effectsList,
+                                 const std::vector<std::tuple<uint16_t, std::string_view>>& shaderList);
 
     // npc trade
-    static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items);
-    static void processPlayerGoods(int money, const std::vector<std::tuple<ItemPtr, int> >& goods);
+    static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string_view, uint32_t, uint32_t, uint32_t>>& items);
+    static void processPlayerGoods(const uint64_t money, const std::vector<std::tuple<ItemPtr, uint16_t>>& goods);
     static void processCloseNpcTrade();
 
     // player trade
@@ -263,17 +262,17 @@ protected:
     static void processCloseTrade();
 
     // edit text/list
-    static void processEditText(uint32_t id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date);
-    static void processEditList(uint32_t id, int doorId, const std::string_view text);
+    static void processEditText(const uint32_t id, const uint32_t itemId, const uint16_t maxLength, const std::string_view text, const std::string_view writer, const std::string_view date);
+    static void processEditList(const uint32_t id, const uint8_t doorId, const std::string_view text);
 
     // questlog
-    static void processQuestLog(const std::vector<std::tuple<int, std::string, bool> >& questList);
-    static void processQuestLine(int questId, const std::vector<std::tuple<std::string, std::string> >& questMissions);
+    static void processQuestLog(const std::vector<std::tuple<int, std::string, bool>>& questList);
+    static void processQuestLine(int questId, const std::vector<std::tuple<std::string, std::string>>& questMissions);
 
     // modal dialogs >= 970
-    static void processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
-                                   & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
-                                   & choiceList, bool priority);
+    static void processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string_view>>
+                                   & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string_view>>
+                                   & choiceList, const bool priority);
 
     friend class ProtocolGame;
     friend class Map;

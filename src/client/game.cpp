@@ -133,12 +133,12 @@ void Game::processLoginAdvice(const std::string_view message)
     g_lua.callGlobalField("g_game", "onLoginAdvice", message);
 }
 
-void Game::processLoginWait(const std::string_view message, int time)
+void Game::processLoginWait(const std::string_view message, const uint8_t time)
 {
     g_lua.callGlobalField("g_game", "onLoginWait", message, time);
 }
 
-void Game::processSessionEnd(int reason)
+void Game::processSessionEnd(const uint8_t reason)
 {
     g_lua.callGlobalField("g_game", "onSessionEnd", reason);
 }
@@ -214,7 +214,7 @@ void Game::processGameEnd()
     g_map.cleanDynamicThings();
 }
 
-void Game::processDeath(int deathType, int penality)
+void Game::processDeath(const uint8_t deathType, const uint8_t penality)
 {
     m_dead = true;
     m_localPlayer->stopWalk();
@@ -222,18 +222,18 @@ void Game::processDeath(int deathType, int penality)
     g_lua.callGlobalField("g_game", "onDeath", deathType, penality);
 }
 
-void Game::processGMActions(const std::vector<uint8_t >& actions)
+void Game::processGMActions(const std::vector<uint8_t>& actions)
 {
     m_gmActions = actions;
     g_lua.callGlobalField("g_game", "onGMActions", actions);
 }
 
-void Game::processPlayerHelpers(int helpers)
+void Game::processPlayerHelpers(const uint16_t helpers)
 {
     g_lua.callGlobalField("g_game", "onPlayerHelpersUpdate", helpers);
 }
 
-void Game::processPlayerModes(Otc::FightModes fightMode, Otc::ChaseModes chaseMode, bool safeMode, Otc::PVPModes pvpMode)
+void Game::processPlayerModes(const Otc::FightModes fightMode, const Otc::ChaseModes chaseMode, const bool safeMode, const Otc::PVPModes pvpMode)
 {
     m_fightMode = fightMode;
     m_chaseMode = chaseMode;
@@ -271,17 +271,17 @@ void Game::processPingBack()
     m_pingEvent = g_dispatcher.scheduleEvent([] { g_game.ping(); }, m_pingDelay);
 }
 
-void Game::processTextMessage(Otc::MessageMode mode, const std::string_view text)
+void Game::processTextMessage(const Otc::MessageMode mode, const std::string_view text)
 {
     g_lua.callGlobalField("g_game", "onTextMessage", mode, text);
 }
 
-void Game::processTalk(const std::string_view name, int level, Otc::MessageMode mode, const std::string_view text, int channelId, const Position& pos)
+void Game::processTalk(const std::string_view name, const uint16_t level, const Otc::MessageMode mode, const std::string_view text, const uint16_t channelId, const Position& pos)
 {
     g_lua.callGlobalField("g_game", "onTalk", name, level, mode, text, channelId, pos);
 }
 
-void Game::processOpenContainer(int containerId, const ItemPtr& containerItem, const std::string_view name, int capacity, bool hasParent, const std::vector<ItemPtr>& items, bool isUnlocked, bool hasPages, int containerSize, int firstIndex)
+void Game::processOpenContainer(const uint8_t containerId, const ItemPtr& containerItem, const std::string_view name, const uint8_t capacity, const bool hasParent, const std::vector<ItemPtr>& items, const bool isUnlocked, const bool hasPages, const uint16_t containerSize, const uint16_t firstIndex)
 {
     const auto& container(ContainerPtr(new Container(containerId, capacity, name, containerItem, hasParent, isUnlocked, hasPages, containerSize, firstIndex)));
     const auto previousContainer = getContainer(containerId);
@@ -298,7 +298,7 @@ void Game::processOpenContainer(int containerId, const ItemPtr& containerItem, c
         previousContainer->onClose();
 }
 
-void Game::processCloseContainer(int containerId)
+void Game::processCloseContainer(const uint8_t containerId)
 {
     if (const auto& container = getContainer(containerId)) {
         m_containers[containerId] = nullptr;
@@ -306,25 +306,25 @@ void Game::processCloseContainer(int containerId)
     }
 }
 
-void Game::processContainerAddItem(int containerId, const ItemPtr& item, int slot)
+void Game::processContainerAddItem(const uint8_t containerId, const ItemPtr& item, const uint16_t slot)
 {
     if (const auto& container = getContainer(containerId))
         container->onAddItem(item, slot);
 }
 
-void Game::processContainerUpdateItem(int containerId, int slot, const ItemPtr& item)
+void Game::processContainerUpdateItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& item)
 {
     if (const auto& container = getContainer(containerId))
         container->onUpdateItem(slot, item);
 }
 
-void Game::processContainerRemoveItem(int containerId, int slot, const ItemPtr& lastItem)
+void Game::processContainerRemoveItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& lastItem)
 {
     if (const auto& container = getContainer(containerId))
         container->onRemoveItem(slot, lastItem);
 }
 
-void Game::processInventoryChange(int slot, const ItemPtr& item)
+void Game::processInventoryChange(const uint8_t slot, const ItemPtr& item)
 {
     if (item)
         item->setPosition(Position(UINT16_MAX, slot, 0));
@@ -332,12 +332,12 @@ void Game::processInventoryChange(int slot, const ItemPtr& item)
     m_localPlayer->setInventoryItem(static_cast<Otc::InventorySlot>(slot), item);
 }
 
-void Game::processChannelList(const std::vector<std::tuple<int, std::string> >& channelList)
+void Game::processChannelList(const std::vector<std::tuple<uint16_t, std::string_view>>& channelList)
 {
     g_lua.callGlobalField("g_game", "onChannelList", channelList);
 }
 
-void Game::processOpenChannel(int channelId, const std::string_view name)
+void Game::processOpenChannel(const uint16_t channelId, const std::string_view name)
 {
     g_lua.callGlobalField("g_game", "onOpenChannel", channelId, name);
 }
@@ -347,12 +347,12 @@ void Game::processOpenPrivateChannel(const std::string_view name)
     g_lua.callGlobalField("g_game", "onOpenPrivateChannel", name);
 }
 
-void Game::processOpenOwnPrivateChannel(int channelId, const std::string_view name)
+void Game::processOpenOwnPrivateChannel(const uint16_t channelId, const std::string_view name)
 {
     g_lua.callGlobalField("g_game", "onOpenOwnPrivateChannel", channelId, name);
 }
 
-void Game::processCloseChannel(int channelId)
+void Game::processCloseChannel(const uint16_t channelId)
 {
     g_lua.callGlobalField("g_game", "onCloseChannel", channelId);
 }
@@ -377,24 +377,24 @@ void Game::processRuleViolationLock()
     g_lua.callGlobalField("g_game", "onRuleViolationLock");
 }
 
-void Game::processVipAdd(uint32_t id, const std::string_view name, uint32_t status, const std::string_view description, int iconId, bool notifyLogin)
+void Game::processVipAdd(const uint32_t id, const std::string_view name, const uint32_t status, const std::string_view description, const uint32_t iconId, const bool notifyLogin)
 {
     m_vips[id] = Vip(name, status, description, iconId, notifyLogin);
     g_lua.callGlobalField("g_game", "onAddVip", id, name, status, description, iconId, notifyLogin);
 }
 
-void Game::processVipStateChange(uint32_t id, uint32_t status)
+void Game::processVipStateChange(const uint32_t id, const uint32_t status)
 {
     std::get<1>(m_vips[id]) = status;
     g_lua.callGlobalField("g_game", "onVipStateChange", id, status);
 }
 
-void Game::processTutorialHint(int id)
+void Game::processTutorialHint(const uint8_t id)
 {
     g_lua.callGlobalField("g_game", "onTutorialHint", id);
 }
 
-void Game::processAddAutomapFlag(const Position& pos, int icon, const std::string_view message)
+void Game::processAddAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message)
 {
     g_lua.callGlobalField("g_game", "onAddAutomapFlag", pos, icon, message);
 }
@@ -404,12 +404,12 @@ void Game::processRemoveAutomapFlag(const Position& pos, int icon, const std::st
     g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
 }
 
-void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& mountList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& effectList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& shaderList)
+void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string_view, uint8_t>>& outfitList,
+                                   const std::vector<std::tuple<uint16_t, std::string_view>>& mountList,
+                                   const std::vector<std::tuple<uint16_t, std::string_view>>& wingsList,
+                                   const std::vector<std::tuple<uint16_t, std::string_view>>& aurasList,
+                                   const std::vector<std::tuple<uint16_t, std::string_view>>& effectList,
+                                   const std::vector<std::tuple<uint16_t, std::string_view>>& shaderList)
 {
     // create virtual creature outfit
     const auto& virtualOutfitCreature = std::make_shared<Creature>();
@@ -433,12 +433,12 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, wingsList, aurasList, effectList, shaderList);
 }
 
-void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, int, int, int> >& items)
+void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string_view, uint32_t, uint32_t, uint32_t>>& items)
 {
     g_lua.callGlobalField("g_game", "onOpenNpcTrade", items);
 }
 
-void Game::processPlayerGoods(int money, const std::vector<std::tuple<ItemPtr, int> >& goods)
+void Game::processPlayerGoods(const uint64_t money, const std::vector<std::tuple<ItemPtr, uint16_t>>& goods)
 {
     g_lua.callGlobalField("g_game", "onPlayerGoods", money, goods);
 }
@@ -463,40 +463,40 @@ void Game::processCloseTrade()
     g_lua.callGlobalField("g_game", "onCloseTrade");
 }
 
-void Game::processEditText(uint32_t id, int itemId, int maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
+void Game::processEditText(const uint32_t id, const uint32_t itemId, const uint16_t maxLength, const std::string_view text, const std::string_view writer, const std::string_view date)
 {
     g_lua.callGlobalField("g_game", "onEditText", id, itemId, maxLength, text, writer, date);
 }
 
-void Game::processEditList(uint32_t id, int doorId, const std::string_view text)
+void Game::processEditList(const uint32_t id, const uint8_t doorId, const std::string_view text)
 {
     g_lua.callGlobalField("g_game", "onEditList", id, doorId, text);
 }
 
-void Game::processQuestLog(const std::vector<std::tuple<int, std::string, bool> >& questList)
+void Game::processQuestLog(const std::vector<std::tuple<int, std::string, bool>>& questList)
 {
     g_lua.callGlobalField("g_game", "onQuestLog", questList);
 }
 
-void Game::processQuestLine(int questId, const std::vector<std::tuple<std::string, std::string> >& questMissions)
+void Game::processQuestLine(int questId, const std::vector<std::tuple<std::string, std::string>>& questMissions)
 {
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
 
-void Game::processModalDialog(uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<int, std::string> >
-                              & buttonList, int enterButton, int escapeButton, const std::vector<std::tuple<int, std::string> >
-                              & choiceList, bool priority)
+void Game::processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string_view>>
+                                & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string_view>>
+                                & choiceList, const bool priority)
 {
     g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }
 
-void Game::processAttackCancel(uint32_t seq)
+void Game::processAttackCancel(const uint32_t seq)
 {
     if (isAttacking() && (seq == 0 || m_seq == seq))
         cancelAttack();
 }
 
-void Game::processWalkCancel(Otc::Direction direction)
+void Game::processWalkCancel(const Otc::Direction direction)
 {
     m_localPlayer->cancelWalk(direction);
 }
