@@ -766,7 +766,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg) const
 {
-    const bool update = msg->getU8() == 1;
+    const bool update = static_cast<bool>(msg->getU8());
     if (update) {
         // amount of coins that can be used to buy prodcuts
         // in the ingame store
@@ -952,7 +952,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             offer.subOffers.reserve(subOffersCount);
 
             for (auto j = 0; j < subOffersCount; ++j) {
-                SubOffer subOffer;
+                SubOffer subOffer{};
                 subOffer.id = msg->getU32();
                 subOffer.count = msg->getU16();
                 subOffer.price = msg->getU32();
@@ -1337,7 +1337,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     const auto& containerItem = getItem(msg);
     const auto& name = msg->getString();
     const uint8_t capacity = msg->getU8();
-    const bool hasParent = msg->getU8() != 0;
+    const bool hasParent = static_cast<bool>(msg->getU8());
 
     bool isUnlocked = true;
     bool hasPages = false;
@@ -1349,8 +1349,8 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     }
 
     if (g_game.getFeature(Otc::GameContainerPagination)) {
-        isUnlocked = msg->getU8() != 0; // drag and drop
-        hasPages = msg->getU8() != 0; // pagination
+        isUnlocked = static_cast<bool>(msg->getU8()); // drag and drop
+        hasPages = static_cast<bool>(msg->getU8()); // pagination
         containerSize = msg->getU16(); // container size
         firstIndex = msg->getU16(); // first index
     }
@@ -1910,7 +1910,7 @@ void ProtocolGame::parseCreatureShields(const InputMessagePtr& msg)
 void ProtocolGame::parseCreatureUnpass(const InputMessagePtr& msg)
 {
     const uint32_t creatureId = msg->getU32();
-    const bool unpass = msg->getU8();
+    const bool unpass = static_cast<bool>(msg->getU8());
 
     const auto& creature = g_map.getCreatureById(creatureId);
     if (!creature) {
@@ -1976,7 +1976,7 @@ void ProtocolGame::parsePremiumTrigger(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePlayerInfo(const InputMessagePtr& msg) const
 {
-    const bool premium = msg->getU8(); // premium
+    const bool premium = static_cast<bool>(msg->getU8()); // premium
 
     if (g_game.getFeature(Otc::GamePremiumExpiration)) {
         msg->getU32(); // premium expiration used for premium advertisement
@@ -1995,7 +1995,7 @@ void ProtocolGame::parsePlayerInfo(const InputMessagePtr& msg) const
         if (g_game.getFeature(Otc::GameUshortSpell)) {
             spells.push_back(msg->getU16()); // spell id
         } else {
-            spells.push_back(static_cast<uint16_t>(msg->getU8())); // spell id
+            spells.push_back(msg->getU8()); // spell id
         }
     }
 
@@ -2180,12 +2180,12 @@ void ProtocolGame::parsePlayerCancelAttack(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePlayerModes(const InputMessagePtr& msg)
 {
-    const uint8_t fightMode = msg->getU8();
-    const uint8_t chaseMode = msg->getU8();
-    const bool safeMode = msg->getU8();
-    const uint8_t pvpMode = g_game.getFeature(Otc::GamePVPMode) ? msg->getU8() : 0;
+    const auto fightMode = static_cast<Otc::FightModes>(msg->getU8());
+    const auto chaseMode =  static_cast<Otc::ChaseModes>(msg->getU8());
+    const bool safeMode = static_cast<bool>(msg->getU8());
+    const auto pvpMode = static_cast<Otc::PVPModes>(g_game.getFeature(Otc::GamePVPMode) ? msg->getU8() : 0);
 
-    g_game.processPlayerModes(static_cast<Otc::FightModes>(fightMode), static_cast<Otc::ChaseModes>(chaseMode), safeMode, static_cast<Otc::PVPModes>(pvpMode));
+    g_game.processPlayerModes(fightMode, chaseMode, safeMode, pvpMode);
 }
 
 void ProtocolGame::parseSpellCooldown(const InputMessagePtr& msg)
@@ -2369,8 +2369,8 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         case Otc::MessageDamageOthers:
         {
             const auto& pos = getPosition(msg);
-            std::array<uint32_t, 2> value;
-            std::array<uint8_t, 2> color;
+            std::array<uint32_t, 2> value{};
+            std::array<uint8_t, 2> color{};
 
             // physical damage
             value[0] = msg->getU32();
@@ -2628,7 +2628,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     if (g_game.getFeature(Otc::GameAdditionalVipInfo)) {
         desc = msg->getString();
         iconId = msg->getU32();
-        notifyLogin = msg->getU8();
+        notifyLogin = static_cast<bool>(msg->getU8());
     }
 
     const uint32_t status = msg->getU8();
@@ -2680,7 +2680,7 @@ void ProtocolGame::parseAutomapFlag(const InputMessagePtr& msg)
     const uint8_t icon = msg->getU8();
     const std::string_view description = msg->getString();
 
-    const bool remove = g_game.getFeature(Otc::GameMinimapRemove) ? msg->getU8() != 0 : false;
+    const bool remove = g_game.getFeature(Otc::GameMinimapRemove) ? static_cast<bool>(msg->getU8()) : false;
     if (!remove) {
         g_game.processAddAutomapFlag(pos, icon, description);
     } else {
@@ -2695,7 +2695,7 @@ void ProtocolGame::parseQuestLog(const InputMessagePtr& msg)
     for (auto i = 0; i < questsCount; ++i) {
         uint16_t id = msg->getU16();
         const std::string questName = msg->getString();
-        bool questCompleted = msg->getU8();
+        const bool questCompleted = static_cast<bool>(msg->getU8());
         questList.emplace_back(id, questName, questCompleted);
     }
 
@@ -2786,7 +2786,7 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
         escapeButton = msg->getU8();
     }
 
-    const bool priority = msg->getU8() == 0x01;
+    const bool priority = static_cast<bool>(msg->getU8());
 
     g_game.processModalDialog(windowId, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }
@@ -2825,7 +2825,7 @@ void ProtocolGame::parseCreaturesMark(const InputMessagePtr& msg)
     const uint8_t len = g_game.getClientVersion() >= 1035 ? 1 : msg->getU8();
     for (auto i = 0; i < len; ++i) {
         const uint32_t creatureId = msg->getU32();
-        const bool isPermanent = msg->getU8() != 1;
+        const bool isPermanent = static_cast<bool>(msg->getU8());
         const uint8_t markType = msg->getU8();
 
         const auto& creature = g_map.getCreatureById(creatureId);
@@ -3122,7 +3122,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         }
 
         const uint8_t healthPercent = msg->getU8();
-        const auto& direction = static_cast<Otc::Direction>(msg->getU8());
+        const auto direction = static_cast<Otc::Direction>(msg->getU8());
         const auto& outfit = getOutfit(msg);
 
         Light light;
@@ -3194,7 +3194,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         }
 
         if (g_game.getClientVersion() >= 854) {
-            unpass = msg->getU8();
+            unpass = static_cast<bool>(msg->getU8());
         }
 
         std::string shader;
@@ -3261,7 +3261,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         }
 
         if (g_game.getClientVersion() >= 953) {
-            const bool unpass = msg->getU8();
+            const bool unpass = static_cast<bool>(msg->getU8());
 
             if (creature) {
                 creature->setPassable(!unpass);
@@ -3330,7 +3330,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
             }
         } else {
             if (g_game.getFeature(Otc::GameThingQuickLoot)) {
-                const bool hasQuickLootFlags = msg->getU8() != 0;
+                const bool hasQuickLootFlags = static_cast<bool>(msg->getU8());
                 if (hasQuickLootFlags) {
                     msg->getU32(); // quick loot flags
                 }
@@ -3522,7 +3522,7 @@ void ProtocolGame::parseExperienceTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
 {
-    bool quickLootFallbackToMainContainer = msg->getU8() == 1;
+    const bool quickLootFallbackToMainContainer = static_cast<bool>(msg->getU8());
 
     std::vector<std::tuple<uint8_t, uint16_t, uint16_t>> lootData;
 
@@ -3581,7 +3581,7 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
         msg->getU64(); // healing
     }
 
-    const bool hasNamesBool = msg->getU8() == 1;
+    const bool hasNamesBool =static_cast<bool>( msg->getU8());
     if (hasNamesBool) {
         const uint8_t membersNameSize = msg->getU8();
         for (auto i = 0; i < membersNameSize; ++i) {
@@ -3604,7 +3604,7 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
 
         const uint8_t slotsCount = msg->getU8(); // total amount of imbuing slots on item
         for (auto slotIndex = 0; slotIndex < slotsCount; ++slotIndex) {
-            const bool slotImbued = msg->getU8(); // 0 - empty, 1 - imbued
+            const bool slotImbued = static_cast<bool>(msg->getU8()); // 0 - empty, 1 - imbued
             ImbuementSlot slot(slotIndex);
             if (slotImbued) {
                 slot.name = msg->getString();
@@ -3659,7 +3659,7 @@ void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
 
     data.totalBless = msg->getU8();
     for (auto i = 0; i < data.totalBless; ++i) {
-        BlessData bless;
+        BlessData bless{};
         bless.blessBitwise = msg->getU16();
         bless.playerBlessCount = msg->getU8();
         bless.store = msg->getU8();
@@ -3910,7 +3910,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
     switch (state) {
         case Otc::PREY_STATE_LOCKED:
         {
-            const Otc::PreyUnlockState_t unlockState = static_cast<Otc::PreyUnlockState_t>(msg->getU8()); // prey slot unlocked
+            const auto unlockState = static_cast<Otc::PreyUnlockState_t>(msg->getU8()); // prey slot unlocked
             if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
                 nextFreeReroll = msg->getU32();
                 wildcards = msg->getU8();
@@ -4364,25 +4364,25 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
     msg->getU16(); // Current Bonus
     msg->getU16(); // Next Bonus
 
-    const bool isSlotOneUnlocked = msg->getU8();
+    const bool isSlotOneUnlocked = static_cast<bool>(msg->getU8());
     const uint32_t bossIdSlotOne = msg->getU32();
     if (isSlotOneUnlocked && bossIdSlotOne > 0) {
         getBosstiarySlot();
     }
 
-    const bool isSlotTwoUnlocked = msg->getU8();
+    const bool isSlotTwoUnlocked = static_cast<bool>(msg->getU8());
     const uint32_t bossIdSlotTwo = msg->getU32();
     if (isSlotTwoUnlocked && bossIdSlotTwo > 0) {
         getBosstiarySlot();
     }
 
-    const bool isTodaySlotUnlocked = msg->getU8();
+    const bool isTodaySlotUnlocked = static_cast<bool>(msg->getU8());
     const uint32_t boostedBossId = msg->getU32();
     if (isTodaySlotUnlocked && boostedBossId > 0) {
         getBosstiarySlot();
     }
 
-    const bool bossesUnlocked = msg->getU8();
+    const bool bossesUnlocked = static_cast<bool>(msg->getU8());
     if (bossesUnlocked) {
         const uint16_t bossesUnlockedSize = msg->getU16();
         for (auto i = 0; i < bossesUnlockedSize; ++i) {
@@ -4472,7 +4472,7 @@ void ProtocolGame::parseMapShader(const InputMessagePtr& msg)
 void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
 {
     const uint32_t creatureId = msg->getU32();
-    const bool typing = msg->getU8();
+    const bool typing = static_cast<bool>(msg->getU8());
 
     const auto& creature = g_map.getCreatureById(creatureId);
     if (!creature) {
@@ -4485,7 +4485,7 @@ void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
 
 void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
 {
-    const bool isEmpty = msg->getU8() == 1;
+    const bool isEmpty = static_cast<bool>(msg->getU8());
     if (isEmpty) {
         return;
     }

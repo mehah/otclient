@@ -399,7 +399,7 @@ void Game::processAddAutomapFlag(const Position& pos, const uint8_t icon, const 
     g_lua.callGlobalField("g_game", "onAddAutomapFlag", pos, icon, message);
 }
 
-void Game::processRemoveAutomapFlag(const Position& pos, int icon, const std::string_view message)
+void Game::processRemoveAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message)
 {
     g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
 }
@@ -1618,7 +1618,7 @@ int Game::findEmptyContainerId()
     return id;
 }
 
-Otc::OperatingSystem_t Game::getOs()
+Otc::OperatingSystem_t Game::getOs() const 
 {
     if (m_clientCustomOs > Otc::CLIENTOS_NONE)
         return m_clientCustomOs;

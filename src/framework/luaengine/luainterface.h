@@ -354,7 +354,7 @@ public:
     int getTop() const;
     int stackSize() const { return getTop(); }
     void clearStack() { pop(stackSize()); }
-    bool hasIndex(int index) { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
+    bool hasIndex(int index) const { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
 
     std::string getSource(int level = 2);
 

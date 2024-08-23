@@ -62,24 +62,24 @@ struct BlessData
 
 struct LogData
 {
-    uint32_t timestamp;
-    uint8_t colorMessage;
+    uint32_t timestamp = 0;
+    uint8_t colorMessage = 0;
     std::string_view historyMessage;
 };
 
 struct BlessDialogData
 {
-    uint8_t totalBless;
+    uint8_t totalBless = 0;
     std::vector<BlessData> blesses;
-    uint8_t premium;
-    uint8_t promotion;
-    uint8_t pvpMinXpLoss;
-    uint8_t pvpMaxXpLoss;
-    uint8_t pveExpLoss;
-    uint8_t equipPvpLoss;
-    uint8_t equipPveLoss;
-    uint8_t skull;
-    uint8_t aol;
+    uint8_t premium = 0;
+    uint8_t promotion = 0;
+    uint8_t pvpMinXpLoss = 0;
+    uint8_t pvpMaxXpLoss = 0;
+    uint8_t pveExpLoss = 0;
+    uint8_t equipPvpLoss = 0;
+    uint8_t equipPveLoss = 0;
+    uint8_t skull = 0;
+    uint8_t aol = 0;
     std::vector<LogData> logs;
 };
 
@@ -89,22 +89,22 @@ struct StoreCategory
 {
     std::string_view name;
     std::vector<StoreCategory> subCategories;
-    uint8_t state;
+    uint8_t state = 0;
     std::vector<std::string_view> icons;
     std::string_view parent;
 };
 
 struct SubOffer
 {
-    uint32_t id;
-    uint16_t count;
-    uint32_t price;
-    uint8_t coinType;
+    uint32_t id = 0;
+    uint16_t count = 0;
+    uint32_t price = 0;
+    uint8_t coinType = 0;
     bool disabled;
-    uint16_t disabledReason;
-    uint8_t state;
-    uint32_t validUntil;
-    uint32_t basePrice;
+    uint16_t disabledReason = 0;
+    uint8_t state = 0;
+    uint32_t validUntil = 0;
+    uint32_t basePrice = 0;
 };
 
 struct StoreOffer
@@ -240,7 +240,7 @@ protected:
 
     // tutorial hint
     static void processTutorialHint(const uint8_t id);
-    static void processAddAutomapFlag(const Position& pos, int icon, const std::string_view message);
+    static void processAddAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message);
     static void processRemoveAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message);
 
     // outfit
@@ -356,16 +356,16 @@ public:
     void setFightMode(Otc::FightModes fightMode);
     void setSafeFight(bool on);
     void setPVPMode(Otc::PVPModes pvpMode);
-    Otc::ChaseModes getChaseMode() { return m_chaseMode; }
-    Otc::FightModes getFightMode() { return m_fightMode; }
-    bool isSafeFight() { return m_safeFight; }
-    Otc::PVPModes getPVPMode() { return m_pvpMode; }
+    Otc::ChaseModes getChaseMode() const { return m_chaseMode; }
+    Otc::FightModes getFightMode() const { return m_fightMode; }
+    bool isSafeFight() const { return m_safeFight; }
+    Otc::PVPModes getPVPMode() const { return m_pvpMode; }
 
     // pvp related
     void setUnjustifiedPoints(UnjustifiedPoints unjustifiedPoints);
-    UnjustifiedPoints getUnjustifiedPoints() { return m_unjustifiedPoints; };
+    UnjustifiedPoints getUnjustifiedPoints() const { return m_unjustifiedPoints; };
     void setOpenPvpSituations(int openPvpSituations);
-    int getOpenPvpSituations() { return m_openPvpSituations; }
+    int getOpenPvpSituations() const { return m_openPvpSituations; }
 
     // npc trade related
     void inspectNpcTrade(const ItemPtr& item);
@@ -433,15 +433,15 @@ public:
     bool getFeature(Otc::GameFeature feature) { return m_features.test(feature); }
 
     void setProtocolVersion(int version);
-    int getProtocolVersion() { return m_protocolVersion; }
+    int getProtocolVersion() const { return m_protocolVersion; }
 
     bool isUsingProtobuf() { return getProtocolVersion() >= 1281 && !getFeature(Otc::GameLoadSprInsteadProtobuf); }
 
     void setClientVersion(int version);
-    int getClientVersion() { return m_clientVersion; }
+    int getClientVersion() const { return m_clientVersion; }
 
     void setCustomOs(Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
-    Otc::OperatingSystem_t getOs();
+    Otc::OperatingSystem_t getOs() const;
 
     bool canPerformGameAction() const;
     bool checkBotProtection() const;
@@ -453,32 +453,32 @@ public:
 #endif
     }
 
-    bool isOnline() { return m_online; }
+    bool isOnline() const { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }
-    bool isDead() { return m_dead; }
+    bool isDead() const { return m_dead; }
     bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
 
-    int getPing() { return m_ping; }
+    int getPing() const { return m_ping; }
     ContainerPtr getContainer(int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }
     CreaturePtr getAttackingCreature() { return m_attackingCreature; }
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
     void setServerBeat(int beat) { m_serverBeat = beat; }
-    int getServerBeat() { return m_serverBeat; }
+    int getServerBeat() const { return m_serverBeat; }
     void setCanReportBugs(bool enable) { m_canReportBugs = enable; }
-    bool canReportBugs() { return m_canReportBugs; }
+    bool canReportBugs() const { return m_canReportBugs; }
     void setExpertPvpMode(bool enable) { m_expertPvpMode = enable; }
-    bool getExpertPvpMode() { return m_expertPvpMode; }
+    bool getExpertPvpMode() const { return m_expertPvpMode; }
     LocalPlayerPtr getLocalPlayer() { return m_localPlayer; }
     ProtocolGamePtr getProtocolGame() { return m_protocolGame; }
     std::string getCharacterName() { return m_characterName; }
     std::string getWorldName() { return m_worldName; }
     std::vector<uint8_t > getGMActions() { return m_gmActions; }
     bool isGM() { return !m_gmActions.empty(); }
-    Otc::Direction getLastWalkDir() { return m_lastWalkDir; }
+    Otc::Direction getLastWalkDir() const { return m_lastWalkDir; }
 
     std::string formatCreatureName(const std::string_view name);
     int findEmptyContainerId();
@@ -500,7 +500,7 @@ public:
     void closeImbuingWindow();
 
     void enableTileThingLuaCallback(bool value) { m_tileThingsLuaCallback = value; }
-    bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
+    bool isTileThingLuaCallbackEnabled() const { return m_tileThingsLuaCallback; }
 
     void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
     // Highscore related
