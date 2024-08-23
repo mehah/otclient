@@ -71,26 +71,26 @@ jobs:
 
     - name: Create Temporary Directory
       run: |
-        $tempDir = "$env:GITHUB_WORKSPACE/tempDir"
+        $tempDir = "$env:GITHUB_WORKSPACE/client"
         New-Item -Path $tempDir -ItemType Directory -Force
 
     - name: Move Files to Temporary Directory
       run: |
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/data" -Destination "$env:GITHUB_WORKSPACE/tempDir/data" -Recurse -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/mods" -Destination "$env:GITHUB_WORKSPACE/tempDir/mods" -Recurse -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/modules" -Destination "$env:GITHUB_WORKSPACE/tempDir/modules" -Recurse -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/init.lua" -Destination "$env:GITHUB_WORKSPACE/tempDir/init.lua" -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/otclient.exe" -Destination "$env:GITHUB_WORKSPACE/tempDir/otclient.exe" -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/data" -Destination "$env:GITHUB_WORKSPACE/client/data" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/mods" -Destination "$env:GITHUB_WORKSPACE/client/mods" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/modules" -Destination "$env:GITHUB_WORKSPACE/client/modules" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/init.lua" -Destination "$env:GITHUB_WORKSPACE/client/init.lua" -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/otclient.exe" -Destination "$env:GITHUB_WORKSPACE/client/otclient.exe" -Force
 
     - name: Upload Temporary Directory as Artifact
       uses: actions/upload-artifact@main
       with:
         name: release-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
-        path: ${{ github.workspace }}/tempDir.zip
+        path: ${{ github.workspace }}/client.zip
 
     - name: Compress Temporary Directory
       run: |
-        Compress-Archive -Path "$env:GITHUB_WORKSPACE/tempDir" -DestinationPath "$env:GITHUB_WORKSPACE/tempDir.zip"
+        Compress-Archive -Path "$env:GITHUB_WORKSPACE/client" -DestinationPath "$env:GITHUB_WORKSPACE/client.zip"
 
     - name: Create Release
       id: create_release
@@ -113,11 +113,11 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/tempDir.zip
+        asset_path: ${{ github.workspace }}/client.zip
         asset_name: release-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}.zip
         asset_content_type: application/zip
 
     - name: Clean Up
       run: |
-        Remove-Item -Path "$env:GITHUB_WORKSPACE/tempDir" -Recurse -Force
-        Remove-Item -Path "$env:GITHUB_WORKSPACE/tempDir.zip" -Force
+        Remove-Item -Path "$env:GITHUB_WORKSPACE/client" -Recurse -Force
+        Remove-Item -Path "$env:GITHUB_WORKSPACE/client.zip" -Force
