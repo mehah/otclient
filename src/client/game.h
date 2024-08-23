@@ -467,9 +467,9 @@ public:
     CreaturePtr getAttackingCreature() { return m_attackingCreature; }
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
     void setServerBeat(int beat) { m_serverBeat = beat; }
-    int getServerBeat() const { return m_serverBeat; }
+    int getServerBeat() { return m_serverBeat; }
     void setCanReportBugs(bool enable) { m_canReportBugs = enable; }
-    bool canReportBugs() const { return m_canReportBugs; }
+    bool canReportBugs() { return m_canReportBugs; }
     void setExpertPvpMode(bool enable) { m_expertPvpMode = enable; }
     bool getExpertPvpMode() { return m_expertPvpMode; }
     LocalPlayerPtr getLocalPlayer() { return m_localPlayer; }
