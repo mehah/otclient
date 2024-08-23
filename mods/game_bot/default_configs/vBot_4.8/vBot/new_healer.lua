@@ -38,11 +38,11 @@ if not storage[panelName] then
         priorities = {
 
             {name="Custom Spell",           enabled=false, custom=true},
-            {name="Exura Gran Sio",         enabled=true,              strong = true},
-            {name="Exura Sio",              enabled=true,                            normal = true},
-            {name="Exura Gran Mas Res",     enabled=true,                                          area = true},
-            {name="Health Item",            enabled=true,                                                      health=true},
-            {name="Mana Item",              enabled=true,                                                                  mana=true}
+            {name="Exura Gran Sio",         enabled=true, strong = true},
+            {name="Exura Sio",              enabled=true, normal = true},
+            {name="Exura Gran Mas Res",     enabled=true, area = true},
+            {name="Health Item",            enabled=true, health=true},
+            {name="Mana Item",              enabled=true, mana=true}
 
         },
         settings = {
@@ -52,9 +52,9 @@ if not storage[panelName] then
             {type="HealItem",       text="Health Item ",                 value=3160},
             {type="HealScroll",     text="Mas Res Players: ",            value=2},
             {type="HealScroll",     text="Heal Friend at: ",             value=80},
-            {type="HealScroll",     text="Use Gran Sio at: ",            value=80},
-            {type="HealScroll",     text="Min Player HP%: ",             value=80},
-            {type="HealScroll",     text="Min Player MP%: ",             value=50},
+            {type="HealScroll",     text="Use Gran Sio at: ",            value=30},
+            {type="HealScroll",     text="Min Player HP%: ",             value=90},
+            {type="HealScroll",     text="Min Player MP%: ",             value=30},
 
         },
         conditions = {
@@ -64,7 +64,7 @@ if not storage[panelName] then
             sorcerers = false,
             party = true,
             guild = false,
-            botserver = false,
+            --botserver = false,
             friends = false
         }
     }
@@ -230,13 +230,13 @@ targetSettings.groups.box.guild.onClick = function(widget)
     widget:setChecked(config.conditions.guild)
     validate(widget)
 end
-
-targetSettings.groups.box.botserver:setChecked(config.conditions.botserver)
-targetSettings.groups.box.botserver.onClick = function(widget)
-    config.conditions.botserver = not config.conditions.botserver
-    widget:setChecked(config.conditions.botserver)
-    validate(widget)
-end
+targetSettings.groups.box.botserver:hide()
+--targetSettings.groups.box.botserver:setChecked(config.conditions.botserver)
+--targetSettings.groups.box.botserver.onClick = function(widget)
+--    config.conditions.botserver = not config.conditions.botserver
+--    widget:setChecked(config.conditions.botserver)
+--    validate(widget)
+--end
 
 validate(targetSettings.vocations.box.knights)
 validate(targetSettings.groups.box.friends)
@@ -337,6 +337,9 @@ for i, action in ipairs(config.priorities) do
 end
 
 local lastItemUse = now
+local lastStrongHeal = 0
+local lastMasRes = 0
+local lastSio = 0
 local function friendHealerAction(spec, targetsInRange)
     local name = spec:getName()
     local health = spec:getHealthPercent()
@@ -353,7 +356,8 @@ local function friendHealerAction(spec, targetsInRange)
 
     for i, action in ipairs(config.priorities) do
         if action.enabled then
-            if action.area and masResAmount <= targetsInRange and canCast("exura gran mas res") then
+            if action.area and masResAmount <= targetsInRange and now > lastMasRes then
+                lastMasRes = now + 2000
                 return say("exura gran mas res")
             end
             if action.mana and findItem(manaItem) and mana <= normalHeal and dist <= itemRange and now - lastItemUse > 1000 then
@@ -364,10 +368,12 @@ local function friendHealerAction(spec, targetsInRange)
                 lastItemUse = now
                 return useWith(healItem, spec)
             end
-            if action.strong and health <= strongHeal and not modules.game_cooldown.isCooldownIconActive(101) then
+            if action.strong and health <= strongHeal and now > lastStrongHeal then
+                lastStrongHeal = now + 60000
                 return say('exura gran sio "'..name)
             end
-            if (action.normal or action.custom) and health <= normalHeal and canCast('exura sio "'..name) then
+            if (action.normal or action.custom) and health <= normalHeal and now > lastSio then
+                lastSio = lastSio + 1000
                 return say('exura sio "'..name)
             end
         end
@@ -401,12 +407,17 @@ local function isCandidate(spec)
         end
     end
 
+    if not table.find(storage.playerList.friendList, name, true) then
+        return nil
+    end
+    
     local okParty = config.conditions.party and spec:isPartyMember()
     local okFriend = config.conditions.friends and isFriend(spec)
     local okGuild = config.conditions.guild and spec:getEmblem() == 1
-    local okBotServer = config.conditions.botserver and vBot.BotServerMembers[spec:getName()]
+   -- local okBotServer = config.conditions.botserver and vBot.BotServerMembers[spec:getName()]
 
-    if not (okParty or okFriend or okGuild or okBotServer) then
+   -- if not (okParty or okFriend or okGuild or okBotServer) then
+    if not (okParty or okFriend or okGuild) then
         return nil
     end
 
@@ -418,7 +429,7 @@ end
 
 macro(100, function()
     if not config.enabled then return end
-    if modules.game_cooldown.isGroupCooldownIconActive(2) then return end
+ --   if modules.game_cooldown.isGroupCooldownIconActive(2) then return end
 
     local minHp = config.settings[7].value
     local minMp = config.settings[8].value
@@ -430,10 +441,10 @@ macro(100, function()
     if hppercent() <= minHp or manapercent() <= minMp then return end
 
     -- get all spectators
-    local spectators = getSpectators()
+    local spectators = getSpectators(posz())
 
     -- main check
-    local healtR
+
     for i, spec in ipairs(spectators) do
         local health, dist = isCandidate(spec)
         --mas san
@@ -441,7 +452,7 @@ macro(100, function()
             inMasResRange = dist <= 3 and inMasResRange+1 or inMasResRange
 
             -- best target
-            if health < healTarget.hp then
+            if health <= healTarget.hp then
                 healTarget = {creature = spec, hp = health}
             end
         end

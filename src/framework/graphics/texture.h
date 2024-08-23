@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include <framework/core/timer.h>
 
 class Texture
 {
@@ -77,6 +78,7 @@ protected:
     size_t m_hash{ 0 };
 
     Size m_size;
+    Timer m_lastTimeUsage;
 
     Matrix3 m_transformMatrix = DEFAULT_MATRIX3;
 
@@ -101,4 +103,7 @@ protected:
             0.0f, 1.0f / size.height(), 0.0f,
             0.0f, 0.0f, 1.0f };
     }
+
+    friend class GarbageCollection;
+    friend class TextureManager;
 };

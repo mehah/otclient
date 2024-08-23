@@ -196,7 +196,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
       <LanguageStandard_C>Default</LanguageStandard_C>
       <DisableSpecificWarnings>4244;4251;4996;4267;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <CombineFilesOnlyFromTheSameFolder>true</CombineFilesOnlyFromTheSameFolder>
-	  <FloatingPointModel>Fast</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
@@ -268,6 +268,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\framework\core\event.cpp" />
     <ClCompile Include="..\src\framework\core\eventdispatcher.cpp" />
     <ClCompile Include="..\src\framework\core\filestream.cpp" />
+    <ClCompile Include="..\src\framework\core\garbagecollection.cpp" />
     <ClCompile Include="..\src\framework\core\graphicalapplication.cpp" />
     <ClCompile Include="..\src\framework\core\logger.cpp" />
     <ClCompile Include="..\src\framework\core\module.cpp" />
@@ -424,6 +425,7 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\framework\core\event.h" />
     <ClInclude Include="..\src\framework\core\eventdispatcher.h" />
     <ClInclude Include="..\src\framework\core\filestream.h" />
+    <ClInclude Include="..\src\framework\core\garbagecollection.h" />
     <ClInclude Include="..\src\framework\core\graphicalapplication.h" />
     <ClInclude Include="..\src\framework\core\inputevent.h" />
     <ClInclude Include="..\src\framework\core\logger.h" />

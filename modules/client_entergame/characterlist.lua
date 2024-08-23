@@ -11,6 +11,16 @@ local resendWaitEvent
 local loginEvent
 local outfitCreatureBox
 
+local autoReconnectButton
+local autoReconnectEvent
+local lastLogout = 0
+local function removeAutoReconnectEvent() --prevent
+    if autoReconnectEvent then
+        removeEvent(autoReconnectEvent)
+        autoReconnectEvent = nil
+    end
+end
+
 -- private functions
 local function tryLogin(charInfo, tries)
     tries = tries or 1
@@ -50,6 +60,7 @@ local function tryLogin(charInfo, tries)
     -- save last used character
     g_settings.set('last-used-character', charInfo.characterName)
     g_settings.set('last-used-world', charInfo.worldName)
+    removeAutoReconnectEvent()
 end
 
 local function updateWait(timeStart, timeEnd)
@@ -185,6 +196,9 @@ function CharacterList.init()
     connect(g_game, {
         onGameEnd = CharacterList.showAgain
     })
+    connect(g_game, {
+        onLogout = onLogout 
+    })
 
     if G.characters then
         CharacterList.create(G.characters, G.characterAccount)
@@ -212,6 +226,9 @@ function CharacterList.terminate()
     })
     disconnect(g_game, {
         onGameEnd = CharacterList.showAgain
+    })
+    disconnect(g_game, {
+        onLogout = onLogout 
     })
 
     if charactersWindow then
@@ -246,6 +263,8 @@ function CharacterList.terminate()
         loginEvent = nil
     end
 
+    removeAutoReconnectEvent()
+    
     CharacterList = nil
 end
 
@@ -260,6 +279,7 @@ function CharacterList.create(characters, account, otui)
 
     charactersWindow = g_ui.displayUI(otui)
     characterList = charactersWindow:getChildById('characters')
+    autoReconnectButton = charactersWindow:getChildById('autoReconnect')
 
     -- characters
     G.characters = characters
@@ -349,6 +369,9 @@ function CharacterList.create(characters, account, otui)
             characterList:ensureChildVisible(focusLabel)
         end)
     end
+    characterList.onChildFocusChange = function()
+        removeAutoReconnectEvent()
+    end
 
     -- account
     local status = ''
@@ -379,6 +402,18 @@ function CharacterList.create(characters, account, otui)
     else
         accountStatusLabel:setOn(false)
     end
+
+    autoReconnectButton.onClick = function(widget)
+        local autoReconnect = not g_settings.getBoolean('autoReconnect', true)
+        autoReconnectButton:setOn(autoReconnect)
+        g_settings.set('autoReconnect', autoReconnect)
+        local statusText = autoReconnect and 'Auto reconnect: On' or 'Auto reconnect: off'
+        if not g_game.getFeature(GameEnterGameShowAppearance) then
+            statusText = autoReconnect and 'Auto reconnect:\n On' or 'Auto reconnect:\n off'
+        end
+        
+        autoReconnectButton:setText(statusText)
+    end
 end
 
 function CharacterList.destroy()
@@ -398,9 +433,19 @@ function CharacterList.show()
     charactersWindow:show()
     charactersWindow:raise()
     charactersWindow:focus()
+
+    local autoReconnect = g_settings.getBoolean('autoReconnect', true)
+    autoReconnectButton:setOn(autoReconnect)
+    local reconnectStatus = autoReconnect and "On" or "Off"
+    if not g_game.getFeature(GameEnterGameShowAppearance) then
+        autoReconnectButton:setText('Auto reconnect:\n ' .. reconnectStatus)
+    else
+        autoReconnectButton:setText('Auto reconnect: ' .. reconnectStatus)
+    end
 end
 
 function CharacterList.hide(showLogin)
+    removeAutoReconnectEvent()
     showLogin = showLogin or false
     charactersWindow:hide()
 
@@ -412,6 +457,7 @@ end
 function CharacterList.showAgain()
     if characterList and characterList:hasChildren() then
         CharacterList.show()
+        scheduleAutoReconnect()
     end
 end
 
@@ -423,6 +469,7 @@ function CharacterList.isVisible()
 end
 
 function CharacterList.doLogin()
+    removeAutoReconnectEvent()
     local selected = characterList:getFocusedChild()
     if selected then
         local charInfo = {
@@ -490,4 +537,29 @@ function CharacterList.updateCharactersAppearances(showOutfits)
 
         CharacterList.updateCharactersAppearance(widget, widget.characterInfo, showOutfits)
     end
+end
+
+function onLogout()
+    lastLogout = g_clock.millis()
+end
+
+function scheduleAutoReconnect()
+    if not g_settings.getBoolean('autoReconnect') or lastLogout + 2000 > g_clock.millis() then
+        return
+    end
+
+    removeAutoReconnectEvent()
+    autoReconnectEvent = scheduleEvent(executeAutoReconnect, 2500)
+end
+
+function executeAutoReconnect()
+    if not g_settings.getBoolean('autoReconnect') then
+        return
+    end
+
+    if errorBox then
+        errorBox:destroy()
+        errorBox = nil
+    end
+    CharacterList.doLogin()
 end

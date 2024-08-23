@@ -817,6 +817,7 @@ void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
     } else {
         // not used
         msg->getU8();
+
         const auto& message = msg->getString();
         const uint32_t coins = msg->getU32();
         const uint32_t transferableCoins = msg->getU32();
@@ -861,7 +862,6 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
                 g_logger.error(stdext::format("Time %i, type %i, change %i, product name %s", time, productType, coinChange, productName));
             }
         }
-
     }
 }
 
@@ -1374,6 +1374,10 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
             msg->getU8(); // category
             msg->getU8(); // categories size
         }
+    }
+    if (g_game.getClientVersion() >= 1340) {
+        msg->getU8();
+        msg->getU8();
     }
 
     if (g_game.getClientVersion() >= 1340) {

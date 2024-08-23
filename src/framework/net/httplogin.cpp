@@ -68,14 +68,15 @@ void LoginHttp::startHttpLogin(const std::string& host, const std::string& path,
     httplib::SSLClient cli(host, port);
 
     cli.set_logger(
-        [&](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
+        [this](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
 
-    json body = json{ {"email", email}, {"password", password}, {"type", "login"} };
+    json body = json{ {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
 
-    if (auto res = cli.Post(path, body.dump(1), "application/json")) {
+    if (auto res = cli.Post(path, headers, body.dump(1), "application/json")) {
         if (res->status == 200) {
             json bodyResponse = json::parse(res->body);
-            std::cout << bodyResponse.dump(4) << std::endl;
+            std::cout << bodyResponse.dump() << std::endl;
 
             std::cout << std::boolalpha << json::accept(res->body) << std::endl;
         }
@@ -136,12 +137,13 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string& host,
     httplib::SSLClient client(host, port);
 
     client.set_logger(
-        [&](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
+        [this](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
 
-    json body = { {"email", email}, {"password", password}, {"type", "login"} };
+    json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
 
     httplib::Result response =
-        client.Post(path, body.dump(1), "application/json");
+        client.Post(path, headers, body.dump(), "application/json");
     if (!response) {
         std::cout << "HTTPS error: unknown" << std::endl;
     } else if (response->status != Success) {
@@ -167,12 +169,13 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
                                          const std::string& password) {
     httplib::Client client(host, port);
     client.set_logger(
-        [&](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
+        [this](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
 
-    json body = { {"email", email}, {"password", password}, {"type", "login"} };
+    httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
+    json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
 
     httplib::Result response =
-        client.Post(path, body.dump(1), "application/json");
+        client.Post(path, headers, body.dump(), "application/json");
     if (!response) {
         std::cout << "HTTP error: unknown" << std::endl;
     } else if (response->status != Success) {
@@ -192,7 +195,12 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
 }
 
 bool LoginHttp::parseJsonResponse(const std::string& body) {
-    json responseJson = json::parse(body);
+    json responseJson;
+    try {
+        responseJson = json::parse(body);
+    } catch (...) {
+        return false;
+    }
 
     if (!responseJson.contains("session")) {
         return false;
