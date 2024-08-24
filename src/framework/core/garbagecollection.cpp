@@ -62,7 +62,7 @@ void GarbageCollection::texture() {
     std::shared_lock l(g_textures.m_mutex);
 
     std::erase_if(g_textures.m_textures, [](const auto& item) {
-        const auto& [key, value] = item;
+        const auto& [key, tex] = item;
         return tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME;
     });
 
