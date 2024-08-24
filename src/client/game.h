@@ -76,7 +76,7 @@ struct BlessDialogData
     uint8_t pvpMinXpLoss;
     uint8_t pvpMaxXpLoss;
     uint8_t pveExpLoss;
-    uint8_t equipPvpLoss ;
+    uint8_t equipPvpLoss;
     uint8_t equipPveLoss;
     uint8_t skull;
     uint8_t aol;

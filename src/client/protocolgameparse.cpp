@@ -1092,8 +1092,6 @@ void ProtocolGame::parsePlayerHelpers(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
 {
-    std::vector<uint8_t > actions;
-
     uint8_t numViolationReasons;
     if (g_game.getClientVersion() >= 850) {
         numViolationReasons = 20;
@@ -1103,7 +1101,8 @@ void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
         numViolationReasons = 32;
     }
 
-    actions.reserve(numViolationReasons);
+    std::vector<uint8_t> actions(numViolationReasons);
+
     for (auto i = 0; i < numViolationReasons; ++i) {
         actions.push_back(msg->getU8());
     }
