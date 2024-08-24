@@ -163,7 +163,7 @@ function optionsController:onInit()
 end
 
 function toggleStore()
-    if g_game.getFeature(GamePurseSlot) then
+    if g_game.getClientVersion() >= 1332 then
         modules.game_store.toggle()
     else
         modules.game_shop.toggle() --game_shopv8
