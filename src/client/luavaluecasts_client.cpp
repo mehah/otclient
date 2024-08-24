@@ -83,7 +83,6 @@ bool luavalue_cast(int index, Outfit& outfit)
         outfit.setAura(g_lua.popInteger());
         g_lua.getField("shaders", index);
         outfit.setShader(g_lua.popString());
-
     }
 
     return true;

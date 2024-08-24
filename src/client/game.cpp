@@ -50,12 +50,12 @@ void Game::terminate()
 void Game::resetGameStates()
 {
     m_online = false;
-    m_denyBotCall = false;
+    enableBotCall();
     m_dead = false;
     m_serverBeat = 50;
     m_seq = 0;
     m_ping = -1;
-    m_canReportBugs = false;
+    setCanReportBugs(false);
     m_fightMode = Otc::FightBalanced;
     m_chaseMode = Otc::DontChase;
     m_pvpMode = Otc::WhiteDove;
@@ -473,12 +473,12 @@ void Game::processEditList(const uint32_t id, const uint8_t doorId, const std::s
     g_lua.callGlobalField("g_game", "onEditList", id, doorId, text);
 }
 
-void Game::processQuestLog(const std::vector<std::tuple<int, std::string, bool>>& questList)
+void Game::processQuestLog(const std::vector<std::tuple<uint16_t, std::string_view, bool>>& questList)
 {
     g_lua.callGlobalField("g_game", "onQuestLog", questList);
 }
 
-void Game::processQuestLine(int questId, const std::vector<std::tuple<std::string, std::string>>& questMissions)
+void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view>>& questMissions)
 {
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
@@ -524,13 +524,13 @@ void Game::loginWorld(const std::string_view account, const std::string_view pas
 
 void Game::cancelLogin()
 {
-    m_denyBotCall = false;
+    enableBotCall();
     // send logout even if the game has not started yet, to make sure that the player doesn't stay logged there
     if (m_protocolGame)
         m_protocolGame->sendLogout();
 
     processDisconnect();
-    m_denyBotCall = true;
+    disableBotCall();
 }
 
 void Game::forceLogout()
@@ -550,7 +550,7 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction, bool isKeyDown /*= false*/)
+bool Game::walk(const Otc::Direction direction, const bool isKeyDown /*= false*/)
 {
     if (!canPerformGameAction())
         return false;
@@ -670,7 +670,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
     m_protocolGame->sendAutoWalk(dirs);
 }
 
-void Game::forceWalk(Otc::Direction direction)
+void Game::forceWalk(const Otc::Direction direction)
 {
     if (!canPerformGameAction())
         return;
@@ -707,7 +707,7 @@ void Game::forceWalk(Otc::Direction direction)
     g_lua.callGlobalField("g_game", "onForceWalk", direction);
 }
 
-void Game::turn(Otc::Direction direction)
+void Game::turn(const Otc::Direction direction)
 {
     if (!canPerformGameAction())
         return;
@@ -741,7 +741,7 @@ void Game::stop()
     m_protocolGame->sendStop();
 }
 
-void Game::look(const ThingPtr& thing, bool isBattleList)
+void Game::look(const ThingPtr& thing, const bool isBattleList)
 {
     if (!canPerformGameAction() || !thing)
         return;
@@ -766,7 +766,7 @@ void Game::move(const ThingPtr& thing, const Position& toPos, int count)
     m_protocolGame->sendMove(thing->getPosition(), thingId, thing->getStackPos(), toPos, count);
 }
 
-void Game::moveToParentContainer(const ThingPtr& thing, int count)
+void Game::moveToParentContainer(const ThingPtr& thing, const int count)
 {
     if (!canPerformGameAction() || !thing || count <= 0)
         return;
@@ -807,7 +807,7 @@ void Game::use(const ThingPtr& thing)
     g_lua.callGlobalField("g_game", "onUse", pos, thing->getId(), thing->getStackPos(), 0);
 }
 
-void Game::useInventoryItem(int itemId)
+void Game::useInventoryItem(const uint16_t itemId)
 {
     if (!canPerformGameAction() || !g_things.isValidDatId(itemId, ThingCategoryItem))
         return;
@@ -835,7 +835,7 @@ void Game::useWith(const ItemPtr& item, const ThingPtr& toThing)
     g_lua.callGlobalField("g_game", "onUseWith", pos, item->getId(), toThing, item->getStackPos());
 }
 
-void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
+void Game::useInventoryItemWith(const uint16_t itemId, const ThingPtr& toThing)
 {
     if (!canPerformGameAction() || !toThing)
         return;
@@ -849,7 +849,7 @@ void Game::useInventoryItemWith(int itemId, const ThingPtr& toThing)
     g_lua.callGlobalField("g_game", "onUseWith", pos, itemId, toThing, 0);
 }
 
-ItemPtr Game::findItemInContainers(uint32_t itemId, int subType)
+ItemPtr Game::findItemInContainers(const uint32_t itemId, const int subType)
 {
     for (const auto& it : m_containers) {
         if (const auto& container = it.second) {
@@ -978,7 +978,7 @@ void Game::talk(const std::string_view message)
     talkChannel(Otc::MessageSay, 0, message);
 }
 
-void Game::talkChannel(Otc::MessageMode mode, int channelId, const std::string_view message)
+void Game::talkChannel(const Otc::MessageMode mode, const uint16_t channelId, const std::string_view message)
 {
     if (!canPerformGameAction() || message.empty())
         return;
@@ -986,7 +986,7 @@ void Game::talkChannel(Otc::MessageMode mode, int channelId, const std::string_v
     m_protocolGame->sendTalk(mode, channelId, "", message);
 }
 
-void Game::talkPrivate(Otc::MessageMode mode, const std::string_view receiver, const std::string_view message)
+void Game::talkPrivate(const Otc::MessageMode mode, const std::string_view receiver, const std::string_view message)
 {
     if (!canPerformGameAction() || receiver.empty() || message.empty())
         return;
@@ -1010,7 +1010,7 @@ void Game::requestChannels()
     m_protocolGame->sendRequestChannels();
 }
 
-void Game::joinChannel(int channelId)
+void Game::joinChannel(const uint16_t channelId)
 {
     if (!canPerformGameAction())
         return;
@@ -1018,7 +1018,7 @@ void Game::joinChannel(int channelId)
     m_protocolGame->sendJoinChannel(channelId);
 }
 
-void Game::leaveChannel(int channelId)
+void Game::leaveChannel(const uint16_t channelId)
 {
     if (!canPerformGameAction())
         return;
@@ -1058,7 +1058,7 @@ void Game::excludeFromOwnChannel(const std::string_view name)
     m_protocolGame->sendExcludeFromOwnChannel(name);
 }
 
-void Game::partyInvite(int creatureId)
+void Game::partyInvite(const uint32_t creatureId)
 {
     if (!canPerformGameAction())
         return;
@@ -1066,7 +1066,7 @@ void Game::partyInvite(int creatureId)
     m_protocolGame->sendInviteToParty(creatureId);
 }
 
-void Game::partyJoin(int creatureId)
+void Game::partyJoin(const uint32_t creatureId)
 {
     if (!canPerformGameAction())
         return;
@@ -1074,7 +1074,7 @@ void Game::partyJoin(int creatureId)
     m_protocolGame->sendJoinParty(creatureId);
 }
 
-void Game::partyRevokeInvitation(int creatureId)
+void Game::partyRevokeInvitation(const uint32_t creatureId)
 {
     if (!canPerformGameAction())
         return;
@@ -1082,7 +1082,7 @@ void Game::partyRevokeInvitation(int creatureId)
     m_protocolGame->sendRevokeInvitation(creatureId);
 }
 
-void Game::partyPassLeadership(int creatureId)
+void Game::partyPassLeadership(const uint32_t creatureId)
 {
     if (!canPerformGameAction())
         return;
@@ -1098,7 +1098,7 @@ void Game::partyLeave()
     m_protocolGame->sendLeaveParty();
 }
 
-void Game::partyShareExperience(bool active)
+void Game::partyShareExperience(const bool active)
 {
     if (!canPerformGameAction())
         return;
@@ -1122,7 +1122,7 @@ void Game::changeOutfit(const Outfit& outfit)
     m_protocolGame->sendChangeOutfit(outfit);
 }
 
-void Game::sendTyping(bool typing)
+void Game::sendTyping(const bool typing)
 {
     if (!canPerformGameAction())
         return;
@@ -1138,7 +1138,7 @@ void Game::addVip(const std::string_view name)
     m_protocolGame->sendAddVip(name);
 }
 
-void Game::removeVip(int playerId)
+void Game::removeVip(const uint32_t playerId)
 {
     if (!canPerformGameAction())
         return;
@@ -1151,7 +1151,7 @@ void Game::removeVip(int playerId)
     m_protocolGame->sendRemoveVip(playerId);
 }
 
-void Game::editVip(int playerId, const std::string_view description, int iconId, bool notifyLogin)
+void Game::editVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin)
 {
     if (!canPerformGameAction())
         return;
@@ -1168,7 +1168,7 @@ void Game::editVip(int playerId, const std::string_view description, int iconId,
         m_protocolGame->sendEditVip(playerId, description, iconId, notifyLogin);
 }
 
-void Game::setChaseMode(Otc::ChaseModes chaseMode)
+void Game::setChaseMode(const Otc::ChaseModes chaseMode)
 {
     if (!canPerformGameAction())
         return;
@@ -1181,7 +1181,7 @@ void Game::setChaseMode(Otc::ChaseModes chaseMode)
     g_lua.callGlobalField("g_game", "onChaseModeChange", chaseMode);
 }
 
-void Game::setFightMode(Otc::FightModes fightMode)
+void Game::setFightMode(const Otc::FightModes fightMode)
 {
     if (!canPerformGameAction())
         return;
@@ -1194,7 +1194,7 @@ void Game::setFightMode(Otc::FightModes fightMode)
     g_lua.callGlobalField("g_game", "onFightModeChange", fightMode);
 }
 
-void Game::setSafeFight(bool on)
+void Game::setSafeFight(const bool on)
 {
     if (!canPerformGameAction())
         return;
@@ -1207,7 +1207,7 @@ void Game::setSafeFight(bool on)
     g_lua.callGlobalField("g_game", "onSafeFightChange", on);
 }
 
-void Game::setPVPMode(Otc::PVPModes pvpMode)
+void Game::setPVPMode(const Otc::PVPModes pvpMode)
 {
     if (!canPerformGameAction())
         return;
@@ -1223,7 +1223,7 @@ void Game::setPVPMode(Otc::PVPModes pvpMode)
     g_lua.callGlobalField("g_game", "onPVPModeChange", pvpMode);
 }
 
-void Game::setUnjustifiedPoints(UnjustifiedPoints unjustifiedPoints)
+void Game::setUnjustifiedPoints(const UnjustifiedPoints unjustifiedPoints)
 {
     if (!canPerformGameAction())
         return;
@@ -1238,7 +1238,7 @@ void Game::setUnjustifiedPoints(UnjustifiedPoints unjustifiedPoints)
     g_lua.callGlobalField("g_game", "onUnjustifiedPointsChange", unjustifiedPoints);
 }
 
-void Game::setOpenPvpSituations(int openPvpSituations)
+void Game::setOpenPvpSituations(const uint8_t openPvpSituations)
 {
     if (!canPerformGameAction())
         return;
@@ -1258,7 +1258,7 @@ void Game::inspectNpcTrade(const ItemPtr& item)
     m_protocolGame->sendInspectNpcTrade(item->getId(), item->getCount());
 }
 
-void Game::buyItem(const ItemPtr& item, int amount, bool ignoreCapacity, bool buyWithBackpack)
+void Game::buyItem(const ItemPtr& item, const uint16_t amount, const bool ignoreCapacity, const bool buyWithBackpack)
 {
     if (!canPerformGameAction() || !item)
         return;
@@ -1266,7 +1266,7 @@ void Game::buyItem(const ItemPtr& item, int amount, bool ignoreCapacity, bool bu
     m_protocolGame->sendBuyItem(item->getId(), item->getCountOrSubType(), amount, ignoreCapacity, buyWithBackpack);
 }
 
-void Game::sellItem(const ItemPtr& item, int amount, bool ignoreEquipped)
+void Game::sellItem(const ItemPtr& item, const uint16_t amount, const bool ignoreEquipped)
 {
     if (!canPerformGameAction() || !item)
         return;
@@ -1290,7 +1290,7 @@ void Game::requestTrade(const ItemPtr& item, const CreaturePtr& creature)
     m_protocolGame->sendRequestTrade(item->getPosition(), item->getId(), item->getStackPos(), creature->getId());
 }
 
-void Game::inspectTrade(bool counterOffer, int index)
+void Game::inspectTrade(const bool counterOffer, const uint8_t index)
 {
     if (!canPerformGameAction())
         return;
@@ -1314,7 +1314,7 @@ void Game::rejectTrade()
     m_protocolGame->sendRejectTrade();
 }
 
-void Game::editText(uint32_t id, const std::string_view text)
+void Game::editText(const uint32_t id, const std::string_view text)
 {
     if (!canPerformGameAction())
         return;
@@ -1322,7 +1322,7 @@ void Game::editText(uint32_t id, const std::string_view text)
     m_protocolGame->sendEditText(id, text);
 }
 
-void Game::editList(uint32_t id, int doorId, const std::string_view text)
+void Game::editList(const uint32_t id, const uint8_t doorId, const std::string_view text)
 {
     if (!canPerformGameAction())
         return;
@@ -1362,7 +1362,7 @@ void Game::reportBug(const std::string_view comment)
     m_protocolGame->sendBugReport(comment);
 }
 
-void Game::reportRuleViolation(const std::string_view target, int reason, int action, const std::string_view comment, const std::string_view statement, int statementId, bool ipBanishment)
+void Game::reportRuleViolation(const std::string_view target, const uint8_t reason, const uint8_t action, const std::string_view comment, const std::string_view statement, const uint16_t statementId, const bool ipBanishment)
 {
     if (!canPerformGameAction())
         return;
@@ -1383,7 +1383,7 @@ void Game::requestQuestLog()
     m_protocolGame->sendRequestQuestLog();
 }
 
-void Game::requestQuestLine(int questId)
+void Game::requestQuestLine(const uint16_t questId)
 {
     if (!canPerformGameAction())
         return;
@@ -1399,7 +1399,7 @@ void Game::equipItem(const ItemPtr& item)
     m_protocolGame->sendEquipItem(item->getId(), item->getCountOrSubType());
 }
 
-void Game::mount(bool mount)
+void Game::mount(const bool mount)
 {
     if (!canPerformGameAction())
         return;
@@ -1407,7 +1407,7 @@ void Game::mount(bool mount)
     m_protocolGame->sendMountStatus(mount);
 }
 
-void Game::requestItemInfo(const ItemPtr& item, int index)
+void Game::requestItemInfo(const ItemPtr& item, const uint8_t index)
 {
     if (!canPerformGameAction())
         return;
@@ -1415,7 +1415,7 @@ void Game::requestItemInfo(const ItemPtr& item, int index)
     m_protocolGame->sendRequestItemInfo(item->getId(), item->getSubType(), index);
 }
 
-void Game::answerModalDialog(uint32_t dialog, int button, int choice)
+void Game::answerModalDialog(const uint32_t dialog, const uint8_t button, const uint8_t choice)
 {
     if (!canPerformGameAction())
         return;
@@ -1431,15 +1431,15 @@ void Game::browseField(const Position& position)
     m_protocolGame->sendBrowseField(position);
 }
 
-void Game::seekInContainer(int cid, int index)
+void Game::seekInContainer(const uint8_t containerId, const uint16_t index)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendSeekInContainer(cid, index);
+    m_protocolGame->sendSeekInContainer(containerId, index);
 }
 
-void Game::buyStoreOffer(int offerId, int productType, const std::string_view name)
+void Game::buyStoreOffer(const uint32_t offerId, const uint8_t productType, const std::string_view name)
 {
     if (!canPerformGameAction())
         return;
@@ -1447,7 +1447,7 @@ void Game::buyStoreOffer(int offerId, int productType, const std::string_view na
     m_protocolGame->sendBuyStoreOffer(offerId, productType, name);
 }
 
-void Game::requestTransactionHistory(int page, int entriesPerPage)
+void Game::requestTransactionHistory(const uint16_t page, const uint32_t entriesPerPage)
 {
     if (!canPerformGameAction())
         return;
@@ -1455,14 +1455,14 @@ void Game::requestTransactionHistory(int page, int entriesPerPage)
     m_protocolGame->sendRequestTransactionHistory(page, entriesPerPage);
 }
 
-void Game::requestStoreOffers(const std::string_view categoryName, int serviceType)
+void Game::requestStoreOffers(const std::string_view categoryName, const uint8_t serviceType)
 {
-    m_denyBotCall = false;
+    enableBotCall();
     m_protocolGame->sendRequestStoreOffers(categoryName, serviceType);
     m_denyBotCall = true;
 }
 
-void Game::openStore(int serviceType, const std::string_view category)
+void Game::openStore(const uint8_t serviceType, const std::string_view category)
 {
     if (!canPerformGameAction())
         return;
@@ -1470,7 +1470,7 @@ void Game::openStore(int serviceType, const std::string_view category)
     m_protocolGame->sendOpenStore(serviceType, category);
 }
 
-void Game::transferCoins(const std::string_view recipient, int amount)
+void Game::transferCoins(const std::string_view recipient, const uint16_t amount)
 {
     if (!canPerformGameAction())
         return;
@@ -1478,7 +1478,7 @@ void Game::transferCoins(const std::string_view recipient, int amount)
     m_protocolGame->sendTransferCoins(recipient, amount);
 }
 
-void Game::openTransactionHistory(int entriesPerPage)
+void Game::openTransactionHistory(const uint8_t entriesPerPage)
 {
     if (!canPerformGameAction())
         return;
@@ -1494,14 +1494,14 @@ void Game::ping()
     if (m_pingReceived != m_pingSent)
         return;
 
-    m_denyBotCall = false;
+    enableBotCall();
     m_protocolGame->sendPing();
-    m_denyBotCall = true;
+    disableBotCall();
     ++m_pingSent;
     m_pingTimer.restart();
 }
 
-void Game::changeMapAwareRange(int xrange, int yrange)
+void Game::changeMapAwareRange(const uint8_t xrange, const uint8_t yrange)
 {
     if (!canPerformGameAction())
         return;
@@ -1534,7 +1534,7 @@ bool Game::canPerformGameAction() const
     return m_online && m_localPlayer && !m_dead && m_protocolGame && m_protocolGame->isConnected() && checkBotProtection();
 }
 
-void Game::setProtocolVersion(int version)
+void Game::setProtocolVersion(const uint16_t version)
 {
     if (m_protocolVersion == version)
         return;
@@ -1552,7 +1552,7 @@ void Game::setProtocolVersion(int version)
     g_lua.callGlobalField("g_game", "onProtocolVersionChange", version);
 }
 
-void Game::setClientVersion(int version)
+void Game::setClientVersion(const uint16_t version)
 {
     if (m_clientVersion == version)
         return;
@@ -1641,27 +1641,39 @@ void Game::leaveMarket()
     g_lua.callGlobalField("g_game", "onMarketLeave");
 }
 
-void Game::browseMarket(uint8_t browseId, uint16_t browseType)
+void Game::browseMarket(const uint8_t browseId, const uint8_t browseType)
 {
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->sendMarketBrowse(browseId, browseType);
 }
 
-void Game::createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous)
+void Game::createMarketOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
 {
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->sendMarketCreateOffer(type, itemId, itemTier, amount, price, anonymous);
 }
 
-void Game::cancelMarketOffer(uint32_t timestamp, uint16_t counter)
+void Game::cancelMarketOffer(const uint32_t timestamp, const uint16_t counter)
 {
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->sendMarketCancelOffer(timestamp, counter);
 }
 
-void Game::acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount)
+void Game::acceptMarketOffer(const uint32_t timestamp, const uint16_t counter, const uint16_t amount)
 {
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->sendMarketAcceptOffer(timestamp, counter, amount);
 }
 
-void Game::preyAction(uint8_t slot, uint8_t actionType, uint16_t index)
+void Game::preyAction(const uint8_t slot, const uint8_t actionType, const uint16_t index)
 {
     if (!canPerformGameAction())
         return;
@@ -1677,17 +1689,19 @@ void Game::preyRequest()
     m_protocolGame->sendPreyRequest();
 }
 
-void Game::applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)
+void Game::applyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendApplyImbuement(slot, imbuementId, protectionCharm);
 }
 
-void Game::clearImbuement(uint8_t slot)
+void Game::clearImbuement(const uint8_t slot)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendClearImbuement(slot);
 }
 
@@ -1695,37 +1709,41 @@ void Game::closeImbuingWindow()
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendCloseImbuingWindow();
 }
 
-void Game::stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
+void Game::imbuementDurations(const bool isOpen)
 {
     if (!canPerformGameAction())
         return;
+
+    m_protocolGame->sendImbuementDurations(isOpen);
+}
+
+void Game::stashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos)
+{
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
 }
 
-void Game::requestHighscore(uint8_t action, uint8_t category, uint32_t vocation, const std::string& world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages)
+void Game::requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendHighscoreInfo(action, category, vocation, world, worldType, battlEye, page, totalPages);
 }
 
-void Game::processHighscore(const std::string& serverName, const std::string& world, uint8_t worldType, uint8_t battlEye,
-                            const std::vector<std::tuple<uint32_t, std::string>>& vocations,
-                            const std::vector<std::tuple<uint8_t, std::string>>& categories,
-                            uint16_t page, uint16_t totalPages,
-                            const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, uint32_t entriesTs)
+void Game::processHighscore(const std::string_view serverName, const std::string_view world, const uint8_t worldType, const uint8_t battlEye,
+                            const std::vector<std::tuple<uint32_t, std::string_view>>& vocations,
+                            const std::vector<std::tuple<uint8_t, std::string_view>>& categories,
+                            const uint16_t page, const uint16_t totalPages,
+                            const std::vector<std::tuple<uint32_t, std::string_view, std::string_view, uint8_t, std::string_view, uint16_t, uint8_t, uint64_t>>& highscores, const uint32_t entriesTs)
 {
     g_lua.callGlobalField("g_game", "onProcessHighscores", serverName, world, worldType, battlEye, vocations, categories, page, totalPages, highscores, entriesTs);
-}
-
-void Game::imbuementDurations(bool isOpen)
-{
-    if (!canPerformGameAction())
-        return;
-    m_protocolGame->sendImbuementDurations(isOpen);
 }
 
 void Game::requestBless()
@@ -1736,16 +1754,16 @@ void Game::requestBless()
     m_protocolGame->sendRequestBless();
 }
 
-void Game::requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems)
+void Game::requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems)
 {
-    m_denyBotCall = false;
+    enableBotCall();
     m_protocolGame->requestQuickLootBlackWhiteList(filter, size, listedItems);
-    m_denyBotCall = true;
+    disableBotCall();
 }
 
-void Game::openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback)
+void Game::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback)
 {
-    m_denyBotCall = false;
+    enableBotCall();
     m_protocolGame->openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback);
-    m_denyBotCall = true;
+    disableBotCall();
 }
