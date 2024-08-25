@@ -32,10 +32,11 @@ void ProtocolGame::send(const OutputMessagePtr& outputMessage)
     // avoid usage of automated sends (bot modules)
     if (!g_game.checkBotProtection())
         return;
+
     Protocol::send(outputMessage);
 }
 
-void ProtocolGame::sendExtendedOpcode(uint8_t opcode, const std::string& buffer)
+void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
 {
     if (m_enableSendExtendedOpcode) {
         const auto& msg = std::make_shared<OutputMessage>();
@@ -48,7 +49,7 @@ void ProtocolGame::sendExtendedOpcode(uint8_t opcode, const std::string& buffer)
     }
 }
 
-void ProtocolGame::sendLoginPacket(uint32_t challengeTimestamp, uint8_t challengeRandom)
+void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint8_t challengeRandom)
 {
     const auto& msg = std::make_shared<OutputMessage>();
 
@@ -294,7 +295,7 @@ void ProtocolGame::sendTurnWest()
     send(msg);
 }
 
-void ProtocolGame::sendEquipItem(int itemId, int countOrSubType)
+void ProtocolGame::sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientEquipItem);
@@ -302,11 +303,11 @@ void ProtocolGame::sendEquipItem(int itemId, int countOrSubType)
     if (g_game.getFeature(Otc::GameCountU16))
         msg->addU16(countOrSubType);
     else
-        msg->addU8(countOrSubType);
+        msg->addU8(static_cast<int8_t>(countOrSubType));
     send(msg);
 }
 
-void ProtocolGame::sendMove(const Position& fromPos, int thingId, int stackpos, const Position& toPos, int count)
+void ProtocolGame::sendMove(const Position& fromPos, const uint16_t thingId, const uint8_t stackpos, const Position& toPos, const uint16_t count)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMove);
@@ -317,11 +318,11 @@ void ProtocolGame::sendMove(const Position& fromPos, int thingId, int stackpos, 
     if(g_game.getFeature(Otc::GameCountU16))
         msg->addU16(count);
     else
-        msg->addU8(count);
+        msg->addU8(static_cast<int8_t>(count));
     send(msg);
 }
 
-void ProtocolGame::sendInspectNpcTrade(int itemId, int count)
+void ProtocolGame::sendInspectNpcTrade(const uint16_t itemId, const uint16_t count)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientInspectNpcTrade);
@@ -329,11 +330,11 @@ void ProtocolGame::sendInspectNpcTrade(int itemId, int count)
     if (g_game.getFeature(Otc::GameCountU16))
         msg->addU16(count);
     else
-        msg->addU8(count);
+        msg->addU8(static_cast<int8_t>(count));
     send(msg);
 }
 
-void ProtocolGame::sendBuyItem(int itemId, int subType, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack)
+void ProtocolGame::sendBuyItem(const uint16_t itemId, const uint8_t subType, const uint16_t amount, const bool ignoreCapacity, const bool buyWithBackpack)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBuyItem);
@@ -342,13 +343,13 @@ void ProtocolGame::sendBuyItem(int itemId, int subType, uint16_t amount, bool ig
     if (g_game.getFeature(Otc::GameDoubleShopSellAmount))
         msg->addU16(amount);
     else
-        msg->addU8(amount);
-    msg->addU8(ignoreCapacity ? 0x01 : 0x00);
-    msg->addU8(buyWithBackpack ? 0x01 : 0x00);
+        msg->addU8(static_cast<int8_t>(amount));
+    msg->addU8(static_cast<int8_t>(ignoreCapacity));
+    msg->addU8(static_cast<int8_t>(buyWithBackpack));
     send(msg);
 }
 
-void ProtocolGame::sendSellItem(int itemId, int subType, uint16_t amount, bool ignoreEquipped)
+void ProtocolGame::sendSellItem(const uint16_t itemId, const uint8_t subType, const uint16_t amount, const bool ignoreEquipped)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientSellItem);
@@ -358,7 +359,7 @@ void ProtocolGame::sendSellItem(int itemId, int subType, uint16_t amount, bool i
         msg->addU16(amount);
     else
         msg->addU8(static_cast<int8_t>(amount));
-    msg->addU8(ignoreEquipped ? 0x01 : 0x00);
+    msg->addU8(static_cast<int8_t>(ignoreEquipped));
     send(msg);
 }
 
@@ -369,7 +370,7 @@ void ProtocolGame::sendCloseNpcTrade()
     send(msg);
 }
 
-void ProtocolGame::sendRequestTrade(const Position& pos, int thingId, int stackpos, uint32_t creatureId)
+void ProtocolGame::sendRequestTrade(const Position& pos, const uint16_t thingId, const uint8_t stackpos, const uint32_t creatureId)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestTrade);
@@ -384,7 +385,7 @@ void ProtocolGame::sendInspectTrade(const bool counterOffer, const uint8_t index
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientInspectTrade);
-    msg->addU8(counterOffer ? 0x01 : 0x00);
+    msg->addU8(static_cast<int8_t>(counterOffer));
     msg->addU8(index);
     send(msg);
 }
@@ -403,7 +404,7 @@ void ProtocolGame::sendRejectTrade()
     send(msg);
 }
 
-void ProtocolGame::sendUseItem(const Position& position, int itemId, int stackpos, int index)
+void ProtocolGame::sendUseItem(const Position& position, const uint16_t itemId, const uint8_t stackpos, const uint8_t index)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientUseItem);
@@ -414,7 +415,7 @@ void ProtocolGame::sendUseItem(const Position& position, int itemId, int stackpo
     send(msg);
 }
 
-void ProtocolGame::sendUseItemWith(const Position& fromPos, int itemId, int fromStackPos, const Position& toPos, int toThingId, int toStackPos)
+void ProtocolGame::sendUseItemWith(const Position& fromPos, const uint16_t itemId, const uint8_t fromStackPos, const Position& toPos, const uint16_t toThingId, const uint8_t toStackPos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientUseItemWith);
@@ -427,7 +428,7 @@ void ProtocolGame::sendUseItemWith(const Position& fromPos, int itemId, int from
     send(msg);
 }
 
-void ProtocolGame::sendUseOnCreature(const Position& pos, int thingId, int stackpos, uint32_t creatureId)
+void ProtocolGame::sendUseOnCreature(const Position& pos, const uint16_t thingId, const uint8_t stackpos, const uint32_t creatureId)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientUseOnCreature);
@@ -438,7 +439,7 @@ void ProtocolGame::sendUseOnCreature(const Position& pos, int thingId, int stack
     send(msg);
 }
 
-void ProtocolGame::sendRotateItem(const Position& pos, int thingId, int stackpos)
+void ProtocolGame::sendRotateItem(const Position& pos, const uint16_t thingId, const uint8_t stackpos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRotateItem);
@@ -448,7 +449,7 @@ void ProtocolGame::sendRotateItem(const Position& pos, int thingId, int stackpos
     send(msg);
 }
 
-void ProtocolGame::sendOnWrapItem(const Position& pos, int thingId, int stackpos)
+void ProtocolGame::sendOnWrapItem(const Position& pos, const uint16_t thingId, const uint8_t stackpos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientOnWrapItem);
@@ -458,7 +459,7 @@ void ProtocolGame::sendOnWrapItem(const Position& pos, int thingId, int stackpos
     send(msg);
 }
 
-void ProtocolGame::sendCloseContainer(int containerId)
+void ProtocolGame::sendCloseContainer(const uint8_t containerId)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientCloseContainer);
@@ -466,7 +467,7 @@ void ProtocolGame::sendCloseContainer(int containerId)
     send(msg);
 }
 
-void ProtocolGame::sendUpContainer(int containerId)
+void ProtocolGame::sendUpContainer(const uint8_t containerId)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientUpContainer);
@@ -493,7 +494,7 @@ void ProtocolGame::sendEditList(const uint32_t id, const uint8_t doorId, const s
     send(msg);
 }
 
-void ProtocolGame::sendLook(const Position& position, int itemId, int stackpos)
+void ProtocolGame::sendLook(const Position& position, const uint16_t itemId, const uint8_t stackpos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientLook);
@@ -503,7 +504,7 @@ void ProtocolGame::sendLook(const Position& position, int itemId, int stackpos)
     send(msg);
 }
 
-void ProtocolGame::sendLookCreature(uint32_t creatureId)
+void ProtocolGame::sendLookCreature(const uint32_t creatureId)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientLookCreature);
@@ -606,19 +607,19 @@ void ProtocolGame::sendCloseNpcChannel()
     send(msg);
 }
 
-void ProtocolGame::sendChangeFightModes(Otc::FightModes fightMode, Otc::ChaseModes chaseMode, bool safeFight, Otc::PVPModes pvpMode)
+void ProtocolGame::sendChangeFightModes(const Otc::FightModes fightMode, const Otc::ChaseModes chaseMode, const bool safeFight, const Otc::PVPModes pvpMode)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientChangeFightModes);
     msg->addU8(fightMode);
     msg->addU8(chaseMode);
-    msg->addU8(safeFight ? 0x01 : 0x00);
+    msg->addU8(static_cast<int8_t>(safeFight));
     if (g_game.getFeature(Otc::GamePVPMode))
         msg->addU8(pvpMode);
     send(msg);
 }
 
-void ProtocolGame::sendAttack(uint32_t creatureId, uint32_t seq)
+void ProtocolGame::sendAttack(const uint32_t creatureId, const uint32_t seq)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientAttack);
@@ -628,7 +629,7 @@ void ProtocolGame::sendAttack(uint32_t creatureId, uint32_t seq)
     send(msg);
 }
 
-void ProtocolGame::sendFollow(uint32_t creatureId, uint32_t seq)
+void ProtocolGame::sendFollow(const uint32_t creatureId, const uint32_t seq)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientFollow);
@@ -681,7 +682,7 @@ void ProtocolGame::sendShareExperience(const bool active)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientShareExperience);
-    msg->addU8(active ? 0x01 : 0x00);
+    msg->addU8(static_cast<int8_t>(active));
     if (g_game.getClientVersion() < 910)
         msg->addU8(0);
     send(msg);
@@ -717,7 +718,7 @@ void ProtocolGame::sendCancelAttackAndFollow()
     send(msg);
 }
 
-void ProtocolGame::sendRefreshContainer(int containerId)
+void ProtocolGame::sendRefreshContainer(const uint8_t containerId)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRefreshContainer);
@@ -739,11 +740,11 @@ void ProtocolGame::sendRequestOutfit()
     send(msg);
 }
 
-void ProtocolGame::sendTyping(bool typing)
+void ProtocolGame::sendTyping(const bool typing)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::GameServerCreatureTyping);
-    msg->addU8(typing);
+    msg->addU8(static_cast<int8_t>(typing));
     send(msg);
 }
 
@@ -793,12 +794,12 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
     send(msg);
 }
 
-void ProtocolGame::sendMountStatus(bool mount)
+void ProtocolGame::sendMountStatus(const bool mount)
 {
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         const auto& msg = std::make_shared<OutputMessage>();
         msg->addU8(Proto::ClientMount);
-        msg->addU8(mount);
+        msg->addU8(static_cast<int8_t>(mount));
         send(msg);
     } else {
         g_logger.error("ProtocolGame::sendMountStatus does not support the current protocol.");
@@ -828,7 +829,7 @@ void ProtocolGame::sendEditVip(const uint32_t playerId, const std::string_view d
     msg->addU32(playerId);
     msg->addString(description);
     msg->addU32(iconId);
-    msg->addU8(notifyLogin);
+    msg->addU8(static_cast<int8_t>(notifyLogin));
     send(msg);
 }
 
@@ -853,7 +854,7 @@ void ProtocolGame::sendRuleViolation(const std::string_view target, const uint8_
     msg->addString(comment);
     msg->addString(statement);
     msg->addU16(statementId);
-    msg->addU8(ipBanishment);
+    msg->addU8(static_cast<int8_t>(ipBanishment));
     send(msg);
 }
 
@@ -883,7 +884,7 @@ void ProtocolGame::sendRequestQuestLine(const uint16_t questId)
     send(msg);
 }
 
-void ProtocolGame::sendNewNewRuleViolation(int reason, int action, const std::string_view characterName, const std::string_view comment, const std::string_view translation)
+void ProtocolGame::sendNewNewRuleViolation(const uint8_t reason, const uint8_t action, const std::string_view characterName, const std::string_view comment, const std::string_view translation)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientNewRuleViolation);
@@ -1054,7 +1055,7 @@ void ProtocolGame::sendMarketBrowse(const uint8_t browseId, const uint16_t brows
     send(msg);
 }
 
-void ProtocolGame::sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous)
+void ProtocolGame::sendMarketCreateOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketCreate);
@@ -1071,7 +1072,7 @@ void ProtocolGame::sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t 
     send(msg);
 }
 
-void ProtocolGame::sendMarketCancelOffer(uint32_t timestamp, uint16_t counter)
+void ProtocolGame::sendMarketCancelOffer(const uint32_t timestamp, const uint16_t counter)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketCancel);
@@ -1080,7 +1081,7 @@ void ProtocolGame::sendMarketCancelOffer(uint32_t timestamp, uint16_t counter)
     send(msg);
 }
 
-void ProtocolGame::sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount)
+void ProtocolGame::sendMarketAcceptOffer(const uint32_t timestamp, const uint16_t counter, const uint16_t amount)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientMarketAccept);
@@ -1090,7 +1091,7 @@ void ProtocolGame::sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, u
     send(msg);
 }
 
-void ProtocolGame::sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index)
+void ProtocolGame::sendPreyAction(const uint8_t slot, const uint8_t actionType, const uint16_t index)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientPreyAction);
@@ -1111,17 +1112,17 @@ void ProtocolGame::sendPreyRequest()
     send(msg);
 }
 
-void ProtocolGame::sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm)
+void ProtocolGame::sendApplyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientApplyImbuement);
     msg->addU8(slot);
     msg->addU32(imbuementId);
-    msg->addU8(protectionCharm ? 1 : 0);
+    msg->addU8(static_cast<int8_t>(protectionCharm));
     send(msg);
 }
 
-void ProtocolGame::sendClearImbuement(uint8_t slot)
+void ProtocolGame::sendClearImbuement(const uint8_t slot)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientClearImbuement);
@@ -1136,7 +1137,7 @@ void ProtocolGame::sendCloseImbuingWindow()
     send(msg);
 }
 
-void ProtocolGame::sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos)
+void ProtocolGame::sendStashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientUseStash);
@@ -1166,25 +1167,24 @@ void ProtocolGame::sendImbuementDurations(bool isOpen)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientImbuementDurations);
-    msg->addU8(isOpen ? 0x01 : 0x00);
+    msg->addU8(static_cast<int8_t>(isOpen));
     send(msg);
 }
 
-void ProtocolGame::requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems)
+void ProtocolGame::requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems)
 {
     auto msg = std::make_shared<OutputMessage>();
     msg->addU8(0x91);
     msg->addU8(filter);
-
     msg->addU16(size);
 
-    for (uint16_t item : listedItems) {
+    for (const uint16_t item : listedItems) {
         msg->addU16(item);
     }
     send(msg);
 }
 
-void ProtocolGame::openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback)
+void ProtocolGame::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback)
 {
     auto msg = std::make_shared<OutputMessage>();
     msg->addU8(0x90);

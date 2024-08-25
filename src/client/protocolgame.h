@@ -33,8 +33,8 @@ public:
     void login(const std::string_view accountName, const std::string_view accountPassword, const std::string_view host, uint16_t port, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey);
     void send(const OutputMessagePtr& outputMessage) override;
 
-    void sendExtendedOpcode(uint8_t opcode, const std::string& buffer);
-    void sendLoginPacket(uint32_t challengeTimestamp, uint8_t challengeRandom);
+    void sendExtendedOpcode(const uint8_t opcode, const std::string& buffer);
+    void sendLoginPacket(const uint32_t challengeTimestamp, const uint8_t challengeRandom);
     void sendEnterGame();
     void sendLogout();
     void sendPing();
@@ -53,27 +53,27 @@ public:
     void sendTurnEast();
     void sendTurnSouth();
     void sendTurnWest();
-    void sendEquipItem(int itemId, int countOrSubType);
-    void sendMove(const Position& fromPos, int thingId, int stackpos, const Position& toPos, int count);
-    void sendInspectNpcTrade(int itemId, int count);
-    void sendBuyItem(int itemId, int subType, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack);
-    void sendSellItem(int itemId, int subType, uint16_t amount, bool ignoreEquipped);
+    void sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType);
+    void sendMove(const Position& fromPos, const uint16_t thingId, const uint8_t stackpos, const Position& toPos, const uint16_t count);
+    void sendInspectNpcTrade(const uint16_t itemId, const uint16_t count);
+    void sendBuyItem(const uint16_t itemId, const uint8_t subType, const uint16_t amount, const bool ignoreCapacity, const bool buyWithBackpack);
+    void sendSellItem(const uint16_t itemId, const uint8_t subType, const uint16_t amount, const bool ignoreEquipped);
     void sendCloseNpcTrade();
-    void sendRequestTrade(const Position& pos, int thingId, int stackpos, uint32_t creatureId);
+    void sendRequestTrade(const Position& pos, const uint16_t thingId, const uint8_t stackpos, const uint32_t creatureId);
     void sendInspectTrade(const bool counterOffer, const uint8_t index);
     void sendAcceptTrade();
     void sendRejectTrade();
-    void sendUseItem(const Position& position, int itemId, int stackpos, int index);
-    void sendUseItemWith(const Position& fromPos, int itemId, int fromStackPos, const Position& toPos, int toThingId, int toStackPos);
-    void sendUseOnCreature(const Position& pos, int thingId, int stackpos, uint32_t creatureId);
-    void sendRotateItem(const Position& pos, int thingId, int stackpos);
-    void sendOnWrapItem(const Position& pos, int thingId, int stackpos);
-    void sendCloseContainer(int containerId);
-    void sendUpContainer(int containerId);
+    void sendUseItem(const Position& position, const uint16_t itemId, const uint8_t stackpos, const uint8_t index);
+    void sendUseItemWith(const Position& fromPos, const uint16_t itemId, const uint8_t fromStackPos, const Position& toPos, const uint16_t toThingId, const uint8_t toStackPos);
+    void sendUseOnCreature(const Position& pos, const uint16_t thingId, const uint8_t stackpos, const uint32_t creatureId);
+    void sendRotateItem(const Position& pos, const uint16_t thingId, const uint8_t stackpos);
+    void sendOnWrapItem(const Position& pos, const uint16_t thingId, const uint8_t stackpos);
+    void sendCloseContainer(const uint8_t containerId);
+    void sendUpContainer(const uint8_t containerId);
     void sendEditText(const uint32_t id, const std::string_view text);
     void sendEditList(const uint32_t id, const uint8_t doorId, const std::string_view text);
-    void sendLook(const Position& position, int itemId, int stackpos);
-    void sendLookCreature(uint32_t creatureId);
+    void sendLook(const Position& position, const uint16_t itemId, const uint8_t stackpos);
+    void sendLookCreature(const uint32_t creatureId);
     void sendTalk(const Otc::MessageMode mode, const uint16_t channelId, const std::string_view receiver, const std::string_view message);
     void sendRequestChannels();
     void sendJoinChannel(const uint16_t channelId);
@@ -83,9 +83,9 @@ public:
     void sendCloseRuleViolation(const std::string_view reporter);
     void sendCancelRuleViolation();
     void sendCloseNpcChannel();
-    void sendChangeFightModes(Otc::FightModes fightMode, Otc::ChaseModes chaseMode, bool safeFight, Otc::PVPModes pvpMode);
-    void sendAttack(uint32_t creatureId, uint32_t seq);
-    void sendFollow(uint32_t creatureId, uint32_t seq);
+    void sendChangeFightModes(const Otc::FightModes fightMode, const Otc::ChaseModes chaseMode, const bool safeFight, const Otc::PVPModes pvpMode);
+    void sendAttack(const uint32_t creatureId, const uint32_t seq);
+    void sendFollow(const uint32_t creatureId, const uint32_t seq);
     void sendInviteToParty(const uint32_t creatureId);
     void sendJoinParty(const uint32_t creatureId);
     void sendRevokeInvitation(const uint32_t creatureId);
@@ -96,12 +96,12 @@ public:
     void sendInviteToOwnChannel(const std::string_view name);
     void sendExcludeFromOwnChannel(const std::string_view name);
     void sendCancelAttackAndFollow();
-    void sendRefreshContainer(int containerId);
+    void sendRefreshContainer(const uint8_t containerId);
     void sendRequestBless();
     void sendRequestOutfit();
+    void sendTyping(const bool typing);
     void sendChangeOutfit(const Outfit& outfit);
-    void sendTyping(bool typing);
-    void sendMountStatus(bool mount);
+    void sendMountStatus(const bool mount);
     void sendAddVip(const std::string_view name);
     void sendRemoveVip(const uint32_t playerId);
     void sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin);
@@ -110,7 +110,7 @@ public:
     void sendDebugReport(const std::string_view a, const std::string_view b, const std::string_view c, const std::string_view d);
     void sendRequestQuestLog();
     void sendRequestQuestLine(const uint16_t questId);
-    void sendNewNewRuleViolation(int reason, int action, const std::string_view characterName, const std::string_view comment, const std::string_view translation);
+    void sendNewNewRuleViolation(const uint8_t reason, const uint8_t action, const std::string_view characterName, const std::string_view comment, const std::string_view translation);
     void sendRequestItemInfo(const uint16_t itemId, const uint8_t subType, const uint8_t index);
     void sendAnswerModalDialog(const uint32_t dialog, const uint8_t button, const uint8_t choice);
     void sendBrowseField(const Position& position);
@@ -123,19 +123,19 @@ public:
     void sendOpenTransactionHistory(const uint8_t entriesPerPage);
     void sendMarketLeave();
     void sendMarketBrowse(const uint8_t browseId, const uint16_t browseType);
-    void sendMarketCreateOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
-    void sendMarketCancelOffer(uint32_t timestamp, uint16_t counter);
-    void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
-    void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
+    void sendMarketCreateOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous);
+    void sendMarketCancelOffer(const uint32_t timestamp, const uint16_t counter);
+    void sendMarketAcceptOffer(const uint32_t timestamp, const uint16_t counter, const uint16_t amount);
+    void sendPreyAction(const uint8_t slot, const uint8_t actionType, const uint16_t index);
     void sendPreyRequest();
-    void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
-    void sendClearImbuement(uint8_t slot);
+    void sendApplyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm);
+    void sendClearImbuement(const uint8_t slot);
     void sendCloseImbuingWindow();
-    void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
+    void sendStashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos);
     void sendHighscoreInfo(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
-    void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
-    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
+    void requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems);
+    void openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback);
 
     // otclient only
     void sendChangeMapAwareRange(const uint8_t xrange, const uint8_t yrange);
@@ -319,7 +319,7 @@ private:
     void parseCreatureShader(const InputMessagePtr& msg);
     void parseMapShader(const InputMessagePtr& msg);
 
-    MarketOffer readMarketOffer(const InputMessagePtr& msg, uint8_t action, uint16_t var);
+    MarketOffer readMarketOffer(const InputMessagePtr& msg, const uint8_t action, const uint16_t var);
 
     Imbuement getImbuementInfo(const InputMessagePtr& msg);
     PreyMonster getPreyMonster(const InputMessagePtr& msg) const;
@@ -330,7 +330,7 @@ public:
     int setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip);
     int setTileDescription(const InputMessagePtr& msg, Position position);
 
-    Outfit getOutfit(const InputMessagePtr& msg, bool parseMount = true) const;
+    Outfit getOutfit(const InputMessagePtr& msg, const bool parseMount = true) const;
     ThingPtr getThing(const InputMessagePtr& msg);
     ThingPtr getMappedThing(const InputMessagePtr& msg) const;
     CreaturePtr getCreature(const InputMessagePtr& msg, int type = 0) const;
