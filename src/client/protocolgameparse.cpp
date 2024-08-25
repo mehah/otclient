@@ -1380,11 +1380,6 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
         msg->getU8();
     }
 
-    if (g_game.getClientVersion() >= 1340) {
-        msg->getU8();
-        msg->getU8();
-    }
-
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
 }
 
