@@ -142,9 +142,10 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, bool smooth)
             std::unique_lock l(m_mutex);
             m_textures[filePath] = texture;
         }
+
+        texture->m_lastTimeUsage.restart();
     }
 
-    texture->m_lastTimeUsage.restart();
     return texture;
 }
 
