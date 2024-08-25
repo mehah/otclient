@@ -332,7 +332,7 @@ void Game::processInventoryChange(const uint8_t slot, const ItemPtr& item)
     m_localPlayer->setInventoryItem(static_cast<Otc::InventorySlot>(slot), item);
 }
 
-void Game::processChannelList(const std::vector<std::tuple<uint16_t, std::string_view>>& channelList)
+void Game::processChannelList(const std::vector<std::tuple<uint16_t, std::string>>& channelList)
 {
     g_lua.callGlobalField("g_game", "onChannelList", channelList);
 }
@@ -404,12 +404,12 @@ void Game::processRemoveAutomapFlag(const Position& pos, const uint8_t icon, con
     g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
 }
 
-void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string_view, uint8_t>>& outfitList,
-                                   const std::vector<std::tuple<uint16_t, std::string_view>>& mountList,
-                                   const std::vector<std::tuple<uint16_t, std::string_view>>& wingsList,
-                                   const std::vector<std::tuple<uint16_t, std::string_view>>& aurasList,
-                                   const std::vector<std::tuple<uint16_t, std::string_view>>& effectList,
-                                   const std::vector<std::tuple<uint16_t, std::string_view>>& shaderList)
+void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& mountList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& effectList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& shaderList)
 {
     // create virtual creature outfit
     const auto& virtualOutfitCreature = std::make_shared<Creature>();
@@ -433,7 +433,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
     g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, wingsList, aurasList, effectList, shaderList);
 }
 
-void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string_view, uint32_t, uint32_t, uint32_t>>& items)
+void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items)
 {
     g_lua.callGlobalField("g_game", "onOpenNpcTrade", items);
 }
@@ -473,18 +473,18 @@ void Game::processEditList(const uint32_t id, const uint8_t doorId, const std::s
     g_lua.callGlobalField("g_game", "onEditList", id, doorId, text);
 }
 
-void Game::processQuestLog(const std::vector<std::tuple<uint16_t, std::string_view, bool>>& questList)
+void Game::processQuestLog(const std::vector<std::tuple<uint16_t, std::string, bool>>& questList)
 {
     g_lua.callGlobalField("g_game", "onQuestLog", questList);
 }
 
-void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view>>& questMissions)
+void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string, std::string>>& questMissions)
 {
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
 
-void Game::processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string_view>>
-                                & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string_view>>
+void Game::processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string>>
+                                & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string>>
                                 & choiceList, const bool priority)
 {
     g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
@@ -1738,10 +1738,10 @@ void Game::requestHighscore(const uint8_t action, const uint8_t category, const 
 }
 
 void Game::processHighscore(const std::string_view serverName, const std::string_view world, const uint8_t worldType, const uint8_t battlEye,
-                            const std::vector<std::tuple<uint32_t, std::string_view>>& vocations,
-                            const std::vector<std::tuple<uint8_t, std::string_view>>& categories,
+                            const std::vector<std::tuple<uint32_t, std::string>>& vocations,
+                            const std::vector<std::tuple<uint8_t, std::string>>& categories,
                             const uint16_t page, const uint16_t totalPages,
-                            const std::vector<std::tuple<uint32_t, std::string_view, std::string_view, uint8_t, std::string_view, uint16_t, uint8_t, uint64_t>>& highscores, const uint32_t entriesTs)
+                            const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, const uint32_t entriesTs)
 {
     g_lua.callGlobalField("g_game", "onProcessHighscores", serverName, world, worldType, battlEye, vocations, categories, page, totalPages, highscores, entriesTs);
 }

@@ -64,7 +64,7 @@ struct LogData
 {
     uint32_t timestamp;
     uint8_t colorMessage;
-    std::string_view historyMessage;
+    std::string historyMessage;
 };
 
 struct BlessDialogData
@@ -87,11 +87,11 @@ using Vip = std::tuple<std::string, uint32_t, std::string, int, bool>;
 
 struct StoreCategory
 {
-    std::string_view name;
+    std::string name;
     std::vector<StoreCategory> subCategories;
     uint8_t state;
-    std::vector<std::string_view> icons;
-    std::string_view parent;
+    std::vector<std::string> icons;
+    std::string parent;
 };
 
 struct SubOffer
@@ -109,12 +109,12 @@ struct SubOffer
 
 struct StoreOffer
 {
-    std::string_view name;
+    std::string name;
     std::vector<SubOffer> subOffers;
     uint32_t ofertaid;
-    std::string_view description;
+    std::string description;
     uint8_t type;
-    std::string_view icon;
+    std::string icon;
     uint16_t mountId;
     uint16_t itemId;
     uint16_t outfitId;
@@ -131,7 +131,7 @@ struct StoreOffer
 
 struct HomeOffer
 {
-    std::string_view name;
+    std::string name;
     uint8_t unknownByte;
     uint32_t id;
     uint16_t unknownU16;
@@ -140,7 +140,7 @@ struct HomeOffer
     uint16_t disabledReasonIndex;
     uint8_t unknownByte2;
     uint8_t type;
-    std::string_view icon;
+    std::string icon;
     uint16_t mountClientId;
     uint16_t itemType;
     uint16_t sexId;
@@ -155,7 +155,7 @@ struct HomeOffer
 
 struct Banner
 {
-    std::string_view image;
+    std::string image;
     uint8_t bannerType;
     uint32_t offerId;
     uint8_t unknownByte1, unknownByte2;
@@ -163,9 +163,9 @@ struct Banner
 
 struct StoreData
 {
-    std::string_view categoryName;
+    std::string categoryName;
     uint32_t redirectId;
-    std::vector<std::string_view> disableReasons;
+    std::vector<std::string> disableReasons;
     std::vector<HomeOffer> homeOffers;
     std::vector<StoreOffer> storeOffers;
     std::vector<Banner> banners;
@@ -222,7 +222,7 @@ protected:
     void processContainerRemoveItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& lastItem);
 
     // channel related
-    static void processChannelList(const std::vector<std::tuple<uint16_t, std::string_view>>& channelList);
+    static void processChannelList(const std::vector<std::tuple<uint16_t, std::string>>& channelList);
     static void processOpenChannel(const uint16_t channelId, const std::string_view name);
     static void processOpenPrivateChannel(const std::string_view name);
     static void processOpenOwnPrivateChannel(const uint16_t channelId, const std::string_view name);
@@ -244,15 +244,15 @@ protected:
     static void processRemoveAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message);
 
     // outfit
-    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string_view, uint8_t>>& outfitList,
-                                const std::vector<std::tuple<uint16_t, std::string_view>>& mountList,
-                                const std::vector<std::tuple<uint16_t, std::string_view>>& wingsList,
-                                const std::vector<std::tuple<uint16_t, std::string_view>>& aurasList,
-                                const std::vector<std::tuple<uint16_t, std::string_view>>& effectsList,
-                                const std::vector<std::tuple<uint16_t, std::string_view>>& shaderList);
+    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
+                                const std::vector<std::tuple<uint16_t, std::string>>& mountList,
+                                const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
+                                const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
+                                const std::vector<std::tuple<uint16_t, std::string>>& effectsList,
+                                const std::vector<std::tuple<uint16_t, std::string>>& shaderList);
 
     // npc trade
-    static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string_view, uint32_t, uint32_t, uint32_t>>& items);
+    static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items);
     static void processPlayerGoods(const uint64_t money, const std::vector<std::tuple<ItemPtr, uint16_t>>& goods);
     static void processCloseNpcTrade();
 
@@ -266,12 +266,12 @@ protected:
     static void processEditList(const uint32_t id, const uint8_t doorId, const std::string_view text);
 
     // questlog
-    static void processQuestLog(const std::vector<std::tuple<uint16_t, std::string_view, bool>>& questList);
-    static void processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view>>& questMissions);
+    static void processQuestLog(const std::vector<std::tuple<uint16_t, std::string, bool>>& questList);
+    static void processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string, std::string>>& questMissions);
 
     // modal dialogs >= 970
-    static void processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string_view>>
-                                   & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string_view>>
+    static void processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string>>
+                                   & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string>>
                                    & choiceList, const bool priority);
 
     friend class ProtocolGame;
@@ -508,10 +508,10 @@ public:
     // highscore related
     void requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
     void processHighscore(const std::string_view serverName, const std::string_view world, const uint8_t worldType, const uint8_t battlEye,
-                            const std::vector<std::tuple<uint32_t, std::string_view>>& vocations,
-                            const std::vector<std::tuple<uint8_t, std::string_view>>& categories,
+                            const std::vector<std::tuple<uint32_t, std::string>>& vocations,
+                            const std::vector<std::tuple<uint8_t, std::string>>& categories,
                             const uint16_t page, const uint16_t totalPages,
-                            const std::vector<std::tuple<uint32_t, std::string_view, std::string_view, uint8_t, std::string_view, uint16_t, uint8_t, uint64_t>>& highscores, const uint32_t entriesTs);
+                            const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, const uint32_t entriesTs);
 
     void requestBless();
     void requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems);
