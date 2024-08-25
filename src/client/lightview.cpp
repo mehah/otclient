@@ -30,6 +30,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 
 LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
+    m_pool->agroup(true);
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
