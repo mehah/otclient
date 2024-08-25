@@ -159,7 +159,12 @@ public:
         return m_hashCtrl;
     }
 
-    void resetBuffer() { m_lastCoordBufferSize = 64; }
+    void resetBuffer() {
+        for (auto& buffer : m_coordsCache) {
+            buffer.coords.clear();
+            buffer.last = 0;
+        }
+    }
 
 protected:
 
@@ -200,7 +205,7 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state, const size_t coordSize) : coords(std::make_unique<CoordsBuffer>(coordSize)), state(std::move(state)) {}
+        DrawObject(PoolState&& state, const std::shared_ptr<CoordsBuffer>& coords) : coords(coords), state(std::move(state)) {}
         DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
             state(std::move(state)), drawMode(drawMode) {
             methods.reserve(10);
@@ -215,7 +220,7 @@ protected:
 
         std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
-        std::unique_ptr<CoordsBuffer> coords;
+        std::shared_ptr<CoordsBuffer> coords;
 
         PoolState state;
         DrawMode drawMode{ DrawMode::TRIANGLES };
@@ -284,6 +289,8 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
 
+    std::shared_ptr<CoordsBuffer> getCoordsBuffer();
+
     template<typename T>
     void setParameter(std::string_view name, T&& value) {
         m_parameters.emplace(name, value);
@@ -326,8 +333,10 @@ private:
                 objs.clear();
             }
         }
-
         m_objectsFlushed.clear();
+
+        std::swap(m_coordsCache[0].coords, m_coordsCache[1].coords);
+        m_coordsCache[1].last = m_coordsCache[0].last;
     }
 
     void resetOnlyOnceParameters() {
@@ -386,13 +395,17 @@ private:
     std::vector<DrawObject> m_objectsFlushed;
     std::vector<DrawObject> m_objectsDraw;
 
+    struct
+    {
+        std::vector<std::shared_ptr<CoordsBuffer>> coords;
+        uint_fast32_t last{ 0 };
+    } m_coordsCache[2];
+
     stdext::map<size_t, CoordsBuffer*> m_coords;
     stdext::map<std::string_view, std::any> m_parameters;
 
     float m_scaleFactor{ 1.f };
     float m_scale{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
-
-    size_t m_lastCoordBufferSize{ 64 };
 
     FrameBufferPtr m_framebuffer;
 
