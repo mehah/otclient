@@ -1375,6 +1375,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
             msg->getU8(); // categories size
         }
     }
+
     if (g_game.getClientVersion() >= 1340) {
         msg->getU8();
         msg->getU8();
