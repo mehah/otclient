@@ -3,10 +3,6 @@ local worldTypeRadioGroup = nil
 local currentPage = 0
 local countPages = 0
 
-local entriesPerPage = 20 -- ????
-local categoryId = 0 -- ????
-local vocationId = 4294967295.0 -- ????
-
 local vocationArray = {}
 local Category = {}
 
