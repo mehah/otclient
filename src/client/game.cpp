@@ -1447,7 +1447,7 @@ void Game::buyStoreOffer(const uint32_t offerId, const uint8_t productType, cons
     m_protocolGame->sendBuyStoreOffer(offerId, productType, name);
 }
 
-void Game::requestTransactionHistory(const uint16_t page, const uint32_t entriesPerPage)
+void Game::requestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage)
 {
     if (!canPerformGameAction())
         return;

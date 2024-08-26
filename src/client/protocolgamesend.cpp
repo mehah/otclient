@@ -760,7 +760,7 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
     if (g_game.getFeature(Otc::GameLooktypeU16))
         msg->addU16(outfit.getId());
     else
-        msg->addU8(outfit.getId());
+        msg->addU8(static_cast<uint8_t>(outfit.getId()));
 
     msg->addU8(outfit.getHead());
     msg->addU8(outfit.getBody());
@@ -955,16 +955,16 @@ void ProtocolGame::sendBuyStoreOffer(const uint32_t offerId, const uint8_t produ
     send(msg);
 }
 
-void ProtocolGame::sendRequestTransactionHistory(const uint16_t page, const uint32_t entriesPerPage)
+void ProtocolGame::sendRequestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestTransactionHistory);
     if (g_game.getClientVersion() <= 1096) {
-        msg->addU16(page);
+        msg->addU16(static_cast<uint16_t>(page));
         msg->addU32(entriesPerPage);
     } else {
         msg->addU32(page);
-        msg->addU8(entriesPerPage);
+        msg->addU8(static_cast<uint8_t>(entriesPerPage));
     }
 
     send(msg);
@@ -1098,7 +1098,7 @@ void ProtocolGame::sendPreyAction(const uint8_t slot, const uint8_t actionType, 
     msg->addU8(slot);
     msg->addU8(actionType);
     if (actionType == 2 || actionType == 5) {
-        msg->addU8(index);
+        msg->addU8(static_cast<uint8_t>(index));
     } else if (actionType == 4) {
         msg->addU16(index); // raceid
         send(msg);

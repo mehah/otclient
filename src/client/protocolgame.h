@@ -116,7 +116,7 @@ public:
     void sendBrowseField(const Position& position);
     void sendSeekInContainer(const uint8_t containerId, const uint16_t index);
     void sendBuyStoreOffer(const uint32_t offerId, const uint8_t productType, const std::string_view name);
-    void sendRequestTransactionHistory(const uint16_t page, const uint32_t entriesPerPage);
+    void sendRequestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage);
     void sendRequestStoreOffers(const std::string_view categoryName, const uint8_t serviceType);
     void sendOpenStore(const uint8_t serviceType, const std::string_view category);
     void sendTransferCoins(const std::string_view recipient, const uint16_t amount);
