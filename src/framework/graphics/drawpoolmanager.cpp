@@ -184,7 +184,9 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     pool->release(pool->m_repaint = alwaysDraw || pool->canRepaint());
 
-    pool->m_refreshTimer.restart();
+    if (pool->m_repaint) {
+        pool->m_refreshTimer.restart();
+    }
 
     resetSelectedPool();
 }
