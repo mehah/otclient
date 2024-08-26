@@ -177,14 +177,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (f) f();
 
-    resetSelectedPool();
-
-    if (!alwaysDraw)
-        pool->m_hashCtrl.update();
-
     std::scoped_lock l(pool->m_mutexDraw);
-
-    pool->setEnable(true);
 
     if (pool->hasFrameBuffer())
         pool->m_framebuffer->prepare(dest, src, colorClear);
@@ -194,44 +187,39 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (pool->m_repaint) {
         pool->m_refreshTimer.restart();
     }
+
+    resetSelectedPool();
 }
 
-bool DrawPoolManager::drawPool(const DrawPoolType type) {
-    auto pool = get(type);
-    std::scoped_lock l(pool->m_mutexDraw);
-    return drawPool(pool);
-}
+void DrawPoolManager::drawPool(const DrawPoolType type) {
+    const auto pool = get(type);
 
-bool DrawPoolManager::drawPool(DrawPool* pool) {
     if (!pool->isEnabled())
-        return false;
+        return;
 
-    if (!pool->hasFrameBuffer()) {
+    std::scoped_lock l(pool->m_mutexDraw);
+    if (pool->hasFrameBuffer()) {
+        if (pool->m_repaint) {
+            pool->m_repaint.store(false);
+            pool->m_framebuffer->bind();
+            for (const auto& obj : pool->m_objectsDraw)
+                drawObject(obj);
+            pool->m_framebuffer->release();
+        }
+
+        // Let's clean this up so that the cleaning is not done in another thread,
+        // and thus the CPU consumption will be partitioned.
+        pool->m_objectsDraw.clear();
+
+        g_painter->resetState();
+
+        if (pool->m_beforeDraw) pool->m_beforeDraw();
+        pool->m_framebuffer->draw();
+        if (pool->m_afterDraw) pool->m_afterDraw();
+    } else {
         pool->m_repaint.store(false);
-
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
-        return true;
     }
-
-    if (!pool->m_framebuffer->canDraw())
-        return  false;
-
-    if (pool->m_repaint) {
-        pool->m_repaint.store(false);
-
-        pool->m_framebuffer->bind();
-        for (const auto& obj : pool->m_objectsDraw)
-            drawObject(obj);
-        pool->m_framebuffer->release();
-    }
-
-    g_painter->resetState();
-
-    if (pool->m_beforeDraw) pool->m_beforeDraw();
-    pool->m_framebuffer->draw();
-    if (pool->m_afterDraw) pool->m_afterDraw();
-
-    return true;
 }
