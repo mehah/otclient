@@ -413,7 +413,7 @@ public:
 
     // >= 1080 ingame store
     void buyStoreOffer(const uint32_t offerId, const uint8_t productType, const std::string_view name = "");
-    void requestTransactionHistory(const uint16_t page, const uint32_t entriesPerPage);
+    void requestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage);
     void requestStoreOffers(const std::string_view categoryName, const uint8_t serviceType = 0);
     void openStore(const uint8_t serviceType = 0, const std::string_view category = "");
     void transferCoins(const std::string_view recipient, const uint16_t amount);
