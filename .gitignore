@@ -212,8 +212,8 @@ tags
 *.xml
 *.otb
 *.otbm
-*.spr
-*.dat
+# *.spr
+# *.dat
 *.pic
 config.otml
 
