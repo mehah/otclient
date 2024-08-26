@@ -90,6 +90,7 @@ struct DrawHashController
     void reset() {
         m_hashs.clear();
         m_lastHash = m_currentHash;
+        m_currentHash = 0;
         m_lastObjectHash = 0;
     }
 

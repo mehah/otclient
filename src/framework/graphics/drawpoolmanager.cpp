@@ -177,46 +177,41 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (f) f();
 
+    std::scoped_lock l(pool->m_mutexDraw);
+
+    if (pool->hasFrameBuffer())
+        pool->m_framebuffer->prepare(dest, src, colorClear);
+
+    pool->release(pool->m_repaint = alwaysDraw || pool->canRepaint());
+
+    pool->m_refreshTimer.restart();
+
     resetSelectedPool();
-
-    if (pool->m_repaint.exchange(alwaysDraw || pool->canRepaint())) {
-        std::scoped_lock l(pool->m_mutexDraw);
-
-        pool->setEnable(true);
-
-        if (pool->hasFrameBuffer())
-            pool->m_framebuffer->prepare(dest, src, colorClear);
-
-        pool->release(true);
-        pool->m_refreshTimer.restart();
-    } else pool->release(false);
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {
     const auto pool = get(type);
 
-    std::scoped_lock l(pool->m_mutexDraw);
-
     if (!pool->isEnabled())
         return false;
 
+    std::scoped_lock l(pool->m_mutexDraw);
+
     if (!pool->hasFrameBuffer()) {
+        pool->m_repaint.store(false);
+
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
-        pool->m_repaint.store(false);
         return true;
     }
 
-    if (!pool->m_framebuffer->canDraw())
-        return  false;
-
     if (pool->m_repaint) {
+        pool->m_repaint.store(false);
         pool->m_framebuffer->bind();
         for (const auto& obj : pool->m_objectsDraw)
             drawObject(obj);
         pool->m_framebuffer->release();
-        pool->m_repaint.store(false);
     }
 
     g_painter->resetState();
