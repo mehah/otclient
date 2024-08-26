@@ -708,7 +708,7 @@ void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() <= 1332) {
+    if (g_game.getClientVersion() < 1332) {
         parseCoinBalance(msg);
     }
 
@@ -719,7 +719,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
         StoreCategory category;
         category.name = msg->getString();
 
-        if (g_game.getClientVersion() <= 1332) {
+        if (g_game.getClientVersion() < 1332) {
             msg->getString();
         }
 
