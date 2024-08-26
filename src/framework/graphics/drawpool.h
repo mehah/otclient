@@ -136,7 +136,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint();
-    void repaint() { m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
+    void repaint() { if (hasFrameBuffer()) m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
