@@ -199,7 +199,6 @@ bool DrawPoolManager::drawPool(const DrawPoolType type) {
 
     if (!pool->hasFrameBuffer()) {
         pool->m_repaint.store(false);
-
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
