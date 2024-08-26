@@ -179,12 +179,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     resetSelectedPool();
 
-    if (!alwaysDraw)
-        pool->m_hashCtrl.update();
-
-    pool->m_repaint.store(pool->m_repaint = alwaysDraw || pool->canRepaint());
-
-    if (pool->m_repaint.load()) {
+    if (pool->m_repaint.exchange(alwaysDraw || pool->canRepaint())) {
         std::scoped_lock l(pool->m_mutexDraw);
 
         pool->setEnable(true);
@@ -198,12 +193,10 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 }
 
 bool DrawPoolManager::drawPool(const DrawPoolType type) {
-    auto pool = get(type);
-    std::scoped_lock l(pool->m_mutexDraw);
-    return drawPool(pool);
-}
+    const auto pool = get(type);
 
-bool DrawPoolManager::drawPool(DrawPool* pool) {
+    std::scoped_lock l(pool->m_mutexDraw);
+
     if (!pool->isEnabled())
         return false;
 
@@ -211,9 +204,7 @@ bool DrawPoolManager::drawPool(DrawPool* pool) {
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
-
         pool->m_repaint.store(false);
-
         return true;
     }
 
