@@ -30,7 +30,6 @@
 #include <framework/graphics/drawpoolmanager.h>
 
 LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
-    m_pool->agroup(true);
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
@@ -94,7 +93,6 @@ void LightView::draw(const Rect& dest, const Rect& src)
 
     m_pool->getHashController().put(src.hash());
     m_pool->getHashController().put(m_globalLightColor.hash());
-    m_pool->getHashController().update();
     if (m_pool->getHashController().wasModified()) {
         std::scoped_lock l(m_pool->getMutex());
         updatePixels();

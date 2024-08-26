@@ -191,35 +191,35 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     resetSelectedPool();
 }
 
-bool DrawPoolManager::drawPool(const DrawPoolType type) {
+void DrawPoolManager::drawPool(const DrawPoolType type) {
     const auto pool = get(type);
 
     if (!pool->isEnabled())
-        return false;
+        return;
 
     std::scoped_lock l(pool->m_mutexDraw);
+    if (pool->hasFrameBuffer()) {
+        if (pool->m_repaint) {
+            pool->m_repaint.store(false);
+            pool->m_framebuffer->bind();
+            for (const auto& obj : pool->m_objectsDraw)
+                drawObject(obj);
+            pool->m_framebuffer->release();
+        }
 
-    if (!pool->hasFrameBuffer()) {
+        // Let's clean this up so that the cleaning is not done in another thread,
+        // and thus the CPU consumption will be partitioned.
+        pool->m_objectsDraw.clear();
+
+        g_painter->resetState();
+
+        if (pool->m_beforeDraw) pool->m_beforeDraw();
+        pool->m_framebuffer->draw();
+        if (pool->m_afterDraw) pool->m_afterDraw();
+    } else {
         pool->m_repaint.store(false);
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
-        return true;
     }
-
-    if (pool->m_repaint) {
-        pool->m_repaint.store(false);
-        pool->m_framebuffer->bind();
-        for (const auto& obj : pool->m_objectsDraw)
-            drawObject(obj);
-        pool->m_framebuffer->release();
-    }
-
-    g_painter->resetState();
-
-    if (pool->m_beforeDraw) pool->m_beforeDraw();
-    pool->m_framebuffer->draw();
-    if (pool->m_afterDraw) pool->m_afterDraw();
-
-    return true;
 }

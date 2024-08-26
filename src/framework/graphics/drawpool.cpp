@@ -27,7 +27,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     DrawPool* pool = new DrawPool;
     if (type == DrawPoolType::MAP || type == DrawPoolType::FOREGROUND) {
         pool->setFramebuffer({});
-
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
