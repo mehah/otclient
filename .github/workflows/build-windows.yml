@@ -69,14 +69,22 @@ jobs:
         path: |
           ${{ github.workspace }}/otclient.exe
 
-    - name: Install Git LFS
-      run: |
-        git lfs install
-
     - name: Create Temporary Directory
       run: |
         $tempDir = "$env:GITHUB_WORKSPACE/client"
         New-Item -Path $tempDir -ItemType Directory -Force
+
+    - name: Move Files to Temporary Directory
+      run: |
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/data" -Destination "$env:GITHUB_WORKSPACE/client/data" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/mods" -Destination "$env:GITHUB_WORKSPACE/client/mods" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/modules" -Destination "$env:GITHUB_WORKSPACE/client/modules" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/init.lua" -Destination "$env:GITHUB_WORKSPACE/client/init.lua" -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/otclient.exe" -Destination "$env:GITHUB_WORKSPACE/client/otclient.exe" -Force
+
+    - name: Install Git LFS
+      run: |
+        git lfs install
 
     - name: Download 'things' Folder from GitHub
       run: |
@@ -92,14 +100,6 @@ jobs:
     - name: Move 'things' Folder to Client Data Directory
       run: |
         Move-Item -Path "$env:GITHUB_WORKSPACE/temp-assets/things" -Destination "$env:GITHUB_WORKSPACE/client/data/things" -Force
-
-    - name: Move Files to Temporary Directory
-      run: |
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/data" -Destination "$env:GITHUB_WORKSPACE/client/data" -Recurse -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/mods" -Destination "$env:GITHUB_WORKSPACE/client/mods" -Recurse -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/modules" -Destination "$env:GITHUB_WORKSPACE/client/modules" -Recurse -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/init.lua" -Destination "$env:GITHUB_WORKSPACE/client/init.lua" -Force
-        Copy-Item -Path "$env:GITHUB_WORKSPACE/otclient.exe" -Destination "$env:GITHUB_WORKSPACE/client/otclient.exe" -Force
 
     - name: Upload Temporary Directory as Artifact
       uses: actions/upload-artifact@main
