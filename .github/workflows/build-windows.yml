@@ -69,10 +69,29 @@ jobs:
         path: |
           ${{ github.workspace }}/otclient.exe
 
+    - name: Install Git LFS
+      run: |
+        git lfs install
+
     - name: Create Temporary Directory
       run: |
         $tempDir = "$env:GITHUB_WORKSPACE/client"
         New-Item -Path $tempDir -ItemType Directory -Force
+
+    - name: Download 'things' Folder from GitHub
+      run: |
+        git clone --depth 1 --filter=blob:none --sparse https://github.com/tibia-oce/assets.git $env:GITHUB_WORKSPACE/temp-assets
+        cd $env:GITHUB_WORKSPACE/temp-assets
+        git sparse-checkout set things
+
+    - name: Fetch Git LFS Files
+      run: |
+        cd $env:GITHUB_WORKSPACE/temp-assets
+        git lfs pull
+
+    - name: Move 'things' Folder to Client Data Directory
+      run: |
+        Move-Item -Path "$env:GITHUB_WORKSPACE/temp-assets/things" -Destination "$env:GITHUB_WORKSPACE/client/data/things" -Recurse -Force
 
     - name: Move Files to Temporary Directory
       run: |
