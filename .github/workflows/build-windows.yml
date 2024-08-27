@@ -91,7 +91,7 @@ jobs:
 
     - name: Move 'things' Folder to Client Data Directory
       run: |
-        Move-Item -Path "$env:GITHUB_WORKSPACE/temp-assets/things" -Destination "$env:GITHUB_WORKSPACE/client/data/things" -Recurse -Force
+        Move-Item -Path "$env:GITHUB_WORKSPACE/temp-assets/things" -Destination "$env:GITHUB_WORKSPACE/client/data/things" -Force
 
     - name: Move Files to Temporary Directory
       run: |
