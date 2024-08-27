@@ -524,11 +524,13 @@ void Game::loginWorld(const std::string_view account, const std::string_view pas
 
 void Game::cancelLogin()
 {
+    m_denyBotCall = false;
     // send logout even if the game has not started yet, to make sure that the player doesn't stay logged there
     if (m_protocolGame)
         m_protocolGame->sendLogout();
 
     processDisconnect();
+    m_denyBotCall = true;
 }
 
 void Game::forceLogout()
@@ -1455,10 +1457,9 @@ void Game::requestTransactionHistory(int page, int entriesPerPage)
 
 void Game::requestStoreOffers(const std::string_view categoryName, int serviceType)
 {
-    if (!canPerformGameAction())
-        return;
-
+    m_denyBotCall = false;
     m_protocolGame->sendRequestStoreOffers(categoryName, serviceType);
+    m_denyBotCall = true;
 }
 
 void Game::openStore(int serviceType, const std::string_view category)
@@ -1727,4 +1728,26 @@ void Game::imbuementDurations(bool isOpen)
     if (!canPerformGameAction())
         return;
     m_protocolGame->sendImbuementDurations(isOpen);
+}
+
+void Game::requestBless()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestBless();
+}
+
+void Game::requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems)
+{
+    m_denyBotCall = false;
+    m_protocolGame->requestQuickLootBlackWhiteList(filter, size, listedItems);
+    m_denyBotCall = true;
+}
+
+void Game::openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback)
+{
+    m_denyBotCall = false;
+    m_protocolGame->openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback);
+    m_denyBotCall = true;
 }

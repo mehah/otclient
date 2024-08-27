@@ -362,6 +362,9 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "stashWithdraw", &Game::stashWithdraw, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestHighscore", &Game::requestHighscore, &g_game);
     g_lua.bindSingletonFunction("g_game", "imbuementDurations", &Game::imbuementDurations, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestBless", &Game::requestBless, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestQuickLootBlackWhiteList", &Game::requestQuickLootBlackWhiteList, &g_game);
+    g_lua.bindSingletonFunction("g_game", "openContainerQuickLoot", &Game::openContainerQuickLoot, &g_game);
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
@@ -571,6 +574,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("isStaticSquareVisible", &Creature::isStaticSquareVisible);
     g_lua.bindClassMemberFunction<Creature>("getStaticSquareColor", &Creature::getStaticSquareColor);
     g_lua.bindClassMemberFunction<Creature>("setBounce", &Creature::setBounce);
+
     g_lua.bindClassMemberFunction<Creature>("setTyping", &Creature::setTyping);
     g_lua.bindClassMemberFunction<Creature>("getTyping", &Creature::getTyping);
     g_lua.bindClassMemberFunction<Creature>("sendTyping", &Creature::sendTyping);
@@ -685,6 +689,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getCountOrSubType", &Item::getCountOrSubType);
     g_lua.bindClassMemberFunction<Item>("getId", &Item::getId);
     g_lua.bindClassMemberFunction<Item>("getTooltip", &Item::getTooltip);
+    g_lua.bindClassMemberFunction<Item>("getDurationTime", &Item::getDurationTime);
 
     g_lua.bindClassMemberFunction<Item>("isStackable", &Item::isStackable);
     g_lua.bindClassMemberFunction<Item>("isMarketable", &Item::isMarketable);
@@ -756,6 +761,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<AttachedEffect>("setDrawOrder", &AttachedEffect::setDrawOrder);
     g_lua.bindClassMemberFunction<AttachedEffect>("setLight", &AttachedEffect::setLight);
     g_lua.bindClassMemberFunction<AttachedEffect>("setBounce", &AttachedEffect::setBounce);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setPulse", &AttachedEffect::setPulse);
+    g_lua.bindClassMemberFunction<AttachedEffect>("setFade", &AttachedEffect::setFade);
+
     g_lua.bindClassMemberFunction<AttachedEffect>("setDirection", &AttachedEffect::setDirection);
     g_lua.bindClassMemberFunction<AttachedEffect>("getDirection", &AttachedEffect::getDirection);
     g_lua.bindClassMemberFunction<AttachedEffect>("move", &AttachedEffect::move);
@@ -894,6 +902,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIItem>("getItemId", &UIItem::getItemId);
     g_lua.bindClassMemberFunction<UIItem>("getItemCount", &UIItem::getItemCount);
     g_lua.bindClassMemberFunction<UIItem>("getItemSubType", &UIItem::getItemSubType);
+    g_lua.bindClassMemberFunction<UIItem>("getItemCountOrSubType", &UIItem::getItemCountOrSubType);
     g_lua.bindClassMemberFunction<UIItem>("getItem", &UIItem::getItem);
     g_lua.bindClassMemberFunction<UIItem>("isVirtual", &UIItem::isVirtual);
     g_lua.bindClassMemberFunction<UIItem>("isItemVisible", &UIItem::isItemVisible);

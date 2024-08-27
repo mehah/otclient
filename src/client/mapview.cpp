@@ -56,6 +56,7 @@ MapView::~MapView()
 }
 
 void MapView::registerEvents() {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutex());
     g_drawPool.addAction([this, camera = m_posInfo.camera, srcRect = m_posInfo.srcRect] {
         m_pool->onBeforeDraw([=, this] {
             float fadeOpacity = 1.f;

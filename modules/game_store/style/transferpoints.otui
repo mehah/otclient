@@ -1,0 +1,134 @@
+StoreWindow
+  id: storeWindow
+  size: 278 207
+  padding: 3
+  visible: false
+  @onEscape: transferCancel()
+
+  Label
+    id: transferPointsLabel
+    !text: tr('Gift Tibia Coins')
+    text-align: center
+    font: verdana-11px-antialised
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 20
+  
+  Label
+    id: descriptionText
+    !text: tr('Please select the amount of Tibia\nCoins you like to gift and enter the\nname of the character that should\nreceive the Tibia Coins.')
+    text-wrap: true
+    text-auto-resize:true
+    anchors.top: transferPointsLabel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 7
+
+  Label
+    id: recipient
+    !text: tr('Recipient:')
+    anchors.top: descriptionText.bottom
+    anchors.left: parent.left
+    size: 57 12
+    margin: 7
+    margin-top: 12
+
+  TextEdit
+    id: transferPointsText
+    size: 150 16
+    background-color: #00000055
+    anchors.verticalCenter: recipient.verticalCenter
+    anchors.right: parent.right
+    margin: 7
+    margin-right: 13
+    text-align: left
+    text-offset: -18 0
+    image-color: #ffffff00
+
+  Label
+    id: transferAmount
+    !text: tr('Amount to transfer:')
+    anchors.top: transferableAmount.bottom
+    anchors.left: parent.left
+    size: 180 12
+    margin: 7
+    margin-top: 10
+
+  TextEdit
+    id: transferPointsValue
+    anchors.verticalCenter: transferAmount.verticalCenter
+    anchors.right: parent.right
+    width: 90
+    margin: 7
+    margin-top: 10
+    margin-right: 13
+    background-color: #00000055
+    image-color: #ffffff00
+    color: white
+    selection-color: #ffffff
+    selection-background-color: gray
+
+  Label
+    id: transferableAmount
+    !text: tr('Transferable Tibia Coins:')
+    anchors.top: recipient.bottom
+    anchors.left: parent.left
+    size: 155 12
+    margin: 7
+    margin-top: 10
+
+  Label
+    id: coinBalance2
+    anchors.top: transferableAmount.top
+    anchors.right: parent.right
+    height: 12
+    text-align: right
+    margin-right: 23
+
+  Label
+    id: coinIcon
+    image-source: tibiaCoin
+    anchors.verticalCenter: coinBalance2.verticalCenter
+    anchors.left: coinBalance2.right
+    margin-left: 5
+    margin-top: 1
+    size: 12 12
+
+  Label
+    height: 38
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  HorizontalSeparator
+    anchors.left: parent.left
+    margin-left: 5
+    anchors.right: parent.right
+    margin-right: 12
+    anchors.top: closeButton.top
+    margin-top: -7
+
+  StoreButton
+    id: closeButton
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-right: 12
+    margin-bottom: 7
+    !text: tr('Cancel')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff
+    @onClick: transferCancel()
+
+  StoreButton
+    id: buttonOk
+    anchors.right: closeButton.left
+    anchors.bottom: parent.bottom
+    margin-right: 10
+    margin-bottom: 7
+    !text: tr('Gift')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff
+    @onClick: transferAccept()

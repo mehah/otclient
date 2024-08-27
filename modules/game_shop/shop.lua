@@ -89,7 +89,7 @@ function hide()
 end
 
 function show()
-    if not shop or not shopButton then
+    if not shop  then
         return
     end
 
@@ -144,9 +144,8 @@ function createShop()
     end
     shop = g_ui.displayUI('shop')
     shop:hide()
-    shopButton = modules.game_mainpanel.addStoreButton('store', tr('Shop'), '/images/options/store_large', toggle,
-        false, 8)
-
+   -- shopButton = modules.game_mainpanel.addStoreButton('store', tr('Shop'), '/images/options/store_large', toggle,false, 8) -- \game_mainpanel\mainpanel.lua
+    shopButton = nil
 
     connect(shop.categories, {
         onChildFocusChange = changeCategory

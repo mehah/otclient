@@ -27,7 +27,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     DrawPool* pool = new DrawPool;
     if (type == DrawPoolType::MAP || type == DrawPoolType::FOREGROUND) {
         pool->setFramebuffer({});
-
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
@@ -62,15 +61,13 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);
-            coords = m_objects[order].emplace_back(std::move(state), m_lastCoordBufferSize).coords.get();
+            coords = m_objects[order].emplace_back(std::move(state), getCoordsBuffer()).coords.get();
         }
 
         if (coordsBuffer)
             coords->append(coordsBuffer.get());
         else
             addCoords(coords, method, DrawMode::TRIANGLES);
-
-        m_lastCoordBufferSize = std::max<size_t>(m_lastCoordBufferSize, coords->size());
     } else {
         bool addNewObj = true;
 
@@ -85,10 +82,6 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
                 else
                     addCoords(prevObj.coords.get(), method, DrawMode::TRIANGLES);
 
-                if (prevObj.coords) {
-                    m_lastCoordBufferSize = std::max<size_t>(m_lastCoordBufferSize, prevObj.coords->size());
-                }
-
                 addNewObj = false;
             }
         }
@@ -96,7 +89,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawPool::Draw
         if (addNewObj) {
             auto state = getState(texture, color);
             if (coordsBuffer) {
-                list.emplace_back(std::move(state), m_lastCoordBufferSize).coords->append(coordsBuffer.get());
+                list.emplace_back(std::move(state), getCoordsBuffer()).coords->append(coordsBuffer.get());
             } else
                 list.emplace_back(drawMode, std::move(state), std::move(method));
         }
@@ -249,6 +242,7 @@ void DrawPool::resetState()
     getCurrentState() = {};
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
+    m_coordsCache[0].last = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
 
@@ -400,4 +394,14 @@ const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
     const auto& tempfb = m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
     tempfb->setSmooth(false);
     return tempfb;
+}
+
+std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer() {
+    if (++m_coordsCache[0].last > m_coordsCache[0].coords.size()) {
+        return  m_coordsCache[0].coords.emplace_back(std::make_shared<CoordsBuffer>());
+    }
+
+    const auto& coords = m_coordsCache[0].coords[m_coordsCache[0].last - 1];
+    coords->clear();
+    return coords;
 }

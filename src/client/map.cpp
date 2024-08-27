@@ -47,7 +47,7 @@ Map g_map;
 
 void Map::init()
 {
-    g_window.addKeyListener([&](const InputEvent& inputEvent) {
+    g_window.addKeyListener([this](const InputEvent& inputEvent) {
         notificateKeyRelease(inputEvent);
     });
 
@@ -1174,6 +1174,7 @@ bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
 
 void Map::updateAttachedWidgets(const MapViewPtr& mapView)
 {
+    g_drawPool.select(DrawPoolType::MAP);
     for (const auto& [widget, object] : m_attachedObjectWidgetMap) {
         if (widget->isDestroyed()) {
             continue;

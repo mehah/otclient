@@ -351,6 +351,7 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
 	set(SOURCE_FILES ${SOURCE_FILES}
 		framework/core/adaptativeframecounter.cpp
 		framework/core/graphicalapplication.cpp
+		framework/core/garbagecollection.cpp
 		framework/input/mouse.cpp
 		framework/graphics/animatedtexture.cpp
 		framework/graphics/apngloader.cpp
