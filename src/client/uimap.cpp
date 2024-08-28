@@ -66,8 +66,7 @@ void UIMap::draw(DrawPoolType drawPane) {
         });
     } else if (drawPane == DrawPoolType::FOREGROUND_MAP) {
         g_drawPool.preDraw(drawPane, [this] {
-            const auto& mapRect = g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect;
-            m_mapView->drawForeground(mapRect);
+            m_mapView->drawForeground(m_mapviewRect);
         });
     }
 }
@@ -86,7 +85,7 @@ void UIMap::drawSelf(DrawPoolType drawPane)
 }
 
 void UIMap::updateMapRect() {
-    m_mapView->updateRect(g_app.isScaled() ? Rect(0, 0, g_graphics.getViewportSize()) : m_mapRect);
+    m_mapView->updateRect(m_mapviewRect);
 }
 
 bool UIMap::setZoom(int zoom)
@@ -215,6 +214,8 @@ void UIMap::updateMapSize()
 
     m_mapRect.resize(mapSize);
     m_mapRect.moveCenter(clippingRect.center());
+
+    m_mapviewRect = Rect(m_mapRect.topLeft() * g_window.getDisplayDensity(), m_mapRect.size() * g_window.getDisplayDensity());
 
     if (!m_keepAspectRatio)
         updateVisibleDimension();

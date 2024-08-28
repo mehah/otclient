@@ -116,7 +116,7 @@ public:
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
-    bool isScaled() { return g_window.getDisplayDensity() != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
+    bool isScaled() { return g_window.getDisplayDensity() != 1.f; }
 
     bool isEncrypted() {
 #if ENABLE_ENCRYPTION == 1
