@@ -104,6 +104,9 @@ public:
     void setDrawTexts(bool v) { m_drawText = v; }
     bool isDrawingTexts() { return m_drawText; }
 
+    float getHUDScale() const;
+    void setHUDScale(float v);
+
     float getCreatureInformationScale() const { return m_creatureInformationScale; }
     void setCreatureInformationScale(float v) { m_creatureInformationScale = v; }
 
