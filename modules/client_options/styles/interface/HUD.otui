@@ -41,6 +41,19 @@ UIWidget
     height: 22
     margin-top: 7
     OptionScaleScroll
+      id: hudScale
+      anchors.fill: parent
+      &minimumScrollValue: 1
+      &maximumScrollValue: 5
+      &scrollSize: 21
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    height: 22
+    margin-top: 7
+    OptionScaleScroll
       id: creatureInformationScale
       anchors.fill: parent
       &minimumScrollValue: 1
