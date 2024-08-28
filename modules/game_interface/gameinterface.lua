@@ -92,7 +92,7 @@ function init()
     }, {
         panel = gameLeftPanel,
         checkbox = gameRootPanel:getChildById('gameSelectLeftColumn')
-    },{
+    }, {
         panel = gameLeftExtraPanel,
         checkbox = gameRootPanel:getChildById('gameSelectLeftExtraColumn')
     } }
@@ -144,9 +144,7 @@ function bindKeys()
         modules.game_textmessage.clearMessages()
     end, gameRootPanel)
 
-    if not g_app.isScaled() then
-        g_keyboard.bindKeyDown('Ctrl+.', nextViewMode, gameRootPanel)
-    end
+    g_keyboard.bindKeyDown('Ctrl+.', nextViewMode, gameRootPanel)
 end
 
 function terminate()
@@ -179,7 +177,7 @@ function terminate()
             onCheckChange = onSelectPanel
         })
     end
-    
+
     logoutButton:destroy()
     gameRootPanel:destroy()
 end
@@ -210,10 +208,6 @@ function show()
     logoutButton:setTooltip(tr('Logout'))
 
     setupViewMode(0)
-    if g_app.isScaled() then
-        setupViewMode(1)
-        setupViewMode(2)
-    end
 
     addEvent(function()
         if not limitedZoom or g_game.isGM() then
@@ -606,7 +600,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             menu:addOption(tr(g_game.getClientVersion() >= 1000 and "Customise Character" or "Set Outfit"), function()
                 g_game.requestOutfit()
             end)
-			
+
             if g_game.getFeature(GamePrey) then
                 menu:addOption(tr('Prey Dialog'), function()
                     modules.game_prey.show()
@@ -777,7 +771,6 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
     end
 
     if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
-
         local quickLoot = modules.game_quickloot.QuickLoot
         menu.addSeparator(menu)
 
@@ -1015,6 +1008,7 @@ function moveStackableItem(item, toPos)
 
     modules.game_hotkeys.enableHotkeys(false)
 end
+
 function onSelectPanel(self, checked)
     if checked then
         for k, v in pairs(panelsList) do
@@ -1025,6 +1019,7 @@ function onSelectPanel(self, checked)
         end
     end
 end
+
 function getRootPanel()
     return gameRootPanel
 end
@@ -1064,6 +1059,7 @@ end
 function getShowTopMenuButton()
     return showTopMenuButton
 end
+
 function getGameTopStatsBar()
     return gameTopPanel
 end
@@ -1180,7 +1176,6 @@ function limitZoom()
     limitedZoom = true
 end
 
-
 function updateStatsBar(dimension, placement)
     StatsBar.updateCurrentStats(dimension, placement)
     StatsBar.updateStatsBarOption()
@@ -1203,7 +1198,7 @@ end
 local function movePanel(mainpanel)
     for _, widget in pairs(mainpanel:getChildren()) do
         if widget then
-            local panel = modules.game_interface.findContentPanelAvailable(widget, widget:getMinimumHeight())      
+            local panel = modules.game_interface.findContentPanelAvailable(widget, widget:getMinimumHeight())
             if panel then
                 if not panel:hasChild(widget) then
                     widget:close()
@@ -1252,8 +1247,9 @@ function setupOptionsMainButton()
         return
     end
 
-    logOutMainButton = modules.game_mainpanel.addSpecialToggleButton('logoutButton', tr('Exit'), '/images/options/button_logout',
-    tryLogout)
+    logOutMainButton = modules.game_mainpanel.addSpecialToggleButton('logoutButton', tr('Exit'),
+        '/images/options/button_logout',
+        tryLogout)
 end
 
 function checkAndOpenLeftPanel()

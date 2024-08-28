@@ -115,6 +115,7 @@ private:
 
     MapViewPtr m_mapView;
     Rect m_mapRect;
+    Rect m_mapviewRect;
 
     float m_aspectRatio;
 
