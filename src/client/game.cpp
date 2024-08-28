@@ -1729,7 +1729,7 @@ void Game::stashWithdraw(const uint16_t itemId, const uint32_t count, const uint
     m_protocolGame->sendStashWithdraw(itemId, count, stackpos);
 }
 
-void Game::requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
+void Game::requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string& world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
 {
     if (!canPerformGameAction())
         return;
@@ -1737,7 +1737,7 @@ void Game::requestHighscore(const uint8_t action, const uint8_t category, const 
     m_protocolGame->sendHighscoreInfo(action, category, vocation, world, worldType, battlEye, page, totalPages);
 }
 
-void Game::processHighscore(const std::string_view serverName, const std::string_view world, const uint8_t worldType, const uint8_t battlEye,
+void Game::processHighscore(const std::string& serverName, const std::string& world, const uint8_t worldType, const uint8_t battlEye,
                             const std::vector<std::tuple<uint32_t, std::string>>& vocations,
                             const std::vector<std::tuple<uint8_t, std::string>>& categories,
                             const uint16_t page, const uint16_t totalPages,

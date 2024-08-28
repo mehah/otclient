@@ -506,8 +506,8 @@ public:
     void stashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos);
 
     // highscore related
-    void requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
-    void processHighscore(const std::string_view serverName, const std::string_view world, const uint8_t worldType, const uint8_t battlEye,
+    void requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string& world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
+    void processHighscore(const std::string& serverName, const std::string& world, const uint8_t worldType, const uint8_t battlEye,
                             const std::vector<std::tuple<uint32_t, std::string>>& vocations,
                             const std::vector<std::tuple<uint8_t, std::string>>& categories,
                             const uint16_t page, const uint16_t totalPages,
