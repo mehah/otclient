@@ -1148,7 +1148,7 @@ void ProtocolGame::sendStashWithdraw(const uint16_t itemId, const uint32_t count
     send(msg);
 }
 
-void ProtocolGame::sendHighscoreInfo(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string& world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
+void ProtocolGame::sendHighscoreInfo(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestHighscore);
