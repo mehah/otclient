@@ -310,13 +310,13 @@ function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
         return
     end
 
-    local bitsChanged = bit.bxor(now, old)
+    local bitsChanged = Bit.bxor(now, old)
     for i = 1, 32 do
         local pow = math.pow(2, i - 1)
         if pow > bitsChanged then
             break
         end
-        local bitChanged = bit.band(bitsChanged, pow)
+        local bitChanged = Bit.band(bitsChanged, pow)
         if bitChanged ~= 0 then
             toggleIcon(bitChanged)
         end
