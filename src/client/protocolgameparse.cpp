@@ -1348,7 +1348,7 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     }
 
     const uint8_t itemCount = msg->getU8();
-    std::vector<ItemPtr> items;
+    std::vector<ItemPtr> items(itemCount);
 
     for (auto i = 0; i < itemCount; i++) {
         items[i] = getItem(msg);
@@ -4315,7 +4315,7 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     const uint32_t buyOfferCount = msg->getU32();
     const uint32_t sellOfferCount = msg->getU32();
 
-    std::vector<MarketOffer> offers
+    std::vector<MarketOffer> offers;
 
     for (uint32_t i = 0; i < buyOfferCount; ++i) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_BUY, var));
