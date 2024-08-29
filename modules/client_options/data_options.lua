@@ -255,29 +255,25 @@ return {
     },
     hudScale                          = {
         event = nil,
-        value = 0,
+        value = g_platform.isMobile() and 2 or 0,
         action = function(value, options, controller, panels, extraWidgets)
-            if g_platform.isMobile() then
-                hudWidget:disable()
-            else
-                value = value / 2
+            value = value / 2
 
-                if options.hudScale.event ~= nil then
-                    removeEvent(options.hudScale.event)
-                end
-
-                options.hudScale.event = scheduleEvent(function()
-                    g_app.setHUDScale(math.max(value + 0.5, 1))
-                    options.hudScale.event = nil
-                end, 250)
+            if options.hudScale.event ~= nil then
+                removeEvent(options.hudScale.event)
             end
+
+            options.hudScale.event = scheduleEvent(function()
+                g_app.setHUDScale(math.max(value + 0.5, 1))
+                options.hudScale.event = nil
+            end, 250)
 
             local hudWidget = panels.interfaceHUD:recursiveGetChildById('hudScale')
             hudWidget:setText(string.format('HUD Scale: %sx', math.max(value + 0.5, 1)))
         end
     },
     creatureInformationScale          = {
-        value = 0,
+        value = g_platform.isMobile() and 2 or 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
                 value = g_window.getDisplayDensity() - 0.5
@@ -290,7 +286,7 @@ return {
         end
     },
     staticTextScale                   = {
-        value = 0,
+        value = g_platform.isMobile() and 2 or 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
                 value = g_window.getDisplayDensity() - 0.5
@@ -303,7 +299,7 @@ return {
         end
     },
     animatedTextScale                 = {
-        value = 0,
+        value = g_platform.isMobile() and 2 or 0,
         action = function(value, options, controller, panels, extraWidgets)
             if value == 0 then
                 value = g_window.getDisplayDensity() - 0.5

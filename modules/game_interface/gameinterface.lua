@@ -208,6 +208,10 @@ function show()
     logoutButton:setTooltip(tr('Logout'))
 
     setupViewMode(0)
+    if g_platform.isMobile() then
+        setupViewMode(1)
+        setupViewMode(2)
+    end
 
     addEvent(function()
         if not limitedZoom or g_game.isGM() then
