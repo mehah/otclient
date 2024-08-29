@@ -132,7 +132,7 @@ public:
     void sendClearImbuement(const uint8_t slot);
     void sendCloseImbuingWindow();
     void sendStashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos);
-    void sendHighscoreInfo(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
+    void sendHighscoreInfo(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string& world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
     void requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback);
