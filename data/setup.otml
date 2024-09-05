@@ -28,6 +28,7 @@ game
     diagonal-walk-speed: 3
 
   render
+    draw-covered-things: true
     invisible-ticks-per-frame: 75
     item-ticks-per-frame: 75
     effect-ticks-per-frame: 75

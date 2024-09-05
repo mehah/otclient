@@ -1,12 +1,7 @@
-
 #include "uigraph.h"
 #include <framework/graphics/fontmanager.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpool.h>
-
-UIGraph::UIGraph()
-{
-}
+#include <framework/graphics/drawpoolmanager.h>
 
 void UIGraph::drawSelf(DrawPoolType drawPane)
 {
@@ -39,15 +34,28 @@ void UIGraph::drawSelf(DrawPoolType drawPane)
     }
 
     if (elements > 0) {
-        //TODO: Adapt in the future
-        /*g_drawQueue->addLine(points, m_width, m_color);
-        if(!m_title.empty())
-            g_drawQueue->addText(m_font, m_title, dest, Fw::AlignTopCenter);
+        g_drawPool.addAction([points = std::move(points), width = m_width, color = m_color] {
+            static std::vector<float> vertices(1024, 0);
+            if (vertices.size() < points.size())
+                vertices.resize(points.size());
+
+            int i = 0;
+            for (const auto& point : points) {
+                vertices[i++] = point.x;
+                vertices[i++] = point.y;
+            }
+
+            g_painter->setColor(color);
+            g_painter->drawLine(vertices, i / 2, width);
+        });
+
+        if (!m_title.empty())
+            m_font->drawText(m_title, dest, Color::white, Fw::AlignTopCenter);
         if (m_showLabes) {
-            g_drawQueue->addText(m_font, std::to_string(m_values.back()), dest, Fw::AlignTopRight);
-            g_drawQueue->addText(m_font, std::to_string(maxVal), dest, Fw::AlignTopLeft);
-            g_drawQueue->addText(m_font, std::to_string(minVal), dest, Fw::AlignBottomLeft);
-        }*/
+            m_font->drawText(std::to_string(m_values.back()), dest, Color::white, Fw::AlignTopRight);
+            m_font->drawText(std::to_string(maxVal), dest, Color::white, Fw::AlignTopLeft);
+            m_font->drawText(std::to_string(minVal), dest, Color::white, Fw::AlignBottomLeft);
+        }
     }
 }
 

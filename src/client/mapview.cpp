@@ -336,7 +336,7 @@ void MapView::updateVisibleTiles()
     m_lastCameraPosition = m_posInfo.camera;
     destroyHighlightTile();
 
-    const bool fadeFinished = getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
+    const bool checkIsCovered = !g_gameConfig.isDrawingCoveredThings() && getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
 
     // cache visible tiles in draw order
     // draw from last floor (the lower) to first floor (the higher)
@@ -361,7 +361,7 @@ void MapView::updateVisibleTiles()
 
                     bool addTile = true;
 
-                    if (fadeFinished) {
+                    if (checkIsCovered) {
                         // skip tiles that are completely behind another tile
                         if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
                             if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {

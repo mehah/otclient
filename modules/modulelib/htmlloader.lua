@@ -55,7 +55,7 @@ local function readNode(el, parent, controller, watchList)
                     el = el,
                     method = nil,
                     fnc = function(self)
-                        local value = fnc(controller, widget)
+                        local value = fnc(controller, self.widget)
                         if value ~= self.res then
                             self.method(self.widget, value)
                             self.res = value
@@ -174,6 +174,7 @@ function HtmlLoader(path, parent, controller)
             table.remove_if(watchList, function(i, obj)
                 local isDestroyed = obj.widget:isDestroyed()
                 if isDestroyed then
+                    obj.widget = nil
                     obj.el.widget = nil
                 else
                     obj.fnc(obj)

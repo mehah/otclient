@@ -41,6 +41,24 @@ function EventController:disconnect()
     disconnect(self.actor, self.events)
 end
 
+function EventController:destroy()
+    self:disconnect()
+    self.actor = nil
+    self.events = nil
+end
+
+function EventController:isWidget()
+    return self.actor.addChild ~= nil
+end
+
+function EventController:actorIsDestroyed()
+    return self:isWidget() and self.actor:isDestroyed()
+end
+
+function EventController:isDestroyed()
+    return self.actor == nil
+end
+
 function EventController:execute(name, ...)
     if name == nil then
         for name, act in pairs(self.events) do
