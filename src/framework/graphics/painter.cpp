@@ -50,7 +50,7 @@ Painter::Painter()
     m_drawTexturedProgram = getProgram(std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data(), std::string{ glslMainFragmentShader } + glslTextureSrcFragmentShader.data());
     m_drawSolidColorProgram = getProgram(std::string{ glslMainVertexShader } + glslPositionOnlyVertexShader.data(), std::string{ glslMainFragmentShader } + glslSolidColorFragmentShader.data());
     m_drawReplaceColorProgram = getProgram(std::string{ glslMainWithTexCoordsVertexShader } + glslPositionOnlyVertexShader.data(), std::string{ glslMainFragmentShader } + glslReplaceColorFragmentShader.data());
-    m_drawLineProgram = getProgram(std::string{ lineVertexShader } + glslPositionOnlyVertexShader.data(), std::string{ lineFragmentShader } + glslTextureSrcFragmentShader.data());
+    m_drawLineProgram = getProgram(lineVertexShader, lineFragmentShader);
 
     PainterShaderProgram::release();
 
