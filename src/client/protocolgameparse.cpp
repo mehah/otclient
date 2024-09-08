@@ -208,8 +208,14 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerDeleteInContainer:
                     parseContainerRemoveItem(msg);
                     break;
+                case Proto::GameServerBosstiaryInfo:
+                    parseBosstiaryInfo(msg);
+                    break;
                 case Proto::GameServerTakeScreenshot:
                     parseTakeScreenshot(msg);
+                    break;
+                case Proto::GameServerCyclopediaItemDetail:
+                    parseCyclopediaItemDetail(msg);
                     break;
                 case Proto::GameServerSetInventory:
                     parseAddInventoryItem(msg);
@@ -401,7 +407,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerPvpSituations:
                     parsePvpSituations(msg);
                     break;
-                case Proto::GameServerRefreshBestiaryTracker:
+                case Proto::GameServerBestiaryRefreshTracker:
                     parseBestiaryTracker(msg);
                     break;
                 case Proto::GameServerTaskHuntingBasicData:
@@ -449,8 +455,23 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerVipLogout:
                     parseVipLogout(msg);
                     break;
-                case Proto::GameServerSendBestiaryEntryChanged:
+                case Proto::GameServerBestiaryRaces:
+                    parseBestiaryRaces(msg);
+                    break;
+                case Proto::GameServerBestiaryOverview:
+                    parseBestiaryOverview(msg);
+                    break;
+                case Proto::GameServerBestiaryMonsterData:
+                    parseBestiaryMonsterData(msg);
+                    break;
+                case Proto::GameServerBestiaryCharmsData:
+                    parseBestiaryCharmsData(msg);
+                    break;
+                case Proto::GameServerBestiaryEntryChanged:
                     parseBestiaryEntryChanged(msg);
+                    break;
+                case Proto::GameServerCyclopediaCharacterInfoData:
+                    parseCyclopediaCharacterInfo(msg);
                     break;
                 case Proto::GameServerTutorialHint:
                     parseTutorialHint(msg);
@@ -1420,6 +1441,48 @@ void ProtocolGame::parseContainerRemoveItem(const InputMessagePtr& msg)
     }
 
     g_game.processContainerRemoveItem(containerId, slot, lastItem);
+}
+
+void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg) 
+{
+    const uint16_t bosstiaryRaceLast = msg->getU16();
+    std::vector<BosstiaryData> bossData;
+
+    for (auto i = 0; i < bosstiaryRaceLast; ++i) {
+        BosstiaryData boss;
+        boss.raceId = msg->getU32();
+        boss.category = msg->getU8();
+        boss.kills = msg->getU32();
+        msg->getU8();
+        boss.isTrackerActived = msg->getU8();
+        bossData.emplace_back(boss);
+    }
+
+    g_game.processBosstiaryInfo(bossData);
+}
+
+void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
+{
+    msg->getU8(); // 0x00
+    msg->getU8(); // bool is cyclopedia
+    msg->getU32(); // creature ID (version 13.00)
+    msg->getU8(); // 0x01
+
+    msg->getString(); // item name
+    const auto& item = getItem(msg);
+
+    msg->getU8(); // 0x00
+
+    const uint8_t descriptionsSize = msg->getU8();
+    std::vector<std::tuple<std::string, std::string>> descriptions;
+
+    for (auto i = 0; i < descriptionsSize; ++i) {
+        const auto& firstDescription = msg->getString();
+        const auto& secondDescription = msg->getString();
+        descriptions.emplace_back(firstDescription, secondDescription);
+    }
+
+    g_game.processItemDetail(item, descriptions);
 }
 
 void ProtocolGame::parseAddInventoryItem(const InputMessagePtr& msg)
@@ -2658,6 +2721,173 @@ void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
     }
 }
 
+void ProtocolGame::parseBestiaryRaces(const InputMessagePtr& msg)
+{
+    std::vector<CyclopediaBestiaryRace> bestiaryData;
+
+    const uint16_t bestiaryRaceLast = msg->getU16();
+    for (auto i = 0; i < bestiaryRaceLast; ++i) {
+        CyclopediaBestiaryRace race;
+        race.race = i;
+        race.bestClass = msg->getString();
+        race.count = msg->getU16();
+        race.unlockedCount = msg->getU16();
+        bestiaryData.emplace_back(race);
+    }
+
+    g_game.processParseBestiaryRaces(bestiaryData);
+}
+
+void ProtocolGame::parseBestiaryOverview(const InputMessagePtr& msg)
+{
+    const auto& raceName = msg->getString();
+
+    const uint16_t raceSize = msg->getU16();
+    std::vector<BestiaryOverviewMonsters> data;
+
+    for (auto i = 0; i < raceSize; ++i) {
+        const uint16_t raceId = msg->getU16();
+        const uint8_t progress = msg->getU8();
+        uint8_t occurrence = 0;
+        uint16_t creatureAnimusMasteryBonus = 0;
+        if (progress > 0) {
+            occurrence = msg->getU8();
+        }
+        if (g_game.getClientVersion() >= 1340) {
+            creatureAnimusMasteryBonus = msg->getU16(); // Creature Animous Bonus
+        }
+        BestiaryOverviewMonsters monster;
+        monster.id = raceId;
+        monster.currentLevel = progress;
+        monster.occurrence = occurrence;
+        monster.creatureAnimusMasteryBonus = creatureAnimusMasteryBonus;
+        data.emplace_back(monster);
+    }
+
+    uint16_t animusMasteryPoints = 0;
+    if (g_game.getClientVersion() >= 1340) {
+        animusMasteryPoints = msg->getU16(); // Animus Mastery Points
+    }
+
+    g_game.processParseBestiaryOverview(raceName, data, animusMasteryPoints);
+}
+
+void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
+{
+    BestiaryMonsterData data;
+    data.id = msg->getU16();
+    data.bestClass = msg->getString();
+    data.currentLevel = msg->getU8();
+
+    if (g_game.getClientVersion() >= 1340) {
+        data.AnimusMasteryBonus = msg->getU16(); // Animus Mastery Bonus
+        data.AnimusMasteryPoints = msg->getU16(); // Animus Mastery Points
+    } else {
+        data.AnimusMasteryBonus = 0;
+        data.AnimusMasteryPoints = 0;
+    }
+
+    data.killCounter = msg->getU32();
+    data.thirdDifficulty = msg->getU16();
+    data.secondUnlock = msg->getU16();
+    data.lastProgressKillCount = msg->getU16();
+    data.difficulty = msg->getU8();
+    data.ocorrence = msg->getU8();
+
+    const uint8_t lootCount = msg->getU8();
+    for (auto i = 0; i < lootCount; ++i) {
+        LootItem lootItem;
+        lootItem.itemId = msg->getU16();
+        lootItem.diffculty = msg->getU8();
+        lootItem.specialEvent = msg->getU8();
+
+        const bool shouldAddItem = lootItem.itemId != 0;
+        if (shouldAddItem) {
+            lootItem.name = msg->getString();
+            lootItem.amount = msg->getU8();
+        }
+        data.loot.emplace_back(lootItem);
+    }
+
+    if (data.currentLevel > 1) {
+        data.charmValue = msg->getU16();
+        data.attackMode = msg->getU8();
+        msg->getU8(); 
+        data.maxHealth = msg->getU32();
+        data.experience = msg->getU32();
+        data.speed = msg->getU16();
+        data.armor = msg->getU16();
+        data.mitigation = msg->getDouble();
+    }
+
+    if (data.currentLevel > 2) {
+        const uint8_t elementsCount = msg->getU8();
+        for (auto i = 0; i < elementsCount; ++i) {
+            const uint8_t elementId = msg->getU8();
+            const uint16_t elementValue = msg->getU16();
+            data.combat[elementId] = elementValue;
+        }
+
+        msg->getU16();
+        data.location = msg->getString();
+    }
+
+    if (data.currentLevel > 3) {
+        const bool hasCharm = static_cast<bool>(msg->getU8());
+        if (hasCharm) {
+            msg->getU8();
+            msg->getU32();
+        } else {
+            msg->getU8();
+        }
+    }
+
+    g_game.processUpdateBestiaryMonsterData(data);
+}
+
+void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
+{
+    BestiaryCharmsData charmData;
+    charmData.points = msg->getU32();
+
+    const uint8_t charmsAmount = msg->getU8();  
+    for (auto i = 0; i < charmsAmount; ++i) {
+        CharmData charm;
+        charm.id = msg->getU8();
+        charm.name = msg->getString();
+        charm.description = msg->getString();
+        msg->getU8();
+        charm.unlockPrice = msg->getU16();
+        charm.unlocked = static_cast<bool>(msg->getU8() == 1);
+        charm.asignedStatus = false;
+        charm.raceId = 0;
+        charm.removeRuneCost = 0;
+
+        if (charm.unlocked) {
+            const bool asigned = static_cast<bool>(msg->getU8());
+            if (asigned) {
+                charm.asignedStatus = asigned;
+                charm.raceId = msg->getU16(); 
+                charm.removeRuneCost = msg->getU32(); 
+            }
+        } else {
+            msg->getU8(); 
+        }
+
+        charmData.charms.emplace_back(charm);
+    }
+
+    msg->getU8(); 
+
+    const uint16_t finishedMonstersSize = msg->getU16();
+    for (auto i = 0; i < finishedMonstersSize; ++i) {
+        const uint16_t raceId = msg->getU16();
+        charmData.finishedMonsters.emplace_back(raceId);
+    }
+
+    g_game.processUpdateBestiaryCharmsData(charmData);
+}
+
 void ProtocolGame::parseTutorialHint(const InputMessagePtr& msg)
 {
     const uint8_t id = msg->getU8();
@@ -3425,19 +3655,22 @@ void ProtocolGame::parseShowDescription(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
 {
-    if (g_game.getFeature(Otc::GameBosstiaryTracker)) {
-        msg->getU8(); // is bestiary boolean
-    }
+    uint8_t trackerType = msg->getU8(); // 0x00 para bestiary, 0x01 para boss
 
     const uint8_t size = msg->getU8();
+    std::vector<std::tuple<uint16_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t>> trackerData;
+
     for (auto i = 0; i < size; ++i) {
-        msg->getU16(); // RaceID
-        msg->getU32(); // Kill count
-        msg->getU16(); // First unlock
-        msg->getU16(); // Second unlock
-        msg->getU16(); // Last unlock
-        msg->getU8(); // Status
+        const uint16_t raceID = msg->getU16();
+        const uint32_t killCount = msg->getU32();
+        const uint16_t firstUnlock = msg->getU16();
+        const uint16_t secondUnlock = msg->getU16();
+        const uint16_t lastUnlock = msg->getU16();
+        const uint8_t status = msg->getU8();
+        trackerData.emplace_back(raceID, killCount, firstUnlock, secondUnlock, lastUnlock, status);
     }
+
+    g_lua.callGlobalField("g_game", "onParseCyclopediaTracker", trackerType, trackerData);
 }
 
 void ProtocolGame::parseTaskHuntingBasicData(const InputMessagePtr& msg)
@@ -3752,6 +3985,435 @@ void ProtocolGame::parseBestiaryEntryChanged(const InputMessagePtr& msg)
     msg->getU16(); // monster ID
 
     // TODO: implement bestiary entry changed usage
+}
+
+void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
+{
+    const auto type = static_cast<Otc::CyclopediaCharacterInfoType_t>(msg->getU8());
+
+    // 0: Send no error
+    // 1: No data available at the moment.
+    // 2: You are not allowed to see this character's data.
+    // 3: You are not allowed to inspect this character.
+    const uint8_t errorCode = msg->getU8();
+    if (errorCode > 0) {
+        return;
+    }
+
+    switch (type) {
+        case Otc::CYCLOPEDIA_CHARACTERINFO_BASEINFORMATION:
+        {
+            msg->getString(); // player name
+            msg->getString(); // player vocation name
+            msg->getU16(); // player level
+            getOutfit(msg, false);
+            msg->getU8(); // ???
+            msg->getString(); // current title name
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_GENERALSTATS:
+        {
+            CyclopediaCharacterGeneralStats stats;
+            stats.experience = msg->getU64();
+            stats.level = msg->getU16();
+            stats.levelPercent = msg->getU8();
+            stats.baseExpGain = msg->getU16();
+            stats.lowLevelExpBonus = msg->getU16();
+            stats.XpBoostPercent = msg->getU16();
+            stats.staminaExpBonus = msg->getU16();
+            stats.XpBoostBonusRemainingTime = msg->getU16();
+            stats.canBuyXpBoost = msg->getU8();
+            stats.health = msg->getU32();
+            stats.maxHealth = msg->getU32();
+            stats.mana = msg->getU32();
+            stats.maxMana = msg->getU32();
+            stats.soul = msg->getU8();
+            stats.staminaMinutes = msg->getU16();
+            stats.regenerationCondition = msg->getU16();
+            stats.offlineTrainingTime = msg->getU16();
+            stats.speed = msg->getU16();
+            stats.baseSpeed = msg->getU16();
+            stats.capacity = msg->getU32();
+            stats.baseCapacity = msg->getU32();
+            stats.freeCapacity = msg->getU32();
+            msg->getU8();
+            msg->getU8();
+            stats.magicLevel = msg->getU16();
+            stats.baseMagicLevel = msg->getU16();
+            stats.loyaltyMagicLevel = msg->getU16();
+            stats.magicLevelPercent = msg->getU16();
+
+            std::vector<std::vector<uint16_t>> skills;
+
+            for (int_fast32_t skill = Otc::Fist; skill <= Otc::Fishing; ++skill) {
+                msg->getU8(); // Hardcoded Skill Ids
+                const uint16_t skillLevel = msg->getU16();
+                const uint16_t baseSkill = msg->getU16();
+                msg->getU16(); // base + loyalty bonus(?)
+                const uint16_t skillPercent = msg->getU16() / 100;
+                skills.push_back({ skillLevel, skillPercent, baseSkill });
+            }
+
+            const uint8_t combatCount = msg->getU8();
+            std::vector<std::tuple<uint8_t, uint16_t>> combats;
+
+            for (auto i = 0; i < combatCount; ++i) {
+                const uint8_t element = msg->getU8();
+                const uint16_t specializedMagicLevel = msg->getU16();
+                combats.emplace_back(element, specializedMagicLevel);
+            }
+
+            g_game.processCyclopediaCharacterGeneralStats(stats, skills, combats);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_COMBATSTATS:
+        {
+            std::vector<std::vector<uint16_t>> additionalSkillsArray;
+
+            if (g_game.getFeature(Otc::GameAdditionalSkills)) {
+                // Critical, Life Leech, Mana Leech
+                for (uint16_t skill = Otc::CriticalChance; skill <= Otc::ManaLeechAmount; ++skill) {
+                    if (!g_game.getFeature(Otc::GameLeechAmount)) {
+                        if (skill == Otc::LifeLeechAmount || skill == Otc::ManaLeechAmount) {
+                            continue;
+                        }
+                    }
+
+                    const uint16_t skillLevel = msg->getU16();
+                    msg->getU16();
+                    additionalSkillsArray.push_back({ skill, skillLevel });
+                }
+            }
+
+            std::vector<std::vector<uint16_t>> forgeSkillsArray;
+
+            if (g_game.getClientVersion() >= 1281) {
+                // forge skill stats
+                const uint8_t lastSkill = g_game.getClientVersion() >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
+                for (uint16_t skill = Otc::Fatal; skill < lastSkill; ++skill) {
+                    const uint16_t skillLevel = msg->getU16();
+                    msg->getU16();
+                    forgeSkillsArray.push_back({ skill, skillLevel });
+                }
+            }
+
+            msg->getU16(); // Cleave Percent
+            msg->getU16(); // Magic Shield Capacity Flat
+            msg->getU16(); // Magic Shield Capacity Percent
+
+            std::vector<uint16_t> perfectShotDamageRangesArray;
+
+            for (auto i = 1; i <= 5; i++) {
+                const uint16_t perfectShotDamageRange = msg->getU16();
+                perfectShotDamageRangesArray.emplace_back(perfectShotDamageRange);
+            }
+
+            msg->getU16(); // Damage reflection
+
+            CyclopediaCharacterCombatStats data;
+            data.haveBlessings = msg->getU8();
+            msg->getU8(); // total blessings
+
+            data.weaponMaxHitChance = msg->getU16();
+            data.weaponElement = msg->getU8();
+            data.weaponElementDamage = msg->getU8();
+            data.weaponElementType = msg->getU8();
+            data.armor = msg->getU16();
+            data.defense = msg->getU16();
+            const double mitigation = msg->getDouble();
+
+            const uint8_t combatCount = msg->getU8();
+            std::vector<std::tuple<uint8_t, uint16_t>> combatsArray;
+
+            for (auto i = 0; i < combatCount; ++i) {
+                const uint8_t element = msg->getU8();
+                const uint16_t clientModifier = msg->getU16();
+                combatsArray.emplace_back(element, clientModifier);
+            }
+
+            const uint8_t concoctionsCount = msg->getU8();
+            std::vector<std::tuple<uint16_t, uint16_t>> concoctionsArray;
+
+            for (auto i = 0; i < concoctionsCount; ++i) {
+                const uint16_t concoctionFirst = msg->getU8();
+                const uint16_t concoctionSecond = msg->getU16();
+                concoctionsArray.emplace_back(concoctionFirst, concoctionSecond);
+            }
+
+            g_game.processCyclopediaCharacterCombatStats(data, mitigation, additionalSkillsArray, forgeSkillsArray, perfectShotDamageRangesArray, combatsArray, concoctionsArray);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_RECENTDEATHS:
+        {
+            CyclopediaCharacterRecentDeaths data;
+            msg->getU16();  
+            msg->getU16();
+
+            const uint16_t entriesCount = msg->getU16();  
+            for (auto i = 0; i < entriesCount; ++i) {
+                RecentDeathEntry entry;
+                entry.timestamp = msg->getU32();
+                entry.cause = msg->getString();
+                data.entries.emplace_back(entry);
+            }
+
+            g_game.processCyclopediaCharacterRecentDeaths(data);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_RECENTPVPKILLS:
+        {
+            CyclopediaCharacterRecentPvPKills data;
+            msg->getU16();  
+            msg->getU16();
+
+            const uint16_t entriesCount = msg->getU16();  
+            for (auto i = 0; i < entriesCount; ++i) {
+                RecentPvPKillEntry entry;
+                entry.timestamp = msg->getU32();
+                entry.description = msg->getString();
+                entry.status = msg->getU8();
+                data.entries.emplace_back(entry);
+            }
+
+            g_game.processCyclopediaCharacterRecentPvpKills(data);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_ACHIEVEMENTS:
+        {
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_ITEMSUMMARY:
+        {
+            CyclopediaCharacterItemSummary data;
+
+            const uint16_t inventoryItemsCount = msg->getU16();
+            for (auto i = 0; i < inventoryItemsCount; ++i) {
+                ItemSummary item;
+                const uint16_t itemId = msg->getU16();
+                const auto& itemCreated = Item::create(itemId);
+                const uint16_t classification = itemCreated->getClassification();
+
+                uint8_t itemClass = 0;
+                if (classification > 0) {
+                    itemClass = msg->getU8();
+                }
+
+                item.itemId = itemId;
+                item.classification = itemClass;
+                item.amount = msg->getU32();
+                data.inventory.emplace_back(item);
+            }
+
+            const uint16_t storeItemsCount = msg->getU16();
+            for (auto i = 0; i < storeItemsCount; ++i) {
+                ItemSummary item;
+                const uint16_t itemId = msg->getU16();
+                const auto& itemCreated = Item::create(itemId);
+                const uint16_t classification = itemCreated->getClassification();
+
+                uint8_t itemClass = 0;
+                if (classification > 0) {
+                    itemClass = msg->getU8();
+                }
+
+                item.itemId = itemId;
+                item.classification = itemClass;
+                item.amount = msg->getU32();
+                data.store.emplace_back(item);
+            }
+
+            const uint16_t stashItemsCount = msg->getU16();
+            for (auto i = 0; i < stashItemsCount; ++i) {
+                ItemSummary item;
+                const uint16_t itemId = msg->getU16();
+                const auto& itemCreated = Item::create(itemId);
+                const uint16_t classification = itemCreated->getClassification();
+
+                uint8_t itemClass = 0;
+                if (classification > 0) {
+                    itemClass = msg->getU8();
+                }
+
+                item.itemId = itemId;
+                item.classification = itemClass;
+                item.amount = msg->getU32();
+                data.stash.emplace_back(item);
+            }
+
+            const uint16_t depotItemsCount = msg->getU16();
+            for (auto i = 0; i < depotItemsCount; ++i) {
+                ItemSummary item;
+                const uint16_t itemId = msg->getU16();
+                const auto& itemCreated = Item::create(itemId);
+                const uint16_t classification = itemCreated->getClassification();
+
+                uint8_t itemClass = 0;
+                if (classification > 0) {
+                    itemClass = msg->getU8();
+                }
+
+                item.itemId = itemId;
+                item.classification = itemClass;
+                item.amount = msg->getU32();
+                data.depot.emplace_back(item);
+            }
+
+            const uint16_t inboxItemsCount = msg->getU16();
+            for (auto i = 0; i < inboxItemsCount; ++i) {
+                ItemSummary item;
+                const uint16_t itemId = msg->getU16();
+                const auto& itemCreated = Item::create(itemId);
+                const uint16_t classification = itemCreated->getClassification();
+
+                uint8_t itemClass = 0;
+                if (classification > 0) {
+                    itemClass = msg->getU8();
+                }
+
+                item.itemId = itemId;
+                item.classification = itemClass;
+                item.amount = msg->getU32();
+                data.inbox.emplace_back(item);
+            }
+
+            g_game.processCyclopediaCharacterItemSummary(data);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_OUTFITSMOUNTS:
+        {
+            const uint16_t outfitsSize = msg->getU16();
+            std::vector<CharacterInfoOutfits> outfits;
+
+            for (auto i = 0; i < outfitsSize; ++i) {
+                CharacterInfoOutfits outfit;
+                outfit.lookType = msg->getU16();
+                outfit.name = msg->getString();
+                outfit.addons = msg->getU8();
+                outfit.type = msg->getU8(); // store / quest / none
+                outfit.isCurrent = msg->getU32(); // 1000 = true / 0 = false
+                outfits.emplace_back(outfit);
+            }
+
+            OutfitColorStruct currentOutfit;
+            if (outfitsSize > 0) {
+                currentOutfit.lookHead = msg->getU8();
+                currentOutfit.lookBody = msg->getU8();
+                currentOutfit.lookLegs = msg->getU8();
+                currentOutfit.lookFeet = msg->getU8();
+            }
+
+            const uint16_t mountsSize = msg->getU16();
+            std::vector<CharacterInfoMounts> mounts;
+
+            for (auto i = 0; i < mountsSize; ++i) {
+                CharacterInfoMounts mount;
+                mount.mountId = msg->getU16();
+                mount.name = msg->getString();
+                mount.type = msg->getU8(); // store / quest / none
+                mount.isCurrent = msg->getU32(); // 1000 = true / 0 = false
+                mounts.emplace_back(mount);
+            }
+
+            if (mountsSize > 0) {
+                currentOutfit.lookMountHead = msg->getU8();
+                currentOutfit.lookMountBody = msg->getU8();
+                currentOutfit.lookMountLegs = msg->getU8();
+                currentOutfit.lookMountFeet = msg->getU8();
+            }
+
+            const uint16_t familiarsSize = msg->getU16();
+            std::vector<CharacterInfoFamiliar> familiars;
+
+            for (auto i = 0; i < familiarsSize; ++i) {
+                CharacterInfoFamiliar familiar;
+                familiar.lookType = msg->getU16();
+                familiar.name = msg->getString();
+                familiar.type = msg->getU8(); // quest / none
+                familiar.isCurrent = msg->getU32(); // 1000 = true / 0 = false
+                familiars.emplace_back(familiar);
+            }
+
+            g_game.processCyclopediaCharacterAppearances(currentOutfit, outfits, mounts, familiars);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_STORESUMMARY:
+        {
+            const uint32_t xpBoostTime = msg->getU32();  
+            const uint32_t dailyRewardXpBoostTime = msg->getU32();  
+
+            std::vector<std::tuple<std::string, uint8_t>> blessings;
+            const uint8_t blessingCount = msg->getU8();
+
+            for (auto i = 0; i < blessingCount; ++i) {
+                const auto& blessingName = msg->getString();
+                const uint8_t blessingObtained = msg->getU8();
+                blessings.emplace_back(blessingName, blessingObtained);
+            }
+
+            const uint8_t preySlotsUnlocked = msg->getU8();
+            const uint8_t preyWildcards = msg->getU8();
+            const uint8_t instantRewards = msg->getU8();
+            const bool hasCharmExpansion = static_cast<bool>(msg->getU8());
+            const uint8_t hirelingsObtained = msg->getU8();
+
+            std::vector<uint16_t> hirelingSkills;
+            const uint8_t hirelingSkillsCount = msg->getU8();
+
+            for (auto i = 0; i < hirelingSkillsCount; ++i) {
+                const uint8_t skill = msg->getU8();
+                hirelingSkills.emplace_back(static_cast<uint16_t>(skill + 1000));
+            }
+
+            msg->getU8();
+
+            std::vector<std::tuple<uint16_t, std::string, uint8_t>> houseItems;
+            const uint16_t houseItemsCount = msg->getU16();
+
+            for (auto i = 0; i < houseItemsCount; ++i) {
+                const uint16_t itemId = msg->getU16();
+                const auto& itemName = msg->getString();
+                const uint8_t count = msg->getU8();
+                houseItems.emplace_back(itemId, itemName, count);
+            }
+            g_lua.callGlobalField("g_game", "onParseCyclopediaStoreSummary", xpBoostTime, dailyRewardXpBoostTime, blessings, preySlotsUnlocked, preyWildcards, instantRewards, hasCharmExpansion, hirelingsObtained, hirelingSkills, houseItems);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_INSPECTION:
+        {
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_BADGES:
+        {
+            const uint8_t showAccountInformation = msg->getU8();
+            const uint8_t playerOnline = msg->getU8();
+            const uint8_t playerPremium = msg->getU8();
+            const auto& loyaltyTitle = msg->getString();
+
+            const uint8_t badgesSize = msg->getU8();
+            std::vector<std::tuple<uint32_t, std::string>> badgesVector;
+
+            for (auto i = 0; i < badgesSize; ++i) {
+                const uint32_t badgeId = msg->getU32();
+                const auto& badgeName = msg->getString();
+                badgesVector.emplace_back(badgeId, badgeName);
+            }
+    
+            g_game.processCyclopediaCharacterGeneralStatsBadge(showAccountInformation, playerOnline, playerPremium, loyaltyTitle, badgesVector);
+            break;
+        }
+        case Otc::CYCLOPEDIA_CHARACTERINFO_TITLES:
+        {
+            msg->getU8(); // current title
+            const uint8_t titlesSize = msg->getU8();
+            for (auto i = 0; i < titlesSize; ++i) {
+                msg->getString(); // title name
+                msg->getString(); // title description
+                msg->getU8(); // bool title permanent
+                msg->getU8(); // bool title unlocked
+            }
+            break;
+        }
+    }
 }
 
 void ProtocolGame::parseDailyRewardCollectionState(const InputMessagePtr& msg)
@@ -4367,47 +5029,55 @@ void ProtocolGame::parseBosstiaryData(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
 {
-    const auto& getBosstiarySlot = [&]() {
-        msg->getU8(); // Boss Race
-        msg->getU32(); // Kill Count
-        msg->getU16(); // Loot Bonus
-        msg->getU8(); // Kill Bonus
-        msg->getU8(); // Boss Race
-        msg->getU32(); // Remove Price
-        msg->getU8(); // Inactive? (Only true if equal to Boosted Boss)
+    BosstiarySlotsData data;
+
+    auto getBosstiarySlot = [&msg]() -> BosstiarySlot {
+        BosstiarySlot slot;
+        slot.bossRace = msg->getU8();
+        slot.killCount = msg->getU32();
+        slot.lootBonus = msg->getU16();
+        slot.killBonus = msg->getU8();
+        slot.bossRaceRepeat = msg->getU8();
+        slot.removePrice = msg->getU32();
+        slot.inactive = msg->getU8();
+        return slot;
     };
 
-    msg->getU32(); // Player Points
-    msg->getU32(); // Total Points next bonus
-    msg->getU16(); // Current Bonus
-    msg->getU16(); // Next Bonus
+    data.playerPoints = msg->getU32();
+    data.totalPointsNextBonus = msg->getU32();
+    data.currentBonus = msg->getU16();
+    data.nextBonus = msg->getU16();
 
-    const bool isSlotOneUnlocked = static_cast<bool>(msg->getU8());
-    const uint32_t bossIdSlotOne = msg->getU32();
-    if (isSlotOneUnlocked && bossIdSlotOne > 0) {
-        getBosstiarySlot();
+    data.isSlotOneUnlocked = msg->getU8();
+    data.bossIdSlotOne = msg->getU32();
+    if (data.isSlotOneUnlocked && data.bossIdSlotOne != 0) {
+        data.slotOneData = getBosstiarySlot();
     }
 
-    const bool isSlotTwoUnlocked = static_cast<bool>(msg->getU8());
-    const uint32_t bossIdSlotTwo = msg->getU32();
-    if (isSlotTwoUnlocked && bossIdSlotTwo > 0) {
-        getBosstiarySlot();
+    data.isSlotTwoUnlocked = msg->getU8();
+    data.bossIdSlotTwo = msg->getU32();
+    if (data.isSlotTwoUnlocked && data.bossIdSlotTwo != 0) {
+        data.slotTwoData = getBosstiarySlot();
     }
 
-    const bool isTodaySlotUnlocked = static_cast<bool>(msg->getU8());
-    const uint32_t boostedBossId = msg->getU32();
-    if (isTodaySlotUnlocked && boostedBossId > 0) {
-        getBosstiarySlot();
+    data.isTodaySlotUnlocked = msg->getU8();
+    data.boostedBossId = msg->getU32();
+    if (data.isTodaySlotUnlocked && data.boostedBossId != 0) {
+        data.todaySlotData = getBosstiarySlot();
     }
 
-    const bool bossesUnlocked = static_cast<bool>(msg->getU8());
-    if (bossesUnlocked) {
+    data.bossesUnlocked = msg->getU8();
+    if (data.bossesUnlocked) {
         const uint16_t bossesUnlockedSize = msg->getU16();
         for (auto i = 0; i < bossesUnlockedSize; ++i) {
-            msg->getU32(); // bossId
-            msg->getU8(); // bossRace
+            BossUnlocked boss;
+            boss.bossId = msg->getU32();
+            boss.bossRace = msg->getU8();
+            data.bossesUnlockedData.emplace_back(boss);
         }
     }
+
+    g_game.processBosstiarySlots(data);
 }
 
 void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg)
