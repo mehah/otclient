@@ -56,9 +56,11 @@ function controllerCyclopedia:onInit()
     g_ui.importStyle("cyclopedia_pages")
 
     controllerCyclopedia:registerEvents(g_game, {
+        -- items
+        onParseItemDetail = Cyclopedia.loadItemDetail,
         -- bestiary
-        onParseBestiaryRaces = Cyclopedia.LoadBestiaryCategories,
-        onParseBestiaryOverview = Cyclopedia.onParseBestiaryOverview,
+        onParseBestiaryRaces = Cyclopedia.loadBestiaryCategories,
+        onParseBestiaryOverview = Cyclopedia.loadBestiaryOverview,
         onUpdateBestiaryMonsterData = Cyclopedia.loadBestiarySelectedCreature,
         -- bosstiary // bestiary
         onParseCyclopediaTracker = Cyclopedia.onParseCyclopediaTracker,
@@ -77,8 +79,6 @@ function controllerCyclopedia:onInit()
         onParseCyclopediaStoreSummary = Cyclopedia.onParseCyclopediaStoreSummary,
         -- charms
         onUpdateBestiaryCharmsData = Cyclopedia.loadCharms,
-        -- items
-        onParseItemDetail = Cyclopedia.onParseItemDetail
     })
 
     --[[===================================================

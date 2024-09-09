@@ -1475,6 +1475,7 @@ void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
 
     const uint8_t descriptionsSize = msg->getU8();
     std::vector<std::tuple<std::string, std::string>> descriptions;
+    descriptions.reserve(descriptionsSize);
 
     for (auto i = 0; i < descriptionsSize; ++i) {
         const auto& firstDescription = msg->getString();
@@ -1482,7 +1483,7 @@ void ProtocolGame::parseCyclopediaItemDetail(const InputMessagePtr& msg)
         descriptions.emplace_back(firstDescription, secondDescription);
     }
 
-    g_game.processItemDetail(item, descriptions);
+    g_game.processItemDetail(item->getId(), descriptions);
 }
 
 void ProtocolGame::parseAddInventoryItem(const InputMessagePtr& msg)
