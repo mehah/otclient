@@ -3,12 +3,15 @@ local oldProtocol = false
 local offerDescriptions = {}
 
 -- TODO:
--- - Support stack offers (x100, x250) for consumables/potions
--- - Add gifting option 
--- - fix character name change 
--- - fix filter
--- - fix string syntax html
--- - images http 
+-- - Implement stack offers (x100, x250) for consumables/potions
+-- - Add gifting option
+-- - Fix character name change
+-- - Fix filter functionality
+-- - Correct HTML string syntax
+-- - Add HTTP image support
+-- - Fix scroll issue in history panel
+-- - Fix onclick behavior for home link to category/item
+
 GameStore = {}
 -- == Enums ==--
 GameStore.website = {
@@ -532,13 +535,9 @@ function onParseStoreCreateHome(offer)
         nameLabel:setTextAlign(AlignCenter)
         nameLabel:setMarginRight(10)
         row:getChildById('lblPrice'):setText(product.price)
-
-        --[[      
- @array in LUA
-   if product.disabledReasonIndex then
-            row:disable()
-            row:setOpacity(0.5)
-        end ]]
+        if product.coinType == GameStore.CoinType.Transferable then
+            row:getChildById('lblPrice'):setIcon("/game_store/images/icon-tibiacointransferable")
+        end
 
         local data = getProductData(product)
         if data then
@@ -796,16 +795,21 @@ end
 -- =============================================*/
 
 function chooseOffert(self, focusedChild)
-    if not focusedChild then return end
-    
+    if not focusedChild then
+        return
+    end
+
     local product = focusedChild.product
     local panel = controllerShop.ui.panelItem
 
-    local descriptionInfo = offerDescriptions[product.subOffers[1].id] or { id = 0xFFFF, description = "" }
-    
+    local descriptionInfo = offerDescriptions[product.subOffers[1].id] or {
+        id = 0xFFFF,
+        description = ""
+    }
+
     panel:getChildById('lblName'):setText(product.name)
     panel:getChildById('lblDescription'):setText(descriptionInfo.description)
-    
+
     local priceLabel = panel:getChildById('lblPrice')
     priceLabel:setText(product.subOffers[1].price)
 
@@ -819,7 +823,7 @@ function chooseOffert(self, focusedChild)
     local coinsBalance2, coinsBalance1 = getCoinsBalance()
     local price = product.subOffers[1].price
     local btnBuy = panel:getChildById('btnBuy')
-    
+
     local isTransferable = product.subOffers[1].coinType == GameStore.CoinType.Transferable
     local currentBalance = isTransferable and coinsBalance1 or coinsBalance2
 
@@ -838,12 +842,14 @@ function chooseOffert(self, focusedChild)
     end
 
     btnBuy.onClick = function(widget)
-        if acceptWindow then return true end
-        
+        if acceptWindow then
+            return true
+        end
+
         local function acceptFunc()
             local latestBalance2, latestBalance1 = getCoinsBalance()
             local latestCurrentBalance = isTransferable and latestBalance1 or latestBalance2
-            
+
             if latestCurrentBalance >= price then
                 if product.name == "Character Name Change" then
                     -- changeName(product.price)
@@ -860,28 +866,29 @@ function chooseOffert(self, focusedChild)
                 acceptWindow = nil
             end
         end
-        
+
         local function cancelFunc()
             acceptWindow:destroy()
             acceptWindow = nil
         end
-        
+
         local coinType = isTransferable and "transferable coins" or "regular coins"
-        local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, price, coinType)
-        local detailsMessage = string.format("%dx %s\nPrice: %d %s", product.subOffers[1].count, product.name, price, coinType)
-        
-        acceptWindow = displayGeneralSHOPBox(
-            tr('Confirmation of Purchase'),
-            confirmationMessage,
-            detailsMessage,
-            getProductData(product),
-            {
-                { text = tr('Buy'), callback = acceptFunc },
-                { text = tr('Cancel'), callback = cancelFunc },
+        local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, price,
+            coinType)
+        local detailsMessage = string.format("%dx %s\nPrice: %d %s", product.subOffers[1].count, product.name, price,
+            coinType)
+
+        acceptWindow = displayGeneralSHOPBox(tr('Confirmation of Purchase'), confirmationMessage, detailsMessage,
+            getProductData(product), {
+                {
+                    text = tr('Buy'),
+                    callback = acceptFunc
+                },
+                {
+                    text = tr('Cancel'),
+                    callback = cancelFunc
+                },
                 anchor = AnchorHorizontalCenter
-            },
-            acceptFunc,
-            cancelFunc
-        )
+            }, acceptFunc, cancelFunc)
     end
 end
