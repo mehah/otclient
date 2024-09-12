@@ -1,9 +1,11 @@
 local acceptWindow = nil
 local oldProtocol = false
 local offerDescriptions = {}
--- mode = -- 0 = normal, 1 = gift, 2 = refund
--- type = -- 0 = transferable tibia coin, 1 = normal tibia coin
 
+-- TODO:
+-- - Support stack offers (x100, x250) for consumables/potions
+-- - Add gifting option 
+-- - fix character name change 
 GameStore = {}
 -- == Enums ==--
 GameStore.website = {
