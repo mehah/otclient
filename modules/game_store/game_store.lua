@@ -6,6 +6,9 @@ local offerDescriptions = {}
 -- - Support stack offers (x100, x250) for consumables/potions
 -- - Add gifting option 
 -- - fix character name change 
+-- - fix filter
+-- - fix string syntax html
+-- - images http 
 GameStore = {}
 -- == Enums ==--
 GameStore.website = {
