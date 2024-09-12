@@ -491,12 +491,11 @@ function onParseStoreCreateProducts(storeProducts)
         row:getChildById('lblPrice'):setText(subOffer.price)
         row:getChildById('count'):setText(subOffer.count .. "x")
 
-        local coinsBalance1, coinsBalance2 = getCoinsBalance()
+        local coinsBalance2, coinsBalance1 = getCoinsBalance()
         local priceLabel = row:getChildById('lblPrice')
         local isTransferable = subOffer.coinType == GameStore.CoinType.Transferable
         local price = product.subOffers[1].price
         local balance = isTransferable and coinsBalance1 or coinsBalance2
-    
         priceLabel:setColor(balance < price and "#d33c3c" or "white")
         
         if isTransferable then
@@ -792,63 +791,65 @@ end
 -- =============================================*/
 
 function chooseOffert(self, focusedChild)
-
-    if (not focusedChild) then
-        return
-    end
+    if not focusedChild then return end
+    
     local product = focusedChild.product
     local panel = controllerShop.ui.panelItem
 
-    local descriptionInfo = offerDescriptions[product.subOffers[1].id]
-    local ofertaid = nil
-    local description = ""
-    if descriptionInfo then
-        ofertaid = descriptionInfo.id
-        description = descriptionInfo.description
-    else
-        ofertaid = 0xFFFF
-        description = ""
-    end
+    -- Obtener información de la descripción
+    local descriptionInfo = offerDescriptions[product.subOffers[1].id] or { id = 0xFFFF, description = "" }
+    
+    -- Actualizar la información del panel
     panel:getChildById('lblName'):setText(product.name)
-
-    local data = getProductData(product)
-    panel:getChildById('image'):destroyChildren()
-    if data then
-        createProductImage(panel:getChildById('image'), data)
-    end
-
-    panel:getChildById('lblDescription'):setText(description)
+    panel:getChildById('lblDescription'):setText(descriptionInfo.description)
+    
     local priceLabel = panel:getChildById('lblPrice')
     priceLabel:setText(product.subOffers[1].price)
-
-    local coinsBalance = getCoinsBalance()
-    if coinsBalance < product.subOffers[1].price then
-        priceLabel:setColor("#d33c3c")
-        -- panel:getChildById('btnBuy'):setTooltip("test")
-        panel:getChildById('btnBuy'):disable()
-
-    else
-        priceLabel:setColor("white")
-        panel:getChildById('btnBuy'):enable()
-        --  panel:getChildById('lblPrice'):removeTooltip()
-
+    
+    -- Actualizar la imagen del producto
+    local data = getProductData(product)
+    local imagePanel = panel:getChildById('image')
+    imagePanel:destroyChildren()
+    if data then
+        createProductImage(imagePanel, data)
     end
 
-    panel:getChildById('btnBuy').onClick = function(widget)
+    local coinsBalance2, coinsBalance1 = getCoinsBalance()
+    local price = product.subOffers[1].price
+    local btnBuy = panel:getChildById('btnBuy')
+    
+    local isTransferable = product.subOffers[1].coinType == GameStore.CoinType.Transferable
+    local currentBalance = isTransferable and coinsBalance1 or coinsBalance2
 
-        if acceptWindow then
-            return true
-        end
+    if isTransferable then
+        priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
+    else
+        priceLabel:setIcon("/game_store/images/tibiaCoin")
+    end
 
-        local acceptFunc = function()
+    -- Actualizar el botón de compra
+    if currentBalance < price then
+        priceLabel:setColor("#d33c3c")
+        btnBuy:disable()
+    else
+        priceLabel:setColor("white")
+        btnBuy:enable()
+    end
 
-            if getCoinsBalance() >= product.subOffers[1].price then
+    -- Configurar el callback del botón de compra
+    btnBuy.onClick = function(widget)
+        if acceptWindow then return true end
+        
+        local function acceptFunc()
+            local latestBalance2, latestBalance1 = getCoinsBalance()
+            local latestCurrentBalance = isTransferable and latestBalance1 or latestBalance2
+            
+            if latestCurrentBalance >= price then
                 if product.name == "Character Name Change" then
                     -- changeName(product.price)
                 else
                     g_game.buyStoreOffer(product.subOffers[1].id, product.type)
                 end
-
                 if acceptWindow then
                     acceptWindow:destroy()
                     acceptWindow = nil
@@ -859,24 +860,28 @@ function chooseOffert(self, focusedChild)
                 acceptWindow = nil
             end
         end
-
-        local cancelFunc = function()
+        
+        local function cancelFunc()
             acceptWindow:destroy()
             acceptWindow = nil
         end
-        acceptWindow = displayGeneralSHOPBox(tr('Confirmation of Purchase'),
-            'Do you want to buy the product "' .. product.name .. '"?', product.subOffers[1].count .. "x " ..
-                product.name .. "\nPrice : " .. product.subOffers[1].price, getProductData(product), {
-                {
-                    text = tr('Buy'),
-                    callback = acceptFunc
-                },
-                {
-                    text = tr('Cancel'),
-                    callback = cancelFunc
-                },
+        
+        local coinType = isTransferable and "transferable coins" or "regular coins"
+        local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, price, coinType)
+        local detailsMessage = string.format("%dx %s\nPrice: %d %s", product.subOffers[1].count, product.name, price, coinType)
+        
+        acceptWindow = displayGeneralSHOPBox(
+            tr('Confirmation of Purchase'),
+            confirmationMessage,
+            detailsMessage,
+            getProductData(product),
+            {
+                { text = tr('Buy'), callback = acceptFunc },
+                { text = tr('Cancel'), callback = cancelFunc },
                 anchor = AnchorHorizontalCenter
-            }, acceptFunc, cancelFunc)
+            },
+            acceptFunc,
+            cancelFunc
+        )
     end
 end
-
