@@ -146,7 +146,7 @@ StoreWindow
       text-auto-resize: true
       phantom: true
 
-    Label
+    UIWidget
       id: icono
       anchors.bottom: parent.bottom
       anchors.left: prev.right

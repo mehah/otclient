@@ -163,9 +163,13 @@ GameStore.DefaultValues = {
 -- =            Local Function                  =
 -- =============================================*/
 local function getCoinsBalance()
-    local coinsText = controllerShop.ui.lblCoins:getText()
-    local numero = string.match(coinsText, "Including:%s*(%d+)")
-    return tonumber(numero)
+    local function extractNumber(text)
+        return tonumber((text:match("%d[%d,]*"):gsub(",", "")))
+    end
+
+    local coins1 = extractNumber(controllerShop.ui.lblCoins.numero:getText())
+    local coins2 = extractNumber(controllerShop.ui.lblCoins.numerodos:getText())
+    return coins1, coins2
 end
 
 local function convertir_timestamp(timestamp)
@@ -487,13 +491,16 @@ function onParseStoreCreateProducts(storeProducts)
         row:getChildById('lblPrice'):setText(subOffer.price)
         row:getChildById('count'):setText(subOffer.count .. "x")
 
-        local coinsBalance = getCoinsBalance()
-        if coinsBalance < product.subOffers[1].price then
-            row:getChildById('lblPrice'):setColor("#d33c3c")
-
-        else
-            row:getChildById('lblPrice'):setColor("white")
-
+        local coinsBalance1, coinsBalance2 = getCoinsBalance()
+        local priceLabel = row:getChildById('lblPrice')
+        local isTransferable = subOffer.coinType == GameStore.CoinType.Transferable
+        local price = product.subOffers[1].price
+        local balance = isTransferable and coinsBalance1 or coinsBalance2
+    
+        priceLabel:setColor(balance < price and "#d33c3c" or "white")
+        
+        if isTransferable then
+            priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
         end
 
         local data = getProductData(product)
