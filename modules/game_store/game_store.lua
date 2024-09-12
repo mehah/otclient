@@ -346,6 +346,12 @@ local function createProductImage(imageParent, data)
     end
 end
 
+local function formatNumberWithCommas(value)
+    local formattedValue = string.format("%d", value)
+    -- Add commas to the formatted value
+    formattedValue = formattedValue:reverse():gsub("(%d%d%d)", "%1,")
+    return formattedValue:reverse():gsub("^,", "")
+end
 -- /*=============================================
 -- =            Controller                   =
 -- =============================================*/
@@ -404,7 +410,8 @@ function controllerShop:onInit()
 end
 
 function onParseStoreGetCoin(getTibiaCoins, getTransferableCoins)
-    controllerShop.ui.lblCoins:setText(string.format("%s (Including: %s)", getTibiaCoins, getTransferableCoins))
+    controllerShop.ui.lblCoins.numero:setText(formatNumberWithCommas(getTibiaCoins))
+    controllerShop.ui.lblCoins.numerodos:setText(string.format("(Including: %s", formatNumberWithCommas(getTransferableCoins)))
 end
 
 function onParseStoreOfferDescriptions(offerId, description)
