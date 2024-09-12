@@ -45,7 +45,9 @@ private:
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;
     ScheduledEventPtr m_liveReloadEvent;
-    std::mutex m_mutex;
+    std::shared_mutex m_mutex;
+
+    friend class GarbageCollection;
 };
 
 extern TextureManager g_textures;

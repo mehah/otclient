@@ -1,0 +1,9 @@
+Module
+  name: game_blessing
+  description: game_blessing
+  author: game_blessing
+  website: game_blessing
+  scripts: [ blessing.lua ]
+  sandboxed: true
+  @onLoad: BlessingController:init()
+  @onUnload: BlessingController:terminate()

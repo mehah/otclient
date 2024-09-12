@@ -320,11 +320,11 @@ void WIN32Window::internalCreateGLContext()
         g_logger.fatal("Unable to initialize EGL");
 
     static int configList[] = {
-        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-        EGL_RED_SIZE, 4,
-        EGL_GREEN_SIZE, 4,
-        EGL_BLUE_SIZE, 4,
-        EGL_ALPHA_SIZE, 4,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
+        EGL_RED_SIZE, 8,
+        EGL_GREEN_SIZE, 8,
+        EGL_BLUE_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
         EGL_NONE
     };
 
@@ -340,7 +340,7 @@ void WIN32Window::internalCreateGLContext()
         g_logger.warning("Didn't got the exact EGL config");
 
     EGLint contextAtrrList[] = {
-        EGL_CONTEXT_CLIENT_VERSION, 2,
+        EGL_CONTEXT_CLIENT_VERSION, 3,
         EGL_NONE
     };
 
@@ -474,7 +474,7 @@ void WIN32Window::resize(const Size& size)
 
 void WIN32Window::show()
 {
-    g_mainDispatcher.addEvent([&] {
+    g_mainDispatcher.addEvent([this] {
         m_hidden = false;
         if (m_maximized)
             ShowWindow(m_window, SW_MAXIMIZE);

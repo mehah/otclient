@@ -41,6 +41,14 @@ local executeConfig = function(attachedEffect, config)
         attachedEffect:setBounce(config.bounce[1], config.bounce[2], config.bounce[3] or 1000)
     end
 
+    if config.pulse then
+        attachedEffect:setPulse(config.pulse[1], config.pulse[2], config.pulse[3] or 1000)
+    end
+
+    if config.fade then
+        attachedEffect:setFade(config.fade[1], config.fade[2], config.fade[3] or 1000)
+    end
+
     if config.duration ~= nil and config.duration > 0 then
         attachedEffect:setDuration(config.duration)
     end

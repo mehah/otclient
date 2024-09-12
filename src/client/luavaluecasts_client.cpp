@@ -83,7 +83,6 @@ bool luavalue_cast(int index, Outfit& outfit)
         outfit.setAura(g_lua.popInteger());
         g_lua.getField("shaders", index);
         outfit.setShader(g_lua.popString());
-
     }
 
     return true;
@@ -287,6 +286,69 @@ bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints)
     g_lua.getField("skullTime", index);
     unjustifiedPoints.skullTime = g_lua.popInteger();
     return true;
+}
+
+int push_luavalue(const BlessData& bless) {
+    g_lua.createTable(0, 3);
+    g_lua.pushInteger(bless.blessBitwise);
+    g_lua.setField("blessBitwise");
+    g_lua.pushInteger(bless.playerBlessCount);
+    g_lua.setField("playerBlessCount");
+    g_lua.pushInteger(bless.store);
+    g_lua.setField("store");
+    return 1;
+}
+
+int push_luavalue(const LogData& log) {
+    g_lua.createTable(0, 3);
+    g_lua.pushInteger(log.timestamp);
+    g_lua.setField("timestamp");
+    g_lua.pushInteger(log.colorMessage);
+    g_lua.setField("colorMessage");
+    g_lua.pushString(log.historyMessage);
+    g_lua.setField("historyMessage");
+    return 1;
+}
+
+int push_luavalue(const BlessDialogData& data) {
+    g_lua.createTable(0, 11);
+    g_lua.pushInteger(data.totalBless);
+    g_lua.setField("totalBless");
+
+    g_lua.createTable(data.blesses.size(), 0);
+    for (size_t i = 0; i < data.blesses.size(); ++i) {
+        push_luavalue(data.blesses[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("blesses");
+
+    g_lua.pushInteger(data.premium);
+    g_lua.setField("premium");
+    g_lua.pushInteger(data.promotion);
+    g_lua.setField("promotion");
+    g_lua.pushInteger(data.pvpMinXpLoss);
+    g_lua.setField("pvpMinXpLoss");
+    g_lua.pushInteger(data.pvpMaxXpLoss);
+    g_lua.setField("pvpMaxXpLoss");
+    g_lua.pushInteger(data.pveExpLoss);
+    g_lua.setField("pveExpLoss");
+    g_lua.pushInteger(data.equipPvpLoss);
+    g_lua.setField("equipPvpLoss");
+    g_lua.pushInteger(data.equipPveLoss);
+    g_lua.setField("equipPveLoss");
+    g_lua.pushInteger(data.skull);
+    g_lua.setField("skull");
+    g_lua.pushInteger(data.aol);
+    g_lua.setField("aol");
+
+    g_lua.createTable(data.logs.size(), 0);
+    for (size_t i = 0; i < data.logs.size(); ++i) {
+        push_luavalue(data.logs[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("logs");
+    
+    return 1;
 }
 
 int push_luavalue(const StoreCategory& category) {

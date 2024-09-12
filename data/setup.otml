@@ -1,6 +1,6 @@
 game
   sprite-size: 32
-  last-supported-version: 1332
+  last-supported-version: 1340
   draw-typing: false
   typing-icon: /images/game/console/typing
   
@@ -28,6 +28,7 @@ game
     diagonal-walk-speed: 3
 
   render
+    draw-covered-things: false
     invisible-ticks-per-frame: 75
     item-ticks-per-frame: 75
     effect-ticks-per-frame: 75

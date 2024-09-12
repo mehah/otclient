@@ -5,5 +5,5 @@ Module
   website: https://github.com/edubart/otclient
   sandboxed: true
   scripts: [ playerdeath ]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: deathController:init()
+  @onUnload: deathController:terminate()

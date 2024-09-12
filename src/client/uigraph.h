@@ -25,9 +25,10 @@
 #include "declarations.h"
 #include <framework/ui/uiwidget.h>
 
-class UIGraph : public UIWidget {
+class UIGraph : public UIWidget
+{
 public:
-    UIGraph();
+    UIGraph() = default;
 
     void drawSelf(DrawPoolType drawPane);
 

@@ -118,7 +118,7 @@ void AttachableObject::clearTemporaryAttachedEffects()
 {
     if (!hasAttachedEffects()) return;
     m_data->attachedEffects.erase(std::remove_if(m_data->attachedEffects.begin(), m_data->attachedEffects.end(),
-                                  [&](const AttachedEffectPtr& obj) {
+                                  [this](const AttachedEffectPtr& obj) {
         if (!obj->isPermanent()) {
             onDetachEffect(obj);
             return true;
@@ -131,7 +131,7 @@ void AttachableObject::clearPermanentAttachedEffects()
 {
     if (!hasAttachedEffects()) return;
     m_data->attachedEffects.erase(std::remove_if(m_data->attachedEffects.begin(), m_data->attachedEffects.end(),
-                                  [&](const AttachedEffectPtr& obj) {
+                                  [this](const AttachedEffectPtr& obj) {
         if (obj->isPermanent()) {
             onDetachEffect(obj);
             return true;

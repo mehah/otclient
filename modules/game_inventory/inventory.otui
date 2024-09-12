@@ -68,7 +68,7 @@ PhantomMiniWindow
       anchors.left: changeSize.right
       margin-left: 3
       size: 12 12
-      
+      @onClick: modules.game_blessing.toggle()
       $pressed !disabled:
         image-clip: 12 0 12 12
 
@@ -556,7 +556,7 @@ PhantomMiniWindow
       anchors.left: changeSize.left
       margin-top: 3
       size: 12 12
-
+      @onClick: modules.game_blessing.toggle()
       $pressed !disabled:
         image-clip: 12 0 12 12
 
