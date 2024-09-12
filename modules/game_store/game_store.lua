@@ -9,8 +9,8 @@ local offerDescriptions = {}
 -- - Fix filter functionality
 -- - Correct HTML string syntax
 -- - Add HTTP image support
--- - Fix scroll issue in history panel
--- - Fix onclick behavior for home link to category/item
+-- - Fix scroll in history panel
+-- - Fix onclick behavior in "home", link to category/item
 
 GameStore = {}
 -- == Enums ==--
