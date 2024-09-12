@@ -796,17 +796,14 @@ function chooseOffert(self, focusedChild)
     local product = focusedChild.product
     local panel = controllerShop.ui.panelItem
 
-    -- Obtener información de la descripción
     local descriptionInfo = offerDescriptions[product.subOffers[1].id] or { id = 0xFFFF, description = "" }
     
-    -- Actualizar la información del panel
     panel:getChildById('lblName'):setText(product.name)
     panel:getChildById('lblDescription'):setText(descriptionInfo.description)
     
     local priceLabel = panel:getChildById('lblPrice')
     priceLabel:setText(product.subOffers[1].price)
-    
-    -- Actualizar la imagen del producto
+
     local data = getProductData(product)
     local imagePanel = panel:getChildById('image')
     imagePanel:destroyChildren()
@@ -827,7 +824,6 @@ function chooseOffert(self, focusedChild)
         priceLabel:setIcon("/game_store/images/tibiaCoin")
     end
 
-    -- Actualizar el botón de compra
     if currentBalance < price then
         priceLabel:setColor("#d33c3c")
         btnBuy:disable()
@@ -836,7 +832,6 @@ function chooseOffert(self, focusedChild)
         btnBuy:enable()
     end
 
-    -- Configurar el callback del botón de compra
     btnBuy.onClick = function(widget)
         if acceptWindow then return true end
         
