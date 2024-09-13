@@ -170,6 +170,26 @@ GameStore.DefaultValues = {
 -- /*=============================================
 -- =            Local Function                  =
 -- =============================================*/
+local function setImagenHttp(widget, url)
+    if Services and Services.store  then
+        HTTP.downloadImage(Services.store..url, function(path, err)
+            if err then
+                g_logger.warning("HTTP error: " .. err .. " - " .. Services.store..url)
+                widget:setImageSource("/game_store/images/dynamic-image-error")
+                widget:setImageAutoResize(true)
+                widget:setImageFixedRatio(false)
+                return
+            end
+            widget:setImageSource(path)
+        end)
+    else
+        widget:setImageSource("/game_store/images/" ..url)
+--[[         widget:setImageSource("/game_store/images/dynamic-image-error")
+        widget:setImageAutoResize(true)
+        widget:setImageFixedRatio(false) ]]
+    end
+end
+
 local function getCoinsBalance()
     local function extractNumber(text)
         return tonumber((text:match("%d[%d,]*"):gsub(",", "")))
@@ -352,7 +372,8 @@ local function createProductImage(imageParent, data)
         itemWidget:fill('parent')
     elseif data.VALOR == "icon" then
         local widget = g_ui.createWidget('UIWidget', imageParent)
-        widget:setImageSource("/game_store/images/64/" .. data.ID)
+       -- widget:setImageSource("/game_store/images/64/" .. data.ID)
+        setImagenHttp(widget,"/64/"..data.ID)
         widget:fill('parent')
     elseif data.VALOR == "mountId" or data.VALOR:find("outfitId") then
         local creature = g_ui.createWidget('Creature', imageParent)
@@ -559,8 +580,9 @@ function onParseStoreCreateHome(offer)
         end
     end
 
-    local imagenAleatoria = offer.banners[math.random(1, #offer.banners)].image
-    controllerShop.ui.HomePanel.HomeImagen:setImageSource("/game_store/images/" .. imagenAleatoria)
+    local ramdomImg = offer.banners[math.random(1, #offer.banners)].image
+   -- controllerShop.ui.HomePanel.HomeImagen:setImageSource("/game_store/images/" .. ramdomImg)
+    setImagenHttp(controllerShop.ui.HomePanel.HomeImagen,ramdomImg)
     enableAllButtons()
 end
 

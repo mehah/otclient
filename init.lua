@@ -6,6 +6,7 @@ Services = {
     --updater = "http://localhost/api/updater.php", --./updater
     --status = "http://localhost/api/status.php", --./client_entergame | ./client_topmenu
     --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
+    --store = "http://localhost/images/store/" --./game_store --https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
 }
 
 --[[ Servers_init = {
