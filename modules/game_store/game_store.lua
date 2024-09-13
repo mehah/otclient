@@ -316,6 +316,7 @@ local function createSubWidget(parent, subId, subButton)
         subWidget.Button:setChecked(true)
         subWidget.Button.Arrow:setVisible(true)
         subWidget.Button.Arrow:setImageSource("/images/ui/icon-arrow7x7-right")
+        controllerShop.ui.openedSubCategory = subWidget
 
         if selectedOption then
             selectedOption:hide()
@@ -418,7 +419,8 @@ function controllerShop:onInit()
         onParseStoreCreateProducts = onParseStoreCreateProducts,
         onParseStoreGetHistory = onParseStoreGetHistory,
         onParseStoreGetPurchaseStatus = onParseStoreGetPurchaseStatus,
-        onParseStoreOfferDescriptions = onParseStoreOfferDescriptions
+        onParseStoreOfferDescriptions = onParseStoreOfferDescriptions,
+        onParseStoreError = onParseStoreError
 
     })
 end
@@ -442,6 +444,11 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
     messageBox.additionalLabel.onClick = function(widget)
         messageBox.additionalLabel:disable()
         messageBox.additionalLabel:getChildren()[1]:setImageSource("/game_store/images/open")
+        if not controllerShop.ui.openedSubCategory then -- temp fix
+            controllerShop.ui.openedCategory.Button:onClick() 
+        else
+            controllerShop.ui.openedSubCategory.Button:onClick()
+        end
         controllerShop:scheduleEvent(function()
             messageBox:destroy()
             controllerShop.ui:show()
@@ -855,6 +862,7 @@ function chooseOffert(self, focusedChild)
             if latestCurrentBalance >= price then
                 if product.name == "Character Name Change" then
                     -- changeName(product.price)
+                    print("no yet")
                 else
                     g_game.buyStoreOffer(product.subOffers[1].id, product.type)
                 end
@@ -893,4 +901,8 @@ function chooseOffert(self, focusedChild)
                 anchor = AnchorHorizontalCenter
             }, acceptFunc, cancelFunc)
     end
+end
+
+function onParseStoreError(errorMessage)
+    displayErrorBox(controllerShop.ui:getText(), errorMessage)
 end

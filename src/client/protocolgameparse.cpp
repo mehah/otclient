@@ -1048,7 +1048,7 @@ void ProtocolGame::parseStoreError(const InputMessagePtr& msg) const
     const uint8_t errorType = msg->getU8();
     const auto& message = msg->getString();
 
-    g_logger.error(stdext::format("Store Error: %s [%i]", message, errorType));
+    g_lua.callGlobalField("g_game", "onParseStoreError", message);
 }
 
 void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)
