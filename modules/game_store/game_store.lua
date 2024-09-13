@@ -213,6 +213,8 @@ end
 -- =============================================*/
 
 local function disableAllButtons()
+    local listProduct = controllerShop.ui.panelItem.listProduct
+    listProduct:destroyChildren()
     for i = 1, controllerShop.ui.listCategory:getChildCount() do
         local widget = controllerShop.ui.listCategory:getChildByIndex(i)
         if widget and widget.Button then
