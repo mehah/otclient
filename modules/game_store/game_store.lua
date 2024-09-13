@@ -861,8 +861,9 @@ function chooseOffert(self, focusedChild)
 
             if latestCurrentBalance >= price then
                 if product.name == "Character Name Change" then
-                    -- changeName(product.price)
-                    print("no yet")
+                    displayErrorBox(controllerShop.ui:getText(),"no yet,UI missing")
+                elseif product.name == "Hireling Apprentice" then
+                    displayErrorBox(controllerShop.ui:getText(),"no yet, UI missing")
                 else
                     g_game.buyStoreOffer(product.subOffers[1].id, product.type)
                 end
