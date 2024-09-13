@@ -213,8 +213,11 @@ end
 -- =============================================*/
 
 local function disableAllButtons()
-    local listProduct = controllerShop.ui.panelItem.listProduct
-    listProduct:destroyChildren()
+    local panel = controllerShop.ui.panelItem
+    panel:getChildById('btnBuy'):disable()
+    panel:getChildById('lblName'):setText("")
+    panel:getChildById('lblPrice'):setText("")
+    panel:getChildById('image'):destroyChildren()
     for i = 1, controllerShop.ui.listCategory:getChildCount() do
         local widget = controllerShop.ui.listCategory:getChildByIndex(i)
         if widget and widget.Button then
