@@ -509,7 +509,9 @@ function onParseStoreCreateProducts(storeProducts)
         end
 
         row:getChildById('lblPrice'):setText(subOffer.price)
-        row:getChildById('count'):setText(subOffer.count .. "x")
+        if subOffer.count > 0 then
+            row:getChildById('count'):setText(subOffer.count .. "x")
+        end
 
         local coinsBalance2, coinsBalance1 = getCoinsBalance()
         local priceLabel = row:getChildById('lblPrice')
