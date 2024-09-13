@@ -1,0 +1,74 @@
+historyData < UIWidget
+  height: 16
+  Label
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom : parent.bottom
+    id: rank
+    width: 150
+    !text: tr('1')
+    text-align: center
+    color: #dfdfdfcf
+    phantom: false
+    margin-left: 4
+
+  VerticalSeparator
+    id: separator
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-top: -1
+    margin-bottom: -1
+    margin-left: 155
+    
+  Label
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.bottom : parent.bottom
+    id: name
+    width: 216
+    !text: tr('-')
+    text-align: left
+    color: #ff0000cf
+    phantom: true
+    margin-left: 5
+
+blessingTEST < UIWidget
+  background-color: alpha
+  height: 62
+  width: 70
+  focusable: true
+  text-align: left
+  UIWidget
+    id: enabled
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-top: -10
+    margin-left: 3
+  Label
+    id: text
+    !text: tr('loooooong text')
+    text-align: center
+    margin-top: 5
+    width: 65
+    anchors.left: prev.left
+    anchors.top: prev.bottom
+
+    image-source: /game_blessing/images/blessingContainer
+    focusable: false
+
+BlessingButton < UIButton
+  size: 128 37
+  image-source: /game_blessing/images/getpremium
+  image-clip: 0 0 128 37
+  image-border: 3
+  @onClick: modules.game_mainpanel.toggleStore()
+  
+  $pressed:
+    image-clip: 0 37 128 37
+  $!on:
+    image-clip: 0 74 128 37
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+

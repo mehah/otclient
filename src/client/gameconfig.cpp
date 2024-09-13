@@ -157,7 +157,9 @@ void GameConfig::loadPlayerNode(const OTMLNodePtr& mainNode) {
 
 void GameConfig::loadRenderNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
-        if (node->tag() == "invisible-ticks-per-frame")
+        if (node->tag() == "draw-covered-things")
+            m_drawCoveredThings = node->value<bool>();
+        else if (node->tag() == "invisible-ticks-per-frame")
             m_invisibleTicksPerFrame = node->value<int>();
         else if (node->tag() == "item-ticks-per-frame")
             m_itemTicksPerFrame = node->value<int>();

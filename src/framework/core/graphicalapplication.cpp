@@ -21,6 +21,7 @@
  */
 
 #include "graphicalapplication.h"
+#include "garbagecollection.h"
 
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
@@ -66,7 +67,7 @@ void GraphicalApplication::init(std::vector<std::string>& args, ApplicationConte
         else g_dispatcher.addEvent([&, PH1]() { inputEvent(PH1); });
     });
 
-    g_window.setOnClose([this] { g_dispatcher.addEvent([&]() { close(); }); });
+    g_window.setOnClose([this] { g_dispatcher.addEvent([this]() { close(); }); });
 
     g_mouse.init();
 
@@ -138,15 +139,17 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
-    const auto& FPS = [&] {
+    const auto& FPS = [this] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
 
     // THREAD - POOL & MAP
-    const auto& mapThread = g_asyncDispatcher.submit_task([&] {
+    const auto& mapThread = g_asyncDispatcher.submit_task([this] {
         const auto uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
         const auto fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
+
+        BS::multi_future<void> tasks;
 
         g_eventThreadId = EventDispatcher::getThreadId();
         while (!m_stopping) {
@@ -166,23 +169,22 @@ void GraphicalApplication::run()
 
             m_drawEvents->preLoad();
 
-            BS::multi_future<void> threads;
-            threads.reserve(3);
+            tasks.clear();
 
             if (m_drawEvents->canDraw(DrawPoolType::LIGHT)) {
-                threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+                tasks.emplace_back(g_asyncDispatcher.submit_task([this] {
                     m_drawEvents->draw(DrawPoolType::LIGHT);
                 }));
             }
 
             if (uiPool->canRepaint()) {
-                threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+                tasks.emplace_back(g_asyncDispatcher.submit_task([this] {
                     g_ui.render(DrawPoolType::FOREGROUND);
                 }));
             }
 
             if (fgMapPool->canRepaint()) {
-                threads.emplace_back(g_asyncDispatcher.submit_task([&] {
+                tasks.emplace_back(g_asyncDispatcher.submit_task([this] {
                     m_drawEvents->draw(DrawPoolType::CREATURE_INFORMATION);
                     m_drawEvents->draw(DrawPoolType::FOREGROUND_MAP);
                 }));
@@ -190,7 +192,7 @@ void GraphicalApplication::run()
 
             m_drawEvents->draw(DrawPoolType::MAP);
 
-            threads.wait();
+            tasks.wait();
 
             m_mapProcessFrameCounter.update();
         }
@@ -224,6 +226,8 @@ void GraphicalApplication::run()
 
 void GraphicalApplication::poll()
 {
+    GarbageCollection::poll();
+
     Application::poll();
 
 #ifdef FRAMEWORK_SOUND
@@ -321,4 +325,10 @@ void GraphicalApplication::doScreenshot(std::string file)
 void GraphicalApplication::doMapScreenshot(std::string fileName)
 {
     if (m_drawEvents) m_drawEvents->doMapScreenshot(fileName);
+}
+
+float GraphicalApplication::getHUDScale() const { return g_window.getDisplayDensity(); }
+void GraphicalApplication::setHUDScale(float v) {
+    g_window.setDisplayDensity(v);
+    resize(g_graphics.getViewportSize());
 }

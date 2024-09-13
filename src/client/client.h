@@ -56,8 +56,8 @@ public:
 
 private:
     UIMapPtr m_mapWidget;
-    float m_effectAlpha{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
-    float m_missileAlpha{ PlatformWindow::DEFAULT_DISPLAY_DENSITY };
+    float m_effectAlpha{ 1.f };
+    float m_missileAlpha{ 1.f };
 };
 
 extern Client g_client;

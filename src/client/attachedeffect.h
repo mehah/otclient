@@ -71,6 +71,9 @@ public:
     void setDirection(const Otc::Direction dir) { m_direction = std::min<Otc::Direction>(dir, Otc::NorthWest); }
 
     void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
+    void setPulse(uint8_t minHeight, uint8_t height, uint16_t speed) { m_pulse = { minHeight, height , speed }; }
+    void setFade(uint8_t start, uint8_t end, uint16_t speed) { m_fade = { start, end , speed }; }
+
     void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
     void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
@@ -90,6 +93,14 @@ public:
     void setLight(const Light& light) { m_light = light; }
 
     ThingType* getThingType() const;
+
+    struct Bounce
+    {
+        uint8_t minHeight{ 0 };
+        uint8_t height{ 0 };
+        uint16_t speed{ 0 };
+        Timer timer;
+    };
 
 private:
     int getCurrentAnimationPhase();
@@ -117,6 +128,7 @@ private:
     bool m_canDrawOnUI{ true };
     bool m_disableWalkAnimation{ false };
     bool m_permanent{ false };
+    bool m_smooth = { true };
 
     Outfit m_outfitOwner;
     Light m_light;
@@ -127,21 +139,18 @@ private:
     Size m_size;
 
     Timer m_animationTimer;
-    Timer m_bounceTimer;
 
     Otc::Direction m_direction{ Otc::North };
 
     std::array<DirControl, Otc::Direction::NorthWest + 1> m_offsetDirections;
+    std::string m_texturePath;
 
-    struct
-    {
-        uint8_t minHeight{ 0 };
-        uint8_t height{ 0 };
-        uint16_t speed{ 0 };
-    } m_bounce;
+    Bounce m_bounce;
+    Bounce m_pulse;
+    Bounce m_fade;
 
     PainterShaderProgramPtr m_shader;
-    AnimatedTexturePtr m_texture;
+    TexturePtr m_texture;
 
     std::string m_name;
 

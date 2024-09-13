@@ -209,7 +209,13 @@ enum ITEM_CATEGORY : uint8_t
     ITEM_CATEGORY_WANDS_RODS = 21,
     ITEM_CATEGORY_PREMIUM_SCROLLS = 22,
     ITEM_CATEGORY_TIBIA_COINS = 23,
-    ITEM_CATEGORY_CREATURE_PRODUCTS = 24
+    ITEM_CATEGORY_CREATURE_PRODUCTS = 24,
+    ITEM_CATEGORY_QUIVER = 25,
+    ITEM_CATEGORY_TWOHANDWEAPON = 26,
+    ITEM_CATEGORY_HELMETS = 27,
+    ITEM_CATEGORY_BACKPACK = 28,
+    ITEM_CATEGORY_ONEHANDWEAPON = 29,
+    ITEM_CATEGORY_ARROW = 30
 };
 
 enum SpriteMask :uint8_t
@@ -248,6 +254,7 @@ struct ImbuementSlot
 
 struct ImbuementTrackerItem
 {
+    ImbuementTrackerItem() : slot(0) { }
     ImbuementTrackerItem(uint8_t slot) : slot(slot) { }
 
     uint8_t slot;

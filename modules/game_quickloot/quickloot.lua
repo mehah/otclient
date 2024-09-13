@@ -21,14 +21,6 @@ function quickLootController:onInit()
             {}
         }
     }
-    QuickLoot.mouseGrabberWidget = g_ui.createWidget("UIWidget")
-
-    QuickLoot.mouseGrabberWidget:setVisible(false)
-    QuickLoot.mouseGrabberWidget:setFocusable(false)
-
-    QuickLoot.mouseGrabberWidget.onMouseRelease = QuickLoot.onChooseItem
-    QuickLoot.lastSelectBag = nil
-    QuickLoot.ErrorWindow = nil
 
     quickLootController.ui:hide()
 
@@ -48,6 +40,19 @@ function quickLootController:onTerminate()
 end
 
 function quickLootController:onGameStart()
+    if not g_game.getFeature(GameThingQuickLoot) then
+        return
+    end
+
+    QuickLoot.mouseGrabberWidget = g_ui.createWidget("UIWidget")
+
+    QuickLoot.mouseGrabberWidget:setVisible(false)
+    QuickLoot.mouseGrabberWidget:setFocusable(false)
+
+    QuickLoot.mouseGrabberWidget.onMouseRelease = QuickLoot.onChooseItem
+    QuickLoot.lastSelectBag = nil
+    QuickLoot.ErrorWindow = nil
+
     quickLootController.ui.information.vipPanel.premium:setOn(not g_game.getLocalPlayer():isPremium())
     QuickLoot.load()
 
@@ -56,6 +61,9 @@ function quickLootController:onGameStart()
 end
 
 function quickLootController:onGameEnd()
+    if not g_game.getFeature(GameThingQuickLoot) then
+        return
+    end
     QuickLoot.save()
     QuickLoot.toggle()
     if quickLootController.ui:isVisible() then
@@ -147,7 +155,15 @@ function QuickLoot.Define()
                 return g_logger.error("Error while reading containers settings file. " .. result)
             end
 
-            QuickLoot.data = result
+            if result == nil then
+                QuickLoot.data = {
+                    filter = 1,
+                    loots = {{}, {}}
+                }
+            else
+                QuickLoot.data = result
+            end
+
         else
             QuickLoot.data = {
                 filter = 1,
@@ -164,7 +180,7 @@ function QuickLoot.Define()
         end)
 
         if not status then
-            return g_logger.error("Error while saving top bar settings. Data won't be saved. Details: " .. result)
+            return g_logger.warning("Error while saving QuickLoot settings. Data won't be saved. Details: " .. result)
         end
 
         if result:len() > 104857600 then
