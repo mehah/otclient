@@ -59,7 +59,7 @@ FileStream::~FileStream()
         close();
 }
 
-void FileStream::cache()
+void FileStream::cache(bool useEnc)
 {
     m_caching = true;
 
@@ -67,13 +67,28 @@ void FileStream::cache()
         if (!m_fileHandle)
             return;
 
-        // cache entire file into data buffer
+        // Cache entire file into data buffer
         m_pos = PHYSFS_tell(m_fileHandle);
         PHYSFS_seek(m_fileHandle, 0);
         const int size = PHYSFS_fileLength(m_fileHandle);
         m_data.resize(size);
+
         if (PHYSFS_readBytes(m_fileHandle, m_data.data(), size) == -1)
             throwError("unable to read file data", true);
+
+#if ENABLE_ENCRYPTION == 1
+        if (useEnc) {
+            if (m_data.size() >= std::string(ENCRYPTION_HEADER).size() &&
+                std::memcmp(m_data.data(), ENCRYPTION_HEADER, std::string(ENCRYPTION_HEADER).size()) == 0) {
+                m_data.erase(m_data.begin(), m_data.begin() + std::string(ENCRYPTION_HEADER).size());
+            }
+
+            uint8_t* decryptedData = ResourceManager::decrypt(m_data.data(), m_data.size());
+            m_data.resize(size - std::string(ENCRYPTION_HEADER).size());
+            memcpy(m_data.data(), decryptedData, m_data.size());
+            delete[] decryptedData;
+        }
+#endif
         PHYSFS_close(m_fileHandle);
         m_fileHandle = nullptr;
     }
