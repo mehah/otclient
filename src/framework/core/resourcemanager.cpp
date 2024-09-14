@@ -223,8 +223,21 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_readBytes(file, &buffer[0], fileSize);
     PHYSFS_close(file);
 
+    bool hasHeader = false;
+    if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() && 
+        buffer.substr(0, std::string(ENCRYPTION_HEADER).size()) == std::string(ENCRYPTION_HEADER)) {
+        hasHeader = true;
+    }
+
 #if ENABLE_ENCRYPTION == 1
-    buffer = decrypt(buffer);
+    if (fullPath.find("/bot/") != std::string::npos && !hasHeader) {
+        return buffer;
+    }
+
+    if (hasHeader) {
+        buffer = buffer.substr(std::string(ENCRYPTION_HEADER).size());
+        buffer = decrypt(buffer);
+    }
 #endif
 
     return buffer;
@@ -271,7 +284,9 @@ bool ResourceManager::writeFileStream(const std::string& fileName, std::iostream
 bool ResourceManager::writeFileContents(const std::string& fileName, const std::string& data)
 {
 #if ENABLE_ENCRYPTION == 1
-    return writeFileBuffer(fileName, (const uint8_t*)encrypt(data, std::string(ENCRYPTION_PASSWORD)).c_str(), data.size());
+    std::string encryptedData = encrypt(data, std::string(ENCRYPTION_PASSWORD));
+    std::string finalData = std::string(ENCRYPTION_HEADER) + encryptedData;
+    return writeFileBuffer(fileName, (const uint8_t*)finalData.c_str(), finalData.size());
 #else
     return writeFileBuffer(fileName, (const uint8_t*)data.c_str(), data.size());
 #endif
@@ -539,7 +554,8 @@ void ResourceManager::runEncryption(const std::string& password)
         std::string data((std::istreambuf_iterator(ifs)), std::istreambuf_iterator<char>());
         ifs.close();
         data = encrypt(data, password);
-        save_string_into_file(data, entry.path().string());
+        std::string finalData = std::string(ENCRYPTION_HEADER) + data;
+        save_string_into_file(finalData, entry.path().string());
     }
 }
 
