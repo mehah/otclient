@@ -209,7 +209,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
 {
     const std::string fullPath = resolvePath(fileName);
 
-    if (fullPath.find(getByteStrings(0)) != std::string::npos) {
+    if (fullPath.find(g_resources.getByteStrings(0)) != std::string::npos) {
         auto dfile = g_http.getFile(fullPath.substr(10));
         if (dfile)
             return std::string(dfile->response.begin(), dfile->response.end());
@@ -232,7 +232,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
 
 #if ENABLE_ENCRYPTION == 1
     if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
-        if (fullPath.find(getByteStrings(1)) != std::string::npos && !hasHeader) {
+        if (fullPath.find(g_resources.getByteStrings(1)) != std::string::npos && !hasHeader) {
             return buffer;
         }
     }
