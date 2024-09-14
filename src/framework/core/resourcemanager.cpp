@@ -767,6 +767,7 @@ std::string ResourceManager::decodificateStrings(const std::vector<unsigned char
     return result;
 }
 
+// used to obfuscate vulnerable strings (provisional)
 std::string ResourceManager::getByteStrings(size_t line) {
     std::vector<std::vector<unsigned char>> strTable = {
         {0x85, 0xCE, 0xC5, 0xDD, 0xC4, 0xC6, 0xC5, 0xCB, 0xCE, 0xD9},  // "/downloads"
