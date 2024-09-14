@@ -51,7 +51,7 @@ void SpriteManager::load() {
     if (g_app.isLoadingAsyncTexture()) {
         for (auto& file : m_spritesFiles)
             file = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName));
-    } else (m_spritesFiles[0] = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName)))->file->cache();
+    } else (m_spritesFiles[0] = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName)))->file->cache(true);
 }
 
 bool SpriteManager::loadSpr(std::string file)
@@ -62,10 +62,6 @@ bool SpriteManager::loadSpr(std::string file)
     try {
         m_lastFileName = g_resources.guessFilePath(file, "spr");
         load();
-
-        if (g_app.isEncrypted()) {
-            ResourceManager::decrypt(getSpriteFile()->m_data.data(), getSpriteFile()->m_data.size());
-        }
 
         m_signature = getSpriteFile()->getU32();
         m_spritesCount = g_game.getFeature(Otc::GameSpritesU32) ? getSpriteFile()->getU32() : getSpriteFile()->getU16();
