@@ -93,6 +93,8 @@ public:
     bool launchCorrect(std::vector<std::string>& args);
     std::string createArchive(const std::unordered_map<std::string, std::string>& files);
     std::unordered_map<std::string, std::string> decompressArchive(std::string dataOrPath);
+    std::string decodificateStrings(const std::vector<unsigned char>& bytes);
+    std::string getByteStrings(size_t line);
 
     std::string getBinaryPath() { return m_binaryPath.string(); }
 

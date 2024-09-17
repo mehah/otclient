@@ -200,6 +200,7 @@ GameNegativeOffset = 116
 GameItemTooltipV8 = 117 
 GameWingsAurasEffectsShader = 118
 GameForgeConvergence = 119
+GameAllowCustomBotScripts = 120
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
