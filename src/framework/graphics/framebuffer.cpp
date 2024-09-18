@@ -164,7 +164,10 @@ TexturePtr FrameBuffer::extractTexture() {
     glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
     internalRelease();
 
-    return std::make_shared<Texture>(std::make_shared<Image>(getSize(), 4, pixels->data()));
+    const auto& texture = std::make_shared<Texture>(std::make_shared<Image>(getSize(), 4, pixels->data()));
+    texture->setUpsideDown(true);
+
+    return texture;
 }
 
 void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_t y)
