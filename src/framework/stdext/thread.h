@@ -22,21 +22,20 @@
 
 #pragma once
 
-#include <cmath>
-#include <cstring>
-#include <ctime>
-#include <ctime>
-
 #include "types.h"
+#include <atomic>
 
-#include "cast.h"
-#include "compiler.h"
-#include "demangle.h"
-#include "format.h"
-#include "hash.h"
-#include "math.h"
-#include "storage.h"
-#include "string.h"
-#include "time.h"
-#include "qrcodegen.h"
-#include "thread.h"
+namespace stdext
+{
+    inline int16_t getThreadId() {
+        static std::atomic_int16_t lastId = -1;
+        thread_local static int16_t id = -1;
+
+        if (id == -1) {
+            lastId.fetch_add(1);
+            id = lastId.load();
+        }
+
+        return id;
+    };
+}
