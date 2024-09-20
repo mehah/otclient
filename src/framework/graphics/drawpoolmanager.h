@@ -35,7 +35,7 @@ public:
     void select(DrawPoolType type);
     void preDraw(const DrawPoolType type, const std::function<void()>& f, const bool alwaysDraw = false) { preDraw(type, f, nullptr, {}, {}, Color::alpha, alwaysDraw); }
     void preDraw(DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, const bool alwaysDraw = false) { preDraw(type, f, nullptr, dest, src, colorClear, alwaysDraw); }
-    void preDraw(DrawPoolType type, const std::function<void()>& f, const std::function<void()>& afterRelease, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, const bool alwaysDraw = false);
+    void preDraw(DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, const bool alwaysDraw = false);
 
     void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
     { addTexturedRect(Rect(point, texture->getSize()), texture, color); }
