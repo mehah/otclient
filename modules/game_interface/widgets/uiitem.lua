@@ -50,7 +50,7 @@ function UIItem:onDrop(widget, mousePos)
           return true
         end
         return false
-      end
+    end
     if not itemPos or not toPos then
         local pressedWidget = g_ui.getPressedWidget()
         local rootWidget = g_ui.getRootWidget()
