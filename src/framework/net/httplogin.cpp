@@ -127,7 +127,7 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
                 }
             } else {
                 status = -1;
-                msg = "Unknown error.\ncheck: \n-Enable Http login\n-Check Apache\n-Check login.php\n-check port 80/8080\n-Check Cloudflare";
+                msg = "Unknown error.\nCheck: \n-Enable Http login\n-Check Apache\n-Check login.php\n-check port 80/8080\n-Check Cloudflare";
             }
 
             g_dispatcher.addEvent([this, request_id, status, msg] {
