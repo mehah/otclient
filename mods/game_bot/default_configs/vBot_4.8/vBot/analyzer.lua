@@ -723,11 +723,10 @@ local expPerHour = function(calculation)
 end
 
 local function add(t, text, color, last)
-    table.insert(t, text)
-    table.insert(t, color)
+    local coloredText = "{" .. text .. ", " .. color .. "}"
+    table.insert(t, coloredText)
     if not last then
-        table.insert(t, ", ")
-        table.insert(t, "#FFFFFF")
+        table.insert(t, "{, , #FFFFFF}")
     end
 end
 
@@ -958,7 +957,8 @@ onTextMessage(function(mode, text)
     local panel = console.consoleTabBar:getTabPanel(tab)
     local consoleBuffer = panel:getChildById('consoleBuffer')
     local message = consoleBuffer:getLastChild()
-    message:setColoredText(t)
+    message:setColoredText(table.concat(t))
+
 end)
 
 local function niceFormat(v)
