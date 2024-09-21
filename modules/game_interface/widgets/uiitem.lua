@@ -178,7 +178,6 @@ function UIItem:onMouseRelease(mousePosition, mouseButton)
 end
 
 function UIItem:canAcceptDrop(widget, mousePos)
-
     if not g_game.isEnabledBotProtection() then
         if not self.selectable and (self:isVirtual() or not self:isDraggable()) then
             return false
@@ -188,6 +187,7 @@ function UIItem:canAcceptDrop(widget, mousePos)
             return false
         end
     end
+
     if not widget or not widget.currentDragThing then
         return false
     end
