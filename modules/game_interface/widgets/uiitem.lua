@@ -43,6 +43,14 @@ function UIItem:onDrop(widget, mousePos)
     if not(toPos) and self:getParent() and self:getParent().slotPosition then
         toPos = self:getParent().slotPosition
     end
+
+    if not g_game.isEnabledBotProtection() and self.selectable then
+        if item:isPickupable() then
+          self:setItem(Item.create(item:getId(), item:getCountOrSubType()))
+          return true
+        end
+        return false
+      end
     if not itemPos or not toPos then
         local pressedWidget = g_ui.getPressedWidget()
         local rootWidget = g_ui.getRootWidget()
@@ -170,8 +178,15 @@ function UIItem:onMouseRelease(mousePosition, mouseButton)
 end
 
 function UIItem:canAcceptDrop(widget, mousePos)
-    if self:isVirtual() or not self:isDraggable() then
-        return false
+
+    if not g_game.isEnabledBotProtection() then
+        if not self.selectable and (self:isVirtual() or not self:isDraggable()) then
+            return false
+        end
+    else
+        if self:isVirtual() or not self:isDraggable() then
+            return false
+        end
     end
     if not widget or not widget.currentDragThing then
         return false
