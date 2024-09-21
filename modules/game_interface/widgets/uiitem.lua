@@ -187,7 +187,6 @@ function UIItem:canAcceptDrop(widget, mousePos)
             return false
         end
     end
-
     if not widget or not widget.currentDragThing then
         return false
     end
