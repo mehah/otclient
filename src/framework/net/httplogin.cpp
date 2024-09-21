@@ -116,7 +116,7 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
             if (result) {
                 status = result->status;
                 try {
-                    auto body = json::parse(result->body);
+                    const auto body = json::parse(result->body);
                     if (body.contains("errorMessage")) {
                         msg = body["errorMessage"];
                     } else {
