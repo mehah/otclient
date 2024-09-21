@@ -170,23 +170,34 @@ GameStore.DefaultValues = {
 -- /*=============================================
 -- =            Local Function                  =
 -- =============================================*/
-local function setImagenHttp(widget, url)
+local function setImagenHttp(widget, url,isIcon)
     if Services and Services.store  then
         HTTP.downloadImage(Services.store..url, function(path, err)
             if err then
                 g_logger.warning("HTTP error: " .. err .. " - " .. Services.store..url)
-                widget:setImageSource("/game_store/images/dynamic-image-error")
-                widget:setImageAutoResize(true)
-                widget:setImageFixedRatio(false)
+                if isIcon then
+                    widget:setIcon("/game_store/images/dynamic-image-error")
+                else
+                    widget:setImageSource("/game_store/images/dynamic-image-error")
+                    widget:setImageFixedRatio(false)
+                end
+
                 return
             end
-            widget:setImageSource(path)
+            if isIcon then
+                widget:setIcon(path)
+            else
+                widget:setImageSource(path)
+            end
         end)
     else
-        widget:setImageSource("/game_store/images/" ..url)
---[[         widget:setImageSource("/game_store/images/dynamic-image-error")
-        widget:setImageAutoResize(true)
-        widget:setImageFixedRatio(false) ]]
+        if not g_resources.fileExists("/game_store/images/" ..url) then
+            widget:setImageSource("/game_store/images/dynamic-image-error")
+            widget:setImageFixedRatio(false)
+        else
+            widget:setImageSource("/game_store/images/" ..url)
+        end
+
     end
 end
 
@@ -323,7 +334,7 @@ end
 local function createSubWidget(parent, subId, subButton)
     local subWidget = g_ui.createWidget("storeCategory", parent)
     subWidget:setId(subId)
-    subWidget.Button.Icon:setIcon(subButton.icon)
+    setImagenHttp(subWidget.Button.Icon,subButton.icon,true)
     subWidget.Button.Title:setText(subButton.text)
     subWidget:setVisible(false)
     subWidget.open = subButton.open
@@ -373,7 +384,7 @@ local function createProductImage(imageParent, data)
     elseif data.VALOR == "icon" then
         local widget = g_ui.createWidget('UIWidget', imageParent)
        -- widget:setImageSource("/game_store/images/64/" .. data.ID)
-        setImagenHttp(widget,"/64/"..data.ID)
+        setImagenHttp(widget,"/64/"..data.ID,false)
         widget:fill('parent')
     elseif data.VALOR == "mountId" or data.VALOR:find("outfitId") then
         local creature = g_ui.createWidget('Creature', imageParent)
@@ -584,7 +595,7 @@ function onParseStoreCreateHome(offer)
 
     local ramdomImg = offer.banners[math.random(1, #offer.banners)].image
    -- controllerShop.ui.HomePanel.HomeImagen:setImageSource("/game_store/images/" .. ramdomImg)
-    setImagenHttp(controllerShop.ui.HomePanel.HomeImagen,ramdomImg)
+    setImagenHttp(controllerShop.ui.HomePanel.HomeImagen,ramdomImg,false)
     enableAllButtons()
 end
 
@@ -661,7 +672,13 @@ function onParseStoreGetCategories(buttons)
         if category then
             local widget = g_ui.createWidget("storeCategory", controllerShop.ui.listCategory)
             widget:setId(category.name)
-            widget.Button.Icon:setIcon("/game_store/images/13/" .. category.icons[1])
+            --widget.Button.Icon:setIcon("/game_store/images/13/" .. category.icons[1])
+            if category.icons[1] == "icon-store-home.png" then
+                widget.Button.Icon:setIcon("/game_store/images/icon-store-home")
+            else
+                setImagenHttp(widget.Button.Icon,"/13/"..category.icons[1],true)
+            end
+    
             widget.Button.Title:setText(category.name)
             widget.open = category.name
 
@@ -673,7 +690,7 @@ function onParseStoreGetCategories(buttons)
                 for subId, subButton in ipairs(category.subCategories) do
                     local subWidget = createSubWidget(widget, subId, {
                         text = subButton.name,
-                        icon = "/game_store/images/13/" .. subButton.icons[1],
+                        icon = "/13/" .. subButton.icons[1],
                         open = subButton.name
                     })
                 end
