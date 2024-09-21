@@ -295,6 +295,14 @@ void ProtocolGame::sendTurnWest()
     send(msg);
 }
 
+void ProtocolGame::sendGmTeleport(const Position& Pos)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientGmTeleport);
+    addPosition(msg, Pos);
+    send(msg);
+}
+
 void ProtocolGame::sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType)
 {
     const auto& msg = std::make_shared<OutputMessage>();

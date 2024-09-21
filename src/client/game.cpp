@@ -1767,3 +1767,11 @@ void Game::openContainerQuickLoot(const uint8_t action, const uint8_t category, 
     m_protocolGame->openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback);
     disableBotCall();
 }
+
+void Game::sendGmTeleport(const Position& pos)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendGmTeleport(pos);
+}

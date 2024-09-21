@@ -516,6 +516,7 @@ public:
     void requestBless();
     void requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback);
+    void sendGmTeleport(const Position& pos);
 
 protected:
     void enableBotCall() { m_denyBotCall = false; }
