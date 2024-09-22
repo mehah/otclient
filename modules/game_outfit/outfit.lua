@@ -96,9 +96,6 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
         local button = g_ui.createWidget("SelectionButton", window.selectionList)
         button:setId("0")
 
-        button.outfit:setOutfit({
-            type = 0
-        })
         button.name:setText("None")
         if tempValue == 0 then
             focused = 0
@@ -846,7 +843,9 @@ function showOutfits()
         
         local thingType = g_things.getThingType(outfit.type, ThingCategoryCreature)
         button.outfit:setPadding(-8)
-        button.outfit:setCreatureSize(thingType:getRealSize() + 32)
+        if thingType:getRealSize() > 0 then
+            button.outfit:setCreatureSize(thingType:getRealSize() + 32)
+        end
         --button.outfit:setBorderColor('red')
         --button.outfit:setBorderWidth(2)
 
@@ -897,7 +896,9 @@ function showMounts()
 
         local thingType = g_things.getThingType(mountData[1], ThingCategoryCreature)
         button.outfit:setPadding(-8)
-        button.outfit:setCreatureSize(thingType:getRealSize() + 32)
+        if thingType:getRealSize() > 0 then
+            button.outfit:setCreatureSize(thingType:getRealSize() + 32)
+        end
 
         button.name:setText(mountData[2])
         if tempOutfit.mount == mountData[1] then
@@ -1056,9 +1057,7 @@ function showTitle()
         local button = g_ui.createWidget("SelectionButton", window.selectionList)
         button:setId("0")
 
-        button.outfit:setOutfit({
-            type = 0
-        })
+
         button.name:setText("None")
         if tempOutfit.tile == 0 then
             focused = 0

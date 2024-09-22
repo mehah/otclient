@@ -88,6 +88,8 @@ private:
     int m_fieldsTableRef;
 };
 
+extern int16_t g_luaThreadId;
+
 template<typename F>
 void connect(const LuaObjectPtr& obj, const std::string_view field, const std::function<F>& f, bool pushFront = false);
 
@@ -156,6 +158,11 @@ connect(const LuaObjectPtr& obj, const std::string_view field, const Lambda& f, 
 template<typename... T>
 int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
 {
+    if (g_luaThreadId > -1 && g_luaThreadId != stdext::getThreadId()) {
+        g_logger.warning("luaCallLuaField(" + std::string{ field } + ") is being called outside the context of the lua call.");
+        return 0;
+    }
+
     // we need to gracefully catch a cast exception here in case
     // this is called from a constructor, this does not need to
     // blow up, we can just debug log it and exit.

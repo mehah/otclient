@@ -37,6 +37,7 @@ public:
     void draw();
     void draw(const Rect& dest) { prepare(dest, Rect(0, 0, getSize())); draw(); }
 
+    void reset() { m_texture = nullptr; }
     void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
 
     bool resize(const Size& size);
@@ -44,7 +45,10 @@ public:
     bool canDraw() const {
         return m_texture && m_coordsBuffer.getVertexCount() > 0;
     }
+
     TexturePtr getTexture() const { return m_texture; }
+    TexturePtr extractTexture();
+
     Size getSize() const { return m_texture->getSize(); }
 
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }

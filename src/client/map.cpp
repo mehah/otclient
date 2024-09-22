@@ -408,13 +408,15 @@ void Map::cleanTile(const Position& pos)
         }
     }
 
-    for (auto itt = m_staticTexts.begin(); itt != m_staticTexts.end();) {
-        const auto& staticText = *itt;
-        if (staticText->getPosition() == pos && staticText->getMessageMode() == Otc::MessageNone)
-            itt = m_staticTexts.erase(itt);
-        else
-            ++itt;
-    }
+    g_textDispatcher.addEvent([=, this] {
+        for (auto itt = m_staticTexts.begin(); itt != m_staticTexts.end();) {
+            const auto& staticText = *itt;
+            if (staticText->getPosition() == pos && staticText->getMessageMode() == Otc::MessageNone)
+                itt = m_staticTexts.erase(itt);
+            else
+                ++itt;
+        }
+    });
 }
 
 #ifdef FRAMEWORK_EDITOR
@@ -521,14 +523,16 @@ void Map::removeUnawareThings()
             removeThing(creature);
     }
 
-    // remove static texts from tiles that we are not aware anymore
-    for (auto it = m_staticTexts.begin(); it != m_staticTexts.end();) {
-        const auto& staticText = *it;
-        if (staticText->getMessageMode() == Otc::MessageNone && !isAwareOfPosition(staticText->getPosition()))
-            it = m_staticTexts.erase(it);
-        else
-            ++it;
-    }
+    g_textDispatcher.addEvent([=, this] {
+        // remove static texts from tiles that we are not aware anymore
+        for (auto it = m_staticTexts.begin(); it != m_staticTexts.end();) {
+            const auto& staticText = *it;
+            if (staticText->getMessageMode() == Otc::MessageNone && !isAwareOfPosition(staticText->getPosition()))
+                it = m_staticTexts.erase(it);
+            else
+                ++it;
+        }
+    });
 
     if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
         // remove tiles that we are not aware anymore

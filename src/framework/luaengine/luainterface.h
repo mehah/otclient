@@ -498,6 +498,11 @@ int LuaInterface::luaCallGlobalField(const std::string_view global, const std::s
 template<typename... T>
 void LuaInterface::callGlobalField(const std::string_view global, const std::string_view field, const T&... args)
 {
+    if (g_luaThreadId > -1 && g_luaThreadId != stdext::getThreadId()) {
+        g_logger.warning("callGlobalField(" + std::string{ global } + ", " + std::string{ field } + ") is being called outside the context of the lua call.");
+        return;
+    }
+
     const int rets = luaCallGlobalField(global, field, args...);
     if (rets > 0)
         pop(rets);
@@ -506,6 +511,11 @@ void LuaInterface::callGlobalField(const std::string_view global, const std::str
 template<typename R, typename... T>
 R LuaInterface::callGlobalField(const std::string_view global, const std::string_view field, const T&... args)
 {
+    if (g_luaThreadId > -1 && g_luaThreadId != stdext::getThreadId()) {
+        g_logger.warning("callGlobalField(" + std::string{ global } + ", " + std::string{ field } + ") is being called outside the context of the lua call.");
+        return R();
+    }
+
     R result;
     if (const int rets = luaCallGlobalField(global, field, args...); rets > 0) {
         assert(rets == 1);

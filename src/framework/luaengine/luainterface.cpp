@@ -391,6 +391,11 @@ std::string LuaInterface::getCurrentSourcePath(int level)
     if (!L)
         return path;
 
+    if (g_luaThreadId > -1 && g_luaThreadId != stdext::getThreadId()) {
+        g_logger.warning("getCurrentSourcePath is being called outside the context of the lua call.");
+        return path;
+    }
+
     // check all stack functions for script source path
     while (true) {
         getStackFunction(level); // pushes stack function

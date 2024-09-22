@@ -74,7 +74,7 @@ void UIItem::setItemId(int id)
         m_item->setId(id);
     else
         m_item = Item::create(id);
-#ifdef BOT_PROTECTION
+#ifndef BOT_PROTECTION
     callLuaField("onItemChange");
 #endif
 }
@@ -82,7 +82,7 @@ void UIItem::setItemId(int id)
 void UIItem::setItemCount(int count) 
 {
     if (m_item) m_item->setCount(count);
-#ifdef BOT_PROTECTION
+#ifndef BOT_PROTECTION
     callLuaField("onItemChange");
 #endif
 }
@@ -90,7 +90,7 @@ void UIItem::setItemCount(int count)
 void UIItem::setItemSubType(int subType)
 { 
     if (m_item) m_item->setSubType(subType); 
-#ifdef BOT_PROTECTION
+#ifndef BOT_PROTECTION
     callLuaField("onItemChange");
 #endif
 }
@@ -99,7 +99,7 @@ void UIItem::setItem(const ItemPtr& item)
 { 
     m_item = item; 
 
-#ifdef BOT_PROTECTION
+#ifndef BOT_PROTECTION
     callLuaField("onItemChange");
 #endif
 }

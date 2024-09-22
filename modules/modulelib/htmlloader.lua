@@ -16,7 +16,7 @@ local function readNode(el, parent, controller, watchList)
     onCreateWidget(el, widget, controller)
 
     for attr, v in pairs(el.attributes) do
-        local attr = translateAttribute(styleName, attr)
+        local attr = translateAttribute(styleName, el.name, attr)
         if attr:starts('on') then
             parseEvents(el, widget, attr:lower(), v, controller)
         elseif attr == 'anchor' then

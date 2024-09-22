@@ -52,8 +52,9 @@ UIMap::~UIMap()
 void UIMap::draw(DrawPoolType drawPane) {
     if (drawPane == DrawPoolType::MAP) {
         g_drawPool.preDraw(drawPane, [this] {
-            m_mapView->registerEvents();
             m_mapView->drawFloor();
+        }, [this] {
+            m_mapView->registerEvents();
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
     } else if (drawPane == DrawPoolType::LIGHT) {
         g_drawPool.preDraw(drawPane, [this] {

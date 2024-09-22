@@ -28,6 +28,7 @@
 #include "item.h"
 #include "mapview.h"
 #include "attachableobject.h"
+#include "statictext.h"
 
 #ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t
@@ -242,8 +243,8 @@ private:
     std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
 
 #ifndef BOT_PROTECTION
-    StaticTextPtr m_timerText;
-    StaticTextPtr m_text;
+    std::unique_ptr<StaticText> m_timerText;
+    std::unique_ptr<StaticText> m_text;
     Color m_fill = Color::alpha;
     ticks_t m_timer = 0;
 #endif

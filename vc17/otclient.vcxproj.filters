@@ -1094,6 +1094,9 @@
     <ClInclude Include="..\src\framework\core\garbagecollection.h">
       <Filter>Header Files\framework\core</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\framework\stdext\thread.h">
+      <Filter>Header Files\framework\stdext</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\otcicon.rc">
