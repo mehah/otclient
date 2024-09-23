@@ -809,10 +809,13 @@ function show()
     controllerShop:scheduleEvent(function()
 
         local firstCategory = controllerShop.ui.listCategory:getChildByIndex(1)
-        controllerShop.ui.openedCategory = firstCategory
-        firstCategory.Button:onClick()
-
-    end, 100, 'fuck antibot')
+        if firstCategory then
+            controllerShop.ui.openedCategory = firstCategory
+            firstCategory.Button:onClick()
+        else
+            g_logger.warning("[game_store] function show() L815, increase scheduleEvent time 300 -> 500. reason: information is late in arriving ")
+        end
+    end, 300, 'fuck antibot')
 end
 
 function getCoinsWebsite()
