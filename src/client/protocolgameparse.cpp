@@ -1355,24 +1355,17 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     }
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
-        // Check if container is store inbox id
-        if (containerItem->getId() == 23396) {
-            msg->getU8(); // category
-            const uint8_t categoriesSize = msg->getU8();
-            for (auto i = 0; i < categoriesSize; ++i) {
-                msg->getU8(); // id
-                msg->getString(); // name
-            }
-        } else {
-            // Parse store inbox category empty
-            msg->getU8(); // category
-            msg->getU8(); // categories size
+        msg->getU8(); // category
+        const uint8_t categoriesSize = msg->getU8();
+        for (auto i = 0; i < categoriesSize; ++i) {
+            msg->getU8(); // id
+            msg->getString(); // name
         }
     }
 
     if (g_game.getClientVersion() >= 1340) {
-        msg->getU8();
-        msg->getU8();
+        msg->getU8(); // isMoveable
+        msg->getU8(); // isHolding
     }
 
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
@@ -3269,6 +3262,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
 
 ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 {
+    g_logger.error(stdext::format("entrou"));
     if (id == 0) {
         id = msg->getU16();
     }
@@ -3305,10 +3299,20 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         if (g_game.getFeature(Otc::GameContainerTypes)) {
             const uint8_t containerType = msg->getU8(); // container type
             switch (containerType) {
+                case 1: // Loot Container
+                    msg->getU32(); // loot category flags
+                    break;
                 case 2: // Content Counter
                     msg->getU32(); // ammo total
                     break;
+                case 3: // Manager Unknown
+                    msg->getU32(); // loot flags
+                    msg->getU32(); // obtain flags
+                    break;
                 case 4: // Loot Highlight
+                    break;
+                case 8: // Obtain
+                    msg->getU32(); // obtain flags
                     break;
                 case 9: // Manager
                     msg->getU32(); // loot flags
@@ -3377,8 +3381,10 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getFeature(Otc::GameThingClock)) {
         if (item->hasClockExpire() || item->hasExpire() || item->hasExpireStop()) {
-            item->setDurationTime(msg->getU32());
-            msg->getU8(); // Is brand-new
+            if (item->getId() != 23398) {
+                item->setDurationTime(msg->getU32());
+                msg->getU8(); // Is brand-new
+            }
         }
     }
 
@@ -3390,7 +3396,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
     }
 
     if (g_game.getFeature(Otc::GameWrapKit)) {
-        if (item->isDecoKit()) {
+        if (item->isDecoKit() || item->getId() == 23398) {
             msg->getU16();
         }
     }
