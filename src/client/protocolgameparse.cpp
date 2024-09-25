@@ -3262,7 +3262,6 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
 
 ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 {
-    g_logger.error(stdext::format("entrou"));
     if (id == 0) {
         id = msg->getU16();
     }
