@@ -49,14 +49,9 @@ void SpriteManager::reload() {
 void SpriteManager::load() {
     m_spritesFiles.resize(g_asyncDispatcher.get_thread_count() + 1);
     if (g_app.isLoadingAsyncTexture()) {
-        for (auto& file : m_spritesFiles) {
+        for (auto& file : m_spritesFiles)
             file = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName));
-        }
-    } else {
-        auto fileStream = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName));
-        fileStream->file->cache();
-        m_spritesFiles[0] = std::move(fileStream);
-    }
+    } else (m_spritesFiles[0] = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName)))->file->cache(true);
 }
 
 bool SpriteManager::loadSpr(std::string file)
@@ -67,10 +62,6 @@ bool SpriteManager::loadSpr(std::string file)
     try {
         m_lastFileName = g_resources.guessFilePath(file, "spr");
         load();
-
-        if (g_app.isEncrypted()) {
-            ResourceManager::decrypt(getSpriteFile()->m_data.data(), getSpriteFile()->m_data.size());
-        }
 
         m_signature = getSpriteFile()->getU32();
         m_spritesCount = g_game.getFeature(Otc::GameSpritesU32) ? getSpriteFile()->getU32() : getSpriteFile()->getU16();
@@ -157,7 +148,7 @@ ImagePtr SpriteManager::getSpriteImage(int id)
         return g_spriteAppearances.getSpriteImage(id);
     }
 
-    const auto threadId = g_app.isLoadingAsyncTexture() ? g_dispatcher.getThreadId() : 0;
+    const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
     if (const auto& sf = m_spritesFiles[threadId]) {
         std::scoped_lock l(sf->mutex);
         return getSpriteImage(id, sf->file);

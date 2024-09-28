@@ -37,14 +37,14 @@ UIWidget::UIWidget()
 {
     m_source = g_lua.getSource(2);
     int level = 3;
-    while((m_source.find("corelib") != std::string::npos || m_source.find("gamelib") != std::string::npos 
+    while ((m_source.find("corelib") != std::string::npos || m_source.find("gamelib") != std::string::npos
            || m_source.find("game_bot/functions/ui") != std::string::npos || m_source.find("[C]") != std::string::npos) && level < 8) {
         std::string tmp_src = g_lua.getSource(level);
         if (tmp_src.length() <= 3) break;
         m_source = tmp_src;
         level += 1;
     }
-	
+
     setProp(PropEnabled, true, false);
     setProp(PropVisible, true, false);
     setProp(PropFocusable, true, false);
@@ -1982,10 +1982,10 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
         for (const auto& child : m_children) {
             if (child->isExplicitlyVisible() && child->isExplicitlyEnabled() && child->containsPoint(mousePos))
                 child->propagateOnMouseMove(mousePos, mouseMoved, widgetList);
-
-            widgetList.emplace_back(static_self_cast<UIWidget>());
         }
     }
+
+    widgetList.emplace_back(static_self_cast<UIWidget>());
 
     return true;
 }
