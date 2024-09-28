@@ -1498,7 +1498,7 @@ void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
     const auto& name = g_game.formatCreatureName(msg->getString());
 
     const uint8_t count = msg->getU8();
-    std::vector<ItemPtr> items;
+    std::vector<ItemPtr> items(count);
 
     for (auto i = 0; i < count; i++) {
         items[i] = getItem(msg);
@@ -1512,7 +1512,7 @@ void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
     const auto& name = g_game.formatCreatureName(msg->getString());
 
     const uint8_t count = msg->getU8();
-    std::vector<ItemPtr> items;
+    std::vector<ItemPtr> items(count);
 
     for (auto i = 0; i < count; i++) {
         items[i] = getItem(msg);
