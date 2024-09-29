@@ -247,18 +247,22 @@ void AndroidWindow::processTextInput() {
 }
 
 void AndroidWindow::processFingerDownAndUp() {
+    static ticks_t lastPress = 0;
+
     bool isTouchdown = m_currentEvent.type == TOUCH_DOWN;
-    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_LONGPRESS) ?
+
+    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_UP && stdext::millis() > lastPress + 500 ) ?
         Fw::MouseRightButton : Fw::MouseLeftButton;
 
     m_inputEvent.reset();
     m_inputEvent.type = (isTouchdown) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
     m_inputEvent.mouseButton = mouseButton;
-	if(isTouchdown) {
-		m_mouseButtonStates |= 1 << mouseButton;
-	} else {
-		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
-	}
+    if(isTouchdown) {
+        lastPress = g_clock.millis();
+        m_mouseButtonStates |= 1 << mouseButton;
+    } else {
+        g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
+    }
 
     handleInputEvent();
 }

@@ -612,9 +612,7 @@ void MapView::setCameraPosition(const Position& pos)
 
 Position MapView::getPosition(const Point& mousePos)
 {
-    auto newMousePos = mousePos;
-    if(!g_platform.isMobile())
-        newMousePos *= g_window.getDisplayDensity();
+    auto newMousePos = mousePos * g_window.getDisplayDensity();
 
     if (!m_posInfo.rect.contains(newMousePos))
         return {};
