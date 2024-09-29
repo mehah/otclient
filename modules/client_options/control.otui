@@ -5,9 +5,16 @@ Panel
     anchors.top: parent.top
     height: 22
 
+    $mobile:
+      height: 0
+      visible: false
+
     OptionCheckBox
       id: classicControl
       !text: tr('Classic control')
+
+      $mobile:
+        visible: false
 
   SmallReversedQtPanel
     anchors.left: parent.left

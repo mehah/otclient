@@ -79,9 +79,18 @@ function init()
     rightDecreaseSidePanels = gameRootPanel:getChildById('rightDecreaseSidePanels')
 
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
-    leftDecreaseSidePanels:setEnabled(modules.client_options.getOption('showLeftPanel'))
+    if g_platform.isMobile() then
+        leftDecreaseSidePanels:setEnabled(false)
+    else
+        leftDecreaseSidePanels:setEnabled(true)
+    end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
+
+    if g_platform.isMobile() then
+        gameRightPanel:setMarginBottom(150)
+        gameLeftPanel:setMarginBottom(150)
+    end
 
     panelsList = { {
         panel = gameRightPanel,
@@ -186,9 +195,18 @@ function onGameStart()
     show()
 
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
-    leftDecreaseSidePanels:setEnabled(modules.client_options.getOption('showLeftPanel'))
+    if g_platform.isMobile() then
+        leftDecreaseSidePanels:setEnabled(false)
+    else
+        leftDecreaseSidePanels:setEnabled(true)
+    end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
+
+    if g_platform.isMobile() then
+        gameRightPanel:setMarginBottom(150)
+        gameLeftPanel:setMarginBottom(150)
+    end
 end
 
 function onGameEnd()
@@ -804,7 +822,56 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             return true      
         end
-        if not autoWalkPos and useThing then
+        local shortcut = modules.game_shortcuts.getShortcut()
+        if shortcut == "look" then
+          if lookThing then
+            modules.game_shortcuts.resetShortcuts()
+            g_game.look(lookThing)
+            return true    
+          end
+          return true    
+        elseif shortcut == "use" then
+          if useThing then
+            modules.game_shortcuts.resetShortcuts()
+            if useThing:isContainer() then
+              if useThing:getParentContainer() then
+                g_game.open(useThing, useThing:getParentContainer())
+              else
+                g_game.open(useThing)
+              end
+              return true
+            elseif useThing:isMultiUse() then
+              startUseWith(useThing)
+              return true
+            else
+              g_game.use(useThing)
+              return true
+            end
+          end
+          return true
+        elseif shortcut == "attack" then
+          if attackCreature and attackCreature ~= player then
+            modules.game_shortcuts.resetShortcuts()
+            g_game.attack(attackCreature)
+            return true
+          elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            modules.game_shortcuts.resetShortcuts()
+            g_game.attack(creatureThing)
+            return true
+          end
+          return true
+        elseif shortcut == "follow" then
+          if attackCreature and attackCreature ~= player then
+            modules.game_shortcuts.resetShortcuts()
+            g_game.follow(attackCreature)
+            return true
+          elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            modules.game_shortcuts.resetShortcuts()
+            g_game.follow(creatureThing)
+            return true
+          end
+          return true
+        elseif not autoWalkPos and useThing then
             createThingMenu(menuPosition, lookThing, useThing, creatureThing)      
             return true
         end
@@ -1100,9 +1167,18 @@ function setupViewMode(mode)
     end
 
     leftIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showLeftExtraPanel'))
-    leftDecreaseSidePanels:setEnabled(modules.client_options.getOption('showLeftPanel'))
+    if g_platform.isMobile() then
+        leftDecreaseSidePanels:setEnabled(false)
+    else
+        leftDecreaseSidePanels:setEnabled(true)
+    end
     rightIncreaseSidePanels:setEnabled(not modules.client_options.getOption('showRightExtraPanel'))
     rightDecreaseSidePanels:setEnabled(modules.client_options.getOption('showRightExtraPanel'))
+
+    if g_platform.isMobile() then
+        gameRightPanel:setMarginBottom(150)
+        gameLeftPanel:setMarginBottom(150)
+    end
 
     if currentViewMode == 2 then
         gameMapPanel:addAnchor(AnchorLeft, 'gameLeftPanel', AnchorRight)
@@ -1123,6 +1199,10 @@ function setupViewMode(mode)
         gameLeftExtraPanel:setMarginTop(0)
         gameBottomPanel:setImageColor('white')
         modules.client_topmenu.getTopMenu():setImageColor('white')
+        if g_platform.isMobile() then
+            gameRightPanel:setMarginBottom(150)
+            gameLeftPanel:setMarginBottom(150)
+        end
     end
 
     if mode == 0 then
@@ -1133,6 +1213,10 @@ function setupViewMode(mode)
             width = 15,
             height = 11
         })
+        if g_platform.isMobile() then
+            gameRightPanel:setMarginBottom(150)
+            gameLeftPanel:setMarginBottom(150)
+        end
     elseif mode == 1 then
         gameMapPanel:setKeepAspectRatio(false)
         gameMapPanel:setLimitVisibleRange(true)
@@ -1141,6 +1225,10 @@ function setupViewMode(mode)
             width = 15,
             height = 11
         })
+        if g_platform.isMobile() then
+            gameRightPanel:setMarginBottom(150)
+            gameLeftPanel:setMarginBottom(150)
+        end
     elseif mode == 2 then
         local limit = limitedZoom and not g_game.isGM()
         gameMapPanel:setLimitVisibleRange(limit)
@@ -1158,13 +1246,17 @@ function setupViewMode(mode)
         gameLeftPanel:setOn(true)
         gameLeftPanel:setVisible(true)
         gameRightPanel:setOn(true)
-        gameRightExtraPanel:setOn(true)
-        gameRightExtraPanel:setVisible(true)
-        gameLeftExtraPanel:setOn(true)
-        gameLeftExtraPanel:setVisible(true)
+        gameRightExtraPanel:setOn(false)
+        gameRightExtraPanel:setVisible(false)
+        gameLeftExtraPanel:setOn(false)
+        gameLeftExtraPanel:setVisible(false)
         gameMapPanel:setOn(true)
         gameBottomPanel:setImageColor('#ffffff88')
         modules.client_topmenu.getTopMenu():setImageColor('#ffffff66')
+        if g_platform.isMobile() then
+            gameRightPanel:setMarginBottom(150)
+            gameLeftPanel:setMarginBottom(150)
+        end
     end
 
     currentViewMode = mode
@@ -1216,14 +1308,19 @@ function onDecreaseLeftPanels()
     if modules.client_options.getOption('showLeftExtraPanel') then
         modules.client_options.setOption('showLeftExtraPanel', false)
         movePanel(gameLeftExtraPanel)
+		if g_platform.isMobile() then
+		    leftDecreaseSidePanels:setEnabled(false)
+		end
         return
     end
 
-    if modules.client_options.getOption('showLeftPanel') then
-        modules.client_options.setOption('showLeftPanel', false)
-        movePanel(gameLeftPanel)
-        leftDecreaseSidePanels:setEnabled(false)
-        return
+    if not g_platform.isMobile() then
+        if modules.client_options.getOption('showLeftPanel') then
+            modules.client_options.setOption('showLeftPanel', false)
+            movePanel(gameLeftPanel)
+            leftDecreaseSidePanels:setEnabled(false)
+            return
+        end
     end
 end
 

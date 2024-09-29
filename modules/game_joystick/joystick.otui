@@ -5,7 +5,7 @@ UIWidget
 
   UIWidget
     id: keypad
-    size: 200 150
+    size: 175 150
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     phantom: false
@@ -14,8 +14,8 @@ UIWidget
     background: #00000044
     image-source: /images/game/mobile/keypad
     image-fixed-ratio: true
-    image-rect: 25 0 150 150
-    
+    image-rect: 12 0 150 150
+
     UIWidget
       id: pointer
       size: 49 49
@@ -25,4 +25,3 @@ UIWidget
       image-fixed-ratio: true
       phantom: true
       focusable: true
-      

@@ -6,6 +6,9 @@ Module
   sandboxed: true
   scripts: [ widgets/uigamemap, widgets/uiitem, widgets/statsbar, gameinterface ]
   load-later:
+    - game_walk
+    - game_joystick
+    - game_shortcuts
     - game_minimap
     - game_healthinfo
     - game_inventory
@@ -37,8 +40,6 @@ Module
     - game_unjustifiedpoints
     - game_shaders
     - game_attachedeffects
-    - game_joystick
-    - game_walk
     - game_stash
     - game_healthcircle
     - game_shop

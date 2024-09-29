@@ -18,9 +18,18 @@ UIWidget
     anchors.top: prev.bottom
     height: 22
     margin-top: 7
+
+    $mobile:
+      height: 0
+      margin-top: 0
+      visible: false
+
     OptionCheckBox
       id: classicControl
       !text: tr('Classic control')
+
+      $mobile:
+        visible: false
 
   SmallReversedQtPanel
     anchors.left: parent.left
@@ -137,4 +146,3 @@ UIWidget
     margin-top: 12
 
     size: 120 20
-

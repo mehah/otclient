@@ -152,3 +152,7 @@ function executeWalk()
     moveListener(dir, firstStep)
   end
 end
+
+function getPanel()
+  return keypad
+end

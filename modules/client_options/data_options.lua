@@ -23,7 +23,7 @@ return {
             g_window.setFullscreen(value)
         end
     },
-    classicControl                    = false,
+    classicControl                    = g_platform.isMobile() and true or false,
     smartWalk                         = false,
     preciseControl                    = {
         value = false,
@@ -318,7 +318,7 @@ return {
         end
     },
     showLeftPanel                     = {
-        value = false,
+        value = true,
         action = function(value, options, controller, panels, extraWidgets)
             modules.game_interface.getLeftPanel():setOn(value)
         end
@@ -383,5 +383,28 @@ return {
     },
     profile                           = {
         value = 1,
+    },
+    rightJoystick                     = {
+        value = false,
+        action = function(value, options, controller, panels, extraWidgets)
+            if not g_platform.isMobile() then return end
+            if value == true then
+                modules.game_shortcuts.getPanel():breakAnchors()
+                modules.game_shortcuts.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
+                modules.game_shortcuts.getPanel():addAnchor(AnchorLeft, "parent", AnchorLeft)
+
+                modules.game_joystick.getPanel():breakAnchors()
+                modules.game_joystick.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
+                modules.game_joystick.getPanel():addAnchor(AnchorRight, "parent", AnchorRight)
+            else
+                modules.game_joystick.getPanel():breakAnchors()
+                modules.game_joystick.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
+                modules.game_joystick.getPanel():addAnchor(AnchorLeft, "parent", AnchorLeft)
+
+                modules.game_shortcuts.getPanel():breakAnchors()
+                modules.game_shortcuts.getPanel():addAnchor(AnchorBottom, "parent", AnchorBottom)
+                modules.game_shortcuts.getPanel():addAnchor(AnchorRight, "parent", AnchorRight)
+            end
+        end
     }
 }
