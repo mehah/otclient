@@ -47,18 +47,6 @@ public:
 
     void startEvent(const ScheduledEventPtr& event);
 
-    static int16_t getThreadId() {
-        static std::atomic_int16_t lastId = -1;
-        thread_local static int16_t id = -1;
-
-        if (id == -1) {
-            lastId.fetch_add(1);
-            id = lastId.load();
-        }
-
-        return id;
-    };
-
 private:
     inline void mergeEvents();
     inline void executeEvents();
@@ -67,7 +55,7 @@ private:
     inline void executeScheduledEvents();
 
     const auto& getThreadTask() const {
-        const auto id = getThreadId();
+        const auto id = stdext::getThreadId();
         bool grow = false;
 
         {
