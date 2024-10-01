@@ -174,7 +174,7 @@ local function setImagenHttp(widget, url,isIcon)
     if Services and Services.store  then
         HTTP.downloadImage(Services.store .. url, function(path, err)
             if err then
-                g_logger.warning("HTTP error: " .. err .. " - " .. Services.store..url)
+                g_logger.warning("HTTP error: " .. err .. " - " .. Services.store .. url)
                 if isIcon then
                     widget:setIcon("/game_store/images/dynamic-image-error")
                 else
