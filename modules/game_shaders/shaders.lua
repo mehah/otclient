@@ -66,6 +66,9 @@ OUTFIT_SHADERS = { {
     name = 'Outfit - Fragmented',
     frag = 'shaders/fragment/noise.frag'
 }, {
+    name = 'Outfit - cyclopedia-black',
+    frag = 'shaders/fragment/cyclopedia.frag'
+}, {
     name = 'Outfit - Outline',
     useFramebuffer = true,
     frag = 'shaders/fragment/outline.frag'

@@ -409,4 +409,19 @@ ResourceTypes = {
     COIN_TOURNAMENT = 93
 };
 
+CyclopediaCharacterInfoTypes = {
+    BaseInformation = 0,
+    GeneralStats = 1,
+    CombatStats = 2,
+    RecentDeaths = 3,
+    RecentPVPKills = 4,
+    Achievements = 5,
+    ItemSummary = 6,
+    OutfitsAndMounts = 7,
+    StoreSummary = 8,
+    Ispection = 9,
+    Badges = 10,
+    Titles = 11
+};
+
 -- @}
