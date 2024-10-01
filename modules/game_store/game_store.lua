@@ -333,7 +333,7 @@ end
 local function createSubWidget(parent, subId, subButton)
     local subWidget = g_ui.createWidget("storeCategory", parent)
     subWidget:setId(subId)
-    setImagenHttp(subWidget.Button.Icon,subButton.icon,true)
+    setImagenHttp(subWidget.Button.Icon, subButton.icon, true)
     subWidget.Button.Title:setText(subButton.text)
     subWidget:setVisible(false)
     subWidget.open = subButton.open
