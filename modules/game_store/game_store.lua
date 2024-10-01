@@ -8,7 +8,7 @@ local offerDescriptions = {}
 -- - Fix character name change
 -- - Fix filter functionality
 -- - Correct HTML string syntax
--- - Add HTTP image support
+-- - fix protocol 11.00
 -- - Fix scroll in history panel
 -- - Fix onclick behavior in "home", link to category/item
 
@@ -16,7 +16,7 @@ GameStore = {}
 -- == Enums ==--
 GameStore.website = {
     WEBSITE_GETCOINS = "https://github.com/mehah/otclient"
-    -- IMAGES_URL = Services.websites.."/store" or ""
+    -- IMAGES_URL =  "http://localhost/images/store/" --./game_store --https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
 }
 
 GameStore.OfferTypes = {
@@ -171,10 +171,10 @@ GameStore.DefaultValues = {
 -- =            Local Function                  =
 -- =============================================*/
 local function setImagenHttp(widget, url, isIcon)
-    if Services and Services.store then
-        HTTP.downloadImage(Services.store .. url, function(path, err)
+    if GameStore.website.IMAGES_URL then
+        HTTP.downloadImage(GameStore.website.IMAGES_URL .. url, function(path, err)
             if err then
-                g_logger.warning("HTTP error: " .. err .. " - " .. Services.store .. url)
+                g_logger.warning("HTTP error: " .. err .. " - " .. GameStore.website.IMAGES_URL .. url)
                 if isIcon then
                     widget:setIcon("/game_store/images/dynamic-image-error")
                 else

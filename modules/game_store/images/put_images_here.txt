@@ -16,6 +16,6 @@ https://www.dropbox.com/s/5b00ubu1erapu9q/store.zip?dl=1
 
 
 if you want to use the http version
-activate the services.store array of init.lua , and follow this guide 
+uncomment "IMAGES_URL" in  GameStore.website (\modules\game_store\game_store.lua) , and follow this guide 
 https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
 
