@@ -676,7 +676,7 @@ function onParseStoreGetCategories(buttons)
             if category.icons[1] == "icon-store-home.png" then
                 widget.Button.Icon:setIcon("/game_store/images/icon-store-home")
             else
-                setImagenHttp(widget.Button.Icon,"/13/"..category.icons[1],true)
+                setImagenHttp(widget.Button.Icon,"/13/" .. category.icons[1], true)
             end
     
             widget.Button.Title:setText(category.name)
