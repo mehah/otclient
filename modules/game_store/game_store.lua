@@ -171,7 +171,7 @@ GameStore.DefaultValues = {
 -- =            Local Function                  =
 -- =============================================*/
 local function setImagenHttp(widget, url, isIcon)
-    if Services and Services.store  then
+    if Services and Services.store then
         HTTP.downloadImage(Services.store .. url, function(path, err)
             if err then
                 g_logger.warning("HTTP error: " .. err .. " - " .. Services.store .. url)
@@ -190,11 +190,11 @@ local function setImagenHttp(widget, url, isIcon)
             end
         end)
     else
-        if not g_resources.fileExists("/game_store/images/" ..url) then
+        if not g_resources.fileExists("/game_store/images/" .. url) then
             widget:setImageSource("/game_store/images/dynamic-image-error")
             widget:setImageFixedRatio(false)
         else
-            widget:setImageSource("/game_store/images/" ..url)
+            widget:setImageSource("/game_store/images/" .. url)
         end
 
     end
@@ -382,8 +382,8 @@ local function createProductImage(imageParent, data)
         itemWidget:fill('parent')
     elseif data.VALOR == "icon" then
         local widget = g_ui.createWidget('UIWidget', imageParent)
-       -- widget:setImageSource("/game_store/images/64/" .. data.ID)
-        setImagenHttp(widget,"/64/" .. data.ID, false)
+        -- widget:setImageSource("/game_store/images/64/" .. data.ID)
+        setImagenHttp(widget, "/64/" .. data.ID, false)
         widget:fill('parent')
     elseif data.VALOR == "mountId" or data.VALOR:find("outfitId") then
         local creature = g_ui.createWidget('Creature', imageParent)
@@ -461,7 +461,8 @@ end
 
 function onParseStoreGetCoin(getTibiaCoins, getTransferableCoins)
     controllerShop.ui.lblCoins.numero:setText(formatNumberWithCommas(getTibiaCoins))
-    controllerShop.ui.lblCoins.numerodos:setText(string.format("(Including: %s", formatNumberWithCommas(getTransferableCoins)))
+    controllerShop.ui.lblCoins.numerodos:setText(string.format("(Including: %s",
+        formatNumberWithCommas(getTransferableCoins)))
 end
 
 function onParseStoreOfferDescriptions(offerId, description)
@@ -481,7 +482,7 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
         messageBox.additionalLabel:disable()
         messageBox.additionalLabel:getChildren()[1]:setImageSource("/game_store/images/open")
         if not controllerShop.ui.openedSubCategory then -- temp fix
-            controllerShop.ui.openedCategory.Button:onClick() 
+            controllerShop.ui.openedCategory.Button:onClick()
         else
             controllerShop.ui.openedSubCategory.Button:onClick()
         end
@@ -552,7 +553,7 @@ function onParseStoreCreateProducts(storeProducts)
         local price = product.subOffers[1].price
         local balance = isTransferable and coinsBalance1 or coinsBalance2
         priceLabel:setColor(balance < price and "#d33c3c" or "white")
-        
+
         if isTransferable then
             priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
         end
@@ -593,7 +594,7 @@ function onParseStoreCreateHome(offer)
     end
 
     local ramdomImg = offer.banners[math.random(1, #offer.banners)].image
-   -- controllerShop.ui.HomePanel.HomeImagen:setImageSource("/game_store/images/" .. ramdomImg)
+    -- controllerShop.ui.HomePanel.HomeImagen:setImageSource("/game_store/images/" .. ramdomImg)
     setImagenHttp(controllerShop.ui.HomePanel.HomeImagen, ramdomImg, false)
     enableAllButtons()
 end
@@ -627,7 +628,7 @@ function onParseStoreGetHistory(currentPage, pageCount, array2)
             row:setBackgroundColor("#414141")
         end
     end
-    
+
 end
 
 function onParseStoreGetCategories(buttons)
@@ -671,13 +672,13 @@ function onParseStoreGetCategories(buttons)
         if category then
             local widget = g_ui.createWidget("storeCategory", controllerShop.ui.listCategory)
             widget:setId(category.name)
-            --widget.Button.Icon:setIcon("/game_store/images/13/" .. category.icons[1])
+            -- widget.Button.Icon:setIcon("/game_store/images/13/" .. category.icons[1])
             if category.icons[1] == "icon-store-home.png" then
                 widget.Button.Icon:setIcon("/game_store/images/icon-store-home")
             else
-                setImagenHttp(widget.Button.Icon,"/13/" .. category.icons[1], true)
+                setImagenHttp(widget.Button.Icon, "/13/" .. category.icons[1], true)
             end
-    
+
             widget.Button.Title:setText(category.name)
             widget.open = category.name
 
@@ -812,7 +813,8 @@ function show()
             controllerShop.ui.openedCategory = firstCategory
             firstCategory.Button:onClick()
         else
-            g_logger.warning("[game_store] function show() L815, increase scheduleEvent time 300 -> 500. reason: information is late in arriving ")
+            g_logger.warning(
+                "[game_store] function show() L815, increase scheduleEvent time 300 -> 500. reason: information is late in arriving ")
         end
     end, 300, 'fuck antibot')
 end
@@ -909,9 +911,9 @@ function chooseOffert(self, focusedChild)
 
             if latestCurrentBalance >= price then
                 if product.name == "Character Name Change" then
-                    displayErrorBox(controllerShop.ui:getText(),"no yet,UI missing")
+                    displayErrorBox(controllerShop.ui:getText(), "no yet,UI missing")
                 elseif product.name == "Hireling Apprentice" then
-                    displayErrorBox(controllerShop.ui:getText(),"no yet, UI missing")
+                    displayErrorBox(controllerShop.ui:getText(), "no yet, UI missing")
                 else
                     g_game.buyStoreOffer(product.subOffers[1].id, product.type)
                 end
