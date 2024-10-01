@@ -172,7 +172,7 @@ GameStore.DefaultValues = {
 -- =============================================*/
 local function setImagenHttp(widget, url,isIcon)
     if Services and Services.store  then
-        HTTP.downloadImage(Services.store..url, function(path, err)
+        HTTP.downloadImage(Services.store .. url, function(path, err)
             if err then
                 g_logger.warning("HTTP error: " .. err .. " - " .. Services.store..url)
                 if isIcon then
