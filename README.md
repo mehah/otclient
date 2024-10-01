@@ -514,12 +514,10 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 |-----------------------	|-----------------------------------	|------	|
 | Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
 | Familiar outfit       	| ![](https://geps.dev/progress/30) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
-| Cyclopedia            	| ![](https://geps.dev/progress/90) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
-| Blessing            	| ![](https://geps.dev/progress/100) 	| [#825](https://github.com/mehah/otclient/pull/825)	|
 | wheel_of_destiny            	| ![](https://geps.dev/progress/1) 	| None	|
+| Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
 | fix Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
-| Quickloot | ![](https://geps.dev/progress/30)   |   None   	|
 | Sound tibia 13 | ![](https://geps.dev/progress/0)   |   None   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
@@ -537,7 +535,7 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
 | Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
 | Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
-| Canary 13.40        	| OpenTibiaBr              	|            	| 〰️             	|
+| Canary 13.40        	| OpenTibiaBr              	|            	| ✅             	|
 
 
 
