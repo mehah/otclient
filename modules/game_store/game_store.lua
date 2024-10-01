@@ -408,8 +408,6 @@ controllerShop = Controller:new()
 g_ui.importStyle("style/ui.otui")
 controllerShop:setUI('game_store')
 function controllerShop:onInit()
-
-    oldProtocol = g_game.getClientVersion() < 1332
     controllerShop.ui:hide()
 
     -- /*=============================================
@@ -494,7 +492,7 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
 end
 
 function controllerShop:onGameStart()
-
+    oldProtocol = g_game.getClientVersion() < 1332
 end
 
 function controllerShop:onGameEnd()
