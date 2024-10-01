@@ -27,7 +27,7 @@
 #include "timer.h"
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
-int16_t g_mainThreadId = EventDispatcher::getThreadId();
+int16_t g_mainThreadId = stdext::getThreadId();
 int16_t g_eventThreadId = -1;
 
 void EventDispatcher::init() {};
@@ -99,7 +99,7 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     if (m_disabled)
         return std::make_shared<Event>(nullptr);
 
-    if (&g_mainDispatcher == this && g_mainThreadId == getThreadId()) {
+    if (&g_mainDispatcher == this && g_mainThreadId == stdext::getThreadId()) {
         callback();
         return std::make_shared<Event>(nullptr);
     }

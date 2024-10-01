@@ -201,6 +201,10 @@ public:
 
     bool isHided() { return isOwnerHidden(); }
 
+    uint8_t getPatternX()const { return m_numPatternX; }
+    uint8_t getPatternY()const { return m_numPatternY; }
+    uint8_t getPatternZ()const { return m_numPatternZ; }
+
 protected:
     virtual ThingType* getThingType() const = 0;
 
