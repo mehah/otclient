@@ -595,7 +595,7 @@ function onParseStoreCreateHome(offer)
 
     local ramdomImg = offer.banners[math.random(1, #offer.banners)].image
    -- controllerShop.ui.HomePanel.HomeImagen:setImageSource("/game_store/images/" .. ramdomImg)
-    setImagenHttp(controllerShop.ui.HomePanel.HomeImagen,ramdomImg,false)
+    setImagenHttp(controllerShop.ui.HomePanel.HomeImagen, ramdomImg, false)
     enableAllButtons()
 end
 
