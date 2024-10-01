@@ -181,7 +181,6 @@ local function setImagenHttp(widget, url,isIcon)
                     widget:setImageSource("/game_store/images/dynamic-image-error")
                     widget:setImageFixedRatio(false)
                 end
-
                 return
             end
             if isIcon then
