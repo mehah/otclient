@@ -925,7 +925,7 @@ void Tile::drawTexts(Point dest)
 void Tile::setText(const std::string& text, Color color)
 {
     if (!m_text) {
-        m_text = std::make_shared<StaticText>();
+        m_text = std::make_unique<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             if (g_client.getMapWidget())
                 g_client.getMapWidget()->getMapView()->addForegroundTile(tile);
@@ -949,7 +949,7 @@ void Tile::setTimer(int time, Color color)
     }
     m_timer = time + g_clock.millis();
     if (!m_timerText) {
-        m_timerText = std::make_shared<StaticText>();
+        m_timerText = std::make_unique<StaticText>();
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             if (g_client.getMapWidget())
                 g_client.getMapWidget()->getMapView()->addForegroundTile(tile);

@@ -37,7 +37,7 @@ FrameBuffer::FrameBuffer()
 {
     glGenFramebuffers(1, &m_fbo);
     if (!m_fbo)
-        g_logger.fatal("Unable to create framebuffer object");
+        g_logger.warning("Unable to create framebuffer object");
 }
 
 FrameBuffer::~FrameBuffer()
@@ -72,7 +72,7 @@ bool FrameBuffer::resize(const Size& size)
 
     const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
-        g_logger.fatal("Unable to setup framebuffer object");
+        g_logger.warning("Unable to setup framebuffer object");
 
     internalRelease();
 
@@ -153,6 +153,21 @@ void FrameBuffer::prepare(const Rect& dest, const Rect& src, const Color& colorC
 Size FrameBuffer::getSize()
 {
     return m_texture->getSize();
+}
+
+TexturePtr FrameBuffer::extractTexture() {
+    internalBind();
+    const auto& size = getSize();
+    const int width = size.width();
+    const int height = size.height();
+    const auto& pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+    internalRelease();
+
+    const auto& texture = std::make_shared<Texture>(std::make_shared<Image>(getSize(), 4, pixels->data()));
+    texture->setUpsideDown(true);
+
+    return texture;
 }
 
 void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_t y)
