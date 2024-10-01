@@ -1,0 +1,1773 @@
+UIWidget
+  id: Cat6
+  anchors.fill: parent
+  visible: false
+  UIWidget
+    id: CharacterBase
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 10
+    image-source: /images/ui/outfits/minipanel
+    image-border: 20
+    size: 170 130
+    color: #929292
+    text-offset: 0 3
+    text-align: top
+    !text: tr('Player Name')
+    change-cursor-image: true
+    cursor: pointer
+    @onClick: modules.game_cyclopedia.Cyclopedia.selectCharacterPage()
+    Label
+      id: InfoLabel
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      margin-bottom: 5
+      !text: tr('Level: 1\nKnight')
+      text-auto-resize: true
+      text-align: center
+      color: #C1C1C1
+    UICreature
+      id: Outfit
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: InfoLabel.top
+      margin-bottom: 5
+      size: 64 64
+      phantom: true
+  UIWidget
+    id: OptionsBase
+    anchors.left: CharacterBase.left
+    anchors.top: CharacterBase.bottom
+    anchors.bottom: parent.bottom
+    margin-top: 10
+    margin-bottom: 30
+    image-source: /images/ui/2pixel_up_frame_borderimage_dark
+    image-size: 170 270
+    image-border: 10
+
+    width: 170
+
+  BorderBox
+    id: InfoBase
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    Panel
+      id: outfitPanel
+      margin-left: -10
+      margin-top: 10
+      anchors.left: parent.left
+      anchors.top: parent.top
+      size: 140 140
+      visible: false
+      UICreature
+        id: Sprite
+        anchors.fill: parent
+    Panel
+      id: inventoryPanel
+      margin-left: -10
+      margin-top: 10
+      anchors.left: parent.left
+      anchors.top: parent.top
+      size: 140 140
+      HeadSlot
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-top: 3
+      BodySlot
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: prev.horizontalCenter
+        margin-top: 3
+      LegSlot
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: prev.horizontalCenter
+        margin-top: 3
+      FeetSlot
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: prev.horizontalCenter
+        margin-top: 3
+      NeckSlot
+        anchors.top: slot1.top
+        anchors.right: slot1.left
+        margin-top: 13
+        margin-right: 5
+      LeftSlot
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: prev.horizontalCenter
+        margin-top: 3
+      FingerSlot
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: prev.horizontalCenter
+        margin-top: 3
+      BackSlot
+        anchors.top: slot1.top
+        anchors.left: slot1.right
+        margin-top: 13
+        margin-left: 5
+      RightSlot
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: prev.horizontalCenter
+        margin-top: 3
+      AmmoSlot
+        anchors.top: prev.bottom
+        anchors.horizontalCenter: prev.horizontalCenter
+        margin-top: 3
+    Button
+      id: CharacterButton
+      anchors.left: inventoryPanel.right
+      anchors.top: parent.top
+      margin-top: 10
+      margin-left: -5
+      size: 34 34
+      icon-source: /game_cyclopedia/images/icon-playerdetails
+      &state: 1
+      @onClick: modules.game_cyclopedia.Cyclopedia.characterButton(self)
+    Button
+      id: WheelButton
+      anchors.left: CharacterButton.right
+      anchors.top: CharacterButton.top
+      margin-left: 5
+      size: 34 34
+      icon-source: /game_cyclopedia/images/button_wheel
+    BorderBox
+      id: DetailsBase
+      anchors.top: inventoryPanel.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-top: 30
+      margin-left: 5
+      margin-right: 5
+      margin-bottom: 5
+      height: 140
+      background-color: #363636
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        size: 200 60
+        padding-left: 2
+        padding-top: 2
+        padding-bottom: 2
+        layout:
+          type: grid
+          cell-size: 325 22
+          cell-spacing: 2
+          flow: true
+        UIWidget
+          !text: tr('Status: Loading, please wait...')
+          color: #BEBEBE
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        step: 80
+        pixel-scroll: true
+    Label
+      id: InspectLabel
+      anchors.bottom: DetailsBase.top
+      anchors.left: DetailsBase.left
+      margin-bottom: 5
+      text-auto-resize: true
+      !text: tr('You are inspecting') .. ": " .. "Player Name"
+      color: #BEBEBE
+  BorderBox
+    id: CharacterStats
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    VerticalSeparator
+      id: separator
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-bottom: 5
+    CharacterSkillBase
+      id: level
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: separator.right
+      SkillNameLabel
+        !text: tr('Level')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+      SkillCharacterPercentPanel
+        background-color: #C00000
+    CharacterSkillBase
+      id: experience
+      anchors.top: level.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 10
+      SkillNameLabel
+        !text: tr('Experience')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+    CharacterSkillBase
+      id: expGainRate
+      anchors.top: experience.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('XP Gain Rate')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #44AD25
+    UIWidget
+      id: xpBoostButton
+      image-source: /images/ui/button-storexp
+      anchors.horizontalCenter: level.horizontalCenter
+      anchors.top: expGainRate.bottom
+      @onClick: modules.game_shop.toggle()
+      $pressed:
+        image-source: /images/ui/button-storexp-pressed
+    HorizontalSeparator
+      id: leftSeparator
+      anchors.top: expGainRate.bottom
+      anchors.left: parent.left
+      anchors.right: xpBoostButton.left
+      margin-top: 5
+      margin-left: 5
+    HorizontalSeparator
+      id: rightSeparator
+      anchors.top: leftSeparator.top
+      anchors.left: xpBoostButton.right
+      anchors.right: separator.right
+      margin-left: 1
+      margin-right: 5
+    CharacterSkillBase
+      id: health
+      anchors.top: xpBoostButton.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 10
+      SkillNameLabel
+        !text: tr('Hit Points')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+    CharacterSkillBase
+      id: mana
+      anchors.top: health.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Mana')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+    CharacterSkillBase
+      id: soul
+      anchors.top: mana.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Soul Points')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+    CharacterSkillBase
+      id: capacity
+      anchors.top: soul.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Capacity')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+    CharacterSkillBase
+      id: speed
+      anchors.top: capacity.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Speed')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+    CharacterSkillBase
+      id: food
+      anchors.top: speed.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Food')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+    CharacterSkillBase
+      id: stamina
+      anchors.top: food.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Stamina')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+      SkillCharacterPercentPanel
+        background-color: green
+    CharacterSkillBase
+      id: trainer
+      anchors.top: stamina.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      SkillNameLabel
+        !text: tr('Offline Training')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+      SkillCharacterPercentPanel
+        background-color: #C00000
+
+    HorizontalSeparator
+      id: leftSeparator2
+      anchors.top: trainer.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      margin-left: 5
+
+    CharacterSkillBase
+      id: accountStatus
+      anchors.top: leftSeparator2.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 10
+      SkillNameLabel
+        !text: tr('Account Status')
+        color: #C0C0C0
+      SkillValueLabel
+        !text: tr('33')
+        color: #C0C0C0
+    CharacterSkillBase
+      id: accountOnline
+      anchors.top: accountStatus.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      SkillNameLabel
+        !text: tr('Account Premium')
+        color: #C0C0C0
+      SkillValueLabel
+        !text: tr('33')
+        color: #C0C0C0
+    CharacterSkillBase
+      id: loyaltyTitle
+      anchors.top: accountOnline.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      SkillNameLabel
+        !text: tr('Loyalty Title')
+        color: #C0C0C0
+      SkillValueLabel
+        !text: tr('33')
+        color: #C0C0C0
+
+    Label
+      id: skillsLabel
+      !text: tr('Skills')
+      color: #C0C0C0
+      anchors.top: level.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-left: 125
+    CharacterSkillBase
+      id: magiclevel
+      anchors.top: skillsLabel.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 10
+      SkillNameLabel
+        !text: tr('Magic')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 27 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    CharacterSkillBase
+      id: skillId0
+      anchors.top: magiclevel.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 13
+      SkillNameLabel
+        !text: tr('Fist')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 0 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    CharacterSkillBase
+      id: skillId1
+      anchors.top: skillId0.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 13
+      SkillNameLabel
+        !text: tr('Club')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 45 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    CharacterSkillBase
+      id: skillId2
+      anchors.top: skillId1.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 13
+      SkillNameLabel
+        !text: tr('Sword')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 36 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    CharacterSkillBase
+      id: skillId3
+      anchors.top: skillId2.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 13
+      SkillNameLabel
+        !text: tr('Axe')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 54 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    CharacterSkillBase
+      id: skillId4
+      anchors.top: skillId3.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 13
+      SkillNameLabel
+        !text: tr('Distance')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 18 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    CharacterSkillBase
+      id: skillId5
+      anchors.top: skillId4.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 13
+      SkillNameLabel
+        !text: tr('Shielding')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 63 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    CharacterSkillBase
+      id: skillId6
+      anchors.top: skillId5.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 13
+      SkillNameLabel
+        !text: tr('Fishing')
+        color: #C0C0C0
+      SkillValueLabel
+      SkillCharacterIcon
+        anchors.left: parent.left
+        image-clip: 72 0 9 9
+      SkillCharacterPercentPanel
+        anchors.left: icon.right
+        margin-top: 15
+        margin-left: 5
+        background-color: #00C000
+    Label
+      !text: tr('Account Badges')
+      margin-top: 12
+      anchors.top: skillId6.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-left: 75
+
+    UIScrollArea
+      id: ListBadge
+      vertical-scrollbar: ListBadgeScrollbar
+      anchors.top: prev.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      height: 140
+      border-width: 1
+      border-color: #00000077
+      background-color: #ffffff11
+      layout:
+        type: grid
+        cell-size: 64 64
+        cell-spacing: 5
+        flow: true
+        fit-children: false
+      padding-left: 20
+
+        
+    VerticalScrollBar
+      id: ListBadgeScrollbar
+      anchors.top: ListBadge.top
+      anchors.right: ListBadge.right
+      anchors.bottom: ListBadge.bottom
+      margin: 1
+      margin-bottom: 10
+
+      step: 5
+      pixel-scroll: true
+
+  BorderBox
+    id: CombatStats
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+
+    VerticalSeparator
+      id: separator
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-bottom: 5
+    CharacterSkillBase
+      id: attack
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      margin-left: 5
+      SkillNameLabel
+        !text: tr('Attack Value:')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        anchors.right: next.left
+        margin-right: 8
+        !text: ('100')
+      SkillCharacterIcon
+        margin-top: 2
+        anchors.right: parent.right
+    CharacterSkillBase
+      id: converted
+      anchors.top: attack.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 0
+      SkillNameLabel
+        !text: tr('Converted Damage:')
+        color: #C0C0C0
+      SkillValueLabel
+        id: none
+        color: #C0C0C0
+        !text: tr('None')
+        margin-right: 2
+        visible: false
+      SkillValueLabel
+        color: #C0C0C0
+        anchors.right: next.left
+        margin-right: 8
+        !text: ('100')
+      SkillCharacterIcon
+        margin-top: 2
+        anchors.right: parent.right
+    CharacterSkillBase
+      id: defence
+      anchors.top: converted.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 0
+      SkillNameLabel
+        !text: tr('Defence Value:')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 2
+    CharacterSkillBase
+      id: armor
+      anchors.top: defence.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Armor Value:')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 2
+    CharacterSkillBase
+      id: mitigation
+      anchors.top: armor.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 0
+      SkillNameLabel
+        !text: tr('Mitigation:')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 2
+    CharacterSkillBase
+      id: blessings
+      anchors.top: mitigation.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Blessings:')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 20
+      UIButton
+        id: blessButton
+        size: 12 12
+        anchors.top: parent.top
+        anchors.right: parent.right
+        margin-top: 1
+        margin-right: 3
+        image-clip: 0 0 12 12
+        image-source: /images/inventory/button_blessings_grey
+        @onClick: modules.game_blessing.toggle()
+        $pressed:
+          image-source: /images/inventory/button_blessings_grey
+          image-clip: 12 0 12 12
+        $on:
+          image-source: /images/inventory/button_blessings_grey
+          image-clip: 12 0 12 12
+        $on pressed:
+          image-source: /images/inventory/button_blessings_grey
+          image-clip: 12 0 12 12
+    CharacterSkillBase
+      id: reduction
+      anchors.top: blessings.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Damage Reduction:')
+        color: #C0C0C0
+    Panel
+      id: reductionNone
+      anchors.top: reduction.bottom
+      anchors.left: reduction.left
+      anchors.right: separator.right
+
+      color: #f00303
+      background-color: #355d89
+      shader: Map - Party
+      margin-left: 10
+      margin-top: 10
+      size: 232 233
+      layout:
+        type: verticalBox
+        fit-children: true
+
+    CharacterSkillBase
+      id: criticalHit
+      anchors.top: attack.top
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Critical Hit:')
+        color: #C0C0C0
+    CharacterSkillBase
+      id: criticalChance
+      anchors.top: criticalHit.bottom
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-left: 15
+      margin-top: 0
+      SkillNameLabel
+        !text: tr('Chance')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 2
+    CharacterSkillBase
+      id: criticalDamage
+      anchors.top: criticalChance.bottom
+      anchors.left: prev.left
+      anchors.right: parent.right
+      margin-left: 0
+      margin-top: 0
+      SkillNameLabel
+        !text: tr('Extra Damage')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 2
+    CharacterSkillBase
+      id: lifeLeech
+      anchors.top: criticalDamage.bottom
+      anchors.left: criticalHit.left
+      anchors.right: parent.right
+      margin-left: 0
+      margin-top: 0
+      SkillNameLabel
+        !text: tr('Life Leech:')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 2
+    CharacterSkillBase
+      id: manaLeech
+      anchors.top: lifeLeech.bottom
+      anchors.left: criticalHit.left
+      anchors.right: parent.right
+      margin-left: 0
+      margin-top: 0
+      SkillNameLabel
+        !text: tr('Mana Leech:')
+        color: #C0C0C0
+      SkillValueLabel
+        color: #C0C0C0
+        margin-right: 2
+  UIWidget
+    id: RecentDeaths
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    BorderBox
+      id: ListBase
+      size: 494 380
+      anchors.top: parent.top
+      anchors.left: parent.left
+      UIWidget
+        height: 16
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        image-source: /images/game/actionbar/1pixel-down-frame
+        image-border: 5
+        UIWidget
+          anchors.fill: parent
+          margin: 1
+          background-color: #363636
+        Label
+          !text: tr('Data and Time')
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: parent.left
+          margin-left: 3
+          margin-top: 1
+          color: #C0C0C0
+          width: 154
+        VerticalSeparator
+          id: separator
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+        Label
+          !text: tr('Cause of Death')
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: separator.left
+          anchors.right: parent.right
+          margin-left: 5
+          margin-top: 1
+          color: #C0C0C0
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        margin: 1
+        margin-top: 16
+        padding-right: 15
+        background-color: #404040
+        layout:
+          type: verticalBox
+          spacing: 3
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        margin: 1
+        margin-top: -15
+        step: 80
+        pixel-scroll: true
+    Button
+      id: previous
+      size: 86 20
+      !text: tr('Previous')
+      //font: verdana-bold-8px-antialiased
+      anchors.top: ListBase.bottom
+      anchors.left: parent.left
+      margin-top: 7
+      text-offset: 0 -1
+      color: #C0C0C0
+      enabled: false
+    Button
+      id: next
+      size: 86 20
+      !text: tr('Next')
+      //font: verdana-bold-8px-antialiased
+      anchors.top: ListBase.bottom
+      anchors.right: parent.right
+      margin-right: -5
+      margin-top: 7
+      text-offset: 0 -1
+      color: #C0C0C0
+      enabled: false
+    Label
+      id: pages
+      !text: tr('Page 1 / 1')
+      color: #C0C0C0
+      anchors.verticalCenter: previous.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+  UIWidget
+    id: RecentKills
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    BorderBox
+      id: ListBase
+      size: 494 380
+      anchors.top: parent.top
+      anchors.left: parent.left
+      UIWidget
+        height: 16
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        image-source: /images/game/actionbar/1pixel-down-frame
+        image-border: 5
+        UIWidget
+          anchors.fill: parent
+          margin: 1
+          background-color: #363636
+        Label
+          !text: tr('Data and Time')
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: parent.left
+          margin-left: 3
+          margin-top: 1
+          color: #C0C0C0
+          width: 154
+        VerticalSeparator
+          id: separator
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+        Label
+          !text: tr('Description')
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: separator.left
+          anchors.right: parent.right
+          margin-left: 5
+          margin-top: 1
+          color: #C0C0C0
+        VerticalSeparator
+          id: separatorTwo
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.right: parent.right
+          margin-right: 100
+        Label
+          !text: tr('Status')
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: separatorTwo.left
+          anchors.right: parent.right
+          margin-left: 5
+          margin-top: 1
+          color: #C0C0C0
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        margin: 1
+        margin-top: 16
+        padding-right: 15
+        background-color: #404040
+        layout:
+          type: verticalBox
+          spacing: -1
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        margin: 1
+        margin-top: -15
+        step: 80
+        pixel-scroll: true
+    Button
+      id: previous
+      size: 86 20
+      !text: tr('Previous')
+      //font: verdana-bold-8px-antialiased
+      anchors.top: ListBase.bottom
+      anchors.left: parent.left
+      margin-top: 7
+      text-offset: 0 -1
+      color: #C0C0C0
+      enabled: false
+    Button
+      id: next
+      size: 86 20
+      !text: tr('Next')
+      //font: verdana-bold-8px-antialiased
+      anchors.top: ListBase.bottom
+      anchors.right: parent.right
+      margin-right: -5
+      margin-top: 7
+      text-offset: 0 -1
+      color: #C0C0C0
+      enabled: false
+    Label
+      id: pages
+      !text: tr('Page 1 / 1')
+      color: #C0C0C0
+      anchors.verticalCenter: previous.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+  UIWidget
+    id: CharacterAchievements
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    UIWidget
+      id: achievements
+      width: 150
+      anchors.top: parent.top
+      anchors.bottom: ListBase.top
+      anchors.left: parent.left
+      Label
+        id: Points
+        text-auto-resize: true
+        !text: tr('Achievements Points: ') .. 0
+        color: #C0C0C0
+        anchors.top: parent.top
+        anchors.left: parent.left
+      Label
+        id: gradeOne
+        text-auto-resize: true
+        !text: tr('Grade 1: ') .. 0
+        color: #C0C0C0
+        anchors.top: prev.bottom
+        anchors.right: parent.right
+        margin-right: 14
+      UIWidget
+        image-source: /game_cyclopedia/images/icon-achievement
+        anchors.top: gradeOne.top
+        anchors.right: gradeOne.left
+        margin-top: 2
+        margin-right: 5
+      Label
+        id: gradeTwo
+        text-auto-resize: true
+        !text: tr('Grade 2: ') .. 0
+        color: #C0C0C0
+        anchors.top: gradeOne.bottom
+        anchors.right: gradeOne.right
+      UIWidget
+        image-source: /game_cyclopedia/images/icon-achievement
+        image-repeated: true
+        width: 22
+        anchors.top: gradeTwo.top
+        anchors.right: gradeTwo.left
+        margin-top: 2
+        margin-right: 4
+      Label
+        id: gradeThree
+        text-auto-resize: true
+        !text: tr('Grade 3: ') .. 0
+        color: #C0C0C0
+        anchors.top: gradeTwo.bottom
+        anchors.right: gradeTwo.right
+      UIWidget
+        image-source: /game_cyclopedia/images/icon-achievement
+        image-repeated: true
+        width: 33
+        anchors.top: gradeThree.top
+        anchors.right: gradeThree.left
+        margin-top: 2
+        margin-right: 4
+      Label
+        id: gradeFour
+        text-auto-resize: true
+        !text: tr('Grade 4: ') .. 0
+        color: #C0C0C0
+        anchors.top: gradeThree.bottom
+        anchors.right: gradeThree.right
+      UIWidget
+        image-source: /game_cyclopedia/images/icon-achievement
+        image-repeated: true
+        width: 44
+        anchors.top: gradeFour.top
+        anchors.right: gradeFour.left
+        margin-top: 2
+        margin-right: 4
+    UIWidget
+      id: filters
+      width: 114
+      image-source: /images/game/actionbar/1pixel-down-frame
+      image-border: 5
+      anchors.top: achievements.top
+      anchors.bottom: ListBase.top
+      anchors.left: achievements.right
+      margin-bottom: 6
+      margin-left: 10
+      RoundCheckBox
+        id: all
+        width: 85
+        text: All
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: parent.top
+        anchors.left: parent.left
+        margin-left: 5
+        margin-top: 10
+        @onClick: modules.game_cyclopedia.Cyclopedia.achievementFilter(self)
+      RoundCheckBox
+        id: locked
+        width: 85
+        text: Locked
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: all.bottom
+        anchors.left: all.left
+        margin-top: 5
+        @onClick: modules.game_cyclopedia.Cyclopedia.achievementFilter(self)
+      RoundCheckBox
+        id: accomplished
+        width: 100
+        text: Accomplished
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: locked.bottom
+        anchors.left: locked.left
+        margin-top: 5
+        checked: true
+        @onClick: modules.game_cyclopedia.Cyclopedia.achievementFilter(self)
+    ComboBox
+      id: sort
+      size: 145 20
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-top: -5
+      @onOptionChange: modules.game_cyclopedia.Cyclopedia.achievementSort(self:getCurrentOption().data)
+    Label
+      !text: ('Sort')
+      anchors.top: sort.top
+      anchors.right: sort.left
+      margin-right: 5
+      margin-top: 4
+    UIWidget
+      id: regular
+      height: 20
+      image-source: /images/game/actionbar/1pixel-down-frame
+      image-border: 5
+      anchors.top: sort.bottom
+      anchors.left: sort.left
+      anchors.right: sort.right
+      margin-top: 5
+      UIWidget
+        anchors.fill: parent
+        image-source: /images/ui/backdrop-dark-grey
+        image-border: 5
+        margin: 1
+      Label
+        id: value
+        text-auto-resize: true
+        !text: ('0/329')
+        anchors.centerIn: parent
+    Label
+      !text: ('Regular')
+      anchors.top: regular.top
+      anchors.right: regular.left
+      margin-right: 5
+      margin-top: 3
+    UIWidget
+      id: secret
+      height: 20
+      image-source: /images/game/actionbar/1pixel-down-frame
+      image-border: 5
+      anchors.top: regular.bottom
+      anchors.left: regular.left
+      anchors.right: regular.right
+      margin-top: 5
+      UIWidget
+        anchors.fill: parent
+        image-source: /images/ui/backdrop-dark-grey
+        image-border: 5
+        margin: 1
+      Label
+        id: value
+        text-auto-resize: true
+        !text: ('0/0')
+        anchors.centerIn: parent
+    Label
+      !text: ('Secret')
+      anchors.top: secret.top
+      anchors.right: secret.left
+      margin-right: 5
+      margin-top: 3
+    BorderBox
+      id: ListBase
+      size: 494 335
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      margin-bottom: 10
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        margin: 1
+        margin-right: 15
+        layout:
+          type: verticalBox
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        margin: 1
+        margin-right: -13
+        step: 80
+        pixel-scroll: true
+  UIWidget
+    id: CharacterItems
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    UIWidget
+      id: gridBase
+      size: 494 340
+      anchors.bottom: parent.bottom
+      anchors.left: parentl.left
+      visible: false
+      UIScrollArea
+        id: grid
+        vertical-scrollbar: gridScrollbar
+        anchors.fill: parent
+        margin-right: 15
+        layout:
+          type: grid
+          cell-size: 34 34
+          cell-spacing: 3
+          flow: true
+      VerticalScrollBar
+        id: gridScrollbar
+        anchors.top: grid.top
+        anchors.right: grid.right
+        anchors.bottom: grid.bottom
+        margin: 1
+        margin-right: -13
+        margin-top: 0
+        step: 80
+        pixel-scroll: true
+    BorderBox
+      id: ListBase
+      size: 494 340
+      anchors.bottom: parent.bottom
+      anchors.left: parentl.left
+      UIWidget
+        id: listTop
+        height: 16
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        image-source: /images/game/actionbar/1pixel-down-frame
+        image-border: 5
+        UIWidget
+          anchors.fill: parent
+          margin: 1
+          background-color: #363636
+        Label
+          !text: tr('Name')
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: parent.left
+          margin-left: 3
+          margin-top: 1
+          color: #C0C0C0
+          width: 154
+        VerticalSeparator
+          id: separator
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.right: parent.right
+          margin-right: 150
+        Label
+          !text: tr('Amount')
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: separator.left
+          anchors.right: parent.right
+          margin-left: 5
+          margin-top: 1
+          color: #C0C0C0
+      UIScrollArea
+        id: list
+        vertical-scrollbar: listScrollbar
+        anchors.fill: parent
+        margin: 1
+        margin-right: 15
+        margin-top: 16
+        background-color: #404040
+        layout:
+          type: verticalBox
+          spacing: 0
+      VerticalScrollBar
+        id: listScrollbar
+        anchors.top: list.top
+        anchors.right: list.right
+        anchors.bottom: list.bottom
+        margin: 1
+        margin-right: -13
+        margin-top: -15
+        step: 80
+        pixel-scroll: true
+    UIWidget
+      id: filters
+      height: 55
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: ListBase.right
+      image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+      image-border: 5
+      CheckBox
+        id: inventory
+        width: 85
+        text: Inventory
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: parent.top
+        anchors.left: parent.left
+        margin-left: 8
+        margin-top: 8
+        @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
+      CheckBox
+        id: depot
+        width: 85
+        text: Depot
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: inventory.top
+        anchors.left: inventory.right
+        margin-left: 10
+        @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
+      CheckBox
+        id: stash
+        width: 100
+        text: Supply Stash
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: depot.bottom
+        anchors.left: depot.left
+        margin-top: 8
+        @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
+      CheckBox
+        id: inbox
+        width: 100
+        text: Inbox
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: depot.top
+        anchors.left: depot.right
+        margin-left: 30
+        @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
+      CheckBox
+        id: store
+        width: 100
+        text: Store Inbox
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.top: inbox.bottom
+        anchors.left: inbox.left
+        margin-top: 8
+        @onCheckChange: modules.game_cyclopedia.Cyclopedia.characterItemsFilter(self)
+      TextEdit
+        id: SearchEdit
+        size: 120 16
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        margin-right: 7
+        padding-top: 2
+        padding-right: 15
+        padding-bottom: 0
+        placeholder: Type to search
+        placeholder-color: #6E706F
+        @onTextChange: modules.game_cyclopedia.Cyclopedia.characterItemsSearch(self:getText())
+    UIWidget
+      id: listFilter
+      height: 20
+      anchors.top: filters.bottom
+      anchors.left: parent.left
+      anchors.right: filters.right
+      image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+      image-border: 5
+      margin-top: 5
+      RoundCheckBox
+        id: list
+        width: 85
+        text: show as list
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.centerIn: parent
+        margin-right: 70
+        @onClick: modules.game_cyclopedia.Cyclopedia.characterItemListFilter(self)
+      RoundCheckBox
+        id: grid
+        width: 100
+        text: show as grid
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: list.right
+        margin-left: 20
+        margin-bottom: 3
+        @onClick: modules.game_cyclopedia.Cyclopedia.characterItemListFilter(self)
+  UIWidget
+    id: CharacterAppearances
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    UIWidget
+      id: listFilter
+      height: 34
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      image-source: /images/game/actionbar/2pixel-up-frame-borderimage
+      image-border: 5
+      RoundCheckBox
+        id: outfits
+        width: 85
+        text: Outfits
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin-left: 10
+        @onClick: modules.game_cyclopedia.Cyclopedia.characterAppearancesFilter(self)
+      RoundCheckBox
+        id: mounts
+        width: 85
+        text: Mounts
+        color: #C0C0C0
+        text-offset: 15 0
+        margin-bottom: 3
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: outfits.right
+        @onClick: modules.game_cyclopedia.Cyclopedia.characterAppearancesFilter(self)
+      RoundCheckBox
+        id: familiars
+        width: 85
+        text: Familiars
+        color: #C0C0C0
+        text-offset: 15 0
+        anchors.verticalCenter: parent.verticalCenter
+        margin-bottom: 3
+        anchors.left: mounts.right
+        @onClick: modules.game_cyclopedia.Cyclopedia.characterAppearancesFilter(self)
+      ComboBox
+        id: show
+        size: 222 20
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: familiars.right
+        
+        @onSetup: |
+          self:addOption("Show All")
+          self:addOption("Show Standard Outfits")
+          self:addOption("Show Quest Outfits")
+          self:addOption("Show Store Outfits")
+    BorderBox
+      id: ListBase
+      size: 489 376
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      UIScrollArea
+        id: list
+        vertical-scrollbar: listScrollbar
+        anchors.fill: parent
+        margin: 5
+        margin-right: 10
+        layout:
+          type: grid
+          cell-size: 152 110
+          cell-spacing: 5
+          flow: true
+      VerticalScrollBar
+        id: listScrollbar
+        anchors.top: list.top
+        anchors.right: list.right
+        anchors.bottom: list.bottom
+        margin: 1
+        margin-right: -13
+        margin-top: 0
+        step: 80
+        pixel-scroll: true
+  UIWidget
+    id: StoreSummary
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    BorderBox
+      id: ListBase
+      size: 494 380
+      anchors.top: parent.top
+      anchors.left: parent.left
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbarStoreSummary
+        anchors.fill: parent
+        margin: 1
+
+        padding-right: 15
+        background-color: #404040
+        layout:
+          type: verticalBox
+          spacing: 3
+
+        MiniPanel
+          id:XPBoosts
+          image-source: /images/ui/outfits/minipanel
+          image-border: 5
+          color: #C0C0C0
+          height: 66
+          padding-bottom: 5
+          margin: 5
+          margin-bottom: 1
+          text: XP Boosts
+
+          Label
+            id: RemainingStoreXPBoostTime
+            text-auto-resize: true
+            color: #909090
+            anchors.top: parent.top
+            anchors.left: parent.left
+            margin-top: 2
+            text: Remaining Store XP Boost Time:
+
+          Label
+            id: RemainingStoreXPBoostTimeValue
+            anchors.top: parent.top
+            anchors.left: parent.right
+            margin-left: -32
+            margin-top: 2
+            text: 00:00222222222
+
+          Label
+            id: RemainingDailyRewardXPBoostTime
+            text-auto-resize: true
+            color: #909090
+            anchors.top: RemainingStoreXPBoostTime.bottom
+            anchors.left: RemainingStoreXPBoostTime.left
+            margin-top: 2
+            text: Remaining Daily Reward XP Boost Time:
+
+          Label
+            id: RemainingDailyRewardXPBoostTimeValue
+            anchors.top: RemainingStoreXPBoostTimeValue.bottom
+            anchors.left: parent.right
+            margin-left: -30
+            margin-top: 2
+            text: 00:00222222222
+
+        MiniPanel
+          id:Blessings
+          image-source: /images/ui/outfits/minipanel
+          image-border: 5
+          color: #C0C0C0
+          padding-bottom: 5
+          margin: 5
+          margin-bottom: 1
+          text: Blessings
+          size: 225 135
+
+          Label
+            id: AvailableBlessings
+            text-auto-resize: true
+            color: #909090
+            anchors.top: parent.top
+            anchors.left: parent.left
+            margin-top: 2
+            text: Available Blessings:
+
+          Panel
+            id: PurchasedHouseItems
+            size: 225 100
+            margin-top: 15
+            anchors.fill: parent
+            image-border: 3
+            layout:
+              type: grid
+              cell-size: 224 20
+              flow: true
+
+
+        MiniPanel
+          id: preyPanel
+          image-source: /images/ui/outfits/minipanel
+          image-border: 5
+          color: #C0C0C0
+          height: 66
+          padding-bottom: 5
+          margin: 5
+          margin-bottom: 1
+          text: Prey
+
+          Label
+            id: PermanentPreySlots
+            text-auto-resize: true
+            color: #909090
+            anchors.top: parent.top
+            anchors.left: parent.left
+            margin-top: 2
+            text: Permanent Prey Slots:
+
+          Label
+            id: PermanentPreySlotsValue
+            anchors.top: parent.top
+            anchors.left: parent.right
+            margin-left: -30
+            margin-top: 2
+            text: 1x
+
+          Label
+            id: PreyWildcards
+            text-auto-resize: true
+            color: #909090
+            anchors.top: PermanentPreySlots.bottom
+            anchors.left: parent.left
+            margin-top: 2
+            text: Prey Wildcards:
+
+          Label
+            id: PreyWildcardsValue
+            anchors.top: PermanentPreySlotsValue.bottom
+            anchors.left: parent.right
+            margin-left: -30
+            margin-top: 2
+            text: 20x
+
+        MiniPanel
+          id: dailyReward
+          image-source: /images/ui/outfits/minipanel
+          image-border: 5
+          color: #C0C0C0
+          height: 66
+          padding-bottom: 5
+          margin: 5
+          margin-bottom: 1
+          text: Daily Reward
+
+          Label
+            id: InstantRewardAccess
+            text-auto-resize: true
+            color: #909090
+            anchors.top: parent.top
+            anchors.left: parent.left
+            margin-top: 2
+            text: Instant Reward Access:
+
+          Label
+            id: InstantRewardAccessValue
+            anchors.top: parent.top
+            anchors.left: parent.right
+            margin-left: -30
+            text: 0x
+
+        MiniPanel
+          id: CharmPanel
+          image-source: /images/ui/outfits/minipanel
+          image-border: 5
+          color: #C0C0C0
+          height: 66
+          padding-bottom: 5
+          margin: 5
+          margin-bottom: 1
+          text: Charm
+
+          Label
+            id: CharmExpansion
+            text-auto-resize: true
+            color: #909090
+            anchors.top: parent.top
+            anchors.left: parent.left
+            margin-top: 2
+            text: Charm Expansion:
+
+          Label
+            id: CharmExpansionValue
+            anchors.top: parent.top
+            anchors.left: parent.right
+            margin-left: -30
+            text: Nooooo
+
+        MiniPanel
+          id: hirelings
+          image-source: /images/ui/outfits/minipanel
+          image-border: 5
+          color: #C0C0C0
+
+          padding-bottom: 5
+          margin: 5
+          margin-bottom: 1
+          text: hirelings
+
+          Label
+            id: PurchasedHireLings
+            text-auto-resize: true
+            color: #909090
+            anchors.top: parent.top
+            anchors.left: parent.left
+            margin-top: 2
+            text: Purchased Hirelngs:
+
+          Label
+            id: PurchasedHirelingsValue
+            anchors.top: parent.top
+            anchors.left: parent.right
+            margin-left: -30
+            text: 0x
+            
+
+          Label
+            id: hirelingjobs
+            text-auto-resize: true
+            color: #909090
+            anchors.top: PurchasedHireLings.bottom
+            anchors.left: parent.left
+            margin-top: 2
+            text: hireling jobs:
+
+          Label
+            id: hirelingOutfits
+            text-auto-resize: true
+            color: #909090
+            anchors.top: prev.bottom
+            anchors.left: parent.left
+            margin-top: 2
+            text: hirelingOutfits:
+
+        MiniPanel
+          id: houseItems
+          image-source: /images/ui/outfits/minipanel
+          image-border: 5
+          color: #C0C0C0
+          height: 66
+          padding-bottom: 5
+          margin: 5
+          margin-bottom: 1
+          size: 530 407
+          text: Purchased House Items
+
+          Panel
+            id: PurchasedHouseItems
+            size: 225 74
+            anchors.fill: parent
+
+            image-border: 3
+            layout:
+              type: grid
+              cell-size: 224 74
+              flow: true
+      VerticalScrollBar
+        id: ListScrollbarStoreSummary
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        margin: 1
+
+        step: 80
+        pixel-scroll: true
+  UIWidget
+    id: CharacterTitles
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        margin: 1
+
+        step: 80
+        pixel-scroll: true
