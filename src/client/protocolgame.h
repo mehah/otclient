@@ -53,7 +53,7 @@ public:
     void sendTurnEast();
     void sendTurnSouth();
     void sendTurnWest();
-    void sendGmTeleport(const Position& Pos);
+    void sendGmTeleport(const Position& pos);
     void sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType);
     void sendMove(const Position& fromPos, const uint16_t thingId, const uint8_t stackpos, const Position& toPos, const uint16_t count);
     void sendInspectNpcTrade(const uint16_t itemId, const uint16_t count);

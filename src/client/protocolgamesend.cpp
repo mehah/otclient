@@ -295,11 +295,11 @@ void ProtocolGame::sendTurnWest()
     send(msg);
 }
 
-void ProtocolGame::sendGmTeleport(const Position& Pos)
+void ProtocolGame::sendGmTeleport(const Position& pos)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientGmTeleport);
-    addPosition(msg, Pos);
+    addPosition(msg, pos);
     send(msg);
 }
 
