@@ -214,7 +214,7 @@ StoreWindow
     icon-align: center
     icon-source: images/iconTransfer
     size: 64 20
-    @onClick:  displayErrorBox(controllerShop.ui:getText(),"no yet,UI missing")
+    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   StoreButton
     id: wtfisthis
@@ -225,7 +225,7 @@ StoreWindow
     icon-align: center
     icon-source: images/icon-trade
     size: 64 20
-    @onClick:  displayErrorBox(controllerShop.ui:getText(),"no yet,UI missing")
+    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   HorizontalSeparator
     anchors.bottom: prev.top
