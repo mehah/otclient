@@ -170,7 +170,7 @@ GameStore.DefaultValues = {
 -- /*=============================================
 -- =            Local Function                  =
 -- =============================================*/
-local function setImagenHttp(widget, url,isIcon)
+local function setImagenHttp(widget, url, isIcon)
     if Services and Services.store  then
         HTTP.downloadImage(Services.store .. url, function(path, err)
             if err then
