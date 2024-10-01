@@ -151,7 +151,7 @@ void GraphicalApplication::run()
 
         BS::multi_future<void> tasks;
 
-        g_eventThreadId = EventDispatcher::getThreadId();
+        g_luaThreadId = g_eventThreadId = stdext::getThreadId();
         while (!m_stopping) {
             poll();
 
@@ -222,6 +222,8 @@ void GraphicalApplication::run()
 
     m_running = false;
     m_stopping = false;
+
+    g_luaThreadId = g_eventThreadId = -1;
 }
 
 void GraphicalApplication::poll()

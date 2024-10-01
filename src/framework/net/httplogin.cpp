@@ -115,10 +115,19 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
             std::string msg = "";
             if (result) {
                 status = result->status;
-                msg = httplib::to_string(result.error());
+                try {
+                    const auto body = json::parse(result->body);
+                    if (body.contains("errorMessage")) {
+                        msg = body["errorMessage"];
+                    } else {
+                        msg = "Unexpected JSON format.";
+                    }
+                } catch (const std::exception&) {
+                    msg = httplib::to_string(result.error());
+                }
             } else {
                 status = -1;
-                msg = "Unknown error";
+                msg = "Unknown error.\nCheck: \n-Enable Http login\n-Check Apache\n-Check login.php\n-check port 80/8080\n-Check Cloudflare";
             }
 
             g_dispatcher.addEvent([this, request_id, status, msg] {
