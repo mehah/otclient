@@ -1,0 +1,1446 @@
+HouseIcon < UIWidget
+  //image-source: /game_cyclopedia/images/house-owner-icon
+  margin-left: 1
+HouseBidArea < UIWidget
+  height: 100
+  margin-top: 2
+  Label
+    !text: tr('Set bid limit:')
+    color: #909090
+    text-align: right
+    size: 90 15
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 2
+  TextEdit
+    id: textEdit
+    size: 100 16
+    text-align: right
+    anchors.top: parent.top
+    anchors.left: prev.right
+    padding-top: 1
+    margin-top: 1
+    margin-left: 5
+  UIWidget
+    image-source: /game_cyclopedia/images/icon_gold
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-top: 3
+    margin-left: 5
+  UIWidget
+    anchors.right: parent.right
+    anchors.top: prev.top
+    image-source: /images/icons/show_gui_help_grey
+  Label
+    id: information
+    color: #C0C0C0
+    text-auto-resize: true
+    text-wrap: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 25
+House < UICheckBox
+  text-align: top
+  text-offset: 0 1
+  color: #909090
+  image-source: /images/ui/widget-borderimage
+  image-border: 5
+  padding: 5
+  padding-top: 18
+  $checked:
+    border: 2 white
+  $!checked:
+    border: 0 white
+  Label
+    id: size
+    size: 100 15
+    !text: tr('Size: 17sqm')
+    color: #909090
+    anchors.top: parent.top
+    anchors.left: parent.left
+  Label
+    id: status
+    !text: tr('Status: auctioned (no bid yet)')
+    text-auto-resize: true
+    color: #909090
+    anchors.top: size.bottom
+    anchors.left: parent.left
+    margin-top: 2
+  Label
+    id: beds
+    size: 95 15
+    !text: tr('Max. Beds: 1')
+    color: #909090
+    anchors.top: size.top
+    anchors.left: size.right
+  Label
+    text-auto-resize: true
+    !text: tr('Rent:   ')
+    color: #909090
+    anchors.top: beds.top
+    anchors.left: beds.right
+  Label
+    id: rent
+    text-auto-resize: true
+    color: #C0C0C0
+    anchors.top: prev.top
+    anchors.left: prev.right
+  UIWidget
+    anchors.left: rent.right
+    anchors.verticalCenter: rent.verticalCenter
+    margin-left: 3
+    image-source: /game_cyclopedia/images/icon_gold
+  Panel
+    id: icons
+    height: 12
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    anchors.right: parent.right
+    layout:
+      type: horizontalBox
+      align-right: true
+      flow: true
+  UIWidget
+    id: description
+    //image-source: /game_cyclopedia/images/house-description
+    anchors.top: sold.top
+    anchors.left: sold.left
+    visible: false
+    
+CharacterBadge < UIWidget
+  image-source: /game_cyclopedia/images/character_icons/friend-badge-icons
+
+CharacterAppearance < UIWidget
+  image-source: /images/ui/button-9grid-idle
+  image-border: 5
+  $pressed:
+    image-source: /images/ui/button-9grid-pressed
+  UICreature
+    id: creature
+    size: 64 64
+    anchors.centerIn: parent
+    phantom: true
+    margin-right: 5
+    margin-bottom: 10
+  Label
+    id: name
+    color: #C0C0C0
+    text-auto-resize: true
+    anchors.top: creature.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    phantom: true
+CharacterGridItem < UIWidget
+  UIWidget
+    size: 32 32
+    id: ItemBackground
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/item
+  UIWidget
+    id: rarity
+    margin: 1
+    anchors.fill: ItemBackground
+  UIItem
+    id: item
+    anchors.fill: ItemBackground
+  Label
+    id: amount
+    !text: tr('0')
+    color: #C0C0C0
+    font: verdana-11px-rounded
+    text-auto-resize: true
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-right: 2
+CharacterListItem < UIWidget
+  size: 480 36
+  UIWidget
+    size: 32 32
+    id: ItemBackground
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/item
+    margin-left: 2
+  UIWidget
+    id: rarity
+    margin: 1
+    anchors.fill: ItemBackground
+  UIItem
+    id: item
+    anchors.fill: ItemBackground
+  Label
+    id: name
+    !text: tr('Boots')
+    color: #C0C0C0
+    text-auto-resize: true
+    anchors.verticalCenter: item.verticalCenter
+    anchors.left: item.right
+    margin-left: 5
+  VerticalSeparator
+    id: separator
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-top: -1
+    margin-bottom: -1
+    margin-right: 135
+  Label
+    id: amount
+    !text: tr('1')
+    color: #C0C0C0
+    text-auto-resize: true
+    anchors.verticalCenter: item.verticalCenter
+    anchors.left: separator.left
+    margin-left: 5
+Achievement < UICheckBox
+  image-source: /images/ui/outfits/minipanel
+  image-border: 5
+  color: #C0C0C0
+  text-auto-resize: true
+  text-wrap: true
+  text-offset: 10 25
+  padding-bottom: 5
+  margin: 5
+  margin-bottom: 1
+  UIWidget
+    id: title
+    text-auto-resize: true
+    color: #909090
+    anchors.top: parent.top
+    margin-top: 2
+    anchors.horizontalCenter: parent.horizontalCenter
+  UIWidget
+    id: icon
+    image-source: /game_cyclopedia/images/icon-achievement
+    image-repeated: true
+    width: 22
+    anchors.top: title.top
+    anchors.left: parent.left
+    margin-left: 2
+    margin-top: 2
+CharacterDeath < UICheckBox
+  size: 450 17
+  Label
+    id: date
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 2
+    $on:
+      color: #F4F4F4
+    $!on:
+      color: #C0C0C0
+  VerticalSeparator
+    id: separator
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-top: -1
+    margin-bottom: -1
+    margin-left: 155
+  Label
+    id: cause
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.left: separator.left
+    margin-left: 5
+    $on:
+      color: #F4F4F4
+    $!on:
+      color: #C0C0C0
+CharacterKill < UICheckBox
+  size: 450 17
+  Label
+    id: date
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 2
+    $on:
+      color: #F4F4F4
+    $!on:
+      color: #C0C0C0
+  VerticalSeparator
+    id: separator
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-top: -1
+    margin-bottom: -1
+    margin-left: 155
+  Label
+    id: description
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.left: separator.left
+    margin-left: 5
+    $on:
+      color: #F4F4F4
+    $!on:
+      color: #C0C0C0
+  VerticalSeparator
+    id: separatorTwo
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-top: -1
+    margin-bottom: -1
+    margin-right: 84
+  Label
+    id: status
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.left: separatorTwo.left
+    margin-left: 5
+    $on:
+      color: #F4F4F4
+    $!on:
+      color: #C0C0C0
+CharacterElementReduction < UIWidget
+  height: 20
+  Label
+    id: name
+    !text: tr('Physical')
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    color: #C0C0C0
+  Label
+    id: value
+    !text: ('+5%')
+    color: #44AD25
+    text-auto-resize: true
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-right: 20
+  UIWidget
+    id: icon
+    size: 9 9
+    image-source: /images/icons/icons-skills
+
+    anchors.top: parent.top
+    anchors.left: value.right
+    margin-left: 5
+    margin-top: 2
+SkillCharacterIcon < UIWidget
+  id: icon
+  size: 9 9
+  anchors.top: parent.top
+  margin-top: 13
+  image-source: /images/icons/icons-skills
+CharacterSkillBase < UIWidget
+  height: 20
+  margin-left: 5
+  margin-right: 5
+  margin-top: 5
+SkillCharacterPercentPanel < ProgressBar
+  id: percent
+  background-color: green
+  height: 5
+  margin-top: 13
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  phantom: false
+SelectBossBossSlots < UICheckBox
+  image-source: /images/ui/outfits/minipanel
+  text-offset: 0 3
+  text-align: top
+  image-border: 5
+  !text: tr('?')
+  color: #BEBEBE
+  border: 0 white
+  @onClick: modules.game_cyclopedia.Cyclopedia.bossSlotSelectBoss(self)
+  $checked:
+    border: 1 white
+  $!checked:
+    border: 0 white
+  UICreature
+    id: Sprite
+    size: 64 64
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-bottom: 10
+    margin-right: 5
+    phantom: true
+  UIWidget
+    id: TypeIcon
+    anchors.right: Sprite.left
+    anchors.top: Sprite.top
+    image-source: images/boss/icon_bane
+SlotBossSlots < UIWidget
+  size: 222 360
+  image-source: /images/ui/outfits/minipanel
+  image-border: 20
+  color: #929292
+  text-offset: 0 3
+  text-align: top
+  Label
+    id: LockLabel
+    anchors.centerIn: parent
+    text-auto-resize: true
+    !text: tr('Unlocks if you reach the\nProwess level for any boss')
+    text-align: center
+    visible: true
+  UIWidget
+    id: SelectBoss
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 3
+    margin-top: 20
+    visible: false
+    BorderBox
+      id: ListBase
+      size: 212 281
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: 5
+      margin-left: 2
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        padding-left: 6
+        padding-top: 6
+        padding-bottom: 4
+        layout:
+          type: grid
+          cell-size: 88 103
+          cell-spacing: 4
+          flow: true
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        step: 80
+        pixel-scroll: true
+    TextEdit
+      id: SearchEdit
+      height: 20
+      anchors.top: ListBase.bottom
+      anchors.right: ListBase.right
+      anchors.left: ListBase.left
+      margin-top: 6
+      padding-top: 2
+      padding-right: 15
+      placeholder: Type to search
+      placeholder-color: #6E706F
+      @onTextChange: modules.game_cyclopedia.Cyclopedia.SelectBossSearchText(self:getText())
+    UIWidget
+      id: SearchClearButton
+      anchors.right: SearchEdit.right
+      anchors.top: SearchEdit.top
+      margin-top: 1
+      margin-right: 1
+      image-source: /images/ui/button-clear-18x18-up
+      @onClick: modules.game_cyclopedia.Cyclopedia.SelectBossSearchText("", true, self)
+      $pressed:
+        image-source: /images/ui/button-clear-18x18-down
+    Button
+      id: SelectButton
+      size: 43 20
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      !text: tr('Select')
+      //font: verdana-bold-8px-antialiased
+      text-offset: 0 -1
+      color: #C0C0C0
+      enabled: false
+      margin-bottom: 2
+      margin-right: 2
+  UIWidget
+    id: ActivedBoss
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 3
+    margin-top: 20
+    visible: false
+    UICreature
+      id: Sprite
+      size: 64 64
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      margin-top: 10
+    UIWidget
+      id: TypeIcon
+      anchors.right: Sprite.left
+      anchors.top: Sprite.top
+      image-source: images/boss/icon_bane
+    BossSlotProgress
+      id: Progress
+      anchors.top: Sprite.bottom
+      anchors.horizontalCenter: Sprite.horizontalCenter
+      margin-top: 34
+    Label
+      anchors.horizontalCenter: Progress.horizontalCenter
+      anchors.bottom: Progress.top
+      margin-bottom: 3
+      text-auto-resize: true
+      !text: tr('Total Kills')
+      color: #BEBEBE
+    Label
+      id: EquipmentLabel
+      anchors.horizontalCenter: Progress.horizontalCenter
+      anchors.top: Progress.bottom
+      text-auto-resize: true
+      !text: ('Equipment loot bonus: 118%')
+      text-align: center
+      margin-top: 18
+    ProgressBackground
+      id: ValueBackground
+      size: 128 20
+      anchors.bottom: parent.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-bottom: 5
+    Label
+      id: Value
+      anchors.centerIn: prev
+      text-auto-resize: true
+      !text: ('0')
+      text-align: center
+    UIWidget
+      image-source: /game_cyclopedia/images/icon_gold
+      anchors.left: Value.right
+      anchors.verticalCenter: Value.verticalCenter
+      margin-left: 2
+      margin-top: 1
+    Button
+      id: RemoveButton
+      height: 20
+      anchors.bottom: ValueBackground.bottom
+      anchors.right: ValueBackground.right
+      anchors.left: ValueBackground.left
+      margin-bottom: 25
+      !text: tr('Remove')
+      //font: verdana-bold-8px-antialiased
+      text-offset: 0 -1
+      color: #C0C0C0
+BossSlotProgress < UIWidget
+  size: 140 35
+  ProgressBackground
+    id: ProgressBorder2
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 20
+    size: 42 14
+  ProgressBackground
+    id: ProgressBorder1
+    anchors.right: ProgressBorder2.left
+    anchors.bottom: ProgressBorder2.bottom
+    margin-right: 2
+    size: 42 14
+  ProgressBackground
+    id: ProgressBorder3
+    anchors.left: ProgressBorder2.right
+    anchors.bottom: ProgressBorder2.bottom
+    margin-left: 2
+    size: 42 14
+  UIWidget
+    id: ProgressBack
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-bottom: 21
+    margin-right: 7
+    margin-left: 7
+    height: 13
+    image-border: 10
+    phantom: true
+  UIWidget
+    id: fill
+    anchors.fill: ProgressBack
+    image-source: /game_cyclopedia/images/boss/fill
+    margin-top: 1
+    phantom: true
+  UIWidget
+    anchors.left: ProgressBorder1.right
+    anchors.top: ProgressBorder1.top
+    image-source: /images/ui/progress-separator
+    margin-right: 4
+    phantom: true
+  UIWidget
+    anchors.left: ProgressBorder2.right
+    anchors.top: ProgressBorder1.top
+    image-source: /images/ui/progress-separator
+    phantom: true
+  UIWidget
+    id: bronzeStar
+    anchors.top: ProgressBorder1.bottom
+    anchors.horizontalCenter: ProgressBorder1.horizontalCenter
+    margin-top: 3
+    image-source: images/boss/icon_star_dark
+  UIWidget
+    id: silverStar
+    anchors.top: ProgressBorder2.bottom
+    anchors.horizontalCenter: ProgressBorder2.horizontalCenter
+    margin-top: 3
+    image-source: images/boss/icon_star_dark
+    image-repeated: true
+    width: 18
+  UIWidget
+    id: goldStar
+    anchors.top: ProgressBorder3.bottom
+    anchors.horizontalCenter: ProgressBorder3.horizontalCenter
+    margin-top: 3
+    image-source: images/boss/icon_star_dark
+    image-repeated: true
+    width: 27
+  Label
+    id: ProgressValue
+    anchors.centerIn: ProgressBorder2
+    text-auto-resize: true
+    !text: tr('0')
+ProgressBackground < UIWidget
+  image-source: /images/game/actionbar/1pixel-down-frame
+  image-border: 5
+  padding: 1
+  UIWidget
+    image-source: /images/ui/backdrop-dark-grey
+    image-border: 5
+    anchors.fill: parent
+    phantom: true
+CheckBoxButton < UICheckBox
+  size: 106 23
+  image-source: /images/ui/button-9grid-idle
+  image-border: 3
+  text-align: center
+  padding: 5 10 5 10
+  change-cursor-image: true
+  cursor: pointer
+  color: #BDBDBD
+  $checked:
+    image-source: /images/ui/button-9grid-pressed
+    text-offset: 1 1
+  $!checked:
+    text-offset: 0 0
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+    change-cursor-image: false
+BorderBox < UIWidget
+  border-width-top: 1
+  border-color-top: black
+  border-width-left: 1
+  border-color-left: black
+  border-width-bottom: 1
+  border-color-bottom: #747474
+  border-width-right: 1
+  border-color-right: #747474
+SubPanel < UIWidget
+  image-source: /images/ui/outfits/minipanel
+  image-border: 3
+  image-border-top: 22
+  color: #929292
+  text-offset: 0 3
+  text-align: top
+ItemCategory < UIWidget
+  color: #C0C0C0
+  text-align: left
+  @onCheckChange: modules.game_cyclopedia.Cyclopedia.onCategoryChange(self)
+  $checked:
+    color: #F6F6F6
+ItemsListBaseItem < UIWidget
+  UIWidget
+    size: 32 32
+    id: ItemBackground
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/item
+    margin-left: 1
+  UIWidget
+    id: Rarity
+    anchors.fill: ItemBackground
+  UIItem
+    id: Sprite
+    anchors.fill: ItemBackground
+  Label
+    id: Name
+    anchors.left: ItemBackground.right
+    anchors.verticalCenter: ItemBackground.verticalCenter
+    margin-left: 5
+    text-auto-resize: true
+    !text: tr('Item Name')
+    color: #C0C0C0
+ItemBasicDetail < UIWidget
+  UIWidget
+    id: background
+    anchors.fill: parent
+    UIWidget
+      id: separator
+      anchors.centerIn: parent
+      margin-right: 40
+      text: :
+      text-auto-resize: true
+      color: #BDBDBD
+    Label
+      id: name
+      anchors.right: separator.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 3
+      !text: tr('Name')
+      text-auto-resize: true
+      color: #BDBDBD
+    Label
+      id: value
+      anchors.left: separator.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 10
+      !text: tr('0')
+      text-auto-resize: true
+      color: #BDBDBD
+CharmItem < UICheckBox
+  !text: tr('Title')
+  image-source: /images/ui/outfits/minipanel
+  image-border: 3
+  image-border-top: 22
+  color: #929292
+  text-offset: 0 3
+  text-align: top
+  border: 0 white
+  @onClick: modules.game_cyclopedia.Cyclopedia.selectCharm(self, self:isChecked())
+  $checked:
+    border: 2 white
+  $!checked:
+    border: 0 white
+  BorderBox
+    id: InfoBase
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-bottom: 5
+    margin-right: 5
+    image-source: /images/ui/panel_flat
+    image-border: 10
+    size: 66 66
+    phantom: true
+    UICreature
+      size: 64 64
+      id: Sprite
+      anchors.centerIn: parent
+      phantom: true
+  UIWidget
+    id: PriceBase
+    size: 73 20
+    anchors.left: parent.left
+    anchors.bottom: InfoBase.bottom
+    margin-left: 8
+    image-source: /images/ui/item
+    image-border: 10
+    phantom: true
+    Label
+      id: Value
+      anchors.centerIn: parent
+      !text: tr('0')
+      text-auto-resize: true
+      margin-right: 3
+    UIWidget
+      id: Charm
+      anchors.left: Value.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 2
+      image-source: /game_cyclopedia/images/icon_charms
+    UIWidget
+      id: Gold
+      anchors.left: Value.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 2
+      image-source: /game_cyclopedia/images/icon_gold
+      visible: false
+  BorderBox
+    id: charmBase
+    anchors.bottom: PriceBase.top
+    anchors.horizontalCenter: PriceBase.horizontalCenter
+    margin-bottom: 7
+    image-source: /images/ui/panel_flat
+    image-border: 10
+    size: 37 37
+    phantom: true
+    UIWidget
+      size: 32 32
+      id: image
+      anchors.centerIn: parent
+      phantom: true
+    UIWidget
+      id: lockedMask
+      size: 35 35
+      anchors.centerIn: parent
+      image-source: /images/ui/ditherpattern
+      phantom: true
+MarkListItem < ButtonBox
+  icon-size: 11 11
+  icon-offset: 3 3
+CharacterCategoryItem < UIWidget
+  size: 150 22
+  image-source: /images/game/actionbar/1pixel-down-frame
+  image-border: 5
+  UIWidget
+    id: Button
+    size: 148 20
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 1
+    margin-top: 1
+    image-source: /images/ui/button-grey-up
+    image-border: 5
+    opacity: 1.0
+    $pressed:
+      image-source: /images/ui/button-grey-down
+    $checked:
+      image-source: /images/ui/button-grey-down
+    UIWidget
+      id: Icon
+      size: 13 13
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 10
+      phantom: true
+      $checked:
+        margin-left: 11
+        margin-top: 1
+      $!checked:
+        margin-left: 10
+        margin-top: 0
+    Label
+      id: Title
+      anchors.left: Icon.right
+      anchors.verticalCenter: Icon.verticalCenter
+      margin-left: 10
+      text-auto-resize: true
+      !text: tr('General Stats')
+      //font: verdana-bold-8px-antialiased
+      color: #C0C0C0
+      $checked:
+        text-offset 10 10
+      $!checked:
+        text-offset 0 0
+    UIWidget
+      id: Arrow
+      size: 7 7
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 5
+      phantom: true
+      image-source: images/icon-arrow7x7-down
+      visible: false
+BestiaryCategory < UIWidget
+  image-source: /images/ui/outfits/minipanel
+  image-border: 20
+  !text: tr('Name')
+  text-align: top
+  text-offset: 0 4
+  color: #909090
+  UIWidget
+    id: ClassBase
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 22
+    size: 64 64
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    $pressed:
+      image-source: /images/ui/2pixel_up_frame_borderimage_dark_reversed
+  UIWidget
+    id: ClassIcon
+    anchors.centerIn: ClassBase
+    phantom: true
+  Label
+    id: KnownValue
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 5
+    !text: tr('Known: ') .. '00'
+    color: #C2C2C2
+  Label
+    id: TotalValue
+    anchors.bottom: KnownValue.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 0
+    !text: tr('Total: ') .. '00'
+    color: #C2C2C2
+BosstiaryItem < UIWidget
+  image-source: /images/ui/outfits/minipanel
+  image-border: 20
+  !text: tr('?')
+  text-align: top
+  text-offset: 0 4
+  color: #919191
+  UIWidget
+    id: TypeIcon
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-left: 7
+    margin-top: 22
+    image-source: images/boss/icon_bane
+  ProgressBackground
+    id: ProgressBorder2
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 20
+    size: 47 14
+  ProgressBackground
+    id: ProgressBorder1
+    anchors.right: ProgressBorder2.left
+    anchors.bottom: ProgressBorder2.bottom
+    margin-right: 2
+    size: 47 14
+  ProgressBackground
+    id: ProgressBorder3
+    anchors.left: ProgressBorder2.right
+    anchors.bottom: ProgressBorder2.bottom
+    margin-left: 2
+    size: 47 14
+  UIWidget
+    id: ProgressBack
+    anchors.left: ProgressBorder1.left
+    anchors.bottom: ProgressBorder2.bottom
+    height: 12
+    phantom: true
+    image-source: /game_cyclopedia/images/bestiary/fill
+  UIWidget
+    id: ProgressBack33
+    anchors.left: ProgressBorder2.left
+    anchors.bottom: ProgressBorder2.bottom
+    height: 12
+    phantom: true
+    image-source: /game_cyclopedia/images/bestiary/fill
+  UIWidget
+    id: ProgressBack55
+    anchors.left: ProgressBorder3.left
+    anchors.bottom: ProgressBorder2.bottom
+    height: 12
+    phantom: true
+    image-source: /game_cyclopedia/images/bestiary/fill
+  UIWidget
+    anchors.left: ProgressBorder1.right
+    anchors.top: ProgressBorder1.top
+    image-source: /images/ui/progress-separator
+    phantom: true
+  UIWidget
+    anchors.left: ProgressBorder2.right
+    anchors.top: ProgressBorder1.top
+    image-source: /images/ui/progress-separator
+    phantom: true
+  Label
+    id: ProgressValue
+    anchors.centerIn: ProgressBorder2
+    text-auto-resize: true
+    !text: tr('0')
+  UIWidget
+    id: bronzeStar
+    anchors.top: ProgressBorder1.bottom
+    anchors.horizontalCenter: ProgressBorder1.horizontalCenter
+    margin-top: 3
+    image-source: images/boss/icon_star_dark
+  UIWidget
+    id: silverStar
+    anchors.top: ProgressBorder2.bottom
+    anchors.horizontalCenter: ProgressBorder2.horizontalCenter
+    margin-top: 3
+    margin-right: 5
+    image-source: images/boss/icon_star_dark
+    image-repeated: true
+    width: 18
+  UIWidget
+    id: goldStar
+    anchors.top: ProgressBorder3.bottom
+    anchors.horizontalCenter: ProgressBorder3.horizontalCenter
+    margin-top: 3
+    image-source: images/boss/icon_star_dark
+    image-repeated: true
+    width: 27
+  Label
+    id: KillsLabel
+    anchors.left: ProgressBorder1.left
+    anchors.bottom: ProgressBorder1.top
+    margin-bottom: 5
+    !text: tr('Total Kills')
+    text-auto-resize: true
+    color: #C1C1C1
+  CheckBox
+    id: TrackCheck
+    anchors.right: ProgressBorder3.right
+    anchors.bottom: ProgressBorder1.top
+    margin-bottom: 5
+    !text: tr('Track')
+    text-auto-resize: true
+    color: #C1C1C1
+    @onCheckChange: |
+      g_game.sendStatusTrackerBestiary(self:getParent():getId(),self:isChecked())
+  UICreature
+    id: Sprite
+    anchors.bottom: TrackCheck.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 5
+    size: 64 64
+BestiaryCreature < UIWidget
+  image-source: /images/ui/outfits/minipanel
+  image-border: 20
+  Label
+    id: Name
+    height: 20
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 2
+    margin-right: 2
+    text-align: center
+    text-offset: 0 3
+    color: #919191
+  UIWidget
+    id: ClassBase
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 22
+    size: 64 64
+    image-source: /images/ui/2pixel_up_frame_borderimage
+    image-border: 10
+    $pressed:
+      image-source: /images/ui/2pixel_up_frame_borderimage_dark_reversed
+  UICreature
+    id: Sprite
+    anchors.fill: ClassBase
+    phantom: true
+  UIWidget
+    id: AnimusMastery
+    anchors.top: prev.top
+    anchors.left: prev.left
+    image-source: /game_cyclopedia/images/indicator_soulcore
+  UIWidget
+    id: Finalized
+    image-source: images/checkmark-icon
+    anchors.horizontalCenter: ClassBase.horizontalCenter
+    anchors.top: ClassBase.bottom
+    margin-top: 5
+    visible: false
+  Label
+    id: KillsLabel
+    anchors.horizontalCenter: ClassBase.horizontalCenter
+    anchors.top: ClassBase.bottom
+    margin-top: 5
+    !text: tr('?')
+    text-auto-resize: true
+    color: #C1C1C1
+  UIWidget
+    id: CompleteIcon
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 15
+    image-source: images/checkmark-icon
+    visible: false
+BestiaryResistProgress < UIWidget
+  image-source: /game_cyclopedia/images/bestiary/barra
+  UIWidget
+    id: Fill
+    anchors.fill: parent
+    background-color: red
+    margin-left: 1
+    margin-bottom: 2
+    margin-top: 2
+    margin-right: 1
+    phantom: true
+  UIWidget
+    id: Border
+    anchors.fill: parent
+    image-source: /game_cyclopedia/images/bestiary/barra
+    phantom: true
+BestiaryItem < UIItem
+  image-source: /images/ui/2pixel_up_frame_borderimage
+  image-border: 10
+  size: 34 34
+  anchors.verticalCenter: parent.verticalCenter
+  padding: 1
+  $checked:
+    image-source: /images/ui/panel_flat
+  $first:
+    anchors.left: parent.left
+  $!first:
+    anchors.left: prev.right
+    margin-left: 2
+  UIWidget
+    id: undefinedItem
+    image-source: /images/ui/undefined_item
+    anchors.fill: parent
+    visible: false
+  Label
+    id: Stackable
+    text-auto-resize: true
+    font: verdana-11px-rounded
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    color: #BFBFBF
+    margin-bottom: -1
+  UIWidget
+    id: Rarity
+    image-border: 5
+    padding: 1
+    anchors.fill: parent
+BestiaryItemGroup < UIWidget
+  height: 45
+  UIWidget
+    id: Items
+    anchors.fill: parent
+    margin-left: 108
+  Label
+    id: Title
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 5
+    !text: tr('Common') .. ':'
+    text-auto-resize: true
+CharmCreatureName < UICheckBox
+  color: #C0C0C0
+  background-color: #484848
+  @onClick: modules.game_cyclopedia.Cyclopedia.selectCreatureCharm(self, self:isChecked())
+  $checked:
+    background-color: #585858
+	
+InventoryItemCyclopedia < Item
+HeadSlot < InventoryItemCyclopedia
+  id: slot1
+
+  &position: {x=65535, y=1, z=0}
+
+BodySlot < InventoryItemCyclopedia
+  id: slot4
+
+  &position: {x=65535, y=4, z=0}
+
+LegSlot < InventoryItemCyclopedia
+  id: slot7
+
+  &position: {x=65535, y=7, z=0}
+
+FeetSlot < InventoryItemCyclopedia
+  id: slot8
+
+  &position: {x=65535, y=8, z=0}
+
+NeckSlot < InventoryItemCyclopedia
+  id: slot2
+
+  &position: {x=65535, y=2, z=0}
+
+LeftSlot < InventoryItemCyclopedia
+  id: slot6
+
+  &position: {x=65535, y=6, z=0}
+
+FingerSlot < InventoryItemCyclopedia
+  id: slot9
+
+  &position: {x=65535, y=9, z=0}
+
+BackSlot < InventoryItemCyclopedia
+  id: slot3
+
+  &position: {x=65535, y=3, z=0}
+
+RightSlot < InventoryItemCyclopedia
+  id: slot5
+
+  &position: {x=65535, y=5, z=0}
+
+AmmoSlot < InventoryItemCyclopedia
+  id: slot10
+
+  &position: {x=65535, y=10, z=0}
+
+BackSlot2 < InventoryItemCyclopedia
+  id: slot12
+  image-source: /images/ui/character/secondary_backpack
+  &position: {x=65535, y=12, z=0}
+
+BackSlot3 < InventoryItemCyclopedia
+  id: slot13
+  image-source: /images/ui/character/secondary_backpack
+  &position: {x=65535, y=13, z=0}
+
+BackSlot4 < InventoryItemCyclopedia
+  id: slot14
+
+  &position: {x=65535, y=14, z=0}
+
+BackSlot5 < InventoryItemCyclopedia
+  id: slot15
+
+  &position: {x=65535, y=15, z=0}
+
+ArtifactSlot < InventoryItemCyclopedia
+  id: slot16
+
+  &position: {x=65535, y=16, z=0}
+
+RuneSlot < InventoryItemCyclopedia
+  id: slot18
+
+  &position: {x=65535, y=18, z=0}
+
+RoundCheckBox < CheckBox
+  image-source: /images/ui/outfits/checkbox_round
+  
+  $first:
+    margin-top: 2
+
+  $!first:
+    margin-top: 5
+
+TrackerButton < Panel
+  height: 34
+  margin-bottom: 5
+  phantom: false
+  border-width: 1
+  border-color: alpha
+  padding: 1
+
+  $hover:
+    border-color: white
+
+  UICreature
+    id: creature
+    size: 16 16
+    anchors.left: parent.left
+    anchors.top: parent.top
+    phantom: true
+
+  UIWidget
+    id: spacer
+    width: 3
+    anchors.left: creature.right
+    anchors.top: creature.top
+
+  Label
+    id: label
+    anchors.left: spacer.right
+    anchors.top: creature.top
+    text-auto-resize: true
+    color: #888888
+    margin-left: 2
+
+  Label
+    id: kills
+    anchors.right: parent.right
+    anchors.top: creature.top
+    text-align: right
+    text-auto-resize: true
+    color: #888888
+    margin-left: 2
+
+  LifeProgressBar
+    id: killsBar
+    height: 8
+    anchors.left: spacer.right
+    anchors.right: parent.right
+    anchors.top: label.bottom
+    margin-top: 2
+    phantom: true
+    visible: false
+    
+  ProgressBackground
+    id: ProgressBorder2
+    anchors.left: spacer.right
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: creature.bottom
+    margin-top: 2
+    size: 54 15
+  ProgressBackground
+    id: ProgressBorder1
+    anchors.right: ProgressBorder2.left
+    anchors.top: creature.bottom
+    margin-right: 2
+    margin-top: 2
+    size: 54 15
+  ProgressBackground
+    id: ProgressBorder3
+    anchors.left: ProgressBorder2.right
+    anchors.top: creature.bottom
+    margin-top: 2
+    margin-left: 2
+    size: 54 15
+  UIWidget
+    id: killsBar2
+    anchors.left: ProgressBorder1.left
+    anchors.top: creature.bottom
+    height: 12
+    phantom: true
+    margin-top: 3
+
+  UIWidget
+    id: ProgressBack33
+    anchors.left: ProgressBorder2.left
+    anchors.top: creature.bottom
+    height: 12
+    phantom: true
+    margin-top: 3
+
+  UIWidget
+    id: ProgressBack55
+    anchors.left: ProgressBorder3.left
+    anchors.top: creature.bottom
+    height: 12
+    phantom: true
+    margin-top: 3
+
+
+BestiaryTracker < MiniWindow
+  id: BestiaryTracker
+  !text: tr('Bestiary Tracker')
+  icon: /images/topbuttons/bestiaryTracker
+  icon-offset: 4 2
+  icon-size: 12 12
+  @onClose: modules.game_cyclopedia.Cyclopedia.onTrackerClose(self:getText())
+
+  UIButton
+    id: menuButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 112 0 14 14
+
+    $hover:
+      image-clip: 112 14 14 14
+
+    $pressed:
+      image-clip: 112 28 14 14
+
+    $on:
+      image-clip: 112 0 14 14
+
+  UIButton
+    id: cyclopediaButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 126 0 14 14
+
+    $hover:
+      image-clip: 126 14 14 14
+
+    $pressed:
+      image-clip: 126 28 14 14
+
+    $on:
+      image-clip: 126 0 14 14
+
+  MiniWindowContents
+    id: contentsPanel
+    padding-left: 5
+    padding-right: 5
+    padding-bottom: 3
+    layout: verticalBox
+
+
+bestiaryTrackerMenu < PopupMenu
+  id: imbuementTrackerMenu
+  width: 304
+
+  ImbuementTrackerMenuOption
+    id: sortByName
+    !text: tr('sort by name')
+
+  ImbuementTrackerMenuOption
+    id: ShortByPercentage
+    !text: tr('Short by completion percentage')
+
+  ImbuementTrackerMenuOption
+    id: sortByKills
+    !text: tr('sort by remaining kills')
+
+  HorizontalSeparator
+
+  ImbuementTrackerMenuOption
+    id: sortByAscending
+    !text: tr('sort by ascending')
+
+  ImbuementTrackerMenuOption
+    id: sortByDescending
+    !text: tr('sort by descending')
+StoreFlatPanel < UIWidget
+  phantom: true
+  auto-focus: first
+  image-source: /game_store/images/panel
+  image-border: 3
+Box < UIWidget
+  border-width-top: 1
+  border-color-top: black
+  border-width-left: 1
+  border-color-left: black
+  border-width-bottom: 1
+  border-color-bottom: gray
+  border-width-right: 1
+  border-color-right: gray
+  image-smooth: true
+  image-fixed-ratio: false
+RowStore2 < UIWidget
+  height: 78
+  margin: 2
+  border: 0 white
+
+  $focus:
+    border: 2 white
+
+  Box
+    id: image
+    size: 64 64
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin: 5 0 0 5
+
+  Label
+    id: lblName
+    anchors.top: parent.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin: 8 0 0 8
+    text-auto-resize: true
+    text-wrap: true
+  Label
+    id: count
+    anchors.bottom: parent.bottom
+    anchors.left: image.right
+    margin: 0 5 5 0
+    margin-left:22
+    text-align: center
+
+  StoreFlatPanel
+    id: lblPrice
+    size: 104 20
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin: 0 5 5 0
+    text-align: center
+    text-offset: 15 0
+    image-color: #1111118c
+    icon: images/tibiaCoin
+    icon-align: right
+    icon-offset: -2 0
+
+BlessCreate < UIWidget
+  background-color: alpha
+  text-offset: 35 1
+  focusable: true
+  font: verdana-11px-rounded
+  text-align: left
+
+  Label
+    id: text2
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    width: 15
+    height: 15
+    margin-top: 2
+    margin-left: 3
+
+  Label
+    id: text1
+    margin-left: 8
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    focusable: false

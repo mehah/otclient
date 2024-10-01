@@ -49,14 +49,39 @@ bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints);
 int push_luavalue(const Imbuement& i);
 int push_luavalue(const ImbuementTrackerItem& i);
 
-// Bless
+// bless
 int push_luavalue(const BlessData& bless);
 int push_luavalue(const LogData& log);
 int push_luavalue(const BlessDialogData& data);
-// Store
+
+// store
 int push_luavalue(const StoreCategory& category);
 int push_luavalue(const SubOffer& subOffer);
 int push_luavalue(const StoreOffer& offer);
 int push_luavalue(const HomeOffer& homeOffer);
 int push_luavalue(const Banner& banner);
 int push_luavalue(const StoreData& storeData);
+
+// cyclopedia
+int push_luavalue(const CyclopediaBestiaryRace& race);
+int push_luavalue(const BestiaryOverviewMonsters& monster);
+int push_luavalue(const CharmData& charm);
+int push_luavalue(const BestiaryCharmsData& charmData);
+int push_luavalue(const CyclopediaCharacterGeneralStats& stats);
+int push_luavalue(const CyclopediaCharacterCombatStats& data);
+int push_luavalue(const CyclopediaCharacterItemSummary& data);
+int push_luavalue(const ItemSummary& item);
+int push_luavalue(const LootItem& lootItem);
+int push_luavalue(const BestiaryMonsterData& data);
+int push_luavalue(const BosstiaryData& boss);
+int push_luavalue(const BosstiarySlot& slot);
+int push_luavalue(const BossUnlocked& boss);
+int push_luavalue(const BosstiarySlotsData& data);
+int push_luavalue(const RecentPvPKillEntry& entry);
+int push_luavalue(const CyclopediaCharacterRecentPvPKills& data);
+int push_luavalue(const RecentDeathEntry& entry);
+int push_luavalue(const CyclopediaCharacterRecentDeaths& data);
+int push_luavalue(const OutfitColorStruct& currentOutfit);
+int push_luavalue(const CharacterInfoOutfits& outfit);
+int push_luavalue(const CharacterInfoMounts& mount);
+int push_luavalue(const CharacterInfoFamiliar& familiar);
