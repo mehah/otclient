@@ -20,5 +20,5 @@ Module
     dofile 'thing'
     dofile 'spells'
     dofile 'tile'
-
+    dofile 'items'
     dofiles 'ui'

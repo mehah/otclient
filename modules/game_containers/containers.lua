@@ -137,6 +137,7 @@ function onContainerOpen(container, previousContainer)
         local itemWidget = g_ui.createWidget('Item', containerPanel)
         itemWidget:setId('item' .. slot)
         itemWidget:setItem(container:getItem(slot))
+        ItemsDatabase.setRarityItem(itemWidget, container:getItem(slot))
         itemWidget:setMargin(0)
         itemWidget.position = container:getSlotPosition(slot)
 

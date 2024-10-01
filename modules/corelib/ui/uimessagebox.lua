@@ -11,11 +11,10 @@ function UIMessageBox.create(title, okCallback, cancelCallback)
     return calendar
 end
 
-
 function UIMessageBox.display(title, message, buttons, onEnterCallback, onEscapeCallback)
     local staticSizes = {
         width = {
-            max = 616,
+            max = 916,
             min = 116
         },
         height = {

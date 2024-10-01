@@ -1,0 +1,447 @@
+
+UIWidget
+  id: Cat1
+  anchors.fill: parent
+  visible: false
+  UILabel
+    id: Categorylabel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 10
+    !text: tr('Categories') .. ':'
+    text-auto-resize: true
+    color: #BDBDBD
+  TextList
+    id: CategoryList
+    vertical-scrollbar: CategoryScrollbar
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 30
+    image-source: /images/ui/panel_flat
+    image-border: 10
+    size: 200 60
+    padding-left: 2
+    padding-top: 2
+    padding-bottom: 2
+    focusable: false
+
+  VerticalScrollBar
+    id: CategoryScrollbar
+    anchors.top: CategoryList.top
+    anchors.right: CategoryList.right
+    anchors.bottom: CategoryList.bottom
+    step: 10
+    pixels-scroll: true
+  VerticalSeparator
+    id: MidSep
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-top: 10
+    margin-bottom:30
+    margin-left: 210
+  fakeCheckBox
+    id: LevelButton
+    size: 47 20
+    anchors.left: parent.left
+    anchors.top: CategoryList.bottom
+    margin-top: 40
+    !text: tr("Level")
+    //font: verdana-bold-8px-antialiased
+    text-offset: 13 6
+    color: #C0C0C0
+    @onCheckChange: modules.game_cyclopedia.Cyclopedia.levelFilter(self:isChecked())
+  fakeCheckBox
+    id: VocationButton
+    size: 47 20
+    anchors.left: LevelButton.right
+    anchors.top: LevelButton.top
+    margin-left: 5
+    !text: tr("Voc.")
+    //font: verdana-bold-8px-antialiased
+    text-offset: 13 6
+    color: #C0C0C0
+    @onCheckChange: modules.game_cyclopedia.Cyclopedia.vocationFilter(self:isChecked())
+  fakeCheckBox
+    id: H1Button
+    size: 47 20
+    anchors.left: VocationButton.right
+    anchors.top: LevelButton.top
+    margin-left: 5
+    text-offset: 13 6
+    !text: tr("1H")
+    //font: verdana-bold-8px-antialiased
+    color: #C0C0C0
+    @onCheckChange: modules.game_cyclopedia.Cyclopedia.h1Filter(self:isChecked())
+  fakeCheckBox
+    id: H2Button
+    size: 47 20
+    anchors.left: H1Button.right
+    anchors.top: LevelButton.top
+    margin-left: 5
+    !text: tr("2H")
+
+    //font: verdana-bold-8px-antialiased
+    text-offset: 13 6
+    color: #C0C0C0
+    @onCheckChange: modules.game_cyclopedia.Cyclopedia.h2Filter(self:isChecked())
+  ComboBox
+    id: ItemFilter
+    size: 77 20
+    anchors.top: LevelButton.bottom
+    anchors.left: parent.left
+    margin-top: 6
+    @onOptionChange: modules.game_cyclopedia.Cyclopedia.classificationFilter(self:getCurrentOption().data)
+  Label
+    id: ItemsLabel
+    anchors.top: ItemFilter.bottom
+    anchors.left: parent.left
+    margin-top: 5
+    !text: tr("Items") .. ':'
+    text-auto-resize: true
+    color: #BDBDBD
+  Panel
+    id: ItemListBase
+    anchors.left: parent.left
+    anchors.top: ItemsLabel.bottom
+    margin-top: 5
+    size: 200 120
+    background-color: #363636
+    UIScrollArea
+      id: List
+      anchors.fill: ItemListBase
+      vertical-scrollbar: ListScrollbar
+      margin-top: 5
+      size: 200 120
+      image-border: 10
+      padding-top: 1
+      padding-bottom: 1
+      layout:
+        type: grid
+        cell-size: 200 35
+        flow: true
+    VerticalScrollBar
+      id: ListScrollbar
+      anchors.top: List.top
+      anchors.right: List.right
+      anchors.bottom: List.bottom
+      step: 30
+      pixel-scroll: true
+  UIWidget
+    size: 32 32
+    id: SelectedItem
+    anchors.left: parent.left
+    anchors.top: ItemListBase.bottom
+    image-source: /images/ui/item
+    margin-top: 10
+    UIWidget
+      id: Rarity
+      anchors.fill: parent
+    UIItem
+      id: Sprite
+      anchors.fill: parent
+  Label
+    id: SearchLabel
+    anchors.left: SelectedItem.right
+    anchors.top: SelectedItem.top
+    margin-left: 5
+    !text: tr('Search') .. ':'
+    text-auto-resize: true
+    color: #BDBDBD
+  TextEdit
+    id: SearchEdit
+    anchors.bottom: SelectedItem.bottom
+    anchors.left: SelectedItem.right
+    anchors.right: ItemListBase.right
+    //font: verdana-10px-antialiased
+    padding-top: 2
+    padding-right: 15
+    margin-left: 5
+    height: 17
+    placeholder: Type to search
+    placeholder-color: #6E706F
+    @onTextChange: modules.game_cyclopedia.Cyclopedia.ItemSearch(self:getText())
+  UIWidget
+    id: SearchClearButton
+    anchors.right: SearchEdit.right
+    anchors.top: SearchEdit.top
+    margin-top: 1
+    margin-right: 2
+    image-source: /game_cyclopedia/images/button_clear_search
+    image-color: white
+    opacity: 0.8
+    @onClick: modules.game_cyclopedia.Cyclopedia.ItemSearch("", true)
+    $hover:
+      opacity: 1.0
+      image-color: white
+    $pressed:
+      opacity: 1.0
+      image-color: gray
+  UIWidget
+    id: LootValue
+    height: 64
+    anchors.left: parent.left
+    anchors.right: SearchClearButton.right
+    anchors.top: SelectedItem.bottom
+    Label
+      id: LootValueLabel
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-top: 15
+      margin-left: 25
+      !text: tr('Loot Value Source') .. ':'
+      text-auto-resize: true
+      color: #BDBDBD
+    CheckBox
+      id: NpcBuyCheck
+      anchors.top: LootValueLabel.bottom
+      anchors.left: LootValueLabel.left
+      margin-top: 4
+
+      text-offset: 15 0
+      !text: tr('NPC Buy Value')
+      width: 130
+      checked: true
+    CheckBox
+      id: MarketCheck
+      anchors.top: NpcBuyCheck.bottom
+      anchors.left: LootValueLabel.left
+      margin-top: 4
+
+      text-offset: 15 0
+      !text: tr('Market Average Value')
+      width: 150
+  Label
+    id: EmptyLabel
+    anchors.top: parent.top
+    anchors.left: MidSep.right
+    margin-top: 10
+    margin-left: 10
+    !text: tr('Please select an item from the list to see its details here.')
+    color: #C0C0C0
+    text-auto-resize: true
+  UIWidget
+    id: InfoBase
+    anchors.left: MidSep.right
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    visible: false
+    Label
+      id: BasicDetailsLabel
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-left: 15
+      margin-top: 15
+      !text: tr('Basic Item Details') .. ':'
+      text-auto-resize: true
+      color: #BEBEBE
+    Panel
+      id: DetailsBase
+      anchors.left: BasicDetailsLabel.left
+      anchors.top: BasicDetailsLabel.bottom
+      anchors.right: parent.right
+      margin-top: 5
+      height: 140
+      background-color: #363636
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        size: 200 60
+        padding-left: 2
+        padding-top: 2
+        padding-bottom: 2
+        layout:
+          type: grid
+          cell-size: 425 22
+          cell-spacing: 2
+          flow: true
+        UIWidget
+          !text: tr('Status: Loading, please wait...')
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        step: 80
+        pixel-scroll: true
+    Panel
+      id: SellBase
+      anchors.left: DetailsBase.left
+      anchors.top: DetailsBase.bottom
+      anchors.right: parent.horizontalCenter
+      margin-top: 35
+      margin-right: -5
+      height: 100
+      background-color: #404040
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        size: 200 60
+        padding-left: 5
+        padding-top: 5
+        padding-bottom: 5
+        layout:
+          type: grid
+          cell-size: 210 30
+          cell-spacing: 0
+          flow: true
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        step: 80
+        pixel-scroll: true
+    Label
+      id: SellLabel
+      anchors.bottom: SellBase.top
+      anchors.left: SellBase.left
+      margin-bottom: 4
+      !text: tr('Sell To') .. ':'
+      text-auto-resize: true
+      color: #BEBEBE
+    Panel
+      id: BuyBase
+      anchors.left: parent.horizontalCenter
+      anchors.top: SellBase.top
+      anchors.right: parent.right
+      margin-left: 13
+      height: 100
+      background-color: #404040
+      UIScrollArea
+        id: List
+        vertical-scrollbar: ListScrollbar
+        anchors.fill: parent
+        size: 200 60
+        padding-left: 5
+        padding-top: 5
+        padding-bottom: 5
+        layout:
+          type: grid
+          cell-size: 210 30
+          cell-spacing: 0
+          flow: true
+      VerticalScrollBar
+        id: ListScrollbar
+        anchors.top: List.top
+        anchors.right: List.right
+        anchors.bottom: List.bottom
+        step: 80
+        pixel-scroll: true
+    Label
+      id: BuyLabel
+      anchors.bottom: BuyBase.top
+      anchors.left: BuyBase.left
+      margin-bottom: 4
+      !text: tr('Buy From') .. ':'
+      text-auto-resize: true
+      color: #BEBEBE
+    UIWidget
+      id: MarketGoldPriceBase
+      anchors.top: BuyBase.bottom
+      anchors.right: parent.right
+      margin-top: 25
+      image-source: /images/ui/item
+      image-border: 10
+      size: 100 22
+      UIWidget
+        id: Icon
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 4
+        image-source: /game_cyclopedia/images/icon-goldcoin
+      Label
+        id: Value
+        anchors.right: Icon.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 4
+        !text: tr('0')
+        text-auto-resize: true
+        color: #BDBDBD
+    Label
+      id: MarketPriceLabel
+      anchors.left: SellBase.left
+      anchors.bottom: MarketGoldPriceBase.bottom
+      !text: tr('Average Market Price') .. ':'
+      text-auto-resize: true
+      color: #BEBEBE
+    TextEdit
+      id: OwnValueEdit
+      anchors.top: MarketGoldPriceBase.bottom
+      anchors.right: parent.right
+      anchors.left: MarketGoldPriceBase.left
+      margin-top: 2
+      placeholder: Type to set
+      placeholder-color: #6E706F
+    Label
+      id: OwnLootLabel
+      anchors.left: SellBase.left
+      anchors.bottom: OwnValueEdit.bottom
+      !text: tr('Prefer Own Loot Value') .. ':'
+      text-auto-resize: true
+      color: #BEBEBE
+    UIWidget
+      id: ResultGoldBase
+      anchors.top: OwnValueEdit.bottom
+      anchors.right: parent.right
+      margin-top: 2
+      image-source: /images/ui/item
+      image-border: 10
+      size: 100 22
+      UIWidget
+        id: Rarity
+        anchors.fill: parent
+        image-border: 5
+        margin: 1
+      UIWidget
+        id: Icon
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 4
+        image-source: /game_cyclopedia/images/icon-goldcoin
+      Label
+        id: Value
+        anchors.right: Icon.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 4
+        !text: tr('0')
+        text-auto-resize: true
+        color: #BDBDBD
+    Label
+      id: ResultLabel
+      anchors.left: SellBase.left
+      anchors.bottom: ResultGoldBase.bottom
+      !text: tr('Resulting Value') .. ':'
+      text-auto-resize: true
+      color: #BEBEBE
+    CheckBox
+      id: TrackCheck
+      anchors.left: SellBase.left
+      anchors.bottom: parent.bottom
+      margin-bottom: 35
+      !text: tr('Track drops of this item')
+      text-auto-resize: true
+    CheckBox
+      id: SkipQuickLootCheck
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-bottom: 35
+      !text: tr('Skip when Quick Looting')
+
+      text-auto-resize: true
+
+  Button
+    id: ManageButton
+    size: 120 20
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    !text: tr('Manage Containers')
+    //font: verdana-bold-8px-antialiased
+    text-offset: 0 -1
+    color: #C0C0C0
+    @onClick: |
+      modules.game_cyclopedia.toggle()
+      modules.game_quickloot.QuickLoot.toggle()

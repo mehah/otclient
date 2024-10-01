@@ -51,6 +51,10 @@ public:
     void setSelectionColor(const Color& color) { m_selectionColor = color; }
     void setSelectionBackgroundColor(const Color& color) { m_selectionBackgroundColor = color; }
     void setAutoScroll(bool autoScroll) { setProp(PropAutoScroll, autoScroll); }
+    void setPlaceholder(std::string placeholder) { m_placeholder = placeholder; }
+    void setPlaceholderColor(const Color& color) { m_placeholderColor = color; }
+    void setPlaceholderAlign(Fw::AlignmentFlag align) { m_placeholderAlign = align; }
+    void setPlaceholderFont(const std::string_view fontName);
 
     void moveCursorHorizontally(bool right);
     void moveCursorVertically(bool up);
@@ -152,4 +156,9 @@ private:
     std::vector<std::pair<Rect, Rect>> m_glyphsSelectRectCache;
 
     std::string m_displayedText;
+
+    std::string m_placeholder;
+    Color m_placeholderColor;
+    Fw::AlignmentFlag m_placeholderAlign;
+    BitmapFontPtr m_placeholderFont;
 };

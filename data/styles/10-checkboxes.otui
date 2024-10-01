@@ -104,3 +104,33 @@ QtCheckBox < UICheckBox
 
   $checked disabled:
     image-clip: 0 26 14 14
+
+fakeCheckBox < UICheckBox
+  font: cipsoftFont
+  size: 106 23
+  image-source: /images/ui/button
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  opacity: 1.0
+  color: #b9b9b9ff
+
+  $hover !disabled:
+    color: #ffffff
+
+  $!checked:
+    image-clip: 0 0 22 23
+
+  $hover !checked:
+    image-clip: 0 0 22 23
+
+  $checked:
+    image-clip: 0 46 22 23
+
+  $hover checked:
+    image-clip: 0 46 22 23
+
+  $disabled:
+    image-color: #dfdfdf88
+    color: #dfdfdf88
+    opacity: 0.8

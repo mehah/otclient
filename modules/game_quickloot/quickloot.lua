@@ -103,25 +103,29 @@ function QuickLoot.Define()
         QuickLoot.loadFilterItems()
     end
 
-    function QuickLoot.lootExists(itemId)
-        return table.contains(QuickLoot.data.loots[QuickLoot.data.filter], itemId)
+    function QuickLoot.lootExists(itemId, filter)
+        if not filter then
+            filter = QuickLoot.data.filter
+        end
+        return table.contains(QuickLoot.data.loots[filter], itemId)
     end
 
-    function QuickLoot.addLootList(itemId)
-        if table.contains(QuickLoot.data.loots[QuickLoot.data.filter], itemId) then
+    function QuickLoot.addLootList(itemId,filter)
+        if not filter then
+            filter = QuickLoot.data.filter
+        end
+        if table.contains(QuickLoot.data.loots[filter], itemId) then
             return
         end
 
-        table.insert(QuickLoot.data.loots[QuickLoot.data.filter], itemId)
+        table.insert(QuickLoot.data.loots[filter], itemId)
 
-        g_game.requestQuickLootBlackWhiteList(getFilter(QuickLoot.data.filter),
-            #QuickLoot.data.loots[QuickLoot.data.filter], QuickLoot.data.loots[QuickLoot.data.filter])
+        g_game.requestQuickLootBlackWhiteList(getFilter(filter),
+            #QuickLoot.data.loots[filter], QuickLoot.data.loots[filter])
         if quickLootController.ui:isVisible() then
             QuickLoot.loadFilterItems()
         end
-
     end
-
     function QuickLoot.clearFilterItems()
         QuickLoot.data.loots[QuickLoot.data.filter] = {}
 
@@ -130,16 +134,21 @@ function QuickLoot.Define()
         QuickLoot.loadFilterItems()
     end
 
-    function QuickLoot.removeLootList(itemId)
-
-        if not table.contains(QuickLoot.data.loots[QuickLoot.data.filter], itemId) then
+    function QuickLoot.removeLootList(itemId, filter)
+        if not filter then
+            filter = QuickLoot.data.filter
+        end
+        if not table.contains(QuickLoot.data.loots[filter], itemId) then
             return
         end
 
-        table.removevalue(QuickLoot.data.loots[QuickLoot.data.filter], itemId)
+        table.removevalue(QuickLoot.data.loots[filter], itemId)
 
-        g_game.requestQuickLootBlackWhiteList(getFilter(QuickLoot.data.filter),
-            #QuickLoot.data.loots[QuickLoot.data.filter], QuickLoot.data.loots[QuickLoot.data.filter])
+        g_game.requestQuickLootBlackWhiteList(getFilter(filter),
+            #QuickLoot.data.loots[filter], QuickLoot.data.loots[filter])
+        if quickLootController.ui:isVisible() then
+            QuickLoot.loadFilterItems()
+        end
     end
 
     function QuickLoot.load()

@@ -1330,6 +1330,9 @@ function Market.loadMarketItems(category)
             end
         end
     else
+        if not marketItems[category] then
+            return
+        end
         -- loop specific category
         if not marketItems[category] then
             return

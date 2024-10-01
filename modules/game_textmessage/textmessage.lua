@@ -53,6 +53,12 @@ MessageSettings = {
     private = {
         color = TextColors.lightblue,
         screenTarget = 'privateLabel'
+    },
+    loot = {
+        color = TextColors.white,
+        consoleTab = 'Loot',
+        screenTarget = 'highCenterLabel',
+        consoleOption = 'showInfoMessagesInConsole'
     }
 }
 
@@ -67,7 +73,7 @@ MessageTypes = {
     [MessageModes.Status] = MessageSettings.status,
     [MessageModes.Warning] = MessageSettings.centerRed,
     [MessageModes.Look] = MessageSettings.centerGreen,
-    [MessageModes.Loot] = MessageSettings.centerGreen,
+    [MessageModes.Loot] = MessageSettings.loot,
     [MessageModes.Red] = MessageSettings.consoleRed,
     [MessageModes.Blue] = MessageSettings.consoleBlue,
     [MessageModes.PrivateFrom] = MessageSettings.consoleBlue,
@@ -150,8 +156,12 @@ function displayMessage(mode, text)
 
     if msgtype.screenTarget then
         local label = messagesPanel:recursiveGetChildById(msgtype.screenTarget)
-        label:setText(text)
-        label:setColor(msgtype.color)
+        if msgtype == MessageSettings.loot then
+            label:setColoredText(ItemsDatabase.setColorLootMessage(text)) -- temp. TODO assets search
+        else
+            label:setText(text)
+            label:setColor(msgtype.color)
+        end
         label:setVisible(true)
         removeEvent(label.hideEvent)
         label.hideEvent = scheduleEvent(function()
