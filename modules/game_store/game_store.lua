@@ -384,7 +384,7 @@ local function createProductImage(imageParent, data)
     elseif data.VALOR == "icon" then
         local widget = g_ui.createWidget('UIWidget', imageParent)
        -- widget:setImageSource("/game_store/images/64/" .. data.ID)
-        setImagenHttp(widget,"/64/"..data.ID,false)
+        setImagenHttp(widget,"/64/" .. data.ID, false)
         widget:fill('parent')
     elseif data.VALOR == "mountId" or data.VALOR:find("outfitId") then
         local creature = g_ui.createWidget('Creature', imageParent)
