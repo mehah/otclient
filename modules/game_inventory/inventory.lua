@@ -125,6 +125,18 @@ local function inventoryEvent(player, slot, item, oldItem)
         end
     end
 
+    if g_game.getFeature(GameThingUpgradeClassification) and item then
+        local tier = item:getTier()
+        if tier > 0 then
+            local xOffset = (math.max(1, math.min(tier, 10)) - 1) * 9
+            slotPanel.item.tier:setImageClip({x = xOffset, y = 0, width = 10, height = 9})
+            slotPanel.item.tier:setVisible(true)
+        else
+            slotPanel.item.tier:setVisible(false)
+        end
+    else
+        slotPanel.item.tier:setVisible(false)
+    end
 end
 
 local function onSoulChange(localPlayer, soul)
