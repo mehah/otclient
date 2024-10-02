@@ -5004,6 +5004,7 @@ function ItemsDatabase.setTier(widget, item)
     if not g_game.getFeature(GameThingUpgradeClassification) then
         return
     end
+
     if not widget then
         return
     end
