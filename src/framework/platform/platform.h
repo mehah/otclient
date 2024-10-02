@@ -46,6 +46,7 @@ public:
         DeviceUnknown,
         Desktop,
         Mobile,
+        Browser,
         Console
     };
 
@@ -80,6 +81,7 @@ public:
     void setDevice(Device device) { m_device = device; }
     bool isDesktop() { return m_device.type == Desktop; }
     bool isMobile() { return m_device.type == Mobile; }
+    bool isBrowser() { return m_device.type == Browser; }
     bool isConsole() { return m_device.type == Console; }
     std::string getDeviceShortName(DeviceType type = DeviceUnknown);
     std::string getOsShortName(OperatingSystem os = OsUnknown);

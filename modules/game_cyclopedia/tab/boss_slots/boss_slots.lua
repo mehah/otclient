@@ -1,4 +1,4 @@
-﻿local UI = nil
+local UI = nil
 
 function showBossSlot()
     UI = g_ui.loadUI("boss_slots", contentContainer)

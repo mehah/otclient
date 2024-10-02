@@ -1,4 +1,4 @@
-﻿RACE = {
+RACE = {
 	[-1] = {name = "unknow", type = 2},
 	[0] = {name = "unknow", type = 2},
 	[1] = {name = "unknow", type = 2},
@@ -1012,8 +1012,8 @@ ACHIEVEMENTS = {
 	[80] = { name = "Party Animal", grade = 1, points = 1, secret = true, description = "Oh my god, it's a paaaaaaaaaaaarty! You're always in for fun, friends and booze and love being the center of attention. There's endless reasons to celebrate! Woohoo!" },
 	[81] = { name = "Fireworks in the Sky", grade = 1, points = 2, secret = true, description = "You love the moment right before your rocket takes off and explodes into beautiful colours - not only on new year's eve!" },
 	[82] = { name = "Quick as a Turtle", grade = 1, points = 2, secret = true, description = "There... is... simply... no... better... way - than to travel on the back of a turtle. At least you get to enjoy the beautiful surroundings of Laguna." },
-	[83] = { name = "Polisher", grade = 2, points = 4, secret = true, description = "If you see a rusty item, you can't resist polishing it. There's always a little flask of rust remover in your inventory – who knows, there might be a golden armor beneath all that dirt!" },
-	[84] = { name = "Ship's Kobold", grade = 2, points = 4, secret = true, description = "You’ve probably never gotten seasick in your life — you love spending your free time on the ocean and covered quite a lot of miles with ships. Aren’t you glad you didn’t have to swim all that?" },
+	[83] = { name = "Polisher", grade = 2, points = 4, secret = true, description = "If you see a rusty item, you can't resist polishing it. There's always a little flask of rust remover in your inventory - who knows, there might be a golden armor beneath all that dirt!" },
+	[84] = { name = "Ship's Kobold", grade = 2, points = 4, secret = true, description = "You've probably never gotten seasick in your life — you love spending your free time on the ocean and covered quite a lot of miles with ships. Aren't you glad you didn't have to swim all that?" },
 	[85] = { name = "Steampunked", grade = 1, points = 2, secret = true, description = "Travelling with the dwarven steamboats through the underground rivers is your preferred way of crossing the lands. No pesky seagulls, and good beer on board!" },
 	[86] = { name = "Vanity", grade = 1, points = 3, secret = true, description = "Aren't you just perfectly, wonderfully, beautifully gorgeous? You can't pass a mirror without admiring your looks. Or maybe doing a quick check whether something's stuck in your teeth, perhaps?" },
 	[87] = { name = "Superstitious", grade = 1, points = 2, secret = true, description = "Fortune tellers and horoscopes guide you through your life. And you probably wouldn't dare going on a big game hunt without your trusty voodoo skull giving you his approval for the day." },
@@ -1339,7 +1339,7 @@ ACHIEVEMENTS = {
 	-- [407] = Unknown/non-existent
 	[408] = { name = "Rift Warrior", grade = 1, points = 3, description = "You went through hell. Seven times. You defeated the demons. Countless times. You put an end to Ferumbras claims to ascendancy. Once and for all." },
 	-- [409] = Unknown/non-existent
-	[410] = { name = "Hat Hunter", grade = 2, points = 5, description = "You sucessfully fought against all odds to protect your world from an ascending god! – You weren't there for the hat only after all?" },
+	[410] = { name = "Hat Hunter", grade = 2, points = 5, description = "You sucessfully fought against all odds to protect your world from an ascending god! - You weren't there for the hat only after all?" },
 	[411] = { name = "Ogre Chef", grade = 1, points = 1, description = "You didn't manage to become an ogre chief. But at least you are, beyond doubt, a worthy ogre chef." },
 	[412] = { name = "The Call of the Wild", grade = 1, points = 2, description = "You opposed man-eating ogres and clumsy clomps. You grappled with hungry chieftains, desperate goblins and angry spirits. So you truly overcame the wild vastness of Krailos." },
 	[413] = { name = "Ender of the End", grade = 2, points = 5, description = "You have entered the heart of destruction and valiantly defeated the world devourer. By your actions you have postponed the end of the world — at least for a while." },

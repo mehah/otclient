@@ -42,6 +42,10 @@
 #include <framework/sound/soundmanager.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 #include <thread>
 
 GraphicalApplication g_app;
@@ -124,6 +128,37 @@ void GraphicalApplication::terminate()
     m_terminated = true;
 }
 
+#ifdef __EMSCRIPTEN__
+void GraphicalApplication::mainLoop() {
+    if (m_stopping) {
+        g_window.terminate();
+        emscripten_cancel_main_loop();
+        return;
+    }
+    mainPoll();
+
+    if (!g_window.isVisible()) {
+        stdext::millisleep(10);
+        return;
+    }
+
+    const auto& FPS = [this] {
+        m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
+        return m_graphicFrameCounter.getFps();
+    };
+
+    g_drawPool.draw();
+    // update screen pixels
+    g_window.swapBuffers();
+
+    if (m_graphicFrameCounter.update()) {
+        g_dispatcher.addEvent([this, fps = FPS()] {
+            g_lua.callGlobalField("g_app", "onFps", fps);
+        });
+    }
+}
+#endif
+
 void GraphicalApplication::run()
 {
     // run the first poll
@@ -139,11 +174,12 @@ void GraphicalApplication::run()
 
     g_lua.callGlobalField("g_app", "onRun");
 
+#ifndef __EMSCRIPTEN__
     const auto& FPS = [this] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
-
+#endif
     // THREAD - POOL & MAP
     const auto& mapThread = g_asyncDispatcher.submit_task([this] {
         const auto uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
@@ -198,6 +234,10 @@ void GraphicalApplication::run()
         }
     });
 
+#ifdef __EMSCRIPTEN__
+    m_running = true;
+    emscripten_set_main_loop(([] { g_app.mainLoop(); }), 0, 1);
+#else
     m_running = true;
     while (!m_stopping) {
         mainPoll();
@@ -218,6 +258,7 @@ void GraphicalApplication::run()
             });
         }
     }
+#endif
     mapThread.wait();
 
     m_running = false;

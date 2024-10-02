@@ -41,7 +41,11 @@
 #include <locale>
 
 #ifdef FRAMEWORK_NET
+#ifdef __EMSCRIPTEN__
+#include <framework/net/webconnection.h>
+#else
 #include <framework/net/connection.h>
+#endif
 #endif
 
 void exitSignalHandler(int sig)
@@ -121,8 +125,11 @@ void Application::deinit()
 void Application::terminate()
 {
 #ifdef FRAMEWORK_NET
-    // terminate network
+#ifdef __EMSCRIPTEN__
+    WebConnection::terminate();
+#else
     Connection::terminate();
+#endif
 #endif
 
     // release configs
@@ -145,14 +152,22 @@ void Application::poll()
     g_clock.update();
 
 #ifdef FRAMEWORK_NET
+#ifdef __EMSCRIPTEN__
+    WebConnection::poll();
+#else
     Connection::poll();
+#endif
 #endif
 
     g_dispatcher.poll();
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET
+#ifdef __EMSCRIPTEN__
+    WebConnection::poll();
+#else
     Connection::poll();
+#endif
 #endif
 
     g_clock.update();
@@ -187,6 +202,8 @@ std::string Application::getOs()
     return "linux";
 #elif ANDROID
     return "android";
+#elif __EMSCRIPTEN__
+    return "browser";
 #else
     return "unknown";
 #endif
