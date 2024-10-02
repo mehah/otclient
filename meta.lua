@@ -1197,6 +1197,9 @@ function g_gameConfig.isDrawingInformationByWidget() end
 ---@return boolean
 function g_gameConfig.isAdjustCreatureInformationBasedCropSize() end
 
+---@return boolean
+function g_gameConfig.isItemRarityAllowed() end
+
 ---@return integer
 function g_gameConfig.getShieldBlinkTicks() end
 
