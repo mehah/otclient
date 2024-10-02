@@ -5026,5 +5026,4 @@ function ItemsDatabase.setTier(widget, item)
     else
         widget.tier:setVisible(false)
     end
-
 end
