@@ -3,15 +3,13 @@ vipButton = nil
 addVipWindow = nil
 editVipWindow = nil
 vipInfo = {}
-
-function init()
-    connect(g_game, {
-        onGameStart = online,
-        onGameEnd = offline,
+controllerVip = Controller:new()
+function controllerVip:onInit()
+    controllerVip:registerEvents(g_game, {
         onAddVip = onAddVip,
         onVipStateChange = onVipStateChange
-    })
 
+    })
     g_keyboard.bindKeyDown('Ctrl+P', toggle)
 
     vipButton = modules.game_mainpanel.addToggleButton('vipListButton', tr('VIP List') .. ' (Ctrl+P)',
@@ -28,33 +26,30 @@ function init()
         vipWindow:setupOnStart()
     end
 end
+function controllerVip:onGameStart()
+    vipWindow:setupOnStart() -- load character window configuration
+    refresh()
+end
 
-function terminate()
+function controllerVip:onGameEnd()
+    vipWindow:setParent(nil, true)
+    clear()
+end
+
+function controllerVip:onTerminate()
     g_keyboard.unbindKeyDown('Ctrl+P')
-    disconnect(g_game, {
-        onGameStart = online,
-        onGameEnd = offline,
-        onAddVip = onAddVip,
-        onVipStateChange = onVipStateChange
-    })
 
     if not g_game.getFeature(GameAdditionalVipInfo) then
         saveVipInfo()
     end
 
-    if addVipWindow then
-        addVipWindow:destroy()
+    local ArrayWidgets = {addVipWindow, editVipWindow, vipWindow, vipButton}
+    for _, widget in ipairs(ArrayWidgets) do
+        if widget then
+            widget:destroy()
+            widget = nil
+        end
     end
-
-    if editVipWindow then
-        editVipWindow:destroy()
-    end
-
-    vipWindow:destroy()
-    vipButton:destroy()
-
-    vipWindow = nil
-    vipButton = nil
 end
 
 function loadVipInfo()
@@ -70,16 +65,6 @@ function saveVipInfo()
     settings = {}
     settings['VipInfo'] = vipInfo
     g_settings.mergeNode('VipList', settings)
-end
-
-function online()
-    vipWindow:setupOnStart() -- load character window configuration
-    refresh()
-end
-
-function offline()
-    vipWindow:setParent(nil, true)
-    clear()
 end
 
 function refresh()
