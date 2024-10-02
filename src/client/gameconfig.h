@@ -52,6 +52,8 @@ public:
     bool isDrawingInformationByWidget() { return m_drawInformationByWidget; }
     bool isForcingNewWalkingFormula() const { return m_forceNewWalkingFormula; }
     bool isAdjustCreatureInformationBasedCropSize() { return m_adjustCreatureInformationBasedCropSize; }
+    bool isItemRarityAllowed() { return m_allowRarity; }
+
     uint16_t getShieldBlinkTicks() { return m_shieldBlinkTicks; }
     uint16_t getVolatileSquareDuration() const { return m_volatileSquareDuration; }
 
@@ -110,6 +112,8 @@ private:
     bool m_drawInformationByWidget{ false };
     bool m_forceNewWalkingFormula{ true };
     bool m_adjustCreatureInformationBasedCropSize{ false };
+    bool m_allowRarity{ false };
+    
     uint16_t m_shieldBlinkTicks{ 500 };
     uint16_t m_volatileSquareDuration{ 1000 };
     double m_creatureDiagonalWalkSpeed{ 3 };
