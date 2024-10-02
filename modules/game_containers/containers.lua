@@ -138,9 +138,9 @@ function onContainerOpen(container, previousContainer)
         itemWidget:setId('item' .. slot)
         itemWidget:setItem(container:getItem(slot))
         ItemsDatabase.setRarityItem(itemWidget, container:getItem(slot))
+        ItemsDatabase.setTier(itemWidget, container:getItem(slot))
         itemWidget:setMargin(0)
         itemWidget.position = container:getSlotPosition(slot)
-
         if not container:isUnlocked() then
             itemWidget:setBorderColor('red')
         end
