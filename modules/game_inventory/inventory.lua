@@ -125,7 +125,6 @@ local function inventoryEvent(player, slot, item, oldItem)
         end
     end
     ItemsDatabase.setTier(slotPanel.item, item)
-
 end
 
 local function onSoulChange(localPlayer, soul)
