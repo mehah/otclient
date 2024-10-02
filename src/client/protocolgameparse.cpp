@@ -3602,7 +3602,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
         if (item->getClassification()) {
-            item->setTier(msg->getU8()); // Item tier
+            item->setTier(msg->getU8());
         }
     }
 
