@@ -105,7 +105,8 @@ public:
     void sendMountStatus(const bool mount);
     void sendAddVip(const std::string_view name);
     void sendRemoveVip(const uint32_t playerId);
-    void sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin);
+    void sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupIDs = {});
+    void sendEditVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t groupId, const std::string_view groupName);
     void sendBugReport(const std::string_view comment);
     void sendRuleViolation(const std::string_view target, const uint8_t reason, const uint8_t action, const std::string_view comment, const std::string_view statement, const uint16_t statementId, const bool ipBanishment);
     void sendDebugReport(const std::string_view a, const std::string_view b, const std::string_view c, const std::string_view d);

@@ -1,0 +1,52 @@
+MainWindow
+  size: 360 121
+  text: Add VIP group (User-Created groups left: %s)
+  text-offset: 0 1
+  @onEnter: modules.game_viplist.addGroup()
+  @onEscape: |
+    self:getParent():destroy()
+    modules.game_viplist.addGroupWindow = nil
+
+  Label
+    id: header
+    !text: tr('Please enter a group name:')
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-auto-resize: true
+    margin-top: -7
+    margin-left: -1
+
+  TextEdit
+    id: name
+    size: 328 16
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 5
+    padding-top: 0
+    max-length: 40
+
+  HorizontalSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: next.top
+    margin-bottom: 11
+
+  Button
+    id: okButton
+    !text: tr('Ok')
+    anchors.right: next.left
+    anchors.bottom: parent.bottom
+    margin-right: 11
+    margin-bottom: 6
+    @onClick: modules.game_viplist.addGroup()
+
+  Button
+    !text: tr('Cancel')
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-bottom: 6
+    @onClick: |
+      self:getParent():destroy()
+      modules.game_viplist.addGroupWindow = nil

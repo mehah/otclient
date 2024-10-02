@@ -377,16 +377,22 @@ void Game::processRuleViolationLock()
     g_lua.callGlobalField("g_game", "onRuleViolationLock");
 }
 
-void Game::processVipAdd(const uint32_t id, const std::string_view name, const uint32_t status, const std::string_view description, const uint32_t iconId, const bool notifyLogin)
+void Game::processVipAdd(const uint32_t id, const std::string_view name, const uint32_t status, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupID)
 {
-    m_vips[id] = Vip(name, status, description, iconId, notifyLogin);
-    g_lua.callGlobalField("g_game", "onAddVip", id, name, status, description, iconId, notifyLogin);
+    m_vips[id] = Vip(name, status, description, iconId, notifyLogin, groupID);
+    g_lua.callGlobalField("g_game", "onAddVip", id, name, status, description, iconId, notifyLogin, groupID);
 }
 
 void Game::processVipStateChange(const uint32_t id, const uint32_t status)
 {
     std::get<1>(m_vips[id]) = status;
-    g_lua.callGlobalField("g_game", "onVipStateChange", id, status);
+    const std::vector<uint8_t>& groupID = std::get<5>(m_vips[id]);
+    g_lua.callGlobalField("g_game", "onVipStateChange", id, status, groupID);
+}
+
+void Game::processVipGroupChange(const std::vector<std::tuple<uint8_t, std::string, bool>>& vipGroups, uint8_t groupsAmountLeft)
+{
+    g_lua.callGlobalField("g_game", "onVipGroupChange", vipGroups, groupsAmountLeft);
 }
 
 void Game::processTutorialHint(const uint8_t id)
@@ -1231,7 +1237,7 @@ void Game::removeVip(const uint32_t playerId)
     m_protocolGame->sendRemoveVip(playerId);
 }
 
-void Game::editVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin)
+void Game::editVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupID)
 {
     if (!canPerformGameAction())
         return;
@@ -1243,9 +1249,22 @@ void Game::editVip(const uint32_t playerId, const std::string_view description, 
     std::get<2>(m_vips[playerId]) = description;
     std::get<3>(m_vips[playerId]) = iconId;
     std::get<4>(m_vips[playerId]) = notifyLogin;
+    std::get<5>(m_vips[playerId]) = groupID;
 
-    if (getFeature(Otc::GameAdditionalVipInfo))
-        m_protocolGame->sendEditVip(playerId, description, iconId, notifyLogin);
+    if (getFeature(Otc::GameAdditionalVipInfo)) {
+        if (getFeature(Otc::GameVipGroups)) {
+            m_protocolGame->sendEditVip(playerId, description, iconId, notifyLogin, groupID);
+        } else {
+            m_protocolGame->sendEditVip(playerId, description, iconId, notifyLogin);
+        }
+    }
+}
+
+void Game::editVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t groupId, const std::string_view groupName)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendEditVipGroups(action, groupId, groupName);
 }
 
 void Game::setChaseMode(const Otc::ChaseModes chaseMode)

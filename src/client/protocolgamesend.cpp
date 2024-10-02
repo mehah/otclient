@@ -830,7 +830,7 @@ void ProtocolGame::sendRemoveVip(const uint32_t playerId)
     send(msg);
 }
 
-void ProtocolGame::sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin)
+void ProtocolGame::sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupIDs)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientEditVip);
@@ -838,6 +838,38 @@ void ProtocolGame::sendEditVip(const uint32_t playerId, const std::string_view d
     msg->addString(description);
     msg->addU32(iconId);
     msg->addU8(static_cast<uint8_t>(notifyLogin));
+    if (g_game.getFeature(Otc::GameVipGroups)) {
+        msg->addU8(static_cast<uint8_t>(groupIDs.size()));
+        for (uint8_t groupID : groupIDs) {
+            msg->addU8(groupID);
+        }
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendEditVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t groupId, const std::string_view groupName)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientEditVipGroups);
+    msg->addU8(action);
+    switch (action) {
+        case Otc::VIP_GROUP_ADD: { 
+            msg->addString(groupName); 
+            break;
+        }
+        case Otc::VIP_GROUP_EDIT: { 
+            msg->addU8(groupId);
+            msg->addString(groupName);
+            break;
+        }
+        case Otc::VIP_GROUP_REMOVE: {
+            msg->addU8(groupId); 
+            break;
+        }
+        default: {
+            return;
+        }
+    }
     send(msg);
 }
 
