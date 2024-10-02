@@ -141,7 +141,7 @@ function onContainerOpen(container, previousContainer)
         ItemsDatabase.setTier(itemWidget, container:getItem(slot))
         itemWidget:setMargin(0)
         itemWidget.position = container:getSlotPosition(slot)
-        
+
         if not container:isUnlocked() then
             itemWidget:setBorderColor('red')
         end
