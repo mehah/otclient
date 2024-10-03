@@ -549,61 +549,8 @@ elseif(ANDROID)
 		log
 		pugixml::pugixml
 	)
-elseif(LINUX)
-	target_include_directories(${PROJECT_NAME}
-		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
-		${LUAJIT_INCLUDE_DIR}
-		${CMAKE_THREAD_LIBS_INIT}
-		${Protobuf_INCLUDE_DIRS}
-		${GMP_INCLUDE_DIR}
-		${PHYSFS_INCLUDE_DIR}
-		${GLEW_INCLUDE_DIR}
-		${PARALLEL_HASHMAP_INCLUDE_DIRS}
-		${NLOHMANN_JSON_INCLUDE_DIR}
-		${OPENSSL_INCLUDE_DIR}
-	)
-	target_link_libraries(${PROJECT_NAME}
-		PRIVATE
-		${LUAJIT_LIBRARY}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
-		${NLOHMANN_JSON_LIBRARY}
-		${GLEW_LIBRARY}
-		${OPENGL_LIBRARIES}
-		${DirectX_LIBRARY}
-		${DirectX_LIBRARIES}
-		${OGG_LIBRARY}
-		${GMP_LIBRARY}
-		${STDUUID}
-		${FOUNDATION}
-		${IOKIT}
-		${OPENSSL_LIBRARY}
-		${OPENSSL_CRYPTO_LIBRARY}
-		${HTTPLIB_LIBRARY}
 
-		Threads::Threads
-		X11::X11
-		asio::asio
-		OpenAL::OpenAL
-		Vorbis::vorbis
-		Vorbis::vorbisfile
-		LibLZMA::LibLZMA
-		pugixml::pugixml
-		ZLIB::ZLIB
-		OpenSSL::SSL
-		OpenSSL::Crypto
-		httplib::httplib
-	)
-
-	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-		target_compile_options(${PROJECT_NAME}
-			PRIVATE
-				-Wall -Wextra -Wpedantic
-		)
-	endif()
-else() #WASM
+elseif(WASM)
 target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
@@ -776,6 +723,61 @@ target_include_directories(${PROJECT_NAME}
   	LINK_FLAGS ${linkflags})
 	add_definitions(-DWEBPORT="7979")
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+
+else() # Linux
+	target_include_directories(${PROJECT_NAME}
+		PRIVATE
+		${CMAKE_SOURCE_DIR}/src
+		${LUAJIT_INCLUDE_DIR}
+		${CMAKE_THREAD_LIBS_INIT}
+		${Protobuf_INCLUDE_DIRS}
+		${GMP_INCLUDE_DIR}
+		${PHYSFS_INCLUDE_DIR}
+		${GLEW_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
+		${NLOHMANN_JSON_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
+	)
+	target_link_libraries(${PROJECT_NAME}
+		PRIVATE
+		${LUAJIT_LIBRARY}
+		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
+		${PROTOBUF_LIBRARY}
+		${NLOHMANN_JSON_LIBRARY}
+		${GLEW_LIBRARY}
+		${OPENGL_LIBRARIES}
+		${DirectX_LIBRARY}
+		${DirectX_LIBRARIES}
+		${OGG_LIBRARY}
+		${GMP_LIBRARY}
+		${STDUUID}
+		${FOUNDATION}
+		${IOKIT}
+		${OPENSSL_LIBRARY}
+		${OPENSSL_CRYPTO_LIBRARY}
+		${HTTPLIB_LIBRARY}
+
+		Threads::Threads
+		X11::X11
+		asio::asio
+		OpenAL::OpenAL
+		Vorbis::vorbis
+		Vorbis::vorbisfile
+		LibLZMA::LibLZMA
+		pugixml::pugixml
+		ZLIB::ZLIB
+		OpenSSL::SSL
+		OpenSSL::Crypto
+		httplib::httplib
+	)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(${PROJECT_NAME}
+			PRIVATE
+				-Wall -Wextra -Wpedantic
+		)
+	endif()
 endif()
 
 # *****************************************************************************
