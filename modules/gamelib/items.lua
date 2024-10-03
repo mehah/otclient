@@ -4943,7 +4943,7 @@ function ItemsDatabase.getRarityByClientId(clientID)
 end
 
 function ItemsDatabase.setRarityItem(widget, item, style)
-    if not g_game.getFeature(GameColoredLoot) then
+    if not g_game.getFeature(GameColorizedLootValue) then
         return
     end
 

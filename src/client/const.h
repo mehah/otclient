@@ -549,7 +549,7 @@ namespace Otc
         GameWingsAurasEffectsShader = 118,
         GameForgeConvergence = 119,
         GameAllowCustomBotScripts = 120,
-        GameColoredLoot = 121,
+        GameColorizedLootValue = 121,
         LastGameFeature
     };
 
