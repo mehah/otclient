@@ -1848,6 +1848,14 @@ void Game::openContainerQuickLoot(const uint8_t action, const uint8_t category, 
     disableBotCall();
 }
 
+void Game::sendGmTeleport(const Position& pos)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendGmTeleport(pos);
+}
+
 void Game::inspectionNormalObject(const Position& position)
 {
     if (!canPerformGameAction())
