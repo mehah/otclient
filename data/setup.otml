@@ -3,7 +3,6 @@ game
   last-supported-version: 1340
   draw-typing: false
   typing-icon: /images/game/console/typing
-  itemsRarity: false
   
   map
     viewport: 8 6

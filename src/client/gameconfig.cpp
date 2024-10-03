@@ -89,8 +89,6 @@ void GameConfig::loadGameNode(const OTMLNodePtr& mainNode) {
             m_drawTyping = node->value<bool>();
         else if (node->tag() == "typing-icon")
             m_typingIcon = node->value();
-        else if (node->tag() == "itemsRarity")
-            m_allowRarity = node->value<bool>();
     }
 }
 
