@@ -5004,33 +5004,19 @@ function ItemsDatabase.getSellValueAndColor(clientID)
 end
 
 function ItemsDatabase.setTier(widget, item)
-    if not g_game.getFeature(GameThingUpgradeClassification) then
+    if not g_game.getFeature(GameThingUpgradeClassification) or not widget then
         return
     end
-
-    if not widget then
-        return
-    end
-
-    if item then
-        local tier = 0
-        if type(item) == "number" then
-            tier = item
-        else
-            tier = item:getTier()
-        end
-        if tier and tier > 0 then
-            local xOffset = (math.max(1, math.min(tier, 10)) - 1) * 9
-            widget.tier:setImageClip({
-                x = xOffset,
-                y = 0,
-                width = 10,
-                height = 9
-            })
-            widget.tier:setVisible(true)
-        else
-            widget.tier:setVisible(false)
-        end
+    local tier = type(item) == "number" and item or (item and item:getTier()) or 0
+    if tier > 0 then
+        local xOffset = (math.min(math.max(tier, 1), 10) - 1) * 9
+        widget.tier:setImageClip({
+            x = xOffset,
+            y = 0,
+            width = 10,
+            height = 9
+        })
+        widget.tier:setVisible(true)
     else
         widget.tier:setVisible(false)
     end
