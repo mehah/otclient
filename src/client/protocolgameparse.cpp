@@ -3041,7 +3041,7 @@ void ProtocolGame::parseCreaturesMark(const InputMessagePtr& msg)
     const uint8_t len = g_game.getClientVersion() >= 1035 ? 1 : msg->getU8();
     for (auto i = 0; i < len; ++i) {
         const uint32_t creatureId = msg->getU32();
-        const bool isPermanent = static_cast<bool>(msg->getU8());
+        const bool isPermanent = false;
         const uint8_t markType = msg->getU8();
 
         const auto& creature = g_map.getCreatureById(creatureId);
