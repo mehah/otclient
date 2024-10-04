@@ -168,6 +168,18 @@ CharacterListItem < UIWidget
   UIItem
     id: item
     anchors.fill: ItemBackground
+    UIWidget
+      id: tier
+      size: 10 9
+      image-source: /images/inventory/tiers-strip
+      image-clip: 0 0 10 9
+      image-size: 10 9
+      anchors.top: parent.top
+      anchors.right: parent.right
+      phantom: true
+      focusable: false
+      visible: false
+      image-smooth: true
   Label
     id: name
     !text: tr('Boots')
