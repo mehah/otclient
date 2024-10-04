@@ -277,11 +277,10 @@ function Cyclopedia.reloadCharacterItems()
 
         if data.visible then
             local listItem = g_ui.createWidget("CharacterListItem", UI.CharacterItems.ListBase.list)
-            -- local frame = g_game.getItemFrame(data.value)
             listItem.item:setItemId(itemId)
             listItem.name:setText(data.name)
             ItemsDatabase.setRarityItem(listItem.item, listItem.item:getItem())
-            ItemsDatabase.setTier(listItem.item, data.classification)
+            ItemsDatabase.setTier(listItem.item, item.classification)
             listItem.amount:setText(data.amount)
             listItem:setBackgroundColor(colors[colorIndex])
             local gridItem = g_ui.createWidget("CharacterGridItem", UI.CharacterItems.gridBase.grid)
@@ -313,16 +312,19 @@ function Cyclopedia.loadCharacterItems(data)
             visible = false,
             name = name,
             amount = data.amount,
-            type = type,
-            classification =  data.classification
-            -- value = thing:getResultingValue()
+            type = type
         }
 
-        local insertedItem = Cyclopedia.Character.Items[data.itemId]
+        local itemKey = data.itemId .. "-" .. (data.classification or "no_classification")
+        local insertedItem = Cyclopedia.Character.Items[itemKey]
         if insertedItem then
             insertedItem.amount = insertedItem.amount + data.amount
         else
-            Cyclopedia.Character.Items[data.itemId] = data_t
+            Cyclopedia.Character.Items[itemKey] = {
+                itemId = data.itemId,
+                classification = data.classification,
+                data = data_t
+            }
         end
     end
 
@@ -343,11 +345,8 @@ function Cyclopedia.loadCharacterItems(data)
 
     local sortedItems = {}
 
-    for itemId, data in pairs(Cyclopedia.Character.Items) do
-        table.insert(sortedItems, {
-            itemId = itemId,
-            data = data
-        })
+    for _, itemData in pairs(Cyclopedia.Character.Items) do
+        table.insert(sortedItems, itemData)
     end
 
     local function compareByName(a, b)
