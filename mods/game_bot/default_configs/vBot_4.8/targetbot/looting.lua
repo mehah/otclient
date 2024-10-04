@@ -14,9 +14,9 @@ TargetBot.Looting.setup = function()
   UI.Container(TargetBot.Looting.onContainersUpdate, true, nil, ui.containers)
   ui.everyItem.onClick = function()
     if ui.everyItem:isOn() then
-      ui.labelToLoot:setText("Items to loot")
-    else
       ui.labelToLoot:setText("Items to ignore")
+    else
+      ui.labelToLoot:setText("Items to loot")
     end
     ui.everyItem:setOn(not ui.everyItem:isOn())
     TargetBot.save()
