@@ -21,6 +21,7 @@
  */
 
 #pragma once
+#ifndef __EMSCRIPTEN__
 
 #include <asio/streambuf.hpp>
 
@@ -29,7 +30,6 @@
 
 class Connection : public LuaObject
 {
-#ifndef __EMSCRIPTEN__
     using ErrorCallback = std::function<void(const std::error_code&)>;
     using RecvCallback = std::function<void(uint8_t*, uint16_t)>;
 
@@ -97,5 +97,5 @@ protected:
     stdext::timer m_activityTimer;
 
     friend class Server;
-#endif
 };
+#endif
