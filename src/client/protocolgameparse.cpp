@@ -4199,13 +4199,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.inventory.emplace_back(item);
             }
@@ -4217,13 +4217,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.store.emplace_back(item);
             }
@@ -4235,13 +4235,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.stash.emplace_back(item);
             }
@@ -4253,13 +4253,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.depot.emplace_back(item);
             }
@@ -4271,13 +4271,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.inbox.emplace_back(item);
             }

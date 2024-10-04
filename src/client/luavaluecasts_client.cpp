@@ -929,8 +929,8 @@ int push_luavalue(const ItemSummary& item) {
     g_lua.createTable(0, 2);
     g_lua.pushInteger(item.itemId);
     g_lua.setField("itemId");
-    g_lua.pushInteger(item.classification);
-    g_lua.setField("classification");
+    g_lua.pushInteger(item.tier);
+    g_lua.setField("tier");
     g_lua.pushInteger(item.amount);
     g_lua.setField("amount");
     return 1;

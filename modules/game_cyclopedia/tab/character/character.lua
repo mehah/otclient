@@ -280,7 +280,7 @@ function Cyclopedia.reloadCharacterItems()
             listItem.item:setItemId(itemId)
             listItem.name:setText(data.name)
             ItemsDatabase.setRarityItem(listItem.item, listItem.item:getItem())
-            ItemsDatabase.setTier(listItem.item, item.classification)
+            ItemsDatabase.setTier(listItem.item, item.tier)
             listItem.amount:setText(data.amount)
             listItem:setBackgroundColor(colors[colorIndex])
             local gridItem = g_ui.createWidget("CharacterGridItem", UI.CharacterItems.gridBase.grid)
@@ -315,14 +315,14 @@ function Cyclopedia.loadCharacterItems(data)
             type = type
         }
 
-        local itemKey = data.itemId .. "-" .. (data.classification or "no_classification")
+        local itemKey = data.itemId .. "-" .. (data.tier or "no_tier")
         local insertedItem = Cyclopedia.Character.Items[itemKey]
         if insertedItem then
             insertedItem.amount = insertedItem.amount + data.amount
         else
             Cyclopedia.Character.Items[itemKey] = {
                 itemId = data.itemId,
-                classification = data.classification,
+                tier = data.tier,
                 data = data_t
             }
         end
