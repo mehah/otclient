@@ -5008,7 +5008,7 @@ function ItemsDatabase.setTier(widget, item)
         return
     end
     local tier = type(item) == "number" and item or (item and item:getTier()) or 0
-    if tier > 0 then
+    if tier and tier > 0 then
         local xOffset = (math.min(math.max(tier, 1), 10) - 1) * 9
         widget.tier:setImageClip({
             x = xOffset,
