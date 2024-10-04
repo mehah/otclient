@@ -1,0 +1,588 @@
+UIWidget
+  id: Cat2
+  anchors.fill: parent
+  visible: false
+
+  Button
+    id: SearchButton
+    size: 40 20
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-bottom: 35
+    !text: tr('Search')
+    font: small-9px
+    text-offset: 0 -1
+    color: #C0C0C0
+    @onClick:  modules.game_cyclopedia.Cyclopedia.BestiarySearch(self:getText())
+  TextEdit
+    id: SearchEdit
+    size: 130 17
+    anchors.right: SearchButton.left
+    anchors.bottom: SearchButton.bottom
+    margin-bottom: 1
+    placeholder: Type to search
+    placeholder-color: #6E706F
+    font: verdana-11px-monochrome
+    color: #C0C0C0
+    padding-top: 1
+    shader: Map - Party
+    @onTextChange: modules.game_cyclopedia.Cyclopedia.BestiarySearchText(self:getText())
+  UIWidget
+    id: PageValue
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 34
+    size: 50 20
+    text-align: center
+    !text: tr('1 / 1')
+    color: #C2C2C2
+  Button
+    id: NextPageButton
+    size: 20 20
+    anchors.left: PageValue.right
+    anchors.bottom: PageValue.bottom
+    icon-source: /game_cyclopedia/images/icon-right-arrow
+    @onClick: modules.game_cyclopedia.Cyclopedia.changeBestiaryPage(false, true)
+    $pressed:
+      icon-source: /game_cyclopedia/images/icon-right-arrow
+    $disabled:
+      icon-source: /game_cyclopedia/images/icon-right-arrow-disabled
+  Button
+    id: PrevPageButton
+    size: 20 20
+    anchors.right: PageValue.left
+    anchors.bottom: PageValue.bottom
+    icon-source: /game_cyclopedia/images/icon-left-arrow
+    @onClick: modules.game_cyclopedia.Cyclopedia.changeBestiaryPage(true, false)
+    $pressed:
+      icon-source: /game_cyclopedia/images/icon-left-arrow-disabled
+    $disabled:
+      icon-source: /game_cyclopedia/images/icon-left-arrow-disabled
+  UIWidget
+    id: BackPageButton
+    size: 20 20
+    anchors.right: PrevPageButton.left
+    anchors.bottom: PageValue.bottom
+    margin-right: 10
+
+
+    image-source: /game_cyclopedia/images/button_back
+    $pressed:
+      image-source: /game_cyclopedia/images/button_back_pressed
+    $disabled:
+      image-source: /game_cyclopedia/images/button_back_disabled
+  Panel
+    id: ListBase
+    anchors.bottom: SearchButton.top
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    margin-bottom: 5
+    UIScrollArea
+      id: CategoryList
+      anchors.fill: parent
+      padding-left: 5
+      padding-top: 5
+      layout:
+        type: grid
+        cell-size: 127 120
+        cell-spacing: 5
+        flow: true
+    UIScrollArea
+      id: CreatureList
+      anchors.fill: parent
+      padding-left: 5
+      padding-top: 5
+      visible: false
+      layout:
+        type: grid
+        cell-size: 127 120
+        cell-spacing: 5
+        flow: true
+    UIWidget
+      id: CreatureInfo
+      anchors.fill: parent
+      image-source: /images/ui/outfits/minipanel
+      image-border: 20
+      visible: false
+      !text: tr('Creature Name')
+      text-align: top
+      text-offset: 0 4
+      color: #919191
+      UIWidget
+        id: AnimusMastery
+        anchors.top: parent.top
+        anchors.left: parent.left
+
+        margin-top: 18
+        margin-left: 3
+        image-source: /game_cyclopedia/images/indicator_soulcore
+      UIWidget
+        id: LeftBase
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.verticalCenter
+        margin-top: 20
+        margin-left: 5
+        width: 125
+        phantom: true
+        CheckBox
+          id: TrackCheck
+          anchors.bottom: parent.bottom
+          anchors.horizontalCenter: parent.horizontalCenter
+          !text: tr('Track Kills')
+          text-auto-resize: true
+          color: #C7C7C7
+          @onCheckChange: |
+            g_game.sendStatusTrackerBestiary(self.raceId,self:isChecked())
+        UICreature
+          id: Sprite
+          anchors.top: parent.top
+          anchors.horizontalCenter: parent.horizontalCenter
+          margin-top: 30
+          size: 96 96
+      ProgressBackground
+        id: ProgressBorder2
+        anchors.left: LeftBase.right
+        anchors.top: parent.top
+        margin-top: 40
+        margin-left: 80
+        size: 60 14
+      ProgressBackground
+        id: ProgressBorder1
+        anchors.right: ProgressBorder2.left
+        anchors.bottom: ProgressBorder2.bottom
+        margin-right: 2
+        size: 60 14
+      ProgressBackground
+        id: ProgressBorder3
+        anchors.left: ProgressBorder2.right
+        anchors.bottom: ProgressBorder2.bottom
+        margin-left: 2
+        size: 60 14
+      UIWidget
+        id: ProgressBack
+        anchors.left: ProgressBorder1.left
+        anchors.bottom: ProgressBorder2.bottom
+        height: 12
+ 
+        phantom: true
+
+        image-source: /game_cyclopedia/images/bestiary/fill
+      UIWidget
+        id: ProgressBack33
+        anchors.left: ProgressBorder2.left
+        anchors.bottom: ProgressBorder2.bottom
+        height: 12
+
+        phantom: true
+
+        image-source: /game_cyclopedia/images/bestiary/fill
+      UIWidget
+        id: ProgressBack55
+        anchors.left: ProgressBorder3.left
+        anchors.bottom: ProgressBorder2.bottom
+        height: 12
+
+        phantom: true
+
+        image-source: /game_cyclopedia/images/bestiary/fill
+      UIWidget
+
+        anchors.left: ProgressBorder1.right
+        anchors.top: ProgressBorder1.top
+        image-source: /images/ui/progress-separator
+
+        phantom: true
+      UIWidget
+
+        anchors.left: ProgressBorder2.right
+        anchors.top: ProgressBorder1.top
+        image-source: /images/ui/progress-separator
+        phantom: true
+      Label
+        id: ProgressValue
+        anchors.centerIn: ProgressBorder2
+
+        text-auto-resize: true
+        !text: tr('0')
+      Label
+        id: TotalLabel
+        anchors.bottom: ProgressBorder2.top
+        anchors.left: ProgressBorder1.right
+
+        margin-bottom: 2
+        !text: tr('Total Kills')
+        color: #C7C7C7
+      UIWidget
+        id: StarBase
+        anchors.left: ProgressBorder1.left
+        anchors.top: ProgressBorder2.bottom
+        margin-top: 4
+        image-source: /game_cyclopedia/images/boss/icon_star
+        image-repeated: true
+        width: 45
+      UIWidget
+        id: StarFill
+        anchors.left: ProgressBorder1.left
+        anchors.top: StarBase.top
+        image-source: /game_cyclopedia/images/boss/icon_star_active
+        image-repeated: true
+        width: 45
+      UIWidget
+        id: DiamondBase
+        anchors.left: ProgressBorder1.left
+        anchors.top: StarFill.bottom
+        margin-top: 5
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-diamond-inactive
+        image-repeated: true
+        width: 36
+      UIWidget
+        id: DiamondFill
+        anchors.left: ProgressBorder1.left
+        anchors.top: DiamondBase.top
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-diamond-active
+        image-repeated: true
+        width: 36
+      UIWidget
+        id: SubTextLabel
+        anchors.top: DiamondBase.bottom
+        anchors.left: DiamondBase.left
+        margin-top: 5
+        text-auto-resize: true
+ 
+      UIWidget
+        id: BonusIcon
+        anchors.top: SubTextLabel.bottom
+        anchors.left: SubTextLabel.left
+        margin-top: 5
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-bonuspoints
+      Label
+        id: BonusValue
+        anchors.verticalCenter: BonusIcon.verticalCenter
+        anchors.left: BonusIcon.right
+        margin-left: 5
+        text-auto-resize: true
+        !text: tr('?')
+        color: #C7C7C7
+      UIWidget
+        id: CharmBase
+        anchors.bottom: LeftBase.bottom
+        anchors.left: BonusIcon.left
+        image-source: /images/ui/panel_flat
+        image-border: 10
+        size: 45 45
+      Button
+        id: SelectButton
+        size: 70 20
+        anchors.left: CharmBase.right
+        anchors.bottom: CharmBase.bottom
+        margin-left: 5
+        !text: tr('Select')
+        //font: verdana-bold-8px-antialiased
+        text-offset: 0 -1
+        color: #C0C0C0
+      ComboBox
+        id: CharmSelector
+        anchors.left: SelectButton.left
+        anchors.right: ProgressBorder3.right
+        anchors.top: CharmBase.top
+        text-align: center
+        enabled: false
+        @onSetup: |
+          self:addOption("?")
+      UIWidget
+        id: BalanceBase
+        anchors.right: CharmSelector.right
+        anchors.left: SelectButton.right
+        anchors.bottom: SelectButton.bottom
+        height: 20
+        margin-left: 5
+        image-source: /images/ui/item
+        image-border: 10
+        UIWidget
+          id: GoldIcon
+          anchors.right: parent.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-right: 5
+          image-source: /game_cyclopedia/images/icon_gold
+        Label
+          id: GoldBalance
+          anchors.right: GoldIcon.left
+          anchors.verticalCenter: parent.verticalCenter
+          margin-right: 5
+          text-align: right
+          !text: '?'
+      Label
+        id: CharmLabel
+        anchors.bottom: CharmBase.top
+        anchors.left: CharmBase.left
+        margin-bottom: 3
+        text-auto-resize: true
+        !text: tr('Charm Selection:')
+        color: #C7C7C7
+      VerticalSeparator
+        id: IconsSep
+        anchors.horizontalCenter: ProgressBorder2.horizontalCenter
+        anchors.top: ProgressBorder2.bottom
+        anchors.bottom: CharmLabel.top
+        margin-top: 3
+        margin-left: 20
+      UIWidget
+        id: Icon1
+        anchors.top: IconsSep.top
+        anchors.left: IconsSep.right
+        margin-top: 2
+        margin-left: 5
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-hitpoints
+      Label
+        id: Value1
+        anchors.verticalCenter: Icon1.verticalCenter
+        anchors.left: Icon1.right
+        margin-left: 5
+        margin-bottom: 1
+        text-auto-resize: true
+        !text: tr('?')
+        color: #C7C7C7
+      UIWidget
+        id: Icon2
+        anchors.top: Icon1.bottom
+        anchors.left: IconsSep.right
+        margin-top: 7
+        margin-left: 5
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-experience
+      Label
+        id: Value2
+        anchors.verticalCenter: Icon2.verticalCenter
+        anchors.left: Icon2.right
+        margin-left: 5
+        margin-bottom: 1
+        text-auto-resize: true
+        !text: tr('?')
+        color: #C7C7C7
+      UIWidget
+        id: Icon3
+        anchors.top: Icon2.bottom
+        anchors.left: IconsSep.right
+        margin-top: 7
+        margin-left: 5
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-speed
+      Label
+        id: Value3
+        anchors.verticalCenter: Icon3.verticalCenter
+        anchors.left: Icon3.right
+        margin-left: 5
+        margin-bottom: 1
+        text-auto-resize: true
+        !text: tr('?')
+        color: #C7C7C7
+      UIWidget
+        id: Icon4
+        anchors.top: Icon3.bottom
+        anchors.left: IconsSep.right
+        margin-top: 7
+        margin-left: 5
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-armor
+      Label
+        id: Value4
+        anchors.verticalCenter: Icon4.verticalCenter
+        anchors.left: Icon4.right
+        margin-left: 5
+        margin-bottom: 1
+        text-auto-resize: true
+        !text: tr('?')
+        color: #C7C7C7
+      UIWidget
+        id: Icon5
+        anchors.top: Icon4.bottom
+        anchors.left: IconsSep.right
+        margin-top: 7
+        margin-left: 5
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-mitigation
+      Label
+        id: Value5
+        anchors.verticalCenter: Icon5.verticalCenter
+        anchors.left: Icon5.right
+        margin-left: 5
+        margin-bottom: 1
+        text-auto-resize: true
+        !text: tr('?')
+        color: #C7C7C7
+      UIWidget
+        id: LocationField
+        anchors.left: BalanceBase.right
+        anchors.bottom: BalanceBase.bottom
+        anchors.right: parent.right
+        height: 100
+        image-source: /images/ui/textedit
+        image-border: 10
+        margin-left: 10
+        margin-right: 5
+        ScrollablePanel
+          id: Textlist
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: parent.left
+          anchors.right: parent.right
+          margin-top: 5
+          margin-bottom: 5
+          margin-left: 5
+          margin-right: 20
+          padding-left: 1
+          vertical-scrollbar: TextlistScrollBar
+          layout: verticalBox
+          UIWidget
+            id: Text
+            text-auto-resize: true
+            text-align: left
+            text-wrap: true
+            !text: '?'
+            color: #C7C7C7
+        VerticalScrollBar
+          id: TextlistScrollBar
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.right: parent.right
+          margin-right: 2
+          margin-top: 2
+          margin-bottom: 2
+          step: 37
+          pixels-scroll: true
+      Label
+        id: LocationLabel
+        anchors.left: LocationField.left
+        anchors.bottom: LocationField.top
+        margin-bottom: 3
+        text-auto-resize: true
+        !text: tr('Location(s)') .. ':'
+        color: #C7C7C7
+      UIWidget
+        id: PhysicalResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-physical-resist
+        anchors.left: ProgressBorder3.right
+        anchors.top: parent.top
+        margin-top: 35
+        margin-left: 10
+      BestiaryResistProgress
+        id: PhysicalProgress
+        anchors.left: PhysicalResist.right
+        anchors.bottom: PhysicalResist.bottom
+        margin-left: 5
+      UIWidget
+        id: EarthResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-earth-resist
+        anchors.left: PhysicalProgress.right
+        anchors.top: PhysicalResist.top
+        margin-left: 5
+      BestiaryResistProgress
+        id: EarthProgress
+        anchors.left: EarthResist.right
+        anchors.bottom: EarthResist.bottom
+        margin-left: 5
+      UIWidget
+        id: FireResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-fire-resist
+        anchors.left: EarthProgress.right
+        anchors.top: PhysicalResist.top
+        margin-left: 5
+      BestiaryResistProgress
+        id: FireProgress
+        anchors.left: FireResist.right
+        anchors.bottom: FireResist.bottom
+        margin-left: 5
+      UIWidget
+        id: DeathResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-death-resist
+        anchors.left: FireProgress.right
+        anchors.top: PhysicalResist.top
+        margin-left: 5
+      BestiaryResistProgress
+        id: DeathProgress
+        anchors.left: DeathResist.right
+        anchors.bottom: DeathResist.bottom
+        margin-left: 5
+      UIWidget
+        id: EnergyResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-energy-resist
+        anchors.left: ProgressBorder3.right
+        anchors.top: PhysicalResist.bottom
+        margin-top: 10
+        margin-left: 10
+      BestiaryResistProgress
+        id: EnergyProgress
+        anchors.left: EnergyResist.right
+        anchors.bottom: EnergyResist.bottom
+        margin-left: 5
+        
+        
+      UIWidget
+        id: HolyResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-holy-resist
+        anchors.left: EnergyProgress.right
+        anchors.top: EnergyResist.top
+        margin-left: 5
+      BestiaryResistProgress
+        id: HolyProgress
+        anchors.left: HolyResist.right
+        anchors.bottom: HolyResist.bottom
+        margin-left: 5
+      UIWidget
+        id: IceResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-ice-resist
+        anchors.left: HolyProgress.right
+        anchors.top: EnergyResist.top
+        margin-left: 5
+      BestiaryResistProgress
+        id: IceProgress
+        anchors.left: IceResist.right
+        anchors.bottom: IceResist.bottom
+        margin-left: 5
+      UIWidget
+        id: HealingResist
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-healing-resist
+        anchors.left: IceProgress.right
+        anchors.top: EnergyResist.top
+        margin-left: 5
+      BestiaryResistProgress
+        id: HealingProgress
+        anchors.left: HealingResist.right
+        anchors.bottom: HealingResist.bottom
+        margin-left: 5
+      UIWidget
+        id: ItemsBase
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: LeftBase.bottom
+        anchors.bottom: parent.bottom
+        margin-top: 5
+        margin-bottom: 5
+        margin-left: 5
+        margin-right: 5
+        image-source: /game_cyclopedia/images/panel_flat
+        image-border: 10
+        UIScrollArea
+          id: Itemlist
+          anchors.fill: parent
+          margin-bottom: 5
+          margin-left: 5
+          margin-right: 20
+          padding-top: 5
+          auto-focus: first
+          vertical-scrollbar: ItemlistScrollBar
+          layout: verticalBox
+        VerticalScrollBar
+          id: ItemlistScrollBar
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.right: parent.right
+          margin-right: 2
+          margin-top: 2
+          margin-bottom: 2
+          step: 37
+          pixels-scroll: true
+
+
+
+
+

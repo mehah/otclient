@@ -11,11 +11,10 @@ function UIMessageBox.create(title, okCallback, cancelCallback)
     return calendar
 end
 
-
 function UIMessageBox.display(title, message, buttons, onEnterCallback, onEscapeCallback)
     local staticSizes = {
         width = {
-            max = 616,
+            max = 916,
             min = 116
         },
         height = {
@@ -161,8 +160,14 @@ function UIMessageBox.displaySHOP(title, message,description,data, buttons, onEn
 
     messageBox.content = messageBox:getChildById('content')
     messageBox.content:setText(message)
-    messageBox.additionalLabel:setText(description)
+    messageBox.content:setTextAutoResize(true)
+    messageBox.content:setTextWrap(true)
+    messageBox.content:setTextAlign(AlignCenter)
 
+    messageBox.additionalLabel:setText(description)
+    messageBox.additionalLabel:setTextWrap(true)
+    messageBox.additionalLabel:setTextAlign(AlignCenter)
+	
     if data then
         local VALOR = data.VALOR
         local ID = data.ID
@@ -170,14 +175,17 @@ function UIMessageBox.displaySHOP(title, message,description,data, buttons, onEn
             local itemWidget = g_ui.createWidget('Item', messageBox.Box)
             itemWidget:setId(ID)
             itemWidget:setItemId(ID)
-        
+            itemWidget:fill('parent')
+            itemWidget:setVirtual(true)
         elseif VALOR == "icon" then
             local widget = g_ui.createWidget('UIWidget', messageBox.Box)
             widget:setImageSource("/game_store/images/64/" .. ID)
+            widget:fill('parent')
         elseif VALOR == "mountId" or VALOR == "outfitId" or VALOR == "maleOutfitId" or VALOR == "outfitId" then
             local creature = g_ui.createWidget('Creature', messageBox.Box)
             creature:setOutfit({ type = ID })
             creature:getCreature():setStaticWalking(1000)
+            creature:fill('parent')
         end
     end
 

@@ -45,6 +45,7 @@ Module
     - game_blessing
     - game_store
     - game_quickloot
-
+    - game_cyclopedia
+    
   @onLoad: init()
   @onUnload: terminate()
