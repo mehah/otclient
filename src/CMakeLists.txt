@@ -193,8 +193,8 @@ find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
 if(WASM)
-find_package(absl REQUIRED)
-find_package(utf8_range REQUIRED)
+	find_package(absl REQUIRED)
+	find_package(utf8_range REQUIRED)
 endif()
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
@@ -223,9 +223,9 @@ if(TOGGLE_DIRECTX)
 	find_package(DirectX REQUIRED)
 endif()
 if(TOGGLE_FRAMEWORK_SOUND)
-if(NOT WASM)
-	find_package(OpenAL CONFIG REQUIRED)
-endif(NOT WASM)
+	if(NOT WASM)
+		find_package(OpenAL CONFIG REQUIRED)
+	endif()
 	find_package(VorbisFile REQUIRED)
 	find_package(Vorbis CONFIG REQUIRED)
 	find_package(Ogg CONFIG REQUIRED)
@@ -241,13 +241,13 @@ if(ANDROID)
 	find_package(EGL REQUIRED)
 else()
 	if(NOT WASM)
-	find_package(OpenGL REQUIRED)
-	find_package(GLEW REQUIRED)
-	find_package(LuaJIT REQUIRED)
-	else(NOT WASM)
-		set(LUA_LIBRARY ${LUA_LIBRARY} "${CMAKE_SOURCE_DIR}/browser/include/lua51/liblua.a")
-		set(BROWSER_INCLUDE_DIR ${BROWSER_INCLUDE_DIR} "../browser/include")
-	endif(NOT WASM)
+		find_package(OpenGL REQUIRED)
+		find_package(GLEW REQUIRED)
+		find_package(LuaJIT REQUIRED)
+	else()
+		set(LUA_LIBRARY ${LUA_LIBRARY} ${CMAKE_SOURCE_DIR}/browser/include/lua51/liblua.a)
+		set(BROWSER_INCLUDE_DIR ${BROWSER_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/browser/include)
+	endif()
 endif()
 
 # *****************************************************************************
@@ -278,7 +278,6 @@ set(SOURCE_FILES
 	framework/luaengine/luavaluecasts.cpp
 	framework/luafunctions.cpp
 	framework/net/connection.cpp
-	framework/net/webconnection.cpp
 	framework/net/inputmessage.cpp
 	framework/net/outputmessage.cpp
 	framework/net/protocol.cpp
@@ -299,7 +298,6 @@ set(SOURCE_FILES
 	framework/platform/platformwindow.cpp
 	framework/platform/unixcrashhandler.cpp
 	framework/platform/unixplatform.cpp
-	framework/platform/browserplatform.cpp
 	framework/platform/win32crashhandler.cpp
 	framework/platform/win32platform.cpp
 	framework/stdext/demangle.cpp
@@ -399,7 +397,6 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
 		framework/graphics/shadermanager.cpp
 		framework/platform/win32window.cpp
 		framework/platform/x11window.cpp
-		framework/platform/browserwindow.cpp
 		framework/ui/uianchorlayout.cpp
 		framework/ui/uiboxlayout.cpp
 		framework/ui/uigridlayout.cpp
@@ -431,6 +428,15 @@ if (TOGGLE_FRAMEWORK_SOUND)
 		framework/sound/soundeffect.cpp
 	)
 endif()
+
+if (WASM)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		framework/platform/browserplatform.cpp
+		framework/platform/browserwindow.cpp
+		framework/net/webconnection.cpp
+	)
+endif()
+
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
@@ -551,7 +557,7 @@ elseif(ANDROID)
 	)
 
 elseif(WASM)
-target_include_directories(${PROJECT_NAME}
+  target_include_directories(${PROJECT_NAME}
 		PRIVATE
 		${CMAKE_SOURCE_DIR}/src
 		${CMAKE_THREAD_LIBS_INIT}
@@ -778,6 +784,7 @@ else() # Linux
 				-Wall -Wextra -Wpedantic
 		)
 	endif()
+
 endif()
 
 # *****************************************************************************
