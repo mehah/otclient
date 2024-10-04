@@ -27,7 +27,7 @@
 #include "browserwindow.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
-#include <base64/base64.h>
+#include <framework/util/crypt.h>
 
 BrowserWindow& g_browserWindow = (BrowserWindow&)g_window;
 
@@ -230,7 +230,7 @@ void BrowserWindow::poll() {
             return EM_TRUE;
         }));
 
-        MAIN_THREAD_EM_ASM({
+        MAIN_THREAD_ASYNC_EM_ASM({
             document.addEventListener("paste", function(event){
                 Module["ccall"]("paste_return", "number",["string", "number"],[event.clipboardData.getData("text/plain"), $0]);
             });
@@ -408,8 +408,7 @@ int BrowserWindow::loadMouseCursor(const std::string& file, const Point& hotSpot
     const auto& path = g_resources.guessFilePath(file, "png");
     std::stringstream fin;
     g_resources.readFileStream(path, fin);
-    std::string base64Image;
-    Base64::Encode(fin.str(), &base64Image);
+    std::string base64Image = g_crypt.base64Encode(fin.str());
     std::string cursor = "url(data:image/png;base64," + base64Image + ") " + std::to_string(hotSpot.x) + " " + std::to_string(hotSpot.y) + ", auto";
 
     m_cursors.push_back(cursor);
