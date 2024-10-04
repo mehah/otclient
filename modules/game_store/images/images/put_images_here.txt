@@ -1,0 +1,21 @@
+if you want to use the local version download this and put it in the folder ‘game_store/images’.
+https://www.dropbox.com/s/5b00ubu1erapu9q/store.zip?dl=1
+
+|-- Client
+    |-- mods
+    |-- client.exe
+    |-- data
+    `-- modules
+        |-- ...
+        `-- game_store
+           `-- images
+                |-- 13
+                |-- 32
+                |-- 64
+                `-- home
+
+
+if you want to use the http version
+uncomment "IMAGES_URL" in  GameStore.website (\modules\game_store\game_store.lua) , and follow this guide 
+https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
+

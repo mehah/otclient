@@ -39,3 +39,4 @@
 #include "string.h"
 #include "time.h"
 #include "qrcodegen.h"
+#include "thread.h"

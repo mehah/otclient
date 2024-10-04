@@ -82,11 +82,7 @@ bool ThingTypeManager::loadDat(std::string file)
         file = g_resources.guessFilePath(file, "dat");
 
         const auto& fin = g_resources.openFile(file);
-        fin->cache();
-
-#if ENABLE_ENCRYPTION == 1
-        ResourceManager::decrypt(fin->m_data.data(), fin->m_data.size());
-#endif
+        fin->cache(true);
 
         m_datSignature = fin->getU32();
         m_contentRevision = static_cast<uint16_t>(m_datSignature);

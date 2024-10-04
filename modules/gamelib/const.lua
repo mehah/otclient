@@ -200,6 +200,8 @@ GameNegativeOffset = 116
 GameItemTooltipV8 = 117 
 GameWingsAurasEffectsShader = 118
 GameForgeConvergence = 119
+GameAllowCustomBotScripts = 120
+GameColorizedLootValue = 121
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
@@ -406,6 +408,21 @@ ResourceTypes = {
     COIN_TRANSFERRABLE = 91,
     COIN_AUCTION = 92,
     COIN_TOURNAMENT = 93
+};
+
+CyclopediaCharacterInfoTypes = {
+    BaseInformation = 0,
+    GeneralStats = 1,
+    CombatStats = 2,
+    RecentDeaths = 3,
+    RecentPVPKills = 4,
+    Achievements = 5,
+    ItemSummary = 6,
+    OutfitsAndMounts = 7,
+    StoreSummary = 8,
+    Ispection = 9,
+    Badges = 10,
+    Titles = 11
 };
 
 -- @}
