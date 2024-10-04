@@ -194,7 +194,6 @@ MainInventoryItem < UIWidget
       id: Duration
       anchors.fill: parent
       phantom: true
-      virtual: true
     UIWidget
       id: tier
       size: 10 9
