@@ -365,6 +365,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "requestBless", &Game::requestBless, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestQuickLootBlackWhiteList", &Game::requestQuickLootBlackWhiteList, &g_game);
     g_lua.bindSingletonFunction("g_game", "openContainerQuickLoot", &Game::openContainerQuickLoot, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendGmTeleport", &Game::sendGmTeleport, &g_game);
     g_lua.bindSingletonFunction("g_game", "inspectionNormalObject", &Game::inspectionNormalObject, &g_game);
     g_lua.bindSingletonFunction("g_game", "inspectionObject", &Game::inspectionObject, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestBestiary", &Game::requestBestiary, &g_game);

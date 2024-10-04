@@ -179,6 +179,7 @@ confirmarSHOP < UIMessageBox
     text-auto-resize: true
     color: #c0c0c0ff
     margin-top: 32
+    text-align: center
 
   Label
 
@@ -210,6 +211,7 @@ confirmarSHOP < UIMessageBox
       image-source:  /game_store/images/close
       anchors.fill: parent
       phantom: true
+      image-smooth: false
 
   HorizontalSeparator
     anchors.left: Box.left

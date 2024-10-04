@@ -201,6 +201,7 @@ GameItemTooltipV8 = 117
 GameWingsAurasEffectsShader = 118
 GameForgeConvergence = 119
 GameAllowCustomBotScripts = 120
+GameColorizedLootValue = 121
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'

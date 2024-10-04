@@ -588,7 +588,7 @@ if true then
         guild = guild .. "..."
       end
       local voc = "?"
-      if text:lower():find("sorcerer") then
+      if text:lower():find("sorcerer") or text:lower():find("mage") then
         voc = "MS"
       elseif text:lower():find("druid") then
         voc = "ED"
