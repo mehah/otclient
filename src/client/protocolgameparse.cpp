@@ -1369,10 +1369,11 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     }
 
     const uint8_t itemCount = msg->getU8();
-    std::vector<ItemPtr> items(itemCount);
+    std::vector<ItemPtr> items;
+    items.reserve(itemCount);
 
     for (auto i = 0; i < itemCount; i++) {
-        items[i] = getItem(msg);
+        items.push_back(getItem(msg));
     }
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
@@ -1556,9 +1557,10 @@ void ProtocolGame::parseOwnTrade(const InputMessagePtr& msg)
 
     const uint8_t count = msg->getU8();
     std::vector<ItemPtr> items;
+    items.reserve(count);
 
     for (auto i = 0; i < count; i++) {
-        items[i] = getItem(msg);
+        items.push_back(getItem(msg));
     }
 
     g_game.processOwnTrade(name, items);
@@ -1570,9 +1572,10 @@ void ProtocolGame::parseCounterTrade(const InputMessagePtr& msg)
 
     const uint8_t count = msg->getU8();
     std::vector<ItemPtr> items;
+    items.reserve(count);
 
     for (auto i = 0; i < count; i++) {
-        items[i] = getItem(msg);
+        items.push_back(getItem(msg));
     }
 
     g_game.processCounterTrade(name, items);
@@ -4779,6 +4782,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
 
     const uint32_t neededItemsListCount = msg->getU32();
     std::vector<ItemPtr> neededItemsList;
+    neededItemsList.reserve(neededItemsListCount);
 
     for (uint32_t i = 0; i < neededItemsListCount; ++i) {
         const uint16_t needItemId = msg->getU16();
