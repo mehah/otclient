@@ -192,7 +192,8 @@ MainInventoryItem < UIWidget
 	
     Label
       id: Duration
-      anchors.fill: parent
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
       phantom: true
     UIWidget
       id: tier
