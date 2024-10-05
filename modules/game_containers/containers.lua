@@ -51,6 +51,8 @@ function refreshContainerItems(container)
     for slot = 0, container:getCapacity() - 1 do
         local itemWidget = container.itemsPanel:getChildById('item' .. slot)
         itemWidget:setItem(container:getItem(slot))
+        ItemsDatabase.setRarityItem(itemWidget, container:getItem(slot))
+        ItemsDatabase.setTier(itemWidget, container:getItem(slot))
     end
 
     if container:hasPages() then
