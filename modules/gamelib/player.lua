@@ -164,7 +164,7 @@ function Player:hasState(state, states)
             break
         end
 
-        local states = Bit.operation(states, pow, Bit.AND)
+        local states = bit.band(states, pow)
         if states == state then
             return true
         end

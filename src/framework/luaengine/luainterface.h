@@ -35,8 +35,8 @@ extern "C" {
 #include <lua51/lua.h>
 #include <lua51/lualib.h>
 #include <lua51/lauxlib.h>
-#define LUAJIT_VERSION = "LUA 5.1"
 }
+#define LUAJIT_VERSION = "LUA 5.1"
 #else
 #error "Cannot detect luajit library"
 #endif
