@@ -1264,6 +1264,7 @@ void Game::editVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t g
 {
     if (!canPerformGameAction())
         return;
+
     m_protocolGame->sendEditVipGroups(action, groupId, groupName);
 }
 
