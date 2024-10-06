@@ -67,6 +67,7 @@ function controllerVip:onGameStart()
     end
     if not g_game.getFeature(GameVipGroups) then
         vipWindow.miniborder:hide()
+        globalSettings.showGrouped = false
     else
         vipInfo = {}
     end
