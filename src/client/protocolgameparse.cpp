@@ -2672,6 +2672,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     uint32_t iconId = 0;
     std::string desc;
     bool notifyLogin = false;
+    std::vector<uint8_t> groupIDs;
 
     const uint32_t id = msg->getU32();
     const auto& name = g_game.formatCreatureName(msg->getString());
@@ -2682,15 +2683,16 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     }
 
     const uint32_t status = msg->getU8();
-
     if (g_game.getFeature(Otc::GameVipGroups)) {
         const uint8_t vipGroupSize = msg->getU8();
+        groupIDs.reserve(vipGroupSize);
         for (auto i = 0; i < vipGroupSize; ++i) {
-            msg->getU8(); // Group ID
+            const uint8_t groupID = msg->getU8();
+            groupIDs.push_back(groupID);
         }
     }
 
-    g_game.processVipAdd(id, name, status, desc, iconId, notifyLogin);
+    g_game.processVipAdd(id, name, status, desc, iconId, notifyLogin, groupIDs);
 }
 
 void ProtocolGame::parseVipState(const InputMessagePtr& msg)
@@ -2706,12 +2708,15 @@ void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
     // On QT client this operation is being processed on the 'parseVipState', now this opcode if for groups
     if (g_game.getFeature(Otc::GameVipGroups)) {
         const uint8_t vipGroupSize = msg->getU8();
+        std::vector<std::tuple<uint8_t, std::string, bool>> vipGroups;
         for (auto i = 0; i < vipGroupSize; ++i) {
-            msg->getU8(); // Group ID
-            msg->getString(); // Group name
-            msg->getU8(); // Can edit group? (bool)
+            const uint8_t groupId = msg->getU8();
+            const auto& groupName = msg->getString();
+            const bool canEditGroup = static_cast<bool>(msg->getU8());
+            vipGroups.emplace_back(groupId, groupName, canEditGroup);
         }
-        msg->getU8(); // Groups amount left
+        const uint8_t groupsAmountLeft = msg->getU8();
+        g_game.processVipGroupChange(vipGroups, groupsAmountLeft);
     } else {
         const uint32_t id = msg->getU32();
         g_game.processVipStateChange(id, 0);
