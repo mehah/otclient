@@ -88,12 +88,14 @@ public:
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
     void setTooltip(const std::string& str) { m_tooltip = str; }
     void setDurationTime(const uint32_t durationTime) { m_durationTime = durationTime; }
+    void setTier(const uint8_t tier) { m_tier = tier; }
 
     int getCountOrSubType() { return m_countOrSubType; }
     int getSubType();
     int getCount() { return isStackable() ? m_countOrSubType : 1; }
     std::string getTooltip() { return m_tooltip; }
     uint32_t getDurationTime() { return m_durationTime; }
+    uint8_t getTier() { return m_tier; }
 
     bool isValid() { return getThingType() != nullptr; }
 
@@ -160,6 +162,7 @@ private:
 
     uint16_t m_countOrSubType{ 0 };
     uint32_t m_durationTime{ 0 };
+    uint8_t m_tier{ 0 };
 
     Color m_color{ Color::white };
 
