@@ -779,4 +779,12 @@ namespace Otc
         STATE_SALE = 2,
         STATE_TIMED = 3
     };
+
+    enum GroupsEditInfoType_t : uint8_t
+    {
+        VIP_GROUP_NONE = 0,
+        VIP_GROUP_ADD = 1,
+        VIP_GROUP_EDIT = 2,
+        VIP_GROUP_REMOVE = 3,
+    };
 }

@@ -1,3 +1,10 @@
+VipGroupBox < CheckBox
+  !text: tr('Empty')
+  color: #f4ecec
+  text-offset: 15 -1
+  $hover !disabled:
+    color: #9a9999
+  
 IconButton < CheckBox
   size: 20 20
   image-source: /images/game/viplist/vipcheckbox
@@ -27,7 +34,7 @@ IconButton < CheckBox
 
 MainWindow
   size: 272 170
-  !text: tr('Edit VIP list entry')
+  !text: tr('Edit VIP')
 
   Label
     id: nameLabel
@@ -36,7 +43,11 @@ MainWindow
     anchors.left: parent.left
     color: green
     width: 180
-
+  HorizontalSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: prev.bottom
+    margin-bottom: -5
   Label
     !text: tr('Description') .. ':'
     anchors.top: prev.bottom
@@ -44,14 +55,22 @@ MainWindow
     text-offset: 0 3
     height: 20
     margin-top: 5
-
+    @onSetup: |
+      if g_game.getFeature(GameVipGroups) then
+        self:hide()
+        self:setHeight(0)
+      end
   TextEdit
     id: descriptionText
     anchors.top: prev.top
     anchors.left: prev.right
     anchors.right: parent.right
     margin: 0 5
-
+    @onSetup: |
+      if g_game.getFeature(GameVipGroups) then
+        self:hide()
+        self:setHeight(0)
+      end
   Label
     !text: tr('Notify-Login') .. ':'
     anchors.top: prev.bottom
@@ -59,12 +78,21 @@ MainWindow
     text-offset: 0 3
     height: 20
     margin-top: 5
-
+    @onSetup: |
+      if g_game.getFeature(GameVipGroups) then
+        self:hide()
+        self:setHeight(0)
+      end
   CheckBox
     id: checkBoxNotify
     anchors.top: prev.top
     anchors.left: prev.right
     margin: 2 6
+    @onSetup: |
+      if g_game.getFeature(GameVipGroups) then
+        self:hide()
+        self:setHeight(0)
+      end
 
   UIWidget
     layout: horizontalBox
@@ -115,12 +143,98 @@ MainWindow
     IconButton
       id: icon10
       icon-clip: 120 0 12 12
+  
+  Label
+    text: Enter a short description:
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-left: -1
+    margin-top: 10
+    text-auto-resize: true
+    @onSetup: |
+      if not g_game.getFeature(GameVipGroups) then
+        self:hide()
+      end
+
+  TextEdit
+    id: descriptionText
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    anchors.right: parent.right
+    height: 50
+    margin-top: 5
+    margin-left: 1
+    multiline: true
+    text-wrap: true
+    @onSetup: |
+      if not g_game.getFeature(GameVipGroups) then
+        self:hide()
+      end
+  SmallReversedQtPanel
+    size: 244 22
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    anchors.right: parent.right
+    margin-top: 11
+    @onSetup: |
+      if not g_game.getFeature(GameVipGroups) then
+        self:hide()
+      end
+    OptionCheckBox
+      id: checkBoxNotify
+      !text: tr('Notify on login')
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      text-auto-resize: true
+
+
+  HorizontalSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 11
+    @onSetup: |
+      if not g_game.getFeature(GameVipGroups) then
+        self:hide()
+      end
+  Label
+    !text: tr('Member of the following groups:')
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    margin-left: -1
+    text-auto-resize: true
+    @onSetup: |
+      if not g_game.getFeature(GameVipGroups) then
+        self:hide()
+      end
+  Panel
+    id: groups
+    width: 253
+
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    anchors.bottom: next.top
+    margin-top: 6
+    margin-bottom: 11
+    @onSetup: |
+      if not g_game.getFeature(GameVipGroups) then
+        self:hide()
+      end
+    layout:
+      type: grid
+      cell-spacing: 3
+      cell-size: 241 12
+      num-columns: 1
 
   HorizontalSeparator
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: next.top
-    margin-bottom: 10
+    margin-bottom: 5
 
   Button
     id: buttonOK
