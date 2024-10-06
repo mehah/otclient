@@ -2672,7 +2672,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     uint32_t iconId = 0;
     std::string desc;
     bool notifyLogin = false;
-    uint8_t groupID = 0;
+    std::vector<uint8_t> groupIDs;
 
     const uint32_t id = msg->getU32();
     const auto& name = g_game.formatCreatureName(msg->getString());
@@ -2683,7 +2683,6 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     }
 
     const uint32_t status = msg->getU8();
-    std::vector<uint8_t> groupIDs;
     if (g_game.getFeature(Otc::GameVipGroups)) {
         const uint8_t vipGroupSize = msg->getU8();
         groupIDs.reserve(vipGroupSize);
