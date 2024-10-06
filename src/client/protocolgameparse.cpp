@@ -2687,7 +2687,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
         const uint8_t vipGroupSize = msg->getU8();
         groupIDs.reserve(vipGroupSize);
         for (auto i = 0; i < vipGroupSize; ++i) {
-            uint8_t groupID = msg->getU8();
+            const uint8_t groupID = msg->getU8();
             groupIDs.push_back(groupID);
         }
     }
