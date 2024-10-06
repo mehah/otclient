@@ -33,9 +33,9 @@ function controllerVip:onInit()
 
     local settings = g_settings.getNode('VipList')
     if settings then
-        globalSettings.showGrouped = settings['Grouped'] or false
-        globalSettings.hideOfflineVips = settings['OfflineVips'] or false
-        globalSettings.vipSortOrder = {}
+       globalSettings.showGrouped = settings['Grouped'] or false
+       globalSettings.hideOfflineVips = settings['OfflineVips'] or false
+       globalSettings.vipSortOrder = {}
        if settings['vipSortOrder'] then
            for k, v in pairs(settings['vipSortOrder']) do
                globalSettings.vipSortOrder[tonumber(k)] = v
