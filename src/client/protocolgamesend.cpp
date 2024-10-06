@@ -851,7 +851,7 @@ void ProtocolGame::sendEditVipGroups(const Otc::GroupsEditInfoType_t action, con
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientEditVipGroups);
-    msg->addU8(action);
+    msg->addU8(static_cast<uint8_t>(action));
     switch (action) {
         case Otc::VIP_GROUP_ADD: { 
             msg->addString(groupName); 
