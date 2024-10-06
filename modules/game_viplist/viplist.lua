@@ -87,6 +87,14 @@ function controllerVip:onGameEnd()
 
     vipWindow:setParent(nil, true)
     clear()
+    if editVipWindow then
+        editVipWindow:destroy()
+        editVipWindow = nil
+    end
+    if addGroupWindow then
+        addGroupWindow:destroy()
+        addGroupWindow = nil
+    end
 end
 
 function loadVipInfo()
@@ -207,6 +215,9 @@ function createEditWindow(widget)
     for i = VipIconFirst, VipIconLast do
         iconRadioGroup:addWidget(editVipWindow:recursiveGetChildById('icon' .. i))
     end
+    if not widget.iconId then
+        widget.iconId = 0
+    end
     iconRadioGroup:selectWidget(editVipWindow:recursiveGetChildById('icon' .. widget.iconId))
 
     local cancelFunction = function()
@@ -226,6 +237,9 @@ function createEditWindow(widget)
         local state = widget.vipState
         local description = descriptionText:getText()
         local iconId = tonumber(iconRadioGroup:getSelectedWidget():getId():sub(5))
+        if not iconId then
+            iconId = 0
+        end
         local notify = notifyCheckBox:isChecked()
         local groups = {}
         for _, child in pairs(editVipWindow.groups:getChildren()) do
@@ -383,16 +397,22 @@ end
 function compareVips(a, b)
     for _, orderType in ipairs(globalSettings.vipSortOrder) do
         if orderType == 'byState' or orderType == 'status' then
-            if a.vipState ~= b.vipState then
-                return a.vipState > b.vipState
+            if a.vipState ~= nil and b.vipState ~= nil then
+                if a.vipState ~= b.vipState then
+                    return a.vipState > b.vipState
+                end
             end
         elseif orderType == 'byName' or orderType == 'name' then
-            if a:getText():lower() ~= b:getText():lower() then
-                return a:getText():lower() < b:getText():lower()
+            if a:getText() ~= nil and b:getText() ~= nil then
+                if a:getText():lower() ~= b:getText():lower() then
+                    return a:getText():lower() < b:getText():lower()
+                end
             end
         elseif orderType == 'byType' or orderType == 'type' then
-            if a.iconId ~= b.iconId then
-                return a.iconId > b.iconId
+            if a.iconId ~= nil and b.iconId ~= nil then
+                if a.iconId ~= b.iconId then
+                    return a.iconId > b.iconId
+                end
             end
         end
     end
@@ -887,7 +907,7 @@ function setVipState(widget, vipState)
     elseif vipState == VipState.Offline then
         widget:setColor('#f75f5f')
     elseif vipState == VipState.Training then
-        widget:setColor('#9966CC')
+        widget:setColor('#f75f5f')
     end
 end
 
