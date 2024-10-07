@@ -67,9 +67,22 @@
       tabindex="0"
     ></canvas>
     <script type="text/javascript">
+      var canvas = document.getElementById("canvas");
       function startGame() {
         document.getElementById("start").style.display = "none";
         callMain();
+        document.addEventListener("keyup", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        document.addEventListener("keydown", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+
+          if (!ev.ctrlKey && !ev.altKey && !ev.shiftKey && ev.key !== "Enter" && ev.key !== "Escape" && ev.key !== "Backspace" && ev.key !== "ArrowLeft" && ev.key !== "ArrowRight" && ev.key !== "ArrowUp" && ev.key !== "ArrowDown") {
+            canvas.dispatchEvent(new KeyboardEvent("keypress", ev));
+          }
+        });
       }
       var Module = {
         locateFile: function (path) {
@@ -118,7 +131,7 @@
           console.log("status: " + text);
           display = "";
           if (text.includes("Running...")) {
-            display = "Loading...";            
+            display = "Loading...";
             document.getElementById("start").style.display = "block";
           } else if (text.includes("Downloading data...")) {
             var matches = text.match(/\((.*?)\)/);

@@ -300,20 +300,11 @@ end
 
 function loadDefautComboKeys()
     if not defaultComboKeys then
-        if g_platform.isBrowser() then
-            for i = 0, 9 do
-                addKeyCombo('Ctrl+' .. i)
-            end
-            for i = 0, 9 do
-                addKeyCombo('Shift+' .. i)
-            end
-        else
-            for i = 1, 12 do
-                addKeyCombo('F' .. i)
-            end
-            for i = 1, 4 do
-                addKeyCombo('Shift+F' .. i)
-            end
+        for i = 1, 12 do
+            addKeyCombo('F' .. i)
+        end
+        for i = 1, 4 do
+            addKeyCombo('Shift+F' .. i)
         end
     else
         for keyCombo, keySettings in pairs(defaultComboKeys) do

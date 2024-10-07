@@ -148,9 +148,9 @@ void BrowserWindow::terminate() {
     emscripten_set_mousedown_callback("#canvas", this, EM_TRUE, nullptr);
     emscripten_set_wheel_callback("#canvas", this, EM_TRUE, nullptr);
     emscripten_set_mousemove_callback("#canvas", this, EM_TRUE, nullptr);
-    emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
-    emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
-    emscripten_set_keypress_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
+    emscripten_set_keydown_callback("#canvas", this, EM_TRUE, nullptr);
+    emscripten_set_keyup_callback("#canvas", this, EM_TRUE, nullptr);
+    emscripten_set_keypress_callback("#canvas", this, EM_TRUE, nullptr);
     emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
     emscripten_set_focus_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
     emscripten_set_blur_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
