@@ -32,15 +32,16 @@
 #include <asio/read_until.hpp>
 #include <framework/core/eventdispatcher.h>
 
+#include <emscripten/threading.h>
+
+
 
 asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> WebConnection::m_outputStreams;
 WebConnection::WebConnection() :
     m_readTimer(g_ioService),
-    m_readRetryTimer(g_ioService),
     m_writeTimer(g_ioService)
 {
-    mWebSocket = 0;
 }
 
 WebConnection::~WebConnection()
@@ -70,9 +71,8 @@ void WebConnection::close()
     if (!m_connected && !m_connecting)
         return;
 
-    // flush send data before disconnecting on clean connections
-    // if (m_connected && !m_error && m_outputStream)
-    //     internal_write();
+    if (m_port != WEBPORT)
+        return;
 
     m_connecting = false;
     m_connected = false;
@@ -81,43 +81,33 @@ void WebConnection::close()
     m_recvCallback = nullptr;
 
     m_readTimer.cancel();
-    m_readRetryTimer.cancel();
     m_writeTimer.cancel();
 
-    // clear();
 
-    if (mWebSocket != 0) {
-        // emscripten_websocket_close(mWebSocket, 1000, "Connection cleared");
-        // emscripten_websocket_delete(mWebSocket);
-        emscripten_websocket_deinitialize();
-        mWebSocket = 0;
-    }
+    emscripten_websocket_deinitialize();
+
+    m_websocket = 0;
 
     while (!m_messages.empty()) {
         m_messages.pop();
     }
 
     //Workaround for the abrupt termination of the websocket
-    g_dispatcher.addEvent([] { 
+    g_dispatcher.addEvent([] {
         g_game.forceLogout();
     });
 }
 
+
 void WebConnection::connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback)
 {
+    m_port = port;
     m_connected = false;
     m_connecting = true;
-    m_error.clear();
     m_connectCallback = connectCallback;
-    
+
     std::string ip = host.data();
     ip.length() == 0 ? ip = "localhost" : ip;
-
-#ifdef WEBPORT
-    const std::string webPort = WEBPORT;
-#else
-    const std::string webPort = "7979";
-#endif
 
 #ifndef NDEBUG
     const std::string prefix = "ws://";
@@ -125,46 +115,68 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
     const std::string prefix = "wss://";
 #endif
 
-    const std::string url =  prefix + ip + ":" + webPort;
+    m_pthread = pthread_self();
 
+    const std::string url = prefix + ip + ":" + std::to_string(port);
     EmscriptenWebSocketCreateAttributes attributes =
     {
         url.c_str(),
         "binary",
-        EM_FALSE // createOnMainThread
+        EM_FALSE // if the webscocket should be created in the main thread. Currently not implemented by emscripten so this does nothing
     };
 
-    mWebSocket = emscripten_websocket_new(&attributes);
+    m_websocket = emscripten_websocket_new(&attributes);
 
-    emscripten_websocket_set_onopen_callback(mWebSocket, this, ([](int eventType, const EmscriptenWebSocketOpenEvent* event, void* userData) -> EM_BOOL {
-        static_cast<WebConnection*>(userData)->onConnect();
+    emscripten_websocket_set_onopen_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketOpenEvent* /*event*/, void* userData) -> EM_BOOL {
+        WebConnection* webConnection = static_cast<WebConnection*>(userData);
+        webConnection->m_readTimer.cancel();
+        webConnection->m_activityTimer.restart();
+        webConnection->m_connected = true;
+
+        if (webConnection->m_connectCallback) {
+            emscripten_dispatch_to_thread(webConnection->m_pthread, EM_FUNC_SIG_VI, reinterpret_cast<void*>(runOnConnectCallback), nullptr, &webConnection->m_connectCallback);
+        }
+
+        webConnection->m_connecting = false;
+
         return EM_TRUE;
     }));
-    emscripten_websocket_set_onerror_callback(mWebSocket, this, ([](int eventType, const EmscriptenWebSocketErrorEvent* event, void* userData) -> EM_BOOL {
-        static_cast<WebConnection*>(userData)->handleError();
+
+    emscripten_websocket_set_onerror_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketErrorEvent* /*event*/, void* userData) -> EM_BOOL {
+        WebConnection* webConnection = static_cast<WebConnection*>(userData);
+        if (webConnection->m_connected || webConnection->m_connecting) {
+            webConnection->close();
+        }
         return EM_TRUE;
     }));
-    emscripten_websocket_set_onclose_callback(mWebSocket, this, ([](int eventType, const EmscriptenWebSocketCloseEvent* event, void* userData) -> EM_BOOL {
+
+    emscripten_websocket_set_onclose_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketCloseEvent* /*event*/, void* userData) -> EM_BOOL {
         static_cast<WebConnection*>(userData)->close();
         return EM_TRUE;
     }));
-    emscripten_websocket_set_onmessage_callback(mWebSocket, this, ([](int eventType, const EmscriptenWebSocketMessageEvent* event, void* userData) -> EM_BOOL {
-        static_cast<WebConnection*>(userData)->onWebSocketMessage(event);
+
+    emscripten_websocket_set_onmessage_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketMessageEvent* webSocketEvent, void* userData) -> EM_BOOL {
+        uint32_t numBytes = webSocketEvent->numBytes;
+        if (numBytes == 0)
+            return EM_TRUE;
+        if (webSocketEvent->isText)
+            return EM_TRUE;
+
+        static std::vector<uint8_t> buffer;
+        buffer.resize((size_t)numBytes);
+        memcpy(&buffer[0], webSocketEvent->data, numBytes);
+        static_cast<WebConnection*>(userData)->m_messages.push(buffer);
+
         return EM_TRUE;
     }));
-    m_readTimer.cancel();
-    m_readTimer.expires_after(std::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
-    m_readTimer.async_wait([this](auto&& error) {
-        onTimeout(std::move(error));
-    });
 }
 
 bool WebConnection::sendPacket(uint8_t* buffer, uint16_t size)
 {
-    if (mWebSocket == 0)
+    if (m_websocket < 1)
         return false;
 
-    const EMSCRIPTEN_RESULT result = emscripten_websocket_send_binary(mWebSocket, buffer, size);
+    const EMSCRIPTEN_RESULT result = emscripten_websocket_send_binary(m_websocket, buffer, size);
     return (result == EMSCRIPTEN_RESULT_SUCCESS);
 }
 
@@ -209,27 +221,11 @@ void WebConnection::internal_write()
     }
 }
 
-
-bool WebConnection::onWebSocketMessage(const EmscriptenWebSocketMessageEvent* webSocketEvent)
-{
-    uint32_t numBytes = webSocketEvent->numBytes;
-    if (numBytes == 0)
-        return true;
-    if (webSocketEvent->isText)
-        return true;
-
-    static std::vector<uint8_t> buffer;
-    buffer.resize((size_t)numBytes);
-    memcpy(&buffer[0], webSocketEvent->data, numBytes);
-    m_messages.push(buffer);
-
-    return true;
-}
-
 void WebConnection::read(const RecvCallback& callback, int tries)
 {
-    if (!m_connected)
+    if (!m_connected) {
         return;
+    }
 
     m_recvCallback = callback;
 
@@ -241,34 +237,19 @@ void WebConnection::read(const RecvCallback& callback, int tries)
         });
     }
 
-    if (!m_messages.empty()) {
-        onRecv();
-    } else {
-        m_readRetryTimer.cancel();
-        m_readRetryTimer.expires_from_now(asio::chrono::milliseconds(10));
-        m_readRetryTimer.async_wait([capture0 = asWebConnection(), callback, &tries](auto&& error) {
-            capture0->read(callback, tries++);
-        });
+    if (m_messages.empty()) {
+        g_dispatcher.addEvent([capture0 = asWebConnection(), callback, tries] { capture0->read(callback, tries + 1); });
+        return;
     }
 
+    onRecv();
 }
 
-bool WebConnection::onConnect()
-{
-    m_readTimer.cancel();
-    m_activityTimer.restart();
-    m_connected = true;
-
-    if (m_connectCallback)
-        m_connectCallback();
-
-    m_connecting = false;
-
-    return true;
+void WebConnection::runOnConnectCallback(std::function<void()> callback) {
+    callback();
 }
 
-void WebConnection::onWrite(const std::shared_ptr<asio::streambuf>&
-                         outputStream)
+void WebConnection::onWrite(const std::shared_ptr<asio::streambuf>& outputStream)
 {
     m_writeTimer.cancel();
 
@@ -303,17 +284,6 @@ void WebConnection::onTimeout(const std::error_code& error)
 
     if (m_connected || m_connecting)
         close();
-}
-
-bool WebConnection::handleError()
-{
-    // if (m_errorCallback)
-    //     m_errorCallback(std::error_code());
-
-    if (m_connected || m_connecting)
-        close();
-
-    return true;
 }
 
 int WebConnection::getIp()

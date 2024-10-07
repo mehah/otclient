@@ -727,8 +727,8 @@ elseif(WASM)
 			--shell-file=../browser/shell.html --use-preload-cache")
 	set_target_properties(${PROJECT_NAME} PROPERTIES
   	LINK_FLAGS ${linkflags})
-	add_definitions(-DWEBPORT="7979")
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+	add_definitions(-DWEBPORT=${WEBPORT})
 
 else() # Linux
 	target_include_directories(${PROJECT_NAME}

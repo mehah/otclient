@@ -39,6 +39,9 @@
 #elif defined(__arm__)
 #define BUILD_ARCH "ARM"
 #elif defined(__EMSCRIPTEN__)
+#ifndef WEBPORT
+#define WEBPORT 7979
+#endif
 #define BUILD_ARCH "WASM32"
 #else
 #define BUILD_ARCH "unknown"

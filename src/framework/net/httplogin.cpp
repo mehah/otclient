@@ -143,6 +143,8 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
         }
     });
 #else
+    g_asyncDispatcher.detach_task(
+        [this, host, path, port, email, password, request_id, httpLogin] {
         emscripten_fetch_attr_t attr;
         emscripten_fetch_attr_init(&attr);
         strcpy(attr.requestMethod, "POST");
@@ -195,6 +197,7 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
                 status);
             });
         }
+    });
 #endif
 }
 

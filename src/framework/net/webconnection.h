@@ -60,7 +60,6 @@ public:
     void setErrorCallback(const ErrorCallback& errorCallback) { m_errorCallback = errorCallback; }
 
     int getIp();
-    std::error_code getError() const { return m_error; }
     bool isConnecting() const { return m_connecting; }
     bool isConnected() const { return m_connected; }
     ticks_t getElapsedTicksSinceLastRead() const { return m_connected ? m_activityTimer.elapsed_millis() : -1; }
@@ -68,31 +67,31 @@ public:
     WebConnectionPtr asWebConnection() { return static_self_cast<WebConnection>(); }
 
 protected:
-    bool onWebSocketMessage(const EmscriptenWebSocketMessageEvent* webSocketEvent);
     bool sendPacket(uint8_t* buffer, uint16_t size);
 
     void internal_write();
-    bool onConnect();
     void onWrite(const std::shared_ptr<asio::streambuf>&
                  outputStream);
     void onRecv();
     void onTimeout(const std::error_code& error);
-    bool handleError();
+
+    static void runOnConnectCallback(std::function<void ()> callback);
 
     std::function<void()> m_connectCallback;
     ErrorCallback m_errorCallback;
     RecvCallback m_recvCallback;
 
     asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_readTimer;
-    asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_readRetryTimer;
     asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_writeTimer;
 
-    EMSCRIPTEN_WEBSOCKET_T mWebSocket;
+    EMSCRIPTEN_WEBSOCKET_T m_websocket = 0;
+    uint16_t m_port;
+    pthread_t m_pthread;
+
     static std::list<std::shared_ptr<asio::streambuf>> m_outputStreams;
     std::shared_ptr<asio::streambuf> m_outputStream;
     bool m_connected{ false };
     bool m_connecting{ false };
-    std::error_code m_error;
     stdext::timer m_activityTimer;
 
     std::queue<std::vector<uint8_t>> m_messages;
