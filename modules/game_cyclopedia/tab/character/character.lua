@@ -79,6 +79,8 @@ function showCharacter()
                 if item then
                     itemWidget:setStyle("InventoryItemCyclopedia")
                     itemWidget:setItem(item)
+                    ItemsDatabase.setRarityItem(itemWidget, itemWidget:getItem())
+                    ItemsDatabase.setTier(itemWidget, itemWidget:getItem())
                     itemWidget:setIcon("")
                 else
                     itemWidget:setStyle(Cyclopedia.InventorySlotStyles[i].name)
@@ -275,28 +277,15 @@ function Cyclopedia.reloadCharacterItems()
 
         if data.visible then
             local listItem = g_ui.createWidget("CharacterListItem", UI.CharacterItems.ListBase.list)
-            -- local frame = g_game.getItemFrame(data.value)
             listItem.item:setItemId(itemId)
             listItem.name:setText(data.name)
+            ItemsDatabase.setRarityItem(listItem.item, listItem.item:getItem())
+            ItemsDatabase.setTier(listItem.item, item.tier)
             listItem.amount:setText(data.amount)
             listItem:setBackgroundColor(colors[colorIndex])
-
             local gridItem = g_ui.createWidget("CharacterGridItem", UI.CharacterItems.gridBase.grid)
             gridItem.item:setItemId(itemId)
             gridItem.amount:setText(data.amount)
-
-            --[[
-            if frame > 0 then
-                listItem.rarity:setImageSource("/images/ui/frames")
-                listItem.rarity:setImageClip(torect(g_game.getRectFrame(frame)))
-                gridItem.rarity:setImageSource("/images/ui/frames")
-                gridItem.rarity:setImageClip(torect(g_game.getRectFrame(frame)))
-            else
-                listItem.rarity:setImageSource("")
-                gridItem.rarity:setImageSource("")
-            end
-            ]]--
-
             colorIndex = 3 - colorIndex
         end
     end
@@ -324,14 +313,18 @@ function Cyclopedia.loadCharacterItems(data)
             name = name,
             amount = data.amount,
             type = type
-            -- value = thing:getResultingValue()
         }
 
-        local insertedItem = Cyclopedia.Character.Items[data.itemId]
+        local itemKey = data.itemId .. "-" .. (data.tier or "no_tier")
+        local insertedItem = Cyclopedia.Character.Items[itemKey]
         if insertedItem then
             insertedItem.amount = insertedItem.amount + data.amount
         else
-            Cyclopedia.Character.Items[data.itemId] = data_t
+            Cyclopedia.Character.Items[itemKey] = {
+                itemId = data.itemId,
+                tier = data.tier,
+                data = data_t
+            }
         end
     end
 
@@ -352,11 +345,8 @@ function Cyclopedia.loadCharacterItems(data)
 
     local sortedItems = {}
 
-    for itemId, data in pairs(Cyclopedia.Character.Items) do
-        table.insert(sortedItems, {
-            itemId = itemId,
-            data = data
-        })
+    for _, itemData in pairs(Cyclopedia.Character.Items) do
+        table.insert(sortedItems, itemData)
     end
 
     local function compareByName(a, b)

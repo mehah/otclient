@@ -271,6 +271,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "addVip", &Game::addVip, &g_game);
     g_lua.bindSingletonFunction("g_game", "removeVip", &Game::removeVip, &g_game);
     g_lua.bindSingletonFunction("g_game", "editVip", &Game::editVip, &g_game);
+    g_lua.bindSingletonFunction("g_game", "editVipGroups", &Game::editVipGroups, &g_game);
     g_lua.bindSingletonFunction("g_game", "setChaseMode", &Game::setChaseMode, &g_game);
     g_lua.bindSingletonFunction("g_game", "setFightMode", &Game::setFightMode, &g_game);
     g_lua.bindSingletonFunction("g_game", "setPVPMode", &Game::setPVPMode, &g_game);
@@ -702,6 +703,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getId", &Item::getId);
     g_lua.bindClassMemberFunction<Item>("getTooltip", &Item::getTooltip);
     g_lua.bindClassMemberFunction<Item>("getDurationTime", &Item::getDurationTime);
+    g_lua.bindClassMemberFunction<Item>("getTier", &Item::getTier);
 
     g_lua.bindClassMemberFunction<Item>("isStackable", &Item::isStackable);
     g_lua.bindClassMemberFunction<Item>("isMarketable", &Item::isMarketable);

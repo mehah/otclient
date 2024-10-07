@@ -165,7 +165,7 @@ CharacterListItem < UIWidget
     id: rarity
     margin: 1
     anchors.fill: ItemBackground
-  UIItem
+  Item
     id: item
     anchors.fill: ItemBackground
   Label

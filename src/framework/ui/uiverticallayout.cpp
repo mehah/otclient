@@ -77,7 +77,7 @@ bool UIVerticalLayout::internalUpdate()
             changed = true;
 
         gap = (m_alignBottom) ? -widget->getMarginTop() : (widget->getHeight() + widget->getMarginBottom());
-        gap += m_spacing;
+        gap += m_alignBottom ? -m_spacing : m_spacing;
         pos.y += gap;
         preferredHeight += gap;
     };

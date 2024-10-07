@@ -2,8 +2,8 @@ Module
   name: game_viplist
   description: Manage vip list window
   author: baxnie, edubart
-  website: https://github.com/edubart/otclient
+  website: https://github.com/mehah/otclient
   sandboxed: true
   scripts: [ viplist ]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: controllerVip:init()
+  @onUnload: controllerVip:terminate()
