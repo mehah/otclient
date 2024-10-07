@@ -4864,7 +4864,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
     std::unordered_map<int, std::string> descriptions;
 
     Otc::MarketItemDescription lastAttribute = Otc::ITEM_DESC_WEIGHT;
-    if (g_game.getClientVersion() >= 1200) {
+    if (g_game.getClientVersion() >= 1100) {
         lastAttribute = Otc::ITEM_DESC_IMBUINGSLOTS;
     }
 
