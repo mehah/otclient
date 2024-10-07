@@ -859,7 +859,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
             msg->getU32();
             const uint32_t time = msg->getU32();
             msg->getU8();
-            const uint32_t amount = (UINT32_MAX -msg->getU32());
+            const uint32_t amount = (UINT32_MAX - msg->getU32());
             msg->getU8();
             const auto& productName = msg->getString();
             msg->getU8();
@@ -1437,7 +1437,7 @@ void ProtocolGame::parseContainerRemoveItem(const InputMessagePtr& msg)
     g_game.processContainerRemoveItem(containerId, slot, lastItem);
 }
 
-void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg) 
+void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg)
 {
     const uint16_t bosstiaryRaceLast = msg->getU16();
     std::vector<BosstiaryData> bossData;
@@ -2651,7 +2651,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             const auto& shaderName = msg->getString();
             shaderList.emplace_back(shaderId, shaderName);
         }
-   }
+    }
 
     g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList, shaderList);
 }
@@ -2672,6 +2672,7 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     uint32_t iconId = 0;
     std::string desc;
     bool notifyLogin = false;
+    std::vector<uint8_t> groupIDs;
 
     const uint32_t id = msg->getU32();
     const auto& name = g_game.formatCreatureName(msg->getString());
@@ -2682,15 +2683,16 @@ void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
     }
 
     const uint32_t status = msg->getU8();
-
     if (g_game.getFeature(Otc::GameVipGroups)) {
         const uint8_t vipGroupSize = msg->getU8();
+        groupIDs.reserve(vipGroupSize);
         for (auto i = 0; i < vipGroupSize; ++i) {
-            msg->getU8(); // Group ID
+            const uint8_t groupID = msg->getU8();
+            groupIDs.push_back(groupID);
         }
     }
 
-    g_game.processVipAdd(id, name, status, desc, iconId, notifyLogin);
+    g_game.processVipAdd(id, name, status, desc, iconId, notifyLogin, groupIDs);
 }
 
 void ProtocolGame::parseVipState(const InputMessagePtr& msg)
@@ -2706,12 +2708,15 @@ void ProtocolGame::parseVipLogout(const InputMessagePtr& msg)
     // On QT client this operation is being processed on the 'parseVipState', now this opcode if for groups
     if (g_game.getFeature(Otc::GameVipGroups)) {
         const uint8_t vipGroupSize = msg->getU8();
+        std::vector<std::tuple<uint8_t, std::string, bool>> vipGroups;
         for (auto i = 0; i < vipGroupSize; ++i) {
-            msg->getU8(); // Group ID
-            msg->getString(); // Group name
-            msg->getU8(); // Can edit group? (bool)
+            const uint8_t groupId = msg->getU8();
+            const auto& groupName = msg->getString();
+            const bool canEditGroup = static_cast<bool>(msg->getU8());
+            vipGroups.emplace_back(groupId, groupName, canEditGroup);
         }
-        msg->getU8(); // Groups amount left
+        const uint8_t groupsAmountLeft = msg->getU8();
+        g_game.processVipGroupChange(vipGroups, groupsAmountLeft);
     } else {
         const uint32_t id = msg->getU32();
         g_game.processVipStateChange(id, 0);
@@ -2809,7 +2814,7 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
     if (data.currentLevel > 1) {
         data.charmValue = msg->getU16();
         data.attackMode = msg->getU8();
-        msg->getU8(); 
+        msg->getU8();
         data.maxHealth = msg->getU32();
         data.experience = msg->getU32();
         data.speed = msg->getU16();
@@ -2847,7 +2852,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
     BestiaryCharmsData charmData;
     charmData.points = msg->getU32();
 
-    const uint8_t charmsAmount = msg->getU8();  
+    const uint8_t charmsAmount = msg->getU8();
     for (auto i = 0; i < charmsAmount; ++i) {
         CharmData charm;
         charm.id = msg->getU8();
@@ -2864,17 +2869,17 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
             const bool asigned = static_cast<bool>(msg->getU8());
             if (asigned) {
                 charm.asignedStatus = asigned;
-                charm.raceId = msg->getU16(); 
-                charm.removeRuneCost = msg->getU32(); 
+                charm.raceId = msg->getU16();
+                charm.removeRuneCost = msg->getU32();
             }
         } else {
-            msg->getU8(); 
+            msg->getU8();
         }
 
         charmData.charms.emplace_back(charm);
     }
 
-    msg->getU8(); 
+    msg->getU8();
 
     const uint16_t finishedMonstersSize = msg->getU16();
     for (auto i = 0; i < finishedMonstersSize; ++i) {
@@ -3041,27 +3046,24 @@ void ProtocolGame::parseChangeMapAwareRange(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCreaturesMark(const InputMessagePtr& msg)
 {
-    const uint8_t len = g_game.getClientVersion() >= 1035 ? 1 : msg->getU8();
-    for (auto i = 0; i < len; ++i) {
-        const uint32_t creatureId = msg->getU32();
-        const bool isPermanent = static_cast<bool>(msg->getU8());
-        const uint8_t markType = msg->getU8();
+    const uint32_t creatureId = msg->getU32();
+    const bool isPermanent = g_game.getClientVersion() >= 1076 ? msg->getU8() == 0 : false;
+    const uint8_t markType = msg->getU8();
 
-        const auto& creature = g_map.getCreatureById(creatureId);
-        if (!creature) {
-            g_logger.traceError(stdext::format("ProtocolGame::parseTrappers: could not get creature with id %d", creatureId));
-            continue;
-        }
+    const auto& creature = g_map.getCreatureById(creatureId);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::parseTrappers: could not get creature with id %d", creatureId));
+        return;
+    }
 
-        if (isPermanent) {
-            if (markType == 0xff) {
-                creature->hideStaticSquare();
-            } else {
-                creature->showStaticSquare(Color::from8bit(markType));
-            }
+    if (isPermanent) {
+        if (markType == 0xff) {
+            creature->hideStaticSquare();
         } else {
-            creature->addTimedSquare(markType);
+            creature->showStaticSquare(Color::from8bit(markType != 0 ? markType : 1));
         }
+    } else {
+        creature->addTimedSquare(markType);
     }
 }
 
@@ -3608,7 +3610,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getFeature(Otc::GameThingUpgradeClassification)) {
         if (item->getClassification()) {
-            msg->getU8(); // Item tier
+            item->setTier(msg->getU8());
         }
     }
 
@@ -3821,7 +3823,7 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
         msg->getU64(); // healing
     }
 
-    const bool hasNamesBool =static_cast<bool>( msg->getU8());
+    const bool hasNamesBool = static_cast<bool>(msg->getU8());
     if (hasNamesBool) {
         const uint8_t membersNameSize = msg->getU8();
         for (auto i = 0; i < membersNameSize; ++i) {
@@ -4155,10 +4157,10 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         case Otc::CYCLOPEDIA_CHARACTERINFO_RECENTDEATHS:
         {
             CyclopediaCharacterRecentDeaths data;
-            msg->getU16();  
+            msg->getU16();
             msg->getU16();
 
-            const uint16_t entriesCount = msg->getU16();  
+            const uint16_t entriesCount = msg->getU16();
             for (auto i = 0; i < entriesCount; ++i) {
                 RecentDeathEntry entry;
                 entry.timestamp = msg->getU32();
@@ -4172,10 +4174,10 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         case Otc::CYCLOPEDIA_CHARACTERINFO_RECENTPVPKILLS:
         {
             CyclopediaCharacterRecentPvPKills data;
-            msg->getU16();  
+            msg->getU16();
             msg->getU16();
 
-            const uint16_t entriesCount = msg->getU16();  
+            const uint16_t entriesCount = msg->getU16();
             for (auto i = 0; i < entriesCount; ++i) {
                 RecentPvPKillEntry entry;
                 entry.timestamp = msg->getU32();
@@ -4202,13 +4204,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.inventory.emplace_back(item);
             }
@@ -4220,13 +4222,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.store.emplace_back(item);
             }
@@ -4238,13 +4240,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.stash.emplace_back(item);
             }
@@ -4256,13 +4258,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.depot.emplace_back(item);
             }
@@ -4274,13 +4276,13 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
 
-                uint8_t itemClass = 0;
+                uint8_t itemTier = 0;
                 if (classification > 0) {
-                    itemClass = msg->getU8();
+                    itemTier = msg->getU8();
                 }
 
                 item.itemId = itemId;
-                item.classification = itemClass;
+                item.tier = itemTier;
                 item.amount = msg->getU32();
                 data.inbox.emplace_back(item);
             }
@@ -4347,8 +4349,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         }
         case Otc::CYCLOPEDIA_CHARACTERINFO_STORESUMMARY:
         {
-            const uint32_t xpBoostTime = msg->getU32();  
-            const uint32_t dailyRewardXpBoostTime = msg->getU32();  
+            const uint32_t xpBoostTime = msg->getU32();
+            const uint32_t dailyRewardXpBoostTime = msg->getU32();
 
             std::vector<std::tuple<std::string, uint8_t>> blessings;
             const uint8_t blessingCount = msg->getU8();
@@ -4406,7 +4408,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const auto& badgeName = msg->getString();
                 badgesVector.emplace_back(badgeId, badgeName);
             }
-    
+
             g_game.processCyclopediaCharacterGeneralStatsBadge(showAccountInformation, playerOnline, playerPremium, loyaltyTitle, badgesVector);
             break;
         }
@@ -4767,7 +4769,7 @@ void ProtocolGame::parseImbuementWindow(const InputMessagePtr& msg)
         const uint8_t firstByte = msg->getU8();
         if (firstByte == 0x01) {
             Imbuement imbuement = getImbuementInfo(msg);
-            const uint32_t duration = msg->getU32(); 
+            const uint32_t duration = msg->getU32();
             const uint32_t removalCost = msg->getU32();
             activeSlots[i] = std::make_tuple(imbuement, duration, removalCost);
         }

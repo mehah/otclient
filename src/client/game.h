@@ -83,7 +83,7 @@ struct BlessDialogData
     std::vector<LogData> logs;
 };
 
-using Vip = std::tuple<std::string, uint32_t, std::string, int, bool>;
+using Vip = std::tuple<std::string, uint32_t, std::string, int, bool, std::vector<uint8_t>>;
 
 struct StoreCategory
 {
@@ -330,7 +330,7 @@ struct BosstiarySlotsData
 struct ItemSummary
 {
     uint16_t itemId;
-    uint8_t classification;
+    uint8_t tier;
     uint32_t amount;
 };
 
@@ -465,8 +465,9 @@ protected:
     static void processRuleViolationLock();
 
     // vip related
-    void processVipAdd(const uint32_t id, const std::string_view name, const uint32_t status, const std::string_view description, const uint32_t iconId, const bool notifyLogin);
+    void processVipAdd(const uint32_t id, const std::string_view name, const uint32_t status, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupID);
     void processVipStateChange(const uint32_t id, const uint32_t status);
+    void processVipGroupChange(const std::vector<std::tuple<uint8_t, std::string, bool>>& vipGroups, uint8_t groupsAmountLeft);
 
     // tutorial hint
     static void processTutorialHint(const uint8_t id);
@@ -604,8 +605,8 @@ public:
     // vip related
     void addVip(const std::string_view name);
     void removeVip(const uint32_t playerId);
-    void editVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin);
-
+    void editVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupID = {});
+    void editVipGroups(const Otc::GroupsEditInfoType_t action,const uint8_t groupId, const std::string_view groupName);
     // fight modes related
     void setChaseMode(const Otc::ChaseModes chaseMode);
     void setFightMode(const Otc::FightModes fightMode);
