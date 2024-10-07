@@ -4987,14 +4987,14 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     }
 
     const uint32_t buyOfferCount = msg->getU32();
-    const uint32_t sellOfferCount = msg->getU32();
+
 
     std::vector<MarketOffer> offers;
 
     for (uint32_t i = 0; i < buyOfferCount; ++i) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_BUY, var));
     }
-
+    const uint32_t sellOfferCount = msg->getU32();
     for (uint32_t i = 0; i < sellOfferCount; ++i) {
         offers.push_back(readMarketOffer(msg, Otc::MARKETACTION_SELL, var));
     }
