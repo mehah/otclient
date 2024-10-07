@@ -195,7 +195,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </details>
 
 - Client 12.85 ~ 12.92, 13.00 ~ 13.40 support (protobuf)
-- Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
+- Market compatible with tfs and canary
 - Async Texture Loading
 - <details>
     <summary>Anti-Aliasing Mode Options</summary>
