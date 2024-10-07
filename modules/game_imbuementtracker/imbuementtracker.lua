@@ -153,6 +153,7 @@ end
 local function addTrackedItem(item)
     local trackedItem = g_ui.createWidget('InventoryItem')
     trackedItem.item:setItem(item['item'])
+    ItemsDatabase.setTier(trackedItem.item, trackedItem.item:getItem())
     trackedItem.item:setVirtual(true)
     local maxDuration = 0
     for _, imbuementSlot in ipairs(item['slots']) do

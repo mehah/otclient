@@ -124,19 +124,65 @@ StoreWindow
     font: cipsoftFont
     @onClick: modules.game_store.toggleTransferHistory()
 
-  StoreFlatPanel
+  Panel
     id: lblCoins
     size: 260 20
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     margin-bottom: 2
-    text-align: left
-    text-offset: 20 0
     image-color: #1111118c
-    text: 0
-    icon: images/tibiaCoin
-    icon-align: left
-    icon-offset: 5 0
+    focusable: false
+    phantom: true
+    image-source: /game_store/images/panel
+    image-border: 3
+    Label
+      id: numero
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      focusable: false
+      margin-left:22
+      margin-bottom: 3
+      text-wrap: true
+      text-auto-resize: true
+      phantom: true
+
+    UIWidget
+      id: icono
+      anchors.bottom: parent.bottom
+      anchors.left: prev.right
+      margin-left: 5
+      margin-bottom: 3
+      image-source: images/tibiaCoin
+      focusable: false
+      phantom: true
+
+    Label
+      id: numerodos
+      anchors.bottom: parent.bottom
+      anchors.left: prev.right
+      text-wrap: true
+      text-auto-resize: true
+      margin-left:5
+      margin-bottom: 3 
+      phantom: true
+
+    UIWidget
+      id: iconodos
+      anchors.bottom: parent.bottom
+      anchors.left: prev.right
+      focusable: false
+      phantom: true
+      margin-left:5
+      margin-bottom: 3
+      image-source: images/icon-tibiacointransferable
+    Label
+      anchors.bottom: parent.bottom
+      anchors.left: prev.right
+      !text: tr(")")
+      focusable: false
+      phantom: true
+      margin-left:5
+      margin-bottom: 3 
 
   StoreButton
     id: btnCoins
@@ -168,7 +214,7 @@ StoreWindow
     icon-align: center
     icon-source: images/iconTransfer
     size: 64 20
-    @onClick: print("no yet")
+    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   StoreButton
     id: wtfisthis
@@ -179,7 +225,7 @@ StoreWindow
     icon-align: center
     icon-source: images/icon-trade
     size: 64 20
-    @onClick: print("no yet")
+    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   HorizontalSeparator
     anchors.bottom: prev.top

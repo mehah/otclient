@@ -10,6 +10,35 @@ VipListLabel < GameLabel
   $first:
     margin-top: 5
 
+VipGroupList < UIWidget
+  size: 156 20
+  margin-top: 6
+
+  Label
+    id: group
+    anchors.top: parent.top
+    anchors.left: parent.left
+    color: #f7f7f7
+    text-align: topLeft
+    !text: tr('No Group')
+    text-auto-resize: true
+  
+  HorizontalSeparator
+    width: 158
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 15
+  
+  Panel
+    id: panel
+    size: 156 45
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 16
+    layout: 
+      type: verticalBox
+      fit-children: true
+
 MiniWindow
   id: vipWindow
   !text: tr('VIP List')
@@ -23,4 +52,14 @@ MiniWindow
     layout: verticalBox
     padding-left: 5
     padding-right: 5
+    padding-bottom: 1
     &onMousePress: modules.game_viplist.onVipListMousePress
+
+  UIWidget
+    id: miniborder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 2
+    margin-bottom: 2

@@ -30,6 +30,8 @@
 #include <framework/platform/platformwindow.h>
 
 #include "framework/graphics/drawpoolmanager.h"
+#include "uitranslator.h"
+#include <framework/graphics/fontmanager.h>
 
 UITextEdit::UITextEdit()
 {
@@ -43,6 +45,10 @@ UITextEdit::UITextEdit()
     setProp(Props::PropGlyphsMustRecache, true);
 
     m_textAlign = Fw::AlignTopLeft;
+    m_placeholder = "";
+    m_placeholderColor = Color::gray;
+    m_placeholderFont = g_fonts.getDefaultFont();
+    m_placeholderAlign = Fw::AlignLeftCenter;
     blinkCursor();
 }
 
@@ -65,6 +71,11 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
         setProp(PropGlyphsMustRecache, false);
 
     const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
+    if (textLength == 0) {
+        if (m_placeholderColor != Color::alpha && !m_placeholder.empty()) {
+            m_placeholderFont->drawText(m_placeholder, m_drawArea, m_placeholderColor, m_placeholderAlign);
+        }
+    }
     if (m_color != Color::alpha) {
         if (glyphsMustRecache) {
             m_glyphsTextRectCache.clear();
@@ -637,6 +648,14 @@ void UITextEdit::onStyleApply(const std::string_view styleName, const OTMLNodePt
             setChangeCursorImage(node->value<bool>());
         else if (node->tag() == "auto-scroll")
             setAutoScroll(node->value<bool>());
+        else if (node->tag() == "placeholder")
+            setPlaceholder(node->value());
+        else if (node->tag() == "placeholder-color")
+            setPlaceholderColor(node->value<Color>());
+        else if (node->tag() == "placeholder-align")
+            setPlaceholderAlign(Fw::translateAlignment(node->value()));
+        else if (node->tag() == "placeholder-font")
+            setPlaceholderFont(node->value());
     }
 }
 
@@ -839,4 +858,9 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
 void UITextEdit::onTextAreaUpdate(const Point& offset, const Size& visibleSize, const Size& totalSize)
 {
     callLuaField("onTextAreaUpdate", offset, visibleSize, totalSize);
+}
+
+void UITextEdit::setPlaceholderFont(const std::string_view fontName)
+{
+    m_placeholderFont = g_fonts.getFont(fontName);
 }

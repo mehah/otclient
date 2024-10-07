@@ -126,7 +126,11 @@ function UIMinimap:setCrossPosition(pos)
     local cross = self.cross
     if not self.cross then
         cross = g_ui.createWidget('MinimapCross', self)
-        cross:setIcon('/images/game/minimap/cross')
+        if self:getParent():getId() == "MapBase" then
+            cross:setIcon('/game_cyclopedia/images/icon-map-player')
+        else
+            cross:setIcon('/images/game/minimap/cross')
+        end
         self.cross = cross
     end
 
@@ -278,6 +282,9 @@ function UIMinimap:onMouseRelease(pos, button)
 
     if button == MouseLeftButton then
         local player = g_game.getLocalPlayer()
+        if g_game.getClientVersion() > 1288 and g_keyboard.isCtrlPressed() and g_keyboard.isShiftPressed() then
+            return g_game.sendGmTeleport(mapPos)
+        end
         if Position.distance(player:getPosition(), mapPos) > 250 then
             modules.game_textmessage.displayStatusMessage(tr('Destination is out of range.'))
             return false
