@@ -241,7 +241,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="250" alt="Haskanoid Video" style="max-width:250px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/raw/main/Picture/Attached%20Effect/Tile/003_particulas.gif?raw=true" width="310" alt="Space Invaders" style="max-width: 310px;"> |
 |-------------------------------------------|---------------|-------------------------|
-|Title Attached Effect | Title Widget | Title light |
+|<center>Title Attached Effect</center> | <center> Title Widget </center>| <center>Title Particule</center> |
 
 
 - <details>
