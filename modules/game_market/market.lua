@@ -409,6 +409,8 @@ local function updateOffers(offers)
 end
 
 local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
+    local purchaseStats2 = {} --temp someone confirm if it works in canary  --  work, test in 13.10
+    local saleStats2 = {} --temp someone confirm if it works in canary  --  work, test in 13.10
     if not selectedItem then
         return
     end
@@ -424,6 +426,13 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
         detailsTable:addRow(columns)
     end
 
+    if not table.empty(saleStats) then --temp someone confirm if it works in canary . -- work, test in 13.10
+        table.insert(saleStats2, OfferStatistic.new(saleStats[1][1], saleStats[1][2], saleStats[1][3], saleStats[1][4], saleStats[1][5], saleStats[1][6]))
+    end
+    if not table.empty(purchaseStats) then --temp someone confirm if it works in canary --  work, test in 13.10
+        table.insert(purchaseStats2, OfferStatistic.new(purchaseStats[1][1], purchaseStats[1][2], purchaseStats[1][3], purchaseStats[1][4], purchaseStats[1][5], purchaseStats[1][6]))
+    end
+    
     -- update sale item statistics
     sellStatsTable:clearData()
     if table.empty(saleStats) then
@@ -433,7 +442,7 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
     else
         local offerAmount = 0
         local transactions, totalPrice, highestPrice, lowestPrice = 0, 0, 0, 0
-        for _, stat in pairs(saleStats) do
+        for _, stat in pairs(saleStats2) do
             if not stat:isNull() then
                 offerAmount = offerAmount + 1
                 transactions = transactions + stat:getTransactions()
@@ -490,13 +499,13 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
 
     -- update buy item statistics
     buyStatsTable:clearData()
-    if table.empty(purchaseStats) then
+    if table.empty(purchaseStats2) then
         buyStatsTable:addRow({{
             text = 'No information'
         }})
     else
         local transactions, totalPrice, highestPrice, lowestPrice = 0, 0, 0, 0
-        for _, stat in pairs(purchaseStats) do
+        for _, stat in pairs(purchaseStats2) do
             if not stat:isNull() then
                 transactions = transactions + stat:getTransactions()
                 totalPrice = totalPrice + stat:getTotalPrice()
