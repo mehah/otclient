@@ -441,7 +441,8 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
   - by [@OTArchive](https://github.com/OTArchive)
   - wiki: https://github.com/OTArchive/otclient-web/wiki/Guia-%E2%80%90-OTClient-Redemption-Web
-  - <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Wiki/2024-09-27_19-50-58.mp4?raw=true" width="400" controls></video>
+  
+  - https://github.com/user-attachments/assets/e8ab58c7-1be3-4c76-bc6d-bd831e846826
 
 </details>
 
