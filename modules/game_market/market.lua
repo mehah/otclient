@@ -1467,11 +1467,19 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
             local itemId = depotItems[i][1]
             local count = depotItems[i][2]
             local itClass = depotItems[i][3]
-            if itemId and count and tonumber(itClass) >= 0 then
-                depotItemsLua[itemId] = {
-                    itemCount = count,
-                    itemClass = itClass
-                }
+            if g_game.getClientVersion() > 1281 then
+                if itemId and count and tonumber(itClass) >= 0 then
+                    depotItemsLua[itemId] = {
+                        itemCount = count,
+                        itemClass = itClass
+                    }
+                end
+            else
+                if itemId and count then
+                    depotItemsLua[itemId] = {
+                        itemCount = count
+                    }
+                end
             end
         end
     end

@@ -4841,11 +4841,11 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
     const uint8_t offers = msg->getU8();
     const uint16_t itemsSent = msg->getU16();
 
-    std::unordered_map<uint16_t, uint16_t> depotItems;
+    std::vector<std::vector<uint16_t>> depotItems;
     for (auto i = 0; i < itemsSent; ++i) {
         const uint16_t itemId = msg->getU16();
         const uint16_t count = msg->getU16();
-        depotItems.emplace(itemId, count);
+        depotItems.push_back({ itemId, count });
     }
 
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, balance, vocation);
