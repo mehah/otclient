@@ -63,7 +63,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
             return false;
 
         const auto& fin = g_resources.openFile(path);
-        fin->cache();
+        fin->cache(true);
 
         const auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
 
