@@ -97,23 +97,14 @@ void Protocol::recv()
     m_inputMessage->setHeaderSize(headerSize);
 
     // read the first 2 bytes which contain the message size
-#ifdef __EMSCRIPTEN__
-    if (m_connection)
-        m_connection->read([capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
-        capture0->internalRecvData(std::forward<decltype(PH1)>(PH1),
-        std::forward<decltype(PH2)>(PH2));
-    });
-#else
     if (m_connection)
         m_connection->read(2, [capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
         std::forward<decltype(PH2)>(PH2));
     });
-#endif
 
 }
 
-#ifndef __EMSCRIPTEN__
 void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
 {
     // read message size
@@ -127,7 +118,6 @@ void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
         std::forward<decltype(PH2)>(PH2));
     });
 }
-#endif
 
 void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
 {
@@ -138,9 +128,6 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
     }
 
     m_inputMessage->fillBuffer(buffer, size);
-#ifdef __EMSCRIPTEN__
-    m_inputMessage->readSize();
-#endif
 
     bool decompress = false;
     if (m_sequencedPackets) {

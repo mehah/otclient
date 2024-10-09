@@ -71,6 +71,9 @@ void WebConnection::close()
     if (!m_connected && !m_connecting)
         return;
 
+    emscripten_websocket_deinitialize();
+    m_websocket = 0;
+
     if (m_port != WEBPORT)
         return;
 
@@ -84,13 +87,7 @@ void WebConnection::close()
     m_writeTimer.cancel();
 
 
-    emscripten_websocket_deinitialize();
-
-    m_websocket = 0;
-
-    while (!m_messages.empty()) {
-        m_messages.pop();
-    }
+    m_inputStream.consume(m_inputStream.size());
 
     //Workaround for the abrupt termination of the websocket
     g_dispatcher.addEvent([] {
@@ -162,10 +159,11 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
         if (webSocketEvent->isText)
             return EM_TRUE;
 
-        static std::vector<uint8_t> buffer;
-        buffer.resize((size_t)numBytes);
-        memcpy(&buffer[0], webSocketEvent->data, numBytes);
-        static_cast<WebConnection*>(userData)->m_messages.push(buffer);
+        uint8_t* const data = webSocketEvent->data;
+        auto webConnection = static_cast<WebConnection*>(userData);
+
+        std::ostream request_stream(&webConnection->m_inputStream);
+        request_stream.write((const char*)data, numBytes);
 
         return EM_TRUE;
     }));
@@ -173,8 +171,10 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
 
 bool WebConnection::sendPacket(uint8_t* buffer, uint16_t size)
 {
-    if (m_websocket < 1)
+    if (m_websocket < 1) {
+        close();
         return false;
+    }
 
     const EMSCRIPTEN_RESULT result = emscripten_websocket_send_binary(m_websocket, buffer, size);
     return (result == EMSCRIPTEN_RESULT_SUCCESS);
@@ -221,13 +221,14 @@ void WebConnection::internal_write()
     }
 }
 
-void WebConnection::read(const RecvCallback& callback, int tries)
+void WebConnection::read(const uint16_t size, const RecvCallback& callback, int tries)
 {
-    if (!m_connected) {
+    if (!m_connected)
         return;
-    }
 
     m_recvCallback = callback;
+
+    auto retry = [capture0 = asWebConnection(), size, callback, tries] { capture0->read(size, callback, tries + 1); };
 
     if (tries == 0) {
         m_readTimer.cancel();
@@ -235,14 +236,16 @@ void WebConnection::read(const RecvCallback& callback, int tries)
         m_readTimer.async_wait([capture0 = asWebConnection()](auto&& PH1) {
             capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
         });
-    }
-
-    if (m_messages.empty()) {
-        g_dispatcher.addEvent([capture0 = asWebConnection(), callback, tries] { capture0->read(callback, tries + 1); });
+        g_dispatcher.addEvent(std::move(retry));
         return;
     }
 
-    onRecv();
+    if (m_inputStream.size() < size) {
+        g_dispatcher.addEvent(std::move(retry));
+        return;
+    }
+
+    onRecv(size);
 }
 
 void WebConnection::runOnConnectCallback(std::function<void()> callback) {
@@ -258,20 +261,18 @@ void WebConnection::onWrite(const std::shared_ptr<asio::streambuf>& outputStream
     m_outputStreams.emplace_back(outputStream);
 }
 
-void WebConnection::onRecv()
+void WebConnection::onRecv(const uint16_t recvSize)
 {
     m_readTimer.cancel();
     m_activityTimer.restart();
 
     if (m_connected) {
-        if (m_recvCallback) {
-            static std::vector<uint8_t> buffer;
-            buffer.resize((size_t)m_messages.front().size());
-            memcpy(&buffer[0], &m_messages.front()[0], m_messages.front().size());
-            m_messages.pop();
-            m_recvCallback(&buffer[0], buffer.size());
+        if (m_recvCallback) {            
+            const auto* header = asio::buffer_cast<const char*>(m_inputStream.data());
+            m_recvCallback((uint8_t*)header, recvSize);
         }
     }
+    m_inputStream.consume(recvSize);
 }
 
 void WebConnection::onTimeout(const std::error_code& error)

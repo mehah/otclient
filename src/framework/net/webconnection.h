@@ -55,7 +55,7 @@ public:
     void close();
 
     void write(uint8_t* buffer, size_t size);
-    void read(const RecvCallback& callback, int tries = 0);
+    void read(const uint16_t size, const RecvCallback& callback, int tries = 0);
 
     void setErrorCallback(const ErrorCallback& errorCallback) { m_errorCallback = errorCallback; }
 
@@ -72,7 +72,7 @@ protected:
     void internal_write();
     void onWrite(const std::shared_ptr<asio::streambuf>&
                  outputStream);
-    void onRecv();
+    void onRecv(const uint16_t recvSize);
     void onTimeout(const std::error_code& error);
 
     static void runOnConnectCallback(std::function<void ()> callback);
@@ -94,7 +94,7 @@ protected:
     bool m_connecting{ false };
     stdext::timer m_activityTimer;
 
-    std::queue<std::vector<uint8_t>> m_messages;
+    asio::streambuf m_inputStream;
 
     friend class Server;
 };
