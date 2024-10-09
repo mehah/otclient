@@ -23,7 +23,11 @@
 #include "protocol.h"
 #include <random>
 #include <framework/core/application.h>
+#ifdef __EMSCRIPTEN__
+#include "webconnection.h"
+#else
 #include "connection.h"
+#endif
 
 Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {
     inflateInit2(&m_zstream, -15);
@@ -40,7 +44,11 @@ Protocol::~Protocol()
 
 void Protocol::connect(const std::string_view host, uint16_t port)
 {
+#ifdef __EMSCRIPTEN__
+    m_connection = std::make_shared<WebConnection>();
+#else
     m_connection = std::make_shared<Connection>();
+#endif
     m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
     m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
 }
@@ -94,6 +102,7 @@ void Protocol::recv()
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
         std::forward<decltype(PH2)>(PH2));
     });
+
 }
 
 void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)

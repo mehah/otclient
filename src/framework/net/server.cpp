@@ -21,7 +21,11 @@
  */
 
 #include "server.h"
+#ifdef __EMSCRIPTEN__
+#include "webconnection.h"
+#else
 #include "connection.h"
+#endif
 
 extern asio::io_service g_ioService;
 
@@ -48,8 +52,11 @@ void Server::close()
 
 void Server::acceptNext()
 {
+#ifdef __EMSCRIPTEN__
+    const auto& connection = std::make_shared<WebConnection>();
+#else
     const auto& connection = std::make_shared<Connection>();
-    connection->m_connecting = true;
+        connection->m_connecting = true;
 
     const auto self = static_self_cast<Server>();
     m_acceptor.async_accept(connection->m_socket, [=](const std::error_code& error) {
@@ -59,4 +66,6 @@ void Server::acceptNext()
         }
         self->callLuaField("onAccept", connection, error.message(), error.value());
     });
+#endif
+
 }

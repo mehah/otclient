@@ -28,6 +28,9 @@ WIN32Window window;
 #elif defined ANDROID
 #include "androidwindow.h"
 AndroidWindow window;
+#elif defined __EMSCRIPTEN__
+#include "browserwindow.h"
+BrowserWindow window;
 #else
 #include "x11window.h"
 #include <framework/core/clock.h>

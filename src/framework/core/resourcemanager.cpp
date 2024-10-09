@@ -439,10 +439,12 @@ std::string ResourceManager::getUserDir()
 {
 #ifdef ANDROID
     return getBaseDir() + "/";
+#elif defined(__EMSCRIPTEN__)
+    return "/user/";
 #else
     static const char* orgName = g_app.getOrganizationName().data();
     static const char* appName = g_app.getCompactName().data();
-
+    
     return PHYSFS_getPrefDir(orgName, appName);
 #endif
 }

@@ -1,4 +1,4 @@
-﻿local UI = nil
+local UI = nil
 function showBosstiary()
     UI = g_ui.loadUI("bosstiary", contentContainer)
     UI:show()

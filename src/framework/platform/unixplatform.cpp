@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__EMSCRIPTEN__)
 
 #include "platform.h"
 #include <cstring>
