@@ -131,8 +131,8 @@ void GraphicalApplication::terminate()
 #ifdef __EMSCRIPTEN__
 void GraphicalApplication::mainLoop() {
     if (m_stopping) {
-        g_window.terminate();
         emscripten_cancel_main_loop();
+        MAIN_THREAD_EM_ASM({ window.location.reload(); });
         return;
     }
     mainPoll();
