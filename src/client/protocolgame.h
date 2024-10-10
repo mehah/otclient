@@ -53,6 +53,7 @@ public:
     void sendTurnEast();
     void sendTurnSouth();
     void sendTurnWest();
+    void sendGmTeleport(const Position& pos);
     void sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType);
     void sendMove(const Position& fromPos, const uint16_t thingId, const uint8_t stackpos, const Position& toPos, const uint16_t count);
     void sendInspectNpcTrade(const uint16_t itemId, const uint16_t count);
@@ -104,7 +105,8 @@ public:
     void sendMountStatus(const bool mount);
     void sendAddVip(const std::string_view name);
     void sendRemoveVip(const uint32_t playerId);
-    void sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin);
+    void sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupIDs = {});
+    void sendEditVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t groupId, const std::string_view groupName);
     void sendBugReport(const std::string_view comment);
     void sendRuleViolation(const std::string_view target, const uint8_t reason, const uint8_t action, const std::string_view comment, const std::string_view statement, const uint16_t statementId, const bool ipBanishment);
     void sendDebugReport(const std::string_view a, const std::string_view b, const std::string_view c, const std::string_view d);
@@ -134,8 +136,19 @@ public:
     void sendStashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos);
     void sendHighscoreInfo(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
+    void sendRequestBestiary();
+    void sendRequestBestiaryOverview(const std::string_view catName);
+    void sendRequestBestiarySearch(const uint16_t raceId);
+    void sendBuyCharmRune(const uint8_t runeId, const uint8_t action, const uint16_t raceId);
+    void sendCyclopediaRequestCharacterInfo(const uint32_t playerId, const Otc::CyclopediaCharacterInfoType_t characterInfoType, const uint16_t entriesPerPage, const uint16_t page);
+    void sendRequestBosstiaryInfo();
+    void sendRequestBossSlootInfo();
+    void sendRequestBossSlotAction(const uint8_t action, const uint32_t raceId);
+    void sendStatusTrackerBestiary(const uint16_t raceId,  const bool status);
     void requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback);
+    void sendInspectionNormalObject(const Position& position);
+    void sendInspectionObject(const Otc::InspectObjectTypes inspectionType, const uint16_t itemId, const uint8_t itemCount);
 
     // otclient only
     void sendChangeMapAwareRange(const uint8_t xrange, const uint8_t yrange);
@@ -201,6 +214,9 @@ private:
     void parseContainerAddItem(const InputMessagePtr& msg);
     void parseContainerUpdateItem(const InputMessagePtr& msg);
     void parseContainerRemoveItem(const InputMessagePtr& msg);
+    void parseBosstiaryInfo(const InputMessagePtr& msg);
+    void parseTakeScreenshot(const InputMessagePtr& msg);
+    void parseCyclopediaItemDetail(const InputMessagePtr& msg);
     void parseAddInventoryItem(const InputMessagePtr& msg);
     void parseRemoveInventoryItem(const InputMessagePtr& msg);
     void parseOpenNpcTrade(const InputMessagePtr& msg);
@@ -290,6 +306,7 @@ private:
     void parseUpdateSupplyTracker(const InputMessagePtr& msg);
     void parseUpdateLootTracker(const InputMessagePtr& msg);
     void parseBestiaryEntryChanged(const InputMessagePtr& msg);
+    void parseCyclopediaCharacterInfo(const InputMessagePtr& msg);
     void parseDailyRewardCollectionState(const InputMessagePtr& msg);
     void parseOpenRewardWall(const InputMessagePtr& msg);
     void parseDailyReward(const InputMessagePtr& msg);
@@ -311,9 +328,13 @@ private:
     void parseBosstiarySlots(const InputMessagePtr& msg);
     void parseBosstiaryCooldownTimer(const InputMessagePtr& msg);
     void parseBosstiaryEntryChanged(const InputMessagePtr& msg);
-    void parseTakeScreenshot(const InputMessagePtr& msg);
-    void parseHighscores(const InputMessagePtr& msg);
+    void parseBestiaryRaces(const InputMessagePtr& msg);
+    void parseBestiaryOverview(const InputMessagePtr& msg);
+    void parseBestiaryMonsterData(const InputMessagePtr& msg);
+    void parseBestiaryCharmsData(const InputMessagePtr& msg);
 
+
+    void parseHighscores(const InputMessagePtr& msg);
     void parseAttachedEffect(const InputMessagePtr& msg);
     void parseDetachEffect(const InputMessagePtr& msg);
     void parseCreatureShader(const InputMessagePtr& msg);

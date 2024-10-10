@@ -185,6 +185,7 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1200 then
+            g_game.enableFeature(GameColorizedLootValue)
             g_game.enableFeature(GameThingQuickLoot)
             g_game.enableFeature(GameTournamentPackets)
             g_game.enableFeature(GameVipGroups)

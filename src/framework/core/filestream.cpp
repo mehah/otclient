@@ -85,7 +85,7 @@ void FileStream::cache(bool useEnc)
 
             uint8_t* decryptedData = ResourceManager::decrypt(m_data.data(), m_data.size());
             m_data.resize(size - std::string(ENCRYPTION_HEADER).size());
-            memcpy(m_data.data(), decryptedData, m_data.size());
+            std::memcmp(m_data.data(), decryptedData, m_data.size());
             delete[] decryptedData;
         }
 #endif

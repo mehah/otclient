@@ -295,6 +295,14 @@ void ProtocolGame::sendTurnWest()
     send(msg);
 }
 
+void ProtocolGame::sendGmTeleport(const Position& pos)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientGmTeleport);
+    addPosition(msg, pos);
+    send(msg);
+}
+
 void ProtocolGame::sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType)
 {
     const auto& msg = std::make_shared<OutputMessage>();
@@ -822,7 +830,7 @@ void ProtocolGame::sendRemoveVip(const uint32_t playerId)
     send(msg);
 }
 
-void ProtocolGame::sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin)
+void ProtocolGame::sendEditVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupIDs)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientEditVip);
@@ -830,6 +838,38 @@ void ProtocolGame::sendEditVip(const uint32_t playerId, const std::string_view d
     msg->addString(description);
     msg->addU32(iconId);
     msg->addU8(static_cast<uint8_t>(notifyLogin));
+    if (g_game.getFeature(Otc::GameVipGroups)) {
+        msg->addU8(static_cast<uint8_t>(groupIDs.size()));
+        for (uint8_t groupID : groupIDs) {
+            msg->addU8(groupID);
+        }
+    }
+    send(msg);
+}
+
+void ProtocolGame::sendEditVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t groupId, const std::string_view groupName)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientEditVipGroups);
+    msg->addU8(static_cast<uint8_t>(action));
+    switch (action) {
+        case Otc::VIP_GROUP_ADD: { 
+            msg->addString(groupName); 
+            break;
+        }
+        case Otc::VIP_GROUP_EDIT: { 
+            msg->addU8(groupId);
+            msg->addString(groupName);
+            break;
+        }
+        case Otc::VIP_GROUP_REMOVE: {
+            msg->addU8(groupId); 
+            break;
+        }
+        default: {
+            return;
+        }
+    }
     send(msg);
 }
 
@@ -939,6 +979,110 @@ void ProtocolGame::sendSeekInContainer(const uint8_t containerId, const uint16_t
     if (g_game.getFeature(Otc::GameContainerFilter)) {
         msg->addU8(0); // Filter
     }
+    send(msg);
+}
+
+void ProtocolGame::sendInspectionNormalObject(const Position& position)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientInspectionObject);
+    msg->addU8(Otc::INSPECT_NORMALOBJECT);
+    addPosition(msg, position);
+    send(msg);
+}
+
+void ProtocolGame::sendInspectionObject(const Otc::InspectObjectTypes inspectionType, const uint16_t itemId, const uint8_t itemCount)
+{
+    if (inspectionType != Otc::INSPECT_NPCTRADE && inspectionType != Otc::INSPECT_CYCLOPEDIA) {
+        return;
+    }
+
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientInspectionObject);
+    msg->addU8(inspectionType);
+    msg->addU16(itemId);
+    msg->addU8(itemCount);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestBestiary()
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientBestiaryRequest);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientBestiaryRequestOverview);
+    msg->addU8(0x02);
+    msg->addString(catName);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestBestiarySearch(const uint16_t raceId)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientBestiaryRequestSearch);
+    msg->addU16(raceId);
+    send(msg);
+}
+
+void ProtocolGame::sendBuyCharmRune(const uint8_t runeId, const uint8_t action, const uint16_t raceId)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientCyclopediaSendBuyCharmRune);
+    msg->addU8(runeId);
+    msg->addU8(action);
+    msg->addU16(raceId);
+    send(msg);
+}
+
+void ProtocolGame::sendCyclopediaRequestCharacterInfo(const uint32_t playerId, const Otc::CyclopediaCharacterInfoType_t characterInfoType, const uint16_t entriesPerPage, const uint16_t page)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientCyclopediaRequestCharacterInfo);
+    msg->addU32(playerId);
+    msg->addU8(characterInfoType);
+
+    if (characterInfoType == Otc::CYCLOPEDIA_CHARACTERINFO_RECENTDEATHS || characterInfoType == Otc::CYCLOPEDIA_CHARACTERINFO_RECENTPVPKILLS) {
+        msg->addU16(entriesPerPage);
+        msg->addU16(page);
+    }
+
+    send(msg);
+}
+
+void ProtocolGame::sendRequestBosstiaryInfo()
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientBosstiaryRequestInfo);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestBossSlootInfo()
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientBosstiaryRequestSlotInfo);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestBossSlotAction(const uint8_t action, const uint32_t raceId)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientBosstiaryRequestSlotAction);
+    msg->addU8(action);
+    msg->addU32(raceId);
+    send(msg);
+}
+
+void ProtocolGame::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientBestiaryTrackerStatus);
+    msg->addU16(raceId);
+    msg->addU8(static_cast<uint8_t>(status));
     send(msg);
 }
 
