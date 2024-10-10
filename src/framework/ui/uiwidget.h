@@ -238,7 +238,6 @@ private:
     DrawConductor m_backgroundDrawConductor;
     DrawConductor m_imageDrawConductor;
     DrawConductor m_iconDrawConductor;
-    DrawConductor m_textDrawConductor;
     DrawConductor m_borderDrawConductor;
 
     // state managment
@@ -382,6 +381,8 @@ protected:
     float m_rotation{ 0.f };
     uint16_t m_autoRepeatDelay{ 500 };
     Point m_lastClickPosition;
+
+    DrawConductor m_textDrawConductor;
 
 public:
     void setX(int x) { move(x, getY()); }
@@ -573,8 +574,6 @@ private:
     Rect m_textCachedScreenCoords;
     std::vector<Point> m_glyphsPositionsCache;
     Size m_textSize;
-    CoordsBufferPtr m_coordsBuffer;
-    std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
 protected:
     virtual void updateText();
@@ -591,6 +590,9 @@ protected:
     BitmapFontPtr m_font;
     std::vector<std::pair<int, Color>> m_textColors;
     std::vector<std::pair<int, Color>> m_drawTextColors;
+
+    CoordsBufferPtr m_coordsBuffer;
+    std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
 

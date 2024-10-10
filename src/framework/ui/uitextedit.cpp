@@ -76,14 +76,15 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
             m_placeholderFont->drawText(m_placeholder, m_drawArea, m_placeholderColor, m_placeholderAlign);
         }
     }
+
     if (m_color != Color::alpha) {
-        if (glyphsMustRecache) {
-            m_glyphsTextRectCache.clear();
-            for (int i = -1; ++i < textLength;)
-                m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
+        if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
+            g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color, m_textDrawConductor);
+        } else {
+            for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
+                g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
+            }
         }
-        for (const auto& [dest, src] : m_glyphsTextRectCache)
-            g_drawPool.addTexturedRect(dest, texture, src, m_color);
     }
 
     if (hasSelection()) {
@@ -258,7 +259,34 @@ void UITextEdit::update(bool focusCursor)
     } else { // AlignLeft
     }
 
+    std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
+    uint32_t curColorRgba;
+    int32_t nextColorIndex = 0;
+    int32_t colorIndex = -1;
+    CoordsBufferPtr coords;
+
+    const int textColorsSize = m_drawTextColors.size();
+    m_colorCoordsBuffer.clear();
+
     for (int i = 0; i < textLength; ++i) {
+        if (i >= nextColorIndex) {
+            colorIndex = colorIndex + 1;
+            if (colorIndex < textColorsSize) {
+                curColorRgba = m_drawTextColors[colorIndex].second.rgba();
+            }
+            if (colorIndex + 1 < textColorsSize) {
+                nextColorIndex = m_drawTextColors[colorIndex + 1].first;
+            } else {
+                nextColorIndex = textLength;
+            }
+
+            if (colorCoordsMap.find(curColorRgba) == colorCoordsMap.end()) {
+                colorCoordsMap.insert(std::make_pair(curColorRgba, std::make_shared<CoordsBuffer>()));
+            }
+
+            coords = colorCoordsMap[curColorRgba];
+        }
+
         glyph = static_cast<uint8_t>(text[i]);
         m_glyphsCoords[i].first.clear();
 
@@ -324,6 +352,16 @@ void UITextEdit::update(bool focusCursor)
         // render glyph
         m_glyphsCoords[i].first = glyphScreenCoords;
         m_glyphsCoords[i].second = glyphTextureCoords;
+
+        if (textColorsSize > 0) {
+            coords->addRect(glyphScreenCoords, glyphTextureCoords);
+        } else {
+            m_coordsBuffer->addRect(glyphScreenCoords, glyphTextureCoords);
+        }
+    }
+
+    for (auto& [rgba, crds] : colorCoordsMap) {
+        m_colorCoordsBuffer.emplace_back(Color(rgba), crds);
     }
 
     if (fireAreaUpdate)
@@ -575,8 +613,11 @@ void UITextEdit::updateDisplayedText()
     else
         text = m_text;
 
-    if (isTextWrap() && m_rect.isValid())
+    m_drawTextColors = m_textColors;
+
+    if (isTextWrap() && m_rect.isValid()) {
         text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x);
+    }
 
     m_displayedText = text;
 }
