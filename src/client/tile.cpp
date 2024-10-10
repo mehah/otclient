@@ -222,7 +222,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
             if (!prevEffect->canDraw())
                 continue;
 
-            if (mustOptimize && newEffect->getSize() > prevEffect->getSize()) {
+            if (mustOptimize && newEffect->getSize() >= prevEffect->getSize()) {
                 prevEffect->canDraw(false);
             } else if (mustOptimize || newEffect->getId() == prevEffect->getId()) {
                 if (!newEffect->waitFor(prevEffect))
