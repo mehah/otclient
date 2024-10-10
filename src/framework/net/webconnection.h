@@ -73,16 +73,14 @@ protected:
     void onWrite(const std::shared_ptr<asio::streambuf>&
                  outputStream);
     void onRecv(const uint16_t recvSize);
-    void onTimeout(const std::error_code& error);
+    void onTimeout();
 
     static void runOnConnectCallback(std::function<void ()> callback);
+    static void runOnErrorCallback(ErrorCallback callback);
 
     std::function<void()> m_connectCallback;
     ErrorCallback m_errorCallback;
     RecvCallback m_recvCallback;
-
-    asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_readTimer;
-    asio::basic_waitable_timer<std::chrono::high_resolution_clock> m_writeTimer;
 
     EMSCRIPTEN_WEBSOCKET_T m_websocket = 0;
     uint16_t m_port;
@@ -95,7 +93,5 @@ protected:
     stdext::timer m_activityTimer;
 
     asio::streambuf m_inputStream;
-
-    friend class Server;
 };
 #endif

@@ -36,11 +36,8 @@
 
 
 
-asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> WebConnection::m_outputStreams;
-WebConnection::WebConnection() :
-    m_readTimer(g_ioService),
-    m_writeTimer(g_ioService)
+WebConnection::WebConnection()
 {
 }
 
@@ -54,15 +51,11 @@ WebConnection::~WebConnection()
 
 void WebConnection::poll()
 {
-    // reset must always be called prior to poll
-    g_ioService.reset();
-    g_ioService.poll();
+
 }
 
 void WebConnection::terminate()
 {
-    g_ioService.stop();
-    m_outputStreams.clear();
     emscripten_websocket_deinitialize();
 }
 
@@ -82,10 +75,6 @@ void WebConnection::close()
     m_connectCallback = nullptr;
     m_errorCallback = nullptr;
     m_recvCallback = nullptr;
-
-    m_readTimer.cancel();
-    m_writeTimer.cancel();
-
 
     m_inputStream.consume(m_inputStream.size());
 
@@ -124,10 +113,13 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
 
     m_websocket = emscripten_websocket_new(&attributes);
 
+    if (m_websocket < 1 && m_errorCallback) {
+        m_errorCallback(asio::error::network_unreachable);
+        return;
+    }
+
     emscripten_websocket_set_onopen_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketOpenEvent* /*event*/, void* userData) -> EM_BOOL {
         WebConnection* webConnection = static_cast<WebConnection*>(userData);
-        webConnection->m_readTimer.cancel();
-        webConnection->m_activityTimer.restart();
         webConnection->m_connected = true;
 
         if (webConnection->m_connectCallback) {
@@ -141,6 +133,9 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
 
     emscripten_websocket_set_onerror_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketErrorEvent* /*event*/, void* userData) -> EM_BOOL {
         WebConnection* webConnection = static_cast<WebConnection*>(userData);
+        if (webConnection->m_errorCallback) {
+            emscripten_dispatch_to_thread(webConnection->m_pthread, EM_FUNC_SIG_VI, reinterpret_cast<void*>(runOnErrorCallback), nullptr, &webConnection->m_errorCallback);
+        }
         if (webConnection->m_connected || webConnection->m_connecting) {
             webConnection->close();
         }
@@ -148,7 +143,8 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
     }));
 
     emscripten_websocket_set_onclose_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketCloseEvent* /*event*/, void* userData) -> EM_BOOL {
-        static_cast<WebConnection*>(userData)->close();
+        WebConnection* webConnection = static_cast<WebConnection*>(userData);
+        webConnection->close();
         return EM_TRUE;
     }));
 
@@ -162,8 +158,9 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
         uint8_t* const data = webSocketEvent->data;
         auto webConnection = static_cast<WebConnection*>(userData);
 
-        std::ostream request_stream(&webConnection->m_inputStream);
-        request_stream.write((const char*)data, numBytes);
+        std::ostream os(&webConnection->m_inputStream);
+        os.write((const char*)data, numBytes);
+        os.flush();
 
         return EM_TRUE;
     }));
@@ -208,12 +205,6 @@ void WebConnection::internal_write()
     std::shared_ptr<asio::streambuf> outputStream = m_outputStream;
     m_outputStream = nullptr;
 
-    m_writeTimer.cancel();
-    m_writeTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(WRITE_TIMEOUT)));
-    m_writeTimer.async_wait([capture0 = asWebConnection()](auto&& PH1) {
-        capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
-    });
-
     const auto* data = asio::buffer_cast<const uint8_t*>(outputStream->data());
     bool write = sendPacket((uint8_t*)data, outputStream->size());
     if (write) {
@@ -228,19 +219,20 @@ void WebConnection::read(const uint16_t size, const RecvCallback& callback, int 
 
     m_recvCallback = callback;
 
+    if (tries > 1000) {
+        onTimeout();
+        return;
+    }
+
     auto retry = [capture0 = asWebConnection(), size, callback, tries] { capture0->read(size, callback, tries + 1); };
 
     if (tries == 0) {
-        m_readTimer.cancel();
-        m_readTimer.expires_from_now(asio::chrono::seconds(static_cast<uint32_t>(READ_TIMEOUT)));
-        m_readTimer.async_wait([capture0 = asWebConnection()](auto&& PH1) {
-            capture0->onTimeout(std::forward<decltype(PH1)>(PH1));
-        });
         g_dispatcher.addEvent(std::move(retry));
         return;
     }
 
     if (m_inputStream.size() < size) {
+        emscripten_thread_sleep(10);
         g_dispatcher.addEvent(std::move(retry));
         return;
     }
@@ -252,10 +244,12 @@ void WebConnection::runOnConnectCallback(std::function<void()> callback) {
     callback();
 }
 
+void WebConnection::runOnErrorCallback(ErrorCallback callback) {
+    callback(asio::error::timed_out);
+}
+
 void WebConnection::onWrite(const std::shared_ptr<asio::streambuf>& outputStream)
 {
-    m_writeTimer.cancel();
-
     // free output stream and store for using it again later
     outputStream->consume(outputStream->size());
     m_outputStreams.emplace_back(outputStream);
@@ -263,11 +257,10 @@ void WebConnection::onWrite(const std::shared_ptr<asio::streambuf>& outputStream
 
 void WebConnection::onRecv(const uint16_t recvSize)
 {
-    m_readTimer.cancel();
     m_activityTimer.restart();
 
     if (m_connected) {
-        if (m_recvCallback) {            
+        if (m_recvCallback) {
             const auto* header = asio::buffer_cast<const char*>(m_inputStream.data());
             m_recvCallback((uint8_t*)header, recvSize);
         }
@@ -275,13 +268,10 @@ void WebConnection::onRecv(const uint16_t recvSize)
     m_inputStream.consume(recvSize);
 }
 
-void WebConnection::onTimeout(const std::error_code& error)
+void WebConnection::onTimeout()
 {
-    if (error == asio::error::operation_aborted)
-        return;
-
     if (m_errorCallback)
-        m_errorCallback(error);
+        m_errorCallback(asio::error::timed_out);
 
     if (m_connected || m_connecting)
         close();

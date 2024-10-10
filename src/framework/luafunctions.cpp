@@ -898,12 +898,14 @@ void Application::registerLuaFunctions()
 #endif
 
 #ifdef FRAMEWORK_NET
+#ifndef __EMSCRIPTEN__
     // Server
     g_lua.registerClass<Server>();
     g_lua.bindClassStaticFunction<Server>("create", &Server::create);
     g_lua.bindClassMemberFunction<Server>("close", &Server::close);
     g_lua.bindClassMemberFunction<Server>("isOpen", &Server::isOpen);
     g_lua.bindClassMemberFunction<Server>("acceptNext", &Server::acceptNext);
+#endif
 
     // Connection
 #ifdef __EMSCRIPTEN__
