@@ -164,7 +164,7 @@ void MapView::drawFloor()
         g_drawPool.flush();
     }
 
-    if (m_posInfo.rect.contains(g_window.getMousePosition())) {
+    if (m_posInfo.rect.contains(g_window.getMousePosition() * g_window.getDisplayDensity())) {
         if (m_crosshairTexture && m_mousePosition.isValid()) {
             const auto& point = transformPositionTo2D(m_mousePosition);
             const auto& crosshairRect = Rect(point, m_tileSize, m_tileSize);
@@ -335,7 +335,7 @@ void MapView::updateVisibleTiles()
     m_lastCameraPosition = m_posInfo.camera;
     destroyHighlightTile();
 
-    const bool fadeFinished = getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
+    const bool checkIsCovered = !g_gameConfig.isDrawingCoveredThings() && getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
 
     // cache visible tiles in draw order
     // draw from last floor (the lower) to first floor (the higher)
@@ -360,7 +360,7 @@ void MapView::updateVisibleTiles()
 
                     bool addTile = true;
 
-                    if (fadeFinished) {
+                    if (checkIsCovered) {
                         // skip tiles that are completely behind another tile
                         if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
                             if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
@@ -612,10 +612,11 @@ void MapView::setCameraPosition(const Position& pos)
 
 Position MapView::getPosition(const Point& mousePos)
 {
-    if (!m_posInfo.rect.contains(mousePos))
+    auto newMousePos = mousePos * g_window.getDisplayDensity();
+    if (!m_posInfo.rect.contains(newMousePos))
         return {};
 
-    const auto& relativeMousePos = mousePos - m_posInfo.rect.topLeft();
+    const auto& relativeMousePos = newMousePos - m_posInfo.rect.topLeft();
     return getPosition(relativeMousePos, m_posInfo.rect.size());
 }
 

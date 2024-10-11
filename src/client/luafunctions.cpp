@@ -271,6 +271,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "addVip", &Game::addVip, &g_game);
     g_lua.bindSingletonFunction("g_game", "removeVip", &Game::removeVip, &g_game);
     g_lua.bindSingletonFunction("g_game", "editVip", &Game::editVip, &g_game);
+    g_lua.bindSingletonFunction("g_game", "editVipGroups", &Game::editVipGroups, &g_game);
     g_lua.bindSingletonFunction("g_game", "setChaseMode", &Game::setChaseMode, &g_game);
     g_lua.bindSingletonFunction("g_game", "setFightMode", &Game::setFightMode, &g_game);
     g_lua.bindSingletonFunction("g_game", "setPVPMode", &Game::setPVPMode, &g_game);
@@ -365,6 +366,18 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "requestBless", &Game::requestBless, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestQuickLootBlackWhiteList", &Game::requestQuickLootBlackWhiteList, &g_game);
     g_lua.bindSingletonFunction("g_game", "openContainerQuickLoot", &Game::openContainerQuickLoot, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendGmTeleport", &Game::sendGmTeleport, &g_game);
+    g_lua.bindSingletonFunction("g_game", "inspectionNormalObject", &Game::inspectionNormalObject, &g_game);
+    g_lua.bindSingletonFunction("g_game", "inspectionObject", &Game::inspectionObject, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestBestiary", &Game::requestBestiary, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestBestiaryOverview", &Game::requestBestiaryOverview, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestBestiarySearch", &Game::requestBestiarySearch, &g_game);
+    g_lua.bindSingletonFunction("g_game", "BuyCharmRune", &Game::requestSendBuyCharmRune, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestCharacterInfo", &Game::requestSendCharacterInfo, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestBosstiaryInfo", &Game::requestBosstiaryInfo, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestBossSlootInfo", &Game::requestBossSlootInfo, &g_game);
+    g_lua.bindSingletonFunction("g_game", "requestBossSlotAction", &Game::requestBossSlotAction, &g_game);
+    g_lua.bindSingletonFunction("g_game", "sendStatusTrackerBestiary", &Game::sendStatusTrackerBestiary, &g_game);
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
@@ -690,6 +703,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getId", &Item::getId);
     g_lua.bindClassMemberFunction<Item>("getTooltip", &Item::getTooltip);
     g_lua.bindClassMemberFunction<Item>("getDurationTime", &Item::getDurationTime);
+    g_lua.bindClassMemberFunction<Item>("getTier", &Item::getTier);
 
     g_lua.bindClassMemberFunction<Item>("isStackable", &Item::isStackable);
     g_lua.bindClassMemberFunction<Item>("isMarketable", &Item::isMarketable);

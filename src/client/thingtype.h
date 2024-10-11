@@ -254,6 +254,7 @@ struct ImbuementSlot
 
 struct ImbuementTrackerItem
 {
+    ImbuementTrackerItem() : slot(0) { }
     ImbuementTrackerItem(uint8_t slot) : slot(slot) { }
 
     uint8_t slot;

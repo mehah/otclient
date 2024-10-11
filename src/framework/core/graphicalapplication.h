@@ -104,6 +104,9 @@ public:
     void setDrawTexts(bool v) { m_drawText = v; }
     bool isDrawingTexts() { return m_drawText; }
 
+    float getHUDScale() const;
+    void setHUDScale(float v);
+
     float getCreatureInformationScale() const { return m_creatureInformationScale; }
     void setCreatureInformationScale(float v) { m_creatureInformationScale = v; }
 
@@ -116,7 +119,7 @@ public:
     bool isLoadingAsyncTexture();
     void setLoadingAsyncTexture(bool v);
 
-    bool isScaled() { return g_window.getDisplayDensity() != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
+    bool isScaled() { return g_window.getDisplayDensity() != 1.f; }
 
     bool isEncrypted() {
 #if ENABLE_ENCRYPTION == 1

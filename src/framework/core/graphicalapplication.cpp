@@ -151,7 +151,7 @@ void GraphicalApplication::run()
 
         BS::multi_future<void> tasks;
 
-        g_eventThreadId = EventDispatcher::getThreadId();
+        g_luaThreadId = g_eventThreadId = stdext::getThreadId();
         while (!m_stopping) {
             poll();
 
@@ -222,6 +222,8 @@ void GraphicalApplication::run()
 
     m_running = false;
     m_stopping = false;
+
+    g_luaThreadId = g_eventThreadId = -1;
 }
 
 void GraphicalApplication::poll()
@@ -325,4 +327,10 @@ void GraphicalApplication::doScreenshot(std::string file)
 void GraphicalApplication::doMapScreenshot(std::string fileName)
 {
     if (m_drawEvents) m_drawEvents->doMapScreenshot(fileName);
+}
+
+float GraphicalApplication::getHUDScale() const { return g_window.getDisplayDensity(); }
+void GraphicalApplication::setHUDScale(float v) {
+    g_window.setDisplayDensity(v);
+    resize(g_graphics.getViewportSize());
 }

@@ -1,0 +1,200 @@
+UIWidget
+  id: Cat3
+  anchors.fill: parent
+  visible: false
+  SubPanel
+    id: InformationBase
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-bottom: 30
+    margin-top: 10
+    width: 163
+    !text: tr('Information')
+    UIWidget
+      id: TextBase
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin: 20 5 5 5
+      height: 110
+      text-align: topLeft
+      text-wrap: true
+      color: #C1C1C1
+      margin-top: 25
+    BorderBox
+      id: InfoBase
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-top: 140
+      margin-right: 7
+      image-source: /images/ui/panel_flat
+      image-border: 10
+      size: 66 66
+      phantom: true
+      UICreature
+        id: sprite
+        anchors.centerIn: parent
+        size: 64 64
+    Button
+      id: UnlockButton
+      size: 75 20
+      anchors.bottom: InfoBase.bottom
+      anchors.left: parent.left
+      margin-left: 10
+      margin-right: 10
+      !text: tr('Unlock')
+      //font: verdana-bold-8px-antialiased
+      text-offset: 0 -1
+      color: #C0C0C0
+      enabled: false
+      @onClick: modules.game_cyclopedia.Cyclopedia.actionCharmButton(self)
+    BorderBox
+      id: ItemBase
+      anchors.top: InfoBase.top
+      anchors.horizontalCenter: UnlockButton.horizontalCenter
+      image-source: /images/ui/panel_flat
+      image-border: 10
+      size: 37 37
+      phantom: true
+      UIWidget
+        size: 32 32
+        id: image
+        anchors.centerIn: parent
+        phantom: true
+    UIWidget
+      id: PriceBase
+      anchors.left: UnlockButton.left
+      anchors.right: UnlockButton.right
+      anchors.top: UnlockButton.bottom
+      margin-top: 5
+      height: 20
+      image-source: /images/ui/item
+      image-border: 10
+      phantom: true
+      Label
+        id: Value
+        anchors.centerIn: parent
+        !text: tr('0')
+        text-auto-resize: true
+      UIWidget
+        id: Charm
+        anchors.left: Value.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 2
+        image-source: /game_cyclopedia/images/icon_charms
+      UIWidget
+        id: Gold
+        anchors.left: Value.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-left: 2
+        image-source: /game_cyclopedia/images/icon_gold
+        visible: false
+    UIWidget
+      id: StoreButton
+      anchors.right: InfoBase.right
+      anchors.top: PriceBase.top
+      margin-top: -2
+      size: 26 20
+      image-source: /game_cyclopedia/images/button_store
+      image-clip: 0 0 26 20
+      $pressed:
+        image-source: /game_cyclopedia/images/button_store
+        image-clip: 0 20 26 20
+    UIWidget
+      id: InfoButton
+      anchors.right: StoreButton.left
+      anchors.verticalCenter: StoreButton.verticalCenter
+      margin-right: 5
+      image-source: /images/icons/show_gui_help_grey
+      !tooltip: ('You can assign 4 more Charms to creatures.\nBuy a "Charm Expansion" to assign your unlocked Charms to\ncreatures nearly unlimitedly and to get a 25% discount whenever\nyou are removing a Charm.')
+    TextEdit
+      id: SearchEdit
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      margin-bottom: 10
+      color: #C0C0C0
+      placeholder: Type to search
+      placeholder-color: #6E706F
+      padding-top: 1
+      size: 140 17
+      @onTextChange: modules.game_cyclopedia.Cyclopedia.searchCharmMonster(self:getText())
+    Label
+      id: SearchLabel
+      anchors.left: SearchEdit.left
+      anchors.bottom: SearchEdit.top
+      margin-bottom: 5
+      color: #C0C0C0
+      !text: tr('Search') .. ':'
+    BorderBox
+      id: CreaturesBase
+      anchors.bottom: SearchEdit.top
+      anchors.right: SearchEdit.right
+      anchors.left: SearchEdit.left
+      margin-bottom: 30
+      image-source: /images/ui/panel_flat
+      image-border: 10
+      height: 105
+      phantom: true
+      UIScrollArea
+        id: CreatureList
+        vertical-scrollbar: CreatureListScrollbar
+        anchors.fill: parent
+        margin-right: 13
+        padding-left: 3
+        padding-top: 3
+        padding-bottom: 2
+        layout:
+          type: grid
+          cell-size: 125 15
+          cell-spacing: 2
+          flow: true
+        CharmCreatureName
+          background-color: #484848
+        CharmCreatureName
+          background-color: #414141
+      VerticalScrollBar
+        id: CreatureListScrollbar
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        step: 80
+        pixel-scroll: true
+    Label
+      id: CreaturesLabel
+      anchors.left: CreaturesBase.left
+      anchors.bottom: CreaturesBase.top
+      margin-bottom: 5
+      color: #C0C0C0
+      !text: tr('Select Creature') .. ':'
+  BorderBox
+    id: ListBase
+    anchors.bottom: InformationBase.bottom
+    anchors.top: parent.top
+    anchors.left: InformationBase.right
+    anchors.right: parent.right
+    margin-top: 10
+    margin-left: 10
+  UIScrollArea
+    id: CharmList
+    vertical-scrollbar: CharmListScrollbar
+    anchors.fill: ListBase
+    margin-right: 13
+
+    padding-left: 3
+    padding-right: 2
+    padding-top: 5
+    padding-bottom: 2
+    layout:
+      type: grid
+      cell-size: 158 94
+      cell-spacing: 2
+      flow: true
+  VerticalScrollBar
+    id: CharmListScrollbar
+    anchors.top: ListBase.top
+    anchors.right: ListBase.right
+    anchors.bottom: ListBase.bottom
+    step: 80
+
+    pixel-scroll: true

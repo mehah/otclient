@@ -114,7 +114,8 @@ return {
     ambientLight                      = {
         value = 0,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsEffectsPanel:recursiveGetChildById('ambientLight'):setText(string.format('Ambient light: %s%%', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('ambientLight'):setText(string.format(
+                'Ambient light: %s%%', value))
             panels.gameMapPanel:setMinimumAmbientLight(value / 100)
             panels.gameMapPanel:setDrawLights(options.enableLights.value)
         end
@@ -232,7 +233,8 @@ return {
     floorFading                       = {
         value = 500,
         action = function(value, options, controller, panels, extraWidgets)
-            panels.graphicsEffectsPanel:recursiveGetChildById('floorFading'):setText(string.format('Floor Fading: %s ms', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('floorFading'):setText(string.format('Floor Fading: %s ms',
+                value))
             panels.gameMapPanel:setFloorFading(tonumber(value))
         end
     },
@@ -249,6 +251,29 @@ return {
             end
 
             g_app.setLoadingAsyncTexture(value)
+        end
+    },
+    hudScale                          = {
+        event = nil,
+        value = 0,
+        action = function(value, options, controller, panels, extraWidgets)
+            if g_platform.isMobile() then
+                hudWidget:disable()
+            else
+                value = value / 2
+
+                if options.hudScale.event ~= nil then
+                    removeEvent(options.hudScale.event)
+                end
+
+                options.hudScale.event = scheduleEvent(function()
+                    g_app.setHUDScale(math.max(value + 0.5, 1))
+                    options.hudScale.event = nil
+                end, 250)
+            end
+
+            local hudWidget = panels.interfaceHUD:recursiveGetChildById('hudScale')
+            hudWidget:setText(string.format('HUD Scale: %sx', math.max(value + 0.5, 1)))
         end
     },
     creatureInformationScale          = {
@@ -308,7 +333,7 @@ return {
             modules.game_interface.getRightExtraPanel():setOn(value)
         end
     },
-    showActionbar                    = {
+    showActionbar                     = {
         value = false,
         action = function(value, options, controller, panels, extraWidgets)
             modules.game_actionbar.setActionBarVisible(value)
@@ -332,14 +357,16 @@ return {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
             g_client.setEffectAlpha(value / 100)
-            panels.graphicsEffectsPanel:recursiveGetChildById('setEffectAlphaScroll'):setText(tr('Opacity Effect: %s%%', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('setEffectAlphaScroll'):setText(tr('Opacity Effect: %s%%',
+                value))
         end
     },
     setMissileAlphaScroll             = {
         value = 100,
         action = function(value, options, controller, panels, extraWidgets)
             g_client.setMissileAlpha(value / 100)
-            panels.graphicsEffectsPanel:recursiveGetChildById('setMissileAlphaScroll'):setText(tr('Opacity Missile: %s%%', value))
+            panels.graphicsEffectsPanel:recursiveGetChildById('setMissileAlphaScroll'):setText(tr(
+                'Opacity Missile: %s%%', value))
         end
     },
     distFromCenScrollbar              = {
@@ -358,7 +385,7 @@ return {
             modules.game_healthcircle.setCircleOpacity(bar:recursiveGetChildById('valueBar'):getValue() / 100)
         end
     },
-    profile                          = {
+    profile                           = {
         value = 1,
     }
 }

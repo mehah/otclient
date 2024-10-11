@@ -33,8 +33,9 @@ public:
     DrawPool* get(const DrawPoolType type) const { return m_pools[static_cast<uint8_t>(type)]; }
 
     void select(DrawPoolType type);
-    void preDraw(const DrawPoolType type, const std::function<void()>& f, const bool alwaysDraw = false) { preDraw(type, f, {}, {}, Color::alpha, alwaysDraw); }
-    void preDraw(DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, const bool alwaysDraw = false);
+    void preDraw(const DrawPoolType type, const std::function<void()>& f, const bool alwaysDraw = false) { preDraw(type, f, nullptr, {}, {}, Color::alpha, alwaysDraw); }
+    void preDraw(DrawPoolType type, const std::function<void()>& f, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, const bool alwaysDraw = false) { preDraw(type, f, nullptr, dest, src, colorClear, alwaysDraw); }
+    void preDraw(DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, const bool alwaysDraw = false);
 
     void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
     { addTexturedRect(Rect(point, texture->getSize()), texture, color); }
@@ -114,9 +115,7 @@ private:
     void init(uint16_t spriteSize);
     void terminate() const;
     void drawObject(const DrawPool::DrawObject& obj);
-
-    bool drawPool(const DrawPoolType type);
-    bool drawPool(DrawPool* pool);
+    void drawPool(const DrawPoolType type);
 
     CoordsBuffer m_coordsBuffer;
     std::array<DrawPool*, static_cast<uint8_t>(DrawPoolType::LAST)> m_pools{};

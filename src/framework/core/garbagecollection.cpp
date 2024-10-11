@@ -37,9 +37,6 @@ constexpr uint32_t THINGTYPE_TIME = 2 * 1000; // 2seg
 Timer lua_timer, texture_timer, drawpool_timer, thingtype_timer;
 
 void GarbageCollection::poll() {
-    if (canCheck(lua_timer, LUA_TIME))
-        g_lua.collectGarbage();
-
     if (canCheck(thingtype_timer, THINGTYPE_TIME))
         g_asyncDispatcher.detach_task([] { thingType(); });
 
@@ -47,13 +44,15 @@ void GarbageCollection::poll() {
         g_asyncDispatcher.detach_task([] { texture(); });
 
     if (canCheck(drawpool_timer, DRAWPOOL_TIME))
-        g_mainDispatcher.addEvent([] { drawpoll(); });
+        drawpoll();
+
+    if (canCheck(lua_timer, LUA_TIME))
+        g_lua.collectGarbage();
 }
 
 void GarbageCollection::drawpoll() {
-    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
+    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);)
         g_drawPool.get(static_cast<DrawPoolType>(i))->resetBuffer();
-    }
 }
 
 void GarbageCollection::texture() {
@@ -85,12 +84,12 @@ void GarbageCollection::thingType() {
     const auto& thingTypes = g_things.m_thingTypes[category];
     const size_t limit = std::min<size_t>(index + AMOUNT_PER_CHECK, thingTypes.size());
 
-    std::vector<ThingTypePtr> thingsUnload;
+    std::vector<ThingTypePtr> thingsUnloaded;
 
     while (index < limit) {
         auto& thing = thingTypes[index];
         if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
-            thingsUnload.emplace_back(thing);
+            thingsUnloaded.emplace_back(thing);
         }
         ++index;
     }
@@ -100,9 +99,9 @@ void GarbageCollection::thingType() {
         ++category;
     }
 
-    if (!thingsUnload.empty()) {
-        g_dispatcher.addEvent([thingsUnload = std::move(thingsUnload)] {
-            for (auto& thingType : thingsUnload)
+    if (!thingsUnloaded.empty()) {
+        g_dispatcher.addEvent([thingsUnloaded = std::move(thingsUnloaded)] {
+            for (auto& thingType : thingsUnloaded)
                 thingType->unload();
         });
     }

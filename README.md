@@ -164,7 +164,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
       - ThingCategoryCreature 
       - ThingExternalTexture: are images in Png | Apng
 
-    - [Wiki](https://github.com/Nottinghster/otclient/wiki/Wiki-Attached-Effects)  
+    - [Wiki](https://github.com/mehah/otclient/wiki/Tutorial-Attached-Effects)  
 
     - Example Code:
     (code sample: [effects.lua](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/effects.lua), [code test](https://github.com/mehah/otclient/blob/main/modules/game_attachedeffects/attachedeffects.lua#L1))
@@ -176,7 +176,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/001_Bone.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/002_aura.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/003_particula.gif?raw=true" width="250" alt="Space Invaders" style="max-width: 250px;"> |
 |-------------------------------------------|---------------|-------------------------|
-| Creature Attached Effect | Light Attached Effect | Creature Particule |
+| ThingCategory Attached Effect | Texture(Png) Attached Effect | <center> Particule </center> |
 
 
 - Floor Shadowing
@@ -194,7 +194,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 
-- Client 12.85 ~ 12.92, 13.00 ~ 13.32 support (protobuf)
+- Client 12.85 ~ 12.92, 13.00 ~ 13.40 support (protobuf)
 - Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
 - Async Texture Loading
 - <details>
@@ -237,7 +237,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </details>
 
 - Drawpool 3
-- Tile Widget [Wiki](https://github.com/mehah/otclient/wiki)
+- Tile Widget [Wiki](https://github.com/mehah/otclient/wiki/Tutorial-Attached-Effects)
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="250" alt="Haskanoid Video" style="max-width:250px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/raw/main/Picture/Attached%20Effect/Tile/003_particulas.gif?raw=true" width="310" alt="Space Invaders" style="max-width: 310px;"> |
 |-------------------------------------------|---------------|-------------------------|
@@ -256,7 +256,13 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
    - [Blessing](https://github.com/mehah/otclient/pull/825)
 </details>
 
+- Support DirectX
 
+- <details>
+   <summary>Garbage Collection </summary>
+  <br>
+  Garbage collector is used to check what is no longer being used and remove it from memory. (lua, texture, drawpool, thingtype)
+</details>
 
 
 
@@ -421,33 +427,45 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/001_interface.png?raw=true" width="300" alt="Haskanoid Video" style="max-width:300px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/002_ingame.png?raw=true" width="300" alt="Peoplemon by Alex Stuart" style="max-width: 300px;"> |
 |-------------------------------------------|---------------|
-| Interface. | In-game |
-- blessing
+|<center> Interface </center> | <center>In-game</center> |
+- Imbuement tracker by [@Reyaleman](https://github.com/reyaleman)
+- Blessing
 - Screenshot
-- highscores
-- Store
-- Cyclopedia
+- Highscores
+- Store (compatible with 13.32 - 13.40)
+- QuickLoot
+- Groups Vip
+
+- <details>
+   <summary>Browser Client by @OTArchive</summary>
+
+  - by [@OTArchive](https://github.com/OTArchive)
+  - wiki: https://github.com/OTArchive/otclient-web/wiki/Guia-%E2%80%90-OTClient-Redemption-Web
+  - <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Wiki/2024-09-27_19-50-58.mp4?raw=true" width="400" controls></video>
+
+</details>
 
 ##### 💸 Sponsored  (Features)
-- Bot V8 | ([@luanluciano93](https://github.com/luanluciano93), [@SkullzOTS](https://github.com/SkullzOTS), [@kokekanon](https://github.com/kokekanon), [@FranciskoKing](https://github.com/FranciskoKing), [@Kizuno18](https://github.com/Kizuno18))
+- Bot V8  ([@luanluciano93](https://github.com/luanluciano93), [@SkullzOTS](https://github.com/SkullzOTS), [@kokekanon](https://github.com/kokekanon), [@FranciskoKing](https://github.com/FranciskoKing), [@Kizuno18](https://github.com/Kizuno18))
   - Is adapted in 85%
   - To enable it, it is necessary to remove/off the BOT_PROTECTION flag.
   - [VS Solution](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/vc17/settings.props#L9) / [CMAKE](https://github.com/mehah/otclient/blob/68e4e1b94c2041bd235441244156e6477058250c/src/CMakeLists.txt#L13)
 
-- Shader with Framebuffer | ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
+- Shader with Framebuffer  ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/001_creature.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/002_items.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/003_UICreature.gif?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
 |-------------------------------------------|---------------|-------------------------|
-| Creature. | Items | UICreature |
+| <center>Creature.</center> |<center> Items</center> |<center> UICreature </center> |
 
-
+- Full Cyclopedia ([@luanluciano93](https://github.com/luanluciano93), [@kokekanon](https://github.com/kokekanon), [@MUN1Z](https://github.com/MUN1Z) ,[@qatari](https://github.com/qatari) )
 
 ##### [OTClient V8](https://github.com/OTCv8) (Features)
 - Lighting System
 - Floor Fading
 - Path Finding
-- game shop module
-- game outfit module
+- Module Shop
+- Module Oufit
+- Placeholder
   
 ## <a name="themobileproject"><img height="32" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png" alt="Android"> The Mobile Project </a>
 The Mobile Project
@@ -505,8 +523,10 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 
 > \[!TIP]
 >
-> if using Nostalrius 7.2, Nekiro TFS-1.5-Downgrades-7.72 OR any protocol below 860 that the walking system is **stuttering**. set this to true.
-https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
+> if using Nostalrius 7.2, Nekiro TFS-1.5-Downgrades-7.72 OR any protocol below 860 that the walking system is **stuttering**. set 
+[force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21) in setup.otml
+>
+> In Old Protocol , if you consider that the speed of the item is too fast, modify [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)  in setup.otml
 
 ## <a name="roadmap">❤️ Roadmap</a>
 
@@ -514,30 +534,26 @@ https://github.com/mehah/otclient/blob/main/data/setup.otml#L21
 |-----------------------	|-----------------------------------	|------	|
 | Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
 | Familiar outfit       	| ![](https://geps.dev/progress/30) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
-| Cyclopedia            	| ![](https://geps.dev/progress/90) 	| [#47](https://github.com/Nottinghster/otclient/pull/47) 	|
-| Blessing            	| ![](https://geps.dev/progress/100) 	| [#825](https://github.com/mehah/otclient/pull/825)	|
-| wheel_of_destiny            	| ![](https://geps.dev/progress/1) 	| None	|
+| wheel of destiny            	| ![](https://geps.dev/progress/1) 	| None	|
+| Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
-| fix Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
-| Quickloot | ![](https://geps.dev/progress/30)   |   None   	|
+| fix: Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
 | Sound tibia 13 | ![](https://geps.dev/progress/0)   |   None   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
 
 
-
-
-
 | Protocol / version   	| Description                 	| Required Feature                                    	| Compatibility 	|
 |---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
-| TFS <br> (7.72)      	| Downgrade nekiro /<br> Nostalrius 	|                                           	| ✅            	|
-| TFS 0.4 <br> (8.6)       	| Fir3element                	|                                  	| ✅             	|
-| TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/kokekanon/otclient.readme/blob/readme3/data/setup.otml#L21)                     	| ✅             	|
+| TFS <br> (7.72)      	| Downgrade nekiro /<br> Nostalrius 	|                  [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)                          	| ✅            	|
+| TFS 0.4 <br> (8.6)       	| Fir3element                	|  [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)                                 	| ✅             	|
+| TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)        	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	|                                              	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
 | Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
 | Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
-| Canary 13.40        	| OpenTibiaBr              	|            	| 〰️             	|
+| Canary 13.40        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
+
 
 
 
