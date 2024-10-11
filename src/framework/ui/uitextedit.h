@@ -152,7 +152,6 @@ private:
 
     std::vector<std::pair<Rect, Rect>> m_glyphsCoords;
 
-    std::vector<std::pair<Rect, Rect>> m_glyphsTextRectCache;
     std::vector<std::pair<Rect, Rect>> m_glyphsSelectRectCache;
 
     std::string m_displayedText;
