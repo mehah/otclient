@@ -506,15 +506,24 @@ void UITextEdit::blinkCursor()
     repaint();
 }
 
+void UITextEdit::deleteSelection()
+{
+    if (!hasSelection()) {
+        return;
+    }
+
+    std::string tmp = m_text;
+    tmp.erase(m_selectionStart, m_selectionEnd - m_selectionStart);
+
+    setCursorPos(m_selectionStart);
+    clearSelection();
+    setText(tmp);
+}
+
 void UITextEdit::del(bool right)
 {
     if (hasSelection()) {
-        std::string tmp = m_text;
-        tmp.erase(m_selectionStart, m_selectionEnd - m_selectionStart);
-
-        setCursorPos(m_selectionStart);
-        clearSelection();
-        setText(tmp);
+        deleteSelection();
     } else
         removeCharacter(right);
 }
@@ -783,6 +792,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
             paste(g_window.getClipboardText());
             return true;
         }
+
         if (keyCode == Fw::KeyX && getProp(PropEditable) && getProp(PropSelectable)) {
             if (hasSelection()) {
                 cut();
@@ -796,6 +806,25 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
         } else if (keyCode == Fw::KeyA && getProp(PropSelectable)) {
             if (m_text.length() > 0) {
                 selectAll();
+                return true;
+            }
+        } else if (keyCode == Fw::KeyBackspace) {
+            if (hasSelection()) {
+                deleteSelection();
+            } else if (m_text.length() > 0) {
+                // delete last word
+                std::string tmp = m_text;
+                if (m_cursorPos == 0) {
+                    tmp.erase(tmp.begin());
+                } else {
+                    int pos = m_cursorPos;
+                    while (pos > 0 && tmp[pos - 1] == ' ')
+                        --pos;
+                    while (pos > 0 && tmp[pos - 1] != ' ')
+                        --pos;
+                    tmp.erase(tmp.begin() + pos, tmp.begin() + m_cursorPos);
+                }
+                setText(tmp);
                 return true;
             }
         }
@@ -842,6 +871,11 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
 
 bool UITextEdit::onKeyText(const std::string_view keyText)
 {
+    // ctrl + backspace inserts a special ASCII character
+    if (keyText.length() == 1 && keyText.front() == Fw::KeyDel) {
+        return false;
+    }
+
     if (getProp(PropEditable)) {
         appendText(keyText.data());
         return true;
