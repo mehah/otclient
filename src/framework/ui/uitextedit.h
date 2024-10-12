@@ -63,6 +63,7 @@ public:
     void removeCharacter(bool right);
     void blinkCursor();
 
+    void deleteSelection();
     void del(bool right = false);
     void paste(const std::string_view text);
     std::string copy();
