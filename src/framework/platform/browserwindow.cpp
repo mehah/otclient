@@ -229,12 +229,75 @@ void BrowserWindow::poll() {
             static_cast<BrowserWindow*>(userData)->handleFocusCallback(eventType, event);
             return EM_TRUE;
         }));
+        emscripten_set_touchend_callback("#canvas", this, EM_TRUE, ([](int eventType, const EmscriptenTouchEvent* event, void* userData) -> EM_BOOL {
+            static_cast<BrowserWindow*>(userData)->handleTouchCallback(eventType, event);
+            return EM_TRUE;
+        }));
+        emscripten_set_touchstart_callback("#canvas", this, EM_TRUE, ([](int eventType, const EmscriptenTouchEvent* event, void* userData) -> EM_BOOL {
+            static_cast<BrowserWindow*>(userData)->handleTouchCallback(eventType, event);
+            return EM_TRUE;
+        }));
+        emscripten_set_touchmove_callback("#canvas", this, EM_TRUE, ([](int eventType, const EmscriptenTouchEvent* event, void* userData) -> EM_BOOL {
+            static_cast<BrowserWindow*>(userData)->handleTouchCallback(eventType, event);
+            return EM_TRUE;
+        }));
 
+        // clang-format off
         MAIN_THREAD_ASYNC_EM_ASM({
             document.addEventListener("paste", function(event){
                 Module["ccall"]("paste_return", "number",["string", "number"],[event.clipboardData.getData("text/plain"), $0]);
             });
         }, this);
+        MAIN_THREAD_ASYNC_EM_ASM({
+            if (navigator && "virtualKeyboard" in navigator && (/iphone|ipod|ipad|android/i).test(navigator.userAgent)) {
+                navigator.virtualKeyboard.overlaysContent = true;
+                const textInput = document.getElementById("title-text");
+                textInput.addEventListener("input", function(ev) {
+                    textInput.innerHTML = "";
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                });
+                textInput.addEventListener("keydown", function(ev) {
+                    if (ev.which === 8) {
+                        const options = {
+                            code: 'Backspace',
+                            key : 'Backspace',
+                            keyCode : 8,
+                            which : 8
+                        };
+                        window.dispatchEvent(new KeyboardEvent('keydown', options));
+                        window.dispatchEvent(new KeyboardEvent('keyup', options));
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                    }
+                    if (ev.which === 13) {
+                        const options = {
+                            charCode: 13,
+                            code : 'Enter',
+                            key : 'Enter',
+                            keyCode : 13,
+                            which : 13
+                        };
+                        window.dispatchEvent(new KeyboardEvent('keydown', options));
+                        window.dispatchEvent(new KeyboardEvent('keypress', options));
+                        window.dispatchEvent(new KeyboardEvent('keyup', options));
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                    }
+                    if (ev.which === 229) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                    }
+                });
+                textInput.addEventListener("keyup", function(ev) {
+                    if (ev.which === 8 || ev.which === 13 || ev.which === 229) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                    }
+                });
+            }
+        });
+        // clang-format on
 
         m_onResize(m_size);
         m_running = true;
@@ -252,11 +315,9 @@ extern "C" {
 }
 
 void BrowserWindow::handleMouseCallback(int eventType, const EmscriptenMouseEvent* mouseEvent) {
-    int x = mouseEvent->canvasX;
-    int y = mouseEvent->canvasY;
-    if (mouseEvent->screenX != 0 && mouseEvent->screenY != 0 && mouseEvent->clientX != 0 && mouseEvent->clientY != 0 && mouseEvent->targetX != 0 && mouseEvent->targetY != 0) {
+    if (!m_usingTouch && mouseEvent->screenX != 0 && mouseEvent->screenY != 0 && mouseEvent->clientX != 0 && mouseEvent->clientY != 0 && mouseEvent->targetX != 0 && mouseEvent->targetY != 0) {
         int button = mouseEvent->button;
-        g_dispatcher.addEvent([this, x, y, eventType, button] {
+        g_dispatcher.addEvent([this, eventType, button] {
             m_inputEvent.reset();
             m_inputEvent.type = (eventType == EMSCRIPTEN_EVENT_MOUSEDOWN) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
             switch (button) {
@@ -283,10 +344,8 @@ void BrowserWindow::handleMouseCallback(int eventType, const EmscriptenMouseEven
 }
 
 void BrowserWindow::handleMouseWheelCallback(const EmscriptenWheelEvent* event) {
-    int x = event->mouse.canvasX;
-    int y = event->mouse.canvasY;
     if (event->mouse.screenX != 0 && event->mouse.screenY != 0 && event->mouse.clientX != 0 && event->mouse.clientY != 0 && event->mouse.targetX != 0 && event->mouse.targetY != 0) {
-        g_dispatcher.addEvent([this, x, y, event] {
+        g_dispatcher.addEvent([this, event] {
             m_inputEvent.reset();
             m_inputEvent.type = Fw::MouseReleaseInputEvent;
             event->deltaY > 0 ? m_inputEvent.wheelDirection = Fw::MouseWheelDown : m_inputEvent.wheelDirection = Fw::MouseWheelUp;
@@ -318,6 +377,66 @@ void BrowserWindow::handleMouseMotionCallback(const EmscriptenMouseEvent* mouseE
     m_inputEvent.mousePos = newMousePos;
     if (m_onInputEvent)
         m_onInputEvent(m_inputEvent);
+}
+
+void BrowserWindow::handleTouchCallback(int eventType, const EmscriptenTouchEvent* event) {
+    m_usingTouch = true;
+    if (event->touches->screenX != 0 && event->touches->screenY != 0 && event->touches->clientX != 0 && event->touches->clientY != 0 && event->touches->targetX != 0 && event->touches->targetY != 0) {
+        updateTouchPosition(event);
+        if (eventType == EMSCRIPTEN_EVENT_TOUCHMOVE) {
+            m_clickTimer.stop();
+            return;
+        };
+        g_dispatcher.addEvent([this, eventType, event] {
+            m_inputEvent.reset();
+            Point newMousePos(event->touches->targetX / m_displayDensity, event->touches->targetY / m_displayDensity);
+            m_inputEvent.mouseButton = Fw::MouseLeftButton;
+            if (eventType == EMSCRIPTEN_EVENT_TOUCHSTART) {
+                m_clickTimer.restart();
+                m_inputEvent.type = Fw::MousePressInputEvent;
+                m_mouseButtonStates |= 1 << Fw::MouseLeftButton;
+            } else if (eventType == EMSCRIPTEN_EVENT_TOUCHEND) {
+                m_inputEvent.type = Fw::MouseReleaseInputEvent;
+                g_dispatcher.addEvent([this] { m_mouseButtonStates &= ~(1 << Fw::MouseLeftButton); });
+                if (m_clickTimer.running() && m_clickTimer.ticksElapsed() >= 200) {
+                    processLongTouch(event);
+                }
+                m_clickTimer.stop();
+            }
+            if (m_inputEvent.type != Fw::NoInputEvent && m_onInputEvent)
+                m_onInputEvent(m_inputEvent);
+        });
+    }
+}
+
+void BrowserWindow::updateTouchPosition(const EmscriptenTouchEvent* event) {
+    g_dispatcher.addEvent([this, event] {
+        m_inputEvent.reset();
+        Point newMousePos(event->touches->targetX / m_displayDensity, event->touches->targetY / m_displayDensity);
+        m_inputEvent.mouseMoved = newMousePos - m_inputEvent.mousePos;
+        m_inputEvent.mousePos = newMousePos;
+        m_inputEvent.type = Fw::MouseMoveInputEvent;
+        if (m_onInputEvent)
+            m_onInputEvent(m_inputEvent);
+    });
+}
+
+void BrowserWindow::processLongTouch(const EmscriptenTouchEvent* event) {
+    m_clickTimer.stop();
+    g_dispatcher.addEvent([this, event] {
+        m_inputEvent.reset();
+        m_inputEvent.mouseButton = Fw::MouseRightButton;
+        m_inputEvent.type = Fw::MousePressInputEvent;
+        if (m_onInputEvent)
+            m_onInputEvent(m_inputEvent);
+    });
+    g_dispatcher.addEvent([this, event] {
+        m_inputEvent.reset();
+        m_inputEvent.mouseButton = Fw::MouseRightButton;
+        m_inputEvent.type = Fw::MouseReleaseInputEvent;
+        if (m_onInputEvent)
+            m_onInputEvent(m_inputEvent);
+    });
 }
 
 int number_of_characters_in_utf8_string(const char* str) {
@@ -386,9 +505,11 @@ std::string BrowserWindow::getClipboardText() {
 void BrowserWindow::setClipboardText(const std::string_view text) {
     m_clipboardText = text.data();
     std::string const& content = text.data();
+    // clang-format off
     MAIN_THREAD_EM_ASM({
-            navigator.clipboard.writeText(UTF8ToString($0));
+        navigator.clipboard.writeText(UTF8ToString($0));
     }, content.c_str());
+    // clang-format on
 }
 
 Size BrowserWindow::getDisplaySize() {
@@ -418,16 +539,19 @@ int BrowserWindow::loadMouseCursor(const std::string& file, const Point& hotSpot
 void BrowserWindow::setMouseCursor(int cursorId) {
     if (cursorId >= (int)m_cursors.size() || cursorId < 0)
         return;
-
+    // clang-format off
     MAIN_THREAD_ASYNC_EM_ASM({
         document.body.style.cursor = UTF8ToString($0);
     }, m_cursors[cursorId].c_str());
+    // clang-format on
 }
 
 void BrowserWindow::restoreMouseCursor() {
+    // clang-format off
     MAIN_THREAD_ASYNC_EM_ASM(
         document.body.style.cursor = "";
         );
+    // clang-format on
 }
 
 /* Does not apply to Browser */

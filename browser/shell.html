@@ -11,6 +11,7 @@
       body {
         margin: 0;
         background-color: black;
+        overscroll-behavior: contain;
       }
       .backbuffer {
         position: absolute;
@@ -58,7 +59,12 @@
     </style>
   </head>
   <body>
-    <div class="title" id="title-text"></div>
+    <div
+      class="title"
+      id="title-text"
+      contenteditable
+      virtualkeyboardpolicy="manual"
+    ></div>
     <button id="start" onclick="startGame()">Start</button>
     <canvas
       class="backbuffer"
@@ -71,6 +77,18 @@
       function startGame() {
         document.getElementById("start").style.display = "none";
         callMain();
+        document.addEventListener("touchstart", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        document.addEventListener("touchmove", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        document.addEventListener("touchend", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
         document.addEventListener("keyup", function (ev) {
           ev.preventDefault();
           ev.stopPropagation();
