@@ -76,14 +76,15 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
             m_placeholderFont->drawText(m_placeholder, m_drawArea, m_placeholderColor, m_placeholderAlign);
         }
     }
+
     if (m_color != Color::alpha) {
-        if (glyphsMustRecache) {
-            m_glyphsTextRectCache.clear();
-            for (int i = -1; ++i < textLength;)
-                m_glyphsTextRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
+        if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
+            g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color, m_textDrawConductor);
+        } else {
+            for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
+                g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
+            }
         }
-        for (const auto& [dest, src] : m_glyphsTextRectCache)
-            g_drawPool.addTexturedRect(dest, texture, src, m_color);
     }
 
     if (hasSelection()) {
@@ -258,12 +259,40 @@ void UITextEdit::update(bool focusCursor)
     } else { // AlignLeft
     }
 
+    std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
+    uint32_t curColorRgba;
+    int32_t nextColorIndex = 0;
+    int32_t colorIndex = -1;
+    CoordsBufferPtr coords;
+
+    const int textColorsSize = m_drawTextColors.size();
+    m_colorCoordsBuffer.clear();
+    m_coordsBuffer->clear();
+
     for (int i = 0; i < textLength; ++i) {
+        if (i >= nextColorIndex) {
+            colorIndex = colorIndex + 1;
+            if (colorIndex < textColorsSize) {
+                curColorRgba = m_drawTextColors[colorIndex].second.rgba();
+            }
+            if (colorIndex + 1 < textColorsSize) {
+                nextColorIndex = m_drawTextColors[colorIndex + 1].first;
+            } else {
+                nextColorIndex = textLength;
+            }
+
+            if (colorCoordsMap.find(curColorRgba) == colorCoordsMap.end()) {
+                colorCoordsMap.insert(std::make_pair(curColorRgba, std::make_shared<CoordsBuffer>()));
+            }
+
+            coords = colorCoordsMap[curColorRgba];
+        }
+
         glyph = static_cast<uint8_t>(text[i]);
         m_glyphsCoords[i].first.clear();
 
         // skip invalid glyphs
-        if (glyph < 32 && glyph != static_cast<uint8_t>('\n'))
+        if (glyph < 32)
             continue;
 
         // calculate initial glyph rect and texture coords
@@ -324,6 +353,16 @@ void UITextEdit::update(bool focusCursor)
         // render glyph
         m_glyphsCoords[i].first = glyphScreenCoords;
         m_glyphsCoords[i].second = glyphTextureCoords;
+
+        if (textColorsSize > 0) {
+            coords->addRect(glyphScreenCoords, glyphTextureCoords);
+        } else {
+            m_coordsBuffer->addRect(glyphScreenCoords, glyphTextureCoords);
+        }
+    }
+
+    for (auto& [rgba, crds] : colorCoordsMap) {
+        m_colorCoordsBuffer.emplace_back(Color(rgba), crds);
     }
 
     if (fireAreaUpdate)
@@ -463,15 +502,24 @@ void UITextEdit::blinkCursor()
     repaint();
 }
 
+void UITextEdit::deleteSelection()
+{
+    if (!hasSelection()) {
+        return;
+    }
+
+    std::string tmp = m_text;
+    tmp.erase(m_selectionStart, m_selectionEnd - m_selectionStart);
+
+    setCursorPos(m_selectionStart);
+    clearSelection();
+    setText(tmp);
+}
+
 void UITextEdit::del(bool right)
 {
     if (hasSelection()) {
-        std::string tmp = m_text;
-        tmp.erase(m_selectionStart, m_selectionEnd - m_selectionStart);
-
-        setCursorPos(m_selectionStart);
-        clearSelection();
-        setText(tmp);
+        deleteSelection();
     } else
         removeCharacter(right);
 }
@@ -575,8 +623,11 @@ void UITextEdit::updateDisplayedText()
     else
         text = m_text;
 
-    if (isTextWrap() && m_rect.isValid())
+    m_drawTextColors = m_textColors;
+
+    if (isTextWrap() && m_rect.isValid()) {
         text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x);
+    }
 
     m_displayedText = text;
 }
@@ -737,6 +788,7 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
             paste(g_window.getClipboardText());
             return true;
         }
+
         if (keyCode == Fw::KeyX && getProp(PropEditable) && getProp(PropSelectable)) {
             if (hasSelection()) {
                 cut();
@@ -750,6 +802,25 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
         } else if (keyCode == Fw::KeyA && getProp(PropSelectable)) {
             if (m_text.length() > 0) {
                 selectAll();
+                return true;
+            }
+        } else if (keyCode == Fw::KeyBackspace) {
+            if (hasSelection()) {
+                deleteSelection();
+            } else if (m_text.length() > 0) {
+                // delete last word
+                std::string tmp = m_text;
+                if (m_cursorPos == 0) {
+                    tmp.erase(tmp.begin());
+                } else {
+                    int pos = m_cursorPos;
+                    while (pos > 0 && tmp[pos - 1] == ' ')
+                        --pos;
+                    while (pos > 0 && tmp[pos - 1] != ' ')
+                        --pos;
+                    tmp.erase(tmp.begin() + pos, tmp.begin() + m_cursorPos);
+                }
+                setText(tmp);
                 return true;
             }
         }
@@ -796,6 +867,11 @@ bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepe
 
 bool UITextEdit::onKeyText(const std::string_view keyText)
 {
+    // ctrl + backspace inserts a special ASCII character
+    if (keyText.length() == 1 && keyText.front() == Fw::KeyDel) {
+        return false;
+    }
+
     if (getProp(PropEditable)) {
         appendText(keyText.data());
         return true;
