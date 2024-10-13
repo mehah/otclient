@@ -29,7 +29,7 @@ CategoryIconCreature < UICreature
   anchors.fill: parent
 
 MiniPanel < Panel
-  text-offset: 0 2
+  text-offset: 0 4
   text-align: top
   image-source: /images/ui/miniwindow
   image-border: 4
@@ -74,7 +74,7 @@ OfferWidget < MiniPanel
     image-source: /images/ui/item
     image-border: 2
     &baseText: '%s points'
-    color: #28db00
+    color: #ffffff
     text-align: center
     margin-left: 0
     margin-right: 2
@@ -82,7 +82,7 @@ OfferWidget < MiniPanel
 OfferIconItem < UIItem
   id: offerIcon
   size: 34 34
-  padding: 1
+  padding: 0
   anchors.centerIn: parent
   virtual: true
   phantom: true
@@ -94,7 +94,7 @@ OfferIconCreature < UICreature
   phantom: true
 
 HistoryLabel < Label
-  height: 18
+  height: 25
   focusable: true
   background: alpha
 
@@ -121,16 +121,18 @@ MainWindow
       anchors.top: parent.top
       &baseText: 'Balance: %s'
       text-auto-resize: true
-      font: terminus-14px-bold
+      font: verdana-11px-rounded
+      color: #8FBC8F
+      margin-top: 5
       anchors.horizontalCenter: parent.horizontalCenter
-    
+
     Button
       id: buyPoints
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.bottom: parent.bottom
       !text: 'Get Points'
-      color: #28db00
+      color: #ffffff
       @onClick: modules.game_store.buyPoints()
 
   TextList    
@@ -167,6 +169,7 @@ MainWindow
       anchors.top: parent.top
       anchors.left: prev.right
       anchors.right: parent.right
+      margin-top: 9
       margin-left: 5
       height: 18
       !text: 'Potions'
