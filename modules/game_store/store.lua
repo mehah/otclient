@@ -233,7 +233,7 @@ function onGameStoreMsg(data)
     if close then
         hideHistory()
         gameStoreWindow:getChildById("purchaseButton"):disable()
-        gameStoreWindow:getChildById("giftButton"):disable()
+        -- gameStoreWindow:getChildById("giftButton"):disable()
         gameStoreWindow:getChildById("offers"):focusChild(nil)
         hide()
     end
@@ -264,7 +264,7 @@ function changeCategory(widget, newCategory)
     if category then
         updateTopPanel(category)
         gameStoreWindow:getChildById("purchaseButton"):disable()
-        gameStoreWindow:getChildById("giftButton"):disable()
+        -- gameStoreWindow:getChildById("giftButton"):disable()
         gameStoreWindow:getChildById("search"):setText("")
     end
 end
@@ -281,7 +281,7 @@ function offerFocus(widget, offerWidget)
             price = tonumber(price)
         }
         gameStoreWindow:getChildById("purchaseButton"):enable()
-        gameStoreWindow:getChildById("giftButton"):enable()
+        -- gameStoreWindow:getChildById("giftButton"):enable()
     end
 end
 
@@ -298,7 +298,7 @@ function purchaseDouble(offerWidget)
             clientId = tonumber(offerWidget:getId())
         }
         gameStoreWindow:getChildById("purchaseButton"):enable()
-        gameStoreWindow:getChildById("giftButton"):enable()
+        -- gameStoreWindow:getChildById("giftButton"):enable()
         purchase()
     end
 end
@@ -316,7 +316,7 @@ end
 function showHistory()
     gameStoreWindow:getChildById("historyButton"):hide()
     gameStoreWindow:getChildById("purchaseButton"):hide()
-    gameStoreWindow:getChildById("giftButton"):hide()
+    -- gameStoreWindow:getChildById("giftButton"):hide()
     gameStoreWindow:getChildById("offers"):hide()
     gameStoreWindow:getChildById("offersScrollBar"):hide()
     gameStoreWindow:getChildById("topPanel"):hide()
@@ -330,14 +330,14 @@ function showHistory()
     gameStoreWindow:getChildById("backButton"):show()
 
     gameStoreWindow:getChildById("purchaseButton"):disable()
-    gameStoreWindow:getChildById("giftButton"):disable()
+    -- gameStoreWindow:getChildById("giftButton"):disable()
     gameStoreWindow:getChildById("offers"):focusChild(nil)
 end
 
 function hideHistory()
     gameStoreWindow:getChildById("historyButton"):show()
     gameStoreWindow:getChildById("purchaseButton"):show()
-    gameStoreWindow:getChildById("giftButton"):show()
+    -- gameStoreWindow:getChildById("giftButton"):show()
     gameStoreWindow:getChildById("offers"):show()
     gameStoreWindow:getChildById("offersScrollBar"):show()
     gameStoreWindow:getChildById("topPanel"):show()
