@@ -12,7 +12,7 @@ return {
         end
     },
     showPing                          = {
-        value = false,
+        value = true,
         action = function(value, options, controller, panels, extraWidgets)
             modules.client_topmenu.setPingVisible(value)
         end
@@ -23,10 +23,10 @@ return {
             g_window.setFullscreen(value)
         end
     },
-    classicControl                    = false,
+    classicControl                    = true,
     smartWalk                         = false,
     preciseControl                    = {
-        value = false,
+        value = true,
         action = function(value, options, controller, panels, extraWidgets)
             g_game.setScheduleLastWalk(not value)
         end
@@ -84,7 +84,7 @@ return {
         end
     },
     musicSoundVolume                  = {
-        value = 100,
+        value = 10,
         action = function(value, options, controller, panels, extraWidgets)
             if g_sounds then
                 g_sounds.getChannel(SoundChannels.Music):setGain(value / 100)
@@ -93,7 +93,7 @@ return {
         end
     },
     enableLights                      = {
-        value = true,
+        value = false,
         action = function(value, options, controller, panels, extraWidgets)
             panels.gameMapPanel:setDrawLights(value and options.ambientLight.value < 100)
             panels.graphicsEffectsPanel:recursiveGetChildById('ambientLight'):setEnabled(value)
@@ -322,19 +322,19 @@ return {
         end
     },
     showLeftPanel                     = {
-        value = false,
+        value = true,
         action = function(value, options, controller, panels, extraWidgets)
             modules.game_interface.getLeftPanel():setOn(value)
         end
     },
     showRightExtraPanel               = {
-        value = false,
+        value = true,
         action = function(value, options, controller, panels, extraWidgets)
             modules.game_interface.getRightExtraPanel():setOn(value)
         end
     },
     showActionbar                     = {
-        value = false,
+        value = true,
         action = function(value, options, controller, panels, extraWidgets)
             modules.game_actionbar.setActionBarVisible(value)
         end

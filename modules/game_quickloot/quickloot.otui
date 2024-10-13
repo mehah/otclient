@@ -268,7 +268,7 @@ Window
           if g_game.getClientVersion() >= 1332 then
             modules.game_store.toggle()
           else
-            modules.game_shop.toggle()
+            modules.game_store.toggle()
           end
 
         $pressed:

@@ -1,6 +1,6 @@
 UIWidget
   anchors.fill: parent
-  visible: false
+  visible: true
   SmallReversedQtPanel
     anchors.left: parent.left
     anchors.right: parent.right

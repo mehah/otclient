@@ -159,15 +159,10 @@ optionsController:setUI('mainoptionspanel', modules.game_interface.getMainRightP
 function optionsController:onInit()
     createButton_large('Store shop', tr('Store shop'), '/images/options/store_large', toggleStore,
     false, 8)
-
 end
 
 function toggleStore()
-    if g_game.getClientVersion() >= 1332 then
-        modules.game_store.toggle()
-    else
-        modules.game_shop.toggle() --game_shopv8
-    end
+    modules.game_store.toggle()
 end
 
 function optionsController:onTerminate()

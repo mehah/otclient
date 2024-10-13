@@ -227,7 +227,7 @@ UIWidget
       image-source: /images/ui/button-storexp
       anchors.horizontalCenter: level.horizontalCenter
       anchors.top: expGainRate.bottom
-      @onClick: modules.game_shop.toggle()
+      @onClick: modules.game_store.toggle()
       $pressed:
         image-source: /images/ui/button-storexp-pressed
     HorizontalSeparator

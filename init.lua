@@ -4,25 +4,19 @@
 -- updater
 Services = {
     --updater = "http://localhost/api/updater.php", --./updater
-    --status = "http://localhost/api/status.php", --./client_entergame | ./client_topmenu
-    --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
+    --status = "https://myaac.mythbound.dev/?online", --./client_entergame | ./client_topmenu
+    websites = "https://myaac.mythbound.dev/?account/manage", --./client_entergame "Forgot password and/or email"
 }
 
---[[ Servers_init = {
-    ["http://ip/login.php"] = {
-        ["port"] = 80,
-        ["protocol"] = 1332,
-        ["httpLogin"] = true
-    },
-    ["ip.net"] = {
+Servers_init = {
+    ["game.mythbound.dev"] = {
         ["port"] = 7171,
-        ["protocol"] = 860,
+        ["protocol"] = 1098,
         ["httpLogin"] = false
     },
+}
 
-} ]]
-
-g_app.setName("OTClient - Redemption");
+g_app.setName("Mythbound");
 g_app.setCompactName("otclient");
 g_app.setOrganizationName("otcr");
 
@@ -95,9 +89,7 @@ local function loadModules()
     g_modules.autoLoadModules(9999)
     g_modules.ensureModuleLoaded('client_mods')
 
-    if not g_game.isEnabledBotProtection() then
-        g_modules.ensureModuleLoaded('game_bot')
-    end
+    g_modules.ensureModuleLoaded('game_bot')
 
     local script = '/' .. g_app.getCompactName() .. 'rc.lua'
 
@@ -106,7 +98,7 @@ local function loadModules()
     end
 
     -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
-    -- g_modules.enableAutoReload()
+    g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip

@@ -39,11 +39,10 @@ Module
     - game_attachedeffects
     - game_stash
     - game_healthcircle
-    - game_shop
+    - game_store
     - game_screenshot
     - game_highscore
     - game_blessing
-    - game_store
     - game_quickloot
     - game_cyclopedia
     

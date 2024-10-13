@@ -1,8 +1,10 @@
 DeathWindow < MainWindow
-  id: deathWindow
+  id: DeathWindow
   !text: tr('You are dead')
   &baseWidth: 350
   &baseHeight: 15
+  min-width: 350
+  max-width: 600
 
   Label
     id: labelText
@@ -15,16 +17,7 @@ DeathWindow < MainWindow
 
   Button
     id: buttonOk
-    !text: tr('Ok')
-    width: 64
-    anchors.left: parent.left
+    !text: tr('Respawn')
+    width: 80
     anchors.bottom: parent.bottom
-    margin-left: 160
-
-  Button
-    id: buttonCancel
-    !text: tr('Cancel')
-    width: 64
-    anchors.left: prev.right
-    anchors.bottom: parent.bottom
-    margin-left: 5
+    anchors.horizontalCenter: parent.horizontalCenter

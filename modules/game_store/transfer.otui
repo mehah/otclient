@@ -2,7 +2,7 @@ MainWindow
   id: transferWindow
   !text: tr('Gift Tibia Coins')
   size: 280 240
-  @onEscape: modules.game_shop.hideTransfer()
+  @onEscape: modules.game_store.hideTransfer()
 
   Label
     anchors.top: parent.top
@@ -67,7 +67,7 @@ MainWindow
     size: 45 21
     margin-top: 15
     margin-right: 5
-    @onClick: modules.game_shop.hideTransfer()
+    @onClick: modules.game_store.hideTransfer()
 
   Button
     id: giftButton
@@ -77,4 +77,4 @@ MainWindow
     anchors.verticalCenter: prev.verticalCenter
     anchors.right: prev.left
     margin-right: 5
-    @onClick: modules.game_shop.transferCoins()
+    @onClick: modules.game_store.transferCoins()

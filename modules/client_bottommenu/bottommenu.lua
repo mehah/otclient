@@ -19,9 +19,16 @@ local creature_boosted
 local boss_boosted
 
 local default_info = {
-    [1] = {image = "images/randomhint", Title = "Random Hint", creature1="images/boost_monster1",creature2= "images/boost_monster2",description = "The customisable status bar includes big health and mana bars and can be placed on the bottom, the top or on the side of your game windows\n\n -\t\t https://github.com/mehah/otclient/wiki "},
-  --  [2] = {image = "image of label", Title = "title", creature1="images of creature",creature2= "images of boos",description = "text in label see tutorial :  https://github.com/mehah/otclient/wiki"},
+    [1] = {
+        image = "images/randomhint",
+        Title = "Welcome to Mythbound!",
+        creature1="images/boost_monster1",
+        creature2= "images/boost_monster2",
+        description = "The customizable status bar includes big health and mana bars and can be placed on the bottom, the top, or on the side of your game windows.\n\n" ..
+                      "- https://github.com/tibia-oce/otclient/wiki \n"
+    },
 }
+
 function init()
     g_ui.importStyle('calendar')
     bottomMenu = g_ui.displayUI('bottommenu')

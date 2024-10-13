@@ -79,76 +79,26 @@ TopMenuPanel
     anchors.verticalCenter: parent.verticalCenter
     anchors.left: parent.left
     margin-left: 10
-    size: 110 32
+    size: 80 32
+    @onClick: EnterGame.openDiscordInvite()
 
     UIWidget
       id: discordIcon
       image-source: /images/icons/icon_discord
       anchors.verticalCenter: parent.verticalCenter
       anchors.left: parent.left
-      size: 30 34
-
-    Panel
-      image-source: /images/icons/icon_streamers
-      anchors.top: parent.top
-      anchors.left: prev.right
-      margin-left: 5
-      margin-top: 11
-      size: 11 7
+      size: 20 22
+      @onClick: EnterGame.openDiscordInvite()
+      
 
     Label
       id: topLeftDiscordStreamersLabel
-      !text: '-'
+      !text: 'Join our communitiy Discord!'
       anchors.left: prev.right
       margin-left: 5
       anchors.verticalCenter: prev.verticalCenter
-      width: 50
-
-  UIWidget
-    id: topLeftYoutube
-    anchors.verticalCenter: parent.verticalCenter
-    anchors.left: topLeftDiscord.right
-    margin-left: 10
-    size: 100 32
-
-    UIWidget
-      id: youtubeIcon
-      image-source: /images/icons/icon_youtube
-      anchors.verticalCenter: parent.verticalCenter
-      anchors.left: parent.left
-      size: 71 16
-
-    Panel
-      image-source: /images/icons/icon_streamers
-      anchors.top: parent.top
-      anchors.left: prev.right
-      margin-left: 5
-      margin-top: 5
-      size: 11 7
-
-    Label
-      id: topLeftYoutubeStreamersLabel
-      !text: '-'
-      anchors.left: prev.right
-      margin-left: 5
-      anchors.verticalCenter: prev.verticalCenter
-      width: 50
-
-    Panel
-      image-source: /images/icons/icon_viewers
-      anchors.bottom: parent.bottom
-      anchors.left: youtubeIcon.right
-      margin-left: 5
-      margin-bottom: 7
-      size: 11 7
-
-    Label
-      id: topLeftYoutubeViewersLabel
-      !text: '-'
-      anchors.left: prev.right
-      margin-left: 5
-      anchors.verticalCenter: prev.verticalCenter
-      width: 50
+      width: 180
+      @onClick: EnterGame.openDiscordInvite()
 
   TopMenuButtonsPanel
     id: leftButtonsPanel
@@ -156,9 +106,9 @@ TopMenuPanel
     anchors.bottom: parent.bottom
     anchors.left: prev.right
 
-
   TopMenuFrameCounterLabel
     id: fpsLabel
+    hidden: true
     phantom: false
     text-auto-resize: true
     anchors.top: parent.top

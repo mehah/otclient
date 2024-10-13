@@ -114,13 +114,11 @@ end
 
 local function updateLabelText()
     if enterGame:getChildById('clientComboBox') and tonumber(enterGame:getChildById('clientComboBox'):getText()) > 1080 then
-        enterGame:setText("Journey Onwards")
-        enterGame:getChildById('emailLabel'):setText("Email:")
-        enterGame:getChildById('rememberEmailBox'):setText("Remember Email:")
+        enterGame:setText("Account Login")
+        enterGame:getChildById('emailLabel'):setText("Account name:")
     else
         enterGame:setText("Enter Game")
         enterGame:getChildById('emailLabel'):setText("Acc Name:")
-        enterGame:getChildById('rememberEmailBox'):setText("Remember password:")
     end
 end
 
@@ -228,6 +226,16 @@ function EnterGame.showPanels()
     modules.client_topmenu.toggle()
 end
 
+function EnterGame.createAccountWebsite()
+    local url = "https://myaac.mythbound.dev/?account/create"
+    g_platform.openUrl(url)
+end
+
+function EnterGame.openDiscordInvite()
+    local url = "https://discord.gg/Erhz4GmDMd"
+    g_platform.openUrl(url)
+end
+
 function EnterGame.firstShow()
     EnterGame.show()
 
@@ -251,6 +259,7 @@ function EnterGame.firstShow()
         EnterGame.postShowCreatureBoost()
     end
 end
+
 
 function EnterGame.terminate()
     g_keyboard.unbindKeyDown('Ctrl+G')

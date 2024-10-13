@@ -4,6 +4,6 @@ Module
   author: BeniS, edubart
   website: https://github.com/edubart/otclient
   sandboxed: true
-  scripts: [ playerdeath ]
-  @onLoad: deathController:init()
-  @onUnload: deathController:terminate()
+  scripts: [ deathwindow ]
+  @onLoad: controller:init()
+  @onUnload: controller:terminate()

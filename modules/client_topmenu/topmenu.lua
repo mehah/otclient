@@ -93,10 +93,7 @@ function init()
     topLeftDiscordLink = topMenu:recursiveGetChildById('discordIcon')
 
     g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
-    if Services.websites then
-        managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
-            nil, openManagerAccounts)
-    end
+
     if g_game.isOnline() then
         online()
     end
