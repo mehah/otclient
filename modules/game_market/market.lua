@@ -409,8 +409,8 @@ local function updateOffers(offers)
 end
 
 local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
-    local purchaseStats2 = {} --temp someone confirm if it works in canary  --  work, test in 13.10
-    local saleStats2 = {} --temp someone confirm if it works in canary  --  work, test in 13.10
+    local purchaseOfferStatistic = {}
+    local saleOfferStatistic = {}
     if not selectedItem then
         return
     end
@@ -426,11 +426,15 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
         detailsTable:addRow(columns)
     end
 
-    if not table.empty(saleStats) then --temp someone confirm if it works in canary . -- work, test in 13.10
-        table.insert(saleStats2, OfferStatistic.new(saleStats[1][1], saleStats[1][2], saleStats[1][3], saleStats[1][4], saleStats[1][5], saleStats[1][6]))
+    if not table.empty(saleStats) then
+        for i = 1, #purchaseStats do
+            table.insert(saleOfferStatistic, OfferStatistic.new(saleStats[i][1], saleStats[i][2], saleStats[i][3], saleStats[i][4], saleStats[i][5], saleStats[i][6]))
+        end
     end
-    if not table.empty(purchaseStats) then --temp someone confirm if it works in canary --  work, test in 13.10
-        table.insert(purchaseStats2, OfferStatistic.new(purchaseStats[1][1], purchaseStats[1][2], purchaseStats[1][3], purchaseStats[1][4], purchaseStats[1][5], purchaseStats[1][6]))
+    if not table.empty(purchaseStats) then
+        for i = 1, #purchaseStats do
+            table.insert(purchaseOfferStatistic, OfferStatistic.new(purchaseStats[i][1], purchaseStats[i][2], purchaseStats[i][3], purchaseStats[i][4], purchaseStats[i][5], purchaseStats[i][6]))
+        end
     end
     
     -- update sale item statistics
@@ -442,7 +446,7 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
     else
         local offerAmount = 0
         local transactions, totalPrice, highestPrice, lowestPrice = 0, 0, 0, 0
-        for _, stat in pairs(saleStats2) do
+        for _, stat in pairs(saleOfferStatistic) do
             if not stat:isNull() then
                 offerAmount = offerAmount + 1
                 transactions = transactions + stat:getTransactions()
@@ -499,13 +503,13 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
 
     -- update buy item statistics
     buyStatsTable:clearData()
-    if table.empty(purchaseStats2) then
+    if table.empty(purchaseOfferStatistic) then
         buyStatsTable:addRow({{
             text = 'No information'
         }})
     else
         local transactions, totalPrice, highestPrice, lowestPrice = 0, 0, 0, 0
-        for _, stat in pairs(purchaseStats2) do
+        for _, stat in pairs(purchaseOfferStatistic) do
             if not stat:isNull() then
                 transactions = transactions + stat:getTransactions()
                 totalPrice = totalPrice + stat:getTotalPrice()
@@ -1283,6 +1287,7 @@ function Market.refreshItemsWidget(selectItem)
         local amount = Market.getDepotCount(item.marketData.tradeAs)
         if amount > 0 then
             itemWidget:setText(amount)
+            itemWidget:setTextOffset(topoint('0 10'))
             itemBox:setTooltip('You have ' .. amount .. ' in your depot.')
         end
 
