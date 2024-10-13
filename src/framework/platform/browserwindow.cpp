@@ -154,6 +154,9 @@ void BrowserWindow::terminate() {
     emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
     emscripten_set_focus_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
     emscripten_set_blur_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, this, EM_TRUE, nullptr);
+    emscripten_set_touchend_callback("#canvas", this, EM_TRUE, nullptr);
+    emscripten_set_touchstart_callback("#canvas", this, EM_TRUE, nullptr);
+    emscripten_set_touchmove_callback("#canvas", this, EM_TRUE, nullptr);
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_get_current_context();
     emscripten_webgl_destroy_context(ctx);
 
@@ -170,10 +173,8 @@ void BrowserWindow::internalInitGL() {
 
     EmscriptenWebGLContextAttributes attr;
     emscripten_webgl_init_context_attributes(&attr);
-    attr.explicitSwapControl = 1;
-    attr.renderViaOffscreenBackBuffer = 1;
     attr.majorVersion = 2;
-    attr.alpha = attr.depth = attr.stencil = attr.antialias = attr.preserveDrawingBuffer = attr.failIfMajorPerformanceCaveat = 0;
+    attr.renderViaOffscreenBackBuffer = attr.explicitSwapControl = attr.alpha = attr.depth = attr.stencil = attr.antialias = attr.preserveDrawingBuffer = attr.failIfMajorPerformanceCaveat = 0;
     EMSCRIPTEN_WEBGL_CONTEXT_HANDLE ctx = emscripten_webgl_create_context("#canvas", &attr);
     emscripten_webgl_make_context_current(ctx);
 
@@ -492,7 +493,7 @@ void BrowserWindow::handleFocusCallback(int eventType, const EmscriptenFocusEven
 }
 
 void BrowserWindow::swapBuffers() {
-    emscripten_webgl_commit_frame();
+    // emscripten_webgl_commit_frame(); // removed to improve performance (reduce CPU overhead)
 }
 
 void BrowserWindow::setVerticalSync(bool enable) {
