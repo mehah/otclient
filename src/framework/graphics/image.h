@@ -30,6 +30,7 @@ public:
     Image(const Size& size, int bpp = 4, uint8_t* pixels = nullptr);
 
     static ImagePtr load(const std::string& file);
+    static ImagePtr loadPNG(const char* data, size_t size);
     static ImagePtr loadPNG(const std::string& file);
     static ImagePtr fromQRCode(const std::string& code, int border);
 
