@@ -2,10 +2,11 @@ name: Build - Ubuntu
 
 on:
   workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-    - main
+  # todo: package release similar to build-windows
+  # pull_request:
+  # push:
+  #   branches:
+  #   - main
 
 env:
   VCPKG_ENABLE_METRICS: 1
