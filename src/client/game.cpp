@@ -635,8 +635,6 @@ bool Game::walk(const Otc::Direction direction)
     if (!canPerformGameAction() || direction == Otc::InvalidDirection)
         return false;
 
-    m_localPlayer->setNextWalkDir(direction);
-
     // must cancel auto walking, and wait next try
     if (m_localPlayer->isAutoWalking()) {
         m_protocolGame->sendStop();
@@ -1920,7 +1918,6 @@ void Game::requestBossSlotAction(const uint8_t action, const uint32_t raceId)
         return;
 
     m_protocolGame->sendRequestBossSlotAction(action, raceId);
-
 }
 
 void Game::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)

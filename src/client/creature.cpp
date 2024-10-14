@@ -666,8 +666,7 @@ void Creature::updateWalk(const bool isPreWalking)
     updateWalkingTile();
 
     if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
-        if (isPreWalking) resetWalkAnimationPhase(true);
-        else terminateWalk();
+        terminateWalk();
     }
 }
 
@@ -696,8 +695,10 @@ void Creature::terminateWalk()
 
     if (isLocalPlayer()) {
         g_dispatcher.addEvent([] {
-            if (g_game.getLocalPlayer())
-                g_game.walk(g_game.getLocalPlayer()->getNextWalkDir());
+            g_dispatcher.deferEvent([] {
+                if (g_game.getLocalPlayer())
+                    g_game.walk(g_game.getLocalPlayer()->getNextWalkDir());
+            });
         });
     }
 
@@ -951,9 +952,10 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
+        if (isLocalPlayer() && stepDuration < 100)
+            stepDuration += 10;
+
         m_stepCache.duration = stepDuration;
-        if (isLocalPlayer())
-            m_stepCache.duration += 10;
 
         m_stepCache.walkDuration = std::min<int>(stepDuration / g_gameConfig.getSpriteSize(), DrawPool::FPS60);
         m_stepCache.diagonalDuration = stepDuration *

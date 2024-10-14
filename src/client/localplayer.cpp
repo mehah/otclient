@@ -41,7 +41,7 @@ bool LocalPlayer::canWalk(bool ignoreLock)
     if (isWalkLocked() && !ignoreLock)
         return false;
 
-    return !m_walking;
+    return m_walkTimer.ticksElapsed() >= getStepDuration();
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
