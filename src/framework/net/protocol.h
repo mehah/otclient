@@ -40,7 +40,11 @@ public:
     Protocol();
     ~Protocol() override;
 
+#ifndef __EMSCRIPTEN__
     void connect(const std::string_view host, uint16_t port);
+#else
+    void connect(const std::string_view host, uint16_t port, bool gameWorld = false);
+#endif
     void disconnect();
 
     bool isConnected() { return m_connection && m_connection->isConnected(); }

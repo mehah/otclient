@@ -42,16 +42,21 @@ Protocol::~Protocol()
     inflateEnd(&m_zstream);
 }
 
+#ifndef __EMSCRIPTEN__
 void Protocol::connect(const std::string_view host, uint16_t port)
 {
-#ifdef __EMSCRIPTEN__
-    m_connection = std::make_shared<WebConnection>();
-#else
     m_connection = std::make_shared<Connection>();
-#endif
     m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
     m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
 }
+#else
+void Protocol::connect(const std::string_view host, uint16_t port, bool gameWorld)
+{
+    m_connection = std::make_shared<WebConnection>();
+    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
+    m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); }, gameWorld);
+}
+#endif
 
 void Protocol::disconnect()
 {

@@ -67,7 +67,7 @@ void WebConnection::close()
     emscripten_websocket_deinitialize();
     m_websocket = 0;
 
-    if (m_port != WEBPORT)
+    if (!m_gameWorld)
         return;
 
     m_connecting = false;
@@ -85,9 +85,10 @@ void WebConnection::close()
 }
 
 
-void WebConnection::connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback)
+void WebConnection::connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback, bool gameWorld)
 {
-    m_port = port;
+    m_gameWorld = gameWorld;
+
     m_connected = false;
     m_connecting = true;
     m_connectCallback = connectCallback;
@@ -116,7 +117,7 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
     if (m_websocket < 1) {
         if (m_errorCallback)
             m_errorCallback(asio::error::network_unreachable);
-        
+
         close();
         return;
     }

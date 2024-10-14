@@ -728,7 +728,6 @@ elseif(WASM)
 	set_target_properties(${PROJECT_NAME} PROPERTIES
   	LINK_FLAGS ${linkflags})
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
-	add_definitions(-DWEBPORT=${WEBPORT})
 
 else() # Linux
 	target_include_directories(${PROJECT_NAME}

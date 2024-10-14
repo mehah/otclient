@@ -51,7 +51,7 @@ public:
     static void poll();
     static void terminate();
 
-    void connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback);
+    void connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback, bool gameWorld);
     void close();
 
     void write(uint8_t* buffer, size_t size);
@@ -83,7 +83,7 @@ protected:
     RecvCallback m_recvCallback;
 
     EMSCRIPTEN_WEBSOCKET_T m_websocket = 0;
-    uint16_t m_port;
+    bool m_gameWorld;
     pthread_t m_pthread;
 
     static std::list<std::shared_ptr<asio::streambuf>> m_outputStreams;
