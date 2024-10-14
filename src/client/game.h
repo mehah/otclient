@@ -541,7 +541,7 @@ public:
     void safeLogout();
 
     // walk related
-    bool walk(const Otc::Direction direction);
+    bool walk(const Otc::Direction direction, bool firstStep = false);
     void autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos);
     void forceWalk(const Otc::Direction direction);
     void turn(const Otc::Direction direction);
@@ -833,6 +833,7 @@ private:
     stdext::map<int, ContainerPtr> m_containers;
     stdext::map<int, Vip> m_vips;
     stdext::timer m_pingTimer;
+    stdext::timer m_walkTimer;
 
     ticks_t m_ping{ -1 };
 };

@@ -630,10 +630,22 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction)
+bool Game::walk(const Otc::Direction direction, bool firstStep)
 {
     if (!canPerformGameAction() || direction == Otc::InvalidDirection)
         return false;
+
+    if (!firstStep) {
+        // create an option in the ui to configure the delay of the first step.
+        constexpr auto firstStepDelay = 200;
+        constexpr auto turnDelay = 100;
+        const auto delay = direction != m_localPlayer->getDirection() ? turnDelay : firstStepDelay;
+        const auto sleep = m_walkTimer.elapsed_millis();
+        if (sleep < delay) {
+            g_dispatcher.scheduleEvent([this, direction] { walk(direction, false); }, std::max<int>(delay - sleep, 1));
+            return false;
+        }
+    } else m_walkTimer.restart();
 
     // must cancel auto walking, and wait next try
     if (m_localPlayer->isAutoWalking()) {
@@ -717,7 +729,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
     const Otc::Direction direction = *dirs.begin();
 
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(true)) {
+        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable()) {
             m_localPlayer->preWalk(direction);
         }
     }
