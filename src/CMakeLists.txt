@@ -582,6 +582,8 @@ elseif(WASM)
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
 		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
 		${GMP_LIBRARY}
 		${STDUUID}
 		${FOUNDATION}
@@ -593,8 +595,6 @@ elseif(WASM)
 		Threads::Threads
 		asio::asio
 		# OpenAL::OpenAL (using emscripten openal api)
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
 		ZLIB::ZLIB
