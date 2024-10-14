@@ -25,7 +25,6 @@ limitedZoom = false
 currentViewMode = 0
 smartWalkDirs = {}
 smartWalkDir = nil
-firstStep = false
 leftIncreaseSidePanels = nil
 leftDecreaseSidePanels = nil
 rightIncreaseSidePanels = nil
@@ -185,6 +184,7 @@ function bindWalkKey(key, dir)
     end, gameRootPanel, true)
     g_keyboard.bindKeyUp(key, function()
         changeWalkDir(dir, true)
+        g_game.getLocalPlayer():setNextWalkDir(Directions.Invalid)
     end, gameRootPanel, true)
     g_keyboard.bindKeyPress(key, function()
         smartWalk(dir)
@@ -455,7 +455,6 @@ function onWalkKeyDown(dir)
             g_game.setChaseMode(DontChase)
         end
     end
-    firstStep = true
     changeWalkDir(dir)
 end
 
@@ -497,8 +496,7 @@ function smartWalk(dir)
     end
 
     local dire = smartWalkDir or dir
-    g_game.walk(dire, firstStep)
-    firstStep = false
+    g_game.walk(dire)
     lastManualWalk = g_clock.millis()
     return true
 end

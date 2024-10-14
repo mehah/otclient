@@ -232,7 +232,7 @@ private:
     TexturePtr m_iconTexture;
     TexturePtr m_typingIconTexture;
 
-    ScheduledEventPtr m_walkUpdateEvent;
+    EventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
     ScheduledEventPtr m_outfitColorUpdateEvent;
 

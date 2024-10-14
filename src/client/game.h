@@ -508,18 +508,18 @@ protected:
     // cyclopedia
     static void processItemDetail(const uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions);
     static void processBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& bestiaryRaces);
-    static void processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills, 
+    static void processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
                                                     const std::vector<std::tuple<uint8_t, uint16_t>>& combats);
-    static void processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, const double mitigation, 
+    static void processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, const double mitigation,
                                                     const std::vector<std::vector<uint16_t>>& additionalSkillsArray,
                                                     const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
-                                                    const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray, 
+                                                    const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray,
                                                     const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray);
-    static void processCyclopediaCharacterGeneralStatsBadge(const uint8_t showAccountInformation, const uint8_t playerOnline, const uint8_t playerPremium, 
+    static void processCyclopediaCharacterGeneralStatsBadge(const uint8_t showAccountInformation, const uint8_t playerOnline, const uint8_t playerPremium,
                                                     const std::string_view loyaltyTitle,
                                                     const std::vector<std::tuple<uint32_t, std::string>>& badgesVector);
     static void processCyclopediaCharacterItemSummary(const CyclopediaCharacterItemSummary& data);
-    static void processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits, 
+    static void processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits,
                                                     const std::vector<CharacterInfoMounts>& mounts, std::vector<CharacterInfoFamiliar>& familiars);
     static void processCyclopediaCharacterRecentDeaths(const CyclopediaCharacterRecentDeaths& data);
     static void processCyclopediaCharacterRecentPvpKills(const CyclopediaCharacterRecentPvPKills& data);
@@ -541,12 +541,11 @@ public:
     void safeLogout();
 
     // walk related
-    bool walk(const Otc::Direction direction, const bool isKeyDown = false);
+    bool walk(const Otc::Direction direction);
     void autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos);
     void forceWalk(const Otc::Direction direction);
     void turn(const Otc::Direction direction);
     void stop();
-    void setScheduleLastWalk(const bool scheduleLastWalk) { m_scheduleLastWalk = scheduleLastWalk; }
 
     // item related
     void look(const ThingPtr& thing, const bool isBattleList = false);
@@ -606,7 +605,7 @@ public:
     void addVip(const std::string_view name);
     void removeVip(const uint32_t playerId);
     void editVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupID = {});
-    void editVipGroups(const Otc::GroupsEditInfoType_t action,const uint8_t groupId, const std::string_view groupName);
+    void editVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t groupId, const std::string_view groupName);
     // fight modes related
     void setChaseMode(const Otc::ChaseModes chaseMode);
     void setFightMode(const Otc::FightModes fightMode);
@@ -734,7 +733,6 @@ public:
     std::string getWorldName() { return m_worldName; }
     std::vector<uint8_t > getGMActions() { return m_gmActions; }
     bool isGM() { return !m_gmActions.empty(); }
-    Otc::Direction getLastWalkDir() { return m_lastWalkDir; }
 
     std::string formatCreatureName(const std::string_view name);
     int findEmptyContainerId();
@@ -802,12 +800,9 @@ private:
     Otc::FightModes m_fightMode{ Otc::FightBalanced };
     Otc::ChaseModes m_chaseMode{ Otc::DontChase };
     Otc::PVPModes m_pvpMode{ Otc::WhiteDove };
-    Otc::Direction m_lastWalkDir;
-    Otc::Direction m_nextScheduledDir;
     Otc::OperatingSystem_t m_clientCustomOs{ Otc::CLIENTOS_NONE };
     UnjustifiedPoints m_unjustifiedPoints;
     ScheduledEventPtr m_pingEvent;
-    ScheduledEventPtr m_walkEvent;
     ScheduledEventPtr m_checkConnectionEvent;
 
     bool m_tileThingsLuaCallback{ false };
