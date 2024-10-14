@@ -59,6 +59,24 @@ bool SpriteManager::loadSpr(std::string file)
     m_spritesCount = 0;
     m_signature = 0;
     m_loaded = false;
+    m_spritesHd = false;
+
+    auto cwmFile = g_resources.guessFilePath(file, "cwm");
+    if (g_resources.fileExists(cwmFile)) {
+        m_spritesHd = true;
+        return loadCwmSpr(cwmFile);
+    }
+
+    auto sprFile = g_resources.guessFilePath(file, "spr");
+    if (g_resources.fileExists(sprFile)) {
+        return loadRegularSpr(sprFile);
+    }
+
+    return false;
+}
+
+bool SpriteManager::loadRegularSpr(std::string file)
+{
     try {
         m_lastFileName = g_resources.guessFilePath(file, "spr");
         load();
@@ -74,6 +92,54 @@ bool SpriteManager::loadSpr(std::string file)
         g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
         return false;
     }
+}
+
+bool SpriteManager::loadCwmSpr(std::string file)
+{
+    m_cwmSpritesMetadata.clear();
+
+    if (g_gameConfig.getSpriteSize() <= 32) {
+        g_logger.error(stdext::format("Change your sprite size to 64x64 or larger for CWM support '%s'", file));
+        return false;
+    }
+
+    try {
+        m_lastFileName = g_resources.guessFilePath(file, "cwm");
+        load();
+
+        const auto& spritesFile = getSpriteFile();
+
+        uint8_t version = spritesFile->getU8();
+        if (version != 0x01) {
+            g_logger.error(stdext::format("Invalid CWM file version - %s", file));
+            return false;
+        }
+
+        m_spritesCount = spritesFile->getU16();
+
+        uint32_t entries = spritesFile->getU32();
+        m_cwmSpritesMetadata.reserve(entries);
+        for (uint32_t i = 0; i < entries; ++i) {
+            FileMetadata spriteMetadata{ spritesFile };
+            m_cwmSpritesMetadata[spriteMetadata.getSpriteId()] = std::move(spriteMetadata);
+        }
+
+        m_spritesOffset = spritesFile->tell();
+
+        if (m_spritesCount == 0) {
+            g_logger.error(stdext::format("Failed to load sprites from '%s' - no sprites", file));
+            return false;
+        }
+
+        m_loaded = true;
+        g_lua.callGlobalField("g_sprites", "onLoadCWMSpr", file);
+        return true;
+    } catch (stdext::exception& e) {
+        g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
+        return false;
+    }
+
+    return false;
 }
 
 #ifdef FRAMEWORK_EDITOR
@@ -151,13 +217,30 @@ ImagePtr SpriteManager::getSpriteImage(int id)
     const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
     if (const auto& sf = m_spritesFiles[threadId]) {
         std::scoped_lock l(sf->mutex);
-        return getSpriteImage(id, sf->file);
+        return m_spritesHd ? getSpriteImageHd(id, sf->file) : getSpriteImage(id, sf->file);
     }
 
     return nullptr;
 }
 
-ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file) {
+ImagePtr SpriteManager::getSpriteImageHd(int id, const FileStreamPtr& file)
+{
+    auto it = m_cwmSpritesMetadata.find(id);
+    if (it == m_cwmSpritesMetadata.end())
+        return nullptr;
+
+    const auto& metadata = it->second;
+
+    std::string buffer(metadata.getFileSize(), 0);
+
+    file->seek(m_spritesOffset + metadata.getOffset());
+    file->read(buffer.data(), metadata.getFileSize());
+
+    return Image::loadPNG(buffer.data(), buffer.size());
+}
+
+ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file)
+{
     if (id == 0 || !file)
         return nullptr;
 
