@@ -82,25 +82,6 @@ jobs:
         Copy-Item -Path "$env:GITHUB_WORKSPACE/init.lua" -Destination "$env:GITHUB_WORKSPACE/client/init.lua" -Force
         Copy-Item -Path "$env:GITHUB_WORKSPACE/otclient.exe" -Destination "$env:GITHUB_WORKSPACE/client/otclient.exe" -Force
 
-    - name: Install Git LFS
-      run: |
-        git lfs install
-
-    - name: Download 'things' Folder from GitHub
-      run: |
-        git clone --depth 1 --filter=blob:none --sparse https://github.com/tibia-oce/assets.git $env:GITHUB_WORKSPACE/temp-assets
-        cd $env:GITHUB_WORKSPACE/temp-assets
-        git sparse-checkout set things
-
-    - name: Fetch Git LFS Files
-      run: |
-        cd $env:GITHUB_WORKSPACE/temp-assets
-        git lfs pull
-
-    - name: Move 'things' Folder to Client Data Directory
-      run: |
-        Move-Item -Path "$env:GITHUB_WORKSPACE/temp-assets/things" -Destination "$env:GITHUB_WORKSPACE/client/data/things" -Force
-
     - name: Upload Temporary Directory as Artifact
       uses: actions/upload-artifact@main
       with:
