@@ -27,7 +27,7 @@
 #include <string>
 
 #ifndef ANDROID
-#if ENABLE_DISCORD_RPC == 1
+#if TOGGLE_DISCORD_RPC == 1
 #include <discord_register.h>
 #include <discord_rpc.h>
 
