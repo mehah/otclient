@@ -113,8 +113,11 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
 
     m_websocket = emscripten_websocket_new(&attributes);
 
-    if (m_websocket < 1 && m_errorCallback) {
-        m_errorCallback(asio::error::network_unreachable);
+    if (m_websocket < 1) {
+        if (m_errorCallback)
+            m_errorCallback(asio::error::network_unreachable);
+        
+        close();
         return;
     }
 
