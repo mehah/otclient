@@ -695,7 +695,7 @@ void Creature::terminateWalk()
     m_walkOffset = {};
     m_walking = false;
 
-    if (isLocalPlayer() && !static_self_cast<LocalPlayer>()->isAutoWalking() && getWalkSteps() > 2) {
+    if (isLocalPlayer() && !static_self_cast<LocalPlayer>()->isAutoWalking() && getWalkSteps() > 1) {
         g_dispatcher.addEvent([] {
             g_dispatcher.deferEvent([] {
                 if (g_game.getLocalPlayer())
