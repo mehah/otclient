@@ -1238,6 +1238,7 @@ function Cyclopedia.onParseCyclopediaStoreSummary(xpBoostTime, dailyRewardXpBoos
     local maxVisibleRows = 1.6
     local itemCount = #houseItems
     UI.StoreSummary.ListBase.List.houseItems:setHeight(math.min(itemCount, maxVisibleRows) * rowHeight)
+    UI.StoreSummary.ListBase.List.houseItems.PurchasedHouseItems:destroyChildren() 
     for _, item in ipairs(houseItems) do
         local row = g_ui.createWidget('RowStore2', UI.StoreSummary.ListBase.List.houseItems.PurchasedHouseItems)
         local nameLabel = row:getChildById('lblName')
