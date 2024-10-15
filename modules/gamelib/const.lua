@@ -41,7 +41,8 @@ Directions = {
     NorthEast = 4,
     SouthEast = 5,
     SouthWest = 6,
-    NorthWest = 7
+    NorthWest = 7,
+    Invalid = 8
 }
 
 Skill = {
@@ -197,7 +198,7 @@ GameContainerFilter = 113
 GameEnterGameShowAppearance = 114
 GameSmoothWalkElevation = 115
 GameNegativeOffset = 116
-GameItemTooltipV8 = 117 
+GameItemTooltipV8 = 117
 GameWingsAurasEffectsShader = 118
 GameForgeConvergence = 119
 GameAllowCustomBotScripts = 120
