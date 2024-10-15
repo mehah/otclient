@@ -317,7 +317,7 @@ function Cyclopedia.loadCharacterItems(data)
 
         local itemKey = data.itemId .. "-" .. (data.tier or "no_tier")
         local insertedItem = Cyclopedia.Character.Items[itemKey]
-        if insertedItem then
+        if insertedItem and insertedItem.amount then
             insertedItem.amount = insertedItem.amount + data.amount
         else
             Cyclopedia.Character.Items[itemKey] = {
