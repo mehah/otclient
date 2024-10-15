@@ -63,19 +63,6 @@ UIWidget
     margin-top: 7
     height: 22
   
-    OptionCheckBoxMarked
-      id: preciseControl
-      !text: tr('Enable precise control')
-      !tooltip: tr('You will have more precision over the character walking,\nbut it can feel more abrupt or unnatural')
-      @onCheckChange: g_game.setScheduleLastWalk(not self:isChecked())
-
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-  
     OptionCheckBox
       id: openMaximized
       !text: tr('Open containers maximized')

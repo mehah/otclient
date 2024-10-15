@@ -25,12 +25,6 @@ return {
     },
     classicControl                    = false,
     smartWalk                         = false,
-    preciseControl                    = {
-        value = false,
-        action = function(value, options, controller, panels, extraWidgets)
-            g_game.setScheduleLastWalk(not value)
-        end
-    },
     autoChaseOverride                 = true,
     moveStack                         = false,
     showStatusMessagesInConsole       = true,
