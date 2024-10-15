@@ -34,6 +34,10 @@
 #include "tile.h"
 #include "framework/core/graphicalapplication.h"
 
+ // create an option in the ui to configure the delay of the first step.
+constexpr auto firstStepDelay = 200;
+constexpr auto turnDelay = 0;
+
 Game g_game;
 
 void Game::init()
@@ -630,27 +634,26 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction, bool firstStep)
+bool Game::walk(const Otc::Direction direction)
 {
     if (!canPerformGameAction() || direction == Otc::InvalidDirection)
         return false;
 
-    if (!firstStep) {
-        // create an option in the ui to configure the delay of the first step.
-        constexpr auto firstStepDelay = 200;
-        constexpr auto turnDelay = 100;
+    if (m_localPlayer->getWalkSteps() == 1) {
         const auto delay = direction != m_localPlayer->getDirection() ? turnDelay : firstStepDelay;
-        const auto sleep = m_walkTimer.elapsed_millis();
-        if (sleep < delay) {
-            g_dispatcher.scheduleEvent([this, direction] { walk(direction, false); }, std::max<int>(delay - sleep, 1));
-            return false;
-        }
-    } else m_walkTimer.restart();
+        g_dispatcher.scheduleEvent([this, direction] {
+            if (m_localPlayer) {
+                m_localPlayer->setWalkSteps(2);
+                walk(direction);
+            }
+        }, delay);
+        return false;
+    }
 
     // must cancel auto walking, and wait next try
     if (m_localPlayer->isAutoWalking()) {
         m_protocolGame->sendStop();
-        m_localPlayer->autoWalk(m_localPlayer->getPosition().translatedToDirection(direction));
+        m_localPlayer->stopAutoWalk();
         return false;
     }
 
@@ -726,17 +729,23 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
         cancelFollow();
     }
 
-    const Otc::Direction direction = *dirs.begin();
+    static ScheduledEventPtr event = nullptr;
+    static std::vector<Otc::Direction> lastDirs;
 
-    if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable()) {
-            m_localPlayer->preWalk(direction);
-        }
+    if (!m_localPlayer->isWalking())
+        m_localPlayer->preWalk(*dirs.begin());
+
+    lastDirs = dirs;
+
+    if (!event) {
+        event = g_dispatcher.scheduleEvent([this] {
+            if (m_protocolGame) {
+                g_lua.callGlobalField("g_game", "onAutoWalk", lastDirs);
+                m_protocolGame->sendAutoWalk(lastDirs);
+            }
+            event = nullptr;
+        }, firstStepDelay);
     }
-
-    g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
-
-    m_protocolGame->sendAutoWalk(dirs);
 }
 
 void Game::forceWalk(const Otc::Direction direction)

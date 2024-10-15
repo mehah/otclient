@@ -389,6 +389,7 @@ void Creature::walk(const Position& oldPos, const Position& newPos)
 
     // starts counting walk
     m_walking = true;
+    m_walkSteps = std::max<int>(++m_walkSteps, 1);
     m_walkTimer.restart();
     m_walkedPixels = 0;
 
@@ -666,7 +667,8 @@ void Creature::updateWalk(const bool isPreWalking)
     updateWalkingTile();
 
     if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
-        terminateWalk();
+        if (isPreWalking) resetWalkAnimationPhase(false);
+        else terminateWalk();
     }
 }
 
@@ -713,6 +715,7 @@ void Creature::resetWalkAnimationPhase(bool toSchedule) {
 
     const auto self = static_self_cast<Creature>();
     m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
+        self->m_walkSteps = 0;
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
     }, g_game.getServerBeat());
