@@ -150,6 +150,23 @@ return {
             g_app.setDrawTexts(value)
         end
     },
+    walkFirstStepDelay                = {
+        value = 250,
+        action = function(value, options, controller, panels, extraWidgets)
+            panels.generalPanel:recursiveGetChildById('walkFirstStepDelay'):setText(string.format(
+                'Walk Delay after first step: %sms', value))
+            g_game.setWalkFirstStepDelay(value)
+        end
+    },
+    walkTurnDelay                     = {
+        value = 100,
+        action = function(value, options, controller, panels, extraWidgets)
+            panels.generalPanel:recursiveGetChildById('walkTurnDelay'):setText(string.format(
+                'Walk delay after turn: %sms',
+                value))
+            g_game.setWalkTurnDelay(value)
+        end
+    },
     turnDelay                         = {
         value = 50,
         action = function(value, options, controller, panels, extraWidgets)
