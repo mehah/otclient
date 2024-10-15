@@ -640,11 +640,11 @@ bool Game::walk(const Otc::Direction direction)
         return false;
 
     if (m_localPlayer->getWalkSteps() == 1) {
-        const auto delay = direction != m_localPlayer->getDirection() ? turnDelay : firstStepDelay;
-        g_dispatcher.scheduleEvent([this, direction] {
-            if (m_localPlayer) {
+        const auto delay = std::max<int>(direction != m_localPlayer->getDirection() ? turnDelay : firstStepDelay, 50);
+        g_dispatcher.scheduleEvent([this] {
+            if (m_localPlayer && m_localPlayer->getNextWalkDir() != Otc::InvalidDirection) {
                 m_localPlayer->setWalkSteps(2);
-                walk(direction);
+                walk(m_localPlayer->getNextWalkDir());
             }
         }, delay);
         return false;
@@ -729,23 +729,11 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
         cancelFollow();
     }
 
-    static ScheduledEventPtr event = nullptr;
-    static std::vector<Otc::Direction> lastDirs;
-
     if (!m_localPlayer->isWalking())
         m_localPlayer->preWalk(*dirs.begin());
 
-    lastDirs = dirs;
-
-    if (!event) {
-        event = g_dispatcher.scheduleEvent([this] {
-            if (m_protocolGame) {
-                g_lua.callGlobalField("g_game", "onAutoWalk", lastDirs);
-                m_protocolGame->sendAutoWalk(lastDirs);
-            }
-            event = nullptr;
-        }, firstStepDelay);
-    }
+    g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
+    m_protocolGame->sendAutoWalk(dirs);
 }
 
 void Game::forceWalk(const Otc::Direction direction)

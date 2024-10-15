@@ -130,7 +130,7 @@ function init()
 end
 
 function bindKeys()
-    gameRootPanel:setAutoRepeatDelay(10)
+    gameRootPanel:setAutoRepeatDelay(50)
 
     bindWalkKey('Up', North)
     bindWalkKey('Right', East)
