@@ -541,7 +541,7 @@ public:
     void safeLogout();
 
     // walk related
-    bool walk(const Otc::Direction direction);
+    bool walk(const Otc::Direction direction, bool force = false);
     void autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos);
     void forceWalk(const Otc::Direction direction);
     void turn(const Otc::Direction direction);
@@ -698,6 +698,12 @@ public:
     void setCustomOs(const Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
     Otc::OperatingSystem_t getOs();
 
+    void setWalkTurnDelay(uint16_t v) { m_walkTurnDelay = v; }
+    void setWalkFirstStepDelay(uint16_t v) { m_walkFirstStepDelay = v; }
+
+    uint16_t getWalkTurnDelay() { return m_walkTurnDelay; }
+    uint16_t getWalkFirstStepDelay() { return m_walkFirstStepDelay; }
+
     bool canPerformGameAction() const;
     bool checkBotProtection() const;
     bool isEnabledBotProtection() {
@@ -816,6 +822,8 @@ private:
     bool m_canReportBugs{ false };
 
     uint8_t m_openPvpSituations{ 0 };
+    uint16_t m_walkFirstStepDelay{ 200 };
+    uint16_t m_walkTurnDelay{ 100 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };
     uint16_t m_protocolVersion{ 0 };
