@@ -76,7 +76,7 @@ RowStore < StoreLightFlatPanel
     text-align: center
     text-offset: 15 0
     image-color: #1111118c
-    icon: images/tibiaCoin
+    icon: /images/ui/tibiaCoin
     icon-align: right
     icon-offset: -2 0
 
@@ -152,7 +152,7 @@ StoreWindow
       anchors.left: prev.right
       margin-left: 5
       margin-bottom: 3
-      image-source: images/tibiaCoin
+      image-source: /images/ui/tibiaCoin
       focusable: false
       phantom: true
 
@@ -193,7 +193,7 @@ StoreWindow
     margin-bottom: 2
     !tooltip: tr('get Tibia Coins')
     image-color: green
-    icon: images/tibiaCoin
+    icon: /images/ui/tibiaCoin
     icon-align: center
     icon-offset: 10 -1
     text-offset: -18 0
@@ -339,7 +339,7 @@ StoreWindow
       text-offset: -18 0
       image-color: #1111118c
       text: 8900
-      icon: images/tibiaCoin
+      icon: /images/ui/tibiaCoin
       icon-align: center
       icon-offset: 10 0
 

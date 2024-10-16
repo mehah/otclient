@@ -1418,7 +1418,7 @@ RowStore2 < UIWidget
     text-align: center
     text-offset: 15 0
     image-color: #1111118c
-    icon: images/tibiaCoin
+    icon: /images/ui/tibiaCoin
     icon-align: right
     icon-offset: -2 0
 
