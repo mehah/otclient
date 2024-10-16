@@ -34,10 +34,6 @@
 #include "tile.h"
 #include "framework/core/graphicalapplication.h"
 
- // create an option in the ui to configure the delay of the first step.
-constexpr auto firstStepDelay = 200;
-constexpr auto turnDelay = 0;
-
 Game g_game;
 
 void Game::init()
@@ -634,20 +630,41 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction)
+bool Game::walk(const Otc::Direction direction, bool force)
 {
-    if (!canPerformGameAction() || direction == Otc::InvalidDirection)
+    static ScheduledEventPtr nextWalkSchedule = nullptr;
+
+    if (direction == Otc::InvalidDirection) {
+        if (nextWalkSchedule) {
+            nextWalkSchedule->cancel();
+            nextWalkSchedule = nullptr;
+        }
+        return false;
+    }
+
+    if (!canPerformGameAction() || nextWalkSchedule)
         return false;
 
-    if (m_localPlayer->getWalkSteps() == 1) {
-        const auto delay = std::max<int>(direction != m_localPlayer->getDirection() ? turnDelay : firstStepDelay, 50);
-        g_dispatcher.scheduleEvent([this] {
-            if (m_localPlayer && m_localPlayer->getNextWalkDir() != Otc::InvalidDirection) {
-                m_localPlayer->setWalkSteps(2);
-                walk(m_localPlayer->getNextWalkDir());
-            }
-        }, delay);
-        return false;
+    if (!force && m_localPlayer->getWalkSteps() > 0) {
+        auto delay = 0;
+        auto steps = m_localPlayer->getWalkSteps();
+
+        if (m_localPlayer->getWalkSteps() == 1) {
+            delay = m_walkFirstStepDelay;
+            steps = 2;
+        } else if (direction != m_localPlayer->getDirection())
+            delay = m_walkTurnDelay;
+
+        if (delay > 0) {
+            nextWalkSchedule = g_dispatcher.scheduleEvent([this, steps, direction] {
+                nextWalkSchedule = nullptr;
+                if (m_localPlayer) {
+                    m_localPlayer->setWalkSteps(steps);
+                    walk(direction, true);
+                }
+            }, delay);
+            return false;
+        }
     }
 
     // must cancel auto walking, and wait next try
