@@ -317,7 +317,7 @@ function Cyclopedia.loadCharacterItems(data)
 
         local itemKey = data.itemId .. "-" .. (data.tier or "no_tier")
         local insertedItem = Cyclopedia.Character.Items[itemKey]
-        if insertedItem then
+        if insertedItem and insertedItem.amount then
             insertedItem.amount = insertedItem.amount + data.amount
         else
             Cyclopedia.Character.Items[itemKey] = {
@@ -1238,6 +1238,7 @@ function Cyclopedia.onParseCyclopediaStoreSummary(xpBoostTime, dailyRewardXpBoos
     local maxVisibleRows = 1.6
     local itemCount = #houseItems
     UI.StoreSummary.ListBase.List.houseItems:setHeight(math.min(itemCount, maxVisibleRows) * rowHeight)
+    UI.StoreSummary.ListBase.List.houseItems.PurchasedHouseItems:destroyChildren() 
     for _, item in ipairs(houseItems) do
         local row = g_ui.createWidget('RowStore2', UI.StoreSummary.ListBase.List.houseItems.PurchasedHouseItems)
         local nameLabel = row:getChildById('lblName')
