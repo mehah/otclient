@@ -955,7 +955,7 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
-        if (isLocalPlayer() && (stepDuration <= 100 || !hasSpeedFormula()))
+        if (isLocalPlayer() && stepDuration < 100)
             stepDuration += 10;
 
         m_stepCache.duration = stepDuration;
