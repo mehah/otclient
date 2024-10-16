@@ -658,13 +658,12 @@ bool Game::walk(const Otc::Direction direction, bool force)
 
             if (delay > 0) {
                 nextWalkSchedule = g_dispatcher.scheduleEvent([this, direction] {
+                    if (m_localPlayer && m_localPlayer->getNextWalkDir() != Otc::InvalidDirection) {
+                        m_localPlayer->setWalkSteps(1);
+                        walk(direction, true);
+                    }
+
                     nextWalkSchedule = nullptr;
-
-                    if (!m_localPlayer || m_localPlayer->getNextWalkDir() == Otc::InvalidDirection)
-                        return;
-
-                    m_localPlayer->setWalkSteps(1);
-                    walk(direction, true);
                 }, delay);
                 return false;
             }
