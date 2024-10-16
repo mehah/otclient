@@ -695,7 +695,7 @@ void Creature::terminateWalk()
     m_walkOffset = {};
     m_walking = false;
 
-    if (isLocalPlayer() && !static_self_cast<LocalPlayer>()->isAutoWalking() && getWalkSteps() > 1) {
+    if (isLocalPlayer() && !static_self_cast<LocalPlayer>()->isAutoWalking()) {
         g_dispatcher.addEvent([] {
             g_dispatcher.deferEvent([] {
                 if (g_game.getLocalPlayer())
@@ -955,7 +955,7 @@ uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
-        if (isLocalPlayer() && stepDuration <= 100)
+        if (isLocalPlayer() && stepDuration < 100)
             stepDuration += 10;
 
         m_stepCache.duration = stepDuration;

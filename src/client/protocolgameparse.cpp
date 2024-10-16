@@ -4019,6 +4019,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             msg->getU16(); // player level
             getOutfit(msg, false);
             msg->getU8(); // ???
+            if (g_game.getFeature(Otc::GameTournamentPackets)) {
+                msg->getU8(); // ???
+            }
             msg->getString(); // current title name
             break;
         }
@@ -4029,6 +4032,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             stats.level = msg->getU16();
             stats.levelPercent = msg->getU8();
             stats.baseExpGain = msg->getU16();
+            if (g_game.getFeature(Otc::GameTournamentPackets)) {
+                msg->getU32(); // tournament exp(deprecated)
+            }
             stats.lowLevelExpBonus = msg->getU16();
             stats.XpBoostPercent = msg->getU16();
             stats.staminaExpBonus = msg->getU16();
