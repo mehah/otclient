@@ -642,28 +642,31 @@ bool Game::walk(const Otc::Direction direction, bool force)
         return false;
     }
 
-    if (!canPerformGameAction() || nextWalkSchedule)
+    if (!canPerformGameAction())
         return false;
 
-    if (!force && m_localPlayer->getWalkSteps() > 0) {
-        auto delay = 0;
-        auto steps = m_localPlayer->getWalkSteps();
-
-        if (m_localPlayer->getWalkSteps() == 1) {
-            delay = m_walkFirstStepDelay;
-            steps = 2;
-        } else if (direction != m_localPlayer->getDirection())
-            delay = m_walkTurnDelay;
-
-        if (delay > 0) {
-            nextWalkSchedule = g_dispatcher.scheduleEvent([this, steps, direction] {
-                nextWalkSchedule = nullptr;
-                if (m_localPlayer) {
-                    m_localPlayer->setWalkSteps(steps);
-                    walk(direction, true);
-                }
-            }, delay);
+    if (!force) {
+        if (nextWalkSchedule)
             return false;
+
+        if (m_localPlayer->getWalkSteps() > 0) {
+            uint16_t delay = 0;
+            if (m_localPlayer->getWalkSteps() == 1) {
+                delay = m_walkFirstStepDelay;
+            } else if (direction != m_localPlayer->getDirection())
+                delay = m_walkTurnDelay;
+
+            if (delay > 0) {
+                nextWalkSchedule = g_dispatcher.scheduleEvent([this, direction] {
+                    if (m_localPlayer && m_localPlayer->getNextWalkDir() != Otc::InvalidDirection) {
+                        m_localPlayer->setWalkSteps(1);
+                        walk(direction, true);
+                    }
+
+                    nextWalkSchedule = nullptr;
+                }, delay);
+                return false;
+            }
         }
     }
 
