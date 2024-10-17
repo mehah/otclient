@@ -46,6 +46,9 @@
 #include "towns.h"
 #include "uicreature.h"
 #include "uiitem.h"
+#include "uieffect.h"
+#include "uimissile.h"
+
 #include "uimap.h"
 #include "uimapanchorlayout.h"
 #include "uiminimap.h"
@@ -925,6 +928,30 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIItem>("getItem", &UIItem::getItem);
     g_lua.bindClassMemberFunction<UIItem>("isVirtual", &UIItem::isVirtual);
     g_lua.bindClassMemberFunction<UIItem>("isItemVisible", &UIItem::isItemVisible);
+
+    g_lua.registerClass<UIEffect, UIWidget>();
+    g_lua.bindClassStaticFunction<UIItem>("create", [] { return std::make_shared<UIEffect>(); });
+    g_lua.bindClassMemberFunction<UIItem>("setEffectId", &UIEffect::setEffectId);
+    g_lua.bindClassMemberFunction<UIItem>("setEffectVisible", &UIEffect::setEffectVisible);
+    g_lua.bindClassMemberFunction<UIItem>("setEffect", &UIEffect::setEffect);
+    g_lua.bindClassMemberFunction<UIItem>("setVirtual", &UIEffect::setVirtual);
+    g_lua.bindClassMemberFunction<UIItem>("clearEffect", &UIEffect::clearEffect);
+    g_lua.bindClassMemberFunction<UIItem>("getEffectId", &UIEffect::getEffectId);
+    g_lua.bindClassMemberFunction<UIItem>("getEffect", &UIEffect::getEffect);
+    g_lua.bindClassMemberFunction<UIItem>("isVirtual", &UIEffect::isVirtual);
+    g_lua.bindClassMemberFunction<UIItem>("isEffectVisible", &UIEffect::isEffectVisible);
+
+    g_lua.registerClass<UIMissile, UIWidget>();
+    g_lua.bindClassStaticFunction<UIItem>("create", [] { return std::make_shared<UIMissile>(); });
+    g_lua.bindClassMemberFunction<UIItem>("setMissileId", &UIMissile::setMissileId);
+    g_lua.bindClassMemberFunction<UIItem>("setMissileVisible", &UIMissile::setMissileVisible);
+    g_lua.bindClassMemberFunction<UIItem>("setMissile", &UIMissile::setMissile);
+    g_lua.bindClassMemberFunction<UIItem>("setVirtual", &UIMissile::setVirtual);
+    g_lua.bindClassMemberFunction<UIItem>("clearMissile", &UIMissile::clearMissile);
+    g_lua.bindClassMemberFunction<UIItem>("getMissileId", &UIMissile::getMissileId);
+    g_lua.bindClassMemberFunction<UIItem>("getMissile", &UIMissile::getMissile);
+    g_lua.bindClassMemberFunction<UIItem>("isVirtual", &UIMissile::isVirtual);
+    g_lua.bindClassMemberFunction<UIItem>("isMissileVisible", &UIMissile::isMissileVisible);
 
     g_lua.registerClass<UISprite, UIWidget>();
     g_lua.bindClassStaticFunction<UISprite>("create", [] { return std::make_shared<UISprite>(); });
