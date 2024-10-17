@@ -20,6 +20,8 @@
  * THE SOFTWARE.
  */
 
+#ifndef __EMSCRIPTEN__
+
 #include "server.h"
 #include "connection.h"
 
@@ -49,7 +51,7 @@ void Server::close()
 void Server::acceptNext()
 {
     const auto& connection = std::make_shared<Connection>();
-    connection->m_connecting = true;
+        connection->m_connecting = true;
 
     const auto self = static_self_cast<Server>();
     m_acceptor.async_accept(connection->m_socket, [=](const std::error_code& error) {
@@ -60,3 +62,5 @@ void Server::acceptNext()
         self->callLuaField("onAccept", connection, error.message(), error.value());
     });
 }
+
+#endif

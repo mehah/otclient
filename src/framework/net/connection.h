@@ -21,6 +21,7 @@
  */
 
 #pragma once
+#ifndef __EMSCRIPTEN__
 
 #include <asio/streambuf.hpp>
 
@@ -97,3 +98,4 @@ protected:
 
     friend class Server;
 };
+#endif

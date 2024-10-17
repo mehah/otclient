@@ -4,6 +4,11 @@ project(otclient)
 # *****************************************************************************
 # Options
 # *****************************************************************************
+if(CMAKE_BASE_NAME STREQUAL "em++")
+    set(WASM ON)
+		message(STATUS "WASM: ON")
+endif()
+
 option(TOGGLE_FRAMEWORK_GRAPHICS "Use Graphics " ON)
 option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
 option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
@@ -66,7 +71,7 @@ endif()
 if (TOGGLE_FRAMEWORK_EDITOR)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_EDITOR)
 endif()
-if (ANDROID)
+if (ANDROID OR WASM)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DOPENGL_ES=2)
 endif()
 
@@ -187,6 +192,10 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
+if(WASM)
+	find_package(absl REQUIRED)
+	find_package(utf8_range REQUIRED)
+endif()
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -201,7 +210,7 @@ if(APPLE)
 	find_library(FOUNDATION Foundation REQUIRED)
 	find_library(IOKIT IOKit REQUIRED)
 endif()
-if(UNIX AND NOT ANDROID)
+if(UNIX AND NOT ANDROID AND NOT WASM)
 	find_package(X11 REQUIRED)
 endif()
 if(WIN32)
@@ -214,7 +223,9 @@ if(TOGGLE_DIRECTX)
 	find_package(DirectX REQUIRED)
 endif()
 if(TOGGLE_FRAMEWORK_SOUND)
-	find_package(OpenAL CONFIG REQUIRED)
+	if(NOT WASM)
+		find_package(OpenAL CONFIG REQUIRED)
+	endif()
 	find_package(VorbisFile REQUIRED)
 	find_package(Vorbis REQUIRED)
 	find_package(Ogg CONFIG REQUIRED)
@@ -229,9 +240,14 @@ if(ANDROID)
 	find_package(game-activity REQUIRED CONFIG)
 	find_package(EGL REQUIRED)
 else()
-	find_package(OpenGL REQUIRED)
-	find_package(GLEW REQUIRED)
-	find_package(LuaJIT REQUIRED)
+	if(NOT WASM)
+		find_package(OpenGL REQUIRED)
+		find_package(GLEW REQUIRED)
+		find_package(LuaJIT REQUIRED)
+	else()
+		set(LUA_LIBRARY ${LUA_LIBRARY} ${CMAKE_SOURCE_DIR}/browser/include/lua51/liblua.a)
+		set(BROWSER_INCLUDE_DIR ${BROWSER_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/browser/include)
+	endif()
 endif()
 
 # *****************************************************************************
@@ -413,6 +429,15 @@ if (TOGGLE_FRAMEWORK_SOUND)
 	)
 endif()
 
+if (WASM)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		framework/platform/browserplatform.cpp
+		framework/platform/browserwindow.cpp
+		framework/net/webconnection.cpp
+	)
+endif()
+
+
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
 
 # *****************************************************************************
@@ -530,6 +555,180 @@ elseif(ANDROID)
 		log
 		pugixml::pugixml
 	)
+
+elseif(WASM)
+  target_include_directories(${PROJECT_NAME}
+		PRIVATE
+		${CMAKE_SOURCE_DIR}/src
+		${CMAKE_THREAD_LIBS_INIT}
+		${Protobuf_INCLUDE_DIRS}
+		${GMP_INCLUDE_DIR}
+		${PHYSFS_INCLUDE_DIR}
+		${GLEW_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
+		${NLOHMANN_JSON_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
+		${BROWSER_INCLUDE_DIR}
+	)
+	target_link_libraries(${PROJECT_NAME}
+		PRIVATE
+		${LUA_LIBRARY}
+		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
+		${PROTOBUF_LIBRARY}
+		${NLOHMANN_JSON_LIBRARY}
+		${GLEW_LIBRARY}
+		${OPENGL_LIBRARIES}
+		${DirectX_LIBRARY}
+		${DirectX_LIBRARIES}
+		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
+		${GMP_LIBRARY}
+		${STDUUID}
+		${FOUNDATION}
+		${IOKIT}
+		${OPENSSL_LIBRARY}
+		${OPENSSL_CRYPTO_LIBRARY}
+		${HTTPLIB_LIBRARY}
+
+		Threads::Threads
+		asio::asio
+		# OpenAL::OpenAL (using emscripten openal api)
+		LibLZMA::LibLZMA
+		pugixml::pugixml
+		ZLIB::ZLIB
+		OpenSSL::SSL
+		OpenSSL::Crypto
+		httplib::httplib
+
+		## all might not be necessary
+		absl::base
+ 		absl::log_severity
+ 		absl::malloc_internal
+ 		absl::raw_logging_internal
+ 		absl::scoped_set_env
+ 		absl::spinlock_wait
+ 		absl::strerror
+ 		absl::throw_delegate
+ 		absl::die_if_null
+ 		absl::log_entry
+ 		absl::city
+ 		absl::hash
+ 		absl::log_globals
+ 		absl::log_flags
+ 		absl::log_initialize
+ 		absl::log_internal_conditions
+ 		absl::log_internal_fnmatch
+ 		absl::log_internal_globals
+ 		absl::log_internal_nullguard
+ 		absl::log_internal_proto
+ 		absl::log_sink
+ 		absl::int128
+ 		absl::time_zone
+ 		absl::time
+ 		absl::kernel_timeout_internal
+ 		absl::graphcycles_internal
+ 		absl::stacktrace
+ 		absl::symbolize
+ 		absl::synchronization
+ 		absl::log_internal_log_sink_set
+ 		absl::str_format_internal
+ 		absl::strings_internal
+ 		absl::strings
+ 		absl::string_view
+ 		absl::log_internal_format
+ 		absl::examine_stack
+ 		absl::log_internal_message
+ 		absl::die_if_null
+ 		absl::log_internal_check_op
+ 		absl::vlog_config_internal
+ 		absl::cord
+ 		absl::crc_cord_state
+ 		absl::cord_internal
+ 		absl::crc32c
+ 		absl::flags_commandlineflag
+ 		absl::flags_config
+ 		absl::flags_internal
+ 		absl::flags_marshalling
+ 		absl::flags_parse
+ 		absl::flags_private_handle_accessor
+ 		absl::flags_program_name
+ 		absl::flags_reflection
+ 		absl::flags_usage
+ 		absl::flags_usage_internal
+ 		absl::log_internal_check_op
+ 		absl::log_internal_fnmatch
+ 		absl::log_internal_format
+ 		absl::log_internal_globals
+ 		absl::log_internal_log_sink_set
+ 		absl::log_internal_message
+ 		absl::random_internal_distribution_test_util
+ 		absl::status
+ 		absl::statusor
+ 		absl::cordz_handle
+ 		absl::cordz_info
+ 		absl::crc_internal
+ 		absl::failure_signal_handler
+ 		absl::hashtablez_sampler
+ 		absl::random_internal_pool_urbg
+ 		absl::bad_any_cast_impl
+ 		absl::bad_optional_access
+ 		absl::bad_variant_access
+ 		absl::civil_time
+ 		absl::cordz_functions
+ 		absl::cordz_sample_token
+ 		absl::crc_cpu_detect
+ 		absl::debugging_internal
+ 		absl::demangle_internal
+ 		absl::exponential_biased
+ 		absl::flags
+ 		absl::flags_commandlineflag_internal
+ 		absl::leak_check
+ 		absl::low_level_hash
+ 		absl::periodic_sampler
+ 		absl::random_distributions
+ 		absl::random_internal_platform
+ 		absl::random_internal_randen
+ 		absl::random_internal_randen_hwaes
+ 		absl::random_internal_randen_hwaes_impl
+ 		absl::random_internal_randen_slow
+ 		absl::random_internal_seed_material
+ 		absl::random_seed_gen_exception
+ 		absl::random_seed_sequences
+ 		absl::raw_hash_set
+
+ 		utf8_range::utf8_validity
+	)
+
+
+	get_property(linkflags TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(${PROJECT_NAME}
+			PRIVATE
+				-Wall -Wextra -Wpedantic
+		)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+		set(linkflags "${linkflags} -sASSERTIONS=1")
+	endif()
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions")
+	set(linkflags "${linkflags}
+			-sINVOKE_RUN=0 -sEXIT_RUNTIME=1 -sTEXTDECODER=0 -sCASE_INSENSITIVE_FS=1
+			-lopenal -lidbfs.js -lwebsocket.js -sEXPORTED_RUNTIME_METHODS=ccall -sEXPORTED_FUNCTIONS=_main,_paste_return
+			-sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
+			-sFORCE_FILESYSTEM -sMALLOC=mimalloc -sWEBSOCKET_SUBPROTOCOL=binary -sOFFSCREENCANVAS_SUPPORT=1
+			-sOFFSCREEN_FRAMEBUFFER -sENVIRONMENT=web,worker -sPROXY_TO_PTHREAD -sFULL_ES2=1
+			-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sUSE_PTHREADS=1 -sFETCH=1
+			-sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sALLOW_MEMORY_GROWTH=1
+			--preload-file=../otclientrc.lua@otclientrc.lua --preload-file=../init.lua@init.lua
+			--preload-file=../data@data --preload-file=../mods@mods --preload-file=../modules@modules
+			--shell-file=../browser/shell.html --use-preload-cache")
+	set_target_properties(${PROJECT_NAME} PROPERTIES
+  	LINK_FLAGS ${linkflags})
+	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+
 else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE

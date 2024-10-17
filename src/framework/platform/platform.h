@@ -28,6 +28,10 @@
 #include <framework/stdext/types.h>
 #include <framework/stdext/storage.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 class Platform
 {
 public:
@@ -46,6 +50,7 @@ public:
         DeviceUnknown,
         Desktop,
         Mobile,
+        Browser,
         Console
     };
 
@@ -79,7 +84,16 @@ public:
     Device getDevice() { return m_device; }
     void setDevice(Device device) { m_device = device; }
     bool isDesktop() { return m_device.type == Desktop; }
-    bool isMobile() { return m_device.type == Mobile; }
+    bool isMobile() {
+    #ifndef __EMSCRIPTEN__
+        return m_device.type == Mobile; 
+    #else
+        return MAIN_THREAD_EM_ASM_INT({
+            return (/iphone|ipod|ipad|android/i).test(navigator.userAgent);
+        }) == 1;
+    #endif
+    }
+    bool isBrowser() { return m_device.type == Browser; }
     bool isConsole() { return m_device.type == Console; }
     std::string getDeviceShortName(DeviceType type = DeviceUnknown);
     std::string getOsShortName(OperatingSystem os = OsUnknown);
