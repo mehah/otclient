@@ -208,6 +208,15 @@ void LocalPlayer::terminateWalk()
 {
     Creature::terminateWalk();
     m_preWalking = false;
+
+    if (!static_self_cast<LocalPlayer>()->isAutoWalking()) {
+        g_dispatcher.addEvent([] {
+            g_dispatcher.deferEvent([] {
+                if (g_game.getLocalPlayer())
+                    g_game.walk(g_game.getLocalPlayer()->getNextWalkDir());
+            });
+        });
+    }
 }
 
 void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPos)
@@ -218,10 +227,6 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
         stopAutoWalk();
     else if (m_autoWalkDestination.isValid() && newPos == m_lastAutoWalkPosition)
         autoWalk(m_autoWalkDestination);
-
-    if (newPos.z != oldPos.z) {
-        m_walkTimer.update(-getStepDuration());
-    }
 }
 
 void LocalPlayer::setStates(uint32_t states)

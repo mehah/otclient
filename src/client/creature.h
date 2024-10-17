@@ -209,7 +209,6 @@ private:
     void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
-    void resetWalkAnimationPhase(bool toSchedule = false);
 
     uint16_t getCurrentAnimationPhase(bool mount = false);
 
