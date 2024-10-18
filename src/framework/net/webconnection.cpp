@@ -93,7 +93,7 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
     m_connecting = true;
     m_connectCallback = connectCallback;
 
-    std::string ip = host.data();
+    std::string ip = std::string(host);
     ip.length() == 0 ? ip = "localhost" : ip;
 
 #ifndef NDEBUG
