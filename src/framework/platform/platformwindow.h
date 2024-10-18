@@ -55,7 +55,7 @@ public:
     virtual void hideMouse() = 0;
     virtual void displayFatalError(const std::string_view /*message*/) {}
 
-    int loadMouseCursor(const std::string& file, const Point& hotSpot);
+    virtual int loadMouseCursor(const std::string& file, const Point& hotSpot);
     virtual void setMouseCursor(int cursorId) = 0;
     virtual void restoreMouseCursor() = 0;
 
