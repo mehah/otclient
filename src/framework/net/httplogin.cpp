@@ -154,9 +154,10 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
         };
         attr.requestHeaders = headers;
         attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
-        std::string body = "{\"email\":\"" + email + "\",\"password\":\"" + password + "\",\"stayloggedin\":true,\"type\":\"login\"}";
-        attr.requestData = body.c_str();
-        attr.requestDataSize = strlen(attr.requestData);
+        json body = json{ {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+        std::string bodyStr = body.dump(1);
+        attr.requestData = bodyStr.data();
+        attr.requestDataSize = bodyStr.length();
 
         std::string url = "https://" + (host.length() > 0 ? host : "127.0.0.1") + ":" + std::to_string(port) + path;
         emscripten_fetch_t* fetch = emscripten_fetch(&attr, url.c_str());
