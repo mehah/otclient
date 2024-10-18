@@ -153,7 +153,7 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
     }));
 
     emscripten_websocket_set_onmessage_callback(m_websocket, this, ([](int /*eventType*/, const EmscriptenWebSocketMessageEvent* webSocketEvent, void* userData) -> EM_BOOL {
-        uint32_t numBytes = webSocketEvent->numBytes;
+        auto numBytes = webSocketEvent->numBytes;
         if (numBytes == 0)
             return EM_TRUE;
         if (webSocketEvent->isText)
