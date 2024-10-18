@@ -1,0 +1,207 @@
+name: Build & Release
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - "data/**"
+      - "mods/**"
+      - "modules/**"
+      - "src/**"
+      - "cmake/**"
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - "data/**"
+      - "mods/**"
+      - "modules/**"
+      - "src/**"
+      - "cmake/**"
+
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 2
+  MAKEFLAGS: '-j 2'
+
+jobs:
+  build:
+    name: ${{ matrix.os }}-${{ matrix.buildtype }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2022]
+        buildtype: [windows-release]
+        include:
+        - os: windows-2022
+          triplet: x64-windows
+          packages: >
+            sccache #magic___^_^___line
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@main
+
+    - name: CCache
+      uses: hendrikmuhs/ccache-action@main
+      with:
+        max-size: "1G"
+        variant: "sccache"
+        key: ccache-${{ matrix.os }}-${{ matrix.buildtype }}
+        restore-keys: |
+          ccache-${{ matrix.os }}
+
+    - name: Restore artifacts and install vcpkg
+      id: vcpkg-step
+      run: |
+        $json=Get-Content vcpkg.json -Raw | ConvertFrom-Json
+        $vcpkgCommitId=$json.'builtin-baseline'
+        Write-Host "vcpkg commit ID: $vcpkgCommitId"
+        echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
+
+    - name: Get vcpkg commit id from vcpkg.json
+      uses: lukka/run-vcpkg@main
+      with:
+        vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
+        vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
+
+    - name: Get latest CMake and ninja
+      uses: lukka/get-cmake@main
+
+    - name: Run CMake
+      uses: lukka/run-cmake@main
+      with:
+        configurePreset: ${{ matrix.buildtype }}
+        buildPreset: ${{ matrix.buildtype }}
+
+    - name: Create and Upload Artifact (exe)
+      uses: actions/upload-artifact@main
+      with:
+        name: otclient-${{ matrix.os }}-${{ matrix.buildtype }}-${{ github.sha }}
+        path: |
+          ${{ github.workspace }}/otclient.exe
+
+    - name: Create Temporary Directory
+      run: |
+        $tempDir = "$env:GITHUB_WORKSPACE/client"
+        New-Item -Path $tempDir -ItemType Directory -Force
+
+    - name: Move Files to Temporary Directory
+      run: |
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/data" -Destination "$env:GITHUB_WORKSPACE/client/data" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/mods" -Destination "$env:GITHUB_WORKSPACE/client/mods" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/modules" -Destination "$env:GITHUB_WORKSPACE/client/modules" -Recurse -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/init.lua" -Destination "$env:GITHUB_WORKSPACE/client/init.lua" -Force
+        Copy-Item -Path "$env:GITHUB_WORKSPACE/otclient.exe" -Destination "$env:GITHUB_WORKSPACE/client/otclient.exe" -Force
+
+    - name: Install Git LFS
+      run: |
+        git lfs install
+
+    - name: Download 'things' Folder from GitHub
+      run: |
+        git clone --depth 1 --filter=blob:none --sparse https://github.com/tibia-oce/assets.git $env:GITHUB_WORKSPACE/temp-assets
+        cd $env:GITHUB_WORKSPACE/temp-assets
+        git sparse-checkout set things
+
+    - name: Fetch Git LFS Files
+      run: |
+        cd $env:GITHUB_WORKSPACE/temp-assets
+        git lfs pull
+
+    - name: Move 'things' Folder to Client Data Directory
+      run: |
+        Move-Item -Path "$env:GITHUB_WORKSPACE/temp-assets/things" -Destination "$env:GITHUB_WORKSPACE/client/data/things" -Force
+
+    - name: Compress Temporary Directory
+      run: |
+        Compress-Archive -Path "$env:GITHUB_WORKSPACE/client" -DestinationPath "$env:GITHUB_WORKSPACE/client.zip"
+
+    - name: Upload client artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: client-zip
+        path: client.zip
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: client-zip
+
+      # https://github.com/semantic-release/semantic-release/issues/1592#issuecomment-902533435
+      # Semantic-release doesn't support pathing to a config file unless using a .js config:
+      # instead copy the file to the root as a workaround to maintain workflow separation
+      - name: Copy Release Config to Root
+        run: |
+          cp .github/.releaserc ./
+
+      - name: Install Semantic Release
+        run: |
+          npm install semantic-release @semantic-release/github --save-dev
+          npm install conventional-changelog-eslint --save-dev
+
+      # Ensure that only one rc pre-release is active at a time by deleting the latest pre-release 
+      # and its corresponding tag on the 'develop' branch. This avoids clutter from multiple rc 
+      # releases after each merge into the develop branch.
+      - name: Delete Existing Pre-release and Tag (Develop Branch Only)
+        if: github.ref == 'refs/heads/develop'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_prerelease_tag=$(gh release list --limit 1 --json tagName,isPrerelease \
+            --jq '.[] | select(.isPrerelease) | .tagName')
+
+          if [ -n "$latest_prerelease_tag" ]; then
+            gh release delete "$latest_prerelease_tag" --yes --cleanup-tag
+          fi
+
+      - name: Semantic Release (Dry Run for PRs)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release --ci --dry-run
+
+      - name: Semantic Release (Full Release on Push)
+        if: ${{ github.event_name == 'push' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEBUG: semantic-release:*
+        run: npx semantic-release --ci
+
+      # https://semantic-release.gitbook.io/semantic-release/usage/workflow-configuration#pre-release-branches
+      # Semantic-release appends a numerical suffix to all pre-releases by default (e.g., `v0.0.1-rc.1`).
+      # Currently, this behavior is not configurable via CLI or the release config. For improved readability 
+      # and consistency, this step renames the tag and associated release by removing the numerical suffix
+      # from the rc pre-release (e.g., renaming `v0.0.1-rc.1` to `v0.0.1-rc`).
+      - name: Rename RC Release Tag (Develop Branch Only)
+        if: github.ref == 'refs/heads/develop'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          latest_tag=$(gh release list --limit 1 --json tagName,isPrerelease --jq '.[] | select(.isPrerelease) | .tagName')
+          if [[ $latest_tag == *"-rc."* ]]; then
+            new_tag=${latest_tag%-rc.*}-rc
+            new_name="Release ${new_tag}"
+            gh release edit "$latest_tag" --tag "$new_tag" --title "$new_name"
+            git tag $new_tag $latest_tag  # Create the new tag pointing to the same commit
+            git tag -d $latest_tag  # Delete the old tag locally
+            git push origin $new_tag  # Push the new tag to the remote
+            git push origin :refs/tags/$latest_tag  # Delete the old tag on the remote
+          fi

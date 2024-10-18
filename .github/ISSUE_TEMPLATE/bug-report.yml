@@ -1,0 +1,40 @@
+name: 🐛 Bug Report
+description: Report a bug for the project.
+assignees: ["jordanhoare"]
+labels: ["bug"]
+title: "bug: "
+body:
+- type: textarea
+  attributes:
+    label: Describe the Bug
+    description: A clear description of what the bug is and how it manifests.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Expected Behavior
+    description: A clear description of what you expected to happen.
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: Steps to Reproduce
+    description: Please explain the steps required to duplicate this issue.
+  validations:
+    required: false
+- type: textarea
+  attributes:
+    label: Screenshots
+    description: If applicable, add screenshots to help explain the problem.
+- type: input
+  attributes:
+    label: Operating System
+    description: The operating system you are running (e.g. Windows, Linux)
+- type: input
+  attributes:
+    label: Version
+    description: The application version you are running (e.g. latest, pre-release)
+- type: textarea
+  attributes:
+    label: Additional Information
+    description: List any other information that is relevant to your issue.

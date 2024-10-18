@@ -1,6 +1,8 @@
----
 blank_issues_enabled: false
 contact_links:
-  - name: 'Help / Support'
-    url: 'https://discord.gg/abgQv8J4fF'
-    about: If you have support question or need help, please use our Discord Server.
+- name: 📚 Documentation
+  url: https://tibia-oce.github.io/
+  about: Check out the project documentation.
+- name: 🤔 Questions
+  url: https://discord.gg/TT2ebFwEyE
+  about: Join our Discord community.

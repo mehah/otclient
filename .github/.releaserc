@@ -1,0 +1,26 @@
+{
+  "branches": [
+    { "name": "master", "prerelease": false },
+    { "name": "develop", "prerelease": "rc" }
+  ],
+  "tagFormat": "v${version}",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/release-notes-generator",
+      {
+        "writerOpts": {
+          "headerPartial": ""
+        }
+      }
+    ],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          { "path": "client.zip", "name": "mythbound.zip", "label": "Client (Windows)" }
+        ]
+      }
+    ]
+  ]
+}
