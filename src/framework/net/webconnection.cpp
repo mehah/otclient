@@ -96,10 +96,10 @@ void WebConnection::connect(const std::string_view host, uint16_t port, const st
     std::string ip = std::string(host);
     ip.length() == 0 ? ip = "localhost" : ip;
 
-#ifndef NDEBUG
-    const std::string prefix = "ws://";
-#else
+#ifdef NDEBUG
     const std::string prefix = "wss://";
+#else
+    const std::string prefix = "ws://";
 #endif
 
     m_pthread = pthread_self();
