@@ -80,7 +80,7 @@ bool Platform::copyFile(std::string from, std::string to)
 
 bool Platform::fileExists(std::string file)
 {
-    return true;
+    return std::filesystem::exists(file);
 }
 
 bool Platform::removeFile(std::string file)
