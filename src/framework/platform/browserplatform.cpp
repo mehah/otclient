@@ -85,7 +85,7 @@ bool Platform::fileExists(std::string file)
 
 bool Platform::removeFile(std::string file)
 {
-    return false;
+    return std::filesystem::remove(file);
 }
 
 ticks_t Platform::getFileModificationTime(std::string file)
