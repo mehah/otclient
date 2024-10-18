@@ -148,8 +148,6 @@ void GraphicalApplication::mainLoop() {
     };
 
     g_drawPool.draw();
-    // update screen pixels
-    g_window.swapBuffers();
 
     if (m_graphicFrameCounter.update()) {
         g_dispatcher.addEvent([this, fps = FPS()] {
