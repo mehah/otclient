@@ -70,13 +70,7 @@ std::string Platform::getTempPath()
 
 std::string Platform::getCurrentDir()
 {
-    std::string res;
-    char cwd[2048];
-    if (getcwd(cwd, sizeof(cwd)) != nullptr) {
-        res = cwd;
-        res += "/";
-    }
-    return res;
+    return std::filesystem::current_path();
 }
 
 bool Platform::copyFile(std::string from, std::string to)
