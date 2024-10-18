@@ -65,7 +65,7 @@ bool Platform::killProcess(const std::string_view /*name*/)
 
 std::string Platform::getTempPath()
 {
-    return "/tmp/";
+    return std::filesystem::temp_directory_path();
 }
 
 std::string Platform::getCurrentDir()
