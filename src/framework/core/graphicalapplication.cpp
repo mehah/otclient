@@ -142,7 +142,7 @@ void GraphicalApplication::mainLoop() {
         return;
     }
 
-    const auto& FPS = [this] {
+    const auto FPS = [this] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
@@ -175,7 +175,7 @@ void GraphicalApplication::run()
     g_lua.callGlobalField("g_app", "onRun");
 
 #ifndef __EMSCRIPTEN__
-    const auto& FPS = [this] {
+    const auto FPS = [this] {
         m_mapProcessFrameCounter.setTargetFps(g_window.vsyncEnabled() || getMaxFps() || getTargetFps() ? 500u : 0u);
         return m_graphicFrameCounter.getFps();
     };
