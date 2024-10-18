@@ -206,9 +206,13 @@ end
 
 local function getCoinsBalance()
     local function extractNumber(text)
-        return tonumber((text:match("%d[%d,]*"):gsub(",", "")))
+        if not text or text == "" then
+            return 0
+        end
+        local numberStr = text:match("%d[%d,]*") or "0"
+        numberStr = numberStr:gsub(",", "")
+        return tonumber(numberStr) or 0
     end
-
     local coins1 = extractNumber(controllerShop.ui.lblCoins.lblTibiaCoins:getText())
     local coins2 = extractNumber(controllerShop.ui.lblCoins.lblTibiaTransfer:getText())
     return coins1, coins2
