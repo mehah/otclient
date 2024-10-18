@@ -75,7 +75,7 @@ std::string Platform::getCurrentDir()
 
 bool Platform::copyFile(std::string from, std::string to)
 {
-    return system(stdext::format("/bin/cp '%s' '%s'", from, to).c_str()) == 0;
+    return std::filesystem::copy_file(from, to);
 }
 
 bool Platform::fileExists(std::string file)
