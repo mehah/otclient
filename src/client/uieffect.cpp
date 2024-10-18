@@ -21,8 +21,6 @@
  */
 
 #include "uieffect.h"
-#include "lightview.h"
-#include <framework/graphics/fontmanager.h>
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 
@@ -57,10 +55,11 @@ void UIEffect::setEffectId(int id)
 {
     if (id == 0)
         m_effect = nullptr;
-    else if (m_effect)
+    else {
+        if (!m_effect)
+            m_effect = std::make_shared<Effect>();
         m_effect->setId(id);
-    else
-        m_effect = std::make_shared<Effect>();
+    }
 }
 
 void UIEffect::setEffect(const EffectPtr& e)

@@ -40,6 +40,9 @@ public:
 
     MissilePtr asMissile() { return static_self_cast<Missile>(); }
 
+    void setDirection(Otc::Direction dir);
+    auto getDirection() { return m_direction; }
+
 protected:
     ThingType* getThingType() const override;
 

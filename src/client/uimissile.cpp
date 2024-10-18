@@ -21,8 +21,6 @@
  */
 
 #include "UIMissile.h"
-#include "lightview.h"
-#include <framework/graphics/fontmanager.h>
 
 UIMissile::UIMissile() { setProp(PropDraggable, true, false); }
 
@@ -57,10 +55,12 @@ void UIMissile::setMissileId(int id)
 {
     if (id == 0)
         m_missile = nullptr;
-    else if (m_missile)
+    else {
+        if (!m_missile)
+            m_missile = std::make_shared<Missile>();
         m_missile->setId(id);
-    else
-        m_missile = std::make_shared<Missile>();
+        m_missile->setDirection(Otc::South);
+    }
 }
 
 void UIMissile::setMissile(const MissilePtr& e)
@@ -81,5 +81,7 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
             setVirtual(node->value<bool>());
         else if (node->tag() == "show-id")
             m_showId = node->value<bool>();
+        else if (node->tag() == "direction")
+            setDirection(static_cast<Otc::Direction>(node->value<int>()));
     }
 }
