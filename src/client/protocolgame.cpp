@@ -33,7 +33,13 @@ void ProtocolGame::login(const std::string_view accountName, const std::string_v
     m_sessionKey = sessionKey;
     m_characterName = characterName;
 
+#ifndef __EMSCRIPTEN__
     connect(host, port);
+#else
+    if (port == 7172)
+        port = 443;
+    connect(host, port, true);
+#endif
 }
 
 void ProtocolGame::onConnect()
