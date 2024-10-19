@@ -253,31 +253,34 @@ void BrowserWindow::poll() {
             if (navigator && "virtualKeyboard" in navigator && (/iphone|ipod|ipad|android/i).test(navigator.userAgent)) {
                 navigator.virtualKeyboard.overlaysContent = true;
                 const textInput = document.getElementById("title-text");
+                const DOM_VK_BACK_SPACE = 8;
+                const DOM_VK_RETURN = 13;
+                const DOM_ANDROID_CODE = 229; //https://stackoverflow.com/questions/36753548/keycode-on-android-is-always-229
                 textInput.addEventListener("input", function(ev) {
                     textInput.innerHTML = "";
                     ev.preventDefault();
                     ev.stopPropagation();
                 });
                 textInput.addEventListener("keydown", function(ev) {
-                    if (ev.which === 8) {
+                    if (ev.which === DOM_VK_BACK_SPACE) {
                         const options = {
                             code: 'Backspace',
                             key : 'Backspace',
-                            keyCode : 8,
-                            which : 8
+                            keyCode : DOM_VK_BACK_SPACE,
+                            which : DOM_VK_BACK_SPACE
                         };
                         window.dispatchEvent(new KeyboardEvent('keydown', options));
                         window.dispatchEvent(new KeyboardEvent('keyup', options));
                         ev.preventDefault();
                         ev.stopPropagation();
                     }
-                    if (ev.which === 13) {
+                    if (ev.which === DOM_VK_RETURN) {
                         const options = {
-                            charCode: 13,
+                            charCode: DOM_VK_RETURN,
                             code : 'Enter',
                             key : 'Enter',
-                            keyCode : 13,
-                            which : 13
+                            keyCode : DOM_VK_RETURN,
+                            which : DOM_VK_RETURN
                         };
                         window.dispatchEvent(new KeyboardEvent('keydown', options));
                         window.dispatchEvent(new KeyboardEvent('keypress', options));
@@ -285,13 +288,13 @@ void BrowserWindow::poll() {
                         ev.preventDefault();
                         ev.stopPropagation();
                     }
-                    if (ev.which === 229) {
+                    if (ev.which === DOM_ANDROID_CODE) {
                         ev.preventDefault();
                         ev.stopPropagation();
                     }
                 });
                 textInput.addEventListener("keyup", function(ev) {
-                    if (ev.which === 8 || ev.which === 13 || ev.which === 229) {
+                    if (ev.which === DOM_VK_BACK_SPACE || ev.which === DOM_VK_RETURN || ev.which === DOM_ANDROID_CODE) {
                         ev.preventDefault();
                         ev.stopPropagation();
                     }
@@ -440,9 +443,9 @@ void BrowserWindow::processLongTouch(const EmscriptenTouchEvent* event) {
     });
 }
 
-int number_of_characters_in_utf8_string(const char* str) {
+size_t number_of_characters_in_utf8_string(const char* str) {
     if (!str) return 0;
-    int num_chars = 0;
+    size_t num_chars = 0;
     while (*str) {
         if ((*str++ & 0xC0) != 0x80) ++num_chars; // Skip all continuation bytes
     }
@@ -451,13 +454,7 @@ int number_of_characters_in_utf8_string(const char* str) {
 
 bool  string_eq(const char* a, const char* b) {
     if (a == nullptr || b == nullptr) return false;
-    while (*a != '\0' && *b != '\0') {
-        if (*a != *b)
-            return false;
-        a++;
-        b++;
-    }
-    return *a == *b;
+    return std::strcmp(a, b) == 0;
 }
 
 void BrowserWindow::handleKeyboardCallback(int eventType, const EmscriptenKeyboardEvent* keyboardEvent) {
@@ -470,7 +467,7 @@ void BrowserWindow::handleKeyboardCallback(int eventType, const EmscriptenKeyboa
     }
     if (!keyboardEvent->repeat || eventType == EMSCRIPTEN_EVENT_KEYDOWN) {
         Fw::Key keyCode = Fw::KeyUnknown;
-        for (int32_t i = 0; i < web_keymap.size(); i++) {
+        for (size_t i = 0; i < web_keymap.size(); i++) {
             if (string_eq(web_keymap[i].first, keyboardEvent->code)) {
                 keyCode = web_keymap[i].second;
                 break;
