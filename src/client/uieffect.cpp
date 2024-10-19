@@ -21,6 +21,7 @@
  */
 
 #include "uieffect.h"
+#include "lightview.h"
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 

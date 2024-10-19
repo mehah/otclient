@@ -20,7 +20,8 @@
  * THE SOFTWARE.
  */
 
-#include "UIMissile.h"
+#include "uimissile.h"
+#include "lightview.h"
 
 UIMissile::UIMissile() { setProp(PropDraggable, true, false); }
 
