@@ -197,9 +197,8 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(Protobuf CONFIG)
-if(NOT Protobuf_FOUND)
-  find_package(Protobuf REQUIRED)
-endif()
+find_package(absl CONFIG REQUIRED)
+
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
