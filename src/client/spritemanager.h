@@ -25,6 +25,29 @@
 #include <framework/core/declarations.h>
 #include <framework/graphics/declarations.h>
 #include "gameconfig.h"
+#include <framework/core/filestream.h>
+
+class FileMetadata
+{
+public:
+    FileMetadata() = default;
+    FileMetadata(const FileStreamPtr& file) {
+        offset = file->getU32();
+        fileSize = file->getU32();
+        fileName = file->getString();
+        spriteId = std::stoi(fileName);
+    }
+
+    uint32_t getSpriteId() const { return spriteId; }
+    const std::string& getFileName() const { return fileName; }
+    uint32_t getOffset() const { return offset; }
+    uint32_t getFileSize() const { return fileSize; }
+private:
+    std::string fileName;
+    uint32_t offset = 0;
+    uint32_t fileSize = 0;
+    uint32_t spriteId = 0;
+};
 
  //@bindsingleton g_sprites
 class SpriteManager
@@ -34,6 +57,8 @@ public:
     void terminate();
 
     bool loadSpr(std::string file);
+    bool loadRegularSpr(std::string file);
+    bool loadCwmSpr(std::string file);
     void reload();
     void unload();
 
@@ -59,16 +84,19 @@ private:
         return m_spritesFiles[0]->file;
     }
 
+    ImagePtr getSpriteImageHd(int id, const FileStreamPtr& file);
     ImagePtr getSpriteImage(int id, const FileStreamPtr& file);
 
     std::string m_lastFileName;
 
+    bool m_spritesHd{ false };
     bool m_loaded{ false };
     uint32_t m_signature{ 0 };
     uint32_t m_spritesCount{ 0 };
     uint32_t m_spritesOffset{ 0 };
 
     std::vector<std::unique_ptr<FileStream_m>> m_spritesFiles;
+    std::unordered_map<uint32_t, FileMetadata> m_cwmSpritesMetadata;
 };
 
 extern SpriteManager g_sprites;

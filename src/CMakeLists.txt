@@ -216,7 +216,7 @@ endif()
 if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(OpenAL CONFIG REQUIRED)
 	find_package(VorbisFile REQUIRED)
-	find_package(Vorbis CONFIG REQUIRED)
+	find_package(Vorbis REQUIRED)
 	find_package(Ogg CONFIG REQUIRED)
 endif()
 if(ANDROID)
@@ -336,6 +336,8 @@ set(SOURCE_FILES
 	client/uicreature.cpp
 	client/uigraph.cpp
 	client/uiitem.cpp
+	client/uieffect.cpp
+	client/uimissile.cpp
 	client/uimap.cpp
 	client/uimapanchorlayout.cpp
 	client/uiminimap.cpp
@@ -471,9 +473,9 @@ if(MSVC)
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
+		${OGG_LIBRARY}
 		${VORBISFILE_LIBRARY}
 		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
@@ -512,6 +514,8 @@ elseif(ANDROID)
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
 		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
 		${GMP_LIBRARY}
 		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
@@ -521,8 +525,6 @@ elseif(ANDROID)
 		Threads::Threads
 		asio::asio
 		OpenSLES
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		game-activity::game-activity
 		GLESv3
@@ -556,6 +558,8 @@ else() # Linux
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
 		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
 		${GMP_LIBRARY}
 		${STDUUID}
 		${FOUNDATION}
@@ -568,8 +572,6 @@ else() # Linux
 		X11::X11
 		asio::asio
 		OpenAL::OpenAL
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
 		ZLIB::ZLIB
