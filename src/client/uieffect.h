@@ -22,37 +22,32 @@
 
 #pragma once
 
-#include <framework/global.h>
-#include <framework/core/timer.h>
-#include "thing.h"
+#include <framework/ui/uiwidget.h>
+#include "declarations.h"
+#include "effect.h"
 
- // @bindclass
-class Missile : public Thing
+class UIEffect : public UIWidget
 {
 public:
-    Missile() { m_drawConductor = { true, DrawOrder::FIFTH }; };
-    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr);
+    UIEffect();
+    void drawSelf(DrawPoolType drawPane) override;
 
-    void setId(uint32_t id) override;
-    void setPath(const Position& fromPosition, const Position& toPosition);
+    void setEffectId(int id);
+    void setEffectVisible(bool visible) { m_effectVisible = visible; }
+    void setEffect(const EffectPtr& effect);
+    void setVirtual(bool virt) { m_virtual = virt; }
+    void clearEffect() { setEffectId(0); }
 
-    bool isMissile() override { return true; }
-
-    MissilePtr asMissile() { return static_self_cast<Missile>(); }
-
-    void setDirection(Otc::Direction dir);
-    auto getDirection() { return m_direction; }
+    int getEffectId() { return m_effect ? m_effect->getId() : 0; }
+    auto getEffect() { return m_effect; }
+    bool isVirtual() { return m_virtual; }
+    bool isEffectVisible() { return m_effectVisible; }
 
 protected:
-    ThingType* getThingType() const override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
-private:
-    Timer m_animationTimer;
-    Point m_delta;
-
-    float m_duration{ 0.f };
-
-    Otc::Direction m_direction{ Otc::InvalidDirection };
-
-    uint8_t m_distance{ 0 };
+    EffectPtr m_effect;
+    bool m_virtual{ false };
+    bool m_showId{ false };
+    bool m_effectVisible{ true };
 };

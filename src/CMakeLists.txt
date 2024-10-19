@@ -336,6 +336,8 @@ set(SOURCE_FILES
 	client/uicreature.cpp
 	client/uigraph.cpp
 	client/uiitem.cpp
+	client/uieffect.cpp
+	client/uimissile.cpp
 	client/uimap.cpp
 	client/uimapanchorlayout.cpp
 	client/uiminimap.cpp

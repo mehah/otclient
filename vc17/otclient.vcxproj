@@ -358,11 +358,13 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClCompile Include="..\src\client\tile.cpp" />
     <ClCompile Include="..\src\client\towns.cpp" />
     <ClCompile Include="..\src\client\uicreature.cpp" />
+    <ClCompile Include="..\src\client\uieffect.cpp" />
     <ClCompile Include="..\src\client\uigraph.cpp" />
     <ClCompile Include="..\src\client\uiitem.cpp" />
     <ClCompile Include="..\src\client\uimap.cpp" />
     <ClCompile Include="..\src\client\uimapanchorlayout.cpp" />
     <ClCompile Include="..\src\client\uiminimap.cpp" />
+    <ClCompile Include="..\src\client\uimissile.cpp" />
     <ClCompile Include="..\src\client\uiprogressrect.cpp" />
     <ClCompile Include="..\src\client\uisprite.cpp" />
     <ClCompile Include="..\src\framework\core\adaptativeframecounter.cpp" />
@@ -512,11 +514,13 @@ cmd /c "start ../vcpkg_installed\$(VcpkgTriplet)\$(VcpkgTriplet)\tools\protobuf\
     <ClInclude Include="..\src\client\tile.h" />
     <ClInclude Include="..\src\client\towns.h" />
     <ClInclude Include="..\src\client\uicreature.h" />
+    <ClInclude Include="..\src\client\uieffect.h" />
     <ClInclude Include="..\src\client\uigraph.h" />
     <ClInclude Include="..\src\client\uiitem.h" />
     <ClInclude Include="..\src\client\uimap.h" />
     <ClInclude Include="..\src\client\uimapanchorlayout.h" />
     <ClInclude Include="..\src\client\uiminimap.h" />
+    <ClInclude Include="..\src\client\uimissile.h" />
     <ClInclude Include="..\src\client\uiprogressrect.h" />
     <ClInclude Include="..\src\client\uisprite.h" />
     <ClInclude Include="..\src\framework\config.h" />
