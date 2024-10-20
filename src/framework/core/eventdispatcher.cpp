@@ -216,6 +216,7 @@ void EventDispatcher::executeScheduledEvents() {
 }
 
 void EventDispatcher::mergeEvents() {
+    std::shared_lock l(m_sharedLock);
     for (const auto& thread : m_threads) {
         std::scoped_lock lock(thread->mutex);
         if (!thread->events.empty()) {

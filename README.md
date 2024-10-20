@@ -195,7 +195,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </details>
 
 - Client 12.85 ~ 12.92, 13.00 ~ 13.40 support (protobuf)
-- Market has been rewritten to work only [Canary](https://github.com/opentibiabr/canary)
+- Market has been rewritten compatible with tfs and canary
 - Async Texture Loading
 - <details>
     <summary>Anti-Aliasing Mode Options</summary>
@@ -241,7 +241,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="250" alt="Haskanoid Video" style="max-width:250px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/raw/main/Picture/Attached%20Effect/Tile/003_particulas.gif?raw=true" width="310" alt="Space Invaders" style="max-width: 310px;"> |
 |-------------------------------------------|---------------|-------------------------|
-|Title Attached Effect | Title Widget | Title light |
+|<center>Title Attached Effect</center> | <center> Title Widget </center>| <center>Title Particule</center> |
 
 
 - <details>
@@ -441,7 +441,8 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
   - by [@OTArchive](https://github.com/OTArchive)
   - wiki: https://github.com/OTArchive/otclient-web/wiki/Guia-%E2%80%90-OTClient-Redemption-Web
-  - <video src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Wiki/2024-09-27_19-50-58.mp4?raw=true" width="400" controls></video>
+  
+  - https://github.com/user-attachments/assets/e8ab58c7-1be3-4c76-bc6d-bd831e846826
 
 </details>
 

@@ -710,16 +710,16 @@ uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView) const
                 firstFloor = std::max<uint8_t >(m_posInfo.camera.z - g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapUndergroundFloorRange());
 
             // loop in 3x3 tiles around the camera
-            for (int_fast32_t ix = -1; checkLimitsFloorsView && ix <= 1 && firstFloor < m_posInfo.camera.z; ++ix) {
-                for (int_fast32_t iy = -1; iy <= 1 && firstFloor < m_posInfo.camera.z; ++iy) {
+            for (int ix = -1; checkLimitsFloorsView && ix <= 1 && firstFloor < m_posInfo.camera.z; ++ix) {
+                for (int iy = -1; iy <= 1 && firstFloor < m_posInfo.camera.z; ++iy) {
                     const auto& pos = m_posInfo.camera.translated(ix, iy);
+                    const bool isLookPossible = g_map.isLookPossible(pos);
 
                     // process tiles that we can look through, e.g. windows, doors
-                    if ((ix == 0 && iy == 0) || ((std::abs(ix) != std::abs(iy)) && g_map.isLookPossible(pos))) {
+                    if ((ix == 0 && iy == 0) || ((std::abs(ix) != std::abs(iy)) && isLookPossible)) {
                         Position upperPos = pos;
                         Position coveredPos = pos;
 
-                        const bool isLookPossible = g_map.isLookPossible(pos);
                         while (coveredPos.coveredUp() && upperPos.up() && upperPos.z >= firstFloor) {
                             // check tiles physically above
                             if (const TilePtr& tile = g_map.getTile(upperPos)) {
@@ -754,7 +754,7 @@ uint8_t MapView::calcLastVisibleFloor() const
 {
     uint8_t z = g_gameConfig.getMapSeaFloor();
 
-    // this could happens if the player is not known yet
+    // this could happen if the player is not known yet
     if (m_posInfo.camera.isValid()) {
         // view only underground floors when below sea level
         if (m_posInfo.camera.z > g_gameConfig.getMapSeaFloor())

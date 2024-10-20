@@ -59,30 +59,24 @@ RowStore < StoreLightFlatPanel
     margin: 8 0 0 8
     text-auto-resize: true
     text-wrap: true
-  Label
-    id: count
-    anchors.bottom: parent.bottom
+  Panel
+    id: StackOffers
+    margin-left: 31
+    height: 80
+    margin-top: 12
+    anchors.top: prev.bottom
     anchors.left: image.right
-    margin: 0 5 5 0
-    margin-left:22
-    text-align: center
-
-  StoreFlatPanel
-    id: lblPrice
-    size: 104 20
-    anchors.bottom: parent.bottom
     anchors.right: parent.right
-    margin: 0 5 5 0
-    text-align: center
-    text-offset: 15 0
-    image-color: #1111118c
-    icon: images/tibiaCoin
-    icon-align: right
-    icon-offset: -2 0
+    layout:
+      type: grid
+      cell-size: 145 20
+      cell-spacing: 5
+      flow: true
+      fit-children: true
 
 MenuCategoryStore < UIWidget
   height: 22
-  image-source: images/barra
+  image-source: images/longButton
   image-border: 5
   margin: 3
   image-clip: 0 0 166 22
@@ -136,7 +130,7 @@ StoreWindow
     image-source: /game_store/images/panel
     image-border: 3
     Label
-      id: numero
+      id: lblTibiaCoins
       anchors.bottom: parent.bottom
       anchors.left: parent.left
       focusable: false
@@ -152,12 +146,12 @@ StoreWindow
       anchors.left: prev.right
       margin-left: 5
       margin-bottom: 3
-      image-source: images/tibiaCoin
+      image-source: /images/ui/tibiaCoin
       focusable: false
       phantom: true
 
     Label
-      id: numerodos
+      id: lblTibiaTransfer
       anchors.bottom: parent.bottom
       anchors.left: prev.right
       text-wrap: true
@@ -193,7 +187,7 @@ StoreWindow
     margin-bottom: 2
     !tooltip: tr('get Tibia Coins')
     image-color: green
-    icon: images/tibiaCoin
+    icon: /images/ui/tibiaCoin
     icon-align: center
     icon-offset: 10 -1
     text-offset: -18 0
@@ -217,7 +211,6 @@ StoreWindow
     @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   StoreButton
-    id: wtfisthis
     anchors.top: transferPoints.top
     !tooltip: tr('Setup up an auction to sell you currents characters.')
     anchors.left: transferPoints.right
@@ -317,31 +310,18 @@ StoreWindow
       anchors.left: scrollList.right
       margin: 8 0 0 8
 
-
-    StoreButton
-      id: btnBuy
+    Panel
+      id: StackOffers
       anchors.top: prev.top
       anchors.left: prev.right
       anchors.right: parent.right
-      margin-left: 5
-      !text: tr('Buy')
-      font: cipsoftFont
-      image-color: #75bfff
-
-    StoreFlatPanel
-      id: lblPrice
-      size: 104 20
-      anchors.top: prev.bottom
-      anchors.left: prev.left
-      anchors.right: prev.right
-      margin: 3 1 0 1
-      text-align: center
-      text-offset: -18 0
-      image-color: #1111118c
-      text: 8900
-      icon: images/tibiaCoin
-      icon-align: center
-      icon-offset: 10 0
+      margin-left: 10
+      layout:
+        type: grid
+        cell-size: 145 50
+        cell-spacing: 3
+        flow: true
+        fit-children: true
 
     StoreFlatLabel
       id: lblDescription
@@ -354,13 +334,48 @@ StoreWindow
       text-auto-resize: true
       text-wrap: true
 
-  UIWidget
+  QtPanel
     id: transferHistory
-    image-source: images/history_container
     anchors.top: parent.top
+    anchors.left: listCategory.right
     anchors.right: parent.right
+    anchors.bottom: listCategory.bottom
+    margin-left:10
     visible: false
 
+    Panel
+      id: historyPanel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-bottom: 22
+      background-color: #363636
+      border: 1 black
+      layout:
+        type: verticalBox
+
+    Button
+      id: btnNextPage
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      margin-bottom:-5
+      !text: tr('Next Page')
+      @onClick: modules.game_store.requestTransactionHistory(self)
+
+    Label
+      id: lblPage
+      anchors.bottom: parent.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      !text: tr('Page 1 / 4')
+
+    Button
+      id: btnPrevPage
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      margin-bottom:-5
+      !text: tr('Prev Page')
+      @onClick: modules.game_store.requestTransactionHistory(self)
 
   StoreLightFlatPanel
     id: HomePanel

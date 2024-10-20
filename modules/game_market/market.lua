@@ -409,6 +409,8 @@ local function updateOffers(offers)
 end
 
 local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
+    local purchaseOfferStatistic = {}
+    local saleOfferStatistic = {}
     if not selectedItem then
         return
     end
@@ -424,6 +426,17 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
         detailsTable:addRow(columns)
     end
 
+    if not table.empty(saleStats) then
+        for i = 1, #purchaseStats do
+            table.insert(saleOfferStatistic, OfferStatistic.new(saleStats[i][1], saleStats[i][2], saleStats[i][3], saleStats[i][4], saleStats[i][5], saleStats[i][6]))
+        end
+    end
+    if not table.empty(purchaseStats) then
+        for i = 1, #purchaseStats do
+            table.insert(purchaseOfferStatistic, OfferStatistic.new(purchaseStats[i][1], purchaseStats[i][2], purchaseStats[i][3], purchaseStats[i][4], purchaseStats[i][5], purchaseStats[i][6]))
+        end
+    end
+    
     -- update sale item statistics
     sellStatsTable:clearData()
     if table.empty(saleStats) then
@@ -433,7 +446,7 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
     else
         local offerAmount = 0
         local transactions, totalPrice, highestPrice, lowestPrice = 0, 0, 0, 0
-        for _, stat in pairs(saleStats) do
+        for _, stat in pairs(saleOfferStatistic) do
             if not stat:isNull() then
                 offerAmount = offerAmount + 1
                 transactions = transactions + stat:getTransactions()
@@ -490,13 +503,13 @@ local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
 
     -- update buy item statistics
     buyStatsTable:clearData()
-    if table.empty(purchaseStats) then
+    if table.empty(purchaseOfferStatistic) then
         buyStatsTable:addRow({{
             text = 'No information'
         }})
     else
         local transactions, totalPrice, highestPrice, lowestPrice = 0, 0, 0, 0
-        for _, stat in pairs(purchaseStats) do
+        for _, stat in pairs(purchaseOfferStatistic) do
             if not stat:isNull() then
                 transactions = transactions + stat:getTransactions()
                 totalPrice = totalPrice + stat:getTotalPrice()
@@ -1274,6 +1287,7 @@ function Market.refreshItemsWidget(selectItem)
         local amount = Market.getDepotCount(item.marketData.tradeAs)
         if amount > 0 then
             itemWidget:setText(amount)
+            itemWidget:setTextOffset(topoint('0 10'))
             itemBox:setTooltip('You have ' .. amount .. ' in your depot.')
         end
 
@@ -1467,11 +1481,19 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
             local itemId = depotItems[i][1]
             local count = depotItems[i][2]
             local itClass = depotItems[i][3]
-            if itemId and count and tonumber(itClass) >= 0 then
-                depotItemsLua[itemId] = {
-                    itemCount = count,
-                    itemClass = itClass
-                }
+            if g_game.getClientVersion() > 1281 then
+                if itemId and count and tonumber(itClass) >= 0 then
+                    depotItemsLua[itemId] = {
+                        itemCount = count,
+                        itemClass = itClass
+                    }
+                end
+            else
+                if itemId and count then
+                    depotItemsLua[itemId] = {
+                        itemCount = count
+                    }
+                end
             end
         end
     end

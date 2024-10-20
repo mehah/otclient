@@ -695,8 +695,18 @@ bool Tile::hasBlockingCreature() const
 bool Tile::limitsFloorsView(bool isFreeView)
 {
     // ground and walls limits the view
-    const auto& firstThing = getThing(0);
-    return firstThing && !firstThing->isDontHide() && (firstThing->isGround() || (isFreeView ? firstThing->isOnBottom() : firstThing->isOnBottom() && firstThing->blockProjectile()));
+    for (const auto& thing : m_things) {
+        // iterate until common item is encountered
+        if (thing->isCommon()) {
+            break;
+        }
+
+        if (!thing->isDontHide() && (thing->isGround() || (isFreeView ? thing->isOnBottom() : thing->isOnBottom() && thing->blockProjectile()))) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool Tile::checkForDetachableThing(const TileSelectType selectType)

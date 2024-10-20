@@ -94,6 +94,8 @@ public:
     void hideStaticSquare() { m_showStaticSquare = false; }
 
     // walk related
+    int getWalkSteps() const { return m_walkSteps; }
+    void setWalkSteps(uint8_t step) { m_walkSteps = step; }
     void turn(Otc::Direction direction);
     void jump(int height, int duration);
     void allowAppearWalk() { m_allowAppearWalk = true; }
@@ -148,6 +150,7 @@ public:
 
     bool isPassable() const { return m_passable; }
     bool isWalking() { return m_walking; }
+
     bool isRemoved() { return m_removed; }
     bool isInvisible() { return m_outfit.isEffect() && m_outfit.getAuxId() == 13; }
     bool isDead() { return m_healthPercent <= 0; }
@@ -194,6 +197,7 @@ protected:
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
     bool m_walking{ false };
+
     Point m_walkOffset;
     Otc::Direction m_direction{ Otc::South };
 
@@ -205,7 +209,6 @@ private:
     void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
-    void resetWalkAnimationPhase(bool toSchedule = false);
 
     uint16_t getCurrentAnimationPhase(bool mount = false);
 
@@ -232,7 +235,7 @@ private:
     TexturePtr m_iconTexture;
     TexturePtr m_typingIconTexture;
 
-    ScheduledEventPtr m_walkUpdateEvent;
+    EventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
     ScheduledEventPtr m_outfitColorUpdateEvent;
 
@@ -290,6 +293,8 @@ private:
     uint8_t m_exactSize{ 0 };
 
     uint8_t m_disableWalkAnimation{ 0 };
+
+    uint8_t m_walkSteps{ 0 };
 
     // Mount Shader
     uint8_t m_mountShaderId{ 0 };

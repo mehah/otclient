@@ -59,10 +59,13 @@ public:
     void setSpells(const std::vector<uint16_t>& spells);
     void setBlessings(uint16_t blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
+    void setNextWalkDir(Otc::Direction dir) { m_nextWalkDir = dir; }
     void takeScreenshot(uint8_t type);
 
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
+
+    auto getNextWalkDir() { return m_nextWalkDir; }
 
     uint8_t getVocation() { return m_vocation; }
     uint8_t getMagicLevel() { return m_magicLevel; }
@@ -182,4 +185,6 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+
+    Otc::Direction m_nextWalkDir{ Otc::InvalidDirection };
 };

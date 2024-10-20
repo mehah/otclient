@@ -37,7 +37,7 @@ function controllerCyclopedia:onInit()
 end
 
 function controllerCyclopedia:onGameStart()
-    if g_game.getClientVersion() >= 1332 then
+    if g_game.getClientVersion() >= 1310 then
         CyclopediaButton = modules.game_mainpanel.addToggleButton('CyclopediaButton', tr('Cyclopedia'),
             '/images/options/cooldowns', toggle, false, 7)
         ButtonBossSlot = modules.game_mainpanel.addToggleButton("bossSlot", tr("Open Boss Slots dialog"),

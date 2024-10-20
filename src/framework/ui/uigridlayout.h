@@ -39,7 +39,7 @@ public:
     void setCellHeight(int height) { m_cellSize.setHeight(height); update(); }
     void setCellSpacing(uint8_t spacing) { m_cellSpacing = spacing; update(); }
     void setNumColumns(uint8_t columns) { m_numColumns = columns; update(); }
-    void setNumLines(uint8_t lines) { m_numLines = lines; update(); }
+    void setNumLines(uint16_t lines) { m_numLines = lines; update(); }
     void setAutoSpacing(bool enable) { m_autoSpacing = enable; update(); }
     void setFitChildren(bool enable) { m_fitChildren = enable; update(); }
     void setFlow(bool enable) { m_flow = enable; update(); }
@@ -47,7 +47,7 @@ public:
     Size getCellSize() { return m_cellSize; }
     uint8_t getCellSpacing() { return m_cellSpacing; }
     uint8_t getNumColumns() { return m_numColumns; }
-    uint8_t getNumLines() { return m_numLines; }
+    uint16_t getNumLines() { return m_numLines; }
 
     bool isUIGridLayout() override { return true; }
 
@@ -58,7 +58,7 @@ private:
     Size m_cellSize{ 16 };
     uint8_t m_cellSpacing{ 0 };
     uint8_t m_numColumns{ 1 };
-    uint8_t m_numLines{ 0 };
+    uint16_t m_numLines{ 0 };
     bool m_autoSpacing{ false };
     bool m_fitChildren{ false };
     bool m_flow{ false };

@@ -4,1274 +4,1430 @@
 #include "appearances.pb.h"
 
 #include <algorithm>
-
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/extension_set.h>
-#include <google/protobuf/wire_format_lite.h>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/generated_message_reflection.h>
-#include <google/protobuf/reflection_ops.h>
-#include <google/protobuf/wire_format.h>
+#include "google/protobuf/io/coded_stream.h"
+#include "google/protobuf/extension_set.h"
+#include "google/protobuf/wire_format_lite.h"
+#include "google/protobuf/descriptor.h"
+#include "google/protobuf/generated_message_reflection.h"
+#include "google/protobuf/reflection_ops.h"
+#include "google/protobuf/wire_format.h"
+#include "google/protobuf/generated_message_tctable_impl.h"
 // @@protoc_insertion_point(includes)
-#include <google/protobuf/port_def.inc>
 
+// Must be included last.
+#include "google/protobuf/port_def.inc"
 PROTOBUF_PRAGMA_INIT_SEG
-
-namespace _pb = ::PROTOBUF_NAMESPACE_ID;
-namespace _pbi = _pb::internal;
-
+namespace _pb = ::google::protobuf;
+namespace _pbi = ::google::protobuf::internal;
+namespace _fl = ::google::protobuf::internal::field_layout;
 namespace otclient {
 namespace protobuf {
 namespace appearances {
-PROTOBUF_CONSTEXPR Coordinate::Coordinate(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.x_)*/0u
-  , /*decltype(_impl_.y_)*/0u
-  , /*decltype(_impl_.z_)*/0u} {}
-struct CoordinateDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR CoordinateDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~CoordinateDefaultTypeInternal() {}
-  union {
-    Coordinate _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CoordinateDefaultTypeInternal _Coordinate_default_instance_;
-PROTOBUF_CONSTEXPR Appearances::Appearances(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.object_)*/{}
-  , /*decltype(_impl_.outfit_)*/{}
-  , /*decltype(_impl_.effect_)*/{}
-  , /*decltype(_impl_.missile_)*/{}
-  , /*decltype(_impl_.special_meaning_appearance_ids_)*/nullptr} {}
-struct AppearancesDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearancesDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearancesDefaultTypeInternal() {}
-  union {
-    Appearances _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearancesDefaultTypeInternal _Appearances_default_instance_;
-PROTOBUF_CONSTEXPR SpritePhase::SpritePhase(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.duration_min_)*/0u
-  , /*decltype(_impl_.duration_max_)*/0u} {}
+
+inline constexpr SpritePhase::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        duration_min_{0u},
+        duration_max_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SpritePhase::SpritePhase(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
 struct SpritePhaseDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR SpritePhaseDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
+  PROTOBUF_CONSTEXPR SpritePhaseDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
   ~SpritePhaseDefaultTypeInternal() {}
   union {
     SpritePhase _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpritePhaseDefaultTypeInternal _SpritePhase_default_instance_;
-PROTOBUF_CONSTEXPR SpriteAnimation::SpriteAnimation(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.sprite_phase_)*/{}
-  , /*decltype(_impl_.default_start_phase_)*/0u
-  , /*decltype(_impl_.synchronized_)*/false
-  , /*decltype(_impl_.random_start_phase_)*/false
-  , /*decltype(_impl_.loop_count_)*/0u
-  , /*decltype(_impl_.loop_type_)*/-1} {}
-struct SpriteAnimationDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR SpriteAnimationDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~SpriteAnimationDefaultTypeInternal() {}
-  union {
-    SpriteAnimation _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpriteAnimationDefaultTypeInternal _SpriteAnimation_default_instance_;
-PROTOBUF_CONSTEXPR Box::Box(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.x_)*/0u
-  , /*decltype(_impl_.y_)*/0u
-  , /*decltype(_impl_.width_)*/0u
-  , /*decltype(_impl_.height_)*/0u} {}
-struct BoxDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR BoxDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~BoxDefaultTypeInternal() {}
-  union {
-    Box _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 BoxDefaultTypeInternal _Box_default_instance_;
-PROTOBUF_CONSTEXPR SpriteInfo::SpriteInfo(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.sprite_id_)*/{}
-  , /*decltype(_impl_.bounding_box_per_direction_)*/{}
-  , /*decltype(_impl_.animation_)*/nullptr
-  , /*decltype(_impl_.pattern_width_)*/0u
-  , /*decltype(_impl_.pattern_height_)*/0u
-  , /*decltype(_impl_.pattern_depth_)*/0u
-  , /*decltype(_impl_.layers_)*/0u
-  , /*decltype(_impl_.bounding_square_)*/0u
-  , /*decltype(_impl_.is_opaque_)*/false} {}
-struct SpriteInfoDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR SpriteInfoDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~SpriteInfoDefaultTypeInternal() {}
-  union {
-    SpriteInfo _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpriteInfoDefaultTypeInternal _SpriteInfo_default_instance_;
-PROTOBUF_CONSTEXPR FrameGroup::FrameGroup(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.sprite_info_)*/nullptr
-  , /*decltype(_impl_.fixed_frame_group_)*/0
-  , /*decltype(_impl_.id_)*/0u} {}
-struct FrameGroupDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR FrameGroupDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~FrameGroupDefaultTypeInternal() {}
-  union {
-    FrameGroup _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FrameGroupDefaultTypeInternal _FrameGroup_default_instance_;
-PROTOBUF_CONSTEXPR Appearance::Appearance(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.frame_group_)*/{}
-  , /*decltype(_impl_.name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.description_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.flags_)*/nullptr
-  , /*decltype(_impl_.id_)*/0u} {}
-struct AppearanceDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceDefaultTypeInternal() {}
-  union {
-    Appearance _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceDefaultTypeInternal _Appearance_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlags::AppearanceFlags(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.npcsaledata_)*/{}
-  , /*decltype(_impl_.bank_)*/nullptr
-  , /*decltype(_impl_.write_)*/nullptr
-  , /*decltype(_impl_.write_once_)*/nullptr
-  , /*decltype(_impl_.hook_)*/nullptr
-  , /*decltype(_impl_.light_)*/nullptr
-  , /*decltype(_impl_.shift_)*/nullptr
-  , /*decltype(_impl_.height_)*/nullptr
-  , /*decltype(_impl_.automap_)*/nullptr
-  , /*decltype(_impl_.lenshelp_)*/nullptr
-  , /*decltype(_impl_.clothes_)*/nullptr
-  , /*decltype(_impl_.default_action_)*/nullptr
-  , /*decltype(_impl_.market_)*/nullptr
-  , /*decltype(_impl_.changedtoexpire_)*/nullptr
-  , /*decltype(_impl_.cyclopediaitem_)*/nullptr
-  , /*decltype(_impl_.upgradeclassification_)*/nullptr
-  , /*decltype(_impl_.clip_)*/false
-  , /*decltype(_impl_.bottom_)*/false
-  , /*decltype(_impl_.top_)*/false
-  , /*decltype(_impl_.container_)*/false
-  , /*decltype(_impl_.cumulative_)*/false
-  , /*decltype(_impl_.usable_)*/false
-  , /*decltype(_impl_.forceuse_)*/false
-  , /*decltype(_impl_.multiuse_)*/false
-  , /*decltype(_impl_.liquidpool_)*/false
-  , /*decltype(_impl_.unpass_)*/false
-  , /*decltype(_impl_.unmove_)*/false
-  , /*decltype(_impl_.unsight_)*/false
-  , /*decltype(_impl_.avoid_)*/false
-  , /*decltype(_impl_.no_movement_animation_)*/false
-  , /*decltype(_impl_.take_)*/false
-  , /*decltype(_impl_.liquidcontainer_)*/false
-  , /*decltype(_impl_.hang_)*/false
-  , /*decltype(_impl_.rotate_)*/false
-  , /*decltype(_impl_.dont_hide_)*/false
-  , /*decltype(_impl_.translucent_)*/false
-  , /*decltype(_impl_.lying_object_)*/false
-  , /*decltype(_impl_.animate_always_)*/false
-  , /*decltype(_impl_.fullbank_)*/false
-  , /*decltype(_impl_.ignore_look_)*/false
-  , /*decltype(_impl_.wrap_)*/false
-  , /*decltype(_impl_.unwrap_)*/false
-  , /*decltype(_impl_.topeffect_)*/false
-  , /*decltype(_impl_.corpse_)*/false
-  , /*decltype(_impl_.player_corpse_)*/false
-  , /*decltype(_impl_.ammo_)*/false
-  , /*decltype(_impl_.show_off_socket_)*/false
-  , /*decltype(_impl_.reportable_)*/false
-  , /*decltype(_impl_.reverse_addons_east_)*/false
-  , /*decltype(_impl_.reverse_addons_west_)*/false
-  , /*decltype(_impl_.reverse_addons_south_)*/false
-  , /*decltype(_impl_.reverse_addons_north_)*/false
-  , /*decltype(_impl_.wearout_)*/false
-  , /*decltype(_impl_.clockexpire_)*/false
-  , /*decltype(_impl_.expire_)*/false
-  , /*decltype(_impl_.expirestop_)*/false
-  , /*decltype(_impl_.deco_kit_)*/false} {}
-struct AppearanceFlagsDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagsDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagsDefaultTypeInternal() {}
-  union {
-    AppearanceFlags _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagsDefaultTypeInternal _AppearanceFlags_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagUpgradeClassification::AppearanceFlagUpgradeClassification(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.upgrade_classification_)*/0u} {}
-struct AppearanceFlagUpgradeClassificationDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagUpgradeClassificationDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagUpgradeClassificationDefaultTypeInternal() {}
-  union {
-    AppearanceFlagUpgradeClassification _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagUpgradeClassificationDefaultTypeInternal _AppearanceFlagUpgradeClassification_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagBank::AppearanceFlagBank(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.waypoints_)*/0u} {}
-struct AppearanceFlagBankDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagBankDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagBankDefaultTypeInternal() {}
-  union {
-    AppearanceFlagBank _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagBankDefaultTypeInternal _AppearanceFlagBank_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagWrite::AppearanceFlagWrite(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.max_text_length_)*/0u} {}
-struct AppearanceFlagWriteDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagWriteDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagWriteDefaultTypeInternal() {}
-  union {
-    AppearanceFlagWrite _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagWriteDefaultTypeInternal _AppearanceFlagWrite_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagWriteOnce::AppearanceFlagWriteOnce(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.max_text_length_once_)*/0u} {}
-struct AppearanceFlagWriteOnceDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagWriteOnceDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagWriteOnceDefaultTypeInternal() {}
-  union {
-    AppearanceFlagWriteOnce _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagWriteOnceDefaultTypeInternal _AppearanceFlagWriteOnce_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagLight::AppearanceFlagLight(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.brightness_)*/0u
-  , /*decltype(_impl_.color_)*/0u} {}
-struct AppearanceFlagLightDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagLightDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagLightDefaultTypeInternal() {}
-  union {
-    AppearanceFlagLight _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagLightDefaultTypeInternal _AppearanceFlagLight_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagHeight::AppearanceFlagHeight(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.elevation_)*/0u} {}
-struct AppearanceFlagHeightDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagHeightDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagHeightDefaultTypeInternal() {}
-  union {
-    AppearanceFlagHeight _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagHeightDefaultTypeInternal _AppearanceFlagHeight_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagShift::AppearanceFlagShift(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.x_)*/0u
-  , /*decltype(_impl_.y_)*/0u} {}
-struct AppearanceFlagShiftDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagShiftDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagShiftDefaultTypeInternal() {}
-  union {
-    AppearanceFlagShift _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagShiftDefaultTypeInternal _AppearanceFlagShift_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagClothes::AppearanceFlagClothes(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.slot_)*/0u} {}
-struct AppearanceFlagClothesDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagClothesDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagClothesDefaultTypeInternal() {}
-  union {
-    AppearanceFlagClothes _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagClothesDefaultTypeInternal _AppearanceFlagClothes_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagDefaultAction::AppearanceFlagDefaultAction(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.action_)*/0} {}
-struct AppearanceFlagDefaultActionDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagDefaultActionDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagDefaultActionDefaultTypeInternal() {}
-  union {
-    AppearanceFlagDefaultAction _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagDefaultActionDefaultTypeInternal _AppearanceFlagDefaultAction_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagMarket::AppearanceFlagMarket(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.restrict_to_profession_)*/{}
-  , /*decltype(_impl_.name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.trade_as_object_id_)*/0u
-  , /*decltype(_impl_.show_as_object_id_)*/0u
-  , /*decltype(_impl_.minimum_level_)*/0u
-  , /*decltype(_impl_.category_)*/1} {}
-struct AppearanceFlagMarketDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagMarketDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagMarketDefaultTypeInternal() {}
-  union {
-    AppearanceFlagMarket _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagMarketDefaultTypeInternal _AppearanceFlagMarket_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagNPC::AppearanceFlagNPC(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.location_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.currency_quest_flag_display_name_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
-  , /*decltype(_impl_.sale_price_)*/0u
-  , /*decltype(_impl_.buy_price_)*/0u
-  , /*decltype(_impl_.currency_object_type_id_)*/0u} {}
-struct AppearanceFlagNPCDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagNPCDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagNPCDefaultTypeInternal() {}
-  union {
-    AppearanceFlagNPC _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagNPCDefaultTypeInternal _AppearanceFlagNPC_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagAutomap::AppearanceFlagAutomap(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.color_)*/0u} {}
-struct AppearanceFlagAutomapDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagAutomapDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagAutomapDefaultTypeInternal() {}
-  union {
-    AppearanceFlagAutomap _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagAutomapDefaultTypeInternal _AppearanceFlagAutomap_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagHook::AppearanceFlagHook(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.south_)*/1
-  , /*decltype(_impl_.east_)*/1} {}
-struct AppearanceFlagHookDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagHookDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagHookDefaultTypeInternal() {}
-  union {
-    AppearanceFlagHook _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagHookDefaultTypeInternal _AppearanceFlagHook_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagLenshelp::AppearanceFlagLenshelp(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.id_)*/0u} {}
-struct AppearanceFlagLenshelpDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagLenshelpDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagLenshelpDefaultTypeInternal() {}
-  union {
-    AppearanceFlagLenshelp _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagLenshelpDefaultTypeInternal _AppearanceFlagLenshelp_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagChangedToExpire::AppearanceFlagChangedToExpire(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.former_object_typeid_)*/0u} {}
-struct AppearanceFlagChangedToExpireDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagChangedToExpireDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagChangedToExpireDefaultTypeInternal() {}
-  union {
-    AppearanceFlagChangedToExpire _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagChangedToExpireDefaultTypeInternal _AppearanceFlagChangedToExpire_default_instance_;
-PROTOBUF_CONSTEXPR AppearanceFlagCyclopedia::AppearanceFlagCyclopedia(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.cyclopedia_type_)*/0u} {}
-struct AppearanceFlagCyclopediaDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR AppearanceFlagCyclopediaDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
-  ~AppearanceFlagCyclopediaDefaultTypeInternal() {}
-  union {
-    AppearanceFlagCyclopedia _instance;
-  };
-};
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagCyclopediaDefaultTypeInternal _AppearanceFlagCyclopedia_default_instance_;
-PROTOBUF_CONSTEXPR SpecialMeaningAppearanceIds::SpecialMeaningAppearanceIds(
-    ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_._has_bits_)*/{}
-  , /*decltype(_impl_._cached_size_)*/{}
-  , /*decltype(_impl_.gold_coin_id_)*/0u
-  , /*decltype(_impl_.platinum_coin_id_)*/0u
-  , /*decltype(_impl_.crystal_coin_id_)*/0u
-  , /*decltype(_impl_.tibia_coin_id_)*/0u
-  , /*decltype(_impl_.stamped_letter_id_)*/0u
-  , /*decltype(_impl_.supply_stash_id_)*/0u} {}
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpritePhaseDefaultTypeInternal _SpritePhase_default_instance_;
+
+inline constexpr SpecialMeaningAppearanceIds::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        gold_coin_id_{0u},
+        platinum_coin_id_{0u},
+        crystal_coin_id_{0u},
+        tibia_coin_id_{0u},
+        stamped_letter_id_{0u},
+        supply_stash_id_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SpecialMeaningAppearanceIds::SpecialMeaningAppearanceIds(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
 struct SpecialMeaningAppearanceIdsDefaultTypeInternal {
-  PROTOBUF_CONSTEXPR SpecialMeaningAppearanceIdsDefaultTypeInternal()
-      : _instance(::_pbi::ConstantInitialized{}) {}
+  PROTOBUF_CONSTEXPR SpecialMeaningAppearanceIdsDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
   ~SpecialMeaningAppearanceIdsDefaultTypeInternal() {}
   union {
     SpecialMeaningAppearanceIds _instance;
   };
 };
-PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpecialMeaningAppearanceIdsDefaultTypeInternal _SpecialMeaningAppearanceIds_default_instance_;
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpecialMeaningAppearanceIdsDefaultTypeInternal _SpecialMeaningAppearanceIds_default_instance_;
+
+inline constexpr Coordinate::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        x_{0u},
+        y_{0u},
+        z_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR Coordinate::Coordinate(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct CoordinateDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CoordinateDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CoordinateDefaultTypeInternal() {}
+  union {
+    Coordinate _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CoordinateDefaultTypeInternal _Coordinate_default_instance_;
+
+inline constexpr Box::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        x_{0u},
+        y_{0u},
+        width_{0u},
+        height_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR Box::Box(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct BoxDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR BoxDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~BoxDefaultTypeInternal() {}
+  union {
+    Box _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 BoxDefaultTypeInternal _Box_default_instance_;
+
+inline constexpr AppearanceFlagWriteOnce::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        max_text_length_once_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagWriteOnce::AppearanceFlagWriteOnce(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagWriteOnceDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagWriteOnceDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagWriteOnceDefaultTypeInternal() {}
+  union {
+    AppearanceFlagWriteOnce _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagWriteOnceDefaultTypeInternal _AppearanceFlagWriteOnce_default_instance_;
+
+inline constexpr AppearanceFlagWrite::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        max_text_length_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagWrite::AppearanceFlagWrite(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagWriteDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagWriteDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagWriteDefaultTypeInternal() {}
+  union {
+    AppearanceFlagWrite _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagWriteDefaultTypeInternal _AppearanceFlagWrite_default_instance_;
+
+inline constexpr AppearanceFlagUpgradeClassification::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        upgrade_classification_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagUpgradeClassification::AppearanceFlagUpgradeClassification(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagUpgradeClassificationDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagUpgradeClassificationDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagUpgradeClassificationDefaultTypeInternal() {}
+  union {
+    AppearanceFlagUpgradeClassification _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagUpgradeClassificationDefaultTypeInternal _AppearanceFlagUpgradeClassification_default_instance_;
+
+inline constexpr AppearanceFlagShift::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        x_{0u},
+        y_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagShift::AppearanceFlagShift(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagShiftDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagShiftDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagShiftDefaultTypeInternal() {}
+  union {
+    AppearanceFlagShift _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagShiftDefaultTypeInternal _AppearanceFlagShift_default_instance_;
+
+inline constexpr AppearanceFlagNPC::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        location_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        currency_quest_flag_display_name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        sale_price_{0u},
+        buy_price_{0u},
+        currency_object_type_id_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagNPC::AppearanceFlagNPC(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagNPCDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagNPCDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagNPCDefaultTypeInternal() {}
+  union {
+    AppearanceFlagNPC _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagNPCDefaultTypeInternal _AppearanceFlagNPC_default_instance_;
+
+inline constexpr AppearanceFlagMarket::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        restrict_to_profession_{},
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        trade_as_object_id_{0u},
+        show_as_object_id_{0u},
+        minimum_level_{0u},
+        category_{static_cast< ::otclient::protobuf::appearances::ITEM_CATEGORY >(1)} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagMarket::AppearanceFlagMarket(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagMarketDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagMarketDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagMarketDefaultTypeInternal() {}
+  union {
+    AppearanceFlagMarket _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagMarketDefaultTypeInternal _AppearanceFlagMarket_default_instance_;
+
+inline constexpr AppearanceFlagLight::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        brightness_{0u},
+        color_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagLight::AppearanceFlagLight(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagLightDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagLightDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagLightDefaultTypeInternal() {}
+  union {
+    AppearanceFlagLight _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagLightDefaultTypeInternal _AppearanceFlagLight_default_instance_;
+
+inline constexpr AppearanceFlagLenshelp::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        id_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagLenshelp::AppearanceFlagLenshelp(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagLenshelpDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagLenshelpDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagLenshelpDefaultTypeInternal() {}
+  union {
+    AppearanceFlagLenshelp _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagLenshelpDefaultTypeInternal _AppearanceFlagLenshelp_default_instance_;
+
+inline constexpr AppearanceFlagHook::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        south_{static_cast< ::otclient::protobuf::appearances::HOOK_TYPE >(1)},
+        east_{static_cast< ::otclient::protobuf::appearances::HOOK_TYPE >(1)} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagHook::AppearanceFlagHook(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagHookDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagHookDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagHookDefaultTypeInternal() {}
+  union {
+    AppearanceFlagHook _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagHookDefaultTypeInternal _AppearanceFlagHook_default_instance_;
+
+inline constexpr AppearanceFlagHeight::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        elevation_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagHeight::AppearanceFlagHeight(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagHeightDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagHeightDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagHeightDefaultTypeInternal() {}
+  union {
+    AppearanceFlagHeight _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagHeightDefaultTypeInternal _AppearanceFlagHeight_default_instance_;
+
+inline constexpr AppearanceFlagDefaultAction::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        action_{static_cast< ::otclient::protobuf::appearances::PLAYER_ACTION >(0)} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagDefaultAction::AppearanceFlagDefaultAction(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagDefaultActionDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagDefaultActionDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagDefaultActionDefaultTypeInternal() {}
+  union {
+    AppearanceFlagDefaultAction _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagDefaultActionDefaultTypeInternal _AppearanceFlagDefaultAction_default_instance_;
+
+inline constexpr AppearanceFlagCyclopedia::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        cyclopedia_type_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagCyclopedia::AppearanceFlagCyclopedia(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagCyclopediaDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagCyclopediaDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagCyclopediaDefaultTypeInternal() {}
+  union {
+    AppearanceFlagCyclopedia _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagCyclopediaDefaultTypeInternal _AppearanceFlagCyclopedia_default_instance_;
+
+inline constexpr AppearanceFlagClothes::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        slot_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagClothes::AppearanceFlagClothes(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagClothesDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagClothesDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagClothesDefaultTypeInternal() {}
+  union {
+    AppearanceFlagClothes _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagClothesDefaultTypeInternal _AppearanceFlagClothes_default_instance_;
+
+inline constexpr AppearanceFlagChangedToExpire::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        former_object_typeid_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagChangedToExpire::AppearanceFlagChangedToExpire(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagChangedToExpireDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagChangedToExpireDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagChangedToExpireDefaultTypeInternal() {}
+  union {
+    AppearanceFlagChangedToExpire _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagChangedToExpireDefaultTypeInternal _AppearanceFlagChangedToExpire_default_instance_;
+
+inline constexpr AppearanceFlagBank::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        waypoints_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagBank::AppearanceFlagBank(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagBankDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagBankDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagBankDefaultTypeInternal() {}
+  union {
+    AppearanceFlagBank _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagBankDefaultTypeInternal _AppearanceFlagBank_default_instance_;
+
+inline constexpr AppearanceFlagAutomap::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        color_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlagAutomap::AppearanceFlagAutomap(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagAutomapDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagAutomapDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagAutomapDefaultTypeInternal() {}
+  union {
+    AppearanceFlagAutomap _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagAutomapDefaultTypeInternal _AppearanceFlagAutomap_default_instance_;
+
+inline constexpr SpriteAnimation::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        sprite_phase_{},
+        default_start_phase_{0u},
+        synchronized_{false},
+        random_start_phase_{false},
+        loop_count_{0u},
+        loop_type_{static_cast< ::otclient::protobuf::appearances::ANIMATION_LOOP_TYPE >(-1)} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SpriteAnimation::SpriteAnimation(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct SpriteAnimationDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR SpriteAnimationDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~SpriteAnimationDefaultTypeInternal() {}
+  union {
+    SpriteAnimation _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpriteAnimationDefaultTypeInternal _SpriteAnimation_default_instance_;
+
+inline constexpr AppearanceFlags::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        npcsaledata_{},
+        bank_{nullptr},
+        write_{nullptr},
+        write_once_{nullptr},
+        hook_{nullptr},
+        light_{nullptr},
+        shift_{nullptr},
+        height_{nullptr},
+        automap_{nullptr},
+        lenshelp_{nullptr},
+        clothes_{nullptr},
+        default_action_{nullptr},
+        market_{nullptr},
+        changedtoexpire_{nullptr},
+        cyclopediaitem_{nullptr},
+        upgradeclassification_{nullptr},
+        clip_{false},
+        bottom_{false},
+        top_{false},
+        container_{false},
+        cumulative_{false},
+        usable_{false},
+        forceuse_{false},
+        multiuse_{false},
+        liquidpool_{false},
+        unpass_{false},
+        unmove_{false},
+        unsight_{false},
+        avoid_{false},
+        no_movement_animation_{false},
+        take_{false},
+        liquidcontainer_{false},
+        hang_{false},
+        rotate_{false},
+        dont_hide_{false},
+        translucent_{false},
+        lying_object_{false},
+        animate_always_{false},
+        fullbank_{false},
+        ignore_look_{false},
+        wrap_{false},
+        unwrap_{false},
+        topeffect_{false},
+        corpse_{false},
+        player_corpse_{false},
+        ammo_{false},
+        show_off_socket_{false},
+        reportable_{false},
+        reverse_addons_east_{false},
+        reverse_addons_west_{false},
+        reverse_addons_south_{false},
+        reverse_addons_north_{false},
+        wearout_{false},
+        clockexpire_{false},
+        expire_{false},
+        expirestop_{false},
+        deco_kit_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR AppearanceFlags::AppearanceFlags(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceFlagsDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceFlagsDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceFlagsDefaultTypeInternal() {}
+  union {
+    AppearanceFlags _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceFlagsDefaultTypeInternal _AppearanceFlags_default_instance_;
+
+inline constexpr SpriteInfo::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        sprite_id_{},
+        bounding_box_per_direction_{},
+        animation_{nullptr},
+        pattern_width_{0u},
+        pattern_height_{0u},
+        pattern_depth_{0u},
+        layers_{0u},
+        bounding_square_{0u},
+        is_opaque_{false} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR SpriteInfo::SpriteInfo(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct SpriteInfoDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR SpriteInfoDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~SpriteInfoDefaultTypeInternal() {}
+  union {
+    SpriteInfo _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 SpriteInfoDefaultTypeInternal _SpriteInfo_default_instance_;
+
+inline constexpr FrameGroup::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        sprite_info_{nullptr},
+        fixed_frame_group_{static_cast< ::otclient::protobuf::appearances::FIXED_FRAME_GROUP >(0)},
+        id_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR FrameGroup::FrameGroup(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct FrameGroupDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR FrameGroupDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~FrameGroupDefaultTypeInternal() {}
+  union {
+    FrameGroup _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 FrameGroupDefaultTypeInternal _FrameGroup_default_instance_;
+
+inline constexpr Appearance::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        frame_group_{},
+        name_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        description_(
+            &::google::protobuf::internal::fixed_address_empty_string,
+            ::_pbi::ConstantInitialized()),
+        flags_{nullptr},
+        id_{0u} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR Appearance::Appearance(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearanceDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearanceDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearanceDefaultTypeInternal() {}
+  union {
+    Appearance _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearanceDefaultTypeInternal _Appearance_default_instance_;
+
+inline constexpr Appearances::Impl_::Impl_(
+    ::_pbi::ConstantInitialized) noexcept
+      : _cached_size_{0},
+        object_{},
+        outfit_{},
+        effect_{},
+        missile_{},
+        special_meaning_appearance_ids_{nullptr} {}
+
+template <typename>
+PROTOBUF_CONSTEXPR Appearances::Appearances(::_pbi::ConstantInitialized)
+    : _impl_(::_pbi::ConstantInitialized()) {}
+struct AppearancesDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR AppearancesDefaultTypeInternal() : _instance(::_pbi::ConstantInitialized{}) {}
+  ~AppearancesDefaultTypeInternal() {}
+  union {
+    Appearances _instance;
+  };
+};
+
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT
+    PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 AppearancesDefaultTypeInternal _Appearances_default_instance_;
 }  // namespace appearances
 }  // namespace protobuf
 }  // namespace otclient
 static ::_pb::Metadata file_level_metadata_appearances_2eproto[26];
 static const ::_pb::EnumDescriptor* file_level_enum_descriptors_appearances_2eproto[6];
-static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_appearances_2eproto = nullptr;
-
-const uint32_t TableStruct_appearances_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_.x_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_.y_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_.z_),
-  0,
-  1,
-  2,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.object_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.outfit_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.effect_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.missile_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.special_meaning_appearance_ids_),
-  ~0u,
-  ~0u,
-  ~0u,
-  ~0u,
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _impl_.duration_min_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _impl_.duration_max_),
-  0,
-  1,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.default_start_phase_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.synchronized_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.random_start_phase_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.loop_type_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.loop_count_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.sprite_phase_),
-  0,
-  1,
-  2,
-  4,
-  3,
-  ~0u,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.x_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.y_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.width_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.height_),
-  0,
-  1,
-  2,
-  3,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.pattern_width_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.pattern_height_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.pattern_depth_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.layers_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.sprite_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.bounding_square_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.animation_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.is_opaque_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.bounding_box_per_direction_),
-  1,
-  2,
-  3,
-  4,
-  ~0u,
-  5,
-  0,
-  6,
-  ~0u,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_.fixed_frame_group_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_.id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_.sprite_info_),
-  1,
-  2,
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.frame_group_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.flags_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.name_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.description_),
-  3,
-  ~0u,
-  2,
-  0,
-  1,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.bank_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.clip_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.bottom_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.top_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.container_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.cumulative_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.usable_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.forceuse_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.multiuse_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.write_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.write_once_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.liquidpool_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unpass_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unmove_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unsight_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.avoid_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.no_movement_animation_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.take_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.liquidcontainer_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.hang_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.hook_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.rotate_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.light_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.dont_hide_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.translucent_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.shift_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.height_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.lying_object_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.animate_always_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.automap_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.lenshelp_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.fullbank_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.ignore_look_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.clothes_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.default_action_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.market_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.wrap_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unwrap_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.topeffect_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.npcsaledata_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.changedtoexpire_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.corpse_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.player_corpse_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.cyclopediaitem_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.ammo_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.show_off_socket_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reportable_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.upgradeclassification_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_east_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_west_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_south_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_north_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.wearout_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.clockexpire_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.expire_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.expirestop_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.deco_kit_),
-  0,
-  15,
-  16,
-  17,
-  18,
-  19,
-  20,
-  21,
-  22,
-  1,
-  2,
-  23,
-  24,
-  25,
-  26,
-  27,
-  28,
-  29,
-  30,
-  31,
-  3,
-  32,
-  4,
-  33,
-  34,
-  5,
-  6,
-  35,
-  36,
-  7,
-  8,
-  37,
-  38,
-  9,
-  10,
-  11,
-  39,
-  40,
-  41,
-  ~0u,
-  12,
-  42,
-  43,
-  13,
-  44,
-  45,
-  46,
-  14,
-  47,
-  48,
-  49,
-  50,
-  51,
-  52,
-  53,
-  54,
-  55,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _impl_.upgrade_classification_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagBank, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagBank, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagBank, _impl_.waypoints_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWrite, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWrite, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWrite, _impl_.max_text_length_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWriteOnce, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWriteOnce, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWriteOnce, _impl_.max_text_length_once_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _impl_.brightness_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _impl_.color_),
-  0,
-  1,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHeight, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHeight, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHeight, _impl_.elevation_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _impl_.x_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _impl_.y_),
-  0,
-  1,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagClothes, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagClothes, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagClothes, _impl_.slot_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagDefaultAction, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagDefaultAction, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagDefaultAction, _impl_.action_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.category_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.trade_as_object_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.show_as_object_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.name_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.restrict_to_profession_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.minimum_level_),
-  4,
-  1,
-  2,
-  0,
-  ~0u,
-  3,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.name_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.location_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.sale_price_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.buy_price_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.currency_object_type_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.currency_quest_flag_display_name_),
-  0,
-  1,
-  3,
-  4,
-  5,
-  2,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagAutomap, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagAutomap, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagAutomap, _impl_.color_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _impl_.south_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _impl_.east_),
-  0,
-  1,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLenshelp, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLenshelp, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLenshelp, _impl_.id_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire, _impl_.former_object_typeid_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagCyclopedia, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagCyclopedia, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagCyclopedia, _impl_.cyclopedia_type_),
-  0,
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_._has_bits_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.gold_coin_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.platinum_coin_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.crystal_coin_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.tibia_coin_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.stamped_letter_id_),
-  PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.supply_stash_id_),
-  0,
-  1,
-  2,
-  3,
-  4,
-  5,
+static constexpr const ::_pb::ServiceDescriptor**
+    file_level_service_descriptors_appearances_2eproto = nullptr;
+const ::uint32_t TableStruct_appearances_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(
+    protodesc_cold) = {
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_.x_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_.y_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Coordinate, _impl_.z_),
+    0,
+    1,
+    2,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.object_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.outfit_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.effect_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.missile_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearances, _impl_.special_meaning_appearance_ids_),
+    ~0u,
+    ~0u,
+    ~0u,
+    ~0u,
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _impl_.duration_min_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpritePhase, _impl_.duration_max_),
+    0,
+    1,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.default_start_phase_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.synchronized_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.random_start_phase_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.loop_type_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.loop_count_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteAnimation, _impl_.sprite_phase_),
+    0,
+    1,
+    2,
+    4,
+    3,
+    ~0u,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.x_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.y_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.width_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Box, _impl_.height_),
+    0,
+    1,
+    2,
+    3,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.pattern_width_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.pattern_height_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.pattern_depth_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.layers_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.sprite_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.bounding_square_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.animation_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.is_opaque_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpriteInfo, _impl_.bounding_box_per_direction_),
+    1,
+    2,
+    3,
+    4,
+    ~0u,
+    5,
+    0,
+    6,
+    ~0u,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_.fixed_frame_group_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_.id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::FrameGroup, _impl_.sprite_info_),
+    1,
+    2,
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.frame_group_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.flags_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.name_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::Appearance, _impl_.description_),
+    3,
+    ~0u,
+    2,
+    0,
+    1,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.bank_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.clip_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.bottom_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.top_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.container_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.cumulative_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.usable_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.forceuse_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.multiuse_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.write_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.write_once_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.liquidpool_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unpass_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unmove_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unsight_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.avoid_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.no_movement_animation_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.take_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.liquidcontainer_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.hang_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.hook_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.rotate_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.light_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.dont_hide_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.translucent_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.shift_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.height_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.lying_object_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.animate_always_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.automap_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.lenshelp_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.fullbank_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.ignore_look_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.clothes_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.default_action_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.market_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.wrap_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.unwrap_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.topeffect_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.npcsaledata_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.changedtoexpire_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.corpse_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.player_corpse_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.cyclopediaitem_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.ammo_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.show_off_socket_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reportable_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.upgradeclassification_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_east_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_west_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_south_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.reverse_addons_north_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.wearout_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.clockexpire_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.expire_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.expirestop_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlags, _impl_.deco_kit_),
+    0,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    1,
+    2,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    3,
+    32,
+    4,
+    33,
+    34,
+    5,
+    6,
+    35,
+    36,
+    7,
+    8,
+    37,
+    38,
+    9,
+    10,
+    11,
+    39,
+    40,
+    41,
+    ~0u,
+    12,
+    42,
+    43,
+    13,
+    44,
+    45,
+    46,
+    14,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification, _impl_.upgrade_classification_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagBank, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagBank, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagBank, _impl_.waypoints_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWrite, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWrite, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWrite, _impl_.max_text_length_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWriteOnce, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWriteOnce, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagWriteOnce, _impl_.max_text_length_once_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _impl_.brightness_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLight, _impl_.color_),
+    0,
+    1,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHeight, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHeight, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHeight, _impl_.elevation_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _impl_.x_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagShift, _impl_.y_),
+    0,
+    1,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagClothes, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagClothes, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagClothes, _impl_.slot_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagDefaultAction, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagDefaultAction, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagDefaultAction, _impl_.action_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.category_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.trade_as_object_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.show_as_object_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.name_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.restrict_to_profession_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagMarket, _impl_.minimum_level_),
+    4,
+    1,
+    2,
+    0,
+    ~0u,
+    3,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.name_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.location_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.sale_price_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.buy_price_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.currency_object_type_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagNPC, _impl_.currency_quest_flag_display_name_),
+    0,
+    1,
+    3,
+    4,
+    5,
+    2,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagAutomap, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagAutomap, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagAutomap, _impl_.color_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _impl_.south_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagHook, _impl_.east_),
+    0,
+    1,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLenshelp, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLenshelp, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagLenshelp, _impl_.id_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire, _impl_.former_object_typeid_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagCyclopedia, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagCyclopedia, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::AppearanceFlagCyclopedia, _impl_.cyclopedia_type_),
+    0,
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_._has_bits_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _internal_metadata_),
+    ~0u,  // no _extensions_
+    ~0u,  // no _oneof_case_
+    ~0u,  // no _weak_field_map_
+    ~0u,  // no _inlined_string_donated_
+    ~0u,  // no _split_
+    ~0u,  // no sizeof(Split)
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.gold_coin_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.platinum_coin_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.crystal_coin_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.tibia_coin_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.stamped_letter_id_),
+    PROTOBUF_FIELD_OFFSET(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds, _impl_.supply_stash_id_),
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
 };
-static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 9, -1, sizeof(::otclient::protobuf::appearances::Coordinate)},
-  { 12, 23, -1, sizeof(::otclient::protobuf::appearances::Appearances)},
-  { 28, 36, -1, sizeof(::otclient::protobuf::appearances::SpritePhase)},
-  { 38, 50, -1, sizeof(::otclient::protobuf::appearances::SpriteAnimation)},
-  { 56, 66, -1, sizeof(::otclient::protobuf::appearances::Box)},
-  { 70, 85, -1, sizeof(::otclient::protobuf::appearances::SpriteInfo)},
-  { 94, 103, -1, sizeof(::otclient::protobuf::appearances::FrameGroup)},
-  { 106, 117, -1, sizeof(::otclient::protobuf::appearances::Appearance)},
-  { 122, 185, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlags)},
-  { 242, 249, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification)},
-  { 250, 257, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagBank)},
-  { 258, 265, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWrite)},
-  { 266, 273, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWriteOnce)},
-  { 274, 282, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLight)},
-  { 284, 291, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHeight)},
-  { 292, 300, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagShift)},
-  { 302, 309, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagClothes)},
-  { 310, 317, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagDefaultAction)},
-  { 318, 330, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagMarket)},
-  { 336, 348, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagNPC)},
-  { 354, 361, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagAutomap)},
-  { 362, 370, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHook)},
-  { 372, 379, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLenshelp)},
-  { 380, 387, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire)},
-  { 388, 395, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagCyclopedia)},
-  { 396, 408, -1, sizeof(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds)},
+
+static const ::_pbi::MigrationSchema
+    schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+        {0, 11, -1, sizeof(::otclient::protobuf::appearances::Coordinate)},
+        {14, 27, -1, sizeof(::otclient::protobuf::appearances::Appearances)},
+        {32, 42, -1, sizeof(::otclient::protobuf::appearances::SpritePhase)},
+        {44, 58, -1, sizeof(::otclient::protobuf::appearances::SpriteAnimation)},
+        {64, 76, -1, sizeof(::otclient::protobuf::appearances::Box)},
+        {80, 97, -1, sizeof(::otclient::protobuf::appearances::SpriteInfo)},
+        {106, 117, -1, sizeof(::otclient::protobuf::appearances::FrameGroup)},
+        {120, 133, -1, sizeof(::otclient::protobuf::appearances::Appearance)},
+        {138, 203, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlags)},
+        {260, 269, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification)},
+        {270, 279, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagBank)},
+        {280, 289, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWrite)},
+        {290, 299, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagWriteOnce)},
+        {300, 310, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLight)},
+        {312, 321, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHeight)},
+        {322, 332, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagShift)},
+        {334, 343, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagClothes)},
+        {344, 353, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagDefaultAction)},
+        {354, 368, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagMarket)},
+        {374, 388, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagNPC)},
+        {394, 403, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagAutomap)},
+        {404, 414, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagHook)},
+        {416, 425, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagLenshelp)},
+        {426, 435, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagChangedToExpire)},
+        {436, 445, -1, sizeof(::otclient::protobuf::appearances::AppearanceFlagCyclopedia)},
+        {446, 460, -1, sizeof(::otclient::protobuf::appearances::SpecialMeaningAppearanceIds)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
-  &::otclient::protobuf::appearances::_Coordinate_default_instance_._instance,
-  &::otclient::protobuf::appearances::_Appearances_default_instance_._instance,
-  &::otclient::protobuf::appearances::_SpritePhase_default_instance_._instance,
-  &::otclient::protobuf::appearances::_SpriteAnimation_default_instance_._instance,
-  &::otclient::protobuf::appearances::_Box_default_instance_._instance,
-  &::otclient::protobuf::appearances::_SpriteInfo_default_instance_._instance,
-  &::otclient::protobuf::appearances::_FrameGroup_default_instance_._instance,
-  &::otclient::protobuf::appearances::_Appearance_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlags_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagUpgradeClassification_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagBank_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagWrite_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagWriteOnce_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagLight_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagHeight_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagShift_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagClothes_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagDefaultAction_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagMarket_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagNPC_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagAutomap_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagHook_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagLenshelp_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagChangedToExpire_default_instance_._instance,
-  &::otclient::protobuf::appearances::_AppearanceFlagCyclopedia_default_instance_._instance,
-  &::otclient::protobuf::appearances::_SpecialMeaningAppearanceIds_default_instance_._instance,
+    &::otclient::protobuf::appearances::_Coordinate_default_instance_._instance,
+    &::otclient::protobuf::appearances::_Appearances_default_instance_._instance,
+    &::otclient::protobuf::appearances::_SpritePhase_default_instance_._instance,
+    &::otclient::protobuf::appearances::_SpriteAnimation_default_instance_._instance,
+    &::otclient::protobuf::appearances::_Box_default_instance_._instance,
+    &::otclient::protobuf::appearances::_SpriteInfo_default_instance_._instance,
+    &::otclient::protobuf::appearances::_FrameGroup_default_instance_._instance,
+    &::otclient::protobuf::appearances::_Appearance_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlags_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagUpgradeClassification_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagBank_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagWrite_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagWriteOnce_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagLight_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagHeight_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagShift_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagClothes_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagDefaultAction_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagMarket_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagNPC_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagAutomap_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagHook_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagLenshelp_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagChangedToExpire_default_instance_._instance,
+    &::otclient::protobuf::appearances::_AppearanceFlagCyclopedia_default_instance_._instance,
+    &::otclient::protobuf::appearances::_SpecialMeaningAppearanceIds_default_instance_._instance,
 };
-
-const char descriptor_table_protodef_appearances_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\021appearances.proto\022\035otclient.protobuf.a"
-  "ppearances\"-\n\nCoordinate\022\t\n\001x\030\001 \001(\r\022\t\n\001y"
-  "\030\002 \001(\r\022\t\n\001z\030\003 \001(\r\"\336\002\n\013Appearances\0229\n\006obj"
-  "ect\030\001 \003(\0132).otclient.protobuf.appearance"
-  "s.Appearance\0229\n\006outfit\030\002 \003(\0132).otclient."
-  "protobuf.appearances.Appearance\0229\n\006effec"
-  "t\030\003 \003(\0132).otclient.protobuf.appearances."
-  "Appearance\022:\n\007missile\030\004 \003(\0132).otclient.p"
-  "rotobuf.appearances.Appearance\022b\n\036specia"
-  "l_meaning_appearance_ids\030\005 \001(\0132:.otclien"
-  "t.protobuf.appearances.SpecialMeaningApp"
-  "earanceIds\"9\n\013SpritePhase\022\024\n\014duration_mi"
-  "n\030\001 \001(\r\022\024\n\014duration_max\030\002 \001(\r\"\375\001\n\017Sprite"
-  "Animation\022\033\n\023default_start_phase\030\001 \001(\r\022\024"
-  "\n\014synchronized\030\002 \001(\010\022\032\n\022random_start_pha"
-  "se\030\003 \001(\010\022E\n\tloop_type\030\004 \001(\01622.otclient.p"
-  "rotobuf.appearances.ANIMATION_LOOP_TYPE\022"
-  "\022\n\nloop_count\030\005 \001(\r\022@\n\014sprite_phase\030\006 \003("
-  "\0132*.otclient.protobuf.appearances.Sprite"
-  "Phase\":\n\003Box\022\t\n\001x\030\001 \001(\r\022\t\n\001y\030\002 \001(\r\022\r\n\005wi"
-  "dth\030\003 \001(\r\022\016\n\006height\030\004 \001(\r\"\254\002\n\nSpriteInfo"
-  "\022\025\n\rpattern_width\030\001 \001(\r\022\026\n\016pattern_heigh"
-  "t\030\002 \001(\r\022\025\n\rpattern_depth\030\003 \001(\r\022\016\n\006layers"
-  "\030\004 \001(\r\022\021\n\tsprite_id\030\005 \003(\r\022\027\n\017bounding_sq"
-  "uare\030\007 \001(\r\022A\n\tanimation\030\006 \001(\0132..otclient"
-  ".protobuf.appearances.SpriteAnimation\022\021\n"
-  "\tis_opaque\030\010 \001(\010\022F\n\032bounding_box_per_dir"
-  "ection\030\t \003(\0132\".otclient.protobuf.appeara"
-  "nces.Box\"\245\001\n\nFrameGroup\022K\n\021fixed_frame_g"
-  "roup\030\001 \001(\01620.otclient.protobuf.appearanc"
-  "es.FIXED_FRAME_GROUP\022\n\n\002id\030\002 \001(\r\022>\n\013spri"
-  "te_info\030\003 \001(\0132).otclient.protobuf.appear"
-  "ances.SpriteInfo\"\272\001\n\nAppearance\022\n\n\002id\030\001 "
-  "\001(\r\022>\n\013frame_group\030\002 \003(\0132).otclient.prot"
-  "obuf.appearances.FrameGroup\022=\n\005flags\030\003 \001"
-  "(\0132..otclient.protobuf.appearances.Appea"
-  "ranceFlags\022\014\n\004name\030\004 \001(\t\022\023\n\013description\030"
-  "\005 \001(\t\"\317\017\n\017AppearanceFlags\022\?\n\004bank\030\001 \001(\0132"
-  "1.otclient.protobuf.appearances.Appearan"
-  "ceFlagBank\022\014\n\004clip\030\002 \001(\010\022\016\n\006bottom\030\003 \001(\010"
-  "\022\013\n\003top\030\004 \001(\010\022\021\n\tcontainer\030\005 \001(\010\022\022\n\ncumu"
-  "lative\030\006 \001(\010\022\016\n\006usable\030\007 \001(\010\022\020\n\010forceuse"
-  "\030\010 \001(\010\022\020\n\010multiuse\030\t \001(\010\022A\n\005write\030\n \001(\0132"
-  "2.otclient.protobuf.appearances.Appearan"
-  "ceFlagWrite\022J\n\nwrite_once\030\013 \001(\01326.otclie"
-  "nt.protobuf.appearances.AppearanceFlagWr"
-  "iteOnce\022\022\n\nliquidpool\030\014 \001(\010\022\016\n\006unpass\030\r "
-  "\001(\010\022\016\n\006unmove\030\016 \001(\010\022\017\n\007unsight\030\017 \001(\010\022\r\n\005"
-  "avoid\030\020 \001(\010\022\035\n\025no_movement_animation\030\021 \001"
-  "(\010\022\014\n\004take\030\022 \001(\010\022\027\n\017liquidcontainer\030\023 \001("
-  "\010\022\014\n\004hang\030\024 \001(\010\022\?\n\004hook\030\025 \001(\01321.otclient"
-  ".protobuf.appearances.AppearanceFlagHook"
-  "\022\016\n\006rotate\030\026 \001(\010\022A\n\005light\030\027 \001(\01322.otclie"
-  "nt.protobuf.appearances.AppearanceFlagLi"
-  "ght\022\021\n\tdont_hide\030\030 \001(\010\022\023\n\013translucent\030\031 "
-  "\001(\010\022A\n\005shift\030\032 \001(\01322.otclient.protobuf.a"
-  "ppearances.AppearanceFlagShift\022C\n\006height"
-  "\030\033 \001(\01323.otclient.protobuf.appearances.A"
-  "ppearanceFlagHeight\022\024\n\014lying_object\030\034 \001("
-  "\010\022\026\n\016animate_always\030\035 \001(\010\022E\n\007automap\030\036 \001"
-  "(\01324.otclient.protobuf.appearances.Appea"
-  "ranceFlagAutomap\022G\n\010lenshelp\030\037 \001(\01325.otc"
-  "lient.protobuf.appearances.AppearanceFla"
-  "gLenshelp\022\020\n\010fullbank\030  \001(\010\022\023\n\013ignore_lo"
-  "ok\030! \001(\010\022E\n\007clothes\030\" \001(\01324.otclient.pro"
-  "tobuf.appearances.AppearanceFlagClothes\022"
-  "R\n\016default_action\030# \001(\0132:.otclient.proto"
-  "buf.appearances.AppearanceFlagDefaultAct"
-  "ion\022C\n\006market\030$ \001(\01323.otclient.protobuf."
-  "appearances.AppearanceFlagMarket\022\014\n\004wrap"
-  "\030% \001(\010\022\016\n\006unwrap\030& \001(\010\022\021\n\ttopeffect\030\' \001("
-  "\010\022E\n\013npcsaledata\030( \003(\01320.otclient.protob"
-  "uf.appearances.AppearanceFlagNPC\022U\n\017chan"
-  "gedtoexpire\030) \001(\0132<.otclient.protobuf.ap"
-  "pearances.AppearanceFlagChangedToExpire\022"
-  "\016\n\006corpse\030* \001(\010\022\025\n\rplayer_corpse\030+ \001(\010\022O"
-  "\n\016cyclopediaitem\030, \001(\01327.otclient.protob"
-  "uf.appearances.AppearanceFlagCyclopedia\022"
-  "\014\n\004ammo\030- \001(\010\022\027\n\017show_off_socket\030. \001(\010\022\022"
-  "\n\nreportable\030/ \001(\010\022a\n\025upgradeclassificat"
-  "ion\0300 \001(\0132B.otclient.protobuf.appearance"
-  "s.AppearanceFlagUpgradeClassification\022\033\n"
-  "\023reverse_addons_east\0301 \001(\010\022\033\n\023reverse_ad"
-  "dons_west\0302 \001(\010\022\034\n\024reverse_addons_south\030"
-  "3 \001(\010\022\034\n\024reverse_addons_north\0304 \001(\010\022\017\n\007w"
-  "earout\0305 \001(\010\022\023\n\013clockexpire\0306 \001(\010\022\016\n\006exp"
-  "ire\0307 \001(\010\022\022\n\nexpirestop\0308 \001(\010\022\020\n\010deco_ki"
-  "t\0309 \001(\010\"E\n#AppearanceFlagUpgradeClassifi"
-  "cation\022\036\n\026upgrade_classification\030\001 \001(\r\"\'"
-  "\n\022AppearanceFlagBank\022\021\n\twaypoints\030\001 \001(\r\""
-  ".\n\023AppearanceFlagWrite\022\027\n\017max_text_lengt"
-  "h\030\001 \001(\r\"7\n\027AppearanceFlagWriteOnce\022\034\n\024ma"
-  "x_text_length_once\030\001 \001(\r\"8\n\023AppearanceFl"
-  "agLight\022\022\n\nbrightness\030\001 \001(\r\022\r\n\005color\030\002 \001"
-  "(\r\")\n\024AppearanceFlagHeight\022\021\n\televation\030"
-  "\001 \001(\r\"+\n\023AppearanceFlagShift\022\t\n\001x\030\001 \001(\r\022"
-  "\t\n\001y\030\002 \001(\r\"%\n\025AppearanceFlagClothes\022\014\n\004s"
-  "lot\030\001 \001(\r\"[\n\033AppearanceFlagDefaultAction"
-  "\022<\n\006action\030\001 \001(\0162,.otclient.protobuf.app"
-  "earances.PLAYER_ACTION\"\204\002\n\024AppearanceFla"
-  "gMarket\022>\n\010category\030\001 \001(\0162,.otclient.pro"
-  "tobuf.appearances.ITEM_CATEGORY\022\032\n\022trade"
-  "_as_object_id\030\002 \001(\r\022\031\n\021show_as_object_id"
-  "\030\003 \001(\r\022\014\n\004name\030\004 \001(\t\022P\n\026restrict_to_prof"
-  "ession\030\005 \003(\01620.otclient.protobuf.appeara"
-  "nces.PLAYER_PROFESSION\022\025\n\rminimum_level\030"
-  "\006 \001(\r\"\245\001\n\021AppearanceFlagNPC\022\014\n\004name\030\001 \001("
-  "\t\022\020\n\010location\030\002 \001(\t\022\022\n\nsale_price\030\003 \001(\r\022"
-  "\021\n\tbuy_price\030\004 \001(\r\022\037\n\027currency_object_ty"
-  "pe_id\030\005 \001(\r\022(\n currency_quest_flag_displ"
-  "ay_name\030\006 \001(\t\"&\n\025AppearanceFlagAutomap\022\r"
-  "\n\005color\030\001 \001(\r\"\205\001\n\022AppearanceFlagHook\0227\n\005"
-  "south\030\001 \001(\0162(.otclient.protobuf.appearan"
-  "ces.HOOK_TYPE\0226\n\004east\030\002 \001(\0162(.otclient.p"
-  "rotobuf.appearances.HOOK_TYPE\"$\n\026Appeara"
-  "nceFlagLenshelp\022\n\n\002id\030\001 \001(\r\"=\n\035Appearanc"
-  "eFlagChangedToExpire\022\034\n\024former_object_ty"
-  "peid\030\001 \001(\r\"3\n\030AppearanceFlagCyclopedia\022\027"
-  "\n\017cyclopedia_type\030\001 \001(\r\"\261\001\n\033SpecialMeani"
-  "ngAppearanceIds\022\024\n\014gold_coin_id\030\001 \001(\r\022\030\n"
-  "\020platinum_coin_id\030\002 \001(\r\022\027\n\017crystal_coin_"
-  "id\030\003 \001(\r\022\025\n\rtibia_coin_id\030\004 \001(\r\022\031\n\021stamp"
-  "ed_letter_id\030\005 \001(\r\022\027\n\017supply_stash_id\030\006 "
-  "\001(\r*\224\001\n\rPLAYER_ACTION\022\026\n\022PLAYER_ACTION_N"
-  "ONE\020\000\022\026\n\022PLAYER_ACTION_LOOK\020\001\022\025\n\021PLAYER_"
-  "ACTION_USE\020\002\022\026\n\022PLAYER_ACTION_OPEN\020\003\022$\n "
-  "PLAYER_ACTION_AUTOWALK_HIGHLIGHT\020\004*\263\005\n\rI"
-  "TEM_CATEGORY\022\030\n\024ITEM_CATEGORY_ARMORS\020\001\022\031"
-  "\n\025ITEM_CATEGORY_AMULETS\020\002\022\027\n\023ITEM_CATEGO"
-  "RY_BOOTS\020\003\022\034\n\030ITEM_CATEGORY_CONTAINERS\020\004"
-  "\022\034\n\030ITEM_CATEGORY_DECORATION\020\005\022\026\n\022ITEM_C"
-  "ATEGORY_FOOD\020\006\022\036\n\032ITEM_CATEGORY_HELMETS_"
-  "HATS\020\007\022\026\n\022ITEM_CATEGORY_LEGS\020\010\022\030\n\024ITEM_C"
-  "ATEGORY_OTHERS\020\t\022\031\n\025ITEM_CATEGORY_POTION"
-  "S\020\n\022\027\n\023ITEM_CATEGORY_RINGS\020\013\022\027\n\023ITEM_CAT"
-  "EGORY_RUNES\020\014\022\031\n\025ITEM_CATEGORY_SHIELDS\020\r"
-  "\022\027\n\023ITEM_CATEGORY_TOOLS\020\016\022\033\n\027ITEM_CATEGO"
-  "RY_VALUABLES\020\017\022\034\n\030ITEM_CATEGORY_AMMUNITI"
-  "ON\020\020\022\026\n\022ITEM_CATEGORY_AXES\020\021\022\027\n\023ITEM_CAT"
-  "EGORY_CLUBS\020\022\022\"\n\036ITEM_CATEGORY_DISTANCE_"
-  "WEAPONS\020\023\022\030\n\024ITEM_CATEGORY_SWORDS\020\024\022\034\n\030I"
-  "TEM_CATEGORY_WANDS_RODS\020\025\022!\n\035ITEM_CATEGO"
-  "RY_PREMIUM_SCROLLS\020\026\022\035\n\031ITEM_CATEGORY_TI"
-  "BIA_COINS\020\027\022#\n\037ITEM_CATEGORY_CREATURE_PR"
-  "ODUCTS\020\030*\355\001\n\021PLAYER_PROFESSION\022\"\n\025PLAYER"
-  "_PROFESSION_ANY\020\377\377\377\377\377\377\377\377\377\001\022\032\n\026PLAYER_PRO"
-  "FESSION_NONE\020\000\022\034\n\030PLAYER_PROFESSION_KNIG"
-  "HT\020\001\022\035\n\031PLAYER_PROFESSION_PALADIN\020\002\022\036\n\032P"
-  "LAYER_PROFESSION_SORCERER\020\003\022\033\n\027PLAYER_PR"
-  "OFESSION_DRUID\020\004\022\036\n\032PLAYER_PROFESSION_PR"
-  "OMOTED\020\n*\203\001\n\023ANIMATION_LOOP_TYPE\022)\n\034ANIM"
-  "ATION_LOOP_TYPE_PINGPONG\020\377\377\377\377\377\377\377\377\377\001\022 \n\034A"
-  "NIMATION_LOOP_TYPE_INFINITE\020\000\022\037\n\033ANIMATI"
-  "ON_LOOP_TYPE_COUNTED\020\001*4\n\tHOOK_TYPE\022\023\n\017H"
-  "OOK_TYPE_SOUTH\020\001\022\022\n\016HOOK_TYPE_EAST\020\002*\201\001\n"
-  "\021FIXED_FRAME_GROUP\022!\n\035FIXED_FRAME_GROUP_"
-  "OUTFIT_IDLE\020\000\022#\n\037FIXED_FRAME_GROUP_OUTFI"
-  "T_MOVING\020\001\022$\n FIXED_FRAME_GROUP_OBJECT_I"
-  "NITIAL\020\002"
-  ;
-static ::_pbi::once_flag descriptor_table_appearances_2eproto_once;
+const char descriptor_table_protodef_appearances_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+    "\n\021appearances.proto\022\035otclient.protobuf.a"
+    "ppearances\"-\n\nCoordinate\022\t\n\001x\030\001 \001(\r\022\t\n\001y"
+    "\030\002 \001(\r\022\t\n\001z\030\003 \001(\r\"\336\002\n\013Appearances\0229\n\006obj"
+    "ect\030\001 \003(\0132).otclient.protobuf.appearance"
+    "s.Appearance\0229\n\006outfit\030\002 \003(\0132).otclient."
+    "protobuf.appearances.Appearance\0229\n\006effec"
+    "t\030\003 \003(\0132).otclient.protobuf.appearances."
+    "Appearance\022:\n\007missile\030\004 \003(\0132).otclient.p"
+    "rotobuf.appearances.Appearance\022b\n\036specia"
+    "l_meaning_appearance_ids\030\005 \001(\0132:.otclien"
+    "t.protobuf.appearances.SpecialMeaningApp"
+    "earanceIds\"9\n\013SpritePhase\022\024\n\014duration_mi"
+    "n\030\001 \001(\r\022\024\n\014duration_max\030\002 \001(\r\"\375\001\n\017Sprite"
+    "Animation\022\033\n\023default_start_phase\030\001 \001(\r\022\024"
+    "\n\014synchronized\030\002 \001(\010\022\032\n\022random_start_pha"
+    "se\030\003 \001(\010\022E\n\tloop_type\030\004 \001(\01622.otclient.p"
+    "rotobuf.appearances.ANIMATION_LOOP_TYPE\022"
+    "\022\n\nloop_count\030\005 \001(\r\022@\n\014sprite_phase\030\006 \003("
+    "\0132*.otclient.protobuf.appearances.Sprite"
+    "Phase\":\n\003Box\022\t\n\001x\030\001 \001(\r\022\t\n\001y\030\002 \001(\r\022\r\n\005wi"
+    "dth\030\003 \001(\r\022\016\n\006height\030\004 \001(\r\"\254\002\n\nSpriteInfo"
+    "\022\025\n\rpattern_width\030\001 \001(\r\022\026\n\016pattern_heigh"
+    "t\030\002 \001(\r\022\025\n\rpattern_depth\030\003 \001(\r\022\016\n\006layers"
+    "\030\004 \001(\r\022\021\n\tsprite_id\030\005 \003(\r\022\027\n\017bounding_sq"
+    "uare\030\007 \001(\r\022A\n\tanimation\030\006 \001(\0132..otclient"
+    ".protobuf.appearances.SpriteAnimation\022\021\n"
+    "\tis_opaque\030\010 \001(\010\022F\n\032bounding_box_per_dir"
+    "ection\030\t \003(\0132\".otclient.protobuf.appeara"
+    "nces.Box\"\245\001\n\nFrameGroup\022K\n\021fixed_frame_g"
+    "roup\030\001 \001(\01620.otclient.protobuf.appearanc"
+    "es.FIXED_FRAME_GROUP\022\n\n\002id\030\002 \001(\r\022>\n\013spri"
+    "te_info\030\003 \001(\0132).otclient.protobuf.appear"
+    "ances.SpriteInfo\"\272\001\n\nAppearance\022\n\n\002id\030\001 "
+    "\001(\r\022>\n\013frame_group\030\002 \003(\0132).otclient.prot"
+    "obuf.appearances.FrameGroup\022=\n\005flags\030\003 \001"
+    "(\0132..otclient.protobuf.appearances.Appea"
+    "ranceFlags\022\014\n\004name\030\004 \001(\t\022\023\n\013description\030"
+    "\005 \001(\t\"\317\017\n\017AppearanceFlags\022\?\n\004bank\030\001 \001(\0132"
+    "1.otclient.protobuf.appearances.Appearan"
+    "ceFlagBank\022\014\n\004clip\030\002 \001(\010\022\016\n\006bottom\030\003 \001(\010"
+    "\022\013\n\003top\030\004 \001(\010\022\021\n\tcontainer\030\005 \001(\010\022\022\n\ncumu"
+    "lative\030\006 \001(\010\022\016\n\006usable\030\007 \001(\010\022\020\n\010forceuse"
+    "\030\010 \001(\010\022\020\n\010multiuse\030\t \001(\010\022A\n\005write\030\n \001(\0132"
+    "2.otclient.protobuf.appearances.Appearan"
+    "ceFlagWrite\022J\n\nwrite_once\030\013 \001(\01326.otclie"
+    "nt.protobuf.appearances.AppearanceFlagWr"
+    "iteOnce\022\022\n\nliquidpool\030\014 \001(\010\022\016\n\006unpass\030\r "
+    "\001(\010\022\016\n\006unmove\030\016 \001(\010\022\017\n\007unsight\030\017 \001(\010\022\r\n\005"
+    "avoid\030\020 \001(\010\022\035\n\025no_movement_animation\030\021 \001"
+    "(\010\022\014\n\004take\030\022 \001(\010\022\027\n\017liquidcontainer\030\023 \001("
+    "\010\022\014\n\004hang\030\024 \001(\010\022\?\n\004hook\030\025 \001(\01321.otclient"
+    ".protobuf.appearances.AppearanceFlagHook"
+    "\022\016\n\006rotate\030\026 \001(\010\022A\n\005light\030\027 \001(\01322.otclie"
+    "nt.protobuf.appearances.AppearanceFlagLi"
+    "ght\022\021\n\tdont_hide\030\030 \001(\010\022\023\n\013translucent\030\031 "
+    "\001(\010\022A\n\005shift\030\032 \001(\01322.otclient.protobuf.a"
+    "ppearances.AppearanceFlagShift\022C\n\006height"
+    "\030\033 \001(\01323.otclient.protobuf.appearances.A"
+    "ppearanceFlagHeight\022\024\n\014lying_object\030\034 \001("
+    "\010\022\026\n\016animate_always\030\035 \001(\010\022E\n\007automap\030\036 \001"
+    "(\01324.otclient.protobuf.appearances.Appea"
+    "ranceFlagAutomap\022G\n\010lenshelp\030\037 \001(\01325.otc"
+    "lient.protobuf.appearances.AppearanceFla"
+    "gLenshelp\022\020\n\010fullbank\030  \001(\010\022\023\n\013ignore_lo"
+    "ok\030! \001(\010\022E\n\007clothes\030\" \001(\01324.otclient.pro"
+    "tobuf.appearances.AppearanceFlagClothes\022"
+    "R\n\016default_action\030# \001(\0132:.otclient.proto"
+    "buf.appearances.AppearanceFlagDefaultAct"
+    "ion\022C\n\006market\030$ \001(\01323.otclient.protobuf."
+    "appearances.AppearanceFlagMarket\022\014\n\004wrap"
+    "\030% \001(\010\022\016\n\006unwrap\030& \001(\010\022\021\n\ttopeffect\030\' \001("
+    "\010\022E\n\013npcsaledata\030( \003(\01320.otclient.protob"
+    "uf.appearances.AppearanceFlagNPC\022U\n\017chan"
+    "gedtoexpire\030) \001(\0132<.otclient.protobuf.ap"
+    "pearances.AppearanceFlagChangedToExpire\022"
+    "\016\n\006corpse\030* \001(\010\022\025\n\rplayer_corpse\030+ \001(\010\022O"
+    "\n\016cyclopediaitem\030, \001(\01327.otclient.protob"
+    "uf.appearances.AppearanceFlagCyclopedia\022"
+    "\014\n\004ammo\030- \001(\010\022\027\n\017show_off_socket\030. \001(\010\022\022"
+    "\n\nreportable\030/ \001(\010\022a\n\025upgradeclassificat"
+    "ion\0300 \001(\0132B.otclient.protobuf.appearance"
+    "s.AppearanceFlagUpgradeClassification\022\033\n"
+    "\023reverse_addons_east\0301 \001(\010\022\033\n\023reverse_ad"
+    "dons_west\0302 \001(\010\022\034\n\024reverse_addons_south\030"
+    "3 \001(\010\022\034\n\024reverse_addons_north\0304 \001(\010\022\017\n\007w"
+    "earout\0305 \001(\010\022\023\n\013clockexpire\0306 \001(\010\022\016\n\006exp"
+    "ire\0307 \001(\010\022\022\n\nexpirestop\0308 \001(\010\022\020\n\010deco_ki"
+    "t\0309 \001(\010\"E\n#AppearanceFlagUpgradeClassifi"
+    "cation\022\036\n\026upgrade_classification\030\001 \001(\r\"\'"
+    "\n\022AppearanceFlagBank\022\021\n\twaypoints\030\001 \001(\r\""
+    ".\n\023AppearanceFlagWrite\022\027\n\017max_text_lengt"
+    "h\030\001 \001(\r\"7\n\027AppearanceFlagWriteOnce\022\034\n\024ma"
+    "x_text_length_once\030\001 \001(\r\"8\n\023AppearanceFl"
+    "agLight\022\022\n\nbrightness\030\001 \001(\r\022\r\n\005color\030\002 \001"
+    "(\r\")\n\024AppearanceFlagHeight\022\021\n\televation\030"
+    "\001 \001(\r\"+\n\023AppearanceFlagShift\022\t\n\001x\030\001 \001(\r\022"
+    "\t\n\001y\030\002 \001(\r\"%\n\025AppearanceFlagClothes\022\014\n\004s"
+    "lot\030\001 \001(\r\"[\n\033AppearanceFlagDefaultAction"
+    "\022<\n\006action\030\001 \001(\0162,.otclient.protobuf.app"
+    "earances.PLAYER_ACTION\"\204\002\n\024AppearanceFla"
+    "gMarket\022>\n\010category\030\001 \001(\0162,.otclient.pro"
+    "tobuf.appearances.ITEM_CATEGORY\022\032\n\022trade"
+    "_as_object_id\030\002 \001(\r\022\031\n\021show_as_object_id"
+    "\030\003 \001(\r\022\014\n\004name\030\004 \001(\t\022P\n\026restrict_to_prof"
+    "ession\030\005 \003(\01620.otclient.protobuf.appeara"
+    "nces.PLAYER_PROFESSION\022\025\n\rminimum_level\030"
+    "\006 \001(\r\"\245\001\n\021AppearanceFlagNPC\022\014\n\004name\030\001 \001("
+    "\t\022\020\n\010location\030\002 \001(\t\022\022\n\nsale_price\030\003 \001(\r\022"
+    "\021\n\tbuy_price\030\004 \001(\r\022\037\n\027currency_object_ty"
+    "pe_id\030\005 \001(\r\022(\n currency_quest_flag_displ"
+    "ay_name\030\006 \001(\t\"&\n\025AppearanceFlagAutomap\022\r"
+    "\n\005color\030\001 \001(\r\"\205\001\n\022AppearanceFlagHook\0227\n\005"
+    "south\030\001 \001(\0162(.otclient.protobuf.appearan"
+    "ces.HOOK_TYPE\0226\n\004east\030\002 \001(\0162(.otclient.p"
+    "rotobuf.appearances.HOOK_TYPE\"$\n\026Appeara"
+    "nceFlagLenshelp\022\n\n\002id\030\001 \001(\r\"=\n\035Appearanc"
+    "eFlagChangedToExpire\022\034\n\024former_object_ty"
+    "peid\030\001 \001(\r\"3\n\030AppearanceFlagCyclopedia\022\027"
+    "\n\017cyclopedia_type\030\001 \001(\r\"\261\001\n\033SpecialMeani"
+    "ngAppearanceIds\022\024\n\014gold_coin_id\030\001 \001(\r\022\030\n"
+    "\020platinum_coin_id\030\002 \001(\r\022\027\n\017crystal_coin_"
+    "id\030\003 \001(\r\022\025\n\rtibia_coin_id\030\004 \001(\r\022\031\n\021stamp"
+    "ed_letter_id\030\005 \001(\r\022\027\n\017supply_stash_id\030\006 "
+    "\001(\r*\224\001\n\rPLAYER_ACTION\022\026\n\022PLAYER_ACTION_N"
+    "ONE\020\000\022\026\n\022PLAYER_ACTION_LOOK\020\001\022\025\n\021PLAYER_"
+    "ACTION_USE\020\002\022\026\n\022PLAYER_ACTION_OPEN\020\003\022$\n "
+    "PLAYER_ACTION_AUTOWALK_HIGHLIGHT\020\004*\263\005\n\rI"
+    "TEM_CATEGORY\022\030\n\024ITEM_CATEGORY_ARMORS\020\001\022\031"
+    "\n\025ITEM_CATEGORY_AMULETS\020\002\022\027\n\023ITEM_CATEGO"
+    "RY_BOOTS\020\003\022\034\n\030ITEM_CATEGORY_CONTAINERS\020\004"
+    "\022\034\n\030ITEM_CATEGORY_DECORATION\020\005\022\026\n\022ITEM_C"
+    "ATEGORY_FOOD\020\006\022\036\n\032ITEM_CATEGORY_HELMETS_"
+    "HATS\020\007\022\026\n\022ITEM_CATEGORY_LEGS\020\010\022\030\n\024ITEM_C"
+    "ATEGORY_OTHERS\020\t\022\031\n\025ITEM_CATEGORY_POTION"
+    "S\020\n\022\027\n\023ITEM_CATEGORY_RINGS\020\013\022\027\n\023ITEM_CAT"
+    "EGORY_RUNES\020\014\022\031\n\025ITEM_CATEGORY_SHIELDS\020\r"
+    "\022\027\n\023ITEM_CATEGORY_TOOLS\020\016\022\033\n\027ITEM_CATEGO"
+    "RY_VALUABLES\020\017\022\034\n\030ITEM_CATEGORY_AMMUNITI"
+    "ON\020\020\022\026\n\022ITEM_CATEGORY_AXES\020\021\022\027\n\023ITEM_CAT"
+    "EGORY_CLUBS\020\022\022\"\n\036ITEM_CATEGORY_DISTANCE_"
+    "WEAPONS\020\023\022\030\n\024ITEM_CATEGORY_SWORDS\020\024\022\034\n\030I"
+    "TEM_CATEGORY_WANDS_RODS\020\025\022!\n\035ITEM_CATEGO"
+    "RY_PREMIUM_SCROLLS\020\026\022\035\n\031ITEM_CATEGORY_TI"
+    "BIA_COINS\020\027\022#\n\037ITEM_CATEGORY_CREATURE_PR"
+    "ODUCTS\020\030*\355\001\n\021PLAYER_PROFESSION\022\"\n\025PLAYER"
+    "_PROFESSION_ANY\020\377\377\377\377\377\377\377\377\377\001\022\032\n\026PLAYER_PRO"
+    "FESSION_NONE\020\000\022\034\n\030PLAYER_PROFESSION_KNIG"
+    "HT\020\001\022\035\n\031PLAYER_PROFESSION_PALADIN\020\002\022\036\n\032P"
+    "LAYER_PROFESSION_SORCERER\020\003\022\033\n\027PLAYER_PR"
+    "OFESSION_DRUID\020\004\022\036\n\032PLAYER_PROFESSION_PR"
+    "OMOTED\020\n*\203\001\n\023ANIMATION_LOOP_TYPE\022)\n\034ANIM"
+    "ATION_LOOP_TYPE_PINGPONG\020\377\377\377\377\377\377\377\377\377\001\022 \n\034A"
+    "NIMATION_LOOP_TYPE_INFINITE\020\000\022\037\n\033ANIMATI"
+    "ON_LOOP_TYPE_COUNTED\020\001*4\n\tHOOK_TYPE\022\023\n\017H"
+    "OOK_TYPE_SOUTH\020\001\022\022\n\016HOOK_TYPE_EAST\020\002*\201\001\n"
+    "\021FIXED_FRAME_GROUP\022!\n\035FIXED_FRAME_GROUP_"
+    "OUTFIT_IDLE\020\000\022#\n\037FIXED_FRAME_GROUP_OUTFI"
+    "T_MOVING\020\001\022$\n FIXED_FRAME_GROUP_OBJECT_I"
+    "NITIAL\020\002"
+};
+static ::absl::once_flag descriptor_table_appearances_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_appearances_2eproto = {
-    false, false, 6328, descriptor_table_protodef_appearances_2eproto,
+    false,
+    false,
+    6328,
+    descriptor_table_protodef_appearances_2eproto,
     "appearances.proto",
-    &descriptor_table_appearances_2eproto_once, nullptr, 0, 26,
-    schemas, file_default_instances, TableStruct_appearances_2eproto::offsets,
-    file_level_metadata_appearances_2eproto, file_level_enum_descriptors_appearances_2eproto,
+    &descriptor_table_appearances_2eproto_once,
+    nullptr,
+    0,
+    26,
+    schemas,
+    file_default_instances,
+    TableStruct_appearances_2eproto::offsets,
+    file_level_metadata_appearances_2eproto,
+    file_level_enum_descriptors_appearances_2eproto,
     file_level_service_descriptors_appearances_2eproto,
 };
+
+// This function exists to be marked as weak.
+// It can significantly speed up compilation by breaking up LLVM's SCC
+// in the .pb.cc translation units. Large translation units see a
+// reduction of more than 35% of walltime for optimized builds. Without
+// the weak attribute all the messages in the file, including all the
+// vtables and everything they use become part of the same SCC through
+// a cycle like:
+// GetMetadata -> descriptor table -> default instances ->
+//   vtables -> GetMetadata
+// By adding a weak function here we break the connection from the
+// individual vtables back into the descriptor table.
 PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_appearances_2eproto_getter() {
   return &descriptor_table_appearances_2eproto;
 }
-
 // Force running AddDescriptors() at dynamic initialization time.
-PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_appearances_2eproto(&descriptor_table_appearances_2eproto);
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY2
+static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_appearances_2eproto(&descriptor_table_appearances_2eproto);
 namespace otclient {
 namespace protobuf {
 namespace appearances {
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* PLAYER_ACTION_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
+const ::google::protobuf::EnumDescriptor* PLAYER_ACTION_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
   return file_level_enum_descriptors_appearances_2eproto[0];
 }
+PROTOBUF_CONSTINIT const uint32_t PLAYER_ACTION_internal_data_[] = {
+    327680u, 0u, };
 bool PLAYER_ACTION_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-      return true;
-    default:
-      return false;
-  }
+  return 0 <= value && value <= 4;
 }
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ITEM_CATEGORY_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
+const ::google::protobuf::EnumDescriptor* ITEM_CATEGORY_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
   return file_level_enum_descriptors_appearances_2eproto[1];
 }
+PROTOBUF_CONSTINIT const uint32_t ITEM_CATEGORY_internal_data_[] = {
+    1572865u, 0u, };
 bool ITEM_CATEGORY_IsValid(int value) {
-  switch (value) {
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 5:
-    case 6:
-    case 7:
-    case 8:
-    case 9:
-    case 10:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    case 15:
-    case 16:
-    case 17:
-    case 18:
-    case 19:
-    case 20:
-    case 21:
-    case 22:
-    case 23:
-    case 24:
-      return true;
-    default:
-      return false;
-  }
+  return 1 <= value && value <= 24;
 }
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* PLAYER_PROFESSION_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
+const ::google::protobuf::EnumDescriptor* PLAYER_PROFESSION_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
   return file_level_enum_descriptors_appearances_2eproto[2];
 }
+PROTOBUF_CONSTINIT const uint32_t PLAYER_PROFESSION_internal_data_[] = {
+    458751u, 32u, 32u, };
 bool PLAYER_PROFESSION_IsValid(int value) {
-  switch (value) {
-    case -1:
-    case 0:
-    case 1:
-    case 2:
-    case 3:
-    case 4:
-    case 10:
-      return true;
-    default:
-      return false;
-  }
+  return ::_pbi::ValidateEnum(value, PLAYER_PROFESSION_internal_data_);
 }
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ANIMATION_LOOP_TYPE_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
+const ::google::protobuf::EnumDescriptor* ANIMATION_LOOP_TYPE_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
   return file_level_enum_descriptors_appearances_2eproto[3];
 }
+PROTOBUF_CONSTINIT const uint32_t ANIMATION_LOOP_TYPE_internal_data_[] = {
+    262143u, 0u, };
 bool ANIMATION_LOOP_TYPE_IsValid(int value) {
-  switch (value) {
-    case -1:
-    case 0:
-    case 1:
-      return true;
-    default:
-      return false;
-  }
+  return -1 <= value && value <= 1;
 }
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* HOOK_TYPE_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
+const ::google::protobuf::EnumDescriptor* HOOK_TYPE_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
   return file_level_enum_descriptors_appearances_2eproto[4];
 }
+PROTOBUF_CONSTINIT const uint32_t HOOK_TYPE_internal_data_[] = {
+    131073u, 0u, };
 bool HOOK_TYPE_IsValid(int value) {
-  switch (value) {
-    case 1:
-    case 2:
-      return true;
-    default:
-      return false;
-  }
+  return 1 <= value && value <= 2;
 }
-
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* FIXED_FRAME_GROUP_descriptor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
+const ::google::protobuf::EnumDescriptor* FIXED_FRAME_GROUP_descriptor() {
+  ::google::protobuf::internal::AssignDescriptors(&descriptor_table_appearances_2eproto);
   return file_level_enum_descriptors_appearances_2eproto[5];
 }
+PROTOBUF_CONSTINIT const uint32_t FIXED_FRAME_GROUP_internal_data_[] = {
+    196608u, 0u, };
 bool FIXED_FRAME_GROUP_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-      return true;
-    default:
-      return false;
-  }
+  return 0 <= value && value <= 2;
 }
-
-
 // ===================================================================
 
 class Coordinate::_Internal {
  public:
   using HasBits = decltype(std::declval<Coordinate>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(Coordinate, _impl_._has_bits_);
   static void set_has_x(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -1283,171 +1439,150 @@ class Coordinate::_Internal {
   }
 };
 
-Coordinate::Coordinate(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+Coordinate::Coordinate(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.Coordinate)
 }
-Coordinate::Coordinate(const Coordinate& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  Coordinate* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.x_){}
-    , decltype(_impl_.y_){}
-    , decltype(_impl_.z_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.x_, &from._impl_.x_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.z_) -
-    reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.z_));
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Coordinate)
+Coordinate::Coordinate(
+    ::google::protobuf::Arena* arena, const Coordinate& from)
+    : Coordinate(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE Coordinate::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void Coordinate::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.x_){0u}
-    , decltype(_impl_.y_){0u}
-    , decltype(_impl_.z_){0u}
-  };
+inline void Coordinate::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, x_),
+           0,
+           offsetof(Impl_, z_) -
+               offsetof(Impl_, x_) +
+               sizeof(Impl_::z_));
 }
-
 Coordinate::~Coordinate() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.Coordinate)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void Coordinate::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void Coordinate::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void Coordinate::Clear() {
+PROTOBUF_NOINLINE void Coordinate::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Coordinate)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000007u) {
-    ::memset(&_impl_.x_, 0, static_cast<size_t>(
+    ::memset(&_impl_.x_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.z_) -
         reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.z_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* Coordinate::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 x = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_x(&has_bits);
-          _impl_.x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 y = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_y(&has_bits);
-          _impl_.y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 z = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_z(&has_bits);
-          _impl_.z_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* Coordinate::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* Coordinate::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 3, 0, 0, 2> Coordinate::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(Coordinate, _impl_._has_bits_),
+    0, // no _extensions_
+    3, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967288,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    3,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_Coordinate_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional uint32 x = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Coordinate, _impl_.x_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.x_)}},
+    // optional uint32 y = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Coordinate, _impl_.y_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.y_)}},
+    // optional uint32 z = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Coordinate, _impl_.z_), 2>(),
+     {24, 2, 0, PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.z_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 x = 1;
+    {PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.x_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 y = 2;
+    {PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.y_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 z = 3;
+    {PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.z_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* Coordinate::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Coordinate)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 x = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_x(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_x(), target);
   }
 
   // optional uint32 y = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_y(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_y(), target);
   }
 
   // optional uint32 z = 3;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_z(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        3, this->_internal_z(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.Coordinate)
   return target;
 }
 
-size_t Coordinate::ByteSizeLong() const {
+::size_t Coordinate::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Coordinate)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1455,36 +1590,40 @@ size_t Coordinate::ByteSizeLong() const {
   if (cached_has_bits & 0x00000007u) {
     // optional uint32 x = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_x());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_x());
     }
 
     // optional uint32 y = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_y());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_y());
     }
 
     // optional uint32 z = 3;
     if (cached_has_bits & 0x00000004u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_z());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_z());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Coordinate::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    Coordinate::MergeImpl
+const ::google::protobuf::Message::ClassData Coordinate::_class_data_ = {
+    Coordinate::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Coordinate::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* Coordinate::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void Coordinate::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void Coordinate::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<Coordinate*>(&to_msg);
   auto& from = static_cast<const Coordinate&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Coordinate)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -1500,7 +1639,7 @@ void Coordinate::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void Coordinate::CopyFrom(const Coordinate& from) {
@@ -1510,15 +1649,18 @@ void Coordinate::CopyFrom(const Coordinate& from) {
   MergeFrom(from);
 }
 
-bool Coordinate::IsInitialized() const {
+PROTOBUF_NOINLINE bool Coordinate::IsInitialized() const {
   return true;
 }
 
-void Coordinate::InternalSwap(Coordinate* other) {
+::_pbi::CachedSize* Coordinate::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void Coordinate::InternalSwap(Coordinate* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.z_)
       + sizeof(Coordinate::_impl_.z_)
       - PROTOBUF_FIELD_OFFSET(Coordinate, _impl_.x_)>(
@@ -1526,92 +1668,86 @@ void Coordinate::InternalSwap(Coordinate* other) {
           reinterpret_cast<char*>(&other->_impl_.x_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Coordinate::GetMetadata() const {
+::google::protobuf::Metadata Coordinate::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[0]);
 }
-
 // ===================================================================
 
 class Appearances::_Internal {
  public:
   using HasBits = decltype(std::declval<Appearances>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(Appearances, _impl_._has_bits_);
   static const ::otclient::protobuf::appearances::SpecialMeaningAppearanceIds& special_meaning_appearance_ids(const Appearances* msg);
   static void set_has_special_meaning_appearance_ids(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-const ::otclient::protobuf::appearances::SpecialMeaningAppearanceIds&
-Appearances::_Internal::special_meaning_appearance_ids(const Appearances* msg) {
+const ::otclient::protobuf::appearances::SpecialMeaningAppearanceIds& Appearances::_Internal::special_meaning_appearance_ids(const Appearances* msg) {
   return *msg->_impl_.special_meaning_appearance_ids_;
 }
-Appearances::Appearances(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+Appearances::Appearances(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.Appearances)
 }
-Appearances::Appearances(const Appearances& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  Appearances* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.object_){from._impl_.object_}
-    , decltype(_impl_.outfit_){from._impl_.outfit_}
-    , decltype(_impl_.effect_){from._impl_.effect_}
-    , decltype(_impl_.missile_){from._impl_.missile_}
-    , decltype(_impl_.special_meaning_appearance_ids_){nullptr}};
+inline PROTOBUF_NDEBUG_INLINE Appearances::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        object_{visibility, arena, from.object_},
+        outfit_{visibility, arena, from.outfit_},
+        effect_{visibility, arena, from.effect_},
+        missile_{visibility, arena, from.missile_} {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  if (from._internal_has_special_meaning_appearance_ids()) {
-    _this->_impl_.special_meaning_appearance_ids_ = new ::otclient::protobuf::appearances::SpecialMeaningAppearanceIds(*from._impl_.special_meaning_appearance_ids_);
-  }
+Appearances::Appearances(
+    ::google::protobuf::Arena* arena,
+    const Appearances& from)
+    : ::google::protobuf::Message(arena) {
+  Appearances* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.special_meaning_appearance_ids_ = (cached_has_bits & 0x00000001u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::SpecialMeaningAppearanceIds>(arena, *from._impl_.special_meaning_appearance_ids_)
+                : nullptr;
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Appearances)
 }
+inline PROTOBUF_NDEBUG_INLINE Appearances::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        object_{visibility, arena},
+        outfit_{visibility, arena},
+        effect_{visibility, arena},
+        missile_{visibility, arena} {}
 
-inline void Appearances::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.object_){arena}
-    , decltype(_impl_.outfit_){arena}
-    , decltype(_impl_.effect_){arena}
-    , decltype(_impl_.missile_){arena}
-    , decltype(_impl_.special_meaning_appearance_ids_){nullptr}
-  };
+inline void Appearances::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.special_meaning_appearance_ids_ = {};
 }
-
 Appearances::~Appearances() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.Appearances)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void Appearances::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.object_.~RepeatedPtrField();
-  _impl_.outfit_.~RepeatedPtrField();
-  _impl_.effect_.~RepeatedPtrField();
-  _impl_.missile_.~RepeatedPtrField();
-  if (this != internal_default_instance()) delete _impl_.special_meaning_appearance_ids_;
+  ABSL_DCHECK(GetArena() == nullptr);
+  delete _impl_.special_meaning_appearance_ids_;
+  _impl_.~Impl_();
 }
 
-void Appearances::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void Appearances::Clear() {
+PROTOBUF_NOINLINE void Appearances::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Appearances)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -1621,229 +1757,208 @@ void Appearances::Clear() {
   _impl_.missile_.Clear();
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    GOOGLE_DCHECK(_impl_.special_meaning_appearance_ids_ != nullptr);
+    ABSL_DCHECK(_impl_.special_meaning_appearance_ids_ != nullptr);
     _impl_.special_meaning_appearance_ids_->Clear();
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* Appearances::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // repeated .otclient.protobuf.appearances.Appearance object = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_object(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.Appearance outfit = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_outfit(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.Appearance effect = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_effect(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.Appearance missile = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_missile(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
-          ptr = ctx->ParseMessage(_internal_mutable_special_meaning_appearance_ids(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* Appearances::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* Appearances::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 5, 5, 0, 2> Appearances::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(Appearances, _impl_._has_bits_),
+    0, // no _extensions_
+    5, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967264,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    5,  // num_field_entries
+    5,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_Appearances_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // repeated .otclient.protobuf.appearances.Appearance object = 1;
+    {::_pbi::TcParser::FastMtR1,
+     {10, 63, 0, PROTOBUF_FIELD_OFFSET(Appearances, _impl_.object_)}},
+    // repeated .otclient.protobuf.appearances.Appearance outfit = 2;
+    {::_pbi::TcParser::FastMtR1,
+     {18, 63, 1, PROTOBUF_FIELD_OFFSET(Appearances, _impl_.outfit_)}},
+    // repeated .otclient.protobuf.appearances.Appearance effect = 3;
+    {::_pbi::TcParser::FastMtR1,
+     {26, 63, 2, PROTOBUF_FIELD_OFFSET(Appearances, _impl_.effect_)}},
+    // repeated .otclient.protobuf.appearances.Appearance missile = 4;
+    {::_pbi::TcParser::FastMtR1,
+     {34, 63, 3, PROTOBUF_FIELD_OFFSET(Appearances, _impl_.missile_)}},
+    // optional .otclient.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
+    {::_pbi::TcParser::FastMtS1,
+     {42, 0, 4, PROTOBUF_FIELD_OFFSET(Appearances, _impl_.special_meaning_appearance_ids_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // repeated .otclient.protobuf.appearances.Appearance object = 1;
+    {PROTOBUF_FIELD_OFFSET(Appearances, _impl_.object_), -1, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // repeated .otclient.protobuf.appearances.Appearance outfit = 2;
+    {PROTOBUF_FIELD_OFFSET(Appearances, _impl_.outfit_), -1, 1,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // repeated .otclient.protobuf.appearances.Appearance effect = 3;
+    {PROTOBUF_FIELD_OFFSET(Appearances, _impl_.effect_), -1, 2,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // repeated .otclient.protobuf.appearances.Appearance missile = 4;
+    {PROTOBUF_FIELD_OFFSET(Appearances, _impl_.missile_), -1, 3,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
+    {PROTOBUF_FIELD_OFFSET(Appearances, _impl_.special_meaning_appearance_ids_), _Internal::kHasBitsOffset + 0, 4,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::Appearance>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::Appearance>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::Appearance>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::Appearance>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::SpecialMeaningAppearanceIds>()},
+  }}, {{
+  }},
+};
+
+::uint8_t* Appearances::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Appearances)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   // repeated .otclient.protobuf.appearances.Appearance object = 1;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_object_size()); i < n; i++) {
-    const auto& repfield = this->_internal_object(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_object().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(1, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   // repeated .otclient.protobuf.appearances.Appearance outfit = 2;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_outfit_size()); i < n; i++) {
-    const auto& repfield = this->_internal_outfit(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_outfit().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(2, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   // repeated .otclient.protobuf.appearances.Appearance effect = 3;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_effect_size()); i < n; i++) {
-    const auto& repfield = this->_internal_effect(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_effect().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(3, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   // repeated .otclient.protobuf.appearances.Appearance missile = 4;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_missile_size()); i < n; i++) {
-    const auto& repfield = this->_internal_missile(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_missile().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(4, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
   if (cached_has_bits & 0x00000001u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(5, _Internal::special_meaning_appearance_ids(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        5, _Internal::special_meaning_appearance_ids(this),
         _Internal::special_meaning_appearance_ids(this).GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.Appearances)
   return target;
 }
 
-size_t Appearances::ByteSizeLong() const {
+::size_t Appearances::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Appearances)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .otclient.protobuf.appearances.Appearance object = 1;
   total_size += 1UL * this->_internal_object_size();
-  for (const auto& msg : this->_impl_.object_) {
+  for (const auto& msg : this->_internal_object()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   // repeated .otclient.protobuf.appearances.Appearance outfit = 2;
   total_size += 1UL * this->_internal_outfit_size();
-  for (const auto& msg : this->_impl_.outfit_) {
+  for (const auto& msg : this->_internal_outfit()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   // repeated .otclient.protobuf.appearances.Appearance effect = 3;
   total_size += 1UL * this->_internal_effect_size();
-  for (const auto& msg : this->_impl_.effect_) {
+  for (const auto& msg : this->_internal_effect()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   // repeated .otclient.protobuf.appearances.Appearance missile = 4;
   total_size += 1UL * this->_internal_missile_size();
-  for (const auto& msg : this->_impl_.missile_) {
+  for (const auto& msg : this->_internal_missile()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   // optional .otclient.protobuf.appearances.SpecialMeaningAppearanceIds special_meaning_appearance_ids = 5;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *_impl_.special_meaning_appearance_ids_);
+    total_size +=
+        1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.special_meaning_appearance_ids_);
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Appearances::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    Appearances::MergeImpl
+const ::google::protobuf::Message::ClassData Appearances::_class_data_ = {
+    Appearances::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Appearances::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* Appearances::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void Appearances::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void Appearances::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<Appearances*>(&to_msg);
   auto& from = static_cast<const Appearances&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Appearances)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_impl_.object_.MergeFrom(from._impl_.object_);
-  _this->_impl_.outfit_.MergeFrom(from._impl_.outfit_);
-  _this->_impl_.effect_.MergeFrom(from._impl_.effect_);
-  _this->_impl_.missile_.MergeFrom(from._impl_.missile_);
-  if (from._internal_has_special_meaning_appearance_ids()) {
+  _this->_internal_mutable_object()->MergeFrom(
+      from._internal_object());
+  _this->_internal_mutable_outfit()->MergeFrom(
+      from._internal_outfit());
+  _this->_internal_mutable_effect()->MergeFrom(
+      from._internal_effect());
+  _this->_internal_mutable_missile()->MergeFrom(
+      from._internal_missile());
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_mutable_special_meaning_appearance_ids()->::otclient::protobuf::appearances::SpecialMeaningAppearanceIds::MergeFrom(
         from._internal_special_meaning_appearance_ids());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void Appearances::CopyFrom(const Appearances& from) {
@@ -1853,11 +1968,14 @@ void Appearances::CopyFrom(const Appearances& from) {
   MergeFrom(from);
 }
 
-bool Appearances::IsInitialized() const {
+PROTOBUF_NOINLINE bool Appearances::IsInitialized() const {
   return true;
 }
 
-void Appearances::InternalSwap(Appearances* other) {
+::_pbi::CachedSize* Appearances::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void Appearances::InternalSwap(Appearances* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
@@ -1868,17 +1986,18 @@ void Appearances::InternalSwap(Appearances* other) {
   swap(_impl_.special_meaning_appearance_ids_, other->_impl_.special_meaning_appearance_ids_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Appearances::GetMetadata() const {
+::google::protobuf::Metadata Appearances::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[1]);
 }
-
 // ===================================================================
 
 class SpritePhase::_Internal {
  public:
   using HasBits = decltype(std::declval<SpritePhase>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_._has_bits_);
   static void set_has_duration_min(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -1887,154 +2006,136 @@ class SpritePhase::_Internal {
   }
 };
 
-SpritePhase::SpritePhase(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+SpritePhase::SpritePhase(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.SpritePhase)
 }
-SpritePhase::SpritePhase(const SpritePhase& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  SpritePhase* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.duration_min_){}
-    , decltype(_impl_.duration_max_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.duration_min_, &from._impl_.duration_min_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.duration_max_) -
-    reinterpret_cast<char*>(&_impl_.duration_min_)) + sizeof(_impl_.duration_max_));
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpritePhase)
+SpritePhase::SpritePhase(
+    ::google::protobuf::Arena* arena, const SpritePhase& from)
+    : SpritePhase(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE SpritePhase::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void SpritePhase::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.duration_min_){0u}
-    , decltype(_impl_.duration_max_){0u}
-  };
+inline void SpritePhase::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, duration_min_),
+           0,
+           offsetof(Impl_, duration_max_) -
+               offsetof(Impl_, duration_min_) +
+               sizeof(Impl_::duration_max_));
 }
-
 SpritePhase::~SpritePhase() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.SpritePhase)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void SpritePhase::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void SpritePhase::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void SpritePhase::Clear() {
+PROTOBUF_NOINLINE void SpritePhase::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpritePhase)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
-    ::memset(&_impl_.duration_min_, 0, static_cast<size_t>(
+    ::memset(&_impl_.duration_min_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.duration_max_) -
         reinterpret_cast<char*>(&_impl_.duration_min_)) + sizeof(_impl_.duration_max_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* SpritePhase::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 duration_min = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_duration_min(&has_bits);
-          _impl_.duration_min_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 duration_max = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_duration_max(&has_bits);
-          _impl_.duration_max_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* SpritePhase::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* SpritePhase::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 0, 2> SpritePhase::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_SpritePhase_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 duration_max = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpritePhase, _impl_.duration_max_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_.duration_max_)}},
+    // optional uint32 duration_min = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpritePhase, _impl_.duration_min_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_.duration_min_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 duration_min = 1;
+    {PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_.duration_min_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 duration_max = 2;
+    {PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_.duration_max_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* SpritePhase::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpritePhase)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 duration_min = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_duration_min(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_duration_min(), target);
   }
 
   // optional uint32 duration_max = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_duration_max(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_duration_max(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.SpritePhase)
   return target;
 }
 
-size_t SpritePhase::ByteSizeLong() const {
+::size_t SpritePhase::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpritePhase)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2042,31 +2143,34 @@ size_t SpritePhase::ByteSizeLong() const {
   if (cached_has_bits & 0x00000003u) {
     // optional uint32 duration_min = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_duration_min());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_duration_min());
     }
 
     // optional uint32 duration_max = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_duration_max());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_duration_max());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData SpritePhase::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    SpritePhase::MergeImpl
+const ::google::protobuf::Message::ClassData SpritePhase::_class_data_ = {
+    SpritePhase::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*SpritePhase::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* SpritePhase::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void SpritePhase::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void SpritePhase::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<SpritePhase*>(&to_msg);
   auto& from = static_cast<const SpritePhase&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpritePhase)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -2079,7 +2183,7 @@ void SpritePhase::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void SpritePhase::CopyFrom(const SpritePhase& from) {
@@ -2089,15 +2193,18 @@ void SpritePhase::CopyFrom(const SpritePhase& from) {
   MergeFrom(from);
 }
 
-bool SpritePhase::IsInitialized() const {
+PROTOBUF_NOINLINE bool SpritePhase::IsInitialized() const {
   return true;
 }
 
-void SpritePhase::InternalSwap(SpritePhase* other) {
+::_pbi::CachedSize* SpritePhase::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void SpritePhase::InternalSwap(SpritePhase* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_.duration_max_)
       + sizeof(SpritePhase::_impl_.duration_max_)
       - PROTOBUF_FIELD_OFFSET(SpritePhase, _impl_.duration_min_)>(
@@ -2105,17 +2212,18 @@ void SpritePhase::InternalSwap(SpritePhase* other) {
           reinterpret_cast<char*>(&other->_impl_.duration_min_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata SpritePhase::GetMetadata() const {
+::google::protobuf::Metadata SpritePhase::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[2]);
 }
-
 // ===================================================================
 
 class SpriteAnimation::_Internal {
  public:
   using HasBits = decltype(std::declval<SpriteAnimation>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_._has_bits_);
   static void set_has_default_start_phase(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -2133,294 +2241,278 @@ class SpriteAnimation::_Internal {
   }
 };
 
-SpriteAnimation::SpriteAnimation(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+SpriteAnimation::SpriteAnimation(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.SpriteAnimation)
 }
-SpriteAnimation::SpriteAnimation(const SpriteAnimation& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  SpriteAnimation* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.sprite_phase_){from._impl_.sprite_phase_}
-    , decltype(_impl_.default_start_phase_){}
-    , decltype(_impl_.synchronized_){}
-    , decltype(_impl_.random_start_phase_){}
-    , decltype(_impl_.loop_count_){}
-    , decltype(_impl_.loop_type_){}};
+inline PROTOBUF_NDEBUG_INLINE SpriteAnimation::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        sprite_phase_{visibility, arena, from.sprite_phase_} {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.default_start_phase_, &from._impl_.default_start_phase_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.loop_type_) -
-    reinterpret_cast<char*>(&_impl_.default_start_phase_)) + sizeof(_impl_.loop_type_));
+SpriteAnimation::SpriteAnimation(
+    ::google::protobuf::Arena* arena,
+    const SpriteAnimation& from)
+    : ::google::protobuf::Message(arena) {
+  SpriteAnimation* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, default_start_phase_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, default_start_phase_),
+           offsetof(Impl_, loop_type_) -
+               offsetof(Impl_, default_start_phase_) +
+               sizeof(Impl_::loop_type_));
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpriteAnimation)
 }
+inline PROTOBUF_NDEBUG_INLINE SpriteAnimation::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        sprite_phase_{visibility, arena},
+        loop_type_{static_cast< ::otclient::protobuf::appearances::ANIMATION_LOOP_TYPE >(-1)} {}
 
-inline void SpriteAnimation::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.sprite_phase_){arena}
-    , decltype(_impl_.default_start_phase_){0u}
-    , decltype(_impl_.synchronized_){false}
-    , decltype(_impl_.random_start_phase_){false}
-    , decltype(_impl_.loop_count_){0u}
-    , decltype(_impl_.loop_type_){-1}
-  };
+inline void SpriteAnimation::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, default_start_phase_),
+           0,
+           offsetof(Impl_, loop_count_) -
+               offsetof(Impl_, default_start_phase_) +
+               sizeof(Impl_::loop_count_));
 }
-
 SpriteAnimation::~SpriteAnimation() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.SpriteAnimation)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void SpriteAnimation::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.sprite_phase_.~RepeatedPtrField();
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void SpriteAnimation::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void SpriteAnimation::Clear() {
+PROTOBUF_NOINLINE void SpriteAnimation::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpriteAnimation)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.sprite_phase_.Clear();
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
-    ::memset(&_impl_.default_start_phase_, 0, static_cast<size_t>(
+    ::memset(&_impl_.default_start_phase_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.loop_count_) -
         reinterpret_cast<char*>(&_impl_.default_start_phase_)) + sizeof(_impl_.loop_count_));
     _impl_.loop_type_ = -1;
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* SpriteAnimation::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 default_start_phase = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_default_start_phase(&has_bits);
-          _impl_.default_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool synchronized = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_synchronized(&has_bits);
-          _impl_.synchronized_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool random_start_phase = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_random_start_phase(&has_bits);
-          _impl_.random_start_phase_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.ANIMATION_LOOP_TYPE loop_type = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::ANIMATION_LOOP_TYPE_IsValid(val))) {
-            _internal_set_loop_type(static_cast<::otclient::protobuf::appearances::ANIMATION_LOOP_TYPE>(val));
-          } else {
-            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(4, val, mutable_unknown_fields());
-          }
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 loop_count = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          _Internal::set_has_loop_count(&has_bits);
-          _impl_.loop_count_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.SpritePhase sprite_phase = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_sprite_phase(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* SpriteAnimation::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* SpriteAnimation::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 6, 2, 0, 2> SpriteAnimation::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_._has_bits_),
+    0, // no _extensions_
+    6, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967232,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    6,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_SpriteAnimation_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional uint32 default_start_phase = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpriteAnimation, _impl_.default_start_phase_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.default_start_phase_)}},
+    // optional bool synchronized = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SpriteAnimation, _impl_.synchronized_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.synchronized_)}},
+    // optional bool random_start_phase = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SpriteAnimation, _impl_.random_start_phase_), 2>(),
+     {24, 2, 0, PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.random_start_phase_)}},
+    // optional .otclient.protobuf.appearances.ANIMATION_LOOP_TYPE loop_type = 4;
+    {::_pbi::TcParser::FastErS1,
+     {32, 4, 0, PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.loop_type_)}},
+    // optional uint32 loop_count = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpriteAnimation, _impl_.loop_count_), 3>(),
+     {40, 3, 0, PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.loop_count_)}},
+    // repeated .otclient.protobuf.appearances.SpritePhase sprite_phase = 6;
+    {::_pbi::TcParser::FastMtR1,
+     {50, 63, 1, PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.sprite_phase_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 default_start_phase = 1;
+    {PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.default_start_phase_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional bool synchronized = 2;
+    {PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.synchronized_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool random_start_phase = 3;
+    {PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.random_start_phase_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.ANIMATION_LOOP_TYPE loop_type = 4;
+    {PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.loop_type_), _Internal::kHasBitsOffset + 4, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kEnumRange)},
+    // optional uint32 loop_count = 5;
+    {PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.loop_count_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // repeated .otclient.protobuf.appearances.SpritePhase sprite_phase = 6;
+    {PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.sprite_phase_), -1, 1,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {-1, 3},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::SpritePhase>()},
+  }}, {{
+  }},
+};
+
+::uint8_t* SpriteAnimation::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpriteAnimation)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 default_start_phase = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_default_start_phase(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_default_start_phase(), target);
   }
 
   // optional bool synchronized = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(2, this->_internal_synchronized(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        2, this->_internal_synchronized(), target);
   }
 
   // optional bool random_start_phase = 3;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(3, this->_internal_random_start_phase(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        3, this->_internal_random_start_phase(), target);
   }
 
   // optional .otclient.protobuf.appearances.ANIMATION_LOOP_TYPE loop_type = 4;
   if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      4, this->_internal_loop_type(), target);
+        4, this->_internal_loop_type(), target);
   }
 
   // optional uint32 loop_count = 5;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(5, this->_internal_loop_count(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        5, this->_internal_loop_count(), target);
   }
 
   // repeated .otclient.protobuf.appearances.SpritePhase sprite_phase = 6;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_sprite_phase_size()); i < n; i++) {
-    const auto& repfield = this->_internal_sprite_phase(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_sprite_phase().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(6, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.SpriteAnimation)
   return target;
 }
 
-size_t SpriteAnimation::ByteSizeLong() const {
+::size_t SpriteAnimation::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpriteAnimation)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .otclient.protobuf.appearances.SpritePhase sprite_phase = 6;
   total_size += 1UL * this->_internal_sprite_phase_size();
-  for (const auto& msg : this->_impl_.sprite_phase_) {
+  for (const auto& msg : this->_internal_sprite_phase()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     // optional uint32 default_start_phase = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_default_start_phase());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_default_start_phase());
     }
 
     // optional bool synchronized = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool random_start_phase = 3;
     if (cached_has_bits & 0x00000004u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional uint32 loop_count = 5;
     if (cached_has_bits & 0x00000008u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_loop_count());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_loop_count());
     }
 
     // optional .otclient.protobuf.appearances.ANIMATION_LOOP_TYPE loop_type = 4;
     if (cached_has_bits & 0x00000010u) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::EnumSize(this->_internal_loop_type());
+                    ::_pbi::WireFormatLite::EnumSize(this->_internal_loop_type());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData SpriteAnimation::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    SpriteAnimation::MergeImpl
+const ::google::protobuf::Message::ClassData SpriteAnimation::_class_data_ = {
+    SpriteAnimation::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*SpriteAnimation::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* SpriteAnimation::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void SpriteAnimation::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void SpriteAnimation::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<SpriteAnimation*>(&to_msg);
   auto& from = static_cast<const SpriteAnimation&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpriteAnimation)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_impl_.sprite_phase_.MergeFrom(from._impl_.sprite_phase_);
+  _this->_internal_mutable_sprite_phase()->MergeFrom(
+      from._internal_sprite_phase());
   cached_has_bits = from._impl_._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -2440,7 +2532,7 @@ void SpriteAnimation::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void SpriteAnimation::CopyFrom(const SpriteAnimation& from) {
@@ -2450,35 +2542,38 @@ void SpriteAnimation::CopyFrom(const SpriteAnimation& from) {
   MergeFrom(from);
 }
 
-bool SpriteAnimation::IsInitialized() const {
+PROTOBUF_NOINLINE bool SpriteAnimation::IsInitialized() const {
   return true;
 }
 
-void SpriteAnimation::InternalSwap(SpriteAnimation* other) {
+::_pbi::CachedSize* SpriteAnimation::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void SpriteAnimation::InternalSwap(SpriteAnimation* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   _impl_.sprite_phase_.InternalSwap(&other->_impl_.sprite_phase_);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.loop_count_)
-      + sizeof(SpriteAnimation::_impl_.loop_count_)
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.loop_type_)
+      + sizeof(SpriteAnimation::_impl_.loop_type_)
       - PROTOBUF_FIELD_OFFSET(SpriteAnimation, _impl_.default_start_phase_)>(
           reinterpret_cast<char*>(&_impl_.default_start_phase_),
           reinterpret_cast<char*>(&other->_impl_.default_start_phase_));
-  swap(_impl_.loop_type_, other->_impl_.loop_type_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata SpriteAnimation::GetMetadata() const {
+::google::protobuf::Metadata SpriteAnimation::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[3]);
 }
-
 // ===================================================================
 
 class Box::_Internal {
  public:
   using HasBits = decltype(std::declval<Box>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(Box, _impl_._has_bits_);
   static void set_has_x(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -2493,188 +2588,162 @@ class Box::_Internal {
   }
 };
 
-Box::Box(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+Box::Box(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.Box)
 }
-Box::Box(const Box& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  Box* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.x_){}
-    , decltype(_impl_.y_){}
-    , decltype(_impl_.width_){}
-    , decltype(_impl_.height_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.x_, &from._impl_.x_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.height_) -
-    reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.height_));
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Box)
+Box::Box(
+    ::google::protobuf::Arena* arena, const Box& from)
+    : Box(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE Box::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void Box::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.x_){0u}
-    , decltype(_impl_.y_){0u}
-    , decltype(_impl_.width_){0u}
-    , decltype(_impl_.height_){0u}
-  };
+inline void Box::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, x_),
+           0,
+           offsetof(Impl_, height_) -
+               offsetof(Impl_, x_) +
+               sizeof(Impl_::height_));
 }
-
 Box::~Box() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.Box)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void Box::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void Box::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void Box::Clear() {
+PROTOBUF_NOINLINE void Box::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Box)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000000fu) {
-    ::memset(&_impl_.x_, 0, static_cast<size_t>(
+    ::memset(&_impl_.x_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.height_) -
         reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.height_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* Box::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 x = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_x(&has_bits);
-          _impl_.x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 y = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_y(&has_bits);
-          _impl_.y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 width = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_width(&has_bits);
-          _impl_.width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 height = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          _Internal::set_has_height(&has_bits);
-          _impl_.height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* Box::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* Box::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 4, 0, 0, 2> Box::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(Box, _impl_._has_bits_),
+    0, // no _extensions_
+    4, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967280,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    4,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_Box_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 height = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Box, _impl_.height_), 3>(),
+     {32, 3, 0, PROTOBUF_FIELD_OFFSET(Box, _impl_.height_)}},
+    // optional uint32 x = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Box, _impl_.x_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(Box, _impl_.x_)}},
+    // optional uint32 y = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Box, _impl_.y_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(Box, _impl_.y_)}},
+    // optional uint32 width = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Box, _impl_.width_), 2>(),
+     {24, 2, 0, PROTOBUF_FIELD_OFFSET(Box, _impl_.width_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 x = 1;
+    {PROTOBUF_FIELD_OFFSET(Box, _impl_.x_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 y = 2;
+    {PROTOBUF_FIELD_OFFSET(Box, _impl_.y_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 width = 3;
+    {PROTOBUF_FIELD_OFFSET(Box, _impl_.width_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 height = 4;
+    {PROTOBUF_FIELD_OFFSET(Box, _impl_.height_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* Box::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Box)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 x = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_x(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_x(), target);
   }
 
   // optional uint32 y = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_y(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_y(), target);
   }
 
   // optional uint32 width = 3;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_width(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        3, this->_internal_width(), target);
   }
 
   // optional uint32 height = 4;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(4, this->_internal_height(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        4, this->_internal_height(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.Box)
   return target;
 }
 
-size_t Box::ByteSizeLong() const {
+::size_t Box::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Box)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2682,41 +2751,46 @@ size_t Box::ByteSizeLong() const {
   if (cached_has_bits & 0x0000000fu) {
     // optional uint32 x = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_x());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_x());
     }
 
     // optional uint32 y = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_y());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_y());
     }
 
     // optional uint32 width = 3;
     if (cached_has_bits & 0x00000004u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_width());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_width());
     }
 
     // optional uint32 height = 4;
     if (cached_has_bits & 0x00000008u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_height());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_height());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Box::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    Box::MergeImpl
+const ::google::protobuf::Message::ClassData Box::_class_data_ = {
+    Box::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Box::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* Box::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void Box::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void Box::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<Box*>(&to_msg);
   auto& from = static_cast<const Box&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Box)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -2735,7 +2809,7 @@ void Box::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_N
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void Box::CopyFrom(const Box& from) {
@@ -2745,15 +2819,18 @@ void Box::CopyFrom(const Box& from) {
   MergeFrom(from);
 }
 
-bool Box::IsInitialized() const {
+PROTOBUF_NOINLINE bool Box::IsInitialized() const {
   return true;
 }
 
-void Box::InternalSwap(Box* other) {
+::_pbi::CachedSize* Box::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void Box::InternalSwap(Box* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Box, _impl_.height_)
       + sizeof(Box::_impl_.height_)
       - PROTOBUF_FIELD_OFFSET(Box, _impl_.x_)>(
@@ -2761,17 +2838,18 @@ void Box::InternalSwap(Box* other) {
           reinterpret_cast<char*>(&other->_impl_.x_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Box::GetMetadata() const {
+::google::protobuf::Metadata Box::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[4]);
 }
-
 // ===================================================================
 
 class SpriteInfo::_Internal {
  public:
   using HasBits = decltype(std::declval<SpriteInfo>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_._has_bits_);
   static void set_has_pattern_width(HasBits* has_bits) {
     (*has_bits)[0] |= 2u;
   }
@@ -2796,84 +2874,76 @@ class SpriteInfo::_Internal {
   }
 };
 
-const ::otclient::protobuf::appearances::SpriteAnimation&
-SpriteInfo::_Internal::animation(const SpriteInfo* msg) {
+const ::otclient::protobuf::appearances::SpriteAnimation& SpriteInfo::_Internal::animation(const SpriteInfo* msg) {
   return *msg->_impl_.animation_;
 }
-SpriteInfo::SpriteInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+SpriteInfo::SpriteInfo(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.SpriteInfo)
 }
-SpriteInfo::SpriteInfo(const SpriteInfo& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  SpriteInfo* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.sprite_id_){from._impl_.sprite_id_}
-    , decltype(_impl_.bounding_box_per_direction_){from._impl_.bounding_box_per_direction_}
-    , decltype(_impl_.animation_){nullptr}
-    , decltype(_impl_.pattern_width_){}
-    , decltype(_impl_.pattern_height_){}
-    , decltype(_impl_.pattern_depth_){}
-    , decltype(_impl_.layers_){}
-    , decltype(_impl_.bounding_square_){}
-    , decltype(_impl_.is_opaque_){}};
+inline PROTOBUF_NDEBUG_INLINE SpriteInfo::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        sprite_id_{visibility, arena, from.sprite_id_},
+        bounding_box_per_direction_{visibility, arena, from.bounding_box_per_direction_} {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  if (from._internal_has_animation()) {
-    _this->_impl_.animation_ = new ::otclient::protobuf::appearances::SpriteAnimation(*from._impl_.animation_);
-  }
-  ::memcpy(&_impl_.pattern_width_, &from._impl_.pattern_width_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.is_opaque_) -
-    reinterpret_cast<char*>(&_impl_.pattern_width_)) + sizeof(_impl_.is_opaque_));
+SpriteInfo::SpriteInfo(
+    ::google::protobuf::Arena* arena,
+    const SpriteInfo& from)
+    : ::google::protobuf::Message(arena) {
+  SpriteInfo* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.animation_ = (cached_has_bits & 0x00000001u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::SpriteAnimation>(arena, *from._impl_.animation_)
+                : nullptr;
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, pattern_width_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, pattern_width_),
+           offsetof(Impl_, is_opaque_) -
+               offsetof(Impl_, pattern_width_) +
+               sizeof(Impl_::is_opaque_));
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpriteInfo)
 }
+inline PROTOBUF_NDEBUG_INLINE SpriteInfo::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        sprite_id_{visibility, arena},
+        bounding_box_per_direction_{visibility, arena} {}
 
-inline void SpriteInfo::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.sprite_id_){arena}
-    , decltype(_impl_.bounding_box_per_direction_){arena}
-    , decltype(_impl_.animation_){nullptr}
-    , decltype(_impl_.pattern_width_){0u}
-    , decltype(_impl_.pattern_height_){0u}
-    , decltype(_impl_.pattern_depth_){0u}
-    , decltype(_impl_.layers_){0u}
-    , decltype(_impl_.bounding_square_){0u}
-    , decltype(_impl_.is_opaque_){false}
-  };
+inline void SpriteInfo::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, animation_),
+           0,
+           offsetof(Impl_, is_opaque_) -
+               offsetof(Impl_, animation_) +
+               sizeof(Impl_::is_opaque_));
 }
-
 SpriteInfo::~SpriteInfo() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.SpriteInfo)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void SpriteInfo::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.sprite_id_.~RepeatedField();
-  _impl_.bounding_box_per_direction_.~RepeatedPtrField();
-  if (this != internal_default_instance()) delete _impl_.animation_;
+  ABSL_DCHECK(GetArena() == nullptr);
+  delete _impl_.animation_;
+  _impl_.~Impl_();
 }
 
-void SpriteInfo::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void SpriteInfo::Clear() {
+PROTOBUF_NOINLINE void SpriteInfo::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpriteInfo)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -2881,296 +2951,282 @@ void SpriteInfo::Clear() {
   _impl_.bounding_box_per_direction_.Clear();
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    GOOGLE_DCHECK(_impl_.animation_ != nullptr);
+    ABSL_DCHECK(_impl_.animation_ != nullptr);
     _impl_.animation_->Clear();
   }
   if (cached_has_bits & 0x0000007eu) {
-    ::memset(&_impl_.pattern_width_, 0, static_cast<size_t>(
+    ::memset(&_impl_.pattern_width_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.is_opaque_) -
         reinterpret_cast<char*>(&_impl_.pattern_width_)) + sizeof(_impl_.is_opaque_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* SpriteInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 pattern_width = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_pattern_width(&has_bits);
-          _impl_.pattern_width_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 pattern_height = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_pattern_height(&has_bits);
-          _impl_.pattern_height_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 pattern_depth = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_pattern_depth(&has_bits);
-          _impl_.pattern_depth_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 layers = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          _Internal::set_has_layers(&has_bits);
-          _impl_.layers_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated uint32 sprite_id = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            _internal_add_sprite_id(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr));
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
-        } else if (static_cast<uint8_t>(tag) == 42) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedUInt32Parser(_internal_mutable_sprite_id(), ptr, ctx);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.SpriteAnimation animation = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
-          ptr = ctx->ParseMessage(_internal_mutable_animation(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 bounding_square = 7;
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
-          _Internal::set_has_bounding_square(&has_bits);
-          _impl_.bounding_square_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool is_opaque = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
-          _Internal::set_has_is_opaque(&has_bits);
-          _impl_.is_opaque_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.Box bounding_box_per_direction = 9;
-      case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 74)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_bounding_box_per_direction(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<74>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* SpriteInfo::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* SpriteInfo::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<4, 9, 2, 0, 2> SpriteInfo::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_._has_bits_),
+    0, // no _extensions_
+    9, 120,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294966784,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    9,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_SpriteInfo_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional uint32 pattern_width = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpriteInfo, _impl_.pattern_width_), 1>(),
+     {8, 1, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.pattern_width_)}},
+    // optional uint32 pattern_height = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpriteInfo, _impl_.pattern_height_), 2>(),
+     {16, 2, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.pattern_height_)}},
+    // optional uint32 pattern_depth = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpriteInfo, _impl_.pattern_depth_), 3>(),
+     {24, 3, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.pattern_depth_)}},
+    // optional uint32 layers = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpriteInfo, _impl_.layers_), 4>(),
+     {32, 4, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.layers_)}},
+    // repeated uint32 sprite_id = 5;
+    {::_pbi::TcParser::FastV32R1,
+     {40, 63, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.sprite_id_)}},
+    // optional .otclient.protobuf.appearances.SpriteAnimation animation = 6;
+    {::_pbi::TcParser::FastMtS1,
+     {50, 0, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.animation_)}},
+    // optional uint32 bounding_square = 7;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpriteInfo, _impl_.bounding_square_), 5>(),
+     {56, 5, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.bounding_square_)}},
+    // optional bool is_opaque = 8;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(SpriteInfo, _impl_.is_opaque_), 6>(),
+     {64, 6, 0, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.is_opaque_)}},
+    // repeated .otclient.protobuf.appearances.Box bounding_box_per_direction = 9;
+    {::_pbi::TcParser::FastMtR1,
+     {74, 63, 1, PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.bounding_box_per_direction_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 pattern_width = 1;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.pattern_width_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 pattern_height = 2;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.pattern_height_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 pattern_depth = 3;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.pattern_depth_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 layers = 4;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.layers_), _Internal::kHasBitsOffset + 4, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // repeated uint32 sprite_id = 5;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.sprite_id_), -1, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kUInt32)},
+    // optional .otclient.protobuf.appearances.SpriteAnimation animation = 6;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.animation_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional uint32 bounding_square = 7;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.bounding_square_), _Internal::kHasBitsOffset + 5, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional bool is_opaque = 8;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.is_opaque_), _Internal::kHasBitsOffset + 6, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // repeated .otclient.protobuf.appearances.Box bounding_box_per_direction = 9;
+    {PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.bounding_box_per_direction_), -1, 1,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::SpriteAnimation>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::Box>()},
+  }}, {{
+  }},
+};
+
+::uint8_t* SpriteInfo::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpriteInfo)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 pattern_width = 1;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_pattern_width(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_pattern_width(), target);
   }
 
   // optional uint32 pattern_height = 2;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_pattern_height(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_pattern_height(), target);
   }
 
   // optional uint32 pattern_depth = 3;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_pattern_depth(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        3, this->_internal_pattern_depth(), target);
   }
 
   // optional uint32 layers = 4;
   if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(4, this->_internal_layers(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        4, this->_internal_layers(), target);
   }
 
   // repeated uint32 sprite_id = 5;
-  for (int i = 0, n = this->_internal_sprite_id_size(); i < n; i++) {
+  for (int i = 0, n = this->_internal_sprite_id_size(); i < n; ++i) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(5, this->_internal_sprite_id(i), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        5, this->_internal_sprite_id().Get(i), target);
   }
 
   // optional .otclient.protobuf.appearances.SpriteAnimation animation = 6;
   if (cached_has_bits & 0x00000001u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(6, _Internal::animation(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        6, _Internal::animation(this),
         _Internal::animation(this).GetCachedSize(), target, stream);
   }
 
   // optional uint32 bounding_square = 7;
   if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(7, this->_internal_bounding_square(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        7, this->_internal_bounding_square(), target);
   }
 
   // optional bool is_opaque = 8;
   if (cached_has_bits & 0x00000040u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(8, this->_internal_is_opaque(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        8, this->_internal_is_opaque(), target);
   }
 
   // repeated .otclient.protobuf.appearances.Box bounding_box_per_direction = 9;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_bounding_box_per_direction_size()); i < n; i++) {
-    const auto& repfield = this->_internal_bounding_box_per_direction(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_bounding_box_per_direction().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(9, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.SpriteInfo)
   return target;
 }
 
-size_t SpriteInfo::ByteSizeLong() const {
+::size_t SpriteInfo::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpriteInfo)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated uint32 sprite_id = 5;
   {
-    size_t data_size = ::_pbi::WireFormatLite::
-      UInt32Size(this->_impl_.sprite_id_);
-    total_size += 1 *
-                  ::_pbi::FromIntSize(this->_internal_sprite_id_size());
-    total_size += data_size;
+    std::size_t data_size = ::_pbi::WireFormatLite::UInt32Size(
+        this->_internal_sprite_id())
+    ;
+    std::size_t tag_size = std::size_t{1} *
+        ::_pbi::FromIntSize(this->_internal_sprite_id_size());
+    ;
+    total_size += tag_size + data_size;
   }
-
   // repeated .otclient.protobuf.appearances.Box bounding_box_per_direction = 9;
   total_size += 1UL * this->_internal_bounding_box_per_direction_size();
-  for (const auto& msg : this->_impl_.bounding_box_per_direction_) {
+  for (const auto& msg : this->_internal_bounding_box_per_direction()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000007fu) {
     // optional .otclient.protobuf.appearances.SpriteAnimation animation = 6;
     if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.animation_);
+      total_size +=
+          1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.animation_);
     }
 
     // optional uint32 pattern_width = 1;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_pattern_width());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_pattern_width());
     }
 
     // optional uint32 pattern_height = 2;
     if (cached_has_bits & 0x00000004u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_pattern_height());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_pattern_height());
     }
 
     // optional uint32 pattern_depth = 3;
     if (cached_has_bits & 0x00000008u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_pattern_depth());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_pattern_depth());
     }
 
     // optional uint32 layers = 4;
     if (cached_has_bits & 0x00000010u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_layers());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_layers());
     }
 
     // optional uint32 bounding_square = 7;
     if (cached_has_bits & 0x00000020u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_bounding_square());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_bounding_square());
     }
 
     // optional bool is_opaque = 8;
     if (cached_has_bits & 0x00000040u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData SpriteInfo::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    SpriteInfo::MergeImpl
+const ::google::protobuf::Message::ClassData SpriteInfo::_class_data_ = {
+    SpriteInfo::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*SpriteInfo::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* SpriteInfo::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void SpriteInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void SpriteInfo::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<SpriteInfo*>(&to_msg);
   auto& from = static_cast<const SpriteInfo&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpriteInfo)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_impl_.sprite_id_.MergeFrom(from._impl_.sprite_id_);
-  _this->_impl_.bounding_box_per_direction_.MergeFrom(from._impl_.bounding_box_per_direction_);
+  _this->_internal_mutable_sprite_id()->MergeFrom(from._internal_sprite_id());
+  _this->_internal_mutable_bounding_box_per_direction()->MergeFrom(
+      from._internal_bounding_box_per_direction());
   cached_has_bits = from._impl_._has_bits_[0];
   if (cached_has_bits & 0x0000007fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -3197,7 +3253,7 @@ void SpriteInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void SpriteInfo::CopyFrom(const SpriteInfo& from) {
@@ -3207,17 +3263,20 @@ void SpriteInfo::CopyFrom(const SpriteInfo& from) {
   MergeFrom(from);
 }
 
-bool SpriteInfo::IsInitialized() const {
+PROTOBUF_NOINLINE bool SpriteInfo::IsInitialized() const {
   return true;
 }
 
-void SpriteInfo::InternalSwap(SpriteInfo* other) {
+::_pbi::CachedSize* SpriteInfo::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void SpriteInfo::InternalSwap(SpriteInfo* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   _impl_.sprite_id_.InternalSwap(&other->_impl_.sprite_id_);
   _impl_.bounding_box_per_direction_.InternalSwap(&other->_impl_.bounding_box_per_direction_);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.is_opaque_)
       + sizeof(SpriteInfo::_impl_.is_opaque_)
       - PROTOBUF_FIELD_OFFSET(SpriteInfo, _impl_.animation_)>(
@@ -3225,17 +3284,18 @@ void SpriteInfo::InternalSwap(SpriteInfo* other) {
           reinterpret_cast<char*>(&other->_impl_.animation_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata SpriteInfo::GetMetadata() const {
+::google::protobuf::Metadata SpriteInfo::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[5]);
 }
-
 // ===================================================================
 
 class FrameGroup::_Internal {
  public:
   using HasBits = decltype(std::declval<FrameGroup>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_._has_bits_);
   static void set_has_fixed_frame_group(HasBits* has_bits) {
     (*has_bits)[0] |= 2u;
   }
@@ -3248,188 +3308,183 @@ class FrameGroup::_Internal {
   }
 };
 
-const ::otclient::protobuf::appearances::SpriteInfo&
-FrameGroup::_Internal::sprite_info(const FrameGroup* msg) {
+const ::otclient::protobuf::appearances::SpriteInfo& FrameGroup::_Internal::sprite_info(const FrameGroup* msg) {
   return *msg->_impl_.sprite_info_;
 }
-FrameGroup::FrameGroup(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+FrameGroup::FrameGroup(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.FrameGroup)
 }
-FrameGroup::FrameGroup(const FrameGroup& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  FrameGroup* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.sprite_info_){nullptr}
-    , decltype(_impl_.fixed_frame_group_){}
-    , decltype(_impl_.id_){}};
+inline PROTOBUF_NDEBUG_INLINE FrameGroup::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0} {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  if (from._internal_has_sprite_info()) {
-    _this->_impl_.sprite_info_ = new ::otclient::protobuf::appearances::SpriteInfo(*from._impl_.sprite_info_);
-  }
-  ::memcpy(&_impl_.fixed_frame_group_, &from._impl_.fixed_frame_group_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.id_) -
-    reinterpret_cast<char*>(&_impl_.fixed_frame_group_)) + sizeof(_impl_.id_));
+FrameGroup::FrameGroup(
+    ::google::protobuf::Arena* arena,
+    const FrameGroup& from)
+    : ::google::protobuf::Message(arena) {
+  FrameGroup* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.sprite_info_ = (cached_has_bits & 0x00000001u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::SpriteInfo>(arena, *from._impl_.sprite_info_)
+                : nullptr;
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, fixed_frame_group_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, fixed_frame_group_),
+           offsetof(Impl_, id_) -
+               offsetof(Impl_, fixed_frame_group_) +
+               sizeof(Impl_::id_));
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.FrameGroup)
 }
+inline PROTOBUF_NDEBUG_INLINE FrameGroup::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void FrameGroup::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.sprite_info_){nullptr}
-    , decltype(_impl_.fixed_frame_group_){0}
-    , decltype(_impl_.id_){0u}
-  };
+inline void FrameGroup::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, sprite_info_),
+           0,
+           offsetof(Impl_, id_) -
+               offsetof(Impl_, sprite_info_) +
+               sizeof(Impl_::id_));
 }
-
 FrameGroup::~FrameGroup() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.FrameGroup)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void FrameGroup::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  if (this != internal_default_instance()) delete _impl_.sprite_info_;
+  ABSL_DCHECK(GetArena() == nullptr);
+  delete _impl_.sprite_info_;
+  _impl_.~Impl_();
 }
 
-void FrameGroup::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void FrameGroup::Clear() {
+PROTOBUF_NOINLINE void FrameGroup::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.FrameGroup)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    GOOGLE_DCHECK(_impl_.sprite_info_ != nullptr);
+    ABSL_DCHECK(_impl_.sprite_info_ != nullptr);
     _impl_.sprite_info_->Clear();
   }
   if (cached_has_bits & 0x00000006u) {
-    ::memset(&_impl_.fixed_frame_group_, 0, static_cast<size_t>(
+    ::memset(&_impl_.fixed_frame_group_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.id_) -
         reinterpret_cast<char*>(&_impl_.fixed_frame_group_)) + sizeof(_impl_.id_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* FrameGroup::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional .otclient.protobuf.appearances.FIXED_FRAME_GROUP fixed_frame_group = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::FIXED_FRAME_GROUP_IsValid(val))) {
-            _internal_set_fixed_frame_group(static_cast<::otclient::protobuf::appearances::FIXED_FRAME_GROUP>(val));
-          } else {
-            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-          }
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 id = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_id(&has_bits);
-          _impl_.id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.SpriteInfo sprite_info = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_sprite_info(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* FrameGroup::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* FrameGroup::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<2, 3, 2, 0, 2> FrameGroup::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_._has_bits_),
+    0, // no _extensions_
+    3, 24,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967288,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    3,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_FrameGroup_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional .otclient.protobuf.appearances.FIXED_FRAME_GROUP fixed_frame_group = 1;
+    {::_pbi::TcParser::FastEr0S1,
+     {8, 1, 2, PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.fixed_frame_group_)}},
+    // optional uint32 id = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(FrameGroup, _impl_.id_), 2>(),
+     {16, 2, 0, PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.id_)}},
+    // optional .otclient.protobuf.appearances.SpriteInfo sprite_info = 3;
+    {::_pbi::TcParser::FastMtS1,
+     {26, 0, 1, PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.sprite_info_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional .otclient.protobuf.appearances.FIXED_FRAME_GROUP fixed_frame_group = 1;
+    {PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.fixed_frame_group_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kEnumRange)},
+    // optional uint32 id = 2;
+    {PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.id_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional .otclient.protobuf.appearances.SpriteInfo sprite_info = 3;
+    {PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.sprite_info_), _Internal::kHasBitsOffset + 0, 1,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+  }}, {{
+    {0, 3},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::SpriteInfo>()},
+  }}, {{
+  }},
+};
+
+::uint8_t* FrameGroup::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.FrameGroup)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.FIXED_FRAME_GROUP fixed_frame_group = 1;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      1, this->_internal_fixed_frame_group(), target);
+        1, this->_internal_fixed_frame_group(), target);
   }
 
   // optional uint32 id = 2;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_id(), target);
   }
 
   // optional .otclient.protobuf.appearances.SpriteInfo sprite_info = 3;
   if (cached_has_bits & 0x00000001u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(3, _Internal::sprite_info(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        3, _Internal::sprite_info(this),
         _Internal::sprite_info(this).GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.FrameGroup)
   return target;
 }
 
-size_t FrameGroup::ByteSizeLong() const {
+::size_t FrameGroup::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.FrameGroup)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3437,39 +3492,40 @@ size_t FrameGroup::ByteSizeLong() const {
   if (cached_has_bits & 0x00000007u) {
     // optional .otclient.protobuf.appearances.SpriteInfo sprite_info = 3;
     if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.sprite_info_);
+      total_size +=
+          1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.sprite_info_);
     }
 
     // optional .otclient.protobuf.appearances.FIXED_FRAME_GROUP fixed_frame_group = 1;
     if (cached_has_bits & 0x00000002u) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::EnumSize(this->_internal_fixed_frame_group());
+                    ::_pbi::WireFormatLite::EnumSize(this->_internal_fixed_frame_group());
     }
 
     // optional uint32 id = 2;
     if (cached_has_bits & 0x00000004u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_id());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData FrameGroup::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    FrameGroup::MergeImpl
+const ::google::protobuf::Message::ClassData FrameGroup::_class_data_ = {
+    FrameGroup::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*FrameGroup::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* FrameGroup::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void FrameGroup::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void FrameGroup::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<FrameGroup*>(&to_msg);
   auto& from = static_cast<const FrameGroup&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.FrameGroup)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -3486,7 +3542,7 @@ void FrameGroup::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void FrameGroup::CopyFrom(const FrameGroup& from) {
@@ -3496,15 +3552,18 @@ void FrameGroup::CopyFrom(const FrameGroup& from) {
   MergeFrom(from);
 }
 
-bool FrameGroup::IsInitialized() const {
+PROTOBUF_NOINLINE bool FrameGroup::IsInitialized() const {
   return true;
 }
 
-void FrameGroup::InternalSwap(FrameGroup* other) {
+::_pbi::CachedSize* FrameGroup::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void FrameGroup::InternalSwap(FrameGroup* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.id_)
       + sizeof(FrameGroup::_impl_.id_)
       - PROTOBUF_FIELD_OFFSET(FrameGroup, _impl_.sprite_info_)>(
@@ -3512,17 +3571,18 @@ void FrameGroup::InternalSwap(FrameGroup* other) {
           reinterpret_cast<char*>(&other->_impl_.sprite_info_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata FrameGroup::GetMetadata() const {
+::google::protobuf::Metadata FrameGroup::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[6]);
 }
-
 // ===================================================================
 
 class Appearance::_Internal {
  public:
   using HasBits = decltype(std::declval<Appearance>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(Appearance, _impl_._has_bits_);
   static void set_has_id(HasBits* has_bits) {
     (*has_bits)[0] |= 8u;
   }
@@ -3538,99 +3598,74 @@ class Appearance::_Internal {
   }
 };
 
-const ::otclient::protobuf::appearances::AppearanceFlags&
-Appearance::_Internal::flags(const Appearance* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlags& Appearance::_Internal::flags(const Appearance* msg) {
   return *msg->_impl_.flags_;
 }
-Appearance::Appearance(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+Appearance::Appearance(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.Appearance)
 }
-Appearance::Appearance(const Appearance& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  Appearance* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.frame_group_){from._impl_.frame_group_}
-    , decltype(_impl_.name_){}
-    , decltype(_impl_.description_){}
-    , decltype(_impl_.flags_){nullptr}
-    , decltype(_impl_.id_){}};
+inline PROTOBUF_NDEBUG_INLINE Appearance::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        frame_group_{visibility, arena, from.frame_group_},
+        name_(arena, from.name_),
+        description_(arena, from.description_) {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (from._internal_has_name()) {
-    _this->_impl_.name_.Set(from._internal_name(), 
-      _this->GetArenaForAllocation());
-  }
-  _impl_.description_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.description_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (from._internal_has_description()) {
-    _this->_impl_.description_.Set(from._internal_description(), 
-      _this->GetArenaForAllocation());
-  }
-  if (from._internal_has_flags()) {
-    _this->_impl_.flags_ = new ::otclient::protobuf::appearances::AppearanceFlags(*from._impl_.flags_);
-  }
-  _this->_impl_.id_ = from._impl_.id_;
+Appearance::Appearance(
+    ::google::protobuf::Arena* arena,
+    const Appearance& from)
+    : ::google::protobuf::Message(arena) {
+  Appearance* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.flags_ = (cached_has_bits & 0x00000004u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlags>(arena, *from._impl_.flags_)
+                : nullptr;
+  _impl_.id_ = from._impl_.id_;
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.Appearance)
 }
+inline PROTOBUF_NDEBUG_INLINE Appearance::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        frame_group_{visibility, arena},
+        name_(arena),
+        description_(arena) {}
 
-inline void Appearance::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.frame_group_){arena}
-    , decltype(_impl_.name_){}
-    , decltype(_impl_.description_){}
-    , decltype(_impl_.flags_){nullptr}
-    , decltype(_impl_.id_){0u}
-  };
-  _impl_.name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.description_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.description_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+inline void Appearance::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, flags_),
+           0,
+           offsetof(Impl_, id_) -
+               offsetof(Impl_, flags_) +
+               sizeof(Impl_::id_));
 }
-
 Appearance::~Appearance() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.Appearance)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void Appearance::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.frame_group_.~RepeatedPtrField();
+  ABSL_DCHECK(GetArena() == nullptr);
   _impl_.name_.Destroy();
   _impl_.description_.Destroy();
-  if (this != internal_default_instance()) delete _impl_.flags_;
+  delete _impl_.flags_;
+  _impl_.~Impl_();
 }
 
-void Appearance::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void Appearance::Clear() {
+PROTOBUF_NOINLINE void Appearance::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.Appearance)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -3644,219 +3679,201 @@ void Appearance::Clear() {
       _impl_.description_.ClearNonDefaultToEmpty();
     }
     if (cached_has_bits & 0x00000004u) {
-      GOOGLE_DCHECK(_impl_.flags_ != nullptr);
+      ABSL_DCHECK(_impl_.flags_ != nullptr);
       _impl_.flags_->Clear();
     }
   }
   _impl_.id_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* Appearance::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 id = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_id(&has_bits);
-          _impl_.id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.FrameGroup frame_group = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            ptr = ctx->ParseMessage(_internal_add_frame_group(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlags flags = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_flags(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional string name = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
-          auto str = _internal_mutable_name();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          #ifndef NDEBUG
-          ::_pbi::VerifyUTF8(str, "otclient.protobuf.appearances.Appearance.name");
-          #endif  // !NDEBUG
-        } else
-          goto handle_unusual;
-        continue;
-      // optional string description = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
-          auto str = _internal_mutable_description();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          #ifndef NDEBUG
-          ::_pbi::VerifyUTF8(str, "otclient.protobuf.appearances.Appearance.description");
-          #endif  // !NDEBUG
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* Appearance::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* Appearance::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 5, 2, 64, 2> Appearance::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(Appearance, _impl_._has_bits_),
+    0, // no _extensions_
+    5, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967264,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    5,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_Appearance_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional uint32 id = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(Appearance, _impl_.id_), 3>(),
+     {8, 3, 0, PROTOBUF_FIELD_OFFSET(Appearance, _impl_.id_)}},
+    // repeated .otclient.protobuf.appearances.FrameGroup frame_group = 2;
+    {::_pbi::TcParser::FastMtR1,
+     {18, 63, 0, PROTOBUF_FIELD_OFFSET(Appearance, _impl_.frame_group_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlags flags = 3;
+    {::_pbi::TcParser::FastMtS1,
+     {26, 2, 1, PROTOBUF_FIELD_OFFSET(Appearance, _impl_.flags_)}},
+    // optional string name = 4;
+    {::_pbi::TcParser::FastSS1,
+     {34, 0, 0, PROTOBUF_FIELD_OFFSET(Appearance, _impl_.name_)}},
+    // optional string description = 5;
+    {::_pbi::TcParser::FastSS1,
+     {42, 1, 0, PROTOBUF_FIELD_OFFSET(Appearance, _impl_.description_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 id = 1;
+    {PROTOBUF_FIELD_OFFSET(Appearance, _impl_.id_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // repeated .otclient.protobuf.appearances.FrameGroup frame_group = 2;
+    {PROTOBUF_FIELD_OFFSET(Appearance, _impl_.frame_group_), -1, 0,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.AppearanceFlags flags = 3;
+    {PROTOBUF_FIELD_OFFSET(Appearance, _impl_.flags_), _Internal::kHasBitsOffset + 2, 1,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional string name = 4;
+    {PROTOBUF_FIELD_OFFSET(Appearance, _impl_.name_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kRawString | ::_fl::kRepAString)},
+    // optional string description = 5;
+    {PROTOBUF_FIELD_OFFSET(Appearance, _impl_.description_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kRawString | ::_fl::kRepAString)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::FrameGroup>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlags>()},
+  }}, {{
+    "\50\0\0\0\4\13\0\0"
+    "otclient.protobuf.appearances.Appearance"
+    "name"
+    "description"
+  }},
+};
+
+::uint8_t* Appearance::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.Appearance)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 id = 1;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_id(), target);
   }
 
   // repeated .otclient.protobuf.appearances.FrameGroup frame_group = 2;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_frame_group_size()); i < n; i++) {
-    const auto& repfield = this->_internal_frame_group(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_frame_group().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(2, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlags flags = 3;
   if (cached_has_bits & 0x00000004u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(3, _Internal::flags(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        3, _Internal::flags(this),
         _Internal::flags(this).GetCachedSize(), target, stream);
   }
 
   // optional string name = 4;
   if (cached_has_bits & 0x00000001u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "otclient.protobuf.appearances.Appearance.name");
-    target = stream->WriteStringMaybeAliased(
-        4, this->_internal_name(), target);
+    const std::string& _s = this->_internal_name();
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(_s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormat::SERIALIZE,
+                                "otclient.protobuf.appearances.Appearance.name");
+    target = stream->WriteStringMaybeAliased(4, _s, target);
   }
 
   // optional string description = 5;
   if (cached_has_bits & 0x00000002u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_description().data(), static_cast<int>(this->_internal_description().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "otclient.protobuf.appearances.Appearance.description");
-    target = stream->WriteStringMaybeAliased(
-        5, this->_internal_description(), target);
+    const std::string& _s = this->_internal_description();
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(_s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormat::SERIALIZE,
+                                "otclient.protobuf.appearances.Appearance.description");
+    target = stream->WriteStringMaybeAliased(5, _s, target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.Appearance)
   return target;
 }
 
-size_t Appearance::ByteSizeLong() const {
+::size_t Appearance::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.Appearance)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .otclient.protobuf.appearances.FrameGroup frame_group = 2;
   total_size += 1UL * this->_internal_frame_group_size();
-  for (const auto& msg : this->_impl_.frame_group_) {
+  for (const auto& msg : this->_internal_frame_group()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000000fu) {
     // optional string name = 4;
     if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_name());
+      total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                      this->_internal_name());
     }
 
     // optional string description = 5;
     if (cached_has_bits & 0x00000002u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_description());
+      total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                      this->_internal_description());
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlags flags = 3;
     if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.flags_);
+      total_size +=
+          1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.flags_);
     }
 
     // optional uint32 id = 1;
     if (cached_has_bits & 0x00000008u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_id());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Appearance::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    Appearance::MergeImpl
+const ::google::protobuf::Message::ClassData Appearance::_class_data_ = {
+    Appearance::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Appearance::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* Appearance::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void Appearance::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void Appearance::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<Appearance*>(&to_msg);
   auto& from = static_cast<const Appearance&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.Appearance)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_impl_.frame_group_.MergeFrom(from._impl_.frame_group_);
+  _this->_internal_mutable_frame_group()->MergeFrom(
+      from._internal_frame_group());
   cached_has_bits = from._impl_._has_bits_[0];
   if (cached_has_bits & 0x0000000fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -3874,7 +3891,7 @@ void Appearance::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void Appearance::CopyFrom(const Appearance& from) {
@@ -3884,26 +3901,23 @@ void Appearance::CopyFrom(const Appearance& from) {
   MergeFrom(from);
 }
 
-bool Appearance::IsInitialized() const {
+PROTOBUF_NOINLINE bool Appearance::IsInitialized() const {
   return true;
 }
 
-void Appearance::InternalSwap(Appearance* other) {
+::_pbi::CachedSize* Appearance::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void Appearance::InternalSwap(Appearance* PROTOBUF_RESTRICT other) {
   using std::swap;
-  auto* lhs_arena = GetArenaForAllocation();
-  auto* rhs_arena = other->GetArenaForAllocation();
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   _impl_.frame_group_.InternalSwap(&other->_impl_.frame_group_);
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.name_, lhs_arena,
-      &other->_impl_.name_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.description_, lhs_arena,
-      &other->_impl_.description_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.description_, &other->_impl_.description_, arena);
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(Appearance, _impl_.id_)
       + sizeof(Appearance::_impl_.id_)
       - PROTOBUF_FIELD_OFFSET(Appearance, _impl_.flags_)>(
@@ -3911,17 +3925,18 @@ void Appearance::InternalSwap(Appearance* other) {
           reinterpret_cast<char*>(&other->_impl_.flags_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata Appearance::GetMetadata() const {
+::google::protobuf::Metadata Appearance::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[7]);
 }
-
 // ===================================================================
 
 class AppearanceFlags::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlags>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_._has_bits_);
   static const ::otclient::protobuf::appearances::AppearanceFlagBank& bank(const AppearanceFlags* msg);
   static void set_has_bank(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
@@ -4107,291 +4122,172 @@ class AppearanceFlags::_Internal {
   }
 };
 
-const ::otclient::protobuf::appearances::AppearanceFlagBank&
-AppearanceFlags::_Internal::bank(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagBank& AppearanceFlags::_Internal::bank(const AppearanceFlags* msg) {
   return *msg->_impl_.bank_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagWrite&
-AppearanceFlags::_Internal::write(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagWrite& AppearanceFlags::_Internal::write(const AppearanceFlags* msg) {
   return *msg->_impl_.write_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagWriteOnce&
-AppearanceFlags::_Internal::write_once(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagWriteOnce& AppearanceFlags::_Internal::write_once(const AppearanceFlags* msg) {
   return *msg->_impl_.write_once_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagHook&
-AppearanceFlags::_Internal::hook(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagHook& AppearanceFlags::_Internal::hook(const AppearanceFlags* msg) {
   return *msg->_impl_.hook_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagLight&
-AppearanceFlags::_Internal::light(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagLight& AppearanceFlags::_Internal::light(const AppearanceFlags* msg) {
   return *msg->_impl_.light_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagShift&
-AppearanceFlags::_Internal::shift(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagShift& AppearanceFlags::_Internal::shift(const AppearanceFlags* msg) {
   return *msg->_impl_.shift_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagHeight&
-AppearanceFlags::_Internal::height(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagHeight& AppearanceFlags::_Internal::height(const AppearanceFlags* msg) {
   return *msg->_impl_.height_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagAutomap&
-AppearanceFlags::_Internal::automap(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagAutomap& AppearanceFlags::_Internal::automap(const AppearanceFlags* msg) {
   return *msg->_impl_.automap_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagLenshelp&
-AppearanceFlags::_Internal::lenshelp(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagLenshelp& AppearanceFlags::_Internal::lenshelp(const AppearanceFlags* msg) {
   return *msg->_impl_.lenshelp_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagClothes&
-AppearanceFlags::_Internal::clothes(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagClothes& AppearanceFlags::_Internal::clothes(const AppearanceFlags* msg) {
   return *msg->_impl_.clothes_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagDefaultAction&
-AppearanceFlags::_Internal::default_action(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagDefaultAction& AppearanceFlags::_Internal::default_action(const AppearanceFlags* msg) {
   return *msg->_impl_.default_action_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagMarket&
-AppearanceFlags::_Internal::market(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagMarket& AppearanceFlags::_Internal::market(const AppearanceFlags* msg) {
   return *msg->_impl_.market_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagChangedToExpire&
-AppearanceFlags::_Internal::changedtoexpire(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagChangedToExpire& AppearanceFlags::_Internal::changedtoexpire(const AppearanceFlags* msg) {
   return *msg->_impl_.changedtoexpire_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagCyclopedia&
-AppearanceFlags::_Internal::cyclopediaitem(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagCyclopedia& AppearanceFlags::_Internal::cyclopediaitem(const AppearanceFlags* msg) {
   return *msg->_impl_.cyclopediaitem_;
 }
-const ::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification&
-AppearanceFlags::_Internal::upgradeclassification(const AppearanceFlags* msg) {
+const ::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification& AppearanceFlags::_Internal::upgradeclassification(const AppearanceFlags* msg) {
   return *msg->_impl_.upgradeclassification_;
 }
-AppearanceFlags::AppearanceFlags(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlags::AppearanceFlags(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlags)
 }
-AppearanceFlags::AppearanceFlags(const AppearanceFlags& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlags* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.npcsaledata_){from._impl_.npcsaledata_}
-    , decltype(_impl_.bank_){nullptr}
-    , decltype(_impl_.write_){nullptr}
-    , decltype(_impl_.write_once_){nullptr}
-    , decltype(_impl_.hook_){nullptr}
-    , decltype(_impl_.light_){nullptr}
-    , decltype(_impl_.shift_){nullptr}
-    , decltype(_impl_.height_){nullptr}
-    , decltype(_impl_.automap_){nullptr}
-    , decltype(_impl_.lenshelp_){nullptr}
-    , decltype(_impl_.clothes_){nullptr}
-    , decltype(_impl_.default_action_){nullptr}
-    , decltype(_impl_.market_){nullptr}
-    , decltype(_impl_.changedtoexpire_){nullptr}
-    , decltype(_impl_.cyclopediaitem_){nullptr}
-    , decltype(_impl_.upgradeclassification_){nullptr}
-    , decltype(_impl_.clip_){}
-    , decltype(_impl_.bottom_){}
-    , decltype(_impl_.top_){}
-    , decltype(_impl_.container_){}
-    , decltype(_impl_.cumulative_){}
-    , decltype(_impl_.usable_){}
-    , decltype(_impl_.forceuse_){}
-    , decltype(_impl_.multiuse_){}
-    , decltype(_impl_.liquidpool_){}
-    , decltype(_impl_.unpass_){}
-    , decltype(_impl_.unmove_){}
-    , decltype(_impl_.unsight_){}
-    , decltype(_impl_.avoid_){}
-    , decltype(_impl_.no_movement_animation_){}
-    , decltype(_impl_.take_){}
-    , decltype(_impl_.liquidcontainer_){}
-    , decltype(_impl_.hang_){}
-    , decltype(_impl_.rotate_){}
-    , decltype(_impl_.dont_hide_){}
-    , decltype(_impl_.translucent_){}
-    , decltype(_impl_.lying_object_){}
-    , decltype(_impl_.animate_always_){}
-    , decltype(_impl_.fullbank_){}
-    , decltype(_impl_.ignore_look_){}
-    , decltype(_impl_.wrap_){}
-    , decltype(_impl_.unwrap_){}
-    , decltype(_impl_.topeffect_){}
-    , decltype(_impl_.corpse_){}
-    , decltype(_impl_.player_corpse_){}
-    , decltype(_impl_.ammo_){}
-    , decltype(_impl_.show_off_socket_){}
-    , decltype(_impl_.reportable_){}
-    , decltype(_impl_.reverse_addons_east_){}
-    , decltype(_impl_.reverse_addons_west_){}
-    , decltype(_impl_.reverse_addons_south_){}
-    , decltype(_impl_.reverse_addons_north_){}
-    , decltype(_impl_.wearout_){}
-    , decltype(_impl_.clockexpire_){}
-    , decltype(_impl_.expire_){}
-    , decltype(_impl_.expirestop_){}
-    , decltype(_impl_.deco_kit_){}};
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlags::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        npcsaledata_{visibility, arena, from.npcsaledata_} {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  if (from._internal_has_bank()) {
-    _this->_impl_.bank_ = new ::otclient::protobuf::appearances::AppearanceFlagBank(*from._impl_.bank_);
-  }
-  if (from._internal_has_write()) {
-    _this->_impl_.write_ = new ::otclient::protobuf::appearances::AppearanceFlagWrite(*from._impl_.write_);
-  }
-  if (from._internal_has_write_once()) {
-    _this->_impl_.write_once_ = new ::otclient::protobuf::appearances::AppearanceFlagWriteOnce(*from._impl_.write_once_);
-  }
-  if (from._internal_has_hook()) {
-    _this->_impl_.hook_ = new ::otclient::protobuf::appearances::AppearanceFlagHook(*from._impl_.hook_);
-  }
-  if (from._internal_has_light()) {
-    _this->_impl_.light_ = new ::otclient::protobuf::appearances::AppearanceFlagLight(*from._impl_.light_);
-  }
-  if (from._internal_has_shift()) {
-    _this->_impl_.shift_ = new ::otclient::protobuf::appearances::AppearanceFlagShift(*from._impl_.shift_);
-  }
-  if (from._internal_has_height()) {
-    _this->_impl_.height_ = new ::otclient::protobuf::appearances::AppearanceFlagHeight(*from._impl_.height_);
-  }
-  if (from._internal_has_automap()) {
-    _this->_impl_.automap_ = new ::otclient::protobuf::appearances::AppearanceFlagAutomap(*from._impl_.automap_);
-  }
-  if (from._internal_has_lenshelp()) {
-    _this->_impl_.lenshelp_ = new ::otclient::protobuf::appearances::AppearanceFlagLenshelp(*from._impl_.lenshelp_);
-  }
-  if (from._internal_has_clothes()) {
-    _this->_impl_.clothes_ = new ::otclient::protobuf::appearances::AppearanceFlagClothes(*from._impl_.clothes_);
-  }
-  if (from._internal_has_default_action()) {
-    _this->_impl_.default_action_ = new ::otclient::protobuf::appearances::AppearanceFlagDefaultAction(*from._impl_.default_action_);
-  }
-  if (from._internal_has_market()) {
-    _this->_impl_.market_ = new ::otclient::protobuf::appearances::AppearanceFlagMarket(*from._impl_.market_);
-  }
-  if (from._internal_has_changedtoexpire()) {
-    _this->_impl_.changedtoexpire_ = new ::otclient::protobuf::appearances::AppearanceFlagChangedToExpire(*from._impl_.changedtoexpire_);
-  }
-  if (from._internal_has_cyclopediaitem()) {
-    _this->_impl_.cyclopediaitem_ = new ::otclient::protobuf::appearances::AppearanceFlagCyclopedia(*from._impl_.cyclopediaitem_);
-  }
-  if (from._internal_has_upgradeclassification()) {
-    _this->_impl_.upgradeclassification_ = new ::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification(*from._impl_.upgradeclassification_);
-  }
-  ::memcpy(&_impl_.clip_, &from._impl_.clip_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.deco_kit_) -
-    reinterpret_cast<char*>(&_impl_.clip_)) + sizeof(_impl_.deco_kit_));
+AppearanceFlags::AppearanceFlags(
+    ::google::protobuf::Arena* arena,
+    const AppearanceFlags& from)
+    : ::google::protobuf::Message(arena) {
+  AppearanceFlags* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::uint32_t cached_has_bits = _impl_._has_bits_[0];
+  _impl_.bank_ = (cached_has_bits & 0x00000001u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagBank>(arena, *from._impl_.bank_)
+                : nullptr;
+  _impl_.write_ = (cached_has_bits & 0x00000002u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagWrite>(arena, *from._impl_.write_)
+                : nullptr;
+  _impl_.write_once_ = (cached_has_bits & 0x00000004u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagWriteOnce>(arena, *from._impl_.write_once_)
+                : nullptr;
+  _impl_.hook_ = (cached_has_bits & 0x00000008u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagHook>(arena, *from._impl_.hook_)
+                : nullptr;
+  _impl_.light_ = (cached_has_bits & 0x00000010u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagLight>(arena, *from._impl_.light_)
+                : nullptr;
+  _impl_.shift_ = (cached_has_bits & 0x00000020u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagShift>(arena, *from._impl_.shift_)
+                : nullptr;
+  _impl_.height_ = (cached_has_bits & 0x00000040u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagHeight>(arena, *from._impl_.height_)
+                : nullptr;
+  _impl_.automap_ = (cached_has_bits & 0x00000080u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagAutomap>(arena, *from._impl_.automap_)
+                : nullptr;
+  _impl_.lenshelp_ = (cached_has_bits & 0x00000100u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagLenshelp>(arena, *from._impl_.lenshelp_)
+                : nullptr;
+  _impl_.clothes_ = (cached_has_bits & 0x00000200u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagClothes>(arena, *from._impl_.clothes_)
+                : nullptr;
+  _impl_.default_action_ = (cached_has_bits & 0x00000400u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagDefaultAction>(arena, *from._impl_.default_action_)
+                : nullptr;
+  _impl_.market_ = (cached_has_bits & 0x00000800u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagMarket>(arena, *from._impl_.market_)
+                : nullptr;
+  _impl_.changedtoexpire_ = (cached_has_bits & 0x00001000u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagChangedToExpire>(arena, *from._impl_.changedtoexpire_)
+                : nullptr;
+  _impl_.cyclopediaitem_ = (cached_has_bits & 0x00002000u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagCyclopedia>(arena, *from._impl_.cyclopediaitem_)
+                : nullptr;
+  _impl_.upgradeclassification_ = (cached_has_bits & 0x00004000u)
+                ? CreateMaybeMessage<::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification>(arena, *from._impl_.upgradeclassification_)
+                : nullptr;
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, clip_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, clip_),
+           offsetof(Impl_, deco_kit_) -
+               offsetof(Impl_, clip_) +
+               sizeof(Impl_::deco_kit_));
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlags)
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlags::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        npcsaledata_{visibility, arena} {}
 
-inline void AppearanceFlags::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.npcsaledata_){arena}
-    , decltype(_impl_.bank_){nullptr}
-    , decltype(_impl_.write_){nullptr}
-    , decltype(_impl_.write_once_){nullptr}
-    , decltype(_impl_.hook_){nullptr}
-    , decltype(_impl_.light_){nullptr}
-    , decltype(_impl_.shift_){nullptr}
-    , decltype(_impl_.height_){nullptr}
-    , decltype(_impl_.automap_){nullptr}
-    , decltype(_impl_.lenshelp_){nullptr}
-    , decltype(_impl_.clothes_){nullptr}
-    , decltype(_impl_.default_action_){nullptr}
-    , decltype(_impl_.market_){nullptr}
-    , decltype(_impl_.changedtoexpire_){nullptr}
-    , decltype(_impl_.cyclopediaitem_){nullptr}
-    , decltype(_impl_.upgradeclassification_){nullptr}
-    , decltype(_impl_.clip_){false}
-    , decltype(_impl_.bottom_){false}
-    , decltype(_impl_.top_){false}
-    , decltype(_impl_.container_){false}
-    , decltype(_impl_.cumulative_){false}
-    , decltype(_impl_.usable_){false}
-    , decltype(_impl_.forceuse_){false}
-    , decltype(_impl_.multiuse_){false}
-    , decltype(_impl_.liquidpool_){false}
-    , decltype(_impl_.unpass_){false}
-    , decltype(_impl_.unmove_){false}
-    , decltype(_impl_.unsight_){false}
-    , decltype(_impl_.avoid_){false}
-    , decltype(_impl_.no_movement_animation_){false}
-    , decltype(_impl_.take_){false}
-    , decltype(_impl_.liquidcontainer_){false}
-    , decltype(_impl_.hang_){false}
-    , decltype(_impl_.rotate_){false}
-    , decltype(_impl_.dont_hide_){false}
-    , decltype(_impl_.translucent_){false}
-    , decltype(_impl_.lying_object_){false}
-    , decltype(_impl_.animate_always_){false}
-    , decltype(_impl_.fullbank_){false}
-    , decltype(_impl_.ignore_look_){false}
-    , decltype(_impl_.wrap_){false}
-    , decltype(_impl_.unwrap_){false}
-    , decltype(_impl_.topeffect_){false}
-    , decltype(_impl_.corpse_){false}
-    , decltype(_impl_.player_corpse_){false}
-    , decltype(_impl_.ammo_){false}
-    , decltype(_impl_.show_off_socket_){false}
-    , decltype(_impl_.reportable_){false}
-    , decltype(_impl_.reverse_addons_east_){false}
-    , decltype(_impl_.reverse_addons_west_){false}
-    , decltype(_impl_.reverse_addons_south_){false}
-    , decltype(_impl_.reverse_addons_north_){false}
-    , decltype(_impl_.wearout_){false}
-    , decltype(_impl_.clockexpire_){false}
-    , decltype(_impl_.expire_){false}
-    , decltype(_impl_.expirestop_){false}
-    , decltype(_impl_.deco_kit_){false}
-  };
+inline void AppearanceFlags::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, bank_),
+           0,
+           offsetof(Impl_, deco_kit_) -
+               offsetof(Impl_, bank_) +
+               sizeof(Impl_::deco_kit_));
 }
-
 AppearanceFlags::~AppearanceFlags() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlags)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlags::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.npcsaledata_.~RepeatedPtrField();
-  if (this != internal_default_instance()) delete _impl_.bank_;
-  if (this != internal_default_instance()) delete _impl_.write_;
-  if (this != internal_default_instance()) delete _impl_.write_once_;
-  if (this != internal_default_instance()) delete _impl_.hook_;
-  if (this != internal_default_instance()) delete _impl_.light_;
-  if (this != internal_default_instance()) delete _impl_.shift_;
-  if (this != internal_default_instance()) delete _impl_.height_;
-  if (this != internal_default_instance()) delete _impl_.automap_;
-  if (this != internal_default_instance()) delete _impl_.lenshelp_;
-  if (this != internal_default_instance()) delete _impl_.clothes_;
-  if (this != internal_default_instance()) delete _impl_.default_action_;
-  if (this != internal_default_instance()) delete _impl_.market_;
-  if (this != internal_default_instance()) delete _impl_.changedtoexpire_;
-  if (this != internal_default_instance()) delete _impl_.cyclopediaitem_;
-  if (this != internal_default_instance()) delete _impl_.upgradeclassification_;
+  ABSL_DCHECK(GetArena() == nullptr);
+  delete _impl_.bank_;
+  delete _impl_.write_;
+  delete _impl_.write_once_;
+  delete _impl_.hook_;
+  delete _impl_.light_;
+  delete _impl_.shift_;
+  delete _impl_.height_;
+  delete _impl_.automap_;
+  delete _impl_.lenshelp_;
+  delete _impl_.clothes_;
+  delete _impl_.default_action_;
+  delete _impl_.market_;
+  delete _impl_.changedtoexpire_;
+  delete _impl_.cyclopediaitem_;
+  delete _impl_.upgradeclassification_;
+  _impl_.~Impl_();
 }
 
-void AppearanceFlags::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlags::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlags::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlags)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -4399,764 +4295,560 @@ void AppearanceFlags::Clear() {
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x000000ffu) {
     if (cached_has_bits & 0x00000001u) {
-      GOOGLE_DCHECK(_impl_.bank_ != nullptr);
+      ABSL_DCHECK(_impl_.bank_ != nullptr);
       _impl_.bank_->Clear();
     }
     if (cached_has_bits & 0x00000002u) {
-      GOOGLE_DCHECK(_impl_.write_ != nullptr);
+      ABSL_DCHECK(_impl_.write_ != nullptr);
       _impl_.write_->Clear();
     }
     if (cached_has_bits & 0x00000004u) {
-      GOOGLE_DCHECK(_impl_.write_once_ != nullptr);
+      ABSL_DCHECK(_impl_.write_once_ != nullptr);
       _impl_.write_once_->Clear();
     }
     if (cached_has_bits & 0x00000008u) {
-      GOOGLE_DCHECK(_impl_.hook_ != nullptr);
+      ABSL_DCHECK(_impl_.hook_ != nullptr);
       _impl_.hook_->Clear();
     }
     if (cached_has_bits & 0x00000010u) {
-      GOOGLE_DCHECK(_impl_.light_ != nullptr);
+      ABSL_DCHECK(_impl_.light_ != nullptr);
       _impl_.light_->Clear();
     }
     if (cached_has_bits & 0x00000020u) {
-      GOOGLE_DCHECK(_impl_.shift_ != nullptr);
+      ABSL_DCHECK(_impl_.shift_ != nullptr);
       _impl_.shift_->Clear();
     }
     if (cached_has_bits & 0x00000040u) {
-      GOOGLE_DCHECK(_impl_.height_ != nullptr);
+      ABSL_DCHECK(_impl_.height_ != nullptr);
       _impl_.height_->Clear();
     }
     if (cached_has_bits & 0x00000080u) {
-      GOOGLE_DCHECK(_impl_.automap_ != nullptr);
+      ABSL_DCHECK(_impl_.automap_ != nullptr);
       _impl_.automap_->Clear();
     }
   }
   if (cached_has_bits & 0x00007f00u) {
     if (cached_has_bits & 0x00000100u) {
-      GOOGLE_DCHECK(_impl_.lenshelp_ != nullptr);
+      ABSL_DCHECK(_impl_.lenshelp_ != nullptr);
       _impl_.lenshelp_->Clear();
     }
     if (cached_has_bits & 0x00000200u) {
-      GOOGLE_DCHECK(_impl_.clothes_ != nullptr);
+      ABSL_DCHECK(_impl_.clothes_ != nullptr);
       _impl_.clothes_->Clear();
     }
     if (cached_has_bits & 0x00000400u) {
-      GOOGLE_DCHECK(_impl_.default_action_ != nullptr);
+      ABSL_DCHECK(_impl_.default_action_ != nullptr);
       _impl_.default_action_->Clear();
     }
     if (cached_has_bits & 0x00000800u) {
-      GOOGLE_DCHECK(_impl_.market_ != nullptr);
+      ABSL_DCHECK(_impl_.market_ != nullptr);
       _impl_.market_->Clear();
     }
     if (cached_has_bits & 0x00001000u) {
-      GOOGLE_DCHECK(_impl_.changedtoexpire_ != nullptr);
+      ABSL_DCHECK(_impl_.changedtoexpire_ != nullptr);
       _impl_.changedtoexpire_->Clear();
     }
     if (cached_has_bits & 0x00002000u) {
-      GOOGLE_DCHECK(_impl_.cyclopediaitem_ != nullptr);
+      ABSL_DCHECK(_impl_.cyclopediaitem_ != nullptr);
       _impl_.cyclopediaitem_->Clear();
     }
     if (cached_has_bits & 0x00004000u) {
-      GOOGLE_DCHECK(_impl_.upgradeclassification_ != nullptr);
+      ABSL_DCHECK(_impl_.upgradeclassification_ != nullptr);
       _impl_.upgradeclassification_->Clear();
     }
   }
   _impl_.clip_ = false;
   if (cached_has_bits & 0x00ff0000u) {
-    ::memset(&_impl_.bottom_, 0, static_cast<size_t>(
+    ::memset(&_impl_.bottom_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.liquidpool_) -
         reinterpret_cast<char*>(&_impl_.bottom_)) + sizeof(_impl_.liquidpool_));
   }
   if (cached_has_bits & 0xff000000u) {
-    ::memset(&_impl_.unpass_, 0, static_cast<size_t>(
+    ::memset(&_impl_.unpass_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.hang_) -
         reinterpret_cast<char*>(&_impl_.unpass_)) + sizeof(_impl_.hang_));
   }
   cached_has_bits = _impl_._has_bits_[1];
   if (cached_has_bits & 0x000000ffu) {
-    ::memset(&_impl_.rotate_, 0, static_cast<size_t>(
+    ::memset(&_impl_.rotate_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.wrap_) -
         reinterpret_cast<char*>(&_impl_.rotate_)) + sizeof(_impl_.wrap_));
   }
   if (cached_has_bits & 0x0000ff00u) {
-    ::memset(&_impl_.unwrap_, 0, static_cast<size_t>(
+    ::memset(&_impl_.unwrap_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.reverse_addons_east_) -
         reinterpret_cast<char*>(&_impl_.unwrap_)) + sizeof(_impl_.reverse_addons_east_));
   }
   if (cached_has_bits & 0x00ff0000u) {
-    ::memset(&_impl_.reverse_addons_west_, 0, static_cast<size_t>(
+    ::memset(&_impl_.reverse_addons_west_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.deco_kit_) -
         reinterpret_cast<char*>(&_impl_.reverse_addons_west_)) + sizeof(_impl_.deco_kit_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlags::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional .otclient.protobuf.appearances.AppearanceFlagBank bank = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
-          ptr = ctx->ParseMessage(_internal_mutable_bank(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool clip = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_clip(&_impl_._has_bits_);
-          _impl_.clip_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool bottom = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_bottom(&_impl_._has_bits_);
-          _impl_.bottom_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool top = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          _Internal::set_has_top(&_impl_._has_bits_);
-          _impl_.top_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool container = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          _Internal::set_has_container(&_impl_._has_bits_);
-          _impl_.container_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool cumulative = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
-          _Internal::set_has_cumulative(&_impl_._has_bits_);
-          _impl_.cumulative_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool usable = 7;
-      case 7:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
-          _Internal::set_has_usable(&_impl_._has_bits_);
-          _impl_.usable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool forceuse = 8;
-      case 8:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
-          _Internal::set_has_forceuse(&_impl_._has_bits_);
-          _impl_.forceuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool multiuse = 9;
-      case 9:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 72)) {
-          _Internal::set_has_multiuse(&_impl_._has_bits_);
-          _impl_.multiuse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagWrite write = 10;
-      case 10:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 82)) {
-          ptr = ctx->ParseMessage(_internal_mutable_write(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
-      case 11:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 90)) {
-          ptr = ctx->ParseMessage(_internal_mutable_write_once(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool liquidpool = 12;
-      case 12:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 96)) {
-          _Internal::set_has_liquidpool(&_impl_._has_bits_);
-          _impl_.liquidpool_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool unpass = 13;
-      case 13:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 104)) {
-          _Internal::set_has_unpass(&_impl_._has_bits_);
-          _impl_.unpass_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool unmove = 14;
-      case 14:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 112)) {
-          _Internal::set_has_unmove(&_impl_._has_bits_);
-          _impl_.unmove_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool unsight = 15;
-      case 15:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 120)) {
-          _Internal::set_has_unsight(&_impl_._has_bits_);
-          _impl_.unsight_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool avoid = 16;
-      case 16:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 128)) {
-          _Internal::set_has_avoid(&_impl_._has_bits_);
-          _impl_.avoid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool no_movement_animation = 17;
-      case 17:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 136)) {
-          _Internal::set_has_no_movement_animation(&_impl_._has_bits_);
-          _impl_.no_movement_animation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool take = 18;
-      case 18:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 144)) {
-          _Internal::set_has_take(&_impl_._has_bits_);
-          _impl_.take_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool liquidcontainer = 19;
-      case 19:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 152)) {
-          _Internal::set_has_liquidcontainer(&_impl_._has_bits_);
-          _impl_.liquidcontainer_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool hang = 20;
-      case 20:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 160)) {
-          _Internal::set_has_hang(&_impl_._has_bits_);
-          _impl_.hang_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagHook hook = 21;
-      case 21:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 170)) {
-          ptr = ctx->ParseMessage(_internal_mutable_hook(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool rotate = 22;
-      case 22:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 176)) {
-          _Internal::set_has_rotate(&_impl_._has_bits_);
-          _impl_.rotate_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagLight light = 23;
-      case 23:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 186)) {
-          ptr = ctx->ParseMessage(_internal_mutable_light(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool dont_hide = 24;
-      case 24:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 192)) {
-          _Internal::set_has_dont_hide(&_impl_._has_bits_);
-          _impl_.dont_hide_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool translucent = 25;
-      case 25:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 200)) {
-          _Internal::set_has_translucent(&_impl_._has_bits_);
-          _impl_.translucent_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagShift shift = 26;
-      case 26:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 210)) {
-          ptr = ctx->ParseMessage(_internal_mutable_shift(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagHeight height = 27;
-      case 27:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 218)) {
-          ptr = ctx->ParseMessage(_internal_mutable_height(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool lying_object = 28;
-      case 28:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 224)) {
-          _Internal::set_has_lying_object(&_impl_._has_bits_);
-          _impl_.lying_object_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool animate_always = 29;
-      case 29:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 232)) {
-          _Internal::set_has_animate_always(&_impl_._has_bits_);
-          _impl_.animate_always_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagAutomap automap = 30;
-      case 30:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 242)) {
-          ptr = ctx->ParseMessage(_internal_mutable_automap(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
-      case 31:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 250)) {
-          ptr = ctx->ParseMessage(_internal_mutable_lenshelp(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool fullbank = 32;
-      case 32:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 0)) {
-          _Internal::set_has_fullbank(&_impl_._has_bits_);
-          _impl_.fullbank_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool ignore_look = 33;
-      case 33:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_ignore_look(&_impl_._has_bits_);
-          _impl_.ignore_look_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagClothes clothes = 34;
-      case 34:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          ptr = ctx->ParseMessage(_internal_mutable_clothes(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagDefaultAction default_action = 35;
-      case 35:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
-          ptr = ctx->ParseMessage(_internal_mutable_default_action(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagMarket market = 36;
-      case 36:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
-          ptr = ctx->ParseMessage(_internal_mutable_market(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool wrap = 37;
-      case 37:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          _Internal::set_has_wrap(&_impl_._has_bits_);
-          _impl_.wrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool unwrap = 38;
-      case 38:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
-          _Internal::set_has_unwrap(&_impl_._has_bits_);
-          _impl_.unwrap_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool topeffect = 39;
-      case 39:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
-          _Internal::set_has_topeffect(&_impl_._has_bits_);
-          _impl_.topeffect_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
-      case 40:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
-          ptr -= 2;
-          do {
-            ptr += 2;
-            ptr = ctx->ParseMessage(_internal_add_npcsaledata(), ptr);
-            CHK_(ptr);
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<322>(ptr));
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
-      case 41:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 74)) {
-          ptr = ctx->ParseMessage(_internal_mutable_changedtoexpire(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool corpse = 42;
-      case 42:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 80)) {
-          _Internal::set_has_corpse(&_impl_._has_bits_);
-          _impl_.corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool player_corpse = 43;
-      case 43:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 88)) {
-          _Internal::set_has_player_corpse(&_impl_._has_bits_);
-          _impl_.player_corpse_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
-      case 44:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 98)) {
-          ptr = ctx->ParseMessage(_internal_mutable_cyclopediaitem(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool ammo = 45;
-      case 45:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 104)) {
-          _Internal::set_has_ammo(&_impl_._has_bits_);
-          _impl_.ammo_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool show_off_socket = 46;
-      case 46:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 112)) {
-          _Internal::set_has_show_off_socket(&_impl_._has_bits_);
-          _impl_.show_off_socket_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool reportable = 47;
-      case 47:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 120)) {
-          _Internal::set_has_reportable(&_impl_._has_bits_);
-          _impl_.reportable_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.AppearanceFlagUpgradeClassification upgradeclassification = 48;
-      case 48:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 130)) {
-          ptr = ctx->ParseMessage(_internal_mutable_upgradeclassification(), ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool reverse_addons_east = 49;
-      case 49:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 136)) {
-          _Internal::set_has_reverse_addons_east(&_impl_._has_bits_);
-          _impl_.reverse_addons_east_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool reverse_addons_west = 50;
-      case 50:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 144)) {
-          _Internal::set_has_reverse_addons_west(&_impl_._has_bits_);
-          _impl_.reverse_addons_west_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool reverse_addons_south = 51;
-      case 51:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 152)) {
-          _Internal::set_has_reverse_addons_south(&_impl_._has_bits_);
-          _impl_.reverse_addons_south_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool reverse_addons_north = 52;
-      case 52:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 160)) {
-          _Internal::set_has_reverse_addons_north(&_impl_._has_bits_);
-          _impl_.reverse_addons_north_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool wearout = 53;
-      case 53:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 168)) {
-          _Internal::set_has_wearout(&_impl_._has_bits_);
-          _impl_.wearout_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool clockexpire = 54;
-      case 54:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 176)) {
-          _Internal::set_has_clockexpire(&_impl_._has_bits_);
-          _impl_.clockexpire_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool expire = 55;
-      case 55:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 184)) {
-          _Internal::set_has_expire(&_impl_._has_bits_);
-          _impl_.expire_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool expirestop = 56;
-      case 56:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 192)) {
-          _Internal::set_has_expirestop(&_impl_._has_bits_);
-          _impl_.expirestop_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional bool deco_kit = 57;
-      case 57:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 200)) {
-          _Internal::set_has_deco_kit(&_impl_._has_bits_);
-          _impl_.deco_kit_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
+const char* AppearanceFlags::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlags::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<5, 57, 16, 0, 9> AppearanceFlags::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_._has_bits_),
+    0, // no _extensions_
+    57, 248,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    0,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    57,  // num_field_entries
+    16,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_AppearanceFlags_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagBank bank = 1;
+    {::_pbi::TcParser::FastMtS1,
+     {10, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.bank_)}},
+    // optional bool clip = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.clip_), 15>(),
+     {16, 15, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.clip_)}},
+    // optional bool bottom = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.bottom_), 16>(),
+     {24, 16, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.bottom_)}},
+    // optional bool top = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.top_), 17>(),
+     {32, 17, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.top_)}},
+    // optional bool container = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.container_), 18>(),
+     {40, 18, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.container_)}},
+    // optional bool cumulative = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.cumulative_), 19>(),
+     {48, 19, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.cumulative_)}},
+    // optional bool usable = 7;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.usable_), 20>(),
+     {56, 20, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.usable_)}},
+    // optional bool forceuse = 8;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.forceuse_), 21>(),
+     {64, 21, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.forceuse_)}},
+    // optional bool multiuse = 9;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.multiuse_), 22>(),
+     {72, 22, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.multiuse_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagWrite write = 10;
+    {::_pbi::TcParser::FastMtS1,
+     {82, 1, 1, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.write_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
+    {::_pbi::TcParser::FastMtS1,
+     {90, 2, 2, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.write_once_)}},
+    // optional bool liquidpool = 12;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.liquidpool_), 23>(),
+     {96, 23, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.liquidpool_)}},
+    // optional bool unpass = 13;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.unpass_), 24>(),
+     {104, 24, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.unpass_)}},
+    // optional bool unmove = 14;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.unmove_), 25>(),
+     {112, 25, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.unmove_)}},
+    // optional bool unsight = 15;
+    {::_pbi::TcParser::SingularVarintNoZag1<bool, offsetof(AppearanceFlags, _impl_.unsight_), 26>(),
+     {120, 26, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.unsight_)}},
+    // optional bool avoid = 16;
+    {::_pbi::TcParser::FastV8S2,
+     {384, 27, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.avoid_)}},
+    // optional bool no_movement_animation = 17;
+    {::_pbi::TcParser::FastV8S2,
+     {392, 28, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.no_movement_animation_)}},
+    // optional bool take = 18;
+    {::_pbi::TcParser::FastV8S2,
+     {400, 29, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.take_)}},
+    // optional bool liquidcontainer = 19;
+    {::_pbi::TcParser::FastV8S2,
+     {408, 30, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.liquidcontainer_)}},
+    // optional bool hang = 20;
+    {::_pbi::TcParser::FastV8S2,
+     {416, 31, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.hang_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagHook hook = 21;
+    {::_pbi::TcParser::FastMtS2,
+     {426, 3, 3, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.hook_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagLight light = 23;
+    {::_pbi::TcParser::FastMtS2,
+     {442, 4, 4, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.light_)}},
+    // repeated .otclient.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
+    {::_pbi::TcParser::FastMtR2,
+     {706, 63, 12, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.npcsaledata_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
+    {::_pbi::TcParser::FastMtS2,
+     {714, 12, 13, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.changedtoexpire_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagShift shift = 26;
+    {::_pbi::TcParser::FastMtS2,
+     {466, 5, 5, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.shift_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagHeight height = 27;
+    {::_pbi::TcParser::FastMtS2,
+     {474, 6, 6, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.height_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
+    {::_pbi::TcParser::FastMtS2,
+     {738, 13, 14, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.cyclopediaitem_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagAutomap automap = 30;
+    {::_pbi::TcParser::FastMtS2,
+     {498, 7, 7, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.automap_)}},
+    // optional .otclient.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
+    {::_pbi::TcParser::FastMtS2,
+     {506, 8, 8, PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.lenshelp_)}},
+  }}, {{
+    33, 0, 2,
+    0, 32, 65024, 48,
+    65535, 65535
+  }}, {{
+    // optional .otclient.protobuf.appearances.AppearanceFlagBank bank = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.bank_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool clip = 2;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.clip_), _Internal::kHasBitsOffset + 15, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool bottom = 3;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.bottom_), _Internal::kHasBitsOffset + 16, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool top = 4;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.top_), _Internal::kHasBitsOffset + 17, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool container = 5;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.container_), _Internal::kHasBitsOffset + 18, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool cumulative = 6;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.cumulative_), _Internal::kHasBitsOffset + 19, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool usable = 7;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.usable_), _Internal::kHasBitsOffset + 20, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool forceuse = 8;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.forceuse_), _Internal::kHasBitsOffset + 21, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool multiuse = 9;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.multiuse_), _Internal::kHasBitsOffset + 22, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagWrite write = 10;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.write_), _Internal::kHasBitsOffset + 1, 1,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.write_once_), _Internal::kHasBitsOffset + 2, 2,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool liquidpool = 12;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.liquidpool_), _Internal::kHasBitsOffset + 23, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool unpass = 13;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.unpass_), _Internal::kHasBitsOffset + 24, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool unmove = 14;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.unmove_), _Internal::kHasBitsOffset + 25, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool unsight = 15;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.unsight_), _Internal::kHasBitsOffset + 26, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool avoid = 16;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.avoid_), _Internal::kHasBitsOffset + 27, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool no_movement_animation = 17;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.no_movement_animation_), _Internal::kHasBitsOffset + 28, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool take = 18;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.take_), _Internal::kHasBitsOffset + 29, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool liquidcontainer = 19;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.liquidcontainer_), _Internal::kHasBitsOffset + 30, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool hang = 20;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.hang_), _Internal::kHasBitsOffset + 31, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagHook hook = 21;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.hook_), _Internal::kHasBitsOffset + 3, 3,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool rotate = 22;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.rotate_), _Internal::kHasBitsOffset + 32, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagLight light = 23;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.light_), _Internal::kHasBitsOffset + 4, 4,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool dont_hide = 24;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.dont_hide_), _Internal::kHasBitsOffset + 33, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool translucent = 25;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.translucent_), _Internal::kHasBitsOffset + 34, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagShift shift = 26;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.shift_), _Internal::kHasBitsOffset + 5, 5,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagHeight height = 27;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.height_), _Internal::kHasBitsOffset + 6, 6,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool lying_object = 28;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.lying_object_), _Internal::kHasBitsOffset + 35, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool animate_always = 29;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.animate_always_), _Internal::kHasBitsOffset + 36, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagAutomap automap = 30;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.automap_), _Internal::kHasBitsOffset + 7, 7,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.lenshelp_), _Internal::kHasBitsOffset + 8, 8,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool fullbank = 32;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.fullbank_), _Internal::kHasBitsOffset + 37, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool ignore_look = 33;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.ignore_look_), _Internal::kHasBitsOffset + 38, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagClothes clothes = 34;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.clothes_), _Internal::kHasBitsOffset + 9, 9,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagDefaultAction default_action = 35;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.default_action_), _Internal::kHasBitsOffset + 10, 10,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagMarket market = 36;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.market_), _Internal::kHasBitsOffset + 11, 11,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool wrap = 37;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.wrap_), _Internal::kHasBitsOffset + 39, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool unwrap = 38;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.unwrap_), _Internal::kHasBitsOffset + 40, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool topeffect = 39;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.topeffect_), _Internal::kHasBitsOffset + 41, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // repeated .otclient.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.npcsaledata_), -1, 12,
+    (0 | ::_fl::kFcRepeated | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.changedtoexpire_), _Internal::kHasBitsOffset + 12, 13,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool corpse = 42;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.corpse_), _Internal::kHasBitsOffset + 42, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool player_corpse = 43;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.player_corpse_), _Internal::kHasBitsOffset + 43, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.cyclopediaitem_), _Internal::kHasBitsOffset + 13, 14,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool ammo = 45;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.ammo_), _Internal::kHasBitsOffset + 44, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool show_off_socket = 46;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.show_off_socket_), _Internal::kHasBitsOffset + 45, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool reportable = 47;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.reportable_), _Internal::kHasBitsOffset + 46, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional .otclient.protobuf.appearances.AppearanceFlagUpgradeClassification upgradeclassification = 48;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.upgradeclassification_), _Internal::kHasBitsOffset + 14, 15,
+    (0 | ::_fl::kFcOptional | ::_fl::kMessage | ::_fl::kTvTable)},
+    // optional bool reverse_addons_east = 49;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.reverse_addons_east_), _Internal::kHasBitsOffset + 47, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool reverse_addons_west = 50;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.reverse_addons_west_), _Internal::kHasBitsOffset + 48, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool reverse_addons_south = 51;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.reverse_addons_south_), _Internal::kHasBitsOffset + 49, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool reverse_addons_north = 52;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.reverse_addons_north_), _Internal::kHasBitsOffset + 50, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool wearout = 53;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.wearout_), _Internal::kHasBitsOffset + 51, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool clockexpire = 54;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.clockexpire_), _Internal::kHasBitsOffset + 52, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool expire = 55;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.expire_), _Internal::kHasBitsOffset + 53, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool expirestop = 56;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.expirestop_), _Internal::kHasBitsOffset + 54, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+    // optional bool deco_kit = 57;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.deco_kit_), _Internal::kHasBitsOffset + 55, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kBool)},
+  }}, {{
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagBank>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagWrite>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagWriteOnce>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagHook>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagLight>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagShift>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagHeight>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagAutomap>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagLenshelp>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagClothes>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagDefaultAction>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagMarket>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagNPC>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagChangedToExpire>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagCyclopedia>()},
+    {::_pbi::TcParser::GetTable<::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification>()},
+  }}, {{
+  }},
+};
+
+::uint8_t* AppearanceFlags::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlags)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagBank bank = 1;
   if (cached_has_bits & 0x00000001u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(1, _Internal::bank(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        1, _Internal::bank(this),
         _Internal::bank(this).GetCachedSize(), target, stream);
   }
 
   // optional bool clip = 2;
   if (cached_has_bits & 0x00008000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(2, this->_internal_clip(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        2, this->_internal_clip(), target);
   }
 
   // optional bool bottom = 3;
   if (cached_has_bits & 0x00010000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(3, this->_internal_bottom(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        3, this->_internal_bottom(), target);
   }
 
   // optional bool top = 4;
   if (cached_has_bits & 0x00020000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(4, this->_internal_top(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        4, this->_internal_top(), target);
   }
 
   // optional bool container = 5;
   if (cached_has_bits & 0x00040000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(5, this->_internal_container(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        5, this->_internal_container(), target);
   }
 
   // optional bool cumulative = 6;
   if (cached_has_bits & 0x00080000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(6, this->_internal_cumulative(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        6, this->_internal_cumulative(), target);
   }
 
   // optional bool usable = 7;
   if (cached_has_bits & 0x00100000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(7, this->_internal_usable(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        7, this->_internal_usable(), target);
   }
 
   // optional bool forceuse = 8;
   if (cached_has_bits & 0x00200000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(8, this->_internal_forceuse(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        8, this->_internal_forceuse(), target);
   }
 
   // optional bool multiuse = 9;
   if (cached_has_bits & 0x00400000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(9, this->_internal_multiuse(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        9, this->_internal_multiuse(), target);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlagWrite write = 10;
   if (cached_has_bits & 0x00000002u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(10, _Internal::write(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        10, _Internal::write(this),
         _Internal::write(this).GetCachedSize(), target, stream);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
   if (cached_has_bits & 0x00000004u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(11, _Internal::write_once(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        11, _Internal::write_once(this),
         _Internal::write_once(this).GetCachedSize(), target, stream);
   }
 
   // optional bool liquidpool = 12;
   if (cached_has_bits & 0x00800000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(12, this->_internal_liquidpool(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        12, this->_internal_liquidpool(), target);
   }
 
   // optional bool unpass = 13;
   if (cached_has_bits & 0x01000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(13, this->_internal_unpass(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        13, this->_internal_unpass(), target);
   }
 
   // optional bool unmove = 14;
   if (cached_has_bits & 0x02000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(14, this->_internal_unmove(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        14, this->_internal_unmove(), target);
   }
 
   // optional bool unsight = 15;
   if (cached_has_bits & 0x04000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(15, this->_internal_unsight(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        15, this->_internal_unsight(), target);
   }
 
   // optional bool avoid = 16;
   if (cached_has_bits & 0x08000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(16, this->_internal_avoid(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        16, this->_internal_avoid(), target);
   }
 
   // optional bool no_movement_animation = 17;
   if (cached_has_bits & 0x10000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(17, this->_internal_no_movement_animation(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        17, this->_internal_no_movement_animation(), target);
   }
 
   // optional bool take = 18;
   if (cached_has_bits & 0x20000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(18, this->_internal_take(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        18, this->_internal_take(), target);
   }
 
   // optional bool liquidcontainer = 19;
   if (cached_has_bits & 0x40000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(19, this->_internal_liquidcontainer(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        19, this->_internal_liquidcontainer(), target);
   }
 
   // optional bool hang = 20;
   if (cached_has_bits & 0x80000000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(20, this->_internal_hang(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        20, this->_internal_hang(), target);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlagHook hook = 21;
   if (cached_has_bits & 0x00000008u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(21, _Internal::hook(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        21, _Internal::hook(this),
         _Internal::hook(this).GetCachedSize(), target, stream);
   }
 
@@ -5164,14 +4856,15 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool rotate = 22;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(22, this->_internal_rotate(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        22, this->_internal_rotate(), target);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagLight light = 23;
   if (cached_has_bits & 0x00000010u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(23, _Internal::light(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        23, _Internal::light(this),
         _Internal::light(this).GetCachedSize(), target, stream);
   }
 
@@ -5179,27 +4872,29 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool dont_hide = 24;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(24, this->_internal_dont_hide(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        24, this->_internal_dont_hide(), target);
   }
 
   // optional bool translucent = 25;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(25, this->_internal_translucent(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        25, this->_internal_translucent(), target);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagShift shift = 26;
   if (cached_has_bits & 0x00000020u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(26, _Internal::shift(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        26, _Internal::shift(this),
         _Internal::shift(this).GetCachedSize(), target, stream);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlagHeight height = 27;
   if (cached_has_bits & 0x00000040u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(27, _Internal::height(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        27, _Internal::height(this),
         _Internal::height(this).GetCachedSize(), target, stream);
   }
 
@@ -5207,27 +4902,29 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool lying_object = 28;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(28, this->_internal_lying_object(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        28, this->_internal_lying_object(), target);
   }
 
   // optional bool animate_always = 29;
   if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(29, this->_internal_animate_always(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        29, this->_internal_animate_always(), target);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagAutomap automap = 30;
   if (cached_has_bits & 0x00000080u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(30, _Internal::automap(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        30, _Internal::automap(this),
         _Internal::automap(this).GetCachedSize(), target, stream);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
   if (cached_has_bits & 0x00000100u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(31, _Internal::lenshelp(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        31, _Internal::lenshelp(this),
         _Internal::lenshelp(this).GetCachedSize(), target, stream);
   }
 
@@ -5235,34 +4932,36 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool fullbank = 32;
   if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(32, this->_internal_fullbank(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        32, this->_internal_fullbank(), target);
   }
 
   // optional bool ignore_look = 33;
   if (cached_has_bits & 0x00000040u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(33, this->_internal_ignore_look(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        33, this->_internal_ignore_look(), target);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagClothes clothes = 34;
   if (cached_has_bits & 0x00000200u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(34, _Internal::clothes(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        34, _Internal::clothes(this),
         _Internal::clothes(this).GetCachedSize(), target, stream);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlagDefaultAction default_action = 35;
   if (cached_has_bits & 0x00000400u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(35, _Internal::default_action(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        35, _Internal::default_action(this),
         _Internal::default_action(this).GetCachedSize(), target, stream);
   }
 
   // optional .otclient.protobuf.appearances.AppearanceFlagMarket market = 36;
   if (cached_has_bits & 0x00000800u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(36, _Internal::market(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        36, _Internal::market(this),
         _Internal::market(this).GetCachedSize(), target, stream);
   }
 
@@ -5270,34 +4969,37 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool wrap = 37;
   if (cached_has_bits & 0x00000080u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(37, this->_internal_wrap(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        37, this->_internal_wrap(), target);
   }
 
   // optional bool unwrap = 38;
   if (cached_has_bits & 0x00000100u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(38, this->_internal_unwrap(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        38, this->_internal_unwrap(), target);
   }
 
   // optional bool topeffect = 39;
   if (cached_has_bits & 0x00000200u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(39, this->_internal_topeffect(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        39, this->_internal_topeffect(), target);
   }
 
   // repeated .otclient.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
   for (unsigned i = 0,
       n = static_cast<unsigned>(this->_internal_npcsaledata_size()); i < n; i++) {
-    const auto& repfield = this->_internal_npcsaledata(i);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+    const auto& repfield = this->_internal_npcsaledata().Get(i);
+    target = ::google::protobuf::internal::WireFormatLite::
         InternalWriteMessage(40, repfield, repfield.GetCachedSize(), target, stream);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
   if (cached_has_bits & 0x00001000u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(41, _Internal::changedtoexpire(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        41, _Internal::changedtoexpire(this),
         _Internal::changedtoexpire(this).GetCachedSize(), target, stream);
   }
 
@@ -5305,20 +5007,22 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool corpse = 42;
   if (cached_has_bits & 0x00000400u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(42, this->_internal_corpse(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        42, this->_internal_corpse(), target);
   }
 
   // optional bool player_corpse = 43;
   if (cached_has_bits & 0x00000800u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(43, this->_internal_player_corpse(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        43, this->_internal_player_corpse(), target);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
   if (cached_has_bits & 0x00002000u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(44, _Internal::cyclopediaitem(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        44, _Internal::cyclopediaitem(this),
         _Internal::cyclopediaitem(this).GetCachedSize(), target, stream);
   }
 
@@ -5326,26 +5030,29 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool ammo = 45;
   if (cached_has_bits & 0x00001000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(45, this->_internal_ammo(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        45, this->_internal_ammo(), target);
   }
 
   // optional bool show_off_socket = 46;
   if (cached_has_bits & 0x00002000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(46, this->_internal_show_off_socket(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        46, this->_internal_show_off_socket(), target);
   }
 
   // optional bool reportable = 47;
   if (cached_has_bits & 0x00004000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(47, this->_internal_reportable(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        47, this->_internal_reportable(), target);
   }
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.AppearanceFlagUpgradeClassification upgradeclassification = 48;
   if (cached_has_bits & 0x00004000u) {
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(48, _Internal::upgradeclassification(this),
+    target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessage(
+        48, _Internal::upgradeclassification(this),
         _Internal::upgradeclassification(this).GetCachedSize(), target, stream);
   }
 
@@ -5353,276 +5060,270 @@ uint8_t* AppearanceFlags::_InternalSerialize(
   // optional bool reverse_addons_east = 49;
   if (cached_has_bits & 0x00008000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(49, this->_internal_reverse_addons_east(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        49, this->_internal_reverse_addons_east(), target);
   }
 
   // optional bool reverse_addons_west = 50;
   if (cached_has_bits & 0x00010000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(50, this->_internal_reverse_addons_west(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        50, this->_internal_reverse_addons_west(), target);
   }
 
   // optional bool reverse_addons_south = 51;
   if (cached_has_bits & 0x00020000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(51, this->_internal_reverse_addons_south(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        51, this->_internal_reverse_addons_south(), target);
   }
 
   // optional bool reverse_addons_north = 52;
   if (cached_has_bits & 0x00040000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(52, this->_internal_reverse_addons_north(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        52, this->_internal_reverse_addons_north(), target);
   }
 
   // optional bool wearout = 53;
   if (cached_has_bits & 0x00080000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(53, this->_internal_wearout(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        53, this->_internal_wearout(), target);
   }
 
   // optional bool clockexpire = 54;
   if (cached_has_bits & 0x00100000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(54, this->_internal_clockexpire(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        54, this->_internal_clockexpire(), target);
   }
 
   // optional bool expire = 55;
   if (cached_has_bits & 0x00200000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(55, this->_internal_expire(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        55, this->_internal_expire(), target);
   }
 
   // optional bool expirestop = 56;
   if (cached_has_bits & 0x00400000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(56, this->_internal_expirestop(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        56, this->_internal_expirestop(), target);
   }
 
   // optional bool deco_kit = 57;
   if (cached_has_bits & 0x00800000u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteBoolToArray(57, this->_internal_deco_kit(), target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(
+        57, this->_internal_deco_kit(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlags)
   return target;
 }
 
-size_t AppearanceFlags::ByteSizeLong() const {
+::size_t AppearanceFlags::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlags)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .otclient.protobuf.appearances.AppearanceFlagNPC npcsaledata = 40;
   total_size += 2UL * this->_internal_npcsaledata_size();
-  for (const auto& msg : this->_impl_.npcsaledata_) {
+  for (const auto& msg : this->_internal_npcsaledata()) {
     total_size +=
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(msg);
   }
-
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x000000ffu) {
     // optional .otclient.protobuf.appearances.AppearanceFlagBank bank = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.bank_);
+      total_size +=
+          1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.bank_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagWrite write = 10;
     if (cached_has_bits & 0x00000002u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.write_);
+      total_size +=
+          1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.write_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagWriteOnce write_once = 11;
     if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.write_once_);
+      total_size +=
+          1 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.write_once_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagHook hook = 21;
     if (cached_has_bits & 0x00000008u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.hook_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.hook_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagLight light = 23;
     if (cached_has_bits & 0x00000010u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.light_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.light_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagShift shift = 26;
     if (cached_has_bits & 0x00000020u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.shift_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.shift_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagHeight height = 27;
     if (cached_has_bits & 0x00000040u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.height_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.height_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagAutomap automap = 30;
     if (cached_has_bits & 0x00000080u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.automap_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.automap_);
     }
 
   }
   if (cached_has_bits & 0x0000ff00u) {
     // optional .otclient.protobuf.appearances.AppearanceFlagLenshelp lenshelp = 31;
     if (cached_has_bits & 0x00000100u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.lenshelp_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.lenshelp_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagClothes clothes = 34;
     if (cached_has_bits & 0x00000200u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.clothes_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.clothes_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagDefaultAction default_action = 35;
     if (cached_has_bits & 0x00000400u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.default_action_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.default_action_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagMarket market = 36;
     if (cached_has_bits & 0x00000800u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.market_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.market_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagChangedToExpire changedtoexpire = 41;
     if (cached_has_bits & 0x00001000u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.changedtoexpire_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.changedtoexpire_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagCyclopedia cyclopediaitem = 44;
     if (cached_has_bits & 0x00002000u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.cyclopediaitem_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.cyclopediaitem_);
     }
 
     // optional .otclient.protobuf.appearances.AppearanceFlagUpgradeClassification upgradeclassification = 48;
     if (cached_has_bits & 0x00004000u) {
-      total_size += 2 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-          *_impl_.upgradeclassification_);
+      total_size +=
+          2 + ::google::protobuf::internal::WireFormatLite::MessageSize(*_impl_.upgradeclassification_);
     }
 
     // optional bool clip = 2;
     if (cached_has_bits & 0x00008000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
   }
   if (cached_has_bits & 0x00ff0000u) {
     // optional bool bottom = 3;
     if (cached_has_bits & 0x00010000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool top = 4;
     if (cached_has_bits & 0x00020000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool container = 5;
     if (cached_has_bits & 0x00040000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool cumulative = 6;
     if (cached_has_bits & 0x00080000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool usable = 7;
     if (cached_has_bits & 0x00100000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool forceuse = 8;
     if (cached_has_bits & 0x00200000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool multiuse = 9;
     if (cached_has_bits & 0x00400000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool liquidpool = 12;
     if (cached_has_bits & 0x00800000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
   }
   if (cached_has_bits & 0xff000000u) {
     // optional bool unpass = 13;
     if (cached_has_bits & 0x01000000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool unmove = 14;
     if (cached_has_bits & 0x02000000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool unsight = 15;
     if (cached_has_bits & 0x04000000u) {
-      total_size += 1 + 1;
+      total_size += 2;
     }
 
     // optional bool avoid = 16;
     if (cached_has_bits & 0x08000000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool no_movement_animation = 17;
     if (cached_has_bits & 0x10000000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool take = 18;
     if (cached_has_bits & 0x20000000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool liquidcontainer = 19;
     if (cached_has_bits & 0x40000000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool hang = 20;
     if (cached_has_bits & 0x80000000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
   }
@@ -5630,148 +5331,150 @@ size_t AppearanceFlags::ByteSizeLong() const {
   if (cached_has_bits & 0x000000ffu) {
     // optional bool rotate = 22;
     if (cached_has_bits & 0x00000001u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool dont_hide = 24;
     if (cached_has_bits & 0x00000002u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool translucent = 25;
     if (cached_has_bits & 0x00000004u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool lying_object = 28;
     if (cached_has_bits & 0x00000008u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool animate_always = 29;
     if (cached_has_bits & 0x00000010u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool fullbank = 32;
     if (cached_has_bits & 0x00000020u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool ignore_look = 33;
     if (cached_has_bits & 0x00000040u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool wrap = 37;
     if (cached_has_bits & 0x00000080u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
   }
   if (cached_has_bits & 0x0000ff00u) {
     // optional bool unwrap = 38;
     if (cached_has_bits & 0x00000100u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool topeffect = 39;
     if (cached_has_bits & 0x00000200u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool corpse = 42;
     if (cached_has_bits & 0x00000400u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool player_corpse = 43;
     if (cached_has_bits & 0x00000800u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool ammo = 45;
     if (cached_has_bits & 0x00001000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool show_off_socket = 46;
     if (cached_has_bits & 0x00002000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool reportable = 47;
     if (cached_has_bits & 0x00004000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool reverse_addons_east = 49;
     if (cached_has_bits & 0x00008000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
   }
   if (cached_has_bits & 0x00ff0000u) {
     // optional bool reverse_addons_west = 50;
     if (cached_has_bits & 0x00010000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool reverse_addons_south = 51;
     if (cached_has_bits & 0x00020000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool reverse_addons_north = 52;
     if (cached_has_bits & 0x00040000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool wearout = 53;
     if (cached_has_bits & 0x00080000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool clockexpire = 54;
     if (cached_has_bits & 0x00100000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool expire = 55;
     if (cached_has_bits & 0x00200000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool expirestop = 56;
     if (cached_has_bits & 0x00400000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
     // optional bool deco_kit = 57;
     if (cached_has_bits & 0x00800000u) {
-      total_size += 2 + 1;
+      total_size += 3;
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlags::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlags::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlags::_class_data_ = {
+    AppearanceFlags::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlags::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlags::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlags::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlags::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlags*>(&to_msg);
   auto& from = static_cast<const AppearanceFlags&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlags)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_impl_.npcsaledata_.MergeFrom(from._impl_.npcsaledata_);
+  _this->_internal_mutable_npcsaledata()->MergeFrom(
+      from._internal_npcsaledata());
   cached_has_bits = from._impl_._has_bits_[0];
   if (cached_has_bits & 0x000000ffu) {
     if (cached_has_bits & 0x00000001u) {
@@ -5977,7 +5680,7 @@ void AppearanceFlags::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
     }
     _this->_impl_._has_bits_[1] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlags::CopyFrom(const AppearanceFlags& from) {
@@ -5987,17 +5690,20 @@ void AppearanceFlags::CopyFrom(const AppearanceFlags& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlags::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlags::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlags::InternalSwap(AppearanceFlags* other) {
+::_pbi::CachedSize* AppearanceFlags::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlags::InternalSwap(AppearanceFlags* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   swap(_impl_._has_bits_[1], other->_impl_._has_bits_[1]);
   _impl_.npcsaledata_.InternalSwap(&other->_impl_.npcsaledata_);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.deco_kit_)
       + sizeof(AppearanceFlags::_impl_.deco_kit_)
       - PROTOBUF_FIELD_OFFSET(AppearanceFlags, _impl_.bank_)>(
@@ -6005,177 +5711,163 @@ void AppearanceFlags::InternalSwap(AppearanceFlags* other) {
           reinterpret_cast<char*>(&other->_impl_.bank_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlags::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlags::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[8]);
 }
-
 // ===================================================================
 
 class AppearanceFlagUpgradeClassification::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagUpgradeClassification>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagUpgradeClassification, _impl_._has_bits_);
   static void set_has_upgrade_classification(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagUpgradeClassification::AppearanceFlagUpgradeClassification(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagUpgradeClassification::AppearanceFlagUpgradeClassification(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
 }
-AppearanceFlagUpgradeClassification::AppearanceFlagUpgradeClassification(const AppearanceFlagUpgradeClassification& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagUpgradeClassification* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.upgrade_classification_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.upgrade_classification_ = from._impl_.upgrade_classification_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
+AppearanceFlagUpgradeClassification::AppearanceFlagUpgradeClassification(
+    ::google::protobuf::Arena* arena, const AppearanceFlagUpgradeClassification& from)
+    : AppearanceFlagUpgradeClassification(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagUpgradeClassification::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagUpgradeClassification::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.upgrade_classification_){0u}
-  };
+inline void AppearanceFlagUpgradeClassification::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.upgrade_classification_ = {};
 }
-
 AppearanceFlagUpgradeClassification::~AppearanceFlagUpgradeClassification() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagUpgradeClassification::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagUpgradeClassification::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagUpgradeClassification::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagUpgradeClassification::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.upgrade_classification_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagUpgradeClassification::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 upgrade_classification = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_upgrade_classification(&has_bits);
-          _impl_.upgrade_classification_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagUpgradeClassification::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagUpgradeClassification::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagUpgradeClassification::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagUpgradeClassification, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagUpgradeClassification_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 upgrade_classification = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagUpgradeClassification, _impl_.upgrade_classification_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagUpgradeClassification, _impl_.upgrade_classification_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 upgrade_classification = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagUpgradeClassification, _impl_.upgrade_classification_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagUpgradeClassification::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 upgrade_classification = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_upgrade_classification(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_upgrade_classification(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
   return target;
 }
 
-size_t AppearanceFlagUpgradeClassification::ByteSizeLong() const {
+::size_t AppearanceFlagUpgradeClassification::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 upgrade_classification = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_upgrade_classification());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_upgrade_classification());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagUpgradeClassification::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagUpgradeClassification::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagUpgradeClassification::_class_data_ = {
+    AppearanceFlagUpgradeClassification::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagUpgradeClassification::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagUpgradeClassification::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagUpgradeClassification::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagUpgradeClassification::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagUpgradeClassification*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagUpgradeClassification&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagUpgradeClassification)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_upgrade_classification()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_upgrade_classification(from._internal_upgrade_classification());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagUpgradeClassification::CopyFrom(const AppearanceFlagUpgradeClassification& from) {
@@ -6185,188 +5877,177 @@ void AppearanceFlagUpgradeClassification::CopyFrom(const AppearanceFlagUpgradeCl
   MergeFrom(from);
 }
 
-bool AppearanceFlagUpgradeClassification::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagUpgradeClassification::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagUpgradeClassification::InternalSwap(AppearanceFlagUpgradeClassification* other) {
+::_pbi::CachedSize* AppearanceFlagUpgradeClassification::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagUpgradeClassification::InternalSwap(AppearanceFlagUpgradeClassification* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.upgrade_classification_, other->_impl_.upgrade_classification_);
+        swap(_impl_.upgrade_classification_, other->_impl_.upgrade_classification_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagUpgradeClassification::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagUpgradeClassification::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[9]);
 }
-
 // ===================================================================
 
 class AppearanceFlagBank::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagBank>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagBank, _impl_._has_bits_);
   static void set_has_waypoints(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagBank::AppearanceFlagBank(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagBank::AppearanceFlagBank(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagBank)
 }
-AppearanceFlagBank::AppearanceFlagBank(const AppearanceFlagBank& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagBank* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.waypoints_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.waypoints_ = from._impl_.waypoints_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagBank)
+AppearanceFlagBank::AppearanceFlagBank(
+    ::google::protobuf::Arena* arena, const AppearanceFlagBank& from)
+    : AppearanceFlagBank(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagBank::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagBank::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.waypoints_){0u}
-  };
+inline void AppearanceFlagBank::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.waypoints_ = {};
 }
-
 AppearanceFlagBank::~AppearanceFlagBank() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagBank)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagBank::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagBank::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagBank::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagBank::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagBank)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.waypoints_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagBank::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 waypoints = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_waypoints(&has_bits);
-          _impl_.waypoints_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagBank::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagBank::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagBank::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagBank, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagBank_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 waypoints = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagBank, _impl_.waypoints_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagBank, _impl_.waypoints_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 waypoints = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagBank, _impl_.waypoints_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagBank::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagBank)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 waypoints = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_waypoints(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_waypoints(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagBank)
   return target;
 }
 
-size_t AppearanceFlagBank::ByteSizeLong() const {
+::size_t AppearanceFlagBank::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagBank)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 waypoints = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_waypoints());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_waypoints());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagBank::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagBank::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagBank::_class_data_ = {
+    AppearanceFlagBank::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagBank::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagBank::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagBank::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagBank::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagBank*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagBank&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagBank)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_waypoints()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_waypoints(from._internal_waypoints());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagBank::CopyFrom(const AppearanceFlagBank& from) {
@@ -6376,188 +6057,177 @@ void AppearanceFlagBank::CopyFrom(const AppearanceFlagBank& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagBank::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagBank::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagBank::InternalSwap(AppearanceFlagBank* other) {
+::_pbi::CachedSize* AppearanceFlagBank::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagBank::InternalSwap(AppearanceFlagBank* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.waypoints_, other->_impl_.waypoints_);
+        swap(_impl_.waypoints_, other->_impl_.waypoints_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagBank::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagBank::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[10]);
 }
-
 // ===================================================================
 
 class AppearanceFlagWrite::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagWrite>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagWrite, _impl_._has_bits_);
   static void set_has_max_text_length(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagWrite::AppearanceFlagWrite(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagWrite::AppearanceFlagWrite(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagWrite)
 }
-AppearanceFlagWrite::AppearanceFlagWrite(const AppearanceFlagWrite& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagWrite* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.max_text_length_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.max_text_length_ = from._impl_.max_text_length_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagWrite)
+AppearanceFlagWrite::AppearanceFlagWrite(
+    ::google::protobuf::Arena* arena, const AppearanceFlagWrite& from)
+    : AppearanceFlagWrite(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagWrite::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagWrite::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.max_text_length_){0u}
-  };
+inline void AppearanceFlagWrite::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.max_text_length_ = {};
 }
-
 AppearanceFlagWrite::~AppearanceFlagWrite() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagWrite)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagWrite::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagWrite::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagWrite::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagWrite::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagWrite)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.max_text_length_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagWrite::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 max_text_length = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_max_text_length(&has_bits);
-          _impl_.max_text_length_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagWrite::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagWrite::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagWrite::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagWrite, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagWrite_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 max_text_length = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagWrite, _impl_.max_text_length_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagWrite, _impl_.max_text_length_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 max_text_length = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagWrite, _impl_.max_text_length_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagWrite::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagWrite)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 max_text_length = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_max_text_length(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_max_text_length(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagWrite)
   return target;
 }
 
-size_t AppearanceFlagWrite::ByteSizeLong() const {
+::size_t AppearanceFlagWrite::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagWrite)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 max_text_length = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_max_text_length());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_max_text_length());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagWrite::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagWrite::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagWrite::_class_data_ = {
+    AppearanceFlagWrite::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagWrite::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagWrite::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagWrite::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagWrite::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagWrite*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagWrite&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagWrite)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_max_text_length()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_max_text_length(from._internal_max_text_length());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagWrite::CopyFrom(const AppearanceFlagWrite& from) {
@@ -6567,188 +6237,177 @@ void AppearanceFlagWrite::CopyFrom(const AppearanceFlagWrite& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagWrite::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagWrite::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagWrite::InternalSwap(AppearanceFlagWrite* other) {
+::_pbi::CachedSize* AppearanceFlagWrite::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagWrite::InternalSwap(AppearanceFlagWrite* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.max_text_length_, other->_impl_.max_text_length_);
+        swap(_impl_.max_text_length_, other->_impl_.max_text_length_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagWrite::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagWrite::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[11]);
 }
-
 // ===================================================================
 
 class AppearanceFlagWriteOnce::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagWriteOnce>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagWriteOnce, _impl_._has_bits_);
   static void set_has_max_text_length_once(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagWriteOnce::AppearanceFlagWriteOnce(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagWriteOnce::AppearanceFlagWriteOnce(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
 }
-AppearanceFlagWriteOnce::AppearanceFlagWriteOnce(const AppearanceFlagWriteOnce& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagWriteOnce* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.max_text_length_once_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.max_text_length_once_ = from._impl_.max_text_length_once_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
+AppearanceFlagWriteOnce::AppearanceFlagWriteOnce(
+    ::google::protobuf::Arena* arena, const AppearanceFlagWriteOnce& from)
+    : AppearanceFlagWriteOnce(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagWriteOnce::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagWriteOnce::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.max_text_length_once_){0u}
-  };
+inline void AppearanceFlagWriteOnce::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.max_text_length_once_ = {};
 }
-
 AppearanceFlagWriteOnce::~AppearanceFlagWriteOnce() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagWriteOnce::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagWriteOnce::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagWriteOnce::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagWriteOnce::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.max_text_length_once_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagWriteOnce::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 max_text_length_once = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_max_text_length_once(&has_bits);
-          _impl_.max_text_length_once_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagWriteOnce::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagWriteOnce::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagWriteOnce::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagWriteOnce, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagWriteOnce_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 max_text_length_once = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagWriteOnce, _impl_.max_text_length_once_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagWriteOnce, _impl_.max_text_length_once_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 max_text_length_once = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagWriteOnce, _impl_.max_text_length_once_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagWriteOnce::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 max_text_length_once = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_max_text_length_once(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_max_text_length_once(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
   return target;
 }
 
-size_t AppearanceFlagWriteOnce::ByteSizeLong() const {
+::size_t AppearanceFlagWriteOnce::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 max_text_length_once = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_max_text_length_once());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_max_text_length_once());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagWriteOnce::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagWriteOnce::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagWriteOnce::_class_data_ = {
+    AppearanceFlagWriteOnce::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagWriteOnce::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagWriteOnce::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagWriteOnce::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagWriteOnce::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagWriteOnce*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagWriteOnce&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagWriteOnce)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_max_text_length_once()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_max_text_length_once(from._internal_max_text_length_once());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagWriteOnce::CopyFrom(const AppearanceFlagWriteOnce& from) {
@@ -6758,28 +6417,32 @@ void AppearanceFlagWriteOnce::CopyFrom(const AppearanceFlagWriteOnce& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagWriteOnce::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagWriteOnce::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagWriteOnce::InternalSwap(AppearanceFlagWriteOnce* other) {
+::_pbi::CachedSize* AppearanceFlagWriteOnce::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagWriteOnce::InternalSwap(AppearanceFlagWriteOnce* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.max_text_length_once_, other->_impl_.max_text_length_once_);
+        swap(_impl_.max_text_length_once_, other->_impl_.max_text_length_once_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagWriteOnce::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagWriteOnce::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[12]);
 }
-
 // ===================================================================
 
 class AppearanceFlagLight::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagLight>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_._has_bits_);
   static void set_has_brightness(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -6788,154 +6451,136 @@ class AppearanceFlagLight::_Internal {
   }
 };
 
-AppearanceFlagLight::AppearanceFlagLight(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagLight::AppearanceFlagLight(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagLight)
 }
-AppearanceFlagLight::AppearanceFlagLight(const AppearanceFlagLight& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagLight* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.brightness_){}
-    , decltype(_impl_.color_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.brightness_, &from._impl_.brightness_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.color_) -
-    reinterpret_cast<char*>(&_impl_.brightness_)) + sizeof(_impl_.color_));
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagLight)
+AppearanceFlagLight::AppearanceFlagLight(
+    ::google::protobuf::Arena* arena, const AppearanceFlagLight& from)
+    : AppearanceFlagLight(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagLight::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagLight::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.brightness_){0u}
-    , decltype(_impl_.color_){0u}
-  };
+inline void AppearanceFlagLight::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, brightness_),
+           0,
+           offsetof(Impl_, color_) -
+               offsetof(Impl_, brightness_) +
+               sizeof(Impl_::color_));
 }
-
 AppearanceFlagLight::~AppearanceFlagLight() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagLight)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagLight::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagLight::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagLight::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagLight::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagLight)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
-    ::memset(&_impl_.brightness_, 0, static_cast<size_t>(
+    ::memset(&_impl_.brightness_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.color_) -
         reinterpret_cast<char*>(&_impl_.brightness_)) + sizeof(_impl_.color_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagLight::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 brightness = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_brightness(&has_bits);
-          _impl_.brightness_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 color = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_color(&has_bits);
-          _impl_.color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagLight::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagLight::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 0, 2> AppearanceFlagLight::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagLight_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 color = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagLight, _impl_.color_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_.color_)}},
+    // optional uint32 brightness = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagLight, _impl_.brightness_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_.brightness_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 brightness = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_.brightness_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 color = 2;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_.color_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagLight::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagLight)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 brightness = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_brightness(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_brightness(), target);
   }
 
   // optional uint32 color = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_color(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_color(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagLight)
   return target;
 }
 
-size_t AppearanceFlagLight::ByteSizeLong() const {
+::size_t AppearanceFlagLight::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagLight)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -6943,31 +6588,34 @@ size_t AppearanceFlagLight::ByteSizeLong() const {
   if (cached_has_bits & 0x00000003u) {
     // optional uint32 brightness = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_brightness());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_brightness());
     }
 
     // optional uint32 color = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_color());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_color());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagLight::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagLight::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagLight::_class_data_ = {
+    AppearanceFlagLight::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagLight::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagLight::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagLight::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagLight::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagLight*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagLight&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagLight)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -6980,7 +6628,7 @@ void AppearanceFlagLight::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, co
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagLight::CopyFrom(const AppearanceFlagLight& from) {
@@ -6990,15 +6638,18 @@ void AppearanceFlagLight::CopyFrom(const AppearanceFlagLight& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagLight::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagLight::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagLight::InternalSwap(AppearanceFlagLight* other) {
+::_pbi::CachedSize* AppearanceFlagLight::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagLight::InternalSwap(AppearanceFlagLight* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_.color_)
       + sizeof(AppearanceFlagLight::_impl_.color_)
       - PROTOBUF_FIELD_OFFSET(AppearanceFlagLight, _impl_.brightness_)>(
@@ -7006,177 +6657,163 @@ void AppearanceFlagLight::InternalSwap(AppearanceFlagLight* other) {
           reinterpret_cast<char*>(&other->_impl_.brightness_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagLight::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagLight::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[13]);
 }
-
 // ===================================================================
 
 class AppearanceFlagHeight::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagHeight>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagHeight, _impl_._has_bits_);
   static void set_has_elevation(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagHeight::AppearanceFlagHeight(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagHeight::AppearanceFlagHeight(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagHeight)
 }
-AppearanceFlagHeight::AppearanceFlagHeight(const AppearanceFlagHeight& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagHeight* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.elevation_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.elevation_ = from._impl_.elevation_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagHeight)
+AppearanceFlagHeight::AppearanceFlagHeight(
+    ::google::protobuf::Arena* arena, const AppearanceFlagHeight& from)
+    : AppearanceFlagHeight(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagHeight::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagHeight::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.elevation_){0u}
-  };
+inline void AppearanceFlagHeight::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.elevation_ = {};
 }
-
 AppearanceFlagHeight::~AppearanceFlagHeight() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagHeight)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagHeight::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagHeight::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagHeight::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagHeight::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagHeight)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.elevation_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagHeight::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 elevation = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_elevation(&has_bits);
-          _impl_.elevation_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagHeight::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagHeight::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagHeight::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagHeight, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagHeight_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 elevation = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagHeight, _impl_.elevation_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagHeight, _impl_.elevation_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 elevation = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagHeight, _impl_.elevation_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagHeight::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagHeight)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 elevation = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_elevation(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_elevation(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagHeight)
   return target;
 }
 
-size_t AppearanceFlagHeight::ByteSizeLong() const {
+::size_t AppearanceFlagHeight::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagHeight)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 elevation = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_elevation());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_elevation());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagHeight::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagHeight::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagHeight::_class_data_ = {
+    AppearanceFlagHeight::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagHeight::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagHeight::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagHeight::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagHeight::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagHeight*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagHeight&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagHeight)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_elevation()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_elevation(from._internal_elevation());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagHeight::CopyFrom(const AppearanceFlagHeight& from) {
@@ -7186,28 +6823,32 @@ void AppearanceFlagHeight::CopyFrom(const AppearanceFlagHeight& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagHeight::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagHeight::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagHeight::InternalSwap(AppearanceFlagHeight* other) {
+::_pbi::CachedSize* AppearanceFlagHeight::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagHeight::InternalSwap(AppearanceFlagHeight* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.elevation_, other->_impl_.elevation_);
+        swap(_impl_.elevation_, other->_impl_.elevation_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagHeight::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagHeight::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[14]);
 }
-
 // ===================================================================
 
 class AppearanceFlagShift::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagShift>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_._has_bits_);
   static void set_has_x(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -7216,154 +6857,136 @@ class AppearanceFlagShift::_Internal {
   }
 };
 
-AppearanceFlagShift::AppearanceFlagShift(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagShift::AppearanceFlagShift(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagShift)
 }
-AppearanceFlagShift::AppearanceFlagShift(const AppearanceFlagShift& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagShift* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.x_){}
-    , decltype(_impl_.y_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.x_, &from._impl_.x_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.y_) -
-    reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.y_));
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagShift)
+AppearanceFlagShift::AppearanceFlagShift(
+    ::google::protobuf::Arena* arena, const AppearanceFlagShift& from)
+    : AppearanceFlagShift(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagShift::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagShift::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.x_){0u}
-    , decltype(_impl_.y_){0u}
-  };
+inline void AppearanceFlagShift::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, x_),
+           0,
+           offsetof(Impl_, y_) -
+               offsetof(Impl_, x_) +
+               sizeof(Impl_::y_));
 }
-
 AppearanceFlagShift::~AppearanceFlagShift() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagShift)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagShift::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagShift::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagShift::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagShift::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagShift)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000003u) {
-    ::memset(&_impl_.x_, 0, static_cast<size_t>(
+    ::memset(&_impl_.x_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.y_) -
         reinterpret_cast<char*>(&_impl_.x_)) + sizeof(_impl_.y_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagShift::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 x = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_x(&has_bits);
-          _impl_.x_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 y = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_y(&has_bits);
-          _impl_.y_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagShift::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagShift::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 0, 0, 2> AppearanceFlagShift::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagShift_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 y = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagShift, _impl_.y_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_.y_)}},
+    // optional uint32 x = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagShift, _impl_.x_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_.x_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 x = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_.x_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 y = 2;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_.y_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagShift::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagShift)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 x = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_x(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_x(), target);
   }
 
   // optional uint32 y = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_y(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_y(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagShift)
   return target;
 }
 
-size_t AppearanceFlagShift::ByteSizeLong() const {
+::size_t AppearanceFlagShift::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagShift)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7371,31 +6994,34 @@ size_t AppearanceFlagShift::ByteSizeLong() const {
   if (cached_has_bits & 0x00000003u) {
     // optional uint32 x = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_x());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_x());
     }
 
     // optional uint32 y = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_y());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_y());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagShift::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagShift::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagShift::_class_data_ = {
+    AppearanceFlagShift::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagShift::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagShift::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagShift::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagShift::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagShift*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagShift&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagShift)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -7408,7 +7034,7 @@ void AppearanceFlagShift::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, co
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagShift::CopyFrom(const AppearanceFlagShift& from) {
@@ -7418,15 +7044,18 @@ void AppearanceFlagShift::CopyFrom(const AppearanceFlagShift& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagShift::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagShift::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagShift::InternalSwap(AppearanceFlagShift* other) {
+::_pbi::CachedSize* AppearanceFlagShift::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagShift::InternalSwap(AppearanceFlagShift* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_.y_)
       + sizeof(AppearanceFlagShift::_impl_.y_)
       - PROTOBUF_FIELD_OFFSET(AppearanceFlagShift, _impl_.x_)>(
@@ -7434,177 +7063,163 @@ void AppearanceFlagShift::InternalSwap(AppearanceFlagShift* other) {
           reinterpret_cast<char*>(&other->_impl_.x_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagShift::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagShift::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[15]);
 }
-
 // ===================================================================
 
 class AppearanceFlagClothes::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagClothes>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagClothes, _impl_._has_bits_);
   static void set_has_slot(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagClothes::AppearanceFlagClothes(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagClothes::AppearanceFlagClothes(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagClothes)
 }
-AppearanceFlagClothes::AppearanceFlagClothes(const AppearanceFlagClothes& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagClothes* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.slot_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.slot_ = from._impl_.slot_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagClothes)
+AppearanceFlagClothes::AppearanceFlagClothes(
+    ::google::protobuf::Arena* arena, const AppearanceFlagClothes& from)
+    : AppearanceFlagClothes(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagClothes::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagClothes::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.slot_){0u}
-  };
+inline void AppearanceFlagClothes::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.slot_ = {};
 }
-
 AppearanceFlagClothes::~AppearanceFlagClothes() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagClothes)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagClothes::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagClothes::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagClothes::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagClothes::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagClothes)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.slot_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagClothes::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 slot = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_slot(&has_bits);
-          _impl_.slot_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagClothes::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagClothes::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagClothes::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagClothes, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagClothes_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 slot = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagClothes, _impl_.slot_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagClothes, _impl_.slot_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 slot = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagClothes, _impl_.slot_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagClothes::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagClothes)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 slot = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_slot(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_slot(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagClothes)
   return target;
 }
 
-size_t AppearanceFlagClothes::ByteSizeLong() const {
+::size_t AppearanceFlagClothes::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagClothes)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 slot = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_slot());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_slot());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagClothes::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagClothes::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagClothes::_class_data_ = {
+    AppearanceFlagClothes::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagClothes::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagClothes::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagClothes::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagClothes::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagClothes*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagClothes&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagClothes)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_slot()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_slot(from._internal_slot());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagClothes::CopyFrom(const AppearanceFlagClothes& from) {
@@ -7614,162 +7229,144 @@ void AppearanceFlagClothes::CopyFrom(const AppearanceFlagClothes& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagClothes::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagClothes::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagClothes::InternalSwap(AppearanceFlagClothes* other) {
+::_pbi::CachedSize* AppearanceFlagClothes::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagClothes::InternalSwap(AppearanceFlagClothes* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.slot_, other->_impl_.slot_);
+        swap(_impl_.slot_, other->_impl_.slot_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagClothes::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagClothes::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[16]);
 }
-
 // ===================================================================
 
 class AppearanceFlagDefaultAction::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagDefaultAction>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagDefaultAction, _impl_._has_bits_);
   static void set_has_action(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagDefaultAction::AppearanceFlagDefaultAction(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagDefaultAction::AppearanceFlagDefaultAction(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
 }
-AppearanceFlagDefaultAction::AppearanceFlagDefaultAction(const AppearanceFlagDefaultAction& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagDefaultAction* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.action_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.action_ = from._impl_.action_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
+AppearanceFlagDefaultAction::AppearanceFlagDefaultAction(
+    ::google::protobuf::Arena* arena, const AppearanceFlagDefaultAction& from)
+    : AppearanceFlagDefaultAction(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagDefaultAction::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagDefaultAction::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.action_){0}
-  };
+inline void AppearanceFlagDefaultAction::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.action_ = {};
 }
-
 AppearanceFlagDefaultAction::~AppearanceFlagDefaultAction() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagDefaultAction::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagDefaultAction::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagDefaultAction::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagDefaultAction::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.action_ = 0;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagDefaultAction::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional .otclient.protobuf.appearances.PLAYER_ACTION action = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::PLAYER_ACTION_IsValid(val))) {
-            _internal_set_action(static_cast<::otclient::protobuf::appearances::PLAYER_ACTION>(val));
-          } else {
-            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-          }
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagDefaultAction::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagDefaultAction::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 1, 0, 2> AppearanceFlagDefaultAction::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagDefaultAction, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    1,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_AppearanceFlagDefaultAction_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional .otclient.protobuf.appearances.PLAYER_ACTION action = 1;
+    {::_pbi::TcParser::FastEr0S1,
+     {8, 0, 4, PROTOBUF_FIELD_OFFSET(AppearanceFlagDefaultAction, _impl_.action_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional .otclient.protobuf.appearances.PLAYER_ACTION action = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagDefaultAction, _impl_.action_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kEnumRange)},
+  }}, {{
+    {0, 5},
+  }}, {{
+  }},
+};
+
+::uint8_t* AppearanceFlagDefaultAction::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.PLAYER_ACTION action = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      1, this->_internal_action(), target);
+        1, this->_internal_action(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
   return target;
 }
 
-size_t AppearanceFlagDefaultAction::ByteSizeLong() const {
+::size_t AppearanceFlagDefaultAction::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7777,31 +7374,32 @@ size_t AppearanceFlagDefaultAction::ByteSizeLong() const {
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
     total_size += 1 +
-      ::_pbi::WireFormatLite::EnumSize(this->_internal_action());
+                  ::_pbi::WireFormatLite::EnumSize(this->_internal_action());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagDefaultAction::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagDefaultAction::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagDefaultAction::_class_data_ = {
+    AppearanceFlagDefaultAction::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagDefaultAction::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagDefaultAction::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagDefaultAction::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagDefaultAction::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagDefaultAction*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagDefaultAction&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagDefaultAction)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_action()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_action(from._internal_action());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagDefaultAction::CopyFrom(const AppearanceFlagDefaultAction& from) {
@@ -7811,28 +7409,32 @@ void AppearanceFlagDefaultAction::CopyFrom(const AppearanceFlagDefaultAction& fr
   MergeFrom(from);
 }
 
-bool AppearanceFlagDefaultAction::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagDefaultAction::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagDefaultAction::InternalSwap(AppearanceFlagDefaultAction* other) {
+::_pbi::CachedSize* AppearanceFlagDefaultAction::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagDefaultAction::InternalSwap(AppearanceFlagDefaultAction* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   swap(_impl_.action_, other->_impl_.action_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagDefaultAction::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagDefaultAction::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[17]);
 }
-
 // ===================================================================
 
 class AppearanceFlagMarket::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagMarket>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_._has_bits_);
   static void set_has_category(HasBits* has_bits) {
     (*has_bits)[0] |= 16u;
   }
@@ -7850,82 +7452,70 @@ class AppearanceFlagMarket::_Internal {
   }
 };
 
-AppearanceFlagMarket::AppearanceFlagMarket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagMarket::AppearanceFlagMarket(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagMarket)
 }
-AppearanceFlagMarket::AppearanceFlagMarket(const AppearanceFlagMarket& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagMarket* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.restrict_to_profession_){from._impl_.restrict_to_profession_}
-    , decltype(_impl_.name_){}
-    , decltype(_impl_.trade_as_object_id_){}
-    , decltype(_impl_.show_as_object_id_){}
-    , decltype(_impl_.minimum_level_){}
-    , decltype(_impl_.category_){}};
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagMarket::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        restrict_to_profession_{visibility, arena, from.restrict_to_profession_},
+        name_(arena, from.name_) {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (from._internal_has_name()) {
-    _this->_impl_.name_.Set(from._internal_name(), 
-      _this->GetArenaForAllocation());
-  }
-  ::memcpy(&_impl_.trade_as_object_id_, &from._impl_.trade_as_object_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.category_) -
-    reinterpret_cast<char*>(&_impl_.trade_as_object_id_)) + sizeof(_impl_.category_));
+AppearanceFlagMarket::AppearanceFlagMarket(
+    ::google::protobuf::Arena* arena,
+    const AppearanceFlagMarket& from)
+    : ::google::protobuf::Message(arena) {
+  AppearanceFlagMarket* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, trade_as_object_id_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, trade_as_object_id_),
+           offsetof(Impl_, category_) -
+               offsetof(Impl_, trade_as_object_id_) +
+               sizeof(Impl_::category_));
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagMarket)
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagMarket::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        restrict_to_profession_{visibility, arena},
+        name_(arena),
+        category_{static_cast< ::otclient::protobuf::appearances::ITEM_CATEGORY >(1)} {}
 
-inline void AppearanceFlagMarket::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.restrict_to_profession_){arena}
-    , decltype(_impl_.name_){}
-    , decltype(_impl_.trade_as_object_id_){0u}
-    , decltype(_impl_.show_as_object_id_){0u}
-    , decltype(_impl_.minimum_level_){0u}
-    , decltype(_impl_.category_){1}
-  };
-  _impl_.name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+inline void AppearanceFlagMarket::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, trade_as_object_id_),
+           0,
+           offsetof(Impl_, minimum_level_) -
+               offsetof(Impl_, trade_as_object_id_) +
+               sizeof(Impl_::minimum_level_));
 }
-
 AppearanceFlagMarket::~AppearanceFlagMarket() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagMarket)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagMarket::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  _impl_.restrict_to_profession_.~RepeatedField();
+  ABSL_DCHECK(GetArena() == nullptr);
   _impl_.name_.Destroy();
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagMarket::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagMarket::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagMarket::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagMarket)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -7935,244 +7525,222 @@ void AppearanceFlagMarket::Clear() {
     _impl_.name_.ClearNonDefaultToEmpty();
   }
   if (cached_has_bits & 0x0000001eu) {
-    ::memset(&_impl_.trade_as_object_id_, 0, static_cast<size_t>(
+    ::memset(&_impl_.trade_as_object_id_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.minimum_level_) -
         reinterpret_cast<char*>(&_impl_.trade_as_object_id_)) + sizeof(_impl_.minimum_level_));
     _impl_.category_ = 1;
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagMarket::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional .otclient.protobuf.appearances.ITEM_CATEGORY category = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::ITEM_CATEGORY_IsValid(val))) {
-            _internal_set_category(static_cast<::otclient::protobuf::appearances::ITEM_CATEGORY>(val));
-          } else {
-            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-          }
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 trade_as_object_id = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_trade_as_object_id(&has_bits);
-          _impl_.trade_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 show_as_object_id = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_show_as_object_id(&has_bits);
-          _impl_.show_as_object_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional string name = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
-          auto str = _internal_mutable_name();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          #ifndef NDEBUG
-          ::_pbi::VerifyUTF8(str, "otclient.protobuf.appearances.AppearanceFlagMarket.name");
-          #endif  // !NDEBUG
-        } else
-          goto handle_unusual;
-        continue;
-      // repeated .otclient.protobuf.appearances.PLAYER_PROFESSION restrict_to_profession = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          ptr -= 1;
-          do {
-            ptr += 1;
-            uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-            CHK_(ptr);
-            if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::PLAYER_PROFESSION_IsValid(val))) {
-              _internal_add_restrict_to_profession(static_cast<::otclient::protobuf::appearances::PLAYER_PROFESSION>(val));
-            } else {
-              ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(5, val, mutable_unknown_fields());
-            }
-            if (!ctx->DataAvailable(ptr)) break;
-          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<40>(ptr));
-        } else if (static_cast<uint8_t>(tag) == 42) {
-          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(_internal_mutable_restrict_to_profession(), ptr, ctx, ::otclient::protobuf::appearances::PLAYER_PROFESSION_IsValid, &_internal_metadata_, 5);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 minimum_level = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
-          _Internal::set_has_minimum_level(&has_bits);
-          _impl_.minimum_level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagMarket::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagMarket::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 6, 2, 63, 2> AppearanceFlagMarket::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_._has_bits_),
+    0, // no _extensions_
+    6, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967232,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    6,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_AppearanceFlagMarket_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional .otclient.protobuf.appearances.ITEM_CATEGORY category = 1;
+    {::_pbi::TcParser::FastEr1S1,
+     {8, 4, 24, PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.category_)}},
+    // optional uint32 trade_as_object_id = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagMarket, _impl_.trade_as_object_id_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.trade_as_object_id_)}},
+    // optional uint32 show_as_object_id = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagMarket, _impl_.show_as_object_id_), 2>(),
+     {24, 2, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.show_as_object_id_)}},
+    // optional string name = 4;
+    {::_pbi::TcParser::FastSS1,
+     {34, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.name_)}},
+    // repeated .otclient.protobuf.appearances.PLAYER_PROFESSION restrict_to_profession = 5;
+    {::_pbi::TcParser::FastEvR1,
+     {40, 63, 1, PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.restrict_to_profession_)}},
+    // optional uint32 minimum_level = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagMarket, _impl_.minimum_level_), 3>(),
+     {48, 3, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.minimum_level_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional .otclient.protobuf.appearances.ITEM_CATEGORY category = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.category_), _Internal::kHasBitsOffset + 4, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kEnumRange)},
+    // optional uint32 trade_as_object_id = 2;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.trade_as_object_id_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 show_as_object_id = 3;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.show_as_object_id_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional string name = 4;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.name_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kRawString | ::_fl::kRepAString)},
+    // repeated .otclient.protobuf.appearances.PLAYER_PROFESSION restrict_to_profession = 5;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.restrict_to_profession_), -1, 1,
+    (0 | ::_fl::kFcRepeated | ::_fl::kEnum)},
+    // optional uint32 minimum_level = 6;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.minimum_level_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }}, {{
+    {1, 24},
+    {::_pbi::FieldAuxEnumData{}, ::otclient::protobuf::appearances::PLAYER_PROFESSION_internal_data_},
+  }}, {{
+    "\62\0\0\0\4\0\0\0"
+    "otclient.protobuf.appearances.AppearanceFlagMarket"
+    "name"
+  }},
+};
+
+::uint8_t* AppearanceFlagMarket::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagMarket)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.ITEM_CATEGORY category = 1;
   if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      1, this->_internal_category(), target);
+        1, this->_internal_category(), target);
   }
 
   // optional uint32 trade_as_object_id = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_trade_as_object_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_trade_as_object_id(), target);
   }
 
   // optional uint32 show_as_object_id = 3;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_show_as_object_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        3, this->_internal_show_as_object_id(), target);
   }
 
   // optional string name = 4;
   if (cached_has_bits & 0x00000001u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "otclient.protobuf.appearances.AppearanceFlagMarket.name");
-    target = stream->WriteStringMaybeAliased(
-        4, this->_internal_name(), target);
+    const std::string& _s = this->_internal_name();
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(_s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormat::SERIALIZE,
+                                "otclient.protobuf.appearances.AppearanceFlagMarket.name");
+    target = stream->WriteStringMaybeAliased(4, _s, target);
   }
 
   // repeated .otclient.protobuf.appearances.PLAYER_PROFESSION restrict_to_profession = 5;
-  for (int i = 0, n = this->_internal_restrict_to_profession_size(); i < n; i++) {
+  for (int i = 0, n = this->_internal_restrict_to_profession_size(); i < n; ++i) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-        5, this->_internal_restrict_to_profession(i), target);
+        5, static_cast<::otclient::protobuf::appearances::PLAYER_PROFESSION>(this->_internal_restrict_to_profession().Get(i)),
+        target);
   }
 
   // optional uint32 minimum_level = 6;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(6, this->_internal_minimum_level(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        6, this->_internal_minimum_level(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagMarket)
   return target;
 }
 
-size_t AppearanceFlagMarket::ByteSizeLong() const {
+::size_t AppearanceFlagMarket::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagMarket)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // repeated .otclient.protobuf.appearances.PLAYER_PROFESSION restrict_to_profession = 5;
   {
-    size_t data_size = 0;
-    unsigned int count = static_cast<unsigned int>(this->_internal_restrict_to_profession_size());for (unsigned int i = 0; i < count; i++) {
-      data_size += ::_pbi::WireFormatLite::EnumSize(
-        this->_internal_restrict_to_profession(static_cast<int>(i)));
-    }
-    total_size += (1UL * count) + data_size;
-  }
+    std::size_t data_size = 0;
+    auto count = static_cast<std::size_t>(this->_internal_restrict_to_profession_size());
 
+    for (std::size_t i = 0; i < count; ++i) {
+      data_size += ::_pbi::WireFormatLite::EnumSize(
+          this->_internal_restrict_to_profession().Get(static_cast<int>(i)));
+    }
+    total_size += data_size;
+    total_size += std::size_t{1} * count;
+  }
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     // optional string name = 4;
     if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_name());
+      total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                      this->_internal_name());
     }
 
     // optional uint32 trade_as_object_id = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_trade_as_object_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_trade_as_object_id());
     }
 
     // optional uint32 show_as_object_id = 3;
     if (cached_has_bits & 0x00000004u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_show_as_object_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_show_as_object_id());
     }
 
     // optional uint32 minimum_level = 6;
     if (cached_has_bits & 0x00000008u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_minimum_level());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_minimum_level());
     }
 
     // optional .otclient.protobuf.appearances.ITEM_CATEGORY category = 1;
     if (cached_has_bits & 0x00000010u) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::EnumSize(this->_internal_category());
+                    ::_pbi::WireFormatLite::EnumSize(this->_internal_category());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagMarket::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagMarket::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagMarket::_class_data_ = {
+    AppearanceFlagMarket::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagMarket::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagMarket::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagMarket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagMarket::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagMarket*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagMarket&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagMarket)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  _this->_impl_.restrict_to_profession_.MergeFrom(from._impl_.restrict_to_profession_);
+  _this->_internal_mutable_restrict_to_profession()->MergeFrom(from._internal_restrict_to_profession());
   cached_has_bits = from._impl_._has_bits_[0];
   if (cached_has_bits & 0x0000001fu) {
     if (cached_has_bits & 0x00000001u) {
@@ -8192,7 +7760,7 @@ void AppearanceFlagMarket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, c
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagMarket::CopyFrom(const AppearanceFlagMarket& from) {
@@ -8202,41 +7770,41 @@ void AppearanceFlagMarket::CopyFrom(const AppearanceFlagMarket& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagMarket::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagMarket::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagMarket::InternalSwap(AppearanceFlagMarket* other) {
+::_pbi::CachedSize* AppearanceFlagMarket::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagMarket::InternalSwap(AppearanceFlagMarket* PROTOBUF_RESTRICT other) {
   using std::swap;
-  auto* lhs_arena = GetArenaForAllocation();
-  auto* rhs_arena = other->GetArenaForAllocation();
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
   _impl_.restrict_to_profession_.InternalSwap(&other->_impl_.restrict_to_profession_);
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.name_, lhs_arena,
-      &other->_impl_.name_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.minimum_level_)
-      + sizeof(AppearanceFlagMarket::_impl_.minimum_level_)
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.category_)
+      + sizeof(AppearanceFlagMarket::_impl_.category_)
       - PROTOBUF_FIELD_OFFSET(AppearanceFlagMarket, _impl_.trade_as_object_id_)>(
           reinterpret_cast<char*>(&_impl_.trade_as_object_id_),
           reinterpret_cast<char*>(&other->_impl_.trade_as_object_id_));
-  swap(_impl_.category_, other->_impl_.category_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagMarket::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagMarket::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[18]);
 }
-
 // ===================================================================
 
 class AppearanceFlagNPC::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagNPC>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_._has_bits_);
   static void set_has_name(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -8257,107 +7825,73 @@ class AppearanceFlagNPC::_Internal {
   }
 };
 
-AppearanceFlagNPC::AppearanceFlagNPC(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagNPC::AppearanceFlagNPC(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagNPC)
 }
-AppearanceFlagNPC::AppearanceFlagNPC(const AppearanceFlagNPC& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagNPC* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.name_){}
-    , decltype(_impl_.location_){}
-    , decltype(_impl_.currency_quest_flag_display_name_){}
-    , decltype(_impl_.sale_price_){}
-    , decltype(_impl_.buy_price_){}
-    , decltype(_impl_.currency_object_type_id_){}};
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagNPC::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility, ::google::protobuf::Arena* arena,
+    const Impl_& from)
+      : _has_bits_{from._has_bits_},
+        _cached_size_{0},
+        name_(arena, from.name_),
+        location_(arena, from.location_),
+        currency_quest_flag_display_name_(arena, from.currency_quest_flag_display_name_) {}
 
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _impl_.name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (from._internal_has_name()) {
-    _this->_impl_.name_.Set(from._internal_name(), 
-      _this->GetArenaForAllocation());
-  }
-  _impl_.location_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.location_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (from._internal_has_location()) {
-    _this->_impl_.location_.Set(from._internal_location(), 
-      _this->GetArenaForAllocation());
-  }
-  _impl_.currency_quest_flag_display_name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.currency_quest_flag_display_name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (from._internal_has_currency_quest_flag_display_name()) {
-    _this->_impl_.currency_quest_flag_display_name_.Set(from._internal_currency_quest_flag_display_name(), 
-      _this->GetArenaForAllocation());
-  }
-  ::memcpy(&_impl_.sale_price_, &from._impl_.sale_price_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.currency_object_type_id_) -
-    reinterpret_cast<char*>(&_impl_.sale_price_)) + sizeof(_impl_.currency_object_type_id_));
+AppearanceFlagNPC::AppearanceFlagNPC(
+    ::google::protobuf::Arena* arena,
+    const AppearanceFlagNPC& from)
+    : ::google::protobuf::Message(arena) {
+  AppearanceFlagNPC* const _this = this;
+  (void)_this;
+  _internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(
+      from._internal_metadata_);
+  new (&_impl_) Impl_(internal_visibility(), arena, from._impl_);
+  ::memcpy(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, sale_price_),
+           reinterpret_cast<const char *>(&from._impl_) +
+               offsetof(Impl_, sale_price_),
+           offsetof(Impl_, currency_object_type_id_) -
+               offsetof(Impl_, sale_price_) +
+               sizeof(Impl_::currency_object_type_id_));
+
   // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagNPC)
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagNPC::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        name_(arena),
+        location_(arena),
+        currency_quest_flag_display_name_(arena) {}
 
-inline void AppearanceFlagNPC::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.name_){}
-    , decltype(_impl_.location_){}
-    , decltype(_impl_.currency_quest_flag_display_name_){}
-    , decltype(_impl_.sale_price_){0u}
-    , decltype(_impl_.buy_price_){0u}
-    , decltype(_impl_.currency_object_type_id_){0u}
-  };
-  _impl_.name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.location_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.location_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  _impl_.currency_quest_flag_display_name_.InitDefault();
-  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    _impl_.currency_quest_flag_display_name_.Set("", GetArenaForAllocation());
-  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+inline void AppearanceFlagNPC::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, sale_price_),
+           0,
+           offsetof(Impl_, currency_object_type_id_) -
+               offsetof(Impl_, sale_price_) +
+               sizeof(Impl_::currency_object_type_id_));
 }
-
 AppearanceFlagNPC::~AppearanceFlagNPC() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagNPC)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagNPC::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
   _impl_.name_.Destroy();
   _impl_.location_.Destroy();
   _impl_.currency_quest_flag_display_name_.Destroy();
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagNPC::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagNPC::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagNPC::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagNPC)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8374,176 +7908,155 @@ void AppearanceFlagNPC::Clear() {
     }
   }
   if (cached_has_bits & 0x00000038u) {
-    ::memset(&_impl_.sale_price_, 0, static_cast<size_t>(
+    ::memset(&_impl_.sale_price_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.currency_object_type_id_) -
         reinterpret_cast<char*>(&_impl_.sale_price_)) + sizeof(_impl_.currency_object_type_id_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagNPC::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional string name = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
-          auto str = _internal_mutable_name();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          #ifndef NDEBUG
-          ::_pbi::VerifyUTF8(str, "otclient.protobuf.appearances.AppearanceFlagNPC.name");
-          #endif  // !NDEBUG
-        } else
-          goto handle_unusual;
-        continue;
-      // optional string location = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
-          auto str = _internal_mutable_location();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          #ifndef NDEBUG
-          ::_pbi::VerifyUTF8(str, "otclient.protobuf.appearances.AppearanceFlagNPC.location");
-          #endif  // !NDEBUG
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 sale_price = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_sale_price(&has_bits);
-          _impl_.sale_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 buy_price = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          _Internal::set_has_buy_price(&has_bits);
-          _impl_.buy_price_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 currency_object_type_id = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          _Internal::set_has_currency_object_type_id(&has_bits);
-          _impl_.currency_object_type_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional string currency_quest_flag_display_name = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
-          auto str = _internal_mutable_currency_quest_flag_display_name();
-          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(ptr);
-          #ifndef NDEBUG
-          ::_pbi::VerifyUTF8(str, "otclient.protobuf.appearances.AppearanceFlagNPC.currency_quest_flag_display_name");
-          #endif  // !NDEBUG
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagNPC::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagNPC::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 6, 0, 100, 2> AppearanceFlagNPC::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_._has_bits_),
+    0, // no _extensions_
+    6, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967232,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    6,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagNPC_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional string name = 1;
+    {::_pbi::TcParser::FastSS1,
+     {10, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.name_)}},
+    // optional string location = 2;
+    {::_pbi::TcParser::FastSS1,
+     {18, 1, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.location_)}},
+    // optional uint32 sale_price = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagNPC, _impl_.sale_price_), 3>(),
+     {24, 3, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.sale_price_)}},
+    // optional uint32 buy_price = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagNPC, _impl_.buy_price_), 4>(),
+     {32, 4, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.buy_price_)}},
+    // optional uint32 currency_object_type_id = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagNPC, _impl_.currency_object_type_id_), 5>(),
+     {40, 5, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.currency_object_type_id_)}},
+    // optional string currency_quest_flag_display_name = 6;
+    {::_pbi::TcParser::FastSS1,
+     {50, 2, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.currency_quest_flag_display_name_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional string name = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.name_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kRawString | ::_fl::kRepAString)},
+    // optional string location = 2;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.location_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kRawString | ::_fl::kRepAString)},
+    // optional uint32 sale_price = 3;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.sale_price_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 buy_price = 4;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.buy_price_), _Internal::kHasBitsOffset + 4, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 currency_object_type_id = 5;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.currency_object_type_id_), _Internal::kHasBitsOffset + 5, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional string currency_quest_flag_display_name = 6;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.currency_quest_flag_display_name_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kRawString | ::_fl::kRepAString)},
+  }},
+  // no aux_entries
+  {{
+    "\57\4\10\0\0\0\40\0"
+    "otclient.protobuf.appearances.AppearanceFlagNPC"
+    "name"
+    "location"
+    "currency_quest_flag_display_name"
+  }},
+};
+
+::uint8_t* AppearanceFlagNPC::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagNPC)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional string name = 1;
   if (cached_has_bits & 0x00000001u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_name().data(), static_cast<int>(this->_internal_name().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "otclient.protobuf.appearances.AppearanceFlagNPC.name");
-    target = stream->WriteStringMaybeAliased(
-        1, this->_internal_name(), target);
+    const std::string& _s = this->_internal_name();
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(_s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormat::SERIALIZE,
+                                "otclient.protobuf.appearances.AppearanceFlagNPC.name");
+    target = stream->WriteStringMaybeAliased(1, _s, target);
   }
 
   // optional string location = 2;
   if (cached_has_bits & 0x00000002u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_location().data(), static_cast<int>(this->_internal_location().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "otclient.protobuf.appearances.AppearanceFlagNPC.location");
-    target = stream->WriteStringMaybeAliased(
-        2, this->_internal_location(), target);
+    const std::string& _s = this->_internal_location();
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(_s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormat::SERIALIZE,
+                                "otclient.protobuf.appearances.AppearanceFlagNPC.location");
+    target = stream->WriteStringMaybeAliased(2, _s, target);
   }
 
   // optional uint32 sale_price = 3;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_sale_price(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        3, this->_internal_sale_price(), target);
   }
 
   // optional uint32 buy_price = 4;
   if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(4, this->_internal_buy_price(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        4, this->_internal_buy_price(), target);
   }
 
   // optional uint32 currency_object_type_id = 5;
   if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(5, this->_internal_currency_object_type_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        5, this->_internal_currency_object_type_id(), target);
   }
 
   // optional string currency_quest_flag_display_name = 6;
   if (cached_has_bits & 0x00000004u) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->_internal_currency_quest_flag_display_name().data(), static_cast<int>(this->_internal_currency_quest_flag_display_name().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::SERIALIZE,
-      "otclient.protobuf.appearances.AppearanceFlagNPC.currency_quest_flag_display_name");
-    target = stream->WriteStringMaybeAliased(
-        6, this->_internal_currency_quest_flag_display_name(), target);
+    const std::string& _s = this->_internal_currency_quest_flag_display_name();
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(_s.data(), static_cast<int>(_s.length()), ::google::protobuf::internal::WireFormat::SERIALIZE,
+                                "otclient.protobuf.appearances.AppearanceFlagNPC.currency_quest_flag_display_name");
+    target = stream->WriteStringMaybeAliased(6, _s, target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagNPC)
   return target;
 }
 
-size_t AppearanceFlagNPC::ByteSizeLong() const {
+::size_t AppearanceFlagNPC::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagNPC)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8551,57 +8064,58 @@ size_t AppearanceFlagNPC::ByteSizeLong() const {
   if (cached_has_bits & 0x0000003fu) {
     // optional string name = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_name());
+      total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                      this->_internal_name());
     }
 
     // optional string location = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_location());
+      total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                      this->_internal_location());
     }
 
     // optional string currency_quest_flag_display_name = 6;
     if (cached_has_bits & 0x00000004u) {
-      total_size += 1 +
-        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-          this->_internal_currency_quest_flag_display_name());
+      total_size += 1 + ::google::protobuf::internal::WireFormatLite::StringSize(
+                                      this->_internal_currency_quest_flag_display_name());
     }
 
     // optional uint32 sale_price = 3;
     if (cached_has_bits & 0x00000008u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_sale_price());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_sale_price());
     }
 
     // optional uint32 buy_price = 4;
     if (cached_has_bits & 0x00000010u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_buy_price());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_buy_price());
     }
 
     // optional uint32 currency_object_type_id = 5;
     if (cached_has_bits & 0x00000020u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_currency_object_type_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_currency_object_type_id());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagNPC::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagNPC::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagNPC::_class_data_ = {
+    AppearanceFlagNPC::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagNPC::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagNPC::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagNPC::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagNPC::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagNPC*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagNPC&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagNPC)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -8626,7 +8140,7 @@ void AppearanceFlagNPC::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, cons
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagNPC::CopyFrom(const AppearanceFlagNPC& from) {
@@ -8636,29 +8150,23 @@ void AppearanceFlagNPC::CopyFrom(const AppearanceFlagNPC& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagNPC::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagNPC::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagNPC::InternalSwap(AppearanceFlagNPC* other) {
+::_pbi::CachedSize* AppearanceFlagNPC::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagNPC::InternalSwap(AppearanceFlagNPC* PROTOBUF_RESTRICT other) {
   using std::swap;
-  auto* lhs_arena = GetArenaForAllocation();
-  auto* rhs_arena = other->GetArenaForAllocation();
+  auto* arena = GetArena();
+  ABSL_DCHECK_EQ(arena, other->GetArena());
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.name_, lhs_arena,
-      &other->_impl_.name_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.location_, lhs_arena,
-      &other->_impl_.location_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
-      &_impl_.currency_quest_flag_display_name_, lhs_arena,
-      &other->_impl_.currency_quest_flag_display_name_, rhs_arena
-  );
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.name_, &other->_impl_.name_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.location_, &other->_impl_.location_, arena);
+  ::_pbi::ArenaStringPtr::InternalSwap(&_impl_.currency_quest_flag_display_name_, &other->_impl_.currency_quest_flag_display_name_, arena);
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.currency_object_type_id_)
       + sizeof(AppearanceFlagNPC::_impl_.currency_object_type_id_)
       - PROTOBUF_FIELD_OFFSET(AppearanceFlagNPC, _impl_.sale_price_)>(
@@ -8666,177 +8174,163 @@ void AppearanceFlagNPC::InternalSwap(AppearanceFlagNPC* other) {
           reinterpret_cast<char*>(&other->_impl_.sale_price_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagNPC::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagNPC::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[19]);
 }
-
 // ===================================================================
 
 class AppearanceFlagAutomap::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagAutomap>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagAutomap, _impl_._has_bits_);
   static void set_has_color(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagAutomap::AppearanceFlagAutomap(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagAutomap::AppearanceFlagAutomap(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagAutomap)
 }
-AppearanceFlagAutomap::AppearanceFlagAutomap(const AppearanceFlagAutomap& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagAutomap* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.color_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.color_ = from._impl_.color_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagAutomap)
+AppearanceFlagAutomap::AppearanceFlagAutomap(
+    ::google::protobuf::Arena* arena, const AppearanceFlagAutomap& from)
+    : AppearanceFlagAutomap(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagAutomap::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagAutomap::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.color_){0u}
-  };
+inline void AppearanceFlagAutomap::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.color_ = {};
 }
-
 AppearanceFlagAutomap::~AppearanceFlagAutomap() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagAutomap)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagAutomap::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagAutomap::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagAutomap::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagAutomap::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.color_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagAutomap::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 color = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_color(&has_bits);
-          _impl_.color_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagAutomap::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagAutomap::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagAutomap::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagAutomap, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagAutomap_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 color = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagAutomap, _impl_.color_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagAutomap, _impl_.color_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 color = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagAutomap, _impl_.color_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagAutomap::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 color = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_color(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_color(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagAutomap)
   return target;
 }
 
-size_t AppearanceFlagAutomap::ByteSizeLong() const {
+::size_t AppearanceFlagAutomap::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 color = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_color());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_color());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagAutomap::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagAutomap::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagAutomap::_class_data_ = {
+    AppearanceFlagAutomap::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagAutomap::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagAutomap::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagAutomap::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagAutomap::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagAutomap*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagAutomap&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagAutomap)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_color()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_color(from._internal_color());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagAutomap::CopyFrom(const AppearanceFlagAutomap& from) {
@@ -8846,28 +8340,32 @@ void AppearanceFlagAutomap::CopyFrom(const AppearanceFlagAutomap& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagAutomap::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagAutomap::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagAutomap::InternalSwap(AppearanceFlagAutomap* other) {
+::_pbi::CachedSize* AppearanceFlagAutomap::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagAutomap::InternalSwap(AppearanceFlagAutomap* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.color_, other->_impl_.color_);
+        swap(_impl_.color_, other->_impl_.color_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagAutomap::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagAutomap::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[20]);
 }
-
 // ===================================================================
 
 class AppearanceFlagHook::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagHook>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_._has_bits_);
   static void set_has_south(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -8876,60 +8374,40 @@ class AppearanceFlagHook::_Internal {
   }
 };
 
-AppearanceFlagHook::AppearanceFlagHook(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagHook::AppearanceFlagHook(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagHook)
 }
-AppearanceFlagHook::AppearanceFlagHook(const AppearanceFlagHook& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagHook* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.south_){}
-    , decltype(_impl_.east_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.south_, &from._impl_.south_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.east_) -
-    reinterpret_cast<char*>(&_impl_.south_)) + sizeof(_impl_.east_));
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagHook)
+AppearanceFlagHook::AppearanceFlagHook(
+    ::google::protobuf::Arena* arena, const AppearanceFlagHook& from)
+    : AppearanceFlagHook(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagHook::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0},
+        south_{static_cast< ::otclient::protobuf::appearances::HOOK_TYPE >(1)},
+        east_{static_cast< ::otclient::protobuf::appearances::HOOK_TYPE >(1)} {}
 
-inline void AppearanceFlagHook::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.south_){1}
-    , decltype(_impl_.east_){1}
-  };
+inline void AppearanceFlagHook::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
 }
-
 AppearanceFlagHook::~AppearanceFlagHook() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagHook)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagHook::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagHook::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagHook::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagHook::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagHook)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -8939,100 +8417,89 @@ void AppearanceFlagHook::Clear() {
     _impl_.east_ = 1;
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagHook::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional .otclient.protobuf.appearances.HOOK_TYPE south = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::HOOK_TYPE_IsValid(val))) {
-            _internal_set_south(static_cast<::otclient::protobuf::appearances::HOOK_TYPE>(val));
-          } else {
-            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(1, val, mutable_unknown_fields());
-          }
-        } else
-          goto handle_unusual;
-        continue;
-      // optional .otclient.protobuf.appearances.HOOK_TYPE east = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
-          CHK_(ptr);
-          if (PROTOBUF_PREDICT_TRUE(::otclient::protobuf::appearances::HOOK_TYPE_IsValid(val))) {
-            _internal_set_east(static_cast<::otclient::protobuf::appearances::HOOK_TYPE>(val));
-          } else {
-            ::PROTOBUF_NAMESPACE_ID::internal::WriteVarint(2, val, mutable_unknown_fields());
-          }
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagHook::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagHook::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<1, 2, 2, 0, 2> AppearanceFlagHook::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_._has_bits_),
+    0, // no _extensions_
+    2, 8,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967292,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    2,  // num_field_entries
+    2,  // num_aux_entries
+    offsetof(decltype(_table_), aux_entries),
+    &_AppearanceFlagHook_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional .otclient.protobuf.appearances.HOOK_TYPE east = 2;
+    {::_pbi::TcParser::FastEr1S1,
+     {16, 1, 2, PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_.east_)}},
+    // optional .otclient.protobuf.appearances.HOOK_TYPE south = 1;
+    {::_pbi::TcParser::FastEr1S1,
+     {8, 0, 2, PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_.south_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional .otclient.protobuf.appearances.HOOK_TYPE south = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_.south_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kEnumRange)},
+    // optional .otclient.protobuf.appearances.HOOK_TYPE east = 2;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_.east_), _Internal::kHasBitsOffset + 1, 1,
+    (0 | ::_fl::kFcOptional | ::_fl::kEnumRange)},
+  }}, {{
+    {1, 2},
+    {1, 2},
+  }}, {{
+  }},
+};
+
+::uint8_t* AppearanceFlagHook::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagHook)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional .otclient.protobuf.appearances.HOOK_TYPE south = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      1, this->_internal_south(), target);
+        1, this->_internal_south(), target);
   }
 
   // optional .otclient.protobuf.appearances.HOOK_TYPE east = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
     target = ::_pbi::WireFormatLite::WriteEnumToArray(
-      2, this->_internal_east(), target);
+        2, this->_internal_east(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagHook)
   return target;
 }
 
-size_t AppearanceFlagHook::ByteSizeLong() const {
+::size_t AppearanceFlagHook::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagHook)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -9041,32 +8508,33 @@ size_t AppearanceFlagHook::ByteSizeLong() const {
     // optional .otclient.protobuf.appearances.HOOK_TYPE south = 1;
     if (cached_has_bits & 0x00000001u) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::EnumSize(this->_internal_south());
+                    ::_pbi::WireFormatLite::EnumSize(this->_internal_south());
     }
 
     // optional .otclient.protobuf.appearances.HOOK_TYPE east = 2;
     if (cached_has_bits & 0x00000002u) {
       total_size += 1 +
-        ::_pbi::WireFormatLite::EnumSize(this->_internal_east());
+                    ::_pbi::WireFormatLite::EnumSize(this->_internal_east());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagHook::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagHook::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagHook::_class_data_ = {
+    AppearanceFlagHook::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagHook::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagHook::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagHook::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagHook::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagHook*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagHook&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagHook)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -9079,7 +8547,7 @@ void AppearanceFlagHook::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, con
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagHook::CopyFrom(const AppearanceFlagHook& from) {
@@ -9089,189 +8557,182 @@ void AppearanceFlagHook::CopyFrom(const AppearanceFlagHook& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagHook::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagHook::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagHook::InternalSwap(AppearanceFlagHook* other) {
+::_pbi::CachedSize* AppearanceFlagHook::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagHook::InternalSwap(AppearanceFlagHook* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.south_, other->_impl_.south_);
-  swap(_impl_.east_, other->_impl_.east_);
+  ::google::protobuf::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_.east_)
+      + sizeof(AppearanceFlagHook::_impl_.east_)
+      - PROTOBUF_FIELD_OFFSET(AppearanceFlagHook, _impl_.south_)>(
+          reinterpret_cast<char*>(&_impl_.south_),
+          reinterpret_cast<char*>(&other->_impl_.south_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagHook::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagHook::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[21]);
 }
-
 // ===================================================================
 
 class AppearanceFlagLenshelp::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagLenshelp>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagLenshelp, _impl_._has_bits_);
   static void set_has_id(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagLenshelp::AppearanceFlagLenshelp(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagLenshelp::AppearanceFlagLenshelp(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagLenshelp)
 }
-AppearanceFlagLenshelp::AppearanceFlagLenshelp(const AppearanceFlagLenshelp& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagLenshelp* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.id_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.id_ = from._impl_.id_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagLenshelp)
+AppearanceFlagLenshelp::AppearanceFlagLenshelp(
+    ::google::protobuf::Arena* arena, const AppearanceFlagLenshelp& from)
+    : AppearanceFlagLenshelp(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagLenshelp::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagLenshelp::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.id_){0u}
-  };
+inline void AppearanceFlagLenshelp::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.id_ = {};
 }
-
 AppearanceFlagLenshelp::~AppearanceFlagLenshelp() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagLenshelp)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagLenshelp::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagLenshelp::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagLenshelp::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagLenshelp::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.id_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagLenshelp::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 id = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_id(&has_bits);
-          _impl_.id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagLenshelp::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagLenshelp::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagLenshelp::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagLenshelp, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagLenshelp_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 id = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagLenshelp, _impl_.id_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagLenshelp, _impl_.id_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 id = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagLenshelp, _impl_.id_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagLenshelp::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 id = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_id(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagLenshelp)
   return target;
 }
 
-size_t AppearanceFlagLenshelp::ByteSizeLong() const {
+::size_t AppearanceFlagLenshelp::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 id = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_id());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_id());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagLenshelp::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagLenshelp::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagLenshelp::_class_data_ = {
+    AppearanceFlagLenshelp::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagLenshelp::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagLenshelp::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagLenshelp::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagLenshelp::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagLenshelp*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagLenshelp&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagLenshelp)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_id()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_id(from._internal_id());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagLenshelp::CopyFrom(const AppearanceFlagLenshelp& from) {
@@ -9281,188 +8742,177 @@ void AppearanceFlagLenshelp::CopyFrom(const AppearanceFlagLenshelp& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagLenshelp::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagLenshelp::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagLenshelp::InternalSwap(AppearanceFlagLenshelp* other) {
+::_pbi::CachedSize* AppearanceFlagLenshelp::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagLenshelp::InternalSwap(AppearanceFlagLenshelp* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.id_, other->_impl_.id_);
+        swap(_impl_.id_, other->_impl_.id_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagLenshelp::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagLenshelp::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[22]);
 }
-
 // ===================================================================
 
 class AppearanceFlagChangedToExpire::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagChangedToExpire>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagChangedToExpire, _impl_._has_bits_);
   static void set_has_former_object_typeid(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagChangedToExpire::AppearanceFlagChangedToExpire(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagChangedToExpire::AppearanceFlagChangedToExpire(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
 }
-AppearanceFlagChangedToExpire::AppearanceFlagChangedToExpire(const AppearanceFlagChangedToExpire& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagChangedToExpire* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.former_object_typeid_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.former_object_typeid_ = from._impl_.former_object_typeid_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
+AppearanceFlagChangedToExpire::AppearanceFlagChangedToExpire(
+    ::google::protobuf::Arena* arena, const AppearanceFlagChangedToExpire& from)
+    : AppearanceFlagChangedToExpire(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagChangedToExpire::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagChangedToExpire::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.former_object_typeid_){0u}
-  };
+inline void AppearanceFlagChangedToExpire::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.former_object_typeid_ = {};
 }
-
 AppearanceFlagChangedToExpire::~AppearanceFlagChangedToExpire() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagChangedToExpire::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagChangedToExpire::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagChangedToExpire::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagChangedToExpire::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.former_object_typeid_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagChangedToExpire::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 former_object_typeid = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_former_object_typeid(&has_bits);
-          _impl_.former_object_typeid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagChangedToExpire::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagChangedToExpire::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagChangedToExpire::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagChangedToExpire, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagChangedToExpire_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 former_object_typeid = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagChangedToExpire, _impl_.former_object_typeid_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagChangedToExpire, _impl_.former_object_typeid_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 former_object_typeid = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagChangedToExpire, _impl_.former_object_typeid_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagChangedToExpire::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 former_object_typeid = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_former_object_typeid(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_former_object_typeid(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
   return target;
 }
 
-size_t AppearanceFlagChangedToExpire::ByteSizeLong() const {
+::size_t AppearanceFlagChangedToExpire::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 former_object_typeid = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_former_object_typeid());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_former_object_typeid());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagChangedToExpire::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagChangedToExpire::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagChangedToExpire::_class_data_ = {
+    AppearanceFlagChangedToExpire::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagChangedToExpire::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagChangedToExpire::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagChangedToExpire::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagChangedToExpire::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagChangedToExpire*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagChangedToExpire&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagChangedToExpire)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_former_object_typeid()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_former_object_typeid(from._internal_former_object_typeid());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagChangedToExpire::CopyFrom(const AppearanceFlagChangedToExpire& from) {
@@ -9472,188 +8922,177 @@ void AppearanceFlagChangedToExpire::CopyFrom(const AppearanceFlagChangedToExpire
   MergeFrom(from);
 }
 
-bool AppearanceFlagChangedToExpire::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagChangedToExpire::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagChangedToExpire::InternalSwap(AppearanceFlagChangedToExpire* other) {
+::_pbi::CachedSize* AppearanceFlagChangedToExpire::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagChangedToExpire::InternalSwap(AppearanceFlagChangedToExpire* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.former_object_typeid_, other->_impl_.former_object_typeid_);
+        swap(_impl_.former_object_typeid_, other->_impl_.former_object_typeid_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagChangedToExpire::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagChangedToExpire::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[23]);
 }
-
 // ===================================================================
 
 class AppearanceFlagCyclopedia::_Internal {
  public:
   using HasBits = decltype(std::declval<AppearanceFlagCyclopedia>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(AppearanceFlagCyclopedia, _impl_._has_bits_);
   static void set_has_cyclopedia_type(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
 };
 
-AppearanceFlagCyclopedia::AppearanceFlagCyclopedia(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+AppearanceFlagCyclopedia::AppearanceFlagCyclopedia(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
 }
-AppearanceFlagCyclopedia::AppearanceFlagCyclopedia(const AppearanceFlagCyclopedia& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  AppearanceFlagCyclopedia* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.cyclopedia_type_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  _this->_impl_.cyclopedia_type_ = from._impl_.cyclopedia_type_;
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
+AppearanceFlagCyclopedia::AppearanceFlagCyclopedia(
+    ::google::protobuf::Arena* arena, const AppearanceFlagCyclopedia& from)
+    : AppearanceFlagCyclopedia(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE AppearanceFlagCyclopedia::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void AppearanceFlagCyclopedia::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.cyclopedia_type_){0u}
-  };
+inline void AppearanceFlagCyclopedia::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  _impl_.cyclopedia_type_ = {};
 }
-
 AppearanceFlagCyclopedia::~AppearanceFlagCyclopedia() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void AppearanceFlagCyclopedia::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void AppearanceFlagCyclopedia::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void AppearanceFlagCyclopedia::Clear() {
+PROTOBUF_NOINLINE void AppearanceFlagCyclopedia::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   _impl_.cyclopedia_type_ = 0u;
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* AppearanceFlagCyclopedia::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 cyclopedia_type = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_cyclopedia_type(&has_bits);
-          _impl_.cyclopedia_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* AppearanceFlagCyclopedia::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* AppearanceFlagCyclopedia::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<0, 1, 0, 0, 2> AppearanceFlagCyclopedia::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(AppearanceFlagCyclopedia, _impl_._has_bits_),
+    0, // no _extensions_
+    1, 0,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967294,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    1,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_AppearanceFlagCyclopedia_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    // optional uint32 cyclopedia_type = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(AppearanceFlagCyclopedia, _impl_.cyclopedia_type_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(AppearanceFlagCyclopedia, _impl_.cyclopedia_type_)}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 cyclopedia_type = 1;
+    {PROTOBUF_FIELD_OFFSET(AppearanceFlagCyclopedia, _impl_.cyclopedia_type_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* AppearanceFlagCyclopedia::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 cyclopedia_type = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_cyclopedia_type(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_cyclopedia_type(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
   return target;
 }
 
-size_t AppearanceFlagCyclopedia::ByteSizeLong() const {
+::size_t AppearanceFlagCyclopedia::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   // optional uint32 cyclopedia_type = 1;
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x00000001u) {
-    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_cyclopedia_type());
+    total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+        this->_internal_cyclopedia_type());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData AppearanceFlagCyclopedia::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    AppearanceFlagCyclopedia::MergeImpl
+const ::google::protobuf::Message::ClassData AppearanceFlagCyclopedia::_class_data_ = {
+    AppearanceFlagCyclopedia::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*AppearanceFlagCyclopedia::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* AppearanceFlagCyclopedia::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void AppearanceFlagCyclopedia::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void AppearanceFlagCyclopedia::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<AppearanceFlagCyclopedia*>(&to_msg);
   auto& from = static_cast<const AppearanceFlagCyclopedia&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.AppearanceFlagCyclopedia)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_cyclopedia_type()) {
+  if ((from._impl_._has_bits_[0] & 0x00000001u) != 0) {
     _this->_internal_set_cyclopedia_type(from._internal_cyclopedia_type());
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void AppearanceFlagCyclopedia::CopyFrom(const AppearanceFlagCyclopedia& from) {
@@ -9663,28 +9102,32 @@ void AppearanceFlagCyclopedia::CopyFrom(const AppearanceFlagCyclopedia& from) {
   MergeFrom(from);
 }
 
-bool AppearanceFlagCyclopedia::IsInitialized() const {
+PROTOBUF_NOINLINE bool AppearanceFlagCyclopedia::IsInitialized() const {
   return true;
 }
 
-void AppearanceFlagCyclopedia::InternalSwap(AppearanceFlagCyclopedia* other) {
+::_pbi::CachedSize* AppearanceFlagCyclopedia::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void AppearanceFlagCyclopedia::InternalSwap(AppearanceFlagCyclopedia* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  swap(_impl_.cyclopedia_type_, other->_impl_.cyclopedia_type_);
+        swap(_impl_.cyclopedia_type_, other->_impl_.cyclopedia_type_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata AppearanceFlagCyclopedia::GetMetadata() const {
+::google::protobuf::Metadata AppearanceFlagCyclopedia::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[24]);
 }
-
 // ===================================================================
 
 class SpecialMeaningAppearanceIds::_Internal {
  public:
   using HasBits = decltype(std::declval<SpecialMeaningAppearanceIds>()._impl_._has_bits_);
+  static constexpr ::int32_t kHasBitsOffset =
+    8 * PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_._has_bits_);
   static void set_has_gold_coin_id(HasBits* has_bits) {
     (*has_bits)[0] |= 1u;
   }
@@ -9705,222 +9148,190 @@ class SpecialMeaningAppearanceIds::_Internal {
   }
 };
 
-SpecialMeaningAppearanceIds::SpecialMeaningAppearanceIds(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                         bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
-  SharedCtor(arena, is_message_owned);
+SpecialMeaningAppearanceIds::SpecialMeaningAppearanceIds(::google::protobuf::Arena* arena)
+    : ::google::protobuf::Message(arena) {
+  SharedCtor(arena);
   // @@protoc_insertion_point(arena_constructor:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
 }
-SpecialMeaningAppearanceIds::SpecialMeaningAppearanceIds(const SpecialMeaningAppearanceIds& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
-  SpecialMeaningAppearanceIds* const _this = this; (void)_this;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){from._impl_._has_bits_}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.gold_coin_id_){}
-    , decltype(_impl_.platinum_coin_id_){}
-    , decltype(_impl_.crystal_coin_id_){}
-    , decltype(_impl_.tibia_coin_id_){}
-    , decltype(_impl_.stamped_letter_id_){}
-    , decltype(_impl_.supply_stash_id_){}};
-
-  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&_impl_.gold_coin_id_, &from._impl_.gold_coin_id_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.supply_stash_id_) -
-    reinterpret_cast<char*>(&_impl_.gold_coin_id_)) + sizeof(_impl_.supply_stash_id_));
-  // @@protoc_insertion_point(copy_constructor:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
+SpecialMeaningAppearanceIds::SpecialMeaningAppearanceIds(
+    ::google::protobuf::Arena* arena, const SpecialMeaningAppearanceIds& from)
+    : SpecialMeaningAppearanceIds(arena) {
+  MergeFrom(from);
 }
+inline PROTOBUF_NDEBUG_INLINE SpecialMeaningAppearanceIds::Impl_::Impl_(
+    ::google::protobuf::internal::InternalVisibility visibility,
+    ::google::protobuf::Arena* arena)
+      : _cached_size_{0} {}
 
-inline void SpecialMeaningAppearanceIds::SharedCtor(
-    ::_pb::Arena* arena, bool is_message_owned) {
-  (void)arena;
-  (void)is_message_owned;
-  new (&_impl_) Impl_{
-      decltype(_impl_._has_bits_){}
-    , /*decltype(_impl_._cached_size_)*/{}
-    , decltype(_impl_.gold_coin_id_){0u}
-    , decltype(_impl_.platinum_coin_id_){0u}
-    , decltype(_impl_.crystal_coin_id_){0u}
-    , decltype(_impl_.tibia_coin_id_){0u}
-    , decltype(_impl_.stamped_letter_id_){0u}
-    , decltype(_impl_.supply_stash_id_){0u}
-  };
+inline void SpecialMeaningAppearanceIds::SharedCtor(::_pb::Arena* arena) {
+  new (&_impl_) Impl_(internal_visibility(), arena);
+  ::memset(reinterpret_cast<char *>(&_impl_) +
+               offsetof(Impl_, gold_coin_id_),
+           0,
+           offsetof(Impl_, supply_stash_id_) -
+               offsetof(Impl_, gold_coin_id_) +
+               sizeof(Impl_::supply_stash_id_));
 }
-
 SpecialMeaningAppearanceIds::~SpecialMeaningAppearanceIds() {
   // @@protoc_insertion_point(destructor:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
-  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
-  (void)arena;
-    return;
-  }
+  _internal_metadata_.Delete<::google::protobuf::UnknownFieldSet>();
   SharedDtor();
 }
-
 inline void SpecialMeaningAppearanceIds::SharedDtor() {
-  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  ABSL_DCHECK(GetArena() == nullptr);
+  _impl_.~Impl_();
 }
 
-void SpecialMeaningAppearanceIds::SetCachedSize(int size) const {
-  _impl_._cached_size_.Set(size);
-}
-
-void SpecialMeaningAppearanceIds::Clear() {
+PROTOBUF_NOINLINE void SpecialMeaningAppearanceIds::Clear() {
 // @@protoc_insertion_point(message_clear_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
-  uint32_t cached_has_bits = 0;
+  PROTOBUF_TSAN_WRITE(&_impl_._tsan_detect_race);
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   if (cached_has_bits & 0x0000003fu) {
-    ::memset(&_impl_.gold_coin_id_, 0, static_cast<size_t>(
+    ::memset(&_impl_.gold_coin_id_, 0, static_cast<::size_t>(
         reinterpret_cast<char*>(&_impl_.supply_stash_id_) -
         reinterpret_cast<char*>(&_impl_.gold_coin_id_)) + sizeof(_impl_.supply_stash_id_));
   }
   _impl_._has_bits_.Clear();
-  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+  _internal_metadata_.Clear<::google::protobuf::UnknownFieldSet>();
 }
 
-const char* SpecialMeaningAppearanceIds::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
-#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
-  _Internal::HasBits has_bits{};
-  while (!ctx->Done(&ptr)) {
-    uint32_t tag;
-    ptr = ::_pbi::ReadTag(ptr, &tag);
-    switch (tag >> 3) {
-      // optional uint32 gold_coin_id = 1;
-      case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          _Internal::set_has_gold_coin_id(&has_bits);
-          _impl_.gold_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 platinum_coin_id = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
-          _Internal::set_has_platinum_coin_id(&has_bits);
-          _impl_.platinum_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 crystal_coin_id = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
-          _Internal::set_has_crystal_coin_id(&has_bits);
-          _impl_.crystal_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 tibia_coin_id = 4;
-      case 4:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
-          _Internal::set_has_tibia_coin_id(&has_bits);
-          _impl_.tibia_coin_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 stamped_letter_id = 5;
-      case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
-          _Internal::set_has_stamped_letter_id(&has_bits);
-          _impl_.stamped_letter_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      // optional uint32 supply_stash_id = 6;
-      case 6:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
-          _Internal::set_has_supply_stash_id(&has_bits);
-          _impl_.supply_stash_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
-          CHK_(ptr);
-        } else
-          goto handle_unusual;
-        continue;
-      default:
-        goto handle_unusual;
-    }  // switch
-  handle_unusual:
-    if ((tag == 0) || ((tag & 7) == 4)) {
-      CHK_(ptr);
-      ctx->SetLastTag(tag);
-      goto message_done;
-    }
-    ptr = UnknownFieldParse(
-        tag,
-        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-        ptr, ctx);
-    CHK_(ptr != nullptr);
-  }  // while
-message_done:
-  _impl_._has_bits_.Or(has_bits);
+const char* SpecialMeaningAppearanceIds::_InternalParse(
+    const char* ptr, ::_pbi::ParseContext* ctx) {
+  ptr = ::_pbi::TcParser::ParseLoop(this, ptr, ctx, &_table_.header);
   return ptr;
-failure:
-  ptr = nullptr;
-  goto message_done;
-#undef CHK_
 }
 
-uint8_t* SpecialMeaningAppearanceIds::_InternalSerialize(
-    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+
+PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1
+const ::_pbi::TcParseTable<3, 6, 0, 0, 2> SpecialMeaningAppearanceIds::_table_ = {
+  {
+    PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_._has_bits_),
+    0, // no _extensions_
+    6, 56,  // max_field_number, fast_idx_mask
+    offsetof(decltype(_table_), field_lookup_table),
+    4294967232,  // skipmap
+    offsetof(decltype(_table_), field_entries),
+    6,  // num_field_entries
+    0,  // num_aux_entries
+    offsetof(decltype(_table_), field_names),  // no aux_entries
+    &_SpecialMeaningAppearanceIds_default_instance_._instance,
+    ::_pbi::TcParser::GenericFallback,  // fallback
+  }, {{
+    {::_pbi::TcParser::MiniParse, {}},
+    // optional uint32 gold_coin_id = 1;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpecialMeaningAppearanceIds, _impl_.gold_coin_id_), 0>(),
+     {8, 0, 0, PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.gold_coin_id_)}},
+    // optional uint32 platinum_coin_id = 2;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpecialMeaningAppearanceIds, _impl_.platinum_coin_id_), 1>(),
+     {16, 1, 0, PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.platinum_coin_id_)}},
+    // optional uint32 crystal_coin_id = 3;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpecialMeaningAppearanceIds, _impl_.crystal_coin_id_), 2>(),
+     {24, 2, 0, PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.crystal_coin_id_)}},
+    // optional uint32 tibia_coin_id = 4;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpecialMeaningAppearanceIds, _impl_.tibia_coin_id_), 3>(),
+     {32, 3, 0, PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.tibia_coin_id_)}},
+    // optional uint32 stamped_letter_id = 5;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpecialMeaningAppearanceIds, _impl_.stamped_letter_id_), 4>(),
+     {40, 4, 0, PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.stamped_letter_id_)}},
+    // optional uint32 supply_stash_id = 6;
+    {::_pbi::TcParser::SingularVarintNoZag1<::uint32_t, offsetof(SpecialMeaningAppearanceIds, _impl_.supply_stash_id_), 5>(),
+     {48, 5, 0, PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.supply_stash_id_)}},
+    {::_pbi::TcParser::MiniParse, {}},
+  }}, {{
+    65535, 65535
+  }}, {{
+    // optional uint32 gold_coin_id = 1;
+    {PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.gold_coin_id_), _Internal::kHasBitsOffset + 0, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 platinum_coin_id = 2;
+    {PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.platinum_coin_id_), _Internal::kHasBitsOffset + 1, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 crystal_coin_id = 3;
+    {PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.crystal_coin_id_), _Internal::kHasBitsOffset + 2, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 tibia_coin_id = 4;
+    {PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.tibia_coin_id_), _Internal::kHasBitsOffset + 3, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 stamped_letter_id = 5;
+    {PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.stamped_letter_id_), _Internal::kHasBitsOffset + 4, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+    // optional uint32 supply_stash_id = 6;
+    {PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.supply_stash_id_), _Internal::kHasBitsOffset + 5, 0,
+    (0 | ::_fl::kFcOptional | ::_fl::kUInt32)},
+  }},
+  // no aux_entries
+  {{
+  }},
+};
+
+::uint8_t* SpecialMeaningAppearanceIds::_InternalSerialize(
+    ::uint8_t* target,
+    ::google::protobuf::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
-  uint32_t cached_has_bits = 0;
-  (void) cached_has_bits;
+  ::uint32_t cached_has_bits = 0;
+  (void)cached_has_bits;
 
   cached_has_bits = _impl_._has_bits_[0];
   // optional uint32 gold_coin_id = 1;
   if (cached_has_bits & 0x00000001u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(1, this->_internal_gold_coin_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        1, this->_internal_gold_coin_id(), target);
   }
 
   // optional uint32 platinum_coin_id = 2;
   if (cached_has_bits & 0x00000002u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(2, this->_internal_platinum_coin_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        2, this->_internal_platinum_coin_id(), target);
   }
 
   // optional uint32 crystal_coin_id = 3;
   if (cached_has_bits & 0x00000004u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(3, this->_internal_crystal_coin_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        3, this->_internal_crystal_coin_id(), target);
   }
 
   // optional uint32 tibia_coin_id = 4;
   if (cached_has_bits & 0x00000008u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(4, this->_internal_tibia_coin_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        4, this->_internal_tibia_coin_id(), target);
   }
 
   // optional uint32 stamped_letter_id = 5;
   if (cached_has_bits & 0x00000010u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(5, this->_internal_stamped_letter_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        5, this->_internal_stamped_letter_id(), target);
   }
 
   // optional uint32 supply_stash_id = 6;
   if (cached_has_bits & 0x00000020u) {
     target = stream->EnsureSpace(target);
-    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(6, this->_internal_supply_stash_id(), target);
+    target = ::_pbi::WireFormatLite::WriteUInt32ToArray(
+        6, this->_internal_supply_stash_id(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+    target =
+        ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+            _internal_metadata_.unknown_fields<::google::protobuf::UnknownFieldSet>(::google::protobuf::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
   return target;
 }
 
-size_t SpecialMeaningAppearanceIds::ByteSizeLong() const {
+::size_t SpecialMeaningAppearanceIds::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
-  size_t total_size = 0;
+  ::size_t total_size = 0;
 
-  uint32_t cached_has_bits = 0;
+  ::uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -9928,51 +9339,58 @@ size_t SpecialMeaningAppearanceIds::ByteSizeLong() const {
   if (cached_has_bits & 0x0000003fu) {
     // optional uint32 gold_coin_id = 1;
     if (cached_has_bits & 0x00000001u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_gold_coin_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_gold_coin_id());
     }
 
     // optional uint32 platinum_coin_id = 2;
     if (cached_has_bits & 0x00000002u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_platinum_coin_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_platinum_coin_id());
     }
 
     // optional uint32 crystal_coin_id = 3;
     if (cached_has_bits & 0x00000004u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_crystal_coin_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_crystal_coin_id());
     }
 
     // optional uint32 tibia_coin_id = 4;
     if (cached_has_bits & 0x00000008u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_tibia_coin_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_tibia_coin_id());
     }
 
     // optional uint32 stamped_letter_id = 5;
     if (cached_has_bits & 0x00000010u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_stamped_letter_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_stamped_letter_id());
     }
 
     // optional uint32 supply_stash_id = 6;
     if (cached_has_bits & 0x00000020u) {
-      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(this->_internal_supply_stash_id());
+      total_size += ::_pbi::WireFormatLite::UInt32SizePlusOne(
+          this->_internal_supply_stash_id());
     }
 
   }
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData SpecialMeaningAppearanceIds::_class_data_ = {
-    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
-    SpecialMeaningAppearanceIds::MergeImpl
+const ::google::protobuf::Message::ClassData SpecialMeaningAppearanceIds::_class_data_ = {
+    SpecialMeaningAppearanceIds::MergeImpl,
+    nullptr,  // OnDemandRegisterArenaDtor
 };
-const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*SpecialMeaningAppearanceIds::GetClassData() const { return &_class_data_; }
+const ::google::protobuf::Message::ClassData* SpecialMeaningAppearanceIds::GetClassData() const {
+  return &_class_data_;
+}
 
-
-void SpecialMeaningAppearanceIds::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+void SpecialMeaningAppearanceIds::MergeImpl(::google::protobuf::Message& to_msg, const ::google::protobuf::Message& from_msg) {
   auto* const _this = static_cast<SpecialMeaningAppearanceIds*>(&to_msg);
   auto& from = static_cast<const SpecialMeaningAppearanceIds&>(from_msg);
   // @@protoc_insertion_point(class_specific_merge_from_start:otclient.protobuf.appearances.SpecialMeaningAppearanceIds)
-  GOOGLE_DCHECK_NE(&from, _this);
-  uint32_t cached_has_bits = 0;
+  ABSL_DCHECK_NE(&from, _this);
+  ::uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   cached_has_bits = from._impl_._has_bits_[0];
@@ -9997,7 +9415,7 @@ void SpecialMeaningAppearanceIds::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to
     }
     _this->_impl_._has_bits_[0] |= cached_has_bits;
   }
-  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_internal_metadata_.MergeFrom<::google::protobuf::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void SpecialMeaningAppearanceIds::CopyFrom(const SpecialMeaningAppearanceIds& from) {
@@ -10007,15 +9425,18 @@ void SpecialMeaningAppearanceIds::CopyFrom(const SpecialMeaningAppearanceIds& fr
   MergeFrom(from);
 }
 
-bool SpecialMeaningAppearanceIds::IsInitialized() const {
+PROTOBUF_NOINLINE bool SpecialMeaningAppearanceIds::IsInitialized() const {
   return true;
 }
 
-void SpecialMeaningAppearanceIds::InternalSwap(SpecialMeaningAppearanceIds* other) {
+::_pbi::CachedSize* SpecialMeaningAppearanceIds::AccessCachedSize() const {
+  return &_impl_._cached_size_;
+}
+void SpecialMeaningAppearanceIds::InternalSwap(SpecialMeaningAppearanceIds* PROTOBUF_RESTRICT other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
-  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+  ::google::protobuf::internal::memswap<
       PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.supply_stash_id_)
       + sizeof(SpecialMeaningAppearanceIds::_impl_.supply_stash_id_)
       - PROTOBUF_FIELD_OFFSET(SpecialMeaningAppearanceIds, _impl_.gold_coin_id_)>(
@@ -10023,122 +9444,18 @@ void SpecialMeaningAppearanceIds::InternalSwap(SpecialMeaningAppearanceIds* othe
           reinterpret_cast<char*>(&other->_impl_.gold_coin_id_));
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata SpecialMeaningAppearanceIds::GetMetadata() const {
+::google::protobuf::Metadata SpecialMeaningAppearanceIds::GetMetadata() const {
   return ::_pbi::AssignDescriptors(
       &descriptor_table_appearances_2eproto_getter, &descriptor_table_appearances_2eproto_once,
       file_level_metadata_appearances_2eproto[25]);
 }
-
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace appearances
 }  // namespace protobuf
 }  // namespace otclient
-PROTOBUF_NAMESPACE_OPEN
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::Coordinate*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::Coordinate >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::Coordinate >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::Appearances*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::Appearances >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::Appearances >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::SpritePhase*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::SpritePhase >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::SpritePhase >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::SpriteAnimation*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::SpriteAnimation >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::SpriteAnimation >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::Box*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::Box >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::Box >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::SpriteInfo*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::SpriteInfo >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::SpriteInfo >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::FrameGroup*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::FrameGroup >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::FrameGroup >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::Appearance*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::Appearance >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::Appearance >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlags*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlags >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlags >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagUpgradeClassification >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagBank*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagBank >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagBank >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagWrite*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagWrite >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagWrite >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagWriteOnce*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagWriteOnce >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagWriteOnce >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagLight*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagLight >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagLight >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagHeight*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagHeight >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagHeight >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagShift*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagShift >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagShift >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagClothes*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagClothes >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagClothes >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagDefaultAction*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagDefaultAction >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagDefaultAction >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagMarket*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagMarket >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagMarket >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagNPC*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagNPC >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagNPC >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagAutomap*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagAutomap >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagAutomap >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagHook*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagHook >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagHook >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagLenshelp*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagLenshelp >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagLenshelp >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagChangedToExpire*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagChangedToExpire >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagChangedToExpire >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::AppearanceFlagCyclopedia*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::AppearanceFlagCyclopedia >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::AppearanceFlagCyclopedia >(arena);
-}
-template<> PROTOBUF_NOINLINE ::otclient::protobuf::appearances::SpecialMeaningAppearanceIds*
-Arena::CreateMaybeMessage< ::otclient::protobuf::appearances::SpecialMeaningAppearanceIds >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::otclient::protobuf::appearances::SpecialMeaningAppearanceIds >(arena);
-}
-PROTOBUF_NAMESPACE_CLOSE
-
+namespace google {
+namespace protobuf {
+}  // namespace protobuf
+}  // namespace google
 // @@protoc_insertion_point(global_scope)
-#include <google/protobuf/port_undef.inc>
+#include "google/protobuf/port_undef.inc"
