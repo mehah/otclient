@@ -187,6 +187,7 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(absl CONFIG REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -196,6 +197,8 @@ find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
+CHECK_INCLUDE_FILE_CXX(phmap/phmap.h PHMAP_Found REQUIRED)
+
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -216,8 +219,8 @@ endif()
 if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(OpenAL CONFIG REQUIRED)
 	find_package(VorbisFile REQUIRED)
-	find_package(Vorbis CONFIG REQUIRED)
-	find_package(Ogg CONFIG REQUIRED)
+	find_package(Vorbis REQUIRED)
+	find_package(Ogg REQUIRED)
 endif()
 if(ANDROID)
 	set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
@@ -336,6 +339,8 @@ set(SOURCE_FILES
 	client/uicreature.cpp
 	client/uigraph.cpp
 	client/uiitem.cpp
+	client/uieffect.cpp
+	client/uimissile.cpp
 	client/uimap.cpp
 	client/uimapanchorlayout.cpp
 	client/uiminimap.cpp
@@ -466,19 +471,20 @@ if(MSVC)
 		${CMAKE_THREAD_LIBS_INIT}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
+		${OGG_LIBRARY}
 		${VORBISFILE_LIBRARY}
 		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
 		${STDUUID}
 
+		protobuf::libprotobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		GLEW::GLEW
 		asio::asio
@@ -508,21 +514,22 @@ elseif(ANDROID)
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
 		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
 		${GMP_LIBRARY}
 		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${STDUUID}
 		${MINIZIP_LIBRARY}
 
+		protobuf::libprotobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		asio::asio
 		OpenSLES
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		game-activity::game-activity
 		GLESv3
@@ -549,13 +556,14 @@ else() # Linux
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
 		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
 		${GMP_LIBRARY}
 		${STDUUID}
 		${FOUNDATION}
@@ -564,12 +572,12 @@ else() # Linux
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
+		protobuf::libprotobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		X11::X11
 		asio::asio
 		OpenAL::OpenAL
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
 		ZLIB::ZLIB

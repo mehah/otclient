@@ -49,10 +49,9 @@ ImagePtr Image::load(const std::string& file)
     return nullptr;
 }
 
-ImagePtr Image::loadPNG(const std::string& file)
+ImagePtr Image::loadPNG(const char* data, size_t size)
 {
-    std::stringstream fin;
-    g_resources.readFileStream(file, fin);
+    std::stringstream fin(std::string{ data, size });
     ImagePtr image;
     if (apng_data apng; load_apng(fin, &apng) == 0) {
         image = std::make_shared<Image>(Size(apng.width, apng.height), apng.bpp, apng.pdata);
@@ -68,6 +67,16 @@ ImagePtr Image::loadPNG(const std::string& file)
     }
 
     return image;
+}
+
+ImagePtr Image::loadPNG(const std::string& file)
+{
+    std::stringstream fin;
+    g_resources.readFileStream(file, fin);
+
+    std::string buffer{ fin.str() };
+
+    return loadPNG(buffer.data(), buffer.size());
 }
 
 void Image::savePNG(const std::string& fileName)
