@@ -3,13 +3,11 @@ local oldProtocol = false
 local offerDescriptions = {}
 
 -- TODO:
--- - Implement stack offers (x100, x250) for consumables/potions
 -- - Add gifting option
 -- - Fix character name change
 -- - Fix filter functionality
 -- - Correct HTML string syntax
 -- - fix protocol 11.00
--- - Fix scroll in history panel
 -- - Fix onclick behavior in "home", link to category/item
 
 GameStore = {}
@@ -170,6 +168,12 @@ GameStore.DefaultValues = {
 -- /*=============================================
 -- =            Local Function                  =
 -- =============================================*/
+local function getPageLabelHistory()
+    local text = controllerShop.ui.transferHistory.lblPage:getText()
+    local currentPage, pageCount = text:match("Page (%d+)/(%d+)")
+    return tonumber(currentPage), tonumber(pageCount)
+end
+
 local function setImagenHttp(widget, url, isIcon)
     if GameStore.website.IMAGES_URL then
         HTTP.downloadImage(GameStore.website.IMAGES_URL .. url, function(path, err)
@@ -204,13 +208,12 @@ local function getCoinsBalance()
     local function extractNumber(text)
         return tonumber((text:match("%d[%d,]*"):gsub(",", "")))
     end
-
-    local coins1 = extractNumber(controllerShop.ui.lblCoins.numero:getText())
-    local coins2 = extractNumber(controllerShop.ui.lblCoins.numerodos:getText())
+    local coins1 = extractNumber(controllerShop.ui.lblCoins.lblTibiaCoins:getText())
+    local coins2 = extractNumber(controllerShop.ui.lblCoins.lblTibiaTransfer:getText())
     return coins1, coins2
 end
 
-local function convertir_timestamp(timestamp)
+local function convert_timestamp(timestamp)
     local fecha_hora = os.date("%Y-%m-%d, %H:%M:%S", timestamp)
     return fecha_hora
 end
@@ -239,14 +242,12 @@ local function getProductData(product)
     end
 end
 -- /*=============================================
--- =            Botones                         =
+-- =    behavior categories and subcategories    =
 -- =============================================*/
 
 local function disableAllButtons()
     local panel = controllerShop.ui.panelItem
-    panel:getChildById('btnBuy'):disable()
-    panel:getChildById('lblName'):setText("")
-    panel:getChildById('lblPrice'):setText("")
+    panel:getChildById('StackOffers'):destroyChildren()
     panel:getChildById('image'):destroyChildren()
     for i = 1, controllerShop.ui.listCategory:getChildCount() do
         local widget = controllerShop.ui.listCategory:getChildByIndex(i)
@@ -379,10 +380,10 @@ local function createProductImage(imageParent, data)
         local itemWidget = g_ui.createWidget('Item', imageParent)
         itemWidget:setId(data.ID)
         itemWidget:setItemId(data.ID)
+        itemWidget:setVirtual(true)
         itemWidget:fill('parent')
     elseif data.VALOR == "icon" then
         local widget = g_ui.createWidget('UIWidget', imageParent)
-        -- widget:setImageSource("/game_store/images/64/" .. data.ID)
         setImagenHttp(widget, "/64/" .. data.ID, false)
         widget:fill('parent')
     elseif data.VALOR == "mountId" or data.VALOR:find("outfitId") then
@@ -396,11 +397,14 @@ local function createProductImage(imageParent, data)
 end
 
 local function formatNumberWithCommas(value)
+    local sign = value < 0 and "-" or ""
+    value = math.abs(value)
     local formattedValue = string.format("%d", value)
-    -- Add commas to the formatted value
     formattedValue = formattedValue:reverse():gsub("(%d%d%d)", "%1,")
-    return formattedValue:reverse():gsub("^,", "")
+    formattedValue = formattedValue:reverse():gsub("^,", "")
+    return sign .. formattedValue
 end
+
 -- /*=============================================
 -- =            Controller                   =
 -- =============================================*/
@@ -438,12 +442,6 @@ function controllerShop:onInit()
     -- =            Parse                         =
     -- =============================================*/
 
-    --[[     ProtocolGame.registerOpcode(0xE1, function(protocol, msg)
-        local purchaseData = msg:getString()
-        print("0xE1", purchaseData)
-    end)
- ]]
-
     controllerShop:registerEvents(g_game, {
         onParseStoreGetCoin = onParseStoreGetCoin,
         onParseStoreGetCategories = onParseStoreGetCategories,
@@ -453,13 +451,32 @@ function controllerShop:onInit()
         onParseStoreGetPurchaseStatus = onParseStoreGetPurchaseStatus,
         onParseStoreOfferDescriptions = onParseStoreOfferDescriptions,
         onParseStoreError = onParseStoreError
-
     })
 end
+function controllerShop:onGameStart()
+    oldProtocol = g_game.getClientVersion() < 1332
+end
+
+function controllerShop:onGameEnd()
+    if controllerShop.ui:isVisible() then
+        controllerShop.ui:hide()
+    end
+    if acceptWindow then
+        acceptWindow:destroy()
+        acceptWindow = nil
+    end
+end
+
+--function controllerShop:onTerminate()
+--end
+
+-- /*=============================================
+-- =            Parse                           =
+-- =============================================*/
 
 function onParseStoreGetCoin(getTibiaCoins, getTransferableCoins)
-    controllerShop.ui.lblCoins.numero:setText(formatNumberWithCommas(getTibiaCoins))
-    controllerShop.ui.lblCoins.numerodos:setText(string.format("(Including: %s",
+    controllerShop.ui.lblCoins.lblTibiaCoins:setText(formatNumberWithCommas(getTibiaCoins))
+    controllerShop.ui.lblCoins.lblTibiaTransfer:setText(string.format("(Including: %s",
         formatNumberWithCommas(getTransferableCoins)))
 end
 
@@ -491,40 +508,12 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
     end
 end
 
-function controllerShop:onGameStart()
-    oldProtocol = g_game.getClientVersion() < 1332
-end
-
-function controllerShop:onGameEnd()
-    if controllerShop.ui:isVisible() then
-        controllerShop.ui:hide()
-    end
-    if acceptWindow then
-        acceptWindow:destroy()
-        acceptWindow = nil
-    end
-end
-
-function controllerShop:onTerminate()
-
-    -- ProtocolGame.unregisterOpcode(0xE1)
-
-end
-
--- /*=============================================
--- =            Build widget                     =
--- =============================================*/
-
 function onParseStoreCreateProducts(storeProducts)
-    -- local descriptionInfo = offerDescriptions[storeProducts.offers.subOffers[1].id]
-
     local listProduct = controllerShop.ui.panelItem.listProduct
     listProduct:destroyChildren()
-
     if not storeProducts then
         return
     end
-
     for _, product in ipairs(storeProducts.offers) do
         local row = g_ui.createWidget('RowStore', listProduct)
         row.store, row.product, row.type = store, product, product.type
@@ -539,23 +528,32 @@ function onParseStoreCreateProducts(storeProducts)
             row:disable()
             row:setOpacity(0.5)
         end
-
-        row:getChildById('lblPrice'):setText(subOffer.price)
-        if subOffer.count > 0 then
-            row:getChildById('count'):setText(subOffer.count .. "x")
+        
+        for _, subOffer in ipairs(product.subOffers) do
+            local offerI = g_ui.createWidget('stackOfferPanel', row:getChildById('StackOffers'))
+            
+            if subOffer.disabled then
+                offerI:disable()
+                offerI:setOpacity(0.5)
+            end
+    
+            local priceLabel = offerI:getChildById('lblPrice')
+            priceLabel:setText(subOffer.price)
+            
+            if subOffer.count > 0 then
+                offerI:getChildById('count'):setText(subOffer.count .. "x")
+            end
+            local coinsBalance2, coinsBalance1 = getCoinsBalance()
+            local isTransferable = subOffer.coinType == GameStore.CoinType.Transferable
+            local price = subOffer.price
+            local balance = isTransferable and coinsBalance1 or coinsBalance2
+ 
+            priceLabel:setColor(balance < price and "#d33c3c" or "white")
+    
+            if isTransferable then
+                priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
+            end
         end
-
-        local coinsBalance2, coinsBalance1 = getCoinsBalance()
-        local priceLabel = row:getChildById('lblPrice')
-        local isTransferable = subOffer.coinType == GameStore.CoinType.Transferable
-        local price = product.subOffers[1].price
-        local balance = isTransferable and coinsBalance1 or coinsBalance2
-        priceLabel:setColor(balance < price and "#d33c3c" or "white")
-
-        if isTransferable then
-            priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
-        end
-
         local data = getProductData(product)
         if data then
             createProductImage(row:getChildById('image'), data)
@@ -570,7 +568,6 @@ function onParseStoreCreateProducts(storeProducts)
 end
 
 function onParseStoreCreateHome(offer)
-
     local homeProductos = controllerShop.ui.HomePanel.HomeRecentlyAdded.HomeProductos
     for _, product in ipairs(offer.offers) do
         local row = g_ui.createWidget('RowStore', homeProductos)
@@ -580,9 +577,12 @@ function onParseStoreCreateHome(offer)
         nameLabel:setText(product.name)
         nameLabel:setTextAlign(AlignCenter)
         nameLabel:setMarginRight(10)
-        row:getChildById('lblPrice'):setText(product.price)
+        
+        local subOfferWidget = g_ui.createWidget('stackOfferPanel', row:getChildById('StackOffers'))
+
+        subOfferWidget.lblPrice:setText(product.price)
         if product.coinType == GameStore.CoinType.Transferable then
-            row:getChildById('lblPrice'):setIcon("/game_store/images/icon-tibiacointransferable")
+            subOfferWidget.lblPrice:setIcon("/game_store/images/icon-tibiacointransferable")
         end
 
         local data = getProductData(product)
@@ -597,36 +597,29 @@ function onParseStoreCreateHome(offer)
     enableAllButtons()
 end
 
-function onParseStoreGetHistory(currentPage, pageCount, array2)
-
-    local transferHistory = controllerShop.ui.transferHistory
+function onParseStoreGetHistory(currentPage, pageCount, historyData)
+    local transferHistory = controllerShop.ui.transferHistory.historyPanel
     transferHistory:destroyChildren()
-
-    for i = 1, #array2 do
-        local row = g_ui.createWidget('HistoryEntry', controllerShop.ui.transferHistory)
-        row.index = i
-        row:getChildById('historyDate'):setText(convertir_timestamp(array2[i][1]))
-        row:getChildById('historyDescription'):setText(array2[i][3])
-
-        local amount = -tonumber(array2[i][2])
-        local balanceLabel = row:getChildById('historyBalance')
-        balanceLabel:setText(amount)
-
-        if amount < 0 then
-            balanceLabel:setColor("#d33c3c")
-        else
-            balanceLabel:setMarginLeft(151)
-            balanceLabel:setColor("#00ff00")
-        end
-        if (i > 1) then
-            row:setMarginTop(24 + ((i - 1) * 15))
-        end
-
-        if (i % 2 == 0) then
-            row:setBackgroundColor("#414141")
-        end
+    local headerRow = g_ui.createWidget("historyData2", transferHistory)
+    headerRow:setBackgroundColor("#363636")
+    headerRow:setBorderColor("#00000077")
+    headerRow:setBorderWidth(1)
+    headerRow.date:setText("Date")
+    headerRow.Balance:setText("Balance")
+    headerRow.Description:setText("Description")
+    controllerShop.ui.transferHistory.lblPage:setText(string.format("Page %d/%d", currentPage + 1, pageCount))
+    for i, data in ipairs(historyData) do
+        local row = g_ui.createWidget("historyData2", transferHistory)
+        row.date:setText(convert_timestamp(data[1]))
+        local balance = data[3]
+        row.Balance:setText(formatNumberWithCommas(balance))
+        row.Balance:setColor(balance < 0 and "#D33C3C" or "#3CD33C")
+        row.Description:setText(data[5])
+        row.Balance:setIcon(data[4] == GameStore.CoinType.Transferable and 
+                            "/game_store/images/icon-tibiacointransferable" or 
+                            "images/ui/tibiaCoin")
+        row:setBackgroundColor(i % 2 == 0 and "#ffffff12" or "#00000012")
     end
-
 end
 
 function onParseStoreGetCategories(buttons)
@@ -704,10 +697,10 @@ function onParseStoreGetCategories(buttons)
                 local btnBuy = panel:getChildById('btnBuy')
                 local image = panel:getChildById('image')
                 local lblPrice = panel:getChildById('lblPrice')
+                local btnBuy = panel:getChildById('StackOffers')
 
-                btnBuy:disable()
                 image:setImageSource("")
-                lblPrice:setText("")
+                btnBuy:destroyChildren()
 
                 local firstChild = image:getFirstChild()
                 if image:getChildCount() ~= 0 and firstChild then
@@ -771,8 +764,12 @@ function onParseStoreGetCategories(buttons)
 
 end
 
+function onParseStoreError(errorMessage)
+    displayErrorBox(controllerShop.ui:getText(), errorMessage)
+end
+
 -- /*=============================================
--- =            Botones                          =
+-- =            buttons                          =
 -- =============================================*/
 
 function hide()
@@ -847,6 +844,16 @@ function toggleTransferHistory()
 
     end
 end
+
+function requestTransactionHistory(widget)
+    local currentPage, pageCount = getPageLabelHistory()
+    local newPage = currentPage + (widget:getId() == "btnNextPage" and 1 or -1)
+    
+    if newPage > 0 and newPage <= pageCount then
+        g_game.requestTransactionHistory(newPage - 1)
+    end
+end
+
 -- /*=============================================
 -- =            focusedChild                     =
 -- =============================================*/
@@ -855,20 +862,16 @@ function chooseOffert(self, focusedChild)
     if not focusedChild then
         return
     end
-
     local product = focusedChild.product
     local panel = controllerShop.ui.panelItem
-
+    
+    panel:getChildById('lblName'):setText(product.name)
+    
     local descriptionInfo = offerDescriptions[product.subOffers[1].id] or {
         id = 0xFFFF,
         description = ""
     }
-
-    panel:getChildById('lblName'):setText(product.name)
     panel:getChildById('lblDescription'):setText(descriptionInfo.description)
-
-    local priceLabel = panel:getChildById('lblPrice')
-    priceLabel:setText(product.subOffers[1].price)
 
     local data = getProductData(product)
     local imagePanel = panel:getChildById('image')
@@ -878,80 +881,80 @@ function chooseOffert(self, focusedChild)
     end
 
     local coinsBalance2, coinsBalance1 = getCoinsBalance()
-    local price = product.subOffers[1].price
-    local btnBuy = panel:getChildById('btnBuy')
+    local offerStackPanel = panel:getChildById('StackOffers')
+    offerStackPanel:destroyChildren()
 
-    local isTransferable = product.subOffers[1].coinType == GameStore.CoinType.Transferable
-    local currentBalance = isTransferable and coinsBalance1 or coinsBalance2
-
-    if isTransferable then
-        priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
-    else
-        priceLabel:setIcon("/game_store/images/tibiaCoin")
-    end
-
-    if currentBalance < price then
-        priceLabel:setColor("#d33c3c")
-        btnBuy:disable()
-    else
-        priceLabel:setColor("white")
-        btnBuy:enable()
-    end
-
-    btnBuy.onClick = function(widget)
-        if acceptWindow then
-            return true
+    for _, subOffer in ipairs(product.subOffers) do
+        local offerPanel = g_ui.createWidget('OfferPanel2', offerStackPanel)
+        
+        local priceLabel = offerPanel:getChildById('lblPrice')
+        priceLabel:setText(subOffer.price)
+        
+        if subOffer.count > 0 then
+            offerPanel:getChildById('btnBuy'):setText("Buy "..subOffer.count .. "x")
         end
 
-        local function acceptFunc()
-            local latestBalance2, latestBalance1 = getCoinsBalance()
-            local latestCurrentBalance = isTransferable and latestBalance1 or latestBalance2
+        local isTransferable = subOffer.coinType == GameStore.CoinType.Transferable
+        local currentBalance = isTransferable and coinsBalance1 or coinsBalance2
+        
+        if isTransferable then
+            priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
+        else
+            priceLabel:setIcon("images/ui/tibiaCoin")
+        end
 
-            if latestCurrentBalance >= price then
-                if product.name == "Character Name Change" then
-                    displayErrorBox(controllerShop.ui:getText(), "no yet,UI missing")
-                elseif product.name == "Hireling Apprentice" then
-                    displayErrorBox(controllerShop.ui:getText(), "no yet, UI missing")
+        if currentBalance < subOffer.price then
+            priceLabel:setColor("#d33c3c")
+            offerPanel:getChildById('btnBuy'):disable()
+        else
+            priceLabel:setColor("white")
+            offerPanel:getChildById('btnBuy'):enable()
+        end
+
+        offerPanel:getChildById('btnBuy').onClick = function(widget)
+            if acceptWindow then
+                return true
+            end
+            local function acceptFunc()
+                local latestBalance2, latestBalance1 = getCoinsBalance()
+                local latestCurrentBalance = isTransferable and latestBalance1 or latestBalance2
+                if latestCurrentBalance >= subOffer.price then
+                    if product.name == "Character Name Change" then
+                        displayErrorBox(controllerShop.ui:getText(), "not yet, UI missing")
+                    elseif product.name == "Hireling Apprentice" then
+                        displayErrorBox(controllerShop.ui:getText(), "not yet, UI missing")
+                    else
+                        g_game.buyStoreOffer(subOffer.id, product.type)
+                    end
+                    if acceptWindow then
+                        acceptWindow:destroy()
+                        acceptWindow = nil
+                    end
                 else
-                    g_game.buyStoreOffer(product.subOffers[1].id, product.type)
-                end
-                if acceptWindow then
+                    displayErrorBox(controllerShop.ui:getText(), tr("You don't have enough coins"))
                     acceptWindow:destroy()
                     acceptWindow = nil
                 end
-            else
-                displayErrorBox(controllerShop.ui:getText(), tr("You don't have enough coins"))
+            end
+            local function cancelFunc()
                 acceptWindow:destroy()
                 acceptWindow = nil
             end
+            local coinType = isTransferable and "transferable coins" or "regular coins"
+            local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, subOffer.price, coinType)
+            local detailsMessage = string.format("%dx %s\nPrice: %d %s", subOffer.count, product.name, subOffer.price, coinType)
+            acceptWindow = displayGeneralSHOPBox(tr('Confirmation of Purchase'), confirmationMessage, detailsMessage,
+                getProductData(product), {
+                    {
+                        text = tr('Buy'),
+                        callback = acceptFunc
+                    },
+                    {
+                        text = tr('Cancel'),
+                        callback = cancelFunc
+                    },
+                    anchor = AnchorHorizontalCenter
+                }, acceptFunc, cancelFunc)
         end
-
-        local function cancelFunc()
-            acceptWindow:destroy()
-            acceptWindow = nil
-        end
-
-        local coinType = isTransferable and "transferable coins" or "regular coins"
-        local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, price,
-            coinType)
-        local detailsMessage = string.format("%dx %s\nPrice: %d %s", product.subOffers[1].count, product.name, price,
-            coinType)
-
-        acceptWindow = displayGeneralSHOPBox(tr('Confirmation of Purchase'), confirmationMessage, detailsMessage,
-            getProductData(product), {
-                {
-                    text = tr('Buy'),
-                    callback = acceptFunc
-                },
-                {
-                    text = tr('Cancel'),
-                    callback = cancelFunc
-                },
-                anchor = AnchorHorizontalCenter
-            }, acceptFunc, cancelFunc)
     end
-end
-
-function onParseStoreError(errorMessage)
-    displayErrorBox(controllerShop.ui:getText(), errorMessage)
 end
