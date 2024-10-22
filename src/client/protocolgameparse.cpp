@@ -852,18 +852,23 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
     }
 
     const uint8_t entries = msg->getU8();
-    std::vector<std::tuple<uint32_t, uint32_t, std::string>> historyData;
-
+    std::vector<std::tuple<uint32_t, uint8_t, int32_t, uint8_t, std::string>> historyData;
     for (auto i = 0; i < entries; ++i) {
         if (g_game.getClientVersion() >= 1332) {
-            msg->getU32();
+            msg->getU32(); // 0
             const uint32_t time = msg->getU32();
-            msg->getU8();
-            const uint32_t amount = (UINT32_MAX - msg->getU32());
-            msg->getU8();
+            const uint8_t mode = msg->getU8(); //0 = normal, 1 = gift, 2 = refund
+            uint32_t rawAmount = msg->getU32();
+            int32_t amount;
+            if (rawAmount > INT32_MAX) {
+                amount = -static_cast<int32_t>(UINT32_MAX - rawAmount + 1);
+            } else {
+                amount = static_cast<int32_t>(rawAmount);
+            }
+            const uint8_t coinType = msg->getU8(); // 0 = transferable tibia coin, 1 = normal tibia coin
             const auto& productName = msg->getString();
-            msg->getU8();
-            historyData.emplace_back(time, amount, productName);
+            msg->getU8(); //details
+            historyData.emplace_back(time, mode, amount, coinType, productName);
         } else {
             const uint16_t time = msg->getU16();
             const uint8_t productType = msg->getU8();
@@ -873,9 +878,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
         }
     }
 
-    if (g_game.getClientVersion() >= 1332) {
-        g_lua.callGlobalField("g_game", "onParseStoreGetHistory", currentPage, pageCount, historyData);
-    }
+    g_lua.callGlobalField("g_game", "onParseStoreGetHistory", currentPage, pageCount, historyData);
 }
 
 void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)

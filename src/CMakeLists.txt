@@ -192,10 +192,8 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
-if(WASM)
-	find_package(absl REQUIRED)
-	find_package(utf8_range REQUIRED)
-endif()
+find_package(phmap REQUIRED)
+find_package(absl CONFIG REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -205,6 +203,7 @@ find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
+
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -228,7 +227,7 @@ if(TOGGLE_FRAMEWORK_SOUND)
 	endif()
 	find_package(VorbisFile REQUIRED)
 	find_package(Vorbis REQUIRED)
-	find_package(Ogg CONFIG REQUIRED)
+	find_package(Ogg REQUIRED)
 endif()
 if(ANDROID)
 	set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
@@ -477,7 +476,8 @@ if(MSVC)
 
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${Protobuf_INCLUDE_DIRS}
 		${VORBISFILE_INCLUDE_DIR}
@@ -493,7 +493,6 @@ if(MSVC)
 		${CMAKE_THREAD_LIBS_INIT}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
@@ -506,6 +505,8 @@ if(MSVC)
 		${DBGHELP_LIBRARY}
 		${STDUUID}
 
+		protobuf::libprotobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		GLEW::GLEW
 		asio::asio
@@ -517,7 +518,8 @@ if(MSVC)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
@@ -535,7 +537,6 @@ elseif(ANDROID)
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
 		${OGG_LIBRARY}
@@ -547,6 +548,8 @@ elseif(ANDROID)
 		${STDUUID}
 		${MINIZIP_LIBRARY}
 
+		protobuf::libprotobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		asio::asio
 		OpenSLES
@@ -734,7 +737,8 @@ elseif(WASM)
 else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
@@ -750,7 +754,6 @@ else() # Linux
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
 		${OPENGL_LIBRARIES}
@@ -767,6 +770,8 @@ else() # Linux
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
+		protobuf::libprotobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		X11::X11
 		asio::asio

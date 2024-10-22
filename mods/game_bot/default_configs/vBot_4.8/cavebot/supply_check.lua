@@ -90,7 +90,7 @@ CaveBot.Extensions.SupplyCheck.setup = function()
         supplyRetries = 0
         missedChecks = 0
         return false
-      elseif supplyRetries > (storage.extras.huntRoutes or 50) then
+      elseif (storage.extras.huntRoutes or 0) ~= 0 and supplyRetries > (storage.extras.huntRoutes or 50) then
         print("CaveBot[SupplyCheck]: Round limit reached, going back on refill. Last round took: " .. round)
         setCaveBotData()
         return false
