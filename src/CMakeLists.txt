@@ -187,6 +187,7 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(phmap REQUIRED)
 find_package(absl CONFIG REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
@@ -197,7 +198,6 @@ find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
-CHECK_INCLUDE_FILE_CXX(phmap/phmap.h PHMAP_Found REQUIRED)
 
 if(APPLE)
 	# Required for Physfs
@@ -455,7 +455,8 @@ if(MSVC)
 
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${Protobuf_INCLUDE_DIRS}
 		${VORBISFILE_INCLUDE_DIR}
@@ -496,7 +497,8 @@ if(MSVC)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
@@ -540,7 +542,8 @@ elseif(ANDROID)
 else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
