@@ -41,7 +41,7 @@ bool LocalPlayer::canWalk(Otc::Direction dir, bool ignoreLock)
     if (isWalkLocked() && !ignoreLock)
         return false;
 
-    return m_walkTimer.ticksElapsed() >= getStepDuration() - 9 && (dir == m_direction || !m_walking);
+    return m_walkTimer.ticksElapsed() >= getStepDuration() && (dir == m_direction || !m_walking);
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
@@ -208,15 +208,6 @@ void LocalPlayer::terminateWalk()
 {
     Creature::terminateWalk();
     m_preWalking = false;
-
-    if (!static_self_cast<LocalPlayer>()->isAutoWalking()) {
-        g_dispatcher.addEvent([] {
-            g_dispatcher.deferEvent([] {
-                if (g_game.getLocalPlayer())
-                    g_game.walk(g_game.getLocalPlayer()->getNextWalkDir());
-            });
-        });
-    }
 }
 
 void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPos)
