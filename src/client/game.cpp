@@ -678,7 +678,7 @@ bool Game::walk(const Otc::Direction direction, bool force)
     }
 
     // check we can walk and add new walk event if false
-    if (!m_localPlayer->canWalk()) {
+    if (!m_localPlayer->canWalk(direction)) {
         return false;
     }
 
@@ -751,7 +751,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
 
     const Otc::Direction direction = *dirs.begin();
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(true)) {
+        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(direction, true)) {
             m_localPlayer->preWalk(direction);
         }
     }

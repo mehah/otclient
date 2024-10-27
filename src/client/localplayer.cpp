@@ -31,7 +31,7 @@ void LocalPlayer::lockWalk(uint16_t millis)
     m_walkLockExpiration = std::max<ticks_t>(m_walkLockExpiration, g_clock.millis() + millis);
 }
 
-bool LocalPlayer::canWalk(bool ignoreLock)
+bool LocalPlayer::canWalk(Otc::Direction dir, bool ignoreLock)
 {
     // paralyzed
     if (isDead())
@@ -41,7 +41,7 @@ bool LocalPlayer::canWalk(bool ignoreLock)
     if (isWalkLocked() && !ignoreLock)
         return false;
 
-    return !m_walking && m_walkTimer.ticksElapsed() >= getStepDuration();
+    return m_walkTimer.ticksElapsed() >= getStepDuration() - 9 && (dir == m_direction || !m_walking);
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
