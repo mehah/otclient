@@ -1,0 +1,10 @@
+Module
+  name: game_crafting
+  description: Crafting system
+  author: Oen
+  website: None
+  sandboxed: true
+  autoload: true
+  scripts: [ crafting ]
+  @onLoad: init()
+  @onUnload: terminate()
