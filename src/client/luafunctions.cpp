@@ -855,8 +855,6 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("getResourceBalance", &LocalPlayer::getResourceBalance);
     g_lua.bindClassMemberFunction<LocalPlayer>("setResourceBalance", &LocalPlayer::setResourceBalance);
     g_lua.bindClassMemberFunction<LocalPlayer>("getTotalMoney", &LocalPlayer::getTotalMoney);
-    g_lua.bindClassMemberFunction<LocalPlayer>("setNextWalkDir", &LocalPlayer::setNextWalkDir);
-    g_lua.bindClassMemberFunction<LocalPlayer>("getNextWalkDir", &LocalPlayer::getNextWalkDir);
 
     g_lua.registerClass<Tile, AttachableObject>();
     g_lua.bindClassMemberFunction<Tile>("clean", &Tile::clean);
