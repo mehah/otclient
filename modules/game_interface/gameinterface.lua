@@ -187,12 +187,16 @@ function bindWalkKey(key, dir)
     g_keyboard.bindKeyPress(key, function()
         smartWalk(dir)
     end, gameRootPanel)
+
+    g_keyboard.setKeyDelay(key, 10)
 end
 
 function unbindWalkKey(key)
     g_keyboard.unbindKeyDown(key, gameRootPanel)
     g_keyboard.unbindKeyUp(key, gameRootPanel)
     g_keyboard.unbindKeyPress(key, gameRootPanel)
+
+    g_keyboard.setKeyDelay(key, 30)
 end
 
 function bindTurnKey(key, dir)
