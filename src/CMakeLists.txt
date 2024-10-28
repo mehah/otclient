@@ -597,6 +597,9 @@ elseif(WASM)
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
+		protobuf::libprotobuf
+		absl::log_internal_check_op
+
 		Threads::Threads
 		asio::asio
 		# OpenAL::OpenAL (using emscripten openal api)
@@ -606,104 +609,6 @@ elseif(WASM)
 		OpenSSL::SSL
 		OpenSSL::Crypto
 		httplib::httplib
-
-		## all might not be necessary
-		absl::base
- 		absl::log_severity
- 		absl::malloc_internal
- 		absl::raw_logging_internal
- 		absl::scoped_set_env
- 		absl::spinlock_wait
- 		absl::strerror
- 		absl::throw_delegate
- 		absl::die_if_null
- 		absl::log_entry
- 		absl::city
- 		absl::hash
- 		absl::log_globals
- 		absl::log_flags
- 		absl::log_initialize
- 		absl::log_internal_conditions
- 		absl::log_internal_fnmatch
- 		absl::log_internal_globals
- 		absl::log_internal_nullguard
- 		absl::log_internal_proto
- 		absl::log_sink
- 		absl::int128
- 		absl::time_zone
- 		absl::time
- 		absl::kernel_timeout_internal
- 		absl::graphcycles_internal
- 		absl::stacktrace
- 		absl::symbolize
- 		absl::synchronization
- 		absl::log_internal_log_sink_set
- 		absl::str_format_internal
- 		absl::strings_internal
- 		absl::strings
- 		absl::string_view
- 		absl::log_internal_format
- 		absl::examine_stack
- 		absl::log_internal_message
- 		absl::die_if_null
- 		absl::log_internal_check_op
- 		absl::vlog_config_internal
- 		absl::cord
- 		absl::crc_cord_state
- 		absl::cord_internal
- 		absl::crc32c
- 		absl::flags_commandlineflag
- 		absl::flags_config
- 		absl::flags_internal
- 		absl::flags_marshalling
- 		absl::flags_parse
- 		absl::flags_private_handle_accessor
- 		absl::flags_program_name
- 		absl::flags_reflection
- 		absl::flags_usage
- 		absl::flags_usage_internal
- 		absl::log_internal_check_op
- 		absl::log_internal_fnmatch
- 		absl::log_internal_format
- 		absl::log_internal_globals
- 		absl::log_internal_log_sink_set
- 		absl::log_internal_message
- 		absl::random_internal_distribution_test_util
- 		absl::status
- 		absl::statusor
- 		absl::cordz_handle
- 		absl::cordz_info
- 		absl::crc_internal
- 		absl::failure_signal_handler
- 		absl::hashtablez_sampler
- 		absl::random_internal_pool_urbg
- 		absl::bad_any_cast_impl
- 		absl::bad_optional_access
- 		absl::bad_variant_access
- 		absl::civil_time
- 		absl::cordz_functions
- 		absl::cordz_sample_token
- 		absl::crc_cpu_detect
- 		absl::debugging_internal
- 		absl::demangle_internal
- 		absl::exponential_biased
- 		absl::flags
- 		absl::flags_commandlineflag_internal
- 		absl::leak_check
- 		absl::low_level_hash
- 		absl::periodic_sampler
- 		absl::random_distributions
- 		absl::random_internal_platform
- 		absl::random_internal_randen
- 		absl::random_internal_randen_hwaes
- 		absl::random_internal_randen_hwaes_impl
- 		absl::random_internal_randen_slow
- 		absl::random_internal_seed_material
- 		absl::random_seed_gen_exception
- 		absl::random_seed_sequences
- 		absl::raw_hash_set
-
- 		utf8_range::utf8_validity
 	)
 
 
