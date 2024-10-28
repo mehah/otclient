@@ -35,6 +35,14 @@ class PlatformWindow
         KEY_PRESS_REPEAT_INTERVAL = 30,
     };
 
+    struct KeyInfo
+    {
+        ticks_t firstTicks = 0;
+        ticks_t lastTicks = 0;
+        bool state = false;
+        uint8_t delay = KEY_PRESS_REPEAT_INTERVAL;
+    };
+
     using OnResizeCallback = std::function<void(const Size&)>;
     using OnInputEventCallback = std::function<void(const InputEvent&)>;
 
@@ -87,7 +95,7 @@ public:
     Point getMousePosition() { return m_inputEvent.mousePos; }
     int getKeyboardModifiers() { return m_inputEvent.keyboardModifiers; }
 
-    bool isKeyPressed(Fw::Key keyCode) { return m_keysState[keyCode]; }
+    bool isKeyPressed(Fw::Key keyCode) { return m_keyInfo[keyCode].state; }
     bool isMouseButtonPressed(Fw::MouseButton mouseButton)
     { if (mouseButton == Fw::MouseNoButton) return m_mouseButtonStates != 0; return (m_mouseButtonStates & (1u << mouseButton)) == (1u << mouseButton); }
     bool isVisible() { return m_visible; }
@@ -103,7 +111,10 @@ public:
 
     void addKeyListener(std::function<void(const InputEvent&)> listener) { m_keyListeners.push_back(listener); }
 
+    void setKeyDelay(const Fw::Key key, uint8_t delay) { if (key < Fw::KeyLast) m_keyInfo[key].delay = delay; }
+
 protected:
+
     virtual int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) = 0;
 
     void updateUnmaximizedCoords();
@@ -114,9 +125,7 @@ protected:
     void fireKeysPress();
 
     stdext::map<int, Fw::Key> m_keyMap;
-    std::array<bool, Fw::KeyLast> m_keysState;
-    std::array<ticks_t, Fw::KeyLast> m_firstKeysPress;
-    std::array<ticks_t, Fw::KeyLast> m_lastKeysPress;
+    std::array<KeyInfo, Fw::KeyLast> m_keyInfo = {};
     Timer m_keyPressTimer;
 
     Size m_size;
