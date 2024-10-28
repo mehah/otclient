@@ -645,6 +645,13 @@ bool Game::walk(const Otc::Direction direction, bool force)
     if (!canPerformGameAction())
         return false;
 
+    // must cancel auto walking, and wait next try
+    if (m_localPlayer->isAutoWalking()) {
+        m_protocolGame->sendStop();
+        m_localPlayer->stopAutoWalk();
+        return false;
+    }
+
     if (!force) {
         if (nextWalkSchedule)
             return false;
@@ -652,6 +659,9 @@ bool Game::walk(const Otc::Direction direction, bool force)
         if (m_localPlayer->getWalkSteps() > 0) {
             uint16_t delay = 0;
             if (m_localPlayer->getWalkSteps() == 1) {
+                if (m_localPlayer->isWalking())
+                    return false;
+
                 delay = m_walkFirstStepDelay;
             } else if (direction != m_localPlayer->getDirection())
                 delay = m_walkTurnDelay;
@@ -668,13 +678,6 @@ bool Game::walk(const Otc::Direction direction, bool force)
                 return false;
             }
         }
-    }
-
-    // must cancel auto walking, and wait next try
-    if (m_localPlayer->isAutoWalking()) {
-        m_protocolGame->sendStop();
-        m_localPlayer->stopAutoWalk();
-        return false;
     }
 
     // check we can walk and add new walk event if false
