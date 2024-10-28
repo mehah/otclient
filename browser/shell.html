@@ -162,13 +162,7 @@
             display = "Loading...";
             document.getElementById("start").style.display = "block";
           } else if (text.includes("Downloading data...")) {
-            var matches = text.match(/\((.*?)\)/);
-            display = "Downloading: ";
-            if (matches) {
-              var progress = matches[1].split("/");
-              var pct = progress[0] / progress[1];
-              display += Math.floor(pct * 100.0) + "%";
-            }
+            display = text;
           }
 
           document.getElementById("title-text").innerHTML = display;
