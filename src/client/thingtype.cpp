@@ -226,6 +226,20 @@ void ThingType::unserializeAppearance(uint16_t clientId, ThingCategory category,
     }
 
     // npcsaledata
+    if (flags.npcsaledata_size() > 0) {
+        for (int i = 0; i < flags.npcsaledata_size(); ++i) {
+            NPCData data;
+            data.name = flags.npcsaledata(i).name();
+            data.location = flags.npcsaledata(i).location();
+            data.salePrice = flags.npcsaledata(i).sale_price();
+            data.buyPrice = flags.npcsaledata(i).buy_price();
+            data.currencyObjectTypeId = flags.npcsaledata(i).currency_object_type_id();
+            data.currencyQuestFlagDisplayName = flags.npcsaledata(i).currency_quest_flag_display_name();
+            m_npcData.push_back(data);
+        }
+        m_flags |= ThingFlagAttrNPC;
+    }
+
     // charged to expire
     // corpse
     // player_corpse
