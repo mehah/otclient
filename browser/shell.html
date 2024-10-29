@@ -125,11 +125,6 @@
         preRun: [
           function () {
             addRunDependency("syncfs");
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const gameData = urlParams.get("gameData");
-            const version = urlParams.get("version");
-
             if (!FS.analyzePath("/user").exists) FS.mkdir("/user");
             FS.mount(IDBFS, { autoPersist: true }, "/user");
             FS.syncfs(true, function (err) {
@@ -157,7 +152,7 @@
         })(),
         setStatus: function (text) {
           console.log("status: " + text);
-          display = "";
+          let display = "";
           if (text.includes("Running...")) {
             display = "Loading...";
             document.getElementById("start").style.display = "block";
