@@ -159,7 +159,6 @@ function displayMessage(mode, text)
         if msgtype == MessageSettings.loot then
             local coloredText = ItemsDatabase.setColorLootMessage(text)
             label:setColoredText(coloredText)
-        
             local console = modules.game_console
             local consoleBuffer = console.consoleTabBar:getTabPanel(console.getTab("Server Log")):getChildById('consoleBuffer')
             consoleBuffer:getLastChild():setColoredText(coloredText)
