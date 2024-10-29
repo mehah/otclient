@@ -22,5 +22,6 @@
     "cxx17": {
       "description": "Enable compiler C++17."
     }
-  }
+  },
+  "builtin-baseline":"c82f74667287d3dc386bce81e44964370c91a289"
 }
