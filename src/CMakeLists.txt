@@ -63,6 +63,7 @@ endif()
 if (TOGGLE_FRAMEWORK_NET)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_NET)
 endif()
+
 if (TOGGLE_FRAMEWORK_EDITOR)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_EDITOR)
 endif()
@@ -122,10 +123,12 @@ if(ASAN_ENABLED)
 	log_option_enabled("asan")
 
 	if(MSVC)
-	target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
+		string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
+		target_link_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
 	else()
-	target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
-	target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
+		target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
+		target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
 	endif()
 else()
 	log_option_disabled("asan")
@@ -347,7 +350,6 @@ set(SOURCE_FILES
 	client/uiprogressrect.cpp
 	client/uisprite.cpp
 
-	protobuf/appearances.pb.cc
 	main.cpp
 	androidmain.cpp
 )
@@ -448,9 +450,11 @@ if(MSVC)
 		set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
 		find_package(Vorbis REQUIRED)
 		set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+		set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
 	else()
 		log_option_disabled("STATIC_LIBRARY")
 		target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
+		set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
 	endif()
 
 	target_include_directories(${PROJECT_NAME}
@@ -484,7 +488,7 @@ if(MSVC)
 		${DBGHELP_LIBRARY}
 		${STDUUID}
 
-		protobuf::libprotobuf
+		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
 		Threads::Threads
 		GLEW::GLEW
@@ -527,7 +531,7 @@ elseif(ANDROID)
 		${STDUUID}
 		${MINIZIP_LIBRARY}
 
-		protobuf::libprotobuf
+		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
 		Threads::Threads
 		asio::asio
@@ -575,7 +579,7 @@ else() # Linux
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
-		protobuf::libprotobuf
+		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
 		Threads::Threads
 		X11::X11
