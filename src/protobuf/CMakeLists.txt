@@ -25,8 +25,14 @@ if(PROTOBUF_FOUND)
 		"${CMAKE_CURRENT_SOURCE_DIR}/*.proto"
 	)
 
-	if (MSVC AND BUILD_STATIC_LIBRARY)
-		add_library(${PROJECT_NAME} STATIC ${ProtoFiles})
+	if (MSVC)
+		if (BUILD_STATIC_LIBRARY)
+			add_library(${PROJECT_NAME} STATIC ${ProtoFiles})
+			set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+		else()
+			add_library(${PROJECT_NAME} ${ProtoFiles})
+			set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+		endif()
 	else()
 		add_library(${PROJECT_NAME} ${ProtoFiles})
 	endif()
@@ -35,11 +41,8 @@ if(PROTOBUF_FOUND)
 		PUBLIC
 			protobuf::libprotobuf
 	)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC _DISABLE_VECTOR_ANNOTATION _DISABLE_STRING_ANNOTATION)
 	target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-
-	if (MSVC AND BUILD_STATIC_LIBRARY)
-		set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-	endif()
 
 	protobuf_generate(TARGET ${PROJECT_NAME} LANGUAGE cpp)
 endif(PROTOBUF_FOUND)
