@@ -175,11 +175,6 @@ function Cyclopedia.applyFilters()
 end
 
 function Cyclopedia.internalCreateItem(data)
-    -- temp fix 13.40
-    if data:getId() > 47381 and data:getId() < 80909 then
-        return
-    end
-
     local player = g_game.getLocalPlayer()
     local vocation = player:getVocation()
     local level = player:getLevel()
