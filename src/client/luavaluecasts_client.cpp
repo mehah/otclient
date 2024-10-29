@@ -119,6 +119,55 @@ bool luavalue_cast(int index, Position& pos)
     return true;
 }
 
+int push_luavalue(const std::vector<NPCData>& data) {
+    g_lua.createTable(data.size(), 0);
+    for (size_t i = 0; i < data.size(); ++i) {
+        g_lua.createTable(0, 6);
+        g_lua.pushString(data[i].name);
+        g_lua.setField("name");
+        g_lua.pushString(data[i].location);
+        g_lua.setField("location");
+        g_lua.pushInteger(data[i].salePrice);
+        g_lua.setField("salePrice");
+        g_lua.pushInteger(data[i].buyPrice);
+        g_lua.setField("buyPrice");
+        g_lua.pushInteger(data[i].currencyObjectTypeId);
+        g_lua.setField("currencyObjectTypeId");
+        g_lua.pushString(data[i].currencyQuestFlagDisplayName);
+        g_lua.setField("currencyQuestFlagDisplayName");
+        g_lua.rawSeti(i + 1);
+    }
+    return 1;
+}
+
+bool luavalue_cast(int index, std::vector<NPCData>& data)
+{
+    if (!g_lua.isTable(index))
+        return false;
+
+    g_lua.pushNil();
+    while (g_lua.next(index < 0 ? index - 1 : index)) {
+        NPCData npcData;
+        if (g_lua.isTable(-1)) {
+            g_lua.getField("name", -1);
+            npcData.name = g_lua.popString();
+            g_lua.getField("location", -1);
+            npcData.location = g_lua.popString();
+            g_lua.getField("salePrice", -1);
+            npcData.salePrice = g_lua.popInteger();
+            g_lua.getField("buyPrice", -1);
+            npcData.buyPrice = g_lua.popInteger();
+            g_lua.getField("currencyObjectTypeId", -1);
+            npcData.currencyObjectTypeId = g_lua.popInteger();
+            g_lua.getField("currencyQuestFlagDisplayName", -1);
+            npcData.currencyQuestFlagDisplayName = g_lua.popString();
+            data.push_back(npcData);
+        }
+        g_lua.pop();
+    }
+    return true;
+}
+
 int push_luavalue(const MarketData& data)
 {
     g_lua.createTable(0, 6);

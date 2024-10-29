@@ -162,7 +162,8 @@ enum ThingFlagAttr :uint64_t
     ThingFlagAttrPodium = static_cast<uint64_t>(1) << 42,
     ThingFlagAttrTopEffect = static_cast<uint64_t>(1) << 43,
     ThingFlagAttrDefaultAction = static_cast<uint64_t>(1) << 44,
-    ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45
+    ThingFlagAttrDecoKit = static_cast<uint64_t>(1) << 45,
+    ThingFlagAttrNPC = static_cast<uint64_t>(1) << 46
 };
 
 enum STACK_PRIORITY : uint8_t
@@ -272,6 +273,16 @@ struct MarketData
     uint16_t tradeAs;
 };
 
+struct NPCData
+{
+    std::string name;
+    std::string location;
+    uint32_t salePrice;
+    uint32_t buyPrice;
+    uint32_t currencyObjectTypeId;
+    std::string currencyQuestFlagDisplayName;
+};
+
 struct MarketOffer
 {
     uint32_t timestamp = 0;
@@ -329,6 +340,34 @@ public:
     const Point& getDisplacement() { return m_displacement; }
     const Light& getLight() { return m_light; }
     const MarketData& getMarketData() { return m_market; }
+    const std::vector<NPCData>& getNpcSaleData() { return m_npcData; }
+    int getMeanPrice() {
+        static constexpr std::array<std::pair<uint32_t, uint32_t>, 3> forcedPrices = { {
+            {3043, 10000},
+            {3031, 50},
+            {3035, 50 }
+            
+        } };
+
+        const uint32_t itemId = getId();
+
+        const auto it = std::find_if(forcedPrices.begin(), forcedPrices.end(),
+            [itemId](const auto& pair) { return pair.first == itemId; });
+
+        if (it != forcedPrices.end()) {
+            return it->second;
+        }
+
+        const auto npcCount = m_npcData.size();
+        if (npcCount == 0) {
+            return 0;
+        }
+
+        const int totalBuyPrice = std::accumulate(m_npcData.begin(), m_npcData.end(), 0,
+            [](int sum, const auto& npc) { return sum + npc.buyPrice; });
+
+        return totalBuyPrice / static_cast<int>(npcCount);
+    }
 
     int getDisplacementX() { return getDisplacement().x; }
     int getDisplacementY() { return getDisplacement().y; }
@@ -480,6 +519,8 @@ private:
     uint64_t m_flags{ 0 };
 
     MarketData m_market;
+    std::vector<NPCData> m_npcData;
+
     Light m_light;
 
     float m_opacity{ 1.f };

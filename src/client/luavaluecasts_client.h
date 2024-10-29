@@ -37,6 +37,10 @@ bool luavalue_cast(int index, Position& pos);
 int push_luavalue(const MarketData& data);
 bool luavalue_cast(int index, MarketData& data);
 
+// NPC
+int push_luavalue(const std::vector<NPCData>& data);
+bool luavalue_cast(int index, std::vector<NPCData>& data);
+
 // light
 int push_luavalue(const Light& light);
 bool luavalue_cast(int index, Light& light);

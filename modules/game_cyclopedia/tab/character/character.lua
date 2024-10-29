@@ -286,6 +286,8 @@ function Cyclopedia.reloadCharacterItems()
             local gridItem = g_ui.createWidget("CharacterGridItem", UI.CharacterItems.gridBase.grid)
             gridItem.item:setItemId(itemId)
             gridItem.amount:setText(data.amount)
+            ItemsDatabase.setRarityItem(gridItem.item, gridItem.item:getItem())
+            ItemsDatabase.setTier(gridItem.item, item.tier)
             colorIndex = 3 - colorIndex
         end
     end

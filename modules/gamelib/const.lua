@@ -214,7 +214,8 @@ TextColors = {
     -- blue1     = '#6e50dc',
     -- blue2     = '#3264c8',
     -- blue3     = '#0096c8',
-    white = '#ffffff' -- '#bebebe'
+    white = '#ffffff', -- '#bebebe'
+    grey = '#AAAAAA'
 }
 
 MessageModes = {
