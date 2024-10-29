@@ -601,7 +601,7 @@ elseif(WASM)
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
-		protobuf::libprotobuf
+		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
 
 		Threads::Threads
@@ -642,6 +642,7 @@ elseif(WASM)
 	set_target_properties(${PROJECT_NAME} PROPERTIES
   	LINK_FLAGS ${linkflags})
 	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+	set(VCPKG_TARGET_TRIPLET "wasm32-emscripten" CACHE STRING "")
 
 else() # Linux
 	target_include_directories(${PROJECT_NAME}

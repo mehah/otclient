@@ -4,8 +4,8 @@ vcpkg_from_github(
     REPO icculus/physfs
     REF "release-${VERSION}"
     SHA512 e0d84d6ac6bd8f0973149a5add54ed5ed890b5fabb4592ba61b59a3b3e01c05e05f1754f18d7a1c8d72e68777a23cda0c50dc0512cf57a8310a950bf908f54b1
-    PATCHES 
-	"use_pthread.patch"
+    PATCHES
+	use_pthread.patch
 )
 
 string(COMPARE EQUAL "${VCPKG_LIBRARY_LINKAGE}" "static" PHYSFS_STATIC)
