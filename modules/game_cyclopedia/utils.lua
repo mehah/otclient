@@ -1528,7 +1528,7 @@ end
 function Cyclopedia.formatSaleData(data)
     local s, sell, b, buy = {}, {}, {}, {}
 
-    for i = 0, #data do
+    for i = 1, #data do
         local value = data[i]
 
         if value then
@@ -1569,18 +1569,18 @@ function Cyclopedia.formatSaleData(data)
     for name, value in pairs(s) do
         if value.various then
             table.insert(sell,
-                string.format("%s gp, %s\nResidence: %s", formatGold(value.price), name, "Various Locations"))
+                string.format("%s gp, %s\nResidence: %s", Cyclopedia.formatGold(value.price), name, "Various Locations"))
         else
-            table.insert(sell, string.format("%s gp, %s\nResidence: %s", formatGold(value.price), name, value.location))
+            table.insert(sell, string.format("%s gp, %s\nResidence: %s", Cyclopedia.formatGold(value.price), name, value.location))
         end
     end
 
     for name, value in pairs(b) do
         if value.various then
             table.insert(buy,
-                string.format("%s gp, %s\nResidence: %s", formatGold(value.price), name, "Various Locations"))
+                string.format("%s gp, %s\nResidence: %s", Cyclopedia.formatGold(value.price), name, "Various Locations"))
         else
-            table.insert(buy, string.format("%s gp, %s\nResidence: %s", formatGold(value.price), name, value.location))
+            table.insert(buy, string.format("%s gp, %s\nResidence: %s", Cyclopedia.formatGold(value.price), name, value.location))
         end
     end
 
