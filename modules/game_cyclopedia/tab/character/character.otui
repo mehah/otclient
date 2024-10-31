@@ -1208,7 +1208,7 @@ UIWidget
       id: gridBase
       size: 494 340
       anchors.bottom: parent.bottom
-      anchors.left: parentl.left
+      anchors.left: parent.left
       visible: false
       UIScrollArea
         id: grid
@@ -1297,7 +1297,7 @@ UIWidget
       height: 55
       anchors.top: parent.top
       anchors.left: parent.left
-      anchors.right: ListBase.right
+      anchors.right: parent.right
       image-source: /images/game/actionbar/2pixel-up-frame-borderimage
       image-border: 5
       CheckBox

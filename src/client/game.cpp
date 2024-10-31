@@ -66,7 +66,6 @@ void Game::resetGameStates()
     m_pingSent = 0;
     m_pingReceived = 0;
     m_unjustifiedPoints = UnjustifiedPoints();
-    m_nextScheduledDir = Otc::InvalidDirection;
 
     for (const auto& it : m_containers) {
         const auto& container = it.second;
@@ -77,11 +76,6 @@ void Game::resetGameStates()
     if (m_pingEvent) {
         m_pingEvent->cancel();
         m_pingEvent = nullptr;
-    }
-
-    if (m_walkEvent) {
-        m_walkEvent->cancel();
-        m_walkEvent = nullptr;
     }
 
     if (m_checkConnectionEvent) {
@@ -506,7 +500,7 @@ void Game::processBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& besti
     g_lua.callGlobalField("g_game", "onParseBestiaryRaces", bestiaryRaces);
 }
 
-void Game::processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills, 
+void Game::processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
                                                 const std::vector<std::tuple<uint8_t, uint16_t>>& combats)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterGeneralStats", stats, skills, combats);
@@ -519,7 +513,7 @@ void Game::processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombat
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterCombatStats", data, mitigation, additionalSkillsArray, forgeSkillsArray, perfectShotDamageRangesArray, combatsArray, concoctionsArray);
 }
 
-void Game::processCyclopediaCharacterGeneralStatsBadge(const uint8_t showAccountInformation, const uint8_t playerOnline, const uint8_t playerPremium, 
+void Game::processCyclopediaCharacterGeneralStatsBadge(const uint8_t showAccountInformation, const uint8_t playerOnline, const uint8_t playerPremium,
                                                 const std::string_view loyaltyTitle, const std::vector<std::tuple<uint32_t, std::string>>& badgesVector)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterBadges", showAccountInformation, playerOnline, playerPremium, loyaltyTitle, badgesVector);
@@ -530,7 +524,7 @@ void Game::processCyclopediaCharacterItemSummary(const CyclopediaCharacterItemSu
     g_lua.callGlobalField("g_game", "onUpdateCyclopediaCharacterItemSummary", data);
 }
 
-void Game::processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits, 
+void Game::processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits,
                                                 const std::vector<CharacterInfoMounts>& mounts, std::vector<CharacterInfoFamiliar>& familiars)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterAppearances", currentOutfit, outfits, mounts, familiars);
@@ -636,42 +630,59 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction, const bool isKeyDown /*= false*/)
+bool Game::walk(const Otc::Direction direction, bool force)
 {
+    static ScheduledEventPtr nextWalkSchedule = nullptr;
+
+    if (direction == Otc::InvalidDirection) {
+        if (nextWalkSchedule) {
+            nextWalkSchedule->cancel();
+            nextWalkSchedule = nullptr;
+        }
+        return false;
+    }
+
     if (!canPerformGameAction())
         return false;
 
     // must cancel auto walking, and wait next try
     if (m_localPlayer->isAutoWalking()) {
         m_protocolGame->sendStop();
-        m_localPlayer->autoWalk(m_localPlayer->getPosition().translatedToDirection(direction));
+        m_localPlayer->stopAutoWalk();
         return false;
+    }
+
+    if (!force) {
+        if (nextWalkSchedule)
+            return false;
+
+        if (m_localPlayer->getWalkSteps() > 0) {
+            uint16_t delay = 0;
+            if (m_localPlayer->getWalkSteps() == 1) {
+                if (m_localPlayer->isWalking())
+                    return false;
+
+                delay = m_walkFirstStepDelay;
+            } else if (direction != m_localPlayer->getDirection())
+                delay = m_walkTurnDelay;
+
+            if (delay > 0) {
+                nextWalkSchedule = g_dispatcher.scheduleEvent([this, direction] {
+                    if (m_localPlayer) {
+                        m_localPlayer->setWalkSteps(1);
+                        walk(direction, true);
+                    }
+
+                    nextWalkSchedule = nullptr;
+                }, delay);
+                return false;
+            }
+        }
     }
 
     // check we can walk and add new walk event if false
-    if (!m_localPlayer->canWalk()) {
-        if (m_nextScheduledDir != direction) {
-            const float ticks = std::clamp<float>(m_localPlayer->getStepTicksLeft(), 1, 2000);
-            if (isKeyDown || (m_scheduleLastWalk && ticks < std::min<int>(m_localPlayer->getStepDuration() / 3, 250))) {
-                // must add a new walk event
-                if (m_walkEvent) {
-                    m_walkEvent->cancel();
-                    m_walkEvent = nullptr;
-                }
-
-                m_walkEvent = g_dispatcher.scheduleEvent([this, direction] { walk(direction); }, ticks);
-                m_nextScheduledDir = direction;
-            }
-        }
+    if (!m_localPlayer->canWalk(direction)) {
         return false;
-    }
-
-    m_nextScheduledDir = Otc::InvalidDirection;
-
-    // if it's going to walk, but there is another scheduled event, cancel it
-    if (m_walkEvent && !m_walkEvent->isExecuted()) {
-        m_walkEvent->cancel();
-        m_walkEvent = nullptr;
     }
 
     const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
@@ -719,8 +730,6 @@ bool Game::walk(const Otc::Direction direction, const bool isKeyDown /*= false*/
 
     forceWalk(direction);
 
-    m_lastWalkDir = direction;
-
     return true;
 }
 
@@ -744,15 +753,13 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
     }
 
     const Otc::Direction direction = *dirs.begin();
-
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(true)) {
+        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(direction, true)) {
             m_localPlayer->preWalk(direction);
         }
     }
 
     g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
-
     m_protocolGame->sendAutoWalk(dirs);
 }
 
@@ -1041,13 +1048,6 @@ void Game::cancelAttackAndFollow()
 
     if (isAttacking())
         setAttackingCreature(nullptr);
-
-    if (m_walkEvent) {
-        m_walkEvent->cancel();
-        m_walkEvent = nullptr;
-    }
-
-    m_nextScheduledDir = Otc::InvalidDirection;
 
     m_localPlayer->stopAutoWalk();
 
@@ -1891,7 +1891,7 @@ void Game::inspectionObject(const Otc::InspectObjectTypes inspectionType, const 
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendInspectionObject(inspectionType , itemId, itemCount);
+    m_protocolGame->sendInspectionObject(inspectionType, itemId, itemCount);
 }
 
 void Game::requestBestiary()
@@ -1956,7 +1956,6 @@ void Game::requestBossSlotAction(const uint8_t action, const uint32_t raceId)
         return;
 
     m_protocolGame->sendRequestBossSlotAction(action, raceId);
-
 }
 
 void Game::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)

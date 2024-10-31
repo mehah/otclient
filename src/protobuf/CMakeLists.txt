@@ -8,6 +8,7 @@ if(APPLE)
 endif(APPLE)
 
 find_package(Protobuf REQUIRED)
+find_package(Threads)
 
 if(EXISTS ${PROTOBUF_PROTOC_EXECUTABLE})
 	message(STATUS "Found Protobuf Compiler: ${PROTOBUF_PROTOC_EXECUTABLE}")
@@ -16,27 +17,32 @@ else()
 endif()
 
 if(PROTOBUF_FOUND)
+
 	include_directories(${PROTOBUF_INCLUDE_DIRS})
 
-	protobuf_generate_cpp(ProtoSources ProtoHeaders appearances.proto)
+	file(GLOB ProtoFiles
+		"${CMAKE_CURRENT_SOURCE_DIR}/**/*.proto"
+		"${CMAKE_CURRENT_SOURCE_DIR}/*.proto"
+	)
 
-	if(NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/appearances.pb.cc OR NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/appearances.pb.h)
-		message(FATAL_ERROR, "Failed to generate protobuf files")
+	if (MSVC)
+		if (BUILD_STATIC_LIBRARY)
+			add_library(${PROJECT_NAME} STATIC ${ProtoFiles})
+			set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+		else()
+			add_library(${PROJECT_NAME} ${ProtoFiles})
+			set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+		endif()
+	else()
+		add_library(${PROJECT_NAME} ${ProtoFiles})
 	endif()
 
-	add_library(${PROJECT_NAME} STATIC ${ProtoSources} ${ProtoHeaders})
-	target_link_libraries(${PROJECT_NAME} ${PROTOBUF_LIBRARY})
-
-	add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
-
-		# Copy files "appearances.pb.cc" to the "src/protobuf" folder
-		COMMAND ${CMAKE_COMMAND} -E copy
-		${CMAKE_CURRENT_BINARY_DIR}/appearances.pb.cc
-		${CMAKE_CURRENT_SOURCE_DIR}/appearances.pb.cc
-
-		# Copy files "appearances.pb.h" to the "src/protobuf" folder
-		COMMAND ${CMAKE_COMMAND} -E copy
-		${CMAKE_CURRENT_BINARY_DIR}/appearances.pb.h
-		${CMAKE_CURRENT_SOURCE_DIR}/appearances.pb.h
+	target_link_libraries(${PROJECT_NAME}
+		PUBLIC
+			protobuf::libprotobuf
 	)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC _DISABLE_VECTOR_ANNOTATION _DISABLE_STRING_ANNOTATION)
+	target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+
+	protobuf_generate(TARGET ${PROJECT_NAME} LANGUAGE cpp)
 endif(PROTOBUF_FOUND)

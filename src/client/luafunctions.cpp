@@ -46,6 +46,9 @@
 #include "towns.h"
 #include "uicreature.h"
 #include "uiitem.h"
+#include "uieffect.h"
+#include "uimissile.h"
+
 #include "uimap.h"
 #include "uimapanchorlayout.h"
 #include "uiminimap.h"
@@ -225,7 +228,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "forceLogout", &Game::forceLogout, &g_game);
     g_lua.bindSingletonFunction("g_game", "safeLogout", &Game::safeLogout, &g_game);
     g_lua.bindSingletonFunction("g_game", "walk", &Game::walk, &g_game);
-    g_lua.bindSingletonFunction("g_game", "setScheduleLastWalk", &Game::setScheduleLastWalk, &g_game);
     g_lua.bindSingletonFunction("g_game", "autoWalk", &Game::autoWalk, &g_game);
     g_lua.bindSingletonFunction("g_game", "forceWalk", &Game::forceWalk, &g_game);
     g_lua.bindSingletonFunction("g_game", "turn", &Game::turn, &g_game);
@@ -339,7 +341,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "answerModalDialog", &Game::answerModalDialog, &g_game);
     g_lua.bindSingletonFunction("g_game", "browseField", &Game::browseField, &g_game);
     g_lua.bindSingletonFunction("g_game", "seekInContainer", &Game::seekInContainer, &g_game);
-    g_lua.bindSingletonFunction("g_game", "getLastWalkDir", &Game::getLastWalkDir, &g_game);
     g_lua.bindSingletonFunction("g_game", "buyStoreOffer", &Game::buyStoreOffer, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestTransactionHistory", &Game::requestTransactionHistory, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestStoreOffers", &Game::requestStoreOffers, &g_game);
@@ -378,6 +379,11 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "requestBossSlootInfo", &Game::requestBossSlootInfo, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestBossSlotAction", &Game::requestBossSlotAction, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendStatusTrackerBestiary", &Game::sendStatusTrackerBestiary, &g_game);
+
+    g_lua.bindSingletonFunction("g_game", "getWalkTurnDelay", &Game::getWalkTurnDelay, &g_game);
+    g_lua.bindSingletonFunction("g_game", "getWalkFirstStepDelay", &Game::getWalkFirstStepDelay, &g_game);
+    g_lua.bindSingletonFunction("g_game", "setWalkTurnDelay", &Game::setWalkTurnDelay, &g_game);
+    g_lua.bindSingletonFunction("g_game", "setWalkFirstStepDelay", &Game::setWalkFirstStepDelay, &g_game);
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
@@ -453,6 +459,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("getPosition", &Thing::getPosition);
     g_lua.bindClassMemberFunction<Thing>("getStackPos", &Thing::getStackPos);
     g_lua.bindClassMemberFunction<Thing>("getMarketData", &Thing::getMarketData);
+    g_lua.bindClassMemberFunction<Thing>("getNpcSaleData", &Thing::getNpcSaleData);
+    g_lua.bindClassMemberFunction<Thing>("getMeanPrice", &Thing::getMeanPrice);
     g_lua.bindClassMemberFunction<Thing>("getStackPriority", &Thing::getStackPriority);
     g_lua.bindClassMemberFunction<Thing>("getParentContainer", &Thing::getParentContainer);
     g_lua.bindClassMemberFunction<Thing>("isItem", &Thing::isItem);
@@ -671,6 +679,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ThingType>("isCloth", &ThingType::isCloth);
     g_lua.bindClassMemberFunction<ThingType>("isMarketable", &ThingType::isMarketable);
     g_lua.bindClassMemberFunction<ThingType>("getMarketData", &ThingType::getMarketData);
+    g_lua.bindClassMemberFunction<ThingType>("getNpcSaleData", &ThingType::getNpcSaleData);
+    g_lua.bindClassMemberFunction<ThingType>("getMeanPrice", &ThingType::getMeanPrice);
     g_lua.bindClassMemberFunction<ThingType>("isUsable", &ThingType::isUsable);
     g_lua.bindClassMemberFunction<ThingType>("isWrapable", &ThingType::isWrapable);
     g_lua.bindClassMemberFunction<ThingType>("isUnwrapable", &ThingType::isUnwrapable);
@@ -709,6 +719,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("isMarketable", &Item::isMarketable);
     g_lua.bindClassMemberFunction<Item>("isFluidContainer", &Item::isFluidContainer);
     g_lua.bindClassMemberFunction<Item>("getMarketData", &Item::getMarketData);
+    g_lua.bindClassMemberFunction<Item>("getNpcSaleData", &Item::getNpcSaleData);
+    g_lua.bindClassMemberFunction<Item>("getMeanPrice", &Item::getMeanPrice);
     g_lua.bindClassMemberFunction<Item>("getClothSlot", &Item::getClothSlot);
     g_lua.bindClassMemberFunction<Item>("hasWearOut", &ThingType::hasWearOut);
     g_lua.bindClassMemberFunction<Item>("hasClockExpire", &ThingType::hasClockExpire);
@@ -920,6 +932,32 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIItem>("getItem", &UIItem::getItem);
     g_lua.bindClassMemberFunction<UIItem>("isVirtual", &UIItem::isVirtual);
     g_lua.bindClassMemberFunction<UIItem>("isItemVisible", &UIItem::isItemVisible);
+
+    g_lua.registerClass<UIEffect, UIWidget>();
+    g_lua.bindClassStaticFunction<UIEffect>("create", [] { return std::make_shared<UIEffect>(); });
+    g_lua.bindClassMemberFunction<UIEffect>("setEffectId", &UIEffect::setEffectId);
+    g_lua.bindClassMemberFunction<UIEffect>("setEffectVisible", &UIEffect::setEffectVisible);
+    g_lua.bindClassMemberFunction<UIEffect>("setEffect", &UIEffect::setEffect);
+    g_lua.bindClassMemberFunction<UIEffect>("setVirtual", &UIEffect::setVirtual);
+    g_lua.bindClassMemberFunction<UIEffect>("clearEffect", &UIEffect::clearEffect);
+    g_lua.bindClassMemberFunction<UIEffect>("getEffectId", &UIEffect::getEffectId);
+    g_lua.bindClassMemberFunction<UIEffect>("getEffect", &UIEffect::getEffect);
+    g_lua.bindClassMemberFunction<UIEffect>("isVirtual", &UIEffect::isVirtual);
+    g_lua.bindClassMemberFunction<UIEffect>("isEffectVisible", &UIEffect::isEffectVisible);
+
+    g_lua.registerClass<UIMissile, UIWidget>();
+    g_lua.bindClassStaticFunction<UIMissile>("create", [] { return std::make_shared<UIMissile>(); });
+    g_lua.bindClassMemberFunction<UIMissile>("setMissileId", &UIMissile::setMissileId);
+    g_lua.bindClassMemberFunction<UIMissile>("setMissileVisible", &UIMissile::setMissileVisible);
+    g_lua.bindClassMemberFunction<UIMissile>("setMissile", &UIMissile::setMissile);
+    g_lua.bindClassMemberFunction<UIMissile>("setVirtual", &UIMissile::setVirtual);
+    g_lua.bindClassMemberFunction<UIMissile>("clearMissile", &UIMissile::clearMissile);
+    g_lua.bindClassMemberFunction<UIMissile>("getMissileId", &UIMissile::getMissileId);
+    g_lua.bindClassMemberFunction<UIMissile>("getMissile", &UIMissile::getMissile);
+    g_lua.bindClassMemberFunction<UIMissile>("isVirtual", &UIMissile::isVirtual);
+    g_lua.bindClassMemberFunction<UIMissile>("isMissileVisible", &UIMissile::isMissileVisible);
+    g_lua.bindClassMemberFunction<UIMissile>("setDirection", &UIMissile::setDirection);
+    g_lua.bindClassMemberFunction<UIMissile>("getDirection", &UIMissile::getDirection);
 
     g_lua.registerClass<UISprite, UIWidget>();
     g_lua.bindClassStaticFunction<UISprite>("create", [] { return std::make_shared<UISprite>(); });

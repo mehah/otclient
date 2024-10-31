@@ -147,6 +147,7 @@ namespace Fw
         KeyBar = 124,         // |
         KeyRightCurly = 125,  // }
         KeyTilde = 126,       // ~
+        KeyDel = 127,       // DEL (Ctrl + Backspace)
         KeyF1 = 128,
         KeyF2 = 129,
         KeyF3 = 130,

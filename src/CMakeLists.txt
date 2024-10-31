@@ -63,6 +63,7 @@ endif()
 if (TOGGLE_FRAMEWORK_NET)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_NET)
 endif()
+
 if (TOGGLE_FRAMEWORK_EDITOR)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_EDITOR)
 endif()
@@ -122,10 +123,12 @@ if(ASAN_ENABLED)
 	log_option_enabled("asan")
 
 	if(MSVC)
-	target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
+		string(REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+		target_compile_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
+		target_link_options(${PROJECT_NAME} PUBLIC /fsanitize=address)
 	else()
-	target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
-	target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
+		target_compile_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
+		target_link_options(${PROJECT_NAME} PUBLIC -fsanitize=address)
 	endif()
 else()
 	log_option_disabled("asan")
@@ -187,6 +190,8 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(phmap REQUIRED)
+find_package(absl CONFIG REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(LibLZMA REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -196,6 +201,7 @@ find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
+
 if(APPLE)
 	# Required for Physfs
 	find_library(FOUNDATION Foundation REQUIRED)
@@ -216,8 +222,8 @@ endif()
 if(TOGGLE_FRAMEWORK_SOUND)
 	find_package(OpenAL CONFIG REQUIRED)
 	find_package(VorbisFile REQUIRED)
-	find_package(Vorbis CONFIG REQUIRED)
-	find_package(Ogg CONFIG REQUIRED)
+	find_package(Vorbis REQUIRED)
+	find_package(Ogg REQUIRED)
 endif()
 if(ANDROID)
 	set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
@@ -336,13 +342,14 @@ set(SOURCE_FILES
 	client/uicreature.cpp
 	client/uigraph.cpp
 	client/uiitem.cpp
+	client/uieffect.cpp
+	client/uimissile.cpp
 	client/uimap.cpp
 	client/uimapanchorlayout.cpp
 	client/uiminimap.cpp
 	client/uiprogressrect.cpp
 	client/uisprite.cpp
 
-	protobuf/appearances.pb.cc
 	main.cpp
 	androidmain.cpp
 )
@@ -443,14 +450,17 @@ if(MSVC)
 		set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
 		find_package(Vorbis REQUIRED)
 		set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+		set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
 	else()
 		log_option_disabled("STATIC_LIBRARY")
 		target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
+		set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
 	endif()
 
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${Protobuf_INCLUDE_DIRS}
 		${VORBISFILE_INCLUDE_DIR}
@@ -466,19 +476,20 @@ if(MSVC)
 		${CMAKE_THREAD_LIBS_INIT}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
+		${OGG_LIBRARY}
 		${VORBISFILE_LIBRARY}
 		${VORBIS_LIBRARY}
-		${OGG_LIBRARY}
 		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
 		${STDUUID}
 
+		protobuf::libprotobuf protobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		GLEW::GLEW
 		asio::asio
@@ -490,7 +501,8 @@ if(MSVC)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
@@ -508,21 +520,22 @@ elseif(ANDROID)
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
 		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
 		${GMP_LIBRARY}
 		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${STDUUID}
 		${MINIZIP_LIBRARY}
 
+		protobuf::libprotobuf protobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		asio::asio
 		OpenSLES
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		game-activity::game-activity
 		GLESv3
@@ -533,7 +546,8 @@ elseif(ANDROID)
 else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE
-		${CMAKE_SOURCE_DIR}/src
+		$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 		${LUAJIT_INCLUDE_DIR}
 		${CMAKE_THREAD_LIBS_INIT}
 		${Protobuf_INCLUDE_DIRS}
@@ -549,13 +563,14 @@ else() # Linux
 		${LUAJIT_LIBRARY}
 		${PHYSFS_LIBRARY}
 		${ZLIB_LIBRARY}
-		${PROTOBUF_LIBRARY}
 		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
 		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
 		${GMP_LIBRARY}
 		${STDUUID}
 		${FOUNDATION}
@@ -564,12 +579,12 @@ else() # Linux
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
+		protobuf::libprotobuf protobuf
+		absl::log_internal_check_op
 		Threads::Threads
 		X11::X11
 		asio::asio
 		OpenAL::OpenAL
-		Vorbis::vorbis
-		Vorbis::vorbisfile
 		LibLZMA::LibLZMA
 		pugixml::pugixml
 		ZLIB::ZLIB

@@ -25,12 +25,6 @@ return {
     },
     classicControl                    = g_platform.isMobile() and true or false,
     smartWalk                         = false,
-    preciseControl                    = {
-        value = false,
-        action = function(value, options, controller, panels, extraWidgets)
-            g_game.setScheduleLastWalk(not value)
-        end
-    },
     autoChaseOverride                 = true,
     moveStack                         = false,
     showStatusMessagesInConsole       = true,
@@ -154,6 +148,23 @@ return {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
             g_app.setDrawTexts(value)
+        end
+    },
+    walkFirstStepDelay                = {
+        value = 250,
+        action = function(value, options, controller, panels, extraWidgets)
+            panels.generalPanel:recursiveGetChildById('walkFirstStepDelay'):setText(string.format(
+                'Walk Delay after first step: %sms', value))
+            g_game.setWalkFirstStepDelay(value)
+        end
+    },
+    walkTurnDelay                     = {
+        value = 100,
+        action = function(value, options, controller, panels, extraWidgets)
+            panels.generalPanel:recursiveGetChildById('walkTurnDelay'):setText(string.format(
+                'Walk delay after turn: %sms',
+                value))
+            g_game.setWalkTurnDelay(value)
         end
     },
     turnDelay                         = {

@@ -22,37 +22,34 @@
 
 #pragma once
 
-#include <framework/global.h>
-#include <framework/core/timer.h>
-#include "thing.h"
+#include <framework/ui/uiwidget.h>
+#include "declarations.h"
+#include "missile.h"
 
- // @bindclass
-class Missile : public Thing
+class UIMissile : public UIWidget
 {
 public:
-    Missile() { m_drawConductor = { true, DrawOrder::FIFTH }; };
-    void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr);
+    UIMissile();
+    void drawSelf(DrawPoolType drawPane) override;
 
-    void setId(uint32_t id) override;
-    void setPath(const Position& fromPosition, const Position& toPosition);
+    void setMissileId(int id);
+    void setMissileVisible(bool visible) { m_missileVisible = visible; }
+    void setMissile(const MissilePtr& missile);
+    void setVirtual(bool virt) { m_virtual = virt; }
+    void setDirection(Otc::Direction dir) { if (m_missile) m_missile->setDirection(dir); }
+    void clearMissile() { setMissileId(0); }
 
-    bool isMissile() override { return true; }
-
-    MissilePtr asMissile() { return static_self_cast<Missile>(); }
-
-    void setDirection(Otc::Direction dir);
-    auto getDirection() { return m_direction; }
+    int getMissileId() { return m_missile ? m_missile->getId() : 0; }
+    auto getDirection() { return m_missile ? m_missile->getDirection() : Otc::Direction::InvalidDirection; }
+    auto getMissile() { return m_missile; }
+    bool isVirtual() { return m_virtual; }
+    bool isMissileVisible() { return m_missileVisible; }
 
 protected:
-    ThingType* getThingType() const override;
+    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
-private:
-    Timer m_animationTimer;
-    Point m_delta;
-
-    float m_duration{ 0.f };
-
-    Otc::Direction m_direction{ Otc::InvalidDirection };
-
-    uint8_t m_distance{ 0 };
+    MissilePtr m_missile;
+    bool m_virtual{ false };
+    bool m_showId{ false };
+    bool m_missileVisible{ true };
 };

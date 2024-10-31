@@ -136,6 +136,10 @@ local function connectKeyPressEvent(widget)
     widget.boundKeyPressCombos = {}
 end
 
+function g_keyboard.setKeyDelay(key, delay)
+    g_window.setKeyDelay(getKeyCode(key), delay);
+end
+
 -- public functions
 function g_keyboard.bindKeyDown(keyComboDesc, callback, widget, alone)
     widget = widget or rootWidget

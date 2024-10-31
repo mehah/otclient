@@ -136,11 +136,7 @@ CharacterGridItem < UIWidget
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
     image-source: /images/ui/item
-  UIWidget
-    id: rarity
-    margin: 1
-    anchors.fill: ItemBackground
-  UIItem
+  Item
     id: item
     anchors.fill: ItemBackground
   Label
@@ -1418,7 +1414,7 @@ RowStore2 < UIWidget
     text-align: center
     text-offset: 15 0
     image-color: #1111118c
-    icon: images/tibiaCoin
+    icon: /images/ui/tibiaCoin
     icon-align: right
     icon-offset: -2 0
 

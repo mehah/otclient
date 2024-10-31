@@ -39,7 +39,7 @@
 #include <client/spriteappearances.h>
 #include <client/spritemanager.h>
 
-#include "protobuf/appearances.pb.h"
+#include <appearances.pb.h>
 
 #include <nlohmann/json.hpp>
 
