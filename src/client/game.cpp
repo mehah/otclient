@@ -645,6 +645,13 @@ bool Game::walk(const Otc::Direction direction, bool force)
     if (!canPerformGameAction())
         return false;
 
+    // must cancel auto walking, and wait next try
+    if (m_localPlayer->isAutoWalking()) {
+        m_protocolGame->sendStop();
+        m_localPlayer->stopAutoWalk();
+        return false;
+    }
+
     if (!force) {
         if (nextWalkSchedule)
             return false;
@@ -652,13 +659,16 @@ bool Game::walk(const Otc::Direction direction, bool force)
         if (m_localPlayer->getWalkSteps() > 0) {
             uint16_t delay = 0;
             if (m_localPlayer->getWalkSteps() == 1) {
+                if (m_localPlayer->isWalking())
+                    return false;
+
                 delay = m_walkFirstStepDelay;
             } else if (direction != m_localPlayer->getDirection())
                 delay = m_walkTurnDelay;
 
             if (delay > 0) {
                 nextWalkSchedule = g_dispatcher.scheduleEvent([this, direction] {
-                    if (m_localPlayer && m_localPlayer->getNextWalkDir() != Otc::InvalidDirection) {
+                    if (m_localPlayer) {
                         m_localPlayer->setWalkSteps(1);
                         walk(direction, true);
                     }
@@ -670,15 +680,8 @@ bool Game::walk(const Otc::Direction direction, bool force)
         }
     }
 
-    // must cancel auto walking, and wait next try
-    if (m_localPlayer->isAutoWalking()) {
-        m_protocolGame->sendStop();
-        m_localPlayer->stopAutoWalk();
-        return false;
-    }
-
     // check we can walk and add new walk event if false
-    if (!m_localPlayer->canWalk()) {
+    if (!m_localPlayer->canWalk(direction)) {
         return false;
     }
 
@@ -751,7 +754,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
 
     const Otc::Direction direction = *dirs.begin();
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(true)) {
+        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(direction, true)) {
             m_localPlayer->preWalk(direction);
         }
     }

@@ -157,8 +157,12 @@ function displayMessage(mode, text)
     if msgtype.screenTarget then
         local label = messagesPanel:recursiveGetChildById(msgtype.screenTarget)
         if msgtype == MessageSettings.loot then
-            label:setColoredText(ItemsDatabase.setColorLootMessage(text)) -- temp. TODO assets search
-        else
+            local coloredText = ItemsDatabase.setColorLootMessage(text)
+            label:setColoredText(coloredText)
+            local console = modules.game_console
+            local consoleBuffer = console.consoleTabBar:getTabPanel(console.getTab("Server Log")):getChildById('consoleBuffer')
+            consoleBuffer:getLastChild():setColoredText(coloredText)
+		else
             label:setText(text)
             label:setColor(msgtype.color)
         end
