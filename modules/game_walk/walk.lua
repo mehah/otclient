@@ -73,12 +73,16 @@ function bindWalkKey(key, dir)
     g_keyboard.bindKeyPress(key, function()
         smartWalk(dir)
     end, modules.game_interface.getRootPanel())
+
+    g_keyboard.setKeyDelay(key, 10)
 end
 
 function unbindWalkKey(key)
     g_keyboard.unbindKeyDown(key, modules.game_interface.getRootPanel())
     g_keyboard.unbindKeyUp(key, modules.game_interface.getRootPanel())
     g_keyboard.unbindKeyPress(key, modules.game_interface.getRootPanel())
+
+    g_keyboard.setKeyDelay(key, 30)
 end
 
 function bindTurnKey(key, dir)
@@ -150,10 +154,7 @@ function smartWalk(dir)
         return false
     end
 
-    local dire = smartWalkDir or dir
-    g_game.walk(dire, firstStep)
-    firstStep = false
+    g_game.walk(smartWalkDir or dir)
 
-    lastManualWalk = g_clock.millis()
     return true
 end
