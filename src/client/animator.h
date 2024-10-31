@@ -27,7 +27,7 @@
 #include <framework/core/declarations.h>
 #include <framework/core/timer.h>
 
-#include <protobuf/appearances.pb.h>
+#include <appearances.pb.h>
 
 using namespace otclient::protobuf;
 

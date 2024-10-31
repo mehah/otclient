@@ -78,11 +78,13 @@ public:
     virtual bool hasLight() const { return getThingType()->hasLight(); }
 
     const MarketData& getMarketData() { return getThingType()->getMarketData(); }
+    const std::vector<NPCData>& getNpcSaleData() { return getThingType()->getNpcSaleData(); }
+    int getMeanPrice()  { return getThingType()->getMeanPrice(); }
     const Size& getSize() const { return getThingType()->getSize(); }
 
     int getWidth() const { return getThingType()->getWidth(); }
     int getHeight() const { return getThingType()->getHeight(); }
-    int getRealSize()const { return getThingType()->getRealSize(); }
+    int getRealSize() const { return getThingType()->getRealSize(); }
     int getLayers() const { return getThingType()->getLayers(); }
     int getNumPatternX()const { return getThingType()->getNumPatternX(); }
     int getNumPatternY()const { return getThingType()->getNumPatternY(); }
