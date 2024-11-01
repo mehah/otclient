@@ -120,7 +120,7 @@ function setSkillValue(id, value)
     if skill then
         local widget = skill:getChildById('value')
         if id == "skillId7" or id == "skillId8" or id == "skillId9" or id == "skillId11" or id == "skillId13" or id == "skillId14" or id == "skillId15" or id == "skillId16" then
-            if g_game.getClientVersion() >= 1310 then -- QT
+            if g_game.getFeature(GameEnterGameShowAppearance) then
                 value = value / 100
             end
             widget:setText(value .. "%")
