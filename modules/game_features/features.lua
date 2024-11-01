@@ -8,6 +8,7 @@ controller:registerEvents(g_game, {
         -- g_game.enableFeature(GameAllowCustomBotScripts)
         
         g_game.enableFeature(GameFormatCreatureName)
+        g_game.enableFeature(GameSpritesAlphaChannel)
 
         if version >= 750 then
             g_game.enableFeature(GameSoul)
