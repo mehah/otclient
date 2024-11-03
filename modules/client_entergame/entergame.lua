@@ -219,12 +219,16 @@ function EnterGame.init()
 end
 
 function EnterGame.hidePanels()
-    modules.client_bottommenu.hide()
+    if g_modules.getModule("client_bottommenu"):isLoaded()  then
+        modules.client_bottommenu.hide()
+    end
     modules.client_topmenu.toggle()
 end
 
 function EnterGame.showPanels()
-    modules.client_bottommenu.show()
+    if g_modules.getModule("client_bottommenu"):isLoaded()  then
+        modules.client_bottommenu.show()
+    end
     modules.client_topmenu.toggle()
 end
 
@@ -245,10 +249,12 @@ function EnterGame.firstShow()
     end
 
     if Services and Services.status then
-        EnterGame.postCacheInfo()
-        EnterGame.postEventScheduler()
-        EnterGame.postShowOff()
-        EnterGame.postShowCreatureBoost()
+        if g_modules.getModule("client_bottommenu"):isLoaded()  then
+            EnterGame.postCacheInfo()
+            EnterGame.postEventScheduler()
+            EnterGame.postShowOff()
+            EnterGame.postShowCreatureBoost()
+        end
     end
 end
 
@@ -333,28 +339,34 @@ end
 function EnterGame.postEventScheduler()
     local onRecvInfo = function(message, err)
         if err then
-            -- onError(nil, 'Bad Request. Game_entergame postEventScheduler1', 400)
-            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postEventScheduler1")
+            g_logger.warning("[Webscraping] Bad Request.Game_entergame postEventScheduler1")
             return
         end
-
-        local _, bodyStart = message:find('{')
-        local _, bodyEnd = message:find('.*}')
-        if not bodyStart or not bodyEnd then
-            -- onError(nil, 'Bad Request. Game_entergame postEventScheduler2', 400)
-            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postEventScheduler2")
-            return
+        
+        local firstStart = message:find('{')
+        local depth = 0
+        local firstEnd = nil
+        
+        for i = firstStart, #message do
+            local char = message:sub(i,i)
+            if char == '{' then
+                depth = depth + 1
+            elseif char == '}' then
+                depth = depth - 1
+                if depth == 0 then
+                    firstEnd = i
+                    break
+                end
+            end
         end
-
-        local response = json.decode(message:sub(bodyStart, bodyEnd))
-        if response.errorMessage then
-            -- onError(nil, response.errorMessage, response.errorCode)
-            g_logger.warning("[Webscraping] " .. "response.errorMessage,response.errorCode")
-            return
-        end
-
-        modules.client_bottommenu.setEventsSchedulerTimestamp(response.lastupdatetimestamp)
-        modules.client_bottommenu.setEventsSchedulerCalender(response.eventlist)
+        
+        local eventsJson = message:sub(firstStart, firstEnd)
+        local success, eventsData = pcall(function()
+            return json.decode(eventsJson)
+        end)
+        
+        modules.client_bottommenu.setEventsSchedulerTimestamp(eventsData.lastupdatetimestamp)
+        modules.client_bottommenu.setEventsSchedulerCalender(eventsData.eventlist)
     end
 
     HTTP.post(Services.status, json.encode({
@@ -420,7 +432,7 @@ function EnterGame.postShowCreatureBoost()
     end
 
     HTTP.post(Services.status, json.encode({
-        type = 'Creatureboost'
+        type = 'boostedcreature'
     }), onRecvInfo, false)
 end
 
