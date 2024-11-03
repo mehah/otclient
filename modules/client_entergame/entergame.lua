@@ -252,7 +252,7 @@ function EnterGame.firstShow()
         if g_modules.getModule("client_bottommenu"):isLoaded()  then
             EnterGame.postCacheInfo()
             EnterGame.postEventScheduler()
-            EnterGame.postShowOff()
+            -- EnterGame.postShowOff() -- myacc/znote no send login.php
             EnterGame.postShowCreatureBoost()
         end
     end
@@ -342,31 +342,19 @@ function EnterGame.postEventScheduler()
             g_logger.warning("[Webscraping] Bad Request.Game_entergame postEventScheduler1")
             return
         end
-        
-        local firstStart = message:find('{')
-        local depth = 0
-        local firstEnd = nil
-        
-        for i = firstStart, #message do
-            local char = message:sub(i,i)
-            if char == '{' then
-                depth = depth + 1
-            elseif char == '}' then
-                depth = depth - 1
-                if depth == 0 then
-                    firstEnd = i
-                    break
-                end
-            end
+
+        local bodyStart, _ = message:find('{')
+        local _, bodyEnd = message:find('%}%b{}')
+
+        local jsonString = message:sub(bodyStart, bodyEnd)
+
+        local response = json.decode(jsonString)
+        if response.errorMessage then
+            g_logger.warning("[Webscraping] " .. "response.errorMessage,response.errorCode")
+            return
         end
-        
-        local eventsJson = message:sub(firstStart, firstEnd)
-        local success, eventsData = pcall(function()
-            return json.decode(eventsJson)
-        end)
-        
-        modules.client_bottommenu.setEventsSchedulerTimestamp(eventsData.lastupdatetimestamp)
-        modules.client_bottommenu.setEventsSchedulerCalender(eventsData.eventlist)
+        modules.client_bottommenu.setEventsSchedulerTimestamp(response.lastupdatetimestamp)
+        modules.client_bottommenu.setEventsSchedulerCalender(response.eventlist)
     end
 
     HTTP.post(Services.status, json.encode({
@@ -377,7 +365,6 @@ end
 function EnterGame.postShowOff()
     local onRecvInfo = function(message, err)
         if err then
-            --  onError(nil, 'Bad Request. 1 Game_entergame postShowOff', 400)
             g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
             return
         end
@@ -385,14 +372,12 @@ function EnterGame.postShowOff()
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            -- onError(nil, 'Bad Request. 2 Game_entergame postShowOff', 400)
             g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            -- onError(nil, response.errorMessage, response.errorCode)
             g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
             return
         end

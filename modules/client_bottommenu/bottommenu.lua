@@ -45,7 +45,8 @@ function init()
     creature_boosted = boostedWindow:recursiveGetChildById('creature')
     boss_boosted = boostedWindow:recursiveGetChildById('boss')
 
-    if not Services.status and default_info then
+--  if not Services.status and default_info then
+    if default_info then
         local widget = g_ui.createWidget('ShowOffWidget', showOffWindow)
         local description = widget:recursiveGetChildById('description')
         local image = widget:recursiveGetChildById('image')
