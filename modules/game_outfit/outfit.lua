@@ -846,8 +846,11 @@ function showOutfits()
         if thingType:getRealSize() > 0 then
             button.outfit:setCreatureSize(thingType:getRealSize() + 32)
         end
-        --button.outfit:setBorderColor('red')
-        --button.outfit:setBorderWidth(2)
+
+        if outfitData[4] and outfitData[4] ~= 0 then
+            --  mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
+            button:setImageColor("#49ABFF")
+        end
 
         button.name:setText(outfitData[2])
         if tempOutfit.type == outfitData[1] then
@@ -903,6 +906,11 @@ function showMounts()
         button.name:setText(mountData[2])
         if tempOutfit.mount == mountData[1] then
             focused = mountData[1]
+        end
+        
+        if mountData[3] and mountData[3] ~= 0 then
+            -- mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+            button:setImageColor("#49ABFF")
         end
     end
 

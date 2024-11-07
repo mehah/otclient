@@ -103,9 +103,6 @@ SelectionButton < Panel
   focusable: true
   phantom: false
 
-  $hover:
-    image-color: #ffffff
-
   $focus:
     border: 1 white
     image-color: #ffffff

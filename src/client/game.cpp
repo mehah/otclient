@@ -404,8 +404,8 @@ void Game::processRemoveAutomapFlag(const Position& pos, const uint8_t icon, con
     g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
 }
 
-void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& mountList,
+void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>>& outfitList,
+                                   const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& effectList,

@@ -77,6 +77,7 @@ namespace Proto
         GameServerCreatureShader = 54,
         GameServerMapShader = 55,
         GameServerCreatureTyping = 56,
+        GameServerFeatures = 67,
         GameServerFloorDescription = 75,
 
         // original tibia ONLY
