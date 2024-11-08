@@ -952,8 +952,12 @@ function showMounts()
             focused = mountData[1]
         end
         
-        if mountData[3] and mountData[3] ~= statesOutft.available then
-            button:setImageColor("#49ABFF")
+        local state = mountData[3]
+        if state then
+            button.state = state
+            if state ~= statesOutft.available then
+                button:setImageColor("#49ABFF")
+            end
         end
     end
 
@@ -1670,6 +1674,7 @@ function onFilterOnlyMine(self, checked)
         local children = window.selectionList:getChildren()
         for _, child in ipairs(children) do
             if checked and (not child.state or child.state ~= 0) then
+                window.selectionList:focusChild(nil)
                 child:hide()
             else
                 child:show()
