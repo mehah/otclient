@@ -774,12 +774,20 @@ OutfitWindow < MainWindow
     margin-left: 5
     height: 50
     text: Filter
+    
+    QtCheckBox
+      id: onlyMine
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      text: "Only mine"
+      width: 84
 
     TextEdit
       id: search
-      anchors.fill: parent
+      anchors.left: prev.right
+      anchors.right: parent.right
       placeholder: Search by name
-      placeholder-color: #00000077
+      placeholder-color: #c0c0c0c0
 
   ScrollablePanel
     id: presetsList

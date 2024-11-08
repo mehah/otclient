@@ -3,6 +3,12 @@ local opcodeSystem = {
     id = 213
 }
 
+local statesOutft ={
+    available = 0,
+    store = 1,
+    goldenOutfitTooltip = 2
+}
+
 local window = nil
 local appearanceGroup = nil
 local colorModeGroup = nil
@@ -522,9 +528,9 @@ function create(player, outfitList, creatureMount, mountList, familiarList, wing
             widget:setVisible(false)
         end
     end
-
-    window.listSearch.search.onKeyPress = onFilterSearch
     previewCreature:getCreature():setDirection(2)
+    window.listSearch.search.onKeyPress = onFilterSearch
+    window.listSearch.onlyMine.onCheckChange = onFilterOnlyMine
 end
 
 function destroy()
@@ -882,9 +888,12 @@ function showOutfits()
             button.outfit:setCreatureSize(thingType:getRealSize() + 32)
         end
 
-        if outfitData[4] and outfitData[4] ~= 0 then
-            --  mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
-            button:setImageColor("#49ABFF")
+        local state = outfitData[4]
+        if state then
+            button.state = state
+            if state ~= statesOutft.available then
+                button:setImageColor("#49ABFF")
+            end
         end
 
         button.name:setText(outfitData[2])
@@ -943,8 +952,7 @@ function showMounts()
             focused = mountData[1]
         end
         
-        if mountData[3] and mountData[3] ~= 0 then
-            -- mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+        if mountData[3] and mountData[3] ~= statesOutft.available then
             button:setImageColor("#49ABFF")
         end
     end
@@ -1540,17 +1548,6 @@ end
 
 function updatePreview()
     local direction = previewCreature:getDirection()
-
-    --[[
-    without c++
-    g_lua.bindClassMemberFunction<UICreature>("getDirection", &UICreature::getDirection);
-
-    local direction = previewCreature:getCreature():getDirection()  -> Not work
-    local direction= previewCreature:getDirection()  ->not work
-    print(g_game.getLocalPlayer():getCreature():getDirection()) ->
-
-    ]]
-
     local previewOutfit = table.copy(tempOutfit)
 
     if not settings.showOutfit then
@@ -1667,6 +1664,20 @@ function rotate(value)
     end
     floor:setMargin(0)
 end
+
+function onFilterOnlyMine(self, checked)
+    addEvent(function()
+        local children = window.selectionList:getChildren()
+        for _, child in ipairs(children) do
+            if checked and (not child.state or child.state ~= 0) then
+                child:hide()
+            else
+                child:show()
+            end
+        end
+    end)
+end
+
 
 function onFilterSearch()
     addEvent(function()
