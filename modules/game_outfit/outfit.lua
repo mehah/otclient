@@ -1796,7 +1796,7 @@ function accept()
     if g_game.getFeature(GamePlayerFamiliars) then
         local player = g_game.getLocalPlayer()
         if settings.currentPreset > 0 then
-            settings.presets[settings.currentPreset].mounted = window.configure.familiar.check:isChecked()
+            settings.presets[settings.currentPreset].familiar = window.configure.familiar.check:isChecked()
         end
     end
     g_game.changeOutfit(tempOutfit)

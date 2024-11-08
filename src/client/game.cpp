@@ -433,7 +433,7 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
 
     if (getFeature(Otc::GamePlayerMounts)) {
         Outfit familiarOutfit;
-        familiarOutfit.setId(currentOutfit.getMount());
+        familiarOutfit.setId(currentOutfit.getFamiliar());
         familiarOutfit.setCategory(ThingCategoryCreature);
     }
 
