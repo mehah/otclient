@@ -2571,7 +2571,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
                 }
             }
 
-            outfitList.emplace_back(outfitId, outfitName, outfitAddons,outfitMode);
+            outfitList.emplace_back(outfitId, outfitName, outfitAddons, outfitMode);
         }
     } else {
         uint16_t outfitStart;
