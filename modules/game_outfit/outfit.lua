@@ -892,7 +892,7 @@ function showOutfits()
         if state then
             button.state = state
             if state ~= statesOutft.available then
-                button:setImageColor("#49ABFF")
+                button:setImageSource("/images/ui/button-blue-qt")
             end
         end
 
@@ -957,7 +957,7 @@ function showMounts()
         if state then
             button.state = state
             if state ~= statesOutft.available then
-                button:setImageColor("#49ABFF")
+                button:setImageSource("/images/ui/button-blue-qt")
             end
         end
     end
