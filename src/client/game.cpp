@@ -406,6 +406,7 @@ void Game::processRemoveAutomapFlag(const Position& pos, const uint8_t icon, con
 
 void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>>& outfitList,
                                    const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& familiarList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& effectList,
@@ -430,7 +431,13 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
         virtualMountCreature->setOutfit(mountOutfit);
     }
 
-    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, wingsList, aurasList, effectList, shaderList);
+    if (getFeature(Otc::GamePlayerMounts)) {
+        Outfit familiarOutfit;
+        familiarOutfit.setId(currentOutfit.getMount());
+        familiarOutfit.setCategory(ThingCategoryCreature);
+    }
+
+    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, familiarList, wingsList, aurasList, effectList, shaderList);
 }
 
 void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items)

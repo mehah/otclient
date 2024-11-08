@@ -203,6 +203,7 @@ GameWingsAurasEffectsShader = 118
 GameForgeConvergence = 119
 GameAllowCustomBotScripts = 120
 GameColorizedLootValue = 121
+GamePlayerFamiliars = 122
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'

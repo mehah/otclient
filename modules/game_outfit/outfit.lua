@@ -19,7 +19,7 @@ local showShaderCheck = nil
 local showBarsCheck = nil
 local showTitleCheck = nil
 local showEffectsCheck = nil
-
+local showFamiliarCheck = nil
 local colorBoxes = {}
 local currentColorBox = nil
 
@@ -33,6 +33,7 @@ local ServerData = {
     currentOutfit = {},
     outfits = {},
     mounts = {},
+    familiars = {},
     wings = {},
     auras = {},
     shaders = {},
@@ -140,7 +141,7 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
     window.listSearch:show()
 end
 
-local AppearanceData = {"preset", "outfit", "mount", "wings", "aura", "effects", "shader", "healthBar", "title"}
+local AppearanceData = {"preset", "outfit", "mount", "familiar", "wings", "aura", "effects", "shader", "healthBar", "title"}
 
 function init()
     if opcodeSystem.enable then
@@ -178,10 +179,18 @@ function terminate()
 end
 
 function onMovementChange(checkBox, checked)
-    if checked == true then
-        previewCreature:getCreature():setStaticWalking(1000)
-    else
-        previewCreature:getCreature():setStaticWalking(0)
+    local walkingSpeed = checked and 1000 or 0 
+
+    local mainCreature = previewCreature:getCreature()
+    if mainCreature then
+        mainCreature:setStaticWalking(walkingSpeed)
+    end
+
+    if g_game.getFeature(GamePlayerFamiliars) then
+        local familiarCreature = previewFamiliar:getCreature()
+        if familiarCreature then
+            familiarCreature:setStaticWalking(walkingSpeed)
+        end
     end
 
     settings.movement = checked
@@ -245,9 +254,15 @@ function onShowMountChange(checkBox, checked)
     updatePreview()
 end
 
+function onShowFamiliarChange(checkBox, checked)
+    settings.showFamiliar = checked
+    updatePreview()
+end
+
 function onShowOutfitChange(checkBox, checked)
     settings.showOutfit = checked
     showMountCheck:setEnabled(settings.showOutfit)
+    showFamiliarCheck:setEnabled(settings.showOutfit)
     showWingsCheck:setEnabled(settings.showOutfit)
     showAuraCheck:setEnabled(settings.showOutfit)
     showShaderCheck:setEnabled(settings.showOutfit)
@@ -290,6 +305,7 @@ local PreviewOptions = {
     ["showFloor"] = onShowFloorChange,
     ["showOutfit"] = onShowOutfitChange,
     ["showMount"] = onShowMountChange,
+    ["showFamiliar"] = onShowFamiliarChange,
     ["showWings"] = onShowWingsChange,
     ["showAura"] = onShowAuraChange,
     ["showShader"] = onShowShaderChange,
@@ -298,7 +314,7 @@ local PreviewOptions = {
     ["showEffects"] = onShowEffectsChange
 }
 
-function create(player, outfitList, creatureMount, mountList, wingsList, auraList, effectsList, shaderList)
+function create(player, outfitList, creatureMount, mountList, familiarList, wingsList, auraList, effectsList, shaderList)
     if ignoreNextOutfitWindow and g_clock.millis() < ignoreNextOutfitWindow + 1000 then
         return
     end
@@ -312,11 +328,11 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
     end
 
     loadSettings()
-
     ServerData = {
         currentOutfit = currentOutfit,
         outfits = outfitList,
         mounts = mountList,
+        familiars = familiarList,
         wings = wingsList,
         auras = auraList,
         effects = effectsList,
@@ -365,6 +381,10 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
     previewCreature = window.preview.panel.creature
     previewCreature:setCreatureSize(200)
     previewCreature:setCenter(true)
+
+    previewFamiliar = window.preview.panel.UIfamiliar
+    previewFamiliar:setCreatureSize(200)
+    previewFamiliar:setCenter(true)
     -- previewCreature:setBorderColor('red')
     -- previewCreature:setBorderWidth(2)
 
@@ -415,6 +435,7 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
     showFloorCheck = window.preview.options.showFloor.check
     showOutfitCheck = window.preview.options.showOutfit.check
     showMountCheck = window.preview.options.showMount.check
+    showFamiliarCheck = window.preview.options.showFamiliar.check
     showWingsCheck = window.preview.options.showWings.check
     showAuraCheck = window.preview.options.showAura.check
     showShaderCheck = window.preview.options.showShader.check
@@ -432,6 +453,7 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
 
     if not settings.showOutfit then
         showMountCheck:setEnabled(false)
+        showFamiliarCheck:setEnabled(false)
         showWingsCheck:setEnabled(false)
         showAuraCheck:setEnabled(false)
         showShaderCheck:setEnabled(false)
@@ -442,6 +464,7 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
 
     showOutfitCheck:setChecked(settings.showOutfit)
     showMountCheck:setChecked(settings.showMount)
+    showFamiliarCheck:setChecked(settings.showFamiliar)
     showWingsCheck:setChecked(settings.showWings)
     showAuraCheck:setChecked(settings.showAura)
     showShaderCheck:setChecked(settings.showShader)
@@ -472,6 +495,7 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
     appearanceGroup:addWidget(window.appearance.settings.preset.check)
     appearanceGroup:addWidget(window.appearance.settings.outfit.check)
     appearanceGroup:addWidget(window.appearance.settings.mount.check)
+    appearanceGroup:addWidget(window.appearance.settings.familiar.check)
     appearanceGroup:addWidget(window.appearance.settings.aura.check)
     appearanceGroup:addWidget(window.appearance.settings.wings.check)
     appearanceGroup:addWidget(window.appearance.settings.shader.check)
@@ -493,6 +517,10 @@ function create(player, outfitList, creatureMount, mountList, wingsList, auraLis
     window.preview.options.showMount:setVisible(g_game.getFeature(GamePlayerMounts))
     window.configure.mount:setVisible(g_game.getFeature(GamePlayerMounts))
     window.appearance.settings.mount:setVisible(g_game.getFeature(GamePlayerMounts))
+
+    window.preview.options.showFamiliar:setVisible(g_game.getFeature(GamePlayerFamiliars))
+    window.appearance.settings.familiar:setVisible(g_game.getFeature(GamePlayerFamiliars))
+
     window.listSearch.search.onKeyPress = onFilterSearch
     previewCreature:getCreature():setDirection(2)
 end
@@ -504,6 +532,7 @@ function destroy()
         showFloorCheck = nil
         showOutfitCheck = nil
         showMountCheck = nil
+        showFamiliarCheck = nil
         showWingsCheck = nil
         showAuraCheck = nil
         showShaderCheck = nil
@@ -525,6 +554,7 @@ function destroy()
             currentOutfit = {},
             outfits = {},
             mounts = {},
+            familiars = {},
             wings = {},
             auras = {},
             shaders = {},
@@ -588,7 +618,8 @@ function newPreset()
         effects = "None",
         wings = "None",
         shader = "None",
-        mounted = window.configure.mount.check:isChecked()
+        mounted = window.configure.mount.check:isChecked(),
+        familiar = "None"
     }
 
     presetWidget:focus()
@@ -656,7 +687,7 @@ function savePreset()
 
     settings.presets[presetId].outfit = outfitCopy
     settings.presets[presetId].mounted = window.configure.mount.check:isChecked()
-
+    settings.presets[presetId].familiar = tempOutfit.familiar or 0
     settings.presets[presetId].shader = "Outfit - Default"
     settings.presets[presetId].auras = lastSelectAura or "None"
     settings.presets[presetId].effects = lastSelectEffects or "None"
@@ -739,7 +770,8 @@ function onAppearanceChange(widget, selectedWidget)
         showOutfits()
     elseif id == "mount" then
         showMounts()
-        -- numbers
+    elseif id == "familiar" then
+        showFamiliars()
     elseif id == "aura" then
         showSelectionList(ServerData.auras, tempOutfit.auras, "aura", onAuraSelect)
     elseif id == "wings" then
@@ -834,6 +866,7 @@ function showOutfits()
         outfit.type = outfitData[1]
         outfit.addons = outfitData[3]
         outfit.mount = 0
+        outfit.familiar = 0
         outfit.auras = 0
         outfit.wings = 0
         outfit.shader = "Outfit - Default"
@@ -931,6 +964,53 @@ function showMounts()
     end
 
     window.selectionList.onChildFocusChange = onMountSelect
+    window.selectionList:show()
+    window.selectionScroll:show()
+    window.listSearch:show()
+end
+
+function showFamiliars()
+    window.presetsList:hide()
+    window.presetsScroll:hide()
+    window.presetButtons:hide()
+
+    window.selectionList.onChildFocusChange = nil
+    window.selectionList:destroyChildren()
+
+    local focused = nil
+
+    local button = g_ui.createWidget("SelectionButton", window.selectionList)
+    button:setId(0)
+    button.name:setText("None")
+    focused = 0
+    for _, familiarData in ipairs(ServerData.familiars) do
+        local button = g_ui.createWidget("SelectionButton", window.selectionList)
+        button:setId(familiarData[1])
+
+        button.outfit:setOutfit({
+            type = familiarData[1]
+        })
+
+        button.name:setText(familiarData[2])
+        if tempOutfit.familiar == familiarData[1] then
+            focused = familiarData[1]
+        end
+    end
+
+    if #ServerData.familiars == 1 then
+        window.selectionList:focusChild(nil)
+    end
+
+    if focused then
+        local w = window.selectionList[focused]
+        w:focus()
+        window.selectionList:ensureChildVisible(w, {
+            x = 0,
+            y = 196
+        })
+    end
+
+    window.selectionList.onChildFocusChange = onFamiliarSelect
     window.selectionList:show()
     window.selectionScroll:show()
     window.listSearch:show()
@@ -1199,6 +1279,34 @@ function onMountSelect(list, focusedChild, unfocusedChild, reason)
     end
 end
 
+function onFamiliarSelect(list, focusedChild, unfocusedChild, reason)
+    if focusedChild then
+        local familiarType = tonumber(focusedChild:getId())
+
+        tempOutfit.familiar = familiarType
+
+        deselectPreset()
+
+        previewFamiliar:setOutfit({
+            type = familiarType
+        })
+
+        updatePreview()
+
+        if settings.showFamiliar and g_game.getFeature(GamePlayerFamiliars) and familiarType > 0 then
+            previewCreature:setMarginRight(50)
+            previewFamiliar:setCreatureSize(200)
+            previewFamiliar:setCenter(true)
+            previewFamiliar:setMarginLeft(70)
+        else
+            previewCreature:setMarginRight(0)
+            previewFamiliar:setMarginLeft(0)
+        end
+
+        updateAppearanceText("familiar", focusedChild.name:getText())
+    end
+end
+
 function onAuraSelect(list, focusedChild, unfocusedChild, reason)
     local auraName = window.appearance.settings["aura"].name:getText()
     if auraName ~= "None" then
@@ -1453,6 +1561,22 @@ function updatePreview()
         previewOutfit.mount = 0
     end
 
+    if not settings.showFamiliar then
+        previewOutfit.familiar = 0
+        previewCreature:setMarginRight(0)
+        previewFamiliar:setMarginLeft(0)
+        previewFamiliar:setVisible(settings.showFamiliar)
+    else
+        if previewOutfit.familiar and previewOutfit.familiar > 0 then
+            previewFamiliar:setVisible(true)
+            previewCreature:setMarginRight(50)
+            previewFamiliar:setCreatureSize(200)
+            previewFamiliar:setCenter(true)
+            previewFamiliar:setMarginLeft(70)
+        end
+
+    end
+
     if settings.showAura then
         attachOrDetachEffect(lastSelectAura, true)
     else
@@ -1536,7 +1660,9 @@ function rotate(value)
     end
 
     previewCreature:getCreature():setDirection(direction)
-
+    if g_game.getFeature(GamePlayerFamiliars) then
+        previewFamiliar:getCreature():setDirection(direction)
+    end
     floor:setMargin(0)
 end
 
@@ -1624,6 +1750,7 @@ function loadDefaultSettings()
         showFloor = true,
         showOutfit = true,
         showMount = true,
+        showFamiliar = true,
         showWings = true,
         showAura = true,
         showShader = true,
@@ -1666,7 +1793,12 @@ function accept()
             settings.presets[settings.currentPreset].mounted = isMountedChecked
         end
     end
-
+    if g_game.getFeature(GamePlayerFamiliars) then
+        local player = g_game.getLocalPlayer()
+        if settings.currentPreset > 0 then
+            settings.presets[settings.currentPreset].mounted = window.configure.familiar.check:isChecked()
+        end
+    end
     g_game.changeOutfit(tempOutfit)
     if opcodeSystem.enable then
         sendAction("changeOutfit", {

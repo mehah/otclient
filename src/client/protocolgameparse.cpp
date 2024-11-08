@@ -2608,17 +2608,21 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    std::vector<std::tuple<uint16_t, std::string> > familiarList;
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
         const uint16_t familiarCount = msg->getU16();
         for (auto i = 0; i < familiarCount; ++i) {
-            msg->getU16(); // familiar lookType
-            msg->getString(); // familiar name
+            const uint16_t familiarLookType = msg->getU16(); // familiar lookType
+            const auto& familiarName = msg->getString(); // familiar name
             const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
             if (familiarMode == 1) {
                 msg->getU32();
             }
+            familiarList.emplace_back(familiarLookType, familiarName);
         }
+    }
 
+    if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // Try outfit mode (?)
         msg->getU8(); // (bool) mounted
         msg->getU8(); // (bool) randomize mount
@@ -2659,7 +2663,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
     }
 
-    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList, shaderList);
+    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, familiarList, wingList, auraList, effectList, shaderList);
 }
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
