@@ -637,19 +637,9 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction, bool force)
+bool Game::walk(const Otc::Direction direction)
 {
-    static ScheduledEventPtr nextWalkSchedule = nullptr;
-
-    if (direction == Otc::InvalidDirection) {
-        if (nextWalkSchedule) {
-            nextWalkSchedule->cancel();
-            nextWalkSchedule = nullptr;
-        }
-        return false;
-    }
-
-    if (!canPerformGameAction())
+    if (!canPerformGameAction() || direction == Otc::InvalidDirection)
         return false;
 
     // must cancel auto walking, and wait next try
@@ -659,38 +649,31 @@ bool Game::walk(const Otc::Direction direction, bool force)
         return false;
     }
 
-    if (!force) {
-        if (nextWalkSchedule)
-            return false;
+    static ScheduledEventPtr nextWalkSchedule = nullptr;
+    static uint16_t steps = 0;
+    static Timer timer;
 
-        if (m_localPlayer->getWalkSteps() > 0) {
-            uint16_t delay = 0;
-            if (m_localPlayer->getWalkSteps() == 1) {
-                if (m_localPlayer->isWalking())
-                    return false;
-
-                delay = m_walkFirstStepDelay;
-            } else if (direction != m_localPlayer->getDirection())
-                delay = m_walkTurnDelay;
-
-            if (delay > 0) {
-                nextWalkSchedule = g_dispatcher.scheduleEvent([this, direction] {
-                    if (m_localPlayer) {
-                        m_localPlayer->setWalkSteps(1);
-                        walk(direction, true);
-                    }
-
-                    nextWalkSchedule = nullptr;
-                }, delay);
-                return false;
-            }
-        }
-    }
+    if (nextWalkSchedule) nextWalkSchedule->cancel();
+    nextWalkSchedule = g_dispatcher.scheduleEvent([this] {
+        nextWalkSchedule = nullptr;
+        steps = 0;
+    }, 150);
 
     // check we can walk and add new walk event if false
     if (!m_localPlayer->canWalk(direction)) {
         return false;
     }
+
+    if (steps == 1) {
+        if (timer.ticksElapsed() <= m_walkFirstStepDelay)
+            return false;
+    } else if (direction != m_localPlayer->getDirection()) {
+        if (timer.ticksElapsed() <= m_walkTurnDelay)
+            return false;
+    }
+
+    ++steps;
+    timer.restart();
 
     const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
 
