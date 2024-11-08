@@ -45,7 +45,8 @@ function init()
     creature_boosted = boostedWindow:recursiveGetChildById('creature')
     boss_boosted = boostedWindow:recursiveGetChildById('boss')
 
-    if not Services.status and default_info then
+--  if not Services.status and default_info then
+    if default_info then
         local widget = g_ui.createWidget('ShowOffWidget', showOffWindow)
         local description = widget:recursiveGetChildById('description')
         local image = widget:recursiveGetChildById('image')
@@ -494,8 +495,15 @@ end
 
 function Booster_creature(data)
     if modules.game_things.isLoaded() then
-        -- note: is better image *
-        creature_boosted:setOutfit(data.creature)
-        boss_boosted:setOutfit(data.boss)
+        local creatureraceid = modules.game_cyclopedia.RACE[data.creatureraceid]
+        local bossraceid = modules.game_cyclopedia.RACE_Bosstiary[data.bossraceid]
+        if creatureraceid then
+            creature_boosted:setOutfit({type=creatureraceid.type})
+            creature_boosted:getCreature():setStaticWalking(1000)
+        end
+        if bossraceid then
+            boss_boosted:setOutfit({type=bossraceid.type})
+            boss_boosted:getCreature():setStaticWalking(1000)
+        end
     end
 end

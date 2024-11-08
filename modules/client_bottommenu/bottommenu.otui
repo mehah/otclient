@@ -150,12 +150,16 @@ Panel
       margin-left: 12
       margin-top: 30
       size: 64 64
-      image-source: /images/ui/panel_flat
 
       Creature
         id: creature
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        image-source: ""
+        image-border: 0
+        border-width: 0
+        border-color: alpha
+
       UIWidget
         id: creature2
         anchors.horizontalCenter: parent.horizontalCenter
@@ -174,12 +178,16 @@ Panel
       margin-right: 12
       margin-top: 30
       size: 64 64
-      image-source: /images/ui/panel_flat
 
       Creature
         id: boss
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        image-source: ""
+        image-border: 0
+        border-width: 0
+        border-color: alpha
+        
       UIWidget
         id: boss2
         anchors.horizontalCenter: parent.horizontalCenter
