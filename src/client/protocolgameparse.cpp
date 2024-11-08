@@ -5200,7 +5200,7 @@ void ProtocolGame::parseFeatures(const InputMessagePtr& msg)
     const uint16_t features = msg->getU16();
     for (auto i = 0; i < features; ++i) {
         const auto feature = static_cast<Otc::GameFeature>(msg->getU8());
-        const bool enabled = static_cast<bool>(getU8());
+        const bool enabled = static_cast<bool>(msg->getU8());
         if (enabled) {
             g_game.enableFeature(feature);
         } else {
