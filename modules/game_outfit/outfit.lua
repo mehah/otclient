@@ -931,6 +931,7 @@ function showMounts()
     local button = g_ui.createWidget("SelectionButton", window.selectionList)
     button:setId(0)
     button.name:setText("None")
+    button.state = 0
     focused = 0
 
     for _, mountData in ipairs(ServerData.mounts) do
