@@ -26,15 +26,18 @@ function terminate()
 
     destroyWindows()
     questLogButton:destroy()
+    questLogButton = nil
 end
 
 function destroyWindows()
     if questLogWindow then
         questLogWindow:destroy()
+        questLogWindow = nil
     end
 
     if questLineWindow then
         questLineWindow:destroy()
+        questLineWindow = nil
     end
 end
 
@@ -69,6 +72,7 @@ function onGameQuestLine(questId, questMissions)
     end
     if questLineWindow then
         questLineWindow:destroy()
+        questLineWindow = nil
     end
 
     questLineWindow = g_ui.createWidget('QuestLineWindow', rootWidget)
@@ -85,7 +89,7 @@ function onGameQuestLine(questId, questMissions)
     })
 
     for i, questMission in pairs(questMissions) do
-        local name, description = unpack(questMission)
+        local name, description, missionId = unpack(questMission)
 
         local missionLabel = g_ui.createWidget('MissionLabel')
         missionLabel:setText(name)
