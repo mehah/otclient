@@ -345,29 +345,6 @@ function create(player, outfitList, creatureMount, mountList, familiarList, wing
 
     window = g_ui.displayUI("outfitwindow")
 
-    local checks = {{window.preview.options.showWings, ServerData.wings},
-                    {window.preview.options.showAura, ServerData.auras},
-                    {window.preview.options.showShader, ServerData.shaders},
-                    {window.preview.options.showBars, ServerData.healthBars},
-                    {window.preview.options.showEffects, ServerData.effects},
-                    {window.preview.options.showTitle, ServerData.title},
-
-                    {window.appearance.settings.wings, ServerData.wings},
-                    {window.appearance.settings.aura, ServerData.auras},
-                    {window.appearance.settings.shader, ServerData.shaders},
-                    {window.appearance.settings.healthBar, ServerData.healthBars},
-                    {window.appearance.settings.effects, ServerData.effects},
-                    {window.appearance.settings.title, ServerData.title}}
-
-    for _, check in ipairs(checks) do
-        local widget, data = check[1], check[2]
-        if not table.empty(data) then
-            widget:setVisible(true)
-        else
-            widget:setVisible(false)
-        end
-    end
-
     floor = window.preview.panel.floor
     for i = 1, floorTiles * floorTiles do
         g_ui.createWidget("FloorTile", floor)
@@ -520,6 +497,31 @@ function create(player, outfitList, creatureMount, mountList, familiarList, wing
 
     window.preview.options.showFamiliar:setVisible(g_game.getFeature(GamePlayerFamiliars))
     window.appearance.settings.familiar:setVisible(g_game.getFeature(GamePlayerFamiliars))
+    
+    local checks = {{window.preview.options.showWings, ServerData.wings},
+                    {window.preview.options.showAura, ServerData.auras},
+                    {window.preview.options.showShader, ServerData.shaders},
+                    {window.preview.options.showBars, ServerData.healthBars},
+                    {window.preview.options.showEffects, ServerData.effects},
+                    {window.preview.options.showTitle, ServerData.title},
+                    {window.preview.options.showFamiliar, ServerData.familiars},
+
+                    {window.appearance.settings.familiar, ServerData.familiars},
+                    {window.appearance.settings.wings, ServerData.wings},
+                    {window.appearance.settings.aura, ServerData.auras},
+                    {window.appearance.settings.shader, ServerData.shaders},
+                    {window.appearance.settings.healthBar, ServerData.healthBars},
+                    {window.appearance.settings.effects, ServerData.effects},
+                    {window.appearance.settings.title, ServerData.title}}
+
+    for _, check in ipairs(checks) do
+        local widget, data = check[1], check[2]
+        if not table.empty(data) then
+            widget:setVisible(true)
+        else
+            widget:setVisible(false)
+        end
+    end
 
     window.listSearch.search.onKeyPress = onFilterSearch
     previewCreature:getCreature():setDirection(2)
