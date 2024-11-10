@@ -541,7 +541,7 @@ public:
     void safeLogout();
 
     // walk related
-    bool walk(const Otc::Direction direction, bool force = false);
+    bool walk(const Otc::Direction direction);
     void autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos);
     void forceWalk(const Otc::Direction direction);
     void turn(const Otc::Direction direction);

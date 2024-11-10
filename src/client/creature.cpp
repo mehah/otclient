@@ -392,9 +392,6 @@ void Creature::walk(const Position& oldPos, const Position& newPos)
     m_walkTimer.restart();
     m_walkedPixels = 0;
 
-    if (++m_walkSteps == 0)
-        m_walkSteps = 1;
-
     // no direction need to be changed when the walk ends
     m_walkTurnDirection = Otc::InvalidDirection;
 
@@ -701,7 +698,6 @@ void Creature::terminateWalk()
 
     const auto self = static_self_cast<Creature>();
     m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
-        self->m_walkSteps = 0;
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
     }, g_game.getServerBeat());
