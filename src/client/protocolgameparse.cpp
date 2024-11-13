@@ -1847,7 +1847,7 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg)
     // TODO: implement creature icons usage
 }
 
-void ProtocolGame::parsecloseForgeWindow(const InputMessagePtr& msg)
+void ProtocolGame::parsecloseForgeWindow(const InputMessagePtr& /*msg*/)
 {
     g_lua.callGlobalField("g_game", "onCloseForgeCloseWindows");
 }
