@@ -267,6 +267,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerTrappers:
                     parseTrappers(msg);
                     break;
+                case Proto::GameServerCloseForgeWindow:
+                    parseCloseForgeWindow(msg);
+                    break;
                 case Proto::GameServerCreatureData:
                     parseCreatureData(msg);
                     break;
@@ -1842,6 +1845,11 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg)
     }
 
     // TODO: implement creature icons usage
+}
+
+void ProtocolGame::parseCloseForgeWindow(const InputMessagePtr& /*msg*/)
+{
+    g_lua.callGlobalField("g_game", "onCloseForgeCloseWindows");
 }
 
 void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
