@@ -117,6 +117,7 @@ namespace Proto
         GameServerMissleEffect = 133, // Anthem on 13.x
         GameServerItemClasses = 134,
         GameServerTrappers = 135,
+        GameServerCloseForgeWindow = 137,
         GameServerCreatureData = 139,
         GameServerCreatureHealth = 140,
         GameServerCreatureLight = 141,
