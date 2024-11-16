@@ -109,7 +109,7 @@ void Map::clean()
 {
     cleanDynamicThings();
 
-    for (int_fast8_t i = -1; ++i <= g_gameConfig.getMapMaxZ();)
+    for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].tileBlocks.clear();
 
 #ifdef FRAMEWORK_EDITOR
@@ -141,7 +141,7 @@ void Map::cleanDynamicThings()
 
     m_knownCreatures.clear();
 
-    for (int_fast8_t i = -1; ++i <= g_gameConfig.getMapMaxZ();)
+    for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].missiles.clear();
 
     cleanTexts();
@@ -369,7 +369,7 @@ TileList Map::getTiles(int8_t floor/* = -1*/)
 
     if (floor < 0) {
         // Search all floors
-        for (int_fast8_t z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
+        for (auto z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
             for (const auto& [key, block] : m_floors[z].tileBlocks) {
                 for (const auto& tile : block.getTiles()) {
                     if (tile != nullptr)
@@ -536,7 +536,7 @@ void Map::removeUnawareThings()
 
     if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
         // remove tiles that we are not aware anymore
-        for (int_fast8_t z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
+        for (auto z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
             auto& tileBlocks = m_floors[z].tileBlocks;
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
                 auto& block = (*it).second;
@@ -623,9 +623,9 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
 
     //TODO: optimize
     //TODO: delivery creatures in distance order
-    for (int_fast8_t iz = -minZRange; iz <= maxZRange; ++iz) {
-        for (int_fast32_t iy = -minYRange; iy <= maxYRange; ++iy) {
-            for (int_fast32_t ix = -minXRange; ix <= maxXRange; ++ix) {
+    for (int iz = -minZRange; iz <= maxZRange; ++iz) {
+        for (int iy = -minYRange; iy <= maxYRange; ++iy) {
+            for (int ix = -minXRange; ix <= maxXRange; ++ix) {
                 if (const auto& tile = getTile(centerPos.translated(ix, iy, iz))) {
                     const auto& tileCreatures = tile->getCreatures();
                     creatures.insert(creatures.end(), tileCreatures.rbegin(), tileCreatures.rend());
@@ -672,8 +672,8 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
         bool done = false;
 
         // Check is Top Ground
-        for (int_fast8_t x = -1; ++x < 2 && !done;) {
-            for (int_fast8_t y = -1; ++y < 2 && !done;) {
+        for (auto x = -1; ++x < 2 && !done;) {
+            for (auto y = -1; ++y < 2 && !done;) {
                 const auto& tile = getTile(tilePos.translated(x, x));
                 if (!tile || !tile->hasTopGround()) {
                     covered = false;
@@ -691,8 +691,8 @@ bool Map::isCompletelyCovered(const Position& pos, uint8_t firstFloor)
         done = false;
 
         // check in 2x2 range tiles that has no transparent pixels
-        for (int_fast8_t x = -1; ++x < 2 && !done;) {
-            for (int_fast8_t y = -1; ++y < 2 && !done;) {
+        for (auto x = -1; ++x < 2 && !done;) {
+            for (auto y = -1; ++y < 2 && !done;) {
                 const auto& tile = getTile(tilePos.translated(-x, -y));
                 if (!tile || !tile->isFullyOpaque()) {
                     covered = false;
