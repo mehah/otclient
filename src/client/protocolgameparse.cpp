@@ -267,6 +267,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerTrappers:
                     parseTrappers(msg);
                     break;
+                case Proto::GameServerCloseForgeWindow:
+                    parseCloseForgeWindow(msg);
+                    break;
                 case Proto::GameServerCreatureData:
                     parseCreatureData(msg);
                     break;
@@ -1844,6 +1847,11 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg)
     // TODO: implement creature icons usage
 }
 
+void ProtocolGame::parseCloseForgeWindow(const InputMessagePtr& /*msg*/)
+{
+    g_lua.callGlobalField("g_game", "onCloseForgeCloseWindows");
+}
+
 void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
 {
     const uint32_t creatureId = msg->getU32();
@@ -2933,12 +2941,16 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
     const uint16_t questId = msg->getU16();
 
     const uint8_t missionCount = msg->getU8();
-    std::vector<std::tuple<std::string, std::string>> questMissions;
+    std::vector<std::tuple<std::string_view, std::string_view, uint16_t>> questMissions;
 
     for (auto i = 0; i < missionCount; ++i) {
+        auto missionId = 0;
+        if (g_game.getClientVersion() >= 1200) {
+            missionId = msg->getU16();
+        }
         const auto& missionName = msg->getString();
         const auto& missionDescrition = msg->getString();
-        questMissions.emplace_back(missionName, missionDescrition);
+        questMissions.emplace_back(missionName, missionDescrition, missionId);
     }
 
     g_game.processQuestLine(questId, questMissions);

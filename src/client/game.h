@@ -498,7 +498,7 @@ protected:
 
     // questlog
     static void processQuestLog(const std::vector<std::tuple<uint16_t, std::string, bool>>& questList);
-    static void processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string, std::string>>& questMissions);
+    static void processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view, uint16_t>>& questMissions);
 
     // modal dialogs >= 970
     static void processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string>>
@@ -541,7 +541,7 @@ public:
     void safeLogout();
 
     // walk related
-    bool walk(const Otc::Direction direction, bool force = false);
+    bool walk(const Otc::Direction direction);
     void autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos);
     void forceWalk(const Otc::Direction direction);
     void turn(const Otc::Direction direction);

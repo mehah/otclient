@@ -286,6 +286,8 @@ function Cyclopedia.reloadCharacterItems()
             local gridItem = g_ui.createWidget("CharacterGridItem", UI.CharacterItems.gridBase.grid)
             gridItem.item:setItemId(itemId)
             gridItem.amount:setText(data.amount)
+            ItemsDatabase.setRarityItem(gridItem.item, gridItem.item:getItem())
+            ItemsDatabase.setTier(gridItem.item, item.tier)
             colorIndex = 3 - colorIndex
         end
     end
@@ -639,7 +641,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
     -- Critical Chance
     local skillIndex = skillsIndexes[Skill.CriticalChance]
     local skill = additionalSkillsArray[skillIndex][2]
-    UI.CombatStats.criticalChance.value:setText(skill .. "%")
+    UI.CombatStats.criticalChance.value:setText(string.format("%.2f%%", skill / 100))
     if skill > 0 then
         UI.CombatStats.criticalChance.value:setColor("#44AD25")
     else
@@ -649,7 +651,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
     -- Critical Damage
     skillIndex = skillsIndexes[Skill.CriticalDamage]
     skill = additionalSkillsArray[skillIndex][2]
-    UI.CombatStats.criticalDamage.value:setText(skill .. "%")
+    UI.CombatStats.criticalDamage.value:setText(string.format("%.2f%%", skill / 100))
     if skill > 0 then
         UI.CombatStats.criticalDamage.value:setColor("#44AD25")
     else
@@ -725,13 +727,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
             value:setText(string.format("%.2f%%", percent / 100))
             value:setColor("#C0C0C0")
             value:setMarginRight(2)
-
-            if percent > 0 then
-                value:setColor("#44AD25")
-            else
-                value:setColor("#C0C0C0")
-            end
-
+            value:setColor("#C0C0C0")
             firstSpecial = firstSpecial and false
         end
     end

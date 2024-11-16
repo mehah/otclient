@@ -788,6 +788,10 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
         }
     }
 
+    if (g_game.getClientVersion() >= 1334) {
+        msg->addU8(static_cast<uint8_t>(outfit.hasMount()));
+    }
+
     if (g_game.getClientVersion() >= 1281) {
         msg->addU16(0x00); //familiars
         msg->addU8(0x00); //randomizeMount

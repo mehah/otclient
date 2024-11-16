@@ -182,18 +182,21 @@ function bindWalkKey(key, dir)
         onWalkKeyDown(dir)
     end, gameRootPanel, true)
     g_keyboard.bindKeyUp(key, function()
-        g_game.getLocalPlayer():setNextWalkDir(Directions.Invalid)
         changeWalkDir(dir, true)
     end, gameRootPanel, true)
     g_keyboard.bindKeyPress(key, function()
         smartWalk(dir)
     end, gameRootPanel)
+
+    g_keyboard.setKeyDelay(key, 10)
 end
 
 function unbindWalkKey(key)
     g_keyboard.unbindKeyDown(key, gameRootPanel)
     g_keyboard.unbindKeyUp(key, gameRootPanel)
     g_keyboard.unbindKeyPress(key, gameRootPanel)
+
+    g_keyboard.setKeyDelay(key, 30)
 end
 
 function bindTurnKey(key, dir)
@@ -494,12 +497,7 @@ function smartWalk(dir)
         return false
     end
 
-
-    local dire = smartWalkDir or dir
-
-    g_game.getLocalPlayer():setNextWalkDir(dire)
-
-    g_game.walk(dire)
+    g_game.walk(smartWalkDir or dir)
 
     return true
 end
