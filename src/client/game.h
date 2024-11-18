@@ -786,6 +786,7 @@ public:
     void requestBestiarySearch(const uint16_t raceId);
     void requestSendBuyCharmRune(const uint8_t runeId, const uint8_t action, const uint16_t raceId);
     void requestSendCharacterInfo(const uint32_t playerId, const Otc::CyclopediaCharacterInfoType_t characterInfoType, const uint16_t entriesPerPage = 0, const uint16_t page = 0);
+    void requestSendCyclopediaHouseAuction(const Otc::CyclopediaHouseAuctionType_t type, const uint32_t houseId, const uint32_t timestamp = 0, const uint64_t bidValue = 0, const std::string_view& name = "");
     void requestBosstiaryInfo();
     void requestBossSlootInfo();
     void requestBossSlotAction(const uint8_t action, const uint32_t raceId);
