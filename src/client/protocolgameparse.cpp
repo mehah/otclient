@@ -3855,7 +3855,7 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
         switch (type) {
 
             case Otc::CYCLOPEDIA_HOUSE_STATE_AVAILABLE: {
-                std::string_view bidderName = msg->getString(); 
+                std::string bidderName = msg->getString(); 
                 const bool isBidder = static_cast<bool>(msg->getU8());
                 msg->getU8(); // disableIndex
 
