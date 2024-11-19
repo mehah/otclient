@@ -3810,14 +3810,11 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
 void ProtocolGame::parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg)
 {
     msg->getU32(); // houseId
-    const uint8_t typeValue = msg->getU8(); // typeValue
-
-    if (typeValue == 1) {
+    if (const uint8_t typeValue = msg->getU8(); typeValue == 1) {
         msg->getU8(); // 0x00
     }
-
     msg->getU8(); // index
-    // TODO Lua // Otui
+    // TO-DO Lua - Otui
 }
 
 void ProtocolGame::parseCyclopediaHousesInfo(const InputMessagePtr& msg)
@@ -3842,7 +3839,7 @@ void ProtocolGame::parseCyclopediaHousesInfo(const InputMessagePtr& msg)
     for (auto i = 0; i < size; ++i) {
         msg->getU32(); // getClientId
     }
-    // TODO Lua // Otui
+    // TO-DO Lua // Otui
 }
 
 void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg) 
@@ -3856,7 +3853,7 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
 
             case Otc::CYCLOPEDIA_HOUSE_STATE_AVAILABLE: {
                 std::string bidderName = msg->getString(); 
-                const bool isBidder = static_cast<bool>(msg->getU8());
+                const auto isBidder = static_cast<bool>(msg->getU8());
                 msg->getU8(); // disableIndex
 
                 if (!bidderName.empty()) {
@@ -3872,7 +3869,7 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
             case Otc::CYCLOPEDIA_HOUSE_STATE_RENTED: {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
-                const bool isRented = static_cast<bool>(msg->getU8());
+                const auto isRented = static_cast<bool>(msg->getU8());
                 if (isRented) {
                     msg->getU8(); // unknown
                     msg->getU8(); // unknown
@@ -3883,7 +3880,7 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
             case Otc::CYCLOPEDIA_HOUSE_STATE_TRANSFER: {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
-                const bool isOwner = static_cast<bool>(msg->getU8());
+                const auto isOwner = static_cast<bool>(msg->getU8());
                 if (isOwner) {
                     msg->getU8(); // unknown
                     msg->getU8(); // unknown
@@ -3893,8 +3890,7 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
                 msg->getU8(); // unknown
                 msg->getU64(); // internalBid
 
-                const bool isNewOwner = static_cast<bool>(msg->getU8());
-                if (isNewOwner) {
+                if (const auto isNewOwner = static_cast<bool>(msg->getU8()); isNewOwner) {
                     msg->getU8(); // acceptTransferError
                     msg->getU8(); // rejectTransferError
                 }
@@ -3908,8 +3904,8 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
             case Otc::CYCLOPEDIA_HOUSE_STATE_MOVEOUT: {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
-                const bool isOwner = static_cast<bool>(msg->getU8());
-                if (isOwner) {
+
+                if (const auto isOwner = static_cast<bool>(msg->getU8()); isOwner) {
                     msg->getU8(); // unknown
                     msg->getU8(); // unknown
                     msg->getU32(); // bidEndDate
@@ -3917,11 +3913,12 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
                 } else {
                     msg->getU32(); // bidEndDate
                 }
+
                 break;
             }
         }
     }
-    // TODO Lua // Otui
+    // TO-DO Lua - Otui
 }
 
 void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
