@@ -3869,8 +3869,8 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
             case Otc::CYCLOPEDIA_HOUSE_STATE_RENTED: {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
-                const auto isRented = static_cast<bool>(msg->getU8());
-                if (isRented) {
+
+                if (const auto isRented = static_cast<bool>(msg->getU8()); isRented) {
                     msg->getU8(); // unknown
                     msg->getU8(); // unknown
                 }
