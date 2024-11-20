@@ -1835,16 +1835,23 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
     }
 }
 
-void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg) const
+void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const
 {
-    const uint8_t sizeIcons = msg->getU8();
-    for (auto i = 0; i < sizeIcons; ++i) {
-        msg->getU8(); // icon.serialize()
-        msg->getU8(); // icon.category
-        msg->getU16(); // icon.count
+    const auto& creature = g_map.getCreatureById(creatureId);
+    if (!creature) {
+        g_logger.traceError(stdext::format("ProtocolGame::addCreatureIcon: could not get creature with id %d", creatureId));
+        return;
     }
 
-    // TODO: implement creature icons usage
+    const uint8_t sizeIcons = msg->getU8();
+    std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> icons; // icon, category, count
+    for (auto i = 0; i < sizeIcons; ++i) {
+        uint8_t icon = msg->getU8(); // icon.serialize()
+        uint8_t category = msg->getU8(); // icon.category -- 0x00 = monster // 0x01 = player?
+        uint16_t count = msg->getU16(); // icon.count
+        icons.emplace_back(icon, category, count);
+    }
+    creature->setIcons(icons);
 }
 
 void ProtocolGame::parseCloseForgeWindow(const InputMessagePtr& /*msg*/)
@@ -1872,7 +1879,7 @@ void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
             msg->getU8();
             break;
         case 14: // creature icons
-            addCreatureIcon(msg);
+            addCreatureIcon(msg, creatureId);
             break;
     }
 }
@@ -3368,7 +3375,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         const uint16_t speed = msg->getU16();
 
         if (g_game.getClientVersion() >= 1281) {
-            addCreatureIcon(msg);
+            addCreatureIcon(msg, creature->getId());
         }
 
         const uint8_t skull = msg->getU8();

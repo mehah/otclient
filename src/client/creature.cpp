@@ -244,6 +244,26 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int
 
     if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
         g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
+   
+    if (g_game.getClientVersion() >= 1281) { //  g_game.getFeature(Otc::GameIcons) 
+        size_t index = 0;
+        for (const auto& [icon, category, count] : m_icons) {
+            int iconY = backgroundRect.y() - 15 + (icon) * 5;
+            if (index < m_IconsTextures.size()) {
+                TexturePtr iconTexture = m_IconsTextures[index];
+                if (iconTexture) {
+                    g_drawPool.addTexturedPos(iconTexture, backgroundRect.right(), iconY);
+                }
+            }
+            CachedText numberText;
+            numberText.setText(std::to_string(count));
+            numberText.setFont(g_fonts.getFont("verdana-11px-rounded"));
+            numberText.setAlign(Fw::AlignCenter);
+            Rect numberRect(backgroundRect.right() + 10, iconY, 20, 20);
+            numberText.draw(numberRect, Color::white);
+            ++index;
+        }
+    }
 }
 
 void Creature::internalDraw(Point dest, const Color& color)
@@ -829,11 +849,25 @@ void Creature::setIcon(uint8_t v) { if (m_icon != v) callLuaField("onIconChange"
 void Creature::setSkull(uint8_t v) { if (m_skull != v) callLuaField("onSkullChange", m_skull = v); }
 void Creature::setShield(uint8_t v) { if (m_shield != v) callLuaField("onShieldChange", m_shield = v); }
 void Creature::setEmblem(uint8_t v) { if (m_emblem != v) callLuaField("onEmblemChange", m_emblem = v); }
+void Creature::setIcons(const std::vector<std::tuple<uint8_t, uint8_t, uint16_t>>& icons)
+{
+    m_icons = icons;
+    for (const auto& [icon, category, count] : m_icons) {
+        callLuaField("onIconsChange", icon, category, count);
+    }
+}
 
 void Creature::setTypeTexture(const std::string& filename) { m_typeTexture = g_textures.getTexture(filename); }
 void Creature::setIconTexture(const std::string& filename) { m_iconTexture = g_textures.getTexture(filename); }
 void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
 void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
+void Creature::setIconsTexture(const std::string& filename)
+{
+    TexturePtr texture = g_textures.getTexture(filename);
+    if (texture) {
+        m_IconsTextures.push_back(texture); 
+    }
+}
 
 void Creature::setShieldTexture(const std::string& filename, bool blink)
 {

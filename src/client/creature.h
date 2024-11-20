@@ -75,11 +75,13 @@ public:
     void setEmblem(uint8_t emblem);
     void setType(uint8_t type);
     void setIcon(uint8_t icon);
+    void setIcons(const std::vector<std::tuple<uint8_t, uint8_t, uint16_t>>& icons);
     void setSkullTexture(const std::string& filename);
     void setShieldTexture(const std::string& filename, bool blink);
     void setEmblemTexture(const std::string& filename);
     void setTypeTexture(const std::string& filename);
     void setIconTexture(const std::string& filename);
+    void setIconsTexture(const std::string& filename);
     void setPassable(bool passable) { m_passable = passable; }
     void setMountShader(const std::string_view name);
     void setStaticWalking(uint16_t v);
@@ -232,6 +234,7 @@ private:
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
     TexturePtr m_typingIconTexture;
+    std::vector<TexturePtr> m_IconsTextures;
 
     EventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
@@ -283,6 +286,7 @@ private:
     uint8_t m_icon{ Otc::NpcIconNone };
     uint8_t m_shield{ Otc::ShieldNone };
     uint8_t m_emblem{ Otc::EmblemNone };
+    std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> m_icons;
 
     // walk related
     uint8_t m_walkAnimationPhase{ 0 };
