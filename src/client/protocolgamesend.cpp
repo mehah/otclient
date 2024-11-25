@@ -1068,7 +1068,6 @@ void ProtocolGame::sendCyclopediaHouseAuction(const Otc::CyclopediaHouseAuctionT
         case Otc::CYCLOPEDIA_HOUSE_TYPE_NONE: // enum class HouseAuctionType : uint8_t {  ?
             msg->addString(name); // townName
             break;
-
         case Otc::CYCLOPEDIA_HOUSE_TYPE_BID:
             msg->addU32(houseId);
             msg->addU64(bidValue);
