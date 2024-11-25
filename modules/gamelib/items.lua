@@ -114,11 +114,7 @@ function ItemsDatabase.setTier(widget, item)
 end
 
 function ItemsDatabase.setCharges(widget, item, style)
-    if not g_game.getFeature(GameThingCounter) then
-        return
-    end
-
-    if not widget then
+    if not g_game.getFeature(GameThingCounter) or not widget then
         return
     end
 
