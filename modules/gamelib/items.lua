@@ -24,6 +24,22 @@ local function getColorForValue(value)
     end
 end
 
+local function clipfunction(value)
+    if value >= 1000000 then
+        return "128 0 32 32"
+    end
+    if value >= 100000 then
+        return "96 0 32 32"
+    end
+    if value >= 10000 then
+        return "64 0 32 32"
+    end
+    if value >= 50 then
+        return "32 0 32 32"
+    end
+    return ""
+end
+
 function ItemsDatabase.setRarityItem(widget, item, style)
     if not g_game.getFeature(GameColorizedLootValue) then
         return
@@ -33,14 +49,27 @@ function ItemsDatabase.setRarityItem(widget, item, style)
         return
     end
 
+    local frameOption = modules.client_options.getOption('framesRarity')
+    if frameOption == "none" then
+        return
+    end
     if item then
         local price = type(item) == "number" and item or (item and item:getMeanPrice()) or 0
         local itemRarity = getColorForValue(price)
-        local imagePath = '/images/ui/item'
-        if itemRarity and itemRarity ~= "white" then -- necessary in setColorLootMessage
-            imagePath = '/images/ui/rarity_' .. itemRarity
+        if itemRarity then
+            local clip = clipfunction(price)
+            if clip ~= "" then
+                local imagePath = '/images/ui/item'
+
+                if frameOption == "frames" then
+                    imagePath = "/images/ui/rarity_frames"
+                elseif frameOption == "corners" then
+                    imagePath = "/images/ui/containerslot-coloredges"
+                end
+                widget:setImageClip(clip)
+                widget:setImageSource(imagePath)
+            end
         end
-        widget:setImageSource(imagePath)
     end
 
     if style then
@@ -82,5 +111,46 @@ function ItemsDatabase.setTier(widget, item)
         widget.tier:setVisible(true)
     else
         widget.tier:setVisible(false)
+    end
+end
+
+function ItemsDatabase.setCharges(widget, item, style)
+    if not g_game.getFeature(GameThingCounter) then
+        return
+    end
+
+    if not widget then
+        return
+    end
+
+    if item and item:getCharges() > 0 then
+        widget.charges:setText(item:getCharges())
+    else
+        widget.charges:setText("")
+    end
+
+    if style then
+        widget:setStyle(style)
+    end
+end
+
+
+function ItemsDatabase.setDuration(widget, item, style)
+    if not g_game.getFeature(GameThingClock) then
+        return
+    end
+
+    if not widget then
+        return
+    end
+    if item and item:getDurationTime() > 0 then
+            local durationTimeLeft = item:getDurationTime()
+            widget.duration:setText(string.format("%dm%02d", durationTimeLeft / 60, durationTimeLeft % 60))
+    else
+        widget.duration:setText("")
+    end
+
+    if style then
+        widget:setStyle(style)
     end
 end
