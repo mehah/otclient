@@ -3829,9 +3829,8 @@ void ProtocolGame::parseCyclopediaHousesInfo(const InputMessagePtr& msg)
     msg->getU8(); // 0x01
     msg->getU32(); // houseClientId
 
-    const uint16_t size = msg->getU16(); // g_game().map.houses.getHouses()
-
-    for (auto i = 0; i < size; ++i) {
+    const uint16_t housesList = msg->getU16(); // g_game().map.houses.getHouses()
+    for (auto i = 0; i < housesList; ++i) {
         msg->getU32(); // getClientId
     }
     // TO-DO Lua // Otui
