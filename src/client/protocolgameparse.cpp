@@ -1844,7 +1844,7 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
     }
 }
 
-void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg)
+void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg) const
 {
     const uint8_t sizeIcons = msg->getU8();
     for (auto i = 0; i < sizeIcons; ++i) {
@@ -3377,12 +3377,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         const uint16_t speed = msg->getU16();
 
         if (g_game.getClientVersion() >= 1281) {
-            const uint8_t iconDebuff = msg->getU8(); // creature debuffs
-            if (iconDebuff != 0) {
-                msg->getU8(); // Icon
-                msg->getU8(); // Update (?)
-                msg->getU16(); // Counter text
-            }
+            addCreatureIcon(msg);
         }
 
         const uint8_t skull = msg->getU8();
