@@ -131,13 +131,10 @@ end
 
 
 function ItemsDatabase.setDuration(widget, item, style)
-    if not g_game.getFeature(GameThingClock) then
+    if not g_game.getFeature(GameThingClock) or not widget then
         return
     end
 
-    if not widget then
-        return
-    end
     if item and item:getDurationTime() > 0 then
             local durationTimeLeft = item:getDurationTime()
             widget.duration:setText(string.format("%dm%02d", durationTimeLeft / 60, durationTimeLeft % 60))
