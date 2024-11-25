@@ -60,7 +60,6 @@ function ItemsDatabase.setRarityItem(widget, item, style)
             local clip = clipfunction(price)
             if clip ~= "" then
                 local imagePath = '/images/ui/item'
-
                 if frameOption == "frames" then
                     imagePath = "/images/ui/rarity_frames"
                 elseif frameOption == "corners" then
