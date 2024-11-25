@@ -1076,7 +1076,6 @@ void ProtocolGame::sendCyclopediaHouseAuction(const Otc::CyclopediaHouseAuctionT
             msg->addU32(houseId);
             msg->addU32(timestamp);
             break;
-
         case Otc::CYCLOPEDIA_HOUSE_TYPE_TRANSFER:
             msg->addU32(houseId);
             msg->addU32(timestamp);
