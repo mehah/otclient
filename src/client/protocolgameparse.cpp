@@ -3635,7 +3635,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getFeature(Otc::GameThingCounter)) {
         if (item->hasWearOut()) {
-            msg->getU32(); // Item charge (UI)
+            item->setCharges(msg->getU32());
             msg->getU8(); // Is brand-new
         }
     }
