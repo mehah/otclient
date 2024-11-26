@@ -27,15 +27,14 @@ end
 local function clipfunction(value)
     if value >= 1000000 then
         return "128 0 32 32"
-    end
-    if value >= 100000 then
+    elseif value >= 100000 then
         return "96 0 32 32"
-    end
-    if value >= 10000 then
+    elseif value >= 10000 then
         return "64 0 32 32"
-    end
-    if value >= 50 then
+    elseif value >= 1000 then
         return "32 0 32 32"
+    elseif value >= 50 then
+        return "0 0 32 32"
     end
     return ""
 end
