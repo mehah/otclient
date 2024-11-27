@@ -846,9 +846,7 @@ function Cyclopedia.loadCharacterGeneralStats(data, skills)
     Cyclopedia.setCharacterSkillBase("magiclevel", data.magicLevel, data.baseMagicLevel)
 
     for i = Skill.Fist + 1, Skill.Fishing + 1 do
-        local skillLevel = skills[i][1]
-        local baseSkill = skills[i][2]
-        local skillPercent = skills[i][3]
+        local skillLevel, baseSkill, skillPercent = unpack(skills[i])
         Cyclopedia.onSkillChange(player, i - 1, skillLevel, skillPercent)
         Cyclopedia.onBaseCharacterSkillChange(player, i - 1, baseSkill)
     end

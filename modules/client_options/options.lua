@@ -105,6 +105,7 @@ local function setupComboBox()
     local crosshairCombo = panels.interface:recursiveGetChildById('crosshair')
     local antialiasingModeCombobox = panels.graphicsPanel:recursiveGetChildById('antialiasingMode')
     local floorViewModeCombobox = panels.graphicsEffectsPanel:recursiveGetChildById('floorViewMode')
+    local framesRarityCombobox = panels.interface:recursiveGetChildById('frames')
 
     for k, v in pairs({ { 'Disabled', 'disabled' }, { 'Default', 'default' }, { 'Full', 'full' } }) do
         crosshairCombo:addOption(v[1], v[2])
@@ -130,6 +131,14 @@ local function setupComboBox()
 
     floorViewModeCombobox.onOptionChange = function(comboBox, option)
         setOption('floorViewMode', comboBox:getCurrentOption().data)
+    end
+
+    for k, v in pairs({ { 'None', 'none' }, { 'Frames', 'frames' }, { 'Corners', 'corners' } }) do
+        framesRarityCombobox:addOption(v[1], v[2])
+    end
+
+    framesRarityCombobox.onOptionChange = function(comboBox, option)
+        setOption('framesRarity', comboBox:getCurrentOption().data)
     end
 
     if not g_game.isEnabledBotProtection() then
