@@ -478,7 +478,7 @@ void Game::processQuestLog(const std::vector<std::tuple<uint16_t, std::string, b
     g_lua.callGlobalField("g_game", "onQuestLog", questList);
 }
 
-void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string, std::string>>& questMissions)
+void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view, uint16_t>>& questMissions)
 {
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
@@ -630,42 +630,10 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction, bool force)
+bool Game::walk(const Otc::Direction direction)
 {
-    static ScheduledEventPtr nextWalkSchedule = nullptr;
-
-    if (direction == Otc::InvalidDirection) {
-        if (nextWalkSchedule) {
-            nextWalkSchedule->cancel();
-            nextWalkSchedule = nullptr;
-        }
+    if (!canPerformGameAction() || direction == Otc::InvalidDirection)
         return false;
-    }
-
-    if (!canPerformGameAction() || nextWalkSchedule)
-        return false;
-
-    if (!force && m_localPlayer->getWalkSteps() > 0) {
-        auto delay = 0;
-        auto steps = m_localPlayer->getWalkSteps();
-
-        if (m_localPlayer->getWalkSteps() == 1) {
-            delay = m_walkFirstStepDelay;
-            steps = 2;
-        } else if (direction != m_localPlayer->getDirection())
-            delay = m_walkTurnDelay;
-
-        if (delay > 0) {
-            nextWalkSchedule = g_dispatcher.scheduleEvent([this, steps, direction] {
-                nextWalkSchedule = nullptr;
-                if (m_localPlayer) {
-                    m_localPlayer->setWalkSteps(steps);
-                    walk(direction, true);
-                }
-            }, delay);
-            return false;
-        }
-    }
 
     // must cancel auto walking, and wait next try
     if (m_localPlayer->isAutoWalking()) {
@@ -674,10 +642,31 @@ bool Game::walk(const Otc::Direction direction, bool force)
         return false;
     }
 
+    static ScheduledEventPtr nextWalkSchedule = nullptr;
+    static uint16_t steps = 0;
+    static Timer timer;
+
+    if (nextWalkSchedule) nextWalkSchedule->cancel();
+    nextWalkSchedule = g_dispatcher.scheduleEvent([this] {
+        nextWalkSchedule = nullptr;
+        steps = 0;
+    }, 150);
+
     // check we can walk and add new walk event if false
-    if (!m_localPlayer->canWalk()) {
+    if (!m_localPlayer->canWalk(direction)) {
         return false;
     }
+
+    if (steps == 1) {
+        if (timer.ticksElapsed() <= m_walkFirstStepDelay)
+            return false;
+    } else if (direction != m_localPlayer->getDirection()) {
+        if (timer.ticksElapsed() <= m_walkTurnDelay)
+            return false;
+    }
+
+    ++steps;
+    timer.restart();
 
     const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
 
@@ -748,7 +737,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
 
     const Otc::Direction direction = *dirs.begin();
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(true)) {
+        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(direction, true)) {
             m_localPlayer->preWalk(direction);
         }
     }

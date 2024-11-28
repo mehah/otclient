@@ -286,6 +286,8 @@ function Cyclopedia.reloadCharacterItems()
             local gridItem = g_ui.createWidget("CharacterGridItem", UI.CharacterItems.gridBase.grid)
             gridItem.item:setItemId(itemId)
             gridItem.amount:setText(data.amount)
+            ItemsDatabase.setRarityItem(gridItem.item, gridItem.item:getItem())
+            ItemsDatabase.setTier(gridItem.item, item.tier)
             colorIndex = 3 - colorIndex
         end
     end
@@ -317,7 +319,7 @@ function Cyclopedia.loadCharacterItems(data)
 
         local itemKey = data.itemId .. "-" .. (data.tier or "no_tier")
         local insertedItem = Cyclopedia.Character.Items[itemKey]
-        if insertedItem then
+        if insertedItem and insertedItem.amount then
             insertedItem.amount = insertedItem.amount + data.amount
         else
             Cyclopedia.Character.Items[itemKey] = {
@@ -639,7 +641,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
     -- Critical Chance
     local skillIndex = skillsIndexes[Skill.CriticalChance]
     local skill = additionalSkillsArray[skillIndex][2]
-    UI.CombatStats.criticalChance.value:setText(skill .. "%")
+    UI.CombatStats.criticalChance.value:setText(string.format("%.2f%%", skill / 100))
     if skill > 0 then
         UI.CombatStats.criticalChance.value:setColor("#44AD25")
     else
@@ -649,7 +651,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
     -- Critical Damage
     skillIndex = skillsIndexes[Skill.CriticalDamage]
     skill = additionalSkillsArray[skillIndex][2]
-    UI.CombatStats.criticalDamage.value:setText(skill .. "%")
+    UI.CombatStats.criticalDamage.value:setText(string.format("%.2f%%", skill / 100))
     if skill > 0 then
         UI.CombatStats.criticalDamage.value:setColor("#44AD25")
     else
@@ -725,13 +727,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
             value:setText(string.format("%.2f%%", percent / 100))
             value:setColor("#C0C0C0")
             value:setMarginRight(2)
-
-            if percent > 0 then
-                value:setColor("#44AD25")
-            else
-                value:setColor("#C0C0C0")
-            end
-
+            value:setColor("#C0C0C0")
             firstSpecial = firstSpecial and false
         end
     end
@@ -850,9 +846,7 @@ function Cyclopedia.loadCharacterGeneralStats(data, skills)
     Cyclopedia.setCharacterSkillBase("magiclevel", data.magicLevel, data.baseMagicLevel)
 
     for i = Skill.Fist + 1, Skill.Fishing + 1 do
-        local skillLevel = skills[i][1]
-        local baseSkill = skills[i][2]
-        local skillPercent = skills[i][3]
+        local skillLevel, baseSkill, skillPercent = unpack(skills[i])
         Cyclopedia.onSkillChange(player, i - 1, skillLevel, skillPercent)
         Cyclopedia.onBaseCharacterSkillChange(player, i - 1, baseSkill)
     end
@@ -1238,6 +1232,7 @@ function Cyclopedia.onParseCyclopediaStoreSummary(xpBoostTime, dailyRewardXpBoos
     local maxVisibleRows = 1.6
     local itemCount = #houseItems
     UI.StoreSummary.ListBase.List.houseItems:setHeight(math.min(itemCount, maxVisibleRows) * rowHeight)
+    UI.StoreSummary.ListBase.List.houseItems.PurchasedHouseItems:destroyChildren() 
     for _, item in ipairs(houseItems) do
         local row = g_ui.createWidget('RowStore2', UI.StoreSummary.ListBase.List.houseItems.PurchasedHouseItems)
         local nameLabel = row:getChildById('lblName')

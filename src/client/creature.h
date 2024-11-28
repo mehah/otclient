@@ -94,8 +94,6 @@ public:
     void hideStaticSquare() { m_showStaticSquare = false; }
 
     // walk related
-    int getWalkSteps() const { return m_walkSteps; }
-    void setWalkSteps(uint8_t step) { m_walkSteps = step; }
     void turn(Otc::Direction direction);
     void jump(int height, int duration);
     void allowAppearWalk() { m_allowAppearWalk = true; }
@@ -209,7 +207,6 @@ private:
     void updateShield();
     void updateWalkingTile();
     void updateWalkAnimation();
-    void resetWalkAnimationPhase(bool toSchedule = false);
 
     uint16_t getCurrentAnimationPhase(bool mount = false);
 
@@ -294,8 +291,6 @@ private:
     uint8_t m_exactSize{ 0 };
 
     uint8_t m_disableWalkAnimation{ 0 };
-
-    uint8_t m_walkSteps{ 0 };
 
     // Mount Shader
     uint8_t m_mountShaderId{ 0 };

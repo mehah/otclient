@@ -267,6 +267,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerTrappers:
                     parseTrappers(msg);
                     break;
+                case Proto::GameServerCloseForgeWindow:
+                    parseCloseForgeWindow(msg);
+                    break;
                 case Proto::GameServerCreatureData:
                     parseCreatureData(msg);
                     break;
@@ -852,18 +855,23 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
     }
 
     const uint8_t entries = msg->getU8();
-    std::vector<std::tuple<uint32_t, uint32_t, std::string>> historyData;
-
+    std::vector<std::tuple<uint32_t, uint8_t, int32_t, uint8_t, std::string>> historyData;
     for (auto i = 0; i < entries; ++i) {
         if (g_game.getClientVersion() >= 1332) {
-            msg->getU32();
+            msg->getU32(); // 0
             const uint32_t time = msg->getU32();
-            msg->getU8();
-            const uint32_t amount = (UINT32_MAX - msg->getU32());
-            msg->getU8();
+            const uint8_t mode = msg->getU8(); //0 = normal, 1 = gift, 2 = refund
+            uint32_t rawAmount = msg->getU32();
+            int32_t amount;
+            if (rawAmount > INT32_MAX) {
+                amount = -static_cast<int32_t>(UINT32_MAX - rawAmount + 1);
+            } else {
+                amount = static_cast<int32_t>(rawAmount);
+            }
+            const uint8_t coinType = msg->getU8(); // 0 = transferable tibia coin, 1 = normal tibia coin
             const auto& productName = msg->getString();
-            msg->getU8();
-            historyData.emplace_back(time, amount, productName);
+            msg->getU8(); //details
+            historyData.emplace_back(time, mode, amount, coinType, productName);
         } else {
             const uint16_t time = msg->getU16();
             const uint8_t productType = msg->getU8();
@@ -873,9 +881,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
         }
     }
 
-    if (g_game.getClientVersion() >= 1332) {
-        g_lua.callGlobalField("g_game", "onParseStoreGetHistory", currentPage, pageCount, historyData);
-    }
+    g_lua.callGlobalField("g_game", "onParseStoreGetHistory", currentPage, pageCount, historyData);
 }
 
 void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
@@ -1829,7 +1835,7 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
     }
 }
 
-void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg)
+void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg) const
 {
     const uint8_t sizeIcons = msg->getU8();
     for (auto i = 0; i < sizeIcons; ++i) {
@@ -1839,6 +1845,11 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg)
     }
 
     // TODO: implement creature icons usage
+}
+
+void ProtocolGame::parseCloseForgeWindow(const InputMessagePtr& /*msg*/)
+{
+    g_lua.callGlobalField("g_game", "onCloseForgeCloseWindows");
 }
 
 void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
@@ -2930,12 +2941,16 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
     const uint16_t questId = msg->getU16();
 
     const uint8_t missionCount = msg->getU8();
-    std::vector<std::tuple<std::string, std::string>> questMissions;
+    std::vector<std::tuple<std::string_view, std::string_view, uint16_t>> questMissions;
 
     for (auto i = 0; i < missionCount; ++i) {
+        auto missionId = 0;
+        if (g_game.getClientVersion() >= 1200) {
+            missionId = msg->getU16();
+        }
         const auto& missionName = msg->getString();
         const auto& missionDescrition = msg->getString();
-        questMissions.emplace_back(missionName, missionDescrition);
+        questMissions.emplace_back(missionName, missionDescrition, missionId);
     }
 
     g_game.processQuestLine(questId, questMissions);
@@ -3353,12 +3368,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
         const uint16_t speed = msg->getU16();
 
         if (g_game.getClientVersion() >= 1281) {
-            const uint8_t iconDebuff = msg->getU8(); // creature debuffs
-            if (iconDebuff != 0) {
-                msg->getU8(); // Icon
-                msg->getU8(); // Update (?)
-                msg->getU16(); // Counter text
-            }
+            addCreatureIcon(msg);
         }
 
         const uint8_t skull = msg->getU8();
@@ -3625,7 +3635,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getFeature(Otc::GameThingCounter)) {
         if (item->hasWearOut()) {
-            msg->getU32(); // Item charge (UI)
+            item->setCharges(msg->getU32());
             msg->getU8(); // Is brand-new
         }
     }
@@ -4019,6 +4029,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             msg->getU16(); // player level
             getOutfit(msg, false);
             msg->getU8(); // ???
+            if (g_game.getFeature(Otc::GameTournamentPackets)) {
+                msg->getU8(); // ???
+            }
             msg->getString(); // current title name
             break;
         }
@@ -4029,6 +4042,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             stats.level = msg->getU16();
             stats.levelPercent = msg->getU8();
             stats.baseExpGain = msg->getU16();
+            if (g_game.getFeature(Otc::GameTournamentPackets)) {
+                msg->getU32(); // tournament exp(deprecated)
+            }
             stats.lowLevelExpBonus = msg->getU16();
             stats.XpBoostPercent = msg->getU16();
             stats.staminaExpBonus = msg->getU16();
@@ -4062,7 +4078,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const uint16_t baseSkill = msg->getU16();
                 msg->getU16(); // base + loyalty bonus(?)
                 const uint16_t skillPercent = msg->getU16() / 100;
-                skills.push_back({ skillLevel, skillPercent, baseSkill });
+                skills.push_back({ skillLevel, baseSkill, skillPercent });
             }
 
             const uint8_t combatCount = msg->getU8();
