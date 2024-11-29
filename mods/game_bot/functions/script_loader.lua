@@ -10,9 +10,14 @@ context.loadScript = function(path, onLoadCallback)
   if not g_resources.fileExists(path) then
     return context.error("File " .. path .. " doesn't exist")
   end
-
   local status, result = pcall(function()
-    assert(load(g_resources.readFileContents(path), path, nil, context))()
+    if _VERSION == "Lua 5.1" and type(jit) ~= "table" then
+      local func = assert(loadstring(g_resources.readFileContents(path)))
+      setfenv(func, context)
+      func()
+    else        
+      assert(load(g_resources.readFileContents(path), path, nil, context))()
+    end
   end)
   if not status then
     return context.error("Error while loading script from: " .. path .. ":\n" .. result)
@@ -42,7 +47,13 @@ context.loadRemoteScript = function(url, onLoadCallback)
     end
 
     local status, result = pcall(function()
-      assert(load(data, url, nil, context))()
+      if _VERSION == "Lua 5.1" and type(jit) ~= "table" then
+        local func = assert(loadstring(data))
+        setfenv(func, context)
+        func()
+      else        
+        assert(load(data, url, nil, context))()
+      end
     end)
     if not status then
       return context.error("Error while loading script from: " .. url .. ":\n" .. result)

@@ -408,6 +408,8 @@
     <ClCompile Include="..\src\framework\platform\win32crashhandler.cpp" />
     <ClCompile Include="..\src\framework\platform\win32platform.cpp" />
     <ClCompile Include="..\src\framework\platform\win32window.cpp" />
+    <ClCompile Include="..\src\framework\proxy\proxy.cpp" />
+    <ClCompile Include="..\src\framework\proxy\proxy_client.cpp" />
     <ClCompile Include="..\src\framework\sound\combinedsoundsource.cpp" />
     <ClCompile Include="..\src\framework\sound\oggsoundfile.cpp" />
     <ClCompile Include="..\src\framework\sound\soundbuffer.cpp" />
@@ -573,6 +575,8 @@
     <ClInclude Include="..\src\framework\platform\platform.h" />
     <ClInclude Include="..\src\framework\platform\platformwindow.h" />
     <ClInclude Include="..\src\framework\platform\win32window.h" />
+    <ClInclude Include="..\src\framework\proxy\proxy.h" />
+    <ClInclude Include="..\src\framework\proxy\proxy_client.h" />
     <ClInclude Include="..\src\framework\sound\combinedsoundsource.h" />
     <ClInclude Include="..\src\framework\sound\declarations.h" />
     <ClInclude Include="..\src\framework\sound\oggsoundfile.h" />

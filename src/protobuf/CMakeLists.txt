@@ -44,5 +44,9 @@ if(PROTOBUF_FOUND)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC _DISABLE_VECTOR_ANNOTATION _DISABLE_STRING_ANNOTATION)
 	target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
+	if(CMAKE_BASE_NAME STREQUAL "em++")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+	endif()
+
 	protobuf_generate(TARGET ${PROJECT_NAME} LANGUAGE cpp)
 endif(PROTOBUF_FOUND)

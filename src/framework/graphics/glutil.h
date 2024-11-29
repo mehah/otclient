@@ -22,7 +22,7 @@
 
 #pragma once
 
-#ifdef OPENGL_ES
+#if defined(OPENGL_ES) || defined(__EMSCRIPTEN__)
  // for static linking
 #define GL_APICALL
 #define EGLAPI

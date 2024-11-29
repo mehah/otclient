@@ -26,15 +26,16 @@
 #include <httplib.h>
 #include <framework/luaengine/luaobject.h>
 
-class LoginHttp : public LuaObject {
+class LoginHttp : public LuaObject
+{
 public:
   LoginHttp();
 
-  void startHttpLogin(const std::string &host, const std::string &path,
-                      uint16_t port, const std::string &email,
-                      const std::string &password);
+  void startHttpLogin(const std::string& host, const std::string& path,
+                      uint16_t port, const std::string& email,
+                      const std::string& password);
 
-  void Logger(const auto &req, const auto &res);
+  void Logger(const auto& req, const auto& res);
 
   std::string getCharacterList();
 
@@ -42,21 +43,21 @@ public:
 
   std::string getSession();
 
-  bool parseJsonResponse(const std::string &body);
+  bool parseJsonResponse(const std::string& body);
 
-  void httpLogin(const std::string &host, const std::string &path,
-                 uint16_t port, const std::string &email,
-                 const std::string &password, int request_id, bool httpLogin);
+  void httpLogin(const std::string& host, const std::string& path,
+                 uint16_t port, const std::string& email,
+                 const std::string& password, int request_id, bool httpLogin);
 
-  httplib::Result loginHttpsJson(const std::string &host,
-                                 const std::string &path, uint16_t port,
-                                 const std::string &email,
-                                 const std::string &password);
+  httplib::Result loginHttpsJson(const std::string& host,
+                                 const std::string& path, uint16_t port,
+                                 const std::string& email,
+                                 const std::string& password);
 
-  httplib::Result loginHttpJson(const std::string &host,
-                                const std::string &path, uint16_t port,
-                                const std::string &email,
-                                const std::string &password);
+  httplib::Result loginHttpJson(const std::string& host,
+                                const std::string& path, uint16_t port,
+                                const std::string& email,
+                                const std::string& password);
 
   enum Result : int { Success = 200, Error = -1 };
 
@@ -64,4 +65,5 @@ private:
   std::string characters;
   std::string worlds;
   std::string session;
+  std::string errorMessage;
 };

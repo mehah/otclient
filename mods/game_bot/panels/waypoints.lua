@@ -746,7 +746,13 @@ Panel
     elseif command.command == "function" and lastGotoSuccesful then
       usedGotoLabel = false
       local status, result = pcall(function()
-        return assert(load("return " .. command.text, nil, nil, context))()(functions)
+        if _VERSION == "Lua 5.1" and type(jit) ~= "table" then
+          local func = assert(loadstring("return " .. command.text))
+          setfenv(func, context)
+          return func()(functions)
+        else        
+          return assert(load("return " .. command.text, nil, nil, context))()(functions)
+        end
       end)
       if not status then
         context.error("Waypoints function execution error:\n" .. result)

@@ -219,28 +219,11 @@ function Cyclopedia.internalCreateItem(data)
     item:setId(data:getId())
     item.Sprite:setItemId(data:getId())
     item.Name:setText(marketData.name)
-    local function getColorForValue(value)
-        if value >= 1000000 then
-            return "yellow"
-        elseif value >= 100000 then
-            return "purple"
-        elseif value >= 10000 then
-            return "blue"
-        elseif value >= 1000 then
-            return "green"
-        elseif value >= 50 then
-            return "grey"
-        end
-        return "white"
-    end
     local price = data:getMeanPrice()
-    local rarity = getColorForValue(price)
+
     item.Value = price
     item.Vocation = marketData.restrictVocation
-
-    if price > 0 then
-        item.Rarity:setImageSource("/images/ui/rarity_" .. rarity)
-    end
+    ItemsDatabase.setRarityItem(item.Sprite, item.Sprite:getItem())
 
     function item.onClick(widget)
         UI.InfoBase.SellBase.List:destroyChildren()
@@ -267,8 +250,8 @@ function Cyclopedia.internalCreateItem(data)
         UI.SelectedItem.Sprite:setItemId(data:getId())
 
         if price > 0 then
-            UI.InfoBase.ResultGoldBase.Rarity:setImageSource("/images/ui/rarity_" .. rarity)
-            UI.SelectedItem.Rarity:setImageSource("/images/ui/rarity_" .. rarity)
+            ItemsDatabase.setRarityItem(UI.SelectedItem.Rarity, price)
+            ItemsDatabase.setRarityItem(UI.InfoBase.ResultGoldBase.Rarity, price)
         else
             UI.InfoBase.ResultGoldBase.Rarity:setImageSource("")
             UI.SelectedItem.Rarity:setImageSource("")

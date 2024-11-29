@@ -52,6 +52,7 @@ jobs:
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
+          vcpkgJsonIgnores: "['**/vcpkg/**', '**/browser/overlay-ports/**']"
 
       - name: Get latest CMake and ninja
         uses: lukka/get-cmake@main

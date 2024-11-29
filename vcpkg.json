@@ -20,7 +20,7 @@
     "zlib",
     {
       "name": "luajit",
-      "platform": "!android"
+      "platform": "!android & !wasm32"
     },
     {
       "name": "opengl",
