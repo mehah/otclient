@@ -23,6 +23,8 @@
 #pragma once
 
 #include <asio.hpp>
+#include <map>
+#include <set>
 
 using ProxyPacket = std::vector<uint8_t>;
 using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-//#define PROXY_DEBUG
+ //#define PROXY_DEBUG
 
 #include "proxy_client.h"
 
@@ -68,7 +68,6 @@ std::string Proxy::getDebugInfo()
     return ss.str();
 }
 
-
 void Proxy::check(const std::error_code& ec)
 {
     if (ec || m_terminated) {
@@ -84,7 +83,7 @@ void Proxy::check(const std::error_code& ec)
         }
     } else if (m_state == STATE_CONNECTED || m_state == STATE_CONNECTING_WAIT_FOR_PING) {
         if (m_waitingForPing) {
-            if (lastPing + 50 > CHECK_INTERVAL* (m_state == STATE_CONNECTING_WAIT_FOR_PING ? 5 : 3)) {
+            if (lastPing + 50 > CHECK_INTERVAL * (m_state == STATE_CONNECTING_WAIT_FOR_PING ? 5 : 3)) {
 #ifdef PROXY_DEBUG
                 std::clog << "[Proxy " << m_host << "] ping timeout" << std::endl;
 #endif
@@ -111,7 +110,7 @@ void Proxy::connect()
     m_resolver = asio::ip::tcp::resolver(m_io);
     auto self(shared_from_this());
     m_resolver.async_resolve(m_host, "http", [self](const std::error_code& ec,
-                                                    asio::ip::tcp::resolver::results_type results) {
+                             asio::ip::tcp::resolver::results_type results) {
         auto endpoint = asio::ip::tcp::endpoint();
         if (ec || results.empty()) {
 #ifdef PROXY_DEBUG
@@ -280,7 +279,6 @@ void Proxy::onPacket(const std::error_code& ec, std::size_t bytes_transferred)
     }
     readHeader();
 }
-
 
 void Proxy::send(const ProxyPacketPtr& packet)
 {
@@ -458,7 +456,7 @@ void Session::readTibia12Header()
 {
     auto self(shared_from_this());
     asio::async_read(m_socket, asio::buffer(m_buffer, 1),
-                            [self](const std::error_code& ec, std::size_t bytes_transferred) {
+                            [self](const std::error_code& ec, std::size_t /*bytes_transferred*/) {
         if (ec) {
             return self->terminate();
         }
@@ -470,7 +468,6 @@ void Session::readTibia12Header()
         }
         self->readTibia12Header();
     });
-
 }
 
 void Session::readHeader()
