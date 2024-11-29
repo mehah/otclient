@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef __EMSCRIPTEN__
 
 #include "connection.h"
 
@@ -96,7 +97,7 @@ void Connection::connect(const std::string_view host, uint16_t port, const std::
 
     const asio::ip::tcp::resolver::query query(host.data(), stdext::unsafe_cast<std::string>(port));
     m_resolver.async_resolve(query, [this](auto&& error, auto&& endpointIterator) {
-       onResolve(std::move(error), std::move(endpointIterator));
+        onResolve(std::move(error), std::move(endpointIterator));
     });
 
     m_readTimer.cancel();
@@ -342,3 +343,5 @@ int Connection::getIp()
     g_logger.error("Getting remote ip");
     return 0;
 }
+
+#endif

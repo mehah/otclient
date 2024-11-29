@@ -3644,7 +3644,7 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
 
     if (g_game.getFeature(Otc::GameThingCounter)) {
         if (item->hasWearOut()) {
-            msg->getU32(); // Item charge (UI)
+            item->setCharges(msg->getU32());
             msg->getU8(); // Is brand-new
         }
     }
@@ -4200,7 +4200,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 const uint16_t baseSkill = msg->getU16();
                 msg->getU16(); // base + loyalty bonus(?)
                 const uint16_t skillPercent = msg->getU16() / 100;
-                skills.push_back({ skillLevel, skillPercent, baseSkill });
+                skills.push_back({ skillLevel, baseSkill, skillPercent });
             }
 
             const uint8_t combatCount = msg->getU8();

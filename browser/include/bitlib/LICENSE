@@ -1,0 +1,20 @@
+   				                      bitlib
+                                ------
+
+                   by Reuben Thomas <rrt@sc3d.org>
+                 http://luaforge.net/projects/bitlib
+
+
+bitlib is a C library for Lua 5.1 that provides bitwise operations. It
+is copyright Reuben Thomas 2000-2009, and is released under the MIT
+license, like Lua (see http://www.lua.org/copyright.html; it's
+basically the same as the BSD license). There is no warranty.
+
+Please report bugs and make suggestions to the email address above, or
+use the LuaForge trackers.
+
+Thanks to John Passaniti for his bitwise operations library, some of
+whose ideas I used, to Shmuel Zeigerman for the test suite, to
+Thatcher Ulrich for portability fixes, and to Enrico Tassi, John
+Stiles and Eduardo Ochs for bug reports.
+

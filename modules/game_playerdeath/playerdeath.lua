@@ -17,7 +17,7 @@ local deathTexts = {
 }
 
 deathController = Controller:new()
-deathController:setUI('deathWindow')
+deathController:setUI('deathwindow')
 function deathController:onInit()
     deathController:registerEvents(g_game, {
         onDeath = display,
