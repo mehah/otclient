@@ -1,0 +1,65 @@
+DebugText < Label
+  font: terminus-10px
+  text-wrap: false
+  text-auto-resize: true
+  text-align: topleft
+  anchors.right: parent.right
+  anchors.left: parent.left
+  anchors.top: prev.bottom
+
+DebugLabel < Label
+  text-wrap: false
+  text-auto-resize: false
+  text-align: center
+  anchors.right: parent.right
+  anchors.left: parent.left
+  anchors.top: prev.bottom
+
+MainWindow
+  id: debugWindow
+  size: 600 150
+  !text: tr('Debug Info')
+  @onClose: modules.client_debug_info.onMiniWindowClose()
+  &save: false
+  margin: 0 0 0 0
+  padding: 25 3 3 3
+  opacity: 0.9
+  $mobile:
+    size: 600 150
+  @onEnter: modules.client_debug_info.toggle()
+  @onEscape: modules.client_debug_info.toggle()
+
+
+  ScrollablePanel
+    id: debugPanel
+    anchors.fill: parent
+    margin-bottom: 5
+    margin: 5 5 5 5
+    padding-left: 5
+    vertical-scrollbar: debugScroll
+
+    DebugLabel
+      !text: tr('Proxies')
+      anchors.top: parent.top
+
+    DebugText
+      id: proxies
+      text: -
+
+  VerticalScrollBar
+    id: debugScroll
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 48
+    pixels-scroll: true
+
+  ResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  ResizeBorder
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
