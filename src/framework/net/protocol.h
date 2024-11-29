@@ -21,8 +21,11 @@
  */
 
 #pragma once
-
+#ifdef __EMSCRIPTEN__
+#include "webconnection.h"
+#else
 #include "connection.h"
+#endif
 #include "declarations.h"
 #include "inputmessage.h"
 #include "outputmessage.h"
@@ -38,15 +41,26 @@ public:
     Protocol();
     ~Protocol() override;
 
+#ifndef __EMSCRIPTEN__
     void connect(const std::string_view host, uint16_t port);
+#else
+    void connect(const std::string_view host, uint16_t port, bool gameWorld = false);
+#endif
     void disconnect();
 
     bool isConnected();
     bool isConnecting();
     ticks_t getElapsedTicksSinceLastRead() const { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
-
+#ifdef __EMSCRIPTEN__
+    WebConnectionPtr getConnection() { return m_connection; }
+#else
     ConnectionPtr getConnection() { return m_connection; }
+#endif
+#ifdef __EMSCRIPTEN__
+    void setConnection(const WebConnectionPtr& connection) { m_connection = connection; }
+#else
     void setConnection(const ConnectionPtr& connection) { m_connection = connection; }
+#endif
 
     void generateXteaKey();
     void setXteaKey(uint32_t a, uint32_t b, uint32_t c, uint32_t d) { m_xteaKey = { a, b, c, d }; }
@@ -84,8 +98,11 @@ private:
     bool m_checksumEnabled{ false };
     bool m_sequencedPackets{ false };
     bool m_xteaEncryptionEnabled{ false };
-
+#ifdef __EMSCRIPTEN__
+    WebConnectionPtr m_connection;
+#else
     ConnectionPtr m_connection;
+#endif
     InputMessagePtr m_inputMessage;
 
     z_stream m_zstream{};

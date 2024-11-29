@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Loading</title>
+    <style>
+      body {
+        margin: 0;
+        background-color: black;
+        overscroll-behavior: contain;
+      }
+      .backbuffer {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        margin: 0px;
+        border: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        display: block;
+        image-rendering: optimizeSpeed;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -o-crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: optimize-contrast;
+        image-rendering: crisp-edges;
+        -ms-interpolation-mode: nearest-neighbor;
+      }
+      .title {
+        pointer-events: none;
+        position: absolute;
+        top: 10px;
+        margin-top: 0px;
+        padding-left: 10px;
+        color: white;
+        text-decoration: none;
+        z-index: 1;
+        text-align: left;
+        font-family: "Roboto", Helvetica, sans-serif;
+        font-size: 20px;
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
+      }
+      #start {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 3;
+        font-size: 2rem;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="title"
+      id="title-text"
+      contenteditable
+      virtualkeyboardpolicy="manual"
+    ></div>
+    <button id="start" onclick="startGame()">Start</button>
+    <canvas
+      class="backbuffer"
+      id="canvas"
+      oncontextmenu="event.preventDefault()"
+      tabindex="0"
+    ></canvas>
+    <script type="text/javascript">
+      var canvas = document.getElementById("canvas");
+      function startGame() {
+        document.getElementById("start").style.display = "none";
+        callMain();
+        document.addEventListener("touchstart", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        document.addEventListener("touchmove", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        document.addEventListener("touchend", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        document.addEventListener("keyup", function (ev) {
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+        document.addEventListener("keydown", function (ev) {
+          if (
+            !ev.ctrlKey &&
+            ev.key !== "Enter" &&
+            ev.key !== "Escape" &&
+            ev.key !== "Backspace" &&
+            ev.key !== "ArrowLeft" &&
+            ev.key !== "ArrowRight" &&
+            ev.key !== "ArrowUp" &&
+            ev.key !== "ArrowDown"
+          ) {
+            canvas.dispatchEvent(new KeyboardEvent("keypress", ev));
+          } else if (ev.ctrlKey && ev.key === "v") {
+            return true;
+          }
+          ev.preventDefault();
+          ev.stopPropagation();
+        });
+      }
+      var Module = {
+        locateFile: function (path) {
+          const baseURL =
+            window.location.origin +
+            window.location.pathname.substring(
+              0,
+              window.location.pathname.lastIndexOf("/")
+            );
+          return baseURL + "/" + path;
+        },
+        preRun: [
+          function () {
+            addRunDependency("syncfs");
+            if (!FS.analyzePath("/user").exists) FS.mkdir("/user");
+            FS.mount(IDBFS, { autoPersist: true }, "/user");
+            FS.syncfs(true, function (err) {
+              if (err) {
+                Module.print(err);
+              }
+              removeRunDependency("syncfs");
+            });
+          },
+        ],
+        postRun: [],
+        print: (function () {
+          return function (text) {
+            text = Array.prototype.slice.call(arguments).join(" ");
+            console.log(text);
+          };
+        })(),
+        printErr: function (text) {
+          text = Array.prototype.slice.call(arguments).join(" ");
+          console.error(text);
+        },
+        canvas: (function () {
+          var canvas = document.getElementById("canvas");
+          return canvas;
+        })(),
+        setStatus: function (text) {
+          console.log("status: " + text);
+          let display = "";
+          if (text.includes("Running...")) {
+            display = "Loading...";
+            document.getElementById("start").style.display = "block";
+          } else if (text.includes("Downloading data...")) {
+            display = text;
+          }
+
+          document.getElementById("title-text").innerHTML = display;
+        },
+        monitorRunDependencies: function (left) {
+          console.log("monitor run deps: " + left);
+          document.getElementById("title-text").innerHTML = "Initializing...";
+        },
+      };
+      window.onerror = function () {
+        console.log("onerror: " + event.message);
+      };
+    </script>
+    {{{ SCRIPT }}}
+  </body>
+</html>

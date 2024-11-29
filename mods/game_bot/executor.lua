@@ -96,10 +96,23 @@ function executeBot(config, storage, tabs, msgCallback, saveConfigCallback, relo
     date = os.date,
     clock = os.clock
   }
-  context.load = function(str) return assert(load(str, nil, nil, context)) end
+  if _VERSION == "Lua 5.1" and type(jit) ~= "table" then
+    context.load = function(str)
+      local func = assert(loadstring(str))
+      setfenv(func, context)
+      return func
+    end
+    context.dofile = function(file) 
+      local func = assert(loadstring(g_resources.readFileContents("/bot/" .. config .. "/" .. file)))
+      setfenv(func, context)
+      func()
+    end
+  else
+    context.load = function(str) return assert(load(str, nil, nil, context)) end
+    context.dofile = function(file) assert(load(g_resources.readFileContents("/bot/" .. config .. "/" .. file), file, nil, context))() end
+  end
   context.loadstring = context.load
   context.assert = assert
-  context.dofile = function(file) assert(load(g_resources.readFileContents("/bot/" .. config .. "/" .. file), file, nil, context))() end
   context.gcinfo = gcinfo
   context.tr = tr
   context.json = json
@@ -164,7 +177,13 @@ function executeBot(config, storage, tabs, msgCallback, saveConfigCallback, relo
 
   -- run lua script
   for i, file in ipairs(luaFiles) do
-    assert(load(g_resources.readFileContents(file), file, nil, context))()
+      if _VERSION == "Lua 5.1" and type(jit) ~= "table" then
+        local func = assert(loadstring(g_resources.readFileContents(file)))
+        setfenv(func, context)
+        func()
+      else
+        assert(load(g_resources.readFileContents(file), file, nil, context))()
+      end
     context.panel = context.mainTab -- reset default tab
   end
 

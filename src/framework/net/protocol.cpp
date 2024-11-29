@@ -23,7 +23,11 @@
 #include "protocol.h"
 #include <random>
 #include <framework/core/application.h>
+#ifdef __EMSCRIPTEN__
+#include "webconnection.h"
+#else
 #include "connection.h"
+#endif
 
 extern asio::io_service g_ioService;
 
@@ -40,6 +44,7 @@ Protocol::~Protocol()
     inflateEnd(&m_zstream);
 }
 
+#ifndef __EMSCRIPTEN__
 void Protocol::connect(const std::string_view host, uint16_t port)
 {
     if (host == "proxy" || host == "0.0.0.0" || (host == "127.0.0.1" && g_proxy.isActive())) {
@@ -54,6 +59,14 @@ void Protocol::connect(const std::string_view host, uint16_t port)
     m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
     m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
 }
+#else
+void Protocol::connect(const std::string_view host, uint16_t port, bool gameWorld)
+{
+    m_connection = std::make_shared<WebConnection>();
+    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
+    m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); }, gameWorld);
+}
+#endif
 
 void Protocol::disconnect()
 {
@@ -137,6 +150,7 @@ void Protocol::recv()
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
         std::forward<decltype(PH2)>(PH2));
     });
+
 }
 
 void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)

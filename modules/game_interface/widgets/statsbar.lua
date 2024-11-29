@@ -309,7 +309,6 @@ function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
     if now == old then
         return
     end
-
     local bitsChanged = bit.bxor(now, old)
     for i = 1, 32 do
         local pow = math.pow(2, i - 1)

@@ -97,7 +97,11 @@ CaveBot.registerAction("function", "red", function(value, retries, prev)
     prefix = prefix .. "local " .. extension .. " = CaveBot.Extensions." .. extension .. "\n"
   end
   local status, result = pcall(function()
-    return assert(load(prefix .. value, "cavebot_function"))()
+    if _VERSION == "Lua 5.1" and type(jit) ~= "table" then
+      return assert(loadstring(prefix .. value))()
+    else
+      return assert(load(prefix .. value, "cavebot_function"))()
+    end
   end)
   if not status then
     error("Error in cavebot function:\n" .. result)

@@ -119,6 +119,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "getOsShortName", &Platform::getOsShortName, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isDesktop", &Platform::isDesktop, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isMobile", &Platform::isMobile, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "isBrowser", &Platform::isBrowser, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isConsole", &Platform::isConsole, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "openDir", &Platform::openDir, &g_platform);
 
@@ -909,16 +910,23 @@ void Application::registerLuaFunctions()
 #endif
 
 #ifdef FRAMEWORK_NET
+#ifndef __EMSCRIPTEN__
     // Server
     g_lua.registerClass<Server>();
     g_lua.bindClassStaticFunction<Server>("create", &Server::create);
     g_lua.bindClassMemberFunction<Server>("close", &Server::close);
     g_lua.bindClassMemberFunction<Server>("isOpen", &Server::isOpen);
     g_lua.bindClassMemberFunction<Server>("acceptNext", &Server::acceptNext);
+#endif
 
     // Connection
+#ifdef __EMSCRIPTEN__
+    g_lua.registerClass<WebConnection>();
+    g_lua.bindClassMemberFunction<WebConnection>("getIp", &WebConnection::getIp);
+#else
     g_lua.registerClass<Connection>();
     g_lua.bindClassMemberFunction<Connection>("getIp", &Connection::getIp);
+#endif
 
     // Protocol
     g_lua.registerClass<Protocol>();
