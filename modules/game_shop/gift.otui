@@ -1,0 +1,24 @@
+MainWindow
+  size: 200 110
+  !text: 'Enter player name'
+  @onEnter: modules.game_shop.confirmGift()
+
+  TextEdit
+    id: targetName
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  Button
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    !text: 'Confirm'
+    width: 64
+    @onClick: modules.game_shop.confirmGift()
+
+  Button
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    !text: 'Cancel'
+    width: 64
+    @onClick: modules.game_shop.cancelGift()
