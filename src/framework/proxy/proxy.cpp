@@ -21,8 +21,8 @@
  */
 
 #include "proxy.h"
-#include <framework/global.h>
-#include <framework/stdext/stdext.h>
+
+#include "proxy_client.h"
 
 ProxyManager g_proxy;
 

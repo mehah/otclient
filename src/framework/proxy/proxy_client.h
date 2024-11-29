@@ -22,21 +22,6 @@
 
 #pragma once
 
-#ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x501
-#endif
-
-#include <chrono>
-#include <cstdint>
-#include <functional>
-#include <list>
-#include <map>
-#include <memory>
-#include <random>
-#include <set>
-#include <string>
-#include <thread>
-#include <vector>
 #include <asio.hpp>
 
 using ProxyPacket = std::vector<uint8_t>;
@@ -45,10 +30,12 @@ using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;
 class Session;
 using SessionPtr = std::shared_ptr<Session>;
 
-class Proxy : public std::enable_shared_from_this<Proxy> {
+class Proxy : public std::enable_shared_from_this<Proxy>
+{
     static constexpr int CHECK_INTERVAL = 2500; // also timeout for ping
     static constexpr int BUFFER_SIZE = 65535;
-    enum ProxyState {
+    enum ProxyState
+    {
         STATE_NOT_CONNECTED,
         STATE_CONNECTING,
         STATE_CONNECTING_WAIT_FOR_PING,
@@ -126,7 +113,8 @@ private:
 
 using ProxyPtr = std::shared_ptr<Proxy>;
 
-class Session : public std::enable_shared_from_this<Session> {
+class Session : public std::enable_shared_from_this<Session>
+{
     static constexpr int CHECK_INTERVAL = 500;
     static constexpr int BUFFER_SIZE = 65535;
     static constexpr int TIMEOUT = 30000;

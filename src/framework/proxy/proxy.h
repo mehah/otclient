@@ -22,13 +22,19 @@
 
 #pragma once
 
-#include "proxy_client.h"
+#include <asio.hpp>
 
-class ProxyManager {
+class Proxy;
+class Session;
+
+using ProxyPacket = std::vector<uint8_t>;
+using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;
+
+class ProxyManager
+{
 public:
     ProxyManager() : m_io(), m_guard(asio::make_work_guard(m_io))
     {
-
     }
     void init();
     void terminate();

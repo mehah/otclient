@@ -22,10 +22,6 @@
 
 //#define PROXY_DEBUG
 
-#include <iostream>
-#include <sstream>
-#include <framework/global.h>
-
 #include "proxy_client.h"
 
 std::map<uint32_t, std::weak_ptr<Session>> g_sessions;
