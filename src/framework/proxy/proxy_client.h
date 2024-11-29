@@ -25,6 +25,7 @@
 #include <asio.hpp>
 #include <map>
 #include <set>
+#include <list>
 
 using ProxyPacket = std::vector<uint8_t>;
 using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;
