@@ -29,6 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platform.h>
+#include <framework/proxy/proxy.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include "asyncdispatcher.h"
 
@@ -99,6 +100,9 @@ void Application::init(std::vector<std::string>& args, ApplicationContext* conte
     // initialize lua
     g_lua.init();
     registerLuaFunctions();
+
+    // initalize proxy
+    g_proxy.init();
 }
 
 void Application::deinit()
@@ -140,6 +144,9 @@ void Application::terminate()
 
     // terminate script environment
     g_lua.terminate();
+
+    // terminate proxy
+    g_proxy.terminate();
 
     m_terminated = true;
 

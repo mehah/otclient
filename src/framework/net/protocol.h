@@ -31,6 +31,7 @@
 #include "outputmessage.h"
 
 #include <framework/luaengine/luaobject.h>
+#include <framework/proxy/proxy.h>
 #include <zlib.h>
 
  // @bindclass
@@ -47,8 +48,8 @@ public:
 #endif
     void disconnect();
 
-    bool isConnected() { return m_connection && m_connection->isConnected(); }
-    bool isConnecting() { return m_connection && m_connection->isConnecting(); }
+    bool isConnected();
+    bool isConnecting();
     ticks_t getElapsedTicksSinceLastRead() const { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
 #ifdef __EMSCRIPTEN__
     WebConnectionPtr getConnection() { return m_connection; }
@@ -78,6 +79,11 @@ protected:
     virtual void onConnect();
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const std::error_code& err);
+
+    void onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet);
+    void onLocalDisconnected(std::error_code ec);
+    bool m_disconnected = false;
+    uint32_t m_proxy = 0;
 
     std::array<uint32_t, 4> m_xteaKey{};
     uint32_t m_packetNumber{ 0 };
