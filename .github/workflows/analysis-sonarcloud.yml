@@ -79,6 +79,7 @@ jobs:
         with:
           vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
+          vcpkgJsonIgnores: "['**/vcpkg/**', '**/browser/overlay-ports/**']"
 
       - name: Install sonar-scanner
         uses: SonarSource/sonarcloud-github-c-cpp@v1

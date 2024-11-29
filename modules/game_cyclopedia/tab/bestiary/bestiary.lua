@@ -124,7 +124,9 @@ function Cyclopedia.CreateCreatureItems(data)
                     itemWidget.Stackable:setText("1")
                 end
             end
+
             ItemsDatabase.setRarityItem(itemWidget, itemWidget:getItem())
+
             itemWidget.onMouseRelease = onAddLootClick
         end
     end
