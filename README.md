@@ -277,11 +277,13 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 
 - <details>
-   <summary>Support Discord RPC by @SkullzOTS (Doesn't work with CMAKE)</summary>
+   <summary>Support Discord RPC by @SkullzOTS</summary>
 
   - by [@SkullzOTS](https://github.com/SkullzOTS)
 
-  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43), set 1 in ENABLE_DISCORD_RPC and configure the others definitions
+  - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43), set 1 in TOGGLE_DISCORD_RPC and configure the others definitions
+
+  - If using CMake then set `-DTOGGLE_DISCORD_RPC=ON`
 
   - You can see the step by step in [YouTube](https://www.youtube.com/watch?v=zCHYtRlD58g)
 
