@@ -33,6 +33,10 @@
 #include "uitranslator.h"
 #include <framework/graphics/fontmanager.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 UITextEdit::UITextEdit()
 {
     setProp(Props::PropCursorInRange, true);
@@ -894,6 +898,16 @@ bool UITextEdit::onMousePress(const Point& mousePos, Fw::MouseButton button)
                 setSelection(pos, pos);
             }
         }
+#ifdef __EMSCRIPTEN__
+        if (g_window.isVisible()) {
+            MAIN_THREAD_ASYNC_EM_ASM({
+                if (navigator && "virtualKeyboard" in navigator) {
+                    document.getElementById("title-text").focus();
+                    navigator.virtualKeyboard.show();
+                }
+            });
+        }
+#endif
         return true;
     }
     return false;

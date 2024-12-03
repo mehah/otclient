@@ -1,4 +1,4 @@
-﻿QuickLoot = {}
+QuickLoot = {}
 
 local function getFilter(id)
     local filter = {

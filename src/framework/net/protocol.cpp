@@ -23,7 +23,13 @@
 #include "protocol.h"
 #include <random>
 #include <framework/core/application.h>
+#ifdef __EMSCRIPTEN__
+#include "webconnection.h"
+#else
 #include "connection.h"
+#endif
+
+extern asio::io_service g_ioService;
 
 Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {
     inflateInit2(&m_zstream, -15);
@@ -38,19 +44,58 @@ Protocol::~Protocol()
     inflateEnd(&m_zstream);
 }
 
+#ifndef __EMSCRIPTEN__
 void Protocol::connect(const std::string_view host, uint16_t port)
 {
+    if (host == "proxy" || host == "0.0.0.0" || (host == "127.0.0.1" && g_proxy.isActive())) {
+        m_disconnected = false;
+        m_proxy = g_proxy.addSession(port,
+                                     std::bind(&Protocol::onProxyPacket, asProtocol(), std::placeholders::_1),
+                                     std::bind(&Protocol::onLocalDisconnected, asProtocol(), std::placeholders::_1));
+        return onConnect();
+    }
+
     m_connection = std::make_shared<Connection>();
     m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
     m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
 }
+#else
+void Protocol::connect(const std::string_view host, uint16_t port, bool gameWorld)
+{
+    m_connection = std::make_shared<WebConnection>();
+    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
+    m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); }, gameWorld);
+}
+#endif
 
 void Protocol::disconnect()
 {
+    m_disconnected = true;
+    if (m_proxy) {
+        g_proxy.removeSession(m_proxy);
+        return;
+    }
+
     if (m_connection) {
         m_connection->close();
         m_connection.reset();
     }
+}
+
+bool Protocol::isConnected()
+{
+    if (m_proxy)
+        return !m_disconnected;
+
+    return m_connection && m_connection->isConnected();
+}
+
+bool Protocol::isConnecting()
+{
+    if (m_proxy)
+        return false;
+
+    return m_connection && m_connection->isConnecting();
 }
 
 void Protocol::send(const OutputMessagePtr& outputMessage)
@@ -68,6 +113,13 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
     // write message size
     outputMessage->writeMessageSize();
 
+    if (m_proxy) {
+        auto packet = std::make_shared<ProxyPacket>(outputMessage->getHeaderBuffer(), outputMessage->getWriteBuffer());
+        g_proxy.send(m_proxy, packet);
+        outputMessage->reset();
+        return;
+    }
+
     // send
     if (m_connection)
         m_connection->write(outputMessage->getHeaderBuffer(), outputMessage->getMessageSize());
@@ -78,6 +130,10 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
 
 void Protocol::recv()
 {
+    if (m_proxy) {
+        return;
+    }
+
     m_inputMessage->reset();
 
     // first update message header size
@@ -94,6 +150,7 @@ void Protocol::recv()
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
         std::forward<decltype(PH2)>(PH2));
     });
+
 }
 
 void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
@@ -252,4 +309,40 @@ void Protocol::onError(const std::error_code& err)
 {
     callLuaField("onError", err.message(), err.value());
     disconnect();
+}
+
+void Protocol::onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet)
+{
+    if (m_disconnected)
+        return;
+    auto self(asProtocol());
+    asio::post(g_ioService, [&, self, packet] {
+        if (m_disconnected)
+            return;
+        m_inputMessage->reset();
+
+        // first update message header size
+        int headerSize = 2; // 2 bytes for message size
+        if (m_checksumEnabled)
+            headerSize += 4; // 4 bytes for checksum
+        if (m_xteaEncryptionEnabled)
+            headerSize += 2; // 2 bytes for XTEA encrypted message size
+        m_inputMessage->setHeaderSize(headerSize);
+        m_inputMessage->fillBuffer(packet->data(), 2);
+        m_inputMessage->readSize();
+        internalRecvData(packet->data() + 2, packet->size() - 2);
+    });
+}
+
+void Protocol::onLocalDisconnected(std::error_code ec)
+{
+    if (m_disconnected)
+        return;
+    auto self(asProtocol());
+    asio::post(g_ioService, [&, self, ec] {
+        if (m_disconnected)
+            return;
+        m_disconnected = true;
+        onError(ec);
+    });
 }
