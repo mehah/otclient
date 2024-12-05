@@ -29,6 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platform.h>
+#include <framework/proxy/proxy.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include "asyncdispatcher.h"
 
@@ -41,7 +42,11 @@
 #include <locale>
 
 #ifdef FRAMEWORK_NET
+#ifdef __EMSCRIPTEN__
+#include <framework/net/webconnection.h>
+#else
 #include <framework/net/connection.h>
+#endif
 #endif
 
 void exitSignalHandler(int sig)
@@ -100,6 +105,9 @@ void Application::init(std::vector<std::string>& args, ApplicationContext* conte
     // initialize lua
     g_lua.init();
     registerLuaFunctions();
+
+    // initalize proxy
+    g_proxy.init();
 }
 
 void Application::deinit()
@@ -126,8 +134,11 @@ void Application::deinit()
 void Application::terminate()
 {
 #ifdef FRAMEWORK_NET
-    // terminate network
+#ifdef __EMSCRIPTEN__
+    WebConnection::terminate();
+#else
     Connection::terminate();
+#endif
 #endif
 
     // release configs
@@ -138,6 +149,9 @@ void Application::terminate()
 
     // terminate script environment
     g_lua.terminate();
+
+    // terminate proxy
+    g_proxy.terminate();
 
     m_terminated = true;
 
@@ -150,14 +164,22 @@ void Application::poll()
     g_clock.update();
 
 #ifdef FRAMEWORK_NET
+#ifdef __EMSCRIPTEN__
+    WebConnection::poll();
+#else
     Connection::poll();
+#endif
 #endif
 
     g_dispatcher.poll();
 
     // poll connection again to flush pending write
 #ifdef FRAMEWORK_NET
+#ifdef __EMSCRIPTEN__
+    WebConnection::poll();
+#else
     Connection::poll();
+#endif
 #endif
 
     g_clock.update();
@@ -192,6 +214,8 @@ std::string Application::getOs()
     return "linux";
 #elif ANDROID
     return "android";
+#elif __EMSCRIPTEN__
+    return "browser";
 #else
     return "unknown";
 #endif

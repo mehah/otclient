@@ -29,14 +29,22 @@
 
 class InputMessage;
 class OutputMessage;
+#ifdef __EMSCRIPTEN__
+class WebConnection;
+#else
 class Connection;
+#endif
 class Protocol;
 class ProtocolHttp;
 class Server;
 
 using InputMessagePtr = std::shared_ptr<InputMessage>;
 using OutputMessagePtr = std::shared_ptr<OutputMessage>;
+#ifdef __EMSCRIPTEN__
+using WebConnectionPtr = std::shared_ptr<WebConnection>;
+#else
 using ConnectionPtr = std::shared_ptr<Connection>;
+#endif
 using ProtocolPtr = std::shared_ptr<Protocol>;
 using ProtocolHttpPtr = std::shared_ptr<ProtocolHttp>;
 using ServerPtr = std::shared_ptr<Server>;

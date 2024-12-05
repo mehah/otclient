@@ -1,4 +1,4 @@
-﻿local UI = nil
+local UI = nil
 
 function showCharms()
     UI = g_ui.loadUI("charms", contentContainer)
