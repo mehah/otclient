@@ -66,7 +66,7 @@ bool Config::save()
     return m_confsDoc->save(m_fileName);
 }
 
-void Config::clear() const
+void Config::clear()
 {
     m_confsDoc->clear();
 }
