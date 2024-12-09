@@ -64,6 +64,9 @@ function quickLootController:onGameEnd()
     if not g_game.getFeature(GameThingQuickLoot) then
         return
     end
+    if g_game.isOnline() then
+        return -- bug controller https://github.com/mehah/otclient/blob/main/modules/modulelib/controller.lua#L206
+    end
     QuickLoot.save()
     QuickLoot.toggle()
     if quickLootController.ui:isVisible() then
