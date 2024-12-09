@@ -205,6 +205,7 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1281 then
+            g_game.enableFeature(GamePlayerFamiliars)
             g_game.disableFeature(GameEnvironmentEffect)
             g_game.disableFeature(GameItemAnimationPhase)
         end

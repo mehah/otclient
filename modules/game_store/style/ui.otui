@@ -288,7 +288,7 @@ confirmarSHOP < UIMessageBox
     anchors.left: Box.right
     anchors.top: content.bottom
     margin-left:16
-    image-source:  /game_store/images/button-blue-down
+    image-source:  /images/ui/button-blue-qt
     image-border: 1
     text-wrap: true
     image-clip: 0 0 98 40

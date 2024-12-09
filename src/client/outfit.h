@@ -39,6 +39,7 @@ public:
     void setId(uint16_t id) { m_id = id; }
     void setAuxId(uint16_t id) { m_auxId = id; }
     void setMount(uint16_t mount) { m_mount = mount; }
+    void setFamiliar(uint16_t familiar) { m_familiar = familiar; }
     void setWing(uint16_t Wing) { m_wing = Wing; }
     void setAura(uint16_t Aura) { m_aura = Aura; }
     void setEffect(uint16_t Effect) { m_effect = Effect; }
@@ -58,6 +59,7 @@ public:
     uint16_t getId() const { return m_id; }
     uint16_t getAuxId() const { return m_auxId; }
     uint16_t getMount() const { return m_mount; }
+    uint16_t getFamiliar() const { return m_familiar; }
     uint16_t getWing() const { return m_wing; }
     uint16_t getAura() const { return m_aura; }
     uint16_t getEffect() const { return m_effect; }
@@ -94,6 +96,7 @@ public:
             m_feet == other.m_feet &&
             m_addons == other.m_addons &&
             m_mount == other.m_mount &&
+            m_familiar == other.m_familiar &&
             m_wing == other.m_wing &&
             m_aura == other.m_aura &&
             m_effect == other.m_effect &&
@@ -109,6 +112,7 @@ private:
     uint16_t m_id{ 0 };
     uint16_t m_auxId{ 0 };
     uint16_t m_mount{ 0 };
+    uint16_t m_familiar{ 0 };
     uint16_t m_wing{ 0 };
     uint16_t m_aura{ 0 };
     uint16_t m_effect{ 0 };
