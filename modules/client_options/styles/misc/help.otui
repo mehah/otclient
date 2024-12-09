@@ -53,7 +53,7 @@ UIWidget
       anchors.left: parent.left
       @onClick: |
         if g_game.isOnline() then
-          g_logger.warning("to prevent errors, change language when offline" )
+          g_logger.warning("To prevent errors, change the language while offline." )
         else
           modules.client_locales.createWindow()
         end
