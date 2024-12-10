@@ -708,7 +708,10 @@ void ProtocolGame::parseRequestPurchaseData(const InputMessagePtr& msg)
 void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
 {
     const auto type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
-    const uint64_t value = msg->getU64();
+    const uint64_t value = (type == Otc::RESOURCE_CHARM_POINTS && g_game.getClientVersion() < 1332)
+        ? msg->getU32()
+        : msg->getU64();
+
     m_localPlayer->setResourceBalance(type, value);
 }
 
@@ -1454,7 +1457,10 @@ void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg)
         boss.category = msg->getU8();
         boss.kills = msg->getU32();
         msg->getU8();
-        boss.isTrackerActived = msg->getU8();
+        boss.isTrackerActived = 0;
+        if (g_game.getClientVersion() >= 1320) {
+            boss.isTrackerActived = msg->getU8();
+        }
         bossData.emplace_back(boss);
     }
 
