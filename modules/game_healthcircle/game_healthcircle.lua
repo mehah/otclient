@@ -114,6 +114,7 @@ function terminate()
     disconnect(g_game, {
         onGameStart = setPlayerValues
     })
+    statsBarMenuLoaded = false
 end
 
 -------------------------------------------------
