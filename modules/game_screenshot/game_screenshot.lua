@@ -98,9 +98,6 @@ function screenshotController:onGameStart()
 end
 
 function screenshotController:onGameEnd()
-    if g_game.isOnline() then
-        return -- bug controller https://github.com/mehah/otclient/blob/main/modules/modulelib/controller.lua#L206
-    end
     if g_game.getClientVersion() >= 1180 then
         g_settings.set("onlyCaptureGameWindow",optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked())
         g_settings.set("enableScreenshots",optionPanel:recursiveGetChildById("enableScreenshots"):isChecked())
