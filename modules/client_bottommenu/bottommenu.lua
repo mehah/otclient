@@ -68,6 +68,9 @@ function init()
         boss2:setImageSource(randomItem.creature2)
         boss2:setVisible(true)
     end
+    if g_game.isOnline() then
+        hide()
+    end
 end
 
 function terminate()
