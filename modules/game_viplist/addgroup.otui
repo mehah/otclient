@@ -4,7 +4,7 @@ MainWindow
   text-offset: 0 1
   @onEnter: modules.game_viplist.addGroup()
   @onEscape: |
-    self:getParent():destroy()
+    self:destroy()
     modules.game_viplist.addGroupWindow = nil
 
   Label
