@@ -152,32 +152,30 @@ function online()
                 pingImg:hide()
             end
         end
+        if PingWidget then
+            return
+        end
+        PingWidget = g_ui.loadUI("pingFps", modules.game_interface.getMapPanel())
+        MainPingPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(1))
+        MainPingPanel.setId(MainPingPanel, "ping")
+        pingImg = MainPingPanel.getChildByIndex(MainPingPanel, 1)
+        pingPanel = MainPingPanel.getChildByIndex(MainPingPanel, 2)
+        if modules.client_options.getOption('showPing') then
+            pingImg:setVisible(true)
+            pingPanel:setVisible(true)
+        else
+            pingImg:setVisible(false)
+            pingPanel:setVisible(true)
+        end
+        mainFpsPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(2))
+        mainFpsPanel.setId(mainFpsPanel, "fps")
+        fpsPanel2 = mainFpsPanel.getChildByIndex(mainFpsPanel, 2)
+        if modules.client_options.getOption('showFps') then
+            fpsPanel2:setVisible(true)
+        else
+            fpsPanel2:setVisible(false)
+        end
     end)
-    if PingWidget then
-        return
-    end
-
-    PingWidget = g_ui.loadUI("pingFps", modules.game_interface.getMapPanel())
-
-    MainPingPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(1))
-    MainPingPanel.setId(MainPingPanel, "ping")
-    pingImg = MainPingPanel.getChildByIndex(MainPingPanel, 1)
-    pingPanel = MainPingPanel.getChildByIndex(MainPingPanel, 2)
-    if modules.client_options.getOption('showPing') then
-        pingImg:setVisible(true)
-        pingPanel:setVisible(true)
-    else
-        pingImg:setVisible(false)
-        pingPanel:setVisible(true)
-    end
-    mainFpsPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(2))
-    mainFpsPanel.setId(mainFpsPanel, "fps")
-    fpsPanel2 = mainFpsPanel.getChildByIndex(mainFpsPanel, 2)
-    if modules.client_options.getOption('showFps') then
-        fpsPanel2:setVisible(true)
-    else
-        fpsPanel2:setVisible(false)
-    end
 end
 
 function offline()
