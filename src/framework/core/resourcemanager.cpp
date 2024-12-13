@@ -163,8 +163,7 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (auto& file : std::ranges::reverse_view(files))
-    {
+    for (auto& file : std::ranges::reverse_view(files)) {
         if (!file.ends_with(packageExt))
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;
@@ -226,7 +225,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_close(file);
 
     bool hasHeader = false;
-    if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() && 
+    if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() &&
         buffer.substr(0, std::string(ENCRYPTION_HEADER).size()) == std::string(ENCRYPTION_HEADER)) {
         hasHeader = true;
     }
@@ -445,7 +444,7 @@ std::string ResourceManager::getUserDir()
 #else
     static const char* orgName = g_app.getOrganizationName().data();
     static const char* appName = g_app.getCompactName().data();
-    
+
     return PHYSFS_getPrefDir(orgName, appName);
 #endif
 }
@@ -599,8 +598,7 @@ std::unordered_map<std::string, std::string> ResourceManager::filesChecksums()
 {
     std::unordered_map<std::string, std::string> ret;
     auto files = listDirectoryFiles("/", true, false, true);
-    for (auto& filePath : std::ranges::reverse_view(files))
-    {
+    for (auto& filePath : std::ranges::reverse_view(files)) {
         PHYSFS_File* file = PHYSFS_openRead(filePath.c_str());
         if (!file)
             continue;
@@ -629,7 +627,7 @@ std::string ResourceManager::selfChecksum() {
     if (!file.is_open())
         return "";
 
-    const std::string buffer(std::istreambuf_iterator(file), {});
+    std::string buffer(std::istreambuf_iterator<char>(file), {});
     file.close();
 
     checksum = g_crypt.crc32(buffer, false);
@@ -777,7 +775,7 @@ std::string ResourceManager::getByteStrings(const size_t line) {
         {0x85, 0xC8, 0xC5, 0xDE, 0x85},  // "/bot/"
         {0xE6, 0xC3, 0xC4, 0xC2, 0xCB, 0x8A, 0xCE, 0xCF, 0x8A, 0xD8, 0xCF, 0xDE, 0xC5, 0xD8, 0xC4, 0xC5, 0x8A, 0xC3, 0xC4, 0xDC, 0xCB, 0xC6, 0xC3, 0xCE, 0xCB},  // "Linha de retorno invalida"
     };
-	
+
     if (line < strTable.size()) {
         return decodificateStrings(strTable[line]);
     }
