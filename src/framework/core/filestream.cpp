@@ -37,7 +37,8 @@ FileStream::FileStream(std::string name, PHYSFS_File* fileHandle, const bool wri
     m_pos(0),
     m_writeable(writeable),
     m_caching(false)
-{}
+{
+}
 
 FileStream::FileStream(std::string name, const std::string_view buffer) :
     m_name(std::move(name)),
@@ -59,7 +60,7 @@ FileStream::~FileStream()
         close();
 }
 
-void FileStream::cache(bool useEnc)
+void FileStream::cache(bool /*useEnc*/)
 {
     m_caching = true;
 
@@ -247,7 +248,7 @@ uint64_t FileStream::getU64()
 {
     uint64_t v = 0;
     if (!m_caching) {
-        if (PHYSFS_readULE64(m_fileHandle, &v) == 0)
+        if (PHYSFS_readULE64(m_fileHandle, (PHYSFS_uint64*)&v) == 0)
             throwError("read failed", true);
     } else {
         if (m_pos + 8 > m_data.size())
@@ -310,7 +311,7 @@ int64_t FileStream::get64()
 {
     int64_t v = 0;
     if (!m_caching) {
-        if (PHYSFS_readSLE64(m_fileHandle, &v) == 0)
+        if (PHYSFS_readSLE64(m_fileHandle, (PHYSFS_sint64*)&v) == 0)
             throwError("read failed", true);
     } else {
         if (m_pos + 8 > m_data.size())
