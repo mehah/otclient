@@ -326,7 +326,7 @@ public:
             moveCenterRight(r.centerRight());
     }
 
-    TRect& operator=(const TRect& other) { x1 = other.x1; y1 = other.y1; x2 = other.x2; y2 = other.y2; return *this; }
+    TRect& operator=(const TRect& other) = default;
     bool operator==(const TRect& other) const { return (x1 == other.x1 && y1 == other.y1 && x2 == other.x2 && y2 == other.y2); }
     bool operator!=(const TRect& other) const { return (x1 != other.x1 || y1 != other.y1 || x2 != other.x2 || y2 != other.y2); }
 

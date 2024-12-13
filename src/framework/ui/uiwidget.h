@@ -493,7 +493,7 @@ public:
     int getPaddingRight() { return m_padding.right; }
     int getPaddingBottom() { return m_padding.bottom; }
     int getPaddingLeft() { return m_padding.left; }
-    Size getPaddingSize() { return Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom); }
+    Size getPaddingSize() { return {m_padding.left + m_padding.right, m_padding.top + m_padding.bottom}; }
     float getOpacity() { return m_opacity; }
     float getRotation() { return m_rotation; }
 

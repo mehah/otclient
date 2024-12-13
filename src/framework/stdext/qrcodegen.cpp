@@ -302,7 +302,7 @@ namespace qrcodegen {
         if (msk < -1 || msk > 7)
             throw std::domain_error("Mask value out of range");
         size = ver * 4 + 17;
-        const size_t sz = static_cast<size_t>(size);
+        const auto sz = static_cast<size_t>(size);
         modules = vector(sz, vector<bool>(sz));  // Initially all light
         isFunction = vector(sz, vector<bool>(sz));
 
@@ -448,8 +448,8 @@ namespace qrcodegen {
     }
 
     void QrCode::setFunctionModule(const int x, const int y, const bool isDark) {
-        const size_t ux = static_cast<size_t>(x);
-        const size_t uy = static_cast<size_t>(y);
+        const auto ux = static_cast<size_t>(x);
+        const auto uy = static_cast<size_t>(y);
         modules.at(uy).at(ux) = isDark;
         isFunction.at(uy).at(ux) = true;
     }
@@ -506,9 +506,9 @@ namespace qrcodegen {
                 right = 5;
             for (int vert = 0; vert < size; vert++) {  // Vertical counter
                 for (int j = 0; j < 2; j++) {
-                    const size_t x = static_cast<size_t>(right - j);  // Actual x coordinate
+                    const auto x = static_cast<size_t>(right - j);  // Actual x coordinate
                     const bool upward = ((right + 1) & 2) == 0;
-                    const size_t y = static_cast<size_t>(upward ? size - 1 - vert : vert);  // Actual y coordinate
+                    const auto y = static_cast<size_t>(upward ? size - 1 - vert : vert);  // Actual y coordinate
                     if (!isFunction.at(y).at(x) && i < data.size() * 8) {
                         modules.at(y).at(x) = getBit(data.at(i >> 3), 7 - static_cast<int>(i & 7));
                         i++;
@@ -524,7 +524,7 @@ namespace qrcodegen {
     void QrCode::applyMask(const int msk) {
         if (msk < 0 || msk > 7)
             throw std::domain_error("Mask value out of range");
-        const size_t sz = static_cast<size_t>(size);
+        const auto sz = static_cast<size_t>(size);
         for (size_t y = 0; y < sz; y++) {
             for (size_t x = 0; x < sz; x++) {
                 bool invert;
@@ -622,7 +622,7 @@ namespace qrcodegen {
 
     vector<int> QrCode::getAlignmentPatternPositions() const {
         if (version == 1)
-            return vector<int>();
+            return {};
         const int numAlign = version / 7 + 2;
         const int step = (version == 32) ? 26 :
                              (version * 4 + numAlign * 2 + 1) / (numAlign * 2 - 2) * 2;
@@ -760,7 +760,7 @@ namespace qrcodegen {
     /*---- Class BitBuffer ----*/
 
     BitBuffer::BitBuffer()
-    {}
+    = default;
 
     void BitBuffer::appendBits(const std::uint32_t val, const int len) {
         if (len < 0 || len > 31 || val >> len != 0)

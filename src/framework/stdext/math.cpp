@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-#include "math.h"
+#include <cmath>
 #include <algorithm>
 #include <climits>
 #include <cmath>

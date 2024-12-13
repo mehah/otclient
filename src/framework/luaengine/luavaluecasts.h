@@ -148,8 +148,8 @@ bool luavalue_cast(int index, OTMLNodePtr& node);
 
 // enum
 template<class T>
-std::enable_if_t<std::is_enum_v<T>, int>
-push_luavalue(T e) { return push_luavalue(static_cast<int>(e)); }
+int
+push_luavalue(T e) requires (std::is_enum_v<T>) { return push_luavalue(static_cast<int>(e)); }
 
 template<class T>
 std::enable_if_t<std::is_enum_v<T>, bool>

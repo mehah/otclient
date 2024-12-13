@@ -34,6 +34,8 @@
 #endif
 #include <zlib.h>
 
+#include <algorithm>
+
 static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static inline bool is_base64(const uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
 
@@ -167,8 +169,8 @@ std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key)
 std::string Crypt::genUUID()
 {
     std::random_device rd;
-    auto seed_data = std::array<int, std::mt19937::state_size> {};
-    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+    auto seed_data = std::array<int, std::mt19937::state_size>{};
+    std::ranges::generate(seed_data, std::ref(rd));
     std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
     std::mt19937 generator(seq);
 
@@ -194,8 +196,8 @@ std::string Crypt::getMachineUUID()
 {
     if (m_machineUUID.is_nil()) {
         std::random_device rd;
-        auto seed_data = std::array<int, std::mt19937::state_size> {};
-        std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+        auto seed_data = std::array<int, std::mt19937::state_size>{};
+        std::ranges::generate(seed_data, std::ref(rd));
         std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
         std::mt19937 generator(seq);
 
@@ -370,9 +372,9 @@ std::string Crypt::crc32(const std::string& decoded_string, const bool upperCase
     crc = ::crc32(crc, (const Bytef*)decoded_string.c_str(), decoded_string.size());
     std::string result = stdext::dec_to_hex(crc);
     if (upperCase)
-        std::transform(result.begin(), result.end(), result.begin(), toupper);
+        std::ranges::transform(result, result.begin(), toupper);
     else
-        std::transform(result.begin(), result.end(), result.begin(), tolower);
+        std::ranges::transform(result, result.begin(), tolower);
     return result;
 }
 
@@ -433,7 +435,7 @@ std::string Crypt::sha1Encrpyt(const std::string& input)
     sha1Block(messageBlock, H);
 
     char hexstring[41];
-    static constexpr char hexDigits[] = {"0123456789abcdef"};
+    static constexpr char hexDigits[] = { "0123456789abcdef" };
     for (int hashByte = 20; --hashByte >= 0;) {
         const uint8_t byte = H[hashByte >> 2] >> (((3 - hashByte) & 3) << 3);
         index = hashByte << 1;

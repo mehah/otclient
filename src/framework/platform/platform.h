@@ -56,7 +56,7 @@ public:
 
     struct Device
     {
-        Device() {}
+        Device() = default;
         Device(const DeviceType t, const OperatingSystem o) : type(t), os(o) {}
         DeviceType type{ DeviceUnknown };
         OperatingSystem os{ OsUnknown };

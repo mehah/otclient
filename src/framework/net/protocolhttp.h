@@ -63,19 +63,19 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
 public:
 
-    HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
+    HttpSession(asio::io_service& service, std::string url, std::string agent,
                 const bool& enable_time_out_on_read_write,
                 const std::unordered_map<std::string, std::string>& custom_header,
-                const int timeout, const bool isJson, const bool checkContentLength, const HttpResult_ptr& result, HttpResult_cb callback) :
+                const int timeout, const bool isJson, const bool checkContentLength, HttpResult_ptr result, HttpResult_cb callback) :
         m_service(service),
-        m_url(url),
-        m_agent(agent),
+        m_url(std::move(url)),
+        m_agent(std::move(agent)),
         m_enable_time_out_on_read_write(enable_time_out_on_read_write),
         m_custom_header(custom_header),
         m_timeout(timeout),
         m_isJson(isJson),
         m_checkContentLength(checkContentLength),
-        m_result(result),
+        m_result(std::move(result)),
         m_callback(std::move(callback)),
         m_socket(service),
         m_resolver(service),
@@ -133,15 +133,15 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 {
 public:
 
-    WebsocketSession(asio::io_service& service, const std::string& url, const std::string& agent,
+    WebsocketSession(asio::io_service& service, std::string url, std::string agent,
                      const bool& enable_time_out_on_read_write, const int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
         m_service(service),
-        m_url(url),
-        m_agent(agent),
+        m_url(std::move(url)),
+        m_agent(std::move(agent)),
         m_enable_time_out_on_read_write(enable_time_out_on_read_write),
         m_timeout(timeout),
-        m_result(result),
-        m_callback(callback),
+        m_result(std::move(result)),
+        m_callback(std::move(callback)),
         m_timer(service),
         m_socket(service),
         m_resolver(service)

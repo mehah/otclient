@@ -170,7 +170,12 @@ public:
     void sendTyping();
     bool getTyping() { return m_typing; }
     void setTypingIconTexture(const std::string& filename);
-    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) { m_bounce = { minHeight, height , speed }; }
+    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
+        m_bounce = { .minHeight =
+minHeight,
+.height = height, .speed = speed
+        };
+    }
 
     void setWidgetInformation(const UIWidgetPtr& info);
     UIWidgetPtr getWidgetInformation() { return m_widgetInformation; }

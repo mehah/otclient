@@ -21,6 +21,7 @@
  */
 
 #include "protocol.h"
+#include <algorithm>
 #include <random>
 #include <framework/core/application.h>
 #ifdef __EMSCRIPTEN__
@@ -50,8 +51,12 @@ void Protocol::connect(const std::string_view host, const uint16_t port)
     if (host == "proxy" || host == "0.0.0.0" || (host == "127.0.0.1" && g_proxy.isActive())) {
         m_disconnected = false;
         m_proxy = g_proxy.addSession(port,
-                                     std::bind(&Protocol::onProxyPacket, asProtocol(), std::placeholders::_1),
-                                     std::bind(&Protocol::onLocalDisconnected, asProtocol(), std::placeholders::_1));
+                                     [capture0 = asProtocol()](auto&& PH1) {
+            capture0->onProxyPacket(std::forward<decltype(PH1)>(PH1));
+        },
+                                     [capture0 = asProtocol()](auto&& PH1) {
+            capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
+        });
         return onConnect();
     }
 
@@ -150,7 +155,6 @@ void Protocol::recv()
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
         std::forward<decltype(PH2)>(PH2));
     });
-
 }
 
 void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
@@ -224,7 +228,7 @@ void Protocol::generateXteaKey()
 {
     std::random_device rd;
     std::uniform_int_distribution<uint32_t > unif;
-    std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd] { return unif(rd); });
+    std::ranges::generate(m_xteaKey, [&unif, &rd] { return unif(rd); });
 }
 
 namespace

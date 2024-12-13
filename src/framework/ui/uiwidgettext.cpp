@@ -168,7 +168,7 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     m_colorCoordsBuffer.clear();
     m_coordsBuffer->clear();
 
-    std::regex exp("\\{([^\\}]+),[ ]*([^\\}]+)\\}");
+    std::regex exp(R"(\{([^\}]+),[ ]*([^\}]+)\})");
 
     std::string _text{ coloredText.data() };
 
@@ -178,17 +178,17 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     while (std::regex_search(_text, res, exp)) {
         std::string prefix = res.prefix().str();
         if (prefix.size() > 0) {
-            m_textColors.push_back(std::make_pair(text.size(), baseColor));
+            m_textColors.emplace_back(text.size(), baseColor);
             text = text + prefix;
         }
         auto color = Color(res[2].str());
-        m_textColors.push_back(std::make_pair(text.size(), color));
+        m_textColors.emplace_back(text.size(), color);
         text = text + res[1].str();
         _text = res.suffix();
     }
 
     if (_text.size() > 0) {
-        m_textColors.push_back(std::make_pair(text.size(), baseColor));
+        m_textColors.emplace_back(text.size(), baseColor);
         text = text + _text;
     }
 

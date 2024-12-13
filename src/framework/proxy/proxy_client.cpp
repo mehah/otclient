@@ -95,7 +95,9 @@ void Proxy::check(const std::error_code& ec)
         }
     }
     m_timer.expires_from_now(std::chrono::milliseconds(CHECK_INTERVAL));
-    m_timer.async_wait(std::bind(&Proxy::check, shared_from_this(), std::placeholders::_1));
+    m_timer.async_wait([capture0 = shared_from_this()](auto&& PH1) {
+        capture0->check(std::forward<decltype(PH1)>(PH1));
+    });
 }
 
 void Proxy::connect()
@@ -208,7 +210,9 @@ void Proxy::removeSession(const uint32_t id)
 
 void Proxy::readHeader()
 {
-    async_read(m_socket, asio::buffer(m_buffer, 2), std::bind(&Proxy::onHeader, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+    async_read(m_socket, asio::buffer(m_buffer, 2), [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+        capture0->onHeader(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+    });
 }
 
 void Proxy::onHeader(const std::error_code& ec, const std::size_t bytes_transferred)
@@ -231,7 +235,9 @@ void Proxy::onHeader(const std::error_code& ec, const std::size_t bytes_transfer
         return disconnect();
     }
 
-    async_read(m_socket, asio::buffer(m_buffer, packetSize), std::bind(&Proxy::onPacket, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+    async_read(m_socket, asio::buffer(m_buffer, packetSize), [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+        capture0->onPacket(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+    });
 }
 
 void Proxy::onPacket(const std::error_code& ec, const std::size_t bytes_transferred)
@@ -287,7 +293,10 @@ void Proxy::send(const ProxyPacketPtr& packet)
     const bool sendNow = m_sendQueue.empty();
     m_sendQueue.push_back(packet);
     if (sendNow) {
-        async_write(m_socket, asio::buffer(packet->data(), packet->size()), std::bind(&Proxy::onSent, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+        async_write(m_socket, asio::buffer(packet->data(), packet->size()),
+                    [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+            capture0->onSent(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+        });
     }
 }
 
@@ -304,7 +313,9 @@ void Proxy::onSent(const std::error_code& ec, const std::size_t bytes_transferre
     m_sendQueue.pop_front();
     if (!m_sendQueue.empty()) {
         async_write(m_socket, asio::buffer(m_sendQueue.front()->data(), m_sendQueue.front()->size()),
-                                 std::bind(&Proxy::onSent, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+                    [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+            capture0->onSent(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+        });
     }
 }
 
@@ -369,7 +380,9 @@ void Session::check(const std::error_code& ec)
     selectProxies();
 
     m_timer.expires_from_now(std::chrono::milliseconds(CHECK_INTERVAL));
-    m_timer.async_wait(std::bind(&Session::check, shared_from_this(), std::placeholders::_1));
+    m_timer.async_wait([capture0 = shared_from_this()](auto&& PH1) {
+        capture0->check(std::forward<decltype(PH1)>(PH1));
+    });
 }
 
 void Session::selectProxies()
@@ -452,7 +465,9 @@ void Session::onProxyPacket(uint32_t packetId, uint32_t lastRecivedPacketId, con
     }
 
     async_write(m_socket, asio::buffer(packet->data(), packet->size()),
-                             std::bind(&Session::onSent, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+                [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+        capture0->onSent(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+    });
 }
 
 void Session::readTibia12Header()
@@ -476,7 +491,9 @@ void Session::readTibia12Header()
 void Session::readHeader()
 {
     async_read(m_socket, asio::buffer(m_buffer, 2),
-                            std::bind(&Session::onHeader, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+               [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+        capture0->onHeader(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+    });
 }
 
 void Session::onHeader(const std::error_code& ec, std::size_t bytes_transferred)
@@ -501,7 +518,9 @@ void Session::onHeader(const std::error_code& ec, std::size_t bytes_transferred)
     }
 
     async_read(m_socket, asio::buffer(m_buffer + 2, packetSize),
-                            std::bind(&Session::onBody, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+               [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+        capture0->onBody(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+    });
 }
 
 void Session::onBody(const std::error_code& ec, const std::size_t bytes_transferred)
@@ -559,6 +578,8 @@ void Session::onSent(const std::error_code& ec, std::size_t bytes_transferred)
     m_sendQueue.erase(m_sendQueue.begin());
     if (!m_sendQueue.empty() && m_sendQueue.begin()->first == m_inputPacketId) {
         async_write(m_socket, asio::buffer(m_sendQueue.begin()->second->data(), m_sendQueue.begin()->second->size()),
-                                 std::bind(&Session::onSent, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
+                    [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
+            capture0->onSent(std::forward<decltype(PH1)>(PH1), std::forward<decltype(PH2)>(PH2));
+        });
     }
 }

@@ -46,7 +46,8 @@ class Proxy : public std::enable_shared_from_this<Proxy>
     };
 public:
     Proxy(asio::io_context& io, const std::string& host, const uint16_t port, const int priority)
-        : m_io(io), m_timer(io), m_socket(io), m_resolver(io), m_state(STATE_NOT_CONNECTED)
+        : m_io(io), m_timer(io), m_socket(io), m_resolver(io)
+
     {
         m_host = host;
         m_port = port;
@@ -90,7 +91,7 @@ private:
     asio::ip::tcp::socket m_socket;
     asio::ip::tcp::resolver m_resolver;
 
-    ProxyState m_state;
+    ProxyState m_state{ STATE_NOT_CONNECTED };
 
     std::string m_host;
     uint16_t m_port;

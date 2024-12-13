@@ -80,7 +80,7 @@ public:
     bool operator<(const TPoint& other) const { return x < other.x && y < other.y; }
     bool operator>(const TPoint& other) const { return x > other.x && y > other.y; }
 
-    TPoint& operator=(const TPoint& other) { x = other.x; y = other.y; return *this; }
+    TPoint& operator=(const TPoint& other) = default;
     bool operator==(const TPoint& other) const { return other.x == x && other.y == y; }
     bool operator!=(const TPoint& other) const { return other.x != x || other.y != y; }
 

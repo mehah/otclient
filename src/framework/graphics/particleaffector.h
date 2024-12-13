@@ -28,7 +28,7 @@
 class ParticleAffector
 {
 public:
-    virtual ~ParticleAffector() {} // fix clang warning
+    virtual ~ParticleAffector() = default; // fix clang warning
 
     void update(float elapsedTime);
     virtual void load(const OTMLNodePtr& node);

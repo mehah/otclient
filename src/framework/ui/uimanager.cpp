@@ -31,6 +31,8 @@
 #include <framework/platform/platformwindow.h>
 #include <framework/core/modulemanager.h>
 
+#include <algorithm>
+
 UIManager g_ui;
 
 void UIManager::init()
@@ -114,7 +116,7 @@ void UIManager::inputEvent(const InputEvent& event)
 
                 // mouse release is always fired first on the pressed widget
                 if (m_pressedWidget) {
-                    const auto it = std::find(widgetList.begin(), widgetList.end(), m_pressedWidget);
+                    const auto it = std::ranges::find(widgetList, m_pressedWidget);
                     if (it != widgetList.end())
                         widgetList.erase(it);
                     widgetList.emplace_front(m_pressedWidget);
@@ -440,7 +442,6 @@ std::string UIManager::getStyleName(const std::string_view styleName)
         return style->tag();
     return "";
 }
-
 
 std::string UIManager::getStyleClass(const std::string_view styleName)
 {

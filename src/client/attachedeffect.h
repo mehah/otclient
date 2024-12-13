@@ -70,15 +70,27 @@ public:
     Otc::Direction getDirection() { return m_direction; }
     void setDirection(const Otc::Direction dir) { m_direction = std::min<Otc::Direction>(dir, Otc::NorthWest); }
 
-    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) { m_bounce = { minHeight, height , speed }; }
-    void setPulse(const uint8_t minHeight, const uint8_t height, const uint16_t speed) { m_pulse = { minHeight, height , speed }; }
-    void setFade(const uint8_t start, const uint8_t end, const uint16_t speed) { m_fade = { start, end , speed }; }
+    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) { m_bounce = { .minHeight=
+        minHeight,
+        .height= height, .speed= speed
+    }; }
+    void setPulse(const uint8_t minHeight, const uint8_t height, const uint16_t speed) { m_pulse = { .minHeight=
+        minHeight,
+        .height= height, .speed= speed
+    }; }
+    void setFade(const uint8_t start, const uint8_t end, const uint16_t speed) { m_fade = { .minHeight= start, .height=
+        end,
+        .speed= speed
+    }; }
 
     void setOnTop(const bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
     void setOnTopByDir(const Otc::Direction direction, const bool onTop) { m_offsetDirections[direction].onTop = onTop; }
 
-    void setDirOffset(const Otc::Direction direction, int8_t x, int8_t y, const bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
+    void setDirOffset(const Otc::Direction direction, int8_t x, int8_t y, const bool onTop = false) { m_offsetDirections[direction] = { .onTop=
+        onTop,
+        .offset= {x, y}
+    }; }
     void setShader(std::string_view name);
     void setCanDrawOnUI(const bool canDraw) { m_canDrawOnUI = canDraw; }
     bool canDrawOnUI() { return m_canDrawOnUI; }

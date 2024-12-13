@@ -35,7 +35,7 @@
 #include "thingtypemanager.h"
 #include "attachedeffectmanager.h"
 #include "tile.h"
-#include "time.h"
+#include <ctime>
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {
@@ -1087,7 +1087,10 @@ void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)
     const uint8_t killsMonthRemaining = msg->getU8();
     const uint8_t skullTime = msg->getU8();
 
-    g_game.setUnjustifiedPoints({ killsDay, killsDayRemaining, killsWeek, killsWeekRemaining, killsMonth, killsMonthRemaining, skullTime });
+    g_game.setUnjustifiedPoints({ .killsDay= killsDay, .killsDayRemaining= killsDayRemaining, .killsWeek= killsWeek, .killsWeekRemaining=
+        killsWeekRemaining,
+        .killsMonth= killsMonth, .killsMonthRemaining= killsMonthRemaining, .skullTime= skullTime
+    });
 }
 
 void ProtocolGame::parsePvpSituations(const InputMessagePtr& msg)
@@ -1618,8 +1621,8 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
                     const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-                    const int8_t offsetX = static_cast<int8_t>(msg->getU8());
-                    const int8_t offsetY = static_cast<int8_t>(msg->getU8());
+                    const auto offsetX = static_cast<int8_t>(msg->getU8());
+                    const auto offsetY = static_cast<int8_t>(msg->getU8());
                     if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
                         g_logger.traceError(stdext::format("invalid missile id %d", shotId));
                         return;
@@ -4566,7 +4569,7 @@ PreyMonster ProtocolGame::getPreyMonster(const InputMessagePtr& msg) const
 {
     const auto& name = msg->getString();
     const auto& outfit = getOutfit(msg, false);
-    return { name , outfit };
+    return { .name= name, .outfit= outfit};
 }
 
 std::vector<PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& msg)
@@ -4978,7 +4981,9 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     }
 
     g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
-    return { timestamp, counter, action, itemId, amount, price, playerName, state, var };
+    return { .timestamp= timestamp, .counter= counter, .action= action, .itemId= itemId, .amount= amount, .price= price,
+        .playerName= playerName, .state= state, .var= var
+    };
 }
 
 void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)

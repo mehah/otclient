@@ -28,9 +28,9 @@
 class SoundFile : public std::enable_shared_from_this<SoundFile>
 {
 public:
-    virtual ~SoundFile() {} // fix clang warning
+    virtual ~SoundFile() = default; // fix clang warning
 
-    SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) {}
+    SoundFile(FileStreamPtr fileStream) : m_file(std::move(fileStream)) {}
     static SoundFilePtr loadSoundFile(const std::string& filename);
 
     virtual int read(void* /*buffer*/, int /*bufferSize*/) { return -1; }

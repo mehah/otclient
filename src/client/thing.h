@@ -225,7 +225,7 @@ protected:
     Color m_highlightColor{ Color::white };
 
     Position m_position;
-    DrawConductor m_drawConductor{ false, THIRD };
+    DrawConductor m_drawConductor{ .agroup= false, .order= THIRD};
 
     uint16_t m_clientId{ 0 };
 

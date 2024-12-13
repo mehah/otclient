@@ -87,7 +87,7 @@ void Application::registerLuaFunctions()
             std::smatch m;
             const std::regex e(exp, std::regex::ECMAScript);
             while (std::regex_search(s, m, e)) {
-                ret.push_back(std::vector<std::string>());
+                ret.emplace_back();
                 for (auto x : m)
                     ret[ret.size() - 1].push_back(x);
                 s = m.suffix().str();

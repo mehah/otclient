@@ -44,10 +44,11 @@ namespace stdext
     void print(const T&... args) { std::ostringstream buf; print_ostream(buf, args...); std::cout << buf.str() << std::endl; }
 
     template<typename T>
-    std::enable_if_t<std::is_integral_v<T> ||
+    T sprintf_cast(const T& t) requires (std::is_integral_v<T> ||
         std::is_pointer_v<T> ||
         std::is_floating_point_v<T> ||
-        std::is_enum_v<T>, T> sprintf_cast(const T& t) { return t; }
+        std::is_enum_v<T>) { return t; }
+
     inline const char* sprintf_cast(const char* s) { return s; }
     inline const char* sprintf_cast(const std::string_view s) { return s.data(); }
 
@@ -96,7 +97,7 @@ namespace stdext
     template<typename... Args>
     std::string format(const std::string_view format, const Args&... args)
     {
-        int n = snprintf(NULL, 0, format.data(), args...);
+        int n = snprintf(nullptr, 0, format.data(), args...);
         assert(n != -1);
         std::string buffer(n + 1, '\0');
         n = snprintf(&buffer[0], buffer.size(), format.data(), args...);

@@ -67,7 +67,7 @@ public:
     bool operator<(const TSize& other) const { return wd < other.wd || ht < other.ht; }
     bool operator>(const TSize& other) const { return wd > other.wd || ht > other.ht; }
 
-    TSize& operator=(const TSize& other) { wd = other.wd; ht = other.ht; return *this; }
+    TSize& operator=(const TSize& other) = default;
     bool operator==(const TSize& other) const { return other.wd == wd && other.ht == ht; }
     bool operator!=(const TSize& other) const { return other.wd != wd || other.ht != ht; }
 

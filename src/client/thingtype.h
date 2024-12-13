@@ -26,6 +26,7 @@
 #include "declarations.h"
 #include "gameconfig.h"
 
+#include <algorithm>
 #include <variant>
 #include <framework/core/declarations.h>
 #include <framework/graphics/drawpoolmanager.h>
@@ -244,7 +245,7 @@ struct Imbuement
 
 struct ImbuementSlot
 {
-    ImbuementSlot(const uint8_t id) : id(id) { }
+    ImbuementSlot(const uint8_t id) : id(id) {}
 
     uint8_t id;
     std::string name;
@@ -255,8 +256,8 @@ struct ImbuementSlot
 
 struct ImbuementTrackerItem
 {
-    ImbuementTrackerItem() : slot(0) { }
-    ImbuementTrackerItem(const uint8_t slot) : slot(slot) { }
+    ImbuementTrackerItem() : slot(0) {}
+    ImbuementTrackerItem(const uint8_t slot) : slot(slot) {}
 
     uint8_t slot;
     ItemPtr item;
@@ -346,13 +347,11 @@ public:
             {3043, 10000},
             {3031, 50},
             {3035, 50 }
-            
         } };
 
         const uint32_t itemId = getId();
 
-        const auto it = std::find_if(forcedPrices.begin(), forcedPrices.end(),
-            [itemId](const auto& pair) { return pair.first == itemId; });
+        const auto it = std::ranges::find_if(forcedPrices, [itemId](const auto& pair) { return pair.first == itemId; });
 
         if (it != forcedPrices.end()) {
             return it->second;

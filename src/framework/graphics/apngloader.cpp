@@ -831,9 +831,11 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
         uint8_t   mCompression;
         uint8_t   mFilterMethod;
         uint8_t   mInterlaceMethod;
-    } ihdr = { swap32(width), swap32(height), 8, coltype, 0, 0, 0 };
+    } ihdr = { .mWidth= swap32(width), .mHeight= swap32(height), .mDepth= 8, .mColorType= coltype, .mCompression= 0,
+            .mFilterMethod= 0, .mInterlaceMethod= 0
+        };
 
-    z_stream        zstream1;
+    z_stream zstream1;
     z_stream        zstream2;
     uint32_t    i, j;
 

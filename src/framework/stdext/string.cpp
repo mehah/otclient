@@ -21,6 +21,7 @@
  */
 
 #include <algorithm>
+#include <ranges>
 #include <vector>
 
 #include "exception.h"
@@ -168,24 +169,24 @@ namespace stdext
 
     void tolower(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), [](const int c) -> char { return static_cast<char>(::tolower(c)); });
+        std::ranges::transform(str, str.begin(), [](const int c) -> char { return static_cast<char>(::tolower(c)); });
     }
 
     void toupper(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), [](const int c) -> char { return static_cast<char>(::toupper(c)); });
+        std::ranges::transform(str, str.begin(), [](const int c) -> char { return static_cast<char>(::toupper(c)); });
     }
 
     void ltrim(std::string& s)
     {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](const uint8_t ch) {
+        s.erase(s.begin(), std::ranges::find_if(s, [](const uint8_t ch) {
             return !std::isspace(ch);
         }));
     }
 
     void rtrim(std::string& s)
     {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](const uint8_t ch) {
+        s.erase(std::ranges::find_if(std::ranges::reverse_view(s), [](const uint8_t ch) {
             return !std::isspace(ch);
         }).base(), s.end());
     }

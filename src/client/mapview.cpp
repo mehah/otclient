@@ -41,6 +41,8 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
 
+#include <algorithm>
+
 MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_drawPool.get(DrawPoolType::MAP))
 {
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
@@ -457,10 +459,10 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
     const uint8_t top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);
-    const uint8_t right = static_cast<uint8_t>(left + 1);
-    const uint8_t bottom = static_cast<uint8_t>(top + 1);
+    const auto right = static_cast<uint8_t>(left + 1);
+    const auto bottom = static_cast<uint8_t>(top + 1);
 
-    m_posInfo.awareRange = { left, top, right, bottom };
+    m_posInfo.awareRange = { .left= left, .top= top, .right= right, .bottom= bottom};
 
     updateViewportDirectionCache();
     updateViewport();
@@ -911,12 +913,12 @@ void MapView::destroyHighlightTile() {
 void MapView::addForegroundTile(const TilePtr& tile) {
     std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
 
-    if (std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile) == m_foregroundTiles.end())
+    if (std::ranges::find(m_foregroundTiles, tile) == m_foregroundTiles.end())
         m_foregroundTiles.emplace_back(tile);
 }
 void MapView::removeForegroundTile(const TilePtr& tile) {
     std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
-    const auto it = std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile);
+    const auto it = std::ranges::find(m_foregroundTiles, tile);
     if (it == m_foregroundTiles.end())
         return;
 

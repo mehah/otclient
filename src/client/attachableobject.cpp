@@ -29,6 +29,8 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/ui/uimanager.h>
 
+#include <algorithm>
+
 #include "client.h"
 #include "game.h"
 #include "map.h"
@@ -55,8 +57,7 @@ void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
         ++m_ownerHidden;
 
     if (obj->getDuration() > 0) {
-        g_dispatcher.scheduleEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect = obj]
-        {
+        g_dispatcher.scheduleEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect = obj] {
             self->detachEffect(effect);
         }, obj->getDuration());
     }
@@ -120,12 +121,12 @@ void AttachableObject::clearTemporaryAttachedEffects()
     if (!hasAttachedEffects()) return;
     std::erase_if(m_data->attachedEffects,
                   [this](const AttachedEffectPtr& obj) {
-                      if (!obj->isPermanent()) {
-                          onDetachEffect(obj);
-                          return true;
-                      }
-                      return false;
-                  });
+        if (!obj->isPermanent()) {
+            onDetachEffect(obj);
+            return true;
+        }
+        return false;
+    });
 }
 
 void AttachableObject::clearPermanentAttachedEffects()
@@ -133,12 +134,12 @@ void AttachableObject::clearPermanentAttachedEffects()
     if (!hasAttachedEffects()) return;
     std::erase_if(m_data->attachedEffects,
                   [this](const AttachedEffectPtr& obj) {
-                      if (obj->isPermanent()) {
-                          onDetachEffect(obj);
-                          return true;
-                      }
-                      return false;
-                  });
+        if (obj->isPermanent()) {
+            onDetachEffect(obj);
+            return true;
+        }
+        return false;
+    });
 }
 
 AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
@@ -159,8 +160,7 @@ void AttachableObject::drawAttachedEffect(const Point& dest, const LightViewPtr&
     for (const auto& effect : m_data->attachedEffects) {
         effect->draw(dest, isOnTop, lightView);
         if (effect->getLoop() == 0) {
-            g_dispatcher.addEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect]
-            {
+            g_dispatcher.addEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect] {
                 self->detachEffect(effect);
             });
         }
@@ -230,7 +230,7 @@ void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>&
     toRemove.reserve(m_data->attachedParticles.size());
 
     for (const auto& effect : m_data->attachedParticles) {
-        auto findPos = std::find(newElements.begin(), newElements.end(), effect->getEffectType()->getName());
+        auto findPos = std::ranges::find(newElements, effect->getEffectType()->getName());
         if (findPos == newElements.end())
             toRemove.emplace_back(effect->getEffectType()->getName());
         else
@@ -264,8 +264,7 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     getData()->attachedWidgets.emplace_back(widget);
     g_map.addAttachedWidgetToObject(widget, std::static_pointer_cast<AttachableObject>(shared_from_this()));
     widget->callLuaField("onAttached", asLuaObject());
-    widget->addOnDestroyCallback("attached-widget-destroy", [this, widget]
-    {
+    widget->addOnDestroyCallback("attached-widget-destroy", [this, widget] {
         detachWidget(widget);
     });
 }

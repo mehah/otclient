@@ -43,10 +43,10 @@ public:
     void drawText(std::string_view text, const Rect& screenCoords, const Color& color = Color::white, Fw::AlignmentFlag align = Fw::AlignTopLeft);
 
     std::vector<std::pair<Rect, Rect>> getDrawTextCoords(std::string_view text,
-                                                         const Size& textBoxSize,
-                                                         Fw::AlignmentFlag align,
-                                                         const Rect& screenCoords,
-                                                         const std::vector<Point>& glyphsPositions) const;
+                                                                       const Size& textBoxSize,
+                                                                       Fw::AlignmentFlag align,
+                                                                       const Rect& screenCoords,
+                                                                       const std::vector<Point>& glyphsPositions) const;
 
     void fillTextCoords(const CoordsBufferPtr& coords, std::string_view text,
                         const Size& textBoxSize, Fw::AlignmentFlag align,

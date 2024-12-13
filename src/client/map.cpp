@@ -34,6 +34,7 @@
 #include <framework/core/graphicalapplication.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/ui/uiwidget.h>
+#include <algorithm>
 #include <queue>
 
 #ifdef FRAMEWORK_EDITOR
@@ -69,7 +70,7 @@ void Map::addMapView(const MapViewPtr& mapView) { m_mapViews.push_back(mapView);
 
 void Map::removeMapView(const MapViewPtr& mapView)
 {
-    const auto it = std::find(m_mapViews.begin(), m_mapViews.end(), mapView);
+    const auto it = std::ranges::find(m_mapViews, mapView);
     if (it != m_mapViews.end())
         m_mapViews.erase(it);
 }
@@ -240,7 +241,7 @@ bool Map::removeThing(const ThingPtr& thing)
 
     if (thing->isMissile()) {
         auto& missiles = m_floors[thing->getPosition().z].missiles;
-        const auto it = std::find(missiles.begin(), missiles.end(), thing->static_self_cast<Missile>());
+        const auto it = std::ranges::find(missiles, thing->static_self_cast<Missile>());
         if (it == missiles.end())
             return false;
 
@@ -267,7 +268,7 @@ bool Map::removeThingByPos(const Position& pos, const int16_t stackPos)
 }
 
 bool Map::removeStaticText(const StaticTextPtr& txt) {
-    const auto it = std::find(m_staticTexts.begin(), m_staticTexts.end(), txt);
+    const auto it = std::ranges::find(m_staticTexts, txt);
     if (it == m_staticTexts.end())
         return false;
 
@@ -276,7 +277,7 @@ bool Map::removeStaticText(const StaticTextPtr& txt) {
 }
 
 bool Map::removeAnimatedText(const AnimatedTextPtr& txt) {
-    const auto it = std::find(m_animatedTexts.begin(), m_animatedTexts.end(), txt);
+    const auto it = std::ranges::find(m_animatedTexts, txt);
     if (it == m_animatedTexts.end())
         return false;
 
@@ -741,10 +742,10 @@ void Map::setAwareRange(const AwareRange& range)
 
 void Map::resetAwareRange() {
     setAwareRange({
-        static_cast<uint8_t>(g_gameConfig.getMapViewPort().width()) ,
-        static_cast<uint8_t>(g_gameConfig.getMapViewPort().height()),
-        static_cast<uint8_t>(g_gameConfig.getMapViewPort().width() + 1),
-        static_cast<uint8_t>(g_gameConfig.getMapViewPort().height() + 1)
+        .left = static_cast<uint8_t>(g_gameConfig.getMapViewPort().width()) ,
+        .top = static_cast<uint8_t>(g_gameConfig.getMapViewPort().height()),
+        .right = static_cast<uint8_t>(g_gameConfig.getMapViewPort().width() + 1),
+        .bottom = static_cast<uint8_t>(g_gameConfig.getMapViewPort().height() + 1)
     });
 }
 
@@ -770,12 +771,13 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
 
     struct SNode
     {
-        SNode(const Position& pos) : cost(0), totalCost(0), pos(pos), prev(nullptr), dir(Otc::InvalidDirection) {}
-        float cost;
-        float totalCost;
+        SNode(const Position& pos) :
+            pos(pos) {}
+        float cost{ 0 };
+        float totalCost{ 0 };
         Position pos;
-        SNode* prev;
-        Otc::Direction dir;
+        SNode* prev{ nullptr };
+        Otc::Direction dir{ Otc::InvalidDirection };
     };
 
     struct LessNode
@@ -910,7 +912,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
                 neighborNode->cost = cost;
                 neighborNode->totalCost = neighborNode->cost + neighborPos.distance(goalPos);
                 neighborNode->dir = walkDir;
-                searchList.push(std::make_pair(neighborNode, neighborNode->totalCost));
+                searchList.emplace(neighborNode, neighborNode->totalCost);
             }
         }
 
@@ -928,7 +930,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
             currentNode = currentNode->prev;
         }
         dirs.pop_back();
-        std::reverse(dirs.begin(), dirs.end());
+        std::ranges::reverse(dirs);
         result = Otc::PathFindResultOk;
     }
 
@@ -989,7 +991,7 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
             nodes.emplace(node->pos, node);
     }
 
-    const auto& initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
+    const auto& initNode = new Node{ .cost = 1, .totalCost = 0, .pos = start, .prev = nullptr, .distance = 0, .unseen = 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 
@@ -1025,7 +1027,9 @@ PathFindResult_ptr Map::newFindPath(const Position& start, const Position& goal,
                     } else {
                         if (!wasSeen)
                             speed = 2000;
-                        it = nodes.emplace(neighbor, new Node{ speed, 10000000.0f, neighbor, node, node->distance + 1, wasSeen ? 0 : 1 }).first;
+                        it = nodes.emplace(neighbor, new Node{ .cost = speed, .totalCost = 10000000.0f, .pos = neighbor, .prev =
+                                               node,
+                                               .distance = node->distance + 1, .unseen = wasSeen ? 0 : 1 }).first;
                     }
                 }
                 if (!it->second) // no way
@@ -1081,9 +1085,14 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
         const bool isNotPathable = !tile->isPathable();
         const float speed = tile->getGroundSpeed();
         if ((isNotWalkable || isNotPathable) && tile->getPosition() != goal) {
-            visibleNodes->push_back(new Node{ speed, 0, tile->getPosition(), nullptr, 0, 0 });
+            visibleNodes->push_back(new Node{ .cost = speed, .totalCost = 0, .pos = tile->getPosition(), .prev = nullptr, .distance =
+                0,
+                .unseen = 0
+            });
         } else {
-            visibleNodes->push_back(new Node{ speed, 10000000.0f, tile->getPosition(), nullptr, 0, 0 });
+            visibleNodes->push_back(new Node{ .cost = speed, .totalCost = 10000000.0f, .pos = tile->getPosition(), .prev =
+                nullptr, .distance = 0, .unseen = 0
+            });
         }
     }
 

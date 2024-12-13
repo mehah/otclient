@@ -27,6 +27,8 @@
 #include <framework/stdext/hash.h>
 #include <framework/core/eventdispatcher.h>
 
+#include <algorithm>
+
 uint32_t ShaderProgram::m_currentProgram = 0;
 
 ShaderProgram::ShaderProgram() :m_programId(glCreateProgram())
@@ -79,7 +81,7 @@ bool ShaderProgram::addShaderFromSourceFile(ShaderType shaderType, const std::st
 
 void ShaderProgram::removeShader(const ShaderPtr& shader)
 {
-    const auto it = std::find(m_shaders.begin(), m_shaders.end(), shader);
+    const auto it = std::ranges::find(m_shaders, shader);
     if (it == m_shaders.end())
         return;
 

@@ -37,7 +37,7 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source") {
             auto split = stdext::split<std::string>(node->value(), ":");
-            if (split.size() == 0) split.push_back("none");
+            if (split.size() == 0) split.emplace_back("none");
             const bool base64 = split.size() > 1 && split[0] == "base64";
             auto& value = split.size() > 1 ? split[1] : split[0];
 

@@ -28,6 +28,7 @@
 #include "game.h"
 
 #include <framework/core/asyncdispatcher.h>
+#include <algorithm>
 #include <nlohmann/json.hpp>
 
 #include "lzma.h"
@@ -174,7 +175,7 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(const int id, const bool lo
     }
 
     // find sheet
-    const auto sheetIt = std::find_if(m_sheets.begin(), m_sheets.end(), [=](const SpriteSheetPtr& sheet) {
+    const auto sheetIt = std::ranges::find_if(m_sheets, [=](const SpriteSheetPtr& sheet) {
         return id >= sheet->firstId && id <= sheet->lastId;
     });
 
