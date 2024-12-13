@@ -77,7 +77,7 @@ void Client::preLoad() {
     }
 }
 
-void Client::draw(DrawPoolType type)
+void Client::draw(const DrawPoolType type)
 {
     if (!g_game.isOnline()) {
         m_mapWidget = nullptr;
@@ -96,7 +96,7 @@ void Client::draw(DrawPoolType type)
     m_mapWidget->draw(type);
 }
 
-bool Client::canDraw(DrawPoolType type) const
+bool Client::canDraw(const DrawPoolType type) const
 {
     switch (type) {
         case DrawPoolType::FOREGROUND:

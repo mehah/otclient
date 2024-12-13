@@ -41,4 +41,4 @@ struct apng_data
 // returns -1 on error, 0 on success
 int load_apng(std::stringstream& file, apng_data* apng);
 void save_png(std::stringstream& file, uint32_t width, uint32_t height, int channels, uint8_t* pixels);
-void free_apng(apng_data* apng);
+void free_apng(const apng_data* apng);

@@ -25,7 +25,7 @@
 #include <framework/luaengine/luaobject.h>
 #include "declarations.h"
 
-class Server : public LuaObject
+class Server final : public LuaObject
 {
 public:
     Server(int port);

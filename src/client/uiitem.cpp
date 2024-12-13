@@ -26,7 +26,7 @@
 
 UIItem::UIItem() { setProp(PropDraggable, true, false); }
 
-void UIItem::drawSelf(DrawPoolType drawPane)
+void UIItem::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -66,7 +66,7 @@ void UIItem::drawSelf(DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIItem::setItemId(int id)
+void UIItem::setItemId(const int id)
 {
     if (id == 0)
         m_item = nullptr;
@@ -79,7 +79,7 @@ void UIItem::setItemId(int id)
 #endif
 }
 
-void UIItem::setItemCount(int count) 
+void UIItem::setItemCount(const int count) 
 {
     if (m_item) m_item->setCount(count);
 #ifndef BOT_PROTECTION
@@ -87,7 +87,7 @@ void UIItem::setItemCount(int count)
 #endif
 }
 
-void UIItem::setItemSubType(int subType)
+void UIItem::setItemSubType(const int subType)
 { 
     if (m_item) m_item->setSubType(subType); 
 #ifndef BOT_PROTECTION

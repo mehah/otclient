@@ -34,7 +34,7 @@ class FileStream : public std::enable_shared_from_this<FileStream>
 {
 public:
     FileStream(std::string name, PHYSFS_File* fileHandle, bool writeable);
-    FileStream(std::string name, const std::string_view buffer);
+    FileStream(std::string name, std::string_view buffer);
     ~FileStream();
 
     void cache(bool useEnc = false);
@@ -70,14 +70,14 @@ public:
     void add16(int16_t v);
     void add32(int32_t v);
     void add64(int64_t v);
-    void addString(const std::string_view v);
-    void addPos(uint16_t x, uint16_t y, uint8_t z) { addU16(x); addU16(y); addU8(z); }
+    void addString(std::string_view v);
+    void addPos(const uint16_t x, const uint16_t y, const uint8_t z) { addU16(x); addU16(y); addU8(z); }
     void addPoint(const Point& p) { addU8(p.x); addU8(p.y); }
 
     std::vector<uint8_t> m_data;
 
 private:
-    void throwError(const std::string_view message, bool physfsError = false) const;
+    void throwError(std::string_view message, bool physfsError = false) const;
 
     std::string m_name;
     PHYSFS_File* m_fileHandle;

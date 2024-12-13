@@ -71,6 +71,6 @@ namespace stdext
         void clear() { m_data.clear(); }
 
     private:
-        stdext::map<Key, std::any> m_data;
+        map<Key, std::any> m_data;
     };
 }

@@ -45,7 +45,7 @@ class Proxy : public std::enable_shared_from_this<Proxy>
         STATE_CONNECTED
     };
 public:
-    Proxy(asio::io_context& io, const std::string& host, uint16_t port, int priority)
+    Proxy(asio::io_context& io, const std::string& host, const uint16_t port, const int priority)
         : m_io(io), m_timer(io), m_socket(io), m_resolver(io), m_state(STATE_NOT_CONNECTED)
     {
         m_host = host;
@@ -122,7 +122,7 @@ class Session : public std::enable_shared_from_this<Session>
     static constexpr int BUFFER_SIZE = 65535;
     static constexpr int TIMEOUT = 30000;
 public:
-    Session(asio::io_context& io, asio::ip::tcp::socket socket, int port)
+    Session(asio::io_context& io, asio::ip::tcp::socket socket, const int port)
         : m_io(io), m_timer(io), m_socket(std::move(socket))
     {
         m_id = (std::chrono::high_resolution_clock::now().time_since_epoch().count()) & 0xFFFFFFFF;
@@ -131,7 +131,7 @@ public:
         m_useSocket = true;
     }
 
-    Session(asio::io_context& io, int port, std::function<void(ProxyPacketPtr)> recvCallback, std::function<void(std::error_code)> disconnectCallback)
+    Session(asio::io_context& io, const int port, std::function<void(ProxyPacketPtr)> recvCallback, std::function<void(std::error_code)> disconnectCallback)
         : m_io(io), m_timer(io), m_socket(io)
     {
         m_id = (std::chrono::high_resolution_clock::now().time_since_epoch().count()) & 0xFFFFFFFF;

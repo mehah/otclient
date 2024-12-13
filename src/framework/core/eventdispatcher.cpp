@@ -138,7 +138,7 @@ void EventDispatcher::executeEvents() {
     m_eventList.clear();
 }
 
-std::vector<std::pair<uint64_t, uint64_t>> generatePartition(size_t size) {
+std::vector<std::pair<uint64_t, uint64_t>> generatePartition(const size_t size) {
     if (size == 0)
         return {};
 

@@ -2,7 +2,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/platform/platformwindow.h>
 
-void UIGraph::drawSelf(DrawPoolType drawPane)
+void UIGraph::drawSelf(const DrawPoolType drawPane)
 {
 	if (drawPane != DrawPoolType::FOREGROUND)
 		return;
@@ -20,7 +20,7 @@ void UIGraph::drawSelf(DrawPoolType drawPane)
 	}
 
 	if (!m_graphs.empty()) {
-		Rect dest = getPaddingRect();
+		const Rect dest = getPaddingRect();
 
 		// draw graph first 
 		for (auto& graph : m_graphs) {
@@ -48,7 +48,7 @@ void UIGraph::drawSelf(DrawPoolType drawPane)
 				updateGraph(graph, updated);
 				g_drawPool.addAction([line = graph.infoLine, color = graph.infoLineColor] {
 					g_painter->setColor(color);
-					std::vector<float> vertices = {
+					const std::vector vertices = {
 						static_cast<float>(line[0].x), static_cast<float>(line[0].y),
 						static_cast<float>(line[1].x), static_cast<float>(line[1].y)
 					};
@@ -102,7 +102,7 @@ void UIGraph::clear()
 	m_graphs.clear();
 }
 
-void UIGraph::setLineWidth(size_t index, int width) {
+void UIGraph::setLineWidth(const size_t index, const int width) {
 	if (m_graphs.size() <= index - 1) {
 		g_logger.warning(stdext::format("[UIGraph::setLineWidth (%s)] Graph of index %d out of bounds.", getId(), index));
 		return;
@@ -145,7 +145,7 @@ size_t UIGraph::createGraph()
 	return m_graphs.size();
 }
 
-void UIGraph::addValue(size_t index, int value, bool ignoreSmallValues)
+void UIGraph::addValue(const size_t index, const int value, const bool ignoreSmallValues)
 {
 	if (m_graphs.size() <= index - 1) {
 		g_logger.warning(stdext::format(
@@ -176,7 +176,7 @@ void UIGraph::addValue(size_t index, int value, bool ignoreSmallValues)
 	m_needsUpdate = true;
 }
 
-void UIGraph::setLineColor(size_t index, const Color& color)
+void UIGraph::setLineColor(const size_t index, const Color& color)
 {
 	if (m_graphs.size() <= index - 1) {
 		g_logger.warning(stdext::format("[UIGraph::setLineColor (%s)] Graph of index %d out of bounds.", getId(), index));
@@ -187,7 +187,7 @@ void UIGraph::setLineColor(size_t index, const Color& color)
 	graph.lineColor = color;
 }
 
-void UIGraph::setInfoText(size_t index, const std::string& text)
+void UIGraph::setInfoText(const size_t index, const std::string& text)
 {
 	if (m_graphs.size() <= index - 1) {
 		g_logger.warning(stdext::format("[UIGraph::setInfoText (%s)] Graph of index %d out of bounds.", getId(), index));
@@ -198,7 +198,7 @@ void UIGraph::setInfoText(size_t index, const std::string& text)
 	graph.infoText = text;
 }
 
-void UIGraph::setGraphVisible(size_t index, bool visible)
+void UIGraph::setGraphVisible(const size_t index, const bool visible)
 {
 	if (m_graphs.size() <= index - 1) {
 		g_logger.warning(stdext::format("[UIGraph::setGraphVisible (%s)] Graph of index %d out of bounds.", getId(), index));
@@ -209,7 +209,7 @@ void UIGraph::setGraphVisible(size_t index, bool visible)
 	graph.visible = visible;
 }
 
-void UIGraph::setInfoLineColor(size_t index, const Color& color)
+void UIGraph::setInfoLineColor(const size_t index, const Color& color)
 {
 	if (m_graphs.size() <= index - 1) {
 		g_logger.warning(stdext::format("[UIGraph::setInfoLineColor (%s)] Graph of index %d out of bounds.", getId(), index));
@@ -220,7 +220,7 @@ void UIGraph::setInfoLineColor(size_t index, const Color& color)
 	graph.infoLineColor = color;
 }
 
-void UIGraph::setTextBackground(size_t index, const Color& color)
+void UIGraph::setTextBackground(const size_t index, const Color& color)
 {
 	if (m_graphs.size() <= index - 1) {
 		g_logger.warning(stdext::format("[UIGraph::setTextBackground (%s)] Graph of index %d out of bounds.", getId(), index));
@@ -238,12 +238,12 @@ void UIGraph::cacheGraphs()
 
 	if (!m_rect.isEmpty() && m_rect.isValid()) {
 		if (!m_graphs.empty()) {
-			Rect rect = getPaddingRect();
+			const Rect rect = getPaddingRect();
 
-			float paddingX = static_cast<float>(rect.x());
-			float paddingY = static_cast<float>(rect.y());
-			float graphWidth = static_cast<float>(rect.width());
-			float graphHeight = static_cast<float>(rect.height());
+			const float paddingX = static_cast<float>(rect.x());
+			const float paddingY = static_cast<float>(rect.y());
+			const float graphWidth = static_cast<float>(rect.width());
+			const float graphHeight = static_cast<float>(rect.height());
 
 			float minValue = 0.0f;
 			float maxValue = 0.0f;
@@ -260,10 +260,10 @@ void UIGraph::cacheGraphs()
 				if (range == 0.0f)
 					range = 1.0f;
 
-				float pointSpacing = graphWidth / std::max<int>(static_cast<int>(graph.values.size()) - 1, 1);
+				const float pointSpacing = graphWidth / std::max<int>(static_cast<int>(graph.values.size()) - 1, 1);
 				for (size_t i = 0; i < graph.values.size(); ++i) {
-					float x = paddingX + i * pointSpacing;
-					float y = paddingY + graphHeight - ((graph.values[i] - minValue) / range) * graphHeight;
+					const float x = paddingX + i * pointSpacing;
+					const float y = paddingY + graphHeight - ((graph.values[i] - minValue) / range) * graphHeight;
 					graph.points.push_back({ static_cast<int>(x), static_cast<int>(y) });
 				}
 			}
@@ -285,11 +285,11 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
 	if (graph.values.empty())
 		return;
 
-	auto dest = getPaddingRect();
-	auto mousePos = g_window.getMousePosition();
-	float graphWidth = static_cast<float>(dest.width());
-	float graphHeight = static_cast<float>(dest.height());
-	float pointSpacing = graphWidth / std::max<int>(static_cast<int>(graph.values.size()) - 1, 1);
+	const auto dest = getPaddingRect();
+	const auto mousePos = g_window.getMousePosition();
+	const float graphWidth = static_cast<float>(dest.width());
+	const float graphHeight = static_cast<float>(dest.height());
+	const float pointSpacing = graphWidth / std::max<int>(static_cast<int>(graph.values.size()) - 1, 1);
 
 	int dataIndex = static_cast<int>((mousePos.x - dest.left()) / pointSpacing + 0.5f);
 	dataIndex = std::clamp(dataIndex, 0, static_cast<int>(graph.values.size()) - 1);
@@ -297,8 +297,8 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
 	if (graph.infoIndex != dataIndex) {
 		graph.infoIndex = dataIndex;
 
-		float snappedX = dest.left() + dataIndex * pointSpacing;
-		int value = graph.values[graph.infoIndex];
+		const float snappedX = dest.left() + dataIndex * pointSpacing;
+		const int value = graph.values[graph.infoIndex];
 
 		graph.infoLine[0] = Point(snappedX, dest.top());
 		graph.infoLine[1] = Point(snappedX, dest.bottom());
@@ -306,15 +306,15 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
 		graph.infoValue = stdext::format("%s %d", graph.infoText, value);
 
 		auto [minValueIter, maxValueIter] = std::minmax_element(graph.values.begin(), graph.values.end());
-		float minValue = static_cast<float>(*minValueIter);
-		float maxValue = static_cast<float>(*maxValueIter);
+		const float minValue = static_cast<float>(*minValueIter);
+		const float maxValue = static_cast<float>(*maxValueIter);
 		float range = maxValue - minValue;
 		if (range == 0.0f)
 			range = 1.0f;
 
-		float pointY = dest.top() + graphHeight - ((value - minValue) / range) * graphHeight;
+		const float pointY = dest.top() + graphHeight - ((value - minValue) / range) * graphHeight;
 
-		auto textSize = m_font->calculateTextRectSize(graph.infoValue);
+		const auto textSize = m_font->calculateTextRectSize(graph.infoValue);
 		graph.infoRectBg.setWidth(textSize.width() + 16);
 		graph.infoRectBg.setHeight(textSize.height());
 		graph.infoRectBg.expand(4);
@@ -329,7 +329,7 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
 		graph.infoRect.moveRight(graph.infoRectBg.right() - 4);
 		graph.infoRect.moveVerticalCenter(graph.infoRectBg.verticalCenter());
 
-		int iconPadding = graph.infoRectBg.height() - graph.infoRectIcon.width();
+		const int iconPadding = graph.infoRectBg.height() - graph.infoRectIcon.width();
 		graph.infoRectIcon.moveLeft(graph.infoRectBg.left() + (iconPadding / 2.0));
 		graph.infoRectIcon.moveVerticalCenter(graph.infoRectBg.verticalCenter());
 
@@ -344,7 +344,7 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
 
 void UIGraph::updateInfoBoxes()
 {
-	auto dest = getPaddingRect();
+	const auto dest = getPaddingRect();
 	std::vector<Rect> occupiedSpaces(m_graphs.size());
 	for (size_t i = 0; i < m_graphs.size(); ++i) {
 		auto& graph = m_graphs[i];
@@ -421,7 +421,7 @@ void UIGraph::onLayoutUpdate()
 	m_needsUpdate = true;
 }
 
-void UIGraph::onVisibilityChange(bool visible)
+void UIGraph::onVisibilityChange(const bool visible)
 {
 	UIWidget::onVisibilityChange(visible);
 	m_needsUpdate = visible;

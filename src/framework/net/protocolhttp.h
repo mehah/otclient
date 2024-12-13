@@ -66,7 +66,7 @@ public:
     HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
                 const bool& enable_time_out_on_read_write,
                 const std::unordered_map<std::string, std::string>& custom_header,
-                int timeout, bool isJson, bool checkContentLength, const HttpResult_ptr& result, HttpResult_cb callback) :
+                const int timeout, const bool isJson, const bool checkContentLength, const HttpResult_ptr& result, HttpResult_cb callback) :
         m_service(service),
         m_url(url),
         m_agent(agent),
@@ -134,7 +134,7 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 public:
 
     WebsocketSession(asio::io_service& service, const std::string& url, const std::string& agent,
-                     const bool& enable_time_out_on_read_write, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
+                     const bool& enable_time_out_on_read_write, const int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
         m_service(service),
         m_url(url),
         m_agent(agent),
@@ -191,7 +191,7 @@ private:
 class Http
 {
 public:
-    Http() : m_ios(), m_guard(asio::make_work_guard(m_ios)) {}
+    Http() : m_guard(make_work_guard(m_ios)) {}
 
     void init();
     void terminate();
@@ -222,7 +222,7 @@ public:
 
     void addCustomHeader(const std::string& name, const std::string& value) { m_custom_header[name] = value; }
 
-    void setEnableTimeOutOnReadWrite(bool enable_time_out_on_read_write) { m_enable_time_out_on_read_write = enable_time_out_on_read_write; }
+    void setEnableTimeOutOnReadWrite(const bool enable_time_out_on_read_write) { m_enable_time_out_on_read_write = enable_time_out_on_read_write; }
 
 private:
     bool m_working = false;

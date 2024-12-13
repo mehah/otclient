@@ -27,7 +27,7 @@
 #include "minimap.h"
 #include "uimapanchorlayout.h"
 
-void UIMinimap::drawSelf(DrawPoolType drawPane)
+void UIMinimap::drawSelf(const DrawPoolType drawPane)
 {
     UIWidget::drawSelf(drawPane);
     if (drawPane != DrawPoolType::FOREGROUND)
@@ -39,7 +39,7 @@ void UIMinimap::drawSelf(DrawPoolType drawPane)
     g_minimap.draw(getPaddingRect(), m_cameraPosition, m_scale, m_color);
 }
 
-bool UIMinimap::setZoom(int8_t zoom)
+bool UIMinimap::setZoom(const int8_t zoom)
 {
     if (zoom == m_zoom)
         return true;
@@ -112,7 +112,7 @@ Position UIMinimap::getTilePosition(const Point& mousePos)
     return g_minimap.getTilePosition(mousePos, getPaddingRect(), m_cameraPosition, m_scale);
 }
 
-void UIMinimap::anchorPosition(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, Fw::AnchorEdge hookedEdge)
+void UIMinimap::anchorPosition(const UIWidgetPtr& anchoredWidget, const Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, const Fw::AnchorEdge hookedEdge)
 {
     if(!m_layout)
         return;
@@ -142,7 +142,7 @@ void UIMinimap::centerInPosition(const UIWidgetPtr& anchoredWidget, const Positi
     layout->centerInPosition(anchoredWidget, hookedPosition);
 }
 
-void UIMinimap::onZoomChange(int zoom, int oldZoom) { callLuaField("onZoomChange", zoom, oldZoom); }
+void UIMinimap::onZoomChange(const int zoom, const int oldZoom) { callLuaField("onZoomChange", zoom, oldZoom); }
 
 void UIMinimap::onCameraPositionChange(const Position& position, const Position& oldPosition) { callLuaField("onCameraPositionChange", position, oldPosition); }
 

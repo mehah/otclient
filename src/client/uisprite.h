@@ -25,7 +25,7 @@
 #include <framework/ui/uiwidget.h>
 #include "declarations.h"
 
-class UISprite : public UIWidget
+class UISprite final : public UIWidget
 {
 public:
     void drawSelf(DrawPoolType drawPane) override;
@@ -37,12 +37,12 @@ public:
     void setSpriteColor(Color color) { m_spriteColor = color; }
 
     bool isSpriteVisible() const { return m_spriteVisible; }
-    void setSpriteVisible(bool visible) { m_spriteVisible = visible; }
+    void setSpriteVisible(const bool visible) { m_spriteVisible = visible; }
 
     bool hasSprite() { return m_sprite != nullptr; }
 
 protected:
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     TexturePtr m_sprite;
     uint16_t m_spriteId{ 0 };

@@ -49,7 +49,7 @@
 #endif
 #endif
 
-void exitSignalHandler(int sig)
+void exitSignalHandler(const int sig)
 {
     static bool signaled = false;
     switch (sig) {

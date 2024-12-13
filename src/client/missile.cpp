@@ -27,7 +27,7 @@
 #include "tile.h"
 #include <client/client.h>
 
-void Missile::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
+void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())
         return;
@@ -69,7 +69,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     g_dispatcher.scheduleEvent([self = asMissile()] { g_map.removeThing(self); }, m_duration);
 }
 
-void Missile::setDirection(Otc::Direction dir) {
+void Missile::setDirection(const Otc::Direction dir) {
     m_direction = dir;
 
     if (m_direction == Otc::NorthWest) {

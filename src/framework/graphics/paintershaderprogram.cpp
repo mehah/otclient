@@ -109,7 +109,7 @@ void PainterShaderProgram::setColor(const Color& color)
     m_color = color;
 }
 
-void PainterShaderProgram::setOpacity(float opacity)
+void PainterShaderProgram::setOpacity(const float opacity)
 {
     if (m_opacity == opacity)
         return;

@@ -46,7 +46,8 @@ FrameBuffer::~FrameBuffer()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_fbo != 0) {
-        g_mainDispatcher.addEvent([id = m_fbo]() {
+        g_mainDispatcher.addEvent([id = m_fbo]
+        {
             glDeleteFramebuffers(1, &id);
         });
     }
@@ -161,7 +162,7 @@ TexturePtr FrameBuffer::extractTexture() {
     const int width = size.width();
     const int height = size.height();
     const auto& pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels->data());
     internalRelease();
 
     const auto& texture = std::make_shared<Texture>(std::make_shared<Image>(getSize(), 4, pixels->data()));
@@ -187,7 +188,7 @@ void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_
         const int height = size.height();
         const auto& pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
 
-        glReadPixels(x / 3, y / 1.5, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+        glReadPixels(x / 3, y / 1.5, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels->data());
 
         internalRelease();
 

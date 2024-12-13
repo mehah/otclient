@@ -32,7 +32,7 @@ struct InputEvent
         keyboardModifiers = 0;
     }
 
-    void reset(Fw::InputEventType eventType = Fw::NoInputEvent)
+    void reset(const Fw::InputEventType eventType = Fw::NoInputEvent)
     {
         type = eventType;
         wheelDirection = Fw::MouseNoWheel;

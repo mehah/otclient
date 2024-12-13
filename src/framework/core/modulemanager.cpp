@@ -55,7 +55,7 @@ void ModuleManager::discoverModules()
     }
 }
 
-void ModuleManager::autoLoadModules(int maxPriority)
+void ModuleManager::autoLoadModules(const int maxPriority)
 {
     for (const auto& [priority, module] : m_autoLoadModules) {
         if (priority > maxPriority)

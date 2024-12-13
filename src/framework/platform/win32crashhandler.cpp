@@ -42,7 +42,7 @@
 
 #endif
 
-const char* getExceptionName(DWORD exceptionCode)
+const char* getExceptionName(const DWORD exceptionCode)
 {
     switch (exceptionCode) {
         case EXCEPTION_ACCESS_VIOLATION:         return "Access violation";
@@ -128,7 +128,7 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
     GlobalFree(pSym);
 }
 
-LONG CALLBACK ExceptionHandler(LPEXCEPTION_POINTERS e)
+LONG CALLBACK ExceptionHandler(const LPEXCEPTION_POINTERS e)
 {
     // generate crash report
     SymInitialize(GetCurrentProcess(), nullptr, TRUE);

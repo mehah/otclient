@@ -139,7 +139,7 @@ void UIWidget::onTextChange(const std::string_view text, const std::string_view 
 
 void UIWidget::onFontChange(const std::string_view font) { callLuaField("onFontChange", font); }
 
-void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
+void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 {
     std::string _text{ text.data() };
     if (hasProp(PropTextOnlyUpperCase))

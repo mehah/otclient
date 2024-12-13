@@ -26,7 +26,7 @@
 #include "declarations.h"
 
  // @bindclass
-class OutputMessage : public LuaObject
+class OutputMessage final : public LuaObject
 {
 public:
     enum
@@ -45,7 +45,7 @@ public:
     void addU16(uint16_t value);
     void addU32(uint32_t value);
     void addU64(uint64_t value);
-    void addString(const std::string_view buffer);
+    void addString(std::string_view buffer);
     void addPaddingBytes(int bytes, uint8_t byte = 0);
 
     void encryptRsa();
@@ -53,8 +53,8 @@ public:
     uint16_t getWritePos() { return m_writePos; }
     uint16_t getMessageSize() { return m_messageSize; }
 
-    void setWritePos(uint16_t writePos) { m_writePos = writePos; }
-    void setMessageSize(uint16_t messageSize) { m_messageSize = messageSize; }
+    void setWritePos(const uint16_t writePos) { m_writePos = writePos; }
+    void setMessageSize(const uint16_t messageSize) { m_messageSize = messageSize; }
 
 protected:
     uint8_t* getWriteBuffer() { return m_buffer + m_writePos; }

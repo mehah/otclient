@@ -120,7 +120,7 @@ void MapView::drawFloor()
 {
     const auto& cameraPosition = m_posInfo.camera;
 
-    uint32_t flags = Otc::DrawThings;
+    const uint32_t flags = Otc::DrawThings;
 
     for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
         const float fadeLevel = getFadeLevel(z);
@@ -450,7 +450,8 @@ void MapView::updateGeometry(const Size& visibleDimension)
         m_lightView->resize(lightSize, tileSize);
     }
 
-    g_mainDispatcher.addEvent([this, bufferSize]() {
+    g_mainDispatcher.addEvent([this, bufferSize]
+    {
         m_pool->getFrameBuffer()->resize(bufferSize);
     });
 
@@ -536,7 +537,7 @@ void MapView::onMapCenterChange(const Position& /*newPos*/, const Position& /*ol
     requestUpdateVisibleTiles();
 }
 
-void MapView::lockFirstVisibleFloor(uint8_t firstVisibleFloor)
+void MapView::lockFirstVisibleFloor(const uint8_t firstVisibleFloor)
 {
     m_lockedFirstVisibleFloor = firstVisibleFloor;
     requestUpdateVisibleTiles();
@@ -575,7 +576,7 @@ void MapView::setVisibleDimension(const Size& visibleDimension)
     updateGeometry(visibleDimension);
 }
 
-void MapView::setFloorViewMode(FloorViewMode floorViewMode)
+void MapView::setFloorViewMode(const FloorViewMode floorViewMode)
 {
     m_floorViewMode = floorViewMode;
 
@@ -587,7 +588,8 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
-    g_mainDispatcher.addEvent([=, this]() {
+    g_mainDispatcher.addEvent([=, this]
+    {
         m_pool->getFrameBuffer()->setSmooth(mode != ANTIALIASING_DISABLED);
     });
 
@@ -612,7 +614,7 @@ void MapView::setCameraPosition(const Position& pos)
 
 Position MapView::getPosition(const Point& mousePos)
 {
-    auto newMousePos = mousePos * g_window.getDisplayDensity();
+    const auto newMousePos = mousePos * g_window.getDisplayDensity();
     if (!m_posInfo.rect.contains(newMousePos))
         return {};
 
@@ -647,7 +649,7 @@ Position MapView::getPosition(const Point& point, const Size& mapSize)
     return position;
 }
 
-void MapView::move(int32_t x, int32_t y)
+void MapView::move(const int32_t x, const int32_t y)
 {
     m_moveOffset.x += x;
     m_moveOffset.y += y;
@@ -693,7 +695,7 @@ Rect MapView::calcFramebufferSource(const Size& destSize)
     return Rect(drawOffset, srcSize);
 }
 
-uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView) const
+uint8_t MapView::calcFirstVisibleFloor(const bool checkLimitsFloorsView) const
 {
     uint8_t z = g_gameConfig.getMapSeaFloor();
     // return forced first visible floor
@@ -792,7 +794,7 @@ TilePtr MapView::getTopTile(Position tilePos) const
     return nullptr;
 }
 
-void MapView::setShader(const std::string_view name, float fadein, float fadeout)
+void MapView::setShader(const std::string_view name, const float fadein, const float fadeout)
 {
     const auto& shader = g_shaders.getShader(name);
 
@@ -817,7 +819,7 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
     });
 }
 
-void MapView::setDrawLights(bool enable)
+void MapView::setDrawLights(const bool enable)
 {
     m_drawingLight = enable;
 
@@ -877,12 +879,12 @@ void MapView::updateViewportDirectionCache()
 }
 
 Position MapView::getCameraPosition() { return isFollowingCreature() ? m_followingCreature->getPosition() : m_customCameraPosition; }
-std::vector<CreaturePtr> MapView::getSightSpectators(bool multiFloor)
+std::vector<CreaturePtr> MapView::getSightSpectators(const bool multiFloor)
 {
     return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2);
 }
 
-std::vector<CreaturePtr> MapView::getSpectators(bool multiFloor)
+std::vector<CreaturePtr> MapView::getSpectators(const bool multiFloor)
 {
     return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom);
 }

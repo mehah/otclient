@@ -121,7 +121,7 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
         PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 }
 
-void Painter::drawLine(const std::vector<float>& vertex, int size, int width)
+void Painter::drawLine(const std::vector<float>& vertex, const int size, const int width)
 {
     m_drawLineProgram->bind();
     m_drawLineProgram->setTransformMatrix(m_transformMatrix);
@@ -174,7 +174,7 @@ void Painter::clearRect(const Color& color, const Rect& rect)
     setClipRect(oldClipRect);
 }
 
-void Painter::setCompositionMode(CompositionMode compositionMode)
+void Painter::setCompositionMode(const CompositionMode compositionMode)
 {
     if (m_compositionMode == compositionMode)
         return;
@@ -183,7 +183,7 @@ void Painter::setCompositionMode(CompositionMode compositionMode)
     updateGlCompositionMode();
 }
 
-void Painter::setBlendEquation(BlendEquation blendEquation)
+void Painter::setBlendEquation(const BlendEquation blendEquation)
 {
     if (m_blendEquation == blendEquation)
         return;
@@ -216,7 +216,7 @@ void Painter::setTexture(Texture* texture)
     updateGlTexture();
 }
 
-void Painter::setAlphaWriting(bool enable)
+void Painter::setAlphaWriting(const bool enable)
 {
     if (m_alphaWriting == enable)
         return;

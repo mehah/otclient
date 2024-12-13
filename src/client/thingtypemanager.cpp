@@ -214,7 +214,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
     }
 }
 
-const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
+const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category)
 {
     if (category < ThingLastCategory)
         return m_thingTypes[category];
@@ -222,7 +222,7 @@ const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
     throw Exception("invalid thing type category %d", category);
 }
 
-const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory category)
+const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category)
 {
     if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
         g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
@@ -231,7 +231,7 @@ const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory ca
     return m_thingTypes[category][id];
 }
 
-ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
+ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const ThingCategory category)
 {
     ThingTypeList ret;
     for (const auto& type : m_thingTypes[category])

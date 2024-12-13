@@ -244,7 +244,7 @@ struct Imbuement
 
 struct ImbuementSlot
 {
-    ImbuementSlot(uint8_t id) : id(id) { }
+    ImbuementSlot(const uint8_t id) : id(id) { }
 
     uint8_t id;
     std::string name;
@@ -256,7 +256,7 @@ struct ImbuementSlot
 struct ImbuementTrackerItem
 {
     ImbuementTrackerItem() : slot(0) { }
-    ImbuementTrackerItem(uint8_t slot) : slot(slot) { }
+    ImbuementTrackerItem(const uint8_t slot) : slot(slot) { }
 
     uint8_t slot;
     ItemPtr item;
@@ -299,12 +299,12 @@ struct MarketOffer
 struct Light
 {
     Light() = default;
-    Light(uint8_t intensity, uint8_t color) : intensity(intensity), color(color) {}
+    Light(const uint8_t intensity, const uint8_t color) : intensity(intensity), color(color) {}
     uint8_t intensity = 0;
     uint8_t color = 215;
 };
 
-class ThingType : public LuaObject
+class ThingType final : public LuaObject
 {
 public:
     void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
@@ -322,7 +322,7 @@ public:
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
     bool isNull() { return m_null; }
-    bool hasAttr(ThingAttr attr) { return (m_flags & thingAttrToThingFlagAttr(attr)); }
+    bool hasAttr(const ThingAttr attr) { return (m_flags & thingAttrToThingFlagAttr(attr)); }
 
     int getWidth() { return m_size.width(); }
     int getHeight() { return m_size.height(); }
@@ -384,7 +384,7 @@ public:
     bool isTopGroundBorder() { return isGroundBorder() && m_size.dimension() == 4; }
     bool isSingleGround() { return isGround() && isSingleDimension(); }
     bool isSingleGroundBorder() { return isGroundBorder() && isSingleDimension(); }
-    bool isTall(const bool useRealSize = false);
+    bool isTall(bool useRealSize = false);
     bool isSingleDimension() { return m_size.area() == 1; }
 
     bool isGround() { return (m_flags & ThingFlagAttrGround); }

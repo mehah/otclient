@@ -58,7 +58,7 @@ public:
     std::string sha1Encrpyt(const std::string& input);
 
 protected:
-    void sha1Block(uint8_t* block, uint32_t* H);
+    void sha1Block(const uint8_t* block, uint32_t* H);
 
 private:
     std::string _encrypt(const std::string& decrypted_string, bool useMachineUUID);

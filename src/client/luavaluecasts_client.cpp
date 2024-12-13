@@ -49,7 +49,7 @@ int push_luavalue(const Outfit& outfit)
     return 1;
 }
 
-bool luavalue_cast(int index, Outfit& outfit)
+bool luavalue_cast(const int index, Outfit& outfit)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -104,7 +104,7 @@ int push_luavalue(const Position& pos)
     return 1;
 }
 
-bool luavalue_cast(int index, Position& pos)
+bool luavalue_cast(const int index, Position& pos)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -140,7 +140,7 @@ int push_luavalue(const std::vector<NPCData>& data) {
     return 1;
 }
 
-bool luavalue_cast(int index, std::vector<NPCData>& data)
+bool luavalue_cast(const int index, std::vector<NPCData>& data)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -187,7 +187,7 @@ int push_luavalue(const MarketData& data)
     return 1;
 }
 
-bool luavalue_cast(int index, MarketData& data)
+bool luavalue_cast(const int index, MarketData& data)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -219,7 +219,7 @@ int push_luavalue(const Light& light)
     return 1;
 }
 
-bool luavalue_cast(int index, Light& light)
+bool luavalue_cast(const int index, Light& light)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -315,7 +315,7 @@ int push_luavalue(const ImbuementTrackerItem& i)
     return 1;
 }
 
-bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints)
+bool luavalue_cast(const int index, UnjustifiedPoints& unjustifiedPoints)
 {
     if (!g_lua.isTable(index))
         return false;

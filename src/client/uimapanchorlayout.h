@@ -27,10 +27,10 @@
 
 #include <utility>
 
-class UIPositionAnchor : public UIAnchor
+class UIPositionAnchor final : public UIAnchor
 {
 public:
-    UIPositionAnchor(Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, Fw::AnchorEdge hookedEdge) :
+    UIPositionAnchor(const Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, const Fw::AnchorEdge hookedEdge) :
         UIAnchor(anchoredEdge, {}, hookedEdge), m_hookedPosition(hookedPosition)
     {}
 
@@ -41,7 +41,7 @@ private:
     Position m_hookedPosition;
 };
 
-class UIMapAnchorLayout : public UIAnchorLayout
+class UIMapAnchorLayout final : public UIAnchorLayout
 {
 public:
     UIMapAnchorLayout(UIWidgetPtr parentWidget) : UIAnchorLayout(std::move(parentWidget)) {}

@@ -585,7 +585,6 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     break;
                 default:
                     throw Exception("unhandled opcode %d", opcode);
-                    break;
             }
             prevOpcode = opcode;
         }
@@ -861,7 +860,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
             msg->getU32(); // 0
             const uint32_t time = msg->getU32();
             const uint8_t mode = msg->getU8(); //0 = normal, 1 = gift, 2 = refund
-            uint32_t rawAmount = msg->getU32();
+            const uint32_t rawAmount = msg->getU32();
             int32_t amount;
             if (rawAmount > INT32_MAX) {
                 amount = -static_cast<int32_t>(UINT32_MAX - rawAmount + 1);
@@ -1828,7 +1827,6 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
         const auto& creature = g_map.getCreatureById(creatureId);
         if (!creature) {
             g_logger.traceError(stdext::format("ProtocolGame::parseTrappers: could not get creature with id %d", creatureId));
-            continue;
         }
 
         //TODO: set creature as trapper
@@ -2322,7 +2320,6 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
             break;
         default:
             throw Exception("ProtocolGame::parseTalk: unknown message mode %d", mode);
-            break;
     }
 
     const auto& text = msg->getString();
@@ -2476,7 +2473,6 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         }
         case Otc::MessageInvalid:
             throw Exception("ProtocolGame::parseTextMessage: unknown message mode %d", mode);
-            break;
         default:
             break;
     }
@@ -2871,7 +2867,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
         charm.description = msg->getString();
         msg->getU8();
         charm.unlockPrice = msg->getU16();
-        charm.unlocked = static_cast<bool>(msg->getU8() == 1);
+        charm.unlocked = msg->getU8() == 1;
         charm.asignedStatus = false;
         charm.raceId = 0;
         charm.removeRuneCost = 0;
@@ -3096,7 +3092,7 @@ void ProtocolGame::parseCreatureType(const InputMessagePtr& msg)
     creature->setType(type);
 }
 
-void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height)
+void ProtocolGame::setMapDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height)
 {
     int startz;
     int endz;
@@ -3118,7 +3114,7 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, i
     }
 }
 
-int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip)
+int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height, const int offset, int skip)
 {
     for (auto nx = 0; nx < width; ++nx) {
         for (auto ny = 0; ny < height; ++ny) {
@@ -3134,7 +3130,7 @@ int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, int x, int y, 
     return skip;
 }
 
-int ProtocolGame::setTileDescription(const InputMessagePtr& msg, Position position)
+int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position position)
 {
     g_map.cleanTile(position);
 
@@ -3300,9 +3296,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                 creatureType = msg->getU8();
             } else if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId) {
                 creatureType = Proto::CreatureTypePlayer;
-            } else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId) {
-                creatureType = Proto::CreatureTypeMonster;
-            } else {
+            } else
+            {
                 creatureType = Proto::CreatureTypeNpc;
             }
 
@@ -3676,7 +3671,7 @@ void ProtocolGame::parseShowDescription(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
 {
-    uint8_t trackerType = msg->getU8(); // 0x00 para bestiary, 0x01 para boss
+    const uint8_t trackerType = msg->getU8(); // 0x00 para bestiary, 0x01 para boss
 
     const uint8_t size = msg->getU8();
     std::vector<std::tuple<uint16_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t>> trackerData;

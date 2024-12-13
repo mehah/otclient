@@ -103,7 +103,7 @@ namespace this_thread {
      */
     class [[nodiscard]] thread_info_index
     {
-        friend class BS::thread_pool;
+        friend class thread_pool;
 
     public:
         /**
@@ -128,7 +128,7 @@ namespace this_thread {
      */
     class [[nodiscard]] thread_info_pool
     {
-        friend class BS::thread_pool;
+        friend class thread_pool;
 
     public:
         /**

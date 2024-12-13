@@ -26,7 +26,7 @@
 #include <httplib.h>
 #include <framework/luaengine/luaobject.h>
 
-class LoginHttp : public LuaObject
+class LoginHttp final : public LuaObject
 {
 public:
   LoginHttp();

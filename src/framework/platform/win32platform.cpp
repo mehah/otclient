@@ -154,7 +154,7 @@ ticks_t Platform::getFileModificationTime(std::string file)
     return uli.QuadPart;
 }
 
-bool Platform::openUrl(std::string url, bool now)
+bool Platform::openUrl(std::string url, const bool now)
 {
     if (url.find("http://") == std::string::npos && url.find("https://") == std::string::npos)
         url.insert(0, "http://");
@@ -169,10 +169,10 @@ bool Platform::openUrl(std::string url, bool now)
     return true;
 }
 
-bool Platform::openDir(std::string path, bool now)
+bool Platform::openDir(std::string path, const bool now)
 {
     const auto& action = [path] {
-        return reinterpret_cast<size_t>(ShellExecuteW(NULL, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), NULL, SW_SHOWNORMAL)) >= 32;
+        return reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), nullptr, SW_SHOWNORMAL)) >= 32;
     };
 
     if (now) return action();

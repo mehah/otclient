@@ -55,7 +55,8 @@ void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
         ++m_ownerHidden;
 
     if (obj->getDuration() > 0) {
-        g_dispatcher.scheduleEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect = obj]() {
+        g_dispatcher.scheduleEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect = obj]
+        {
             self->detachEffect(effect);
         }, obj->getDuration());
     }
@@ -95,7 +96,7 @@ bool AttachableObject::detachEffectById(uint16_t id)
     return true;
 }
 
-void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect, bool callEvent)
+void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect, const bool callEvent)
 {
     if (effect->isHidedOwner())
         --m_ownerHidden;
@@ -106,7 +107,7 @@ void AttachableObject::onDetachEffect(const AttachedEffectPtr& effect, bool call
         effect->callLuaField("onDetach", attachedObjectToLuaObject());
 }
 
-void AttachableObject::clearAttachedEffects(bool ignoreLuaEvent)
+void AttachableObject::clearAttachedEffects(const bool ignoreLuaEvent)
 {
     if (!hasAttachedEffects()) return;
     for (const auto& e : m_data->attachedEffects)
@@ -117,27 +118,27 @@ void AttachableObject::clearAttachedEffects(bool ignoreLuaEvent)
 void AttachableObject::clearTemporaryAttachedEffects()
 {
     if (!hasAttachedEffects()) return;
-    m_data->attachedEffects.erase(std::remove_if(m_data->attachedEffects.begin(), m_data->attachedEffects.end(),
-                                  [this](const AttachedEffectPtr& obj) {
-        if (!obj->isPermanent()) {
-            onDetachEffect(obj);
-            return true;
-        }
-        return false;
-    }), m_data->attachedEffects.end());
+    std::erase_if(m_data->attachedEffects,
+                  [this](const AttachedEffectPtr& obj) {
+                      if (!obj->isPermanent()) {
+                          onDetachEffect(obj);
+                          return true;
+                      }
+                      return false;
+                  });
 }
 
 void AttachableObject::clearPermanentAttachedEffects()
 {
     if (!hasAttachedEffects()) return;
-    m_data->attachedEffects.erase(std::remove_if(m_data->attachedEffects.begin(), m_data->attachedEffects.end(),
-                                  [this](const AttachedEffectPtr& obj) {
-        if (obj->isPermanent()) {
-            onDetachEffect(obj);
-            return true;
-        }
-        return false;
-    }), m_data->attachedEffects.end());
+    std::erase_if(m_data->attachedEffects,
+                  [this](const AttachedEffectPtr& obj) {
+                      if (obj->isPermanent()) {
+                          onDetachEffect(obj);
+                          return true;
+                      }
+                      return false;
+                  });
 }
 
 AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
@@ -152,13 +153,14 @@ AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
     return *it;
 }
 
-void AttachableObject::drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, bool isOnTop)
+void AttachableObject::drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, const bool isOnTop)
 {
     if (!hasAttachedEffects()) return;
     for (const auto& effect : m_data->attachedEffects) {
         effect->draw(dest, isOnTop, lightView);
         if (effect->getLoop() == 0) {
-            g_dispatcher.addEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect]() {
+            g_dispatcher.addEvent([self = std::static_pointer_cast<AttachableObject>(shared_from_this()), effect]
+            {
                 self->detachEffect(effect);
             });
         }
@@ -262,7 +264,8 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
     getData()->attachedWidgets.emplace_back(widget);
     g_map.addAttachedWidgetToObject(widget, std::static_pointer_cast<AttachableObject>(shared_from_this()));
     widget->callLuaField("onAttached", asLuaObject());
-    widget->addOnDestroyCallback("attached-widget-destroy", [this, widget]() {
+    widget->addOnDestroyCallback("attached-widget-destroy", [this, widget]
+    {
         detachWidget(widget);
     });
 }
@@ -301,12 +304,12 @@ bool AttachableObject::detachWidget(const UIWidgetPtr widget)
     return true;
 }
 
-void AttachableObject::clearAttachedWidgets(bool callEvent)
+void AttachableObject::clearAttachedWidgets(const bool callEvent)
 {
     if (!hasAttachedWidgets()) return;
 
     // keep the same behavior as detachWidget
-    auto oldList = std::move(m_data->attachedWidgets);
+    const auto oldList = std::move(m_data->attachedWidgets);
     m_data->attachedWidgets.clear();
 
     for (const auto& widget : oldList) {

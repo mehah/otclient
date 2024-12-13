@@ -26,11 +26,11 @@
 
 #include <vorbis/vorbisfile.h>
 
-class OggSoundFile : public SoundFile
+class OggSoundFile final : public SoundFile
 {
 public:
     OggSoundFile(const FileStreamPtr& fileStream) : SoundFile(fileStream) { memset(&m_vorbisFile, 0, sizeof(m_vorbisFile)); }
-    ~OggSoundFile() { ov_clear(&m_vorbisFile); }
+    ~OggSoundFile() override { ov_clear(&m_vorbisFile); }
 
     bool prepareOgg();
 

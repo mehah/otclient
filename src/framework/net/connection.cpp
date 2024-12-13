@@ -88,7 +88,7 @@ void Connection::close()
     }
 }
 
-void Connection::connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback)
+void Connection::connect(const std::string_view host, const uint16_t port, const std::function<void()>& connectCallback)
 {
     m_connected = false;
     m_connecting = true;
@@ -121,7 +121,7 @@ void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>:
     });
 }
 
-void Connection::write(uint8_t* buffer, size_t size)
+void Connection::write(const uint8_t* buffer, const size_t size)
 {
     if (!m_connected)
         return;
@@ -167,7 +167,7 @@ void Connection::internal_write()
     });
 }
 
-void Connection::read(uint16_t bytes, const RecvCallback& callback)
+void Connection::read(const uint16_t bytes, const RecvCallback& callback)
 {
     if (!m_connected)
         return;
@@ -291,7 +291,7 @@ void Connection::onWrite(const std::error_code& error, size_t, const std::shared
         handleError(error);
 }
 
-void Connection::onRecv(const std::error_code& error, size_t recvSize)
+void Connection::onRecv(const std::error_code& error, const size_t recvSize)
 {
     m_readTimer.cancel();
     m_activityTimer.restart();

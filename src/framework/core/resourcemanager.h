@@ -90,7 +90,7 @@ public:
     std::string selfChecksum();
     void updateFiles(const std::set<std::string>& files);
     void updateExecutable(std::string fileName);
-    bool launchCorrect(std::vector<std::string>& args);
+    bool launchCorrect(const std::vector<std::string>& args);
     std::string createArchive(const std::unordered_map<std::string, std::string>& files);
     std::unordered_map<std::string, std::string> decompressArchive(std::string dataOrPath);
     std::string decodificateStrings(const std::vector<unsigned char>& bytes);

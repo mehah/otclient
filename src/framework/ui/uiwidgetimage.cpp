@@ -38,7 +38,7 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
         if (node->tag() == "image-source") {
             auto split = stdext::split<std::string>(node->value(), ":");
             if (split.size() == 0) split.push_back("none");
-            bool base64 = split.size() > 1 && split[0] == "base64";
+            const bool base64 = split.size() > 1 && split[0] == "base64";
             auto& value = split.size() > 1 ? split[1] : split[0];
 
             if (value == "" || value == "none") {
@@ -188,7 +188,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
     }
 }
 
-void UIWidget::setImageSource(const std::string_view source, bool base64)
+void UIWidget::setImageSource(const std::string_view source, const bool base64)
 {
     updateImageCache();
 

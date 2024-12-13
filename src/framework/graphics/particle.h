@@ -30,8 +30,8 @@ class Particle
 {
 public:
     Particle(const Point& pos, const Size& startSize, const Size& finalSize, const PointF& velocity,
-                       const PointF& acceleration, float duration, float ignorePhysicsAfter, const std::vector<Color>& colors,
-                       const std::vector<float>& colorsStops, CompositionMode compositionMode, const TexturePtr& texture, const AnimatedTexturePtr& animatedTexture) :
+                       const PointF& acceleration, const float duration, const float ignorePhysicsAfter, const std::vector<Color>& colors,
+                       const std::vector<float>& colorsStops, const CompositionMode compositionMode, const TexturePtr& texture, const AnimatedTexturePtr& animatedTexture) :
         m_colors(colors), m_colorsStops(colorsStops), m_texture(texture), m_animatedTexture(animatedTexture), m_position(PointF(pos.x, pos.y)),
         m_velocity(velocity), m_acceleration(acceleration), m_startSize(startSize), m_finalSize(finalSize),
         m_duration(duration), m_ignorePhysicsAfter(ignorePhysicsAfter), m_compositionMode(compositionMode)

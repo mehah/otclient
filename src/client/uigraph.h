@@ -46,25 +46,25 @@ struct Graph
     bool visible;
 };
 
-class UIGraph : public UIWidget
+class UIGraph final : public UIWidget
 {
 public:
     UIGraph() = default;
 
-    void drawSelf(DrawPoolType drawPane);
+    void drawSelf(DrawPoolType drawPane) override;
 
     void clear();
     size_t createGraph();
     size_t getGraphsCount() { return m_graphs.size(); }
     void addValue(size_t index, int value, bool ignoreSmallValues = false);
 
-    void setCapacity(int capacity) {
+    void setCapacity(const int capacity) {
         m_capacity = capacity;
         m_needsUpdate = true;
     }
     void setTitle(const std::string& title) { m_title = title; }
-    void setShowLabels(bool value) { m_showLabes = value; }
-    void setShowInfo(bool value) { m_showInfo = value; }
+    void setShowLabels(const bool value) { m_showLabes = value; }
+    void setShowInfo(const bool value) { m_showInfo = value; }
 
     void setLineWidth(size_t index, int width);
     void setLineColor(size_t index, const Color& color);
@@ -75,9 +75,9 @@ public:
 
 protected:
     void onStyleApply(const std::string& styleName, const OTMLNodePtr& styleNode);
-    void onGeometryChange(const Rect& oldRect, const Rect& newRect);
-    void onLayoutUpdate();
-    void onVisibilityChange(bool visible);
+    void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
+    void onLayoutUpdate() override;
+    void onVisibilityChange(bool visible) override;
 
     void cacheGraphs();
     void updateGraph(Graph& graph, bool& updated);

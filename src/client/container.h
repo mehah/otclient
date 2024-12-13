@@ -28,14 +28,14 @@
 #include <framework/luaengine/luaobject.h>
 
  // @bindclass
-class Container : public LuaObject
+class Container final : public LuaObject
 {
 public:
 
     ItemPtr getItem(int slot);
     std::deque<ItemPtr> getItems() { return m_items; }
     int getItemsCount() { return m_items.size(); }
-    Position getSlotPosition(int slot) { return { 0xffff, m_id | 0x40, static_cast<uint8_t>(slot) }; }
+    Position getSlotPosition(const int slot) { return { 0xffff, m_id | 0x40, static_cast<uint8_t>(slot) }; }
     int getId() { return m_id; }
     int getCapacity() { return m_capacity; }
     ItemPtr getContainerItem() { return m_containerItem; }
@@ -49,7 +49,7 @@ public:
     ItemPtr findItemById(uint32_t itemId, int subType) const;
 
 protected:
-    Container(uint8_t id, uint8_t capacity, const std::string_view name, const ItemPtr& containerItem, bool hasParent, bool isUnlocked, bool hasPages, uint16_t containerSize, uint16_t firstIndex)
+    Container(const uint8_t id, const uint8_t capacity, const std::string_view name, const ItemPtr& containerItem, const bool hasParent, const bool isUnlocked, const bool hasPages, const uint16_t containerSize, const uint16_t firstIndex)
         :m_id(id), m_capacity(capacity), m_containerItem(containerItem), m_name(name), m_hasParent(hasParent), m_unlocked(isUnlocked), m_hasPages(hasPages), m_size(containerSize), m_firstIndex(firstIndex)
     {}
 

@@ -35,13 +35,13 @@ using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;
 class ProxyManager
 {
 public:
-    ProxyManager() : m_io(), m_guard(asio::make_work_guard(m_io))
+    ProxyManager() : m_guard(make_work_guard(m_io))
     {
     }
     void init();
     void terminate();
     void clear();
-    void setMaxActiveProxies(int value)
+    void setMaxActiveProxies(const int value)
     {
         m_maxActiveProxies = value;
         if (m_maxActiveProxies < 1)

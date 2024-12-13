@@ -54,7 +54,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
         m_texture->setupSize(m_mapSize);
 }
 
-void LightView::addLightSource(const Point& pos, const Light& light, float brightness)
+void LightView::addLightSource(const Point& pos, const Light& light, const float brightness)
 {
     if (!isDark() || light.intensity == 0)
         return;
@@ -82,7 +82,7 @@ void LightView::addLightSource(const Point& pos, const Light& light, float brigh
 
 void LightView::resetShade(const Point& pos)
 {
-    size_t index = (pos.y / m_tileSize) * m_mapSize.width() + (pos.x / m_tileSize);
+    const size_t index = (pos.y / m_tileSize) * m_mapSize.width() + (pos.x / m_tileSize);
     if (index >= m_lightData.tiles.size()) return;
     m_lightData.tiles[index] = m_lightData.lights.size();
 }

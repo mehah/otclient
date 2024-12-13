@@ -26,7 +26,7 @@
 #include "declarations.h"
 #include "item.h"
 
-class UIItem : public UIWidget
+class UIItem final : public UIWidget
 {
 public:
     UIItem();
@@ -35,10 +35,10 @@ public:
     void setItemId(int id);
     void setItemCount(int count);
     void setItemSubType(int subType);
-    void setItemVisible(bool visible) { m_itemVisible = visible; }
+    void setItemVisible(const bool visible) { m_itemVisible = visible; }
     void setItem(const ItemPtr& item);
-    void setShowCount(bool value) { m_alwaysShowCount = value; }
-    void setVirtual(bool virt) { m_virtual = virt; }
+    void setShowCount(const bool value) { m_alwaysShowCount = value; }
+    void setVirtual(const bool virt) { m_virtual = virt; }
     void clearItem() { setItemId(0); }
 
     int getItemId() { return m_item ? m_item->getId() : 0; }
@@ -50,7 +50,7 @@ public:
     bool isItemVisible() { return m_itemVisible; }
 
 protected:
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     ItemPtr m_item;
     bool m_virtual{ false };

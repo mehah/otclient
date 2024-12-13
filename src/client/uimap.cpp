@@ -49,7 +49,7 @@ UIMap::~UIMap()
     g_map.removeMapView(m_mapView);
 }
 
-void UIMap::draw(DrawPoolType drawPane) {
+void UIMap::draw(const DrawPoolType drawPane) {
     if (drawPane == DrawPoolType::MAP) {
         g_drawPool.preDraw(drawPane, [this] {
             m_mapView->drawFloor();
@@ -72,7 +72,7 @@ void UIMap::draw(DrawPoolType drawPane) {
     }
 }
 
-void UIMap::drawSelf(DrawPoolType drawPane)
+void UIMap::drawSelf(const DrawPoolType drawPane)
 {
     UIWidget::drawSelf(drawPane);
 
@@ -81,7 +81,6 @@ void UIMap::drawSelf(DrawPoolType drawPane)
         g_drawPool.addAction([] {glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
         g_drawPool.addAction([] {glEnable(GL_BLEND); });
-        return;
     }
 }
 
@@ -89,7 +88,7 @@ void UIMap::updateMapRect() {
     m_mapView->updateRect(m_mapviewRect);
 }
 
-bool UIMap::setZoom(int zoom)
+bool UIMap::setZoom(const int zoom)
 {
     m_zoom = std::clamp<int>(zoom, m_maxZoomIn, m_maxZoomOut);
     updateVisibleDimension();
@@ -143,7 +142,7 @@ void UIMap::setVisibleDimension(const Size& visibleDimension)
         updateMapSize();
 }
 
-void UIMap::setKeepAspectRatio(bool enable)
+void UIMap::setKeepAspectRatio(const bool enable)
 {
     m_keepAspectRatio = enable;
     if (enable)

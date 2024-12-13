@@ -44,25 +44,25 @@ int Thing::getStackPriority()
 {
     // Bug fix for old versions
     if (g_game.getClientVersion() <= 800 && isSplash())
-        return STACK_PRIORITY::GROUND;
+        return GROUND;
 
     if (isGround())
-        return STACK_PRIORITY::GROUND;
+        return GROUND;
 
     if (isGroundBorder())
-        return STACK_PRIORITY::GROUND_BORDER;
+        return GROUND_BORDER;
 
     if (isOnBottom())
-        return STACK_PRIORITY::ON_BOTTOM;
+        return ON_BOTTOM;
 
     if (isOnTop())
-        return STACK_PRIORITY::ON_TOP;
+        return ON_TOP;
 
     if (isCreature())
-        return STACK_PRIORITY::CREATURE;
+        return CREATURE;
 
     // common items
-    return STACK_PRIORITY::COMMON_ITEMS;
+    return COMMON_ITEMS;
 }
 
 const TilePtr& Thing::getTile()

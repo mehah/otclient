@@ -79,7 +79,7 @@ namespace stdext
     }
 
     template<typename... Args>
-    int snprintf(char* s, size_t maxlen, const char* format)
+    int snprintf(char* s, const size_t maxlen, const char* format)
     {
         std::strncpy(s, format, maxlen);
         s[maxlen - 1] = 0;

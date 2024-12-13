@@ -191,7 +191,7 @@ const std::unordered_map<std::string, EFXEAXREVERBPROPERTIES> EffectPresets{
 
 template <typename T>
 T LoadProcAddress(const char* name) {
-    void const* addr = alGetProcAddress(name);
+    const void* addr = alGetProcAddress(name);
     if (!addr) {
         g_logger.error(stdext::format("Failed to Load Proc Address during SoundEffect ctor for preset : %s", name));
     }
@@ -238,19 +238,18 @@ SoundEffect::SoundEffect(ALCdevice* device) : m_device(device) {
         if (!alGenEffects) {
             g_logger.error(stdext::format("unable to load OpenAl EFX extension"));
             return;
-        } else {
-            auto effects = std::make_unique<ALuint[]>(1);
-            auto slots = std::make_unique<ALuint[]>(1);
-            alGenEffects(1, effects.get());
-            alGenAuxiliaryEffectSlots(1, slots.get());
-            // Check for errors
-            if (alGetError() != AL_NO_ERROR) {
-                g_logger.error("Failed to generate effects or slots");
-                return;
-            }
-            m_effectId = effects[0];
-            m_effectSlot = slots[0];
         }
+        const auto effects = std::make_unique<ALuint[]>(1);
+        const auto slots = std::make_unique<ALuint[]>(1);
+        alGenEffects(1, effects.get());
+        alGenAuxiliaryEffectSlots(1, slots.get());
+        // Check for errors
+        if (alGetError() != AL_NO_ERROR) {
+            g_logger.error("Failed to generate effects or slots");
+            return;
+        }
+        m_effectId = effects[0];
+        m_effectSlot = slots[0];
     }
     assert(alGetError() == AL_NO_ERROR);
 }
@@ -260,14 +259,14 @@ SoundEffect::~SoundEffect()
     if (m_effectId != 0) {
         alDeleteEffects(1, &m_effectId);
         //alDeleteAuxiliaryEffectSlots(1, &m_effectSlot);
-        auto err = alGetError();
+        const auto err = alGetError();
         if (err != AL_NO_ERROR) {
             g_logger.error(stdext::format("error while deleting sound effect: %s", alGetString(err)));
         }
     }
     if (m_effectSlot != 0) {
         alDeleteAuxiliaryEffectSlots(1, &m_effectSlot);
-        auto err = alGetError();
+        const auto err = alGetError();
         if (err != AL_NO_ERROR) {
             g_logger.error(stdext::format("error while deleting sound aux effect slot: %s", alGetString(err)));
         }
@@ -329,18 +328,17 @@ void SoundEffect::loadPreset(const EFXEAXREVERBPROPERTIES& preset)
     }
 
     /* Update effect slot */
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
     assert(alGetError() == AL_NO_ERROR && "Failed to set effect slot");
 }
 
 void SoundEffect::setPreset(const std::string& presetName)
 {
-    auto it = EffectPresets.find(presetName);
+    const auto it = EffectPresets.find(presetName);
     if (it != EffectPresets.end()) {
         loadPreset(it->second);
     } else {
         g_logger.error(stdext::format("Failed to find preset: %s", presetName));
-        return;
     }
 }
 
@@ -350,7 +348,7 @@ void SoundEffect::setReverbDensity(const float density) const {
     } else {
         alEffectf(m_effectId, AL_REVERB_DENSITY, density);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
 void SoundEffect::setReverbDiffusion(const float diffusion) const {
@@ -359,7 +357,7 @@ void SoundEffect::setReverbDiffusion(const float diffusion) const {
     } else {
         alEffectf(m_effectId, AL_REVERB_DIFFUSION, diffusion);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
 void SoundEffect::setReverbGain(const float gain) const {
@@ -368,7 +366,7 @@ void SoundEffect::setReverbGain(const float gain) const {
     } else {
         alEffectf(m_effectId, AL_REVERB_GAIN, gain);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
 void SoundEffect::setReverbGainHF(const float gainHF) const{
@@ -377,7 +375,7 @@ void SoundEffect::setReverbGainHF(const float gainHF) const{
     } else {
         alEffectf(m_effectId, AL_REVERB_GAINHF, gainHF);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
 void SoundEffect::setReverbGainLF(const float gainLF) const {
@@ -392,7 +390,7 @@ void SoundEffect::setReverbDecayTime(const float decayTime) const {
     } else {
         alEffectf(m_effectId, AL_REVERB_DECAY_TIME, decayTime);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
 void SoundEffect::setReverbDecayHfRatio(const float decayHfRatio) const {
@@ -401,7 +399,7 @@ void SoundEffect::setReverbDecayHfRatio(const float decayHfRatio) const {
     } else {
         alEffectf(m_effectId, AL_REVERB_DECAY_HFRATIO, decayHfRatio);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
 void SoundEffect::setReverbDecayLfRatio(const float decayLfRatio) const {
@@ -416,7 +414,7 @@ void SoundEffect::setReverbReflectionsGain(const float reflectionsGain) const {
     } else {
         alEffectf(m_effectId, AL_REVERB_REFLECTIONS_GAIN, reflectionsGain);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
 void SoundEffect::setReverbReflectionsDelay(const float reflectionsDelay) const {
@@ -425,5 +423,5 @@ void SoundEffect::setReverbReflectionsDelay(const float reflectionsDelay) const 
     } else {
         alEffectf(m_effectId, AL_REVERB_REFLECTIONS_DELAY, reflectionsDelay);
     }
-    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, (ALint)m_effectId);
+    alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }

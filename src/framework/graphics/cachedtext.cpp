@@ -48,7 +48,7 @@ void CachedText::update()
     m_textScreenCoords = {};
 }
 
-void CachedText::wrapText(int maxWidth)
+void CachedText::wrapText(const int maxWidth)
 {
     if (!m_font)
         return;

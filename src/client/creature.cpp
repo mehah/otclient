@@ -58,7 +58,7 @@ void Creature::onCreate() {
     callLuaField("onCreate");
 }
 
-void Creature::draw(const Point& dest, bool drawThings, const LightViewPtr& /*lightView*/)
+void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr& /*lightView*/)
 {
     if (!canBeSeen() || !canDraw())
         return;
@@ -105,7 +105,7 @@ void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawAttachedLightEffect(dest + m_walkOffset * g_drawPool.getScaleFactor(), lightView);
 }
 
-void Creature::draw(const Rect& destRect, uint8_t size, bool center)
+void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
 {
     if (!getThingType())
         return;
@@ -127,7 +127,7 @@ void Creature::draw(const Rect& destRect, uint8_t size, bool center)
     } g_drawPool.releaseFrameBuffer(destRect);
 }
 
-void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags)
+void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, const int drawFlags)
 {
     static const Color
         DEFAULT_COLOR(96, 96, 96),
@@ -168,7 +168,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, int
     const int cropSizeText = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? getExactSize() : 12;
     const int cropSizeBackGround = g_gameConfig.isAdjustCreatureInformationBasedCropSize() ? cropSizeText - nameSize.height() : 0;
 
-    bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+    const bool isScaled = g_app.getCreatureInformationScale() != PlatformWindow::DEFAULT_DISPLAY_DENSITY;
     if (isScaled) {
         p.scale(g_app.getCreatureInformationScale());
     }
@@ -255,7 +255,7 @@ void Creature::internalDraw(Point dest, const Color& color)
         m_shader->setUniformValue(ShaderManager::OUTFIT_ID_UNIFORM, id);
     };*/
 
-    bool replaceColorShader = color != Color::white;
+    const bool replaceColorShader = color != Color::white;
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader());
     else
@@ -362,7 +362,7 @@ void Creature::internalDraw(Point dest, const Color& color)
     }
 }
 
-void Creature::turn(Otc::Direction direction)
+void Creature::turn(const Otc::Direction direction)
 {
     // schedules to set the new direction when walk ends
     if (m_walking) {
@@ -413,7 +413,7 @@ void Creature::stopWalk()
     terminateWalk();
 }
 
-void Creature::jump(int height, int duration)
+void Creature::jump(const int height, const int duration)
 {
     if (!m_jumpOffset.isNull())
         return;
@@ -558,7 +558,7 @@ void Creature::updateWalkAnimation()
         return;
 
     int minFootDelay = 20;
-    int maxFootDelay = footAnimPhases > 2 ? 80 : 205;
+    const int maxFootDelay = footAnimPhases > 2 ? 80 : 205;
     int footAnimDelay = footAnimPhases;
 
     if (g_game.getFeature(Otc::GameEnhancedAnimations) && footAnimPhases > 2) {
@@ -578,7 +578,7 @@ void Creature::updateWalkAnimation()
     }
 }
 
-void Creature::updateWalkOffset(uint8_t totalPixelsWalked)
+void Creature::updateWalkOffset(const uint8_t totalPixelsWalked)
 {
     m_walkOffset = {};
     if (m_direction == Otc::North || m_direction == Otc::NorthEast || m_direction == Otc::NorthWest)
@@ -703,7 +703,7 @@ void Creature::terminateWalk()
     }, g_game.getServerBeat());
 }
 
-void Creature::setHealthPercent(uint8_t healthPercent)
+void Creature::setHealthPercent(const uint8_t healthPercent)
 {
     static const Color
         COLOR1(0x00, 0xBC, 0x00),
@@ -737,7 +737,7 @@ void Creature::setHealthPercent(uint8_t healthPercent)
         onDeath();
 }
 
-void Creature::setDirection(Otc::Direction direction)
+void Creature::setDirection(const Otc::Direction direction)
 {
     if (direction == Otc::InvalidDirection)
         return;
@@ -813,7 +813,7 @@ void Creature::setSpeed(uint16_t speed)
     callLuaField("onSpeedChange", m_speed, oldSpeed);
 }
 
-void Creature::setBaseSpeed(uint16_t baseSpeed)
+void Creature::setBaseSpeed(const uint16_t baseSpeed)
 {
     if (m_baseSpeed == baseSpeed)
         return;
@@ -824,18 +824,18 @@ void Creature::setBaseSpeed(uint16_t baseSpeed)
     callLuaField("onBaseSpeedChange", baseSpeed, oldBaseSpeed);
 }
 
-void Creature::setType(uint8_t v) { if (m_type != v) callLuaField("onTypeChange", m_type = v); }
-void Creature::setIcon(uint8_t v) { if (m_icon != v) callLuaField("onIconChange", m_icon = v); }
-void Creature::setSkull(uint8_t v) { if (m_skull != v) callLuaField("onSkullChange", m_skull = v); }
-void Creature::setShield(uint8_t v) { if (m_shield != v) callLuaField("onShieldChange", m_shield = v); }
-void Creature::setEmblem(uint8_t v) { if (m_emblem != v) callLuaField("onEmblemChange", m_emblem = v); }
+void Creature::setType(const uint8_t v) { if (m_type != v) callLuaField("onTypeChange", m_type = v); }
+void Creature::setIcon(const uint8_t v) { if (m_icon != v) callLuaField("onIconChange", m_icon = v); }
+void Creature::setSkull(const uint8_t v) { if (m_skull != v) callLuaField("onSkullChange", m_skull = v); }
+void Creature::setShield(const uint8_t v) { if (m_shield != v) callLuaField("onShieldChange", m_shield = v); }
+void Creature::setEmblem(const uint8_t v) { if (m_emblem != v) callLuaField("onEmblemChange", m_emblem = v); }
 
 void Creature::setTypeTexture(const std::string& filename) { m_typeTexture = g_textures.getTexture(filename); }
 void Creature::setIconTexture(const std::string& filename) { m_iconTexture = g_textures.getTexture(filename); }
 void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
 void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
 
-void Creature::setShieldTexture(const std::string& filename, bool blink)
+void Creature::setShieldTexture(const std::string& filename, const bool blink)
 {
     m_shieldTexture = g_textures.getTexture(filename);
     m_showShieldTexture = true;
@@ -850,7 +850,7 @@ void Creature::setShieldTexture(const std::string& filename, bool blink)
     m_shieldBlink = blink;
 }
 
-void Creature::addTimedSquare(uint8_t color)
+void Creature::addTimedSquare(const uint8_t color)
 {
     m_showTimedSquare = true;
     m_timedSquareColor = Color::from8bit(color != 0 ? color : 1);
@@ -875,7 +875,7 @@ void Creature::updateShield()
         m_showShieldTexture = true;
 }
 
-int getSmoothedElevation(const Creature* creature, int currentElevation, float factor) {
+int getSmoothedElevation(const Creature* creature, const int currentElevation, const float factor) {
     const auto& fromPos = creature->getLastStepFromPosition();
     const auto& toPos = creature->getLastStepToPosition();
     const auto& fromTile = g_map.getTile(fromPos);
@@ -908,7 +908,7 @@ int Creature::getDrawElevation() {
 
 bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw) && speedA != 0 && speedB != 0 && speedC != 0; }
 
-uint16_t Creature::getStepDuration(bool ignoreDiagonal, Otc::Direction dir)
+uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Direction dir)
 {
     if (m_speed < 1)
         return 0;
@@ -1060,7 +1060,7 @@ void Creature::setTypingIconTexture(const std::string& filename)
     m_typingIconTexture = g_textures.getTexture(filename);
 }
 
-void Creature::setTyping(bool typing)
+void Creature::setTyping(const bool typing)
 {
     m_typing = typing;
 }
@@ -1107,7 +1107,7 @@ void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
     }
 }
 
-void Creature::setStaticWalking(uint16_t v) {
+void Creature::setStaticWalking(const uint16_t v) {
     if (m_walkUpdateEvent) {
         m_walkUpdateEvent->cancel();
         m_walkUpdateEvent = nullptr;

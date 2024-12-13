@@ -57,7 +57,7 @@ public:
     struct Device
     {
         Device() {}
-        Device(DeviceType t, OperatingSystem o) : type(t), os(o) {}
+        Device(const DeviceType t, const OperatingSystem o) : type(t), os(o) {}
         DeviceType type{ DeviceUnknown };
         OperatingSystem os{ OsUnknown };
 
@@ -68,8 +68,8 @@ public:
     void processArgs(std::vector<std::string>& args);
     bool spawnProcess(std::string process, const std::vector<std::string>& args);
     int getProcessId();
-    bool isProcessRunning(const std::string_view name);
-    bool killProcess(const std::string_view name);
+    bool isProcessRunning(std::string_view name);
+    bool killProcess(std::string_view name);
     std::string getTempPath();
     std::string getCurrentDir();
     bool copyFile(std::string from, std::string to);
@@ -82,7 +82,7 @@ public:
     double getTotalSystemMemory();
     std::string getOSName();
     Device getDevice() { return m_device; }
-    void setDevice(Device device) { m_device = device; }
+    void setDevice(const Device device) { m_device = device; }
     bool isDesktop() { return m_device.type == Desktop; }
     bool isMobile() {
     #ifndef __EMSCRIPTEN__
@@ -97,17 +97,17 @@ public:
     bool isConsole() { return m_device.type == Console; }
     std::string getDeviceShortName(DeviceType type = DeviceUnknown);
     std::string getOsShortName(OperatingSystem os = OsUnknown);
-    std::string traceback(const std::string_view where, int level = 1, int maxDepth = 32);
+    std::string traceback(std::string_view where, int level = 1, int maxDepth = 32);
     void addKeyListener(std::function<void(const InputEvent&)> /*listener*/) {}
 
-    static Platform::DeviceType getDeviceTypeByName(std::string shortName);
-    static Platform::OperatingSystem getOsByName(std::string shortName);
+    static DeviceType getDeviceTypeByName(std::string shortName);
+    static OperatingSystem getOsByName(std::string shortName);
 
 private:
     Device m_device{ Device(Desktop, Windows) };
 
-    static std::unordered_map<Platform::DeviceType, std::string> m_deviceShortNames;
-    static std::unordered_map<Platform::OperatingSystem, std::string> m_osShortNames;
+    static std::unordered_map<DeviceType, std::string> m_deviceShortNames;
+    static std::unordered_map<OperatingSystem, std::string> m_osShortNames;
 };
 
 extern Platform g_platform;

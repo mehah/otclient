@@ -27,7 +27,7 @@
 #include "thing.h"
 
  // @bindclass
-class Effect : public Thing
+class Effect final : public Thing
 {
 public:
     void draw(const Point& /*dest*/, bool drawThings = true, const LightViewPtr & = nullptr) override;

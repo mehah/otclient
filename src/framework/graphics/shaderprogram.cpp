@@ -149,9 +149,9 @@ std::string ShaderProgram::log() const
 
 int ShaderProgram::getAttributeLocation(const char* name) const { return glGetAttribLocation(m_programId, name); }
 
-void ShaderProgram::bindAttributeLocation(int location, const char* name) const { return glBindAttribLocation(m_programId, location, name); }
+void ShaderProgram::bindAttributeLocation(const int location, const char* name) const { return glBindAttribLocation(m_programId, location, name); }
 
-void ShaderProgram::bindUniformLocation(int location, const char* name)
+void ShaderProgram::bindUniformLocation(const int location, const char* name)
 {
     assert(m_linked);
     assert(location >= 0 && location < MAX_UNIFORM_LOCATIONS);

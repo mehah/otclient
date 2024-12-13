@@ -36,7 +36,7 @@ void UIQrCode::parseCustomStyle(const OTMLNodePtr& styleNode)
     }
 }
 
-void UIQrCode::setCode(const std::string& code, int border)
+void UIQrCode::setCode(const std::string& code, const int border)
 {
     if (code.empty()) {
         m_imageTexture = nullptr;
@@ -45,7 +45,7 @@ void UIQrCode::setCode(const std::string& code, int border)
     }
 
     m_qrCode = code;
-    m_imageTexture = TexturePtr(new Texture(Image::fromQRCode(code, border)));
+    m_imageTexture = std::make_shared<Texture>(Image::fromQRCode(code, border));
 
     if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
         const auto& imageSize = m_imageTexture->getSize();

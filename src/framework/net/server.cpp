@@ -27,7 +27,7 @@
 
 extern asio::io_service g_ioService;
 
-Server::Server(int port)
+Server::Server(const int port)
     : m_acceptor(g_ioService, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
 {}
 

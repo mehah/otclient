@@ -42,7 +42,7 @@ void Particle::render() const
     g_drawPool.addTexturedRect(m_rect, m_texture, m_color);
 }
 
-void Particle::update(float elapsedTime)
+void Particle::update(const float elapsedTime)
 {
     // check if finished
     if (m_duration >= 0 && m_elapsedTime >= m_duration) {
@@ -60,7 +60,7 @@ void Particle::update(float elapsedTime)
     m_elapsedTime += elapsedTime;
 }
 
-void Particle::updatePosition(float elapsedTime)
+void Particle::updatePosition(const float elapsedTime)
 {
     if (m_ignorePhysicsAfter < 0 || m_elapsedTime < m_ignorePhysicsAfter) {
         // update position

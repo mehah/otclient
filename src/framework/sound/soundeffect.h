@@ -25,7 +25,7 @@
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 
-class SoundEffect : public LuaObject
+class SoundEffect final : public LuaObject
 {
 
 public:
@@ -35,16 +35,16 @@ public:
     void init(ALCdevice* device);
 
     void setPreset(const std::string& presetName);
-    void setReverbDensity(const float density) const;
-    void setReverbDiffusion(const float diffusion) const;
-    void setReverbGain(const float gain) const;
-    void setReverbGainHF(const float gainHF) const;
-    void setReverbGainLF(const float gainLF) const;
-    void setReverbDecayTime(const float decayTime) const;
-    void setReverbDecayHfRatio(const float decayHfRatio) const;
-    void setReverbDecayLfRatio(const float decayLfRatio) const;
-    void setReverbReflectionsGain(const float reflectionsGain) const;
-    void setReverbReflectionsDelay(const float reflectionsDelay) const;
+    void setReverbDensity(float density) const;
+    void setReverbDiffusion(float diffusion) const;
+    void setReverbGain(float gain) const;
+    void setReverbGainHF(float gainHF) const;
+    void setReverbGainLF(float gainLF) const;
+    void setReverbDecayTime(float decayTime) const;
+    void setReverbDecayHfRatio(float decayHfRatio) const;
+    void setReverbDecayLfRatio(float decayLfRatio) const;
+    void setReverbReflectionsGain(float reflectionsGain) const;
+    void setReverbReflectionsDelay(float reflectionsDelay) const;
 
 private:
 

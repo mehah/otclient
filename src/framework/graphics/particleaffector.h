@@ -44,7 +44,7 @@ protected:
     float m_elapsedTime{ 0 };
 };
 
-class GravityAffector : public ParticleAffector
+class GravityAffector final : public ParticleAffector
 {
 public:
     void load(const OTMLNodePtr& node) override;
@@ -55,7 +55,7 @@ private:
     float m_gravity{ 0 };
 };
 
-class AttractionAffector : public ParticleAffector
+class AttractionAffector final : public ParticleAffector
 {
 public:
     void load(const OTMLNodePtr& node) override;

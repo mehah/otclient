@@ -33,7 +33,7 @@ namespace stdext
     public:
         exception() = default;
 
-        exception(std::string_view what) : m_what(std::string(what)) {}
+        exception(const std::string_view what) : m_what(std::string(what)) {}
 
         template<typename... Args>
         exception(std::string_view what, const Args&... args) : m_what(stdext::format({ what }, args...)) {}

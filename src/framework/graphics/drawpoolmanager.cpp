@@ -32,7 +32,7 @@ void resetSelectedPool() {
 
 DrawPoolManager g_drawPool;
 
-void DrawPoolManager::init(uint16_t spriteSize)
+void DrawPoolManager::init(const uint16_t spriteSize)
 {
     if (spriteSize != 0)
         m_spriteSize = spriteSize;
@@ -149,7 +149,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
      }, DrawMode::TRIANGLES, condutor);
 }
 
-void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint16_t innerLineWidth, const DrawConductor& condutor) const
+void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, const uint16_t innerLineWidth, const DrawConductor& condutor) const
 {
     if (dest.isEmpty() || innerLineWidth == 0) {
         getCurrentPool()->resetOnlyOnceParameters();
