@@ -522,9 +522,6 @@
     <ClCompile Include="..\src\framework\graphics\hardwarebuffer.cpp">
       <Filter>Source Files\framework\graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\protobuf\appearances.pb.cc">
-      <Filter>Source Files\protobuf</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\client\attachableobject.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
@@ -569,6 +566,12 @@
     </ClCompile>
     <ClCompile Include="..\src\client\uimissile.cpp">
       <Filter>Source Files\client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\proxy\proxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\proxy\proxy_client.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1091,9 +1094,6 @@
     <ClInclude Include="..\src\framework\net\httplogin.h">
       <Filter>Header Files\framework\net</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\util\BS_thread_pool.hpp">
-      <Filter>Header Files\framework\util</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\sound\soundeffect.h">
       <Filter>Header Files\framework\sound</Filter>
     </ClInclude>
@@ -1108,6 +1108,12 @@
     </ClInclude>
     <ClInclude Include="..\src\client\uieffect.h">
       <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\proxy\proxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\proxy\proxy_client.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
