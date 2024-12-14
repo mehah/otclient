@@ -102,7 +102,7 @@ void SoundChannel::setPitch(const float pitch)
 {
     if (m_currentSource)
         m_currentSource->setPitch(pitch);
-    m_pitch = pitch; 
+    m_pitch = pitch;
 }
 
 void SoundChannel::setPosition(const Point& pos)

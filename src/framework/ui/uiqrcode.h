@@ -26,7 +26,7 @@
 
 #include "uiwidget.h"
 
-// @bindclass
+ // @bindclass
 class UIQrCode final : public UIWidget
 {
 public:

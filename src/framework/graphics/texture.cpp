@@ -29,7 +29,7 @@
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 
-// UINT16_MAX = just to avoid conflicts with GL generated ID.
+ // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
 
 Texture::Texture() : m_uniqueId(++UID) { generateHash(); }
@@ -62,8 +62,7 @@ Texture::~Texture()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_id != 0) {
-        g_mainDispatcher.addEvent([id = m_id]
-        {
+        g_mainDispatcher.addEvent([id = m_id] {
             glDeleteTextures(1, &id);
         });
     }

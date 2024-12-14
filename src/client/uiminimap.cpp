@@ -71,7 +71,7 @@ void UIMinimap::setCameraPosition(const Position& pos)
 
     const Position oldPos = m_cameraPosition;
     m_cameraPosition = pos;
-    
+
     if (m_layout)
         m_layout->update();
 
@@ -114,7 +114,7 @@ Position UIMinimap::getTilePosition(const Point& mousePos)
 
 void UIMinimap::anchorPosition(const UIWidgetPtr& anchoredWidget, const Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, const Fw::AnchorEdge hookedEdge)
 {
-    if(!m_layout)
+    if (!m_layout)
         return;
 
     const auto& layout = m_layout->static_self_cast<UIMapAnchorLayout>();
@@ -124,7 +124,7 @@ void UIMinimap::anchorPosition(const UIWidgetPtr& anchoredWidget, const Fw::Anch
 
 void UIMinimap::fillPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition)
 {
-    if(!m_layout)
+    if (!m_layout)
         return;
 
     const auto& layout = m_layout->static_self_cast<UIMapAnchorLayout>();
@@ -134,7 +134,7 @@ void UIMinimap::fillPosition(const UIWidgetPtr& anchoredWidget, const Position& 
 
 void UIMinimap::centerInPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition)
 {
-    if(!m_layout)
+    if (!m_layout)
         return;
 
     const auto& layout = m_layout->static_self_cast<UIMapAnchorLayout>();

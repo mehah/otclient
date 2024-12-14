@@ -32,7 +32,7 @@
 class UILayout : public LuaObject
 {
 public:
-    UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) { }
+    UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) {}
 
     void update();
     void updateLater();

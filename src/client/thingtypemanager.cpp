@@ -100,16 +100,16 @@ bool ThingTypeManager::loadDat(std::string file)
                 const auto& type = std::make_shared<ThingType>();
                 type->unserialize(id, static_cast<ThingCategory>(category), fin);
                 m_thingTypes[category][id] = type;
+            }
         }
-    }
 
         m_datLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
-} catch (const stdext::exception& e) {
-    g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
-    return false;
-}
+    } catch (const stdext::exception& e) {
+        g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
+        return false;
+    }
 }
 
 bool ThingTypeManager::loadOtml(std::string file)
@@ -141,10 +141,10 @@ bool ThingTypeManager::loadOtml(std::string file)
             }
         }
         return true;
-} catch (const std::exception& e) {
-    g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
-    return false;
-}
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
+        return false;
+    }
 }
 
 bool ThingTypeManager::loadAppearances(const std::string& file)

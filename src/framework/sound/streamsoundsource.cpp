@@ -44,9 +44,9 @@ void StreamSoundSource::setFile(std::string filename)
     const SoundFilePtr soundFile = SoundFile::loadSoundFile(filename);
 
     if (!soundFile) {
-		g_logger.error(stdext::format("unable to load sound file '%s'", filename));
-		return;
-	}
+        g_logger.error(stdext::format("unable to load sound file '%s'", filename));
+        return;
+    }
 
     setSoundFile(soundFile);
 }

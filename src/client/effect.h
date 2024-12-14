@@ -26,7 +26,7 @@
 #include <framework/core/timer.h>
 #include <framework/global.h>
 
-// @bindclass
+ // @bindclass
 class Effect final : public Thing
 {
 public:

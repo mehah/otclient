@@ -28,7 +28,7 @@
 #include <framework/util/point.h>
 #include <future>
 
-//@bindsingleton g_sounds
+ //@bindsingleton g_sounds
 class SoundManager
 {
     enum

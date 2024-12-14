@@ -1087,9 +1087,9 @@ void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)
     const uint8_t killsMonthRemaining = msg->getU8();
     const uint8_t skullTime = msg->getU8();
 
-    g_game.setUnjustifiedPoints({ .killsDay= killsDay, .killsDayRemaining= killsDayRemaining, .killsWeek= killsWeek, .killsWeekRemaining=
+    g_game.setUnjustifiedPoints({ .killsDay = killsDay, .killsDayRemaining = killsDayRemaining, .killsWeek = killsWeek, .killsWeekRemaining =
         killsWeekRemaining,
-        .killsMonth= killsMonth, .killsMonthRemaining= killsMonthRemaining, .skullTime= skullTime
+        .killsMonth = killsMonth, .killsMonthRemaining = killsMonthRemaining, .skullTime = skullTime
     });
 }
 
@@ -3299,8 +3299,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                 creatureType = msg->getU8();
             } else if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId) {
                 creatureType = Proto::CreatureTypePlayer;
-            } else
-            {
+            } else {
                 creatureType = Proto::CreatureTypeNpc;
             }
 
@@ -4569,7 +4568,7 @@ PreyMonster ProtocolGame::getPreyMonster(const InputMessagePtr& msg) const
 {
     const auto& name = msg->getString();
     const auto& outfit = getOutfit(msg, false);
-    return { .name= name, .outfit= outfit};
+    return { .name = name, .outfit = outfit };
 }
 
 std::vector<PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& msg)
@@ -4981,8 +4980,8 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     }
 
     g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
-    return { .timestamp= timestamp, .counter= counter, .action= action, .itemId= itemId, .amount= amount, .price= price,
-        .playerName= playerName, .state= state, .var= var
+    return { .timestamp = timestamp, .counter = counter, .action = action, .itemId = itemId, .amount = amount, .price = price,
+        .playerName = playerName, .state = state, .var = var
     };
 }
 
@@ -5003,7 +5002,6 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     }
 
     const uint32_t buyOfferCount = msg->getU32();
-
 
     std::vector<MarketOffer> offers;
 

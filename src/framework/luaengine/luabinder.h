@@ -59,8 +59,8 @@ namespace luabinder
     /// C++ function caller that can push results to lua
     template<typename Ret, typename F, typename... Args>
     int
-    call_fun_and_push_result(const F& f, LuaInterface* lua, const Args&... args)
-    requires (!std::is_void_v<Ret>)
+        call_fun_and_push_result(const F& f, LuaInterface* lua, const Args&... args)
+        requires (!std::is_void_v<Ret>)
     {
         Ret ret = f(args...);
         int numRets = lua->polymorphicPush(ret);
@@ -70,8 +70,8 @@ namespace luabinder
     /// C++ void function caller
     template<typename Ret, typename F, typename... Args>
     int
-    call_fun_and_push_result(const F& f, LuaInterface* /*lua*/, const Args&... args)
-    requires (std::is_void_v<Ret>)
+        call_fun_and_push_result(const F& f, LuaInterface* /*lua*/, const Args&... args)
+        requires (std::is_void_v<Ret>)
     {
         f(args...);
         return 0;
@@ -150,7 +150,7 @@ namespace luabinder
 
     template<typename Lambda>
     LuaCppFunction bind_fun(const Lambda& f)
-    requires (std::is_constructible_v<decltype(&Lambda::operator())>)
+        requires (std::is_constructible_v<decltype(&Lambda::operator())>)
     {
         using F = decltype(&Lambda::operator());
         return bind_lambda_fun<F>::call(f);

@@ -323,7 +323,7 @@ void ProtocolGame::sendMove(const Position& fromPos, const uint16_t thingId, con
     msg->addU16(thingId);
     msg->addU8(stackpos);
     addPosition(msg, toPos);
-    if(g_game.getFeature(Otc::GameCountU16))
+    if (g_game.getFeature(Otc::GameCountU16))
         msg->addU16(count);
     else
         msg->addU8(static_cast<uint8_t>(count));
@@ -857,17 +857,17 @@ void ProtocolGame::sendEditVipGroups(const Otc::GroupsEditInfoType_t action, con
     msg->addU8(Proto::ClientEditVipGroups);
     msg->addU8(action);
     switch (action) {
-        case Otc::VIP_GROUP_ADD: { 
-            msg->addString(groupName); 
+        case Otc::VIP_GROUP_ADD: {
+            msg->addString(groupName);
             break;
         }
-        case Otc::VIP_GROUP_EDIT: { 
+        case Otc::VIP_GROUP_EDIT: {
             msg->addU8(groupId);
             msg->addString(groupName);
             break;
         }
         case Otc::VIP_GROUP_REMOVE: {
-            msg->addU8(groupId); 
+            msg->addU8(groupId);
             break;
         }
         default: {

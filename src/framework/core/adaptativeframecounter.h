@@ -30,7 +30,7 @@
 class AdaptativeFrameCounter
 {
 public:
-    AdaptativeFrameCounter() : m_interval(stdext::millis()) { }
+    AdaptativeFrameCounter() : m_interval(stdext::millis()) {}
 
     void init() { m_timer.restart(); }
     bool update();

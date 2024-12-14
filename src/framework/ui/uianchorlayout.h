@@ -33,7 +33,8 @@ public:
 
     UIAnchor(const Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, const Fw::AnchorEdge hookedEdge) :
         m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::string{ hookedWidgetId })
-    {}
+    {
+    }
 
     Fw::AnchorEdge getAnchoredEdge() const { return m_anchoredEdge; }
     Fw::AnchorEdge getHookedEdge() const { return m_hookedEdge; }

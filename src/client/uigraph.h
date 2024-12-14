@@ -92,7 +92,7 @@ private:
 
     bool m_showLabes{ true };
     bool m_showInfo{ true };
-    bool m_needsUpdate{false};
+    bool m_needsUpdate{ false };
 
     size_t m_capacity = 100;
     size_t m_ignores = 0;

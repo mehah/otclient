@@ -64,7 +64,6 @@ static LPALGETAUXILIARYEFFECTSLOTFV alGetAuxiliaryEffectSlotfv;
 
 // Remove duplicates from the EffectPresets map
 const std::unordered_map<std::string, EFXEAXREVERBPROPERTIES> EffectPresets{
-
     // Basic Standard Presets
     {"generic", EFX_REVERB_PRESET_GENERIC},
     {"paddedCell", EFX_REVERB_PRESET_PADDEDCELL},
@@ -102,7 +101,7 @@ const std::unordered_map<std::string, EFXEAXREVERBPROPERTIES> EffectPresets{
     {"castleCourtyard", EFX_REVERB_PRESET_CASTLE_COURTYARD},
     {"castleAlcove", EFX_REVERB_PRESET_CASTLE_ALCOVE},
 
-    // Factory 
+    // Factory
     {"factoryHall", EFX_REVERB_PRESET_FACTORY_HALL},
     {"factoryShortPassage", EFX_REVERB_PRESET_FACTORY_SHORTPASSAGE},
     {"factoryLongPassage", EFX_REVERB_PRESET_FACTORY_LONGPASSAGE},
@@ -146,29 +145,29 @@ const std::unordered_map<std::string, EFXEAXREVERBPROPERTIES> EffectPresets{
     {"prefabWorkshop", EFX_REVERB_PRESET_PREFAB_WORKSHOP},
     {"prefabSchoolroom", EFX_REVERB_PRESET_PREFAB_SCHOOLROOM},
     {"prefabOutHouse", EFX_REVERB_PRESET_PREFAB_OUTHOUSE},
-	{"prefabCaravan", EFX_REVERB_PRESET_PREFAB_CARAVAN},
+    {"prefabCaravan", EFX_REVERB_PRESET_PREFAB_CARAVAN},
     {"prefabPractiseRoom", EFX_REVERB_PRESET_PREFAB_PRACTISEROOM},
 
     // Dome and Pipes
-	{"domeTomb", EFX_REVERB_PRESET_DOME_TOMB},
-	{"pipeSmall", EFX_REVERB_PRESET_PIPE_SMALL},
+    {"domeTomb", EFX_REVERB_PRESET_DOME_TOMB},
+    {"pipeSmall", EFX_REVERB_PRESET_PIPE_SMALL},
     {"domedSaintPauls", EFX_REVERB_PRESET_DOME_SAINTPAULS},
     {"pipeLongThin", EFX_REVERB_PRESET_PIPE_LONGTHIN},
     {"pipeLarge", EFX_REVERB_PRESET_PIPE_LARGE},
-	{"pipeResonant", EFX_REVERB_PRESET_PIPE_RESONANT},
+    {"pipeResonant", EFX_REVERB_PRESET_PIPE_RESONANT},
 
     // Outdoors
     {"outdoorsBackyard", EFX_REVERB_PRESET_OUTDOORS_BACKYARD},
-	{"outdoorsRollingPlains", EFX_REVERB_PRESET_OUTDOORS_ROLLINGPLAINS},
-	{"outdoorsDeepCanyon", EFX_REVERB_PRESET_OUTDOORS_DEEPCANYON},
-	{"outdoorsCreek", EFX_REVERB_PRESET_OUTDOORS_CREEK},
-	{"outdoorsValley", EFX_REVERB_PRESET_OUTDOORS_VALLEY},
+    {"outdoorsRollingPlains", EFX_REVERB_PRESET_OUTDOORS_ROLLINGPLAINS},
+    {"outdoorsDeepCanyon", EFX_REVERB_PRESET_OUTDOORS_DEEPCANYON},
+    {"outdoorsCreek", EFX_REVERB_PRESET_OUTDOORS_CREEK},
+    {"outdoorsValley", EFX_REVERB_PRESET_OUTDOORS_VALLEY},
 
     // Mood
-	{"moodHeaven", EFX_REVERB_PRESET_MOOD_HEAVEN},
-	{"moodHell", EFX_REVERB_PRESET_MOOD_HELL},
-	{"moodMemory", EFX_REVERB_PRESET_MOOD_MEMORY},
-    
+    {"moodHeaven", EFX_REVERB_PRESET_MOOD_HEAVEN},
+    {"moodHell", EFX_REVERB_PRESET_MOOD_HELL},
+    {"moodMemory", EFX_REVERB_PRESET_MOOD_MEMORY},
+
     // Driving
     {"drivingCommentator", EFX_REVERB_PRESET_DRIVING_COMMENTATOR},
     {"drivingPitGarage", EFX_REVERB_PRESET_DRIVING_PITGARAGE},
@@ -185,8 +184,8 @@ const std::unordered_map<std::string, EFXEAXREVERBPROPERTIES> EffectPresets{
 
     // Misc
     {"dustyRoom", EFX_REVERB_PRESET_DUSTYROOM},
-	{"chapel", EFX_REVERB_PRESET_CHAPEL},
-	{"smallWaterRoom", EFX_REVERB_PRESET_SMALLWATERROOM},
+    {"chapel", EFX_REVERB_PRESET_CHAPEL},
+    {"smallWaterRoom", EFX_REVERB_PRESET_SMALLWATERROOM},
 };
 
 template <typename T>
@@ -201,7 +200,6 @@ T LoadProcAddress(const char* name) {
 #define LOAD_PROC(x) x = LoadProcAddress<decltype(x)>(#x)
 
 void SoundEffect::init(ALCdevice* device) {
-
     m_device = device;
 
     LOAD_PROC(alGenEffects);
@@ -369,7 +367,7 @@ void SoundEffect::setReverbGain(const float gain) const {
     alAuxiliaryEffectSloti(m_effectSlot, AL_EFFECTSLOT_EFFECT, static_cast<ALint>(m_effectId));
 }
 
-void SoundEffect::setReverbGainHF(const float gainHF) const{
+void SoundEffect::setReverbGainHF(const float gainHF) const {
     if (g_sounds.isEaxEnabled()) {
         alEffectf(m_effectId, AL_EAXREVERB_GAINHF, gainHF);
     } else {

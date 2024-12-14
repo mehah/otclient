@@ -625,7 +625,7 @@ namespace qrcodegen {
             return {};
         const int numAlign = version / 7 + 2;
         const int step = (version == 32) ? 26 :
-                             (version * 4 + numAlign * 2 + 1) / (numAlign * 2 - 2) * 2;
+            (version * 4 + numAlign * 2 + 1) / (numAlign * 2 - 2) * 2;
         vector<int> result;
         for (int i = 0, pos = size - 7; i < numAlign - 1; i++, pos -= step)
             result.insert(result.begin(), pos);
@@ -760,7 +760,7 @@ namespace qrcodegen {
     /*---- Class BitBuffer ----*/
 
     BitBuffer::BitBuffer()
-    = default;
+        = default;
 
     void BitBuffer::appendBits(const std::uint32_t val, const int len) {
         if (len < 0 || len > 31 || val >> len != 0)

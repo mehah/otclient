@@ -57,7 +57,6 @@ public:
                         const Size& textBoxSize, Fw::AlignmentFlag align,
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const;
 
-
     /// Calculate glyphs positions to use on render, also calculates textBoxSize if wanted
     const std::vector<Point>& calculateGlyphsPositions(std::string_view text,
                                                        Fw::AlignmentFlag align,

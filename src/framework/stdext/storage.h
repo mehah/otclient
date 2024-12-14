@@ -36,7 +36,7 @@ namespace stdext
         class Hash = phmap::priv::hash_default_hash<T>,
         class Eq = phmap::priv::hash_default_eq<T>,
         class Alloc = phmap::priv::Allocator<T>>
-    using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
+        using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
 
     template<typename T>
     concept OnlyEnum = std::is_enum_v<T>;

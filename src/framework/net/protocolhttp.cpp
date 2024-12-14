@@ -175,8 +175,7 @@ int Http::ws(const std::string& url, int timeout)
         result->operationId = operationId;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
-            g_dispatcher.addEvent([result, type, message]
-            {
+            g_dispatcher.addEvent([result, type, message] {
                 if (type == WebsocketCallbackType::OPEN) {
                     g_lua.callGlobalField("g_http", "onWsOpen", result->operationId, message);
                 } else if (type == WebsocketCallbackType::MESSAGE) {
@@ -394,7 +393,7 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
             async_read(m_ssl, m_response,
                              asio::transfer_at_least(1),
                              [sft = shared_from_this()](
-                             const std::error_code& ec, const size_t bytes) {
+                       const std::error_code& ec, const size_t bytes) {
                 sft->on_read(ec, bytes);
             });
         });
@@ -425,7 +424,7 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
             async_read(m_socket, m_response,
                              asio::transfer_at_least(1),
                              [sft = shared_from_this()](
-                             const std::error_code& ec, const size_t bytes) {
+                       const std::error_code& ec, const size_t bytes) {
                 sft->on_read(ec, bytes);
             });
         });
@@ -438,8 +437,7 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
 
 void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transferred)
 {
-    auto on_done_read = [this]
-    {
+    auto on_done_read = [this] {
         m_timer.cancel();
         const auto& data = m_response.data();
         m_result->response.append(buffers_begin(data), buffers_end(data));
@@ -475,7 +473,7 @@ void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transfer
         async_read(m_ssl, m_response,
                          asio::transfer_at_least(1),
                          [sft = shared_from_this(), on_done_read](
-                         const std::error_code& ec, const size_t bytes) {
+                   const std::error_code& ec, const size_t bytes) {
             if (bytes > 0) {
                 sft->on_read(ec, bytes);
             } else {
@@ -486,7 +484,7 @@ void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transfer
         async_read(m_socket, m_response,
                          asio::transfer_at_least(1),
                          [sft = shared_from_this(), on_done_read](
-                         const std::error_code& ec, const size_t bytes) {
+                   const std::error_code& ec, const size_t bytes) {
             if (bytes > 0) {
                 sft->on_read(ec, bytes);
             } else {
@@ -663,7 +661,7 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t /*bytes
             async_read(m_ssl, m_response,
                              asio::transfer_at_least(1),
                              [sft = shared_from_this()](
-                             const std::error_code& ec, const size_t bytes) {
+                       const std::error_code& ec, const size_t bytes) {
                 sft->on_read(ec, bytes);
             });
         });
@@ -690,7 +688,7 @@ void WebsocketSession::on_request_sent(const std::error_code& ec, size_t /*bytes
             async_read(m_socket, m_response,
                              asio::transfer_at_least(1),
                              [sft = shared_from_this()](
-                             const std::error_code& ec, const size_t bytes) {
+                       const std::error_code& ec, const size_t bytes) {
                 sft->on_read(ec, bytes);
             });
         });
@@ -775,14 +773,14 @@ void WebsocketSession::on_read(const std::error_code& ec, const size_t bytes_tra
         async_read(m_ssl, m_response,
                          asio::transfer_at_least(1),
                          [sft = shared_from_this()](
-                         const std::error_code& ec, const size_t bytes) {
+                   const std::error_code& ec, const size_t bytes) {
             sft->on_read(ec, bytes);
         });
     } else {
         async_read(m_socket, m_response,
                          asio::transfer_at_least(1),
                          [sft = shared_from_this()](
-                         const std::error_code& ec, const size_t bytes) {
+                   const std::error_code& ec, const size_t bytes) {
             sft->on_read(ec, bytes);
         });
     }

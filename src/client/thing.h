@@ -31,7 +31,7 @@
 #include <framework/graphics/drawpool.h>
 #include <framework/luaengine/luaobject.h>
 
-// @bindclass
+ // @bindclass
 #pragma pack(push,1) // disable memory alignment
 class Thing : public AttachableObject
 {
@@ -79,7 +79,7 @@ public:
 
     const MarketData& getMarketData() { return getThingType()->getMarketData(); }
     const std::vector<NPCData>& getNpcSaleData() { return getThingType()->getNpcSaleData(); }
-    int getMeanPrice()  { return getThingType()->getMeanPrice(); }
+    int getMeanPrice() { return getThingType()->getMeanPrice(); }
     const Size& getSize() const { return getThingType()->getSize(); }
 
     int getWidth() const { return getThingType()->getWidth(); }
@@ -225,7 +225,7 @@ protected:
     Color m_highlightColor{ Color::white };
 
     Position m_position;
-    DrawConductor m_drawConductor{ .agroup= false, .order= THIRD};
+    DrawConductor m_drawConductor{ .agroup = false, .order = THIRD };
 
     uint16_t m_clientId{ 0 };
 

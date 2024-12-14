@@ -111,9 +111,9 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
         return;
     }
 
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type= DrawPool::DrawMethodType::UPSIDEDOWN_RECT, .dest=
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::UPSIDEDOWN_RECT, .dest =
                               dest,
-                              .src= src
+                              .src = src
                           }, DrawMode::TRIANGLE_STRIP, condutor);
 }
 
@@ -124,9 +124,9 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
         return;
     }
 
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type= DrawPool::DrawMethodType::REPEATED_RECT, .dest=
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::REPEATED_RECT, .dest =
                               dest,
-                              .src= src
+                              .src = src
                           }, DrawMode::TRIANGLES, condutor);
 }
 
@@ -137,7 +137,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
         return;
     }
 
-    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ .type= DrawPool::DrawMethodType::RECT, .dest= dest}, DrawMode::TRIANGLES, condutor);
+    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::RECT, .dest = dest }, DrawMode::TRIANGLES, condutor);
 }
 
 void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color, const DrawConductor& condutor) const

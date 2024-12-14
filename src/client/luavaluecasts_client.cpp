@@ -396,7 +396,7 @@ int push_luavalue(const BlessDialogData& data) {
         g_lua.rawSeti(i + 1);
     }
     g_lua.setField("logs");
-    
+
     return 1;
 }
 
@@ -749,7 +749,7 @@ int push_luavalue(const BestiaryMonsterData& data) {
     }
 
     return 1;
-}       
+}
 
 int push_luavalue(const CharmData& charm) {
     g_lua.createTable(0, 7);
@@ -971,7 +971,7 @@ int push_luavalue(const BosstiarySlotsData& data) {
         g_lua.rawSeti(i + 1);
     }
     g_lua.setField("bossesUnlockedData");
-        return 1;
+    return 1;
 }
 
 int push_luavalue(const ItemSummary& item) {

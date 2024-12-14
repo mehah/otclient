@@ -122,7 +122,6 @@ void Outfit::resetClothes()
     setAura(0);
     setEffect(0);
     setShader("Outfit - Default");
-
 }
 
 void Outfit::setHead(const uint8_t head) {

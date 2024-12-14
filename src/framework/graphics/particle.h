@@ -34,10 +34,11 @@ public:
                        const std::vector<float>& colorsStops, const CompositionMode compositionMode, TexturePtr texture,
                        AnimatedTexturePtr animatedTexture) :
         m_colors(colors), m_colorsStops(colorsStops), m_texture(std::move(texture)), m_animatedTexture(std::move(
-            animatedTexture)), m_position(PointF(pos.x, pos.y)),
+        animatedTexture)), m_position(PointF(pos.x, pos.y)),
         m_velocity(velocity), m_acceleration(acceleration), m_startSize(startSize), m_finalSize(finalSize),
         m_duration(duration), m_ignorePhysicsAfter(ignorePhysicsAfter), m_compositionMode(compositionMode)
-    {}
+    {
+    }
 
     void render() const;
     void update(float elapsedTime);

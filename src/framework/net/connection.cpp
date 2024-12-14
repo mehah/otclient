@@ -38,7 +38,8 @@ Connection::Connection() :
     m_delayedWriteTimer(g_ioService),
     m_resolver(g_ioService),
     m_socket(g_ioService)
-{}
+{
+}
 
 Connection::~Connection()
 {
@@ -106,7 +107,6 @@ void Connection::connect(const std::string_view host, const uint16_t port, const
         onTimeout(std::move(error));
     });
 }
-
 
 void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>::iterator& endpointIterator)
 {

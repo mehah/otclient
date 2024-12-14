@@ -52,7 +52,8 @@ public:
         ApplicationContext(),
         m_spriteSize(spriteSize),
         m_drawEvents(std::move(drawEvents))
-    {}
+    {
+    }
 
     void setSpriteSize(const uint8_t size) { m_spriteSize = size; }
     uint8_t getSpriteSize() { return m_spriteSize; }

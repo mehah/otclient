@@ -27,7 +27,6 @@
 
 class SoundEffect final : public LuaObject
 {
-
 public:
     explicit SoundEffect(ALCdevice* device);
     ~SoundEffect() override;

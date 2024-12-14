@@ -28,7 +28,8 @@ OTMLParser::OTMLParser(const OTMLDocumentPtr& doc, std::istream& in) :
     currentDepth(0), currentLine(0),
     doc(doc), currentParent(doc), previousNode(nullptr),
     in(in)
-{}
+{
+}
 
 void OTMLParser::parse()
 {

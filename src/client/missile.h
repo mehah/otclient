@@ -26,11 +26,11 @@
 #include <framework/core/timer.h>
 #include <framework/global.h>
 
-// @bindclass
+ // @bindclass
 class Missile final : public Thing
 {
 public:
-    Missile() { m_drawConductor = { .agroup= true, .order= FIFTH}; };
+    Missile() { m_drawConductor = { .agroup = true, .order = FIFTH }; };
     void draw(const Point& dest, bool drawThings = true, const LightViewPtr& lightView = nullptr) override;
 
     void setId(uint32_t id) override;

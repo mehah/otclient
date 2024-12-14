@@ -49,7 +49,7 @@ private:
     uint32_t spriteId = 0;
 };
 
- //@bindsingleton g_sprites
+//@bindsingleton g_sprites
 class SpriteManager
 {
 public:

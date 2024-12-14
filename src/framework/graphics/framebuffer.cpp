@@ -46,8 +46,7 @@ FrameBuffer::~FrameBuffer()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_fbo != 0) {
-        g_mainDispatcher.addEvent([id = m_fbo]
-        {
+        g_mainDispatcher.addEvent([id = m_fbo] {
             glDeleteFramebuffers(1, &id);
         });
     }

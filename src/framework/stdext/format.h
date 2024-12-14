@@ -47,7 +47,9 @@ namespace stdext
     T sprintf_cast(const T& t) requires (std::is_integral_v<T> ||
         std::is_pointer_v<T> ||
         std::is_floating_point_v<T> ||
-        std::is_enum_v<T>) { return t; }
+        std::is_enum_v<T>) {
+        return t;
+    }
 
     inline const char* sprintf_cast(const char* s) { return s; }
     inline const char* sprintf_cast(const std::string_view s) { return s.data(); }

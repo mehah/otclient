@@ -452,8 +452,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
         m_lightView->resize(lightSize, tileSize);
     }
 
-    g_mainDispatcher.addEvent([this, bufferSize]
-    {
+    g_mainDispatcher.addEvent([this, bufferSize] {
         m_pool->getFrameBuffer()->resize(bufferSize);
     });
 
@@ -462,7 +461,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
     const auto right = static_cast<uint8_t>(left + 1);
     const auto bottom = static_cast<uint8_t>(top + 1);
 
-    m_posInfo.awareRange = { .left= left, .top= top, .right= right, .bottom= bottom};
+    m_posInfo.awareRange = { .left = left, .top = top, .right = right, .bottom = bottom };
 
     updateViewportDirectionCache();
     updateViewport();
@@ -590,8 +589,7 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
-    g_mainDispatcher.addEvent([=, this]
-    {
+    g_mainDispatcher.addEvent([=, this] {
         m_pool->getFrameBuffer()->setSmooth(mode != ANTIALIASING_DISABLED);
     });
 

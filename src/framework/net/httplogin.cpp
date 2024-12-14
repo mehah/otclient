@@ -101,7 +101,7 @@ void LoginHttp::httpLogin(const std::string& host, const std::string& path,
                           uint16_t port, const std::string& email,
                           const std::string& password, int request_id,
                           bool httpLogin) {
-#ifndef __EMSCRIPTEN__                        
+#ifndef __EMSCRIPTEN__
     g_asyncDispatcher.detach_task(
         [this, host, path, port, email, password, request_id, httpLogin] {
         httplib::Result result =

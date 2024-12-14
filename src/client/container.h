@@ -51,7 +51,8 @@ public:
 protected:
     Container(const uint8_t id, const uint8_t capacity, const std::string_view name, ItemPtr containerItem, const bool hasParent, const bool isUnlocked, const bool hasPages, const uint16_t containerSize, const uint16_t firstIndex)
         :m_id(id), m_capacity(capacity), m_containerItem(std::move(containerItem)), m_name(name), m_hasParent(hasParent), m_unlocked(isUnlocked), m_hasPages(hasPages), m_size(containerSize), m_firstIndex(firstIndex)
-    {}
+    {
+    }
 
     void onOpen(const ContainerPtr& previousContainer);
     void onClose();

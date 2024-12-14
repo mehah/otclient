@@ -30,7 +30,8 @@ int16_t g_luaThreadId = -1;
 
 LuaObject::LuaObject() :
     m_fieldsTableRef(-1)
-{}
+{
+}
 
 LuaObject::~LuaObject()
 {
