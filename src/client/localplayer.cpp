@@ -349,13 +349,13 @@ void LocalPlayer::setMana(const uint32_t mana, const uint32_t maxMana)
     callLuaField("onManaChange", mana, maxMana, oldMana, oldMaxMana);
 }
 
-void LocalPlayer::setMagicLevel(const uint8_t magicLevel, const uint8_t magicLevelPercent)
+void LocalPlayer::setMagicLevel(const uint16_t magicLevel, const uint16_t magicLevelPercent)
 {
     if (m_magicLevel == magicLevel && m_magicLevelPercent == magicLevelPercent)
         return;
 
-    const uint8_t oldMagicLevel = m_magicLevel;
-    const uint8_t oldMagicLevelPercent = m_magicLevelPercent;
+    const uint16_t oldMagicLevel = m_magicLevel;
+    const uint16_t oldMagicLevelPercent = m_magicLevelPercent;
 
     m_magicLevel = magicLevel;
     m_magicLevelPercent = magicLevelPercent;
@@ -363,12 +363,12 @@ void LocalPlayer::setMagicLevel(const uint8_t magicLevel, const uint8_t magicLev
     callLuaField("onMagicLevelChange", magicLevel, magicLevelPercent, oldMagicLevel, oldMagicLevelPercent);
 }
 
-void LocalPlayer::setBaseMagicLevel(const uint8_t baseMagicLevel)
+void LocalPlayer::setBaseMagicLevel(const uint16_t baseMagicLevel)
 {
     if (m_baseMagicLevel == baseMagicLevel)
         return;
 
-    const uint8_t oldBaseMagicLevel = m_baseMagicLevel;
+    const uint16_t oldBaseMagicLevel = m_baseMagicLevel;
     m_baseMagicLevel = baseMagicLevel;
 
     callLuaField("onBaseMagicLevelChange", baseMagicLevel, oldBaseMagicLevel);

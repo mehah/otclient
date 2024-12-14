@@ -45,8 +45,8 @@ public:
     void setExperience(uint64_t experience);
     void setLevel(uint16_t level, uint8_t levelPercent);
     void setMana(uint32_t mana, uint32_t maxMana);
-    void setMagicLevel(uint8_t magicLevel, uint8_t magicLevelPercent);
-    void setBaseMagicLevel(uint8_t baseMagicLevel);
+    void setMagicLevel(uint16_t magicLevel, uint16_t magicLevelPercent);
+    void setBaseMagicLevel(uint16_t baseMagicLevel);
     void setSoul(uint8_t soul);
     void setStamina(uint16_t stamina);
     void setKnown(const bool known) { m_known = known; }
@@ -65,9 +65,9 @@ public:
     uint32_t getTotalCapacity() { return m_totalCapacity; }
 
     uint8_t getVocation() { return m_vocation; }
-    uint8_t getMagicLevel() { return m_magicLevel; }
-    uint8_t getMagicLevelPercent() { return m_magicLevelPercent; }
-    uint8_t getBaseMagicLevel() { return m_baseMagicLevel; }
+    uint16_t getMagicLevel() { return m_magicLevel; }
+    uint16_t getMagicLevelPercent() { return m_magicLevelPercent; }
+    uint16_t getBaseMagicLevel() { return m_baseMagicLevel; }
     uint8_t getSoul() { return m_soul; }
     uint8_t getLevelPercent() { return m_levelPercent; }
 
@@ -175,9 +175,9 @@ private:
     uint8_t m_levelPercent{ 0 };
     uint32_t m_mana{ 0 };
     uint32_t m_maxMana{ 0 };
-    uint8_t m_magicLevel{ 0 };
-    uint8_t m_magicLevelPercent{ 0 };
-    uint8_t m_baseMagicLevel{ 0 };
+    uint16_t m_magicLevel{ 0 };
+    uint16_t m_magicLevelPercent{ 0 };
+    uint16_t m_baseMagicLevel{ 0 };
     uint8_t m_soul{ 0 };
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
