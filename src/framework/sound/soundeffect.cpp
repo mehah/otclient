@@ -21,18 +21,18 @@
  */
 
 #include "soundeffect.h"
-#include "soundmanager.h"
-#include "soundsource.h"
 #include "declarations.h"
 #include "soundbuffer.h"
 #include "soundfile.h"
+#include "soundmanager.h"
+#include "soundsource.h"
 
 #include "framework/stdext/time.h"
 
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <AL/efx.h>
 #include <AL/efx-presets.h>
+#include <AL/efx.h>
 
 #include <unordered_map>
 

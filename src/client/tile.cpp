@@ -29,17 +29,17 @@
 
 #include <ranges>
 
-#include <algorithm>
 #include "client.h"
 #include "effect.h"
 #include "game.h"
 #include "item.h"
 #include "lightview.h"
+#include "localplayer.h"
 #include "map.h"
-#include "uimap.h"
 #include "protocolgame.h"
 #include "statictext.h"
-#include "localplayer.h"
+#include "uimap.h"
+#include <algorithm>
 
 Tile::Tile(const Position& position) : m_position(position) {}
 

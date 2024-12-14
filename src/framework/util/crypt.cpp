@@ -21,9 +21,9 @@
  */
 
 #include "crypt.h"
+#include "framework/core/application.h"
 #include <framework/core/logger.h>
 #include <framework/core/resourcemanager.h>
-#include "framework/core/application.h"
 #include <framework/platform/platform.h>
 #include <framework/stdext/math.h>
 

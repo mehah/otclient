@@ -23,8 +23,8 @@
 #pragma once
 
 #include <asio/io_service.hpp>
-#include <asio/write.hpp>
 #include <asio/ip/tcp.hpp>
+#include <asio/write.hpp>
 #include <framework/global.h>
 
 class InputMessage;

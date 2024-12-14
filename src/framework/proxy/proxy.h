@@ -23,8 +23,8 @@
 #pragma once
 
 #include <asio.hpp>
-#include <map>
 #include <list>
+#include <map>
 
 class Proxy;
 class Session;

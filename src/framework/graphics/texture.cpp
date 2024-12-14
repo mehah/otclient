@@ -25,11 +25,11 @@
 #include "graphics.h"
 #include "image.h"
 
+#include "framework/stdext/math.h"
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
-#include "framework/stdext/math.h"
 
- // UINT16_MAX = just to avoid conflicts with GL generated ID.
+// UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
 
 Texture::Texture() : m_uniqueId(++UID) { generateHash(); }

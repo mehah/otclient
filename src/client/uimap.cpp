@@ -21,13 +21,13 @@
  */
 
 #include "uimap.h"
+#include "game.h"
+#include "map.h"
+#include "mapview.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
-#include "game.h"
-#include "map.h"
-#include "mapview.h"
 
 UIMap::UIMap()
 {

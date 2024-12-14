@@ -22,8 +22,8 @@
 
 #include "painter.h"
 
-#include <framework/platform/platformwindow.h>
 #include "framework/graphics/texture.h"
+#include <framework/platform/platformwindow.h>
 
 #include "shader/shadersources.h"
 

@@ -22,19 +22,19 @@
 
 #include "client.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "map.h"
-#include "uimap.h"
 #include "minimap.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
-#include "gameconfig.h"
+#include "uimap.h"
 
-#include <framework/ui/ui.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
-#include <framework/graphics/shadermanager.h>
 #include <framework/graphics/image.h>
+#include <framework/graphics/shadermanager.h>
+#include <framework/ui/ui.h>
 
 Client g_client;
 

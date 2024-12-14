@@ -23,9 +23,9 @@
 #include "soundmanager.h"
 #include "combinedsoundsource.h"
 #include "soundbuffer.h"
+#include "soundeffect.h"
 #include "soundfile.h"
 #include "streamsoundsource.h"
-#include "soundeffect.h"
 
 #include <cstdint>
 #include <framework/core/asyncdispatcher.h>

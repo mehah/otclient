@@ -25,10 +25,10 @@
 #include "texture.h"
 
 #include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
-#include <framework/graphics/image.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/image.h>
 #include <framework/platform/platformwindow.h>
 
 uint32_t FrameBuffer::boundFbo = 0;

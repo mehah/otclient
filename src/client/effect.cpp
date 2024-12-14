@@ -21,11 +21,11 @@
  */
 
 #include "effect.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
 #include "game.h"
 #include "map.h"
 #include <client/client.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 
 void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {

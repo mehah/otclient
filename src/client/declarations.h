@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include "global.h"
 #include <framework/net/declarations.h>
 #include <framework/ui/declarations.h>
-#include "global.h"
 
- // core
+// core
 class Map;
 class Game;
 class MapView;

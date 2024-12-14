@@ -26,17 +26,17 @@
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
+#include "statictext.h"
 #include "thingtypemanager.h"
 #include "tile.h"
-#include "statictext.h"
 
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
-#include <framework/graphics/texturemanager.h>
 #include <framework/graphics/shadermanager.h>
+#include <framework/graphics/texturemanager.h>
 #include <framework/ui/uiwidget.h>
 
 double Creature::speedA = 0;

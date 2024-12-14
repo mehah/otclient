@@ -25,11 +25,11 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/modulemanager.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
-#include <framework/core/modulemanager.h>
 
 #include <algorithm>
 

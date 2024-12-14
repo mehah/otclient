@@ -31,8 +31,8 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otmlnode.h>
 
-#include "framework/graphics/texture.h"
 #include "framework/graphics/drawpool.h"
+#include "framework/graphics/texture.h"
 
 template<typename T = int>
 struct EdgeGroup

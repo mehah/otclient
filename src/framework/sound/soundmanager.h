@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include <future>
 #include "declarations.h"
 #include "soundchannel.h"
 #include "soundsource.h"
 #include <framework/util/point.h>
+#include <future>
 
- //@bindsingleton g_sounds
+//@bindsingleton g_sounds
 class SoundManager
 {
     enum

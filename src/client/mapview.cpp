@@ -23,6 +23,7 @@
 #include "mapview.h"
 
 #include "animatedtext.h"
+#include "client.h"
 #include "creature.h"
 #include "game.h"
 #include "lightview.h"
@@ -30,14 +31,13 @@
 #include "missile.h"
 #include "statictext.h"
 #include "tile.h"
-#include "client.h"
 
+#include "framework/graphics/texturemanager.h"
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
-#include "framework/graphics/texturemanager.h"
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
 

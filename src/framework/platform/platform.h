@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include <framework/core/inputevent.h>
+#include <framework/stdext/storage.h>
+#include <framework/stdext/types.h>
 #include <string>
 #include <vector>
-#include <framework/core/inputevent.h>
-#include <framework/stdext/types.h>
-#include <framework/stdext/storage.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>

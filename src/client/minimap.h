@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include <framework/graphics/declarations.h>
 #include "declarations.h"
 #include "gameconfig.h"
+#include <framework/graphics/declarations.h>
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;

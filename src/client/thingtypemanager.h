@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/global.h>
 #include "thingtype.h"
+#include <framework/global.h>
 
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"

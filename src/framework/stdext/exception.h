@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include "format.h"
 #include <exception>
 #include <string>
-#include "format.h"
 
 namespace stdext
 {

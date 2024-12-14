@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include "point.h"
 #include "../const.h"
+#include "point.h"
 
 template<class T>
 class TSize

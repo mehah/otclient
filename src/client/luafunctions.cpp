@@ -22,6 +22,7 @@
 
 #include "animatedtext.h"
 #include "attachedeffect.h"
+#include "attachedeffectmanager.h"
 #include "client.h"
 #include "container.h"
 #include "creature.h"
@@ -37,7 +38,6 @@
 #include "outfit.h"
 #include "player.h"
 #include "protocolgame.h"
-#include "attachedeffectmanager.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
 #include "statictext.h"
@@ -45,17 +45,17 @@
 #include "tile.h"
 #include "towns.h"
 #include "uicreature.h"
-#include "uiitem.h"
 #include "uieffect.h"
+#include "uiitem.h"
 #include "uimissile.h"
 
+#include "attachableobject.h"
+#include "uigraph.h"
 #include "uimap.h"
 #include "uimapanchorlayout.h"
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
-#include "uigraph.h"
-#include "attachableobject.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"

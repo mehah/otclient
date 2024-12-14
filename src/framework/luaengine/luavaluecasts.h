@@ -24,9 +24,9 @@
 
  // this file is and must be included only from luainterface.h
 
+#include "declarations.h"
 #include <framework/otml/declarations.h>
 #include <framework/platform/platform.h>
-#include "declarations.h"
 
 #include <set>
 

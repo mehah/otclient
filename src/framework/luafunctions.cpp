@@ -34,12 +34,12 @@
 #include <framework/util/crypt.h>
 
 #ifdef FRAMEWORK_GRAPHICS
-#include "framework/graphics/particleeffect.h"
-#include "framework/graphics/texturemanager.h"
 #include "framework/graphics/fontmanager.h"
 #include "framework/graphics/graphics.h"
+#include "framework/graphics/particleeffect.h"
 #include "framework/graphics/particlemanager.h"
 #include "framework/graphics/shadermanager.h"
+#include "framework/graphics/texturemanager.h"
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
@@ -48,16 +48,16 @@
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/combinedsoundsource.h>
 #include <framework/sound/soundchannel.h>
+#include <framework/sound/soundeffect.h>
 #include <framework/sound/soundmanager.h>
 #include <framework/sound/soundsource.h>
 #include <framework/sound/streamsoundsource.h>
-#include <framework/sound/soundeffect.h>
 #endif
 
 #ifdef FRAMEWORK_NET
+#include <framework/net/httplogin.h>
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
-#include <framework/net/httplogin.h>
 #include <framework/net/server.h>
 #endif
 

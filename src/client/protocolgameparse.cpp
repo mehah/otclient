@@ -25,7 +25,7 @@
 #include "effect.h"
 #include "framework/net/inputmessage.h"
 
-#include <framework/core/eventdispatcher.h>
+#include "attachedeffectmanager.h"
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
@@ -33,9 +33,9 @@
 #include "missile.h"
 #include "statictext.h"
 #include "thingtypemanager.h"
-#include "attachedeffectmanager.h"
 #include "tile.h"
 #include <ctime>
+#include <framework/core/eventdispatcher.h>
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {

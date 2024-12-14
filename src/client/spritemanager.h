@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <framework/core/declarations.h>
-#include <framework/graphics/declarations.h>
 #include "gameconfig.h"
+#include <framework/core/declarations.h>
 #include <framework/core/filestream.h>
+#include <framework/graphics/declarations.h>
 
 class FileMetadata
 {

@@ -21,13 +21,13 @@
  */
 
 #include "attachableobject.h"
-#include <framework/graphics/particlemanager.h>
 #include <framework/graphics/particleeffect.h>
+#include <framework/graphics/particlemanager.h>
 
 #include <framework/core/eventdispatcher.h>
-#include <framework/ui/uiwidget.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/ui/uimanager.h>
+#include <framework/ui/uiwidget.h>
 
 #include <algorithm>
 

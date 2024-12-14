@@ -25,9 +25,9 @@
 
 #include <framework/core/application.h>
 
-#include <utility>
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
+#include <utility>
 
 asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;

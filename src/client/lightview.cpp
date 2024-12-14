@@ -25,8 +25,8 @@
 #include "mapview.h"
 #include "spritemanager.h"
 
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
 LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {

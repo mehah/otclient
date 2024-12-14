@@ -23,8 +23,8 @@
 #include "eventdispatcher.h"
 #include "asyncdispatcher.h"
 
-#include <framework/core/clock.h>
 #include "timer.h"
+#include <framework/core/clock.h>
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 int16_t g_mainThreadId = stdext::getThreadId();

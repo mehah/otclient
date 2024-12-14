@@ -30,8 +30,8 @@
 #include "creatures.h"
 #endif
 
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/binarytree.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>

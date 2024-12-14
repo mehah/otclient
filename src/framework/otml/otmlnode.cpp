@@ -22,8 +22,8 @@
 
 #include "otmlnode.h"
 
-#include <algorithm>
 #include "otmlemitter.h"
+#include <algorithm>
 
 OTMLNodePtr OTMLNode::create(const std::string_view tag, const bool unique)
 {

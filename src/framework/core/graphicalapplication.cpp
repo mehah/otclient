@@ -23,20 +23,20 @@
 #include "graphicalapplication.h"
 #include "garbagecollection.h"
 
+#include "framework/stdext/time.h"
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
+#include <framework/graphics/image.h>
 #include <framework/graphics/particlemanager.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/input/mouse.h>
 #include <framework/platform/platformwindow.h>
 #include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
-#include "framework/stdext/time.h"
-#include <framework/graphics/image.h>
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>

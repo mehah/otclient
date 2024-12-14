@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <bitset>
-#include <framework/core/timer.h>
 #include "animatedtext.h"
 #include "container.h"
 #include "creature.h"
@@ -31,6 +29,8 @@
 #include "item.h"
 #include "outfit.h"
 #include "protocolgame.h"
+#include <bitset>
+#include <framework/core/timer.h>
 
 struct UnjustifiedPoints
 {

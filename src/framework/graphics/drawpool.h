@@ -26,10 +26,10 @@
 
 #include "declarations.h"
 #include "framebuffer.h"
-#include "texture.h"
 #include "framework/core/timer.h"
-#include <framework/platform/platformwindow.h>
+#include "texture.h"
 #include <framework/core/graphicalapplication.h>
+#include <framework/platform/platformwindow.h>
 
 #include "../stdext/storage.h"
 #include <unordered_set>

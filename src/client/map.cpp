@@ -30,11 +30,11 @@
 #include "statictext.h"
 #include "tile.h"
 
-#include <framework/core/asyncdispatcher.h>
-#include <framework/core/graphicalapplication.h>
-#include <framework/core/eventdispatcher.h>
-#include <framework/ui/uiwidget.h>
 #include <algorithm>
+#include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
+#include <framework/ui/uiwidget.h>
 #include <queue>
 
 #ifdef FRAMEWORK_EDITOR

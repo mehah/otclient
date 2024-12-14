@@ -24,10 +24,10 @@
 
 #include "declarations.h"
 
-#include <framework/otml/declarations.h>
 #include <framework/graphics/bitmapfont.h>
+#include <framework/otml/declarations.h>
 
- // @bindclass
+// @bindclass
 class GameConfig
 {
 public:

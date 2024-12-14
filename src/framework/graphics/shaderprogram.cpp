@@ -24,8 +24,8 @@
 #include "graphics.h"
 
 #include <framework/core/application.h>
-#include <framework/stdext/hash.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/stdext/hash.h>
 
 #include <algorithm>
 

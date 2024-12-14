@@ -23,8 +23,8 @@
 #ifdef WIN32
 
 #include "platform.h"
-#include <framework/stdext/stdext.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/stdext/stdext.h>
 #include <tchar.h>
 
 #ifdef NDEBUG

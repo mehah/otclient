@@ -23,15 +23,15 @@
 #include "thingtype.h"
 #include "game.h"
 #include "lightview.h"
+#include "localplayer.h"
 #include "map.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
-#include "localplayer.h"
 
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
-#include <framework/core/graphicalapplication.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>

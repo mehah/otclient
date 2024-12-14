@@ -39,18 +39,18 @@
 #include <iostream>
 #include <list>
 #include <map>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <tuple>
 #include <typeinfo>
-#include <vector>
 #include <unordered_map>
-#include <map>
+#include <vector>
 
-#include <parallel_hashmap/phmap.h>
 #include <parallel_hashmap/btree.h>
+#include <parallel_hashmap/phmap.h>
 #include <pugixml.hpp>
 
 using namespace std::literals;

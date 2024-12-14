@@ -21,8 +21,8 @@
  */
 
 #include "filestream.h"
-#include <framework/core/application.h>
 #include "binarytree.h"
+#include <framework/core/application.h>
 
 #include <physfs.h>
 

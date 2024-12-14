@@ -24,8 +24,8 @@
 #include "resourcemanager.h"
 
 #include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/otml/otml.h>
 
 #include <algorithm>

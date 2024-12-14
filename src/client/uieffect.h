@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "effect.h"
+#include <framework/ui/uiwidget.h>
 
 class UIEffect final : public UIWidget
 {

@@ -24,13 +24,13 @@
 
 #include <framework/luaengine/luaobject.h>
 
-#include <algorithm>
+#include "attachableobject.h"
 #include "declarations.h"
 #include "effect.h"
 #include "item.h"
 #include "mapview.h"
-#include "attachableobject.h"
 #include "statictext.h"
+#include <algorithm>
 
 #ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t

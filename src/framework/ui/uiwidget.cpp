@@ -35,9 +35,9 @@
 
 #include <ranges>
 
-#include <ranges>
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
+#include <ranges>
 
 UIWidget::UIWidget()
 {

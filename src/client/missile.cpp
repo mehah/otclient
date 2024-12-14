@@ -21,11 +21,11 @@
  */
 
 #include "missile.h"
-#include <framework/core/eventdispatcher.h>
 #include "map.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include <client/client.h>
+#include <framework/core/eventdispatcher.h>
 
 void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {

@@ -23,8 +23,8 @@
 #include "uiverticallayout.h"
 #include <framework/core/eventdispatcher.h>
 
-#include <ranges>
 #include "uiwidget.h"
+#include <ranges>
 
 void UIVerticalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {

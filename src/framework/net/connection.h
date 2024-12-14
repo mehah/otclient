@@ -25,8 +25,8 @@
 
 #include <asio/streambuf.hpp>
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
+#include <framework/luaengine/luaobject.h>
 
 class Connection final : public LuaObject
 {

@@ -21,15 +21,15 @@
  */
 
 #include "spritemanager.h"
-#include <framework/core/filestream.h>
+#include "game.h"
+#include "gameconfig.h"
+#include "spriteappearances.h"
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/core/filestream.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
-#include "game.h"
-#include "spriteappearances.h"
-#include <framework/core/graphicalapplication.h>
-#include "gameconfig.h"
 
 SpriteManager g_sprites;
 

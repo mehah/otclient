@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "missile.h"
+#include <framework/ui/uiwidget.h>
 
 class UIMissile final : public UIWidget
 {
