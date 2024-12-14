@@ -23,7 +23,7 @@
 #include "coordsbuffer.h"
 #include "graphics.h"
 
-void CoordsBuffer::addBoudingRect(const Rect& dest, int innerLineWidth)
+void CoordsBuffer::addBoudingRect(const Rect& dest, const int innerLineWidth)
 {
     const int left = dest.left();
     const int right = dest.right();

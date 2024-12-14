@@ -22,19 +22,19 @@
 
 #include "client.h"
 #include "game.h"
+#include "gameconfig.h"
 #include "map.h"
-#include "uimap.h"
 #include "minimap.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
-#include "gameconfig.h"
+#include "uimap.h"
 
-#include <framework/ui/ui.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
-#include <framework/graphics/shadermanager.h>
 #include <framework/graphics/image.h>
+#include <framework/graphics/shadermanager.h>
+#include <framework/ui/ui.h>
 
 Client g_client;
 
@@ -77,7 +77,7 @@ void Client::preLoad() {
     }
 }
 
-void Client::draw(DrawPoolType type)
+void Client::draw(const DrawPoolType type)
 {
     if (!g_game.isOnline()) {
         m_mapWidget = nullptr;
@@ -96,7 +96,7 @@ void Client::draw(DrawPoolType type)
     m_mapWidget->draw(type);
 }
 
-bool Client::canDraw(DrawPoolType type) const
+bool Client::canDraw(const DrawPoolType type) const
 {
     switch (type) {
         case DrawPoolType::FOREGROUND:

@@ -23,13 +23,13 @@
 #include "luaexception.h"
 #include "luainterface.h"
 
-LuaException::LuaException(const std::string_view error, int traceLevel)
+LuaException::LuaException(const std::string_view error, const int traceLevel)
 {
     g_lua.clearStack(); // on every exception, clear lua stack
     generateLuaErrorMessage(error, traceLevel);
 }
 
-void LuaException::generateLuaErrorMessage(const std::string_view error, int traceLevel)
+void LuaException::generateLuaErrorMessage(const std::string_view error, const int traceLevel)
 {
     // append trace level to error message
     if (traceLevel >= 0)
@@ -38,7 +38,7 @@ void LuaException::generateLuaErrorMessage(const std::string_view error, int tra
         m_what = stdext::format("LUA ERROR:\n%s", error);
 }
 
-LuaBadNumberOfArgumentsException::LuaBadNumberOfArgumentsException(int expected, int got)
+LuaBadNumberOfArgumentsException::LuaBadNumberOfArgumentsException(const int expected, const int got)
 {
     std::string error = "attempt to call a function with wrong number of arguments";
     if (expected >= 0 && got >= 0)

@@ -24,14 +24,14 @@
 
 #include <framework/ui/uiwidget.h>
 
-class UIParticles : public UIWidget
+class UIParticles final : public UIWidget
 {
 public:
     void drawSelf(DrawPoolType drawPane) override;
 
-    void addEffect(const std::string_view name);
+    void addEffect(std::string_view name);
 
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     void setReferencePos(const PointF& point) { m_referencePos = point; }
     PointF getReferencePos() { return m_referencePos; }

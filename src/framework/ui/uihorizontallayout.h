@@ -26,14 +26,14 @@
 
 #include "uiboxlayout.h"
 
-class UIHorizontalLayout : public UIBoxLayout
+class UIHorizontalLayout final : public UIBoxLayout
 {
 public:
     UIHorizontalLayout(UIWidgetPtr parentWidget) : UIBoxLayout(std::move(parentWidget)) {}
 
     void applyStyle(const OTMLNodePtr& styleNode) override;
 
-    void setAlignRight(bool aliginRight) { m_alignRight = aliginRight; update(); }
+    void setAlignRight(const bool aliginRight) { m_alignRight = aliginRight; update(); }
 
     bool isUIHorizontalLayout() override { return true; }
 

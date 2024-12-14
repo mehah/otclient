@@ -21,8 +21,8 @@
  */
 
 #include "drawpoolmanager.h"
-#include "drawpool.h"
 #include "declarations.h"
+#include "drawpool.h"
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
@@ -32,7 +32,7 @@ void resetSelectedPool() {
 
 DrawPoolManager g_drawPool;
 
-void DrawPoolManager::init(uint16_t spriteSize)
+void DrawPoolManager::init(const uint16_t spriteSize)
 {
     if (spriteSize != 0)
         m_spriteSize = spriteSize;
@@ -111,7 +111,10 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
         return;
     }
 
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::UPSIDEDOWN_RECT, dest, src }, DrawMode::TRIANGLE_STRIP, condutor);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::UPSIDEDOWN_RECT, .dest =
+                              dest,
+                              .src = src
+                          }, DrawMode::TRIANGLE_STRIP, condutor);
 }
 
 void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
@@ -121,7 +124,10 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
         return;
     }
 
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ DrawPool::DrawMethodType::REPEATED_RECT, dest, src }, DrawMode::TRIANGLES, condutor);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::REPEATED_RECT, .dest =
+                              dest,
+                              .src = src
+                          }, DrawMode::TRIANGLES, condutor);
 }
 
 void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawConductor& condutor) const
@@ -131,7 +137,7 @@ void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const 
         return;
     }
 
-    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ DrawPool::DrawMethodType::RECT, dest }, DrawMode::TRIANGLES, condutor);
+    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::RECT, .dest = dest }, DrawMode::TRIANGLES, condutor);
 }
 
 void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color, const DrawConductor& condutor) const
@@ -149,7 +155,7 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
      }, DrawMode::TRIANGLES, condutor);
 }
 
-void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, uint16_t innerLineWidth, const DrawConductor& condutor) const
+void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, const uint16_t innerLineWidth, const DrawConductor& condutor) const
 {
     if (dest.isEmpty() || innerLineWidth == 0) {
         getCurrentPool()->resetOnlyOnceParameters();

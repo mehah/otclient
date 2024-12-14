@@ -33,8 +33,8 @@ public:
 
     bool importFont(const std::string& file);
 
-    bool fontExists(const std::string_view fontName);
-    BitmapFontPtr getFont(const std::string_view fontName);
+    bool fontExists(std::string_view fontName);
+    BitmapFontPtr getFont(std::string_view fontName);
 
     BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
     BitmapFontPtr getDefaultWidgetFont() const { return m_defaultWidgetFont; }

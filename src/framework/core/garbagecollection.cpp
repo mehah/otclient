@@ -22,12 +22,12 @@
 
 #include "garbagecollection.h"
 #include <client/thingtypemanager.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/graphics/texturemanager.h>
-#include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/drawpoolmanager.h>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/graphics/animatedtexture.h>
+#include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/texturemanager.h>
+#include <framework/luaengine/luainterface.h>
 
 constexpr uint32_t LUA_TIME = 15 * 60 * 1000; // 15min
 constexpr uint32_t TEXTURE_TIME = 30 * 60 * 1000; // 30min

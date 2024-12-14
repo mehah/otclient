@@ -26,7 +26,7 @@
 #include "event.h"
 
  // @bindclass
-class ScheduledEvent : public Event
+class ScheduledEvent final : public Event
 {
 public:
     ScheduledEvent(const std::function<void()>& callback, int delay, int maxCycles = 0);

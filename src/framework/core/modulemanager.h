@@ -33,11 +33,11 @@ public:
     void discoverModules();
     void autoLoadModules(int maxPriority);
     ModulePtr discoverModule(const std::string& moduleFile);
-    void ensureModuleLoaded(const std::string_view moduleName);
+    void ensureModuleLoaded(std::string_view moduleName);
     void unloadModules();
     void reloadModules();
 
-    ModulePtr getModule(const std::string_view moduleName);
+    ModulePtr getModule(std::string_view moduleName);
     std::deque<ModulePtr> getModules() { return m_modules; }
     ModulePtr getCurrentModule() { return m_currentModule; }
     void enableAutoReload();

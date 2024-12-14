@@ -26,10 +26,10 @@
 
 #include "declarations.h"
 #include "framebuffer.h"
-#include "texture.h"
 #include "framework/core/timer.h"
-#include <framework/platform/platformwindow.h>
+#include "texture.h"
 #include <framework/core/graphicalapplication.h>
+#include <framework/platform/platformwindow.h>
 
 #include "../stdext/storage.h"
 #include <unordered_set>
@@ -97,7 +97,7 @@ private:
 struct DrawConductor
 {
     bool agroup{ false };
-    uint8_t order{ DrawOrder::FIRST };
+    uint8_t order{ FIRST };
 };
 
 constexpr DrawConductor DEFAULT_DRAW_CONDUCTOR;
@@ -110,12 +110,12 @@ public:
         FPS20 = 1000 / 20,
         FPS60 = 1000 / 60;
 
-    void setEnable(bool v) { m_enabled = v; }
+    void setEnable(const bool v) { m_enabled = v; }
 
     DrawPoolType getType() const { return m_type; }
 
     bool isEnabled() const { return m_enabled; }
-    bool isType(DrawPoolType type) const { return m_type == type; }
+    bool isType(const DrawPoolType type) const { return m_type == type; }
 
     bool isValid() const { return !m_framebuffer || m_framebuffer->isValid(); }
     bool hasFrameBuffer() const { return m_framebuffer != nullptr; }
@@ -126,11 +126,11 @@ public:
     void resetState();
     void scale(float factor);
 
-    void agroup(bool agroup) { m_alwaysGroupDrawings = agroup; }
+    void agroup(const bool agroup) { m_alwaysGroupDrawings = agroup; }
 
-    void setScaleFactor(float scale) { m_scaleFactor = scale; }
-    inline float getScaleFactor() const { return m_scaleFactor; }
-    inline bool isScaled() const { return m_scaleFactor != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
+    void setScaleFactor(const float scale) { m_scaleFactor = scale; }
+    float getScaleFactor() const { return m_scaleFactor; }
+    bool isScaled() const { return m_scaleFactor != PlatformWindow::DEFAULT_DISPLAY_DENSITY; }
 
     void setFramebuffer(const Size& size);
     void removeFramebuffer();
@@ -226,8 +226,8 @@ protected:
     };
 
 private:
-    static DrawPool* create(const DrawPoolType type);
-    static void addCoords(CoordsBuffer* buffer, const DrawPool::DrawMethod& method, DrawMode drawMode);
+    static DrawPool* create(DrawPoolType type);
+    static void addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMode drawMode);
 
     enum STATE_TYPE : uint32_t
     {
@@ -238,7 +238,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, const TexturePtr& texture, DrawPool::DrawMethod&& method,
+    void add(const Color& color, const TexturePtr& texture, DrawMethod&& method,
              DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
@@ -246,9 +246,9 @@ private:
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
     void releaseFrameBuffer(const Rect& dest);
 
-    inline void setFPS(uint16_t fps) { m_refreshDelay = 1000 / fps; }
+    void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
-    bool updateHash(const DrawPool::DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord);
+    bool updateHash(const DrawMethod& method, const TexturePtr& texture, const Color& color, bool hasCoord);
     PoolState getState(const TexturePtr& texture, const Color& color);
 
     PoolState& getCurrentState() { return m_states[m_lastStateIndex]; }
@@ -276,7 +276,7 @@ private:
     void translate(const Point& p) { translate(p.x, p.y); }
     void rotate(float angle);
     void rotate(float x, float y, float angle);
-    void rotate(const Point& p, float angle) { rotate(p.x, p.y, angle); }
+    void rotate(const Point& p, const float angle) { rotate(p.x, p.y, angle); }
 
     std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
@@ -285,18 +285,18 @@ private:
         m_parameters.emplace(name, value);
     }
     template<typename T>
-    T getParameter(std::string_view name) {
-        auto it = m_parameters.find(name);
+    T getParameter(const std::string_view name) {
+        const auto it = m_parameters.find(name);
         if (it != m_parameters.end()) {
             return std::any_cast<T>(it->second);
         }
 
         return T();
     }
-    bool containsParameter(std::string_view name) {
+    bool containsParameter(const std::string_view name) {
         return m_parameters.contains(name);
     }
-    void removeParameter(std::string_view name) {
+    void removeParameter(const std::string_view name) {
         const auto& it = m_parameters.find(name);
         if (it != m_parameters.end())
             m_parameters.erase(it);
@@ -311,7 +311,7 @@ private:
         }
     }
 
-    void release(bool flush = true) {
+    void release(const bool flush = true) {
         m_objectsDraw.clear();
 
         if (flush) {
@@ -358,7 +358,7 @@ private:
         --m_lastStateIndex;
     }
 
-    const FrameBufferPtr& getTemporaryFrameBuffer(const uint8_t index);
+    const FrameBufferPtr& getTemporaryFrameBuffer(uint8_t index);
 
     bool m_enabled{ true };
     bool m_alwaysGroupDrawings{ false };
@@ -381,7 +381,7 @@ private:
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
 
-    std::vector<DrawObject> m_objects[static_cast<uint8_t>(DrawOrder::LAST)];
+    std::vector<DrawObject> m_objects[static_cast<uint8_t>(LAST)];
     std::vector<DrawObject> m_objectsFlushed;
     std::vector<DrawObject> m_objectsDraw;
 

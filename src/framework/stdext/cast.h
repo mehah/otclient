@@ -133,7 +133,7 @@ namespace stdext
     }
 
     // used by safe_cast
-    class cast_exception : public exception
+    class cast_exception final : public exception
     {
     public:
         ~cast_exception() noexcept override = default;

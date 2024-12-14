@@ -99,25 +99,25 @@ uint16_t read16(std::istream& f1)
     return (static_cast<uint16_t>(a) << 8) + static_cast<uint16_t>(b);
 }
 
-uint16_t readshort(uint8_t* p)
+uint16_t readshort(const uint8_t* p)
 {
     return (static_cast<uint16_t>(*p) << 8) + static_cast<uint16_t>(*(p + 1));
 }
 
-void read_sub_row(uint8_t* row, uint32_t rowbytes, uint32_t bpp)
+void read_sub_row(uint8_t* row, const uint32_t rowbytes, const uint32_t bpp)
 {
     for (uint32_t i = bpp; i < rowbytes; i++)
         row[i] += row[i - bpp];
 }
 
-void read_up_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t)
+void read_up_row(uint8_t* row, const uint8_t* prev_row, const uint32_t rowbytes, uint32_t)
 {
     if (prev_row)
         for (uint32_t i = 0; i < rowbytes; i++)
             row[i] += prev_row[i];
 }
 
-void read_average_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t bpp)
+void read_average_row(uint8_t* row, const uint8_t* prev_row, const uint32_t rowbytes, const uint32_t bpp)
 {
     uint32_t i;
 
@@ -132,7 +132,7 @@ void read_average_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32
     }
 }
 
-void read_paeth_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t bpp)
+void read_paeth_row(uint8_t* row, const uint8_t* prev_row, const uint32_t rowbytes, const uint32_t bpp)
 {
     uint32_t i;
 
@@ -156,7 +156,7 @@ void read_paeth_row(uint8_t* row, uint8_t* prev_row, uint32_t rowbytes, uint32_t
     }
 }
 
-void unpack(z_stream& zstream, uint8_t* dst, uint32_t dst_size, uint8_t* src, uint32_t src_size, uint32_t h, uint32_t rowbytes, uint8_t bpp)
+void unpack(z_stream& zstream, uint8_t* dst, const uint32_t dst_size, uint8_t* src, const uint32_t src_size, const uint32_t h, const uint32_t rowbytes, const uint8_t bpp)
 {
     uint8_t* row = dst;
     uint8_t* prev_row = nullptr;
@@ -181,7 +181,7 @@ void unpack(z_stream& zstream, uint8_t* dst, uint32_t dst_size, uint8_t* src, ui
     }
 }
 
-void compose0(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbytes2, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
+void compose0(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
     uint32_t    i, g, a;
 
@@ -215,7 +215,7 @@ void compose0(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbyte
     }
 }
 
-void compose2(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbytes2, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
+void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
     uint32_t    i;
     uint32_t    r, g, b, a;
@@ -271,7 +271,7 @@ void compose2(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbyte
     }
 }
 
-void compose3(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbytes2, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
+void compose3(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, const uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
     uint32_t a2;
     uint8_t   col = 0;
@@ -331,7 +331,7 @@ void compose3(uint8_t* dst1, uint32_t dstbytes1, uint8_t* dst2, uint32_t dstbyte
     }
 }
 
-void compose4(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
+void compose4(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
     uint32_t    i;
     uint32_t    g, a, a2;
@@ -339,7 +339,7 @@ void compose4(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, 
     const uint32_t step = (depth + 7) / 8;
 
     for (uint32_t j = 0; j < h; j++) {
-        uint8_t* sp = src + 1;
+        const uint8_t* sp = src + 1;
         uint8_t* dp = dst;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
@@ -378,7 +378,7 @@ void compose4(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, 
     }
 }
 
-void compose6(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, uint32_t w, uint32_t h, uint32_t bop, uint8_t depth)
+void compose6(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
     uint32_t    i;
     uint32_t    r, g, b, a;
@@ -387,7 +387,7 @@ void compose6(uint8_t* dst, uint32_t dstbytes, uint8_t* src, uint32_t srcbytes, 
     const uint32_t step = (depth + 7) / 8;
 
     for (uint32_t j = 0; j < h; j++) {
-        uint8_t* sp = src + 1;
+        const uint8_t* sp = src + 1;
         auto* dp = (uint32_t*)dst;
 
         if (bop == PNG_BLEND_OP_SOURCE) {
@@ -755,7 +755,7 @@ int load_apng(std::stringstream& file, apng_data* apng)
     return 0;
 }
 
-void write_chunk(std::ostream& f, const char* name, uint8_t* data, uint32_t length)
+void write_chunk(std::ostream& f, const char* name, uint8_t* data, const uint32_t length)
 {
     uint32_t crc = crc32(0, nullptr, 0);
     uint32_t len = swap32(length);
@@ -773,7 +773,7 @@ void write_chunk(std::ostream& f, const char* name, uint8_t* data, uint32_t leng
     f.write((char*)&crc, 4);
 }
 
-void write_IDATs(std::ostream& f, uint8_t* data, uint32_t length, uint32_t idat_size)
+void write_IDATs(std::ostream& f, uint8_t* data, uint32_t length, const uint32_t idat_size)
 {
     uint32_t z_cmf = data[0];
 
@@ -831,9 +831,11 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
         uint8_t   mCompression;
         uint8_t   mFilterMethod;
         uint8_t   mInterlaceMethod;
-    } ihdr = { swap32(width), swap32(height), 8, coltype, 0, 0, 0 };
+    } ihdr = { .mWidth = swap32(width), .mHeight = swap32(height), .mDepth = 8, .mColorType = coltype, .mCompression = 0,
+            .mFilterMethod = 0, .mInterlaceMethod = 0
+    };
 
-    z_stream        zstream1;
+    z_stream zstream1;
     z_stream        zstream2;
     uint32_t    i, j;
 
@@ -1038,7 +1040,7 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
     free(paeth_row);
 }
 
-void free_apng(apng_data* apng)
+void free_apng(const apng_data* apng)
 {
     if (apng->pdata)
         free(apng->pdata);

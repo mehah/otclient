@@ -27,10 +27,10 @@
 class LuaException : public stdext::exception
 {
 public:
-    LuaException(const std::string_view error, int traceLevel = -1);
+    LuaException(std::string_view error, int traceLevel = -1);
     ~LuaException() noexcept override = default;
 
-    void generateLuaErrorMessage(const std::string_view error, int traceLevel);
+    void generateLuaErrorMessage(std::string_view error, int traceLevel);
 
     const char* what() const noexcept override { return m_what.data(); }
 
@@ -40,14 +40,14 @@ protected:
     std::string m_what;
 };
 
-class LuaBadNumberOfArgumentsException : public LuaException
+class LuaBadNumberOfArgumentsException final : public LuaException
 {
 public:
     LuaBadNumberOfArgumentsException(int expected = -1, int got = -1);
 };
 
-class LuaBadValueCastException : public LuaException
+class LuaBadValueCastException final : public LuaException
 {
 public:
-    LuaBadValueCastException(const std::string_view luaTypeName, const std::string_view cppTypeName);
+    LuaBadValueCastException(std::string_view luaTypeName, std::string_view cppTypeName);
 };

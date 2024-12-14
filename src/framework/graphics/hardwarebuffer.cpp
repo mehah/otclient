@@ -26,7 +26,7 @@
 #include <framework/core/application.h>
 #include <framework/core/logger.h>
 
-HardwareBuffer::HardwareBuffer(Type type) :m_type(type)
+HardwareBuffer::HardwareBuffer(const Type type) :m_type(type)
 {
     glGenBuffers(1, &m_id);
     if (!m_id)

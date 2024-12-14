@@ -23,8 +23,8 @@
 #include "eventdispatcher.h"
 #include "asyncdispatcher.h"
 
-#include <framework/core/clock.h>
 #include "timer.h"
+#include <framework/core/clock.h>
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 int16_t g_mainThreadId = stdext::getThreadId();
@@ -138,7 +138,7 @@ void EventDispatcher::executeEvents() {
     m_eventList.clear();
 }
 
-std::vector<std::pair<uint64_t, uint64_t>> generatePartition(size_t size) {
+std::vector<std::pair<uint64_t, uint64_t>> generatePartition(const size_t size) {
     if (size == 0)
         return {};
 

@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include <framework/luaengine/luaobject.h>
 #include "declarations.h"
+#include <framework/luaengine/luaobject.h>
 
 class SoundSource : public LuaObject
 {
 protected:
-    SoundSource(uint32_t sourceId) : m_sourceId(sourceId) {}
+    SoundSource(const uint32_t sourceId) : m_sourceId(sourceId) {}
 
 public:
     enum FadeState { NoFading, FadingOn, FadingOff };
@@ -62,7 +62,7 @@ public:
 
 protected:
     void setBuffer(const SoundBufferPtr& buffer);
-    void setChannel(uint8_t channel) { m_channel = channel; }
+    void setChannel(const uint8_t channel) { m_channel = channel; }
 
     virtual void update();
     friend class SoundManager;

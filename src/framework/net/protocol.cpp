@@ -21,8 +21,9 @@
  */
 
 #include "protocol.h"
-#include <random>
+#include <algorithm>
 #include <framework/core/application.h>
+#include <random>
 #ifdef __EMSCRIPTEN__
 #include "webconnection.h"
 #else
@@ -45,13 +46,17 @@ Protocol::~Protocol()
 }
 
 #ifndef __EMSCRIPTEN__
-void Protocol::connect(const std::string_view host, uint16_t port)
+void Protocol::connect(const std::string_view host, const uint16_t port)
 {
     if (host == "proxy" || host == "0.0.0.0" || (host == "127.0.0.1" && g_proxy.isActive())) {
         m_disconnected = false;
         m_proxy = g_proxy.addSession(port,
-                                     std::bind(&Protocol::onProxyPacket, asProtocol(), std::placeholders::_1),
-                                     std::bind(&Protocol::onLocalDisconnected, asProtocol(), std::placeholders::_1));
+                                     [capture0 = asProtocol()](auto&& PH1) {
+            capture0->onProxyPacket(std::forward<decltype(PH1)>(PH1));
+        },
+                                     [capture0 = asProtocol()](auto&& PH1) {
+            capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
+        });
         return onConnect();
     }
 
@@ -114,7 +119,7 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
     outputMessage->writeMessageSize();
 
     if (m_proxy) {
-        auto packet = std::make_shared<ProxyPacket>(outputMessage->getHeaderBuffer(), outputMessage->getWriteBuffer());
+        const auto packet = std::make_shared<ProxyPacket>(outputMessage->getHeaderBuffer(), outputMessage->getWriteBuffer());
         g_proxy.send(m_proxy, packet);
         outputMessage->reset();
         return;
@@ -150,10 +155,9 @@ void Protocol::recv()
         capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
         std::forward<decltype(PH2)>(PH2));
     });
-
 }
 
-void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
+void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
@@ -167,7 +171,7 @@ void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
     });
 }
 
-void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
+void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 {
     // process data only if really connected
     if (!isConnected()) {
@@ -181,7 +185,7 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
     if (m_sequencedPackets) {
         decompress = (m_inputMessage->getU32() & 1 << 31);
     } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", (int)m_inputMessage->getMessageSize()));
+        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", static_cast<int>(m_inputMessage->getMessageSize())));
         return;
     }
 
@@ -200,7 +204,7 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
         m_zstream.avail_in = m_inputMessage->getUnreadSize();
         m_zstream.avail_out = InputMessage::BUFFER_MAXSIZE;
 
-        int32_t ret = inflate(&m_zstream, Z_FINISH);
+        const int32_t ret = inflate(&m_zstream, Z_FINISH);
         if (ret != Z_OK && ret != Z_STREAM_END) {
             g_logger.traceError(stdext::format("failed to decompress message - %s", m_zstream.msg));
             return;
@@ -224,7 +228,7 @@ void Protocol::generateXteaKey()
 {
     std::random_device rd;
     std::uniform_int_distribution<uint32_t > unif;
-    std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd] { return unif(rd); });
+    std::ranges::generate(m_xteaKey, [&unif, &rd] { return unif(rd); });
 }
 
 namespace
@@ -232,7 +236,7 @@ namespace
     constexpr uint32_t delta = 0x9E3779B9;
 
     template<typename Round>
-    void apply_rounds(uint8_t* data, size_t length, Round round)
+    void apply_rounds(uint8_t* data, const size_t length, Round round)
     {
         for (auto j = 0u; j < length; j += 8) {
             uint32_t left = data[j + 0] | data[j + 1] << 8u | data[j + 2] << 16u | data[j + 3] << 24u,
@@ -316,7 +320,7 @@ void Protocol::onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet
     if (m_disconnected)
         return;
     auto self(asProtocol());
-    asio::post(g_ioService, [&, self, packet] {
+    post(g_ioService, [&, packet] {
         if (m_disconnected)
             return;
         m_inputMessage->reset();
@@ -339,7 +343,7 @@ void Protocol::onLocalDisconnected(std::error_code ec)
     if (m_disconnected)
         return;
     auto self(asProtocol());
-    asio::post(g_ioService, [&, self, ec] {
+    post(g_ioService, [&, ec] {
         if (m_disconnected)
             return;
         m_disconnected = true;

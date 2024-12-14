@@ -35,7 +35,7 @@ namespace stdext
         x ^= x >> 33U;
         x *= UINT64_C(0xff51afd7ed558ccd);
         x ^= x >> 33U;
-        return static_cast<size_t>(x);
+        return x;
     }
 
     // Boost Lib
@@ -47,7 +47,7 @@ namespace stdext
     template <class T>
     void hash_combine(size_t& seed, const T& v)
     {
-        stdext::hash<T> hasher;
+        hash<T> hasher;
         hash_union(seed, hasher(v));
     }
 }
