@@ -140,18 +140,30 @@ namespace stdext
 
     std::wstring utf8_to_utf16(const std::string_view src)
     {
+#ifndef BOT_PROTECTION
+        constexpr size_t BUFFER_SIZE = 65536;
+#else
+        constexpr size_t BUFFER_SIZE = 4096;
+#endif
+
         std::wstring res;
-        wchar_t out[4096];
-        if (MultiByteToWideChar(CP_UTF8, 0, src.data(), -1, out, 4096))
+        wchar_t out[BUFFER_SIZE];
+        if (MultiByteToWideChar(CP_UTF8, 0, src.data(), -1, out, BUFFER_SIZE))
             res = out;
         return res;
     }
 
     std::string utf16_to_utf8(const std::wstring_view src)
     {
+#ifndef BOT_PROTECTION
+        constexpr size_t BUFFER_SIZE = 65536;
+#else
+        constexpr size_t BUFFER_SIZE = 4096;
+#endif
+
         std::string res;
-        char out[4096];
-        if (WideCharToMultiByte(CP_UTF8, 0, src.data(), -1, out, 4096, nullptr, nullptr))
+        char out[BUFFER_SIZE];
+        if (WideCharToMultiByte(CP_UTF8, 0, src.data(), -1, out, BUFFER_SIZE, nullptr, nullptr))
             res = out;
         return res;
     }
