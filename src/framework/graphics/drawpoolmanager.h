@@ -117,7 +117,6 @@ private:
     void drawObject(const DrawPool::DrawObject& obj);
     void drawPool(DrawPoolType type);
 
-    CoordsBuffer m_coordsBuffer;
     std::array<DrawPool*, static_cast<uint8_t>(DrawPoolType::LAST)> m_pools{};
 
     Size m_size;

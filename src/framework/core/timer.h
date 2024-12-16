@@ -29,7 +29,7 @@ class Timer
 public:
     Timer() { restart(); }
 
-    void restart();
+    void restart(const int shift = 0);
     void stop() { m_stopped = true; }
     void update(const ticks_t tick) { m_startTicks += tick; }
 

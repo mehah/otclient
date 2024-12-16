@@ -23,9 +23,9 @@
 #include "timer.h"
 #include "clock.h"
 
-void Timer::restart()
+void Timer::restart(const int shift)
 {
-    m_startTicks = g_clock.millis();
+    m_startTicks = g_clock.millis() - shift;
     m_stopped = false;
 }
 

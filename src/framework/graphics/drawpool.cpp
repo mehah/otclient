@@ -36,6 +36,8 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             // creates a temporary framebuffer with smoothing.
             pool->m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
         }
+    } else if (type == DrawPoolType::LIGHT) {
+        pool->m_hashCtrl = true;
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
         pool->setFPS(60);
@@ -45,8 +47,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method,
-                   DrawMode drawMode, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
+void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
         return;
@@ -67,7 +68,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         if (coordsBuffer)
             coords->append(coordsBuffer.get());
         else
-            addCoords(coords, method, DrawMode::TRIANGLES);
+            addCoords(coords, method);
     } else {
         bool addNewObj = true;
 
@@ -75,12 +76,10 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         if (!list.empty()) {
             auto& prevObj = list.back();
             if (prevObj.state == getCurrentState()) {
-                if (!prevObj.coords)
-                    prevObj.addMethod(std::move(method));
-                else if (coordsBuffer)
+                if (coordsBuffer)
                     prevObj.coords->append(coordsBuffer.get());
                 else
-                    addCoords(prevObj.coords.get(), method, DrawMode::TRIANGLES);
+                    addCoords(prevObj.coords.get(), method);
 
                 addNewObj = false;
             }
@@ -88,32 +87,28 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
 
         if (addNewObj) {
             auto state = getState(texture, color);
+            auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
+
             if (coordsBuffer) {
-                list.emplace_back(std::move(state), getCoordsBuffer()).coords->append(coordsBuffer.get());
+                draw.coords->append(coordsBuffer.get());
             } else
-                list.emplace_back(drawMode, std::move(state), std::move(method));
+                addCoords(draw.coords.get(), method);
         }
     }
 
     resetOnlyOnceParameters();
 }
 
-void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method, const DrawMode drawMode)
+void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method)
 {
     if (method.type == DrawMethodType::BOUNDING_RECT) {
         buffer->addBoudingRect(method.dest, method.intValue);
     } else if (method.type == DrawMethodType::RECT) {
-        if (drawMode == DrawMode::TRIANGLES)
-            buffer->addRect(method.dest, method.src);
-        else
-            buffer->addQuad(method.dest, method.src);
+        buffer->addRect(method.dest, method.src);
     } else if (method.type == DrawMethodType::TRIANGLE) {
         buffer->addTriangle(method.a, method.b, method.c);
     } else if (method.type == DrawMethodType::UPSIDEDOWN_RECT) {
-        if (drawMode == DrawMode::TRIANGLES)
-            buffer->addUpsideDownRect(method.dest, method.src);
-        else
-            buffer->addUpsideDownQuad(method.dest, method.src);
+        buffer->addUpsideDownRect(method.dest, method.src);
     } else if (method.type == DrawMethodType::REPEATED_RECT) {
         buffer->addRepeatedRects(method.dest, method.src);
     }

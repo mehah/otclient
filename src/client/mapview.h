@@ -215,7 +215,7 @@ private:
     struct FloorData
     {
         MapObject cachedVisibleTiles;
-        stdext::timer fadingTimers;
+        Timer fadingTimers;
     };
 
     struct Crosshair
@@ -251,7 +251,7 @@ private:
     {
         if (!canFloorFade()) return 1.f;
 
-        float fading = std::clamp<float>(static_cast<float>(m_floors[z].fadingTimers.elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
+        float fading = std::clamp<float>(static_cast<float>(m_floors[z].fadingTimers.ticksElapsed()) / static_cast<float>(m_floorFading), 0.f, 1.f);
         if (z < m_cachedFirstVisibleFloor)
             fading = 1.0 - fading;
         return fading;
