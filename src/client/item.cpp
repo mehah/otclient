@@ -36,7 +36,7 @@
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/shadermanager.h>
 
-ItemPtr Item::create(int id)
+ItemPtr Item::create(const int id)
 {
     const auto& item = std::make_shared<Item>();
     item->setId(id);
@@ -44,7 +44,7 @@ ItemPtr Item::create(int id)
     return item;
 }
 
-void Item::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
+void Item::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw(m_color) || isHided())
         return;
@@ -60,7 +60,7 @@ void Item::draw(const Point& dest, bool drawThings, const LightViewPtr& lightVie
         internalDraw(animationPhase, dest, getHighlightColor(), drawThings, true);
 }
 
-void Item::internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView)
+void Item::internalDraw(const int animationPhase, const Point& dest, const Color& color, const bool drawThings, const bool replaceColorShader, const LightViewPtr& lightView)
 {
     if (replaceColorShader)
         g_drawPool.setShaderProgram(g_painter->getReplaceColorShader(), true);
@@ -95,14 +95,14 @@ void Item::setConductor()
 {
     if (isSingleGround()) {
         m_drawConductor.agroup = true;
-        m_drawConductor.order = DrawOrder::FIRST;
+        m_drawConductor.order = FIRST;
     } else if (isSingleGroundBorder() && !hasElevation()) {
         m_drawConductor.agroup = true;
-        m_drawConductor.order = DrawOrder::SECOND;
+        m_drawConductor.order = SECOND;
     }
 }
 
-void Item::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
+void Item::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
 {
     Thing::setPosition(position, stackPos);
 

@@ -22,7 +22,9 @@
 
 #include "uihorizontallayout.h"
 #include <framework/core/eventdispatcher.h>
+
 #include "uiwidget.h"
+#include <ranges>
 
 void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
@@ -81,8 +83,8 @@ bool UIHorizontalLayout::internalUpdate()
     };
 
     if (m_alignRight) {
-        for (auto it = parentWidget->m_children.rbegin(); it != parentWidget->m_children.rend(); ++it)
-            action(*it);
+        for (auto& it : std::ranges::reverse_view(parentWidget->m_children))
+            action(it);
     } else for (const auto& widget : parentWidget->m_children)
         action(widget);
 

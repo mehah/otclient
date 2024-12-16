@@ -26,7 +26,7 @@
 
 #include "framework/graphics/particleeffect.h"
 
-void UIParticles::drawSelf(DrawPoolType drawPane)
+void UIParticles::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;

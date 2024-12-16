@@ -46,7 +46,7 @@ public:
             c.x, c.y
         };
 
-        size_t size = sizeof(arr) / sizeof(int);
+        const size_t size = sizeof(arr) / sizeof(int);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -66,16 +66,16 @@ public:
             right, bottom
         };
 
-        size_t size = sizeof(arr) / sizeof(float);
+        const size_t size = sizeof(arr) / sizeof(float);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void addRect(const RectF& rect)
     {
-        float top = rect.top();
-        float right = rect.right() + 1.f;
-        float bottom = rect.bottom() + 1.f;
-        float left = rect.left();
+        const float top = rect.top();
+        const float right = rect.right() + 1.f;
+        const float bottom = rect.bottom() + 1.f;
+        const float left = rect.left();
 
         float arr[] = {
             left, top,
@@ -86,7 +86,7 @@ public:
             right, bottom
         };
 
-        size_t size = sizeof(arr) / sizeof(float);
+        const size_t size = sizeof(arr) / sizeof(float);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -106,7 +106,7 @@ public:
             right, bottom
         };
 
-        size_t size = sizeof(arr) / sizeof(float);
+        const size_t size = sizeof(arr) / sizeof(float);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -124,7 +124,7 @@ public:
             right, top,
         };
 
-        size_t size = sizeof(arr) / sizeof(float);
+        const size_t size = sizeof(arr) / sizeof(float);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -144,7 +144,7 @@ public:
             right, top
         };
 
-        size_t size = sizeof(arr) / sizeof(float);
+        const size_t size = sizeof(arr) / sizeof(float);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 

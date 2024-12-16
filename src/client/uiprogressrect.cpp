@@ -26,7 +26,7 @@
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 
-void UIProgressRect::drawSelf(DrawPoolType drawPane)
+void UIProgressRect::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;

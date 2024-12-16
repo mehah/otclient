@@ -21,11 +21,11 @@
  */
 
 #include "animatedtext.h"
+#include "game.h"
+#include "gameconfig.h"
+#include "map.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
-#include "game.h"
-#include "map.h"
-#include "gameconfig.h"
 
 AnimatedText::AnimatedText()
 {

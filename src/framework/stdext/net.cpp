@@ -38,7 +38,7 @@ namespace stdext
         return asio::detail::socket_ops::host_to_network_long(address_v4.to_ulong());
     }
 
-    std::vector<uint32_t > listSubnetAddresses(uint32_t address, uint8_t mask)
+    std::vector<uint32_t > listSubnetAddresses(const uint32_t address, const uint8_t mask)
     {
         std::vector<uint32_t > list;
         if (mask < 32) {

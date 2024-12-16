@@ -22,9 +22,9 @@
 
 #pragma once
 
+#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
-#include "declarations.h"
 
 #include <utility>
 
@@ -32,7 +32,7 @@
 class UILayout : public LuaObject
 {
 public:
-    UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) { }
+    UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) {}
 
     void update();
     void updateLater();

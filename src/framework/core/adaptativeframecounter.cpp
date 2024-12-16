@@ -22,8 +22,8 @@
 
 #include "adaptativeframecounter.h"
 #include <framework/core/eventdispatcher.h>
-#include <framework/platform/platformwindow.h>
 #include <framework/graphics/drawpool.h>
+#include <framework/platform/platformwindow.h>
 
 bool AdaptativeFrameCounter::update()
 {
