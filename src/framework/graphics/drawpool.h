@@ -197,24 +197,9 @@ protected:
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
         DrawObject(PoolState&& state, const std::shared_ptr<CoordsBuffer>& coords) : coords(coords), state(std::move(state)) {}
-        DrawObject(const DrawMode drawMode, PoolState&& state, DrawMethod&& method) :
-            state(std::move(state)), drawMode(drawMode) {
-            methods.reserve(10);
-            methods.emplace_back(std::move(method));
-        }
-
-        void addMethod(DrawMethod&& method)
-        {
-            drawMode = DrawMode::TRIANGLES;
-            methods.emplace_back(std::move(method));
-        }
-
-        std::vector<DrawMethod> methods;
         std::function<void()> action{ nullptr };
         std::shared_ptr<CoordsBuffer> coords;
-
         PoolState state;
-        DrawMode drawMode{ DrawMode::TRIANGLES };
     };
 
     struct DrawObjectState
@@ -229,7 +214,7 @@ protected:
 
 private:
     static DrawPool* create(DrawPoolType type);
-    static void addCoords(CoordsBuffer* buffer, const DrawMethod& method, DrawMode drawMode);
+    static void addCoords(CoordsBuffer* buffer, const DrawMethod& method);
 
     enum STATE_TYPE : uint32_t
     {
@@ -240,8 +225,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, const TexturePtr& texture, DrawMethod&& method,
-             DrawMode drawMode = DrawMode::TRIANGLES, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
+    void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addAction(const std::function<void()>& action);
