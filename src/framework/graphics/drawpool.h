@@ -56,10 +56,11 @@ enum DrawOrder : uint8_t
 
 struct DrawHashController
 {
-    bool put(size_t hash) {
-        m_lastObjectHash = hash;
+    DrawHashController(bool agroup = false) : m_agroup(agroup) {}
 
-        if (m_hashs.emplace(hash).second) {
+    bool put(size_t hash) {
+        if ((m_agroup && m_hashs.emplace(hash).second) || m_lastObjectHash != hash) {
+            m_lastObjectHash = hash;
             stdext::hash_union(m_currentHash, hash);
             return true;
         }
@@ -92,6 +93,7 @@ private:
     size_t m_lastHash{ 0 };
     size_t m_currentHash{ 0 };
     size_t m_lastObjectHash{ 0 };
+    bool m_agroup{ false };
 };
 
 struct DrawConductor

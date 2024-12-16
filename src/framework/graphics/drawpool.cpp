@@ -36,6 +36,8 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             // creates a temporary framebuffer with smoothing.
             pool->m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
         }
+    } else if (type == DrawPoolType::LIGHT) {
+        pool->m_hashCtrl = true;
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
         pool->setFPS(60);

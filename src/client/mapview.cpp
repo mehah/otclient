@@ -317,20 +317,20 @@ void MapView::updateVisibleTiles()
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
         m_fadeType = FadeType::NONE$;
         for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
-            m_floors[iz].fadingTimers.restart(m_floorFading * 1000);
+            m_floors[iz].fadingTimers.restart(m_floorFading);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
         m_fadeType = FadeType::OUT$;
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
-            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.elapsed_millis());
-            m_floors[iz].fadingTimers.restart(shift * 1000);
+            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
+            m_floors[iz].fadingTimers.restart(shift);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
         m_fadeType = FadeType::IN$;
         m_fadeFinish = false;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
-            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.elapsed_millis());
-            m_floors[iz].fadingTimers.restart(shift * 1000);
+            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
+            m_floors[iz].fadingTimers.restart(shift);
         }
     }
 
