@@ -444,6 +444,7 @@ endif()
 
 
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
+target_link_options(${PROJECT_NAME} PUBLIC -flto=auto)
 
 # *****************************************************************************
 # Includes and librarys
