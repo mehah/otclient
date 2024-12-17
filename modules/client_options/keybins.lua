@@ -748,7 +748,7 @@ function terminate_binds()
 end
 
 function listKeybindsComboBox(value)
-    local widget = panels.keybindsPanel:recursiveGetChildById('list')
+    local widget = panels.keybindsPanel.presets.list
     presetOption(widget, 'currentPreset', value, false)
     changedKeybinds = {}
     changedHotkeys = {}
