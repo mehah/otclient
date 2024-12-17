@@ -11,7 +11,13 @@ function init()
     debugInfoWindow = g_ui.displayUI('debug_info')
     debugInfoWindow:hide()
 
-    g_keyboard.bindKeyDown('Ctrl+Alt+D', toggle)
+    Keybind.new("Debug", "Toggle Stats", "Ctrl+Alt+D", "")
+    Keybind.bind("Debug", "Toggle Stats", {
+      {
+        type = KEY_DOWN,
+        callback = toggle,
+      }
+    })
 
     updateEvent = scheduleEvent(update, 2000)
 end
@@ -20,7 +26,7 @@ function terminate()
     debugInfoWindow:destroy()
     debugInfoButton:destroy()
 
-    g_keyboard.unbindKeyDown('Ctrl+Alt+D')
+    Keybind.delete("Debug", "Toggle Stats")
 
     removeEvent(updateEvent)
 end
