@@ -155,6 +155,7 @@ local function setupComboBox()
     listKeybindsPanel.onOptionChange = function(comboBox, option)
         setOption('listKeybindsPanel', option)
     end
+    panels.keybindsPanel.presets.list:setCurrentOption(Keybind.currentPreset)
 end
 
 local function setup()
