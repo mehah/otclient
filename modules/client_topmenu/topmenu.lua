@@ -113,7 +113,7 @@ function terminate()
     })
 
     topMenu:destroy()
-    if PingWidget then
+    if PingWidget and not PingWidget:isDestroyed() then
         PingWidget:destroy()
         PingWidget = nil
     end
@@ -138,8 +138,23 @@ function online()
     showGameButtons()
 
     addEvent(function()
-        if modules.client_options.getOption('showPing') and
-            (g_game.getFeature(GameClientPing) or g_game.getFeature(GameExtendedClientPing)) then
+        local showPing = modules.client_options.getOption('showPing')
+        local pingFeatureAvailable = g_game.getFeature(GameClientPing) or g_game.getFeature(GameExtendedClientPing)
+        
+        if not PingWidget then
+            PingWidget = g_ui.loadUI("pingFps", modules.game_interface.getMapPanel())
+            MainPingPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(1))
+            MainPingPanel:setId("ping")
+            
+            pingImg = MainPingPanel:getChildByIndex(1)
+            pingPanel = MainPingPanel:getChildByIndex(2)
+            
+            mainFpsPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(2))
+            mainFpsPanel:setId("fps")
+            fpsPanel2 = mainFpsPanel:getChildByIndex(2)
+        end
+
+        if showPing and pingFeatureAvailable then
             pingLabel:show()
             if pingPanel then
                 pingPanel:show()
@@ -152,29 +167,12 @@ function online()
                 pingImg:hide()
             end
         end
-        if PingWidget then
-            return
-        end
-        PingWidget = g_ui.loadUI("pingFps", modules.game_interface.getMapPanel())
-        MainPingPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(1))
-        MainPingPanel.setId(MainPingPanel, "ping")
-        pingImg = MainPingPanel.getChildByIndex(MainPingPanel, 1)
-        pingPanel = MainPingPanel.getChildByIndex(MainPingPanel, 2)
-        if modules.client_options.getOption('showPing') then
-            pingImg:setVisible(true)
-            pingPanel:setVisible(true)
-        else
-            pingImg:setVisible(false)
-            pingPanel:setVisible(true)
-        end
-        mainFpsPanel = g_ui.createWidget("testPingPanel", PingWidget:getChildByIndex(2))
-        mainFpsPanel.setId(mainFpsPanel, "fps")
-        fpsPanel2 = mainFpsPanel.getChildByIndex(mainFpsPanel, 2)
-        if modules.client_options.getOption('showFps') then
-            fpsPanel2:setVisible(true)
-        else
-            fpsPanel2:setVisible(false)
-        end
+
+        pingImg:setVisible(showPing)
+        pingPanel:setVisible(showPing)
+        
+        local showFps = modules.client_options.getOption('showFps')
+        fpsPanel2:setVisible(showFps)
     end)
 end
 
