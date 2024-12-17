@@ -92,7 +92,13 @@ function init()
     topLeftYoutubeLink = topMenu:recursiveGetChildById('youtubeIcon')
     topLeftDiscordLink = topMenu:recursiveGetChildById('discordIcon')
 
-    g_keyboard.bindKeyDown('Ctrl+Shift+T', toggle)
+    Keybind.new("UI", "Toggle Top Menu", "Ctrl+Shift+T", "")
+    Keybind.bind("UI", "Toggle Top Menu", {
+      {
+        type = KEY_DOWN,
+        callback = toggle,
+      }
+    })
     if Services.websites then
         managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
             nil, openManagerAccounts)
@@ -121,7 +127,7 @@ function terminate()
         managerAccountsButton:destroy()
         managerAccountsButton = nil
     end
-
+    Keybind.delete("UI", "Toggle Top Menu")
 end
 
 function hide()

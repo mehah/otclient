@@ -62,11 +62,11 @@ function UIPopupMenu:onGeometryChange(newRect, oldRect)
     self:bindRectToParent()
 end
 
-function UIPopupMenu:addOption(optionName, optionCallback, shortcut)
+function UIPopupMenu:addOption(optionName, optionCallback, shortcut, disabled)
     local optionWidget = g_ui.createWidget(self:getStyleName() .. 'Button', self)
     optionWidget.onClick = function(widget)
         self:destroy()
-        optionCallback()
+        optionCallback(self:getPosition())
     end
     optionWidget:setText(optionName)
     local width = optionWidget:getTextSize().width + optionWidget:getMarginLeft() + optionWidget:getMarginRight() + 15
@@ -77,7 +77,7 @@ function UIPopupMenu:addOption(optionName, optionCallback, shortcut)
         width = width + shortcutLabel:getTextSize().width + shortcutLabel:getMarginLeft() +
                     shortcutLabel:getMarginRight()
     end
-
+    optionWidget:setEnabled(not disabled)
     self:setWidth(math.max(190, math.max(self:getWidth(), width)))
 end
 

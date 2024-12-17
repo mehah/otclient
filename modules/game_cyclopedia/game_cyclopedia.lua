@@ -33,6 +33,21 @@ controllerCyclopedia = Controller:new()
 controllerCyclopedia:setUI('game_cyclopedia')
 
 function controllerCyclopedia:onInit()
+    Keybind.new("Windows", "Show/hide Bosstiary Tracker", "", "")
+    Keybind.bind("Windows", "Show/hide Bosstiary Tracker", {
+      {
+        type = KEY_DOWN,
+        callback = Cyclopedia.toggleBosstiaryTracker,
+      }
+    })
+
+    Keybind.new("Windows", "Show/hide Bestiary Tracker", "", "")
+    Keybind.bind("Windows", "Show/hide Bestiary Tracker", {
+      {
+        type = KEY_DOWN,
+        callback = Cyclopedia.toggleBestiaryTracker,
+      }
+    })
 
 end
 
@@ -212,6 +227,8 @@ function controllerCyclopedia:onTerminate()
             end
         })
     end
+    Keybind.delete("Windows", "Show/hide Bosstiary Tracker")
+    Keybind.delete("Windows", "Show/hide Bestiary Tracker")
 end
 
 function hide()
