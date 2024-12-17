@@ -228,12 +228,13 @@ function controller:onInit()
       }
     })
     Keybind.new("UI", "Show/hide FPS / lag indicator", "", "")
-    Keybind.bind("UI", "Show/hide FPS / lag indicator", {
-      {
+    Keybind.bind("UI", "Show/hide FPS / lag indicator", {{
         type = KEY_DOWN,
-        callback = print(1),
-      }
-    })
+        callback = function()
+            toggleOption('showPing')
+            toggleOption('showFps')
+        end
+    }})
 
     Keybind.new("UI", "Show/hide Creature Names and Bars", "Ctrl+N", "")
     Keybind.bind("UI", "Show/hide Creature Names and Bars", {

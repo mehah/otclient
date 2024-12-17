@@ -20,7 +20,9 @@ function init()
     Keybind.bind("Windows", "Show/hide quest Log", {
       {
         type = KEY_DOWN,
-        callback =  g_game.requestQuestLog(),
+        callback =  function()
+            g_game.requestQuestLog()
+        end,
       }
     })
 end
