@@ -1,4 +1,3 @@
-
 local actionNameLimit = 39
 local changedOptions = {}
 local changedKeybinds = {}
