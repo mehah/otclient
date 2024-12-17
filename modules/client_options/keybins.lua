@@ -76,7 +76,7 @@ function removePreset()
     presetWindow.action = 'remove'
 
     presetWindow:setWidth(presetWindow.info:getTextSize().width + presetWindow:getPaddingLeft() +
-                              presetWindow:getPaddingRight())
+        presetWindow:getPaddingRight())
     presetWindow:show()
     presetWindow:raise()
     presetWindow:focus()
@@ -338,7 +338,7 @@ function updateKeybinds()
         return keybindA.action < keybindB.action
     end)
 
-   
+
     local comboBox = panels.keybindsPanel.presets.list:getCurrentOption()
     if not comboBox then
         return
@@ -393,7 +393,7 @@ function addKeybind(category, action, primary, secondary)
         text = text:sub(1, actionNameLimit + 15 + 8) .. '...'
     end
 
-    local row = panels.keybindsPanel.tablePanel.keybinds:addRow({{
+    local row = panels.keybindsPanel.tablePanel.keybinds:addRow({ {
         coloredText = {
             text = text,
             color = '#c0c0c0'
@@ -411,7 +411,7 @@ function addKeybind(category, action, primary, secondary)
         style = 'EditableKeybindsTableColumn',
         text = secondary,
         width = 90
-    }})
+    } })
 
     row.category = category
     row.action = action
@@ -424,8 +424,6 @@ function addKeybind(category, action, primary, secondary)
     row:getChildByIndex(5).edit.onClick = editKeybindSecondary
 end
 
-
-
 function clearHotkey(row)
     table.insert(changedHotkeys, {
         hotkeyId = row.hotkeyId,
@@ -433,7 +431,6 @@ function clearHotkey(row)
     })
     panels.keybindsPanel.tablePanel.keybinds:removeRow(row)
 end
-
 
 function editHotkeyKey(text)
     keyEditWindow.buttons.cancel.onClick = function()
@@ -636,7 +633,6 @@ function chatModeChange()
     panels.keybindsPanel.search.field:clearText()
 
     updateKeybinds()
-
 end
 
 function getChatMode()
@@ -663,17 +659,13 @@ function applyChangedOptions()
         for index, keybind in pairs(keybinds) do
             if keybind.primary then
                 if Keybind.setPrimaryActionKey(keybind.primary.category, keybind.primary.action, preset,
-                    keybind.primary.keyCombo, getChatMode()) then
-
+                        keybind.primary.keyCombo, getChatMode()) then
                     needKeybindsUpdate = true
-
                 end
             elseif keybind.secondary then
                 if Keybind.setSecondaryActionKey(keybind.secondary.category, keybind.secondary.action, preset,
-                    keybind.secondary.keyCombo, getChatMode()) then
-
+                        keybind.secondary.keyCombo, getChatMode()) then
                     needKeybindsUpdate = true
-
                 end
             end
         end
@@ -688,9 +680,9 @@ end
 
 function presetOption(widget, key, value, force)
     if not controller.ui:isVisible() then
-      return
+        return
     end
-  
+
     changedOptions[key] = { widget = widget, value = value, force = force }
     if key == "currentPreset" then
         Keybind.selectPreset(value)
@@ -704,7 +696,7 @@ function init_binds()
     chatModeGroup:addWidget(panels.keybindsPanel.panel.chatMode.off)
     chatModeGroup.onSelectionChange = chatModeChange
     chatModeGroup:selectWidget(panels.keybindsPanel.panel.chatMode.on)
-  
+
     keyEditWindow = g_ui.displayUI("styles/controls/key_edit")
     keyEditWindow:hide()
     presetWindow = g_ui.displayUI("styles/controls/preset")
@@ -725,26 +717,26 @@ function init_binds()
 end
 
 function terminate_binds()
-      if presetWindow then
+    if presetWindow then
         presetWindow:destroy()
         presetWindow = nil
-      end
-    
-      if chatModeGroup then
+    end
+
+    if chatModeGroup then
         chatModeGroup:destroy()
         chatModeGroup = nil
-      end
-    
-      if keyEditWindow then
+    end
+
+    if keyEditWindow then
         if keyEditWindow:isVisible() then
-          keyEditWindow:ungrabKeyboard()
-          disconnect(keyEditWindow, { onKeyDown = editKeybindKeyDown })
+            keyEditWindow:ungrabKeyboard()
+            disconnect(keyEditWindow, { onKeyDown = editKeybindKeyDown })
         end
         keyEditWindow:destroy()
         keyEditWindow = nil
-      end
-    
-      actionSearchEvent = nil
+    end
+
+    actionSearchEvent = nil
 end
 
 function listKeybindsComboBox(value)
