@@ -364,7 +364,6 @@ function updateHotkeys()
     end
 end
 
-
 function preAddHotkey(action, data)
     local preset = panels.keybindsPanel.presets.list:getCurrentOption().text
     local chatMode = getChatMode()
