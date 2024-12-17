@@ -657,8 +657,6 @@ function applyChangedOptions()
         if key == 'resetKeybinds' then
             Keybind.resetKeybindsToDefault(option.value, option.chatMode)
             needKeybindsUpdate = true
-        else
-            setOption(key, option.value, option.force)
         end
     end
     changedOptions = {}
