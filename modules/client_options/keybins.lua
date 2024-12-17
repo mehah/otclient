@@ -758,7 +758,7 @@ function listKeybindsComboBox(value)
 end
 
 function debug()
-    local currentOptionText = panels.keybindsPanel.presets.list:getCurrentOption().text
+    local currentOptionText = Keybind.currentPreset
     local chatMode = Keybind.chatMode
     local chatModeText = (chatMode == 1) and "Chat mode ON" or (chatMode == 2) and "Chat mode OFF" or "Unknown chat mode"
     print(string.format("The current configuration is: %s, and the mode is: %s", currentOptionText, chatModeText))
