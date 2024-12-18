@@ -24,7 +24,7 @@
 
 #include "shaderprogram.h"
 
-class PainterShaderProgram : public ShaderProgram
+class PainterShaderProgram final : public ShaderProgram
 {
 protected:
     enum
@@ -68,7 +68,7 @@ public:
     void addMultiTexture(const std::string& file);
     void bindMultiTextures() const;
 
-    void setUseFramebuffer(bool v) {
+    void setUseFramebuffer(const bool v) {
         m_useFramebuffer = v;
     }
 

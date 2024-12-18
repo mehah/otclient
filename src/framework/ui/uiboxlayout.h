@@ -34,8 +34,8 @@ public:
     void addWidget(const UIWidgetPtr& /*widget*/) override { update(); }
     void removeWidget(const UIWidgetPtr& /*widget*/) override { update(); }
 
-    void setSpacing(uint8_t spacing) { m_spacing = spacing; update(); }
-    void setFitChildren(bool fitParent) { m_fitChildren = fitParent; update(); }
+    void setSpacing(const uint8_t spacing) { m_spacing = spacing; update(); }
+    void setFitChildren(const bool fitParent) { m_fitChildren = fitParent; update(); }
 
     bool isUIBoxLayout() override { return true; }
 

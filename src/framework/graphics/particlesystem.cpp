@@ -21,10 +21,10 @@
  */
 
 #include "particlesystem.h"
-#include <framework/core/clock.h>
-#include <framework/graphics/drawpoolmanager.h>
 #include "particle.h"
 #include "particleaffector.h"
+#include <framework/core/clock.h>
+#include <framework/graphics/drawpoolmanager.h>
 
 ParticleSystem::ParticleSystem() :m_lastUpdateTime(g_clock.seconds()) {}
 

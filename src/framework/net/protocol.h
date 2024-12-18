@@ -42,7 +42,7 @@ public:
     ~Protocol() override;
 
 #ifndef __EMSCRIPTEN__
-    void connect(const std::string_view host, uint16_t port);
+    void connect(std::string_view host, uint16_t port);
 #else
     void connect(const std::string_view host, uint16_t port, bool gameWorld = false);
 #endif
@@ -63,7 +63,7 @@ public:
 #endif
 
     void generateXteaKey();
-    void setXteaKey(uint32_t a, uint32_t b, uint32_t c, uint32_t d) { m_xteaKey = { a, b, c, d }; }
+    void setXteaKey(const uint32_t a, const uint32_t b, const uint32_t c, const uint32_t d) { m_xteaKey = { a, b, c, d }; }
     std::vector<uint32_t > getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
     void enableXteaEncryption() { m_xteaEncryptionEnabled = true; }
 
@@ -89,8 +89,8 @@ protected:
     uint32_t m_packetNumber{ 0 };
 
 private:
-    void internalRecvHeader(uint8_t* buffer, uint16_t size);
-    void internalRecvData(uint8_t* buffer, uint16_t size);
+    void internalRecvHeader(const uint8_t* buffer, uint16_t size);
+    void internalRecvData(const uint8_t* buffer, uint16_t size);
 
     bool xteaDecrypt(const InputMessagePtr& inputMessage) const;
     void xteaEncrypt(const OutputMessagePtr& outputMessage) const;

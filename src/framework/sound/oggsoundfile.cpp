@@ -61,7 +61,7 @@ int OggSoundFile::read(void* buffer, int bufferSize)
     return totalBytesRead;
 }
 
-int OggSoundFile::cb_seek(void* source, ogg_int64_t offset, int whence)
+int OggSoundFile::cb_seek(void* source, const ogg_int64_t offset, const int whence)
 {
     auto* const file = static_cast<FileStream*>(source);
     switch (whence) {
@@ -85,4 +85,4 @@ int OggSoundFile::cb_close(void* source) {
 
 void OggSoundFile::reset() { ov_pcm_seek(&m_vorbisFile, 0); }
 long OggSoundFile::cb_tell(void* source) { return static_cast<FileStream*>(source)->tell(); }
-size_t OggSoundFile::cb_read(void* ptr, size_t size, size_t nmemb, void* source) { return static_cast<FileStream*>(source)->read(ptr, size, nmemb); }
+size_t OggSoundFile::cb_read(void* ptr, const size_t size, const size_t nmemb, void* source) { return static_cast<FileStream*>(source)->read(ptr, size, nmemb); }

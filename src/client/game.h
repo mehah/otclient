@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include <bitset>
-#include <framework/core/timer.h>
 #include "animatedtext.h"
 #include "container.h"
 #include "creature.h"
@@ -31,6 +29,8 @@
 #include "item.h"
 #include "outfit.h"
 #include "protocolgame.h"
+#include <bitset>
+#include <framework/core/timer.h>
 
 struct UnjustifiedPoints
 {
@@ -419,60 +419,60 @@ protected:
     void processPing();
     void processPingBack();
 
-    static void processUpdateNeeded(const std::string_view signature);
-    static void processLoginError(const std::string_view error);
-    static void processLoginAdvice(const std::string_view message);
-    static void processLoginWait(const std::string_view message, const uint8_t time);
-    static void processSessionEnd(const uint8_t reason);
+    static void processUpdateNeeded(std::string_view signature);
+    static void processLoginError(std::string_view error);
+    static void processLoginAdvice(std::string_view message);
+    static void processLoginWait(std::string_view message, uint8_t time);
+    static void processSessionEnd(uint8_t reason);
     static void processLogin();
     void processPendingGame();
     void processEnterGame();
 
     void processGameStart();
     void processGameEnd();
-    void processDeath(const uint8_t deathType, const uint8_t penality);
+    void processDeath(uint8_t deathType, uint8_t penality);
 
     void processGMActions(const std::vector<uint8_t>& actions);
-    void processInventoryChange(const uint8_t slot, const ItemPtr& item);
-    void processAttackCancel(const uint32_t seq);
-    void processWalkCancel(const Otc::Direction direction);
+    void processInventoryChange(uint8_t slot, const ItemPtr& item);
+    void processAttackCancel(uint32_t seq);
+    void processWalkCancel(Otc::Direction direction);
 
-    static void processPlayerHelpers(const uint16_t helpers);
-    void processPlayerModes(const Otc::FightModes fightMode, const Otc::ChaseModes chaseMode, const bool safeMode, const Otc::PVPModes pvpMode);
+    static void processPlayerHelpers(uint16_t helpers);
+    void processPlayerModes(Otc::FightModes fightMode, Otc::ChaseModes chaseMode, bool safeMode, Otc::PVPModes pvpMode);
 
     // message related
-    static void processTextMessage(const Otc::MessageMode mode, const std::string_view text);
-    static void processTalk(const std::string_view name, const uint16_t level, const Otc::MessageMode mode, const std::string_view text, const uint16_t channelId, const Position& pos);
+    static void processTextMessage(Otc::MessageMode mode, std::string_view text);
+    static void processTalk(std::string_view name, uint16_t level, Otc::MessageMode mode, std::string_view text, uint16_t channelId, const Position& pos);
 
     // container related
-    void processOpenContainer(const uint8_t containerId, const ItemPtr& containerItem, const std::string_view name, const uint8_t capacity, const bool hasParent, const std::vector<ItemPtr>& items, const bool isUnlocked, const bool hasPages, const uint16_t containerSize, const uint16_t firstIndex);
-    void processCloseContainer(const uint8_t containerId);
-    void processContainerAddItem(const uint8_t containerId, const ItemPtr& item, const uint16_t slot);
-    void processContainerUpdateItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& item);
-    void processContainerRemoveItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& lastItem);
+    void processOpenContainer(uint8_t containerId, const ItemPtr& containerItem, std::string_view name, uint8_t capacity, bool hasParent, const std::vector<ItemPtr>& items, bool isUnlocked, bool hasPages, uint16_t containerSize, uint16_t firstIndex);
+    void processCloseContainer(uint8_t containerId);
+    void processContainerAddItem(uint8_t containerId, const ItemPtr& item, uint16_t slot);
+    void processContainerUpdateItem(uint8_t containerId, uint16_t slot, const ItemPtr& item);
+    void processContainerRemoveItem(uint8_t containerId, uint16_t slot, const ItemPtr& lastItem);
 
     // channel related
     static void processChannelList(const std::vector<std::tuple<uint16_t, std::string>>& channelList);
-    static void processOpenChannel(const uint16_t channelId, const std::string_view name);
-    static void processOpenPrivateChannel(const std::string_view name);
-    static void processOpenOwnPrivateChannel(const uint16_t channelId, const std::string_view name);
-    static void processCloseChannel(const uint16_t channelId);
+    static void processOpenChannel(uint16_t channelId, std::string_view name);
+    static void processOpenPrivateChannel(std::string_view name);
+    static void processOpenOwnPrivateChannel(uint16_t channelId, std::string_view name);
+    static void processCloseChannel(uint16_t channelId);
 
     // rule violations
-    static void processRuleViolationChannel(const uint16_t channelId);
-    static void processRuleViolationRemove(const std::string_view name);
-    static void processRuleViolationCancel(const std::string_view name);
+    static void processRuleViolationChannel(uint16_t channelId);
+    static void processRuleViolationRemove(std::string_view name);
+    static void processRuleViolationCancel(std::string_view name);
     static void processRuleViolationLock();
 
     // vip related
-    void processVipAdd(const uint32_t id, const std::string_view name, const uint32_t status, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupID);
-    void processVipStateChange(const uint32_t id, const uint32_t status);
+    void processVipAdd(uint32_t id, std::string_view name, uint32_t status, std::string_view description, uint32_t iconId, bool notifyLogin, const std::vector<uint8_t>& groupID);
+    void processVipStateChange(uint32_t id, uint32_t status);
     void processVipGroupChange(const std::vector<std::tuple<uint8_t, std::string, bool>>& vipGroups, uint8_t groupsAmountLeft);
 
     // tutorial hint
-    static void processTutorialHint(const uint8_t id);
-    static void processAddAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message);
-    static void processRemoveAutomapFlag(const Position& pos, const uint8_t icon, const std::string_view message);
+    static void processTutorialHint(uint8_t id);
+    static void processAddAutomapFlag(const Position& pos, uint8_t icon, std::string_view message);
+    static void processRemoveAutomapFlag(const Position& pos, uint8_t icon, std::string_view message);
 
     // outfit
     void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
@@ -484,47 +484,47 @@ protected:
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items);
-    static void processPlayerGoods(const uint64_t money, const std::vector<std::tuple<ItemPtr, uint16_t>>& goods);
+    static void processPlayerGoods(uint64_t money, const std::vector<std::tuple<ItemPtr, uint16_t>>& goods);
     static void processCloseNpcTrade();
 
     // player trade
-    static void processOwnTrade(const std::string_view name, const std::vector<ItemPtr>& items);
-    static void processCounterTrade(const std::string_view name, const std::vector<ItemPtr>& items);
+    static void processOwnTrade(std::string_view name, const std::vector<ItemPtr>& items);
+    static void processCounterTrade(std::string_view name, const std::vector<ItemPtr>& items);
     static void processCloseTrade();
 
     // edit text/list
-    static void processEditText(const uint32_t id, const uint32_t itemId, const uint16_t maxLength, const std::string_view text, const std::string_view writer, const std::string_view date);
-    static void processEditList(const uint32_t id, const uint8_t doorId, const std::string_view text);
+    static void processEditText(uint32_t id, uint32_t itemId, uint16_t maxLength, std::string_view text, std::string_view writer, std::string_view date);
+    static void processEditList(uint32_t id, uint8_t doorId, std::string_view text);
 
     // questlog
     static void processQuestLog(const std::vector<std::tuple<uint16_t, std::string, bool>>& questList);
-    static void processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view, uint16_t>>& questMissions);
+    static void processQuestLine(uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view, uint16_t>>& questMissions);
 
     // modal dialogs >= 970
-    static void processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string>>
-                                   & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string>>
-                                   & choiceList, const bool priority);
+    static void processModalDialog(uint32_t id, std::string_view title, std::string_view message, const std::vector<std::tuple<uint8_t, std::string>>
+                                   & buttonList, uint8_t enterButton, uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string>>
+                                   & choiceList, bool priority);
 
     // cyclopedia
-    static void processItemDetail(const uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions);
+    static void processItemDetail(uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions);
     static void processBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& bestiaryRaces);
     static void processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
                                                     const std::vector<std::tuple<uint8_t, uint16_t>>& combats);
-    static void processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, const double mitigation,
+    static void processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, double mitigation,
                                                     const std::vector<std::vector<uint16_t>>& additionalSkillsArray,
                                                     const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
                                                     const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray,
                                                     const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray);
-    static void processCyclopediaCharacterGeneralStatsBadge(const uint8_t showAccountInformation, const uint8_t playerOnline, const uint8_t playerPremium,
-                                                    const std::string_view loyaltyTitle,
-                                                    const std::vector<std::tuple<uint32_t, std::string>>& badgesVector);
+    static void processCyclopediaCharacterGeneralStatsBadge(uint8_t showAccountInformation, uint8_t playerOnline, uint8_t playerPremium,
+                                                            std::string_view loyaltyTitle,
+                                                            const std::vector<std::tuple<uint32_t, std::string>>& badgesVector);
     static void processCyclopediaCharacterItemSummary(const CyclopediaCharacterItemSummary& data);
     static void processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits,
-                                                    const std::vector<CharacterInfoMounts>& mounts, std::vector<CharacterInfoFamiliar>& familiars);
+                                                    const std::vector<CharacterInfoMounts>& mounts, const std::vector<CharacterInfoFamiliar>& familiars);
     static void processCyclopediaCharacterRecentDeaths(const CyclopediaCharacterRecentDeaths& data);
     static void processCyclopediaCharacterRecentPvpKills(const CyclopediaCharacterRecentPvPKills& data);
     static void processParseBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& bestiaryData);
-    static void processParseBestiaryOverview(const std::string_view raceName, const std::vector<BestiaryOverviewMonsters>& data, const uint16_t animusMasteryPoints);
+    static void processParseBestiaryOverview(std::string_view raceName, const std::vector<BestiaryOverviewMonsters>& data, uint16_t animusMasteryPoints);
     static void processUpdateBestiaryMonsterData(const BestiaryMonsterData& data);
     static void processUpdateBestiaryCharmsData(const BestiaryCharmsData& charmData);
     static void processBosstiaryInfo(const std::vector<BosstiaryData>& boss);
@@ -535,29 +535,29 @@ protected:
 
 public:
     // login related
-    void loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey);
+    void loginWorld(std::string_view account, std::string_view password, std::string_view worldName, std::string_view worldHost, int worldPort, std::string_view characterName, std::string_view authenticatorToken, std::string_view sessionKey);
     void cancelLogin();
     void forceLogout();
     void safeLogout();
 
     // walk related
-    bool walk(const Otc::Direction direction);
+    bool walk(Otc::Direction direction);
     void autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos);
-    void forceWalk(const Otc::Direction direction);
-    void turn(const Otc::Direction direction);
+    void forceWalk(Otc::Direction direction);
+    void turn(Otc::Direction direction);
     void stop();
 
     // item related
-    void look(const ThingPtr& thing, const bool isBattleList = false);
+    void look(const ThingPtr& thing, bool isBattleList = false);
     void move(const ThingPtr& thing, const Position& toPos, int count);
-    void moveToParentContainer(const ThingPtr& thing, const int count);
+    void moveToParentContainer(const ThingPtr& thing, int count);
     void rotate(const ThingPtr& thing);
     void wrap(const ThingPtr& thing);
     void use(const ThingPtr& thing);
     void useWith(const ItemPtr& item, const ThingPtr& toThing);
-    void useInventoryItem(const uint16_t itemId);
-    void useInventoryItemWith(const uint16_t itemId, const ThingPtr& toThing);
-    ItemPtr findItemInContainers(const uint32_t itemId, const int subType);
+    void useInventoryItem(uint16_t itemId);
+    void useInventoryItemWith(uint16_t itemId, const ThingPtr& toThing);
+    ItemPtr findItemInContainers(uint32_t itemId, int subType);
 
     // container related
     int open(const ItemPtr& item, const ContainerPtr& previousContainer);
@@ -573,27 +573,27 @@ public:
     void cancelAttackAndFollow();
 
     // talk related
-    void talk(const std::string_view message);
-    void talkChannel(const Otc::MessageMode mode, const uint16_t channelId, const std::string_view message);
-    void talkPrivate(const Otc::MessageMode mode, const std::string_view receiver, const std::string_view message);
+    void talk(std::string_view message);
+    void talkChannel(Otc::MessageMode mode, uint16_t channelId, std::string_view message);
+    void talkPrivate(Otc::MessageMode mode, std::string_view receiver, std::string_view message);
 
     // channel related
-    void openPrivateChannel(const std::string_view receiver);
+    void openPrivateChannel(std::string_view receiver);
     void requestChannels();
-    void joinChannel(const uint16_t channelId);
-    void leaveChannel(const uint16_t channelId);
+    void joinChannel(uint16_t channelId);
+    void leaveChannel(uint16_t channelId);
     void closeNpcChannel();
     void openOwnChannel();
-    void inviteToOwnChannel(const std::string_view name);
-    void excludeFromOwnChannel(const std::string_view name);
+    void inviteToOwnChannel(std::string_view name);
+    void excludeFromOwnChannel(std::string_view name);
 
     // party related
-    void partyInvite(const uint32_t creatureId);
-    void partyJoin(const uint32_t creatureId);
-    void partyRevokeInvitation(const uint32_t creatureId);
-    void partyPassLeadership(const uint32_t creatureId);
+    void partyInvite(uint32_t creatureId);
+    void partyJoin(uint32_t creatureId);
+    void partyRevokeInvitation(uint32_t creatureId);
+    void partyPassLeadership(uint32_t creatureId);
     void partyLeave();
-    void partyShareExperience(const bool active);
+    void partyShareExperience(bool active);
 
     // outfit related
     void requestOutfit();
@@ -602,104 +602,104 @@ public:
     void sendTyping(bool typing);
 
     // vip related
-    void addVip(const std::string_view name);
-    void removeVip(const uint32_t playerId);
-    void editVip(const uint32_t playerId, const std::string_view description, const uint32_t iconId, const bool notifyLogin, const std::vector<uint8_t>& groupID = {});
-    void editVipGroups(const Otc::GroupsEditInfoType_t action, const uint8_t groupId, const std::string_view groupName);
+    void addVip(std::string_view name);
+    void removeVip(uint32_t playerId);
+    void editVip(uint32_t playerId, std::string_view description, uint32_t iconId, bool notifyLogin, const std::vector<uint8_t>& groupID = {});
+    void editVipGroups(Otc::GroupsEditInfoType_t action, uint8_t groupId, std::string_view groupName);
     // fight modes related
-    void setChaseMode(const Otc::ChaseModes chaseMode);
-    void setFightMode(const Otc::FightModes fightMode);
-    void setSafeFight(const bool on);
-    void setPVPMode(const Otc::PVPModes pvpMode);
+    void setChaseMode(Otc::ChaseModes chaseMode);
+    void setFightMode(Otc::FightModes fightMode);
+    void setSafeFight(bool on);
+    void setPVPMode(Otc::PVPModes pvpMode);
     Otc::ChaseModes getChaseMode() { return m_chaseMode; }
     Otc::FightModes getFightMode() { return m_fightMode; }
     bool isSafeFight() { return m_safeFight; }
     Otc::PVPModes getPVPMode() { return m_pvpMode; }
 
     // pvp related
-    void setUnjustifiedPoints(const UnjustifiedPoints unjustifiedPoints);
+    void setUnjustifiedPoints(UnjustifiedPoints unjustifiedPoints);
     UnjustifiedPoints getUnjustifiedPoints() { return m_unjustifiedPoints; };
-    void setOpenPvpSituations(const uint8_t openPvpSituations);
+    void setOpenPvpSituations(uint8_t openPvpSituations);
     int getOpenPvpSituations() { return m_openPvpSituations; }
 
     // npc trade related
     void inspectNpcTrade(const ItemPtr& item);
-    void buyItem(const ItemPtr& item, const uint16_t amount, const bool ignoreCapacity, const bool buyWithBackpack);
-    void sellItem(const ItemPtr& item, const uint16_t amount, const bool ignoreEquipped);
+    void buyItem(const ItemPtr& item, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack);
+    void sellItem(const ItemPtr& item, uint16_t amount, bool ignoreEquipped);
     void closeNpcTrade();
 
     // player trade related
     void requestTrade(const ItemPtr& item, const CreaturePtr& creature);
-    void inspectTrade(const bool counterOffer, const uint8_t index);
+    void inspectTrade(bool counterOffer, uint8_t index);
     void acceptTrade();
     void rejectTrade();
 
     // house window and editable items related
-    void editText(const uint32_t id, const std::string_view text);
-    void editList(const uint32_t id, const uint8_t doorId, const std::string_view text);
+    void editText(uint32_t id, std::string_view text);
+    void editList(uint32_t id, uint8_t doorId, std::string_view text);
 
     // rule violations (only gms)
-    void openRuleViolation(const std::string_view reporter);
-    void closeRuleViolation(const std::string_view reporter);
+    void openRuleViolation(std::string_view reporter);
+    void closeRuleViolation(std::string_view reporter);
     void cancelRuleViolation();
 
     // reports
-    void reportBug(const std::string_view comment);
-    void reportRuleViolation(const std::string_view target, const uint8_t reason, const uint8_t action, const std::string_view comment, const std::string_view statement, const uint16_t statementId, const bool ipBanishment);
-    void debugReport(const std::string_view a, const std::string_view b, const std::string_view c, const std::string_view d);
+    void reportBug(std::string_view comment);
+    void reportRuleViolation(std::string_view target, uint8_t reason, uint8_t action, std::string_view comment, std::string_view statement, uint16_t statementId, bool ipBanishment);
+    void debugReport(std::string_view a, std::string_view b, std::string_view c, std::string_view d);
 
     // questlog related
     void requestQuestLog();
-    void requestQuestLine(const uint16_t questId);
+    void requestQuestLine(uint16_t questId);
 
     // 870 only
     void equipItem(const ItemPtr& item);
-    void mount(const bool mount);
+    void mount(bool mount);
 
     // 910 only
-    void requestItemInfo(const ItemPtr& item, const uint8_t index);
+    void requestItemInfo(const ItemPtr& item, uint8_t index);
 
     // >= 970 modal dialog
-    void answerModalDialog(const uint32_t dialog, const uint8_t button, const uint8_t choice);
+    void answerModalDialog(uint32_t dialog, uint8_t button, uint8_t choice);
 
     // >= 984 browse field
     void browseField(const Position& position);
-    void seekInContainer(const uint8_t containerId, const uint16_t index);
+    void seekInContainer(uint8_t containerId, uint16_t index);
 
     // >= 1080 ingame store
-    void buyStoreOffer(const uint32_t offerId, const uint8_t productType, const std::string_view name = "");
-    void requestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage);
-    void requestStoreOffers(const std::string_view categoryName, const uint8_t serviceType = 0);
-    void openStore(const uint8_t serviceType = 0, const std::string_view category = "");
-    void transferCoins(const std::string_view recipient, const uint16_t amount);
-    void openTransactionHistory(const uint8_t entriesPerPage);
+    void buyStoreOffer(uint32_t offerId, uint8_t productType, std::string_view name = "");
+    void requestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
+    void requestStoreOffers(std::string_view categoryName, uint8_t serviceType = 0);
+    void openStore(uint8_t serviceType = 0, std::string_view category = "");
+    void transferCoins(std::string_view recipient, uint16_t amount);
+    void openTransactionHistory(uint8_t entriesPerPage);
 
     //void reportRuleViolation2();
     void ping();
     void setPingDelay(const int delay) { m_pingDelay = delay; }
 
     // otclient only
-    void changeMapAwareRange(const uint8_t xrange, const uint8_t yrange);
+    void changeMapAwareRange(uint8_t xrange, uint8_t yrange);
 
     // dynamic support for game features
     void enableFeature(const Otc::GameFeature feature) { m_features.set(feature, true); }
     void disableFeature(const Otc::GameFeature feature) { m_features.set(feature, false); }
-    void setFeature(const Otc::GameFeature feature, bool enabled) { m_features.set(feature, enabled); }
+    void setFeature(const Otc::GameFeature feature, const bool enabled) { m_features.set(feature, enabled); }
     bool getFeature(const Otc::GameFeature feature) { return m_features.test(feature); }
 
-    void setProtocolVersion(const uint16_t version);
+    void setProtocolVersion(uint16_t version);
     int getProtocolVersion() { return m_protocolVersion; }
 
     bool isUsingProtobuf() { return getProtocolVersion() >= 1281 && !getFeature(Otc::GameLoadSprInsteadProtobuf); }
 
-    void setClientVersion(const uint16_t version);
+    void setClientVersion(uint16_t version);
     int getClientVersion() { return m_clientVersion; }
 
     void setCustomOs(const Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
     Otc::OperatingSystem_t getOs();
 
-    void setWalkTurnDelay(uint16_t v) { m_walkTurnDelay = v; }
-    void setWalkFirstStepDelay(uint16_t v) { m_walkFirstStepDelay = v; }
+    void setWalkTurnDelay(const uint16_t v) { m_walkTurnDelay = v; }
+    void setWalkFirstStepDelay(const uint16_t v) { m_walkFirstStepDelay = v; }
 
     uint16_t getWalkTurnDelay() { return m_walkTurnDelay; }
     uint16_t getWalkFirstStepDelay() { return m_walkFirstStepDelay; }
@@ -722,16 +722,16 @@ public:
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
 
     int getPing() { return m_ping; }
-    ContainerPtr getContainer(int index) { return m_containers[index]; }
+    ContainerPtr getContainer(const int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }
     CreaturePtr getAttackingCreature() { return m_attackingCreature; }
     CreaturePtr getFollowingCreature() { return m_followingCreature; }
-    void setServerBeat(int beat) { m_serverBeat = beat; }
+    void setServerBeat(const int beat) { m_serverBeat = beat; }
     int getServerBeat() { return m_serverBeat; }
-    void setCanReportBugs(bool enable) { m_canReportBugs = enable; }
+    void setCanReportBugs(const bool enable) { m_canReportBugs = enable; }
     bool canReportBugs() { return m_canReportBugs; }
-    void setExpertPvpMode(bool enable) { m_expertPvpMode = enable; }
+    void setExpertPvpMode(const bool enable) { m_expertPvpMode = enable; }
     bool getExpertPvpMode() { return m_expertPvpMode; }
     LocalPlayerPtr getLocalPlayer() { return m_localPlayer; }
     ProtocolGamePtr getProtocolGame() { return m_protocolGame; }
@@ -740,57 +740,57 @@ public:
     std::vector<uint8_t > getGMActions() { return m_gmActions; }
     bool isGM() { return !m_gmActions.empty(); }
 
-    std::string formatCreatureName(const std::string_view name);
+    std::string formatCreatureName(std::string_view name);
     int findEmptyContainerId();
 
     // market related
     void leaveMarket();
-    void browseMarket(const uint8_t browseId, const uint8_t browseType);
-    void createMarketOffer(const uint8_t type, const uint16_t itemId, const uint8_t itemTier, const uint16_t amount, const uint64_t price, const uint8_t anonymous);
-    void cancelMarketOffer(const uint32_t timestamp, const uint16_t counter);
-    void acceptMarketOffer(const uint32_t timestamp, const uint16_t counter, const uint16_t amount);
+    void browseMarket(uint8_t browseId, uint8_t browseType);
+    void createMarketOffer(uint8_t type, uint16_t itemId, uint8_t itemTier, uint16_t amount, uint64_t price, uint8_t anonymous);
+    void cancelMarketOffer(uint32_t timestamp, uint16_t counter);
+    void acceptMarketOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
 
     // prey related
-    void preyAction(const uint8_t slot, const uint8_t actionType, const uint16_t index);
+    void preyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void preyRequest();
 
     // imbuing related
-    void applyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm);
-    void clearImbuement(const uint8_t slot);
+    void applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
+    void clearImbuement(uint8_t slot);
     void closeImbuingWindow();
     void imbuementDurations(bool isOpen = false);
 
-    void enableTileThingLuaCallback(bool value) { m_tileThingsLuaCallback = value; }
+    void enableTileThingLuaCallback(const bool value) { m_tileThingsLuaCallback = value; }
     bool isTileThingLuaCallbackEnabled() { return m_tileThingsLuaCallback; }
 
-    void stashWithdraw(const uint16_t itemId, const uint32_t count, const uint8_t stackpos);
+    void stashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
 
     // highscore related
-    void requestHighscore(const uint8_t action, const uint8_t category, const uint32_t vocation, const std::string_view world, const uint8_t worldType, const uint8_t battlEye, const uint16_t page, const uint8_t totalPages);
-    void processHighscore(const std::string_view serverName, const std::string_view world, const uint8_t worldType, const uint8_t battlEye,
-                            const std::vector<std::tuple<uint32_t, std::string>>& vocations,
-                            const std::vector<std::tuple<uint8_t, std::string>>& categories,
-                            const uint16_t page, const uint16_t totalPages,
-                            const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, const uint32_t entriesTs);
+    void requestHighscore(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
+    void processHighscore(std::string_view serverName, std::string_view world, uint8_t worldType, uint8_t battlEye,
+                          const std::vector<std::tuple<uint32_t, std::string>>& vocations,
+                          const std::vector<std::tuple<uint8_t, std::string>>& categories,
+                          uint16_t page, uint16_t totalPages,
+                          const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, uint32_t entriesTs);
 
     void requestBless();
-    void requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems);
-    void openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback);
+    void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
+    void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
     void sendGmTeleport(const Position& pos);
 
     // cyclopedia related
     void inspectionNormalObject(const Position& position);
-    void inspectionObject(const Otc::InspectObjectTypes inspectionType, const uint16_t itemId, const uint8_t itemCount);
+    void inspectionObject(Otc::InspectObjectTypes inspectionType, uint16_t itemId, uint8_t itemCount);
     void requestBestiary();
-    void requestBestiaryOverview(const std::string_view catName);
-    void requestBestiarySearch(const uint16_t raceId);
-    void requestSendBuyCharmRune(const uint8_t runeId, const uint8_t action, const uint16_t raceId);
-    void requestSendCharacterInfo(const uint32_t playerId, const Otc::CyclopediaCharacterInfoType_t characterInfoType, const uint16_t entriesPerPage = 0, const uint16_t page = 0);
-    void requestSendCyclopediaHouseAuction(const Otc::CyclopediaHouseAuctionType_t type, const uint32_t houseId, const uint32_t timestamp = 0, const uint64_t bidValue = 0, const std::string_view name = "");
+    void requestBestiaryOverview(std::string_view catName);
+    void requestBestiarySearch(uint16_t raceId);
+    void requestSendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
+    void requestSendCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage = 0, uint16_t page = 0);
+    void requestSendCyclopediaHouseAuction(Otc::CyclopediaHouseAuctionType_t type, uint32_t houseId, uint32_t timestamp = 0, uint64_t bidValue = 0, std::string_view name = "");
     void requestBosstiaryInfo();
     void requestBossSlootInfo();
-    void requestBossSlotAction(const uint8_t action, const uint32_t raceId);
-    void sendStatusTrackerBestiary(const uint16_t raceId, const bool status);
+    void requestBossSlotAction(uint8_t action, uint32_t raceId);
+    void sendStatusTrackerBestiary(uint16_t raceId, bool status);
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }

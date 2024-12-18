@@ -21,9 +21,9 @@
  */
 
 #include "gameconfig.h"
-#include <framework/otml/otml.h>
-#include <framework/graphics/fontmanager.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/graphics/fontmanager.h>
+#include <framework/otml/otml.h>
 
 GameConfig g_gameConfig;
 
@@ -31,9 +31,6 @@ static constexpr bool LOAD_SETUP = true;
 
 void GameConfig::init()
 {
-    if (!LOAD_SETUP)
-        return;
-
     const std::string& fileName = "/data/setup";
 
     try {

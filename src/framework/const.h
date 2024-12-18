@@ -23,6 +23,7 @@
 #pragma once
 
 #include <cstdint>
+#include <numbers>
 
 #define DEG_TO_RAD (std::acos(-1.f)/180.f)
 #define RAD_TO_DEC (180.f/std::acos(-1.f))
@@ -48,7 +49,7 @@
 namespace Fw
 {
     // clang c++20 dont support std::numbers::pi
-    static constexpr float pi = 3.141592653589793f;
+    static constexpr float pi = std::numbers::pi_v<float>;
     static constexpr float MIN_ALPHA = 0.003f;
 
     enum Key : uint8_t

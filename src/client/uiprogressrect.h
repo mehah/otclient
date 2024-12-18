@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "item.h"
+#include <framework/ui/uiwidget.h>
 
-class UIProgressRect : public UIWidget
+class UIProgressRect final : public UIWidget
 {
 public:
     void drawSelf(DrawPoolType drawPane) override;
@@ -35,7 +35,7 @@ public:
     float getPercent() { return m_percent; }
 
 protected:
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     float m_percent{ 0 };
 };

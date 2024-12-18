@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/global.h>
 #include "glutil.h"
+#include <framework/global.h>
 
 enum class DrawPoolType : uint8_t;
 

@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include <framework/global.h>
-#include <framework/core/timer.h>
 #include "thing.h"
+#include <framework/core/timer.h>
+#include <framework/global.h>
 
  // @bindclass
-class Effect : public Thing
+class Effect final : public Thing
 {
 public:
     void draw(const Point& /*dest*/, bool drawThings = true, const LightViewPtr & = nullptr) override;

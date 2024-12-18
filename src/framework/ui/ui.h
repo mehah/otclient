@@ -28,7 +28,7 @@
 #include "uilayout.h"
 #include "uimanager.h"
 #include "uiparticles.h"
+#include "uiqrcode.h"
 #include "uitextedit.h"
 #include "uiverticallayout.h"
 #include "uiwidget.h"
-#include "uiqrcode.h"
