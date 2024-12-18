@@ -762,8 +762,8 @@ namespace Otc
         INSPECT_NPCTRADE = 1,
         INSPECT_PLAYERTRADE = 2,
         INSPECT_CYCLOPEDIA = 3
-    }; 
-    
+    };
+
     enum GameStoreInfoType_t : uint8_t
     {
         SHOW_NONE = 0,

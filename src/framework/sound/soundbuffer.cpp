@@ -53,7 +53,7 @@ bool SoundBuffer::fillBuffer(const SoundFilePtr& soundFile)
     return fillBuffer(format, samples, samples.size(), soundFile->getRate());
 }
 
-bool SoundBuffer::fillBuffer(ALenum sampleFormat, const std::vector<char>& data, int size, int rate) const
+bool SoundBuffer::fillBuffer(const ALenum sampleFormat, const std::vector<char>& data, const int size, const int rate) const
 {
     alBufferData(m_bufferId, sampleFormat, data.data(), size, rate);
     const ALenum err = alGetError();

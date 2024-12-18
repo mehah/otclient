@@ -22,6 +22,6 @@
 
 #pragma once
 
-#include <framework/util/BS_thread_pool.hpp>
+#include <BS_thread_pool.hpp>
 
 extern BS::thread_pool g_asyncDispatcher;

@@ -25,7 +25,7 @@
 
 UIMissile::UIMissile() { setProp(PropDraggable, true, false); }
 
-void UIMissile::drawSelf(DrawPoolType drawPane)
+void UIMissile::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -52,7 +52,7 @@ void UIMissile::drawSelf(DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIMissile::setMissileId(int id)
+void UIMissile::setMissileId(const int id)
 {
     if (id == 0)
         m_missile = nullptr;

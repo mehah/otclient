@@ -22,20 +22,20 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "effect.h"
+#include <framework/ui/uiwidget.h>
 
-class UIEffect : public UIWidget
+class UIEffect final : public UIWidget
 {
 public:
     UIEffect();
     void drawSelf(DrawPoolType drawPane) override;
 
     void setEffectId(int id);
-    void setEffectVisible(bool visible) { m_effectVisible = visible; }
+    void setEffectVisible(const bool visible) { m_effectVisible = visible; }
     void setEffect(const EffectPtr& effect);
-    void setVirtual(bool virt) { m_virtual = virt; }
+    void setVirtual(const bool virt) { m_virtual = virt; }
     void clearEffect() { setEffectId(0); }
 
     int getEffectId() { return m_effect ? m_effect->getId() : 0; }
@@ -44,7 +44,7 @@ public:
     bool isEffectVisible() { return m_effectVisible; }
 
 protected:
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     EffectPtr m_effect;
     bool m_virtual{ false };

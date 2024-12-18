@@ -32,4 +32,4 @@ void Clock::update()
 }
 
 ticks_t Clock::realMicros() { return stdext::micros(); }
-ticks_t Clock::realMillis(){  return stdext::millis(); }
+ticks_t Clock::realMillis() { return stdext::millis(); }

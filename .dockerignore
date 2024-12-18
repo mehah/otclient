@@ -1,2 +1,12 @@
+/.git/
+/.github/
+/.idea/
+/.vs/
+/android/
 /build/
+/cmake-build*
+/vc17/
 Dockerfile
+*.dll
+*.exe
+*.pdb

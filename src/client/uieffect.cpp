@@ -25,7 +25,7 @@
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 
-void UIEffect::drawSelf(DrawPoolType drawPane)
+void UIEffect::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -52,7 +52,7 @@ void UIEffect::drawSelf(DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIEffect::setEffectId(int id)
+void UIEffect::setEffectId(const int id)
 {
     if (id == 0)
         m_effect = nullptr;

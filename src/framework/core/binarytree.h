@@ -69,7 +69,7 @@ public:
     void addU8(uint8_t v);
     void addU16(uint16_t v);
     void addU32(uint32_t v);
-    void addString(const std::string_view v);
+    void addString(std::string_view v);
     void addPos(uint16_t x, uint16_t y, uint8_t z);
     void addPoint(const Point& point);
 

@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/graphics/paintershaderprogram.h>
 #include "declarations.h"
+#include <framework/graphics/paintershaderprogram.h>
 
  //@bindsingleton g_shaders
 class ShaderManager
@@ -46,18 +46,18 @@ public:
     void clear();
 
     // TODO: Move these setup methods to a ClientShaderManager
-    void setupMapShader(const std::string_view name);
-    void setupItemShader(const std::string_view name);
-    void setupOutfitShader(const std::string_view name);
-    void setupMountShader(const std::string_view name);
+    void setupMapShader(std::string_view name);
+    void setupItemShader(std::string_view name);
+    void setupOutfitShader(std::string_view name);
+    void setupMountShader(std::string_view name);
 
-    void createShader(const std::string_view name, bool useFramebuffer = false);
-    void createFragmentShader(const std::string_view name, const std::string_view file, bool useFramebuffer = false);
-    void createFragmentShaderFromCode(const std::string_view name, const std::string_view code, bool useFramebuffer = false);
+    void createShader(std::string_view name, bool useFramebuffer = false);
+    void createFragmentShader(std::string_view name, std::string_view file, bool useFramebuffer = false);
+    void createFragmentShaderFromCode(std::string_view name, std::string_view code, bool useFramebuffer = false);
 
-    void addMultiTexture(const std::string_view name, const std::string_view file);
+    void addMultiTexture(std::string_view name, std::string_view file);
 
-    PainterShaderProgramPtr getShader(const std::string_view name);
+    PainterShaderProgramPtr getShader(std::string_view name);
     PainterShaderProgramPtr getShaderById(const uint8_t id) const {
         return id > 0 && id <= m_shadersVector.size() ? m_shadersVector[id - 1] : nullptr;
     }

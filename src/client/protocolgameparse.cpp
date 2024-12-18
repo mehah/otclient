@@ -25,7 +25,7 @@
 #include "effect.h"
 #include "framework/net/inputmessage.h"
 
-#include <framework/core/eventdispatcher.h>
+#include "attachedeffectmanager.h"
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
@@ -33,9 +33,9 @@
 #include "missile.h"
 #include "statictext.h"
 #include "thingtypemanager.h"
-#include "attachedeffectmanager.h"
 #include "tile.h"
-#include "time.h"
+#include <ctime>
+#include <framework/core/eventdispatcher.h>
 
 void ProtocolGame::parseMessage(const InputMessagePtr& msg)
 {
@@ -585,7 +585,6 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     break;
                 default:
                     throw Exception("unhandled opcode %d", opcode);
-                    break;
             }
             prevOpcode = opcode;
         }
@@ -864,7 +863,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
             msg->getU32(); // 0
             const uint32_t time = msg->getU32();
             const uint8_t mode = msg->getU8(); //0 = normal, 1 = gift, 2 = refund
-            uint32_t rawAmount = msg->getU32();
+            const uint32_t rawAmount = msg->getU32();
             int32_t amount;
             if (rawAmount > INT32_MAX) {
                 amount = -static_cast<int32_t>(UINT32_MAX - rawAmount + 1);
@@ -1091,7 +1090,10 @@ void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)
     const uint8_t killsMonthRemaining = msg->getU8();
     const uint8_t skullTime = msg->getU8();
 
-    g_game.setUnjustifiedPoints({ killsDay, killsDayRemaining, killsWeek, killsWeekRemaining, killsMonth, killsMonthRemaining, skullTime });
+    g_game.setUnjustifiedPoints({ .killsDay = killsDay, .killsDayRemaining = killsDayRemaining, .killsWeek = killsWeek, .killsWeekRemaining =
+        killsWeekRemaining,
+        .killsMonth = killsMonth, .killsMonthRemaining = killsMonthRemaining, .skullTime = skullTime
+    });
 }
 
 void ProtocolGame::parsePvpSituations(const InputMessagePtr& msg)
@@ -1625,8 +1627,8 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
                     const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
-                    const int8_t offsetX = static_cast<int8_t>(msg->getU8());
-                    const int8_t offsetY = static_cast<int8_t>(msg->getU8());
+                    const auto offsetX = static_cast<int8_t>(msg->getU8());
+                    const auto offsetY = static_cast<int8_t>(msg->getU8());
                     if (!g_things.isValidDatId(shotId, ThingCategoryMissile)) {
                         g_logger.traceError(stdext::format("invalid missile id %d", shotId));
                         return;
@@ -1834,7 +1836,6 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
         const auto& creature = g_map.getCreatureById(creatureId);
         if (!creature) {
             g_logger.traceError(stdext::format("ProtocolGame::parseTrappers: could not get creature with id %d", creatureId));
-            continue;
         }
 
         //TODO: set creature as trapper
@@ -2328,7 +2329,6 @@ void ProtocolGame::parseTalk(const InputMessagePtr& msg)
             break;
         default:
             throw Exception("ProtocolGame::parseTalk: unknown message mode %d", mode);
-            break;
     }
 
     const auto& text = msg->getString();
@@ -2482,7 +2482,6 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
         }
         case Otc::MessageInvalid:
             throw Exception("ProtocolGame::parseTextMessage: unknown message mode %d", mode);
-            break;
         default:
             break;
     }
@@ -2877,7 +2876,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
         charm.description = msg->getString();
         msg->getU8();
         charm.unlockPrice = msg->getU16();
-        charm.unlocked = static_cast<bool>(msg->getU8() == 1);
+        charm.unlocked = msg->getU8() == 1;
         charm.asignedStatus = false;
         charm.raceId = 0;
         charm.removeRuneCost = 0;
@@ -3102,7 +3101,7 @@ void ProtocolGame::parseCreatureType(const InputMessagePtr& msg)
     creature->setType(type);
 }
 
-void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height)
+void ProtocolGame::setMapDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height)
 {
     int startz;
     int endz;
@@ -3124,7 +3123,7 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, i
     }
 }
 
-int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip)
+int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height, const int offset, int skip)
 {
     for (auto nx = 0; nx < width; ++nx) {
         for (auto ny = 0; ny < height; ++ny) {
@@ -3140,7 +3139,7 @@ int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, int x, int y, 
     return skip;
 }
 
-int ProtocolGame::setTileDescription(const InputMessagePtr& msg, Position position)
+int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position position)
 {
     g_map.cleanTile(position);
 
@@ -3306,8 +3305,6 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                 creatureType = msg->getU8();
             } else if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId) {
                 creatureType = Proto::CreatureTypePlayer;
-            } else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId) {
-                creatureType = Proto::CreatureTypeMonster;
             } else {
                 creatureType = Proto::CreatureTypeNpc;
             }
@@ -3682,7 +3679,7 @@ void ProtocolGame::parseShowDescription(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBestiaryTracker(const InputMessagePtr& msg)
 {
-    uint8_t trackerType = msg->getU8(); // 0x00 para bestiary, 0x01 para boss
+    const uint8_t trackerType = msg->getU8(); // 0x00 para bestiary, 0x01 para boss
 
     const uint8_t size = msg->getU8();
     std::vector<std::tuple<uint16_t, uint32_t, uint16_t, uint16_t, uint16_t, uint8_t>> trackerData;
@@ -4577,7 +4574,7 @@ PreyMonster ProtocolGame::getPreyMonster(const InputMessagePtr& msg) const
 {
     const auto& name = msg->getString();
     const auto& outfit = getOutfit(msg, false);
-    return { name , outfit };
+    return { .name = name, .outfit = outfit };
 }
 
 std::vector<PreyMonster> ProtocolGame::getPreyMonsters(const InputMessagePtr& msg)
@@ -4989,7 +4986,9 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     }
 
     g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
-    return { timestamp, counter, action, itemId, amount, price, playerName, state, var };
+    return { .timestamp = timestamp, .counter = counter, .action = action, .itemId = itemId, .amount = amount, .price = price,
+        .playerName = playerName, .state = state, .var = var
+    };
 }
 
 void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
@@ -5009,7 +5008,6 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     }
 
     const uint32_t buyOfferCount = msg->getU32();
-
 
     std::vector<MarketOffer> offers;
 
