@@ -15,6 +15,16 @@ function init()
         onQuestLine = onGameQuestLine,
         onGameEnd = destroyWindows
     })
+
+    Keybind.new("Windows", "Show/hide quest Log", "", "")
+    Keybind.bind("Windows", "Show/hide quest Log", {
+      {
+        type = KEY_DOWN,
+        callback =  function()
+            g_game.requestQuestLog()
+        end,
+      }
+    })
 end
 
 function terminate()
@@ -27,6 +37,7 @@ function terminate()
     destroyWindows()
     questLogButton:destroy()
     questLogButton = nil
+    Keybind.delete("Windows", "Show/hide quest Log")
 end
 
 function destroyWindows()
