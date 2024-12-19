@@ -154,25 +154,41 @@ function bindKeys()
     bindTurnKey('Ctrl+Numpad2', South)
     bindTurnKey('Ctrl+Numpad4', West)
 
-    g_keyboard.bindKeyPress('Escape', function()
-        g_game.cancelAttackAndFollow()
-    end, gameRootPanel)
     g_keyboard.bindKeyPress('Ctrl+=', function()
         gameMapPanel:zoomIn()
     end, gameRootPanel)
     g_keyboard.bindKeyPress('Ctrl+-', function()
         gameMapPanel:zoomOut()
     end, gameRootPanel)
-    g_keyboard.bindKeyDown('Ctrl+Q', function()
-        tryLogout(false)
-    end, gameRootPanel)
-    g_keyboard.bindKeyDown('Ctrl+L', function()
-        tryLogout(false)
-    end, gameRootPanel)
-    g_keyboard.bindKeyDown('Alt+W', function()
-        g_map.cleanTexts()
-        modules.game_textmessage.clearMessages()
-    end, gameRootPanel)
+
+    Keybind.new("Movement", "Stop All Actions", "Esc", "", true)
+    Keybind.bind("Movement", "Stop All Actions", {
+        {
+          type = KEY_PRESS,
+          callback = function()
+            g_game.cancelAttackAndFollow()
+          end,
+        }
+      }, gameRootPanel)
+      
+    Keybind.new("Misc", "Logout", "Ctrl+L", "Ctrl+Q")
+    Keybind.bind("Misc", "Logout", {
+        {
+          type = KEY_PRESS,
+          callback = function() tryLogout(false) end,
+        }
+      }, gameRootPanel)
+
+    Keybind.new("UI", "Clear All Texts", "Ctrl+W", "")
+    Keybind.bind("UI", "Clear All Texts", {
+        {
+          type = KEY_DOWN,
+          callback = function()
+            g_map.cleanTexts()
+            modules.game_textmessage.clearMessages()
+          end,
+        }
+      }, gameRootPanel)
 
     g_keyboard.bindKeyDown('Ctrl+.', nextViewMode, gameRootPanel)
 end
@@ -251,6 +267,9 @@ function terminate()
 
     logoutButton:destroy()
     gameRootPanel:destroy()
+    Keybind.delete("Movement", "Stop All Actions")
+    Keybind.delete("Misc", "Logout")
+    Keybind.delete("UI", "Clear All Texts")
 end
 
 function onGameStart()

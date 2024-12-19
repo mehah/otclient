@@ -74,6 +74,17 @@ SouthEast = Directions.SouthEast
 SouthWest = Directions.SouthWest
 NorthWest = Directions.NorthWest
 
+DirectionString = {
+    [North] = "North",
+    [East] = "East",
+    [South] = "South",
+    [West] = "West",
+    [NorthEast] = "North East",
+    [SouthEast] = "South East",
+    [SouthWest] = "South West",
+    [NorthWest] = "North West"
+  }
+  
 FightOffensive = 1
 FightBalanced = 2
 FightDefensive = 3
