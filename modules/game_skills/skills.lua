@@ -31,7 +31,13 @@ function init()
     skillsButton:setOn(true)
     skillsWindow = g_ui.loadUI('skills')
 
-    g_keyboard.bindKeyDown('Alt+S', toggle)
+    Keybind.new("Windows", "Show/hide skills windows", "Alt+S", "")
+    Keybind.bind("Windows", "Show/hide skills windows", {
+      {
+        type = KEY_DOWN,
+        callback = toggle,
+      }
+    })
 
     skillSettings = g_settings.getNode('skills-hide')
     if not skillSettings then
@@ -69,7 +75,7 @@ function terminate()
         onGameEnd = offline
     })
 
-    g_keyboard.unbindKeyDown('Alt+S')
+    Keybind.delete("Windows", "Show/hide skills windows")
     skillsWindow:destroy()
     skillsButton:destroy()
 
