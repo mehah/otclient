@@ -127,7 +127,13 @@ end
 -- public functions
 function EnterGame.init()
     enterGame = g_ui.displayUI('entergame')
-    g_keyboard.bindKeyDown('Ctrl+G', EnterGame.openWindow)
+    Keybind.new("Misc.", "Change Character", "Ctrl+G", "")
+    Keybind.bind("Misc.", "Change Character", {
+      {
+        type = KEY_DOWN,
+        callback = EnterGame.openWindow,
+      }
+    })
 
     local account = g_settings.get('account')
     local password = g_settings.get('password')
@@ -259,7 +265,7 @@ function EnterGame.firstShow()
 end
 
 function EnterGame.terminate()
-    g_keyboard.unbindKeyDown('Ctrl+G')
+    Keybind.delete("Misc.", "Change Character")
 
     disconnect(clientBox, {
         onOptionChange = EnterGame.onClientVersionChange

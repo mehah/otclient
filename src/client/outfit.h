@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/util/color.h>
 #include "thingtypemanager.h"
+#include <framework/util/color.h>
 
 class Outfit
 {
@@ -49,10 +49,10 @@ public:
     void setBody(uint8_t body);
     void setLegs(uint8_t legs);
     void setFeet(uint8_t feet);
-    void setAddons(uint8_t addons) { m_addons = addons; }
-    void setTemp(bool temp) { m_temp = temp; }
+    void setAddons(const uint8_t addons) { m_addons = addons; }
+    void setTemp(const bool temp) { m_temp = temp; }
 
-    void setCategory(ThingCategory category) { m_category = category; }
+    void setCategory(const ThingCategory category) { m_category = category; }
 
     void resetClothes();
 

@@ -53,13 +53,13 @@ void ProxyManager::terminate()
 void ProxyManager::clear()
 {
     for (auto& session_weak : m_sessions) {
-        if (auto session = session_weak.lock()) {
+        if (const auto session = session_weak.lock()) {
             session->terminate();
         }
     }
     m_sessions.clear();
     for (auto& proxy_weak : m_proxies) {
-        if (auto proxy = proxy_weak.lock()) {
+        if (const auto proxy = proxy_weak.lock()) {
             proxy->terminate();
         }
     }
@@ -74,22 +74,22 @@ bool ProxyManager::isActive()
 void ProxyManager::addProxy(const std::string& host, uint16_t port, int priority)
 {
     for (auto& proxy_weak : m_proxies) {
-        if (auto proxy = proxy_weak.lock()) {
+        if (const auto proxy = proxy_weak.lock()) {
             if (proxy->getHost() == host && proxy->getPort() == port) {
                 return; // already exist
             }
         }
     }
 
-    auto proxy = std::make_shared<Proxy>(m_io, host, port, priority);
+    const auto proxy = std::make_shared<Proxy>(m_io, host, port, priority);
     proxy->start();
     m_proxies.push_back(proxy);
 }
 
-void ProxyManager::removeProxy(const std::string& host, uint16_t port)
+void ProxyManager::removeProxy(const std::string& host, const uint16_t port)
 {
     for (auto it = m_proxies.begin(); it != m_proxies.end(); ) {
-        if (auto proxy = it->lock()) {
+        if (const auto proxy = it->lock()) {
             if (proxy->getHost() == host && proxy->getPort() == port) {
                 proxy->terminate();
                 it = m_proxies.erase(it);
@@ -105,16 +105,16 @@ void ProxyManager::removeProxy(const std::string& host, uint16_t port)
 uint32_t ProxyManager::addSession(uint16_t port, std::function<void(ProxyPacketPtr)> recvCallback, std::function<void(std::error_code)> disconnectCallback)
 {
     assert(recvCallback && disconnectCallback);
-    auto session = std::make_shared<Session>(m_io, port, recvCallback, disconnectCallback);
+    const auto session = std::make_shared<Session>(m_io, port, recvCallback, disconnectCallback);
     session->start(m_maxActiveProxies);
     m_sessions.push_back(session);
     return session->getId();
 }
 
-void ProxyManager::removeSession(uint32_t sessionId)
+void ProxyManager::removeSession(const uint32_t sessionId)
 {
     for (auto it = m_sessions.begin(); it != m_sessions.end(); ) {
-        if (auto session = it->lock()) {
+        if (const auto session = it->lock()) {
             if (session->getId() == sessionId) {
                 session->terminate();
                 it = m_sessions.erase(it);
@@ -127,11 +127,11 @@ void ProxyManager::removeSession(uint32_t sessionId)
     }
 }
 
-void ProxyManager::send(uint32_t sessionId, ProxyPacketPtr packet)
+void ProxyManager::send(const uint32_t sessionId, ProxyPacketPtr packet)
 {
     SessionPtr session = nullptr;
     for (auto& session_weak : m_sessions) {
-        if (auto tsession = session_weak.lock()) {
+        if (const auto tsession = session_weak.lock()) {
             if (tsession->getId() == sessionId) {
                 session = tsession;
                 break;
@@ -149,7 +149,7 @@ std::map<std::string, uint32_t> ProxyManager::getProxies()
 {
     std::map<std::string, uint32_t> ret;
     for (auto& proxy_weak : m_proxies) {
-        if (auto proxy = proxy_weak.lock()) {
+        if (const auto proxy = proxy_weak.lock()) {
             ret[proxy->getHost() + ":" + std::to_string(proxy->getPort())] = proxy->getRealPing();
         }
     }
@@ -160,7 +160,7 @@ std::map<std::string, std::string> ProxyManager::getProxiesDebugInfo()
 {
     std::map<std::string, std::string> ret;
     for (auto& proxy_weak : m_proxies) {
-        if (auto proxy = proxy_weak.lock()) {
+        if (const auto proxy = proxy_weak.lock()) {
             ret[proxy->getHost() + ":" + std::to_string(proxy->getPort())] = proxy->getDebugInfo();
         }
     }
@@ -171,7 +171,7 @@ int ProxyManager::getPing()
 {
     uint32_t ret = 0;
     for (auto& proxy_weak : m_proxies) {
-        if (auto proxy = proxy_weak.lock()) {
+        if (const auto proxy = proxy_weak.lock()) {
             if ((proxy->getRealPing() < ret || ret == 0) && proxy->getRealPing() > 0)
                 ret = proxy->getRealPing();
         }

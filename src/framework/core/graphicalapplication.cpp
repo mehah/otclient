@@ -23,20 +23,20 @@
 #include "graphicalapplication.h"
 #include "garbagecollection.h"
 
+#include "framework/stdext/time.h"
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
+#include <framework/graphics/image.h>
 #include <framework/graphics/particlemanager.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/input/mouse.h>
 #include <framework/platform/platformwindow.h>
 #include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
-#include "framework/stdext/time.h"
-#include <framework/graphics/image.h>
 
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/soundmanager.h>
@@ -54,7 +54,7 @@ void GraphicalApplication::init(std::vector<std::string>& args, ApplicationConte
 {
     Application::init(args, context);
 
-    GraphicalApplicationContext* graphicalContext = static_cast<GraphicalApplicationContext*>(context);
+    auto graphicalContext = static_cast<GraphicalApplicationContext*>(context);
     setDrawEvents(graphicalContext->getDrawEvents());
 
     // setup platform window
@@ -68,10 +68,10 @@ void GraphicalApplication::init(std::vector<std::string>& args, ApplicationConte
 
     g_window.setOnInputEvent([this](auto&& PH1) {
         if (!m_running) inputEvent(PH1);
-        else g_dispatcher.addEvent([&, PH1]() { inputEvent(PH1); });
+        else g_dispatcher.addEvent([&, PH1] { inputEvent(PH1); });
     });
 
-    g_window.setOnClose([this] { g_dispatcher.addEvent([this]() { close(); }); });
+    g_window.setOnClose([this] { g_dispatcher.addEvent([this] { close(); }); });
 
     g_mouse.init();
 
@@ -308,11 +308,6 @@ void GraphicalApplication::resize(const Size& size)
 
     g_mainDispatcher.addEvent([size, scale] {
         g_drawPool.get(DrawPoolType::FOREGROUND)->setFramebuffer(size / scale);
-
-        if (USE_FRAMEBUFFER) {
-            g_drawPool.get(DrawPoolType::CREATURE_INFORMATION)->setFramebuffer(size);
-            g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->setFramebuffer(size);
-        }
     });
 }
 
@@ -345,10 +340,10 @@ void GraphicalApplication::doScreenshot(std::string file)
 
     g_mainDispatcher.addEvent([file] {
         auto resolution = g_graphics.getViewportSize();
-        int width = resolution.width();
-        int height = resolution.height();
+        const int width = resolution.width();
+        const int height = resolution.height();
         auto pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
-        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+        glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels->data());
 
         g_asyncDispatcher.detach_task([resolution, pixels, file] {
             try {
@@ -369,7 +364,7 @@ void GraphicalApplication::doMapScreenshot(std::string fileName)
 }
 
 float GraphicalApplication::getHUDScale() const { return g_window.getDisplayDensity(); }
-void GraphicalApplication::setHUDScale(float v) {
+void GraphicalApplication::setHUDScale(const float v) {
     g_window.setDisplayDensity(v);
     resize(g_graphics.getViewportSize());
 }

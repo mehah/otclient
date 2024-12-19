@@ -33,7 +33,7 @@ OTMLException::OTMLException(const OTMLNodePtr& node, const std::string_view err
     m_what = ss.str();
 }
 
-OTMLException::OTMLException(const OTMLDocumentPtr& doc, const std::string_view error, int line)
+OTMLException::OTMLException(const OTMLDocumentPtr& doc, const std::string_view error, const int line)
 {
     std::stringstream ss;
     ss << "OTML error";

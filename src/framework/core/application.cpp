@@ -22,16 +22,16 @@
 
 #include "application.h"
 
+#include "asyncdispatcher.h"
 #include <framework/core/configmanager.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/modulemanager.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/graphics/drawpoolmanager.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/crashhandler.h>
 #include <framework/platform/platform.h>
 #include <framework/proxy/proxy.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include "asyncdispatcher.h"
 
 #include <csignal>
 #include <gitinfo.h>
@@ -49,7 +49,7 @@
 #endif
 #endif
 
-void exitSignalHandler(int sig)
+void exitSignalHandler(const int sig)
 {
     static bool signaled = false;
     switch (sig) {

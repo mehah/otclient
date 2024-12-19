@@ -18,6 +18,7 @@
     "pugixml",
     "stduuid",
     "zlib",
+    "bshoshany-thread-pool",
     {
       "name": "luajit",
       "platform": "!android & !wasm32"

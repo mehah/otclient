@@ -20,14 +20,14 @@
  * THE SOFTWARE.
  */
 
+#include "framework/graphics/drawpoolmanager.h"
+#include "uiwidget.h"
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/painter.h>
 #include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/image.h>
+#include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
-#include "uiwidget.h"
-#include "framework/graphics/drawpoolmanager.h"
 #include <framework/util/crypt.h>
 
 void UIWidget::initImage() {}
@@ -37,8 +37,8 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source") {
             auto split = stdext::split<std::string>(node->value(), ":");
-            if (split.size() == 0) split.push_back("none");
-            bool base64 = split.size() > 1 && split[0] == "base64";
+            if (split.size() == 0) split.emplace_back("none");
+            const bool base64 = split.size() > 1 && split[0] == "base64";
             auto& value = split.size() > 1 ? split[1] : split[0];
 
             if (value == "" || value == "none") {
@@ -188,7 +188,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
     }
 }
 
-void UIWidget::setImageSource(const std::string_view source, bool base64)
+void UIWidget::setImageSource(const std::string_view source, const bool base64)
 {
     updateImageCache();
 

@@ -1,0 +1,66 @@
+MainWindow
+  size: 400 225
+  layout:
+    type: verticalBox
+    spacing: 10
+    fit-children: true
+  
+  Label
+    font: verdana-11px-monochrome
+    text-align: center
+    color: #c0c0c0
+    text: Mode: "Chat On"
+  
+  FlatPanel
+    id: keyCombo
+    height: 33
+    font: verdana-11px-monochrome
+    text-align: center
+    color: #c0c0c0
+  
+  Label
+    id: info
+    font: verdana-11px-monochrome
+    color: #c0c0c0
+    text-wrap: true
+    text-auto-resize: true
+  
+  Label
+    id: alone
+    font: verdana-11px-monochrome
+    color: #c0c0c0
+    !text: tr("This action must be bound to a single key.")
+    visible: false
+  
+  Label
+    id: used
+    font: verdana-11px-monochrome
+    text-align: center
+    color: #f75f5f
+    !text: tr("This hotkey is already in use.")
+    visible: false
+
+  HorizontalSeparator
+
+  Panel
+    id: buttons
+    height: 20
+    layout:
+      type: horizontalBox
+      align-right: true
+      spacing: -5
+    
+    SmallButton
+      id: ok
+      width: 40
+      !text: tr("Ok")
+    
+    SmallButton
+      id: clear
+      width: 45
+      !text: tr("Clear")
+    SmallButton
+      id: cancel
+      width: 45
+      !text: tr("Cancel")
+

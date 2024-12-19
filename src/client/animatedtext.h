@@ -29,11 +29,11 @@
 #include <framework/luaengine/luaobject.h>
 
  // @bindclass
-class AnimatedText : public LuaObject
+class AnimatedText final : public LuaObject
 {
 public:
     AnimatedText();
-    AnimatedText(const std::string_view text, int color) : AnimatedText() {
+    AnimatedText(const std::string_view text, const int color) : AnimatedText() {
         setText(text);
         setColor(color);
     }
@@ -42,7 +42,7 @@ public:
 
     void onAppear();
 
-    void setColor(int color) { m_color = Color::from8bit(color); }
+    void setColor(const int color) { m_color = Color::from8bit(color); }
     void setText(const std::string_view text) { m_cachedText.setText(text); }
     void setOffset(const Point& offset) { m_offset = offset; }
 

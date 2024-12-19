@@ -22,7 +22,7 @@
 
 #include "uicreature.h"
 
-void UICreature::drawSelf(DrawPoolType drawPane)
+void UICreature::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;

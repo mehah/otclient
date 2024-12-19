@@ -102,7 +102,7 @@ bool Mouse::isCursorChanged()
     return !m_cursorStack.empty();
 }
 
-bool Mouse::isPressed(Fw::MouseButton mouseButton)
+bool Mouse::isPressed(const Fw::MouseButton mouseButton)
 {
     return g_window.isMouseButtonPressed(mouseButton);
 }
