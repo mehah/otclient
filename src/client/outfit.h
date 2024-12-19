@@ -36,13 +36,13 @@ class Outfit
 public:
     static Color getColor(int color);
 
-    void setId(uint16_t id) { m_id = id; }
-    void setAuxId(uint16_t id) { m_auxId = id; }
-    void setMount(uint16_t mount) { m_mount = mount; }
-    void setFamiliar(uint16_t familiar) { m_familiar = familiar; }
-    void setWing(uint16_t Wing) { m_wing = Wing; }
-    void setAura(uint16_t Aura) { m_aura = Aura; }
-    void setEffect(uint16_t Effect) { m_effect = Effect; }
+    void setId(const uint16_t id) { m_id = id; }
+    void setAuxId(const uint16_t id) { m_auxId = id; }
+    void setMount(const uint16_t mount) { m_mount = mount; }
+    void setFamiliar(const uint16_t familiar) { m_familiar = familiar; }
+    void setWing(const uint16_t Wing) { m_wing = Wing; }
+    void setAura(const uint16_t Aura) { m_aura = Aura; }
+    void setEffect(const uint16_t Effect) { m_effect = Effect; }
     void setShader(const std::string& shader) { m_shader = shader; }
 
     void setHead(uint8_t head);
