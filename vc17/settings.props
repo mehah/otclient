@@ -17,6 +17,7 @@
 
     <OTCLIENT_LIBDEPS>
         advapi32.lib;
+        avrt.lib;
         crypt32.lib;
         dbghelp.lib;
         gdi32.lib;
@@ -44,6 +45,7 @@
 
     <OTCLIENT_LIBDEPS_D>
         advapi32.lib;
+        avrt.lib;
         discord-rpc.lib;
         dbghelp.lib;
         gdi32.lib;
