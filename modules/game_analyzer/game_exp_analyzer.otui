@@ -1,0 +1,41 @@
+MiniWindow
+  id: expAnalyzerWindow
+  !text: tr('XP Analyzer')
+  height: 63
+  &save: true
+  
+  MiniWindowContents
+  SkillNameLabel
+    id: expGainLabel
+    font: verdana-11px-monochrome
+    !text: tr('XP Gain:')
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-top: 25
+    margin-left: 10
+
+  SkillValueLabel
+    id: expGainValue
+    !text: tr('0')
+    font: verdana-11px-monochrome
+    text-align: topright
+    anchors.left: expGainLabel.right
+    margin-top: 25
+    margin-right: 25
+
+  SkillNameLabel
+    id: expHourLabel
+    !text: tr('XP/h:')
+    font: verdana-11px-monochrome
+    margin-top: 40
+    margin-left: 10
+
+  SkillValueLabel
+    id: expHourValue
+    !text: tr('0')
+    font: verdana-11px-monochrome
+    text-align: topright
+    anchors.left: expHourLabel.right
+    margin-top: 40
+    margin-right: 25
