@@ -26,8 +26,8 @@
 
 #include "uimap.h"
 
-#include <framework/graphics/declarations.h>
 #include <framework/core/graphicalapplication.h>
+#include <framework/graphics/declarations.h>
 
 class Client : public ApplicationDrawEvents
 {
@@ -49,10 +49,10 @@ public:
     UIMapPtr getMapWidget() { return m_mapWidget; }
 
     float getEffectAlpha() const { return m_effectAlpha; }
-    void setEffectAlpha(float v) { m_effectAlpha = v; }
+    void setEffectAlpha(const float v) { m_effectAlpha = v; }
 
     float getMissileAlpha() const { return m_missileAlpha; }
-    void setMissileAlpha(float v) { m_missileAlpha = v; }
+    void setMissileAlpha(const float v) { m_missileAlpha = v; }
 
 private:
     UIMapPtr m_mapWidget;

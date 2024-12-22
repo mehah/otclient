@@ -30,8 +30,8 @@
 #include "creatures.h"
 #endif
 
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/binarytree.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
@@ -100,16 +100,16 @@ bool ThingTypeManager::loadDat(std::string file)
                 const auto& type = std::make_shared<ThingType>();
                 type->unserialize(id, static_cast<ThingCategory>(category), fin);
                 m_thingTypes[category][id] = type;
+            }
         }
-    }
 
         m_datLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
-} catch (const stdext::exception& e) {
-    g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
-    return false;
-}
+    } catch (const stdext::exception& e) {
+        g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
+        return false;
+    }
 }
 
 bool ThingTypeManager::loadOtml(std::string file)
@@ -141,10 +141,10 @@ bool ThingTypeManager::loadOtml(std::string file)
             }
         }
         return true;
-} catch (const std::exception& e) {
-    g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
-    return false;
-}
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
+        return false;
+    }
 }
 
 bool ThingTypeManager::loadAppearances(const std::string& file)
@@ -214,7 +214,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
     }
 }
 
-const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
+const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category)
 {
     if (category < ThingLastCategory)
         return m_thingTypes[category];
@@ -222,7 +222,7 @@ const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
     throw Exception("invalid thing type category %d", category);
 }
 
-const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory category)
+const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category)
 {
     if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
         g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
@@ -231,7 +231,7 @@ const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory ca
     return m_thingTypes[category][id];
 }
 
-ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
+ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const ThingCategory category)
 {
     ThingTypeList ret;
     for (const auto& type : m_thingTypes[category])

@@ -23,7 +23,7 @@
 #include "otmlemitter.h"
 #include "otmldocument.h"
 
-std::string OTMLEmitter::emitNode(const OTMLNodePtr& node, int currentDepth)
+std::string OTMLEmitter::emitNode(const OTMLNodePtr& node, const int currentDepth)
 {
     std::stringstream ss;
 

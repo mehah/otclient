@@ -47,7 +47,7 @@ void ParticleEmitter::load(const OTMLNodePtr& node)
         throw Exception("emitter didn't provide a valid particle type");
 }
 
-void ParticleEmitter::update(float elapsedTime, const ParticleSystemPtr& system)
+void ParticleEmitter::update(const float elapsedTime, const ParticleSystemPtr& system)
 {
     m_elapsedTime += elapsedTime;
 

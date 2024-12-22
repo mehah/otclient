@@ -25,7 +25,7 @@
 
 bool Position::isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= g_gameConfig.getMapMaxZ())); }
 
-bool Position::up(int8_t n)
+bool Position::up(const int8_t n)
 {
     const int8_t nz = z - n;
     if (nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
@@ -35,7 +35,7 @@ bool Position::up(int8_t n)
     return false;
 }
 
-bool Position::down(int8_t n)
+bool Position::down(const int8_t n)
 {
     const int8_t nz = z + n;
     if (nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
@@ -46,7 +46,7 @@ bool Position::down(int8_t n)
     return false;
 }
 
-bool Position::coveredUp(int8_t n)
+bool Position::coveredUp(const int8_t n)
 {
     const int32_t nx = x + n, ny = y + n;
     const int8_t nz = z - n;
@@ -58,7 +58,7 @@ bool Position::coveredUp(int8_t n)
     return false;
 }
 
-bool Position::coveredDown(int8_t n)
+bool Position::coveredDown(const int8_t n)
 {
     const int32_t nx = x - n, ny = y - n;
     const int8_t nz = z + n;

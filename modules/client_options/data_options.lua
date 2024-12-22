@@ -463,4 +463,10 @@ return {
             end, 100)
         end
     },
+    autoSwitchPreset                    = false,
+    listKeybindsPanel                   = {
+        action = function(value, options, controller, panels, extraWidgets)
+            listKeybindsComboBox(value)
+        end
+    },
 }

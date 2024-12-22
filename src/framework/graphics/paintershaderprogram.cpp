@@ -21,10 +21,10 @@
  */
 
 #include "paintershaderprogram.h"
-#include <framework/core/clock.h>
-#include <framework/platform/platformwindow.h>
 #include "texture.h"
 #include "texturemanager.h"
+#include <framework/core/clock.h>
+#include <framework/platform/platformwindow.h>
 
 PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds()) {}
 
@@ -109,7 +109,7 @@ void PainterShaderProgram::setColor(const Color& color)
     m_color = color;
 }
 
-void PainterShaderProgram::setOpacity(float opacity)
+void PainterShaderProgram::setOpacity(const float opacity)
 {
     if (m_opacity == opacity)
         return;

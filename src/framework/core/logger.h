@@ -29,7 +29,7 @@
 
 struct LogMessage
 {
-    LogMessage(Fw::LogLevel level, std::string_view message, std::size_t when) : level(level), message(message), when(when) {}
+    LogMessage(const Fw::LogLevel level, const std::string_view message, const std::size_t when) : level(level), message(message), when(when) {}
     Fw::LogLevel level;
     std::string message;
     std::size_t when;
@@ -43,11 +43,11 @@ class Logger
         MAX_LOG_HISTORY = 1000
     };
 
-    using OnLogCallback = std::function<void(Fw::LogLevel, const std::string_view, int64_t)>;
+    using OnLogCallback = std::function<void(Fw::LogLevel, std::string_view, int64_t)>;
 
 public:
-    void log(Fw::LogLevel level, const std::string_view message);
-    void logFunc(Fw::LogLevel level, const std::string_view message, const std::string_view prettyFunction);
+    void log(Fw::LogLevel level, std::string_view message);
+    void logFunc(Fw::LogLevel level, std::string_view message, std::string_view prettyFunction);
 
     void fine(const std::string_view what) { log(Fw::LogFine, what); }
     void debug(const std::string_view what) { log(Fw::LogDebug, what); }
@@ -57,9 +57,9 @@ public:
     void fatal(const std::string_view what) { log(Fw::LogFatal, what); }
 
     void fireOldMessages();
-    void setLogFile(const std::string_view file);
+    void setLogFile(std::string_view file);
     void setOnLog(const OnLogCallback& onLog) { m_onLog = onLog; }
-    void setLevel(Fw::LogLevel level) { m_level = level; }
+    void setLevel(const Fw::LogLevel level) { m_level = level; }
     Fw::LogLevel getLevel() { return m_level; }
 
 private:

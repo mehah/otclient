@@ -22,11 +22,11 @@
 
 #pragma once
 
+#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
-#include "declarations.h"
 
-class ParticleEffectType : public LuaObject
+class ParticleEffectType final : public LuaObject
 {
 public:
     void load(const OTMLNodePtr& node);

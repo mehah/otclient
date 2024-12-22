@@ -43,7 +43,7 @@ bool Config::load(const std::string& file)
             m_confsDoc = confsDoc;
 
         return true;
-    } catch (stdext::exception const& e) {
+    } catch (const stdext::exception& e) {
         g_logger.error(stdext::format("Unable to parse configuration file '%s': ", e.what()));
         return false;
     }
@@ -66,7 +66,7 @@ bool Config::save()
     return m_confsDoc->save(m_fileName);
 }
 
-void Config::clear() const
+void Config::clear()
 {
     m_confsDoc->clear();
 }
@@ -145,7 +145,7 @@ OTMLNodePtr Config::getNode(const std::string& key)
 
 int Config::getNodeSize(const std::string& key)
 {
-    auto node = m_confsDoc->get(key);
+    const auto node = m_confsDoc->get(key);
     if (node)
         return node->size();
     return 0;

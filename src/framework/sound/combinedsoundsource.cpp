@@ -59,31 +59,31 @@ bool CombinedSoundSource::isPlaying()
     return false;
 }
 
-void CombinedSoundSource::setLooping(bool looping)
+void CombinedSoundSource::setLooping(const bool looping)
 {
     for (const auto& source : m_sources)
         source->setLooping(looping);
 }
 
-void CombinedSoundSource::setRelative(bool relative)
+void CombinedSoundSource::setRelative(const bool relative)
 {
     for (const auto& source : m_sources)
         source->setRelative(relative);
 }
 
-void CombinedSoundSource::setReferenceDistance(float distance)
+void CombinedSoundSource::setReferenceDistance(const float distance)
 {
     for (const auto& source : m_sources)
         source->setReferenceDistance(distance);
 }
 
-void CombinedSoundSource::setGain(float gain)
+void CombinedSoundSource::setGain(const float gain)
 {
     for (const auto& source : m_sources)
         source->setGain(gain);
 }
 
-void CombinedSoundSource::setPitch(float pitch)
+void CombinedSoundSource::setPitch(const float pitch)
 {
     for (const auto& source : m_sources)
         source->setPitch(pitch);
@@ -101,13 +101,13 @@ void CombinedSoundSource::setVelocity(const Point& velocity)
         source->setVelocity(velocity);
 }
 
-void CombinedSoundSource::setFading(FadeState state, float fadetime)
+void CombinedSoundSource::setFading(const FadeState state, const float fadetime)
 {
     for (const auto& source : m_sources)
         source->setFading(state, fadetime);
 }
 
-void CombinedSoundSource::setEffect(SoundEffectPtr soundEffect)
+void CombinedSoundSource::setEffect(const SoundEffectPtr soundEffect)
 {
     for (const SoundSourcePtr& source : m_sources)
         source->setEffect(soundEffect);

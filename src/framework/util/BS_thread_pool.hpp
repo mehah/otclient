@@ -101,9 +101,9 @@ namespace this_thread {
     /**
      * @brief A helper class to store information about the index of the current thread.
      */
-    class [[nodiscard]] thread_info_index
+    class thread_info_index
     {
-        friend class BS::thread_pool;
+        friend class thread_pool;
 
     public:
         /**
@@ -111,7 +111,7 @@ namespace this_thread {
          *
          * @return An `std::optional` object, optionally containing a thread index. Unless you are 100% sure this thread is in a pool, first use `std::optional::has_value()` to check if it contains a value, and if so, use `std::optional::value()` to obtain that value.
          */
-        [[nodiscard]] optional_index operator()() const
+        optional_index operator()() const
         {
             return index;
         }
@@ -126,9 +126,9 @@ namespace this_thread {
     /**
      * @brief A helper class to store information about the thread pool that owns the current thread.
      */
-    class [[nodiscard]] thread_info_pool
+    class thread_info_pool
     {
-        friend class BS::thread_pool;
+        friend class thread_pool;
 
     public:
         /**
@@ -136,7 +136,7 @@ namespace this_thread {
          *
          * @return An `std::optional` object, optionally containing a pointer to a thread pool. Unless you are 100% sure this thread is in a pool, first use `std::optional::has_value()` to check if it contains a value, and if so, use `std::optional::value()` to obtain that value.
          */
-        [[nodiscard]] optional_pool operator()() const
+        optional_pool operator()() const
         {
             return pool;
         }
@@ -165,7 +165,7 @@ namespace this_thread {
  * @tparam T The return type of the futures.
  */
 template <typename T>
-class [[nodiscard]] multi_future : public std::vector<std::future<T>>
+class multi_future : public std::vector<std::future<T>>
 {
 public:
     // Inherit all constructors from the base class `std::vector`.
@@ -184,7 +184,7 @@ public:
      *
      * @return If the futures return `void`, this function returns `void` as well. Otherwise, it returns a vector containing the results.
      */
-    [[nodiscard]] std::conditional_t<std::is_void_v<T>, void, std::vector<T>> get()
+    std::conditional_t<std::is_void_v<T>, void, std::vector<T>> get()
     {
         if constexpr (std::is_void_v<T>)
         {
@@ -207,7 +207,7 @@ public:
      *
      * @return The number of ready futures.
      */
-    [[nodiscard]] size_t ready_count() const
+    size_t ready_count() const
     {
         size_t count = 0;
         for (const std::future<T>& future : *this)
@@ -223,7 +223,7 @@ public:
      *
      * @return `true` if all futures are valid, `false` if at least one of the futures is not valid.
      */
-    [[nodiscard]] bool valid() const
+    bool valid() const
     {
         bool is_valid = true;
         for (const std::future<T>& future : *this)
@@ -285,7 +285,7 @@ public:
 /**
  * @brief A fast, lightweight, and easy-to-use C++17 thread pool class.
  */
-class [[nodiscard]] thread_pool
+class thread_pool
 {
 public:
     // ============================
@@ -347,7 +347,7 @@ public:
      *
      * @return The native thread handles.
      */
-    [[nodiscard]] std::vector<std::thread::native_handle_type> get_native_handles() const
+    std::vector<std::thread::native_handle_type> get_native_handles() const
     {
         std::vector<std::thread::native_handle_type> native_handles(thread_count);
         for (concurrency_t i = 0; i < thread_count; ++i)
@@ -363,7 +363,7 @@ public:
      *
      * @return The number of queued tasks.
      */
-    [[nodiscard]] size_t get_tasks_queued() const
+    size_t get_tasks_queued() const
     {
         const std::scoped_lock tasks_lock(tasks_mutex);
         return tasks.size();
@@ -374,7 +374,7 @@ public:
      *
      * @return The number of running tasks.
      */
-    [[nodiscard]] size_t get_tasks_running() const
+    size_t get_tasks_running() const
     {
         const std::scoped_lock tasks_lock(tasks_mutex);
         return tasks_running;
@@ -385,7 +385,7 @@ public:
      *
      * @return The total number of tasks.
      */
-    [[nodiscard]] size_t get_tasks_total() const
+    size_t get_tasks_total() const
     {
         const std::scoped_lock tasks_lock(tasks_mutex);
         return tasks_running + tasks.size();
@@ -396,7 +396,7 @@ public:
      *
      * @return The number of threads.
      */
-    [[nodiscard]] concurrency_t get_thread_count() const
+    concurrency_t get_thread_count() const
     {
         return thread_count;
     }
@@ -406,7 +406,7 @@ public:
      *
      * @return The unique thread identifiers.
      */
-    [[nodiscard]] std::vector<std::thread::id> get_thread_ids() const
+    std::vector<std::thread::id> get_thread_ids() const
     {
         std::vector<std::thread::id> thread_ids(thread_count);
         for (concurrency_t i = 0; i < thread_count; ++i)
@@ -422,7 +422,7 @@ public:
      *
      * @return `true` if the pool is paused, `false` if it is not paused.
      */
-    [[nodiscard]] bool is_paused() const
+    bool is_paused() const
     {
         const std::scoped_lock tasks_lock(tasks_mutex);
         return paused;
@@ -602,7 +602,7 @@ public:
      * @return A future to be used later to wait for the function to finish executing and/or obtain its returned value if it has one.
      */
     template <typename F, typename R = std::invoke_result_t<std::decay_t<F>>>
-    [[nodiscard]] std::future<R> submit_task(F&& task BS_THREAD_POOL_PRIORITY_INPUT)
+    std::future<R> submit_task(F&& task BS_THREAD_POOL_PRIORITY_INPUT)
     {
         const std::shared_ptr<std::promise<R>> task_promise = std::make_shared<std::promise<R>>();
         detach_task(
@@ -652,7 +652,7 @@ public:
      * @return A `multi_future` that can be used to wait for all the blocks to finish. If the block function returns a value, the `multi_future` can also be used to obtain the values returned by each block.
      */
     template <typename T, typename F, typename R = std::invoke_result_t<std::decay_t<F>, T, T>>
-    [[nodiscard]] multi_future<R> submit_blocks(const T first_index, const T index_after_last, F&& block, const size_t num_blocks = 0 BS_THREAD_POOL_PRIORITY_INPUT)
+    multi_future<R> submit_blocks(const T first_index, const T index_after_last, F&& block, const size_t num_blocks = 0 BS_THREAD_POOL_PRIORITY_INPUT)
     {
         if (index_after_last > first_index)
         {
@@ -683,7 +683,7 @@ public:
      * @return A `multi_future` that can be used to wait for all the blocks to finish.
      */
     template <typename T, typename F>
-    [[nodiscard]] multi_future<void> submit_loop(const T first_index, const T index_after_last, F&& loop, const size_t num_blocks = 0 BS_THREAD_POOL_PRIORITY_INPUT)
+    multi_future<void> submit_loop(const T first_index, const T index_after_last, F&& loop, const size_t num_blocks = 0 BS_THREAD_POOL_PRIORITY_INPUT)
     {
         if (index_after_last > first_index)
         {
@@ -715,7 +715,7 @@ public:
      * @return A `multi_future` that can be used to wait for all the tasks to finish. If the sequence function returns a value, the `multi_future` can also be used to obtain the values returned by each task.
      */
     template <typename T, typename F, typename R = std::invoke_result_t<std::decay_t<F>, T>>
-    [[nodiscard]] multi_future<R> submit_sequence(const T first_index, const T index_after_last, F&& sequence BS_THREAD_POOL_PRIORITY_INPUT)
+    multi_future<R> submit_sequence(const T first_index, const T index_after_last, F&& sequence BS_THREAD_POOL_PRIORITY_INPUT)
     {
         if (index_after_last > first_index)
         {
@@ -889,7 +889,7 @@ private:
      * @param num_threads The parameter passed to the constructor or `reset()`. If the parameter is a positive number, then the pool will be created with this number of threads. If the parameter is non-positive, or a parameter was not supplied (in which case it will have the default value of 0), then the pool will be created with the total number of hardware threads available, as obtained from `std::thread::hardware_concurrency()`. If the latter returns zero for some reason, then the pool will be created with just one thread.
      * @return The number of threads to use for constructing the pool.
      */
-    [[nodiscard]] static concurrency_t determine_thread_count(const concurrency_t num_threads)
+    static concurrency_t determine_thread_count(const concurrency_t num_threads)
     {
         if (num_threads > 0)
             return num_threads;
@@ -952,7 +952,7 @@ private:
      * @tparam T The type of the indices. Should be a signed or unsigned integer.
      */
     template <typename T>
-    class [[nodiscard]] blocks
+    class blocks
     {
     public:
         /**
@@ -966,7 +966,7 @@ private:
         {
             if (index_after_last > first_index)
             {
-                const size_t total_size = static_cast<size_t>(index_after_last - first_index);
+                const auto total_size = static_cast<size_t>(index_after_last - first_index);
                 if (num_blocks > total_size)
                     num_blocks = total_size;
                 block_size = total_size / num_blocks;
@@ -989,7 +989,7 @@ private:
          * @param block The block number.
          * @return The first index.
          */
-        [[nodiscard]] T start(const size_t block) const
+        T start(const size_t block) const
         {
             return first_index + static_cast<T>(block * block_size) + static_cast<T>(block < remainder ? block : remainder);
         }
@@ -1000,7 +1000,7 @@ private:
          * @param block The block number.
          * @return The index after the last index.
          */
-        [[nodiscard]] T end(const size_t block) const
+        T end(const size_t block) const
         {
             return (block == num_blocks - 1) ? index_after_last : start(block + 1);
         }
@@ -1010,7 +1010,7 @@ private:
          *
          * @return The number of blocks.
          */
-        [[nodiscard]] size_t get_num_blocks() const
+        size_t get_num_blocks() const
         {
             return num_blocks;
         }
@@ -1046,7 +1046,7 @@ private:
     /**
      * @brief A helper class to store a task with an assigned priority.
      */
-    class [[nodiscard]] pr_task
+    class pr_task
     {
         friend class thread_pool;
 
@@ -1074,7 +1074,7 @@ private:
          * @param rhs The second task.
          * @return `true` if the first task has a lower priority than the second task, `false` otherwise.
          */
-        [[nodiscard]] friend bool operator<(const pr_task& lhs, const pr_task& rhs)
+        friend bool operator<(const pr_task& lhs, const pr_task& rhs)
         {
             return lhs.priority < rhs.priority;
         }
