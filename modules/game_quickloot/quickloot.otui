@@ -49,9 +49,9 @@ QuicklootBagLabel < UIWidget
     margin-left: 2
   SelectBagButton
     id: selectBag
-    &click: 6
-    &Select:0
-    &borrar:1
+    &click: 2
+    &Select:4
+    &borrar:5
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: parent.right
 
@@ -61,9 +61,9 @@ QuicklootBagLabel < UIWidget
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: selectBag.left
     margin-right: 5
-    &click: 6
-    &Select:0
-    &borrar:1
+    &click: 2
+    &Select:4
+    &borrar:5
     @onClick: modules.game_quickloot.QuickLoot.clearItem(self)
   Item
     id: item
@@ -71,18 +71,18 @@ QuicklootBagLabel < UIWidget
     anchors.right: removeBag.left
     margin-right: 5
     opacity: 1.0
-    &click: 6
-    &Select:0
-    &borrar:1
+    &click: 2
+    &Select:4
+    &borrar:5
     @onClick: modules.game_quickloot.QuickLoot.openContainer(self)
     $pressed:
       opacity: 0.5
 
   SelectBagButton
     id: selectBag2
-    &click: 2
-    &Select:4
-    &borrar:5
+    &click: 6
+    &Select:0
+    &borrar:1
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: item.left
     margin-right: 5
@@ -92,18 +92,18 @@ QuicklootBagLabel < UIWidget
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: selectBag2.left
     margin-right: 5
-    &click: 2
-    &Select:4
-    &borrar:5
+    &click: 6
+    &Select:0
+    &borrar:1
     @onClick: modules.game_quickloot.QuickLoot.clearItem(self)
   Item
     id: item2
     anchors.verticalCenter: parent.verticalCenter
     anchors.right: removeBag2.left
     margin-right: 5
-    &click: 2
-    &Select:4
-    &borrar:5
+    &click: 6
+    &Select:0
+    &borrar:1
     opacity: 1.0
     @onClick: modules.game_quickloot.QuickLoot.openContainer(self)
     $pressed:
