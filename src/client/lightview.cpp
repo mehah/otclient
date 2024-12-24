@@ -137,33 +137,56 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
 
 void LightView::updatePixels() {
     const size_t lightSize = m_lightData.lights.size();
-
     const int mapWidth = m_mapSize.width();
     const int mapHeight = m_mapSize.height();
+    const int tileCenterOffset = m_tileSize / 2;
+    const float invTileSize = 1.0f / m_tileSize; // Pré-cálculo para evitar divisões
 
-    for (int x = -1; ++x < mapWidth;) {
-        for (int y = -1; ++y < mapHeight;) {
-            const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
-            const int index = (y * mapWidth + x);
+    for (int y = 0; y < mapHeight; ++y) {
+        for (int x = 0; x < mapWidth; ++x) {
+            const int index = y * mapWidth + x;
             const int colorIndex = index * 4;
-            m_pixels[colorIndex] = m_globalLightColor.r();
-            m_pixels[colorIndex + 1] = m_globalLightColor.g();
-            m_pixels[colorIndex + 2] = m_globalLightColor.b();
-            m_pixels[colorIndex + 3] = 255; // alpha channel
+
+            // Inicializa a cor global para o pixel
+            int r = m_globalLightColor.r();
+            int g = m_globalLightColor.g();
+            int b = m_globalLightColor.b();
+
+            const int centerX = x * m_tileSize + tileCenterOffset;
+            const int centerY = y * m_tileSize + tileCenterOffset;
+
             for (size_t i = m_lightData.tiles[index]; i < lightSize; ++i) {
                 const auto& light = m_lightData.lights[i];
-                const float distance = (std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
-                                        (pos.y - light.pos.y) * (pos.y - light.pos.y))) / m_tileSize;
 
+                // Calcula distância ao quadrado
+                const float dx = centerX - light.pos.x;
+                const float dy = centerY - light.pos.y;
+                const float distanceSq = dx * dx + dy * dy;
+                const float lightRadiusSq = (light.intensity * m_tileSize) * (light.intensity * m_tileSize);
+
+                // Verifica se a luz influencia o pixel
+                if (distanceSq > lightRadiusSq) continue;
+
+                // Calcula a intensidade com base na distância normalizada
+                const float distance = std::sqrt(distanceSq) * invTileSize;
                 float intensity = (-distance + light.intensity) * 0.2f;
                 if (intensity < 0.01f) continue;
-                if (intensity > 1.0f) intensity = 1.0f;
+                intensity = std::min<float>(intensity, 1.0f);
 
+                // Calcula as cores ajustadas
                 const auto& lightColor = Color::from8bit(light.color) * intensity;
-                m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
-                m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
-                m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
+
+                // Atualiza os valores de cor usando máximo
+                r = std::max<int>(r, lightColor.r());
+                g = std::max<int>(g, lightColor.g());
+                b = std::max<int>(b, lightColor.b());
             }
+
+            // Armazena as cores no buffer de pixels
+            m_pixels[colorIndex] = r;
+            m_pixels[colorIndex + 1] = g;
+            m_pixels[colorIndex + 2] = b;
+            m_pixels[colorIndex + 3] = 255; // Canal alpha
         }
     }
 }
