@@ -27,6 +27,7 @@
 
 #include "inputmessage.h"
 #include "outputmessage.h"
+#include "framework/core/graphicalapplication.h"
 #ifdef __EMSCRIPTEN__
 #include "webconnection.h"
 #else
