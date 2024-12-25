@@ -31,6 +31,8 @@
 #include <framework/core/clock.h>
 #include <framework/core/resourcemanager.h>
 
+#include "soundchannel.h"
+
 class StreamSoundSource;
 class CombinedSoundSource;
 class SoundFile;

@@ -496,7 +496,7 @@ void Session::readHeader()
     });
 }
 
-void Session::onHeader(const std::error_code& ec, std::size_t bytes_transferred)
+void Session::onHeader(const std::error_code& ec, std::size_t /*bytes_transferred*/)
 {
     if (ec) {
 #ifdef PROXY_DEBUG
@@ -565,7 +565,7 @@ void Session::onPacket(const ProxyPacketPtr& packet)
     });
 }
 
-void Session::onSent(const std::error_code& ec, std::size_t bytes_transferred)
+void Session::onSent(const std::error_code& ec, std::size_t /*bytes_transferred*/)
 {
     if (ec) {
 #ifdef PROXY_DEBUG
