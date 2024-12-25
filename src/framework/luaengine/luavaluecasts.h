@@ -231,6 +231,7 @@ int push_internal_luavalue(const std::tuple<Args...>& tuple);
 // start definitions
 
 #include "luaexception.h"
+#include "luainterface.h"
 #include "luaobject.h"
 
 template<typename T>
