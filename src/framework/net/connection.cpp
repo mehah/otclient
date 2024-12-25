@@ -24,6 +24,7 @@
 #include "connection.h"
 
 #include <framework/core/application.h>
+#include "framework/core/graphicalapplication.h"
 
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
