@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,13 @@
 #include "luaexception.h"
 #include "luainterface.h"
 
-LuaException::LuaException(const std::string_view error, int traceLevel)
+LuaException::LuaException(const std::string_view error, const int traceLevel)
 {
     g_lua.clearStack(); // on every exception, clear lua stack
     generateLuaErrorMessage(error, traceLevel);
 }
 
-void LuaException::generateLuaErrorMessage(const std::string_view error, int traceLevel)
+void LuaException::generateLuaErrorMessage(const std::string_view error, const int traceLevel)
 {
     // append trace level to error message
     if (traceLevel >= 0)
@@ -38,7 +38,7 @@ void LuaException::generateLuaErrorMessage(const std::string_view error, int tra
         m_what = stdext::format("LUA ERROR:\n%s", error);
 }
 
-LuaBadNumberOfArgumentsException::LuaBadNumberOfArgumentsException(int expected, int got)
+LuaBadNumberOfArgumentsException::LuaBadNumberOfArgumentsException(const int expected, const int got)
 {
     std::string error = "attempt to call a function with wrong number of arguments";
     if (expected >= 0 && got >= 0)

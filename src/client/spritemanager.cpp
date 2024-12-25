@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,15 +21,14 @@
  */
 
 #include "spritemanager.h"
-#include <framework/core/filestream.h>
+#include "game.h"
+#include "gameconfig.h"
+#include "spriteappearances.h"
 #include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
+#include <framework/core/filestream.h>
+#include <framework/core/graphicalapplication.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
-#include "game.h"
-#include "spriteappearances.h"
-#include <framework/core/graphicalapplication.h>
-#include "gameconfig.h"
 
 SpriteManager g_sprites;
 
@@ -61,13 +60,13 @@ bool SpriteManager::loadSpr(std::string file)
     m_loaded = false;
     m_spritesHd = false;
 
-    auto cwmFile = g_resources.guessFilePath(file, "cwm");
+    const auto cwmFile = g_resources.guessFilePath(file, "cwm");
     if (g_resources.fileExists(cwmFile)) {
         m_spritesHd = true;
         return loadCwmSpr(cwmFile);
     }
 
-    auto sprFile = g_resources.guessFilePath(file, "spr");
+    const auto sprFile = g_resources.guessFilePath(file, "spr");
     if (g_resources.fileExists(sprFile)) {
         return loadRegularSpr(sprFile);
     }
@@ -109,7 +108,7 @@ bool SpriteManager::loadCwmSpr(std::string file)
 
         const auto& spritesFile = getSpriteFile();
 
-        uint8_t version = spritesFile->getU8();
+        const uint8_t version = spritesFile->getU8();
         if (version != 0x01) {
             g_logger.error(stdext::format("Invalid CWM file version - %s", file));
             return false;
@@ -117,7 +116,7 @@ bool SpriteManager::loadCwmSpr(std::string file)
 
         m_spritesCount = spritesFile->getU16();
 
-        uint32_t entries = spritesFile->getU32();
+        const uint32_t entries = spritesFile->getU32();
         m_cwmSpritesMetadata.reserve(entries);
         for (uint32_t i = 0; i < entries; ++i) {
             FileMetadata spriteMetadata{ spritesFile };
@@ -138,8 +137,6 @@ bool SpriteManager::loadCwmSpr(std::string file)
         g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
         return false;
     }
-
-    return false;
 }
 
 #ifdef FRAMEWORK_EDITOR
@@ -208,7 +205,7 @@ void SpriteManager::unload()
     m_spritesFiles.clear();
 }
 
-ImagePtr SpriteManager::getSpriteImage(int id)
+ImagePtr SpriteManager::getSpriteImage(const int id)
 {
     if (g_game.getClientVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
         return g_spriteAppearances.getSpriteImage(id);
@@ -223,9 +220,9 @@ ImagePtr SpriteManager::getSpriteImage(int id)
     return nullptr;
 }
 
-ImagePtr SpriteManager::getSpriteImageHd(int id, const FileStreamPtr& file)
+ImagePtr SpriteManager::getSpriteImageHd(const int id, const FileStreamPtr& file)
 {
-    auto it = m_cwmSpritesMetadata.find(id);
+    const auto it = m_cwmSpritesMetadata.find(id);
     if (it == m_cwmSpritesMetadata.end())
         return nullptr;
 
@@ -239,7 +236,7 @@ ImagePtr SpriteManager::getSpriteImageHd(int id, const FileStreamPtr& file)
     return Image::loadPNG(buffer.data(), buffer.size());
 }
 
-ImagePtr SpriteManager::getSpriteImage(int id, const FileStreamPtr& file)
+ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
 {
     if (id == 0 || !file)
         return nullptr;

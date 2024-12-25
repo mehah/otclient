@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <framework/core/declarations.h>
-#include <framework/graphics/declarations.h>
 #include "gameconfig.h"
+#include <framework/core/declarations.h>
 #include <framework/core/filestream.h>
+#include <framework/graphics/declarations.h>
 
 class FileMetadata
 {
@@ -49,7 +49,7 @@ private:
     uint32_t spriteId = 0;
 };
 
- //@bindsingleton g_sprites
+//@bindsingleton g_sprites
 class SpriteManager
 {
 public:

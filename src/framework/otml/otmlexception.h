@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,11 @@
 #include "declarations.h"
 
  /// All OTML errors throw this exception
-class OTMLException : public stdext::exception
+class OTMLException final : public stdext::exception
 {
 public:
-    OTMLException(const OTMLNodePtr& node, const std::string_view error);
-    OTMLException(const OTMLDocumentPtr& doc, const std::string_view error, int line = -1);
+    OTMLException(const OTMLNodePtr& node, std::string_view error);
+    OTMLException(const OTMLDocumentPtr& doc, std::string_view error, int line = -1);
     ~OTMLException() noexcept override = default;
 
     const char* what() const noexcept override { return m_what.data(); }

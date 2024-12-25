@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 #include <framework/otml/declarations.h>
 
  // @bindclass
-class Config : public LuaObject
+class Config final : public LuaObject
 {
 public:
     Config();
@@ -36,7 +36,7 @@ public:
     bool load(const std::string& file);
     bool unload();
     bool save();
-    void clear() const;
+    void clear();
     void setValue(const std::string& key, const std::string& value);
     void setList(const std::string& key, const std::vector<std::string>& list);
     std::string getValue(const std::string& key);

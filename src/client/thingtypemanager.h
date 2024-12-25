@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/global.h>
 #include "thingtype.h"
+#include <framework/global.h>
 
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"
@@ -73,7 +73,7 @@ public:
     uint16_t getContentRevision() { return m_contentRevision; }
 
     bool isDatLoaded() { return m_datLoaded; }
-    bool isValidDatId(uint16_t id, ThingCategory category) const { return id >= 1 && id < m_thingTypes[category].size(); }
+    bool isValidDatId(const uint16_t id, const ThingCategory category) const { return id >= 1 && id < m_thingTypes[category].size(); }
 
 private:
     ThingTypeList m_thingTypes[ThingLastCategory];

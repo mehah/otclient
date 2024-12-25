@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,12 @@
 #include "minimap.h"
 #include "tile.h"
 
-#include <zlib.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
+#include <zlib.h>
 
 Minimap g_minimap;
 static MinimapTile nulltile;
@@ -71,7 +70,7 @@ void MinimapBlock::update()
     m_mustUpdate = false;
 }
 
-void MinimapBlock::updateTile(int x, int y, const MinimapTile& tile)
+void MinimapBlock::updateTile(const int x, const int y, const MinimapTile& tile)
 {
     if (m_tiles[getTileIndex(x, y)].color != tile.color)
         m_mustUpdate = true;
@@ -92,7 +91,7 @@ void Minimap::clean()
         m_tileBlocks[i].clear();
 }
 
-void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scale, const Color& color)
+void Minimap::draw(const Rect& screenRect, const Position& mapCenter, const float scale, const Color& color)
 {
     if (screenRect.isEmpty())
         return;
@@ -137,7 +136,7 @@ void Minimap::draw(const Rect& screenRect, const Position& mapCenter, float scal
     g_drawPool.setClipRect(oldClipRect);
 }
 
-Point Minimap::getTilePoint(const Position& pos, const Rect& screenRect, const Position& mapCenter, float scale)
+Point Minimap::getTilePoint(const Position& pos, const Rect& screenRect, const Position& mapCenter, const float scale)
 {
     if (screenRect.isEmpty() || pos.z != mapCenter.z)
         return { -1 };
@@ -148,7 +147,7 @@ Point Minimap::getTilePoint(const Position& pos, const Rect& screenRect, const P
     return posoff + screenRect.topLeft() - off + (Point(1) * scale) / 2;
 }
 
-Position Minimap::getTilePosition(const Point& point, const Rect& screenRect, const Position& mapCenter, float scale)
+Position Minimap::getTilePosition(const Point& point, const Rect& screenRect, const Position& mapCenter, const float scale)
 {
     if (screenRect.isEmpty())
         return {};
@@ -159,7 +158,7 @@ Position Minimap::getTilePosition(const Point& point, const Rect& screenRect, co
     return { pos2d.x, pos2d.y, mapCenter.z };
 }
 
-Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Position& mapCenter, float scale)
+Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Position& mapCenter, const float scale)
 {
     if (screenRect.isEmpty() || pos.z != mapCenter.z)
         return {};
@@ -171,7 +170,7 @@ Rect Minimap::getTileRect(const Position& pos, const Rect& screenRect, const Pos
     return tileRect;
 }
 
-Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, float scale) const
+Rect Minimap::calcMapRect(const Rect& screenRect, const Position& mapCenter, const float scale) const
 {
     const int w = screenRect.width() / scale;
     const int h = std::ceil(screenRect.height() / scale);
@@ -362,7 +361,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
             if (ret != Z_OK || destLen != blockSize)
                 break;
 
-            memcpy(reinterpret_cast<uint8_t*>(&block.getTiles()), decompressBuffer.data(), blockSize);
+            memcpy(&block.getTiles(), decompressBuffer.data(), blockSize);
             block.mustUpdate();
             block.justSaw();
         }
@@ -405,7 +404,7 @@ void Minimap::saveOtmm(const std::string& fileName)
 
         for (uint_fast8_t z = 0; z <= g_gameConfig.getMapMaxZ(); ++z) {
             for (const auto& [index, block] : m_tileBlocks[z]) {
-                if (!(*block).wasSeen())
+                if (!block->wasSeen())
                     continue;
 
                 const auto& pos = getIndexPosition(index, z);
@@ -414,14 +413,14 @@ void Minimap::saveOtmm(const std::string& fileName)
                 fin->addU8(pos.z);
 
                 unsigned long len = blockSize;
-                compress2(compressBuffer.data(), &len, (uint8_t*)&(*block).getTiles(), blockSize, COMPRESS_LEVEL);
+                compress2(compressBuffer.data(), &len, (uint8_t*)&block->getTiles(), blockSize, COMPRESS_LEVEL);
                 fin->addU16(len);
                 fin->write(compressBuffer.data(), len);
             }
         }
 
         // end of file
-        const Position invalidPos;
+        constexpr Position invalidPos;
         fin->addU16(invalidPos.x);
         fin->addU16(invalidPos.y);
         fin->addU8(invalidPos.z);

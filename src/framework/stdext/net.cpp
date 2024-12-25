@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,7 +38,7 @@ namespace stdext
         return asio::detail::socket_ops::host_to_network_long(address_v4.to_ulong());
     }
 
-    std::vector<uint32_t > listSubnetAddresses(uint32_t address, uint8_t mask)
+    std::vector<uint32_t > listSubnetAddresses(const uint32_t address, const uint8_t mask)
     {
         std::vector<uint32_t > list;
         if (mask < 32) {

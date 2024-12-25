@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 class Image
 {
 public:
-    Image(const Size& size, int bpp = 4, uint8_t* pixels = nullptr);
+    Image(const Size& size, int bpp = 4, const uint8_t* pixels = nullptr);
 
     static ImagePtr load(const std::string& file);
     static ImagePtr loadPNG(const char* data, size_t size);
@@ -49,17 +49,17 @@ public:
     bool nextMipmap();
 
     void flipVertically();
-    void setOpacity(const uint8_t v);
+    void setOpacity(uint8_t v);
 
     void reverseChannels(); // argb -> bgra or bgra -> argb
 
-    void setPixel(int x, int y, const uint8_t* pixel) {
+    void setPixel(const int x, const int y, const uint8_t* pixel) {
         const auto index = static_cast<size_t>(y * m_size.width() + x) * m_bpp;
         if (index < m_pixels.size())
             memcpy(&m_pixels[index], pixel, m_bpp);
     }
-    void setPixel(int x, int y, const Color& color) { setPixel(x, y, Color(color.rgba()).rgba()); }
-    void setPixel(int x, int y, uint32_t rgba) { setPixel(x, y, reinterpret_cast<uint8_t*>(&rgba)); }
+    void setPixel(const int x, const int y, const Color& color) { setPixel(x, y, Color(color.rgba()).rgba()); }
+    void setPixel(const int x, const int y, uint32_t rgba) { setPixel(x, y, reinterpret_cast<uint8_t*>(&rgba)); }
 
     std::vector<uint8_t>& getPixels() { return m_pixels; }
     uint8_t* getPixelData() { return &m_pixels[0]; }
@@ -68,7 +68,7 @@ public:
     int getWidth() const { return m_size.width(); }
     int getHeight() const { return m_size.height(); }
     int getBpp() const { return m_bpp; }
-    uint8_t* getPixel(int x, int y) { return &m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp]; }
+    uint8_t* getPixel(const int x, const int y) { return &m_pixels[static_cast<size_t>(y * m_size.width() + x) * m_bpp]; }
 
     bool hasTransparentPixel() const { return m_transparentPixel; }
     void setTransparentPixel(const bool value) { m_transparentPixel = value; }

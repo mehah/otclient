@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,10 @@
  */
 
 #include "paintershaderprogram.h"
-#include <framework/core/clock.h>
-#include <framework/platform/platformwindow.h>
 #include "texture.h"
 #include "texturemanager.h"
+#include <framework/core/clock.h>
+#include <framework/platform/platformwindow.h>
 
 PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds()) {}
 
@@ -109,7 +109,7 @@ void PainterShaderProgram::setColor(const Color& color)
     m_color = color;
 }
 
-void PainterShaderProgram::setOpacity(float opacity)
+void PainterShaderProgram::setOpacity(const float opacity)
 {
     if (m_opacity == opacity)
         return;

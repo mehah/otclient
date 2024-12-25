@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,18 @@
 
 #pragma once
 
-#include <framework/ui/uianchorlayout.h>
 #include "declarations.h"
+#include <framework/ui/uianchorlayout.h>
 
 #include <utility>
 
-class UIPositionAnchor : public UIAnchor
+class UIPositionAnchor final : public UIAnchor
 {
 public:
-    UIPositionAnchor(Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, Fw::AnchorEdge hookedEdge) :
+    UIPositionAnchor(const Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, const Fw::AnchorEdge hookedEdge) :
         UIAnchor(anchoredEdge, {}, hookedEdge), m_hookedPosition(hookedPosition)
-    {}
+    {
+    }
 
     UIWidgetPtr getHookedWidget(const UIWidgetPtr& /*widget*/, const UIWidgetPtr& parentWidget) override { return parentWidget; }
     int getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr& parentWidget) override;
@@ -41,7 +42,7 @@ private:
     Position m_hookedPosition;
 };
 
-class UIMapAnchorLayout : public UIAnchorLayout
+class UIMapAnchorLayout final : public UIAnchorLayout
 {
 public:
     UIMapAnchorLayout(UIWidgetPtr parentWidget) : UIAnchorLayout(std::move(parentWidget)) {}

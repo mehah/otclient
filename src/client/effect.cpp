@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  */
 
 #include "effect.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
 #include "game.h"
 #include "map.h"
 #include <client/client.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 
-void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
+void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())
         return;
@@ -57,11 +57,11 @@ void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightV
     const int offsetX = m_position.x - g_map.getCentralPosition().x;
     const int offsetY = m_position.y - g_map.getCentralPosition().y;
 
-    int xPattern = unsigned(offsetX) % getNumPatternX();
+    int xPattern = static_cast<unsigned>(offsetX) % getNumPatternX();
     xPattern = 1 - xPattern - getNumPatternX();
     if (xPattern < 0) xPattern += getNumPatternX();
 
-    int yPattern = unsigned(offsetY) % getNumPatternY();
+    int yPattern = static_cast<unsigned>(offsetY) % getNumPatternY();
 
     if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
         xPattern = offsetX % getNumPatternX();
@@ -76,7 +76,7 @@ void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightV
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
         if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
             m_drawConductor.agroup = true;
-            m_drawConductor.order = DrawOrder::FOURTH;
+            m_drawConductor.order = FOURTH;
         }
 
         if (drawThings && g_client.getEffectAlpha() < 1.f)
@@ -126,7 +126,7 @@ bool Effect::waitFor(const EffectPtr& effect)
     return true;
 }
 
-void Effect::setId(uint32_t id)
+void Effect::setId(const uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryEffect))
         return;
@@ -134,7 +134,7 @@ void Effect::setId(uint32_t id)
     m_clientId = id;
 }
 
-void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
+void Effect::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
 {
     if (m_clientId == 0)
         return;

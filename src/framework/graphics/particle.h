@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,15 @@ class Particle
 {
 public:
     Particle(const Point& pos, const Size& startSize, const Size& finalSize, const PointF& velocity,
-                       const PointF& acceleration, float duration, float ignorePhysicsAfter, const std::vector<Color>& colors,
-                       const std::vector<float>& colorsStops, CompositionMode compositionMode, const TexturePtr& texture, const AnimatedTexturePtr& animatedTexture) :
-        m_colors(colors), m_colorsStops(colorsStops), m_texture(texture), m_animatedTexture(animatedTexture), m_position(PointF(pos.x, pos.y)),
+                       const PointF& acceleration, const float duration, const float ignorePhysicsAfter, const std::vector<Color>& colors,
+                       const std::vector<float>& colorsStops, const CompositionMode compositionMode, TexturePtr texture,
+                       AnimatedTexturePtr animatedTexture) :
+        m_colors(colors), m_colorsStops(colorsStops), m_texture(std::move(texture)), m_animatedTexture(std::move(
+        animatedTexture)), m_position(PointF(pos.x, pos.y)),
         m_velocity(velocity), m_acceleration(acceleration), m_startSize(startSize), m_finalSize(finalSize),
         m_duration(duration), m_ignorePhysicsAfter(ignorePhysicsAfter), m_compositionMode(compositionMode)
-    {}
+    {
+    }
 
     void render() const;
     void update(float elapsedTime);

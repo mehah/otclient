@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,16 +22,14 @@
 
 #pragma once
 
-#include "declarations.h"
-
 #include "uiwidget.h"
 
-// @bindclass
-class UIQrCode : public UIWidget
+ // @bindclass
+class UIQrCode final : public UIWidget
 {
 public:
     void setCode(const std::string& code, int border);
-    void setCodeBorder(int border) { m_qrCodeBorder = border; setCode(m_qrCode, border); }
+    void setCodeBorder(const int border) { m_qrCodeBorder = border; setCode(m_qrCode, border); }
 
     std::string getCode() { return m_qrCode; }
     int getCodeBorder() { return m_qrCodeBorder; }

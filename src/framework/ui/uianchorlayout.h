@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,12 @@
 class UIAnchor : public std::enable_shared_from_this<UIAnchor>
 {
 public:
-    virtual ~UIAnchor() {} // fix clang warning
+    virtual ~UIAnchor() = default; // fix clang warning
 
-    UIAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge) :
+    UIAnchor(const Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, const Fw::AnchorEdge hookedEdge) :
         m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::string{ hookedWidgetId })
-    {}
+    {
+    }
 
     Fw::AnchorEdge getAnchoredEdge() const { return m_anchoredEdge; }
     Fw::AnchorEdge getHookedEdge() const { return m_hookedEdge; }
@@ -55,7 +56,7 @@ public:
     void addAnchor(const UIAnchorPtr& anchor);
     const UIAnchorList& getAnchors() { return m_anchors; }
     bool isUpdated() const { return m_updated; }
-    void setUpdated(bool updated) { m_updated = updated; }
+    void setUpdated(const bool updated) { m_updated = updated; }
 
 private:
     UIAnchorList m_anchors;
@@ -69,11 +70,11 @@ public:
     UIAnchorLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
     void addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
-                   const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
+                   std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
     void removeAnchors(const UIWidgetPtr& anchoredWidget);
     bool hasAnchors(const UIWidgetPtr& anchoredWidget) const;
-    void centerIn(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
-    void fill(const UIWidgetPtr& anchoredWidget, const std::string_view hookedWidgetId);
+    void centerIn(const UIWidgetPtr& anchoredWidget, std::string_view hookedWidgetId);
+    void fill(const UIWidgetPtr& anchoredWidget, std::string_view hookedWidgetId);
 
     void addWidget(const UIWidgetPtr& widget) override;
     void removeWidget(const UIWidgetPtr& widget) override;

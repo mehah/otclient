@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,11 @@
  */
 
 #include "statictext.h"
+#include "framework/core/graphicalapplication.h"
+#include "map.h"
 #include <framework/core/clock.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/fontmanager.h>
-#include "map.h"
-#include "framework/core/graphicalapplication.h"
 
 StaticText::StaticText()
 {
@@ -50,7 +50,7 @@ void StaticText::drawText(const Point& dest, const Rect& parentRect)
 void StaticText::setText(const std::string_view text) { m_cachedText.setText(text); }
 void StaticText::setFont(const std::string_view fontName) { m_cachedText.setFont(g_fonts.getFont(fontName)); }
 
-bool StaticText::addMessage(const std::string_view name, Otc::MessageMode mode, const std::string_view text)
+bool StaticText::addMessage(const std::string_view name, const Otc::MessageMode mode, const std::string_view text)
 {
     //TODO: this could be moved to lua
     // first message

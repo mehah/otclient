@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,9 @@
 #pragma once
 
 #include <asio.hpp>
+#include <list>
 #include <map>
 #include <set>
-#include <list>
 
 using ProxyPacket = std::vector<uint8_t>;
 using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;
@@ -45,8 +45,9 @@ class Proxy : public std::enable_shared_from_this<Proxy>
         STATE_CONNECTED
     };
 public:
-    Proxy(asio::io_context& io, const std::string& host, uint16_t port, int priority)
-        : m_io(io), m_timer(io), m_socket(io), m_resolver(io), m_state(STATE_NOT_CONNECTED)
+    Proxy(asio::io_context& io, const std::string& host, const uint16_t port, const int priority)
+        : m_io(io), m_timer(io), m_socket(io), m_resolver(io)
+
     {
         m_host = host;
         m_port = port;
@@ -90,7 +91,7 @@ private:
     asio::ip::tcp::socket m_socket;
     asio::ip::tcp::resolver m_resolver;
 
-    ProxyState m_state;
+    ProxyState m_state{ STATE_NOT_CONNECTED };
 
     std::string m_host;
     uint16_t m_port;
@@ -122,7 +123,7 @@ class Session : public std::enable_shared_from_this<Session>
     static constexpr int BUFFER_SIZE = 65535;
     static constexpr int TIMEOUT = 30000;
 public:
-    Session(asio::io_context& io, asio::ip::tcp::socket socket, int port)
+    Session(asio::io_context& io, asio::ip::tcp::socket socket, const int port)
         : m_io(io), m_timer(io), m_socket(std::move(socket))
     {
         m_id = (std::chrono::high_resolution_clock::now().time_since_epoch().count()) & 0xFFFFFFFF;
@@ -131,7 +132,7 @@ public:
         m_useSocket = true;
     }
 
-    Session(asio::io_context& io, int port, std::function<void(ProxyPacketPtr)> recvCallback, std::function<void(std::error_code)> disconnectCallback)
+    Session(asio::io_context& io, const int port, std::function<void(ProxyPacketPtr)> recvCallback, std::function<void(std::error_code)> disconnectCallback)
         : m_io(io), m_timer(io), m_socket(io)
     {
         m_id = (std::chrono::high_resolution_clock::now().time_since_epoch().count()) & 0xFFFFFFFF;
@@ -175,7 +176,7 @@ private:
 
     std::set<ProxyPtr> m_proxies;
 
-    int m_maxConnections;
+    size_t m_maxConnections;
 
     uint8_t m_buffer[BUFFER_SIZE];
     std::map<uint32_t, ProxyPacketPtr> m_sendQueue;

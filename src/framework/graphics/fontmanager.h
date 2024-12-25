@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,8 @@ public:
 
     bool importFont(const std::string& file);
 
-    bool fontExists(const std::string_view fontName);
-    BitmapFontPtr getFont(const std::string_view fontName);
+    bool fontExists(std::string_view fontName);
+    BitmapFontPtr getFont(std::string_view fontName);
 
     BitmapFontPtr getDefaultFont() const { return m_defaultFont; }
     BitmapFontPtr getDefaultWidgetFont() const { return m_defaultWidgetFont; }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 #include "eventdispatcher.h"
 #include "asyncdispatcher.h"
 
-#include <framework/core/clock.h>
 #include "timer.h"
 
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
@@ -138,7 +137,7 @@ void EventDispatcher::executeEvents() {
     m_eventList.clear();
 }
 
-std::vector<std::pair<uint64_t, uint64_t>> generatePartition(size_t size) {
+std::vector<std::pair<uint64_t, uint64_t>> generatePartition(const size_t size) {
     if (size == 0)
         return {};
 

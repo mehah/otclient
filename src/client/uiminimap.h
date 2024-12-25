@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
+#include <framework/ui/uiwidget.h>
 
-class UIMinimap : public UIWidget
+class UIMinimap final : public UIWidget
 {
 public:
     void drawSelf(DrawPoolType drawPane) override;
@@ -34,8 +34,8 @@ public:
     bool zoomOut() { return setZoom(m_zoom - 1); }
 
     bool setZoom(int8_t zoom);
-    void setMinZoom(int8_t minZoom) { m_minZoom = minZoom; }
-    void setMaxZoom(int8_t maxZoom) { m_maxZoom = maxZoom; }
+    void setMinZoom(const int8_t minZoom) { m_minZoom = minZoom; }
+    void setMaxZoom(const int8_t maxZoom) { m_maxZoom = maxZoom; }
     void setCameraPosition(const Position& pos);
     bool floorUp();
     bool floorDown();
@@ -57,7 +57,7 @@ public:
 protected:
     virtual void onZoomChange(int zoom, int oldZoom);
     virtual void onCameraPositionChange(const Position& position, const Position& oldPosition);
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
 private:
     Rect m_mapArea;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ public:
     virtual void setSmooth(bool smooth);
     virtual void setRepeat(bool repeat);
     void setUpsideDown(bool upsideDown);
-    void setTime(ticks_t time) { m_time = time; }
+    void setTime(const ticks_t time) { m_time = time; }
 
     const Size& getSize() const { return m_size; }
     const Matrix3& getTransformMatrix() const { return m_transformMatrix; }
@@ -57,8 +57,8 @@ public:
     int getHeight() const { return m_size.height(); }
 
     bool isEmpty() const { return m_id == 0; }
-    bool hasRepeat() const { return getProp(Prop::repeat); }
-    bool hasMipmaps() const { return getProp(Prop::hasMipMaps); }
+    bool hasRepeat() const { return getProp(repeat); }
+    bool hasMipmaps() const { return getProp(hasMipMaps); }
     virtual bool isAnimatedTexture() const { return false; }
     bool setupSize(const Size& size);
 
@@ -68,7 +68,7 @@ protected:
     void setupFilters() const;
     void createTexture();
     void setupTranformMatrix();
-    void setupPixels(int level, const Size& size, uint8_t* pixels, int channels = 4, bool compress = false) const;
+    void setupPixels(int level, const Size& size, const uint8_t* pixels, int channels = 4, bool compress = false) const;
     void generateHash() { m_hash = stdext::hash_int(m_id > 0 ? m_id : m_uniqueId); }
 
     const uint32_t m_uniqueId;
@@ -95,8 +95,8 @@ protected:
     };
 
     uint16_t m_props{ 0 };
-    void setProp(Prop prop, bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
-    bool getProp(Prop prop) const { return m_props & prop; };
+    void setProp(const Prop prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
+    bool getProp(const Prop prop) const { return m_props & prop; };
 
     static const Matrix3 toMatrix(const Size& size) {
         return { 1.0f / size.width(), 0.0f, 0.0f,

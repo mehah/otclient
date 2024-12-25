@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@
 #else
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <AL/efx.h>
 #include <AL/efx-presets.h>
+#include <AL/efx.h>
 #endif
 
 class SoundManager;

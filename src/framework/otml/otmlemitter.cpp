@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 #include "otmlemitter.h"
 #include "otmldocument.h"
 
-std::string OTMLEmitter::emitNode(const OTMLNodePtr& node, int currentDepth)
+std::string OTMLEmitter::emitNode(const OTMLNodePtr& node, const int currentDepth)
 {
     std::stringstream ss;
 

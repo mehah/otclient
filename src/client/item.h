@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,8 @@
 
 #pragma once
 
-#include <framework/global.h>
-#include "effect.h"
 #include "thing.h"
+#include <framework/global.h>
 
 enum ItemAttr : uint8_t
 {
@@ -71,7 +70,7 @@ enum ItemAttr : uint8_t
 
 // @bindclass
 #pragma pack(push,1) // disable memory alignment
-class Item : public Thing
+class Item final : public Thing
 {
 public:
     static ItemPtr create(int id);
@@ -81,9 +80,9 @@ public:
 
     void setId(uint32_t id) override;
 
-    void setCountOrSubType(int value) { m_countOrSubType = value; updatePatterns(); }
-    void setCount(int count) { m_countOrSubType = count; updatePatterns(); }
-    void setSubType(int subType) { m_countOrSubType = subType; updatePatterns(); }
+    void setCountOrSubType(const int value) { m_countOrSubType = value; updatePatterns(); }
+    void setCount(const int count) { m_countOrSubType = count; updatePatterns(); }
+    void setSubType(const int subType) { m_countOrSubType = subType; updatePatterns(); }
     void setColor(const Color& c) { if (m_color != c) m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
     void setTooltip(const std::string& str) { m_tooltip = str; }
@@ -101,7 +100,7 @@ public:
 
     bool isValid() { return getThingType() != nullptr; }
 
-    void setAsync(bool enable) { m_async = enable; }
+    void setAsync(const bool enable) { m_async = enable; }
 
     ItemPtr clone();
     ItemPtr asItem() { return static_self_cast<Item>(); }
@@ -109,7 +108,7 @@ public:
 
     void updatePatterns();
     int calculateAnimationPhase();
-    int getExactSize(int layer = 0, int /*xPattern*/ = 0, int /*yPattern*/ = 0, int /*zPattern*/ = 0, int /*animationPhase*/ = 0) override {
+    int getExactSize(const int layer = 0, int /*xPattern*/ = 0, int /*yPattern*/ = 0, int /*zPattern*/ = 0, int /*animationPhase*/ = 0) override {
         return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, calculateAnimationPhase());
     }
 

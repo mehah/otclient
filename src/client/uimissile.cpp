@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 
 UIMissile::UIMissile() { setProp(PropDraggable, true, false); }
 
-void UIMissile::drawSelf(DrawPoolType drawPane)
+void UIMissile::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -52,7 +52,7 @@ void UIMissile::drawSelf(DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIMissile::setMissileId(int id)
+void UIMissile::setMissileId(const int id)
 {
     if (id == 0)
         m_missile = nullptr;

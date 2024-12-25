@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,12 +24,14 @@
 
 #include "server.h"
 #include "connection.h"
+#include <asio/io_service.hpp>
 
 extern asio::io_service g_ioService;
 
-Server::Server(int port)
+Server::Server(const int port)
     : m_acceptor(g_ioService, asio::ip::tcp::endpoint(asio::ip::tcp::v4(), port))
-{}
+{
+}
 
 ServerPtr Server::create(int port)
 {
@@ -51,7 +53,7 @@ void Server::close()
 void Server::acceptNext()
 {
     const auto& connection = std::make_shared<Connection>();
-        connection->m_connecting = true;
+    connection->m_connecting = true;
 
     const auto self = static_self_cast<Server>();
     m_acceptor.async_accept(connection->m_socket, [=](const std::error_code& error) {

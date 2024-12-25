@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ int push_luavalue(const Outfit& outfit)
     return 1;
 }
 
-bool luavalue_cast(int index, Outfit& outfit)
+bool luavalue_cast(const int index, Outfit& outfit)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -104,7 +104,7 @@ int push_luavalue(const Position& pos)
     return 1;
 }
 
-bool luavalue_cast(int index, Position& pos)
+bool luavalue_cast(const int index, Position& pos)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -140,7 +140,7 @@ int push_luavalue(const std::vector<NPCData>& data) {
     return 1;
 }
 
-bool luavalue_cast(int index, std::vector<NPCData>& data)
+bool luavalue_cast(const int index, std::vector<NPCData>& data)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -187,7 +187,7 @@ int push_luavalue(const MarketData& data)
     return 1;
 }
 
-bool luavalue_cast(int index, MarketData& data)
+bool luavalue_cast(const int index, MarketData& data)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -219,7 +219,7 @@ int push_luavalue(const Light& light)
     return 1;
 }
 
-bool luavalue_cast(int index, Light& light)
+bool luavalue_cast(const int index, Light& light)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -315,7 +315,7 @@ int push_luavalue(const ImbuementTrackerItem& i)
     return 1;
 }
 
-bool luavalue_cast(int index, UnjustifiedPoints& unjustifiedPoints)
+bool luavalue_cast(const int index, UnjustifiedPoints& unjustifiedPoints)
 {
     if (!g_lua.isTable(index))
         return false;
@@ -396,7 +396,7 @@ int push_luavalue(const BlessDialogData& data) {
         g_lua.rawSeti(i + 1);
     }
     g_lua.setField("logs");
-    
+
     return 1;
 }
 
@@ -749,7 +749,7 @@ int push_luavalue(const BestiaryMonsterData& data) {
     }
 
     return 1;
-}       
+}
 
 int push_luavalue(const CharmData& charm) {
     g_lua.createTable(0, 7);
@@ -971,7 +971,7 @@ int push_luavalue(const BosstiarySlotsData& data) {
         g_lua.rawSeti(i + 1);
     }
     g_lua.setField("bossesUnlockedData");
-        return 1;
+    return 1;
 }
 
 int push_luavalue(const ItemSummary& item) {

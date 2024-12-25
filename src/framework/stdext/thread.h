@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,13 @@
 
 #pragma once
 
-#include "types.h"
 #include <atomic>
 
 namespace stdext
 {
     inline int16_t getThreadId() {
         static std::atomic_int16_t lastId = -1;
-        thread_local static int16_t id = -1;
+        thread_local int16_t id = -1;
 
         if (id == -1) {
             lastId.fetch_add(1);

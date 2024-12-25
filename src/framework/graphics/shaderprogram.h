@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/luaengine/luaobject.h>
 #include "glutil.h"
+#include <framework/luaengine/luaobject.h>
 
 #include "shader.h"
 
@@ -37,11 +37,11 @@ class ShaderProgram : public LuaObject
 
 public:
     ShaderProgram();
-    ~ShaderProgram();
+    ~ShaderProgram() override;
 
     bool addShader(const ShaderPtr& shader);
-    bool addShaderFromSourceCode(ShaderType shaderType, const std::string_view sourceCode);
-    bool addShaderFromSourceFile(ShaderType shaderType, const std::string_view sourceFile);
+    bool addShaderFromSourceCode(ShaderType shaderType, std::string_view sourceCode);
+    bool addShaderFromSourceFile(ShaderType shaderType, std::string_view sourceFile);
     void removeShader(const ShaderPtr& shader);
     void removeAllShaders();
     virtual bool link();
@@ -49,8 +49,8 @@ public:
     static void release();
     std::string log() const;
 
-    static void disableAttributeArray(int location) { glDisableVertexAttribArray(location); }
-    static void enableAttributeArray(int location) { glEnableVertexAttribArray(location); }
+    static void disableAttributeArray(const int location) { glDisableVertexAttribArray(location); }
+    static void enableAttributeArray(const int location) { glEnableVertexAttribArray(location); }
     void disableAttributeArray(const char* name) const
     { glDisableVertexAttribArray(getAttributeLocation(name)); }
     void enableAttributeArray(const char* name) const
@@ -60,46 +60,46 @@ public:
     void bindAttributeLocation(int location, const char* name) const;
     void bindUniformLocation(int location, const char* name);
 
-    void setAttributeArray(int location, const float* values, int size, int stride = 0) { glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, stride, values); }
-    void setAttributeValue(int location, float value) { glVertexAttrib1f(location, value); }
-    void setAttributeValue(int location, float x, float y) { glVertexAttrib2f(location, x, y); }
-    void setAttributeValue(int location, float x, float y, float z) { glVertexAttrib3f(location, x, y, z); }
-    void setAttributeArray(const char* name, const float* values, int size, int stride = 0) const
+    void setAttributeArray(const int location, const float* values, const int size, const int stride = 0) { glVertexAttribPointer(location, size, GL_FLOAT, GL_FALSE, stride, values); }
+    void setAttributeValue(const int location, const float value) { glVertexAttrib1f(location, value); }
+    void setAttributeValue(const int location, const float x, const float y) { glVertexAttrib2f(location, x, y); }
+    void setAttributeValue(const int location, const float x, const float y, const float z) { glVertexAttrib3f(location, x, y, z); }
+    void setAttributeArray(const char* name, const float* values, const int size, const int stride = 0) const
     { glVertexAttribPointer(getAttributeLocation(name), size, GL_FLOAT, GL_FALSE, stride, values); }
-    void setAttributeValue(const char* name, float value) const
+    void setAttributeValue(const char* name, const float value) const
     { glVertexAttrib1f(getAttributeLocation(name), value); }
-    void setAttributeValue(const char* name, float x, float y) const
+    void setAttributeValue(const char* name, const float x, const float y) const
     { glVertexAttrib2f(getAttributeLocation(name), x, y); }
-    void setAttributeValue(const char* name, float x, float y, float z) const
+    void setAttributeValue(const char* name, const float x, const float y, const float z) const
     { glVertexAttrib3f(getAttributeLocation(name), x, y, z); }
 
-    void setUniformValue(int location, const Color& color) const
+    void setUniformValue(const int location, const Color& color) const
     { glUniform4f(m_uniformLocations[location], color.rF(), color.gF(), color.bF(), color.aF()); }
-    void setUniformValue(int location, int value) const
+    void setUniformValue(const int location, const int value) const
     { glUniform1i(m_uniformLocations[location], value); }
-    void setUniformValue(int location, float value) const
+    void setUniformValue(const int location, const float value) const
     { glUniform1f(m_uniformLocations[location], value); }
-    void setUniformValue(int location, float x, float y) const
+    void setUniformValue(const int location, const float x, const float y) const
     { glUniform2f(m_uniformLocations[location], x, y); }
-    void setUniformValue(int location, float x, float y, float z) const
+    void setUniformValue(const int location, const float x, const float y, const float z) const
     { glUniform3f(m_uniformLocations[location], x, y, z); }
-    void setUniformValue(int location, float x, float y, float z, float w) const
+    void setUniformValue(const int location, const float x, const float y, const float z, const float w) const
     { glUniform4f(m_uniformLocations[location], x, y, z, w); }
-    void setUniformValue(int location, const Matrix2& mat) const
+    void setUniformValue(const int location, const Matrix2& mat) const
     { glUniformMatrix2fv(m_uniformLocations[location], 1, GL_FALSE, mat.data()); }
-    void setUniformValue(int location, const Matrix3& mat) const
+    void setUniformValue(const int location, const Matrix3& mat) const
     { glUniformMatrix3fv(m_uniformLocations[location], 1, GL_FALSE, mat.data()); }
     void setUniformValue(const char* name, const Color& color) const
     { glUniform4f(glGetUniformLocation(m_programId, name), color.rF(), color.gF(), color.bF(), color.aF()); }
-    void setUniformValue(const char* name, int value) const
+    void setUniformValue(const char* name, const int value) const
     { glUniform1i(glGetUniformLocation(m_programId, name), value); }
-    void setUniformValue(const char* name, float value) const
+    void setUniformValue(const char* name, const float value) const
     { glUniform1f(glGetUniformLocation(m_programId, name), value); }
-    void setUniformValue(const char* name, float x, float y) const
+    void setUniformValue(const char* name, const float x, const float y) const
     { glUniform2f(glGetUniformLocation(m_programId, name), x, y); }
-    void setUniformValue(const char* name, float x, float y, float z) const
+    void setUniformValue(const char* name, const float x, const float y, const float z) const
     { glUniform3f(glGetUniformLocation(m_programId, name), x, y, z); }
-    void setUniformValue(const char* name, float x, float y, float z, float w) const
+    void setUniformValue(const char* name, const float x, const float y, const float z, const float w) const
     { glUniform4f(glGetUniformLocation(m_programId, name), x, y, z, w); }
     void setUniformValue(const char* name, const Matrix2& mat) const
     { glUniformMatrix2fv(glGetUniformLocation(m_programId, name), 1, GL_FALSE, mat.data()); }

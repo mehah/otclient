@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,8 @@
 
 #pragma once
 
-#include <array>
 #include <cmath>
 #include <ostream>
-#include "../stdext/types.h"
 
 template<class T>
 class TSize;
@@ -37,13 +35,13 @@ public:
     TPoint() : x(0), y(0) {}
     TPoint(T xy) : x(xy), y(xy) {}
     TPoint(T x, T y) : x(x), y(y) {}
-    TPoint(const TPoint<T>& other) : x(other.x), y(other.y) {}
+    TPoint(const TPoint& other) : x(other.x), y(other.y) {}
 
     bool isNull() const { return x == 0 && y == 0; }
     TSize<T> toSize() const { return TSize<T>(x, y); }
-    TPoint<T> translated(T dx, T dy) const { TPoint<T> point = *this; point.x += dx; point.y += dy; return point; }
+    TPoint translated(T dx, T dy) const { TPoint point = *this; point.x += dx; point.y += dy; return point; }
 
-    TPoint<T> scale(float v) {
+    TPoint scale(const float v) {
         if (v != 1.f) {
             float factor = (1.f - (1.f / v));
             x -= x * factor;
@@ -52,42 +50,42 @@ public:
         return *this;
     }
 
-    TPoint<T> operator-() const { return TPoint<T>(-x, -y); }
+    TPoint operator-() const { return TPoint(-x, -y); }
 
-    TPoint<T> operator+(const TPoint<T>& other) const { return TPoint<T>(x + other.x, y + other.y); }
-    TPoint<T>& operator+=(const TPoint<T>& other) { x += other.x; y += other.y; return *this; }
-    TPoint<T> operator-(const TPoint<T>& other) const { return TPoint<T>(x - other.x, y - other.y); }
-    TPoint<T>& operator-=(const TPoint<T>& other) { x -= other.x; y -= other.y; return *this; }
-    TPoint<T> operator*(const TPoint<T>& other) const { return TPoint<T>(x * other.x, y * other.y); }
-    TPoint<T>& operator*=(const TPoint<T>& other) { x *= other.x; y *= other.y; return *this; }
-    TPoint<T> operator/(const TPoint<T>& other) const { return TPoint<T>(x / other.x, y / other.y); }
-    TPoint<T>& operator/=(const TPoint<T>& other) { x /= other.x; y /= other.y; return *this; }
+    TPoint operator+(const TPoint& other) const { return TPoint(x + other.x, y + other.y); }
+    TPoint& operator+=(const TPoint& other) { x += other.x; y += other.y; return *this; }
+    TPoint operator-(const TPoint& other) const { return TPoint(x - other.x, y - other.y); }
+    TPoint& operator-=(const TPoint& other) { x -= other.x; y -= other.y; return *this; }
+    TPoint operator*(const TPoint& other) const { return TPoint(x * other.x, y * other.y); }
+    TPoint& operator*=(const TPoint& other) { x *= other.x; y *= other.y; return *this; }
+    TPoint operator/(const TPoint& other) const { return TPoint(x / other.x, y / other.y); }
+    TPoint& operator/=(const TPoint& other) { x /= other.x; y /= other.y; return *this; }
 
-    TPoint<T> operator+(T other) const { return TPoint<T>(x + other, y + other); }
-    TPoint<T>& operator+=(T other) { x += other; y += other; return *this; }
-    TPoint<T> operator-(T other) const { return TPoint<T>(x - other, y - other); }
-    TPoint<T>& operator-=(T other) { x -= other; y -= other; return *this; }
-    TPoint<T> operator*(float v) const { return TPoint<T>(x * v, y * v); }
-    TPoint<T>& operator*=(float v) { x *= v; y *= v; return *this; }
-    TPoint<T> operator/(float v) const { return TPoint<T>(x / v, y / v); }
-    TPoint<T>& operator/=(float v) { x /= v; y /= v; return *this; }
+    TPoint operator+(T other) const { return TPoint(x + other, y + other); }
+    TPoint& operator+=(T other) { x += other; y += other; return *this; }
+    TPoint operator-(T other) const { return TPoint(x - other, y - other); }
+    TPoint& operator-=(T other) { x -= other; y -= other; return *this; }
+    TPoint operator*(float v) const { return TPoint(x * v, y * v); }
+    TPoint& operator*=(float v) { x *= v; y *= v; return *this; }
+    TPoint operator/(float v) const { return TPoint(x / v, y / v); }
+    TPoint& operator/=(float v) { x /= v; y /= v; return *this; }
 
-    TPoint<T> operator&(int a) { return TPoint<T>(x & a, y & a); }
-    TPoint<T>& operator&=(int a) { x &= a; y &= a; return *this; }
+    TPoint operator&(int a) { return TPoint(x & a, y & a); }
+    TPoint& operator&=(int a) { x &= a; y &= a; return *this; }
 
-    bool operator<=(const TPoint<T>& other) const { return x <= other.x && y <= other.y; }
-    bool operator>=(const TPoint<T>& other) const { return x >= other.x && y >= other.y; }
-    bool operator<(const TPoint<T>& other) const { return x < other.x && y < other.y; }
-    bool operator>(const TPoint<T>& other) const { return x > other.x && y > other.y; }
+    bool operator<=(const TPoint& other) const { return x <= other.x && y <= other.y; }
+    bool operator>=(const TPoint& other) const { return x >= other.x && y >= other.y; }
+    bool operator<(const TPoint& other) const { return x < other.x && y < other.y; }
+    bool operator>(const TPoint& other) const { return x > other.x && y > other.y; }
 
-    TPoint<T>& operator=(const TPoint<T>& other) { x = other.x; y = other.y; return *this; }
-    bool operator==(const TPoint<T>& other) const { return other.x == x && other.y == y; }
-    bool operator!=(const TPoint<T>& other) const { return other.x != x || other.y != y; }
+    TPoint& operator=(const TPoint& other) = default;
+    bool operator==(const TPoint& other) const { return other.x == x && other.y == y; }
+    bool operator!=(const TPoint& other) const { return other.x != x || other.y != y; }
 
     float length() const { return sqrt(static_cast<float>(x * x + y * y)); }
     T manhattanLength() const { return std::abs(x) + std::abs(y); }
 
-    float distanceFrom(const TPoint<T>& other) const { return TPoint<T>(x - other.x, y - other.y).length(); }
+    float distanceFrom(const TPoint& other) const { return TPoint(x - other.x, y - other.y).length(); }
 
     std::size_t hash() const { return (7 * 15 + x) * 15 + y; }
 

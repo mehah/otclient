@@ -186,3 +186,23 @@ HorizontalQtScrollBar < UIScrollBar
       image-clip: 54 10 12 12
 
   HorizontalScrollBarQtSlider
+
+SmallButton < UIButton
+  size: 106 20
+  font: cipsoftFont
+  text-offset: 0 2
+  image-source: /images/ui/button
+  image-clip: 0 0 22 23
+  image-border: 3
+  padding: 5 10 5 10
+  change-cursor-image: true
+  cursor: pointer
+  color: #ffffff
+  $hover !disabled:
+    image-clip: 0 23 22 23
+  $pressed:
+    image-clip: 0 46 22 23
+    text-offset: 1 2
+  $disabled:
+    color: #ffffff88
+    change-cursor-image: false

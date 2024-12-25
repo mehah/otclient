@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,13 @@
 #pragma once
 
 #include "../stdext/cast.h"
-#include "../stdext/string.h"
 #include "../stdext/types.h"
 
 class Color
 {
 public:
-    Color() { m_hash = Color::white.hash(); };
-    Color(const std::string_view coltext);
+    Color() { m_hash = white.hash(); };
+    Color(std::string_view coltext);
     Color(const uint32_t rgba) { setRGBA(rgba); }
     Color(const int r, const int g, const int b, const int a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f) { update(); }
     Color(const float r, const float g, const float b, const float a = 1.0f) : m_r(r), m_g(g), m_b(b), m_a(a) { update(); }
@@ -49,7 +48,7 @@ public:
     }
 
     Color(const Color& color) = default;
-    Color(const Color& color, float a) {
+    Color(const Color& color, const float a) {
         m_r = color.m_r;
         m_g = color.m_g;
         m_b = color.m_b;
@@ -89,8 +88,8 @@ public:
     Color operator*(const float v) const { return Color(m_r * v, m_g * v, m_b * v, m_a * v); }
     Color operator/(const float v) const { return Color(m_r / v, m_g / v, m_b / v, m_a / v); }
 
-    Color& operator=(uint32_t rgba) { setRGBA(rgba); return *this; }
-    bool operator==(uint32_t rgba) const { return this->rgba() == rgba; }
+    Color& operator=(const uint32_t rgba) { setRGBA(rgba); return *this; }
+    bool operator==(const uint32_t rgba) const { return this->rgba() == rgba; }
 
     Color& operator=(const Color& other) = default;
     bool operator==(const Color& other) const { return other.hash() == hash(); }
@@ -117,7 +116,7 @@ public:
     static Color from8bit(const int color, const float brightness = 1.0f)
     {
         if (color >= 216 || color <= 0)
-            return Color::alpha;
+            return alpha;
 
         const int r = static_cast<int>((color / 36 % 6 * 51) * brightness);
         const int g = static_cast<int>((color / 6 % 6 * 51) * brightness);

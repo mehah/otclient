@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
  */
 
 #include <algorithm>
+#include <ranges>
 #include <vector>
 
 #include "exception.h"
@@ -33,7 +34,7 @@
 
 namespace stdext
 {
-    std::string resolve_path(const std::string_view filePath, std::string_view sourcePath)
+    std::string resolve_path(const std::string_view filePath, const std::string_view sourcePath)
     {
         if (filePath.starts_with("/"))
             return filePath.data();
@@ -58,7 +59,7 @@ namespace stdext
         return std::string(date);
     }
 
-    std::string dec_to_hex(uint64_t num)
+    std::string dec_to_hex(const uint64_t num)
     {
         std::ostringstream o;
         o << std::hex << num;
@@ -75,20 +76,20 @@ namespace stdext
 
     bool is_valid_utf8(const std::string_view src)
     {
-        int c, i, ix, n, j;
+        int i, ix, n;
         for (i = 0, ix = src.length(); i < ix; i++) {
-            c = (unsigned char)src[i];
+            int c = static_cast<unsigned char>(src[i]);
             //if (c==0x09 || c==0x0a || c==0x0d || (0x20 <= c && c <= 0x7e) ) n = 0; // is_printable_ascii
             if (0x00 <= c && c <= 0x7f) n = 0; // 0bbbbbbb
             else if ((c & 0xE0) == 0xC0) n = 1; // 110bbbbb
-            else if (c == 0xed && i < (ix - 1) && ((unsigned char)src[i + 1] & 0xa0) == 0xa0) return false; //U+d800 to U+dfff
+            else if (c == 0xed && i < (ix - 1) && (static_cast<unsigned char>(src[i + 1]) & 0xa0) == 0xa0) return false; //U+d800 to U+dfff
             else if ((c & 0xF0) == 0xE0) n = 2; // 1110bbbb
             else if ((c & 0xF8) == 0xF0) n = 3; // 11110bbb
             //else if (($c & 0xFC) == 0xF8) n=4; // 111110bb //byte 5, unnecessary in 4 byte UTF-8
             //else if (($c & 0xFE) == 0xFC) n=5; // 1111110b //byte 6, unnecessary in 4 byte UTF-8
             else return false;
-            for (j = 0; j < n && i < ix; j++) { // n bytes matching 10bbbbbb follow ?
-                if ((++i == ix) || (((unsigned char)src[i] & 0xC0) != 0x80))
+            for (int j = 0; j < n && i < ix; j++) { // n bytes matching 10bbbbbb follow ?
+                if ((++i == ix) || ((static_cast<unsigned char>(src[i]) & 0xC0) != 0x80))
                     return false;
             }
         }
@@ -139,18 +140,30 @@ namespace stdext
 
     std::wstring utf8_to_utf16(const std::string_view src)
     {
+#ifndef BOT_PROTECTION
+        constexpr size_t BUFFER_SIZE = 65536;
+#else
+        constexpr size_t BUFFER_SIZE = 4096;
+#endif
+
         std::wstring res;
-        wchar_t out[4096];
-        if (MultiByteToWideChar(CP_UTF8, 0, src.data(), -1, out, 4096))
+        wchar_t out[BUFFER_SIZE];
+        if (MultiByteToWideChar(CP_UTF8, 0, src.data(), -1, out, BUFFER_SIZE))
             res = out;
         return res;
     }
 
     std::string utf16_to_utf8(const std::wstring_view src)
     {
+#ifndef BOT_PROTECTION
+        constexpr size_t BUFFER_SIZE = 65536;
+#else
+        constexpr size_t BUFFER_SIZE = 4096;
+#endif
+
         std::string res;
-        char out[4096];
-        if (WideCharToMultiByte(CP_UTF8, 0, src.data(), -1, out, 4096, nullptr, nullptr))
+        char out[BUFFER_SIZE];
+        if (WideCharToMultiByte(CP_UTF8, 0, src.data(), -1, out, BUFFER_SIZE, nullptr, nullptr))
             res = out;
         return res;
     }
@@ -168,24 +181,24 @@ namespace stdext
 
     void tolower(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), [](int c) -> char { return static_cast<char>(::tolower(c)); });
+        std::ranges::transform(str, str.begin(), [](const int c) -> char { return static_cast<char>(::tolower(c)); });
     }
 
     void toupper(std::string& str)
     {
-        std::transform(str.begin(), str.end(), str.begin(), [](int c) -> char { return static_cast<char>(::toupper(c)); });
+        std::ranges::transform(str, str.begin(), [](const int c) -> char { return static_cast<char>(::toupper(c)); });
     }
 
     void ltrim(std::string& s)
     {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](uint8_t ch) {
+        s.erase(s.begin(), std::ranges::find_if(s, [](const uint8_t ch) {
             return !std::isspace(ch);
         }));
     }
 
     void rtrim(std::string& s)
     {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](uint8_t ch) {
+        s.erase(std::ranges::find_if(std::ranges::reverse_view(s), [](const uint8_t ch) {
             return !std::isspace(ch);
         }).base(), s.end());
     }

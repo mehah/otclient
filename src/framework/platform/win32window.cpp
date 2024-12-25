@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -253,7 +253,7 @@ void WIN32Window::terminate()
 
 struct WindowProcProxy
 {
-    static LRESULT CALLBACK call(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+    static LRESULT CALLBACK call(const HWND hWnd, const uint32_t uMsg, const WPARAM wParam, const LPARAM lParam)
     {
         auto* const ww = static_cast<WIN32Window*>(&g_window);
         return ww->windowProc(hWnd, uMsg, wParam, lParam);
@@ -426,7 +426,7 @@ bool WIN32Window::isExtensionSupported(const char* ext)
     //TODO
     return false;
 #else
-    const auto wglGetExtensionsString = (const char* (WINAPI*)())(getExtensionProcAddress("wglGetExtensionsStringEXT"));
+    const auto wglGetExtensionsString = static_cast<const char* (__stdcall*)()>(getExtensionProcAddress("wglGetExtensionsStringEXT"));
     if (!wglGetExtensionsString)
         return false;
 
@@ -513,7 +513,7 @@ void WIN32Window::poll()
     updateUnmaximizedCoords();
 }
 
-Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
+Fw::Key WIN32Window::retranslateVirtualKey(const WPARAM wParam, const LPARAM lParam)
 {
     // ignore numpad keys when numlock is on
     if ((wParam >= VK_NUMPAD0 && wParam <= VK_NUMPAD9) || wParam == VK_SEPARATOR)
@@ -565,7 +565,7 @@ Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
 
 #define IsKeyDown(a) (GetKeyState(a) & 0x80)
 
-LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WIN32Window::windowProc(const HWND hWnd, const uint32_t uMsg, const WPARAM wParam, const LPARAM lParam)
 {
     m_inputEvent.keyboardModifiers = 0;
     if (IsKeyDown(VK_CONTROL))
@@ -945,7 +945,7 @@ void WIN32Window::setVerticalSync(bool enable)
         if (!isExtensionSupported("WGL_EXT_swap_control"))
             return;
 
-        const auto wglSwapInterval = (BOOL(WINAPI*)(int))getExtensionProcAddress("wglSwapIntervalEXT");
+        const auto wglSwapInterval = static_cast<BOOL(__stdcall*)(int)>(getExtensionProcAddress("wglSwapIntervalEXT"));
         if (!wglSwapInterval)
             return;
 

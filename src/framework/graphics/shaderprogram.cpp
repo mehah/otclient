@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,8 +24,10 @@
 #include "graphics.h"
 
 #include <framework/core/application.h>
-#include <framework/stdext/hash.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/stdext/hash.h>
+
+#include "framework/core/graphicalapplication.h"
 
 uint32_t ShaderProgram::m_currentProgram = 0;
 
@@ -79,7 +81,7 @@ bool ShaderProgram::addShaderFromSourceFile(ShaderType shaderType, const std::st
 
 void ShaderProgram::removeShader(const ShaderPtr& shader)
 {
-    const auto it = std::find(m_shaders.begin(), m_shaders.end(), shader);
+    const auto it = std::ranges::find(m_shaders, shader);
     if (it == m_shaders.end())
         return;
 
@@ -149,9 +151,9 @@ std::string ShaderProgram::log() const
 
 int ShaderProgram::getAttributeLocation(const char* name) const { return glGetAttribLocation(m_programId, name); }
 
-void ShaderProgram::bindAttributeLocation(int location, const char* name) const { return glBindAttribLocation(m_programId, location, name); }
+void ShaderProgram::bindAttributeLocation(const int location, const char* name) const { return glBindAttribLocation(m_programId, location, name); }
 
-void ShaderProgram::bindUniformLocation(int location, const char* name)
+void ShaderProgram::bindUniformLocation(const int location, const char* name)
 {
     assert(m_linked);
     assert(location >= 0 && location < MAX_UNIFORM_LOCATIONS);

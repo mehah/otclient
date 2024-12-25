@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,16 +22,15 @@
 
 #pragma once
 
-#include <framework/core/declarations.h>
-#include <framework/core/timer.h>
-#include <framework/graphics/cachedtext.h>
 #include "mapview.h"
 #include "outfit.h"
 #include "thing.h"
+#include <framework/core/declarations.h>
+#include <framework/core/timer.h>
+#include <framework/graphics/cachedtext.h>
 
 struct PreyMonster
 {
-public:
     std::string name;
     Outfit outfit;
 };
@@ -45,7 +44,7 @@ public:
     static double speedC;
 
     Creature();
-    ~Creature();
+    ~Creature() override;
 
     static bool hasSpeedFormula();
 
@@ -61,9 +60,9 @@ public:
     void internalDraw(Point dest, const Color& color = Color::white);
     void drawInformation(const MapPosInfo& mapRect, const Point& dest, int drawFlags);
 
-    void setId(uint32_t id) override { m_id = id; }
-    void setMasterId(uint32_t id) { m_masterId = id; }
-    void setName(const std::string_view name);
+    void setId(const uint32_t id) override { m_id = id; }
+    void setMasterId(const uint32_t id) { m_masterId = id; }
+    void setName(std::string_view name);
     void setHealthPercent(uint8_t healthPercent);
     void setDirection(Otc::Direction direction);
     void setOutfit(const Outfit& outfit);
@@ -80,8 +79,8 @@ public:
     void setEmblemTexture(const std::string& filename);
     void setTypeTexture(const std::string& filename);
     void setIconTexture(const std::string& filename);
-    void setPassable(bool passable) { m_passable = passable; }
-    void setMountShader(const std::string_view name);
+    void setPassable(const bool passable) { m_passable = passable; }
+    void setMountShader(std::string_view name);
     void setStaticWalking(uint16_t v);
 
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
@@ -160,7 +159,7 @@ public:
     void setCovered(bool covered);
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
-    void setDisableWalkAnimation(bool v) {
+    void setDisableWalkAnimation(const bool v) {
         if (v) ++m_disableWalkAnimation; else {
             if (m_disableWalkAnimation <= 1) m_disableWalkAnimation = 0;
             else --m_disableWalkAnimation;
@@ -171,7 +170,12 @@ public:
     void sendTyping();
     bool getTyping() { return m_typing; }
     void setTypingIconTexture(const std::string& filename);
-    void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
+    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
+        m_bounce = { .minHeight =
+minHeight,
+.height = height, .speed = speed
+        };
+    }
 
     void setWidgetInformation(const UIWidgetPtr& info);
     UIWidgetPtr getWidgetInformation() { return m_widgetInformation; }
@@ -219,7 +223,7 @@ private:
         uint16_t walkDuration{ 0 };
         uint16_t diagonalDuration{ 0 };
 
-        uint16_t getDuration(Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
+        uint16_t getDuration(const Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
     UIWidgetPtr m_widgetInformation;
@@ -316,14 +320,14 @@ private:
 };
 
 // @bindclass
-class Npc : public Creature
+class Npc final : public Creature
 {
 public:
     bool isNpc() override { return true; }
 };
 
 // @bindclass
-class Monster : public Creature
+class Monster final : public Creature
 {
 public:
     bool isMonster() override { return true; }
