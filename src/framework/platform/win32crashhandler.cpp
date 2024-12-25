@@ -42,6 +42,8 @@
 
 #endif
 
+#include <framework/core/graphicalapplication.h>
+
 const char* getExceptionName(const DWORD exceptionCode)
 {
     switch (exceptionCode) {

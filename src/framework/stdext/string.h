@@ -26,7 +26,6 @@
 #include <vector>
 
 #include "cast.h"
-#include "types.h"
 
 namespace stdext
 {

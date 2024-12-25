@@ -23,7 +23,6 @@
 #pragma once
 
 #include "../stdext/cast.h"
-#include "../stdext/string.h"
 #include "../stdext/types.h"
 
 class Color

@@ -22,8 +22,9 @@
 #ifndef SOUNDEFFECT_H
 #define SOUNDEFFECT_H
 
-#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
+#include <AL/alc.h>
+#include <AL/efx-presets.h>
 
 class SoundEffect final : public LuaObject
 {

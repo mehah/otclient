@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <climits>
 #include <cmath>
-#include <cmath>
 #include <random>
 
 #ifdef _MSC_VER

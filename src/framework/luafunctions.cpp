@@ -63,6 +63,9 @@
 
 #include <regex>
 
+#include "net/inputmessage.h"
+#include "net/outputmessage.h"
+
 void Application::registerLuaFunctions()
 {
     // conversion globals

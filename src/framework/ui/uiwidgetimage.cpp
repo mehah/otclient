@@ -22,10 +22,7 @@
 
 #include "framework/graphics/drawpoolmanager.h"
 #include "uiwidget.h"
-#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/image.h>
-#include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/util/crypt.h>

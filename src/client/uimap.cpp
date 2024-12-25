@@ -24,10 +24,7 @@
 #include "game.h"
 #include "map.h"
 #include "mapview.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/graphics.h>
 
 UIMap::UIMap()
 {

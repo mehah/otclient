@@ -176,7 +176,7 @@ private:
 
     std::set<ProxyPtr> m_proxies;
 
-    int m_maxConnections;
+    size_t m_maxConnections;
 
     uint8_t m_buffer[BUFFER_SIZE];
     std::map<uint32_t, ProxyPacketPtr> m_sendQueue;

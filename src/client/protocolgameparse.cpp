@@ -31,7 +31,6 @@
 #include "luavaluecasts_client.h"
 #include "map.h"
 #include "missile.h"
-#include "statictext.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include <ctime>
@@ -1074,7 +1073,7 @@ void ProtocolGame::parseStoreError(const InputMessagePtr& msg) const
     const uint8_t errorType = msg->getU8();
     const auto& message = msg->getString();
 
-    g_lua.callGlobalField("g_game", "onParseStoreError", message);
+    g_lua.callGlobalField("g_game", "onParseStoreError", message, errorType);
 }
 
 void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)

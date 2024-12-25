@@ -27,9 +27,9 @@
 #include <framework/core/application.h>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
-#include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
-#include <framework/platform/platformwindow.h>
+
+#include "framework/core/graphicalapplication.h"
 
 uint32_t FrameBuffer::boundFbo = 0;
 
@@ -100,6 +100,10 @@ void FrameBuffer::bind()
     } else {
         g_painter->clear(Color::alpha);
     }
+}
+
+bool FrameBuffer::canDraw() const {
+    return m_texture && m_coordsBuffer.getVertexCount() > 0;
 }
 
 void FrameBuffer::release() const
