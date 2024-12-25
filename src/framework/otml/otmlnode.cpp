@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 #include "otmlnode.h"
 
 #include "otmlemitter.h"
-#include <algorithm>
 
 OTMLNodePtr OTMLNode::create(const std::string_view tag, const bool unique)
 {
