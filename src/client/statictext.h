@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include <framework/graphics/cachedtext.h>
 #include "thing.h"
+#include <framework/graphics/cachedtext.h>
 
  // @bindclass
-class StaticText : public LuaObject
+class StaticText final : public LuaObject
 {
 public:
     StaticText();
@@ -43,9 +43,9 @@ public:
 
     bool isYell() const { return m_mode == Otc::MessageYell || m_mode == Otc::MessageMonsterYell || m_mode == Otc::MessageBarkLoud; }
 
-    void setText(const std::string_view text);
-    void setFont(const std::string_view fontName);
-    bool addMessage(const std::string_view name, Otc::MessageMode mode, const std::string_view text);
+    void setText(std::string_view text);
+    void setFont(std::string_view fontName);
+    bool addMessage(std::string_view name, Otc::MessageMode mode, std::string_view text);
 
     StaticTextPtr asStaticText() { return static_self_cast<StaticText>(); }
 

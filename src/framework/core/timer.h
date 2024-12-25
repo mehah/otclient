@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ class Timer
 public:
     Timer() { restart(); }
 
-    void restart();
+    void restart(const int shift = 0);
     void stop() { m_stopped = true; }
     void update(const ticks_t tick) { m_startTicks += tick; }
 

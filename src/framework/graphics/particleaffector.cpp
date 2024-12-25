@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 #include "particleaffector.h"
 #include "particle.h"
 
-void ParticleAffector::update(float elapsedTime)
+void ParticleAffector::update(const float elapsedTime)
 {
     if (m_duration >= 0 && m_elapsedTime >= m_duration + m_delay) {
         m_finished = true;
@@ -77,7 +77,7 @@ void GravityAffector::load(const OTMLNodePtr& node)
     }
 }
 
-void GravityAffector::updateParticle(const ParticlePtr& particle, float elapsedTime) const
+void GravityAffector::updateParticle(const ParticlePtr& particle, const float elapsedTime) const
 {
     if (!m_active)
         return;
@@ -107,7 +107,7 @@ void AttractionAffector::load(const OTMLNodePtr& node)
     }
 }
 
-void AttractionAffector::updateParticle(const ParticlePtr& particle, float elapsedTime) const
+void AttractionAffector::updateParticle(const ParticlePtr& particle, const float elapsedTime) const
 {
     if (!m_active)
         return;

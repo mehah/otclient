@@ -4,6 +4,11 @@ project(otclient)
 # *****************************************************************************
 # Options
 # *****************************************************************************
+if(CMAKE_BASE_NAME STREQUAL "em++")
+    set(WASM ON)
+		message(STATUS "WASM: ON")
+endif()
+
 option(TOGGLE_FRAMEWORK_GRAPHICS "Use Graphics " ON)
 option(TOGGLE_FRAMEWORK_SOUND "Use SOUND " ON)
 option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
@@ -67,7 +72,7 @@ endif()
 if (TOGGLE_FRAMEWORK_EDITOR)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DFRAMEWORK_EDITOR)
 endif()
-if (ANDROID)
+if (ANDROID OR WASM)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DOPENGL_ES=2)
 endif()
 
@@ -207,7 +212,7 @@ if(APPLE)
 	find_library(FOUNDATION Foundation REQUIRED)
 	find_library(IOKIT IOKit REQUIRED)
 endif()
-if(UNIX AND NOT ANDROID)
+if(UNIX AND NOT ANDROID AND NOT WASM)
 	find_package(X11 REQUIRED)
 endif()
 if(WIN32)
@@ -220,7 +225,9 @@ if(TOGGLE_DIRECTX)
 	find_package(DirectX REQUIRED)
 endif()
 if(TOGGLE_FRAMEWORK_SOUND)
-	find_package(OpenAL CONFIG REQUIRED)
+	if(NOT WASM)
+		find_package(OpenAL CONFIG REQUIRED)
+	endif()
 	find_package(VorbisFile REQUIRED)
 	find_package(Vorbis REQUIRED)
 	find_package(Ogg REQUIRED)
@@ -235,9 +242,14 @@ if(ANDROID)
 	find_package(game-activity REQUIRED CONFIG)
 	find_package(EGL REQUIRED)
 else()
-	find_package(OpenGL REQUIRED)
-	find_package(GLEW REQUIRED)
-	find_package(LuaJIT REQUIRED)
+	if(NOT WASM)
+		find_package(OpenGL REQUIRED)
+		find_package(GLEW REQUIRED)
+		find_package(LuaJIT REQUIRED)
+	else()
+		set(LUA_LIBRARY ${LUA_LIBRARY} ${CMAKE_SOURCE_DIR}/browser/include/lua51/liblua.a)
+		set(BROWSER_INCLUDE_DIR ${BROWSER_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/browser/include)
+	endif()
 endif()
 
 # *****************************************************************************
@@ -299,6 +311,8 @@ set(SOURCE_FILES
 	framework/stdext/qrcodegen.cpp
 	framework/util/color.cpp
 	framework/util/crypt.cpp
+	framework/proxy/proxy.cpp
+	framework/proxy/proxy_client.cpp
 
 	client/animatedtext.cpp
 	client/animator.cpp
@@ -420,7 +434,17 @@ if (TOGGLE_FRAMEWORK_SOUND)
 	)
 endif()
 
+if (WASM)
+	set(SOURCE_FILES ${SOURCE_FILES}
+		framework/platform/browserplatform.cpp
+		framework/platform/browserwindow.cpp
+		framework/net/webconnection.cpp
+	)
+endif()
+
+
 target_sources(${PROJECT_NAME} PRIVATE ${SOURCE_FILES})
+target_link_options(${PROJECT_NAME} PUBLIC -flto=auto)
 
 # *****************************************************************************
 # Includes and librarys
@@ -543,6 +567,86 @@ elseif(ANDROID)
 		log
 		pugixml::pugixml
 	)
+
+elseif(WASM)
+  target_include_directories(${PROJECT_NAME}
+		PRIVATE
+		${CMAKE_SOURCE_DIR}/src
+		${CMAKE_THREAD_LIBS_INIT}
+		${Protobuf_INCLUDE_DIRS}
+		${GMP_INCLUDE_DIR}
+		${PHYSFS_INCLUDE_DIR}
+		${GLEW_INCLUDE_DIR}
+		${PARALLEL_HASHMAP_INCLUDE_DIRS}
+		${NLOHMANN_JSON_INCLUDE_DIR}
+		${OPENSSL_INCLUDE_DIR}
+		${BROWSER_INCLUDE_DIR}
+	)
+	target_link_libraries(${PROJECT_NAME}
+		PRIVATE
+		${LUA_LIBRARY}
+		${PHYSFS_LIBRARY}
+		${ZLIB_LIBRARY}
+		${PROTOBUF_LIBRARY}
+		${NLOHMANN_JSON_LIBRARY}
+		${GLEW_LIBRARY}
+		${OPENGL_LIBRARIES}
+		${DirectX_LIBRARY}
+		${DirectX_LIBRARIES}
+		${OGG_LIBRARY}
+		${VORBISFILE_LIBRARY}
+		${VORBIS_LIBRARY}
+		${GMP_LIBRARY}
+		${STDUUID}
+		${FOUNDATION}
+		${IOKIT}
+		${OPENSSL_LIBRARY}
+		${OPENSSL_CRYPTO_LIBRARY}
+		${HTTPLIB_LIBRARY}
+
+		protobuf::libprotobuf protobuf
+		absl::log_internal_check_op
+
+		Threads::Threads
+		asio::asio
+		# OpenAL::OpenAL (using emscripten openal api)
+		LibLZMA::LibLZMA
+		pugixml::pugixml
+		ZLIB::ZLIB
+		OpenSSL::SSL
+		OpenSSL::Crypto
+		httplib::httplib
+	)
+
+
+	get_property(linkflags TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS)
+
+	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+		target_compile_options(${PROJECT_NAME}
+			PRIVATE
+				-Wall -Wextra -Wpedantic
+		)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+		set(linkflags "${linkflags} -sASSERTIONS=1")
+	endif()
+
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -ffast-math -frtti -pthread -fexceptions")
+	set(linkflags "${linkflags}
+			-sINVOKE_RUN=0 -sEXIT_RUNTIME=1 -sTEXTDECODER=0 -sCASE_INSENSITIVE_FS=1
+			-lopenal -lidbfs.js -lwebsocket.js -sEXPORTED_RUNTIME_METHODS=ccall -sEXPORTED_FUNCTIONS=_main,_paste_return
+			-sINCOMING_MODULE_JS_API=[locateFile,preRun,postRun,print,printErr,canvas,setStatus,monitorRunDependencies]
+			-sFORCE_FILESYSTEM -sMALLOC=mimalloc -sWEBSOCKET_SUBPROTOCOL=binary -sOFFSCREENCANVAS_SUPPORT=1
+			-sOFFSCREEN_FRAMEBUFFER -sENVIRONMENT=web,worker -sPROXY_TO_PTHREAD -sFULL_ES2=1
+			-sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sUSE_PTHREADS=1 -sFETCH=1
+			-sPTHREAD_POOL_SIZE=navigator.hardwareConcurrency -sALLOW_MEMORY_GROWTH=1
+			--preload-file=../otclientrc.lua@otclientrc.lua --preload-file=../init.lua@init.lua
+			--preload-file=../data@data --preload-file=../mods@mods --preload-file=../modules@modules
+			--shell-file=../browser/shell.html --use-preload-cache")
+	set_target_properties(${PROJECT_NAME} PROPERTIES
+  	LINK_FLAGS ${linkflags})
+	set(CMAKE_EXECUTABLE_SUFFIX ".html")
+	set(VCPKG_TARGET_TRIPLET "wasm32-emscripten" CACHE STRING "")
+
 else() # Linux
 	target_include_directories(${PROJECT_NAME}
 		PRIVATE

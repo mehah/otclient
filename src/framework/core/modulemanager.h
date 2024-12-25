@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,11 +33,11 @@ public:
     void discoverModules();
     void autoLoadModules(int maxPriority);
     ModulePtr discoverModule(const std::string& moduleFile);
-    void ensureModuleLoaded(const std::string_view moduleName);
+    void ensureModuleLoaded(std::string_view moduleName);
     void unloadModules();
     void reloadModules();
 
-    ModulePtr getModule(const std::string_view moduleName);
+    ModulePtr getModule(std::string_view moduleName);
     std::deque<ModulePtr> getModules() { return m_modules; }
     ModulePtr getCurrentModule() { return m_currentModule; }
     void enableAutoReload();

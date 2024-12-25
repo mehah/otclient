@@ -512,6 +512,8 @@ function destroy()
         showTitleCheck = nil
         colorBoxes = {}
         currentColorBox = nil
+        previewCreature:destroy()
+        previewCreature = nil    
         if appearanceGroup then
             appearanceGroup:destroy()
             appearanceGroup = nil

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,11 @@ namespace stdext
 
     struct timer
     {
-    public:
         timer() { restart(); }
         float elapsed_seconds() const { return (micros() - m_start) / 1000000.f; }
         ticks_t elapsed_millis() const { return (micros() - m_start) / 1000; }
         ticks_t elapsed_micros() const { return micros() - m_start; }
-        void restart(int shift = 0) { m_start = micros() - shift; }
+        void restart(const int shift = 0) { m_start = micros() - shift; }
 
     private:
         ticks_t m_start{};

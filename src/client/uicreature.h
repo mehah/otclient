@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,11 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "creature.h"
 #include "declarations.h"
+#include <framework/ui/uiwidget.h>
 
-class UICreature : public UIWidget
+class UICreature final : public UIWidget
 {
 public:
     void drawSelf(DrawPoolType drawPane) override;
@@ -36,9 +36,9 @@ public:
 
     CreaturePtr getCreature() { return m_creature; }
     uint8_t getCreatureSize() { return m_creatureSize; }
-    void setCreatureSize(uint8_t size) { m_creatureSize = size; }
+    void setCreatureSize(const uint8_t size) { m_creatureSize = size; }
 
-    void setCenter(bool v) { m_center = v; }
+    void setCenter(const bool v) { m_center = v; }
     bool isCentered() { return m_center; }
 
     /*
@@ -55,13 +55,12 @@ public:
     Otc::Direction getDirection() {
         if (m_creature != nullptr) {
             return m_creature->getDirection();
-        } else {
-            return Otc::InvalidDirection;
         }
+        return Otc::InvalidDirection;
     }
     // @
 protected:
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
     Outfit getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };

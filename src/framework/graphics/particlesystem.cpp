@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,10 +21,10 @@
  */
 
 #include "particlesystem.h"
-#include <framework/core/clock.h>
-#include <framework/graphics/drawpoolmanager.h>
 #include "particle.h"
 #include "particleaffector.h"
+#include <framework/core/clock.h>
+#include <framework/graphics/drawpoolmanager.h>
 
 ParticleSystem::ParticleSystem() :m_lastUpdateTime(g_clock.seconds()) {}
 

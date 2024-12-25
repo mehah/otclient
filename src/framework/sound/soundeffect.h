@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,12 @@
 #ifndef SOUNDEFFECT_H
 #define SOUNDEFFECT_H
 
-#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
+#include <AL/alc.h>
+#include <AL/efx-presets.h>
 
-class SoundEffect : public LuaObject
+class SoundEffect final : public LuaObject
 {
-
 public:
     explicit SoundEffect(ALCdevice* device);
     ~SoundEffect() override;
@@ -35,16 +35,16 @@ public:
     void init(ALCdevice* device);
 
     void setPreset(const std::string& presetName);
-    void setReverbDensity(const float density) const;
-    void setReverbDiffusion(const float diffusion) const;
-    void setReverbGain(const float gain) const;
-    void setReverbGainHF(const float gainHF) const;
-    void setReverbGainLF(const float gainLF) const;
-    void setReverbDecayTime(const float decayTime) const;
-    void setReverbDecayHfRatio(const float decayHfRatio) const;
-    void setReverbDecayLfRatio(const float decayLfRatio) const;
-    void setReverbReflectionsGain(const float reflectionsGain) const;
-    void setReverbReflectionsDelay(const float reflectionsDelay) const;
+    void setReverbDensity(float density) const;
+    void setReverbDiffusion(float diffusion) const;
+    void setReverbGain(float gain) const;
+    void setReverbGainHF(float gainHF) const;
+    void setReverbGainLF(float gainLF) const;
+    void setReverbDecayTime(float decayTime) const;
+    void setReverbDecayHfRatio(float decayHfRatio) const;
+    void setReverbDecayLfRatio(float decayLfRatio) const;
+    void setReverbReflectionsGain(float reflectionsGain) const;
+    void setReverbReflectionsDelay(float reflectionsDelay) const;
 
 private:
 

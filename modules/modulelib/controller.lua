@@ -59,6 +59,7 @@ Controller = {
     ui = nil,
     name = nil,
     attrs = nil,
+    extendedOpcodes = nil,
     opcodes = nil,
     events = nil,
     htmlRoot = nil,
@@ -75,7 +76,8 @@ function Controller:new()
         scheduledEvents = {},
         keyboardEvents = {},
         attrs = {},
-        opcodes = {}
+        extendedOpcodes = {},
+        opcodes = {},
     }
     setmetatable(obj, self)
     self.__index = self
@@ -194,10 +196,6 @@ function Controller:setUI(name, parent)
 end
 
 function Controller:terminate()
-    if self.onTerminate then
-        self:onTerminate()
-    end
-
     if self.onGameStart then
         disconnect(g_game, { onGameStart = self.onGameStart })
     end
@@ -207,12 +205,20 @@ function Controller:terminate()
         disconnect(g_game, { onGameEnd = self.onGameEnd })
     end
 
+    if self.onTerminate then
+        self:onTerminate()
+    end
+
     for i, event in pairs(self.keyboardEvents) do
         g_keyboard['unbind' .. event.name](event.args[1], event.args[2], event.args[3])
     end
 
-    for i, opcode in pairs(self.opcodes) do
+    for i, opcode in pairs(self.extendedOpcodes) do
         ProtocolGame.unregisterExtendedOpcode(opcode)
+    end
+
+    for _, opcode in ipairs(self.opcodes) do
+        ProtocolGame.unregisterOpcode(opcode)
     end
 
     for type, events in pairs(self.events) do
@@ -239,6 +245,7 @@ function Controller:terminate()
     self.attrs = nil
     self.events = nil
     self.dataUI = nil
+    self.extendedOpcodes = nil
     self.opcodes = nil
     self.keyboardEvents = nil
     self.keyboardAnchor = nil
@@ -267,6 +274,11 @@ end
 
 function Controller:registerExtendedOpcode(opcode, fnc)
     ProtocolGame.registerExtendedOpcode(opcode, fnc)
+    table.insert(self.extendedOpcodes, opcode)
+end
+
+function Controller:registerOpcode(opcode, fnc)
+    ProtocolGame.registerOpcode(opcode, fnc)
     table.insert(self.opcodes, opcode)
 end
 

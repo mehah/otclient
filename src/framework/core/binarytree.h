@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -69,7 +69,7 @@ public:
     void addU8(uint8_t v);
     void addU16(uint16_t v);
     void addU32(uint32_t v);
-    void addString(const std::string_view v);
+    void addString(std::string_view v);
     void addPos(uint16_t x, uint16_t y, uint8_t z);
     void addPoint(const Point& point);
 

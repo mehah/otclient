@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,20 @@
  */
 
 #include "protocol.h"
-#include <random>
+#include <algorithm>
 #include <framework/core/application.h>
+#include <random>
+
+#include "inputmessage.h"
+#include "outputmessage.h"
+#include "framework/core/graphicalapplication.h"
+#ifdef __EMSCRIPTEN__
+#include "webconnection.h"
+#else
 #include "connection.h"
+#endif
+
+extern asio::io_service g_ioService;
 
 Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {
     inflateInit2(&m_zstream, -15);
@@ -38,19 +49,62 @@ Protocol::~Protocol()
     inflateEnd(&m_zstream);
 }
 
-void Protocol::connect(const std::string_view host, uint16_t port)
+#ifndef __EMSCRIPTEN__
+void Protocol::connect(const std::string_view host, const uint16_t port)
 {
+    if (host == "proxy" || host == "0.0.0.0" || (host == "127.0.0.1" && g_proxy.isActive())) {
+        m_disconnected = false;
+        m_proxy = g_proxy.addSession(port,
+                                     [capture0 = asProtocol()](auto&& PH1) {
+            capture0->onProxyPacket(std::forward<decltype(PH1)>(PH1));
+        },
+                                     [capture0 = asProtocol()](auto&& PH1) {
+            capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
+        });
+        return onConnect();
+    }
+
     m_connection = std::make_shared<Connection>();
     m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
     m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
 }
+#else
+void Protocol::connect(const std::string_view host, uint16_t port, bool gameWorld)
+{
+    m_connection = std::make_shared<WebConnection>();
+    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
+    m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); }, gameWorld);
+}
+#endif
 
 void Protocol::disconnect()
 {
+    m_disconnected = true;
+    if (m_proxy) {
+        g_proxy.removeSession(m_proxy);
+        return;
+    }
+
     if (m_connection) {
         m_connection->close();
         m_connection.reset();
     }
+}
+
+bool Protocol::isConnected()
+{
+    if (m_proxy)
+        return !m_disconnected;
+
+    return m_connection && m_connection->isConnected();
+}
+
+bool Protocol::isConnecting()
+{
+    if (m_proxy)
+        return false;
+
+    return m_connection && m_connection->isConnecting();
 }
 
 void Protocol::send(const OutputMessagePtr& outputMessage)
@@ -68,6 +122,13 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
     // write message size
     outputMessage->writeMessageSize();
 
+    if (m_proxy) {
+        const auto packet = std::make_shared<ProxyPacket>(outputMessage->getHeaderBuffer(), outputMessage->getWriteBuffer());
+        g_proxy.send(m_proxy, packet);
+        outputMessage->reset();
+        return;
+    }
+
     // send
     if (m_connection)
         m_connection->write(outputMessage->getHeaderBuffer(), outputMessage->getMessageSize());
@@ -78,6 +139,10 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
 
 void Protocol::recv()
 {
+    if (m_proxy) {
+        return;
+    }
+
     m_inputMessage->reset();
 
     // first update message header size
@@ -96,7 +161,7 @@ void Protocol::recv()
     });
 }
 
-void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
+void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
@@ -110,7 +175,7 @@ void Protocol::internalRecvHeader(uint8_t* buffer, uint16_t size)
     });
 }
 
-void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
+void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 {
     // process data only if really connected
     if (!isConnected()) {
@@ -124,7 +189,7 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
     if (m_sequencedPackets) {
         decompress = (m_inputMessage->getU32() & 1 << 31);
     } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", (int)m_inputMessage->getMessageSize()));
+        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", static_cast<int>(m_inputMessage->getMessageSize())));
         return;
     }
 
@@ -143,7 +208,7 @@ void Protocol::internalRecvData(uint8_t* buffer, uint16_t size)
         m_zstream.avail_in = m_inputMessage->getUnreadSize();
         m_zstream.avail_out = InputMessage::BUFFER_MAXSIZE;
 
-        int32_t ret = inflate(&m_zstream, Z_FINISH);
+        const int32_t ret = inflate(&m_zstream, Z_FINISH);
         if (ret != Z_OK && ret != Z_STREAM_END) {
             g_logger.traceError(stdext::format("failed to decompress message - %s", m_zstream.msg));
             return;
@@ -167,7 +232,7 @@ void Protocol::generateXteaKey()
 {
     std::random_device rd;
     std::uniform_int_distribution<uint32_t > unif;
-    std::generate(m_xteaKey.begin(), m_xteaKey.end(), [&unif, &rd] { return unif(rd); });
+    std::ranges::generate(m_xteaKey, [&unif, &rd] { return unif(rd); });
 }
 
 namespace
@@ -175,7 +240,7 @@ namespace
     constexpr uint32_t delta = 0x9E3779B9;
 
     template<typename Round>
-    void apply_rounds(uint8_t* data, size_t length, Round round)
+    void apply_rounds(uint8_t* data, const size_t length, Round round)
     {
         for (auto j = 0u; j < length; j += 8) {
             uint32_t left = data[j + 0] | data[j + 1] << 8u | data[j + 2] << 16u | data[j + 3] << 24u,
@@ -252,4 +317,40 @@ void Protocol::onError(const std::error_code& err)
 {
     callLuaField("onError", err.message(), err.value());
     disconnect();
+}
+
+void Protocol::onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet)
+{
+    if (m_disconnected)
+        return;
+    auto self(asProtocol());
+    post(g_ioService, [&, packet] {
+        if (m_disconnected)
+            return;
+        m_inputMessage->reset();
+
+        // first update message header size
+        int headerSize = 2; // 2 bytes for message size
+        if (m_checksumEnabled)
+            headerSize += 4; // 4 bytes for checksum
+        if (m_xteaEncryptionEnabled)
+            headerSize += 2; // 2 bytes for XTEA encrypted message size
+        m_inputMessage->setHeaderSize(headerSize);
+        m_inputMessage->fillBuffer(packet->data(), 2);
+        m_inputMessage->readSize();
+        internalRecvData(packet->data() + 2, packet->size() - 2);
+    });
+}
+
+void Protocol::onLocalDisconnected(std::error_code ec)
+{
+    if (m_disconnected)
+        return;
+    auto self(asProtocol());
+    post(g_ioService, [&, ec] {
+        if (m_disconnected)
+            return;
+        m_disconnected = true;
+        onError(ec);
+    });
 }

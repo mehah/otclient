@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,8 @@ OTMLParser::OTMLParser(const OTMLDocumentPtr& doc, std::istream& in) :
     currentDepth(0), currentLine(0),
     doc(doc), currentParent(doc), previousNode(nullptr),
     in(in)
-{}
+{
+}
 
 void OTMLParser::parse()
 {
@@ -47,7 +48,7 @@ std::string OTMLParser::getNextLine()
     return line;
 }
 
-int OTMLParser::getLineDepth(const std::string_view line, bool multilining) const
+int OTMLParser::getLineDepth(const std::string_view line, const bool multilining) const
 {
     auto _line = std::string{ line };
     stdext::trim(_line); // fix for lines without content.

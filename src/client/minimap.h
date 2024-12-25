@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include <framework/graphics/declarations.h>
 #include "declarations.h"
 #include "gameconfig.h"
+#include <framework/graphics/declarations.h>
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;
@@ -44,7 +44,7 @@ struct MinimapTile
     uint8_t flags{ 0 };
     uint8_t color{ 255 };
     uint8_t speed{ 10 };
-    bool hasFlag(MinimapTileFlags flag) const { return flags & flag; }
+    bool hasFlag(const MinimapTileFlags flag) const { return flags & flag; }
     int getSpeed() const { return speed * 10; }
     bool operator==(const MinimapTile& other) const { return color == other.color && flags == other.flags && speed == other.speed; }
     bool operator!=(const MinimapTile& other) const { return !(*this == other); }
@@ -56,9 +56,9 @@ public:
     void clean();
     void update();
     void updateTile(int x, int y, const MinimapTile& tile);
-    MinimapTile& getTile(int x, int y) { return m_tiles[getTileIndex(x, y)]; }
-    void resetTile(int x, int y) { m_tiles[getTileIndex(x, y)] = MinimapTile(); }
-    uint32_t getTileIndex(int x, int y) { return ((y % MMBLOCK_SIZE) * MMBLOCK_SIZE) + (x % MMBLOCK_SIZE); }
+    MinimapTile& getTile(const int x, const int y) { return m_tiles[getTileIndex(x, y)]; }
+    void resetTile(const int x, const int y) { m_tiles[getTileIndex(x, y)] = MinimapTile(); }
+    uint32_t getTileIndex(const int x, const int y) { return ((y % MMBLOCK_SIZE) * MMBLOCK_SIZE) + (x % MMBLOCK_SIZE); }
     const TexturePtr& getTexture() { return m_texture; }
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE>& getTiles() { return m_tiles; }
     void mustUpdate() { m_mustUpdate = true; }
@@ -120,7 +120,7 @@ private:
                      pos.y - pos.y % MMBLOCK_SIZE
         };
     }
-    Position getIndexPosition(int index, int z)
+    Position getIndexPosition(const int index, const int z)
     {
         return {
             (index % (65536 / MMBLOCK_SIZE)) * MMBLOCK_SIZE,

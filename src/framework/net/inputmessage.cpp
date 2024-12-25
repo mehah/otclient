@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -96,21 +96,21 @@ double InputMessage::getDouble()
     return (v / std::pow(10.f, precision));
 }
 
-bool InputMessage::decryptRsa(int size)
+bool InputMessage::decryptRsa(const int size)
 {
     checkRead(size);
     g_crypt.rsaDecrypt(static_cast<uint8_t*>(m_buffer) + m_readPos, size);
     return (getU8() == 0x00);
 }
 
-void InputMessage::fillBuffer(uint8_t* buffer, uint16_t size)
+void InputMessage::fillBuffer(const uint8_t* buffer, const uint16_t size)
 {
     checkWrite(m_readPos + size);
     memcpy(m_buffer + m_readPos, buffer, size);
     m_messageSize += size;
 }
 
-void InputMessage::setHeaderSize(uint16_t size)
+void InputMessage::setHeaderSize(const uint16_t size)
 {
     assert(MAX_HEADER_SIZE - size >= 0);
     m_headerPos = MAX_HEADER_SIZE - size;
@@ -124,19 +124,19 @@ bool InputMessage::readChecksum()
     return receivedCheck == checksum;
 }
 
-bool InputMessage::canRead(int bytes) const
+bool InputMessage::canRead(const int bytes) const
 {
     if ((m_readPos - m_headerPos + bytes > m_messageSize) || (m_readPos + bytes > BUFFER_MAXSIZE))
         return false;
     return true;
 }
-void InputMessage::checkRead(int bytes)
+void InputMessage::checkRead(const int bytes)
 {
     if (!canRead(bytes))
         throw stdext::exception("InputMessage eof reached");
 }
 
-void InputMessage::checkWrite(int bytes)
+void InputMessage::checkWrite(const int bytes)
 {
     if (bytes > BUFFER_MAXSIZE)
         throw stdext::exception("InputMessage max buffer size reached");

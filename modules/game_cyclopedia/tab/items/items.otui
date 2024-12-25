@@ -394,7 +394,7 @@ UIWidget
       UIWidget
         id: Rarity
         anchors.fill: parent
-        image-border: 5
+        image-border: 8
         margin: 1
       UIWidget
         id: Icon

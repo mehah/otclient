@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@
 #include "uiwidget.h"
 
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 
@@ -412,7 +411,7 @@ void UIWidget::drawIcon(const Rect& screenCoords) const
 
 void UIWidget::setIcon(const std::string& iconFile)
 {
-    g_dispatcher.addEvent([&, iconFile = iconFile]() {
+    g_dispatcher.addEvent([&, iconFile = iconFile] {
         m_icon = iconFile.empty() ? nullptr : g_textures.getTexture(iconFile);
         if (m_icon && !m_iconClipRect.isValid()) {
             m_iconClipRect = Rect(0, 0, m_icon->getSize());

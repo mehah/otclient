@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,11 +28,11 @@
 class AttachedEffectManager
 {
 public:
-    AttachedEffectPtr registerByThing(uint16_t id, const std::string_view name, uint16_t thingId, ThingCategory category);
-    AttachedEffectPtr registerByImage(uint16_t id, const std::string_view name, const std::string_view path, bool smooth);
+    AttachedEffectPtr registerByThing(uint16_t id, std::string_view name, uint16_t thingId, ThingCategory category);
+    AttachedEffectPtr registerByImage(uint16_t id, std::string_view name, std::string_view path, bool smooth);
 
     AttachedEffectPtr getById(uint16_t id);
-    void remove(uint16_t id) { m_effects.erase(id); }
+    void remove(const uint16_t id) { m_effects.erase(id); }
     void clear() { m_effects.clear(); }
 
 private:

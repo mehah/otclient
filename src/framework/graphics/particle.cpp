@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ void Particle::render() const
     g_drawPool.addTexturedRect(m_rect, m_texture, m_color);
 }
 
-void Particle::update(float elapsedTime)
+void Particle::update(const float elapsedTime)
 {
     // check if finished
     if (m_duration >= 0 && m_elapsedTime >= m_duration) {
@@ -60,7 +60,7 @@ void Particle::update(float elapsedTime)
     m_elapsedTime += elapsedTime;
 }
 
-void Particle::updatePosition(float elapsedTime)
+void Particle::updatePosition(const float elapsedTime)
 {
     if (m_ignorePhysicsAfter < 0 || m_elapsedTime < m_ignorePhysicsAfter) {
         // update position

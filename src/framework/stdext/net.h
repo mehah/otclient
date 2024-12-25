@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,13 @@
 
 #pragma once
 
+#include "types.h"
 #include <string>
 #include <vector>
-#include "types.h"
 
 namespace stdext
 {
     std::string ip_to_string(uint32_t ip);
-    uint32_t string_to_ip(const std::string_view string);
+    uint32_t string_to_ip(std::string_view string);
     std::vector<uint32_t> listSubnetAddresses(uint32_t address, uint8_t mask);
 }

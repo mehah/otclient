@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@
 class AdaptativeFrameCounter
 {
 public:
-    AdaptativeFrameCounter() : m_interval(stdext::millis()) { }
+    AdaptativeFrameCounter() : m_interval(stdext::millis()) {}
 
     void init() { m_timer.restart(); }
     bool update();
@@ -49,12 +49,12 @@ public:
         return ((maxFps - m_fps) / maxFps) * 100.f;
     }
 
-    float getFpsPercent(float percent) const {
+    float getFpsPercent(const float percent) const {
         return getFps() * (percent / 100);
     }
 
 private:
-    uint32_t getMaxPeriod(uint16_t fps) const { return 1000000u / fps; }
+    uint32_t getMaxPeriod(const uint16_t fps) const { return 1000000u / fps; }
 
     uint16_t m_maxFps{};
     uint16_t m_targetFps{ 60u };

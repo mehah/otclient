@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 #include "animatedtext.h"
 #include "attachedeffect.h"
+#include "attachedeffectmanager.h"
 #include "client.h"
 #include "container.h"
 #include "creature.h"
@@ -37,7 +38,6 @@
 #include "outfit.h"
 #include "player.h"
 #include "protocolgame.h"
-#include "attachedeffectmanager.h"
 #include "spriteappearances.h"
 #include "spritemanager.h"
 #include "statictext.h"
@@ -45,17 +45,17 @@
 #include "tile.h"
 #include "towns.h"
 #include "uicreature.h"
-#include "uiitem.h"
 #include "uieffect.h"
+#include "uiitem.h"
 #include "uimissile.h"
 
+#include "attachableobject.h"
+#include "uigraph.h"
 #include "uimap.h"
 #include "uimapanchorlayout.h"
 #include "uiminimap.h"
 #include "uiprogressrect.h"
 #include "uisprite.h"
-#include "uigraph.h"
-#include "attachableobject.h"
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
@@ -714,6 +714,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("getTooltip", &Item::getTooltip);
     g_lua.bindClassMemberFunction<Item>("getDurationTime", &Item::getDurationTime);
     g_lua.bindClassMemberFunction<Item>("getTier", &Item::getTier);
+    g_lua.bindClassMemberFunction<Item>("getCharges", &Item::getCharges);
 
     g_lua.bindClassMemberFunction<Item>("isStackable", &Item::isStackable);
     g_lua.bindClassMemberFunction<Item>("isMarketable", &Item::isMarketable);
@@ -1062,13 +1063,21 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIProgressRect>("getPercent", &UIProgressRect::getPercent);
 
     g_lua.registerClass<UIGraph, UIWidget>();
-    g_lua.bindClassStaticFunction<UIGraph>("create", [] { return UIGraphPtr(new UIGraph); });
-    g_lua.bindClassMemberFunction<UIGraph>("addValue", &UIGraph::addValue);
+    g_lua.bindClassStaticFunction<UIGraph>("create", [] { return std::make_shared<UIGraph>(); });
     g_lua.bindClassMemberFunction<UIGraph>("clear", &UIGraph::clear);
-    g_lua.bindClassMemberFunction<UIGraph>("setLineWidth", &UIGraph::setLineWidth);
+    g_lua.bindClassMemberFunction<UIGraph>("createGraph", &UIGraph::createGraph);
+    g_lua.bindClassMemberFunction<UIGraph>("getGraphsCount", &UIGraph::getGraphsCount);
+    g_lua.bindClassMemberFunction<UIGraph>("addValue", &UIGraph::addValue);
     g_lua.bindClassMemberFunction<UIGraph>("setCapacity", &UIGraph::setCapacity);
     g_lua.bindClassMemberFunction<UIGraph>("setTitle", &UIGraph::setTitle);
     g_lua.bindClassMemberFunction<UIGraph>("setShowLabels", &UIGraph::setShowLabels);
+    g_lua.bindClassMemberFunction<UIGraph>("setShowInfo", &UIGraph::setShowInfo);
+    g_lua.bindClassMemberFunction<UIGraph>("setLineWidth", &UIGraph::setLineWidth);
+    g_lua.bindClassMemberFunction<UIGraph>("setLineColor", &UIGraph::setLineColor);
+    g_lua.bindClassMemberFunction<UIGraph>("setInfoText", &UIGraph::setInfoText);
+    g_lua.bindClassMemberFunction<UIGraph>("setInfoLineColor", &UIGraph::setInfoLineColor);
+    g_lua.bindClassMemberFunction<UIGraph>("setTextBackground", &UIGraph::setTextBackground);
+    g_lua.bindClassMemberFunction<UIGraph>("setGraphVisible", &UIGraph::setGraphVisible);
 
     g_lua.registerClass<UIMapAnchorLayout, UIAnchorLayout>();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/util/color.h>
 #include "thingtypemanager.h"
+#include <framework/util/color.h>
 
 class Outfit
 {
@@ -36,22 +36,22 @@ class Outfit
 public:
     static Color getColor(int color);
 
-    void setId(uint16_t id) { m_id = id; }
-    void setAuxId(uint16_t id) { m_auxId = id; }
-    void setMount(uint16_t mount) { m_mount = mount; }
-    void setWing(uint16_t Wing) { m_wing = Wing; }
-    void setAura(uint16_t Aura) { m_aura = Aura; }
-    void setEffect(uint16_t Effect) { m_effect = Effect; }
+    void setId(const uint16_t id) { m_id = id; }
+    void setAuxId(const uint16_t id) { m_auxId = id; }
+    void setMount(const uint16_t mount) { m_mount = mount; }
+    void setWing(const uint16_t Wing) { m_wing = Wing; }
+    void setAura(const uint16_t Aura) { m_aura = Aura; }
+    void setEffect(const uint16_t Effect) { m_effect = Effect; }
     void setShader(const std::string& shader) { m_shader = shader; }
 
     void setHead(uint8_t head);
     void setBody(uint8_t body);
     void setLegs(uint8_t legs);
     void setFeet(uint8_t feet);
-    void setAddons(uint8_t addons) { m_addons = addons; }
-    void setTemp(bool temp) { m_temp = temp; }
+    void setAddons(const uint8_t addons) { m_addons = addons; }
+    void setTemp(const bool temp) { m_temp = temp; }
 
-    void setCategory(ThingCategory category) { m_category = category; }
+    void setCategory(const ThingCategory category) { m_category = category; }
 
     void resetClothes();
 

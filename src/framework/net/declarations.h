@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,21 +22,27 @@
 
 #pragma once
 
-#include <asio/io_service.hpp>
-#include <asio/write.hpp>
 #include <asio/ip/tcp.hpp>
-#include <framework/global.h>
+#include <asio/write.hpp>
 
 class InputMessage;
 class OutputMessage;
+#ifdef __EMSCRIPTEN__
+class WebConnection;
+#else
 class Connection;
+#endif
 class Protocol;
 class ProtocolHttp;
 class Server;
 
 using InputMessagePtr = std::shared_ptr<InputMessage>;
 using OutputMessagePtr = std::shared_ptr<OutputMessage>;
+#ifdef __EMSCRIPTEN__
+using WebConnectionPtr = std::shared_ptr<WebConnection>;
+#else
 using ConnectionPtr = std::shared_ptr<Connection>;
+#endif
 using ProtocolPtr = std::shared_ptr<Protocol>;
 using ProtocolHttpPtr = std::shared_ptr<ProtocolHttp>;
 using ServerPtr = std::shared_ptr<Server>;

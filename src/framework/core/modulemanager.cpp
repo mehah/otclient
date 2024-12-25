@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,11 @@
 #include "resourcemanager.h"
 
 #include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/otml/otml.h>
+
+#include <algorithm>
 
 ModuleManager g_modules;
 
@@ -55,7 +57,7 @@ void ModuleManager::discoverModules()
     }
 }
 
-void ModuleManager::autoLoadModules(int maxPriority)
+void ModuleManager::autoLoadModules(const int maxPriority)
 {
     for (const auto& [priority, module] : m_autoLoadModules) {
         if (priority > maxPriority)
@@ -132,7 +134,7 @@ ModulePtr ModuleManager::getModule(const std::string_view moduleName)
 
 void ModuleManager::updateModuleLoadOrder(const ModulePtr& module)
 {
-    if (const auto it = std::find(m_modules.begin(), m_modules.end(), module);
+    if (const auto it = std::ranges::find(m_modules, module);
         it != m_modules.end())
         m_modules.erase(it);
     if (module->isLoaded())
@@ -164,7 +166,7 @@ void ModuleManager::enableAutoReload() {
         if (!module->isReloadable())
             continue;
 
-        ModuleData data = { module, {} };
+        ModuleData data = { .ref = module, .files = {} };
 
         bool hasFile = false;
         for (auto path : g_resources.listDirectoryFiles("/" + module->getName(), true, false, true)) {

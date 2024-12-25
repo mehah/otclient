@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -94,7 +94,7 @@ void BitmapFont::drawText(const std::string_view text, const Point& startPos, co
     drawText(text, screenCoords, color, Fw::AlignTopLeft);
 }
 
-void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color& color, Fw::AlignmentFlag align)
+void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color& color, const Fw::AlignmentFlag align)
 {
     Size textBoxSize;
     const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
@@ -103,7 +103,7 @@ void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords,
     }
 }
 
-std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const
+std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Size& textBoxSize, const Fw::AlignmentFlag align, const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const
 {
     std::vector<std::pair<Rect, Rect>> list;
     // prevent glitches from invalid rects
@@ -179,7 +179,7 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
 }
 
 void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
-                                const Size& textBoxSize, Fw::AlignmentFlag align, const Rect& screenCoords,
+                                const Size& textBoxSize, const Fw::AlignmentFlag align, const Rect& screenCoords,
                                 const std::vector<Point>& glyphsPositions) const
 {
     coords->clear();
@@ -256,7 +256,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
 
 void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, const std::string_view text,
                         const std::vector<std::pair<int, Color>> textColors,
-                        const Size& textBoxSize, Fw::AlignmentFlag align,
+                        const Size& textBoxSize, const Fw::AlignmentFlag align,
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const
 {
     colorCoords.clear();
@@ -285,7 +285,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
                 nextColorIndex = textLenght;
             }
 
-            if (colorCoordsMap.find(curColorRgba) == colorCoordsMap.end()) {
+            if (!colorCoordsMap.contains(curColorRgba)) {
                 colorCoordsMap.insert(std::make_pair(curColorRgba, std::make_shared<CoordsBuffer>()));
             }
 
@@ -359,7 +359,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     }
 }
 
-const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, Fw::AlignmentFlag align, Size* textBoxSize) const
+const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, Size* textBoxSize) const
 {
     const int textLength = text.length();
     int maxLineWidth = 0;
@@ -476,7 +476,7 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
     }
 }
 
-std::string BitmapFont::wrapText(const std::string_view text, int maxWidth, std::vector<std::pair<int, Color>>* colors)
+std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth, std::vector<std::pair<int, Color>>* colors)
 {
     if (text.empty())
         return "";
@@ -538,7 +538,7 @@ std::string BitmapFont::wrapText(const std::string_view text, int maxWidth, std:
     return outText;
 }
 
-void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, int pos, int newTextLen)
+void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const int pos, const int newTextLen)
 {
     if (!colors) return;
     for (auto& it : *colors) {

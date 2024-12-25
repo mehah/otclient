@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,9 @@
 #include <framework/core/application.h>
 #include <framework/core/logger.h>
 
-HardwareBuffer::HardwareBuffer(Type type) :m_type(type)
+#include "framework/core/graphicalapplication.h"
+
+HardwareBuffer::HardwareBuffer(const Type type) :m_type(type)
 {
     glGenBuffers(1, &m_id);
     if (!m_id)

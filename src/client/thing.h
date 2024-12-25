@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,14 +22,14 @@
 
 #pragma once
 
-#include <framework/core/clock.h>
-#include <framework/graphics/drawpool.h>
-#include <framework/luaengine/luaobject.h>
+#include "attachableobject.h"
 #include "declarations.h"
 #include "spritemanager.h"
 #include "thingtype.h"
 #include "thingtypemanager.h"
-#include "attachableobject.h"
+#include <framework/core/clock.h>
+#include <framework/graphics/drawpool.h>
+#include <framework/luaengine/luaobject.h>
 
  // @bindclass
 #pragma pack(push,1) // disable memory alignment
@@ -72,14 +72,14 @@ public:
     virtual Point getDisplacement() const { return getThingType()->getDisplacement(); }
     virtual int getDisplacementX() const { return getThingType()->getDisplacementX(); }
     virtual int getDisplacementY() const { return getThingType()->getDisplacementY(); }
-    virtual int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) { return getThingType()->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase); }
+    virtual int getExactSize(const int layer = 0, const int xPattern = 0, const int yPattern = 0, const int zPattern = 0, const int animationPhase = 0) { return getThingType()->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase); }
 
     virtual const Light& getLight() const { return getThingType()->getLight(); }
     virtual bool hasLight() const { return getThingType()->hasLight(); }
 
     const MarketData& getMarketData() { return getThingType()->getMarketData(); }
     const std::vector<NPCData>& getNpcSaleData() { return getThingType()->getNpcSaleData(); }
-    int getMeanPrice()  { return getThingType()->getMeanPrice(); }
+    int getMeanPrice() { return getThingType()->getMeanPrice(); }
     const Size& getSize() const { return getThingType()->getSize(); }
 
     int getWidth() const { return getThingType()->getWidth(); }
@@ -163,12 +163,13 @@ public:
 
     uint16_t getClassification() { return getThingType()->getClassification(); }
 
-    void canDraw(bool canDraw) { m_canDraw = canDraw; }
-    inline bool canDraw(const Color& color = Color::white) const {
+    void canDraw(const bool canDraw) { m_canDraw = canDraw; }
+
+    bool canDraw(const Color& color = Color::white) const {
         return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && getThingType() && getThingType()->getOpacity() > Fw::MIN_ALPHA;
     }
 
-    void setShader(const std::string_view name);
+    void setShader(std::string_view name);
     uint8_t getShaderId() const { return m_shaderId; }
     PainterShaderProgramPtr getShader() const;
 
@@ -210,7 +211,7 @@ public:
 protected:
     virtual ThingType* getThingType() const = 0;
 
-    void setAttachedEffectDirection(Otc::Direction dir) const
+    void setAttachedEffectDirection(const Otc::Direction dir) const
     {
         if (!hasAttachedEffects()) return;
 
@@ -224,7 +225,7 @@ protected:
     Color m_highlightColor{ Color::white };
 
     Position m_position;
-    DrawConductor m_drawConductor{ false, DrawOrder::THIRD };
+    DrawConductor m_drawConductor{ .agroup = false, .order = THIRD };
 
     uint16_t m_clientId{ 0 };
 
@@ -237,8 +238,8 @@ protected:
     uint8_t m_shaderId{ 0 };
 
 private:
-    void lua_setMarked(std::string_view color) { setMarked(Color(color)); }
-    void lua_setHighlight(std::string_view color) { setHighlight(Color(color)); }
+    void lua_setMarked(const std::string_view color) { setMarked(Color(color)); }
+    void lua_setHighlight(const std::string_view color) { setHighlight(Color(color)); }
 
     bool m_canDraw{ true };
 

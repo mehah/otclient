@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,8 @@
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
-#include "framework/stdext/math.h"
+
+#include "framework/core/graphicalapplication.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
@@ -46,7 +47,7 @@ Texture::Texture(const Size& size) : m_uniqueId(++UID)
     setupFilters();
 }
 
-Texture::Texture(const ImagePtr& image, bool buildMipmaps, bool compress) : m_uniqueId(++UID)
+Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(++UID)
 {
     generateHash();
 
@@ -62,7 +63,7 @@ Texture::~Texture()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_id != 0) {
-        g_mainDispatcher.addEvent([id = m_id]() {
+        g_mainDispatcher.addEvent([id = m_id] {
             glDeleteTextures(1, &id);
         });
     }
@@ -72,7 +73,7 @@ Texture* Texture::create()
 {
     if (m_image) {
         createTexture();
-        uploadPixels(m_image, getProp(Prop::buildMipmaps), getProp(Prop::compress));
+        uploadPixels(m_image, getProp(buildMipmaps), getProp(compress));
         m_image = nullptr;
     }
 
@@ -81,11 +82,11 @@ Texture* Texture::create()
 
 void Texture::updateImage(const ImagePtr& image) { m_image = image; setupSize(image->getSize()); }
 
-void Texture::updatePixels(uint8_t* pixels, int level, int channels, bool compress) {
+void Texture::updatePixels(uint8_t* pixels, const int level, const int channels, const bool compress) {
     bind();
     setupPixels(level, m_size, pixels, channels, compress);
 }
-void Texture::uploadPixels(const ImagePtr& image, bool buildMipmaps, bool compress)
+void Texture::uploadPixels(const ImagePtr& image, const bool buildMipmaps, const bool compress)
 {
     if (!setupSize(image->getSize()))
         return;
@@ -106,7 +107,7 @@ void Texture::bind() { if (m_id) glBindTexture(GL_TEXTURE_2D, m_id); }
 
 void Texture::buildHardwareMipmaps()
 {
-    if (getProp(Prop::hasMipMaps))
+    if (getProp(hasMipMaps))
         return;
 
 #ifndef OPENGL_ES
@@ -114,14 +115,14 @@ void Texture::buildHardwareMipmaps()
         return;
 #endif
 
-    setProp(Prop::hasMipMaps, true);
+    setProp(hasMipMaps, true);
 
     bind();
     setupFilters();
     glGenerateMipmap(GL_TEXTURE_2D);
 }
 
-void Texture::setSmooth(bool smooth)
+void Texture::setSmooth(const bool smooth)
 {
     if (smooth == getProp(Prop::smooth))
         return;
@@ -133,7 +134,7 @@ void Texture::setSmooth(bool smooth)
     setupFilters();
 }
 
-void Texture::setRepeat(bool repeat)
+void Texture::setRepeat(const bool repeat)
 {
     if (getProp(Prop::repeat) == repeat)
         return;
@@ -145,7 +146,7 @@ void Texture::setRepeat(bool repeat)
     setupWrap();
 }
 
-void Texture::setUpsideDown(bool upsideDown)
+void Texture::setUpsideDown(const bool upsideDown)
 {
     if (getProp(Prop::upsideDown) == upsideDown)
         return;
@@ -188,7 +189,7 @@ bool Texture::setupSize(const Size& size)
 
 void Texture::setupWrap() const
 {
-    const GLint texParam = getProp(Prop::repeat) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
+    const GLint texParam = getProp(repeat) ? GL_REPEAT : GL_CLAMP_TO_EDGE;
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texParam);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texParam);
 }
@@ -199,11 +200,11 @@ void Texture::setupFilters() const
 
     GLenum minFilter;
     GLenum magFilter;
-    if (getProp(Prop::smooth)) {
-        minFilter = getProp(Prop::hasMipMaps) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+    if (getProp(smooth)) {
+        minFilter = getProp(hasMipMaps) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
         magFilter = GL_LINEAR;
     } else {
-        minFilter = getProp(Prop::hasMipMaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
+        minFilter = getProp(hasMipMaps) ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
         magFilter = GL_NEAREST;
     }
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
@@ -233,7 +234,7 @@ void Texture::setupTranformMatrix()
     static Matrix3 MATRIX256x512_CACHED = toMatrix(SIZE256x512);
     static Matrix3 MATRIX512x1024_CACHED = toMatrix(SIZE512x1024);
 
-    if (getProp(Prop::upsideDown)) {
+    if (getProp(upsideDown)) {
         m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                                                  0.0f,
                               0.0f,                 -1.0f / m_size.height(),                                0.0f,
                               0.0f,                  m_size.height() / static_cast<float>(m_size.height()), 1.0f };
@@ -254,7 +255,7 @@ void Texture::setupTranformMatrix()
     }
 }
 
-void Texture::setupPixels(int level, const Size& size, uint8_t* pixels, int channels, bool compress) const
+void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixels, const int channels, const bool compress) const
 {
     GLenum format = 0;
     switch (channels) {

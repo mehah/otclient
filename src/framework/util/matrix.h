@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ class Matrix
 public:
     Matrix() { setIdentity(); }
     Matrix(int) {} // construct without initializing identity matrix
-    Matrix(const Matrix<N, M, T>& other) = default;
+    Matrix(const Matrix& other) = default;
     template<typename U>
     Matrix(const std::initializer_list<U>& values) { *this = values; }
     template<typename U>
@@ -48,22 +48,22 @@ public:
     T* data() { return m[0]; }
     const T* data() const { return m[0]; }
 
-    T& operator()(int row, int column) { return m[row - 1][column - 1]; }
-    T operator()(int row, int column) const { return m[row - 1][column - 1]; }
+    T& operator()(const int row, const int column) { return m[row - 1][column - 1]; }
+    T operator()(const int row, const int column) const { return m[row - 1][column - 1]; }
 
-    Matrix<N, M, T>& operator=(const Matrix<N, M, T>& other) = default;
+    Matrix& operator=(const Matrix& other) = default;
     template<typename U>
-    Matrix<N, M, T>& operator=(const std::initializer_list<U>& values);
+    Matrix& operator=(const std::initializer_list<U>& values);
     template<typename U>
-    Matrix<N, M, T>& operator=(const U* values);
-    Matrix<N, M, T>& operator+=(const Matrix<N, M, T>& other);
-    Matrix<N, M, T>& operator-=(const Matrix<N, M, T>& other);
-    Matrix<N, M, T>& operator*=(T factor);
-    Matrix<N, M, T>& operator/=(T divisor);
-    bool operator==(const Matrix<N, M, T>& other) const;
-    bool operator!=(const Matrix<N, M, T>& other) const;
+    Matrix& operator=(const U* values);
+    Matrix& operator+=(const Matrix& other);
+    Matrix& operator-=(const Matrix& other);
+    Matrix& operator*=(T factor);
+    Matrix& operator/=(T divisor);
+    bool operator==(const Matrix& other) const;
+    bool operator!=(const Matrix& other) const;
 
-    Matrix<N, M, T>& generateHash()
+    Matrix& generateHash()
     {
         m_hash = 0;
         for (int i = -1; ++i < N;)
@@ -143,7 +143,7 @@ Matrix<N, M, T>& Matrix<N, M, T>::operator=(const U* values)
 }
 
 template<int N, int M, typename T>
-Matrix<N, M, T>& Matrix<N, M, T>::operator+=(const Matrix<N, M, T>& other)
+Matrix<N, M, T>& Matrix<N, M, T>::operator+=(const Matrix& other)
 {
     for (int i = 0; i < N; ++i)
         for (int j = 0; j < M; ++j)
@@ -152,7 +152,7 @@ Matrix<N, M, T>& Matrix<N, M, T>::operator+=(const Matrix<N, M, T>& other)
 }
 
 template<int N, int M, typename T>
-Matrix<N, M, T>& Matrix<N, M, T>::operator-=(const Matrix<N, M, T>& other)
+Matrix<N, M, T>& Matrix<N, M, T>::operator-=(const Matrix& other)
 {
     for (int i = 0; i < N; ++i)
         for (int j = 0; j < M; ++j)
@@ -180,13 +180,13 @@ Matrix<N, M, T>& Matrix<N, M, T>::operator/=(T divisor)
 }
 
 template<int N, int M, typename T>
-bool Matrix<N, M, T>::operator==(const Matrix<N, M, T>& other) const
+bool Matrix<N, M, T>::operator==(const Matrix& other) const
 {
     return hash() == other.hash();
 }
 
 template<int N, int M, typename T>
-bool Matrix<N, M, T>::operator!=(const Matrix<N, M, T>& other) const
+bool Matrix<N, M, T>::operator!=(const Matrix& other) const
 {
     return !(*this == other);
 }

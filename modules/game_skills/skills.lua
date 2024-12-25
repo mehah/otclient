@@ -31,7 +31,13 @@ function init()
     skillsButton:setOn(true)
     skillsWindow = g_ui.loadUI('skills')
 
-    g_keyboard.bindKeyDown('Alt+S', toggle)
+    Keybind.new("Windows", "Show/hide skills windows", "Alt+S", "")
+    Keybind.bind("Windows", "Show/hide skills windows", {
+      {
+        type = KEY_DOWN,
+        callback = toggle,
+      }
+    })
 
     skillSettings = g_settings.getNode('skills-hide')
     if not skillSettings then
@@ -69,7 +75,7 @@ function terminate()
         onGameEnd = offline
     })
 
-    g_keyboard.unbindKeyDown('Alt+S')
+    Keybind.delete("Windows", "Show/hide skills windows")
     skillsWindow:destroy()
     skillsButton:destroy()
 
@@ -119,8 +125,10 @@ function setSkillValue(id, value)
     local skill = skillsWindow:recursiveGetChildById(id)
     if skill then
         local widget = skill:getChildById('value')
-        if id == "skillId7" or id == "skillId9" or id == "skillId11" or id == "skillId13" or id == "skillId14" or id == "skillId15" or id == "skillId16" then
-            local value = value / 100
+        if id == "skillId7" or id == "skillId8" or id == "skillId9" or id == "skillId11" or id == "skillId13" or id == "skillId14" or id == "skillId15" or id == "skillId16" then
+            if g_game.getFeature(GameEnterGameShowAppearance) then
+                value = value / 100
+            end
             widget:setText(value .. "%")
         else
             widget:setText(value)

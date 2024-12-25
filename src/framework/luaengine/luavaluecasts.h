@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,9 +24,9 @@
 
  // this file is and must be included only from luainterface.h
 
+#include "declarations.h"
 #include <framework/otml/declarations.h>
 #include <framework/platform/platform.h>
-#include "declarations.h"
 
 #include <set>
 
@@ -46,51 +46,51 @@ int push_luavalue(double d);
 bool luavalue_cast(int index, double& d);
 
 // float
-inline int push_luavalue(float f) { push_luavalue(static_cast<double>(f)); return 1; }
-inline bool luavalue_cast(int index, float& f)
+inline int push_luavalue(const float f) { push_luavalue(static_cast<double>(f)); return 1; }
+inline bool luavalue_cast(const int index, float& f)
 {
     double d;
     const bool r = luavalue_cast(index, d); f = d; return r;
 }
 
 // int8
-inline int push_luavalue(int8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, int8_t& v)
+inline int push_luavalue(const int8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline bool luavalue_cast(const int index, int8_t& v)
 {
     int i;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // uint8_t
-inline int push_luavalue(uint8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, uint8_t& v)
+inline int push_luavalue(const uint8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline bool luavalue_cast(const int index, uint8_t& v)
 {
     int i;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // int16
-inline int push_luavalue(int16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, int16_t& v)
+inline int push_luavalue(const int16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline bool luavalue_cast(const int index, int16_t& v)
 {
     int i;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // uint16
-inline int push_luavalue(uint16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
-inline bool luavalue_cast(int index, uint16_t& v)
+inline int push_luavalue(const uint16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline bool luavalue_cast(const int index, uint16_t& v)
 {
     int i;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // uint32
-inline int push_luavalue(uint32_t v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, uint32_t& v)
+inline int push_luavalue(const uint32_t v) { push_luavalue(static_cast<double>(v)); return 1; }
+inline bool luavalue_cast(const int index, uint32_t& v)
 {
     double d;
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 // int64
-inline int push_luavalue(int64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, int64_t& v)
+inline int push_luavalue(const int64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
+inline bool luavalue_cast(const int index, int64_t& v)
 {
     double d;
     const bool r = luavalue_cast(index, d); v = d; return r;
@@ -107,8 +107,8 @@ inline bool luavalue_cast(int index, ulong& v)
 #endif
 
 // uint64
-inline int push_luavalue(uint64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, uint64_t& v)
+inline int push_luavalue(const uint64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
+inline bool luavalue_cast(const int index, uint64_t& v)
 {
     double d;
     const bool r = luavalue_cast(index, d); v = d; return r;
@@ -116,7 +116,7 @@ inline bool luavalue_cast(int index, uint64_t& v)
 
 // string
 int push_luavalue(const char* cstr);
-int push_luavalue(const std::string_view str);
+int push_luavalue(std::string_view str);
 bool luavalue_cast(int index, std::string& str);
 
 // lua cpp function
@@ -148,8 +148,8 @@ bool luavalue_cast(int index, OTMLNodePtr& node);
 
 // enum
 template<class T>
-std::enable_if_t<std::is_enum_v<T>, int>
-push_luavalue(T e) { return push_luavalue(static_cast<int>(e)); }
+int
+push_luavalue(T e) requires (std::is_enum_v<T>) { return push_luavalue(static_cast<int>(e)); }
 
 template<class T>
 std::enable_if_t<std::is_enum_v<T>, bool>
@@ -242,7 +242,7 @@ int push_internal_luavalue(T v)
 
 template<class T>
 std::enable_if_t<std::is_enum_v<T>, bool>
-luavalue_cast(int index, T& myenum)
+luavalue_cast(const int index, T& myenum)
 {
     if (int i; luavalue_cast(index, i)) {
         myenum = static_cast<T>(i);
@@ -264,7 +264,7 @@ push_luavalue(const T& obj)
 
 template<class T>
 std::enable_if_t<std::is_base_of_v<LuaObject, T>, bool>
-luavalue_cast(int index, std::shared_ptr<T>& ptr)
+luavalue_cast(const int index, std::shared_ptr<T>& ptr)
 {
     LuaObjectPtr obj;
     if (!luavalue_cast(index, obj))
@@ -286,7 +286,7 @@ int push_luavalue(const std::function<Ret(Args...)>& func)
 }
 
 template<typename... Args>
-bool luavalue_cast(int index, std::function<void(Args...)>& func)
+bool luavalue_cast(const int index, std::function<void(Args...)>& func)
 {
     if (g_lua.isFunction(index)) {
         g_lua.pushValue(index);
@@ -321,7 +321,7 @@ bool luavalue_cast(int index, std::function<void(Args...)>& func)
 
 template<typename Ret, typename... Args>
 std::enable_if_t<!std::is_void_v<Ret>, bool>
-luavalue_cast(int index, std::function<Ret(Args...)>& func)
+luavalue_cast(const int index, std::function<Ret(Args...)>& func)
 {
     if (g_lua.isFunction(index)) {
         g_lua.pushValue(index);
@@ -368,7 +368,7 @@ int push_luavalue(const std::list<T>& list)
 }
 
 template<typename T>
-bool luavalue_cast(int index, std::list<T>& list)
+bool luavalue_cast(const int index, std::list<T>& list)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();
@@ -397,7 +397,7 @@ int push_luavalue(const std::vector<T>& vec)
 }
 
 template<typename T>
-bool luavalue_cast(int index, std::vector<T>& vec)
+bool luavalue_cast(const int index, std::vector<T>& vec)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();
@@ -426,7 +426,7 @@ int push_luavalue(const std::set<T>& set)
 }
 
 template<typename T>
-bool luavalue_cast(int index, std::set<T>& set)
+bool luavalue_cast(const int index, std::set<T>& set)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();
@@ -455,7 +455,7 @@ int push_luavalue(const std::deque<T>& set)
 }
 
 template<typename T>
-bool luavalue_cast(int index, std::deque<T>& vec)
+bool luavalue_cast(const int index, std::deque<T>& vec)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();
@@ -483,7 +483,7 @@ int push_luavalue(const stdext::map<K, V, H>& map)
 }
 
 template<class K, class V, class H>
-bool luavalue_cast(int index, stdext::map<K, V, H>& map)
+bool luavalue_cast(const int index, stdext::map<K, V, H>& map)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();
@@ -512,7 +512,7 @@ int push_luavalue(const std::map<K, V, H>& map)
 }
 
 template<class K, class V, class H>
-bool luavalue_cast(int index, std::map<K, V, H>& map)
+bool luavalue_cast(const int index, std::map<K, V, H>& map)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();
@@ -541,7 +541,7 @@ int push_luavalue(const std::unordered_map<K, V, H>& map)
 }
 
 template<class K, class V, class H>
-bool luavalue_cast(int index, std::unordered_map<K, V, H>& map)
+bool luavalue_cast(const int index, std::unordered_map<K, V, H>& map)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();
@@ -558,7 +558,7 @@ bool luavalue_cast(int index, std::unordered_map<K, V, H>& map)
 }
 
 template<class K, class V>
-bool luavalue_cast(int index, std::pair<K, V>& pair)
+bool luavalue_cast(const int index, std::pair<K, V>& pair)
 {
     if (g_lua.isTable(index)) {
         g_lua.pushNil();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,12 +36,12 @@ private:
     /// Retrieve next line from the input stream
     std::string getNextLine();
     /// Counts depth of a line (every 2 spaces increments one depth)
-    int getLineDepth(const std::string_view line, bool multilining = false) const;
+    int getLineDepth(std::string_view line, bool multilining = false) const;
 
     /// Parse each line of the input stream
     void parseLine(std::string line);
     /// Parse nodes tag and value
-    void parseNode(const std::string_view data);
+    void parseNode(std::string_view data);
 
     int currentDepth;
     int currentLine;

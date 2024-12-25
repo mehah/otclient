@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ OTMLException::OTMLException(const OTMLNodePtr& node, const std::string_view err
     m_what = ss.str();
 }
 
-OTMLException::OTMLException(const OTMLDocumentPtr& doc, const std::string_view error, int line)
+OTMLException::OTMLException(const OTMLDocumentPtr& doc, const std::string_view error, const int line)
 {
     std::stringstream ss;
     ss << "OTML error";

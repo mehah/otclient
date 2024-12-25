@@ -1,0 +1,9 @@
+Module
+  name: client_debug_info
+  description: Showing and sending debug/stats informations
+  author: otclient@otclient.ovh
+  sandboxed: true
+  scripts: [ debug_info ]
+  dependencies: [ client_topmenu ]
+  @onLoad: init()
+  @onUnload: terminate()

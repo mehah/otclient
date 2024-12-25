@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,10 @@
 class OTMLNode : public std::enable_shared_from_this<OTMLNode>
 {
 public:
-    virtual ~OTMLNode() {} // fix clang warning
+    virtual ~OTMLNode() = default; // fix clang warning
 
-    static OTMLNodePtr create(const std::string_view tag = "", bool unique = false);
-    static OTMLNodePtr create(const std::string_view tag, const std::string_view value);
+    static OTMLNodePtr create(std::string_view tag = "", bool unique = false);
+    static OTMLNodePtr create(std::string_view tag, std::string_view value);
 
     std::string tag() { return m_tag; }
     int size() const { return m_children.size(); }
@@ -44,18 +44,18 @@ public:
     bool hasValue() const { return !m_value.empty(); }
     bool hasChildren() const;
     bool hasChildAt(const std::string_view childTag) const { return !!get(childTag); }
-    bool hasChildAtIndex(int childIndex) { return !!getIndex(childIndex); }
+    bool hasChildAtIndex(const int childIndex) { return !!getIndex(childIndex); }
 
     void setTag(const std::string_view tag) { m_tag = tag; }
     void setValue(const std::string_view value) { m_value = value; }
-    void setNull(bool null) { m_null = null; }
-    void setUnique(bool unique) { m_unique = unique; }
+    void setNull(const bool null) { m_null = null; }
+    void setUnique(const bool unique) { m_unique = unique; }
     void setSource(const std::string_view source) { m_source = source; }
 
-    OTMLNodePtr get(const std::string_view childTag) const;
+    OTMLNodePtr get(std::string_view childTag) const;
     OTMLNodePtr getIndex(int childIndex);
 
-    OTMLNodePtr at(const std::string_view childTag);
+    OTMLNodePtr at(std::string_view childTag);
     OTMLNodePtr atIndex(int childIndex);
 
     void addChild(const OTMLNodePtr& newChild);
@@ -71,18 +71,18 @@ public:
     template<typename T = std::string>
     T value();
     template<typename T = std::string>
-    T valueAt(const std::string_view childTag);
+    T valueAt(std::string_view childTag);
     template<typename T = std::string>
     T valueAtIndex(int childIndex);
     template<typename T = std::string>
-    T valueAt(const std::string_view childTag, const T& def);
+    T valueAt(std::string_view childTag, const T& def);
     template<typename T = std::string>
     T valueAtIndex(int childIndex, const T& def);
 
     template<typename T>
     void write(const T& v);
     template<typename T>
-    void writeAt(const std::string_view childTag, const T& v);
+    void writeAt(std::string_view childTag, const T& v);
     template<typename T>
     void writeIn(const T& v);
 
@@ -133,7 +133,7 @@ T OTMLNode::valueAt(const std::string_view childTag)
 }
 
 template<typename T>
-T OTMLNode::valueAtIndex(int childIndex)
+T OTMLNode::valueAtIndex(const int childIndex)
 {
     const OTMLNodePtr node = atIndex(childIndex);
     return node->value<T>();
@@ -149,7 +149,7 @@ T OTMLNode::valueAt(const std::string_view childTag, const T& def)
 }
 
 template<typename T>
-T OTMLNode::valueAtIndex(int childIndex, const T& def)
+T OTMLNode::valueAtIndex(const int childIndex, const T& def)
 {
     if (const auto& node = getIndex(childIndex))
         return node->value<T>();

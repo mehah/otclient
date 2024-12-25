@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 #include "container.h"
 #include "item.h"
 
-ItemPtr Container::getItem(int slot)
+ItemPtr Container::getItem(const int slot)
 {
     if (slot < 0 || slot >= static_cast<int>(m_items.size()))
         return nullptr;
@@ -62,7 +62,7 @@ void Container::onAddItem(const ItemPtr& item, int slot)
     callLuaField("onAddItem", slot, item);
 }
 
-ItemPtr Container::findItemById(uint32_t itemId, int subType) const
+ItemPtr Container::findItemById(const uint32_t itemId, const int subType) const
 {
     for (const auto& item : m_items)
         if (item->getId() == itemId && (subType == -1 || item->getSubType() == subType))

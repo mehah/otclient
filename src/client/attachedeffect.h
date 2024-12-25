@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include "thingtype.h"
 #include "outfit.h"
+#include "thingtype.h"
 
-class AttachedEffect : public LuaObject
+class AttachedEffect final : public LuaObject
 {
 public:
     static AttachedEffectPtr create(uint16_t thingId, ThingCategory category);
 
-    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr, const bool drawThing = true);
+    void draw(const Point& /*dest*/, bool /*isOnTop*/, const LightViewPtr & = nullptr, bool drawThing = true);
     void drawLight(const Point& /*dest*/, const LightViewPtr&);
 
     uint16_t getId() { return m_id; }
@@ -38,31 +38,31 @@ public:
     AttachedEffectPtr clone();
 
     float getSpeed() { return m_speed / 100.f; }
-    void setSpeed(float speed) { m_speed = speed * 100u; }
+    void setSpeed(const float speed) { m_speed = speed * 100u; }
 
     float getOpacity() { return m_opacity / 100.f; }
-    void setOpacity(float opacity) { m_opacity = opacity * 100u; }
+    void setOpacity(const float opacity) { m_opacity = opacity * 100u; }
 
     Size getSize() { return m_size; }
     void setSize(const Size& s) { m_size = s; }
 
     bool isHidedOwner() { return m_hideOwner; }
-    void setHideOwner(bool v) { m_hideOwner = v; }
+    void setHideOwner(const bool v) { m_hideOwner = v; }
 
     bool isTransform() { return m_transform; }
-    void setTransform(bool v) { m_transform = v; }
+    void setTransform(const bool v) { m_transform = v; }
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation; }
-    void setDisableWalkAnimation(bool v) { m_disableWalkAnimation = v; }
+    void setDisableWalkAnimation(const bool v) { m_disableWalkAnimation = v; }
 
     bool isPermanent() { return m_permanent; }
-    void setPermanent(bool permanent) { m_permanent = permanent; }
+    void setPermanent(const bool permanent) { m_permanent = permanent; }
 
     uint16_t getDuration() { return m_duration; }
-    void setDuration(uint16_t v) { m_duration = v; }
+    void setDuration(const uint16_t v) { m_duration = v; }
 
     int8_t getLoop() { return m_loop; }
-    void setLoop(int8_t v) { m_loop = v; }
+    void setLoop(const int8_t v) { m_loop = v; }
 
     void setName(std::string_view n) { m_name = { n.data() }; }
     std::string getName() { return m_name; }
@@ -70,17 +70,37 @@ public:
     Otc::Direction getDirection() { return m_direction; }
     void setDirection(const Otc::Direction dir) { m_direction = std::min<Otc::Direction>(dir, Otc::NorthWest); }
 
-    void setBounce(uint8_t minHeight, uint8_t height, uint16_t speed) { m_bounce = { minHeight, height , speed }; }
-    void setPulse(uint8_t minHeight, uint8_t height, uint16_t speed) { m_pulse = { minHeight, height , speed }; }
-    void setFade(uint8_t start, uint8_t end, uint16_t speed) { m_fade = { start, end , speed }; }
+    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
+        m_bounce = { .minHeight =
+minHeight,
+.height = height, .speed = speed
+        };
+    }
+    void setPulse(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
+        m_pulse = { .minHeight =
+minHeight,
+.height = height, .speed = speed
+        };
+    }
+    void setFade(const uint8_t start, const uint8_t end, const uint16_t speed) {
+        m_fade = { .minHeight = start, .height =
+end,
+.speed = speed
+        };
+    }
 
-    void setOnTop(bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
+    void setOnTop(const bool onTop) { for (auto& control : m_offsetDirections) control.onTop = onTop; }
     void setOffset(int16_t x, int16_t y) { for (auto& control : m_offsetDirections) control.offset = { x, y }; }
-    void setOnTopByDir(Otc::Direction direction, bool onTop) { m_offsetDirections[direction].onTop = onTop; }
+    void setOnTopByDir(const Otc::Direction direction, const bool onTop) { m_offsetDirections[direction].onTop = onTop; }
 
-    void setDirOffset(Otc::Direction direction, int8_t x, int8_t y, bool onTop = false) { m_offsetDirections[direction] = { onTop, {x, y} }; }
-    void setShader(const std::string_view name);
-    void setCanDrawOnUI(bool canDraw) { m_canDrawOnUI = canDraw; }
+    void setDirOffset(const Otc::Direction direction, int8_t x, int8_t y, const bool onTop = false) {
+        m_offsetDirections[direction] = { .onTop =
+onTop,
+.offset = {x, y}
+        };
+    }
+    void setShader(std::string_view name);
+    void setCanDrawOnUI(const bool canDraw) { m_canDrawOnUI = canDraw; }
     bool canDrawOnUI() { return m_canDrawOnUI; }
 
     void move(const Position& fromPosition, const Position& toPosition);
@@ -88,7 +108,7 @@ public:
     void attachEffect(const AttachedEffectPtr& e) { m_effects.emplace_back(e); }
 
     DrawOrder getDrawOrder() { return m_drawOrder; }
-    void setDrawOrder(DrawOrder drawOrder) { m_drawOrder = drawOrder; }
+    void setDrawOrder(const DrawOrder drawOrder) { m_drawOrder = drawOrder; }
     const Light& getLight() const { return m_light; }
     void setLight(const Light& light) { m_light = light; }
 
@@ -99,7 +119,7 @@ public:
         uint8_t minHeight{ 0 };
         uint8_t height{ 0 };
         uint16_t speed{ 0 };
-        Timer timer;
+        Timer timer{};
     };
 
 private:
@@ -116,7 +136,7 @@ private:
     uint8_t m_speed{ 100 };
     uint8_t m_opacity{ 100 };
     uint8_t m_lastAnimation{ 0 };
-    DrawOrder m_drawOrder{ DrawOrder::FIRST };
+    DrawOrder m_drawOrder{ FIRST };
 
     uint16_t m_id{ 0 };
     uint16_t m_duration{ 0 };

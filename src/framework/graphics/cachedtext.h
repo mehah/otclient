@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,8 +33,8 @@ public:
 
     void wrapText(int maxWidth);
     void setFont(const BitmapFontPtr& font);
-    void setText(const std::string_view text);
-    void setAlign(const Fw::AlignmentFlag align);
+    void setText(std::string_view text);
+    void setAlign(Fw::AlignmentFlag align);
 
     Size getTextSize() const { return m_textSize; }
     std::string getText() const { return m_text; }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,9 @@
 #include "timer.h"
 #include "clock.h"
 
-void Timer::restart()
+void Timer::restart(const int shift)
 {
-    m_startTicks = g_clock.millis();
+    m_startTicks = g_clock.millis() - shift;
     m_stopped = false;
 }
 

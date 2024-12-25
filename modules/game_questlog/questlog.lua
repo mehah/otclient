@@ -15,6 +15,16 @@ function init()
         onQuestLine = onGameQuestLine,
         onGameEnd = destroyWindows
     })
+
+    Keybind.new("Windows", "Show/hide quest Log", "", "")
+    Keybind.bind("Windows", "Show/hide quest Log", {
+      {
+        type = KEY_DOWN,
+        callback =  function()
+            g_game.requestQuestLog()
+        end,
+      }
+    })
 end
 
 function terminate()
@@ -26,15 +36,19 @@ function terminate()
 
     destroyWindows()
     questLogButton:destroy()
+    questLogButton = nil
+    Keybind.delete("Windows", "Show/hide quest Log")
 end
 
 function destroyWindows()
     if questLogWindow then
         questLogWindow:destroy()
+        questLogWindow = nil
     end
 
     if questLineWindow then
         questLineWindow:destroy()
+        questLineWindow = nil
     end
 end
 
@@ -69,6 +83,7 @@ function onGameQuestLine(questId, questMissions)
     end
     if questLineWindow then
         questLineWindow:destroy()
+        questLineWindow = nil
     end
 
     questLineWindow = g_ui.createWidget('QuestLineWindow', rootWidget)
@@ -85,7 +100,7 @@ function onGameQuestLine(questId, questMissions)
     })
 
     for i, questMission in pairs(questMissions) do
-        local name, description = unpack(questMission)
+        local name, description, missionId = unpack(questMission)
 
         local missionLabel = g_ui.createWidget('MissionLabel')
         missionLabel:setText(name)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "player.h"
 
  // @bindclass
-class LocalPlayer : public Player
+class LocalPlayer final : public Player
 {
 public:
     void unlockWalk() { m_walkLockExpiration = 0; }
@@ -45,12 +45,12 @@ public:
     void setExperience(uint64_t experience);
     void setLevel(uint16_t level, uint8_t levelPercent);
     void setMana(uint32_t mana, uint32_t maxMana);
-    void setMagicLevel(uint8_t magicLevel, uint8_t magicLevelPercent);
-    void setBaseMagicLevel(uint8_t baseMagicLevel);
+    void setMagicLevel(uint16_t magicLevel, uint16_t magicLevelPercent);
+    void setBaseMagicLevel(uint16_t baseMagicLevel);
     void setSoul(uint8_t soul);
     void setStamina(uint16_t stamina);
-    void setKnown(bool known) { m_known = known; }
-    void setPendingGame(bool pending) { m_pending = pending; }
+    void setKnown(const bool known) { m_known = known; }
+    void setPendingGame(const bool pending) { m_pending = pending; }
     void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item);
     void setVocation(uint8_t vocation);
     void setPremium(bool premium);
@@ -65,16 +65,16 @@ public:
     uint32_t getTotalCapacity() { return m_totalCapacity; }
 
     uint8_t getVocation() { return m_vocation; }
-    uint8_t getMagicLevel() { return m_magicLevel; }
-    uint8_t getMagicLevelPercent() { return m_magicLevelPercent; }
-    uint8_t getBaseMagicLevel() { return m_baseMagicLevel; }
+    uint16_t getMagicLevel() { return m_magicLevel; }
+    uint16_t getMagicLevelPercent() { return m_magicLevelPercent; }
+    uint16_t getBaseMagicLevel() { return m_baseMagicLevel; }
     uint8_t getSoul() { return m_soul; }
     uint8_t getLevelPercent() { return m_levelPercent; }
 
     uint16_t getLevel() { return m_level; }
-    uint16_t getSkillLevel(Otc::Skill skill) { return m_skills[skill].level; }
-    uint16_t getSkillBaseLevel(Otc::Skill skill) { return m_skills[skill].baseLevel; }
-    uint16_t getSkillLevelPercent(Otc::Skill skill) { return m_skills[skill].levelPercent; }
+    uint16_t getSkillLevel(const Otc::Skill skill) { return m_skills[skill].level; }
+    uint16_t getSkillBaseLevel(const Otc::Skill skill) { return m_skills[skill].baseLevel; }
+    uint16_t getSkillLevelPercent(const Otc::Skill skill) { return m_skills[skill].levelPercent; }
     uint16_t getStamina() { return m_stamina; }
     uint16_t getBlessings() { return m_blessings; }
     uint16_t getRegenerationTime() { return m_regenerationTime; }
@@ -88,9 +88,9 @@ public:
     uint64_t getExperience() { return m_experience; }
 
     const std::vector<uint16_t>& getSpells() { return m_spells; }
-    ItemPtr getInventoryItem(Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
+    ItemPtr getInventoryItem(const Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
 
-    uint64_t getResourceBalance(Otc::ResourceTypes_t type)
+    uint64_t getResourceBalance(const Otc::ResourceTypes_t type)
     {
         const auto it = m_resourcesBalance.find(type);
         return it != m_resourcesBalance.end() ? it->second : 0;
@@ -175,9 +175,9 @@ private:
     uint8_t m_levelPercent{ 0 };
     uint32_t m_mana{ 0 };
     uint32_t m_maxMana{ 0 };
-    uint8_t m_magicLevel{ 0 };
-    uint8_t m_magicLevelPercent{ 0 };
-    uint8_t m_baseMagicLevel{ 0 };
+    uint16_t m_magicLevel{ 0 };
+    uint16_t m_magicLevelPercent{ 0 };
+    uint16_t m_baseMagicLevel{ 0 };
     uint8_t m_soul{ 0 };
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };

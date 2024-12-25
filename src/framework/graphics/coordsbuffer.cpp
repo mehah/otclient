@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 #include "coordsbuffer.h"
 #include "graphics.h"
 
-void CoordsBuffer::addBoudingRect(const Rect& dest, int innerLineWidth)
+void CoordsBuffer::addBoudingRect(const Rect& dest, const int innerLineWidth)
 {
     const int left = dest.left();
     const int right = dest.right();

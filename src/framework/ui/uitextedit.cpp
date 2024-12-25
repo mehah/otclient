@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,6 @@
  */
 
 #include "uitextedit.h"
-#include <framework/core/application.h>
 #include <framework/core/clock.h>
 #include <framework/graphics/bitmapfont.h>
 #include <framework/graphics/graphics.h>
@@ -33,16 +32,20 @@
 #include "uitranslator.h"
 #include <framework/graphics/fontmanager.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#endif
+
 UITextEdit::UITextEdit()
 {
-    setProp(Props::PropCursorInRange, true);
-    setProp(Props::PropCursorVisible, true);
-    setProp(Props::PropEditable, true);
-    setProp(Props::PropChangeCursorImage, true);
-    setProp(Props::PropUpdatesEnabled, true);
-    setProp(Props::PropAutoScroll, true);
-    setProp(Props::PropSelectable, true);
-    setProp(Props::PropGlyphsMustRecache, true);
+    setProp(PropCursorInRange, true);
+    setProp(PropCursorVisible, true);
+    setProp(PropEditable, true);
+    setProp(PropChangeCursorImage, true);
+    setProp(PropUpdatesEnabled, true);
+    setProp(PropAutoScroll, true);
+    setProp(PropSelectable, true);
+    setProp(PropGlyphsMustRecache, true);
 
     m_textAlign = Fw::AlignTopLeft;
     m_placeholder = "";
@@ -52,7 +55,7 @@ UITextEdit::UITextEdit()
     blinkCursor();
 }
 
-void UITextEdit::drawSelf(DrawPoolType drawPane)
+void UITextEdit::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -121,7 +124,7 @@ void UITextEdit::drawSelf(DrawPoolType drawPane)
     }
 }
 
-void UITextEdit::update(bool focusCursor)
+void UITextEdit::update(const bool focusCursor)
 {
     if (!getProp(PropUpdatesEnabled))
         return;
@@ -281,7 +284,7 @@ void UITextEdit::update(bool focusCursor)
                 nextColorIndex = textLength;
             }
 
-            if (colorCoordsMap.find(curColorRgba) == colorCoordsMap.end()) {
+            if (!colorCoordsMap.contains(curColorRgba)) {
                 colorCoordsMap.insert(std::make_pair(curColorRgba, std::make_shared<CoordsBuffer>()));
             }
 
@@ -407,7 +410,7 @@ void UITextEdit::setSelection(int start, int end)
     repaint();
 }
 
-void UITextEdit::setTextHidden(bool hidden)
+void UITextEdit::setTextHidden(const bool hidden)
 {
     if (getProp(PropTextHidden) == hidden)
         return;
@@ -457,7 +460,7 @@ void UITextEdit::appendText(const std::string_view txt)
     }
 }
 
-void UITextEdit::appendCharacter(char c)
+void UITextEdit::appendCharacter(const char c)
 {
     if ((c == '\n' && !getProp(PropMultiline)) || c == '\r')
         return;
@@ -482,7 +485,7 @@ void UITextEdit::appendCharacter(char c)
     setText(tmp2);
 }
 
-void UITextEdit::removeCharacter(bool right)
+void UITextEdit::removeCharacter(const bool right)
 {
     std::string tmp = m_text;
     if (static_cast<size_t>(m_cursorPos) >= 0 && tmp.length() > 0) {
@@ -516,7 +519,7 @@ void UITextEdit::deleteSelection()
     setText(tmp);
 }
 
-void UITextEdit::del(bool right)
+void UITextEdit::del(const bool right)
 {
     if (hasSelection()) {
         deleteSelection();
@@ -554,7 +557,7 @@ void UITextEdit::wrapText()
     setText(m_font->wrapText(m_text, getPaddingRect().width() - m_textOffset.x));
 }
 
-void UITextEdit::moveCursorHorizontally(bool right)
+void UITextEdit::moveCursorHorizontally(const bool right)
 {
     if (right) {
         if (static_cast<size_t>(m_cursorPos) + 1 <= m_text.length())
@@ -656,7 +659,7 @@ void UITextEdit::updateText()
     update(true);
 }
 
-void UITextEdit::onHoverChange(bool hovered)
+void UITextEdit::onHoverChange(const bool hovered)
 {
     if (getProp(PropChangeCursorImage)) {
         if (hovered && !g_mouse.isCursorChanged())
@@ -716,7 +719,7 @@ void UITextEdit::onGeometryChange(const Rect& oldRect, const Rect& newRect)
     UIWidget::onGeometryChange(oldRect, newRect);
 }
 
-void UITextEdit::onFocusChange(bool focused, Fw::FocusReason reason)
+void UITextEdit::onFocusChange(const bool focused, const Fw::FocusReason reason)
 {
     if (focused) {
         if (reason == Fw::KeyboardFocusReason)
@@ -732,7 +735,7 @@ void UITextEdit::onFocusChange(bool focused, Fw::FocusReason reason)
     UIWidget::onFocusChange(focused, reason);
 }
 
-bool UITextEdit::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
+bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, const int autoRepeatTicks)
 {
     if (UIWidget::onKeyPress(keyCode, keyboardModifiers, autoRepeatTicks))
         return true;
@@ -879,7 +882,7 @@ bool UITextEdit::onKeyText(const std::string_view keyText)
     return false;
 }
 
-bool UITextEdit::onMousePress(const Point& mousePos, Fw::MouseButton button)
+bool UITextEdit::onMousePress(const Point& mousePos, const Fw::MouseButton button)
 {
     if (UIWidget::onMousePress(mousePos, button))
         return true;
@@ -894,12 +897,22 @@ bool UITextEdit::onMousePress(const Point& mousePos, Fw::MouseButton button)
                 setSelection(pos, pos);
             }
         }
+#ifdef __EMSCRIPTEN__
+        if (g_window.isVisible()) {
+            MAIN_THREAD_ASYNC_EM_ASM({
+                if (navigator && "virtualKeyboard" in navigator) {
+                    document.getElementById("title-text").focus();
+                    navigator.virtualKeyboard.show();
+                }
+            });
+        }
+#endif
         return true;
     }
     return false;
 }
 
-bool UITextEdit::onMouseRelease(const Point& mousePos, Fw::MouseButton button)
+bool UITextEdit::onMouseRelease(const Point& mousePos, const Fw::MouseButton button)
 {
     return UIWidget::onMouseRelease(mousePos, button);
 }

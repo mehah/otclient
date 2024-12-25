@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 #pragma once
 
-#include <framework/core/declarations.h>
 #include "texture.h"
+#include <framework/core/declarations.h>
 
 class TextureManager
 {
@@ -35,7 +35,7 @@ public:
     void clearCache();
     void liveReload();
 
-    void preload(const std::string& fileName, bool smooth = true) { getTexture(fileName, smooth); }
+    void preload(const std::string& fileName, const bool smooth = true) { getTexture(fileName, smooth); }
     TexturePtr getTexture(const std::string& fileName, bool smooth = true);
     const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
     TexturePtr loadTexture(std::stringstream& file);

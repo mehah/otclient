@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,11 +21,11 @@
  */
 
 #include "soundchannel.h"
-#include <random>
 #include "soundmanager.h"
 #include "streamsoundsource.h"
+#include <random>
 
-SoundSourcePtr SoundChannel::play(const std::string& filename, float fadetime, float gain, float pitch)
+SoundSourcePtr SoundChannel::play(const std::string& filename, const float fadetime, const float gain, const float pitch)
 {
     if (!g_sounds.isAudioEnabled() || !m_enabled)
         return nullptr;
@@ -37,7 +37,7 @@ SoundSourcePtr SoundChannel::play(const std::string& filename, float fadetime, f
     return m_currentSource;
 }
 
-void SoundChannel::stop(float fadetime)
+void SoundChannel::stop(const float fadetime)
 {
     m_queue.clear();
 
@@ -74,7 +74,7 @@ void SoundChannel::update()
     }
 }
 
-void SoundChannel::setEnabled(bool enable)
+void SoundChannel::setEnabled(const bool enable)
 {
     if (m_enabled == enable)
         return;
@@ -91,18 +91,18 @@ void SoundChannel::setEnabled(bool enable)
     }
 }
 
-void SoundChannel::setGain(float gain)
+void SoundChannel::setGain(const float gain)
 {
     if (m_currentSource)
         m_currentSource->setGain(gain);
     m_gain = gain;
 }
 
-void SoundChannel::setPitch(float pitch)
+void SoundChannel::setPitch(const float pitch)
 {
     if (m_currentSource)
         m_currentSource->setPitch(pitch);
-    m_pitch = pitch; 
+    m_pitch = pitch;
 }
 
 void SoundChannel::setPosition(const Point& pos)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,11 @@
 #include "texture.h"
 
 #include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/asyncdispatcher.h>
+#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/image.h>
-#include <framework/graphics/drawpoolmanager.h>
-#include <framework/platform/platformwindow.h>
+
+#include "framework/core/graphicalapplication.h"
 
 uint32_t FrameBuffer::boundFbo = 0;
 
@@ -46,7 +46,7 @@ FrameBuffer::~FrameBuffer()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_fbo != 0) {
-        g_mainDispatcher.addEvent([id = m_fbo]() {
+        g_mainDispatcher.addEvent([id = m_fbo] {
             glDeleteFramebuffers(1, &id);
         });
     }
@@ -100,6 +100,10 @@ void FrameBuffer::bind()
     } else {
         g_painter->clear(Color::alpha);
     }
+}
+
+bool FrameBuffer::canDraw() const {
+    return m_texture && m_coordsBuffer.getVertexCount() > 0;
 }
 
 void FrameBuffer::release() const
@@ -161,7 +165,7 @@ TexturePtr FrameBuffer::extractTexture() {
     const int width = size.width();
     const int height = size.height();
     const auto& pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
-    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+    glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels->data());
     internalRelease();
 
     const auto& texture = std::make_shared<Texture>(std::make_shared<Image>(getSize(), 4, pixels->data()));
@@ -187,7 +191,7 @@ void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_
         const int height = size.height();
         const auto& pixels = std::make_shared<std::vector<uint8_t>>(width * height * 4 * sizeof(GLubyte), 0);
 
-        glReadPixels(x / 3, y / 1.5, width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLubyte*)(pixels->data()));
+        glReadPixels(x / 3, y / 1.5, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels->data());
 
         internalRelease();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,21 +22,21 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "missile.h"
+#include <framework/ui/uiwidget.h>
 
-class UIMissile : public UIWidget
+class UIMissile final : public UIWidget
 {
 public:
     UIMissile();
     void drawSelf(DrawPoolType drawPane) override;
 
     void setMissileId(int id);
-    void setMissileVisible(bool visible) { m_missileVisible = visible; }
+    void setMissileVisible(const bool visible) { m_missileVisible = visible; }
     void setMissile(const MissilePtr& missile);
-    void setVirtual(bool virt) { m_virtual = virt; }
-    void setDirection(Otc::Direction dir) { if (m_missile) m_missile->setDirection(dir); }
+    void setVirtual(const bool virt) { m_virtual = virt; }
+    void setDirection(const Otc::Direction dir) { if (m_missile) m_missile->setDirection(dir); }
     void clearMissile() { setMissileId(0); }
 
     int getMissileId() { return m_missile ? m_missile->getId() : 0; }
@@ -46,7 +46,7 @@ public:
     bool isMissileVisible() { return m_missileVisible; }
 
 protected:
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
     MissilePtr m_missile;
     bool m_virtual{ false };

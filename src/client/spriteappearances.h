@@ -40,7 +40,10 @@ class SpriteSheet
 public:
     static constexpr uint16_t SIZE = 384;
 
-    SpriteSheet(int firstId, int lastId, SpriteLayout spriteLayout, const std::string& file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(file) {}
+    SpriteSheet(const int firstId, const int lastId, const SpriteLayout spriteLayout, std::string file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(std::move(
+        file))
+    {
+    }
 
     Size getSpriteSize() const
     {
@@ -78,7 +81,7 @@ public:
 
     void unload();
 
-    void setSpritesCount(int count) { m_spritesCount = count; }
+    void setSpritesCount(const int count) { m_spritesCount = count; }
     int getSpritesCount() const { return m_spritesCount; }
 
     void setPath(const std::string& path) { m_path = path; }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,17 +25,17 @@
 Platform g_platform;
 
 std::unordered_map<Platform::DeviceType, std::string> Platform::m_deviceShortNames = {
-    {Platform::Desktop, "desktop"},
-    {Platform::Mobile,  "mobile"},
-    {Platform::Console, "console"},
+    {Desktop, "desktop"},
+    {Mobile,  "mobile"},
+    {Console, "console"},
 };
 
 std::unordered_map<Platform::OperatingSystem, std::string> Platform::m_osShortNames = {
-    {Platform::Windows, "windows"},
-    {Platform::Linux,   "linux"},
-    {Platform::macOS,   "macos"},
-    {Platform::Android, "android"},
-    {Platform::iOS,     "ios"},
+    {Windows, "windows"},
+    {Linux,   "linux"},
+    {macOS,   "macos"},
+    {Android, "android"},
+    {iOS,     "ios"},
 };
 
 std::string Platform::getDeviceShortName(DeviceType type)
@@ -43,7 +43,7 @@ std::string Platform::getDeviceShortName(DeviceType type)
     if (type == DeviceUnknown)
         type = m_device.type;
 
-    auto it = m_deviceShortNames.find(type);
+    const auto it = m_deviceShortNames.find(type);
     if (it == m_deviceShortNames.end())
         return "";
     return it->second;
@@ -54,7 +54,7 @@ std::string Platform::getOsShortName(OperatingSystem os)
     if (os == OsUnknown)
         os = m_device.os;
 
-    auto it = m_osShortNames.find(os);
+    const auto it = m_osShortNames.find(os);
     if (it == m_osShortNames.end())
         return "";
     return it->second;
@@ -62,7 +62,7 @@ std::string Platform::getOsShortName(OperatingSystem os)
 
 Platform::DeviceType Platform::getDeviceTypeByName(std::string shortName)
 {
-    for (auto const& [type, name] : m_deviceShortNames) {
+    for (const auto& [type, name] : m_deviceShortNames) {
         if (name == shortName)
             return type;
     }
@@ -71,7 +71,7 @@ Platform::DeviceType Platform::getDeviceTypeByName(std::string shortName)
 
 Platform::OperatingSystem Platform::getOsByName(std::string shortName)
 {
-    for (auto const& [type, name] : m_osShortNames) {
+    for (const auto& [type, name] : m_osShortNames) {
         if (name == shortName)
             return type;
     }

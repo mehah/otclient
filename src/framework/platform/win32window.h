@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,17 +62,17 @@ public:
     void swapBuffers() override;
     void showMouse() override;
     void hideMouse() override;
-    void displayFatalError(const std::string_view message) override;
+    void displayFatalError(std::string_view message) override;
 
     void setMouseCursor(int cursorId) override;
     void restoreMouseCursor() override;
 
-    void setTitle(const std::string_view title) override;
+    void setTitle(std::string_view title) override;
     void setMinimumSize(const Size& minimumSize) override;
     void setFullscreen(bool fullscreen) override;
     void setVerticalSync(bool enable) override;
     void setIcon(const std::string& file) override;
-    void setClipboardText(const std::string_view text) override;
+    void setClipboardText(std::string_view text) override;
 
     Size getDisplaySize() override;
     std::string getClipboardText() override;

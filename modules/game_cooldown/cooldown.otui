@@ -29,6 +29,8 @@ Panel
   anchors.top: parent.top
   anchors.left: parent.left
   anchors.right: parent.right
+  focusable: false
+  phantom: true
   Panel
     id:contentsPanel2
     anchors.fill: parent

@@ -20,8 +20,13 @@ local globalSettings = {
 controllerVip = Controller:new()
 function controllerVip:onInit()
 
-    g_keyboard.bindKeyDown('Ctrl+P', toggle)
-
+    Keybind.new("Windows", "Show/hide VIP list", "Ctrl+P", "")
+    Keybind.bind("Windows", "Show/hide VIP list", {
+      {
+        type = KEY_DOWN,
+        callback = toggle,
+      }
+    })
     vipButton = modules.game_mainpanel.addToggleButton('vipListButton', tr('VIP List') .. ' (Ctrl+P)',
                                                                 '/images/options/button_vip', toggle, false, 3)
     vipWindow = g_ui.loadUI('viplist')
@@ -50,7 +55,7 @@ function controllerVip:onInit()
 end
 
 function controllerVip:onTerminate()
-    g_keyboard.unbindKeyDown('Ctrl+P')
+    Keybind.delete("Windows", "Show/hide VIP list")
     local ArrayWidgets = {addVipWindow, editVipWindow, vipWindow, vipButton, addGroupWindow}
     for _, widget in ipairs(ArrayWidgets) do
         if widget ~= nil or widget then

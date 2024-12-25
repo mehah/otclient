@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,20 @@
  * THE SOFTWARE.
  */
 
+#include <algorithm>
 #include <filesystem>
+#include <ranges>
 
-#include <client/game.h>
-#include "resourcemanager.h"
 #include "filestream.h"
+#include "resourcemanager.h"
+#include <client/game.h>
 
 #include <framework/core/application.h>
-#include <framework/luaengine/luainterface.h>
-#include <framework/platform/platform.h>
-#include <framework/net/protocolhttp.h>
-#include <framework/util/crypt.h>
 #include <framework/graphics/drawpoolmanager.h>
+#include <framework/luaengine/luainterface.h>
+#include <framework/net/protocolhttp.h>
+#include <framework/platform/platform.h>
+#include <framework/util/crypt.h>
 
 #include <physfs.h>
 
@@ -44,7 +46,7 @@ void ResourceManager::init(const char* argv0)
 
 #if defined(WIN32)
     char fileName[255];
-    GetModuleFileNameA(NULL, fileName, sizeof(fileName));
+    GetModuleFileNameA(nullptr, fileName, sizeof(fileName));
     m_binaryPath = std::filesystem::absolute(fileName);
 #elif defined(ANDROID)
     // nothing
@@ -122,7 +124,7 @@ bool ResourceManager::setWriteDir(const std::string& writeDir, bool)
     return true;
 }
 
-bool ResourceManager::addSearchPath(const std::string& path, bool pushFront)
+bool ResourceManager::addSearchPath(const std::string& path, const bool pushFront)
 {
     std::string savePath = path;
     if (!PHYSFS_mount(path.c_str(), nullptr, pushFront ? 0 : 1)) {
@@ -152,7 +154,7 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 {
     if (!PHYSFS_unmount(path.c_str()))
         return false;
-    const auto it = std::find(m_searchPaths.begin(), m_searchPaths.end(), path);
+    const auto it = std::ranges::find(m_searchPaths, path);
     assert(it != m_searchPaths.end());
     m_searchPaths.erase(it);
     return true;
@@ -161,9 +163,7 @@ bool ResourceManager::removeSearchPath(const std::string& path)
 void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const std::string& packageExt)
 {
     auto files = listDirectoryFiles(packagesDir);
-    for (auto it = files.rbegin(); it != files.rend(); ++it) {
-        const auto& file = *it;
-
+    for (auto& file : std::ranges::reverse_view(files)) {
         if (!file.ends_with(packageExt))
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;
@@ -210,7 +210,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     const std::string fullPath = resolvePath(fileName);
 
     if (fullPath.find(g_resources.getByteStrings(0)) != std::string::npos) {
-        auto dfile = g_http.getFile(fullPath.substr(10));
+        const auto dfile = g_http.getFile(fullPath.substr(10));
         if (dfile)
             return std::string(dfile->response.begin(), dfile->response.end());
     }
@@ -224,13 +224,13 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_readBytes(file, &buffer[0], fileSize);
     PHYSFS_close(file);
 
+#if ENABLE_ENCRYPTION == 1
     bool hasHeader = false;
-    if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() && 
+    if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() &&
         buffer.substr(0, std::string(ENCRYPTION_HEADER).size()) == std::string(ENCRYPTION_HEADER)) {
         hasHeader = true;
     }
 
-#if ENABLE_ENCRYPTION == 1
     if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
         if (fullPath.find(g_resources.getByteStrings(1)) != std::string::npos && !hasHeader) {
             return buffer;
@@ -246,7 +246,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     return buffer;
 }
 
-bool ResourceManager::writeFileBuffer(const std::string& fileName, const uint8_t* data, uint32_t size, bool createDirectory)
+bool ResourceManager::writeFileBuffer(const std::string& fileName, const uint8_t* data, const uint32_t size, const bool createDirectory)
 {
     if (createDirectory) {
         const auto& path = std::filesystem::path(fileName);
@@ -331,7 +331,7 @@ bool ResourceManager::makeDir(const std::string& directory)
     return PHYSFS_mkdir(directory.c_str());
 }
 
-std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& directoryPath, bool fullPath /* = false */, bool raw /*= false*/, bool recursive)
+std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& directoryPath, const bool fullPath /* = false */, const bool raw /*= false*/, const bool recursive)
 {
     std::list<std::string> files;
     const auto path = raw ? directoryPath : resolvePath(directoryPath);
@@ -362,7 +362,7 @@ std::list<std::string> ResourceManager::listDirectoryFiles(const std::string& di
     return files;
 }
 
-std::vector<std::string> ResourceManager::getDirectoryFiles(const std::string& path, bool filenameOnly, bool recursive)
+std::vector<std::string> ResourceManager::getDirectoryFiles(const std::string& path, const bool filenameOnly, const bool recursive)
 {
     if (!std::filesystem::exists(path))
         return {};
@@ -371,7 +371,7 @@ std::vector<std::string> ResourceManager::getDirectoryFiles(const std::string& p
     return discoverPath(p, filenameOnly, recursive);
 }
 
-std::vector<std::string> ResourceManager::discoverPath(const std::filesystem::path& path, bool filenameOnly, bool recursive)
+std::vector<std::string> ResourceManager::discoverPath(const std::filesystem::path& path, const bool filenameOnly, const bool recursive)
 {
     std::vector<std::string> files;
 
@@ -439,6 +439,8 @@ std::string ResourceManager::getUserDir()
 {
 #ifdef ANDROID
     return getBaseDir() + "/";
+#elif defined(__EMSCRIPTEN__)
+    return "/user/";
 #else
     static const char* orgName = g_app.getOrganizationName().data();
     static const char* appName = g_app.getCompactName().data();
@@ -520,7 +522,7 @@ std::string ResourceManager::decrypt(const std::string& data)
     return ss.str();
 }
 
-uint8_t* ResourceManager::decrypt(uint8_t* data, int32_t size)
+uint8_t* ResourceManager::decrypt(uint8_t* data, const int32_t size)
 {
     const auto& password = std::string(ENCRYPTION_PASSWORD);
     const int plen = password.length();
@@ -550,7 +552,7 @@ void ResourceManager::runEncryption(const std::string& password)
     std::vector<std::string> excludedExtensions = { ".rar",".ogg",".xml",".dll",".exe", ".log",".otb" };
     for (const auto& entry : std::filesystem::recursive_directory_iterator("./")) {
         if (std::string ext = entry.path().extension().string();
-            std::find(excludedExtensions.begin(), excludedExtensions.end(), ext) != excludedExtensions.end())
+            std::ranges::find(excludedExtensions, ext) != excludedExtensions.end())
             continue;
 
         std::ifstream ifs(entry.path().string(), std::ios_base::binary);
@@ -573,7 +575,7 @@ void ResourceManager::save_string_into_file(const std::string& contents, const s
 std::string ResourceManager::fileChecksum(const std::string& path) {
     static stdext::map<std::string, std::string> cache;
 
-    auto it = cache.find(path);
+    const auto it = cache.find(path);
     if (it != cache.end())
         return it->second;
 
@@ -581,9 +583,9 @@ std::string ResourceManager::fileChecksum(const std::string& path) {
     if (!file)
         return "";
 
-    int fileSize = PHYSFS_fileLength(file);
+    const int fileSize = PHYSFS_fileLength(file);
     std::string buffer(fileSize, 0);
-    PHYSFS_readBytes(file, (void*)&buffer[0], fileSize);
+    PHYSFS_readBytes(file, &buffer[0], fileSize);
     PHYSFS_close(file);
 
     auto checksum = g_crypt.crc32(buffer, false);
@@ -596,18 +598,17 @@ std::unordered_map<std::string, std::string> ResourceManager::filesChecksums()
 {
     std::unordered_map<std::string, std::string> ret;
     auto files = listDirectoryFiles("/", true, false, true);
-    for (auto it = files.rbegin(); it != files.rend(); ++it) {
-        const auto& filePath = *it;
+    for (auto& filePath : std::ranges::reverse_view(files)) {
         PHYSFS_File* file = PHYSFS_openRead(filePath.c_str());
         if (!file)
             continue;
 
-        int fileSize = PHYSFS_fileLength(file);
+        const int fileSize = PHYSFS_fileLength(file);
         std::string buffer(fileSize, 0);
-        PHYSFS_readBytes(file, (void*)&buffer[0], fileSize);
+        PHYSFS_readBytes(file, &buffer[0], fileSize);
         PHYSFS_close(file);
 
-        auto checksum = g_crypt.crc32(buffer, false);
+        const auto checksum = g_crypt.crc32(buffer, false);
         ret[filePath] = checksum;
     }
 
@@ -673,14 +674,14 @@ void ResourceManager::updateExecutable(std::string fileName)
     if (fileName[0] == '/')
         fileName = fileName.substr(1);
 
-    auto dFile = g_http.getFile(fileName);
+    const auto dFile = g_http.getFile(fileName);
     if (!dFile)
         g_logger.fatal(stdext::format("Cannot find executable: %s in downloads", fileName));
 
     const auto& oldWriteDir = getWriteDir();
     setWriteDir(getWorkDir());
-    std::filesystem::path path(m_binaryPath);
-    auto newBinary = path.stem().string() + "-" + std::to_string(time(nullptr)) + path.extension().string();
+    const std::filesystem::path path(m_binaryPath);
+    const auto newBinary = path.stem().string() + "-" + std::to_string(time(nullptr)) + path.extension().string();
     g_logger.info(stdext::format("Updating binary file: %s", newBinary));
     PHYSFS_file* file = PHYSFS_openWrite(newBinary.c_str());
     if (!file)
@@ -693,7 +694,7 @@ void ResourceManager::updateExecutable(std::string fileName)
 #endif
 }
 
-bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curently works only on windows
+bool ResourceManager::launchCorrect(const std::vector<std::string>& args) { // curently works only on windows
 #if (defined(ANDROID) || defined(FREE_VERSION))
     return false;
 #else
@@ -701,12 +702,12 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
     fileName2 = stdext::split(fileName2, "-")[0];
     stdext::tolower(fileName2);
 
-    std::filesystem::path path(m_binaryPath.parent_path());
+    const std::filesystem::path path(m_binaryPath.parent_path());
     std::error_code ec;
-    auto lastWrite = std::filesystem::last_write_time(m_binaryPath, ec);
+    auto lastWrite = last_write_time(m_binaryPath, ec);
     std::filesystem::path binary = m_binaryPath;
     for (auto& entry : std::filesystem::directory_iterator(path)) {
-        if (std::filesystem::is_directory(entry.path()))
+        if (is_directory(entry.path()))
             continue;
 
         auto fileName1 = entry.path().stem().string();
@@ -717,7 +718,7 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
 
         if (entry.path().extension() == m_binaryPath.extension()) {
             std::error_code _ec;
-            auto writeTime = std::filesystem::last_write_time(entry.path(), _ec);
+            auto writeTime = last_write_time(entry.path(), _ec);
             if (!_ec && writeTime > lastWrite) {
                 lastWrite = writeTime;
                 binary = entry.path();
@@ -726,7 +727,7 @@ bool ResourceManager::launchCorrect(std::vector<std::string>& args) { // curentl
     }
 
     for (auto& entry : std::filesystem::directory_iterator(path)) { // remove old
-        if (std::filesystem::is_directory(entry.path()))
+        if (is_directory(entry.path()))
             continue;
 
         auto fileName1 = entry.path().stem().string();
@@ -761,23 +762,22 @@ std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(
 
 std::string ResourceManager::decodificateStrings(const std::vector<unsigned char>& bytes) {
     std::string result;
-    for (unsigned char c : bytes) {
+    for (const unsigned char c : bytes) {
         result.push_back(c ^ 0xAA);
     }
     return result;
 }
 
 // used to obfuscate vulnerable strings (provisional)
-std::string ResourceManager::getByteStrings(size_t line) {
-    std::vector<std::vector<unsigned char>> strTable = {
+std::string ResourceManager::getByteStrings(const size_t line) {
+    const std::vector<std::vector<unsigned char>> strTable = {
         {0x85, 0xCE, 0xC5, 0xDD, 0xC4, 0xC6, 0xC5, 0xCB, 0xCE, 0xD9},  // "/downloads"
         {0x85, 0xC8, 0xC5, 0xDE, 0x85},  // "/bot/"
         {0xE6, 0xC3, 0xC4, 0xC2, 0xCB, 0x8A, 0xCE, 0xCF, 0x8A, 0xD8, 0xCF, 0xDE, 0xC5, 0xD8, 0xC4, 0xC5, 0x8A, 0xC3, 0xC4, 0xDC, 0xCB, 0xC6, 0xC3, 0xCE, 0xCB},  // "Linha de retorno invalida"
     };
-	
+
     if (line < strTable.size()) {
         return decodificateStrings(strTable[line]);
-    } else {
-        return decodificateStrings(strTable[2]);
     }
+    return decodificateStrings(strTable[2]);
 }

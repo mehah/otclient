@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "uilayout.h"
 
  // @bindclass
-class UIGridLayout : public UILayout
+class UIGridLayout final : public UILayout
 {
 public:
     UIGridLayout(UIWidgetPtr parentWidget);
@@ -35,14 +35,14 @@ public:
     void addWidget(const UIWidgetPtr& widget) override;
 
     void setCellSize(const Size& size) { m_cellSize = size; update(); }
-    void setCellWidth(int width) { m_cellSize.setWidth(width); update(); }
-    void setCellHeight(int height) { m_cellSize.setHeight(height); update(); }
-    void setCellSpacing(uint8_t spacing) { m_cellSpacing = spacing; update(); }
-    void setNumColumns(uint8_t columns) { m_numColumns = columns; update(); }
-    void setNumLines(uint16_t lines) { m_numLines = lines; update(); }
-    void setAutoSpacing(bool enable) { m_autoSpacing = enable; update(); }
-    void setFitChildren(bool enable) { m_fitChildren = enable; update(); }
-    void setFlow(bool enable) { m_flow = enable; update(); }
+    void setCellWidth(const int width) { m_cellSize.setWidth(width); update(); }
+    void setCellHeight(const int height) { m_cellSize.setHeight(height); update(); }
+    void setCellSpacing(const uint8_t spacing) { m_cellSpacing = spacing; update(); }
+    void setNumColumns(const uint8_t columns) { m_numColumns = columns; update(); }
+    void setNumLines(const uint16_t lines) { m_numLines = lines; update(); }
+    void setAutoSpacing(const bool enable) { m_autoSpacing = enable; update(); }
+    void setFitChildren(const bool enable) { m_fitChildren = enable; update(); }
+    void setFlow(const bool enable) { m_flow = enable; update(); }
 
     Size getCellSize() { return m_cellSize; }
     uint8_t getCellSpacing() { return m_cellSpacing; }

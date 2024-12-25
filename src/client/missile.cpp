@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  */
 
 #include "missile.h"
-#include <framework/core/eventdispatcher.h>
 #include "map.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include <client/client.h>
+#include <framework/core/eventdispatcher.h>
 
-void Missile::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
+void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())
         return;
@@ -69,7 +69,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     g_dispatcher.scheduleEvent([self = asMissile()] { g_map.removeThing(self); }, m_duration);
 }
 
-void Missile::setDirection(Otc::Direction dir) {
+void Missile::setDirection(const Otc::Direction dir) {
     m_direction = dir;
 
     if (m_direction == Otc::NorthWest) {

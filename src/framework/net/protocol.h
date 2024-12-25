@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,15 @@
  */
 
 #pragma once
-
+#ifdef __EMSCRIPTEN__
+#include "webconnection.h"
+#else
 #include "connection.h"
+#endif
 #include "declarations.h"
-#include "inputmessage.h"
-#include "outputmessage.h"
 
 #include <framework/luaengine/luaobject.h>
+#include <framework/proxy/proxy.h>
 #include <zlib.h>
 
  // @bindclass
@@ -37,18 +39,29 @@ public:
     Protocol();
     ~Protocol() override;
 
-    void connect(const std::string_view host, uint16_t port);
+#ifndef __EMSCRIPTEN__
+    void connect(std::string_view host, uint16_t port);
+#else
+    void connect(const std::string_view host, uint16_t port, bool gameWorld = false);
+#endif
     void disconnect();
 
-    bool isConnected() { return m_connection && m_connection->isConnected(); }
-    bool isConnecting() { return m_connection && m_connection->isConnecting(); }
+    bool isConnected();
+    bool isConnecting();
     ticks_t getElapsedTicksSinceLastRead() const { return m_connection ? m_connection->getElapsedTicksSinceLastRead() : -1; }
-
+#ifdef __EMSCRIPTEN__
+    WebConnectionPtr getConnection() { return m_connection; }
+#else
     ConnectionPtr getConnection() { return m_connection; }
+#endif
+#ifdef __EMSCRIPTEN__
+    void setConnection(const WebConnectionPtr& connection) { m_connection = connection; }
+#else
     void setConnection(const ConnectionPtr& connection) { m_connection = connection; }
+#endif
 
     void generateXteaKey();
-    void setXteaKey(uint32_t a, uint32_t b, uint32_t c, uint32_t d) { m_xteaKey = { a, b, c, d }; }
+    void setXteaKey(const uint32_t a, const uint32_t b, const uint32_t c, const uint32_t d) { m_xteaKey = { a, b, c, d }; }
     std::vector<uint32_t > getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
     void enableXteaEncryption() { m_xteaEncryptionEnabled = true; }
 
@@ -65,12 +78,17 @@ protected:
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const std::error_code& err);
 
+    void onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet);
+    void onLocalDisconnected(std::error_code ec);
+    bool m_disconnected = false;
+    uint32_t m_proxy = 0;
+
     std::array<uint32_t, 4> m_xteaKey{};
     uint32_t m_packetNumber{ 0 };
 
 private:
-    void internalRecvHeader(uint8_t* buffer, uint16_t size);
-    void internalRecvData(uint8_t* buffer, uint16_t size);
+    void internalRecvHeader(const uint8_t* buffer, uint16_t size);
+    void internalRecvData(const uint8_t* buffer, uint16_t size);
 
     bool xteaDecrypt(const InputMessagePtr& inputMessage) const;
     void xteaEncrypt(const OutputMessagePtr& outputMessage) const;
@@ -78,8 +96,11 @@ private:
     bool m_checksumEnabled{ false };
     bool m_sequencedPackets{ false };
     bool m_xteaEncryptionEnabled{ false };
-
+#ifdef __EMSCRIPTEN__
+    WebConnectionPtr m_connection;
+#else
     ConnectionPtr m_connection;
+#endif
     InputMessagePtr m_inputMessage;
 
     z_stream m_zstream{};

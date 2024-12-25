@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -76,17 +76,17 @@ void SoundSource::setBuffer(const SoundBufferPtr& buffer)
     m_buffer = buffer;
 }
 
-void SoundSource::setLooping(bool looping)
+void SoundSource::setLooping(const bool looping)
 {
     alSourcei(m_sourceId, AL_LOOPING, looping ? AL_TRUE : AL_FALSE);
 }
 
-void SoundSource::setRelative(bool relative)
+void SoundSource::setRelative(const bool relative)
 {
     alSourcei(m_sourceId, AL_SOURCE_RELATIVE, relative ? AL_TRUE : AL_FALSE);
 }
 
-void SoundSource::setReferenceDistance(float distance)
+void SoundSource::setReferenceDistance(const float distance)
 {
     alSourcef(m_sourceId, AL_REFERENCE_DISTANCE, distance);
 }
@@ -98,13 +98,13 @@ float SoundSource::getReferenceDistance()
     return distance;
 }
 
-void SoundSource::setGain(float gain)
+void SoundSource::setGain(const float gain)
 {
     alSourcef(m_sourceId, AL_GAIN, gain);
     m_gain = gain;
 }
 
-void SoundSource::setPitch(float pitch)
+void SoundSource::setPitch(const float pitch)
 {
     alSourcef(m_sourceId, AL_PITCH, pitch);
 }
@@ -114,7 +114,7 @@ void SoundSource::setPosition(const Point& pos)
     alSource3f(m_sourceId, AL_POSITION, pos.x, pos.y, 0);
 }
 
-void SoundSource::setRolloff(float rolloff)
+void SoundSource::setRolloff(const float rolloff)
 {
     alSourcef(m_sourceId, AL_ROLLOFF_FACTOR, rolloff);
 }
@@ -124,7 +124,7 @@ void SoundSource::setVelocity(const Point& velocity)
     alSource3f(m_sourceId, AL_VELOCITY, velocity.x, velocity.y, 0);
 }
 
-void SoundSource::setFading(FadeState state, float fadeTime)
+void SoundSource::setFading(const FadeState state, const float fadeTime)
 {
     const float now = stdext::millis() / 1000.0f;
     if (m_fadeState != NoFading) {
@@ -168,11 +168,11 @@ void SoundSource::update()
     }
 }
 
-void SoundSource::setEffect(SoundEffectPtr soundEffect)
+void SoundSource::setEffect(const SoundEffectPtr soundEffect)
 {
     m_effectId = soundEffect->m_effectId;
-    alSource3i(m_sourceId, AL_AUXILIARY_SEND_FILTER, (ALint)soundEffect->m_effectId, 0, AL_FILTER_NULL);
-    ALenum err = alGetError();
+    alSource3i(m_sourceId, AL_AUXILIARY_SEND_FILTER, static_cast<ALint>(soundEffect->m_effectId), 0, AL_FILTER_NULL);
+    const ALenum err = alGetError();
     if (err != AL_NO_ERROR) {
         g_logger.error(stdext::format("Failed to set effect on source: %s", alGetString(err)));
     }
@@ -183,7 +183,7 @@ void SoundSource::removeEffect()
     if (m_effectId != 0) {
         m_effectId = 0;
         alSource3i(m_sourceId, AL_AUXILIARY_SEND_FILTER, AL_EFFECTSLOT_NULL, 0, AL_FILTER_NULL);
-        ALenum err = alGetError();
+        const ALenum err = alGetError();
         if (err != AL_NO_ERROR) {
             g_logger.error(stdext::format("Failed to remove effect on source: %s", alGetString(err)));
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,13 +38,11 @@ public:
     void draw(const Rect& dest) { prepare(dest, Rect(0, 0, getSize())); draw(); }
 
     void reset() { m_texture = nullptr; }
-    void setSmooth(bool enabled) { m_smooth = enabled; m_texture = nullptr; }
+    void setSmooth(const bool enabled) { m_smooth = enabled; m_texture = nullptr; }
 
     bool resize(const Size& size);
     bool isValid() const { return m_texture != nullptr; }
-    bool canDraw() const {
-        return m_texture && m_coordsBuffer.getVertexCount() > 0;
-    }
+    bool canDraw() const;
 
     TexturePtr getTexture() const { return m_texture; }
     TexturePtr extractTexture();
@@ -53,7 +51,7 @@ public:
 
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }
     void disableBlend() { m_disableBlend = true; }
-    void doScreenshot(std::string file, const uint16_t x = 0, const uint16_t y = 0);
+    void doScreenshot(std::string file, uint16_t x = 0, uint16_t y = 0);
     Size getSize();
 
 protected:

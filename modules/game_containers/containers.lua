@@ -53,6 +53,10 @@ function refreshContainerItems(container)
         itemWidget:setItem(container:getItem(slot))
         ItemsDatabase.setRarityItem(itemWidget, container:getItem(slot))
         ItemsDatabase.setTier(itemWidget, container:getItem(slot))
+        if modules.client_options.getOption('showExpiryInContainers') then
+            ItemsDatabase.setCharges(itemWidget, container:getItem(slot))
+            ItemsDatabase.setDuration(itemWidget, container:getItem(slot))
+        end
     end
 
     if container:hasPages() then
@@ -140,6 +144,10 @@ function onContainerOpen(container, previousContainer)
         itemWidget:setItem(container:getItem(slot))
         ItemsDatabase.setRarityItem(itemWidget, container:getItem(slot))
         ItemsDatabase.setTier(itemWidget, container:getItem(slot))
+        if modules.client_options.getOption('showExpiryInContainers') then
+            ItemsDatabase.setCharges(itemWidget, container:getItem(slot))
+            ItemsDatabase.setDuration(itemWidget, container:getItem(slot))
+        end
         itemWidget:setMargin(0)
         itemWidget.position = container:getSlotPosition(slot)
 
@@ -191,4 +199,8 @@ function onContainerUpdateItem(container, slot, item, oldItem)
     end
     local itemWidget = container.itemsPanel:getChildById('item' .. slot)
     itemWidget:setItem(item)
+    if modules.client_options.getOption('showExpiryInContainers') then
+        ItemsDatabase.setCharges(itemWidget, container:getItem(slot))
+        ItemsDatabase.setDuration(itemWidget, container:getItem(slot))
+    end
 end

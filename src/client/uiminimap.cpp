@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 #include "minimap.h"
 #include "uimapanchorlayout.h"
 
-void UIMinimap::drawSelf(DrawPoolType drawPane)
+void UIMinimap::drawSelf(const DrawPoolType drawPane)
 {
     UIWidget::drawSelf(drawPane);
     if (drawPane != DrawPoolType::FOREGROUND)
@@ -39,7 +39,7 @@ void UIMinimap::drawSelf(DrawPoolType drawPane)
     g_minimap.draw(getPaddingRect(), m_cameraPosition, m_scale, m_color);
 }
 
-bool UIMinimap::setZoom(int8_t zoom)
+bool UIMinimap::setZoom(const int8_t zoom)
 {
     if (zoom == m_zoom)
         return true;
@@ -71,7 +71,7 @@ void UIMinimap::setCameraPosition(const Position& pos)
 
     const Position oldPos = m_cameraPosition;
     m_cameraPosition = pos;
-    
+
     if (m_layout)
         m_layout->update();
 
@@ -112,9 +112,9 @@ Position UIMinimap::getTilePosition(const Point& mousePos)
     return g_minimap.getTilePosition(mousePos, getPaddingRect(), m_cameraPosition, m_scale);
 }
 
-void UIMinimap::anchorPosition(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, Fw::AnchorEdge hookedEdge)
+void UIMinimap::anchorPosition(const UIWidgetPtr& anchoredWidget, const Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, const Fw::AnchorEdge hookedEdge)
 {
-    if(!m_layout)
+    if (!m_layout)
         return;
 
     const auto& layout = m_layout->static_self_cast<UIMapAnchorLayout>();
@@ -124,7 +124,7 @@ void UIMinimap::anchorPosition(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge
 
 void UIMinimap::fillPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition)
 {
-    if(!m_layout)
+    if (!m_layout)
         return;
 
     const auto& layout = m_layout->static_self_cast<UIMapAnchorLayout>();
@@ -134,7 +134,7 @@ void UIMinimap::fillPosition(const UIWidgetPtr& anchoredWidget, const Position& 
 
 void UIMinimap::centerInPosition(const UIWidgetPtr& anchoredWidget, const Position& hookedPosition)
 {
-    if(!m_layout)
+    if (!m_layout)
         return;
 
     const auto& layout = m_layout->static_self_cast<UIMapAnchorLayout>();
@@ -142,7 +142,7 @@ void UIMinimap::centerInPosition(const UIWidgetPtr& anchoredWidget, const Positi
     layout->centerInPosition(anchoredWidget, hookedPosition);
 }
 
-void UIMinimap::onZoomChange(int zoom, int oldZoom) { callLuaField("onZoomChange", zoom, oldZoom); }
+void UIMinimap::onZoomChange(const int zoom, const int oldZoom) { callLuaField("onZoomChange", zoom, oldZoom); }
 
 void UIMinimap::onCameraPositionChange(const Position& position, const Position& oldPosition) { callLuaField("onCameraPositionChange", position, oldPosition); }
 

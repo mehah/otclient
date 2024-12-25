@@ -223,7 +223,10 @@ function UITable:addRow(data, height)
 
     self.columns[rowId] = {}
     for colId, column in pairs(data) do
-        local col = g_ui.createWidget(self.columBaseStyle, row)
+        local col = g_ui.createWidget(column.style or self.columBaseStyle, row)
+        if column.id then
+          col:setId(column.id)
+        end
         if column.width then
             col:setWidth(column.width)
         else
@@ -235,11 +238,29 @@ function UITable:addRow(data, height)
         if column.text then
             col:setText(column.text)
         end
+        if column.color then
+            col:setColor(column.color)
+        end
+        if column.coloredText then
+            col:parseColoredText(column.coloredText.text, column.coloredText.color)
+        end
         if column.sortvalue then
             col.sortvalue = column.sortvalue
         else
             col.sortvalue = column.text or 0
         end
+        if column.marginTop then
+            col:setMarginTop(column.marginTop)
+        end
+        if column.marginBottom then
+            col:setMarginBottom(column.marginBottom)
+        end
+        if column.comboBox then
+            for _, comboValue in ipairs(column.comboBox) do
+                col:addOption(comboValue[1], comboValue[2])
+            end
+        end
+
         table.insert(self.columns[rowId], col)
     end
 

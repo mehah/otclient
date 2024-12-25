@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,15 @@
 #include "uimanager.h"
 #include "uitranslator.h"
 
-#include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
 #include <framework/platform/platformwindow.h>
+
+#include <algorithm>
+
+#include <ranges>
+
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 
@@ -66,7 +70,7 @@ UIWidget::~UIWidget()
 #endif
 }
 
-void UIWidget::draw(const Rect& visibleRect, DrawPoolType drawPane)
+void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
 {
     Rect oldClipRect;
     if (isClipping()) {
@@ -96,7 +100,7 @@ void UIWidget::draw(const Rect& visibleRect, DrawPoolType drawPane)
     }
 }
 
-void UIWidget::drawSelf(DrawPoolType drawPane)
+void UIWidget::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -120,7 +124,7 @@ void UIWidget::drawSelf(DrawPoolType drawPane)
         g_drawPool.resetShaderProgram();
 }
 
-void UIWidget::drawChildren(const Rect& visibleRect, DrawPoolType drawPane)
+void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane)
 {
     // draw children
     for (const auto& child : m_children) {
@@ -224,7 +228,7 @@ void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
 
     if (!(index >= 0 && index <= childrenSize)) {
         //g_logger.traceWarning("attempt to insert a child UIWidget into an invalid index, using nearest index...");
-        index = std::clamp<int>(index, 0, static_cast<int>(childrenSize));
+        index = std::clamp<int>(index, 0, childrenSize);
     }
 
     // there was no change of index
@@ -272,7 +276,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         if (isChildLocked(child))
             unlockChild(child);
 
-        const auto it = std::find(m_children.begin(), m_children.end(), child);
+        const auto it = std::ranges::find(m_children, child);
         m_children.erase(it);
         m_childrenById.erase(child->getId());
 
@@ -310,7 +314,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         g_logger.traceError("attempt to remove an unknown child from a UIWidget");
 }
 
-void UIWidget::focusChild(const UIWidgetPtr& child, Fw::FocusReason reason)
+void UIWidget::focusChild(const UIWidgetPtr& child, const Fw::FocusReason reason)
 {
     if (isDestroyed())
         return;
@@ -345,7 +349,7 @@ void UIWidget::focusChild(const UIWidgetPtr& child, Fw::FocusReason reason)
     onChildFocusChange(child, oldFocused, reason);
 }
 
-void UIWidget::focusNextChild(Fw::FocusReason reason, bool rotate)
+void UIWidget::focusNextChild(const Fw::FocusReason reason, const bool rotate)
 {
     if (isDestroyed())
         return;
@@ -355,9 +359,9 @@ void UIWidget::focusNextChild(Fw::FocusReason reason, bool rotate)
         UIWidgetList rotatedChildren(m_children);
 
         if (m_focusedChild) {
-            const auto focusedIt = std::find(rotatedChildren.begin(), rotatedChildren.end(), m_focusedChild);
+            const auto focusedIt = std::ranges::find(rotatedChildren, m_focusedChild);
             if (focusedIt != rotatedChildren.end()) {
-                std::rotate(rotatedChildren.begin(), focusedIt, rotatedChildren.end());
+                std::ranges::rotate(rotatedChildren, focusedIt);
                 rotatedChildren.pop_front();
             }
         }
@@ -372,7 +376,7 @@ void UIWidget::focusNextChild(Fw::FocusReason reason, bool rotate)
     } else {
         auto it = m_children.begin();
         if (m_focusedChild)
-            it = std::find(m_children.begin(), m_children.end(), m_focusedChild);
+            it = std::ranges::find(m_children, m_focusedChild);
 
         for (; it != m_children.end(); ++it) {
             const auto& child = *it;
@@ -387,7 +391,7 @@ void UIWidget::focusNextChild(Fw::FocusReason reason, bool rotate)
         focusChild(toFocus, reason);
 }
 
-void UIWidget::focusPreviousChild(Fw::FocusReason reason, bool rotate)
+void UIWidget::focusPreviousChild(const Fw::FocusReason reason, const bool rotate)
 {
     if (isDestroyed())
         return;
@@ -395,12 +399,12 @@ void UIWidget::focusPreviousChild(Fw::FocusReason reason, bool rotate)
     UIWidgetPtr toFocus;
     if (rotate) {
         UIWidgetList rotatedChildren(m_children);
-        std::reverse(rotatedChildren.begin(), rotatedChildren.end());
+        std::ranges::reverse(rotatedChildren);
 
         if (m_focusedChild) {
-            const auto focusedIt = std::find(rotatedChildren.begin(), rotatedChildren.end(), m_focusedChild);
+            const auto focusedIt = std::ranges::find(rotatedChildren, m_focusedChild);
             if (focusedIt != rotatedChildren.end()) {
-                std::rotate(rotatedChildren.begin(), focusedIt, rotatedChildren.end());
+                std::ranges::rotate(rotatedChildren, focusedIt);
                 rotatedChildren.pop_front();
             }
         }
@@ -415,7 +419,7 @@ void UIWidget::focusPreviousChild(Fw::FocusReason reason, bool rotate)
     } else {
         auto it = m_children.rbegin();
         if (m_focusedChild)
-            it = std::find(m_children.rbegin(), m_children.rend(), m_focusedChild);
+            it = std::ranges::find(std::ranges::reverse_view(m_children), m_focusedChild);
 
         for (; it != m_children.rend(); ++it) {
             const auto& child = *it;
@@ -442,7 +446,7 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
         return;
 
     // remove and push child again
-    const auto it = std::find(m_children.begin(), m_children.end(), child);
+    const auto it = std::ranges::find(m_children, child);
     if (it == m_children.end()) {
         g_logger.traceError("cannot find child");
         return;
@@ -468,7 +472,7 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
         return;
 
     // remove and push child again
-    const auto it = std::find(m_children.begin(), m_children.end(), child);
+    const auto it = std::ranges::find(m_children, child);
     if (it == m_children.end()) {
         g_logger.traceError("cannot find child");
         return;
@@ -485,7 +489,7 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
     updateChildrenIndexStates();
 }
 
-void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
+void UIWidget::moveChildToIndex(const UIWidgetPtr& child, const int index)
 {
     if (isDestroyed())
         return;
@@ -505,7 +509,7 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, int index)
     }
 
     // remove and push child again
-    const auto it = std::find(m_children.begin(), m_children.end(), child);
+    const auto it = std::ranges::find(m_children, child);
     if (it == m_children.end()) {
         g_logger.traceError("cannot find child");
         return;
@@ -536,8 +540,8 @@ void UIWidget::reorderChildren(const std::vector<UIWidgetPtr>& childrens) {
     }
 
     m_children.clear();
-    for (size_t i = 0; i < childrens.size(); ++i) {
-        m_children.push_back(childrens[i]);
+    for (const auto& children : childrens) {
+        m_children.push_back(children);
     }
 
     updateChildrenIndexStates();
@@ -589,7 +593,7 @@ void UIWidget::unlockChild(const UIWidgetPtr& child)
         return;
     }
 
-    const auto it = std::find(m_lockedChildren.begin(), m_lockedChildren.end(), child);
+    const auto it = std::ranges::find(m_lockedChildren, child);
     if (it == m_lockedChildren.end())
         return;
 
@@ -675,7 +679,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
     setProp(PropLoadingStyle, false);
 }
 
-void UIWidget::addAnchor(Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
+void UIWidget::addAnchor(const Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, const Fw::AnchorEdge hookedEdge)
 {
     if (isDestroyed())
         return;
@@ -686,7 +690,7 @@ void UIWidget::addAnchor(Fw::AnchorEdge anchoredEdge, const std::string_view hoo
         g_logger.traceError(stdext::format("cannot add anchors to widget '%s': the parent doesn't use anchors layout", m_id));
 }
 
-void UIWidget::removeAnchor(Fw::AnchorEdge anchoredEdge)
+void UIWidget::removeAnchor(const Fw::AnchorEdge anchoredEdge)
 {
     addAnchor(anchoredEdge, "none", Fw::AnchorNone);
 }
@@ -782,7 +786,7 @@ void UIWidget::focus()
         parent->focusChild(static_self_cast<UIWidget>(), Fw::ActiveFocusReason);
 }
 
-void UIWidget::recursiveFocus(Fw::FocusReason reason)
+void UIWidget::recursiveFocus(const Fw::FocusReason reason)
 {
     if (isDestroyed())
         return;
@@ -937,7 +941,7 @@ void UIWidget::destroyChildren()
 
 void UIWidget::removeChildren()
 {
-    UILayoutPtr layout = getLayout();
+    const UILayoutPtr layout = getLayout();
     if (layout)
         layout->disableUpdates();
 
@@ -953,13 +957,13 @@ void UIWidget::removeChildren()
 
 void UIWidget::hideChildren()
 {
-    for (auto& child : m_children)
+    for (const auto& child : m_children)
         child->hide();
 }
 
 void UIWidget::showChildren()
 {
-    for (auto& child : m_children)
+    for (const auto& child : m_children)
         child->show();
 }
 
@@ -1109,7 +1113,7 @@ void UIWidget::setStyleFromNode(const OTMLNodePtr& styleNode)
     updateStyle();
 }
 
-void UIWidget::setEnabled(bool enabled)
+void UIWidget::setEnabled(const bool enabled)
 {
     if (hasProp(PropEnabled) == enabled)
         return;
@@ -1122,7 +1126,7 @@ void UIWidget::setEnabled(bool enabled)
     callLuaField("onEnabled", enabled);
 }
 
-void UIWidget::setVisible(bool visible)
+void UIWidget::setVisible(const bool visible)
 {
     if (hasProp(PropVisible) == visible)
         return;
@@ -1148,18 +1152,18 @@ void UIWidget::setVisible(bool visible)
         g_ui.onWidgetDisappear(static_self_cast<UIWidget>());
 }
 
-void UIWidget::setOn(bool on)
+void UIWidget::setOn(const bool on)
 {
     setState(Fw::OnState, on);
 }
 
-void UIWidget::setChecked(bool checked)
+void UIWidget::setChecked(const bool checked)
 {
     if (setState(Fw::CheckedState, checked))
         callLuaField("onCheckChange", checked);
 }
 
-void UIWidget::setFocusable(bool focusable)
+void UIWidget::setFocusable(const bool focusable)
 {
     if (isFocusable() == focusable)
         return;
@@ -1176,28 +1180,28 @@ void UIWidget::setFocusable(bool focusable)
     }
 }
 
-void UIWidget::setPhantom(bool phantom)
+void UIWidget::setPhantom(const bool phantom)
 {
     setProp(PropPhantom, phantom);
 }
 
-void UIWidget::setDraggable(bool draggable)
+void UIWidget::setDraggable(const bool draggable)
 {
     setProp(PropDraggable, draggable);
 }
 
-void UIWidget::setFixedSize(bool fixed)
+void UIWidget::setFixedSize(const bool fixed)
 {
     setProp(PropFixedSize, fixed);
     updateParentLayout();
 }
 
-void UIWidget::setLastFocusReason(Fw::FocusReason reason)
+void UIWidget::setLastFocusReason(const Fw::FocusReason reason)
 {
     m_lastFocusReason = reason;
 }
 
-void UIWidget::setAutoFocusPolicy(Fw::AutoFocusPolicy policy)
+void UIWidget::setAutoFocusPolicy(const Fw::AutoFocusPolicy policy)
 {
     m_autoFocusPolicy = policy;
 }
@@ -1221,13 +1225,13 @@ bool UIWidget::isAnchored()
 
 bool UIWidget::isChildLocked(const UIWidgetPtr& child)
 {
-    const auto it = std::find(m_lockedChildren.begin(), m_lockedChildren.end(), child);
+    const auto it = std::ranges::find(m_lockedChildren, child);
     return it != m_lockedChildren.end();
 }
 
 bool UIWidget::hasChild(const UIWidgetPtr& child)
 {
-    const auto it = std::find(m_children.begin(), m_children.end(), child);
+    const auto it = std::ranges::find(m_children, child);
     if (it != m_children.end())
         return true;
 
@@ -1319,8 +1323,7 @@ UIWidgetPtr UIWidget::getChildByPos(const Point& childPos)
     if (!containsPaddingPoint(childPos))
         return nullptr;
 
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos))
             return child;
     }
@@ -1337,10 +1340,9 @@ UIWidgetPtr UIWidget::getChildByIndex(int index)
     return nullptr;
 }
 
-UIWidgetPtr UIWidget::getChildByState(Fw::WidgetState state)
+UIWidgetPtr UIWidget::getChildByState(const Fw::WidgetState state)
 {
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->hasState(state))
             return child;
     }
@@ -1362,14 +1364,12 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
     return nullptr;
 }
 
-UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPhantom)
+UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool wantsPhantom)
 {
     if (!containsPaddingPoint(childPos))
         return nullptr;
 
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
-
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
             if (const auto& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
                 return subChild;
@@ -1381,11 +1381,9 @@ UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, bool wantsPh
     return nullptr;
 }
 
-UIWidgetPtr UIWidget::recursiveGetChildByState(Fw::WidgetState state, bool wantsPhantom)
+UIWidgetPtr UIWidget::recursiveGetChildByState(const Fw::WidgetState state, const bool wantsPhantom)
 {
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
-
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->hasState(state)) {
             if (const auto& subChild = child->recursiveGetChildByState(state, wantsPhantom))
                 return subChild;
@@ -1416,9 +1414,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
         return {};
 
     UIWidgetList children;
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
-
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
             if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
@@ -1436,8 +1432,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     if (!containsPaddingPoint(childPos))
         return children;
 
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible() && child->containsMarginPoint(childPos)) {
             UIWidgetList subChildren = child->recursiveGetChildrenByMarginPos(childPos);
             if (!subChildren.empty())
@@ -1449,19 +1444,17 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
 }
 
 UIWidgetPtr UIWidget::getChildByStyleName(const std::string_view styleName) {
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->getStyleName() == styleName)
             return child;
     }
     return nullptr;
 }
 
-UIWidgetList UIWidget::recursiveGetChildrenByState(Fw::WidgetState state)
+UIWidgetList UIWidget::recursiveGetChildrenByState(const Fw::WidgetState state)
 {
     UIWidgetList children;
-    for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-        const auto& child = (*it);
+    for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->hasState(state)) {
             UIWidgetList subChildren = child->recursiveGetChildrenByState(state);
             if (!subChildren.empty())
@@ -1497,7 +1490,7 @@ UIWidgetPtr UIWidget::backwardsGetWidgetById(const std::string_view id)
     return widget;
 }
 
-void UIWidget::setProp(FlagProp prop, bool v, bool callEvent)
+void UIWidget::setProp(const FlagProp prop, const bool v, const bool callEvent)
 {
     // Note: Be aware that setProp is called many times, there will be a cost,
     // so only call this event if it is really necessary.
@@ -1511,7 +1504,7 @@ void UIWidget::setProp(FlagProp prop, bool v, bool callEvent)
     if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
 }
 
-bool UIWidget::setState(Fw::WidgetState state, bool on)
+bool UIWidget::setState(const Fw::WidgetState state, const bool on)
 {
     if (state == Fw::InvalidState)
         return false;
@@ -1529,7 +1522,7 @@ bool UIWidget::setState(Fw::WidgetState state, bool on)
     return true;
 }
 
-bool UIWidget::hasState(Fw::WidgetState state)
+bool UIWidget::hasState(const Fw::WidgetState state)
 {
     if (state == Fw::InvalidState)
         return false;
@@ -1537,7 +1530,7 @@ bool UIWidget::hasState(Fw::WidgetState state)
     return (m_states & state);
 }
 
-void UIWidget::updateState(Fw::WidgetState state)
+void UIWidget::updateState(const Fw::WidgetState state)
 {
     if (isDestroyed())
         return;
@@ -1750,22 +1743,22 @@ void UIWidget::onLayoutUpdate()
     callLuaField("onLayoutUpdate");
 }
 
-void UIWidget::onFocusChange(bool focused, Fw::FocusReason reason)
+void UIWidget::onFocusChange(const bool focused, const Fw::FocusReason reason)
 {
     callLuaField("onFocusChange", focused, reason);
 }
 
-void UIWidget::onChildFocusChange(const UIWidgetPtr& focusedChild, const UIWidgetPtr& unfocusedChild, Fw::FocusReason reason)
+void UIWidget::onChildFocusChange(const UIWidgetPtr& focusedChild, const UIWidgetPtr& unfocusedChild, const Fw::FocusReason reason)
 {
     callLuaField("onChildFocusChange", focusedChild, unfocusedChild, reason);
 }
 
-void UIWidget::onHoverChange(bool hovered)
+void UIWidget::onHoverChange(const bool hovered)
 {
     callLuaField("onHoverChange", hovered);
 }
 
-void UIWidget::onVisibilityChange(bool visible)
+void UIWidget::onVisibilityChange(const bool visible)
 {
     if (!isAnchored())
         bindRectToParent();
@@ -1777,7 +1770,7 @@ bool UIWidget::onDragEnter(const Point& mousePos)
     return callLuaField<bool>("onDragEnter", mousePos);
 }
 
-bool UIWidget::onDragLeave(UIWidgetPtr droppedWidget, const Point& mousePos)
+bool UIWidget::onDragLeave(const UIWidgetPtr droppedWidget, const Point& mousePos)
 {
     return callLuaField<bool>("onDragLeave", droppedWidget, mousePos);
 }
@@ -1787,7 +1780,7 @@ bool UIWidget::onDragMove(const Point& mousePos, const Point& mouseMoved)
     return callLuaField<bool>("onDragMove", mousePos, mouseMoved);
 }
 
-bool UIWidget::onDrop(UIWidgetPtr draggedWidget, const Point& mousePos)
+bool UIWidget::onDrop(const UIWidgetPtr draggedWidget, const Point& mousePos)
 {
     return callLuaField<bool>("onDrop", draggedWidget, mousePos);
 }
@@ -1797,22 +1790,22 @@ bool UIWidget::onKeyText(const std::string_view keyText)
     return callLuaField<bool>("onKeyText", keyText);
 }
 
-bool UIWidget::onKeyDown(uint8_t keyCode, int keyboardModifiers)
+bool UIWidget::onKeyDown(const uint8_t keyCode, const int keyboardModifiers)
 {
     return callLuaField<bool>("onKeyDown", keyCode, keyboardModifiers);
 }
 
-bool UIWidget::onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
+bool UIWidget::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, const int autoRepeatTicks)
 {
     return callLuaField<bool>("onKeyPress", keyCode, keyboardModifiers, autoRepeatTicks);
 }
 
-bool UIWidget::onKeyUp(uint8_t keyCode, int keyboardModifiers)
+bool UIWidget::onKeyUp(const uint8_t keyCode, const int keyboardModifiers)
 {
     return callLuaField<bool>("onKeyUp", keyCode, keyboardModifiers);
 }
 
-bool UIWidget::onMousePress(const Point& mousePos, Fw::MouseButton button)
+bool UIWidget::onMousePress(const Point& mousePos, const Fw::MouseButton button)
 {
     if (button == Fw::MouseLeftButton) {
         if (m_clickTimer.running() && m_clickTimer.ticksElapsed() <= 200) {
@@ -1827,7 +1820,7 @@ bool UIWidget::onMousePress(const Point& mousePos, Fw::MouseButton button)
     return callLuaField<bool>("onMousePress", mousePos, button);
 }
 
-bool UIWidget::onMouseRelease(const Point& mousePos, Fw::MouseButton button)
+bool UIWidget::onMouseRelease(const Point& mousePos, const Fw::MouseButton button)
 {
     return callLuaField<bool>("onMouseRelease", mousePos, button);
 }
@@ -1837,7 +1830,7 @@ bool UIWidget::onMouseMove(const Point& mousePos, const Point& mouseMoved)
     return callLuaField<bool>("onMouseMove", mousePos, mouseMoved);
 }
 
-bool UIWidget::onMouseWheel(const Point& mousePos, Fw::MouseWheelDirection direction)
+bool UIWidget::onMouseWheel(const Point& mousePos, const Fw::MouseWheelDirection direction)
 {
     return callLuaField<bool>("onMouseWheel", mousePos, direction);
 }
@@ -1880,7 +1873,7 @@ bool UIWidget::propagateOnKeyText(const std::string_view keyText)
     return onKeyText(keyText);
 }
 
-bool UIWidget::propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers)
+bool UIWidget::propagateOnKeyDown(const uint8_t keyCode, const int keyboardModifiers)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
@@ -1902,7 +1895,7 @@ bool UIWidget::propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers)
     return onKeyDown(keyCode, keyboardModifiers);
 }
 
-bool UIWidget::propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks)
+bool UIWidget::propagateOnKeyPress(const uint8_t keyCode, const int keyboardModifiers, const int autoRepeatTicks)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
@@ -1926,7 +1919,7 @@ bool UIWidget::propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int a
     return false;
 }
 
-bool UIWidget::propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers)
+bool UIWidget::propagateOnKeyUp(const uint8_t keyCode, const int keyboardModifiers)
 {
     // do a backup of children list, because it may change while looping it
     UIWidgetList children;
@@ -1952,9 +1945,7 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
 {
     bool ret = false;
     if (containsPaddingPoint(mousePos)) {
-        for (auto it = m_children.rbegin(); it != m_children.rend(); ++it) {
-            const auto& child = *it;
-
+        for (auto& child : std::ranges::reverse_view(m_children)) {
             if (child->isExplicitlyEnabled() && child->isExplicitlyVisible() && child->containsPoint(mousePos)) {
                 if (child->propagateOnMouseEvent(mousePos, widgetList)) {
                     ret = true;
@@ -2039,7 +2030,7 @@ void UIWidget::removeOnDestroyCallback(const std::string& id)
     if (hasProp(PropDestroyed))
         return;
 
-    auto it = m_onDestroyCallbacks.find(id);
+    const auto it = m_onDestroyCallbacks.find(id);
     if (it != m_onDestroyCallbacks.end())
         m_onDestroyCallbacks.erase(it);
 }

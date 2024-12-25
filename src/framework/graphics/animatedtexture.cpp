@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 
 #include <utility>
 
-AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<uint16_t> framesDelay, uint16_t numPlays, bool buildMipmaps, bool compress)
+AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<uint16_t> framesDelay, const uint16_t numPlays, bool buildMipmaps, bool compress)
 {
     if (!setupSize(size))
         return;
@@ -37,7 +37,7 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
         m_frames.emplace_back(std::make_shared<Texture>(frame, buildMipmaps, compress));
     }
 
-    setProp(Prop::hasMipMaps, buildMipmaps);
+    setProp(hasMipMaps, buildMipmaps);
 
     m_framesDelay = std::move(framesDelay);
     m_numPlays = numPlays;
@@ -46,8 +46,8 @@ AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& 
 
 void AnimatedTexture::buildHardwareMipmaps()
 {
-    if (getProp(Prop::hasMipMaps)) return;
-    setProp(Prop::hasMipMaps, true);
+    if (getProp(hasMipMaps)) return;
+    setProp(hasMipMaps, true);
 
     g_mainDispatcher.addEvent([this] {
         for (const auto& frame : m_frames)

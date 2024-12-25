@@ -1,4 +1,4 @@
-﻿local UI = nil
+local UI = nil
 local virtualFloor = 7
 
 function showMap()

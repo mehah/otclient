@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@
 class ParticleAffector
 {
 public:
-    virtual ~ParticleAffector() {} // fix clang warning
+    virtual ~ParticleAffector() = default; // fix clang warning
 
     void update(float elapsedTime);
     virtual void load(const OTMLNodePtr& node);
@@ -44,7 +44,7 @@ protected:
     float m_elapsedTime{ 0 };
 };
 
-class GravityAffector : public ParticleAffector
+class GravityAffector final : public ParticleAffector
 {
 public:
     void load(const OTMLNodePtr& node) override;
@@ -55,7 +55,7 @@ private:
     float m_gravity{ 0 };
 };
 
-class AttractionAffector : public ParticleAffector
+class AttractionAffector final : public ParticleAffector
 {
 public:
     void load(const OTMLNodePtr& node) override;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,6 @@
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 
-#include <random>
 #include <zlib.h>
 
  //  result
@@ -63,19 +62,19 @@ class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
 public:
 
-    HttpSession(asio::io_service& service, const std::string& url, const std::string& agent,
+    HttpSession(asio::io_service& service, std::string url, std::string agent,
                 const bool& enable_time_out_on_read_write,
                 const std::unordered_map<std::string, std::string>& custom_header,
-                int timeout, bool isJson, bool checkContentLength, const HttpResult_ptr& result, HttpResult_cb callback) :
+                const int timeout, const bool isJson, const bool checkContentLength, HttpResult_ptr result, HttpResult_cb callback) :
         m_service(service),
-        m_url(url),
-        m_agent(agent),
+        m_url(std::move(url)),
+        m_agent(std::move(agent)),
         m_enable_time_out_on_read_write(enable_time_out_on_read_write),
         m_custom_header(custom_header),
         m_timeout(timeout),
         m_isJson(isJson),
         m_checkContentLength(checkContentLength),
-        m_result(result),
+        m_result(std::move(result)),
         m_callback(std::move(callback)),
         m_socket(service),
         m_resolver(service),
@@ -133,15 +132,15 @@ class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 {
 public:
 
-    WebsocketSession(asio::io_service& service, const std::string& url, const std::string& agent,
-                     const bool& enable_time_out_on_read_write, int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
+    WebsocketSession(asio::io_service& service, std::string url, std::string agent,
+                     const bool& enable_time_out_on_read_write, const int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
         m_service(service),
-        m_url(url),
-        m_agent(agent),
+        m_url(std::move(url)),
+        m_agent(std::move(agent)),
         m_enable_time_out_on_read_write(enable_time_out_on_read_write),
         m_timeout(timeout),
-        m_result(result),
-        m_callback(callback),
+        m_result(std::move(result)),
+        m_callback(std::move(callback)),
         m_timer(service),
         m_socket(service),
         m_resolver(service)
@@ -191,7 +190,7 @@ private:
 class Http
 {
 public:
-    Http() : m_ios(), m_guard(asio::make_work_guard(m_ios)) {}
+    Http() : m_guard(make_work_guard(m_ios)) {}
 
     void init();
     void terminate();
@@ -222,7 +221,7 @@ public:
 
     void addCustomHeader(const std::string& name, const std::string& value) { m_custom_header[name] = value; }
 
-    void setEnableTimeOutOnReadWrite(bool enable_time_out_on_read_write) { m_enable_time_out_on_read_write = enable_time_out_on_read_write; }
+    void setEnableTimeOutOnReadWrite(const bool enable_time_out_on_read_write) { m_enable_time_out_on_read_write = enable_time_out_on_read_write; }
 
 private:
     bool m_working = false;

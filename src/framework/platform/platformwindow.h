@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,9 @@
 
 #pragma once
 
-#include <framework/global.h>
 #include <framework/core/inputevent.h>
 #include <framework/core/timer.h>
+#include <framework/global.h>
 #include <framework/graphics/declarations.h>
 
  //@bindsingleton g_window
@@ -63,16 +63,16 @@ public:
     virtual void hideMouse() = 0;
     virtual void displayFatalError(const std::string_view /*message*/) {}
 
-    int loadMouseCursor(const std::string& file, const Point& hotSpot);
+    virtual int loadMouseCursor(const std::string& file, const Point& hotSpot);
     virtual void setMouseCursor(int cursorId) = 0;
     virtual void restoreMouseCursor() = 0;
 
-    virtual void setTitle(const std::string_view title) = 0;
+    virtual void setTitle(std::string_view title) = 0;
     virtual void setMinimumSize(const Size& minimumSize) = 0;
     virtual void setFullscreen(bool fullscreen) = 0;
     virtual void setVerticalSync(bool enable) = 0;
     virtual void setIcon(const std::string& iconFile) = 0;
-    virtual void setClipboardText(const std::string_view text) = 0;
+    virtual void setClipboardText(std::string_view text) = 0;
 
     virtual Size getDisplaySize() = 0;
     virtual std::string getClipboardText() = 0;
@@ -81,7 +81,7 @@ public:
     int getDisplayWidth() { return getDisplaySize().width(); }
     int getDisplayHeight() { return getDisplaySize().height(); }
     float getDisplayDensity() { return m_displayDensity; }
-    void setDisplayDensity(float v) { m_displayDensity = v; }
+    void setDisplayDensity(const float v) { m_displayDensity = v; }
 
     Size getUnmaximizedSize() { return m_unmaximizedSize; }
     Size getSize() { return m_size; }
@@ -95,8 +95,8 @@ public:
     Point getMousePosition() { return m_inputEvent.mousePos; }
     int getKeyboardModifiers() { return m_inputEvent.keyboardModifiers; }
 
-    bool isKeyPressed(Fw::Key keyCode) { return m_keyInfo[keyCode].state; }
-    bool isMouseButtonPressed(Fw::MouseButton mouseButton)
+    bool isKeyPressed(const Fw::Key keyCode) { return m_keyInfo[keyCode].state; }
+    bool isMouseButtonPressed(const Fw::MouseButton mouseButton)
     { if (mouseButton == Fw::MouseNoButton) return m_mouseButtonStates != 0; return (m_mouseButtonStates & (1u << mouseButton)) == (1u << mouseButton); }
     bool isVisible() { return m_visible; }
     bool isMaximized() { return m_maximized; }
@@ -111,7 +111,7 @@ public:
 
     void addKeyListener(std::function<void(const InputEvent&)> listener) { m_keyListeners.push_back(listener); }
 
-    void setKeyDelay(const Fw::Key key, uint8_t delay) { if (key < Fw::KeyLast) m_keyInfo[key].delay = delay; }
+    void setKeyDelay(const Fw::Key key, const uint8_t delay) { if (key < Fw::KeyLast) m_keyInfo[key].delay = delay; }
 
 protected:
 

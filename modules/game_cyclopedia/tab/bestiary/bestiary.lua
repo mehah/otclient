@@ -125,10 +125,7 @@ function Cyclopedia.CreateCreatureItems(data)
                 end
             end
 
-            local price, rarity = ItemsDatabase.getSellValueAndColor(itemWidget.id)
-            if price > 0 then
-                itemWidget:setImageSource("/images/ui/rarity_" .. rarity)
-            end
+            ItemsDatabase.setRarityItem(itemWidget, itemWidget:getItem())
 
             itemWidget.onMouseRelease = onAddLootClick
         end

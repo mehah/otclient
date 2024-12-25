@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
 
 #pragma once
 
+#include "declarations.h"
 #include <framework/core/inputevent.h>
 #include <framework/otml/declarations.h>
 #include <framework/platform/platform.h>
-#include "declarations.h"
 
  //@bindsingleton g_ui
 class UIManager
@@ -46,9 +46,9 @@ public:
     bool importStyle(const std::string& fl, bool checkDeviceStyles = true);
     void importStyleFromOTML(const OTMLNodePtr& styleNode);
     void importStyleFromOTML(const OTMLDocumentPtr& doc);
-    OTMLNodePtr getStyle(const std::string_view sn);
-    std::string getStyleName(const std::string_view styleName);
-    std::string getStyleClass(const std::string_view styleName);
+    OTMLNodePtr getStyle(std::string_view sn);
+    std::string getStyleName(std::string_view styleName);
+    std::string getStyleClass(std::string_view styleName);
     OTMLNodePtr findMainWidgetNode(const OTMLDocumentPtr& doc);
 
     UIWidgetPtr loadUI(const std::string& file, const UIWidgetPtr& parent);
@@ -56,12 +56,12 @@ public:
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::OperatingSystem os);
     OTMLNodePtr loadDeviceUI(const std::string& file, Platform::DeviceType deviceType);
     UIWidgetPtr displayUI(const std::string& file) { return loadUI(file, m_rootWidget); }
-    UIWidgetPtr createWidget(const std::string_view styleName, const UIWidgetPtr& parent);
+    UIWidgetPtr createWidget(std::string_view styleName, const UIWidgetPtr& parent);
     UIWidgetPtr createWidgetFromOTML(const OTMLNodePtr& widgetNode, const UIWidgetPtr& parent);
 
     void setMouseReceiver(const UIWidgetPtr& widget) { m_mouseReceiver = widget; }
     void setKeyboardReceiver(const UIWidgetPtr& widget) { m_keyboardReceiver = widget; }
-    void setDebugBoxesDrawing(bool enabled) { m_drawDebugBoxes = enabled; }
+    void setDebugBoxesDrawing(const bool enabled) { m_drawDebugBoxes = enabled; }
     void resetMouseReceiver() { m_mouseReceiver = m_rootWidget; }
     void resetKeyboardReceiver() { m_keyboardReceiver = m_rootWidget; }
     UIWidgetPtr getMouseReceiver() { return m_mouseReceiver; }

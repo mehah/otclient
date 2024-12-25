@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 
-void UIEffect::drawSelf(DrawPoolType drawPane)
+void UIEffect::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -52,7 +52,7 @@ void UIEffect::drawSelf(DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UIEffect::setEffectId(int id)
+void UIEffect::setEffectId(const int id)
 {
     if (id == 0)
         m_effect = nullptr;

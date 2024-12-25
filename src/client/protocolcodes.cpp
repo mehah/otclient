@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ namespace Proto
 {
     stdext::map<uint8_t, uint8_t > messageModesMap;
 
-    void buildMessageModesMap(int version)
+    void buildMessageModesMap(const int version)
     {
         messageModesMap.clear();
 
@@ -224,15 +224,15 @@ namespace Proto
         }
     }
 
-    Otc::MessageMode translateMessageModeFromServer(uint8_t mode)
+    Otc::MessageMode translateMessageModeFromServer(const uint8_t mode)
     {
-        const auto it = std::find_if(messageModesMap.begin(), messageModesMap.end(), [=](const std::pair<uint8_t, uint8_t >& p) { return p.second == mode; });
+        const auto it = std::ranges::find_if(messageModesMap, [=](const std::pair<uint8_t, uint8_t >& p) { return p.second == mode; });
         if (it != messageModesMap.end())
             return static_cast<Otc::MessageMode>(it->first);
         return Otc::MessageInvalid;
     }
 
-    uint8_t translateMessageModeToServer(Otc::MessageMode mode)
+    uint8_t translateMessageModeToServer(const Otc::MessageMode mode)
     {
         if (mode >= Otc::LastMessage)
             return Otc::MessageInvalid;

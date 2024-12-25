@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,26 +24,26 @@
 #include <framework/otml/otmlnode.h>
 
  // bool
-int push_luavalue(bool b)
+int push_luavalue(const bool b)
 {
     g_lua.pushBoolean(b);
     return 1;
 }
 
-bool luavalue_cast(int index, bool& b)
+bool luavalue_cast(const int index, bool& b)
 {
     b = g_lua.toBoolean(index);
     return true;
 }
 
 // int
-int push_luavalue(int i)
+int push_luavalue(const int i)
 {
     g_lua.pushInteger(i);
     return 1;
 }
 
-bool luavalue_cast(int index, int& i)
+bool luavalue_cast(const int index, int& i)
 {
     i = g_lua.toInteger(index);
     if (i == 0 && !g_lua.isNumber(index) && !g_lua.isNil())
@@ -52,13 +52,13 @@ bool luavalue_cast(int index, int& i)
 }
 
 // double
-int push_luavalue(double d)
+int push_luavalue(const double d)
 {
     g_lua.pushNumber(d);
     return 1;
 }
 
-bool luavalue_cast(int index, double& d)
+bool luavalue_cast(const int index, double& d)
 {
     d = g_lua.toNumber(index);
     if (d == 0 && !g_lua.isNumber(index) && !g_lua.isNil())
@@ -73,7 +73,7 @@ int push_luavalue(const std::string_view str)
     return 1;
 }
 
-bool luavalue_cast(int index, std::string& str)
+bool luavalue_cast(const int index, std::string& str)
 {
     str = g_lua.toString(index);
     return true;
@@ -101,7 +101,7 @@ int push_luavalue(const Color& color)
     return 1;
 }
 
-bool luavalue_cast(int index, Color& color)
+bool luavalue_cast(const int index, Color& color)
 {
     if (g_lua.isTable(index)) {
         g_lua.getField("r", index);
@@ -139,7 +139,7 @@ int push_luavalue(const Rect& rect)
     return 1;
 }
 
-bool luavalue_cast(int index, Rect& rect)
+bool luavalue_cast(const int index, Rect& rect)
 {
     if (g_lua.isTable(index)) {
         g_lua.getField("x", index);
@@ -173,7 +173,7 @@ int push_luavalue(const Point& point)
     return 1;
 }
 
-bool luavalue_cast(int index, Point& point)
+bool luavalue_cast(const int index, Point& point)
 {
     if (g_lua.isTable(index)) {
         g_lua.getField("x", index);
@@ -203,7 +203,7 @@ int push_luavalue(const Size& size)
     return 1;
 }
 
-bool luavalue_cast(int index, Size& size)
+bool luavalue_cast(const int index, Size& size)
 {
     if (g_lua.isTable(index)) {
         g_lua.getField("width", index);
@@ -233,7 +233,7 @@ int push_luavalue(const Platform::Device& device)
     return 1;
 }
 
-bool luavalue_cast(int index, Platform::Device& device)
+bool luavalue_cast(const int index, Platform::Device& device)
 {
     if (g_lua.isTable(index)) {
         g_lua.getField("type", index);
@@ -310,7 +310,7 @@ int push_luavalue(const OTMLNodePtr& node)
     return 1;
 }
 
-bool luavalue_cast(int index, OTMLNodePtr& node)
+bool luavalue_cast(const int index, OTMLNodePtr& node)
 {
     node = OTMLNode::create();
     node->setUnique(true);
@@ -352,7 +352,7 @@ bool luavalue_cast(int index, OTMLNodePtr& node)
 }
 
 // object ptr
-bool luavalue_cast(int index, LuaObjectPtr& obj)
+bool luavalue_cast(const int index, LuaObjectPtr& obj)
 {
     if (g_lua.isUserdata(index)) {
         obj = g_lua.toObject(index);

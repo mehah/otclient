@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,7 @@ void OutputMessage::setBuffer(const std::string& buffer)
     m_messageSize += len;
 }
 
-void OutputMessage::addU8(uint8_t value)
+void OutputMessage::addU8(const uint8_t value)
 {
     checkWrite(1);
     m_buffer[m_writePos] = value;
@@ -48,7 +48,7 @@ void OutputMessage::addU8(uint8_t value)
     m_messageSize += 1;
 }
 
-void OutputMessage::addU16(uint16_t value)
+void OutputMessage::addU16(const uint16_t value)
 {
     checkWrite(2);
     stdext::writeULE16(m_buffer + m_writePos, value);
@@ -56,7 +56,7 @@ void OutputMessage::addU16(uint16_t value)
     m_messageSize += 2;
 }
 
-void OutputMessage::addU32(uint32_t value)
+void OutputMessage::addU32(const uint32_t value)
 {
     checkWrite(4);
     stdext::writeULE32(m_buffer + m_writePos, value);
@@ -64,7 +64,7 @@ void OutputMessage::addU32(uint32_t value)
     m_messageSize += 4;
 }
 
-void OutputMessage::addU64(uint64_t value)
+void OutputMessage::addU64(const uint64_t value)
 {
     checkWrite(8);
     stdext::writeULE64(m_buffer + m_writePos, value);
@@ -84,7 +84,7 @@ void OutputMessage::addString(const std::string_view buffer)
     m_messageSize += len;
 }
 
-void OutputMessage::addPaddingBytes(int bytes, uint8_t byte)
+void OutputMessage::addPaddingBytes(const int bytes, const uint8_t byte)
 {
     if (bytes <= 0)
         return;
@@ -113,7 +113,7 @@ void OutputMessage::writeChecksum()
     m_messageSize += 4;
 }
 
-void OutputMessage::writeSequence(uint32_t sequence)
+void OutputMessage::writeSequence(const uint32_t sequence)
 {
     assert(m_headerPos >= 4);
     m_headerPos -= 4;
@@ -129,12 +129,12 @@ void OutputMessage::writeMessageSize()
     m_messageSize += 2;
 }
 
-bool OutputMessage::canWrite(int bytes) const
+bool OutputMessage::canWrite(const int bytes) const
 {
     return m_writePos + bytes <= BUFFER_MAXSIZE;
 }
 
-void OutputMessage::checkWrite(int bytes)
+void OutputMessage::checkWrite(const int bytes)
 {
     if (!canWrite(bytes))
         throw stdext::exception("OutputMessage max buffer size reached");

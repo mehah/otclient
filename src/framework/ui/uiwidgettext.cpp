@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,11 @@
  * THE SOFTWARE.
  */
 
-#include <framework/core/graphicalapplication.h>
+#include "uitranslator.h"
+#include "uiwidget.h"
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
 #include <regex>
-#include "uitranslator.h"
-#include "uiwidget.h"
 
 void UIWidget::initText()
 {
@@ -139,7 +138,7 @@ void UIWidget::onTextChange(const std::string_view text, const std::string_view 
 
 void UIWidget::onFontChange(const std::string_view font) { callLuaField("onFontChange", font); }
 
-void UIWidget::setText(const std::string_view text, bool dontFireLuaCall)
+void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 {
     std::string _text{ text.data() };
     if (hasProp(PropTextOnlyUpperCase))
@@ -168,7 +167,7 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     m_colorCoordsBuffer.clear();
     m_coordsBuffer->clear();
 
-    std::regex exp("\\{([^\\}]+),[ ]*([^\\}]+)\\}");
+    std::regex exp(R"(\{([^\}]+),[ ]*([^\}]+)\})");
 
     std::string _text{ coloredText.data() };
 
@@ -178,17 +177,17 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     while (std::regex_search(_text, res, exp)) {
         std::string prefix = res.prefix().str();
         if (prefix.size() > 0) {
-            m_textColors.push_back(std::make_pair(text.size(), baseColor));
+            m_textColors.emplace_back(text.size(), baseColor);
             text = text + prefix;
         }
         auto color = Color(res[2].str());
-        m_textColors.push_back(std::make_pair(text.size(), color));
+        m_textColors.emplace_back(text.size(), color);
         text = text + res[1].str();
         _text = res.suffix();
     }
 
     if (_text.size() > 0) {
-        m_textColors.push_back(std::make_pair(text.size(), baseColor));
+        m_textColors.emplace_back(text.size(), baseColor);
         text = text + _text;
     }
 

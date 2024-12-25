@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ class ParticleManager
 {
 public:
     bool importParticle(std::string file);
-    ParticleEffectPtr createEffect(const std::string_view name);
+    ParticleEffectPtr createEffect(std::string_view name);
     void terminate();
 
     void poll();

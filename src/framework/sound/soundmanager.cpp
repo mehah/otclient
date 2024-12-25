@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,18 @@
  */
 
 #include "soundmanager.h"
-#include "combinedsoundsource.h"
 #include "soundbuffer.h"
+#include "soundeffect.h"
 #include "soundfile.h"
 #include "streamsoundsource.h"
-#include "soundeffect.h"
+#include "combinedsoundsource.h"
 
 #include <cstdint>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
+
+#include "soundchannel.h"
 
 class StreamSoundSource;
 class CombinedSoundSource;
@@ -150,7 +151,7 @@ void SoundManager::poll()
     }
 }
 
-void SoundManager::setAudioEnabled(bool enable)
+void SoundManager::setAudioEnabled(const bool enable)
 {
     if (m_audioEnabled == enable)
         return;
@@ -184,7 +185,7 @@ void SoundManager::preload(std::string filename)
         m_buffers[filename] = buffer;
 }
 
-SoundSourcePtr SoundManager::play(const std::string& fn, float fadetime, float gain, float pitch)
+SoundSourcePtr SoundManager::play(const std::string& fn, const float fadetime, float gain, float pitch)
 {
     if (!m_audioEnabled)
         return nullptr;
@@ -328,7 +329,7 @@ void SoundManager::setPosition(const Point& pos)
 
 SoundEffectPtr SoundManager::createSoundEffect()
 {
-    SoundEffectPtr soundEffect = std::make_shared<SoundEffect>(m_device);
+    auto soundEffect = std::make_shared<SoundEffect>(m_device);
     return soundEffect;
 }
 
@@ -336,7 +337,6 @@ bool SoundManager::isEaxEnabled()
 {
     if (alGetEnumValue("AL_EFFECT_EAXREVERB") != 0) {
         return true;
-    } else {
-        return false;
     }
+    return false;
 }

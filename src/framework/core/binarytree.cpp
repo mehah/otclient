@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -82,7 +82,7 @@ BinaryTreeVec BinaryTree::getChildren()
     }
 }
 
-void BinaryTree::seek(uint32_t pos)
+void BinaryTree::seek(const uint32_t pos)
 {
     unserialize();
     if (pos > m_buffer.size())
@@ -90,7 +90,7 @@ void BinaryTree::seek(uint32_t pos)
     m_pos = pos;
 }
 
-void BinaryTree::skip(uint32_t len)
+void BinaryTree::skip(const uint32_t len)
 {
     unserialize();
     seek(tell() + len);
@@ -163,19 +163,19 @@ OutputBinaryTree::OutputBinaryTree(FileStreamPtr fin) : m_fin(std::move(fin))
     startNode(0);
 }
 
-void OutputBinaryTree::addU8(uint8_t v)
+void OutputBinaryTree::addU8(const uint8_t v)
 {
     write(&v, 1);
 }
 
-void OutputBinaryTree::addU16(uint16_t v)
+void OutputBinaryTree::addU16(const uint16_t v)
 {
     uint8_t data[2];
     stdext::writeULE16(data, v);
     write(data, 2);
 }
 
-void OutputBinaryTree::addU32(uint32_t v)
+void OutputBinaryTree::addU32(const uint32_t v)
 {
     uint8_t data[4];
     stdext::writeULE32(data, v);
@@ -191,7 +191,7 @@ void OutputBinaryTree::addString(const std::string_view v)
     write((const uint8_t*)v.data(), v.length());
 }
 
-void OutputBinaryTree::addPos(uint16_t x, uint16_t y, uint8_t z)
+void OutputBinaryTree::addPos(const uint16_t x, const uint16_t y, const uint8_t z)
 {
     addU16(x);
     addU16(y);
@@ -204,7 +204,7 @@ void OutputBinaryTree::addPoint(const Point& point)
     addU8(point.y);
 }
 
-void OutputBinaryTree::startNode(uint8_t node)
+void OutputBinaryTree::startNode(const uint8_t node)
 {
     m_fin->addU8(static_cast<uint8_t>(BinaryTree::Node::START));
     write(&node, 1);
@@ -215,7 +215,7 @@ void OutputBinaryTree::endNode() const
     m_fin->addU8(static_cast<uint8_t>(BinaryTree::Node::END));
 }
 
-void OutputBinaryTree::write(const uint8_t* data, size_t size) const
+void OutputBinaryTree::write(const uint8_t* data, const size_t size) const
 {
     for (size_t i = 0; i < size; ++i) {
         if (const auto v = static_cast<BinaryTree::Node>(data[i]);

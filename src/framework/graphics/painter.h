@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,7 @@ public:
 
     void setColor(const Color& color) { if (m_color != color) m_color = color; }
     void setTexture(Texture* texture);
-    void setOpacity(float opacity) { m_opacity = opacity; }
+    void setOpacity(const float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
     void setResolution(const Size& resolution, const Matrix3& projectionMatrix = DEFAULT_MATRIX3);
     void setDrawProgram(PainterShaderProgram* drawProgram) { m_drawProgram = drawProgram; }

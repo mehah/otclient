@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "mapview.h"
 
 #include "animatedtext.h"
+#include "client.h"
 #include "creature.h"
 #include "game.h"
 #include "lightview.h"
@@ -30,16 +31,16 @@
 #include "missile.h"
 #include "statictext.h"
 #include "tile.h"
-#include "client.h"
 
-#include <framework/core/application.h>
+#include "framework/graphics/texturemanager.h"
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/graphics.h>
-#include "framework/graphics/texturemanager.h"
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
+
+#include <algorithm>
 
 MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_drawPool.get(DrawPoolType::MAP))
 {
@@ -120,7 +121,7 @@ void MapView::drawFloor()
 {
     const auto& cameraPosition = m_posInfo.camera;
 
-    uint32_t flags = Otc::DrawThings;
+    const uint32_t flags = Otc::DrawThings;
 
     for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
         const float fadeLevel = getFadeLevel(z);
@@ -315,20 +316,20 @@ void MapView::updateVisibleTiles()
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
         m_fadeType = FadeType::NONE$;
         for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
-            m_floors[iz].fadingTimers.restart(m_floorFading * 1000);
+            m_floors[iz].fadingTimers.restart(m_floorFading);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
         m_fadeType = FadeType::OUT$;
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
-            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.elapsed_millis());
-            m_floors[iz].fadingTimers.restart(shift * 1000);
+            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
+            m_floors[iz].fadingTimers.restart(shift);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
         m_fadeType = FadeType::IN$;
         m_fadeFinish = false;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
-            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.elapsed_millis());
-            m_floors[iz].fadingTimers.restart(shift * 1000);
+            const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
+            m_floors[iz].fadingTimers.restart(shift);
         }
     }
 
@@ -450,16 +451,16 @@ void MapView::updateGeometry(const Size& visibleDimension)
         m_lightView->resize(lightSize, tileSize);
     }
 
-    g_mainDispatcher.addEvent([this, bufferSize]() {
+    g_mainDispatcher.addEvent([this, bufferSize] {
         m_pool->getFrameBuffer()->resize(bufferSize);
     });
 
     const uint8_t left = std::min<uint8_t>(g_map.getAwareRange().left, (m_drawDimension.width() / 2) - 1);
     const uint8_t top = std::min<uint8_t>(g_map.getAwareRange().top, (m_drawDimension.height() / 2) - 1);
-    const uint8_t right = static_cast<uint8_t>(left + 1);
-    const uint8_t bottom = static_cast<uint8_t>(top + 1);
+    const auto right = static_cast<uint8_t>(left + 1);
+    const auto bottom = static_cast<uint8_t>(top + 1);
 
-    m_posInfo.awareRange = { left, top, right, bottom };
+    m_posInfo.awareRange = { .left = left, .top = top, .right = right, .bottom = bottom };
 
     updateViewportDirectionCache();
     updateViewport();
@@ -536,7 +537,7 @@ void MapView::onMapCenterChange(const Position& /*newPos*/, const Position& /*ol
     requestUpdateVisibleTiles();
 }
 
-void MapView::lockFirstVisibleFloor(uint8_t firstVisibleFloor)
+void MapView::lockFirstVisibleFloor(const uint8_t firstVisibleFloor)
 {
     m_lockedFirstVisibleFloor = firstVisibleFloor;
     requestUpdateVisibleTiles();
@@ -575,7 +576,7 @@ void MapView::setVisibleDimension(const Size& visibleDimension)
     updateGeometry(visibleDimension);
 }
 
-void MapView::setFloorViewMode(FloorViewMode floorViewMode)
+void MapView::setFloorViewMode(const FloorViewMode floorViewMode)
 {
     m_floorViewMode = floorViewMode;
 
@@ -587,7 +588,7 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
-    g_mainDispatcher.addEvent([=, this]() {
+    g_mainDispatcher.addEvent([=, this] {
         m_pool->getFrameBuffer()->setSmooth(mode != ANTIALIASING_DISABLED);
     });
 
@@ -612,7 +613,7 @@ void MapView::setCameraPosition(const Position& pos)
 
 Position MapView::getPosition(const Point& mousePos)
 {
-    auto newMousePos = mousePos * g_window.getDisplayDensity();
+    const auto newMousePos = mousePos * g_window.getDisplayDensity();
     if (!m_posInfo.rect.contains(newMousePos))
         return {};
 
@@ -647,7 +648,7 @@ Position MapView::getPosition(const Point& point, const Size& mapSize)
     return position;
 }
 
-void MapView::move(int32_t x, int32_t y)
+void MapView::move(const int32_t x, const int32_t y)
 {
     m_moveOffset.x += x;
     m_moveOffset.y += y;
@@ -693,7 +694,7 @@ Rect MapView::calcFramebufferSource(const Size& destSize)
     return Rect(drawOffset, srcSize);
 }
 
-uint8_t MapView::calcFirstVisibleFloor(bool checkLimitsFloorsView) const
+uint8_t MapView::calcFirstVisibleFloor(const bool checkLimitsFloorsView) const
 {
     uint8_t z = g_gameConfig.getMapSeaFloor();
     // return forced first visible floor
@@ -792,7 +793,7 @@ TilePtr MapView::getTopTile(Position tilePos) const
     return nullptr;
 }
 
-void MapView::setShader(const std::string_view name, float fadein, float fadeout)
+void MapView::setShader(const std::string_view name, const float fadein, const float fadeout)
 {
     const auto& shader = g_shaders.getShader(name);
 
@@ -817,7 +818,7 @@ void MapView::setShader(const std::string_view name, float fadein, float fadeout
     });
 }
 
-void MapView::setDrawLights(bool enable)
+void MapView::setDrawLights(const bool enable)
 {
     m_drawingLight = enable;
 
@@ -877,12 +878,12 @@ void MapView::updateViewportDirectionCache()
 }
 
 Position MapView::getCameraPosition() { return isFollowingCreature() ? m_followingCreature->getPosition() : m_customCameraPosition; }
-std::vector<CreaturePtr> MapView::getSightSpectators(bool multiFloor)
+std::vector<CreaturePtr> MapView::getSightSpectators(const bool multiFloor)
 {
     return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2);
 }
 
-std::vector<CreaturePtr> MapView::getSpectators(bool multiFloor)
+std::vector<CreaturePtr> MapView::getSpectators(const bool multiFloor)
 {
     return g_map.getSpectatorsInRangeEx(getCameraPosition(), multiFloor, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom);
 }
@@ -909,12 +910,12 @@ void MapView::destroyHighlightTile() {
 void MapView::addForegroundTile(const TilePtr& tile) {
     std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
 
-    if (std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile) == m_foregroundTiles.end())
+    if (std::ranges::find(m_foregroundTiles, tile) == m_foregroundTiles.end())
         m_foregroundTiles.emplace_back(tile);
 }
 void MapView::removeForegroundTile(const TilePtr& tile) {
     std::scoped_lock l(g_drawPool.get(DrawPoolType::FOREGROUND_MAP)->getMutex());
-    const auto it = std::find(m_foregroundTiles.begin(), m_foregroundTiles.end(), tile);
+    const auto it = std::ranges::find(m_foregroundTiles, tile);
     if (it == m_foregroundTiles.end())
         return;
 

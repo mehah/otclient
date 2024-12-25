@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include "math.h"
 #include <algorithm>
 #include <climits>
 #include <cmath>
@@ -49,7 +48,7 @@ namespace stdext
         return (b << 16) | a;
     }
 
-    int random_range(int min, int max)
+    int random_range(const int min, const int max)
     {
         static std::random_device rd;
         static std::mt19937 gen(rd());
@@ -57,7 +56,7 @@ namespace stdext
         return min + (dis(gen) % (max - min + 1));
     }
 
-    float random_range(float min, float max)
+    float random_range(const float min, const float max)
     {
         static std::random_device rd;
         static std::mt19937 gen(rd());
@@ -67,24 +66,24 @@ namespace stdext
 
     std::mt19937& random_gen()
     {
-	    static std::random_device rd;
-	    static std::mt19937 generator(rd());
-	    return generator;
+        static std::random_device rd;
+        static std::mt19937 generator(rd());
+        return generator;
     }
 
-    bool random_bool(double probability)
+    bool random_bool(const double probability)
     {
-	    static std::bernoulli_distribution booleanRand;
-	    return booleanRand(random_gen(), std::bernoulli_distribution::param_type(probability));
+        static std::bernoulli_distribution booleanRand;
+        return booleanRand(random_gen(), std::bernoulli_distribution::param_type(probability));
     }
 
-    int32_t normal_random(int32_t minNumber, int32_t maxNumber)
+    int32_t normal_random(const int32_t minNumber, const int32_t maxNumber)
     {
-        static std::normal_distribution<float> normalRand(0.5f, 0.25f);
+        static std::normal_distribution normalRand(0.5f, 0.25f);
 
         float v;
         do {
-            v = normalRand(stdext::random_gen());
+            v = normalRand(random_gen());
         } while (v < 0.0 || v > 1.0);
 
         auto&& [a, b] = std::minmax(minNumber, maxNumber);

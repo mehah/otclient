@@ -124,18 +124,22 @@ function ShaderController:onInit()
     for _, opts in pairs(MOUNT_SHADERS) do
         registerShader(opts, 'setupMountShader')
     end
+    Keybind.new('Windows', 'show/hide Shader Windows', HOTKEY, '')
+    Keybind.bind('Windows', 'show/hide Shader Windows', {
+        {
+          type = KEY_DOWN,
+          callback = function() ShaderController.ui:setVisible(not ShaderController.ui:isVisible()) end,
+         }
+    })
 end
 
 function ShaderController:onTerminate()
     g_shaders.clear()
+    Keybind.delete('Windows', 'show/hide Shader Windows')
 end
 
 function ShaderController:onGameStart()
     attachShaders()
-
-    self:bindKeyDown(HOTKEY, function()
-        ShaderController.ui:setVisible(not ShaderController.ui:isVisible())
-    end)
 
     self:loadHtml('shaders.html', modules.game_interface.getMapPanel())
 

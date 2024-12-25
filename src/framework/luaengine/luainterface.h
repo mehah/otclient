@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,13 @@
 #include <luajit/lua.hpp>
 #elif __has_include(<lua.hpp>)
 #include <lua.hpp>
+#elif defined(__EMSCRIPTEN__)
+extern "C" {
+#include <lua51/lua.h>
+#include <lua51/lualib.h>
+#include <lua51/lauxlib.h>
+}
+#define LUAJIT_VERSION = "LUA 5.1"
 #else
 #error "Cannot detect luajit library"
 #endif
@@ -62,23 +69,23 @@ public:
     void terminate();
 
     // functions that will register all script stuff in lua global environment
-    void registerSingletonClass(const std::string_view className);
-    void registerClass(const std::string_view className, const std::string_view baseClass = "LuaObject");
+    void registerSingletonClass(std::string_view className);
+    void registerClass(std::string_view className, std::string_view baseClass = "LuaObject");
 
-    void registerClassStaticFunction(const std::string_view className,
-                                     const std::string_view functionName,
+    void registerClassStaticFunction(std::string_view className,
+                                     std::string_view functionName,
                                      const LuaCppFunction& function);
 
-    void registerClassMemberFunction(const std::string_view className,
-                                     const std::string_view functionName,
+    void registerClassMemberFunction(std::string_view className,
+                                     std::string_view functionName,
                                      const LuaCppFunction& function);
 
-    void registerClassMemberField(const std::string_view className,
-                                  const std::string_view field,
+    void registerClassMemberField(std::string_view className,
+                                  std::string_view field,
                                   const LuaCppFunction& getFunction,
                                   const LuaCppFunction& setFunction);
 
-    void registerGlobalFunction(const std::string_view functionName,
+    void registerGlobalFunction(std::string_view functionName,
                                 const LuaCppFunction& function);
 
     // register shortcuts using templates
@@ -110,37 +117,37 @@ public:
 
     // methods for binding functions
     template<class C, typename F>
-    void bindSingletonFunction(const std::string_view functionName, F C::* function, C* instance);
+    void bindSingletonFunction(std::string_view functionName, F C::* function, C* instance);
     template<class C, typename F>
-    void bindSingletonFunction(const std::string_view className, const std::string_view functionName, F C::* function, C* instance);
+    void bindSingletonFunction(std::string_view className, std::string_view functionName, F C::* function, C* instance);
 
     template<class C, typename F>
-    void bindClassStaticFunction(const std::string_view functionName, const F& function);
+    void bindClassStaticFunction(std::string_view functionName, const F& function);
     template<typename F>
-    void bindClassStaticFunction(const std::string_view className, const std::string_view functionName, const F& function);
+    void bindClassStaticFunction(std::string_view className, std::string_view functionName, const F& function);
 
     template<class C, typename F, class FC>
-    void bindClassMemberFunction(const std::string_view functionName, F FC::* function);
+    void bindClassMemberFunction(std::string_view functionName, F FC::* function);
     template<class C, typename F, class FC>
-    void bindClassMemberFunction(const std::string_view className, const std::string_view functionName, F FC::* function);
+    void bindClassMemberFunction(std::string_view className, std::string_view functionName, F FC::* function);
 
     template<class C, typename F1, typename F2, class FC>
-    void bindClassMemberField(const std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
+    void bindClassMemberField(std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
     template<class C, typename F1, typename F2, class FC>
-    void bindClassMemberField(const std::string_view className, const std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
+    void bindClassMemberField(std::string_view className, std::string_view fieldName, F1 FC::* getFunction, F2 FC::* setFunction);
 
     template<class C, typename F, class FC>
-    void bindClassMemberGetField(const std::string_view fieldName, F FC::* getFunction);
+    void bindClassMemberGetField(std::string_view fieldName, F FC::* getFunction);
     template<class C, typename F, class FC>
-    void bindClassMemberGetField(const std::string_view className, const std::string_view fieldName, F FC::* getFunction);
+    void bindClassMemberGetField(std::string_view className, std::string_view fieldName, F FC::* getFunction);
 
     template<class C, typename F, class FC>
-    void bindClassMemberSetField(const std::string_view fieldName, F FC::* setFunction);
+    void bindClassMemberSetField(std::string_view fieldName, F FC::* setFunction);
     template<class C, typename F, class FC>
-    void bindClassMemberSetField(const std::string_view className, const std::string_view fieldName, F FC::* setFunction);
+    void bindClassMemberSetField(std::string_view className, std::string_view fieldName, F FC::* setFunction);
 
     template<typename F>
-    void bindGlobalFunction(const std::string_view functionName, const F& function);
+    void bindGlobalFunction(std::string_view functionName, const F& function);
 
 private:
     /// Metamethod that will retrieve fields values (that include functions) from the object when using '.' or ':'
@@ -165,7 +172,7 @@ public:
 
     /// Loads and runs the script from buffer
     /// @exception LuaException is thrown on any lua error
-    void runBuffer(const std::string_view buffer, const std::string_view source);
+    void runBuffer(std::string_view buffer, std::string_view source);
 
     /// Loads a script file and pushes it's main function onto stack,
     /// @exception LuaException is thrown on any lua error
@@ -173,22 +180,22 @@ public:
 
     /// Loads a function from buffer and pushes it onto stack,
     /// @exception LuaException is thrown on any lua error
-    void loadFunction(const std::string_view buffer, const std::string_view source = "lua function buffer");
+    void loadFunction(std::string_view buffer, std::string_view source = "lua function buffer");
 
     /// Evaluates a lua expression and pushes the result value onto the stack
     /// @exception LuaException is thrown on any lua error
-    void evaluateExpression(const std::string_view expression, const std::string_view source = "lua expression");
+    void evaluateExpression(std::string_view expression, std::string_view source = "lua expression");
 
     /// Generates a traceback message for the current call stack
     /// @param errorMessage is an additional error message
     /// @param level is the level of the traceback, 0 means trace from calling function
     /// @return the generated traceback message
-    std::string traceback(const std::string_view errorMessage = "", int level = 0);
+    std::string traceback(std::string_view errorMessage = "", int level = 0);
 
     /// Throw a lua error if inside a lua call or generates an C++ stdext::exception
     /// @param message is the error message wich will be displayed before the error traceback
     /// @exception stdext::exception is thrown with the error message if the error is not captured by lua
-    void throwError(const std::string_view message);
+    void throwError(std::string_view message);
 
     /// Searches for the source of the current running function
     std::string getCurrentSourcePath(int level = 0);
@@ -213,13 +220,13 @@ public:
     int newSandboxEnv();
 
     template<typename... T>
-    int luaCallGlobalField(const std::string_view global, const std::string_view field, const T&... args);
+    int luaCallGlobalField(std::string_view global, std::string_view field, const T&... args);
 
     template<typename... T>
-    void callGlobalField(const std::string_view global, const std::string_view field, const T&... args);
+    void callGlobalField(std::string_view global, std::string_view field, const T&... args);
 
     template<typename R, typename... T>
-    R callGlobalField(const std::string_view global, const std::string_view field, const T&... args);
+    R callGlobalField(std::string_view global, std::string_view field, const T&... args);
 
     bool isInCppCallback() const { return m_cppCallbackDepth != 0; }
 
@@ -258,7 +265,7 @@ public:
 
     void collectGarbage() const;
 
-    void loadBuffer(const std::string_view buffer, const std::string_view source);
+    void loadBuffer(std::string_view buffer, std::string_view source);
 
     int pcall(int numArgs = 0, int numRets = 0, int errorFuncIndex = 0);
     void call(int numArgs = 0, int numRets = 0);
@@ -289,8 +296,8 @@ public:
     void setMetatable(int index = -2);
     void getMetatable(int index = -1);
 
-    void getField(const std::string_view key, int index = -1);
-    void setField(const std::string_view key, int index = -2);
+    void getField(std::string_view key, int index = -1);
+    void setField(std::string_view key, int index = -2);
 
     void getTable(int index = -2);
     void setTable(int index = -3);
@@ -299,9 +306,9 @@ public:
     void getEnv(int index = -1);
     void setEnv(int index = -2);
 
-    void getGlobal(const std::string_view key) const;
-    void getGlobalField(const std::string_view globalKey, const std::string_view fieldKey);
-    void setGlobal(const std::string_view key);
+    void getGlobal(std::string_view key) const;
+    void getGlobalField(std::string_view globalKey, std::string_view fieldKey);
+    void setGlobal(std::string_view key);
 
     void rawGet(int index = -1);
     void rawGeti(int n, int index = -1);
@@ -325,7 +332,7 @@ public:
     void pushInteger(long v);
     void pushNumber(double v);
     void pushBoolean(bool v);
-    void pushString(const std::string_view v);
+    void pushString(std::string_view v);
     void pushLightUserdata(void* p);
     void pushThread();
     void pushValue(int index = -1);
@@ -340,7 +347,7 @@ public:
     bool isTable(int index = -1);
     bool isFunction(int index = -1);
     bool isCFunction(int index = -1);
-    bool isLuaFunction(int index = -1) { return (isFunction(index) && !isCFunction(index)); }
+    bool isLuaFunction(const int index = -1) { return (isFunction(index) && !isCFunction(index)); }
     bool isUserdata(int index = -1);
 
     bool toBoolean(int index = -1);
@@ -354,7 +361,7 @@ public:
     int getTop() const;
     int stackSize() const { return getTop(); }
     void clearStack() { pop(stackSize()); }
-    bool hasIndex(int index) { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
+    bool hasIndex(const int index) { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
 
     std::string getSource(int level = 2);
 

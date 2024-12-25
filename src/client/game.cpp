@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,6 @@
  */
 
 #include "game.h"
-#include <framework/core/application.h>
-#include <framework/core/eventdispatcher.h>
 #include "container.h"
 #include "creature.h"
 #include "localplayer.h"
@@ -30,9 +28,11 @@
 #include "map.h"
 #include "protocolcodes.h"
 #include "protocolgame.h"
+#include <framework/core/application.h>
+#include <framework/core/eventdispatcher.h>
 
-#include "tile.h"
 #include "framework/core/graphicalapplication.h"
+#include "tile.h"
 
 Game g_game;
 
@@ -384,7 +384,7 @@ void Game::processVipStateChange(const uint32_t id, const uint32_t status)
     g_lua.callGlobalField("g_game", "onVipStateChange", id, status, groupID);
 }
 
-void Game::processVipGroupChange(const std::vector<std::tuple<uint8_t, std::string, bool>>& vipGroups, uint8_t groupsAmountLeft)
+void Game::processVipGroupChange(const std::vector<std::tuple<uint8_t, std::string, bool>>& vipGroups, const uint8_t groupsAmountLeft)
 {
     g_lua.callGlobalField("g_game", "onVipGroupChange", vipGroups, groupsAmountLeft);
 }
@@ -478,7 +478,7 @@ void Game::processQuestLog(const std::vector<std::tuple<uint16_t, std::string, b
     g_lua.callGlobalField("g_game", "onQuestLog", questList);
 }
 
-void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string, std::string>>& questMissions)
+void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view, uint16_t>>& questMissions)
 {
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
@@ -525,7 +525,7 @@ void Game::processCyclopediaCharacterItemSummary(const CyclopediaCharacterItemSu
 }
 
 void Game::processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits,
-                                                const std::vector<CharacterInfoMounts>& mounts, std::vector<CharacterInfoFamiliar>& familiars)
+                                                const std::vector<CharacterInfoMounts>& mounts, const std::vector<CharacterInfoFamiliar>& familiars)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterAppearances", currentOutfit, outfits, mounts, familiars);
 }
@@ -581,7 +581,7 @@ void Game::processWalkCancel(const Otc::Direction direction)
     m_localPlayer->cancelWalk(direction);
 }
 
-void Game::loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey)
+void Game::loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, const int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey)
 {
     if (m_protocolGame || isOnline())
         throw Exception("Unable to login into a world while already online or logging.");
@@ -630,19 +630,9 @@ void Game::safeLogout()
     m_protocolGame->sendLogout();
 }
 
-bool Game::walk(const Otc::Direction direction, bool force)
+bool Game::walk(const Otc::Direction direction)
 {
-    static ScheduledEventPtr nextWalkSchedule = nullptr;
-
-    if (direction == Otc::InvalidDirection) {
-        if (nextWalkSchedule) {
-            nextWalkSchedule->cancel();
-            nextWalkSchedule = nullptr;
-        }
-        return false;
-    }
-
-    if (!canPerformGameAction())
+    if (!canPerformGameAction() || direction == Otc::InvalidDirection)
         return false;
 
     // must cancel auto walking, and wait next try
@@ -652,38 +642,31 @@ bool Game::walk(const Otc::Direction direction, bool force)
         return false;
     }
 
-    if (!force) {
-        if (nextWalkSchedule)
-            return false;
+    static ScheduledEventPtr nextWalkSchedule = nullptr;
+    static uint16_t steps = 0;
+    static Timer timer;
 
-        if (m_localPlayer->getWalkSteps() > 0) {
-            uint16_t delay = 0;
-            if (m_localPlayer->getWalkSteps() == 1) {
-                if (m_localPlayer->isWalking())
-                    return false;
-
-                delay = m_walkFirstStepDelay;
-            } else if (direction != m_localPlayer->getDirection())
-                delay = m_walkTurnDelay;
-
-            if (delay > 0) {
-                nextWalkSchedule = g_dispatcher.scheduleEvent([this, direction] {
-                    if (m_localPlayer) {
-                        m_localPlayer->setWalkSteps(1);
-                        walk(direction, true);
-                    }
-
-                    nextWalkSchedule = nullptr;
-                }, delay);
-                return false;
-            }
-        }
-    }
+    if (nextWalkSchedule) nextWalkSchedule->cancel();
+    nextWalkSchedule = g_dispatcher.scheduleEvent([this] {
+        nextWalkSchedule = nullptr;
+        steps = 0;
+    }, 150);
 
     // check we can walk and add new walk event if false
     if (!m_localPlayer->canWalk(direction)) {
         return false;
     }
+
+    if (steps == 1) {
+        if (timer.ticksElapsed() <= m_walkFirstStepDelay)
+            return false;
+    } else if (direction != m_localPlayer->getDirection()) {
+        if (timer.ticksElapsed() <= m_walkTurnDelay)
+            return false;
+    }
+
+    ++steps;
+    timer.restart();
 
     const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,16 +29,17 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/platform/platform.h>
+#include <framework/proxy/proxy.h>
 #include <framework/stdext/net.h>
 #include <framework/util/crypt.h>
 
 #ifdef FRAMEWORK_GRAPHICS
-#include "framework/graphics/particleeffect.h"
-#include "framework/graphics/texturemanager.h"
 #include "framework/graphics/fontmanager.h"
 #include "framework/graphics/graphics.h"
+#include "framework/graphics/particleeffect.h"
 #include "framework/graphics/particlemanager.h"
 #include "framework/graphics/shadermanager.h"
+#include "framework/graphics/texturemanager.h"
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
@@ -47,20 +48,23 @@
 #ifdef FRAMEWORK_SOUND
 #include <framework/sound/combinedsoundsource.h>
 #include <framework/sound/soundchannel.h>
+#include <framework/sound/soundeffect.h>
 #include <framework/sound/soundmanager.h>
 #include <framework/sound/soundsource.h>
 #include <framework/sound/streamsoundsource.h>
-#include <framework/sound/soundeffect.h>
 #endif
 
 #ifdef FRAMEWORK_NET
+#include <framework/net/httplogin.h>
 #include <framework/net/protocol.h>
 #include <framework/net/protocolhttp.h>
-#include <framework/net/httplogin.h>
 #include <framework/net/server.h>
 #endif
 
 #include <regex>
+
+#include "net/inputmessage.h"
+#include "net/outputmessage.h"
 
 void Application::registerLuaFunctions()
 {
@@ -73,9 +77,9 @@ void Application::registerLuaFunctions()
     g_lua.bindGlobalFunction("pointtostring", [](const Point& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("colortostring", [](const Color& v) { return stdext::to_string(v); });
     g_lua.bindGlobalFunction("sizetostring", [](const Size& v) { return stdext::to_string(v); });
-    g_lua.bindGlobalFunction("iptostring", [](uint32_t v) { return stdext::ip_to_string(v); });
+    g_lua.bindGlobalFunction("iptostring", [](const uint32_t v) { return stdext::ip_to_string(v); });
     g_lua.bindGlobalFunction("stringtoip", [](const std::string_view v) { return stdext::string_to_ip(v); });
-    g_lua.bindGlobalFunction("listSubnetAddresses", [](uint32_t a, uint8_t b) { return stdext::listSubnetAddresses(a, b); });
+    g_lua.bindGlobalFunction("listSubnetAddresses", [](const uint32_t a, const uint8_t b) { return stdext::listSubnetAddresses(a, b); });
     g_lua.bindGlobalFunction("ucwords", [](std::string s) { return stdext::ucwords(s); });
     g_lua.bindGlobalFunction("regexMatch", [](std::string s, const std::string& exp) {
         int limit = 10000;
@@ -84,9 +88,9 @@ void Application::registerLuaFunctions()
             return ret;
         try {
             std::smatch m;
-            std::regex e(exp, std::regex::ECMAScript);
+            const std::regex e(exp, std::regex::ECMAScript);
             while (std::regex_search(s, m, e)) {
-                ret.push_back(std::vector<std::string>());
+                ret.emplace_back();
                 for (auto x : m)
                     ret[ret.size() - 1].push_back(x);
                 s = m.suffix().str();
@@ -118,6 +122,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_platform", "getOsShortName", &Platform::getOsShortName, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isDesktop", &Platform::isDesktop, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isMobile", &Platform::isMobile, &g_platform);
+    g_lua.bindSingletonFunction("g_platform", "isBrowser", &Platform::isBrowser, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "isConsole", &Platform::isConsole, &g_platform);
     g_lua.bindSingletonFunction("g_platform", "openDir", &Platform::openDir, &g_platform);
 
@@ -255,6 +260,16 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_resources", "createArchive", &ResourceManager::createArchive, &g_resources);
     g_lua.bindSingletonFunction("g_resources", "decompressArchive", &ResourceManager::decompressArchive, &g_resources);
 
+    // OTCv8 proxy system
+    g_lua.registerSingletonClass("g_proxy");
+    g_lua.bindSingletonFunction("g_proxy", "addProxy", &ProxyManager::addProxy, &g_proxy);
+    g_lua.bindSingletonFunction("g_proxy", "removeProxy", &ProxyManager::removeProxy, &g_proxy);
+    g_lua.bindSingletonFunction("g_proxy", "clear", &ProxyManager::clear, &g_proxy);
+    g_lua.bindSingletonFunction("g_proxy", "setMaxActiveProxies", &ProxyManager::setMaxActiveProxies, &g_proxy);
+    g_lua.bindSingletonFunction("g_proxy", "getProxies", &ProxyManager::getProxies, &g_proxy);
+    g_lua.bindSingletonFunction("g_proxy", "getProxiesDebugInfo", &ProxyManager::getProxiesDebugInfo, &g_proxy);
+    g_lua.bindSingletonFunction("g_proxy", "getPing", &ProxyManager::getPing, &g_proxy);
+
     // Config
     g_lua.registerClass<Config>();
     g_lua.bindClassMemberFunction<Config>("save", &Config::save);
@@ -270,6 +285,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Config>("getOrCreateNode", &Config::getOrCreateNode);
     g_lua.bindClassMemberFunction<Config>("mergeNode", &Config::mergeNode);
     g_lua.bindClassMemberFunction<Config>("getFileName", &Config::getFileName);
+    g_lua.bindClassMemberFunction<Config>("clear", &Config::clear);
 
     // Module
     g_lua.registerClass<Module>();
@@ -898,16 +914,23 @@ void Application::registerLuaFunctions()
 #endif
 
 #ifdef FRAMEWORK_NET
+#ifndef __EMSCRIPTEN__
     // Server
     g_lua.registerClass<Server>();
     g_lua.bindClassStaticFunction<Server>("create", &Server::create);
     g_lua.bindClassMemberFunction<Server>("close", &Server::close);
     g_lua.bindClassMemberFunction<Server>("isOpen", &Server::isOpen);
     g_lua.bindClassMemberFunction<Server>("acceptNext", &Server::acceptNext);
+#endif
 
     // Connection
+#ifdef __EMSCRIPTEN__
+    g_lua.registerClass<WebConnection>();
+    g_lua.bindClassMemberFunction<WebConnection>("getIp", &WebConnection::getIp);
+#else
     g_lua.registerClass<Connection>();
     g_lua.bindClassMemberFunction<Connection>("getIp", &Connection::getIp);
+#endif
 
     // Protocol
     g_lua.registerClass<Protocol>();

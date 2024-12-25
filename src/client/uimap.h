@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,13 @@
 
 #pragma once
 
-#include <framework/ui/uiwidget.h>
 #include "declarations.h"
 #include "tile.h"
+#include <framework/ui/uiwidget.h>
 
 #include "mapview.h"
 
-class UIMap : public UIWidget
+class UIMap final : public UIWidget
 {
 public:
     UIMap();
@@ -37,25 +37,25 @@ public:
     void drawSelf(DrawPoolType drawPane) override;
     void draw(DrawPoolType drawPane);
 
-    void movePixels(int x, int y) { m_mapView->move(x, y); }
+    void movePixels(const int x, const int y) { m_mapView->move(x, y); }
     void followCreature(const CreaturePtr& creature) { m_mapView->followCreature(creature); }
     void setCameraPosition(const Position& pos) { m_mapView->setCameraPosition(pos); }
-    void setMaxZoomIn(int maxZoomIn) { m_maxZoomIn = maxZoomIn; }
-    void setMaxZoomOut(int maxZoomOut) { m_maxZoomOut = maxZoomOut; }
-    void lockVisibleFloor(int floor) { m_mapView->lockFirstVisibleFloor(floor); }
+    void setMaxZoomIn(const int maxZoomIn) { m_maxZoomIn = maxZoomIn; }
+    void setMaxZoomOut(const int maxZoomOut) { m_maxZoomOut = maxZoomOut; }
+    void lockVisibleFloor(const int floor) { m_mapView->lockFirstVisibleFloor(floor); }
     void unlockVisibleFloor() { m_mapView->unlockFirstVisibleFloor(); }
     void setVisibleDimension(const Size& visibleDimension);
-    void setFloorViewMode(MapView::FloorViewMode viewMode) { m_mapView->setFloorViewMode(viewMode); }
-    void setDrawNames(bool enable) { m_mapView->setDrawNames(enable); }
-    void setDrawHealthBars(bool enable) { m_mapView->setDrawHealthBars(enable); }
-    void setDrawLights(bool enable) { m_mapView->setDrawLights(enable); }
-    void setLimitVisibleDimension(bool enable) { m_mapView->setLimitVisibleDimension(enable); updateVisibleDimension(); }
-    void setDrawManaBar(bool enable) { m_mapView->setDrawManaBar(enable); }
+    void setFloorViewMode(const MapView::FloorViewMode viewMode) { m_mapView->setFloorViewMode(viewMode); }
+    void setDrawNames(const bool enable) { m_mapView->setDrawNames(enable); }
+    void setDrawHealthBars(const bool enable) { m_mapView->setDrawHealthBars(enable); }
+    void setDrawLights(const bool enable) { m_mapView->setDrawLights(enable); }
+    void setLimitVisibleDimension(const bool enable) { m_mapView->setLimitVisibleDimension(enable); updateVisibleDimension(); }
+    void setDrawManaBar(const bool enable) { m_mapView->setDrawManaBar(enable); }
     void setKeepAspectRatio(bool enable);
-    void setShader(const std::string_view name, float fadein, float fadeout) { m_mapView->setShader(name, fadein, fadeout); }
-    void setMinimumAmbientLight(float intensity) { m_mapView->setMinimumAmbientLight(intensity); }
-    void setLimitVisibleRange(bool limitVisibleRange) { m_limitVisibleRange = limitVisibleRange; updateVisibleDimension(); }
-    void setDrawViewportEdge(bool force) { m_mapView->m_forceDrawViewportEdge = force; m_mapView->m_visibleDimension = {}; updateVisibleDimension(); }
+    void setShader(const std::string_view name, const float fadein, const float fadeout) { m_mapView->setShader(name, fadein, fadeout); }
+    void setMinimumAmbientLight(const float intensity) { m_mapView->setMinimumAmbientLight(intensity); }
+    void setLimitVisibleRange(const bool limitVisibleRange) { m_limitVisibleRange = limitVisibleRange; updateVisibleDimension(); }
+    void setDrawViewportEdge(const bool force) { m_mapView->m_forceDrawViewportEdge = force; m_mapView->m_visibleDimension = {}; updateVisibleDimension(); }
 
     bool zoomIn();
     bool zoomOut();
@@ -69,10 +69,10 @@ public:
     bool isLimitVisibleRangeEnabled() { return m_limitVisibleRange; }
     bool isSwitchingShader() { return m_mapView->isSwitchingShader(); }
 
-    void setShadowFloorIntensity(float intensity) { m_mapView->setShadowFloorIntensity(intensity); }
+    void setShadowFloorIntensity(const float intensity) { m_mapView->setShadowFloorIntensity(intensity); }
 
-    std::vector<CreaturePtr> getSpectators(bool multiFloor = false) { return m_mapView->getSpectators(multiFloor); }
-    std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false) { return m_mapView->getSightSpectators(multiFloor); }
+    std::vector<CreaturePtr> getSpectators(const bool multiFloor = false) { return m_mapView->getSpectators(multiFloor); }
+    std::vector<CreaturePtr> getSightSpectators(const bool multiFloor = false) { return m_mapView->getSightSpectators(multiFloor); }
     bool isInRange(const Position& pos) { return m_mapView->isInRange(pos); }
 
     PainterShaderProgramPtr getShader() { return m_mapView->getShader(); }
@@ -102,7 +102,7 @@ public:
     void updateMapRect();
 
 protected:
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
     bool onMouseMove(const Point& mousePos, const Point& mouseMoved) override;
 

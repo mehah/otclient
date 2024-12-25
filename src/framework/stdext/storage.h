@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ namespace stdext
         class Hash = phmap::priv::hash_default_hash<T>,
         class Eq = phmap::priv::hash_default_eq<T>,
         class Alloc = phmap::priv::Allocator<T>>
-    using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
+        using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
 
     template<typename T>
     concept OnlyEnum = std::is_enum_v<T>;
@@ -71,6 +71,6 @@ namespace stdext
         void clear() { m_data.clear(); }
 
     private:
-        stdext::map<Key, std::any> m_data;
+        map<Key, std::any> m_data;
     };
 }
