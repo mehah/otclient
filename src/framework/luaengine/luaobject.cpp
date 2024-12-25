@@ -24,6 +24,8 @@
 #include "luainterface.h"
 
 #include <framework/core/application.h>
+#include "framework/core/graphicalapplication.h"
+
 #include <typeinfo>
 
 int16_t g_luaThreadId = -1;
