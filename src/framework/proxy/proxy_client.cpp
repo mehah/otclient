@@ -178,7 +178,7 @@ void Proxy::ping()
     send(packet);
 }
 
-void Proxy::onPing(uint32_t packetId)
+void Proxy::onPing(uint32_t /*packetId*/)
 {
     if (m_state == STATE_CONNECTING_WAIT_FOR_PING) {
         m_state = STATE_CONNECTED;
