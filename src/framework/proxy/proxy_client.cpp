@@ -421,7 +421,7 @@ void Session::selectProxies()
                 candidate_proxy->send(packet.second);
             }
         }
-        if (static_cast<int>(m_proxies.size()) > m_maxConnections) {
+        if (m_proxies.size() > m_maxConnections) {
 #ifdef PROXY_DEBUG
             std::clog << "[Session " << m_id << "] remove proxy: " << worst_ping->getHost() << std::endl;
 #endif
