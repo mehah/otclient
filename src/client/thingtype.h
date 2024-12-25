@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,14 +24,10 @@
 
 #include "animator.h"
 #include "declarations.h"
-#include "gameconfig.h"
 
-#include <algorithm>
 #include <framework/core/declarations.h>
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/texture.h>
 #include <framework/luaengine/luaobject.h>
-#include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 #include <variant>
 

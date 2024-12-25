@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -178,7 +178,7 @@ void Proxy::ping()
     send(packet);
 }
 
-void Proxy::onPing(uint32_t packetId)
+void Proxy::onPing(uint32_t /*packetId*/)
 {
     if (m_state == STATE_CONNECTING_WAIT_FOR_PING) {
         m_state = STATE_CONNECTED;
@@ -421,7 +421,7 @@ void Session::selectProxies()
                 candidate_proxy->send(packet.second);
             }
         }
-        if (static_cast<int>(m_proxies.size()) > m_maxConnections) {
+        if (m_proxies.size() > m_maxConnections) {
 #ifdef PROXY_DEBUG
             std::clog << "[Session " << m_id << "] remove proxy: " << worst_ping->getHost() << std::endl;
 #endif
@@ -496,7 +496,7 @@ void Session::readHeader()
     });
 }
 
-void Session::onHeader(const std::error_code& ec, std::size_t bytes_transferred)
+void Session::onHeader(const std::error_code& ec, std::size_t /*bytes_transferred*/)
 {
     if (ec) {
 #ifdef PROXY_DEBUG
@@ -565,7 +565,7 @@ void Session::onPacket(const ProxyPacketPtr& packet)
     });
 }
 
-void Session::onSent(const std::error_code& ec, std::size_t bytes_transferred)
+void Session::onSent(const std::error_code& ec, std::size_t /*bytes_transferred*/)
 {
     if (ec) {
 #ifdef PROXY_DEBUG

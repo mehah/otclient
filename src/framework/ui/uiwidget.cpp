@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 #include "uimanager.h"
 #include "uitranslator.h"
 
-#include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
@@ -37,7 +36,6 @@
 
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
-#include <ranges>
 
 UIWidget::UIWidget()
 {

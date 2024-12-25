@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -224,13 +224,13 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_readBytes(file, &buffer[0], fileSize);
     PHYSFS_close(file);
 
+#if ENABLE_ENCRYPTION == 1
     bool hasHeader = false;
     if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() &&
         buffer.substr(0, std::string(ENCRYPTION_HEADER).size()) == std::string(ENCRYPTION_HEADER)) {
         hasHeader = true;
     }
 
-#if ENABLE_ENCRYPTION == 1
     if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
         if (fullPath.find(g_resources.getByteStrings(1)) != std::string::npos && !hasHeader) {
             return buffer;
