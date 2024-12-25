@@ -23,6 +23,7 @@
 #include "drawpoolmanager.h"
 #include "declarations.h"
 #include "drawpool.h"
+#include "graphics.h"
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
