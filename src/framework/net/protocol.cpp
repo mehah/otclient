@@ -24,6 +24,9 @@
 #include <algorithm>
 #include <framework/core/application.h>
 #include <random>
+
+#include "inputmessage.h"
+#include "outputmessage.h"
 #ifdef __EMSCRIPTEN__
 #include "webconnection.h"
 #else
