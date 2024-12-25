@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,6 @@
 #include "uimanager.h"
 #include "ui.h"
 
-#include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/modulemanager.h>
 #include <framework/core/resourcemanager.h>
@@ -31,7 +30,7 @@
 #include <framework/otml/otml.h>
 #include <framework/platform/platformwindow.h>
 
-#include <algorithm>
+#include "framework/graphics/graphics.h"
 
 UIManager g_ui;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,6 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
 
 #include <ranges>
@@ -33,11 +32,8 @@
 #include "effect.h"
 #include "game.h"
 #include "item.h"
-#include "lightview.h"
-#include "localplayer.h"
 #include "map.h"
 #include "protocolgame.h"
-#include "statictext.h"
 #include "uimap.h"
 #include <algorithm>
 

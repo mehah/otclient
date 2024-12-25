@@ -219,9 +219,9 @@ function QuickLoot.Define()
         quickLootController.ui.fallbackPanel.checkbox:setChecked(fallback)
         -- LuaFormatter off
 		local slotBags = {
-			{ color = "#484848", name = "Unassigned", type = 1 },
+			{ color = "#484848", name = "Unassigned", type = 31 },
 			{ color = "#414141", name = "Gold", type = 30 },
-			{ color = "#484848", name = "Armors", type = 31 },
+			{ color = "#484848", name = "Armors", type = 1 },
 			{ color = "#414141", name = "Amulets", type = 2  },
 			{ color = "#484848", name = "Boots", type = 3 },
 			{ color = "#414141", name = "Containers", type = 4 },
@@ -259,8 +259,8 @@ function QuickLoot.Define()
 
             for _, container in pairs(lootContainers) do
                 if container[1] == id then
-                    local lootContainerId = container[2]
-                    local obtainerContainerId = container[3]
+                    local lootContainerId = container[3]
+                    local obtainerContainerId = container[2]
 
                     widget.item:setItemId(lootContainerId)
                     widget.item2:setItemId(obtainerContainerId)

@@ -23,7 +23,6 @@
 #include "spriteappearances.h"
 #include "game.h"
 #include <framework/core/filestream.h>
-#include <framework/core/graphicalapplication.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
 
