@@ -29,6 +29,8 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/image.h>
 
+#include "framework/core/graphicalapplication.h"
+
 uint32_t FrameBuffer::boundFbo = 0;
 
 FrameBuffer::FrameBuffer()
