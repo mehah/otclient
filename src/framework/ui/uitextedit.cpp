@@ -21,7 +21,6 @@
  */
 
 #include "uitextedit.h"
-#include <framework/core/application.h>
 #include <framework/core/clock.h>
 #include <framework/graphics/bitmapfont.h>
 #include <framework/graphics/graphics.h>

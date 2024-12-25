@@ -24,6 +24,8 @@
 #include <framework/stdext/hash.h>
 #include <iomanip>
 
+#include "framework/stdext/string.h"
+
  // NOTE: AABBGGRR order
 const Color Color::alpha = 0x00000000U;
 const Color Color::white = 0xffffffffU;

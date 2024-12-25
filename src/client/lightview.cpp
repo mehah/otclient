@@ -22,8 +22,6 @@
 
 #include "lightview.h"
 #include "map.h"
-#include "mapview.h"
-#include "spritemanager.h"
 
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>

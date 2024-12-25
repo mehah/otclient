@@ -27,7 +27,6 @@
 #include "declarations.h"
 #include "framebuffer.h"
 #include "framework/core/timer.h"
-#include "texture.h"
 #include <framework/core/graphicalapplication.h>
 #include <framework/platform/platformwindow.h>
 

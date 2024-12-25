@@ -24,7 +24,6 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
 
 #include <ranges>
@@ -33,11 +32,8 @@
 #include "effect.h"
 #include "game.h"
 #include "item.h"
-#include "lightview.h"
-#include "localplayer.h"
 #include "map.h"
 #include "protocolgame.h"
-#include "statictext.h"
 #include "uimap.h"
 #include <algorithm>
 

@@ -24,7 +24,6 @@
 
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
-#include <future>
 #include <httplib.h>
 #include <iostream>
 #include <nlohmann/json.hpp>

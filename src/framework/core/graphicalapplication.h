@@ -26,7 +26,6 @@
 
 #include <framework/core/adaptativeframecounter.h>
 #include <framework/core/inputevent.h>
-#include <framework/core/timer.h>
 #include <framework/graphics/declarations.h>
 #include <framework/platform/platformwindow.h>
 

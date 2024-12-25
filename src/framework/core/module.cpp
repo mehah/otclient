@@ -27,8 +27,6 @@
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otml.h>
 
-#include <algorithm>
-
 Module::Module(const std::string_view name) : m_sandboxEnv(g_lua.newSandboxEnv()), m_name(name.data()) {}
 
 bool Module::load()

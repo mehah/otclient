@@ -23,7 +23,6 @@
 #pragma once
 
 #include <framework/global.h>
-#include <framework/graphics/declarations.h>
 
 class ApplicationContext
 {
@@ -92,7 +91,6 @@ protected:
 };
 
 #ifdef FRAMEWORK_GRAPHICS
-#include "graphicalapplication.h"
 #else
 #include "consoleapplication.h"
 #endif

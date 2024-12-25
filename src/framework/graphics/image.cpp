@@ -26,7 +26,6 @@
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/apngloader.h>
 
-#include "framework/stdext/math.h"
 #include "framework/stdext/qrcodegen.h"
 
 using namespace qrcodegen;

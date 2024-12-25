@@ -22,6 +22,7 @@
 
 #include "filestream.h"
 #include "binarytree.h"
+#include "graphicalapplication.h"
 #include <framework/core/application.h>
 
 #include <physfs.h>

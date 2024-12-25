@@ -23,7 +23,6 @@
 #pragma once
 
 #include <framework/core/inputevent.h>
-#include <framework/stdext/storage.h>
 #include <framework/stdext/types.h>
 #include <string>
 #include <vector>

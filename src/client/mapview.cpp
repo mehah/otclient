@@ -33,7 +33,6 @@
 #include "tile.h"
 
 #include "framework/graphics/texturemanager.h"
-#include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>

@@ -22,7 +22,6 @@
 
 #pragma once
 
-#include "effect.h"
 #include "thing.h"
 #include <framework/global.h>
 

@@ -24,14 +24,10 @@
 
 #include "animator.h"
 #include "declarations.h"
-#include "gameconfig.h"
 
-#include <algorithm>
 #include <framework/core/declarations.h>
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/texture.h>
 #include <framework/luaengine/luaobject.h>
-#include <framework/net/server.h>
 #include <framework/otml/declarations.h>
 #include <variant>
 

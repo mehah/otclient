@@ -27,7 +27,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/stdext/hash.h>
 
-#include <algorithm>
+#include "framework/core/graphicalapplication.h"
 
 uint32_t ShaderProgram::m_currentProgram = 0;
 

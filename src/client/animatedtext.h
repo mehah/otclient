@@ -25,7 +25,6 @@
 #include "declarations.h"
 #include <framework/core/timer.h>
 #include <framework/graphics/cachedtext.h>
-#include <framework/graphics/fontmanager.h>
 #include <framework/luaengine/luaobject.h>
 
  // @bindclass

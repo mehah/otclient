@@ -23,7 +23,6 @@
 #include "minimap.h"
 #include "tile.h"
 
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/drawpoolmanager.h>

@@ -22,7 +22,6 @@
 
 #include <chrono>
 #include <ctime>
-#include <ctime>
 #include <thread>
 
 #include "types.h"

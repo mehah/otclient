@@ -46,8 +46,6 @@
 #include <emscripten/emscripten.h>
 #endif
 
-#include <thread>
-
 GraphicalApplication g_app;
 
 void GraphicalApplication::init(std::vector<std::string>& args, ApplicationContext* context)

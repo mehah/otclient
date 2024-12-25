@@ -31,7 +31,6 @@
 #include "luavaluecasts_client.h"
 #include "map.h"
 #include "missile.h"
-#include "statictext.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include <ctime>

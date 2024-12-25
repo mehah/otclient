@@ -22,8 +22,6 @@
 
 #include "protocolcodes.h"
 
-#include <algorithm>
-
 namespace Proto
 {
     stdext::map<uint8_t, uint8_t > messageModesMap;

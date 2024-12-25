@@ -23,8 +23,6 @@
 #include "framework/net/outputmessage.h"
 #include "game.h"
 #include "protocolgame.h"
-#include <framework/core/application.h>
-#include <framework/platform/platform.h>
 #include <framework/util/crypt.h>
 
 void ProtocolGame::send(const OutputMessagePtr& outputMessage)

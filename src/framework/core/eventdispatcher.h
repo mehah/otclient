@@ -22,12 +22,9 @@
 
 #pragma once
 
-#include "clock.h"
 #include "scheduledevent.h"
 
-#include <thread>
-
- // @bindsingleton g_dispatcher
+// @bindsingleton g_dispatcher
 class EventDispatcher
 {
 public:

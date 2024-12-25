@@ -24,9 +24,8 @@
 
 #include "thing.h"
 #include <framework/core/timer.h>
-#include <framework/global.h>
 
- // @bindclass
+// @bindclass
 class Missile final : public Thing
 {
 public:
