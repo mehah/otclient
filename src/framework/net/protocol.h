@@ -27,8 +27,6 @@
 #include "connection.h"
 #endif
 #include "declarations.h"
-#include "inputmessage.h"
-#include "outputmessage.h"
 
 #include <framework/luaengine/luaobject.h>
 #include <framework/proxy/proxy.h>

@@ -22,7 +22,6 @@
 
 #include "uitranslator.h"
 #include "uiwidget.h"
-#include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
 #include <regex>

@@ -30,14 +30,11 @@
 #include "creatures.h"
 #endif
 
-#include <framework/core/binarytree.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
 
 #include <client/spriteappearances.h>
-#include <client/spritemanager.h>
 
 #include <appearances.pb.h>
 

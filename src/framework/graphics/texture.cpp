@@ -25,7 +25,6 @@
 #include "graphics.h"
 #include "image.h"
 
-#include "framework/stdext/math.h"
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 

@@ -27,8 +27,6 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/stdext/hash.h>
 
-#include <algorithm>
-
 uint32_t ShaderProgram::m_currentProgram = 0;
 
 ShaderProgram::ShaderProgram() :m_programId(glCreateProgram())

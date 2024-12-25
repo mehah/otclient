@@ -22,7 +22,6 @@
 #ifndef SOUNDEFFECT_H
 #define SOUNDEFFECT_H
 
-#include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 
 class SoundEffect final : public LuaObject

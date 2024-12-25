@@ -24,8 +24,6 @@
 #include "oggsoundfile.h"
 #include <framework/core/resourcemanager.h>
 
-#include "framework/stdext/time.h"
-
 SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
     const auto& file = g_resources.openFile(filename);

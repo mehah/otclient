@@ -27,7 +27,6 @@
 #include "uimap.h"
 
 #include <framework/core/graphicalapplication.h>
-#include <framework/graphics/declarations.h>
 
 class Client : public ApplicationDrawEvents
 {

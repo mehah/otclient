@@ -25,7 +25,6 @@
 #include <framework/graphics/declarations.h>
 #include <framework/graphics/drawpool.h>
 #include <framework/graphics/framebuffer.h>
-#include <framework/graphics/graphics.h>
 
 class DrawPoolManager
 {

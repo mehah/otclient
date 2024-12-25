@@ -36,6 +36,8 @@
 
 #include <algorithm>
 
+#include "framework/core/graphicalapplication.h"
+
 static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static inline bool is_base64(const uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
 

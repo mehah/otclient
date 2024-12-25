@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "../stdext/types.h"
-#include <array>
 #include <cmath>
 #include <ostream>
 

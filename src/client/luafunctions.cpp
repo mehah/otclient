@@ -31,7 +31,6 @@
 #include "gameconfig.h"
 #include "item.h"
 #include "localplayer.h"
-#include "luavaluecasts_client.h"
 #include "map.h"
 #include "minimap.h"
 #include "missile.h"

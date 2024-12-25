@@ -25,7 +25,6 @@
 #include "uimanager.h"
 #include "uitranslator.h"
 
-#include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
@@ -37,7 +36,6 @@
 
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
-#include <ranges>
 
 UIWidget::UIWidget()
 {

@@ -25,7 +25,6 @@
 #include <framework/graphics/particlemanager.h>
 
 #include <framework/core/eventdispatcher.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/ui/uimanager.h>
 #include <framework/ui/uiwidget.h>
 
@@ -34,7 +33,6 @@
 #include "client.h"
 #include "game.h"
 #include "map.h"
-#include "tile.h"
 #include "uimap.h"
 
 extern ParticleManager g_particles;

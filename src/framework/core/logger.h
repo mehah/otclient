@@ -25,7 +25,6 @@
 #include "../global.h"
 
 #include <fstream>
-#include <mutex>
 
 struct LogMessage
 {

@@ -24,7 +24,6 @@
 
 #include "const.h"
 #include <framework/const.h>
-#include <framework/stdext/types.h>
 #include <framework/util/point.h>
 
 #include <array>

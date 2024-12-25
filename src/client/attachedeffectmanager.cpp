@@ -22,7 +22,6 @@
 
 #include "attachedeffectmanager.h"
 #include "attachedeffect.h"
-#include "spritemanager.h"
 #include "thingtypemanager.h"
 #include <framework/core/resourcemanager.h>
 
