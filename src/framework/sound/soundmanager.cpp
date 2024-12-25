@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,18 @@
  */
 
 #include "soundmanager.h"
-#include "combinedsoundsource.h"
 #include "soundbuffer.h"
 #include "soundeffect.h"
 #include "soundfile.h"
 #include "streamsoundsource.h"
+#include "combinedsoundsource.h"
 
 #include <cstdint>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
+
+#include "soundchannel.h"
 
 class StreamSoundSource;
 class CombinedSoundSource;
