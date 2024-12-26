@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,6 @@
 
 #include "lightview.h"
 #include "map.h"
-#include "mapview.h"
-#include "spritemanager.h"
 
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/eventdispatcher.h>
@@ -56,8 +54,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
 
 void LightView::addLightSource(const Point& pos, const Light& light, const float brightness)
 {
-    if (!isDark() || light.intensity == 0)
-        return;
+    if (!isDark() || light.intensity == 0) return;
 
     if (!m_lightData.lights.empty()) {
         auto& prevLight = m_lightData.lights.back();
@@ -67,17 +64,17 @@ void LightView::addLightSource(const Point& pos, const Light& light, const float
         }
     }
 
-    size_t hash = 0;
-
-    stdext::hash_union(hash, pos.hash());
+    size_t hash = pos.hash();
     stdext::hash_combine(hash, light.intensity);
     stdext::hash_combine(hash, light.color);
 
     if (g_drawPool.getOpacity() < 1.f)
         stdext::hash_combine(hash, g_drawPool.getOpacity());
 
-    if (m_pool->getHashController().put(hash))
-        m_lightData.lights.emplace_back(pos, light.intensity, light.color, std::min<float>(brightness, g_drawPool.getOpacity()));
+    if (m_pool->getHashController().put(hash)) {
+        const float effectiveBrightness = std::min<float>(brightness, g_drawPool.getOpacity());
+        m_lightData.lights.emplace_back(pos, light.intensity, light.color, effectiveBrightness);
+    }
 }
 
 void LightView::resetShade(const Point& pos)
@@ -135,35 +132,55 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
                      static_cast<float>(size.width()) / m_tileSize, static_cast<float>(size.height()) / m_tileSize));
 }
 
-void LightView::updatePixels() {
-    const size_t lightSize = m_lightData.lights.size();
+void LightView::updatePixels()
+{
+    const auto lightSize = m_lightData.lights.size();
+    const auto mapWidth = m_mapSize.width();
+    const auto mapHeight = m_mapSize.height();
+    const auto tileCenterOffset = m_tileSize / 2;
+    const auto invTileSize = 1.0f / m_tileSize;
 
-    const int mapWidth = m_mapSize.width();
-    const int mapHeight = m_mapSize.height();
+    auto* pixelData = m_pixels.data();
 
-    for (int x = -1; ++x < mapWidth;) {
-        for (int y = -1; ++y < mapHeight;) {
-            const Point pos(x * m_tileSize + m_tileSize / 2, y * m_tileSize + m_tileSize / 2);
-            const int index = (y * mapWidth + x);
-            const int colorIndex = index * 4;
-            m_pixels[colorIndex] = m_globalLightColor.r();
-            m_pixels[colorIndex + 1] = m_globalLightColor.g();
-            m_pixels[colorIndex + 2] = m_globalLightColor.b();
-            m_pixels[colorIndex + 3] = 255; // alpha channel
-            for (size_t i = m_lightData.tiles[index]; i < lightSize; ++i) {
+    for (int y = 0; y < mapHeight; ++y) {
+        for (int x = 0; x < mapWidth; ++x) {
+            const auto centerX = x * m_tileSize + tileCenterOffset;
+            const auto centerY = y * m_tileSize + tileCenterOffset;
+            const auto index = y * mapWidth + x;
+
+            auto r = m_globalLightColor.r();
+            auto g = m_globalLightColor.g();
+            auto b = m_globalLightColor.b();
+
+            for (auto i = m_lightData.tiles[index]; i < lightSize; ++i) {
                 const auto& light = m_lightData.lights[i];
-                const float distance = (std::sqrt((pos.x - light.pos.x) * (pos.x - light.pos.x) +
-                                        (pos.y - light.pos.y) * (pos.y - light.pos.y))) / m_tileSize;
 
-                float intensity = (-distance + light.intensity) * 0.2f;
+                const auto dx = centerX - light.pos.x;
+                const auto dy = centerY - light.pos.y;
+                const auto distanceSq = dx * dx + dy * dy;
+
+                const auto lightRadiusSq = (light.intensity * m_tileSize) * (light.intensity * m_tileSize);
+                if (distanceSq > lightRadiusSq) continue;
+
+                const auto distanceNorm = std::sqrt(distanceSq) * invTileSize;
+                float intensity = (-distanceNorm + light.intensity) * 0.2f;
                 if (intensity < 0.01f) continue;
-                if (intensity > 1.0f) intensity = 1.0f;
+
+                intensity = std::min<float>(intensity, 1.0f);
 
                 const auto& lightColor = Color::from8bit(light.color) * intensity;
-                m_pixels[colorIndex] = std::max<int>(m_pixels[colorIndex], lightColor.r());
-                m_pixels[colorIndex + 1] = std::max<int>(m_pixels[colorIndex + 1], lightColor.g());
-                m_pixels[colorIndex + 2] = std::max<int>(m_pixels[colorIndex + 2], lightColor.b());
+
+                r = std::max<int>(r, lightColor.r());
+                g = std::max<int>(g, lightColor.g());
+                b = std::max<int>(b, lightColor.b());
             }
+
+            const auto colorIndex = index * 4;
+
+            pixelData[colorIndex] = r;
+            pixelData[colorIndex + 1] = g;
+            pixelData[colorIndex + 2] = b;
+            pixelData[colorIndex + 3] = 255;
         }
     }
 }

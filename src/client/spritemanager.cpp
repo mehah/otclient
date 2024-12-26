@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 #include "gameconfig.h"
 #include "spriteappearances.h"
 #include <framework/core/asyncdispatcher.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/filestream.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/core/resourcemanager.h>

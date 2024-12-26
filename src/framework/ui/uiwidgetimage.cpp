@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,7 @@
 
 #include "framework/graphics/drawpoolmanager.h"
 #include "uiwidget.h"
-#include <framework/core/eventdispatcher.h>
 #include <framework/graphics/animatedtexture.h>
-#include <framework/graphics/image.h>
-#include <framework/graphics/painter.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/util/crypt.h>

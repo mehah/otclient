@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
 #include "map.h"
-#include "statictext.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 
@@ -34,10 +33,11 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/drawpoolmanager.h>
-#include <framework/graphics/graphics.h>
 #include <framework/graphics/shadermanager.h>
 #include <framework/graphics/texturemanager.h>
 #include <framework/ui/uiwidget.h>
+
+#include "statictext.h"
 
 double Creature::speedA = 0;
 double Creature::speedB = 0;

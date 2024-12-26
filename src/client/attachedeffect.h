@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -119,7 +119,7 @@ onTop,
         uint8_t minHeight{ 0 };
         uint8_t height{ 0 };
         uint16_t speed{ 0 };
-        Timer timer;
+        Timer timer{};
     };
 
 private:
