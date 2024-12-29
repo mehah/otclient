@@ -4,18 +4,19 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    namespace 'com.github.otclient'
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.github.otclient"
         minSdk 21
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags '-std=c++20'
+                cppFlags '-std=c++20', '-fuse-ld=lld'
                 arguments "-DVCPKG_TARGET_ANDROID=ON"
             }
         }
@@ -40,14 +41,14 @@ android {
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
-            version '3.22.1'
+            version '3.31.1'
         }
     }
     buildFeatures {
         viewBinding true
         prefab true
     }
-    ndkVersion '25.1.8937393'
+    ndkVersion '28.0.12674087'
 }
 
 dependencies {
