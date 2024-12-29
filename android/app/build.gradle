@@ -49,6 +49,7 @@ android {
         prefab true
     }
     ndkVersion '28.0.12674087'
+    buildToolsVersion '35.0.0'
 }
 
 dependencies {
