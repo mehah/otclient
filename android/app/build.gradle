@@ -5,56 +5,67 @@ plugins {
 
 android {
     namespace 'com.github.otclient'
-    compileSdk 33
+    compileSdk 35
 
     defaultConfig {
         applicationId "com.github.otclient"
         minSdk 21
-        targetSdk 33
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags '-std=c++20', '-fuse-ld=lld'
-                arguments "-DVCPKG_TARGET_ANDROID=ON"
+                cppFlags '-std=c++20', '-fuse-ld=lld', '-flto'
+                arguments "-DVCPKG_TARGET_ANDROID=ON", "-DANDROID_STL=c++_shared"
             }
-        }
-        ndk {
-            abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
         }
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
     externalNativeBuild {
         cmake {
             path file('../../CMakeLists.txt')
             version '3.31.1'
         }
     }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
     buildFeatures {
         viewBinding true
         prefab true
     }
+
     ndkVersion '28.0.12674087'
-    buildToolsVersion '35.0.0'
+
+    defaultConfig {
+
+        targetSdk 35
+        externalNativeBuild {
+            cmake {
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            }
+        }
+    }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.8.0'
-    implementation 'androidx.appcompat:appcompat:1.5.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.games:games-activity:1.2.1'
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'com.google.android.material:material:1.10.0'
 }
