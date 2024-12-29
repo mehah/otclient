@@ -385,7 +385,7 @@ void AndroidWindow::handleNativeEvents() {
     struct android_poll_source* source;
 
     // If not visible, block until we get an event; if visible, don't block.
-    while ((ALooper_pollAll(m_visible ? 0 : -1, NULL, &events, (void **) &source)) >= 0) {
+    while ((ALooper_pollOnce(m_visible ? 0 : -1, NULL, &events, (void **) &source)) >= 0) {
         if (source != NULL) {
             source->process(m_app, source);
         }
