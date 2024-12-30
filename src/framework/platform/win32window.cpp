@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-#include "framework/core/graphicalapplication.h"
 #ifdef WIN32
 
 #include "win32window.h"
@@ -28,6 +27,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
+#include "framework/core/graphicalapplication.h"
 
 #ifdef NDEBUG
 #include <timeapi.h>
