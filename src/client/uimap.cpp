@@ -177,6 +177,21 @@ bool UIMap::onMouseMove(const Point& mousePos, const Point& mouseMoved)
     return UIWidget::onMouseMove(mousePos, mouseMoved);
 }
 
+bool UIMap::onMousePress(const Point& mousePos, Fw::MouseButton button)
+{
+    return UIWidget::onMousePress(mousePos, button);
+}
+
+bool UIMap::onMouseRelease(const Point& mousePos, Fw::MouseButton button)
+{
+    return UIWidget::onMouseRelease(mousePos, button);
+}
+
+bool UIMap::onMouseWheel(const Point& mousePos, Fw::MouseWheelDirection direction)
+{
+    return UIWidget::onMouseWheel(mousePos, direction);
+}
+
 void UIMap::updateVisibleDimension()
 {
     int dimensionHeight = m_zoom;

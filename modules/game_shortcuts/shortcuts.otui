@@ -1,0 +1,65 @@
+GameAction < UIButton
+  size: 64 64
+  phantom: false
+
+  UIButton
+    id: image
+    size: 48 48
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    phantom: true
+    $checked:
+      opacity: 1.0
+      background: #00FF0033
+    $!checked:
+      opacity: 0.6
+      background: alpha
+
+UIWidget
+  anchors.fill: parent
+  focusable: false
+  phantom: true
+
+  UIWidget
+    id: shortcuts
+    size: 175 150
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    phantom: false
+    focusable: true
+    visible: false
+    background: #00000044
+
+    UIWidget
+      id: shortcutIcons
+      focusable: false
+      anchors.fill: parent
+
+      GameAction
+        id: attack
+        anchors.left: parent.left
+        anchors.top: parent.top
+        margin-left: 15
+        margin-top: 4
+        @onSetup: self.image:setImageSource("/images/game/mobile/attack")
+      GameAction
+        id: look
+        anchors.left: parent.left
+        anchors.top: attack.bottom
+        margin-left: 15
+        margin-top: 14
+        @onSetup: self.image:setImageSource("/images/game/mobile/look")
+      GameAction
+        id: follow
+        anchors.right: parent.right
+        anchors.top: parent.top
+        margin-right: 15
+        margin-top: 4
+        @onSetup: self.image:setImageSource("/images/game/mobile/follow")
+      GameAction
+        id: use
+        anchors.right: parent.right
+        anchors.top: follow.bottom
+        margin-right: 15
+        margin-top: 14
+        @onSetup: self.image:setImageSource("/images/game/mobile/use")
