@@ -25,6 +25,7 @@
 #include "container.h"
 #include "creature.h"
 #include "declarations.h"
+#include "localplayer.h"
 #include "outfit.h"
 #include "protocolgame.h"
 #include <bitset>
