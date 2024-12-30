@@ -255,7 +255,7 @@ function g_keyboard.isCtrlPressed()
     if (g_platform.isMobile()) then
         return false
     else
-        return Bit.band(g_window.getKeyboardModifiers(), KeyboardCtrlModifier) ~= 0
+        return bit.band(g_window.getKeyboardModifiers(), KeyboardCtrlModifier) ~= 0
     end
 end
 
@@ -263,7 +263,7 @@ function g_keyboard.isAltPressed()
     if (g_platform.isMobile()) then
         return false
     else
-        return Bit.band(g_window.getKeyboardModifiers(), KeyboardAltModifier) ~= 0
+        return bit.band(g_window.getKeyboardModifiers(), KeyboardAltModifier) ~= 0
     end
 end
 
@@ -271,6 +271,6 @@ function g_keyboard.isShiftPressed()
     if (g_platform.isMobile()) then
         return false
     else
-        return Bit.band(g_window.getKeyboardModifiers(), KeyboardShiftModifier) ~= 0
+        return bit.band(g_window.getKeyboardModifiers(), KeyboardShiftModifier) ~= 0
     end
 end
