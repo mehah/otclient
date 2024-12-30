@@ -20,6 +20,7 @@
  * THE SOFTWARE.
  */
 
+#include "framework/core/graphicalapplication.h"
 #ifdef WIN32
 
 #include "win32window.h"
