@@ -3801,7 +3801,8 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
 void ProtocolGame::parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg)
 {
     msg->getU32(); // houseId
-    if (const uint8_t typeValue = msg->getU8(); typeValue == 1) {
+    const uint8_t typeValue = msg->getU8();
+    if (typeValue == 1) {
         msg->getU8(); // 0x00
     }
     msg->getU8(); // index
