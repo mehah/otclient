@@ -1,0 +1,9 @@
+Module
+  name: game_shortcuts
+  description: Mobile Shortcuts
+  author: SkullZ OTS
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  scripts: [ shortcuts ]
+  @onLoad: init()
+  @onUnload: terminate()
