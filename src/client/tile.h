@@ -28,6 +28,7 @@
 #include "declarations.h"
 #include "item.h"
 #include "mapview.h"
+#include "statictext.h"
 
 #ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t
