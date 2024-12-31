@@ -719,6 +719,11 @@ if(WIN32)
 	)
 endif(WIN32)
 
+if(ANDROID)
+  set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=lld")
+  set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
+endif()
+
 # *****************************************************************************
 # Link compilation files folder
 # *****************************************************************************

@@ -33,6 +33,25 @@ UIWidget
     OptionCheckBox
       id: displayMana
       !text: tr('Display player mana bar')
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    $!mobile:
+      height: 0
+      margin-top: 0
+      visible: false
+  
+    OptionCheckBox
+      id: rightJoystick
+      !text: tr('Joystick in RightPanel')
+
+      $!mobile:
+        visible: false
       
   SmallReversedQtPanel
     anchors.left: parent.left
@@ -87,4 +106,3 @@ UIWidget
       &minimumScrollValue: 1
       &maximumScrollValue: 9
       &scrollSize: 21
-
