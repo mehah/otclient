@@ -247,18 +247,22 @@ void AndroidWindow::processTextInput() {
 }
 
 void AndroidWindow::processFingerDownAndUp() {
+    static ticks_t lastPress = 0;
+
     bool isTouchdown = m_currentEvent.type == TOUCH_DOWN;
-    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_LONGPRESS) ?
+
+    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_UP && stdext::millis() > lastPress + 500 ) ?
         Fw::MouseRightButton : Fw::MouseLeftButton;
 
     m_inputEvent.reset();
     m_inputEvent.type = (isTouchdown) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
     m_inputEvent.mouseButton = mouseButton;
-	if(isTouchdown) {
-		m_mouseButtonStates |= 1 << mouseButton;
-	} else {
-		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
-	}
+    if(isTouchdown) {
+        lastPress = g_clock.millis();
+        m_mouseButtonStates |= 1 << mouseButton;
+    } else {
+        g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
+    }
 
     handleInputEvent();
 }
@@ -381,8 +385,8 @@ void AndroidWindow::handleNativeEvents() {
     struct android_poll_source* source;
 
     // If not visible, block until we get an event; if visible, don't block.
-    while ((ALooper_pollAll(m_visible ? 0 : -1, NULL, &events, (void **) &source)) >= 0) {
-        if (source != NULL) {
+    while ((ALooper_pollOnce(m_visible ? 0 : -1, nullptr, &events, (void**)&source)) >= 0) {
+        if (source != nullptr) {
             source->process(m_app, source);
         }
 

@@ -23,6 +23,7 @@
 #include <client/client.h>
 #include <client/game.h>
 #include <client/gameconfig.h>
+#include <client/localplayer.h>
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>

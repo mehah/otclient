@@ -35,6 +35,7 @@
 #include "map.h"
 #include "protocolgame.h"
 #include "uimap.h"
+#include "localplayer.h"
 #include <algorithm>
 
 Tile::Tile(const Position& position) : m_position(position) {}
