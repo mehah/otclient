@@ -1,0 +1,70 @@
+TrackerButton < Panel
+  height: 34
+  margin-bottom: 5
+  phantom: false
+  border-width: 1
+  border-color: alpha
+  padding: 1
+
+  $hover:
+    border-color: white
+
+  UICreature
+    id: creature
+    size: 32 32
+    anchors.left: parent.left
+    anchors.top: parent.top
+    phantom: true
+
+  UIWidget
+    id: spacer
+    width: 3
+    anchors.left: creature.right
+    anchors.top: creature.top
+
+  Label
+    id: label
+    anchors.left: spacer.right
+    anchors.top: creature.top
+    text-auto-resize: true
+    color: #888888
+    margin-left: 2
+
+  Label
+    id: kills
+    anchors.right: parent.right
+    anchors.top: creature.top
+    text-align: right
+    text-auto-resize: true
+    color: #888888
+    margin-left: 2
+
+  LifeProgressBar
+    id: killsBar
+    height: 8
+    anchors.left: spacer.right
+    anchors.right: parent.right
+    anchors.top: label.bottom
+    margin-top: 2
+    phantom: true
+
+MiniWindow
+  id: tasksTracker
+  !text: tr('Tasks Tracker')
+  height: 166
+  icon: /images/topbuttons/tasks
+  @onClose: modules.game_tasks.onTrackerClose()
+  &save: true
+  &autoOpen: false
+
+  MiniWindowContents
+    Panel
+      id: trackerPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+      margin-top: 5
+      padding-right: 5
+      layout:
+        type: verticalBox
+        fit-children: true
