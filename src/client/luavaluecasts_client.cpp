@@ -46,6 +46,16 @@ int push_luavalue(const Outfit& outfit)
         g_lua.pushInteger(outfit.getMount());
         g_lua.setField("mount");
     }
+    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+        g_lua.pushInteger(outfit.getWing());
+        g_lua.setField("wings");
+        g_lua.pushInteger(outfit.getEffect());
+        g_lua.setField("effects");
+        g_lua.pushInteger(outfit.getAura());
+        g_lua.setField("auras");
+        g_lua.pushString(outfit.getShader());
+        g_lua.setField("shaders");
+    }
     return 1;
 }
 
