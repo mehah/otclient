@@ -149,6 +149,7 @@ public:
     void openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback);
     void sendInspectionNormalObject(const Position& position);
     void sendInspectionObject(const Otc::InspectObjectTypes inspectionType, const uint16_t itemId, const uint8_t itemCount);
+    void sendUpdateAutoLoot(uint16_t clientId, const std::string& name, bool remove);
 
     // otclient only
     void sendChangeMapAwareRange(const uint8_t xrange, const uint8_t yrange);
@@ -322,6 +323,13 @@ private:
     void parseMarketEnterOld(const InputMessagePtr& msg);
     void parseMarketDetail(const InputMessagePtr& msg);
     void parseMarketBrowse(const InputMessagePtr& msg);
+
+    // Autoloot categories
+    // todo: const uint16_t thingId, stackpos
+    void parseAutoloot(const InputMessagePtr& msg);
+    void sendAddLootCategory(const Position&, int, int, uint16_t);
+    void sendRemoveLootCategory(const Position& pos, int thingId, int stackpos);
+    void parseUpdateContainer(const InputMessagePtr& msg);
 
     // 13x
     void parseBosstiaryData(const InputMessagePtr& msg);

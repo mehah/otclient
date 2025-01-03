@@ -47,6 +47,7 @@ public:
     int getSize() { return m_size; }
     int getFirstIndex() { return m_firstIndex; }
     ItemPtr findItemById(uint32_t itemId, int subType) const;
+    void onUpdate();
 
 protected:
     Container(uint8_t id, uint8_t capacity, const std::string_view name, const ItemPtr& containerItem, bool hasParent, bool isUnlocked, bool hasPages, uint16_t containerSize, uint16_t firstIndex)
@@ -55,9 +56,9 @@ protected:
 
     void onOpen(const ContainerPtr& previousContainer);
     void onClose();
-    void onAddItem(const ItemPtr& item, int slot);
+    void onAddItem(const ItemPtr& item, int slot, uint16_t categoryId);
     void onAddItems(const std::vector<ItemPtr>& items);
-    void onUpdateItem(int slot, const ItemPtr& item);
+    void onUpdateItem(int slot, const ItemPtr& item, uint16_t categoryId);
     void onRemoveItem(int slot, const ItemPtr& lastItem);
 
     friend class Game;

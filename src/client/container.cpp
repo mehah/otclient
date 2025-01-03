@@ -41,7 +41,7 @@ void Container::onClose()
     callLuaField("onClose");
 }
 
-void Container::onAddItem(const ItemPtr& item, int slot)
+void Container::onAddItem(const ItemPtr& item, int slot, uint16_t categoryId)
 {
     slot -= m_firstIndex;
 
@@ -51,6 +51,7 @@ void Container::onAddItem(const ItemPtr& item, int slot)
         callLuaField("onSizeChange", m_size);
         return;
     }
+    item->setLootCategory(categoryId);
 
     if (slot == 0)
         m_items.emplace_front(item);
@@ -77,7 +78,7 @@ void Container::onAddItems(const std::vector<ItemPtr>& items)
     updateItemsPositions();
 }
 
-void Container::onUpdateItem(int slot, const ItemPtr& item)
+void Container::onUpdateItem(int slot, const ItemPtr& item, uint16_t categoryId)
 {
     slot -= m_firstIndex;
     if (slot < 0 || slot >= static_cast<int>(m_items.size())) {
@@ -85,7 +86,9 @@ void Container::onUpdateItem(int slot, const ItemPtr& item)
         return;
     }
 
-    const auto& oldItem = m_items[slot];
+    item->setLootCategory(categoryId);
+
+    ItemPtr oldItem = m_items[slot];
     m_items[slot] = item;
     item->setPosition(getSlotPosition(slot));
 
@@ -106,14 +109,14 @@ void Container::onRemoveItem(int slot, const ItemPtr& lastItem)
         return;
     }
 
-    const auto& item = m_items[slot];
+    ItemPtr item = m_items[slot];
     m_items.erase(m_items.begin() + slot);
 
+
     if (lastItem) {
-        onAddItem(lastItem, m_firstIndex + m_capacity - 1);
+        onAddItem(lastItem, m_firstIndex + m_capacity - 1, 0);
         --m_size;
     }
-
     --m_size;
 
     updateItemsPositions();
@@ -126,4 +129,9 @@ void Container::updateItemsPositions()
 {
     for (int slot = 0; slot < static_cast<int>(m_items.size()); ++slot)
         m_items[slot]->setPosition(getSlotPosition(slot));
+}
+
+void Container::onUpdate()
+{
+    callLuaField("onUpdate");
 }

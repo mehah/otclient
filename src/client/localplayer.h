@@ -51,7 +51,7 @@ public:
     void setStamina(uint16_t stamina);
     void setKnown(bool known) { m_known = known; }
     void setPendingGame(bool pending) { m_pending = pending; }
-    void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item);
+    void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item, uint16_t categoryId);
     void setVocation(uint8_t vocation);
     void setPremium(bool premium);
     void setRegenerationTime(uint16_t regenerationTime);
@@ -89,6 +89,15 @@ public:
 
     const std::vector<uint16_t>& getSpells() { return m_spells; }
     ItemPtr getInventoryItem(Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
+
+    void addAutoLoot(uint16_t clientId, const std::string& name);
+    void removeAutoLoot(uint16_t clientId, const std::string& name);
+    bool isInAutoLootList(uint16_t clientId);
+    void manageAutoloot(const std::map<uint16_t, std::string>& items, bool remove);
+    void addToAutolootList(uint16_t clientId, const std::string& name);
+    void removeFromAutolootList(uint16_t clientId);
+
+    std::map<uint16_t, std::string> getAutolootItems() { return m_autolootItems; }
 
     uint64_t getResourceBalance(Otc::ResourceTypes_t type)
     {
@@ -156,6 +165,8 @@ private:
 
     std::array<Skill, Otc::LastSkill> m_skills;
     std::vector<uint16_t> m_spells;
+    
+    std::map<uint16_t, std::string> m_autolootItems;
 
     stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
 

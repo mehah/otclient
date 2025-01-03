@@ -306,16 +306,16 @@ void Game::processCloseContainer(const uint8_t containerId)
     }
 }
 
-void Game::processContainerAddItem(const uint8_t containerId, const ItemPtr& item, const uint16_t slot)
+void Game::processContainerAddItem(const uint8_t containerId, const ItemPtr& item, const uint16_t slot, uint16_t categoryId)
 {
     if (const auto& container = getContainer(containerId))
-        container->onAddItem(item, slot);
+        container->onAddItem(item, slot, categoryId);
 }
 
-void Game::processContainerUpdateItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& item)
+void Game::processContainerUpdateItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& item, uint16_t categoryId)
 {
     if (const auto& container = getContainer(containerId))
-        container->onUpdateItem(slot, item);
+        container->onUpdateItem(slot, item, categoryId);
 }
 
 void Game::processContainerRemoveItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& lastItem)
@@ -324,12 +324,12 @@ void Game::processContainerRemoveItem(const uint8_t containerId, const uint16_t 
         container->onRemoveItem(slot, lastItem);
 }
 
-void Game::processInventoryChange(const uint8_t slot, const ItemPtr& item)
+void Game::processInventoryChange(const uint8_t slot, const ItemPtr& item, uint16_t categoryId)
 {
     if (item)
         item->setPosition(Position(UINT16_MAX, slot, 0));
 
-    m_localPlayer->setInventoryItem(static_cast<Otc::InventorySlot>(slot), item);
+    m_localPlayer->setInventoryItem(static_cast<Otc::InventorySlot>(slot), item, categoryId);
 }
 
 void Game::processChannelList(const std::vector<std::tuple<uint16_t, std::string>>& channelList)
@@ -1962,4 +1962,56 @@ void Game::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)
     enableBotCall();
     m_protocolGame->sendStatusTrackerBestiary(raceId, status);
     disableBotCall();
+}
+
+
+void Game::addLootCategory(const ThingPtr& thing, uint16_t categoryId)
+{
+    if (!canPerformGameAction() || !thing)
+        return;
+
+    if (!thing->isItem())
+        return;
+
+    ItemPtr item = thing->static_self_cast<Item>();
+    if (categoryId != 0xFFFF) {
+        item->setLootCategory(categoryId);
+    }
+
+    m_protocolGame->sendAddLootCategory(thing->getPosition(), thing->getId(), thing->getStackPos(), categoryId);
+}
+
+void Game::removeLootCategory(const ThingPtr& thing)
+{
+    if (!canPerformGameAction() || !thing)
+        return;
+
+    if (!thing->isItem())
+        return;
+
+    ItemPtr item = thing->static_self_cast<Item>();
+    item->setLootCategory(0);
+
+    m_protocolGame->sendRemoveLootCategory(thing->getPosition(), thing->getId(), thing->getStackPos());
+}
+
+void Game::processUpdateContainer(int containerId)
+{
+    ContainerPtr container = getContainer(containerId);
+    if (!container) {
+        g_logger.traceError("container not found");
+        return;
+    }
+
+    container->onUpdate();
+}
+
+void Game::addAutoLoot(uint16_t clientId, const std::string& name)
+{
+    m_protocolGame->sendUpdateAutoLoot(clientId, name, false);
+}
+
+void Game::removeAutoLoot(uint16_t clientId, const std::string& name)
+{
+    m_protocolGame->sendUpdateAutoLoot(clientId, name, true);
 }

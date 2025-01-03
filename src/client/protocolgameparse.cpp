@@ -580,6 +580,12 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerStoreCompletePurchase:
                     parseCompleteStorePurchase(msg);
                     break;
+                case Proto::GameServerAutoloot:
+                    parseAutoloot(msg);
+                    break;
+                case Proto::GameServerUpdateContainer:
+                    parseUpdateContainer(msg);
+                    break;
                 default:
                     throw Exception("unhandled opcode %d", opcode);
                     break;
@@ -1373,7 +1379,10 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
     items.reserve(itemCount);
 
     for (auto i = 0; i < itemCount; i++) {
-        items.push_back(getItem(msg));
+        // TODO:  May need to merge with push_back
+        // items.push_back(getItem(msg));
+        items[i] = getItem(msg);
+        items[i]->setLootCategory(msg->getU16());
     }
 
     if (g_game.getFeature(Otc::GameContainerFilter)) {
@@ -1383,11 +1392,6 @@ void ProtocolGame::parseOpenContainer(const InputMessagePtr& msg)
             msg->getU8(); // id
             msg->getString(); // name
         }
-    }
-
-    if (g_game.getClientVersion() >= 1340) {
-        msg->getU8(); // isMoveable
-        msg->getU8(); // isHolding
     }
 
     g_game.processOpenContainer(containerId, containerItem, name, capacity, hasParent, items, isUnlocked, hasPages, containerSize, firstIndex);
@@ -1404,8 +1408,8 @@ void ProtocolGame::parseContainerAddItem(const InputMessagePtr& msg)
     const uint8_t containerId = msg->getU8();
     const uint16_t slot = g_game.getFeature(Otc::GameContainerPagination) ? msg->getU16() : 0;
     const auto& item = getItem(msg);
-
-    g_game.processContainerAddItem(containerId, item, slot);
+    uint16_t categoryId = msg->getU16();
+    g_game.processContainerAddItem(containerId, item, slot, categoryId);
 }
 
 void ProtocolGame::parseContainerUpdateItem(const InputMessagePtr& msg)
@@ -1413,8 +1417,8 @@ void ProtocolGame::parseContainerUpdateItem(const InputMessagePtr& msg)
     const uint8_t containerId = msg->getU8();
     const uint16_t slot = g_game.getFeature(Otc::GameContainerPagination) ? msg->getU16() : msg->getU8();
     const auto& item = getItem(msg);
-
-    g_game.processContainerUpdateItem(containerId, slot, item);
+    uint16_t categoryId = msg->getU16();
+    g_game.processContainerUpdateItem(containerId, slot, item, categoryId);
 }
 
 void ProtocolGame::parseContainerRemoveItem(const InputMessagePtr& msg)
@@ -1484,14 +1488,14 @@ void ProtocolGame::parseAddInventoryItem(const InputMessagePtr& msg)
 {
     const uint8_t slot = msg->getU8();
     const auto& item = getItem(msg);
-
-    g_game.processInventoryChange(slot, item);
+    uint16_t categoryId = msg->getU16();
+    g_game.processInventoryChange(slot, item, categoryId);
 }
 
 void ProtocolGame::parseRemoveInventoryItem(const InputMessagePtr& msg)
 {
     const uint8_t slot = msg->getU8();
-    g_game.processInventoryChange(slot, ItemPtr());
+    g_game.processInventoryChange(slot, ItemPtr(), 0);
 }
 
 void ProtocolGame::parseOpenNpcTrade(const InputMessagePtr& msg)
@@ -3103,6 +3107,18 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, int x, int y, i
     }
 }
 
+void ProtocolGame::parseAutoloot(const InputMessagePtr& msg)
+{
+    bool remove = msg->getU8() == 1;
+    uint16_t size = msg->getU16();
+    std::map<uint16_t, std::string> autolootItems;
+    for (uint16_t i = 1; i <= size; ++i) {
+        autolootItems.insert_or_assign(msg->getU16(), msg->getString());
+    }
+
+    m_localPlayer->manageAutoloot(autolootItems, remove);
+}
+
 int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, int x, int y, int z, int width, int height, int offset, int skip)
 {
     for (auto nx = 0; nx < width; ++nx) {
@@ -3644,6 +3660,8 @@ ItemPtr ProtocolGame::getItem(const InputMessagePtr& msg, int id)
         item->setTooltip(msg->getString());
     }
 
+    item->setRarityId(msg->getU8());
+
     return item;
 }
 
@@ -3654,6 +3672,12 @@ Position ProtocolGame::getPosition(const InputMessagePtr& msg)
     const uint8_t z = msg->getU8();
 
     return { x, y, z };
+}
+
+void ProtocolGame::parseUpdateContainer(const InputMessagePtr& msg)
+{
+    int containerId = msg->getU8();
+    g_game.processUpdateContainer(containerId);
 }
 
 void ProtocolGame::parseShowDescription(const InputMessagePtr& msg)

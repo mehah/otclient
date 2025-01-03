@@ -433,7 +433,7 @@ protected:
     void processDeath(const uint8_t deathType, const uint8_t penality);
 
     void processGMActions(const std::vector<uint8_t>& actions);
-    void processInventoryChange(const uint8_t slot, const ItemPtr& item);
+    void processInventoryChange(const uint8_t slot, const ItemPtr& item, uint16_t categoryId);
     void processAttackCancel(const uint32_t seq);
     void processWalkCancel(const Otc::Direction direction);
 
@@ -447,8 +447,8 @@ protected:
     // container related
     void processOpenContainer(const uint8_t containerId, const ItemPtr& containerItem, const std::string_view name, const uint8_t capacity, const bool hasParent, const std::vector<ItemPtr>& items, const bool isUnlocked, const bool hasPages, const uint16_t containerSize, const uint16_t firstIndex);
     void processCloseContainer(const uint8_t containerId);
-    void processContainerAddItem(const uint8_t containerId, const ItemPtr& item, const uint16_t slot);
-    void processContainerUpdateItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& item);
+    void processContainerAddItem(const uint8_t containerId, const ItemPtr& item, const uint16_t slot, uint16_t categoryId);
+    void processContainerUpdateItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& item, uint16_t categoryId);
     void processContainerRemoveItem(const uint8_t containerId, const uint16_t slot, const ItemPtr& lastItem);
 
     // channel related
@@ -547,6 +547,11 @@ public:
     void turn(const Otc::Direction direction);
     void stop();
     void setScheduleLastWalk(const bool scheduleLastWalk) { m_scheduleLastWalk = scheduleLastWalk; }
+
+    // Autoloot categories
+    void removeLootCategory(const ThingPtr& thing);
+    void addLootCategory(const ThingPtr& thing, uint16_t categoryId);
+    void processUpdateContainer(int);
 
     // item related
     void look(const ThingPtr& thing, const bool isBattleList = false);
@@ -708,6 +713,9 @@ public:
         return false;
 #endif
     }
+
+    void addAutoLoot(uint16_t clientId, const std::string& name);
+    void removeAutoLoot(uint16_t clientId, const std::string& name);
 
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }

@@ -378,6 +378,8 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "requestBossSlootInfo", &Game::requestBossSlootInfo, &g_game);
     g_lua.bindSingletonFunction("g_game", "requestBossSlotAction", &Game::requestBossSlotAction, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendStatusTrackerBestiary", &Game::sendStatusTrackerBestiary, &g_game);
+    g_lua.bindSingletonFunction("g_game", "removeLootCategory", &Game::removeLootCategory, &g_game);
+    g_lua.bindSingletonFunction("g_game", "addLootCategory", &Game::addLootCategory, &g_game);
 
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
@@ -714,7 +716,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("hasClockExpire", &ThingType::hasClockExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpire", &ThingType::hasExpire);
     g_lua.bindClassMemberFunction<Item>("hasExpireStop", &ThingType::hasExpireStop);
-#ifdef FRAMEWORK_EDITOR
+#ifdef FRAMEWORK_EDITORQ
     g_lua.bindClassMemberFunction<Item>("getName", &Item::getName);
     g_lua.bindClassMemberFunction<Item>("getServerId", &Item::getServerId);
     g_lua.bindClassStaticFunction<Item>("createOtb", &Item::createFromOtb);
@@ -726,6 +728,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Item>("removeContainerItem", &Item::removeContainerItem);
     g_lua.bindClassMemberFunction<Item>("clearContainerItems", &Item::clearContainerItems);
     g_lua.bindClassMemberFunction<Item>("getContainerItem", &Item::getContainerItem);
+
+    g_lua.bindClassMemberFunction<Item>("getLootCategory", &Item::getLootCategory);
+    g_lua.bindClassMemberFunction<Item>("getRarityId", &Item::getRarityId);
 
     g_lua.bindClassMemberFunction<Item>("getDescription", &Item::getDescription);
     g_lua.bindClassMemberFunction<Item>("getText", &Item::getText);
@@ -849,6 +854,10 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("getResourceBalance", &LocalPlayer::getResourceBalance);
     g_lua.bindClassMemberFunction<LocalPlayer>("setResourceBalance", &LocalPlayer::setResourceBalance);
     g_lua.bindClassMemberFunction<LocalPlayer>("getTotalMoney", &LocalPlayer::getTotalMoney);
+    g_lua.bindClassMemberFunction<LocalPlayer>("removeAutoLoot", &LocalPlayer::removeAutoLoot);
+    g_lua.bindClassMemberFunction<LocalPlayer>("addAutoLoot", &LocalPlayer::addAutoLoot);
+    g_lua.bindClassMemberFunction<LocalPlayer>("isInAutoLootList", &LocalPlayer::isInAutoLootList);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getAutolootItems", &LocalPlayer::getAutolootItems);
 
     g_lua.registerClass<Tile, AttachableObject>();
     g_lua.bindClassMemberFunction<Tile>("clean", &Tile::clean);

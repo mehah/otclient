@@ -1346,3 +1346,34 @@ void ProtocolGame::openContainerQuickLoot(const uint8_t action, const uint8_t ca
     }
     send(msg);
 }
+
+void ProtocolGame::sendRemoveLootCategory(const Position& pos, int thingId, int stackpos)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientRemoveLootCategory);
+    addPosition(msg, pos);
+    msg->addU16(thingId);
+    msg->addU8(stackpos);
+    send(msg);
+}
+
+void ProtocolGame::sendAddLootCategory(const Position& pos, int thingId, int stackpos, uint16_t categoryId)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientAddLootCategory);
+    addPosition(msg, pos);
+    msg->addU16(thingId);
+    msg->addU8(stackpos);
+    msg->addU16(categoryId);
+    send(msg);
+}
+
+void ProtocolGame::sendUpdateAutoLoot(uint16_t clientId, const std::string& name, bool remove)
+{
+    OutputMessagePtr msg(new OutputMessage);
+    msg->addU8(Proto::ClientUpdateAutoLoot);
+    msg->addU16(clientId);
+    msg->addString(name);
+    msg->addU8(remove ? 0x01 : 0x00);
+    send(msg);
+}

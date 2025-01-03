@@ -25,7 +25,8 @@ RUN /opt/vcpkg/vcpkg --feature-flags=binarycaching,manifests,versions install
 COPY ./ /otclient/
 WORKDIR /otclient/build
 
-RUN cmake -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake ..
+RUN cmake -DCMAKE_TOOLCHAIN_FILE=/opt/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_VERBOSE_MAKEFILE=ON ..
+# RUN make VERBOSE=1 -j$(nproc)
 RUN make -j$(nproc)
 
 FROM ubuntu:22.04
