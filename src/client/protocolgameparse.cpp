@@ -3456,10 +3456,14 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setMasterId(masterId);
             creature->setShader(shader);
             creature->clearTemporaryAttachedEffects();
+            std::unordered_set<uint16_t> currentAttachedEffectIds;
+            for (const auto& attachedEffect : creature->getAttachedEffects()) {
+                currentAttachedEffectIds.insert(attachedEffect->getId());
+            }
 
             for (const auto effectId : attachedEffectList) {
                 const auto& effect = g_attachedEffects.getById(effectId);
-                if (effect) {
+                if (effect && currentAttachedEffectIds.find(effectId) == currentAttachedEffectIds.end()) {
                     const auto& clonedEffect = effect->clone();
                     clonedEffect->setPermanent(false);
                     creature->attachEffect(clonedEffect);
