@@ -333,41 +333,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
         totalSpritesCount += totalSprites;
     }
 
-    if (sizes.size() > 1) {
-        // correction for some sprites
-        for (const auto& s : sizes) {
-            m_size.setWidth(std::max<int>(m_size.width(), s.width()));
-            m_size.setHeight(std::max<int>(m_size.height(), s.height()));
-        }
-        const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
-        if (expectedSize != m_spritesIndex.size()) {
-            const std::vector sprites(std::move(m_spritesIndex));
-            m_spritesIndex.clear();
-            m_spritesIndex.reserve(expectedSize);
-            for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
-                const int totalSprites = total_sprites[i];
-                if (m_size == sizes[i]) {
-                    for (int j = 0; j < totalSprites; ++j) {
-                        m_spritesIndex.push_back(sprites[idx++]);
-                    }
-                    continue;
-                }
-                const size_t patterns = (totalSprites / sizes[i].area());
-                for (size_t p = 0; p < patterns; ++p) {
-                    for (int x = 0; x < m_size.width(); ++x) {
-                        for (int y = 0; y < m_size.height(); ++y) {
-                            if (x < sizes[i].width() && y < sizes[i].height()) {
-                                m_spritesIndex.push_back(sprites[idx++]);
-                                continue;
-                            }
-                            m_spritesIndex.push_back(0);
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     prepareTextureLoad(sizes, total_sprites);
 }
 
@@ -596,9 +561,7 @@ void ThingType::prepareTextureLoad(const std::vector<Size>& sizes, const std::ve
                         for (int y = 0; y < m_size.height(); ++y) {
                             if (x < sizes[i].width() && y < sizes[i].height()) {
                                 m_spritesIndex.push_back(sprites[idx++]);
-                                continue;
                             }
-                            m_spritesIndex.push_back(0);
                         }
                     }
                 }
@@ -752,20 +715,22 @@ void ThingType::loadTexture(const int animationPhase)
                         if (protobufSupported) {
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
-                            if (!spriteImage) {
-                                continue;
-                            }
 
                             // verifies that the first block in the lower right corner is transparent.
-                            if (spriteImage->hasTransparentPixel()) {
+                            if (!spriteImage || spriteImage->hasTransparentPixel()) {
                                 fullImage->setTransparentPixel(true);
                             }
 
-                            if (spriteMask) {
-                                spriteImage->overwriteMask(maskColors[(l - 1)]);
-                            }
+                            if (spriteImage) {
+                                if (spriteMask) {
+                                    spriteImage->overwriteMask(maskColors[(l - 1)]);
+                                }
 
-                            fullImage->blit(framePos, spriteImage);
+                                auto spriteSize = spriteImage->getSize() / g_gameConfig.getSpriteSize();
+
+                                const Point& spritePos = Point(m_size.width() - spriteSize.width(), m_size.height() - spriteSize.height()) * g_gameConfig.getSpriteSize();
+                                fullImage->blit(framePos + spritePos, spriteImage);
+                            }
                         } else {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
