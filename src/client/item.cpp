@@ -92,7 +92,7 @@ void Item::setConductor()
     if (isSingleGround()) {
         m_drawConductor.agroup = true;
         m_drawConductor.order = FIRST;
-    } else if (isSingleGroundBorder() && !hasElevation()) {
+    } else if (isGroundBorder() && !hasElevation()) {
         m_drawConductor.agroup = true;
         m_drawConductor.order = SECOND;
     }
