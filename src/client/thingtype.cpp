@@ -285,9 +285,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
     m_animationPhases = 0;
     int totalSpritesCount = 0;
 
-    std::vector<Size> sizes;
-    std::vector<int> total_sprites;
-
     for (const auto& framegroup : appearance.frame_group()) {
         const int frameGroupType = framegroup.fixed_frame_group();
         const auto& spriteInfo = framegroup.sprite_info();
@@ -305,7 +302,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
 
         if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
             m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
-            sizes.emplace_back(m_size);
         }
 
         // animations
@@ -320,7 +316,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
         }
 
         const int totalSprites = m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * std::max<int>(1, spritesPhases.size());
-        total_sprites.push_back(totalSprites);
 
         if (totalSpritesCount + totalSprites > 4096)
             throw Exception("a thing type has more than 4096 sprites");
@@ -333,7 +328,7 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
         totalSpritesCount += totalSprites;
     }
 
-    prepareTextureLoad(sizes, total_sprites);
+    m_textureData.resize(m_animationPhases);
 }
 
 void ThingType::unserialize(const uint16_t clientId, const ThingCategory category, const FileStreamPtr& fin)
@@ -482,9 +477,6 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
     m_animationPhases = 0;
     int totalSpritesCount = 0;
 
-    std::vector<Size> sizes;
-    std::vector<int> total_sprites;
-
     for (int i = 0; i < groupCount; ++i) {
         uint8_t frameGroupType = FrameGroupDefault;
         if (hasFrameGroups)
@@ -493,7 +485,6 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
         const uint8_t width = fin->getU8();
         const uint8_t height = fin->getU8();
         m_size = { width, height };
-        sizes.emplace_back(m_size);
         if (width > 1 || height > 1) {
             m_realSize = fin->getU8();
         }
@@ -520,53 +511,12 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
         }
 
         const int totalSprites = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * groupAnimationsPhases;
-        total_sprites.push_back(totalSprites);
-
         if (totalSpritesCount + totalSprites > 4096)
             throw Exception("a thing type has more than 4096 sprites");
 
         m_spritesIndex.resize(totalSpritesCount + totalSprites);
         for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
             m_spritesIndex[j] = g_game.getFeature(Otc::GameSpritesU32) ? fin->getU32() : fin->getU16();
-
-        totalSpritesCount += totalSprites;
-    }
-
-    prepareTextureLoad(sizes, total_sprites);
-}
-
-void ThingType::prepareTextureLoad(const std::vector<Size>& sizes, const std::vector<int>& total_sprites) {
-    if (sizes.size() > 1) {
-        // correction for some sprites
-        for (const auto& s : sizes) {
-            m_size.setWidth(std::max<int>(m_size.width(), s.width()));
-            m_size.setHeight(std::max<int>(m_size.height(), s.height()));
-        }
-        const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
-        if (expectedSize != m_spritesIndex.size()) {
-            const std::vector sprites(std::move(m_spritesIndex));
-            m_spritesIndex.clear();
-            m_spritesIndex.reserve(expectedSize);
-            for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
-                const int totalSprites = total_sprites[i];
-                if (m_size == sizes[i]) {
-                    for (int j = 0; j < totalSprites; ++j) {
-                        m_spritesIndex.push_back(sprites[idx++]);
-                    }
-                    continue;
-                }
-                const size_t patterns = (totalSprites / sizes[i].area());
-                for (size_t p = 0; p < patterns; ++p) {
-                    for (int x = 0; x < m_size.width(); ++x) {
-                        for (int y = 0; y < m_size.height(); ++y) {
-                            if (x < sizes[i].width() && y < sizes[i].height()) {
-                                m_spritesIndex.push_back(sprites[idx++]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
     m_textureData.resize(m_animationPhases);
