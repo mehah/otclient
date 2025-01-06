@@ -208,6 +208,9 @@ public:
     uint8_t getPatternY()const { return m_numPatternY; }
     uint8_t getPatternZ()const { return m_numPatternZ; }
 
+    bool canAnimate() { return m_animate; }
+    void setAnimate(bool aniamte) { m_animate = aniamte; }
+
 protected:
     virtual ThingType* getThingType() const = 0;
 
@@ -242,6 +245,7 @@ private:
     void lua_setHighlight(const std::string_view color) { setHighlight(Color(color)); }
 
     bool m_canDraw{ true };
+    bool m_animate{ true };
 
     friend class Client;
     friend class Tile;
