@@ -36,22 +36,24 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
     if (m_animationTimer.ticksElapsed() < m_timeToStartDrawing)
         return;
 
-    int animationPhase;
-    if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
-        const auto* animator = getThingType()->getIdleAnimator();
-        if (!animator)
-            return;
+    int animationPhase = 0;
+    if (canAnimate()) {
+        if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
+            const auto* animator = getThingType()->getIdleAnimator();
+            if (!animator)
+                return;
 
-        // This requires a separate getPhaseAt method as using getPhase would make all magic effects use the same phase regardless of their appearance time
-        animationPhase = animator->getPhaseAt(m_animationTimer);
-    } else {
-        // hack to fix some animation phases duration, currently there is no better solution
-        int ticks = g_gameConfig.getEffectTicksPerFrame();
-        if (m_clientId == 33) {
-            ticks <<= 2;
+            // This requires a separate getPhaseAt method as using getPhase would make all magic effects use the same phase regardless of their appearance time
+            animationPhase = animator->getPhaseAt(m_animationTimer);
+        } else {
+            // hack to fix some animation phases duration, currently there is no better solution
+            int ticks = g_gameConfig.getEffectTicksPerFrame();
+            if (m_clientId == 33) {
+                ticks <<= 2;
+            }
+
+            animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
         }
-
-        animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
     const int offsetX = m_position.x - g_map.getCentralPosition().x;

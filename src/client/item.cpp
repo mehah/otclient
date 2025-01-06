@@ -246,7 +246,7 @@ void Item::updatePatterns()
 
 int Item::calculateAnimationPhase()
 {
-    if (!hasAnimationPhases()) return 0;
+    if (!hasAnimationPhases() || !canAnimate()) return 0;
 
     if (getIdleAnimator()) return getIdleAnimator()->getPhase();
 

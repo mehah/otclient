@@ -1005,6 +1005,8 @@ ThingType* Creature::getMountThingType() const {
 
 uint16_t Creature::getCurrentAnimationPhase(const bool mount)
 {
+    if (!canAnimate()) return 0;
+
     const auto thingType = mount ? getMountThingType() : getThingType();
 
     if (const auto idleAnimator = thingType->getIdleAnimator()) {
