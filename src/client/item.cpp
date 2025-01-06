@@ -92,7 +92,7 @@ void Item::setConductor()
     if (isSingleGround()) {
         m_drawConductor.agroup = true;
         m_drawConductor.order = FIRST;
-    } else if (isSingleGroundBorder() && !hasElevation()) {
+    } else if (isGroundBorder() && !hasElevation()) {
         m_drawConductor.agroup = true;
         m_drawConductor.order = SECOND;
     }
@@ -246,7 +246,7 @@ void Item::updatePatterns()
 
 int Item::calculateAnimationPhase()
 {
-    if (!hasAnimationPhases()) return 0;
+    if (!hasAnimationPhases() || !canAnimate()) return 0;
 
     if (getIdleAnimator()) return getIdleAnimator()->getPhase();
 
