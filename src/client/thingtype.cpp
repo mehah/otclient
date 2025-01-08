@@ -517,6 +517,8 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
         m_spritesIndex.resize(totalSpritesCount + totalSprites);
         for (int j = totalSpritesCount; j < (totalSpritesCount + totalSprites); ++j)
             m_spritesIndex[j] = g_game.getFeature(Otc::GameSpritesU32) ? fin->getU32() : fin->getU16();
+
+        totalSpritesCount += totalSprites;
     }
 
     m_textureData.resize(m_animationPhases);
