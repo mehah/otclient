@@ -46,6 +46,10 @@ int push_luavalue(const Outfit& outfit)
         g_lua.pushInteger(outfit.getMount());
         g_lua.setField("mount");
     }
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        g_lua.pushInteger(outfit.getFamiliar());
+        g_lua.setField("familiar");
+    }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
         g_lua.pushInteger(outfit.getWing());
         g_lua.setField("wings");
@@ -83,6 +87,10 @@ bool luavalue_cast(const int index, Outfit& outfit)
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         g_lua.getField("mount", index);
         outfit.setMount(g_lua.popInteger());
+    }
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        g_lua.getField("familiar", index);
+        outfit.setFamiliar(g_lua.popInteger());
     }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
         g_lua.getField("wings", index);
