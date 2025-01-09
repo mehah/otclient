@@ -647,13 +647,17 @@ bool Game::walk(const Otc::Direction direction)
     static Timer timer;
 
     if (nextWalkSchedule) nextWalkSchedule->cancel();
-    nextWalkSchedule = g_dispatcher.scheduleEvent([this] {
-        nextWalkSchedule = nullptr;
-        steps = 0;
-    }, 150);
 
     // check we can walk and add new walk event if false
     if (!m_localPlayer->canWalk(direction)) {
+        if (m_localPlayer->isWalking()) {
+            // schedule next walk event for smoother walking
+            auto delay = std::max<int32_t>(1, m_localPlayer->getStepDuration(true, direction) - m_localPlayer->getWalkTicksElapsed());
+            nextWalkSchedule = g_dispatcher.scheduleEvent([this, direction] {
+                walk(direction);
+                nextWalkSchedule = nullptr;
+            }, delay);
+        }
         return false;
     }
 
