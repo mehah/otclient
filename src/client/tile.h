@@ -181,7 +181,7 @@ public:
             ;
     }
 
-    bool hasElevation(const int elevation = 1) const { return m_elevation >= elevation; }
+    bool hasElevation(const int elevation = 1) { return m_elevation >= elevation; }
 
 #ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
@@ -228,7 +228,7 @@ private:
             setThingFlag(thing);
     }
 
-    bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
+    bool hasThingWithElevation() { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
     void markHighlightedThing(const Color& color) {
         if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < static_cast<int8_t>(m_things.size())) {
             m_things[m_highlightThingStackPos]->setMarked(color);
