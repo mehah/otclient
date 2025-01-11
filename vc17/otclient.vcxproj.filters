@@ -1055,9 +1055,6 @@
     <ClInclude Include="..\src\framework\graphics\shader\shadersources.h">
       <Filter>Header Files\framework\graphics\shader</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\protobuf\appearances.pb.h">
-      <Filter>Header Files\protobuf</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\client\attachableobject.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>

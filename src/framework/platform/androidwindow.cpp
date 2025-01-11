@@ -247,20 +247,26 @@ void AndroidWindow::processTextInput() {
 }
 
 void AndroidWindow::processFingerDownAndUp() {
-    static ticks_t lastPress = 0;
-
     bool isTouchdown = m_currentEvent.type == TOUCH_DOWN;
 
-    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_UP && stdext::millis() > lastPress + 500 ) ?
+    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_UP && !m_isDragging && stdext::millis() > m_lastPress + 500) ?
         Fw::MouseRightButton : Fw::MouseLeftButton;
 
     m_inputEvent.reset();
     m_inputEvent.type = (isTouchdown) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
     m_inputEvent.mouseButton = mouseButton;
-    if(isTouchdown) {
-        lastPress = g_clock.millis();
+
+    if (isTouchdown) {
+        m_lastPress = g_clock.millis();
         m_mouseButtonStates |= 1 << mouseButton;
-    } else {
+    } else if (m_currentEvent.type == TOUCH_UP) {
+        if (!m_isDragging) {
+            if (stdext::millis() > m_lastPress + 500) {
+                mouseButton = Fw::MouseRightButton;
+                m_inputEvent.mouseButton = mouseButton;
+            }
+        }
+        m_isDragging = false;
         g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
     }
 
@@ -268,8 +274,23 @@ void AndroidWindow::processFingerDownAndUp() {
 }
 
 void AndroidWindow::processFingerMotion() {
+    static Point lastMousePos(-1, -1);
+    static const int dragThreshold = 5;
+
     m_inputEvent.reset();
     m_inputEvent.type = Fw::MouseMoveInputEvent;
+
+    Point newMousePos(m_currentEvent.x / m_displayDensity, m_currentEvent.y / m_displayDensity);
+
+    if (lastMousePos.x != -1 && lastMousePos.y != -1) {
+        int dx = std::abs(newMousePos.x - lastMousePos.x);
+        int dy = std::abs(newMousePos.y - lastMousePos.y);
+
+        if (dx > dragThreshold || dy > dragThreshold) {
+            m_isDragging = true;
+        }
+    }
+    lastMousePos = newMousePos;
 
     handleInputEvent();
 }
