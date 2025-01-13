@@ -145,31 +145,31 @@ function bindKeys()
     Keybind.new("Movement", "Stop All Actions", "Esc", "", true)
     Keybind.bind("Movement", "Stop All Actions", {
         {
-          type = KEY_PRESS,
-          callback = function()
-            g_game.cancelAttackAndFollow()
-          end,
+            type = KEY_PRESS,
+            callback = function()
+                g_game.cancelAttackAndFollow()
+            end,
         }
-      }, gameRootPanel)
-      
+    }, gameRootPanel)
+
     Keybind.new("Misc", "Logout", "Ctrl+L", "Ctrl+Q")
     Keybind.bind("Misc", "Logout", {
         {
-          type = KEY_PRESS,
-          callback = function() tryLogout(false) end,
+            type = KEY_PRESS,
+            callback = function() tryLogout(false) end,
         }
-      }, gameRootPanel)
+    }, gameRootPanel)
 
     Keybind.new("UI", "Clear All Texts", "Ctrl+W", "")
     Keybind.bind("UI", "Clear All Texts", {
         {
-          type = KEY_DOWN,
-          callback = function()
-            g_map.cleanTexts()
-            modules.game_textmessage.clearMessages()
-          end,
+            type = KEY_DOWN,
+            callback = function()
+                g_map.cleanTexts()
+                modules.game_textmessage.clearMessages()
+            end,
         }
-      }, gameRootPanel)
+    }, gameRootPanel)
 
     g_keyboard.bindKeyDown('Ctrl+.', nextViewMode, gameRootPanel)
 end
@@ -803,16 +803,6 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end
     end
 
-    if not g_game.isEnabledBotProtection() and useThing and useThing:isItem() then
-        menu:addSeparator()
-        local useThingId = useThing:getId()
-        if useThing:getSubType() > 1 then
-            menu:addOption("ID: " .. useThingId .. " SubType: " .. g_window.getClipboardText(), function() end)
-        else
-            menu:addOption("ID: " .. useThingId, function() g_window.setClipboardText(useThingId) end)
-        end
-    end
-
     if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
         local quickLoot = modules.game_quickloot.QuickLoot
         menu.addSeparator(menu)
@@ -841,59 +831,59 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
     if g_platform.isMobile() then
         if mouseButton == MouseRightButton then
             createThingMenu(menuPosition, lookThing, useThing, creatureThing)
-            return true      
+            return true
         end
         local shortcut = modules.game_shortcuts.getShortcut()
         if shortcut == "look" then
-          if lookThing then
-            modules.game_shortcuts.resetShortcuts()
-            g_game.look(lookThing)
-            return true    
-          end
-          return true    
-        elseif shortcut == "use" then
-          if useThing then
-            modules.game_shortcuts.resetShortcuts()
-            if useThing:isContainer() then
-              if useThing:getParentContainer() then
-                g_game.open(useThing, useThing:getParentContainer())
-              else
-                g_game.open(useThing)
-              end
-              return true
-            elseif useThing:isMultiUse() then
-              startUseWith(useThing)
-              return true
-            else
-              g_game.use(useThing)
-              return true
+            if lookThing then
+                modules.game_shortcuts.resetShortcuts()
+                g_game.look(lookThing)
+                return true
             end
-          end
-          return true
+            return true
+        elseif shortcut == "use" then
+            if useThing then
+                modules.game_shortcuts.resetShortcuts()
+                if useThing:isContainer() then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                    else
+                        g_game.open(useThing)
+                    end
+                    return true
+                elseif useThing:isMultiUse() then
+                    startUseWith(useThing)
+                    return true
+                else
+                    g_game.use(useThing)
+                    return true
+                end
+            end
+            return true
         elseif shortcut == "attack" then
-          if attackCreature and attackCreature ~= player then
-            modules.game_shortcuts.resetShortcuts()
-            g_game.attack(attackCreature)
+            if attackCreature and attackCreature ~= player then
+                modules.game_shortcuts.resetShortcuts()
+                g_game.attack(attackCreature)
+                return true
+            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+                modules.game_shortcuts.resetShortcuts()
+                g_game.attack(creatureThing)
+                return true
+            end
             return true
-          elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
-            modules.game_shortcuts.resetShortcuts()
-            g_game.attack(creatureThing)
-            return true
-          end
-          return true
         elseif shortcut == "follow" then
-          if attackCreature and attackCreature ~= player then
-            modules.game_shortcuts.resetShortcuts()
-            g_game.follow(attackCreature)
+            if attackCreature and attackCreature ~= player then
+                modules.game_shortcuts.resetShortcuts()
+                g_game.follow(attackCreature)
+                return true
+            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+                modules.game_shortcuts.resetShortcuts()
+                g_game.follow(creatureThing)
+                return true
+            end
             return true
-          elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
-            modules.game_shortcuts.resetShortcuts()
-            g_game.follow(creatureThing)
-            return true
-          end
-          return true
         elseif not autoWalkPos and useThing then
-            createThingMenu(menuPosition, lookThing, useThing, creatureThing)      
+            createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             return true
         end
     elseif not modules.client_options.getOption('classicControl') then
@@ -1329,9 +1319,9 @@ function onDecreaseLeftPanels()
     if modules.client_options.getOption('showLeftExtraPanel') then
         modules.client_options.setOption('showLeftExtraPanel', false)
         movePanel(gameLeftExtraPanel)
-		if g_platform.isMobile() then
-		    leftDecreaseSidePanels:setEnabled(false)
-		end
+        if g_platform.isMobile() then
+            leftDecreaseSidePanels:setEnabled(false)
+        end
         return
     end
 
