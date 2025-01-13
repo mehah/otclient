@@ -52,13 +52,16 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
         return;
 
+    bool agroup = m_alwaysGroupDrawings || conductor.agroup;
+
     uint8_t order = conductor.order;
-    if (m_type == DrawPoolType::FOREGROUND)
+    if (m_type == DrawPoolType::FOREGROUND) {
         order = FIRST;
-    else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
+        agroup = false;
+    } else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
         order = THIRD;
 
-    if (m_alwaysGroupDrawings || conductor.agroup) {
+    if (agroup) {
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);
