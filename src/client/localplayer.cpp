@@ -44,10 +44,9 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
     if (isWalking()) {
         if (isAutoWalking()) return true; // always allow automated walks
         if (isPreWalking()) return false; // allow only single prewalk
-        return m_walkTimer.ticksElapsed() >= getStepDuration(); // allow only if walk done
     }
 
-    return true;
+    return m_walkTimer.ticksElapsed() >= getStepDuration(); // allow only if walk done, ex. diagonals may need additional ticks before taking another step
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
