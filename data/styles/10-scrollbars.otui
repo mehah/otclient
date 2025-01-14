@@ -30,7 +30,7 @@ VerticalScrollBar < UIScrollBar
 
   UIButton
     id: decrementButton
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.top: parent.top
     anchors.left: parent.left
     image-source: /images/ui/scrollbar
     image-clip: 0 0 13 13
@@ -45,7 +45,7 @@ VerticalScrollBar < UIScrollBar
 
   UIButton
     id: incrementButton
-    anchors.verticalCenter: parent.verticalCenter
+    anchors.bottom: parent.bottom
     anchors.right: parent.right
     size: 13 13
     image-source: /images/ui/scrollbar
@@ -150,6 +150,7 @@ VerticalQtScrollBar < UIScrollBar
 HorizontalScrollBarQtSlider < UIButton
   id: sliderButton
   anchors.centerIn: parent
+  margin-top: 1
   size: 44 12
   image-source: /images/ui/scrollbar_new_horizontal
   image-clip: 34 22 44 12
@@ -177,7 +178,7 @@ HorizontalQtScrollBar < UIScrollBar
 
   UIButton
     id: incrementButton
-    anchors.bottom: parent.bottom
+    anchors.top: parent.top
     anchors.right: parent.right
     size: 12 12
     image-source: /images/ui/scrollbar_new_horizontal
