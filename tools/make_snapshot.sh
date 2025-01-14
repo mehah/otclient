@@ -12,18 +12,18 @@ makejobs=4
 replace=false
 rebuild=true
 for arg in "$@"; do
-    case "$arg" in
-        --no-rebuild)
-            rebuild=false
-            ;;
-        --replace)
-            replace=true
-            ;;
-        *)
-            echo "usage: $0 [--replace] [--no-rebuild]"
-            exit
-            ;;
-    esac
+	case "$arg" in
+	--no-rebuild)
+		rebuild=false
+		;;
+	--replace)
+		replace=true
+		;;
+	*)
+		echo "usage: $0 [--replace] [--no-rebuild]"
+		exit
+		;;
+	esac
 done
 
 # setup work directory
@@ -32,41 +32,38 @@ cd $workdir
 
 # update otclient
 if [ -d otclient ]; then
-    cd otclient
-    git pull || exit
+	cd otclient
+	git pull || exit
 else
-    git clone $gitroot otclient || exit
+	git clone $gitroot otclient || exit
 fi
 
 cd $workdir/otclient
-revision=`git rev-list --all | wc -l`
-commit=`git describe --always`
-version=`cat CMakeLists.txt | grep "set(VERSION" | sed 's/.*"\([^"]*\)".*/\1/'`
-
+revision=$(git rev-list --all | wc -l)
+commit=$(git describe --always)
+version=$(cat CMakeLists.txt | grep "set(VERSION" | sed 's/.*"\([^"]*\)".*/\1/')
 
 if $rebuild; then
-    rm -rf build.win32
-    rm -rf build.win64
-    rm -rf build.win32dx9
-    rm -rf build.win64dx9
-    rm -rf build.linux32
-    rm -rf build.linux64
+	rm -rf build.win32
+	rm -rf build.win64
+	rm -rf build.win32dx9
+	rm -rf build.win64dx9
+	rm -rf build.linux32
+	rm -rf build.linux64
 fi
 
 WIN32_EXTRA_LIBS="-Wl,-Bstatic -lgcc -lstdc++ -lpthread -Wl,-Bdynamic"
-
 
 # compile for win64
 mkdir -p build.win64
 cd build.win64
 if $rebuild; then
-    x86_64-w64-mingw32-cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBOT_PROTECTION=OFF \
-        -DBUILD_REVISION=$revision \
-        -DBUILD_COMMIT=$commit \
-        -DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
-        .. || exit
+	x86_64-w64-mingw32-cmake \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_REVISION=$revision \
+		-DBUILD_COMMIT=$commit \
+		-DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
+		.. || exit
 fi
 make -j$makejobs || exit
 cd ..
@@ -75,13 +72,12 @@ cd ..
 mkdir -p build.win32
 cd build.win32
 if $rebuild; then
-    i686-w64-mingw32-cmake \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBOT_PROTECTION=OFF \
-        -DBUILD_REVISION=$revision \
-        -DBUILD_COMMIT=$commit \
-        -DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
-        .. || exit
+	i686-w64-mingw32-cmake \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_REVISION=$revision \
+		-DBUILD_COMMIT=$commit \
+		-DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
+		.. || exit
 fi
 make -j$makejobs || exit
 cd ..
@@ -90,14 +86,13 @@ cd ..
 #mkdir -p build.win64dx9
 #cd build.win64dx9
 #if $rebuild; then
-    #x86_64-w64-mingw32-cmake \
-        #-DCMAKE_BUILD_TYPE=Release \
-        #-DBOT_PROTECTION=OFF \
-        #-DOPENGLES=2.0 \
-        #-DBUILD_REVISION=$revision \
-        #-DBUILD_COMMIT=$commit \
-        #-DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
-        #.. || exit
+#x86_64-w64-mingw32-cmake \
+#-DCMAKE_BUILD_TYPE=Release \
+#-DOPENGLES=2.0 \
+#-DBUILD_REVISION=$revision \
+#-DBUILD_COMMIT=$commit \
+#-DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
+#.. || exit
 #fi
 #make -j$makejobs || exit
 #cd ..
@@ -106,14 +101,13 @@ cd ..
 #mkdir -p build.win32dx9
 #cd build.win32dx9
 #if $rebuild; then
-    #i686-w64-mingw32-cmake \
-        #-DCMAKE_BUILD_TYPE=Release \
-        #-DBOT_PROTECTION=OFF \
-        #-DOPENGLES=2.0 \
-        #-DBUILD_REVISION=$revision \
-        #-DBUILD_COMMIT=$commit \
-        #-DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
-        #.. || exit
+#i686-w64-mingw32-cmake \
+#-DCMAKE_BUILD_TYPE=Release \
+#-DOPENGLES=2.0 \
+#-DBUILD_REVISION=$revision \
+#-DBUILD_COMMIT=$commit \
+#-DEXTRA_LIBS="$WIN32_EXTRA_LIBS" \
+#.. || exit
 #fi
 #make -j$makejobs || exit
 #cd ..
@@ -122,11 +116,10 @@ cd ..
 mkdir -p build.linux64
 cd build.linux64
 if $rebuild; then
-    cmake -DCMAKE_BUILD_TYPE=Release \
-        -DBOT_PROTECTION=OFF \
-        -DBUILD_REVISION=$revision \
-        -DBUILD_COMMIT=$commit \
-        .. || exit
+	cmake -DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_REVISION=$revision \
+		-DBUILD_COMMIT=$commit \
+		.. || exit
 fi
 make -j$makejobs || exit
 cd ..
@@ -138,18 +131,17 @@ export LDFLAGS="-march=i686 -m32"
 
 LIBPATH=/usr/lib
 if [ -d /usr/lib32 ]; then
-    LIBPATH=/usr/lib32
+	LIBPATH=/usr/lib32
 fi
 
 mkdir -p build.linux32
 cd build.linux32
 if $rebuild; then
-    cmake -DCMAKE_BUILD_TYPE=Release \
-        -DBOT_PROTECTION=OFF \
-        -DBUILD_REVISION=$revision \
-        -DBUILD_COMMIT=$commit \
-        -DCMAKE_LIBRARY_PATH=$LIBPATH \
-        .. || exit
+	cmake -DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_REVISION=$revision \
+		-DBUILD_COMMIT=$commit \
+		-DCMAKE_LIBRARY_PATH=$LIBPATH \
+		.. || exit
 fi
 make -j$makejobs || exit
 cd ..
@@ -187,11 +179,11 @@ cd $workdir
 
 # determine zip name
 if ! $replace; then
-    let i=1
-    while [ -e $pkgzip ]; do
-        pkgzip="$pkgname-$i.zip"
-        let i=i+1
-    done
+	let i=1
+	while [ -e $pkgzip ]; do
+		pkgzip="$pkgname-$i.zip"
+		let i=i+1
+	done
 fi
 
 # compress to a zip file
@@ -241,11 +233,11 @@ cd $workdir
 
 # determine zip name
 if [ ! $replace ]; then
-    let i=1
-    while [ -e $pkgzip ]; do
-        pkgzip="$pkgname-$i.zip"
-        let i=i+1
-    done
+	let i=1
+	while [ -e $pkgzip ]; do
+		pkgzip="$pkgname-$i.zip"
+		let i=i+1
+	done
 fi
 
 # compress to a zip file
@@ -258,4 +250,3 @@ echo "Package generated to $pkgzip"
 cd otclient
 wine build.win32/otclient.exe
 rm -f *.log
-

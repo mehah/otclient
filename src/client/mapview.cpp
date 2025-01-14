@@ -264,7 +264,7 @@ void MapView::drawForeground(const Rect& rect)
         p += rect.topLeft();
         animatedText->drawText(p, rect);
     }
-#ifndef BOT_PROTECTION
+
     g_drawPool.scale(1.f);
     for (const auto& tile : m_foregroundTiles) {
         const auto& dest = transformPositionTo2D(tile->getPosition());
@@ -277,7 +277,6 @@ void MapView::drawForeground(const Rect& rect)
 
         tile->drawTexts(p);
     }
-#endif
 }
 
 void MapView::updateVisibleTiles()

@@ -1238,7 +1238,6 @@ void Map::updateAttachedWidgets(const MapViewPtr& mapView)
     }
 }
 
-#ifndef BOT_PROTECTION
 std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params)
 {
     // using Dijkstra's algorithm
@@ -1455,4 +1454,3 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
     }
     return creatures;
 }
-#endif
