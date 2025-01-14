@@ -183,19 +183,21 @@ function walk(dir)
 
     nextWalkDir = nil
 
-    local toPos = Position.translatedToDirection(player:getPosition(), dir)
-    local toTile = g_map.getTile(toPos)
-    if toTile and toTile:isWalkable() then
-        if not player:isPreWalking() then
-            player:preWalk(dir)
-        end
-    else
-        -- check for stairs/elevation steps
-        if not canChangeFloorDown(toPos) and not canChangeFloorUp(toPos) then
-            return false
-        end
+    if g_game.getFeature(GameAllowPreWalk) then
+        local toPos = Position.translatedToDirection(player:getPosition(), dir)
+        local toTile = g_map.getTile(toPos)
+        if toTile and toTile:isWalkable() then
+            if not player:isPreWalking() then
+                player:preWalk(dir)
+            end
+        else
+            -- check for stairs/elevation steps
+            if not canChangeFloorDown(toPos) and not canChangeFloorUp(toPos) then
+                return false
+            end
 
-        player:lockWalk(200)
+            player:lockWalk(200)
+        end
     end
 
     g_game.walk(dir)
@@ -234,14 +236,22 @@ end
 
 function addWalkEvent(dir, delay)
     cancelWalkEvent()
-    walkEvent = scheduleEvent(function()
+
+    local function walkCallback()
         if g_keyboard.getModifiers() ~= KeyboardNoModifier then
             return
         end
 
         local direction = smartWalkDir or dir
         walk(direction)
-    end, delay or 10)
+    end
+
+    if delay and delay == 0 then
+        walkEvent = addEvent(walkCallback)
+        return
+    end
+
+    walkEvent = scheduleEvent(walkCallback, delay or 10)
 end
 
 function cancelWalkEvent()
@@ -249,6 +259,8 @@ function cancelWalkEvent()
         removeEvent(walkEvent)
         walkEvent = nil
     end
+
+    nextWalkDir = nil
 end
 
 -- events
@@ -268,10 +280,12 @@ end
 
 function onWalkFinish(player)
     if nextWalkDir then
-        addWalkEvent(nextWalkDir)
+        if not g_game.getFeature(GameAllowPreWalk) then
+            walk(nextWalkDir)
+        else
+            addWalkEvent(nextWalkDir)
+        end
     end
-
-    nextWalkDir = nil
 end
 
 function onCancelWalk(player)

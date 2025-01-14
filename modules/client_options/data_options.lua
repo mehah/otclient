@@ -151,7 +151,7 @@ return {
         end
     },
     walkTurnDelay                     = {
-        value = 250,
+        value = 100,
         action = function(value, options, controller, panels, extraWidgets)
             panels.generalPanel:recursiveGetChildById('walkTurnDelay'):setText(string.format(
                 'Walk delay after turn: %sms',
@@ -159,7 +159,7 @@ return {
         end
     },
     walkTeleportDelay                 = {
-        value = 250,
+        value = 50,
         action = function(value, options, controller, panels, extraWidgets)
             panels.generalPanel:recursiveGetChildById('walkTeleportDelay'):setText(string.format(
                 'Walk delay after teleport: %sms',
@@ -167,7 +167,7 @@ return {
         end
     },
     walkStairsDelay                   = {
-        value = 250,
+        value = 50,
         action = function(value, options, controller, panels, extraWidgets)
             panels.generalPanel:recursiveGetChildById('walkStairsDelay'):setText(string.format(
                 'Walk delay after floor change: %sms',
