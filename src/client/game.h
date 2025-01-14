@@ -703,14 +703,6 @@ public:
     uint16_t getWalkFirstStepDelay() { return m_walkFirstStepDelay; }
 
     bool canPerformGameAction() const;
-    bool checkBotProtection() const;
-    bool isEnabledBotProtection() {
-#ifdef BOT_PROTECTION
-        return true;
-#else
-        return false;
-#endif
-    }
 
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }

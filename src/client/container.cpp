@@ -52,10 +52,8 @@ void Container::onAddItem(const ItemPtr& item, int slot)
         return;
     }
 
-    if (slot == 0)
-        m_items.emplace_front(item);
-    else
-        m_items.emplace_back(item);
+    m_items.insert(m_items.begin() + slot, item);
+
     updateItemsPositions();
 
     callLuaField("onSizeChange", m_size);

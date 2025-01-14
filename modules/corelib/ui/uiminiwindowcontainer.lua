@@ -95,7 +95,7 @@ function UIMiniWindowContainer:fits(child, minContentHeight, maxContentHeight)
 
     local containerPanel = child:getChildById('contentsPanel')
     local indispensableHeight = containerPanel:getMarginTop() + containerPanel:getMarginBottom() +
-                                    containerPanel:getPaddingTop() + containerPanel:getPaddingBottom()
+        containerPanel:getPaddingTop() + containerPanel:getPaddingBottom()
 
     local totalHeight = 0
     local children = self:getChildren()
@@ -117,7 +117,7 @@ function UIMiniWindowContainer:fits(child, minContentHeight, maxContentHeight)
 end
 
 function UIMiniWindowContainer:onDrop(widget, mousePos)
-    if (self.onlyPhantomDrop and not(widget.moveOnlyToMain)) or (widget.moveOnlyToMain and not(self.onlyPhantomDrop)) then
+    if (self.onlyPhantomDrop and not (widget.moveOnlyToMain)) or (widget.moveOnlyToMain and not (self.onlyPhantomDrop)) then
         return true
     end
 
@@ -138,12 +138,10 @@ function UIMiniWindowContainer:onDrop(widget, mousePos)
             self:addChild(widget)
         end
 
-        if not g_game.isEnabledBotProtection() then
-            if widget:getId() == "botWindow" and
-                (widget:getParent():getId() == "gameLeftPanel" or widget:getParent():getId() == "gameLeftExtraPanel" or
-                    widget:getParent():getId() == "gameRightExtraPanel") then
-                widget:getParent():setWidth(190)
-            end
+        if widget:getId() == "botWindow" and
+            (widget:getParent():getId() == "gameLeftPanel" or widget:getParent():getId() == "gameLeftExtraPanel" or
+                widget:getParent():getId() == "gameRightExtraPanel") then
+            widget:getParent():setWidth(190)
         end
         self:fitAll(widget)
         return true
@@ -193,7 +191,6 @@ function UIMiniWindowContainer:scheduleInsert(widget, index)
                     break
                 end
             end
-
         end
     end
 end
