@@ -76,14 +76,14 @@ end
 function bindWalkKey(key, dir)
     local gameRootPanel = modules.game_interface.getRootPanel()
     g_keyboard.bindKeyDown(key, function()
+        g_keyboard.setKeyDelay(key, 10)
         changeWalkDir(dir)
     end, gameRootPanel, true)
     g_keyboard.bindKeyUp(key, function()
+        g_keyboard.setKeyDelay(key, 30)
         changeWalkDir(dir, true)
     end, gameRootPanel, true)
     g_keyboard.bindKeyPress(key, function(_, _, ticks) smartWalk(dir, ticks) end, gameRootPanel)
-
-    g_keyboard.setKeyDelay(key, 30)
 end
 
 function unbindWalkKey(key)
@@ -91,8 +91,6 @@ function unbindWalkKey(key)
     g_keyboard.unbindKeyDown(key, gameRootPanel)
     g_keyboard.unbindKeyUp(key, gameRootPanel)
     g_keyboard.unbindKeyPress(key, gameRootPanel)
-
-    g_keyboard.setKeyDelay(key, 30)
 end
 
 function bindTurnKey(key, dir)
@@ -195,8 +193,6 @@ function walk(dir)
             if not canChangeFloorDown(toPos) and not canChangeFloorUp(toPos) then
                 return false
             end
-
-            player:lockWalk(200)
         end
     end
 
