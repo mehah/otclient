@@ -25,15 +25,6 @@
 #include "protocolgame.h"
 #include <framework/util/crypt.h>
 
-void ProtocolGame::send(const OutputMessagePtr& outputMessage)
-{
-    // avoid usage of automated sends (bot modules)
-    if (!g_game.checkBotProtection())
-        return;
-
-    Protocol::send(outputMessage);
-}
-
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
 {
     if (m_enableSendExtendedOpcode) {

@@ -1592,21 +1592,6 @@ void Game::changeMapAwareRange(const uint8_t xrange, const uint8_t yrange)
     m_protocolGame->sendChangeMapAwareRange(xrange, yrange);
 }
 
-bool Game::checkBotProtection() const
-{
-#ifdef BOT_PROTECTION
-#ifndef ANDROID
-    // accepts calls comming from a stacktrace containing only C++ functions,
-    // if the stacktrace contains a lua function, then only accept if the engine is processing an input event
-    if (m_denyBotCall && g_lua.isInCppCallback() && !g_app.isOnInputEvent()) {
-        g_logger.error(g_lua.traceback("caught a lua call to a bot protected game function, the call was cancelled"));
-        return false;
-    }
-#endif
-#endif
-    return true;
-}
-
 bool Game::canPerformGameAction() const
 {
     // we can only perform game actions if we meet these conditions:
@@ -1615,8 +1600,7 @@ bool Game::canPerformGameAction() const
     // - the local player is not dead
     // - we have a game protocol
     // - the game protocol is connected
-    // - its not a bot action
-    return m_online && m_localPlayer && !m_dead && m_protocolGame && m_protocolGame->isConnected() && checkBotProtection();
+    return m_online && m_localPlayer && !m_dead && m_protocolGame && m_protocolGame->isConnected();
 }
 
 void Game::setProtocolVersion(const uint16_t version)

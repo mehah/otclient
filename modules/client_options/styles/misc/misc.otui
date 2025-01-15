@@ -25,6 +25,3 @@ UIWidget
       anchors.left: parent.left
       anchors.right: parent.right
       anchors.top: prev.bottom
-
-      @onSetup: |
-        self:getParent():setVisible(not g_game.isEnabledBotProtection())
