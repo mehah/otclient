@@ -27,6 +27,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
+#include "framework/core/graphicalapplication.h"
 
 #ifdef NDEBUG
 #include <timeapi.h>

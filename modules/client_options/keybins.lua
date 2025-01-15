@@ -600,7 +600,7 @@ function searchActions(field, text, oldText)
 end
 
 function performeSearchActions()
-    local searchText = panels.keybindsPanel.search.field:getText():trim():lower()
+    local searchText = panels.keybindsPanel.search.field:getText():trim():lower():gsub("%+", "%%+")
 
     local rows = panels.keybindsPanel.tablePanel.keybinds.dataSpace:getChildren()
     if searchText:len() > 0 then

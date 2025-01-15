@@ -78,7 +78,6 @@ function UIMiniWindow:setup()
     end
 
     self:getChildById('minimizeButton').onClick = function()
-
         if self:isOn() then
             self:maximize()
         else
@@ -87,7 +86,6 @@ function UIMiniWindow:setup()
     end
 
     self:getChildById('lockButton').onClick = function()
-
         if self:isDraggable() then
             self:lock()
         else
@@ -118,7 +116,6 @@ function UIMiniWindow:setupOnStart()
         settings = {
             [char] = {}
         }
-
     elseif not settings[char] then
         -- if there are no settings for this character, we'll copy the settings from
         -- another one, so we'll have something better than all the windows randomly positioned
@@ -127,7 +124,6 @@ function UIMiniWindow:setupOnStart()
             g_settings.setNode('CharMiniWindows', settings)
             break
         end
-
     end
 
     local selfSettings = settings[char][self:getId()]
@@ -143,7 +139,6 @@ function UIMiniWindow:setupOnStart()
                     self:setParent(parent, true)
                     self:setPosition(topoint(selfSettings.position))
                     newParentSet = true
-
                 end
             end
         end
@@ -190,13 +185,13 @@ function UIMiniWindow:setupOnStart()
     end
 
     self:fitOnParent()
-    if not g_game.isEnabledBotProtection() and self:getId() == "botWindow" then
+    if self:getId() == "botWindow" then
         local parent = self:getParent()
         local parentId = parent:getId()
-        
-        if parentId == "gameLeftPanel" or 
-           parentId == "gameLeftExtraPanel" or 
-           parentId == "gameRightExtraPanel" then
+
+        if parentId == "gameLeftPanel" or
+            parentId == "gameLeftExtraPanel" or
+            parentId == "gameRightExtraPanel" then
             if parent:isVisible() then
                 parent:setWidth(190)
             end
@@ -420,7 +415,6 @@ function UIMiniWindow:saveParent(parent)
             self:saveParentPosition(parent:getId(), self:getPosition())
         end
     end
-
 end
 
 function UIMiniWindow:saveParentPosition(parentId, position)
@@ -469,7 +463,7 @@ end
 function UIMiniWindow:setContentHeight(height)
     local contentsPanel = self:getChildById('contentsPanel')
     local minHeight = contentsPanel:getMarginTop() + contentsPanel:getMarginBottom() + contentsPanel:getPaddingTop() +
-                          contentsPanel:getPaddingBottom()
+        contentsPanel:getPaddingBottom()
 
     local resizeBorder = self:getChildById('bottomResizeBorder')
     resizeBorder:setParentSize(minHeight + height)
@@ -478,7 +472,7 @@ end
 function UIMiniWindow:setContentMinimumHeight(height)
     local contentsPanel = self:getChildById('contentsPanel')
     local minHeight = contentsPanel:getMarginTop() + contentsPanel:getMarginBottom() + contentsPanel:getPaddingTop() +
-                          contentsPanel:getPaddingBottom()
+        contentsPanel:getPaddingBottom()
 
     local resizeBorder = self:getChildById('bottomResizeBorder')
     resizeBorder:setMinimum(minHeight + height)
@@ -487,7 +481,7 @@ end
 function UIMiniWindow:setContentMaximumHeight(height)
     local contentsPanel = self:getChildById('contentsPanel')
     local minHeight = contentsPanel:getMarginTop() + contentsPanel:getMarginBottom() + contentsPanel:getPaddingTop() +
-                          contentsPanel:getPaddingBottom()
+        contentsPanel:getPaddingBottom()
 
     local resizeBorder = self:getChildById('bottomResizeBorder')
     resizeBorder:setMaximum(minHeight + height)

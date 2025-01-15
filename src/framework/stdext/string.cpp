@@ -140,11 +140,7 @@ namespace stdext
 
     std::wstring utf8_to_utf16(const std::string_view src)
     {
-#ifndef BOT_PROTECTION
         constexpr size_t BUFFER_SIZE = 65536;
-#else
-        constexpr size_t BUFFER_SIZE = 4096;
-#endif
 
         std::wstring res;
         wchar_t out[BUFFER_SIZE];
@@ -155,11 +151,7 @@ namespace stdext
 
     std::string utf16_to_utf8(const std::wstring_view src)
     {
-#ifndef BOT_PROTECTION
         constexpr size_t BUFFER_SIZE = 65536;
-#else
-        constexpr size_t BUFFER_SIZE = 4096;
-#endif
 
         std::string res;
         char out[BUFFER_SIZE];

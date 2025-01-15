@@ -16,7 +16,6 @@ option(TOGGLE_FRAMEWORK_NET "Use NET " ON)
 option(TOGGLE_FRAMEWORK_EDITOR "Use Editor " OFF)
 option(TOGGLE_DIRECTX "Use DX9 support" OFF)
 option(TOGGLE_BIN_FOLDER "Use build/bin folder for generate compilation files" OFF)
-option(TOGGLE_BOT_PROTECTION "Use bot protection" ON)
 option(DEBUG_LOG "Enable Debug Log" OFF)
 option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
 option(BUILD_STATIC_LIBRARY "Build using static libraries" OFF)
@@ -75,14 +74,6 @@ endif()
 if (ANDROID OR WASM)
 	set(FRAMEWORK_DEFINITIONS ${FRAMEWORK_DEFINITIONS} -DOPENGL_ES=2)
 endif()
-
-# Set for use bot protection
-if(TOGGLE_BOT_PROTECTION)
-	message(STATUS "Bot protection: ON")
-else(TOGGLE_BOT_PROTECTION)
-	message(STATUS "Bot protection: OFF")
-endif(TOGGLE_BOT_PROTECTION)
-
 
 # Set for use precompiled header
 if(TOGGLE_PRE_COMPILED_HEADER)
@@ -173,10 +164,6 @@ endif()
 
 # Client options
 add_definitions(-DCLIENT)
-# Set bot protection
-if(TOGGLE_BOT_PROTECTION)
-	add_definitions(-DBOT_PROTECTION)
-endif(TOGGLE_BOT_PROTECTION)
 add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
@@ -718,6 +705,11 @@ if(WIN32)
 		LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
 	)
 endif(WIN32)
+
+if(ANDROID)
+  set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=lld")
+  set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=lld")
+endif()
 
 # *****************************************************************************
 # Link compilation files folder

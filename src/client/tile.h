@@ -28,6 +28,7 @@
 #include "declarations.h"
 #include "item.h"
 #include "mapview.h"
+#include "statictext.h"
 
 #ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t
@@ -204,7 +205,6 @@ public:
 
     bool checkForDetachableThing(TileSelectType selectType = TileSelectType::FILTERED);
 
-#ifndef BOT_PROTECTION
     void drawTexts(Point dest);
     void setText(const std::string& text, Color color);
     std::string getText();
@@ -213,7 +213,7 @@ public:
     void setFill(Color color);
     void resetFill() { m_fill = Color::alpha; }
     bool canShoot(int distance);
-#endif
+
 private:
     void updateThingStackPos();
     void drawTop(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation);
@@ -241,12 +241,10 @@ private:
     std::unique_ptr<std::vector<EffectPtr>> m_effects;
     std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
 
-#ifndef BOT_PROTECTION
     std::unique_ptr<StaticText> m_timerText;
     std::unique_ptr<StaticText> m_text;
     Color m_fill = Color::alpha;
     ticks_t m_timer = 0;
-#endif
 
     uint32_t m_isCompletelyCovered{ 0 };
     uint32_t m_isCovered{ 0 };

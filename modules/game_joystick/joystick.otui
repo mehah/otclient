@@ -1,0 +1,27 @@
+UIWidget
+  anchors.fill: parent
+  focusable: false
+  phantom: true
+
+  UIWidget
+    id: keypad
+    size: 175 150
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    phantom: false
+    focusable: true
+    visible: false
+    background: #00000044
+    image-source: /images/game/mobile/keypad
+    image-fixed-ratio: true
+    image-rect: 12 0 150 150
+
+    UIWidget
+      id: pointer
+      size: 49 49
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      image-source: /images/game/mobile/keypad_pointer
+      image-fixed-ratio: true
+      phantom: true
+      focusable: true

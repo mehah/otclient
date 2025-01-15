@@ -74,34 +74,29 @@ void UIItem::setItemId(const int id)
         m_item->setId(id);
     else
         m_item = Item::create(id);
-#ifndef BOT_PROTECTION
+
     callLuaField("onItemChange");
-#endif
 }
 
 void UIItem::setItemCount(const int count)
 {
     if (m_item) m_item->setCount(count);
-#ifndef BOT_PROTECTION
+
     callLuaField("onItemChange");
-#endif
 }
 
 void UIItem::setItemSubType(const int subType)
 {
     if (m_item) m_item->setSubType(subType);
-#ifndef BOT_PROTECTION
+
     callLuaField("onItemChange");
-#endif
 }
 
 void UIItem::setItem(const ItemPtr& item)
 {
     m_item = item;
 
-#ifndef BOT_PROTECTION
     callLuaField("onItemChange");
-#endif
 }
 
 void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)

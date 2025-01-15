@@ -1,0 +1,9 @@
+Module
+  name: game_joystick
+  description: Handles the mobile joystick to control walk
+  author: OTClient team
+  website: https://github.com/mehah/otclient
+  sandboxed: true
+  scripts: [ joystick ]
+  @onLoad: init()
+  @onUnload: terminate()

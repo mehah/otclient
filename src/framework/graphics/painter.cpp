@@ -128,6 +128,9 @@ void Painter::drawLine(const std::vector<float>& vertex, const int size, const i
     m_drawLineProgram->setProjectionMatrix(m_projectionMatrix);
     m_drawLineProgram->setTextureMatrix(m_textureMatrix);
     m_drawLineProgram->setColor(m_color);
+#ifndef OPENGL_ES
+    glEnable(GL_LINE_SMOOTH);
+#endif
     glLineWidth(width);
 
     PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
@@ -136,6 +139,9 @@ void Painter::drawLine(const std::vector<float>& vertex, const int size, const i
     glDrawArrays(GL_LINE_STRIP, 0, size);
 
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
+#ifndef OPENGL_ES
+    glDisable(GL_LINE_SMOOTH);
+#endif
 }
 
 void Painter::resetState()

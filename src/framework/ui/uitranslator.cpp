@@ -114,6 +114,8 @@ Fw::WidgetState Fw::translateState(std::string state)
         return DraggingState;
     if (state == "hidden")
         return HiddenState;
+    if (state == "mobile")
+        return MobileState;
     return InvalidState;
 }
 

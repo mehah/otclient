@@ -293,6 +293,7 @@ namespace Fw
         AlternateState = 1 << 10,
         DraggingState = 1 << 11,
         HiddenState = 1 << 12,
-        LastWidgetState = 1 << 13
+        MobileState = 1 << 13,
+        LastWidgetState = 1 << 14
     };
 }

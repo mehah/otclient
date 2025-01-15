@@ -180,12 +180,10 @@ minHeight,
     void setWidgetInformation(const UIWidgetPtr& info);
     UIWidgetPtr getWidgetInformation() { return m_widgetInformation; }
 
-#ifndef BOT_PROTECTION
     void setText(const std::string& text, const Color& color);
     std::string getText();
     void clearText() { setText("", Color::white); }
     bool canShoot(int distance);
-#endif
 
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
@@ -314,9 +312,7 @@ private:
     bool m_typing{ false };
     bool m_isCovered{ false };
 
-#ifndef BOT_PROTECTION
     StaticTextPtr m_text;
-#endif
 };
 
 // @bindclass

@@ -28,6 +28,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/util/crypt.h>
+#include "framework/core/graphicalapplication.h"
 
 BrowserWindow& g_browserWindow = (BrowserWindow&)g_window;
 
