@@ -1058,6 +1058,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIProgressRect>("setPercent", &UIProgressRect::setPercent);
     g_lua.bindClassMemberFunction<UIProgressRect>("getPercent", &UIProgressRect::getPercent);
 
+#ifndef __EMSCRIPTEN__
     g_lua.registerClass<UIGraph, UIWidget>();
     g_lua.bindClassStaticFunction<UIGraph>("create", [] { return std::make_shared<UIGraph>(); });
     g_lua.bindClassMemberFunction<UIGraph>("clear", &UIGraph::clear);
@@ -1074,6 +1075,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIGraph>("setInfoLineColor", &UIGraph::setInfoLineColor);
     g_lua.bindClassMemberFunction<UIGraph>("setTextBackground", &UIGraph::setTextBackground);
     g_lua.bindClassMemberFunction<UIGraph>("setGraphVisible", &UIGraph::setGraphVisible);
+#endif
 
     g_lua.registerClass<UIMapAnchorLayout, UIAnchorLayout>();
 }
