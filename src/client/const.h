@@ -550,6 +550,7 @@ namespace Otc
         GameForgeConvergence = 119,
         GameAllowCustomBotScripts = 120,
         GameColorizedLootValue = 121,
+		GameAllowPreWalk = 122,
         LastGameFeature
     };
 

@@ -106,7 +106,7 @@ public:
     int getDisplacementY() const override;
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
-    float getStepProgress() { return m_walkTimer.ticksElapsed() / m_stepCache.duration; }
+    float getStepProgress() { return m_walkTimer.ticksElapsed() / static_cast<float>(m_stepCache.duration); }
     float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
 
     uint8_t getSkull() { return m_skull; }

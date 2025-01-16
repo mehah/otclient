@@ -378,11 +378,6 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_game", "sendStatusTrackerBestiary", &Game::sendStatusTrackerBestiary, &g_game);
     g_lua.bindSingletonFunction("g_game", "sendCyclopediaHouseAuction", &Game::requestSendCyclopediaHouseAuction, &g_game);
 
-    g_lua.bindSingletonFunction("g_game", "getWalkTurnDelay", &Game::getWalkTurnDelay, &g_game);
-    g_lua.bindSingletonFunction("g_game", "getWalkFirstStepDelay", &Game::getWalkFirstStepDelay, &g_game);
-    g_lua.bindSingletonFunction("g_game", "setWalkTurnDelay", &Game::setWalkTurnDelay, &g_game);
-    g_lua.bindSingletonFunction("g_game", "setWalkFirstStepDelay", &Game::setWalkFirstStepDelay, &g_game);
-
     g_lua.registerSingletonClass("g_gameConfig");
     g_lua.bindSingletonFunction("g_gameConfig", "loadFonts", &GameConfig::loadFonts, &g_gameConfig);
     g_lua.bindSingletonFunction("g_gameConfig", "getSpriteSize", &GameConfig::getSpriteSize, &g_gameConfig);
@@ -813,6 +808,7 @@ void Client::registerLuaFunctions()
     g_lua.registerClass<LocalPlayer, Player>();
     g_lua.bindClassMemberFunction<LocalPlayer>("unlockWalk", &LocalPlayer::unlockWalk);
     g_lua.bindClassMemberFunction<LocalPlayer>("lockWalk", &LocalPlayer::lockWalk);
+    g_lua.bindClassMemberFunction<LocalPlayer>("isWalkLocked", &LocalPlayer::isWalkLocked);
     g_lua.bindClassMemberFunction<LocalPlayer>("canWalk", &LocalPlayer::canWalk);
     g_lua.bindClassMemberFunction<LocalPlayer>("setStates", &LocalPlayer::setStates);
     g_lua.bindClassMemberFunction<LocalPlayer>("setSkill", &LocalPlayer::setSkill);
@@ -853,9 +849,12 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<LocalPlayer>("isPremium", &LocalPlayer::isPremium);
     g_lua.bindClassMemberFunction<LocalPlayer>("isKnown", &LocalPlayer::isKnown);
     g_lua.bindClassMemberFunction<LocalPlayer>("isPreWalking", &LocalPlayer::isPreWalking);
+    g_lua.bindClassMemberFunction<LocalPlayer>("preWalk", &LocalPlayer::preWalk);
+    g_lua.bindClassMemberFunction<LocalPlayer>("getLastPrewalkingPosition", &LocalPlayer::getLastPrewalkingPosition);
     g_lua.bindClassMemberFunction<LocalPlayer>("hasSight", &LocalPlayer::hasSight);
     g_lua.bindClassMemberFunction<LocalPlayer>("isAutoWalking", &LocalPlayer::isAutoWalking);
     g_lua.bindClassMemberFunction<LocalPlayer>("stopAutoWalk", &LocalPlayer::stopAutoWalk);
+    g_lua.bindClassMemberFunction<LocalPlayer>("isServerWalking", &LocalPlayer::isServerWalking);
     g_lua.bindClassMemberFunction<LocalPlayer>("autoWalk", &LocalPlayer::autoWalk);
     g_lua.bindClassMemberFunction<LocalPlayer>("getResourceBalance", &LocalPlayer::getResourceBalance);
     g_lua.bindClassMemberFunction<LocalPlayer>("setResourceBalance", &LocalPlayer::setResourceBalance);
@@ -880,6 +879,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("getCreatures", &Tile::getCreatures);
     g_lua.bindClassMemberFunction<Tile>("getGround", &Tile::getGround);
     g_lua.bindClassMemberFunction<Tile>("isWalkable", &Tile::isWalkable);
+    g_lua.bindClassMemberFunction<Tile>("hasElevation", &Tile::hasElevation);
 
     g_lua.bindClassMemberFunction<Tile>("isFullGround", &Tile::isFullGround);
     g_lua.bindClassMemberFunction<Tile>("isFullyOpaque", &Tile::isFullyOpaque);
@@ -1058,6 +1058,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIProgressRect>("setPercent", &UIProgressRect::setPercent);
     g_lua.bindClassMemberFunction<UIProgressRect>("getPercent", &UIProgressRect::getPercent);
 
+#ifndef __EMSCRIPTEN__
     g_lua.registerClass<UIGraph, UIWidget>();
     g_lua.bindClassStaticFunction<UIGraph>("create", [] { return std::make_shared<UIGraph>(); });
     g_lua.bindClassMemberFunction<UIGraph>("clear", &UIGraph::clear);
@@ -1074,6 +1075,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIGraph>("setInfoLineColor", &UIGraph::setInfoLineColor);
     g_lua.bindClassMemberFunction<UIGraph>("setTextBackground", &UIGraph::setTextBackground);
     g_lua.bindClassMemberFunction<UIGraph>("setGraphVisible", &UIGraph::setGraphVisible);
+#endif
 
     g_lua.registerClass<UIMapAnchorLayout, UIAnchorLayout>();
 }

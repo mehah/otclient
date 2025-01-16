@@ -6,7 +6,8 @@ controller:registerEvents(g_game, {
         -- g_game.enableFeature(GameNegativeOffset)
         -- g_game.enableFeature(GameWingsAurasEffectsShader)
         -- g_game.enableFeature(GameAllowCustomBotScripts)
-        
+
+        g_game.enableFeature(GameAllowPreWalk)
         g_game.enableFeature(GameFormatCreatureName)
 
         if version >= 750 then
@@ -226,7 +227,7 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1314 then
-            g_game.disableFeature(GameTournamentPackets)  
+            g_game.disableFeature(GameTournamentPackets)
             g_game.enableFeature(GameDynamicForgeVariables)
         end
 

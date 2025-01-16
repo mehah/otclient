@@ -114,28 +114,10 @@ UIWidget
     height: 22
 
     OptionScaleScroll
-      id: walkFirstStepDelay
-      !text: tr('Walk Delay after first step: 50ms')
-      anchors.fill: parent
-      &minimumScrollValue: 50
-      &maximumScrollValue: 500
-      &scrollSize: 21
-      @onSetup: |
-        local value = modules.client_options.getOption('walkFirstStepDelay')
-        self:setText(tr('Walk Delay after first step: %dms', value))
-
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-
-    OptionScaleScroll
       id: walkTurnDelay
       !text: tr('Walk delay after turn: 50ms')
       anchors.fill: parent
-      &minimumScrollValue: 50
+      &minimumScrollValue: 10
       &maximumScrollValue: 500
       &scrollSize: 21
       @onSetup: |
@@ -150,15 +132,33 @@ UIWidget
     height: 22
 
     OptionScaleScroll
-      id: turnDelay
-      !text: tr('Turn delay: 30ms')
+      id: walkTeleportDelay
+      !text: tr('Walk delay after teleport: 200ms')
       anchors.fill: parent
-      &minimumScrollValue: 30
-      &maximumScrollValue: 250
+      &minimumScrollValue: 50
+      &maximumScrollValue: 500
       &scrollSize: 21
       @onSetup: |
-        local value = modules.client_options.getOption('turnDelay')
-        self:setText(tr('Turn delay: %dms', value))
+        local value = modules.client_options.getOption('walkTeleportDelay')
+        self:setText(tr('Walk delay after turn: %dms', value))
+
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+
+    OptionScaleScroll
+      id: walkStairsDelay
+      !text: tr('Walk delay after floor change: 200ms')
+      anchors.fill: parent
+      &minimumScrollValue: 50
+      &maximumScrollValue: 500
+      &scrollSize: 21
+      @onSetup: |
+        local value = modules.client_options.getOption('walkStairsDelay')
+        self:setText(tr('Walk delay after turn: %dms', value))
 
   QtButton
     id: hotkeysButton
