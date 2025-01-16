@@ -190,6 +190,7 @@ HorizontalQtScrollBar < UIScrollBar
 SmallButton < UIButton
   size: 106 20
   font: cipsoftFont
+  text-offset: 0 2
   image-source: /images/ui/button
   image-clip: 0 0 22 23
   image-border: 3
