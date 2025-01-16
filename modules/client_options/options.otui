@@ -107,6 +107,7 @@ OptionScaleScrollMarked < Label
     id: valueBar
     step: 1
     anchors.right: toolTipWidget.left
+    anchors.verticalCenter: toolTipWidget.verticalCenter
     margin-right: 10
     width: 174
     @onValueChange: |
