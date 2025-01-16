@@ -696,12 +696,6 @@ public:
     void setCustomOs(const Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
     Otc::OperatingSystem_t getOs();
 
-    void setWalkTurnDelay(const uint16_t v) { m_walkTurnDelay = v; }
-    void setWalkFirstStepDelay(const uint16_t v) { m_walkFirstStepDelay = v; }
-
-    uint16_t getWalkTurnDelay() { return m_walkTurnDelay; }
-    uint16_t getWalkFirstStepDelay() { return m_walkFirstStepDelay; }
-
     bool canPerformGameAction() const;
 
     bool isOnline() { return m_online; }
@@ -813,8 +807,6 @@ private:
     bool m_canReportBugs{ false };
 
     uint8_t m_openPvpSituations{ 0 };
-    uint16_t m_walkFirstStepDelay{ 200 };
-    uint16_t m_walkTurnDelay{ 100 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };
     uint16_t m_protocolVersion{ 0 };
