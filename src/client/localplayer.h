@@ -105,7 +105,7 @@ public:
 
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
-    bool isPreWalking() { return m_preWalking; }
+    bool isPreWalking() { return m_lastPrewalkDestination.isValid(); }
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
@@ -116,10 +116,14 @@ public:
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
+    void preWalk(Otc::Direction direction);
+    Position getLastPrewalkingPosition() { return m_lastPrewalkDestination; }
+
+    bool isServerWalking() { return m_serverWalk; }
+
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
-    void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(m_preWalking); }
-    void stopWalk() override;
+    void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(isPreWalking()); }
     void updateWalkOffset(uint8_t totalPixelsWalked) override;
     void terminateWalk() override;
 
@@ -133,7 +137,6 @@ private:
         uint16_t baseLevel{ 0 };
         uint16_t levelPercent{ 0 };
     };
-    void preWalk(Otc::Direction direction);
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
 
     bool retryAutoWalk();
@@ -146,11 +149,11 @@ private:
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
-    bool m_preWalking{ false };
     bool m_knownCompletePath{ false };
     bool m_premium{ false };
     bool m_known{ false };
     bool m_pending{ false };
+    bool m_serverWalk{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 

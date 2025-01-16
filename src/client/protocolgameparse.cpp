@@ -1236,6 +1236,7 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
 {
     const auto& pos = getPosition(msg);
+    const auto& oldPos = m_localPlayer->getPosition();
 
     if (!m_mapKnown) {
         m_localPlayer->setPosition(pos);
@@ -1252,6 +1253,7 @@ void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
     }
 
     g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onMapDescription"); });
+    g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, pos, oldPos);
 }
 
 void ProtocolGame::parseMapMoveNorth(const InputMessagePtr& msg)
@@ -2529,9 +2531,12 @@ void ProtocolGame::parseFloorChangeUp(const InputMessagePtr& msg)
         setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), 3, skip);
     }
 
-    ++pos.x;
-    ++pos.y;
-    g_map.setCentralPosition(pos);
+    auto newPos = pos;
+    ++newPos.x;
+    ++newPos.y;
+    g_map.setCentralPosition(newPos);
+
+    g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, newPos, pos);
 }
 
 void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
@@ -2552,9 +2557,12 @@ void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
         setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), -3, skip);
     }
 
-    --pos.x;
-    --pos.y;
-    g_map.setCentralPosition(pos);
+    auto newPos = pos;
+    --newPos.x;
+    --newPos.y;
+    g_map.setCentralPosition(newPos);
+
+    g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, newPos, pos);
 }
 
 void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
