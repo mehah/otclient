@@ -41,65 +41,71 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
     if (isWalkLocked() && !ignoreLock)
         return false;
 
-    return m_walkTimer.ticksElapsed() >= getStepDuration() && (dir == m_direction || !m_walking);
+    if (isWalking()) {
+        if (isAutoWalking()) return true; // always allow automated walks
+        if (isPreWalking()) return false; // allow only single prewalk
+    }
+
+    return m_walkTimer.ticksElapsed() >= getStepDuration(); // allow only if walk done, ex. diagonals may need additional ticks before taking another step
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (m_preWalking) {
-        m_preWalking = false;
+    if (isPreWalking()) {
         if (newPos == m_lastPrewalkDestination) {
             updateWalk();
-            return;
         }
+        m_lastPrewalkDestination = {};
+        return;
     }
 
+    m_serverWalk = true;
     Creature::walk(oldPos, newPos);
 }
 
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
+    auto pos = m_position.translatedToDirection(direction);
     // avoid reanimating prewalks
-    if (m_preWalking)
+    if (m_lastPrewalkDestination.isValid() || m_lastPrewalkDestination == pos)
         return;
 
-    m_preWalking = true;
-
     // start walking to direction
-    m_lastPrewalkDestination = m_position.translatedToDirection(direction);
+    m_lastPrewalkDestination = pos;
     Creature::walk(m_position, m_lastPrewalkDestination);
 }
 
 bool LocalPlayer::retryAutoWalk()
 {
-    if (m_autoWalkDestination.isValid()) {
-        g_game.stop();
-
-        if (m_autoWalkRetries <= 3) {
-            if (m_autoWalkContinueEvent)
-                m_autoWalkContinueEvent->cancel();
-
-            m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(
-                [capture0 = asLocalPlayer(), autoWalkDest = m_autoWalkDestination] { capture0->autoWalk(autoWalkDest, true); }, 200
-            );
-
-            m_autoWalkRetries += 1;
-
-            return true;
-        }
-
-        m_autoWalkDestination = {};
+    if (!m_autoWalkDestination.isValid()) {
+        return false;
     }
 
+    g_game.stop();
+
+    if (m_autoWalkRetries <= 3) {
+        if (m_autoWalkContinueEvent)
+            m_autoWalkContinueEvent->cancel();
+
+        m_autoWalkContinueEvent = g_dispatcher.scheduleEvent(
+            [thisPtr = asLocalPlayer(), autoWalkDest = m_autoWalkDestination] { thisPtr->autoWalk(autoWalkDest, true); }, 200
+        );
+
+        m_autoWalkRetries += 1;
+
+        return true;
+    }
+
+    m_autoWalkDestination = {};
     return false;
 }
 
 void LocalPlayer::cancelWalk(const Otc::Direction direction)
 {
     // only cancel client side walks
-    if (m_walking && m_preWalking)
+    if (isWalking() && isPreWalking())
         stopWalk();
 
     g_map.notificateCameraMove(m_walkOffset);
@@ -177,16 +183,9 @@ void LocalPlayer::stopAutoWalk()
         m_autoWalkContinueEvent->cancel();
 }
 
-void LocalPlayer::stopWalk()
-{
-    Creature::stopWalk(); // will call terminateWalk
-
-    m_lastPrewalkDestination = {};
-}
-
 void LocalPlayer::updateWalkOffset(const uint8_t totalPixelsWalked)
 {
-    if (!m_preWalking) {
+    if (!isPreWalking()) {
         Creature::updateWalkOffset(totalPixelsWalked);
         return;
     }
@@ -207,7 +206,9 @@ void LocalPlayer::updateWalkOffset(const uint8_t totalPixelsWalked)
 void LocalPlayer::terminateWalk()
 {
     Creature::terminateWalk();
-    m_preWalking = false;
+    m_serverWalk = false;
+    m_lastPrewalkDestination = {};
+    callLuaField("onWalkFinish");
 }
 
 void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPos)
@@ -218,6 +219,10 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
         stopAutoWalk();
     else if (m_autoWalkDestination.isValid() && newPos == m_lastAutoWalkPosition)
         autoWalk(m_autoWalkDestination);
+
+    if (isServerWalking()) {
+        m_serverWalk = false;
+    }
 }
 
 void LocalPlayer::setStates(const uint32_t states)

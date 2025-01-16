@@ -81,6 +81,7 @@ OptionScaleScroll < Label
     id: valueBar
     step: 1
     anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
     margin-right: 3
     width: 174
     @onValueChange: |
