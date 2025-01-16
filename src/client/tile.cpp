@@ -293,10 +293,10 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         }
     }
 
+    updateThingStackPos();
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
 
-    updateThingStackPos();
     updateElevation(thing, m_drawElevation);
     checkForDetachableThing();
 
