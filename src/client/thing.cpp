@@ -84,9 +84,6 @@ int Thing::getStackPos()
     if (m_stackPos >= 0)
         return m_stackPos;
 
-    if (const TilePtr& tile = getTile())
-        return tile->getThingStackPos(static_self_cast<Thing>());
-
     g_logger.traceError("got a thing with invalid stackpos");
     return -1;
 }
