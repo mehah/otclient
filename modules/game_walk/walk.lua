@@ -248,25 +248,25 @@ end
 function bindWalkKey(key, dir)
     local gameRootPanel = modules.game_interface.getRootPanel()
 
-    WalkController:bindKeyDown(key, function()
+    g_keyboard.bindKeyDown(key, function()
         g_keyboard.setKeyDelay(key, 10)
         changeWalkDir(dir)
     end, gameRootPanel, true)
 
-    WalkController:bindKeyUp(key, function()
+    g_keyboard.bindKeyUp(key, function()
         g_keyboard.setKeyDelay(key, 30)
         changeWalkDir(dir, true)
     end, gameRootPanel, true)
 
-    WalkController:bindKeyPress(key, function(_, _, ticks) smartWalk(dir) end, gameRootPanel)
+    g_keyboard.bindKeyPress(key, function() smartWalk(dir) end, gameRootPanel)
 end
 
 function bindTurnKey(key, dir)
     local gameRootPanel = modules.game_interface.getRootPanel()
 
-    WalkController:bindKeyDown(key, function() turn(dir, false) end, gameRootPanel)
-    WalkController:bindKeyPress(key, function() turn(dir, true) end, gameRootPanel)
-    WalkController:bindKeyUp(key, function()
+    g_keyboard.bindKeyDown(key, function() turn(dir, false) end, gameRootPanel)
+    g_keyboard.bindKeyPress(key, function() turn(dir, true) end, gameRootPanel)
+    g_keyboard.bindKeyUp(key, function()
         local player = g_game.getLocalPlayer()
         if player then player:lockWalk(200) end
     end, gameRootPanel)
