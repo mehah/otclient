@@ -95,6 +95,7 @@ end
 
 --- Changes the current walking direction.
 local function changeWalkDir(dir, pop)
+    -- Remove all occurrences of the specified direction
     while table.removevalue(smartWalkDirs, dir) do end
 
     if pop then
@@ -109,19 +110,17 @@ local function changeWalkDir(dir, pop)
     smartWalkDir = smartWalkDirs[1]
 
     if modules.client_options.getOption('smartWalk') and #smartWalkDirs > 1 then
-        local dirPairs = {
-            [North] = { West, NorthWest },
-            [West] = { North, NorthWest },
-            [South] = { West, SouthWest },
-            [East] = { North, NorthEast },
+        local diagonalMap = {
+            [North] = { [West] = NorthWest, [East] = NorthEast },
+            [South] = { [West] = SouthWest, [East] = SouthEast },
+            [West]  = { [North] = NorthWest, [South] = SouthWest },
+            [East]  = { [North] = NorthEast, [South] = SouthEast }
         }
-        local pair = dirPairs[smartWalkDir]
-        if pair then
-            for _, d in ipairs(pair) do
-                if table.contains(smartWalkDirs, d) then
-                    smartWalkDir = d
-                    break
-                end
+
+        for _, d in ipairs(smartWalkDirs) do
+            if diagonalMap[smartWalkDir] and diagonalMap[smartWalkDir][d] then
+                smartWalkDir = diagonalMap[smartWalkDir][d]
+                break
             end
         end
     end
