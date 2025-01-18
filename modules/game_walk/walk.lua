@@ -24,14 +24,14 @@ end
 
 --- Generalized floor change check.
 local function canChangeFloor(pos, deltaZ)
-    local newPos = pos:clone()
-    newPos.z = newPos.z + deltaZ
-    local toTile = g_map.getTile(newPos)
+    pos.z = pos.z + deltaZ
+    local toTile = g_map.getTile(pos)
+
     if deltaZ > 0 then
         return toTile and toTile:hasElevation(3)
-    else
-        return toTile and toTile:isWalkable()
     end
+
+    return toTile and toTile:isWalkable()
 end
 
 --- Makes the player walk in the given direction.
@@ -115,11 +115,13 @@ local function changeWalkDir(dir, pop)
             [South] = { West, SouthWest },
             [East] = { North, NorthEast },
         }
-        for _, d in pairs(smartWalkDirs) do
-            local pair = dirPairs[smartWalkDir]
-            if pair and table.contains(pair, d) then
-                smartWalkDir = pair[2]
-                break
+        local pair = dirPairs[smartWalkDir]
+        if pair then
+            for _, d in ipairs(pair) do
+                if table.contains(smartWalkDirs, d) then
+                    smartWalkDir = d
+                    break
+                end
             end
         end
     end
@@ -136,6 +138,7 @@ local function turn(dir, repeated)
 
     local TURN_DELAY_REPEATED = 1000
     local TURN_DELAY_DEFAULT = 200
+
     local delay = repeated and TURN_DELAY_REPEATED or TURN_DELAY_DEFAULT
 
     if lastTurn + delay < g_clock.millis() then
@@ -231,15 +234,11 @@ function WalkController:onGameStart()
     modules.game_interface.getRootPanel().onFocusChange = stopSmartWalk
     modules.game_joystick.addOnJoystickMoveListener(function(dir) g_game.walk(dir) end)
 
-    local function configureAutoWalkFeature()
-        if not g_game.isOfficialTibia() then
-            g_game.enableFeature(GameForceFirstAutoWalkStep)
-        else
-            g_game.disableFeature(GameForceFirstAutoWalkStep)
-        end
+    if not g_game.isOfficialTibia() then
+        g_game.enableFeature(GameForceFirstAutoWalkStep)
+    else
+        g_game.disableFeature(GameForceFirstAutoWalkStep)
     end
-
-    configureAutoWalkFeature()
 end
 
 --- Cleans up resources when the game ends.
