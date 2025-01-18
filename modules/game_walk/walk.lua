@@ -1,4 +1,3 @@
---- Walk Controller Optimized
 local smartWalkDirs = {}
 local smartWalkDir = nil
 local walkEvent = nil
