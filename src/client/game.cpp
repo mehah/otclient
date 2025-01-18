@@ -635,80 +635,6 @@ bool Game::walk(const Otc::Direction direction)
     if (!canPerformGameAction() || direction == Otc::InvalidDirection)
         return false;
 
-    // must cancel auto walking, and wait next try
-    if (m_localPlayer->isAutoWalking()) {
-        m_protocolGame->sendStop();
-        m_localPlayer->stopAutoWalk();
-        return false;
-    }
-
-    static ScheduledEventPtr nextWalkSchedule = nullptr;
-    static uint16_t steps = 0;
-    static Timer timer;
-
-    if (nextWalkSchedule) nextWalkSchedule->cancel();
-    nextWalkSchedule = g_dispatcher.scheduleEvent([this] {
-        nextWalkSchedule = nullptr;
-        steps = 0;
-    }, 150);
-
-    // check we can walk and add new walk event if false
-    if (!m_localPlayer->canWalk(direction)) {
-        return false;
-    }
-
-    if (steps == 1) {
-        if (timer.ticksElapsed() <= m_walkFirstStepDelay)
-            return false;
-    } else if (direction != m_localPlayer->getDirection()) {
-        if (timer.ticksElapsed() <= m_walkTurnDelay)
-            return false;
-    }
-
-    ++steps;
-    timer.restart();
-
-    const auto& toPos = m_localPlayer->getPosition().translatedToDirection(direction);
-
-    // only do prewalks to walkable tiles (like grounds and not walls)
-    const auto& toTile = g_map.getTile(toPos);
-    if (toTile && toTile->isWalkable()) {
-        m_localPlayer->preWalk(direction);
-    } else {
-        // check if can walk to a lower floor
-        const auto& canChangeFloorDown = [&]() -> bool {
-            Position pos = toPos;
-            if (!pos.down())
-                return false;
-
-            const auto& toTile = g_map.getTile(pos);
-            return toTile && toTile->hasElevation(3);
-        };
-
-        // check if can walk to a higher floor
-        const auto& canChangeFloorUp = [&]() -> bool {
-            const auto& fromTile = m_localPlayer->getTile();
-            if (!fromTile || !fromTile->hasElevation(3))
-                return false;
-
-            Position pos = toPos;
-            if (!pos.up())
-                return false;
-
-            const auto& toTile = g_map.getTile(pos);
-            return toTile && toTile->isWalkable();
-        };
-
-        if (!(canChangeFloorDown() || canChangeFloorUp() || !toTile || toTile->isEmpty()))
-            return false;
-
-        m_localPlayer->lockWalk();
-    }
-
-    // must cancel follow before any new walk
-    if (isFollowing())
-        cancelFollow();
-
     g_lua.callGlobalField("g_game", "onWalk", direction);
 
     forceWalk(direction);
@@ -1592,19 +1518,6 @@ void Game::changeMapAwareRange(const uint8_t xrange, const uint8_t yrange)
     m_protocolGame->sendChangeMapAwareRange(xrange, yrange);
 }
 
-bool Game::checkBotProtection() const
-{
-#ifdef BOT_PROTECTION
-    // accepts calls comming from a stacktrace containing only C++ functions,
-    // if the stacktrace contains a lua function, then only accept if the engine is processing an input event
-    if (m_denyBotCall && g_lua.isInCppCallback() && !g_app.isOnInputEvent()) {
-        g_logger.error(g_lua.traceback("caught a lua call to a bot protected game function, the call was cancelled"));
-        return false;
-    }
-#endif
-    return true;
-}
-
 bool Game::canPerformGameAction() const
 {
     // we can only perform game actions if we meet these conditions:
@@ -1613,8 +1526,7 @@ bool Game::canPerformGameAction() const
     // - the local player is not dead
     // - we have a game protocol
     // - the game protocol is connected
-    // - its not a bot action
-    return m_online && m_localPlayer && !m_dead && m_protocolGame && m_protocolGame->isConnected() && checkBotProtection();
+    return m_online && m_localPlayer && !m_dead && m_protocolGame && m_protocolGame->isConnected();
 }
 
 void Game::setProtocolVersion(const uint16_t version)
@@ -1913,6 +1825,14 @@ void Game::requestSendCharacterInfo(const uint32_t playerId, const Otc::Cycloped
         return;
 
     m_protocolGame->sendCyclopediaRequestCharacterInfo(playerId, characterInfoType, entriesPerPage, page);
+}
+
+void Game::requestSendCyclopediaHouseAuction(const Otc::CyclopediaHouseAuctionType_t type, const uint32_t houseId, const uint32_t timestamp, const uint64_t bidValue, const std::string_view name)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendCyclopediaHouseAuction(type, houseId, timestamp, bidValue, name);
 }
 
 void Game::requestBosstiaryInfo()

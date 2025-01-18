@@ -28,6 +28,7 @@
 #include "declarations.h"
 #include "item.h"
 #include "mapview.h"
+#include "statictext.h"
 
 #ifdef FRAMEWORK_EDITOR
 enum tileflags_t : uint32_t
@@ -180,7 +181,7 @@ public:
             ;
     }
 
-    bool hasElevation(const int elevation = 1) const { return m_elevation >= elevation; }
+    bool hasElevation(const int elevation = 1) { return m_elevation >= elevation; }
 
 #ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
@@ -204,7 +205,6 @@ public:
 
     bool checkForDetachableThing(TileSelectType selectType = TileSelectType::FILTERED);
 
-#ifndef BOT_PROTECTION
     void drawTexts(Point dest);
     void setText(const std::string& text, Color color);
     std::string getText();
@@ -213,7 +213,7 @@ public:
     void setFill(Color color);
     void resetFill() { m_fill = Color::alpha; }
     bool canShoot(int distance);
-#endif
+
 private:
     void updateThingStackPos();
     void drawTop(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation);
@@ -228,7 +228,7 @@ private:
             setThingFlag(thing);
     }
 
-    bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
+    bool hasThingWithElevation() { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
     void markHighlightedThing(const Color& color) {
         if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < static_cast<int8_t>(m_things.size())) {
             m_things[m_highlightThingStackPos]->setMarked(color);
@@ -241,12 +241,10 @@ private:
     std::unique_ptr<std::vector<EffectPtr>> m_effects;
     std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
 
-#ifndef BOT_PROTECTION
     std::unique_ptr<StaticText> m_timerText;
     std::unique_ptr<StaticText> m_text;
     Color m_fill = Color::alpha;
     ticks_t m_timer = 0;
-#endif
 
     uint32_t m_isCompletelyCovered{ 0 };
     uint32_t m_isCovered{ 0 };

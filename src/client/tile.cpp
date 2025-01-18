@@ -35,6 +35,7 @@
 #include "map.h"
 #include "protocolgame.h"
 #include "uimap.h"
+#include "localplayer.h"
 #include <algorithm>
 
 Tile::Tile(const Position& position) : m_position(position) {}
@@ -56,12 +57,10 @@ void Tile::draw(const Point& dest, const int flags, const LightViewPtr& lightVie
 
     uint8_t drawElevation = 0;
 
-#ifndef BOT_PROTECTION
     if (m_fill != Color::alpha) {
         g_drawPool.addFilledRect(Rect(dest, Size{ g_gameConfig.getSpriteSize() }), m_fill);
         return;
     }
-#endif
 
     for (const auto& thing : m_things) {
         if (!thing->isGround() && !thing->isGroundBorder() && !thing->isOnBottom())
@@ -152,11 +151,7 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
 
 void Tile::clean()
 {
-    if (g_client.getMapWidget()
-#ifndef BOT_PROTECTION
-        && (m_text || m_timerText)
-#endif
-        ) {
+    if (g_client.getMapWidget() && (m_text || m_timerText)) {
         g_dispatcher.scheduleEvent([tile = static_self_cast<Tile>()] {
             if (g_client.getMapWidget())
                 g_client.getMapWidget()->getMapView()->removeForegroundTile(tile);
@@ -298,10 +293,10 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         }
     }
 
+    updateThingStackPos();
     thing->setPosition(m_position, stackPos, hasElev);
     thing->onAppear();
 
-    updateThingStackPos();
     updateElevation(thing, m_drawElevation);
     checkForDetachableThing();
 
@@ -912,7 +907,6 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
     return flags > 0;
 }
 
-#ifndef BOT_PROTECTION
 void Tile::drawTexts(Point dest)
 {
     if (m_timerText && g_clock.millis() < m_timer) {
@@ -984,4 +978,3 @@ bool Tile::canShoot(int distance)
         return false;
     return g_map.isSightClear(playerPos, m_position);
 }
-#endif

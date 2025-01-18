@@ -563,7 +563,12 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
             loadBox:destroy()
             loadBox = nil
         end
-        return EnterGame.show()
+
+        local errorBox = displayErrorBox(tr("Login Error"), string.format("Things are not loaded, please put assets in things/%d/<assets>.", clientVersion))
+	connect(errorBox, {
+		onOk = EnterGame.show
+	})
+	return
     end
 
     local host, path = G.host:match("([^/]+)/([^/].*)")
@@ -732,7 +737,12 @@ function EnterGame.doLogin()
                 loadBox:destroy()
                 loadBox = nil
             end
-            return EnterGame.show()
+
+            local errorBox = displayErrorBox(tr("Login Error"), string.format("Things are not loaded, please put spr and dat in things/%d/<here>.", clientVersion))
+            connect(errorBox, {
+               onOk = EnterGame.show
+            })
+            return
         end
     end
 end

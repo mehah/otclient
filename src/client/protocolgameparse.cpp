@@ -430,6 +430,15 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerLootContainers:
                     parseLootContainers(msg);
                     break;
+                case Proto::GameServerCyclopediaHouseAuctionMessage:
+                    parseCyclopediaHouseAuctionMessage(msg);
+                    break;
+                case Proto::GameServerCyclopediaHousesInfo:
+                    parseCyclopediaHousesInfo(msg);
+                    break;
+                case Proto::GameServerCyclopediaHouseList:
+                    parseCyclopediaHouseList(msg);
+                    break;
                 case Proto::GameServerChooseOutfit:
                     parseOpenOutfitWindow(msg);
                     break;
@@ -1224,6 +1233,7 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
 {
     const auto& pos = getPosition(msg);
+    const auto& oldPos = m_localPlayer->getPosition();
 
     if (!m_mapKnown) {
         m_localPlayer->setPosition(pos);
@@ -1240,6 +1250,7 @@ void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
     }
 
     g_dispatcher.addEvent([] { g_lua.callGlobalField("g_game", "onMapDescription"); });
+    g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, pos, oldPos);
 }
 
 void ProtocolGame::parseMapMoveNorth(const InputMessagePtr& msg)
@@ -2514,9 +2525,12 @@ void ProtocolGame::parseFloorChangeUp(const InputMessagePtr& msg)
         setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z - g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), 3, skip);
     }
 
-    ++pos.x;
-    ++pos.y;
-    g_map.setCentralPosition(pos);
+    auto newPos = pos;
+    ++newPos.x;
+    ++newPos.y;
+    g_map.setCentralPosition(newPos);
+
+    g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, newPos, pos);
 }
 
 void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
@@ -2537,9 +2551,12 @@ void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
         setFloorDescription(msg, pos.x - range.left, pos.y - range.top, pos.z + g_gameConfig.getMapAwareUndergroundFloorRange(), range.horizontal(), range.vertical(), -3, skip);
     }
 
-    --pos.x;
-    --pos.y;
-    g_map.setCentralPosition(pos);
+    auto newPos = pos;
+    --newPos.x;
+    --newPos.y;
+    g_map.setCentralPosition(newPos);
+
+    g_lua.callGlobalField("g_game", "onTeleport", m_localPlayer, newPos, pos);
 }
 
 void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
@@ -3787,6 +3804,120 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     }
 
     g_lua.callGlobalField("g_game", "onQuickLootContainers", quickLootFallbackToMainContainer, lootList);
+}
+
+void ProtocolGame::parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg)
+{
+    msg->getU32(); // houseId
+    const uint8_t typeValue = msg->getU8();
+    if (typeValue == 1) {
+        msg->getU8(); // 0x00
+    }
+    msg->getU8(); // index
+    // TO-DO Lua - Otui
+}
+
+void ProtocolGame::parseCyclopediaHousesInfo(const InputMessagePtr& msg)
+{
+    msg->getU32(); // houseClientId
+    msg->getU8(); // 0x00
+
+    msg->getU8(); // accountHouseCount
+
+    msg->getU8(); // 0x00
+
+    msg->getU8(); // 3
+    msg->getU8(); // 3
+
+    msg->getU8(); // 0x01
+
+    msg->getU8(); // 0x01
+    msg->getU32(); // houseClientId
+
+    const uint16_t housesList = msg->getU16(); // g_game().map.houses.getHouses()
+    for (auto i = 0; i < housesList; ++i) {
+        msg->getU32(); // getClientId
+    }
+    // TO-DO Lua // Otui
+}
+
+void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg) 
+{
+    const uint16_t housesCount = msg->getU16(); // housesCount
+    for (auto i = 0; i < housesCount; ++i) {
+        msg->getU32(); // clientId
+        msg->getU8(); // 0x00 = Renovation, 0x01 = Available
+        
+        const auto type = static_cast<Otc::CyclopediaHouseState_t>(msg->getU8());
+        switch (type) {
+            case Otc::CYCLOPEDIA_HOUSE_STATE_AVAILABLE: {
+                std::string bidderName = msg->getString(); 
+                const auto isBidder = static_cast<bool>(msg->getU8());
+                msg->getU8(); // disableIndex
+
+                if (!bidderName.empty()) {
+                    msg->getU32(); // bidEndDate
+                    msg->getU64(); // highestBid
+                    if (isBidder) {
+                        msg->getU64(); // bidHolderLimit
+                    }
+                }
+                break;
+            }
+            case Otc::CYCLOPEDIA_HOUSE_STATE_RENTED: {
+                msg->getString(); // ownerName
+                msg->getU32(); // paidUntil
+                
+                const auto isRented = static_cast<bool>(msg->getU8());
+                if (isRented) {
+                    msg->getU8(); // unknown
+                    msg->getU8(); // unknown
+                }
+                break;
+            }
+            case Otc::CYCLOPEDIA_HOUSE_STATE_TRANSFER: {
+                msg->getString(); // ownerName
+                msg->getU32(); // paidUntil
+                const auto isOwner = static_cast<bool>(msg->getU8());
+                if (isOwner) {
+                    msg->getU8(); // unknown
+                    msg->getU8(); // unknown
+                }
+                msg->getU32(); // bidEndDate
+                msg->getString(); // bidderName
+                msg->getU8(); // unknown
+                msg->getU64(); // internalBid
+                
+                const auto isNewOwner = static_cast<bool>(msg->getU8());
+                if (isNewOwner) {
+                    msg->getU8(); // acceptTransferError
+                    msg->getU8(); // rejectTransferError
+                }
+
+                if (isOwner) {
+                    msg->getU8(); // cancelTransferError
+                }
+                break;
+            }
+            case Otc::CYCLOPEDIA_HOUSE_STATE_MOVEOUT: {
+                msg->getString(); // ownerName
+                msg->getU32(); // paidUntil
+
+                const auto isOwner = static_cast<bool>(msg->getU8());
+                if (isOwner) {
+                    msg->getU8(); // unknown
+                    msg->getU8(); // unknown
+                    msg->getU32(); // bidEndDate
+                    msg->getU8(); // unknown
+                } else {
+                    msg->getU32(); // bidEndDate
+                }
+
+                break;
+            }
+        }
+    }
+    // TO-DO Lua - Otui
 }
 
 void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)

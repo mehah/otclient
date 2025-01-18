@@ -264,7 +264,7 @@ void MapView::drawForeground(const Rect& rect)
         p += rect.topLeft();
         animatedText->drawText(p, rect);
     }
-#ifndef BOT_PROTECTION
+
     g_drawPool.scale(1.f);
     for (const auto& tile : m_foregroundTiles) {
         const auto& dest = transformPositionTo2D(tile->getPosition());
@@ -277,7 +277,6 @@ void MapView::drawForeground(const Rect& rect)
 
         tile->drawTexts(p);
     }
-#endif
 }
 
 void MapView::updateVisibleTiles()
@@ -404,7 +403,7 @@ void MapView::updateRect(const Rect& rect) {
         m_posInfo.horizontalStretchFactor = rect.width() / static_cast<float>(m_posInfo.srcRect.width());
         m_posInfo.verticalStretchFactor = rect.height() / static_cast<float>(m_posInfo.srcRect.height());
 
-        const auto& mousePos = getPosition(g_window.getMousePosition());
+        const auto& mousePos = getPosition(g_window.getMousePosition() * g_window.getDisplayDensity());
         if (mousePos != m_mousePosition)
             onMouseMove(m_mousePosition = mousePos, true);
     }

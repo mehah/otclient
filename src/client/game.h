@@ -696,21 +696,7 @@ public:
     void setCustomOs(const Otc::OperatingSystem_t os) { m_clientCustomOs = os; }
     Otc::OperatingSystem_t getOs();
 
-    void setWalkTurnDelay(const uint16_t v) { m_walkTurnDelay = v; }
-    void setWalkFirstStepDelay(const uint16_t v) { m_walkFirstStepDelay = v; }
-
-    uint16_t getWalkTurnDelay() { return m_walkTurnDelay; }
-    uint16_t getWalkFirstStepDelay() { return m_walkFirstStepDelay; }
-
     bool canPerformGameAction() const;
-    bool checkBotProtection() const;
-    bool isEnabledBotProtection() {
-#ifdef BOT_PROTECTION
-        return true;
-#else
-        return false;
-#endif
-    }
 
     bool isOnline() { return m_online; }
     bool isLogging() { return !m_online && m_protocolGame; }
@@ -784,6 +770,7 @@ public:
     void requestBestiarySearch(uint16_t raceId);
     void requestSendBuyCharmRune(uint8_t runeId, uint8_t action, uint16_t raceId);
     void requestSendCharacterInfo(uint32_t playerId, Otc::CyclopediaCharacterInfoType_t characterInfoType, uint16_t entriesPerPage = 0, uint16_t page = 0);
+    void requestSendCyclopediaHouseAuction(Otc::CyclopediaHouseAuctionType_t type, uint32_t houseId, uint32_t timestamp = 0, uint64_t bidValue = 0, std::string_view name = "");
     void requestBosstiaryInfo();
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
@@ -820,8 +807,6 @@ private:
     bool m_canReportBugs{ false };
 
     uint8_t m_openPvpSituations{ 0 };
-    uint16_t m_walkFirstStepDelay{ 200 };
-    uint16_t m_walkTurnDelay{ 100 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };
     uint16_t m_protocolVersion{ 0 };

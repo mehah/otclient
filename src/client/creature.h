@@ -106,7 +106,7 @@ public:
     int getDisplacementY() const override;
     int getExactSize(int layer = 0, int xPattern = 0, int yPattern = 0, int zPattern = 0, int animationPhase = 0) override;
 
-    float getStepProgress() { return m_walkTimer.ticksElapsed() / m_stepCache.duration; }
+    float getStepProgress() { return m_walkTimer.ticksElapsed() / static_cast<float>(m_stepCache.duration); }
     float getStepTicksLeft() { return static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)) - m_walkTimer.ticksElapsed(); }
 
     uint8_t getSkull() { return m_skull; }
@@ -180,12 +180,10 @@ minHeight,
     void setWidgetInformation(const UIWidgetPtr& info);
     UIWidgetPtr getWidgetInformation() { return m_widgetInformation; }
 
-#ifndef BOT_PROTECTION
     void setText(const std::string& text, const Color& color);
     std::string getText();
     void clearText() { setText("", Color::white); }
     bool canShoot(int distance);
-#endif
 
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
@@ -314,9 +312,7 @@ private:
     bool m_typing{ false };
     bool m_isCovered{ false };
 
-#ifndef BOT_PROTECTION
     StaticTextPtr m_text;
-#endif
 };
 
 // @bindclass

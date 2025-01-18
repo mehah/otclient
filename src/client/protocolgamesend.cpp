@@ -25,15 +25,6 @@
 #include "protocolgame.h"
 #include <framework/util/crypt.h>
 
-void ProtocolGame::send(const OutputMessagePtr& outputMessage)
-{
-    // avoid usage of automated sends (bot modules)
-    if (!g_game.checkBotProtection())
-        return;
-
-    Protocol::send(outputMessage);
-}
-
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
 {
     if (m_enableSendExtendedOpcode) {
@@ -1051,6 +1042,47 @@ void ProtocolGame::sendCyclopediaRequestCharacterInfo(const uint32_t playerId, c
     if (characterInfoType == Otc::CYCLOPEDIA_CHARACTERINFO_RECENTDEATHS || characterInfoType == Otc::CYCLOPEDIA_CHARACTERINFO_RECENTPVPKILLS) {
         msg->addU16(entriesPerPage);
         msg->addU16(page);
+    }
+
+    send(msg);
+}
+
+void ProtocolGame::sendCyclopediaHouseAuction(const Otc::CyclopediaHouseAuctionType_t type, const uint32_t houseId, const uint32_t timestamp, const uint64_t bidValue, const std::string_view name)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientCyclopediaHouseAuction);
+    msg->addU8(type);
+
+    switch (type) {
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_NONE:
+            msg->addString(name); // townName
+            break;
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_BID:
+            msg->addU32(houseId);
+            msg->addU64(bidValue);
+            break;
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_MOVEOUT:
+            msg->addU32(houseId);
+            msg->addU32(timestamp);
+            break;
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_TRANSFER:
+            msg->addU32(houseId);
+            msg->addU32(timestamp);
+            msg->addString(name); // newOwner
+            msg->addU64(bidValue);
+            break;
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_CANCEL_MOVEOUT:
+            msg->addU32(houseId);
+            break;
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_CANCEL_TRANSFER:
+            msg->addU32(houseId);
+            break;
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_ACCEPT_TRANSFER:
+            msg->addU32(houseId);
+            break;
+        case Otc::CYCLOPEDIA_HOUSE_TYPE_REFECT_TRANSFER:
+            msg->addU32(houseId);
+            break;
     }
 
     send(msg);

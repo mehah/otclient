@@ -550,6 +550,7 @@ namespace Otc
         GameForgeConvergence = 119,
         GameAllowCustomBotScripts = 120,
         GameColorizedLootValue = 121,
+		GameAllowPreWalk = 122,
         LastGameFeature
     };
 
@@ -737,6 +738,27 @@ namespace Otc
         SUPPLY_STASH_ACTION_STOW_CONTAINER = 1,
         SUPPLY_STASH_ACTION_STOW_STACK = 2,
         SUPPLY_STASH_ACTION_WITHDRAW = 3
+    };
+
+    enum CyclopediaHouseState_t : uint8_t
+    {
+        CYCLOPEDIA_HOUSE_STATE_AVAILABLE = 0,
+        // 1 ?
+        CYCLOPEDIA_HOUSE_STATE_RENTED = 2,
+        CYCLOPEDIA_HOUSE_STATE_TRANSFER = 3,
+        CYCLOPEDIA_HOUSE_STATE_MOVEOUT = 4,
+    };
+
+    enum CyclopediaHouseAuctionType_t : uint8_t
+    {
+        CYCLOPEDIA_HOUSE_TYPE_NONE = 0,
+        CYCLOPEDIA_HOUSE_TYPE_BID = 1,
+        CYCLOPEDIA_HOUSE_TYPE_MOVEOUT = 2,
+        CYCLOPEDIA_HOUSE_TYPE_TRANSFER = 3,
+        CYCLOPEDIA_HOUSE_TYPE_CANCEL_MOVEOUT = 4,
+        CYCLOPEDIA_HOUSE_TYPE_CANCEL_TRANSFER = 5,
+        CYCLOPEDIA_HOUSE_TYPE_ACCEPT_TRANSFER = 6,
+        CYCLOPEDIA_HOUSE_TYPE_REFECT_TRANSFER = 7,
     };
 
     enum CyclopediaCharacterInfoType_t : uint8_t

@@ -12,34 +12,34 @@ panels = {
     keybindsPanel = nil
 }
 -- LuaFormatter off
-local buttons = {{
+local buttons = { {
 
     text = "Controls",
     icon = "/images/icons/icon_controls",
     open = "generalPanel",
-    subCategories = {{
+    subCategories = { {
         text = "General Hotkeys",
         open = "keybindsPanel"
-    }}
+    } }
 }, {
     text = "Interface",
     icon = "/images/icons/icon_interface",
     open = "interface",
-    subCategories = {{
+    subCategories = { {
         text = "HUD",
         open = "interfaceHUD"
     }, {
         text = "Console",
         open = "interfaceConsole"
-    }}
+    } }
 }, {
     text = "Graphics",
     icon = "/images/icons/icon_graphics",
     open = "graphicsPanel",
-    subCategories = {{
+    subCategories = { {
         text = "Effects",
         open = "graphicsEffectsPanel"
-    }}
+    } }
 }, {
     text = "Sound",
     icon = "/images/icons/icon_sound",
@@ -64,8 +64,8 @@ local buttons = {{
     }, ]] {
         text = "Help",
         open = "miscHelp"
-    }}
-}}
+    } }
+} }
 
 -- LuaFormatter on
 local extraWidgets = {
@@ -137,16 +137,14 @@ local function setupComboBox()
         setOption('framesRarity', comboBox:getCurrentOption().data)
     end
 
-    if not g_game.isEnabledBotProtection() then
-        local profileCombobox = panels.misc:recursiveGetChildById('profile')
+    local profileCombobox = panels.misc:recursiveGetChildById('profile')
 
-        for i = 1, 10 do
-            profileCombobox:addOption(tostring(i), i)
-        end
+    for i = 1, 10 do
+        profileCombobox:addOption(tostring(i), i)
+    end
 
-        profileCombobox.onOptionChange = function(comboBox, option)
-            setOption('profile', comboBox:getCurrentOption().data)
-        end
+    profileCombobox.onOptionChange = function(comboBox, option)
+        setOption('profile', comboBox:getCurrentOption().data)
     end
 
     for _, preset in ipairs(Keybind.presets) do
@@ -192,28 +190,28 @@ function controller:onInit()
 
     extraWidgets.audioButton = modules.client_topmenu.addTopRightToggleButton('audioButton', tr('Audio'),
         '/images/topbuttons/button_mute_up', function() toggleOption('enableAudio') end)
-        
+
     extraWidgets.optionsButton = modules.client_topmenu.addTopRightToggleButton('optionsButton', tr('Options'),
         '/images/topbuttons/button_options', toggle)
 
     extraWidgets.logoutButton = modules.client_topmenu.addTopRightToggleButton('logoutButton', tr('Exit'),
-            '/images/topbuttons/logout', toggle)
+        '/images/topbuttons/logout', toggle)
 
-    panels.generalPanel = g_ui.loadUI('styles/controls/general',controller.ui.optionsTabContent)
-    panels.keybindsPanel = g_ui.loadUI('styles/controls/keybinds',controller.ui.optionsTabContent)
+    panels.generalPanel = g_ui.loadUI('styles/controls/general', controller.ui.optionsTabContent)
+    panels.keybindsPanel = g_ui.loadUI('styles/controls/keybinds', controller.ui.optionsTabContent)
 
-    panels.graphicsPanel = g_ui.loadUI('styles/graphics/graphics',controller.ui.optionsTabContent)
-    panels.graphicsEffectsPanel = g_ui.loadUI('styles/graphics/effects',controller.ui.optionsTabContent)
-    
-    panels.interface = g_ui.loadUI('styles/interface/interface',controller.ui.optionsTabContent)
-    panels.interfaceConsole = g_ui.loadUI('styles/interface/console',controller.ui.optionsTabContent)
-    panels.interfaceHUD = g_ui.loadUI('styles/interface/HUD',controller.ui.optionsTabContent)
+    panels.graphicsPanel = g_ui.loadUI('styles/graphics/graphics', controller.ui.optionsTabContent)
+    panels.graphicsEffectsPanel = g_ui.loadUI('styles/graphics/effects', controller.ui.optionsTabContent)
 
-    panels.soundPanel = g_ui.loadUI('styles/sound/audio',controller.ui.optionsTabContent)
-    
-    panels.misc = g_ui.loadUI('styles/misc/misc',controller.ui.optionsTabContent)
-    panels.miscHelp = g_ui.loadUI('styles/misc/help',controller.ui.optionsTabContent)
-   
+    panels.interface = g_ui.loadUI('styles/interface/interface', controller.ui.optionsTabContent)
+    panels.interfaceConsole = g_ui.loadUI('styles/interface/console', controller.ui.optionsTabContent)
+    panels.interfaceHUD = g_ui.loadUI('styles/interface/HUD', controller.ui.optionsTabContent)
+
+    panels.soundPanel = g_ui.loadUI('styles/sound/audio', controller.ui.optionsTabContent)
+
+    panels.misc = g_ui.loadUI('styles/misc/misc', controller.ui.optionsTabContent)
+    panels.miscHelp = g_ui.loadUI('styles/misc/help', controller.ui.optionsTabContent)
+
     self.ui:hide()
 
     configureCharacterCategories()
@@ -222,34 +220,34 @@ function controller:onInit()
 
     Keybind.new("UI", "Toggle Fullscreen", "Ctrl+Shift+F", "")
     Keybind.bind("UI", "Toggle Fullscreen", {
-      {
-        type = KEY_DOWN,
-        callback = function() toggleOption('fullscreen') end,
-      }
+        {
+            type = KEY_DOWN,
+            callback = function() toggleOption('fullscreen') end,
+        }
     })
     Keybind.new("UI", "Show/hide FPS / lag indicator", "", "")
-    Keybind.bind("UI", "Show/hide FPS / lag indicator", {{
+    Keybind.bind("UI", "Show/hide FPS / lag indicator", { {
         type = KEY_DOWN,
         callback = function()
             toggleOption('showPing')
             toggleOption('showFps')
         end
-    }})
+    } })
 
     Keybind.new("UI", "Show/hide Creature Names and Bars", "Ctrl+N", "")
     Keybind.bind("UI", "Show/hide Creature Names and Bars", {
-      {
-        type = KEY_DOWN,
-        callback = toggleDisplays,
-      }
+        {
+            type = KEY_DOWN,
+            callback = toggleDisplays,
+        }
     })
 
     Keybind.new("Sound", "Mute/unmute", "", "")
     Keybind.bind("Sound", "Mute/unmute", {
-      {
-        type = KEY_DOWN,
-        callback = function() toggleOption('enableAudio') end,
-      }
+        {
+            type = KEY_DOWN,
+            callback = function() toggleOption('enableAudio') end,
+        }
     })
 end
 
@@ -485,7 +483,6 @@ function configureCharacterCategories()
                 end
 
                 close(oldOpen)
-
             end
 
             if parent.subCategoriesSize then
