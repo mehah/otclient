@@ -74,12 +74,18 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
 
         const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
+        auto oldScaleFactor = g_drawPool.getScaleFactor();
+
+        g_drawPool.setScaleFactor(getScaleFactor());
+
         internalDraw(_dest);
 
         if (isMarked())
             internalDraw(_dest, getMarkedColor());
         else if (isHighlighted())
             internalDraw(_dest, getHighlightColor());
+
+        g_drawPool.setScaleFactor(oldScaleFactor);
     }
 
     // drawLight(dest, lightView);
