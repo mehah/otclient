@@ -304,27 +304,32 @@ function EnterGame.terminate()
     EnterGame = nil
 end
 
+local function reportRequestWarning(requestType, msg, errorCode)
+    g_logger.warning(("[Webscraping - %s] %s"):format(requestType, msg), errorCode)
+end
+
 function EnterGame.postCacheInfo()
+    local requestType = 'cacheinfo'
     local onRecvInfo = function(message, err)
 
         if err then
             -- onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
-            g_logger.warning("[Webscraping] " .. "Bad Request. Game_entergame postCacheInfo1")
+            reportRequestWarning(requestType, "Bad Request. Game_entergame postCacheInfo1")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postCacheInfo2")
             -- onError(nil, 'Bad Request.Game_entergame postCacheInfo2', 400)
+            reportRequestWarning(requestType, "Bad Request.Game_entergame postCacheInfo2")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
             -- onError(nil, response.errorMessage, response.errorCode)
+            reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
         end
 
@@ -338,14 +343,15 @@ function EnterGame.postCacheInfo()
     end
 
     HTTP.post(Services.status, json.encode({
-        type = 'cacheinfo'
+        type = requestType
     }), onRecvInfo, false)
 end
 
 function EnterGame.postEventScheduler()
+    local requestType = 'eventschedule'
     local onRecvInfo = function(message, err)
         if err then
-            g_logger.warning("[Webscraping] Bad Request.Game_entergame postEventScheduler1")
+            reportRequestWarning(requestType, "Bad Request.Game_entergame postEventScheduler1")
             return
         end
 
@@ -356,7 +362,7 @@ function EnterGame.postEventScheduler()
 
         local response = json.decode(jsonString)
         if response.errorMessage then
-            g_logger.warning("[Webscraping] " .. "response.errorMessage,response.errorCode")
+            reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
         end
         modules.client_bottommenu.setEventsSchedulerTimestamp(response.lastupdatetimestamp)
@@ -364,27 +370,28 @@ function EnterGame.postEventScheduler()
     end
 
     HTTP.post(Services.status, json.encode({
-        type = 'eventschedule'
+        type = requestType
     }), onRecvInfo, false)
 end
 
 function EnterGame.postShowOff()
+    local requestType = 'showoff'
     local onRecvInfo = function(message, err)
         if err then
-            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
+            reportRequestWarning(requestType, "Bad Request.Game_entergame postShowOff")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowOff")
+            reportRequestWarning(requestType, "Bad Request.Game_entergame postShowOff")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
+            reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
         end
 
@@ -392,30 +399,31 @@ function EnterGame.postShowOff()
     end
 
     HTTP.post(Services.status, json.encode({
-        type = 'showoff'
+        type = requestType
     }), onRecvInfo, false)
 end
 
 function EnterGame.postShowCreatureBoost()
+    local requestType = 'boostedcreature'
     local onRecvInfo = function(message, err)
         if err then
             -- onError(nil, 'Bad Request. 1 Game_entergame postShowCreatureBoost', 400)
-            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowCreatureBoost1")
+            reportRequestWarning(requestType, "Bad Request.Game_entergame postShowCreatureBoost1")
             return
         end
 
         local _, bodyStart = message:find('{')
         local _, bodyEnd = message:find('.*}')
         if not bodyStart or not bodyEnd then
-            g_logger.warning("[Webscraping] " .. "Bad Request.Game_entergame postShowCreatureBoost2")
             -- onError(nil, 'Bad Request. 2 Game_entergame postShowCreatureBoost', 400)
+            reportRequestWarning(requestType, "Bad Request.Game_entergame postShowCreatureBoost2")
             return
         end
 
         local response = json.decode(message:sub(bodyStart, bodyEnd))
         if response.errorMessage then
-            g_logger.warning("[Webscraping] " .. response.errorMessage, response.errorCode)
             -- onError(nil, response.errorMessage, response.errorCode)
+            reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
         end
 
@@ -423,7 +431,7 @@ function EnterGame.postShowCreatureBoost()
     end
 
     HTTP.post(Services.status, json.encode({
-        type = 'boostedcreature'
+        type = requestType
     }), onRecvInfo, false)
 end
 
