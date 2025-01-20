@@ -419,7 +419,7 @@ function EnterGame.postShowCreatureBoost()
             return
         end
 
-        modules.client_bottommenu.Booster_creature(response)
+        modules.client_bottommenu.Boosted_creature(response)
     end
 
     HTTP.post(Services.status, json.encode({

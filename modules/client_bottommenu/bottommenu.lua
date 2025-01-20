@@ -20,7 +20,7 @@ local boss_boosted
 
 local default_info = {
     [1] = {image = "images/randomhint", Title = "Random Hint", creature1="images/boost_monster1",creature2= "images/boost_monster2",description = "The customisable status bar includes big health and mana bars and can be placed on the bottom, the top or on the side of your game windows\n\n -\t\t https://github.com/mehah/otclient/wiki "},
-  --  [2] = {image = "image of label", Title = "title", creature1="images of creature",creature2= "images of boos",description = "text in label see tutorial :  https://github.com/mehah/otclient/wiki"},
+  --  [2] = {image = "image of label", Title = "title", creature1="image of boosted creature",creature2= "images of boosted boss",description = "text in label see tutorial :  https://github.com/mehah/otclient/wiki"},
 }
 function init()
     g_ui.importStyle('calendar')
@@ -496,7 +496,7 @@ function onClickOnNextCalendar()
     reloadEventsSchedulerCurrentPage()
 end
 
-function Booster_creature(data)
+function Boosted_creature(data)
     if modules.game_things.isLoaded() then
         local creatureraceid = modules.game_cyclopedia.RACE[data.creatureraceid]
         local bossraceid = modules.game_cyclopedia.RACE_Bosstiary[data.bossraceid]

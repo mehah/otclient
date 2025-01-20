@@ -692,7 +692,7 @@ function Cyclopedia.toggleBosstiaryTracker()
 end
 
 function Cyclopedia.onTrackerClose(temp)
-    if temp == "Boosteary Tracker" then
+    if temp == "Bosstiary Tracker" then
         trackerButtonBosstiary:setOn(false)
     else
         trackerButton:setOn(false)

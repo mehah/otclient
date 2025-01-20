@@ -164,7 +164,7 @@ function Cyclopedia.CreateBosstiaryCreature(data)
 
 end
 
-function Cyclopedia.LoadBoostiaryCreatures(data)
+function Cyclopedia.LoadBosstiaryCreatures(data)
     if not UI then
         return
     end
@@ -236,11 +236,11 @@ function Cyclopedia.LoadBoostiaryCreatures(data)
         end
     end
 
-    Cyclopedia.LoadBoostiaryCreature(Cyclopedia.Bosstiary.Page)
+    Cyclopedia.LoadBosstiaryCreature(Cyclopedia.Bosstiary.Page)
     Cyclopedia.verifyBosstiaryButtons()
 end
 
-function Cyclopedia.LoadBoostiaryCreature(page)
+function Cyclopedia.LoadBosstiaryCreature(page)
     if not Cyclopedia.Bosstiary.Creatures[page] then
         return
     end
@@ -282,7 +282,7 @@ function Cyclopedia.changeBosstiaryPage(prev, next)
         Cyclopedia.Bosstiary.Page = Cyclopedia.Bosstiary.Page - 1
     end
 
-    Cyclopedia.LoadBoostiaryCreature(Cyclopedia.Bosstiary.Page)
+    Cyclopedia.LoadBosstiaryCreature(Cyclopedia.Bosstiary.Page)
     Cyclopedia.verifyBosstiaryButtons()
 end
 
@@ -438,6 +438,6 @@ function Cyclopedia.ReadjustPages()
     end
 
     UI.PageValue:setText(string.format("%d / %d", Cyclopedia.Bosstiary.Page, Cyclopedia.Bosstiary.TotalPages))
-    Cyclopedia.LoadBoostiaryCreature(Cyclopedia.Bosstiary.Page)
+    Cyclopedia.LoadBosstiaryCreature(Cyclopedia.Bosstiary.Page)
     Cyclopedia.verifyBosstiaryButtons()
 end
