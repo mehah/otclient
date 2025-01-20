@@ -535,7 +535,6 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
-| Familiar outfit       	| ![](https://geps.dev/progress/30) 	| [#39](https://github.com/Nottinghster/otclient/pull/39) 	|
 | wheel of destiny            	| ![](https://geps.dev/progress/1) 	| None	|
 | Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
@@ -547,9 +546,9 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 
 | Protocol / version   	| Description                 	| Required Feature                                    	| Compatibility 	|
 |---------------------	|-----------------------------	|-----------------------------------------------------	|---------------	|
-| TFS <br> (7.72)      	| Downgrade nekiro /<br> Nostalrius 	|                  [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)                          	| ✅            	|
-| TFS 0.4 <br> (8.6)       	| Fir3element                	|  [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)                                 	| ✅             	|
-| TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)        	| ✅             	|
+| TFS <br> (7.72)      	| Downgrade nekiro /<br> Nostalrius 	|                  [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 500](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)                          	| ✅            	|
+| TFS 0.4 <br> (8.6)       	| Fir3element                	|  [item-ticks-per-frame: 500](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)                                 	| ✅             	|
+| TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 500](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)        	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	|                                              	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
 | Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|

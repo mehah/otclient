@@ -781,8 +781,11 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
         msg->addU8(outfit.hasMount());
     }
 
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        msg->addU16(outfit.getFamiliar()); //familiars
+    }
+
     if (g_game.getClientVersion() >= 1281) {
-        msg->addU16(0x00); //familiars
         msg->addU8(0x00); //randomizeMount
     }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
