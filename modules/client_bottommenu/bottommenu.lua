@@ -500,13 +500,22 @@ function Boosted_creature(data)
     if modules.game_things.isLoaded() then
         local creatureraceid = modules.game_cyclopedia.RACE[data.creatureraceid]
         local bossraceid = modules.game_cyclopedia.RACE_Bosstiary[data.bossraceid]
+        local fileName = debug.getinfo(1, "S").source -- current file name - bottommenu.lua
+
         if creatureraceid then
             creature_boosted:setOutfit({type=creatureraceid.type})
             creature_boosted:getCreature():setStaticWalking(1000)
+        else
+            local msg = string.format("[%s] Creature with race id %s was not found.", fileName, data.creatureraceid)
+            g_logger.warning(msg)
         end
+
         if bossraceid then
             boss_boosted:setOutfit({type=bossraceid.type})
             boss_boosted:getCreature():setStaticWalking(1000)
+        else
+            local msg = string.format("[%s] Boss with race id %s was not found.", fileName, data.creatureraceid)
+            g_logger.warning(msg)
         end
     end
 end
