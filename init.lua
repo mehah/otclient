@@ -4,16 +4,19 @@
 -- updater
 Services = {
     --updater = "http://localhost/api/updater.php", --./updater
-    --status = "http://localhost/login.php", --./client_entergame | ./client_topmenu
+    status = "http://localhost/login.php", --./client_entergame | ./client_topmenu
     --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
 }
 
---[[ Servers_init = {
-    ["http://ip/login.php"] = {
+Servers_init = {
+    ["http://127.0.0.1/login.php"] = {
         ["port"] = 80,
-        ["protocol"] = 1332,
+        ["protocol"] = 1320,
         ["httpLogin"] = true
     },
+}
+
+--[[
     ["ip.net"] = {
         ["port"] = 7171,
         ["protocol"] = 860,
@@ -102,7 +105,7 @@ local function loadModules()
     end
 
     -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
-    -- g_modules.enableAutoReload()
+    g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip

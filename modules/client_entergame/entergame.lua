@@ -565,7 +565,6 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     g_game.setClientVersion(clientVersion)
     g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
     g_game.chooseRsa(G.host)
-
     if not modules.game_things.isLoaded() then
         if loadBox then
             loadBox:destroy()
@@ -573,10 +572,10 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
         end
 
         local errorBox = displayErrorBox(tr("Login Error"), string.format("Things are not loaded, please put assets in things/%d/<assets>.", clientVersion))
-	connect(errorBox, {
-		onOk = EnterGame.show
-	})
-	return
+        connect(errorBox, {
+            onOk = EnterGame.show
+        })
+        return
     end
 
     local host, path = G.host:match("([^/]+)/([^/].*)")
@@ -803,7 +802,8 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
     stayLoggedBox:setChecked(false)
     stayLoggedBox:setOn(false)
 
-    clientBox:setCurrentOption(tonumber(protocol))
+    local clientVersion = tonumber(protocol)
+    clientBox:setCurrentOption(clientVersion)
     clientBox:setVisible(false)
     clientBox:setHeight(0)
 
@@ -841,6 +841,13 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
 
     enterGame:setHeight(windowHeight)
     enterGame.disableToken = true
+
+    -- preload the assets
+    -- this is for the client_bottommenu module
+	-- it needs images of outfits
+    -- so it can display the boosted creature
+	g_game.setClientVersion(clientVersion)
+	g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
 end
 
 function EnterGame.setServerInfo(message)

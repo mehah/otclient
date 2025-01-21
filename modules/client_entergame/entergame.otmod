@@ -4,9 +4,11 @@ Module
   author: edubart
   website: https://github.com/edubart/otclient
 
+  dependencies:
+    - game_things
+
   load-later:
     - game_features
-    - game_things
 
   @onLoad: |
     dofile 'entergame'

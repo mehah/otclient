@@ -19,8 +19,15 @@ local creature_boosted
 local boss_boosted
 
 local default_info = {
-    [1] = {image = "images/randomhint", Title = "Random Hint", creature1="images/boost_monster1",creature2= "images/boost_monster2",description = "The customisable status bar includes big health and mana bars and can be placed on the bottom, the top or on the side of your game windows\n\n -\t\t https://github.com/mehah/otclient/wiki "},
-  --  [2] = {image = "image of label", Title = "title", creature1="image of boosted creature",creature2= "images of boosted boss",description = "text in label see tutorial :  https://github.com/mehah/otclient/wiki"},
+-- hint 1
+  {
+    image = "images/randomhint",
+	Title = "Enabling Boosted Creature Panel",
+	description = "Boosted creatures panel requires configuring a webservice (init.lua) and preloading a client version by either setting one server in Servers_init (init.lua) or by altering entergame.lua.\n\nFor more hints, visit:\t\t https://github.com/mehah/otclient/wiki"
+  },
+
+-- hint 2
+  -- {image = "image of label", Title = "title", creature1="image of boosted creature",creature2= "images of boosted boss",description = "text in label see tutorial :  https://github.com/mehah/otclient/wiki"},
 }
 function init()
     g_ui.importStyle('calendar')
@@ -47,7 +54,8 @@ function init()
 
 --  if not Services.status and default_info then
     if default_info then
-        local widget = g_ui.createWidget('ShowOffWidget', showOffWindow)
+		local scrollable = showOffWindow:recursiveGetChildById('contentsPanel')
+        local widget = g_ui.createWidget('ShowOffWidget', scrollable)
         local description = widget:recursiveGetChildById('description')
         local image = widget:recursiveGetChildById('image')
 

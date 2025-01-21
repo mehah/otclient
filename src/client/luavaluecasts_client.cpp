@@ -1125,3 +1125,15 @@ int push_luavalue(const CharacterInfoFamiliar& familiar) {
     g_lua.setField("isCurrent");
     return 1;
 }
+
+int push_luavalue(const MonsterRaceData& raceData)
+{
+    g_lua.createTable(0, 3);
+    g_lua.pushInteger(raceData.raceId);
+    g_lua.setField("id");
+    g_lua.pushString(raceData.name);
+    g_lua.setField("name");
+    push_luavalue(raceData.outfit);
+    g_lua.setField("outfit");
+    return 1;
+}

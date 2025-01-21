@@ -6,7 +6,7 @@ message Staticdata {
 	repeated Creature monsters = 1;
 	repeated Achievement achievements = 2;
 	repeated House houses = 3;
-	repeated Boss bosses = 4;
+	repeated Creature bosses = 4;
 	repeated Quest quests = 5;
 }
 
@@ -54,12 +54,6 @@ message House {
 	optional bool isGuildHall = 8;
 	optional string city = 9;
 	optional bool isShop = 10;
-}
-
-message Boss {
-	optional uint32 raceId = 1;
-	optional string name = 2;
-	optional Outfit outfit = 3;
 }
 
 message Quest {

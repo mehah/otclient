@@ -1112,6 +1112,9 @@
     <ClInclude Include="..\src\framework\proxy\proxy_client.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\client\staticdata.h">
+      <Filter>Header Files\client</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\otcicon.rc">
