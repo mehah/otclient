@@ -6,8 +6,6 @@ Module
 
   dependencies:
     - game_things
-
-  load-later:
     - game_features
 
   @onLoad: |
