@@ -277,8 +277,8 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
         // note: aside from compatibility with the QT client,
         // there is no need to have monsters and bosses
         // in separate data banks
-        loadCreatureBank(m_monsterRaces, staticDataLib.monsters(), false);
-        loadCreatureBank(m_monsterRaces, staticDataLib.bosses(), true);
+        loadCreatureBank(m_monsterRaces, raceBank, false);
+        loadCreatureBank(m_monsterRaces, bossBank, true);
         return true;
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (StaticData): %s", file, e.what()));
