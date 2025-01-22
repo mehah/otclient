@@ -1,5 +1,5 @@
 ShowOffWidget < UIWidget
-  size: 1020 100
+  size: 1020 1000
   anchors.left: parent.left
   anchors.top: parent.top
 
@@ -11,7 +11,7 @@ ShowOffWidget < UIWidget
     margin-left: 10
     image-auto-resize: true
 
-  Label
+  UITextEdit
     id: description
     size: 476 0
     anchors.left: image.right
@@ -22,6 +22,7 @@ ShowOffWidget < UIWidget
     color: #c0c0c0ff
     text-wrap: true
     text-auto-resize: true
+    selectable: true
 
 Panel
   id: bottomMenu
@@ -154,6 +155,7 @@ Panel
 
       Creature
         id: creature
+        size: 64 64
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         image-source: ""
@@ -162,7 +164,7 @@ Panel
         border-color: alpha
 
       UIWidget
-        id: creature2
+        id: monsterImage
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         visible: false
@@ -182,6 +184,7 @@ Panel
 
       Creature
         id: boss
+        size: 64 64
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         image-source: ""
@@ -190,7 +193,7 @@ Panel
         border-color: alpha
         
       UIWidget
-        id: boss2
+        id: bossImage
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         visible: false

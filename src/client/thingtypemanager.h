@@ -30,7 +30,7 @@
 #include "itemtype.h"
 #endif
 
-using RaceList = std::vector<MonsterRaceData>;
+using RaceList = std::vector<RaceType>;
 
 class ThingTypeManager
 {
@@ -68,7 +68,7 @@ public:
 
     ThingTypeList findThingTypeByAttr(ThingAttr attr, ThingCategory category);
 
-    const MonsterRaceData& getRaceData(uint32_t raceId);
+    const RaceType& getRaceData(uint32_t raceId);
 
     const ThingTypePtr& getNullThingType() { return m_nullThingType; }
 

@@ -1126,11 +1126,11 @@ int push_luavalue(const CharacterInfoFamiliar& familiar) {
     return 1;
 }
 
-int push_luavalue(const MonsterRaceData& raceData)
+int push_luavalue(const RaceType& raceData)
 {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(raceData.raceId);
-    g_lua.setField("id");
+    g_lua.setField("raceId");
     g_lua.pushString(raceData.name);
     g_lua.setField("name");
     push_luavalue(raceData.outfit);

@@ -15,8 +15,10 @@ local eventSchedulerCalendarYearIndex
 local eventSchedulerCalendarMonth
 
 local boostedWindow
-local creature_boosted
-local boss_boosted
+local monsterOutfit
+local monsterImage
+local bossOutfit
+local bossImage
 
 local default_info = {
 -- hint 1
@@ -27,7 +29,7 @@ local default_info = {
   },
 
 -- hint 2
-  -- {image = "image of label", Title = "title", creature1="image of boosted creature",creature2= "images of boosted boss",description = "text in label see tutorial :  https://github.com/mehah/otclient/wiki"},
+  -- {image = "image of label", Title = "title", description = "your hint here"},
 }
 function init()
     g_ui.importStyle('calendar')
@@ -49,12 +51,12 @@ function init()
     eventSchedulerCalendarMonth = tonumber(os.date("%m"))
 
     boostedWindow = bottomMenu:recursiveGetChildById('boostedWindow')
-    creature_boosted = boostedWindow:recursiveGetChildById('creature')
-    boss_boosted = boostedWindow:recursiveGetChildById('boss')
+    monsterOutfit = boostedWindow:recursiveGetChildById('creature')
+    bossOutfit = boostedWindow:recursiveGetChildById('boss')
 
 --  if not Services.status and default_info then
     if default_info then
-		local scrollable = showOffWindow:recursiveGetChildById('contentsPanel')
+        local scrollable = showOffWindow:recursiveGetChildById('contentsPanel')
         local widget = g_ui.createWidget('ShowOffWidget', scrollable)
         local description = widget:recursiveGetChildById('description')
         local image = widget:recursiveGetChildById('image')
@@ -65,16 +67,17 @@ function init()
         showOffWindow.title:setText(tr(randomItem.Title))
         image:setImageSource(randomItem.image)
         description:setText(tr(randomItem.description))
-        creature_boosted:setVisible(false)
-        boss_boosted:setVisible(false)
+        monsterOutfit:setVisible(false)
+        bossOutfit:setVisible(false)
+        widget:resize(widget:getWidth(), description:getHeight())
 
-        local creature2 = boostedWindow:recursiveGetChildById('creature2')
-        local boss2 = boostedWindow:recursiveGetChildById('boss2')
+        monsterImage = boostedWindow:recursiveGetChildById('monsterImage')
+        bossImage = boostedWindow:recursiveGetChildById('bossImage')
 
-        creature2:setImageSource(randomItem.creature1)    
-        creature2:setVisible(true) 
-        boss2:setImageSource(randomItem.creature2)
-        boss2:setVisible(true)
+        monsterImage:setImageSource("images/icon-questionmark")
+        monsterImage:setVisible(true)
+        bossImage:setImageSource("images/icon-questionmark")
+        bossImage:setVisible(true)
     end
     if g_game.isOnline() then
         hide()
@@ -505,25 +508,35 @@ function onClickOnNextCalendar()
 end
 
 function Boosted_creature(data)
-    if modules.game_things.isLoaded() then
-        local creatureraceid = modules.game_cyclopedia.RACE[data.creatureraceid]
-        local bossraceid = modules.game_cyclopedia.RACE_Bosstiary[data.bossraceid]
-        local fileName = debug.getinfo(1, "S").source -- current file name - bottommenu.lua
+    if not modules.game_things.isLoaded() then
+		return
+	end
 
-        if creatureraceid then
-            creature_boosted:setOutfit({type=creatureraceid.type})
-            creature_boosted:getCreature():setStaticWalking(1000)
-        else
-            local msg = string.format("[%s] Creature with race id %s was not found.", fileName, data.creatureraceid)
-            g_logger.warning(msg)
-        end
+	local raceMon = g_things.getRaceData(data.creatureraceid)
+	local raceBoss = g_things.getRaceData(data.bossraceid)
+	local fileName = debug.getinfo(1, "S").source -- current file name - bottommenu.lua
 
-        if bossraceid then
-            boss_boosted:setOutfit({type=bossraceid.type})
-            boss_boosted:getCreature():setStaticWalking(1000)
-        else
-            local msg = string.format("[%s] Boss with race id %s was not found.", fileName, data.creatureraceid)
-            g_logger.warning(msg)
-        end
-    end
+	if data.creatureraceid then
+		if raceMon.raceId ~= 0 then
+			monsterOutfit:setOutfit(raceMon.outfit)
+			monsterOutfit:getCreature():setStaticWalking(1000)
+			monsterOutfit:setVisible(true)
+			monsterImage:setVisible(false)
+		else
+			local msg = string.format("[%s] Creature with race id %s was not found.", fileName, data.creatureraceid)
+			g_logger.warning(msg)
+		end
+	end
+
+	if data.bossraceid then
+		if raceBoss.raceId ~= 0 then
+			bossOutfit:setOutfit(raceBoss.outfit)
+			bossOutfit:getCreature():setStaticWalking(1000)
+			bossOutfit:setVisible(true)
+			bossImage:setVisible(false)
+		else
+			local msg = string.format("[%s] Boss with race id %s was not found.", fileName, data.creatureraceid)
+			g_logger.warning(msg)
+		end
+	end
 end

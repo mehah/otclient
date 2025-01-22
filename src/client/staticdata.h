@@ -26,7 +26,7 @@
 
 class Outfit;
 
-struct MonsterRaceData
+struct RaceType
 {
     uint32_t raceId;
     std::string name;

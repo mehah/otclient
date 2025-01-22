@@ -218,7 +218,7 @@ namespace {
     void loadCreatureBank(RaceList& otcRaceList, const RaceBank& protobufRaceList) {
         for (const auto& protobufRace : protobufRaceList) {
             // add race to vector
-            MonsterRaceData otcRaceType = MonsterRaceData();
+            RaceType otcRaceType = RaceType();
             otcRaceType.raceId = protobufRace.raceid();
             otcRaceType.name = protobufRace.name();
 
@@ -320,14 +320,14 @@ ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const 
     return ret;
 }
 
-const MonsterRaceData& ThingTypeManager::getRaceData(uint32_t raceId)
+const RaceType& ThingTypeManager::getRaceData(uint32_t raceId)
 {
     for (const auto& raceData : m_monsterRaces) {
         if (raceData.raceId == raceId) {
             return raceData;
         }
     }
-    auto emptyVal = new MonsterRaceData();
+    auto emptyVal = new RaceType();
     return *emptyVal;
 }
 

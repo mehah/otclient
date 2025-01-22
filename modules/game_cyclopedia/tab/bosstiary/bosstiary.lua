@@ -77,7 +77,7 @@ function Cyclopedia.CreateBosstiaryCreature(data)
 
     local widget = g_ui.createWidget("BosstiaryItem", UI.ListBase.BossList)
     widget:setId(data.raceId)
-    local raceData = RACE_Bosstiary[data.raceId]
+    local raceData = g_things.getRaceData(data.raceId)
     local icons = {
         [CATEGORY.BANE] = "/game_cyclopedia/images/boss/icon_bane",
         [CATEGORY.ARCHFOE] = "/game_cyclopedia/images/boss/icon_archfoe",
@@ -138,30 +138,24 @@ function Cyclopedia.CreateBosstiaryCreature(data)
     end
     widget.ProgressValue:setText(data.kills)
 
-     Cyclopedia.SetBestiaryProgress(46,widget.ProgressBack, widget.ProgressBack33, widget.ProgressBack55,  data.kills, CONFIG[data.category].PROWESS, CONFIG[data.category].EXPERTISE, CONFIG[data.category].MASTERY)
+    Cyclopedia.SetBestiaryProgress(46,widget.ProgressBack, widget.ProgressBack33, widget.ProgressBack55,  data.kills, CONFIG[data.category].PROWESS, CONFIG[data.category].EXPERTISE, CONFIG[data.category].MASTERY)
    
-    if raceData then
-        widget.Sprite:setOutfit({
-            type = Cyclopedia.safeOutfit(raceData.type)
-        })
-        widget.Sprite:getCreature():setStaticWalking(1000)
-        if data.unlocked then
-            widget.Sprite:getCreature():setShader("")
-            widget:setText(format(data.name))
-            widget.TrackCheck:enable()
-            if data.isTrackerActived == 1 then
-                widget.TrackCheck:setChecked(true)
-            else
-                widget.TrackCheck:setChecked(false)
-            end
-        else
-            widget.Sprite:getCreature():setShader("Outfit - cyclopedia-black")
-            widget.TrackCheck:disable()
+	widget.Sprite:setOutfit(raceData.outfit)
+	widget.Sprite:getCreature():setStaticWalking(1000)
+	if data.unlocked then
+		widget.Sprite:getCreature():setShader("")
+		widget:setText(format(data.name))
+		widget.TrackCheck:enable()
+		if data.isTrackerActived == 1 then
+			widget.TrackCheck:setChecked(true)
+		else
+			widget.TrackCheck:setChecked(false)
+		end
+	else
+		widget.Sprite:getCreature():setShader("Outfit - cyclopedia-black")
+		widget.TrackCheck:disable()
 
-        end
-
-    end
-
+	end
 end
 
 function Cyclopedia.LoadBosstiaryCreatures(data)
@@ -182,10 +176,9 @@ function Cyclopedia.LoadBosstiaryCreatures(data)
     Cyclopedia.Bosstiary.Creatures[page] = {}
 
     local validCreatures = {}
-    local invalidCreatures = {}
 
     for i, dataEntry in ipairs(data) do
-        local raceData = RACE_Bosstiary[dataEntry.raceId]
+        local raceData = g_things.getRaceData(dataEntry.raceId)
         local creature = {
             visible = true,
             raceId = dataEntry.raceId,
@@ -196,15 +189,7 @@ function Cyclopedia.LoadBosstiaryCreatures(data)
             unlocked = dataEntry.kills > 0 and true or false
         }
 
-        if raceData then
-            table.insert(validCreatures, creature)
-        else
-            table.insert(invalidCreatures, creature)
-        end
-    end
-
-    for _, value in pairs(invalidCreatures) do
-        table.insert(validCreatures, value)
+        table.insert(validCreatures, creature)
     end
 
     table.sort(validCreatures, function(a, b)

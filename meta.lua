@@ -184,6 +184,10 @@ function g_things.getThingTypes(category) end
 ---@return ThingType[]
 function g_things.findThingTypeByAttr(attr, category) end
 
+---@param raceId integer
+---@return RaceType[]
+function g_things.getRaceData(raceId) end
+
 ---* FRAMEWORK_EDITOR
 ---@param id integer
 ---@return ThingType | nil
