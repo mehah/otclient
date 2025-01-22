@@ -547,7 +547,7 @@ if true then
   local function checkPlayers()
     for i, spec in ipairs(getSpectators()) do
       if spec:isPlayer() and spec:getText() == "" and spec:getPosition().z == posz() and spec ~= player then
-        g_game.look(spec)
+        g_game.look(spec, true)
         found = now
       end
     end
@@ -568,7 +568,7 @@ if true then
   onCreatureAppear(function(creature)
     if not settings.checkPlayer then return end
     if creature:isPlayer() and creature:getText() == "" and creature:getPosition().z == posz() and creature ~= player then
-      g_game.look(creature)
+      g_game.look(creature, true)
       found = now
     end
   end)
