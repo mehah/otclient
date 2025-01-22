@@ -2962,7 +2962,7 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
     const uint16_t questId = msg->getU16();
 
     const uint8_t missionCount = msg->getU8();
-    std::vector<std::tuple<std::string_view, std::string_view, uint16_t>> questMissions;
+    std::vector<std::tuple<std::string, std::string, uint16_t>> questMissions;
 
     for (auto i = 0; i < missionCount; ++i) {
         auto missionId = 0;

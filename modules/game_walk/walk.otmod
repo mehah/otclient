@@ -5,5 +5,5 @@ Module
   website: https://github.com/mehah/otclient
   scripts: [ walk ]
   dependencies: [ game_joystick, game_interface ]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: WalkController:init()
+  @onUnload: WalkController:terminate()

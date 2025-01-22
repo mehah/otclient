@@ -4,163 +4,39 @@ local walkEvent = nil
 local lastTurn = 0
 local nextWalkDir = nil
 
-function init()
-    connect(g_game, {
-        onGameStart = onGameStart,
-        onTeleport = onTeleport,
-    })
-    connect(LocalPlayer, {
-        onWalk = onWalk,
-        onCancelWalk = onCancelWalk,
-        onWalkFinish = onWalkFinish,
-    })
+WalkController = Controller:new()
 
-    bindKeys()
-end
-
-function terminate()
-    disconnect(g_game, {
-        onGameStart = onGameStart,
-        onTeleport = onTeleport,
-    })
-    disconnect(LocalPlayer, {
-        onWalk = onWalk,
-        onCancelWalk = onCancelWalk,
-        onWalkFinish = onWalkFinish,
-    })
-
-    stopSmartWalk()
-end
-
-function onGameStart()
-    modules.game_interface.getRootPanel().onFocusChange = stopSmartWalk
-
-    modules.game_joystick.addOnJoystickMoveListener(function(dir)
-        g_game.walk(dir)
-    end)
-
-    -- open tibia has delay in auto walking
-    if not g_game.isOfficialTibia() then
-        g_game.enableFeature(GameForceFirstAutoWalkStep)
-    else
-        g_game.disableFeature(GameForceFirstAutoWalkStep)
-    end
-end
-
-function bindKeys()
-    modules.game_interface.getRootPanel():setAutoRepeatDelay(200)
-
-    bindWalkKey('Up', North)
-    bindWalkKey('Right', East)
-    bindWalkKey('Down', South)
-    bindWalkKey('Left', West)
-    bindWalkKey('Numpad8', North)
-    bindWalkKey('Numpad9', NorthEast)
-    bindWalkKey('Numpad6', East)
-    bindWalkKey('Numpad3', SouthEast)
-    bindWalkKey('Numpad2', South)
-    bindWalkKey('Numpad1', SouthWest)
-    bindWalkKey('Numpad4', West)
-    bindWalkKey('Numpad7', NorthWest)
-
-    bindTurnKey('Ctrl+Up', North)
-    bindTurnKey('Ctrl+Right', East)
-    bindTurnKey('Ctrl+Down', South)
-    bindTurnKey('Ctrl+Left', West)
-    bindTurnKey('Ctrl+Numpad8', North)
-    bindTurnKey('Ctrl+Numpad6', East)
-    bindTurnKey('Ctrl+Numpad2', South)
-    bindTurnKey('Ctrl+Numpad4', West)
-end
-
-function bindWalkKey(key, dir)
-    local gameRootPanel = modules.game_interface.getRootPanel()
-    g_keyboard.bindKeyDown(key, function()
-        g_keyboard.setKeyDelay(key, 10)
-        changeWalkDir(dir)
-    end, gameRootPanel, true)
-    g_keyboard.bindKeyUp(key, function()
-        g_keyboard.setKeyDelay(key, 30)
-        changeWalkDir(dir, true)
-    end, gameRootPanel, true)
-    g_keyboard.bindKeyPress(key, function(_, _, ticks) smartWalk(dir, ticks) end, gameRootPanel)
-end
-
-function unbindWalkKey(key)
-    local gameRootPanel = modules.game_interface.getRootPanel()
-    g_keyboard.unbindKeyDown(key, gameRootPanel)
-    g_keyboard.unbindKeyUp(key, gameRootPanel)
-    g_keyboard.unbindKeyPress(key, gameRootPanel)
-end
-
-function bindTurnKey(key, dir)
-    if modules.game_interface then
-        local gameRootPanel = modules.game_interface.getRootPanel()
-        g_keyboard.bindKeyDown(key, function() turn(dir, false) end, gameRootPanel)
-        g_keyboard.bindKeyPress(key, function() turn(dir, true) end, gameRootPanel)
-        g_keyboard.bindKeyUp(key, function()
-            local player = g_game.getLocalPlayer()
-            if player then player:lockWalk(200) end
-        end, gameRootPanel)
-    end
-end
-
-function unbindTurnKey(key)
-    if modules.game_interface then
-        local gameRootPanel = modules.game_interface.getRootPanel()
-        g_keyboard.unbindKeyDown(key, gameRootPanel)
-        g_keyboard.unbindKeyPress(key, gameRootPanel)
-        g_keyboard.unbindKeyUp(key, gameRootPanel)
-    end
-end
-
-function stopSmartWalk()
+--- Stops the smart walking process.
+local function stopSmartWalk()
     smartWalkDirs = {}
     smartWalkDir = nil
 end
 
-function changeWalkDir(dir, pop)
-    while table.removevalue(smartWalkDirs, dir) do end
-    if pop then
-        if #smartWalkDirs == 0 then
-            stopSmartWalk()
-            return
-        end
-    else
-        table.insert(smartWalkDirs, 1, dir)
+--- Cancels the current walk event if active.
+local function cancelWalkEvent()
+    if walkEvent then
+        removeEvent(walkEvent)
+        walkEvent = nil
     end
-
-    smartWalkDir = smartWalkDirs[1]
-    if modules.client_options.getOption('smartWalk') and #smartWalkDirs > 1 then
-        for _, d in pairs(smartWalkDirs) do
-            if (smartWalkDir == North and d == West) or (smartWalkDir == West and d == North) then
-                smartWalkDir = NorthWest
-                break
-            elseif (smartWalkDir == North and d == East) or (smartWalkDir == East and d == North) then
-                smartWalkDir = NorthEast
-                break
-            elseif (smartWalkDir == South and d == West) or (smartWalkDir == West and d == South) then
-                smartWalkDir = SouthWest
-                break
-            elseif (smartWalkDir == South and d == East) or (smartWalkDir == East and d == South) then
-                smartWalkDir = SouthEast
-                break
-            end
-        end
-    end
+    nextWalkDir = nil
 end
 
-function smartWalk(dir)
-    addWalkEvent(dir)
+--- Generalized floor change check.
+local function canChangeFloor(pos, deltaZ)
+    pos.z = pos.z + deltaZ
+    local toTile = g_map.getTile(pos)
+
+    if deltaZ > 0 then
+        return toTile and toTile:hasElevation(3)
+    end
+
+    return toTile and toTile:isWalkable()
 end
 
-function walk(dir)
+--- Makes the player walk in the given direction.
+local function walk(dir)
     local player = g_game.getLocalPlayer()
-    if not player or g_game.isDead() or player:isDead() then
-        return
-    end
-
-    if player:isWalkLocked() then
+    if not player or g_game.isDead() or player:isDead() or player:isWalkLocked() then
         cancelWalkEvent()
         return
     end
@@ -184,15 +60,12 @@ function walk(dir)
     if g_game.getFeature(GameAllowPreWalk) then
         local toPos = Position.translatedToDirection(player:getPosition(), dir)
         local toTile = g_map.getTile(toPos)
-        if toTile and toTile:isWalkable() then
-            if not player:isPreWalking() then
-                player:preWalk(dir)
-            end
-        else
-            -- check for stairs/elevation steps
-            if not canChangeFloorDown(toPos) and not canChangeFloorUp(toPos) then
+        if not toTile or not toTile:isWalkable() then
+            if not canChangeFloor(toPos, 1) and not canChangeFloor(toPos, -1) then
                 return false
             end
+        elseif not player:isPreWalking() then
+            player:preWalk(dir)
         end
     end
 
@@ -200,7 +73,60 @@ function walk(dir)
     return true
 end
 
-function turn(dir, repeated)
+--- Adds a walk event with an optional delay.
+local function addWalkEvent(dir, delay)
+    cancelWalkEvent()
+
+    local function walkCallback()
+        if g_keyboard.getModifiers() ~= KeyboardNoModifier then
+            return
+        end
+        walk(smartWalkDir or dir)
+    end
+
+    walkEvent = delay == 0 and addEvent(walkCallback) or scheduleEvent(walkCallback, delay or 10)
+end
+
+--- Initiates a smart walk in the given direction.
+local function smartWalk(dir)
+    addWalkEvent(dir)
+end
+
+--- Changes the current walking direction.
+local function changeWalkDir(dir, pop)
+    -- Remove all occurrences of the specified direction
+    while table.removevalue(smartWalkDirs, dir) do end
+
+    if pop then
+        if #smartWalkDirs == 0 then
+            stopSmartWalk()
+            return
+        end
+    else
+        table.insert(smartWalkDirs, 1, dir)
+    end
+
+    smartWalkDir = smartWalkDirs[1]
+
+    if modules.client_options.getOption('smartWalk') and #smartWalkDirs > 1 then
+        local diagonalMap = {
+            [North] = { [West] = NorthWest, [East] = NorthEast },
+            [South] = { [West] = SouthWest, [East] = SouthEast },
+            [West]  = { [North] = NorthWest, [South] = SouthWest },
+            [East]  = { [North] = NorthEast, [South] = SouthEast }
+        }
+
+        for _, d in ipairs(smartWalkDirs) do
+            if diagonalMap[smartWalkDir] and diagonalMap[smartWalkDir][d] then
+                smartWalkDir = diagonalMap[smartWalkDir][d]
+                break
+            end
+        end
+    end
+end
+
+--- Handles turning the player.
+local function turn(dir, repeated)
     local player = g_game.getLocalPlayer()
     if player:isWalking() and player:getDirection() == dir then
         return
@@ -208,7 +134,10 @@ function turn(dir, repeated)
 
     cancelWalkEvent()
 
-    local delay = repeated and 1000 or 200
+    local TURN_DELAY_REPEATED = 1000
+    local TURN_DELAY_DEFAULT = 200
+
+    local delay = repeated and TURN_DELAY_REPEATED or TURN_DELAY_DEFAULT
 
     if lastTurn + delay < g_clock.millis() then
         g_game.turn(dir)
@@ -218,63 +147,57 @@ function turn(dir, repeated)
     end
 end
 
-function canChangeFloorDown(pos)
-    pos.z = pos.z + 1
-    local toTile = g_map.getTile(pos)
-    return toTile and toTile:hasElevation(3)
-end
+--- Binds movement keys to their respective directions.
+local function bindKeys()
+    modules.game_interface.getRootPanel():setAutoRepeatDelay(200)
 
-function canChangeFloorUp(pos)
-    pos.z = pos.z - 1
-    local toTile = g_map.getTile(pos)
-    return toTile and toTile:isWalkable()
-end
+    local keys = {
+        { "Up",      North },
+        { "Right",   East },
+        { "Down",    South },
+        { "Left",    West },
+        { "Numpad8", North },
+        { "Numpad9", NorthEast },
+        { "Numpad6", East },
+        { "Numpad3", SouthEast },
+        { "Numpad2", South },
+        { "Numpad1", SouthWest },
+        { "Numpad4", West },
+        { "Numpad7", NorthWest },
+    }
 
-function addWalkEvent(dir, delay)
-    cancelWalkEvent()
-
-    local function walkCallback()
-        if g_keyboard.getModifiers() ~= KeyboardNoModifier then
-            return
-        end
-
-        local direction = smartWalkDir or dir
-        walk(direction)
+    for _, keyDir in ipairs(keys) do
+        bindWalkKey(keyDir[1], keyDir[2])
     end
 
-    if delay and delay == 0 then
-        walkEvent = addEvent(walkCallback)
-        return
-    end
+    local turnKeys = {
+        { "Ctrl+Up",    North },
+        { "Ctrl+Right", East },
+        { "Ctrl+Down",  South },
+        { "Ctrl+Left",  West },
+    }
 
-    walkEvent = scheduleEvent(walkCallback, delay or 10)
+    for _, keyDir in ipairs(turnKeys) do
+        bindTurnKey(keyDir[1], keyDir[2])
+    end
 end
 
-function cancelWalkEvent()
-    if walkEvent then
-        removeEvent(walkEvent)
-        walkEvent = nil
-    end
-
-    nextWalkDir = nil
-end
-
--- events
-function onTeleport(player, newPos, oldPos)
+--- Handles player teleportation events.
+local function onTeleport(player, newPos, oldPos)
     if not newPos or not oldPos then
         return
     end
 
-    if Position.offsetX(newPos, oldPos) >= 3 or Position.offsetY(newPos, oldPos) >= 3 or Position.offsetZ(newPos, oldPos) >= 2 then
-        -- teleport
-        player:lockWalk(g_settings.getNumber("walkTeleportDelay"))
-    else
-        -- floor change is also teleport
-        player:lockWalk(g_settings.getNumber("walkStairsDelay"))
-    end
+    local offsetX, offsetY, offsetZ = Position.offsetX(newPos, oldPos), Position.offsetY(newPos, oldPos),
+        Position.offsetZ(newPos, oldPos)
+    local TELEPORT_DELAY = g_settings.getNumber("walkTeleportDelay")
+    local STAIRS_DELAY = g_settings.getNumber("walkStairsDelay")
+    local delay = (offsetX >= 3 or offsetY >= 3 or offsetZ >= 2) and TELEPORT_DELAY or STAIRS_DELAY
+    player:lockWalk(delay)
 end
 
-function onWalkFinish(player)
+--- Handles the end of a walking event.
+local function onWalkFinish(player)
     if nextWalkDir then
         if not g_game.getFeature(GameAllowPreWalk) then
             walk(nextWalkDir)
@@ -284,6 +207,81 @@ function onWalkFinish(player)
     end
 end
 
-function onCancelWalk(player)
+--- Handles cancellation of a walking event.
+local function onCancelWalk(player)
     player:lockWalk(50)
+end
+
+--- Initializes the WalkController.
+function WalkController:onInit()
+    bindKeys()
+end
+
+--- Sets up game-related events for the WalkController.
+function WalkController:onGameStart()
+    self:registerEvents(g_game, {
+        onGameStart = onGameStart,
+        onTeleport = onTeleport,
+    })
+
+    self:registerEvents(LocalPlayer, {
+        onCancelWalk = onCancelWalk,
+        onWalkFinish = onWalkFinish,
+    })
+
+    modules.game_interface.getRootPanel().onFocusChange = stopSmartWalk
+    modules.game_joystick.addOnJoystickMoveListener(function(dir) g_game.walk(dir) end)
+
+    if not g_game.isOfficialTibia() then
+        g_game.enableFeature(GameForceFirstAutoWalkStep)
+    else
+        g_game.disableFeature(GameForceFirstAutoWalkStep)
+    end
+end
+
+--- Cleans up resources when the game ends.
+function WalkController:onGameEnd()
+    stopSmartWalk()
+end
+
+--- Utility functions for binding and unbinding keys.
+function bindWalkKey(key, dir)
+    local gameRootPanel = modules.game_interface.getRootPanel()
+
+    g_keyboard.bindKeyDown(key, function()
+        g_keyboard.setKeyDelay(key, 10)
+        changeWalkDir(dir)
+    end, gameRootPanel, true)
+
+    g_keyboard.bindKeyUp(key, function()
+        g_keyboard.setKeyDelay(key, 30)
+        changeWalkDir(dir, true)
+    end, gameRootPanel, true)
+
+    g_keyboard.bindKeyPress(key, function() smartWalk(dir) end, gameRootPanel)
+end
+
+function bindTurnKey(key, dir)
+    local gameRootPanel = modules.game_interface.getRootPanel()
+
+    g_keyboard.bindKeyDown(key, function() turn(dir, false) end, gameRootPanel)
+    g_keyboard.bindKeyPress(key, function() turn(dir, true) end, gameRootPanel)
+    g_keyboard.bindKeyUp(key, function()
+        local player = g_game.getLocalPlayer()
+        if player then player:lockWalk(200) end
+    end, gameRootPanel)
+end
+
+function unbindWalkKey(key)
+    local gameRootPanel = modules.game_interface.getRootPanel()
+    g_keyboard.unbindKeyDown(key, gameRootPanel)
+    g_keyboard.unbindKeyUp(key, gameRootPanel)
+    g_keyboard.unbindKeyPress(key, gameRootPanel)
+end
+
+function unbindTurnKey(key)
+    local gameRootPanel = modules.game_interface.getRootPanel()
+    g_keyboard.unbindKeyDown(key, gameRootPanel)
+    g_keyboard.unbindKeyPress(key, gameRootPanel)
+    g_keyboard.unbindKeyUp(key, gameRootPanel)
 end
