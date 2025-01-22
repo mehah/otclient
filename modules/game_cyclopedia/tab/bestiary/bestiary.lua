@@ -371,17 +371,19 @@ function Cyclopedia.loadBestiaryCreatures(data)
     Cyclopedia.verifyBestiaryButtons()
 end
 
+-- note: this one needs refactor
+-- expected result:
+-- when a string is entered
+-- the list should generate client-side
+-- the list of search results that match the search string
+-- looks identical to category view
 function Cyclopedia.BestiarySearch()
     local text = UI.SearchEdit:getText()
-    local creatures = {}
+    local raceList = g_things.getRacesByName(text)
+	if #raceList > 0 then
+		g_game.requestBestiarySearch(raceList[1].raceId)
+	end
 
-    for id, data in pairs(RACE) do
-        if string.find(data.name, text) then
-            table.insert(creatures, id)
-        end
-    end
-
-    g_game.requestBestiarySearch(creatures)
     UI.SearchEdit:setText("")
 end
 

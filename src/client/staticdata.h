@@ -31,4 +31,5 @@ struct RaceType
     uint32_t raceId;
     std::string name;
     Outfit outfit;
+    bool boss;
 };

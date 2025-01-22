@@ -69,6 +69,7 @@ public:
     ThingTypeList findThingTypeByAttr(ThingAttr attr, ThingCategory category);
 
     const RaceType& getRaceData(uint32_t raceId);
+    const std::vector<RaceType>& getRacesByName(const std::string& searchString);
 
     const ThingTypePtr& getNullThingType() { return m_nullThingType; }
 

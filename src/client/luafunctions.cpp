@@ -78,6 +78,7 @@ void Client::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_things", "getThingTypes", &ThingTypeManager::getThingTypes, &g_things);
     g_lua.bindSingletonFunction("g_things", "findThingTypeByAttr", &ThingTypeManager::findThingTypeByAttr, &g_things);
     g_lua.bindSingletonFunction("g_things", "getRaceData", &ThingTypeManager::getRaceData, &g_things);
+    g_lua.bindSingletonFunction("g_things", "getRacesByName", &ThingTypeManager::getRacesByName, &g_things);
 
 #ifdef FRAMEWORK_EDITOR
     g_lua.bindSingletonFunction("g_things", "getItemType", &ThingTypeManager::getItemType, &g_things);

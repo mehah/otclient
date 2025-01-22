@@ -188,6 +188,10 @@ function g_things.findThingTypeByAttr(attr, category) end
 ---@return RaceType[]
 function g_things.getRaceData(raceId) end
 
+---@param searchString string
+---@return Vector<RaceType>
+function g_things.getRacesByName(searchString) end
+
 ---* FRAMEWORK_EDITOR
 ---@param id integer
 ---@return ThingType | nil

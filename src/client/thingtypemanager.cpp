@@ -215,12 +215,13 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
 namespace {
     using RaceBank = google::protobuf::RepeatedPtrField<staticdata::Creature>;
     
-    void loadCreatureBank(RaceList& otcRaceList, const RaceBank& protobufRaceList) {
+    void loadCreatureBank(RaceList& otcRaceList, const RaceBank& protobufRaceList, bool boss) {
         for (const auto& protobufRace : protobufRaceList) {
             // add race to vector
             RaceType otcRaceType = RaceType();
             otcRaceType.raceId = protobufRace.raceid();
             otcRaceType.name = protobufRace.name();
+            otcRaceType.boss = boss;
 
             Outfit otcOutfit;
             const auto& protobufOutfit = protobufRace.outfit();
@@ -276,8 +277,8 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
         // note: aside from compatibility with the QT client,
         // there is no need to have monsters and bosses
         // in separate data banks
-        loadCreatureBank(m_monsterRaces, staticDataLib.monsters());
-        loadCreatureBank(m_monsterRaces, staticDataLib.bosses());
+        loadCreatureBank(m_monsterRaces, staticDataLib.monsters(), false);
+        loadCreatureBank(m_monsterRaces, staticDataLib.bosses(), true);
         return true;
     } catch (const std::exception& e) {
         g_logger.error(stdext::format("Failed to load '%s' (StaticData): %s", file, e.what()));
@@ -329,6 +330,17 @@ const RaceType& ThingTypeManager::getRaceData(uint32_t raceId)
     }
     auto emptyVal = new RaceType();
     return *emptyVal;
+}
+
+const std::vector<RaceType>& ThingTypeManager::getRacesByName(const std::string& searchString)
+{
+    static std::vector<RaceType> result;
+    for (auto& race : m_monsterRaces) {
+        if (race.name.find(searchString) != std::string::npos) {
+            result.push_back(race);
+        }
+    }
+    return result;
 }
 
 #ifdef FRAMEWORK_EDITOR
