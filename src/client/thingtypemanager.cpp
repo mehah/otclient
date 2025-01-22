@@ -271,7 +271,7 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
 
         const auto& raceBank = staticDataLib.monsters();
         const auto& bossBank = staticDataLib.bosses();
-        //m_monsterRaces.resize(static_cast<size_t>(raceBank.size()) + bossBank.size());
+        m_monsterRaces.reserve(static_cast<size_t>(raceBank.size()) + bossBank.size());
 
         // load monsters and bosses
         // note: aside from compatibility with the QT client,
@@ -288,7 +288,7 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
     return false;
 }
 
-bool ThingTypeManager::loadSounds(const std::string& file)
+bool ThingTypeManager::loadSounds(const std::string& /* file */)
 {
     // to be implemented
     // to be moved to g_sounds
@@ -328,14 +328,14 @@ const RaceType& ThingTypeManager::getRaceData(uint32_t raceId)
             return raceData;
         }
     }
-    auto emptyVal = new RaceType();
-    return *emptyVal;
+
+    return emptyRaceType;
 }
 
-const std::vector<RaceType>& ThingTypeManager::getRacesByName(const std::string& searchString)
+const RaceList& ThingTypeManager::getRacesByName(const std::string& searchString)
 {
-    static std::vector<RaceType> result;
-    for (auto& race : m_monsterRaces) {
+    RaceList result;
+    for (const auto& race : m_monsterRaces) {
         if (race.name.find(searchString) != std::string::npos) {
             result.push_back(race);
         }

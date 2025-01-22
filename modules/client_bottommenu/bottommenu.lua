@@ -508,36 +508,45 @@ function onClickOnNextCalendar()
     reloadEventsSchedulerCurrentPage()
 end
 
+-- (internal)
+-- set creature/boss to boosted slot
+local function applyToBoostedSlot(raceId, outfitWidget, imageWidget, fileName)
+    -- check if raceId was provided in the JSON response
+    if not raceId then
+        return
+    end
+
+    -- fetch race data
+    local raceData = g_things.getRaceData(raceId)
+
+    -- check if race id is present in the staticdata
+    if raceData.raceId == 0 then
+        local msg = string.format("[%s] Creature with race id %s was not found.", fileName, data.creatureraceid)
+        g_logger.warning(msg)
+        return
+    end
+
+    -- apply to selected widget
+    outfitWidget:setOutfit(raceData.outfit)
+    outfitWidget:getCreature():setStaticWalking(1000)
+    outfitWidget:setVisible(true)
+    imageWidget:setVisible(false)
+end
+
 function setBoostedCreatureAndBoss(data)
     if not modules.game_things.isLoaded() then
         return
     end
 
-    local raceMonster = g_things.getRaceData(data.creatureraceid)
-    local raceBoss = g_things.getRaceData(data.bossraceid)
+    -- file name for error reporting
     local fileName = debug.getinfo(1, "S").source -- current file name - bottommenu.lua
 
-    if data.creatureraceid then
-        if raceMonster.raceId ~= 0 then
-            monsterOutfit:setOutfit(raceMonster.outfit)
-            monsterOutfit:getCreature():setStaticWalking(1000)
-            monsterOutfit:setVisible(true)
-            monsterImage:setVisible(false)
-        else
-            local msg = string.format("[%s] Creature with race id %s was not found.", fileName, data.creatureraceid)
-            g_logger.warning(msg)
-        end
-    end
+    -- boosted creature
+    -- before bosstiary was introduced, the webservice was sending creature race in 'raceid' field
+    -- after bosstiary was added, it was changed to 'creatureraceid'
+    -- this 'or' statement ensures backwards compatibility
+    applyToBoostedSlot(data.creatureraceid or data.raceid, monsterOutfit, monsterImage, fileName)
 
-    if data.bossraceid then
-        if raceBoss.raceId ~= 0 then
-            bossOutfit:setOutfit(raceBoss.outfit)
-            bossOutfit:getCreature():setStaticWalking(1000)
-            bossOutfit:setVisible(true)
-            bossImage:setVisible(false)
-        else
-            local msg = string.format("[%s] Boss with race id %s was not found.", fileName, data.creatureraceid)
-            g_logger.warning(msg)
-        end
-    end
+    -- boosted boss
+    applyToBoostedSlot(data.bossraceid, bossOutfit, bossImage, fileName)
 end
