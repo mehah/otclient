@@ -25,7 +25,7 @@ function load(version)
     local errorList = {}
 
     if version >= 1281 and not g_game.getFeature(GameLoadSprInsteadProtobuf) then
-		local filePath = resolvepath(string.format('/things/%d/', version))
+        local filePath = resolvepath(string.format('/things/%d/', version))
         if not g_things.loadAppearances(filePath) then
             errorList[#errorList + 1] = "Couldn't load assets"
         end

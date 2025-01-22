@@ -50,7 +50,7 @@ function Cyclopedia.CreateCharmItem(data)
     if data.id ~= nil then
         widget.charmBase.image:setImageSource("/game_cyclopedia/images/charms/" .. data.id)
     else
-		g_logger.error(string.format("Cyclopedia.CreateCharmItem - charm %s is nil", data.id))
+        g_logger.error(string.format("Cyclopedia.CreateCharmItem - charm %s is nil", data.id))
         return
     end
 
@@ -62,7 +62,7 @@ function Cyclopedia.CreateCharmItem(data)
             widget.InfoBase.Sprite:setOutfit(g_things.getRaceData(data.raceId).outfit)
             widget.InfoBase.Sprite:getCreature():setStaticWalking(1000)
         else
-			g_logger.error("Cyclopedia.CreateCharmItem - no race id provided")
+            g_logger.error("Cyclopedia.CreateCharmItem - no race id provided")
         end
     end
 
@@ -113,10 +113,10 @@ function Cyclopedia.loadCharms(charmsData)
     local raceIdNamePairs = {}
 
     for _, raceId in ipairs(charmsData.finishedMonsters) do
-		local raceName = g_things.getRaceData(raceId).name
-		if #raceName == 0 then
-			raceName = string.format("unnamed_%d", raceId)
-		end
+        local raceName = g_things.getRaceData(raceId).name
+        if #raceName == 0 then
+            raceName = string.format("unnamed_%d", raceId)
+        end
 
         table.insert(raceIdNamePairs, {
             raceId = raceId,

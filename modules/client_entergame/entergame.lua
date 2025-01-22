@@ -283,7 +283,7 @@ function EnterGame.terminate()
     end
 
     if clientBox then
-	    clientBox = nil
+        clientBox = nil
     end
 
     if motdWindow then
@@ -844,10 +844,10 @@ function EnterGame.setUniqueServer(host, port, protocol, windowWidth, windowHeig
 
     -- preload the assets
     -- this is for the client_bottommenu module
-	-- it needs images of outfits
+    -- it needs images of outfits
     -- so it can display the boosted creature
-	g_game.setClientVersion(clientVersion)
-	g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
+    g_game.setClientVersion(clientVersion)
+    g_game.setProtocolVersion(g_game.getClientProtocolVersion(clientVersion))
 end
 
 function EnterGame.setServerInfo(message)

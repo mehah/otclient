@@ -140,10 +140,10 @@ function Cyclopedia.loadBestiarySelectedCreature(data)
         4
     }
 
-	local raceData = g_things.getRaceData(data.id)
+    local raceData = g_things.getRaceData(data.id)
     local formattedName = raceData.name:gsub("(%l)(%w*)", function(first, rest)
-		return first:upper() .. rest
-	end)
+        return first:upper() .. rest
+    end)
 
     UI.ListBase.CreatureInfo:setText(formattedName)
     Cyclopedia.SetBestiaryDiamonds(occurence[data.ocorrence])
@@ -380,9 +380,9 @@ end
 function Cyclopedia.BestiarySearch()
     local text = UI.SearchEdit:getText()
     local raceList = g_things.getRacesByName(text)
-	if #raceList > 0 then
-		g_game.requestBestiarySearch(raceList[1].raceId)
-	end
+    if #raceList > 0 then
+        g_game.requestBestiarySearch(raceList[1].raceId)
+    end
 
     UI.SearchEdit:setText("")
 end
@@ -410,8 +410,8 @@ function Cyclopedia.CreateBestiaryCreaturesItem(data)
     widget:setId(data.id)
 
     local formattedName = raceData.name:gsub("(%l)(%w*)", function(first, rest)
-		return first:upper() .. rest
-	end)
+        return first:upper() .. rest
+    end)
 
     widget.Name:setText(verify(formattedName))
     widget.Sprite:setOutfit(raceData.outfit)

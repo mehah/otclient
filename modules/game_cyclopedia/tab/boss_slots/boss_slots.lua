@@ -133,14 +133,14 @@ function Cyclopedia.loadBossSlots(data)
         end
 
         local uRaceData = g_things.getRaceData(unlockData.bossId)
-		local data_t = {
-			visible = true,
-			bossId = unlockData.bossId,
-			category = unlockData.bossRace,
-			name = uRaceData.name
-		}
+        local data_t = {
+            visible = true,
+            bossId = unlockData.bossId,
+            category = unlockData.bossRace,
+            name = uRaceData.name
+        }
 
-		table.insert(Cyclopedia.BossSlots.UnlockBosses, data_t)
+        table.insert(Cyclopedia.BossSlots.UnlockBosses, data_t)
     end
 
     if Cyclopedia.BossSlots.UnlockBosses then
@@ -206,7 +206,7 @@ function Cyclopedia.setLockedSlot(widget, slot, unlockedBosses)
     end
 
     for _, internalData in ipairs(Cyclopedia.BossSlots.UnlockBosses) do
-		local raceData = g_things.getRaceData(internalData.bossId)
+        local raceData = g_things.getRaceData(internalData.bossId)
         local internalWidget = g_ui.createWidget("SelectBossBossSlots", widget.SelectBoss.ListBase.List)
         internalWidget:setId(internalData.bossId)
         internalWidget.Sprite:setOutfit(raceData.outfit)
@@ -234,7 +234,7 @@ function Cyclopedia.setLockedSlot(widget, slot, unlockedBosses)
 end
 
 function Cyclopedia.setActiveSlot(widget, slot, slotData, data, bossId)
-	local raceData = g_things.getRaceData(bossId)
+    local raceData = g_things.getRaceData(bossId)
     widget.LockLabel:setVisible(false)
     widget.SelectBoss:setVisible(false)
     widget.ActivedBoss:setVisible(true)
@@ -376,7 +376,7 @@ function Cyclopedia.readjustSelectBoss()
 
     for _, internalData in ipairs(Cyclopedia.BossSlots.UnlockBosses) do
         if internalData.visible then
-			local raceData = g_things.getRaceData(internalData.bossId)
+            local raceData = g_things.getRaceData(internalData.bossId)
             local internalWidget = g_ui.createWidget("SelectBossBossSlots", widget.SelectBoss.ListBase.List)
             internalWidget.Sprite:setOutfit(raceData.outfit)
             internalWidget:setText(format(raceData.name))

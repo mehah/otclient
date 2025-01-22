@@ -11,9 +11,9 @@ function showBosstiary()
     -- UI.FilterBase.ArchfoeIcon:setTooltipAlign(AlignTopLeft)
     UI.FilterBase.NemesisIcon:setTooltip(
         "Nemesis\n\nFor unlocking a level, you will receive the following boss points:\nProwess: 10\nExpertise: 30\nMastery: 60")
-    --	UI.FilterBase.NemesisIcon:setTooltipAlign(AlignTopLeft)
+    -- UI.FilterBase.NemesisIcon:setTooltipAlign(AlignTopLeft)
     UI.StarBase.Info1:setTooltip("Once you have reached the Prowess level, you can assign the boss\nto a boss slot.")
-    --	UI.StarBase.Info1:setTooltipAlign(AlignTopLeft)
+    -- UI.StarBase.Info1:setTooltipAlign(AlignTopLeft)
     UI.StarBase.Info2:setTooltip(
         "Once you have reached the Expertise Level, you can display the\nboss on a Podium of Vigour.")
     -- UI.StarBase.Info2:setTooltipAlign(AlignTopLeft)
@@ -134,28 +134,28 @@ function Cyclopedia.CreateBosstiaryCreature(data)
     elseif data.category == CATEGORY.NEMESIS then
         widget.TypeIcon:setTooltip(
             "Nemesis\n\nFor unlocking a level, you will receive the following boss points:\nProwess: 10\nExpertise: 30\nMastery: 60")
-        --	widget.TypeIcon:setTooltipAlign(AlignTopLeft)
+        -- widget.TypeIcon:setTooltipAlign(AlignTopLeft)
     end
     widget.ProgressValue:setText(data.kills)
 
     Cyclopedia.SetBestiaryProgress(46,widget.ProgressBack, widget.ProgressBack33, widget.ProgressBack55,  data.kills, CONFIG[data.category].PROWESS, CONFIG[data.category].EXPERTISE, CONFIG[data.category].MASTERY)
    
-	widget.Sprite:setOutfit(raceData.outfit)
-	widget.Sprite:getCreature():setStaticWalking(1000)
-	if data.unlocked then
-		widget.Sprite:getCreature():setShader("")
-		widget:setText(format(data.name))
-		widget.TrackCheck:enable()
-		if data.isTrackerActived == 1 then
-			widget.TrackCheck:setChecked(true)
-		else
-			widget.TrackCheck:setChecked(false)
-		end
-	else
-		widget.Sprite:getCreature():setShader("Outfit - cyclopedia-black")
-		widget.TrackCheck:disable()
+    widget.Sprite:setOutfit(raceData.outfit)
+    widget.Sprite:getCreature():setStaticWalking(1000)
+    if data.unlocked then
+        widget.Sprite:getCreature():setShader("")
+        widget:setText(format(data.name))
+        widget.TrackCheck:enable()
+        if data.isTrackerActived == 1 then
+            widget.TrackCheck:setChecked(true)
+        else
+            widget.TrackCheck:setChecked(false)
+        end
+    else
+        widget.Sprite:getCreature():setShader("Outfit - cyclopedia-black")
+        widget.TrackCheck:disable()
 
-	end
+    end
 end
 
 function Cyclopedia.LoadBosstiaryCreatures(data)

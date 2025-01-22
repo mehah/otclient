@@ -21,16 +21,17 @@ local bossOutfit
 local bossImage
 
 local default_info = {
--- hint 1
-  {
-    image = "images/randomhint",
-	Title = "Enabling Boosted Creature Panel",
-	description = "Boosted creatures panel requires configuring a webservice (init.lua) and preloading a client version by either setting one server in Servers_init (init.lua) or by altering entergame.lua.\n\nFor more hints, visit:\t\t https://github.com/mehah/otclient/wiki"
-  },
+    -- hint 1
+    {
+        image = "images/randomhint",
+        Title = "Enabling Boosted Creature Panel",
+        description = "Boosted creatures panel requires configuring a webservice (init.lua) and preloading a client version by either setting one server in Servers_init (init.lua) or by altering entergame.lua.\n\nFor more hints, visit:\t\t https://github.com/mehah/otclient/wiki"
+    },
 
--- hint 2
-  -- {image = "image of label", Title = "title", description = "your hint here"},
+    -- hint 2
+    -- {image = "image of label", Title = "title", description = "your hint here"},
 }
+
 function init()
     g_ui.importStyle('calendar')
     bottomMenu = g_ui.displayUI('bottommenu')
@@ -509,34 +510,34 @@ end
 
 function setBoostedCreatureAndBoss(data)
     if not modules.game_things.isLoaded() then
-		return
-	end
+        return
+    end
 
-	local raceMonster = g_things.getRaceData(data.creatureraceid)
-	local raceBoss = g_things.getRaceData(data.bossraceid)
-	local fileName = debug.getinfo(1, "S").source -- current file name - bottommenu.lua
+    local raceMonster = g_things.getRaceData(data.creatureraceid)
+    local raceBoss = g_things.getRaceData(data.bossraceid)
+    local fileName = debug.getinfo(1, "S").source -- current file name - bottommenu.lua
 
-	if data.creatureraceid then
-		if raceMonster.raceId ~= 0 then
-			monsterOutfit:setOutfit(raceMonster.outfit)
-			monsterOutfit:getCreature():setStaticWalking(1000)
-			monsterOutfit:setVisible(true)
-			monsterImage:setVisible(false)
-		else
-			local msg = string.format("[%s] Creature with race id %s was not found.", fileName, data.creatureraceid)
-			g_logger.warning(msg)
-		end
-	end
+    if data.creatureraceid then
+        if raceMonster.raceId ~= 0 then
+            monsterOutfit:setOutfit(raceMonster.outfit)
+            monsterOutfit:getCreature():setStaticWalking(1000)
+            monsterOutfit:setVisible(true)
+            monsterImage:setVisible(false)
+        else
+            local msg = string.format("[%s] Creature with race id %s was not found.", fileName, data.creatureraceid)
+            g_logger.warning(msg)
+        end
+    end
 
-	if data.bossraceid then
-		if raceBoss.raceId ~= 0 then
-			bossOutfit:setOutfit(raceBoss.outfit)
-			bossOutfit:getCreature():setStaticWalking(1000)
-			bossOutfit:setVisible(true)
-			bossImage:setVisible(false)
-		else
-			local msg = string.format("[%s] Boss with race id %s was not found.", fileName, data.creatureraceid)
-			g_logger.warning(msg)
-		end
-	end
+    if data.bossraceid then
+        if raceBoss.raceId ~= 0 then
+            bossOutfit:setOutfit(raceBoss.outfit)
+            bossOutfit:getCreature():setStaticWalking(1000)
+            bossOutfit:setVisible(true)
+            bossImage:setVisible(false)
+        else
+            local msg = string.format("[%s] Boss with race id %s was not found.", fileName, data.creatureraceid)
+            g_logger.warning(msg)
+        end
+    end
 end
