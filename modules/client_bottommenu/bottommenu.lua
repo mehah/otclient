@@ -507,18 +507,18 @@ function onClickOnNextCalendar()
     reloadEventsSchedulerCurrentPage()
 end
 
-function Boosted_creature(data)
+function setBoostedCreatureAndBoss(data)
     if not modules.game_things.isLoaded() then
 		return
 	end
 
-	local raceMon = g_things.getRaceData(data.creatureraceid)
+	local raceMonster = g_things.getRaceData(data.creatureraceid)
 	local raceBoss = g_things.getRaceData(data.bossraceid)
 	local fileName = debug.getinfo(1, "S").source -- current file name - bottommenu.lua
 
 	if data.creatureraceid then
-		if raceMon.raceId ~= 0 then
-			monsterOutfit:setOutfit(raceMon.outfit)
+		if raceMonster.raceId ~= 0 then
+			monsterOutfit:setOutfit(raceMonster.outfit)
 			monsterOutfit:getCreature():setStaticWalking(1000)
 			monsterOutfit:setVisible(true)
 			monsterImage:setVisible(false)
