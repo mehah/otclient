@@ -43,7 +43,7 @@ void Platform::init(std::vector<std::string>& args)
 
 #ifdef __APPLE__
     #include "TargetConditionals.h"
-    #if defined(TARGET_OS_IPHONE) || defined(TARGET_IPHONE_SIMULATOR)
+    #if (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE) || (defined(TARGET_OS_SIMULATOR) && TARGET_OS_SIMULATOR)
         setDevice({ Mobile, iOS });
     #else
         setDevice({ Desktop, macOS });

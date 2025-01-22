@@ -89,10 +89,11 @@ EnterGameWindow
     $!on:
       visible: false
 
-  Label
+  UIButton
     !text: tr('Forgot password and/or email')
     id: Forgot_password_email
     font: verdana-11px-monochrome-underline
+    text-align: left
     anchors.left: rememberEmailBox.left
     anchors.right: parent.right
     anchors.top: rememberEmailBox.bottom
