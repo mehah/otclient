@@ -965,7 +965,7 @@ BosstiaryItem < UIWidget
     text-auto-resize: true
     color: #C1C1C1
     @onSetup:  |
-      if (g_game.getClientVersion() <= 1320) then
+      if (g_game.getClientVersion() < 1320) then
         self:hide()
       end
     @onCheckChange: |
