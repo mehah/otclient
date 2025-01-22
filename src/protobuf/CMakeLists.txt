@@ -35,6 +35,7 @@ if(PROTOBUF_FOUND)
 		endif()
 
 		target_compile_options(${PROJECT_NAME} PRIVATE /FS)
+		set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_PDB_NAME ${PROJECT_NAME})
 	else()
 		add_library(${PROJECT_NAME} ${ProtoFiles})
 	endif()
