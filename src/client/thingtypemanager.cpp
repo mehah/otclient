@@ -332,7 +332,7 @@ const RaceType& ThingTypeManager::getRaceData(uint32_t raceId)
     return emptyRaceType;
 }
 
-const RaceList& ThingTypeManager::getRacesByName(const std::string& searchString)
+RaceList ThingTypeManager::getRacesByName(const std::string& searchString)
 {
     RaceList result;
     for (const auto& race : m_monsterRaces) {
