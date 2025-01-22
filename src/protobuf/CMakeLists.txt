@@ -34,11 +34,10 @@ if(PROTOBUF_FOUND)
 			set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 		endif()
 
+		target_compile_options(${PROJECT_NAME} PRIVATE /FS)
 	else()
 		add_library(${PROJECT_NAME} ${ProtoFiles})
 	endif()
-
-	target_compile_options(${PROJECT_NAME} PRIVATE /FS)
 
 	target_link_libraries(${PROJECT_NAME}
 		PUBLIC
