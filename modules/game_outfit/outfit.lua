@@ -1580,7 +1580,6 @@ function updatePreview()
             previewFamiliar:setCenter(true)
             previewFamiliar:setMarginLeft(70)
         end
-
     end
 
     if settings.showAura then
@@ -1815,7 +1814,6 @@ function accept()
         end
     end
     if g_game.getFeature(GamePlayerFamiliars) then
-        local player = g_game.getLocalPlayer()
         if settings.currentPreset > 0 then
             settings.presets[settings.currentPreset].familiar = window.configure.familiar.check:isChecked()
         end
