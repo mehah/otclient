@@ -445,6 +445,8 @@ if(MSVC)
 		_WIN32_WINNT=0x0600
 	)
 
+	add_compile_options(/MP /FS /Zf /EHsc)
+
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
