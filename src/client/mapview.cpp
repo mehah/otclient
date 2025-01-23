@@ -336,7 +336,7 @@ void MapView::updateVisibleTiles()
     m_lastCameraPosition = m_posInfo.camera;
     destroyHighlightTile();
 
-    const uint32_t numThreads = g_asyncDispatcher.get_thread_count(); // Número de partes (e threads)
+    const uint32_t numThreads = g_asyncDispatcher.get_thread_count();
 
     BS::multi_future<void> tasks;
     tasks.reserve(numThreads);
@@ -351,11 +351,9 @@ void MapView::updateVisibleTiles()
 
         const uint32_t chunkSize = (numDiagonals + numThreads - 1) / numThreads; // Divisão em partes iguais
 
-        // Vetor para armazenar as threads
         std::vector<std::vector<TilePtr>> threads;
         threads.resize(numThreads);
 
-        // Função para processar um intervalo de diagonais
         auto processDiagonalRange = [&](uint32_t start, uint32_t end, uint32_t index) {
             for (uint32_t diagonal = start; diagonal < end && diagonal < numDiagonals; ++diagonal) {
                 const uint32_t advance = std::max<uint32_t>(diagonal - m_drawDimension.height(), 0);
@@ -386,8 +384,8 @@ void MapView::updateVisibleTiles()
                             tile->onAddInMapView();
                         }
 
-                        if (isDrawingLights() && tile->canShade())
-                            floor.shades.emplace_back(tile);
+                        //if (isDrawingLights() && tile->canShade())
+                        //    floor.shades.emplace_back(tile);
 
                         if (addTile || !floor.shades.empty()) {
                             if (iz < m_floorMin)
@@ -400,12 +398,10 @@ void MapView::updateVisibleTiles()
             }
         };
 
-        // Divisão do intervalo de diagonais e criação de threads
         for (uint32_t i = 0; i < numThreads; ++i) {
             uint32_t start = i * chunkSize;
             uint32_t end = start + chunkSize;
 
-            //threads[i].emplace_back();
             tasks.emplace_back(g_asyncDispatcher.submit_task([=] {
                 processDiagonalRange(start, end, i);
             }));
