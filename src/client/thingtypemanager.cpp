@@ -37,11 +37,12 @@
 #include <client/spriteappearances.h>
 
 #include <appearances.pb.h>
+#include <staticdata.pb.h>
+#include <sounds.pb.h>
 
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-using namespace otclient::protobuf;
 
 ThingTypeManager g_things;
 
@@ -211,6 +212,89 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
     }
 }
 
+namespace {
+    using RaceBank = google::protobuf::RepeatedPtrField<staticdata::Creature>;
+    
+    void loadCreatureBank(RaceList& otcRaceList, const RaceBank& protobufRaceList, bool boss) {
+        for (const auto& protobufRace : protobufRaceList) {
+            // add race to vector
+            RaceType otcRaceType = RaceType();
+            otcRaceType.raceId = protobufRace.raceid();
+            otcRaceType.name = protobufRace.name();
+            otcRaceType.boss = boss;
+
+            Outfit otcOutfit;
+            const auto& protobufOutfit = protobufRace.outfit();
+            if (protobufOutfit.lookitem() != 0) {
+                otcOutfit.setAuxId(static_cast<uint16_t>(protobufOutfit.lookitem()));
+            } else {
+                otcOutfit.setId(static_cast<uint16_t>(protobufOutfit.looktype()));
+                otcOutfit.setAddons(static_cast<uint8_t>(protobufOutfit.lookaddons()));
+                if (protobufOutfit.has_colors()) {
+                    const auto& pbColors = protobufOutfit.colors();
+                    otcOutfit.setHead(static_cast<uint8_t>(pbColors.head()));
+                    otcOutfit.setBody(static_cast<uint8_t>(pbColors.body()));
+                    otcOutfit.setLegs(static_cast<uint8_t>(pbColors.legs()));
+                    otcOutfit.setFeet(static_cast<uint8_t>(pbColors.feet()));
+                }
+            }
+
+            otcRaceType.outfit = otcOutfit;
+            otcRaceList.emplace_back(otcRaceType);
+        }
+    }
+}
+
+bool ThingTypeManager::loadStaticData(const std::string& file)
+{
+    try {
+        std::string staticDataFile;
+
+        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
+        for (const auto& obj : document) {
+            const auto& type = obj["type"];
+            if (type == "staticdata") {
+                staticDataFile = obj["file"];
+            }
+        }
+
+        // load staticdata.dat
+        std::stringstream datFileStream;
+        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, staticDataFile)), datFileStream);
+        auto staticDataLib = staticdata::Staticdata();
+        if (!staticDataLib.ParseFromIstream(&datFileStream)) {
+            throw stdext::exception("Couldn't parse staticdata lib.");
+        }
+
+        // if reload, start again
+        m_monsterRaces.clear();
+
+        const auto& raceBank = staticDataLib.monsters();
+        const auto& bossBank = staticDataLib.bosses();
+        m_monsterRaces.reserve(static_cast<size_t>(raceBank.size()) + bossBank.size());
+
+        // load monsters and bosses
+        // note: aside from compatibility with the QT client,
+        // there is no need to have monsters and bosses
+        // in separate data banks
+        loadCreatureBank(m_monsterRaces, raceBank, false);
+        loadCreatureBank(m_monsterRaces, bossBank, true);
+        return true;
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to load '%s' (StaticData): %s", file, e.what()));
+        return false;
+    }
+
+    return false;
+}
+
+bool ThingTypeManager::loadSounds(const std::string& /* file */)
+{
+    // to be implemented
+    // to be moved to g_sounds
+    return false;
+}
+
 const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category)
 {
     if (category < ThingLastCategory)
@@ -235,6 +319,28 @@ ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const 
         if (type->hasAttr(attr))
             ret.emplace_back(type);
     return ret;
+}
+
+const RaceType& ThingTypeManager::getRaceData(uint32_t raceId)
+{
+    for (const auto& raceData : m_monsterRaces) {
+        if (raceData.raceId == raceId) {
+            return raceData;
+        }
+    }
+
+    return emptyRaceType;
+}
+
+RaceList ThingTypeManager::getRacesByName(const std::string& searchString)
+{
+    RaceList result;
+    for (const auto& race : m_monsterRaces) {
+        if (race.name.find(searchString) != std::string::npos) {
+            result.push_back(race);
+        }
+    }
+    return result;
 }
 
 #ifdef FRAMEWORK_EDITOR

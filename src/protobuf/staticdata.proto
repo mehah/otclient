@@ -1,0 +1,62 @@
+syntax = "proto2";
+
+package otclient.protobuf.staticdata;
+
+message Staticdata {
+	repeated Creature monsters = 1;
+	repeated Achievement achievements = 2;
+	repeated House houses = 3;
+	repeated Creature bosses = 4;
+	repeated Quest quests = 5;
+}
+
+message Outfit {
+	optional int32 looktype = 1;
+	optional OutfitColors colors = 2;
+	optional int32 lookaddons = 3;
+	optional int32 lookitem = 4;
+}
+
+message OutfitColors {
+	optional int32 head = 1;
+	optional int32 body = 2;
+	optional int32 legs = 3;
+	optional int32 feet = 4;
+}
+
+message Creature {
+	optional uint32 raceId = 1;
+	optional string name = 2;
+	optional Outfit outfit = 3;
+}
+
+message Achievement {
+	optional uint32 id = 1;
+	optional string name = 2;
+	optional string description = 3;
+	optional uint32 grade = 4;
+}
+
+message Position {
+	optional uint32 x = 1;
+	optional uint32 y = 2;
+	optional uint32 z = 3;
+}
+
+message House {
+	optional uint32 id = 1;
+	optional string name = 2;
+	optional string description = 3;
+	optional uint32 rent = 4;
+	optional uint32 beds = 5;
+	optional Position position = 6;
+	optional uint32 SQMs = 7;
+	optional bool isGuildHall = 8;
+	optional string city = 9;
+	optional bool isShop = 10;
+}
+
+message Quest {
+	optional uint32 id = 1;
+	optional string name = 2;
+}

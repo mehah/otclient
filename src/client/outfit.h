@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "thingtypemanager.h"
+#include "thingtype.h"
 #include <framework/util/color.h>
 
 class Outfit

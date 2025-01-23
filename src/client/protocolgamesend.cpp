@@ -1009,7 +1009,7 @@ void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBestiaryRequestOverview);
-    msg->addU8(0x02);
+    msg->addU8(0x00);
     msg->addString(catName);
     send(msg);
 }
