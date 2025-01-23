@@ -25,17 +25,8 @@ if(PROTOBUF_FOUND)
 		"${CMAKE_CURRENT_SOURCE_DIR}/*.proto"
 	)
 
-	if (MSVC)
-		if (BUILD_STATIC_LIBRARY)
-			add_library(${PROJECT_NAME} STATIC ${ProtoFiles})
-			set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-		else()
-			add_library(${PROJECT_NAME} ${ProtoFiles})
-			set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
-		endif()
-
-		target_compile_options(${PROJECT_NAME} PRIVATE /FS)
-		set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_PDB_NAME ${PROJECT_NAME})
+	if (MSVC AND BUILD_STATIC_LIBRARY)
+		add_library(${PROJECT_NAME} STATIC ${ProtoFiles})
 	else()
 		add_library(${PROJECT_NAME} ${ProtoFiles})
 	endif()
@@ -44,11 +35,17 @@ if(PROTOBUF_FOUND)
 		PUBLIC
 			protobuf::libprotobuf
 	)
+
+	target_compile_options(${PROJECT_NAME} PRIVATE /FS)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC _DISABLE_VECTOR_ANNOTATION _DISABLE_STRING_ANNOTATION)
 	target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
 
 	if(CMAKE_BASE_NAME STREQUAL "em++")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+	endif()
+
+	if (MSVC AND BUILD_STATIC_LIBRARY)
+		set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 	endif()
 
 	protobuf_generate(TARGET ${PROJECT_NAME} LANGUAGE cpp)
