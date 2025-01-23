@@ -247,7 +247,11 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseMagicEffect(msg);
                     break;
                 case Proto::GameServerTextEffect:
-                    parseAnimatedText(msg);
+                    if (g_game.getClientVersion() >= 1320) {
+                        parseRemoveMagicEffect(msg);
+                    } else {
+                        parseAnimatedText(msg);
+                    }
                     break;
                 case Proto::GameServerMissleEffect:
                     if (g_game.getFeature(Otc::GameAnthem)) {
@@ -1701,6 +1705,19 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
     effect->setId(effectId);
 
     g_map.addThing(effect, pos);
+}
+
+void ProtocolGame::parseRemoveMagicEffect(const InputMessagePtr& msg)
+{
+    const auto& pos = getPosition(msg);
+    uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
+    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+        g_logger.warning(stdext::format("[ProtocolGame::parseRemoveMagicEffect] - Invalid effectId type {}", effectId));
+        return;
+    }
+    // const auto& effect = std::make_shared<Effect>();
+    // effect->setId(effectId);
+    // g_map.removeThingEffectByPos(effect, pos);
 }
 
 void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
