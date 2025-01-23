@@ -67,7 +67,7 @@ function controllerCyclopedia:onGameStart()
             -- bosstiary // bestiary
             onParseCyclopediaTracker = Cyclopedia.onParseCyclopediaTracker,
             -- bosstiary
-            onParseSendBosstiary = Cyclopedia.LoadBoostiaryCreatures,
+            onParseSendBosstiary = Cyclopedia.LoadBosstiaryCreatures,
             -- boss_slot
             onParseBosstiarySlots = Cyclopedia.loadBossSlots,
             -- character
@@ -133,7 +133,7 @@ function controllerCyclopedia:onGameStart()
 
         trackerButtonBosstiary:setOn(false)
         trackerMiniWindowBosstiary = g_ui.createWidget('BestiaryTracker', modules.game_interface.getRightPanel())
-        trackerMiniWindowBosstiary:setText("Boosteary Tracker")
+        trackerMiniWindowBosstiary:setText("Bosstiary Tracker")
 
         trackerMiniWindowBosstiary.menuButton.onClick = function(widget, mousePos, mouseButton)
             local menu = g_ui.createWidget('bestiaryTrackerMenu')
