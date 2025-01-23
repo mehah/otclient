@@ -1,24 +1,33 @@
 -- @docclass Player
 PlayerStates = {
-    None = 0,
-    Poison = 1,
-    Burn = 2,
-    Energy = 4,
-    Drunk = 8,
-    ManaShield = 16,
-    Paralyze = 32,
-    Haste = 64,
-    Swords = 128,
-    Drowning = 256,
-    Freezing = 512,
-    Dazzled = 1024,
-    Cursed = 2048,
-    PartyBuff = 4096,
-    PzBlock = 8192,
-    Pz = 16384,
-    Bleeding = 32768,
-    Hungry = 65536,
-    Feared = 1048576,
+	Poison = 0,
+	Burn = 1,
+	Energy = 2,
+	Drunk = 3,
+	ManaShield = 4,
+	Paralyze = 5,
+	Haste = 6,
+	Swords = 7,
+	Drowning = 8,
+	Freezing = 9,
+	Dazzled = 10,
+	Cursed = 11,
+	PartyBuff = 12,
+	RedSwords = 13,
+	Pigeon = 14,
+	Bleeding = 15,
+	LesserHex = 16,
+	IntenseHex = 17,
+	GreaterHex = 18,
+	Rooted = 19,
+	Feared = 20,
+	GoshnarTaint1 = 21,
+	GoshnarTaint2 = 22,
+	GoshnarTaint3 = 23,
+	GoshnarTaint4 = 24,
+	GoshnarTaint5 = 25,
+	NewManaShield = 26,
+	Agony = 27,
 }
 
 Icons = {}
@@ -35,11 +44,21 @@ Icons[PlayerStates.Freezing] = { tooltip = tr('You are freezing'), path = '/imag
 Icons[PlayerStates.Dazzled] = { tooltip = tr('You are dazzled'), path = '/images/game/states/dazzled', id = 'condition_dazzled' }
 Icons[PlayerStates.Cursed] = { tooltip = tr('You are cursed'), path = '/images/game/states/cursed', id = 'condition_cursed' }
 Icons[PlayerStates.PartyBuff] = { tooltip = tr('You are strengthened'), path = '/images/game/states/strengthened', id = 'condition_strengthened' }
-Icons[PlayerStates.PzBlock] = { tooltip = tr('You may not logout or enter a protection zone'), path = '/images/game/states/protection_zone_block', id = 'condition_protection_zone_block' }
-Icons[PlayerStates.Pz] = { tooltip = tr('You are within a protection zone'), path = '/images/game/states/protection_zone', id = 'condition_protection_zone' }
-Icons[PlayerStates.Bleeding] = { tooltip = tr('You are bleeding'), path = '/images/game/states/bleeding', id = 'condition_bleeding' }
-Icons[PlayerStates.Hungry] = { tooltip = tr('You are hungry'), path = '/images/game/states/hungry', id = 'condition_hungry' }
-Icons[PlayerStates.Feared] = { tooltip = tr('You are feared'), path = '/images/game/states/feared', id = 'condition_feared' }
+Icons[PlayerStates.RedSwords] = { tooltip = tr('You may not logout or enter a protection zone'), path = '/images/game/states/feared', id = 'condition_RedSwords' }
+Icons[PlayerStates.Pigeon] = { tooltip = tr('You are within a protection zone'), path = '/images/game/states/feared', id = 'condition_Pigeon' }
+Icons[PlayerStates.Bleeding] = { tooltip = tr('You are Bleeding'), path = '/images/game/states/feared', id = 'condition_Bleeding' }
+Icons[PlayerStates.LesserHex] = { tooltip = tr('You are LesserHex'), path = '/images/game/states/feared', id = 'condition_LesserHex' }
+Icons[PlayerStates.IntenseHex] = { tooltip = tr('You are IntenseHex'), path = '/images/game/states/feared', id = 'condition_IntenseHex' }
+Icons[PlayerStates.GreaterHex] = { tooltip = tr('You are GreaterHex'), path = '/images/game/states/feared', id = 'condition_GreaterHex' }
+Icons[PlayerStates.Rooted] = { tooltip = tr('You are Rooted'), path = '/images/game/states/feared', id = 'condition_Rooted' }
+Icons[PlayerStates.Feared] = { tooltip = tr('You are Feared'), path = '/images/game/states/feared', id = 'condition_Feared' }
+Icons[PlayerStates.GoshnarTaint1] = { tooltip = tr('You are GoshnarTaint1'), path = '/images/game/states/feared', id = 'condition_GoshnarTaint1' }
+Icons[PlayerStates.GoshnarTaint2] = { tooltip = tr('You are GoshnarTaint2'), path = '/images/game/states/feared', id = 'condition_GoshnarTaint2' }
+Icons[PlayerStates.GoshnarTaint3] = { tooltip = tr('You are GoshnarTaint3'), path = '/images/game/states/feared', id = 'condition_GoshnarTaint3' }
+Icons[PlayerStates.GoshnarTaint4] = { tooltip = tr('You are GoshnarTaint4'), path = '/images/game/states/feared', id = 'condition_GoshnarTaint4' }
+Icons[PlayerStates.GoshnarTaint5] = { tooltip = tr('You are GoshnarTaint5'), path = '/images/game/states/feared', id = 'condition_GoshnarTaint5' }
+Icons[PlayerStates.NewManaShield] = { tooltip = tr('You are NewManaShield'), path = '/images/game/states/feared', id = 'condition_NewManaShield' }
+Icons[PlayerStates.Agony] = { tooltip = tr('You are Agony'), path = '/images/game/states/feared', id = 'condition_Agony' }
 
 InventorySlotOther = 0
 InventorySlotHead = 1
