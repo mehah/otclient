@@ -39,6 +39,7 @@
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
+#include <framework/core/asyncdispatcher.h>
 
 #include <algorithm>
 
@@ -335,6 +336,11 @@ void MapView::updateVisibleTiles()
     m_lastCameraPosition = m_posInfo.camera;
     destroyHighlightTile();
 
+    const uint32_t numThreads = g_asyncDispatcher.get_thread_count(); // Número de partes (e threads)
+
+    BS::multi_future<void> tasks;
+    tasks.reserve(numThreads);
+
     const bool checkIsCovered = !g_gameConfig.isDrawingCoveredThings() && getFadeLevel(m_cachedFirstVisibleFloor) == 1.f;
 
     // cache visible tiles in draw order
@@ -343,49 +349,72 @@ void MapView::updateVisibleTiles()
     for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
         auto& floor = m_floors[iz].cachedVisibleTiles;
 
-        // loop through / diagonals beginning at top left and going to top right
-        for (uint_fast32_t diagonal = 0; diagonal < numDiagonals; ++diagonal) {
-            // loop current diagonal tiles
-            const uint32_t advance = std::max<uint32_t >(diagonal - m_drawDimension.height(), 0);
-            for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
-                // position on current floor
-                //TODO: check position limits
-                Position tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
-                // adjust tilePos to the wanted floor
-                tilePos.coveredUp(m_posInfo.camera.z - iz);
-                if (const auto& tile = g_map.getTile(tilePos)) {
-                    // skip tiles that have nothing
-                    if (!tile->isDrawable())
-                        continue;
+        const uint32_t chunkSize = (numDiagonals + numThreads - 1) / numThreads; // Divisão em partes iguais
 
-                    bool addTile = true;
+        // Vetor para armazenar as threads
+        std::vector<std::vector<TilePtr>> threads;
+        threads.resize(numThreads);
 
-                    if (checkIsCovered) {
-                        // skip tiles that are completely behind another tile
-                        if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
-                            if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
-                                addTile = false;
+        // Função para processar um intervalo de diagonais
+        auto processDiagonalRange = [&](uint32_t start, uint32_t end, uint32_t index) {
+            for (uint32_t diagonal = start; diagonal < end && diagonal < numDiagonals; ++diagonal) {
+                const uint32_t advance = std::max<uint32_t>(diagonal - m_drawDimension.height(), 0);
+                for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
+                    // position on current floor
+                                    //TODO: check position limits
+                    Position tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
+                    // adjust tilePos to the wanted floor
+                    tilePos.coveredUp(m_posInfo.camera.z - iz);
+                    if (const auto& tile = g_map.getTile(tilePos)) {
+                        // skip tiles that have nothing
+                        if (!tile->isDrawable())
+                            continue;
+
+                        bool addTile = true;
+
+                        if (checkIsCovered) {
+                            // skip tiles that are completely behind another tile
+                            if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
+                                if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
+                                    addTile = false;
+                                }
                             }
                         }
-                    }
 
-                    if (addTile) {
-                        floor.tiles.emplace_back(tile);
-                        tile->onAddInMapView();
-                    }
+                        if (addTile) {
+                            threads[index].emplace_back(tile);
+                            tile->onAddInMapView();
+                        }
 
-                    if (isDrawingLights() && tile->canShade())
-                        floor.shades.emplace_back(tile);
+                        if (isDrawingLights() && tile->canShade())
+                            floor.shades.emplace_back(tile);
 
-                    if (addTile || !floor.shades.empty()) {
-                        if (iz < m_floorMin)
-                            m_floorMin = iz;
-                        else if (iz > m_floorMax)
-                            m_floorMax = iz;
+                        if (addTile || !floor.shades.empty()) {
+                            if (iz < m_floorMin)
+                                m_floorMin = iz;
+                            else if (iz > m_floorMax)
+                                m_floorMax = iz;
+                        }
                     }
                 }
             }
+        };
+
+        // Divisão do intervalo de diagonais e criação de threads
+        for (uint32_t i = 0; i < numThreads; ++i) {
+            uint32_t start = i * chunkSize;
+            uint32_t end = start + chunkSize;
+
+            //threads[i].emplace_back();
+            tasks.emplace_back(g_asyncDispatcher.submit_task([=] {
+                processDiagonalRange(start, end, i);
+            }));
         }
+
+        tasks.wait();
+        tasks.clear();
+        for (uint32_t i = 0; i < numThreads; ++i)
+            floor.tiles.insert(floor.tiles.end(), threads[i].begin(), threads[i].end());
     }
 
     m_updateVisibleTiles = false;
