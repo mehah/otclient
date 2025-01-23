@@ -298,7 +298,7 @@ local function toggleIcon(bitChanged)
 
     local iconId = Icons[bitChanged]
     if not iconId then
-        g_logger.warning(string.format("No icon ID %s found. Check Icons array in modules/gamelib/player.lua.", tostring(bitChanged)))
+        g_logger.warning(string.format("No icon ID %s (%s)  found. Check Icons array in modules/gamelib/player.lua.", tostring(bitChanged), tostring(math.log(bitChanged) / math.log(2))))
         return
     end
     for _, contentData in ipairs(contents) do
