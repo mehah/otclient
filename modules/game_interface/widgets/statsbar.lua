@@ -289,8 +289,13 @@ end
 local function toggleIcon(bitChanged)
     local contents = getStatsBarsIconContent()
 
+    local iconId = Icons[bitChanged]
+    if not iconId then
+        g_logger.warning(string.format("No icon ID %s found. Check Icons array in modules/gamelib/player.lua.", tostring(bitChanged)))
+        return
+    end
     for _, contentData in ipairs(contents) do
-        local icon = contentData.content:getChildById(Icons[bitChanged].id)
+        local icon = contentData.content:getChildById(iconId.id)
         if icon then
             icon:destroy()
         else
