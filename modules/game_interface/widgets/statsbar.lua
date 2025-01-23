@@ -261,9 +261,9 @@ local function loadIcon(bitChanged, content, topmenu)
     local icon = g_ui.createWidget('ConditionWidget', content)
     icon:setId(Icons[bitChanged].id)
     icon:setImageSource("/images/game/states/player-state-flags")
-    icon:setImageClip((bitChanged * 9) .. ' 0 9 9')
+    icon:setImageClip(((Icons[bitChanged].clip - 1) * 9) .. ' 0 9 9')
     local tooltip = Icons[bitChanged].tooltip
-    if bitChanged >= 21 and bitChanged <= 26 then
+    if tooltip == "You are GoshnarTaint" then
         tooltip = "Goshnar's Lairs Penalties:\n" ..
                   "- 10% chance of creature teleportation to you\n" ..
                   "- 0.5% chance of new creature spawn when hitting another\n" ..
@@ -329,8 +329,7 @@ function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
         end
         local bitChanged = bit.band(bitsChanged, pow)
         if bitChanged ~= 0 then
-            local iconIndex = math.log(bitChanged) / math.log(2)
-            toggleIcon(iconIndex)
+            toggleIcon(bitChanged)
         end
     end
 end
