@@ -18,7 +18,7 @@ PlayerStates = {
     Pz = 16384,
     Bleeding = 32768,
     Hungry = 65536,
-    feared = 1048576,
+    Feared = 1048576,
 }
 
 Icons = {}
