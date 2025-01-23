@@ -53,7 +53,7 @@ public:
     void sendTurnSouth();
     void sendTurnWest();
     void sendGmTeleport(const Position& pos);
-    void sendEquipItem(uint16_t itemId, uint16_t countOrSubType);
+    void sendEquipItem(uint16_t itemId, uint8_t tier);
     void sendMove(const Position& fromPos, uint16_t thingId, uint8_t stackpos, const Position& toPos, uint16_t count);
     void sendInspectNpcTrade(uint16_t itemId, uint16_t count);
     void sendBuyItem(uint16_t itemId, uint8_t subType, uint16_t amount, bool ignoreCapacity, bool buyWithBackpack);

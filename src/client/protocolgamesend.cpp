@@ -292,15 +292,13 @@ void ProtocolGame::sendGmTeleport(const Position& pos)
     send(msg);
 }
 
-void ProtocolGame::sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType)
+void ProtocolGame::sendEquipItem(const uint16_t itemId, const uint8_t tier)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientEquipItem);
     msg->addU16(itemId);
-    if (g_game.getFeature(Otc::GameCountU16))
-        msg->addU16(countOrSubType);
-    else
-        msg->addU8(static_cast<uint8_t>(countOrSubType));
+    if (g_game.getFeature(Otc::GameThingUpgradeClassification))
+        msg->addU8(tier);
     send(msg);
 }
 

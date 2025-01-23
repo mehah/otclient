@@ -858,11 +858,11 @@ void Game::useInventoryItemWith(const uint16_t itemId, const ThingPtr& toThing)
     g_lua.callGlobalField("g_game", "onUseWith", pos, itemId, toThing, 0);
 }
 
-ItemPtr Game::findItemInContainers(const uint32_t itemId, const int subType)
+ItemPtr Game::findItemInContainers(const uint32_t itemId, const int subType, const uint8_t tier)
 {
     for (const auto& it : m_containers) {
         if (const auto& container = it.second) {
-            if (const auto& item = container->findItemById(itemId, subType)) {
+            if (const auto& item = container->findItemById(itemId, subType, tier)) {
                 return item;
             }
         }
@@ -1412,7 +1412,7 @@ void Game::equipItem(const ItemPtr& item)
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendEquipItem(item->getId(), item->getCountOrSubType());
+    m_protocolGame->sendEquipItem(item->getId(), item->getTier());
 }
 
 void Game::mount(const bool mount)
