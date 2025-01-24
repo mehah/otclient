@@ -5,8 +5,8 @@ Module
   website: https://github.com/edubart/otclient
 
   dependencies:
-    - game_things
     - game_features
+    - game_things
 
   @onLoad: |
     dofile 'entergame'
