@@ -1,6 +1,7 @@
 -- @docclass Player
 -- local index = math.log(bit) / math.log(2)
 PlayerStates = {
+	None = 0,	-- vbot
 	Poison = 1,
 	Burn = 2,
 	Energy = 4,
@@ -15,8 +16,11 @@ PlayerStates = {
 	Cursed = 2048,
 	PartyBuff = 4096,
 	RedSwords = 8192,
+	PzBlock = 8192,	-- vbot
+	Pz = 16384,	-- vbot
 	Pigeon = 16384,
 	Bleeding = 32768,
+	Hungry = 65536,	-- vbot
 	LesserHex = 65536,
 	IntenseHex = 131072,
 	GreaterHex = 262144,
