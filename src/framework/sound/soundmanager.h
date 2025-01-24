@@ -133,6 +133,7 @@ public:
     void setPosition(const Point& pos);
     bool isEaxEnabled();
     bool loadClientFiles(const std::string& directory);
+    std::string getAudioFileNameById(int32_t audioFileId);
 
     void preload(std::string filename);
     SoundSourcePtr play(const std::string& filename, float fadetime = 0, float gain = 0, float pitch = 0);

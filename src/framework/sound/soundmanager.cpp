@@ -509,7 +509,6 @@ bool SoundManager::loadClientFiles(const std::string& directory)
 {
     // find catalog from json file
     try {
-        int spritesCount = 0;
         json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(directory + "catalog-sound", "json"))));
         for (const auto& obj : document) {
             const auto& type = obj["type"];
@@ -521,7 +520,16 @@ bool SoundManager::loadClientFiles(const std::string& directory)
 
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (Sounds): %s", directory, e.what()));
+        g_logger.warning(stdext::format("Failed to load '%s' (Sounds): %s", directory, e.what()));
         return false;
     }
+}
+
+std::string SoundManager::getAudioFileNameById(int32_t audioFileId)
+{
+    if (m_clientSoundFiles.contains(audioFileId)) {
+        return m_clientSoundFiles[audioFileId];
+    }
+
+    return "";
 }

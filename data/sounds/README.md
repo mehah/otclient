@@ -6,4 +6,4 @@ For the list of supported client versions see `modules/gamelib/game.lua`
 
 # Example configuration
 
-`data/things/1340/ (catalog-sound.json and all sound files)`
+`data/sounds/1340/ (catalog-sound.json and all sound files)`

@@ -5835,6 +5835,10 @@ function g_sounds.isEaxEnabled() end
 ---@return boolean
 function g_sounds.loadClientFiles(directory) end
 
+---@param audioFileId string
+---@return string
+function getAudioFileNameById(audioFileId) end
+
 --------------------------------
 --------- SoundSource ----------
 --------------------------------
