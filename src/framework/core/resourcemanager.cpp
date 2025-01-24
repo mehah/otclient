@@ -225,22 +225,19 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_close(file);
 
 #if ENABLE_ENCRYPTION == 1
-    bool hasHeader = false;
-    if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() &&
-        buffer.substr(0, std::string(ENCRYPTION_HEADER).size()) == std::string(ENCRYPTION_HEADER)) {
-        hasHeader = true;
-    }
+    const auto headerSize = std::string(ENCRYPTION_HEADER).size();
+    const bool hasHeader = (buffer.size() >= headerSize &&
+                            buffer.compare(0, headerSize, ENCRYPTION_HEADER) == 0);
 
     if (hasHeader) {
-        buffer = buffer.substr(std::string(ENCRYPTION_HEADER).size());
+        buffer = buffer.substr(headerSize);
         buffer = decrypt(buffer);
     } else {
         if (fullPath.find(std::string(AY_OBFUSCATE("/bot/"))) != std::string::npos) {
             if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
                 return buffer;
-            } else {
-                return "";
             }
+            return "";
         }
     }
 #endif
