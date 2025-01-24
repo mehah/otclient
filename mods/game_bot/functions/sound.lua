@@ -27,5 +27,5 @@ context.stopSound = function()
 end
 
 context.playAlarm = function()
-  return context.playSound("/sounds/alarm.ogg")
+  return context.playSound("sounds/alarm.ogg")
 end

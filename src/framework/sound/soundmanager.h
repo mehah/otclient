@@ -163,7 +163,6 @@ private:
     std::map<uint32_t, ClientItemAmbient> m_clientItemAmbientEffects;
     std::map<uint32_t, ClientMusic> m_clientMusic;
 
-
     std::vector<SoundSourcePtr> m_sources;
     bool m_audioEnabled{ true };
 };

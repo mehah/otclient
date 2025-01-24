@@ -384,7 +384,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
         | | |------> (u32) sound_id (audio file id)
         | |
         | |-+--> (RandomSoundEffect) random_sound_effect
-        | | |------> <vector> (u32) random_sound_id (audio file id)
+        |   |------> <vector> (u32) random_sound_id (audio file id)
         |
         |
         | ////// ambient sound for location (needs to be triggered with a packet)
@@ -392,8 +392,8 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
         | |----> (u32) id
         | |----> (u32) looping_sound_id (audio file id)
         | |-+--> <vector> (DelayedSoundEffect) delayed_effects
-        | | |------> (u32) numeric_sound_effect_id (sound effect id)
-        | | |------> (u32) delay_seconds
+        |   |------> (u32) numeric_sound_effect_id (sound effect id)
+        |   |------> (u32) delay_seconds
         |
         |
         | ////// sound of items placed on the map
