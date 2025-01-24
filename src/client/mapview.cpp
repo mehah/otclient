@@ -289,6 +289,11 @@ void MapView::updateVisibleTiles()
     if (!m_posInfo.camera.isValid())
         return;
 
+    // clear current visible tiles cache
+    do {
+        m_floors[m_floorMin].cachedVisibleTiles.clear();
+    } while (++m_floorMin <= m_floorMax);
+
     m_lockedFirstVisibleFloor = m_floorViewMode == LOCKED ? m_posInfo.camera.z : -1;
 
     const auto prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
@@ -383,8 +388,7 @@ void MapView::updateVisibleTiles()
         }
     };
 
-    bool multithreading = true;
-    if (multithreading) {
+    if (m_multithreading) {
         static const uint32_t numThreads = g_asyncDispatcher.get_thread_count();
         static BS::multi_future<void> tasks(numThreads);
         tasks.clear();
@@ -395,7 +399,7 @@ void MapView::updateVisibleTiles()
             const auto start = i * chunkSize;
             const auto end = start + chunkSize;
 
-            tasks.emplace_back(g_asyncDispatcher.submit_task([=] {
+            tasks.emplace_back(g_asyncDispatcher.submit_task([=, this] {
                 processDiagonalRange(m_floorThreads[i], start, end);
             }));
         }
@@ -443,9 +447,12 @@ void MapView::updateGeometry(const Size& visibleDimension)
 {
     float scaleFactor = m_antiAliasingMode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
 
-    size_t maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
+    auto maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
 
-    m_pool->agroup(maxAwareRange > 115);
+    const auto optimize = maxAwareRange > 115;
+
+    m_pool->agroup(optimize);
+    m_multithreading = optimize;
     while (maxAwareRange > 100) {
         maxAwareRange /= 2;
         scaleFactor /= 2;
