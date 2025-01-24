@@ -1,0 +1,9 @@
+DatSpr
+  extended: true
+  transparency: true
+  frame-durations: true
+  frame-groups: true
+  metadata-file: Tibia.dat
+  sprites-file: Tibia.spr
+  sprite-size: 32
+  sprite-data-size: 4096

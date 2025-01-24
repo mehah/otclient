@@ -2094,6 +2094,7 @@ function onTextChange(text)
     if tab == defaultTab or tab == serverTab then
         if player then
             player:setTyping(text ~= "")
+            player:sendTyping()
         end
     else
         player:setTyping(false)

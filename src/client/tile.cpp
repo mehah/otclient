@@ -212,18 +212,6 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
         const bool mustOptimize = g_app.mustOptimize() || g_app.isForcedEffectOptimization();
 
-        for (const auto& prevEffect : *m_effects) {
-            if (!prevEffect->canDraw())
-                continue;
-
-            if (mustOptimize && newEffect->getSize() > prevEffect->getSize()) {
-                prevEffect->canDraw(false);
-            } else if (mustOptimize || newEffect->getId() == prevEffect->getId()) {
-                if (!newEffect->waitFor(prevEffect))
-                    return;
-            }
-        }
-
         if (newEffect->isTopEffect())
             m_effects->insert(m_effects->begin(), newEffect);
         else

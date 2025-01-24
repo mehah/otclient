@@ -145,3 +145,49 @@ AttachedEffectManager.register(11, 'Bat', 307, ThingCategoryCreature, {
     offset = { 0, 0 },
     bounce = { 20, 20, 2000 }
 })
+
+
+
+--[[
+    register(id, name, thingId, thingType, config)
+    config = {
+        speed, disableWalkAnimation, shader, drawOnUI, opacity
+        duration, loop, transform, hideOwner, size{width, height}
+        offset{x, y, onTop}, dirOffset[dir]{x, y, onTop},
+        light { color, intensity}, drawOrder(only for tiles),
+        bounce{minHeight, height, speed},
+        pulse{minHeight, height, speed},
+        fade{start, end, speed}
+
+        onAttach, onDetach
+    }
+]]
+--
+
+
+AttachedEffectManager.register(12, 'Daniel Teste 1', 83, ThingCategoryEffect, {
+    size = { 96, 96 },
+    offset = { -32, 0, true },
+    opacity = 0.5,
+})
+
+
+
+AttachedEffectManager.register(13, 'Daniel Teste 2', 0, 0, {
+    duration = 500,
+    onAttach = function(effect, owner)
+        local spriteSize = g_gameConfig.getSpriteSize()
+        local length = 3
+
+        missile = AttachedEffect.create(9, ThingCategoryMissile)
+        attackedCreature = owner:getCreature():getAttackingCreature();
+        attackedCreaturePos = attackedCreature:getPosition()
+
+        missile:setDuration(effect:getDuration())
+        missile:setDirection(3)
+        missile:setBounce(0, 15, 1000)
+        missile:move(owner:getPosition(), attackedCreaturePos)
+
+        effect:attachEffect(missile)
+    end,
+})

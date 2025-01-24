@@ -2,7 +2,7 @@
     registerThingConfig(thingId, thingType)
     set(attachedEffectId, config)
 ]] --
-local c = AttachedEffectManager.registerThingConfig(ThingCategoryCreature, 618)
+local c = AttachedEffectManager.registerThingConfig(ThingExternalTexture, 618)
 
 c:set(1, {
     speed = 10,

@@ -315,7 +315,7 @@ private:
     bool m_fadeFinish{ false };
     bool m_autoViewMode{ false };
     bool m_drawViewportEdge{ false };
-    bool m_forceDrawViewportEdge{ false };
+    bool m_forceDrawViewportEdge{ true };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
 
