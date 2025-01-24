@@ -806,7 +806,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end
     end
 
-    if g_modules.getModule("game_bot"):isLoaded() and useThing and useThing:isItem() then
+    if modules.game_bot and useThing and useThing:isItem() then
         menu:addSeparator()
         local useThingId = useThing:getId()
         menu:addOption("ID: " .. useThingId, function() g_window.setClipboardText(useThingId) end)
