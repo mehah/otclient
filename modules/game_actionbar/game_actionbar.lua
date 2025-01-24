@@ -925,7 +925,7 @@ end
 
 function setActionBarVisible(visible)
     if visible then
-        actionBar:setHeight(34)
+        actionBar:setHeight(38)
         actionBar:show()
     else
         actionBar:setHeight(0)
