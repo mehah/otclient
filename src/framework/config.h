@@ -36,6 +36,7 @@
 #define ENABLE_ENCRYPTION_BUILDER 0
 // for security reasons make sure you are using password with at last 100+ characters
 #define ENCRYPTION_PASSWORD "SET_YOUR_PASSWORD_HERE"
+// do not insert special characters in the header (ONLY UPPERCASE LETTERS, LOWERCASE LETTERS AND NUMBERS)
 #define ENCRYPTION_HEADER "SET_YOUR_HEADER_HERE"
 
 // DISCORD RPC (https://discord.com/developers/applications)
