@@ -356,11 +356,11 @@ using ProtobufMusicTracks = google::protobuf::RepeatedPtrField<sounds::MusicTemp
 bool SoundManager::loadFromProtobuf(const std::string& directory, const std::string& fileName)
 {
     /*
-        ////// file structure
+        * file structure
         <struct> Sounds
         |
         |
-        | ////// audio file id -> audio file name (ogg)
+        | * audio file id -> audio file name (ogg)
         |-+- <vector> (Sound) sound
         | |----> (u32) id
         | |----> (string) filename (sound-abcd.ogg)
@@ -368,7 +368,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
         | |----> (bool) is_stream
         |
         |
-        | ////// sound effect
+        | * sound effect
         |-+- <vector> (NumericSoundEffect) numeric_sound_effect
         | |----> (u32) id (the id you request in sound effect packet)
         | |----> (enum - ENumericSoundType) numeric_sound_type
@@ -387,7 +387,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
         |   |------> <vector> (u32) random_sound_id (audio file id)
         |
         |
-        | ////// ambient sound for location (needs to be triggered with a packet)
+        | * ambient sound for location (needs to be triggered with a packet)
         |-+- <vector> (AmbienceStream) ambience_stream
         | |----> (u32) id
         | |----> (u32) looping_sound_id (audio file id)
@@ -396,7 +396,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
         |   |------> (u32) delay_seconds
         |
         |
-        | ////// sound of items placed on the map
+        | * sound of items placed on the map
         |-+- <vector> (AmbienceObjectStream) ambience_object_stream
         | |----> (u32) id (ID OF THIS EFFECT, NOT ITEM ID!)
         | |----> <vector> (u32) counted_appearance_types (ITEM CLIENT IDS that will have this sound, eg. waterfall or campfire)
@@ -406,7 +406,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
         | |----> (u32) max_sound_distance (how far can it be heard)
         |
         |
-        | ////// music for location (needs to be triggered with a packet)
+        | * music for location (needs to be triggered with a packet)
         |-+- <vector> (MusicTemplate) music_template
           |----> (u32) id
           |----> (u32) sound_id (audio file id)
