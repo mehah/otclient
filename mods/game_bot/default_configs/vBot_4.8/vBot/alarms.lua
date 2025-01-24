@@ -115,12 +115,12 @@ addAlarm("playerDetected", "Player Detected", false, 1, 1)
 addAlarm("creatureName", "Creature Name:", "", 3, 1, "You can add a name or part of it, that if found in any visible creature name will trigger alert.\nYou can add many, just separate them by comma.")
 
 local lastCall = now
-function alarm(file, windowText)
+local function alarm(file, windowText)
   if now - lastCall < 2000 then return end -- 2s delay
   lastCall = now
 
   if not g_resources.fileExists(file) then
-    file = "../sounds/alarm.ogg"
+    file = "sounds/alarm.ogg"
     lastCall = now + 4000 -- alarm.ogg length is 6s
   end
 
