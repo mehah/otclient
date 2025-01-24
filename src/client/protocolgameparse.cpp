@@ -1709,15 +1709,13 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
 
 void ProtocolGame::parseRemoveMagicEffect(const InputMessagePtr& msg)
 {
-    const auto& pos = getPosition(msg);
+    getPosition(msg);
     uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
     if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
         g_logger.warning(stdext::format("[ProtocolGame::parseRemoveMagicEffect] - Invalid effectId type {}", effectId));
         return;
     }
-    // const auto& effect = std::make_shared<Effect>();
-    // effect->setId(effectId);
-    // g_map.removeThingEffectByPos(effect, pos);
+    // TO-DO
 }
 
 void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
