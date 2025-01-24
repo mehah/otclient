@@ -345,27 +345,20 @@ void MapView::updateVisibleTiles()
             auto& floor = floors[iz].cachedVisibleTiles;
             floor.clear();
 
-            for (uint32_t diagonal = start; diagonal < end && diagonal < numDiagonals; ++diagonal) {
-                const uint32_t advance = std::max<uint32_t>(diagonal - m_drawDimension.height(), 0);
+            for (uint32_t diagonal = start; diagonal < end; ++diagonal) {
+                const uint32_t advance = (diagonal >= m_drawDimension.height()) ? diagonal - m_drawDimension.height() : 0;
                 for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
-                    // position on current floor
-                                    //TODO: check position limits
                     Position tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
-                    // adjust tilePos to the wanted floor
                     tilePos.coveredUp(m_posInfo.camera.z - iz);
+
                     if (const auto& tile = g_map.getTile(tilePos)) {
-                        // skip tiles that have nothing
-                        if (!tile->isDrawable())
-                            continue;
+                        if (!tile->isDrawable()) continue;
 
                         bool addTile = true;
 
-                        if (checkIsCovered) {
-                            // skip tiles that are completely behind another tile
-                            if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
-                                if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
-                                    addTile = false;
-                                }
+                        if (checkIsCovered && tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
+                            if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
+                                addTile = false;
                             }
                         }
 
@@ -374,8 +367,9 @@ void MapView::updateVisibleTiles()
                             tile->onAddInMapView();
                         }
 
-                        if (isDrawingLights() && tile->canShade())
+                        if (isDrawingLights() && tile->canShade()) {
                             floor.shades.emplace_back(tile);
+                        }
 
                         if (addTile || !floor.shades.empty()) {
                             if (iz < m_floorMin)
