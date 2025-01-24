@@ -231,15 +231,17 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
         hasHeader = true;
     }
 
-    if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
-        if (fullPath.find(AY_OBFUSCATE("/bot/")) != std::string::npos && !hasHeader) {
-            return buffer;
-        }
-    }
-
     if (hasHeader) {
         buffer = buffer.substr(std::string(ENCRYPTION_HEADER).size());
         buffer = decrypt(buffer);
+    } else {
+        if (fullPath.find(std::string(AY_OBFUSCATE("/bot/"))) != std::string::npos) {
+            if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
+                return buffer;
+            } else {
+                return "";
+            }
+        }
     }
 #endif
 
