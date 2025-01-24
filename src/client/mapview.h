@@ -324,6 +324,8 @@ private:
     AntialiasingMode m_antiAliasingMode{ ANTIALIASING_DISABLED };
 
     std::vector<FloorData> m_floors;
+    std::vector<std::vector<FloorData>> m_floorThreads;
+
     std::vector<TilePtr> m_foregroundTiles;
 
     PainterShaderProgramPtr m_shader;
