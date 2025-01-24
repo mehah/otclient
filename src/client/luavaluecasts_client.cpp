@@ -46,6 +46,20 @@ int push_luavalue(const Outfit& outfit)
         g_lua.pushInteger(outfit.getMount());
         g_lua.setField("mount");
     }
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        g_lua.pushInteger(outfit.getFamiliar());
+        g_lua.setField("familiar");
+    }
+    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+        g_lua.pushInteger(outfit.getWing());
+        g_lua.setField("wings");
+        g_lua.pushInteger(outfit.getEffect());
+        g_lua.setField("effects");
+        g_lua.pushInteger(outfit.getAura());
+        g_lua.setField("auras");
+        g_lua.pushString(outfit.getShader());
+        g_lua.setField("shaders");
+    }
     return 1;
 }
 
@@ -73,6 +87,10 @@ bool luavalue_cast(const int index, Outfit& outfit)
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         g_lua.getField("mount", index);
         outfit.setMount(g_lua.popInteger());
+    }
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        g_lua.getField("familiar", index);
+        outfit.setFamiliar(g_lua.popInteger());
     }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
         g_lua.getField("wings", index);
@@ -1123,5 +1141,19 @@ int push_luavalue(const CharacterInfoFamiliar& familiar) {
     g_lua.setField("type");
     g_lua.pushInteger(familiar.isCurrent);
     g_lua.setField("isCurrent");
+    return 1;
+}
+
+int push_luavalue(const RaceType& raceData)
+{
+    g_lua.createTable(0, 4);
+    g_lua.pushInteger(raceData.raceId);
+    g_lua.setField("raceId");
+    g_lua.pushString(raceData.name);
+    g_lua.setField("name");
+    push_luavalue(raceData.outfit);
+    g_lua.setField("outfit");
+    g_lua.pushBoolean(raceData.boss);
+    g_lua.setField("boss");
     return 1;
 }

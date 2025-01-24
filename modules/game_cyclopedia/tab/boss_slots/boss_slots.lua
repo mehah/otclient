@@ -59,14 +59,8 @@ function Cyclopedia.loadBossSlots(data)
         return
     end
 
-    if not RACE_Bosstiary[data.boostedBossId] then
-        g_logger.warning(string.format("Race id: %d not found. add in ./modules/game_cyclopedia/utils.lua", data.id))
-    end
-
-    local raceData = RACE_Bosstiary[data.boostedBossId]
-    UI.Sprite:setOutfit({
-        type = Cyclopedia.safeOutfit(raceData and raceData.type or 22)
-    })
+    local raceData = g_things.getRaceData(data.boostedBossId)
+    UI.Sprite:setOutfit(raceData.outfit)
 
     UI.Sprite:getCreature():setStaticWalking(1000)
     UI.TopBase.InfoLabel:setText(string.format("Equipment Loot Bonus: %d%% Next: %d%%", data.currentBonus,
@@ -118,7 +112,7 @@ function Cyclopedia.loadBossSlots(data)
 
     local unlockedBosses = data.bossIdSlotTwo
 
-    UI.MidTitle:setText(string.format("Boosted Boss: %s", format(RACE_Bosstiary[data.boostedBossId].name)))
+    UI.MidTitle:setText(string.format("Boosted Boss: %s", format(raceData.name)))
     Cyclopedia.setBosstiarySlotsBossProgress(UI.BoostedProgress, data.todaySlotData.killCount,
         CONFIG[data.todaySlotData.bossRace].MASTERY)
     UI.TypeIcon:setImageSource(ICONS[data.todaySlotData.bossRace])
@@ -138,17 +132,15 @@ function Cyclopedia.loadBossSlots(data)
             break
         end
 
-        local raceData = RACE_Bosstiary[unlockData.bossId]
-        if raceData then
-            local data_t = {
-                visible = true,
-                bossId = unlockData.bossId,
-                category = unlockData.bossRace,
-                name = raceData.name
-            }
+        local uRaceData = g_things.getRaceData(unlockData.bossId)
+        local data_t = {
+            visible = true,
+            bossId = unlockData.bossId,
+            category = unlockData.bossRace,
+            name = uRaceData.name
+        }
 
-            table.insert(Cyclopedia.BossSlots.UnlockBosses, data_t)
-        end
+        table.insert(Cyclopedia.BossSlots.UnlockBosses, data_t)
     end
 
     if Cyclopedia.BossSlots.UnlockBosses then
@@ -214,12 +206,11 @@ function Cyclopedia.setLockedSlot(widget, slot, unlockedBosses)
     end
 
     for _, internalData in ipairs(Cyclopedia.BossSlots.UnlockBosses) do
+        local raceData = g_things.getRaceData(internalData.bossId)
         local internalWidget = g_ui.createWidget("SelectBossBossSlots", widget.SelectBoss.ListBase.List)
         internalWidget:setId(internalData.bossId)
-        internalWidget.Sprite:setOutfit({
-            type = Cyclopedia.safeOutfit(RACE_Bosstiary[internalData.bossId] and RACE_Bosstiary[internalData.bossId].type or 22)
-        })
-        internalWidget:setText(format(RACE_Bosstiary[internalData.bossId].name))
+        internalWidget.Sprite:setOutfit(raceData.outfit)
+        internalWidget:setText(format(raceData.name))
         internalWidget.Sprite:getCreature():setStaticWalking(1000)
         internalWidget.TypeIcon:setImageSource(ICONS[internalData.category])
 
@@ -243,10 +234,11 @@ function Cyclopedia.setLockedSlot(widget, slot, unlockedBosses)
 end
 
 function Cyclopedia.setActiveSlot(widget, slot, slotData, data, bossId)
+    local raceData = g_things.getRaceData(bossId)
     widget.LockLabel:setVisible(false)
     widget.SelectBoss:setVisible(false)
     widget.ActivedBoss:setVisible(true)
-    widget:setText(string.format("Slot %d: %s", slot, RACE_Bosstiary[bossId].name))
+    widget:setText(string.format("Slot %d: %s", slot, raceData.name))
     widget.ActivedBoss.TypeIcon:setImageSource(ICONS[slotData.bossRace])
 
     Cyclopedia.setBosstiarySlotsBossProgress(widget.ActivedBoss.Progress, slotData.killBonus,
@@ -284,9 +276,7 @@ function Cyclopedia.setActiveSlot(widget, slot, slotData, data, bossId)
                                          "/game_cyclopedia/images/boss/icon_star_gold" or
                                          "/game_cyclopedia/images/boss/icon_star_dark")
 
-    widget.ActivedBoss.Sprite:setOutfit({
-        type = Cyclopedia.safeOutfit(RACE_Bosstiary[bossId] and RACE_Bosstiary[bossId].type or 22)
-    })
+    widget.ActivedBoss.Sprite:setOutfit(raceData.outfit)
     widget.ActivedBoss.Sprite:getCreature():setStaticWalking(1000)
     widget.ActivedBoss.EquipmentLabel:setText(string.format("Equipment loot bonus: %d%%", slotData.lootBonus))
     widget.ActivedBoss.Value:setText(comma_value(slotData.removePrice))
@@ -386,11 +376,10 @@ function Cyclopedia.readjustSelectBoss()
 
     for _, internalData in ipairs(Cyclopedia.BossSlots.UnlockBosses) do
         if internalData.visible then
+            local raceData = g_things.getRaceData(internalData.bossId)
             local internalWidget = g_ui.createWidget("SelectBossBossSlots", widget.SelectBoss.ListBase.List)
-            internalWidget.Sprite:setOutfit({
-                type = Cyclopedia.safeOutfit(RACE_Bosstiary[internalData.bossId] and RACE_Bosstiary[internalData.bossId].type or 22)
-            })
-            internalWidget:setText(format(RACE_Bosstiary[internalData.bossId].name))
+            internalWidget.Sprite:setOutfit(raceData.outfit)
+            internalWidget:setText(format(raceData.name))
             internalWidget.Sprite:getCreature():setStaticWalking(1000)
             internalWidget.TypeIcon:setImageSource(icons[internalData.category])
 

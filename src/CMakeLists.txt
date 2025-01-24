@@ -445,6 +445,8 @@ if(MSVC)
 		_WIN32_WINNT=0x0600
 	)
 
+	target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
+
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 		string(REPLACE "/Zi" "/Z7" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 		string(REPLACE "/Zi" "/Z7" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
@@ -464,7 +466,6 @@ if(MSVC)
 		set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
 	else()
 		log_option_disabled("STATIC_LIBRARY")
-		target_compile_options(${PROJECT_NAME} PUBLIC /MP /FS /Zf /EHsc )
 		set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
 	endif()
 

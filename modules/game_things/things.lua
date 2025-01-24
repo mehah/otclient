@@ -22,11 +22,15 @@ function isLoaded()
 end
 
 function load(version)
-    local errorMessage = ''
+    local errorList = {}
 
     if version >= 1281 and not g_game.getFeature(GameLoadSprInsteadProtobuf) then
-        if not g_things.loadAppearances(resolvepath(string.format('/things/%d/', version))) then
-            errorMessage = errorMessage .. 'Couldn\'t load assets'
+        local filePath = resolvepath(string.format('/things/%d/', version))
+        if not g_things.loadAppearances(filePath) then
+            errorList[#errorList + 1] = "Couldn't load assets"
+        end
+        if not g_things.loadStaticData(filePath) then
+            errorList[#errorList + 1] = "Couldn't load staticdata"
         end
     else
         if g_game.getFeature(GameLoadSprInsteadProtobuf) then
@@ -47,19 +51,17 @@ function load(version)
         end
 
         if not g_things.loadDat(datPath) then
-            errorMessage = errorMessage ..
-                tr('Unable to load dat file, please place a valid dat in \'%s.dat\'', datPath) .. '\n'
+            errorList[#errorList + 1] = tr('Unable to load dat file, please place a valid dat in \'%s.dat\'', datPath)
         end
         if not g_sprites.loadSpr(sprPath) then
-            errorMessage = errorMessage ..
-                tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
+            errorList[#errorList + 1] = tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
         end
     end
 
-    loaded = (errorMessage:len() == 0)
+    loaded = #errorList == 0
 
-    if errorMessage:len() > 0 then
-        local messageBox = displayErrorBox(tr('Error'), errorMessage)
+    if not loaded then
+        local messageBox = displayErrorBox(tr('Error'), table.concat(errorList, "\n"))
         addEvent(function()
             messageBox:raise()
             messageBox:focus()
