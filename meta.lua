@@ -5837,7 +5837,7 @@ function g_sounds.loadClientFiles(directory) end
 
 ---@param audioFileId string
 ---@return string
-function getAudioFileNameById(audioFileId) end
+function g_sounds.getAudioFileNameById(audioFileId) end
 
 --------------------------------
 --------- SoundSource ----------
