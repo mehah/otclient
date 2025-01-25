@@ -520,7 +520,10 @@ bool SoundManager::loadClientFiles(const std::string& directory)
 
         return true;
     } catch (const std::exception& e) {
-        g_logger.warning(stdext::format("Failed to load '%s' (Sounds): %s", directory, e.what()));
+        if (g_game.getClientVersion() >= 1300) {
+            g_logger.warning(stdext::format("Failed to load '%s' (Sounds): %s", directory, e.what()));
+        }
+
         return false;
     }
 }
