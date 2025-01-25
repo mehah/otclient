@@ -48,7 +48,7 @@ MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
     m_floorThreads.resize(g_asyncDispatcher.get_thread_count());
     for (auto& thread : m_floorThreads)
-        thread.resize(g_gameConfig.getMapMaxZ() + 1);
+        thread.resize(m_floors.size());
 
     setVisibleDimension(Size(15, 11));
 }
@@ -318,19 +318,19 @@ void MapView::updateVisibleTiles()
     // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
         m_fadeType = FadeType::NONE$;
-        for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (auto iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_floors[iz].fadingTimers.restart(m_floorFading);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
         m_fadeType = FadeType::OUT$;
-        for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
+        for (auto iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
             m_floors[iz].fadingTimers.restart(shift);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
         m_fadeType = FadeType::IN$;
         m_fadeFinish = false;
-        for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
+        for (auto iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
             m_floors[iz].fadingTimers.restart(shift);
         }
@@ -346,13 +346,13 @@ void MapView::updateVisibleTiles()
     const uint32_t numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
 
     auto processDiagonalRange = [&](std::vector<FloorData>& floors, uint32_t start, uint32_t end) {
-        for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (auto iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             auto& floor = floors[iz].cachedVisibleTiles;
             floor.clear();
 
-            for (int diagonal = start; diagonal < end; ++diagonal) {
+            for (auto diagonal = start; diagonal < end; ++diagonal) {
                 const auto advance = (diagonal >= m_drawDimension.height()) ? diagonal - m_drawDimension.height() : 0;
-                for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
+                for (auto iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
                     auto tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
                     tilePos.coveredUp(m_posInfo.camera.z - iz);
 
@@ -395,7 +395,7 @@ void MapView::updateVisibleTiles()
 
         const auto chunkSize = (numDiagonals + numThreads - 1) / numThreads;
 
-        for (int i = 0; i < numThreads; ++i) {
+        for (auto i = 0; i < numThreads; ++i) {
             const auto start = i * chunkSize;
             const auto end = start + chunkSize;
 
@@ -410,7 +410,7 @@ void MapView::updateVisibleTiles()
             auto& floor = m_floors[fi];
             floor.cachedVisibleTiles.clear();
 
-            for (uint32_t i = 0; i < numThreads; ++i) {
+            for (auto i = 0; i < numThreads; ++i) {
                 auto& floorThread = m_floorThreads[i][fi];
                 floor.cachedVisibleTiles.tiles.insert(floor.cachedVisibleTiles.tiles.end(), std::make_move_iterator(floorThread.cachedVisibleTiles.tiles.begin()), std::make_move_iterator(floorThread.cachedVisibleTiles.tiles.end()));
                 floor.cachedVisibleTiles.shades.insert(floor.cachedVisibleTiles.tiles.end(), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.begin()), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.end()));
