@@ -22,28 +22,14 @@
 
 #pragma once
 
-#include <framework/global.h>
+#include "outfit.h"
 
-#include <AL/al.h>
-#include <AL/alc.h>
-#include <AL/efx-presets.h>
-#include <AL/efx.h>
+class Outfit;
 
-class SoundManager;
-class SoundSource;
-class SoundBuffer;
-class SoundFile;
-class SoundChannel;
-class StreamSoundSource;
-class CombinedSoundSource;
-class OggSoundFile;
-class SoundEffect;
-
-using SoundSourcePtr = std::shared_ptr<SoundSource>;
-using SoundFilePtr = std::shared_ptr<SoundFile>;
-using SoundBufferPtr = std::shared_ptr<SoundBuffer>;
-using SoundChannelPtr = std::shared_ptr<SoundChannel>;
-using StreamSoundSourcePtr = std::shared_ptr<StreamSoundSource>;
-using CombinedSoundSourcePtr = std::shared_ptr<CombinedSoundSource>;
-using OggSoundFilePtr = std::shared_ptr<OggSoundFile>;
-using SoundEffectPtr = std::shared_ptr<SoundEffect>;
+struct RaceType
+{
+    uint32_t raceId;
+    std::string name;
+    Outfit outfit;
+    bool boss;
+};

@@ -781,8 +781,11 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
         msg->addU8(outfit.hasMount());
     }
 
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        msg->addU16(outfit.getFamiliar()); //familiars
+    }
+
     if (g_game.getClientVersion() >= 1281) {
-        msg->addU16(0x00); //familiars
         msg->addU8(0x00); //randomizeMount
     }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
@@ -1009,7 +1012,7 @@ void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBestiaryRequestOverview);
-    msg->addU8(0x02);
+    msg->addU8(0x00);
     msg->addString(catName);
     send(msg);
 }

@@ -4,7 +4,7 @@ Module
   author: edubart
   website: https://github.com/edubart/otclient
 
-  load-later:
+  dependencies:
     - game_features
     - game_things
 

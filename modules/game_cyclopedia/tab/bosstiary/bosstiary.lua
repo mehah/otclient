@@ -11,9 +11,9 @@ function showBosstiary()
     -- UI.FilterBase.ArchfoeIcon:setTooltipAlign(AlignTopLeft)
     UI.FilterBase.NemesisIcon:setTooltip(
         "Nemesis\n\nFor unlocking a level, you will receive the following boss points:\nProwess: 10\nExpertise: 30\nMastery: 60")
-    --	UI.FilterBase.NemesisIcon:setTooltipAlign(AlignTopLeft)
+    -- UI.FilterBase.NemesisIcon:setTooltipAlign(AlignTopLeft)
     UI.StarBase.Info1:setTooltip("Once you have reached the Prowess level, you can assign the boss\nto a boss slot.")
-    --	UI.StarBase.Info1:setTooltipAlign(AlignTopLeft)
+    -- UI.StarBase.Info1:setTooltipAlign(AlignTopLeft)
     UI.StarBase.Info2:setTooltip(
         "Once you have reached the Expertise Level, you can display the\nboss on a Podium of Vigour.")
     -- UI.StarBase.Info2:setTooltipAlign(AlignTopLeft)
@@ -77,7 +77,7 @@ function Cyclopedia.CreateBosstiaryCreature(data)
 
     local widget = g_ui.createWidget("BosstiaryItem", UI.ListBase.BossList)
     widget:setId(data.raceId)
-    local raceData = RACE_Bosstiary[data.raceId]
+    local raceData = g_things.getRaceData(data.raceId)
     local icons = {
         [CATEGORY.BANE] = "/game_cyclopedia/images/boss/icon_bane",
         [CATEGORY.ARCHFOE] = "/game_cyclopedia/images/boss/icon_archfoe",
@@ -134,37 +134,31 @@ function Cyclopedia.CreateBosstiaryCreature(data)
     elseif data.category == CATEGORY.NEMESIS then
         widget.TypeIcon:setTooltip(
             "Nemesis\n\nFor unlocking a level, you will receive the following boss points:\nProwess: 10\nExpertise: 30\nMastery: 60")
-        --	widget.TypeIcon:setTooltipAlign(AlignTopLeft)
+        -- widget.TypeIcon:setTooltipAlign(AlignTopLeft)
     end
     widget.ProgressValue:setText(data.kills)
 
-     Cyclopedia.SetBestiaryProgress(46,widget.ProgressBack, widget.ProgressBack33, widget.ProgressBack55,  data.kills, CONFIG[data.category].PROWESS, CONFIG[data.category].EXPERTISE, CONFIG[data.category].MASTERY)
+    Cyclopedia.SetBestiaryProgress(46,widget.ProgressBack, widget.ProgressBack33, widget.ProgressBack55,  data.kills, CONFIG[data.category].PROWESS, CONFIG[data.category].EXPERTISE, CONFIG[data.category].MASTERY)
    
-    if raceData then
-        widget.Sprite:setOutfit({
-            type = Cyclopedia.safeOutfit(raceData.type)
-        })
-        widget.Sprite:getCreature():setStaticWalking(1000)
-        if data.unlocked then
-            widget.Sprite:getCreature():setShader("")
-            widget:setText(format(data.name))
-            widget.TrackCheck:enable()
-            if data.isTrackerActived == 1 then
-                widget.TrackCheck:setChecked(true)
-            else
-                widget.TrackCheck:setChecked(false)
-            end
+    widget.Sprite:setOutfit(raceData.outfit)
+    widget.Sprite:getCreature():setStaticWalking(1000)
+    if data.unlocked then
+        widget.Sprite:getCreature():setShader("")
+        widget:setText(format(data.name))
+        widget.TrackCheck:enable()
+        if data.isTrackerActived == 1 then
+            widget.TrackCheck:setChecked(true)
         else
-            widget.Sprite:getCreature():setShader("Outfit - cyclopedia-black")
-            widget.TrackCheck:disable()
-
+            widget.TrackCheck:setChecked(false)
         end
+    else
+        widget.Sprite:getCreature():setShader("Outfit - cyclopedia-black")
+        widget.TrackCheck:disable()
 
     end
-
 end
 
-function Cyclopedia.LoadBoostiaryCreatures(data)
+function Cyclopedia.LoadBosstiaryCreatures(data)
     if not UI then
         return
     end
@@ -182,10 +176,9 @@ function Cyclopedia.LoadBoostiaryCreatures(data)
     Cyclopedia.Bosstiary.Creatures[page] = {}
 
     local validCreatures = {}
-    local invalidCreatures = {}
 
     for i, dataEntry in ipairs(data) do
-        local raceData = RACE_Bosstiary[dataEntry.raceId]
+        local raceData = g_things.getRaceData(dataEntry.raceId)
         local creature = {
             visible = true,
             raceId = dataEntry.raceId,
@@ -196,15 +189,7 @@ function Cyclopedia.LoadBoostiaryCreatures(data)
             unlocked = dataEntry.kills > 0 and true or false
         }
 
-        if raceData then
-            table.insert(validCreatures, creature)
-        else
-            table.insert(invalidCreatures, creature)
-        end
-    end
-
-    for _, value in pairs(invalidCreatures) do
-        table.insert(validCreatures, value)
+        table.insert(validCreatures, creature)
     end
 
     table.sort(validCreatures, function(a, b)
@@ -236,11 +221,11 @@ function Cyclopedia.LoadBoostiaryCreatures(data)
         end
     end
 
-    Cyclopedia.LoadBoostiaryCreature(Cyclopedia.Bosstiary.Page)
+    Cyclopedia.LoadBosstiaryCreature(Cyclopedia.Bosstiary.Page)
     Cyclopedia.verifyBosstiaryButtons()
 end
 
-function Cyclopedia.LoadBoostiaryCreature(page)
+function Cyclopedia.LoadBosstiaryCreature(page)
     if not Cyclopedia.Bosstiary.Creatures[page] then
         return
     end
@@ -282,7 +267,7 @@ function Cyclopedia.changeBosstiaryPage(prev, next)
         Cyclopedia.Bosstiary.Page = Cyclopedia.Bosstiary.Page - 1
     end
 
-    Cyclopedia.LoadBoostiaryCreature(Cyclopedia.Bosstiary.Page)
+    Cyclopedia.LoadBosstiaryCreature(Cyclopedia.Bosstiary.Page)
     Cyclopedia.verifyBosstiaryButtons()
 end
 
@@ -438,6 +423,6 @@ function Cyclopedia.ReadjustPages()
     end
 
     UI.PageValue:setText(string.format("%d / %d", Cyclopedia.Bosstiary.Page, Cyclopedia.Bosstiary.TotalPages))
-    Cyclopedia.LoadBoostiaryCreature(Cyclopedia.Bosstiary.Page)
+    Cyclopedia.LoadBosstiaryCreature(Cyclopedia.Bosstiary.Page)
     Cyclopedia.verifyBosstiaryButtons()
 end

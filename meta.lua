@@ -155,6 +155,14 @@ function g_things.loadAppearances(file) end
 
 ---@param file string
 ---@return boolean
+function g_things.loadStaticData(file) end
+
+---@param file string
+---@return boolean
+function g_things.loadSounds(file) end
+
+---@param file string
+---@return boolean
 function g_things.loadDat(file) end
 
 ---@param file string
@@ -183,6 +191,14 @@ function g_things.getThingTypes(category) end
 ---@param category integer
 ---@return ThingType[]
 function g_things.findThingTypeByAttr(attr, category) end
+
+---@param raceId integer
+---@return RaceType[]
+function g_things.getRaceData(raceId) end
+
+---@param searchString string
+---@return Vector<RaceType>
+function g_things.getRacesByName(searchString) end
 
 ---* FRAMEWORK_EDITOR
 ---@param id integer

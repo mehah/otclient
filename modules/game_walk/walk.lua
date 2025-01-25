@@ -2,6 +2,7 @@ local smartWalkDirs = {}
 local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
+local lastCancelWalkTime = 0
 local nextWalkDir = nil
 
 WalkController = Controller:new()
@@ -75,7 +76,10 @@ end
 
 --- Adds a walk event with an optional delay.
 local function addWalkEvent(dir, delay)
-    cancelWalkEvent()
+    if os.time() - lastCancelWalkTime > 10 then
+        cancelWalkEvent()
+        lastCancelWalkTime = os.time()
+    end
 
     local function walkCallback()
         if g_keyboard.getModifiers() ~= KeyboardNoModifier then
