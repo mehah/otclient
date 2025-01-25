@@ -3,7 +3,7 @@ g_tooltip = {}
 
 -- private variables
 local toolTipLabel
-local SpecialoolTipLabel
+local SpecialToolTipLabel
 local currentHoveredWidget
 
 -- private functions
@@ -34,13 +34,13 @@ local function moveToolTip(first)
     toolTipLabel:setPosition(pos)
 end
 local function moveSpecialToolTip(first)
-    if not first and (not SpecialoolTipLabel:isVisible() or SpecialoolTipLabel:getOpacity() < 0.1) then
+    if not first and (not SpecialToolTipLabel:isVisible() or SpecialToolTipLabel:getOpacity() < 0.1) then
         return
     end
 
     local pos = g_window.getMousePosition()
     local windowSize = g_window.getSize()
-    local labelSize = SpecialoolTipLabel:getSize()
+    local labelSize = SpecialToolTipLabel:getSize()
 
     pos.x = pos.x + 1
     pos.y = pos.y + 1
@@ -57,7 +57,7 @@ local function moveSpecialToolTip(first)
         pos.y = pos.y + 10
     end
 
-    SpecialoolTipLabel:setPosition(pos)
+    SpecialToolTipLabel:setPosition(pos)
 end
 
 local function onWidgetDestroy(widget)
@@ -142,16 +142,18 @@ function g_tooltip.init()
         toolTipLabel:setBorderWidth(1)
         toolTipLabel:setTextOffset(topoint('5 3'))
         toolTipLabel:hide()
+        toolTipLabel:setPhantom(true)
     end)
 
     addEvent(function()
-        SpecialoolTipLabel = g_ui.createWidget('UIWidget', rootWidget)
-        SpecialoolTipLabel:setBackgroundColor('#c0c0c0ff')
-        SpecialoolTipLabel:setBorderColor("#4c4c4cff")
-        SpecialoolTipLabel:setBorderWidth(1)
-        SpecialoolTipLabel:setWidth(455)
-        SpecialoolTipLabel:setPaddingTop(2)
-        SpecialoolTipLabel:hide()
+        SpecialToolTipLabel = g_ui.createWidget('UIWidget', rootWidget)
+        SpecialToolTipLabel:setBackgroundColor('#c0c0c0ff')
+        SpecialToolTipLabel:setBorderColor("#4c4c4cff")
+        SpecialToolTipLabel:setBorderWidth(1)
+        SpecialToolTipLabel:setWidth(455)
+        SpecialToolTipLabel:setPaddingTop(2)
+        SpecialToolTipLabel:hide()
+        SpecialToolTipLabel:setPhantom(true)
     end)
 end
 
@@ -192,18 +194,18 @@ function g_tooltip.display(text)
 end
 
 function g_tooltip.displaySpecial(special)
-    if not SpecialoolTipLabel then
+    if not SpecialToolTipLabel then
         return
     end
 
     local width = 4
     local height = 4
-    SpecialoolTipLabel:destroyChildren()
+    SpecialToolTipLabel:destroyChildren()
     for index, data in ipairs(special) do
         local headerW = 0
         local headerH = 0
         if string.len(data.header) > 0 then
-            local header = g_ui.createWidget('UILabel', SpecialoolTipLabel)
+            local header = g_ui.createWidget('UILabel', SpecialToolTipLabel)
             if index == 1 then
                 header:addAnchor(AnchorTop, 'parent', AnchorTop)
             else
@@ -221,7 +223,7 @@ function g_tooltip.displaySpecial(special)
             headerH = header:getHeight()
         end
 
-        local info = g_ui.createWidget('UILabel', SpecialoolTipLabel)
+        local info = g_ui.createWidget('UILabel', SpecialToolTipLabel)
         if string.len(data.header) > 0 then
             info:addAnchor(AnchorTop, 'prev', AnchorBottom)
         else
@@ -238,11 +240,11 @@ function g_tooltip.displaySpecial(special)
         height = height + headerH + info:getHeight()
     end
 
-    SpecialoolTipLabel:resize(width, height)
-    SpecialoolTipLabel:show()
-    SpecialoolTipLabel:raise()
-    SpecialoolTipLabel:enable()
-    g_effects.fadeIn(SpecialoolTipLabel, 100)
+    SpecialToolTipLabel:resize(width, height)
+    SpecialToolTipLabel:show()
+    SpecialToolTipLabel:raise()
+    SpecialToolTipLabel:enable()
+    g_effects.fadeIn(SpecialToolTipLabel, 100)
     moveSpecialToolTip(true)
 
     connect(rootWidget, {
@@ -259,8 +261,7 @@ function g_tooltip.hide()
 end
 
 function g_tooltip.hideSpecial()
-    g_effects.fadeOut(SpecialoolTipLabel, 100)
-
+    g_effects.fadeOut(SpecialToolTipLabel, 100)
     disconnect(rootWidget, {
         onMouseMove = moveSpecialToolTip
     })
