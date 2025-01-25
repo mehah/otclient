@@ -209,7 +209,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
 {
     const std::string fullPath = resolvePath(fileName);
 
-    if (fullPath.find(g_resources.getByteStrings(0)) != std::string::npos) {
+    if (fullPath.find(AY_OBFUSCATE("/downloads")) != std::string::npos) {
         const auto dfile = g_http.getFile(fullPath.substr(10));
         if (dfile)
             return std::string(dfile->response.begin(), dfile->response.end());
@@ -225,21 +225,20 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
     PHYSFS_close(file);
 
 #if ENABLE_ENCRYPTION == 1
-    bool hasHeader = false;
-    if (buffer.size() >= std::string(ENCRYPTION_HEADER).size() &&
-        buffer.substr(0, std::string(ENCRYPTION_HEADER).size()) == std::string(ENCRYPTION_HEADER)) {
-        hasHeader = true;
-    }
-
-    if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
-        if (fullPath.find(g_resources.getByteStrings(1)) != std::string::npos && !hasHeader) {
-            return buffer;
-        }
-    }
+    const auto headerSize = std::string(ENCRYPTION_HEADER).size();
+    const bool hasHeader = (buffer.size() >= headerSize &&
+                            buffer.compare(0, headerSize, ENCRYPTION_HEADER) == 0);
 
     if (hasHeader) {
-        buffer = buffer.substr(std::string(ENCRYPTION_HEADER).size());
+        buffer = buffer.substr(headerSize);
         buffer = decrypt(buffer);
+    } else {
+        if (fullPath.find(std::string(AY_OBFUSCATE("/bot/"))) != std::string::npos) {
+            if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
+                return buffer;
+            }
+            return "";
+        }
     }
 #endif
 
@@ -758,26 +757,4 @@ std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(
 {
     std::unordered_map<std::string, std::string> ret;
     return ret;
-}
-
-std::string ResourceManager::decodificateStrings(const std::vector<unsigned char>& bytes) {
-    std::string result;
-    for (const unsigned char c : bytes) {
-        result.push_back(c ^ 0xAA);
-    }
-    return result;
-}
-
-// used to obfuscate vulnerable strings (provisional)
-std::string ResourceManager::getByteStrings(const size_t line) {
-    const std::vector<std::vector<unsigned char>> strTable = {
-        {0x85, 0xCE, 0xC5, 0xDD, 0xC4, 0xC6, 0xC5, 0xCB, 0xCE, 0xD9},  // "/downloads"
-        {0x85, 0xC8, 0xC5, 0xDE, 0x85},  // "/bot/"
-        {0xE6, 0xC3, 0xC4, 0xC2, 0xCB, 0x8A, 0xCE, 0xCF, 0x8A, 0xD8, 0xCF, 0xDE, 0xC5, 0xD8, 0xC4, 0xC5, 0x8A, 0xC3, 0xC4, 0xDC, 0xCB, 0xC6, 0xC3, 0xCE, 0xCB},  // "Linha de retorno invalida"
-    };
-
-    if (line < strTable.size()) {
-        return decodificateStrings(strTable[line]);
-    }
-    return decodificateStrings(strTable[2]);
 }
