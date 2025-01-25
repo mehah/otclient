@@ -318,12 +318,15 @@ private:
     bool m_forceDrawViewportEdge{ false };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
+    bool m_multithreading{ false };
 
     FadeType m_fadeType{ FadeType::NONE$ };
 
     AntialiasingMode m_antiAliasingMode{ ANTIALIASING_DISABLED };
 
     std::vector<FloorData> m_floors;
+    std::vector<std::vector<FloorData>> m_floorThreads;
+
     std::vector<TilePtr> m_foregroundTiles;
 
     PainterShaderProgramPtr m_shader;

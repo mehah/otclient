@@ -144,6 +144,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerCreatureTyping:
                     parseCreatureTyping(msg);
                     break;
+                case Proto::GameServerFeatures:
+                    parseFeatures(msg);
+                    break;
                 case Proto::GameServerFloorDescription:
                     parseFloorDescription(msg);
                     break;
@@ -2575,7 +2578,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         msg->getU16(); // current familiar looktype
     }
 
-    std::vector<std::tuple<uint16_t, std::string, uint8_t>> outfitList;
+    std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>> outfitList;
 
     if (g_game.getFeature(Otc::GameNewOutfitProtocol)) {
         const uint16_t outfitCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
@@ -2583,15 +2586,15 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             const uint16_t outfitId = msg->getU16();
             const auto& outfitName = msg->getString();
             const uint8_t outfitAddons = msg->getU8();
-
+            uint8_t outfitMode = 0;
             if (g_game.getClientVersion() >= 1281) {
-                const uint8_t outfitMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
+                outfitMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
                 if (outfitMode == 1) {
                     msg->getU32();
                 }
             }
 
-            outfitList.emplace_back(outfitId, outfitName, outfitAddons);
+            outfitList.emplace_back(outfitId, outfitName, outfitAddons, outfitMode);
         }
     } else {
         uint16_t outfitStart;
@@ -2605,40 +2608,44 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
 
         for (auto i = outfitStart; i <= outfitEnd; ++i) {
-            outfitList.emplace_back(i, "", 0);
+            outfitList.emplace_back(i, "", 0, 0);
         }
     }
 
-    std::vector<std::tuple<uint16_t, std::string>> mountList;
+    std::vector<std::tuple<uint16_t, std::string, uint8_t>> mountList;
 
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         const uint16_t mountCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
         for (auto i = 0; i < mountCount; ++i) {
             const uint16_t mountId = msg->getU16(); // mount type
             const auto& mountName = msg->getString(); // mount name
-
+            uint8_t mountMode = 0;
             if (g_game.getClientVersion() >= 1281) {
-                const uint8_t mountMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+                mountMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
                 if (mountMode == 1) {
                     msg->getU32();
                 }
             }
 
-            mountList.emplace_back(mountId, mountName);
+            mountList.emplace_back(mountId, mountName, mountMode);
         }
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    std::vector<std::tuple<uint16_t, std::string> > familiarList;
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
         const uint16_t familiarCount = msg->getU16();
         for (auto i = 0; i < familiarCount; ++i) {
-            msg->getU16(); // familiar lookType
-            msg->getString(); // familiar name
+            const uint16_t familiarLookType = msg->getU16(); // familiar lookType
+            const auto& familiarName = msg->getString(); // familiar name
             const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
             if (familiarMode == 1) {
                 msg->getU32();
             }
+            familiarList.emplace_back(familiarLookType, familiarName);
         }
+    }
 
+    if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // Try outfit mode (?)
         msg->getU8(); // (bool) mounted
         msg->getU8(); // (bool) randomize mount
@@ -2679,7 +2686,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
     }
 
-    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList, shaderList);
+    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, familiarList, wingList, auraList, effectList, shaderList);
 }
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
@@ -3227,7 +3234,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
         outfit.setMount(mount);
     }
 
-    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader) && parseMount) {
         const uint16_t wings = msg->getU16();
         outfit.setWing(wings);
 
@@ -3466,10 +3473,14 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setMasterId(masterId);
             creature->setShader(shader);
             creature->clearTemporaryAttachedEffects();
+            std::unordered_set<uint16_t> currentAttachedEffectIds;
+            for (const auto& attachedEffect : creature->getAttachedEffects()) {
+                currentAttachedEffectIds.insert(attachedEffect->getId());
+            }
 
             for (const auto effectId : attachedEffectList) {
                 const auto& effect = g_attachedEffects.getById(effectId);
-                if (effect) {
+                if (effect && currentAttachedEffectIds.find(effectId) == currentAttachedEffectIds.end()) {
                     const auto& clonedEffect = effect->clone();
                     clonedEffect->setPermanent(false);
                     creature->attachEffect(clonedEffect);
@@ -5325,6 +5336,20 @@ void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
     }
 
     creature->setTyping(typing);
+}
+
+void ProtocolGame::parseFeatures(const InputMessagePtr& msg)
+{
+    const uint16_t features = msg->getU16();
+    for (auto i = 0; i < features; ++i) {
+        const auto feature = static_cast<Otc::GameFeature>(msg->getU8());
+        const auto enabled = static_cast<bool>(msg->getU8());
+        if (enabled) {
+            g_game.enableFeature(feature);
+        } else {
+            g_game.disableFeature(feature);
+        }
+    }
 }
 
 void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
