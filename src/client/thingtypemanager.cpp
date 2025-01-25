@@ -287,13 +287,6 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
     return false;
 }
 
-bool ThingTypeManager::loadSounds(const std::string& /* file */)
-{
-    // to be implemented
-    // to be moved to g_sounds
-    return false;
-}
-
 const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category)
 {
     if (category < ThingLastCategory)
