@@ -4,7 +4,7 @@ TextEditButtons < Panel
 
   Button
     id: ok
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     anchors.bottom: parent.bottom
     anchors.right: next.left
     margin-right: 10
@@ -12,14 +12,14 @@ TextEditButtons < Panel
 
   Button
     id: cancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     width: 60
 
 TextEditWindow < MainWindow
   id: textedit
-  !text: tr("Edit text")
+  !text: localize('WindowTitleTextEdit')
   layout:
     type: verticalBox
     fit-children: true

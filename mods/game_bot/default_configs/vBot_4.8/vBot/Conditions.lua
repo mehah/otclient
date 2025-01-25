@@ -10,7 +10,7 @@ Panel
     anchors.left: parent.left
     text-align: center
     width: 130
-    !text: tr('Conditions')
+    !text: localize('BotButtonConditions')
 
   Button
     id: conditionList

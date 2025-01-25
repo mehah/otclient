@@ -17,8 +17,8 @@ minimap.onMouseRelease = function(widget,pos,button)
     local menu = g_ui.createWidget('PopupMenu')
     menu:setId("minimapMenu")
     menu:setGameMenu(true)
-    menu:addOption(tr('Create mark'), function() minimap:createFlagWindow(mapPos) end)
-    menu:addOption(tr('Add CaveBot GoTo'), function() CaveBot.addAction("goto", mapPos.x .. "," .. mapPos.y .. "," .. mapPos.z, true) CaveBot.save() end)
+    menu:addOption(localize('BotMinimapOptionCreateMark'), function() minimap:createFlagWindow(mapPos) end)
+    menu:addOption(localize('BotMinimapOptionAddGoTo'), function() CaveBot.addAction("goto", mapPos.x .. "," .. mapPos.y .. "," .. mapPos.z, true) CaveBot.save() end)
     menu:display(pos)
     return true
   end

@@ -81,7 +81,7 @@ CaveBot.Config.add = function(id, title, defaultValue)
     return warn("Invalid default value of config for key " .. id .. ", should be number or boolean")
   end
 
-  panel.title:setText(tr(title) .. ":")
+  panel.title:setText(localize(title) .. ":")
 
   CaveBot.Config.value_setters[id] = setter
   CaveBot.Config.values[id] = defaultValue

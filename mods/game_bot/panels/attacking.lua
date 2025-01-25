@@ -11,7 +11,7 @@ Panels.MonsterEditor = function(monster, config, callback, parent)
 MainWindow
   id: monsterEditor
   size: 450 450
-  !text: tr("Edit monster")
+  !text: localize('BotAttackingTitleEditMonster')
 
   Label
     id: info
@@ -302,7 +302,7 @@ MainWindow
 
   Button
     id: okButton
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     anchors.bottom: parent.bottom
     anchors.right: next.left
     margin-right: 10
@@ -310,7 +310,7 @@ MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     width: 60
@@ -712,10 +712,12 @@ Panel
       context.storage.attacking.activeConfig = 0
       refreshConfig()
     end
-    questionWindow = context.displayGeneralBox(tr('Remove config'), tr('Do you want to remove current attacking config?'),
+    questionWindow = context.displayGeneralBox(
+      localize('BotRemoveConfig'),
+      localize('BotAttackingMessageRemoveConfig'),
       {
-        { text = tr('Yes'), callback = removeConfig },
-        { text = tr('No'),  callback = closeWindow },
+        { text = localize('UIButtonYes'), callback = removeConfig },
+        { text = localize('UIButtonNo'),  callback = closeWindow },
         anchor = AnchorHorizontalCenter
       }, removeConfig, closeWindow)
   end

@@ -411,7 +411,7 @@ HoldConditions < Panel
     font: cipsoftFont
 
 ConditionsWindow < MainWindow
-  !text: tr('Condition Manager')
+  !text: localize('BotWindowTitleConditionManager')
   size: 445 280
   @onEscape: self:hide()
 
@@ -454,7 +454,7 @@ ConditionsWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

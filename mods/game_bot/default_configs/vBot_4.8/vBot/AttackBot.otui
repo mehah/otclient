@@ -36,7 +36,7 @@ AttackEntry < UIWidget
 
   Button
     id: remove
-    !text: tr('x')
+    !text: 'x'
     anchors.right: parent.right
     margin-right: 15
     width: 15
@@ -51,7 +51,7 @@ AttackBotBotPanel < Panel
     anchors.left: parent.left
     text-align: center
     width: 130
-    !text: tr('AttackBot')
+    !text: localize('BotAttackingButton')
 
   Button
     id: settings
@@ -562,7 +562,7 @@ AttackBotWindow < MainWindow
     anchors.top: parent.top
     margin-top: 10
     margin-left: 2
-    !text: tr('More important methods come first (Example: Exori gran above Exori)')
+    !text: localize('BotInfoMethodOrder')
     text-align: left
     font: verdana-11px-rounded
     color: #aeaeae

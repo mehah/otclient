@@ -43,7 +43,7 @@ SpellEntry < Label
 
   Button
     id: remove
-    !text: tr('x')
+    !text: 'x'
     anchors.right: parent.right
     margin-right: 15
     text-offset: 1 0
@@ -79,7 +79,7 @@ ItemEntry < Label
 
   Button
     id: remove
-    !text: tr('x')
+    !text: 'x'
     anchors.right: parent.right
     margin-right: 15
     text-offset: 1 0
@@ -442,7 +442,7 @@ HealBotSettingsPanel < Panel
       color: #ff4513
 
 HealWindow < MainWindow
-  !text: tr('Self Healer')
+  !text: localize('BotSelfHealer')
   size: 520 360
   @onEscape: self:hide()
 
@@ -451,7 +451,7 @@ HealWindow < MainWindow
     anchors.left: parent.left
     anchors.top: parent.top
     margin-left: 2
-    !text: tr('More important methods come first (Example: Exura gran above Exura)')
+    !text: localize('BotInfoMethodOrder')
     text-align: left
     font: verdana-11px-rounded
     color: #aeaeae
@@ -476,7 +476,7 @@ HealWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom
@@ -485,7 +485,7 @@ HealWindow < MainWindow
 
   Button
     id: settingsButton
-    !text: tr('Settings')
+    !text: localize('UIButtonSettings')
     font: cipsoftFont
     anchors.left: parent.left
     anchors.bottom: parent.bottom

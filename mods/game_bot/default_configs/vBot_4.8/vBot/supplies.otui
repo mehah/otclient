@@ -11,7 +11,7 @@ ProfileLabel < UIWidget
 
   Button
     id: remove
-    !text: tr('X')
+    !text: 'X'
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     width: 14
@@ -83,7 +83,7 @@ ItemPanel < Panel
     !tooltip: ("This is average consumption of supplies by round to help calculate the amount to purchase\n (info provided by CaveBot Stats)")
 
 SuppliesWindow < MainWindow
-  !text: tr('Supplies')
+  !text: localize('BotSupplies')
   size: 430 330
   @onEscape: self:hide()
 
@@ -217,7 +217,7 @@ SuppliesWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

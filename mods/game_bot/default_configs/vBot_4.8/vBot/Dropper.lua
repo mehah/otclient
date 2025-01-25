@@ -10,7 +10,7 @@ Panel
     anchors.left: parent.left
     text-align: center
     width: 130
-    !text: tr('Dropper')
+    !text: localize('BotWindowTitleDropper')
 
   Button
     id: edit

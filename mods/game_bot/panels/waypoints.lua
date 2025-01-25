@@ -252,10 +252,10 @@ Panel
     if context.storage.cavebot.enabled then
       autoRecording = false
       ui.recording:setOn(false)
-      ui.enableButton:setText("On")
+      ui.enableButton:setText(localize('UIButtonOn'))
       ui.enableButton:setColor('#00AA00FF')
     else
-      ui.enableButton:setText("Off")
+      ui.enableButton:setText(localize('UIButtonOff'))
       ui.enableButton:setColor('#FF0000FF')
       ui.recording:setOn(autoRecording)
     end
@@ -264,7 +264,7 @@ Panel
     for i, config in ipairs(context.storage.cavebot.configs) do
       local name = getConfigName(config)
       if not name then
-        name = "Unnamed config"
+        name = localize('BotUnnamedConfig')
       end
       ui.config:addOption(name)
     end
@@ -303,15 +303,15 @@ Panel
     if autoRecording then
       refreshConfig()
     elseif context.storage.cavebot.enabled then
-      ui.enableButton:setText("On")
+      ui.enableButton:setText(localize('UIButtonOn'))
       ui.enableButton:setColor('#00AA00FF')
     else
-      ui.enableButton:setText("Off")
+      ui.enableButton:setText(localize('UIButtonOff'))
       ui.enableButton:setColor('#FF0000FF')
     end
   end
   ui.add.onClick = function()
-    modules.client_textedit.multilineEditor("Waypoints editor", "name:Config name\nlabel:start\n", function(newText)
+    modules.client_textedit.multilineEditor(localize('WaypointsEditorTitle'), "name:Config name\nlabel:start\n", function(newText)
       table.insert(context.storage.cavebot.configs, newText)
       context.storage.cavebot.activeConfig = #context.storage.cavebot.configs
       refreshConfig()
@@ -321,7 +321,7 @@ Panel
     if not context.storage.cavebot.activeConfig or not context.storage.cavebot.configs[context.storage.cavebot.activeConfig] then
       return
     end
-    modules.client_textedit.multilineEditor("Waypoints editor",
+    modules.client_textedit.multilineEditor(localize('WaypointsEditorTitle'),
       context.storage.cavebot.configs[context.storage.cavebot.activeConfig], function(newText)
         context.storage.cavebot.configs[context.storage.cavebot.activeConfig] = newText
         refreshConfig()
@@ -345,10 +345,12 @@ Panel
       context.storage.cavebot.activeConfig = 0
       refreshConfig()
     end
-    questionWindow = context.displayGeneralBox(tr('Remove config'), tr('Do you want to remove current waypoints config?'),
+    questionWindow = context.displayGeneralBox(
+      localize('BotRemoveConfig'),
+      localize('WaypointsEditorMessageRemoveConfig'),
       {
-        { text = tr('Yes'), callback = removeConfig },
-        { text = tr('No'),  callback = closeWindow },
+        { text = localize('UIButtonYes'), callback = removeConfig },
+        { text = localize('UIButtonNo'),  callback = closeWindow },
         anchor = AnchorHorizontalCenter
       }, removeConfig, closeWindow)
   end
@@ -528,7 +530,7 @@ Panel
     if not context.storage.cavebot.activeConfig or not context.storage.cavebot.configs[context.storage.cavebot.activeConfig] then
       return
     end
-    modules.client_textedit.multilineEditor("Add function",
+    modules.client_textedit.multilineEditor(localize('WaypointsEditorTitleAddFunction'),
       "function(waypoints)\n  -- your lua code, function is executed if previous goto was successful or is just after label\n\n  -- must return true to execute next command, otherwise will run in loop till correct return\n  return true\nend",
       function(newText)
         context.storage.cavebot.configs[context.storage.cavebot.activeConfig] = context.storage.cavebot.configs
@@ -694,7 +696,7 @@ Panel
           executeNextMacroCall = true
         end
       else
-        context.error("Waypoints: invalid use of goto function")
+        context.error(localize('WaypointsEditorErrorInvalidGoto'))
       end
     elseif command.command == "use" then
       local matches = regexMatch(command.text, [[([0-9]+)[^0-9]+([0-9]+)[^0-9]+([0-9]+)]])
@@ -711,7 +713,7 @@ Panel
           end
         end
       else
-        context.error("Waypoints: invalid use of use function")
+        context.error(localize('WaypointsEditorErrorInvalidUse'))
       end
     elseif command.command == "usewith" then
       local matches = regexMatch(command.text, [[([0-9]+)[^0-9]+([0-9]+)[^0-9]+([0-9]+)[^0-9]+([0-9]+)]])
@@ -729,7 +731,7 @@ Panel
           end
         end
       else
-        context.error("Waypoints: invalid use of usewith function")
+        context.error(localize('WaypointsEditorErrorInvalidUseWith'))
       end
     elseif command.command == "wait" and lastGotoSuccesful then
       if not waitTo or waitTo == 0 then
@@ -755,7 +757,7 @@ Panel
         end
       end)
       if not status then
-        context.error("Waypoints function execution error:\n" .. result)
+        context.error(localize('WaypointsEditorErrorExecution') .. ":\n" .. result)
         context.delay(2500)
       end
       if not result or usedGotoLabel then

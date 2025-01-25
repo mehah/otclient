@@ -55,7 +55,7 @@ MinimapZoomOutButton < Button
   //icon-source: /images/game/minimap/zoom_out
 
 MinimapResetButton < Button
-  !text: tr('Center')
+  !text: localize('MinimapButtonCenter')
   size: 44 20
   anchors.left: parent.left
   anchors.top: parent.top
@@ -112,11 +112,11 @@ MinimapFlagCheckBox < CheckBox
     image-clip: 52 0 26 26
 
 MinimapFlagWindow < MainWindow
-  !text: tr('Create Map Mark')
+  !text: localize('MinimapWindowTitleSetMark')
   size: 196 185
 
   Label
-    !text: tr('Position') .. ':'
+    !text: localize('FormFieldPosition') .. ':'
     text-auto-resize: true
     anchors.top: parent.top
     anchors.left: parent.left
@@ -130,7 +130,7 @@ MinimapFlagWindow < MainWindow
     margin-top: 2
 
   Label
-    !text: tr('Description') .. ':'
+    !text: localize('FormFieldDescription') .. ':'
     anchors.left: parent.left
     anchors.top: prev.bottom
     margin-top: 7
@@ -232,7 +232,7 @@ MinimapFlagWindow < MainWindow
 
   Button
     id: okButton
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     width: 64
     anchors.right: next.left
     anchors.bottom: parent.bottom
@@ -240,7 +240,7 @@ MinimapFlagWindow < MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom

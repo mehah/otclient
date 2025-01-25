@@ -22,7 +22,7 @@ BotTabBarButton < TabBarButton
 
 MiniWindow
   id: botWindow
-  !text: tr('Bot')
+  !text: localize('BotMiniWindowTitle')
   height: 600
   icon: /images/topbuttons/bot
   @onClose: modules.game_bot.onMiniWindowClose()
@@ -49,7 +49,7 @@ MiniWindow
       anchors.top: prev.top
       anchors.left: prev.right
       anchors.right: parent.right
-      !text: tr('Edit')
+      !text: localize('UIButtonEdit')
       @onClick: modules.game_bot.edit()
       margin-left: 3
       margin-right: 37
@@ -78,7 +78,7 @@ MiniWindow
       text-wrap: true
       text-auto-resize: true
       text-align: center
-      !text: tr('Status: waiting')
+      !text: localize('BotStatusWaiting')
       margin-left: 3
       margin-right: 3
 

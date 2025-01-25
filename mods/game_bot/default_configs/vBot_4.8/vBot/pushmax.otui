@@ -1,5 +1,5 @@
 PushMaxWindow < MainWindow
-  !text: tr('Pushmax Settings')
+  !text: localize('BotPushMaxSettings')
   size: 200 240
   @onEscape: self:hide()
 
@@ -76,7 +76,7 @@ PushMaxWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

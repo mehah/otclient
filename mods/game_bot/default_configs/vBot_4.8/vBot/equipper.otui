@@ -19,7 +19,7 @@ BossLabel < UIWidget
 
   Button
     id: remove
-    !text: tr('X')
+    !text: 'X'
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     width: 14
@@ -164,7 +164,7 @@ ListPanel < FlatPanel
     anchors.top: parent.top
     margin-top: 10
     margin-left: 2
-    !text: tr('More important methods come first.')
+    !text: localize('BotEquipperMethodOrder')
     text-align: left
     font: verdana-11px-rounded
     color: #aeaeae
@@ -521,7 +521,7 @@ EquipWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom
@@ -529,7 +529,7 @@ EquipWindow < MainWindow
 
   Button
     id: bossList
-    !text: tr('Boss list')
+    !text: localize('BotEquipperBossList')
     font: cipsoftFont
     anchors.left: parent.left
     anchors.bottom: parent.bottom

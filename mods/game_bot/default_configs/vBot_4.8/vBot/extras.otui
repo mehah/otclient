@@ -63,7 +63,7 @@ ExtrasCheckBox < BotSwitch
   margin-top: 7
 
 ExtrasWindow < MainWindow
-  !text: tr('Extras')
+  !text: localize('BotWindowTitleExtras')
   size: 440 360
   padding: 25
 
@@ -150,7 +150,7 @@ ExtrasWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

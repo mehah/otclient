@@ -1,7 +1,7 @@
 ItemSelectorWindow < MainWindow
   id: itemSelector
   size: 260 120
-  !text: tr("Select item")
+  !text: localize('ItemSelectorWindowTitle')
 
   Item
     id: item
@@ -28,7 +28,7 @@ ItemSelectorWindow < MainWindow
     anchors.left: prev.left
     anchors.right: prev.right
     text-align: center
-    !text: tr("Item ID")
+    !text: localize('ItemSelectorItemID')
 
   SpinBox
     id: itemCount
@@ -47,18 +47,18 @@ ItemSelectorWindow < MainWindow
     anchors.left: prev.left
     anchors.right: prev.right
     text-align: center
-    !text: tr("Count / SubType")
+    !text: localize('ItemSelectorCountSubtype')
 
   Button
     id: clearButton
-    !text: tr('Clear')
+    !text: localize('UIButtonClear')
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     width: 60
 
   Button
     id: okButton
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     anchors.bottom: parent.bottom
     anchors.right: next.left
     margin-right: 10
@@ -66,7 +66,7 @@ ItemSelectorWindow < MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     width: 60

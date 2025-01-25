@@ -1,5 +1,5 @@
 GameButtonsWindow
   id: buttons
   &save: true
-  !text: tr("Buttons")
+  !text: localize('ButtonsWindowTitle')
   icon: /images/topbuttons/buttons

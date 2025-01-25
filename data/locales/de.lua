@@ -1,4 +1,4 @@
-
+-- Author: Samuel
 locale = {
   name = "de",
   charset = "cp1252",
