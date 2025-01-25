@@ -318,19 +318,19 @@ void MapView::updateVisibleTiles()
     // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
         m_fadeType = FadeType::NONE$;
-        for (auto iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_floors[iz].fadingTimers.restart(m_floorFading);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
         m_fadeType = FadeType::OUT$;
-        for (auto iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
+        for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
             m_floors[iz].fadingTimers.restart(shift);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
         m_fadeType = FadeType::IN$;
         m_fadeFinish = false;
-        for (auto iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
+        for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
             m_floors[iz].fadingTimers.restart(shift);
         }
@@ -346,13 +346,12 @@ void MapView::updateVisibleTiles()
     const uint32_t numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
 
     auto processDiagonalRange = [&](std::vector<FloorData>& floors, uint32_t start, uint32_t end) {
-        for (auto iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             auto& floor = floors[iz].cachedVisibleTiles;
-            floor.clear();
 
-            for (auto diagonal = start; diagonal < end; ++diagonal) {
-                const auto advance = (diagonal >= m_drawDimension.height()) ? diagonal - m_drawDimension.height() : 0;
-                for (auto iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
+            for (uint_fast32_t diagonal = start; diagonal < end; ++diagonal) {
+                const auto advance = (static_cast<size_t>(diagonal) >= m_drawDimension.height()) ? diagonal - m_drawDimension.height() : 0;
+                for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
                     auto tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
                     tilePos.coveredUp(m_posInfo.camera.z - iz);
 
@@ -389,7 +388,7 @@ void MapView::updateVisibleTiles()
     };
 
     if (m_multithreading) {
-        static const uint32_t numThreads = g_asyncDispatcher.get_thread_count();
+        static const int numThreads = g_asyncDispatcher.get_thread_count();
         static BS::multi_future<void> tasks(numThreads);
         tasks.clear();
 
@@ -398,6 +397,9 @@ void MapView::updateVisibleTiles()
         for (auto i = 0; i < numThreads; ++i) {
             const auto start = i * chunkSize;
             const auto end = start + chunkSize;
+
+            for (auto& floor : m_floorThreads[i])
+                floor.cachedVisibleTiles.clear();
 
             tasks.emplace_back(g_asyncDispatcher.submit_task([=, this] {
                 processDiagonalRange(m_floorThreads[i], start, end);
