@@ -1412,7 +1412,11 @@ void Game::equipItem(const ItemPtr& item)
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendEquipItem(item->getId(), item->getTier());
+    if (g_game.getFeature(Otc::GameThingUpgradeClassification) && item->getClassification() > 0) {
+        m_protocolGame->sendEquipItemWithTier(item->getId(), item->getTier());
+    } else {
+        m_protocolGame->sendEquipItemWithCountOrSubType(item->getId(), item->getCountOrSubType());
+    }
 }
 
 void Game::mount(const bool mount)
