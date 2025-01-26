@@ -61,7 +61,7 @@ extern "C" {
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
         if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
             g_lua.init();
-            g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
+            g_resources.runEncryption(args.size() >= 3 ? args[2] :  std::string(ENCRYPTION_PASSWORD));
             std::cout << "Encryption complete" << std::endl;
 #ifdef WIN32
             MessageBoxA(NULL, "Encryption complete", "Success", 0);
