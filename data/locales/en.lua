@@ -39,6 +39,10 @@ locale:thousandsSeperator(',')
 -- action: SetMark
 -- full string: MinimapWindowTitleSetMark
 
+-- inserting arguments into translation strings:
+-- %0 does not do anything
+-- %1-%9 - arguments provided with the localize function
+
 -- UI: common buttons
 locale:translate("UIButtonOk", "OK")
 locale:translate("UIButtonCancel", "Cancel")
@@ -57,6 +61,109 @@ locale:translate("UIButtonClear", "Clear")
 locale:translate("FormFieldDescription", "Description")
 locale:translate("FormFieldPosition", "Position")
 
+-- UI: common dialog options
+locale:translate("ContextMenuCopyName", "Copy Name")
+
+-- UI: system messages
+locale:translate("Warning", "Warning")
+locale:translate("Error", "Error")
+
+-- date / time
+-- for future
+--[[
+locale:translate("ClockAM", "AM")
+locale:translate("ClockPM", "PM")
+]]
+
+-- weekday
+locale:translate("Sunday", "Sunday")
+locale:translate("Monday", "Monday")
+locale:translate("Tuesday", "Tuesday")
+locale:translate("Wednesday", "Wednesday")
+locale:translate("Thursday", "Thursday")
+locale:translate("Friday", "Friday")
+locale:translate("Saturday", "Saturday")
+
+-- month
+locale:translate("January", "January")
+locale:translate("February", "February")
+locale:translate("March", "March")
+locale:translate("April", "April")
+locale:translate("May", "May")
+locale:translate("June", "June")
+locale:translate("July", "July")
+locale:translate("August", "August")
+locale:translate("September", "September")
+locale:translate("October", "October")
+locale:translate("November", "November")
+locale:translate("December", "December")
+
+--[[
+-- for future
+-- month alternative
+-- (this is for grammatical purposes in other languages)
+locale:translate("AltJanuary", "of January")
+locale:translate("AltFebruary", "of February")
+locale:translate("AltMarch", "of March")
+locale:translate("AltApril", "of April")
+locale:translate("AltMay", "of May")
+locale:translate("AltJune", "of June")
+locale:translate("AltJuly", "of July")
+locale:translate("AltAugust", "of August")
+locale:translate("AltSeptember", "of September")
+locale:translate("AltOctober", "of October")
+locale:translate("AltNovember", "of November")
+locale:translate("AltDecember", "of December")
+
+-- month name short
+locale:translate("ShortJanuary", "Jan")
+locale:translate("ShortFebruary", "Feb")
+locale:translate("ShortMarch", "Mar")
+locale:translate("ShortApril", "Apr")
+locale:translate("ShortMay", "May")
+locale:translate("ShortJune", "Jun")
+locale:translate("ShortJuly", "Jul")
+locale:translate("ShortAugust", "Aug")
+locale:translate("ShortSeptember", "Sep")
+locale:translate("ShortOctober", "Oct")
+locale:translate("ShortNovember", "Nov")
+locale:translate("ShortDecember", "Dec")
+
+-- place suffixes (1st, 2nd, ..., nth)
+-- (this is for grammatical purposes in other languages)
+locale:translate("suffix_0", "th")
+locale:translate("suffix_1", "st")
+locale:translate("suffix_2", "nd")
+locale:translate("suffix_3", "rd")
+locale:translate("suffix_4", "th")
+locale:translate("suffix_5", "th")
+locale:translate("suffix_6", "th")
+locale:translate("suffix_7", "th")
+locale:translate("suffix_8", "th")
+locale:translate("suffix_9", "th")
+locale:translate("suffix_10", "th")
+locale:translate("suffix_11", "th")
+locale:translate("suffix_12", "th")
+locale:translate("suffix_13", "th")
+locale:translate("suffix_14", "th")
+locale:translate("suffix_15", "th")
+locale:translate("suffix_16", "th")
+locale:translate("suffix_17", "th")
+locale:translate("suffix_18", "th")
+locale:translate("suffix_19", "th")
+locale:translate("suffix_20", "th")
+locale:translate("suffix_n1", "st")
+locale:translate("suffix_n2", "nd")
+locale:translate("suffix_n3", "rd")
+locale:translate("suffix_n4", "th")
+locale:translate("suffix_n5", "th")
+locale:translate("suffix_n6", "th")
+locale:translate("suffix_n7", "th")
+locale:translate("suffix_n8", "th")
+locale:translate("suffix_n9", "th")
+locale:translate("suffix_n0", "th")
+]]
+
 -- UI: window titles misc
 locale:translate("WindowTitleTextEdit", "Edit text")
 
@@ -71,6 +178,76 @@ locale:translate("ItemSelectorWindowTitle", "Select Item")
 -- minimap
 locale:translate("MinimapWindowTitleSetMark", "Create Map Mark")
 locale:translate("MinimapButtonCenter", "Center")
+
+-- text window (books and house list)
+locale:translate("TextWindowDescriptionWriter", "You read the following, written by \n%1\n")
+locale:translate("TextWindowDescriptionTime", "You read the following, written on \n%1.\n")
+locale:transalte("TextWindowWrittenAt", "on %1.\n")
+locale:translate("TextWindowEmpty", "It is empty.")
+locale:translate("TextWindowWriteable", "You can enter new text.")
+locale:translate("TextWindowShowText", "Show Text")
+locale:translate("TextWindowEditText", "Edit Text")
+locale:translate("TextWindowOneNamePerLine", "Enter one name per line.")
+locale:translate("TextWindowDescriptionHouseList", "Edit List")
+
+-- things
+locale:translate("ThingsAssetLoadingFailed", "Couldn't load assets")
+locale:translate("ThingsStaticDataLoadingFailed", "Couldn't load staticdata")
+locale:translate("ThingsProtocolSpritesWarning", "Loading sprites instead of protobuf is unstable, use it at your own risk!")
+locale:translate("ThingsDatLoadingFailed", "Unable to load dat file, please place a valid dat in '%1.dat'")
+locale:translate("ThingsSprLoadingFailed", "Unable to load spr file, please place a valid spr in '%1.spr'")
+
+-- unjustified kills panel
+locale:translate("UnjustifiedPanelTitle", "Unjustified Points")
+locale:translate("UnjustifiedPanelOpenPvP", "Open PvP")
+locale:translate("UnjustifiedPanelOpenPvPSituations", "Open PvP Situations")
+locale:translate("UnjustifiedPanelSkullTime", "Skull Time")
+
+-- updater
+locale:translate("UpdaterTitle", "Updater")
+locale:translate("UpdaterChangeURL", "Change updater URL")
+locale:translate("UpdaterCheckInProgress", "Checking for updates")
+locale:translate("UpdaterMessageFileDownload", "Downloading:\n%1")
+locale:translate("UpdaterMessageFileDownloadRetry", "Downloading (%1 retry):\n%2")
+locale:translate("UpdaterError", "Updater Error")
+locale:translate("UpdaterTimeout", "Timeout")
+locale:translate("UpdaterMessagePending", "Updating client (may take few seconds)")
+locale:translate("UpdaterMessageUpdatingFiles", "Updating %1 files")
+
+-- viplist
+locale:translate("VipListNoGroup", "No Group")
+locale:translate("VipListPanelTitle", "VIP List")
+locale:translate("VipListDialogVipAdd", "Add new VIP")
+locale:translate("VipListDialogVipEdit", "Edit VIP")
+locale:translate("VipListDialogVipEditDescription", "Description")
+locale:translate("VipListDialogShowOffline", "Show Offline")
+locale:translate("VipListDialogHideOffline", "Hide Offline")
+locale:translate("VipListDialogShowGroups", "Show Groups")
+locale:translate("VipListDialogHideGroups", "Hide Groups")
+locale:translate("VipListDialogPlayerEdit", "Edit %1")
+locale:translate("VipListDialogPlayerRemove", "Remove %1")
+locale:translate("VipListDialogPlayerOpenChat", "Message to %1")
+locale:translate("VipListDialogGroupAdd", "Add new group")
+locale:translate("VipListDialogGroupEdit", "Edit group %1")
+locale:translate("VipListDialogGroupRemove", "Remove group %1")
+locale:translate("VipListPrivateChatInvite", "Invite to private chat")
+locale:translate("VipListPrivateChatExclude", "Exclude from private chat")
+locale:translate("VipListMessagePlayerLoggedIn", "%1 has logged in.")
+locale:translate("VipListMessagePlayerLoggedOut", "%1 has logged out.")
+locale:translate("VipListSortName", "Sort by name")
+locale:translate("VipListSortType", "Sort by type")
+locale:translate("VipListSortStatus", "Sort by status")
+locale:translate("VipListGroupLimitTitle", "Maximum of User-Created Groups Reached")
+locale:translate("VipListGroupLimitMessage", "You have already reached the maximum of groups you can create yourself.")
+locale:translate("VipListWindowTitleGroupEdit", "Edit VIP group")
+locale:translate("VipListWindowFormGroupName", "Please enter a group name")
+locale:translate("VipListWindowTitleVipAdd", "Add to VIP list")
+locale:translate("VipListLabelMemberOfGroups", "Member of the following groups")
+locale:translate("VipListLabelNotifyOnLogin", "Notify-Login")
+locale:translate("VipListCheckboxNotifyOnLogin", "Notify on login")
+locale:translate("VipListCheckboxEmpty", "Empty")
+locale:translate("VipListLabelCharacterName", "Please enter a character name")
+locale:translate("VipListLabelGroupName", "Please enter a group name")
 
 -- bot: main window
 locale:translate("BotMainWindowTitle", "Config editor & manager")
@@ -113,8 +290,6 @@ locale:translate("BotConfigUploadFailSize", "Config %1 is too big, maximum size 
 locale:translate("BotConfigUploadFailCompression", "Config %1 is invalid (can't be compressed)")
 locale:translate("BotConfigUploadSuccessTitle", "Succesful config upload")
 locale:translate("BotConfigUploadSuccessText", "Config %1 has been uploaded.\n%2")
-
-
 locale:translate("BotConfigDownloadTitle", "Download Config")
 locale:translate("BotConfigDownloadText", "Downloading config with hash %1. Please wait.")
 locale:translate("BotConfigDownloadErrorTitle", "Config download error")

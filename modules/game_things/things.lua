@@ -27,15 +27,15 @@ function load(version)
     if version >= 1281 and not g_game.getFeature(GameLoadSprInsteadProtobuf) then
         local filePath = resolvepath(string.format('/things/%d/', version))
         if not g_things.loadAppearances(filePath) then
-            errorList[#errorList + 1] = "Couldn't load assets"
+            errorList[#errorList + 1] = localize('ThingsAssetLoadingFailed')
         end
         if not g_things.loadStaticData(filePath) then
-            errorList[#errorList + 1] = "Couldn't load staticdata"
+            errorList[#errorList + 1] = localize('ThingsStaticDataLoadingFailed')
         end
     else
         if g_game.getFeature(GameLoadSprInsteadProtobuf) then
-            local warningBox = displayErrorBox(tr('Warning'),
-                'Load spr instead protobuf it\'s unstable, use by yours risk!')
+            local warningBox = displayErrorBox(localize('Warning'),
+                localize('ThingsProtocolSpritesWarning'))
             addEvent(function()
                 warningBox:raise()
                 warningBox:focus()
@@ -51,17 +51,17 @@ function load(version)
         end
 
         if not g_things.loadDat(datPath) then
-            errorList[#errorList + 1] = tr('Unable to load dat file, please place a valid dat in \'%s.dat\'', datPath)
+            errorList[#errorList + 1] = localize('ThingsDatLoadingFailed', datPath)
         end
         if not g_sprites.loadSpr(sprPath) then
-            errorList[#errorList + 1] = tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
+            errorList[#errorList + 1] = localize('ThingsSprLoadingFailed', sprPath)
         end
     end
 
     loaded = #errorList == 0
 
     if not loaded then
-        local messageBox = displayErrorBox(tr('Error'), table.concat(errorList, "\n"))
+        local messageBox = displayErrorBox(localize('Error'), table.concat(errorList, "\n"))
         addEvent(function()
             messageBox:raise()
             messageBox:focus()

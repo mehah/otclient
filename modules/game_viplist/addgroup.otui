@@ -9,7 +9,7 @@ MainWindow
 
   Label
     id: header
-    !text: tr('Please enter a group name:')
+    !text: localize('VipListLabelGroupName') .. ":"
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
@@ -35,7 +35,7 @@ MainWindow
 
   Button
     id: okButton
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     anchors.right: next.left
     anchors.bottom: parent.bottom
     margin-right: 11
@@ -43,7 +43,7 @@ MainWindow
     @onClick: modules.game_viplist.addGroup()
 
   Button
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     margin-bottom: 6

@@ -65,9 +65,9 @@ function init()
         math.randomseed(os.time())
         local randomIndex = math.random(1, #default_info)
         local randomItem = default_info[randomIndex]
-        showOffWindow.title:setText(tr(randomItem.Title))
+        showOffWindow.title:setText(randomItem.Title)
         image:setImageSource(randomItem.image)
-        description:setText(tr(randomItem.description))
+        description:setText(randomItem.description)
         monsterOutfit:setVisible(false)
         bossOutfit:setVisible(false)
         widget:resize(widget:getWidth(), description:getHeight())
@@ -124,8 +124,8 @@ function setShowOffData(data)
 
     local description = widget:recursiveGetChildById('description')
 
-    showOffWindow.title:setText(tr(data.title))
-    description:setText(tr(data.description))
+    showOffWindow.title:setText(data.title)
+    description:setText(data.description)
 end
 
 -- @ Calendar/Events scheduler

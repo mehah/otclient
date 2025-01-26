@@ -41,9 +41,9 @@ local function parseExpression(content, controller)
         local script = content:sub(pos + 2, lastPos - 1)
 
         local res = nil
-        if content:sub(pos - 2, pos - 1) == 'tr' then
+        if content:sub(pos - 2, pos - 1) == 'localize' then
             pos = pos - 2
-            res = tr(script)
+            res = localize(script)
         else
             local f = loadstring('return function(self) return ' .. script .. ' end')
             res = f()(controller)

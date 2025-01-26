@@ -81,7 +81,7 @@ CalendarGrid < MiniQtWindow
     id: calendarCurrentMonth
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: parent.top
-    !text: tr('September 2023')
+    !text: 'September 2023'
     margin-top: 28
     height: 16
     text-align: center
