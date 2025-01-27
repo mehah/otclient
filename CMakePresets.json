@@ -101,6 +101,40 @@
         "TOGGLE_PRE_COMPILED_HEADER": "OFF",
         "SPEED_UP_BUILD_UNITY": "OFF"
       }
+    },
+    {
+      "name": "macos-release",
+      "displayName": "macOS - Release",
+      "description": "Sets Ninja generator, compilers, build and install directory and set build type as release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        },
+        "BUILD_STATIC_LIBRARY": "ON",
+        "CMAKE_BUILD_TYPE": "Release",
+        "OPTIONS_ENABLE_SCCACHE": "ON",
+        "CMAKE_CXX_FLAGS_RELEASE": "-O1 -DNDEBUG"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "macos-debug",
+      "inherits": "macos-release",
+      "displayName": "macOS - Debug",
+      "description": "Build Debug Mode",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "DEBUG_LOG": "ON",
+        "ASAN_ENABLED": "ON",
+        "BUILD_STATIC_LIBRARY": "OFF"
+      }
     }
   ],
   "buildPresets": [
@@ -123,6 +157,14 @@
     {
       "name": "windows-debug",
       "configurePreset": "windows-debug"
+    },
+    {
+      "name": "macos-release",
+      "configurePreset": "macos-release"
+    },
+    {
+      "name": "macos-debug",
+      "configurePreset": "macos-debug"
     }
   ]
 }
