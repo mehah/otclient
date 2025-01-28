@@ -49,7 +49,7 @@ OfferPanel2 < Panel
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    !text: tr('Buy')
+    !text: localize('StoreButtonBuyItem')
     font: cipsoftFont
     image-color: #75bfff
 
@@ -198,7 +198,7 @@ storeCategory < UIWidget
       margin-left: 10
       text-align: center
       text-auto-resize: true
-      !text: tr('General Stats')
+      !text: localize('StoreItemStats')
       color: #ffffff
       font: cipsoftFont
       $checked:

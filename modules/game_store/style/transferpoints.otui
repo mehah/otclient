@@ -7,7 +7,7 @@ StoreWindow
 
   Label
     id: transferPointsLabel
-    !text: tr('Gift Tibia Coins')
+    !text: localize('StoreWindowTitleGiftTc')
     text-align: center
     font: verdana-11px-antialised
     anchors.top: parent.top
@@ -17,7 +17,7 @@ StoreWindow
   
   Label
     id: descriptionText
-    !text: tr('Please select the amount of Tibia\nCoins you like to gift and enter the\nname of the character that should\nreceive the Tibia Coins.')
+    !text: localize('StoreMessageTcTransfer')
     text-wrap: true
     text-auto-resize:true
     anchors.top: transferPointsLabel.bottom
@@ -27,7 +27,7 @@ StoreWindow
 
   Label
     id: recipient
-    !text: tr('Recipient:')
+    !text: localize('StoreTcRecipient') .. ":"
     anchors.top: descriptionText.bottom
     anchors.left: parent.left
     size: 57 12
@@ -48,7 +48,7 @@ StoreWindow
 
   Label
     id: transferAmount
-    !text: tr('Amount to transfer:')
+    !text: localize('StoreTcToTransfer') .. ":"
     anchors.top: transferableAmount.bottom
     anchors.left: parent.left
     size: 180 12
@@ -71,7 +71,7 @@ StoreWindow
 
   Label
     id: transferableAmount
-    !text: tr('Transferable Tibia Coins:')
+    !text: localize('StoreTransferableTc') .. ":"
     anchors.top: recipient.bottom
     anchors.left: parent.left
     size: 155 12
@@ -115,7 +115,7 @@ StoreWindow
     anchors.bottom: parent.bottom
     margin-right: 12
     margin-bottom: 7
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     font: cipsoftFont
     size: 43 20
     color: #ffffff
@@ -127,7 +127,7 @@ StoreWindow
     anchors.bottom: parent.bottom
     margin-right: 10
     margin-bottom: 7
-    !text: tr('Gift')
+    !text: localize('StoreButtonGiftTc')
     font: cipsoftFont
     size: 43 20
     color: #ffffff

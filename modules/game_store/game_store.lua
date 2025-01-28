@@ -931,7 +931,7 @@ function chooseOffert(self, focusedChild)
                         acceptWindow = nil
                     end
                 else
-                    displayErrorBox(controllerShop.ui:getText(), tr("You don't have enough coins"))
+                    displayErrorBox(controllerShop.ui:getText(), localize("StoreMessageNotEnoughCoins"))
                     acceptWindow:destroy()
                     acceptWindow = nil
                 end
@@ -940,17 +940,17 @@ function chooseOffert(self, focusedChild)
                 acceptWindow:destroy()
                 acceptWindow = nil
             end
-            local coinType = isTransferable and "transferable coins" or "regular coins"
-            local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, subOffer.price, coinType)
-            local detailsMessage = string.format("%dx %s\nPrice: %d %s", subOffer.count, product.name, subOffer.price, coinType)
-            acceptWindow = displayGeneralSHOPBox(tr('Confirmation of Purchase'), confirmationMessage, detailsMessage,
+            local coinType = isTransferable and localize('StoreCurrencyTcTransferable') or localize('StoreCurrencyTcRegular')
+            local confirmationMessage = localize('StoreMessageConfirmBuy', product.name, subOffer.price, coinType)
+            local detailsMessage = localize("%dx %s\n%s: %d %s", subOffer.count, product.name, localize('StoreLabelPrice'), subOffer.price, coinType)
+            acceptWindow = displayGeneralSHOPBox(localize('StoreWindowTitleConfirmBuy'), confirmationMessage, detailsMessage,
                 getProductData(product), {
                     {
-                        text = tr('Buy'),
+                        text = localize('StoreButtonBuyItem'),
                         callback = acceptFunc
                     },
                     {
-                        text = tr('Cancel'),
+                        text = localize('UIButtonCancel'),
                         callback = cancelFunc
                     },
                     anchor = AnchorHorizontalCenter

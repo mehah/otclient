@@ -1638,7 +1638,7 @@ function onTalk(name, level, mode, message, channelId, creaturePos)
             modules.game_textmessage.displayPrivateMessage(name .. ':\n' .. message)
         end
     else
-        local channel = tr('Local Chat')
+        local channel = localize('ChatChannelNameDefault')
         if not defaultMessage then
             channel = channels[channelId]
         end
@@ -2027,8 +2027,8 @@ function onClickIgnoreButton()
 end
 
 function online()
-    defaultTab = addTab(tr('Local Chat'), true)
-    serverTab = addTab(tr('Server Log'), false)
+    defaultTab = addTab(localize('ChatChannelNameDefault'), true)
+    serverTab = addTab(localize('ChatChannelNameServerLog'), false)
 
     if g_game.getClientVersion() >= 820 then
         local tab = addTab('NPCs', false)

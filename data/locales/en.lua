@@ -56,10 +56,14 @@ locale:translate("UIButtonSettings", "Settings")
 locale:translate("UIButtonEdit", "Edit")
 locale:translate("UIButtonRemove", "Remove")
 locale:translate("UIButtonClear", "Clear")
+locale:translate("UIButtonPaginationPrev", "Prev Page")
+locale:translate("UIButtonPaginationNext", "Next Page")
 
 -- UI: common form fields
 locale:translate("FormFieldDescription", "Description")
 locale:translate("FormFieldPosition", "Position")
+locale:translate("FormFieldCurrentPage", "Page")
+locale:translate("FormFieldFind", "Find")
 
 -- UI: common dialog options
 locale:translate("ContextMenuCopyName", "Copy Name")
@@ -170,6 +174,14 @@ locale:translate("WindowTitleTextEdit", "Edit text")
 -- UI: possibly unused
 locale:translate("ButtonsWindowTitle", "Buttons")
 
+-- misc
+locale:translate("ThereIsNoWay", "There is no way.")
+
+-- chat
+locale:translate("ChatChannelNameDefault", "Local Chat")
+locale:translate("ChatChannelNameServerLog", "Server Log")
+locale:translate("ChatChannelNameLoot", "Loot")
+
 -- item selector
 locale:translate("ItemSelectorCountSubtype", "Count / SubType")
 locale:translate("ItemSelectorItemID", "Item ID")
@@ -178,6 +190,41 @@ locale:translate("ItemSelectorWindowTitle", "Select Item")
 -- minimap
 locale:translate("MinimapWindowTitleSetMark", "Create Map Mark")
 locale:translate("MinimapButtonCenter", "Center")
+
+-- stash
+locale:translate("StashWindowTitle", "Supply Stash")
+locale:translate("StashWindowWithdraw", "Stash Withdraw")
+
+-- store
+locale:translate("StoreButtonBuyItem", "Buy")
+locale:translate("StoreButtonGiftTc", "Gift")
+locale:translate("StoreButtonGetCoins", "Get")
+locale:translate("StoreButtonGetCoinsTooltip", "Get Tibia Coins")
+locale:translate("StoreButtonTransactionHistory", "History")
+locale:translate("StoreButtonTransferCoins", "Transfer Coins")
+locale:translate("StoreButtonSellCharacter", "Setup up an auction to sell you currents characters.")
+locale:translate("StoreWindowTitleGiftTc", "Gift Tibia Coins")
+locale:translate("StoreItemStats", "General Stats")
+locale:translate("StoreTransferableTc", "Transferable Tibia Coins")
+locale:translate("StoreTcToTransfer", "Amount to transfer")
+locale:translate("StoreTcRecipient", "Recipient")
+locale:translate("StoreMessageTcTransfer", "Please select the amount of Tibia\nCoins you like to gift and enter the\nname of the character that should\nreceive the Tibia Coins.")
+locale:translate("StoreGiftTcButton", "Please select the amount of Tibia\nCoins you like to gift and enter the\nname of the character that should\nreceive the Tibia Coins.")
+locale:translate("StoreWindowTitleRenameChar", "Enter New Character Name")
+locale:translate("StoreWindowMessageRenameChar", "Please enter the new name for your character")
+locale:translate("StoreWindowTitleMain", "Store")
+locale:translate("StoreWindowTitleConfirmBuy", "Confirmation of Purchase")
+locale:translate("StoreWindow", "Confirmation of Purchase")
+locale:translate("StoreLabelPrice", "Price")
+locale:translate("StoreMessageConfirmBuy", "Do you want to buy the product \"%1\" for %2 %3?")
+locale:translate("StoreMessageNotEnoughCoins", "You don't have enough coins")
+locale:translate("StoreCurrencyTcRegular", "regular coins")
+locale:translate("StoreCurrencyTcTransferable", "transferable coins")
+
+-- tasks
+locale:translate("TaskSystemWindowTitle", "Tasks")
+locale:translate("TaskSystemAlertTitle", "Tasks")
+locale:translate("TaskSystemAbortMessage", "Do you really want to abort this task?")
 
 -- text window (books and house list)
 locale:translate("TextWindowDescriptionWriter", "You read the following, written by \n%1\n")
