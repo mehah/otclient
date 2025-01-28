@@ -40,36 +40,33 @@ local function clipfunction(value)
 end
 
 function ItemsDatabase.setRarityItem(widget, item, style)
-    if not g_game.getFeature(GameColorizedLootValue) then
+    if not g_game.getFeature(GameColorizedLootValue) or not widget then
         return
     end
-
-    if not widget then
-        return
-    end
-
     local frameOption = modules.client_options.getOption('framesRarity')
     if frameOption == "none" then
         return
     end
+    local imagePath = '/images/ui/item'
+    local clip = nil
     if item then
         local price = type(item) == "number" and item or (item and item:getMeanPrice()) or 0
         local itemRarity = getColorForValue(price)
         if itemRarity then
-            local clip = clipfunction(price)
+            clip = clipfunction(price)
             if clip ~= "" then
-                local imagePath = '/images/ui/item'
                 if frameOption == "frames" then
                     imagePath = "/images/ui/rarity_frames"
                 elseif frameOption == "corners" then
                     imagePath = "/images/ui/containerslot-coloredges"
                 end
-                widget:setImageClip(clip)
-                widget:setImageSource(imagePath)
+            else
+                clip = nil
             end
         end
     end
-
+    widget:setImageClip(clip)
+    widget:setImageSource(imagePath)
     if style then
         widget:setStyle(style)
     end
