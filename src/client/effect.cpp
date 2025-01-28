@@ -142,9 +142,15 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos, const
         return;
 
     Thing::setPosition(position, stackPos, hasElevation);
+    int pattern_x = getNumPatternX();
+    int pattern_y = getNumPatternY();
+    if (pattern_x == 0 || pattern_y == 0) {
+        g_logger.warning(std::format("Failed to send magic effect {:d}. No sprites declared.", m_clientId));
+        return;
+    }
 
-    m_numPatternX = m_position.x % getNumPatternX();
-    m_numPatternY = m_position.y % getNumPatternY();
+    m_numPatternX = m_position.x % pattern_x;
+    m_numPatternY = m_position.y % pattern_y;
 }
 
 ThingType* Effect::getThingType() const {
