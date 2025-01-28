@@ -26,7 +26,7 @@ function init()
         onGameEnd = offline
     })
 
-    skillsButton = modules.game_mainpanel.addToggleButton('skillsButton', tr('Skills') .. ' (Alt+S)',
+    skillsButton = modules.game_mainpanel.addToggleButton('skillsButton', localize('SkillsWindowTitle') .. ' (Alt+S)',
                                                                    '/images/options/button_skills', toggle, false, 1)
     skillsButton:setOn(true)
     skillsWindow = g_ui.loadUI('skills')
@@ -413,8 +413,8 @@ end
 
 function onLevelChange(localPlayer, value, percent)
     setSkillValue('level', comma_value(value))
-    local text = tr('You have %s percent to go', 100 - percent) .. '\n' ..
-                     tr('%s of experience left', expToAdvance(localPlayer:getLevel(), localPlayer:getExperience()))
+    local text = localize('SkillsWindowTooltipPercentNeeded', 100 - percent) .. '\n' ..
+                     localize('SkillsWindowTooltipExperienceNeeded', expToAdvance(localPlayer:getLevel(), localPlayer:getExperience()))
 
     if localPlayer.expSpeed ~= nil then
         local expPerHour = math.floor(localPlayer.expSpeed * 3600)
@@ -423,8 +423,8 @@ function onLevelChange(localPlayer, value, percent)
             local hoursLeft = (nextLevelExp - localPlayer:getExperience()) / expPerHour
             local minutesLeft = math.floor((hoursLeft - math.floor(hoursLeft)) * 60)
             hoursLeft = math.floor(hoursLeft)
-            text = text .. '\n' .. tr('%s of experience per hour', comma_value(expPerHour))
-            text = text .. '\n' .. tr('Next level in %d hours and %d minutes', hoursLeft, minutesLeft)
+            text = text .. '\n' .. localize('SkillsWindowTooltipExperiencePerHour', comma_value(expPerHour))
+            text = text .. '\n' .. localize('SkillsWindowTooltipTimeToLevelUp', hoursLeft, minutesLeft)
         end
     end
 
@@ -466,26 +466,25 @@ function onStaminaChange(localPlayer, stamina)
 
     -- TODO not all client versions have premium time
     if stamina > 2400 and g_game.getClientVersion() >= 1038 and localPlayer:isPremium() then
-        local text = tr('You have %s hours and %s minutes left', hours, minutes) .. '\n' ..
-                         tr('Now you will gain 50%% more experience')
+        local text = localize('SkillsWindowTooltipXPBoostTimeLeft', hours, minutes) .. '\n' ..
+                         localize('SkillsWindowTooltipXPBoostBonus')
         setSkillPercent('stamina', percent, text, 'green')
     elseif stamina > 2400 and g_game.getClientVersion() >= 1038 and not localPlayer:isPremium() then
-        local text = tr('You have %s hours and %s minutes left', hours, minutes) .. '\n' .. tr(
-                         'You will not gain 50%% more experience because you aren\'t premium player, now you receive only 1x experience points')
+        local text = localize('SkillsWindowTooltipStaminaTimeLeft', hours, minutes) .. '\n' .. localize('SkillsWindowTooltipStaminaPremiumOnly')
         setSkillPercent('stamina', percent, text, '#89F013')
     elseif stamina >= 2400 and g_game.getClientVersion() < 1038 then
-        local text = tr('You have %s hours and %s minutes left', hours, minutes) .. '\n' ..
-                         tr('If you are premium player, you will gain 50%% more experience')
+        local text = localize('SkillsWindowTooltipStaminaTimeLeft', hours, minutes) .. '\n' ..
+                         localize('SkillsWindowTooltipStaminaPremiumActive')
         setSkillPercent('stamina', percent, text, 'green')
     elseif stamina < 2400 and stamina > 840 then
-        setSkillPercent('stamina', percent, tr('You have %s hours and %s minutes left', hours, minutes), 'orange')
+        setSkillPercent('stamina', percent, localize('SkillsWindowTooltipStaminaTimeLeft', hours, minutes), 'orange')
     elseif stamina <= 840 and stamina > 0 then
-        local text = tr('You have %s hours and %s minutes left', hours, minutes) .. '\n' ..
-                         tr('You gain only 50%% experience and you don\'t may gain loot from monsters')
+        local text = localize('SkillsWindowTooltipStaminaTimeLeft', hours, minutes) .. '\n' ..
+                         localize('SkillsWindowTooltipStaminaLow')
         setSkillPercent('stamina', percent, text, 'red')
     elseif stamina == 0 then
-        local text = tr('You have %s hours and %s minutes left', hours, minutes) .. '\n' ..
-                         tr('You don\'t may receive experience and loot from monsters')
+        local text = localize('SkillsWindowTooltipStaminaTimeLeft', hours, minutes) .. '\n' ..
+                         localize('SkillsWindowTooltipStaminaZero')
         setSkillPercent('stamina', percent, text, 'black')
     end
 end
@@ -502,7 +501,7 @@ function onOfflineTrainingChange(localPlayer, offlineTrainingTime)
     local percent = 100 * offlineTrainingTime / (12 * 60) -- max is 12 hours
 
     setSkillValue('offlineTraining', hours .. ':' .. minutes)
-    setSkillPercent('offlineTraining', percent, tr('You have %s percent', percent))
+    setSkillPercent('offlineTraining', percent, localize('SkillsWindowOfflineTimePercentLeft', percent))
 end
 
 function onRegenerationChange(localPlayer, regenerationTime)
@@ -531,7 +530,7 @@ end
 
 function onMagicLevelChange(localPlayer, magiclevel, percent)
     setSkillValue('magiclevel', magiclevel)
-    setSkillPercent('magiclevel', percent, tr('You have %s percent to go', 100 - percent))
+    setSkillPercent('magiclevel', percent, localize('SkillsWindowTooltipPercentNeeded', 100 - percent))
 
     onBaseMagicLevelChange(localPlayer, localPlayer:getBaseMagicLevel())
 end
@@ -542,7 +541,7 @@ end
 
 function onSkillChange(localPlayer, id, level, percent)
     setSkillValue('skillId' .. id, level)
-    setSkillPercent('skillId' .. id, percent, tr('You have %s percent to go', 100 - percent))
+    setSkillPercent('skillId' .. id, percent, localize('SkillsWindowTooltipPercentNeeded', 100 - percent))
 
     onBaseSkillChange(localPlayer, id, localPlayer:getSkillBaseLevel(id))
 

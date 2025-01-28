@@ -55,7 +55,7 @@ SkillPercentPanel < ProgressBar
 
 MiniWindow
   id: skillWindow
-  !text: tr('Skills')
+  !text: localize('SkillsWindowTitle')
   height: 150
   icon: /images/topbuttons/skills
   @onOpen: modules.game_skills.onMiniWindowOpen()
@@ -72,13 +72,13 @@ MiniWindow
       id: experience
       height: 15
       SkillNameLabel
-        !text: tr('Experience')
+        !text: localize('StatExperience')
       SkillValueLabel
 
     SkillButton
       id: level
       SkillNameLabel
-        !text: tr('Level')
+        !text: localize('StatLevel')
       SkillValueLabel
       RedPercentPanel
 
@@ -86,61 +86,61 @@ MiniWindow
       id: health
       height: 15
       SkillNameLabel
-        !text: tr('Hit Points')
+        !text: localize('StatHealth')
       SkillValueLabel
 
     SkillButton
       id: mana
       height: 15
       SkillNameLabel
-        !text: tr('Mana')
+        !text: localize('StatMana')
       SkillValueLabel
 
     SkillButton
       id: soul
       height: 15
       SkillNameLabel
-        !text: tr('Soul Points')
+        !text: localize('StatSoul')
       SkillValueLabel
 
     SkillButton
       id: capacity
       height: 15
       SkillNameLabel
-        !text: tr('Capacity')
+        !text: localize('StatCapacity')
       SkillValueLabel
 
     SkillButton
       id: speed
       height: 15
       SkillNameLabel
-        !text: tr('Speed')
+        !text: localize('StatSpeed')
       SkillValueLabel
 
     SkillButton
       id: regenerationTime
       SkillNameLabel
-        !text: tr('Regeneration Time')
+        !text: localize('StatRegeneration')
       SkillValueLabel
 
     SkillButton
       id: stamina
       SkillNameLabel
-        !text: tr('Stamina')
+        !text: localize('StatStamina')
       SkillValueLabel
       RedPercentPanel
 
     SkillButton
       id: offlineTraining
       SkillNameLabel
-        !text: tr('Offline Training')
+        !text: localize('StatOfflineTraining')
       SkillValueLabel
       RedPercentPanel
 
     SkillButton
       id: magiclevel
       SkillNameLabel
-        !text: tr('Magic Level')
+        !text: localize('SkillMagicLevel')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_magic
@@ -151,7 +151,7 @@ MiniWindow
     SkillButton
       id: skillId0
       SkillNameLabel
-        !text: tr('Fist Fighting')
+        !text: localize('SkillFist')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_fist
@@ -161,7 +161,7 @@ MiniWindow
     SkillButton
       id: skillId1
       SkillNameLabel
-        !text: tr('Club Fighting')
+        !text: localize('SkillClub')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_club
@@ -171,7 +171,7 @@ MiniWindow
     SkillButton
       id: skillId2
       SkillNameLabel
-        !text: tr('Sword Fighting')
+        !text: localize('SkillSword')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_sword
@@ -181,7 +181,7 @@ MiniWindow
     SkillButton
       id: skillId3
       SkillNameLabel
-        !text: tr('Axe Fighting')
+        !text: localize('SkillAxe')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_axe
@@ -191,7 +191,7 @@ MiniWindow
     SkillButton
       id: skillId4
       SkillNameLabel
-        !text: tr('Distance Fighting')
+        !text: localize('SkillDistance')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_distance
@@ -201,7 +201,7 @@ MiniWindow
     SkillButton
       id: skillId5
       SkillNameLabel
-        !text: tr('Shielding')
+        !text: localize('SkillShielding')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_shielding
@@ -211,7 +211,7 @@ MiniWindow
     SkillButton
       id: skillId6
       SkillNameLabel
-        !text: tr('Fishing')
+        !text: localize('SkillFishing')
       SkillValueLabel
       ImageSkill
         image-source: /images/icons/icon_fishing
@@ -225,59 +225,59 @@ MiniWindow
     SmallSkillButton
       id: skillId7
       SkillNameLabel
-        !text: tr('Critical Hit Chance')
+        !text: localize('SkillCriticalHitChance')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId8
       SkillNameLabel
-        !text: tr('Critical Hit Damage')
+        !text: localize('SkillCriticalHitDamage')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId9
       SkillNameLabel
-        !text: tr('Life Leech Chance')
+        !text: localize('SkillLifeLeechChance')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId10
       SkillNameLabel
-        !text: tr('Life Leech Amount')
+        !text: localize('SkillLifeLeechPercent')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId11
       SkillNameLabel
-        !text: tr('Mana Leech Chance')
+        !text: localize('SkillManaLeechChance')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId12
       SkillNameLabel
-        !text: tr('Mana Leech Amount')
+        !text: localize('SkillManaLeechPercent')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId13
       SkillNameLabel
-        !text: tr('Fatal')
+        !text: localize('SkillOnslaught')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId14
       SkillNameLabel
-        !text: tr('Dodge')
+        !text: localize('SkillRuse')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId15
       SkillNameLabel
-        !text: tr('Momentum')
+        !text: localize('SkillMomentum')
       SkillValueLabel
 
     SmallSkillButton
       id: skillId16
       SkillNameLabel
-        !text: tr('Transcendence')
+        !text: localize('SkillTranscendence')
       SkillValueLabel

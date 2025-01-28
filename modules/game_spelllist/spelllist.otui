@@ -38,7 +38,7 @@ FilterButton < Button
 
 MainWindow
   id: spelllistWindow
-  !text: tr('Spell List')
+  !text: localize('SpellListWindowTitle')
   size: 550 400
   @onEscape: toggle()
 
@@ -55,7 +55,7 @@ MainWindow
 
   Button
     id: buttonCancel
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom
@@ -73,78 +73,78 @@ MainWindow
     id: labelName
     anchors.left: spellList.right
     anchors.top: spellList.top
-    !text: tr('Name') .. ':'
+    !text: localize('SpellListLabelName') .. ':'
 
   Label
     anchors.left: parent.left
     anchors.top: spellList.bottom
-    !text: tr('Filters') .. ':'
+    !text: localize('SpellListLabelFilters') .. ':'
     margin-top: 8
 
   FilterButton
     id: buttonFilterLevel
-    !text: tr('Level')
-    !tooltip: tr('Hide spells for higher exp. levels')
+    !text: localize('SpellListLabelLevel')
+    !tooltip: localize('SpellListTooltipLevel')
 
   FilterButton
     id: buttonFilterVocation
-    !text: tr('Vocation')
-    !tooltip: tr('Hide spells for other vocations')
+    !text: localize('SpellListLabelVocation')
+    !tooltip: localize('SpellListTooltipVocation')
 
   SpellInfoLabel
     id: labelFormula
     anchors.left: spellList.right
     anchors.top: labelName.bottom
-    !text: tr('Formula') .. ':'
+    !text: localize('SpellListLabelFormula') .. ':'
 
 
   SpellInfoLabel
     id: labelVocation
     anchors.left: spellList.right
     anchors.top: labelFormula.bottom
-    !text: tr('Vocation') .. ':'
+    !text: localize('SpellListLabelVocation') .. ':'
 
   SpellInfoLabel
     id: labelGroup
     anchors.left: spellList.right
     anchors.top: labelVocation.bottom
-    !text: tr('Group') .. ':'
+    !text: localize('SpellListLabelGroup') .. ':'
 
   SpellInfoLabel
     id: labelType
     anchors.left: spellList.right
     anchors.top: labelGroup.bottom
-    !text: tr('Type') .. ':'
+    !text: localize('SpellListLabelType') .. ':'
 
   SpellInfoLabel
     id: labelCooldown
     anchors.left: spellList.right
     anchors.top: labelType.bottom
-    !text: tr('Cooldown') .. ':'
+    !text: localize('SpellListLabelCooldown') .. ':'
 
   SpellInfoLabel
     id: labelLevel
     anchors.left: spellList.right
     anchors.top: labelCooldown.bottom
-    !text: tr('Level') .. ':'
+    !text: localize('SpellListLabelLevel') .. ':'
 
   SpellInfoLabel
     id: labelMana
     anchors.left: spellList.right
     anchors.top: labelLevel.bottom
-    !text: tr('Mana') .. ' / ' .. tr('Soul') .. ':'
+    !text: localize('SpellListLabelMana') .. ' / ' .. localize('SpellListLabelSoul') .. ':'
 
   SpellInfoLabel
     id: labelPremium
     anchors.left: spellList.right
     anchors.top: labelMana.bottom
-    !text: tr('Premium') .. ':'
+    !text: localize('SpellListLabelPremium') .. ':'
 
   SpellInfoLabel
     id: labelDescription
     anchors.left: spellList.right
     anchors.top: labelPremium.bottom
-    !text: tr('Description') .. ':'
+    !text: localize('SpellListLabelDescription') .. ':'
 
   SpellInfoValueLabel
     id: labelNameValue
@@ -202,7 +202,7 @@ MainWindow
     anchors.left: spellList.right
     width: 70
     font: verdana-11px-monochrome
-    !text: tr('Vocation')
+    !text: localize('SpellListLabelVocation')
     margin-top: 30
     margin-left: 20
 
@@ -212,7 +212,7 @@ MainWindow
     anchors.top: prev.bottom
     margin-top: 3
     margin-left: 3
-    !text: tr('Any')
+    !text: localize('SpellListLabelVocationAny')
     width: 75
 
   CheckBox
@@ -220,7 +220,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Sorcerer')
+    !text: localize('SpellListLabelVocationSorcerer')
     width: 75
 
   CheckBox
@@ -228,7 +228,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Druid')
+    !text: localize('SpellListLabelVocationDruid')
     width: 75
 
   CheckBox
@@ -236,7 +236,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Paladin')
+    !text: localize('SpellListLabelVocationPaladin')
     width: 75
 
   CheckBox
@@ -244,7 +244,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Knight')
+    !text: localize('SpellListLabelVocationKnight')
     width: 75
 
   Label
@@ -253,7 +253,7 @@ MainWindow
     anchors.left: labelVocationFilter.right
     width: 70
     font: verdana-11px-monochrome
-    !text: tr('Group')
+    !text: localize('SpellListLabelGroup')
     margin-top: 30
     margin-left: 20
 
@@ -263,7 +263,7 @@ MainWindow
     anchors.top: prev.bottom
     margin-top: 3
     margin-left: 3
-    !text: tr('Any')
+    !text: localize('SpellListLabelTypeAny')
     width: 75
 
   CheckBox
@@ -271,7 +271,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Attack')
+    !text: localize('SpellListLabelTypeAttack')
     width: 75
 
   CheckBox
@@ -279,7 +279,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Healing')
+    !text: localize('SpellListLabelTypeHealing')
     width: 75
 
   CheckBox
@@ -287,7 +287,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Support')
+    !text: localize('SpellListLabelTypeSupport')
     width: 75
 
   Label
@@ -296,7 +296,7 @@ MainWindow
     anchors.left: labelGroupFilter.right
     width: 70
     font: verdana-11px-monochrome
-    !text: tr('Premium')
+    !text: localize('SpellListLabelPremium')
     margin-top: 30
     margin-left: 20
 
@@ -306,7 +306,7 @@ MainWindow
     anchors.top: prev.bottom
     margin-top: 3
     margin-left: 3
-    !text: tr('Any')
+    !text: localize('SpellListLabelTypeFreeOrPremium')
     width: 75
 
   CheckBox
@@ -314,7 +314,7 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('No')
+    !text: localize('UIButtonNo')
     width: 75
 
   CheckBox
@@ -322,5 +322,5 @@ MainWindow
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 3
-    !text: tr('Yes')
+    !text: localize('UIButtonYes')
     width: 75
