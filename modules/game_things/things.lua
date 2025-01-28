@@ -59,21 +59,27 @@ function load(version)
     end
 
     loaded = #errorList == 0
-
-    if not loaded then
-        local messageBox = displayErrorBox(localize('Error'), table.concat(errorList, "\n"))
-        addEvent(function()
-            messageBox:raise()
-            messageBox:focus()
-        end)
-
-        disconnect(g_game, {
-            onClientVersionChange = load
-        })
-        g_game.setClientVersion(0)
-        g_game.setProtocolVersion(0)
-        connect(g_game, {
-            onClientVersionChange = load
-        })
+    if loaded then
+        -- loading client files was successful, try to load sounds now
+        -- sound files are optional, this means that failing to load them
+        -- will not block logging into game
+        g_sounds.loadClientFiles(resolvepath(string.format('/sounds/%d/', version)))
+        return
     end
+
+    -- loading client files failed, show an error
+    local messageBox = displayErrorBox(localize('Error'), table.concat(errorList, "\n"))
+    addEvent(function()
+        messageBox:raise()
+        messageBox:focus()
+    end)
+
+    disconnect(g_game, {
+        onClientVersionChange = load
+    })
+    g_game.setClientVersion(0)
+    g_game.setProtocolVersion(0)
+    connect(g_game, {
+        onClientVersionChange = load
+    })
 end

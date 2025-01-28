@@ -114,17 +114,15 @@ addAlarm("creatureDetected", "Creature Detected", false, 1, 1)
 addAlarm("playerDetected", "Player Detected", false, 1, 1)
 addAlarm("creatureName", "Creature Name:", "", 3, 1, "You can add a name or part of it, that if found in any visible creature name will trigger alert.\nYou can add many, just separate them by comma.")
 
-
 local lastCall = now
 local function alarm(file, windowText)
   if now - lastCall < 2000 then return end -- 2s delay
   lastCall = now
 
   if not g_resources.fileExists(file) then
-    file = "/sounds/alarm.ogg"
+    file = "sounds/alarm.ogg"
     lastCall = now + 4000 -- alarm.ogg length is 6s
   end
-
 
   if modules.game_bot.g_app.getOs() == "windows" and config.flashClient.enabled then
     g_window.flash()
@@ -137,7 +135,7 @@ end
 onTextMessage(function(mode, text)
   if not config.enabled then return end
   if mode == 22 and config.damageTaken.enabled then
-    return alarm('/sounds/magnum.ogg', "Damage Received!")
+    return alarm('sounds/magnum.ogg', "Damage Received!")
   end
 
   if config.customMessage.enabled then
@@ -152,7 +150,7 @@ onTextMessage(function(mode, text)
         part = part:lower()
 
         if text:find(part) then
-          return alarm('/sounds/magnum.ogg', "Special Message!")
+          return alarm('sounds/magnum.ogg', "Special Message!")
         end
       end
     end
@@ -166,11 +164,11 @@ onTalk(function(name, level, mode, text, channelId, pos)
   if config.ignoreFriends.enabled and isFriend(name) then return end -- ignore friends if enabled
 
   if mode == 1 and config.defaultMsg.enabled then
-    return alarm("/sounds/magnum.ogg", "Default Message!")
+    return alarm("sounds/magnum.ogg", "Default Message!")
   end
 
   if mode == 4 and config.privateMsg.enabled then
-    return alarm("/sounds/Private_Message.ogg", "Private Message!")
+    return alarm("sounds/Private_Message.ogg", "Private Message!")
   end
 end)
 
@@ -179,13 +177,13 @@ macro(100, function()
   if not config.enabled then return end
   if config.lowHealth.enabled then
     if hppercent() < config.lowHealth.value then
-      return alarm("/sounds/Low_Health.ogg", "Low Health!")
+      return alarm("sounds/Low_Health.ogg", "Low Health!")
     end
   end
 
   if config.lowMana.enabled then
     if hppercent() < config.lowMana.value then
-      return alarm("/sounds/Low_Mana.ogg", "Low Mana!")
+      return alarm("sounds/Low_Mana.ogg", "Low Mana!")
     end
   end
 
@@ -193,15 +191,15 @@ macro(100, function()
     if not spec:isLocalPlayer() and not (config.ignoreFriends.enabled and isFriend(spec)) then
 
       if config.creatureDetected.enabled then
-        return alarm("/sounds/magnum.ogg", "Creature Detected!")
+        return alarm("sounds/magnum.ogg", "Creature Detected!")
       end
 
       if spec:isPlayer() then
         if spec:isTimedSquareVisible() and config.playerAttack.enabled then
-          return alarm("/sounds/Player_Attack.ogg", "Player Attack!")
+          return alarm("sounds/Player_Attack.ogg", "Player Attack!")
         end
         if config.playerDetected.enabled then
-          return alarm("/sounds/Player_Detected.ogg", "Player Detected!")
+          return alarm("sounds/Player_Detected.ogg", "Player Detected!")
         end
       end
 
@@ -213,7 +211,7 @@ macro(100, function()
           local frag = fragments[i]:trim():lower()
 
           if name:lower():find(frag) then
-            return alarm("/sounds/alarm.ogg", "Special Creature Detected!")
+            return alarm("sounds/alarm.ogg", "Special Creature Detected!")
           end
         end
       end
