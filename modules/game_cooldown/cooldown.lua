@@ -232,8 +232,8 @@ function onSpellGroupCooldown(groupId, duration)
         removeEvent(icon.event)
     end
 
-    progressRect.icon = icon
     if progressRect then
+        progressRect.icon = icon
         removeEvent(progressRect.event)
         local updateFunc = function()
             updateCooldown(progressRect, duration)

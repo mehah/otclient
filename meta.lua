@@ -159,10 +159,6 @@ function g_things.loadStaticData(file) end
 
 ---@param file string
 ---@return boolean
-function g_things.loadSounds(file) end
-
----@param file string
----@return boolean
 function g_things.loadDat(file) end
 
 ---@param file string
@@ -5834,6 +5830,14 @@ function g_sounds.createSoundEffect() end
 
 ---@return boolean
 function g_sounds.isEaxEnabled() end
+
+---@param file string
+---@return boolean
+function g_sounds.loadClientFiles(directory) end
+
+---@param audioFileId string
+---@return string
+function g_sounds.getAudioFileNameById(audioFileId) end
 
 --------------------------------
 --------- SoundSource ----------

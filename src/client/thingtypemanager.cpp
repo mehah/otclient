@@ -38,7 +38,6 @@
 
 #include <appearances.pb.h>
 #include <staticdata.pb.h>
-#include <sounds.pb.h>
 
 #include <nlohmann/json.hpp>
 
@@ -285,13 +284,6 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
         return false;
     }
 
-    return false;
-}
-
-bool ThingTypeManager::loadSounds(const std::string& /* file */)
-{
-    // to be implemented
-    // to be moved to g_sounds
     return false;
 }
 
