@@ -432,6 +432,6 @@ message AppearanceTypesCountSoundEffect {
 }
 
 message MinMaxFloat {
-	optional float min = 1;
-	optional float max = 2;
+	optional float min_value = 1;
+	optional float max_value = 2;
 }
