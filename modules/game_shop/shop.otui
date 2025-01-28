@@ -132,7 +132,7 @@ ShopOfferImage < ShopOffer
   
 MainWindow
   id: shopWindow
-  !text: tr('Shop')
+  !text: localize('StoreWindowTitle')
   size: 750 500
   @onEscape: modules.game_shop.hide()
   $mobile:
@@ -160,7 +160,7 @@ MainWindow
       anchors.top: prev.bottom
       margin-top: 10
       visible: false
-      !text: tr("Buy points2")
+      !text: localize("StoreButtonBuyPoints")
 
   Panel
     id: adPanel
@@ -222,7 +222,7 @@ MainWindow
 
   Button
     id: transactionHistory
-    !text: tr('Transaction history')
+    !text: localize('StoreButtonTransactionHistory')
     width: 128
     anchors.left: parent.left
     anchors.bottom: parent.bottom

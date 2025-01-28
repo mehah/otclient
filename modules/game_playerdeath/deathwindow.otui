@@ -1,6 +1,6 @@
 DeathWindow < MainWindow
   id: deathWindow
-  !text: tr('You are dead')
+  !text: localize('DeathWindowTitle')
   &baseWidth: 350
   &baseHeight: 15
 

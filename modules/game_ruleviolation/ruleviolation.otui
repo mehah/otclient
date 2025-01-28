@@ -36,20 +36,20 @@ MainWindow
   @onEscape: hide()
 
   RVLabel
-    !text: tr('Name') .. ':'
+    !text: localize('RuleViolationLabelPlayerName') .. ':'
 
   RVTextEdit
     id: nameText
 
   RVLabel
-    !text: tr('Statement') .. ':'
+    !text: localize('RuleViolationLabelPlayerMessage') .. ':'
 
   RVTextEdit
     id: statementText
     enabled: false
 
   RVLabel
-    !text: tr('Reason') .. ':'
+    !text: localize('RuleViolationLabelPenaltyReason') .. ':'
 
   TextList
     id: reasonList
@@ -70,7 +70,7 @@ MainWindow
     pixels-scroll: true
 
   RVLabel
-    !text: tr('Action') .. ':'
+    !text: localize('RuleViolationLabelAction') .. ':'
 
   TextList
     id: actionList
@@ -92,14 +92,14 @@ MainWindow
 
   CheckBox
     id: ipBanCheckBox
-    !text: tr('IP Address Banishment')
+    !text: localize('RuleViolationCheckboxIpBan')
     margin-top: 10
     anchors.top: prev.bottom
     anchors.left: parent.left
     anchors.right: parent.right
 
   RVLabel
-    !text: tr('Comment') .. ':'
+    !text: localize('RuleViolationLabelComment') .. ':'
 
   RVTextEdit
     id: commentText

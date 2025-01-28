@@ -281,5 +281,5 @@ UIWidget
       anchors.right: parent.right
       width: 45
       margin-top: 8
-      !text: tr('Reset')
+      !text: localize('UIButtonReset')
       @onClick : resetActions()
