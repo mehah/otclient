@@ -1,6 +1,6 @@
 MainWindow
   id: transferWindow
-  !text: tr('Gift Tibia Coins')
+  !text: localize('StoreWindowTitleGiftTc')
   size: 280 240
   @onEscape: modules.game_shop.hideTransfer()
 
@@ -10,13 +10,13 @@ MainWindow
     anchors.right: parent.right
     text-wrap: true
     height: 56
-    !text: tr('Please select the amount of Tibia Coins you would like to gift and enter the name of the character that should receive the Tibia Coins.')
+    !text: localize('StoreMessageTcTransfer')
 
   Label
     anchors.top: prev.bottom
     anchors.left: parent.left
     margin-top: 20
-    !text: tr('Reciepient:')
+    !text: localize('StoreTcRecipient') .. ":"
 
   TextEdit
     id: recipient
@@ -32,14 +32,14 @@ MainWindow
     anchors.right: parent.right
     margin-top: 10
     text-align: center
-    !text: tr('Transferable Tibia Coins:')
+    !text: localize('StoreTransferableTc') .. ":"
 
   Label
     id: coinsAmountLabel
     anchors.top: prev.bottom
     anchors.left: parent.left
     margin-top: 20
-    !text: tr('Amount to gift: ')
+    !text: localize('StoreWindowLabelGiftAmount') .. ": "
 
   SpinBox
     id: coinsAmount
@@ -71,7 +71,7 @@ MainWindow
 
   Button
     id: giftButton
-    !text: tr('Gift')
+    !text: localize('StoreButtonGiftTc')
     font: cipsoftFont
     size: 45 21
     anchors.verticalCenter: prev.verticalCenter

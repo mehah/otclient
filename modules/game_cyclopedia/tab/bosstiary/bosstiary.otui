@@ -249,7 +249,7 @@ UIWidget
     margin-bottom: 5
     size: 60 20
     text-align: center
-    !text: tr('1 / 1')
+    !text: '1 / 1'
     color: #C2C2C2
   Button
     id: NextPageButton

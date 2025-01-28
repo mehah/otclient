@@ -230,7 +230,7 @@ MainWindow
 
   Label
     id: transferOpen
-    !text: tr('by kondra (otclient@otclient.ovh)')
+    !text: 'by kondra (otclient@otclient.ovh)'
     width: 450
     anchors.left: prev. right
     margin-left: 45

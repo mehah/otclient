@@ -6,7 +6,7 @@ historyData < UIWidget
     anchors.bottom : parent.bottom
     id: rank
     width: 150
-    !text: tr('1')
+    !text: '1'
     text-align: center
     color: #dfdfdfcf
     phantom: false
@@ -27,7 +27,7 @@ historyData < UIWidget
     anchors.bottom : parent.bottom
     id: name
     width: 216
-    !text: tr('-')
+    !text: '-'
     text-align: left
     color: #ff0000cf
     phantom: true
@@ -47,7 +47,7 @@ blessingTEST < UIWidget
     margin-left: 3
   Label
     id: text
-    !text: tr('loooooong text')
+    !text: localize('BlessingsLongTextPlaceholder')
     text-align: center
     margin-top: 5
     width: 65

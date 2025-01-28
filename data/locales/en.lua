@@ -195,6 +195,9 @@ locale:translate("ThereIsNoWay", "There is no way.")
 locale:translate("DebugInfoTitle", "Debug Info")
 locale:translate("DebugInfoProxies", "Proxies")
 
+-- blessings
+locale:translate("BlessingsLongTextPlaceholder", "This is a placeholder for a very long text.")
+
 -- chat
 locale:translate("ChatChannelNameDefault", "Local Chat")
 locale:translate("ChatChannelNameServerLog", "Server Log")
@@ -351,6 +354,7 @@ locale:translate("StoreButtonTransactionHistory", "History")
 locale:translate("StoreButtonTransferCoins", "Transfer Coins")
 locale:translate("StoreButtonSellCharacter", "Setup up an auction to sell you currents characters.")
 locale:translate("StoreWindowTitleGiftTc", "Gift Tibia Coins")
+locale:translate("StoreWindowLabelGiftAmount", "Amount to gift")
 locale:translate("StoreItemStats", "General Stats")
 locale:translate("StoreTransferableTc", "Transferable Tibia Coins")
 locale:translate("StoreTcToTransfer", "Amount to transfer")
@@ -367,6 +371,10 @@ locale:translate("StoreMessageConfirmBuy", "Do you want to buy the product \"%1\
 locale:translate("StoreMessageNotEnoughCoins", "You don't have enough coins")
 locale:translate("StoreCurrencyTcRegular", "regular coins")
 locale:translate("StoreCurrencyTcTransferable", "transferable coins")
+locale:translate("StoreTitleBuyItem", "Buying from shop")
+locale:translate("StoreMessageBuyItem", "Do you want to buy %1 for %2 premium points?"")
+locale:translate("StoreCoinBalanceLabel", "Points")
+locale:translate("StoreButton", "Store")
 
 -- tasks
 locale:translate("TaskSystemWindowTitle", "Tasks")

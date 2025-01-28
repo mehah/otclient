@@ -264,7 +264,7 @@ UIWidget
         anchors.left: BonusIcon.right
         margin-left: 5
         text-auto-resize: true
-        !text: tr('?')
+        !text: '?'
         color: #C7C7C7
       UIWidget
         id: CharmBase
@@ -343,7 +343,7 @@ UIWidget
         margin-left: 5
         margin-bottom: 1
         text-auto-resize: true
-        !text: tr('?')
+        !text: '?'
         color: #C7C7C7
       UIWidget
         id: Icon2
@@ -359,7 +359,7 @@ UIWidget
         margin-left: 5
         margin-bottom: 1
         text-auto-resize: true
-        !text: tr('?')
+        !text: '?'
         color: #C7C7C7
       UIWidget
         id: Icon3
@@ -375,7 +375,7 @@ UIWidget
         margin-left: 5
         margin-bottom: 1
         text-auto-resize: true
-        !text: tr('?')
+        !text: '?'
         color: #C7C7C7
       UIWidget
         id: Icon4
@@ -391,7 +391,7 @@ UIWidget
         margin-left: 5
         margin-bottom: 1
         text-auto-resize: true
-        !text: tr('?')
+        !text: '?'
         color: #C7C7C7
       UIWidget
         id: Icon5
@@ -407,7 +407,7 @@ UIWidget
         margin-left: 5
         margin-bottom: 1
         text-auto-resize: true
-        !text: tr('?')
+        !text: '?'
         color: #C7C7C7
       UIWidget
         id: LocationField

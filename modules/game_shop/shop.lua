@@ -144,7 +144,7 @@ function createShop()
     end
     shop = g_ui.displayUI('shop')
     shop:hide()
-   -- shopButton = modules.game_mainpanel.addStoreButton('store', tr('Shop'), '/images/options/store_large', toggle,false, 8) -- \game_mainpanel\mainpanel.lua
+   -- shopButton = modules.game_mainpanel.addStoreButton('store', localize('StoreButton'), '/images/options/store_large', toggle,false, 8) -- \game_mainpanel\mainpanel.lua
     shopButton = nil
 
     connect(shop.categories, {
@@ -311,8 +311,8 @@ function onCoinBalance(coins, transferableCoins)
     if not shop or otcv8shop then
         return
     end
-    shop.infoPanel.points:setText(tr("Points:") .. " " .. coins)
-    transferWindow.coinsBalance:setText(tr('Transferable Tibia Coins: ') .. coins)
+    shop.infoPanel.points:setText(localize('StoreCoinBalanceLabel') .. ": " .. coins)
+    transferWindow.coinsBalance:setText(localize('StoreTransferableTc') .. ": " .. coins)
     transferWindow.coinsAmount:setMaximum(coins)
     shop.infoPanel.buy:hide()
     shop.infoPanel:setHeight(20)
@@ -411,7 +411,7 @@ function processMessage(data)
         msgWindow:destroy()
     end
 
-    local title = tr(data["title"])
+    local title = localize(data["title"])
     local msg = data["msg"]
     msgWindow = displayInfoBox(title, msg)
     msgWindow.onDestroy = function(widget)
@@ -440,7 +440,7 @@ function processStatus(data)
         processAd(data['ad'])
     end
     if data['points'] then
-        shop.infoPanel.points:setText(tr("Points:") .. " " .. formatNumberWithCommas(data['points']))
+        shop.infoPanel.points:setText(localize('StoreCoinBalanceLabel') .. ": " .. formatNumberWithCommas(data['points']))
     end
     if data['buyUrl'] and data['buyUrl']:sub(1, 4):lower() == "http" then
         shop.infoPanel.buy:show()
@@ -642,15 +642,15 @@ function buyOffer(widget)
             msgWindow:destroy()
         end
 
-        local title = tr("Buying from shop")
-        local msg = "Do you want to buy " .. item.title .. " for " .. item.cost .. " premium points?"
+        local title = localize("StoreTitleBuyItem")
+        local msg = localize('StoreMessageBuyItem', item.title, item.cost)
         msgWindow = displayGeneralBox(title, msg, {
             {
-                text = tr('Yes'),
+                text = localize('UIButtonYes'),
                 callback = buyConfirmed
             },
             {
-                text = tr('No'),
+                text = localize('UIButtonNo'),
                 callback = buyCanceled
             },
             anchor = AnchorHorizontalCenter
