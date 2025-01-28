@@ -184,7 +184,7 @@ MainWindow
 
   Button
     id: okButton
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     width: 64
     anchors.right: next.left
     anchors.bottom: parent.bottom
@@ -193,7 +193,7 @@ MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom
@@ -239,7 +239,7 @@ HotkeyAssignWindow < MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom

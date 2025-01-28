@@ -172,7 +172,7 @@ MainWindow
     margin-top: 15
 
   QtButton
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     size: 64 20
     anchors.right: parent.right
     anchors.top: prev.bottom

@@ -24,7 +24,7 @@ AmountWindow < MainWindow
 
   Button
     id: buttonCancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     height: 20
     anchors.left: amountScrollBar.horizontalCenter
     anchors.right: amountScrollBar.right
@@ -34,7 +34,7 @@ AmountWindow < MainWindow
 
   Button
     id: buttonOk
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     height: 20
     anchors.right: amountScrollBar.horizontalCenter
     anchors.left: amountScrollBar.left

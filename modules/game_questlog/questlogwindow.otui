@@ -47,6 +47,6 @@ QuestLogWindow < MainWindow
     id: closeButton
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     width: 90
     @onClick: self:getParent():destroy()

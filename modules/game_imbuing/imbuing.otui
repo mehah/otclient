@@ -332,7 +332,7 @@ MainWindow
 
   Button
     id: close
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     width: 50
     anchors.right: parent.right
     anchors.bottom: parent.bottom

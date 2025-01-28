@@ -33,7 +33,7 @@ Panel
 
   Button
     id: sellCancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.right: parent.right
     anchors.bottom: next.bottom
     margin-right: 6
@@ -105,7 +105,7 @@ Panel
 
   Button
     id: buyCancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 5

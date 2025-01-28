@@ -105,14 +105,14 @@ MainWindow
     id: commentText
 
   Button
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom
     @onClick: hide()
 
   Button
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     width: 64
     margin-right: 5
     anchors.right: prev.left

@@ -33,7 +33,7 @@ CountWindow < MainWindow
 
   Button
     id: buttonCancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     height: 20
     anchors.left: countScrollBar.horizontalCenter
     anchors.right: countScrollBar.right
@@ -43,7 +43,7 @@ CountWindow < MainWindow
 
   Button
     id: buttonOk
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     height: 20
     anchors.right: countScrollBar.horizontalCenter
     anchors.left: countScrollBar.left

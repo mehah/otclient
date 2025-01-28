@@ -39,5 +39,5 @@ MainWindow
     SmallButton
       id: cancel
       width: 45
-      !text: tr("Cancel")
+      !text: localize('UIButtonCancel')
   

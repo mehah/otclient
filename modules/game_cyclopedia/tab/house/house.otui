@@ -299,7 +299,7 @@ UIWidget
     Button
       id: cancel
       size: 43 20
-      !text: tr('Cancel')
+      !text: localize('UIButtonCancel')
       color: #C0C0C0
       anchors.bottom: parent.bottom
       anchors.right: parent.right
@@ -411,7 +411,7 @@ UIWidget
     Button
       id: cancel
       size: 43 20
-      !text: tr('Cancel')
+      !text: localize('UIButtonCancel')
       color: #C0C0C0
       anchors.bottom: parent.bottom
       anchors.right: parent.right
@@ -605,7 +605,7 @@ UIWidget
     Button
       id: cancel
       size: 43 20
-      !text: tr('Cancel')
+      !text: localize('UIButtonCancel')
       color: #C0C0C0
       anchors.bottom: parent.bottom
       anchors.right: parent.right
@@ -851,7 +851,7 @@ UIWidget
     Button
       id: cancel
       size: 43 20
-      !text: tr('Cancel')
+      !text: localize('UIButtonCancel')
       color: #C0C0C0
       anchors.bottom: parent.bottom
       anchors.right: parent.right
@@ -1036,7 +1036,7 @@ UIWidget
     Button
       id: cancel
       size: 43 20
-      !text: tr('Cancel')
+      !text: localize('UIButtonCancel')
       color: #C0C0C0
       anchors.bottom: parent.bottom
       anchors.right: parent.right
@@ -1221,7 +1221,7 @@ UIWidget
     Button
       id: cancel
       size: 43 20
-      !text: tr('Cancel')
+      !text: localize('UIButtonCancel')
       color: #C0C0C0
       anchors.bottom: parent.bottom
       anchors.right: parent.right

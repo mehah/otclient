@@ -211,7 +211,7 @@ MainWindow
     size: 40 20
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     //font: verdana-bold-8px-antialiased
     text-offset: 0 -1
     color: #C0C0C0

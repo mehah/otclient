@@ -338,7 +338,7 @@ function tryExit()
             'If you shut down the program, your character might stay in the game.\nClick on \'Logout\' to ensure that you character leaves the game properly.\nClick on \'Exit\' if you want to exit the program without logging out your character.'),
         {
             {
-                text = tr('Cancel'),
+                text = localize('UIButtonCancel'),
                 callback = cancelFunc
             },
             {

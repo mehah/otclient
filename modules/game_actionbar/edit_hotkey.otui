@@ -50,7 +50,7 @@ MainWindow
 
   Button
     id: clearButton
-    !text: tr('Clear')
+    !text: localize('UIButtonClear')
     width: 80
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.bottom: parent.bottom
@@ -58,7 +58,7 @@ MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 80
     anchors.right: parent.right
     anchors.bottom: parent.bottom

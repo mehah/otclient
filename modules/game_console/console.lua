@@ -1222,7 +1222,7 @@ function processChannelTabMenu(tab, mousePos, mouseButton)
     local characterName = g_game.getCharacterName()
     channelName = tab:getText()
     if tab ~= defaultTab and tab ~= serverTab then
-        menu:addOption(tr('Close'), function()
+        menu:addOption(localize('UIButtonClose'), function()
             removeTab(channelName)
         end)
         -- menu:addOption(tr('Show Server Messages'), function() --[[TODO]] end)

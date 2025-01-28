@@ -60,7 +60,7 @@ MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom
