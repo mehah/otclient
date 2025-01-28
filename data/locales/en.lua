@@ -43,6 +43,9 @@ locale:thousandsSeperator(',')
 -- %0 does not do anything
 -- %1-%9 - arguments provided with the localize function
 
+-- language selection
+locale:translate("LanguagePickerWindowMessage", "Select your language")
+
 -- UI: common buttons
 locale:translate("UIButtonOk", "OK")
 locale:translate("UIButtonCancel", "Cancel")
@@ -170,17 +173,88 @@ locale:translate("suffix_n0", "th")
 
 -- UI: window titles misc
 locale:translate("WindowTitleTextEdit", "Edit text")
+locale:translate("WindowTitleGraphicsError", "Graphics card driver not detected")
+locale:translate("WindowMessageGraphicsError", "No graphics card detected, everything will be drawn using the CPU,\nthus the performance will be really bad.\nPlease update your graphics driver to have a better performance.")
 
 -- UI: possibly unused
 locale:translate("ButtonsWindowTitle", "Buttons")
 
+-- bottom panel (login screen)
+locale:translate("BottomPanelTitleRandomHint", "Random Hint")
+locale:translate("BottomPanelTitleEventSchedule", "Event Schedule")
+locale:translate("BottomPanelActiveEvents", "Active")
+locale:translate("BottomPanelUpcomingEvents", "Upcoming")
+locale:translate("BottomPanelTitleBoosted", "Boosted")
+locale:translate("BottomPanelLabelBoostedCreature", "Creature")
+locale:translate("BottomPanelLabelBoostedBoss", "Boss")
+locale:translate("BottomPanelWindowTitleEventSchedule", "Event Schedule")
+locale:translate("BottomPanelWindowHintEventSchedule", "* Event starts/ends at server save of this day.")
+
 -- misc
 locale:translate("ThereIsNoWay", "There is no way.")
+locale:translate("DebugInfoTitle", "Debug Info")
+locale:translate("DebugInfoProxies", "Proxies")
 
 -- chat
 locale:translate("ChatChannelNameDefault", "Local Chat")
 locale:translate("ChatChannelNameServerLog", "Server Log")
 locale:translate("ChatChannelNameLoot", "Loot")
+
+-- character list + entergame
+locale:translate("CharacterListTitleConnecting", "Please wait")
+locale:translate("CharacterListMessageConnecting", "Connecting to game server...")
+locale:translate("CharacterListMessageReconnect", "Trying to reconnect in %1 seconds.")
+locale:translate("CharacterListTitleLoginError", "Login Error")
+locale:translate("CharacterListTitleConnectionError", "Connection Error")
+locale:translate("CharacterListTitleUpdateRequired", "Update needed")
+locale:translate("CharacterListMessageUpdateRequired", "Enter with your account again to update your client.")
+locale:translate("CharacterListMessageUpdateNeeded", "Your client needs updating, try redownloading it.")
+locale:translate("CharacterListAccountStatus", "Account Status")
+locale:translate("CharacterListAccountFrozen", "Frozen")
+locale:translate("CharacterListAccountBanned", "Suspended")
+locale:translate("CharacterListAccountFree", "Free Account")
+locale:translate("CharacterListAccountPremiumGratis", "Gratis Premium Account")
+locale:translate("CharacterListAccountPremiumNormal", "Premium Account (%1) days left")
+locale:translate("CharacterListMessageNoCharacterSelected", "You must select a character to login!")
+locale:translate("CharacterListWindowTitle", "Character List")
+locale:translate("CharacterListColumnPlayer", "Character")
+locale:translate("CharacterListColumnStatus", "Status")
+locale:translate("CharacterListColumnLevel", "Level")
+locale:translate("CharacterListColumnVocation", "Vocation")
+locale:translate("CharacterListColumnWorld", "World")
+locale:translate("CharacterListMotd", "Message of the day")
+
+-- entergame
+locale:translate("EnterGameTitleOld", "Enter Game")
+locale:translate("EnterGameTitleNew", "Journey Onwards")
+locale:translate("EnterGameEmail", "Email")
+locale:translate("EnterGameAccName", "Acc Name")
+locale:translate("EnterGamePassword", "Password")
+locale:translate("EnterGameClientVersion", "Client Version")
+locale:translate("EnterGameClientPort", "Port")
+locale:translate("EnterGameRememberEmail", "Remember e-mail")
+locale:translate("EnterGameTooltipRememberEmail", "Be aware that your email address will be stored on your configuration file \"config.otml\" if you activate this option.")
+locale:translate("EnterGameRememberPassword", "Remember password")
+locale:translate("EnterGameTooltipRememberPassword", "Remember account and password when the client starts")
+locale:translate("EnterGameButtonAccountLost", "Forgot password and/or email")
+locale:translate("EnterGameAuthenticatorToken", "Authenticator Token")
+locale:translate("EnterGameCheckboxKeepSession", "Stay logged during session")
+locale:translate("EnterGameThingsErrorAssets", "Things are not loaded, please put assets in things/%1/<assets>.")
+locale:translate("EnterGameThingsErrorSprites", "Things are not loaded, please put spr and dat in things/%1/<here>.")
+locale:translate("EnterGameHttpError", "ERROR , try adding \n- ip/login.php \n- Enable HTTP login")
+locale:translate("EnterGameMessageConnectingHttp", "Connecting to login server...\nServer: [%1]")
+locale:translate("EnterGameMessageConnecting", "Connecting to login server...")
+locale:translate("EnterGameMessageAlreadyLogged", "Cannot login while already in game.")
+locale:translate("EnterGameTitleWaitList", "Waiting List")
+locale:translate("EnterGameTitleServerList", "Server list")
+locale:translate("EnterGameLabelServerList", "Make sure that your client uses\nthe correct game client version")
+locale:translate("EnterGameCheckboxAutoLogin", "Auto login")
+locale:translate("EnterGameTooltipAutoLogin", "Open charlist automatically when starting client")
+locale:translate("EnterGameCheckboxHttpLogin", "Enable HTTP login")
+locale:translate("EnterGameTooltipHttpLogin", "If login fails using HTTPS (encrypted) try with HTTP (unencrypted)")
+locale:translate("EnterGameButtonLogin", "Login")
+locale:translate("EnterGameButtonCreateAccount", "Create New Account")
+locale:translate("EnterGameLabelServer", "Server")
 
 -- item selector
 locale:translate("ItemSelectorCountSubtype", "Count / SubType")

@@ -150,7 +150,7 @@ CharacterWidget < UIWidget
 
 MainWindow
   id: charactersWindow
-  !text: tr('Character List')
+  !text: localize('CharacterListWindowTitle')
   visible: false
   @onEnter: CharacterList.doLogin()
   @onEscape: CharacterList.hide(true)
@@ -192,7 +192,7 @@ MainWindow
     width: 250
     anchors.left: parent.left
     anchors.top: characters.top
-    !text: tr('Character') .. ''
+    !text: localize('CharacterListColumnPlayer')
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
         self:hide()
@@ -203,7 +203,7 @@ MainWindow
     anchors.left: parent.left
     anchors.top: characters.top
     margin-left: 250
-    !text: tr('Status') .. ''
+    !text: localize('CharacterListColumnStatus')
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
         self:hide()
@@ -214,7 +214,7 @@ MainWindow
     anchors.left: parent.left
     anchors.top: characters.top
     margin-left: 350
-    !text: tr('Level') .. ''
+    !text: localize('CharacterListColumnLevel')
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
         self:hide()
@@ -225,7 +225,7 @@ MainWindow
     anchors.left: parent.left
     anchors.top: characters.top
     margin-left: 410
-    !text: tr('Vocation') .. ''
+    !text: localize('CharacterListColumnVocation')
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
         self:hide()
@@ -236,7 +236,7 @@ MainWindow
     anchors.right: characters.right
     anchors.top: characters.top
     margin-left: 550
-    !text: tr('World') .. ''
+    !text: localize('CharacterListColumnWorld')
     @onSetup: |
       if not(g_game.getFeature(GameEnterGameShowAppearance)) then
         self:hide()
@@ -293,7 +293,7 @@ MainWindow
 
   Label
     id: accountStatusCaption
-    !text: tr('Account Status') .. ':'
+    !text: localize('CharacterListAccountStatus') .. ':'
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.bottom: next.top
@@ -318,7 +318,7 @@ MainWindow
 
   Label
     id: accountStatusLabel
-    !text: tr('Free Account')
+    !text: localize('CharacterListAccountFree')
     anchors.left: parent.left
     text-auto-resize: true
     @onSetup: |
@@ -361,7 +361,7 @@ MainWindow
 
   Button
     id: buttonOk
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     width: 64
     anchors.right: next.left
     anchors.bottom: parent.bottom
@@ -370,7 +370,7 @@ MainWindow
 
   Button
     id: buttonCancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom

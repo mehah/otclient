@@ -4,7 +4,7 @@ local debugInfoButton = nil
 local updateEvent = nil
 
 function init()
-    debugInfoButton = modules.client_topmenu.addTopRightToggleButton('debugInfoButton', tr('Debug Info'),
+    debugInfoButton = modules.client_topmenu.addTopRightToggleButton('debugInfoButton', localize('DebugInfoTitle'),
             '/images/topbuttons/debug', toggle)
     debugInfoButton:setOn(false)
 

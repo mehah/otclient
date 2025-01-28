@@ -2,7 +2,7 @@ CalendarGrid < MiniQtWindow
   size: 780 575
 
   Label
-    !text: tr('Event Schedule')
+    !text: localize('BottomPanelWindowTitleEventSchedule')
     font: verdana-11px-antialised
     text-offset: 0 2
     text-align: top
@@ -21,7 +21,7 @@ CalendarGrid < MiniQtWindow
 
     CalendarWeekDays
       id: row1
-      &weekName: tr('Monday')
+      &weekName: localize('Monday')
       &disableLeftBright: true
       anchors.top: parent.top
       anchors.left: parent.left
@@ -31,7 +31,7 @@ CalendarGrid < MiniQtWindow
 
     CalendarWeekDays
       id: row2
-      &weekName: tr('Tuesday')
+      &weekName: localize('Tuesday')
       anchors.top: prev.top
       anchors.left: prev.right
       margin-left: 1
@@ -39,7 +39,7 @@ CalendarGrid < MiniQtWindow
 
     CalendarWeekDays
       id: row3
-      &weekName: tr('Wednesday')
+      &weekName: localize('Wednesday')
       anchors.top: prev.top
       anchors.left: prev.right
       margin-left: 1
@@ -47,7 +47,7 @@ CalendarGrid < MiniQtWindow
 
     CalendarWeekDays
       id: row4
-      &weekName: tr('Thursday')
+      &weekName: localize('Thursday')
       anchors.top: prev.top
       anchors.left: prev.right
       margin-left: 1
@@ -55,7 +55,7 @@ CalendarGrid < MiniQtWindow
 
     CalendarWeekDays
       id: row5
-      &weekName: tr('Friday')
+      &weekName: localize('Friday')
       anchors.top: prev.top
       anchors.left: prev.right
       margin-left: 1
@@ -63,7 +63,7 @@ CalendarGrid < MiniQtWindow
 
     CalendarWeekDays
       id: row6
-      &weekName: tr('Saturday')
+      &weekName: localize('Saturday')
       anchors.top: prev.top
       anchors.left: prev.right
       margin-left: 1
@@ -71,7 +71,7 @@ CalendarGrid < MiniQtWindow
 
     CalendarWeekDays
       id: row0
-      &weekName: tr('Sunday')
+      &weekName: localize('Sunday')
       anchors.top: prev.top
       anchors.left: prev.right
       margin-left: 1
@@ -112,7 +112,7 @@ CalendarGrid < MiniQtWindow
   Label
     anchors.left: calendarWidget.left
     anchors.top: calendarWidget.bottom
-    !text: tr('* Event starts/ends at server save of this day.')
+    !text: localize('BottomPanelWindowHintEventSchedule')
     margin-top: 10
     height: 16
     text-align: left
@@ -127,7 +127,7 @@ CalendarGrid < MiniQtWindow
     image-source: /images/ui/horizontal_line_bright
 
   QtButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     anchors.right: calendarWidget.right
     anchors.top: prev.bottom
     margin-top: 10

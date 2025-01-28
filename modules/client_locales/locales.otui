@@ -16,7 +16,7 @@ UIWindow
   anchors.fill: parent
 
   LocalesMainLabel
-    !text: tr('Select your language')
+    !text: localize('LanguagePickerWindowMessage')
     text-auto-resize: true
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.verticalCenter: parent.verticalCenter

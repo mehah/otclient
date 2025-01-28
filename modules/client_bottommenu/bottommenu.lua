@@ -274,7 +274,7 @@ function reloadEventsSchedulerCurrentPage()
             widget:clearEvents()
             widget.dayOfTheWeek = day
             widget:recursiveGetChildById('dayAndSeason'):setOn(true)
-            widget:recursiveGetChildById('day'):setText(tr(day))
+            widget:recursiveGetChildById('day'):setText(localize(day))
             widget:recursiveGetChildById('day'):setWidth(string.len(widget:recursiveGetChildById('day'):getText()) * 10)
             widget:recursiveGetChildById('fill'):setOn(true)
             for _, event in ipairs(events) do

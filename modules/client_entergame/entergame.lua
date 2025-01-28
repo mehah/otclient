@@ -20,7 +20,7 @@ local function onError(protocol, message, errorCode)
         EnterGame.clearAccountFields()
     end
 
-    local errorBox = displayErrorBox(tr('Login Error'), message)
+    local errorBox = displayErrorBox(localize('CharacterListTitleLoginError'), message)
     connect(errorBox, {
         onOk = EnterGame.show
     })
@@ -82,7 +82,7 @@ local function onCharacterList(protocol, characters, account, otui)
         local lastMotdNumber = g_settings.getNumber('motd')
         if G.motdNumber and G.motdNumber ~= lastMotdNumber then
             g_settings.set('motd', G.motdNumber)
-            motdWindow = displayInfoBox(tr('Message of the day'), G.motdMessage)
+            motdWindow = displayInfoBox(localize('CharacterListMotd'), G.motdMessage)
             connect(motdWindow, {
                 onOk = function()
                     CharacterList.show()
@@ -105,7 +105,7 @@ local function onUpdateNeeded(protocol, signature)
         local cancelFunc = EnterGame.show
         EnterGame.updateFunc(signature, continueFunc, cancelFunc)
     else
-        local errorBox = displayErrorBox(tr('Update needed'), tr('Your client needs updating, try redownloading it.'))
+        local errorBox = displayErrorBox(localize('CharacterListTitleUpdateRequired'), localize('CharacterListMessageUpdateNeeded'))
         connect(errorBox, {
             onOk = EnterGame.show
         })
@@ -114,13 +114,13 @@ end
 
 local function updateLabelText()
     if enterGame:getChildById('clientComboBox') and tonumber(enterGame:getChildById('clientComboBox'):getText()) > 1080 then
-        enterGame:setText("Journey Onwards")
-        enterGame:getChildById('emailLabel'):setText("Email:")
-        enterGame:getChildById('rememberEmailBox'):setText("Remember Email:")
+        enterGame:setText(localize('EnterGameTitleNew'))
+        enterGame:getChildById('emailLabel'):setText(localize('EnterGameEmail') .. ":")
+        enterGame:getChildById('rememberEmailBox'):setText(localize('EnterGameRememberEmail') .. ":")
     else
-        enterGame:setText("Enter Game")
-        enterGame:getChildById('emailLabel'):setText("Acc Name:")
-        enterGame:getChildById('rememberEmailBox'):setText("Remember password:")
+        enterGame:setText(localize('EnterGameTitleOld'))
+        enterGame:getChildById('emailLabel'):setText(localize('EnterGameAccName') .. ":")
+        enterGame:getChildById('rememberEmailBox'):setText(localize('EnterGameRememberPassword') .. ":")
     end
 end
 
@@ -571,7 +571,7 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
             loadBox = nil
         end
 
-        local errorBox = displayErrorBox(tr("Login Error"), string.format("Things are not loaded, please put assets in things/%d/<assets>.", clientVersion))
+        local errorBox = displayErrorBox(localize('CharacterListTitleLoginError'), localize('EnterGameThingsErrorAssets', clientVersion))
         connect(errorBox, {
             onOk = EnterGame.show
         })
@@ -597,10 +597,12 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     end
 
     if not host then
-        loadBox = displayCancelBox(tr('Please wait'), tr('ERROR , try adding \n- ip/login.php \n- Enable HTTP login'))
+        loadBox = displayCancelBox(localize('CharacterListTitleConnectionError'), localize('EnterGameHttpError'))
     else
-        loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...\nServer: [%s]',
-            host .. ":" .. tostring(G.port) .. path))
+        loadBox = displayCancelBox(
+            localize('CharacterListTitleConnecting'),
+            localize('EnterGameMessageConnectingHttp', host .. ":" .. tostring(G.port) .. path)
+        )
     end
 
     connect(loadBox, {
@@ -703,7 +705,7 @@ function EnterGame.doLogin()
     EnterGame.hide()
 
     if g_game.isOnline() then
-        local errorBox = displayErrorBox(tr('Login Error'), tr('Cannot login while already in game.'))
+        local errorBox = displayErrorBox(localize('CharacterListTitleLoginError'), localize('EnterGameMessageAlreadyLogged'))
         connect(errorBox, {
             onOk = EnterGame.show
         })
@@ -724,7 +726,7 @@ function EnterGame.doLogin()
         protocolLogin.onCharacterList = onCharacterList
         protocolLogin.onUpdateNeeded = onUpdateNeeded
 
-        loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
+        loadBox = displayCancelBox(localize('CharacterListTitleConnecting'), localize('EnterGameMessageConnecting'))
         connect(loadBox, {
             onCancel = function(msgbox)
                 loadBox = nil
@@ -745,7 +747,7 @@ function EnterGame.doLogin()
                 loadBox = nil
             end
 
-            local errorBox = displayErrorBox(tr("Login Error"), string.format("Things are not loaded, please put spr and dat in things/%d/<here>.", clientVersion))
+            local errorBox = displayErrorBox(localize('CharacterListTitleLoginError'), localize('EnterGameThingsErrorSprites', clientVersion))
             connect(errorBox, {
                onOk = EnterGame.show
             })
@@ -756,7 +758,7 @@ end
 
 function EnterGame.displayMotd()
     if not motdWindow then
-        motdWindow = displayInfoBox(tr('Message of the day'), G.motdMessage)
+        motdWindow = displayInfoBox(localize('CharacterListMotd'), G.motdMessage)
         motdWindow.onOk = function()
             motdWindow = nil
         end

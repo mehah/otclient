@@ -18,7 +18,7 @@ DebugLabel < Label
 MainWindow
   id: debugWindow
   size: 600 150
-  !text: tr('Debug Info')
+  !text: localize('DebugInfoTitle')
   @onClose: modules.client_debug_info.onMiniWindowClose()
   &save: false
   margin: 0 0 0 0
@@ -39,7 +39,7 @@ MainWindow
     vertical-scrollbar: debugScroll
 
     DebugLabel
-      !text: tr('Proxies')
+      !text: localize('DebugInfoProxies')
       anchors.top: parent.top
 
     DebugText

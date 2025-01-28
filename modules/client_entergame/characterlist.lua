@@ -48,7 +48,7 @@ local function tryLogin(charInfo, tries)
     g_game.loginWorld(G.account, G.password, charInfo.worldName, charInfo.worldHost, charInfo.worldPort,
                       charInfo.characterName, G.authenticatorToken, G.sessionKey)
 
-    loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to game server...'))
+    loadBox = displayCancelBox(localize('CharacterListTitleConnecting'), localize('CharacterListMessageConnecting'))
     connect(loadBox, {
         onCancel = function()
             loadBox = nil
@@ -74,7 +74,7 @@ local function updateWait(timeStart, timeEnd)
             progressBar:setPercent(percent)
 
             local label = waitingWindow:getChildById('timeLabel')
-            label:setText(tr('Trying to reconnect in %s seconds.', timeStr))
+            label:setText(localize('CharacterListMessageReconnect', timeStr))
 
             updateWaitEvent = scheduleEvent(function()
                 updateWait(timeStart, timeEnd)
@@ -141,7 +141,7 @@ end
 
 function onGameLoginError(message)
     CharacterList.destroyLoadBox()
-    errorBox = displayErrorBox(tr('Login Error'), message)
+    errorBox = displayErrorBox(localize('CharacterListTitleLoginError'), message)
     errorBox.onOk = function()
         errorBox = nil
         CharacterList.showAgain()
@@ -157,7 +157,7 @@ function onGameConnectionError(message, code)
     CharacterList.destroyLoadBox()
     local text = translateNetworkError(code, g_game.getProtocolGame() and g_game.getProtocolGame():isConnecting(),
                                        message)
-    errorBox = displayErrorBox(tr('Connection Error'), text)
+    errorBox = displayErrorBox(localize('CharacterListTitleConnectionError'), text)
     errorBox.onOk = function()
         errorBox = nil
         CharacterList.showAgain()
@@ -166,7 +166,7 @@ end
 
 function onGameUpdateNeeded(signature)
     CharacterList.destroyLoadBox()
-    errorBox = displayErrorBox(tr('Update needed'), tr('Enter with your account again to update your client.'))
+    errorBox = displayErrorBox(localize('CharacterListTitleUpdateRequired'), localize('CharacterListMessageUpdateRequired'))
     errorBox.onOk = function()
         errorBox = nil
         CharacterList.showAgain()
@@ -303,7 +303,7 @@ function CharacterList.create(characters, account, otui)
                 else
                     local text = value
                     if subWidget.baseText and subWidget.baseTranslate then
-                        text = tr(subWidget.baseText, text)
+                        text = localize(subWidget.baseText, text)
                     elseif subWidget.baseText then
                         text = string.format(subWidget.baseText, text)
                     end
@@ -376,21 +376,21 @@ function CharacterList.create(characters, account, otui)
     -- account
     local status = ''
     if account.status == AccountStatus.Frozen then
-        status = tr(' (Frozen)')
+        status = string.format(" (%s)", localize('CharacterListAccountFrozen'))
     elseif account.status == AccountStatus.Suspended then
-        status = tr(' (Suspended)')
+        status = string.format(" (%s)", localize('CharacterListAccountBanned'))
     end
 
     if account.subStatus == SubscriptionStatus.Free then
-        accountStatusLabel:setText(('%s%s'):format(tr('Free Account'), status))
+        accountStatusLabel:setText(('%s%s'):format(localize('CharacterListAccountFree'), status))
         if accountStatusIcon ~= nil then
             accountStatusIcon:setImageSource('/images/game/entergame/nopremium')
         end
     elseif account.subStatus == SubscriptionStatus.Premium then
         if account.premDays == 0 or account.premDays == 65535 then
-            accountStatusLabel:setText(('%s%s'):format(tr('Gratis Premium Account'), status))
+            accountStatusLabel:setText(('%s%s'):format(localize('CharacterListAccountPremiumGratis'), status))
         else
-            accountStatusLabel:setText(('%s%s'):format(tr('Premium Account (%s) days left', account.premDays), status))
+            accountStatusLabel:setText(('%s%s'):format(localize('CharacterListAccountPremiumNormal', account.premDays), status))
         end
         if accountStatusIcon ~= nil then
             accountStatusIcon:setImageSource('/images/game/entergame/premium')
@@ -485,7 +485,7 @@ function CharacterList.doLogin()
         end
         tryLogin(charInfo)
     else
-        displayErrorBox(tr('Error'), tr('You must select a character to login!'))
+        displayErrorBox(localize('Error'), localize('CharacterListMessageNoCharacterSelected'))
     end
 end
 

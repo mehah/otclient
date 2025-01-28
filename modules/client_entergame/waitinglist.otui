@@ -1,6 +1,6 @@
 MainWindow
   id: waitingWindow
-  !text: tr('Waiting List')
+  !text: localize('EnterGameTitleWaitList')
   size: 260 180
   draggable: false
   @onEscape: CharacterList.cancelWait()
@@ -38,7 +38,7 @@ MainWindow
 
   Button
     id: buttonCancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom
