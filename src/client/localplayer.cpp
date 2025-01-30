@@ -67,6 +67,9 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
+    if (m_walking)
+        return;
+
     auto pos = m_position.translatedToDirection(direction);
     // avoid reanimating prewalks
     if (m_lastPrewalkDestination.isValid() || m_lastPrewalkDestination == pos)

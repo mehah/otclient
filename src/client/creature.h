@@ -187,8 +187,8 @@ minHeight,
 
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
-    virtual void updateWalk(bool isPreWalking = false);
     virtual void terminateWalk();
+    void updateWalk();
 
     ThingType* getThingType() const override;
     ThingType* getMountThingType() const;
@@ -202,6 +202,7 @@ protected:
     Otc::Direction m_direction{ Otc::South };
 
     Timer m_walkTimer;
+    uint8_t m_walkedPixels{ 0 };
 
 private:
     void nextWalkUpdate();
@@ -288,7 +289,6 @@ private:
 
     // walk related
     uint8_t m_walkAnimationPhase{ 0 };
-    uint8_t m_walkedPixels{ 0 };
 
     uint8_t m_exactSize{ 0 };
 

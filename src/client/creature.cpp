@@ -653,7 +653,7 @@ void Creature::nextWalkUpdate()
     m_walkUpdateEvent = isLocalPlayer() ? g_dispatcher.addEvent(action) : g_dispatcher.scheduleEvent(action, m_stepCache.walkDuration);
 }
 
-void Creature::updateWalk(const bool isPreWalking)
+void Creature::updateWalk()
 {
     const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
 
