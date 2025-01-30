@@ -655,7 +655,7 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk(const bool isPreWalking)
 {
-    const float walkTicksPerPixel = (getStepDuration(true) + 8.f) / static_cast<float>(g_gameConfig.getSpriteSize());
+    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
 
     const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, g_gameConfig.getSpriteSize());
 
@@ -672,7 +672,7 @@ void Creature::updateWalk(const bool isPreWalking)
         g_map.notificateCameraMove(m_walkOffset);
     }
 
-    if (m_walkedPixels == g_gameConfig.getSpriteSize() && !isPreWalking) {
+    if (m_walkedPixels == g_gameConfig.getSpriteSize()) {
         terminateWalk();
     }
 }
