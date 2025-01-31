@@ -187,8 +187,8 @@ minHeight,
 
 protected:
     virtual void updateWalkOffset(uint8_t totalPixelsWalked);
-    virtual void updateWalk(bool isPreWalking = false);
     virtual void terminateWalk();
+    void updateWalk();
 
     ThingType* getThingType() const override;
     ThingType* getMountThingType() const;

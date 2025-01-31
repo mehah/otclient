@@ -55,10 +55,12 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 
     if (isPreWalking()) {
         if (newPos == m_lastPrewalkDestination) {
+            m_lastPrewalkDestination = {};
             updateWalk();
+            return;
         }
+
         m_lastPrewalkDestination = {};
-        return;
     }
 
     m_serverWalk = true;
