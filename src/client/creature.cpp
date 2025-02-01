@@ -941,6 +941,9 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
+        if (isLocalPlayer() && stepDuration <= 100)
+            stepDuration += 10;
+
         m_stepCache.duration = stepDuration;
 
         m_stepCache.walkDuration = std::min<int>(stepDuration / g_gameConfig.getSpriteSize(), DrawPool::FPS60);
