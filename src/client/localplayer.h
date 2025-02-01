@@ -153,8 +153,6 @@ private:
     bool m_pending{ false };
     bool m_serverWalk{ false };
 
-    uint64_t m_lastWalkServerTicks;
-
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 
     std::array<Skill, Otc::LastSkill> m_skills;
