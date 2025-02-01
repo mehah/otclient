@@ -43,7 +43,7 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
 
     if (isWalking()) {
         if (isAutoWalking()) return true; // always allow automated walks
-        return false; // don't walk if you are already walking
+        if (isPreWalking()) return false; // don't walk if you are already walking
     }
 
     if (g_game.getServerWalkTicks() == -1)
@@ -73,7 +73,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
     // avoid reanimating prewalks
-    if (isWalking() || isServerWalking() || m_lastPrewalkDestination.isValid())
+    if (m_lastPrewalkDestination.isValid())
         return;
 
     auto pos = m_position.translatedToDirection(direction);
@@ -81,9 +81,7 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
     if (m_lastPrewalkDestination == pos)
         return;
 
-    m_lastPrewalkDestination = pos;
-
-    Creature::walk(m_position, m_lastPrewalkDestination);
+    Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -276,7 +274,7 @@ void LocalPlayer::setHealth(const uint32_t health, const uint32_t maxHealth)
         callLuaField("onHealthChange", health, maxHealth, oldHealth, oldMaxHealth);
 
         if (isDead()) {
-            if (isWalking())
+            if (isPreWalking())
                 stopWalk();
             lockWalk();
         }
