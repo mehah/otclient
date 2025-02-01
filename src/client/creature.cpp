@@ -614,7 +614,7 @@ void Creature::updateWalkingTile()
 
             // only render creatures where bottom right is inside tile rect
             if (virtualTileRect.contains(virtualCreatureRect.bottomRight())) {
-                newWalkingTile = g_map.getOrCreateTile(m_position.translated(xi, yi, 0));
+                newWalkingTile = g_map.getOrCreateTile(getPosition().translated(xi, yi, 0));
             }
         }
     }
@@ -655,7 +655,7 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk()
 {
-    const float walkTicksPerPixel = (getStepDuration(true) + 8.f) / static_cast<float>(g_gameConfig.getSpriteSize());
+    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
 
     const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, g_gameConfig.getSpriteSize());
 

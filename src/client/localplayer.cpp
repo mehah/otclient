@@ -46,37 +46,42 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
         if (isPreWalking()) return false; // allow only single prewalk
     }
 
-    return m_walkTimer.ticksElapsed() >= getStepDuration(); // allow only if walk done, ex. diagonals may need additional ticks before taking another step
+    if (g_game.getServerWalkTicks() == -1)
+        return false;
+
+    // allow only if walk done, ex. diagonals may need additional ticks before taking another step
+    return m_walkTimer.ticksElapsed() >= std::max<int>(getStepDuration(), g_game.getServerWalkTicks());
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking()) {
-        if (newPos == m_lastPrewalkDestination) {
-            m_lastPrewalkDestination = {};
-            updateWalk();
+    if (oldPos.z == newPos.z) {
+        if (m_lastPrewalkDestination == newPos || g_game.getWalkTicksElapsed() <= 1)
             return;
-        }
 
-        m_lastPrewalkDestination = {};
+        if (g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
+            return;
     }
 
     m_serverWalk = true;
+
     Creature::walk(oldPos, newPos);
 }
 
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
-    auto pos = m_position.translatedToDirection(direction);
     // avoid reanimating prewalks
-    if (m_lastPrewalkDestination.isValid() || m_lastPrewalkDestination == pos)
+    if (m_lastPrewalkDestination.isValid())
         return;
 
-    // start walking to direction
-    m_lastPrewalkDestination = pos;
-    Creature::walk(m_position, m_lastPrewalkDestination);
+    auto pos = m_position.translatedToDirection(direction);
+
+    if (m_lastPrewalkDestination == pos)
+        return;
+
+    Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -183,26 +188,6 @@ void LocalPlayer::stopAutoWalk()
 
     if (m_autoWalkContinueEvent)
         m_autoWalkContinueEvent->cancel();
-}
-
-void LocalPlayer::updateWalkOffset(const uint8_t totalPixelsWalked)
-{
-    if (!isPreWalking()) {
-        Creature::updateWalkOffset(totalPixelsWalked);
-        return;
-    }
-
-    // pre walks offsets are calculated in the oposite direction
-    m_walkOffset = {};
-    if (m_direction == Otc::North || m_direction == Otc::NorthEast || m_direction == Otc::NorthWest)
-        m_walkOffset.y = -totalPixelsWalked;
-    else if (m_direction == Otc::South || m_direction == Otc::SouthEast || m_direction == Otc::SouthWest)
-        m_walkOffset.y = totalPixelsWalked;
-
-    if (m_direction == Otc::East || m_direction == Otc::NorthEast || m_direction == Otc::SouthEast)
-        m_walkOffset.x = totalPixelsWalked;
-    else if (m_direction == Otc::West || m_direction == Otc::NorthWest || m_direction == Otc::SouthWest)
-        m_walkOffset.x = -totalPixelsWalked;
 }
 
 void LocalPlayer::terminateWalk()
