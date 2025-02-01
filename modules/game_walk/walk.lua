@@ -88,7 +88,7 @@ local function addWalkEvent(dir, delay)
         walk(smartWalkDir or dir)
     end
 
-    walkEvent = delay == 0 and addEvent(walkCallback) or scheduleEvent(walkCallback, delay or 10)
+    walkEvent = delay == 0 and addEvent(walkCallback) or scheduleEvent(walkCallback, delay or 5)
 end
 
 --- Initiates a smart walk in the given direction.
