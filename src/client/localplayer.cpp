@@ -43,7 +43,7 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
 
     if (isWalking()) {
         if (isAutoWalking()) return true; // always allow automated walks
-        if (isPreWalking()) return false; // don't walk if you are already walking
+        if (isPreWalking()) return false; // allow only single prewalk
     }
 
     if (g_game.getServerWalkTicks() == -1)
