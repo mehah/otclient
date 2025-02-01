@@ -119,7 +119,7 @@ public:
 
     void preWalk(Otc::Direction direction);
 
-    Position getPosition() override { return m_lastStepToPosition.isValid() && m_lastStepToPosition.z == m_position.z ? m_lastStepToPosition : m_position; }
+    Position getPosition() override { return m_lastStepToPosition.isValid() && m_position.distance(m_lastStepToPosition) < 2 ? m_lastStepToPosition : m_position; }
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
