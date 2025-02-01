@@ -55,6 +55,7 @@ void Game::resetGameStates()
     m_serverBeat = 50;
     m_seq = 0;
     m_ping = -1;
+    m_walkTicks = 0;
     setCanReportBugs(false);
     m_fightMode = Otc::FightBalanced;
     m_chaseMode = Otc::DontChase;
@@ -683,6 +684,9 @@ void Game::forceWalk(const Otc::Direction direction)
 {
     if (!canPerformGameAction())
         return;
+
+    m_walkTimer.restart();
+    m_walkTicks = -1;
 
     switch (direction) {
         case Otc::North:

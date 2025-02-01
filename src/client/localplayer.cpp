@@ -43,37 +43,44 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
 
     if (isWalking()) {
         if (isAutoWalking()) return true; // always allow automated walks
-        if (isPreWalking()) return false; // allow only single prewalk
+        return false; // don't walk if you are already walking
     }
 
-    return m_walkTimer.ticksElapsed() >= getStepDuration(); // allow only if walk done, ex. diagonals may need additional ticks before taking another step
+    if (g_game.getServerWalkTicks() == -1)
+        return false;
+
+    // allow only if walk done, ex. diagonals may need additional ticks before taking another step
+    return m_walkTimer.ticksElapsed() >= std::max<int>(getStepDuration(), g_game.getServerWalkTicks());
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking()) {
-        m_lastPrewalkDestination = {};
+    if (m_lastPrewalkDestination == newPos || g_game.getWalkTicksElapsed() >= 0 && g_game.getWalkTicksElapsed() <= 1)
         return;
-    }
+
+    if (g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
+        return;
 
     m_serverWalk = true;
+
     Creature::walk(oldPos, newPos);
 }
 
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
-    if (isWalking())
+    // avoid reanimating prewalks
+    if (isWalking() || isServerWalking() || m_lastPrewalkDestination.isValid())
         return;
 
     auto pos = m_position.translatedToDirection(direction);
-    // avoid reanimating prewalks
-    if (m_lastPrewalkDestination.isValid() || m_lastPrewalkDestination == pos)
+
+    if (m_lastPrewalkDestination == pos)
         return;
 
-    // start walking to direction
     m_lastPrewalkDestination = pos;
+
     Creature::walk(m_position, m_lastPrewalkDestination);
 }
 
@@ -105,7 +112,7 @@ bool LocalPlayer::retryAutoWalk()
 void LocalPlayer::cancelWalk(const Otc::Direction direction)
 {
     // only cancel client side walks
-    if (isWalking() && isPreWalking())
+    if (isWalking())
         stopWalk();
 
     g_map.notificateCameraMove(m_walkOffset);
@@ -267,7 +274,7 @@ void LocalPlayer::setHealth(const uint32_t health, const uint32_t maxHealth)
         callLuaField("onHealthChange", health, maxHealth, oldHealth, oldMaxHealth);
 
         if (isDead()) {
-            if (isPreWalking())
+            if (isWalking())
                 stopWalk();
             lockWalk();
         }

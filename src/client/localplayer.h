@@ -105,6 +105,7 @@ public:
 
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
+    bool isServerWalking() { return m_serverWalk; }
     bool isPreWalking() { return m_lastPrewalkDestination.isValid(); }
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
@@ -117,11 +118,8 @@ public:
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
     void preWalk(Otc::Direction direction);
-    Position getLastPrewalkingPosition() { return m_lastPrewalkDestination; }
 
-    bool isServerWalking() { return m_serverWalk; }
-
-    Position getPosition() override { return isWalking() ? m_lastStepToPosition : m_position; }
+    Position getPosition() override { return m_lastStepToPosition.isValid() && m_lastStepToPosition.z == m_position.z ? m_lastStepToPosition : m_position; }
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
@@ -154,6 +152,8 @@ private:
     bool m_known{ false };
     bool m_pending{ false };
     bool m_serverWalk{ false };
+
+    uint64_t m_lastWalkServerTicks;
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 
