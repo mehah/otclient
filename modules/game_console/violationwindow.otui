@@ -24,7 +24,7 @@ MainWindow
 
   Button
     id: buttonOk
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     width: 64
     anchors.right: next.left
     anchors.bottom: parent.bottom
@@ -33,7 +33,7 @@ MainWindow
 
   Button
     id: buttonCancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom

@@ -331,7 +331,7 @@ Window
     pixels-scroll: true
   QtButton
     size: 43 20
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     color: #C0C0C0
     anchors.bottom: parent.bottom
     anchors.right: parent.right

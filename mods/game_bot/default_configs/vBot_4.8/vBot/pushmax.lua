@@ -12,7 +12,7 @@ Panel
     anchors.left: parent.left
     text-align: center
     width: 130
-    !text: tr('PUSHMAX')
+    !text: localize('BotPushMaxButton')
 
   Button
     id: push

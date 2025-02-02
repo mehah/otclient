@@ -59,7 +59,7 @@ Panel
     anchors.left: parent.left
     text-align: center
     width: 130
-    !text: tr('Open Minimised')
+    !text: localize('BotButtonOpenMinimised')
     font: verdana-11px-rounded
 
   Button
@@ -74,7 +74,7 @@ Panel
 
   Button
     id: reopenCont
-    !text: tr('Reopen All')
+    !text: localize('BotButtonReopenAll')
     anchors.left: parent.left
     anchors.top: prev.bottom
     anchors.right: parent.horizontalCenter
@@ -85,7 +85,7 @@ Panel
 
   Button
     id: minimiseCont
-    !text: tr('Minimise All')
+    !text: localize('BotButtonMinimiseAll')
     anchors.top: prev.top
     anchors.left: parent.horizontalCenter
     anchors.right: parent.right
@@ -117,7 +117,7 @@ BackpackName < Label
 
   Button
     id: state
-    !text: tr('M')
+    !text: 'M'
     anchors.right: remove.left
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 1
@@ -126,8 +126,8 @@ BackpackName < Label
 
   Button
     id: remove
-    !text: tr('X')
-    !tooltip: tr('Remove')
+    !text: 'X'
+    !tooltip: localize('UIButtonRemove')
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 15
@@ -136,7 +136,7 @@ BackpackName < Label
 
   Button
     id: openNext
-    !text: tr('N')
+    !text: 'N'
     anchors.right: state.left
     anchors.verticalCenter: parent.verticalCenter
     margin-right: 1
@@ -145,7 +145,7 @@ BackpackName < Label
     tooltip: Open container inside with the same ID.
 
 ContListsWindow < MainWindow
-  !text: tr('Container Names')
+  !text: localize('BotWindowTitleContainerNames')
   size: 465 170
   @onEscape: self:hide()
 
@@ -290,7 +290,7 @@ ContListsWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

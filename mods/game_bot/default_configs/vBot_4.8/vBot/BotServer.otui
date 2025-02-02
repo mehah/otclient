@@ -10,7 +10,7 @@ BotServerData < Panel
     anchors.left: parent.left
     anchors.right: parent.right
     text-align: center
-    !text: tr("BotServer Data")
+    !text: localize('BotServerWindowLabelData')
 
   Label
     id: label
@@ -155,7 +155,7 @@ FeaturePanel < Panel
     text: Broadcast
 
 BotServerWindow < MainWindow
-  !text: tr('BotServer')
+  !text: localize('BotServerWindowTitle')
   size: 370 310
   @onEscape: self:hide()
 
@@ -179,7 +179,7 @@ BotServerWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

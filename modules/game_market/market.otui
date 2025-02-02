@@ -35,7 +35,7 @@ MarketWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     anchors.top: mainTabContent.bottom
     anchors.horizontalCenter: mainTabContent.horizontalCenter
     margin-top: 5

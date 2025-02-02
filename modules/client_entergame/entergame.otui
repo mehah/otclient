@@ -1,5 +1,5 @@
 EnterGameWindow < MainWindow
-  !text: tr('Enter Game')
+  !text: localize('EnterGameTitleOld')
   size: 236 316
 
 
@@ -34,7 +34,7 @@ EnterGameWindow
 
   Label
     id: emailLabel
-    !text: tr('Acc Name:') 
+    !text: localize('EnterGameAccName') .. ":" 
     anchors.left: parent.left
     anchors.top: parent.top
 
@@ -43,7 +43,7 @@ EnterGameWindow
       
   Label
     id: passwordLabel
-    !text: tr('Password:')
+    !text: localize('EnterGamePassword') .. ":" 
     anchors.left: emailLabel.left
     anchors.top: emailLabel.bottom
     margin-top: 10
@@ -64,8 +64,8 @@ EnterGameWindow
 
   QtCheckBox
     id: rememberEmailBox
-    !text: tr('Remember password')
-    !tooltip: tr('Remember account and password when starts client')
+    !text: localize('EnterGameRememberPassword')
+    !tooltip: localize('EnterGameTooltipRememberPassword')
     anchors.left: passwordLabel.left
     anchors.right: parent.right
     anchors.top: accountPasswordTextEdit.bottom
@@ -78,7 +78,7 @@ EnterGameWindow
   UIWidget
     id: rememberEmailTip
     image-source: /images/icons/show_gui_help_grey
-    !specialtooltip: 'Be aware that your email address will be stored on your configuration file "config.otml" if you activate this option.'
+    !specialtooltip: localize('EnterGameTooltipRememberEmail')
     anchors.right: accountNameTextEdit.right
     anchors.verticalCenter: rememberEmailBox.verticalCenter
     visible: false
@@ -90,7 +90,7 @@ EnterGameWindow
       visible: false
 
   UIButton
-    !text: tr('Forgot password and/or email')
+    !text: localize('EnterGameButtonAccountLost')
     id: Forgot_password_email
     font: verdana-11px-monochrome-underline
     text-align: left
@@ -110,7 +110,7 @@ EnterGameWindow
 
   MenuLabel
     id: authenticatorTokenLabel
-    !text: tr('Authenticator Token')
+    !text: localize('EnterGameAuthenticatorToken')
     anchors.left: prev.left
     anchors.top: prev.bottom
     text-auto-resize: true
@@ -136,7 +136,7 @@ EnterGameWindow
 
   QtCheckBox
     id: stayLoggedBox
-    !text: tr('Stay logged during session')
+    !text: localize('EnterGameCheckboxKeepSession')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -156,7 +156,7 @@ EnterGameWindow
 
   MenuLabel
     id: serverLabel
-    !text: tr('Server')
+    !text: localize('EnterGameLabelServer')
     anchors.left: prev.left
     anchors.top: prev.bottom
     margin-top: 8
@@ -164,7 +164,7 @@ EnterGameWindow
 
   ServerListButton
     id: serverListButton
-    !tooltip: tr('Server list')
+    !tooltip: localize('EnterGameTitleServerList')
     anchors.right: parent.right
     anchors.top: serverLabel.bottom
     margin-top: 3
@@ -172,7 +172,7 @@ EnterGameWindow
 
   TextEdit
     id: serverHostTextEdit
-    !tooltip: tr('Make sure that your client uses\nthe correct game client version')
+    !tooltip: localize('EnterGameLabelServerList')
     anchors.left: parent.left
     anchors.right: serverListButton.left
     anchors.top: serverLabel.bottom
@@ -181,7 +181,7 @@ EnterGameWindow
 
   MenuLabel
     id: clientLabel
-    !text: tr('Client Version')
+    !text: localize('EnterGameClientVersion')
     anchors.left: parent.left
     anchors.top: serverHostTextEdit.bottom
     text-auto-resize: true
@@ -202,7 +202,7 @@ EnterGameWindow
 
   MenuLabel
     id: portLabel
-    !text: tr('Port')
+    !text: localize('EnterGameClientPort')
     anchors.left: serverPortTextEdit.left
     anchors.top: serverHostTextEdit.bottom
     margin-top: 8
@@ -219,8 +219,8 @@ EnterGameWindow
   QtCheckBox
     id: autoLoginBox
     enabled: false
-    !text: tr('Auto login')
-    !tooltip: tr('Open charlist automatically when starting client')
+    !text: localize('EnterGameCheckboxAutoLogin')
+    !tooltip: localize('EnterGameTooltipAutoLogin')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -229,8 +229,8 @@ EnterGameWindow
   QtCheckBox
     id: httpLoginBox
     enabled: true
-    !text: tr('Enable HTTP login')
-    !tooltip: tr('If login fails using HTTPS (encrypted) try with HTTP (unencrypted)')
+    !text: localize('EnterGameCheckboxHttpLogin')
+    !tooltip: localize('EnterGameTooltipHttpLogin')
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
@@ -243,7 +243,7 @@ EnterGameWindow
     margin-top: 6
 
   QtButton
-    !text: tr('Login')
+    !text: localize('EnterGameButtonLogin')
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 9
@@ -251,7 +251,7 @@ EnterGameWindow
     @onClick: EnterGame.doLogin()
 
   QtButton
-    !text: tr('Create New Account')
+    !text: localize('EnterGameButtonCreateAccount')
     anchors.left: parent.left
     anchors.top: prev.bottom
     margin-top: -17

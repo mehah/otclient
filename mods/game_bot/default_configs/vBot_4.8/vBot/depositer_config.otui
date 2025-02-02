@@ -34,7 +34,7 @@ StashItem < Panel
 
 DepositerPanel < MainWindow
   size: 230 380
-  !text: tr('Depositer Panel')
+  !text: localize('BotWindowTitleDepositer')
   @onEscape: self:hide()
 
   UIWidget
@@ -90,7 +90,7 @@ DepositerPanel < MainWindow
 
   Button
     id: CloseButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

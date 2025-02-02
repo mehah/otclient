@@ -13,7 +13,7 @@ SkullWidget < UIWidget
 
 MiniWindow
   id: unjustifiedPointsWindow
-  !text: tr('Unjustified Points')
+  !text: localize('UnjustifiedPanelTitle')
   height: 114
   icon: /images/topbuttons/unjustifiedpoints
   @onOpen: modules.game_unjustifiedpoints.onMiniWindowOpen()
@@ -24,8 +24,8 @@ MiniWindow
     Label
       anchors.top: parent.top
       anchors.left: parent.left
-      !text: tr('Open PvP')
-      !tooltip: tr('Open PvP Situations')
+      !text: localize('UnjustifiedPanelOpenPvP')
+      !tooltip: localize('UnjustifiedPanelOpenPvPSituations')
       phantom: false
       margin-top: 2
       margin-left: 10
@@ -41,7 +41,7 @@ MiniWindow
     Label
       anchors.top: parent.top
       anchors.right: parent.right
-      !text: tr('Skull Time')
+      !text: localize('UnjustifiedPanelSkullTime')
       margin-top: 2
       margin-right: 10
 

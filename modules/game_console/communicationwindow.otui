@@ -183,7 +183,7 @@ MainWindow
 
       Button
         id: buttonCancel
-        !text: tr('Cancel')
+        !text: localize('UIButtonCancel')
         width: 75
         anchors.top: parent.top
         anchors.left: prev.right

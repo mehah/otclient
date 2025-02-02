@@ -341,7 +341,7 @@ function QuickLoot.Define()
                             QuickLoot.ErrorWindow = displayGeneralBox(tr("Invalid Loot Container"), tr(
                                 "You can only select containers you carry in your inventory."), {
                                 {
-                                    text = tr("Ok"),
+                                    text = localize('UIButtonOk'),
                                     callback = QuickLoot.confirmError
                                 },
                                 anchor = AnchorHorizontalCenter
@@ -357,7 +357,7 @@ function QuickLoot.Define()
                         QuickLoot.ErrorWindow = displayGeneralBox(tr("Invalid Loot Container"), tr(
                             "You can only select containers you carry in your inventory."), {
                             {
-                                text = tr("Ok"),
+                                text = localize('UIButtonOk'),
                                 callback = QuickLoot.confirmError
                             },
                             anchor = AnchorHorizontalCenter

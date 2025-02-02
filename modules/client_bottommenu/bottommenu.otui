@@ -54,7 +54,7 @@ Panel
 
     Label
       id: showOffWindowText
-      !text: tr('Random Hint')
+      !text: localize('BottomPanelTitleRandomHint')
       font: verdana-11px-antialised
       text-offset: 0 2
       text-align: top
@@ -74,7 +74,7 @@ Panel
     draggable: false
 
     Label
-      !text: tr('Event Schedule')
+      !text: localize('BottomPanelTitleEventSchedule')
       font: verdana-11px-antialised
       text-offset: 0 2
       text-align: top
@@ -98,7 +98,7 @@ Panel
       @onClick: onClickOnCalendar()
 
       CalendarTopMark
-        !text: tr('Active')
+        !text: localize('BottomPanelActiveEvents')
         &disableLeftBright: true
         anchors.top: parent.top
         anchors.left: parent.left
@@ -112,7 +112,7 @@ Panel
         anchors.bottom: parent.bottom
 
       CalendarTopMark
-        !text: tr('Upcoming')
+        !text: localize('BottomPanelUpcomingEvents')
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.left: parent.horizontalCenter
@@ -136,7 +136,7 @@ Panel
     draggable: false
 
     Label
-      !text: tr('Boosted')
+      !text: localize('BottomPanelTitleBoosted')
       font: verdana-11px-antialised
       text-offset: 0 2
       text-align: top
@@ -170,7 +170,7 @@ Panel
         visible: false
 
     Label
-      !text: tr('Creature')
+      !text: localize('BottomPanelLabelBoostedCreature')
       anchors.horizontalCenter: prev.horizontalCenter
       anchors.top: prev.bottom
       margin-top: 3
@@ -199,7 +199,7 @@ Panel
         visible: false
 
     Label
-      !text: tr('Boss')
+      !text: localize('BottomPanelLabelBoostedBoss')
       anchors.horizontalCenter: prev.horizontalCenter
       anchors.top: prev.bottom
       margin-top: 3

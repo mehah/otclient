@@ -1,6 +1,6 @@
 StashWindow < MainWindow
   id: stashWindow
-  !text: tr('Supply Stash')
+  !text: localize('StashWindowTitle')
   size: 700 530
 
   @onEscape: onSupplyStashClose()
@@ -53,7 +53,7 @@ StashWindow < MainWindow
     width: 164
     height: 25
     Label
-      !text: tr('Find') .. ':'
+      !text: localize('FormFieldFind') .. ':'
       anchors.top: parent.top
       anchors.left: parent.left
       width: 30
@@ -70,7 +70,7 @@ StashWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     anchors.top: mainTabContent.bottom
     anchors.horizontalCenter: mainTabContent.horizontalCenter
     margin-top: 5
@@ -106,7 +106,7 @@ StashItemBox < UICheckBox
 
 StashSelectAmount < MainWindow
   id: stashSelectAmount
-  !text: tr('Stash Withdraw')
+  !text: localize('StashWindowWithdraw')
   size: 196 90
 
   Item
@@ -129,7 +129,7 @@ StashSelectAmount < MainWindow
 
   Button
     id: buttonCancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     height: 20
     anchors.left: countScrollBar.horizontalCenter
     anchors.right: countScrollBar.right
@@ -139,7 +139,7 @@ StashSelectAmount < MainWindow
 
   Button
     id: buttonOk
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     height: 20
     anchors.right: countScrollBar.horizontalCenter
     anchors.left: countScrollBar.left
