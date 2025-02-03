@@ -119,11 +119,11 @@ public:
 
     void preWalk(Otc::Direction direction);
 
-    Position getPosition() override { return m_lastStepToPosition.isValid() && m_lastStepToPosition.z == m_position.z && m_position.distance(m_lastStepToPosition) < 2 ? m_lastStepToPosition : m_position; }
+    Position getPosition() override { return m_lastPrewalkDestination.isValid() ? m_lastPrewalkDestination : m_position; }
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
-    void terminateWalk() override;
+    void terminateWalk(std::function<void()>&& onTerminate = nullptr) override;
 
     friend class Game;
 

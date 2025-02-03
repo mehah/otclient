@@ -186,7 +186,7 @@ minHeight,
     bool canShoot(int distance);
 
 protected:
-    virtual void terminateWalk();
+    virtual void terminateWalk(std::function<void()>&& onTerminate = nullptr);
     void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
 
@@ -202,7 +202,6 @@ protected:
     Otc::Direction m_direction{ Otc::South };
 
     Timer m_walkTimer;
-    Position m_lastStepToPosition;
 
 private:
     void nextWalkUpdate();
@@ -245,6 +244,7 @@ private:
     CachedText m_name;
     CachedStep m_stepCache;
 
+    Position m_lastStepToPosition;
     Position m_lastStepFromPosition;
     Position m_oldPosition;
 

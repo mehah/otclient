@@ -677,7 +677,7 @@ void Creature::updateWalk()
     }
 }
 
-void Creature::terminateWalk()
+void Creature::terminateWalk(std::function<void()>&& onTerminate)
 {
     // remove any scheduled walk update
     if (m_walkUpdateEvent) {
@@ -701,9 +701,10 @@ void Creature::terminateWalk()
     m_walking = false;
 
     const auto self = static_self_cast<Creature>();
-    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
+    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self, onTerminate = std::move(onTerminate)] {
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
+        if (onTerminate) onTerminate();
     }, g_game.getServerBeat());
 }
 
