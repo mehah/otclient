@@ -57,11 +57,11 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (oldPos.z == newPos.z) {
-        if (m_lastPrewalkDestination == newPos || g_game.getWalkTicksElapsed() <= 1)
+    if (oldPos.z == newPos.z && m_lastPrewalkDestination.isValid()) {
+        if (m_lastPrewalkDestination == newPos)
             return;
 
-        if (g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
+        if (g_game.getWalkTicksElapsed() <= 1 || g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
             return;
     }
 
