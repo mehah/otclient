@@ -33,60 +33,61 @@ namespace stdext
 {
     uint32_t adler32(const uint8_t* buffer, size_t size)
     {
-        size_t a = 1, b = 0;
-        while (size > 0) {
-            size_t tlen = size > 5552 ? 5552 : size;
-            size -= tlen;
-            do {
-                a += *buffer++;
-                b += a;
-            } while (--tlen);
+        constexpr uint32_t MOD_ADLER = 65521;
+        uint32_t a = 1, b = 0;
 
-            a %= 65521;
-            b %= 65521;
+        while (size > 0) {
+            size_t tlen = std::min<size_t>(size, size_t(5552));
+            size -= tlen;
+
+            for (size_t i = 0; i < tlen; ++i) {
+                a += buffer[i];
+                b += a;
+            }
+            buffer += tlen; // Avança o ponteiro do buffer
+
+            a %= MOD_ADLER;
+            b %= MOD_ADLER;
         }
+
         return (b << 16) | a;
     }
 
     int random_range(const int min, const int max)
     {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        static std::uniform_int_distribution dis(0, INT_MAX);
-        return min + (dis(gen) % (max - min + 1));
+        thread_local std::mt19937 gen(std::random_device{}());
+        std::uniform_int_distribution<int> dis(std::min<int>(min, max), std::max<int>(min, max));
+        return dis(gen);
     }
 
     float random_range(const float min, const float max)
     {
-        static std::random_device rd;
-        static std::mt19937 gen(rd());
-        static std::uniform_real_distribution<float> dis(0.0, 1.0);
-        return min + (max - min) * dis(gen);
+        thread_local std::mt19937 gen(std::random_device{}());
+        std::uniform_real_distribution<float> dis(min, max);
+        return dis(gen);
     }
 
     std::mt19937& random_gen()
     {
-        static std::random_device rd;
-        static std::mt19937 generator(rd());
+        thread_local std::mt19937 generator(std::random_device{}());
         return generator;
     }
 
     bool random_bool(const double probability)
     {
-        static std::bernoulli_distribution booleanRand;
-        return booleanRand(random_gen(), std::bernoulli_distribution::param_type(probability));
+        thread_local std::mt19937& gen = random_gen();
+        return std::bernoulli_distribution(probability)(gen);
     }
 
     int32_t normal_random(const int32_t minNumber, const int32_t maxNumber)
     {
-        static std::normal_distribution normalRand(0.5f, 0.25f);
+        thread_local std::mt19937& gen = random_gen();
+        static std::normal_distribution<float> normalRand(0.5f, 0.25f);
 
         float v;
-        do {
-            v = normalRand(random_gen());
-        } while (v < 0.0 || v > 1.0);
+        while ((v = normalRand(gen)) < 0.0 || v > 1.0);
 
-        auto&& [a, b] = std::minmax(minNumber, maxNumber);
-        return a + std::lround(v * (b - a));
+        auto [a, b] = std::minmax(minNumber, maxNumber);
+        return static_cast<int32_t>(std::round(a + v * (b - a)));
     }
 }
