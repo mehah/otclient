@@ -57,11 +57,11 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (oldPos.z == newPos.z) {
-        if (m_lastPrewalkDestination == newPos || g_game.getWalkTicksElapsed() <= 1)
+    if (oldPos.z == newPos.z && m_lastPrewalkDestination.isValid()) {
+        if (m_lastPrewalkDestination == newPos)
             return;
 
-        if (g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
+        if (g_game.getWalkTicksElapsed() <= 1 || g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
             return;
     }
 
@@ -73,9 +73,6 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
     // avoid reanimating prewalks
-    if (m_lastPrewalkDestination.isValid())
-        return;
-
     auto pos = m_position.translatedToDirection(direction);
 
     if (m_lastPrewalkDestination == pos)
@@ -190,11 +187,13 @@ void LocalPlayer::stopAutoWalk()
         m_autoWalkContinueEvent->cancel();
 }
 
-void LocalPlayer::terminateWalk()
+void LocalPlayer::terminateWalk(std::function<void()>&& onTerminate)
 {
-    Creature::terminateWalk();
+    Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {
+        m_lastPrewalkDestination = {};
+    });
+
     m_serverWalk = false;
-    m_lastPrewalkDestination = {};
     callLuaField("onWalkFinish");
 }
 

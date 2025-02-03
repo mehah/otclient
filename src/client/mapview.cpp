@@ -428,6 +428,12 @@ void MapView::updateVisibleTiles()
 }
 
 void MapView::updateRect(const Rect& rect) {
+    if (m_posInfo.camera != getCameraPosition()) {
+        m_posInfo.camera = getCameraPosition();
+        requestUpdateVisibleTiles();
+        requestUpdateMapPosInfo();
+    }
+
     if (m_posInfo.rect != rect || m_updateMapPosInfo) {
         m_updateMapPosInfo = false;
 
@@ -441,8 +447,6 @@ void MapView::updateRect(const Rect& rect) {
         if (mousePos != m_mousePosition)
             onMouseMove(m_mousePosition = mousePos, true);
     }
-
-    m_posInfo.camera = getCameraPosition();
 }
 
 void MapView::updateGeometry(const Size& visibleDimension)
