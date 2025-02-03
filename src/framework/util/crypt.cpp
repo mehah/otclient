@@ -127,9 +127,7 @@ std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key) {
 }
 
 std::string Crypt::genUUID() {
-    static std::random_device rd;
-    static std::mt19937 generator(rd());
-    return uuids::to_string(uuids::uuid_random_generator{ generator }());
+    return uuids::to_string(uuids::uuid_random_generator{ stdext::random_gen() }());
 }
 
 bool Crypt::setMachineUUID(std::string uuidstr)
@@ -150,9 +148,7 @@ bool Crypt::setMachineUUID(std::string uuidstr)
 std::string Crypt::getMachineUUID()
 {
     if (m_machineUUID.is_nil()) {
-        static std::random_device rd;
-        static std::mt19937 generator(rd());
-        m_machineUUID = uuids::uuid_random_generator{ generator }();
+        m_machineUUID = uuids::uuid_random_generator{ stdext::random_gen() }();
     }
     return _encrypt(uuids::to_string(m_machineUUID), false);
 }
