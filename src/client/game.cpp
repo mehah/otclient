@@ -652,7 +652,9 @@ bool Game::walk(const Otc::Direction direction)
 
 void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos)
 {
-    if (!canPerformGameAction())
+    static EventPtr event;
+
+    if (!canPerformGameAction() || event)
         return;
 
     if (dirs.size() == 0)
@@ -669,11 +671,12 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
         cancelFollow();
     }
 
-    const Otc::Direction direction = *dirs.begin();
-    if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(direction, true)) {
-            m_localPlayer->preWalk(direction);
-        }
+    if (m_localPlayer->isPreWalking()) {
+        event = g_dispatcher.scheduleEvent([=, this] {
+            event = nullptr;
+            g_game.autoWalk(dirs, startPos);
+        }, 10);
+        return;
     }
 
     g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
