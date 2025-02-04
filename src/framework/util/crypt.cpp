@@ -37,6 +37,7 @@
 #include <algorithm>
 
 #include "framework/core/graphicalapplication.h"
+#include <openssl/sha.h>
 
 static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static inline bool is_base64(const uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
@@ -69,114 +70,64 @@ Crypt::~Crypt()
 #endif
 }
 
-std::string Crypt::base64Encode(const std::string& decoded_string)
-{
+std::string Crypt::base64Encode(const std::string& decoded_string) {
+    size_t encoded_size = 4 * ((decoded_string.size() + 2) / 3);
     std::string ret;
-    int i = 0;
-    uint8_t char_array_3[3];
-    uint8_t char_array_4[4];
-    int pos = 0;
-    int len = decoded_string.size();
+    ret.reserve(encoded_size);
 
-    while (len--) {
-        char_array_3[i++] = decoded_string[pos++];
-        if (i == 3) {
-            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-            char_array_4[3] = char_array_3[2] & 0x3f;
-
-            for (i = 0; (i < 4); i++)
-                ret += base64_chars[char_array_4[i]];
-            i = 0;
+    int val = 0, valb = -6;
+    for (uint8_t c : decoded_string) {
+        val = (val << 8) + c;
+        valb += 8;
+        while (valb >= 0) {
+            ret.push_back(base64_chars[(val >> valb) & 0x3F]);
+            valb -= 6;
         }
     }
 
-    if (i) {
-        int j = 0;
-        for (j = i; j < 3; j++)
-            char_array_3[j] = '\0';
-
-        char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-        char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-        char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-        char_array_4[3] = char_array_3[2] & 0x3f;
-
-        for (j = 0; (j < i + 1); j++)
-            ret += base64_chars[char_array_4[j]];
-
-        while ((i++ < 3))
-            ret += '=';
+    while (valb > -6) {
+        ret.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
+        valb -= 6;
     }
 
+    while (ret.size() % 4) ret.push_back('=');
     return ret;
 }
 
-std::string Crypt::base64Decode(const std::string_view& encoded_string)
-{
-    int len = encoded_string.size();
-    int i = 0;
-    int in_ = 0;
-    uint8_t char_array_4[4], char_array_3[3];
+std::string Crypt::base64Decode(const std::string_view& encoded_string) {
+    std::vector<int> T(256, -1);
+    for (int i = 0; i < 64; i++) T[base64_chars[i]] = i;
+
     std::string ret;
+    ret.reserve(encoded_string.size() * 3 / 4);
 
-    while (len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
-        char_array_4[i++] = encoded_string[in_]; in_++;
-        if (i == 4) {
-            for (i = 0; i < 4; i++)
-                char_array_4[i] = base64_chars.find(char_array_4[i]);
-
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-            for (i = 0; (i < 3); i++)
-                ret += char_array_3[i];
-            i = 0;
+    int val = 0, valb = -8;
+    for (uint8_t c : encoded_string) {
+        if (T[c] == -1) break;
+        val = (val << 6) + T[c];
+        valb += 6;
+        if (valb >= 0) {
+            ret.push_back((val >> valb) & 0xFF);
+            valb -= 8;
         }
     }
-
-    if (i) {
-        int j = 0;
-        for (j = i; j < 4; j++)
-            char_array_4[j] = 0;
-
-        for (j = 0; j < 4; j++)
-            char_array_4[j] = base64_chars.find(char_array_4[j]);
-
-        char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-        char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-        char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-        for (j = 0; (j < i - 1); j++)
-            ret += char_array_3[j];
-    }
-
     return ret;
 }
 
-std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key)
-{
-    std::string out;
-    out.resize(buffer.size());
-    size_t j = 0;
-    for (size_t i = 0; i < buffer.size(); ++i) {
-        out[i] = buffer[i] ^ key[j++];
-        if (j >= key.size())
-            j = 0;
-    }
+std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key) {
+    if (key.empty()) return buffer; // Evita divisão por zero e falhas
+
+    std::string out(buffer);
+    size_t keySize = key.size();
+
+    std::transform(out.begin(), out.end(), out.begin(),
+                   [&](char c) { return c ^ key[(&c - &out[0]) % keySize]; });
+
     return out;
 }
 
-std::string Crypt::genUUID()
-{
-    std::random_device rd;
-    auto seed_data = std::array<int, std::mt19937::state_size>{};
-    std::ranges::generate(seed_data, std::ref(rd));
-    std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-    std::mt19937 generator(seq);
-
-    return to_string(uuids::uuid_random_generator{ generator }());
+std::string Crypt::genUUID() {
+    return uuids::to_string(uuids::uuid_random_generator{ stdext::random_gen() }());
 }
 
 bool Crypt::setMachineUUID(std::string uuidstr)
@@ -197,76 +148,73 @@ bool Crypt::setMachineUUID(std::string uuidstr)
 std::string Crypt::getMachineUUID()
 {
     if (m_machineUUID.is_nil()) {
-        std::random_device rd;
-        auto seed_data = std::array<int, std::mt19937::state_size>{};
-        std::ranges::generate(seed_data, std::ref(rd));
-        std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
-        std::mt19937 generator(seq);
-
-        m_machineUUID = uuids::uuid_random_generator{ generator }();
+        m_machineUUID = uuids::uuid_random_generator{ stdext::random_gen() }();
     }
-    return _encrypt(to_string(m_machineUUID), false);
+    return _encrypt(uuids::to_string(m_machineUUID), false);
 }
 
 std::string Crypt::getCryptKey(const bool useMachineUUID) const
 {
-    constexpr std::hash<uuids::uuid> uuid_hasher;
-    const uuids::uuid uuid = useMachineUUID ? m_machineUUID : uuids::uuid();
-    const uuids::uuid u = uuids::uuid_name_generator(uuid)
-        (g_app.getCompactName() + g_platform.getCPUName() + g_platform.getOSName() + g_resources.getUserDir());
-    const std::size_t hash = uuid_hasher(u);
+    static const uuids::uuid default_uuid{};
+    const uuids::uuid& uuid = useMachineUUID ? m_machineUUID : default_uuid;
 
-    std::string key;
-    key.assign((const char*)&hash, sizeof(hash));
-    return key;
+    const uuids::uuid u = uuids::uuid_name_generator(uuid)(
+        g_app.getCompactName() + g_platform.getCPUName() + g_platform.getOSName() + g_resources.getUserDir()
+    );
+
+    const std::size_t hash = std::hash<uuids::uuid>{}(u);
+
+    return std::string(reinterpret_cast<const char*>(&hash), sizeof(hash));
 }
 
 std::string Crypt::_encrypt(const std::string& decrypted_string, const bool useMachineUUID)
 {
-    const uint32_t sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
+    uint32_t sum = stdext::adler32(reinterpret_cast<const uint8_t*>(decrypted_string.data()), decrypted_string.size());
 
-    std::string tmp = "0000" + decrypted_string;
+    // Usa `reserve()` para evitar realocações desnecessárias
+    std::string tmp;
+    tmp.reserve(4 + decrypted_string.size());
 
-    stdext::writeULE32((uint8_t*)&tmp[0], sum);
-    std::string encrypted = base64Encode(xorCrypt(tmp, getCryptKey(useMachineUUID)));
-    return encrypted;
+    tmp.append(4, '\0');  // Reserva espaço para o checksum
+    tmp.append(decrypted_string); // Adiciona a string original
+
+    // Escreve o checksum nas 4 primeiras posições
+    stdext::writeULE32(reinterpret_cast<uint8_t*>(&tmp[0]), sum);
+
+    // Executa XOR e Base64 na string final
+    return base64Encode(xorCrypt(tmp, getCryptKey(useMachineUUID)));
 }
 
 std::string Crypt::_decrypt(const std::string& encrypted_string, const bool useMachineUUID)
 {
-    const auto& decoded = base64Decode(encrypted_string);
-    const auto& tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
+    std::string decoded = base64Decode(encrypted_string);
+    std::string tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
 
-    if (tmp.length() >= 4) {
-        const uint32_t readsum = stdext::readULE32((const uint8_t*)tmp.c_str());
-        std::string decrypted_string = tmp.substr(4);
-        const uint32_t sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
-        if (readsum == sum)
-            return decrypted_string;
-    }
-    return {};
+    if (tmp.size() < 4)
+        return {};  // Retorna string vazia se não há espaço suficiente para o checksum
+
+    // Lê o checksum da string descriptografada
+    uint32_t readsum = stdext::readULE32(reinterpret_cast<const uint8_t*>(tmp.data()));
+
+    // Obtém a string original sem os primeiros 4 bytes
+    std::string decrypted_string = tmp.substr(4);
+
+    // Valida a integridade da mensagem
+    uint32_t sum = stdext::adler32(reinterpret_cast<const uint8_t*>(decrypted_string.data()), decrypted_string.size());
+
+    return (readsum == sum) ? decrypted_string : std::string();
 }
 
 void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
 {
 #ifdef USE_GMP
-    mpz_set_str(m_n, n, 10);
-    mpz_set_str(m_e, e, 10);
-#else
-#if OPENSSL_VERSION_NUMBER < 0x10100005L
-    BN_dec2bn(&m_rsa->n, n);
-    BN_dec2bn(&m_rsa->e, e);
-    // clear rsa cache
-    if (m_rsa->_method_mod_n) {
-        BN_MONT_CTX_free(m_rsa->_method_mod_n);
-        m_rsa->_method_mod_n = nullptr;
-    }
+    mpz_set_str(m_n, n.c_str(), 10);
+    mpz_set_str(m_e, e.c_str(), 10);
 #else
     BIGNUM* bn = nullptr, * be = nullptr;
     BN_dec2bn(&bn, n.c_str());
     BN_dec2bn(&be, e.c_str());
     RSA_set0_key(m_rsa, bn, be, nullptr);
-#endif
 #endif
 }
 
@@ -380,71 +328,16 @@ std::string Crypt::crc32(const std::string& decoded_string, const bool upperCase
     return result;
 }
 
-std::string Crypt::sha1Encrpyt(const std::string& input)
-{
-    uint32_t H[] = {
-        0x67452301,
-        0xEFCDAB89,
-        0x98BADCFE,
-        0x10325476,
-        0xC3D2E1F0
-    };
+// NOSONAR - Intentional use of SHA-1 as there is no security impact in this context
+std::string Crypt::sha1Encrypt(const std::string& input) {
+    unsigned char hash[SHA_DIGEST_LENGTH];
+    SHA1(reinterpret_cast<const unsigned char*>(input.data()), input.size(), hash);
 
-    uint8_t messageBlock[64];
-    size_t index = 0;
+    std::ostringstream oss;
+    for (unsigned char byte : hash)
+        oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
 
-    uint32_t length_low = 0;
-    uint32_t length_high = 0;
-    for (const char ch : input) {
-        messageBlock[index++] = ch;
-
-        length_low += 8;
-        if (length_low == 0) {
-            length_high++;
-        }
-
-        if (index == 64) {
-            sha1Block(messageBlock, H);
-            index = 0;
-        }
-    }
-
-    messageBlock[index++] = 0x80;
-
-    if (index > 56) {
-        while (index < 64) {
-            messageBlock[index++] = 0;
-        }
-
-        sha1Block(messageBlock, H);
-        index = 0;
-    }
-
-    while (index < 56) {
-        messageBlock[index++] = 0;
-    }
-
-    messageBlock[56] = length_high >> 24;
-    messageBlock[57] = length_high >> 16;
-    messageBlock[58] = length_high >> 8;
-    messageBlock[59] = length_high;
-
-    messageBlock[60] = length_low >> 24;
-    messageBlock[61] = length_low >> 16;
-    messageBlock[62] = length_low >> 8;
-    messageBlock[63] = length_low;
-
-    sha1Block(messageBlock, H);
-
-    char hexstring[41];
-    static constexpr char hexDigits[] = { "0123456789abcdef" };
-    for (int hashByte = 20; --hashByte >= 0;) {
-        const uint8_t byte = H[hashByte >> 2] >> (((3 - hashByte) & 3) << 3);
-        index = hashByte << 1;
-        hexstring[index] = hexDigits[byte >> 4];
-        hexstring[index + 1] = hexDigits[byte & 15];
-    }
-    return std::string(hexstring, 40);
+    return oss.str();
 }
 
 void Crypt::sha1Block(const uint8_t* block, uint32_t* H)
