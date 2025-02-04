@@ -1330,7 +1330,7 @@ void ProtocolGame::parseTileTransformThing(const InputMessagePtr& msg)
         return;
     }
 
-    const auto& pos = thing->getPosition();
+    const auto& pos = thing->getServerPosition();
     const int stackPos = thing->getStackPos();
 
     if (!g_map.removeThing(thing)) {
