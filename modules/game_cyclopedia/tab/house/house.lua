@@ -173,7 +173,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
                 confirmWindow = displayGeneralBox(tr("Summary"), tr(
                     "Your bid was successfull. You are currently holding the highest bid."), {
                     {
-                        text = tr("Ok"),
+                        text = localize('UIButtonOk'),
                         callback = yesCallback
                     },
                     anchor = AnchorHorizontalCenter
@@ -188,7 +188,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
                 "Bid failed.\nYour character's bank acocunt balance is too low to pay the bid and the rent for the first month."),
                 {
                     {
-                        text = tr("Ok"),
+                        text = localize('UIButtonOk'),
                         callback = yesCallback
                     },
                     anchor = AnchorHorizontalCenter
@@ -202,7 +202,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
         if message == 0 then
             confirmWindow = displayGeneralBox(tr("Summary"), tr("You have sucessfully iniated your move out."), {
                 {
-                    text = tr("Ok"),
+                    text = localize('UIButtonOk'),
                     callback = yesCallback
                 },
                 anchor = AnchorHorizontalCenter
@@ -217,7 +217,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
             confirmWindow = displayGeneralBox(tr("Summary"),
                 tr("You have sucessfully initiated the transfer of your house."), {
                     {
-                        text = tr("Ok"),
+                        text = localize('UIButtonOk'),
                         callback = yesCallback
                     },
                     anchor = AnchorHorizontalCenter
@@ -230,7 +230,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
             confirmWindow = displayGeneralBox(tr("Summary"), tr(
                 "Setting up a house transfer failed.\nA character with this name does not exist."), {
                 {
-                    text = tr("Ok"),
+                    text = localize('UIButtonOk'),
                     callback = yesCallback
                 },
                 anchor = AnchorHorizontalCenter
@@ -245,7 +245,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
             confirmWindow = displayGeneralBox(tr("Summary"), tr(
                 "You have sucessfully cancelled the transfer. You will keep the house."), {
                 {
-                    text = tr("Ok"),
+                    text = localize('UIButtonOk'),
                     callback = yesCallback
                 },
                 anchor = AnchorHorizontalCenter
@@ -259,7 +259,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
         if message == 0 then
             confirmWindow = displayGeneralBox(tr("Summary"), tr("You have sucessfully accepted the transfer."), {
                 {
-                    text = tr("Ok"),
+                    text = localize('UIButtonOk'),
                     callback = yesCallback
                 },
                 anchor = AnchorHorizontalCenter
@@ -273,7 +273,7 @@ function Cyclopedia.houseMessage(houseId, type, message)
         confirmWindow = displayGeneralBox(tr("Summary"), tr(
             "You jected the house transfer sucessfully. The old owner will keep the house."), {
             {
-                text = tr("Ok"),
+                text = localize('UIButtonOk'),
                 callback = yesCallback
             },
             anchor = AnchorHorizontalCenter

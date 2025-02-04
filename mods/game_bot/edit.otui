@@ -1,6 +1,6 @@
 MainWindow
   id: editWindow
-  !text: tr("Config editor & manager")
+  !text: localize('BotMainWindowTitle')
   @onEscape: self:hide()
   size: 550 570
   $mobile:
@@ -20,7 +20,7 @@ MainWindow
       text-auto-resize: true
       text-align: center
       text-wrap: true
-      !text: tr("Config Manager\nYou can use config manager to share configs between different machines, especially smartphones. After you configure your config, you can upload it, then you'll get unique hash code which you can use on diffent machinge (for eg. mobile phone) to download it.")
+      !text: localize('BotMainWindowText')
 
     HorizontalSeparator
       anchors.top: prev.bottom
@@ -44,7 +44,7 @@ MainWindow
         text-auto-resize: true
         text-align: center
         text-wrap: true
-        !text: tr("Upload config")
+        !text: localize('BotMainWindowConfigUploadLabel')
 
       Label
         anchors.top: prev.bottom
@@ -54,7 +54,7 @@ MainWindow
         text-auto-resize: true
         text-align: center
         text-wrap: true
-        !text: tr("Select config to upload")
+        !text: localize('BotMainWindowConfigUploadSelector')
 
       ComboBox
         id: config
@@ -71,7 +71,7 @@ MainWindow
         anchors.top: prev.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        !text: tr('Upload config')
+        !text: localize('BotMainWindowConfigUploadButton')
         margin-top: 4
         margin-left: 40
         margin-right: 40
@@ -91,7 +91,7 @@ MainWindow
         text-auto-resize: true
         text-align: center
         text-wrap: true
-        !text: tr("Download config")
+        !text: localize('BotMainWindowConfigDownloadLabel')
 
       Label
         anchors.top: prev.bottom
@@ -101,7 +101,7 @@ MainWindow
         text-auto-resize: true
         text-align: center
         text-wrap: true
-        !text: tr("Enter config hash code")
+        !text: localize('BotMainWindowConfigDownloadHashField')
 
       TextEdit
         id: config
@@ -117,7 +117,7 @@ MainWindow
         anchors.top: prev.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        !text: tr('Download config')
+        !text: localize('BotMainWindowConfigDownloadButton')
         margin-top: 4
         margin-left: 40
         margin-right: 40
@@ -146,7 +146,7 @@ MainWindow
       text-auto-resize: true
       text-align: center
       text-wrap: true
-      !text: tr("Bot configs are stored in:")
+      !text: localize('BotMainWindowInfoConfig') .. ":"
 
     TextEdit
       anchors.horizontalCenter: parent.horizontalCenter
@@ -160,7 +160,7 @@ MainWindow
 
     Button
       id: documentationButton
-      !text: tr('Click here to open bot directory')
+      !text: localize('BotMainWindowOpenBotFolder')
       anchors.horizontalCenter: parent.horizontalCenter
       anchors.top: prev.bottom
       margin-top: 5
@@ -175,7 +175,7 @@ MainWindow
       text-auto-resize: true
       text-align: center
       text-wrap: true
-      !text: tr("Every directory in bot directory is treated as different config.\nTo create new config just create new directory.")
+      !text: localize('BotMainWindowInfoDirectory')
 
     Label
       margin-top: 5
@@ -194,7 +194,7 @@ MainWindow
       text-auto-resize: true
       text-align: center
       text-wrap: true
-      !text: tr("Inside config directory put .lua and .otui files.\nEvery file will be loaded and executed in alphabetical order, .otui first and then .lua.")
+      !text: localize('BotMainWindowInfoLoadingOrder')
 
     Label
       margin-top: 3
@@ -204,17 +204,17 @@ MainWindow
       text-auto-resize: true
       text-align: center
       text-wrap: true
-      !text: tr("To reload configs just press On and Off in bot window.\nTo learn more about bot click Tutorials button.")
+      !text: localize('BotMainWindowInfoReload')
 
   Button
-    !text: tr('Documentation')
+    !text: localize('BotMainWindowDocumentation')
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     width: 118
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?documentation")
 
   Button
-    !text: tr('Tutorials')
+    !text: localize('BotMainWindowTutorials')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
     margin-left: 5
@@ -222,7 +222,7 @@ MainWindow
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?tutorials")
 
   Button
-    !text: tr('Scripts')
+    !text: localize('BotMainWindowScripts')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
     margin-left: 5
@@ -230,7 +230,7 @@ MainWindow
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?scripts")
 
   Button
-    !text: tr('Forum')
+    !text: localize('BotMainWindowForum')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
     margin-left: 5
@@ -238,7 +238,7 @@ MainWindow
     @onClick: g_platform.openUrl("http://otclient.ovh/bot.php?forum")
 
   Button
-    !text: tr('Discord')
+    !text: localize('BotMainWindowDiscord')
     anchors.bottom: parent.bottom
     anchors.left: prev.right
     margin-left: 5
@@ -247,7 +247,7 @@ MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     width: 60

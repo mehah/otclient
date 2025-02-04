@@ -11,7 +11,7 @@ Panel
     anchors.right: parent.right
     text-align: center
     height: 18
-    !text: tr('BotServer')
+    !text: localize('BotServerButton')
 ]])
 ui:setId(panelName)
 

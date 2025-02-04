@@ -94,7 +94,7 @@ MenuCategoryStore < UIWidget
 
 StoreWindow
   size: 780 537
-  !text: tr('Store')
+  !text: localize('StoreWindowTitleMain')
   color: #909090
   visible: false
   @onEscape: modules.game_store.toggle()
@@ -104,7 +104,7 @@ StoreWindow
     size: 45 20
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     @onClick: modules.game_store.toggle()
 
@@ -114,7 +114,7 @@ StoreWindow
     anchors.bottom: parent.bottom
     anchors.right: btnClose.left
     margin-right: 5
-    !text: tr('History')
+    !text: localize('StoreButtonTransactionHistory')
     font: cipsoftFont
     @onClick: modules.game_store.toggleTransferHistory()
 
@@ -172,7 +172,7 @@ StoreWindow
     Label
       anchors.bottom: parent.bottom
       anchors.left: prev.right
-      !text: tr(")")
+      !text: ")"
       focusable: false
       phantom: true
       margin-left:5
@@ -185,13 +185,13 @@ StoreWindow
     anchors.left: prev.right
     margin-left: 5
     margin-bottom: 2
-    !tooltip: tr('get Tibia Coins')
+    !tooltip: localize('StoreButtonGetCoinsTooltip')
     image-color: green
     icon: /images/ui/tibiaCoin
     icon-align: center
     icon-offset: 10 -1
     text-offset: -18 0
-    !text: tr('Get')
+    !text: localize('StoreButtonGetCoins')
     font: cipsoftFont
     @onClick: modules.game_store.getCoinsWebsite()
 
@@ -202,7 +202,7 @@ StoreWindow
   StoreButton
     id: transferPoints
     anchors.top: btnCoins.top
-    !tooltip: tr('Transfer Coins')
+    !tooltip: localize('StoreButtonTransferCoins')
     anchors.left: btnCoins.right
     margin-left: 5
     icon-align: center
@@ -212,7 +212,7 @@ StoreWindow
 
   StoreButton
     anchors.top: transferPoints.top
-    !tooltip: tr('Setup up an auction to sell you currents characters.')
+    !tooltip: localize('StoreButtonSellCharacter')
     anchors.left: transferPoints.right
     margin-left: 5
     icon-align: center
@@ -360,21 +360,21 @@ StoreWindow
       anchors.bottom: parent.bottom
       anchors.right: parent.right
       margin-bottom:-5
-      !text: tr('Next Page')
+      !text: localize('UIButtonPaginationNext')
       @onClick: modules.game_store.requestTransactionHistory(self)
 
     Label
       id: lblPage
       anchors.bottom: parent.bottom
       anchors.horizontalCenter: parent.horizontalCenter
-      !text: tr('Page 1 / 4')
+      !text: localize('FormFieldCurrentPage') .. " 1 / 4"
 
     Button
       id: btnPrevPage
       anchors.bottom: parent.bottom
       anchors.left: parent.left
       margin-bottom:-5
-      !text: tr('Prev Page')
+      !text: localize('UIButtonPaginationPrev')
       @onClick: modules.game_store.requestTransactionHistory(self)
 
   StoreLightFlatPanel

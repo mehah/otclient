@@ -315,7 +315,7 @@ BotServer < Panel
     text: Triggers
 
 ComboWindow < MainWindow
-  !text: tr('Combo Options')
+  !text: localize('BotWindowTitleComboOptions')
   size: 500 280
   @onEscape: self:hide()
 
@@ -372,7 +372,7 @@ ComboWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom
@@ -382,7 +382,7 @@ ComboWindow < MainWindow
 
   Button
     id: toolsButton
-    !text: tr('Help')
+    !text: localize('UIButtonHelp')
     font: cipsoftFont
     anchors.right: closeButton.left
     anchors.top: closeButton.top

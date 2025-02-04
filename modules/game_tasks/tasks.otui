@@ -83,7 +83,7 @@ SelectionButton < Panel
 MainWindow
   size: 549 509
   id: tasksWindow
-  !text: tr('Tasks')
+  !text: localize('WindowTitleTaskSystem')
 
   @onEnter: modules.game_tasks.toggleWindow()
   @onEscape: modules.game_tasks.toggleWindow()

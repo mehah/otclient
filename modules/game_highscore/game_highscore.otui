@@ -393,6 +393,6 @@ MainWindow
   Button
     anchors.right: separator.right
     anchors.top: separator.top
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     @onClick: modules.game_highscore.hide()
     margin-top: 10

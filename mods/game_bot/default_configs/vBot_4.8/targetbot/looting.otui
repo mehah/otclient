@@ -18,7 +18,7 @@ TargetBotLootingPanel < Panel
 
   BotSwitch
     id: everyItem
-    !text: tr("Loot every item, except these")
+    !text: localize('BotLootingBlacklist')
     margin-top: 2
     font: small-9px
 

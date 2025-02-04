@@ -40,7 +40,7 @@ VocationPanel < Panel
     text: Paladins
 
 SioListWindow < MainWindow
-  !text: tr('Healer Options')
+  !text: localize('BotHealerOptions')
   size: 220 360
   @onEscape: self:hide()
 
@@ -181,7 +181,7 @@ SioListWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

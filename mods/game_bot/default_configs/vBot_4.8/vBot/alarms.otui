@@ -61,7 +61,7 @@ AlarmCheckBoxAndTextEdit < Panel
     margin-bottom: 1
 
 AlarmsWindow < MainWindow
-  !text: tr('Alarms')
+  !text: localize('BotAlarms')
   size: 330 400
   padding: 15
   @onEscape: self:hide()
@@ -126,7 +126,7 @@ AlarmsWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

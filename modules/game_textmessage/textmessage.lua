@@ -2,48 +2,48 @@ MessageSettings = {
     none = {},
     consoleRed = {
         color = TextColors.red,
-        consoleTab = 'Local Chat'
+        consoleTab = 'ChatChannelNameDefault'
     },
     consoleOrange = {
         color = TextColors.orange,
-        consoleTab = 'Local Chat'
+        consoleTab = 'ChatChannelNameDefault'
     },
     consoleBlue = {
         color = TextColors.blue,
-        consoleTab = 'Local Chat'
+        consoleTab = 'ChatChannelNameDefault'
     },
     centerRed = {
         color = TextColors.red,
-        consoleTab = 'Server Log',
+        consoleTab = 'ChatChannelNameServerLog',
         screenTarget = 'lowCenterLabel'
     },
     centerGreen = {
         color = TextColors.green,
-        consoleTab = 'Server Log',
+        consoleTab = 'ChatChannelNameServerLog',
         screenTarget = 'highCenterLabel',
         consoleOption = 'showInfoMessagesInConsole'
     },
     centerWhite = {
         color = TextColors.white,
-        consoleTab = 'Server Log',
+        consoleTab = 'ChatChannelNameServerLog',
         screenTarget = 'middleCenterLabel',
         consoleOption = 'showEventMessagesInConsole'
     },
     bottomWhite = {
         color = TextColors.white,
-        consoleTab = 'Server Log',
+        consoleTab = 'ChatChannelNameServerLog',
         screenTarget = 'statusLabel',
         consoleOption = 'showEventMessagesInConsole'
     },
     status = {
         color = TextColors.white,
-        consoleTab = 'Server Log',
+        consoleTab = 'ChatChannelNameServerLog',
         screenTarget = 'statusLabel',
         consoleOption = 'showStatusMessagesInConsole'
     },
     othersStatus = {
         color = TextColors.white,
-        consoleTab = 'Server Log',
+        consoleTab = 'ChatChannelNameServerLog',
         consoleOption = 'showOthersStatusMessagesInConsole'
     },
     statusSmall = {
@@ -56,7 +56,7 @@ MessageSettings = {
     },
     loot = {
         color = TextColors.white,
-        consoleTab = 'Loot',
+        consoleTab = 'ChatChannelNameLoot',
         screenTarget = 'highCenterLabel',
         consoleOption = 'showInfoMessagesInConsole'
     }
@@ -150,7 +150,7 @@ function displayMessage(mode, text)
 
     if msgtype.consoleTab ~= nil and
         (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
-        modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
+        modules.game_console.addText(text, msgtype, localize(msgtype.consoleTab))
         -- TODO move to game_console
     end
 
@@ -205,5 +205,5 @@ function clearMessages()
 end
 
 function LocalPlayer:onAutoWalkFail(player)
-    modules.game_textmessage.displayFailureMessage(tr('There is no way.'))
+    modules.game_textmessage.displayFailureMessage(localize('ThereIsNoWay'))
 end

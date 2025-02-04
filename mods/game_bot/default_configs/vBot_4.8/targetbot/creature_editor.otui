@@ -74,14 +74,14 @@ TargetBotCreatureEditorWindow < MainWindow
     anchors.right: parent.right
     anchors.top: parent.top
     text-align: center
-    !text: tr('You can use * (any characters) and ? (any character) in target name')
+    !text: localize('BotCreatureEditorHint_1')
 
   Label
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
     text-align: center
-    !text: tr('You can also enter multiple targets, separate them by ,')
+    !text: localize('BotCreatureEditorHint_2')
 
   TextEdit
     id: name
@@ -142,7 +142,7 @@ TargetBotCreatureEditorWindow < MainWindow
 
   Button
     id: help
-    !text: tr('Help & Tutorials')
+    !text: localize('BotHelpTutorials')
     anchors.bottom: parent.bottom
     anchors.left: parent.left
     width: 150
@@ -150,7 +150,7 @@ TargetBotCreatureEditorWindow < MainWindow
 
   Button
     id: ok
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     anchors.bottom: parent.bottom
     anchors.right: next.left
     margin-right: 10
@@ -158,7 +158,7 @@ TargetBotCreatureEditorWindow < MainWindow
 
   Button
     id: cancel
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     width: 60

@@ -26,7 +26,7 @@ function init()
     })
 
     unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
-                                                                              tr('Unjustified Points'),
+                                                                              localize('UnjustifiedPanelTitle'),
                                                                               '/images/options/button_frags',
                                                                               toggle)
     unjustifiedPointsButton:setOn(true)

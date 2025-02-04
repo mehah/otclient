@@ -9,13 +9,14 @@ CaveBot.Config.setup = function()
   local ui = CaveBot.Config.ui
   local add = CaveBot.Config.add
 
-  add("ping", "Server ping", 100)
-  add("walkDelay", "Walk delay", 10)
-  add("mapClick", "Use map click", false)
-  add("mapClickDelay", "Map click delay", 100)
-  add("ignoreFields", "Ignore fields", false)
-  add("skipBlocked", "Skip blocked path", false)
-  add("useDelay", "Delay after use", 400)
+  -- panel id, panel title (see locales), default value
+  add("ping", "BotCavePing", 100)
+  add("walkDelay", "BotCaveWalkDelay", 10)
+  add("mapClick", "BotCaveMapClick", false)
+  add("mapClickDelay", "BotCaveMapClickDelay", 100)
+  add("ignoreFields", "BotCaveIgnoreFields", false)
+  add("skipBlocked", "BotCaveSkipBlocked", false)
+  add("useDelay", "BotCaveUseDelay", 400)
 end
 
 CaveBot.Config.show = function()
@@ -79,7 +80,7 @@ CaveBot.Config.add = function(id, title, defaultValue)
     return error("Invalid default value of config for key " .. id .. ", should be number or boolean")
   end
 
-  panel.title:setText(tr(title) .. ":")
+  panel.title:setText(localize(title) .. ":")
 
   CaveBot.Config.value_setters[id] = setter
   CaveBot.Config.values[id] = defaultValue

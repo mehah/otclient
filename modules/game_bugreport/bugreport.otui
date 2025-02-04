@@ -32,7 +32,7 @@ BugReportWindow < MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     width: 80

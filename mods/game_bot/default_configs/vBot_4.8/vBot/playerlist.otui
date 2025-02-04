@@ -11,7 +11,7 @@ PlayerLabel < UIWidget
 
   Button
     id: remove
-    !text: tr('X')
+    !text: 'X'
     anchors.right: parent.right
     anchors.verticalCenter: parent.verticalCenter
     width: 14
@@ -97,7 +97,7 @@ tPanel < Panel
     font: verdana-11px-rounded
 
 PlayerListWindow < MainWindow
-  !text: tr('Player List')
+  !text: localize('BotPlayerList')
   size: 405 356
   @onEscape: self:hide()
 
@@ -141,7 +141,7 @@ PlayerListWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

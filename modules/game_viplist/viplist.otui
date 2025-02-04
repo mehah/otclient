@@ -20,7 +20,7 @@ VipGroupList < UIWidget
     anchors.left: parent.left
     color: #f7f7f7
     text-align: topLeft
-    !text: tr('No Group')
+    !text: localize('VipListNoGroup')
     text-auto-resize: true
   
   HorizontalSeparator
@@ -41,7 +41,7 @@ VipGroupList < UIWidget
 
 MiniWindow
   id: vipWindow
-  !text: tr('VIP List')
+  !text: localize('VipListPanelTitle')
   height: 100
   icon: /images/topbuttons/viplist
   @onOpen: modules.game_viplist.onMiniWindowOpen()

@@ -35,7 +35,7 @@ function init()
 
   initCallbacks()
 
-  botButton = modules.game_mainpanel.addToggleButton('botButton', tr('Bot'), '/images/options/bot', toggle, false, 99999)
+  botButton = modules.game_mainpanel.addToggleButton('botButton', localize('BotMainPanelToggleButton'), '/images/options/bot', toggle, false, 99999)
   botButton:setOn(false)
   botButton:hide()
 
@@ -336,37 +336,37 @@ function uploadConfig()
   local config = editWindow.manager.upload.config:getCurrentOption().text
   local archive = compressConfig(config)
   if not archive then
-      return displayErrorBox(tr("Config upload failed"), tr("Config %s is invalid (can't be compressed)", config))
+      return displayErrorBox(localize('BotConfigUploadFailTitle'), localize('BotConfigUploadFailCompression', config))
   end
   if archive:len() > 1024 * 1024 then
-      return displayErrorBox(tr("Config upload failed"), tr("Config %s is too big, maximum size is 1024KB. Now it has %s KB.", config, math.floor(archive:len() / 1024)))
+      return displayErrorBox(localize('BotConfigUploadFailTitle'), localize('BotConfigUploadFailSize', config, math.floor(archive:len() / 1024)))
   end
 
-  local infoBox = displayInfoBox(tr("Uploading config"), tr("Uploading config %s. Please wait.", config))
+  local infoBox = displayInfoBox(localize('BotConfigUploadPendingTitle'), localize('BotConfigUploadPendingText', config))
 
   HTTP.postJSON(configManagerUrl .. "?config=" .. config:gsub("%s+", "_"), archive, function(data, err)
     if infoBox then
       infoBox:destroy()
     end
     if err or data["error"] then
-      return displayErrorBox(tr("Config upload failed"), tr("Error while upload config %s:\n%s", config, err or data["error"]))
+      return displayErrorBox(localize('BotConfigUploadFailTitle'), localize('BotConfigUploadFailText', config, err or data["error"]))
     end
-    displayInfoBox(tr("Succesful config upload"), tr("Config %s has been uploaded.\n%s", config, data["message"]))
+    displayInfoBox(localize('BotConfigUploadSuccessTitle'), localize('BotConfigUploadSuccessText', config, data["message"]))
   end)
 end
 
 function downloadConfig()
   local hash = editWindow.manager.download.config:getText()
   if hash:len() == 0 then
-      return displayErrorBox(tr("Config download error"), tr("Enter correct config hash"))
+      return displayErrorBox(localize('BotConfigDownloadErrorTitle'), localize('BotConfigDownloadErrorHash'))
   end
-  local infoBox = displayInfoBox(tr("Downloading config"), tr("Downloading config with hash %s. Please wait.", hash))
+  local infoBox = displayInfoBox(localize('BotConfigDownloadTitle'), localize('BotConfigDownloadText', hash))
   HTTP.download(configManagerUrl .. "?hash=" .. hash, hash .. ".zip", function(path, checksum, err)
     if infoBox then
       infoBox:destroy()
     end
     if err then
-      return displayErrorBox(tr("Config download error"), tr("Config with hash %s cannot be downloaded", hash))
+      return displayErrorBox(localize('BotConfigDownloadErrorTitle'), localize('BotConfigDownloadErrorFailed', hash))
     end
     modules.client_textedit.show("", {
       title="Enter name for downloaded config",
