@@ -186,8 +186,8 @@ minHeight,
     bool canShoot(int distance);
 
 protected:
-    virtual void updateWalkOffset(uint8_t totalPixelsWalked);
     virtual void terminateWalk();
+    void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
 
     ThingType* getThingType() const override;
@@ -202,6 +202,7 @@ protected:
     Otc::Direction m_direction{ Otc::South };
 
     Timer m_walkTimer;
+    Position m_lastStepToPosition;
 
 private:
     void nextWalkUpdate();
@@ -245,7 +246,6 @@ private:
     CachedStep m_stepCache;
 
     Position m_lastStepFromPosition;
-    Position m_lastStepToPosition;
     Position m_oldPosition;
 
     Timer m_footTimer;

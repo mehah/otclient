@@ -65,7 +65,7 @@ local function walk(dir)
             if not canChangeFloor(toPos, 1) and not canChangeFloor(toPos, -1) then
                 return false
             end
-        elseif not player:isPreWalking() then
+        else
             player:preWalk(dir)
         end
     end
@@ -88,7 +88,7 @@ local function addWalkEvent(dir, delay)
         walk(smartWalkDir or dir)
     end
 
-    walkEvent = delay == 0 and addEvent(walkCallback) or scheduleEvent(walkCallback, delay or 10)
+    walkEvent = delay == 0 and addEvent(walkCallback) or scheduleEvent(walkCallback, delay or 5)
 end
 
 --- Initiates a smart walk in the given direction.

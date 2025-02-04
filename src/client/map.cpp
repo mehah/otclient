@@ -244,7 +244,7 @@ bool Map::removeThing(const ThingPtr& thing)
         return false;
 
     if (thing->isMissile()) {
-        auto& missiles = m_floors[thing->getPosition().z].missiles;
+        auto& missiles = m_floors[thing->getServerPosition().z].missiles;
         const auto it = std::ranges::find(missiles, thing->static_self_cast<Missile>());
         if (it == missiles.end())
             return false;
@@ -255,7 +255,7 @@ bool Map::removeThing(const ThingPtr& thing)
 
     if (const auto& tile = thing->getTile()) {
         if (tile->removeThing(thing)) {
-            notificateTileUpdate(thing->getPosition(), thing, Otc::OPERATION_REMOVE);
+            notificateTileUpdate(thing->getServerPosition(), thing, Otc::OPERATION_REMOVE);
             return true;
         }
     }
