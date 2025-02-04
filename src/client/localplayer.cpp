@@ -50,7 +50,7 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
         return false;
 
     // allow only if walk done, ex. diagonals may need additional ticks before taking another step
-    return m_walkTimer.ticksElapsed() >= std::max<int>(getStepDuration(), g_game.getServerWalkTicks());
+    return m_walkTimer.ticksElapsed() >= getStepDuration();
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)

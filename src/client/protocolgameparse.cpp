@@ -41,6 +41,11 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
     int opcode = -1;
     int prevOpcode = -1;
 
+    if (g_game.m_walkTicks == -1 && g_game.getLocalPlayer()) {
+        g_game.m_walkTicks = g_game.m_walkTimer.ticksElapsed();
+        g_game.m_walkTimer.restart();
+    }
+
     try {
         while (!msg->eof()) {
             opcode = msg->getU8();
@@ -1365,11 +1370,6 @@ void ProtocolGame::parseCreatureMove(const InputMessagePtr& msg)
 
     const auto& creature = thing->static_self_cast<Creature>();
     creature->allowAppearWalk();
-
-    if (creature->isLocalPlayer() && g_game.m_walkTicks == -1) {
-        g_game.m_walkTicks = std::min<ticks_t>(g_game.m_walkTimer.ticksElapsed(), creature->getStepDuration(true));
-        g_game.m_walkTimer.restart();
-    }
 
     g_map.addThing(thing, newPos, -1);
 }
