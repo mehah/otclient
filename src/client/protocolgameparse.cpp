@@ -1367,7 +1367,7 @@ void ProtocolGame::parseCreatureMove(const InputMessagePtr& msg)
     creature->allowAppearWalk();
 
     if (creature->isLocalPlayer() && g_game.m_walkTicks == -1) {
-        g_game.m_walkTicks = g_game.m_walkTimer.ticksElapsed();
+        g_game.m_walkTicks = std::min<ticks_t>(g_game.m_walkTimer.ticksElapsed(), creature->getStepDuration(true));
         g_game.m_walkTimer.restart();
     }
 
