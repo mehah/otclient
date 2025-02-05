@@ -183,7 +183,7 @@ void LocalPlayer::stopAutoWalk()
         m_autoWalkContinueEvent->cancel();
 }
 
-void LocalPlayer::terminateWalk(std::function<void()>&& onTerminate)
+void LocalPlayer::terminateWalk(std::function<void()>&& /*onTerminate*/)
 {
     Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {
         m_lastPrewalkDestination = {};
