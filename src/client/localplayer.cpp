@@ -58,7 +58,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking() && getPosition() == newPos)
+    if (isPreWalking())
         return;
 
     m_serverWalk = true;

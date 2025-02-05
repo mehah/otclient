@@ -956,7 +956,8 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     if (isLocalPlayer() && g_game.getPing() > m_stepCache.duration) {
         // stabilizes camera transition with server response time to keep movement fluid.
-        duration += std::min<int>(g_game.getPing() - m_stepCache.duration, 20);
+        const auto diff = g_game.getPing() - m_stepCache.duration;
+        if (diff > 0) duration += diff < 10 ? 10 : 20;
     }
 
     return duration;

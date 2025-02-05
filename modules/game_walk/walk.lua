@@ -75,7 +75,7 @@ local function walk(dir)
 end
 
 --- Adds a walk event with an optional delay.
-local function addWalkEvent(dir, delay)
+local function addWalkEvent(dir)
     if os.time() - lastCancelWalkTime > 10 then
         cancelWalkEvent()
         lastCancelWalkTime = os.time()
@@ -88,7 +88,7 @@ local function addWalkEvent(dir, delay)
         walk(smartWalkDir or dir)
     end
 
-    walkEvent = delay == 0 and addEvent(walkCallback) or scheduleEvent(walkCallback, delay or 5)
+    walkEvent = addEvent(walkCallback)
 end
 
 --- Initiates a smart walk in the given direction.
