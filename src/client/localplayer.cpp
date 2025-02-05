@@ -31,7 +31,7 @@ void LocalPlayer::lockWalk(const uint16_t millis)
     m_walkLockExpiration = std::max<ticks_t>(m_walkLockExpiration, g_clock.millis() + millis);
 }
 
-bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
+bool LocalPlayer::canWalk(const bool ignoreLock)
 {
     // paralyzed
     if (isDead())

@@ -83,7 +83,7 @@ local function walk(dir)
         player:lockWalk(duration * 2)
     end
 
-    if not player:canWalk(dir) then
+    if not player:canWalk() then
         nextWalkDir = dir
         return
     end
