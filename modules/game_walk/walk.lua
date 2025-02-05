@@ -62,7 +62,7 @@ local function walk(dir)
 
     if not player or g_game.isDead() or player:isDead() or player:isWalkLocked() or player:isServerWalking() then
         if player:isServerWalking() then
-            player:lockWalk(25)
+            player:lockWalk(50)
         end
 
         cancelWalkEvent()
@@ -77,9 +77,9 @@ local function walk(dir)
         scheduleEvent(function()
             player:stopAutoWalk()
             g_game.stop()
-        end, 100)
+        end, 150)
 
-        player:lockWalk(100)
+        player:lockWalk(150)
     end
 
 
