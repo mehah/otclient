@@ -679,7 +679,7 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
         return;
     }
 
-    g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
+    g_lua.callGlobalField("g_game", "onAutoWalk", m_localPlayer, dirs);
     m_protocolGame->sendAutoWalk(dirs);
 }
 

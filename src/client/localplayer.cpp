@@ -201,10 +201,6 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
         stopAutoWalk();
     else if (m_autoWalkDestination.isValid() && newPos == m_lastAutoWalkPosition)
         autoWalk(m_autoWalkDestination);
-
-    if (isServerWalking()) {
-        m_serverWalk = false;
-    }
 }
 
 void LocalPlayer::setStates(const uint32_t states)
