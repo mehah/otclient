@@ -66,7 +66,6 @@ local function walk(dir)
         end
 
         cancelWalkEvent()
-        return
     end
 
     if g_game.isFollowing() then

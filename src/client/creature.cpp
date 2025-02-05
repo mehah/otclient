@@ -923,6 +923,8 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     const auto& tile = g_map.getTile(tilePos.isValid() ? tilePos : m_position);
 
+    const int serverBeat = g_game.getServerBeat();
+
     int groundSpeed = 0;
     if (tile) groundSpeed = tile->getGroundSpeed();
     if (groundSpeed == 0)
@@ -938,7 +940,6 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
         } else stepDuration /= m_speed;
 
         if (g_gameConfig.isForcingNewWalkingFormula() || g_game.getClientVersion() >= 860) {
-            const int serverBeat = g_game.getServerBeat();
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
@@ -957,7 +958,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
     if (isLocalPlayer() && g_game.getPing() > m_stepCache.duration) {
         // stabilizes camera transition with server response time to keep movement fluid.
         const auto diff = g_game.getPing() - m_stepCache.duration;
-        if (diff > 0) duration += diff < 10 ? 10 : 20;
+        duration += std::min<int>(((diff + 9) / 10) * 10, serverBeat);
     }
 
     return duration;
