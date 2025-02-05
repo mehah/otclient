@@ -586,6 +586,11 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 menu:addOption(tr('Open'), function()
                     g_game.open(useThing)
                 end, shortcut)
+                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and useThing:getPosition().x ~= 0xffff then
+                    menu.addOption(menu, tr("Loot corpse"), function()
+                        g_game.sendQuickLoot(1, useThing)
+                    end)
+                end
             end
         else
             if useThing:isMultiUse() then

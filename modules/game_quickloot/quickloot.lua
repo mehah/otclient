@@ -27,10 +27,18 @@ function quickLootController:onInit()
     quickLootController:registerEvents(g_game, {
         onQuickLootContainers = QuickLoot.start
     })
+    Keybind.new("Loot:", "Quick Loot Nearby Corses", "Alt+Q", "")
+    Keybind.bind("Loot:", "Quick Loot Nearby Corses", {
+      {
+        type = KEY_DOWN,
+        callback = function() g_game.sendQuickLoot(2) end,
+      }
+    })
 
 end
 
 function quickLootController:onTerminate()
+    Keybind.delete("Loot:", "Quick Loot Nearby Corses")
     if QuickLoot.mouseGrabberWidget then
         QuickLoot.mouseGrabberWidget:destroy()
         QuickLoot.mouseGrabberWidget = nil
