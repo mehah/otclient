@@ -58,7 +58,8 @@ MessageSettings = {
         color = TextColors.white,
         consoleTab = 'Loot',
         screenTarget = 'highCenterLabel',
-        consoleOption = 'showInfoMessagesInConsole'
+        consoleOption = 'showInfoMessagesInConsole',
+        colored = true
     }
 }
 
@@ -156,10 +157,7 @@ function displayMessage(mode, text)
 
     if msgtype == MessageSettings.loot then
         local coloredText = ItemsDatabase.setColorLootMessage(text)
-        local getTabServerLog = modules.game_console.consoleTabBar:getTabPanel(modules.game_console.serverTab)
-        if getTabServerLog then
-            getTabServerLog:getChildById('consoleBuffer'):getLastChild():setColoredText(coloredText)
-        end
+        modules.game_console.addText(coloredText, msgtype, tr("Server Log"))
     end
 
     if msgtype.screenTarget then
