@@ -61,6 +61,11 @@ local function walk(dir)
     local player = g_game.getLocalPlayer()
 
     if not player or g_game.isDead() or player:isDead() or player:isWalkLocked() or player:isServerWalking() then
+        if player:isServerWalking() then
+            print(213)
+            player:lockWalk(25)
+        end
+
         cancelWalkEvent()
         return
     end
