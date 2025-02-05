@@ -41,10 +41,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
     int opcode = -1;
     int prevOpcode = -1;
 
-    if (g_game.m_walkTicks == -1 && g_game.getLocalPlayer()) {
-        g_game.m_walkTicks = g_game.m_walkTimer.ticksElapsed();
-        g_game.m_walkTimer.restart();
-    }
+    g_game.m_relativePing = g_game.m_requestTimer.ticksElapsed();
 
     try {
         while (!msg->eof()) {

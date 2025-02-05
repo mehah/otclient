@@ -43,27 +43,23 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
 
     if (isWalking()) {
         if (isAutoWalking()) return true; // always allow automated walks
-        if (isPreWalking()) return false; // allow only single prewalk
+        if (isPreWalking())  return false; // allow only single prewalk
     }
 
-    if (g_game.getServerWalkTicks() == -1)
+    // walking will only be allowed when the client's position is the same as the server's.
+    if (getPosition() != getServerPosition())
         return false;
 
     // allow only if walk done, ex. diagonals may need additional ticks before taking another step
-    return m_walkTimer.ticksElapsed() >= std::max<int>(getStepDuration(), g_game.getServerWalkTicks());
+    return m_walkTimer.ticksElapsed() >= getStepDuration();
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (oldPos.z == newPos.z && m_lastPrewalkDestination.isValid()) {
-        if (m_lastPrewalkDestination == newPos)
-            return;
-
-        if (g_game.getWalkTicksElapsed() <= 1 || g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
-            return;
-    }
+    if (isPreWalking() && getPosition() == newPos)
+        return;
 
     m_serverWalk = true;
 

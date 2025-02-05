@@ -706,7 +706,7 @@ public:
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
 
-    int getPing() { return m_ping; }
+    int getPing() { return m_ping > -1 ? m_ping : m_relativePing; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }
@@ -776,8 +776,7 @@ public:
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
-    auto getServerWalkTicks() const { return m_walkTicks; }
-    auto getWalkTicksElapsed() const { return m_walkTimer.ticksElapsed(); }
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -829,8 +828,8 @@ private:
     stdext::timer m_pingTimer;
 
     ticks_t m_ping{ -1 };
-    ticks_t m_walkTicks{ 0 };
-    Timer m_walkTimer;
+    ticks_t m_relativePing{ -1 };
+    Timer m_requestTimer;
 };
 
 extern Game g_game;
