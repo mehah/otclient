@@ -62,7 +62,7 @@ local function walk(dir)
 
     if not player or g_game.isDead() or player:isDead() or player:isWalkLocked() or player:isServerWalking() then
         if player:isServerWalking() then
-            player:lockWalk(50)
+            player:lockWalk(25)
         end
 
         cancelWalkEvent()
@@ -77,9 +77,9 @@ local function walk(dir)
         scheduleEvent(function()
             player:stopAutoWalk()
             g_game.stop()
-        end, 150)
+        end, 100)
 
-        player:lockWalk(200)
+        player:lockWalk(100)
     end
 
 
@@ -231,6 +231,8 @@ local function onWalkFinish(player)
     end
 end
 
+local function onAutoWalk(player) end
+
 --- Handles cancellation of a walking event.
 local function onCancelWalk(player)
     player:lockWalk(50)
@@ -249,12 +251,14 @@ end
 function WalkController:onGameStart()
     self:registerEvents(g_game, {
         onGameStart = onGameStart,
-        onTeleport = onTeleport
+        onTeleport = onTeleport,
+        onAutoWalk = onAutoWalk
     })
 
     self:registerEvents(LocalPlayer, {
         onCancelWalk = onCancelWalk,
-        onWalkFinish = onWalkFinish
+        onWalkFinish = onWalkFinish,
+        onAutoWalk = onAutoWalk
     })
 
     modules.game_interface.getRootPanel().onFocusChange = stopSmartWalk
