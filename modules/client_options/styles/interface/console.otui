@@ -88,3 +88,14 @@ UIWidget
       id: showPrivateMessagesOnScreen
       !text: tr('Show private messages on screen')
 
+  SmallReversedQtPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 7
+    height: 22
+  
+    OptionCheckBox
+      id: showLootMessagesOnScreen
+      !text: tr('Show loot messages on screen')
+
