@@ -83,7 +83,6 @@ local function walk(dir)
         player:lockWalk(duration * 2)
     end
 
-
     if not player:canWalk(dir) then
         nextWalkDir = dir
         return
@@ -109,10 +108,8 @@ end
 
 --- Adds a walk event with an optional delay.
 local function addWalkEvent(dir)
-    if os.time() - lastCancelWalkTime > 10 then
-        cancelWalkEvent()
-        lastCancelWalkTime = os.time()
-    end
+    cancelWalkEvent()
+
 
     local function walkCallback()
         if g_keyboard.getModifiers() ~= KeyboardNoModifier then
