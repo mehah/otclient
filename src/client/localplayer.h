@@ -108,7 +108,7 @@ public:
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
-    bool isPreWalking() { return m_lastPrewalkDestination.isValid(); }
+    bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid(); }
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
@@ -123,8 +123,7 @@ public:
 
     bool isSynchronized() { return getPosition() == getServerPosition(); }
     Position getPosition() override {
-        return m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2 ? m_lastPrewalkDestination :
-            m_updatingServerPosition ? getLastStepToPosition() : m_position;
+        return isPreWalking() ? m_lastPrewalkDestination : m_position;
     }
 
 protected:

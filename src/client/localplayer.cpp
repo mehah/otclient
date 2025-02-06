@@ -58,7 +58,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking() || !isAutoWalking() && getPosition() == newPos)
+    if (isPreWalking())
         return;
 
     m_serverWalk = true;
@@ -82,12 +82,11 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
     if (event) event->cancel();
     event = g_dispatcher.scheduleEvent(
         [this, self = static_self_cast<LocalPlayer>()] { m_updatingServerPosition = false; event = nullptr; },
-        std::max<int>(getStepDuration(), g_game.getPing() + 100));
+        std::max<int>(getStepDuration(), g_game.getPing()) + 50);
 }
 
 void LocalPlayer::setPosition(const Position& position, uint8_t stackPos, bool hasElevation) {
     Creature::setPosition(position, stackPos, hasElevation);
-    m_updatingServerPosition = false;
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -198,9 +197,7 @@ void LocalPlayer::stopAutoWalk()
 
 void LocalPlayer::terminateWalk(std::function<void()>&& /*onTerminate*/)
 {
-    Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {
-        m_lastPrewalkDestination = {};
-    });
+    Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {});
 
     m_serverWalk = false;
     callLuaField("onWalkFinish");
