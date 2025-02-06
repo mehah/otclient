@@ -677,7 +677,7 @@ void Creature::updateWalk()
     }
 }
 
-void Creature::terminateWalk(std::function<void()>&& onTerminate)
+void Creature::terminateWalk()
 {
     // remove any scheduled walk update
     if (m_walkUpdateEvent) {
@@ -701,10 +701,9 @@ void Creature::terminateWalk(std::function<void()>&& onTerminate)
     m_walking = false;
 
     const auto self = static_self_cast<Creature>();
-    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self, onTerminate = std::move(onTerminate)] {
+    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
-        if (onTerminate) onTerminate();
     }, g_game.getServerBeat());
 }
 
@@ -958,7 +957,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
     if (isLocalPlayer() && g_game.getPing() > m_stepCache.duration) {
         // stabilizes camera transition with server response time to keep movement fluid.
         const auto diff = g_game.getPing() - m_stepCache.duration;
-        duration += std::min<int>(((diff + 9) / 10) * 10, serverBeat);
+        duration += std::min<int>(((diff + 9) / 10) * 10, 20);
     }
 
     return duration;

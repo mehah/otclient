@@ -186,7 +186,7 @@ minHeight,
     bool canShoot(int distance);
 
 protected:
-    virtual void terminateWalk(std::function<void()>&& onTerminate = nullptr);
+    virtual void terminateWalk();
     void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
 

@@ -58,7 +58,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking())
+    if (isPreWalking() || getLastStepToPosition() == newPos)
         return;
 
     m_serverWalk = true;
@@ -66,15 +66,22 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
     Creature::walk(oldPos, newPos);
 }
 
-void LocalPlayer::preWalk(const Otc::Direction direction)
+bool LocalPlayer::preWalk(const Otc::Direction direction)
 {
     // avoid reanimating prewalks
     auto pos = m_position.translatedToDirection(direction);
 
     if (m_lastPrewalkDestination == pos)
-        return;
+        return false;
 
     Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
+
+    if (m_eventPreWalkReset) {
+        m_eventPreWalkReset->cancel();
+        m_eventPreWalkReset = nullptr;
+    }
+
+    return true;
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -183,11 +190,14 @@ void LocalPlayer::stopAutoWalk()
         m_autoWalkContinueEvent->cancel();
 }
 
-void LocalPlayer::terminateWalk(std::function<void()>&& /*onTerminate*/)
+void LocalPlayer::terminateWalk()
 {
-    Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {
+    Creature::terminateWalk();
+
+    m_eventPreWalkReset = g_dispatcher.scheduleEvent([this, self = static_self_cast<LocalPlayer>()] {
         m_lastPrewalkDestination = {};
-    });
+        m_eventPreWalkReset = nullptr;
+    }, std::max<int>(g_game.getServerBeat(), g_game.getPing()));
 
     m_serverWalk = false;
     callLuaField("onWalkFinish");

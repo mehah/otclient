@@ -89,8 +89,8 @@ local function walk(dir)
             if not canChangeFloor(toPos, 1) and not canChangeFloor(toPos, -1) then
                 return false
             end
-        else
-            player:preWalk(dir)
+        elseif not player:preWalk(dir) then
+            return
         end
     end
 
