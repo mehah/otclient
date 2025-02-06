@@ -61,8 +61,6 @@ public:
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
     void takeScreenshot(uint8_t type);
 
-    void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
-
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
 

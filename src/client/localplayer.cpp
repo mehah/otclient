@@ -85,10 +85,6 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
         std::max<int>(getStepDuration(), g_game.getPing()) + 50);
 }
 
-void LocalPlayer::setPosition(const Position& position, uint8_t stackPos, bool hasElevation) {
-    Creature::setPosition(position, stackPos, hasElevation);
-}
-
 bool LocalPlayer::retryAutoWalk()
 {
     if (!m_autoWalkDestination.isValid()) {
