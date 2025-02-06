@@ -2,7 +2,6 @@ local smartWalkDirs = {}
 local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
-local lastCancelWalkTime = 0
 local nextWalkDir = nil
 
 local keys = {
@@ -225,7 +224,9 @@ local function onAutoWalk(player) end
 
 --- Handles cancellation of a walking event.
 local function onCancelWalk(player)
-    player:lockWalk(50)
+    if not player:isWalkLocked() then
+        player:lockWalk(50)
+    end
 end
 
 --- Initializes the WalkController.
