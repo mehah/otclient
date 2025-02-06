@@ -117,14 +117,14 @@ public:
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
-    bool preWalk(Otc::Direction direction);
+    void preWalk(Otc::Direction direction);
 
     bool isSynchronized() { return getPosition() == getServerPosition(); }
     Position getPosition() override { return m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2 ? m_lastPrewalkDestination : m_position; }
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
-    void terminateWalk() override;
+    void terminateWalk(std::function<void()>&& onTerminate = nullptr) override;
 
     friend class Game;
 
@@ -139,8 +139,6 @@ private:
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
 
     bool retryAutoWalk();
-
-    EventPtr m_eventPreWalkReset;
 
     // walk related
     Position m_lastPrewalkDestination;
