@@ -620,6 +620,11 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 g_game.browseField(useThing:getPosition())
             end)
         end
+        if useThing:isLyingCorpse() and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and useThing:getPosition().x ~= 0xffff then
+            menu.addOption(menu, tr("Loot corpse"), function()
+                g_game.sendQuickLoot(1, useThing)
+            end)
+        end
     end
 
     if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then

@@ -82,7 +82,7 @@ function UIPopupMenu:addOption(optionName, optionCallback, shortcut, disabled)
 end
 
 function UIPopupMenu:addSeparator()
-    g_ui.createWidget(self:getStyleName() .. 'Separator', self)
+    g_ui.createWidget('HorizontalSeparator', self)
 end
 
 function UIPopupMenu:setGameMenu(state)

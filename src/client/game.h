@@ -759,8 +759,12 @@ public:
                           const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, uint32_t entriesTs);
 
     void requestBless();
+
+    // quickLoot related
+    void sendQuickLoot(const uint8_t variant, const ItemPtr& item);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
+
     void sendGmTeleport(const Position& pos);
 
     // cyclopedia related
