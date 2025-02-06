@@ -677,7 +677,7 @@ void Creature::updateWalk()
     }
 }
 
-void Creature::terminateWalk()
+void Creature::terminateWalk(std::function<void()>&& onTerminate)
 {
     // remove any scheduled walk update
     if (m_walkUpdateEvent) {
@@ -701,9 +701,10 @@ void Creature::terminateWalk()
     m_walking = false;
 
     const auto self = static_self_cast<Creature>();
-    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self] {
+    m_walkFinishAnimEvent = g_dispatcher.scheduleEvent([self, onTerminate = std::move(onTerminate)] {
         self->m_walkAnimationPhase = 0;
         self->m_walkFinishAnimEvent = nullptr;
+        if (onTerminate) onTerminate();
     }, g_game.getServerBeat());
 }
 
@@ -922,6 +923,8 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     const auto& tile = g_map.getTile(tilePos.isValid() ? tilePos : m_position);
 
+    const int serverBeat = g_game.getServerBeat();
+
     int groundSpeed = 0;
     if (tile) groundSpeed = tile->getGroundSpeed();
     if (groundSpeed == 0)
@@ -937,7 +940,6 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
         } else stepDuration /= m_speed;
 
         if (g_gameConfig.isForcingNewWalkingFormula() || g_game.getClientVersion() >= 860) {
-            const int serverBeat = g_game.getServerBeat();
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
@@ -951,7 +953,15 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
                 : 2);
     }
 
-    return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
+    auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
+
+    if (isLocalPlayer() && g_game.getPing() > m_stepCache.duration) {
+        // stabilizes camera transition with server response time to keep movement fluid.
+        const auto diff = g_game.getPing() - m_stepCache.duration;
+        duration += std::min<int>(((diff + 9) / 10) * 10, serverBeat);
+    }
+
+    return duration;
 }
 
 Point Creature::getDisplacement() const

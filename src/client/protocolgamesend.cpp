@@ -25,6 +25,11 @@
 #include "protocolgame.h"
 #include <framework/util/crypt.h>
 
+void ProtocolGame::onSend() {
+    g_game.m_relativePing.timer.restart();
+    g_game.m_relativePing.requested = true;
+}
+
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
 {
     if (m_enableSendExtendedOpcode) {

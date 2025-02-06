@@ -31,7 +31,7 @@ void LocalPlayer::lockWalk(const uint16_t millis)
     m_walkLockExpiration = std::max<ticks_t>(m_walkLockExpiration, g_clock.millis() + millis);
 }
 
-bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
+bool LocalPlayer::canWalk(const bool ignoreLock)
 {
     // paralyzed
     if (isDead())
@@ -43,27 +43,23 @@ bool LocalPlayer::canWalk(const Otc::Direction dir, const bool ignoreLock)
 
     if (isWalking()) {
         if (isAutoWalking()) return true; // always allow automated walks
-        if (isPreWalking()) return false; // allow only single prewalk
+        if (isPreWalking())  return false; // allow only single prewalk
     }
 
-    if (g_game.getServerWalkTicks() == -1)
+    // walking will only be allowed when the client's position is the same as the server's.
+    if (!isSynchronized())
         return false;
 
     // allow only if walk done, ex. diagonals may need additional ticks before taking another step
-    return m_walkTimer.ticksElapsed() >= std::max<int>(getStepDuration(), g_game.getServerWalkTicks());
+    return m_walkTimer.ticksElapsed() >= getStepDuration();
 }
 
 void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (oldPos.z == newPos.z) {
-        if (m_lastPrewalkDestination == newPos || g_game.getWalkTicksElapsed() <= 1)
-            return;
-
-        if (g_game.getServerWalkTicks() - getStepDuration() > g_game.getWalkTicksElapsed())
-            return;
-    }
+    if (isPreWalking())
+        return;
 
     m_serverWalk = true;
 
@@ -73,15 +69,20 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
     // avoid reanimating prewalks
-    if (m_lastPrewalkDestination.isValid())
-        return;
-
     auto pos = m_position.translatedToDirection(direction);
 
     if (m_lastPrewalkDestination == pos)
         return;
 
     Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
+
+    m_updatingServerPosition = true;
+
+    static EventPtr event;
+    if (event) event->cancel();
+    event = g_dispatcher.scheduleEvent(
+        [this, self = static_self_cast<LocalPlayer>()] { m_updatingServerPosition = false; event = nullptr; },
+        std::max<int>(getStepDuration(), g_game.getPing()) + 50);
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -175,7 +176,7 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     });
 
     if (!retry)
-        lockWalk();
+        lockWalk(getStepDuration());
 
     return true;
 }
@@ -190,11 +191,11 @@ void LocalPlayer::stopAutoWalk()
         m_autoWalkContinueEvent->cancel();
 }
 
-void LocalPlayer::terminateWalk()
+void LocalPlayer::terminateWalk(std::function<void()>&& /*onTerminate*/)
 {
-    Creature::terminateWalk();
+    Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {});
+
     m_serverWalk = false;
-    m_lastPrewalkDestination = {};
     callLuaField("onWalkFinish");
 }
 
@@ -206,10 +207,6 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
         stopAutoWalk();
     else if (m_autoWalkDestination.isValid() && newPos == m_lastAutoWalkPosition)
         autoWalk(m_autoWalkDestination);
-
-    if (isServerWalking()) {
-        m_serverWalk = false;
-    }
 }
 
 void LocalPlayer::setStates(const uint32_t states)

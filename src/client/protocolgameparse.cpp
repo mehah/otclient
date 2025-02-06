@@ -41,6 +41,11 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
     int opcode = -1;
     int prevOpcode = -1;
 
+    if (g_game.m_relativePing.requested) {
+        g_game.m_relativePing.delay = g_game.m_relativePing.timer.ticksElapsed();
+        g_game.m_relativePing.requested = false;
+    }
+
     try {
         while (!msg->eof()) {
             opcode = msg->getU8();
@@ -1325,7 +1330,7 @@ void ProtocolGame::parseTileTransformThing(const InputMessagePtr& msg)
         return;
     }
 
-    const auto& pos = thing->getPosition();
+    const auto& pos = thing->getServerPosition();
     const int stackPos = thing->getStackPos();
 
     if (!g_map.removeThing(thing)) {
@@ -1365,11 +1370,6 @@ void ProtocolGame::parseCreatureMove(const InputMessagePtr& msg)
 
     const auto& creature = thing->static_self_cast<Creature>();
     creature->allowAppearWalk();
-
-    if (creature->isLocalPlayer() && g_game.m_walkTicks == -1) {
-        g_game.m_walkTicks = g_game.m_walkTimer.ticksElapsed();
-        g_game.m_walkTimer.restart();
-    }
 
     g_map.addThing(thing, newPos, -1);
 }

@@ -2,8 +2,31 @@ local smartWalkDirs = {}
 local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
-local lastCancelWalkTime = 0
 local nextWalkDir = nil
+local lastWalkDir = nil
+
+
+local keys = {
+    { "Up",      North },
+    { "Right",   East },
+    { "Down",    South },
+    { "Left",    West },
+    { "Numpad8", North },
+    { "Numpad9", NorthEast },
+    { "Numpad6", East },
+    { "Numpad3", SouthEast },
+    { "Numpad2", South },
+    { "Numpad1", SouthWest },
+    { "Numpad4", West },
+    { "Numpad7", NorthWest },
+}
+
+local turnKeys = {
+    { "Ctrl+Up",    North },
+    { "Ctrl+Right", East },
+    { "Ctrl+Down",  South },
+    { "Ctrl+Left",  West },
+}
 
 WalkController = Controller:new()
 
@@ -37,15 +60,6 @@ end
 --- Makes the player walk in the given direction.
 local function walk(dir)
     local player = g_game.getLocalPlayer()
-    if not player or g_game.isDead() or player:isDead() or player:isWalkLocked() then
-        cancelWalkEvent()
-        return
-    end
-
-    if not player:canWalk(dir) then
-        nextWalkDir = dir
-        return
-    end
 
     if g_game.isFollowing() then
         g_game.cancelFollow()
@@ -54,9 +68,23 @@ local function walk(dir)
     if player:isAutoWalking() then
         player:stopAutoWalk()
         g_game.stop()
+        player:lockWalk(player:getStepDuration())
+    end
+
+    if not player or g_game.isDead() or player:isDead() or player:isWalkLocked() or player:isServerWalking() then
+        cancelWalkEvent()
+        return
+    end
+
+    if not player:canWalk() then
+        if lastWalkDir ~= dir then
+            nextWalkDir = dir
+        end
+        return
     end
 
     nextWalkDir = nil
+    lastWalkDir = nil
 
     if g_game.getFeature(GameAllowPreWalk) then
         local toPos = Position.translatedToDirection(player:getPosition(), dir)
@@ -75,11 +103,9 @@ local function walk(dir)
 end
 
 --- Adds a walk event with an optional delay.
-local function addWalkEvent(dir, delay)
-    if os.time() - lastCancelWalkTime > 10 then
-        cancelWalkEvent()
-        lastCancelWalkTime = os.time()
-    end
+local function addWalkEvent(dir)
+    cancelWalkEvent()
+
 
     local function walkCallback()
         if g_keyboard.getModifiers() ~= KeyboardNoModifier then
@@ -88,7 +114,7 @@ local function addWalkEvent(dir, delay)
         walk(smartWalkDir or dir)
     end
 
-    walkEvent = delay == 0 and addEvent(walkCallback) or scheduleEvent(walkCallback, delay or 5)
+    walkEvent = addEvent(walkCallback)
 end
 
 --- Initiates a smart walk in the given direction.
@@ -155,34 +181,22 @@ end
 local function bindKeys()
     modules.game_interface.getRootPanel():setAutoRepeatDelay(200)
 
-    local keys = {
-        { "Up",      North },
-        { "Right",   East },
-        { "Down",    South },
-        { "Left",    West },
-        { "Numpad8", North },
-        { "Numpad9", NorthEast },
-        { "Numpad6", East },
-        { "Numpad3", SouthEast },
-        { "Numpad2", South },
-        { "Numpad1", SouthWest },
-        { "Numpad4", West },
-        { "Numpad7", NorthWest },
-    }
-
     for _, keyDir in ipairs(keys) do
         bindWalkKey(keyDir[1], keyDir[2])
     end
 
-    local turnKeys = {
-        { "Ctrl+Up",    North },
-        { "Ctrl+Right", East },
-        { "Ctrl+Down",  South },
-        { "Ctrl+Left",  West },
-    }
-
     for _, keyDir in ipairs(turnKeys) do
         bindTurnKey(keyDir[1], keyDir[2])
+    end
+end
+
+local function unbindKeys()
+    for _, keyDir in ipairs(keys) do
+        unbindWalkKey(keyDir[1])
+    end
+
+    for _, keyDir in ipairs(turnKeys) do
+        unbindTurnKey(keyDir[1])
     end
 end
 
@@ -211,9 +225,13 @@ local function onWalkFinish(player)
     end
 end
 
+local function onAutoWalk(player) end
+
 --- Handles cancellation of a walking event.
 local function onCancelWalk(player)
-    player:lockWalk(50)
+    if not player:isWalkLocked() then
+        player:lockWalk(50)
+    end
 end
 
 --- Initializes the WalkController.
@@ -221,16 +239,22 @@ function WalkController:onInit()
     bindKeys()
 end
 
+function WalkController:onTerminate()
+    unbindKeys()
+end
+
 --- Sets up game-related events for the WalkController.
 function WalkController:onGameStart()
     self:registerEvents(g_game, {
         onGameStart = onGameStart,
         onTeleport = onTeleport,
+        onAutoWalk = onAutoWalk
     })
 
     self:registerEvents(LocalPlayer, {
         onCancelWalk = onCancelWalk,
         onWalkFinish = onWalkFinish,
+        onAutoWalk = onAutoWalk
     })
 
     modules.game_interface.getRootPanel().onFocusChange = stopSmartWalk
