@@ -3,6 +3,8 @@ local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
 local nextWalkDir = nil
+local lastWalkDir = nil
+
 
 local keys = {
     { "Up",      North },
@@ -75,11 +77,14 @@ local function walk(dir)
     end
 
     if not player:canWalk() then
-        nextWalkDir = dir
+        if lastWalkDir ~= dir then
+            nextWalkDir = dir
+        end
         return
     end
 
     nextWalkDir = nil
+    lastWalkDir = nil
 
     if g_game.getFeature(GameAllowPreWalk) then
         local toPos = Position.translatedToDirection(player:getPosition(), dir)
