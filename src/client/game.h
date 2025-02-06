@@ -706,7 +706,7 @@ public:
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
 
-    int getPing() { return m_ping > -1 ? m_ping : m_relativePing; }
+    int getPing() { return m_ping > -1 ? m_ping : m_relativePing.delay; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }
@@ -828,8 +828,13 @@ private:
     stdext::timer m_pingTimer;
 
     ticks_t m_ping{ -1 };
-    ticks_t m_relativePing{ -1 };
-    Timer m_requestTimer;
+
+    struct
+    {
+        Timer timer;
+        ticks_t delay{ -1 };
+        bool requested{ false };
+    } m_relativePing;
 };
 
 extern Game g_game;

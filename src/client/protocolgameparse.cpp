@@ -41,7 +41,10 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
     int opcode = -1;
     int prevOpcode = -1;
 
-    g_game.m_relativePing = g_game.m_requestTimer.ticksElapsed();
+    if (g_game.m_relativePing.requested) {
+        g_game.m_relativePing.delay = g_game.m_relativePing.timer.ticksElapsed();
+        g_game.m_relativePing.requested = false;
+    }
 
     try {
         while (!msg->eof()) {
