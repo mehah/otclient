@@ -58,7 +58,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking())
+    if (isPreWalking() || getPosition() == newPos)
         return;
 
     m_serverWalk = true;
@@ -75,6 +75,19 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
         return;
 
     Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
+
+    m_updatingServerPosition = true;
+
+    static EventPtr event;
+    if (event) event->cancel();
+    event = g_dispatcher.scheduleEvent(
+        [this, self = static_self_cast<LocalPlayer>()] { m_updatingServerPosition = false; event = nullptr; },
+        std::max<int>(getStepDuration(), 500));
+}
+
+void LocalPlayer::setPosition(const Position& position, uint8_t stackPos, bool hasElevation) {
+    Creature::setPosition(position, stackPos, hasElevation);
+    m_updatingServerPosition = false;
 }
 
 bool LocalPlayer::retryAutoWalk()

@@ -61,6 +61,8 @@ public:
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
     void takeScreenshot(uint8_t type);
 
+    void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
+
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
 
@@ -120,7 +122,10 @@ public:
     void preWalk(Otc::Direction direction);
 
     bool isSynchronized() { return getPosition() == getServerPosition(); }
-    Position getPosition() override { return m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2 ? m_lastPrewalkDestination : m_position; }
+    Position getPosition() override {
+        return m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2 ? m_lastPrewalkDestination :
+            m_updatingServerPosition ? getLastStepToPosition() : m_position;
+    }
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
@@ -153,6 +158,7 @@ private:
     bool m_known{ false };
     bool m_pending{ false };
     bool m_serverWalk{ false };
+    bool m_updatingServerPosition{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 
