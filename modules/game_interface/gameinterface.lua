@@ -586,11 +586,6 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 menu:addOption(tr('Open'), function()
                     g_game.open(useThing)
                 end, shortcut)
-                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and useThing:getPosition().x ~= 0xffff then
-                    menu.addOption(menu, tr("Loot corpse"), function()
-                        g_game.sendQuickLoot(1, useThing)
-                    end)
-                end
             end
         else
             if useThing:isMultiUse() then
@@ -623,6 +618,11 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         if g_game.getFeature(GameBrowseField) and useThing:getPosition().x ~= 0xffff then
             menu:addOption(tr('Browse Field'), function()
                 g_game.browseField(useThing:getPosition())
+            end)
+        end
+        if useThing:isLyingCorpse() and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and useThing:getPosition().x ~= 0xffff then
+            menu.addOption(menu, tr("Loot corpse"), function()
+                g_game.sendQuickLoot(1, useThing)
             end)
         end
     end
