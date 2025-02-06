@@ -1366,7 +1366,9 @@ void ProtocolGame::sendQuickLoot(const uint8_t variant, const Position& pos, con
 {
     const auto msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientSendQuickLoot);
-    msg->addU8(variant);
+    if (g_game.getClientVersion() >= 1332) {
+        msg->addU8(variant);
+    }
     addPosition(msg, pos);
     if (variant != 2) {
         msg->addU16(itemId);
