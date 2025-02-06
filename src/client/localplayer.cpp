@@ -47,7 +47,7 @@ bool LocalPlayer::canWalk(const bool ignoreLock)
     }
 
     // walking will only be allowed when the client's position is the same as the server's.
-    if (getPosition() != getServerPosition())
+    if (!isSynchronized())
         return false;
 
     // allow only if walk done, ex. diagonals may need additional ticks before taking another step
@@ -168,7 +168,7 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     });
 
     if (!retry)
-        lockWalk();
+        lockWalk(getStepDuration());
 
     return true;
 }

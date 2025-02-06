@@ -119,6 +119,7 @@ public:
 
     void preWalk(Otc::Direction direction);
 
+    bool isSynchronized() { return getPosition() == getServerPosition(); }
     Position getPosition() override { return m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2 ? m_lastPrewalkDestination : m_position; }
 
 protected:
