@@ -176,7 +176,7 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
     });
 
     if (!retry)
-        lockWalk(getStepDuration());
+        lockWalk();
 
     return true;
 }

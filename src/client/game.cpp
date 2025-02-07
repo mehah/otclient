@@ -672,10 +672,10 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
     }
 
     if (m_localPlayer->isPreWalking()) {
-        event = g_dispatcher.scheduleEvent([=, this] {
+        event = g_dispatcher.addEvent([=, this] {
             event = nullptr;
             g_game.autoWalk(dirs, startPos);
-        }, 10);
+        });
         return;
     }
 
