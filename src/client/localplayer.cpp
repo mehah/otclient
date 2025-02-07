@@ -74,9 +74,9 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
     if (m_lastPrewalkDestination == pos)
         return;
 
-    Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
-
     m_updatingServerPosition = true;
+
+    Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
 
     static EventPtr event;
     if (event) event->cancel();
