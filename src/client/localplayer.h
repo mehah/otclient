@@ -106,7 +106,7 @@ public:
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
-    bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z; }
+    bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2; }
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }

@@ -75,7 +75,7 @@ local function walk(dir)
     if player:isAutoWalking() then
         player:stopAutoWalk()
         g_game.stop()
-        player:lockWalk(player:getStepDuration())
+        player:lockWalk(player:getStepDuration() * 2)
         return
     end
 
