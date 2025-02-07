@@ -81,8 +81,7 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
     static EventPtr event;
     if (event) event->cancel();
     event = g_dispatcher.scheduleEvent(
-        [this, self = static_self_cast<LocalPlayer>()] { m_updatingServerPosition = false; event = nullptr; },
-        std::max<int>(getStepDuration(), g_game.getPing()) + 50);
+        [this, self = static_self_cast<LocalPlayer>()] { m_updatingServerPosition = false; event = nullptr; }, getMaxStepLatency());
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -130,17 +129,8 @@ void LocalPlayer::cancelWalk(const Otc::Direction direction)
 
 bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
 {
-    static EventPtr event;
-    if (event) return true;
-
-    if (isPreWalking()) {
-        lockWalk();
-        event = g_dispatcher.addEvent([=, this, self = asLocalPlayer()] {
-            event = nullptr;
-            autoWalk(destination);
-        });
+    if (waitPreWalk([=, this] { autoWalk(destination); }))
         return true;
-    }
 
     // reset state
     m_autoWalkDestination = {};
@@ -205,9 +195,10 @@ void LocalPlayer::stopAutoWalk()
 
 void LocalPlayer::terminateWalk(std::function<void()>&& /*onTerminate*/)
 {
-    Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {});
+    Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {
+        m_serverWalk = false;
+    });
 
-    m_serverWalk = false;
     callLuaField("onWalkFinish");
 }
 
@@ -496,4 +487,21 @@ void LocalPlayer::setResourceBalance(const Otc::ResourceTypes_t type, const uint
 bool LocalPlayer::hasSight(const Position& pos)
 {
     return m_position.isInRange(pos, g_map.getAwareRange().left - 1, g_map.getAwareRange().top - 1);
+}
+
+bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking) {
+    static EventPtr event;
+    if (event) return false;
+
+    const bool preWalking = m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2;
+
+    if (preWalking && afterPreWalking) {
+        lockWalk(getMaxStepLatency());
+        event = g_dispatcher.addEvent([this, self = asLocalPlayer(), action = afterPreWalking] {
+            event = nullptr;
+            action();
+        });
+    }
+
+    return preWalking;
 }

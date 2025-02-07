@@ -3,7 +3,7 @@ local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
 local nextWalkDir = nil
-local lastWalkDir = nil
+local lastStop = 0
 
 local keys = {
     { "Up",      North },
@@ -63,6 +63,10 @@ local function walk(dir)
         return
     end
 
+    if player:isServerWalking() and not player:isAutoWalking() then
+        return
+    end
+
     if player:isWalkLocked() then
         nextWalkDir = nil
         return
@@ -80,14 +84,11 @@ local function walk(dir)
     end
 
     if not player:canWalk() then
-        if lastWalkDir ~= dir then
-            nextWalkDir = dir
-        end
+        nextWalkDir = dir
         return
     end
 
     nextWalkDir = nil
-    lastWalkDir = nil
 
     if g_game.getFeature(GameAllowPreWalk) then
         local toPos = Position.translatedToDirection(player:getPosition(), dir)

@@ -801,6 +801,12 @@ void Game::use(const ThingPtr& thing)
     if (!canPerformGameAction() || !thing)
         return;
 
+    static EventPtr event;
+    if (event) return;
+
+    if (m_localPlayer->waitPreWalk([=, this] { use(thing); }))
+        return;
+
     Position pos = thing->getPosition();
     if (!pos.isValid()) // virtual item
         pos = Position(0xFFFF, 0, 0); // inventory item

@@ -107,6 +107,8 @@ public:
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
     bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2; }
+    bool waitPreWalk(std::function<void()>&& afterPreWalking);
+
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
@@ -131,14 +133,15 @@ protected:
     friend class Game;
 
 private:
-
     struct Skill
     {
         uint16_t level{ 0 };
         uint16_t baseLevel{ 0 };
         uint16_t levelPercent{ 0 };
     };
+
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
+    auto getMaxStepLatency() { return std::max<int>(getStepDuration(), g_game.getPing()) + 50; }
 
     bool retryAutoWalk();
 
