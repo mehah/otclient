@@ -505,3 +505,5 @@ bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking) {
 
     return preWalking;
 }
+
+int LocalPlayer::getMaxStepLatency() { return std::max<int>(getStepDuration(), g_game.getPing()) + 50; }

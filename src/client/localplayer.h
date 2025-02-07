@@ -141,7 +141,7 @@ private:
     };
 
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
-    auto getMaxStepLatency() { return std::max<int>(getStepDuration(), g_game.getPing()) + 50; }
+    int getMaxStepLatency();
 
     bool retryAutoWalk();
 
