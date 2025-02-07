@@ -671,14 +671,6 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
         cancelFollow();
     }
 
-    if (m_localPlayer->isPreWalking()) {
-        event = g_dispatcher.addEvent([=, this] {
-            event = nullptr;
-            g_game.autoWalk(dirs, startPos);
-        });
-        return;
-    }
-
     g_lua.callGlobalField("g_game", "onAutoWalk", m_localPlayer, dirs);
     m_protocolGame->sendAutoWalk(dirs);
 }

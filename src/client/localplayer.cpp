@@ -130,6 +130,18 @@ void LocalPlayer::cancelWalk(const Otc::Direction direction)
 
 bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
 {
+    static EventPtr event;
+    if (event) return true;
+
+    if (isPreWalking()) {
+        lockWalk();
+        event = g_dispatcher.addEvent([=, this, self = asLocalPlayer()] {
+            event = nullptr;
+            autoWalk(destination);
+        });
+        return true;
+    }
+
     // reset state
     m_autoWalkDestination = {};
     m_lastAutoWalkPosition = {};
@@ -144,8 +156,8 @@ bool LocalPlayer::autoWalk(const Position& destination, const bool retry)
         return true;
 
     m_autoWalkDestination = destination;
-    auto self(asLocalPlayer());
-    g_map.findPathAsync(m_position, destination, [self](const auto& result) {
+
+    g_map.findPathAsync(m_position, destination, [self = asLocalPlayer()](const auto& result) {
         if (self->m_autoWalkDestination != result->destination)
             return;
 
