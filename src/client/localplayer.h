@@ -107,7 +107,7 @@ public:
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
     bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2; }
-    bool waitPreWalk(std::function<void()>&& afterPreWalking);
+    bool waitPreWalk(std::function<void()>&& afterPreWalking, int lockDelay = 0);
 
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }

@@ -63,9 +63,7 @@ local function walk(dir)
         return
     end
 
-    if player:isServerWalking() and not player:isAutoWalking() then
-        return
-    end
+
 
     if player:isWalkLocked() then
         nextWalkDir = nil
@@ -76,10 +74,9 @@ local function walk(dir)
         g_game.cancelFollow()
     end
 
-    if player:isAutoWalking() then
+    if player:isAutoWalking() or player:isServerWalking() then
         player:stopAutoWalk()
         g_game.stop()
-        player:lockWalk(player:getStepDuration() * 2)
         return
     end
 

@@ -489,14 +489,14 @@ bool LocalPlayer::hasSight(const Position& pos)
     return m_position.isInRange(pos, g_map.getAwareRange().left - 1, g_map.getAwareRange().top - 1);
 }
 
-bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking) {
+bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking, int lockDelay) {
     static EventPtr event;
     if (event) return false;
 
     const bool preWalking = m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2;
 
     if (preWalking && afterPreWalking) {
-        lockWalk(getMaxStepLatency());
+        lockWalk(lockDelay == 0 ? getMaxStepLatency() : lockDelay);
         event = g_dispatcher.addEvent([this, self = asLocalPlayer(), action = afterPreWalking] {
             event = nullptr;
             action();
