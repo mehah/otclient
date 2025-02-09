@@ -1157,3 +1157,39 @@ int push_luavalue(const RaceType& raceData)
     g_lua.setField("boss");
     return 1;
 }
+
+int push_luavalue(const ClientSoundEffect& soundEffect) {
+    g_lua.createTable(0, 7);
+
+    g_lua.pushInteger(soundEffect.clientId);
+    g_lua.setField("clientId");
+
+    g_lua.pushInteger(static_cast<int>(soundEffect.type));
+    g_lua.setField("type");
+
+    g_lua.createTable(0, 2);
+    g_lua.pushNumber(soundEffect.pitchMin);
+    g_lua.setField("min");
+    g_lua.pushNumber(soundEffect.pitchMax);
+    g_lua.setField("max");
+    g_lua.setField("randomPitch");
+
+    g_lua.createTable(0, 2);
+    g_lua.pushNumber(soundEffect.volumeMin);
+    g_lua.setField("min");
+    g_lua.pushNumber(soundEffect.volumeMax);
+    g_lua.setField("max");
+    g_lua.setField("randomVolume");
+
+    g_lua.pushInteger(soundEffect.soundId);
+    g_lua.setField("soundId");
+
+    g_lua.createTable(soundEffect.randomSoundId.size(), 0);
+    for (size_t i = 0; i < soundEffect.randomSoundId.size(); ++i) {
+        g_lua.pushInteger(soundEffect.randomSoundId[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("randomSoundId");
+
+    return 1;
+}

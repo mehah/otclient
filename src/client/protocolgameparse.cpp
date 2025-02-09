@@ -1677,15 +1677,17 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                 }
 
                 case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT: {
-                    msg->getU8(); // Source
-                    msg->getU16(); // Sound ID
+                    const uint8_t soundSource = msg->getU8(); // Source
+                    const uint16_t SoundID = msg->getU16(); // Sound ID
+                    g_lua.callGlobalField("g_sounds", "soundMain", soundSource, SoundID, pos);
                     break;
                 }
 
                 case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT: {
-                    msg->getU8(); // ENUM
-                    msg->getU8(); // Source
-                    msg->getU16(); // Sound ID
+                    const uint8_t SoundENUM = msg->getU8(); // ENUM
+                    const uint8_t soundSource = msg->getU8(); // Source
+                    const uint16_t soundID = msg->getU16(); // Sound ID
+                    g_lua.callGlobalField("g_sounds", "soundSecondary", SoundENUM, soundSource, soundID, pos);
                     break;
                 }
                 default:

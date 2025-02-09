@@ -159,6 +159,7 @@ void SoundManager::poll()
 
 void SoundManager::setAudioEnabled(const bool enable)
 {
+    g_lua.callGlobalField("g_sounds", "testSound", enable); // for test
     if (m_audioEnabled == enable)
         return;
 
@@ -536,3 +537,29 @@ std::string SoundManager::getAudioFileNameById(int32_t audioFileId)
 
     return "";
 }
+
+std::vector<uint32_t> SoundManager::getRandomSoundIds(uint32_t id) 
+{
+    // test
+    if (m_clientSoundEffects.find(id) == m_clientSoundEffects.end()) {
+        return {};
+    }
+    const auto& soundEffect = m_clientSoundEffects[id];
+    if (!soundEffect.randomSoundId.empty()) {
+        return soundEffect.randomSoundId;
+    }
+    if (soundEffect.soundId != 0) {
+        return { soundEffect.soundId };
+    }
+    return {};
+}
+
+ClientSoundType SoundManager::getSoundEffectType(uint32_t id) 
+{
+    if (m_clientSoundEffects.find(id) == m_clientSoundEffects.end()) {
+        return NUMERIC_SOUND_TYPE_UNKNOWN;
+    }
+
+    return m_clientSoundEffects[id].type;
+}
+

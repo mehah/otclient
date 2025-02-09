@@ -24,6 +24,7 @@
 
 #include "game.h"
 #include "outfit.h"
+#include <framework/sound/soundmanager.h>
 
  // outfit
 int push_luavalue(const Outfit& outfit);
@@ -92,3 +93,6 @@ int push_luavalue(const CharacterInfoFamiliar& familiar);
 
 // bestiary
 int push_luavalue(const RaceType& raceData);
+
+// sound
+int push_luavalue(const ClientSoundEffect& soundEffect);

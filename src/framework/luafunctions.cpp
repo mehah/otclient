@@ -219,6 +219,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_modules", "getModules", &ModuleManager::getModules, &g_modules);
     g_lua.bindSingletonFunction("g_modules", "getCurrentModule", &ModuleManager::getCurrentModule, &g_modules);
     g_lua.bindSingletonFunction("g_modules", "enableAutoReload", &ModuleManager::enableAutoReload, &g_modules);
+    g_lua.bindSingletonFunction("g_modules", "isAutoReloadEnabled", &ModuleManager::isAutoReloadEnabled, &g_modules);
 
     // EventDispatcher
     g_lua.registerSingletonClass("g_dispatcher");
@@ -1006,6 +1007,8 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_sounds", "isEaxEnabled", &SoundManager::isEaxEnabled, &g_sounds);
     g_lua.bindSingletonFunction("g_sounds", "loadClientFiles", &SoundManager::loadClientFiles, &g_sounds);
     g_lua.bindSingletonFunction("g_sounds", "getAudioFileNameById", &SoundManager::getAudioFileNameById, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "getRandomSoundIds", &SoundManager::getRandomSoundIds, &g_sounds);
+    g_lua.bindSingletonFunction("g_sounds", "getSoundEffectType", &SoundManager::getSoundEffectType, &g_sounds);
 
     g_lua.registerClass<SoundSource>();
     g_lua.bindClassStaticFunction<SoundSource>("create", [] { return std::make_shared<SoundSource>(); });
