@@ -50,6 +50,7 @@ Module
     - game_quickloot
     - game_cyclopedia
     - game_creatureinformation
-    
+    - game_sound
+
   @onLoad: init()
   @onUnload: terminate()

@@ -1,0 +1,9 @@
+Module
+  name: game_sound
+  description: sound
+  author: OTClient team
+  website: https://github.com/mehah/otclient
+  scripts: [ game_sound ]
+  sandbox: true
+  @onLoad: controllerSound:init()
+  @onUnload: controllerSound:terminate()

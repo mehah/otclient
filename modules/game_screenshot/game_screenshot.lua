@@ -70,6 +70,7 @@ function screenshotController:onGameStart()
     if g_game.getClientVersion() < 1180 then
         return
     end
+    if optionPanel then return end
     optionPanel = g_ui.loadUI('game_screenshot',modules.client_options:getPanel())
 
     for _, screenshotEvent in ipairs(AutoScreenshotEvents) do
@@ -98,6 +99,7 @@ function screenshotController:onGameStart()
 end
 
 function screenshotController:onGameEnd()
+    if not optionPanel then return end
     if g_game.getClientVersion() >= 1180 then
         g_settings.set("onlyCaptureGameWindow",optionPanel:recursiveGetChildById("onlyCaptureGameWindow"):isChecked())
         g_settings.set("enableScreenshots",optionPanel:recursiveGetChildById("enableScreenshots"):isChecked())

@@ -105,7 +105,7 @@ UIWidget
     height: 33
 
     OptionScaleScroll
-      id: musicSoundVolume
+      id: soundEventVolume
       margin-top: 5
       anchors.top: parent.top
       anchors.left: parent.left
@@ -115,5 +115,5 @@ UIWidget
       &scrollSize: 21
       margin-left: -15
       @onSetup: |
-        local value = modules.client_options.getOption('musicSoundVolume')
+        local value = modules.client_options.getOption('soundEventVolume')
         self:setText(tr('Event Volume: %d %%', value))

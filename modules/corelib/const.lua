@@ -329,5 +329,14 @@ NetworkMessageTypes = {
 SoundChannels = {
     Music = 1,
     Ambient = 2,
-    Effect = 3
+    Effect = 3,
+    Spells = 4,
+    Item = 5,
+    Event = 6,
+    OwnBattles = 7,
+    OthersPlayers = 8,
+    Creature = 9,
+    SoundUI = 10,
+    Bot = 11,
+    secundaryChannel = 12
 }

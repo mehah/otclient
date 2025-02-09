@@ -36,10 +36,10 @@ UIWidget
       margin-top:5
 
     MiniWindowContents
+      id: panelOwnBattleSubChannels
       padding-left: 10
       padding-right: 5
       padding-top: 10
-
       layout: verticalBox
       QtCheckBox
         id: battleSoundOwnBattleSubChannelsAttack
@@ -86,6 +86,7 @@ UIWidget
 
 
     MiniWindowContents
+      id: panelOtherPlayersSubChannels
       padding-left: 10
       padding-right: 5
       padding-top: 10
