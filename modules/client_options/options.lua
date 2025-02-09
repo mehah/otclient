@@ -9,7 +9,10 @@ panels = {
     interface = nil,
     misc = nil,
     miscHelp = nil,
-    keybindsPanel = nil
+    keybindsPanel = nil,
+    battleSoundsPanel = nil,
+    iuSoundPanel = nil,
+
 }
 -- LuaFormatter off
 local buttons = { {
@@ -43,14 +46,14 @@ local buttons = { {
 }, {
     text = "Sound",
     icon = "/images/icons/icon_sound",
-    open = "soundPanel"
-    --[[     subCategories = {{
+    open = "soundPanel",
+    subCategories = {{
         text = "Battle Sounds",
-        open = "Battle_Sounds"
+        open = "battleSoundsPanel"
     }, {
         text = "UI Sounds",
-        open = "UI_Sounds"
-    }} ]]
+        open = "iuSoundPanel"
+    }} 
 }, {
     text = "Misc.",
     icon = "/images/icons/icon_misc",
@@ -207,7 +210,9 @@ function controller:onInit()
     panels.interfaceConsole = g_ui.loadUI('styles/interface/console', controller.ui.optionsTabContent)
     panels.interfaceHUD = g_ui.loadUI('styles/interface/HUD', controller.ui.optionsTabContent)
 
-    panels.soundPanel = g_ui.loadUI('styles/sound/audio', controller.ui.optionsTabContent)
+    panels.soundPanel = g_ui.loadUI('styles/sound/sound', controller.ui.optionsTabContent)
+    panels.battleSoundsPanel = g_ui.loadUI('styles/sound/battleSounds', controller.ui.optionsTabContent)
+    panels.iuSoundPanel = g_ui.loadUI('styles/sound/uiSounds', controller.ui.optionsTabContent)
 
     panels.misc = g_ui.loadUI('styles/misc/misc', controller.ui.optionsTabContent)
     panels.miscHelp = g_ui.loadUI('styles/misc/help', controller.ui.optionsTabContent)
