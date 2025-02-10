@@ -3,7 +3,6 @@ local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
 local nextWalkDir = nil
-local lastStop = 0
 
 local keys = {
     { "Up",      North },
@@ -73,13 +72,11 @@ local function walk(dir)
     end
 
     local isAutoWalking = player:isAutoWalking()
-    local isServerWalking = player:isServerWalking()
-
-    if isAutoWalking or isServerWalking then
+    if isAutoWalking or player:isServerWalking() then
         g_game.stop()
         if isAutoWalking then
             player:stopAutoWalk()
-        elseif isServerWalking then
+        else
             player:lockWalk(player:getStepDuration());
         end
         return
@@ -111,16 +108,11 @@ end
 --- Adds a walk event with an optional delay.
 local function addWalkEvent(dir)
     cancelWalkEvent()
-
-
-    local function walkCallback()
-        if g_keyboard.getModifiers() ~= KeyboardNoModifier then
-            return
+    walkEvent = addEvent(function()
+        if g_keyboard.getModifiers() == KeyboardNoModifier then
+            walk(smartWalkDir or dir)
         end
-        walk(smartWalkDir or dir)
-    end
-
-    walkEvent = addEvent(walkCallback)
+    end)
 end
 
 --- Initiates a smart walk in the given direction.
@@ -187,23 +179,13 @@ end
 local function bindKeys()
     modules.game_interface.getRootPanel():setAutoRepeatDelay(200)
 
-    for _, keyDir in ipairs(keys) do
-        bindWalkKey(keyDir[1], keyDir[2])
-    end
-
-    for _, keyDir in ipairs(turnKeys) do
-        bindTurnKey(keyDir[1], keyDir[2])
-    end
+    for _, keyDir in ipairs(keys) do bindWalkKey(keyDir[1], keyDir[2]) end
+    for _, keyDir in ipairs(turnKeys) do bindTurnKey(keyDir[1], keyDir[2]) end
 end
 
 local function unbindKeys()
-    for _, keyDir in ipairs(keys) do
-        unbindWalkKey(keyDir[1])
-    end
-
-    for _, keyDir in ipairs(turnKeys) do
-        unbindTurnKey(keyDir[1])
-    end
+    for _, keyDir in ipairs(keys) do unbindWalkKey(keyDir[1]) end
+    for _, keyDir in ipairs(turnKeys) do unbindTurnKey(keyDir[1]) end
 end
 
 --- Handles player teleportation events.
@@ -212,10 +194,12 @@ local function onTeleport(player, newPos, oldPos)
         return
     end
 
-    local offsetX, offsetY, offsetZ = Position.offsetX(newPos, oldPos), Position.offsetY(newPos, oldPos),
-        Position.offsetZ(newPos, oldPos)
+    local offsetX, offsetY, offsetZ =
+        Position.offsetX(newPos, oldPos), Position.offsetY(newPos, oldPos), Position.offsetZ(newPos, oldPos)
+
     local TELEPORT_DELAY = g_settings.getNumber("walkTeleportDelay")
     local STAIRS_DELAY = g_settings.getNumber("walkStairsDelay")
+
     local delay = (offsetX >= 3 or offsetY >= 3 or offsetZ >= 2) and TELEPORT_DELAY or STAIRS_DELAY
     player:lockWalk(delay)
 end

@@ -128,7 +128,7 @@ public:
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
-    void terminateWalk(std::function<void()>&& onTerminate = nullptr) override;
+    void terminateWalk() override;
 
     friend class Game;
 
