@@ -196,8 +196,9 @@ void LocalPlayer::stopAutoWalk()
 void LocalPlayer::terminateWalk(std::function<void()>&& /*onTerminate*/)
 {
     Creature::terminateWalk([this, self = static_self_cast<LocalPlayer>()] {
-        m_serverWalk = false;
     });
+
+    m_serverWalk = false;
 
     callLuaField("onWalkFinish");
 }
