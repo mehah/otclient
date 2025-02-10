@@ -491,7 +491,7 @@ bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking, int lockD
     static EventPtr event;
     if (event) return false;
 
-    const bool preWalking = m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2;
+    const bool preWalking = isPreWalking();
 
     if (preWalking && afterPreWalking) {
         lockWalk(lockDelay == 0 ? getMaxStepLatency() : lockDelay);
