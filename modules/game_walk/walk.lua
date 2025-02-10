@@ -3,6 +3,8 @@ local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
 local nextWalkDir = nil
+local lastCancelWalkTime = 0
+
 
 local keys = {
     { "Up",      North },
@@ -107,7 +109,10 @@ end
 
 --- Adds a walk event with an optional delay.
 local function addWalkEvent(dir)
-    cancelWalkEvent()
+    if os.time() - lastCancelWalkTime > 10 then
+        cancelWalkEvent()
+        lastCancelWalkTime = os.time()
+    end
     walkEvent = addEvent(function()
         if g_keyboard.getModifiers() == KeyboardNoModifier then
             walk(smartWalkDir or dir)
