@@ -41,14 +41,14 @@ bool LocalPlayer::canWalk(const bool ignoreLock)
     if (isWalkLocked() && !ignoreLock)
         return false;
 
+    // walking will only be allowed when the client's position is the same as the server's.
+    if (!isSynchronized())
+        return false;
+
     if (isWalking()) {
         if (isAutoWalking()) return true; // always allow automated walks
         if (isPreWalking())  return false; // allow only single prewalk
     }
-
-    // walking will only be allowed when the client's position is the same as the server's.
-    if (!isSynchronized())
-        return false;
 
     // allow only if walk done, ex. diagonals may need additional ticks before taking another step
     return m_walkTimer.ticksElapsed() >= getStepDuration();
@@ -504,4 +504,4 @@ bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking, int lockD
     return preWalking;
 }
 
-int LocalPlayer::getMaxStepLatency() { return std::max<int>(getStepDuration(), g_game.getPing()) + 50; }
+int LocalPlayer::getMaxStepLatency() { return std::max<int>(std::max<int>(getStepDuration(), g_game.getPing()), 100) + 50; }
