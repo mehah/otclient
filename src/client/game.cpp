@@ -650,11 +650,9 @@ bool Game::walk(const Otc::Direction direction)
     return true;
 }
 
-void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos)
+void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& /*startPos*/)
 {
-    static EventPtr event;
-
-    if (!canPerformGameAction() || event)
+    if (!canPerformGameAction())
         return;
 
     if (dirs.size() == 0)
