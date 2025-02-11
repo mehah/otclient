@@ -68,15 +68,13 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
-    // avoid reanimating prewalks
-    auto pos = m_position.translatedToDirection(direction);
-
-    if (m_lastPrewalkDestination == pos)
-        return;
-
     m_updatingServerPosition = true;
 
-    Creature::walk(m_position, m_lastPrewalkDestination = std::move(pos));
+    // avoid reanimating prewalks
+    const auto& oldPos = getPosition();
+    auto pos = oldPos.translatedToDirection(direction);
+    if (m_lastPrewalkDestination != pos)
+        Creature::walk(oldPos, m_lastPrewalkDestination = std::move(pos));;
 
     static EventPtr event;
     if (event) event->cancel();
