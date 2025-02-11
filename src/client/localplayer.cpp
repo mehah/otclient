@@ -79,7 +79,7 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
     static EventPtr event;
     if (event) event->cancel();
     event = g_dispatcher.scheduleEvent(
-        [this, self = static_self_cast<LocalPlayer>()] { m_updatingServerPosition = false; event = nullptr; }, std::max<int>(500, g_game.getPing()));
+        [this, self = static_self_cast<LocalPlayer>()] { updateClientPosition(); event = nullptr; }, std::max<int>(500, g_game.getPing()));
 }
 
 bool LocalPlayer::retryAutoWalk()
