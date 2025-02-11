@@ -100,17 +100,27 @@ struct SubOffer
     uint8_t coinType;
     bool disabled;
     uint16_t disabledReason;
+    uint16_t reasonIdDisable;
     uint8_t state;
     uint32_t validUntil;
     uint32_t basePrice;
+    std::string name;         // oldProtocol
+    std::string description;  // oldProtocol
+    std::vector<std::string> icons; // oldProtocol
+    std::string parent;       // oldProtocol
 };
 
 struct StoreOffer
 {
     std::string name;
     std::vector<SubOffer> subOffers;
-    uint32_t ofertaid;
+    uint32_t id;
     std::string description;
+    uint32_t price; // oldProtocol
+    uint8_t state; // oldProtocol
+    uint32_t basePrice; // oldProtocol
+    bool disabled; // oldProtocol
+    uint16_t disabledReason; // oldProtocol
     uint8_t type;
     std::string icon;
     uint16_t mountId;
@@ -666,9 +676,12 @@ public:
     void seekInContainer(uint8_t containerId, uint16_t index);
 
     // >= 1080 ingame store
-    void buyStoreOffer(uint32_t offerId, uint8_t productType, std::string_view name = "");
+    void buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string& name, const uint8_t type, const std::string_view& location);
     void requestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
-    void requestStoreOffers(std::string_view categoryName, uint8_t serviceType = 0);
+    void requestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType);
+    void sendRequestStoreHome();
+    void sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType);
+    void sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType);
     void openStore(uint8_t serviceType = 0, std::string_view category = "");
     void transferCoins(std::string_view recipient, uint16_t amount);
     void openTransactionHistory(uint8_t entriesPerPage);

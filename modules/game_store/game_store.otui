@@ -154,7 +154,6 @@ StoreWindow
       id: lblTibiaTransfer
       anchors.bottom: parent.bottom
       anchors.left: prev.right
-      text-wrap: true
       text-auto-resize: true
       margin-left:5
       margin-bottom: 3 
@@ -208,7 +207,6 @@ StoreWindow
     icon-align: center
     icon-source: images/iconTransfer
     size: 64 20
-    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   StoreButton
     anchors.top: transferPoints.top
@@ -218,7 +216,6 @@ StoreWindow
     icon-align: center
     icon-source: images/icon-trade
     size: 64 20
-    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   HorizontalSeparator
     anchors.bottom: prev.top

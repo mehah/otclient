@@ -810,4 +810,14 @@ namespace Otc
         VIP_GROUP_EDIT = 2,
         VIP_GROUP_REMOVE = 3,
     };
+
+    enum Store_Type_Actions_t : uint8_t
+    {
+        OPEN_HOME = 0,
+        OPEN_PREMIUM_BOOST = 1,
+        OPEN_CATEGORY = 2,
+        OPEN_USEFUL_THINGS = 3,
+        OPEN_OFFER = 4,
+        OPEN_SEARCH = 5,
+    };
 }

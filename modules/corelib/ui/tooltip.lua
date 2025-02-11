@@ -80,6 +80,9 @@ local function onWidgetHoverChange(widget, hovered)
         elseif widget.specialtooltip and not g_mouse.isPressed() then
             g_tooltip.displaySpecial(widget.specialtooltip)
             currentHoveredWidget = widget
+        elseif widget.parseColoreDisplay and not g_mouse.isPressed() then
+            g_tooltip.parseColoreDisplay(widget.parseColoreDisplay)
+            currentHoveredWidget = widget
         end
     else
         if widget == currentHoveredWidget then
@@ -88,6 +91,9 @@ local function onWidgetHoverChange(widget, hovered)
             end
             if widget.specialtooltip then
                 g_tooltip.hideSpecial()
+            end
+            if widget.parseColoreDisplay then
+                g_tooltip.hide()
             end
             currentHoveredWidget = nil
         end
@@ -193,6 +199,28 @@ function g_tooltip.display(text)
     })
 end
 
+function g_tooltip.parseColoreDisplay(text)
+    if text == nil or text:len() == 0 then
+        return
+    end
+    if not toolTipLabel then
+        return
+    end
+
+    toolTipLabel:parseColoredText(text)
+    toolTipLabel:resizeToText()
+    toolTipLabel:resize(toolTipLabel:getWidth() + 4, toolTipLabel:getHeight() + 4)
+    toolTipLabel:show()
+    toolTipLabel:raise()
+    toolTipLabel:enable()
+    g_effects.fadeIn(toolTipLabel, 100)
+    moveToolTip(true)
+
+    connect(rootWidget, {
+        onMouseMove = moveToolTip
+    })
+end
+
 function g_tooltip.displaySpecial(special)
     if not SpecialToolTipLabel then
         return
@@ -279,6 +307,15 @@ function UIWidget:setTooltip(text)
     end
 end
 
+function UIWidget:parseColoreDisplayToolTip(text)
+    local tooltipWidget = self:getChildById('toolTipWidget')
+    if tooltipWidget then
+        tooltipWidget.tooltip = text
+    else
+        self.parseColoreDisplay = text
+    end
+end
+
 function UIWidget:setSpecialToolTip(special)
     if type(special) == "string" then
         special = {{header = '', info = special}}
@@ -289,6 +326,7 @@ end
 function UIWidget:removeTooltip()
     self.tooltip = nil
     self.specialtooltip = nil
+    self.parseColoreDisplay = nil
 end
 
 function UIWidget:getTooltip()

@@ -454,7 +454,7 @@ int push_luavalue(const StoreCategory& category) {
 }
 
 int push_luavalue(const SubOffer& subOffer) {
-    g_lua.createTable(0, 9);
+    g_lua.createTable(0, 14);
     g_lua.pushInteger(subOffer.id);
     g_lua.setField("id");
     g_lua.pushInteger(subOffer.count);
@@ -468,6 +468,8 @@ int push_luavalue(const SubOffer& subOffer) {
     if (subOffer.disabled) {
         g_lua.pushInteger(subOffer.disabledReason);
         g_lua.setField("disabledReason");
+        g_lua.pushInteger(subOffer.reasonIdDisable);
+        g_lua.setField("reasonIdDisable");
     }
     g_lua.pushInteger(subOffer.state);
     g_lua.setField("state");
@@ -477,11 +479,28 @@ int push_luavalue(const SubOffer& subOffer) {
         g_lua.pushInteger(subOffer.basePrice);
         g_lua.setField("basePrice");
     }
+    if (g_game.getClientVersion() < 1310) {
+
+        g_lua.pushString(subOffer.name); // Nuevo
+        g_lua.setField("name");
+        g_lua.pushString(subOffer.description); // Nuevo
+        g_lua.setField("description");
+
+        g_lua.createTable(0, subOffer.icons.size()); // Nuevo
+        for (size_t i = 0; i < subOffer.icons.size(); ++i) {
+            g_lua.pushString(subOffer.icons[i]);
+            g_lua.rawSeti(i + 1);
+        }
+        g_lua.setField("icons");
+
+        g_lua.pushString(subOffer.parent); // Nuevo
+        g_lua.setField("parent");
+    }
     return 1;
 }
 
 int push_luavalue(const StoreOffer& offer) {
-    g_lua.createTable(0, 14);
+    g_lua.createTable(0, 20);
     g_lua.pushString(offer.name);
     g_lua.setField("name");
 
@@ -492,10 +511,26 @@ int push_luavalue(const StoreOffer& offer) {
     }
     g_lua.setField("subOffers");
 
-    g_lua.pushInteger(offer.ofertaid);
-    g_lua.setField("ofertaid");
-    g_lua.pushString(offer.description);
-    g_lua.setField("description");
+    if (g_game.getClientVersion() < 1310) { // oldProtocol
+        g_lua.pushString(offer.description); 
+        g_lua.setField("description");
+        g_lua.pushInteger(offer.id);
+        g_lua.setField("id");
+        g_lua.pushInteger(offer.price);
+        g_lua.setField("price");
+        g_lua.pushInteger(offer.state);
+        g_lua.setField("state");
+        g_lua.pushInteger(offer.stateNewUntil);
+        g_lua.setField("stateNewUntil");
+        g_lua.pushInteger(offer.basePrice);
+        g_lua.setField("basePrice");
+        g_lua.pushBoolean(offer.disabled);
+        g_lua.setField("disabled");
+        if (offer.disabled) {
+            g_lua.pushInteger(offer.disabledReason);
+            g_lua.setField("disabledReason");
+        }
+    }
     g_lua.pushInteger(offer.type);
     g_lua.setField("type");
 
