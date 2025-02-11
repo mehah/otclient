@@ -58,7 +58,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking())
+    if (isPreWalking() || newPos == getLastStepToPosition())
         return;
 
     m_serverWalk = true;
@@ -504,4 +504,4 @@ bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking, int lockD
     return preWalking;
 }
 
-int LocalPlayer::getMaxStepLatency() { return std::max<int>(std::max<int>(getStepDuration(), g_game.getPing()), 100) + 50; }
+int LocalPlayer::getMaxStepLatency() { return std::max<int>(getStepDuration(), g_game.getPing()) + 50; }

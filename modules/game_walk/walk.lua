@@ -76,10 +76,10 @@ local function walk(dir)
     local isAutoWalking = player:isAutoWalking()
     if isAutoWalking or player:isServerWalking() then
         g_game.stop()
-
         if isAutoWalking then
             player:stopAutoWalk()
         end
+        player:lockWalk(100)
         return
     end
 
