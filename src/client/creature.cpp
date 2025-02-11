@@ -133,7 +133,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         DEFAULT_COLOR(96, 96, 96),
         NPC_COLOR(0x66, 0xcc, 0xff);
 
-    if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
+    if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(getPosition()))
         return;
 
     if (g_gameConfig.isDrawingInformationByWidget()) {
@@ -918,9 +918,9 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
         return 0;
 
     const auto& tilePos = dir == Otc::InvalidDirection ?
-        m_lastStepToPosition : m_position.translatedToDirection(dir);
+        m_lastStepToPosition : getPosition().translatedToDirection(dir);
 
-    const auto& tile = g_map.getTile(tilePos.isValid() ? tilePos : m_position);
+    const auto& tile = g_map.getTile(tilePos.isValid() ? tilePos : getPosition());
 
     const int serverBeat = g_game.getServerBeat();
 
