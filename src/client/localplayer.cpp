@@ -58,11 +58,11 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking() || newPos == getLastStepToPosition())
+    if (isPreWalking())
         return;
 
-    m_serverWalk = true;
     updateClientPosition();
+    m_serverWalk = true;
     Creature::walk(oldPos, newPos);
 }
 
@@ -74,7 +74,7 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
     const auto& oldPos = getPosition();
     auto pos = oldPos.translatedToDirection(direction);
     if (m_lastPrewalkDestination != pos)
-        Creature::walk(oldPos, m_lastPrewalkDestination = std::move(pos));;
+        Creature::walk(oldPos, m_lastPrewalkDestination = std::move(pos));
 
     static EventPtr event;
     if (event) event->cancel();
