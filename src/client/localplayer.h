@@ -106,7 +106,7 @@ public:
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
-    bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2; }
+    bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z; }
     bool waitPreWalk(std::function<void()>&& afterPreWalking, int lockDelay = 0);
 
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
@@ -124,6 +124,11 @@ public:
     bool isSynchronized() { return getPosition() == getServerPosition(); }
     Position getPosition() override {
         return isPreWalking() ? m_lastPrewalkDestination : m_position;
+    }
+
+    void updateClientPosition(const Position& position) {
+        m_lastPrewalkDestination = position;
+        m_updatingServerPosition = false;
     }
 
 protected:
