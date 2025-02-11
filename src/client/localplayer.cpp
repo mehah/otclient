@@ -62,7 +62,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
         return;
 
     m_serverWalk = true;
-
+    updateClientPosition();
     Creature::walk(oldPos, newPos);
 }
 
