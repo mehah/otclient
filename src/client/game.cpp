@@ -650,7 +650,7 @@ bool Game::walk(const Otc::Direction direction)
     return true;
 }
 
-void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& /*startPos*/)
+void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& startPos)
 {
     if (!canPerformGameAction())
         return;
@@ -667,6 +667,13 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& /*s
     // must cancel follow before any new walk
     if (isFollowing()) {
         cancelFollow();
+    }
+
+    auto it = dirs.begin();
+    Otc::Direction direction = *it;
+    TilePtr toTile = g_map.getTile(startPos.translatedToDirection(direction));
+    if (m_localPlayer->isPreWalking() && startPos == m_localPlayer->getPosition() && toTile && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
+        m_localPlayer->preWalk(direction);
     }
 
     g_lua.callGlobalField("g_game", "onAutoWalk", m_localPlayer, dirs);

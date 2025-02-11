@@ -1370,6 +1370,11 @@ void ProtocolGame::parseCreatureMove(const InputMessagePtr& msg)
 
     const auto& creature = thing->static_self_cast<Creature>();
     creature->allowAppearWalk();
+    if (thing->isLocalPlayer()) {
+        const auto& player = thing->static_self_cast<LocalPlayer>();
+        if (!player->isPreWalking())
+            player->updateClientPosition(newPos);
+    }
 
     g_map.addThing(thing, newPos, -1);
 }

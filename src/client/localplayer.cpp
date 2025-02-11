@@ -58,10 +58,9 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking())
+    if (isPreWalking() || newPos == getLastStepToPosition())
         return;
 
-    updateClientPosition();
     m_serverWalk = true;
     Creature::walk(oldPos, newPos);
 }
