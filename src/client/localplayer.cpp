@@ -81,7 +81,7 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
         m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
             m_preWalks.clear();
             m_ajustInvalidPosEvent = nullptr;
-        }, std::max<int>(getStepDuration() * 2, g_game.getPing() + 50));
+        }, std::max<int>(getStepDuration(), g_game.getPing()) * 1.25);
     }
 }
 
