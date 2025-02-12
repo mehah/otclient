@@ -134,11 +134,7 @@ private:
     void walk(const Position& oldPos, const Position& newPos) override;
     void terminateWalk() override;
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
-    void cancelAjustInvalidPosEvent() {
-        if (!m_ajustInvalidPosEvent) return;
-        m_ajustInvalidPosEvent->cancel();
-        m_ajustInvalidPosEvent = nullptr;
-    }
+    void cancelAjustInvalidPosEvent();
 
     bool retryAutoWalk();
 

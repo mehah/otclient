@@ -89,6 +89,12 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     }
 }
 
+void LocalPlayer::cancelAjustInvalidPosEvent() {
+    if (!m_ajustInvalidPosEvent) return;
+    m_ajustInvalidPosEvent->cancel();
+    m_ajustInvalidPosEvent = nullptr;
+}
+
 bool LocalPlayer::retryAutoWalk()
 {
     if (!m_autoWalkDestination.isValid()) {
