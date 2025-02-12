@@ -79,8 +79,8 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera)) {
         cancelAjustInvalidPosEvent();
 
-        int duration = std::max<int>(getStepDuration(), g_game.getPing()) * 1.25;
-        duration = std::min<int>(duration, 1000); // Ensures it does not exceed 1000ms
+        int duration = std::max<int>(getStepDuration(), g_game.getPing()) + 50;
+        duration = std::clamp<int>(duration, 500, 1000); // Ensures it does not exceed 1000ms
 
         m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
             m_preWalks.clear();
