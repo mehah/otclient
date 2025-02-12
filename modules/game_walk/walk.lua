@@ -79,7 +79,7 @@ local function walk(dir)
         if isAutoWalking then
             player:stopAutoWalk()
         end
-        player:lockWalk(100)
+        player:lockWalk(player:getStepDuration() + 50)
         return
     end
 
@@ -220,7 +220,6 @@ local function onWalkFinish(player)
 end
 
 local function onAutoWalk(player)
-    cancelWalkEvent()
 end
 
 --- Handles cancellation of a walking event.

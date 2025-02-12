@@ -106,7 +106,7 @@ public:
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
-    bool isPreWalking() { return m_updatingServerPosition && m_lastPrewalkDestination.isValid() && m_lastPrewalkDestination.z == m_position.z && m_lastPrewalkDestination.distance(m_position) < 2; }
+    bool isPreWalking() { return !m_preWalks.empty(); }
     bool waitPreWalk(std::function<void()>&& afterPreWalking, int lockDelay = 0);
 
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
@@ -123,13 +123,10 @@ public:
 
     bool isSynchronized() { return getPosition() == getServerPosition(); }
     Position getPosition() override {
-        return isPreWalking() ? m_lastPrewalkDestination : m_position;
+        return isPreWalking() ? m_preWalks.back() : m_position;
     }
 
-    void updateClientPosition(const Position& position = {}) {
-        m_lastPrewalkDestination = position.isValid() ? position : m_position;
-        m_updatingServerPosition = false;
-    }
+    void resetPreWalk() { m_preWalks.clear(); }
 
 protected:
     void walk(const Position& oldPos, const Position& newPos) override;
@@ -151,9 +148,9 @@ private:
     bool retryAutoWalk();
 
     // walk related
-    Position m_lastPrewalkDestination;
     Position m_lastAutoWalkPosition;
     Position m_autoWalkDestination;
+    std::deque<Position> m_preWalks;
 
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
@@ -163,7 +160,6 @@ private:
     bool m_known{ false };
     bool m_pending{ false };
     bool m_serverWalk{ false };
-    bool m_updatingServerPosition{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 

@@ -58,27 +58,21 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 {
     m_autoWalkRetries = 0;
 
-    if (isPreWalking() || newPos == getLastStepToPosition())
+    if (isPreWalking() && newPos == m_preWalks.front()) {
+        m_preWalks.pop_front();
         return;
+    }
 
+    m_preWalks.clear();
     m_serverWalk = true;
+
     Creature::walk(oldPos, newPos);
 }
 
 void LocalPlayer::preWalk(const Otc::Direction direction)
 {
-    m_updatingServerPosition = true;
-
-    // avoid reanimating prewalks
     const auto& oldPos = getPosition();
-    auto pos = oldPos.translatedToDirection(direction);
-    if (m_lastPrewalkDestination != pos)
-        Creature::walk(oldPos, m_lastPrewalkDestination = std::move(pos));
-
-    static EventPtr event;
-    if (event) event->cancel();
-    event = g_dispatcher.scheduleEvent(
-        [this, self = static_self_cast<LocalPlayer>()] { updateClientPosition(); event = nullptr; }, std::max<int>(500, g_game.getPing()));
+    Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -485,7 +479,7 @@ bool LocalPlayer::hasSight(const Position& pos)
 }
 
 bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking, int lockDelay) {
-    static EventPtr event;
+    /*static EventPtr event;
     if (event) return false;
 
     const bool preWalking = isPreWalking();
@@ -498,7 +492,8 @@ bool LocalPlayer::waitPreWalk(std::function<void()>&& afterPreWalking, int lockD
         });
     }
 
-    return preWalking;
+    return preWalking; */
+    return false;
 }
 
 int LocalPlayer::getMaxStepLatency() { return std::max<int>(getStepDuration(), g_game.getPing()) + 50; }
