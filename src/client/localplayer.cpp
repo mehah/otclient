@@ -61,7 +61,8 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 
     if (isPreWalking() && newPos == m_preWalks.front()) {
         m_preWalks.pop_front();
-        cancelAjustInvalidPosEvent();
+        if (m_preWalks.empty())
+            cancelAjustInvalidPosEvent();
         return;
     }
 
