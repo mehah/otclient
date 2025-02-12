@@ -79,7 +79,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     cancelAjustInvalidPosEvent();
 
     int duration = std::max<int>(getStepDuration(), g_game.getPing()) + 50;
-    duration = std::clamp<int>(duration, 500, 1000); // Ensures it does not exceed 1000ms
+    duration = std::clamp<int>(duration, 500, 1000); // Clamps 'duration' within the range of 500 to 1000ms.
 
     m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
         m_preWalks.clear();
