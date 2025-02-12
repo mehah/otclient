@@ -628,7 +628,8 @@ void Creature::updateWalkingTile()
 
     if (newWalkingTile) {
         newWalkingTile->addWalkingCreature(self);
-        g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
+        if (isLocalPlayer())
+            g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
     }
 
     m_walkingTile = newWalkingTile;
@@ -954,10 +955,9 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 
-    if (isLocalPlayer() && g_game.getPing() > m_stepCache.duration) {
+    if (g_game.getFeature(Otc::GameAdjustCameraByLatency) && isLocalPlayer() && static_self_cast<LocalPlayer>()->isPreWalking()) {
         // stabilizes camera transition with server response time to keep movement fluid.
-        const auto diff = g_game.getPing() - m_stepCache.duration;
-        duration += std::min<int>(((diff + 9) / 10) * 10, serverBeat * 2);
+        duration = std::max<int>(duration, ((g_game.mapUpdatedAt() + 9) / 10) * 10);
     }
 
     return duration;

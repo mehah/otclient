@@ -107,7 +107,6 @@ public:
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
     bool isPreWalking() { return !m_preWalks.empty(); }
-    bool waitPreWalk(std::function<void()>&& afterPreWalking, int lockDelay = 0);
 
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
@@ -121,18 +120,8 @@ public:
 
     void preWalk(Otc::Direction direction);
 
-    bool isSynchronized() { return getPosition() == getServerPosition(); }
-    Position getPosition() override {
-        return isPreWalking() ? m_preWalks.back() : m_position;
-    }
-
+    Position getPosition() override { return isPreWalking() ? m_preWalks.back() : m_position; }
     void resetPreWalk() { m_preWalks.clear(); }
-
-protected:
-    void walk(const Position& oldPos, const Position& newPos) override;
-    void terminateWalk() override;
-
-    friend class Game;
 
 private:
     struct Skill
@@ -142,8 +131,14 @@ private:
         uint16_t levelPercent{ 0 };
     };
 
+    void walk(const Position& oldPos, const Position& newPos) override;
+    void terminateWalk() override;
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
-    int getMaxStepLatency();
+    void cancelAjustInvalidPosEvent() {
+        if (!m_ajustInvalidPosEvent) return;
+        m_ajustInvalidPosEvent->cancel();
+        m_ajustInvalidPosEvent = nullptr;
+    }
 
     bool retryAutoWalk();
 
@@ -152,6 +147,7 @@ private:
     Position m_autoWalkDestination;
     std::deque<Position> m_preWalks;
 
+    ScheduledEventPtr m_ajustInvalidPosEvent;
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
@@ -191,4 +187,6 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+
+    friend class Game;
 };

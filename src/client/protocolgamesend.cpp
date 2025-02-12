@@ -125,6 +125,8 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
 
     if (g_game.getFeature(Otc::GameSequencedPackets))
         enabledSequencedPackets();
+
+    g_game.m_mapUpdateTimer.restart();
 }
 
 void ProtocolGame::sendEnterGame()

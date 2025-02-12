@@ -1240,6 +1240,8 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 
     const auto& range = g_map.getAwareRange();
     setFloorDescription(msg, pos.x - range.left, pos.y - range.top, floor, range.horizontal(), range.vertical(), pos.z - floor, 0);
+
+    g_game.m_mapUpdatedAt = g_game.m_mapUpdateTimer.ticksElapsed();
 }
 
 void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
@@ -3158,6 +3160,8 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, const int x, co
     for (auto nz = startz; nz != endz + zstep; nz += zstep) {
         skip = setFloorDescription(msg, x, y, nz, width, height, z - nz, skip);
     }
+
+    g_game.m_mapUpdatedAt = g_game.m_mapUpdateTimer.ticksElapsed();
 }
 
 int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height, const int offset, int skip)

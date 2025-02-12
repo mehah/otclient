@@ -685,6 +685,8 @@ void Game::forceWalk(const Otc::Direction direction)
     if (!canPerformGameAction())
         return;
 
+    m_mapUpdateTimer.restart();
+
     switch (direction) {
         case Otc::North:
             m_protocolGame->sendWalkNorth();
@@ -804,9 +806,6 @@ void Game::wrap(const ThingPtr& thing)
 void Game::use(const ThingPtr& thing)
 {
     if (!canPerformGameAction() || !thing)
-        return;
-
-    if (m_localPlayer->waitPreWalk([=, this] { use(thing); }))
         return;
 
     Position pos = thing->getPosition();

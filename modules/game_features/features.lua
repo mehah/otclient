@@ -9,6 +9,7 @@ controller:registerEvents(g_game, {
 
         g_game.enableFeature(GameAllowPreWalk)
         g_game.enableFeature(GameFormatCreatureName)
+        g_game.enableFeature(GameAdjustCameraByLatency)
 
         if version >= 750 then
             g_game.enableFeature(GameSoul)
