@@ -64,6 +64,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
         return;
     }
 
+    cancelAjustInvalidPosEvent();
     m_preWalks.clear();
     m_serverWalk = true;
 
