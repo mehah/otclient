@@ -861,7 +861,7 @@ function show()
     controllerShop.ui:raise()
     controllerShop.ui:focus()
 
-    if g_game.getClientVersion() >= 1310 and g_game.getClientVersion() < 1332 then
+    if g_game.getClientVersion() >= 1310 and g_game.getClientVersion() < 1320 then
         g_game.sendRequestStoreHome()
         g_logger.warning("Check 0xFA")
         controllerShop:scheduleEvent(function()
@@ -907,7 +907,7 @@ function toggleTransferHistory()
     if controllerShop.ui.transferHistory:isVisible() then
         controllerShop.ui.transferHistory:setVisible(false)
 
-        if controllerShop.ui.openedCategory:getId() == "Home" then
+        if controllerShop.ui.openedCategory and controllerShop.ui.openedCategory:getId() == "Home" then
             controllerShop.ui.HomePanel:setVisible(true)
 
         else

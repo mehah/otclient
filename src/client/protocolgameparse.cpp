@@ -833,7 +833,7 @@ void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
         msg->getU8();
         const uint32_t getTibiaCoins = msg->getU32();
         const uint32_t getTransferableCoins = msg->getU32();
-        if (g_game.getClientVersion() >= 1332) {
+        if (g_game.getClientVersion() >= 1320) {
             msg->getU32(); // Reserved Auction Coins
         }
         g_lua.callGlobalField("g_game", "onParseStoreGetCoin", getTibiaCoins, getTransferableCoins);
