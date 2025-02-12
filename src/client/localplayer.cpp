@@ -33,38 +33,25 @@ void LocalPlayer::lockWalk(const uint16_t millis)
 
 bool LocalPlayer::canWalk(const bool ignoreLock)
 {
-    // The player is dead and cannot walk
+    // Prevent movement if the player is dead
     if (isDead())
         return false;
 
-    // Walking is locked and the lock is not being ignored
+    // Prevent movement if walking is locked, unless ignored
     if (isWalkLocked() && !ignoreLock)
         return false;
 
-    // If the game feature for camera adjustment by latency is enabled
-    if (g_game.getFeature(Otc::GameAdjustCameraByLatency)) {
-        // Prevent walking if the player's position is desynchronized from the server position
-        if (getPosition().distance(getServerPosition()) > 0)
-            return false;
-    }
-    // Otherwise, ensure the player can only walk when their position matches the server's position
-    else if (getPosition() != getServerPosition())
+    // Ensure synchronization with the server before allowing movement
+    if (!g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && getPosition() != getServerPosition())
         return false;
 
-    // Check if the player is already walking
+    // Handle ongoing movement cases
     if (isWalking()) {
-        // If the player is auto-walking, allow it to proceed uninterrupted
-        if (isAutoWalking())
-            return true;
-
-        // If the player is still in a pre-walk state, prevent further movement
-        if (isPreWalking())
-            return false;
+        if (isAutoWalking()) return true;  // Allow auto-walking
+        if (isPreWalking()) return false;  // Prevent pre-walk interruptions
     }
 
-    // Allow walking only if the walk timer has elapsed.
-    // This ensures that movement follows proper timing constraints,
-    // such as extra delay for diagonal steps.
+    // allow only if walk done, ex. diagonals may need additional ticks before taking another step
     return m_walkTimer.ticksElapsed() >= getStepDuration();
 }
 
@@ -89,11 +76,13 @@ void LocalPlayer::preWalk(const Otc::Direction direction)
     const auto& oldPos = getPosition();
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
 
-    cancelAjustInvalidPosEvent();
-    m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
-        m_preWalks.clear();
-        m_ajustInvalidPosEvent = nullptr;
-    }, std::max<int>(g_game.mapUpdatedAt(), std::max<int>(500, g_game.getPing())));
+    if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera)) {
+        cancelAjustInvalidPosEvent();
+        m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
+            m_preWalks.clear();
+            m_ajustInvalidPosEvent = nullptr;
+        }, std::max<int>(getStepDuration() * 2, g_game.getPing() + 50));
+    }
 }
 
 bool LocalPlayer::retryAutoWalk()

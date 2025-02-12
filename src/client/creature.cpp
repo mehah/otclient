@@ -955,7 +955,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 
-    if (g_game.getFeature(Otc::GameAdjustCameraByLatency) && isLocalPlayer() && static_self_cast<LocalPlayer>()->isPreWalking()) {
+    if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && isLocalPlayer() && static_self_cast<LocalPlayer>()->isPreWalking()) {
         // stabilizes camera transition with server response time to keep movement fluid.
         duration = std::max<int>(duration, ((g_game.mapUpdatedAt() + 9) / 10) * 10);
     }

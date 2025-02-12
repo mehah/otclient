@@ -216,7 +216,7 @@ GameAllowCustomBotScripts = 120
 GameColorizedLootValue = 121
 GameAllowPreWalk = 122
 GamePlayerFamiliars = 123
-GameAdjustCameraByLatency = 124
+GameLatencyAdaptiveCamera = 124
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
