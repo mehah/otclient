@@ -184,12 +184,12 @@ GameStore.DefaultValues = {
 local function destroyWindow(windows)
     if type(windows) == "table" then
         for _, window in ipairs(windows) do
-            if window and not windows:isDestroyed() then
+            if window then
                 window:destroy()
                 window = nil
             end
         end
-    elseif windows and not windows:isDestroyed() then
+    elseif windows  then
         windows:destroy()
         windows = nil
     end
@@ -491,11 +491,11 @@ function controllerShop:onGameEnd()
         controllerShop.ui:hide()
     end
 
-    destroyWindow({transferPointsWindow,changeNameWindow,acceptWindow})
+    destroyWindow({transferPointsWindow, changeNameWindow, acceptWindow})
 end
 
 function controllerShop:onTerminate()
-    destroyWindow({transferPointsWindow,changeNameWindow,acceptWindow})
+    destroyWindow({transferPointsWindow, changeNameWindow, acceptWindow})
 end
 
 -- /*=============================================

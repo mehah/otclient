@@ -737,7 +737,7 @@ void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
 
 void ProtocolGame::parseStore(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() <= 1098) {
+    if (g_game.getClientVersion() <= 1100) {
         parseCoinBalance(msg);
     }
 
@@ -835,6 +835,9 @@ void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
         const uint32_t getTransferableCoins = msg->getU32();
         if (g_game.getClientVersion() >= 1320) {
             msg->getU32(); // Reserved Auction Coins
+        }
+        if (g_game.getFeature(Otc::GameTournamentPackets)) {
+            msg->getU32();
         }
         g_lua.callGlobalField("g_game", "onParseStoreGetCoin", getTibiaCoins, getTransferableCoins);
     } else {
