@@ -705,7 +705,7 @@ public:
     bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
-    int mapUpdatedAt() const { return m_ping > -1 ? m_ping : m_mapUpdatedAt; }
+    auto mapUpdatedAt() const { return m_mapUpdatedAt; }
 
     int getPing() { return m_ping > -1 ? m_ping : m_relativePing.delay; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
