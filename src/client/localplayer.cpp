@@ -61,7 +61,6 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 
     if (isPreWalking() && newPos == m_preWalks.front()) {
         m_preWalks.pop_front();
-        cancelAjustInvalidPosEvent();
         return;
     }
 
@@ -77,14 +76,10 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
 
     cancelAjustInvalidPosEvent();
-
-    int duration = std::max<int>(getStepDuration(), g_game.getPing()) + 50;
-    duration = std::clamp<int>(duration, 500, 1000); // Clamps 'duration' within the range of 500 to 1000ms.
-
     m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
         m_preWalks.clear();
         m_ajustInvalidPosEvent = nullptr;
-    }, duration);
+    }, std::min<int>(getStepDuration() * 1.5, 1000));
 }
 
 void LocalPlayer::cancelAjustInvalidPosEvent() {
