@@ -481,19 +481,19 @@ int push_luavalue(const SubOffer& subOffer) {
     }
     if (g_game.getClientVersion() < 1310) {
 
-        g_lua.pushString(subOffer.name); // Nuevo
+        g_lua.pushString(subOffer.name);
         g_lua.setField("name");
-        g_lua.pushString(subOffer.description); // Nuevo
+        g_lua.pushString(subOffer.description);
         g_lua.setField("description");
 
-        g_lua.createTable(0, subOffer.icons.size()); // Nuevo
+        g_lua.createTable(0, subOffer.icons.size());
         for (size_t i = 0; i < subOffer.icons.size(); ++i) {
             g_lua.pushString(subOffer.icons[i]);
             g_lua.rawSeti(i + 1);
         }
         g_lua.setField("icons");
 
-        g_lua.pushString(subOffer.parent); // Nuevo
+        g_lua.pushString(subOffer.parent);
         g_lua.setField("parent");
     }
     return 1;

@@ -1003,7 +1003,7 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 				subOffer.disabled = msg->getU8() == 1;
 				if (subOffer.disabled) {
 					const uint8_t reason = msg->getU8();
-					for (auto j = 0; j < reason; ++j) {
+					for (auto k = 0; k < reason; ++k) {
                         subOffer.reasonIdDisable = msg->getU16();
 					}
 				}
