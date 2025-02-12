@@ -73,8 +73,8 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
 
 void LocalPlayer::preWalk(Otc::Direction direction)
 {
-    const auto newPos = getPosition().translatedToDirection(direction);
-    Creature::walk(getPosition(), m_preWalks.emplace_back(newPos));
+    const auto& oldPos = getPosition();
+    Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
 
     if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera)) {
         cancelAjustInvalidPosEvent();
