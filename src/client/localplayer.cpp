@@ -71,17 +71,21 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
     Creature::walk(oldPos, newPos);
 }
 
-void LocalPlayer::preWalk(const Otc::Direction direction)
+void LocalPlayer::preWalk(Otc::Direction direction)
 {
-    const auto& oldPos = getPosition();
-    Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
+    const auto newPos = getPosition().translatedToDirection(direction);
+    Creature::walk(getPosition(), m_preWalks.emplace_back(newPos));
 
     if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera)) {
         cancelAjustInvalidPosEvent();
+
+        int duration = std::max<int>(getStepDuration(), g_game.getPing()) * 1.25;
+        duration = std::min<int>(duration, 1000); // Ensures it does not exceed 1000ms
+
         m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
             m_preWalks.clear();
             m_ajustInvalidPosEvent = nullptr;
-        }, std::max<int>(getStepDuration(), g_game.getPing()) * 1.25);
+        }, duration);
     }
 }
 
