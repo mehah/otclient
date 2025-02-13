@@ -86,7 +86,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
         m_preWalks.clear();
         g_game.resetMapUpdatedAt();
         m_ajustInvalidPosEvent = nullptr;
-    }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 50, 1000));
+    }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
 }
 
 void LocalPlayer::cancelAjustInvalidPosEvent() {
