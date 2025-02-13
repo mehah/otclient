@@ -1134,3 +1134,17 @@ function transferPoints()
         g_game.transferCoins(receipient, amount)
     end
 end
+
+-- /*=============================================
+-- =            Search Button            =
+-- =============================================*/
+
+function search()
+    controllerShop.ui.panelItem:setVisible(true)
+    controllerShop.ui.transferHistory:setVisible(false)
+    controllerShop.ui.HomePanel:setVisible(false)
+    if  controllerShop.ui.openedCategory ~= nil then
+        close(controllerShop.ui.openedCategory)
+    end
+    g_game.sendRequestStoreSearch(controllerShop.ui.SearchEdit:getText(), 0, 1)
+end

@@ -236,6 +236,34 @@ StoreWindow
     margin-bottom: 8
     padding: 5
 
+  TextEdit
+    id: SearchEdit
+    anchors.bottom: listCategory.bottom
+    anchors.left: parent.left
+    margin-left: 5
+    margin-bottom: 10
+    height: 17
+    width: 180
+    placeholder: Type to search
+    placeholder-color: #6E706F
+
+  UIWidget
+    id: SearchClearButton
+    anchors.right: SearchEdit.right
+    anchors.top: SearchEdit.top
+    margin-top: 1
+    margin-right: 2
+    image-source: /game_cyclopedia/images/button_clear_search
+    image-color: white
+    opacity: 0.8
+    @onClick: modules.game_store.search()
+    $hover:
+      opacity: 1.0
+      image-color: white
+    $pressed:
+      opacity: 1.0
+      image-color: gray
+
   StoreLightFlatPanel
     id: panelItem
     anchors.top: parent.top
