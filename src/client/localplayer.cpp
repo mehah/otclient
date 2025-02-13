@@ -43,7 +43,7 @@ bool LocalPlayer::canWalk(const bool ignoreLock)
 
     // Ensure movement synchronization with the server
     if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera)) {
-        if (m_preWalks.size() > 1) // Limit pre-walk actions to one
+        if (m_preWalks.size() > g_game.getWalkMaxSteps()) // Limit pre-walk actions to one
             return false;
     } else if (getPosition() != getServerPosition())
         return false;
