@@ -203,6 +203,8 @@ protected:
 
     Timer m_walkTimer;
 
+    int16_t m_lastMapDuration = -1;
+
 private:
     void nextWalkUpdate();
     void updateJump();
