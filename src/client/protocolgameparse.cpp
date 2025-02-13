@@ -915,12 +915,13 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 		msg->getU8(); //  -- sort by 0 - most popular, 1 - alphabetically, 2 - newest
 		const uint8_t dropMenuShowAll = msg->getU8();
 		for (auto i = 0; i < dropMenuShowAll; ++i) {
-			msg->getString();
+            const auto& menu = msg->getString();
+            storeData.menuFilter.push_back(menu);
 		}
 		if (g_game.getClientVersion() > 1332) {
-			msg->getU16(); // Skip unknown U16
+            msg->getU16(); // Skip unknown U16
 		} else {
-			msg->getString(); // dropdown menu position
+            msg->getString(); // dropdown menu position
 		}
 
 		const uint16_t disableReasonsSize = msg->getU16();

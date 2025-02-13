@@ -179,6 +179,7 @@ struct StoreData
     std::vector<Banner> banners;
     uint8_t bannerDelay;
     bool tooManyResults;
+    std::vector<std::string> menuFilter;
 };
 
 struct CyclopediaCharacterGeneralStats

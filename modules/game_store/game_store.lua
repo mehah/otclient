@@ -14,7 +14,6 @@ local reasonCategory = {}
 -- - Fix onclick behavior in "home", link to category/item -- void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType) ?
 -- - cache
 -- - delete array unnecessary GameStore.X
--- - search Packets
 -- - try on outfit
 
 GameStore = {}
@@ -184,14 +183,16 @@ GameStore.DefaultValues = {
 local function destroyWindow(windows)
     if type(windows) == "table" then
         for _, window in ipairs(windows) do
-            if window then
+            if window and not window:isDestroyed() then
                 window:destroy()
                 window = nil
             end
         end
-    elseif windows  then
-        windows:destroy()
-        windows = nil
+    else
+        if windows and not windows:isDestroyed() then
+            windows:destroy()
+            windows = nil
+        end
     end
 end
 
@@ -441,30 +442,14 @@ controllerShop:setUI('game_store')
 function controllerShop:onInit()
     controllerShop.ui:hide()
 
-    -- /*=============================================
-    -- =            ComboBox                         =
-    -- =============================================*/
-
-    for k, v in pairs({{'Disabled', 'disabled'}}) do
-        controllerShop.ui.panelItem.comboBoxContainer.showAll:addOption(v[1], v[2])
-    end
-
-    --[[     
-    controllerShop.ui.panelItem.comboBoxContainer.MostPopularFirst.onOptionChange = function(comboBox, option)
-    end 
-    ]]
     for k, v in pairs({{'Most Popular Fist', 'MostPopularFist'}, {'Alphabetically', 'Alphabetically'},
                        {'Newest Fist', 'NewestFist'}}) do
         controllerShop.ui.panelItem.comboBoxContainer.MostPopularFirst:addOption(v[1], v[2])
     end
 
-    --[[     
-    controllerShop.ui.panelItem.comboBoxContainer.MostPopularFirst.onOptionChange = function(comboBox, option)
-    end
- ]]
     controllerShop.ui.transferPoints.onClick = transferPoints
     controllerShop.ui.panelItem.listProduct.onChildFocusChange = chooseOffert
-
+    controllerShop.ui.HomePanel.HomeRecentlyAdded.HomeProductos.onChildFocusChange = chooseHome
     -- /*=============================================
     -- =            Parse                         =
     -- =============================================*/
@@ -530,8 +515,6 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
     messageBox.buttonAnimation.onClick = function(widget)
         messageBox.buttonAnimation:disable()
         local phase = 0
-        local timer = 0
-        local shouldContinue = true
         
         periodicalEvent(function()
             messageBox.buttonAnimation.animation:setImageClip((phase % 13 * 108) .. " 0 108 108")
@@ -539,23 +522,34 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
             if phase >= 12 then
                 phase = 11
             end
-            timer = timer + 120
-            if timer >= 2000 then
-                messageBox:hide()
-                controllerShop.ui:show()
-                local button = controllerShop.ui.openedSubCategory and 
-                    controllerShop.ui.openedSubCategory.Button or 
-                    controllerShop.ui.openedCategory.Button
-                button:onClick()
-                shouldContinue = false
-            end
         end, function()
-            return shouldContinue and messageBox.buttonAnimation.animation
+            return messageBox.buttonAnimation.animation
         end, 120, 120)
+        
+        controllerShop:scheduleEvent(function()
+            messageBox:hide()
+            controllerShop.ui:show()
+            local button = controllerShop.ui.openedSubCategory and 
+                controllerShop.ui.openedSubCategory.Button or 
+                controllerShop.ui.openedCategory.Button
+            button:onClick()
+        end, 2000)
     end
 end
 
 function onParseStoreCreateProducts(storeProducts)
+    local comboBox = controllerShop.ui.panelItem.comboBoxContainer.showAll
+    comboBox:clearOptions()
+    comboBox:addOption("Disable", 0)
+
+    if #storeProducts.menuFilter > 0 then
+        for k, t in pairs(storeProducts.menuFilter) do
+            comboBox:addOption(t, k - 1)
+        end
+        comboBox.onOptionChange = function(a, b, c, d)
+            --pdump(a:getCurrentOption())
+        end
+    end
     reasonCategory = storeProducts.disableReasons
     local listProduct = controllerShop.ui.panelItem.listProduct
     listProduct:destroyChildren()
@@ -564,7 +558,7 @@ function onParseStoreCreateProducts(storeProducts)
     end
     for _, product in ipairs(storeProducts.offers) do
         local row = g_ui.createWidget('RowStore', listProduct)
-        row.store, row.product, row.type = store, product, product.type
+        row.product, row.type = product, product.type
 
         local nameLabel = row:getChildById('lblName')
         nameLabel:setText(product.name)
@@ -574,7 +568,7 @@ function onParseStoreCreateProducts(storeProducts)
         local subOffers = product.subOffers or { product }
         for _, subOffer in ipairs(subOffers) do
             local offerI = g_ui.createWidget('stackOfferPanel', row:getChildById('StackOffers'))
-
+            offerI:setId(subOffer.id)
             if subOffer.disabled then
                 offerI:disable()
                 row:setOpacity(0.5)
@@ -603,9 +597,21 @@ function onParseStoreCreateProducts(storeProducts)
     end
 
     controllerShop:scheduleEvent(function()
-        local firstChild = listProduct:getFirstChild()
-        if firstChild and firstChild:isEnabled() then
-            listProduct:focusChild(firstChild)
+        local redirectId = storeProducts.redirectId
+        if redirectId and type(redirectId) == "number" and redirectId ~= 0 then -- home behavior 
+            for _, child in ipairs(listProduct:getChildren()) do
+                for _, subOffer in ipairs(child.product.subOffers or { child.product }) do
+                    if subOffer.id == redirectId then
+                        listProduct:focusChild(child)
+                        return
+                    end
+                end
+            end
+        else
+            local firstChild = listProduct:getFirstChild()
+            if firstChild and firstChild:isEnabled() then
+                listProduct:focusChild(firstChild)
+            end
         end
     end, 300, 'onParseStoreOfferDescriptionsSafeDelay')
 
@@ -616,7 +622,7 @@ function onParseStoreCreateHome(offer)
     local homeProductos = controllerShop.ui.HomePanel.HomeRecentlyAdded.HomeProductos
     for _, product in ipairs(offer.offers) do
         local row = g_ui.createWidget('RowStore', homeProductos)
-        row.store, row.product, row.type = store, product, product.type
+        row.product, row.type = product, product.type
 
         local nameLabel = row:getChildById('lblName')
         nameLabel:setText(product.name)
@@ -1069,6 +1075,17 @@ function chooseOffert(self, focusedChild)
     end
 end
 
+function chooseHome(self, focusedChild)
+    if not focusedChild then
+        return
+    end
+    local product = focusedChild.product
+    local panel = controllerShop.ui.HomePanel.HomeRecentlyAdded.HomeProductos
+    g_game.sendRequestStoreOfferById(product.id)
+    controllerShop.ui.panelItem:setVisible(true)
+    controllerShop.ui.transferHistory:setVisible(false)
+    controllerShop.ui.HomePanel:setVisible(false)
+end
 -- /*=============================================
 -- =            Behavior  Change Name            =
 -- =============================================*/

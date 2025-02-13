@@ -664,11 +664,18 @@ int push_luavalue(const Banner& banner) {
 }
 
 int push_luavalue(const StoreData& storeData) {
-    g_lua.createTable(0, 7);
+    g_lua.createTable(0, 8);
     g_lua.pushString(storeData.categoryName);
     g_lua.setField("categoryName");
     g_lua.pushInteger(storeData.redirectId);
     g_lua.setField("redirectId");
+
+    g_lua.createTable(0, storeData.menuFilter.size());
+    for (size_t i = 0; i < storeData.menuFilter.size(); ++i) {
+        g_lua.pushString(storeData.menuFilter[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("menuFilter");
 
     g_lua.createTable(0, storeData.disableReasons.size());
     for (size_t i = 0; i < storeData.disableReasons.size(); ++i) {
