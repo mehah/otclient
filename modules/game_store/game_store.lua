@@ -1,18 +1,26 @@
+-- Auxiliar miniWindows
 local acceptWindow = nil
 local changeNameWindow = nil
 local transferPointsWindow = nil
+local processingWindow = nil
+local messageBox = nil
+
+
 local oldProtocol = false
+local a0xF2 = true
+
 local offerDescriptions = {}
 local reasonCategory = {}
 local bannersHome = {}
+
 local currentIndex = 1
+
 -- /*=============================================
 -- =            To-do                  =
 -- =============================================*/
 -- - Fix filter functionality
 -- - Correct HTML string syntax
 -- - cache
--- - delete array unnecessary GameStore.X
 -- - try on outfit
 -- - improve homePanel/hystoryPanel
 
@@ -20,87 +28,12 @@ GameStore = {}
 -- == Enums ==--
 GameStore.website = {
     WEBSITE_GETCOINS = "https://github.com/mehah/otclient",
-    -- IMAGES_URL =  "http://localhost/images/store/" --./game_store --https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
-}
-
-GameStore.OfferTypes = {
-    OFFER_TYPE_NONE = 0,
-    OFFER_TYPE_ITEM = 1,
-    OFFER_TYPE_STACKABLE = 2,
-    OFFER_TYPE_CHARGES = 3,
-    OFFER_TYPE_OUTFIT = 4,
-    OFFER_TYPE_OUTFIT_ADDON = 5,
-    OFFER_TYPE_MOUNT = 6,
-    OFFER_TYPE_NAMECHANGE = 7,
-    OFFER_TYPE_SEXCHANGE = 8,
-    OFFER_TYPE_HOUSE = 9,
-    OFFER_TYPE_EXPBOOST = 10,
-    OFFER_TYPE_PREYSLOT = 11,
-    OFFER_TYPE_PREYBONUS = 12,
-    OFFER_TYPE_TEMPLE = 13,
-    OFFER_TYPE_BLESSINGS = 14,
-    OFFER_TYPE_PREMIUM = 15,
-    OFFER_TYPE_ALLBLESSINGS = 17,
-    OFFER_TYPE_INSTANT_REWARD_ACCESS = 18,
-    OFFER_TYPE_CHARMS = 19,
-    OFFER_TYPE_HIRELING = 20,
-    OFFER_TYPE_HIRELING_NAMECHANGE = 21,
-    OFFER_TYPE_HIRELING_SEXCHANGE = 22,
-    OFFER_TYPE_HIRELING_SKILL = 23,
-    OFFER_TYPE_HIRELING_OUTFIT = 24,
-    OFFER_TYPE_HUNTINGSLOT = 25,
-    OFFER_TYPE_ITEM_BED = 26,
-    OFFER_TYPE_ITEM_UNIQUE = 27
-}
-
-GameStore.SubActions = {
-    PREY_THIRDSLOT_REAL = 0,
-    PREY_WILDCARD = 1,
-    INSTANT_REWARD = 2,
-    BLESSING_TWIST = 3,
-    BLESSING_SOLITUDE = 4,
-    BLESSING_PHOENIX = 5,
-    BLESSING_SUNS = 6,
-    BLESSING_SPIRITUAL = 7,
-    BLESSING_EMBRACE = 8,
-    BLESSING_BLOOD = 9,
-    BLESSING_HEART = 10,
-    BLESSING_ALL_PVE = 11,
-    BLESSING_ALL_PVP = 12,
-    CHARM_EXPANSION = 13,
-    TASKHUNTING_THIRDSLOT = 14,
-    PREY_THIRDSLOT_REDIRECT = 15
-}
-
-GameStore.ActionType = {
-    OPEN_HOME = 0,
-    OPEN_PREMIUM_BOOST = 1,
-    OPEN_CATEGORY = 2,
-    OPEN_USEFUL_THINGS = 3,
-    OPEN_OFFER = 4,
-    OPEN_SEARCH = 5
+   IMAGES_URL =  "http://localhost/1340/images/store/" --./game_store --https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
 }
 
 GameStore.CoinType = {
     Coin = 0,
     Transferable = 1
-}
-
-GameStore.Storages = {
-    expBoostCount = 51052
-}
-
-GameStore.ConverType = {
-    SHOW_NONE = 0,
-    SHOW_MOUNT = 1,
-    SHOW_OUTFIT = 2,
-    SHOW_ITEM = 3,
-    SHOW_HIRELING = 4
-}
-
-GameStore.ConfigureOffers = {
-    SHOW_NORMAL = 0,
-    SHOW_CONFIGURE = 1
 }
 
 GameStore.ClientOfferTypes = { -- sendBuy
@@ -113,33 +46,11 @@ GameStore.ClientOfferTypes = { -- sendBuy
 	CLIENT_STORE_OFFER_CONFIRM = 6,--idk
 }
 
-
-GameStore.HistoryTypes = {
-    HISTORY_TYPE_NONE = 0,
-    HISTORY_TYPE_GIFT = 1,
-    HISTORY_TYPE_REFUND = 2
-}
-
 GameStore.States = {
     STATE_NONE = 0,
     STATE_NEW = 1,
     STATE_SALE = 2,
     STATE_TIMED = 3
-}
-
-GameStore.StoreErrors = {
-    STORE_ERROR_PURCHASE = 0,
-    STORE_ERROR_NETWORK = 1,
-    STORE_ERROR_HISTORY = 2,
-    STORE_ERROR_TRANSFER = 3,
-    STORE_ERROR_INFORMATION = 4
-}
-
-GameStore.ServiceTypes = {
-    SERVICE_STANDERD = 0,
-    SERVICE_OUTFITS = 3,
-    SERVICE_MOUNTS = 4,
-    SERVICE_BLESSINGS = 5
 }
 
 GameStore.SendingPackets = {
@@ -164,21 +75,25 @@ GameStore.RecivedPackets = {
     C_RequestTransactionHistory = 0xFE -- 254
 }
 
-GameStore.ExpBoostValues = {
-    [1] = 30,
-    [2] = 45,
-    [3] = 90,
-    [4] = 180,
-    [5] = 360
-}
-
-GameStore.DefaultValues = {
-    DEFAULT_VALUE_ENTRIES_PER_PAGE = 26
-}
-
 -- /*=============================================
 -- =            Local Function auxiliaries      =
 -- =============================================*/
+
+local function showPanel(panel)
+    if panel == "HomePanel" then
+        controllerShop.ui.HomePanel:setVisible(true)
+        controllerShop.ui.panelItem:setVisible(false)
+        controllerShop.ui.transferHistory:setVisible(false)
+    elseif panel == "transferHistory" then
+        controllerShop.ui.HomePanel:setVisible(false)
+        controllerShop.ui.panelItem:setVisible(false)
+        controllerShop.ui.transferHistory:setVisible(true)
+    elseif panel == "panelItem" then
+        controllerShop.ui.HomePanel:setVisible(false)
+        controllerShop.ui.panelItem:setVisible(true)
+        controllerShop.ui.transferHistory:setVisible(false)
+    end
+end
 
 local function destroyWindow(windows)
     if type(windows) == "table" then
@@ -232,13 +147,54 @@ local function setImagenHttp(widget, url, isIcon)
     end
 end
 
+local function formatNumberWithCommas(value)
+    local sign = value < 0 and "-" or ""
+    value = math.abs(value)
+    local formattedValue = string.format("%d", value)
+    formattedValue = formattedValue:reverse():gsub("(%d%d%d)", "%1,")
+    formattedValue = formattedValue:reverse():gsub("^,", "")
+    return sign .. formattedValue
+end
+
 local function getCoinsBalance()
     local function extractNumber(text)
-        return tonumber((text:match("%d[%d,]*"):gsub(",", "")))
+        if type(text) ~= "string" then 
+            return 0 
+        end
+        local numberStr = text:match("%d[%d,]*")
+        if not numberStr then 
+            return 0 
+        end
+        local cleanNumber = numberStr:gsub("[^%d]", "")
+        return tonumber(cleanNumber) or 0
     end
-    local coins1 = extractNumber(controllerShop.ui.lblCoins.lblTibiaCoins:getText())
-    local coins2 = extractNumber(controllerShop.ui.lblCoins.lblTibiaTransfer:getText())
+
+    local lblCoins = controllerShop.ui.lblCoins.lblTibiaCoins
+    local lblTransfer = controllerShop.ui.lblCoins.lblTibiaTransfer
+
+    local coins1 = lblCoins and extractNumber(lblCoins:getText()) or 0
+    local coins2 = lblTransfer and extractNumber(lblTransfer:getText()) or 0
     return coins1, coins2
+end
+
+local function fixServerNoSend0xF2()
+    if a0xF2 then
+        local player = g_game.getLocalPlayer()
+        local coin, transfer = getCoinsBalance()
+        local coinBalance = g_game.getLocalPlayer():getResourceBalance(ResourceTypes.COIN_NORMAL)
+        local transferBalance = player:getResourceBalance(ResourceTypes.COIN_TRANSFERRABLE)
+        if not coin or not transfer or coin ~= coinBalance or transfer ~= transferBalance then
+            controllerShop.ui.lblCoins.lblTibiaCoins:setText(formatNumberWithCommas(coinBalance))
+    
+            if transfer ~= transferBalance then
+                controllerShop.ui.lblCoins.lblTibiaTransfer:setText(
+                    string.format("(Including: %s", formatNumberWithCommas(transferBalance))
+                )
+            end
+            local packet2 = GameStore.SendingPackets.S_CoinBalanceUpdating
+            g_logger.warning(string.format("[game_store BUG] Check 0x%X (%d) on server  onParseStoreGetCoin", packet2, packet2))
+        end 
+    end
 end
 
 local function convert_timestamp(timestamp)
@@ -291,14 +247,6 @@ local function createProductImage(imageParent, data)
     end
 end
 
-local function formatNumberWithCommas(value)
-    local sign = value < 0 and "-" or ""
-    value = math.abs(value)
-    local formattedValue = string.format("%d", value)
-    formattedValue = formattedValue:reverse():gsub("(%d%d%d)", "%1,")
-    formattedValue = formattedValue:reverse():gsub("^,", "")
-    return sign .. formattedValue
-end
 
 -- /*=============================================
 -- =    behavior categories and subcategories    =
@@ -470,17 +418,16 @@ end
 function controllerShop:onGameStart()
     oldProtocol = g_game.getClientVersion() < 1310
 end
-
 function controllerShop:onGameEnd()
     if controllerShop.ui:isVisible() then
         controllerShop.ui:hide()
     end
 
-    destroyWindow({transferPointsWindow, changeNameWindow, acceptWindow})
+    destroyWindow({transferPointsWindow, changeNameWindow, acceptWindow, processingWindow,messageBox})
 end
 
 function controllerShop:onTerminate()
-    destroyWindow({transferPointsWindow, changeNameWindow, acceptWindow})
+    destroyWindow({transferPointsWindow, changeNameWindow, acceptWindow, processingWindow,messageBox})
 end
 
 -- /*=============================================
@@ -494,6 +441,7 @@ function onStoreInit(url, coinsPacketSize)
 end
 
 function onParseStoreGetCoin(getTibiaCoins, getTransferableCoins)
+    a0xF2 = false
     controllerShop.ui.lblCoins.lblTibiaCoins:setText(formatNumberWithCommas(getTibiaCoins))
     controllerShop.ui.lblCoins.lblTibiaTransfer:setText(string.format("(Including: %s",
         formatNumberWithCommas(getTransferableCoins)))
@@ -507,32 +455,33 @@ function onParseStoreOfferDescriptions(offerId, description)
 end
 
 function onParseStoreGetPurchaseStatus(purchaseStatus)
+    destroyWindow({processingWindow, messageBox})
     controllerShop.ui:hide()
-    local messageBox = g_ui.createWidget('confirmarSHOP', g_ui.getRootWidget())
+    messageBox = g_ui.createWidget('confirmarSHOP', g_ui.getRootWidget())
     messageBox.Box:setText(purchaseStatus)
     messageBox.buttonAnimation.animation:setImageClip("0 0 108 108")
-    
     messageBox.buttonAnimation.onClick = function(widget)
         messageBox.buttonAnimation:disable()
         local phase = 0
-        
-        periodicalEvent(function()
-            messageBox.buttonAnimation.animation:setImageClip((phase % 13 * 108) .. " 0 108 108")
-            phase = phase + 1
-            if phase >= 12 then
-                phase = 11
+        local animationEvent = periodicalEvent(function()
+            if messageBox and messageBox.buttonAnimation and messageBox.buttonAnimation.animation then
+                messageBox.buttonAnimation.animation:setImageClip((phase % 13 * 108) .. " 0 108 108")
+                phase = phase + 1
+                if phase >= 12 then
+                    phase = 11
+                end
             end
         end, function()
-            return messageBox.buttonAnimation.animation
+            return messageBox and messageBox.buttonAnimation and messageBox.buttonAnimation.animation
         end, 120, 120)
-        
         controllerShop:scheduleEvent(function()
-            messageBox:hide()
+            destroyWindow({messageBox})
             controllerShop.ui:show()
-            local button = controllerShop.ui.openedSubCategory and 
-                controllerShop.ui.openedSubCategory.Button or 
-                controllerShop.ui.openedCategory.Button
-            button:onClick()
+            if animationEvent then
+                removeEvent(animationEvent)
+                animationEvent = nil
+            end
+            fixServerNoSend0xF2()
         end, 2000)
     end
 end
@@ -546,9 +495,9 @@ function onParseStoreCreateProducts(storeProducts)
         for k, t in pairs(storeProducts.menuFilter) do
             comboBox:addOption(t, k - 1)
         end
-        comboBox.onOptionChange = function(a, b, c, d)
-            --pdump(a:getCurrentOption())
-        end
+--[[         comboBox.onOptionChange = function(a, b, c, d)
+            pdump(a:getCurrentOption())
+        end ]]
     end
     reasonCategory = storeProducts.disableReasons
     local listProduct = controllerShop.ui.panelItem.listProduct
@@ -579,6 +528,7 @@ function onParseStoreCreateProducts(storeProducts)
             if subOffer.count and subOffer.count > 0 then
                 offerI:getChildById('count'):setText(subOffer.count .. "x")
             end
+            fixServerNoSend0xF2()
             local coinsBalance2, coinsBalance1 = getCoinsBalance()
             local isTransferable = subOffer.coinType == GameStore.CoinType.Transferable
             local price = subOffer.price
@@ -618,6 +568,8 @@ function onParseStoreCreateProducts(storeProducts)
     end, 300, 'onParseStoreOfferDescriptionsSafeDelay')
 
     enableAllButtons()
+    showPanel("panelItem")
+    fixServerNoSend0xF2()
 end
 
 function onParseStoreCreateHome(offer)
@@ -648,6 +600,8 @@ function onParseStoreCreateHome(offer)
     setImagenHttp(controllerShop.ui.HomePanel.HomeImagen, ramdomImg, false)
     enableAllButtons()
     bannersHome = table.copy(offer.banners)
+    showPanel("HomePanel")
+    fixServerNoSend0xF2()
 end
 
 function onParseStoreGetHistory(currentPage, pageCount, historyData)
@@ -673,6 +627,7 @@ function onParseStoreGetHistory(currentPage, pageCount, historyData)
                             "images/ui/tibiaCoin")
         row:setBackgroundColor(i % 2 == 0 and "#ffffff12" or "#00000012")
     end
+    showPanel("transferHistory")
 end
 
 function onParseStoreGetCategories(buttons)
@@ -814,27 +769,23 @@ function onParseStoreGetCategories(buttons)
                 end
                 if category.name == "Home" then
                     controllerShop.ui.HomePanel.HomeRecentlyAdded.HomeProductos:destroyChildren()
-
                     g_game.sendRequestStoreHome()
-                    controllerShop.ui.panelItem:setVisible(false)
-                    controllerShop.ui.transferHistory:setVisible(false)
-                    controllerShop.ui.HomePanel:setVisible(true)
-
                 else
-
                     g_game.requestStoreOffers(category.name,"", 0, 1)
-                    controllerShop.ui.panelItem:setVisible(true)
-                    controllerShop.ui.transferHistory:setVisible(false)
-                    controllerShop.ui.HomePanel:setVisible(false)
-
                 end
-
                 controllerShop.ui.openedCategory = parent
             end
         end
+        local firstCategory = controllerShop.ui.listCategory:getChildByIndex(1)
+        if controllerShop.ui.openedCategory == nil and firstCategory then
+            controllerShop.ui.openedCategory = firstCategory
+            firstCategory.Button:onClick()
+        end
+
 end
 
 function onParseStoreError(errorMessage)
+    destroyWindow(processingWindow)
     displayErrorBox(controllerShop.ui:getText(), errorMessage)
 end
 
@@ -869,37 +820,17 @@ function show()
     controllerShop.ui:raise()
     controllerShop.ui:focus()
 
-    -- todo improve
-    
-    if g_game.getClientVersion() >= 1310 and g_game.getClientVersion() < 1320 then
-        g_game.sendRequestStoreHome()
-        g_logger.warning("Check 0xFA")
-        controllerShop:scheduleEvent(function()
-            g_logger.warning("Check 0xF2")
-            controllerShop.ui.lblCoins.lblTibiaCoins:setText(formatNumberWithCommas(g_game.getLocalPlayer():getResourceBalance(ResourceTypes.COIN_NORMAL)))
-            controllerShop.ui.lblCoins.lblTibiaTransfer:setText(string.format("(Including: %s",
-                formatNumberWithCommas(g_game.getLocalPlayer():getResourceBalance(ResourceTypes.COIN_TRANSFERRABLE))))
-                local firstCategory = controllerShop.ui.listCategory:getChildByIndex(1)
-                if controllerShop.ui.openedCategory == nil and firstCategory then
-                    controllerShop.ui.openedCategory = firstCategory
-                    firstCategory.Button:onClick()
-                end
-        end, 300, 'serverNoSendPackets0xF20xFA')
-    else
-        g_game.openStore()
-        controllerShop:scheduleEvent(function()
-            local firstCategory = controllerShop.ui.listCategory:getChildByIndex(1)
-            if controllerShop.ui.openedCategory == nil and firstCategory then
-                controllerShop.ui.openedCategory = firstCategory
-                firstCategory.Button:onClick()
-            else
-                g_logger.warning(
-                    "[game_store] function show() L815, increase scheduleEvent time 300 -> 500. reason: information is late in arriving ")
-            end
-        end, 300, 'fuckAntibot')
-    end
-
+    g_game.openStore()
+    controllerShop:scheduleEvent(function()
+        if controllerShop.ui.listCategory:getChildCount() == 0 then
+            g_game.sendRequestStoreHome() -- fix 13.10
+            local packet1 = GameStore.RecivedPackets.C_OpenStore
+            g_logger.warning(string.format("[game_store BUG] Check 0x%X (%d)", packet1, packet1))
+        end
+    end, 1000, 'serverNoSendPackets0xF20xFA')
 end
+
+
 
 function getCoinsWebsite()
     if GameStore.website.WEBSITE_GETCOINS ~= "" then
@@ -914,24 +845,13 @@ end
 
 function toggleTransferHistory()
     if controllerShop.ui.transferHistory:isVisible() then
-        controllerShop.ui.transferHistory:setVisible(false)
-
         if controllerShop.ui.openedCategory and controllerShop.ui.openedCategory:getId() == "Home" then
-            controllerShop.ui.HomePanel:setVisible(true)
-
+            showPanel("HomePanel")
         else
-            controllerShop.ui.panelItem:setVisible(true)
+            showPanel("panelItem")
         end
-
     else
-        controllerShop.ui.transferHistory:setVisible(true)
-        -- listCategory:getFocusedChild():focus(false)
-        controllerShop.ui.panelItem:setVisible(false)
-
-        controllerShop.ui.HomePanel:setVisible(false)
-
         g_game.requestTransactionHistory()
-
     end
 end
 
@@ -952,6 +872,7 @@ function chooseOffert(self, focusedChild)
     if not focusedChild then
         return
     end
+
     local product = focusedChild.product
     local panel = controllerShop.ui.panelItem
     panel:getChildById('lblName'):setText(product.name)
@@ -970,7 +891,7 @@ function chooseOffert(self, focusedChild)
     if data then
         createProductImage(imagePanel, data)
     end
-
+    fixServerNoSend0xF2()
     local coinsBalance2, coinsBalance1 = getCoinsBalance()
     local offerStackPanel = panel:getChildById('StackOffers')
     offerStackPanel:destroyChildren()
@@ -1009,25 +930,36 @@ function chooseOffert(self, focusedChild)
         if offer.disabled then
             local btnBuy = offerPanel:getChildById('btnBuy')
             btnBuy:disable()
-            btnBuy:setOpacity(0.8) 
-            -- temp hack toolstips with :disable() and client QT
+            btnBuy:setOpacity(0.8)
+        
+            local lblDescription = panel:getChildById('lblDescription')
+            lblDescription:parseColoredText(string.format(
+                "[color=#ff0000]The product is currently not available for this character. See the buy button tooltip for details.[/color]\n\n-%s",
+                description
+            ))
+        
+            -- Add tooltip overlay if reasonIdDisable exists
             if offer.reasonIdDisable then
                 local tooltipOverlay = g_ui.createWidget('UIWidget', offerPanel)
-                tooltipOverlay:setFocusable(false)
                 tooltipOverlay:setId('tooltipOverlay')
+                tooltipOverlay:setFocusable(false)
                 tooltipOverlay:setSize(btnBuy:getSize())
                 tooltipOverlay:setPosition(btnBuy:getPosition())
+        
+                local reasonText = oldProtocol and offer.reasonIdDisable 
+                    or reasonCategory[offer.reasonIdDisable + 1]
+        
                 tooltipOverlay:parseColoreDisplayToolTip(string.format(
                     "[color=#ff0000]The product is not available for this character:\n\n- %s[/color]",
-                    reasonCategory[offer.reasonIdDisable + 1]))
+                    reasonText
+                ))
+        
                 tooltipOverlay:setOpacity(0)
                 tooltipOverlay:addAnchor(AnchorLeft, btnBuy:getId(), AnchorLeft)
                 tooltipOverlay:addAnchor(AnchorTop, btnBuy:getId(), AnchorTop)
-                panel:getChildById('lblDescription'):parseColoredText(string.format(
-                    "[color=#ff0000]The Product is Currently not aviable for this character. see the buy button tooltips for details[/color]\n\n-%s",
-                    description))
             end
         end
+        
 
         offerPanel:getChildById('btnBuy').onClick = function(widget)
             if acceptWindow then
@@ -1043,10 +975,21 @@ function chooseOffert(self, focusedChild)
             end
 
             local function acceptFunc()
+                fixServerNoSend0xF2()
                 local latestBalance2, latestBalance1 = getCoinsBalance()
                 local latestCurrentBalance = isTransferable and latestBalance1 or latestBalance2
                 if latestCurrentBalance >= offer.price then
                     g_game.buyStoreOffer(offer.id, GameStore.ClientOfferTypes.CLIENT_STORE_OFFER_OTHER)
+                    local closeWindow = function()
+                        destroyWindow(processingWindow)
+                    end
+                    controllerShop.ui:hide()
+                    processingWindow = displayGeneralBox('Processing purchase.', 'Your purchase is being processed',
+                    {
+                      { text = tr('ok'),  callback = closeWindow },
+                      anchor = 50
+                    }, closeWindow, closeWindow)
+
                 else
                     displayErrorBox(controllerShop.ui:getText(), tr("You don't have enough coins"))
                 end
@@ -1088,9 +1031,6 @@ function chooseHome(self, focusedChild)
     local product = focusedChild.product
     local panel = controllerShop.ui.HomePanel.HomeRecentlyAdded.HomeProductos
     g_game.sendRequestStoreOfferById(product.id)
-    controllerShop.ui.panelItem:setVisible(true)
-    controllerShop.ui.transferHistory:setVisible(false)
-    controllerShop.ui.HomePanel:setVisible(false)
 end
 
 function changeImagenHome(direction)
@@ -1145,6 +1085,7 @@ function transferPoints()
     transferPointsWindow = g_ui.displayUI('style/transferpoints')
     transferPointsWindow:show()
     local playerBalance = g_game.getLocalPlayer():getResourceBalance(ResourceTypes.COIN_TRANSFERRABLE)
+    fixServerNoSend0xF2()
     local coinsBalance2, coinsBalance1  = getCoinsBalance()
     if playerBalance == 0 then
         playerBalance = coinsBalance1 -- temp fix canary 1340
@@ -1181,11 +1122,9 @@ end
 -- =============================================*/
 
 function search()
-    controllerShop.ui.panelItem:setVisible(true)
-    controllerShop.ui.transferHistory:setVisible(false)
-    controllerShop.ui.HomePanel:setVisible(false)
     if  controllerShop.ui.openedCategory ~= nil then
         close(controllerShop.ui.openedCategory)
     end
     g_game.sendRequestStoreSearch(controllerShop.ui.SearchEdit:getText(), 0, 1)
 end
+

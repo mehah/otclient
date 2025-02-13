@@ -1089,11 +1089,10 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 				offer.state = highlightState;
 			}
 
-			const uint8_t disabledState = msg->getU8();
-			if (g_game.getFeature(Otc::GameIngameStoreHighlights) && disabledState == 1) {
-				offer.disabled = true;
-				msg->getString(); // disabledReason
-			}
+            offer.disabled = msg->getU8() == 1;
+            if (g_game.getFeature(Otc::GameIngameStoreHighlights) && offer.disabled) {
+                offer.reasonIdDisable = msg->getString(); // disabledReason
+            }
 
 			const uint8_t iconCount = msg->getU8();
 			for (auto j = 0; j < iconCount; ++j) {

@@ -512,7 +512,7 @@ int push_luavalue(const StoreOffer& offer) {
     g_lua.setField("subOffers");
 
     if (g_game.getClientVersion() < 1310) { // oldProtocol
-        g_lua.pushString(offer.description); 
+        g_lua.pushString(offer.description);
         g_lua.setField("description");
         g_lua.pushInteger(offer.id);
         g_lua.setField("id");
@@ -527,9 +527,12 @@ int push_luavalue(const StoreOffer& offer) {
         g_lua.pushBoolean(offer.disabled);
         g_lua.setField("disabled");
         if (offer.disabled) {
-            g_lua.pushInteger(offer.disabledReason);
-            g_lua.setField("disabledReason");
+            g_lua.pushString(offer.reasonIdDisable);
+            g_lua.setField("reasonIdDisable");
         }
+    } else{
+        g_lua.pushBoolean(offer.configurable);
+        g_lua.setField("configurable");
     }
     g_lua.pushInteger(offer.type);
     g_lua.setField("type");
@@ -579,8 +582,6 @@ int push_luavalue(const StoreOffer& offer) {
     g_lua.setField("popularityScore");
     g_lua.pushInteger(offer.stateNewUntil);
     g_lua.setField("stateNewUntil");
-    g_lua.pushBoolean(offer.configurable);
-    g_lua.setField("configurable");
     g_lua.pushInteger(offer.productsCapacity);
     g_lua.setField("productsCapacity");
 

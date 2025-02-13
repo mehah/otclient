@@ -120,7 +120,7 @@ struct StoreOffer
     uint8_t state; // oldProtocol
     uint32_t basePrice; // oldProtocol
     bool disabled; // oldProtocol
-    uint16_t disabledReason; // oldProtocol
+    std::string reasonIdDisable; // oldProtocol
     uint8_t type;
     std::string icon;
     uint16_t mountId;

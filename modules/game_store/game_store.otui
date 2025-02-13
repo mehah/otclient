@@ -410,7 +410,6 @@ StoreWindow
     anchors.bottom: listCategory.bottom
     margin-left: 8
     padding: 6
-    visible: false
     UIWidget
       id: HomeImagen
       height: 20
