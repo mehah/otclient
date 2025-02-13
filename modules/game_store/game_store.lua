@@ -603,6 +603,7 @@ function onParseStoreCreateProducts(storeProducts)
                 for _, subOffer in ipairs(child.product.subOffers or { child.product }) do
                     if subOffer.id == redirectId then
                         listProduct:focusChild(child)
+                        listProduct:ensureChildVisible(child)
                         return
                     end
                 end
@@ -611,6 +612,7 @@ function onParseStoreCreateProducts(storeProducts)
             local firstChild = listProduct:getFirstChild()
             if firstChild and firstChild:isEnabled() then
                 listProduct:focusChild(firstChild)
+                listProduct:ensureChildVisible(firstChild)
             end
         end
     end, 300, 'onParseStoreOfferDescriptionsSafeDelay')
