@@ -865,7 +865,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
                 if (g_map.isAwareOfPosition(neighborPos)) {
                     wasSeen = true;
                     if (const auto& tile = getTile(neighborPos)) {
-                        hasCreature = tile->hasCreature() && (!(flags & Otc::PathFindIgnoreCreatures));
+                        hasCreature = tile->hasCreatures() && (!(flags & Otc::PathFindIgnoreCreatures));
                         isNotWalkable = !tile->isWalkable(flags & Otc::PathFindIgnoreCreatures);
                         isNotPathable = !tile->isPathable();
                         speed = tile->getGroundSpeed();

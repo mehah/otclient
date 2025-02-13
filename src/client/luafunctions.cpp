@@ -888,7 +888,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Tile>("isFullGround", &Tile::isFullGround);
     g_lua.bindClassMemberFunction<Tile>("isFullyOpaque", &Tile::isFullyOpaque);
     g_lua.bindClassMemberFunction<Tile>("isLookPossible", &Tile::isLookPossible);
-    g_lua.bindClassMemberFunction<Tile>("hasCreature", &Tile::hasCreature);
+    g_lua.bindClassMemberFunction<Tile>("hasCreatures", &Tile::hasCreatures);
     g_lua.bindClassMemberFunction<Tile>("isEmpty", &Tile::isEmpty);
     g_lua.bindClassMemberFunction<Tile>("isClickable", &Tile::isClickable);
     g_lua.bindClassMemberFunction<Tile>("isPathable", &Tile::isPathable);

@@ -644,6 +644,30 @@ void Creature::nextWalkUpdate()
     // do the update
     updateWalk();
 
+    // Cancel pre-walk movement if the local player tries to walk on an unwalkable tile.
+    if (isLocalPlayer()) {
+        const auto& player = static_self_cast<LocalPlayer>();
+        if (player->isPreWalking()) {
+            const auto& tile = g_map.getTile(player->getPosition());
+            if (tile) {
+                bool cancel = false;
+                for (const auto& creature : tile->getWalkingCreatures()) {
+                    if (creature != player && creature->getPosition() == player->getPosition()) {
+                        cancel = true;
+                        break;
+                    }
+                }
+
+                if (cancel) {
+                    g_logger.info("hehe");
+                    player->cancelWalk();
+                    g_map.notificateTileUpdate(player->getPosition(), player, Otc::OPERATION_CLEAN);
+                    return;
+                }
+            }
+        }
+    }
+
     if (!m_walking) return;
 
     auto action = [self = static_self_cast<Creature>()] {

@@ -124,7 +124,7 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
         return;
 
     bool localPlayerDrawed = false;
-    if (hasCreature()) {
+    if (hasCreatures()) {
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
@@ -387,7 +387,7 @@ ThingPtr Tile::getThing(const int stackPos)
 std::vector<CreaturePtr> Tile::getCreatures()
 {
     std::vector<CreaturePtr> creatures;
-    if (hasCreature()) {
+    if (hasCreatures()) {
         for (const auto& thing : m_things) {
             if (thing->isCreature())
                 creatures.emplace_back(thing->static_self_cast<Creature>());
@@ -499,7 +499,7 @@ ThingPtr Tile::getTopUseThing()
 
 CreaturePtr Tile::getTopCreature(const bool checkAround)
 {
-    if (!hasCreature()) return nullptr;
+    if (!hasCreatures()) return nullptr;
 
     CreaturePtr creature;
     for (const auto& thing : m_things) {
@@ -592,7 +592,7 @@ bool Tile::isWalkable(const bool ignoreCreatures)
         return false;
     }
 
-    if (!ignoreCreatures && hasCreature()) {
+    if (!ignoreCreatures && hasCreatures()) {
         for (const auto& thing : m_things) {
             if (!thing->isCreature()) continue;
 
@@ -613,7 +613,7 @@ bool Tile::isCompletelyCovered(const uint8_t firstFloor, const bool resetCache)
         m_isCompletelyCovered = m_isCovered = 0;
     }
 
-    if (hasCreature() || !m_walkingCreatures.empty() || hasLight())
+    if (hasCreatures() || !m_walkingCreatures.empty() || hasLight())
         return false;
 
     const uint32_t idChecked = 1 << firstFloor;
@@ -924,7 +924,7 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
         flags &= ~Otc::DrawThings;
         if (!hasLight())
             flags &= ~Otc::DrawLights;
-        if (!hasCreature())
+        if (!hasCreatures())
             flags &= ~(Otc::DrawManaBar | Otc::DrawNames | Otc::DrawBars);
     }
 

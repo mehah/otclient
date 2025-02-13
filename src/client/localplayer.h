@@ -184,5 +184,6 @@ private:
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
 
+    friend class Creature;
     friend class Game;
 };

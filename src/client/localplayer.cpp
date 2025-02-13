@@ -128,6 +128,10 @@ void LocalPlayer::cancelWalk(const Otc::Direction direction)
 
     g_map.notificateCameraMove(m_walkOffset);
 
+    if (m_ajustInvalidPosEvent) {
+        m_ajustInvalidPosEvent->execute();
+    }
+
     lockWalk();
     if (retryAutoWalk()) return;
 

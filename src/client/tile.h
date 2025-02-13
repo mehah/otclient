@@ -151,7 +151,8 @@ public:
     bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; };
     bool hasTopGround(const bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & HAS_TOP_GROUND_BORDER); }
 
-    bool hasCreature() { return m_thingTypeFlag & HAS_CREATURE; }
+    bool hasCreatures() { return m_thingTypeFlag & HAS_CREATURE; }
+
     bool hasTopItem() const { return m_thingTypeFlag & HAS_TOP_ITEM; }
     bool hasCommonItem() const { return m_thingTypeFlag & HAS_COMMON_ITEM; }
     bool hasBottomItem() const { return m_thingTypeFlag & HAS_BOTTOM_ITEM; }
