@@ -4,17 +4,17 @@ local transferPointsWindow = nil
 local oldProtocol = false
 local offerDescriptions = {}
 local reasonCategory = {}
-
+local bannersHome = {}
+local currentIndex = 1
 -- /*=============================================
 -- =            To-do                  =
 -- =============================================*/
 -- - Fix filter functionality
 -- - Correct HTML string syntax
--- - fix home buttons and scheduleEvent
--- - Fix onclick behavior in "home", link to category/item -- void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType) ?
 -- - cache
 -- - delete array unnecessary GameStore.X
 -- - try on outfit
+-- - improve homePanel/hystoryPanel
 
 GameStore = {}
 -- == Enums ==--
@@ -645,9 +645,9 @@ function onParseStoreCreateHome(offer)
     end
 
     local ramdomImg = offer.banners[math.random(1, #offer.banners)].image
-    -- controllerShop.ui.HomePanel.HomeImagen:setImageSource("/game_store/images/" .. ramdomImg)
     setImagenHttp(controllerShop.ui.HomePanel.HomeImagen, ramdomImg, false)
     enableAllButtons()
+    bannersHome = table.copy(offer.banners)
 end
 
 function onParseStoreGetHistory(currentPage, pageCount, historyData)
@@ -869,6 +869,8 @@ function show()
     controllerShop.ui:raise()
     controllerShop.ui:focus()
 
+    -- todo improve
+    
     if g_game.getClientVersion() >= 1310 and g_game.getClientVersion() < 1320 then
         g_game.sendRequestStoreHome()
         g_logger.warning("Check 0xFA")
@@ -883,7 +885,6 @@ function show()
                     firstCategory.Button:onClick()
                 end
         end, 300, 'serverNoSendPackets0xF20xFA')
-
     else
         g_game.openStore()
         controllerShop:scheduleEvent(function()
@@ -1076,6 +1077,9 @@ function chooseOffert(self, focusedChild)
         end
     end
 end
+-- /*=============================================
+-- =            Home           =
+-- =============================================*/
 
 function chooseHome(self, focusedChild)
     if not focusedChild then
@@ -1088,6 +1092,24 @@ function chooseHome(self, focusedChild)
     controllerShop.ui.transferHistory:setVisible(false)
     controllerShop.ui.HomePanel:setVisible(false)
 end
+
+function changeImagenHome(direction)
+    if direction == "nextImagen" then
+        currentIndex = currentIndex + 1
+        if currentIndex > #bannersHome then
+            currentIndex = 1
+        end
+    elseif direction == "prevImagen" then
+        currentIndex = currentIndex - 1
+        if currentIndex < 1 then
+            currentIndex = #bannersHome
+        end
+    end
+    local currentBanner = bannersHome[currentIndex]
+    local imagePath = currentBanner.image
+    setImagenHttp(controllerShop.ui.HomePanel.HomeImagen, imagePath, false)
+end
+
 -- /*=============================================
 -- =            Behavior  Change Name            =
 -- =============================================*/

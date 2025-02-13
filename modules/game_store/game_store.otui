@@ -418,9 +418,33 @@ StoreWindow
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
-      layout: horizontalBox
       margin-right:10
- 
+    UIButton
+      id: prevImagen
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.left
+      size: 16 29
+      image-source: images/button-featured-offers-left
+      margin-left: 15
+      @onClick: modules.game_store.changeImagenHome(self:getId())
+      $pressed :
+        image-source: images/button-featured-offers-left-highlight
+      $hover:
+        image-source: images/button-featured-offers-left-highlight
+
+
+    UIButton
+      id: nextImagen
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.right: HomeImagen.right
+      size: 16 29
+      margin-right: 15
+      image-source: images/button-featured-offers-right
+      @onClick: modules.game_store.changeImagenHome(self:getId())
+      $pressed:
+        image-source: images/button-featured-offers-right-highlight
+      $hover:
+        image-source: images/button-featured-offers-right-highlight
 
     MiniPanel
       id:HomeRecentlyAdded
