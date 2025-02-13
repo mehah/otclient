@@ -79,6 +79,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     cancelAjustInvalidPosEvent();
     m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
         m_preWalks.clear();
+        g_game.resetMapUpdatedAt();
         m_ajustInvalidPosEvent = nullptr;
     }, std::min<int>(getStepDuration() * 1.5, 1000));
 }

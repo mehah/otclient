@@ -706,6 +706,7 @@ public:
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
     auto mapUpdatedAt() const { return m_mapUpdatedAt; }
+    void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
     int getPing() { return m_ping > -1 ? m_ping : m_relativePing.delay; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
@@ -778,6 +779,13 @@ public:
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
 
+    void updateMapLatency() {
+        if (!m_mapUpdateTimer.first) {
+            m_mapUpdatedAt = m_mapUpdateTimer.second.ticksElapsed();
+            m_mapUpdateTimer.first = true;
+        }
+    }
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -810,7 +818,7 @@ private:
     bool m_canReportBugs{ false };
 
     uint16_t m_mapUpdatedAt{ 0 };
-    Timer m_mapUpdateTimer;
+    std::pair<uint16_t, Timer> m_mapUpdateTimer = { true, Timer{} };
 
     uint8_t m_openPvpSituations{ 0 };
     uint16_t m_serverBeat{ 50 };
