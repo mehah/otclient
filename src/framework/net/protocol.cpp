@@ -122,6 +122,8 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
     // write message size
     outputMessage->writeMessageSize();
 
+    onSend();
+
     if (m_proxy) {
         const auto packet = std::make_shared<ProxyPacket>(outputMessage->getHeaderBuffer(), outputMessage->getWriteBuffer());
         g_proxy.send(m_proxy, packet);
