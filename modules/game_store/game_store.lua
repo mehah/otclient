@@ -28,7 +28,7 @@ GameStore = {}
 -- == Enums ==--
 GameStore.website = {
     WEBSITE_GETCOINS = "https://github.com/mehah/otclient",
-   IMAGES_URL =  "http://localhost/1340/images/store/" --./game_store --https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
+    --IMAGES_URL =  "http://localhost/images/store/" --./game_store --https://docs.opentibiabr.com/opentibiabr/downloads/website-applications/applications#store-for-client-13-1
 }
 
 GameStore.CoinType = {
@@ -36,7 +36,7 @@ GameStore.CoinType = {
     Transferable = 1
 }
 
-GameStore.ClientOfferTypes = { -- sendBuy
+GameStore.ClientOfferTypes = {
 	CLIENT_STORE_OFFER_OTHER = 0,
 	CLIENT_STORE_OFFER_NAMECHANGE = 1,
 	CLIENT_STORE_OFFER_WORLD_TRANSFER = 2,
@@ -247,7 +247,6 @@ local function createProductImage(imageParent, data)
     end
 end
 
-
 -- /*=============================================
 -- =    behavior categories and subcategories    =
 -- =============================================*/
@@ -366,7 +365,6 @@ local function createSubWidget(parent, subId, subButton)
         else
             g_game.requestStoreOffers(subButton.text,"", 0, 1)
         end
-
     end
 
     subWidget:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)

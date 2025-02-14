@@ -188,6 +188,7 @@ function UIMessageBox.displaySHOP(title, message, description, buttons, onEnterC
             button:setImageClip("0 0 108 20")
         else
             button:addAnchor(AnchorRight, 'prev', AnchorLeft)
+
             button:setMarginRight(10)
         end
     end

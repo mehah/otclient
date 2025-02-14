@@ -1463,7 +1463,7 @@ void Game::seekInContainer(const uint8_t containerId, const uint16_t index)
     m_protocolGame->sendSeekInContainer(containerId, index);
 }
 
-void Game::buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string& name, const uint8_t type, const std::string_view& location)
+void Game::buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location)
 {
     if (!canPerformGameAction())
         return;

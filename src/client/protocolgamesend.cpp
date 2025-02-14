@@ -1133,7 +1133,7 @@ void ProtocolGame::sendStatusTrackerBestiary(const uint16_t raceId, const bool s
     send(msg);
 }
 
-void ProtocolGame::sendBuyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string& name, const uint8_t type, const std::string_view& location)
+void ProtocolGame::sendBuyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBuyStoreOffer);

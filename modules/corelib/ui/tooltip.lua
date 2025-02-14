@@ -62,7 +62,7 @@ end
 
 local function onWidgetDestroy(widget)
     if widget == currentHoveredWidget then
-        if widget.tooltip then
+        if widget.tooltip or widget.parseColoreDisplay then
             g_tooltip.hide()
         end
         if widget.specialtooltip then
@@ -86,14 +86,11 @@ local function onWidgetHoverChange(widget, hovered)
         end
     else
         if widget == currentHoveredWidget then
-            if widget.tooltip then
+            if widget.tooltip or widget.parseColoreDisplay then
                 g_tooltip.hide()
             end
             if widget.specialtooltip then
                 g_tooltip.hideSpecial()
-            end
-            if widget.parseColoreDisplay then
-                g_tooltip.hide()
             end
             currentHoveredWidget = nil
         end
@@ -122,7 +119,11 @@ local function onWidgetStyleApply(widget, styleName, styleNode)
             tooltipWidget.specialtooltip = widget.specialtooltip
             widget.specialtooltip = nil
         end
-        if tooltipWidget.tooltip or tooltipWidget.specialtooltip then
+        if widget.parseColoreDisplay then
+            tooltipWidget.parseColoreDisplay = widget.parseColoreDisplay
+            widget.parseColoreDisplay = nil
+        end
+        if tooltipWidget.tooltip or tooltipWidget.specialtooltip or widget.parseColoreDisplay then
             tooltipWidget:setOpacity(1)
         else
             tooltipWidget:setOpacity(0.4)
@@ -310,7 +311,7 @@ end
 function UIWidget:parseColoreDisplayToolTip(text)
     local tooltipWidget = self:getChildById('toolTipWidget')
     if tooltipWidget then
-        tooltipWidget.tooltip = text
+        tooltipWidget.parseColoreDisplay = text
     else
         self.parseColoreDisplay = text
     end

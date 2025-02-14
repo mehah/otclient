@@ -677,7 +677,7 @@ public:
     void seekInContainer(uint8_t containerId, uint16_t index);
 
     // >= 1080 ingame store
-    void buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string& name, const uint8_t type, const std::string_view& location);
+    void buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location);
     void requestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
     void requestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType);
     void sendRequestStoreHome();
