@@ -89,6 +89,21 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
 }
 
+void LocalPlayer::onWalking() {
+    if (isPreWalking()) {
+        if (const auto& tile = g_map.getTile(getPosition())) {
+            for (const auto& creature : tile->getWalkingCreatures()) {
+                // Cancel pre-walk movement if the local player tries to walk on an unwalkable tile.
+                if (creature.get() != this && creature->getPosition() == getPosition()) {
+                    cancelWalk();
+                    g_map.notificateTileUpdate(getPosition(), asLocalPlayer(), Otc::OPERATION_CLEAN);
+                    break;
+                }
+            }
+        }
+    }
+}
+
 void LocalPlayer::cancelAjustInvalidPosEvent() {
     if (!m_ajustInvalidPosEvent) return;
     m_ajustInvalidPosEvent->cancel();

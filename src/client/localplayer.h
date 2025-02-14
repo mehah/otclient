@@ -131,6 +131,8 @@ private:
         uint16_t levelPercent{ 0 };
     };
 
+    void onWalking() override;
+
     void walk(const Position& oldPos, const Position& newPos) override;
     void terminateWalk() override;
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);

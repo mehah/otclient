@@ -187,6 +187,7 @@ minHeight,
 
 protected:
     virtual void terminateWalk();
+    virtual void onWalking() {};
     void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
 
