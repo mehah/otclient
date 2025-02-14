@@ -2730,7 +2730,7 @@ function Tile:isFullyOpaque() end
 function Tile:isLookPossible() end
 
 ---@return boolean
-function Tile:hasCreature() end
+function Tile:hasCreatures() end
 
 ---@return boolean
 function Tile:isEmpty() end

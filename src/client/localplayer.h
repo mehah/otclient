@@ -34,7 +34,7 @@ public:
     void stopAutoWalk();
 
     bool autoWalk(const Position& destination, bool retry = false);
-    bool canWalk(Otc::Direction dir, bool ignoreLock = false);
+    bool canWalk(bool ignoreLock = false);
 
     void setStates(uint32_t states);
     void setSkill(Otc::Skill skillId, uint16_t level, uint16_t levelPercent);
@@ -106,7 +106,8 @@ public:
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
     bool isServerWalking() { return m_serverWalk; }
-    bool isPreWalking() { return m_lastPrewalkDestination.isValid(); }
+    bool isPreWalking() { return !m_preWalks.empty(); }
+
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
@@ -119,31 +120,32 @@ public:
 
     void preWalk(Otc::Direction direction);
 
-    Position getPosition() override { return m_lastStepToPosition.isValid() && m_lastStepToPosition.z == m_position.z && m_position.distance(m_lastStepToPosition) < 2 ? m_lastStepToPosition : m_position; }
-
-protected:
-    void walk(const Position& oldPos, const Position& newPos) override;
-    void terminateWalk() override;
-
-    friend class Game;
+    Position getPosition() override { return isPreWalking() ? m_preWalks.back() : m_position; }
+    void resetPreWalk() { m_preWalks.clear(); }
 
 private:
-
     struct Skill
     {
         uint16_t level{ 0 };
         uint16_t baseLevel{ 0 };
         uint16_t levelPercent{ 0 };
     };
+
+    void onWalking() override;
+
+    void walk(const Position& oldPos, const Position& newPos) override;
+    void terminateWalk() override;
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
+    void cancelAjustInvalidPosEvent();
 
     bool retryAutoWalk();
 
     // walk related
-    Position m_lastPrewalkDestination;
     Position m_lastAutoWalkPosition;
     Position m_autoWalkDestination;
+    std::deque<Position> m_preWalks;
 
+    ScheduledEventPtr m_ajustInvalidPosEvent;
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
@@ -183,4 +185,6 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+
+    friend class Game;
 };
