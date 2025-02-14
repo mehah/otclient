@@ -708,7 +708,7 @@ public:
     auto mapUpdatedAt() const { return m_mapUpdatedAt; }
     void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
-    int getPing() { return m_ping > -1 ? m_ping : m_relativePing.delay; }
+    int getPing() { return m_ping; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
     stdext::map<int, ContainerPtr> getContainers() { return m_containers; }
     stdext::map<int, Vip> getVips() { return m_vips; }
@@ -844,13 +844,6 @@ private:
     stdext::timer m_pingTimer;
 
     ticks_t m_ping{ -1 };
-
-    struct
-    {
-        Timer timer;
-        ticks_t delay{ -1 };
-        bool requested{ false };
-    } m_relativePing;
 };
 
 extern Game g_game;
