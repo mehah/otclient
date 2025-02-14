@@ -117,7 +117,7 @@ public:
     void sendAnswerModalDialog(uint32_t dialog, uint8_t button, uint8_t choice);
     void sendBrowseField(const Position& position);
     void sendSeekInContainer(uint8_t containerId, uint16_t index);
-    void sendBuyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string& string_view, const uint8_t type, const std::string_view& location);
+    void sendBuyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location);
     void sendRequestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
     void sendRequestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder = 0, const uint8_t serviceType = 0);
     void sendRequestStoreHome();

@@ -748,7 +748,7 @@ void ProtocolGame::parseStore(const InputMessagePtr& msg) const
         StoreCategory category;
         category.name = msg->getString();
 
-        if (g_game.getClientVersion() < 1310) {
+        if (g_game.getClientVersion() < 1291) {
             msg->getString();
         }
 
@@ -823,7 +823,7 @@ void ProtocolGame::parseCoinBalance(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
 {
-    if (g_game.getClientVersion() >= 1098) {
+    if (g_game.getClientVersion() >= 1291) {
         const uint8_t action = msg->getU8();
         if (action == 0) {
             return;
@@ -833,7 +833,7 @@ void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
         msg->getU8();
         const uint32_t getTibiaCoins = msg->getU32();
         const uint32_t getTransferableCoins = msg->getU32();
-        if (g_game.getClientVersion() >= 1320) {
+        if (g_game.getClientVersion() >= 1281) {
             msg->getU32(); // Reserved Auction Coins
         }
         if (g_game.getFeature(Otc::GameTournamentPackets)) {
@@ -848,7 +848,7 @@ void ProtocolGame::parseCoinBalanceUpdating(const InputMessagePtr& msg)
 
 void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() >= 1310) {
+    if (g_game.getClientVersion() >= 1291) {
         msg->getU8();
         const auto& purchaseStatus = msg->getString();
         g_lua.callGlobalField("g_game", "onParseStoreGetPurchaseStatus", purchaseStatus);
@@ -878,7 +878,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
     const uint8_t entries = msg->getU8();
     std::vector<std::tuple<uint32_t, uint8_t, int32_t, uint8_t, std::string>> historyData;
     for (auto i = 0; i < entries; ++i) {
-        if (g_game.getClientVersion() >= 1310) {
+        if (g_game.getClientVersion() >= 1291) {
             msg->getU32(); // transactionId
             const uint32_t time = msg->getU32();
             const uint8_t mode = msg->getU8(); //0 = normal, 1 = gift, 2 = refund
@@ -907,7 +907,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
 
 void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 {
-	if (g_game.getClientVersion() >= 1310) {
+	if (g_game.getClientVersion() >= 1291) {
 		StoreData storeData;
 		storeData.categoryName = msg->getString();
 		storeData.redirectId = msg->getU32();
@@ -918,18 +918,18 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             const auto& menu = msg->getString();
             storeData.menuFilter.push_back(menu);
 		}
-		if (g_game.getClientVersion() > 1332) {
-            msg->getU16(); // Skip unknown U16
-		} else {
-            msg->getString(); // dropdown menu position
-		}
+  
+        uint16_t stringLength = msg->getU16(); // Read the length of the string
+        msg->skipBytes(stringLength); // Skip the string contents
 
-		const uint16_t disableReasonsSize = msg->getU16();
+        if (g_game.getClientVersion() >= 1310) {
+            const uint16_t disableReasonsSize = msg->getU16();
 
-		for (auto i = 0; i < disableReasonsSize; ++i) {
-			const auto& reason = msg->getString();
-			storeData.disableReasons.push_back(reason);
-		}
+            for (auto i = 0; i < disableReasonsSize; ++i) {
+                const auto& reason = msg->getString();
+                storeData.disableReasons.push_back(reason);
+            }
+        }
 
 		const uint16_t offersCount = msg->getU16();
 		if (storeData.categoryName == "Home") {
@@ -945,7 +945,11 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 				const uint8_t hasDisabledReason = msg->getU8();
 				if (hasDisabledReason == 1) {
 					msg->skipBytes(1);
-					offer.disabledReasonIndex = msg->getU16();
+                    if (g_game.getClientVersion() >= 1300) {
+                        offer.disabledReasonIndex = msg->getU16();
+                    } else{
+                        msg->getString();
+                    }
 				}
 
 				offer.unknownByte2 = msg->getU8();
@@ -1008,7 +1012,11 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
 				if (subOffer.disabled) {
 					const uint8_t reason = msg->getU8();
 					for (auto k = 0; k < reason; ++k) {
-                        subOffer.reasonIdDisable = msg->getU16();
+                        if (g_game.getClientVersion() >= 1300) {
+                            subOffer.reasonIdDisable = msg->getU16();
+                        } else {
+                            msg->getString();
+                        }
 					}
 				}
 				subOffer.state = msg->getU8();

@@ -416,6 +416,7 @@ end
 function controllerShop:onGameStart()
     oldProtocol = g_game.getClientVersion() < 1310
 end
+
 function controllerShop:onGameEnd()
     if controllerShop.ui:isVisible() then
         controllerShop.ui:hide()

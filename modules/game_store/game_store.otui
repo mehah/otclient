@@ -136,7 +136,6 @@ StoreWindow
       focusable: false
       margin-left:22
       margin-bottom: 3
-      text-wrap: true
       text-auto-resize: true
       phantom: true
 
