@@ -553,6 +553,7 @@ namespace Otc
         GameAllowPreWalk = 122,
         GamePlayerFamiliars = 123,
         GameLatencyAdaptiveCamera = 124,
+        GameMapCache = 125,
         LastGameFeature
     };
 
