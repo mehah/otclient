@@ -650,7 +650,6 @@ void ProtocolGame::parseLogin(const InputMessagePtr& msg) const
         // e.g you can only buy packs of 25, 50, 75, .. coins in the market
         const uint16_t coinsPacketSize = msg->getU16();
         g_lua.callGlobalField("g_game", "onStoreInit", url, coinsPacketSize);
-
     }
 
     if (g_game.getClientVersion() >= 1281) {
@@ -919,8 +918,8 @@ void ProtocolGame::parseStoreOffers(const InputMessagePtr& msg)
             storeData.menuFilter.push_back(menu);
 		}
   
-        uint16_t stringLength = msg->getU16(); // Read the length of the string
-        msg->skipBytes(stringLength); // Skip the string contents
+        uint16_t stringLength = msg->getU16(); 
+        msg->skipBytes(stringLength); // tfs send string , canary send u16
 
         if (g_game.getClientVersion() >= 1310) {
             const uint16_t disableReasonsSize = msg->getU16();

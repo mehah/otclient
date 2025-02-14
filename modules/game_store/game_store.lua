@@ -824,9 +824,9 @@ function show()
         if controllerShop.ui.listCategory:getChildCount() == 0 then
             g_game.sendRequestStoreHome() -- fix 13.10
             local packet1 = GameStore.RecivedPackets.C_OpenStore
-            g_logger.warning(string.format("[game_store BUG] Check 0x%X (%d)", packet1, packet1))
+            g_logger.warning(string.format("[game_store BUG] Check 0x%X (%d) L827", packet1, packet1))
         end
-    end, 1000, 'serverNoSendPackets0xF20xFA')
+    end, 1000, function() return 'serverNoSendPackets0xF20xFA' end)
 end
 
 
@@ -1020,7 +1020,7 @@ function chooseOffert(self, focusedChild)
     end
 end
 -- /*=============================================
--- =            Home           =
+-- =            Home                             =
 -- =============================================*/
 
 function chooseHome(self, focusedChild)
