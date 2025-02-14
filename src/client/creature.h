@@ -187,6 +187,7 @@ minHeight,
 
 protected:
     virtual void terminateWalk();
+    virtual void onWalking() {};
     void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
 
@@ -202,7 +203,8 @@ protected:
     Otc::Direction m_direction{ Otc::South };
 
     Timer m_walkTimer;
-    Position m_lastStepToPosition;
+
+    int16_t m_lastMapDuration = -1;
 
 private:
     void nextWalkUpdate();
@@ -245,6 +247,7 @@ private:
     CachedText m_name;
     CachedStep m_stepCache;
 
+    Position m_lastStepToPosition;
     Position m_lastStepFromPosition;
     Position m_oldPosition;
 

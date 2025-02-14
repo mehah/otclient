@@ -719,6 +719,8 @@ public:
     bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
+    auto mapUpdatedAt() const { return m_mapUpdatedAt; }
+    void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
     int getPing() { return m_ping; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
@@ -790,8 +792,17 @@ public:
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
-    auto getServerWalkTicks() const { return m_walkTicks; }
-    auto getWalkTicksElapsed() const { return m_walkTimer.ticksElapsed(); }
+
+    void updateMapLatency() {
+        if (!m_mapUpdateTimer.first) {
+            m_mapUpdatedAt = m_mapUpdateTimer.second.ticksElapsed();
+            m_mapUpdateTimer.first = true;
+        }
+    }
+
+    auto getWalkMaxSteps() { return m_walkMaxSteps; }
+    void setWalkMaxSteps(uint8_t v) { m_walkMaxSteps = v; }
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -823,6 +834,10 @@ private:
     bool m_safeFight{ true };
     bool m_canReportBugs{ false };
 
+    uint16_t m_mapUpdatedAt{ 0 };
+    std::pair<uint16_t, Timer> m_mapUpdateTimer = { true, Timer{} };
+
+    uint8_t m_walkMaxSteps = 1;
     uint8_t m_openPvpSituations{ 0 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };
@@ -843,8 +858,6 @@ private:
     stdext::timer m_pingTimer;
 
     ticks_t m_ping{ -1 };
-    ticks_t m_walkTicks{ 0 };
-    Timer m_walkTimer;
 };
 
 extern Game g_game;

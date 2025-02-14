@@ -1279,6 +1279,8 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 
     const auto& range = g_map.getAwareRange();
     setFloorDescription(msg, pos.x - range.left, pos.y - range.top, floor, range.horizontal(), range.vertical(), pos.z - floor, 0);
+
+    g_game.updateMapLatency();
 }
 
 void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
@@ -1369,7 +1371,7 @@ void ProtocolGame::parseTileTransformThing(const InputMessagePtr& msg)
         return;
     }
 
-    const auto& pos = thing->getPosition();
+    const auto& pos = thing->getServerPosition();
     const int stackPos = thing->getStackPos();
 
     if (!g_map.removeThing(thing)) {
@@ -1409,11 +1411,6 @@ void ProtocolGame::parseCreatureMove(const InputMessagePtr& msg)
 
     const auto& creature = thing->static_self_cast<Creature>();
     creature->allowAppearWalk();
-
-    if (creature->isLocalPlayer() && g_game.m_walkTicks == -1) {
-        g_game.m_walkTicks = g_game.m_walkTimer.ticksElapsed();
-        g_game.m_walkTimer.restart();
-    }
 
     g_map.addThing(thing, newPos, -1);
 }
@@ -3202,6 +3199,8 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, const int x, co
     for (auto nz = startz; nz != endz + zstep; nz += zstep) {
         skip = setFloorDescription(msg, x, y, nz, width, height, z - nz, skip);
     }
+
+    g_game.updateMapLatency();
 }
 
 int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height, const int offset, int skip)
@@ -3241,6 +3240,10 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
         }
 
         const auto& thing = getThing(msg);
+        if (thing->isLocalPlayer()) {
+            thing->static_self_cast<LocalPlayer>()->resetPreWalk();
+        }
+
         g_map.addThing(thing, position, stackPos);
     }
 
