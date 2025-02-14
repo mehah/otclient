@@ -956,7 +956,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 
-    if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && isLocalPlayer() && static_self_cast<LocalPlayer>()->isPreWalking()) {
+    if (isLocalPlayer() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
         if (m_lastMapDuration == -1)
             m_lastMapDuration = ((g_game.mapUpdatedAt() + 9) / 10) * 10;
 
