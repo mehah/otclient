@@ -39,7 +39,7 @@ TextWindow < MainWindow
 
   Button
     id: okButton
-    !text: tr('Ok')
+    !text: localize('UIButtonOk')
     anchors.bottom: parent.bottom
     anchors.right: next.left
     margin-right: 10
@@ -47,7 +47,7 @@ TextWindow < MainWindow
 
   Button
     id: cancelButton
-    !text: tr('Cancel')
+    !text: localize('UIButtonCancel')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
     width: 60

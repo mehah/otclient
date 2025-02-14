@@ -21,7 +21,7 @@ function init()
     })
 
     g_keyboard.bindKeyDown('Escape', hideWindowzz)
-	taskButton = modules.client_topmenu.addLeftGameButton('taskButton', tr('Tasks'), '/modules/game_tasks/images/taskIcon', toggleWindow)
+	taskButton = modules.client_topmenu.addLeftGameButton('taskButton', localize('TaskSystemWindowTitle'), '/modules/game_tasks/images/taskIcon', toggleWindow)
     ProtocolGame.registerExtendedJSONOpcode(215, parseOpcode)
 end
 
@@ -167,13 +167,13 @@ function abort()
         cancelConfirm = nil
     end
 
-    cancelConfirm = displayGeneralBox(tr('Tasks'), tr("Do you really want to abort this task?"), {
+    cancelConfirm = displayGeneralBox(localize('TaskSystemAlertTitle'), localize("TaskSystemAbortMessage"), {
         {
-            text = tr('Yes'),
+            text = localize('UIButtonYes'),
             callback = yesFunc
         },
         {
-            text = tr('No'),
+            text = localize('UIButtonNo'),
             callback = noFunc
         },
         anchor = AnchorHorizontalCenter

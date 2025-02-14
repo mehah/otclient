@@ -1,16 +1,16 @@
 local deathTexts = {
     regular = {
-        text = 'Alas! Brave adventurer, you have met a sad fate.\nBut do not despair, for the gods will bring you back\ninto this world in exchange for a small sacrifice\n\nSimply click on Ok to resume your journeys!',
+        text = 'DeathMessageRegular',
         height = 140,
         width = 0
     },
     unfair = {
-        text = 'Alas! Brave adventurer, you have met a sad fate.\nBut do not despair, for the gods will bring you back\ninto this world in exchange for a small sacrifice\n\nThis death penalty has been reduced by %i%%\nbecause it was an unfair fight.\n\nSimply click on Ok to resume your journeys!',
+        text = 'DeathMessageUnfair',
         height = 185,
         width = 0
     },
     blessed = {
-        text = 'Alas! Brave adventurer, you have met a sad fate.\nBut do not despair, for the gods will bring you back into this world\n\nThis death penalty has been reduced by 100%\nbecause you are blessed with the Adventurer\'s Blessing\n\nSimply click on Ok to resume your journeys!',
+        text = 'DeathMessageBlessed',
         height = 170,
         width = 90
     }
@@ -48,7 +48,7 @@ function displayDeadMessage()
         return
     end
 
-    modules.game_textmessage.displayGameMessage(tr('You are dead.'))
+    modules.game_textmessage.displayGameMessage(localize('DeathWindowTitle') .. ".")
 end
 
 function openWindow(deathType, penalty)
@@ -62,16 +62,16 @@ function openWindow(deathType, penalty)
     local textLabel = deathController.ui:getChildById('labelText')
     if deathType == DeathType.Regular then
         if penalty == 100 then
-            textLabel:setText(deathTexts.regular.text)
+            textLabel:setText(localize(deathTexts.regular.text))
             deathController.ui:setHeight(deathController.ui.baseHeight + deathTexts.regular.height)
             deathController.ui:setWidth(deathController.ui.baseWidth + deathTexts.regular.width)
         else
-            textLabel:setText(string.format(deathTexts.unfair.text, 100 - penalty))
+            textLabel:setText(localize(deathTexts.unfair.text, 100 - penalty))
             deathController.ui:setHeight(deathController.ui.baseHeight + deathTexts.unfair.height)
             deathController.ui:setWidth(deathController.ui.baseWidth + deathTexts.unfair.width)
         end
     elseif deathType == DeathType.Blessed then
-        textLabel:setText(deathTexts.blessed.text)
+        textLabel:setText(localize(deathTexts.blessed.text))
         deathController.ui:setHeight(deathController.ui.baseHeight + deathTexts.blessed.height)
         deathController.ui:setWidth(deathController.ui.baseWidth + deathTexts.blessed.width)
     end

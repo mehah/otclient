@@ -10,7 +10,7 @@ Panel
     anchors.left: parent.left
     text-align: center
     width: 130
-    !text: tr('Friend Healer')
+    !text: localize('BotFriendHealer')
 
   Button
     id: edit

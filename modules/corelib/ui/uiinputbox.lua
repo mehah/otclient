@@ -111,8 +111,8 @@ function UIInputBox:addSpinBox(labelText, minimum, maximum, value, step)
 end
 
 function UIInputBox:display(okButtonText, cancelButtonText)
-    okButtonText = okButtonText or tr('Ok')
-    cancelButtonText = cancelButtonText or tr('Cancel')
+    okButtonText = okButtonText or localize('UIButtonOk')
+    cancelButtonText = cancelButtonText or localize('UIButtonCancel')
 
     local buttonsWidget = g_ui.createWidget('InputBoxButtonsPanel', self)
     local okButton = g_ui.createWidget('InputBoxButton', buttonsWidget)

@@ -34,10 +34,10 @@ MainWindow
     SmallButton
       id: ok
       width: 40
-      !text: tr("Ok")
+      !text: localize('UIButtonOk')
     
     SmallButton
       id: cancel
       width: 45
-      !text: tr("Cancel")
+      !text: localize('UIButtonCancel')
   

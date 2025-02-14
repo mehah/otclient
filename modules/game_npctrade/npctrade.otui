@@ -263,7 +263,7 @@ MainWindow
     @onClick: modules.game_npctrade.onTradeClick()
 
   Button
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     width: 64
     anchors.right: parent.right
     anchors.bottom: parent.bottom

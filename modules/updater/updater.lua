@@ -32,9 +32,9 @@ local function downloadFiles(url, files, index, retries, doneCallback)
   local file_checksum = entry[2]
 
   if retries > 0 then
-    updaterWindow.downloadStatus:setText(tr("Downloading (%i retry):\n%s", retries, file))
+    updaterWindow.downloadStatus:setText(localize('UpdaterMessageFileDownloadRetry', retries, file))
   else
-    updaterWindow.downloadStatus:setText(tr("Downloading:\n%s", file))
+    updaterWindow.downloadStatus:setText(localize('UpdaterMessageFileDownload', file))
   end
   updaterWindow.downloadProgress:setPercent(0)
   updaterWindow.mainProgress:setPercent(math.floor(100 * index / #files))
@@ -135,7 +135,7 @@ local function updateFiles(data, keepCurrentFiles)
     end
   end
 
-  updaterWindow.status:setText(tr("Updating %i files", #toUpdate))
+  updaterWindow.status:setText(localize('UpdaterMessageUpdatingFiles', #toUpdate))
   updaterWindow.mainProgress:setPercent(0)
   updaterWindow.downloadProgress:setPercent(0)
   updaterWindow.downloadProgress:show()
@@ -143,7 +143,7 @@ local function updateFiles(data, keepCurrentFiles)
   updaterWindow.changeUrlButton:hide()
 
   downloadFiles(data["url"], toUpdate, 1, 0, function()
-    updaterWindow.status:setText(tr("Updating client (may take few seconds)"))
+    updaterWindow.status:setText(localize('UpdaterMessagePending'))
     updaterWindow.mainProgress:setPercent(100)
     updaterWindow.downloadProgress:hide()
     updaterWindow.downloadStatus:hide()
@@ -206,7 +206,7 @@ function Updater.check(args)
   local function progressUpdater(value)
     removeEvent(scheduledEvent)
     if value == 100 then
-      return Updater.error(tr("Timeout"))
+      return Updater.error(localize('UpdaterTimeout'))
     end
     if updateData and (value > 60 or (not g_platform.isMobile() or not ALLOW_CUSTOM_SERVERS or not loadModulesFunc)) then -- gives 3s to set custom updater for mobile version
       return updateFiles(updateData)
@@ -233,7 +233,7 @@ end
 function Updater.error(message)
   removeEvent(scheduledEvent)
   if not updaterWindow then return end
-  displayErrorBox(tr("Updater Error"), message).onOk = function()
+  displayErrorBox(localize('UpdaterError'), message).onOk = function()
     Updater.abort()
   end
 end

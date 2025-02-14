@@ -176,7 +176,7 @@ AnalyzerPriceLabel < Label
 
   Button
     id: remove
-    !text: tr('x')
+    !text: 'x'
     anchors.right: parent.right
     margin-right: 15
     width: 15
@@ -500,7 +500,7 @@ FeaturesWindow < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

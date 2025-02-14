@@ -17,7 +17,7 @@ TargetBotLootingPanel < Panel
 
   BotSwitch
     id: everyItem
-    !text: tr("Loot every item")
+    !text: localize('BotLootingConfigLootAll')
     margin-top: 2
 
   Label
@@ -72,7 +72,7 @@ TargetBotLootingPanel < Panel
     margin-top: 3
     margin-left: 20
     margin-right: 20
-    !text: tr("Drag item or click on any of empty slot")
+    !text: localize('BotLootingAddItem')
     text-align: center
     text-wrap: true
     text-auto-resize: true

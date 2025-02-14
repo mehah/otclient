@@ -369,7 +369,7 @@ Conditions < Panel
       num-columns: 2
 
 FriendHealer < MainWindow
-  !text: tr('Friend Healer')
+  !text: localize('BotFriendHealer')
   size: 512 390
   padding-top: 30
   @onEscape: self:hide()
@@ -405,7 +405,7 @@ FriendHealer < MainWindow
 
   Button
     id: closeButton
-    !text: tr('Close')
+    !text: localize('UIButtonClose')
     font: cipsoftFont
     anchors.right: parent.right
     anchors.bottom: parent.bottom

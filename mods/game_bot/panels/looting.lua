@@ -212,10 +212,10 @@ Panel
   refreshConfig = function(focusIndex)
     ignoreOnOptionChange = true
     if context.storage.looting.enabled then
-      ui.enableButton:setText("On")
+      ui.enableButton:setText(localize('UIButtonOn'))
       ui.enableButton:setColor('#00AA00FF')
     else
-      ui.enableButton:setText("Off")
+      ui.enableButton:setText(localize('UIButtonOff'))
       ui.enableButton:setColor('#FF0000FF')
     end
 
@@ -223,7 +223,7 @@ Panel
     for i, config in ipairs(context.storage.looting.configs) do
       local name = getConfigName(config)
       if not name then
-        name = "Unnamed config"
+        name = localize('BotUnnamedConfig')
       end
       ui.config:addOption(name)
     end
@@ -266,7 +266,7 @@ Panel
     refreshConfig()
   end
   ui.add.onClick = function()
-    modules.client_textedit.multilineEditor("Looting editor", "name:Config name", function(newText)
+    modules.client_textedit.multilineEditor(localize('BotLootingEditorTitle'), "name:Config name", function(newText)
       table.insert(context.storage.looting.configs, newText)
       context.storage.looting.activeConfig = #context.storage.looting.configs
       refreshConfig()
@@ -276,7 +276,7 @@ Panel
     if not context.storage.looting.activeConfig or not context.storage.looting.configs[context.storage.looting.activeConfig] then
       return
     end
-    modules.client_textedit.multilineEditor("Looting editor", context.storage.looting.configs[context.storage.looting.activeConfig], function(newText)
+    modules.client_textedit.multilineEditor(localize('BotLootingEditorTitle'), context.storage.looting.configs[context.storage.looting.activeConfig], function(newText)
       context.storage.looting.configs[context.storage.looting.activeConfig] = newText
       refreshConfig()
     end)
@@ -299,9 +299,11 @@ Panel
       context.storage.looting.activeConfig = 0
       refreshConfig()
     end
-    questionWindow = context.displayGeneralBox(tr('Remove config'), tr('Do you want to remove current looting config?'), {
-      { text=tr('Yes'), callback=removeConfig },
-      { text=tr('No'), callback=closeWindow },
+    questionWindow = context.displayGeneralBox(
+      localize('BotRemoveConfig'),
+      localize('BotLootingEditorMessageRemoveConfig'), {
+      { text=localize('UIButtonYes'), callback=removeConfig },
+      { text=localize('UIButtonNo'), callback=closeWindow },
       anchor=AnchorHorizontalCenter}, removeConfig, closeWindow)
   end
   refreshConfig()

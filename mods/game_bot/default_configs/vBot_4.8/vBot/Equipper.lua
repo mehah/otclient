@@ -9,7 +9,7 @@ Panel
     anchors.left: parent.left
     text-align: center
     width: 130
-    !text: tr('EQ Manager')
+    !text: localize('BotEquipperEQManager')
 
   Button
     id: setup

@@ -1,5 +1,24 @@
 dofile 'neededtranslations'
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- private variables
 local defaultLocaleName = 'en'
 local installedLocales
@@ -201,7 +220,8 @@ function getCurrentLocale()
 end
 
 -- global function used to translate texts
-function _G.tr(text, ...)
+-- TO DO: gsub: %1, %2, %3 as arguments
+function _G.localize(text, ...)
     if currentLocale then
         if tonumber(text) and currentLocale.formatNumbers then
             local number = tostring(text):split('.')
@@ -233,3 +253,5 @@ function _G.tr(text, ...)
     end
     return text
 end
+
+_G.tr = _G.localize
