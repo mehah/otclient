@@ -28,7 +28,6 @@ StoreWindow
   TextEdit
     id: transferPointsText
     size: 150 16
-    background-color: #00000055
     anchors.top: descriptionText.bottom
     anchors.right: parent.right
     anchors.left: parent.left
@@ -36,7 +35,6 @@ StoreWindow
     margin-right: 13
     text-align: left
     text-offset: -18 0
-    image-color: #ffffff00
 
   Label
     height: 38
@@ -62,7 +60,6 @@ StoreWindow
     font: cipsoftFont
     size: 43 20
     color: #ffffff
-    @onClick: changeNameCancel()
 
   StoreButton
     id: buttonOk
@@ -74,4 +71,3 @@ StoreWindow
     font: cipsoftFont
     size: 43 20
     color: #ffffff
-    @onClick: changeNameAccept()

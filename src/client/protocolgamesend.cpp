@@ -1134,16 +1134,21 @@ void ProtocolGame::sendStatusTrackerBestiary(const uint16_t raceId, const bool s
     send(msg);
 }
 
-void ProtocolGame::sendBuyStoreOffer(const uint32_t offerId, const uint8_t productType, const std::string_view name)
+void ProtocolGame::sendBuyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBuyStoreOffer);
     msg->addU32(offerId);
-    msg->addU8(productType);
-
-    if (productType == Otc::ProductTypeNameChange)
+    msg->addU8(action);
+    if (action > 0 && action < 6) {
         msg->addString(name);
-
+        if (action == 3 || action == 5) {
+            msg->addU8(type);
+        }
+        if (action == 5) {
+            msg->addString(location);
+        }
+    }
     send(msg);
 }
 
@@ -1162,16 +1167,45 @@ void ProtocolGame::sendRequestTransactionHistory(const uint32_t page, const uint
     send(msg);
 }
 
-void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, const uint8_t serviceType)
+void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);
-
-    if (g_game.getFeature(Otc::GameIngameStoreServiceType)) {
-        msg->addU8(serviceType);
-    }
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_CATEGORY);
     msg->addString(categoryName);
+    msg->addString(subCategory);
+    msg->addU8(sortOrder);
+    msg->addU8(serviceType);
+    send(msg);
+}
 
+void ProtocolGame::sendRequestStoreHome() 
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_HOME);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestStoreOfferById(uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_OFFER);
+    msg->addU32(offerId);
+    msg->addU8(sortOrder);
+    msg->addU8(serviceType);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_SEARCH);
+    msg->addString(searchText);
+    msg->addU8(sortOrder);
+    msg->addU8(serviceType);
     send(msg);
 }
 

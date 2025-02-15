@@ -432,7 +432,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Blessing
 - Screenshot
 - Highscores
-- Store (compatible with 13.32 - 13.40)
+- Store (compatible with 1098 , 12.91 ~ 13.40)
 - QuickLoot
 - Groups Vip
 
