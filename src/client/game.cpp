@@ -1767,18 +1767,30 @@ void Game::requestBless()
     m_protocolGame->sendRequestBless();
 }
 
+void Game::sendQuickLoot(const uint8_t variant, const ItemPtr& item)
+{
+    if (!canPerformGameAction())
+        return;
+
+    Position pos = (item && item->getPosition().isValid()) ? item->getPosition() : Position(0, 0, 0);
+    uint16_t itemId = item ? item->getId() : 0;
+    uint8_t stackPos = item ? item->getStackPos() : 0;
+    m_protocolGame->sendQuickLoot(variant, pos, itemId, stackPos);
+}
+
 void Game::requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems)
 {
-    enableBotCall();
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->requestQuickLootBlackWhiteList(filter, size, listedItems);
-    disableBotCall();
 }
 
 void Game::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback)
 {
-    enableBotCall();
+    if (!canPerformGameAction())
+        return;
     m_protocolGame->openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback);
-    disableBotCall();
 }
 
 void Game::sendGmTeleport(const Position& pos)
