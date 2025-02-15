@@ -24,15 +24,10 @@
 
 #include <framework/global.h>
 
-#if defined(__APPLE__)
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-#else
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/efx-presets.h>
 #include <AL/efx.h>
-#endif
 
 class SoundManager;
 class SoundSource;

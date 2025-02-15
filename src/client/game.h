@@ -473,8 +473,9 @@ protected:
     static void processRemoveAutomapFlag(const Position& pos, uint8_t icon, std::string_view message);
 
     // outfit
-    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& mountList,
+    void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>>& outfitList,
+                                const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
+                                const std::vector<std::tuple<uint16_t, std::string>>& familiarList,
                                 const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
                                 const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
                                 const std::vector<std::tuple<uint16_t, std::string>>& effectsList,
@@ -496,7 +497,7 @@ protected:
 
     // questlog
     static void processQuestLog(const std::vector<std::tuple<uint16_t, std::string, bool>>& questList);
-    static void processQuestLine(uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view, uint16_t>>& questMissions);
+    static void processQuestLine(uint16_t questId, const std::vector<std::tuple<std::string, std::string, uint16_t>>& questMissions);
 
     // modal dialogs >= 970
     static void processModalDialog(uint32_t id, std::string_view title, std::string_view message, const std::vector<std::tuple<uint8_t, std::string>>
@@ -555,7 +556,7 @@ public:
     void useWith(const ItemPtr& item, const ThingPtr& toThing);
     void useInventoryItem(uint16_t itemId);
     void useInventoryItemWith(uint16_t itemId, const ThingPtr& toThing);
-    ItemPtr findItemInContainers(uint32_t itemId, int subType);
+    ItemPtr findItemInContainers(uint32_t itemId, int subType, uint8_t tier);
 
     // container related
     int open(const ItemPtr& item, const ContainerPtr& previousContainer);
@@ -704,6 +705,8 @@ public:
     bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
+    auto mapUpdatedAt() const { return m_mapUpdatedAt; }
+    void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
     int getPing() { return m_ping; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
@@ -775,6 +778,17 @@ public:
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
+
+    void updateMapLatency() {
+        if (!m_mapUpdateTimer.first) {
+            m_mapUpdatedAt = m_mapUpdateTimer.second.ticksElapsed();
+            m_mapUpdateTimer.first = true;
+        }
+    }
+
+    auto getWalkMaxSteps() { return m_walkMaxSteps; }
+    void setWalkMaxSteps(uint8_t v) { m_walkMaxSteps = v; }
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -806,6 +820,10 @@ private:
     bool m_safeFight{ true };
     bool m_canReportBugs{ false };
 
+    uint16_t m_mapUpdatedAt{ 0 };
+    std::pair<uint16_t, Timer> m_mapUpdateTimer = { true, Timer{} };
+
+    uint8_t m_walkMaxSteps = 1;
     uint8_t m_openPvpSituations{ 0 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };

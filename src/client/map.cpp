@@ -126,6 +126,13 @@ void Map::cleanDynamicThings()
     for (const auto& mapview : m_mapViews)
         mapview->followCreature(nullptr);
 
+    for (const auto& [uid, creature] : m_knownCreatures) {
+        creature->setWidgetInformation(nullptr);
+        removeThing(creature);
+    }
+
+    m_knownCreatures.clear();
+
     std::vector<UIWidgetPtr> widgets;
     widgets.reserve(m_attachedObjectWidgetMap.size());
 
@@ -137,15 +144,12 @@ void Map::cleanDynamicThings()
     for (const auto& widget : widgets)
         widget->destroy();
 
-    for (const auto& [uid, creature] : m_knownCreatures)
-        removeThing(creature);
-
-    m_knownCreatures.clear();
-
     for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].missiles.clear();
 
     cleanTexts();
+
+    g_lua.collectGarbage();
 }
 
 void Map::addThing(const ThingPtr& thing, const Position& pos, const int16_t stackPos)
@@ -240,7 +244,7 @@ bool Map::removeThing(const ThingPtr& thing)
         return false;
 
     if (thing->isMissile()) {
-        auto& missiles = m_floors[thing->getPosition().z].missiles;
+        auto& missiles = m_floors[thing->getServerPosition().z].missiles;
         const auto it = std::ranges::find(missiles, thing->static_self_cast<Missile>());
         if (it == missiles.end())
             return false;
@@ -251,7 +255,7 @@ bool Map::removeThing(const ThingPtr& thing)
 
     if (const auto& tile = thing->getTile()) {
         if (tile->removeThing(thing)) {
-            notificateTileUpdate(thing->getPosition(), thing, Otc::OPERATION_REMOVE);
+            notificateTileUpdate(thing->getServerPosition(), thing, Otc::OPERATION_REMOVE);
             return true;
         }
     }
@@ -536,6 +540,13 @@ void Map::removeUnawareThings()
     });
 
     if (!g_game.getFeature(Otc::GameKeepUnawareTiles)) {
+        const auto& customAwareRange = g_game.getFeature(Otc::GameMapCache) ? AwareRange{
+            .left = static_cast<uint8_t>(m_awareRange.left * 4),
+            .top = static_cast<uint8_t>(m_awareRange.top * 4),
+            .right = static_cast<uint8_t>(m_awareRange.right * 4),
+            .bottom = static_cast<uint8_t>(m_awareRange.bottom * 4),
+        } : m_awareRange;
+
         // remove tiles that we are not aware anymore
         for (auto z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
             auto& tileBlocks = m_floors[z].tileBlocks;
@@ -546,7 +557,7 @@ void Map::removeUnawareThings()
                     if (!tile) continue;
 
                     const auto& pos = tile->getPosition();
-                    if (isAwareOfPosition(pos)) {
+                    if (isAwareOfPosition(pos, customAwareRange)) {
                         blockEmpty = false;
                         continue;
                     }
@@ -710,9 +721,9 @@ bool Map::isCompletelyCovered(const Position& pos, const uint8_t firstFloor)
     return false;
 }
 
-bool Map::isAwareOfPosition(const Position& pos) const
+bool Map::isAwareOfPosition(const Position& pos, const AwareRange& awareRange) const
 {
-    if (pos.z < getFirstAwareFloor() || pos.z > getLastAwareFloor())
+    if ((pos.z < getFirstAwareFloor() || pos.z > getLastAwareFloor()) && awareRange == m_awareRange)
         return false;
 
     Position groundedPos = pos;
@@ -728,10 +739,10 @@ bool Map::isAwareOfPosition(const Position& pos) const
         }
     }
 
-    return m_centralPosition.isInRange(groundedPos, m_awareRange.left,
-                                       m_awareRange.right,
-                                       m_awareRange.top,
-                                       m_awareRange.bottom);
+    return m_centralPosition.isInRange(groundedPos, awareRange.left,
+                                       awareRange.right,
+                                       awareRange.top,
+                                       awareRange.bottom);
 }
 
 void Map::setAwareRange(const AwareRange& range)
@@ -854,7 +865,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
                 if (g_map.isAwareOfPosition(neighborPos)) {
                     wasSeen = true;
                     if (const auto& tile = getTile(neighborPos)) {
-                        hasCreature = tile->hasCreature() && (!(flags & Otc::PathFindIgnoreCreatures));
+                        hasCreature = tile->hasCreatures() && (!(flags & Otc::PathFindIgnoreCreatures));
                         isNotWalkable = !tile->isWalkable(flags & Otc::PathFindIgnoreCreatures);
                         isNotPathable = !tile->isPathable();
                         speed = tile->getGroundSpeed();

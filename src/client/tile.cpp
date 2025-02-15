@@ -47,8 +47,14 @@ void updateElevation(const ThingPtr& thing, uint8_t& drawElevation) {
 
 void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_t& drawElevation, const LightViewPtr& lightView = nullptr)
 {
-    thing->draw(dest - drawElevation * g_drawPool.getScaleFactor(), flags & Otc::DrawThings, lightView);
-    updateElevation(thing, drawElevation);
+    const auto& newDest = dest - drawElevation * g_drawPool.getScaleFactor();
+
+    if (flags == Otc::DrawLights)
+        thing->drawLight(newDest, lightView);
+    else {
+        thing->draw(newDest, flags & Otc::DrawThings, lightView);
+        updateElevation(thing, drawElevation);
+    }
 }
 
 void Tile::draw(const Point& dest, const int flags, const LightViewPtr& lightView)
@@ -96,9 +102,13 @@ void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
     uint8_t drawElevation = 0;
 
     for (const auto& thing : m_things) {
+        if (thing->isCreature()) continue;
+
         thing->drawLight(dest - drawElevation * g_drawPool.getScaleFactor(), lightView);
         updateElevation(thing, drawElevation);
     }
+
+    drawCreature(dest, Otc::DrawLights, true, drawElevation, lightView);
 
     if (m_effects) {
         for (const auto& effet : *m_effects)
@@ -108,16 +118,22 @@ void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawAttachedLightEffect(dest, lightView);
 }
 
-void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw, uint8_t drawElevation)
+void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw, uint8_t drawElevation, const LightViewPtr& lightView)
 {
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
-    if (hasCreature()) {
+    bool localPlayerDrawed = false;
+    if (hasCreatures()) {
         for (const auto& thing : m_things) {
             if (!thing->isCreature() || thing->static_self_cast<Creature>()->isWalking()) continue;
 
-            drawThing(thing, dest, flags, drawElevation);
+            if (thing->isLocalPlayer()) {
+                if (thing->getPosition() != m_position) continue;
+                localPlayerDrawed = true;
+            }
+
+            drawThing(thing, dest, flags, drawElevation, lightView);
         }
     }
 
@@ -127,7 +143,15 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
             dest.y + ((creature->getPosition().y - m_position.y) * g_gameConfig.getSpriteSize() - creature->getDrawElevation()) * g_drawPool.getScaleFactor()
         );
 
-        creature->draw(cDest, flags & Otc::DrawThings);
+        if (flags == Otc::DrawLights)
+            creature->drawLight(cDest, lightView);
+        else
+            creature->draw(cDest, flags & Otc::DrawThings);
+    }
+
+    // draw the local character if he is on a virtual tile, that is, his visual position is not the same as the server.
+    if (!localPlayerDrawed && g_game.getLocalPlayer() && !g_game.getLocalPlayer()->isWalking() && g_game.getLocalPlayer()->getPosition() == m_position) {
+        drawThing(g_game.getLocalPlayer(), dest, flags, drawElevation, lightView);
     }
 }
 
@@ -363,7 +387,7 @@ ThingPtr Tile::getThing(const int stackPos)
 std::vector<CreaturePtr> Tile::getCreatures()
 {
     std::vector<CreaturePtr> creatures;
-    if (hasCreature()) {
+    if (hasCreatures()) {
         for (const auto& thing : m_things) {
             if (thing->isCreature())
                 creatures.emplace_back(thing->static_self_cast<Creature>());
@@ -475,7 +499,7 @@ ThingPtr Tile::getTopUseThing()
 
 CreaturePtr Tile::getTopCreature(const bool checkAround)
 {
-    if (!hasCreature()) return nullptr;
+    if (!hasCreatures()) return nullptr;
 
     CreaturePtr creature;
     for (const auto& thing : m_things) {
@@ -568,7 +592,7 @@ bool Tile::isWalkable(const bool ignoreCreatures)
         return false;
     }
 
-    if (!ignoreCreatures && hasCreature()) {
+    if (!ignoreCreatures && hasCreatures()) {
         for (const auto& thing : m_things) {
             if (!thing->isCreature()) continue;
 
@@ -589,7 +613,7 @@ bool Tile::isCompletelyCovered(const uint8_t firstFloor, const bool resetCache)
         m_isCompletelyCovered = m_isCovered = 0;
     }
 
-    if (hasCreature() || !m_walkingCreatures.empty() || hasLight())
+    if (hasCreatures() || !m_walkingCreatures.empty() || hasLight())
         return false;
 
     const uint32_t idChecked = 1 << firstFloor;
@@ -900,7 +924,7 @@ bool Tile::canRender(uint32_t& flags, const Position& cameraPosition, const Awar
         flags &= ~Otc::DrawThings;
         if (!hasLight())
             flags &= ~Otc::DrawLights;
-        if (!hasCreature())
+        if (!hasCreatures())
             flags &= ~(Otc::DrawManaBar | Otc::DrawNames | Otc::DrawBars);
     }
 

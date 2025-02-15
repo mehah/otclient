@@ -55,6 +55,8 @@ void Game::resetGameStates()
     m_serverBeat = 50;
     m_seq = 0;
     m_ping = -1;
+    m_mapUpdatedAt = 0;
+    m_mapUpdateTimer = { true, Timer{} };
     setCanReportBugs(false);
     m_fightMode = Otc::FightBalanced;
     m_chaseMode = Otc::DontChase;
@@ -404,8 +406,9 @@ void Game::processRemoveAutomapFlag(const Position& pos, const uint8_t icon, con
     g_lua.callGlobalField("g_game", "onRemoveAutomapFlag", pos, icon, message);
 }
 
-void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& outfitList,
-                                   const std::vector<std::tuple<uint16_t, std::string>>& mountList,
+void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>>& outfitList,
+                                   const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
+                                   const std::vector<std::tuple<uint16_t, std::string>>& familiarList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
                                    const std::vector<std::tuple<uint16_t, std::string>>& effectList,
@@ -430,7 +433,13 @@ void Game::processOpenOutfitWindow(const Outfit& currentOutfit, const std::vecto
         virtualMountCreature->setOutfit(mountOutfit);
     }
 
-    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, wingsList, aurasList, effectList, shaderList);
+    if (getFeature(Otc::GamePlayerFamiliars)) {
+        Outfit familiarOutfit;
+        familiarOutfit.setId(currentOutfit.getFamiliar());
+        familiarOutfit.setCategory(ThingCategoryCreature);
+    }
+
+    g_lua.callGlobalField("g_game", "onOpenOutfitWindow", virtualOutfitCreature, outfitList, virtualMountCreature, mountList, familiarList, wingsList, aurasList, effectList, shaderList);
 }
 
 void Game::processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items)
@@ -478,7 +487,7 @@ void Game::processQuestLog(const std::vector<std::tuple<uint16_t, std::string, b
     g_lua.callGlobalField("g_game", "onQuestLog", questList);
 }
 
-void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string_view, std::string_view, uint16_t>>& questMissions)
+void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple<std::string, std::string, uint16_t>>& questMissions)
 {
     g_lua.callGlobalField("g_game", "onQuestLine", questId, questMissions);
 }
@@ -663,12 +672,12 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
 
     const Otc::Direction direction = *dirs.begin();
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(direction, true)) {
+        if (m_localPlayer->isPreWalking() && startPos == m_localPlayer->getPosition() && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
             m_localPlayer->preWalk(direction);
         }
     }
 
-    g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
+    g_lua.callGlobalField("g_game", "onAutoWalk", m_localPlayer, dirs);
     m_protocolGame->sendAutoWalk(dirs);
 }
 
@@ -676,6 +685,11 @@ void Game::forceWalk(const Otc::Direction direction)
 {
     if (!canPerformGameAction())
         return;
+
+    if (m_mapUpdateTimer.first || m_localPlayer->m_preWalks.size() == 1) {
+        m_mapUpdateTimer.second.restart();
+        m_mapUpdateTimer.first = false;
+    }
 
     switch (direction) {
         case Otc::North:
@@ -851,11 +865,11 @@ void Game::useInventoryItemWith(const uint16_t itemId, const ThingPtr& toThing)
     g_lua.callGlobalField("g_game", "onUseWith", pos, itemId, toThing, 0);
 }
 
-ItemPtr Game::findItemInContainers(const uint32_t itemId, const int subType)
+ItemPtr Game::findItemInContainers(const uint32_t itemId, const int subType, const uint8_t tier)
 {
     for (const auto& it : m_containers) {
         if (const auto& container = it.second) {
-            if (const auto& item = container->findItemById(itemId, subType)) {
+            if (const auto& item = container->findItemById(itemId, subType, tier)) {
                 return item;
             }
         }
@@ -1405,7 +1419,11 @@ void Game::equipItem(const ItemPtr& item)
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendEquipItem(item->getId(), item->getCountOrSubType());
+    if (g_game.getFeature(Otc::GameThingUpgradeClassification) && item->getClassification() > 0) {
+        m_protocolGame->sendEquipItemWithTier(item->getId(), item->getTier());
+    } else {
+        m_protocolGame->sendEquipItemWithCountOrSubType(item->getId(), item->getCountOrSubType());
+    }
 }
 
 void Game::mount(const bool mount)

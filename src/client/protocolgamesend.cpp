@@ -25,6 +25,7 @@
 #include "protocolgame.h"
 #include <framework/util/crypt.h>
 
+void ProtocolGame::onSend() {}
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
 {
     if (m_enableSendExtendedOpcode) {
@@ -292,15 +293,25 @@ void ProtocolGame::sendGmTeleport(const Position& pos)
     send(msg);
 }
 
-void ProtocolGame::sendEquipItem(const uint16_t itemId, const uint16_t countOrSubType)
+void ProtocolGame::sendEquipItemWithTier(const uint16_t itemId, const uint8_t tier)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientEquipItem);
     msg->addU16(itemId);
-    if (g_game.getFeature(Otc::GameCountU16))
+    msg->addU8(tier);
+    send(msg);
+}
+
+void ProtocolGame::sendEquipItemWithCountOrSubType(const uint16_t itemId, const uint16_t countOrSubType)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientEquipItem);
+    msg->addU16(itemId);
+    if (g_game.getFeature(Otc::GameCountU16)) {
         msg->addU16(countOrSubType);
-    else
+    } else {
         msg->addU8(static_cast<uint8_t>(countOrSubType));
+    }
     send(msg);
 }
 
@@ -781,8 +792,11 @@ void ProtocolGame::sendChangeOutfit(const Outfit& outfit)
         msg->addU8(outfit.hasMount());
     }
 
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
+        msg->addU16(outfit.getFamiliar()); //familiars
+    }
+
     if (g_game.getClientVersion() >= 1281) {
-        msg->addU16(0x00); //familiars
         msg->addU8(0x00); //randomizeMount
     }
     if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
@@ -1009,7 +1023,7 @@ void ProtocolGame::sendRequestBestiaryOverview(const std::string_view catName)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBestiaryRequestOverview);
-    msg->addU8(0x02);
+    msg->addU8(0x00);
     msg->addString(catName);
     send(msg);
 }

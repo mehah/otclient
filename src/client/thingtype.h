@@ -52,6 +52,16 @@ enum ThingCategory : uint8_t
     ThingLastCategory = ThingInvalidCategory,
 };
 
+enum StaticDataCategory : uint8_t
+{
+    StaticDataMonster = 0,
+    StaticDataAchievement,
+    StaticDataHouse,
+    StaticDataBoss,
+    StaticDataQuest,
+    StaticDataLast = StaticDataQuest,
+};
+
 enum ThingAttr : uint8_t
 {
     ThingAttrGround = 0,

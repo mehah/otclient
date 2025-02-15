@@ -144,6 +144,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerCreatureTyping:
                     parseCreatureTyping(msg);
                     break;
+                case Proto::GameServerFeatures:
+                    parseFeatures(msg);
+                    break;
                 case Proto::GameServerFloorDescription:
                     parseFloorDescription(msg);
                     break;
@@ -247,7 +250,11 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     parseMagicEffect(msg);
                     break;
                 case Proto::GameServerTextEffect:
-                    parseAnimatedText(msg);
+                    if (g_game.getClientVersion() >= 1320) {
+                        parseRemoveMagicEffect(msg);
+                    } else {
+                        parseAnimatedText(msg);
+                    }
                     break;
                 case Proto::GameServerMissleEffect:
                     if (g_game.getFeature(Otc::GameAnthem)) {
@@ -1228,6 +1235,8 @@ void ProtocolGame::parseFloorDescription(const InputMessagePtr& msg)
 
     const auto& range = g_map.getAwareRange();
     setFloorDescription(msg, pos.x - range.left, pos.y - range.top, floor, range.horizontal(), range.vertical(), pos.z - floor, 0);
+
+    g_game.updateMapLatency();
 }
 
 void ProtocolGame::parseMapDescription(const InputMessagePtr& msg)
@@ -1318,7 +1327,7 @@ void ProtocolGame::parseTileTransformThing(const InputMessagePtr& msg)
         return;
     }
 
-    const auto& pos = thing->getPosition();
+    const auto& pos = thing->getServerPosition();
     const int stackPos = thing->getStackPos();
 
     if (!g_map.removeThing(thing)) {
@@ -1701,6 +1710,17 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
     effect->setId(effectId);
 
     g_map.addThing(effect, pos);
+}
+
+void ProtocolGame::parseRemoveMagicEffect(const InputMessagePtr& msg)
+{
+    getPosition(msg);
+    uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
+    if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
+        g_logger.warning(stdext::format("[ProtocolGame::parseRemoveMagicEffect] - Invalid effectId type {}", effectId));
+        return;
+    }
+    // TO-DO
 }
 
 void ProtocolGame::parseAnimatedText(const InputMessagePtr& msg)
@@ -2575,7 +2595,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         msg->getU16(); // current familiar looktype
     }
 
-    std::vector<std::tuple<uint16_t, std::string, uint8_t>> outfitList;
+    std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>> outfitList;
 
     if (g_game.getFeature(Otc::GameNewOutfitProtocol)) {
         const uint16_t outfitCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
@@ -2583,15 +2603,15 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             const uint16_t outfitId = msg->getU16();
             const auto& outfitName = msg->getString();
             const uint8_t outfitAddons = msg->getU8();
-
+            uint8_t outfitMode = 0;
             if (g_game.getClientVersion() >= 1281) {
-                const uint8_t outfitMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
+                outfitMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId), 0x02 golden outfit tooltip (hardcoded)
                 if (outfitMode == 1) {
                     msg->getU32();
                 }
             }
 
-            outfitList.emplace_back(outfitId, outfitName, outfitAddons);
+            outfitList.emplace_back(outfitId, outfitName, outfitAddons, outfitMode);
         }
     } else {
         uint16_t outfitStart;
@@ -2605,40 +2625,44 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
 
         for (auto i = outfitStart; i <= outfitEnd; ++i) {
-            outfitList.emplace_back(i, "", 0);
+            outfitList.emplace_back(i, "", 0, 0);
         }
     }
 
-    std::vector<std::tuple<uint16_t, std::string>> mountList;
+    std::vector<std::tuple<uint16_t, std::string, uint8_t>> mountList;
 
     if (g_game.getFeature(Otc::GamePlayerMounts)) {
         const uint16_t mountCount = g_game.getClientVersion() >= 1281 ? msg->getU16() : msg->getU8();
         for (auto i = 0; i < mountCount; ++i) {
             const uint16_t mountId = msg->getU16(); // mount type
             const auto& mountName = msg->getString(); // mount name
-
+            uint8_t mountMode = 0;
             if (g_game.getClientVersion() >= 1281) {
-                const uint8_t mountMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
+                mountMode = msg->getU8(); // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
                 if (mountMode == 1) {
                     msg->getU32();
                 }
             }
 
-            mountList.emplace_back(mountId, mountName);
+            mountList.emplace_back(mountId, mountName, mountMode);
         }
     }
 
-    if (g_game.getClientVersion() >= 1281) {
+    std::vector<std::tuple<uint16_t, std::string> > familiarList;
+    if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
         const uint16_t familiarCount = msg->getU16();
         for (auto i = 0; i < familiarCount; ++i) {
-            msg->getU16(); // familiar lookType
-            msg->getString(); // familiar name
+            const uint16_t familiarLookType = msg->getU16(); // familiar lookType
+            const auto& familiarName = msg->getString(); // familiar name
             const uint8_t familiarMode = msg->getU8(); // 0x00 // mode: 0x00 - available, 0x01 store (requires U32 store offerId)
             if (familiarMode == 1) {
                 msg->getU32();
             }
+            familiarList.emplace_back(familiarLookType, familiarName);
         }
+    }
 
+    if (g_game.getClientVersion() >= 1281) {
         msg->getU8(); // Try outfit mode (?)
         msg->getU8(); // (bool) mounted
         msg->getU8(); // (bool) randomize mount
@@ -2679,7 +2703,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
     }
 
-    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, wingList, auraList, effectList, shaderList);
+    g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, familiarList, wingList, auraList, effectList, shaderList);
 }
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
@@ -2956,7 +2980,7 @@ void ProtocolGame::parseQuestLine(const InputMessagePtr& msg)
     const uint16_t questId = msg->getU16();
 
     const uint8_t missionCount = msg->getU8();
-    std::vector<std::tuple<std::string_view, std::string_view, uint16_t>> questMissions;
+    std::vector<std::tuple<std::string, std::string, uint16_t>> questMissions;
 
     for (auto i = 0; i < missionCount; ++i) {
         auto missionId = 0;
@@ -3131,6 +3155,8 @@ void ProtocolGame::setMapDescription(const InputMessagePtr& msg, const int x, co
     for (auto nz = startz; nz != endz + zstep; nz += zstep) {
         skip = setFloorDescription(msg, x, y, nz, width, height, z - nz, skip);
     }
+
+    g_game.updateMapLatency();
 }
 
 int ProtocolGame::setFloorDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height, const int offset, int skip)
@@ -3170,6 +3196,10 @@ int ProtocolGame::setTileDescription(const InputMessagePtr& msg, const Position 
         }
 
         const auto& thing = getThing(msg);
+        if (thing->isLocalPlayer()) {
+            thing->static_self_cast<LocalPlayer>()->resetPreWalk();
+        }
+
         g_map.addThing(thing, position, stackPos);
     }
 
@@ -3227,7 +3257,7 @@ Outfit ProtocolGame::getOutfit(const InputMessagePtr& msg, const bool parseMount
         outfit.setMount(mount);
     }
 
-    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader)) {
+    if (g_game.getFeature(Otc::GameWingsAurasEffectsShader) && parseMount) {
         const uint16_t wings = msg->getU16();
         outfit.setWing(wings);
 
@@ -3466,10 +3496,14 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             creature->setMasterId(masterId);
             creature->setShader(shader);
             creature->clearTemporaryAttachedEffects();
+            std::unordered_set<uint16_t> currentAttachedEffectIds;
+            for (const auto& attachedEffect : creature->getAttachedEffects()) {
+                currentAttachedEffectIds.insert(attachedEffect->getId());
+            }
 
             for (const auto effectId : attachedEffectList) {
                 const auto& effect = g_attachedEffects.getById(effectId);
-                if (effect) {
+                if (effect && currentAttachedEffectIds.find(effectId) == currentAttachedEffectIds.end()) {
                     const auto& clonedEffect = effect->clone();
                     clonedEffect->setPermanent(false);
                     creature->attachEffect(clonedEffect);
@@ -3841,17 +3875,17 @@ void ProtocolGame::parseCyclopediaHousesInfo(const InputMessagePtr& msg)
     // TO-DO Lua // Otui
 }
 
-void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg) 
+void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
 {
     const uint16_t housesCount = msg->getU16(); // housesCount
     for (auto i = 0; i < housesCount; ++i) {
         msg->getU32(); // clientId
         msg->getU8(); // 0x00 = Renovation, 0x01 = Available
-        
+
         const auto type = static_cast<Otc::CyclopediaHouseState_t>(msg->getU8());
         switch (type) {
             case Otc::CYCLOPEDIA_HOUSE_STATE_AVAILABLE: {
-                std::string bidderName = msg->getString(); 
+                std::string bidderName = msg->getString();
                 const auto isBidder = static_cast<bool>(msg->getU8());
                 msg->getU8(); // disableIndex
 
@@ -3867,7 +3901,7 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
             case Otc::CYCLOPEDIA_HOUSE_STATE_RENTED: {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
-                
+
                 const auto isRented = static_cast<bool>(msg->getU8());
                 if (isRented) {
                     msg->getU8(); // unknown
@@ -3887,7 +3921,7 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
                 msg->getString(); // bidderName
                 msg->getU8(); // unknown
                 msg->getU64(); // internalBid
-                
+
                 const auto isNewOwner = static_cast<bool>(msg->getU8());
                 if (isNewOwner) {
                     msg->getU8(); // acceptTransferError
@@ -5325,6 +5359,20 @@ void ProtocolGame::parseCreatureTyping(const InputMessagePtr& msg)
     }
 
     creature->setTyping(typing);
+}
+
+void ProtocolGame::parseFeatures(const InputMessagePtr& msg)
+{
+    const uint16_t features = msg->getU16();
+    for (auto i = 0; i < features; ++i) {
+        const auto feature = static_cast<Otc::GameFeature>(msg->getU8());
+        const auto enabled = static_cast<bool>(msg->getU8());
+        if (enabled) {
+            g_game.enableFeature(feature);
+        } else {
+            g_game.disableFeature(feature);
+        }
+    }
 }
 
 void ProtocolGame::parseHighscores(const InputMessagePtr& msg)
