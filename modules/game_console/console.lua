@@ -1016,7 +1016,13 @@ function addTabText(text, speaktype, tab, creatureName)
     local consoleBuffer = panel:getChildById('consoleBuffer')
     local label = g_ui.createWidget('ConsoleLabel', consoleBuffer)
     label:setId('consoleLabel' .. consoleBuffer:getChildCount())
-    label:setText(text)
+
+    if speaktype.colored then
+        label:setColoredText(text)
+    else
+        label:setText(text)
+    end
+    
     label:setColor(speaktype.color)
     -- consoleTabBar:blinkTab(tab)
     if consoleTabBar:getCurrentTab() ~= tab then
