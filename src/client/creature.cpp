@@ -107,7 +107,7 @@ void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
 
 void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
 {
-    if (!getThingType())
+    if (!canDraw())
         return;
 
     uint8_t frameSize = getExactSize();
@@ -1127,6 +1127,9 @@ void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
 }
 
 void Creature::setStaticWalking(const uint16_t v) {
+    if (!canDraw())
+        return;
+
     if (m_walkUpdateEvent) {
         m_walkUpdateEvent->cancel();
         m_walkUpdateEvent = nullptr;
