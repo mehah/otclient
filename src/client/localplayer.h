@@ -34,7 +34,7 @@ public:
     void stopAutoWalk();
 
     bool autoWalk(const Position& destination, bool retry = false);
-    bool canWalk(Otc::Direction dir, bool ignoreLock = false);
+    bool canWalk(bool ignoreLock = false);
 
     void setStates(uint32_t states);
     void setSkill(Otc::Skill skillId, uint16_t level, uint16_t levelPercent);
@@ -105,7 +105,9 @@ public:
 
     bool hasSight(const Position& pos);
     bool isKnown() { return m_known; }
-    bool isPreWalking() { return m_preWalking; }
+    bool isServerWalking() { return m_serverWalk; }
+    bool isPreWalking() { return !m_preWalks.empty(); }
+
     bool isAutoWalking() { return m_autoWalkDestination.isValid(); }
     bool isPremium() { return m_premium; }
     bool isPendingGame() const { return m_pending; }
@@ -116,41 +118,42 @@ public:
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
-protected:
-    void walk(const Position& oldPos, const Position& newPos) override;
-    void updateWalk(const bool /*isPreWalking*/ = false) override { Creature::updateWalk(m_preWalking); }
-    void stopWalk() override;
-    void updateWalkOffset(uint8_t totalPixelsWalked) override;
-    void terminateWalk() override;
+    void preWalk(Otc::Direction direction);
 
-    friend class Game;
+    Position getPosition() override { return isPreWalking() ? m_preWalks.back() : m_position; }
+    void resetPreWalk() { m_preWalks.clear(); }
 
 private:
-
     struct Skill
     {
         uint16_t level{ 0 };
         uint16_t baseLevel{ 0 };
         uint16_t levelPercent{ 0 };
     };
-    void preWalk(Otc::Direction direction);
+
+    void onWalking() override;
+
+    void walk(const Position& oldPos, const Position& newPos) override;
+    void terminateWalk() override;
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
+    void cancelAjustInvalidPosEvent();
 
     bool retryAutoWalk();
 
     // walk related
-    Position m_lastPrewalkDestination;
     Position m_lastAutoWalkPosition;
     Position m_autoWalkDestination;
+    std::deque<Position> m_preWalks;
 
+    ScheduledEventPtr m_ajustInvalidPosEvent;
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
-    bool m_preWalking{ false };
     bool m_knownCompletePath{ false };
     bool m_premium{ false };
     bool m_known{ false };
     bool m_pending{ false };
+    bool m_serverWalk{ false };
 
     ItemPtr m_inventoryItems[Otc::LastInventorySlot];
 
@@ -182,4 +185,6 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+
+    friend class Game;
 };

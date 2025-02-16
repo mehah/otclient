@@ -1065,6 +1065,7 @@ end
 local interface = modules.game_interface
 
 local function setFrames()
+  if g_game.getFeature(GameColorizedLootValue) then return end
   if not storage.analyzers.rarityFrames then return end
   for _, container in pairs(getContainers()) do
       local window = container.itemsPanel

@@ -26,6 +26,7 @@ leftDecreaseSidePanels = nil
 rightIncreaseSidePanels = nil
 rightDecreaseSidePanels = nil
 hookedMenuOptions = {}
+local lastStopAction = 0
 
 function init()
     g_ui.importStyle('styles/countwindow')
@@ -142,11 +143,13 @@ function bindKeys()
         gameMapPanel:zoomOut()
     end, gameRootPanel)
 
-    Keybind.new("Movement", "Stop All Actions", "Esc", "", true)
+    Keybind.new("Movement", "Stop All Actions", "Escape", "", true)
     Keybind.bind("Movement", "Stop All Actions", {
         {
             type = KEY_PRESS,
             callback = function()
+                if lastStopAction + 50 > g_clock.millis() then return end
+                lastStopAction = g_clock.millis()
                 g_game.cancelAttackAndFollow()
             end,
         }
@@ -617,6 +620,11 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 g_game.browseField(useThing:getPosition())
             end)
         end
+        if useThing:isLyingCorpse() and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and useThing:getPosition().x ~= 0xffff then
+            menu.addOption(menu, tr("Loot corpse"), function()
+                g_game.sendQuickLoot(1, useThing)
+            end)
+        end
     end
 
     if lookThing and not lookThing:isCreature() and not lookThing:isNotMoveable() and lookThing:isPickupable() then
@@ -803,7 +811,7 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
         end
     end
 
-    if g_modules.getModule("game_bot"):isLoaded() and useThing and useThing:isItem() then
+    if modules.game_bot and useThing and useThing:isItem() then
         menu:addSeparator()
         local useThingId = useThing:getId()
         menu:addOption("ID: " .. useThingId, function() g_window.setClipboardText(useThingId) end)

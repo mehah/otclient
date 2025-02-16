@@ -60,10 +60,10 @@ void Container::onAddItem(const ItemPtr& item, int slot)
     callLuaField("onAddItem", slot, item);
 }
 
-ItemPtr Container::findItemById(const uint32_t itemId, const int subType) const
+ItemPtr Container::findItemById(const uint32_t itemId, const int subType, const uint8_t tier) const
 {
     for (const auto& item : m_items)
-        if (item->getId() == itemId && (subType == -1 || item->getSubType() == subType))
+        if (item->getId() == itemId && (subType == -1 || item->getSubType() == subType) && item->getTier() == tier)
             return item;
     return nullptr;
 }

@@ -50,7 +50,7 @@ function Cyclopedia.CreateCharmItem(data)
     if data.id ~= nil then
         widget.charmBase.image:setImageSource("/game_cyclopedia/images/charms/" .. data.id)
     else
-        print("Error: CHARMS[" .. tostring(data.id) .. "] is nil")
+        g_logger.error(string.format("Cyclopedia.CreateCharmItem - charm %s is nil", data.id))
         return
     end
 
@@ -58,14 +58,11 @@ function Cyclopedia.CreateCharmItem(data)
     widget.data = data
 
     if data.asignedStatus then
-        if data.raceId and RACE[data.raceId] then
-            widget.InfoBase.Sprite:setOutfit({
-                type = Cyclopedia.safeOutfit(RACE[data.raceId] and RACE[data.raceId].type or 22)
-            })
-
+        if data.raceId then
+            widget.InfoBase.Sprite:setOutfit(g_things.getRaceData(data.raceId).outfit)
             widget.InfoBase.Sprite:getCreature():setStaticWalking(1000)
         else
-            print("Error: RACE[" .. tostring(data.raceId) .. "] es nil")
+            g_logger.error("Cyclopedia.CreateCharmItem - no race id provided")
         end
     end
 
@@ -116,9 +113,14 @@ function Cyclopedia.loadCharms(charmsData)
     local raceIdNamePairs = {}
 
     for _, raceId in ipairs(charmsData.finishedMonsters) do
+        local raceName = g_things.getRaceData(raceId).name
+        if #raceName == 0 then
+            raceName = string.format("unnamed_%d", raceId)
+        end
+
         table.insert(raceIdNamePairs, {
             raceId = raceId,
-            name = RACE and RACE.name or "buscar_" .. raceId
+            name = raceName
         })
     end
 
@@ -210,9 +212,7 @@ function Cyclopedia.selectCharm(widget, isChecked)
 
     if widget.data.asignedStatus then
         UI.InformationBase.InfoBase.sprite:setVisible(true)
-        UI.InformationBase.InfoBase.sprite:setOutfit({
-            type = Cyclopedia.safeOutfit(RACE[widget.data.raceId] and RACE[widget.data.raceId].type or 22)
-        })
+        UI.InformationBase.InfoBase.sprite:setOutfit(g_things.getRaceData(widget.data.raceId).outfit)
         UI.InformationBase.InfoBase.sprite:getCreature():setStaticWalking(1000)
         UI.InformationBase.InfoBase.sprite:setOpacity(1)
     else
@@ -263,7 +263,7 @@ function Cyclopedia.selectCharm(widget, isChecked)
         for index, raceId in ipairs(Cyclopedia.Charms.Monsters) do
             local internalWidget = g_ui.createWidget("CharmCreatureName", UI.InformationBase.CreaturesBase.CreatureList)
             internalWidget:setId(index)
-            internalWidget:setText(format(RACE[raceId].name))
+            internalWidget:setText(format(g_things.getRaceData(raceId).name))
             internalWidget.raceId = raceId
             internalWidget:setBackgroundColor(color)
             internalWidget.color = color
@@ -280,7 +280,7 @@ function Cyclopedia.selectCharm(widget, isChecked)
         button:setText("Remove")
 
         local internalWidget = g_ui.createWidget("CharmCreatureName", UI.InformationBase.CreaturesBase.CreatureList)
-        internalWidget:setText(format(RACE[widget.data.raceId].name))
+        internalWidget:setText(format(g_things.getRaceData(widget.data.raceId).name))
         internalWidget:setEnabled(false)
         internalWidget:setColor("#707070")
         UI.InformationBase.SearchEdit:setEnabled(false)
@@ -313,9 +313,7 @@ function Cyclopedia.selectCreatureCharm(widget, isChecked)
     end
 
     UI.InformationBase.InfoBase.sprite:setVisible(true)
-    UI.InformationBase.InfoBase.sprite:setOutfit({
-        type = Cyclopedia.safeOutfit(RACE[widget.raceId] and RACE[widget.raceId].type or 22)
-    })
+    UI.InformationBase.InfoBase.sprite:setOutfit(g_things.getRaceData(widget.raceId).outfit)
     UI.InformationBase.InfoBase.sprite:getCreature():setStaticWalking(1000)
     UI.InformationBase.InfoBase.sprite:setOpacity(0.5)
     UI.InformationBase.UnlockButton:setEnabled(true)
@@ -346,7 +344,7 @@ function Cyclopedia.searchCharmMonster(text)
 
     if text ~= "" then
         for _, raceId in ipairs(Cyclopedia.Charms.Monsters) do
-            local name = RACE[raceId].name
+            local name = g_things.getRaceData(raceId).name
             if string.find(name:lower(), text:lower()) then
                 table.insert(searchedMonsters, raceId)
             end
@@ -360,7 +358,7 @@ function Cyclopedia.searchCharmMonster(text)
     for _, raceId in ipairs(searchedMonsters) do
         local internalWidget = g_ui.createWidget("CharmCreatureName", UI.InformationBase.CreaturesBase.CreatureList)
         internalWidget:setId(raceId)
-        internalWidget:setText(format(RACE[raceId].name))
+        internalWidget:setText(format(g_things.getRaceData(raceId).name))
         internalWidget.raceId = raceId
         internalWidget:setBackgroundColor(color)
         internalWidget.color = color

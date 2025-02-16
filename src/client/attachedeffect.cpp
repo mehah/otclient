@@ -23,6 +23,7 @@
 #include "attachedeffect.h"
 #include "gameconfig.h"
 #include "lightview.h"
+#include "thingtypemanager.h"
 
 #include <framework/core/clock.h>
 #include <framework/graphics/animatedtexture.h>

@@ -278,6 +278,21 @@ function inventoryController:onInit()
 end
 
 function inventoryController:onGameStart()
+    local player = g_game.getLocalPlayer()
+    if player then
+        local char = g_game.getCharacterName()
+        local lastCombatControls = g_settings.getNode('LastCombatControls')
+        if not table.empty(lastCombatControls) then
+            if lastCombatControls[char] then
+                g_game.setFightMode(lastCombatControls[char].fightMode)
+                g_game.setChaseMode(lastCombatControls[char].chaseMode)
+                g_game.setSafeFight(lastCombatControls[char].safeFight)
+                if lastCombatControls[char].pvpMode then
+                    g_game.setPVPMode(lastCombatControls[char].pvpMode)
+                end
+            end
+        end
+    end
     inventoryController:registerEvents(LocalPlayer, {
         onInventoryChange = inventoryEvent,
         onSoulChange = onSoulChange,
@@ -324,6 +339,24 @@ end
 
 function inventoryController:onGameEnd()
     stopEvent()
+
+    local lastCombatControls = g_settings.getNode('LastCombatControls')
+    if not lastCombatControls then
+        lastCombatControls = {}
+    end
+    local player = g_game.getLocalPlayer()
+    if player then
+        local char = g_game.getCharacterName()
+        lastCombatControls[char] = {
+            fightMode = g_game.getFightMode(),
+            chaseMode = g_game.getChaseMode(),
+            safeFight = g_game.isSafeFight()
+        }
+        if g_game.getFeature(GamePVPMode) then
+            lastCombatControls[char].pvpMode = g_game.getPVPMode()
+        end
+        g_settings.setNode('LastCombatControls', lastCombatControls)
+    end
 end
 
 function onSetSafeFight(self, checked)

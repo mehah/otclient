@@ -182,6 +182,7 @@ void EventDispatcher::executeDeferEvents() {
             event.execute();
         m_deferEventList.clear();
 
+        std::shared_lock l(m_sharedLock);
         for (const auto& thread : m_threads) {
             std::scoped_lock lock(thread->mutex);
             if (!thread->deferEvents.empty()) {

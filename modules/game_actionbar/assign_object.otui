@@ -1,4 +1,4 @@
-PreviewItem < UIItem
+PreviewItem < Item
   size: 85 85
   //background-color: gray
   padding: 10

@@ -155,6 +155,10 @@ function g_things.loadAppearances(file) end
 
 ---@param file string
 ---@return boolean
+function g_things.loadStaticData(file) end
+
+---@param file string
+---@return boolean
 function g_things.loadDat(file) end
 
 ---@param file string
@@ -183,6 +187,14 @@ function g_things.getThingTypes(category) end
 ---@param category integer
 ---@return ThingType[]
 function g_things.findThingTypeByAttr(attr, category) end
+
+---@param raceId integer
+---@return RaceType[]
+function g_things.getRaceData(raceId) end
+
+---@param searchString string
+---@return Vector<RaceType>
+function g_things.getRacesByName(searchString) end
 
 ---* FRAMEWORK_EDITOR
 ---@param id integer
@@ -1175,6 +1187,23 @@ function g_game.requestHighscore(action, category, vocation, world, worldType, b
 
 ---@param isOpen? boolean false
 function g_game.imbuementDurations(isOpen) end
+
+---@param variant integer
+---@param item ItemPtr
+function g_game.sendQuickLoot(variant, item) end
+
+---@param filter integer
+---@param size integer
+---@param listedItems integer[]
+function g_game.requestQuickLootBlackWhiteList(filter, size, listedItems) end
+
+---@param action integer
+---@param category integer
+---@param pos Position
+---@param itemId integer
+---@param stackpos integer
+---@param useMainAsFallback boolean
+function g_game.openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback) end
 
 --------------------------------
 --------- g_gameConfig ---------
@@ -2701,7 +2730,7 @@ function Tile:isFullyOpaque() end
 function Tile:isLookPossible() end
 
 ---@return boolean
-function Tile:hasCreature() end
+function Tile:hasCreatures() end
 
 ---@return boolean
 function Tile:isEmpty() end
@@ -5818,6 +5847,14 @@ function g_sounds.createSoundEffect() end
 
 ---@return boolean
 function g_sounds.isEaxEnabled() end
+
+---@param file string
+---@return boolean
+function g_sounds.loadClientFiles(directory) end
+
+---@param audioFileId string
+---@return string
+function g_sounds.getAudioFileNameById(audioFileId) end
 
 --------------------------------
 --------- SoundSource ----------

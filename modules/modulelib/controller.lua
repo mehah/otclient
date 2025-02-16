@@ -69,8 +69,9 @@ Controller = {
 }
 
 function Controller:new()
+    local module = g_modules.getCurrentModule()
     local obj = {
-        name = g_modules.getCurrentModule():getName(),
+        name = module and module:getName() or nil,
         currentTypeEvent = TypeEvent.MODULE_INIT,
         events = {},
         scheduledEvents = {},
@@ -364,7 +365,7 @@ function Controller:bindKeyDown(...)
         args = args,
         controllerEventType = self.currentTypeEvent
     })
-    g_keyboard.bindKeyDown(args[1], args[2], args[3])
+    g_keyboard.bindKeyDown(args[1], args[2], args[3], args[4])
 end
 
 function Controller:bindKeyUp(...)
@@ -379,7 +380,7 @@ function Controller:bindKeyUp(...)
         controllerEventType = self.currentTypeEvent
     })
 
-    g_keyboard.bindKeyUp(args[1], args[2], args[3])
+    g_keyboard.bindKeyUp(args[1], args[2], args[3], args[4])
 end
 
 function Controller:bindKeyPress(...)

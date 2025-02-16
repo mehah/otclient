@@ -45,7 +45,7 @@ PresetButton < Panel
 
   $focus:
     border: 1 white
-    image-color: #ffffff
+
   
   UICreature
     id: creature
@@ -95,20 +95,15 @@ PresetButton < Panel
       text: Save
 
 SelectionButton < Panel
-  image-source: /images/ui/button
-  image-color: #dfdfdf
-  image-clip: 0 0 22 23
+  image-source:  /images/ui/button-grey-qt
+  image-clip: 0 0 98 40
   image-border: 3
   border: 1 alpha
   focusable: true
   phantom: false
-
-  $hover:
-    image-color: #ffffff
-
   $focus:
     border: 1 white
-    image-color: #ffffff
+
   
   UICreature
     id: outfit
@@ -194,6 +189,28 @@ OutfitWindow < MainWindow
           anchors.left: parent.left
           anchors.right: parent.right
           text: Show Mount
+
+      FlatPanel
+        id: showFamiliar
+        height: 22
+        padding: 5
+        @onSetup: |
+          if not g_game.getFeature(GamePlayerFamiliars) then
+            self:hide()
+            self:setHeight(0)
+            self:setPadding(0)
+          end
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: parent.right
+          text: Show Familiar
+          @onSetup: |
+            if not g_game.getFeature(GamePlayerFamiliars) then
+              self:hide()
+            end
 
       FlatPanel
         id: showWings
@@ -287,7 +304,16 @@ OutfitWindow < MainWindow
           type: grid
           cell-size: 64 64
           flow: true
-      
+
+      UICreature
+        id: UIfamiliar
+        anchors.centerIn: parent
+        size: 256 256
+        @onSetup: |
+          if not g_game.getFeature(GamePlayerFamiliars) then
+            self:hide()
+          end
+
       UICreature
         id: creature
         anchors.centerIn: parent
@@ -499,7 +525,40 @@ OutfitWindow < MainWindow
           anchors.bottom: parent.bottom
           anchors.left: prev.right
           anchors.right: parent.right
-      
+
+      Panel
+        id: familiar
+        height: 20
+        @onSetup: |
+          if not g_game.getFeature(GamePlayerFamiliars) then
+            self:hide()
+            self:setHeight(0)
+          end
+
+        CheckBox
+          id: check
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          image-source: /images/ui/outfits/checkbox_round
+          text-offset: 15 0
+          text: Familiar:
+          width: 84
+          @onSetup: |
+            if not g_game.getFeature(GamePlayerFamiliars) then
+              self:hide()
+            end
+
+        FlatPanel
+          id: name
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.left: prev.right
+          anchors.right: parent.right
+          @onSetup: |
+            if not g_game.getFeature(GamePlayerFamiliars) then
+              self:hide()
+            end
+
       Panel
         id: wings
         height: 20
@@ -590,7 +649,7 @@ OutfitWindow < MainWindow
           anchors.left: parent.left
           image-source: /images/ui/outfits/checkbox_round
           text-offset: 15 0
-          text: Effects Bar:
+          text: Effects:
           width: 84
         
         FlatPanel
@@ -599,8 +658,6 @@ OutfitWindow < MainWindow
           anchors.bottom: parent.bottom
           anchors.left: prev.right
           anchors.right: parent.right
-
-
 
       Panel
         id: title
@@ -715,12 +772,20 @@ OutfitWindow < MainWindow
     margin-left: 5
     height: 50
     text: Filter
+    
+    QtCheckBox
+      id: onlyMine
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      text: "Only mine"
+      width: 84
 
     TextEdit
       id: search
-      anchors.fill: parent
+      anchors.left: prev.right
+      anchors.right: parent.right
       placeholder: Search by name
-      placeholder-color: #00000077
+      placeholder-color: #c0c0c0c0
 
   ScrollablePanel
     id: presetsList

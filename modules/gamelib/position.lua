@@ -32,6 +32,18 @@ function Position.distance(pos1, pos2)
     return math.sqrt(math.pow((pos2.x - pos1.x), 2) + math.pow((pos2.y - pos1.y), 2))
 end
 
+function Position.offsetX(pos1, pos2)
+    return math.abs(pos2.x - pos1.x)
+end
+
+function Position.offsetY(pos1, pos2)
+    return math.abs(pos2.y - pos1.y)
+end
+
+function Position.offsetZ(pos1, pos2)
+    return math.abs(pos2.z - pos1.z)
+end
+
 function Position.manhattanDistance(pos1, pos2)
     return math.abs(pos2.x - pos1.x) + math.abs(pos2.y - pos1.y)
 end

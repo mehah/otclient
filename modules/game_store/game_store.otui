@@ -136,7 +136,6 @@ StoreWindow
       focusable: false
       margin-left:22
       margin-bottom: 3
-      text-wrap: true
       text-auto-resize: true
       phantom: true
 
@@ -154,7 +153,6 @@ StoreWindow
       id: lblTibiaTransfer
       anchors.bottom: parent.bottom
       anchors.left: prev.right
-      text-wrap: true
       text-auto-resize: true
       margin-left:5
       margin-bottom: 3 
@@ -208,7 +206,6 @@ StoreWindow
     icon-align: center
     icon-source: images/iconTransfer
     size: 64 20
-    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   StoreButton
     anchors.top: transferPoints.top
@@ -218,7 +215,6 @@ StoreWindow
     icon-align: center
     icon-source: images/icon-trade
     size: 64 20
-    @onClick: displayErrorBox("Game Store","no yet,UI missing")
 
   HorizontalSeparator
     anchors.bottom: prev.top
@@ -238,6 +234,34 @@ StoreWindow
     layout: verticalBox
     margin-bottom: 8
     padding: 5
+
+  TextEdit
+    id: SearchEdit
+    anchors.bottom: listCategory.bottom
+    anchors.left: parent.left
+    margin-left: 5
+    margin-bottom: 10
+    height: 17
+    width: 180
+    placeholder: Type to search
+    placeholder-color: #6E706F
+
+  UIWidget
+    id: SearchClearButton
+    anchors.right: SearchEdit.right
+    anchors.top: SearchEdit.top
+    margin-top: 1
+    margin-right: 2
+    image-source: /game_cyclopedia/images/button_clear_search
+    image-color: white
+    opacity: 0.8
+    @onClick: modules.game_store.search()
+    $hover:
+      opacity: 1.0
+      image-color: white
+    $pressed:
+      opacity: 1.0
+      image-color: gray
 
   StoreLightFlatPanel
     id: panelItem
@@ -385,7 +409,6 @@ StoreWindow
     anchors.bottom: listCategory.bottom
     margin-left: 8
     padding: 6
-    visible: false
     UIWidget
       id: HomeImagen
       height: 20
@@ -393,9 +416,33 @@ StoreWindow
       anchors.top: parent.top
       anchors.left: parent.left
       anchors.right: parent.right
-      layout: horizontalBox
       margin-right:10
- 
+    UIButton
+      id: prevImagen
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.left
+      size: 16 29
+      image-source: images/button-featured-offers-left
+      margin-left: 15
+      @onClick: modules.game_store.changeImagenHome(self:getId())
+      $pressed :
+        image-source: images/button-featured-offers-left-highlight
+      $hover:
+        image-source: images/button-featured-offers-left-highlight
+
+
+    UIButton
+      id: nextImagen
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.right: HomeImagen.right
+      size: 16 29
+      margin-right: 15
+      image-source: images/button-featured-offers-right
+      @onClick: modules.game_store.changeImagenHome(self:getId())
+      $pressed:
+        image-source: images/button-featured-offers-right-highlight
+      $hover:
+        image-source: images/button-featured-offers-right-highlight
 
     MiniPanel
       id:HomeRecentlyAdded

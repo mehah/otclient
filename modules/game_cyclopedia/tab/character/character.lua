@@ -562,16 +562,16 @@ end
 
 function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsArray, forgeSkillsArray,
     perfectShotDamageRanges, combatsArray, concoctionsArray)
-    UI.CombatStats.attack.icon:setImageSource(Icons[data.weaponElement+1].icon)
-    UI.CombatStats.attack.icon:setImageClip(Icons[data.weaponElement+1].clip)
+    UI.CombatStats.attack.icon:setImageSource("/images/game/states/player-state-flags")
+    UI.CombatStats.attack.icon:setImageClip((data.weaponElement * 9) .. ' 0 9 9')
     UI.CombatStats.attack.value:setText(data.weaponMaxHitChance)
 
     if data.weaponElementDamage > 0 then
         UI.CombatStats.converted.none:setVisible(false)
         UI.CombatStats.converted.value:setVisible(true)
         UI.CombatStats.converted.icon:setVisible(true)
-        UI.CombatStats.converted.icon:setImageSource(Icons[data.weaponElementType+1].icon)
-        UI.CombatStats.converted.icon:setImageClip(Icons[data.weaponElementType+1].clip)
+        UI.CombatStats.converted.icon:setImageSource("/images/game/states/player-state-flags")
+        UI.CombatStats.converted.icon:setImageClip((data.weaponElementType * 9) .. ' 0 9 9')
         UI.CombatStats.converted.value:setText(data.weaponElementDamage .. "%")
     else
         UI.CombatStats.converted.none:setVisible(true)

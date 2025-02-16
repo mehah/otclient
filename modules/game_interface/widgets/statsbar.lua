@@ -260,12 +260,19 @@ end
 local function loadIcon(bitChanged, content, topmenu)
     local icon = g_ui.createWidget('ConditionWidget', content)
     icon:setId(Icons[bitChanged].id)
-    icon:setImageSource(Icons[bitChanged].path)
-    icon:setTooltip(Icons[bitChanged].tooltip)
-    icon:setImageSize({
-        width = 9,
-        height = 9
-    })
+    icon:setImageSource("/images/game/states/player-state-flags")
+    icon:setImageClip(((Icons[bitChanged].clip - 1) * 9) .. ' 0 9 9')
+    local tooltip = Icons[bitChanged].tooltip
+    if tooltip == "You are GoshnarTaint" then
+        tooltip = "Goshnar's Lairs Penalties:\n" ..
+                  "- 10% chance of creature teleportation to you\n" ..
+                  "- 0.5% chance of new creature spawn when hitting another\n" ..
+                  "- 15% increased damage received\n" ..
+                  "- 10% chance of creature full heal instead of dying\n" ..
+                  "- Lose 10% of current HP and mana every 10 seconds"
+    end
+    icon:setTooltip(tooltip)
+    icon:setImageSize(tosize("9 9"))
     if topmenu then
         icon:setMarginTop(5)
     end
@@ -289,8 +296,13 @@ end
 local function toggleIcon(bitChanged)
     local contents = getStatsBarsIconContent()
 
+    local iconId = Icons[bitChanged]
+    if not iconId then
+        g_logger.warning(string.format("No icon ID %s (%s)  found. Check Icons array in modules/gamelib/player.lua.", tostring(bitChanged), tostring(math.log(bitChanged) / math.log(2))))
+        return
+    end
     for _, contentData in ipairs(contents) do
-        local icon = contentData.content:getChildById(Icons[bitChanged].id)
+        local icon = contentData.content:getChildById(iconId.id)
         if icon then
             icon:destroy()
         else

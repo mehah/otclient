@@ -10,5 +10,6 @@ function UIActionSlot.create()
     slot.useType = nil
     slot.autoSend = nil
     slot.parameter = nil
+    slot.getTier = nil
     return slot
 end

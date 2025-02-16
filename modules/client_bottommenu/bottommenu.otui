@@ -1,26 +1,28 @@
 ShowOffWidget < UIWidget
-  anchors.fill: parent
+  size: 1020 1000
+  anchors.left: parent.left
+  anchors.top: parent.top
 
   Label
     id: image
     size: 64 64
     anchors.left: parent.left
     anchors.top: parent.top
-    margin-top: 28
     margin-left: 10
     image-auto-resize: true
 
-  Label
+  UITextEdit
     id: description
+    size: 476 0
     anchors.left: image.right
-    anchors.right: parent.right
+    anchors.top: parent.top
     anchors.bottom: parent.bottom
-    anchors.top: image.top
-    margin-top: 10
+    margin-top: 2
     margin-left: 10
-    margin-right: 40
     color: #c0c0c0ff
     text-wrap: true
+    text-auto-resize: true
+    selectable: true
 
 Panel
   id: bottomMenu
@@ -52,7 +54,7 @@ Panel
 
     Label
       id: showOffWindowText
-      !text: tr('Random Hit')
+      !text: tr('Random Hint')
       font: verdana-11px-antialised
       text-offset: 0 2
       text-align: top
@@ -153,6 +155,7 @@ Panel
 
       Creature
         id: creature
+        size: 64 64
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         image-source: ""
@@ -161,7 +164,7 @@ Panel
         border-color: alpha
 
       UIWidget
-        id: creature2
+        id: monsterImage
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         visible: false
@@ -181,6 +184,7 @@ Panel
 
       Creature
         id: boss
+        size: 64 64
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         image-source: ""
@@ -189,7 +193,7 @@ Panel
         border-color: alpha
         
       UIWidget
-        id: boss2
+        id: bossImage
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
         visible: false

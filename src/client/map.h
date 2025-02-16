@@ -269,7 +269,8 @@ public:
     bool isLookPossible(const Position& pos);
     bool isCovered(const Position& pos, uint8_t firstFloor = 0);
     bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0);
-    bool isAwareOfPosition(const Position& pos) const;
+    bool isAwareOfPosition(const Position& pos) const { return isAwareOfPosition(pos, m_awareRange); }
+    bool isAwareOfPosition(const Position& pos, const AwareRange& awareRange) const;
 
     void resetLastCamera() const;
 

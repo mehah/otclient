@@ -39,12 +39,16 @@
 #include <framework/graphics/graphics.h>
 #include <framework/graphics/shadermanager.h>
 #include <framework/platform/platformwindow.h>
+#include <framework/core/asyncdispatcher.h>
 
 #include <algorithm>
 
 MapView::MapView() : m_lightView(std::make_unique<LightView>(Size())), m_pool(g_drawPool.get(DrawPoolType::MAP))
 {
     m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
+    m_floorThreads.resize(g_asyncDispatcher.get_thread_count());
+    for (auto& thread : m_floorThreads)
+        thread.resize(m_floors.size());
 
     setVisibleDimension(Size(15, 11));
 }
@@ -292,21 +296,21 @@ void MapView::updateVisibleTiles()
 
     m_lockedFirstVisibleFloor = m_floorViewMode == LOCKED ? m_posInfo.camera.z : -1;
 
-    const uint8_t prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
+    const auto prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
 
     if (m_lastCameraPosition != m_posInfo.camera) {
         if (m_lastCameraPosition.z != m_posInfo.camera.z) {
             onFloorChange(m_posInfo.camera.z, m_lastCameraPosition.z);
         }
 
-        const uint8_t cachedFirstVisibleFloor = calcFirstVisibleFloor(m_floorViewMode != ALWAYS);
+        const auto cachedFirstVisibleFloor = calcFirstVisibleFloor(m_floorViewMode != ALWAYS);
         m_cachedFirstVisibleFloor = cachedFirstVisibleFloor;
         m_cachedLastVisibleFloor = std::max<uint8_t>(cachedFirstVisibleFloor, calcLastVisibleFloor());
 
         m_floorMin = m_floorMax = m_posInfo.camera.z;
     }
 
-    uint8_t cachedFirstVisibleFloor = m_cachedFirstVisibleFloor;
+    auto cachedFirstVisibleFloor = m_cachedFirstVisibleFloor;
     if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY || canFloorFade()) {
         cachedFirstVisibleFloor = calcFirstVisibleFloor(false);
     }
@@ -340,52 +344,82 @@ void MapView::updateVisibleTiles()
     // cache visible tiles in draw order
     // draw from last floor (the lower) to first floor (the higher)
     const uint32_t numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
-    for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
-        auto& floor = m_floors[iz].cachedVisibleTiles;
 
-        // loop through / diagonals beginning at top left and going to top right
-        for (uint_fast32_t diagonal = 0; diagonal < numDiagonals; ++diagonal) {
-            // loop current diagonal tiles
-            const uint32_t advance = std::max<uint32_t >(diagonal - m_drawDimension.height(), 0);
-            for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
-                // position on current floor
-                //TODO: check position limits
-                Position tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
-                // adjust tilePos to the wanted floor
-                tilePos.coveredUp(m_posInfo.camera.z - iz);
-                if (const auto& tile = g_map.getTile(tilePos)) {
-                    // skip tiles that have nothing
-                    if (!tile->isDrawable())
-                        continue;
+    auto processDiagonalRange = [&](std::vector<FloorData>& floors, uint32_t start, uint32_t end) {
+        for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+            auto& floor = floors[iz].cachedVisibleTiles;
 
-                    bool addTile = true;
+            for (uint_fast32_t diagonal = start; diagonal < end; ++diagonal) {
+                const auto advance = (static_cast<size_t>(diagonal) >= m_drawDimension.height()) ? diagonal - m_drawDimension.height() : 0;
+                for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
+                    auto tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
+                    tilePos.coveredUp(m_posInfo.camera.z - iz);
 
-                    if (checkIsCovered) {
-                        // skip tiles that are completely behind another tile
-                        if (tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
+                    if (const auto& tile = g_map.getTile(tilePos)) {
+                        if (!tile->isDrawable()) continue;
+
+                        bool addTile = true;
+
+                        if (checkIsCovered && tile->isCompletelyCovered(m_cachedFirstVisibleFloor, m_resetCoveredCache)) {
                             if (m_floorViewMode != ALWAYS_WITH_TRANSPARENCY || (tilePos.z < m_posInfo.camera.z && tile->isCovered(m_cachedFirstVisibleFloor))) {
                                 addTile = false;
                             }
                         }
-                    }
 
-                    if (addTile) {
-                        floor.tiles.emplace_back(tile);
-                        tile->onAddInMapView();
-                    }
+                        if (addTile) {
+                            floor.tiles.emplace_back(tile);
+                            tile->onAddInMapView();
+                        }
 
-                    if (isDrawingLights() && tile->canShade())
-                        floor.shades.emplace_back(tile);
+                        if (isDrawingLights() && tile->canShade()) {
+                            floor.shades.emplace_back(tile);
+                        }
 
-                    if (addTile || !floor.shades.empty()) {
-                        if (iz < m_floorMin)
-                            m_floorMin = iz;
-                        else if (iz > m_floorMax)
-                            m_floorMax = iz;
+                        if (addTile || !floor.shades.empty()) {
+                            if (iz < m_floorMin)
+                                m_floorMin = iz;
+                            else if (iz > m_floorMax)
+                                m_floorMax = iz;
+                        }
                     }
                 }
             }
         }
+    };
+
+    if (m_multithreading) {
+        static const int numThreads = g_asyncDispatcher.get_thread_count();
+        static BS::multi_future<void> tasks(numThreads);
+        tasks.clear();
+
+        const auto chunkSize = (numDiagonals + numThreads - 1) / numThreads;
+
+        for (auto i = 0; i < numThreads; ++i) {
+            const auto start = i * chunkSize;
+            const auto end = start + chunkSize;
+
+            for (auto& floor : m_floorThreads[i])
+                floor.cachedVisibleTiles.clear();
+
+            tasks.emplace_back(g_asyncDispatcher.submit_task([=, this] {
+                processDiagonalRange(m_floorThreads[i], start, end);
+            }));
+        }
+
+        tasks.wait();
+
+        for (auto fi = 0; fi < m_floors.size(); ++fi) {
+            auto& floor = m_floors[fi];
+            floor.cachedVisibleTiles.clear();
+
+            for (auto i = 0; i < numThreads; ++i) {
+                auto& floorThread = m_floorThreads[i][fi];
+                floor.cachedVisibleTiles.tiles.insert(floor.cachedVisibleTiles.tiles.end(), std::make_move_iterator(floorThread.cachedVisibleTiles.tiles.begin()), std::make_move_iterator(floorThread.cachedVisibleTiles.tiles.end()));
+                floor.cachedVisibleTiles.shades.insert(floor.cachedVisibleTiles.tiles.end(), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.begin()), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.end()));
+            }
+        }
+    } else {
+        processDiagonalRange(m_floors, 0, numDiagonals);
     }
 
     m_updateVisibleTiles = false;
@@ -394,6 +428,12 @@ void MapView::updateVisibleTiles()
 }
 
 void MapView::updateRect(const Rect& rect) {
+    if (m_posInfo.camera != getCameraPosition()) {
+        m_posInfo.camera = getCameraPosition();
+        requestUpdateVisibleTiles();
+        requestUpdateMapPosInfo();
+    }
+
     if (m_posInfo.rect != rect || m_updateMapPosInfo) {
         m_updateMapPosInfo = false;
 
@@ -407,17 +447,18 @@ void MapView::updateRect(const Rect& rect) {
         if (mousePos != m_mousePosition)
             onMouseMove(m_mousePosition = mousePos, true);
     }
-
-    m_posInfo.camera = getCameraPosition();
 }
 
 void MapView::updateGeometry(const Size& visibleDimension)
 {
     float scaleFactor = m_antiAliasingMode == ANTIALIASING_SMOOTH_RETRO ? 2.f : 1.f;
 
-    size_t maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
+    auto maxAwareRange = std::max<size_t>(visibleDimension.width(), visibleDimension.height());
 
-    m_pool->agroup(maxAwareRange > 115);
+    const auto optimize = maxAwareRange > 115;
+
+    m_pool->agroup(optimize);
+    m_multithreading = optimize;
     while (maxAwareRange > 100) {
         maxAwareRange /= 2;
         scaleFactor /= 2;

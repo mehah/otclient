@@ -77,6 +77,7 @@ namespace Proto
         GameServerCreatureShader = 54,
         GameServerMapShader = 55,
         GameServerCreatureTyping = 56,
+        GameServerFeatures = 67,
         GameServerFloorDescription = 75,
 
         // original tibia ONLY
@@ -282,6 +283,9 @@ namespace Proto
         ClientOnWrapItem = 139,
         ClientLook = 140,
         ClientLookCreature = 141,
+        ClientSendQuickLoot = 143,
+        ClientLootContainer = 144,
+        ClientQuickLootBlackWhitelist = 145,
         ClientTalk = 150,
         ClientRequestChannels = 151,
         ClientJoinChannel = 152,

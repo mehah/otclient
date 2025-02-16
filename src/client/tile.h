@@ -151,7 +151,8 @@ public:
     bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; };
     bool hasTopGround(const bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & HAS_TOP_GROUND_BORDER); }
 
-    bool hasCreature() { return m_thingTypeFlag & HAS_CREATURE; }
+    bool hasCreatures() { return m_thingTypeFlag & HAS_CREATURE; }
+
     bool hasTopItem() const { return m_thingTypeFlag & HAS_TOP_ITEM; }
     bool hasCommonItem() const { return m_thingTypeFlag & HAS_COMMON_ITEM; }
     bool hasBottomItem() const { return m_thingTypeFlag & HAS_BOTTOM_ITEM; }
@@ -181,7 +182,7 @@ public:
             ;
     }
 
-    bool hasElevation(const int elevation = 1) const { return m_elevation >= elevation; }
+    bool hasElevation(const int elevation = 1) { return m_elevation >= elevation; }
 
 #ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
@@ -217,7 +218,7 @@ public:
 private:
     void updateThingStackPos();
     void drawTop(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation);
-    void drawCreature(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation);
+    void drawCreature(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation, const LightViewPtr& lightView = nullptr);
 
     void setThingFlag(const ThingPtr& thing);
 
@@ -228,7 +229,7 @@ private:
             setThingFlag(thing);
     }
 
-    bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
+    bool hasThingWithElevation() { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
     void markHighlightedThing(const Color& color) {
         if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < static_cast<int8_t>(m_things.size())) {
             m_things[m_highlightThingStackPos]->setMarked(color);

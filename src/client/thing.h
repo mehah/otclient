@@ -48,7 +48,8 @@ public:
     virtual uint32_t getId() { return m_clientId; }
     uint16_t getClientId() const { return m_clientId; }
 
-    Position getPosition() { return m_position; }
+    virtual Position getPosition() { return m_position; }
+    Position getServerPosition() { return m_position; }
 
     const TilePtr& getTile();
     ContainerPtr getParentContainer();
