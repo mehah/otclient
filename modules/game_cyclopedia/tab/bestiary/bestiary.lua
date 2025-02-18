@@ -46,6 +46,7 @@ function Cyclopedia.SetBestiaryProgress(fit, firstBar, secondBar, thirdBar, kill
     end
 
     local function setBarVisibility(bar, isVisible, width)
+        isVisible = isVisible and width > 0
         bar:setVisible(isVisible)
         if isVisible then
             bar:setImageRect({
