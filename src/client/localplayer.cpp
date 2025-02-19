@@ -80,13 +80,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
 
     const auto& oldPos = getPosition();
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
-
     cancelAjustInvalidPosEvent();
-    m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
-        m_preWalks.clear();
-        g_game.resetMapUpdatedAt();
-        m_ajustInvalidPosEvent = nullptr;
-    }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
 }
 
 void LocalPlayer::onWalking() {
@@ -222,6 +216,12 @@ void LocalPlayer::stopAutoWalk()
 
 void LocalPlayer::terminateWalk()
 {
+    m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
+        m_preWalks.clear();
+        g_game.resetMapUpdatedAt();
+        m_ajustInvalidPosEvent = nullptr;
+    }, 150);
+
     Creature::terminateWalk();
     m_serverWalk = false;
     callLuaField("onWalkFinish");
