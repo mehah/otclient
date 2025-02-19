@@ -3,6 +3,7 @@ local smartWalkDir = nil
 local walkEvent = nil
 local lastTurn = 0
 local nextWalkDir = nil
+local lastWalkDir = nil
 local lastCancelWalkTime = 0
 
 
@@ -84,11 +85,14 @@ local function walk(dir)
     end
 
     if not player:canWalk() then
-        nextWalkDir = dir
+        if lastWalkDir ~= dir then
+            nextWalkDir = dir
+        end
         return
     end
 
     nextWalkDir = nil
+    lastWalkDir = dir
 
     if g_game.getFeature(GameAllowPreWalk) then
         local toPos = Position.translatedToDirection(player:getPosition(), dir)
@@ -107,16 +111,19 @@ local function walk(dir)
 end
 
 --- Adds a walk event with an optional delay.
-local function addWalkEvent(dir)
+local function addWalkEvent(dir, delay)
     if os.time() - lastCancelWalkTime > 20 then
         cancelWalkEvent()
         lastCancelWalkTime = os.time()
     end
-    walkEvent = addEvent(function()
+
+    local action = function()
         if g_keyboard.getModifiers() == KeyboardNoModifier then
             walk(smartWalkDir or dir)
         end
-    end)
+    end
+
+    walkEvent = delay ~= nil and delay > 0 and scheduleEvent(action, delay) or addEvent(action)
 end
 
 --- Initiates a smart walk in the given direction.
@@ -214,7 +221,7 @@ local function onWalkFinish(player)
         if not g_game.getFeature(GameAllowPreWalk) then
             walk(nextWalkDir)
         else
-            addWalkEvent(nextWalkDir)
+            addWalkEvent(nextWalkDir, 50)
         end
     end
 end
