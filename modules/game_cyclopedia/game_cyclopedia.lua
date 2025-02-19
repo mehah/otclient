@@ -215,17 +215,6 @@ function controllerCyclopedia:onTerminate()
         trackerMiniWindowBosstiary:destroy()
         trackerMiniWindowBosstiary = nil
     end
-
-    if focusCategoryList then
-        disconnect(focusCategoryList, {
-            onChildFocusChange = function(self, focusedChild)
-                if focusedChild == nil then
-                    return
-                end
-                focusedChild:onClick()
-            end
-        })
-    end
 end
 
 function hide()
@@ -233,16 +222,6 @@ function hide()
         return
     end
     controllerCyclopedia.ui:hide()
-    if focusCategoryList then
-        disconnect(focusCategoryList, {
-            onChildFocusChange = function(self, focusedChild)
-                if focusedChild == nil then
-                    return
-                end
-                focusedChild:onClick()
-            end
-        })
-    end
 end
 
 function show()
@@ -263,7 +242,7 @@ function SelectWindow(type)
         bestiary = { obj = bestiary, func = showBestiary },
         charms = { obj = charms, func = showCharms },
         map = { obj = map, func = showMap },
-        houses = { obj = houses, func = showHouse }, 
+        houses = { obj = houses, func = showHouse },
         character = { obj = character, func = showCharacter },
         bosstiary = { obj = bosstiary, func = showBosstiary },
         bossSlot = { obj = bossSlot, func = showBossSlot }
