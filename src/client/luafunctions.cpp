@@ -500,6 +500,8 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Thing>("setHighlight", &Thing::lua_setHighlight);
     g_lua.bindClassMemberFunction<Thing>("isHighlighted", &Thing::isHighlighted);
     g_lua.bindClassMemberFunction<Thing>("getExactSize", &Thing::getExactSize);
+    g_lua.bindClassMemberFunction<Thing>("getScaleFactor", &Thing::getScaleFactor);
+    g_lua.bindClassMemberFunction<Thing>("setScaleFactor", &Thing::setScaleFactor);
     g_lua.bindClassMemberFunction<Thing>("canAnimate", &Thing::canAnimate);
 
 #ifdef FRAMEWORK_EDITOR
