@@ -432,6 +432,14 @@ UIWidget
       !text: tr('Skip when Quick Looting')
 
       text-auto-resize: true
+    CheckBox
+      id: LootQuickLootCheck
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-bottom: 35
+      !text: tr('Loot when Quick Looting')
+
+      text-auto-resize: true
 
   Button
     id: ManageButton
