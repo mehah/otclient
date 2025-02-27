@@ -61,6 +61,15 @@ function showItems()
     controllerCyclopedia.ui.GoldBase:setVisible(false)
     controllerCyclopedia.ui.BestiaryTrackerButton:setVisible(false)
 
+    local lootFilterValue = modules.game_quickloot.quickLootController.ui.filters.add:getText()
+    if string.match(lootFilterValue:lower(), "skipped") then
+        UI.InfoBase.SkipQuickLootCheck:setVisible(true)
+        UI.InfoBase.LootQuickLootCheck:setVisible(false)
+    else
+        UI.InfoBase.SkipQuickLootCheck:setVisible(false)
+        UI.InfoBase.LootQuickLootCheck:setVisible(true)
+    end
+
     local CategoryColor = "#484848"
 
     for _, data in ipairs(Cyclopedia.CategoryItems) do
@@ -264,6 +273,15 @@ function Cyclopedia.internalCreateItem(data)
                 modules.game_quickloot.QuickLoot.addLootList(data:getId(), 1)
             else
                 modules.game_quickloot.QuickLoot.removeLootList(data:getId(), 1)
+            end
+        end
+
+        UI.InfoBase.LootQuickLootCheck.onCheckChange = function(self, checked)
+            UI.InfoBase.LootQuickLootCheck:setChecked(modules.game_quickloot.QuickLoot.lootExists(data:getId(), 2))
+            if checked then
+                modules.game_quickloot.QuickLoot.addLootList(data:getId(), 2)
+            else
+                modules.game_quickloot.QuickLoot.removeLootList(data:getId(), 2)
             end
         end
 
