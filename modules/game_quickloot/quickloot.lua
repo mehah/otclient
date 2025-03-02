@@ -421,6 +421,9 @@ function QuickLoot.Define()
         end
         QuickLoot.show()
         QuickLoot.loadFilterItems()
+        if QuickLoot.data.filter == 2 and not quickLootController.ui.filters.accepted:isChecked() then
+            quickLootController.ui.filters.accepted:onClick()
+        end
     end
 
     function QuickLoot.show()
