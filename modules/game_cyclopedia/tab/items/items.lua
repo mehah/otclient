@@ -61,15 +61,6 @@ function showItems()
     controllerCyclopedia.ui.GoldBase:setVisible(false)
     controllerCyclopedia.ui.BestiaryTrackerButton:setVisible(false)
 
-    local lootFilterValue = modules.game_quickloot.quickLootController.ui.filters.add:getText()
-    if string.match(lootFilterValue:lower(), "skipped") then
-        UI.InfoBase.SkipQuickLootCheck:setVisible(true)
-        UI.InfoBase.LootQuickLootCheck:setVisible(false)
-    else
-        UI.InfoBase.SkipQuickLootCheck:setVisible(false)
-        UI.InfoBase.LootQuickLootCheck:setVisible(true)
-    end
-
     local CategoryColor = "#484848"
 
     for _, data in ipairs(Cyclopedia.CategoryItems) do
@@ -267,25 +258,21 @@ function Cyclopedia.internalCreateItem(data)
         end
         widget:setBackgroundColor("#585858")
        
-        UI.InfoBase.SkipQuickLootCheck.onCheckChange = function(self, checked)
-            UI.InfoBase.SkipQuickLootCheck:setChecked(modules.game_quickloot.QuickLoot.lootExists(data:getId(), 1))
+        if modules.game_quickloot.QuickLoot.data.filter == 2 then
+            UI.InfoBase.quickLootCheck:setText("Loot when Quick Looting")
+        else
+            UI.InfoBase.quickLootCheck:setText('Skip when Quick Looting')
+        end
+        UI.InfoBase.quickLootCheck.onCheckChange = function(self, checked)
             if checked then
-                modules.game_quickloot.QuickLoot.addLootList(data:getId(), 1)
+                modules.game_quickloot.QuickLoot.addLootList(data:getId(), modules.game_quickloot.QuickLoot.data.filter)
             else
-                modules.game_quickloot.QuickLoot.removeLootList(data:getId(), 1)
+                modules.game_quickloot.QuickLoot.removeLootList(data:getId(), modules.game_quickloot.QuickLoot.data.filter)
             end
         end
+        UI.InfoBase.quickLootCheck:setChecked(modules.game_quickloot.QuickLoot.lootExists(data:getId(), modules.game_quickloot.QuickLoot.data.filter))
 
-        UI.InfoBase.LootQuickLootCheck.onCheckChange = function(self, checked)
-            UI.InfoBase.LootQuickLootCheck:setChecked(modules.game_quickloot.QuickLoot.lootExists(data:getId(), 2))
-            if checked then
-                modules.game_quickloot.QuickLoot.addLootList(data:getId(), 2)
-            else
-                modules.game_quickloot.QuickLoot.removeLootList(data:getId(), 2)
-            end
-        end
-
-         local buy, sell = Cyclopedia.formatSaleData(internalData:getNpcSaleData())
+        local buy, sell = Cyclopedia.formatSaleData(internalData:getNpcSaleData())
         local sellColor = "#484848"
 
         for index, value in ipairs(sell) do
