@@ -4367,7 +4367,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             std::vector<std::tuple<uint16_t, uint16_t>> concoctionsArray;
 
             for (auto i = 0; i < concoctionsCount; ++i) {
-                const uint16_t concoctionFirst = msg->getU8();
+                const uint16_t concoctionFirst = msg->getU16();
                 const uint16_t concoctionSecond = msg->getU16();
                 concoctionsArray.emplace_back(concoctionFirst, concoctionSecond);
             }
