@@ -2348,13 +2348,14 @@ void ProtocolGame::parseMultiUseCooldown(const InputMessagePtr& msg)
 
 void ProtocolGame::parseTalk(const InputMessagePtr& msg)
 {
+    uint32_t statement = 0;
     if (g_game.getFeature(Otc::GameMessageStatements)) {
-        msg->getU32(); // channel statement guid
+        statement = msg->getU32(); // channel statement guid
     }
 
     const auto& name = g_game.formatCreatureName(msg->getString());
 
-    if (g_game.getClientVersion() >= 1281) {
+    if (statement > 0 && g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
     }
 
