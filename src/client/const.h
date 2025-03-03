@@ -192,7 +192,7 @@ namespace Otc
         FluidHealth,
         FluidUrine,
         FluidRum,
-        FluidFruidJuice,
+        FluidFruitJuice,
         FluidCoconutMilk,
         FluidTea,
         FluidMead,

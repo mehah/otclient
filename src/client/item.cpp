@@ -217,7 +217,7 @@ void Item::updatePatterns()
                 case Otc::FluidRum:
                     color = Otc::FluidBrown;
                     break;
-                case Otc::FluidFruidJuice:
+                case Otc::FluidFruitJuice:
                     color = Otc::FluidYellow;
                     break;
                 case Otc::FluidCoconutMilk:
