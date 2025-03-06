@@ -709,16 +709,37 @@ UIWidget
       anchors.top: reduction.bottom
       anchors.left: reduction.left
       anchors.right: separator.right
-
-      color: #f00303
-      background-color: #355d89
-      shader: Map - Party
       margin-left: 10
       margin-top: 10
       size: 232 233
       layout:
         type: verticalBox
         fit-children: true
+    HorizontalSeparator
+      anchors.top: prev.bottom
+      anchors.left: reduction.left
+      anchors.right: separator.right
+      margin-right: 10
+
+    CharacterSkillBase
+      id: concoction
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 1
+      SkillNameLabel
+        !text: tr('Concoctions:')
+        color: #C0C0C0  
+    CharacterSkillBase
+      id: concoctionPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: separator.right
+
+      layout:
+        type: grid
+        cell-size: 32 32
+        flow: true
 
     CharacterSkillBase
       id: criticalHit
