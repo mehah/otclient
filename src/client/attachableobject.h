@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ class AttachableObject : public LuaObject
 {
 public:
     AttachableObject() = default;
-    virtual ~AttachableObject();
+    ~AttachableObject() override;
 
     virtual LuaObjectPtr attachedObjectToLuaObject() = 0;
     virtual bool isTile() { return false; }
@@ -45,9 +45,9 @@ public:
     bool detachEffect(const AttachedEffectPtr& obj);
     AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
-    virtual void onStartAttachEffect(const AttachedEffectPtr& /*effect*/) { };
-    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& /*effect*/) { };
-    virtual void onStartDetachEffect(const AttachedEffectPtr& /*effect*/) { };
+    virtual void onStartAttachEffect(const AttachedEffectPtr& /*effect*/) {};
+    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& /*effect*/) {};
+    virtual void onStartDetachEffect(const AttachedEffectPtr& /*effect*/) {};
 
     bool isOwnerHidden() { return m_ownerHidden > 0; }
 
@@ -67,7 +67,7 @@ public:
     void attachWidget(const UIWidgetPtr& widget);
     void clearAttachedWidgets(bool callEvent = true);
     bool detachWidgetById(const std::string& id);
-    bool detachWidget(const UIWidgetPtr widget);
+    bool detachWidget(UIWidgetPtr widget);
     UIWidgetPtr getAttachedWidgetById(const std::string& id);
 
 protected:
@@ -84,7 +84,7 @@ protected:
     void onDetachEffect(const AttachedEffectPtr& effect, bool callEvent = true);
     void drawAttachedParticlesEffect(const Point& dest);
 
-    inline auto getData() {
+    auto getData() {
         if (!m_data)
             m_data = std::make_shared<Data>();
         return m_data;

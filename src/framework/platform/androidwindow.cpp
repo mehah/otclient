@@ -248,24 +248,49 @@ void AndroidWindow::processTextInput() {
 
 void AndroidWindow::processFingerDownAndUp() {
     bool isTouchdown = m_currentEvent.type == TOUCH_DOWN;
-    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_LONGPRESS) ?
+
+    Fw::MouseButton mouseButton = (m_currentEvent.type == TOUCH_UP && !m_isDragging && stdext::millis() > m_lastPress + 500) ?
         Fw::MouseRightButton : Fw::MouseLeftButton;
 
     m_inputEvent.reset();
     m_inputEvent.type = (isTouchdown) ? Fw::MousePressInputEvent : Fw::MouseReleaseInputEvent;
     m_inputEvent.mouseButton = mouseButton;
-	if(isTouchdown) {
-		m_mouseButtonStates |= 1 << mouseButton;
-	} else {
-		g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
-	}
+
+    if (isTouchdown) {
+        m_lastPress = g_clock.millis();
+        m_mouseButtonStates |= 1 << mouseButton;
+    } else if (m_currentEvent.type == TOUCH_UP) {
+        if (!m_isDragging) {
+            if (stdext::millis() > m_lastPress + 500) {
+                mouseButton = Fw::MouseRightButton;
+                m_inputEvent.mouseButton = mouseButton;
+            }
+        }
+        m_isDragging = false;
+        g_dispatcher.addEvent([this, mouseButton] { m_mouseButtonStates &= ~(1 << mouseButton); });
+    }
 
     handleInputEvent();
 }
 
 void AndroidWindow::processFingerMotion() {
+    static Point lastMousePos(-1, -1);
+    static const int dragThreshold = 5;
+
     m_inputEvent.reset();
     m_inputEvent.type = Fw::MouseMoveInputEvent;
+
+    Point newMousePos(m_currentEvent.x / m_displayDensity, m_currentEvent.y / m_displayDensity);
+
+    if (lastMousePos.x != -1 && lastMousePos.y != -1) {
+        int dx = std::abs(newMousePos.x - lastMousePos.x);
+        int dy = std::abs(newMousePos.y - lastMousePos.y);
+
+        if (dx > dragThreshold || dy > dragThreshold) {
+            m_isDragging = true;
+        }
+    }
+    lastMousePos = newMousePos;
 
     handleInputEvent();
 }
@@ -381,8 +406,8 @@ void AndroidWindow::handleNativeEvents() {
     struct android_poll_source* source;
 
     // If not visible, block until we get an event; if visible, don't block.
-    while ((ALooper_pollAll(m_visible ? 0 : -1, NULL, &events, (void **) &source)) >= 0) {
-        if (source != NULL) {
+    while ((ALooper_pollOnce(m_visible ? 0 : -1, nullptr, &events, (void**)&source)) >= 0) {
+        if (source != nullptr) {
             source->process(m_app, source);
         }
 

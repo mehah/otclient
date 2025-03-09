@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,10 @@
 
 #pragma once
 
+#include "lightview.h"
 #include <framework/core/inputevent.h>
 #include <framework/graphics/declarations.h>
-#include <framework/graphics/paintershaderprogram.h>
 #include <framework/luaengine/luaobject.h>
-#include "lightview.h"
 
 struct AwareRange
 {
@@ -39,6 +38,9 @@ struct AwareRange
     uint8_t vertical() const { return top + bottom + 1; }
 
     Size dimension() const { return { left * 2 + 1 , top * 2 + 1 }; }
+
+    bool operator==(const AwareRange& other) const
+    { return left == other.left && top == other.top && right == other.right && bottom == other.bottom; }
 };
 
 struct MapPosInfo
@@ -50,12 +52,12 @@ struct MapPosInfo
     float verticalStretchFactor;
     float scaleFactor;
 
-    bool isInRange(const Position& pos, bool ignoreZ = false) const
+    bool isInRange(const Position& pos, const bool ignoreZ = false) const
     {
         return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
     }
 
-    bool isInRangeEx(const Position& pos, bool ignoreZ = false)  const
+    bool isInRangeEx(const Position& pos, const bool ignoreZ = false)  const
     {
         return camera.isInRange(pos, awareRange.left, awareRange.right, awareRange.top, awareRange.bottom, ignoreZ);
     }
@@ -68,7 +70,7 @@ private:
 };
 
 // @bindclass
-class MapView : public LuaObject
+class MapView final : public LuaObject
 {
 public:
     enum FloorViewMode
@@ -118,30 +120,30 @@ public:
     Position getCameraPosition();
     void setCameraPosition(const Position& pos);
 
-    void setMinimumAmbientLight(float intensity) { m_minimumAmbientLight = intensity; updateLight(); }
+    void setMinimumAmbientLight(const float intensity) { m_minimumAmbientLight = intensity; updateLight(); }
     float getMinimumAmbientLight() const { return m_minimumAmbientLight; }
 
-    void setShadowFloorIntensity(float intensity) { m_shadowFloorIntensity = intensity; updateLight(); }
+    void setShadowFloorIntensity(const float intensity) { m_shadowFloorIntensity = intensity; updateLight(); }
     float getShadowFloorIntensity() const { return m_shadowFloorIntensity; }
 
-    void setDrawNames(bool enable) { m_drawNames = enable; }
+    void setDrawNames(const bool enable) { m_drawNames = enable; }
     bool isDrawingNames() const { return m_drawNames; }
 
-    void setDrawHealthBars(bool enable) { m_drawHealthBars = enable; }
+    void setDrawHealthBars(const bool enable) { m_drawHealthBars = enable; }
     bool isDrawingHealthBars() const { return m_drawHealthBars; }
 
     void setDrawLights(bool enable);
     bool isDrawingLights() const { return m_drawingLight && m_lightView->isDark(); }
 
-    void setLimitVisibleDimension(bool v) { m_limitVisibleDimension = v; }
+    void setLimitVisibleDimension(const bool v) { m_limitVisibleDimension = v; }
     bool isLimitedVisibleDimension() const { return m_limitVisibleDimension; }
 
-    void setDrawManaBar(bool enable) { m_drawManaBar = enable; }
+    void setDrawManaBar(const bool enable) { m_drawManaBar = enable; }
     bool isDrawingManaBar() const { return m_drawManaBar; }
 
     void move(int32_t x, int32_t y);
 
-    void setShader(const std::string_view name, float fadein, float fadeout);
+    void setShader(std::string_view name, float fadein, float fadeout);
     PainterShaderProgramPtr getShader() { return m_shader; }
 
     Position getPosition(const Point& point, const Size& mapSize);
@@ -155,12 +157,12 @@ public:
     std::vector<CreaturePtr> getSpectators(bool multiFloor = false);
     std::vector<CreaturePtr> getSightSpectators(bool multiFloor = false);
 
-    bool isInRange(const Position& pos, bool ignoreZ = false)
+    bool isInRange(const Position& pos, const bool ignoreZ = false)
     {
         return getCameraPosition().isInRange(pos, m_posInfo.awareRange.left - 1, m_posInfo.awareRange.right - 2, m_posInfo.awareRange.top - 1, m_posInfo.awareRange.bottom - 2, ignoreZ);
     }
 
-    bool isInRangeEx(const Position& pos, bool ignoreZ = false)
+    bool isInRangeEx(const Position& pos, const bool ignoreZ = false)
     {
         return getCameraPosition().isInRange(pos, m_posInfo.awareRange.left, m_posInfo.awareRange.right, m_posInfo.awareRange.top, m_posInfo.awareRange.bottom, ignoreZ);
     }
@@ -178,7 +180,7 @@ public:
 
     void setDrawHighlightTarget(const bool enable) { m_drawHighlightTarget = enable; }
 
-    void setFloorFading(uint16_t value) { m_floorFading = value; }
+    void setFloorFading(const uint16_t value) { m_floorFading = value; }
 
     PainterShaderProgramPtr getNextShader() { return m_nextShader; }
     bool isSwitchingShader() { return !m_shaderSwitchDone; }
@@ -215,7 +217,7 @@ private:
     struct FloorData
     {
         MapObject cachedVisibleTiles;
-        stdext::timer fadingTimers;
+        Timer fadingTimers;
     };
 
     struct Crosshair
@@ -247,11 +249,11 @@ private:
 
     bool canFloorFade() const { return m_floorViewMode == FADE && m_floorFading; }
 
-    float getFadeLevel(uint8_t z) const
+    float getFadeLevel(const uint8_t z) const
     {
         if (!canFloorFade()) return 1.f;
 
-        float fading = std::clamp<float>(static_cast<float>(m_floors[z].fadingTimers.elapsed_millis()) / static_cast<float>(m_floorFading), 0.f, 1.f);
+        float fading = std::clamp<float>(static_cast<float>(m_floors[z].fadingTimers.ticksElapsed()) / static_cast<float>(m_floorFading), 0.f, 1.f);
         if (z < m_cachedFirstVisibleFloor)
             fading = 1.0 - fading;
         return fading;
@@ -319,12 +321,15 @@ private:
     bool m_forceDrawViewportEdge{ false };
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
+    bool m_multithreading{ false };
 
     FadeType m_fadeType{ FadeType::NONE$ };
 
-    AntialiasingMode m_antiAliasingMode{ AntialiasingMode::ANTIALIASING_DISABLED };
+    AntialiasingMode m_antiAliasingMode{ ANTIALIASING_DISABLED };
 
     std::vector<FloorData> m_floors;
+    std::vector<std::vector<FloorData>> m_floorThreads;
+
     std::vector<TilePtr> m_foregroundTiles;
 
     PainterShaderProgramPtr m_shader;
@@ -340,6 +345,6 @@ private:
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
 
-    DrawConductor m_shadowConductor{ false, DrawOrder::FIFTH };
+    DrawConductor m_shadowConductor{ .agroup = false, .order = FIFTH };
     DrawPool* m_pool;
 };

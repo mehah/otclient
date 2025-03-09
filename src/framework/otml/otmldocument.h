@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@
 
 #include "otmlnode.h"
 
-class OTMLDocument : public OTMLNode
+class OTMLDocument final : public OTMLNode
 {
 public:
     /// Create a new OTML document for filling it with nodes
@@ -36,13 +36,13 @@ public:
     /// Parse OTML from input stream
     /// @param in
     /// @param source is the file name that will be used to show errors messages
-    static OTMLDocumentPtr parse(std::istream& in, const std::string_view source);
+    static OTMLDocumentPtr parse(std::istream& in, std::string_view source);
 
     /// Emits this document and all it's children to a std::string
     std::string emit() override;
 
     /// Save this document to a file
-    bool save(const std::string_view fileName);
+    bool save(std::string_view fileName);
 
 private:
     OTMLDocument() = default;

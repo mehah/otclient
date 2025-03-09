@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,42 +31,41 @@
 class BitmapFont
 {
 public:
-    BitmapFont(std::string_view name) : m_name(name) {}
+    BitmapFont(const std::string_view name) : m_name(name) {}
 
     /// Load font from otml node
     void load(const OTMLNodePtr& fontNode);
 
     /// Simple text render starting at startPos
-    void drawText(const std::string_view text, const Point& startPos, const Color& color = Color::white);
+    void drawText(std::string_view text, const Point& startPos, const Color& color = Color::white);
 
     /// Advanced text render delimited by a screen region and alignment
-    void drawText(const std::string_view text, const Rect& screenCoords, const Color& color = Color::white, Fw::AlignmentFlag align = Fw::AlignTopLeft);
+    void drawText(std::string_view text, const Rect& screenCoords, const Color& color = Color::white, Fw::AlignmentFlag align = Fw::AlignTopLeft);
 
-    std::vector<std::pair<Rect, Rect>> getDrawTextCoords(const std::string_view text,
-                                                         const Size& textBoxSize,
-                                                         Fw::AlignmentFlag align,
-                                                         const Rect& screenCoords,
-                                                         const std::vector<Point>& glyphsPositions) const;
+    std::vector<std::pair<Rect, Rect>> getDrawTextCoords(std::string_view text,
+                                                                       const Size& textBoxSize,
+                                                                       Fw::AlignmentFlag align,
+                                                                       const Rect& screenCoords,
+                                                                       const std::vector<Point>& glyphsPositions) const;
 
-    void fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
+    void fillTextCoords(const CoordsBufferPtr& coords, std::string_view text,
                         const Size& textBoxSize, Fw::AlignmentFlag align,
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const;
 
-    void fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, const std::string_view text, 
-                        const std::vector<std::pair<int, Color>> textColors,
+    void fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, std::string_view text,
+                             std::vector<std::pair<int, Color>> textColors,
                         const Size& textBoxSize, Fw::AlignmentFlag align,
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const;
-
 
     /// Calculate glyphs positions to use on render, also calculates textBoxSize if wanted
-    const std::vector<Point>& calculateGlyphsPositions(const std::string_view text,
+    const std::vector<Point>& calculateGlyphsPositions(std::string_view text,
                                                        Fw::AlignmentFlag align,
                                                        Size* textBoxSize = nullptr) const;
 
     /// Simulate render and calculate text size
-    Size calculateTextRectSize(const std::string_view text);
+    Size calculateTextRectSize(std::string_view text);
 
-    std::string wrapText(const std::string_view text, int maxWidth, std::vector<std::pair<int, Color>>* colors = nullptr);
+    std::string wrapText(std::string_view text, int maxWidth, std::vector<std::pair<int, Color>>* colors = nullptr);
 
     const std::string& getName() { return m_name; }
     int getGlyphHeight() const { return m_glyphHeight; }

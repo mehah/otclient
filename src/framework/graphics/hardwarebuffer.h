@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ public:
 
     void bind() const { glBindBuffer(static_cast<GLenum>(m_type), m_id); }
     static void unbind(Type type) { glBindBuffer(static_cast<GLenum>(type), 0); }
-    void write(void const* data, int count, UsagePattern usage) const { glBufferData(static_cast<GLenum>(m_type), count, data, static_cast<GLenum>(usage)); }
+    void write(const void* data, const int count, UsagePattern usage) const { glBufferData(static_cast<GLenum>(m_type), count, data, static_cast<GLenum>(usage)); }
 
 private:
     Type m_type;

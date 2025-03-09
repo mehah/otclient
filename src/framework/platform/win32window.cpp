@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,12 +27,15 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
+#include "framework/core/graphicalapplication.h"
 
 #ifdef NDEBUG
 #include <timeapi.h>
 #endif
 
 #define HSB_BIT_SET(p, n) (p[(n)/8] |= (128 >>((n)%8)))
+
+constexpr auto WINDOW_NAME = "BASED_ON_TIBIA_GAME_ENGINE";
 
 WIN32Window::WIN32Window()
 {
@@ -243,8 +246,8 @@ void WIN32Window::terminate()
     }
 
     if (m_instance) {
-        if (!UnregisterClassA(g_app.getCompactName().data(), m_instance))
-            g_logger.error("UnregisterClassA failed");
+        if (!UnregisterClassA(WINDOW_NAME, m_instance))
+            g_logger.error("UnregisterClassA failed: " + std::to_string(GetLastError()));
         m_instance = nullptr;
     }
 
@@ -253,7 +256,7 @@ void WIN32Window::terminate()
 
 struct WindowProcProxy
 {
-    static LRESULT CALLBACK call(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+    static LRESULT CALLBACK call(const HWND hWnd, const uint32_t uMsg, const WPARAM wParam, const LPARAM lParam)
     {
         auto* const ww = static_cast<WIN32Window*>(&g_window);
         return ww->windowProc(hWnd, uMsg, wParam, lParam);
@@ -273,7 +276,7 @@ void WIN32Window::internalCreateWindow()
     wc.hCursor = m_defaultCursor;
     wc.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
     wc.lpszMenuName = nullptr;
-    wc.lpszClassName = g_app.getCompactName().data();
+    wc.lpszClassName = WINDOW_NAME;
 
     if (!RegisterClassA(&wc))
         g_logger.fatal("Failed to register the window class.");
@@ -287,7 +290,7 @@ void WIN32Window::internalCreateWindow()
 
     updateUnmaximizedCoords();
     m_window = CreateWindowExA(dwExStyle,
-                               g_app.getCompactName().data(),
+                               WINDOW_NAME,
                                nullptr,
                                dwStyle,
                                screenRect.left(),
@@ -426,7 +429,7 @@ bool WIN32Window::isExtensionSupported(const char* ext)
     //TODO
     return false;
 #else
-    const auto wglGetExtensionsString = (const char* (WINAPI*)())(getExtensionProcAddress("wglGetExtensionsStringEXT"));
+    const auto wglGetExtensionsString = static_cast<const char* (__stdcall*)()>(getExtensionProcAddress("wglGetExtensionsStringEXT"));
     if (!wglGetExtensionsString)
         return false;
 
@@ -513,7 +516,7 @@ void WIN32Window::poll()
     updateUnmaximizedCoords();
 }
 
-Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
+Fw::Key WIN32Window::retranslateVirtualKey(const WPARAM wParam, const LPARAM lParam)
 {
     // ignore numpad keys when numlock is on
     if ((wParam >= VK_NUMPAD0 && wParam <= VK_NUMPAD9) || wParam == VK_SEPARATOR)
@@ -565,7 +568,7 @@ Fw::Key WIN32Window::retranslateVirtualKey(WPARAM wParam, LPARAM lParam)
 
 #define IsKeyDown(a) (GetKeyState(a) & 0x80)
 
-LRESULT WIN32Window::windowProc(HWND hWnd, uint32_t uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WIN32Window::windowProc(const HWND hWnd, const uint32_t uMsg, const WPARAM wParam, const LPARAM lParam)
 {
     m_inputEvent.keyboardModifiers = 0;
     if (IsKeyDown(VK_CONTROL))
@@ -945,7 +948,7 @@ void WIN32Window::setVerticalSync(bool enable)
         if (!isExtensionSupported("WGL_EXT_swap_control"))
             return;
 
-        const auto wglSwapInterval = (BOOL(WINAPI*)(int))getExtensionProcAddress("wglSwapIntervalEXT");
+        const auto wglSwapInterval = static_cast<BOOL(__stdcall*)(int)>(getExtensionProcAddress("wglSwapIntervalEXT"));
         if (!wglSwapInterval)
             return;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ void UIQrCode::parseCustomStyle(const OTMLNodePtr& styleNode)
     }
 }
 
-void UIQrCode::setCode(const std::string& code, int border)
+void UIQrCode::setCode(const std::string& code, const int border)
 {
     if (code.empty()) {
         m_imageTexture = nullptr;
@@ -45,7 +45,7 @@ void UIQrCode::setCode(const std::string& code, int border)
     }
 
     m_qrCode = code;
-    m_imageTexture = TexturePtr(new Texture(Image::fromQRCode(code, border)));
+    m_imageTexture = std::make_shared<Texture>(Image::fromQRCode(code, border));
 
     if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
         const auto& imageSize = m_imageTexture->getSize();

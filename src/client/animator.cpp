@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+* Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ void Animator::unserializeAppearance(const appearances::SpriteAnimation& animati
     assert(m_startPhase >= -1 && m_startPhase < m_animationPhases);
 }
 
-void Animator::unserialize(int animationPhases, const FileStreamPtr& fin)
+void Animator::unserialize(const int animationPhases, const FileStreamPtr& fin)
 {
     m_animationPhases = animationPhases;
     m_async = fin->getU8() == 0;
@@ -77,7 +77,7 @@ void Animator::serialize(const FileStreamPtr& fin) const
     }
 }
 
-void Animator::setPhase(int phase)
+void Animator::setPhase(const int phase)
 {
     if (m_phase == phase)
         return;
@@ -133,7 +133,7 @@ int Animator::getPhase()
     return m_phase;
 }
 
-int Animator::getPhaseAt(Timer& timer, float durationFactor) const
+int Animator::getPhaseAt(Timer& timer, const float durationFactor) const
 {
     const ticks_t time = timer.ticksElapsed();
 
@@ -195,7 +195,7 @@ int Animator::getLoopPhase()
     return m_phase;
 }
 
-int Animator::getPhaseDuration(int phase) const
+int Animator::getPhaseDuration(const int phase) const
 {
     assert(phase < static_cast<int>(m_phaseDurations.size()));
 

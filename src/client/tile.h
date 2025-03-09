@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,11 @@
 #pragma once
 
 #include <framework/luaengine/luaobject.h>
+
+#include "attachableobject.h"
 #include "declarations.h"
-#include "effect.h"
 #include "item.h"
 #include "mapview.h"
-#include "attachableobject.h"
 #include "statictext.h"
 
 #ifdef FRAMEWORK_EDITOR
@@ -90,7 +90,7 @@ enum TileThingType : uint32_t
     CORRECT_CORPSE = 1 << 25
 };
 
-class Tile : public AttachableObject
+class Tile final : public AttachableObject
 {
 public:
     Tile(const Position& position);
@@ -111,7 +111,7 @@ public:
     bool removeThing(ThingPtr thing);
     ThingPtr getThing(int stackPos);
     EffectPtr getEffect(uint16_t id) const;
-    bool hasThing(const ThingPtr& thing) { return std::find(m_things.begin(), m_things.end(), thing) != m_things.end(); }
+    bool hasThing(const ThingPtr& thing) { return std::ranges::find(m_things, thing) != m_things.end(); }
     int getThingStackPos(const ThingPtr& thing);
     ThingPtr getTopThing();
 
@@ -135,11 +135,11 @@ public:
 
     bool isWalkable(bool ignoreCreatures = false);
     bool isClickable();
-    bool isPathable() { return (m_thingTypeFlag & TileThingType::NOT_PATHABLE) == 0; }
-    bool isFullGround() { return m_thingTypeFlag & TileThingType::FULL_GROUND; }
-    bool isFullyOpaque() { return m_thingTypeFlag & TileThingType::IS_OPAQUE; }
-    bool isSingleDimension() { return (m_thingTypeFlag & TileThingType::NOT_SINGLE_DIMENSION) == 0 && m_walkingCreatures.empty(); }
-    bool isLookPossible() { return (m_thingTypeFlag & TileThingType::BLOCK_PROJECTTILE) == 0; }
+    bool isPathable() { return (m_thingTypeFlag & NOT_PATHABLE) == 0; }
+    bool isFullGround() { return m_thingTypeFlag & FULL_GROUND; }
+    bool isFullyOpaque() { return m_thingTypeFlag & IS_OPAQUE; }
+    bool isSingleDimension() { return (m_thingTypeFlag & NOT_SINGLE_DIMENSION) == 0 && m_walkingCreatures.empty(); }
+    bool isLookPossible() { return (m_thingTypeFlag & BLOCK_PROJECTTILE) == 0; }
     bool isEmpty() { return m_things.empty(); }
     bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || hasEffect() || hasAttachedEffects(); }
     bool isCovered(int8_t firstFloor);
@@ -148,25 +148,26 @@ public:
     bool hasBlockingCreature() const;
 
     bool hasEffect() const { return m_effects && !m_effects->empty(); }
-    bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & TileThingType::HAS_GROUND_BORDER; };
-    bool hasTopGround(bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & TileThingType::HAS_TOP_GROUND_BORDER); }
+    bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; };
+    bool hasTopGround(const bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & HAS_TOP_GROUND_BORDER); }
 
-    bool hasCreature() { return m_thingTypeFlag & TileThingType::HAS_CREATURE; }
-    bool hasTopItem() const { return m_thingTypeFlag & TileThingType::HAS_TOP_ITEM; }
-    bool hasCommonItem() const { return m_thingTypeFlag & TileThingType::HAS_COMMON_ITEM; }
-    bool hasBottomItem() const { return m_thingTypeFlag & TileThingType::HAS_BOTTOM_ITEM; }
+    bool hasCreatures() { return m_thingTypeFlag & HAS_CREATURE; }
 
-    bool hasIgnoreLook() { return m_thingTypeFlag & TileThingType::IGNORE_LOOK; }
-    bool hasDisplacement() const { return m_thingTypeFlag & TileThingType::HAS_DISPLACEMENT; }
-    bool hasLight() const { return m_thingTypeFlag & TileThingType::HAS_LIGHT; }
-    bool hasTallThings() const { return m_thingTypeFlag & TileThingType::HAS_TALL_THINGS; }
-    bool hasWideThings() const { return m_thingTypeFlag & TileThingType::HAS_WIDE_THINGS; }
-    bool hasTallThings2() const { return m_thingTypeFlag & TileThingType::HAS_TALL_THINGS_2; }
-    bool hasWideThings2() const { return m_thingTypeFlag & TileThingType::HAS_WIDE_THINGS_2; }
-    bool hasWall() const { return m_thingTypeFlag & TileThingType::HAS_WALL; }
+    bool hasTopItem() const { return m_thingTypeFlag & HAS_TOP_ITEM; }
+    bool hasCommonItem() const { return m_thingTypeFlag & HAS_COMMON_ITEM; }
+    bool hasBottomItem() const { return m_thingTypeFlag & HAS_BOTTOM_ITEM; }
 
-    bool mustHookSouth() const { return m_thingTypeFlag & TileThingType::HAS_HOOK_SOUTH; }
-    bool mustHookEast() const { return m_thingTypeFlag & TileThingType::HAS_HOOK_EAST; }
+    bool hasIgnoreLook() { return m_thingTypeFlag & IGNORE_LOOK; }
+    bool hasDisplacement() const { return m_thingTypeFlag & HAS_DISPLACEMENT; }
+    bool hasLight() const { return m_thingTypeFlag & HAS_LIGHT; }
+    bool hasTallThings() const { return m_thingTypeFlag & HAS_TALL_THINGS; }
+    bool hasWideThings() const { return m_thingTypeFlag & HAS_WIDE_THINGS; }
+    bool hasTallThings2() const { return m_thingTypeFlag & HAS_TALL_THINGS_2; }
+    bool hasWideThings2() const { return m_thingTypeFlag & HAS_WIDE_THINGS_2; }
+    bool hasWall() const { return m_thingTypeFlag & HAS_WALL; }
+
+    bool mustHookSouth() const { return m_thingTypeFlag & HAS_HOOK_SOUTH; }
+    bool mustHookEast() const { return m_thingTypeFlag & HAS_HOOK_EAST; }
 
     bool limitsFloorsView(bool isFreeView = false);
 
@@ -181,7 +182,7 @@ public:
             ;
     }
 
-    bool hasElevation(int elevation = 1) const { return m_elevation >= elevation; }
+    bool hasElevation(const int elevation = 1) { return m_elevation >= elevation; }
 
 #ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }
@@ -203,9 +204,8 @@ public:
 
     TilePtr asTile() { return static_self_cast<Tile>(); }
 
-    bool checkForDetachableThing(const TileSelectType selectType = TileSelectType::FILTERED);
+    bool checkForDetachableThing(TileSelectType selectType = TileSelectType::FILTERED);
 
-#ifndef BOT_PROTECTION
     void drawTexts(Point dest);
     void setText(const std::string& text, Color color);
     std::string getText();
@@ -214,11 +214,11 @@ public:
     void setFill(Color color);
     void resetFill() { m_fill = Color::alpha; }
     bool canShoot(int distance);
-#endif
+
 private:
     void updateThingStackPos();
     void drawTop(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation);
-    void drawCreature(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation);
+    void drawCreature(const Point& dest, int flags, bool forceDraw, uint8_t drawElevation, const LightViewPtr& lightView = nullptr);
 
     void setThingFlag(const ThingPtr& thing);
 
@@ -229,7 +229,7 @@ private:
             setThingFlag(thing);
     }
 
-    bool hasThingWithElevation() const { return hasElevation() && m_thingTypeFlag & TileThingType::HAS_THING_WITH_ELEVATION; }
+    bool hasThingWithElevation() { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
     void markHighlightedThing(const Color& color) {
         if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < static_cast<int8_t>(m_things.size())) {
             m_things[m_highlightThingStackPos]->setMarked(color);
@@ -242,12 +242,10 @@ private:
     std::unique_ptr<std::vector<EffectPtr>> m_effects;
     std::unique_ptr<std::vector<TilePtr>> m_tilesRedraw;
 
-#ifndef BOT_PROTECTION
     std::unique_ptr<StaticText> m_timerText;
     std::unique_ptr<StaticText> m_text;
     Color m_fill = Color::alpha;
     ticks_t m_timer = 0;
-#endif
 
     uint32_t m_isCompletelyCovered{ 0 };
     uint32_t m_isCovered{ 0 };

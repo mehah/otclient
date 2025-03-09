@@ -1,0 +1,9 @@
+Module
+  name: game_walk
+  description: Control walk and turns
+  author: OTClient team
+  website: https://github.com/mehah/otclient
+  scripts: [ walk ]
+  dependencies: [ game_joystick, game_interface ]
+  @onLoad: WalkController:init()
+  @onUnload: WalkController:terminate()

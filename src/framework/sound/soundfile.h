@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,15 +22,15 @@
 
 #pragma once
 
-#include <framework/core/filestream.h>
 #include "declarations.h"
+#include <framework/core/filestream.h>
 
 class SoundFile : public std::enable_shared_from_this<SoundFile>
 {
 public:
-    virtual ~SoundFile() {} // fix clang warning
+    virtual ~SoundFile() = default; // fix clang warning
 
-    SoundFile(const FileStreamPtr& fileStream) : m_file(fileStream) {}
+    SoundFile(FileStreamPtr fileStream) : m_file(std::move(fileStream)) {}
     static SoundFilePtr loadSoundFile(const std::string& filename);
 
     virtual int read(void* /*buffer*/, int /*bufferSize*/) { return -1; }

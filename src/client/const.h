@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -166,11 +166,14 @@ namespace Otc
         FluidTransparent = 0,
         FluidBlue,
         FluidRed,
-        FluidBrown,
+        FluidOrange,
         FluidGreen,
         FluidYellow,
         FluidWhite,
-        FluidPurple
+        FluidPurple,
+        FluidBlack,
+        FluidBrown,
+        FluidPink
     };
 
     enum FluidsType : uint8_t
@@ -189,10 +192,13 @@ namespace Otc
         FluidHealth,
         FluidUrine,
         FluidRum,
-        FluidFruidJuice,
+        FluidFruitJuice,
         FluidCoconutMilk,
         FluidTea,
-        FluidMead
+        FluidMead,
+        FluidInk,
+        FluidCandy,
+        FluidChocolate
     };
 
     enum FightModes : uint8_t
@@ -550,6 +556,10 @@ namespace Otc
         GameForgeConvergence = 119,
         GameAllowCustomBotScripts = 120,
         GameColorizedLootValue = 121,
+        GameAllowPreWalk = 122,
+        GamePlayerFamiliars = 123,
+        GameLatencyAdaptiveCamera = 124,
+        GameMapCache = 125,
         LastGameFeature
     };
 
@@ -739,6 +749,27 @@ namespace Otc
         SUPPLY_STASH_ACTION_WITHDRAW = 3
     };
 
+    enum CyclopediaHouseState_t : uint8_t
+    {
+        CYCLOPEDIA_HOUSE_STATE_AVAILABLE = 0,
+        // 1 ?
+        CYCLOPEDIA_HOUSE_STATE_RENTED = 2,
+        CYCLOPEDIA_HOUSE_STATE_TRANSFER = 3,
+        CYCLOPEDIA_HOUSE_STATE_MOVEOUT = 4,
+    };
+
+    enum CyclopediaHouseAuctionType_t : uint8_t
+    {
+        CYCLOPEDIA_HOUSE_TYPE_NONE = 0,
+        CYCLOPEDIA_HOUSE_TYPE_BID = 1,
+        CYCLOPEDIA_HOUSE_TYPE_MOVEOUT = 2,
+        CYCLOPEDIA_HOUSE_TYPE_TRANSFER = 3,
+        CYCLOPEDIA_HOUSE_TYPE_CANCEL_MOVEOUT = 4,
+        CYCLOPEDIA_HOUSE_TYPE_CANCEL_TRANSFER = 5,
+        CYCLOPEDIA_HOUSE_TYPE_ACCEPT_TRANSFER = 6,
+        CYCLOPEDIA_HOUSE_TYPE_REFECT_TRANSFER = 7,
+    };
+
     enum CyclopediaCharacterInfoType_t : uint8_t
     {
         CYCLOPEDIA_CHARACTERINFO_BASEINFORMATION = 0,
@@ -761,8 +792,8 @@ namespace Otc
         INSPECT_NPCTRADE = 1,
         INSPECT_PLAYERTRADE = 2,
         INSPECT_CYCLOPEDIA = 3
-    }; 
-    
+    };
+
     enum GameStoreInfoType_t : uint8_t
     {
         SHOW_NONE = 0,
@@ -786,5 +817,15 @@ namespace Otc
         VIP_GROUP_ADD = 1,
         VIP_GROUP_EDIT = 2,
         VIP_GROUP_REMOVE = 3,
+    };
+
+    enum Store_Type_Actions_t : uint8_t
+    {
+        OPEN_HOME = 0,
+        OPEN_PREMIUM_BOOST = 1,
+        OPEN_CATEGORY = 2,
+        OPEN_USEFUL_THINGS = 3,
+        OPEN_OFFER = 4,
+        OPEN_SEARCH = 5,
     };
 }

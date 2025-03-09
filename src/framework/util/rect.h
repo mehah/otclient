@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ public:
     TRect() : x1(0), y1(0), x2(-1), y2(-1) {}
     TRect(T x, T y, T width, T height) : x1(x), y1(y), x2(x + width - 1), y2(y + height - 1) {}
     TRect(const TPoint<T>& topLeft, const TPoint<T>& bottomRight) : x1(topLeft.x), y1(topLeft.y), x2(bottomRight.x), y2(bottomRight.y) {}
-    TRect(const TRect<T>& other) : x1(other.x1), y1(other.y1), x2(other.x2), y2(other.y2) {}
+    TRect(const TRect& other) : x1(other.x1), y1(other.y1), x2(other.x2), y2(other.y2) {}
     TRect(T x, T y, const TSize<T>& size) : x1(x), y1(y), x2(x + size.width() - 1), y2(y + size.height() - 1) {}
     TRect(const TPoint<T>& topLeft, const TSize<T>& size) : x1(topLeft.x), y1(topLeft.y), x2(x1 + size.width() - 1), y2(y1 + size.height() - 1) {}
     TRect(const TPoint<T>& topLeft, int width, int height) : x1(topLeft.x), y1(topLeft.y), x2(x1 + width - 1), y2(y1 + height - 1) {}
@@ -111,13 +111,13 @@ public:
     void moveCenterLeft(const TPoint<T>& p) { moveLeft(p.x); moveVerticalCenter(p.y); }
     void moveCenterRight(const TPoint<T>& p) { moveRight(p.x); moveVerticalCenter(p.y); }
 
-    TRect<T> translated(int x, int y) const { return TRect<T>(TPoint<T>(x1 + x, y1 + y), TPoint<T>(x2 + x, y2 + y)); }
-    TRect<T> translated(const TPoint<T>& p) const { return TRect<T>(TPoint<T>(x1 + p.x, y1 + p.y), TPoint<T>(x2 + p.x, y2 + p.y)); }
+    TRect translated(int x, int y) const { return TRect(TPoint<T>(x1 + x, y1 + y), TPoint<T>(x2 + x, y2 + y)); }
+    TRect translated(const TPoint<T>& p) const { return TRect(TPoint<T>(x1 + p.x, y1 + p.y), TPoint<T>(x2 + p.x, y2 + p.y)); }
 
-    TRect<T> expanded(T add) const { return TRect<T>(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
+    TRect expanded(T add) const { return TRect(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
 
-    TRect<T> clamp(const TSize<T>& min, const TSize<T>& max) const {
-        return TRect<T>(x1, y1,
+    TRect clamp(const TSize<T>& min, const TSize<T>& max) const {
+        return TRect(x1, y1,
             std::min<int>(max.width(), std::max<int>(min.width(), width())),
             std::min<int>(max.height(), std::max<int>(min.height(), height())));
     }
@@ -152,7 +152,7 @@ public:
         y2 = y1 + h;
     }
 
-    bool contains(const TPoint<T>& p, bool insideOnly = false) const
+    bool contains(const TPoint<T>& p, const bool insideOnly = false) const
     {
         T l, r;
         if (x2 < x1 - 1) {
@@ -187,14 +187,14 @@ public:
         return true;
     }
 
-    bool contains(const TRect<T>& r, bool insideOnly = false) const
+    bool contains(const TRect& r, const bool insideOnly = false) const
     {
         if (contains(r.topLeft(), insideOnly) && contains(r.bottomRight(), insideOnly))
             return true;
         return false;
     }
 
-    bool intersects(const TRect<T>& r) const
+    bool intersects(const TRect& r) const
     {
         if (isNull() || r.isNull())
             return false;
@@ -236,9 +236,9 @@ public:
         return true;
     }
 
-    TRect<T> united(const TRect<T>& r) const
+    TRect united(const TRect& r) const
     {
-        TRect<T> tmp;
+        TRect tmp;
         tmp.x1 = std::min<T>(x1, r.x1);
         tmp.x2 = std::max<T>(x2, r.x2);
         tmp.y1 = std::min<T>(y1, r.y1);
@@ -246,7 +246,7 @@ public:
         return tmp;
     }
 
-    TRect<T> intersection(const TRect<T>& r) const
+    TRect intersection(const TRect& r) const
     {
         if (isNull())
             return r;
@@ -281,7 +281,7 @@ public:
         else
             b2 = r.y2;
 
-        TRect<T> tmp;
+        TRect tmp;
         tmp.x1 = std::max<int>(l1, l2);
         tmp.x2 = std::min<int>(r1, r2);
         tmp.y1 = std::max<int>(t1, t2);
@@ -289,7 +289,7 @@ public:
         return tmp;
     }
 
-    void bind(const TRect<T>& r)
+    void bind(const TRect& r)
     {
         if (isNull() || r.isNull())
             return;
@@ -304,7 +304,7 @@ public:
             moveTop(r.top());
     }
 
-    void alignIn(const TRect<T>& r, Fw::AlignmentFlag align)
+    void alignIn(const TRect& r, const Fw::AlignmentFlag align)
     {
         if (align == Fw::AlignTopLeft)
             moveTopLeft(r.topLeft());
@@ -326,12 +326,12 @@ public:
             moveCenterRight(r.centerRight());
     }
 
-    TRect<T>& operator=(const TRect<T>& other) { x1 = other.x1; y1 = other.y1; x2 = other.x2; y2 = other.y2; return *this; }
-    bool operator==(const TRect<T>& other) const { return (x1 == other.x1 && y1 == other.y1 && x2 == other.x2 && y2 == other.y2); }
-    bool operator!=(const TRect<T>& other) const { return (x1 != other.x1 || y1 != other.y1 || x2 != other.x2 || y2 != other.y2); }
+    TRect& operator=(const TRect& other) = default;
+    bool operator==(const TRect& other) const { return (x1 == other.x1 && y1 == other.y1 && x2 == other.x2 && y2 == other.y2); }
+    bool operator!=(const TRect& other) const { return (x1 != other.x1 || y1 != other.y1 || x2 != other.x2 || y2 != other.y2); }
 
-    TRect<T>& operator|=(const TRect<T>& other) { *this = united(other); return *this; }
-    TRect<T>& operator&=(const TRect<T>& other) { *this = intersection(other); return *this; }
+    TRect& operator|=(const TRect& other) { *this = united(other); return *this; }
+    TRect& operator&=(const TRect& other) { *this = intersection(other); return *this; }
 
 private:
     T x1, y1, x2, y2;

@@ -180,11 +180,13 @@ function toggleInformation()
     end
 end
 
-function controller:onGameStart()
+function controller:onInit()
     controller:registerEvents(Creature, creatureEvents)
     controller:registerEvents(LocalPlayer, { onManaChange = onManaChange })
+end
 
-    if devMode then
+if devMode then
+    function controller:onGameStart()
         local spectators = modules.game_interface.getMapPanel():getSpectators()
         for _, creature in ipairs(spectators) do
             onCreate(creature)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -89,3 +89,6 @@ int push_luavalue(const OutfitColorStruct& currentOutfit);
 int push_luavalue(const CharacterInfoOutfits& outfit);
 int push_luavalue(const CharacterInfoMounts& mount);
 int push_luavalue(const CharacterInfoFamiliar& familiar);
+
+// bestiary
+int push_luavalue(const RaceType& raceData);

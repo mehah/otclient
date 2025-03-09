@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 #include "container.h"
 #include "item.h"
 
-ItemPtr Container::getItem(int slot)
+ItemPtr Container::getItem(const int slot)
 {
     if (slot < 0 || slot >= static_cast<int>(m_items.size()))
         return nullptr;
@@ -52,20 +52,18 @@ void Container::onAddItem(const ItemPtr& item, int slot)
         return;
     }
 
-    if (slot == 0)
-        m_items.emplace_front(item);
-    else
-        m_items.emplace_back(item);
+    m_items.insert(m_items.begin() + slot, item);
+
     updateItemsPositions();
 
     callLuaField("onSizeChange", m_size);
     callLuaField("onAddItem", slot, item);
 }
 
-ItemPtr Container::findItemById(uint32_t itemId, int subType) const
+ItemPtr Container::findItemById(const uint32_t itemId, const int subType, const uint8_t tier) const
 {
     for (const auto& item : m_items)
-        if (item->getId() == itemId && (subType == -1 || item->getSubType() == subType))
+        if (item->getId() == itemId && (subType == -1 || item->getSubType() == subType) && item->getTier() == tier)
             return item;
     return nullptr;
 }
@@ -85,7 +83,7 @@ void Container::onUpdateItem(int slot, const ItemPtr& item)
         return;
     }
 
-    const auto& oldItem = m_items[slot];
+    const auto oldItem = m_items[slot];
     m_items[slot] = item;
     item->setPosition(getSlotPosition(slot));
 
@@ -106,7 +104,7 @@ void Container::onRemoveItem(int slot, const ItemPtr& lastItem)
         return;
     }
 
-    const auto& item = m_items[slot];
+    const auto item = m_items[slot];
     m_items.erase(m_items.begin() + slot);
 
     if (lastItem) {

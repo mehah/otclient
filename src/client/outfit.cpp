@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -118,35 +118,35 @@ void Outfit::resetClothes()
     setLegs(0);
     setFeet(0);
     setMount(0);
+    setFamiliar(0);
     setWing(0);
     setAura(0);
     setEffect(0);
     setShader("Outfit - Default");
-
 }
 
-void Outfit::setHead(uint8_t head) {
+void Outfit::setHead(const uint8_t head) {
     if (m_head == head)
         return;
 
     m_head = head;
     m_headColor = getColor(head);
 }
-void Outfit::setBody(uint8_t body) {
+void Outfit::setBody(const uint8_t body) {
     if (m_body == body)
         return;
 
     m_body = body;
     m_bodyColor = getColor(body);
 }
-void Outfit::setLegs(uint8_t legs) {
+void Outfit::setLegs(const uint8_t legs) {
     if (m_legs == legs)
         return;
 
     m_legs = legs;
     m_legsColor = getColor(legs);
 }
-void Outfit::setFeet(uint8_t feet) {
+void Outfit::setFeet(const uint8_t feet) {
     if (m_feet == feet)
         return;
 

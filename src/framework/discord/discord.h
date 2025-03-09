@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,22 +27,22 @@
 #include <string>
 
 #ifndef ANDROID
-    #if ENABLE_DISCORD_RPC == 1
-        #include <discord_register.h>
-        #include <discord_rpc.h>
-        
-        class Discord
-        {
-        public:
-            void init(std::function<bool()>& canUpdate, std::function<void(std::string&)>& onUpdate);
-        
-        private:
-            void update();
+#if ENABLE_DISCORD_RPC == 1
+#include <discord_register.h>
+#include <discord_rpc.h>
 
-            std::function<bool()> m_canUpdate;
-            std::function<void(std::string&)> m_onUpdate;
-        };
-        
-        extern Discord g_discord;
-    #endif
+class Discord
+{
+public:
+    void init(std::function<bool()>& canUpdate, std::function<void(std::string&)>& onUpdate);
+
+private:
+    void update();
+
+    std::function<bool()> m_canUpdate;
+    std::function<void(std::string&)> m_onUpdate;
+};
+
+extern Discord g_discord;
+#endif
 #endif

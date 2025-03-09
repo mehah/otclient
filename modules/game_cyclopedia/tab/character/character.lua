@@ -562,16 +562,16 @@ end
 
 function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsArray, forgeSkillsArray,
     perfectShotDamageRanges, combatsArray, concoctionsArray)
-    UI.CombatStats.attack.icon:setImageSource(Icons[data.weaponElement+1].icon)
-    UI.CombatStats.attack.icon:setImageClip(Icons[data.weaponElement+1].clip)
+    UI.CombatStats.attack.icon:setImageSource("/images/game/states/player-state-flags")
+    UI.CombatStats.attack.icon:setImageClip((data.weaponElement * 9) .. ' 0 9 9')
     UI.CombatStats.attack.value:setText(data.weaponMaxHitChance)
 
     if data.weaponElementDamage > 0 then
         UI.CombatStats.converted.none:setVisible(false)
         UI.CombatStats.converted.value:setVisible(true)
         UI.CombatStats.converted.icon:setVisible(true)
-        UI.CombatStats.converted.icon:setImageSource(Icons[data.weaponElementType+1].icon)
-        UI.CombatStats.converted.icon:setImageClip(Icons[data.weaponElementType+1].clip)
+        UI.CombatStats.converted.icon:setImageSource("/images/game/states/player-state-flags")
+        UI.CombatStats.converted.icon:setImageClip((data.weaponElementType * 9) .. ' 0 9 9')
         UI.CombatStats.converted.value:setText(data.weaponElementDamage .. "%")
     else
         UI.CombatStats.converted.none:setVisible(true)
@@ -592,7 +592,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
     end
     UI.CombatStats.reductionNone:destroyChildren()
 
-    if  (next(combatsArray) == nil) then
+    if (next(combatsArray) == nil) then
         UI.CombatStats.reductionNone:setVisible(true)
     else
         UI.CombatStats.reductionNone:setVisible(true)
@@ -628,6 +628,22 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
                 widget.name:setText(element.id)
             end
             widget:setMarginLeft(13)
+        end
+    end
+
+    -- concoctions
+    UI.CombatStats.concoctionPanel:destroyChildren()
+    if concoctionsArray or next(concoctionsArray) ~= nil then
+        for i = 1, #concoctionsArray do
+            local widget = g_ui.createWidget("CharacterGridItem", UI.CombatStats.concoctionPanel)
+            local itemId = concoctionsArray[i][1]
+            widget:setId("concoction_" .. itemId)
+            widget.item:setItemId(itemId)
+            widget.item:setVirtual(true)
+            local minutes = concoctionsArray[i][2] / 60
+            local itemName = widget.item:getItem():getMarketData().name
+            widget.item:setTooltip(string.format("%s: %.0f minutes", itemName, minutes))
+            widget.amount:setVisible(false)
         end
     end
 
@@ -846,9 +862,7 @@ function Cyclopedia.loadCharacterGeneralStats(data, skills)
     Cyclopedia.setCharacterSkillBase("magiclevel", data.magicLevel, data.baseMagicLevel)
 
     for i = Skill.Fist + 1, Skill.Fishing + 1 do
-        local skillLevel = skills[i][1]
-        local baseSkill = skills[i][2]
-        local skillPercent = skills[i][3]
+        local skillLevel, baseSkill, skillPercent = unpack(skills[i])
         Cyclopedia.onSkillChange(player, i - 1, skillLevel, skillPercent)
         Cyclopedia.onBaseCharacterSkillChange(player, i - 1, baseSkill)
     end

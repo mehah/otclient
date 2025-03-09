@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,14 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef __EMSCRIPTEN__
 
 #include "connection.h"
 
 #include <framework/core/application.h>
+#include "framework/core/graphicalapplication.h"
 
-#include <utility>
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
+#include <utility>
+
+#include <asio/io_service.hpp>
 
 asio::io_service g_ioService;
 std::list<std::shared_ptr<asio::streambuf>> Connection::m_outputStreams;
@@ -37,7 +41,8 @@ Connection::Connection() :
     m_delayedWriteTimer(g_ioService),
     m_resolver(g_ioService),
     m_socket(g_ioService)
-{}
+{
+}
 
 Connection::~Connection()
 {
@@ -87,7 +92,7 @@ void Connection::close()
     }
 }
 
-void Connection::connect(const std::string_view host, uint16_t port, const std::function<void()>& connectCallback)
+void Connection::connect(const std::string_view host, const uint16_t port, const std::function<void()>& connectCallback)
 {
     m_connected = false;
     m_connecting = true;
@@ -96,7 +101,7 @@ void Connection::connect(const std::string_view host, uint16_t port, const std::
 
     const asio::ip::tcp::resolver::query query(host.data(), stdext::unsafe_cast<std::string>(port));
     m_resolver.async_resolve(query, [this](auto&& error, auto&& endpointIterator) {
-       onResolve(std::move(error), std::move(endpointIterator));
+        onResolve(std::move(error), std::move(endpointIterator));
     });
 
     m_readTimer.cancel();
@@ -105,7 +110,6 @@ void Connection::connect(const std::string_view host, uint16_t port, const std::
         onTimeout(std::move(error));
     });
 }
-
 
 void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>::iterator& endpointIterator)
 {
@@ -120,7 +124,7 @@ void Connection::internal_connect(const asio::ip::basic_resolver<asio::ip::tcp>:
     });
 }
 
-void Connection::write(uint8_t* buffer, size_t size)
+void Connection::write(const uint8_t* buffer, const size_t size)
 {
     if (!m_connected)
         return;
@@ -166,7 +170,7 @@ void Connection::internal_write()
     });
 }
 
-void Connection::read(uint16_t bytes, const RecvCallback& callback)
+void Connection::read(const uint16_t bytes, const RecvCallback& callback)
 {
     if (!m_connected)
         return;
@@ -290,7 +294,7 @@ void Connection::onWrite(const std::error_code& error, size_t, const std::shared
         handleError(error);
 }
 
-void Connection::onRecv(const std::error_code& error, size_t recvSize)
+void Connection::onRecv(const std::error_code& error, const size_t recvSize)
 {
     m_readTimer.cancel();
     m_activityTimer.restart();
@@ -342,3 +346,5 @@ int Connection::getIp()
     g_logger.error("Getting remote ip");
     return 0;
 }
+
+#endif

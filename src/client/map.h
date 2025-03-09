@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -155,7 +155,7 @@ public:
 
     void addMapView(const MapViewPtr& mapView);
     void removeMapView(const MapViewPtr& mapView);
-    MapViewPtr getMapView(size_t i) { return i < m_mapViews.size() ? m_mapViews[i] : nullptr; }
+    MapViewPtr getMapView(const size_t i) { return i < m_mapViews.size() ? m_mapViews[i] : nullptr; }
 
     void notificateTileUpdate(const Position& pos, const ThingPtr& thing, Otc::Operation operation);
     void notificateCameraMove(const Point& offset) const;
@@ -197,8 +197,8 @@ public:
     void setShowAnimations(bool show);
 #endif
 
-    void setWidth(uint16_t w) { m_width = w; }
-    void setHeight(uint16_t h) { m_height = h; }
+    void setWidth(const uint16_t w) { m_width = w; }
+    void setHeight(const uint16_t h) { m_height = h; }
     Size getSize() { return { m_width, m_height }; }
 
     void clean();
@@ -245,17 +245,17 @@ public:
     void addCreature(const CreaturePtr& creature);
     void removeCreatureById(uint32_t id);
 
-    std::vector<CreaturePtr> getSpectators(const Position& centerPos, bool multiFloor)
+    std::vector<CreaturePtr> getSpectators(const Position& centerPos, const bool multiFloor)
     {
         return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left, m_awareRange.right, m_awareRange.top, m_awareRange.bottom);
     }
 
-    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, bool multiFloor)
+    std::vector<CreaturePtr> getSightSpectators(const Position& centerPos, const bool multiFloor)
     {
         return getSpectatorsInRangeEx(centerPos, multiFloor, m_awareRange.left - 1, m_awareRange.right - 2, m_awareRange.top - 1, m_awareRange.bottom - 2);
     }
 
-    std::vector<CreaturePtr> getSpectatorsInRange(const Position& centerPos, bool multiFloor, int32_t xRange, int32_t yRange)
+    std::vector<CreaturePtr> getSpectatorsInRange(const Position& centerPos, const bool multiFloor, const int32_t xRange, const int32_t yRange)
     {
         return getSpectatorsInRangeEx(centerPos, multiFloor, xRange, xRange, yRange, yRange);
     }
@@ -269,7 +269,8 @@ public:
     bool isLookPossible(const Position& pos);
     bool isCovered(const Position& pos, uint8_t firstFloor = 0);
     bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0);
-    bool isAwareOfPosition(const Position& pos) const;
+    bool isAwareOfPosition(const Position& pos) const { return isAwareOfPosition(pos, m_awareRange); }
+    bool isAwareOfPosition(const Position& pos, const AwareRange& awareRange) const;
 
     void resetLastCamera() const;
 
@@ -281,7 +282,7 @@ public:
     Position getCentralPosition() { return m_centralPosition; }
     uint8_t getFirstAwareFloor() const;
     uint8_t getLastAwareFloor() const;
-    const std::vector<MissilePtr>& getFloorMissiles(uint8_t z) { return m_floors[z].missiles; }
+    const std::vector<MissilePtr>& getFloorMissiles(const uint8_t z) { return m_floors[z].missiles; }
 
     std::vector<AnimatedTextPtr> getAnimatedTexts() { return m_animatedTexts; }
     std::vector<StaticTextPtr> getStaticTexts() { return m_staticTexts; }
@@ -292,13 +293,11 @@ public:
     void findPathAsync(const Position& start, const Position& goal,
                        const std::function<void(PathFindResult_ptr)>& callback);
 
-    void setFloatingEffect(bool enable) { m_floatingEffect = enable; }
+    void setFloatingEffect(const bool enable) { m_floatingEffect = enable; }
     bool isDrawingFloatingEffects() { return m_floatingEffect; }
 
-#ifndef BOT_PROTECTION
     std::map<std::string, std::tuple<int, int, int, std::string>> findEveryPath(const Position& start, int maxDistance, const std::map<std::string, std::string>& params);
     std::vector<CreaturePtr> getSpectatorsByPattern(const Position& centerPos, const std::string& pattern, Otc::Direction direction);
-#endif
 
     int getMinimapColor(const Position& pos);
     bool isSightClear(const Position& fromPos, const Position& toPos);

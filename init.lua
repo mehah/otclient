@@ -8,10 +8,11 @@ Services = {
     --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
 }
 
---[[ Servers_init = {
-    ["http://ip/login.php"] = {
+--[[
+Servers_init = {
+    ["http://127.0.0.1/login.php"] = {
         ["port"] = 80,
-        ["protocol"] = 1332,
+        ["protocol"] = 1320,
         ["httpLogin"] = true
     },
     ["ip.net"] = {
@@ -19,8 +20,8 @@ Services = {
         ["protocol"] = 860,
         ["httpLogin"] = false
     },
-
-} ]]
+}
+]]
 
 g_app.setName("OTClient - Redemption");
 g_app.setCompactName("otclient");
@@ -94,10 +95,6 @@ local function loadModules()
     -- mods 1000-9999
     g_modules.autoLoadModules(9999)
     g_modules.ensureModuleLoaded('client_mods')
-
-    if not g_game.isEnabledBotProtection() then
-        g_modules.ensureModuleLoaded('game_bot')
-    end
 
     local script = '/' .. g_app.getCompactName() .. 'rc.lua'
 

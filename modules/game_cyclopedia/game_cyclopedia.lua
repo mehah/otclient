@@ -33,7 +33,6 @@ controllerCyclopedia = Controller:new()
 controllerCyclopedia:setUI('game_cyclopedia')
 
 function controllerCyclopedia:onInit()
-
 end
 
 function controllerCyclopedia:onGameStart()
@@ -68,7 +67,7 @@ function controllerCyclopedia:onGameStart()
             -- bosstiary // bestiary
             onParseCyclopediaTracker = Cyclopedia.onParseCyclopediaTracker,
             -- bosstiary
-            onParseSendBosstiary = Cyclopedia.LoadBoostiaryCreatures,
+            onParseSendBosstiary = Cyclopedia.LoadBosstiaryCreatures,
             -- boss_slot
             onParseBosstiarySlots = Cyclopedia.loadBossSlots,
             -- character
@@ -134,7 +133,7 @@ function controllerCyclopedia:onGameStart()
 
         trackerButtonBosstiary:setOn(false)
         trackerMiniWindowBosstiary = g_ui.createWidget('BestiaryTracker', modules.game_interface.getRightPanel())
-        trackerMiniWindowBosstiary:setText("Boosteary Tracker")
+        trackerMiniWindowBosstiary:setText("Bosstiary Tracker")
 
         trackerMiniWindowBosstiary.menuButton.onClick = function(widget, mousePos, mouseButton)
             local menu = g_ui.createWidget('bestiaryTrackerMenu')
@@ -168,6 +167,19 @@ function controllerCyclopedia:onGameStart()
         trackerMiniWindow:setupOnStart()
         loadFilters()
         Cyclopedia.BossSlots.UnlockBosses = {}
+        Keybind.new("Windows", "Show/hide Bosstiary Tracker", "", "")
+
+        Keybind.bind("Windows", "Show/hide Bosstiary Tracker", {{
+            type = KEY_DOWN,
+            callback = Cyclopedia.toggleBosstiaryTracker
+        }})
+
+        Keybind.new("Windows", "Show/hide Bestiary Tracker", "", "")
+        Keybind.bind("Windows", "Show/hide Bestiary Tracker", {{
+            type = KEY_DOWN,
+            callback = Cyclopedia.toggleBestiaryTracker
+        }})
+
     end
 
 end
@@ -179,6 +191,8 @@ function controllerCyclopedia:onGameEnd()
     end
     hide()
     saveFilters()
+    Keybind.delete("Windows", "Show/hide Bosstiary Tracker")
+    Keybind.delete("Windows", "Show/hide Bestiary Tracker")
 end
 
 function controllerCyclopedia:onTerminate()
@@ -201,17 +215,6 @@ function controllerCyclopedia:onTerminate()
         trackerMiniWindowBosstiary:destroy()
         trackerMiniWindowBosstiary = nil
     end
-
-    if focusCategoryList then
-        disconnect(focusCategoryList, {
-            onChildFocusChange = function(self, focusedChild)
-                if focusedChild == nil then
-                    return
-                end
-                focusedChild:onClick()
-            end
-        })
-    end
 end
 
 function hide()
@@ -219,16 +222,6 @@ function hide()
         return
     end
     controllerCyclopedia.ui:hide()
-    if focusCategoryList then
-        disconnect(focusCategoryList, {
-            onChildFocusChange = function(self, focusedChild)
-                if focusedChild == nil then
-                    return
-                end
-                focusedChild:onClick()
-            end
-        })
-    end
 end
 
 function show()
@@ -249,7 +242,7 @@ function SelectWindow(type)
         bestiary = { obj = bestiary, func = showBestiary },
         charms = { obj = charms, func = showCharms },
         map = { obj = map, func = showMap },
-        houses = { obj = houses, func = showHouse }, 
+        houses = { obj = houses, func = showHouse },
         character = { obj = character, func = showCharacter },
         bosstiary = { obj = bosstiary, func = showBosstiary },
         bossSlot = { obj = bossSlot, func = showBossSlot }

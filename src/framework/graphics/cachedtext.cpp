@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,8 +21,8 @@
  */
 
 #include "cachedtext.h"
-#include <framework/graphics/drawpoolmanager.h>
 #include "fontmanager.h"
+#include <framework/graphics/drawpoolmanager.h>
 
 CachedText::CachedText() : m_align(Fw::AlignCenter), m_coordsBuffer(std::make_shared<CoordsBuffer>()) {}
 
@@ -48,7 +48,7 @@ void CachedText::update()
     m_textScreenCoords = {};
 }
 
-void CachedText::wrapText(int maxWidth)
+void CachedText::wrapText(const int maxWidth)
 {
     if (!m_font)
         return;

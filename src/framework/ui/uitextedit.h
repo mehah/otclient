@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 #include "uiwidget.h"
 
  // @bindclass
-class UITextEdit : public UIWidget
+class UITextEdit final : public UIWidget
 {
 public:
     UITextEdit();
@@ -38,34 +38,34 @@ private:
 public:
     void setCursorPos(int pos);
     void setSelection(int start, int end);
-    void setCursorVisible(bool enable) { setProp(PropCursorVisible, enable); }
-    void setChangeCursorImage(bool enable) { setProp(PropChangeCursorImage, enable); }
+    void setCursorVisible(const bool enable) { setProp(PropCursorVisible, enable); }
+    void setChangeCursorImage(const bool enable) { setProp(PropChangeCursorImage, enable); }
     void setTextHidden(bool hidden);
     void setValidCharacters(const std::string_view validCharacters) { m_validCharacters = validCharacters; }
-    void setShiftNavigation(bool enable) { setProp(PropShiftNavigation, enable); }
-    void setMultiline(bool enable) { setProp(PropMultiline, enable); }
-    void setMaxLength(uint32_t maxLength) { m_maxLength = maxLength; }
+    void setShiftNavigation(const bool enable) { setProp(PropShiftNavigation, enable); }
+    void setMultiline(const bool enable) { setProp(PropMultiline, enable); }
+    void setMaxLength(const uint32_t maxLength) { m_maxLength = maxLength; }
     void setTextVirtualOffset(const Point& offset);
-    void setEditable(bool editable) { setProp(PropEditable, editable); }
-    void setSelectable(bool selectable) { setProp(PropSelectable, selectable); }
+    void setEditable(const bool editable) { setProp(PropEditable, editable); }
+    void setSelectable(const bool selectable) { setProp(PropSelectable, selectable); }
     void setSelectionColor(const Color& color) { m_selectionColor = color; }
     void setSelectionBackgroundColor(const Color& color) { m_selectionBackgroundColor = color; }
-    void setAutoScroll(bool autoScroll) { setProp(PropAutoScroll, autoScroll); }
+    void setAutoScroll(const bool autoScroll) { setProp(PropAutoScroll, autoScroll); }
     void setPlaceholder(std::string placeholder) { m_placeholder = placeholder; }
     void setPlaceholderColor(const Color& color) { m_placeholderColor = color; }
-    void setPlaceholderAlign(Fw::AlignmentFlag align) { m_placeholderAlign = align; }
-    void setPlaceholderFont(const std::string_view fontName);
+    void setPlaceholderAlign(const Fw::AlignmentFlag align) { m_placeholderAlign = align; }
+    void setPlaceholderFont(std::string_view fontName);
 
     void moveCursorHorizontally(bool right);
     void moveCursorVertically(bool up);
-    void appendText(const std::string_view text);
+    void appendText(std::string_view text);
     void appendCharacter(char c);
     void removeCharacter(bool right);
     void blinkCursor();
 
     void deleteSelection();
     void del(bool right = false);
-    void paste(const std::string_view text);
+    void paste(std::string_view text);
     std::string copy();
     std::string cut();
     void selectAll() { setSelection(0, m_text.length()); }
@@ -98,10 +98,10 @@ protected:
     void updateText() override;
 
     void onHoverChange(bool hovered) override;
-    void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode) override;
+    void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
     void onGeometryChange(const Rect& oldRect, const Rect& newRect) override;
     void onFocusChange(bool focused, Fw::FocusReason reason) override;
-    bool onKeyText(const std::string_view keyText) override;
+    bool onKeyText(std::string_view keyText) override;
     bool onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks) override;
     bool onMousePress(const Point& mousePos, Fw::MouseButton button) override;
     bool onMouseRelease(const Point& mousePos, Fw::MouseButton button) override;
@@ -140,8 +140,8 @@ private:
     ticks_t m_cursorTicks;
 
     uint32_t m_props{ 0 };
-    void setProp(Props prop, bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
-    bool getProp(Props prop) const { return m_props & prop; };
+    void setProp(const Props prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
+    bool getProp(const Props prop) const { return m_props & prop; };
 
     int m_selectionReference{ 0 };
     int m_selectionStart{ 0 };

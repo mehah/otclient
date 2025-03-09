@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,12 +41,12 @@ void StreamSoundSource::setFile(std::string filename)
     filename = g_resources.guessFilePath(filename, "ogg");
     filename = g_resources.resolvePath(filename);
 
-    SoundFilePtr soundFile = SoundFile::loadSoundFile(filename);
+    const SoundFilePtr soundFile = SoundFile::loadSoundFile(filename);
 
     if (!soundFile) {
-		g_logger.error(stdext::format("unable to load sound file '%s'", filename));
-		return;
-	}
+        g_logger.error(stdext::format("unable to load sound file '%s'", filename));
+        return;
+    }
 
     setSoundFile(soundFile);
 }
@@ -139,7 +139,7 @@ void StreamSoundSource::update()
     }
 }
 
-bool StreamSoundSource::fillBufferAndQueue(uint32_t buffer)
+bool StreamSoundSource::fillBufferAndQueue(const uint32_t buffer)
 {
     if (m_waitingFile)
         return false;
@@ -154,7 +154,7 @@ bool StreamSoundSource::fillBufferAndQueue(uint32_t buffer)
 
     int bytesRead = 0;
     do {
-        bytesRead += m_soundFile->read(reinterpret_cast<void*>(bufferData.data() + bytesRead), maxRead - bytesRead);
+        bytesRead += m_soundFile->read(bufferData.data() + bytesRead, maxRead - bytesRead);
 
         // end of sound file
         if (bytesRead < maxRead) {
@@ -194,7 +194,7 @@ bool StreamSoundSource::fillBufferAndQueue(uint32_t buffer)
     return (bytesRead >= STREAM_FRAGMENT_SIZE && !m_eof);
 }
 
-void StreamSoundSource::downMix(DownMix downMix)
+void StreamSoundSource::downMix(const DownMix downMix)
 {
     m_downMix = downMix;
 }

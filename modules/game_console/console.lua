@@ -222,14 +222,8 @@ function init()
     g_keyboard.bindKeyPress('Shift+Down', function()
         navigateMessageHistory(-1)
     end, consolePanel)
-    g_keyboard.bindKeyPress('Tab', function()
-        consoleTabBar:selectNextTab()
-    end, consolePanel)
-    g_keyboard.bindKeyPress('Shift+Tab', function()
-        consoleTabBar:selectPrevTab()
-    end, consolePanel)
+  
     g_keyboard.bindKeyDown('Enter', switchChatOnCall, consolePanel)
-    g_keyboard.bindKeyDown('Enter', sendCurrentMessage, consolePanel)
     g_keyboard.bindKeyDown('Escape', disableChatOnCall, consolePanel)
     g_keyboard.bindKeyPress('Ctrl+A', function()
         consoleTextEdit:clearText()
@@ -241,9 +235,52 @@ function init()
     consoleTabBar.onTabChange = onTabChange
 
     -- tibia like hotkeys
-    g_keyboard.bindKeyDown('Ctrl+O', g_game.requestChannels)
-    g_keyboard.bindKeyDown('Ctrl+E', removeCurrentTab)
-    g_keyboard.bindKeyDown('Ctrl+H', openHelp)
+    local gameRootPanel = modules.game_interface.getRootPanel()
+    Keybind.new("Chat Channel", "Next Channel", "Tab", "")
+    Keybind.bind("Chat Channel", "Next Channel", {
+        {
+          type = KEY_PRESS,
+          callback = function() consoleTabBar:selectNextTab() end,
+        }
+      }, consolePanel)
+
+    Keybind.new("Chat Channel", "Previous Channel", "Shift+Tab", "")
+    Keybind.bind("Chat Channel", "Previous Channel", {
+        {
+          type = KEY_PRESS,
+          callback = function() consoleTabBar:selectPrevTab() end,
+        }
+    }, consolePanel)
+    Keybind.new("Chat", "Send current chat line", { [CHAT_MODE.ON] = "Enter", [CHAT_MODE.OFF] = "" }, "")
+    Keybind.bind("Chat", "Send current chat line", {
+        {
+          type = KEY_DOWN,
+          callback = sendCurrentMessage,
+        }
+      }, consolePanel)
+    Keybind.new("Chat Channel", "Open Channel List", "Ctrl+O", "")
+    Keybind.bind("Chat Channel", "Open Channel List", {
+        {
+          type = KEY_DOWN,
+          callback = g_game.requestChannels,
+        }
+      }, gameRootPanel)
+    Keybind.new("Chat Channel", "Close Current Channel", "Ctrl+E", "")
+
+    Keybind.bind("Chat Channel", "Close Current Channel", {
+      {
+        type = KEY_DOWN,
+        callback = removeCurrentTab,
+      }
+    }, gameRootPanel)
+
+    Keybind.new("Chat Channel", "Open Help Channel", "Ctrl+H", "")
+    Keybind.bind("Chat Channel", "Open Help Channel", {
+        {
+          type = KEY_DOWN,
+          callback = openHelp,
+        }
+      }, consolePanel)
 
     -- toggle WASD
     consoleToggleChat = consolePanel:getChildById('toggleChat')
@@ -294,39 +331,39 @@ function updateChatMode()
 end
 
 local function unbindMovingKeys()
-    local gameInterface = modules.game_interface
-    gameInterface.unbindWalkKey('W')
-    gameInterface.unbindWalkKey('D')
-    gameInterface.unbindWalkKey('S')
-    gameInterface.unbindWalkKey('A')
+    local gameWalk = modules.game_walk
+    gameWalk.unbindWalkKey('W')
+    gameWalk.unbindWalkKey('D')
+    gameWalk.unbindWalkKey('S')
+    gameWalk.unbindWalkKey('A')
 
-    gameInterface.unbindWalkKey('E')
-    gameInterface.unbindWalkKey('Q')
-    gameInterface.unbindWalkKey('C')
-    gameInterface.unbindWalkKey('Z')
+    gameWalk.unbindWalkKey('E')
+    gameWalk.unbindWalkKey('Q')
+    gameWalk.unbindWalkKey('C')
+    gameWalk.unbindWalkKey('Z')
 
-    gameInterface.unbindTurnKey('Ctrl+W')
-    gameInterface.unbindTurnKey('Ctrl+D')
-    gameInterface.unbindTurnKey('Ctrl+S')
-    gameInterface.unbindTurnKey('Ctrl+A')
+    gameWalk.unbindTurnKey('Ctrl+W')
+    gameWalk.unbindTurnKey('Ctrl+D')
+    gameWalk.unbindTurnKey('Ctrl+S')
+    gameWalk.unbindTurnKey('Ctrl+A')
 end
 
 local function bindMovingKeys()
-    local gameInterface = modules.game_interface
-    gameInterface.bindWalkKey('W', North)
-    gameInterface.bindWalkKey('D', East)
-    gameInterface.bindWalkKey('S', South)
-    gameInterface.bindWalkKey('A', West)
+    local gameWalk = modules.game_walk
+    gameWalk.bindWalkKey('W', North)
+    gameWalk.bindWalkKey('D', East)
+    gameWalk.bindWalkKey('S', South)
+    gameWalk.bindWalkKey('A', West)
 
-    gameInterface.bindWalkKey('E', NorthEast)
-    gameInterface.bindWalkKey('Q', NorthWest)
-    gameInterface.bindWalkKey('C', SouthEast)
-    gameInterface.bindWalkKey('Z', SouthWest)
+    gameWalk.bindWalkKey('E', NorthEast)
+    gameWalk.bindWalkKey('Q', NorthWest)
+    gameWalk.bindWalkKey('C', SouthEast)
+    gameWalk.bindWalkKey('Z', SouthWest)
 
-    gameInterface.bindTurnKey('Ctrl+W', North)
-    gameInterface.bindTurnKey('Ctrl+D', East)
-    gameInterface.bindTurnKey('Ctrl+S', South)
-    gameInterface.bindTurnKey('Ctrl+A', West)
+    gameWalk.bindTurnKey('Ctrl+W', North)
+    gameWalk.bindTurnKey('Ctrl+D', East)
+    gameWalk.bindTurnKey('Ctrl+S', South)
+    gameWalk.bindTurnKey('Ctrl+A', West)
 end
 
 function switchChat(enabled)
@@ -340,9 +377,11 @@ function switchChat(enabled)
     if enabled then
         unbindMovingKeys()
         consoleToggleChat:setTooltip(tr('Disable chat mode, allow to walk using WASD'))
+        Keybind.setChatMode(CHAT_MODE.ON)
     else
         bindMovingKeys()
         consoleToggleChat:setTooltip(tr('Enable chat mode'))
+        Keybind.setChatMode(CHAT_MODE.OFF)
     end
 end
 
@@ -401,10 +440,12 @@ function terminate()
         clear()
     end
 
-    g_keyboard.unbindKeyDown('Ctrl+O')
-    g_keyboard.unbindKeyDown('Ctrl+E')
-    g_keyboard.unbindKeyDown('Ctrl+H')
-
+    Keybind.delete("Chat Channel", "Close Current Channel")--
+    Keybind.delete("Chat Channel", "Next Channel")--
+    Keybind.delete("Chat Channel", "Previous Channel")--
+    Keybind.delete("Chat Channel", "Open Channel List")--
+    Keybind.delete("Chat Channel", "Open Help Channel")--
+    Keybind.delete("Chat", "Send current chat line")
     saveCommunicationSettings()
 
     if channelsWindow then
@@ -975,7 +1016,13 @@ function addTabText(text, speaktype, tab, creatureName)
     local consoleBuffer = panel:getChildById('consoleBuffer')
     local label = g_ui.createWidget('ConsoleLabel', consoleBuffer)
     label:setId('consoleLabel' .. consoleBuffer:getChildCount())
-    label:setText(text)
+
+    if speaktype.colored then
+        label:setColoredText(text)
+    else
+        label:setText(text)
+    end
+    
     label:setColor(speaktype.color)
     -- consoleTabBar:blinkTab(tab)
     if consoleTabBar:getCurrentTab() ~= tab then
@@ -1994,7 +2041,14 @@ function online()
         tab.npcChat = true
     end
     if g_game.getClientVersion() < 862 then
-        g_keyboard.bindKeyDown('Ctrl+R', openPlayerReportRuleViolationWindow)
+        Keybind.new("Dialogs", "Open Rule Violation", "Ctrl+R", "")
+        local gameRootPanel = modules.game_interface.getRootPanel()
+        Keybind.bind("Dialogs", "Open Rule Violation", {
+          {
+            type = KEY_DOWN,
+            callback = openPlayerReportRuleViolationWindow,
+          }
+        }, gameRootPanel)
     end
     -- open last channels
     local lastChannelsOpen = g_settings.getNode('lastChannelsOpen')
@@ -2019,7 +2073,7 @@ end
 
 function offline()
     if g_game.getClientVersion() < 862 then
-        g_keyboard.unbindKeyDown('Ctrl+R')
+        Keybind.delete("Dialogs", "Open Rule Violation")
     end
     clear()
 end

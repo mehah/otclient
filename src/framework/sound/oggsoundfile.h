@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,11 @@
 
 #include <vorbis/vorbisfile.h>
 
-class OggSoundFile : public SoundFile
+class OggSoundFile final : public SoundFile
 {
 public:
     OggSoundFile(const FileStreamPtr& fileStream) : SoundFile(fileStream) { memset(&m_vorbisFile, 0, sizeof(m_vorbisFile)); }
-    ~OggSoundFile() { ov_clear(&m_vorbisFile); }
+    ~OggSoundFile() override { ov_clear(&m_vorbisFile); }
 
     bool prepareOgg();
 

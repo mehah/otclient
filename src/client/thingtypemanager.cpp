@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,21 +30,18 @@
 #include "creatures.h"
 #endif
 
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/binarytree.h>
 #include <framework/core/filestream.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/otml/otml.h>
 
 #include <client/spriteappearances.h>
-#include <client/spritemanager.h>
 
 #include <appearances.pb.h>
+#include <staticdata.pb.h>
 
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
-using namespace otclient::protobuf;
 
 ThingTypeManager g_things;
 
@@ -100,16 +97,16 @@ bool ThingTypeManager::loadDat(std::string file)
                 const auto& type = std::make_shared<ThingType>();
                 type->unserialize(id, static_cast<ThingCategory>(category), fin);
                 m_thingTypes[category][id] = type;
+            }
         }
-    }
 
         m_datLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
-} catch (const stdext::exception& e) {
-    g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
-    return false;
-}
+    } catch (const stdext::exception& e) {
+        g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
+        return false;
+    }
 }
 
 bool ThingTypeManager::loadOtml(std::string file)
@@ -141,10 +138,10 @@ bool ThingTypeManager::loadOtml(std::string file)
             }
         }
         return true;
-} catch (const std::exception& e) {
-    g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
-    return false;
-}
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
+        return false;
+    }
 }
 
 bool ThingTypeManager::loadAppearances(const std::string& file)
@@ -214,7 +211,83 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
     }
 }
 
-const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
+namespace {
+    using RaceBank = google::protobuf::RepeatedPtrField<staticdata::Creature>;
+    
+    void loadCreatureBank(RaceList& otcRaceList, const RaceBank& protobufRaceList, bool boss) {
+        for (const auto& protobufRace : protobufRaceList) {
+            // add race to vector
+            RaceType otcRaceType = RaceType();
+            otcRaceType.raceId = protobufRace.raceid();
+            otcRaceType.name = protobufRace.name();
+            otcRaceType.boss = boss;
+
+            Outfit otcOutfit;
+            const auto& protobufOutfit = protobufRace.outfit();
+            if (protobufOutfit.lookitem() != 0) {
+                otcOutfit.setAuxId(static_cast<uint16_t>(protobufOutfit.lookitem()));
+            } else {
+                otcOutfit.setId(static_cast<uint16_t>(protobufOutfit.looktype()));
+                otcOutfit.setAddons(static_cast<uint8_t>(protobufOutfit.lookaddons()));
+                if (protobufOutfit.has_colors()) {
+                    const auto& pbColors = protobufOutfit.colors();
+                    otcOutfit.setHead(static_cast<uint8_t>(pbColors.head()));
+                    otcOutfit.setBody(static_cast<uint8_t>(pbColors.body()));
+                    otcOutfit.setLegs(static_cast<uint8_t>(pbColors.legs()));
+                    otcOutfit.setFeet(static_cast<uint8_t>(pbColors.feet()));
+                }
+            }
+
+            otcRaceType.outfit = otcOutfit;
+            otcRaceList.emplace_back(otcRaceType);
+        }
+    }
+}
+
+bool ThingTypeManager::loadStaticData(const std::string& file)
+{
+    try {
+        std::string staticDataFile;
+
+        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
+        for (const auto& obj : document) {
+            const auto& type = obj["type"];
+            if (type == "staticdata") {
+                staticDataFile = obj["file"];
+            }
+        }
+
+        // load staticdata.dat
+        std::stringstream datFileStream;
+        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, staticDataFile)), datFileStream);
+        auto staticDataLib = staticdata::Staticdata();
+        if (!staticDataLib.ParseFromIstream(&datFileStream)) {
+            throw stdext::exception("Couldn't parse staticdata lib.");
+        }
+
+        // if reload, start again
+        m_monsterRaces.clear();
+
+        const auto& raceBank = staticDataLib.monsters();
+        const auto& bossBank = staticDataLib.bosses();
+        m_monsterRaces.reserve(static_cast<size_t>(raceBank.size()) + bossBank.size());
+
+        // load monsters and bosses
+        // note: aside from compatibility with the QT client,
+        // there is no need to have monsters and bosses
+        // in separate data banks
+        loadCreatureBank(m_monsterRaces, raceBank, false);
+        loadCreatureBank(m_monsterRaces, bossBank, true);
+        return true;
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to load '%s' (StaticData): %s", file, e.what()));
+        return false;
+    }
+
+    return false;
+}
+
+const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category)
 {
     if (category < ThingLastCategory)
         return m_thingTypes[category];
@@ -222,7 +295,7 @@ const ThingTypeList& ThingTypeManager::getThingTypes(ThingCategory category)
     throw Exception("invalid thing type category %d", category);
 }
 
-const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory category)
+const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category)
 {
     if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
         g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
@@ -231,13 +304,35 @@ const ThingTypePtr& ThingTypeManager::getThingType(uint16_t id, ThingCategory ca
     return m_thingTypes[category][id];
 }
 
-ThingTypeList ThingTypeManager::findThingTypeByAttr(ThingAttr attr, ThingCategory category)
+ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const ThingCategory category)
 {
     ThingTypeList ret;
     for (const auto& type : m_thingTypes[category])
         if (type->hasAttr(attr))
             ret.emplace_back(type);
     return ret;
+}
+
+const RaceType& ThingTypeManager::getRaceData(uint32_t raceId)
+{
+    for (const auto& raceData : m_monsterRaces) {
+        if (raceData.raceId == raceId) {
+            return raceData;
+        }
+    }
+
+    return emptyRaceType;
+}
+
+RaceList ThingTypeManager::getRacesByName(const std::string& searchString)
+{
+    RaceList result;
+    for (const auto& race : m_monsterRaces) {
+        if (race.name.find(searchString) != std::string::npos) {
+            result.push_back(race);
+        }
+    }
+    return result;
 }
 
 #ifdef FRAMEWORK_EDITOR

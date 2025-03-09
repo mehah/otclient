@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 
-void UISprite::drawSelf(DrawPoolType drawPane)
+void UISprite::drawSelf(const DrawPoolType drawPane)
 {
     if (drawPane != DrawPoolType::FOREGROUND)
         return;
@@ -50,7 +50,7 @@ void UISprite::drawSelf(DrawPoolType drawPane)
     drawText(m_rect);
 }
 
-void UISprite::setSpriteId(int id)
+void UISprite::setSpriteId(const int id)
 {
     if (!g_sprites.isLoaded())
         return;

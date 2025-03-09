@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otmlnode.h>
 
-#include "framework/graphics/texture.h"
 #include "framework/graphics/drawpool.h"
+#include "framework/graphics/texture.h"
 
 template<typename T = int>
 struct EdgeGroup
@@ -132,10 +132,10 @@ public:
     void unlockChild(const UIWidgetPtr& child);
     void mergeStyle(const OTMLNodePtr& styleNode);
     void applyStyle(const OTMLNodePtr& styleNode);
-    void addAnchor(Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
+    void addAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
     void removeAnchor(Fw::AnchorEdge anchoredEdge);
-    void fill(const std::string_view hookedWidgetId);
-    void centerIn(const std::string_view hookedWidgetId);
+    void fill(std::string_view hookedWidgetId);
+    void centerIn(std::string_view hookedWidgetId);
     void breakAnchors();
     void updateParentLayout();
     void updateLayout();
@@ -156,11 +156,11 @@ public:
     void hideChildren();
     void showChildren();
 
-    void setId(const std::string_view id);
+    void setId(std::string_view id);
     void setParent(const UIWidgetPtr& parent);
     void setLayout(const UILayoutPtr& layout);
     bool setRect(const Rect& rect);
-    void setStyle(const std::string_view styleName);
+    void setStyle(std::string_view styleName);
     void setStyleFromNode(const OTMLNodePtr& styleNode);
     void setEnabled(bool enabled);
     void setVisible(bool visible);
@@ -170,13 +170,13 @@ public:
     void setPhantom(bool phantom);
     void setDraggable(bool draggable);
     void setFixedSize(bool fixed);
-    void setClipping(bool clipping) { setProp(PropClipping, clipping); }
+    void setClipping(const bool clipping) { setProp(PropClipping, clipping); }
     void setLastFocusReason(Fw::FocusReason reason);
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
-    void setAutoRepeatDelay(int delay) { m_autoRepeatDelay = delay; }
+    void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
 
-    void setOnHtml(bool v) { setProp(PropOnHTML, v); }
+    void setOnHtml(const bool v) { setProp(PropOnHTML, v); }
     bool isOnHtml() { return hasProp(PropOnHTML); }
 
     bool isAnchored();
@@ -200,36 +200,36 @@ public:
 
     UIWidgetPtr getChildAfter(const UIWidgetPtr& relativeChild);
     UIWidgetPtr getChildBefore(const UIWidgetPtr& relativeChild);
-    UIWidgetPtr getChildById(const std::string_view childId);
+    UIWidgetPtr getChildById(std::string_view childId);
     UIWidgetPtr getChildByPos(const Point& childPos);
     UIWidgetPtr getChildByIndex(int index);
     UIWidgetPtr getChildByState(Fw::WidgetState state);
-    UIWidgetPtr getChildByStyleName(const std::string_view styleName);
-    UIWidgetPtr recursiveGetChildById(const std::string_view id);
+    UIWidgetPtr getChildByStyleName(std::string_view styleName);
+    UIWidgetPtr recursiveGetChildById(std::string_view id);
     UIWidgetPtr recursiveGetChildByPos(const Point& childPos, bool wantsPhantom);
     UIWidgetPtr recursiveGetChildByState(Fw::WidgetState state, bool wantsPhantom);
     UIWidgetList recursiveGetChildren();
     UIWidgetList recursiveGetChildrenByPos(const Point& childPos);
     UIWidgetList recursiveGetChildrenByMarginPos(const Point& childPos);
     UIWidgetList recursiveGetChildrenByState(Fw::WidgetState state);
-    UIWidgetList recursiveGetChildrenByStyleName(const std::string_view styleName);
-    UIWidgetPtr backwardsGetWidgetById(const std::string_view id);
+    UIWidgetList recursiveGetChildrenByStyleName(std::string_view styleName);
+    UIWidgetPtr backwardsGetWidgetById(std::string_view id);
 
-    void setShader(const std::string_view name);
+    void setShader(std::string_view name);
     bool hasShader() { return m_shader != nullptr; }
 
     void setProp(FlagProp prop, bool v, bool callEvent = false);
-    bool hasProp(FlagProp prop) { return (m_flagsProp & prop); }
+    bool hasProp(const FlagProp prop) { return (m_flagsProp & prop); }
 
     void disableUpdateTemporarily();
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 
-    void setBackgroundDrawOrder(uint8_t order) { m_backgroundDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
-    void setImageDrawOrder(uint8_t order) { m_imageDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
-    void setIconDrawOrder(uint8_t order) { m_iconDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
-    void setTextDrawOrder(uint8_t order) { m_textDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
-    void setBorderDrawOrder(uint8_t order) { m_borderDrawConductor.order = std::min<uint8_t>(order, DrawOrder::LAST - 1); }
+    void setBackgroundDrawOrder(const uint8_t order) { m_backgroundDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
+    void setImageDrawOrder(const uint8_t order) { m_imageDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
+    void setIconDrawOrder(const uint8_t order) { m_iconDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
+    void setTextDrawOrder(const uint8_t order) { m_textDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
+    void setBorderDrawOrder(const uint8_t order) { m_borderDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
 
 private:
     uint32_t m_flagsProp{ 0 };
@@ -258,7 +258,7 @@ private:
 
     // event processing
 protected:
-    virtual void onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode);
+    virtual void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode);
     virtual void onGeometryChange(const Rect& oldRect, const Rect& newRect);
     virtual void onLayoutUpdate();
     virtual void onFocusChange(bool focused, Fw::FocusReason reason);
@@ -269,7 +269,7 @@ protected:
     virtual bool onDragLeave(UIWidgetPtr droppedWidget, const Point& mousePos);
     virtual bool onDragMove(const Point& mousePos, const Point& mouseMoved);
     virtual bool onDrop(UIWidgetPtr draggedWidget, const Point& mousePos);
-    virtual bool onKeyText(const std::string_view keyText);
+    virtual bool onKeyText(std::string_view keyText);
     virtual bool onKeyDown(uint8_t keyCode, int keyboardModifiers);
     virtual bool onKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks);
     virtual bool onKeyUp(uint8_t keyCode, int keyboardModifiers);
@@ -282,7 +282,7 @@ protected:
 
     friend class UILayout;
 
-    bool propagateOnKeyText(const std::string_view keyText);
+    bool propagateOnKeyText(std::string_view keyText);
     bool propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers);
     bool propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks);
     bool propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers);
@@ -291,9 +291,9 @@ protected:
 
     // function shortcuts
 public:
-    void resize(int width, int height) { setRect(Rect(getPosition(), Size(width, height))); }
+    void resize(const int width, const int height) { setRect(Rect(getPosition(), Size(width, height))); }
     void move(int x, int y);
-    void rotate(float degrees) { setRotation(degrees); }
+    void rotate(const float degrees) { setRotation(degrees); }
     void hide() { setVisible(false); }
     void show() { setVisible(true); }
     void disable() { setEnabled(false); }
@@ -303,7 +303,7 @@ public:
     bool isEnabled() { return !hasState(Fw::DisabledState); }
     bool isDisabled() { return hasState(Fw::DisabledState); }
     bool isFocused() { return hasState(Fw::FocusState); }
-    bool isHovered(bool orChild = false) { return hasState(Fw::HoverState) || (orChild && isChildHovered()); }
+    bool isHovered(const bool orChild = false) { return hasState(Fw::HoverState) || (orChild && isChildHovered()); }
     bool isChildHovered() { return getHoveredChild() != nullptr; }
     bool isPressed() { return hasState(Fw::PressedState); }
     bool isFirst() { return hasState(Fw::FirstState); }
@@ -374,9 +374,9 @@ protected:
     Rect m_iconClipRect;
     Fw::AlignmentFlag m_iconAlign{ Fw::AlignNone };
     EdgeGroup<Color> m_borderColor;
-    EdgeGroup<int> m_borderWidth;
-    EdgeGroup<int> m_margin;
-    EdgeGroup<int> m_padding;
+    EdgeGroup<> m_borderWidth;
+    EdgeGroup<> m_margin;
+    EdgeGroup<> m_padding;
     float m_opacity{ 1.f };
     float m_rotation{ 0.f };
     uint16_t m_autoRepeatDelay{ 500 };
@@ -385,64 +385,64 @@ protected:
     DrawConductor m_textDrawConductor;
 
 public:
-    void setX(int x) { move(x, getY()); }
-    void setY(int y) { move(getX(), y); }
-    void setWidth(int width) { resize(width, getHeight()); }
-    void setHeight(int height) { resize(getWidth(), height); }
+    void setX(const int x) { move(x, getY()); }
+    void setY(const int y) { move(getX(), y); }
+    void setWidth(const int width) { resize(width, getHeight()); }
+    void setHeight(const int height) { resize(getWidth(), height); }
     void setSize(const Size& size) { resize(size.width(), size.height()); }
-    void setMinWidth(int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
-    void setMaxWidth(int maxWidth) { m_maxSize.setWidth(maxWidth); setRect(m_rect); }
-    void setMinHeight(int minHeight) { m_minSize.setHeight(minHeight); setRect(m_rect); }
-    void setMaxHeight(int maxHeight) { m_maxSize.setHeight(maxHeight); setRect(m_rect); }
+    void setMinWidth(const int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
+    void setMaxWidth(const int maxWidth) { m_maxSize.setWidth(maxWidth); setRect(m_rect); }
+    void setMinHeight(const int minHeight) { m_minSize.setHeight(minHeight); setRect(m_rect); }
+    void setMaxHeight(const int maxHeight) { m_maxSize.setHeight(maxHeight); setRect(m_rect); }
     void setMinSize(const Size& minSize) { m_minSize = minSize; setRect(m_rect); }
     void setMaxSize(const Size& maxSize) { m_maxSize = maxSize; setRect(m_rect); }
     void setPosition(const Point& pos) { move(pos.x, pos.y); }
     void setColor(const Color& color) { m_color = color; repaint(); }
     void setBackgroundColor(const Color& color) { m_backgroundColor = color; repaint(); }
-    void setBackgroundOffsetX(int x) { m_backgroundRect.setX(x); repaint(); }
-    void setBackgroundOffsetY(int y) { m_backgroundRect.setX(y); repaint(); }
+    void setBackgroundOffsetX(const int x) { m_backgroundRect.setX(x); repaint(); }
+    void setBackgroundOffsetY(const int y) { m_backgroundRect.setX(y); repaint(); }
     void setBackgroundOffset(const Point& pos) { m_backgroundRect.move(pos); repaint(); }
-    void setBackgroundWidth(int width) { m_backgroundRect.setWidth(width); repaint(); }
-    void setBackgroundHeight(int height) { m_backgroundRect.setHeight(height); repaint(); }
+    void setBackgroundWidth(const int width) { m_backgroundRect.setWidth(width); repaint(); }
+    void setBackgroundHeight(const int height) { m_backgroundRect.setHeight(height); repaint(); }
     void setBackgroundSize(const Size& size) { m_backgroundRect.resize(size); repaint(); }
     void setBackgroundRect(const Rect& rect) { m_backgroundRect = rect; repaint(); }
     void setIcon(const std::string& iconFile);
     void setIconColor(const Color& color) { m_iconColor = color; repaint(); }
-    void setIconOffsetX(int x) { m_iconOffset.x = x; repaint(); }
-    void setIconOffsetY(int y) { m_iconOffset.y = y; repaint(); }
+    void setIconOffsetX(const int x) { m_iconOffset.x = x; repaint(); }
+    void setIconOffsetY(const int y) { m_iconOffset.y = y; repaint(); }
     void setIconOffset(const Point& pos) { m_iconOffset = pos; repaint(); }
-    void setIconWidth(int width) { m_iconRect.setWidth(width); repaint(); }
-    void setIconHeight(int height) { m_iconRect.setHeight(height); repaint(); }
+    void setIconWidth(const int width) { m_iconRect.setWidth(width); repaint(); }
+    void setIconHeight(const int height) { m_iconRect.setHeight(height); repaint(); }
     void setIconSize(const Size& size) { m_iconRect.resize(size); repaint(); }
     void setIconRect(const Rect& rect) { m_iconRect = rect; repaint(); }
     void setIconClip(const Rect& rect) { m_iconClipRect = rect; repaint(); }
-    void setIconAlign(Fw::AlignmentFlag align) { m_iconAlign = align; repaint(); }
-    void setBorderWidth(int width) { m_borderWidth.set(width); updateLayout(); }
-    void setBorderWidthTop(int width) { m_borderWidth.top = width; repaint(); }
-    void setBorderWidthRight(int width) { m_borderWidth.right = width; repaint(); }
-    void setBorderWidthBottom(int width) { m_borderWidth.bottom = width; repaint(); }
-    void setBorderWidthLeft(int width) { m_borderWidth.left = width; repaint(); }
+    void setIconAlign(const Fw::AlignmentFlag align) { m_iconAlign = align; repaint(); }
+    void setBorderWidth(const int width) { m_borderWidth.set(width); updateLayout(); }
+    void setBorderWidthTop(const int width) { m_borderWidth.top = width; repaint(); }
+    void setBorderWidthRight(const int width) { m_borderWidth.right = width; repaint(); }
+    void setBorderWidthBottom(const int width) { m_borderWidth.bottom = width; repaint(); }
+    void setBorderWidthLeft(const int width) { m_borderWidth.left = width; repaint(); }
     void setBorderColor(const Color& color) { m_borderColor.set(color); updateLayout(); }
     void setBorderColorTop(const Color& color) { m_borderColor.top = color; repaint(); }
     void setBorderColorRight(const Color& color) { m_borderColor.right = color; repaint(); }
     void setBorderColorBottom(const Color& color) { m_borderColor.bottom = color; repaint(); }
     void setBorderColorLeft(const Color& color) { m_borderColor.left = color; repaint(); }
-    void setMargin(int margin) { m_margin.set(margin); updateParentLayout(); }
-    void setMarginHorizontal(int margin) { m_margin.right = m_margin.left = margin; updateParentLayout(); }
-    void setMarginVertical(int margin) { m_margin.bottom = m_margin.top = margin; updateParentLayout(); }
-    void setMarginTop(int margin) { m_margin.top = margin; updateParentLayout(); }
-    void setMarginRight(int margin) { m_margin.right = margin; updateParentLayout(); }
-    void setMarginBottom(int margin) { m_margin.bottom = margin; updateParentLayout(); }
-    void setMarginLeft(int margin) { m_margin.left = margin; updateParentLayout(); }
-    void setPadding(int padding) { m_padding.top = m_padding.right = m_padding.bottom = m_padding.left = padding; updateLayout(); }
-    void setPaddingHorizontal(int padding) { m_padding.right = m_padding.left = padding; updateLayout(); }
-    void setPaddingVertical(int padding) { m_padding.bottom = m_padding.top = padding; updateLayout(); }
-    void setPaddingTop(int padding) { m_padding.top = padding; updateLayout(); }
-    void setPaddingRight(int padding) { m_padding.right = padding; updateLayout(); }
-    void setPaddingBottom(int padding) { m_padding.bottom = padding; updateLayout(); }
-    void setPaddingLeft(int padding) { m_padding.left = padding; updateLayout(); }
-    void setOpacity(float opacity) { m_opacity = std::clamp<float>(opacity, 0.0f, 1.0f); repaint(); }
-    void setRotation(float degrees) { m_rotation = degrees; repaint(); }
+    void setMargin(const int margin) { m_margin.set(margin); updateParentLayout(); }
+    void setMarginHorizontal(const int margin) { m_margin.right = m_margin.left = margin; updateParentLayout(); }
+    void setMarginVertical(const int margin) { m_margin.bottom = m_margin.top = margin; updateParentLayout(); }
+    void setMarginTop(const int margin) { m_margin.top = margin; updateParentLayout(); }
+    void setMarginRight(const int margin) { m_margin.right = margin; updateParentLayout(); }
+    void setMarginBottom(const int margin) { m_margin.bottom = margin; updateParentLayout(); }
+    void setMarginLeft(const int margin) { m_margin.left = margin; updateParentLayout(); }
+    void setPadding(const int padding) { m_padding.top = m_padding.right = m_padding.bottom = m_padding.left = padding; updateLayout(); }
+    void setPaddingHorizontal(const int padding) { m_padding.right = m_padding.left = padding; updateLayout(); }
+    void setPaddingVertical(const int padding) { m_padding.bottom = m_padding.top = padding; updateLayout(); }
+    void setPaddingTop(const int padding) { m_padding.top = padding; updateLayout(); }
+    void setPaddingRight(const int padding) { m_padding.right = padding; updateLayout(); }
+    void setPaddingBottom(const int padding) { m_padding.bottom = padding; updateLayout(); }
+    void setPaddingLeft(const int padding) { m_padding.left = padding; updateLayout(); }
+    void setOpacity(const float opacity) { m_opacity = std::clamp<float>(opacity, 0.0f, 1.0f); repaint(); }
+    void setRotation(const float degrees) { m_rotation = degrees; repaint(); }
 
     int getX() { return m_rect.x(); }
     int getY() { return m_rect.y(); }
@@ -493,7 +493,7 @@ public:
     int getPaddingRight() { return m_padding.right; }
     int getPaddingBottom() { return m_padding.bottom; }
     int getPaddingLeft() { return m_padding.left; }
-    Size getPaddingSize() { return Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom); }
+    Size getPaddingSize() { return { m_padding.left + m_padding.right, m_padding.top + m_padding.bottom }; }
     float getOpacity() { return m_opacity; }
     float getRotation() { return m_rotation; }
 
@@ -521,29 +521,29 @@ protected:
     Timer m_imageAnimatorTimer;
     uint32_t m_currentFrame{ 0 };
 
-    EdgeGroup<int> m_imageBorder;
+    EdgeGroup<> m_imageBorder;
 
 public:
-    void setImageSource(const std::string_view source, bool base64);
+    void setImageSource(std::string_view source, bool base64);
     void setImageClip(const Rect& clipRect) { m_imageClipRect = clipRect; updateImageCache(); }
-    void setImageOffsetX(int x) { m_imageRect.setX(x); updateImageCache(); }
-    void setImageOffsetY(int y) { m_imageRect.setY(y); updateImageCache(); }
+    void setImageOffsetX(const int x) { m_imageRect.setX(x); updateImageCache(); }
+    void setImageOffsetY(const int y) { m_imageRect.setY(y); updateImageCache(); }
     void setImageOffset(const Point& pos) { m_imageRect.move(pos); updateImageCache(); }
-    void setImageWidth(int width) { m_imageRect.setWidth(width); updateImageCache(); }
-    void setImageHeight(int height) { m_imageRect.setHeight(height); updateImageCache(); }
+    void setImageWidth(const int width) { m_imageRect.setWidth(width); updateImageCache(); }
+    void setImageHeight(const int height) { m_imageRect.setHeight(height); updateImageCache(); }
     void setImageSize(const Size& size) { m_imageRect.resize(size); updateImageCache(); }
     void setImageRect(const Rect& rect) { m_imageRect = rect; updateImageCache(); }
     void setImageColor(const Color& color) { m_imageColor = color; updateImageCache(); }
-    void setImageFixedRatio(bool fixedRatio) { setProp(PropImageFixedRatio, fixedRatio); updateImageCache(); }
-    void setImageRepeated(bool repeated) { setProp(PropImageRepeated, repeated); updateImageCache(); }
-    void setImageSmooth(bool smooth) { setProp(PropImageSmooth, smooth); }
-    void setImageAutoResize(bool autoResize) { setProp(PropImageAutoResize, autoResize); }
-    void setImageIndividualAnimation(bool v) { setProp(PropImageIndividualAnimation, v); }
-    void setImageBorderTop(int border) { m_imageBorder.top = border; configureBorderImage(); }
-    void setImageBorderRight(int border) { m_imageBorder.right = border; configureBorderImage(); }
-    void setImageBorderBottom(int border) { m_imageBorder.bottom = border; configureBorderImage(); }
-    void setImageBorderLeft(int border) { m_imageBorder.left = border; configureBorderImage(); }
-    void setImageBorder(int border) { m_imageBorder.set(border); configureBorderImage(); }
+    void setImageFixedRatio(const bool fixedRatio) { setProp(PropImageFixedRatio, fixedRatio); updateImageCache(); }
+    void setImageRepeated(const bool repeated) { setProp(PropImageRepeated, repeated); updateImageCache(); }
+    void setImageSmooth(const bool smooth) { setProp(PropImageSmooth, smooth); }
+    void setImageAutoResize(const bool autoResize) { setProp(PropImageAutoResize, autoResize); }
+    void setImageIndividualAnimation(const bool v) { setProp(PropImageIndividualAnimation, v); }
+    void setImageBorderTop(const int border) { m_imageBorder.top = border; configureBorderImage(); }
+    void setImageBorderRight(const int border) { m_imageBorder.right = border; configureBorderImage(); }
+    void setImageBorderBottom(const int border) { m_imageBorder.bottom = border; configureBorderImage(); }
+    void setImageBorderLeft(const int border) { m_imageBorder.left = border; configureBorderImage(); }
+    void setImageBorder(const int border) { m_imageBorder.set(border); configureBorderImage(); }
 
     std::string getImageSource() { return m_imageSource; }
     Rect getImageClip() { return m_imageClipRect; }
@@ -579,8 +579,8 @@ protected:
     virtual void updateText();
     void drawText(const Rect& screenCoords);
 
-    virtual void onTextChange(const std::string_view text, const std::string_view oldText);
-    virtual void onFontChange(const std::string_view font);
+    virtual void onTextChange(std::string_view text, std::string_view oldText);
+    virtual void onFontChange(std::string_view font);
 
     std::string m_text;
     std::string m_drawText;
@@ -600,17 +600,17 @@ public:
     void resizeToText();
     void clearText() { setText(""); }
 
-    void setText(const std::string_view text, bool dontFireLuaCall = false);
-    void setColoredText(const std::string_view coloredText, bool dontFireLuaCall = false);
-    void setTextAlign(Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
+    void setText(std::string_view text, bool dontFireLuaCall = false);
+    void setColoredText(std::string_view coloredText, bool dontFireLuaCall = false);
+    void setTextAlign(const Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
-    void setTextWrap(bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
-    void setTextAutoResize(bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
-    void setTextHorizontalAutoResize(bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
-    void setTextVerticalAutoResize(bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
-    void setTextOnlyUpperCase(bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
-    void setFont(const std::string_view fontName);
-    void setFontScale(float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }
+    void setTextWrap(const bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
+    void setTextAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    void setTextHorizontalAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
+    void setTextVerticalAutoResize(const bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
+    void setFont(std::string_view fontName);
+    void setFontScale(const float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }
 
     std::string getText() { return m_text; }
     std::string getDrawText() { return m_drawText; }

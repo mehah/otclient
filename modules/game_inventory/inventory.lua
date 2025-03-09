@@ -43,6 +43,21 @@ local function updateSlotsDuration()
     end
     -- @
 
+    if not modules.client_options.getOption('showExpiryInInvetory') then
+        stopEvent()
+        local ui = getInventoryUi()
+        for slot, itemDurationReg in pairs(itemSlotsWithDuration) do
+            local getSlotInfo = getSlotPanelBySlot[slot]
+            if getSlotInfo then
+                local slotPanel = getSlotInfo(ui)
+                if slotPanel and slotPanel.item then
+                    slotPanel.item.duration:setText("")
+                end
+            end
+        end
+        return
+    end
+
     local currTime = g_clock.seconds()
     local ui = getInventoryUi()
     local hasItemsWithDuration = false
@@ -56,7 +71,7 @@ local function updateSlotsDuration()
             if getSlotInfo then
                 local slotPanel = getSlotInfo(ui)
                 if slotPanel and slotPanel.item then
-                    slotPanel.item.Duration:setText(formatDuration(durationTimeLeft))
+                    slotPanel.item.duration:setText(formatDuration(durationTimeLeft))
                 end
             end
         end
@@ -110,19 +125,28 @@ local function inventoryEvent(player, slot, item, oldItem)
     toggler:setEnabled(not item)
     slotPanel.item:setWidth(34)
     slotPanel.item:setHeight(34)
+    slotPanel.item.duration:setText("")
+    slotPanel.item.charges:setText("")
     if g_game.getFeature(GameThingClock) then
         if item and item:getDurationTime() > 0 then
-            itemSlotsWithDuration[slot] = {
-                item = item,
-                timeEnd = g_clock.seconds() + item:getDurationTime()
-            }
-            updateSlotsDuration()
+            if not itemSlotsWithDuration[slot] or itemSlotsWithDuration[slot].item ~= item then
+                itemSlotsWithDuration[slot] = {
+                    item = item,
+                    timeEnd = g_clock.seconds() + item:getDurationTime()
+                }
+            end
+            if modules.client_options.getOption('showExpiryInInvetory') then
+                if not updateSlotsDurationEvent then
+                    updateSlotsDuration()
+                end
+            end
         else
             itemSlotsWithDuration[slot] = nil
-            if slotPanel and slotPanel.item then
-                slotPanel.item.Duration:setText("")
-            end
         end
+    end
+    
+    if modules.client_options.getOption('showExpiryInInvetory') then
+        ItemsDatabase.setCharges(slotPanel.item, item)
     end
     ItemsDatabase.setTier(slotPanel.item, item)
 end
@@ -254,6 +278,21 @@ function inventoryController:onInit()
 end
 
 function inventoryController:onGameStart()
+    local player = g_game.getLocalPlayer()
+    if player then
+        local char = g_game.getCharacterName()
+        local lastCombatControls = g_settings.getNode('LastCombatControls')
+        if not table.empty(lastCombatControls) then
+            if lastCombatControls[char] then
+                g_game.setFightMode(lastCombatControls[char].fightMode)
+                g_game.setChaseMode(lastCombatControls[char].chaseMode)
+                g_game.setSafeFight(lastCombatControls[char].safeFight)
+                if lastCombatControls[char].pvpMode then
+                    g_game.setPVPMode(lastCombatControls[char].pvpMode)
+                end
+            end
+        end
+    end
     inventoryController:registerEvents(LocalPlayer, {
         onInventoryChange = inventoryEvent,
         onSoulChange = onSoulChange,
@@ -300,6 +339,24 @@ end
 
 function inventoryController:onGameEnd()
     stopEvent()
+
+    local lastCombatControls = g_settings.getNode('LastCombatControls')
+    if not lastCombatControls then
+        lastCombatControls = {}
+    end
+    local player = g_game.getLocalPlayer()
+    if player then
+        local char = g_game.getCharacterName()
+        lastCombatControls[char] = {
+            fightMode = g_game.getFightMode(),
+            chaseMode = g_game.getChaseMode(),
+            safeFight = g_game.isSafeFight()
+        }
+        if g_game.getFeature(GamePVPMode) then
+            lastCombatControls[char].pvpMode = g_game.getPVPMode()
+        end
+        g_settings.setNode('LastCombatControls', lastCombatControls)
+    end
 end
 
 function onSetSafeFight(self, checked)
@@ -402,4 +459,21 @@ end
 
 function getSlot5()
     return inventoryController.ui.onPanel.shield
+end
+
+function reloadInventory()
+    if modules.client_options.getOption('showExpiryInInvetory') then
+        updateSlotsDuration()
+    end
+    
+    for slot, getSlotInfo in pairs(getSlotPanelBySlot) do
+        local ui = getInventoryUi()
+        local slotPanel, toggler = getSlotInfo(ui)
+        if slotPanel then
+            local player = g_game.getLocalPlayer()
+            if player then
+                inventoryEvent(player, slot, player:getInventoryItem(slot))
+            end
+        end
+    end
 end

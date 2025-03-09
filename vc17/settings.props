@@ -7,7 +7,6 @@
         _CRT_SECURE_NO_WARNINGS;
         _WIN32_WINNT=0x0600;
         NTDDI_VERSION=0x06000000;
-        BOT_PROTECTION;
         CRASH_HANDLER;
         FRAMEWORK_GRAPHICS;
         FRAMEWORK_NET;
@@ -17,6 +16,7 @@
 
     <OTCLIENT_LIBDEPS>
         advapi32.lib;
+        avrt.lib;
         crypt32.lib;
         dbghelp.lib;
         gdi32.lib;
@@ -44,11 +44,13 @@
 
     <OTCLIENT_LIBDEPS_D>
         advapi32.lib;
+        avrt.lib;
         discord-rpc.lib;
         dbghelp.lib;
         gdi32.lib;
         glew32d.lib;
         kernel32.lib;
+        ole32.lib;
         lua51.lib;
         ogg.lib;
         lzma.lib;
@@ -56,7 +58,7 @@
         libcrypto.lib;
         libprotobufd.lib;
         opengl32.lib;
-        physfs.lib;
+        physfs-static.lib;
         shell32.lib;
         user32.lib;
         vorbis.lib;

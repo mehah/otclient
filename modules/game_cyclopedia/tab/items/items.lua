@@ -219,28 +219,11 @@ function Cyclopedia.internalCreateItem(data)
     item:setId(data:getId())
     item.Sprite:setItemId(data:getId())
     item.Name:setText(marketData.name)
-    local function getColorForValue(value)
-        if value >= 1000000 then
-            return "yellow"
-        elseif value >= 100000 then
-            return "purple"
-        elseif value >= 10000 then
-            return "blue"
-        elseif value >= 1000 then
-            return "green"
-        elseif value >= 50 then
-            return "grey"
-        end
-        return "white"
-    end
     local price = data:getMeanPrice()
-    local rarity = getColorForValue(price)
+
     item.Value = price
     item.Vocation = marketData.restrictVocation
-
-    if price > 0 then
-        item.Rarity:setImageSource("/images/ui/rarity_" .. rarity)
-    end
+    ItemsDatabase.setRarityItem(item.Sprite, item.Sprite:getItem())
 
     function item.onClick(widget)
         UI.InfoBase.SellBase.List:destroyChildren()
@@ -267,24 +250,29 @@ function Cyclopedia.internalCreateItem(data)
         UI.SelectedItem.Sprite:setItemId(data:getId())
 
         if price > 0 then
-            UI.InfoBase.ResultGoldBase.Rarity:setImageSource("/images/ui/rarity_" .. rarity)
-            UI.SelectedItem.Rarity:setImageSource("/images/ui/rarity_" .. rarity)
+            ItemsDatabase.setRarityItem(UI.SelectedItem.Rarity, price)
+            ItemsDatabase.setRarityItem(UI.InfoBase.ResultGoldBase.Rarity, price)
         else
             UI.InfoBase.ResultGoldBase.Rarity:setImageSource("")
             UI.SelectedItem.Rarity:setImageSource("")
         end
         widget:setBackgroundColor("#585858")
        
-        UI.InfoBase.SkipQuickLootCheck.onCheckChange = function(self, checked)
-            UI.InfoBase.SkipQuickLootCheck:setChecked(modules.game_quickloot.QuickLoot.lootExists(data:getId(), 1))
+        if modules.game_quickloot.QuickLoot.data.filter == 2 then
+            UI.InfoBase.quickLootCheck:setText("Loot when Quick Looting")
+        else
+            UI.InfoBase.quickLootCheck:setText('Skip when Quick Looting')
+        end
+        UI.InfoBase.quickLootCheck.onCheckChange = function(self, checked)
             if checked then
-                modules.game_quickloot.QuickLoot.addLootList(data:getId(), 1)
+                modules.game_quickloot.QuickLoot.addLootList(data:getId(), modules.game_quickloot.QuickLoot.data.filter)
             else
-                modules.game_quickloot.QuickLoot.removeLootList(data:getId(), 1)
+                modules.game_quickloot.QuickLoot.removeLootList(data:getId(), modules.game_quickloot.QuickLoot.data.filter)
             end
         end
+        UI.InfoBase.quickLootCheck:setChecked(modules.game_quickloot.QuickLoot.lootExists(data:getId(), modules.game_quickloot.QuickLoot.data.filter))
 
-         local buy, sell = Cyclopedia.formatSaleData(internalData:getNpcSaleData())
+        local buy, sell = Cyclopedia.formatSaleData(internalData:getNpcSaleData())
         local sellColor = "#484848"
 
         for index, value in ipairs(sell) do

@@ -1,0 +1,437 @@
+syntax = "proto2";
+
+package otclient.protobuf.sounds;
+
+message Sounds {
+	repeated Sound sound = 1;
+	repeated NumericSoundEffect numeric_sound_effect = 2;
+	repeated AmbienceStream ambience_stream = 3;
+	repeated AmbienceObjectStream ambience_object_stream = 4;
+	repeated MusicTemplate music_template = 5;
+}
+
+message Sound {
+	optional uint32 id = 1;
+	optional string filename = 2;
+	optional string original_filename = 3;
+	optional bool is_stream = 4;
+}
+
+message NumericSoundEffect {
+	optional uint32 id = 1;
+	optional ENumericSoundType numeric_sound_type = 2;
+	optional MinMaxFloat random_pitch = 3;
+	optional MinMaxFloat random_volume = 4;
+	optional SimpleSoundEffect simple_sound_effect = 5;
+	optional RandomSoundEffect random_sound_effect = 6;
+}
+
+message AmbienceStream {
+	optional uint32 id = 1;
+	optional uint32 looping_sound_id = 2;
+	repeated DelayedSoundEffect delayed_effects = 3;
+}
+
+message AmbienceObjectStream {
+	optional uint32 id = 1;
+	repeated uint32 counted_appearance_types = 2;
+	repeated AppearanceTypesCountSoundEffect sound_effects = 3;
+	optional uint32 max_sound_distance = 4;
+}
+
+message MusicTemplate {
+	optional uint32 id = 1;
+	optional uint32 sound_id = 2;
+	optional EMusicType music_type = 3;
+}
+
+enum ENumericSoundType {
+	NUMERIC_SOUND_TYPE_UNKNOWN = 0;
+	NUMERIC_SOUND_TYPE_SPELL_ATTACK = 1;
+	NUMERIC_SOUND_TYPE_SPELL_HEALING = 2;
+	NUMERIC_SOUND_TYPE_SPELL_SUPPORT = 3;
+	NUMERIC_SOUND_TYPE_WEAPON_ATTACK = 4;
+	NUMERIC_SOUND_TYPE_CREATURE_NOISE = 5;
+	NUMERIC_SOUND_TYPE_CREATURE_DEATH = 6;
+	NUMERIC_SOUND_TYPE_CREATURE_ATTACK = 7;
+	NUMERIC_SOUND_TYPE_AMBIENCE_STREAM = 8;
+	NUMERIC_SOUND_TYPE_FOOD_AND_DRINK = 9;
+	NUMERIC_SOUND_TYPE_ITEM_MOVEMENT = 10;
+	NUMERIC_SOUND_TYPE_EVENT = 11;
+	NUMERIC_SOUND_TYPE_UI = 12;
+	NUMERIC_SOUND_TYPE_WHISPER_WITHOUT_OPEN_CHAT = 13;
+	NUMERIC_SOUND_TYPE_CHAT_MESSAGE = 14;
+	NUMERIC_SOUND_TYPE_PARTY = 15;
+	NUMERIC_SOUND_TYPE_VIP_LIST = 16;
+	NUMERIC_SOUND_TYPE_RAID_ANNOUNCEMENT = 17;
+	NUMERIC_SOUND_TYPE_SERVER_MESSAGE = 18;
+	NUMERIC_SOUND_TYPE_SPELL_GENERIC = 19;
+}
+
+enum EMusicType {
+	MUSIC_TYPE_UNKNOWN = 0;
+	MUSIC_TYPE_MUSIC = 1;
+	MUSIC_TYPE_MUSIC_IMMEDIATE = 2;
+	MUSIC_TYPE_MUSIC_TITLE = 3;
+}
+
+enum ESoundEffectType {
+	SOUND_EFFECT_TYPE_Silence = 0;
+	SOUND_EFFECT_TYPE_HumanCloseAttackFist = 1;
+	SOUND_EFFECT_TYPE_MonsterCloseAttackFist = 2;
+	SOUND_EFFECT_TYPE_CloseAttackSword = 3;
+	SOUND_EFFECT_TYPE_CloseAttackClub = 4;
+	SOUND_EFFECT_TYPE_CloseAttackAxe = 5;
+	SOUND_EFFECT_TYPE_DistAttackBow = 6;
+	SOUND_EFFECT_TYPE_DistAttackCrossbow = 7;
+	SOUND_EFFECT_TYPE_DistAttackThrow = 8;
+	SOUND_EFFECT_TYPE_MagicalRangeAttack = 9;
+	SOUND_EFFECT_TYPE_SpellOrRune = 10;
+	SOUND_EFFECT_TYPE_Other = 11;
+	SOUND_EFFECT_TYPE_PhysicalRangeMiss = 12;
+	SOUND_EFFECT_TYPE_DistAttackBowShot = 13;
+	SOUND_EFFECT_TYPE_DistAttackCrossBowShot = 14;
+	SOUND_EFFECT_TYPE_DistAttackThrowShot = 15;
+	SOUND_EFFECT_TYPE_DistAttackRodShot = 16;
+	SOUND_EFFECT_TYPE_DistAttackWandShot = 17;
+	SOUND_EFFECT_TYPE_BurstArrowEffect = 18;
+	SOUND_EFFECT_TYPE_DiamondArrowEffect = 19;
+	SOUND_EFFECT_TYPE_NoDamage = 20;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackFist = 100;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackClaw = 101;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackBite = 102;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackRip = 103;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackAcid = 104;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackMagic = 105;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackEthereal = 106;
+	SOUND_EFFECT_TYPE_MonsterMeleeAttackConstruct = 107;
+	SOUND_EFFECT_TYPE_SpellLightHealing = 1001;
+	SOUND_EFFECT_TYPE_SpellIntenseHealing = 1002;
+	SOUND_EFFECT_TYPE_SpellUltimateHealing = 1003;
+	SOUND_EFFECT_TYPE_SpellIntenseHealingRune = 1004;
+	SOUND_EFFECT_TYPE_SpellUltimateHealingRune = 1005;
+	SOUND_EFFECT_TYPE_SpellHaste = 1006;
+	SOUND_EFFECT_TYPE_SpellLightMagicMissileRune = 1007;
+	SOUND_EFFECT_TYPE_SpellHeavyMagicMissileRune = 1008;
+	SOUND_EFFECT_TYPE_SpellSummonCreature = 1009;
+	SOUND_EFFECT_TYPE_SpellLight = 1010;
+	SOUND_EFFECT_TYPE_SpellGreatLight = 1011;
+	SOUND_EFFECT_TYPE_SpellConvinceCreatureRune = 1012;
+	SOUND_EFFECT_TYPE_SpellEnergyWave = 1013;
+	SOUND_EFFECT_TYPE_SpellChameleonRune = 1014;
+	SOUND_EFFECT_TYPE_SpellFireballRune = 1015;
+	SOUND_EFFECT_TYPE_SpellGreatFireballRune = 1016;
+	SOUND_EFFECT_TYPE_SpellFireBombRune = 1017;
+	SOUND_EFFECT_TYPE_SpellExplosionRune = 1018;
+	SOUND_EFFECT_TYPE_SpellFireWave = 1019;
+	SOUND_EFFECT_TYPE_SpellFindPerson = 1020;
+	SOUND_EFFECT_TYPE_SpellSuddenDeathRune = 1021;
+	SOUND_EFFECT_TYPE_SpellEnergyBeam = 1022;
+	SOUND_EFFECT_TYPE_SpellGreatEnergyBeam = 1023;
+	SOUND_EFFECT_TYPE_SpellHellsCore = 1024;
+	SOUND_EFFECT_TYPE_SpellFireFieldRune = 1025;
+	SOUND_EFFECT_TYPE_SpellPoisonFieldRune = 1026;
+	SOUND_EFFECT_TYPE_SpellEnergyFieldRune = 1027;
+	SOUND_EFFECT_TYPE_SpellFireWallRune = 1028;
+	SOUND_EFFECT_TYPE_SpellCurePoison = 1029;
+	SOUND_EFFECT_TYPE_SpellDestroyFieldRune = 1030;
+	SOUND_EFFECT_TYPE_SpellCurePoisonRune = 1031;
+	SOUND_EFFECT_TYPE_SpellPoisonWallRune = 1032;
+	SOUND_EFFECT_TYPE_SpellEnergyWallRune = 1033;
+	SOUND_EFFECT_TYPE_SpellSalvation = 1036;
+	SOUND_EFFECT_TYPE_SpellCreatureIllusion = 1038;
+	SOUND_EFFECT_TYPE_SpellStrongHaste = 1039;
+	SOUND_EFFECT_TYPE_SpellFood = 1042;
+	SOUND_EFFECT_TYPE_SpellStrongIceWave = 1043;
+	SOUND_EFFECT_TYPE_SpellMagicShield = 1044;
+	SOUND_EFFECT_TYPE_SpellInvisible = 1045;
+	SOUND_EFFECT_TYPE_SpellConjureExplosiveArrow = 1049;
+	SOUND_EFFECT_TYPE_SpellSoulfireRune = 1050;
+	SOUND_EFFECT_TYPE_SpellConjureArrow = 1051;
+	SOUND_EFFECT_TYPE_SpellParalyseRune = 1054;
+	SOUND_EFFECT_TYPE_SpellEnergyBombRune = 1055;
+	SOUND_EFFECT_TYPE_SpellWrathOfNature = 1056;
+	SOUND_EFFECT_TYPE_SpellStrongEtherealSpear = 1057;
+	SOUND_EFFECT_TYPE_SpellFrontSweep = 1059;
+	SOUND_EFFECT_TYPE_SpellBrutalStrike = 1061;
+	SOUND_EFFECT_TYPE_SpellAnnihilation = 1062;
+	SOUND_EFFECT_TYPE_SpellInviteGuests = 1071;
+	SOUND_EFFECT_TYPE_SpellInviteSubowners = 1072;
+	SOUND_EFFECT_TYPE_SpellKickGuest = 1073;
+	SOUND_EFFECT_TYPE_SpellEditDoor = 1074;
+	SOUND_EFFECT_TYPE_SpellUltimateLight = 1075;
+	SOUND_EFFECT_TYPE_SpellMagicRope = 1076;
+	SOUND_EFFECT_TYPE_SpellStalagmiteRune = 1077;
+	SOUND_EFFECT_TYPE_SpellDisintegrateRune = 1078;
+	SOUND_EFFECT_TYPE_SpellBerserk = 1080;
+	SOUND_EFFECT_TYPE_SpellLevitate = 1081;
+	SOUND_EFFECT_TYPE_SpellMassHealing = 1082;
+	SOUND_EFFECT_TYPE_SpellAnimateDeadRune = 1083;
+	SOUND_EFFECT_TYPE_SpellHealFriend = 1084;
+	SOUND_EFFECT_TYPE_SpellUndeadLegion = 1085;
+	SOUND_EFFECT_TYPE_SpellMagicWallRune = 1086;
+	SOUND_EFFECT_TYPE_SpellDeathStrike = 1087;
+	SOUND_EFFECT_TYPE_SpellEnergyStrike = 1088;
+	SOUND_EFFECT_TYPE_SpellFlameStrike = 1089;
+	SOUND_EFFECT_TYPE_SpellCancelInvisibility = 1090;
+	SOUND_EFFECT_TYPE_SpellPoisonBombRune = 1091;
+	SOUND_EFFECT_TYPE_SpellConjureWandOfDarkness = 1092;
+	SOUND_EFFECT_TYPE_SpellChallenge = 1093;
+	SOUND_EFFECT_TYPE_SpellWildGrowthRune = 1094;
+	SOUND_EFFECT_TYPE_SpellFierceBerserk = 1105;
+	SOUND_EFFECT_TYPE_SpellGroundshaker = 1106;
+	SOUND_EFFECT_TYPE_SpellWhirlwindThrow = 1107;
+	SOUND_EFFECT_TYPE_SpellEnchantSpear = 1110;
+	SOUND_EFFECT_TYPE_SpellEtherealSpear = 1111;
+	SOUND_EFFECT_TYPE_SpellIceStrike = 1112;
+	SOUND_EFFECT_TYPE_SpellTerraStrike = 1113;
+	SOUND_EFFECT_TYPE_SpellIcicleRune = 1114;
+	SOUND_EFFECT_TYPE_SpellAvalancheRune = 1115;
+	SOUND_EFFECT_TYPE_SpellStoneShowerRune = 1116;
+	SOUND_EFFECT_TYPE_SpellThunderstormRune = 1117;
+	SOUND_EFFECT_TYPE_SpellEternalWinter = 1118;
+	SOUND_EFFECT_TYPE_SpellRageOfTheSkies = 1119;
+	SOUND_EFFECT_TYPE_SpellTerraWave = 1120;
+	SOUND_EFFECT_TYPE_SpellIceWave = 1121;
+	SOUND_EFFECT_TYPE_SpellDivineMissile = 1122;
+	SOUND_EFFECT_TYPE_SpellWoundCleansing = 1123;
+	SOUND_EFFECT_TYPE_SpellDivineCaldera = 1124;
+	SOUND_EFFECT_TYPE_SpellDivineHealing = 1125;
+	SOUND_EFFECT_TYPE_SpellTrainParty = 1126;
+	SOUND_EFFECT_TYPE_SpellProtectParty = 1127;
+	SOUND_EFFECT_TYPE_SpellHealParty = 1128;
+	SOUND_EFFECT_TYPE_SpellEnchantParty = 1129;
+	SOUND_EFFECT_TYPE_SpellHolyMissileRune = 1130;
+	SOUND_EFFECT_TYPE_SpellCharge = 1131;
+	SOUND_EFFECT_TYPE_SpellProtector = 1132;
+	SOUND_EFFECT_TYPE_SpellBloodRage = 1133;
+	SOUND_EFFECT_TYPE_SpellSwiftFoot = 1134;
+	SOUND_EFFECT_TYPE_SpellSharpshooter = 1135;
+	SOUND_EFFECT_TYPE_SpellIgnite = 1138;
+	SOUND_EFFECT_TYPE_SpellCurse = 1139;
+	SOUND_EFFECT_TYPE_SpellElectrify = 1140;
+	SOUND_EFFECT_TYPE_SpellInflictWound = 1141;
+	SOUND_EFFECT_TYPE_SpellEnvenom = 1142;
+	SOUND_EFFECT_TYPE_SpellHolyFlash = 1143;
+	SOUND_EFFECT_TYPE_SpellCureBleeding = 1144;
+	SOUND_EFFECT_TYPE_SpellCureBurning = 1145;
+	SOUND_EFFECT_TYPE_SpellCureElectrification = 1146;
+	SOUND_EFFECT_TYPE_SpellCureCurse = 1147;
+	SOUND_EFFECT_TYPE_SpellPhysicalStrike = 1148;
+	SOUND_EFFECT_TYPE_SpellLightning = 1149;
+	SOUND_EFFECT_TYPE_SpellStrongFlameStrike = 1150;
+	SOUND_EFFECT_TYPE_SpellStrongEnergyStrike = 1151;
+	SOUND_EFFECT_TYPE_SpellStrongIceStrike = 1152;
+	SOUND_EFFECT_TYPE_SpellStrongTerraStrike = 1153;
+	SOUND_EFFECT_TYPE_SpellUltimateFlameStrike = 1154;
+	SOUND_EFFECT_TYPE_SpellUltimateEnergyStrike = 1155;
+	SOUND_EFFECT_TYPE_SpellUltimateIceStrike = 1156;
+	SOUND_EFFECT_TYPE_SpellUltimateTerraStrike = 1157;
+	SOUND_EFFECT_TYPE_SpellIntenseWoundCleansing = 1158;
+	SOUND_EFFECT_TYPE_SpellRecovery = 1159;
+	SOUND_EFFECT_TYPE_SpellIntenseRecovery = 1160;
+	SOUND_EFFECT_TYPE_SpellPractiseHealing = 1166;
+	SOUND_EFFECT_TYPE_SpellPractiseFireWave = 1167;
+	SOUND_EFFECT_TYPE_SpellPractiseMagicMissileRune = 1168;
+	SOUND_EFFECT_TYPE_SpellApprenticesStrike = 1169;
+	SOUND_EFFECT_TYPE_SpellMudAttack = 1172;
+	SOUND_EFFECT_TYPE_SpellChillOut = 1173;
+	SOUND_EFFECT_TYPE_SpellMagicPatch = 1174;
+	SOUND_EFFECT_TYPE_SpellBruiseBane = 1175;
+	SOUND_EFFECT_TYPE_SpellArrowCall = 1176;
+	SOUND_EFFECT_TYPE_SpellBuzz = 1177;
+	SOUND_EFFECT_TYPE_SpellScorch = 1178;
+	SOUND_EFFECT_TYPE_SpellLightestMissileRune = 1179;
+	SOUND_EFFECT_TYPE_SpellLightStoneShowerRune = 1180;
+	SOUND_EFFECT_TYPE_SpellSummonKnightFamiliar = 1194;
+	SOUND_EFFECT_TYPE_SpellSummonPaladinFamiliar = 1195;
+	SOUND_EFFECT_TYPE_SpellSummonSorcererFamiliar = 1196;
+	SOUND_EFFECT_TYPE_SpellSummonDruidFamiliar = 1197;
+	SOUND_EFFECT_TYPE_SpellChivalrousChallenge = 1237;
+	SOUND_EFFECT_TYPE_SpellDivineDazzle = 1238;
+	SOUND_EFFECT_TYPE_SpellFairWoundCleansing = 1239;
+	SOUND_EFFECT_TYPE_SpellGreatFireWave = 1240;
+	SOUND_EFFECT_TYPE_SpellRestoration = 1241;
+	SOUND_EFFECT_TYPE_SpellNaturesEmbrace = 1242;
+	SOUND_EFFECT_TYPE_SpellExposeWeakness = 1243;
+	SOUND_EFFECT_TYPE_SpellSapStrength = 1244;
+	SOUND_EFFECT_TYPE_SpellCancelMagicShield = 1245;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetFire = 2002;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetEnergy = 2003;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetEarth = 2004;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetIce = 2005;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetDeath = 2006;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetHoly = 2007;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetHit = 2008;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetLifeDrain = 2009;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetManaDrain = 2010;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetDrowning = 2011;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetBleeding = 2012;
+	SOUND_EFFECT_TYPE_MonsterSpellSingleTargetHealing = 2013;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaFire = 2015;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaEnergy = 2016;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaEarth = 2017;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaIce = 2018;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaDeath = 2019;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaHoly = 2020;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaHit = 2021;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaLifeDrain = 2022;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaManaDrain = 2023;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaDrowning = 2024;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaBleeding = 2025;
+	SOUND_EFFECT_TYPE_MonsterSpellSmallAreaHealing = 2026;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaFire = 2028;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaEnergy = 2029;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaEarth = 2030;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaIce = 2031;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaDeath = 2032;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaHoly = 2033;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaHit = 2034;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaLifeDrain = 2035;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaManaDrain = 2036;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaDrowning = 2037;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaBleeding = 2038;
+	SOUND_EFFECT_TYPE_MonsterSpellLargeAreaHealing = 2039;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveFire = 2041;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveEnergy = 2042;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveEarth = 2043;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveIce = 2044;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveDeath = 2045;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveHoly = 2046;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveHit = 2047;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveLifeDrain = 2048;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveManaDrain = 2049;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveDrowning = 2050;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveBleeding = 2051;
+	SOUND_EFFECT_TYPE_MonsterSpellWaveHealing = 2052;
+	SOUND_EFFECT_TYPE_MonsterSpellDeleteField = 2054;
+	SOUND_EFFECT_TYPE_MonsterSpellChallenge = 2055;
+	SOUND_EFFECT_TYPE_MonsterSpellSpeed = 2056;
+	SOUND_EFFECT_TYPE_MonsterSpellDrunken = 2057;
+	SOUND_EFFECT_TYPE_MonsterSpellStrength = 2058;
+	SOUND_EFFECT_TYPE_MonsterSpellOutfit = 2059;
+	SOUND_EFFECT_TYPE_MonsterSpellSummon = 2060;
+	SOUND_EFFECT_TYPE_MonsterSpellMagicLevel = 2061;
+	SOUND_EFFECT_TYPE_MonsterSpellTeleport = 2062;
+	SOUND_EFFECT_TYPE_MonsterSpellHex = 2063;
+	SOUND_EFFECT_TYPE_MonsterSpellSuperDrunken = 2064;
+	SOUND_EFFECT_TYPE_MonsterSpellRoot = 2065;
+	SOUND_EFFECT_TYPE_MonsterSpellFear = 2066;
+	SOUND_EFFECT_TYPE_MonsterSpellHighRiskTeleport = 2067;
+	SOUND_EFFECT_TYPE_MonsterSpellMinion = 2068;
+	SOUND_EFFECT_TYPE_MonsterSpellAgony = 2069;
+	SOUND_EFFECT_TYPE_AmphibicBark = 2500;
+	SOUND_EFFECT_TYPE_AquaticBeastBark = 2501;
+	SOUND_EFFECT_TYPE_AquaticCritterBark = 2502;
+	SOUND_EFFECT_TYPE_AquaticDeeplingBark = 2503;
+	SOUND_EFFECT_TYPE_AquaticQuaraBark = 2504;
+	SOUND_EFFECT_TYPE_BirdBark = 2505;
+	SOUND_EFFECT_TYPE_ConstructBark = 2506;
+	SOUND_EFFECT_TYPE_DemonBark = 2507;
+	SOUND_EFFECT_TYPE_DragonBark = 2508;
+	SOUND_EFFECT_TYPE_ElementalEarthBark = 2509;
+	SOUND_EFFECT_TYPE_ElementalEnergyBark = 2510;
+	SOUND_EFFECT_TYPE_ElementalFireBark = 2511;
+	SOUND_EFFECT_TYPE_ElementalWaterBark = 2512;
+	SOUND_EFFECT_TYPE_ExtraDimensionalBeastBark = 2513;
+	SOUND_EFFECT_TYPE_ExtraDimensionalEnergyBark = 2514;
+	SOUND_EFFECT_TYPE_ExtraDimensionalHorrorBark = 2515;
+	SOUND_EFFECT_TYPE_FeyBark = 2516;
+	SOUND_EFFECT_TYPE_GiantBark = 2517;
+	SOUND_EFFECT_TYPE_HumanFemaleBark = 2518;
+	SOUND_EFFECT_TYPE_HumanMaleBark = 2519;
+	SOUND_EFFECT_TYPE_HumanoidGoblinBark = 2520;
+	SOUND_EFFECT_TYPE_HumanoidOrcBark = 2521;
+	SOUND_EFFECT_TYPE_LycanthropeBark = 2522;
+	SOUND_EFFECT_TYPE_MagicalEnergyBark = 2523;
+	SOUND_EFFECT_TYPE_MagicalHorrorBark = 2524;
+	SOUND_EFFECT_TYPE_MammalBearBark = 2525;
+	SOUND_EFFECT_TYPE_MammalCritterBark = 2526;
+	SOUND_EFFECT_TYPE_MammalDogBark = 2527;
+	SOUND_EFFECT_TYPE_MammalElephantBark = 2528;
+	SOUND_EFFECT_TYPE_MammalFeralBark = 2529;
+	SOUND_EFFECT_TYPE_MammalHorseBark = 2530;
+	SOUND_EFFECT_TYPE_MammalMammothBark = 2531;
+	SOUND_EFFECT_TYPE_MonsterBark = 2532;
+	SOUND_EFFECT_TYPE_PhantomBark = 2533;
+	SOUND_EFFECT_TYPE_PlantBark = 2534;
+	SOUND_EFFECT_TYPE_ReptileLargeBark = 2535;
+	SOUND_EFFECT_TYPE_ReptileSmallBark = 2536;
+	SOUND_EFFECT_TYPE_SlimeBark = 2537;
+	SOUND_EFFECT_TYPE_UndeadBark = 2538;
+	SOUND_EFFECT_TYPE_VerminCritterBark = 2539;
+	SOUND_EFFECT_TYPE_VerminInsectBark = 2540;
+	SOUND_EFFECT_TYPE_VerminRotwormBark = 2541;
+	SOUND_EFFECT_TYPE_HumanSageBark = 2542;
+	SOUND_EFFECT_TYPE_HumanCroneBark = 2543;
+	SOUND_EFFECT_TYPE_ApeBark = 2544;
+	SOUND_EFFECT_TYPE_AmphibicDeath = 2600;
+	SOUND_EFFECT_TYPE_AquaticBeastDeath = 2601;
+	SOUND_EFFECT_TYPE_AquaticCritterDeath = 2602;
+	SOUND_EFFECT_TYPE_AquaticDeeplingDeath = 2603;
+	SOUND_EFFECT_TYPE_AquaticQuaraDeath = 2604;
+	SOUND_EFFECT_TYPE_BirdDeath = 2605;
+	SOUND_EFFECT_TYPE_ConstructDeath = 2606;
+	SOUND_EFFECT_TYPE_DemonDeath = 2607;
+	SOUND_EFFECT_TYPE_DragonDeath = 2608;
+	SOUND_EFFECT_TYPE_ElementalEarthDeath = 2609;
+	SOUND_EFFECT_TYPE_ElementalEnergyDeath = 2610;
+	SOUND_EFFECT_TYPE_ElementalFireDeath = 2611;
+	SOUND_EFFECT_TYPE_ElementalWaterDeath = 2612;
+	SOUND_EFFECT_TYPE_ExtraDimensionalBeastDeath = 2613;
+	SOUND_EFFECT_TYPE_ExtraDimensionalEnergyDeath = 2614;
+	SOUND_EFFECT_TYPE_ExtraDimensionalHorrorDeath = 2615;
+	SOUND_EFFECT_TYPE_FeyDeath = 2616;
+	SOUND_EFFECT_TYPE_GiantDeath = 2617;
+	SOUND_EFFECT_TYPE_HumanFemaleDeath = 2618;
+	SOUND_EFFECT_TYPE_HumanMaleDeath = 2619;
+	SOUND_EFFECT_TYPE_HumanoidGoblinDeath = 2620;
+	SOUND_EFFECT_TYPE_HumanoidOrcDeath = 2621;
+	SOUND_EFFECT_TYPE_LycanthropeDeath = 2622;
+	SOUND_EFFECT_TYPE_MagicalEnergyDeath = 2623;
+	SOUND_EFFECT_TYPE_MagicalHorrorDeath = 2624;
+	SOUND_EFFECT_TYPE_MammalBearDeath = 2625;
+	SOUND_EFFECT_TYPE_MammalCritterDeath = 2626;
+	SOUND_EFFECT_TYPE_MammalDogDeath = 2627;
+	SOUND_EFFECT_TYPE_MammalElephantDeath = 2628;
+	SOUND_EFFECT_TYPE_MammalFeralDeath = 2629;
+	SOUND_EFFECT_TYPE_MammalHorseDeath = 2630;
+	SOUND_EFFECT_TYPE_MammalMammothDeath = 2631;
+	SOUND_EFFECT_TYPE_MonsterDeath = 2632;
+	SOUND_EFFECT_TYPE_PhantomDeath = 2633;
+	SOUND_EFFECT_TYPE_PlantDeath = 2634;
+	SOUND_EFFECT_TYPE_ReptileLargeDeath = 2635;
+	SOUND_EFFECT_TYPE_ReptileSmallDeath = 2636;
+	SOUND_EFFECT_TYPE_SlimeDeath = 2637;
+	SOUND_EFFECT_TYPE_UndeadDeath = 2638;
+	SOUND_EFFECT_TYPE_VerminCritterDeath = 2639;
+	SOUND_EFFECT_TYPE_VerminInsectDeath = 2640;
+	SOUND_EFFECT_TYPE_VerminRotwormDeath = 2641;
+	SOUND_EFFECT_TYPE_HumanSageDeath = 2642;
+	SOUND_EFFECT_TYPE_HumanCroneDeath = 2643;
+	SOUND_EFFECT_TYPE_ApeDeath = 2644;
+	SOUND_EFFECT_TYPE_GodspellKillAllMonsters = 10001;
+}
+
+message SimpleSoundEffect {
+	optional uint32 sound_id = 1;
+}
+
+message RandomSoundEffect {
+	repeated uint32 random_sound_id = 1;
+}
+
+message DelayedSoundEffect {
+	optional uint32 numeric_sound_effect_id = 1;
+	optional uint32 delay_seconds = 2;
+}
+
+message AppearanceTypesCountSoundEffect {
+	optional uint32 count = 1;
+	optional uint32 looping_sound_id = 2;
+}
+
+message MinMaxFloat {
+	optional float min_value = 1;
+	optional float max_value = 2;
+}

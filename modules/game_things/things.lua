@@ -22,11 +22,15 @@ function isLoaded()
 end
 
 function load(version)
-    local errorMessage = ''
+    local errorList = {}
 
     if version >= 1281 and not g_game.getFeature(GameLoadSprInsteadProtobuf) then
-        if not g_things.loadAppearances(resolvepath(string.format('/things/%d/', version))) then
-            errorMessage = errorMessage .. 'Couldn\'t load assets'
+        local filePath = resolvepath(string.format('/things/%d/', version))
+        if not g_things.loadAppearances(filePath) then
+            errorList[#errorList + 1] = "Couldn't load assets"
+        end
+        if not g_things.loadStaticData(filePath) then
+            errorList[#errorList + 1] = "Couldn't load staticdata"
         end
     else
         if g_game.getFeature(GameLoadSprInsteadProtobuf) then
@@ -47,31 +51,35 @@ function load(version)
         end
 
         if not g_things.loadDat(datPath) then
-            errorMessage = errorMessage ..
-                tr('Unable to load dat file, please place a valid dat in \'%s.dat\'', datPath) .. '\n'
+            errorList[#errorList + 1] = tr('Unable to load dat file, please place a valid dat in \'%s.dat\'', datPath)
         end
         if not g_sprites.loadSpr(sprPath) then
-            errorMessage = errorMessage ..
-                tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
+            errorList[#errorList + 1] = tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
         end
     end
 
-    loaded = (errorMessage:len() == 0)
-
-    if errorMessage:len() > 0 then
-        local messageBox = displayErrorBox(tr('Error'), errorMessage)
-        addEvent(function()
-            messageBox:raise()
-            messageBox:focus()
-        end)
-
-        disconnect(g_game, {
-            onClientVersionChange = load
-        })
-        g_game.setClientVersion(0)
-        g_game.setProtocolVersion(0)
-        connect(g_game, {
-            onClientVersionChange = load
-        })
+    loaded = #errorList == 0
+    if loaded then
+        -- loading client files was successful, try to load sounds now
+        -- sound files are optional, this means that failing to load them
+        -- will not block logging into game
+        g_sounds.loadClientFiles(resolvepath(string.format('/sounds/%d/', version)))
+        return
     end
+
+    -- loading client files failed, show an error
+    local messageBox = displayErrorBox(tr('Error'), table.concat(errorList, "\n"))
+    addEvent(function()
+        messageBox:raise()
+        messageBox:focus()
+    end)
+
+    disconnect(g_game, {
+        onClientVersionChange = load
+    })
+    g_game.setClientVersion(0)
+    g_game.setProtocolVersion(0)
+    connect(g_game, {
+        onClientVersionChange = load
+    })
 end

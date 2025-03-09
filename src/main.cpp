@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,8 +22,8 @@
 
 #include <client/client.h>
 #include <client/game.h>
-#include <client/localplayer.h>
 #include <client/gameconfig.h>
+#include <client/localplayer.h>
 #include <framework/core/application.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/luaengine/luainterface.h>
@@ -42,7 +42,7 @@
 extern "C" {
 #endif
 
-    int main(int argc, const char* argv[])
+    int main(const int argc, const char* argv[])
     {
         std::vector<std::string> args(argv, argv + argc);
 
@@ -61,7 +61,7 @@ extern "C" {
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
         if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
             g_lua.init();
-            g_resources.runEncryption(args.size() >= 3 ? args[2] : ENCRYPTION_PASSWORD);
+            g_resources.runEncryption(args.size() >= 3 ? args[2] :  std::string(ENCRYPTION_PASSWORD));
             std::cout << "Encryption complete" << std::endl;
 #ifdef WIN32
             MessageBoxA(NULL, "Encryption complete", "Success", 0);

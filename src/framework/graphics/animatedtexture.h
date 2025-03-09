@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,10 +22,10 @@
 
 #pragma once
 
-#include <framework/core/timer.h>
 #include "texture.h"
+#include <framework/core/timer.h>
 
-class AnimatedTexture : public Texture
+class AnimatedTexture final : public Texture
 {
 public:
     AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<uint16_t> framesDelay, uint16_t numPlays, bool buildMipmaps = false, bool compress = false);
@@ -41,10 +41,10 @@ public:
     void setRepeat(bool repeat) override;
 
     uint32_t getNumPlays() const { return m_numPlays; }
-    void setNumPlays(uint32_t n) { m_numPlays = n; }
+    void setNumPlays(const uint32_t n) { m_numPlays = n; }
 
     bool isOnMap() const { return m_onMap; }
-    void setOnMap(bool v) { m_onMap = v; }
+    void setOnMap(const bool v) { m_onMap = v; }
 
     void update();
     void restart() { m_animTimer.restart(); m_currentPlay = 0; m_currentFrame = 0; }

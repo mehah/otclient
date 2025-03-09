@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
  */
 
 #include "effect.h"
-#include <framework/core/eventdispatcher.h>
-#include <framework/core/graphicalapplication.h>
 #include "game.h"
 #include "map.h"
 #include <client/client.h>
+#include <framework/core/eventdispatcher.h>
+#include <framework/core/graphicalapplication.h>
 
-void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightView)
+void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())
         return;
@@ -36,32 +36,34 @@ void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightV
     if (m_animationTimer.ticksElapsed() < m_timeToStartDrawing)
         return;
 
-    int animationPhase;
-    if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
-        const auto* animator = getThingType()->getIdleAnimator();
-        if (!animator)
-            return;
+    int animationPhase = 0;
+    if (canAnimate()) {
+        if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
+            const auto* animator = getThingType()->getIdleAnimator();
+            if (!animator)
+                return;
 
-        // This requires a separate getPhaseAt method as using getPhase would make all magic effects use the same phase regardless of their appearance time
-        animationPhase = animator->getPhaseAt(m_animationTimer);
-    } else {
-        // hack to fix some animation phases duration, currently there is no better solution
-        int ticks = g_gameConfig.getEffectTicksPerFrame();
-        if (m_clientId == 33) {
-            ticks <<= 2;
+            // This requires a separate getPhaseAt method as using getPhase would make all magic effects use the same phase regardless of their appearance time
+            animationPhase = animator->getPhaseAt(m_animationTimer);
+        } else {
+            // hack to fix some animation phases duration, currently there is no better solution
+            int ticks = g_gameConfig.getEffectTicksPerFrame();
+            if (m_clientId == 33) {
+                ticks <<= 2;
+            }
+
+            animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
         }
-
-        animationPhase = std::min<int>(static_cast<int>(m_animationTimer.ticksElapsed() / ticks), getAnimationPhases() - 1);
     }
 
     const int offsetX = m_position.x - g_map.getCentralPosition().x;
     const int offsetY = m_position.y - g_map.getCentralPosition().y;
 
-    int xPattern = unsigned(offsetX) % getNumPatternX();
+    int xPattern = static_cast<unsigned>(offsetX) % getNumPatternX();
     xPattern = 1 - xPattern - getNumPatternX();
     if (xPattern < 0) xPattern += getNumPatternX();
 
-    int yPattern = unsigned(offsetY) % getNumPatternY();
+    int yPattern = static_cast<unsigned>(offsetY) % getNumPatternY();
 
     if (g_game.getFeature(Otc::GameMapOldEffectRendering)) {
         xPattern = offsetX % getNumPatternX();
@@ -76,7 +78,7 @@ void Effect::draw(const Point& dest, bool drawThings, const LightViewPtr& lightV
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
         if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
             m_drawConductor.agroup = true;
-            m_drawConductor.order = DrawOrder::FOURTH;
+            m_drawConductor.order = FOURTH;
         }
 
         if (drawThings && g_client.getEffectAlpha() < 1.f)
@@ -126,7 +128,7 @@ bool Effect::waitFor(const EffectPtr& effect)
     return true;
 }
 
-void Effect::setId(uint32_t id)
+void Effect::setId(const uint32_t id)
 {
     if (!g_things.isValidDatId(id, ThingCategoryEffect))
         return;
@@ -134,15 +136,21 @@ void Effect::setId(uint32_t id)
     m_clientId = id;
 }
 
-void Effect::setPosition(const Position& position, uint8_t stackPos, bool hasElevation)
+void Effect::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
 {
     if (m_clientId == 0)
         return;
 
     Thing::setPosition(position, stackPos, hasElevation);
+    int pattern_x = getNumPatternX();
+    int pattern_y = getNumPatternY();
+    if (pattern_x == 0 || pattern_y == 0) {
+        g_logger.warning(stdext::format("Failed to send magic effect %d. No sprites declared.", m_clientId));
+        return;
+    }
 
-    m_numPatternX = m_position.x % getNumPatternX();
-    m_numPatternY = m_position.y % getNumPatternY();
+    m_numPatternX = m_position.x % pattern_x;
+    m_numPatternY = m_position.y % pattern_y;
 }
 
 ThingType* Effect::getThingType() const {

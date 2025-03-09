@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,12 @@ public:
     void addWidget(const UIWidgetPtr& /*widget*/) override { update(); }
     void removeWidget(const UIWidgetPtr& /*widget*/) override { update(); }
 
-    void setSpacing(uint8_t spacing) { m_spacing = spacing; update(); }
-    void setFitChildren(bool fitParent) { m_fitChildren = fitParent; update(); }
+    void setSpacing(const int8_t spacing) { m_spacing = spacing; update(); }
+    void setFitChildren(const bool fitParent) { m_fitChildren = fitParent; update(); }
 
     bool isUIBoxLayout() override { return true; }
 
 protected:
     bool m_fitChildren{ false };
-    uint8_t m_spacing{ 0 };
+    int8_t m_spacing{ 0 };
 };

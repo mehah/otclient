@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ void ParticleEmitter::load(const OTMLNodePtr& node)
         throw Exception("emitter didn't provide a valid particle type");
 }
 
-void ParticleEmitter::update(float elapsedTime, const ParticleSystemPtr& system)
+void ParticleEmitter::update(const float elapsedTime, const ParticleSystemPtr& system)
 {
     m_elapsedTime += elapsedTime;
 

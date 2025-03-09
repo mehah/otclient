@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,14 +27,14 @@
 #include "uiboxlayout.h"
 
  // @bindclass
-class UIVerticalLayout : public UIBoxLayout
+class UIVerticalLayout final : public UIBoxLayout
 {
 public:
     UIVerticalLayout(UIWidgetPtr parentWidget) : UIBoxLayout(std::move(parentWidget)) {}
 
     void applyStyle(const OTMLNodePtr& styleNode) override;
 
-    void setAlignBottom(bool aliginBottom) { m_alignBottom = aliginBottom; update(); }
+    void setAlignBottom(const bool aliginBottom) { m_alignBottom = aliginBottom; update(); }
     bool isAlignBottom() { return m_alignBottom; }
 
     bool isUIVerticalLayout() override { return true; }

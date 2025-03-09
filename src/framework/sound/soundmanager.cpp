@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,17 +21,24 @@
  */
 
 #include "soundmanager.h"
-#include "combinedsoundsource.h"
 #include "soundbuffer.h"
+#include "soundeffect.h"
 #include "soundfile.h"
 #include "streamsoundsource.h"
-#include "soundeffect.h"
+#include "combinedsoundsource.h"
 
 #include <cstdint>
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
-#include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
+#include <nlohmann/json.hpp>
+#include <sounds.pb.h>
+
+#include "soundchannel.h"
+
+using namespace otclient::protobuf;
+
+using json = nlohmann::json;
 
 class StreamSoundSource;
 class CombinedSoundSource;
@@ -150,7 +157,7 @@ void SoundManager::poll()
     }
 }
 
-void SoundManager::setAudioEnabled(bool enable)
+void SoundManager::setAudioEnabled(const bool enable)
 {
     if (m_audioEnabled == enable)
         return;
@@ -184,7 +191,7 @@ void SoundManager::preload(std::string filename)
         m_buffers[filename] = buffer;
 }
 
-SoundSourcePtr SoundManager::play(const std::string& fn, float fadetime, float gain, float pitch)
+SoundSourcePtr SoundManager::play(const std::string& fn, const float fadetime, float gain, float pitch)
 {
     if (!m_audioEnabled)
         return nullptr;
@@ -328,7 +335,7 @@ void SoundManager::setPosition(const Point& pos)
 
 SoundEffectPtr SoundManager::createSoundEffect()
 {
-    SoundEffectPtr soundEffect = std::make_shared<SoundEffect>(m_device);
+    auto soundEffect = std::make_shared<SoundEffect>(m_device);
     return soundEffect;
 }
 
@@ -336,7 +343,196 @@ bool SoundManager::isEaxEnabled()
 {
     if (alGetEnumValue("AL_EFFECT_EAXREVERB") != 0) {
         return true;
-    } else {
+    }
+    return false;
+}
+
+using ProtobufSoundFiles = google::protobuf::RepeatedPtrField<sounds::Sound>;
+using ProtobufSoundEffects = google::protobuf::RepeatedPtrField<sounds::NumericSoundEffect>;
+using ProtobufLocationAmbiences = google::protobuf::RepeatedPtrField<sounds::AmbienceStream>;
+using ProtobufItemAmbiences = google::protobuf::RepeatedPtrField<sounds::AmbienceObjectStream>;
+using ProtobufMusicTracks = google::protobuf::RepeatedPtrField<sounds::MusicTemplate>;
+
+bool SoundManager::loadFromProtobuf(const std::string& directory, const std::string& fileName)
+{
+    /*
+        * file structure
+        <struct> Sounds
+        |
+        |
+        | * audio file id -> audio file name (ogg)
+        |-+- <vector> (Sound) sound
+        | |----> (u32) id
+        | |----> (string) filename (sound-abcd.ogg)
+        | |----> (string) original_filename (unused)
+        | |----> (bool) is_stream
+        |
+        |
+        | * sound effect
+        |-+- <vector> (NumericSoundEffect) numeric_sound_effect
+        | |----> (u32) id (the id you request in sound effect packet)
+        | |----> (enum - ENumericSoundType) numeric_sound_type
+        | |-+--> (MinMaxFloat) random_pitch
+        | | |------> (float) min
+        | | |------> (float) max
+        | |
+        | |-+--> (MinMaxFloat) random_volume
+        | | |------> (float) min
+        | | |------> (float) max
+        | |
+        | |-+--> (SimpleSoundEffect) simple_sound_effect
+        | | |------> (u32) sound_id (audio file id)
+        | |
+        | |-+--> (RandomSoundEffect) random_sound_effect
+        |   |------> <vector> (u32) random_sound_id (audio file id)
+        |
+        |
+        | * ambient sound for location (needs to be triggered with a packet)
+        |-+- <vector> (AmbienceStream) ambience_stream
+        | |----> (u32) id
+        | |----> (u32) looping_sound_id (audio file id)
+        | |-+--> <vector> (DelayedSoundEffect) delayed_effects
+        |   |------> (u32) numeric_sound_effect_id (sound effect id)
+        |   |------> (u32) delay_seconds
+        |
+        |
+        | * sound of items placed on the map
+        |-+- <vector> (AmbienceObjectStream) ambience_object_stream
+        | |----> (u32) id (ID OF THIS EFFECT, NOT ITEM ID!)
+        | |----> <vector> (u32) counted_appearance_types (ITEM CLIENT IDS that will have this sound, eg. waterfall or campfire)
+        | |-+--> <vector> (AppearanceTypesCountSoundEffect) sound_effects
+        | | |------> (u32) count (how many on the screen are required to trigger, eg. 3 are required for the swamp tiles to play sound)
+        | | |------> (u32) looping_sound_id (audio file id)
+        | |----> (u32) max_sound_distance (how far can it be heard)
+        |
+        |
+        | * music for location (needs to be triggered with a packet)
+        |-+- <vector> (MusicTemplate) music_template
+          |----> (u32) id
+          |----> (u32) sound_id (audio file id)
+          |----> (enum - EMusicType) music_type
+    */
+
+    // create the sound bank from protobuf file
+    try {
+        std::stringstream fileInputStream;
+        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", directory, fileName)), fileInputStream);
+
+        // read the soundbank
+        auto protobufSounds = sounds::Sounds();
+        if (!protobufSounds.ParseFromIstream(&fileInputStream)) {
+            throw stdext::exception("Couldn't parse appearances lib.");
+        }
+
+        // deserialize audio files
+        for (const auto& protobufAudioFile : protobufSounds.sound()) {
+            m_clientSoundFiles[protobufAudioFile.id()] = protobufAudioFile.filename();
+        }
+
+        // deserialize sound effects
+        for (const auto& protobufSoundEffect : protobufSounds.numeric_sound_effect()) {
+            const auto& pitch = protobufSoundEffect.random_pitch();
+            const auto& volume = protobufSoundEffect.random_volume();
+            std::vector<uint32_t> randomSounds = {};
+            if (protobufSoundEffect.has_random_sound_effect()) {
+                for (const uint32_t& audioFileId : protobufSoundEffect.random_sound_effect().random_sound_id()) {
+                    randomSounds.push_back(audioFileId);
+                }
+            }
+
+            uint32_t effectId = protobufSoundEffect.id();
+            m_clientSoundEffects.emplace(effectId, ClientSoundEffect{
+                effectId,
+                static_cast<ClientSoundType>(protobufSoundEffect.numeric_sound_type()),
+                pitch.min_value(),
+                pitch.max_value(),
+                volume.max_value(),
+                volume.max_value(),
+                protobufSoundEffect.has_simple_sound_effect() ? protobufSoundEffect.simple_sound_effect().sound_id() : 0,
+                std::move(randomSounds)
+            });
+        }
+
+        // deserialize location ambients
+        for (const auto& protobufLocationAmbient : protobufSounds.ambience_stream()) {
+            uint32_t effectId = protobufLocationAmbient.id();
+            DelayedSoundEffects effects = {};
+            for (const auto& delayedEffect : protobufLocationAmbient.delayed_effects()) {
+                effects.push_back({delayedEffect.numeric_sound_effect_id(), delayedEffect.delay_seconds()});
+            }
+
+            m_clientAmbientEffects.emplace(effectId, ClientLocationAmbient{
+                effectId,
+                protobufLocationAmbient.looping_sound_id(),
+                std::move(effects)
+            });
+        }
+
+        // deserialize item ambients
+        for (const auto& protobufItemAmbient : protobufSounds.ambience_object_stream()) {
+            std::vector<uint32_t> itemClientIds = {};            
+            for (const auto& itemId : protobufItemAmbient.counted_appearance_types()) {
+                itemClientIds.push_back(itemId);
+            }
+
+            ItemCountSoundEffects soundEffects = {};
+            for (const auto& soundEffect : protobufItemAmbient.sound_effects()) {
+                soundEffects.push_back({soundEffect.looping_sound_id(), soundEffect.count()});
+            }
+
+            uint32_t effectId = protobufItemAmbient.id();
+            m_clientItemAmbientEffects.emplace(effectId, ClientItemAmbient{
+                effectId,
+                std::move(itemClientIds),
+                std::move(soundEffects)
+            });
+        }
+
+        // deserialize music
+        for (const auto& protobufMusicTemplate : protobufSounds.music_template()) {
+            uint32_t effectId = protobufMusicTemplate.id();
+            m_clientMusic.emplace(effectId, ClientMusic{
+                effectId,
+                protobufMusicTemplate.sound_id(),
+                static_cast<ClientMusicType>(protobufMusicTemplate.music_type())
+            });
+        }
+
+        return true;
+    } catch (const std::exception& e) {
+        g_logger.error(stdext::format("Failed to load soundbank '%s': %s", fileName, e.what()));
         return false;
     }
+}
+
+bool SoundManager::loadClientFiles(const std::string& directory)
+{
+    // find catalog from json file
+    try {
+        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(directory + "catalog-sound", "json"))));
+        for (const auto& obj : document) {
+            const auto& type = obj["type"];
+            if (type == "sounds") {
+                // dat file encoded with protobuf
+                loadFromProtobuf(directory, obj["file"]);
+            }
+        }
+
+        return true;
+    } catch (const std::exception& e) {
+        if (g_game.getClientVersion() >= 1300) {
+            g_logger.warning(stdext::format("Failed to load '%s' (Sounds): %s", directory, e.what()));
+        }
+
+        return false;
+    }
+}
+
+std::string SoundManager::getAudioFileNameById(int32_t audioFileId)
+{
+    if (m_clientSoundFiles.contains(audioFileId)) {
+        return m_clientSoundFiles[audioFileId];
+    }
+
+    return "";
 }

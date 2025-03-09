@@ -1,4 +1,4 @@
-﻿QuickLoot = {}
+QuickLoot = {}
 
 local function getFilter(id)
     local filter = {
@@ -27,10 +27,18 @@ function quickLootController:onInit()
     quickLootController:registerEvents(g_game, {
         onQuickLootContainers = QuickLoot.start
     })
+    Keybind.new("Loot", "Quick Loot Nearby Corpses", "Alt+Q", "")
+    Keybind.bind("Loot", "Quick Loot Nearby Corpses", {
+      {
+        type = KEY_DOWN,
+        callback = function() g_game.sendQuickLoot(2) end,
+      }
+    })
 
 end
 
 function quickLootController:onTerminate()
+    Keybind.delete("Loot", "Quick Loot Nearby Corpses")
     if QuickLoot.mouseGrabberWidget then
         QuickLoot.mouseGrabberWidget:destroy()
         QuickLoot.mouseGrabberWidget = nil
@@ -219,9 +227,9 @@ function QuickLoot.Define()
         quickLootController.ui.fallbackPanel.checkbox:setChecked(fallback)
         -- LuaFormatter off
 		local slotBags = {
-			{ color = "#484848", name = "Unassigned", type = 1 },
+			{ color = "#484848", name = "Unassigned", type = 31 },
 			{ color = "#414141", name = "Gold", type = 30 },
-			{ color = "#484848", name = "Armors", type = 31 },
+			{ color = "#484848", name = "Armors", type = 1 },
 			{ color = "#414141", name = "Amulets", type = 2  },
 			{ color = "#484848", name = "Boots", type = 3 },
 			{ color = "#414141", name = "Containers", type = 4 },
@@ -259,8 +267,8 @@ function QuickLoot.Define()
 
             for _, container in pairs(lootContainers) do
                 if container[1] == id then
-                    local lootContainerId = container[2]
-                    local obtainerContainerId = container[3]
+                    local lootContainerId = container[3]
+                    local obtainerContainerId = container[2]
 
                     widget.item:setItemId(lootContainerId)
                     widget.item2:setItemId(obtainerContainerId)
@@ -413,6 +421,9 @@ function QuickLoot.Define()
         end
         QuickLoot.show()
         QuickLoot.loadFilterItems()
+        if QuickLoot.data.filter == 2 and not quickLootController.ui.filters.accepted:isChecked() then
+            quickLootController.ui.filters.accepted:onClick()
+        end
     end
 
     function QuickLoot.show()

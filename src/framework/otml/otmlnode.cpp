@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,10 @@
  */
 
 #include "otmlnode.h"
+
 #include "otmlemitter.h"
 
-OTMLNodePtr OTMLNode::create(const std::string_view tag, bool unique)
+OTMLNodePtr OTMLNode::create(const std::string_view tag, const bool unique)
 {
     const auto& node = std::make_shared<OTMLNode>();
     node->setTag(tag);
@@ -59,7 +60,7 @@ OTMLNodePtr OTMLNode::get(const std::string_view childTag) const
     return nullptr;
 }
 
-OTMLNodePtr OTMLNode::getIndex(int childIndex)
+OTMLNodePtr OTMLNode::getIndex(const int childIndex)
 {
     return childIndex < size() && childIndex >= 0 ? m_children[childIndex] : nullptr;
 }
@@ -75,7 +76,7 @@ OTMLNodePtr OTMLNode::at(const std::string_view childTag)
     throw OTMLException(asOTMLNode(), stdext::format("child node with tag '%s' not found", childTag));
 }
 
-OTMLNodePtr OTMLNode::atIndex(int childIndex)
+OTMLNodePtr OTMLNode::atIndex(const int childIndex)
 {
     if (childIndex >= size() || childIndex < 0)
         throw OTMLException(asOTMLNode(), stdext::format("child node with index '%d' not found", childIndex));
@@ -117,7 +118,7 @@ void OTMLNode::addChild(const OTMLNodePtr& newChild)
 
 bool OTMLNode::removeChild(const OTMLNodePtr& oldChild)
 {
-    const auto it = std::find(m_children.begin(), m_children.end(), oldChild);
+    const auto it = std::ranges::find(m_children, oldChild);
     if (it == m_children.end())
         return false;
 
@@ -127,7 +128,7 @@ bool OTMLNode::removeChild(const OTMLNodePtr& oldChild)
 
 bool OTMLNode::replaceChild(const OTMLNodePtr& oldChild, const OTMLNodePtr& newChild)
 {
-    auto it = std::find(m_children.begin(), m_children.end(), oldChild);
+    auto it = std::ranges::find(m_children, oldChild);
     if (it != m_children.end()) {
         it = m_children.erase(it);
         m_children.insert(it, newChild);

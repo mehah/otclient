@@ -46,6 +46,7 @@ function Cyclopedia.SetBestiaryProgress(fit, firstBar, secondBar, thirdBar, kill
     end
 
     local function setBarVisibility(bar, isVisible, width)
+        isVisible = isVisible and width > 0
         bar:setVisible(isVisible)
         if isVisible then
             bar:setImageRect({
@@ -125,10 +126,7 @@ function Cyclopedia.CreateCreatureItems(data)
                 end
             end
 
-            local price, rarity = ItemsDatabase.getSellValueAndColor(itemWidget.id)
-            if price > 0 then
-                itemWidget:setImageSource("/images/ui/rarity_" .. rarity)
-            end
+            ItemsDatabase.setRarityItem(itemWidget, itemWidget:getItem())
 
             itemWidget.onMouseRelease = onAddLootClick
         end
@@ -143,21 +141,15 @@ function Cyclopedia.loadBestiarySelectedCreature(data)
         4
     }
 
-    local formattedName = "BUSCAR__" .. data.id
-    local outfit = 22
-    if RACE[data.id] then
-        formattedName = RACE[data.id].name:gsub("(%l)(%w*)", function(first, rest)
-            return first:upper() .. rest
-        end)
-        outfit = RACE[data.id].type
-    end
+    local raceData = g_things.getRaceData(data.id)
+    local formattedName = raceData.name:gsub("(%l)(%w*)", function(first, rest)
+        return first:upper() .. rest
+    end)
 
     UI.ListBase.CreatureInfo:setText(formattedName)
     Cyclopedia.SetBestiaryDiamonds(occurence[data.ocorrence])
     Cyclopedia.SetBestiaryStars(data.difficulty)
-    UI.ListBase.CreatureInfo.LeftBase.Sprite:setOutfit({
-        type = outfit
-    })
+    UI.ListBase.CreatureInfo.LeftBase.Sprite:setOutfit(raceData.outfit)
     UI.ListBase.CreatureInfo.LeftBase.Sprite:getCreature():setStaticWalking(1000)
 
     Cyclopedia.SetBestiaryProgress(60, UI.ListBase.CreatureInfo.ProgressBack, UI.ListBase.CreatureInfo.ProgressBack33,
@@ -380,17 +372,19 @@ function Cyclopedia.loadBestiaryCreatures(data)
     Cyclopedia.verifyBestiaryButtons()
 end
 
+-- note: this one needs refactor
+-- expected result:
+-- when a string is entered
+-- the list should generate client-side
+-- the list of search results that match the search string
+-- looks identical to category view
 function Cyclopedia.BestiarySearch()
     local text = UI.SearchEdit:getText()
-    local creatures = {}
-
-    for id, data in pairs(RACE) do
-        if string.find(data.name, text) then
-            table.insert(creatures, id)
-        end
+    local raceList = g_things.getRacesByName(text)
+    if #raceList > 0 then
+        g_game.requestBestiarySearch(raceList[1].raceId)
     end
 
-    g_game.requestBestiarySearch(creatures)
     UI.SearchEdit:setText("")
 end
 
@@ -403,9 +397,7 @@ function Cyclopedia.BestiarySearchText(text)
 end
 
 function Cyclopedia.CreateBestiaryCreaturesItem(data)
-    if not RACE[data.id] then
-        g_logger.warning(string.format("Race id: %d not found. add in ./modules/game_cyclopedia/utils.lua", data.id))
-    end
+    local raceData = g_things.getRaceData(data.id)
 
     local function verify(name)
         if #name > 18 then
@@ -418,17 +410,12 @@ function Cyclopedia.CreateBestiaryCreaturesItem(data)
     local widget = g_ui.createWidget("BestiaryCreature", UI.ListBase.CreatureList)
     widget:setId(data.id)
 
-    local formattedName = "search__" .. data.id
-    if RACE[data.id] then
-        formattedName = RACE[data.id].name:gsub("(%l)(%w*)", function(first, rest)
-            return first:upper() .. rest
-        end)
-    end
+    local formattedName = raceData.name:gsub("(%l)(%w*)", function(first, rest)
+        return first:upper() .. rest
+    end)
 
     widget.Name:setText(verify(formattedName))
-    widget.Sprite:setOutfit({
-        type = Cyclopedia.safeOutfit(RACE[data.id] and RACE[data.id].type or nil)
-    })
+    widget.Sprite:setOutfit(raceData.outfit)
     widget.Sprite:getCreature():setStaticWalking(1000)
 
     if data.AnimusMasteryBonus > 0 then
@@ -695,7 +682,7 @@ function Cyclopedia.toggleBosstiaryTracker()
 end
 
 function Cyclopedia.onTrackerClose(temp)
-    if temp == "Boosteary Tracker" then
+    if temp == "Bosstiary Tracker" then
         trackerButtonBosstiary:setOn(false)
     else
         trackerButton:setOn(false)
@@ -727,7 +714,6 @@ function Cyclopedia.onParseCyclopediaTracker(trackerType, data)
 
     local isBoss = trackerType == 1
     local window = isBoss and trackerMiniWindowBosstiary or trackerMiniWindow
-    local raceData = isBoss and RACE_Bosstiary or RACE
 
     window.contentsPanel:destroyChildren()
     storedRaceIDs = {}
@@ -735,14 +721,12 @@ function Cyclopedia.onParseCyclopediaTracker(trackerType, data)
     for _, entry in ipairs(data) do
         local raceId, kills, uno, dos, maxKills = unpack(entry)
         table.insert(storedRaceIDs, raceId)
-        local raceInfo = raceData[raceId]
-        local name = raceInfo.name
+        local raceData = g_things.getRaceData(raceId)
+        local name = raceData.name
 
         local widget = g_ui.createWidget("TrackerButton", window.contentsPanel)
         widget:setId(raceId)
-        widget.creature:setOutfit({
-            type = raceInfo.type
-        })
+        widget.creature:setOutfit(raceData.outfit)
         widget.label:setText(name:len() > 12 and name:sub(1, 9) .. "..." or name)
         widget.kills:setText(kills .. "/" .. maxKills)
         widget.onMouseRelease = onTrackerClick
@@ -810,15 +794,24 @@ function onTrackerClick(widget, mousePosition, mouseButton)
 end
 
 function onAddLootClick(widget, mousePosition, mouseButton)
-    local taskId = tonumber(widget:getId())
+    local itemId = widget:getItemId()
+    local quickLoot = modules.game_quickloot.QuickLoot
+    local lootFilterValue = quickLoot.data.filter
     local menu = g_ui.createWidget("PopupMenu")
 
     menu:setGameMenu(true)
-    --if true then -- is in loot list ?
-        menu:addOption("Add to Loot List", function() print("future") end)
-    --else
-        --menu:addOption("Remove from Loot List", function() print("future") end)
-    --end
+
+    if not quickLoot.lootExists(itemId, lootFilterValue) then
+        menu:addOption("Add to Loot List",
+        function()
+            quickLoot.addLootList(itemId, lootFilterValue)
+        end)
+    else
+        menu:addOption("Remove from Loot List", 
+        function() 
+            quickLoot.removeLootList(itemId, lootFilterValue)
+        end)
+    end
 
     menu:display(menuPosition)
 

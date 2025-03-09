@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ bool Module::load()
     if (!m_supportedDevices.empty() && !hasSupportedDevice(g_platform.getDevice()))
         return true;
 
-    ticks_t startTime = stdext::millis();
+    const ticks_t startTime = stdext::millis();
 
     g_modules.m_currentModule = static_self_cast<Module>();
     try {
@@ -86,7 +86,7 @@ bool Module::load()
 
         m_loaded = true;
 
-        g_logger.debug(stdext::format("Loaded module '%s' (%s)", m_name, 
+        g_logger.debug(stdext::format("Loaded module '%s' (%s)", m_name,
                        stdext::format("%.2fs", (stdext::millis() - startTime) / 1000.0)));
     } catch (const stdext::exception& e) {
         // remove from package.loaded
@@ -135,7 +135,7 @@ void Module::unload()
 
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
-        } catch (stdext::exception const& e) {
+        } catch (const stdext::exception& e) {
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
             g_logger.error(stdext::format("Unable to unload module '%s': %s", m_name, e.what()));
@@ -173,9 +173,9 @@ bool Module::isDependent() const
     return false;
 }
 
-bool Module::hasDependency(const std::string_view name, bool recursive)
+bool Module::hasDependency(const std::string_view name, const bool recursive)
 {
-    if (std::find(m_dependencies.begin(), m_dependencies.end(), name) != m_dependencies.end())
+    if (std::ranges::find(m_dependencies, name) != m_dependencies.end())
         return true;
 
     if (recursive) {
@@ -190,7 +190,7 @@ bool Module::hasDependency(const std::string_view name, bool recursive)
     return false;
 }
 
-bool Module::hasSupportedDevice(Platform::Device device)
+bool Module::hasSupportedDevice(const Platform::Device device)
 {
     for (const auto& sd : m_supportedDevices) {
         if (sd.type == device.type || sd.type == Platform::DeviceUnknown) {
@@ -251,7 +251,7 @@ void Module::discover(const OTMLNodePtr& moduleNode)
                     if (g_resources.isFileType(filePath, "lua")) {
                         filePath = std::filesystem::path(filePath).replace_extension().string();
 
-                        auto foundElement = std::find(m_scripts.begin(), m_scripts.end(), filePath);
+                        auto foundElement = std::ranges::find(m_scripts, filePath);
                         if (m_scripts.end() == foundElement)
                             m_scripts.emplace_back(filePath);
                     }

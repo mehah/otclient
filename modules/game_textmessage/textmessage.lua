@@ -58,7 +58,8 @@ MessageSettings = {
         color = TextColors.white,
         consoleTab = 'Loot',
         screenTarget = 'highCenterLabel',
-        consoleOption = 'showInfoMessagesInConsole'
+        consoleOption = 'showInfoMessagesInConsole',
+        colored = true
     }
 }
 
@@ -150,22 +151,27 @@ function displayMessage(mode, text)
 
     if msgtype.consoleTab ~= nil and
         (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
-        modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
-        -- TODO move to game_console
+        if msgtype == MessageSettings.loot then
+            local lootColoredText = ItemsDatabase.setColorLootMessage(text)
+            modules.game_console.addText(lootColoredText, msgtype, tr("Server Log"))
+            modules.game_console.addText(lootColoredText, msgtype, tr(msgtype.consoleTab))
+        else
+            modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
+        end
     end
 
     if msgtype.screenTarget then
         local label = messagesPanel:recursiveGetChildById(msgtype.screenTarget)
-        if msgtype == MessageSettings.loot then
+        if msgtype == MessageSettings.loot and not modules.client_options.getOption('showLootMessagesOnScreen') then
+            return
+        elseif msgtype == MessageSettings.loot then
             local coloredText = ItemsDatabase.setColorLootMessage(text)
             label:setColoredText(coloredText)
-            local console = modules.game_console
-            local consoleBuffer = console.consoleTabBar:getTabPanel(console.getTab("Server Log")):getChildById('consoleBuffer')
-            consoleBuffer:getLastChild():setColoredText(coloredText)
-		else
+        else
             label:setText(text)
             label:setColor(msgtype.color)
         end
+
         label:setVisible(true)
         removeEvent(label.hideEvent)
         label.hideEvent = scheduleEvent(function()

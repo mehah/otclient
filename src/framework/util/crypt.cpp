@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2022 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,9 @@
  */
 
 #include "crypt.h"
+#include "framework/core/application.h"
 #include <framework/core/logger.h>
 #include <framework/core/resourcemanager.h>
-#include "framework/core/application.h"
 #include <framework/platform/platform.h>
 #include <framework/stdext/math.h>
 
@@ -34,8 +34,12 @@
 #endif
 #include <zlib.h>
 
+#include <algorithm>
+
+#include "framework/core/graphicalapplication.h"
+
 static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static inline bool is_base64(uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
+static inline bool is_base64(const uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
 
 Crypt g_crypt;
 
@@ -167,8 +171,8 @@ std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key)
 std::string Crypt::genUUID()
 {
     std::random_device rd;
-    auto seed_data = std::array<int, std::mt19937::state_size> {};
-    std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+    auto seed_data = std::array<int, std::mt19937::state_size>{};
+    std::ranges::generate(seed_data, std::ref(rd));
     std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
     std::mt19937 generator(seq);
 
@@ -194,8 +198,8 @@ std::string Crypt::getMachineUUID()
 {
     if (m_machineUUID.is_nil()) {
         std::random_device rd;
-        auto seed_data = std::array<int, std::mt19937::state_size> {};
-        std::generate(std::begin(seed_data), std::end(seed_data), std::ref(rd));
+        auto seed_data = std::array<int, std::mt19937::state_size>{};
+        std::ranges::generate(seed_data, std::ref(rd));
         std::seed_seq seq(std::begin(seed_data), std::end(seed_data));
         std::mt19937 generator(seq);
 
@@ -204,7 +208,7 @@ std::string Crypt::getMachineUUID()
     return _encrypt(to_string(m_machineUUID), false);
 }
 
-std::string Crypt::getCryptKey(bool useMachineUUID) const
+std::string Crypt::getCryptKey(const bool useMachineUUID) const
 {
     constexpr std::hash<uuids::uuid> uuid_hasher;
     const uuids::uuid uuid = useMachineUUID ? m_machineUUID : uuids::uuid();
@@ -217,7 +221,7 @@ std::string Crypt::getCryptKey(bool useMachineUUID) const
     return key;
 }
 
-std::string Crypt::_encrypt(const std::string& decrypted_string, bool useMachineUUID)
+std::string Crypt::_encrypt(const std::string& decrypted_string, const bool useMachineUUID)
 {
     const uint32_t sum = stdext::adler32((const uint8_t*)decrypted_string.c_str(), decrypted_string.size());
 
@@ -228,7 +232,7 @@ std::string Crypt::_encrypt(const std::string& decrypted_string, bool useMachine
     return encrypted;
 }
 
-std::string Crypt::_decrypt(const std::string& encrypted_string, bool useMachineUUID)
+std::string Crypt::_decrypt(const std::string& encrypted_string, const bool useMachineUUID)
 {
     const auto& decoded = base64Decode(encrypted_string);
     const auto& tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
@@ -364,15 +368,15 @@ int Crypt::rsaGetSize()
 #endif
 }
 
-std::string Crypt::crc32(const std::string& decoded_string, bool upperCase)
+std::string Crypt::crc32(const std::string& decoded_string, const bool upperCase)
 {
-    uint32_t crc = ::crc32(0, Z_NULL, 0);
+    uint32_t crc = ::crc32(0, nullptr, 0);
     crc = ::crc32(crc, (const Bytef*)decoded_string.c_str(), decoded_string.size());
     std::string result = stdext::dec_to_hex(crc);
     if (upperCase)
-        std::transform(result.begin(), result.end(), result.begin(), toupper);
+        std::ranges::transform(result, result.begin(), toupper);
     else
-        std::transform(result.begin(), result.end(), result.begin(), tolower);
+        std::ranges::transform(result, result.begin(), tolower);
     return result;
 }
 
@@ -391,7 +395,7 @@ std::string Crypt::sha1Encrpyt(const std::string& input)
 
     uint32_t length_low = 0;
     uint32_t length_high = 0;
-    for (char ch : input) {
+    for (const char ch : input) {
         messageBlock[index++] = ch;
 
         length_low += 8;
@@ -433,7 +437,7 @@ std::string Crypt::sha1Encrpyt(const std::string& input)
     sha1Block(messageBlock, H);
 
     char hexstring[41];
-    static const char hexDigits[] = {"0123456789abcdef"};
+    static constexpr char hexDigits[] = { "0123456789abcdef" };
     for (int hashByte = 20; --hashByte >= 0;) {
         const uint8_t byte = H[hashByte >> 2] >> (((3 - hashByte) & 3) << 3);
         index = hashByte << 1;
@@ -443,7 +447,7 @@ std::string Crypt::sha1Encrpyt(const std::string& input)
     return std::string(hexstring, 40);
 }
 
-void Crypt::sha1Block(uint8_t* block, uint32_t* H)
+void Crypt::sha1Block(const uint8_t* block, uint32_t* H)
 {
     uint32_t W[80];
     for (int i = 0; i < 16; ++i) {
