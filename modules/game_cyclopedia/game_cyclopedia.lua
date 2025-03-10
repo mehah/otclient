@@ -236,7 +236,16 @@ function show()
     controllerCyclopedia.ui.GoldBase.Value:setText(Cyclopedia.formatGold(g_game.getLocalPlayer():getResourceBalance(1)))
 end
 
-function SelectWindow(type)
+local tabStack = {}
+function toggleBack()
+    local previousTab = table.remove(tabStack, #tabStack)
+    if #tabStack < 1 then
+        controllerCyclopedia.ui.BackButton:setEnabled(false)
+    end
+    SelectWindow(previousTab, true)
+end
+
+function SelectWindow(type, isBackButtonPress)
     local windowTypes = {
         items = { obj = items, func = showItems },
         bestiary = { obj = bestiary, func = showBestiary },
@@ -249,8 +258,13 @@ function SelectWindow(type)
     }
 
     if previousType then
-        previousType.obj:enable()
-        previousType.obj:setOn(false)
+        local previousWindow = windowTypes[previousType]
+        previousWindow.obj:enable()
+        previousWindow.obj:setOn(false)
+        if not isBackButtonPress then
+            table.insert(tabStack, previousType)
+            controllerCyclopedia.ui.BackButton:setEnabled(true)
+        end
     end
     contentContainer:destroyChildren()
 
@@ -258,7 +272,7 @@ function SelectWindow(type)
     if window then
         window.obj:setOn(true)
         window.obj:disable()
-        previousType = window
+        previousType = type
         if window.func then
             window.func(contentContainer)
         end
