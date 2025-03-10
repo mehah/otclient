@@ -255,7 +255,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
             }
             CachedText numberText;
             numberText.setText(std::to_string(count));
-            numberText.setFont(g_fonts.getFont("verdana-11px-rounded"));
+            numberText.setFont((g_gameConfig.getStaticTextFont()));
             numberText.setAlign(Fw::AlignCenter);
             Rect numberRect(backgroundRect.right() + 10, iconY, 20, 20);
             numberText.draw(numberRect, Color::white);
