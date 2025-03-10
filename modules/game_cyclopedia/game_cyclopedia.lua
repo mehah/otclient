@@ -280,23 +280,11 @@ function SelectWindow(type, isBackButtonPress)
 end
 
 function getBosstiary()
-    if not controllerCyclopedia.ui then
-        return
-    end
-    if controllerCyclopedia.ui:isVisible() then
-        return hide()
-    end
-    show()
+    toggle()
     SelectWindow("bosstiary")
 end
 
 function getBossSlot()
-    if not controllerCyclopedia.ui then
-        return
-    end
-    if controllerCyclopedia.ui:isVisible() then
-        return hide()
-    end
-    show()
+    toggle()
     SelectWindow("bossSlot")
 end
