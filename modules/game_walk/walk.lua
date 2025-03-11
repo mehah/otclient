@@ -127,7 +127,7 @@ local function addWalkEvent(dir, delay)
 end
 
 --- Initiates a smart walk in the given direction.
-local function smartWalk(dir)
+function smartWalk(dir)
     addWalkEvent(dir)
 end
 

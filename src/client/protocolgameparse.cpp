@@ -2348,13 +2348,14 @@ void ProtocolGame::parseMultiUseCooldown(const InputMessagePtr& msg)
 
 void ProtocolGame::parseTalk(const InputMessagePtr& msg)
 {
+    uint32_t statement = 0;
     if (g_game.getFeature(Otc::GameMessageStatements)) {
-        msg->getU32(); // channel statement guid
+        statement = msg->getU32(); // channel statement guid
     }
 
     const auto& name = g_game.formatCreatureName(msg->getString());
 
-    if (g_game.getClientVersion() >= 1281) {
+    if (statement > 0 && g_game.getClientVersion() >= 1281) {
         msg->getU8(); // suffix
     }
 
@@ -4367,7 +4368,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             std::vector<std::tuple<uint16_t, uint16_t>> concoctionsArray;
 
             for (auto i = 0; i < concoctionsCount; ++i) {
-                const uint16_t concoctionFirst = msg->getU8();
+                const uint16_t concoctionFirst = msg->getU16();
                 const uint16_t concoctionSecond = msg->getU16();
                 concoctionsArray.emplace_back(concoctionFirst, concoctionSecond);
             }
