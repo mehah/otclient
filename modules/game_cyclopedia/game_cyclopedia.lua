@@ -19,14 +19,14 @@ local bossSlot = nil
 local ButtonBossSlot = nil
 local ButtonBestiary = nil
 
-function toggle()
+function toggle(defaultWindow)
     if not controllerCyclopedia.ui then
         return
     end
     if controllerCyclopedia.ui:isVisible() then
         return hide()
     end
-    show()
+    show(defaultWindow)
 end
 
 controllerCyclopedia = Controller:new()
@@ -38,12 +38,12 @@ end
 function controllerCyclopedia:onGameStart()
     if g_game.getClientVersion() >= 1310 then
         CyclopediaButton = modules.game_mainpanel.addToggleButton('CyclopediaButton', tr('Cyclopedia'),
-            '/images/options/cooldowns', toggle, false, 7)
+            '/images/options/cooldowns', function() toggle("items") end, false, 7)
         ButtonBossSlot = modules.game_mainpanel.addToggleButton("bossSlot", tr("Open Boss Slots dialog"),
-            "/images/options/ButtonBossSlot", getBossSlot, false, 20)
+            "/images/options/ButtonBossSlot", function() toggle("bossSlot") end, false, 20)
         CyclopediaButton:setOn(false)
         ButtonBestiary = modules.game_mainpanel.addToggleButton("bosstiary", tr("Open Bosstiary dialog"),
-            "/images/options/ButtonBosstiary", getBosstiary, false, 17)
+            "/images/options/ButtonBosstiary", function() toggle("bosstiary") end, false, 17)
 
         contentContainer = controllerCyclopedia.ui:recursiveGetChildById('contentContainer')
         buttonSelection = controllerCyclopedia.ui:recursiveGetChildById('buttonSelection')
@@ -114,8 +114,7 @@ function controllerCyclopedia:onGameStart()
         end
 
         trackerMiniWindow.cyclopediaButton.onClick = function(widget, mousePos, mouseButton)
-            toggle()
-            SelectWindow("bestiary")
+            toggle("bestiary")
             return true
         end
 
@@ -155,8 +154,7 @@ function controllerCyclopedia:onGameStart()
 
         trackerMiniWindowBosstiary.cyclopediaButton.onClick =
             function(widget, mousePos, mouseButton)
-                toggle()
-                SelectWindow("bosstiary")
+                toggle("bosstiary")
                 return true
             end
 
@@ -224,7 +222,7 @@ function hide()
     controllerCyclopedia.ui:hide()
 end
 
-function show()
+function show(defaultWindow)
     if not controllerCyclopedia.ui or not CyclopediaButton then
         return
     end
@@ -232,7 +230,7 @@ function show()
     controllerCyclopedia.ui:show()
     controllerCyclopedia.ui:raise()
     controllerCyclopedia.ui:focus()
-    SelectWindow("items")
+    SelectWindow(defaultWindow, false)
     controllerCyclopedia.ui.GoldBase.Value:setText(Cyclopedia.formatGold(g_game.getLocalPlayer():getResourceBalance(1)))
 end
 
@@ -277,14 +275,4 @@ function SelectWindow(type, isBackButtonPress)
             window.func(contentContainer)
         end
     end
-end
-
-function getBosstiary()
-    toggle()
-    SelectWindow("bosstiary")
-end
-
-function getBossSlot()
-    toggle()
-    SelectWindow("bossSlot")
 end
