@@ -18,6 +18,9 @@ local bosstiary = nil
 local bossSlot = nil
 local ButtonBossSlot = nil
 local ButtonBestiary = nil
+local tabStack = {}
+local previousType = nil
+local windowTypes = {}
 
 function toggle(defaultWindow)
     if not controllerCyclopedia.ui then
@@ -55,6 +58,17 @@ function controllerCyclopedia:onGameStart()
         character = buttonSelection:recursiveGetChildById('character')
         bosstiary = buttonSelection:recursiveGetChildById('bosstiary')
         bossSlot = buttonSelection:recursiveGetChildById('bossSlot')
+
+        windowTypes = {
+            items = { obj = items, func = showItems },
+            bestiary = { obj = bestiary, func = showBestiary },
+            charms = { obj = charms, func = showCharms },
+            map = { obj = map, func = showMap },
+            houses = { obj = houses, func = showHouse },
+            character = { obj = character, func = showCharacter },
+            bosstiary = { obj = bosstiary, func = showBosstiary },
+            bossSlot = { obj = bossSlot, func = showBossSlot }
+        }
 
         g_ui.importStyle("cyclopedia_widgets")
         g_ui.importStyle("cyclopedia_pages")
@@ -219,7 +233,19 @@ function hide()
     if not controllerCyclopedia.ui then
         return
     end
+    resetCyclopediaTabs()
     controllerCyclopedia.ui:hide()
+end
+
+function resetCyclopediaTabs()
+    tabStack = {}
+    controllerCyclopedia.ui.BackButton:setEnabled(false)
+    if previousType then
+        local previousWindow = windowTypes[previousType]
+        previousWindow.obj:enable()
+        previousWindow.obj:setOn(false)
+        previousType = nil;
+    end
 end
 
 function show(defaultWindow)
@@ -234,7 +260,6 @@ function show(defaultWindow)
     controllerCyclopedia.ui.GoldBase.Value:setText(Cyclopedia.formatGold(g_game.getLocalPlayer():getResourceBalance(1)))
 end
 
-local tabStack = {}
 function toggleBack()
     local previousTab = table.remove(tabStack, #tabStack)
     if #tabStack < 1 then
@@ -244,17 +269,6 @@ function toggleBack()
 end
 
 function SelectWindow(type, isBackButtonPress)
-    local windowTypes = {
-        items = { obj = items, func = showItems },
-        bestiary = { obj = bestiary, func = showBestiary },
-        charms = { obj = charms, func = showCharms },
-        map = { obj = map, func = showMap },
-        houses = { obj = houses, func = showHouse },
-        character = { obj = character, func = showCharacter },
-        bosstiary = { obj = bosstiary, func = showBosstiary },
-        bossSlot = { obj = bossSlot, func = showBossSlot }
-    }
-
     if previousType then
         local previousWindow = windowTypes[previousType]
         previousWindow.obj:enable()
