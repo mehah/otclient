@@ -166,11 +166,14 @@ namespace Otc
         FluidTransparent = 0,
         FluidBlue,
         FluidRed,
-        FluidBrown,
+        FluidOrange,
         FluidGreen,
         FluidYellow,
         FluidWhite,
-        FluidPurple
+        FluidPurple,
+        FluidBlack,
+        FluidBrown,
+        FluidPink
     };
 
     enum FluidsType : uint8_t
@@ -189,10 +192,13 @@ namespace Otc
         FluidHealth,
         FluidUrine,
         FluidRum,
-        FluidFruidJuice,
+        FluidFruitJuice,
         FluidCoconutMilk,
         FluidTea,
-        FluidMead
+        FluidMead,
+        FluidInk,
+        FluidCandy,
+        FluidChocolate
     };
 
     enum FightModes : uint8_t
