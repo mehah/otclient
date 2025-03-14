@@ -18,15 +18,18 @@ local bosstiary = nil
 local bossSlot = nil
 local ButtonBossSlot = nil
 local ButtonBestiary = nil
+local tabStack = {}
+local previousType = nil
+local windowTypes = {}
 
-function toggle()
+function toggle(defaultWindow)
     if not controllerCyclopedia.ui then
         return
     end
     if controllerCyclopedia.ui:isVisible() then
         return hide()
     end
-    show()
+    show(defaultWindow)
 end
 
 controllerCyclopedia = Controller:new()
@@ -38,12 +41,12 @@ end
 function controllerCyclopedia:onGameStart()
     if g_game.getClientVersion() >= 1310 then
         CyclopediaButton = modules.game_mainpanel.addToggleButton('CyclopediaButton', tr('Cyclopedia'),
-            '/images/options/cooldowns', toggle, false, 7)
+            '/images/options/cooldowns', function() toggle("items") end, false, 7)
         ButtonBossSlot = modules.game_mainpanel.addToggleButton("bossSlot", tr("Open Boss Slots dialog"),
-            "/images/options/ButtonBossSlot", getBossSlot, false, 20)
+            "/images/options/ButtonBossSlot", function() toggle("bossSlot") end, false, 20)
         CyclopediaButton:setOn(false)
         ButtonBestiary = modules.game_mainpanel.addToggleButton("bosstiary", tr("Open Bosstiary dialog"),
-            "/images/options/ButtonBosstiary", getBosstiary, false, 17)
+            "/images/options/ButtonBosstiary", function() toggle("bosstiary") end, false, 17)
 
         contentContainer = controllerCyclopedia.ui:recursiveGetChildById('contentContainer')
         buttonSelection = controllerCyclopedia.ui:recursiveGetChildById('buttonSelection')
@@ -55,6 +58,17 @@ function controllerCyclopedia:onGameStart()
         character = buttonSelection:recursiveGetChildById('character')
         bosstiary = buttonSelection:recursiveGetChildById('bosstiary')
         bossSlot = buttonSelection:recursiveGetChildById('bossSlot')
+
+        windowTypes = {
+            items = { obj = items, func = showItems },
+            bestiary = { obj = bestiary, func = showBestiary },
+            charms = { obj = charms, func = showCharms },
+            map = { obj = map, func = showMap },
+            houses = { obj = houses, func = showHouse },
+            character = { obj = character, func = showCharacter },
+            bosstiary = { obj = bosstiary, func = showBosstiary },
+            bossSlot = { obj = bossSlot, func = showBossSlot }
+        }
 
         g_ui.importStyle("cyclopedia_widgets")
         g_ui.importStyle("cyclopedia_pages")
@@ -114,8 +128,7 @@ function controllerCyclopedia:onGameStart()
         end
 
         trackerMiniWindow.cyclopediaButton.onClick = function(widget, mousePos, mouseButton)
-            toggle()
-            SelectWindow("bestiary")
+            toggle("bestiary")
             return true
         end
 
@@ -155,8 +168,7 @@ function controllerCyclopedia:onGameStart()
 
         trackerMiniWindowBosstiary.cyclopediaButton.onClick =
             function(widget, mousePos, mouseButton)
-                toggle()
-                SelectWindow("bosstiary")
+                toggle("bosstiary")
                 return true
             end
 
@@ -221,10 +233,22 @@ function hide()
     if not controllerCyclopedia.ui then
         return
     end
+    resetCyclopediaTabs()
     controllerCyclopedia.ui:hide()
 end
 
-function show()
+function resetCyclopediaTabs()
+    tabStack = {}
+    controllerCyclopedia.ui.BackButton:setEnabled(false)
+    if previousType then
+        local previousWindow = windowTypes[previousType]
+        previousWindow.obj:enable()
+        previousWindow.obj:setOn(false)
+        previousType = nil;
+    end
+end
+
+function show(defaultWindow)
     if not controllerCyclopedia.ui or not CyclopediaButton then
         return
     end
@@ -232,25 +256,27 @@ function show()
     controllerCyclopedia.ui:show()
     controllerCyclopedia.ui:raise()
     controllerCyclopedia.ui:focus()
-    SelectWindow("items")
+    SelectWindow(defaultWindow, false)
     controllerCyclopedia.ui.GoldBase.Value:setText(Cyclopedia.formatGold(g_game.getLocalPlayer():getResourceBalance(1)))
 end
 
-function SelectWindow(type)
-    local windowTypes = {
-        items = { obj = items, func = showItems },
-        bestiary = { obj = bestiary, func = showBestiary },
-        charms = { obj = charms, func = showCharms },
-        map = { obj = map, func = showMap },
-        houses = { obj = houses, func = showHouse },
-        character = { obj = character, func = showCharacter },
-        bosstiary = { obj = bosstiary, func = showBosstiary },
-        bossSlot = { obj = bossSlot, func = showBossSlot }
-    }
+function toggleBack()
+    local previousTab = table.remove(tabStack, #tabStack)
+    if #tabStack < 1 then
+        controllerCyclopedia.ui.BackButton:setEnabled(false)
+    end
+    SelectWindow(previousTab, true)
+end
 
+function SelectWindow(type, isBackButtonPress)
     if previousType then
-        previousType.obj:enable()
-        previousType.obj:setOn(false)
+        local previousWindow = windowTypes[previousType]
+        previousWindow.obj:enable()
+        previousWindow.obj:setOn(false)
+        if not isBackButtonPress then
+            table.insert(tabStack, previousType)
+            controllerCyclopedia.ui.BackButton:setEnabled(true)
+        end
     end
     contentContainer:destroyChildren()
 
@@ -258,31 +284,9 @@ function SelectWindow(type)
     if window then
         window.obj:setOn(true)
         window.obj:disable()
-        previousType = window
+        previousType = type
         if window.func then
             window.func(contentContainer)
         end
     end
-end
-
-function getBosstiary()
-    if not controllerCyclopedia.ui then
-        return
-    end
-    if controllerCyclopedia.ui:isVisible() then
-        return hide()
-    end
-    show()
-    SelectWindow("bosstiary")
-end
-
-function getBossSlot()
-    if not controllerCyclopedia.ui then
-        return
-    end
-    if controllerCyclopedia.ui:isVisible() then
-        return hide()
-    end
-    show()
-    SelectWindow("bossSlot")
 end
