@@ -75,17 +75,6 @@ function terminate()
     if editHotkeyWindow then
         closeEditHotkeyWindow()
     end
-    if spellsPanel then
-        disconnect(spellsPanel, {
-            onChildFocusChange = function(self, focusedChild)
-                if focusedChild == nil then
-                    return
-                end
-                updatePreviewSpell(focusedChild)
-            end
-        })
-    end
-
 end
 
 function online()

@@ -166,11 +166,14 @@ namespace Otc
         FluidTransparent = 0,
         FluidBlue,
         FluidRed,
-        FluidBrown,
+        FluidOrange,
         FluidGreen,
         FluidYellow,
         FluidWhite,
-        FluidPurple
+        FluidPurple,
+        FluidBlack,
+        FluidBrown,
+        FluidPink
     };
 
     enum FluidsType : uint8_t
@@ -189,10 +192,13 @@ namespace Otc
         FluidHealth,
         FluidUrine,
         FluidRum,
-        FluidFruidJuice,
+        FluidFruitJuice,
         FluidCoconutMilk,
         FluidTea,
-        FluidMead
+        FluidMead,
+        FluidInk,
+        FluidCandy,
+        FluidChocolate
     };
 
     enum FightModes : uint8_t
@@ -552,6 +558,8 @@ namespace Otc
         GameColorizedLootValue = 121,
         GameAllowPreWalk = 122,
         GamePlayerFamiliars = 123,
+        GameLatencyAdaptiveCamera = 124,
+        GameMapCache = 125,
         LastGameFeature
     };
 
@@ -809,5 +817,15 @@ namespace Otc
         VIP_GROUP_ADD = 1,
         VIP_GROUP_EDIT = 2,
         VIP_GROUP_REMOVE = 3,
+    };
+
+    enum Store_Type_Actions_t : uint8_t
+    {
+        OPEN_HOME = 0,
+        OPEN_PREMIUM_BOOST = 1,
+        OPEN_CATEGORY = 2,
+        OPEN_USEFUL_THINGS = 3,
+        OPEN_OFFER = 4,
+        OPEN_SEARCH = 5,
     };
 }

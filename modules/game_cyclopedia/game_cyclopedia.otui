@@ -226,6 +226,8 @@ MainWindow
     //font: verdana-bold-8px-antialiased
     text-offset: 0 -1
     color: #C0C0C0
+    enabled: false
+    @onClick: toggleBack()
   HorizontalSeparator
     id: BottomSep
     anchors.bottom: CloseButton.top

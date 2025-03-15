@@ -55,7 +55,8 @@ void Game::resetGameStates()
     m_serverBeat = 50;
     m_seq = 0;
     m_ping = -1;
-    m_walkTicks = 0;
+    m_mapUpdatedAt = 0;
+    m_mapUpdateTimer = { true, Timer{} };
     setCanReportBugs(false);
     m_fightMode = Otc::FightBalanced;
     m_chaseMode = Otc::DontChase;
@@ -671,12 +672,12 @@ void Game::autoWalk(const std::vector<Otc::Direction>& dirs, const Position& sta
 
     const Otc::Direction direction = *dirs.begin();
     if (const auto& toTile = g_map.getTile(startPos.translatedToDirection(direction))) {
-        if (startPos == m_localPlayer->m_lastPrewalkDestination && toTile->isWalkable() && m_localPlayer->canWalk(direction, true)) {
+        if (m_localPlayer->isPreWalking() && startPos == m_localPlayer->getPosition() && toTile->isWalkable() && !m_localPlayer->isWalking() && m_localPlayer->canWalk(true)) {
             m_localPlayer->preWalk(direction);
         }
     }
 
-    g_lua.callGlobalField("g_game", "onAutoWalk", dirs);
+    g_lua.callGlobalField("g_game", "onAutoWalk", m_localPlayer, dirs);
     m_protocolGame->sendAutoWalk(dirs);
 }
 
@@ -685,8 +686,10 @@ void Game::forceWalk(const Otc::Direction direction)
     if (!canPerformGameAction())
         return;
 
-    m_walkTimer.restart();
-    m_walkTicks = -1;
+    if (m_mapUpdateTimer.first || m_localPlayer->m_preWalks.size() == 1) {
+        m_mapUpdateTimer.second.restart();
+        m_mapUpdateTimer.first = false;
+    }
 
     switch (direction) {
         case Otc::North:
@@ -1463,12 +1466,12 @@ void Game::seekInContainer(const uint8_t containerId, const uint16_t index)
     m_protocolGame->sendSeekInContainer(containerId, index);
 }
 
-void Game::buyStoreOffer(const uint32_t offerId, const uint8_t productType, const std::string_view name)
+void Game::buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendBuyStoreOffer(offerId, productType, name);
+    m_protocolGame->sendBuyStoreOffer(offerId, action, name, type,location);
 }
 
 void Game::requestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage)
@@ -1479,11 +1482,36 @@ void Game::requestTransactionHistory(const uint32_t page, const uint32_t entries
     m_protocolGame->sendRequestTransactionHistory(page, entriesPerPage);
 }
 
-void Game::requestStoreOffers(const std::string_view categoryName, const uint8_t serviceType)
+void Game::requestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType)
 {
-    enableBotCall();
-    m_protocolGame->sendRequestStoreOffers(categoryName, serviceType);
-    m_denyBotCall = true;
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestStoreOffers(categoryName, subCategory, sortOrder, serviceType);
+}
+
+void Game::sendRequestStoreHome()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestStoreHome();
+}
+
+void Game::sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestStoreOfferById(offerId, sortOrder , serviceType);
+}
+
+void Game::sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestStoreSearch(searchText, sortOrder, serviceType);
 }
 
 void Game::openStore(const uint8_t serviceType, const std::string_view category)
@@ -1764,18 +1792,30 @@ void Game::requestBless()
     m_protocolGame->sendRequestBless();
 }
 
+void Game::sendQuickLoot(const uint8_t variant, const ItemPtr& item)
+{
+    if (!canPerformGameAction())
+        return;
+
+    Position pos = (item && item->getPosition().isValid()) ? item->getPosition() : Position(0, 0, 0);
+    uint16_t itemId = item ? item->getId() : 0;
+    uint8_t stackPos = item ? item->getStackPos() : 0;
+    m_protocolGame->sendQuickLoot(variant, pos, itemId, stackPos);
+}
+
 void Game::requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems)
 {
-    enableBotCall();
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->requestQuickLootBlackWhiteList(filter, size, listedItems);
-    disableBotCall();
 }
 
 void Game::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback)
 {
-    enableBotCall();
+    if (!canPerformGameAction())
+        return;
     m_protocolGame->openContainerQuickLoot(action, category, pos, itemId, stackpos, useMainAsFallback);
-    disableBotCall();
 }
 
 void Game::sendGmTeleport(const Position& pos)

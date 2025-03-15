@@ -432,7 +432,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Blessing
 - Screenshot
 - Highscores
-- Store (compatible with 13.32 - 13.40)
+- Store (compatible with 1098 , 12.91 ~ 13.40)
 - QuickLoot
 - Groups Vip
 
@@ -534,12 +534,11 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
-| Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
 | wheel of destiny            	| ![](https://geps.dev/progress/1) 	| None	|
 | Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
 | fix: Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
-| Sound tibia 13 | ![](https://geps.dev/progress/0)   |   None   	|
+| Sound tibia 13 | ![](https://geps.dev/progress/60)   |   None   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
 

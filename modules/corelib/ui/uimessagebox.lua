@@ -138,11 +138,11 @@ function UIMessageBox:cancel()
     self:destroy()
 end
 
-function UIMessageBox.displaySHOP(title, message,description,data, buttons, onEnterCallback, onEscapeCallback)
+function UIMessageBox.displaySHOP(title, message, description, buttons, onEnterCallback, onEscapeCallback)
     local staticSizes = {
         width = {
-            max = 380,
-            min = 380
+            max = 390,
+            min = 390
         },
         height = {
             min = 200,
@@ -150,13 +150,14 @@ function UIMessageBox.displaySHOP(title, message,description,data, buttons, onEn
         }
     }
     local currentSizes = {
-        width = 380,
-        height = 200
+        width = 0,
+        height = 0
     }
 
     local messageBox = g_ui.createWidget('MessageBoxShopWindow', rootWidget)
     messageBox.title = messageBox:getChildById('title')
     messageBox.title:setText(title)
+    messageBox.title:setTextAutoResize(true)
 
     messageBox.content = messageBox:getChildById('content')
     messageBox.content:setText(message)
@@ -167,31 +168,12 @@ function UIMessageBox.displaySHOP(title, message,description,data, buttons, onEn
     messageBox.additionalLabel:setText(description)
     messageBox.additionalLabel:setTextWrap(true)
     messageBox.additionalLabel:setTextAlign(AlignCenter)
-	
-    if data then
-        local VALOR = data.VALOR
-        local ID = data.ID
-        if VALOR == "item" then
-            local itemWidget = g_ui.createWidget('Item', messageBox.Box)
-            itemWidget:setId(ID)
-            itemWidget:setItemId(ID)
-            itemWidget:fill('parent')
-            itemWidget:setVirtual(true)
-        elseif VALOR == "icon" then
-            local widget = g_ui.createWidget('UIWidget', messageBox.Box)
-            widget:setImageSource("/game_store/images/64/" .. ID)
-            widget:fill('parent')
-        elseif VALOR == "mountId" or VALOR == "outfitId" or VALOR == "maleOutfitId" or VALOR == "outfitId" then
-            local creature = g_ui.createWidget('Creature', messageBox.Box)
-            creature:setOutfit({ type = ID })
-            creature:getCreature():setStaticWalking(1000)
-            creature:fill('parent')
-        end
-    end
 
-    messageBox.content:resize(messageBox.content:getWidth(), messageBox.content:getHeight())
-    currentSizes.width = currentSizes.width + messageBox.content:getWidth() + 32
-    currentSizes.height = currentSizes.height + messageBox.content:getHeight() + 20
+    local contentWidth = messageBox.content:getTextSize().width + messageBox.content:getPaddingLeft() + messageBox.content:getPaddingRight()
+    local contentHeight = messageBox.content:getHeight() + messageBox.content:getPaddingTop() + messageBox.content:getPaddingBottom()
+
+    currentSizes.width = contentWidth + 32
+    currentSizes.height = contentHeight + 20
 
     messageBox.holder = messageBox:getChildById('holder')
 
@@ -206,12 +188,12 @@ function UIMessageBox.displaySHOP(title, message,description,data, buttons, onEn
             button:setImageClip("0 0 108 20")
         else
             button:addAnchor(AnchorRight, 'prev', AnchorLeft)
-            
+
             button:setMarginRight(10)
         end
     end
 
-    messageBox:setWidth(math.min(staticSizes.width.max, math.max(staticSizes.width.min, currentSizes.width)))
+    messageBox:setWidth(currentSizes.width)
     messageBox:setHeight(math.min(staticSizes.height.max, math.max(staticSizes.height.min, currentSizes.height)))
 
     if onEnterCallback then

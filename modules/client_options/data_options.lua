@@ -35,6 +35,7 @@ return {
     showPrivateMessagesInConsole      = true,
     showOthersStatusMessagesInConsole = false,
     showPrivateMessagesOnScreen       = true,
+    showLootMessagesOnScreen          = true,
     showOutfitsOnList                 = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
