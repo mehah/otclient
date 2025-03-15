@@ -72,7 +72,7 @@ stackOfferPanel < Panel
   Label
     id: count
     anchors.bottom: parent.bottom
-    anchors.left: image.right
+    anchors.left: parent.left
     margin: 0 5 5 0
     text-align: center
     text-auto-resize: true
@@ -269,6 +269,7 @@ confirmarSHOP < UIMessageBox
     anchors.top: parent.top
     text-wrap: true
     text-auto-resize: true
+    text-offset: 5 0
     color: #c0c0c0ff
     margin-top: 32
     text-align: center
@@ -276,14 +277,16 @@ confirmarSHOP < UIMessageBox
   Label
 
     id: Box
-    size: 200 105
+    size: 250 105
     anchors.left: parent.left
     anchors.top: content.bottom
     margin-left: 10
+    text-wrap: true
+    text-align: topLeft
     image-source:  /game_store/images/panel_flat
     image-border: 1
   Button
-    id: additionalLabel
+    id: buttonAnimation
     size: 105 105
     anchors.left: Box.right
     anchors.top: content.bottom
@@ -292,18 +295,17 @@ confirmarSHOP < UIMessageBox
     image-border: 1
     text-wrap: true
     image-clip: 0 0 98 40
-    $on:
-      image-clip: 0 40 98 40
+
     $pressed:
       image-clip: 0 40 98 40
-    
 
     UIWidget
-      id: Duration2
-      image-source:  /game_store/images/close
+      id: animation
+      image-source:  /game_store/images/purchase_animation
       anchors.fill: parent
       phantom: true
-      image-smooth: false
+      size: 108 108
+      image-clip: 0 0 108 108
 
   HorizontalSeparator
     anchors.left: Box.left

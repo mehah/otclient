@@ -100,17 +100,27 @@ struct SubOffer
     uint8_t coinType;
     bool disabled;
     uint16_t disabledReason;
+    uint16_t reasonIdDisable;
     uint8_t state;
     uint32_t validUntil;
     uint32_t basePrice;
+    std::string name;         // oldProtocol
+    std::string description;  // oldProtocol
+    std::vector<std::string> icons; // oldProtocol
+    std::string parent;       // oldProtocol
 };
 
 struct StoreOffer
 {
     std::string name;
     std::vector<SubOffer> subOffers;
-    uint32_t ofertaid;
+    uint32_t id;
     std::string description;
+    uint32_t price; // oldProtocol
+    uint8_t state; // oldProtocol
+    uint32_t basePrice; // oldProtocol
+    bool disabled; // oldProtocol
+    std::string reasonIdDisable; // oldProtocol
     uint8_t type;
     std::string icon;
     uint16_t mountId;
@@ -169,6 +179,7 @@ struct StoreData
     std::vector<Banner> banners;
     uint8_t bannerDelay;
     bool tooManyResults;
+    std::vector<std::string> menuFilter;
 };
 
 struct CyclopediaCharacterGeneralStats
@@ -556,7 +567,7 @@ public:
     void useWith(const ItemPtr& item, const ThingPtr& toThing);
     void useInventoryItem(uint16_t itemId);
     void useInventoryItemWith(uint16_t itemId, const ThingPtr& toThing);
-    ItemPtr findItemInContainers(uint32_t itemId, int subType);
+    ItemPtr findItemInContainers(uint32_t itemId, int subType, uint8_t tier);
 
     // container related
     int open(const ItemPtr& item, const ContainerPtr& previousContainer);
@@ -666,9 +677,12 @@ public:
     void seekInContainer(uint8_t containerId, uint16_t index);
 
     // >= 1080 ingame store
-    void buyStoreOffer(uint32_t offerId, uint8_t productType, std::string_view name = "");
+    void buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location);
     void requestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
-    void requestStoreOffers(std::string_view categoryName, uint8_t serviceType = 0);
+    void requestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType);
+    void sendRequestStoreHome();
+    void sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType);
+    void sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType);
     void openStore(uint8_t serviceType = 0, std::string_view category = "");
     void transferCoins(std::string_view recipient, uint16_t amount);
     void openTransactionHistory(uint8_t entriesPerPage);
@@ -705,6 +719,8 @@ public:
     bool isAttacking() { return !!m_attackingCreature && !m_attackingCreature->isRemoved(); }
     bool isFollowing() { return !!m_followingCreature && !m_followingCreature->isRemoved(); }
     bool isConnectionOk() { return m_protocolGame && m_protocolGame->getElapsedTicksSinceLastRead() < 5000; }
+    auto mapUpdatedAt() const { return m_mapUpdatedAt; }
+    void resetMapUpdatedAt() { m_mapUpdatedAt = 0; }
 
     int getPing() { return m_ping; }
     ContainerPtr getContainer(const int index) { return m_containers[index]; }
@@ -759,8 +775,12 @@ public:
                           const std::vector<std::tuple<uint32_t, std::string, std::string, uint8_t, std::string, uint16_t, uint8_t, uint64_t>>& highscores, uint32_t entriesTs);
 
     void requestBless();
+
+    // quickLoot related
+    void sendQuickLoot(const uint8_t variant, const ItemPtr& item);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
+
     void sendGmTeleport(const Position& pos);
 
     // cyclopedia related
@@ -776,6 +796,17 @@ public:
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
+
+    void updateMapLatency() {
+        if (!m_mapUpdateTimer.first) {
+            m_mapUpdatedAt = m_mapUpdateTimer.second.ticksElapsed();
+            m_mapUpdateTimer.first = true;
+        }
+    }
+
+    auto getWalkMaxSteps() { return m_walkMaxSteps; }
+    void setWalkMaxSteps(uint8_t v) { m_walkMaxSteps = v; }
+
 protected:
     void enableBotCall() { m_denyBotCall = false; }
     void disableBotCall() { m_denyBotCall = true; }
@@ -807,6 +838,10 @@ private:
     bool m_safeFight{ true };
     bool m_canReportBugs{ false };
 
+    uint16_t m_mapUpdatedAt{ 0 };
+    std::pair<uint16_t, Timer> m_mapUpdateTimer = { true, Timer{} };
+
+    uint8_t m_walkMaxSteps = 1;
     uint8_t m_openPvpSituations{ 0 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };

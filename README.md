@@ -1,6 +1,6 @@
 <h1><img src="https://github.com/mehah/otclient/blob/main/data/images/clienticon.png?raw=true" width="32" alt="logo"/> OTClient - Redemption</h1>
 
-[![Discord Shield](https://discordapp.com/api/guilds/888062548082061433/widget.png?style=shield)](https://discord.gg/HZN8yJJSyC)
+[![Discord Shield](https://discordapp.com/api/guilds/888062548082061433/widget.png?style=shield)](https://discord.gg/tUjTBZzMCy)
 [![Build - Ubuntu](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-ubuntu.yml)
 [![Build - Windows](https://github.com/mehah/otclient/actions/workflows/build-windows.yml/badge.svg)](https://github.com/mehah/otclient/actions/workflows/build-windows.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -432,7 +432,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Blessing
 - Screenshot
 - Highscores
-- Store (compatible with 13.32 - 13.40)
+- Store (compatible with 1098 , 12.91 ~ 13.40)
 - QuickLoot
 - Groups Vip
 
@@ -517,7 +517,7 @@ xhost -
 
 ## <a name="need-help?">🩺 Need help?</a>
 
-Try to ask questions in [discord](https://discord.gg/HZN8yJJSyC)
+Try to ask questions in [discord](https://discord.gg/tUjTBZzMCy)
 
 ## <a name="bugs">📑 Bugs?</a>
 
@@ -534,12 +534,11 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
-| Android compatibility 	| ![](https://geps.dev/progress/50) 	| [Branch](https://github.com/mehah/otclient/tree/mobile-working) 	|
 | wheel of destiny            	| ![](https://geps.dev/progress/1) 	| None	|
 | Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
 | fix: Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
-| Sound tibia 13 | ![](https://geps.dev/progress/0)   |   None   	|
+| Sound tibia 13 | ![](https://geps.dev/progress/60)   |   None   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
 
