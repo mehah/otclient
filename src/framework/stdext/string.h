@@ -35,7 +35,7 @@ namespace stdext
     /// Resolve a file path by combining sourcePath with filePath
     [[nodiscard]] std::string resolve_path(std::string_view filePath, std::string_view sourcePath);
     /// Get current date and time in a std::string
-    std::string date_time_string(const char* format = "%b %d %Y %H:%M:%S");
+    [[nodiscard]] std::string date_time_string(const char* format = "%b %d %Y %H:%M:%S");
 
     [[nodiscard]] std::string dec_to_hex(uint64_t num);
     [[nodiscard]] uint64_t hex_to_dec(std::string_view str);

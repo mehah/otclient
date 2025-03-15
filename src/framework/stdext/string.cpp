@@ -47,13 +47,12 @@ namespace stdext
         return std::string(sourcePath.substr(0, slashPos + 1)) + std::string(filePath);
     }
 
-    std::string date_time_string(const char* format/* = "%b %d %Y %H:%M:%S"*/)
-    {
+    [[nodiscard]] std::string date_time_string(const char* format/* = "%b %d %Y %H:%M:%S"*/) {
+        std::time_t tnow = std::time(nullptr);
+        std::tm ts{};
+        localtime_s(&ts, &tnow);
         char date[100];
-        std::time_t tnow;
-        std::time(&tnow);
-        const std::tm* ts = std::localtime(&tnow);
-        std::strftime(date, 100, format, ts);
+        std::strftime(date, sizeof(date), format, &ts);
         return std::string(date);
     }
 
