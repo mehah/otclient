@@ -46,12 +46,21 @@ namespace stdext
         return std::string(sourcePath.substr(0, slashPos + 1)) + std::string(filePath);
     }
 
-    [[nodiscard]] std::string date_time_string(const char* format/* = "%b %d %Y %H:%M:%S"*/) {
+    [[nodiscard]] std::string date_time_string(const char* format) {
         std::time_t tnow = std::time(nullptr);
         std::tm ts{};
+
+        // Platform-specific time handling
+#ifdef _WIN32
         localtime_s(&ts, &tnow);
-        char date[100];
-        std::strftime(date, sizeof(date), format, &ts);
+#else
+        localtime_r(&tnow, &ts);
+#endif
+
+        char date[20];  // Reduce buffer size based on expected format
+        if (std::strftime(date, sizeof(date), format, &ts) == 0)
+            throw std::runtime_error("Failed to format date-time string");
+
         return std::string(date);
     }
 
