@@ -53,7 +53,7 @@ namespace stdext
         return (b << 16) | a;
     }
 
-    static std::mt19937& random_gen()
+    std::mt19937& random_gen()
     {
         thread_local static std::mt19937 generator{ std::random_device{}() };
         return generator;
