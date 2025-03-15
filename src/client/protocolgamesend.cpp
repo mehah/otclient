@@ -25,6 +25,7 @@
 #include "protocolgame.h"
 #include <framework/util/crypt.h>
 
+void ProtocolGame::onSend() {}
 void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& buffer)
 {
     if (m_enableSendExtendedOpcode) {
@@ -1133,16 +1134,21 @@ void ProtocolGame::sendStatusTrackerBestiary(const uint16_t raceId, const bool s
     send(msg);
 }
 
-void ProtocolGame::sendBuyStoreOffer(const uint32_t offerId, const uint8_t productType, const std::string_view name)
+void ProtocolGame::sendBuyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientBuyStoreOffer);
     msg->addU32(offerId);
-    msg->addU8(productType);
-
-    if (productType == Otc::ProductTypeNameChange)
+    msg->addU8(action);
+    if (action > 0 && action < 6) {
         msg->addString(name);
-
+        if (action == 3 || action == 5) {
+            msg->addU8(type);
+        }
+        if (action == 5) {
+            msg->addString(location);
+        }
+    }
     send(msg);
 }
 
@@ -1161,16 +1167,45 @@ void ProtocolGame::sendRequestTransactionHistory(const uint32_t page, const uint
     send(msg);
 }
 
-void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, const uint8_t serviceType)
+void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType)
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);
-
-    if (g_game.getFeature(Otc::GameIngameStoreServiceType)) {
-        msg->addU8(serviceType);
-    }
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_CATEGORY);
     msg->addString(categoryName);
+    msg->addString(subCategory);
+    msg->addU8(sortOrder);
+    msg->addU8(serviceType);
+    send(msg);
+}
 
+void ProtocolGame::sendRequestStoreHome() 
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_HOME);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestStoreOfferById(uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_OFFER);
+    msg->addU32(offerId);
+    msg->addU8(sortOrder);
+    msg->addU8(serviceType);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_SEARCH);
+    msg->addString(searchText);
+    msg->addU8(sortOrder);
+    msg->addU8(serviceType);
     send(msg);
 }
 
@@ -1362,10 +1397,25 @@ void ProtocolGame::sendImbuementDurations(const bool isOpen)
     send(msg);
 }
 
+void ProtocolGame::sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint8_t stackpos)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientSendQuickLoot);
+    if (g_game.getClientVersion() >= 1332) {
+        msg->addU8(variant);
+    }
+    addPosition(msg, pos);
+    if (variant != 2) {
+        msg->addU16(itemId);
+        msg->addU8(stackpos);
+    }
+    send(msg);
+}
+
 void ProtocolGame::requestQuickLootBlackWhiteList(const uint8_t filter, const uint16_t size, const std::vector<uint16_t>& listedItems)
 {
     const auto msg = std::make_shared<OutputMessage>();
-    msg->addU8(0x91);
+    msg->addU8(Proto::ClientQuickLootBlackWhitelist);
     msg->addU8(filter);
     msg->addU16(size);
 
@@ -1378,7 +1428,7 @@ void ProtocolGame::requestQuickLootBlackWhiteList(const uint8_t filter, const ui
 void ProtocolGame::openContainerQuickLoot(const uint8_t action, const uint8_t category, const Position& pos, const uint16_t itemId, const uint8_t stackpos, const bool useMainAsFallback)
 {
     const auto msg = std::make_shared<OutputMessage>();
-    msg->addU8(0x90);
+    msg->addU8(Proto::ClientLootContainer);
     msg->addU8(action);
 
     if (action == 0 || action == 4) {

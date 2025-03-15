@@ -107,7 +107,7 @@ void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
 
 void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
 {
-    if (!getThingType())
+    if (!canDraw())
         return;
 
     uint8_t frameSize = getExactSize();
@@ -133,7 +133,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         DEFAULT_COLOR(96, 96, 96),
         NPC_COLOR(0x66, 0xcc, 0xff);
 
-    if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(m_position))
+    if (isDead() || !canBeSeen() || !(drawFlags & Otc::DrawCreatureInfo) || !mapRect.isInRange(getPosition()))
         return;
 
     if (g_gameConfig.isDrawingInformationByWidget()) {
@@ -628,7 +628,8 @@ void Creature::updateWalkingTile()
 
     if (newWalkingTile) {
         newWalkingTile->addWalkingCreature(self);
-        g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
+        if (isLocalPlayer())
+            g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
     }
 
     m_walkingTile = newWalkingTile;
@@ -642,6 +643,7 @@ void Creature::nextWalkUpdate()
 
     // do the update
     updateWalk();
+    onWalking();
 
     if (!m_walking) return;
 
@@ -918,9 +920,11 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
         return 0;
 
     const auto& tilePos = dir == Otc::InvalidDirection ?
-        m_lastStepToPosition : m_position.translatedToDirection(dir);
+        m_lastStepToPosition : getPosition().translatedToDirection(dir);
 
-    const auto& tile = g_map.getTile(tilePos.isValid() ? tilePos : m_position);
+    const auto& tile = g_map.getTile(tilePos.isValid() ? tilePos : getPosition());
+
+    const int serverBeat = g_game.getServerBeat();
 
     int groundSpeed = 0;
     if (tile) groundSpeed = tile->getGroundSpeed();
@@ -937,7 +941,6 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
         } else stepDuration /= m_speed;
 
         if (g_gameConfig.isForcingNewWalkingFormula() || g_game.getClientVersion() >= 860) {
-            const int serverBeat = g_game.getServerBeat();
             stepDuration = ((stepDuration + serverBeat - 1) / serverBeat) * serverBeat;
         }
 
@@ -951,7 +954,17 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
                 : 2);
     }
 
-    return ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
+    auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
+
+    if (isLocalPlayer() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
+        if (m_lastMapDuration == -1)
+            m_lastMapDuration = ((g_game.mapUpdatedAt() + 9) / 10) * 10;
+
+        // stabilizes camera transition with server response time to keep movement fluid.
+        duration = std::max<int>(duration, m_lastMapDuration);
+    }
+
+    return duration;
 }
 
 Point Creature::getDisplacement() const
@@ -1114,6 +1127,9 @@ void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
 }
 
 void Creature::setStaticWalking(const uint16_t v) {
+    if (!canDraw())
+        return;
+
     if (m_walkUpdateEvent) {
         m_walkUpdateEvent->cancel();
         m_walkUpdateEvent = nullptr;
