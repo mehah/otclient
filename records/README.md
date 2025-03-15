@@ -1,6 +1,6 @@
 # Record On Client
 
-`modules/client_entergame/entergame.lua`
+`modules/client_entergame/characterlist.lua`
 https://github.com/mehah/otclient/blob/5bf0e87ff4393d300c02e9185f18e8cea9f52a90/modules/client_entergame/characterlist.lua#L48
 Add Add an argument to the function `g_game.loginWorld` , which represents the name and extension.
 
