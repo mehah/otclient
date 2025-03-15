@@ -603,11 +603,11 @@ MainWindow
     id: openStore
     anchors.left: prev.right
     margin-left: 10
-    size: 20 20
+    size: 26 20
     anchors.verticalCenter: closeButton.verticalCenter
     tooltip: Go to the Store to get more Prey Wildcards!
     image-source: /images/topbuttons/shop
-    image-clip: 0 0 20 20
+    image-clip: 0 0 26 20
     background-color: #17354e
     @onClick: modules.game_shop.show()
 

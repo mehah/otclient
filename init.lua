@@ -3,9 +3,9 @@
 
 -- updater
 Services = {
-    --updater = "http://localhost/api/updater.php", --./updater
-    --status = "http://localhost/login.php", --./client_entergame | ./client_topmenu
-    --websites = "http://localhost/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
+    --updater = "https://underfox.servegame.com/api/updater.php", --./updater
+    status = "https://underfox.servegame.com/login.php", --./client_entergame | ./client_topmenu
+    websites = "https://underfox.servegame.com/?subtopic=accountmanagement", --./client_entergame "Forgot password and/or email"
 }
 
 --[[
@@ -103,7 +103,7 @@ local function loadModules()
     end
 
     -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
-    -- g_modules.enableAutoReload()
+    g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip
