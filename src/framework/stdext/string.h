@@ -49,8 +49,8 @@ namespace stdext
     void replace_all(std::string& str, std::string_view search, std::string_view replacement);
 
     [[nodiscard]] constexpr bool is_valid_utf8(std::string_view src);
-    std::string utf8_to_latin1(std::string_view src);
-    std::string latin1_to_utf8(std::string_view src);
+    [[nodiscard]] std::string utf8_to_latin1(std::string_view src);
+    [[nodiscard]] std::string latin1_to_utf8(std::string_view src);
 
 #ifdef WIN32
     [[nodiscard]] std::wstring utf8_to_utf16(std::string_view src);

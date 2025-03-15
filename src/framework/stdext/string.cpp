@@ -90,39 +90,37 @@ namespace stdext
         return true;
     }
 
-    std::string utf8_to_latin1(const std::string_view src)
-    {
+    [[nodiscard]] std::string utf8_to_latin1(std::string_view src) {
         std::string out;
-        for (int i = -1, s = src.length(); ++i < s;) {
-            const uint8_t c = src[i];
-            if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09)
+        out.reserve(src.size()); // Reserve memory to avoid multiple allocations
+        for (size_t i = 0; i < src.size(); ++i) {
+            uint8_t c = static_cast<uint8_t>(src[i]);
+            if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09) {
                 out += c;
-            else if (c == 0xc2 || c == 0xc3) {
-                const uint8_t c2 = src[++i];
-                if (c == 0xc2) {
-                    if (c2 > 0xa1 && c2 < 0xbb)
-                        out += c2;
-                } else if (c == 0xc3)
-                    out += 64 + c2;
-            } else if (c >= 0xc4 && c <= 0xdf)
-                i += 1;
-            else if (c >= 0xe0 && c <= 0xed)
-                i += 2;
-            else if (c >= 0xf0 && c <= 0xf4)
-                i += 3;
+            } else if (c == 0xc2 || c == 0xc3) {
+                if (i + 1 < src.size()) {
+                    uint8_t c2 = static_cast<uint8_t>(src[++i]);
+                    out += (c == 0xc2) ? c2 : (c2 + 64);
+                }
+            } else {
+                // Skip multi-byte characters
+                while (i + 1 < src.size() && (src[i + 1] & 0xC0) == 0x80) {
+                    ++i;
+                }
+            }
         }
         return out;
     }
 
-    std::string latin1_to_utf8(const std::string_view src)
-    {
+    [[nodiscard]] std::string latin1_to_utf8(std::string_view src) {
         std::string out;
-        for (const uint8_t c : src) {
-            if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09)
-                out += c;
-            else {
-                out += 0xc2 + (c > 0xbf);
-                out += 0x80 + (c & 0x3f);
+        out.reserve(src.size() * 2); // Reserve space to reduce allocations
+        for (uint8_t c : src) {
+            if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09) {
+                out += c; // Directly append ASCII characters
+            } else {
+                out.push_back(0xc2 + (c > 0xbf));
+                out.push_back(0x80 + (c & 0x3f));
             }
         }
         return out;
@@ -154,40 +152,20 @@ namespace stdext
         return res;
     }
 
-    std::wstring latin1_to_utf16(const std::string_view src)
-    {
-        return utf8_to_utf16(latin1_to_utf8(src));
-    }
+    std::wstring latin1_to_utf16(const std::string_view src) { return utf8_to_utf16(latin1_to_utf8(src)); }
 
-    std::string utf16_to_latin1(const std::wstring_view src)
-    {
-        return utf8_to_latin1(utf16_to_utf8(src));
-    }
+    std::string utf16_to_latin1(const std::wstring_view src) { return utf8_to_latin1(utf16_to_utf8(src)); }
 #endif
 
-    void tolower(std::string& str) {
-        std::ranges::transform(str, str.begin(), ::tolower);
-    }
+    void tolower(std::string& str) { std::ranges::transform(str, str.begin(), ::tolower); }
 
-    void toupper(std::string& str) {
-        std::ranges::transform(str, str.begin(), ::toupper);
-    }
+    void toupper(std::string& str) { std::ranges::transform(str, str.begin(), ::toupper); }
 
-    void ltrim(std::string& s)
-    {
-        s.erase(s.begin(), std::ranges::find_if(s, [](unsigned char ch) { return !std::isspace(ch); }));
-    }
+    void ltrim(std::string& s) { s.erase(s.begin(), std::ranges::find_if(s, [](unsigned char ch) { return !std::isspace(ch); })); }
 
-    void rtrim(std::string& s)
-    {
-        s.erase(std::ranges::find_if(s | std::views::reverse, [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
-    }
+    void rtrim(std::string& s) { s.erase(std::ranges::find_if(s | std::views::reverse, [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end()); }
 
-    void trim(std::string& s)
-    {
-        ltrim(s);
-        rtrim(s);
-    }
+    void trim(std::string& s) { ltrim(s);       rtrim(s); }
 
     void ucwords(std::string& str) {
         bool capitalize = true;
@@ -209,10 +187,7 @@ namespace stdext
         }
     }
 
-    void eraseWhiteSpace(std::string& str)
-    {
-        std::erase_if(str, isspace);
-    }
+    void eraseWhiteSpace(std::string& str) { std::erase_if(str, isspace); }
 
     [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators) {
         std::vector<std::string> result;
