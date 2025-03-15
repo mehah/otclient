@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <ranges>
 #include <vector>
-#include <format>
 #include <charconv>
 
 #include "exception.h"
