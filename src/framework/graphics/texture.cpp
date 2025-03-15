@@ -33,8 +33,8 @@
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
 
-Texture::Texture() : m_uniqueId(++UID) { generateHash(); }
-Texture::Texture(const Size& size) : m_uniqueId(++UID)
+Texture::Texture() : m_uniqueId(UID.fetch_add(1)) { generateHash(); }
+Texture::Texture(const Size& size) : m_uniqueId(UID.fetch_add(1))
 {
     generateHash();
     if (!setupSize(size))
@@ -47,7 +47,7 @@ Texture::Texture(const Size& size) : m_uniqueId(++UID)
     setupFilters();
 }
 
-Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(++UID)
+Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(UID.fetch_add(1))
 {
     generateHash();
 

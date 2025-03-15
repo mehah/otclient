@@ -61,7 +61,7 @@ end
 context.changeOutfit = context.setOutfit
 context.setSpeed = function(value) context.player:setSpeed(value) end
 
-context.walk = function(dir) return modules.game_interface.smartWalk(dir) end
+context.walk = function(dir) return modules.game_walk.smartWalk(dir) end
 context.turn = function(dir) return g_game.turn(dir) end
 
 -- game releated

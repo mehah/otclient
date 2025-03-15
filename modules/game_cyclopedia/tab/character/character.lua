@@ -592,7 +592,7 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
     end
     UI.CombatStats.reductionNone:destroyChildren()
 
-    if  (next(combatsArray) == nil) then
+    if (next(combatsArray) == nil) then
         UI.CombatStats.reductionNone:setVisible(true)
     else
         UI.CombatStats.reductionNone:setVisible(true)
@@ -628,6 +628,22 @@ function Cyclopedia.loadCharacterCombatStats(data, mitigation, additionalSkillsA
                 widget.name:setText(element.id)
             end
             widget:setMarginLeft(13)
+        end
+    end
+
+    -- concoctions
+    UI.CombatStats.concoctionPanel:destroyChildren()
+    if concoctionsArray or next(concoctionsArray) ~= nil then
+        for i = 1, #concoctionsArray do
+            local widget = g_ui.createWidget("CharacterGridItem", UI.CombatStats.concoctionPanel)
+            local itemId = concoctionsArray[i][1]
+            widget:setId("concoction_" .. itemId)
+            widget.item:setItemId(itemId)
+            widget.item:setVirtual(true)
+            local minutes = concoctionsArray[i][2] / 60
+            local itemName = widget.item:getItem():getMarketData().name
+            widget.item:setTooltip(string.format("%s: %.0f minutes", itemName, minutes))
+            widget.amount:setVisible(false)
         end
     end
 
