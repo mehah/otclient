@@ -57,7 +57,10 @@ namespace stdext
     }
 
     [[nodiscard]] std::string dec_to_hex(uint64_t num) {
-        return std::format("{:x}", num);
+        char buffer[17]; // 16 characters for a uint64_t in hex + null terminator
+        auto [ptr, ec] = std::to_chars(buffer, buffer + sizeof(buffer) - 1, num, 16);
+        *ptr = '\0'; // Null-terminate the string
+        return std::string(buffer);
     }
 
     [[nodiscard]] uint64_t hex_to_dec(std::string_view str) {
