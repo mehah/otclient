@@ -7,7 +7,7 @@ Add Add an argument to the function `g_game.loginWorld` , which represents the n
 Ex: `os.time() .. '.cam'`
 ```diff
 -   g_game.loginWorld(G.account, G.password, charInfo.worldName, charInfo.worldHost, charInfo.worldPort, charInfo.characterName, G.authenticatorToken, G.sessionKey)
-+ g_game.loginWorld(G.account, G.password, charInfo.worldName, charInfo.worldHost, charInfo.worldPort, charInfo.characterName, G.authenticatorToken, G.sessionKey, os.time() .. '.cam')
++   g_game.loginWorld(G.account, G.password, charInfo.worldName, charInfo.worldHost, charInfo.worldPort, charInfo.characterName, G.authenticatorToken, G.sessionKey, os.time() .. '.cam')
 ```
 
 # Record On TFS by gesior
