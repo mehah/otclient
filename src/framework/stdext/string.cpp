@@ -79,7 +79,7 @@ namespace stdext
         return num;
     }
 
-    [[nodiscard]] constexpr bool is_valid_utf8(std::string_view src) {
+    [[nodiscard]] bool is_valid_utf8(std::string_view src) {
         for (size_t i = 0; i < src.size();) {
             unsigned char c = src[i];
             size_t bytes = (c < 0x80) ? 1 : (c < 0xE0) ? 2 : (c < 0xF0) ? 3 : (c < 0xF5) ? 4 : 0;
