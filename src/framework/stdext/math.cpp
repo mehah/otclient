@@ -53,41 +53,48 @@ namespace stdext
         return (b << 16) | a;
     }
 
-    int random_range(const int min, const int max)
+    static std::mt19937& random_gen()
     {
-        thread_local std::mt19937 gen(std::random_device{}());
-        std::uniform_int_distribution<int> dis(std::min<int>(min, max), std::max<int>(min, max));
-        return dis(gen);
-    }
-
-    float random_range(const float min, const float max)
-    {
-        thread_local std::mt19937 gen(std::random_device{}());
-        std::uniform_real_distribution<float> dis(min, max);
-        return dis(gen);
-    }
-
-    std::mt19937& random_gen()
-    {
-        thread_local std::mt19937 generator(std::random_device{}());
+        thread_local static std::mt19937 generator{ std::random_device{}() };
         return generator;
     }
 
-    bool random_bool(const double probability)
+    int random_range(int min, int max)
     {
-        thread_local std::mt19937& gen = random_gen();
-        return std::bernoulli_distribution(probability)(gen);
+        if (min > max) std::swap(min, max);
+
+        std::uniform_int_distribution<int> dis(min, max);
+        return dis(random_gen());
     }
 
-    int32_t normal_random(const int32_t minNumber, const int32_t maxNumber)
+    float random_range(float min, float max)
     {
-        thread_local std::mt19937& gen = random_gen();
-        static std::normal_distribution<float> normalRand(0.5f, 0.25f);
+        if (min > max) std::swap(min, max);
+
+        std::uniform_real_distribution<float> dis(min, max);
+        return dis(random_gen());
+    }
+
+    bool random_bool(double probability)
+    {
+        if (probability < 0.0 || probability > 1.0)
+            throw std::invalid_argument("Probability must be between 0 and 1");
+
+        std::bernoulli_distribution dis(probability);
+        return dis(random_gen());
+    }
+
+    int32_t normal_random(int32_t minNumber, int32_t maxNumber)
+    {
+        if (minNumber > maxNumber) std::swap(minNumber, maxNumber);
+
+        thread_local static std::normal_distribution<float> normalRand(0.5f, 0.25f);
 
         float v;
-        while ((v = normalRand(gen)) < 0.0 || v > 1.0);
+        do {
+            v = normalRand(random_gen());
+        } while (v < 0.0f || v > 1.0f); // Garante que o valor está entre 0 e 1
 
-        auto [a, b] = std::minmax(minNumber, maxNumber);
-        return static_cast<int32_t>(std::round(a + v * (b - a)));
+        return static_cast<int32_t>(std::round(minNumber + v * (maxNumber - minNumber)));
     }
 }
