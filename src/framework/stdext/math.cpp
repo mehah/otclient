@@ -54,9 +54,13 @@ namespace stdext
         return (b << 16) | a;
     }
 
-    std::mt19937& random_gen()
-    {
-        thread_local static std::mt19937 generator{ std::random_device{}() };
+    std::mt19937& random_gen() {
+        thread_local static std::mt19937 generator([] {
+            std::random_device rd;
+            std::seed_seq seq{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() };
+            return std::mt19937(seq);
+        }());
+
         return generator;
     }
 
