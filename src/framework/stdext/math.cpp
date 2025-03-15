@@ -24,6 +24,7 @@
 #include <climits>
 #include <cmath>
 #include <random>
+#include <stdexcept>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4267) // '?' : conversion from 'A' to 'B', possible loss of data
