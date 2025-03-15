@@ -58,9 +58,6 @@
     <Filter Include="Source Files\framework\util">
       <UniqueIdentifier>{72db416b-9ce3-4263-a2c2-8a0c2b70d560}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\framework\xml">
-      <UniqueIdentifier>{54796849-74ed-4598-9e80-fcbceb7d5f2d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\framework\core">
       <UniqueIdentifier>{795a6eac-124a-40b3-9b1e-239b14c4356e}</UniqueIdentifier>
     </Filter>
@@ -75,9 +72,6 @@
     </Filter>
     <Filter Include="Header Files\framework\net">
       <UniqueIdentifier>{4223b0e8-d3ca-4d2f-8e8f-b6031d23f154}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\framework\xml">
-      <UniqueIdentifier>{bf591049-3ef9-426e-8e03-9d6a84875801}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\framework\util">
       <UniqueIdentifier>{a40c2fa6-72ad-4e88-b01e-dd584f0faf8e}</UniqueIdentifier>
