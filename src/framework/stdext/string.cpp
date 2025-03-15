@@ -41,7 +41,7 @@ namespace stdext
 
         auto slashPos = sourcePath.find_last_of('/');
         if (slashPos == std::string::npos)
-            throw std::runtime_error(std::format("Invalid source path '{}' for file '{}'", sourcePath, filePath));
+            throw std::runtime_error("Invalid source path '" + std::string(sourcePath) + "' for file '" + std::string(filePath) + "'");
 
         return std::string(sourcePath.substr(0, slashPos + 1)) + std::string(filePath);
     }
