@@ -18,8 +18,11 @@ Ex: `os.time() .. '.cam'`
 # Play Record
 In terminal : 
 ```lua
-g_game.setClientVersion(860)         
-g_game.setProtocolVersion(g_game.getClientProtocolVersion(860))         
-g_game.playRecord("test860.cam")
+g_game.setClientVersion(1098)         
+g_game.setProtocolVersion(g_game.getClientProtocolVersion(1098))         
+```
+
+```lua
+g_game.playRecord("test1098.cam")
 EnterGame.hide()
 ```
