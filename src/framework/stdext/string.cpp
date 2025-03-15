@@ -191,7 +191,7 @@ namespace stdext
 
     [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators) {
         std::vector<std::string> result;
-        for (auto&& part : str | std::views::split(separators)) {
+        for (auto&& part : std::views::split(str, separators)) {
             result.emplace_back(part.begin(), part.end());
         }
         return result;
