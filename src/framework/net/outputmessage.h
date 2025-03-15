@@ -66,6 +66,7 @@ protected:
     void writeMessageSize();
 
     friend class Protocol;
+    friend class PacketPlayer;
 
 private:
     bool canWrite(int bytes) const;
