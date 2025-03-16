@@ -606,13 +606,15 @@ MainWindow
     size: 26 20
     anchors.verticalCenter: closeButton.verticalCenter
     tooltip: Go to the Store to get more Prey Wildcards!
-    image-source: /images/topbuttons/shop
+    image-source: /images/game/prey/prey_smallstore
     image-clip: 0 0 26 20
     background-color: #17354e
-    @onClick: modules.game_shop.show()
+    @onClick: modules.game_store.show()
 
     $pressed:
-      image-clip: 0 20 20 20
+      image-clip: 0 0 26 20
+      image-source: /images/game/prey/prey_smallstore_clicked
+      image-clip: -1 -1 27 21
 
 PreyCreature < Panel
   height: 22
