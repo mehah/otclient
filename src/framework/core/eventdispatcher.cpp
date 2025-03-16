@@ -218,7 +218,7 @@ void EventDispatcher::executeScheduledEvents() {
 void EventDispatcher::mergeEvents() {
     std::shared_lock l(m_sharedLock);
     for (const auto& thread : m_threads) {
-        std::scoped_lock lock(thread->mutex);
+        std::unique_lock lock(thread->mutex, std::try_to_lock);
         if (!thread->events.empty()) {
             m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
             thread->events.clear();
