@@ -54,7 +54,7 @@ Color::Color(const std::string_view coltext)
     update();
 }
 
-constexpr void Color::update() { m_hash = rgba(); }
+void Color::update() { m_hash = rgba(); }
 
 std::ostream& operator<<(std::ostream& out, const Color& color)
 {
