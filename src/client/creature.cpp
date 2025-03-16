@@ -135,7 +135,7 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, const int drawFlags)
 {
-    static const Color
+    static constexpr Color
         DEFAULT_COLOR(96, 96, 96),
         NPC_COLOR(0x66, 0xcc, 0xff);
 
@@ -717,7 +717,7 @@ void Creature::terminateWalk()
 
 void Creature::setHealthPercent(const uint8_t healthPercent)
 {
-    static const Color
+    static constexpr Color
         COLOR1(0x00, 0xBC, 0x00),
         COLOR2(0x50, 0xA1, 0x50),
         COLOR3(0xA1, 0xA1, 0x00),
