@@ -32,16 +32,18 @@ template<class T>
 class TPoint
 {
 public:
-    TPoint() : x(0), y(0) {}
-    TPoint(T xy) : x(xy), y(xy) {}
-    TPoint(T x, T y) : x(x), y(y) {}
-    TPoint(const TPoint& other) : x(other.x), y(other.y) {}
+    T x{}, y{};
+    constexpr TPoint() = default;
+    constexpr TPoint(T x, T y) : x{ x }, y{ y } {}
+    constexpr TPoint(T xy) : x{ xy }, y{ xy } {}
 
-    bool isNull() const { return x == 0 && y == 0; }
-    TSize<T> toSize() const { return TSize<T>(x, y); }
-    TPoint translated(T dx, T dy) const { TPoint point = *this; point.x += dx; point.y += dy; return point; }
-
-    TPoint scale(const float v) {
+    constexpr bool isNull() const noexcept { return x == 0 && y == 0; }
+    constexpr T manhattanLength() const noexcept { return std::abs(x) + std::abs(y); }
+    constexpr float length() const noexcept { return std::sqrt(static_cast<float>(x * x + y * y)); }
+    constexpr float distanceFrom(const TPoint& other) const noexcept { return (*this - other).length(); }
+    constexpr TPoint translated(T dx, T dy) const noexcept { return { x + dx, y + dy }; }
+    constexpr TSize<T> toSize() const noexcept { return { x, y }; }
+    constexpr TPoint scale(float v) noexcept {
         if (v != 1.f) {
             float factor = (1.f - (1.f / v));
             x -= x * factor;
@@ -50,7 +52,7 @@ public:
         return *this;
     }
 
-    TPoint operator-() const { return TPoint(-x, -y); }
+    constexpr TPoint operator-() const noexcept { return { -x, -y }; }
 
     TPoint operator+(const TPoint& other) const { return TPoint(x + other.x, y + other.y); }
     TPoint& operator+=(const TPoint& other) { x += other.x; y += other.y; return *this; }
@@ -82,30 +84,16 @@ public:
     bool operator==(const TPoint& other) const { return other.x == x && other.y == y; }
     bool operator!=(const TPoint& other) const { return other.x != x || other.y != y; }
 
-    float length() const { return sqrt(static_cast<float>(x * x + y * y)); }
-    T manhattanLength() const { return std::abs(x) + std::abs(y); }
+    constexpr std::size_t hash() const noexcept { return (7 * 15 + x) * 15 + y; }
 
-    float distanceFrom(const TPoint& other) const { return TPoint(x - other.x, y - other.y).length(); }
+    friend std::ostream& operator<<(std::ostream& out, const TPoint& point) {
+        return out << point.x << " " << point.y;
+    }
 
-    std::size_t hash() const { return (7 * 15 + x) * 15 + y; }
-
-    T x, y;
+    friend std::istream& operator>>(std::istream& in, TPoint& point) {
+        return in >> point.x >> point.y;
+    }
 };
 
 using Point = TPoint<int>;
 using PointF = TPoint<float>;
-
-template<class T>
-std::ostream& operator<<(std::ostream& out, const TPoint<T>& point)
-{
-    out << point.x << " " << point.y;
-    return out;
-}
-
-template<class T>
-std::istream& operator>>(std::istream& in, TPoint<T>& point)
-{
-    in >> point.x;
-    in >> point.y;
-    return in;
-}
