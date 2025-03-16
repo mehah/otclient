@@ -680,6 +680,7 @@ function setupHotkeys()
                 elseif slot.useType == 'equip' then
                     local item = Item.create(slot.itemId)
                     if item then
+                        item:setTier(slot.getTier)
                         g_game.equipItem(item)
                     end
                 end
@@ -723,6 +724,7 @@ function setupHotkeys()
                     elseif slot.useType == 'equip' then
                         local item = Item.create(slot.itemId)
                         if item then
+                            item:setTier(slot.getTier)
                             g_game.equipItem(item)
                         end
                     end
