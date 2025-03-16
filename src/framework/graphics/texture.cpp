@@ -213,44 +213,44 @@ void Texture::setupFilters() const
 
 void Texture::setupTranformMatrix()
 {
-    const static Size SIZE32x64(32, 64);
-    const static Size SIZE64x32(64, 32);
-    const static Size SIZE64x128(64, 128);
-    const static Size SIZE128x256(128, 256);
-    const static Size SIZE256x512(256, 512);
-    const static Size SIZE512x1024(512, 1024);
+    static constexpr Size SIZE32x64(32, 64);
+    static constexpr Size SIZE64x32(64, 32);
+    static constexpr Size SIZE64x128(64, 128);
+    static constexpr Size SIZE128x256(128, 256);
+    static constexpr Size SIZE256x512(256, 512);
+    static constexpr Size SIZE512x1024(512, 1024);
 
-    static Matrix3 MATRIX11x11_CACHED = toMatrix(11);
-    static Matrix3 MATRIX32x32_CACHED = toMatrix(32);
-    static Matrix3 MATRIX64x64_CACHED = toMatrix(64);
-    static Matrix3 MATRIX128x128_CACHED = toMatrix(128);
-    static Matrix3 MATRIX256x256_CACHED = toMatrix(256);
-    static Matrix3 MATRIX512x512_CACHED = toMatrix(512);
+    static const auto MATRIX11x11_CACHED = toMatrix(11);
+    static const auto MATRIX32x32_CACHED = toMatrix(32);
+    static const auto MATRIX64x64_CACHED = toMatrix(64);
+    static const auto MATRIX128x128_CACHED = toMatrix(128);
+    static const auto MATRIX256x256_CACHED = toMatrix(256);
+    static const auto MATRIX512x512_CACHED = toMatrix(512);
 
-    static Matrix3 MATRIX32x64_CACHED = toMatrix(SIZE32x64);
-    static Matrix3 MATRIX64x32_CACHED = toMatrix(SIZE64x32);
-    static Matrix3 MATRIX64x128_CACHED = toMatrix(SIZE64x128);
-    static Matrix3 MATRIX128x256_CACHED = toMatrix(SIZE128x256);
-    static Matrix3 MATRIX256x512_CACHED = toMatrix(SIZE256x512);
-    static Matrix3 MATRIX512x1024_CACHED = toMatrix(SIZE512x1024);
+    static const auto MATRIX32x64_CACHED = toMatrix(SIZE32x64);
+    static const auto MATRIX64x32_CACHED = toMatrix(SIZE64x32);
+    static const auto MATRIX64x128_CACHED = toMatrix(SIZE64x128);
+    static const auto MATRIX128x256_CACHED = toMatrix(SIZE128x256);
+    static const auto MATRIX256x512_CACHED = toMatrix(SIZE256x512);
+    static const auto MATRIX512x1024_CACHED = toMatrix(SIZE512x1024);
 
     if (getProp(upsideDown)) {
         m_transformMatrix = { 1.0f / m_size.width(), 0.0f,                                                  0.0f,
                               0.0f,                 -1.0f / m_size.height(),                                0.0f,
                               0.0f,                  m_size.height() / static_cast<float>(m_size.height()), 1.0f };
     } else {
-        if (m_size == 11) m_transformMatrix = std::move(MATRIX11x11_CACHED);
-        else if (m_size == 32) m_transformMatrix = std::move(MATRIX32x32_CACHED);
-        else if (m_size == 64) m_transformMatrix = std::move(MATRIX64x64_CACHED);
-        else if (m_size == 128) m_transformMatrix = std::move(MATRIX128x128_CACHED);
-        else if (m_size == 256) m_transformMatrix = std::move(MATRIX256x256_CACHED);
-        else if (m_size == 512) m_transformMatrix = std::move(MATRIX512x512_CACHED);
-        else if (m_size == SIZE32x64) m_transformMatrix = std::move(MATRIX32x64_CACHED);
-        else if (m_size == SIZE64x32) m_transformMatrix = std::move(MATRIX64x32_CACHED);
-        else if (m_size == SIZE64x128) m_transformMatrix = std::move(MATRIX64x128_CACHED);
-        else if (m_size == SIZE128x256) m_transformMatrix = std::move(MATRIX128x256_CACHED);
-        else if (m_size == SIZE256x512) m_transformMatrix = std::move(MATRIX256x512_CACHED);
-        else if (m_size == SIZE512x1024) m_transformMatrix = std::move(MATRIX512x1024_CACHED);
+        if (m_size == 11) m_transformMatrix = MATRIX11x11_CACHED;
+        else if (m_size == 32) m_transformMatrix = MATRIX32x32_CACHED;
+        else if (m_size == 64) m_transformMatrix = MATRIX64x64_CACHED;
+        else if (m_size == 128) m_transformMatrix = MATRIX128x128_CACHED;
+        else if (m_size == 256) m_transformMatrix = MATRIX256x256_CACHED;
+        else if (m_size == 512) m_transformMatrix = MATRIX512x512_CACHED;
+        else if (m_size == SIZE32x64) m_transformMatrix = MATRIX32x64_CACHED;
+        else if (m_size == SIZE64x32) m_transformMatrix = MATRIX64x32_CACHED;
+        else if (m_size == SIZE64x128) m_transformMatrix = MATRIX64x128_CACHED;
+        else if (m_size == SIZE128x256) m_transformMatrix = MATRIX128x256_CACHED;
+        else if (m_size == SIZE256x512) m_transformMatrix = MATRIX256x512_CACHED;
+        else if (m_size == SIZE512x1024) m_transformMatrix = MATRIX512x1024_CACHED;
         else m_transformMatrix = toMatrix(m_size);
     }
 }

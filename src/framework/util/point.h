@@ -67,10 +67,10 @@ public:
     constexpr TPoint& operator+=(T other) { x += other; y += other; return *this; }
     constexpr TPoint operator-(T other) const { return { x - other, y - other }; }
     constexpr TPoint& operator-=(T other) { x -= other; y -= other; return *this; }
-    constexpr TPoint operator*(T v) const { return { x * v, y * v }; }
-    constexpr TPoint& operator*=(T v) { x *= v; y *= v; return *this; }
-    constexpr TPoint operator/(T v) const { return { x / v, y / v }; }
-    constexpr TPoint& operator/=(T v) { x /= v; y /= v; return *this; }
+    constexpr TPoint operator*(float v) const { return TPoint(x * v, y * v); }
+    constexpr TPoint& operator*=(float v) { x *= v; y *= v; return *this; }
+    constexpr TPoint operator/(float v) const { return TPoint(x / v, y / v); }
+    constexpr TPoint& operator/=(float v) { x /= v; y /= v; return *this; }
 
     constexpr TPoint operator&(int a) const { return { x & a, y & a }; }
     constexpr TPoint& operator&=(int a) { x &= a; y &= a; return *this; }

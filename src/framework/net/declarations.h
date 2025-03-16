@@ -35,6 +35,8 @@ class Connection;
 class Protocol;
 class ProtocolHttp;
 class Server;
+class PacketPlayer;
+class PacketRecorder;
 
 using InputMessagePtr = std::shared_ptr<InputMessage>;
 using OutputMessagePtr = std::shared_ptr<OutputMessage>;
@@ -46,3 +48,5 @@ using ConnectionPtr = std::shared_ptr<Connection>;
 using ProtocolPtr = std::shared_ptr<Protocol>;
 using ProtocolHttpPtr = std::shared_ptr<ProtocolHttp>;
 using ServerPtr = std::shared_ptr<Server>;
+using PacketPlayerPtr = std::shared_ptr<PacketPlayer>;
+using PacketRecorderPtr = std::shared_ptr<PacketRecorder>;
