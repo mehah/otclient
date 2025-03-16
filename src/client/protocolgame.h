@@ -375,6 +375,7 @@ private:
     bool m_gameInitialized{ false };
     bool m_mapKnown{ false };
     bool m_firstRecv{ true };
+    bool m_record {false};
 
     std::string m_accountName;
     std::string m_accountPassword;
