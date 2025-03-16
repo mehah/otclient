@@ -54,35 +54,36 @@ public:
 
     constexpr TPoint operator-() const noexcept { return { -x, -y }; }
 
-    TPoint operator+(const TPoint& other) const { return TPoint(x + other.x, y + other.y); }
-    TPoint& operator+=(const TPoint& other) { x += other.x; y += other.y; return *this; }
-    TPoint operator-(const TPoint& other) const { return TPoint(x - other.x, y - other.y); }
-    TPoint& operator-=(const TPoint& other) { x -= other.x; y -= other.y; return *this; }
-    TPoint operator*(const TPoint& other) const { return TPoint(x * other.x, y * other.y); }
-    TPoint& operator*=(const TPoint& other) { x *= other.x; y *= other.y; return *this; }
-    TPoint operator/(const TPoint& other) const { return TPoint(x / other.x, y / other.y); }
-    TPoint& operator/=(const TPoint& other) { x /= other.x; y /= other.y; return *this; }
+    constexpr TPoint operator+(const TPoint& other) const { return { x + other.x, y + other.y }; }
+    constexpr TPoint& operator+=(const TPoint& other) { x += other.x; y += other.y; return *this; }
+    constexpr TPoint operator-(const TPoint& other) const { return { x - other.x, y - other.y }; }
+    constexpr TPoint& operator-=(const TPoint& other) { x -= other.x; y -= other.y; return *this; }
+    constexpr TPoint operator*(const TPoint& other) const { return { x * other.x, y * other.y }; }
+    constexpr TPoint& operator*=(const TPoint& other) { x *= other.x; y *= other.y; return *this; }
+    constexpr TPoint operator/(const TPoint& other) const { return { x / other.x, y / other.y }; }
+    constexpr TPoint& operator/=(const TPoint& other) { x /= other.x; y /= other.y; return *this; }
 
-    TPoint operator+(T other) const { return TPoint(x + other, y + other); }
-    TPoint& operator+=(T other) { x += other; y += other; return *this; }
-    TPoint operator-(T other) const { return TPoint(x - other, y - other); }
-    TPoint& operator-=(T other) { x -= other; y -= other; return *this; }
-    TPoint operator*(float v) const { return TPoint(x * v, y * v); }
-    TPoint& operator*=(float v) { x *= v; y *= v; return *this; }
-    TPoint operator/(float v) const { return TPoint(x / v, y / v); }
-    TPoint& operator/=(float v) { x /= v; y /= v; return *this; }
+    constexpr TPoint operator+(T other) const { return { x + other, y + other }; }
+    constexpr TPoint& operator+=(T other) { x += other; y += other; return *this; }
+    constexpr TPoint operator-(T other) const { return { x - other, y - other }; }
+    constexpr TPoint& operator-=(T other) { x -= other; y -= other; return *this; }
+    constexpr TPoint operator*(T v) const { return { x * v, y * v }; }
+    constexpr TPoint& operator*=(T v) { x *= v; y *= v; return *this; }
+    constexpr TPoint operator/(T v) const { return { x / v, y / v }; }
+    constexpr TPoint& operator/=(T v) { x /= v; y /= v; return *this; }
 
-    TPoint operator&(int a) { return TPoint(x & a, y & a); }
-    TPoint& operator&=(int a) { x &= a; y &= a; return *this; }
+    constexpr TPoint operator&(int a) const { return { x & a, y & a }; }
+    constexpr TPoint& operator&=(int a) { x &= a; y &= a; return *this; }
 
-    bool operator<=(const TPoint& other) const { return x <= other.x && y <= other.y; }
-    bool operator>=(const TPoint& other) const { return x >= other.x && y >= other.y; }
-    bool operator<(const TPoint& other) const { return x < other.x && y < other.y; }
-    bool operator>(const TPoint& other) const { return x > other.x && y > other.y; }
+    constexpr bool operator<=(const TPoint& other) const { return x <= other.x && y <= other.y; }
+    constexpr bool operator>=(const TPoint& other) const { return x >= other.x && y >= other.y; }
+    constexpr bool operator<(const TPoint& other) const { return x < other.x && y < other.y; }
+    constexpr bool operator>(const TPoint& other) const { return x > other.x && y > other.y; }
 
-    TPoint& operator=(const TPoint& other) = default;
-    bool operator==(const TPoint& other) const { return other.x == x && other.y == y; }
-    bool operator!=(const TPoint& other) const { return other.x != x || other.y != y; }
+    constexpr TPoint& operator=(const TPoint& other) = default;
+
+    constexpr bool operator==(const TPoint& other) const { return other.x == x && other.y == y; }
+    constexpr bool operator!=(const TPoint& other) const { return other.x != x || other.y != y; }
 
     constexpr std::size_t hash() const noexcept { return (7 * 15 + x) * 15 + y; }
 
