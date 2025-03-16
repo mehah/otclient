@@ -76,18 +76,7 @@ public:
     void setRGBA(const uint32_t rgba) { setRGBA((rgba >> 0) & 0xff, (rgba >> 8) & 0xff, (rgba >> 16) & 0xff, (rgba >> 24) & 0xff); }
 
     Color& operator=(const uint32_t rgba) { setRGBA(rgba); return *this; }
-
-    constexpr Color operator+(const Color& other) const { return Color(m_r + other.m_r, m_g + other.m_g, m_b + other.m_b, m_a + other.m_a); }
-    constexpr Color operator-(const Color& other) const { return Color(m_r - other.m_r, m_g - other.m_g, m_b - other.m_b, m_a - other.m_a); }
-
-    constexpr Color operator*(const float v) const { return Color(m_r * v, m_g * v, m_b * v, m_a * v); }
-    constexpr Color operator/(const float v) const { return Color(m_r / v, m_g / v, m_b / v, m_a / v); }
-
-    constexpr bool operator==(const uint32_t rgba) const { return this->rgba() == rgba; }
-
     constexpr Color& operator=(const Color& other) = default;
-    constexpr bool operator==(const Color& other) const { return other.hash() == hash(); }
-    constexpr bool operator!=(const Color& other) const { return other.hash() != hash(); }
 
     void blend(const Color& color)
     {
@@ -128,6 +117,14 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const Color& color);
     friend std::istream& operator>>(std::istream& in, Color& color);
+    friend constexpr Color operator+(const Color& lhs, const Color& rhs) { return Color(lhs.m_r + rhs.m_r, lhs.m_g + rhs.m_g, lhs.m_b + rhs.m_b, lhs.m_a + rhs.m_a); }
+    friend constexpr Color operator-(const Color& lhs, const Color& rhs) { return Color(lhs.m_r - rhs.m_r, lhs.m_g - rhs.m_g, lhs.m_b - rhs.m_b, lhs.m_a - rhs.m_a); }
+    friend constexpr Color operator*(const Color& lhs, float v) { return Color(lhs.m_r * v, lhs.m_g * v, lhs.m_b * v, lhs.m_a * v); }
+    friend constexpr Color operator/(const Color& lhs, float v) { return Color(lhs.m_r / v, lhs.m_g / v, lhs.m_b / v, lhs.m_a / v); }
+
+    friend constexpr bool operator==(const Color& lhs, const Color& rhs) { return lhs.m_hash == rhs.m_hash; }
+    friend constexpr bool operator!=(const Color& lhs, const Color& rhs) { return lhs.m_hash != rhs.m_hash; }
+    friend constexpr bool operator==(const Color& lhs, uint32_t rgba) { return lhs.rgba() == rgba; }
 
 private:
     void update();
