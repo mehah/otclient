@@ -160,10 +160,10 @@ end
 function Cyclopedia.applyFilters()
     local isSearching = UI.SearchEdit:getText() ~= ""
     if not isSearching then
+        local id = nil
         if UI.selectedCategory then
-            local id = tonumber(UI.selectedCategory:getId())
+           id = tonumber(UI.selectedCategory:getId())
         end
-
         if Cyclopedia.ItemList[id] then
             for _, data in pairs(Cyclopedia.ItemList[id]) do
                 local item = Cyclopedia.internalCreateItem(data)
