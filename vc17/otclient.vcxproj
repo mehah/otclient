@@ -397,6 +397,8 @@
     <ClCompile Include="..\src\framework\net\httplogin.cpp" />
     <ClCompile Include="..\src\framework\net\inputmessage.cpp" />
     <ClCompile Include="..\src\framework\net\outputmessage.cpp" />
+    <ClCompile Include="..\src\framework\net\packet_player.cpp" />
+    <ClCompile Include="..\src\framework\net\packet_recorder.cpp" />
     <ClCompile Include="..\src\framework\net\protocol.cpp" />
     <ClCompile Include="..\src\framework\net\protocolhttp.cpp" />
     <ClCompile Include="..\src\framework\net\server.cpp" />
@@ -563,6 +565,8 @@
     <ClInclude Include="..\src\framework\net\httplogin.h" />
     <ClInclude Include="..\src\framework\net\inputmessage.h" />
     <ClInclude Include="..\src\framework\net\outputmessage.h" />
+    <ClInclude Include="..\src\framework\net\packet_player.h" />
+    <ClInclude Include="..\src\framework\net\packet_recorder.h" />
     <ClInclude Include="..\src\framework\net\protocol.h" />
     <ClInclude Include="..\src\framework\net\protocolhttp.h" />
     <ClInclude Include="..\src\framework\net\server.h" />

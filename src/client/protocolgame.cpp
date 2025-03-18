@@ -24,6 +24,9 @@
 #include "framework/net/inputmessage.h"
 #include "game.h"
 
+#include <framework/net/packet_player.h>
+#include <framework/net/packet_recorder.h>
+
 void ProtocolGame::login(const std::string_view accountName, const std::string_view accountPassword, const std::string_view host, uint16_t port,
                          const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey)
 {
