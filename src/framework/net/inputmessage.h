@@ -37,6 +37,7 @@ public:
 
     void setBuffer(const std::string& buffer);
     std::string_view getBuffer() { return std::string_view{ (char*)m_buffer + m_headerPos, m_messageSize }; }
+    std::string getBodyBuffer() { return std::string((char*)m_buffer + MAX_HEADER_SIZE, m_messageSize - getHeaderSize()); }
 
     void skipBytes(const uint16_t bytes) { m_readPos += bytes; }
     void setReadPos(const uint16_t readPos) { m_readPos = readPos; }

@@ -545,7 +545,8 @@ protected:
 
 public:
     // login related
-    void loginWorld(std::string_view account, std::string_view password, std::string_view worldName, std::string_view worldHost, int worldPort, std::string_view characterName, std::string_view authenticatorToken, std::string_view sessionKey);
+    void loginWorld(std::string_view account, std::string_view password, std::string_view worldName, std::string_view worldHost, int worldPort, std::string_view characterName, std::string_view authenticatorToken, std::string_view sessionKey, const std::string_view& recordTo);
+    void playRecord(const std::string_view& file);
     void cancelLogin();
     void forceLogout();
     void safeLogout();

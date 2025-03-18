@@ -24,114 +24,103 @@
 
 #include "../const.h"
 
-template<class T>
+template <class T>
 class TPoint;
 
-template<class T>
+template <class T>
 class TSize;
 
-template<class T>
+template <class T>
 class TRect
 {
 public:
-    TRect() : x1(0), y1(0), x2(-1), y2(-1) {}
-    TRect(T x, T y, T width, T height) : x1(x), y1(y), x2(x + width - 1), y2(y + height - 1) {}
-    TRect(const TPoint<T>& topLeft, const TPoint<T>& bottomRight) : x1(topLeft.x), y1(topLeft.y), x2(bottomRight.x), y2(bottomRight.y) {}
-    TRect(const TRect& other) : x1(other.x1), y1(other.y1), x2(other.x2), y2(other.y2) {}
-    TRect(T x, T y, const TSize<T>& size) : x1(x), y1(y), x2(x + size.width() - 1), y2(y + size.height() - 1) {}
-    TRect(const TPoint<T>& topLeft, const TSize<T>& size) : x1(topLeft.x), y1(topLeft.y), x2(x1 + size.width() - 1), y2(y1 + size.height() - 1) {}
-    TRect(const TPoint<T>& topLeft, int width, int height) : x1(topLeft.x), y1(topLeft.y), x2(x1 + width - 1), y2(y1 + height - 1) {}
+    constexpr TRect() noexcept : x1{ 0 }, y1{ 0 }, x2{ -1 }, y2{ -1 } {}
+    constexpr TRect(T x, T y, T width, T height) noexcept : x1{ x }, y1{ y }, x2{ x + width - 1 }, y2{ y + height - 1 } {}
+    constexpr TRect(const TPoint<T>& topLeft, const TPoint<T>& bottomRight) noexcept : x1{ topLeft.x }, y1{ topLeft.y }, x2{ bottomRight.x }, y2{ bottomRight.y } {}
+    constexpr TRect(T x, T y, const TSize<T>& size) : x1(x), y1(y), x2(x + size.width() - 1), y2(y + size.height() - 1) {}
+    constexpr TRect(const TPoint<T>& topLeft, const TSize<T>& size) noexcept : x1{ topLeft.x }, y1{ topLeft.y }, x2{ x1 + size.width() - 1 }, y2{ y1 + size.height() - 1 } {}
+    constexpr TRect(const TPoint<T>& topLeft, T width, T height) noexcept : x1{ topLeft.x }, y1{ topLeft.y }, x2{ x1 + width - 1 }, y2{ y1 + height - 1 } {}
+    constexpr TRect(const TRect& other) noexcept = default;
 
-    bool isNull() const { return x2 == x1 - 1 && y2 == y1 - 1; }
-    bool isEmpty() const { return x1 > x2 || y1 > y2; }
-    bool isValid() const { return x1 <= x2 && y1 <= y2; }
+    [[nodiscard]] constexpr bool isNull() const noexcept { return x2 == x1 - 1 && y2 == y1 - 1; }
+    [[nodiscard]] constexpr bool isEmpty() const noexcept { return x1 > x2 || y1 > y2; }
+    [[nodiscard]] constexpr bool isValid() const noexcept { return x1 <= x2 && y1 <= y2; }
 
-    T left() const { return x1; }
-    T top() const { return y1; }
-    T right() const { return x2; }
-    T bottom() const { return y2; }
-    T horizontalCenter() const { return x1 + (x2 - x1) / 2; }
-    T verticalCenter() const { return y1 + (y2 - y1) / 2; }
-    T x() const { return x1; }
-    T y() const { return y1; }
-    TPoint<T> topLeft() const { return TPoint<T>(x1, y1); }
-    TPoint<T> bottomRight() const { return TPoint<T>(x2, y2); }
-    TPoint<T> topRight() const { return TPoint<T>(x2, y1); }
-    TPoint<T> bottomLeft() const { return TPoint<T>(x1, y2); }
-    TPoint<T> topCenter() const { return TPoint<T>((x1 + x2) / 2, y1); }
-    TPoint<T> bottomCenter() const { return TPoint<T>((x1 + x2) / 2, y2); }
-    TPoint<T> centerLeft() const { return TPoint<T>(x1, (y1 + y2) / 2); }
-    TPoint<T> centerRight() const { return TPoint<T>(x2, (y1 + y2) / 2); }
-    TPoint<T> center() const { return TPoint<T>((x1 + x2) / 2, (y1 + y2) / 2); }
-    T width() const { return  x2 - x1 + 1; }
-    T height() const { return  y2 - y1 + 1; }
-    TSize<T> size() const { return TSize<T>(width(), height()); }
-    void reset() { x1 = y1 = 0; x2 = y2 = -1; }
-    void clear() { x2 = x1 - 1; y2 = y1 - 1; }
+    [[nodiscard]] constexpr T left() const noexcept { return x1; }
+    [[nodiscard]] constexpr T top() const noexcept { return y1; }
+    [[nodiscard]] constexpr T right() const noexcept { return x2; }
+    [[nodiscard]] constexpr T bottom() const noexcept { return y2; }
+    [[nodiscard]] constexpr T horizontalCenter() const noexcept { return x1 + (x2 - x1) / 2; }
+    [[nodiscard]] constexpr T verticalCenter() const noexcept { return y1 + (y2 - y1) / 2; }
+    [[nodiscard]] constexpr T x() const noexcept { return x1; }
+    [[nodiscard]] constexpr T y() const noexcept { return y1; }
+    [[nodiscard]] constexpr TPoint<T> topLeft() const noexcept { return { x1, y1 }; }
+    [[nodiscard]] constexpr TPoint<T> bottomRight() const noexcept { return { x2, y2 }; }
+    [[nodiscard]] constexpr TPoint<T> topRight() const noexcept { return { x2, y1 }; }
+    [[nodiscard]] constexpr TPoint<T> bottomLeft() const noexcept { return { x1, y2 }; }
+    [[nodiscard]] constexpr TPoint<T> topCenter() const noexcept { return { (x1 + x2) / 2, y1 }; }
+    [[nodiscard]] constexpr TPoint<T> bottomCenter() const noexcept { return { (x1 + x2) / 2, y2 }; }
+    [[nodiscard]] constexpr TPoint<T> centerLeft() const noexcept { return { x1, (y1 + y2) / 2 }; }
+    [[nodiscard]] constexpr TPoint<T> centerRight() const noexcept { return { x2, (y1 + y2) / 2 }; }
+    [[nodiscard]] constexpr TPoint<T> center() const noexcept { return { (x1 + x2) / 2, (y1 + y2) / 2 }; }
+    [[nodiscard]] constexpr T width() const noexcept { return x2 - x1 + 1; }
+    [[nodiscard]] constexpr T height() const noexcept { return y2 - y1 + 1; }
+    [[nodiscard]] constexpr TSize<T> size() const noexcept { return { width(), height() }; }
+    constexpr void reset() noexcept { x1 = y1 = 0; x2 = y2 = -1; }
+    constexpr void clear() noexcept { x2 = x1 - 1; y2 = y1 - 1; }
 
-    void setLeft(T pos) { x1 = pos; }
-    void setTop(T pos) { y1 = pos; }
-    void setRight(T pos) { x2 = pos; }
-    void setBottom(T pos) { y2 = pos; }
-    void setX(T x) { x1 = x; }
-    void setY(T y) { y1 = y; }
-    void setTopLeft(const TPoint<T>& p) { x1 = p.x; y1 = p.y; }
-    void setBottomRight(const TPoint<T>& p) { x2 = p.x; y2 = p.y; }
-    void setTopRight(const TPoint<T>& p) { x2 = p.x; y1 = p.y; }
-    void setBottomLeft(const TPoint<T>& p) { x1 = p.x; y2 = p.y; }
-    void setWidth(T width) { x2 = x1 + width - 1; }
-    void setHeight(T height) { y2 = y1 + height - 1; }
-    void setSize(const TSize<T>& size) { x2 = x1 + size.width() - 1; y2 = y1 + size.height() - 1; }
-    void setRect(T x, T y, T width, T height) { x1 = x; y1 = y; x2 = (x + width - 1); y2 = (y + height - 1); }
-    void setCoords(int left, int top, int right, int bottom) { x1 = left; y1 = top; x2 = right; y2 = bottom; }
+    constexpr void setLeft(T pos) noexcept { x1 = pos; }
+    constexpr void setTop(T pos) noexcept { y1 = pos; }
+    constexpr void setRight(T pos) noexcept { x2 = pos; }
+    constexpr void setBottom(T pos) noexcept { y2 = pos; }
+    constexpr void setX(T x) noexcept { x1 = x; }
+    constexpr void setY(T y) noexcept { y1 = y; }
+    constexpr void setTopLeft(const TPoint<T>& p) noexcept { x1 = p.x; y1 = p.y; }
+    constexpr void setBottomRight(const TPoint<T>& p) noexcept { x2 = p.x; y2 = p.y; }
+    constexpr void setTopRight(const TPoint<T>& p) noexcept { x2 = p.x; y1 = p.y; }
+    constexpr void setBottomLeft(const TPoint<T>& p) noexcept { x1 = p.x; y2 = p.y; }
+    constexpr void setWidth(T width) noexcept { x2 = x1 + width - 1; }
+    constexpr void setHeight(T height) noexcept { y2 = y1 + height - 1; }
+    constexpr void setSize(const TSize<T>& size) noexcept { x2 = x1 + size.width - 1; y2 = y1 + size.height - 1; }
+    constexpr void setRect(T x, T y, T width, T height) noexcept { x1 = x; y1 = y; x2 = x + width - 1; y2 = y + height - 1; }
+    constexpr void setCoords(T left, T top, T right, T bottom) noexcept { x1 = left; y1 = top; x2 = right; y2 = bottom; }
 
-    void expandLeft(T add) { x1 -= add; }
-    void expandTop(T add) { y1 -= add; }
-    void expandRight(T add) { x2 += add; }
-    void expandBottom(T add) { y2 += add; }
-    void expand(T top, T right, T bottom, T left) { x1 -= left; y1 -= top; x2 += right; y2 += bottom; }
-    void expand(T add) { x1 -= add; y1 -= add; x2 += add; y2 += add; }
+    constexpr void expandLeft(T add) noexcept { x1 -= add; }
+    constexpr void expandTop(T add) noexcept { y1 -= add; }
+    constexpr void expandRight(T add) noexcept { x2 += add; }
+    constexpr void expandBottom(T add) noexcept { y2 += add; }
+    constexpr void expand(T top, T right, T bottom, T left) noexcept { x1 -= left; y1 -= top; x2 += right; y2 += bottom; }
+    constexpr void expand(T add) noexcept { x1 -= add; y1 -= add; x2 += add; y2 += add; }
 
-    void translate(T x, T y) { x1 += x; y1 += y; x2 += x; y2 += y; }
-    void translate(const TPoint<T>& p) { x1 += p.x; y1 += p.y; x2 += p.x; y2 += p.y; }
-    void resize(const TSize<T>& size) { x2 = x1 + size.width() - 1; y2 = y1 + size.height() - 1; }
-    void resize(T width, T height) { x2 = x1 + width - 1; y2 = y1 + height - 1; }
-    void move(T x, T y) { x2 += x - x1; y2 += y - y1; x1 = x; y1 = y; }
-    void move(const TPoint<T>& p) { x2 += p.x - x1; y2 += p.y - y1; x1 = p.x; y1 = p.y; }
-    void moveLeft(T pos) { x2 += (pos - x1); x1 = pos; }
-    void moveTop(T pos) { y2 += (pos - y1); y1 = pos; }
-    void moveRight(T pos) { x1 += (pos - x2); x2 = pos; }
-    void moveBottom(T pos) { y1 += (pos - y2); y2 = pos; }
-    void moveTopLeft(const TPoint<T>& p) { moveLeft(p.x); moveTop(p.y); }
-    void moveBottomRight(const TPoint<T>& p) { moveRight(p.x); moveBottom(p.y); }
-    void moveTopRight(const TPoint<T>& p) { moveRight(p.x); moveTop(p.y); }
-    void moveBottomLeft(const TPoint<T>& p) { moveLeft(p.x); moveBottom(p.y); }
-    void moveTopCenter(const TPoint<T>& p) { moveHorizontalCenter(p.x); moveTop(p.y); }
-    void moveBottomCenter(const TPoint<T>& p) { moveHorizontalCenter(p.x); moveBottom(p.y); }
-    void moveCenterLeft(const TPoint<T>& p) { moveLeft(p.x); moveVerticalCenter(p.y); }
-    void moveCenterRight(const TPoint<T>& p) { moveRight(p.x); moveVerticalCenter(p.y); }
+    constexpr void translate(T x, T y) noexcept { x1 += x; y1 += y; x2 += x; y2 += y; }
+    constexpr void translate(const TPoint<T>& p) noexcept { x1 += p.x; y1 += p.y; x2 += p.x; y2 += p.y; }
+    constexpr void resize(const TSize<T>& size) noexcept { x2 = x1 + size.width() - 1; y2 = y1 + size.height() - 1; }
+    constexpr void resize(T width, T height) noexcept { x2 = x1 + width - 1; y2 = y1 + height - 1; }
+    constexpr void move(T x, T y) noexcept { x2 += x - x1; y2 += y - y1; x1 = x; y1 = y; }
+    constexpr void move(const TPoint<T>& p) noexcept { x2 += p.x - x1; y2 += p.y - y1; x1 = p.x; y1 = p.y; }
+    constexpr void moveLeft(T pos) noexcept { x2 += (pos - x1); x1 = pos; }
+    constexpr void moveTop(T pos) noexcept { y2 += (pos - y1); y1 = pos; }
+    constexpr void moveRight(T pos) noexcept { x1 += (pos - x2); x2 = pos; }
+    constexpr void moveBottom(T pos) noexcept { y1 += (pos - y2); y2 = pos; }
+    constexpr void moveTopLeft(const TPoint<T>& p) noexcept { moveLeft(p.x); moveTop(p.y); }
+    constexpr void moveBottomRight(const TPoint<T>& p) noexcept { moveRight(p.x); moveBottom(p.y); }
+    constexpr void moveTopRight(const TPoint<T>& p) noexcept { moveRight(p.x); moveTop(p.y); }
+    constexpr void moveBottomLeft(const TPoint<T>& p) noexcept { moveLeft(p.x); moveBottom(p.y); }
+    constexpr void moveTopCenter(const TPoint<T>& p) noexcept { moveHorizontalCenter(p.x); moveTop(p.y); }
+    constexpr void moveBottomCenter(const TPoint<T>& p) noexcept { moveHorizontalCenter(p.x); moveBottom(p.y); }
+    constexpr void moveCenterLeft(const TPoint<T>& p) noexcept { moveLeft(p.x); moveVerticalCenter(p.y); }
+    constexpr void moveCenterRight(const TPoint<T>& p) noexcept { moveRight(p.x); moveVerticalCenter(p.y); }
 
-    TRect translated(int x, int y) const { return TRect(TPoint<T>(x1 + x, y1 + y), TPoint<T>(x2 + x, y2 + y)); }
-    TRect translated(const TPoint<T>& p) const { return TRect(TPoint<T>(x1 + p.x, y1 + p.y), TPoint<T>(x2 + p.x, y2 + p.y)); }
-
-    TRect expanded(T add) const { return TRect(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
-
-    TRect clamp(const TSize<T>& min, const TSize<T>& max) const {
+    constexpr TRect translated(T x, T y) const noexcept { return TRect(TPoint<T>(x1 + x, y1 + y), TPoint<T>(x2 + x, y2 + y)); }
+    constexpr TRect translated(const TPoint<T>& p) const noexcept { return TRect(TPoint<T>(x1 + p.x, y1 + p.y), TPoint<T>(x2 + p.x, y2 + p.y)); }
+    constexpr TRect expanded(T add) const noexcept { return TRect(TPoint<T>(x1 - add, y1 - add), TPoint<T>(x2 + add, y2 + add)); }
+    constexpr TRect clamp(const TSize<T>& min, const TSize<T>& max) const noexcept {
         return TRect(x1, y1,
-            std::min<int>(max.width(), std::max<int>(min.width(), width())),
-            std::min<int>(max.height(), std::max<int>(min.height(), height())));
+            std::min<T>(max.width(), std::max<T>(min.width(), width())),
+            std::min<T>(max.height(), std::max<T>(min.height(), height())));
     }
 
-    std::size_t hash() const
-    {
-        size_t h = 37;
-        h = (h * 54059) ^ (x1 * 76963);
-        h = (h * 54059) ^ (y1 * 76963);
-        return h;
-    }
-
-    void moveCenter(const TPoint<T>& p)
-    {
+    constexpr void moveCenter(const TPoint<T>& p) noexcept {
         T w = x2 - x1;
         T h = y2 - y1;
         x1 = p.x - w / 2;
@@ -139,172 +128,51 @@ public:
         x2 = x1 + w;
         y2 = y1 + h;
     }
-    void moveHorizontalCenter(T x)
-    {
+    constexpr void moveHorizontalCenter(T x) noexcept {
         T w = x2 - x1;
         x1 = x - w / 2;
         x2 = x1 + w;
     }
-    void moveVerticalCenter(T y)
-    {
+    constexpr void moveVerticalCenter(T y) noexcept {
         T h = y2 - y1;
         y1 = y - h / 2;
         y2 = y1 + h;
     }
 
-    bool contains(const TPoint<T>& p, const bool insideOnly = false) const
-    {
-        T l, r;
-        if (x2 < x1 - 1) {
-            l = x2;
-            r = x1;
-        } else {
-            l = x1;
-            r = x2;
-        }
-        if (insideOnly) {
-            if (p.x <= l || p.x >= r)
-                return false;
-        } else {
-            if (p.x < l || p.x > r)
-                return false;
-        }
-        T t, b;
-        if (y2 < y1 - 1) {
-            t = y2;
-            b = y1;
-        } else {
-            t = y1;
-            b = y2;
-        }
-        if (insideOnly) {
-            if (p.y <= t || p.y >= b)
-                return false;
-        } else {
-            if (p.y < t || p.y > b)
-                return false;
-        }
-        return true;
+    constexpr std::size_t hash() const noexcept {
+        std::size_t h = 37;
+        h = (h * 54059) ^ (x1 * 76963);
+        h = (h * 54059) ^ (y1 * 76963);
+        return h;
     }
 
-    bool contains(const TRect& r, const bool insideOnly = false) const
-    {
-        if (contains(r.topLeft(), insideOnly) && contains(r.bottomRight(), insideOnly))
-            return true;
-        return false;
+    constexpr bool contains(const TPoint<T>& p, bool insideOnly = false) const noexcept {
+        return (insideOnly ? (p.x > x1 && p.x < x2) : (p.x >= x1 && p.x <= x2)) &&
+            (insideOnly ? (p.y > y1 && p.y < y2) : (p.y >= y1 && p.y <= y2));
     }
 
-    bool intersects(const TRect& r) const
-    {
-        if (isNull() || r.isNull())
-            return false;
-
-        int l1 = x1;
-        int r1 = x1;
-        if (x2 - x1 + 1 < 0)
-            l1 = x2;
-        else
-            r1 = x2;
-
-        int l2 = r.x1;
-        int r2 = r.x1;
-        if (r.x2 - r.x1 + 1 < 0)
-            l2 = r.x2;
-        else
-            r2 = r.x2;
-
-        if (l1 > r2 || l2 > r1)
-            return false;
-
-        int t1 = y1;
-        int b1 = y1;
-        if (y2 - y1 + 1 < 0)
-            t1 = y2;
-        else
-            b1 = y2;
-
-        int t2 = r.y1;
-        int b2 = r.y1;
-        if (r.y2 - r.y1 + 1 < 0)
-            t2 = r.y2;
-        else
-            b2 = r.y2;
-
-        if (t1 > b2 || t2 > b1)
-            return false;
-
-        return true;
+    constexpr bool contains(const TRect& r, bool insideOnly = false) const noexcept {
+        return contains(r.topLeft(), insideOnly) && contains(r.bottomRight(), insideOnly);
     }
 
-    TRect united(const TRect& r) const
-    {
-        TRect tmp;
-        tmp.x1 = std::min<T>(x1, r.x1);
-        tmp.x2 = std::max<T>(x2, r.x2);
-        tmp.y1 = std::min<T>(y1, r.y1);
-        tmp.y2 = std::max<T>(y2, r.y2);
-        return tmp;
+    constexpr bool intersects(const TRect& r) const noexcept {
+        return !(r.x2 < x1 || r.x1 > x2 || r.y2 < y1 || r.y1 > y2);
     }
 
-    TRect intersection(const TRect& r) const
-    {
-        if (isNull())
-            return r;
-        if (r.isNull())
-            return *this;
-
-        int l1 = x1;
-        int r1 = x1;
-        if (x2 - x1 + 1 < 0)
-            l1 = x2;
-        else
-            r1 = x2;
-
-        int l2 = r.x1;
-        int r2 = r.x1;
-        if (r.x2 - r.x1 + 1 < 0)
-            l2 = r.x2;
-        else
-            r2 = r.x2;
-
-        int t1 = y1;
-        int b1 = y1;
-        if (y2 - y1 + 1 < 0)
-            t1 = y2;
-        else
-            b1 = y2;
-
-        int t2 = r.y1;
-        int b2 = r.y1;
-        if (r.y2 - r.y1 + 1 < 0)
-            t2 = r.y2;
-        else
-            b2 = r.y2;
-
-        TRect tmp;
-        tmp.x1 = std::max<int>(l1, l2);
-        tmp.x2 = std::min<int>(r1, r2);
-        tmp.y1 = std::max<int>(t1, t2);
-        tmp.y2 = std::min<int>(b1, b2);
-        return tmp;
+    constexpr TRect united(const TRect& r) const noexcept {
+        return { std::min<T>(x1, r.x1), std::min<T>(y1, r.y1),
+                std::max<T>(x2, r.x2) - std::min<T>(x1, r.x1) + 1,
+                std::max<T>(y2, r.y2) - std::min<T>(y1, r.y1) + 1 };
     }
 
-    void bind(const TRect& r)
-    {
-        if (isNull() || r.isNull())
-            return;
-
-        if (right() > r.right())
-            moveRight(r.right());
-        if (bottom() > r.bottom())
-            moveBottom(r.bottom());
-        if (left() < r.left())
-            moveLeft(r.left());
-        if (top() < r.top())
-            moveTop(r.top());
+    constexpr TRect intersection(const TRect& r) const noexcept {
+        if (!intersects(r)) return {};
+        return { std::max<T>(x1, r.x1), std::max<T>(y1, r.y1),
+                std::min<T>(x2, r.x2) - std::max<T>(x1, r.x1) + 1,
+                std::min<T>(y2, r.y2) - std::max<T>(y1, r.y1) + 1 };
     }
 
-    void alignIn(const TRect& r, const Fw::AlignmentFlag align)
+    constexpr void alignIn(const TRect& r, const Fw::AlignmentFlag align)
     {
         if (align == Fw::AlignTopLeft)
             moveTopLeft(r.topLeft());
@@ -326,12 +194,38 @@ public:
             moveCenterRight(r.centerRight());
     }
 
-    TRect& operator=(const TRect& other) = default;
-    bool operator==(const TRect& other) const { return (x1 == other.x1 && y1 == other.y1 && x2 == other.x2 && y2 == other.y2); }
-    bool operator!=(const TRect& other) const { return (x1 != other.x1 || y1 != other.y1 || x2 != other.x2 || y2 != other.y2); }
+    constexpr void bind(const TRect& r)
+    {
+        if (isNull() || r.isNull())
+            return;
 
-    TRect& operator|=(const TRect& other) { *this = united(other); return *this; }
-    TRect& operator&=(const TRect& other) { *this = intersection(other); return *this; }
+        if (right() > r.right())
+            moveRight(r.right());
+        if (bottom() > r.bottom())
+            moveBottom(r.bottom());
+        if (left() < r.left())
+            moveLeft(r.left());
+        if (top() < r.top())
+            moveTop(r.top());
+    }
+
+    constexpr TRect& operator=(const TRect& other) noexcept = default;
+    constexpr bool operator!=(const TRect& other) const noexcept { return !(*this == other); }
+    constexpr TRect& operator|=(const TRect& other) noexcept { return *this = united(other); }
+    constexpr TRect& operator&=(const TRect& other) noexcept { return *this = intersection(other); }
+
+    [[nodiscard]] constexpr bool operator==(const TRect& other) const noexcept = default;
+
+    friend std::ostream& operator<<(std::ostream& out, const TRect& rect) {
+        return out << rect.x1 << ' ' << rect.y1 << ' ' << rect.width() << ' ' << rect.height();
+    }
+
+    friend std::istream& operator>>(std::istream& in, TRect& rect) {
+        T x, y, w, h;
+        in >> x >> y >> w >> h;
+        rect.setRect(x, y, w, h);
+        return in;
+    }
 
 private:
     T x1, y1, x2, y2;
@@ -339,19 +233,3 @@ private:
 
 using Rect = TRect<int>;
 using RectF = TRect<float>;
-
-template<class T>
-std::ostream& operator<<(std::ostream& out, const TRect<T>& rect)
-{
-    out << rect.left() << " " << rect.top() << " " << rect.width() << " " << rect.height();
-    return out;
-}
-
-template<class T>
-std::istream& operator>>(std::istream& in, TRect<T>& rect)
-{
-    T x, y, w, h;
-    in >> x >> y >> w >> h;
-    rect.setRect(x, y, w, h);
-    return in;
-}

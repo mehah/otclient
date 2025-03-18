@@ -151,13 +151,13 @@ function displayMessage(mode, text)
 
     if msgtype.consoleTab ~= nil and
         (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
-        modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
-        -- TODO move to game_console
-    end
-
-    if msgtype == MessageSettings.loot then
-        local coloredText = ItemsDatabase.setColorLootMessage(text)
-        modules.game_console.addText(coloredText, msgtype, tr("Server Log"))
+        if msgtype == MessageSettings.loot then
+            local lootColoredText = ItemsDatabase.setColorLootMessage(text)
+            modules.game_console.addText(lootColoredText, msgtype, tr("Server Log"))
+            modules.game_console.addText(lootColoredText, msgtype, tr(msgtype.consoleTab))
+        else
+            modules.game_console.addText(text, msgtype, tr(msgtype.consoleTab))
+        end
     end
 
     if msgtype.screenTarget then

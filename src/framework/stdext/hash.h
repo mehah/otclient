@@ -30,7 +30,7 @@ namespace stdext
     using hash = phmap::Hash<_Kty>;
 
     // Robin Hood lib
-    inline size_t hash_int(uint64_t x) noexcept
+    constexpr size_t hash_int(uint64_t x) noexcept
     {
         x ^= x >> 33U;
         x *= UINT64_C(0xff51afd7ed558ccd);
@@ -39,7 +39,7 @@ namespace stdext
     }
 
     // Boost Lib
-    inline void hash_union(size_t& seed, const size_t h)
+    constexpr void hash_union(size_t& seed, const size_t h)
     {
         seed ^= h + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }

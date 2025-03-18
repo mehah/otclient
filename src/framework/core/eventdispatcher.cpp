@@ -218,20 +218,23 @@ void EventDispatcher::executeScheduledEvents() {
 void EventDispatcher::mergeEvents() {
     std::shared_lock l(m_sharedLock);
     for (const auto& thread : m_threads) {
-        std::scoped_lock lock(thread->mutex);
-        if (!thread->events.empty()) {
-            m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
-            thread->events.clear();
-        }
+        if (thread->mutex.try_lock()) {
+            if (!thread->events.empty()) {
+                m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
+                thread->events.clear();
+            }
 
-        if (!thread->asyncEvents.empty()) {
-            m_asyncEventList.insert(m_asyncEventList.end(), make_move_iterator(thread->asyncEvents.begin()), make_move_iterator(thread->asyncEvents.end()));
-            thread->asyncEvents.clear();
-        }
+            if (!thread->asyncEvents.empty()) {
+                m_asyncEventList.insert(m_asyncEventList.end(), make_move_iterator(thread->asyncEvents.begin()), make_move_iterator(thread->asyncEvents.end()));
+                thread->asyncEvents.clear();
+            }
 
-        if (!thread->scheduledEventList.empty()) {
-            m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
-            thread->scheduledEventList.clear();
+            if (!thread->scheduledEventList.empty()) {
+                m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
+                thread->scheduledEventList.clear();
+            }
+
+            thread->mutex.unlock();
         }
     }
 }

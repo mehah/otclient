@@ -425,13 +425,17 @@ UIWidget
       !text: tr('Track drops of this item')
       text-auto-resize: true
     CheckBox
-      id: SkipQuickLootCheck
+      id: quickLootCheck
       anchors.right: parent.right
       anchors.bottom: parent.bottom
       margin-bottom: 35
-      !text: tr('Skip when Quick Looting')
-
       text-auto-resize: true
+      @onSetup: |
+        if modules.game_quickloot.QuickLoot.data.filter == 2 then
+          self:setText("Loot when Quick Looting")
+        else
+          self:setText('Skip when Quick Looting')
+        end
 
   Button
     id: ManageButton

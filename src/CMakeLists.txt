@@ -300,6 +300,8 @@ set(SOURCE_FILES
 	framework/util/crypt.cpp
 	framework/proxy/proxy.cpp
 	framework/proxy/proxy_client.cpp
+	framework/net/packet_player.cpp
+	framework/net/packet_recorder.cpp
 
 	client/animatedtext.cpp
 	client/animator.cpp

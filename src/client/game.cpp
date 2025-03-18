@@ -34,6 +34,9 @@
 #include "framework/core/graphicalapplication.h"
 #include "tile.h"
 
+#include <framework/net/packet_player.h>
+#include <framework/net/packet_recorder.h>
+
 Game g_game;
 
 void Game::init()
@@ -590,7 +593,7 @@ void Game::processWalkCancel(const Otc::Direction direction)
     m_localPlayer->cancelWalk(direction);
 }
 
-void Game::loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, const int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey)
+void Game::loginWorld(const std::string_view account, const std::string_view password, const std::string_view worldName, const std::string_view worldHost, const int worldPort, const std::string_view characterName, const std::string_view authenticatorToken, const std::string_view sessionKey, const std::string_view& recordTo)
 {
     if (m_protocolGame || isOnline())
         throw Exception("Unable to login into a world while already online or logging.");
@@ -606,9 +609,36 @@ void Game::loginWorld(const std::string_view account, const std::string_view pas
     m_localPlayer->setName(characterName);
 
     m_protocolGame = std::make_shared<ProtocolGame>();
+    if (!recordTo.empty()) {
+        m_protocolGame->setRecorder(std::make_shared<PacketRecorder>(recordTo));
+    }
     m_protocolGame->login(account, password, worldHost, static_cast<uint16_t>(worldPort), characterName, authenticatorToken, sessionKey);
     m_characterName = characterName;
     m_worldName = worldName;
+}
+
+void Game::playRecord(const std::string_view& file)
+{
+    if (m_protocolGame || isOnline())
+        throw Exception("Unable to login into a world while already online or logging.");
+
+    if (m_protocolVersion == 0)
+        throw Exception("Must set a valid game protocol version before logging.");
+
+    auto packetPlayer = std::make_shared<PacketPlayer>(file);
+    if (!packetPlayer)
+        throw Exception("Invalid record file.");
+
+    // reset the new game state
+    resetGameStates();
+
+    m_localPlayer = std::make_shared<LocalPlayer>();
+    m_localPlayer->setName("Player");
+
+    m_protocolGame = std::make_shared<ProtocolGame>();
+    m_protocolGame->playRecord(packetPlayer);
+    m_characterName = "Player";
+    m_worldName = "Record";
 }
 
 void Game::cancelLogin()

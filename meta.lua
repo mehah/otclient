@@ -710,8 +710,9 @@ g_game = {}
 ---@param characterName string
 ---@param authenticatorToken string
 ---@param sessionKey string
+---@param recordTo string
 function g_game.loginWorld(account, password, worldName, worldHost, worldPort, characterName, authenticatorToken,
-                           sessionKey)
+                           sessionKey, recordTo)
 end
 
 function g_game.cancelLogin() end

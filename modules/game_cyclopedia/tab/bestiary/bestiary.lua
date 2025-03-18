@@ -46,6 +46,7 @@ function Cyclopedia.SetBestiaryProgress(fit, firstBar, secondBar, thirdBar, kill
     end
 
     local function setBarVisibility(bar, isVisible, width)
+        isVisible = isVisible and width > 0
         bar:setVisible(isVisible)
         if isVisible then
             bar:setImageRect({
@@ -793,15 +794,24 @@ function onTrackerClick(widget, mousePosition, mouseButton)
 end
 
 function onAddLootClick(widget, mousePosition, mouseButton)
-    local taskId = tonumber(widget:getId())
+    local itemId = widget:getItemId()
+    local quickLoot = modules.game_quickloot.QuickLoot
+    local lootFilterValue = quickLoot.data.filter
     local menu = g_ui.createWidget("PopupMenu")
 
     menu:setGameMenu(true)
-    --if true then -- is in loot list ?
-        menu:addOption("Add to Loot List", function() print("future") end)
-    --else
-        --menu:addOption("Remove from Loot List", function() print("future") end)
-    --end
+
+    if not quickLoot.lootExists(itemId, lootFilterValue) then
+        menu:addOption("Add to Loot List",
+        function()
+            quickLoot.addLootList(itemId, lootFilterValue)
+        end)
+    else
+        menu:addOption("Remove from Loot List", 
+        function() 
+            quickLoot.removeLootList(itemId, lootFilterValue)
+        end)
+    end
 
     menu:display(menuPosition)
 

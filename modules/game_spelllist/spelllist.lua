@@ -191,15 +191,6 @@ function terminate()
         onGameEnd = offline
     })
 
-    disconnect(spellList, {
-        onChildFocusChange = function(self, focusedChild)
-            if focusedChild == nil then
-                return
-            end
-            updateSpellInformation(focusedChild)
-        end
-    })
-
     spelllistWindow:destroy()
     spelllistButton:destroy()
 
