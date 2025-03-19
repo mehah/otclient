@@ -187,7 +187,8 @@ function Cyclopedia.internalCreateItem(data)
     local classificationFilter = Cyclopedia.Items.ClassificationFilter
 
     if vocFilter and tonumber(marketData.restrictVocation) > 0 then
-        local vocBitMask = Bit.bit(tonumber(vocation))
+        local demotedVoc = vocation > 10 and (vocation - 10) or vocation
+        local vocBitMask = Bit.bit(tonumber(demotedVoc))
         if not Bit.hasBit(marketData.restrictVocation, vocBitMask) then
             return
         end
