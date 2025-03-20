@@ -124,31 +124,13 @@ function Cyclopedia.levelFilter(value)
     Cyclopedia.applyFilters()
 end
 
-function Cyclopedia.h1Filter(value)
+function Cyclopedia.handFilter(h1Val, h2Val)
     UI.ItemListBase.List:destroyChildren()
-
-    local brother = UI.H2Button
-
-    Cyclopedia.Items.h1Filter = value
+    Cyclopedia.Items.h1Filter = h1Val
+    Cyclopedia.Items.h2Filter = h2Val
+    UI.H1Button:setChecked(h1Val)
+    UI.H2Button:setChecked(h2Val)
     Cyclopedia.applyFilters()
-
-    if value and brother:isChecked() then
-        brother:setChecked(false)
-        Cyclopedia.Items.h2Filter = false
-    end
-end
-
-function Cyclopedia.h2Filter(value)
-    UI.ItemListBase.List:destroyChildren()
-
-    local brother = UI.H1Button
-    Cyclopedia.Items.h2Filter = value
-    Cyclopedia.applyFilters()
-
-    if value and brother:isChecked() then
-        brother:setChecked(false)
-        Cyclopedia.Items.h1Filter = false
-    end
 end
 
 function Cyclopedia.classificationFilter(data)
