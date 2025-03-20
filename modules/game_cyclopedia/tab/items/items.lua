@@ -385,7 +385,18 @@ function Cyclopedia.ItemSearch(text, clearTextEdit)
     end
 end
 
+local function isHandWeapon(id)
+    if id >= 17 and id <= 21 or id == 1000 then
+        return true
+    end
+end
+
 function Cyclopedia.selectItemCategory(id)
+    if not isHandWeapon(id) then
+        UI.H1Button:setChecked(false)
+        UI.H2Button:setChecked(false)
+    end
+
     if UI.SearchEdit:getText() ~= "" then
         Cyclopedia.ItemSearch("", true)
     end
