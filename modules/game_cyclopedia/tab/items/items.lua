@@ -159,6 +159,7 @@ end
 
 local function processItemsById(id)
     local idsToProcess = {}
+    local tempTable = {}
 
     if id == 1000 then
         idsToProcess = {17, 18, 19, 20, 21}
@@ -169,9 +170,17 @@ local function processItemsById(id)
     for _, idToProcess in pairs(idsToProcess) do
         if not table.empty(Cyclopedia.ItemList[idToProcess]) then
             for _, data in pairs(Cyclopedia.ItemList[idToProcess]) do
-                local item = Cyclopedia.internalCreateItem(data)
+                table.insert(tempTable, data)
             end
         end
+    end
+
+    table.sort(tempTable, function(a, b)
+        return string.lower(a:getMarketData().name) < string.lower((b:getMarketData().name))
+    end)
+
+    for _, data in pairs(tempTable) do
+        local item = Cyclopedia.internalCreateItem(data)
     end
 end
 
