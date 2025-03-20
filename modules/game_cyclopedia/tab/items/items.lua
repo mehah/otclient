@@ -157,17 +157,29 @@ function Cyclopedia.classificationFilter(data)
     Cyclopedia.applyFilters()
 end
 
+local function processItemsById(id)
+    local idsToProcess = {}
+
+    if id == 1000 then
+        idsToProcess = {17, 18, 19, 20, 21}
+    else
+        idsToProcess = {id}
+    end
+
+    for _, idToProcess in pairs(idsToProcess) do
+        if not table.empty(Cyclopedia.ItemList[idToProcess]) then
+            for _, data in pairs(Cyclopedia.ItemList[idToProcess]) do
+                local item = Cyclopedia.internalCreateItem(data)
+            end
+        end
+    end
+end
+
 function Cyclopedia.applyFilters()
     local isSearching = UI.SearchEdit:getText() ~= ""
     if not isSearching then
-        local id = nil
         if UI.selectedCategory then
-           id = tonumber(UI.selectedCategory:getId())
-        end
-        if Cyclopedia.ItemList[id] then
-            for _, data in pairs(Cyclopedia.ItemList[id]) do
-                local item = Cyclopedia.internalCreateItem(data)
-            end
+           processItemsById(tonumber(UI.selectedCategory:getId()))
         end
     else
         Cyclopedia.ItemSearch(UI.SearchEdit:getText(), false)
@@ -386,21 +398,7 @@ function Cyclopedia.selectItemCategory(id)
         Cyclopedia.Items.ClassificationFilter = 0
     end
 
-    local idsToProcess = {}
-
-    if id == 1000 then
-        idsToProcess = {16, 17, 18, 19, 20, 21}
-    else
-        idsToProcess = {id}
-    end
-
-    for _, idToProcess in pairs(idsToProcess) do
-        if not table.empty(Cyclopedia.ItemList[idToProcess]) then
-            for _, data in pairs(Cyclopedia.ItemList[idToProcess]) do
-                local item = Cyclopedia.internalCreateItem(data)
-            end
-        end
-    end
+    processItemsById(id)
 
     if Cyclopedia.hasHandedFilter(id) then
         UI.H1Button:enable()
