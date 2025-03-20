@@ -124,12 +124,21 @@ function Cyclopedia.levelFilter(value)
     Cyclopedia.applyFilters()
 end
 
+local ignoreRecursiveCalls = false
 function Cyclopedia.handFilter(h1Val, h2Val)
-    UI.ItemListBase.List:destroyChildren()
     Cyclopedia.Items.h1Filter = h1Val
     Cyclopedia.Items.h2Filter = h2Val
+
+    if ignoreRecursiveCalls then
+        return
+    end
+    
+    ignoreRecursiveCalls = true
     UI.H1Button:setChecked(h1Val)
     UI.H2Button:setChecked(h2Val)
+    ignoreRecursiveCalls = false
+
+    UI.ItemListBase.List:destroyChildren()
     Cyclopedia.applyFilters()
 end
 
@@ -375,8 +384,10 @@ end
 
 function Cyclopedia.selectItemCategory(id)
     if not isHandWeapon(id) then
+        ignoreRecursiveCalls = true
         UI.H1Button:setChecked(false)
         UI.H2Button:setChecked(false)
+        ignoreRecursiveCalls = false
     end
 
     if UI.SearchEdit:getText() ~= "" then
