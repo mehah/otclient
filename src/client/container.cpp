@@ -45,7 +45,6 @@ void Container::onAddItem(const ItemPtr& item, int slot)
 {
     slot -= m_firstIndex;
 
-
     // indicates that there is a new item on next page
     if (m_hasPages && slot > m_capacity) {
         callLuaField("onSizeChange", ++m_size);
@@ -100,7 +99,6 @@ void Container::onRemoveItem(int slot, const ItemPtr& lastItem)
 {
     slot -= m_firstIndex;
 
-    
     // indicates that there has been deleted an item on next page
     if (m_hasPages && slot >= static_cast<int>(m_items.size())) {
         callLuaField("onSizeChange", --m_size);
