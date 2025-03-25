@@ -76,7 +76,7 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
 
         auto oldScaleFactor = g_drawPool.getScaleFactor();
 
-        g_drawPool.setScaleFactor(getScaleFactor());
+        g_drawPool.setScaleFactor(getScaleFactor() + (oldScaleFactor - 1.f));
 
         internalDraw(_dest);
 
