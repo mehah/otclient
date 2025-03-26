@@ -46,7 +46,7 @@ void SpriteManager::reload() {
 }
 
 void SpriteManager::load() {
-    m_spritesFiles.resize(g_asyncDispatcher.get_thread_count() + 1);
+    m_spritesFiles.resize(g_asyncDispatcher.get_thread_count() * 2);
     if (g_app.isLoadingAsyncTexture()) {
         for (auto& file : m_spritesFiles)
             file = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName));

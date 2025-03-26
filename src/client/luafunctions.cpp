@@ -711,6 +711,7 @@ void Client::registerLuaFunctions()
 
     g_lua.bindClassMemberFunction<Item>("setCount", &Item::setCount);
     g_lua.bindClassMemberFunction<Item>("setTooltip", &Item::setTooltip);
+    g_lua.bindClassMemberFunction<Item>("setTier", &Item::setTier);
 
     g_lua.bindClassMemberFunction<Item>("getCount", &Item::getCount);
     g_lua.bindClassMemberFunction<Item>("getSubType", &Item::getSubType);
