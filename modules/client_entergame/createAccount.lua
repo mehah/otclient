@@ -78,7 +78,7 @@ local function handleHttpResponse(requestType, callback)
         end
         local json_part = message:match("{.*}")
         if not json_part then
-            reportRequestWarning(requestType, "ERROR: No se encontró JSON en la respuesta", "fx handleHttpResponse")
+            reportRequestWarning(requestType, "ERROR: JSON not found in the response", "fx handleHttpResponse")
             return
         end
         local status, response = pcall(json.decode, json_part)
