@@ -230,6 +230,9 @@ local function createAccountAndCharacter(array, callback)
     }), handleHttpResponse("createaccountandcharacter", callback), false)
 end
 
+-- /*=============================================
+-- =            successfull Check               =
+-- =============================================*/
 local function checkAllRequirements()
     local function allWidgetsEnabled(widgets)
         for _, widget in pairs(widgets) do
@@ -444,6 +447,7 @@ local function behavioronCheckChange()
             setRequirementState(a:getParent():getChildById('icons'), b)
         end
 end
+
 -- /*=============================================
 -- =            onClick - Create Your Account    =
 -- =============================================*/
@@ -506,7 +510,7 @@ function onClickSuggestName()
 end
 
 -- /*=============================================
--- =    game world to play on   =
+-- =    Panel game world to play on   =
 -- =============================================*/
 
 local function findWorldByName(name)
@@ -569,7 +573,6 @@ local function initializeWorldsList(worlds)
         return a.Name < b.Name
     end)
 
-    -- Clear existing widgets
     UITextList.listAllWorlds:destroyChildren()
     Worlds = worlds
 
@@ -680,34 +683,39 @@ function createWidgetAccount()
             -- sexModeGroup.onSelectionChange = sexModeChange
             sexModeGroup:selectWidget(MainWindowsCreateAccount.createAccount.createYourCharacter.panelSex.Male)
 
-            -- Wold
+            -- world
             UIComboBox.world = MainWindowsCreateAccount.mainPanelSelectAGameWorldToPlayOn.panelSelectAGameWorldToPlayOn.panelSelectworldAndPvp.comboBoxWorld
             UIComboBox.pvp = MainWindowsCreateAccount.mainPanelSelectAGameWorldToPlayOn.panelSelectAGameWorldToPlayOn.panelSelectworldAndPvp.comboBoxPvp
             UITextList.listAllWorlds = MainWindowsCreateAccount.mainPanelSelectAGameWorldToPlayOn.panelSelectAGameWorldToPlayOn.textListAllWorlds
             UIlabel.titleMiniPanelWorld = MainWindowsCreateAccount.mainPanelSelectAGameWorldToPlayOn.panelSelectAGameWorldToPlayOn.worldInfo
     
-            -- icons
+            -- icons Account
             iconsCreateAccount.Password = MainWindowsCreateAccount.createAccount.createYourAccount.panelPassword.icons
             iconsCreateAccount.Email = MainWindowsCreateAccount.createAccount.createYourAccount.panelEmail.icons
             iconsCreateAccount.RepeatPassword = MainWindowsCreateAccount.createAccount.createYourAccount.panelRepeatPassword.icons
             iconsCreateAccount.CheckBox = MainWindowsCreateAccount.createAccount.createYourAccount.panelCheckBox.icons
-
+            -- icons Characters
             iconsCreateCharacter.Sex = MainWindowsCreateAccount.createAccount.createYourCharacter.panelSex.icons
             iconsCreateCharacter.RecommendedWorld = MainWindowsCreateAccount.createAccount.createYourCharacter.panelRecommendedWorld.icons
             iconsCreateCharacter.CharacterName = MainWindowsCreateAccount.createAccount.createYourCharacter.panelCharacterName.icons
-            -- Tooltips
+
+            -- Tooltips Password
             toolstips.allExceptPassword = MainWindowsCreateAccount.createAccount.testToolstips
             toolstips.password = MainWindowsCreateAccount.createAccount.passwordRequirements
-            -- Tooltips
+
+            -- Input TextEdit
             UITextEdit.email = MainWindowsCreateAccount.createAccount.test.textEditEmail
             UITextEdit.password = MainWindowsCreateAccount.createAccount.test.textEditPassword
             UITextEdit.repeatPassword = MainWindowsCreateAccount.createAccount.test.textEditRepeatPassword
             UITextEdit.character = MainWindowsCreateAccount.createAccount.test.textEditCharacter
 -- LuaFormatter on
+
             globalInfo.selectedWorld = data.RecommendedWorld
+
             initializeWorldsList(data.Worlds)
             UIlabel.RecommendedWorld:setText(string.format("%s (%s)", data.RecommendedWorld,
                 findWorldByName(data.RecommendedWorld).Region))
+
             behavioronTextChange()
             behavioronFocusChange()
             behavioronCheckChange()
@@ -717,6 +725,7 @@ function createWidgetAccount()
         ensableBtnCreateNewAccount()
     end
 end
+
 -- /*=============================================
 -- =                    onTerminate              =
 -- =============================================*/
