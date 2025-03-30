@@ -1,4 +1,3 @@
-
 WorldWidget < UIWidget
   height: 14
   background-color: alpha

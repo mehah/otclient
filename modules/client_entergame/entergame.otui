@@ -101,7 +101,7 @@ EnterGameWindow
     margin-top: 5
     @onClick: g_platform.openUrl(Services.websites)
     @onSetup: | 
-        if Services and Servers_init and table.size(Servers_init) == 1 and Services.websites then
+        if Services and Services.websites then
             self:setVisible(true)
         else
             self:setVisible(false)
