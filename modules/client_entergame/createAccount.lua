@@ -1,3 +1,5 @@
+-- https://github.com/opentibiabr/myaac/pull/33/files
+
 local MainWindowsCreateAccount = nil
 
 local UIwidgetImagen = {
