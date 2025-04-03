@@ -139,6 +139,7 @@ HELP_CHANNEL = 9
 
 consolePanel = nil
 consoleContentPanel = nil
+local extendedViewButtonToggleChat = nil
 consoleTabBar = nil
 consoleTextEdit = nil
 consoleToggleChat = nil
@@ -2103,5 +2104,59 @@ function onTextChange(text)
         end
     else
         player:setTyping(false)
+    end
+end
+
+function extendedView(bool)
+    if bool then
+        consolePanel:setMarginRight(10)
+        consolePanel:setMarginBottom(10)
+        consolePanel:getChildById('extendedViewDraggable'):show()
+        consolePanel:getChildById('extendedViewHide'):show()
+        consolePanel:getChildById('extendedViewHide'):setChecked(not modules.game_interface.gameBottomPanel:isVisible())
+    else
+        consolePanel:setMarginRight(0)
+        consolePanel:setMarginBottom(0)
+        consolePanel:getChildById('extendedViewDraggable'):hide()
+        consolePanel:getChildById('extendedViewHide'):hide()
+        modules.game_interface.gameBottomPanel:show()
+    end
+    modules.game_interface.gameBottomPanel:setDraggable(not bool)
+end
+
+function extendedViewDraggable(bool)
+    modules.game_interface.gameBottomPanel:setDraggable(not bool)
+end
+
+function extendedViewHide(bool)
+    if bool then
+        modules.game_interface.gameBottomPanel:hide()
+        createButtonChat()
+    else
+        modules.game_interface.gameBottomPanel:show()
+        destroyButtonChat()
+        consolePanel:getChildById('extendedViewHide'):setChecked(false)
+    end
+end
+
+function createButtonChat()
+    if extendedViewButtonToggleChat then
+        return
+    end
+    extendedViewButtonToggleChat = g_ui.createWidget("Button", modules.game_interface.getMapPanel())
+    extendedViewButtonToggleChat:setSize("30 23")
+    extendedViewButtonToggleChat:setIcon("/images/game/npcicons/icon_chat")
+    extendedViewButtonToggleChat:addAnchor(AnchorBottom, "parent", AnchorBottom)
+    extendedViewButtonToggleChat:addAnchor(AnchorLeft, "parent", AnchorLeft)
+    extendedViewButtonToggleChat:setMarginBottom(10)
+    extendedViewButtonToggleChat.onClick = function(a,b)
+        extendedViewHide(modules.game_interface.gameBottomPanel:isVisible())
+    end
+end
+
+function destroyButtonChat()
+    if extendedViewButtonToggleChat then
+        extendedViewButtonToggleChat:destroy()
+        extendedViewButtonToggleChat = nil
     end
 end

@@ -32,7 +32,7 @@ local managerAccountsButton
 local function addButton(id, description, icon, callback, panel, toggle, front)
     local class
     if toggle then
-        class = 'TopToggleButton'
+        class = 'MainToggleButton'
     else
         class = 'Button'
     end
@@ -421,6 +421,10 @@ function getTopMenu()
     return topMenu
 end
 
+function getRightGameButtonsPanel()
+    return topLeftTogglesPanel
+end
+
 function toggle()
     local menu = getTopMenu()
     if not menu then
@@ -441,4 +445,22 @@ function openManagerAccounts()
         g_platform.openUrl(Services.websites)
     end
 
+end
+
+function extendedView(extendedView)
+    if not topMenu then
+        return
+    end
+    topMenu:breakAnchors()
+    if extendedView then
+        topMenu:show()
+        topMenu:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+        topMenu:addAnchor(AnchorRight, 'parent', AnchorRight)
+        pingLabel:setVisible(false)
+        fpsLabel:setVisible(false)
+    else
+        topMenu:hide()
+        topMenu:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
+        topMenu:setWidth(1020)
+    end
 end

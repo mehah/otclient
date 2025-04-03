@@ -1230,6 +1230,7 @@ function setupViewMode(mode)
         end
     end
 
+    testExtendedView(mode)
     if mode == 0 then
         gameMapPanel:setKeepAspectRatio(true)
         gameMapPanel:setLimitVisibleRange(false)
@@ -1378,4 +1379,85 @@ function checkAndOpenLeftPanel()
         modules.client_options.setOption('showLeftPanel', true)
         return
     end
+end
+
+function testExtendedView(mode)
+    local extendedView = mode == 2
+    modules.game_console.extendedView(extendedView)
+    if extendedView then
+        gameBottomPanel:getChildById('rightResizeBorder'):setMaximum(gameBottomPanel:getWidth())
+        local topMenuHeight = modules.client_topmenu.getTopMenu():getHeight()
+
+        local panels = {gameMainRightPanel, gameLeftPanel, gameRightPanel, gameRightExtraPanel}
+
+        for _, panel in ipairs(panels) do
+            panel:setMarginTop(topMenuHeight - panel:getPaddingTop())
+        end
+
+        local buttons = {leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
+                         leftDecreaseSidePanels}
+
+        for _, button in ipairs(buttons) do
+            button:setMarginTop(topMenuHeight)
+            button:hide()
+        end
+
+        gameMainRightPanel:setImageColor('alpha')
+
+        gameBottomPanel:breakAnchors()
+
+        gameBottomPanel:setDraggable(true)
+        gameBottomPanel:bindRectToParent()
+        gameBottomPanel:getChildById('bottomResizeBorder'):enable()
+        gameBottomPanel:getChildById('rightResizeBorder'):enable()
+        bottomSplitter:setVisible(false)
+
+        -- Move children
+        local children = gameMainRightPanel:getChildren()
+        for _, child in ipairs(children) do
+            child:setParent(gameRightPanel)
+        end
+
+        gameMainRightPanel:setHeight(0)
+    else
+        -- Reset to normal view
+        gameMainRightPanel:setHeight(200)
+        gameMainRightPanel:setMarginTop(0)
+        gameMainRightPanel:setImageColor('white')
+
+        local buttons = {leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
+                         leftDecreaseSidePanels}
+
+        for _, button in ipairs(buttons) do
+            button:setMarginTop(0)
+            button:show()
+        end
+
+        -- Reset bottom panel
+        gameBottomPanel:setDraggable(false)
+        gameBottomPanel:breakAnchors()
+        bottomSplitter:setVisible(true)
+
+        -- Set anchors
+        gameBottomPanel:addAnchor(AnchorLeft, 'gameLeftExtraPanel', AnchorRight)
+        gameBottomPanel:addAnchor(AnchorRight, 'gameRightExtraPanel', AnchorLeft)
+        gameBottomPanel:addAnchor(AnchorTop, 'gameBottomStatsBarPanel', AnchorBottom)
+        gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+
+        gameBottomPanel:getChildById('bottomResizeBorder'):disable()
+        gameBottomPanel:getChildById('rightResizeBorder'):disable()
+
+        -- Move children back
+        local children = gameRightPanel:getChildren()
+        for _, child in ipairs(children) do
+            if child.moveOnlyToMain  then
+            child:setParent(gameMainRightPanel)
+            end
+        end
+    end
+    modules.client_topmenu.extendedView(extendedView)
+    modules.game_healthinfo.extendedView(extendedView)
+    modules.game_inventory.extendedView(extendedView)
+    modules.game_minimap.extendedView(extendedView)
+    modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
 end

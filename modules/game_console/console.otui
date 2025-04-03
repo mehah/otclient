@@ -151,6 +151,51 @@ Panel
       image-clip: 18 0 18 18
 
   TabButton
+    id: extendedViewDraggable
+    !tooltip: tr('Enable/ Disable draggable chat')
+    image-source: /images/ui/console_buttons
+    image-clip: 0 64 16 16
+    anchors.right: extendedViewHide.left
+    anchors.bottom: consoleContentPanel.top
+    margin-bottom: 5
+    margin-right: 1
+    size: 16 16
+    visible: false
+
+    @onClick: |
+      self:setChecked(not self:isChecked())
+      extendedViewDraggable(self:isChecked())
+
+    $checked:
+      image-clip: 16 64 16 16
+    $!checked:
+      image-clip: 0 64 16 16
+    $pressed:
+      image-clip: 16 64 16 16
+
+  TabButton
+    id: extendedViewHide
+    !tooltip: tr('Hide Chat')
+    image-source: /images/ui/console_buttons
+    image-clip: 0 80 16 16
+    anchors.right: closeChannelButton.left
+    anchors.bottom: consoleContentPanel.top
+    margin-bottom: 5
+    margin-right: 1
+    visible: false
+    size: 16 16
+    @onClick: |
+      self:setChecked(not self:isChecked())
+      extendedViewHide(self:isChecked())
+
+    $checked:
+      image-clip: 16 80 16 16
+    $!checked:
+      image-clip: 0 80 16 16
+    $pressed:
+      image-clip: 16 80 16 16
+
+  TabButton
     id: closeChannelButton
     !tooltip: tr('Close this channel') .. ' (Ctrl+E)'
     image-source: /images/ui/console_buttons

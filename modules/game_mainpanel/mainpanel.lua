@@ -206,5 +206,52 @@ end
 function addStoreButton(id, description, image, callback, front)
     return createButton_large(id, description, image, callback, true, front)
 end
--- @ End of Options
 
+function toggleExtendedViewButtons(extended)
+    local optionsPanel = optionsController.ui.onPanel.options
+    local specialsPanel = optionsController.ui.onPanel.store
+    local rightGamePanel = modules.client_topmenu.getRightGameButtonsPanel()
+
+    if extended then
+
+        local optionChildren = optionsPanel:getChildren()
+        for _, button in ipairs(optionChildren) do
+            if not button:isDestroyed() then
+                button.originalPanel = "options"
+                rightGamePanel:addChild(button)
+            end
+        end
+
+        local specialChildren = specialsPanel:getChildren()
+        for _, button in ipairs(specialChildren) do
+            if not button:isDestroyed() then
+                button.originalPanel = "specials"
+                rightGamePanel:addChild(button)
+            end
+        end
+
+
+        optionsController.ui:hide()
+        optionsController.ui:setHeight(0)
+
+    else
+        local children = rightGamePanel:getChildren()
+        for _, button in ipairs(children) do
+            if not button:isDestroyed() then
+                if button.originalPanel == "options" then
+                    optionsPanel:addChild(button)
+                elseif button.originalPanel == "specials" then
+                    specialsPanel:addChild(button)
+                end
+            end
+        end
+
+        optionsController.ui:show()
+        optionsController.ui:setHeight(28)
+        modules.game_interface.getMainRightPanel():moveChildToIndex(optionsController.ui, 4)
+    end
+    optionsController:scheduleEvent(function()
+        refreshOptionsSizes()
+    end, 50, "safeReloadHeight")
+
+end
