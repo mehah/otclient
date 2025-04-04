@@ -2120,6 +2120,7 @@ function extendedView(bool)
         consolePanel:getChildById('extendedViewDraggable'):hide()
         consolePanel:getChildById('extendedViewHide'):hide()
         modules.game_interface.gameBottomPanel:show()
+        destroyButtonChat()
     end
     modules.game_interface.gameBottomPanel:setDraggable(not bool)
 end
