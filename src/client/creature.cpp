@@ -76,7 +76,7 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
 
         auto oldScaleFactor = g_drawPool.getScaleFactor();
 
-        g_drawPool.setScaleFactor(getScaleFactor());
+        g_drawPool.setScaleFactor(getScaleFactor() + (oldScaleFactor - 1.f));
 
         internalDraw(_dest);
 
@@ -446,7 +446,7 @@ void Creature::updateJump()
 
     m_jumpOffset = PointF(height, height);
 
-    if (isLocalPlayer()) {
+    if (isCameraFollowing()) {
         g_map.notificateCameraMove(m_walkOffset);
     }
 
@@ -488,7 +488,7 @@ void Creature::onAppear()
         m_disappearEvent = nullptr;
     }
 
-    if (isLocalPlayer() && m_position != m_oldPosition) {
+    if (isCameraFollowing() && m_position != m_oldPosition) {
         g_map.notificateCameraMove(m_walkOffset);
     }
 
@@ -634,7 +634,7 @@ void Creature::updateWalkingTile()
 
     if (newWalkingTile) {
         newWalkingTile->addWalkingCreature(self);
-        if (isLocalPlayer())
+        if (isCameraFollowing())
             g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
     }
 
@@ -658,7 +658,7 @@ void Creature::nextWalkUpdate()
         self->nextWalkUpdate();
     };
 
-    m_walkUpdateEvent = isLocalPlayer() ? g_dispatcher.addEvent(action) : g_dispatcher.scheduleEvent(action, m_stepCache.walkDuration);
+    m_walkUpdateEvent = isCameraFollowing() ? g_dispatcher.addEvent(action) : g_dispatcher.scheduleEvent(action, m_stepCache.walkDuration);
 }
 
 void Creature::updateWalk()
@@ -676,7 +676,7 @@ void Creature::updateWalk()
     updateWalkOffset(m_walkedPixels);
     updateWalkingTile();
 
-    if (isLocalPlayer() && oldWalkOffset != m_walkOffset) {
+    if (isCameraFollowing() && oldWalkOffset != m_walkOffset) {
         g_map.notificateCameraMove(m_walkOffset);
     }
 
@@ -962,7 +962,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 
-    if (isLocalPlayer() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
+    if (isCameraFollowing() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
         if (m_lastMapDuration == -1)
             m_lastMapDuration = ((g_game.mapUpdatedAt() + 9) / 10) * 10;
 

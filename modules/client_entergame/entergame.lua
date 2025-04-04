@@ -858,3 +858,7 @@ end
 function EnterGame.disableMotd()
     motdEnabled = false
 end
+
+function ensableBtnCreateNewAccount()
+    enterGame.btnCreateNewAccount:enable()
+end
