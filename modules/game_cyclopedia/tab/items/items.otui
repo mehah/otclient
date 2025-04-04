@@ -72,7 +72,7 @@ UIWidget
     !text: tr("1H")
     //font: verdana-bold-8px-antialiased
     color: #C0C0C0
-    @onCheckChange: modules.game_cyclopedia.Cyclopedia.h1Filter(self:isChecked())
+    @onCheckChange: modules.game_cyclopedia.Cyclopedia.handFilter(self:isChecked(), false)
   fakeCheckBox
     id: H2Button
     size: 47 20
@@ -84,7 +84,7 @@ UIWidget
     //font: verdana-bold-8px-antialiased
     text-offset: 13 6
     color: #C0C0C0
-    @onCheckChange: modules.game_cyclopedia.Cyclopedia.h2Filter(self:isChecked())
+    @onCheckChange: modules.game_cyclopedia.Cyclopedia.handFilter(false, self:isChecked())
   ComboBox
     id: ItemFilter
     size: 77 20
