@@ -2106,6 +2106,7 @@ function onTextChange(text)
         player:setTyping(false)
     end
 end
+local extendedViewEnable = false
 
 function extendedView(bool)
     if bool then
@@ -2114,6 +2115,7 @@ function extendedView(bool)
         consolePanel:getChildById('extendedViewDraggable'):show()
         consolePanel:getChildById('extendedViewHide'):show()
         consolePanel:getChildById('extendedViewHide'):setChecked(not modules.game_interface.gameBottomPanel:isVisible())
+        extendedViewEnable = true
     else
         consolePanel:setMarginRight(0)
         consolePanel:setMarginBottom(0)
@@ -2121,6 +2123,8 @@ function extendedView(bool)
         consolePanel:getChildById('extendedViewHide'):hide()
         modules.game_interface.gameBottomPanel:show()
         destroyButtonChat()
+        extendedViewEnable = false
+
     end
     modules.game_interface.gameBottomPanel:setDraggable(not bool)
 end
@@ -2128,15 +2132,90 @@ end
 function extendedViewDraggable(bool)
     modules.game_interface.gameBottomPanel:setDraggable(not bool)
 end
+local function setAllChildrenPhantomFalse(widget)
+    widget:setPhantom(true)
+    print(widget:getId())
+    for _, child in pairs(widget:getChildren()) do
+        setAllChildrenPhantomFalse(child)
+    end
+end
+function extendedViewCanSee(bool)
+    local gameBottomPanel = modules.game_interface.gameBottomPanel
+    local consoleTabBar = gameBottomPanel:getChildById('consolePanel'):getChildById('consoleTabBar')
+    local consoleBuffer = consoleTabBar:getCurrentTab().tabPanel:getChildById('consoleBuffer')
+
+    local children = gameBottomPanel:getChildren()
+    if bool then
+        for _, child in pairs(children) do
+            child:setVisible(false)
+        end
+        consoleBuffer:setVisible(true)
+        gameBottomPanel:setPhantom(true)
+        gameBottomPanel:setVisible(true)
+        gameBottomPanel:getChildById('consolePanel'):setVisible(true)
+        for _, child in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
+            if child:getId() == "consoleContentPanel" then
+                child:setVisible(true)
+                child:setPhantom(true)
+                setAllChildrenPhantomFalse(consoleBuffer)
+                child.tabPanel.consoleScrollBar:setVisible(false)
+            else
+                child:setVisible(false)
+            end
+        end
+        consoleTabBar:getCurrentTab().tabPanel:getChildById('consoleBuffer'):setImageSource("")
+        gameBottomPanel:setImageSource("")
+    else
+        for _, child in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
+            if child:getId() == "consoleContentPanel" then
+                child:setVisible(false)
+                child:setPhantom(false)
+                for _, subChild in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
+                    subChild:setPhantom(false)
+                end
+            end
+        end
+
+    end
+end
+function returnChat()
+    local gameBottomPanel = modules.game_interface.gameBottomPanel
+    local consoleTabBar = gameBottomPanel:getChildById('consolePanel'):getChildById('consoleTabBar')
+    local consoleBuffer = consoleTabBar:getCurrentTab().tabPanel:getChildById('consoleBuffer')
+
+    local children = gameBottomPanel:getChildren()
+    for _, child in pairs(children) do
+        if child:getId() == "cooldownWindow" then
+            child:setVisible(modules.client_options.getOption('showSpellGroupCooldowns'))
+        else
+            child:setVisible(true)
+        end
+    end
+    gameBottomPanel:getChildById('consolePanel'):setVisible(true)
+    for _, child in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
+        child:setVisible(true)
+    end
+    consoleTabBar:getCurrentTab().tabPanel:getChildById('consoleBuffer'):setImageSource(
+        "/images/ui/3pixel_frame_borderimage")
+    gameBottomPanel:setImageSource("/images/ui/background_dark")
+    gameBottomPanel:setPhantom(false)
+end
+local extendedViewButtonToggleChat2 = nil
 
 function extendedViewHide(bool)
     if bool then
         modules.game_interface.gameBottomPanel:hide()
         createButtonChat()
+        extendedViewCanSee(extendedViewButtonToggleChat2:isOn())
+
     else
-        modules.game_interface.gameBottomPanel:show()
-        destroyButtonChat()
         consolePanel:getChildById('extendedViewHide'):setChecked(false)
+        modules.game_interface.gameBottomPanel:show()
+        extendedViewCanSee(false)
+        returnChat()
+        destroyButtonChat()
+        extendedViewButtonToggleChat2:setOn(false)
+
     end
 end
 
@@ -2144,14 +2223,47 @@ function createButtonChat()
     if extendedViewButtonToggleChat then
         return
     end
-    extendedViewButtonToggleChat = g_ui.createWidget("Button", modules.game_interface.getMapPanel())
-    extendedViewButtonToggleChat:setSize("30 23")
+
+    extendedViewButtonToggleChat = g_ui.createWidget("MainToggleButton", modules.game_interface.getMapPanel())
+    extendedViewButtonToggleChat:setId("test")
     extendedViewButtonToggleChat:setIcon("/images/game/npcicons/icon_chat")
     extendedViewButtonToggleChat:addAnchor(AnchorBottom, "parent", AnchorBottom)
     extendedViewButtonToggleChat:addAnchor(AnchorLeft, "parent", AnchorLeft)
-    extendedViewButtonToggleChat:setMarginBottom(10)
-    extendedViewButtonToggleChat.onClick = function(a,b)
-        extendedViewHide(modules.game_interface.gameBottomPanel:isVisible())
+    if g_platform.isMobile() then
+        extendedViewButtonToggleChat:setMarginBottom(modules.game_joystick.getPanel():getHeight())
+        extendedViewButtonToggleChat:setSize("90 90")
+
+    else
+        extendedViewButtonToggleChat:setMarginBottom(10)
+        extendedViewButtonToggleChat:setSize("30 23")
+
+    end
+    extendedViewButtonToggleChat.onClick = function(a, b)
+        extendedViewHide(not extendedViewEnable)
+    end
+    -- Second button
+    extendedViewButtonToggleChat2 = g_ui.createWidget("MainToggleButton", modules.game_interface.getMapPanel())
+
+    extendedViewButtonToggleChat2:setIcon("/images/game/npcicons/icon_chat")
+    extendedViewButtonToggleChat2:addAnchor(AnchorBottom, "parent", AnchorBottom)
+    extendedViewButtonToggleChat2:addAnchor(AnchorLeft, "test", AnchorRight)
+    if g_platform.isMobile() then
+        extendedViewButtonToggleChat2:setMarginBottom(modules.game_joystick.getPanel():getHeight())
+        extendedViewButtonToggleChat2:setSize("90 90")
+    else
+        extendedViewButtonToggleChat2:setSize("30 23")
+        extendedViewButtonToggleChat2:setMarginBottom(10)
+    end
+    extendedViewButtonToggleChat2:setMarginLeft(5)
+    extendedViewButtonToggleChat2.onClick = function(a, b)
+        if extendedViewButtonToggleChat2:isOn() then
+            extendedViewButtonToggleChat2:setOn(false)
+        else
+            extendedViewButtonToggleChat2:setOn(true)
+
+        end
+
+        extendedViewCanSee(extendedViewButtonToggleChat2:isOn())
     end
 end
 
@@ -2160,4 +2272,13 @@ function destroyButtonChat()
         extendedViewButtonToggleChat:destroy()
         extendedViewButtonToggleChat = nil
     end
+    if extendedViewButtonToggleChat2 then
+        extendedViewButtonToggleChat2:destroy()
+        extendedViewButtonToggleChat2 = nil
+    end
+
+end
+
+function testMobile()
+    return consolePanel:getHeight()
 end

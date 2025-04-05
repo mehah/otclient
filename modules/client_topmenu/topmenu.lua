@@ -27,6 +27,10 @@ local fpsPanel2
 local PingWidget
 local pingImg
 
+local zoomInButton = nil
+local zoomOutButton = nil
+local zoomLevel = 0
+
 local managerAccountsButton
 -- private functions
 local function addButton(id, description, icon, callback, panel, toggle, front)
@@ -127,6 +131,17 @@ function terminate()
         managerAccountsButton:destroy()
         managerAccountsButton = nil
     end
+    if g_platform.isMobile() then
+        if zoomInButton then
+            zoomInButton:destroy()
+            zoomInButton= nil
+        end
+        if zoomOutButton then
+            zoomOutButton:destroy()
+            zoomOutButton= nil
+        end
+    end
+
     Keybind.delete("UI", "Toggle Top Menu")
 end
 
@@ -447,6 +462,26 @@ function openManagerAccounts()
 
 end
 
+local zoomLevel = 0
+local function updateZoomButtons()
+    if zoomInButton then
+        zoomInButton:setEnabled(zoomLevel < 4)
+    end
+    if zoomOutButton then
+        zoomOutButton:setEnabled(zoomLevel > 1)
+    end
+end
+
+local function setZoom(value)
+    local oldValue = zoomLevel
+    zoomLevel = math.max(1, math.min(4, value))
+    modules.client_options.setOption('hudScale', zoomLevel)
+    updateZoomButtons()
+    return oldValue ~= zoomLevel
+end
+
+
+
 function extendedView(extendedView)
     if not topMenu then
         return
@@ -454,10 +489,24 @@ function extendedView(extendedView)
     topMenu:breakAnchors()
     if extendedView then
         topMenu:show()
+        topMenu:raise()
+        topMenu:focus()
         topMenu:addAnchor(AnchorLeft, 'parent', AnchorLeft)
         topMenu:addAnchor(AnchorRight, 'parent', AnchorRight)
         pingLabel:setVisible(false)
         fpsLabel:setVisible(false)
+        if g_platform.isMobile() then
+            zoomInButton = modules.client_topmenu.addLeftToggleButton('zoomInButton', 'Zoom In',
+                '/images/topbuttons/zoomin', function()
+                    setZoom(zoomLevel + 0.5)
+                end)
+
+            zoomOutButton = modules.client_topmenu.addLeftToggleButton('zoomOutButton', 'Zoom Out',
+                '/images/topbuttons/zoomout', function()
+                    setZoom(zoomLevel - 0.5)
+                end)
+            updateZoomButtons()
+        end
     else
         topMenu:hide()
         topMenu:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)

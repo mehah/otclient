@@ -228,7 +228,9 @@ function EnterGame.hidePanels()
     if g_modules.getModule("client_bottommenu"):isLoaded()  then
         modules.client_bottommenu.hide()
     end
+	if not g_platform.isMobile() then
     modules.client_topmenu.toggle()
+	end
 end
 
 function EnterGame.showPanels()
