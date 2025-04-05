@@ -27,12 +27,16 @@ local fpsPanel2
 local PingWidget
 local pingImg
 
+local zoomInButton = nil
+local zoomOutButton = nil
+local zoomLevel = 0
+
 local managerAccountsButton
 -- private functions
 local function addButton(id, description, icon, callback, panel, toggle, front)
     local class
     if toggle then
-        class = 'TopToggleButton'
+        class = 'MainToggleButton'
     else
         class = 'Button'
     end
@@ -127,6 +131,17 @@ function terminate()
         managerAccountsButton:destroy()
         managerAccountsButton = nil
     end
+    if g_platform.isMobile() then
+        if zoomInButton then
+            zoomInButton:destroy()
+            zoomInButton= nil
+        end
+        if zoomOutButton then
+            zoomOutButton:destroy()
+            zoomOutButton= nil
+        end
+    end
+
     Keybind.delete("UI", "Toggle Top Menu")
 end
 
@@ -421,6 +436,10 @@ function getTopMenu()
     return topMenu
 end
 
+function getRightGameButtonsPanel()
+    return topLeftTogglesPanel
+end
+
 function toggle()
     local menu = getTopMenu()
     if not menu then
@@ -432,7 +451,7 @@ function toggle()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     else
         menu:show()
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorTop)
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
     end
 end
 
@@ -441,4 +460,58 @@ function openManagerAccounts()
         g_platform.openUrl(Services.websites)
     end
 
+end
+
+local zoomLevel = 0
+local function updateZoomButtons()
+    if zoomInButton then
+        zoomInButton:setEnabled(zoomLevel < 4)
+    end
+    if zoomOutButton then
+        zoomOutButton:setEnabled(zoomLevel > 1)
+    end
+end
+
+local function setZoom(value)
+    local oldValue = zoomLevel
+    zoomLevel = math.max(1.5, math.min(6, value))
+    modules.client_options.setOption('hudScale', zoomLevel)
+    updateZoomButtons()
+    return oldValue ~= zoomLevel
+end
+
+function extendedView(extendedView)
+    if not topMenu then
+        return
+    end
+    topMenu:breakAnchors()
+    if extendedView then
+        topMenu:show()
+        topMenu:raise()
+        topMenu:focus()
+        topMenu:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+        topMenu:addAnchor(AnchorRight, 'parent', AnchorRight)
+        scheduleEvent(function()
+            modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
+
+        end, 250)
+        pingLabel:setVisible(false)
+        fpsLabel:setVisible(false)
+        if g_platform.isMobile() then
+            zoomInButton = modules.client_topmenu.addLeftToggleButton('zoomInButton', 'Zoom In',
+                '/images/topbuttons/zoomin', function()
+                    setZoom(zoomLevel + 0.5)
+                end)
+
+            zoomOutButton = modules.client_topmenu.addLeftToggleButton('zoomOutButton', 'Zoom Out',
+                '/images/topbuttons/zoomout', function()
+                    setZoom(zoomLevel - 0.5)
+                end)
+            updateZoomButtons()
+        end
+    else
+        topMenu:hide()
+        topMenu:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
+        topMenu:setWidth(1020)
+    end
 end

@@ -1223,12 +1223,13 @@ function setupViewMode(mode)
         gameRightExtraPanel:setMarginTop(0)
         gameLeftExtraPanel:setMarginTop(0)
         gameBottomPanel:setImageColor('white')
-        modules.client_topmenu.getTopMenu():setImageColor('white')
         if g_platform.isMobile() then
             gameRightPanel:setMarginBottom(150)
             gameLeftPanel:setMarginBottom(150)
         end
     end
+
+    testExtendedView(mode)
 
     if mode == 0 then
         gameMapPanel:setKeepAspectRatio(true)
@@ -1277,7 +1278,6 @@ function setupViewMode(mode)
         gameLeftExtraPanel:setVisible(false)
         gameMapPanel:setOn(true)
         gameBottomPanel:setImageColor('#ffffff88')
-        modules.client_topmenu.getTopMenu():setImageColor('#ffffff66')
         if g_platform.isMobile() then
             gameRightPanel:setMarginBottom(150)
             gameLeftPanel:setMarginBottom(150)
@@ -1378,4 +1378,109 @@ function checkAndOpenLeftPanel()
         modules.client_options.setOption('showLeftPanel', true)
         return
     end
+end
+
+function testExtendedView(mode)
+    local extendedView = mode == 2
+    modules.game_console.extendedView(extendedView)
+    if extendedView then
+        gameBottomPanel:getChildById('rightResizeBorder'):setMaximum(gameBottomPanel:getWidth())
+        local topMenuHeight = modules.client_topmenu.getTopMenu():getHeight()
+
+        local panels = {gameMainRightPanel, gameLeftPanel, gameRightPanel, gameRightExtraPanel}
+
+        for _, panel in ipairs(panels) do
+            panel:setMarginTop(topMenuHeight - panel:getPaddingTop())
+        end
+
+        local buttons = {leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
+                         leftDecreaseSidePanels}
+
+        for _, button in ipairs(buttons) do
+            button:setMarginTop(topMenuHeight)
+            button:hide()
+        end
+
+        gameMainRightPanel:setImageColor('alpha')
+
+
+
+        if not g_platform.isMobile() then
+            gameBottomPanel:breakAnchors()
+            gameBottomPanel:bindRectToParent()
+        gameBottomPanel:setDraggable(true)
+
+        end
+        gameBottomPanel:getChildById('bottomResizeBorder'):enable()
+        gameBottomPanel:getChildById('rightResizeBorder'):enable()
+        bottomSplitter:setVisible(false)
+
+        -- Move children
+        local children = gameMainRightPanel:getChildren()
+        for _, child in ipairs(children) do
+            child:setParent(gameRightPanel)
+        end
+
+        gameMainRightPanel:setHeight(0)
+    else
+        -- Reset to normal view
+        gameMainRightPanel:setHeight(200)
+        gameMainRightPanel:setMarginTop(0)
+        gameMainRightPanel:setImageColor('white')
+
+        local buttons = {leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
+                         leftDecreaseSidePanels}
+
+        for _, button in ipairs(buttons) do
+            button:setMarginTop(0)
+            button:show()
+        end
+
+        -- Reset bottom panel
+        gameBottomPanel:setDraggable(false)
+
+        bottomSplitter:setVisible(true)
+
+        -- Set anchors
+        if not g_platform.isMobile() then
+        gameBottomPanel:breakAnchors()
+        gameBottomPanel:addAnchor(AnchorLeft, 'gameLeftExtraPanel', AnchorRight)
+        gameBottomPanel:addAnchor(AnchorRight, 'gameRightExtraPanel', AnchorLeft)
+        gameBottomPanel:addAnchor(AnchorTop, 'gameBottomStatsBarPanel', AnchorBottom)
+        gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
+        end
+        gameBottomPanel:getChildById('bottomResizeBorder'):disable()
+        gameBottomPanel:getChildById('rightResizeBorder'):disable()
+
+        -- Move children back
+        local children = gameRightPanel:getChildren()
+        for _, child in ipairs(children) do
+            if child.moveOnlyToMain  then
+            child:setParent(gameMainRightPanel)
+            end
+        end
+    end
+
+    modules.game_healthinfo.extendedView(extendedView)
+    modules.game_inventory.extendedView(extendedView)
+    modules.game_minimap.extendedView(extendedView)
+    modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
+    modules.client_topmenu.extendedView(extendedView)
+    if g_platform.isMobile() then
+        testMobile2()
+    end
+end
+
+
+function testMobile()
+    gameBottomPanel:addAnchor(AnchorLeft, 'testJoystickd', AnchorRight)
+    gameBottomPanel:addAnchor(AnchorRight, 'testJoystick', AnchorLeft)
+end
+function testMobile2()
+    gameBottomPanel:setWidth(g_window.getWidth() - 175 -175)
+    gameBottomPanel:setPosition({
+        x = 175,
+        y = gameBottomPanel:getY()
+    })
+
 end

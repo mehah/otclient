@@ -12,10 +12,11 @@ SelectColumnButton < CheckBox
   $hover:
     opacity: 1
 
-GameBottomPanel < Panel
+GameBottomPanel < UIWindow
   image-source: /images/ui/background_dark
   image-repeated: true
   padding-top: 6
+  draggable:false
 
   UIWidget
     image-source: /images/ui/divider_horizontal
@@ -25,6 +26,27 @@ GameBottomPanel < Panel
     margin-top: -6
     height: 5
     focusable: false
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    enabled: false
+    border: 4 red
+    height: 5
+    margin-top: 5
+    minimum: 170
+
+  ResizeBorder
+    id: rightResizeBorder
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    enabled: false
+    border: 3 blue
+    minimum: 300
+
 
 GameMapPanel < UIGameMap
   padding: 4
@@ -96,7 +118,6 @@ UIWidget
     &onlyPhantomDrop: true
     height: 200
     focusable: false
-    height: 1
     on: true
 
   GameSidePanel
