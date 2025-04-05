@@ -247,8 +247,6 @@ function getMiniMapUi()
     return mapController.ui.minimapBorder.minimap
 end
 
--- @ End of Minimap
-
 function extendedView(extendedView)
     if extendedView then
         if not iconTopMenu then
@@ -271,7 +269,6 @@ function extendedView(extendedView)
         mapController.ui:show()
 
     end
-
     mapController.ui.moveOnlyToMain = not extendedView
 end
 

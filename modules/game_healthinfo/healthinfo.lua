@@ -1,4 +1,3 @@
--- @ Health/Mana
 local iconTopMenu = nil
 local function healthManaEvent()
     local player = g_game.getLocalPlayer()
@@ -35,8 +34,6 @@ function healthManaController:onGameStart()
     }):execute()
 end
 
--- @ End of Health/Mana
-
 function extendedView(extendedView)
     if extendedView then
         if not iconTopMenu then
@@ -66,7 +63,6 @@ function toggle()
         healthManaController.ui:hide()
         iconTopMenu:setOn(false)
     else
-
         healthManaController.ui:show()
         iconTopMenu:setOn(true)
     end

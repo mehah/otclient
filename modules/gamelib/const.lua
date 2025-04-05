@@ -442,4 +442,8 @@ CyclopediaCharacterInfoTypes = {
     Titles = 11
 };
 
--- @}
+gameView = {
+    Classic = 0,
+    Alternative = 1,
+    Extended = 2
+}

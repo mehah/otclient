@@ -140,6 +140,7 @@ HELP_CHANNEL = 9
 consolePanel = nil
 consoleContentPanel = nil
 local extendedViewButtonToggleChat = nil
+local extendedViewButtonShowAlphaChat = nil
 consoleTabBar = nil
 consoleTextEdit = nil
 consoleToggleChat = nil
@@ -2106,16 +2107,14 @@ function onTextChange(text)
         player:setTyping(false)
     end
 end
-local extendedViewEnable = false
 
-function extendedView(bool)
+function setExtendedView(bool, mobileConfig)
     if bool then
         consolePanel:setMarginRight(10)
         consolePanel:setMarginBottom(10)
         consolePanel:getChildById('extendedViewDraggable'):show()
         consolePanel:getChildById('extendedViewHide'):show()
         consolePanel:getChildById('extendedViewHide'):setChecked(not modules.game_interface.gameBottomPanel:isVisible())
-        extendedViewEnable = true
     else
         consolePanel:setMarginRight(0)
         consolePanel:setMarginBottom(0)
@@ -2123,8 +2122,6 @@ function extendedView(bool)
         consolePanel:getChildById('extendedViewHide'):hide()
         modules.game_interface.gameBottomPanel:show()
         destroyButtonChat()
-        extendedViewEnable = false
-
     end
     modules.game_interface.gameBottomPanel:setDraggable(not bool)
 end
@@ -2132,13 +2129,7 @@ end
 function extendedViewDraggable(bool)
     modules.game_interface.gameBottomPanel:setDraggable(not bool)
 end
-local function setAllChildrenPhantomFalse(widget)
-    widget:setPhantom(true)
-    print(widget:getId())
-    for _, child in pairs(widget:getChildren()) do
-        setAllChildrenPhantomFalse(child)
-    end
-end
+
 function extendedViewCanSee(bool)
     local gameBottomPanel = modules.game_interface.gameBottomPanel
     local consoleTabBar = gameBottomPanel:getChildById('consolePanel'):getChildById('consoleTabBar')
@@ -2155,9 +2146,9 @@ function extendedViewCanSee(bool)
         gameBottomPanel:getChildById('consolePanel'):setVisible(true)
         for _, child in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
             if child:getId() == "consoleContentPanel" then
+                child:disable()
                 child:setVisible(true)
-                child:setPhantom(true)
-                setAllChildrenPhantomFalse(consoleBuffer)
+                -- setAllChildrenPhantomFalse(consoleBuffer)
                 child.tabPanel.consoleScrollBar:setVisible(false)
             else
                 child:setVisible(false)
@@ -2168,16 +2159,17 @@ function extendedViewCanSee(bool)
     else
         for _, child in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
             if child:getId() == "consoleContentPanel" then
+                child:enable()
                 child:setVisible(false)
-                child:setPhantom(false)
-                for _, subChild in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
+                --[[                 for _, subChild in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
                     subChild:setPhantom(false)
-                end
+                end ]]
             end
         end
 
     end
 end
+
 function returnChat()
     local gameBottomPanel = modules.game_interface.gameBottomPanel
     local consoleTabBar = gameBottomPanel:getChildById('consolePanel'):getChildById('consoleTabBar')
@@ -2200,22 +2192,19 @@ function returnChat()
     gameBottomPanel:setImageSource("/images/ui/background_dark")
     gameBottomPanel:setPhantom(false)
 end
-local extendedViewButtonToggleChat2 = nil
 
 function extendedViewHide(bool)
     if bool then
         modules.game_interface.gameBottomPanel:hide()
         createButtonChat()
-        extendedViewCanSee(extendedViewButtonToggleChat2:isOn())
-
+        extendedViewCanSee(extendedViewButtonShowAlphaChat:isOn())
     else
         consolePanel:getChildById('extendedViewHide'):setChecked(false)
         modules.game_interface.gameBottomPanel:show()
         extendedViewCanSee(false)
         returnChat()
+        extendedViewButtonShowAlphaChat:setOn(false)
         destroyButtonChat()
-        extendedViewButtonToggleChat2:setOn(false)
-
     end
 end
 
@@ -2231,39 +2220,34 @@ function createButtonChat()
     extendedViewButtonToggleChat:addAnchor(AnchorLeft, "parent", AnchorLeft)
     if g_platform.isMobile() then
         extendedViewButtonToggleChat:setMarginBottom(modules.game_joystick.getPanel():getHeight())
-        extendedViewButtonToggleChat:setSize("90 90")
-
+        extendedViewButtonToggleChat:setSize("60 60")
     else
         extendedViewButtonToggleChat:setMarginBottom(10)
         extendedViewButtonToggleChat:setSize("30 23")
-
     end
     extendedViewButtonToggleChat.onClick = function(a, b)
-        extendedViewHide(not extendedViewEnable)
+        extendedViewHide(modules.game_interface.currentViewMode ~= 2)
     end
-    -- Second button
-    extendedViewButtonToggleChat2 = g_ui.createWidget("MainToggleButton", modules.game_interface.getMapPanel())
+    extendedViewButtonShowAlphaChat = g_ui.createWidget("MainToggleButton", modules.game_interface.getMapPanel())
 
-    extendedViewButtonToggleChat2:setIcon("/images/game/npcicons/icon_chat")
-    extendedViewButtonToggleChat2:addAnchor(AnchorBottom, "parent", AnchorBottom)
-    extendedViewButtonToggleChat2:addAnchor(AnchorLeft, "test", AnchorRight)
+    extendedViewButtonShowAlphaChat:setIcon("/images/game/npcicons/icon_chat")
+    extendedViewButtonShowAlphaChat:addAnchor(AnchorBottom, "parent", AnchorBottom)
+    extendedViewButtonShowAlphaChat:addAnchor(AnchorLeft, "test", AnchorRight)
     if g_platform.isMobile() then
-        extendedViewButtonToggleChat2:setMarginBottom(modules.game_joystick.getPanel():getHeight())
-        extendedViewButtonToggleChat2:setSize("90 90")
+        extendedViewButtonShowAlphaChat:setMarginBottom(modules.game_joystick.getPanel():getHeight())
+        extendedViewButtonShowAlphaChat:setSize("60 60")
     else
-        extendedViewButtonToggleChat2:setSize("30 23")
-        extendedViewButtonToggleChat2:setMarginBottom(10)
+        extendedViewButtonShowAlphaChat:setSize("30 23")
+        extendedViewButtonShowAlphaChat:setMarginBottom(10)
     end
-    extendedViewButtonToggleChat2:setMarginLeft(5)
-    extendedViewButtonToggleChat2.onClick = function(a, b)
-        if extendedViewButtonToggleChat2:isOn() then
-            extendedViewButtonToggleChat2:setOn(false)
+    extendedViewButtonShowAlphaChat:setMarginLeft(5)
+    extendedViewButtonShowAlphaChat.onClick = function(a, b)
+        if extendedViewButtonShowAlphaChat:isOn() then
+            extendedViewButtonShowAlphaChat:setOn(false)
         else
-            extendedViewButtonToggleChat2:setOn(true)
-
+            extendedViewButtonShowAlphaChat:setOn(true)
         end
-
-        extendedViewCanSee(extendedViewButtonToggleChat2:isOn())
+        extendedViewCanSee(extendedViewButtonShowAlphaChat:isOn())
     end
 end
 
@@ -2272,13 +2256,8 @@ function destroyButtonChat()
         extendedViewButtonToggleChat:destroy()
         extendedViewButtonToggleChat = nil
     end
-    if extendedViewButtonToggleChat2 then
-        extendedViewButtonToggleChat2:destroy()
-        extendedViewButtonToggleChat2 = nil
+    if extendedViewButtonShowAlphaChat then
+        extendedViewButtonShowAlphaChat:destroy()
+        extendedViewButtonShowAlphaChat = nil
     end
-
-end
-
-function testMobile()
-    return consolePanel:getHeight()
 end

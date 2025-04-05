@@ -29,7 +29,7 @@ local pingImg
 
 local zoomInButton = nil
 local zoomOutButton = nil
-local zoomLevel = 0
+local zoomLevel = 2
 
 local managerAccountsButton
 -- private functions
@@ -64,6 +64,23 @@ local function addButton(id, description, icon, callback, panel, toggle, front)
         end
     end
     return button
+end
+
+local function updateZoomButtons()
+    if zoomInButton then
+        zoomInButton:setEnabled(zoomLevel < 6)
+    end
+    if zoomOutButton then
+        zoomOutButton:setEnabled(zoomLevel > 1.5)
+    end
+end
+
+local function setZoom(value)
+    local oldValue = zoomLevel
+    zoomLevel = math.max(1.5, math.min(6, value))
+    modules.client_options.setOption('hudScale', zoomLevel)
+    updateZoomButtons()
+    return oldValue ~= zoomLevel
 end
 
 -- public functions
@@ -106,6 +123,18 @@ function init()
     if Services.websites then
         managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
             nil, openManagerAccounts)
+    end
+    if g_platform.isMobile() then
+        zoomInButton = modules.client_topmenu.addLeftToggleButton('zoomInButton', 'Zoom In',
+            '/images/topbuttons/zoomin', function()
+                setZoom(zoomLevel + 0.5)
+            end)
+
+        zoomOutButton = modules.client_topmenu.addLeftToggleButton('zoomOutButton', 'Zoom Out',
+            '/images/topbuttons/zoomout', function()
+                setZoom(zoomLevel - 0.5)
+            end)
+        updateZoomButtons()
     end
     if g_game.isOnline() then
         online()
@@ -441,17 +470,15 @@ function getRightGameButtonsPanel()
 end
 
 function toggle()
-    local menu = getTopMenu()
-    if not menu then
+    if not topMenu then
         return
     end
 
-    if menu:isVisible() then
-        menu:hide()
+    if topMenu:isVisible() then
+        topMenu:hide()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     else
-        menu:show()
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
+        topMenu:show()
     end
 end
 
@@ -462,24 +489,6 @@ function openManagerAccounts()
 
 end
 
-local zoomLevel = 0
-local function updateZoomButtons()
-    if zoomInButton then
-        zoomInButton:setEnabled(zoomLevel < 4)
-    end
-    if zoomOutButton then
-        zoomOutButton:setEnabled(zoomLevel > 1)
-    end
-end
-
-local function setZoom(value)
-    local oldValue = zoomLevel
-    zoomLevel = math.max(1.5, math.min(6, value))
-    modules.client_options.setOption('hudScale', zoomLevel)
-    updateZoomButtons()
-    return oldValue ~= zoomLevel
-end
-
 function extendedView(extendedView)
     if not topMenu then
         return
@@ -487,31 +496,25 @@ function extendedView(extendedView)
     topMenu:breakAnchors()
     if extendedView then
         topMenu:show()
-        topMenu:raise()
-        topMenu:focus()
         topMenu:addAnchor(AnchorLeft, 'parent', AnchorLeft)
         topMenu:addAnchor(AnchorRight, 'parent', AnchorRight)
-        scheduleEvent(function()
-            modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
-
-        end, 250)
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
         pingLabel:setVisible(false)
         fpsLabel:setVisible(false)
-        if g_platform.isMobile() then
-            zoomInButton = modules.client_topmenu.addLeftToggleButton('zoomInButton', 'Zoom In',
-                '/images/topbuttons/zoomin', function()
-                    setZoom(zoomLevel + 0.5)
-                end)
-
-            zoomOutButton = modules.client_topmenu.addLeftToggleButton('zoomOutButton', 'Zoom Out',
-                '/images/topbuttons/zoomout', function()
-                    setZoom(zoomLevel - 0.5)
-                end)
-            updateZoomButtons()
-        end
+        topMenu.topLeftOnlinePlayers:hide()
+        topMenu.topLeftDiscord:setWidth(0)
+        topMenu.topLeftYoutube:setWidth(0)
+        topMenu.topLeftDiscord:hide()
+        topMenu.topLeftYoutube:hide()
     else
         topMenu:hide()
         topMenu:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
         topMenu:setWidth(1020)
+        topMenu.topLeftDiscord:setWidth(110)
+        topMenu.topLeftYoutube:setWidth(100)
+        topMenu.topLeftOnlinePlayers:show()
+        topMenu.topLeftDiscord:show()
+        topMenu.topLeftYoutube:show()
     end
 end
