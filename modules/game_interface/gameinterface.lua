@@ -1223,13 +1223,13 @@ function setupViewMode(mode)
         gameRightExtraPanel:setMarginTop(0)
         gameLeftExtraPanel:setMarginTop(0)
         gameBottomPanel:setImageColor('white')
-        modules.client_topmenu.getTopMenu():setImageColor('white')
         if g_platform.isMobile() then
             gameRightPanel:setMarginBottom(150)
             gameLeftPanel:setMarginBottom(150)
         end
     end
 
+    testExtendedView(mode)
 
     if mode == 0 then
         gameMapPanel:setKeepAspectRatio(true)
@@ -1256,7 +1256,6 @@ function setupViewMode(mode)
             gameLeftPanel:setMarginBottom(150)
         end
     elseif mode == 2 then
-        testExtendedView(mode)
         local limit = limitedZoom and not g_game.isGM()
         gameMapPanel:setLimitVisibleRange(limit)
         gameMapPanel:setZoom(11)
@@ -1279,7 +1278,6 @@ function setupViewMode(mode)
         gameLeftExtraPanel:setVisible(false)
         gameMapPanel:setOn(true)
         gameBottomPanel:setImageColor('#ffffff88')
-        modules.client_topmenu.getTopMenu():setImageColor('#ffffff66')
         if g_platform.isMobile() then
             gameRightPanel:setMarginBottom(150)
             gameLeftPanel:setMarginBottom(150)

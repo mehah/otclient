@@ -161,7 +161,6 @@ Panel
     margin-right: 1
     size: 16 16
     visible: true
-    shader: Map - Party
 
     @onClick: |
       self:setChecked(not self:isChecked())

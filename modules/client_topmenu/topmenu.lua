@@ -451,7 +451,7 @@ function toggle()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     else
         menu:show()
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorTop)
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
     end
 end
 
@@ -474,13 +474,11 @@ end
 
 local function setZoom(value)
     local oldValue = zoomLevel
-    zoomLevel = math.max(1, math.min(4, value))
+    zoomLevel = math.max(1.5, math.min(6, value))
     modules.client_options.setOption('hudScale', zoomLevel)
     updateZoomButtons()
     return oldValue ~= zoomLevel
 end
-
-
 
 function extendedView(extendedView)
     if not topMenu then
@@ -493,6 +491,10 @@ function extendedView(extendedView)
         topMenu:focus()
         topMenu:addAnchor(AnchorLeft, 'parent', AnchorLeft)
         topMenu:addAnchor(AnchorRight, 'parent', AnchorRight)
+        scheduleEvent(function()
+            modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
+
+        end, 250)
         pingLabel:setVisible(false)
         fpsLabel:setVisible(false)
         if g_platform.isMobile() then
