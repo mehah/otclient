@@ -176,6 +176,7 @@ end
 
 function hide()
     topMenu:hide()
+    modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
 end
 
 function show()
@@ -475,10 +476,9 @@ function toggle()
     end
 
     if topMenu:isVisible() then
-        topMenu:hide()
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
+        hide()
     else
-        topMenu:show()
+        show()
     end
 end
 
@@ -507,7 +507,9 @@ function extendedView(extendedView)
         topMenu.topLeftDiscord:hide()
         topMenu.topLeftYoutube:hide()
     else
-        topMenu:hide()
+        if g_game.isOnline() then
+            topMenu:hide()
+        end
         topMenu:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
         topMenu:setWidth(1020)
