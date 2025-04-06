@@ -1474,5 +1474,3 @@ function testExtendedView(mode)
     modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
     modules.client_topmenu.extendedView(extendedView)
 end
-
-

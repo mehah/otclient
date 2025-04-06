@@ -2107,7 +2107,6 @@ function onTextChange(text)
         player:setTyping(false)
     end
 end
-
 function setExtendedView(bool, mobileConfig)
     if bool then
         consolePanel:setMarginRight(10)
@@ -2115,6 +2114,11 @@ function setExtendedView(bool, mobileConfig)
         consolePanel:getChildById('extendedViewDraggable'):show()
         consolePanel:getChildById('extendedViewHide'):show()
         consolePanel:getChildById('extendedViewHide'):setChecked(not modules.game_interface.gameBottomPanel:isVisible())
+        if modules.game_interface.currentViewMode == 2 then
+            scheduleEvent(function()
+                extendedViewHide(false)
+            end, 100)
+        end
     else
         consolePanel:setMarginRight(0)
         consolePanel:setMarginBottom(0)
@@ -2203,7 +2207,9 @@ function extendedViewHide(bool)
         modules.game_interface.gameBottomPanel:show()
         extendedViewCanSee(false)
         returnChat()
-        extendedViewButtonShowAlphaChat:setOn(false)
+        if extendedViewButtonShowAlphaChat then
+            extendedViewButtonShowAlphaChat:setOn(false)
+        end
         destroyButtonChat()
     end
 end
