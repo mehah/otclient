@@ -2107,6 +2107,7 @@ function onTextChange(text)
         player:setTyping(false)
     end
 end
+
 function setExtendedView(bool, mobileConfig)
     if bool then
         consolePanel:setMarginRight(10)
@@ -2124,7 +2125,7 @@ function setExtendedView(bool, mobileConfig)
         consolePanel:setMarginBottom(0)
         consolePanel:getChildById('extendedViewDraggable'):hide()
         consolePanel:getChildById('extendedViewHide'):hide()
-        modules.game_interface.gameBottomPanel:show()
+        modules.game_interface.gameBottomPanel:show(true)
         destroyButtonChat()
     end
     modules.game_interface.gameBottomPanel:setDraggable(not bool)
@@ -2189,7 +2190,9 @@ function returnChat()
     end
     gameBottomPanel:getChildById('consolePanel'):setVisible(true)
     for _, child in pairs(gameBottomPanel:getChildById('consolePanel'):getChildren()) do
-        child:setVisible(true)
+        if child:getId() ~= "consoleTextEdit" then
+            child:setVisible(true)
+        end
     end
     consoleTabBar:getCurrentTab().tabPanel:getChildById('consoleBuffer'):setImageSource(
         "/images/ui/3pixel_frame_borderimage")
@@ -2204,7 +2207,7 @@ function extendedViewHide(bool)
         extendedViewCanSee(extendedViewButtonShowAlphaChat:isOn())
     else
         consolePanel:getChildById('extendedViewHide'):setChecked(false)
-        modules.game_interface.gameBottomPanel:show()
+        modules.game_interface.gameBottomPanel:show(true)
         extendedViewCanSee(false)
         returnChat()
         if extendedViewButtonShowAlphaChat then
