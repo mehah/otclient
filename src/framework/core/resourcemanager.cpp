@@ -237,7 +237,6 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
         std::replace(path.begin(), path.end(), '\\', '/');
         if (path.compare(0, 5, std::string(AY_OBFUSCATE("/bot/"))) == 0) {
             if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
-                g_logger.warning(fullPath);
                 return buffer;
             }
             return "";
