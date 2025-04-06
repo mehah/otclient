@@ -1468,12 +1468,11 @@ function testExtendedView(mode)
             end
         end
     end
-    modules.game_healthinfo.extendedView(extendedView)
-    modules.game_inventory.extendedView(extendedView)
-    modules.game_minimap.extendedView(extendedView)
     scheduleEvent(function()
+        modules.client_topmenu.extendedView(extendedView)
+        modules.game_healthinfo.extendedView(extendedView)
+        modules.game_inventory.extendedView(extendedView)
+        modules.game_minimap.extendedView(extendedView)
         modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
-
     end, 100)
-    modules.client_topmenu.extendedView(extendedView)
 end
