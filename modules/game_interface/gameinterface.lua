@@ -1391,17 +1391,13 @@ end
 
 function testExtendedView(mode)
     local extendedView = mode == 2
-    modules.game_console.setExtendedView(extendedView,mobileConfig)
+    modules.game_console.setExtendedView(extendedView)
     if extendedView then
         local topMenuHeight = modules.client_topmenu.getTopMenu():getHeight()
-        local panels = {gameMainRightPanel, gameLeftPanel, gameRightPanel, gameRightExtraPanel}
-        for _, panel in ipairs(panels) do
-            panel:setMarginTop(topMenuHeight - panel:getPaddingTop())
-        end
+
         local buttons = {leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
                          leftDecreaseSidePanels}
         for _, button in ipairs(buttons) do
-            button:setMarginTop(topMenuHeight)
             button:hide()
         end
 
@@ -1420,12 +1416,6 @@ function testExtendedView(mode)
         gameBottomPanel:getChildById('bottomResizeBorder'):enable()
         gameBottomPanel:getChildById('rightResizeBorder'):enable()
         bottomSplitter:setVisible(false)
-
-        -- Move children
-        local children = gameMainRightPanel:getChildren()
-        for _, child in ipairs(children) do
-            child:setParent(gameRightPanel)
-        end
 
         gameMainRightPanel:setHeight(0)
         gameMainRightPanel:setImageColor('alpha')
@@ -1460,7 +1450,7 @@ function testExtendedView(mode)
         gameBottomPanel:getChildById('bottomResizeBorder'):disable()
         gameBottomPanel:getChildById('rightResizeBorder'):disable()
 
-        -- Move children back
+        -- Move children back to gameMainRightPanel
         local children = gameRightPanel:getChildren()
         for _, child in ipairs(children) do
             if child.moveOnlyToMain then
@@ -1468,11 +1458,12 @@ function testExtendedView(mode)
             end
         end
     end
+    -- create icons or destroy , depending on the view
+    modules.game_minimap.extendedView(extendedView)
+    modules.game_healthinfo.extendedView(extendedView)
+    modules.game_inventory.extendedView(extendedView)
     scheduleEvent(function()
         modules.client_topmenu.extendedView(extendedView)
-        modules.game_healthinfo.extendedView(extendedView)
-        modules.game_inventory.extendedView(extendedView)
-        modules.game_minimap.extendedView(extendedView)
         modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
     end, 100)
 end

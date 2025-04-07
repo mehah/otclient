@@ -503,10 +503,11 @@ function extendedView(extendedView)
         end
         inventoryController.ui:setBorderColor('alpha')
         inventoryController.ui:setBorderWidth(0)
-        if not modules.game_interface.getMainRightPanel():hasChild(inventoryController.ui) then
-            modules.game_interface.getMainRightPanel():insertChild(3, inventoryController.ui)
+        local mainRightPanel = modules.game_interface.getMainRightPanel()
+        if not mainRightPanel:hasChild(inventoryController.ui) then
+            mainRightPanel:insertChild(3, inventoryController.ui)
         end
-        inventoryController.ui:show()
+        inventoryController.ui:show(true)
     end
     inventoryController.ui.moveOnlyToMain = not extendedView
 

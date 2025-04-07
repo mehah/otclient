@@ -239,10 +239,11 @@ function toggleExtendedViewButtons(extended)
                 end
             end
         end
-        optionsController.ui:show()
+        optionsController.ui:show(true)
         optionsController.ui:setHeight(28)
-        if modules.game_interface.getMainRightPanel():hasChild(optionsController.ui) then
-            modules.game_interface.getMainRightPanel():moveChildToIndex(optionsController.ui, 4)
+        local mainRightPanel = modules.game_interface.getMainRightPanel()
+        if mainRightPanel:hasChild(optionsController.ui) then
+            mainRightPanel:moveChildToIndex(optionsController.ui, 4)
         end
     end
     refreshOptionsSizes()

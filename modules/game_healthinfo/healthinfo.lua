@@ -50,10 +50,11 @@ function extendedView(extendedView)
         end
         healthManaController.ui:setBorderColor('alpha')
         healthManaController.ui:setBorderWidth(0)
-        if not modules.game_interface.getMainRightPanel():hasChild(healthManaController.ui) then
-            modules.game_interface.getMainRightPanel():insertChild(2, healthManaController.ui)
+        local mainRightPanel = modules.game_interface.getMainRightPanel()
+        if not mainRightPanel:hasChild(healthManaController.ui) then
+            mainRightPanel:insertChild(2, healthManaController.ui)
         end
-        healthManaController.ui:show()
+        healthManaController.ui:show(true)
     end
     healthManaController.ui.moveOnlyToMain = not extendedView
 end

@@ -263,10 +263,11 @@ function extendedView(extendedView)
         end
         mapController.ui:setBorderColor('alpha')
         mapController.ui:setBorderWidth(0)
-        if not modules.game_interface.getMainRightPanel():hasChild(mapController.ui) then
-            modules.game_interface.getMainRightPanel():insertChild(1, mapController.ui)
+        local mainRightPanel = modules.game_interface.getMainRightPanel()
+        if not mainRightPanel:hasChild(mapController.ui) then
+            mainRightPanel:insertChild(1, mapController.ui)
         end
-        mapController.ui:show()
+        mapController.ui:show(true)
 
     end
     mapController.ui.moveOnlyToMain = not extendedView

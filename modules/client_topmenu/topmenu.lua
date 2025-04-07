@@ -161,11 +161,11 @@ function terminate()
         managerAccountsButton = nil
     end
     if g_platform.isMobile() then
-        if zoomInButton then
+        if zoomInButton and not zoomOutButton:isDestroyed() then
             zoomInButton:destroy()
             zoomInButton= nil
         end
-        if zoomOutButton then
+        if zoomOutButton and not zoomOutButton:isDestroyed() then
             zoomOutButton:destroy()
             zoomOutButton= nil
         end
