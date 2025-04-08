@@ -161,6 +161,7 @@ UIWidget
       width: 120
       margin-left: 10
       anchors.verticalCenter: prev.verticalCenter
+      anchors.right: parent.right
       anchors.left: prev.right
       mouse-scroll: false
       @onTextChange: modules.game_healthcircle.updateStatsBar()

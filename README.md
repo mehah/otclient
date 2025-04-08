@@ -146,7 +146,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 - <details>
    <summary>Auto Reload Module</summary>
-
+   <br>
    Activate `g_modules.enableAutoReload()`  ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L114))
 
 
@@ -257,11 +257,19 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </details>
 
 - Support DirectX
-
+- Hud Scale
 - <details>
    <summary>Garbage Collection </summary>
   <br>
   Garbage collector is used to check what is no longer being used and remove it from memory. (lua, texture, drawpool, thingtype)
+</details>
+
+- <details>
+   <summary>Latency-adaptive camera</summary>
+  <br>
+  Basically the camera adapts to the server latency to always remain smooth and not have that stuttering session when walking.
+
+  In short, if the ping gets high, the camera moves slower, trying to keep up with the server's response time. If the ping goes down soon after, the camera will move faster. Of course, this all depends on your character's speed.
 </details>
 
 
@@ -373,7 +381,6 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </p>
 
 - Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
-- Tutorial to Use OTC in TFS main [see wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main)
 
 - 3D Sound and Sound Effects! by [@Codinablack](https://github.com/codinablack)
 
@@ -531,15 +538,15 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 >
 > In Old Protocol , if you consider that the speed of the item is too fast, modify [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)  in setup.otml
 
-## <a name="roadmap">❤️ Roadmap</a>
+## <a name="roadmap">❤️ Roadmap of the community</a>
 
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | wheel of destiny            	| ![](https://geps.dev/progress/1) 	| None	|
+| Daily Reward Wall            	| ![](https://geps.dev/progress/0) 	| None	|
 | Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
-| fix: Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
-| Sound tibia 13 | ![](https://geps.dev/progress/60)   |   None   	|
+| Sound tibia 13 | ![](https://geps.dev/progress/80)   |  [#1098](https://github.com/mehah/otclient/pull/1098)   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
 
@@ -554,6 +561,7 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 | Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
 | Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
 | Canary 13.40        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
+| Canary 14.05        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ❌             	|
 
 
 
