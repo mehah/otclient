@@ -55,7 +55,7 @@ jobs:
           vcpkgJsonIgnores: "['**/vcpkg/**', '**/browser/overlay-ports/**']"
 
       - name: Get latest CMake and ninja
-        uses: lukka/get-cmake@main
+        uses: lukka/get-cmake@v3.31.6
 
       - name: Run CMake
         uses: lukka/run-cmake@main
