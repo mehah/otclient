@@ -119,8 +119,9 @@ local function isItemValid(item, category, searchFilter)
         return false
     end
     if filterVocation and marketData.restrictVocation > 0 then
-        local voc = Bit.bit(information.vocation)
-        if not Bit.hasBit(marketData.restrictVocation, voc) then
+        local demotedVoc = information.vocation > 10 and (information.vocation - 10) or information.vocation
+        local vocBitMask = Bit.bit(demotedVoc)
+        if not Bit.hasBit(marketData.restrictVocation, vocBitMask) then
             return false
         end
     end

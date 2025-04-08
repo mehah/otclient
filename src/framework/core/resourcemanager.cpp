@@ -233,12 +233,15 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
         buffer = buffer.substr(headerSize);
         buffer = decrypt(buffer);
     } else {
-        if (fullPath.find(std::string(AY_OBFUSCATE("/bot/"))) != std::string::npos) {
+        std::string path = fullPath;
+        std::replace(path.begin(), path.end(), '\\', '/');
+        if (path.compare(0, 5, std::string(AY_OBFUSCATE("/bot/"))) == 0) {
             if (g_game.getFeature(Otc::GameAllowCustomBotScripts)) {
                 return buffer;
             }
             return "";
         }
+        buffer = "";
     }
 #endif
 
