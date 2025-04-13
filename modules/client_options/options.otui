@@ -132,6 +132,17 @@ MainWindow
     image-border-bottom: 2
   @onEnter: modules.client_options.hide()
   @onEscape: modules.client_options.hide()
+  $mobile:
+    size: 500 380
+
+  HorizontalSeparator
+    id: separator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    image-source: /images/ui/horizontal_line_bright
+    height: 1
+    margin-bottom: 15
 
   Label
     !text: tr('Options')
@@ -148,6 +159,7 @@ MainWindow
     id: optionsTabBar
     anchors.top: parent.top
     anchors.left: parent.left
+    anchors.bottom: separator.bottom
     margin-left: 1
     margin-top: -10
     image-border: 3
@@ -159,23 +171,16 @@ MainWindow
     anchors.top: optionsTabBar.top
     anchors.left: optionsTabBar.right
     anchors.right: parent.right
-    anchors.bottom: optionsTabBar.bottom
+    anchors.bottom: separator.bottom
     margin-left: 10
 
 
-  HorizontalSeparator
-    anchors.left: optionsTabBar.left
-    anchors.right: optionsTabContent.right
-    anchors.top: optionsTabContent.bottom
-    image-source: /images/ui/horizontal_line_bright
-    height: 1
-    margin-top: 15
 
   QtButton
     !text: tr('Ok')
     size: 64 20
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 10
+    margin-top: 5
     margin-right: 10
     @onClick: modules.client_options.hide()

@@ -1,3 +1,5 @@
+local iconTopMenu = nil
+
 local inventoryShrink = false
 local itemSlotsWithDuration = {}
 local updateSlotsDurationEvent = nil
@@ -359,6 +361,13 @@ function inventoryController:onGameEnd()
     end
 end
 
+function inventoryController:onTerminate()
+    if iconTopMenu then
+        iconTopMenu:destroy()
+        iconTopMenu = nil
+    end
+end
+
 function onSetSafeFight(self, checked)
     if not checked then
         inventoryController.ui.onPanel.pvp:setChecked(false)
@@ -475,5 +484,41 @@ function reloadInventory()
                 inventoryEvent(player, slot, player:getInventoryItem(slot))
             end
         end
+    end
+end
+
+function extendedView(extendedView)
+    if extendedView then
+        if not iconTopMenu then
+            iconTopMenu = modules.client_topmenu.addTopRightToggleButton('inventory', tr('Show inventory'),
+                '/images/topbuttons/inventory', toggle)
+            iconTopMenu:setOn(inventoryController.ui:isVisible())
+            inventoryController.ui:setBorderColor('black')
+            inventoryController.ui:setBorderWidth(2)
+        end
+    else
+        if iconTopMenu then
+            iconTopMenu:destroy()
+            iconTopMenu = nil
+        end
+        inventoryController.ui:setBorderColor('alpha')
+        inventoryController.ui:setBorderWidth(0)
+        local mainRightPanel = modules.game_interface.getMainRightPanel()
+        if not mainRightPanel:hasChild(inventoryController.ui) then
+            mainRightPanel:insertChild(3, inventoryController.ui)
+        end
+        inventoryController.ui:show(true)
+    end
+    inventoryController.ui.moveOnlyToMain = not extendedView
+
+end
+
+function toggle()
+    if iconTopMenu:isOn() then
+        inventoryController.ui:hide()
+        iconTopMenu:setOn(false)
+    else
+        inventoryController.ui:show()
+        iconTopMenu:setOn(true)
     end
 end

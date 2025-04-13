@@ -425,7 +425,7 @@ ResourceTypes = {
     COIN_TRANSFERRABLE = 91,
     COIN_AUCTION = 92,
     COIN_TOURNAMENT = 93
-};
+}
 
 CyclopediaCharacterInfoTypes = {
     BaseInformation = 0,
@@ -440,6 +440,6 @@ CyclopediaCharacterInfoTypes = {
     Ispection = 9,
     Badges = 10,
     Titles = 11
-};
+}
 
 -- @}
