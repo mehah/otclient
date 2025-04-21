@@ -109,7 +109,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     }
                     break;
                 case Proto::GameServerChallenge:
-                    parseChallenge(msg);
+                    parseLoginChallenge(msg);
                     break;
                 case Proto::GameServerDeath:
                     parseDeath(msg);
@@ -1227,10 +1227,14 @@ void ProtocolGame::parseSessionEnd(const InputMessagePtr& msg)
 void ProtocolGame::parsePing(const InputMessagePtr&) { g_game.processPing(); }
 void ProtocolGame::parsePingBack(const InputMessagePtr&) { g_game.processPingBack(); }
 
-void ProtocolGame::parseChallenge(const InputMessagePtr& msg)
+void ProtocolGame::parseLoginChallenge(const InputMessagePtr& msg)
 {
     const uint32_t timestamp = msg->getU32();
     const uint8_t random = msg->getU8();
+
+    if (g_game.getClientVersion() >= 1405) {
+        msg->skipBytes(1);
+    }
 
     sendLoginPacket(timestamp, random);
 }
@@ -2295,9 +2299,13 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
 void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
 {
-    uint32_t states;
+    uint64_t states;
     if (g_game.getClientVersion() >= 1281) {
-        states = msg->getU32();
+        if (g_game.getClientVersion() >= 1405) {
+            states = msg->getU64();
+        } else {
+            states = msg->getU32();
+        }
         if (g_game.getFeature(Otc::GamePlayerStateCounter)) {
             msg->getU8(); // icons counter
         }

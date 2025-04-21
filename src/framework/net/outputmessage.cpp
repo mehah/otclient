@@ -129,6 +129,19 @@ void OutputMessage::writeMessageSize()
     m_messageSize += 2;
 }
 
+void OutputMessage::writePaddingAmount()
+{
+    const uint8_t paddingAmount = 8 - (m_messageSize % 8) - 1;
+    addPaddingBytes(paddingAmount);
+    prependU8(paddingAmount);
+}
+
+void OutputMessage::writeHeaderSize()
+{
+    uint16_t headerSize = static_cast<uint16_t>((m_messageSize - 4) / 8); // -4 for checksum
+    prependU16(headerSize); // Uses writeULE16 and updates `m_headerPos` and `m_messageSize`
+}
+
 bool OutputMessage::canWrite(const int bytes) const
 {
     return m_writePos + bytes <= BUFFER_MAXSIZE;
@@ -138,4 +151,22 @@ void OutputMessage::checkWrite(const int bytes)
 {
     if (!canWrite(bytes))
         throw stdext::exception("OutputMessage max buffer size reached");
+}
+
+void OutputMessage::prependU8(uint8_t value)
+{
+    assert(m_headerPos > 0);
+    m_headerPos--;
+    m_writePos--;
+    m_buffer[m_headerPos] = value;
+    m_messageSize++;
+}
+
+void OutputMessage::prependU16(uint16_t value)
+{
+    assert(m_headerPos >= 2);
+    m_headerPos -= 2;
+    m_writePos -= 2;
+    stdext::writeULE16(m_buffer + m_headerPos, value);
+    m_messageSize += 2;
 }

@@ -122,8 +122,10 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
 
 
     // encrypt
-    if (m_xteaEncryptionEnabled)
+    if (m_xteaEncryptionEnabled) {
+        outputMessage->writePaddingAmount();
         xteaEncrypt(outputMessage);
+    }
 
     // write checksum
     if (m_sequencedPackets)
@@ -132,7 +134,8 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
         outputMessage->writeChecksum();
 
     // write message size
-    outputMessage->writeMessageSize();
+    if (!m_xteaEncryptionEnabled)
+        outputMessage->writeMessageSize();
 
     onSend();
 
@@ -203,7 +206,13 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
     if (m_sequencedPackets) {
         decompress = (m_inputMessage->getU32() & 1 << 31);
     } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", static_cast<int>(m_inputMessage->getMessageSize())));
+        std::stringstream ss;
+        ss << std::hex << std::uppercase; // Configure to hexadecimal and uppercase letters
+        for (size_t i = 0; i < m_inputMessage->getHeaderSize(); ++i) {
+            ss << std::setw(2) << std::setfill('0') << static_cast<int>(m_inputMessage->getBuffer()[i]) << " ";
+        }
+        std::string headerHex = ss.str();
+        g_logger.traceError(stdext::format("got a network message with invalid checksum, header: %s, size: %i", headerHex, static_cast<int>(m_inputMessage->getMessageSize())));
         return;
     }
 
@@ -292,14 +301,19 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage) const
         });
     }
 
-    const uint16_t decryptedSize = inputMessage->getU16() + 2;
-    const int sizeDelta = decryptedSize - encryptedSize;
-    if (sizeDelta > 0 || -sizeDelta > encryptedSize) {
-        g_logger.traceError("invalid decrypted network message");
-        return false;
+    uint16_t decryptedSize;
+    if (g_game.getClientVersion() >= 1405) {
+        const uint8_t paddingSize = inputMessage->getU8();
+        decryptedSize = encryptedSize - paddingSize - 5; // Padding byte + real size
+        if (decryptedSize + paddingSize + 1 != encryptedSize) {
+            g_logger.traceError("invalid decrypted network message");
+            return false;
+        }
+    } else {
+        decryptedSize = inputMessage->getU16();
     }
 
-    inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
+    inputMessage->setMessageSize(inputMessage->getHeaderSize() + decryptedSize);
     return true;
 }
 

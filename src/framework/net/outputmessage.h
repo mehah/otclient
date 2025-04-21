@@ -33,7 +33,7 @@ public:
     {
         BUFFER_MAXSIZE = 65536,
         MAX_STRING_LENGTH = 65536,
-        MAX_HEADER_SIZE = 8
+        MAX_HEADER_SIZE = 7
     };
 
     void reset();
@@ -47,6 +47,8 @@ public:
     void addU64(uint64_t value);
     void addString(std::string_view buffer);
     void addPaddingBytes(int bytes, uint8_t byte = 0);
+    void prependU8(uint8_t value);
+    void prependU16(uint16_t value);
 
     void encryptRsa();
 
@@ -64,6 +66,8 @@ protected:
     void writeChecksum();
     void writeSequence(uint32_t sequence);
     void writeMessageSize();
+    void writePaddingAmount();
+    void writeHeaderSize();
 
     friend class Protocol;
     friend class PacketPlayer;

@@ -32,7 +32,7 @@ public:
     enum
     {
         BUFFER_MAXSIZE = 65536,
-        MAX_HEADER_SIZE = 8
+        MAX_HEADER_SIZE = 7
     };
 
     void setBuffer(const std::string& buffer);
