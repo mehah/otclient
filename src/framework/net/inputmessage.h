@@ -73,6 +73,9 @@ public:
     int getUnreadSize() { return m_messageSize - (m_readPos - m_headerPos); }
     uint16_t getMessageSize() { return m_messageSize; }
 
+    void setPaddingSize(uint8_t padding) { m_padding = padding; }
+    uint8_t getPaddingSize() { return m_padding; }
+
     bool eof() { return (m_readPos - m_headerPos) >= m_messageSize; }
 
 protected:
@@ -100,5 +103,6 @@ private:
     uint16_t m_headerPos{ MAX_HEADER_SIZE };
     uint16_t m_readPos{ MAX_HEADER_SIZE };
     uint16_t m_messageSize{ 0 };
+    uint8_t m_padding{ 0 };
     uint8_t m_buffer[BUFFER_MAXSIZE]{};
 };

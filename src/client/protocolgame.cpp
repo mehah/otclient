@@ -67,11 +67,11 @@ void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
         m_firstRecv = false;
 
         if (g_game.getFeature(Otc::GameMessageSizeCheck)) {
-            const int size = inputMessage->getU16();
-            if (size != inputMessage->getUnreadSize()) {
-                g_logger.traceError("invalid message size");
-                return;
-            }
+            const int padding = inputMessage->getU8();
+            // if (size != inputMessage->getUnreadSize()) {
+            //     g_logger.traceError("invalid message size");
+            //     return;
+            // }
         }
     }
 

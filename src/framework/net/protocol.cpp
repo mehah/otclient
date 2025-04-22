@@ -28,6 +28,7 @@
 #include "inputmessage.h"
 #include "outputmessage.h"
 #include "framework/core/graphicalapplication.h"
+#include "client/game.h"
 #ifdef __EMSCRIPTEN__
 #include "webconnection.h"
 #else
@@ -120,10 +121,11 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
         m_recorder->addOutputPacket(outputMessage);
     }
 
+    // padding
+    outputMessage->writePaddingAmount();
 
     // encrypt
     if (m_xteaEncryptionEnabled) {
-        outputMessage->writePaddingAmount();
         xteaEncrypt(outputMessage);
     }
 
@@ -135,7 +137,7 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
 
     // write message size
     if (!m_xteaEncryptionEnabled)
-        outputMessage->writeMessageSize();
+        outputMessage->writeHeaderSize();
 
     onSend();
 
@@ -167,7 +169,7 @@ void Protocol::recv()
     if (m_checksumEnabled)
         headerSize += 4; // 4 bytes for checksum
     if (m_xteaEncryptionEnabled)
-        headerSize += 2; // 2 bytes for XTEA encrypted message size
+        headerSize += 1; // 2 bytes for XTEA encrypted message size
     m_inputMessage->setHeaderSize(headerSize);
 
     // read the first 2 bytes which contain the message size
@@ -182,7 +184,7 @@ void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
-    const uint16_t remainingSize = m_inputMessage->readSize();
+    const uint16_t remainingSize = m_inputMessage->readSize() * 8 + 4;
 
     // read remaining message data
     if (m_connection)
@@ -225,6 +227,7 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 
     if (decompress) {
         static uint8_t zbuffer[InputMessage::BUFFER_MAXSIZE];
+        uint8_t inBuffer[InputMessage::BUFFER_MAXSIZE]{};
 
         m_zstream.next_in = m_inputMessage->getDataBuffer();
         m_zstream.next_out = zbuffer;
@@ -304,11 +307,8 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage) const
     uint16_t decryptedSize;
     if (g_game.getClientVersion() >= 1405) {
         const uint8_t paddingSize = inputMessage->getU8();
-        decryptedSize = encryptedSize - paddingSize - 5; // Padding byte + real size
-        if (decryptedSize + paddingSize + 1 != encryptedSize) {
-            g_logger.traceError("invalid decrypted network message");
-            return false;
-        }
+        inputMessage->setPaddingSize(paddingSize);
+        decryptedSize = encryptedSize - paddingSize - 1;
     } else {
         decryptedSize = inputMessage->getU16();
     }
@@ -319,7 +319,7 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage) const
 
 void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
 {
-    outputMessage->writeMessageSize();
+    // outputMessage->writeMessageSize();
     uint16_t encryptedSize = outputMessage->getMessageSize();
 
     //add bytes until reach 8 multiple
