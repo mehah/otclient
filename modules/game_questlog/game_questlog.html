@@ -1,0 +1,132 @@
+<style>
+  /* MainWindows */
+  .questLog-window {
+    width: 790;
+    height: 639;
+    font: verdana-11px-antialised;
+    opacity: 1;
+    display: block;
+  }
+
+  /* Panel left */
+  .content-left {
+    width: 367;
+    height: 551;
+    margin-left: 5;
+
+  }
+  .search-box {
+    width: 270;
+    display: block;
+  }
+  .filter {
+    height: 40;
+    margin-left: 5;
+
+  }
+
+
+  .checkbox-group {
+    display: flex;
+    white-space: pre;
+    /*text-auto-resize: true;*/
+  }
+  .questLogButton {
+/*     white-space: pre; */
+    font:cipsoftFont;
+  }
+
+  /* Panel right */
+  .content-right {
+    width: 375;
+    height: 551;
+    background-color: #404040;
+    margin-bottom: 10;
+    margin-left: 385;
+    display: block;
+  }
+
+  /* areas scrollables */
+  
+
+
+  /* foot */
+  .separator {
+    display: block;
+    margin-top: 5;
+    width: 760;
+  }
+
+
+/*
+  #SearchClearButton {
+  float: right;
+  background-image: url('/game_cyclopedia/images/button_clear_search.png');
+  background-color: white;  
+  opacity: 0.8;
+  width: 16;          
+  height: 16;
+  background-size: cover;
+  border: none;
+  cursor: pointer;
+}
+
+#SearchClearButton:hover {
+  opacity: 1.0;
+  background-color: white;
+}
+
+#SearchClearButton:active {
+  opacity: 1.0;
+  background-color: gray;
+} */
+</style>
+
+<window id="main" anchor="parent" class="questLog-window" text="Quest Log" onescape="self:close()">
+
+  <!--  Panel left -->
+  <minipanel id="panelQuestLog" text="Quest Log" focusable="false" class="content-left" anchor="parent"
+    layout="type: verticalBox;spacing:5">
+    <TextListQuestLog id="areaPanelQuestList"
+      style="border-width: 1;border-color: #00000077;height: 425;background-color: #404040">
+    </TextListQuestLog>
+    <select id="comboBoxFilter" onchange="self:onFilterQuestLog(event)">
+      <option>Alphabetically (A-Z)</option>
+      <option>Alphabetically (Z-A)</option>
+      <option>Completed on Top</option>
+      <option>Completed on Bottom</option>
+    </select>
+    <TextEditQuestLog id="textEditSearchQuest" type="text" class="search-box" placeholder="Type to search" >
+    </TextEditQuestLog>
+
+    <div id="filterPanel"
+      layout="type: grid;cell-size: 158 22;num-lines:2;num-columns: 3;cell-spacing: 0;flow: false;fit-children: false"
+      class="filter">
+      <input id="checkboxShowComplete" type="checkbox" class="checkbox-group" text="Quest Log" textOffset="18 5" onchange="self:filterQuestListShowComplete(event)" >Show Completed
+      </input>
+      <label style="text-align: right;"  textOffset="0 -2">Quests completed:</label>
+      <label id="lblCompleteNumber" style="margin-left: 12;text-align: left;" textOffset="5 -1">-99</label>
+        <!-- next line grid -->
+      <input id="checkboxShowShidden" type="checkbox" class="checkbox-group" text="Quest Log" textOffset="18 5" onchange="self:filterQuestListShowComplete(event)" >Show hidden
+      </input>
+      <label style="text-align: right;" textOffset="0 -2">Quests hidden:</label>
+      <label id="lblHiddenNumber" style="margin-left: 12;text-align: left;" textOffset="5 -2">-99</label>
+    </div>
+  </minipanel>
+
+  <!--  Panel right  -->
+  <minipanel id="panelQuestLineSelected" class="content-right" anchor="parent" text="No quest line Selected" layout="type: verticalBox;">
+    <TextListQuestLog id="ScrollAreaQuestList"
+      style="height: 200">
+    </TextListQuestLog>
+    <MultiLineQuestLog id="panelQuestInfo" 
+      style="margin-top:5;background-color:#363636;height: 300;">
+    </MultiLineQuestLog>
+    <input id="checkboxShowInQuestTracker" type="checkbox" class="checkbox-group" onchange="self:test(event)" >Show in quest tracker</input>
+  </minipanel>
+
+  <!-- foot  -->
+  <HorizontalSeparator class="separator"></HorizontalSeparator>
+  <Qtbutton class="questLogButton" textAutoResize="true" style="margin-top:12;" onclick="self:toggleMiniWindowsTracker()">Quest Tracker</Qtbutton>
+  <Qtbutton class="questLogButton" textAutoResize="true" style="float: right;" onclick="self:close()">Close</Qtbutton>
+</window>

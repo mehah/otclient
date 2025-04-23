@@ -9,13 +9,12 @@ end
 
 function BlessingController:onGameStart()
     g_ui.importStyle("style.otui")
-    BlessingController:loadHtml('blessing.html', g_ui.getRootWidget())
-
+    BlessingController:loadHtml('blessing.html')
+    BlessingController.ui:centerIn('parent') -- temp fix css
     BlessingController:registerEvents(g_game, {
         onUpdateBlessDialog = onUpdateBlessDialog
     })
     BlessingController.ui:hide()
-    BlessingController.ui.minipanel1:setText("Record of Blessings") -- Temp fix html/css system
 end
 
 function BlessingController:onGameEnd()
