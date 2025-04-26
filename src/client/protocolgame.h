@@ -99,6 +99,7 @@ public:
     void sendCancelAttackAndFollow();
     void sendRefreshContainer(uint8_t containerId);
     void sendRequestBless();
+    void sendRequestTrackerQuestLog(const std::vector<uint8_t>& questId);
     void sendRequestOutfit();
     void sendTyping(bool typing);
     void sendChangeOutfit(const Outfit& outfit);
@@ -278,6 +279,7 @@ private:
     void parseWalkWait(const InputMessagePtr& msg) const;
     void parseFloorChangeUp(const InputMessagePtr& msg);
     void parseFloorChangeDown(const InputMessagePtr& msg);
+    void parseQuestTracker(const InputMessagePtr& msg);
     void parseKillTracker(const InputMessagePtr& msg);
     void parseOpenOutfitWindow(const InputMessagePtr& msg) const;
     void parseVipAdd(const InputMessagePtr& msg);

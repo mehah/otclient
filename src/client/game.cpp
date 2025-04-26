@@ -1946,7 +1946,16 @@ void Game::requestBossSlotAction(const uint8_t action, const uint32_t raceId)
 
 void Game::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)
 {
-    enableBotCall();
+    if (!canPerformGameAction())
+        return;
     m_protocolGame->sendStatusTrackerBestiary(raceId, status);
-    disableBotCall();
 }
+
+void Game::sendRequestTrackerQuestLog(const std::vector<uint8_t>& questId)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestTrackerQuestLog(questId);
+}
+
