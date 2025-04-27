@@ -1528,6 +1528,22 @@ void Game::sendRequestStoreHome()
     m_protocolGame->sendRequestStoreHome();
 }
 
+void Game::sendRequestStorePremiumBoost()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestStorePremiumBoost();
+}
+
+void Game::sendRequestUsefulThings(const uint8_t serviceType)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestUsefulThings(serviceType);
+}
+
 void Game::sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType)
 {
     if (!canPerformGameAction())
@@ -1949,4 +1965,20 @@ void Game::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)
     enableBotCall();
     m_protocolGame->sendStatusTrackerBestiary(raceId, status);
     disableBotCall();
+}
+
+void Game::sendOpenRewardWall()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendOpenRewardWall();
+}
+
+void Game::requestOpenRewardHistory()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendOpenRewardHistory();
 }

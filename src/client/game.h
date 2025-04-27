@@ -412,6 +412,43 @@ struct CharacterInfoFamiliar
     uint32_t isCurrent;
 };
 
+struct DailyRewardItem
+{
+    uint16_t itemId;
+    std::string name;
+    uint32_t weight;
+};
+
+struct DailyRewardBundle
+{
+    uint8_t bundleType;
+    uint16_t itemId;
+    std::string name;
+    uint8_t count;
+};
+
+struct DailyRewardDay
+{
+    uint8_t redeemMode;
+    std::vector<DailyRewardItem> selectableItems;
+    std::vector<DailyRewardBundle> bundleItems;
+};
+
+struct DailyRewardBonus
+{
+    std::string name;
+    uint8_t id;
+};
+
+struct DailyRewardData
+{
+    uint8_t days;
+    std::vector<DailyRewardDay> freeRewards;
+    std::vector<DailyRewardDay> premiumRewards;
+    std::vector<DailyRewardBonus> bonuses;
+    uint8_t maxUnlockableDragons;
+};
+
 //@bindsingleton g_game
 class Game
 {
@@ -682,6 +719,8 @@ public:
     void requestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
     void requestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType);
     void sendRequestStoreHome();
+    void sendRequestStorePremiumBoost();
+    void sendRequestUsefulThings(const uint8_t serviceType);
     void sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType);
     void sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType);
     void openStore(uint8_t serviceType = 0, std::string_view category = "");
@@ -797,6 +836,8 @@ public:
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
+    void sendOpenRewardWall();
+    void requestOpenRewardHistory();
 
     void updateMapLatency() {
         if (!m_mapUpdateTimer.first) {

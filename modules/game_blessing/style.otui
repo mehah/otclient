@@ -56,19 +56,3 @@ blessingTEST < UIWidget
 
     image-source: /game_blessing/images/blessingContainer
     focusable: false
-
-BlessingButton < UIButton
-  size: 128 37
-  image-source: /game_blessing/images/getpremium
-  image-clip: 0 0 128 37
-  image-border: 3
-  @onClick: modules.game_mainpanel.toggleStore()
-  
-  $pressed:
-    image-clip: 0 37 128 37
-  $!on:
-    image-clip: 0 74 128 37
-  $disabled:
-    color: #dfdfdf88
-    opacity: 0.8
-

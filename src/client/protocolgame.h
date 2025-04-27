@@ -121,6 +121,8 @@ public:
     void sendRequestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
     void sendRequestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder = 0, const uint8_t serviceType = 0);
     void sendRequestStoreHome();
+    void sendRequestStorePremiumBoost();
+    void sendRequestUsefulThings(const uint8_t offerId);
     void sendRequestStoreOfferById(uint32_t offerId, uint8_t sortOrder = 0, uint8_t serviceType = 0);
     void sendRequestStoreSearch(const std::string_view searchText, uint8_t sortOrder = 0, uint8_t serviceType = 0);
     void sendOpenStore(uint8_t serviceType, std::string_view category);
@@ -136,6 +138,8 @@ public:
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
+    void sendOpenRewardWall();
+    void sendOpenRewardHistory();
     void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
