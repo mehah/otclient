@@ -4,8 +4,6 @@ rewardWallController = Controller:new()
 -- =============================================*/
 -- - Button
 -- - Windows reward potions
--- - store medalla
--- - buy premium
 -- - cpp : SelectReward
 -- - improve Ids
 
