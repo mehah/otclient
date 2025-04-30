@@ -52,21 +52,6 @@ local skillsTuples = {
 
 StatsBar = {}
 
-
-local function createBlankIcon()
-    local statsBarConfigs = getConfigurations()
-    
-    for _, statsBarConfig in ipairs(statsBarConfigs) do
-        local icon = g_ui.createWidget('ConditionWidget', statsBarConfig.icons)
-        icon:setImageSource('/images/ui/blank')
-        icon:setImageSize({
-            width = 1,
-            height = 1
-        })
-        icon:setMarginRight(-10)
-    end
-end
-
 function getConfigurations()
     -- This method will return all the stats bar configurations.
     local configs = {}
@@ -273,8 +258,11 @@ local function loadIcon(bitChanged, content, topmenu)
     end
     icon:setTooltip(tooltip)
     icon:setImageSize(tosize("9 9"))
+    icon:setMarginRight(-2)
     if topmenu then
         icon:setMarginTop(5)
+        icon:setMarginLeft(1)
+        icon:setMarginRight(-2)
     end
     return icon
 end
@@ -554,8 +542,6 @@ end
 
 function StatsBar.OnGameStart()
     StatsBar.loadSettings()
-
-    createBlankIcon()
     StatsBar.reloadCurrentTab()
     modules.game_healthcircle.setStatsBarOption()
 end
