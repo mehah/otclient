@@ -3,7 +3,7 @@ rewardWallController = Controller:new()
 -- =            To-do                  =
 -- =============================================*/
 -- - otui -> html/css g_ui.displayUI 
--- - Improve Ids
+-- - Improve Ids footerGold2 , footerGold1
 -- - fix displayErrorBox
 -- - fix onhoverRewardType
 -- - add windows warning: no sufficient Instant Reward Access 
@@ -61,8 +61,8 @@ local bonusShrine = 0
 -- =============================================*/
 local function premiumStatusWindwos(isPremium)
     rewardWallController.ui.premiumStatus.premiumButton:setOn(not isPremium)
-    rewardWallController.ui.info.free:setColor(isPremium and "#909090" or "#FFFFFF")
-    rewardWallController.ui.info.premium:setColor(isPremium and "#FFFFFF" or "#909090")
+    rewardWallController.ui.infoPanel.free:setColor(isPremium and "#909090" or "#FFFFFF")
+    rewardWallController.ui.infoPanel.premium:setColor(isPremium and "#FFFFFF" or "#909090")
     if isPremium then
         for i, widget in pairs(rewardWallController.ui.restingAreaPanel.bonusIcons:getChildren()) do
             if widget then
@@ -86,7 +86,7 @@ end
 
 local function visibleHistory(bool)
     for i, widget in ipairs(rewardWallController.ui:getChildren()) do
-        if widget:getId() == "History" then
+        if widget:getId() == "historyPanel" then
             widget:setVisible(bool)
         else
             widget:setVisible(not bool)
@@ -98,11 +98,11 @@ local function visibleHistory(bool)
 end
 
 local function updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
-    local dailyRewardsPanels = rewardWallController.ui.dailyRewardsPanels
+    local dailyRewardsPanel = rewardWallController.ui.dailyRewardsPanel
 
     for i = 1, dayStreakDay do
-        local rewardWidget = dailyRewardsPanels:getChildById("reward" .. i)
-        local rewardArrow = dailyRewardsPanels:getChildById("arrow" .. i)
+        local rewardWidget = dailyRewardsPanel:getChildById("reward" .. i)
+        local rewardArrow = dailyRewardsPanel:getChildById("arrow" .. i)
         if rewardWidget then
             local test = g_ui.createWidget("RewardButton", rewardWidget:getChildById("rewardGold" .. i))
             test:setOn(true)
@@ -116,7 +116,7 @@ local function updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
         end
     end
 
-    local currentReward = dailyRewardsPanels:getChildById("reward" .. dayStreakDay + 1)
+    local currentReward = dailyRewardsPanel:getChildById("reward" .. dayStreakDay + 1)
     if currentReward then
         local test = g_ui.createWidget("GoldLabel2", currentReward:getChildById("rewardGold" .. dayStreakDay + 1))
         test:setOn(true)
@@ -136,7 +136,7 @@ local function updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
     end
 
     for i = dayStreakDay + 2, 7 do
-        local rewardWidget = dailyRewardsPanels:getChildById("reward" .. i)
+        local rewardWidget = dailyRewardsPanel:getChildById("reward" .. i)
         if rewardWidget then
             local test = g_ui.createWidget("RewardButton", rewardWidget:getChildById("rewardGold" .. i))
             test:setOn(false)
@@ -194,10 +194,35 @@ local function disconnectOnServerError()
         onServerError = onServerError
     })
 end
+local function checkRewards(data)
+    for index, reward in ipairs(data) do
+        local hasSelectableItems = reward.selectableItems and next(reward.selectableItems) ~= nil
+        local rewardButton = rewardWallController.ui.dailyRewardsPanel:getChildById("reward" .. index):getChildById(
+            "rewardButton" .. index)
+        local iconWidget = rewardWallController.ui.dailyRewardsPanel:getChildById("reward" .. index):getChildByIndex(1)
 
+        if hasSelectableItems then
+            iconWidget:setIcon("game_rewardwall/images/icon-reward-pickitems")
+            rewardButton.bundleType = bundleType.ITEMS
+            rewardButton.rewardItem = reward.selectableItems
+            rewardButton.getMaxUsed = reward.itemsToSelect
+        elseif reward.bundleItems[1].bundleType == 3 then
+            iconWidget:setIcon("game_rewardwall/images/icon-reward-xpboost")
+            rewardButton.bundleType = bundleType.XPBOOST
+        else
+            iconWidget:setIcon("game_rewardwall/images/icon-reward-fixeditems")
+            rewardButton.bundleType = bundleType.PREY
+        end
+    end
+end
 -- /*=============================================
 -- =            onParse                  =
 -- =============================================*/
+local function onDailyReward(data)
+    bonuses = data.bonuses
+    checkRewards(g_game.getLocalPlayer():isPremium() and data.premiumRewards or data.freeRewards)
+end
+
 local function onServerError(code, error)
     closeGeneralBoxError()
     displayGeneralBox2 = displayGeneralBox(rewardWallController.ui:getText(), error, {
@@ -223,38 +248,12 @@ local function onOpenRewardWall(bonusShrine, nextRewardTime, dayStreakDay, wasDa
 
     rewardWallController.ui.footerPanel.footerGold2.text:setText(
         g_game.getLocalPlayer():getResourceBalance(ResourceTypes.DAILYREWARD_STREAK))
-
 end
 
-local function checkRewards(data)
-    for index, reward in ipairs(data) do
-        local hasSelectableItems = reward.selectableItems and next(reward.selectableItems) ~= nil
-        local rewardButton = rewardWallController.ui.dailyRewardsPanels:getChildById("reward" .. index):getChildById(
-            "rewardButton" .. index)
-        local iconWidget = rewardWallController.ui.dailyRewardsPanels:getChildById("reward" .. index):getChildByIndex(1)
 
-        if hasSelectableItems then
-            iconWidget:setIcon("game_rewardwall/images/icon-reward-pickitems")
-            rewardButton.bundleType = bundleType.ITEMS
-            rewardButton.rewardItem = reward.selectableItems
-            rewardButton.getMaxUsed = reward.itemsToSelect
-        elseif reward.bundleItems[1].bundleType == 3 then
-            iconWidget:setIcon("game_rewardwall/images/icon-reward-xpboost")
-            rewardButton.bundleType = bundleType.XPBOOST
-        else
-            iconWidget:setIcon("game_rewardwall/images/icon-reward-fixeditems")
-            rewardButton.bundleType = bundleType.PREY
-        end
-    end
-end
-
-local function onDailyReward(data)
-    bonuses = data.bonuses
-    checkRewards(g_game.getLocalPlayer():isPremium() and data.premiumRewards or data.freeRewards)
-end
 
 local function onRewardHistory(rewardHistory)
-    local transferHistory = rewardWallController.ui.History.History.List
+    local transferHistory = rewardWallController.ui.historyPanel.historyList.List
     transferHistory:destroyChildren()
 
     local headerRow = g_ui.createWidget("historyData2", transferHistory)
@@ -314,7 +313,7 @@ end
 
 local function fixCssIncompatibility() -- temp
     rewardWallController.ui:centerIn('parent') -- mainWindows to the center of the screen
-    rewardWallController.ui.History.History:fill('parent')
+    rewardWallController.ui.historyPanel.historyList:fill('parent')
 
     -- note: I don't know how to edit children in css
     local restingAreaGold = rewardWallController.ui.restingAreaPanel.restingAreaInfo.restingAreaGold
@@ -388,7 +387,7 @@ end
 -- =            Call css onClick                =
 -- =============================================*/
 function rewardWallController:onClickshowHistory()
-    visibleHistory(not rewardWallController.ui.History:isVisible())
+    visibleHistory(not rewardWallController.ui.historyPanel:isVisible())
     g_game.requestOpenRewardHistory()
 end
 
@@ -411,7 +410,7 @@ end
 
 function rewardWallController:onhoverBonus(event)
     if not event.value then
-        rewardWallController.ui.info:setText("")
+        rewardWallController.ui.infoPanel:setText("")
         return
     end
 
@@ -420,7 +419,7 @@ function rewardWallController:onhoverBonus(event)
     local bonus = bonuses[index]
 
     if not bonus then
-        rewardWallController.ui.info:setText("Unknown bonus.")
+        rewardWallController.ui.infoPanel:setText("Unknown bonus.")
         return
     end
 
@@ -431,12 +430,12 @@ function rewardWallController:onhoverBonus(event)
         bonus.id,
         isPremium and ("\n\nActive bonuses: [color=#909090]%s[/color]."):format(getBonusStrings(bonuses)) or "")
 
-    rewardWallController.ui.info:parseColoredText(bonusText)
+    rewardWallController.ui.infoPanel:parseColoredText(bonusText)
 end
 
 function rewardWallController:onhoverStatusPlayer(event)
     if not event.value then
-        rewardWallController.ui.info:setText("")
+        rewardWallController.ui.infoPanel:setText("")
         return
     end
 
@@ -450,13 +449,13 @@ function rewardWallController:onhoverStatusPlayer(event)
 
     local id = event.target:getId()
     local info = playerStatus[id]
-    rewardWallController.ui.info:parseColoredText(info or DEFAULT_MESSAGE)
+    rewardWallController.ui.infoPanel:parseColoredText(info or DEFAULT_MESSAGE)
 end
 
 function rewardWallController:onhoverRewardType(event)
     if not event.value then
-        rewardWallController.ui.info.free:setText("")
-        rewardWallController.ui.info.premium:setText("")
+        rewardWallController.ui.infoPanel.free:setText("")
+        rewardWallController.ui.infoPanel.premium:setText("")
         return
     end
     -- TODO fix this
@@ -486,11 +485,11 @@ function rewardWallController:onhoverRewardType(event)
 
     local targetBundle = rewardTexts[event.target.bundleType]
     if targetBundle then
-        rewardWallController.ui.info.free:setText(targetBundle.free)
-        rewardWallController.ui.info.premium:setText(targetBundle.premium)
+        rewardWallController.ui.infoPanel.free:setText(targetBundle.free)
+        rewardWallController.ui.infoPanel.premium:setText(targetBundle.premium)
     else
-        rewardWallController.ui.info.free:setText("")
-        rewardWallController.ui.info.premium:setText("")
+        rewardWallController.ui.infoPanel.free:setText("")
+        rewardWallController.ui.infoPanel.premium:setText("")
     end
 end
 
@@ -501,10 +500,10 @@ function rewardWallController:onhoverStatusReward(event)
         [STATUS.LOCKED] = "This daily reward is still locked.\nFirst collect the previous daily rewards of this cycle."
     }
     if not event.value then
-        rewardWallController.ui.info:setText("")
+        rewardWallController.ui.infoPanel:setText("")
         return
     end
-    rewardWallController.ui.info:setText(statusReward[event.target.status])
+    rewardWallController.ui.infoPanel:setText(statusReward[event.target.status])
 end
 
 -- /*=============================================
