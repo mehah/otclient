@@ -221,10 +221,9 @@ local function onRestingAreaState(zone, state, message)
     ZONE.lastProcessedZone = zone
     local gameInterface = modules.game_interface
     if zone == ZONE.RESTING_AREA_ZONE then
-        gameInterface.processIcon(ZONE.NUMERIC_ICON_ID, function() end, true)
-        gameInterface.processIcon(ZONE.ICON_ID, function(icon)
+        gameInterface.processIcon(ZONE.NUMERIC_ICON_ID, function(icon) 
             icon:setTooltip(message)
-        end, true) 
+        end, true)
     else
         gameInterface.processIcon(ZONE.ICON_ID, function(icon)
             icon:destroy()

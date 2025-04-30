@@ -313,6 +313,7 @@ local function toggleIcon(bitChanged)
 end
 
 function processIcon(id, action, createIfMissing)
+    -- game_rewardwall
     for _, contentData in ipairs(getStatsBarsIconContent()) do
         local icon = contentData.content:getChildById(id)
         if icon then
