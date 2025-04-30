@@ -254,7 +254,7 @@ local function onDailyReward(data)
 end
 
 local function onRewardHistory(rewardHistory)
-    local transferHistory = rewardWallController.ui.History.History
+    local transferHistory = rewardWallController.ui.History.History.List
     transferHistory:destroyChildren()
 
     local headerRow = g_ui.createWidget("historyData2", transferHistory)

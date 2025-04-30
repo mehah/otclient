@@ -239,4 +239,30 @@ TESDTSTST < Panel
     size: 68 22
     margin-top: 10
 
-
+TextListWithScroll < Panel
+  font: verdana-11px-antialised
+  width: 192
+  text-offset: 24 5
+  text-align: topLeft
+  border-width: 1
+  border-color: #00000077
+  height: 425
+  image-border: 4
+  image-border-top: 23
+  image-border-bottom: 4
+  focusable: false
+  TextList
+    id: List
+    vertical-scrollbar: spellsScrollBar
+    anchors.fill: parent
+    padding: 1
+    width: 10
+    focusable: false
+    background-color: #404040
+  VerticalQtScrollBar
+    id: spellsScrollBar
+    anchors.top: prev.top
+    anchors.bottom: prev.bottom
+    anchors.right: prev.right
+    step: 50
+    pixels-scroll: true
