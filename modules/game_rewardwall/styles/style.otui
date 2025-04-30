@@ -31,7 +31,7 @@ ItemReward < UIWidget
     minimum: 0
     maximum: 10
     focusable: true
-    @onTextChange:  modules.game_rewardwall.changeNumber(self:getParent())
+    @onTextChange:  modules.game_rewardwall.onTextChangeChangeNumber(self:getParent())
     $disabled:
       color: #aaaaaa44
 

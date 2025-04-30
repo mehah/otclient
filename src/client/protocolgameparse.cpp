@@ -4652,7 +4652,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 void ProtocolGame::parseDailyRewardCollectionState(const InputMessagePtr& msg)
 {
     const uint8_t state = msg->getU8();
-    g_logger.warning(std::format("parseDailyRewardCollectionState->state: {}", state));
+    g_lua.callGlobalField("g_game", "onDailyRewardCollectionState", state);
 }
 
 void ProtocolGame::parseOpenRewardWall(const InputMessagePtr& msg)
