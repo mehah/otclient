@@ -1962,9 +1962,10 @@ void Game::requestBossSlotAction(const uint8_t action, const uint32_t raceId)
 
 void Game::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)
 {
-    enableBotCall();
+    if (!canPerformGameAction())
+        return;
+
     m_protocolGame->sendStatusTrackerBestiary(raceId, status);
-    disableBotCall();
 }
 
 void Game::sendOpenRewardWall()
@@ -1981,4 +1982,12 @@ void Game::requestOpenRewardHistory()
         return;
 
     m_protocolGame->sendOpenRewardHistory();
+}
+
+void Game::requestGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendGetRewardDaily(bonusShrine, items);
 }

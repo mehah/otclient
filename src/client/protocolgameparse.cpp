@@ -4651,9 +4651,8 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
 void ProtocolGame::parseDailyRewardCollectionState(const InputMessagePtr& msg)
 {
-    msg->getU8(); // state
-
-    // TODO: implement daily reward collection state usage
+    const uint8_t state = msg->getU8();
+    g_logger.warning(std::format("parseDailyRewardCollectionState->state: {}", state));
 }
 
 void ProtocolGame::parseOpenRewardWall(const InputMessagePtr& msg)
@@ -4690,10 +4689,10 @@ namespace {
     {
         DailyRewardDay day;
         day.redeemMode = msg->getU8(); // reward type
-
+        day.itemsToSelect = 0; // reward type
         if (day.redeemMode == 1) {
             // select x items from the list
-            const uint8_t itemsToSelect = msg->getU8(); // items to select
+            day.itemsToSelect = msg->getU8(); // reward type
             const uint8_t itemListSize = msg->getU8();
             for (auto listIndex = 0; listIndex < itemListSize; ++listIndex) {
                 DailyRewardItem item;
@@ -5051,10 +5050,11 @@ void ProtocolGame::parseCloseImbuementWindow(const InputMessagePtr& /*msg*/)
 
 void ProtocolGame::parseError(const InputMessagePtr& msg)
 {
-    msg->getU8(); // error code
-    msg->getString(); // error
+    const uint8_t code = msg->getU8();
+    const auto& error = msg->getString();
+    g_logger.warning(std::format("error: {}", error));
+    g_lua.callGlobalField("g_game", "onServerError", code,error);
 
-    // TODO: implement error usage
 }
 
 void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)

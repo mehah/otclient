@@ -1226,10 +1226,11 @@ int push_luavalue(const DailyRewardBundle& bundle) {
 }
 
 int push_luavalue(const DailyRewardDay& day) {
-    g_lua.createTable(0, 3);
+    g_lua.createTable(0, 4);
     g_lua.pushInteger(day.redeemMode);
     g_lua.setField("redeemMode");
-
+    g_lua.pushInteger(day.itemsToSelect);
+    g_lua.setField("itemsToSelect");
     g_lua.createTable(day.selectableItems.size(), 0);
     for (size_t i = 0; i < day.selectableItems.size(); ++i) {
         push_luavalue(day.selectableItems[i]);

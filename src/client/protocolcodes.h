@@ -328,6 +328,7 @@ namespace Proto
         ClientCloseImbuingWindow = 215,
         ClientOpenRewardWall = 216,
         ClientOpenRewardHistory = 217,
+        sendGetRewardDaily = 218,
         ClientAddVip = 220,
         ClientRemoveVip = 221,
         ClientEditVip = 222,

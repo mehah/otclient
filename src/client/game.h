@@ -430,6 +430,7 @@ struct DailyRewardBundle
 struct DailyRewardDay
 {
     uint8_t redeemMode;
+    uint8_t itemsToSelect;
     std::vector<DailyRewardItem> selectableItems;
     std::vector<DailyRewardBundle> bundleItems;
 };
@@ -838,6 +839,7 @@ public:
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
     void sendOpenRewardWall();
     void requestOpenRewardHistory();
+    void requestGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
 
     void updateMapLatency() {
         if (!m_mapUpdateTimer.first) {
