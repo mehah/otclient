@@ -312,6 +312,19 @@ local function toggleIcon(bitChanged)
     end
 end
 
+function processIcon(id, action, createIfMissing)
+    for _, contentData in ipairs(getStatsBarsIconContent()) do
+        local icon = contentData.content:getChildById(id)
+        if icon then
+            action(icon)
+        elseif createIfMissing then
+            icon = loadIcon(id, contentData.content, contentData.loadIconTransparent)
+            icon:setParent(contentData.content)
+            action(icon)
+        end
+    end
+end
+
 function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
     local player = g_game.getLocalPlayer()
     if not player then

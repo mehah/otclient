@@ -38,6 +38,13 @@ local COLORS = {
     BASE_1 = "#484848",
     BASE_2 = "#414141"
 }
+
+local ZONE = {
+    lastProcessedZone = -99,
+    RESTING_AREA_ZONE = 1,
+    ICON_ID = "condition_Rewards",
+    NUMERIC_ICON_ID = 30
+}
 -- @ variable
 local bundleType = {
     ITEMS = 1,
@@ -183,17 +190,6 @@ local function closeGeneralBoxError()
     end
 end
 
-local function connectOnServerError()
-    connect(g_game, {
-        onServerError = onServerError
-    })
-end
-
-local function disconnectOnServerError()
-    disconnect(g_game, {
-        onServerError = onServerError
-    })
-end
 local function checkRewards(data)
     for index, reward in ipairs(data) do
         local hasSelectableItems = reward.selectableItems and next(reward.selectableItems) ~= nil
@@ -218,6 +214,24 @@ end
 -- /*=============================================
 -- =            onParse                  =
 -- =============================================*/
+local function onRestingAreaState(zone, state, message)
+    if ZONE.lastProcessedZone == zone then
+        return
+    end
+    ZONE.lastProcessedZone = zone
+    local gameInterface = modules.game_interface
+    if zone == ZONE.RESTING_AREA_ZONE then
+        gameInterface.processIcon(ZONE.NUMERIC_ICON_ID, function() end, true)
+        gameInterface.processIcon(ZONE.ICON_ID, function(icon)
+            icon:setTooltip(message)
+        end, true) 
+    else
+        gameInterface.processIcon(ZONE.ICON_ID, function(icon)
+            icon:destroy()
+        end)
+    end
+end
+
 local function onDailyReward(data)
     bonuses = data.bonuses
     checkRewards(g_game.getLocalPlayer():isPremium() and data.premiumRewards or data.freeRewards)
@@ -232,6 +246,18 @@ local function onServerError(code, error)
         },
         anchor = 50
     }, closeGeneralBoxError, closeGeneralBoxError)
+end
+
+local function connectOnServerError()
+    connect(g_game, {
+        onServerError = onServerError
+    })
+end
+
+local function disconnectOnServerError()
+    disconnect(g_game, {
+        onServerError = onServerError
+    })
 end
 
 local function onOpenRewardWall(bonusShrine, nextRewardTime, dayStreakDay, wasDailyRewardTaken, errorMessage, tokens,
@@ -349,7 +375,8 @@ function rewardWallController:onInit()
     rewardWallController:registerEvents(g_game, {
         onOpenRewardWall = onOpenRewardWall,
         onDailyReward = onDailyReward,
-        onRewardHistory = onRewardHistory
+        onRewardHistory = onRewardHistory,
+        onRestingAreaState = onRestingAreaState
     })
     fixCssIncompatibility()
 end
@@ -459,11 +486,7 @@ function rewardWallController:onhoverRewardType(event)
         return
     end
     -- TODO fix this
-    local test = event.target.getMaxUsed
-    if not test then
-        return
-    end
-
+    local test = event.target.getMaxUsed or 1
     local rewardTexts = {
         [bundleType.ITEMS] = {
             free = string.format(

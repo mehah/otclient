@@ -4148,11 +4148,11 @@ void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
 
 void ProtocolGame::parseRestingAreaState(const InputMessagePtr& msg)
 {
-    msg->getU8(); // zone
-    msg->getU8(); // state
-    msg->getString(); // message
+    const uint8_t zone = msg->getU8();
+    const uint8_t state = msg->getU8();
+    const auto& message = msg->getString();
 
-    // TODO: implement resting area state usage
+    g_lua.callGlobalField("g_game", "onRestingAreaState", zone, state, message);
 }
 
 void ProtocolGame::parseUpdateImpactTracker(const InputMessagePtr& msg)
