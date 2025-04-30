@@ -1,9 +1,56 @@
+ItemReward < UIWidget
+  padding-top: 4
+  padding-bottom: 4
+  padding-left: 8
+  padding-right: 8
+  height: 40
+
+  Item
+    id: item
+    size: 32 32
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-align: center
+    phantom: true
+
+  Label
+    id: title
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: prev.right
+    text-align: left
+    width: 190
+    margin-left: 10
+
+  SpinBox
+    id: number
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: prev.right
+    width: 38
+    height: 23
+    text: 0
+    minimum: 0
+    maximum: 10
+    focusable: true
+    @onTextChange:  modules.game_rewardwall.changeNumber(self:getParent())
+    $disabled:
+      color: #aaaaaa44
+
+  Label
+    id: weight
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    width: 81
+    text-align: right
+    text-auto-resize: true
+    text: 12
+    text: 0.00 oz
+
 RewardButton < UIWidget
   size: 66 20
-  image-source: images/rewardButton
+  image-source: /game_rewardwall/images/rewardButton
   image-clip: 0 20 66 20
   $!on:
-    image-source: images/rewardButton
+    image-source: /game_rewardwall/images/rewardButton
     image-clip: 0 0 66 20
 
 RewardButton3 < UIButton
@@ -33,7 +80,7 @@ RewardButton3 < UIButton
 
   UIWidget
     id:ditherpattern
-    image-source: images/ditherpattern
+    image-source: /game_rewardwall/images/ditherpattern
     image-border: 3
     anchors.fill: parent
     phantom: true
@@ -60,7 +107,7 @@ imgBonuses < UIWidget
 
   UIWidget
     id:ditherpattern
-    image-source: images/ditherpattern
+    image-source: /game_rewardwall/images/ditherpattern
     image-border: 3
     anchors.fill: parent
     phantom: true
@@ -71,7 +118,7 @@ imgBonuses < UIWidget
     visible:false
   UIWidget
     id:ditherpattern
-    image-source: images/icon-banner-premium
+    image-source: /game_rewardwall/images/icon-banner-premium
     phantom: true
     anchors.top: parent.top
     anchors.left: parent.left

@@ -2,10 +2,12 @@ rewardWallController = Controller:new()
 -- /*=============================================
 -- =            To-do                  =
 -- =============================================*/
--- - Button
--- - Windows reward potions
--- - cpp : SelectReward
--- - improve Ids
+-- - otui -> html/css g_ui.displayUI 
+-- - Improve Ids
+-- - fix displayErrorBox
+-- - fix onhoverRewardType
+-- - add windows warning: no sufficient Instant Reward Access 
+-- - add windows confirmation of ussing instant reward access
 
 local ServerPackets = {
     ShowDialog = 0xED, -- universal
@@ -27,8 +29,15 @@ local ClientPackets = {
 
 -- @ widget
 local ButtonRewardWall = nil
+local windowsPickWindow = nil
+local displayGeneralBox2 = nil
+
 -- @ array
 local bonuses = {}
+local COLORS = {
+    BASE_1 = "#484848",
+    BASE_2 = "#414141"
+}
 -- @ variable
 local bundleType = {
     ITEMS = 1,
@@ -41,27 +50,26 @@ local STATUS = {
     ACTIVE = 2,
     LOCKED = 3
 }
-local RESOURCE_DAILYREWARD_STREAK = 20
 local RESOURCE_DAILYREWARD_JOKERS = 21
 
 local DAILY_REWARD_SYSTEM_TYPE_ONE = 1
 local DAILY_REWARD_SYSTEM_TYPE_TWO = 2
-
+local actualUsed = {}
+local bonusShrine = 0
 -- /*=============================================
 -- =            Local function                  =
 -- =============================================*/
 local function premiumStatusWindwos(isPremium)
     rewardWallController.ui.premiumStatus.premiumButton:setOn(not isPremium)
-    rewardWallController.ui.info.free:setColor(isPremium and "#909090" or "#FFFFFF") 
+    rewardWallController.ui.info.free:setColor(isPremium and "#909090" or "#FFFFFF")
     rewardWallController.ui.info.premium:setColor(isPremium and "#FFFFFF" or "#909090")
     if isPremium then
         for i, widget in pairs(rewardWallController.ui.restingAreaPanel.bonusIcons:getChildren()) do
             if widget then
-             widget:setOn(true)
+                widget:setOn(true)
             end
         end
     end
-
 end
 
 local function convert_timestamp(timestamp)
@@ -83,13 +91,13 @@ local function visibleHistory(bool)
         else
             widget:setVisible(not bool)
         end
-        if i == 5 then
+        if i == 5 then -- foot
             break
         end
     end
 end
 
-local function updateDailyRewards(dayStreakDay)
+local function updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
     local dailyRewardsPanels = rewardWallController.ui.dailyRewardsPanels
 
     for i = 1, dayStreakDay do
@@ -102,7 +110,7 @@ local function updateDailyRewards(dayStreakDay)
             test:setPhantom(true)
 
             rewardArrow:setImageClip("5 0 5 7")
-            rewardWidget:getChildById("rewardButton" .. i):setOn(false)
+            rewardWidget:getChildById("rewardButton" .. i):setOn(true)
             rewardWidget:getChildById("rewardButton" .. i).ditherpattern:setVisible(true)
             rewardWidget:getChildById("rewardGold" .. i).status = 1
         end
@@ -114,8 +122,12 @@ local function updateDailyRewards(dayStreakDay)
         test:setOn(true)
         test:fill("parent")
         test:setPhantom(true)
-        test.text:setText("-99")
-        test.text:setColor("red")
+        test.text:setText(wasDailyRewardTaken)
+        if wasDailyRewardTaken < g_game.getLocalPlayer():getResourceBalance(ResourceTypes.DAILYREWARD_STREAK) then
+            test.text:setColor("white")
+        else
+            test.text:setColor("red")
+        end
         test.gold:setImageSource("/game_rewardwall/images/icon-daily-reward-joker")
         test.gold:setImageSize("12 12")
         test.gold:setImageOffset("-20 0")
@@ -155,19 +167,63 @@ local function getDayStreakIcon(dayStreakLevel)
     end
 end
 
+local function getBonusDescription(bonusName, streakCount, activeBonuses)
+    local isPremium = g_game.getLocalPlayer():isPremium()
+
+    return string.format(
+        "Allow [color=#909090]%s[/color]%s\nThis bonus is active because you are [color=%s]Premium[/color] and reached a reward streak of at least [color=#44AD25]%d[/color].%s",
+        bonusName, isPremium and "" or "[color=#ff0000](Locked)[/color]", isPremium and "#44AD25" or "#ff0000",
+        streakCount, isPremium and ("\n\nActive bonuses: [color=#909090]%s[/color]."):format(activeBonuses) or "")
+end
+
+local function closeGeneralBoxError()
+    if displayGeneralBox2 then
+        displayGeneralBox2:destroy()
+        displayGeneralBox2 = nil
+    end
+end
+
+local function connectOnServerError()
+    connect(g_game, {
+        onServerError = onServerError
+    })
+end
+
+local function disconnectOnServerError()
+    disconnect(g_game, {
+        onServerError = onServerError
+    })
+end
+
 -- /*=============================================
 -- =            onParse                  =
 -- =============================================*/
+local function onServerError(code, error)
+    closeGeneralBoxError()
+    displayGeneralBox2 = displayGeneralBox(rewardWallController.ui:getText(), error, {
+        {
+            text = tr('ok'),
+            callback = closeGeneralBoxError
+        },
+        anchor = 50
+    }, closeGeneralBoxError, closeGeneralBoxError)
+end
+
 local function onOpenRewardWall(bonusShrine, nextRewardTime, dayStreakDay, wasDailyRewardTaken, errorMessage, tokens,
     timeLeft, dayStreakLevel)
-
-    updateDailyRewards(dayStreakDay)
+    bonusShrine = bonusShrine
+    updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
     rewardWallController.ui.restingAreaPanel.restingAreaInfo.rewardStreakIcon:setText(dayStreakLevel)
-    rewardWallController.ui.restingAreaPanel.restingAreaInfo.timeLeft:setText((timeLeft == 0 and "Expired") or (timeLeft == 90001 and "< 1 min") or timeLeft)
+    rewardWallController.ui.restingAreaPanel.restingAreaInfo.timeLeft:setText(
+        (timeLeft == 0 and "Expired") or (timeLeft == 90001 and "< 1 min") or timeLeft)
     rewardWallController.ui.restingAreaPanel.restingAreaInfo.restingAreaGold.text:setText(tokens)
-    rewardWallController.ui.footerPanel.footerGold1.text:setText(dayStreakLevel)
+    rewardWallController.ui.footerPanel.footerGold1.text:setText(tokens)
     rewardWallController.ui.restingAreaPanel.restingAreaInfo.rewardStreakIcon:setImageSource(
         "/game_rewardwall/images/" .. getDayStreakIcon(dayStreakLevel))
+
+    rewardWallController.ui.footerPanel.footerGold2.text:setText(
+        g_game.getLocalPlayer():getResourceBalance(ResourceTypes.DAILYREWARD_STREAK))
+
 end
 
 local function checkRewards(data)
@@ -180,6 +236,8 @@ local function checkRewards(data)
         if hasSelectableItems then
             iconWidget:setIcon("game_rewardwall/images/icon-reward-pickitems")
             rewardButton.bundleType = bundleType.ITEMS
+            rewardButton.rewardItem = reward.selectableItems
+            rewardButton.getMaxUsed = reward.itemsToSelect
         elseif reward.bundleItems[1].bundleType == 3 then
             iconWidget:setIcon("game_rewardwall/images/icon-reward-xpboost")
             rewardButton.bundleType = bundleType.XPBOOST
@@ -192,7 +250,7 @@ end
 
 local function onDailyReward(data)
     bonuses = data.bonuses
-    checkRewards(g_game.getLocalPlayer():isPremium() and data.freeRewards or data.premiumRewards)
+    checkRewards(g_game.getLocalPlayer():isPremium() and data.premiumRewards or data.freeRewards)
 end
 
 local function onRewardHistory(rewardHistory)
@@ -229,6 +287,7 @@ local function show()
     rewardWallController.ui:show()
     rewardWallController.ui:raise()
     rewardWallController.ui:focus()
+    connectOnServerError()
 end
 
 local function hide()
@@ -236,6 +295,9 @@ local function hide()
         return
     end
     rewardWallController.ui:hide()
+    if not windowsPickWindow then
+        disconnectOnServerError()
+    end
 end
 
 local function toggle()
@@ -243,6 +305,7 @@ local function toggle()
         return
     end
     if rewardWallController.ui:isVisible() then
+
         return hide()
     end
     premiumStatusWindwos(g_game.getLocalPlayer():isPremium())
@@ -280,7 +343,7 @@ end
 -- =            Controller                  =
 -- =============================================*/
 function rewardWallController:onInit()
-    g_ui.importStyle("style.otui")
+    g_ui.importStyle("styles/style.otui")
     rewardWallController:loadHtml('game_rewardwall.html')
     rewardWallController.ui:hide()
 
@@ -297,6 +360,11 @@ function rewardWallController:onTerminate()
         ButtonRewardWall:destroy()
         ButtonRewardWall = nil
     end
+    if windowsPickWindow then
+        windowsPickWindow:destroy()
+        windowsPickWindow = nil
+    end
+    closeGeneralBoxError()
 end
 
 function rewardWallController:onGameStart()
@@ -310,6 +378,11 @@ function rewardWallController:onGameEnd()
     if rewardWallController.ui:isVisible() then
         rewardWallController.ui:hide()
     end
+    if windowsPickWindow then
+        windowsPickWindow:destroy()
+        windowsPickWindow = nil
+    end
+    closeGeneralBoxError()
 end
 -- /*=============================================
 -- =            Call css onClick                =
@@ -336,19 +409,6 @@ end
 -- =            Call onHover css                  =
 -- =============================================*/
 
-local function getBonusDescription(bonusName, streakCount, activeBonuses)
-    local isPremium = g_game.getLocalPlayer():isPremium()
-
-    return string.format(
-        "Allow [color=#909090]%s[/color]%s\nThis bonus is active because you are [color=%s]Premium[/color] and reached a reward streak of at least [color=#44AD25]%d[/color].%s",
-        bonusName,
-        isPremium and "" or "[color=#ff0000](Locked)[/color]",
-        isPremium and "#44AD25" or "#ff0000",
-        streakCount,
-        isPremium and ("\n\nActive bonuses: [color=#909090]%s[/color]."):format(activeBonuses) or ""
-    )
-end
-
 function rewardWallController:onhoverBonus(event)
     if not event.value then
         rewardWallController.ui.info:setText("")
@@ -367,16 +427,12 @@ function rewardWallController:onhoverBonus(event)
     local isPremium = g_game.getLocalPlayer():isPremium()
     local bonusText = string.format(
         "Allow [color=#909090]%s[/color]%s\nThis bonus is active because you are [color=%s]Premium[/color] and reached a reward streak of at least [color=#44AD25]%d[/color].%s",
-        bonus.name,
-        isPremium and "" or "[color=#ff0000](Locked)[/color]",
-        isPremium and "#44AD25" or "#ff0000",
+        bonus.name, isPremium and "" or "[color=#ff0000](Locked)[/color]", isPremium and "#44AD25" or "#ff0000",
         bonus.id,
-        isPremium and ("\n\nActive bonuses: [color=#909090]%s[/color]."):format(getBonusStrings(bonuses)) or ""
-    )
+        isPremium and ("\n\nActive bonuses: [color=#909090]%s[/color]."):format(getBonusStrings(bonuses)) or "")
 
     rewardWallController.ui.info:parseColoredText(bonusText)
 end
-
 
 function rewardWallController:onhoverStatusPlayer(event)
     if not event.value then
@@ -403,11 +459,20 @@ function rewardWallController:onhoverRewardType(event)
         rewardWallController.ui.info.premium:setText("")
         return
     end
+    -- TODO fix this
+    local test = event.target.getMaxUsed
+    if not test then
+        return
+    end
 
     local rewardTexts = {
         [bundleType.ITEMS] = {
-            free = "Reward for Free Accounts:\nPick 5 items from the list. Among\nother items it contains: health\npotion, a fire bomb rune, a\nthundestorm rune",
-            premium = "Reward for Premium Accounts:\nPick 10 items from the list. Among\nother items it contains: health\npotion, a fire bomb rune, a\nthundestorm rune."
+            free = string.format(
+                "Reward for Free Accounts:\nPick %d items from the list. Among\nother items it contains: health\npotion, a fire bomb rune, a\nthundestorm rune",
+                tonumber(test / 2)),
+            premium = string.format(
+                "Reward for Premium Accounts:\nPick %d items from the list. Among\nother items it contains: health\npotion, a fire bomb rune, a\nthundestorm rune.",
+                tonumber(test))
         },
         [bundleType.PREY] = {
             free = "Reward for Free Accounts:\n * 1x Prey Wildcard",
@@ -440,4 +505,98 @@ function rewardWallController:onhoverStatusReward(event)
         return
     end
     rewardWallController.ui.info:setText(statusReward[event.target.status])
+end
+
+-- /*=============================================
+-- =            Auxiliar Windows pickReward      =
+-- =============================================*/
+
+function onClickBtnOk()
+    if table.empty(actualUsed) then
+        return
+    end
+    g_game.requestGetRewardDaily(bonusShrine, actualUsed)
+end
+
+function destroyPickReward()
+    if windowsPickWindow then
+        windowsPickWindow:destroy()
+        windowsPickWindow = nil
+    end
+    toggle()
+end
+
+function changeNumber(getPanel)
+    if not getPanel.getMaxUsed then
+        return
+    end
+
+    local alreadyUsed = 0
+    local itemId = getPanel:getChildById('item'):getItemId()
+    local thisPanelUsed = actualUsed[itemId] or 0
+
+    for _, count in pairs(actualUsed) do
+        alreadyUsed = alreadyUsed + (count or 0)
+    end
+
+    local numberField = getPanel:getChildById('number')
+    local currentValue = tonumber(numberField:getText()) or 0
+    local maxAllowed = getPanel.getMaxUsed - (alreadyUsed - thisPanelUsed)
+
+    if currentValue > maxAllowed then
+        numberField:setText(maxAllowed)
+    end
+    actualUsed[itemId] = tonumber(numberField:getText()) or 0
+    alreadyUsed = 0
+    for _, count in pairs(actualUsed) do
+        alreadyUsed = alreadyUsed + (count or 0)
+    end
+    local color = alreadyUsed == 0 and "#D33C3C" or "#00FF00"
+    windowsPickWindow:getChildById('btnOk'):setEnabled(alreadyUsed > 0)
+
+    local text = string.format("You have selected [color=%s]%d[/color] of %d reward items", color, alreadyUsed,
+        getPanel.getMaxUsed)
+    windowsPickWindow:getChildById('rewardLabel'):parseColoredText(text)
+end
+
+function rewardWallController:onClickDisplayWindowsPickRewardWindow(event)
+    if event.target:isOn() then
+        return
+    end
+
+    if event.target.bundleType == bundleType.ITEMS then
+        if not windowsPickWindow then
+            windowsPickWindow = g_ui.displayUI('styles/pickreward')
+            windowsPickWindow:show()
+            windowsPickWindow:getChildById('capacity'):setText("Free capacity: " ..
+                                                                   g_game:getLocalPlayer():getFreeCapacity() .. " oz")
+
+            local text = string.format("You have selected [color=#D33C3C]0[/color] of %d reward items",
+                event.target.getMaxUsed)
+            windowsPickWindow:getChildById('rewardLabel'):parseColoredText(text, "#c0c0c0")
+
+            for i, item in pairs(event.target.rewardItem) do
+                local getItem = g_ui.createWidget('ItemReward', windowsPickWindow:getChildById('rewardList'))
+                getItem:getChildById('item'):setItemId(item.itemId)
+                getItem:getChildById('title'):setText(item.name)
+                getItem:setBackgroundColor((i % 2 == 0) and COLORS.BASE_1 or COLORS.BASE_2)
+                getItem.totalWeight = item.weight
+                getItem.getMaxUsed = event.target.getMaxUsed
+            end
+            actualUsed = {}
+            toggle()
+        else
+            windowsPickWindow:show()
+            windowsPickWindow:raise()
+            windowsPickWindow:focus()
+        end
+    elseif event.target.bundleType == bundleType.XPBOOST or event.target.bundleType == bundleType.PREY then
+        displayGeneralBox2 = displayGeneralBox('Processing purchase.', 'Your purchase is being processed', {
+            {
+                text = tr('ok'),
+                callback = closeGeneralBoxError
+            },
+            anchor = 50
+        }, closeGeneralBoxError, closeGeneralBoxError)
+    end
 end
