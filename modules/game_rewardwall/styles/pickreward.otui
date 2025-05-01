@@ -1,7 +1,7 @@
 // todo change to css/html
 MainWindow
   !text: tr('Pick reward')
-  size: 451 380
+  size: 451 390
   @onEscape: modules.game_rewardwall.destroyPickReward()
   padding: 20
   color: #c0c0c0
@@ -63,7 +63,7 @@ MainWindow
     margin-top: 5
     text: Close
     font: cipsoftFont
-    @onClick: modules.game_rewardwall.destroyPickReward()
+    @onClick: modules.game_rewardwall.destroyPickReward(true)
 
   QtButton
     id: btnOk

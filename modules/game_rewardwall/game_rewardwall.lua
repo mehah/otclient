@@ -4,10 +4,6 @@ rewardWallController = Controller:new()
 -- =============================================*/
 -- - otui -> html/css g_ui.displayUI 
 -- - Improve Ids footerGold2 , footerGold1
--- - fix displayErrorBox
--- - fix onhoverRewardType
--- - add windows warning: no sufficient Instant Reward Access 
--- - add windows confirmation of ussing instant reward access
 
 local ServerPackets = {
     ShowDialog = 0xED,
@@ -30,7 +26,6 @@ local ClientPackets = {
 -- @ widget
 local ButtonRewardWall = nil
 local windowsPickWindow = nil
-local displayGeneralBox2 = nil
 local generalBox = nil
 -- @ array
 local bonuses = {}
@@ -73,22 +68,57 @@ local DailyRewardStatus = { -- sendDailyRewardCollectionState 0xDE ?
 }
 
 local CONST_WINDOWS_BOX = {
-    CREATE = 0,
     ALREADY = 1,
     RELEASE = 2,
-    CONFIRMATION_IRA = 3,-- IRA = Instant Reward Access
+    CONFIRMATION_IRA = 3, -- IRA = Instant Reward Access
     NO_IRA = 4
 }
--- unuse
-local RESOURCE_DAILYREWARD_JOKERS = 21
-local DAILY_REWARD_SYSTEM_TYPE_ONE = 1
-local DAILY_REWARD_SYSTEM_TYPE_TWO = 2
 
-
+local BOX_CONFIGS = {
+    [CONST_WINDOWS_BOX.ALREADY] = {
+        title = "Warning",
+        content = "Sorry, you have already taken your daily reward or you are unable to collect it"
+    },
+    [CONST_WINDOWS_BOX.CONFIRMATION_IRA] = {
+        title = "Confirmation of using Instant Reward Access",
+        content = "Remember! You can always collect your daily reward for free by visiting a reward shrine!\n\nYou Currently own 3x Instant Reward Access. Do you really want to use one to claim your daily reward now?",
+        okCallback = function()
+            g_game.requestGetRewardDaily(bonusShrine, actualUsed)
+            if windowsPickWindow then
+                windowsPickWindow:destroy()
+                windowsPickWindow = nil
+            end
+            if generalBox then
+                generalBox:destroy()
+                generalBox = nil
+            end
+            show()
+        end
+    },
+    [CONST_WINDOWS_BOX.NO_IRA] = {
+        title = "Warning: No Sufficient Instant Reward Access",
+        content = "Remember! you can always collect your daily reward for free by visiting a reward shrine!\nyou do not have an Instant Reward Access.\nVisit the store to buy more!"
+    }
+}
 
 -- /*=============================================
 -- =            Local function                  =
 -- =============================================*/
+local function destroyWindows(windows)
+    if type(windows) == "table" then
+        for _, window in pairs(windows) do
+            if window and not window:isDestroyed() then
+                window:destroy()
+            end
+        end
+    else
+        if windows and not windows:isDestroyed() then
+            windows:destroy()
+        end
+    end
+    return nil
+end
+
 local function premiumStatusWindwos(isPremium)
     rewardWallController.ui.premiumStatus.premiumMessage:setText(isPremium and
                                                                      "Great! You benefit from the best possible rewards and bonuses due to your premium status." or
@@ -164,6 +194,9 @@ local function updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
         test.gold:setImageOffset("-20 0")
         currentReward:getChildById("rewardGold" .. dayStreakDay + 1).status = 2
         currentReward:setOn(false)
+        currentReward:getChildById("rewardButton" .. dayStreakDay + 1).ditherpattern:setVisible(false)
+        currentReward:getChildById("rewardButton" .. dayStreakDay + 1):setOn(false)
+
     end
 
     for i = dayStreakDay + 2, 7 do
@@ -207,15 +240,15 @@ local function getBonusDescription(bonusName, streakCount, activeBonuses)
         streakCount, isPremium and ("\n\nActive bonuses: [color=#909090]%s[/color]."):format(activeBonuses) or "")
 end
 
-local function closeGeneralBoxError()
-    if displayGeneralBox2 then
-        displayGeneralBox2:destroy()
-        displayGeneralBox2 = nil
-    end
-end
-
 local function checkRewards(data)
-    for index, reward in ipairs(data) do
+    local premium = g_game.getLocalPlayer():isPremium()
+    local rewardType = premium and data.premiumRewards or data.freeRewards
+    local altType = premium and data.freeRewards or data.premiumRewards
+
+    for index = 1, #rewardType do
+        local reward = rewardType[index]
+        local altReward = altType[index]
+
         local hasSelectableItems = reward.selectableItems and next(reward.selectableItems) ~= nil
         local rewardButton = rewardWallController.ui.dailyRewardsPanel:getChildById("reward" .. index):getChildById(
             "rewardButton" .. index)
@@ -225,13 +258,15 @@ local function checkRewards(data)
             iconWidget:setIcon("game_rewardwall/images/icon-reward-pickitems")
             rewardButton.bundleType = bundleType.ITEMS
             rewardButton.rewardItem = reward.selectableItems
-            rewardButton.getMaxUsed = reward.itemsToSelect
-        elseif reward.bundleItems[1].bundleType == 3 then
+            rewardButton.itemsToSelect = {reward.itemsToSelect or 0, altReward and altReward.itemsToSelect or 0}
+        elseif reward.bundleItems[1] and reward.bundleItems[1].bundleType == bundleType.XPBOOST then
             iconWidget:setIcon("game_rewardwall/images/icon-reward-xpboost")
             rewardButton.bundleType = bundleType.XPBOOST
+            rewardButton.itemsToSelect = {reward.bundleItems[1].itemId or 0, altReward and altReward.bundleItems[1].itemId or 0}
         else
             iconWidget:setIcon("game_rewardwall/images/icon-reward-fixeditems")
             rewardButton.bundleType = bundleType.PREY
+            rewardButton.itemsToSelect = {reward.bundleItems[1].count or 0, altReward and altReward.bundleItems[1].count or 0}
         end
     end
 end
@@ -255,7 +290,7 @@ end
 ]]
 
 local function onRestingAreaState(zone, state, message)
-    if ZONE.LAST_ZONE == zone then
+    if ZONE.LAST_ZONE == zone then -- todo move cpp
         return
     end
     ZONE.LAST_ZONE = zone
@@ -273,18 +308,24 @@ end
 
 local function onDailyReward(data)
     bonuses = data.bonuses
-    checkRewards(g_game.getLocalPlayer():isPremium() and data.premiumRewards or data.freeRewards)
+    checkRewards(data)
 end
 
 local function onServerError(code, error)
-    closeGeneralBoxError()
-    displayGeneralBox2 = displayGeneralBox(rewardWallController.ui:getText(), error, {
-        {
-            text = tr('ok'),
-            callback = closeGeneralBoxError
-        },
-        anchor = 50
-    }, closeGeneralBoxError, closeGeneralBoxError)
+    generalBox = destroyWindows(generalBox)
+    local cancelCallback = function()
+        generalBox = destroyWindows(generalBox)
+        rewardWallController.ui:show()
+        rewardWallController.ui:raise()
+        rewardWallController.ui:focus()
+    end
+
+    local standardButtons = {{
+        text = "ok",
+        callback = cancelCallback
+    }}
+
+    generalBox = displayGeneralBox3(rewardWallController.ui:getText(), error, standardButtons)
 end
 
 local function connectOnServerError()
@@ -299,12 +340,14 @@ local function disconnectOnServerError()
     })
 end
 
-local function onOpenRewardWall(bonusShrine, nextRewardTime, dayStreakDay, wasDailyRewardTaken, errorMessage, tokens,
+local function onOpenRewardWall(bonusShrines, nextRewardTime, dayStreakDay, wasDailyRewardTaken, errorMessage, tokens,
     timeLeft, dayStreakLevel)
-    if bonusShrine == OPEN_WINDOWS.SHRINE then
-        toggle()
+    if bonusShrines == OPEN_WINDOWS.SHRINE then
+        rewardWallController.ui:show()
+        rewardWallController.ui:raise()
+        rewardWallController.ui:focus()
     end
-    bonusShrine = bonusShrine
+    bonusShrine = bonusShrines
     updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
     rewardWallController.ui.restingAreaPanel.restingAreaInfo.rewardStreakIcon:setText(dayStreakLevel)
     rewardWallController.ui.restingAreaPanel.restingAreaInfo.timeLeft:setText(
@@ -344,7 +387,7 @@ end
 -- /*=============================================
 -- =            Windows                  =
 -- =============================================*/
-local function show()
+function show()
     if not rewardWallController.ui then
         return
     end
@@ -356,12 +399,12 @@ local function show()
     premiumStatusWindwos(g_game.getLocalPlayer():isPremium())
 end
 
-local function hide()
+function hide(bool)
     if not rewardWallController.ui then
         return
     end
     rewardWallController.ui:hide()
-    if not windowsPickWindow then
+    if bool then
         disconnectOnServerError()
     end
 end
@@ -371,10 +414,11 @@ function toggle()
         return
     end
     if rewardWallController.ui:isVisible() then
-
-        return hide()
+        ButtonRewardWall:setOn(false)
+        return hide(true)
     end
     show()
+    ButtonRewardWall:setOn(true)
 end
 
 local function fixCssIncompatibility() -- temp
@@ -417,19 +461,7 @@ function rewardWallController:onInit()
 end
 
 function rewardWallController:onTerminate()
-    if ButtonRewardWall then
-        ButtonRewardWall:destroy()
-        ButtonRewardWall = nil
-    end
-    if windowsPickWindow then
-        windowsPickWindow:destroy()
-        windowsPickWindow = nil
-    end
-    if generalBox then
-        generalBox:destroy()
-        generalBox = nil
-    end
-    closeGeneralBoxError()
+    generalBox, windowsPickWindow, ButtonRewardWall = destroyWindows({generalBox, windowsPickWindow, ButtonRewardWall})
 end
 
 function rewardWallController:onGameStart()
@@ -443,15 +475,7 @@ function rewardWallController:onGameEnd()
     if rewardWallController.ui:isVisible() then
         rewardWallController.ui:hide()
     end
-    if windowsPickWindow then
-        windowsPickWindow:destroy()
-        windowsPickWindow = nil
-    end
-    if generalBox then
-        generalBox:destroy()
-        generalBox = nil
-    end
-    closeGeneralBoxError()
+    generalBox, windowsPickWindow = destroyWindows({generalBox, windowsPickWindow})
 end
 -- /*=============================================
 -- =            Call css onClick                =
@@ -459,6 +483,8 @@ end
 function rewardWallController:onClickshowHistory()
     visibleHistory(not rewardWallController.ui.historyPanel:isVisible())
     g_game.requestOpenRewardHistory()
+    rewardWallController.ui.footerPanel.historyButton:setText(
+        rewardWallController.ui.historyPanel:isVisible() and "back" or "history")
 end
 
 function rewardWallController:onClickToggle()
@@ -481,14 +507,20 @@ function rewardWallController:onClickDisplayWindowsPickRewardWindow(event)
     end
 
     if event.target.bundleType == bundleType.ITEMS then
+        local isPremium = g_game.getLocalPlayer():isPremium()
+        local itemsToSelect = event.target.itemsToSelect
         if not windowsPickWindow then
+            if type(itemsToSelect) == "table" then
+                itemsToSelect = isPremium and itemsToSelect[1] or itemsToSelect[2]
+            else
+                itemsToSelect = itemsToSelect or 1
+            end
             windowsPickWindow = g_ui.displayUI('styles/pickreward')
             windowsPickWindow:show()
             windowsPickWindow:getChildById('capacity'):setText("Free capacity: " ..
                                                                    g_game:getLocalPlayer():getFreeCapacity() .. " oz")
 
-            local text = string.format("You have selected [color=#D33C3C]0[/color] of %d reward items",
-                event.target.getMaxUsed)
+            local text = string.format("You have selected [color=#D33C3C]0[/color] of %d reward items", itemsToSelect)
             windowsPickWindow:getChildById('rewardLabel'):parseColoredText(text, "#c0c0c0")
 
             for i, item in pairs(event.target.rewardItem) do
@@ -496,11 +528,12 @@ function rewardWallController:onClickDisplayWindowsPickRewardWindow(event)
                 getItem:getChildById('item'):setItemId(item.itemId)
                 getItem:getChildById('title'):setText(item.name)
                 getItem:setBackgroundColor((i % 2 == 0) and COLORS.BASE_1 or COLORS.BASE_2)
-                getItem.totalWeight = item.weight
-                getItem.getMaxUsed = event.target.getMaxUsed
+                getItem.totalWeight = item.weight or 1
+                getItem.itemsToSelect = itemsToSelect
+
             end
             actualUsed = {}
-            toggle()
+            hide()
         else
             windowsPickWindow:show()
             windowsPickWindow:raise()
@@ -508,7 +541,9 @@ function rewardWallController:onClickDisplayWindowsPickRewardWindow(event)
         end
 
     elseif event.target.bundleType == bundleType.XPBOOST or event.target.bundleType == bundleType.PREY then
-        managerMessageBoxWindow(0)
+        hide()
+        actualUsed = {}
+        managerMessageBoxWindow(CONST_WINDOWS_BOX.CONFIRMATION_IRA)
     end
 end
 
@@ -566,36 +601,50 @@ function rewardWallController:onhoverRewardType(event)
         rewardWallController.ui.infoPanel.premium:setText("")
         return
     end
-    -- TODO fix this
-    local test = event.target.getMaxUsed or 1
-    local rewardTexts = {
-        [bundleType.ITEMS] = {
+
+    local itemsToSelect = event.target.itemsToSelect or {1, 1}
+    local freeAmount = 0
+    local premiumAmount = 0
+
+    if type(itemsToSelect) == "table" then
+        freeAmount = itemsToSelect[2] or 0
+        premiumAmount = itemsToSelect[1] or 0
+    else
+        freeAmount = itemsToSelect
+        premiumAmount = itemsToSelect
+    end
+
+    local rewardType = event.target.bundleType
+    local rewardTexts = {}
+
+    if rewardType == bundleType.ITEMS then
+        rewardTexts = {
             free = string.format(
-                "Reward for Free Accounts:\nPick %d items from the list. Among\nother items it contains: health\npotion, a fire bomb rune, a\nthundestorm rune",
-                tonumber(test / 2)),
+                "Reward for Free Accounts:\nPick %d items from the list. Among\nother items it contains: health\npotion, a fire bomb rune, a\nthundestorm rune.",
+                freeAmount),
             premium = string.format(
                 "Reward for Premium Accounts:\nPick %d items from the list. Among\nother items it contains: health\npotion, a fire bomb rune, a\nthundestorm rune.",
-                tonumber(test))
-        },
-        [bundleType.PREY] = {
-            free = "Reward for Free Accounts:\n * 1x Prey Wildcard",
-            premium = "Reward for Premium Accounts:\n * 2x Prey Wildcard"
-        },
-        [bundleType.XPBOOST] = {
-            free = "Reward for Free Accounts:\n * 10 minutes 50% XP Boost",
-            premium = "Reward for Premium Accounts:\n * 30 minutes 50% XP Boost"
+                premiumAmount)
         }
-    }
-
-    local targetBundle = rewardTexts[event.target.bundleType]
-    if targetBundle then
-        rewardWallController.ui.infoPanel.free:setText(targetBundle.free)
-        rewardWallController.ui.infoPanel.premium:setText(targetBundle.premium)
+    elseif rewardType == bundleType.PREY then
+        rewardTexts = {
+            free = string.format("Reward for Free Accounts:\n * %d x Prey Wildcard", freeAmount),
+            premium = string.format("Reward for Premium Accounts:\n * %d x Prey Wildcard", premiumAmount)
+        }
+    elseif rewardType == bundleType.XPBOOST then
+        rewardTexts = {
+            free = string.format("Reward for Free Accounts:\n * %d minutes 50%% XP Boost", freeAmount),
+            premium = string.format("Reward for Premium Accounts:\n * %d minutes 50%% XP Boost", premiumAmount)
+        }
     else
-        rewardWallController.ui.infoPanel.free:setText("")
-        rewardWallController.ui.infoPanel.premium:setText("")
+        print("WARNING: Unknown rewardType:", rewardType)
+        return
     end
+
+    rewardWallController.ui.infoPanel.free:setText(rewardTexts.free)
+    rewardWallController.ui.infoPanel.premium:setText(rewardTexts.premium)
 end
+
 
 function rewardWallController:onhoverStatusReward(event)
     local statusReward = {
@@ -618,19 +667,21 @@ function onClickBtnOk()
     if table.empty(actualUsed) then
         return
     end
-    g_game.requestGetRewardDaily(bonusShrine, actualUsed)
+    managerMessageBoxWindow(CONST_WINDOWS_BOX.CONFIRMATION_IRA)
 end
 
-function destroyPickReward()
-    if windowsPickWindow then
-        windowsPickWindow:destroy()
-        windowsPickWindow = nil
+function destroyPickReward(bool)
+    windowsPickWindow = destroyWindows(windowsPickWindow)
+
+    if bool then
+        rewardWallController.ui:show()
+        rewardWallController.ui:raise()
+        rewardWallController.ui:focus()
     end
-    toggle()
 end
 
 function onTextChangeChangeNumber(getPanel)
-    if not getPanel.getMaxUsed then
+    if not getPanel.itemsToSelect then
         return
     end
 
@@ -644,7 +695,7 @@ function onTextChangeChangeNumber(getPanel)
 
     local numberField = getPanel:getChildById('number')
     local currentValue = tonumber(numberField:getText()) or 0
-    local maxAllowed = getPanel.getMaxUsed - (alreadyUsed - thisPanelUsed)
+    local maxAllowed = getPanel.itemsToSelect - (alreadyUsed - thisPanelUsed)
 
     if currentValue > maxAllowed then
         numberField:setText(maxAllowed)
@@ -658,40 +709,53 @@ function onTextChangeChangeNumber(getPanel)
     windowsPickWindow:getChildById('btnOk'):setEnabled(alreadyUsed > 0)
 
     local text = string.format("You have selected [color=%s]%d[/color] of %d reward items", color, alreadyUsed,
-        getPanel.getMaxUsed)
+        getPanel.itemsToSelect)
     windowsPickWindow:getChildById('rewardLabel'):parseColoredText(text)
+    getPanel:getChildById('weight'):setText(string.format("%.2f oz", actualUsed[itemId] * getPanel.totalWeight))
+    local totalWeight = 0
+    for i, widget in pairs(getPanel:getParent():getChildren()) do
+        local weightLabel = widget:getChildById('weight')
+        if weightLabel then
+            local weightText = weightLabel:getText()
+            local weightValue = tonumber(weightText:match("(%d+)"))
+            if weightValue then
+                totalWeight = totalWeight + weightValue
+            end
+        end
+    end
+    windowsPickWindow:getChildById("weight"):setText(string.format("Total weight: %.2f oz", totalWeight))
+    windowsPickWindow:getChildById("weight"):resizeToText()
 end
 
 -- /*=============================================
 -- =            Auxiliar GeneralBox             =
 -- =============================================*/
-
-function displayGeneralBox(title, message, buttons, onEnterCallback, onEscapeCallback)
-    if not generalBox then
-        generalBox = g_ui.createWidget('MessageBoxWindow', rootWidget)
-    else
-        local holder = generalBox:getChildById('holder')
-        if holder then
-            holder:destroyChildren()
-        end
+function displayGeneralBox3(title, message, buttons, onEnterCallback, onEscapeCallback)
+    if generalBox then
+        generalBox = destroyWindows(generalBox)
     end
+
+    generalBox = g_ui.createWidget('MessageBoxWindow', rootWidget)
+    if not generalBox then
+        return nil
+    end
+
     local titleWidget = generalBox:getChildById('title')
     if titleWidget then
         titleWidget:setText(title)
     end
-    local content = generalBox:getChildById('content')
-    if content then
-        content:setText(message)
-        content:resizeToText()
-    end
+
     local holder = generalBox:getChildById('holder')
-    if holder then
+    if holder and buttons then
         for i = 1, #buttons do
             local button = g_ui.createWidget('Button', holder)
-            button:setId(buttons[i].text:lower():gsub(" ", "_"))
+            local buttonId = buttons[i].text:lower():gsub(" ", "_")
+
+            button:setId(buttonId)
             button:setText(buttons[i].text)
             button:setWidth(math.max(86, 10 + (string.len(buttons[i].text) * 8)))
             button:setHeight(20)
+            button:setMarginTop(-5)
 
             if i == 1 then
                 button:addAnchor(AnchorTop, 'parent', AnchorTop)
@@ -710,22 +774,58 @@ function displayGeneralBox(title, message, buttons, onEnterCallback, onEscapeCal
     if onEscapeCallback then
         generalBox.onEscape = onEscapeCallback
     end
+
+    local content = generalBox:getChildById('content')
+    if not content then
+        generalBox = destroyWindows(generalBox)
+
+        return nil
+    end
+
+    content:setText(message)
+    content:resizeToText()
+
     local contentWidth = content:getWidth() + 32
-    local contentHeight = content:getHeight() + 42 + holder:getHeight()
-    generalBox:setWidth(math.min(916, math.max(116, contentWidth)))
-    generalBox:setHeight(math.min(616, math.max(56, contentHeight)))
+    local contentHeight = content:getHeight() + 42 + (holder and holder:getHeight() or 0)
+    generalBox:setWidth(math.min(916, math.max(300, contentWidth)))
+    generalBox:setHeight(math.min(616, math.max(119, contentHeight)))
+
     generalBox.setContent = function(self, newMessage)
+        local content = generalBox:getChildById('content')
+        if not content then
+            return
+        end
+
         content:setText(newMessage)
         content:resizeToText()
+        content:setTextWrap(false)
+        content:setTextAutoResize(false)
+
+        local holder = generalBox:getChildById('holder')
+        if not holder then
+            return
+        end
+
         local contentWidth = content:getWidth() + 32
-        local contentHeight = content:getHeight() + 42 + holder:getHeight()
-        self:setWidth(math.min(916, math.max(116, contentWidth)))
-        self:setHeight(math.min(616, math.max(56, contentHeight)))
+        local contentHeight = content:getHeight() + 50 + holder:getHeight()
+        generalBox:setWidth(math.min(736, math.max(300, contentWidth)))
+        generalBox:setHeight(math.min(300, math.max(89, contentHeight)))
     end
+
     generalBox.setTitle = function(self, newTitle)
+        local titleWidget = generalBox:getChildById('title')
+        if not titleWidget then
+            return
+        end
+
         titleWidget:setText(newTitle)
     end
     generalBox.modifyButton = function(self, buttonId, newText, newCallback)
+        local holder = generalBox:getChildById('holder')
+        if not holder then
+            return nil
+        end
+
         local button = holder:getChildById(buttonId)
         if button then
             if newText then
@@ -751,63 +851,38 @@ function displayGeneralBox(title, message, buttons, onEnterCallback, onEscapeCal
 end
 
 function managerMessageBoxWindow(id)
-    if id == CONST_WINDOWS_BOX.CREATE then
-        generalBox = displayGeneralBox("test", "¿test?", {{
-            text = "ok",
-            callback = function()
-                print("test1")
-            end
-        }, {
-            text = "cancel",
-            callback = function()
-                print("test2")
-            end
-        }})
-    elseif id == CONST_WINDOWS_BOX.ALREADY then
-        generalBox:setTitle("Warning")
-        generalBox:setContent("Sorry, you have already taken you daily reward or you are unable to collect it")
-        generalBox:modifyButton("ok", "ok", function()
-            print("test3")
-            generalBox:destroy()
-        end)
-        generalBox:modifyButton("cancel", "cancel", function()
-            print("test4")
-            generalBox:destroy()
-        end)
-    elseif id == CONST_WINDOWS_BOX.RELEASE then
-        generalBox:setTitle("Info")
-        generalBox:setContent("You have already collected your daily reward. ")
-        generalBox:modifyButton("ok", "ok", function()
-            print("test5")
-            generalBox:destroy()
-        end)
-        generalBox:modifyButton("cancel", "cancel", function()
-            print("test6")
-            generalBox:destroy()
-        end)
-    elseif id == CONST_WINDOWS_BOX.CONFIRMATION_IRA then
-        generalBox:setTitle("Confirmation of using Instant Reward Access")
-        generalBox:setContent(
-            "Remember! You can always collect your daily reward for free by visition a reward shrine!\n You Currently own 3x Instant Reward Access. Do you really want to use one to claim your daily reward now? ")
-        generalBox:modifyButton("ok", "ok", function()
-            print("test7")
-            generalBox:destroy()
-        end)
-        generalBox:modifyButton("cancel", "cancel", function()
-            print("test8")
-            generalBox:destroy()
-        end)
-    elseif id == CONST_WINDOWS_BOX.NO_IRA then
-        generalBox:setTitle("Warning: No Sufficient Instant Reward Access")
-        generalBox:setContent(
-            "Remember! you can always collect your daily reward for free by visiting a reward shrine!\nyou do not have an instant Reward Access. \nvisit the store to buy more! ")
-        generalBox:modifyButton("ok", "ok", function()
-            print("test9")
-            generalBox:destroy()
-        end)
-        generalBox:modifyButton("cancel", "cancel", function()
-            print("test10")
-            generalBox:destroy()
-        end)
+    local config = BOX_CONFIGS[id]
+    if not config then
+        return
+    end
+
+    local cancelCallback = function()
+        generalBox, windowsPickWindow = destroyWindows({generalBox, windowsPickWindow})
+        rewardWallController.ui:show()
+        rewardWallController.ui:raise()
+        rewardWallController.ui:focus()
+    end
+
+    local okCallback = config.okCallback or function()
+        generalBox, windowsPickWindow = destroyWindows({generalBox, windowsPickWindow})
+        rewardWallController.ui:show()
+        rewardWallController.ui:raise()
+        rewardWallController.ui:focus()
+    end
+
+    local standardButtons = {{
+        text = "cancel",
+        callback = cancelCallback
+    }, {
+        text = "ok",
+        callback = okCallback
+    }}
+
+    generalBox = displayGeneralBox3(config.title, config.content, standardButtons)
+
+    rewardWallController.ui:hide()
+
+    if windowsPickWindow then
+        windowsPickWindow = destroyWindows(windowsPickWindow)
     end
 end
