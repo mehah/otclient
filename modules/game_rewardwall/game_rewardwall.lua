@@ -2,8 +2,8 @@ rewardWallController = Controller:new()
 -- /*=============================================
 -- =            To-do                  =
 -- =============================================*/
--- - otui -> html/css g_ui.displayUI 
--- - Improve Ids footerGold2 , footerGold1
+-- - otui -> html/css (g_ui.displayUI)
+-- - Improve Ids footerGold2 , footerGold1, "test", "displayGeneralBox3"
 
 local ServerPackets = {
     ShowDialog = 0xED,
@@ -196,7 +196,6 @@ local function updateDailyRewards(dayStreakDay, wasDailyRewardTaken)
         currentReward:setOn(false)
         currentReward:getChildById("rewardButton" .. dayStreakDay + 1).ditherpattern:setVisible(false)
         currentReward:getChildById("rewardButton" .. dayStreakDay + 1):setOn(false)
-
     end
 
     for i = dayStreakDay + 2, 7 do
@@ -262,11 +261,13 @@ local function checkRewards(data)
         elseif reward.bundleItems[1] and reward.bundleItems[1].bundleType == bundleType.XPBOOST then
             iconWidget:setIcon("game_rewardwall/images/icon-reward-xpboost")
             rewardButton.bundleType = bundleType.XPBOOST
-            rewardButton.itemsToSelect = {reward.bundleItems[1].itemId or 0, altReward and altReward.bundleItems[1].itemId or 0}
+            rewardButton.itemsToSelect = {reward.bundleItems[1].itemId or 0,
+                                          altReward and altReward.bundleItems[1].itemId or 0}
         else
             iconWidget:setIcon("game_rewardwall/images/icon-reward-fixeditems")
             rewardButton.bundleType = bundleType.PREY
-            rewardButton.itemsToSelect = {reward.bundleItems[1].count or 0, altReward and altReward.bundleItems[1].count or 0}
+            rewardButton.itemsToSelect = {reward.bundleItems[1].count or 0,
+                                          altReward and altReward.bundleItems[1].count or 0}
         end
     end
 end
@@ -466,8 +467,14 @@ end
 
 function rewardWallController:onGameStart()
     if g_game.getClientVersion() > 1140 then -- Summer Update 2017
-        ButtonRewardWall = modules.game_mainpanel.addToggleButton("rewardWall", tr("Open rewardWall"),
-            "/images/options/rewardwall", toggle, false, 20)
+        if not ButtonRewardWall then
+            ButtonRewardWall = modules.game_mainpanel.addToggleButton("rewardWall", tr("Open rewardWall"),
+                "/images/options/rewardwall", toggle(), false, 21)
+        end
+    else
+        scheduleEvent(function()
+            g_modules.getModule("game_rewardwall"):unload()
+        end, 100)
     end
 end
 
@@ -644,7 +651,6 @@ function rewardWallController:onhoverRewardType(event)
     rewardWallController.ui.infoPanel.free:setText(rewardTexts.free)
     rewardWallController.ui.infoPanel.premium:setText(rewardTexts.premium)
 end
-
 
 function rewardWallController:onhoverStatusReward(event)
     local statusReward = {

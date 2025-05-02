@@ -77,7 +77,13 @@ RewardButton3 < UIButton
     border-color-bottom: #747474
     border-width-right: 1
     border-color-right: #747474
-
+	
+  $!on:
+    border-width-top: 0
+    border-width-left: 0
+    border-width-bottom: 0
+    border-width-right: 0
+	
   UIWidget
     id:ditherpattern
     image-source: /game_rewardwall/images/ditherpattern
