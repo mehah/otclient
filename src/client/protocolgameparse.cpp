@@ -5052,7 +5052,7 @@ void ProtocolGame::parseError(const InputMessagePtr& msg)
 {
     const uint8_t code = msg->getU8();
     const auto& error = msg->getString();
-    g_lua.callGlobalField("g_game", "onServerError", code,error);
+    g_lua.callGlobalField("g_game", "onServerError", code, error);
 }
 
 void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
