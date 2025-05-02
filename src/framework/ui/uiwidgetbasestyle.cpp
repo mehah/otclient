@@ -419,5 +419,4 @@ void UIWidget::setIcon(const std::string& iconFile)
 
         repaint();
     });
-    m_iconPath = iconFile;
 }

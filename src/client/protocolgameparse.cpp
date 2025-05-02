@@ -2757,14 +2757,11 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
 void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
 {
     const uint8_t messageType = msg->getU8();
-
     switch (messageType) {
         case 1: {
             const uint8_t remainingQuests = msg->getU8();
             const uint8_t missionCount = msg->getU8();
-
             std::vector<std::tuple<uint16_t, std::string, uint8_t, std::string, std::string>> missions;
-
             for (uint8_t i = 0; i < missionCount; ++i) {
                 const uint16_t missionId = msg->getU16();
                 const std::string& questName = msg->getString();
@@ -2774,14 +2771,10 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
                 }
                 const std::string& missionName = msg->getString();
                 const std::string& missionDesc = msg->getString();
-
                 missions.emplace_back(missionId, questName, questIsCompleted, missionName, missionDesc);
             }
-
             return g_lua.callGlobalField("g_game", "onQuestTracker", remainingQuests, missions);
-            
         }
-
         case 0: {
             const uint16_t missionId = msg->getU16();
             const std::string& missionName = msg->getString();
@@ -2790,7 +2783,6 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
                 questIsCompleted = msg->getU8();
             }
             const std::string& missionDesc = msg->getString();
-
             return g_lua.callGlobalField("g_game", "onUpdateQuestTracker", missionId, missionName, questIsCompleted, missionDesc);
         }
     }

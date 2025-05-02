@@ -369,7 +369,6 @@ protected:
     Color m_backgroundColor{ Color::alpha };
     Rect m_backgroundRect;
     TexturePtr m_icon;
-    std::string m_iconPath;
     Color m_iconColor{ Color::white };
     Rect m_iconRect;
     Rect m_iconClipRect;
@@ -478,7 +477,6 @@ public:
     Rect getIconRect() { return m_iconRect; }
     Rect getIconClip() { return m_iconClipRect; }
     Fw::AlignmentFlag getIconAlign() { return m_iconAlign; }
-    std::string getIconPath() { return m_iconPath; }
     Color getBorderTopColor() { return m_borderColor.top; }
     Color getBorderRightColor() { return m_borderColor.right; }
     Color getBorderBottomColor() { return m_borderColor.bottom; }

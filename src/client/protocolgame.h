@@ -99,7 +99,7 @@ public:
     void sendCancelAttackAndFollow();
     void sendRefreshContainer(uint8_t containerId);
     void sendRequestBless();
-    void sendRequestTrackerQuestLog(const std::vector<uint8_t>& questId);
+    void sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& items);
     void sendRequestOutfit();
     void sendTyping(bool typing);
     void sendChangeOutfit(const Outfit& outfit);

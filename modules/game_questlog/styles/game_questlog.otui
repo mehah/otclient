@@ -103,7 +103,7 @@ QuestLogLabel < UIWidget
   CheckBoxButton
     id: iconShow
     anchors.right: parent.right
-    icon-source: icon-show-small-on
+    icon-source: /game_questlog/images/icon-show-small-on
     width: 15
     height: 15
     margin-right: 30
@@ -111,7 +111,7 @@ QuestLogLabel < UIWidget
   CheckBoxButton
     id: iconPin
     anchors.left: prev.right
-    icon-source: icon-pin
+    icon-source: /game_questlog/images/icon-pin
     height: 15
     width: 15
     margin-left: 3
@@ -208,27 +208,7 @@ ButtonTrackerMenuOption < UIButton
     color: #c0c0c0ff
 
 
-QuestLogMiniWindowsMenu < PopupMenu
-  id: imbuementTrackerMenu
-  width: 304
 
-  ButtonTrackerMenuOption
-    id: sortByName
-    !text: tr('Remove All quest')
-
-  ButtonTrackerMenuOption
-    id: ShortByPercentage
-    !text: tr('Remove completed quests')
-
-  HorizontalSeparator
-
-  ImbuementTrackerMenuOption
-    id: sortByAscending
-    !text: tr('Automatically track new quests')
-
-  ImbuementTrackerMenuOption
-    id: sortByDescending
-    !text: tr('Automatically untrack completed quests')
 
 QuestTrackerLabel < Panel
   height: 20
@@ -244,6 +224,13 @@ QuestTrackerLabel < Panel
     text-align: center
     text-wrap: true
     text-auto-resize: true
-
+    &onMousePress: modules.game_questlog.onQuestLogMousePress
   HorizontalSeparator
     margin-top: 3
+
+TrackerWindowsMenu < PopupMenu
+  width: 304
+
+  ButtonTrackerMenuOption
+    id: remove
+    !text: tr('remove')

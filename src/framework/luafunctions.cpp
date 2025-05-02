@@ -691,7 +691,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getIconRect", &UIWidget::getIconRect);
     g_lua.bindClassMemberFunction<UIWidget>("getIconClip", &UIWidget::getIconClip);
     g_lua.bindClassMemberFunction<UIWidget>("getIconAlign", &UIWidget::getIconAlign);
-    g_lua.bindClassMemberFunction<UIWidget>("getIconPath", &UIWidget::getIconPath);
     g_lua.bindClassMemberFunction<UIWidget>("getBorderTopColor", &UIWidget::getBorderTopColor);
     g_lua.bindClassMemberFunction<UIWidget>("getBorderRightColor", &UIWidget::getBorderRightColor);
     g_lua.bindClassMemberFunction<UIWidget>("getBorderBottomColor", &UIWidget::getBorderBottomColor);

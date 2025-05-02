@@ -1,0 +1,76 @@
+.questLog-window {
+  width: 790;
+  height: 639;
+  font: verdana-11px-antialised;
+  opacity: 1;
+  display: block;
+}
+
+/* Panel left */
+.content-left {
+  width: 367;
+  height: 551;
+  margin-left: 5;
+
+}
+
+.search-box {
+  width: 270;
+  display: block;
+}
+
+.filter {
+  height: 40;
+  margin-left: 5;
+}
+
+
+.checkbox-group {
+  display: flex;
+  white-space: pre;
+  /*text-auto-resize: true;*/
+}
+
+.questLogButton {
+  /*     white-space: pre; */
+  font: cipsoftFont;
+}
+
+/* Panel right */
+.content-right {
+  width: 375;
+  height: 551;
+  background-color: #404040;
+  margin-bottom: 10;
+  margin-left: 385;
+  display: block;
+}
+/* foot */
+.separator {
+  display: block;
+  margin-top: 5;
+  width: 760;
+}
+
+/*
+  #SearchClearButton {
+  float: right;
+  background-image: url('/game_cyclopedia/images/button_clear_search.png');
+  background-color: white;  
+  opacity: 0.8;
+  width: 16;          
+  height: 16;
+  background-size: cover;
+  border: none;
+  cursor: pointer;
+}
+
+#SearchClearButton:hover {
+  opacity: 1.0;
+  background-color: white;
+}
+
+#SearchClearButton:active {
+  opacity: 1.0;
+  background-color: gray;
+} */

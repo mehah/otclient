@@ -741,13 +741,14 @@ void ProtocolGame::sendRequestBless()
     send(msg);
 }
 
-void ProtocolGame::sendRequestTrackerQuestLog(const std::vector<uint8_t>& questId)
+void ProtocolGame::sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& items)
 {
     const auto msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestTrackerQuestLog);
-    msg->addU8(static_cast<uint8_t>(questId.size()));
-    for (uint16_t id : questId) {
-        msg->addU16(id);
+    msg->addU8(static_cast<uint8_t>(items.size()));
+    for (const auto& [itemId, text] : items) {
+        msg->addU16(itemId);
+        msg->addString(text);
     }
     send(msg);
 }
