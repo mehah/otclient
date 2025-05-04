@@ -258,8 +258,6 @@ local function loadIcon(bitChanged, content, topmenu)
     end
     icon:setTooltip(tooltip)
     icon:setImageSize(tosize("9 9"))
-    icon:setMarginLeft(1)
-    icon:setMarginRight(-2)
     if topmenu then
         icon:setMarginTop(5)
         icon:setMarginLeft(2)
