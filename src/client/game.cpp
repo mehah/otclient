@@ -1951,11 +1951,11 @@ void Game::sendStatusTrackerBestiary(const uint16_t raceId, const bool status)
     m_protocolGame->sendStatusTrackerBestiary(raceId, status);
 }
 
-void Game::sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& items)
+void Game::sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& quests)
 {
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestTrackerQuestLog(items);
+    m_protocolGame->sendRequestTrackerQuestLog(quests);
 }
 

@@ -86,10 +86,10 @@ function UIPopupMenu:addSeparator()
 end
 
 function UIPopupMenu:addText(text)
-	local optionWidget = g_ui.createWidget("PopupScrollMenuShortcutLabel", self)
-	optionWidget:setText(text)
-	local width = optionWidget:getTextSize().width + optionWidget:getMarginLeft() + optionWidget:getMarginRight() + 15
-	self:setWidth(math.max(self:getWidth(), width))
+    local optionWidget = g_ui.createWidget("PopupScrollMenuShortcutLabel", self)
+    optionWidget:setText(text)
+    local width = optionWidget:getTextSize().width + optionWidget:getMarginLeft() + optionWidget:getMarginRight() + 15
+    self:setWidth(math.max(self:getWidth(), width))
 end
 
 function UIPopupMenu:addCheckBox(text, checked, callback)
@@ -98,7 +98,7 @@ function UIPopupMenu:addCheckBox(text, checked, callback)
     checkBox:setChecked(checked or false)
     checkBox.onClick = function()
         self:destroy()
-        callback(checkBox,checkBox:isChecked())
+        callback(checkBox, checkBox:isChecked())
     end
     local width = checkBox:getTextSize().width + checkBox:getMarginLeft() + checkBox:getMarginRight() + 30
     self:setWidth(math.max(self:getWidth(), width))

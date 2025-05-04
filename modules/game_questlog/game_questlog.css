@@ -1,3 +1,4 @@
+/* Optimized CSS */
 .questLog-window {
   width: 790;
   height: 639;
@@ -6,37 +7,12 @@
   display: block;
 }
 
-/* Panel left */
 .content-left {
   width: 367;
   height: 551;
   margin-left: 5;
-
 }
 
-.search-box {
-  width: 270;
-  display: block;
-}
-
-.filter {
-  height: 40;
-  margin-left: 5;
-}
-
-
-.checkbox-group {
-  display: flex;
-  white-space: pre;
-  /*text-auto-resize: true;*/
-}
-
-.questLogButton {
-  /*     white-space: pre; */
-  font: cipsoftFont;
-}
-
-/* Panel right */
 .content-right {
   width: 375;
   height: 551;
@@ -45,32 +21,52 @@
   margin-left: 385;
   display: block;
 }
-/* foot */
+
+.search-box {
+  width: 270;
+}
+
+.filter {
+  height: 40;
+  margin-left: 5;
+}
+
+.checkbox-group {
+  display: flex;
+  white-space: pre;
+  text-offset: 18 -3;
+
+}
+
+.questLogButton {
+  font: cipsoftFont;
+  text-auto-resize: true;
+}
+
 .separator {
   display: block;
   margin-top: 5;
   width: 760;
 }
 
-/*
-  #SearchClearButton {
-  float: right;
-  background-image: url('/game_cyclopedia/images/button_clear_search.png');
-  background-color: white;  
-  opacity: 0.8;
-  width: 16;          
-  height: 16;
-  background-size: cover;
-  border: none;
-  cursor: pointer;
+.quest-list {
+  border-width: 1;
+  border-color: #00000077;
+  height: 425;
+  background-color: #404040;
 }
 
-#SearchClearButton:hover {
-  opacity: 1.0;
-  background-color: white;
+.quest-info {
+  margin-top: 5;
+  background-color: #363636;
+  height: 300;
 }
 
-#SearchClearButton:active {
-  opacity: 1.0;
-  background-color: gray;
-} */
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+  margin-left: 12;
+}

@@ -797,7 +797,7 @@ public:
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
-    void sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& items);
+    void sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& quests);
     
     void updateMapLatency() {
         if (!m_mapUpdateTimer.first) {

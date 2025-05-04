@@ -374,7 +374,7 @@ local function showQuestTracker()
             end
         end)
         menu:addOption('Remove completed quests', function()
-            print("bbbbbbbbbb")
+            print("todo")
         end)
         menu:addSeparator()
         menu:addCheckBox('Automatically track new quests', false, function(a, b)
@@ -517,7 +517,7 @@ function filterQuestList(searchText)
     recolorVisibleItems()
 end
 
-function questLogController:test(event)
+function questLogController:onCheckChangeQuestTracker(event)
     if not trackerMiniWindow then
         showQuestTracker()
         return
@@ -677,4 +677,3 @@ function questLogController:onGameEnd()
         trackerMiniWindow:hide()
     end
 end
-
