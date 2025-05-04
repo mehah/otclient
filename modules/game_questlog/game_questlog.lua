@@ -1,4 +1,11 @@
 questLogController = Controller:new()
+
+-- @ todo
+-- test tracker onUpdateQuestTracker
+-- test 14.10
+-- questLogController:bindKeyPress('Down' // 'up') focusNextChild // focusPreviousChild
+-- PopMenu Remove completed quests // Automatically track new quests // Automatically untrack completed quests
+
 -- @  windows
 local trackerMiniWindow = nil
 local questLogButton = nil
@@ -175,6 +182,7 @@ local function createQuestItem(parent, id, text, color, icon)
     item:setText(text)
     item:setBackgroundColor(color)
     item:setPhantom(false)
+    item:setFocusable(true)
     item.BaseColor = color
     item.isPinned = false
     item.isComplete = false
@@ -321,6 +329,12 @@ end
 --[[=================================================
 =                        Windows                     =
 =================================================== ]] --
+local function hide()
+    if not questLogController.ui then
+        return
+    end
+    questLogController.ui:hide()
+end
 
 function show()
     if not questLogController.ui then
@@ -378,13 +392,6 @@ local function showQuestTracker()
     trackerMiniWindow:moveChildToIndex(trackerMiniWindow.menuButton, 4)
     trackerMiniWindow:moveChildToIndex(trackerMiniWindow.cyclopediaButton, 5)
     trackerMiniWindow:setup()
-end
-
-local function hide()
-    if not questLogController.ui then
-        return
-    end
-    questLogController.ui:hide()
 end
 
 --[[=================================================
@@ -579,9 +586,9 @@ function questLogController:onInit()
     questLogController.ui:centerIn('parent')
     hide()
 
-    UITextList.questLogList = questLogController.ui.panelQuestLog.areaPanelQuestList.spellList
-    UITextList.questLogLine = questLogController.ui.panelQuestLineSelected.ScrollAreaQuestList.spellList
-    UITextList.questLogInfo = questLogController.ui.panelQuestLineSelected.panelQuestInfo.spellList
+    UITextList.questLogList = questLogController.ui.panelQuestLog.areaPanelQuestList.questList
+    UITextList.questLogLine = questLogController.ui.panelQuestLineSelected.ScrollAreaQuestList.questList
+    UITextList.questLogInfo = questLogController.ui.panelQuestLineSelected.panelQuestInfo.questList
     UITextList.questLogInfo:setBackgroundColor('#363636')
 
     UITextEdit.search = questLogController.ui.panelQuestLog.textEditSearchQuest
@@ -600,7 +607,7 @@ function questLogController:onInit()
 
     questLogButton = modules.game_mainpanel.addToggleButton('questLogButton', tr('Quest Log'),
         '/images/options/button_questlog', function()
-            show()
+            toggle()
         end, false, 1000)
     Keybind.new("Windows", "Show/hide quest Log", "", "")
     Keybind.bind("Windows", "Show/hide quest Log", {{
@@ -624,12 +631,11 @@ function questLogController:onGameStart()
         if settings[namePlayer] then
             sendQuestTracker(settings[namePlayer])
         end
-    elseif g_game.getClientVersion() >= 1410 then
         if not buttonQuestLogTrackerButton then
             buttonQuestLogTrackerButton = modules.game_mainpanel.addToggleButton("QuestLogTracker",
                 tr("Open QuestLog Tracker"), "/images/options/button_questlog_tracker", function()
                     questLogController:toggleMiniWindowsTracker()
-                end, false, 17)
+                end, false, 1001)
         end
     end
 end
@@ -639,7 +645,4 @@ function questLogController:onGameEnd()
         save()
     end
     hide()
-    if trackerMiniWindow then
-        trackerMiniWindow:hide()
-    end
 end

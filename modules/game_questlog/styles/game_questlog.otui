@@ -9,24 +9,23 @@ TextListQuestLog < Panel
   image-border: 4
   image-border-top: 23
   image-border-bottom: 4
-  focusable: false
-  id:test
+  focusable: true
 
   TextList
-    id: spellList
+    id: questList
     vertical-scrollbar: spellsScrollBar
     anchors.fill: parent
     padding: 1
     width: 10
-    focusable: false
+    focusable: true
     background-color: #404040
-
+    auto-focus: first
 
   VerticalQtScrollBar
     id: spellsScrollBar
-    anchors.top: spellList.top
-    anchors.bottom: spellList.bottom
-    anchors.right: spellList.right
+    anchors.top: questList.top
+    anchors.bottom: questList.bottom
+    anchors.right: questList.right
     step: 50
     pixels-scroll: true
 
@@ -42,10 +41,9 @@ MultiLineQuestLog < Panel
   image-border-top: 23
   image-border-bottom: 4
   focusable: false
-  id:test
 
   MultilineTextEdit
-    id: spellList
+    id: questList
     vertical-scrollbar: spellsScrollBar
     anchors.fill: parent
     padding: 1
@@ -57,9 +55,9 @@ MultiLineQuestLog < Panel
 
   VerticalQtScrollBar
     id: spellsScrollBar
-    anchors.top: spellList.top
-    anchors.bottom: spellList.bottom
-    anchors.right: spellList.right
+    anchors.top: questList.top
+    anchors.bottom: questList.bottom
+    anchors.right: questList.right
     step: 50
     pixels-scroll: true
 
@@ -95,7 +93,7 @@ QuestLogLabel < UIWidget
   color: #C0C0C0
   text-align: left
   text-offset: 15 0
-
+  focusable: true
   icon-align: left
 
   $checked:
@@ -206,9 +204,6 @@ ButtonTrackerMenuOption < UIButton
 
   $disabled:
     color: #c0c0c0ff
-
-
-
 
 QuestTrackerLabel < Panel
   height: 20
