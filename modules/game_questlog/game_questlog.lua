@@ -54,6 +54,7 @@ local function isIdInTracker(key, id)
     end
     return table.findbyfield(settings[key], 1, tonumber(id)) ~= nil
 end
+
 local function addUniqueIdQuest(key, id, name)
     if not settings[key] then
         settings[key] = {}
@@ -131,6 +132,7 @@ local sortFunctions = {
         end
     end
 }
+
 local function sendQuestTracker(listToMap)
     local map = {}
     for _, entry in ipairs(listToMap) do
@@ -186,7 +188,6 @@ local function createQuestItem(parent, id, text, color, icon)
             questLogCache.completed = questLogCache.completed + 1
         end
     end
-
     return item
 end
 
@@ -194,6 +195,7 @@ local function updateQuestCounter()
     UIlabel.numberQuestComplete:setText(questLogCache.completed)
     UIlabel.numberQuestHidden:setText(questLogCache.hidden)
 end
+
 local function recolorVisibleItems()
     local categoryColor = COLORS.BASE_1
     local visibleIndex = 0
@@ -209,10 +211,8 @@ end
 
 local function sortQuestList(questList, sortOrder)
     questLogController.currentSortOrder = sortOrder
-
     local pinnedItems = {}
     local regularItems = {}
-
     for _, child in pairs(questLogCache.items) do
         if child.isPinned then
             table.insert(pinnedItems, child)
@@ -220,29 +220,22 @@ local function sortQuestList(questList, sortOrder)
             table.insert(regularItems, child)
         end
     end
-
     local sortFunc = sortFunctions[sortOrder]
     if sortFunc then
         table.sort(regularItems, sortFunc)
     end
-
     questLogCache.items = {}
-
     local index = 1
     for _, item in ipairs(pinnedItems) do
         questList:moveChildToIndex(item, index)
         table.insert(questLogCache.items, item)
         index = index + 1
-
     end
-
     for _, item in ipairs(regularItems) do
         questList:moveChildToIndex(item, index)
         table.insert(questLogCache.items, item)
         index = index + 1
-
     end
-
     recolorVisibleItems()
     updateQuestCounter()
 end
@@ -253,7 +246,6 @@ local function setupQuestItemClickHandler(item, isQuestList)
         resetItemCategorySelection(list)
         self:setChecked(true)
         self:setBackgroundColor(COLORS.SELECTED)
-
         if isQuestList then
             g_game.requestQuestLine(self:getId())
             self.iconShow:setVisible(true)
@@ -269,7 +261,6 @@ local function setupQuestItemClickHandler(item, isQuestList)
         function item.iconPin:onClick(mousePos)
             local parent = self:getParent()
             parent.isPinned = not parent.isPinned
-
             if parent.isPinned then
                 self:setImageColor("#00ff00")
                 local list = UITextList.questLogList
@@ -279,12 +270,9 @@ local function setupQuestItemClickHandler(item, isQuestList)
                 table.removevalue(questLogCache.items, parent)
                 table.insert(questLogCache.items, 1, parent)
                 recolorVisibleItems()
-
             else
                 self:setImageColor("#ffffff")
-
                 self:setVisible(false)
-
                 sortQuestList(UITextList.questLogList, questLogController.currentSortOrder or "Alphabetically (A-Z)")
             end
             return true
@@ -293,11 +281,9 @@ local function setupQuestItemClickHandler(item, isQuestList)
         function item.iconShow:onClick(mousePos, mouseButton)
             local parent = self:getParent()
             parent.isHiddenQuestLog = not parent.isHiddenQuestLog
-
             if parent.isHiddenQuestLog then
                 questLogCache.hidden = questLogCache.hidden + 1
                 self:setImageColor("#ff0000")
-
                 if not UICheckBox.showShidden:isChecked() then
                     parent:setVisible(false)
                     questLogCache.visible = questLogCache.visible - 1
@@ -305,14 +291,12 @@ local function setupQuestItemClickHandler(item, isQuestList)
             else
                 questLogCache.hidden = questLogCache.hidden - 1
                 self:setImageColor("#ffffff")
-
                 if UICheckBox.showShidden:isChecked() then
                     parent:setVisible(false)
                     questLogCache.visible = questLogCache.visible - 1
                 else
                     local isCompleted = parent.isComplete
                     local shouldBeVisible = UICheckBox.showComplete:isChecked() or not isCompleted
-
                     parent:setVisible(shouldBeVisible)
                     if shouldBeVisible then
                         questLogCache.visible = questLogCache.visible + 1
@@ -335,8 +319,9 @@ local function setupQuestItemClickHandler(item, isQuestList)
 end
 
 --[[=================================================
-=               Windows                     =
+=                        Windows                     =
 =================================================== ]] --
+
 function show()
     if not questLogController.ui then
         return
@@ -362,7 +347,6 @@ local function showQuestTracker()
         trackerMiniWindow:show()
         return
     end
-
     trackerMiniWindow = g_ui.createWidget('QuestLogTracker', modules.game_interface.getRightPanel())
     trackerMiniWindow.menuButton.onClick = function(widget, mousePos)
         local menu = g_ui.createWidget('PopupMenu')
@@ -387,12 +371,10 @@ local function showQuestTracker()
         menu:display(mousePos)
         return true
     end
-
     trackerMiniWindow.cyclopediaButton.onClick = function()
         show()
         return true
     end
-
     trackerMiniWindow:moveChildToIndex(trackerMiniWindow.menuButton, 4)
     trackerMiniWindow:moveChildToIndex(trackerMiniWindow.cyclopediaButton, 5)
     trackerMiniWindow:setup()
@@ -404,8 +386,9 @@ local function hide()
     end
     questLogController.ui:hide()
 end
+
 --[[=================================================
-=               onParse                     =
+=                      onParse                      =
 =================================================== ]] --
 local function onQuestLog(questList)
     UITextList.questLogList:destroyChildren()
@@ -418,7 +401,6 @@ local function onQuestLog(questList)
     }
 
     local categoryColor = COLORS.BASE_1
-
     for _, data in pairs(questList) do
         local id, questName, questCompleted = unpack(data)
         if _ == 2 and true then
@@ -429,7 +411,6 @@ local function onQuestLog(questList)
         setupQuestItemClickHandler(itemCat, true)
         categoryColor = categoryColor == COLORS.BASE_1 and COLORS.BASE_2 or COLORS.BASE_1
     end
-
     sortQuestList(UITextList.questLogList, "Alphabetically (A-Z)")
     updateQuestCounter()
 end
@@ -437,7 +418,6 @@ end
 local function onQuestLine(questId, questMissions)
     UITextList.questLogLine:destroyChildren()
     local categoryColor = COLORS.BASE_1
-
     for _, data in pairs(questMissions) do
         local missionName, missionDescription, missionId = unpack(data)
         local itemCat = createQuestItem(UITextList.questLogLine, missionId, missionName, categoryColor)
@@ -459,7 +439,6 @@ local function onQuestTracker(remainingQuests, missions)
     trackerMiniWindow.contentsPanel.list:destroyChildren()
     for index, mission in ipairs(missions) do
         local missionId, questName, questIsCompleted, missionName, missionDesc = unpack(mission)
-
         local trackerLabel = g_ui.createWidget('QuestTrackerLabel', trackerMiniWindow.contentsPanel.list)
         trackerLabel:setId(missionId)
         trackerLabel.description:setText(missionDesc)
@@ -467,53 +446,44 @@ local function onQuestTracker(remainingQuests, missions)
 end
 
 local function onUpdateQuestTracker(missionId, missionName, questIsCompleted, missionDesc)
-    print(missionId, missionName, questIsCompleted, missionDesc)
+    -- print(missionId, missionName, questIsCompleted, missionDesc)
     local trackerLabel = trackerMiniWindow.contentsPanel.list:getChildById(missionId)
     if trackerLabel then
         trackerLabel.description:setText(missionDesc)
     end
 end
-
 --[[=================================================
-=               on Call /otui/html                     =
+=               onCall otui / html                  =
 =================================================== ]] --
 function filterQuestList(searchText)
     local showComplete = UICheckBox.showComplete:isChecked()
     local showHidden = UICheckBox.showShidden:isChecked()
     local searchPattern = searchText and string.lower(searchText) or nil
-
     questLogCache.visible = 0
-
     for _, child in pairs(questLogCache.items) do
         local isCompleted = child.isComplete
         local isHidden = child.isHiddenQuestLog
         local text = child:getText()
         local visible = true
-
         if searchPattern and text then
             visible = string.find(string.lower(text), searchPattern) ~= nil
         end
-
         if not showComplete and isCompleted then
             visible = false
         end
-
         if showHidden then
             visible = visible and isHidden
         else
             visible = visible and not isHidden
         end
-
         child:setVisible(visible)
         if visible then
             questLogCache.visible = questLogCache.visible + 1
         end
-
         if child.iconShow then
             child.iconShow:setVisible(child.isHiddenQuestLog)
         end
     end
-
     recolorVisibleItems()
 end
 
@@ -522,7 +492,6 @@ function questLogController:onCheckChangeQuestTracker(event)
         showQuestTracker()
         return
     end
-
     if UITextList.questLogLine:hasChildren() and UITextList.questLogLine:getFocusedChild() then
         local id = tonumber(UITextList.questLogLine:getFocusedChild():getId())
         if event.checked then
@@ -535,7 +504,6 @@ function questLogController:onCheckChangeQuestTracker(event)
                 trackerLabel = nil
             end
         end
-
         if settings[namePlayer] and (event.checked == isIdInTracker(namePlayer, id)) then
             sendQuestTracker(settings[namePlayer])
         end
@@ -557,14 +525,12 @@ function questLogController:toggleMiniWindowsTracker()
         showQuestTracker()
         return
     end
-
     if trackerMiniWindow:isVisible() then
         if buttonQuestLogTrackerButton then
             buttonQuestLogTrackerButton:setOn(false)
         end
         return trackerMiniWindow:hide()
     end
-
     if buttonQuestLogTrackerButton then
         buttonQuestLogTrackerButton:setOn(true)
     end
@@ -586,6 +552,7 @@ function onSearchTextChange(text)
         filterQuestList()
     end
 end
+
 function onQuestLogMousePress(widget, mousePos, mouseButton)
     if mouseButton ~= MouseRightButton then
         return
@@ -635,7 +602,6 @@ function questLogController:onInit()
         '/images/options/button_questlog', function()
             show()
         end, false, 1000)
-
     Keybind.new("Windows", "Show/hide quest Log", "", "")
     Keybind.bind("Windows", "Show/hide quest Log", {{
         type = KEY_DOWN,
