@@ -224,7 +224,7 @@ function optionsController:onGameStart()
                 reloadMainPanelSizes()
             end
         end
-    end, 50)
+    end, 50, "onGameStart")
     if g_game.getClientVersion() >= 1400 then
         controlButton1400 = modules.game_mainpanel.addToggleButton('skillsButton', tr('Skills') .. ' (Alt+S)',
         '/images/options/button_skills', function() modules.client_options.openOptionsCategory("Interface", "Control Buttons") end, false, 1)
@@ -482,6 +482,10 @@ function moveButtonUp()
         updateDisplayedButtonsList()
         reorderButtons()
         saveButtonConfig()
+        local focusedChild = displayedList:getFocusedChild()
+        if focusedChild then
+            displayedList:ensureChildVisible(focusedChild)
+        end
     end
 end
 
@@ -506,6 +510,10 @@ function moveButtonDown()
         updateDisplayedButtonsList()
         reorderButtons()
         saveButtonConfig()
+        local focusedChild = displayedList:getFocusedChild()
+        if focusedChild then
+            displayedList:ensureChildVisible(focusedChild)
+        end
     end
 end
 
