@@ -156,7 +156,7 @@ function highscoreController:onGameStart()
         return
     end
 
-    highscoreButton = modules.client_topmenu.addRightGameToggleButton('highscore', tr('highscore'),
+    highscoreButton = modules.client_topmenu.addRightGameToggleButton('Highscores', tr('highscore'),
         '/images/options/highscores', toggle, false)
     highscoreButton:setOn(false)
 end

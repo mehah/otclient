@@ -142,7 +142,7 @@ function controllerCyclopedia:onGameStart()
     =================================================== ]] --
 
         trackerButtonBosstiary = modules.game_mainpanel.addToggleButton("bosstiarytrackerButton",
-            tr("bosstiary Tracker"), "/images/options/bosstiaryTracker", Cyclopedia.toggleBosstiaryTracker, false, 17)
+            tr("Bosstiary Tracker"), "/images/options/bosstiaryTracker", Cyclopedia.toggleBosstiaryTracker, false, 17)
 
         trackerButtonBosstiary:setOn(false)
         trackerMiniWindowBosstiary = g_ui.createWidget('BestiaryTracker', modules.game_interface.getRightPanel())
