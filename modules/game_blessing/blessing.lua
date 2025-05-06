@@ -10,7 +10,8 @@ end
 function BlessingController:onGameStart()
     g_ui.importStyle("style.otui")
     BlessingController:loadHtml('blessing.html')
-    BlessingController.ui:centerIn('parent') -- temp fix css
+    BlessingController.ui:centerIn('parent')
+
     BlessingController:registerEvents(g_game, {
         onUpdateBlessDialog = onUpdateBlessDialog
     })
