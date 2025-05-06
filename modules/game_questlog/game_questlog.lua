@@ -356,12 +356,37 @@ local function toggle()
     show()
 end
 
+local function toggleTracker()
+    if trackerMiniWindow:isOn() then
+        trackerMiniWindow:close()
+    else
+        if not trackerMiniWindow:getParent() then
+            local panel = modules.game_interface
+                              .findContentPanelAvailable(trackerMiniWindow, trackerMiniWindow:getMinimumHeight())
+            if not panel then
+                return
+            end
+
+            panel:addChild(trackerMiniWindow)
+        end
+        trackerMiniWindow:open()
+    end
+end
+
+function onOpenTracker()
+    buttonQuestLogTrackerButton:setOn(true)
+end
+
+function onCloseTracker()
+    buttonQuestLogTrackerButton:setOn(false)
+end
+
 local function showQuestTracker()
     if trackerMiniWindow then
-        trackerMiniWindow:show()
+        toggleTracker()
         return
     end
-    trackerMiniWindow = g_ui.createWidget('QuestLogTracker', modules.game_interface.getRightPanel())
+    trackerMiniWindow = g_ui.createWidget('QuestLogTracker')
     trackerMiniWindow.menuButton.onClick = function(widget, mousePos)
         local menu = g_ui.createWidget('PopupMenu')
         menu:setGameMenu(true)
@@ -391,7 +416,10 @@ local function showQuestTracker()
     end
     trackerMiniWindow:moveChildToIndex(trackerMiniWindow.menuButton, 4)
     trackerMiniWindow:moveChildToIndex(trackerMiniWindow.cyclopediaButton, 5)
+    trackerMiniWindow:setContentMinimumHeight(80)
     trackerMiniWindow:setup()
+    trackerMiniWindow:setupOnStart() -- load character window configuration
+    toggleTracker()
 end
 
 --[[=================================================
@@ -645,4 +673,5 @@ function questLogController:onGameEnd()
         save()
     end
     hide()
+    trackerMiniWindow:setParent(nil, true)
 end

@@ -122,6 +122,8 @@ QuestLogTracker < MiniWindow
   icon: /images/topbuttons/icon-questtracker-widget
   icon-offset: 4 2
   icon-size: 12 12
+  @onOpen: modules.game_questlog.onOpenTracker()
+  @onClose: modules.game_questlog.onCloseTracker()
   UIButton
     id: menuButton
     anchors.top: prev.top
