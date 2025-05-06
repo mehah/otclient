@@ -595,11 +595,11 @@ function onQuestLogMousePress(widget, mousePos, mouseButton)
     local menu = g_ui.createWidget('PopupMenu')
     menu:setGameMenu(true)
     menu:addOption(tr('remove'), function()
-        widget:getParent():destroy()
         removeNumber(namePlayer, widget:getParent():getId())
         if settings[namePlayer] then
             sendQuestTracker(settings[namePlayer])
         end
+        widget:getParent():destroy()
     end)
     menu:display(mousePos)
     return true
