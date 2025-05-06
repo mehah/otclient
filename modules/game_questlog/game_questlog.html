@@ -17,10 +17,10 @@
       class="filter">
       <input id="checkboxShowComplete" type="checkbox" class="checkbox-group" text="Quest Log" onchange="self:filterQuestListShowComplete(event)" checked>Show Completed</input>
       <label class="text-right text-offset-normal">Quests completed:</label>
-      <label id="lblCompleteNumber" class="text-left" textOffset="5 -1">-99</label>
+      <label id="lblCompleteNumber" class="text-left" textOffset="5 -1">0</label>
       <input id="checkboxShowShidden" type="checkbox" class="checkbox-group" text="Quest Log" onchange="self:filterQuestListShowHidden(event)">Show hidden</input>
       <label class="text-right text-offset-normal">Quests hidden:</label>
-      <label id="lblHiddenNumber" class="text-left" textOffset="5 -2">-99</label>
+      <label id="lblHiddenNumber" class="text-left" textOffset="5 -2">0</label>
     </div>
   </minipanel>
 
@@ -31,6 +31,6 @@
   </minipanel>
 
   <HorizontalSeparator class="separator"></HorizontalSeparator>
-  <Qtbutton class="questLogButton" style="margin-top:12;" onclick="self:toggleMiniWindowsTracker()">Quest Tracker</Qtbutton>
+  <Qtbutton id="trackerButton"class="questLogButton" style="margin-top:12;" onclick="self:toggleMiniWindowsTracker()">Quest Tracker</Qtbutton>
   <Qtbutton class="questLogButton" style="float: right;" onclick="self:close()">Close</Qtbutton>
 </window>

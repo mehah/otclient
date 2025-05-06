@@ -4,7 +4,7 @@ questLogController = Controller:new()
 -- test tracker onUpdateQuestTracker
 -- test 14.10
 -- questLogController:bindKeyPress('Down' // 'up') focusNextChild // focusPreviousChild
--- PopMenu Remove completed quests // Automatically track new quests // Automatically untrack completed quests
+-- PopMenu Miniwindows "Remove completed quests // Automatically track new quests // Automatically untrack completed quests"
 
 -- @  windows
 local trackerMiniWindow = nil
@@ -90,7 +90,7 @@ local function load()
                 "Error while reading profiles file. To fix this problem you can delete storage.json. Details: " ..
                     result)
         end
-        settings = result
+        return result
     end
 end
 
@@ -248,6 +248,7 @@ local function sortQuestList(questList, sortOrder)
     updateQuestCounter()
 end
 
+
 local function setupQuestItemClickHandler(item, isQuestList)
     function item:onClick()
         local list = isQuestList and UITextList.questLogList or UITextList.questLogLine
@@ -258,6 +259,7 @@ local function setupQuestItemClickHandler(item, isQuestList)
             g_game.requestQuestLine(self:getId())
             self.iconShow:setVisible(true)
             self.iconPin:setVisible(true)
+            questLogController.ui.panelQuestLineSelected:setText(self:getText())
         else
             UITextList.questLogInfo:setText(self.description)
         end
@@ -366,13 +368,14 @@ local function toggleTracker()
             if not panel then
                 return
             end
-
             panel:addChild(trackerMiniWindow)
         end
         trackerMiniWindow:open()
     end
 end
-
+--[[=================================================
+=                        miniWindows                     =
+=================================================== ]] --
 function onOpenTracker()
     buttonQuestLogTrackerButton:setOn(true)
 end
@@ -394,6 +397,8 @@ local function showQuestTracker()
             if settings[namePlayer] then
                 table.clear(settings[namePlayer])
                 sendQuestTracker(settings[namePlayer])
+                trackerMiniWindow.contentsPanel.list:getLayout():enableUpdates()
+                trackerMiniWindow.contentsPanel.list:getLayout():update()
             end
         end)
         menu:addOption('Remove completed quests', function()
@@ -418,7 +423,6 @@ local function showQuestTracker()
     trackerMiniWindow:moveChildToIndex(trackerMiniWindow.cyclopediaButton, 5)
     trackerMiniWindow:setContentMinimumHeight(80)
     trackerMiniWindow:setup()
-    trackerMiniWindow:setupOnStart() -- load character window configuration
     toggleTracker()
 end
 
@@ -465,7 +469,6 @@ end
 local function onQuestTracker(remainingQuests, missions)
     if not trackerMiniWindow then
         showQuestTracker()
-        return
     end
     if not missions or type(missions[1]) ~= "table" then
         trackerMiniWindow.contentsPanel.list:destroyChildren()
@@ -481,6 +484,7 @@ local function onQuestTracker(remainingQuests, missions)
 end
 
 local function onUpdateQuestTracker(missionId, missionName, questIsCompleted, missionDesc)
+    -- untest
     -- print(missionId, missionName, questIsCompleted, missionDesc)
     local trackerLabel = trackerMiniWindow.contentsPanel.list:getChildById(missionId)
     if trackerLabel then
@@ -530,6 +534,7 @@ function questLogController:onCheckChangeQuestTracker(event)
     if UITextList.questLogLine:hasChildren() and UITextList.questLogLine:getFocusedChild() then
         local id = tonumber(UITextList.questLogLine:getFocusedChild():getId())
         if event.checked then
+            showQuestTracker()
             addUniqueIdQuest(namePlayer, id, UITextList.questLogLine:getFocusedChild():getText())
         else
             removeNumber(namePlayer, id, UITextList.questLogLine:getFocusedChild():getText())
@@ -653,11 +658,12 @@ function questLogController:onTerminate()
 end
 
 function questLogController:onGameStart()
-    namePlayer = g_game.getCharacterName():lower()
     if g_game.getClientVersion() >= 1280 then
-        load()
+        namePlayer = g_game.getCharacterName():lower()
+        settings = load()
         if settings[namePlayer] then
             sendQuestTracker(settings[namePlayer])
+            pdump(settings[namePlayer])
         end
         if not buttonQuestLogTrackerButton then
             buttonQuestLogTrackerButton = modules.game_mainpanel.addToggleButton("QuestLogTracker",
@@ -665,6 +671,12 @@ function questLogController:onGameStart()
                     questLogController:toggleMiniWindowsTracker()
                 end, false, 1001)
         end
+        if trackerMiniWindow then
+            trackerMiniWindow:setupOnStart()
+        end
+    else
+        UICheckBox.showInQuestTracker:setVisible(false)
+        questLogController.ui.trackerButton:setVisible(false)
     end
 end
 
@@ -673,5 +685,7 @@ function questLogController:onGameEnd()
         save()
     end
     hide()
-    trackerMiniWindow:setParent(nil, true)
+    if trackerMiniWindow then
+        trackerMiniWindow:setParent(nil, true)
+    end
 end
