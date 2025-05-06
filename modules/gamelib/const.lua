@@ -442,4 +442,7 @@ CyclopediaCharacterInfoTypes = {
     Titles = 11
 }
 
+StoreConst = {
+   InstantRewardAccess = 233,
+}
 -- @}

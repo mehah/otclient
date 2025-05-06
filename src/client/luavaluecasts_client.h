@@ -92,3 +92,9 @@ int push_luavalue(const CharacterInfoFamiliar& familiar);
 
 // bestiary
 int push_luavalue(const RaceType& raceData);
+
+// rewardWall
+int push_luavalue(const DailyRewardItem& item);
+int push_luavalue(const DailyRewardBundle& bundle);
+int push_luavalue(const DailyRewardDay& day);
+int push_luavalue(const DailyRewardData& data);
