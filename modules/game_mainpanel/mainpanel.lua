@@ -169,8 +169,8 @@ function optionsController:onInit()
     false, 8)
 
     if not optionPanel then
-        optionPanel = g_ui.loadUI('option_control_buttons',modules.client_options:getPanel())
-        modules.client_options.addButton("Interface", "Control Buttons", optionPanel, function()     initControlButtons() end)
+        optionPanel = g_ui.loadUI('option_control_buttons', modules.client_options:getPanel())
+        modules.client_options.addButton("Interface", "Control Buttons", optionPanel, function() initControlButtons() end)
     end
 end
 
@@ -185,8 +185,8 @@ end
 function optionsController:onTerminate()
     if optionPanel then
         optionPanel:destroy()
-        optionPanel= nil
-        modules.client_options.removeButton("Interface", "Control Buttons")  -- reload
+        optionPanel = nil
+        modules.client_options.removeButton("Interface", "Control Buttons")  -- hot reload
     end
     if controlButton1400 then
         controlButton1400:destroy()
@@ -225,9 +225,9 @@ function optionsController:onGameStart()
             end
         end
     end, 50, "onGameStart")
-    if g_game.getClientVersion() >= 1400 then
-        controlButton1400 = modules.game_mainpanel.addToggleButton('skillsButton', tr('Skills') .. ' (Alt+S)',
-        '/images/options/button_skills', function() modules.client_options.openOptionsCategory("Interface", "Control Buttons") end, false, 1)
+    if g_game.getClientVersion() >= 1400 and not controlButton1400 then
+        controlButton1400 = modules.game_mainpanel.addToggleButton('controButtons', tr('Manage control buttons'),
+        '/images/options/button_control', function() modules.client_options.openOptionsCategory("Interface", "Control Buttons") end, false, 1)
         controlButton1400:setOn(false)
     end
 end

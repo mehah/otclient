@@ -641,7 +641,6 @@ function openOptionsCategory(category, subcategory)
         local widget = controller.ui.optionsTabBar:getChildByIndex(i)
         if widget and widget.Button.Title:getText() == category then
             widget.Button:onClick()
-            
             if subcategory and widget.subCategories then
                 for subId, _ in ipairs(widget.subCategories) do
                     local subWidget = widget:getChildById(subId)
