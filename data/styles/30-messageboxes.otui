@@ -44,12 +44,12 @@ MessageBoxWindow < UIMessageBox
     margin-top: 32
 
   HorizontalSeparator
-    anchors.left: content.left
-    anchors.right: content.right
+    anchors.left: parent.left
+    anchors.right: parent.right
     anchors.top: content.bottom
-    image-source: /images/ui/horizontal_line_bright
-    height: 1
     margin-top: 10
+    margin-right: 15
+    margin-left: 15
 
   UIWidget
     id: holder

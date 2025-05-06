@@ -442,6 +442,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Store (compatible with 1098 , 12.91 ~ 13.40)
 - QuickLoot
 - Groups Vip
+- Reward Wall (Daily Rewards)
 
 - <details>
    <summary>Browser Client by @OTArchive</summary>
@@ -543,7 +544,6 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | wheel of destiny            	| ![](https://geps.dev/progress/1) 	| None	|
-| Daily Reward Wall            	| ![](https://geps.dev/progress/0) 	| None	|
 | Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
 | Sound tibia 13 | ![](https://geps.dev/progress/80)   |  [#1098](https://github.com/mehah/otclient/pull/1098)   	|
@@ -558,10 +558,8 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 500](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)        	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	|                                              	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
-| Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
-| Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
-| Canary 13.40        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
-| Canary 14.05        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ❌             	|
+| Canary  <br> (13.21 / 13.32 / 13.40)       	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
+| Canary <br> (14.05)        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ❌             	|
 
 
 
