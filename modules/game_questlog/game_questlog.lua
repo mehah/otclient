@@ -402,7 +402,7 @@ local function showQuestTracker()
             end
         end)
         menu:addOption('Remove completed quests', function()
-            print("todo")
+            print("to-do")
         end)
         menu:addSeparator()
         menu:addCheckBox('Automatically track new quests', false, function(a, b)
@@ -663,7 +663,6 @@ function questLogController:onGameStart()
         settings = load()
         if settings[namePlayer] then
             sendQuestTracker(settings[namePlayer])
-            pdump(settings[namePlayer])
         end
         if not buttonQuestLogTrackerButton then
             buttonQuestLogTrackerButton = modules.game_mainpanel.addToggleButton("QuestLogTracker",
