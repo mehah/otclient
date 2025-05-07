@@ -73,3 +73,17 @@ PopupScrollMenu < UIPopupScrollMenu
   image-source: /images/ui/3pixel_frame_borderimage
   image-border: 4
   padding: 3
+
+PopupMenuCheckBox < ThickCheckBox
+  text-offset: 18 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff

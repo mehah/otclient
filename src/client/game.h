@@ -840,6 +840,7 @@ public:
     void sendOpenRewardWall();
     void requestOpenRewardHistory();
     void requestGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
+    void sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& quests);
 
     void updateMapLatency() {
         if (!m_mapUpdateTimer.first) {

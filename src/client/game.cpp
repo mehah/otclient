@@ -1991,3 +1991,11 @@ void Game::requestGetRewardDaily(const uint8_t bonusShrine, const std::map<uint1
 
     m_protocolGame->sendGetRewardDaily(bonusShrine, items);
 }
+
+void Game::sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& quests)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendRequestTrackerQuestLog(quests);
+}
