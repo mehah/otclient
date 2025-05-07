@@ -90,7 +90,7 @@ local function load()
                 "Error while reading profiles file. To fix this problem you can delete storage.json. Details: " ..
                     result)
         end
-        return result
+        return result or {}
     end
 end
 
@@ -660,7 +660,7 @@ end
 function questLogController:onGameStart()
     if g_game.getClientVersion() >= 1280 then
         namePlayer = g_game.getCharacterName():lower()
-        settings = load()
+        settings = load() or {}
         if settings[namePlayer] then
             sendQuestTracker(settings[namePlayer])
         end
