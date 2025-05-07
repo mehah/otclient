@@ -5,6 +5,14 @@ local specialsAmount = 0
 local storeAmount = 0
 
 local chaseModeRadioGroup
+local controlButton1400 = nil
+local optionPanel = nil
+local buttonConfigs = {}
+local buttonOrder = {}
+local COLORS = {
+    BASE_1 = "#484848",
+    BASE_2 = "#414141"
+}
 
 function reloadMainPanelSizes()
     local main = modules.game_interface.getMainRightPanel()
@@ -160,6 +168,10 @@ function optionsController:onInit()
     createButton_large('Store shop', tr('Store shop'), '/images/options/store_large', toggleStore,
     false, 8)
 
+    if not optionPanel then
+        optionPanel = g_ui.loadUI('option_control_buttons', modules.client_options:getPanel())
+        modules.client_options.addButton("Interface", "Control Buttons", optionPanel, function() initControlButtons() end)
+    end
 end
 
 function toggleStore()
@@ -171,6 +183,15 @@ function toggleStore()
 end
 
 function optionsController:onTerminate()
+    if optionPanel then
+        optionPanel:destroy()
+        optionPanel = nil
+        modules.client_options.removeButton("Interface", "Control Buttons")  -- hot reload
+    end
+    if controlButton1400 then
+        controlButton1400:destroy()
+        controlButton1400 = nil
+    end
 end
 
 function optionsController:onGameStart()
@@ -184,6 +205,31 @@ function optionsController:onGameStart()
         return (a.index or 1000) < (b.index or 1000)
     end)
     getOptionsPanel:reorderChildren(children)
+    optionsController:scheduleEvent(function()
+        if optionPanel then
+            local config = loadButtonConfig()
+            buttonConfigs = config.buttons or {}
+            buttonOrder = config.order or {}
+            local optionsPanel = optionsController.ui.onPanel.options
+            if optionsPanel then
+                for _, button in ipairs(optionsPanel:getChildren()) do
+                    local id = button:getId()
+                    if id and buttonConfigs[id] then
+                        button:setVisible(buttonConfigs[id].visible)
+                    end
+                end
+                reorderButtons()
+                updateDisplayedButtonsList()
+                updateAvailableButtonsList()
+                reloadMainPanelSizes()
+            end
+        end
+    end, 50, "onGameStart")
+    if g_game.getClientVersion() >= 1400 and not controlButton1400 then
+        controlButton1400 = modules.game_mainpanel.addToggleButton('controButtons', tr('Manage control buttons'),
+        '/images/options/button_control', function() modules.client_options.openOptionsCategory("Interface", "Control Buttons") end, false, 1)
+        controlButton1400:setOn(false)
+    end
 end
 
 function optionsController:onGameEnd()
@@ -247,4 +293,317 @@ function toggleExtendedViewButtons(extended)
         end
     end
     refreshOptionsSizes()
+end
+
+function saveButtonConfig()
+    local config = {
+        buttons = {},
+        order = {}
+    }
+    for id, buttonConfig in pairs(buttonConfigs) do
+        if type(id) == "string" and type(buttonConfig) == "table" then
+            config.buttons[id] = {
+                visible = buttonConfig.visible,
+                tooltip = buttonConfig.tooltip
+            }
+        end
+    end
+    for i, id in ipairs(buttonOrder) do
+        config.order[tostring(i)] = id
+    end
+    g_settings.setNode('control_buttons', config)
+end
+
+function loadButtonConfig()
+    local config = g_settings.getNode('control_buttons') or {
+        buttons = {},
+        order = {}
+    }
+    local orderArray = {}
+    if config.order then
+        local keys = {}
+        for k in pairs(config.order) do
+            table.insert(keys, tonumber(k))
+        end
+        table.sort(keys)
+        for _, k in ipairs(keys) do
+            table.insert(orderArray, config.order[tostring(k)])
+        end
+    end
+
+    return {
+        buttons = config.buttons or {},
+        order = orderArray
+    }
+end
+
+local function updateList(listWidget, isVisibleList)
+    if not g_game.isOnline() or not listWidget then
+        return
+    end
+    local focusedItem = listWidget:getFocusedChild()
+    local focusedId = focusedItem and focusedItem.buttonId
+    local existingItems = {}
+    for _, child in ipairs(listWidget:getChildren()) do
+        existingItems[child.buttonId] = child
+    end
+    local displayButtons = {}
+    for id, config in pairs(buttonConfigs) do
+        if (config.visible == true) == isVisibleList then
+            table.insert(displayButtons, {
+                id = id,
+                config = config
+            })
+        end
+    end
+    if isVisibleList then
+        table.sort(displayButtons, function(a, b)
+            local indexA = table.find(buttonOrder, a.id) or 999
+            local indexB = table.find(buttonOrder, b.id) or 999
+            return indexA < indexB
+        end)
+    end
+    for buttonId, item in pairs(existingItems) do
+        local shouldBeInList = false
+        for _, buttonData in ipairs(displayButtons) do
+            if buttonData.id == buttonId then
+                shouldBeInList = true
+                break
+            end
+        end
+        if not shouldBeInList then
+            item:destroy()
+            existingItems[buttonId] = nil
+        end
+    end
+
+    local currentChildren = {}
+    for i, buttonData in ipairs(displayButtons) do
+        local buttonId = buttonData.id
+        local buttonConfig = buttonData.config
+        local item = existingItems[buttonId]
+        if not item then
+            item = g_ui.createWidget('HotkeyListLabel', listWidget)
+            item:setId(buttonId)
+            item.buttonId = buttonId
+            item:setText(buttonConfig.tooltip)
+            item:setTextAlign(AlignLeft)
+        end
+        if not item:isFocused() then
+            item:setBackgroundColor((i % 2 == 0) and COLORS.BASE_1 or COLORS.BASE_2)
+        end
+
+        table.insert(currentChildren, item)
+    end
+    listWidget:reorderChildren(currentChildren)
+    if focusedId then
+        for _, child in ipairs(listWidget:getChildren()) do
+            if child.buttonId == focusedId then
+                child:focus()
+                break
+            end
+        end
+    end
+end
+
+function updateDisplayedButtonsList()
+    updateList(optionPanel.panelDisplayedButtons.displayedButtonsList, true)
+end
+
+function updateAvailableButtonsList()
+    updateList(optionPanel.panelAvailableButtons.displayedAvailableButtonsList, false)
+end
+
+function moveToAvailable()
+    local displayedList = optionPanel.panelDisplayedButtons.displayedButtonsList
+    local selectedItem = displayedList:getFocusedChild()
+
+    if not selectedItem then
+        return
+    end
+
+    local buttonId = selectedItem.buttonId
+    local optionsPanel = optionsController.ui.onPanel.options
+    local button = optionsPanel:getChildById(buttonId)
+    if button then
+        button:setVisible(false)
+        buttonConfigs[buttonId].visible = false
+        table.removevalue(buttonOrder, buttonId)
+        updateDisplayedButtonsList()
+        updateAvailableButtonsList()
+        saveButtonConfig()
+        reloadMainPanelSizes()
+        displayedList:focusNextChild(KeyboardFocusReason)
+    end
+end
+
+function moveToDisplayed()
+    local availableList = optionPanel.panelAvailableButtons.displayedAvailableButtonsList
+    local selectedItem = availableList:getFocusedChild()
+
+    if not selectedItem then
+        return
+    end
+
+    local buttonId = selectedItem.buttonId
+    local optionsPanel = optionsController.ui.onPanel.options
+    local button = optionsPanel:getChildById(buttonId)
+
+    if button then
+        button:setVisible(true)
+        buttonConfigs[buttonId].visible = true
+        table.insert(buttonOrder, buttonId)
+        updateDisplayedButtonsList()
+        updateAvailableButtonsList()
+        reorderButtons()
+        saveButtonConfig()
+        reloadMainPanelSizes()
+        availableList:focusNextChild(KeyboardFocusReason)
+    end
+end
+
+function moveButtonUp()
+    if not g_game.isOnline() then
+        return
+    end
+
+    local displayedList = optionPanel.panelDisplayedButtons.displayedButtonsList
+    local selectedItem = displayedList:getFocusedChild()
+
+    if not selectedItem then
+        return
+    end
+
+    local buttonId = selectedItem.buttonId
+    local index = table.find(buttonOrder, buttonId)
+
+    if index and index > 1 then
+        buttonOrder[index], buttonOrder[index - 1] = buttonOrder[index - 1], buttonOrder[index]
+        updateDisplayedButtonsList()
+        reorderButtons()
+        saveButtonConfig()
+        local focusedChild = displayedList:getFocusedChild()
+        if focusedChild then
+            displayedList:ensureChildVisible(focusedChild)
+        end
+    end
+end
+
+function moveButtonDown()
+    if not g_game.isOnline() then
+        return
+    end
+
+    local displayedList = optionPanel.panelDisplayedButtons.displayedButtonsList
+    local selectedItem = displayedList:getFocusedChild()
+
+    if not selectedItem then
+        return
+    end
+
+    local buttonId = selectedItem.buttonId
+    local index = table.find(buttonOrder, buttonId)
+
+    if index and index < #buttonOrder then
+        buttonOrder[index], buttonOrder[index + 1] = buttonOrder[index + 1], buttonOrder[index]
+
+        updateDisplayedButtonsList()
+        reorderButtons()
+        saveButtonConfig()
+        local focusedChild = displayedList:getFocusedChild()
+        if focusedChild then
+            displayedList:ensureChildVisible(focusedChild)
+        end
+    end
+end
+
+function reorderButtons()
+    if not g_game.isOnline() then
+        return
+    end
+    local optionsPanel = optionsController.ui.onPanel.options
+    local children = {}
+    for _, id in ipairs(buttonOrder) do
+        local button = optionsPanel:getChildById(id)
+        if button then
+            table.insert(children, button)
+        end
+    end
+    for _, button in ipairs(optionsPanel:getChildren()) do
+        local id = button:getId()
+        if not table.find(buttonOrder, id) then
+            table.insert(children, button)
+        end
+    end
+    optionsPanel:reorderChildren(children)
+end
+
+function reset()
+    g_settings.setNode('control_buttons', {})
+    buttonConfigs = {}
+    buttonOrder = {}
+    local optionsPanel = optionsController.ui.onPanel.options
+    if optionsPanel then
+        for _, button in ipairs(optionsPanel:getChildren()) do
+            local id = button:getId()
+            if id then
+                button:setVisible(true)
+                buttonConfigs[id] = {
+                    visible = true,
+                    tooltip = button:getTooltip() or id
+                }
+                table.insert(buttonOrder, id)
+            end
+        end
+    end
+    updateDisplayedButtonsList()
+    updateAvailableButtonsList()
+    reorderButtons()
+    reloadMainPanelSizes()
+end
+
+function initControlButtons()
+    local config = loadButtonConfig()
+    buttonConfigs = config.buttons or {}
+    buttonOrder = config.order or {}
+    local currentButtons = {}
+    for _, button in ipairs(optionsController.ui.onPanel.options:getChildren()) do
+        local id = button:getId()
+        if id then
+            currentButtons[id] = true
+            if not buttonConfigs[id] then
+                buttonConfigs[id] = {
+                    visible = button:isVisible(),
+                    tooltip = button:getTooltip() or id
+                }
+
+                if button:isVisible() and not table.find(buttonOrder, id) then
+                    table.insert(buttonOrder, id)
+                end
+            else
+                button:setVisible(buttonConfigs[id].visible)
+            end
+        end
+    end
+
+    local toRemove = {}
+    for id in pairs(buttonConfigs) do
+        if not currentButtons[id] then
+            table.insert(toRemove, id)
+        end
+    end
+
+    for _, id in ipairs(toRemove) do
+        buttonConfigs[id] = nil
+        for i, orderId in ipairs(buttonOrder) do
+            if orderId == id then
+                table.remove(buttonOrder, i)
+                break
+            end
+        end
+    end
+    updateDisplayedButtonsList()
+    updateAvailableButtonsList()
+    reorderButtons()
+    reloadMainPanelSizes()
 end
