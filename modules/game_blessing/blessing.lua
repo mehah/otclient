@@ -16,6 +16,7 @@ function BlessingController:onGameStart()
         onUpdateBlessDialog = onUpdateBlessDialog
     })
     BlessingController.ui:hide()
+    BlessingController.ui.minipanel1:setText("Record of Blessings") -- Temp fix html/css system
 end
 
 function BlessingController:onGameEnd()

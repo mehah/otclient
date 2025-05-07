@@ -836,7 +836,7 @@ public:
     void requestBosstiaryInfo();
     void requestBossSlootInfo();
     void requestBossSlotAction(uint8_t action, uint32_t raceId);
-    void sendStatusTrackerBestiary(uint16_t raceId, bool status);   
+    void sendStatusTrackerBestiary(uint16_t raceId, bool status);
     void sendOpenRewardWall();
     void requestOpenRewardHistory();
     void requestGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
