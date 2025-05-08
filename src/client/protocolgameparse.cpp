@@ -3425,10 +3425,13 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             uint8_t creatureType;
             if (g_game.getClientVersion() >= 910) {
                 creatureType = msg->getU8();
-            } else if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId) {
-                creatureType = Proto::CreatureTypePlayer;
             } else {
-                creatureType = Proto::CreatureTypeNpc;
+                if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId)
+                    creatureType = Proto::CreatureTypePlayer;
+                else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId)
+                    creatureType = Proto::CreatureTypeMonster;
+                else
+                    creatureType = Proto::CreatureTypeNpc;
             }
 
             uint32_t masterId = 0;
