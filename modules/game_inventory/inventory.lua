@@ -269,7 +269,7 @@ function inventoryController:onInit()
     connect(inventoryController.ui.onPanel.expert, {
         onCheckChange = expertMode
     })
-    pvpModeRadioGroup = UIRadioGroup.create()
+    local pvpModeRadioGroup = UIRadioGroup.create()
     pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteDoveBox)
     pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.whiteHandBox)
     pvpModeRadioGroup:addWidget(inventoryController.ui.onPanel.yellowHandBox)

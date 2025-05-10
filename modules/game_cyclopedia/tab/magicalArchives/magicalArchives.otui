@@ -1,0 +1,51 @@
+UIWidget
+  id: Cat5
+  anchors.fill: parent
+  visible: false
+  UIWidget
+    id: InformationBase
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-bottom: 8
+    margin-top: 10
+    width: 180
+    MiniPanel
+      id: selectSpell
+      anchors.fill: parent
+      image-border: 10
+      padding-right: 16
+      margin-bottom: 25
+      !text: tr('Select Spell')
+      layout:
+        type: verticalBox
+        spacing: 6
+
+      ComboBox
+      TextListQuestLog
+        height: 330
+      TextEditQuestLog
+
+  MiniPanel
+    id: spellAndRune
+    text: Spell / Rune Information
+    anchors.top: InformationBase.top
+    anchors.left: InformationBase.right
+    anchors.right: parent.right
+    anchors.bottom: InformationBase.bottom
+    margin-left: 10
+    margin-bottom: 25
+
+    Label
+      anchors.centerIn: parent
+      text: select a spell to view detailed information. 
+    Label
+      id: deleteme
+      anchors.centerIn: parent
+      !text: tr("\nrequires modification of protobuf")
+      font-scale: 2
+      margin-top: 12
+      text-auto-resize: true
+
+
+

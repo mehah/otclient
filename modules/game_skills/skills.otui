@@ -13,6 +13,7 @@ SkillNameLabel < GameLabel
   anchors.left: parent.left
   anchors.top: parent.top
   anchors.bottom: parent.bottom
+  color: #C0C0C0
 
 SkillValueLabel < GameLabel
   id: value
@@ -22,6 +23,7 @@ SkillValueLabel < GameLabel
   anchors.top: parent.top
   anchors.bottom: parent.bottom
   anchors.left: prev.left
+  color: #C0C0C0
 
 ImageSkill < UIWidget
   id: icon
@@ -29,6 +31,15 @@ ImageSkill < UIWidget
   width: 9
   margin-top: 13
   anchors.left: parent.left
+  anchors.top: parent.top
+  phantom: false
+
+ImageAbsorb < UIWidget
+  id: icon
+  size: 9 9
+  width: 9
+  margin-top: 2
+  anchors.right: parent.right
   anchors.top: parent.top
   phantom: false
 
@@ -53,6 +64,27 @@ SkillPercentPanel < ProgressBar
   anchors.top: parent.top
   phantom: false
 
+XpBoostButton < UIWidget
+  height: 30
+  HorizontalSeparator
+    id: leftSeparator
+    anchors.top: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: -23
+    margin-left: 5
+  UIWidget
+    id: xpBoostButton
+    image-source: /images/ui/button-storexp
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top : -6
+    @onClick: |
+      modules.game_store.toggle()
+      g_game.sendRequestStorePremiumBoost()
+    $pressed:
+      image-source: /images/ui/button-storexp-pressed
+
 MiniWindow
   id: skillWindow
   !text: tr('Skills')
@@ -69,13 +101,6 @@ MiniWindow
 
     SkillButton
       margin-top: 5
-      id: experience
-      height: 15
-      SkillNameLabel
-        !text: tr('Experience')
-      SkillValueLabel
-
-    SkillButton
       id: level
       SkillNameLabel
         !text: tr('Level')
@@ -83,6 +108,23 @@ MiniWindow
       RedPercentPanel
 
     SkillButton
+      id: experience
+      height: 15
+      SkillNameLabel
+        !text: tr('XP')
+      SkillValueLabel
+
+    SkillButton
+      id: xpGainRate
+      height: 15
+      SkillNameLabel
+        !text: tr('XP Gain Rate')
+      SkillValueLabel
+
+    XpBoostButton
+
+    SkillButton
+      margin-top: -12
       id: health
       height: 15
       SkillNameLabel
@@ -125,6 +167,7 @@ MiniWindow
 
     SkillButton
       id: stamina
+      margin-top: -5
       SkillNameLabel
         !text: tr('Stamina')
       SkillValueLabel
@@ -136,6 +179,10 @@ MiniWindow
         !text: tr('Offline Training')
       SkillValueLabel
       RedPercentPanel
+
+    HorizontalSeparator
+      margin-top: 5
+      margin-bottom: 5
 
     SkillButton
       id: magiclevel
@@ -281,3 +328,242 @@ MiniWindow
       SkillNameLabel
         !text: tr('Transcendence')
       SkillValueLabel
+
+// 14.12
+    SmallSkillButton
+      id: damageHealing
+      visible: false
+      SkillNameLabel
+        !text: tr('Damage/Healing')
+      SkillValueLabel
+
+    SmallSkillButton
+      id: attackValue
+      visible: false
+      SkillNameLabel
+        !text: tr('Attack Value')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+
+    SmallSkillButton
+      visible: false
+      id: convertedDamage
+      SkillNameLabel
+        !text: tr('converted Damage')
+      SkillValueLabel
+    SmallSkillButton
+      visible: false
+      id: convertedElement
+      SkillNameLabel
+        !text: tr('converted Element')
+      SkillValueLabel
+      
+    SmallSkillButton
+      id: lifeLeech
+      visible: false
+      SkillNameLabel
+        !text: tr('Life Leech')
+      SkillValueLabel
+    SmallSkillButton
+      id: manaLeech
+      visible: false
+      SkillNameLabel
+        !text: tr('Mana Leech')
+      SkillValueLabel
+    SmallSkillButton
+      visible: false
+      id: criticalHit
+      SkillNameLabel
+        !text: tr('Critical Hit:')
+    SmallSkillButton
+      id: criticalChance
+      visible: false
+      SkillNameLabel
+        margin-left: 15
+        !text: tr('Chance')
+      SkillValueLabel
+    SmallSkillButton
+      id: criticalExtraDamage
+      visible: false
+      SkillNameLabel
+        margin-left: 15
+        !text: tr('Extra Damage')
+      SkillValueLabel
+
+    SmallSkillButton
+      id: onslaught
+      visible: false
+      SkillNameLabel
+        !text: tr('Onslaught')
+      SkillValueLabel
+    HorizontalSeparator
+      id: separadorOnDefenseInfoChange
+      margin-top: 5      
+      visible: false
+      margin-bottom: 5
+
+    SmallSkillButton
+      id: physicalResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Physical')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-physical-resist
+    SmallSkillButton
+      id: fireResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Fire')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-fire-resist
+
+    SmallSkillButton
+      id: earthResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Earth')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-earth-resist
+    SmallSkillButton
+      id: energyResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Energy')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-energy-resist
+    SmallSkillButton
+      id: IceResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Ice')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-ice-resist
+    SmallSkillButton
+      id: HolyResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Holy')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-holy-resist
+
+    SmallSkillButton
+      id: deathResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Death')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-death-resist
+    SmallSkillButton
+      id: HealingResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Healing')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-healing-resist
+    
+    SmallSkillButton
+      id: drowResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Drown')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-drowning-resist
+    SmallSkillButton
+      id: lifedrainResist
+      visible: false
+      SkillNameLabel
+        !text: tr('Lifedrain')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-lifedrain-resist
+    SmallSkillButton
+      id: manadRainResist
+      visible: false
+      SkillNameLabel
+        !text: tr('manadrain')
+      SkillValueLabel
+        margin-right: 12
+      ImageAbsorb
+        image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-manadrain-resist
+
+
+
+
+
+    SmallSkillButton
+      id: defenceValue
+      visible: false
+      SkillNameLabel
+        !text: tr('Defence Value')
+      SkillValueLabel
+      
+    SmallSkillButton
+      id: armorValue
+      visible: false
+      SkillNameLabel
+        !text: tr('Armor Value')
+      SkillValueLabel
+
+    SmallSkillButton
+      id: mitigation
+      visible: false
+      SkillNameLabel
+        !text: tr('Mitigation')
+      SkillValueLabel
+    SmallSkillButton
+      id: dodge
+      visible: false
+      SkillNameLabel
+        !text: tr('Dodge')
+      SkillValueLabel    
+    SmallSkillButton
+      id: damageReflection
+      visible: false
+      SkillNameLabel
+        !text: tr('Damage Reflection')
+      SkillValueLabel  
+
+    HorizontalSeparator
+      id: separadorOnForgeBonusesChange
+      visible: false
+      margin-top: 5
+      margin-bottom: 5
+
+    SmallSkillButton
+      id: momentum
+      visible: false
+      SkillNameLabel
+        !text: tr('Momentum')
+      SkillValueLabel  
+    SmallSkillButton
+      id: transcendence
+      visible: false
+      SkillNameLabel
+        !text: tr('Transcendence')
+      SkillValueLabel  
+    SmallSkillButton
+      id: amplification
+      visible: false
+      SkillNameLabel
+        !text: tr('Amplification')
+      SkillValueLabel  

@@ -476,16 +476,16 @@ local function onQuestTracker(remainingQuests, missions)
     end
     trackerMiniWindow.contentsPanel.list:destroyChildren()
     for index, mission in ipairs(missions) do
-        local missionId, questName, questIsCompleted, missionName, missionDesc = unpack(mission)
+        local questId, missionId, questName, missionName, missionDesc = unpack(mission)
         local trackerLabel = g_ui.createWidget('QuestTrackerLabel', trackerMiniWindow.contentsPanel.list)
         trackerLabel:setId(missionId)
         trackerLabel.description:setText(missionDesc)
     end
 end
 
-local function onUpdateQuestTracker(missionId, missionName, questIsCompleted, missionDesc)
+local function onUpdateQuestTracker(questId, missionId, questName, missionName, missionDesc)
     -- untest
-    -- print(missionId, missionName, questIsCompleted, missionDesc)
+    -- print(questId, missionId, questName, missionName, missionDesc)
     local trackerLabel = trackerMiniWindow.contentsPanel.list:getChildById(missionId)
     if trackerLabel then
         trackerLabel.description:setText(missionDesc)

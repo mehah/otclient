@@ -60,6 +60,14 @@ public:
     void setBlessings(uint16_t blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
     void takeScreenshot(uint8_t type);
+    void setFlatDamageHealing(uint16_t flatBonus);
+    void setAttackInfo(uint16_t attackValue, uint8_t attackElement);
+    void setConvertedDamage(double convertedDamage, uint8_t convertedElement);
+    void setImbuements(double lifeLeech, double manaLeech, double critChance, double critDamage, double onslaught);
+    void setDefenseInfo(uint16_t defense, uint16_t armor, double mitigation, double dodge, uint16_t damageReflection);
+    void setCombatAbsorbValues(const std::map<uint8_t, double>& absorbValues);
+    void setForgeBonuses(double momentum, double transcendence, double amplification);
+    void setExperienceRate(Otc::ExperienceRate_t type, uint16_t value);
 
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
@@ -161,6 +169,8 @@ private:
     std::vector<uint16_t> m_spells;
 
     stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
+    std::map<uint8_t, double> m_combatAbsorbValues;
+    std::map<Otc::ExperienceRate_t, uint16_t> m_experienceRates;
 
     uint8_t m_autoWalkRetries{ 0 };
 
@@ -185,6 +195,27 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+
+    uint8_t m_attackElement{ 0 };
+    uint8_t m_convertedElement{ 0 };
+
+    uint16_t m_flatDamageHealing{ 0 };
+    uint16_t m_attackValue{ 0 };
+    uint16_t m_defense{ 0 };
+    uint16_t m_armor{ 0 };
+    uint16_t m_damageReflection{ 0 };
+
+    double m_convertedDamage{ 0 };
+    double m_lifeLeech{ 0 };
+    double m_manaLeech{ 0 };
+    double m_critChance{ 0 };
+    double m_critDamage{ 0 };
+    double m_onslaught{ 0 };
+    double m_mitigation{ 0 };
+    double m_dodge{ 0 };
+    double m_momentum{ 0 };
+    double m_transcendence{ 0 };
+    double m_amplification{ 0 };
 
     friend class Game;
 };

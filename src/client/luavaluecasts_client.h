@@ -89,6 +89,9 @@ int push_luavalue(const OutfitColorStruct& currentOutfit);
 int push_luavalue(const CharacterInfoOutfits& outfit);
 int push_luavalue(const CharacterInfoMounts& mount);
 int push_luavalue(const CharacterInfoFamiliar& familiar);
+int push_luavalue(const CyclopediaCharacterOffenceStats& data);
+int push_luavalue(const CyclopediaCharacterDefenceStats& data);
+int push_luavalue(const CyclopediaCharacterMiscStats& data);
 
 // bestiary
 int push_luavalue(const RaceType& raceData);

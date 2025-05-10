@@ -100,6 +100,9 @@ function showCharacter()
     controllerCyclopedia.ui.CharmsBase:setVisible(true)
     controllerCyclopedia.ui.GoldBase:setVisible(true)
     controllerCyclopedia.ui.BestiaryTrackerButton:setVisible(false)
+    if g_game.getClientVersion() >= 1410 then
+        controllerCyclopedia.ui.CharmsBase1410:setVisible(true)
+    end
 end
 
 Cyclopedia.Character = {}
@@ -966,18 +969,41 @@ function Cyclopedia.configureCharacterCategories()
         {
             text = "General Stats",
             icon = "/game_cyclopedia/images/character_icons/icon_generalstats",
-            subCategories = {
-                {
-                    text = "Character Stats",
-                    icon = "/game_cyclopedia/images/character_icons/icon-character-generalstats-overview",
-                    open = "CharacterStats"
-                },
-                {
-                    text = "Combat Stats",
-                    icon = "/game_cyclopedia/images/character_icons/icon-character-generalstats-combatstats",
-                    open = "CombatStats"
+            subCategories = function()
+                local categories = {
+                    {
+                        text = "Character Stats",
+                        icon = "/game_cyclopedia/images/character_icons/icon-character-generalstats-overview",
+                        open = "CharacterStats"
+                    }
                 }
-            }
+                
+                if g_game.getClientVersion() < 1410 then
+                    table.insert(categories, {
+                        text = "Combat Stats",
+                        icon = "/game_cyclopedia/images/character_icons/icon-character-generalstats-combatstats",
+                        open = "CombatStats"
+                    })
+                else
+                    table.insert(categories, {
+                        text = "Offence Stats",
+                        icon = "/game_cyclopedia/images/character_icons/icon-character-generalstats-combatstats",
+                        open = "OffenceStats"
+                    })
+                    table.insert(categories, {
+                        text = "Deffence Stats",
+                        icon = "/game_cyclopedia/images/character_icons/icon-character-generalstats-defence",
+                        open = "DeffenceStats"
+                    })
+                    table.insert(categories, {
+                        text = "Misc. Stats",
+                        icon = "/game_cyclopedia/images/character_icons/icon-character-generalstats-misc",
+                        open = "MiscStats"
+                    })
+                end
+                
+                return categories
+            end
         },
         {
             text = "Battle Results",
@@ -1033,11 +1059,16 @@ function Cyclopedia.configureCharacterCategories()
         end
 
         if button.subCategories ~= nil then
-            widget.subCategories = button.subCategories
-            widget.subCategoriesSize = #button.subCategories
+            local subCats = button.subCategories
+            if type(subCats) == "function" then
+                subCats = subCats()
+            end
+            
+            widget.subCategories = subCats
+            widget.subCategoriesSize = #subCats
             widget.Button.Arrow:setVisible(true)
 
-            for subId, subButton in ipairs(button.subCategories) do
+            for subId, subButton in ipairs(subCats) do
                 local subWidget = g_ui.createWidget("CharacterCategoryItem", widget)
                 subWidget:setId(subId)
                 subWidget.Button.Icon:setIcon(subButton.icon)
@@ -1060,6 +1091,12 @@ function Cyclopedia.configureCharacterCategories()
                         g_game.requestCharacterInfo(0, CyclopediaCharacterInfoTypes.Badges)
                     elseif subWidget.open == "CombatStats" then
                         g_game.requestCharacterInfo(0, CyclopediaCharacterInfoTypes.CombatStats)
+                    elseif subWidget.open == "OffenceStats" then
+                        g_game.requestCharacterInfo(0, CyclopediaCharacterInfoTypes.Offencestats)
+                    elseif subWidget.open == "DeffenceStats" then
+                        g_game.requestCharacterInfo(0, CyclopediaCharacterInfoTypes.Defencestats)
+                    elseif subWidget.open == "MiscStats" then
+                        g_game.requestCharacterInfo(0, CyclopediaCharacterInfoTypes.Miscstats)
                     elseif subWidget.open == "RecentDeaths" then
                         g_game.requestCharacterInfo(0, CyclopediaCharacterInfoTypes.RecentDeaths, 23, 1)
                     elseif subWidget.open == "RecentKills" then
@@ -1084,11 +1121,11 @@ function Cyclopedia.configureCharacterCategories()
         if id == 1 then
             widget:addAnchor(AnchorTop, "parent", AnchorTop)
             widget:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)
-            widget:setMarginTop(10)
+            widget:setMarginTop(5)
         else
             widget:addAnchor(AnchorTop, "prev", AnchorBottom)
             widget:addAnchor(AnchorHorizontalCenter, "parent", AnchorHorizontalCenter)
-            widget:setMarginTop(10)
+            widget:setMarginTop(5)
         end
 
         function widget.Button.onClick(this)
@@ -1262,3 +1299,347 @@ function Cyclopedia.onParseCyclopediaStoreSummary(xpBoostTime, dailyRewardXpBoos
         itemWidget:fill('parent')
     end
 end
+
+local  function getWeaponSkillName(skillType)
+        local skillNames = {
+            [0] = "Fist Fighting",
+            [1] = "Club Fighting",
+            [2] = "Sword Fighting",
+            [3] = "Axe Fighting",
+            [4] = "Distance Fighting",
+            [5] = "Shielding",
+            [6] = "Fishing",
+            [7] = "Magic Level",
+            [8] = "Critical Hits",
+            [9] = "Life Leech",
+            [10] = "Mana Leech"
+        }
+        
+        return skillNames[skillType] or "Fighting Skill"
+    end
+    function Cyclopedia.onCyclopediaCharacterOffenceStats(data)
+        UI.OffenceStats.rightPanel:destroyChildren()
+        UI.OffenceStats.leftPanel:destroyChildren()
+    
+        local attackValue = data.weaponAttack + data.weaponFlatModifier + data.weaponDamage + data.weaponSkillLevel
+        local stats = {
+            {name = "Flat Damage and healing", value = data.flatDamage or 0, icon = false, percent = false},
+            {name = "Attack Value", value = attackValue, icon = true, weaponElement = data.weaponElement},
+            {name = "From Base Attack", value = data.weaponAttack or 0, align = "center", icon = false},
+            {name = "From Equipment", value = data.weaponFlatModifier or 0, align = "center", icon = false},
+    
+            {name = getWeaponSkillName(data.weaponSkillType), value = data.weaponSkillLevel or 0, align = "center", icon = false},
+            {name = "From Combat Tactics", value = data.weaponDamage or 0, align = "center", icon = false},
+    
+            {name = "Life Leech", value = data.lifeLeech or 0, icon = false, percent = true},
+            {name = "From Base", value = data.lifeLeechBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Equipment", value = data.lifeLeechImbuement or 0, align = "center", percent = true, icon = false},
+            {name = "From Wheel", value = data.lifeLeechWheel or 0, align = "center", percent = true, icon = false},
+    
+            {name = "Mana Leech", value = data.manaLeech or 0, icon = false, percent = true},
+            {name = "From Base", value = data.manaLeechBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Equipment", value = data.manaLeechImbuement or 0, align = "center", percent = true, icon = false},
+            {name = "From Wheel", value = data.manaLeechWheel or 0, align = "center", percent = true, icon = false},
+    
+            {name = "Onslaught", value = data.onslaught or 0, icon = false, percent = true},
+            {name = "From Base", value = data.onslaughtBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Amplification", value = data.onslaughtBonus or 0, align = "center", percent = true, icon = false},
+    
+            {name = "Critical Hit", parent = "right", value = "", icon = false},
+            {name = "     Chance", parent = "right", value = data.critChance or 0, percent = true, icon = false},
+            {name = "     Extra Damage", parent = "right", value = data.critDamage or 0, percent = true, icon = false},
+            {name = "From Base", parent = "right", value = data.critDamageBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Equipment", parent = "right", value = data.critDamageImbuement or 0, align = "center", percent = true, icon = false},
+            {name = "From Wheel", parent = "right", value = data.critDamageWheel or 0, align = "center", percent = true, icon = false}
+        }
+        
+        if data.perfectShotDamage then
+            for i = 1, 5 do
+                if data.perfectShotDamage[i] and data.perfectShotDamage[i] > 0 then
+                    table.insert(stats, {
+                        name = "Perfect Shot Damage Bonus", 
+                        parent = "right", 
+                        value = "", 
+                        icon = false
+                    })
+                    table.insert(stats, {
+                        name = "     +" .. data.perfectShotDamage[i] .. " from range " .. i, 
+                        parent = "right", 
+                        value = "", 
+                        align = "center", 
+                        icon = false
+                    })
+                    break
+                end
+            end
+        end
+    
+        local function renderStat(stat)
+            local parent = stat.parent == "right" and UI.OffenceStats.rightPanel or UI.OffenceStats.leftPanel
+    
+            if stat.align == "center" then
+                local widget = g_ui.createWidget("Label", parent)
+                local valueText = stat.value
+                if stat.percent then
+                    local percentValue = math.floor(stat.value * 10000) / 100
+                    local sign = percentValue > 0 and "+ " or ""
+                    valueText = sign .. percentValue .. "%"
+                end
+                widget:setText("   " .. valueText .. " " .. stat.name)
+                widget:setMarginLeft(80)
+                return widget
+            else
+                local widget = g_ui.createWidget("CharacterSkillBase", parent)
+                local nameLabel = g_ui.createWidget("SkillNameLabel", widget)
+                nameLabel:setText(stat.name .. ":")
+                local valueLabel = g_ui.createWidget("SkillValueLabel", widget)
+                if stat.percent then
+                    local percentValue = math.floor(stat.value * 10000) / 100
+                    local sign = percentValue > 0 and "+ " or ""
+                    valueLabel:setText(sign .. percentValue .. "%")
+                else
+                    valueLabel:setText(tostring(stat.value))
+                end
+                if stat.icon then
+                    valueLabel:setMarginRight(12)
+                    local icon = g_ui.createWidget("SkillCharacterIcon", widget)
+                    icon:setMarginTop(2)
+                    icon:addAnchor(AnchorRight, "parent", AnchorRight)
+                    local element = clientCombat[stat.weaponElement]
+                    if element then
+                        icon:setImageSource(element.path)
+                        icon:setImageSize({
+                            width = 9,
+                            height = 9
+                        })
+                    end
+                end
+    
+                return widget
+            end
+        end
+    
+        for _, stat in ipairs(stats) do
+            if stat.align ~= "center" and stat.value == 0 and stat.value ~= "" then
+                -- Skip
+            else
+                renderStat(stat)
+            end
+        end
+    end
+    function Cyclopedia.onCyclopediaCharacterDefenceStats(data)
+        UI.DeffenceStats.rightPanel:destroyChildren()
+        UI.DeffenceStats.leftPanel:destroyChildren()
+    
+        local stats = {
+            {name = "Defence Value", value = data.defense or 0, icon = false, percent = false},
+            {name = "From Equipment", value = data.defenseEquipment or 0, align = "center", icon = false},
+            {name = "From Wheel", value = data.defenseWheel or 0, align = "center", icon = false},
+            {name = getWeaponSkillName(data.defenseSkillType), value = data.shieldingSkill or 0, align = "center", icon = false},
+            
+            {name = "Armor Value", value = data.armor or 0, icon = false, percent = false},
+            
+            {name = "Mitigation", value = data.mitigation or 0, icon = false, percent = true},
+            {name = "From Shielding", value = data.mitigationShield or 0, align = "center", percent = true, icon = false},
+            {name = "From Combat Tactics", value = data.mitigationCombatTactics or 0, align = "center", percent = true, icon = false},
+            {name = "From Base", value = data.mitigationBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Equipment", value = data.mitigationEquipment or 0, align = "center", percent = true, icon = false},
+            {name = "From Wheel", value = data.mitigationWheel or 0, align = "center", percent = true, icon = false},
+            
+            {name = "Dodge", value = data.dodgeTotal or 0, icon = false, percent = true},
+            {name = "From Base", value = data.dodgeBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Amplification", value = data.dodgeBonus or 0, align = "center", percent = true, icon = false},
+            {name = "From Wheel", value = data.dodgeWheel or 0, align = "center", percent = true, icon = false},
+            
+            {name = "Magic Shield Capacity", value = data.magicShieldCapacity or 0, icon = false, percent = false},
+            {name = "Flat", value = data.magicShieldCapacityFlat or 0, align = "center", icon = false},
+            {name = "Percent", value = data.magicShieldCapacityPercent or 0, align = "center", percent = true, icon = false},
+            
+            {name = "Reflect Physical", value = data.reflectPhysical or 0, icon = false, percent = false},
+            
+            {name = "Resistances", parent = "right", value = "", icon = false}
+        }
+        
+        local resistanceMap = {}
+        if data.resistances then
+            for _, resistance in ipairs(data.resistances) do
+                resistanceMap[resistance.element] = resistance.value
+            end
+        end
+        
+        for elementId, elementInfo in pairs(Cyclopedia.clientCombat) do
+            local value = resistanceMap[elementId] or 0
+            local percentValue = value *100
+            local color = "#FFFFFF"
+            
+            if percentValue > 0 then
+                color = "#44AD25"
+            elseif percentValue < 0 then
+                color = "#FF9900"
+            end
+            
+            local sign = percentValue >= 0 and "+" or ""
+            print(percentValue)
+            table.insert(stats, {
+                name = "     " .. elementInfo.id,
+                parent = "right", 
+                value = sign .. string.format("%.2f", tonumber(percentValue)) .. "%", 
+                percent = false,
+                element = elementId,
+                icon = true,
+                color = color
+            })
+        end
+    
+        local function renderStat(stat)
+            local parent = stat.parent == "right" and UI.DeffenceStats.rightPanel or UI.DeffenceStats.leftPanel
+    
+            if stat.align == "center" then
+                local widget = g_ui.createWidget("Label", parent)
+                local valueText = stat.value
+                if stat.percent then
+                    local percentValue = math.floor(stat.value * 10000) / 100
+                    local sign = percentValue > 0 and "+ " or ""
+                    valueText = sign .. percentValue .. "%"
+                end
+                widget:setText("   " .. valueText .. " " .. stat.name)
+                widget:setMarginLeft(80)
+                return widget
+            else
+                local widget = g_ui.createWidget("CharacterSkillBase", parent)
+                local nameLabel = g_ui.createWidget("SkillNameLabel", widget)
+                nameLabel:setText(stat.name .. ":")
+                local valueLabel = g_ui.createWidget("SkillValueLabel", widget)
+                if stat.percent then
+                    local percentValue = math.floor(stat.value * 10000) / 100
+                    local sign = percentValue > 0 and "+ " or ""
+                    valueLabel:setText(sign .. percentValue .. "%")
+                else
+                    valueLabel:setText(tostring(stat.value))
+                end
+                
+                if stat.color then
+                    valueLabel:setColor(stat.color)
+                end
+                
+                if stat.icon then
+                    valueLabel:setMarginRight(12)
+                    local icon = g_ui.createWidget("SkillCharacterIcon", widget)
+                    icon:setMarginTop(2)
+                    icon:addAnchor(AnchorRight, "parent", AnchorRight)
+                    local element = Cyclopedia.clientCombat[stat.element]
+                    if element then
+                        icon:setImageSource(element.path)
+                        icon:setImageSize({
+                            width = 9,
+                            height = 9
+                        })
+                    end
+                end
+    
+                return widget
+            end
+        end
+    
+        for _, stat in ipairs(stats) do
+            if stat.align ~= "center" and stat.value == 0 and stat.value ~= "" then
+                -- Skip
+            else
+                renderStat(stat)
+            end
+        end
+    end
+
+    function Cyclopedia.onCyclopediaCharacterMiscStats(data)
+        UI.MiscStats.leftPanel:destroyChildren()
+        UI.MiscStats.rightPanel:destroyChildren()
+    
+        local stats = {
+            {name = "Momentum", value = data.momentumTotal or 0, icon = false, percent = true},
+            {name = "From Equipment", value = data.momentumBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Amplification", value = data.momentumBonus or 0, align = "center", percent = true, icon = false},
+            {name = "From Wheel", value = data.momentumWheel or 0, align = "center", percent = true, icon = false},
+            
+            {name = "Transcendence", value = data.dodgeTotal or 0, icon = false, percent = true},
+            {name = "From Base", value = data.dodgeBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Amplification", value = data.dodgeBonus or 0, align = "center", percent = true, icon = false},
+            {name = "From Event Bonus", value = data.dodgeWheel or 0, align = "center", percent = true, icon = false},
+            
+            {name = "Damage Reflection", value = data.damageReflectionTotal or 0, icon = false, percent = true},
+            {name = "From Base", value = data.damageReflectionBase or 0, align = "center", percent = true, icon = false},
+            {name = "From Bonus", value = data.damageReflectionBonus or 0, align = "center", percent = true, icon = false},
+            
+            {name = "Blessings", value = (data.haveBlesses or 0) .. "/" .. (data.totalBlesses or 0), icon = false, percent = false},
+
+        }
+        
+        if data.concoctions and #data.concoctions > 0 then
+            for _, concoction in ipairs(data.concoctions) do
+                table.insert(stats, {
+                    name = "     " .. concoction.name,
+                    parent = "right", 
+                    value = concoction.value, 
+                    percent = true,
+                    icon = false
+                })
+            end
+        end
+    
+        local function renderStat(stat)
+            local parent = stat.parent == "right" and UI.MiscStats.rightPanel or UI.MiscStats.leftPanel
+    
+            if stat.align == "center" then
+                local widget = g_ui.createWidget("Label", parent)
+                local valueText = stat.value
+                if stat.percent then
+                    local percentValue = math.floor(stat.value * 10000) / 100
+                    local sign = percentValue > 0 and "+ " or ""
+                    valueText = sign .. percentValue .. "%"
+                end
+                widget:setText("   " .. valueText .. " " .. stat.name)
+                widget:setMarginLeft(60)
+                return widget
+            else
+                local widget = g_ui.createWidget("CharacterSkillBase", parent)
+                local nameLabel = g_ui.createWidget("SkillNameLabel", widget)
+                nameLabel:setText(stat.name .. ":")
+                local valueLabel = g_ui.createWidget("SkillValueLabel", widget)
+                if stat.percent then
+                    local percentValue = math.floor(stat.value * 10000) / 100
+                    local sign = percentValue > 0 and "+ " or ""
+                    
+                    
+                    valueLabel:setText(sign .. percentValue .. "%")
+                else
+                    valueLabel:setText(tostring(stat.value))
+                end
+                
+                if stat.icon then
+                    valueLabel:setMarginRight(12)
+                    local icon = g_ui.createWidget("SkillCharacterIcon", widget)
+                    icon:setMarginTop(2)
+                    icon:addAnchor(AnchorRight, "parent", AnchorRight)
+                    if stat.element then
+                        local element = Cyclopedia.clientCombat[stat.element]
+                        if element then
+                            icon:setImageSource(element.path)
+                            icon:setImageSize({
+                                width = 9,
+                                height = 9
+                            })
+                        end
+                    end
+                end
+    
+                return widget
+            end
+        end
+    
+        for _, stat in ipairs(stats) do
+            if stat.align ~= "center" and stat.value == 0 and stat.value ~= "" then
+                -- Skip
+            else
+                renderStat(stat)
+            end
+        end
+    end

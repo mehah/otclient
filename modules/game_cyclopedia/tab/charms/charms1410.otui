@@ -1,0 +1,298 @@
+UIWidget
+  id: Cat3
+  anchors.fill: parent
+  visible: false
+  MiniPanel
+    id: InformationBase
+    text: carnage
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 551 122
+    layout:
+      type: horizontalBox
+      spacing: -1
+
+    Label
+      id: TextBase
+      text: "killin a monster has 10% chance to deal physical damage equal to 15& of its maximum health to all monsters in a small rabius"
+      width: 174
+      text-wrap: true
+
+    BorderBox
+      id: ItemBase
+      image-source: /images/ui/panel_flat
+      image-border: 10
+      width: 44
+      height: 45
+      margin-top: 20
+      margin-bottom: 20
+      phantom: true
+      UIWidget
+        size: 32 32
+        id: image
+        anchors.centerIn: parent
+        phantom: true
+    Panel
+      id: verticalPanelUnLockClearChram
+      width: 92
+      margin-left: 5
+      QtButton
+        id: UnlockButton
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: UnLock
+      GoldLabel2
+        id: PriceBaseCharm
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 20
+        text: Addon 1
+        margin-top: 3
+
+      QtButton
+        id: check
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: Addon 1
+        margin-top:3
+        text: Clear Charm
+
+
+      UIWidget
+        id: PriceBaseGold
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 3
+        height: 20
+        image-source: /images/ui/item
+        image-border: 10
+        phantom: true
+        Label
+          id: Value
+          anchors.centerIn: parent
+          !text: tr('0')
+          text-auto-resize: true
+        UIWidget
+          id: Charm
+          anchors.left: Value.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 2
+          image-source: /game_cyclopedia/images/icon_charms
+        UIWidget
+          id: Gold
+          anchors.left: Value.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 2
+          image-source: /game_cyclopedia/images/icon_gold
+          visible: false
+    Panel
+      id: PanelCreatureList
+      width: 140
+      margin-left: 5
+      TextEditQuestLog
+        id:SearchEdit
+        height: 20
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+      BorderBox
+        id: CreaturesBase
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 68
+        margin-left: 5
+        margin-top: 5
+        image-source: /images/ui/panel_flat
+        image-border: 10
+        phantom: true
+        UIScrollArea
+          id: CreatureList
+          vertical-scrollbar: CreatureListScrollbar
+          anchors.fill: parent
+          margin-right: 13
+          padding-left: 3
+          padding-top: 3
+          padding-bottom: 2
+          layout:
+            type: grid
+            cell-size: 125 15
+            cell-spacing: 2
+            flow: true
+          CharmCreatureName
+            background-color: #484848
+          CharmCreatureName
+            background-color: #414141
+        VerticalQtScrollBar
+          id: CreatureListScrollbar
+          anchors.top: parent.top
+          anchors.right: parent.right
+          anchors.bottom: parent.bottom
+          step: 80
+          pixel-scroll: true
+
+    Panel
+      id: panelSelectCreature
+      width: 80
+      margin-left: 5
+      QtButton 
+        id: CreaturesLabel
+        height: 20
+        text: select Creature
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+      BorderBox
+        id: InfoBase
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 68
+        margin-top: 5
+        image-source: /images/ui/panel_flat
+        image-border: 10
+        phantom: true
+        UICreature
+          id: sprite
+          anchors.centerIn: parent
+          size: 64 64
+
+  QtPanel
+    id: anotherPanel
+    size: 112 122
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-left: 5
+
+    QtButton
+      text: Reset all charms
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-top: -15
+
+    UIWidget
+      id: CharmsBase1410
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/ui/item
+      image-border: 10
+      margin-top: 15
+      size: 100 20
+      !tooltip: tr("Minor Charm echoes\nEarned by unlocking or upgrading major charm and promotion your character")
+      UIWidget
+        id: Icon
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 4
+        image-source: /game_cyclopedia/images/icon_gold
+      Label
+        id: Value
+        anchors.right: Icon.left
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 4
+        !text: tr('0')
+        text-auto-resize: true
+        color: #BDBDBD
+
+  QtPanel
+    id: mainPanelCharmsType
+    height: 299
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 5
+
+    Panel
+      id: typeCharmPanel
+      height: 38
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      QtButton
+        id: MajorCharms
+        !text: tr('Major Charms')
+        font: verdana-11px-antialised
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: 322
+        margin: 1
+        $on:
+          margin-top: -1
+        $checked:
+          image-clip: 0 46 22 23
+          text-offset: 1 1
+
+        UIWidget
+          image-source: /game_cyclopedia/images/charms/icon-charms-major
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          phantom: true
+      QtButton
+        id: MinorCharms
+        !text: tr('Minor Charms')
+        font: verdana-11px-antialised
+        width: 322
+        anchors.top: parent.top
+        anchors.left: prev.right
+        anchors.bottom: parent.bottom
+        margin: 1
+        $on:
+          margin-top: -1
+        $checked:
+          image-clip: 0 46 22 23
+          text-offset: 1 1
+
+        
+        UIWidget
+          image-source: /game_cyclopedia/images/charms/icon-charms-minor
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          phantom: true
+
+    Panel
+      id: panelCharmList
+      font: verdana-11px-antialised
+      text-offset: 24 5
+      text-align: topLeft
+      border-width: 1
+      border-color: #00000077
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 232
+      margin-top: 10
+      image-border: 4
+      image-border-top: 23
+      image-border-bottom: 4
+      focusable: true
+      UIScrollArea
+        id: CharmList
+        vertical-scrollbar: spellsScrollBar
+        anchors.fill: parent
+        padding: 1
+        width: 10
+        focusable: true
+        background-color: #404040
+        border-width: 1
+        border-color: #272727
+        padding: 1
+        auto-focus: first
+        layout:
+          type: grid
+          cell-size: 158 100
+          cell-spacing: 2
+          flow: true
+      VerticalQtScrollBar
+        id: spellsScrollBar
+        anchors.top: prev.top
+        anchors.bottom: prev.bottom
+        anchors.right: prev.right
+        step: 50
+        pixels-scroll: true

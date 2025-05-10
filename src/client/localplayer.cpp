@@ -515,3 +515,120 @@ bool LocalPlayer::hasSight(const Position& pos)
 {
     return m_position.isInRange(pos, g_map.getAwareRange().left - 1, g_map.getAwareRange().top - 1);
 }
+
+void LocalPlayer::setFlatDamageHealing(uint16_t flatBonus)
+{
+    if (m_flatDamageHealing == flatBonus)
+        return;
+
+    const uint16_t oldFlatBonus = m_flatDamageHealing;
+    m_flatDamageHealing = flatBonus;
+
+    callLuaField("onFlatDamageHealingChange", flatBonus);
+}
+
+void LocalPlayer::setAttackInfo(uint16_t attackValue, uint8_t attackElement)
+{
+    if (m_attackValue == attackValue && m_attackElement == attackElement)
+        return;
+
+    const uint16_t oldAttackValue = m_attackValue;
+    const uint8_t oldAttackElement = m_attackElement;
+    m_attackValue = attackValue;
+    m_attackElement = attackElement;
+
+    callLuaField("onAttackInfoChange", attackValue, attackElement);
+}
+
+void LocalPlayer::setConvertedDamage(double convertedDamage, uint8_t convertedElement)
+{
+    if (m_convertedDamage == convertedDamage && m_convertedElement == convertedElement)
+        return;
+
+    const double oldConvertedDamage = m_convertedDamage;
+    const uint8_t oldConvertedElement = m_convertedElement;
+    m_convertedDamage = convertedDamage;
+    m_convertedElement = convertedElement;
+
+    callLuaField("onConvertedDamageChange", convertedDamage, convertedElement);
+}
+
+void LocalPlayer::setImbuements(double lifeLeech, double manaLeech, double critChance, double critDamage, double onslaught)
+{
+    if (m_lifeLeech == lifeLeech && m_manaLeech == manaLeech && m_critChance == critChance &&
+        m_critDamage == critDamage && m_onslaught == onslaught)
+        return;
+
+    const double oldLifeLeech = m_lifeLeech;
+    const double oldManaLeech = m_manaLeech;
+    const double oldCritChance = m_critChance;
+    const double oldCritDamage = m_critDamage;
+    const double oldOnslaught = m_onslaught;
+
+    m_lifeLeech = lifeLeech;
+    m_manaLeech = manaLeech;
+    m_critChance = critChance;
+    m_critDamage = critDamage;
+    m_onslaught = onslaught;
+
+    callLuaField("onImbuementsChange", lifeLeech, manaLeech, critChance, critDamage, onslaught);
+}
+
+void LocalPlayer::setDefenseInfo(uint16_t defense, uint16_t armor, double mitigation, double dodge, uint16_t damageReflection)
+{
+    if (m_defense == defense && m_armor == armor && m_mitigation == mitigation &&
+        m_dodge == dodge && m_damageReflection == damageReflection)
+        return;
+
+    const uint16_t oldDefense = m_defense;
+    const uint16_t oldArmor = m_armor;
+    const double oldMitigation = m_mitigation;
+    const double oldDodge = m_dodge;
+    const uint16_t oldDamageReflection = m_damageReflection;
+
+    m_defense = defense;
+    m_armor = armor;
+    m_mitigation = mitigation;
+    m_dodge = dodge;
+    m_damageReflection = damageReflection;
+
+    callLuaField("onDefenseInfoChange", defense, armor, mitigation, dodge, damageReflection);
+}
+
+void LocalPlayer::setCombatAbsorbValues(const std::map<uint8_t, double>& absorbValues)
+{
+    if (m_combatAbsorbValues == absorbValues)
+        return;
+
+    const auto oldAbsorbValues = m_combatAbsorbValues;
+    m_combatAbsorbValues = absorbValues;
+
+    callLuaField("onCombatAbsorbValuesChange", absorbValues);
+}
+
+void LocalPlayer::setForgeBonuses(double momentum, double transcendence, double amplification)
+{
+    if (m_momentum == momentum && m_transcendence == transcendence && m_amplification == amplification)
+        return;
+
+    const double oldMomentum = m_momentum;
+    const double oldTranscendence = m_transcendence;
+    const double oldAmplification = m_amplification;
+
+    m_momentum = momentum;
+    m_transcendence = transcendence;
+    m_amplification = amplification;
+
+    callLuaField("onForgeBonusesChange", momentum, transcendence, amplification);
+}
+
+void LocalPlayer::setExperienceRate(Otc::ExperienceRate_t type, uint16_t value)
+{
+    if (m_experienceRates[type] == value)
+        return;
+
+    const uint16_t oldValue = m_experienceRates[type];
+    m_experienceRates[type] = value;
+
+    callLuaField("onExperienceRateChange", type, value);
+}

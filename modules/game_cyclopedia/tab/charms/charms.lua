@@ -1,60 +1,127 @@
 local UI = nil
+local TypeCharmRadioGroup = nil
+Cyclopedia.Charms = {}
+local  charmCategory_t =  {
+	CHARM_ALL = 0,
+	CHARM_MAJOR = 1,
+	CHARM_MINOR = 2,
+};
+
+local charm_t = {
+	CHARM_UNDEFINED = 0,
+	CHARM_OFFENSIVE = 1,
+	CHARM_DEFENSIVE = 2,
+	CHARM_PASSIVE = 3,
+};
+local charmRune_t = {
+	CHARM_WOUND = 0,
+	CHARM_ENFLAME = 1,
+	CHARM_POISON = 2,
+	CHARM_FREEZE = 3,
+	CHARM_ZAP = 4,
+	CHARM_CURSE = 5,
+	CHARM_CRIPPLE = 6,
+	CHARM_PARRY = 7,
+	CHARM_DODGE = 8,
+	CHARM_ADRENALINE = 9,
+	CHARM_NUMB = 10,
+	CHARM_CLEANSE = 11,
+	CHARM_BLESS = 12,
+	CHARM_SCAVENGE = 13,
+	CHARM_GUT = 14,
+	CHARM_LOW = 15,
+	CHARM_DIVINE = 16,
+	CHARM_VAMP = 17,
+	CHARM_VOID = 18,
+	CHARM_SAVAGE = 19,
+	CHARM_FATAL = 20,
+	CHARM_VOIDINVERSION = 21,
+	CHARM_CARNAGE = 22,
+	CHARM_OVERPOWER = 23,
+	CHARM_OVERFLUX = 24,
+}
+-- Apparently, in versions higher than 14.10, relevant information such as name and description isn't sent by the server. 
+-- Should Protobuf be modified?
+local charms = {
+    [charmRune_t.CHARM_WOUND] = { name = "Wound", description = "Triggers on a creature with a chance to deal 5% of its initial HP as physical damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_ENFLAME] = { name = "Enflame", description = "Triggers on a creature with a chance to deal 5% of its initial HP as fire damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_POISON] = { name = "Poison", description = "Triggers on a creature with a chance to deal 5% of its initial HP as earth damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_FREEZE] = { name = "Freeze", description = "Triggers on a creature with a chance to deal 5% of its initial HP as ice damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_ZAP] = { name = "Zap", description = "Triggers on a creature with a chance to deal 5% of its initial HP as energy damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_CURSE] = { name = "Curse", description = "Triggers on a creature with a chance to deal 5% of its initial HP as death damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_CRIPPLE] = { name = "Cripple", description = "Cripples the creature and paralyzes it for 10 seconds.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_PARRY] = { name = "Parry", description = "Reflects incoming damage back to the aggressor.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_DEFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_DODGE] = { name = "Dodge", description = "Dodges an attack with a chance, avoiding all damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_DEFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_ADRENALINE] = { name = "Adrenaline Burst", description = "Boosts movement speed for 10 seconds after being hit.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_DEFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_NUMB] = { name = "Numb", description = "Numbs the creature and paralyzes it for 10 seconds.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_DEFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_CLEANSE] = { name = "Cleanse", description = "Removes a negative status effect and grants temporary immunity.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_DEFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_BLESS] = { name = "Bless", description = "Reduces skill and XP loss by 10% when killed by the chosen creature.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_SCAVENGE] = { name = "Scavenge", description = "Enhances chances to successfully skin or dust a creature.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_GUT] = { name = "Gut", description = "Increases creature product yields by 20%.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_LOW] = { name = "Low Blow", description = "Adds 8% critical hit chance to attacks with critical hit weapons.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_DIVINE] = { name = "Divine Wrath", description = "Triggers on a creature and deals 5% of its initial HP as holy damage.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_VAMP] = { name = "Vampiric Embrace", description = "Adds 4% life leech to attacks if using life-leeching equipment.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [18] = { name = "Void's Call", description = "Adds 2% mana leech to attacks if using mana-leeching equipment.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_SAVAGE] = { name = "Savage Blow", description = "Adds extra critical damage to attacks with critical hit weapons.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_FATAL] = { name = "Fatal Hold", description = "Prevents creatures from fleeing due to low health for 30 seconds.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_VOIDINVERSION] = { name = "Void Inversion", description = "Chance to gain mana instead of losing it when taking Mana Drain damage.", category = charmCategory_t.CHARM_MINOR, type = charm_t.CHARM_PASSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_CARNAGE] = { name = "Carnage", description = "Killing a monster deals physical damage to others nearby.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_OVERPOWER] = { name = "Overpower", description = "Deals physical damage based on your maximum health.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+    [charmRune_t.CHARM_OVERFLUX] = { name = "Overflux", description = "Deals physical damage based on your maximum mana.", category = charmCategory_t.CHARM_MAJOR, type = charm_t.CHARM_OFFENSIVE, clip = "32 0 32 32" },
+}
+local lastCategory = charmCategory_t.CHARM_MAJOR
+
 
 function showCharms()
-    UI = g_ui.loadUI("charms", contentContainer)
+    local UIUX = g_game.getClientVersion() >= 1410 and "charms1410" or "charms"
+    UI = g_ui.loadUI(UIUX, contentContainer)
     UI:show()
     g_game.requestBestiary()
     controllerCyclopedia.ui.CharmsBase:setVisible(true)
     controllerCyclopedia.ui.GoldBase:setVisible(true)
     controllerCyclopedia.ui.BestiaryTrackerButton:setVisible(false)
+    if g_game.getClientVersion() >= 1410 then
+        controllerCyclopedia.ui.CharmsBase1410:setVisible(true)
+        TypeCharmRadioGroup = UIRadioGroup.create()
+        TypeCharmRadioGroup:addWidget(UI.mainPanelCharmsType.typeCharmPanel.MajorCharms)
+        TypeCharmRadioGroup:addWidget(UI.mainPanelCharmsType.typeCharmPanel.MinorCharms)
+        TypeCharmRadioGroup:selectWidget(TypeCharmRadioGroup:getFirstWidget())
+        connect(TypeCharmRadioGroup, {
+            onSelectionChange = onTypeCharmRadioGroup
+        })
+    end
 end
 
-Cyclopedia.Charms = {}
-
-local CHARMS = {
-    { ID = 9, IMAGE = "/game_cyclopedia/images/charms/9", TYPE = 1 },
-    { ID = 11, IMAGE = "/game_cyclopedia/images/charms/11", TYPE = 2 },
-    { ID = 10, IMAGE = "/game_cyclopedia/images/charms/10", TYPE = 3 },
-    { ID = 6, IMAGE = "/game_cyclopedia/images/charms/6", TYPE = 2 },
-    { ID = 8, IMAGE = "/game_cyclopedia/images/charms/8", TYPE = 2 },
-    { ID = 7, IMAGE = "/game_cyclopedia/images/charms/7", TYPE = 3 },
-    { ID = 5, IMAGE = "/game_cyclopedia/images/charms/5", TYPE = 4 },
-    { ID = 1, IMAGE = "/game_cyclopedia/images/charms/1", TYPE = 4 },
-    { ID = 3, IMAGE = "/game_cyclopedia/images/charms/3", TYPE = 4 },
-    { ID = 2, IMAGE = "/game_cyclopedia/images/charms/2", TYPE = 4 },
-    { ID = 0, IMAGE = "/game_cyclopedia/images/charms/0", TYPE = 4 },
-    { ID = 4, IMAGE = "/game_cyclopedia/images/charms/4", TYPE = 4 },
-    { ID = 16, IMAGE = "/game_cyclopedia/images/charms/16", TYPE = 5 },
-    { ID = 15, IMAGE = "/game_cyclopedia/images/charms/15", TYPE = 6 },
-    { ID = 17, IMAGE = "/game_cyclopedia/images/charms/17", TYPE = 6 },
-    { ID = 13, IMAGE = "/game_cyclopedia/images/charms/13", TYPE = 6 },
-    { ID = 12, IMAGE = "/game_cyclopedia/images/charms/12", TYPE = 6 },
-    { ID = 14, IMAGE = "/game_cyclopedia/images/charms/14", TYPE = 6 },
-    { ID = 18, IMAGE = "/game_cyclopedia/images/charms/18", TYPE = 6 },
-}
-
-function Cyclopedia.UpdateCharmsBalance(Value)
-    for i, child in pairs(UI.Bottombase:getChildren()) do
-        if child.CharmsBase then
-            child.CharmsBase.Value:setText(Value)
-        end
+function onTerminateCharm()
+    if TypeCharmRadioGroup then
+        disconnect(TypeCharmRadioGroup, {
+            onSelectionChange = onTypeCharmRadioGroup
+        })
+        TypeCharmRadioGroup:destroy()
+        TypeCharmRadioGroup = nil
     end
 end
 
 function Cyclopedia.CreateCharmItem(data)
-    local widget = g_ui.createWidget("CharmItem", UI.CharmList)
+    local CharmList = g_game.getClientVersion() >= 1410 and UI.mainPanelCharmsType.panelCharmList.CharmList or UI.CharmList
+    local widget = g_ui.createWidget("CharmItem", CharmList)
     local value = widget.PriceBase.Value
 
     widget:setId(data.id)
+    widget.charmBase.image:setImageSource("/game_cyclopedia/images/charms/monster-bonus-effects")
 
     if data.id ~= nil then
-        widget.charmBase.image:setImageSource("/game_cyclopedia/images/charms/" .. data.id)
+        widget.charmBase.image:setImageClip((data.id * 32) .. ' 0 32 32')
     else
         g_logger.error(string.format("Cyclopedia.CreateCharmItem - charm %s is nil", data.id))
         return
     end
 
-    widget:setText(data.name)
+    if g_game.getClientVersion() >= 1410 then
+        widget:setText(charms[data.id].name)
+    else
+        widget:setText(data.name)
+    end
     widget.data = data
 
     if data.asignedStatus then
@@ -99,87 +166,151 @@ function Cyclopedia.CreateCharmItem(data)
             value:setColor("#C0C0C0")
         end
     end
+    
+    widget.category = charms[data.id].category
 end
 
 function Cyclopedia.loadCharms(charmsData)
-    controllerCyclopedia.ui.CharmsBase.Value:setText(Cyclopedia.formatGold(charmsData.points))
-
-    if UI == nil or UI.CharmList == nil then -- I know, don't change it
+    if not UI then
         return
+    end
+
+    local CharmList = g_game.getClientVersion() >= 1410 and UI.mainPanelCharmsType.panelCharmList.CharmList or UI.CharmList
+    local player = g_game.getLocalPlayer()
+    
+    if g_game.getClientVersion() >= 1410 then
+        local mainCharmValue = string.format("%d/%d", 
+            player:getResourceBalance(ResourceTypes.CHARM),
+            player:getResourceBalance(ResourceTypes.MAX_CHARM))
+        controllerCyclopedia.ui.CharmsBase.Value:setText(mainCharmValue)
+        
+        local minorCharmValue = string.format("%d/%d", 
+            player:getResourceBalance(ResourceTypes.MINOR_CHARM),
+            player:getResourceBalance(ResourceTypes.MAX_MINOR_CHARM))
+        controllerCyclopedia.ui.CharmsBase1410.Value:setText(minorCharmValue)
+    else
+        controllerCyclopedia.ui.CharmsBase.Value:setText(Cyclopedia.formatGold(charmsData.points))
     end
 
     UI.CharmsPoints = charmsData.points
 
+    Cyclopedia.Charms.Monsters = {}
     local raceIdNamePairs = {}
 
     for _, raceId in ipairs(charmsData.finishedMonsters) do
-        local raceName = g_things.getRaceData(raceId).name
-        if #raceName == 0 then
-            raceName = string.format("unnamed_%d", raceId)
-        end
-
-        table.insert(raceIdNamePairs, {
-            raceId = raceId,
-            name = raceName
-        })
+        local raceData = g_things.getRaceData(raceId)
+        local raceName = raceData.name ~= "" and raceData.name or string.format("unnamed_%d", raceId)
+        table.insert(raceIdNamePairs, { raceId = raceId, name = raceName })
     end
 
-    local function compareByName(a, b)
-        return a.name:lower() < b.name:lower()
-    end
-
-    table.sort(raceIdNamePairs, compareByName)
-
-    Cyclopedia.Charms.Monsters = {}
+    table.sort(raceIdNamePairs, function(a, b) return a.name:lower() < b.name:lower() end)
 
     for _, pair in ipairs(raceIdNamePairs) do
         table.insert(Cyclopedia.Charms.Monsters, pair.raceId)
     end
 
-    UI.CharmList:destroyChildren()
+    CharmList:destroyChildren()
 
     local formatedData = {}
 
     for _, charmData in pairs(charmsData.charms) do
-        local internalId = (charmData.id)
-        if internalId then
-            charmData.internalId = internalId
-            charmData.typePriority = CHARMS[internalId + 1].TYPE
-            table.insert(formatedData, charmData)
+        local internalId = charmData.id
+        if internalId ~= nil then
+            if charms[internalId] then
+                local charm = charms[internalId]
+                charmData.name = charmData.name ~= "" and charmData.name or charm.name
+                charmData.description = charmData.description ~= "" and charmData.description or charm.description
+                charmData.internalId = internalId
+                charmData.typePriority = charm.type
+                charmData.category = charm.category
+                table.insert(formatedData, charmData)
+            end
         end
     end
-
     table.sort(formatedData, function(a, b)
-        if a.unlocked == b.unlocked then
-            if a.typePriority == b.typePriority then
-                return a.name < b.name
-            else
-                return a.typePriority < b.typePriority
-            end
-        else
+        if a.unlocked ~= b.unlocked then
             return a.unlocked and not b.unlocked
         end
+        return a.name:lower() < b.name:lower()
     end)
 
     for _, value in ipairs(formatedData) do
-        Cyclopedia.CreateCharmItem(value)
+        if value and value.name and value.description and 
+           value.internalId ~= nil and value.typePriority ~= nil then
+            local status, err = pcall(function()
+                Cyclopedia.CreateCharmItem(value)
+            end)
+            
+            if not status then
+                g_logger.error("Error al crear charm item: " .. tostring(err) .. 
+                               " para charm ID: " .. tostring(value.internalId) .. 
+                               " (" .. tostring(value.name) .. ")")
+            end
+        else
+            g_logger.error("Charm data incompleto: " .. 
+                          (value and ("ID: " .. tostring(value.internalId or "unknown")) or "nil"))
+        end
     end
 
+    if g_game.getClientVersion() >= 1410 then
+        local selectedWidget = TypeCharmRadioGroup:getSelectedWidget()
+        if selectedWidget then
+            local charmCategory = selectedWidget:getId() == "MajorCharms" and charmCategory_t.CHARM_MAJOR or charmCategory_t.CHARM_MINOR
+            
+            for _, widget in ipairs(CharmList:getChildren()) do
+                widget:setVisible(widget.category == charmCategory)
+            end
+            
+            CharmList:getLayout():update()
+        end
+    end
+
+    local firstCharm
     if Cyclopedia.Charms.redirect then
-        Cyclopedia.selectCharm(UI.CharmList:getChildById(Cyclopedia.Charms.redirect),
-            UI.CharmList:getChildById(Cyclopedia.Charms.redirect):isChecked())
+        firstCharm = CharmList:getChildById(Cyclopedia.Charms.redirect)
         Cyclopedia.Charms.redirect = nil
     else
-        Cyclopedia.selectCharm(UI.CharmList:getChildByIndex(1), UI.CharmList:getChildByIndex(1):isChecked())
+        firstCharm = CharmList:getChildByIndex(1)
+    end
+    
+    if firstCharm then
+        Cyclopedia.selectCharm(firstCharm, firstCharm:isChecked())
     end
 end
 
 function Cyclopedia.selectCharm(widget, isChecked)
-    UI.InformationBase.CreaturesBase.CreatureList:destroyChildren()
+    local clientVersion = g_game.getClientVersion()
+    local UI_BASE = {}
+    
+    if clientVersion >= 1410 then
+        UI_BASE.CreatureList = UI.InformationBase.PanelCreatureList.CreaturesBase.CreatureList
+        UI_BASE.InfoBase = UI.InformationBase.panelSelectCreature.InfoBase
+        UI_BASE.TextBase = UI.InformationBase.TextBase
+        UI_BASE.ItemBase = UI.InformationBase.ItemBase
+        UI_BASE.PriceBase = UI.InformationBase.verticalPanelUnLockClearChram.PriceBaseGold
+        UI_BASE.UnlockButton = UI.InformationBase.verticalPanelUnLockClearChram.UnlockButton
+        UI_BASE.SearchEdit = UI.InformationBase.PanelCreatureList.SearchEdit.SearchEdit
+        UI_BASE.SearchLabel = UI.InformationBase.SearchLabel
+        UI_BASE.CreaturesBase = UI.InformationBase.PanelCreatureList.CreaturesBase
+        UI_BASE.CreaturesLabel = UI.InformationBase.panelSelectCreature.CreaturesLabel
+    else
+        UI_BASE.CreatureList = UI.InformationBase.CreaturesBase.CreatureList
+        UI_BASE.InfoBase = UI.InformationBase.InfoBase
+        UI_BASE.TextBase = UI.InformationBase.TextBase
+        UI_BASE.ItemBase = UI.InformationBase.ItemBase
+        UI_BASE.PriceBase = UI.InformationBase.PriceBase
+        UI_BASE.UnlockButton = UI.InformationBase.UnlockButton
+        UI_BASE.SearchEdit = UI.InformationBase.SearchEdit
+        UI_BASE.SearchLabel = UI.InformationBase.SearchLabel
+        UI_BASE.CreaturesBase = UI.InformationBase.CreaturesBase
+        UI_BASE.CreaturesLabel = UI.InformationBase.CreaturesLabel
+    end
+    
+    UI_BASE.CreatureList:destroyChildren()
 
     local parent = widget:getParent()
-    local button = UI.InformationBase.UnlockButton
-    local value = UI.InformationBase.PriceBase.Value
+    local button = UI_BASE.UnlockButton
+    local value = UI_BASE.PriceBase.Value
 
     UI.InformationBase.data = widget.data
 
@@ -207,24 +338,28 @@ function Cyclopedia.selectCharm(widget, isChecked)
         widget:setChecked(true)
     end
 
-    UI.InformationBase.TextBase:setText(widget.data.description)
-    UI.InformationBase.ItemBase.image:setImageSource(widget.charmBase.image:getImageSource())
+    UI_BASE.TextBase:setText(widget.data.description)
+    UI_BASE.ItemBase.image:setImageSource(widget.charmBase.image:getImageSource())
+    UI_BASE.ItemBase.image:setImageClip(widget.charmBase.image:getImageClip())
 
+    if clientVersion >= 1410 then
+        UI.InformationBase:setText(widget:getText())
+    end
     if widget.data.asignedStatus then
-        UI.InformationBase.InfoBase.sprite:setVisible(true)
-        UI.InformationBase.InfoBase.sprite:setOutfit(g_things.getRaceData(widget.data.raceId).outfit)
-        UI.InformationBase.InfoBase.sprite:getCreature():setStaticWalking(1000)
-        UI.InformationBase.InfoBase.sprite:setOpacity(1)
+        UI_BASE.InfoBase.sprite:setVisible(true)
+        UI_BASE.InfoBase.sprite:setOutfit(g_things.getRaceData(widget.data.raceId).outfit)
+        UI_BASE.InfoBase.sprite:getCreature():setStaticWalking(1000)
+        UI_BASE.InfoBase.sprite:setOpacity(1)
     else
-        UI.InformationBase.InfoBase.sprite:setVisible(false)
+        UI_BASE.InfoBase.sprite:setVisible(false)
     end
 
     if widget.icon == 1 then
-        UI.InformationBase.PriceBase.Gold:setVisible(true)
-        UI.InformationBase.PriceBase.Charm:setVisible(false)
+        UI_BASE.PriceBase.Gold:setVisible(true)
+        UI_BASE.PriceBase.Charm:setVisible(false)
     else
-        UI.InformationBase.PriceBase.Gold:setVisible(false)
-        UI.InformationBase.PriceBase.Charm:setVisible(true)
+        UI_BASE.PriceBase.Gold:setVisible(false)
+        UI_BASE.PriceBase.Charm:setVisible(true)
     end
 
     if widget.icon == 1 and g_game.getLocalPlayer():getResourceBalance(1) then
@@ -254,14 +389,13 @@ function Cyclopedia.selectCharm(widget, isChecked)
 
         value:setText(widget.data.unlockPrice)
     end
-
-    if widget.data.unlocked and not widget.data.asignedStatus then
+    if (widget.data.unlocked and not widget.data.asignedStatus) or clientVersion >= 1410  then
         button:setText("Select")
 
         local color = "#484848"
 
         for index, raceId in ipairs(Cyclopedia.Charms.Monsters) do
-            local internalWidget = g_ui.createWidget("CharmCreatureName", UI.InformationBase.CreaturesBase.CreatureList)
+            local internalWidget = g_ui.createWidget("CharmCreatureName", UI_BASE.CreatureList)
             internalWidget:setId(index)
             internalWidget:setText(format(g_things.getRaceData(raceId).name))
             internalWidget.raceId = raceId
@@ -271,32 +405,50 @@ function Cyclopedia.selectCharm(widget, isChecked)
         end
 
         button:setEnabled(false)
-        UI.InformationBase.SearchEdit:setEnabled(true)
-        UI.InformationBase.SearchLabel:setEnabled(true)
-        UI.InformationBase.CreaturesLabel:setEnabled(true)
+        UI_BASE.SearchEdit:setEnabled(true)
+        if UI_BASE.SearchLabel then
+            UI_BASE.SearchLabel:setEnabled(true)
+        end
+        UI_BASE.CreaturesLabel:setEnabled(true)
     end
 
     if widget.data.asignedStatus then
         button:setText("Remove")
 
-        local internalWidget = g_ui.createWidget("CharmCreatureName", UI.InformationBase.CreaturesBase.CreatureList)
+        local internalWidget = g_ui.createWidget("CharmCreatureName", UI_BASE.CreatureList)
         internalWidget:setText(format(g_things.getRaceData(widget.data.raceId).name))
         internalWidget:setEnabled(false)
         internalWidget:setColor("#707070")
-        UI.InformationBase.SearchEdit:setEnabled(false)
-        UI.InformationBase.SearchLabel:setEnabled(false)
-        UI.InformationBase.CreaturesLabel:setEnabled(false)
+        UI_BASE.SearchEdit:setEnabled(false)
+        if UI_BASE.SearchLabel then
+        UI_BASE.SearchLabel:setEnabled(false)        
+
+        end
+        UI_BASE.CreaturesLabel:setEnabled(false)
     end
 
     if not widget.data.unlocked then
         button:setText("Unlock")
-        UI.InformationBase.SearchEdit:setEnabled(false)
-        UI.InformationBase.SearchLabel:setEnabled(false)
-        UI.InformationBase.CreaturesLabel:setEnabled(false)
+        UI_BASE.SearchEdit:setEnabled(false)
+        if UI_BASE.SearchLabel then
+
+        UI_BASE.SearchLabel:setEnabled(false)
+        end
+        UI_BASE.CreaturesLabel:setEnabled(false)
     end
 end
 
 function Cyclopedia.selectCreatureCharm(widget, isChecked)
+    local UI_BASE = {}
+    local clientVersion = g_game.getClientVersion()
+    
+    if clientVersion >= 1410 then
+        UI_BASE.InfoBase = UI.InformationBase.panelSelectCreature.InfoBase
+        UI_BASE.UnlockButton = UI.InformationBase.verticalPanelUnLockClearChram.UnlockButton
+    else
+        UI_BASE.InfoBase = UI.InformationBase.InfoBase
+        UI_BASE.UnlockButton = UI.InformationBase.UnlockButton
+    end
     local parent = widget:getParent()
 
     for i = 1, parent:getChildCount() do
@@ -312,17 +464,27 @@ function Cyclopedia.selectCreatureCharm(widget, isChecked)
         widget:setChecked(true)
     end
 
-    UI.InformationBase.InfoBase.sprite:setVisible(true)
-    UI.InformationBase.InfoBase.sprite:setOutfit(g_things.getRaceData(widget.raceId).outfit)
-    UI.InformationBase.InfoBase.sprite:getCreature():setStaticWalking(1000)
-    UI.InformationBase.InfoBase.sprite:setOpacity(0.5)
-    UI.InformationBase.UnlockButton:setEnabled(true)
+    UI_BASE.InfoBase.sprite:setVisible(true)
+    UI_BASE.InfoBase.sprite:setOutfit(g_things.getRaceData(widget.raceId).outfit)
+    UI_BASE.InfoBase.sprite:getCreature():setStaticWalking(1000)
+    UI_BASE.InfoBase.sprite:setOpacity(0.5)
+    UI_BASE.UnlockButton:setEnabled(true)
 
     Cyclopedia.Charms.SelectedCreature = widget.raceId
 end
 
 function Cyclopedia.searchCharmMonster(text)
-    UI.InformationBase.CreaturesBase.CreatureList:destroyChildren()
+    local clientVersion = g_game.getClientVersion()
+    local UI_BASE = {}
+    
+    if clientVersion >= 1410 then
+        UI_BASE.CreaturesBase = UI.InformationBase.PanelCreatureList.CreaturesBase
+    else
+        UI_BASE.CreaturesBase = UI.InformationBase.CreaturesBase
+    end
+
+
+    UI_BASE.CreaturesBase.CreatureList:destroyChildren()
 
     local function format(string)
         local capitalizedText = string:gsub("(%l)(%w*)", function(first, rest)
@@ -356,7 +518,7 @@ function Cyclopedia.searchCharmMonster(text)
     local color = "#484848"
 
     for _, raceId in ipairs(searchedMonsters) do
-        local internalWidget = g_ui.createWidget("CharmCreatureName", UI.InformationBase.CreaturesBase.CreatureList)
+        local internalWidget = g_ui.createWidget("CharmCreatureName", UI_BASE.CreaturesBase.CreatureList)
         internalWidget:setId(raceId)
         internalWidget:setText(format(g_things.getRaceData(raceId).name))
         internalWidget.raceId = raceId
@@ -477,4 +639,19 @@ function Cyclopedia.actionCharmButton(widget)
             )
         end
     end
+end
+
+function onTypeCharmRadioGroup(radioGroup, selectedWidget)
+    local charmCategory = selectedWidget:getId() == "MajorCharms" and charmCategory_t.CHARM_MAJOR or charmCategory_t.CHARM_MINOR
+    local CharmList = UI.mainPanelCharmsType.panelCharmList.CharmList
+    
+    for _, widget in ipairs(CharmList:getChildren()) do
+        if widget.category == charmCategory then
+            widget:setVisible(true)
+        else
+            widget:setVisible(false)
+        end
+    end
+    
+    CharmList:getLayout():update()
 end

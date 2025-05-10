@@ -1283,3 +1283,245 @@ int push_luavalue(const DailyRewardData& data) {
 
     return 1;
 }
+
+int push_luavalue(const CyclopediaCharacterOffenceStats& data)
+{
+    g_lua.createTable(0, 30);
+
+    g_lua.pushNumber(data.critChance);
+    g_lua.setField("critChance");
+
+    g_lua.pushNumber(data.critDamage);
+    g_lua.setField("critDamage");
+
+    g_lua.pushNumber(data.critDamageBase);
+    g_lua.setField("critDamageBase");
+
+    g_lua.pushNumber(data.critDamageImbuement);
+    g_lua.setField("critDamageImbuement");
+
+    g_lua.pushNumber(data.critDamageWheel);
+    g_lua.setField("critDamageWheel");
+
+    g_lua.pushNumber(data.lifeLeech);
+    g_lua.setField("lifeLeech");
+
+    g_lua.pushNumber(data.lifeLeechBase);
+    g_lua.setField("lifeLeechBase");
+
+    g_lua.pushNumber(data.lifeLeechImbuement);
+    g_lua.setField("lifeLeechImbuement");
+
+    g_lua.pushNumber(data.lifeLeechWheel);
+    g_lua.setField("lifeLeechWheel");
+
+    g_lua.pushNumber(data.manaLeech);
+    g_lua.setField("manaLeech");
+
+    g_lua.pushNumber(data.manaLeechBase);
+    g_lua.setField("manaLeechBase");
+
+    g_lua.pushNumber(data.manaLeechImbuement);
+    g_lua.setField("manaLeechImbuement");
+
+    g_lua.pushNumber(data.manaLeechWheel);
+    g_lua.setField("manaLeechWheel");
+
+    g_lua.pushNumber(data.onslaught);
+    g_lua.setField("onslaught");
+
+    g_lua.pushNumber(data.onslaughtBase);
+    g_lua.setField("onslaughtBase");
+
+    g_lua.pushNumber(data.onslaughtBonus);
+    g_lua.setField("onslaughtBonus");
+
+    g_lua.pushNumber(data.cleavePercent);
+    g_lua.setField("cleavePercent");
+
+    g_lua.createTable(data.perfectShotDamage.size(), 0);
+    for (size_t i = 0; i < data.perfectShotDamage.size(); ++i) {
+        g_lua.pushInteger(data.perfectShotDamage[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("perfectShotDamage");
+
+    g_lua.pushInteger(data.flatDamage);
+    g_lua.setField("flatDamage");
+
+    g_lua.pushInteger(data.flatDamageBase);
+    g_lua.setField("flatDamageBase");
+
+    g_lua.pushInteger(data.weaponAttack);
+    g_lua.setField("weaponAttack");
+
+    g_lua.pushInteger(data.weaponFlatModifier);
+    g_lua.setField("weaponFlatModifier");
+
+    g_lua.pushInteger(data.weaponDamage);
+    g_lua.setField("weaponDamage");
+
+    g_lua.pushInteger(data.weaponSkillType);
+    g_lua.setField("weaponSkillType");
+
+    g_lua.pushInteger(data.weaponSkillLevel);
+    g_lua.setField("weaponSkillLevel");
+
+    g_lua.pushInteger(data.weaponSkillModifier);
+    g_lua.setField("weaponSkillModifier");
+
+    g_lua.pushInteger(data.weaponElement);
+    g_lua.setField("weaponElement");
+
+    g_lua.pushNumber(data.weaponElementDamage);
+    g_lua.setField("weaponElementDamage");
+
+    g_lua.pushInteger(data.weaponElementType);
+    g_lua.setField("weaponElementType");
+
+    g_lua.createTable(data.weaponAccuracy.size(), 0);
+    for (size_t i = 0; i < data.weaponAccuracy.size(); ++i) {
+        g_lua.pushNumber(data.weaponAccuracy[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("weaponAccuracy");
+
+    return 1;
+}
+
+// In src/client/luavaluecasts_client.cpp
+int push_luavalue(const CyclopediaCharacterDefenceStats& data)
+{
+    g_lua.createTable(0, 20);
+
+    g_lua.pushNumber(data.dodgeTotal);
+    g_lua.setField("dodgeTotal");
+
+    g_lua.pushNumber(data.dodgeBase);
+    g_lua.setField("dodgeBase");
+
+    g_lua.pushNumber(data.dodgeBonus);
+    g_lua.setField("dodgeBonus");
+
+    g_lua.pushNumber(data.dodgeWheel);
+    g_lua.setField("dodgeWheel");
+
+    g_lua.pushInteger(data.magicShieldCapacity);
+    g_lua.setField("magicShieldCapacity");
+
+    g_lua.pushInteger(data.magicShieldCapacityFlat);
+    g_lua.setField("magicShieldCapacityFlat");
+
+    g_lua.pushNumber(data.magicShieldCapacityPercent);
+    g_lua.setField("magicShieldCapacityPercent");
+
+    g_lua.pushInteger(data.reflectPhysical);
+    g_lua.setField("reflectPhysical");
+
+    g_lua.pushInteger(data.armor);
+    g_lua.setField("armor");
+
+    g_lua.pushInteger(data.defense);
+    g_lua.setField("defense");
+
+    g_lua.pushInteger(data.defenseEquipment);
+    g_lua.setField("defenseEquipment");
+
+    g_lua.pushInteger(data.defenseSkillType);
+    g_lua.setField("defenseSkillType");
+
+    g_lua.pushInteger(data.shieldingSkill);
+    g_lua.setField("shieldingSkill");
+
+    g_lua.pushInteger(data.defenseWheel);
+    g_lua.setField("defenseWheel");
+
+    g_lua.pushNumber(data.mitigation);
+    g_lua.setField("mitigation");
+
+    g_lua.pushNumber(data.mitigationBase);
+    g_lua.setField("mitigationBase");
+
+    g_lua.pushNumber(data.mitigationEquipment);
+    g_lua.setField("mitigationEquipment");
+
+    g_lua.pushNumber(data.mitigationShield);
+    g_lua.setField("mitigationShield");
+
+    g_lua.pushNumber(data.mitigationWheel);
+    g_lua.setField("mitigationWheel");
+
+    g_lua.pushNumber(data.mitigationCombatTactics);
+    g_lua.setField("mitigationCombatTactics");
+
+    g_lua.createTable(data.resistances.size(), 0);
+    for (size_t i = 0; i < data.resistances.size(); ++i) {
+        g_lua.createTable(0, 2);
+        g_lua.pushInteger(data.resistances[i].element);
+        g_lua.setField("element");
+        g_lua.pushNumber(data.resistances[i].value);
+        g_lua.setField("value");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("resistances");
+
+    return 1;
+}
+
+// In src/client/luavaluecasts_client.cpp
+int push_luavalue(const CyclopediaCharacterMiscStats& data)
+{
+    g_lua.createTable(0, 14);
+
+    g_lua.pushNumber(data.momentumTotal);
+    g_lua.setField("momentumTotal");
+
+    g_lua.pushNumber(data.momentumBase);
+    g_lua.setField("momentumBase");
+
+    g_lua.pushNumber(data.momentumBonus);
+    g_lua.setField("momentumBonus");
+
+    g_lua.pushNumber(data.momentumWheel);
+    g_lua.setField("momentumWheel");
+
+    g_lua.pushNumber(data.dodgeTotal);
+    g_lua.setField("dodgeTotal");
+
+    g_lua.pushNumber(data.dodgeBase);
+    g_lua.setField("dodgeBase");
+
+    g_lua.pushNumber(data.dodgeBonus);
+    g_lua.setField("dodgeBonus");
+
+    g_lua.pushNumber(data.dodgeWheel);
+    g_lua.setField("dodgeWheel");
+
+    g_lua.pushNumber(data.damageReflectionTotal);
+    g_lua.setField("damageReflectionTotal");
+
+    g_lua.pushNumber(data.damageReflectionBase);
+    g_lua.setField("damageReflectionBase");
+
+    g_lua.pushNumber(data.damageReflectionBonus);
+    g_lua.setField("damageReflectionBonus");
+
+    g_lua.pushInteger(data.haveBlesses);
+    g_lua.setField("haveBlesses");
+
+    g_lua.pushInteger(data.totalBlesses);
+    g_lua.setField("totalBlesses");
+
+    g_lua.createTable(data.concoctions.size(), 0);
+    for (size_t i = 0; i < data.concoctions.size(); ++i) {
+        g_lua.createTable(0, 2);
+        g_lua.pushInteger(data.concoctions[i].id);
+        g_lua.setField("id");
+        g_lua.pushInteger(data.concoctions[i].duration);
+        g_lua.setField("duration");
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("concoctions");
+
+    return 1;
+}

@@ -559,7 +559,7 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	|                                              	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
 | Canary  <br> (13.21 / 13.32 / 13.40)       	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
-| Canary <br> (14.05)        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ❌             	|
+| Canary <br> (14.00 ~ 14.12)        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
 
 
 

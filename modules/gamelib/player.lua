@@ -68,6 +68,32 @@ Icons[PlayerStates.NewManaShield] = {  clip = 27, tooltip = tr('You are NewManaS
 Icons[PlayerStates.Agony] = { clip = 28, tooltip = tr('You are Agony'),  id = 'condition_Agony' }
 Icons[PlayerStates.Rewards] = { clip = 30, tooltip = tr('Rewards'),  id = 'condition_Rewards' }
 
+combatStates= {
+	CLIENT_COMBAT_PHYSICAL = 0,
+	CLIENT_COMBAT_FIRE = 1,
+	CLIENT_COMBAT_EARTH = 2,
+	CLIENT_COMBAT_ENERGY = 3,
+	CLIENT_COMBAT_ICE = 4,
+	CLIENT_COMBAT_HOLY = 5,
+	CLIENT_COMBAT_DEATH = 6,
+	CLIENT_COMBAT_HEALING = 7,
+	CLIENT_COMBAT_DROWN = 8,
+	CLIENT_COMBAT_LIFEDRAIN = 9,
+	CLIENT_COMBAT_MANADRAIN = 10,
+}
+clientCombat ={}
+clientCombat[combatStates.CLIENT_COMBAT_PHYSICAL] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-physical-resist', id = 'Physical' }
+clientCombat[combatStates.CLIENT_COMBAT_FIRE] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-fire-resist', id = 'Fire' }
+clientCombat[combatStates.CLIENT_COMBAT_EARTH] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-earth-resist', id = 'Earth' }
+clientCombat[combatStates.CLIENT_COMBAT_ENERGY] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-energy-resist', id = 'Energy' }
+clientCombat[combatStates.CLIENT_COMBAT_ICE] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-ice-resist', id = 'Ice' }
+clientCombat[combatStates.CLIENT_COMBAT_HOLY] = {path = '/game_cyclopedia/images/bestiary/icons/monster-icon-holy-resist', id = 'Holy' }
+clientCombat[combatStates.CLIENT_COMBAT_DEATH] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-death-resist', id = 'Death' }
+clientCombat[combatStates.CLIENT_COMBAT_HEALING] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-healing-resist', id = 'Healing' }
+clientCombat[combatStates.CLIENT_COMBAT_DROWN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-drowning-resist', id = 'Drown' }
+clientCombat[combatStates.CLIENT_COMBAT_LIFEDRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-lifedrain-resist', id = 'Lifedrain ' }
+clientCombat[combatStates.CLIENT_COMBAT_MANADRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-manadrain-resist', id = 'Manadrain' }
+
 InventorySlotOther = 0
 InventorySlotHead = 1
 InventorySlotNeck = 2

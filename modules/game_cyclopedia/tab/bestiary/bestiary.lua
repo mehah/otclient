@@ -34,6 +34,9 @@ function showBestiary()
     controllerCyclopedia.ui.CharmsBase:setVisible(true)
     controllerCyclopedia.ui.GoldBase:setVisible(true)
     controllerCyclopedia.ui.BestiaryTrackerButton:setVisible(true)
+    if g_game.getClientVersion() >= 1410 then
+        controllerCyclopedia.ui.CharmsBase1410:hide()
+    end
     g_game.requestBestiary()
 end
 
