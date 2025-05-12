@@ -1,0 +1,9 @@
+Module
+  name: game_shop
+  description: In-game shop
+  author: MatC, Nottinghster
+  website: None
+  sandboxed: true
+  scripts: [ game_shop ]
+  @onLoad: init()
+  @onUnload: terminate()

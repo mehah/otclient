@@ -398,7 +398,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
    <summary>Layout based on tibia 13 by @marcosvf132</summary>
 
   - by [@marcosvf132](https://github.com/marcosvf132)
-  - Game_shop v8
+  - Game_shop based in Store by [@Oskar1121](https://github.com/Oskar1121/Store) and modified/fixed by [@Nottinghster](https://github.com/Nottinghster/)
   - Minimap WorldTime
 
     - tfs c++(old): `void ProtocolGame::sendWorldTime()`
