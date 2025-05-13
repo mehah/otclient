@@ -75,6 +75,8 @@ function onExtendedOpcode(protocol, code, buffer)
         onGameShopFetchBase(data)
     elseif action == "fetchOffers" then
         onGameShopFetchOffers(data)
+    elseif action == "fetchDescription" then
+        onGameShopFetchDescription(data)
     elseif action == "points" then
         onGameShopUpdatePoints(data)
     elseif action == "history" then
@@ -195,10 +197,6 @@ function updateHistory()
 end
 
 function onGameShopUpdateHistory(historyList)
-    -- date
-    -- price
-    -- name
-    -- count
     currentPage = 1
     history = historyList
     totalPages = math.max(1, math.ceil(#history / entriesPerPage))
@@ -264,14 +262,6 @@ function buyPoints()
 end
 
 function onGameShopFetchOffers(data)
-    -- parent
-    -- name
-    -- id
-    -- price
-    -- isSecondPrice
-    -- count
-    -- description
-    -- categoryId
     offers[data.category] = data.offers
     if not selected and data.category == "Premium Time" then
         select(gameShopWindow:getChildById("categoriesList"):getChildren()[1]:getChildById("button"))
@@ -279,14 +269,7 @@ function onGameShopFetchOffers(data)
 end
 
 function addCategory(data)
-    -- title
-    -- parent
-    -- iconId
-    -- categoryId
-    -- description
-
     categories[data.title] = data
-
     local categoriesList = gameShopWindow:getChildById("categoriesList")
     local category
     if data.parent then
@@ -471,15 +454,19 @@ function updateDescription(self)
     local descriptionPanel = offerDetails:getChildById("description")
     local widget = descriptionPanel:getChildren()[1]
     if not widget then
-        widget = g_ui.createWidget("OfferDescripionLabel", descriptionPanel)
+        widget = g_ui.createWidget("OfferDescriptionLabel", descriptionPanel)
     end
 
-    local description = categories[self.categoryId].description
-    if not description or description == "" then
-        description = self.data.description
-    end
-
-    widget:setText(description)
+    g_game.getProtocolGame():sendExtendedOpcode(
+        GAME_SHOP_CODE,
+        json.encode({
+            action = "getDescription",
+            data = {
+                category = self.categoryId,
+                name = self.data.name
+            }
+        })
+    )
 
     local buyButton = offerDetails:getChildById("buyButton")
     local priceWidget = offerDetails:getChildById("price")
@@ -534,7 +521,6 @@ function updateDescription(self)
         image:show()
         image:setImageSource("/game_shop/images/" .. self.data.id)
     elseif type(self.data.id) == "number" then
-        -- local categoryId = categories[self.categoryId].categoryId
         local categoryId = self.offerCategoryId
         if categoryId == CATEGORY_ITEM then
             item:show()
@@ -548,6 +534,21 @@ function updateDescription(self)
             mount:setOutfit({type = self.data.id})
         end
     end
+end
+
+function onGameShopFetchDescription(data)
+    if not selectedOffer or selectedOffer.data.name ~= data.name then
+        return
+    end
+
+    local offersPanel = gameShopWindow:getChildById("offers")
+    local offerDetails = offersPanel:getChildById("offerDetails")
+    local descriptionPanel = offerDetails:getChildById("description")
+    local widget = descriptionPanel:getChildren()[1]
+    if not widget then
+        widget = g_ui.createWidget("OfferDescriptionLabel", descriptionPanel)
+    end
+    widget:setText(data.description)
 end
 
 function onOfferBuy(self)

@@ -183,7 +183,7 @@ OfferBuyPrice < FlatPanel
   $on:
     icon: images/coin_second
 
-OfferDescripionLabel < Label
+OfferDescriptionLabel < Label
   text-align: topLeft
   text-wrap: true
   text-vertical-auto-resize: true
