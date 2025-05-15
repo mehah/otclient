@@ -288,8 +288,3 @@ void EventDispatcher::ThreadTask::try_unlock() {
         mutex.unlock();
     }
 }
-
-const std::unique_ptr<EventDispatcher::ThreadTask>& EventDispatcher::getThreadTask() const {
-    const auto id = stdext::getThreadId();
-    return m_threads[id % g_asyncDispatcher.get_thread_count()];
-}

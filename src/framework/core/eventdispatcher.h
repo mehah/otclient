@@ -121,7 +121,9 @@ private:
     inline void executeDeferEvents();
     inline void executeScheduledEvents();
 
-    const std::unique_ptr<ThreadTask>& getThreadTask() const;
+    const std::unique_ptr<ThreadTask>& getThreadTask() const {
+        return m_threads[stdext::getThreadId() % m_threads.size()];
+    }
 
     size_t m_pollEventsSize{};
     bool m_disabled{ false };
