@@ -364,6 +364,10 @@ function selectOffer(self)
 
     self:setChecked(true)
     selectedOffer = self
+    
+    if not selectedOffer.categoryId then
+        selectedOffer.categoryId = selected:getId()
+    end
 
     updateDescription(self)
 end
@@ -457,12 +461,17 @@ function updateDescription(self)
         widget = g_ui.createWidget("OfferDescriptionLabel", descriptionPanel)
     end
 
+    local categoryToUse = self.data.originalCategory or self.categoryId
+    if self.categoryId == searchResultCategoryId and not self.data.originalCategory then
+        categoryToUse = self.data.parent
+    end
+
     g_game.getProtocolGame():sendExtendedOpcode(
         GAME_SHOP_CODE,
         json.encode({
             action = "getDescription",
             data = {
-                category = self.categoryId,
+                category = categoryToUse,
                 name = self.data.name
             }
         })
@@ -521,7 +530,7 @@ function updateDescription(self)
         image:show()
         image:setImageSource("/game_shop/images/" .. self.data.id)
     elseif type(self.data.id) == "number" then
-        local categoryId = self.offerCategoryId
+        local categoryId = self.offerCategoryId or self.data.offerCategoryId
         if categoryId == CATEGORY_ITEM then
             item:show()
             item:setItemId(self.data.id)
@@ -537,7 +546,17 @@ function updateDescription(self)
 end
 
 function onGameShopFetchDescription(data)
-    if not selectedOffer or selectedOffer.data.name ~= data.name then
+    if not selectedOffer then
+        return
+    end
+    
+    if selectedOffer.data.name ~= data.name then
+        return
+    end
+    
+    if selectedOffer.categoryId == searchResultCategoryId and 
+       data.category and selectedOffer.data.originalCategory and 
+       data.category ~= selectedOffer.data.originalCategory then
         return
     end
 
@@ -621,7 +640,8 @@ function buyConfirmed()
                         price = msgWindow.price,
                         name = selectedOffer.data.name,
                         id = selectedOffer.data.id,
-                        parent = selectedOffer.data.parent
+                        parent = selectedOffer.data.parent,
+                        originalCategory = selectedOffer.data.originalCategory
                     }
                 }
             )
@@ -833,9 +853,14 @@ function onSearch()
     local searchTerm = text:lower()
 
     for categoryId, offerData in pairs(offers) do
-        for _, offer in pairs(offerData) do
-            if string.find(offer.name:lower(), searchTerm) then
-                table.insert(results, offer)
+        if categoryId ~= searchResultCategoryId then
+            for _, offer in pairs(offerData) do
+                if string.find(offer.name:lower(), searchTerm) then
+                    local offerCopy = table.copy(offer)
+                    offerCopy.originalCategory = categoryId
+                    offerCopy.offerCategoryId = offer.categoryId
+                    table.insert(results, offerCopy)
+                end
             end
         end
     end

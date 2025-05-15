@@ -57,6 +57,10 @@ function gameShopInitialize()
 	addItem("Premium Time", "180 Days of Premium Time", "180_days", 1500, false, 180, PREMIUM_DESCRIPTION)
 	addItem("Premium Time", "360 Days of Premium Time", "360_days", 3000, false, 360, PREMIUM_DESCRIPTION)
 
+	addCategory(nil, "Rookgaard Items", 12, CATEGORY_ITEM)
+	addItem("Rookgaard Items", "Health Potion", 7618, 6, false, 5, HEALTH_POTION_DESCRIPTION)
+	addItem("Rookgaard Items", "Mana Potion", 7620, 6, false, 5, MANA_POTION_DESCRIPTION)
+
 	addCategory(nil, "Consumables", 6, CATEGORY_NONE)
 	addCategory("Consumables", "Blessings", 8, CATEGORY_BLESSING)
 	addItem("Blessings", "All regular Blessings", "All_regular_Blessings", 130, false, -1, BLESSING_DESCRIPTION)
@@ -274,8 +278,8 @@ function gameShopInitialize()
 
 	addCategory(nil, "Extras", 9, CATEGORY_NONE)
 	addCategory("Extras", "Extra Services", 7, CATEGORY_EXTRAS)
-	addItem("Extra Services", "Name Change", "Name_Change", 250, false, 1, "Tired of your current character name? Purchase a new one!\n\n\n- only usable by purchasing character\n- relog required after purchase to finalise the name change")
-	addItem("Extra Services", "Sex Change", "Sex_Change", 120, false, 1, "Turns your female character into a male one - or vice versa.\n\n\n- only usable by purchasing character\n- activated at purchase\n- you will keep all outfits you have purchased or earned in quest")
+	addItem("Extra Services", "Name Change", "Name_Change", 250, false, 1, "Tired of your current character name? Purchase a new one!\n\n- only usable by purchasing character\n- relog required after purchase to finalise the name change")
+	addItem("Extra Services", "Sex Change", "Sex_Change", 120, false, 1, "Turns your female character into a male one - or vice versa.\n\n- only usable by purchasing character\n- activated at purchase\n- you will keep all outfits you have purchased or earned in quest")
 	
 	addCategory("Extras", "Useful Things", 24, CATEGORY_EXTRAS)
 	addItem("Useful Things", "Temple Teleport", "Temple_Teleport", 15, false, 1, "Teleports you instantly to your home temple.\n\n- only usable by purchasing character\n- use it to teleport you to your home temple\n- cannot be used while having a battle sign or a protection zone block")
@@ -665,20 +669,53 @@ function gameShopFetch(player)
     gameShopUpdatePoints(player)
     gameShopUpdateHistory(player)
 
-    player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "fetchBase", data = {categories = GAME_SHOP.categories, url = DONATION_URL}}))
+    local isRookgaard = player:getVocation():getId() == 0
+    local filteredCategories = {}
+    
+    for _, category in ipairs(GAME_SHOP.categories) do
+        if isRookgaard then
+            if category.title == "Rookgaard Items" or category.title == "Premium Time" then
+                table.insert(filteredCategories, category)
+            end
+        else
+            if category.title ~= "Rookgaard Items" then
+                table.insert(filteredCategories, category)
+            end
+        end
+    end
+
+    player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "fetchBase", data = {categories = filteredCategories, url = DONATION_URL}}))
 
     for category, offersTable in pairs(GAME_SHOP.offers) do
-        local offersWithoutDesc = {}
-        for _, offer in ipairs(offersTable) do
-            local offerCopy = {}
-            for k, v in pairs(offer) do
-                if k ~= "description" then
-                    offerCopy[k] = v
+        if isRookgaard then
+            if category == "Rookgaard Items" or category == "Premium Time" then
+                local offersWithoutDesc = {}
+                for _, offer in ipairs(offersTable) do
+                    local offerCopy = {}
+                    for k, v in pairs(offer) do
+                        if k ~= "description" then
+                            offerCopy[k] = v
+                        end
+                    end
+                    table.insert(offersWithoutDesc, offerCopy)
                 end
+                player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "fetchOffers", data = {category = category, offers = offersWithoutDesc}}))
             end
-            table.insert(offersWithoutDesc, offerCopy)
+        else
+            if category ~= "Rookgaard Items" then
+                local offersWithoutDesc = {}
+                for _, offer in ipairs(offersTable) do
+                    local offerCopy = {}
+                    for k, v in pairs(offer) do
+                        if k ~= "description" then
+                            offerCopy[k] = v
+                        end
+                    end
+                    table.insert(offersWithoutDesc, offerCopy)
+                end
+                player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "fetchOffers", data = {category = category, offers = offersWithoutDesc}}))
+            end
         end
-        player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "fetchOffers", data = {category = category, offers = offersWithoutDesc}}))
     end
 end
 
