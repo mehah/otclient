@@ -534,8 +534,9 @@ function onRegenerationChange(localPlayer, regenerationTime)
     end
     setSkillValue('regenerationTime', fmt)
     checkAlert('regenerationTime', regenerationTime, false, alert)
-    local gameInterface = modules.game_interface
-    gameInterface.StatsBar.onHungryChange(regenerationTime, alert)
+    if g_game.getFeature(GameEnterGameShowAppearance) then
+        modules.game_interface.StatsBar.onHungryChange(regenerationTime, alert)
+    end
 end
 
 function onSpeedChange(localPlayer, speed)

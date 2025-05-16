@@ -669,7 +669,7 @@ function StatsBar.terminate()
     StatsBar.destroyAllBars()
 end
 
-function StatsBar.onHungryChange(regenerationTime,alert)
+function StatsBar.onHungryChange(regenerationTime, alert)
     local contents = getStatsBarsIconContent()
     local info = Icons[PlayerStates.Hungry]
     if regenerationTime <= alert then
