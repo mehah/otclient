@@ -55,7 +55,7 @@ function reloadMainPanelSizes()
                     local specials_height = calculatePanelHeightFromPanel(specials_panel, 18, 18, 2) 
 
                     local max_panel_height = math.max(options_height, specials_height)
-                    panel:setHeight(panel:getHeight() + max_panel_height)
+                    panel:setHeight(panel:getHeight() + max_panel_height + 5)
                     height = height + options_height
 
                     local store_panel = panel.onPanel.store
@@ -74,7 +74,7 @@ function reloadMainPanelSizes()
         end
     end
 
-    main:setHeight(height)
+    main:setHeight(height - 10)
     rightPanel:fitAll()
 end
 
