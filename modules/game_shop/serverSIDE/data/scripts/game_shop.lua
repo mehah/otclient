@@ -2,6 +2,15 @@ local DONATION_URL = "https://github.com/mehah/otclient"
 local GAME_SHOP = nil
 local SECOND_CURRENCY_ENABLED = false
 
+if not GlobalStorage then
+    GlobalStorage = {}
+end
+GlobalStorage.GameShopRefreshCount = 89412
+
+local pointsCache = {}
+local secondPointsCache = {}
+local shopInitialized = false
+
 local LoginEvent = CreatureEvent("GameShopLogin")
 
 local chars = {
@@ -28,6 +37,28 @@ local minChars = 2
 
 function LoginEvent.onLogin(player)
 	player:registerEvent("GameShopExtended")
+	
+	local accountId = player:getAccountId()
+	
+	local resultId = db.storeQuery("SELECT `points`, `points_second` FROM `znote_accounts` WHERE `id` = " .. accountId)
+	if resultId ~= false then
+		local points = result.getDataInt(resultId, "points")
+		local secondPoints = result.getDataInt(resultId, "points_second")
+		result.free(resultId)
+		
+		pointsCache[accountId] = {
+			points = points,
+			time = os.time()
+		}
+		
+		if SECOND_CURRENCY_ENABLED then
+			secondPointsCache[accountId] = {
+				points = secondPoints,
+				time = os.time()
+			}
+		end
+	end
+	
 	return true
 end
 
@@ -45,6 +76,10 @@ local PREMIUM_DESCRIPTION = "Enhance your gaming experience by gaining additiona
 local BLESSING_DESCRIPTION = "Reduces your character's chance to lose any items as well as the amount of your character's experience and skill loss upon death:\n\n* 1 blessing = 8.00% less Skill / XP loss, 30% equipment protection\n* 2 blessing = 16.00% less Skill / XP loss, 55% equipment protection\n* 3 blessing = 24.00% less Skill / XP loss, 75% equipment protection\n* 4 blessing = 32.00% less Skill / XP loss, 90% equipment protection\n* 5 blessing = 40.00% less Skill / XP loss, 100% equipment protection\n* 6 blessing = 48.00% less Skill / XP loss, 100% equipment protection\n* 7 blessing = 56.00% less Skill / XP loss, 100% equipment protection\n\n- only usable by purchasing character\n- maximum amount that can be owned by character: 5\n- added directly to the Record of Blessings\n- characters with a red or black skull will always lose all equipment upon death"
 
 function gameShopInitialize()
+	if shopInitialized then
+		return
+	end
+	
 	GAME_SHOP = {
 		categories = {},
 		categoriesId = {},
@@ -276,6 +311,9 @@ function gameShopInitialize()
 	addItem("Outfits", "Insectoid", 465, 450, false, 1, "Do you worship warm temperatures and are opposed to the thought of long and dark winter nights? Do you refuse to spend countless evenings in front of your chimney while ice-cold wind whistles through the cracks and niches of your house? It is time to stop freezing and to become an honourable Sun Priest! With this stylish outfit, you can finally show the world your unconditional dedication and commitment to the sun!")
 	addItem("Outfits", "Entrepreneur", 472, 450, false, 1, "The mutated pumpkin is too weak for your mighty weapons? Time to show that evil vegetable how to scare the living daylight out of people! Put on a scary looking pumpkin on your head and spread terror and fear amongst the Tibian population.")
 
+	addCategory(nil, "Boosts", 17, CATEGORY_EXTRAS)
+	addItem("Boosts", "XP Boost", "XP_Boost", 30, false, 1, "Purchase a boost that increases the experience points your character gains from hunting by 50%!\n\n* only usable by purchasing character\n* lasts for 1 hour hunting time\n* paused if stamina falls under 14 hours\n* cannot be purchased if an XP boost is already active")
+
 	addCategory(nil, "Extras", 9, CATEGORY_NONE)
 	addCategory("Extras", "Extra Services", 7, CATEGORY_EXTRAS)
 	addItem("Extra Services", "Name Change", "Name_Change", 250, false, 1, "Tired of your current character name? Purchase a new one!\n\n- only usable by purchasing character\n- relog required after purchase to finalise the name change")
@@ -283,6 +321,8 @@ function gameShopInitialize()
 	
 	addCategory("Extras", "Useful Things", 24, CATEGORY_EXTRAS)
 	addItem("Useful Things", "Temple Teleport", "Temple_Teleport", 15, false, 1, "Teleports you instantly to your home temple.\n\n- only usable by purchasing character\n- use it to teleport you to your home temple\n- cannot be used while having a battle sign or a protection zone block")
+	
+	shopInitialized = true
 end
 
 function addCategory(parent, title, iconId, categoryId, description)
@@ -329,6 +369,8 @@ function gameShopPurchase(player, offer)
 		if offers[i].name == offer.name and offers[i].price == offer.price and offers[i].count == offer.count then
 			local points = 0
 			local query = ""
+			local accountId = player:getAccountId()
+			
 			if offers[i].isSecondPrice then
 				points = getSecondCurrency(player)
 				query = "points_second"
@@ -347,19 +389,51 @@ function gameShopPurchase(player, offer)
 				return errorMsg(player, status)
 			end
 
-			local aid = player:getAccountId()
-			local escapeName = db.escapeString(offers[i].name)
-			local escapePrice = db.escapeString(-offers[i].price)
-			local escapeIsSecondPrice = db.escapeString(offers[i].isSecondPrice and "1" or "0")
-			local escapeCount = offers[i].count and db.escapeString(offers[i].count) or 0
-			if GAME_SHOP.categoriesId[offer.parent] == CATEGORY_PREMIUM then
-				escapeCount = 0
+			local queryData = {
+				"UPDATE `znote_accounts` set `", 
+				query, 
+				"` = `", 
+				query, 
+				"` - ", 
+				tostring(offers[i].price), 
+				" WHERE `id` = ", 
+				tostring(accountId)
+			}
+			
+			db.query(table.concat(queryData))
+			
+			if offers[i].isSecondPrice then
+				if secondPointsCache[accountId] then
+					secondPointsCache[accountId].points = secondPointsCache[accountId].points - offers[i].price
+					secondPointsCache[accountId].time = os.time()
+				end
+			else
+				if pointsCache[accountId] then
+					pointsCache[accountId].points = pointsCache[accountId].points - offers[i].price
+					pointsCache[accountId].time = os.time()
+				end
 			end
-
-			db.query("UPDATE `znote_accounts` set `" .. query .. "` = `" .. query .. "` - " .. offers[i].price .. " WHERE `id` = " .. aid)
-			db.asyncQuery("INSERT INTO `shop_history` VALUES (NULL, " .. aid .. ", " .. player:getGuid() .. ", NOW(), " .. escapeName .. ", " .. escapePrice .. ", " .. escapeIsSecondPrice .. ", " .. escapeCount .. ", NULL)")
-			addEvent(gameShopUpdateHistory, 1000, player:getId())
-			addEvent(gameShopUpdatePoints, 1000, player:getId())
+			
+			local historyData = {
+				"INSERT INTO `shop_history` VALUES (NULL, ", 
+				tostring(accountId), 
+				", ", 
+				tostring(player:getGuid()), 
+				", NOW(), ",
+				db.escapeString(offers[i].name),
+				", ",
+				tostring(-offers[i].price),
+				", ",
+				offers[i].isSecondPrice and "1" or "0",
+				", ",
+				tostring(offers[i].count or 0),
+				", NULL)"
+			}
+			
+			db.asyncQuery(table.concat(historyData))
+			
+			addEvent(updatePlayerShopData, 1000, player:getId())
+			
 			return infoMsg(player, "You've bought " .. offers[i].name .. "!", true)
 		end
 	end
@@ -469,6 +543,8 @@ function defaultExtrasCallback(player, offer)
 		return defaultChangeSexCallback(player)
 	elseif offer.name == "Temple Teleport" then
 		return defaultTeleportCallback(player)
+	elseif offer.name == "XP Boost" then
+		return defaultXPBoostCallback(player)
 	end
 
 	return "Something went wrong, extra service couldn't be executed."
@@ -539,6 +615,28 @@ function defaultTeleportCallback(player, offer)
 	return false
 end
 
+function defaultXPBoostCallback(player, offer)
+	local boostStorage = 693690
+	local boostDuration = 3600
+    local currentBoostEnd = player:getStorageValue(boostStorage)
+    local currentStamina = player:getStamina()
+
+    if currentBoostEnd >= os.time() and currentStamina > 14 * 60 then
+        return "You already have an XP boost active!"
+    end
+
+    local newBoostEnd = os.time() + boostDuration
+
+    if currentStamina <= 14 * 60 then
+        local remainingStaminaTime = currentStamina * 60
+        newBoostEnd = os.time() + remainingStaminaTime
+    end
+
+    player:setStorageValue(boostStorage, newBoostEnd)
+    player:sendTextMessage(MESSAGE_STATUS_CONSOLE_ORANGE, "Your one hour XP boost has started! You will gain 50% extra experience while hunting.")
+	return false
+end
+
 function getValid(name, opt)
     local function tchelper(first, rest)
         return first:upper()..rest:lower()
@@ -547,34 +645,44 @@ function getValid(name, opt)
     return opt and name:gsub("(%a)([%w_']*)", tchelper) or name:gsub("^%l", string.upper)
 end
 
-function wordCount(str)
-    local count = 0
-    for word in string.gmatch(str, "%a+") do
-        count = count + 1
-    end
-
-    return count
-end
-
 function validName(name)
     if not name then
 		return false
 	end
 
-	if name:len() < minChars then
+	local len = name:len()
+	if len < minChars or len > maxLength then
 		return false
 	end
-
-	for i = 1, #forbiddenWords do
-		for word in string.gmatch(name, "%a+") do
-			if word:lower() == forbiddenWords[i] then
+	
+	if string.find(name, "  ") then
+		return false
+	end
+	
+	local wordCount = 1
+	for i = 1, len do
+		if name:sub(i, i) == " " then
+			wordCount = wordCount + 1
+			if wordCount > maxWords then
 				return false
 			end
 		end
 	end
 
-    for i = 1, name:len() do
-        if not(isInArray(chars, name:sub(i,i))) or wordCount(name) > maxWords or name:len() > maxLength or string.find(name, "  ") then
+	local lowerName = name:lower()
+	for _, word in ipairs(forbiddenWords) do
+		if string.find(lowerName, "%f[%a]" .. word .. "%f[%A]") then
+			return false
+		end
+	end
+
+    local charsSet = {}
+    for i = 1, #chars do
+        charsSet[chars[i]] = true
+    end
+    
+    for i = 1, len do
+        if not charsSet[name:sub(i, i)] then
             return false
         end
     end
@@ -586,9 +694,15 @@ function gameShopUpdateHistory(player)
 	if type(player) == "number" then
 		player = Player(player)
 	end
+	
+	if not player then
+		return
+	end
 
 	local history = {}
-	local resultId = db.storeQuery("SELECT * FROM `shop_history` WHERE `account` = " .. player:getAccountId() .. " order by `id` DESC")
+	local accountId = player:getAccountId()
+	
+	local resultId = db.storeQuery("SELECT * FROM `shop_history` WHERE `account` = " .. accountId .. " ORDER BY `id` DESC LIMIT 50")
 	if resultId ~= false then
 		repeat
 			table.insert(history, {
@@ -609,17 +723,15 @@ local ExtendedEvent = CreatureEvent("GameShopExtended")
 
 function ExtendedEvent.onExtendedOpcode(player, opcode, buffer)
     if opcode == ExtendedOPCodes.CODE_GAMESHOP then
-        if not GAME_SHOP then
+        if not shopInitialized then
             gameShopInitialize()
-            addEvent(refreshPlayersPoints, 10 * 1000)
+            if getGlobalStorageValue(GlobalStorage.GameShopRefreshCount) == -1 then
+                setGlobalStorageValue(GlobalStorage.GameShopRefreshCount, 0)
+                addEvent(refreshPlayersPoints, 10 * 1000)
+            end
         end
 
-        local status, json_data =
-            pcall(
-            function()
-                return json.decode(buffer)
-            end
-        )
+        local status, json_data = pcall(function() return json.decode(buffer) end)
         if not status then
             return
         end
@@ -674,7 +786,7 @@ function gameShopFetch(player)
     
     for _, category in ipairs(GAME_SHOP.categories) do
         if isRookgaard then
-            if category.title == "Rookgaard Items" or category.title == "Premium Time" then
+            if category.title == "Rookgaard Items" or category.title == "Premium Time" or category.title == "Boosts" then
                 table.insert(filteredCategories, category)
             end
         else
@@ -723,19 +835,36 @@ function gameShopUpdatePoints(player)
 	if type(player) == "number" then
 		player = Player(player)
 	end
+	
+	if not player then
+		return
+	end
 
-	player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "points", data = {
-		points = getPoints(player), secondPoints = getSecondCurrency(player)}}))
+	player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({
+		action = "points", 
+		data = {
+			points = getPoints(player), 
+			secondPoints = getSecondCurrency(player)
+		}
+	}))
 end
 
 function gameShopUpdatePointsAndRemovePlayer(player)
 	if type(player) == "number" then
 		player = Player(player)
 	end
+	
+	if not player then
+		return
+	end
 
-	player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "points", data = {
-		points = getPoints(player), secondPoints = getSecondCurrency(player)}}))
-	player:remove()
+	gameShopUpdatePoints(player)
+	
+	addEvent(function()
+		if player then
+			player:remove()
+		end
+	end, 500)
 end
 
 function gameShopChangeName(player, offer)
@@ -777,8 +906,7 @@ function gameShopChangeName(player, offer)
 			db.query("UPDATE `znote_accounts` set `points` = `points` - " .. offers[i].price .. " WHERE `id` = " .. aid)
 			db.asyncQuery("INSERT INTO `shop_history` VALUES (NULL, '" .. aid .. "', '" .. player:getGuid() .. "', NOW(), " .. escapeTitle .. ", " .. escapePrice .. ", " .. escapeIsSecondPrice .. ", " .. escapeCount .. ", NULL)")
 
-			addEvent(gameShopUpdateHistory, 1000, player:getId())
-			addEvent(gameShopUpdatePointsAndRemovePlayer, 1000, player:getId())
+			addEvent(updatePlayerShopData, 1000, player:getId())
 			return infoMsg(player, "You've bought " .. offers[i].title .. "! Please log out of your account and join us with your new name already set.", true)
 		end
 	end
@@ -844,13 +972,11 @@ function gameShopTransferCoins(player, transfer)
 		db.asyncQuery("INSERT INTO `shop_history` VALUES (NULL, '" .. accountId .. "', '" .. GUID .. "', NOW(), " .. escapeTitle .. ", " .. db.escapeString(amountSecond) .. ", 1, 1, " .. db.escapeString(player:getName()) .. ")")
 	end
 
-	addEvent(gameShopUpdateHistory, 1000, player:getId())
-	addEvent(gameShopUpdatePoints, 1000, player:getId())
+	addEvent(updatePlayerShopData, 1000, player:getId())
 	
 	local targetPlayer = Player(receiver)
 	if targetPlayer then
-		addEvent(gameShopUpdateHistory, 1000, targetPlayer:getId())
-		addEvent(gameShopUpdatePoints, 1000, targetPlayer:getId())
+		addEvent(updatePlayerShopData, 1000, targetPlayer:getId())
 	end
 	
 	local message = "You've sent "
@@ -866,11 +992,22 @@ function gameShopTransferCoins(player, transfer)
 end
 
 function getPoints(player)
+	local accountId = player:getAccountId()
+	
+	if pointsCache[accountId] and pointsCache[accountId].time > os.time() - 300 then
+		return pointsCache[accountId].points
+	end
+	
 	local points = 0
-	local resultId = db.storeQuery("SELECT `points` FROM `znote_accounts` WHERE `id` = " .. player:getAccountId())
+	local resultId = db.storeQuery("SELECT `points` FROM `znote_accounts` WHERE `id` = " .. accountId)
 	if resultId ~= false then
 		points = result.getDataInt(resultId, "points")
 		result.free(resultId)
+		
+		pointsCache[accountId] = {
+			points = points,
+			time = os.time()
+		}
 	end
 
 	return points
@@ -881,11 +1018,22 @@ function getSecondCurrency(player)
 		return -1
 	end
 
+	local accountId = player:getAccountId()
+	
+	if secondPointsCache[accountId] and secondPointsCache[accountId].time > os.time() - 300 then
+		return secondPointsCache[accountId].points
+	end
+	
 	local points = 0
-	local resultId = db.storeQuery("SELECT `points_second` FROM `znote_accounts` WHERE `id` = " .. player:getAccountId())
+	local resultId = db.storeQuery("SELECT `points_second` FROM `znote_accounts` WHERE `id` = " .. accountId)
 	if resultId ~= false then
 		points = result.getDataInt(resultId, "points_second")
 		result.free(resultId)
+		
+		secondPointsCache[accountId] = {
+			points = points,
+			time = os.time()
+		}
 	end
 
 	return points
@@ -912,7 +1060,29 @@ function refreshPlayersPoints()
 	addEvent(refreshPlayersPoints, 10 * 1000)
 end
 
+function updatePlayerShopData(playerId)
+    local player = Player(playerId)
+    if player then
+        gameShopUpdatePoints(player)
+        gameShopUpdateHistory(player)
+    end
+end
+
+local LogoutEvent = CreatureEvent("GameShopLogout")
+
+function LogoutEvent.onLogout(player)
+	local accountId = player:getAccountId()
+	pointsCache[accountId] = nil
+	secondPointsCache[accountId] = nil
+	
+	return true
+end
+
 LoginEvent:type("login")
 LoginEvent:register()
+
+LogoutEvent:type("logout")
+LogoutEvent:register()
+
 ExtendedEvent:type("extendedopcode")
 ExtendedEvent:register()
