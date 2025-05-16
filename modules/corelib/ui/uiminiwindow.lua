@@ -249,6 +249,7 @@ function UIMiniWindow:onDragLeave(droppedWidget, mousePos)
             self.movedWidget = nil
         end
     end
+    return true
 end
 
 function UIMiniWindow:onDragMove(mousePos, mouseMoved)
