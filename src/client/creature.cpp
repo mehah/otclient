@@ -249,23 +249,33 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
         g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
    
-    if (g_game.getClientVersion() >= 1281) { //  g_game.getFeature(Otc::GameIcons) 
-        size_t index = 0;
-        for (const auto& [icon, category, count] : m_icons) {
-            int iconY = backgroundRect.y() - 15 + (icon) * 5;
-            if (index < m_IconsTextures.size()) {
-                TexturePtr iconTexture = m_IconsTextures[index];
-                if (iconTexture) {
-                    g_drawPool.addTexturedPos(iconTexture, backgroundRect.right(), iconY);
-                }
+    if (g_game.getClientVersion() >= 1281) {
+        const int ICON_SIZE = 11; // Icon size is 11x11
+        const int ICON_SPACING = 2; // Space between icons
+        // Ajustes de posición para los iconos
+        const int ICON_OFFSET_X = 5; // Desplazamiento adicional a la derecha
+        const int ICON_OFFSET_Y = g_gameConfig.getOffSet();; // Desplazamiento adicional hacia abajo
+        for (size_t i = 0; i < m_icons.size(); ++i) {
+            if (i < m_IconsTextures.size() && m_IconsTextures[i]) {
+                // Posición base ajustada - ahora apilamos hacia ABAJO
+                int iconX = backgroundRect.right() + ICON_OFFSET_X;
+                // El primer icono (i=0) comienza en la posición base y los siguientes van ABAJO
+                int iconY = backgroundRect.y() + ICON_OFFSET_Y + (i * (ICON_SIZE + ICON_SPACING));
+
+                // Draw the icon
+                g_drawPool.addTexturedPos(m_IconsTextures[i], iconX, iconY);
+
+                // Draw the count if needed
+                const auto& [icon, category, count] = m_icons[i];
+         
+                    CachedText numberText;
+                    numberText.setText(std::to_string(count));
+                    numberText.setFont(g_gameConfig.getStaticTextFont());
+                    numberText.setAlign(Fw::AlignCenter);
+                    Rect numberRect(iconX + ICON_SIZE, iconY, 20, ICON_SIZE);
+                    numberText.draw(numberRect, Color::white);
+              
             }
-            CachedText numberText;
-            numberText.setText(std::to_string(count));
-            numberText.setFont((g_gameConfig.getStaticTextFont()));
-            numberText.setAlign(Fw::AlignCenter);
-            Rect numberRect(backgroundRect.right() + 10, iconY, 20, 20);
-            numberText.draw(numberRect, Color::white);
-            ++index;
         }
     }
 }
