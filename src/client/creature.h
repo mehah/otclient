@@ -247,7 +247,7 @@ private:
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
     TexturePtr m_typingIconTexture;
-    std::vector<TexturePtr> m_IconsTextures;
+    std::vector<TexturePtr> m_iconsTextures;
 
     EventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;

@@ -120,7 +120,7 @@ function getIconsImagePath(iconId, category)
 end
 
 function Creature:onIconsChange(icon, category, count)
-    local imagePath = getIconsImagePath(icon,category)
+    local imagePath = getIconsImagePath(icon, category)
     if imagePath then
         self:setIconsTexture(imagePath)
     end

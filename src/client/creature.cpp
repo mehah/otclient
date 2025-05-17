@@ -249,33 +249,30 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
         g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
    
-    if (g_game.getClientVersion() >= 1281) {
-        const int ICON_SIZE = 11; // Icon size is 11x11
-        const int ICON_SPACING = 2; // Space between icons
-        // Ajustes de posición para los iconos
-        const int ICON_OFFSET_X = 5; // Desplazamiento adicional a la derecha
-        const int ICON_OFFSET_Y = g_gameConfig.getOffSet();; // Desplazamiento adicional hacia abajo
-        for (size_t i = 0; i < m_icons.size(); ++i) {
-            if (i < m_IconsTextures.size() && m_IconsTextures[i]) {
-                // Posición base ajustada - ahora apilamos hacia ABAJO
-                int iconX = backgroundRect.right() + ICON_OFFSET_X;
-                // El primer icono (i=0) comienza en la posición base y los siguientes van ABAJO
-                int iconY = backgroundRect.y() + ICON_OFFSET_Y + (i * (ICON_SIZE + ICON_SPACING));
+    if (g_game.getClientVersion() >= 1281 && !m_icons.empty()) {
+        constexpr int ICON_SIZE = 11;
+        constexpr int ICON_SPACING = 2;
+        constexpr int ICON_OFFSET_X = 5;
+        const int ICON_OFFSET_Y = g_gameConfig.getOffSet();
 
-                // Draw the icon
-                g_drawPool.addTexturedPos(m_IconsTextures[i], iconX, iconY);
+        for (size_t i = 0; i < m_icons.size() && i < m_iconsTextures.size(); ++i) {
+            if (!m_iconsTextures[i])
+                continue;
 
-                // Draw the count if needed
-                const auto& [icon, category, count] = m_icons[i];
-         
-                    CachedText numberText;
-                    numberText.setText(std::to_string(count));
-                    numberText.setFont(g_gameConfig.getStaticTextFont());
-                    numberText.setAlign(Fw::AlignCenter);
-                    Rect numberRect(iconX + ICON_SIZE, iconY, 20, ICON_SIZE);
-                    numberText.draw(numberRect, Color::white);
-              
-            }
+            const int iconX = backgroundRect.right() + ICON_OFFSET_X;
+            const int iconY = backgroundRect.y() + ICON_OFFSET_Y + (i * (ICON_SIZE + ICON_SPACING));
+
+            // Draw icon
+            g_drawPool.addTexturedPos(m_iconsTextures[i], iconX, iconY);
+
+            // Draw count if needed
+            const auto& [icon, category, count] = m_icons[i];
+                CachedText numberText;
+                numberText.setText(std::to_string(count));
+                numberText.setFont(g_gameConfig.getStaticTextFont());
+                numberText.setAlign(Fw::AlignCenter);
+                Rect numberRect(iconX + ICON_SIZE, iconY, 20, ICON_SIZE);
+                numberText.draw(numberRect, Color::white);
         }
     }
 }
@@ -876,6 +873,7 @@ void Creature::setEmblem(const uint8_t v) { if (m_emblem != v) callLuaField("onE
 void Creature::setIcons(const std::vector<std::tuple<uint8_t, uint8_t, uint16_t>>& icons)
 {
     m_icons = icons;
+    m_iconsTextures.clear();
     for (const auto& [icon, category, count] : m_icons) {
         callLuaField("onIconsChange", icon, category, count);
     }
@@ -889,7 +887,7 @@ void Creature::setIconsTexture(const std::string& filename)
 {
     TexturePtr texture = g_textures.getTexture(filename);
     if (texture) {
-        m_IconsTextures.push_back(texture); 
+        m_iconsTextures.push_back(texture);
     }
 }
 
