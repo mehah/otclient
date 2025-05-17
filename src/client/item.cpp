@@ -31,6 +31,9 @@
 #include <framework/core/clock.h>
 #include <framework/core/filestream.h>
 #include <framework/graphics/shadermanager.h>
+#ifdef FRAMEWORK_EDITOR
+#include <framework/core/binarytree.h>
+#endif
 
 ItemPtr Item::create(const int id)
 {
