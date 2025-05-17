@@ -1,0 +1,72 @@
+.questLog-window {
+  width: 790;
+  height: 639;
+  font: verdana-11px-antialised;
+  opacity: 1;
+  display: block;
+  color: #929292
+}
+
+.content-left {
+  width: 367;
+  height: 551;
+  margin-left: 5;
+}
+
+.content-right {
+  width: 375;
+  height: 551;
+  background-color: #404040;
+  margin-bottom: 10;
+  margin-left: 385;
+  display: block;
+}
+
+.search-box {
+  width: 270;
+}
+
+.filter {
+  height: 40;
+  margin-left: 5;
+}
+
+.checkbox-group {
+  display: flex;
+  white-space: pre;
+  text-offset: 18 -3;
+
+}
+
+.questLogButton {
+  font: cipsoftFont;
+  text-auto-resize: true;
+}
+
+.separator {
+  display: block;
+  margin-top: 5;
+  width: 760;
+}
+
+.quest-list {
+  border-width: 1;
+  border-color: #00000077;
+  height: 425;
+  background-color: #404040;
+}
+
+.quest-info {
+  margin-top: 5;
+  background-color: #363636;
+  height: 300;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-left {
+  text-align: left;
+  margin-left: 12;
+}

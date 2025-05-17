@@ -403,6 +403,7 @@ local function createSubWidget(parent, subId, subButton)
     subWidget.Button.Title:setText(subButton.text)
     subWidget:setVisible(false)
     subWidget.open = subButton.open
+    subWidget.callbackFunc = subButton.callbackFunc
 
     function subWidget.Button.onClick()
         local selectedOption = controller.ui.selectedOption
@@ -425,6 +426,9 @@ local function createSubWidget(parent, subId, subButton)
             controller.ui.selectedOption = panelToShow
         else
             print("Error: panelToShow is nil or does not exist in panels")
+        end
+        if subWidget.callbackFunc then
+            subWidget.callbackFunc()
         end
     end
 
@@ -591,7 +595,7 @@ function removeButton(categoryText, buttonText)
     end
 end
 
-function addButton(categoryText, buttonText, openPanel)
+function addButton(categoryText, buttonText, openPanel, callback)
     for _, category in ipairs(buttons) do
         if category.text == categoryText then
             if not category.subCategories then
@@ -600,7 +604,8 @@ function addButton(categoryText, buttonText, openPanel)
             local panelName = type(openPanel) == "string" and openPanel or getPanelName(openPanel)
             table.insert(category.subCategories, {
                 text = buttonText,
-                open = panelName
+                open = panelName,
+                callbackFunc = callback
             })
             if type(openPanel) ~= "string" then
                 panels[panelName] = openPanel
@@ -626,4 +631,27 @@ end
 
 function getPanel()
     return controller.ui.optionsTabContent
+end
+
+function openOptionsCategory(category, subcategory)
+    if not controller.ui:isVisible() then
+        show()
+    end
+    for i = 1, controller.ui.optionsTabBar:getChildCount() do
+        local widget = controller.ui.optionsTabBar:getChildByIndex(i)
+        if widget and widget.Button.Title:getText() == category then
+            widget.Button:onClick()
+            if subcategory and widget.subCategories then
+                for subId, _ in ipairs(widget.subCategories) do
+                    local subWidget = widget:getChildById(subId)
+                    if subWidget and subWidget.Button.Title:getText() == subcategory then
+                        subWidget.Button:onClick()
+                        return true
+                    end
+                end
+            end
+            return true
+        end
+    end
+    return false
 end

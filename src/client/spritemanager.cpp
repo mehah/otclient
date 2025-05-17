@@ -46,7 +46,7 @@ void SpriteManager::reload() {
 }
 
 void SpriteManager::load() {
-    m_spritesFiles.resize(g_asyncDispatcher.get_thread_count() * 2);
+    m_spritesFiles.resize(g_asyncDispatcher.get_thread_count());
     if (g_app.isLoadingAsyncTexture()) {
         for (auto& file : m_spritesFiles)
             file = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName));
@@ -212,7 +212,7 @@ ImagePtr SpriteManager::getSpriteImage(const int id)
     }
 
     const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
-    if (const auto& sf = m_spritesFiles[threadId]) {
+    if (const auto& sf = m_spritesFiles[threadId % m_spritesFiles.size()]) {
         std::scoped_lock l(sf->mutex);
         return m_spritesHd ? getSpriteImageHd(id, sf->file) : getSpriteImage(id, sf->file);
     }

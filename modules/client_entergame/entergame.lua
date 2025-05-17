@@ -228,14 +228,14 @@ function EnterGame.hidePanels()
     if g_modules.getModule("client_bottommenu"):isLoaded()  then
         modules.client_bottommenu.hide()
     end
-    modules.client_topmenu.toggle()
+    modules.client_topmenu.hide()
 end
 
 function EnterGame.showPanels()
     if g_modules.getModule("client_bottommenu"):isLoaded()  then
         modules.client_bottommenu.show()
     end
-    modules.client_topmenu.toggle()
+    modules.client_topmenu.show()
 end
 
 function EnterGame.firstShow()
