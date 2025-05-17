@@ -45,15 +45,20 @@ void Container::onAddItem(const ItemPtr& item, int slot)
 {
     slot -= m_firstIndex;
 
-    ++m_size;
     // indicates that there is a new item on next page
     if (m_hasPages && slot > m_capacity) {
-        callLuaField("onSizeChange", m_size);
+        callLuaField("onSizeChange", ++m_size);
         return;
     }
 
-    m_items.insert(m_items.begin() + slot, item);
+    if (m_items.size() == m_capacity) {
+        onRemoveItem(m_firstIndex + m_capacity - 1, nullptr);
+        ++m_size;
+    }
 
+    m_items.insert(m_items.begin() + slot, item);
+    ++m_size;
+    
     updateItemsPositions();
 
     callLuaField("onSizeChange", m_size);
@@ -93,9 +98,10 @@ void Container::onUpdateItem(int slot, const ItemPtr& item)
 void Container::onRemoveItem(int slot, const ItemPtr& lastItem)
 {
     slot -= m_firstIndex;
+
+    // indicates that there has been deleted an item on next page
     if (m_hasPages && slot >= static_cast<int>(m_items.size())) {
-        --m_size;
-        callLuaField("onSizeChange", m_size);
+        callLuaField("onSizeChange", --m_size);
         return;
     }
 

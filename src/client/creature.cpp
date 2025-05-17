@@ -74,12 +74,18 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
 
         const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
+        auto oldScaleFactor = g_drawPool.getScaleFactor();
+
+        g_drawPool.setScaleFactor(getScaleFactor() + (oldScaleFactor - 1.f));
+
         internalDraw(_dest);
 
         if (isMarked())
             internalDraw(_dest, getMarkedColor());
         else if (isHighlighted())
             internalDraw(_dest, getHighlightColor());
+
+        g_drawPool.setScaleFactor(oldScaleFactor);
     }
 
     // drawLight(dest, lightView);
@@ -129,7 +135,7 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, const int drawFlags)
 {
-    static const Color
+    static constexpr Color
         DEFAULT_COLOR(96, 96, 96),
         NPC_COLOR(0x66, 0xcc, 0xff);
 
@@ -460,7 +466,7 @@ void Creature::updateJump()
 
     m_jumpOffset = PointF(height, height);
 
-    if (isLocalPlayer()) {
+    if (isCameraFollowing()) {
         g_map.notificateCameraMove(m_walkOffset);
     }
 
@@ -502,7 +508,7 @@ void Creature::onAppear()
         m_disappearEvent = nullptr;
     }
 
-    if (isLocalPlayer() && m_position != m_oldPosition) {
+    if (isCameraFollowing() && m_position != m_oldPosition) {
         g_map.notificateCameraMove(m_walkOffset);
     }
 
@@ -648,7 +654,7 @@ void Creature::updateWalkingTile()
 
     if (newWalkingTile) {
         newWalkingTile->addWalkingCreature(self);
-        if (isLocalPlayer())
+        if (isCameraFollowing())
             g_map.notificateTileUpdate(newWalkingTile->getPosition(), self, Otc::OPERATION_CLEAN);
     }
 
@@ -672,12 +678,14 @@ void Creature::nextWalkUpdate()
         self->nextWalkUpdate();
     };
 
-    m_walkUpdateEvent = isLocalPlayer() ? g_dispatcher.addEvent(action) : g_dispatcher.scheduleEvent(action, m_stepCache.walkDuration);
+    m_walkUpdateEvent = isCameraFollowing() ? g_dispatcher.addEvent(action) : g_dispatcher.scheduleEvent(action, m_stepCache.walkDuration);
 }
 
 void Creature::updateWalk()
 {
-    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
+    const int stabilizeCam = isCameraFollowing() && g_window.vsyncEnabled() ? 10.f : 0;
+
+    const float walkTicksPerPixel = (getStepDuration(true) + stabilizeCam) / static_cast<float>(g_gameConfig.getSpriteSize());
 
     const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, g_gameConfig.getSpriteSize());
 
@@ -690,7 +698,7 @@ void Creature::updateWalk()
     updateWalkOffset(m_walkedPixels);
     updateWalkingTile();
 
-    if (isLocalPlayer() && oldWalkOffset != m_walkOffset) {
+    if (isCameraFollowing() && oldWalkOffset != m_walkOffset) {
         g_map.notificateCameraMove(m_walkOffset);
     }
 
@@ -731,7 +739,7 @@ void Creature::terminateWalk()
 
 void Creature::setHealthPercent(const uint8_t healthPercent)
 {
-    static const Color
+    static constexpr Color
         COLOR1(0x00, 0xBC, 0x00),
         COLOR2(0x50, 0xA1, 0x50),
         COLOR3(0xA1, 0xA1, 0x00),
@@ -990,7 +998,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 
-    if (isLocalPlayer() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
+    if (isCameraFollowing() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
         if (m_lastMapDuration == -1)
             m_lastMapDuration = ((g_game.mapUpdatedAt() + 9) / 10) * 10;
 

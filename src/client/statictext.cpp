@@ -109,7 +109,7 @@ void StaticText::scheduleUpdate()
 
 void StaticText::compose()
 {
-    static const Color
+    static constexpr Color
         MESSAGE_COLOR1(239, 239, 0),
         MESSAGE_COLOR2(254, 101, 0),
         MESSAGE_COLOR3(95, 247, 247);

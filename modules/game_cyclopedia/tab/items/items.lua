@@ -124,31 +124,25 @@ function Cyclopedia.levelFilter(value)
     Cyclopedia.applyFilters()
 end
 
-function Cyclopedia.h1Filter(value)
-    UI.ItemListBase.List:destroyChildren()
-
-    local brother = UI.H2Button
-
-    Cyclopedia.Items.h1Filter = value
-    Cyclopedia.applyFilters()
-
-    if value and brother:isChecked() then
-        brother:setChecked(false)
-        Cyclopedia.Items.h2Filter = false
-    end
+local ignoreRecursiveCalls = false
+local function setCheckedWithoutRecursion(h1Val, h2Val)
+    ignoreRecursiveCalls = true
+    UI.H1Button:setChecked(h1Val)
+    UI.H2Button:setChecked(h2Val)
+    ignoreRecursiveCalls = false
 end
 
-function Cyclopedia.h2Filter(value)
-    UI.ItemListBase.List:destroyChildren()
+function Cyclopedia.handFilter(h1Val, h2Val)
+    Cyclopedia.Items.h1Filter = h1Val
+    Cyclopedia.Items.h2Filter = h2Val
 
-    local brother = UI.H1Button
-    Cyclopedia.Items.h2Filter = value
-    Cyclopedia.applyFilters()
-
-    if value and brother:isChecked() then
-        brother:setChecked(false)
-        Cyclopedia.Items.h1Filter = false
+    if ignoreRecursiveCalls then
+        return
     end
+
+    setCheckedWithoutRecursion(h1Val, h2Val)
+    UI.ItemListBase.List:destroyChildren()
+    Cyclopedia.applyFilters()
 end
 
 function Cyclopedia.classificationFilter(data)
@@ -157,17 +151,38 @@ function Cyclopedia.classificationFilter(data)
     Cyclopedia.applyFilters()
 end
 
+local function processItemsById(id)
+    local idsToProcess = {}
+    local tempTable = {}
+
+    if id == 1000 then
+        idsToProcess = {17, 18, 19, 20, 21}
+    else
+        idsToProcess = {id}
+    end
+
+    for _, idToProcess in pairs(idsToProcess) do
+        if not table.empty(Cyclopedia.ItemList[idToProcess]) then
+            for _, data in pairs(Cyclopedia.ItemList[idToProcess]) do
+                table.insert(tempTable, data)
+            end
+        end
+    end
+
+    table.sort(tempTable, function(a, b)
+        return string.lower(a:getMarketData().name) < string.lower((b:getMarketData().name))
+    end)
+
+    for _, data in pairs(tempTable) do
+        local item = Cyclopedia.internalCreateItem(data)
+    end
+end
+
 function Cyclopedia.applyFilters()
     local isSearching = UI.SearchEdit:getText() ~= ""
     if not isSearching then
         if UI.selectedCategory then
-            local id = tonumber(UI.selectedCategory:getId())
-        end
-
-        if Cyclopedia.ItemList[id] then
-            for _, data in pairs(Cyclopedia.ItemList[id]) do
-                local item = Cyclopedia.internalCreateItem(data)
-            end
+           processItemsById(tonumber(UI.selectedCategory:getId()))
         end
     else
         Cyclopedia.ItemSearch(UI.SearchEdit:getText(), false)
@@ -186,8 +201,12 @@ function Cyclopedia.internalCreateItem(data)
     local h2Filter = Cyclopedia.Items.h2Filter
     local classificationFilter = Cyclopedia.Items.ClassificationFilter
 
-    if vocFilter and tonumber(marketData.restrictVocation) ~= tonumber(vocation) then
-        return
+    if vocFilter and tonumber(marketData.restrictVocation) > 0 then
+        local demotedVoc = vocation > 10 and (vocation - 10) or vocation
+        local vocBitMask = Bit.bit(tonumber(demotedVoc))
+        if not Bit.hasBit(marketData.restrictVocation, vocBitMask) then
+            return
+        end
     end
 
     if levelFilter and level < marketData.requiredLevel then
@@ -360,7 +379,17 @@ function Cyclopedia.ItemSearch(text, clearTextEdit)
     end
 end
 
+local function isHandWeapon(id)
+    if id >= 17 and id <= 21 or id == 1000 then
+        return true
+    end
+end
+
 function Cyclopedia.selectItemCategory(id)
+    if not isHandWeapon(id) then
+        setCheckedWithoutRecursion(false, false)
+    end
+
     if UI.SearchEdit:getText() ~= "" then
         Cyclopedia.ItemSearch("", true)
     end
@@ -382,21 +411,7 @@ function Cyclopedia.selectItemCategory(id)
         Cyclopedia.Items.ClassificationFilter = 0
     end
 
-    local idsToProcess = {}
-
-    if id == 1000 then
-        idsToProcess = {16, 17, 18, 19, 20, 21}
-    else
-        idsToProcess = {id}
-    end
-
-    for _, idToProcess in pairs(idsToProcess) do
-        if not table.empty(Cyclopedia.ItemList[idToProcess]) then
-            for _, data in pairs(Cyclopedia.ItemList[idToProcess]) do
-                local item = Cyclopedia.internalCreateItem(data)
-            end
-        end
-    end
+    processItemsById(id)
 
     if Cyclopedia.hasHandedFilter(id) then
         UI.H1Button:enable()

@@ -25,8 +25,8 @@ pingFpsLabel < UIWidget
 Panel
   anchors.top: parent.top
   anchors.left: parent.left
-  anchors.right: parent.right
   height: 60
+  width: 150
   margin-top: 35
   Panel
     anchors.top: parent.top

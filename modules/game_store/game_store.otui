@@ -183,12 +183,12 @@ StoreWindow
     anchors.left: prev.right
     margin-left: 5
     margin-bottom: 2
-    !tooltip: tr('get Tibia Coins')
+    !tooltip: tr('Get Tibia Coins')
     image-color: green
     icon: /images/ui/tibiaCoin
     icon-align: center
     icon-offset: 10 -1
-    text-offset: -18 0
+    text-offset: -10 0
     !text: tr('Get')
     font: cipsoftFont
     @onClick: modules.game_store.getCoinsWebsite()

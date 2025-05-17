@@ -14,7 +14,7 @@ LockedPreyPanel < Panel
     height: 64
     background-color: #1c4161
     margin-top: 3
-    @onClick: modules.game_shop.show()
+    @onClick: modules.game_mainpanel.toggleStore()
 
     UIWidget
       id: shopPermButton
@@ -23,7 +23,7 @@ LockedPreyPanel < Panel
       image-source: /images/game/prey/prey_perm_test
       size: 195 67
       image-clip: 0 0 204 67
-      @onClick: modules.game_shop.show()
+      @onClick: modules.game_mainpanel.toggleStore()
       @onHoverChange: modules.game_prey.onHover(self)
 
       $pressed:
@@ -37,7 +37,7 @@ LockedPreyPanel < Panel
     height: 64
     background-color: #1c4161
     margin-top: 7
-    @onClick: modules.game_shop.show()
+    @onClick: modules.game_mainpanel.toggleStore()
 
     UIWidget
       id: shopTempButton
@@ -46,7 +46,7 @@ LockedPreyPanel < Panel
       image-source: /images/game/prey/prey_temp_test
       size: 195 67
       image-clip: 0 0 204 67
-      @onClick: modules.game_shop.show()
+      @onClick: modules.game_mainpanel.toggleStore()
       @onHoverChange: modules.game_prey.onHover(self)
 
       $pressed:
@@ -460,8 +460,10 @@ CardLabel < FlatPanel
     text-align: right
 
 GoldLabel < FlatPanel
-  padding: 5
-
+  image-source: /images/ui/backdrop-dark-grey
+  image-border: 5
+  margin: 1
+  
   UIWidget
     id: gold
     anchors.right: parent.right
@@ -603,16 +605,18 @@ MainWindow
     id: openStore
     anchors.left: prev.right
     margin-left: 10
-    size: 20 20
+    size: 26 20
     anchors.verticalCenter: closeButton.verticalCenter
     tooltip: Go to the Store to get more Prey Wildcards!
-    image-source: /images/topbuttons/shop
-    image-clip: 0 0 20 20
+    image-source: /images/game/prey/prey_smallstore
+    image-clip: 0 0 26 20
     background-color: #17354e
-    @onClick: modules.game_shop.show()
+    @onClick: modules.game_mainpanel.toggleStore()
 
     $pressed:
-      image-clip: 0 20 20 20
+      image-clip: 0 0 26 20
+      image-source: /images/game/prey/prey_smallstore_clicked
+      image-clip: -1 -1 27 21
 
 PreyCreature < Panel
   height: 22

@@ -1,0 +1,36 @@
+<link href="game_questlog/game_questlog.css" />
+<window id="main" anchor="parent" class="questLog-window" text="Quest Log" onescape="self:close()">
+
+  <minipanel id="panelQuestLog" text="Quest Log" focusable="false" class="content-left" anchor="parent"
+    layout="type: verticalBox;spacing:5">
+    <TextListQuestLog id="areaPanelQuestList" class="quest-list"></TextListQuestLog>
+    <select id="comboBoxFilter" onchange="self:onFilterQuestLog(event)">
+      <option>Alphabetically (A-Z)</option>
+      <option>Alphabetically (Z-A)</option>
+      <option>Completed on Top</option>
+      <option>Completed on Bottom</option>
+    </select>
+    <TextEditQuestLog id="textEditSearchQuest" type="text" class="search-box" placeholder="Type to search"></TextEditQuestLog>
+
+    <div id="filterPanel"
+      layout="type: grid;cell-size: 158 22;num-lines:2;num-columns: 3;cell-spacing: 0;flow: false;fit-children: false"
+      class="filter">
+      <input id="checkboxShowComplete" type="checkbox" class="checkbox-group" text="Quest Log" onchange="self:filterQuestListShowComplete(event)" checked>Show Completed</input>
+      <label class="text-right text-offset-normal">Quests completed:</label>
+      <label id="lblCompleteNumber" class="text-left" textOffset="5 -1">0</label>
+      <input id="checkboxShowShidden" type="checkbox" class="checkbox-group" text="Quest Log" onchange="self:filterQuestListShowHidden(event)">Show hidden</input>
+      <label class="text-right text-offset-normal">Quests hidden:</label>
+      <label id="lblHiddenNumber" class="text-left" textOffset="5 -2">0</label>
+    </div>
+  </minipanel>
+
+  <minipanel id="panelQuestLineSelected" class="content-right" anchor="parent" text="No quest line Selected" layout="type: verticalBox;">
+    <TextListQuestLog id="ScrollAreaQuestList" style="height: 200"></TextListQuestLog>
+    <MultiLineQuestLog id="panelQuestInfo" class="quest-info"></MultiLineQuestLog>
+    <input id="checkboxShowInQuestTracker" type="checkbox"  style="text-offset: 18 0;" onchange="self:onCheckChangeQuestTracker(event)" >Show in quest tracker</input>
+  </minipanel>
+
+  <HorizontalSeparator class="separator"></HorizontalSeparator>
+  <Qtbutton id="trackerButton"class="questLogButton" style="margin-top:12;" onclick="self:toggleMiniWindowsTracker()">Quest Tracker</Qtbutton>
+  <Qtbutton class="questLogButton" style="float: right;" onclick="self:close()">Close</Qtbutton>
+</window>

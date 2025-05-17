@@ -308,7 +308,6 @@ end
 
 function disable()
     terminalButton:hide()
-    g_keyboard.unbindKeyDown('Ctrl+T')
     disabled = true
 end
 

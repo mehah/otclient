@@ -37,7 +37,7 @@ function init()
 
   botButton = modules.game_mainpanel.addToggleButton('botButton', tr('Bot'), '/images/options/bot', toggle, false, 99999)
   botButton:setOn(false)
-  botButton:hide()
+  botButton:show()
 
   botWindow = g_ui.loadUI('bot', modules.game_interface.getLeftPanel())
   botWindow:setup()
@@ -262,7 +262,6 @@ end
 
 function online()
   botWindow:setupOnStart()
-  botButton:show()
   if not modules.client_profiles.ChangedProfile then
     scheduleEvent(refresh, 20)
   end
@@ -271,7 +270,6 @@ end
 function offline()
   save()
   clear()
-  botButton:hide()
   editWindow:hide()
 end
 
