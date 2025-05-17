@@ -47,7 +47,6 @@ public:
 
     uint8_t getTileMaxElevation() const { return m_tileMaxElevation; }
     uint8_t getTileMaxThings() const { return m_tileMaxThings; }
-    uint8_t getOffSet() const { return m_getOffSet; }
     uint8_t getTileTransparentFloorViewRange() const { return m_tileTransparentFloorViewRange; }
 
     bool isDrawingInformationByWidget() { return m_drawInformationByWidget; }
@@ -106,7 +105,6 @@ private:
     uint8_t m_tileMaxElevation{ 24 };
     uint8_t m_tileMaxThings{ 10 };
     uint8_t m_tileTransparentFloorViewRange{ 2 };
-    uint8_t m_getOffSet{ 12 };
 
     // Creature
     bool m_drawInformationByWidget{ false };

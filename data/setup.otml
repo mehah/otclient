@@ -15,7 +15,7 @@ game
     max-elevation: 24
     max-things: 10
     transparent-floor-view-range: 2
-    getOffSet: 15
+
   creature
     draw-information-by-widget-beta: false
     force-new-walking-formula: false

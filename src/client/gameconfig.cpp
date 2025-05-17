@@ -123,8 +123,6 @@ void GameConfig::loadTileNode(const OTMLNodePtr& mainNode) {
             m_tileMaxElevation = node->value<int>();
         else if (node->tag() == "max-things")
             m_tileMaxThings = node->value<int>();
-        else if (node->tag() == "getOffSet")
-            m_getOffSet = node->value<int>();
         else if (node->tag() == "transparent-floor-view-range")
             m_tileTransparentFloorViewRange = node->value<int>();
     }
