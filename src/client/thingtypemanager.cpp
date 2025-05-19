@@ -28,6 +28,7 @@
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"
 #include "creatures.h"
+#include <framework/core/binarytree.h>
 #endif
 
 #include <framework/core/filestream.h>
