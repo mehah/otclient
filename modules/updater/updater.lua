@@ -217,7 +217,7 @@ function Updater.check(args)
   progressUpdater(0)
 
   httpOperationId = HTTP.postJSON(Services.updater, {
-    version = APP_VERSION,
+    version = g_app.getBuildRevision(),
     build = g_app.getVersion(),
     os = g_app.getOs(),
     platform = g_window.getPlatformType(),
