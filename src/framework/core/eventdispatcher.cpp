@@ -209,6 +209,8 @@ void EventDispatcher::executeDeferEvents() {
 
         for (const auto& thread : m_threads) {
             std::scoped_lock lock(thread->mutex);
+            if (m_deferEventList.size() < thread->deferEvents.size())
+                m_deferEventList.swap(thread->deferEvents);
             if (!thread->deferEvents.empty()) {
                 m_deferEventList.insert(m_deferEventList.end(), make_move_iterator(thread->deferEvents.begin()), make_move_iterator(thread->deferEvents.end()));
                 thread->deferEvents.clear();
