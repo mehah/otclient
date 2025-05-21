@@ -59,7 +59,7 @@ void GarbageCollection::texture() {
     static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
 
     std::vector<TexturePtr> copy;
-    copy.resize(g_textures.m_textures.size() + g_textures.m_animatedTextures.size());
+    copy.reserve(std::max<int>((g_textures.m_textures.size() + g_textures.m_animatedTextures.size()) / 2, 32));
     {
         std::shared_lock l(g_textures.m_mutex);
         std::erase_if(g_textures.m_textures, [&copy](const auto& item) {
