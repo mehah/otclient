@@ -98,7 +98,7 @@ QuestLogLabel < UIWidget
 
   $checked:
     color: #F6F6F6
-  CheckBoxButton
+  UIButton
     id: iconShow
     anchors.right: parent.right
     icon-source: /game_questlog/images/icon-show-small-on
@@ -106,7 +106,7 @@ QuestLogLabel < UIWidget
     height: 15
     margin-right: 30
     visible: false
-  CheckBoxButton
+  UIButton
     id: iconPin
     anchors.left: prev.right
     icon-source: /game_questlog/images/icon-pin
