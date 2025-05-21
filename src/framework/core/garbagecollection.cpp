@@ -38,10 +38,10 @@ Timer lua_timer, texture_timer, drawpool_timer, thingtype_timer;
 
 void GarbageCollection::poll() {
     if (canCheck(thingtype_timer, THINGTYPE_TIME))
-        g_asyncDispatcher.detach_task([] { thingType(); });
+        thingType();
 
     if (canCheck(texture_timer, TEXTURE_TIME))
-        g_asyncDispatcher.detach_task([] { texture(); });
+        texture();
 
     if (canCheck(drawpool_timer, DRAWPOOL_TIME))
         drawpoll();
@@ -58,16 +58,36 @@ void GarbageCollection::drawpoll() {
 void GarbageCollection::texture() {
     static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
 
-    std::shared_lock l(g_textures.m_mutex);
+    std::vector<TexturePtr> copy;
+    copy.resize(g_textures.m_textures.size() + g_textures.m_animatedTextures.size());
+    {
+        std::shared_lock l(g_textures.m_mutex);
+        std::erase_if(g_textures.m_textures, [&copy](const auto& item) {
+            const auto& [key, tex] = item;
+            if (tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME) {
+                copy.emplace_back(tex);
+                return true;
+            }
 
-    std::erase_if(g_textures.m_textures, [](const auto& item) {
-        const auto& [key, tex] = item;
-        return tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME;
-    });
+            return false;
+        });
 
-    std::erase_if(g_textures.m_animatedTextures, [](const TexturePtr& tex) {
-        return tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME;
-    });
+        std::erase_if(g_textures.m_animatedTextures, [&copy](const TexturePtr& tex) {
+            if (tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME) {
+                copy.emplace_back(tex);
+                return true;
+            }
+
+            return false;
+        });
+    }
+
+    if (!copy.empty()) {
+        g_mainDispatcher.addEvent([textures = std::move(copy)] {
+            std::shared_lock l(g_textures.m_mutex);
+            // The intention here is just to destroy the textures in the thread that manages the graphics.
+        });
+    }
 }
 
 void GarbageCollection::thingType() {
@@ -84,12 +104,10 @@ void GarbageCollection::thingType() {
     const auto& thingTypes = g_things.m_thingTypes[category];
     const size_t limit = std::min<size_t>(index + AMOUNT_PER_CHECK, thingTypes.size());
 
-    std::vector<ThingTypePtr> thingsUnloaded;
-
     while (index < limit) {
         auto& thing = thingTypes[index];
         if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
-            thingsUnloaded.emplace_back(thing);
+            thing->unload();
         }
         ++index;
     }
@@ -97,12 +115,5 @@ void GarbageCollection::thingType() {
     if (limit == thingTypes.size()) {
         index = 0;
         ++category;
-    }
-
-    if (!thingsUnloaded.empty()) {
-        g_dispatcher.addEvent([thingsUnloaded = std::move(thingsUnloaded)] {
-            for (auto& thingType : thingsUnloaded)
-                thingType->unload();
-        });
     }
 }

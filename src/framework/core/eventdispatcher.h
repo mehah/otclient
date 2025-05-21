@@ -110,9 +110,6 @@ private:
         std::vector<Event> asyncEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
-
-        void try_lock();
-        void try_unlock();
     };
 
     inline void mergeEvents();
