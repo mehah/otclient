@@ -58,36 +58,16 @@ void GarbageCollection::drawpoll() {
 void GarbageCollection::texture() {
     static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
 
-    std::vector<TexturePtr> copy;
-    copy.reserve(std::max<int>((g_textures.m_textures.size() + g_textures.m_animatedTextures.size()) / 2, 32));
-    {
-        std::shared_lock l(g_textures.m_mutex);
-        std::erase_if(g_textures.m_textures, [&copy](const auto& item) {
-            const auto& [key, tex] = item;
-            if (tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME) {
-                copy.emplace_back(tex);
-                return true;
-            }
+    std::shared_lock l(g_textures.m_mutex);
 
-            return false;
-        });
+    std::erase_if(g_textures.m_textures, [](const auto& item) {
+        const auto& [key, tex] = item;
+        return tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME;
+    });
 
-        std::erase_if(g_textures.m_animatedTextures, [&copy](const TexturePtr& tex) {
-            if (tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME) {
-                copy.emplace_back(tex);
-                return true;
-            }
-
-            return false;
-        });
-    }
-
-    if (!copy.empty()) {
-        g_mainDispatcher.addEvent([textures = std::move(copy)] {
-            std::shared_lock l(g_textures.m_mutex);
-            // The intention here is just to destroy the textures in the thread that manages the graphics.
-        });
-    }
+    std::erase_if(g_textures.m_animatedTextures, [](const TexturePtr& tex) {
+        return tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME;
+    });
 }
 
 void GarbageCollection::thingType() {
