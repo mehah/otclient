@@ -231,9 +231,11 @@ std::string Platform::traceback(const std::string_view where, int level, int max
     if(!where.empty())
         ss << "\n\t[C++]: " << where;
 
-    void* buffer[maxDepth + level + 1];
-    int numLevels = backtrace(buffer, maxDepth + level + 1);
-    char **tracebackBuffer = backtrace_symbols(buffer, numLevels);
+    const int size = maxDepth + level + 1;
+    std::vector<void*> buffer(size);
+
+    int numLevels = backtrace(buffer.data(), size);
+    char **tracebackBuffer = backtrace_symbols(buffer.data(), numLevels);
     if(tracebackBuffer) {
         for(int i = 1 + level; i < numLevels; i++) {
             std::string line = tracebackBuffer[i];
