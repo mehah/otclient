@@ -71,14 +71,15 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
         return false;
 
     if(pid == 0) {
-        char* cargs[args.size()+2];
-        cargs[0] = (char*)process.c_str();
-        for(uint i=1;i<=args.size();++i)
-            cargs[i] = (char*)args[i-1].c_str();
-        cargs[args.size()+1] = nullptr;
+        std::vector<char*> cargs;
+        cargs.push_back(const_cast<char*>(process.c_str()));
+        for(const auto& arg : args) {
+            cargs.push_back(const_cast<char*>(arg.c_str()));
+        }
+        cargs.push_back(nullptr);
 
-        if(execv(process.c_str(), cargs) == -1)
-            _exit(EXIT_FAILURE);
+        execv(process.c_str(), cargs.data());
+        _exit(EXIT_FAILURE);
     }
 
     return true;
