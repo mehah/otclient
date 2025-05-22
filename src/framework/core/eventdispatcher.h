@@ -26,7 +26,7 @@
 
 enum class TaskGroup : int8_t
 {
-    None = -1, // is outside the context of the dispatcher
+    WithoutGroup = -1, // is outside the context of the dispatcher
     Serial,
     GenericParallel,
     Last
@@ -62,12 +62,12 @@ struct DispatcherContext
 
 private:
     void reset() {
-        group = TaskGroup::None;
+        group = TaskGroup::WithoutGroup;
         type = DispatcherType::None;
     }
 
     DispatcherType type = DispatcherType::None;
-    TaskGroup group = TaskGroup::None;
+    TaskGroup group = TaskGroup::WithoutGroup;
 
     friend class EventDispatcher;
 };
