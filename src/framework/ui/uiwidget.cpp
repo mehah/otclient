@@ -66,7 +66,7 @@ UIWidget::~UIWidget()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
     if (!isDestroyed())
-        g_logger.warning(stdext::format("widget '%s' was not explicitly destroyed", m_id));
+        g_logger.warning(std::format("widget {} -> {} was not explicitly destroyed", id, source));
 #endif
 }
 
