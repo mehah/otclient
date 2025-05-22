@@ -255,7 +255,11 @@ void Texture::setupTranformMatrix()
     }
 }
 
-void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixels, const int channels, const bool compress) const
+void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixels, const int channels, const bool
+#ifndef OPENGL_ES
+                          compress
+#endif
+) const
 {
     GLenum format = 0;
     switch (channels) {
