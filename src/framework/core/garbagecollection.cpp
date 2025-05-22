@@ -58,7 +58,7 @@ void GarbageCollection::drawpoll() {
 void GarbageCollection::texture() {
     static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
 
-    std::shared_lock l(g_textures.m_mutex);
+    std::unique_lock l(g_textures.m_mutex);
 
     std::erase_if(g_textures.m_textures, [](const auto& item) {
         const auto& [key, tex] = item;
@@ -75,6 +75,7 @@ void GarbageCollection::thingType() {
         IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
         AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
 
+    static std::vector<ThingTypePtr> thingTypesToUnload;
     static uint8_t category{ ThingLastCategory };
     static size_t index = 0;
 
@@ -87,7 +88,7 @@ void GarbageCollection::thingType() {
     while (index < limit) {
         auto& thing = thingTypes[index];
         if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
-            thing->unload();
+            thingTypesToUnload.emplace_back(thing);
         }
         ++index;
     }
@@ -95,5 +96,13 @@ void GarbageCollection::thingType() {
     if (limit == thingTypes.size()) {
         index = 0;
         ++category;
+    }
+
+    if (!thingTypesToUnload.empty()) {
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
+        for (auto& thingType : thingTypesToUnload) {
+            thingType->unload();
+        }
+        thingTypesToUnload.clear();
     }
 }
