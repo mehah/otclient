@@ -350,7 +350,7 @@ void MapView::updateVisibleTiles()
             auto& floor = floors[iz].cachedVisibleTiles;
 
             for (uint_fast32_t diagonal = start; diagonal < end; ++diagonal) {
-                const auto advance = (static_cast<size_t>(diagonal) >= m_drawDimension.height()) ? diagonal - m_drawDimension.height() : 0;
+                const auto advance = (static_cast<size_t>(diagonal) >= static_cast<size_t>(m_drawDimension.height())) ? diagonal - static_cast<size_t>(m_drawDimension.height()) : 0;
                 for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
                     auto tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
                     tilePos.coveredUp(m_posInfo.camera.z - iz);
@@ -408,7 +408,7 @@ void MapView::updateVisibleTiles()
 
         tasks.wait();
 
-        for (auto fi = 0; fi < m_floors.size(); ++fi) {
+        for (int fi = 0, s = m_floors.size(); fi < s; ++fi) {
             auto& floor = m_floors[fi];
             floor.cachedVisibleTiles.clear();
 
