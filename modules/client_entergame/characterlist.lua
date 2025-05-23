@@ -264,6 +264,7 @@ function CharacterList.terminate()
     end
 
     removeAutoReconnectEvent()
+    destroyCreateAccount()
     
     CharacterList = nil
 end
@@ -404,7 +405,7 @@ function CharacterList.create(characters, account, otui)
     end
 
     autoReconnectButton.onClick = function(widget)
-        local autoReconnect = not g_settings.getBoolean('autoReconnect', true)
+        local autoReconnect = not g_settings.getBoolean('autoReconnect', false)
         autoReconnectButton:setOn(autoReconnect)
         g_settings.set('autoReconnect', autoReconnect)
         local statusText = autoReconnect and 'Auto reconnect: On' or 'Auto reconnect: off'
@@ -434,7 +435,7 @@ function CharacterList.show()
     charactersWindow:raise()
     charactersWindow:focus()
 
-    local autoReconnect = g_settings.getBoolean('autoReconnect', true)
+    local autoReconnect = g_settings.getBoolean('autoReconnect', false)
     autoReconnectButton:setOn(autoReconnect)
     local reconnectStatus = autoReconnect and "On" or "Off"
     if not g_game.getFeature(GameEnterGameShowAppearance) then
@@ -494,6 +495,7 @@ function CharacterList.destroyLoadBox()
         loadBox:destroy()
         loadBox = nil
     end
+    destroyCreateAccount()
 end
 
 function CharacterList.cancelWait()

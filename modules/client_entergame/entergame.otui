@@ -251,15 +251,18 @@ EnterGameWindow
     @onClick: EnterGame.doLogin()
 
   QtButton
+    id: btnCreateNewAccount
     !text: tr('Create New Account')
     anchors.left: parent.left
     anchors.top: prev.bottom
     margin-top: -17
     size: 109 20
-    @onClick: g_platform.openUrl(Services.websites)
+    @onClick: |
+      self:disable()
+      createWidgetAccount()
 
     @onSetup: | 
-      if Services and Services.websites then
+      if Services and Servers_init and table.size(Servers_init) == 1 and Services.createAccount then
         self:setVisible(true)
       else
         self:setVisible(false)

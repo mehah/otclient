@@ -477,7 +477,7 @@ TopStatsBarCompactOnTop < UIWidget
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     margin-top: 5
-    size: 53 14
+    size: 103 14
     layout:
       type: horizontalBox
 
@@ -1047,7 +1047,7 @@ TopStatsBarCompactOnBottom < UIWidget
     anchors.horizontalCenter: parent.horizontalCenter
     achors.bottom: paren.bottom
     margin-top: 8
-    size: 53 14
+    size: 103 14
     layout:
       type: horizontalBox
 

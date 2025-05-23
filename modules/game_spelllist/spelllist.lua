@@ -78,10 +78,10 @@ function setSpelllistProfile(name)
 end
 
 function online()
-    if g_game.getFeature(GameSpellList) then
-        spelllistButton:show()
-    else
-        spelllistButton:hide()
+    if g_game.getFeature(GameSpellList) and not spelllistButton then
+        spelllistButton = modules.game_mainpanel.addToggleButton('spelllistButton', tr('Spell List'),
+        '/images/options/button_spells', toggle, false, 4)
+        spelllistButton:setOn(false)
     end
 
     -- Vocation is only send in newer clients
@@ -104,10 +104,6 @@ function init()
 
     spelllistWindow = g_ui.displayUI('spelllist', modules.game_interface.getRightPanel())
     spelllistWindow:hide()
-
-    spelllistButton = modules.game_mainpanel.addToggleButton('spelllistButton', tr('Spell List'),
-                                                                      '/images/options/button_spells', toggle, false, 4)
-    spelllistButton:setOn(false)
 
     nameValueLabel = spelllistWindow:getChildById('labelNameValue')
     formulaValueLabel = spelllistWindow:getChildById('labelFormulaValue')
@@ -192,8 +188,10 @@ function terminate()
     })
 
     spelllistWindow:destroy()
-    spelllistButton:destroy()
-
+    if spelllistButton then
+        spelllistButton:destroy()
+        spelllistButton = nil
+    end
     vocationRadioGroup:destroy()
     groupRadioGroup:destroy()
     premiumRadioGroup:destroy()
@@ -398,7 +396,9 @@ end
 
 function resetWindow()
     spelllistWindow:hide()
-    spelllistButton:setOn(false)
+    if spelllistButton then
+        spelllistButton:setOn(false)
+    end
 
     -- Resetting filters
     filters.level = false

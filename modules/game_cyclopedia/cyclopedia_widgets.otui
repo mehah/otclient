@@ -600,24 +600,7 @@ ProgressBackground < UIWidget
     image-border: 5
     anchors.fill: parent
     phantom: true
-CheckBoxButton < UICheckBox
-  size: 106 23
-  image-source: /images/ui/button-9grid-idle
-  image-border: 3
-  text-align: center
-  padding: 5 10 5 10
-  change-cursor-image: true
-  cursor: pointer
-  color: #BDBDBD
-  $checked:
-    image-source: /images/ui/button-9grid-pressed
-    text-offset: 1 1
-  $!checked:
-    text-offset: 0 0
-  $disabled:
-    color: #dfdfdf88
-    opacity: 0.8
-    change-cursor-image: false
+
 BorderBox < UIWidget
   border-width-top: 1
   border-color-top: black

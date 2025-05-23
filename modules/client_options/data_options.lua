@@ -222,7 +222,7 @@ return {
         end
     },
     forceEffectOptimization           = {
-        value = true,
+        value = false,
         action = function(value, options, controller, panels, extraWidgets)
             g_app.forceEffectOptimization(value)
         end

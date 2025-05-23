@@ -23,7 +23,7 @@ local IMG_ATTR_TRANSLATED = {
 
 local function translateStyleName(styleName, el)
     if styleName == 'select' then
-        return 'combobox'
+        return 'QtComboBox'
     end
 
     if styleName == 'hr' then
@@ -32,7 +32,7 @@ local function translateStyleName(styleName, el)
 
     if styleName == 'input' then
         if el.attributes['type'] == 'checkbox' or el.attributes['type'] == 'radio' then
-            return 'CheckBox'
+            return 'QtCheckBox'
         end
 
         return 'TextEdit'

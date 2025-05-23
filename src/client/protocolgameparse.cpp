@@ -461,6 +461,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerSendUpdateLootTracker:
                     parseUpdateLootTracker(msg);
                     break;
+                case Proto::GameServerQuestTracker:
+                    parseQuestTracker(msg);
+                    break;
                 case Proto::GameServerKillTracker:
                     parseKillTracker(msg);
                     break;
@@ -2751,6 +2754,40 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
     g_game.processOpenOutfitWindow(currentOutfit, outfitList, mountList, familiarList, wingList, auraList, effectList, shaderList);
 }
 
+void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
+{
+    const uint8_t messageType = msg->getU8();
+    switch (messageType) {
+        case 1: {
+            const uint8_t remainingQuests = msg->getU8();
+            const uint8_t missionCount = msg->getU8();
+            std::vector<std::tuple<uint16_t, std::string, uint8_t, std::string, std::string>> missions;
+            for (uint8_t i = 0; i < missionCount; ++i) {
+                const uint16_t missionId = msg->getU16();
+                const std::string& questName = msg->getString();
+                uint8_t questIsCompleted = 0;
+                if (g_game.getClientVersion() >= 1410) {
+                    questIsCompleted = msg->getU8();
+                }
+                const std::string& missionName = msg->getString();
+                const std::string& missionDesc = msg->getString();
+                missions.emplace_back(missionId, questName, questIsCompleted, missionName, missionDesc);
+            }
+            return g_lua.callGlobalField("g_game", "onQuestTracker", remainingQuests, missions);
+        }
+        case 0: {
+            const uint16_t missionId = msg->getU16();
+            const std::string& missionName = msg->getString();
+            uint8_t questIsCompleted = 0;
+            if (g_game.getClientVersion() >= 1410) {
+                questIsCompleted = msg->getU8();
+            }
+            const std::string& missionDesc = msg->getString();
+            return g_lua.callGlobalField("g_game", "onUpdateQuestTracker", missionId, missionName, questIsCompleted, missionDesc);
+        }
+    }
+}
+
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
 {
     msg->getString(); // monster name
@@ -3388,10 +3425,13 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
             uint8_t creatureType;
             if (g_game.getClientVersion() >= 910) {
                 creatureType = msg->getU8();
-            } else if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId) {
-                creatureType = Proto::CreatureTypePlayer;
             } else {
-                creatureType = Proto::CreatureTypeNpc;
+                if (id >= Proto::PlayerStartId && id < Proto::PlayerEndId)
+                    creatureType = Proto::CreatureTypePlayer;
+                else if (id >= Proto::MonsterStartId && id < Proto::MonsterEndId)
+                    creatureType = Proto::CreatureTypeMonster;
+                else
+                    creatureType = Proto::CreatureTypeNpc;
             }
 
             uint32_t masterId = 0;
@@ -4148,11 +4188,11 @@ void ProtocolGame::parseBlessDialog(const InputMessagePtr& msg)
 
 void ProtocolGame::parseRestingAreaState(const InputMessagePtr& msg)
 {
-    msg->getU8(); // zone
-    msg->getU8(); // state
-    msg->getString(); // message
+    const uint8_t zone = msg->getU8();
+    const uint8_t state = msg->getU8();
+    const auto& message = msg->getString();
 
-    // TODO: implement resting area state usage
+    g_lua.callGlobalField("g_game", "onRestingAreaState", zone, state, message);
 }
 
 void ProtocolGame::parseUpdateImpactTracker(const InputMessagePtr& msg)
@@ -4651,110 +4691,134 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
 void ProtocolGame::parseDailyRewardCollectionState(const InputMessagePtr& msg)
 {
-    msg->getU8(); // state
-
-    // TODO: implement daily reward collection state usage
+    const uint8_t state = msg->getU8();
+    g_lua.callGlobalField("g_game", "onDailyRewardCollectionState", state);
 }
 
 void ProtocolGame::parseOpenRewardWall(const InputMessagePtr& msg)
 {
-    msg->getU8(); // bonus shrine (1) or instant bonus (0)
-    msg->getU32(); // next reward time
-    msg->getU8(); // day streak day
+    const uint8_t bonusShrine = msg->getU8(); // bonus shrine (1) or instant bonus (0)
+    const uint32_t nextRewardTime = msg->getU32(); // next reward time
+    const uint8_t dayStreakDay = msg->getU8(); // day streak day
 
     const uint8_t wasDailyRewardTaken = msg->getU8();
+    uint16_t tokens = 0;
+    std::string errorMessage = "";
+    uint32_t timeLeft = 0;
+
     if (wasDailyRewardTaken != 0) {// taken (player already took reward?)
-        msg->getString(); // error message
+        errorMessage = msg->getString(); // error message
         const uint8_t token = msg->getU8();
         if (token != 0) {
-            msg->getU16(); // Tokens
+            tokens = msg->getU16(); // Tokens
         }
     } else {
         msg->getU8(); // Unknown
-        msg->getU32(); // time left to pickup reward without loosing streak
-        msg->getU16(); // Tokens
+        timeLeft = msg->getU32(); // time left to pickup reward without loosing streak
+        tokens = msg->getU16(); // Tokens
     }
 
-    msg->getU16(); // day streak level
-    // TODO: implement open reward wall usage
+    const uint16_t dayStreakLevel = msg->getU16(); // day streak level
+
+    g_lua.callGlobalField("g_game", "onOpenRewardWall", bonusShrine, nextRewardTime, dayStreakDay,
+                          wasDailyRewardTaken, errorMessage, tokens, timeLeft, dayStreakLevel);
 }
 
 namespace {
-    void parseRewardDay(const InputMessagePtr& msg)
+    DailyRewardDay parseRewardDay(const InputMessagePtr& msg)
     {
-        const uint8_t redeemMode = msg->getU8(); // reward type
-        if (redeemMode == 1) {
+        DailyRewardDay day;
+        day.redeemMode = msg->getU8(); // reward type
+        day.itemsToSelect = 0; // reward type
+        if (day.redeemMode == 1) {
             // select x items from the list
-            msg->getU8(); // items to select
-
+            day.itemsToSelect = msg->getU8(); // reward type
             const uint8_t itemListSize = msg->getU8();
             for (auto listIndex = 0; listIndex < itemListSize; ++listIndex) {
-                msg->getU16(); // Item ID
-                msg->getString(); // Item name
-                msg->getU32(); // Item weight
+                DailyRewardItem item;
+                item.itemId = msg->getU16(); // Item ID
+                item.name = msg->getString(); // Item name
+                item.weight = msg->getU32(); // Item weight
+                day.selectableItems.emplace_back(item);
             }
-        } else if (redeemMode == 2) {
+        } else if (day.redeemMode == 2) {
             // no choice, click to redeem all
-
             const uint8_t itemListSize = msg->getU8();
             for (auto listIndex = 0; listIndex < itemListSize; ++listIndex) {
                 const uint8_t bundleType = msg->getU8(); // type of reward
+                DailyRewardBundle bundle;
+                bundle.bundleType = bundleType;
+
                 switch (bundleType) {
                     case 1: {
                         // Items
-                        msg->getU16(); // Item ID
-                        msg->getString(); // Item name
-                        msg->getU8(); // Item Count
+                        bundle.itemId = msg->getU16(); // Item ID
+                        bundle.name = msg->getString(); // Item name
+                        bundle.count = msg->getU8(); // Item Count
                         break;
                     }
                     case 2: {
                         // Prey Wildcards
-                        msg->getU8(); // Prey Wildcards Count
+                        bundle.itemId = 0;
+                        bundle.name = "Prey Wildcards";
+                        bundle.count = msg->getU8(); // Prey Wildcards Count
                         break;
                     }
                     case 3: {
                         // XP Boost
-                        msg->getU16(); // XP Boost Minutes
+                        bundle.itemId = msg->getU16(); // XP Boost Minutes
+                        bundle.name = "XP Boost";
+                        bundle.count = 0;
                         break;
                     }
                     default:
                         // Invalid type
                         break;
                 }
+                day.bundleItems.emplace_back(bundle);
             }
         }
+
+        return day;
     }
 }
 
 void ProtocolGame::parseDailyReward(const InputMessagePtr& msg)
 {
-    const uint8_t days = msg->getU8(); // Reward count (7 days)
-    for (auto i = 1; i <= days; ++i) {
-        parseRewardDay(msg); // Free account
-        parseRewardDay(msg); // Premium account
+    DailyRewardData data;
+    data.days = msg->getU8(); // Reward count (7 days)
+
+    for (auto i = 1; i <= data.days; ++i) {
+        data.freeRewards.push_back(parseRewardDay(msg)); // Free account
+        data.premiumRewards.push_back(parseRewardDay(msg)); // Premium account
     }
 
-    const uint8_t bonus = msg->getU8();
-    for (auto i = 0; i < bonus; ++i) {
-        msg->getString(); // Bonus name
-        msg->getU8(); // Bonus ID
+    const uint8_t bonusCount = msg->getU8();
+    for (auto i = 0; i < bonusCount; ++i) {
+        DailyRewardBonus bonus;
+        bonus.name = msg->getString(); // Bonus name
+        bonus.id = msg->getU8(); // Bonus ID
+        data.bonuses.push_back(bonus);
     }
 
-    msg->getU8(); // max unlockable "dragons" for free accounts
-    // TODO: implement daily reward usage
+    data.maxUnlockableDragons = msg->getU8(); // max unlockable "dragons" for free accounts
+
+    g_lua.callGlobalField("g_game", "onDailyReward", data);
 }
 
 void ProtocolGame::parseRewardHistory(const InputMessagePtr& msg)
 {
-    const uint8_t historyCount = msg->getU8(); // history count
+    const uint8_t historyCount = msg->getU8();
+    std::vector<std::tuple<uint32_t, bool, std::string, uint16_t>> rewardHistory;
     for (auto i = 0; i < historyCount; ++i) {
-        msg->getU32(); // timestamp
-        msg->getU8(); // is Premium
-        msg->getString(); // description
-        msg->getU16(); // daystreak
+        const uint32_t timestamp = msg->getU32();
+        const bool isPremium = static_cast<bool>(msg->getU8());
+        const auto& description = msg->getString();
+        const uint32_t daystreak = msg->getU16();
+        rewardHistory.emplace_back(timestamp, isPremium, description, daystreak);
     }
 
-    // TODO: implement reward history usage
+    g_lua.callGlobalField("g_game", "onRewardHistory", rewardHistory);
 }
 
 void ProtocolGame::parsePreyFreeRerolls(const InputMessagePtr& msg)
@@ -5026,10 +5090,9 @@ void ProtocolGame::parseCloseImbuementWindow(const InputMessagePtr& /*msg*/)
 
 void ProtocolGame::parseError(const InputMessagePtr& msg)
 {
-    msg->getU8(); // error code
-    msg->getString(); // error
-
-    // TODO: implement error usage
+    const uint8_t code = msg->getU8();
+    const auto& error = msg->getString();
+    g_lua.callGlobalField("g_game", "onServerError", code, error);
 }
 
 void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)

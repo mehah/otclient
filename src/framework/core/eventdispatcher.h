@@ -24,13 +24,59 @@
 
 #include "scheduledevent.h"
 
+enum class TaskGroup : int8_t
+{
+    NoGroup = -1, // is outside the context of the dispatcher
+    Serial,
+    GenericParallel,
+    Last
+};
+
+enum class DispatcherType : uint8_t
+{
+    NoType,
+    Event,
+    AsyncEvent,
+    ScheduledEvent,
+    CycleEvent,
+    DeferEvent
+};
+
+struct DispatcherContext
+{
+    bool isGroup(const TaskGroup _group) const {
+        return group == _group;
+    }
+
+    bool isAsync() const {
+        return type == DispatcherType::AsyncEvent;
+    }
+
+    auto getGroup() const {
+        return group;
+    }
+
+    auto getType() const {
+        return type;
+    }
+
+private:
+    void reset() {
+        group = TaskGroup::NoGroup;
+        type = DispatcherType::NoType;
+    }
+
+    DispatcherType type = DispatcherType::NoType;
+    TaskGroup group = TaskGroup::NoGroup;
+
+    friend class EventDispatcher;
+};
+
 // @bindsingleton g_dispatcher
 class EventDispatcher
 {
 public:
-    EventDispatcher() {
-        m_threads.emplace_back(std::make_unique<ThreadTask>());
-    }
+    EventDispatcher();
 
     void init();
     void shutdown();
@@ -44,33 +90,12 @@ public:
 
     void startEvent(const ScheduledEventPtr& event);
 
-private:
-    inline void mergeEvents();
-    inline void executeEvents();
-    inline void executeAsyncEvents();
-    inline void executeDeferEvents();
-    inline void executeScheduledEvents();
-
-    const auto& getThreadTask() const {
-        const auto id = stdext::getThreadId();
-        bool grow = false;
-
-        {
-            std::shared_lock l(m_sharedLock);
-            grow = id >= static_cast<int16_t>(m_threads.size());
-        }
-
-        if (grow) {
-            std::unique_lock l(m_sharedLock);
-            for (auto i = static_cast<int16_t>(m_threads.size()); i <= id; ++i)
-                m_threads.emplace_back(std::make_unique<ThreadTask>());
-        }
-
-        return m_threads[id];
+    const auto& context() const {
+        return dispacherContext;
     }
 
-    size_t m_pollEventsSize{};
-    bool m_disabled{ false };
+private:
+    thread_local static DispatcherContext dispacherContext;
 
     // Thread Events
     struct ThreadTask
@@ -86,8 +111,21 @@ private:
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
     };
+
+    inline void mergeEvents();
+    inline void executeEvents();
+    inline void executeAsyncEvents();
+    inline void executeDeferEvents();
+    inline void executeScheduledEvents();
+
+    const std::unique_ptr<ThreadTask>& getThreadTask() const {
+        return m_threads[stdext::getThreadId() % m_threads.size()];
+    }
+
+    size_t m_pollEventsSize{};
+    bool m_disabled{ false };
+
     mutable std::vector<std::unique_ptr<ThreadTask>> m_threads;
-    mutable std::shared_mutex m_sharedLock;
 
     // Main Events
     std::vector<EventPtr> m_eventList;

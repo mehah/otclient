@@ -1,0 +1,9 @@
+Module
+  name: game_questlog
+  description: game_questlog
+  author: game_questlog
+  website: game_questlog
+  scripts: [ game_questlog.lua ]
+  sandboxed: true
+  @onLoad: questLogController:init()
+  @onUnload: questLogController:terminate()

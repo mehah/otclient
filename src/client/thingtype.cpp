@@ -202,7 +202,8 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
         m_market.name = m_name;
 
         for (const int32_t voc : flags.market().restrict_to_profession()) {
-            m_market.restrictVocation |= voc;
+            uint16_t vocBitMask = std::pow(2, voc - 1);
+            m_market.restrictVocation |= vocBitMask;
         }
 
         m_market.requiredLevel = flags.market().minimum_level();

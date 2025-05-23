@@ -19,6 +19,9 @@ UIWidget
     margin-top: 10
     Label
       text: Client user features profile
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
     ComboBox
       id: profile
       margin-top: 3

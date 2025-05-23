@@ -1,0 +1,79 @@
+// todo change to css/html
+MainWindow
+  !text: tr('Pick reward')
+  size: 451 390
+  @onEscape: modules.game_rewardwall.destroyPickReward()
+  padding: 20
+  color: #c0c0c0
+
+  Label
+    id: rewardLabel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: 10
+    text: you have selected 0 of 2 reward items.
+
+  TextList
+    id: rewardList
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-bottom: 10
+    margin-right: 10
+    margin-top: 5
+    height: 267
+    vertical-scrollbar: rewardListScrollBar
+    background-color: #404040
+
+  VerticalQtScrollBar
+    id: rewardListScrollBar
+    anchors.top: rewardList.top
+    anchors.bottom: rewardList.bottom
+    anchors.left: rewardList.right
+    step: 14
+    pixels-scroll: true
+
+  Panel
+    id: capacity
+    anchors.left: parent.left
+    anchors.top: rewardList.bottom
+    margin-top: 10
+    text: Free capacity: 737.60 oz
+
+  Label
+    id: weight
+    anchors.right: parent.right
+    anchors.top: rewardList.bottom
+    margin-top: 10
+    text: Total weight: 0.00 oz
+
+  HorizontalSeparator
+    id: separator
+    anchors.left: parent.left
+    anchors.right: parent.right 
+    anchors.top: prev.bottom
+    margin-top: 10
+
+  QtButton
+    id: btnClose
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    size: 45 20
+    margin-top: 5
+    text: Close
+    font: cipsoftFont
+    @onClick: modules.game_rewardwall.destroyPickReward(true)
+
+  QtButton
+    id: btnOk
+    anchors.right: prev.left
+    anchors.top: separator.bottom
+    size: 60 20
+    margin-top: 5
+    margin-right: 10
+    text: Ok
+    color: #FFFFFF
+    font: cipsoftFont
+    enabled: false
+    @onClick: modules.game_rewardwall.onClickBtnOk()

@@ -1,0 +1,233 @@
+TextListQuestLog < Panel
+  font: verdana-11px-antialised
+  width: 192
+  text-offset: 24 5
+  text-align: topLeft
+  border-width: 1
+  border-color: #00000077
+  height: 425
+  image-border: 4
+  image-border-top: 23
+  image-border-bottom: 4
+  focusable: true
+
+  TextList
+    id: questList
+    vertical-scrollbar: spellsScrollBar
+    anchors.fill: parent
+    padding: 1
+    width: 10
+    focusable: true
+    background-color: #404040
+    auto-focus: first
+
+  VerticalQtScrollBar
+    id: spellsScrollBar
+    anchors.top: questList.top
+    anchors.bottom: questList.bottom
+    anchors.right: questList.right
+    step: 50
+    pixels-scroll: true
+
+MultiLineQuestLog < Panel
+  font: verdana-11px-antialised
+  width: 192
+  text-offset: 24 5
+  text-align: topLeft
+  border-width: 1
+  border-color: #00000077
+  height: 425
+  image-border: 4
+  image-border-top: 23
+  image-border-bottom: 4
+  focusable: false
+
+  MultilineTextEdit
+    id: questList
+    vertical-scrollbar: spellsScrollBar
+    anchors.fill: parent
+    padding: 1
+    width: 10
+    focusable: false
+    text-wrap: true
+    background-color: #404040
+
+
+  VerticalQtScrollBar
+    id: spellsScrollBar
+    anchors.top: questList.top
+    anchors.bottom: questList.bottom
+    anchors.right: questList.right
+    step: 50
+    pixels-scroll: true
+
+TextEditQuestLog < Panel
+  height: 18
+  TextEdit
+    id: SearchEdit
+    anchors.fill: parent
+    margin-left: 5
+    height: 17
+    placeholder: Type to search
+    placeholder-color: #6E706F
+    @onTextChange : onSearchTextChange(self:getText())
+
+  UIWidget
+    id: SearchClearButton
+    anchors.right: SearchEdit.right
+    anchors.top: SearchEdit.top
+    margin-top: 1
+    margin-right: 2
+    image-source: /game_cyclopedia/images/button_clear_search
+    image-color: white
+    opacity: 0.8
+    @onClick: self:getParent():getChildById('SearchEdit'):clearText()
+    $hover:
+      opacity: 1.0
+      image-color: white
+    $pressed:
+      opacity: 1.0
+      image-color: gray
+
+QuestLogLabel < UIWidget
+  color: #C0C0C0
+  text-align: left
+  text-offset: 15 0
+  focusable: true
+  icon-align: left
+
+  $checked:
+    color: #F6F6F6
+  CheckBoxButton
+    id: iconShow
+    anchors.right: parent.right
+    icon-source: /game_questlog/images/icon-show-small-on
+    width: 15
+    height: 15
+    margin-right: 30
+    visible: false
+  CheckBoxButton
+    id: iconPin
+    anchors.left: prev.right
+    icon-source: /game_questlog/images/icon-pin
+    height: 15
+    width: 15
+    margin-left: 3
+    visible: false
+
+
+QuestLogTracker < MiniWindow
+  id: QuestLogTracker
+  !text: tr('Quest Tracker')
+  icon: /images/topbuttons/icon-questtracker-widget
+  icon-offset: 4 2
+  icon-size: 12 12
+  @onOpen: modules.game_questlog.onOpenTracker()
+  @onClose: modules.game_questlog.onCloseTracker()
+  UIButton
+    id: menuButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 112 0 14 14
+
+    $hover:
+      image-clip: 112 14 14 14
+
+    $pressed:
+      image-clip: 112 28 14 14
+
+    $on:
+      image-clip: 112 0 14 14
+
+  UIButton
+    id: cyclopediaButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 2
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 126 0 14 14
+
+    $hover:
+      image-clip: 126 14 14 14
+
+    $pressed:
+      image-clip: 126 28 14 14
+
+    $on:
+      image-clip: 126 0 14 14
+
+  UIWidget
+    id: miniborder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 2
+    margin-bottom: 2
+
+  MiniWindowContents
+    id: contentsPanel
+    padding-left: 5
+    padding-right: 5
+    padding-bottom: 3
+    layout: verticalBox
+    Panel
+      id: list
+      layout:
+        type: verticalBox
+        fit-children: true
+    Panel
+      height: 30
+      margin-top: 5
+      QtButton
+        margin-top: 8
+        anchors.fill: parent
+        text: Add  Tracked  Quest
+        margin-left: 20
+        margin-right: 20
+        color: white
+        @onClick: modules.game_questlog.show()
+
+
+ButtonTrackerMenuOption < UIButton
+  text-offset: 5 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+QuestTrackerLabel < Panel
+  height: 20
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  $!first:
+    margin-top: 3
+
+  Label
+    id: description
+    text-align: center
+    text-wrap: true
+    text-auto-resize: true
+    &onMousePress: modules.game_questlog.onQuestLogMousePress
+  HorizontalSeparator
+    margin-top: 3
+
+TrackerWindowsMenu < PopupMenu
+  width: 304
+
+  ButtonTrackerMenuOption
+    id: remove
+    !text: tr('remove')

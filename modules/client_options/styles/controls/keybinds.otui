@@ -163,6 +163,8 @@ UIWidget
         !text: tr("Chat Mode Off")
         margin-bottom: -5
         text-offset: 20 -3
+        $mobile:
+          margin-left:-120
     UIWidget
       id: toolTipWidget
       image-source: /images/icons/show_gui_help_grey
@@ -191,7 +193,9 @@ UIWidget
       id: field
       width: 300
       @onTextChange: searchActions()
-    
+      $mobile:
+        width: 140
+
     UIButton
       id: clear
       image-source: /images/ui/button-clear-18x18-up

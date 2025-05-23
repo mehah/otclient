@@ -25,13 +25,6 @@ function init()
         onSkullChange = onSkullChange
     })
 
-    unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
-                                                                              tr('Unjustified Points'),
-                                                                              '/images/options/button_frags',
-                                                                              toggle)
-    unjustifiedPointsButton:setOn(true)
-    unjustifiedPointsButton:hide()
-
     unjustifiedPointsWindow = g_ui.loadUI('unjustifiedpoints')
     unjustifiedPointsWindow:disableResize()
     unjustifiedPointsWindow:setup()
@@ -66,15 +59,22 @@ function terminate()
     })
 
     unjustifiedPointsWindow:destroy()
-    unjustifiedPointsButton:destroy()
+    if unjustifiedPointsButton then
+        unjustifiedPointsButton:destroy()
+        unjustifiedPointsButton = nil
+    end
 end
 
 function onMiniWindowOpen()
-    unjustifiedPointsButton:setOn(true)
+    if unjustifiedPointsButton then
+        unjustifiedPointsButton:setOn(true)
+    end
 end
 
 function onMiniWindowClose()
-    unjustifiedPointsButton:setOn(false)
+    if unjustifiedPointsButton then
+        unjustifiedPointsButton:setOn(false)
+    end
 end
 
 function toggle()
@@ -96,12 +96,11 @@ function toggle()
 end
 
 function online()
-    if g_game.getFeature(GameUnjustifiedPoints) then
+    if g_game.getFeature(GameUnjustifiedPoints) and not unjustifiedPointsButton then
         unjustifiedPointsWindow:setupOnStart() -- load character window configuration
-        unjustifiedPointsButton:show()
-    else
-        unjustifiedPointsButton:hide()
-        unjustifiedPointsWindow:close()
+        unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
+            tr('Unjustified Points'), '/images/options/button_frags', toggle)
+        unjustifiedPointsButton:setOn(false)
     end
 
     refresh()

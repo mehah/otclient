@@ -741,6 +741,20 @@ void ProtocolGame::sendRequestBless()
     send(msg);
 }
 
+void ProtocolGame::sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& quests)
+{
+    const auto msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestTrackerQuestLog);
+    msg->addU8(static_cast<uint8_t>(quests.size()));
+    for (const auto& [questId, questName] : quests) {
+        msg->addU16(questId);
+        if (g_game.getClientVersion() >= 1410) {
+            msg->addString(questName);
+        }
+    }
+    send(msg);
+}
+
 void ProtocolGame::sendRequestOutfit()
 {
     const auto& msg = std::make_shared<OutputMessage>();
@@ -1186,6 +1200,23 @@ void ProtocolGame::sendRequestStoreHome()
     msg->addU8(Otc::Store_Type_Actions_t::OPEN_HOME);
     send(msg);
 }
+void ProtocolGame::sendRequestStorePremiumBoost()
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_PREMIUM_BOOST);
+    msg->addU8(0);
+    send(msg);
+}
+
+void ProtocolGame::sendRequestUsefulThings(const uint8_t offerId)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientRequestStoreOffers);
+    msg->addU8(Otc::Store_Type_Actions_t::OPEN_USEFUL_THINGS);
+    msg->addU8(offerId);
+    send(msg);
+}
 
 void ProtocolGame::sendRequestStoreOfferById(uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType)
 {
@@ -1360,6 +1391,33 @@ void ProtocolGame::sendCloseImbuingWindow()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientCloseImbuingWindow);
+    send(msg);
+}
+
+void ProtocolGame::sendOpenRewardWall()
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientOpenRewardWall);
+    send(msg);
+}
+
+void ProtocolGame::sendOpenRewardHistory()
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientOpenRewardHistory);
+    send(msg);
+}
+
+void ProtocolGame::sendGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::sendGetRewardDaily);
+    msg->addU8(bonusShrine);
+    msg->addU8(items.size());
+    for (const auto& [itemId, count] : items) {
+        msg->addU16(itemId);
+        msg->addU8(count);
+    }
     send(msg);
 }
 

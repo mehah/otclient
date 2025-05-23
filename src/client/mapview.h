@@ -204,7 +204,7 @@ protected:
 private:
     enum class FadeType
     {
-        NONE$, IN$, OUT$
+        NONE, FADE_IN, FADE_OUT
     };
 
     struct MapObject
@@ -323,7 +323,7 @@ private:
     bool m_shiftPressed{ false };
     bool m_multithreading{ false };
 
-    FadeType m_fadeType{ FadeType::NONE$ };
+    FadeType m_fadeType{ FadeType::NONE };
 
     AntialiasingMode m_antiAliasingMode{ ANTIALIASING_DISABLED };
 

@@ -1,0 +1,740 @@
+WorldWidget < UIWidget
+  height: 14
+  background-color: alpha
+  &updateOnStates: |
+    function(self)
+      local children = self:getChildren()
+      for i=1,#children do
+        children[i]:setOn(self:isFocused())
+      end
+    end
+  @onFocusChange: self:updateOnStates()
+  @onSetup: self:updateOnStates()
+
+
+  Label
+    id: details
+    color: #aaaaaa
+    anchors.top: parent.top
+    anchors.left: parent.left
+    font: verdana-11px-monochrome
+    text-auto-resize: true
+    background-color: alpha
+    text-offset: 2 0
+
+    $on:
+      color: #ffffff
+
+PanelCreateYourAccount < Panel
+  id: searchTemplate
+  height: 20
+  margin-top: 5
+  layout:
+    type: horizontalBox
+    spacing: 200
+
+  Label
+    id: label
+    text-offset: 0 2
+    font: verdana-11px-monochrome
+
+  UIWidget
+    id: field
+    width: 180
+
+  UIWidget
+    id: icons
+    image-source: /images/ui/createaccount/icon-yes
+    image-size: 12 9
+    margin-top: 12
+    enabled: false
+    $disabled:
+      image-source: /images/ui/createaccount/icon-no
+
+MainWindow
+  id: mainWindow
+  size: 513 390
+  text: "Start Your Journey"
+  @onEscape: destroyCreateAccount()
+
+  Panel
+    id: imagesBanner
+    size: 708 99
+    anchors.left: parent.left
+    margin-left: 39
+    anchors.top: parent.top
+    height: 40
+    layout:
+      type: horizontalBox
+    UIWidget
+      image-source: /images/ui/createaccount/bannerleft
+    UIWidget
+      id: accountdatainvalid
+      image-source: /images/ui/createaccount/banneraccountdatavalid
+      enabled: false
+      $disabled:
+        image-source: /images/ui/createaccount/banneraccountdatainvalid
+    UIWidget
+      id: banneralldatainvalid
+      image-source: /images/ui/createaccount/banneralldatavalid
+      enabled: false
+      $disabled:
+        image-source: /images/ui/createaccount/banneralldatainvalid
+    UIWidget
+      id: bannercharacterdatainvalid
+      image-source: /images/ui/createaccount/bannercharacterdatavalid
+      enabled: false
+      $disabled:
+        image-source: /images/ui/createaccount/bannercharacterdatainvalid
+    UIWidget
+      image-source: /images/ui/createaccount/bannerright
+
+  Panel
+    id: createAccount
+    size: 712 350
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    anchors.bottom: parent.bottom
+
+    MiniPanel
+      id: createYourAccount
+      size: 712 123
+      text: "Create Your Account"
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 5
+
+      PanelCreateYourAccount
+        id: panelEmail
+        margin-top: -2
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        Label:
+          !text: tr('Email:')
+          margin-left: 100
+          width: 160
+
+
+
+
+      PanelCreateYourAccount
+        id: panelPassword
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: prev.bottom
+        Label:
+          !text: tr('Password:')
+          margin-left: 76
+          width: 183
+
+
+      PanelCreateYourAccount
+        id: panelRepeatPassword
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: prev.bottom
+        Label:
+          !text: tr('Repeat Password:')
+          margin-left: 32
+          width: 227
+      Panel
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: prev.bottom
+        id: panelCheckBox
+        height: 25
+        margin-top: 5
+        layout:
+          type: horizontalBox
+          spacing: 2
+        QtCheckBox
+          id: checkboxPrivacy
+          text: "I agree to the Tibia Service Agreement,\n Tibia Rules and Tibia Privacy Policy. "
+          width: 273
+          margin-left: 50
+
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-top: 12
+          margin-left: 2
+          enabled: false
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+    MiniPanel
+      id: createYourCharacter
+      height: 95
+      text: "Create Your Character"
+      margin-top: 5
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+
+      Panel
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        id: panelCharacterName 
+        height: 20
+        margin-top: -1
+
+        layout:
+          type: horizontalBox
+          spacing: 4
+
+        Label
+          text-offset: 0 2
+          margin-left: 38
+          font: verdana-11px-monochrome
+          !text: tr('Character Name:')
+        
+        Label
+          id: characterTextEdit
+          width: 180
+        
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-top: 12
+          margin-left: 3
+          enabled: false
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+
+        Button
+          text: "Suggest Name"
+          font: cipsoftFont
+          @onClick: onClickSuggestName()
+      Panel
+        id: panelSex
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: prev.bottom
+        height: 25
+        margin-top: 5
+        $!first:
+          margin-left:50
+        layout:
+          type: horizontalBox
+          spacing:26
+        Label
+          text: Character Sex:
+        RadioBox
+          id: Male
+          text-horizontal-auto-resize: true
+          !text: tr("male")
+          margin-bottom: -5
+          text-offset: 20 -3
+        RadioBox
+          id: Female
+          text-horizontal-auto-resize: true
+          !text: tr("female")
+          margin-bottom: -5
+          text-offset: 20 -5
+          width: 100
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-top: 12
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+      Panel
+        id: panelRecommendedWorld
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: prev.bottom
+        height: 20
+        $!first:
+          margin-left:10
+        layout:
+          type: horizontalBox
+          spacing: 35
+        Label
+          text: Recommended World:
+        Label
+          id: worldLabel
+          margin-left:-25
+          !text: tr("Canary (America)")
+          text-auto-resize: true
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-top: 12
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+        Button
+          text: "Change World"
+          font: cipsoftFont
+          margin-left: -30
+          @onClick: toggleMainPanels(true)
+    HorizontalSeparator
+      id: separatorOne
+      margin-top: 5
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+    Button
+      text: "Already Registered"
+      size: 115 22
+      margin-top: 15
+      margin-left: 5
+      anchors.top: separatorOne.bottom
+      anchors.left: parent.left
+      font: cipsoftFont
+      @onClick: toggleCreateAccount(true)
+    UIButton
+      id: buttonStartPlaying
+      text: "Start Playing"
+      size: 120 33
+      margin-top: 10
+      margin-right: 5
+      anchors.top: separatorOne.bottom
+      anchors.right: parent.right
+      font: cipsoftFont
+      image-source: /images/ui/createaccount/button_startplaying
+      enabled:false
+      @onClick: onClickStartPlaying()
+      $pressed:
+        image-source: /images/ui/createaccount/button_startplaying_down
+        text-offset: 1 1
+
+      $disabled:
+        color: #dfdfdf88
+        opacity: 0.8
+      $!disabled:
+        color: #ffffff
+        opacity: 1
+    HorizontalSeparator
+      margin-top: 5
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+    Label
+      text: "This site is protected by ReCAPTCHA and  the google Privacy Policy and Terms of Services apply."
+      margin-top: 5
+      font: cipsoftFont
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-align: center
+    Panel
+      id: test
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      height: 500
+      margin-top: 5
+      width: 181
+      $!first:
+        margin-top:28
+      layout:
+        type: verticalBox
+        spacing:1
+      HiddenTextQtEdit
+        id: textEditEmail
+        text-hidden: false
+      HiddenTextQtToggleEdit
+        id: textEditPassword
+      HiddenTextQtToggleEdit
+        id: textEditRepeatPassword
+      HiddenTextQtEdit
+        id: textEditCharacter
+        text-hidden: false
+        margin-top: 58
+    Panel
+      id: testToolstips
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      height: 500
+      margin-top: 5
+      width: 181
+      $!first:
+        margin-top:50
+      layout:
+        type: verticalBox
+        spacing:1
+      Panel
+        id: textEditEmail
+
+        background-color: #C0C0C0
+        border: 1 black
+        visible: false
+        height: 20
+        visible:false
+        color: #3F3F3F
+        text-vertical-auto-resize: true
+        text-wrap:true
+      Panel
+        id: textEditRepeatPassword
+        background-color: #C0C0C0
+        border: 1 black
+        height: 20
+        margin-top: 46
+        visible:false
+        color: #3F3F3F
+        text-vertical-auto-resize: true
+        text-wrap:true
+      Panel
+        id: textEditCharacter
+        &test: panelCharacterName
+        background-color: #C0C0C0
+        border: 1 black
+        margin-top: 125
+        visible:false
+        color: #3F3F3F
+        text-vertical-auto-resize: true
+        text-wrap:true
+
+    Panel
+      id: passwordRequirements
+      anchors.top: parent.top
+      anchors.left: prev.right
+      margin-left: 110
+      margin-top: 20
+      size: 260 100
+      layout: verticalBox
+      background-color: #C0C0C0
+      border: 1 black
+      visible: false
+      Panel
+        height: 19
+        layout: horizontalBox
+        Label
+          text-auto-resize: true
+          color: #3F3F3F
+          text: Password Requirements
+          text-offset: 5 5
+      Panel
+        height: 14
+        layout: horizontalBox
+        id: PasswordLength
+
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-top: 12
+          enabled: false
+          margin-left: 5
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+
+        Label
+          text-auto-resize: true
+          color: #3F3F3F
+          text: 10 - 29 Characters
+          text-offset: 10 2
+
+      Panel
+        height: 14
+        layout: horizontalBox
+        id: InvalidCharacters
+
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-left: 5
+          margin-top: 12
+          enabled: false
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+
+        Label
+          text-auto-resize: true
+          color: #3F3F3F
+          text: No invalid Character
+          text-offset: 10 2
+
+      Panel
+        height: 14
+        layout: horizontalBox
+        id: HasLowerCase
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-left: 5
+          margin-top: 12
+          enabled: false
+
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+
+        Label
+          text-auto-resize: true
+          color: #3F3F3F
+          text: At least one lower case letter (a-z)
+          text-offset: 10 2
+      Panel
+        height: 14
+        layout: horizontalBox
+        id: HasUpperCase
+
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-left: 5
+          enabled: false
+          margin-top: 12
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+
+        Label
+          text-auto-resize: true
+          color: #3F3F3F
+          text: At least one upper case letter (A-Z)
+          text-offset: 10 2
+      Panel
+        height: 14
+        layout: horizontalBox
+        id: HasNumber
+
+        UIWidget
+          id: icons
+          image-source: /images/ui/createaccount/icon-yes
+          image-size: 12 9
+          margin-left: 5
+          enabled: false
+          margin-top: 12
+          $disabled:
+            image-source: /images/ui/createaccount/icon-no
+
+        Label
+          text-auto-resize: true
+          color: #3F3F3F
+          text: At least one number(0-9)
+          text-offset: 10 2
+  Panel
+    id: mainPanelSelectAGameWorldToPlayOn
+    size: 712 350
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: imagesBanner.bottom
+    anchors.bottom: parent.bottom
+    visible: false
+    @onSetup: |
+      g_keyboard.bindKeyPress('Up', function() 
+        local characters = self:recursiveGetChildById('textListAllWorlds')
+        characters:focusPreviousChild(KeyboardFocusReason)
+        local focusedChild = characters:getFocusedChild()
+        if focusedChild then
+          characters:ensureChildVisible(focusedChild)
+        end
+      end, self)
+      g_keyboard.bindKeyPress('Down', function() 
+        local characters = self:recursiveGetChildById('textListAllWorlds')
+        characters:focusNextChild(KeyboardFocusReason)
+        local focusedChild = characters:getFocusedChild()
+        if focusedChild then
+          characters:ensureChildVisible(focusedChild)
+        end
+      end, self)
+    MiniPanel
+      id: panelSelectAGameWorldToPlayOn
+      size: 712 215
+      text: "Select a Game World to Play On"
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 5
+      Panel
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        id: panelSelectworldAndPvp 
+        height: 20
+        margin-top: -1
+        layout:
+          type: horizontalBox
+          spacing: 30
+
+        Label
+          text-offset: 0 2
+          margin-left: 38
+          font: verdana-11px-monochrome
+          !text: tr('World Location:')
+        QtComboBox
+          id: comboBoxWorld
+        Label
+          text: Pvp Type:
+        QtComboBox
+          id: comboBoxPvp
+
+      TextList
+        id: textListAllWorlds
+        background-color: #404040
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        margin-top: 5
+        width: 140
+        vertical-scrollbar: ListScrollBar
+
+      VerticalQtScrollBar
+        id: ListScrollBar
+        anchors.top: textListAllWorlds.top
+        anchors.right: textListAllWorlds.right
+        anchors.bottom: textListAllWorlds.bottom
+        step: 14
+        pixels-scroll: true
+      MiniPanel
+        id: worldInfo
+        text: World Name
+        background-color: #404040
+        anchors.top: panelSelectworldAndPvp.bottom
+        anchors.left: textListAllWorlds.right
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        margin-left: 5
+        margin-top: 5
+        text: Information
+        layout: verticalBox
+
+        Panel
+          height: 14
+          layout: horizontalBox
+
+          Label
+            width: 110
+            color: #dfdfdf
+            text: Player Online:
+
+          Label
+            id: PlayersOnline
+            text-auto-resize: true
+            color: #dfdfdf
+
+        Panel
+          height: 14
+          margin-top: 5
+          layout: horizontalBox
+
+          Label
+            width: 110
+            color: #dfdfdf
+            text: PvP Type:
+
+          Label
+            id: PvPType
+            text-auto-resize: true
+            color: #dfdfdf
+
+        Panel
+          height: 14
+          margin-top: 5
+          layout: horizontalBox
+
+          Label
+            width: 110
+            color: #dfdfdf
+            text: World Locations:
+
+          Label
+            id: Region
+            text-auto-resize: true
+            color: #dfdfdf
+
+        Panel
+          height: 14
+          margin-top: 5
+          layout: horizontalBox
+
+          Label
+            width: 110
+            color: #dfdfdf
+            text: Creation Date
+
+          Label
+            id: CreationDate
+            text-auto-resize: true
+            color: #dfdfdf
+
+        Panel
+          height: 14
+          margin-top: 5
+          layout: horizontalBox
+
+          Label
+            width: 110
+            color: #dfdfdf
+            text: BattleEye Status:
+
+          Label
+            id: BattlEyeActivationTimestamp
+            text-auto-resize: true
+            color: #dfdfdf
+
+        Panel
+          height: 14
+          margin-top: 5
+          layout: horizontalBox
+
+          Label
+            width: 110
+            color: #dfdfdf
+            text: Premium Only:
+
+          Label
+            id: PremiumOnly
+            text-auto-resize: true
+            color: #dfdfdf
+
+        Panel
+          height: 14
+          margin-top: 5
+          layout: horizontalBox
+
+          Label
+            width: 110
+            color: #dfdfdf
+            text: Transfer Type:
+
+          Label
+            id: TransferType
+            text-auto-resize: true
+            color: #dfdfdf
+
+    HorizontalSeparator
+      id:separadorThee
+      margin-top: 10
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+
+    Button
+      text: "back"
+      size: 115 22
+      margin-top: 10
+      margin-left: 5
+      anchors.top: separadorThee.bottom
+      anchors.left: parent.left
+      font: cipsoftFont
+      @onClick: toggleMainPanels(false)
+
+    Button
+      text: "Ok"
+      size: 115 22
+      margin-top: 10
+      margin-left: 5
+      anchors.top: separadorThee.bottom
+      anchors.right: parent.right
+      font: cipsoftFont
+      @onClick: onClickOkChangeWorld()
+
+    Button
+      text: "Reset"
+      size: 115 22
+      margin-top: 10
+      margin-right: 5
+      anchors.top: separadorThee.bottom
+      anchors.right: prev.left
+      font: cipsoftFont
+      @onClick: onClickResetGameWorld()

@@ -1,0 +1,111 @@
+<link href="game_rewardwall/game_rewardwall.css" />
+<window id="rewardWallWindow" anchor="parent" class="reward-wall-window" text="Reward Wall"
+  onescape="self:onClickToggle()" layout="type: verticalBox;spacing:10">
+  <!-- History Panel -->
+  <minipanel id="historyPanel" text="History" class="history-panel">
+    <TextListWithScroll id="historyList" class="history-list"></TextListWithScroll>
+  </minipanel>
+
+  <!-- Resting Area Bonuses Panel -->
+  <minipanel id="restingAreaPanel" text="Resting Area Bonuses" class="content-panel" anchor="parent">
+    <div id="restingAreaInfo" layout="type: verticalBox;spacing:5" class="resting-area-info">
+      <img src="/game_rewardwall/images/icon-rewardstreak-default" id="rewardStreakIcon" class="resting-area-icon"
+        onhover="self:onhoverStatusPlayer(event)">2</img>
+      <UIWidget id="timeLeft" class="resting-area-time" onhover="self:onhoverStatusPlayer(event)">2 min</UIWidget>
+      <GoldLabel2 id="restingAreaGold" class="resting-area-gold" onhover="self:onhoverStatusPlayer(event)"></GoldLabel2>
+    </div>
+
+    <div id="bonusIcons" anchor="parent" layout="type: horizontalBox;spacing:4" class="bonus-icons-container">
+      <imgBonuses id="bonusIcon1" style="icon-clip: 0 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon2" style="icon-clip: 64 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon3" style="icon-clip: 128 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon4" style="icon-clip: 192 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon5" style="icon-clip: 256 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon6" style="icon-clip: 320 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
+    </div>
+
+    <label id="streakWarning" anchor="parent" class="info-label premium-message">
+      Great! You benefit from the best possible rewards and bonuses due to your premium status.
+    </label>
+  </minipanel>
+
+  <!-- Daily Rewards Panel -->
+  <minipanel id="dailyRewardsPanel" text="Daily Rewards" class="daily-rewards-panel"
+    layout="type: horizontalBox;spacing:-1;">
+    <div id="reward1" layout="type: verticalBox;spacing:5" class="reward-item">
+      <RewardButton3 id="rewardButton1" class="reward-button" onhover="self:onhoverRewardType(event)"
+        onclick="self:onClickDisplayWindowsPickRewardWindow(event)"></RewardButton3>
+      <div id="rewardGold1" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
+    </div>
+    <img src="/game_rewardwall/images/icon-rewardarrow" id="arrow1" class="reward-arrow"></img>
+
+    <div id="reward2" layout="type: verticalBox;spacing:5" class="reward-item">
+      <RewardButton3 id="rewardButton2" class="reward-button" onhover="self:onhoverRewardType(event)"
+        onclick="self:onClickDisplayWindowsPickRewardWindow(event)"></RewardButton3>
+      <div id="rewardGold2" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
+    </div>
+    <img src="/game_rewardwall/images/icon-rewardarrow" id="arrow2" class="reward-arrow"></img>
+
+    <div id="reward3" layout="type: verticalBox;spacing:5" class="reward-item">
+      <RewardButton3 id="rewardButton3" class="reward-button" onhover="self:onhoverRewardType(event)"
+        onclick="self:onClickDisplayWindowsPickRewardWindow(event)"></RewardButton3>
+      <div id="rewardGold3" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
+    </div>
+    <img src="/game_rewardwall/images/icon-rewardarrow" id="arrow3" class="reward-arrow"></img>
+
+    <div id="reward4" layout="type: verticalBox;spacing:5" class="reward-item">
+      <RewardButton3 id="rewardButton4" class="reward-button" onhover="self:onhoverRewardType(event)"
+        onclick="self:onClickDisplayWindowsPickRewardWindow(event)"></RewardButton3>
+      <div id="rewardGold4" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
+    </div>
+    <img src="/game_rewardwall/images/icon-rewardarrow" id="arrow4" class="reward-arrow"></img>
+
+    <div id="reward5" layout="type: verticalBox;spacing:5" class="reward-item">
+      <RewardButton3 id="rewardButton5" class="reward-button" onhover="self:onhoverRewardType(event)"
+        onclick="self:onClickDisplayWindowsPickRewardWindow(event)"></RewardButton3>
+      <div id="rewardGold5" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
+    </div>
+    <img src="/game_rewardwall/images/icon-rewardarrow" id="arrow5" class="reward-arrow"></img>
+
+    <div id="reward6" layout="type: verticalBox;spacing:5" class="reward-item">
+      <RewardButton3 id="rewardButton6" class="reward-button" onhover="self:onhoverRewardType(event)"
+        onclick="self:onClickDisplayWindowsPickRewardWindow(event)"></RewardButton3>
+      <div id="rewardGold6" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
+    </div>
+    <img src="/game_rewardwall/images/icon-rewardarrow" id="arrow6" class="reward-arrow"></img>
+
+    <div id="reward7" layout="type: verticalBox;spacing:5" class="reward-item">
+      <RewardButton3 id="rewardButton7" class="reward-button" onhover="self:onhoverRewardType(event)"
+        onclick="self:onClickDisplayWindowsPickRewardWindow(event)"></RewardButton3>
+      <div id="rewardGold7" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
+    </div>
+    <img src="/game_rewardwall/images/icon-rewardarrow-loop-inactive" id="arrowLoop" class="reward-arrow-loop"></img>
+  </minipanel>
+
+  <!-- Premium Status Panel -->
+  <QtPanel id="premiumStatus" class="premium-panel">
+    <label id="premiumMessage" anchor="parent" class="info-label premium-info2">
+      Great! You benefit from the best possible rewards and bonuses due to your premium status.
+    </label>
+    <BigPremiumButton id="premiumButton" class="premium-button" onclick="self:onClickSendStoreRewardWall()">
+    </BigPremiumButton>
+  </QtPanel>
+
+  <!-- Info Hover Panel -->
+  <QtPanel id="infoPanel" class="info-label infoPanel">
+    <label id="free" anchor="parent" class="free-info"></label>
+    <label id="premium" class="premium-info"></label>
+  </QtPanel>
+
+  <!-- Footer Panel -->
+  <div id="footerPanel" class="footer-panel" anchor="parent">
+    <HorizontalSeparator id="footerSeparator" class="footer-separator"></HorizontalSeparator>
+    <GoldLabel2 id="footerGold1" anchor="parent" class="footer-gold-1"></GoldLabel2>
+    <GoldLabel2 id="footerGold2" class="footer-gold-2"> </GoldLabel2>
+    <MiniPremiumButton id="instantRewardButton" class="instant-reward-button"
+      onclick="self:onClickbuyInstantRewardAccess()"></MiniPremiumButton>
+    <Qtbutton id="historyButton" class="action-button history-button" onclick="self:onClickshowHistory()">History
+    </Qtbutton>
+    <Qtbutton id="closeButton" class="action-button close-button" onclick="self:onClickToggle()">Close</Qtbutton>
+  </div>
+</window>

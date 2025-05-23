@@ -11,6 +11,7 @@ Module
   @onLoad: |
     dofile 'entergame'
     dofile 'characterlist'
+    dofile 'createAccount'
     EnterGame.init()
     CharacterList.init()
 

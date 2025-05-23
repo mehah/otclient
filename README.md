@@ -146,7 +146,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 - <details>
    <summary>Auto Reload Module</summary>
-
+   <br>
    Activate `g_modules.enableAutoReload()`  ([init.lua](https://github.com/mehah/otclient/blob/main/init.lua#L114))
 
 
@@ -257,11 +257,19 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </details>
 
 - Support DirectX
-
+- Hud Scale
 - <details>
    <summary>Garbage Collection </summary>
   <br>
   Garbage collector is used to check what is no longer being used and remove it from memory. (lua, texture, drawpool, thingtype)
+</details>
+
+- <details>
+   <summary>Latency-adaptive camera</summary>
+  <br>
+  Basically the camera adapts to the server latency to always remain smooth and not have that stuttering session when walking.
+
+  In short, if the ping gets high, the camera moves slower, trying to keep up with the server's response time. If the ping goes down soon after, the camera will move faster. Of course, this all depends on your character's speed.
 </details>
 
 
@@ -373,7 +381,6 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </p>
 
 - Lua Debugger for VSCode [see wiki](https://github.com/mehah/otclient/wiki/Lua-Debugging-(VSCode)) [@BenDol](https://github.com/BenDol)
-- Tutorial to Use OTC in TFS main [see wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main)
 
 - 3D Sound and Sound Effects! by [@Codinablack](https://github.com/codinablack)
 
@@ -391,7 +398,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
    <summary>Layout based on tibia 13 by @marcosvf132</summary>
 
   - by [@marcosvf132](https://github.com/marcosvf132)
-  - Game_shop v8
+  - Game_shop based in Store by [@Oskar1121](https://github.com/Oskar1121/Store) and modified/fixed by [@Nottinghster](https://github.com/Nottinghster/)
   - Minimap WorldTime
 
     - tfs c++(old): `void ProtocolGame::sendWorldTime()`
@@ -435,6 +442,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Store (compatible with 1098 , 12.91 ~ 13.40)
 - QuickLoot
 - Groups Vip
+- Reward Wall (Daily Rewards)
 
 - <details>
    <summary>Browser Client by @OTArchive</summary>
@@ -531,15 +539,14 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 >
 > In Old Protocol , if you consider that the speed of the item is too fast, modify [item-ticks-per-frame: 75](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)  in setup.otml
 
-## <a name="roadmap">❤️ Roadmap</a>
+## <a name="roadmap">❤️ Roadmap of the community</a>
 
 | TO-DO list            	| Status                            	| PR   	|
 |-----------------------	|-----------------------------------	|------	|
 | wheel of destiny            	| ![](https://geps.dev/progress/1) 	| None	|
 | Forge            	| ![](https://geps.dev/progress/1) 	| None	|
 | Analyzer              	| ![](https://geps.dev/progress/10)   |  [#802](https://github.com/mehah/otclient/pull/802)    	|
-| fix: Extended view new-layout | ![](https://geps.dev/progress/0)   |   None   	|
-| Sound tibia 13 | ![](https://geps.dev/progress/60)   |   None   	|
+| Sound tibia 13 | ![](https://geps.dev/progress/80)   |  [#1098](https://github.com/mehah/otclient/pull/1098)   	|
 
 ## <a name="supportprotocol">💯 Support Protocol</a>
 
@@ -551,9 +558,8 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 500](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)        	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	|                                              	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
-| Canary 13.21        	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
-| Canary 13.32        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
-| Canary 13.40        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
+| Canary  <br> (13.21 / 13.32 / 13.40)       	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
+| Canary <br> (14.05)        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ❌             	|
 
 
 

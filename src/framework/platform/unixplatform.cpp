@@ -71,14 +71,15 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
         return false;
 
     if(pid == 0) {
-        char* cargs[args.size()+2];
-        cargs[0] = (char*)process.c_str();
-        for(uint i=1;i<=args.size();++i)
-            cargs[i] = (char*)args[i-1].c_str();
-        cargs[args.size()+1] = nullptr;
+        std::vector<char*> cargs;
+        cargs.push_back(const_cast<char*>(process.c_str()));
+        for(const auto& arg : args) {
+            cargs.push_back(const_cast<char*>(arg.c_str()));
+        }
+        cargs.push_back(nullptr);
 
-        if(execv(process.c_str(), cargs) == -1)
-            _exit(EXIT_FAILURE);
+        execv(process.c_str(), cargs.data());
+        _exit(EXIT_FAILURE);
     }
 
     return true;
@@ -231,9 +232,11 @@ std::string Platform::traceback(const std::string_view where, int level, int max
     if(!where.empty())
         ss << "\n\t[C++]: " << where;
 
-    void* buffer[maxDepth + level + 1];
-    int numLevels = backtrace(buffer, maxDepth + level + 1);
-    char **tracebackBuffer = backtrace_symbols(buffer, numLevels);
+    const int size = maxDepth + level + 1;
+    std::vector<void*> buffer(size);
+
+    int numLevels = backtrace(buffer.data(), size);
+    char **tracebackBuffer = backtrace_symbols(buffer.data(), numLevels);
     if(tracebackBuffer) {
         for(int i = 1 + level; i < numLevels; i++) {
             std::string line = tracebackBuffer[i];

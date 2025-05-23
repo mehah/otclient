@@ -134,3 +134,22 @@ fakeCheckBox < UICheckBox
     image-color: #dfdfdf88
     color: #dfdfdf88
     opacity: 0.8
+
+CheckBoxButton < UICheckBox
+  size: 106 23
+  image-source: /images/ui/button-9grid-idle
+  image-border: 3
+  text-align: center
+  padding: 5 10 5 10
+  change-cursor-image: true
+  cursor: pointer
+  color: #BDBDBD
+  $checked:
+    image-source: /images/ui/button-9grid-pressed
+    text-offset: 1 1
+  $!checked:
+    text-offset: 0 0
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+    change-cursor-image: false

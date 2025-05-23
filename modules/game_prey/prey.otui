@@ -460,8 +460,10 @@ CardLabel < FlatPanel
     text-align: right
 
 GoldLabel < FlatPanel
-  padding: 5
-
+  image-source: /images/ui/backdrop-dark-grey
+  image-border: 5
+  margin: 1
+  
   UIWidget
     id: gold
     anchors.right: parent.right

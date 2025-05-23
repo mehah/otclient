@@ -1,0 +1,148 @@
+GiftCoinsLabel < Label
+  color: #C0C0C0
+
+MainWindow
+  id: transferWindow
+  !text: tr('Gift Tibia Coins')
+  size: 280 238
+  color: #909090
+  @onEscape: modules.game_shop.cancelGiftCoins()
+  $on:
+    size: 280 300
+
+  GiftCoinsLabel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 4
+    text-wrap: true
+    height: 56
+    text: Please select the amount of Tibia Coins you like to gift and enter the name of the character that should receive the Tibia Coins.
+
+  GiftCoinsLabel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 10
+    text: Reciepient:
+
+  TextEdit
+    id: recipient
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    width: 150
+    text-align: left
+
+  GiftCoinsLabel
+    id: coinsBalance
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 10
+    text-align: left
+    text-horizontal-auto-resize: true
+    text: Transferable Tibia Coins:
+
+  UIWidget
+    anchors.left: prev.right
+    anchors.verticalcenter: prev.verticalcenter
+    image-source: images/coin
+    margin-left: 6
+    phantom: true
+
+  GiftCoinsLabel
+    id: coinsAmountLabel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 10
+    text-align: left
+    text-horizontal-auto-resize: true
+    text: Amount to gift: 0
+
+  UIWidget
+    anchors.left: prev.right
+    anchors.verticalcenter: prev.verticalcenter
+    image-source: images/coin
+    margin-left: 6
+    phantom: true
+
+  HorizontalScrollBar
+    id: coinsAmountScrollbar
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    step: 25
+    minimum: 0
+    maximum: 0
+    @onValueChange: modules.game_shop.changeCoinsAmount(self:getValue())
+
+  GiftCoinsLabel
+    id: taskPointsBalance
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 10
+    text-align: left
+    text-horizontal-auto-resize: true
+    text: Transferable Task points:
+
+  UIWidget
+    id: taskPointsCoin
+    anchors.left: prev.right
+    anchors.verticalcenter: prev.verticalcenter
+    image-source: images/coin_second
+    margin-left: 6
+    phantom: true
+
+  GiftCoinsLabel
+    id: taskPointsAmountLabel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 10
+    text-align: left
+    text-horizontal-auto-resize: true
+    text: Amount to gift: 0
+
+  UIWidget
+    id: taskPointsLabelCoin
+    anchors.left: prev.right
+    anchors.verticalcenter: prev.verticalcenter
+    image-source: images/coin_second
+    margin-left: 6
+    phantom: true
+
+  HorizontalScrollBar
+    id: taskPointsAmountScrollbar
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    step: 25
+    minimum: 0
+    maximum: 0
+    @onValueChange: modules.game_shop.changeTaskPointsAmount(self:getValue())
+
+  HorizontalSeparator
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: cancelButton.top
+    margin-bottom: 8    
+
+  Button
+    id: cancelButton
+    !text: tr('Cancel')
+    font: cipsoftFont
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    size: 45 21
+    margin-top: 15
+    margin-right: 5
+    @onClick: modules.game_shop.cancelGiftCoins()
+
+  Button
+    id: giftButton
+    !text: tr('Gift')
+    font: cipsoftFont
+    size: 45 21
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: prev.left
+    margin-right: 5
+    @onClick: modules.game_shop.confirmGiftCoins()

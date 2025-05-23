@@ -34,6 +34,7 @@ class TPoint
 public:
     T x{}, y{};
     constexpr TPoint() = default;
+    constexpr TPoint(const TPoint& other) = default;
     constexpr TPoint(T x, T y) : x{ x }, y{ y } {}
     constexpr TPoint(T xy) : x{ xy }, y{ xy } {}
 

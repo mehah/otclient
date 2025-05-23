@@ -61,7 +61,11 @@ FileStream::~FileStream()
         close();
 }
 
-void FileStream::cache(bool useEnc)
+void FileStream::cache(bool
+#if ENABLE_ENCRYPTION == 1
+                       useEnc
+#endif
+)
 {
     m_caching = true;
 
