@@ -193,7 +193,7 @@ void MapView::drawLights() {
 
         const auto& map = m_floors[z].cachedVisibleTiles;
 
-        if (m_fadeType != FadeType::OUT$ || fadeLevel == 1.f) {
+        if (m_fadeType != FadeType::FADE_OUT || fadeLevel == 1.f) {
             for (const auto& tile : map.shades) {
                 if (alwaysTransparent && tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true))
                     continue;
@@ -317,18 +317,18 @@ void MapView::updateVisibleTiles()
 
     // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
-        m_fadeType = FadeType::NONE$;
+        m_fadeType = FadeType::NONE;
         for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
             m_floors[iz].fadingTimers.restart(m_floorFading);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
-        m_fadeType = FadeType::OUT$;
+        m_fadeType = FadeType::FADE_OUT;
         for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
             m_floors[iz].fadingTimers.restart(shift);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
-        m_fadeType = FadeType::IN$;
+        m_fadeType = FadeType::FADE_IN;
         m_fadeFinish = false;
         for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
@@ -350,7 +350,7 @@ void MapView::updateVisibleTiles()
             auto& floor = floors[iz].cachedVisibleTiles;
 
             for (uint_fast32_t diagonal = start; diagonal < end; ++diagonal) {
-                const auto advance = (static_cast<size_t>(diagonal) >= m_drawDimension.height()) ? diagonal - m_drawDimension.height() : 0;
+                const auto advance = (static_cast<size_t>(diagonal) >= static_cast<size_t>(m_drawDimension.height())) ? diagonal - static_cast<size_t>(m_drawDimension.height()) : 0;
                 for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
                     auto tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
                     tilePos.coveredUp(m_posInfo.camera.z - iz);
@@ -408,7 +408,7 @@ void MapView::updateVisibleTiles()
 
         tasks.wait();
 
-        for (auto fi = 0; fi < m_floors.size(); ++fi) {
+        for (int fi = 0, s = m_floors.size(); fi < s; ++fi) {
             auto& floor = m_floors[fi];
             floor.cachedVisibleTiles.clear();
 
