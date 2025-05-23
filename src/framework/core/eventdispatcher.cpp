@@ -73,9 +73,8 @@ void EventDispatcher::startEvent(const ScheduledEventPtr& event)
     }
 
     const auto& thread = getThreadTask();
-    thread->try_lock();
+    std::scoped_lock l(thread->mutex);
     thread->scheduledEventList.emplace_back(event);
-    thread->try_unlock();
 }
 
 ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& callback, int delay)
@@ -86,10 +85,8 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
     assert(delay >= 0);
 
     const auto& thread = getThreadTask();
-    thread->try_lock();
-    auto ret = thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 1));
-    thread->try_unlock();
-    return ret;
+    std::scoped_lock l(thread->mutex);
+    return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 1));
 }
 
 ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callback, int delay)
@@ -100,10 +97,8 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
     assert(delay > 0);
 
     const auto& thread = getThreadTask();
-    thread->try_lock();
-    auto ret = thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 0));
-    thread->try_unlock();
-    return ret;
+    std::scoped_lock l(thread->mutex);
+    return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 0));
 }
 
 EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
@@ -117,10 +112,8 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     }
 
     const auto& thread = getThreadTask();
-    thread->try_lock();
-    auto ret = thread->events.emplace_back(std::make_shared<Event>(callback));
-    thread->try_unlock();
-    return ret;
+    std::scoped_lock l(thread->mutex);
+    return thread->events.emplace_back(std::make_shared<Event>(callback));
 }
 
 void EventDispatcher::asyncEvent(std::function<void()>&& callback) {
@@ -128,9 +121,8 @@ void EventDispatcher::asyncEvent(std::function<void()>&& callback) {
         return;
 
     const auto& thread = getThreadTask();
-    thread->try_lock();
+    std::scoped_lock l(thread->mutex);
     thread->asyncEvents.emplace_back(std::move(callback));
-    thread->try_unlock();
 }
 
 void EventDispatcher::deferEvent(const std::function<void()>& callback) {
@@ -138,9 +130,8 @@ void EventDispatcher::deferEvent(const std::function<void()>& callback) {
         return;
 
     const auto& thread = getThreadTask();
-    thread->try_lock();
+    std::scoped_lock l(thread->mutex);
     thread->deferEvents.emplace_back(callback);
-    thread->try_unlock();
 }
 
 void EventDispatcher::executeEvents() {
@@ -218,6 +209,8 @@ void EventDispatcher::executeDeferEvents() {
 
         for (const auto& thread : m_threads) {
             std::scoped_lock lock(thread->mutex);
+            if (m_deferEventList.size() < thread->deferEvents.size())
+                m_deferEventList.swap(thread->deferEvents);
             if (!thread->deferEvents.empty()) {
                 m_deferEventList.insert(m_deferEventList.end(), make_move_iterator(thread->deferEvents.begin()), make_move_iterator(thread->deferEvents.end()));
                 thread->deferEvents.clear();
@@ -257,34 +250,30 @@ void EventDispatcher::executeScheduledEvents() {
 
 void EventDispatcher::mergeEvents() {
     for (const auto& thread : m_threads) {
-        if (thread->mutex.try_lock()) {
+        std::scoped_lock l(thread->mutex);
+        if (!thread->events.empty()) {
+            if (m_eventList.size() < thread->events.size())
+                m_eventList.swap(thread->events);
+
             if (!thread->events.empty()) {
                 m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
                 thread->events.clear();
             }
+        }
+
+        if (!thread->asyncEvents.empty()) {
+            if (m_asyncEventList.size() < thread->asyncEvents.size())
+                m_asyncEventList.swap(thread->asyncEvents);
 
             if (!thread->asyncEvents.empty()) {
                 m_asyncEventList.insert(m_asyncEventList.end(), make_move_iterator(thread->asyncEvents.begin()), make_move_iterator(thread->asyncEvents.end()));
                 thread->asyncEvents.clear();
             }
-
-            if (!thread->scheduledEventList.empty()) {
-                m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
-                thread->scheduledEventList.clear();
-            }
-
-            thread->mutex.unlock();
         }
-    }
-}
 
-void EventDispatcher::ThreadTask::try_lock() {
-    if (g_dispatcher.context().getGroup() == TaskGroup::None) {
-        mutex.lock();
-    }
-}
-void EventDispatcher::ThreadTask::try_unlock() {
-    if (g_dispatcher.context().getGroup() == TaskGroup::None) {
-        mutex.unlock();
+        if (!thread->scheduledEventList.empty()) {
+            m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
+            thread->scheduledEventList.clear();
+        }
     }
 }

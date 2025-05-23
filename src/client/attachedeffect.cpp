@@ -54,7 +54,7 @@ AttachedEffectPtr AttachedEffect::clone()
     obj->m_fade.timer.restart();
 
     if (!obj->m_texturePath.empty()) {
-        if (obj->m_texture = g_textures.getTexture(obj->m_texturePath, obj->m_smooth)) {
+        if ((obj->m_texture = g_textures.getTexture(obj->m_texturePath, obj->m_smooth))) {
             if (obj->m_texture->isAnimatedTexture()) {
                 const auto& animatedTexture = std::static_pointer_cast<AnimatedTexture>(obj->m_texture);
                 animatedTexture->setOnMap(true);

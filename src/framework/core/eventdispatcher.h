@@ -26,7 +26,7 @@
 
 enum class TaskGroup : int8_t
 {
-    None = -1, // is outside the context of the dispatcher
+    NoGroup = -1, // is outside the context of the dispatcher
     Serial,
     GenericParallel,
     Last
@@ -34,7 +34,7 @@ enum class TaskGroup : int8_t
 
 enum class DispatcherType : uint8_t
 {
-    None,
+    NoType,
     Event,
     AsyncEvent,
     ScheduledEvent,
@@ -62,12 +62,12 @@ struct DispatcherContext
 
 private:
     void reset() {
-        group = TaskGroup::None;
-        type = DispatcherType::None;
+        group = TaskGroup::NoGroup;
+        type = DispatcherType::NoType;
     }
 
-    DispatcherType type = DispatcherType::None;
-    TaskGroup group = TaskGroup::None;
+    DispatcherType type = DispatcherType::NoType;
+    TaskGroup group = TaskGroup::NoGroup;
 
     friend class EventDispatcher;
 };
@@ -110,9 +110,6 @@ private:
         std::vector<Event> asyncEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
-
-        void try_lock();
-        void try_unlock();
     };
 
     inline void mergeEvents();
