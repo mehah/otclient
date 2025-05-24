@@ -449,8 +449,8 @@ public:
     const Timer getLastTimeUsage() const { return m_lastTimeUsage; }
 
     void unload() {
-        m_textureData.clear();
-        m_textureData.resize(m_animationPhases);
+        for (auto& data : m_textureData)
+            data.source = nullptr;
     }
 
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }

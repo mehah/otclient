@@ -34,7 +34,6 @@ PacketPlayer::~PacketPlayer()
 
 PacketPlayer::PacketPlayer(const std::string_view& file)
 {
-    static uint32_t sessionId = 1;
 #ifdef ANDROID
     std::ifstream f(std::string("records/") + std::string(file));
 #else
