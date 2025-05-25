@@ -449,9 +449,6 @@ function terminate()
     Keybind.delete("Chat Channel", "Open Channel List")
     Keybind.delete("Chat Channel", "Open Help Channel")
     Keybind.delete("Chat", "Send current chat line")
-    if g_game.getClientVersion() < 862 then
-        Keybind.delete("Dialogs", "Open Rule Violation")
-    end
     saveCommunicationSettings()
 
     if channelsWindow then
@@ -583,6 +580,9 @@ function clear()
     if channelsWindow then
         channelsWindow:destroy()
         channelsWindow = nil
+    end
+    if g_game.getClientVersion() < 862 then
+        Keybind.delete("Dialogs", "Open Rule Violation")
     end
 end
 
