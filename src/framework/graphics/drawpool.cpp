@@ -322,8 +322,10 @@ void DrawPool::PoolState::execute() const {
     g_painter->setShaderProgram(shaderProgram);
     g_painter->setTransformMatrix(transformMatrix);
     if (action) action();
-    if (texture)
-        g_painter->setTexture(texture->create());
+    if (texture) {
+        texture->create();
+        g_painter->setTexture(texture);
+    }
 }
 
 void DrawPool::setFramebuffer(const Size& size) {

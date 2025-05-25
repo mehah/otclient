@@ -89,13 +89,11 @@ TexturePtr AnimatedTexture::getCurrentFrame() {
     return m_frames[m_currentFrame];
 }
 
-Texture* AnimatedTexture::create() {
+void AnimatedTexture::create() {
     if (getCurrentFrame()->isEmpty()) {
         for (const auto& frame : m_frames)
             frame->create();
     }
-
-    return this;
 }
 
 void AnimatedTexture::update()

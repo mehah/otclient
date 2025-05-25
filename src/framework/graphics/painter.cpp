@@ -62,7 +62,7 @@ Painter::Painter()
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 }
 
-void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
+void Painter::drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode)
 {
     const int vertexCount = coordsBuffer.getVertexCount();
     if (vertexCount == 0)
@@ -85,34 +85,16 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
     m_drawProgram->setResolution(m_resolution);
     m_drawProgram->updateTime();
 
-    coordsBuffer.cache(); // Try to cache
-
     // only set texture coords arrays when needed
-    {
-        if (textured) {
-            m_drawProgram->setTextureMatrix(m_textureMatrix);
-            m_drawProgram->bindMultiTextures();
-
-            const auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
-            if (hardwareBuffer)
-                hardwareBuffer->bind();
-
-            m_drawProgram->setAttributeArray(PainterShaderProgram::TEXCOORD_ATTR, hardwareBuffer ? nullptr : coordsBuffer.getTextureCoordArray(), 2);
-        } else
-            PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
-    }
+    if (textured) {
+        m_drawProgram->setTextureMatrix(m_textureMatrix);
+        m_drawProgram->bindMultiTextures();
+        m_drawProgram->setAttributeArray(PainterShaderProgram::TEXCOORD_ATTR, coordsBuffer.getTextureCoordArray(), 2);
+    } else
+        PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 
     // set vertex array
-    {
-        const auto* hardwareBuffer = coordsBuffer.getHardwareVertexCache();
-        if (hardwareBuffer)
-            hardwareBuffer->bind();
-
-        m_drawProgram->setAttributeArray(PainterShaderProgram::VERTEX_ATTR, hardwareBuffer ? nullptr : coordsBuffer.getVertexArray(), 2);
-    }
-
-    if (coordsBuffer.isCached())
-        HardwareBuffer::unbind(HardwareBuffer::Type::VERTEX_BUFFER);
+    m_drawProgram->setAttributeArray(PainterShaderProgram::VERTEX_ATTR, coordsBuffer.getVertexArray(), 2);
 
     // draw the element in coords buffers
     glDrawArrays(static_cast<GLenum>(drawMode), 0, vertexCount);
@@ -121,7 +103,7 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
         PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 }
 
-void Painter::drawLine(const std::vector<float>& vertex, const int size, const int width)
+void Painter::drawLine(const std::vector<float>& vertex, const int size, const int width) const
 {
     m_drawLineProgram->bind();
     m_drawLineProgram->setTransformMatrix(m_transformMatrix);
@@ -207,12 +189,13 @@ void Painter::setClipRect(const Rect& clipRect)
     updateGlClipRect();
 }
 
-void Painter::setTexture(Texture* texture)
+void Painter::setTexture(const TexturePtr& texture)
 {
     if (m_texture == texture)
         return;
 
-    if (!(m_texture = texture)) {
+    m_texture = texture;
+    if (!texture) {
         m_glTextureId = 0;
         return;
     }

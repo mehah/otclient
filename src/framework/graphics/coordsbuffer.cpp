@@ -66,12 +66,3 @@ void CoordsBuffer::addRepeatedRects(const Rect& dest, const Rect& src)
         }
     }
 }
-
-void CoordsBuffer::cache()
-{
-    if (!m_canCache)
-        return;
-
-    m_vertexArray.cache();
-    m_textureCoordArray.cache();
-}

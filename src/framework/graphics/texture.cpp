@@ -69,15 +69,13 @@ Texture::~Texture()
     }
 }
 
-Texture* Texture::create()
+void Texture::create()
 {
     if (m_image) {
         createTexture();
         uploadPixels(m_image, getProp(buildMipmaps), getProp(compress));
         m_image = nullptr;
     }
-
-    return this;
 }
 
 void Texture::updateImage(const ImagePtr& image) { m_image = image; setupSize(image->getSize()); }

@@ -33,7 +33,7 @@ public:
     Texture(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     virtual ~Texture();
 
-    virtual Texture* create();
+    virtual void create();
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     void updateImage(const ImagePtr& image);
     void updatePixels(uint8_t* pixels, int level = 0, int channels = 4, bool compress = false);

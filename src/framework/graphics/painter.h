@@ -60,8 +60,8 @@ public:
     void clear(const Color& color);
     void clearRect(const Color& color, const Rect& rect);
 
-    void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES);
-    void drawLine(const std::vector<float>& vertex, int size, int width);
+    void drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES);
+    void drawLine(const std::vector<float>& vertex, int size, int width) const;
 
     float getOpacity() const { return m_opacity; }
     bool getAlphaWriting() const { return m_alphaWriting; }
@@ -80,7 +80,7 @@ public:
     PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
 
     void setColor(const Color& color) { if (m_color != color) m_color = color; }
-    void setTexture(Texture* texture);
+    void setTexture(const TexturePtr& texture);
     void setOpacity(const float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
     void setResolution(const Size& resolution, const Matrix3& projectionMatrix = DEFAULT_MATRIX3);
@@ -121,7 +121,7 @@ protected:
     Matrix3 m_textureMatrix;
 
     BlendEquation m_blendEquation{ BlendEquation::ADD };
-    Texture* m_texture{ nullptr };
+    TexturePtr m_texture{ nullptr };
     bool m_alphaWriting{ false };
     uint32_t m_glTextureId{ 0 };
 
