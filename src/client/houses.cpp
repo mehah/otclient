@@ -152,7 +152,7 @@ void HouseManager::load(const std::string& fileName)
             house->load(elem);
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to load '{}': {}", fileName, e.what());
     }
     sort();
 }
@@ -177,7 +177,7 @@ void HouseManager::save(const std::string& fileName)
             throw Exception("failed to save houses XML %s", fileName);
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to save '{}': {}", fileName, e.what());
     }
 }
 

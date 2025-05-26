@@ -207,7 +207,7 @@ SoundSourcePtr SoundManager::play(const std::string& fn, const float fadetime, f
     const std::string& filename = resolveSoundFile(fn);
     const auto& soundSource = createSoundSource(filename);
     if (!soundSource) {
-        g_logger.error(stdext::format("unable to play '%s'", filename));
+        g_logger.error("unable to play '{}'", filename);
         return nullptr;
     }
 
@@ -308,7 +308,7 @@ SoundSourcePtr SoundManager::createSoundSource(const std::string& name)
 #endif
         }
     } catch (std::exception& e) {
-        g_logger.error(stdext::format("failed to load sound source: '%s'", e.what()));
+        g_logger.error("failed to load sound source: '{}'", e.what());
         return nullptr;
     }
 
@@ -500,7 +500,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
 
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load soundbank '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to load soundbank '{}': {}", fileName, e.what());
         return false;
     }
 }
@@ -521,7 +521,7 @@ bool SoundManager::loadClientFiles(const std::string& directory)
         return true;
     } catch (const std::exception& e) {
         if (g_game.getClientVersion() >= 1300) {
-            g_logger.warning(stdext::format("Failed to load '%s' (Sounds): %s", directory, e.what()));
+            g_logger.warning("Failed to load '{}' (Sounds): {}", directory, e.what());
         }
 
         return false;

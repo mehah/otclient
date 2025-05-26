@@ -291,7 +291,7 @@ bool LuaInterface::safeRunScript(const std::string& fileName)
         runScript(fileName);
         return true;
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to load script '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to load script '{}': {}", fileName, e.what());
         return false;
     }
 }
@@ -442,7 +442,7 @@ int LuaInterface::safeCall(const int numArgs, const int numRets)
     // if there was an error throw an exception
     if (ret != 0) {
         const std::string& error = popString();
-        g_logger.error(stdext::format("Lua exception: %s", error));
+        g_logger.error("Lua exception: {}", error);
         throw LuaException(error);
     }
 
@@ -516,7 +516,7 @@ int LuaInterface::signalCall(const int numArgs, const int numRets)
             throw LuaException("attempt to call a non function value", 0);
         }
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("protected lua call failed: %s", e.what()));
+        g_logger.error("protected lua call failed: {}", e.what());
     }
 
     // pushes nil values if needed
@@ -1195,7 +1195,7 @@ void LuaInterface::pushObject(const LuaObjectPtr& obj)
 
     obj->luaGetMetatable();
     if (isNil())
-        g_logger.fatal(stdext::format("metatable for class '%s' not found, did you bind the C++ class?", obj->getClassName()));
+        g_logger.fatal("metatable for class '{}' not found, did you bind the C++ class?", obj->getClassName());
     setMetatable();
 }
 

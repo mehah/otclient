@@ -18,7 +18,7 @@ def convert_format_string(fmt_str):
 def convert_content(content):
     # Apenas chamadas dentro de g_logger.XYZ(...)
     pattern = re.compile(
-        r'(g_logger\.(?:fine|debug|info|warning|error|fatal|traceDebug|traceInfo|traceWarning|traceError)\s*\(\s*)'
+        r'(g_logger\.(?:fine|debug|info|warning|error|fatal)\s*\(\s*)'
         r'stdext::format\(\s*"((?:[^"\\]|\\.)*)"\s*,\s*((?:[^()]|\([^()]*\))+?)\s*\)(\s*\))'
     )
 

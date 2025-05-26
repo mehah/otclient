@@ -1764,7 +1764,7 @@ void ProtocolGame::parseRemoveMagicEffect(const InputMessagePtr& msg)
     getPosition(msg);
     uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
     if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
-        g_logger.warning(stdext::format("[ProtocolGame::parseRemoveMagicEffect] - Invalid effectId type {}", effectId));
+        g_logger.warning("[ProtocolGame::parseRemoveMagicEffect] - Invalid effectId type {}", effectId);
         return;
     }
     // TO-DO
@@ -2488,7 +2488,7 @@ void ProtocolGame::parseTextMessage(const InputMessagePtr& msg)
     const Otc::MessageMode mode = Proto::translateMessageModeFromServer(code);
     std::string text;
 
-    g_logger.debug(stdext::format("[ProtocolGame::parseTextMessage] code: %d, mode: %d", code, mode));
+    g_logger.debug("[ProtocolGame::parseTextMessage] code: {}, mode: {}", code, static_cast<uint8_t>(mode));
 
     switch (mode) {
         case Otc::MessageChannelManagement:

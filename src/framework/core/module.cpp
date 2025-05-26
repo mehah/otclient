@@ -97,7 +97,7 @@ bool Module::load()
 
         if (m_sandboxed)
             g_lua.resetGlobalEnvironment();
-        g_logger.error(stdext::format("Unable to load module '%s': %s", m_name, e.what()));
+        g_logger.error("Unable to load module '{}': {}", m_name, e.what());
 
         g_modules.m_currentModule = nullptr;
 
@@ -109,7 +109,7 @@ bool Module::load()
     for (const auto& modName : m_loadLaterModules) {
         const auto& dep = g_modules.getModule(modName);
         if (!dep)
-            g_logger.error(stdext::format("Unable to find module '%s' required by '%s'", modName, m_name));
+            g_logger.error("Unable to find module '{}' required by '{}'", modName, m_name);
         else if (!dep->isLoaded())
             dep->load();
     }
@@ -138,7 +138,7 @@ void Module::unload()
         } catch (const stdext::exception& e) {
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
-            g_logger.error(stdext::format("Unable to unload module '%s': %s", m_name, e.what()));
+            g_logger.error("Unable to unload module '{}': {}", m_name, e.what());
         }
 
         // clear all env references
@@ -153,7 +153,7 @@ void Module::unload()
         g_lua.pop();
 
         m_loaded = false;
-        //g_logger.info(stdext::format("Unloaded module '%s'", m_name));
+        //g_logger.info("Unloaded module '{}'", m_name);
         g_modules.updateModuleLoadOrder(asModule());
     }
 }

@@ -391,7 +391,7 @@ void Item::unserializeItem(const BinaryTreePtr& in)
             }
         }
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to unserialize OTBM item: %s", e.what()));
+        g_logger.error("Failed to unserialize OTBM item: {}", e.what());
     }
 }
 

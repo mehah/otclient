@@ -75,7 +75,7 @@ bool ResourceManager::discoverWorkDir(const std::string& existentFile)
             continue;
 
         if (PHYSFS_exists(existentFile.c_str())) {
-            g_logger.debug(stdext::format("Found work dir at '%s'", dir));
+            g_logger.debug("Found work dir at '{}'", dir);
             m_workDir = dir;
             found = true;
             break;
@@ -119,7 +119,7 @@ bool ResourceManager::setWriteDir(const std::string& writeDir, bool)
     m_writeDir = writeDir;
 
     if (!addSearchPath(writeDir))
-        g_logger.error(stdext::format("Unable to add write '%s' directory to search path", writeDir));
+        g_logger.error("Unable to add write '{}' directory to search path", writeDir);
 
     return true;
 }
@@ -638,7 +638,7 @@ std::string ResourceManager::selfChecksum() {
 }
 
 void ResourceManager::updateFiles(const std::set<std::string>& files) {
-    g_logger.info(stdext::format("Updating client, %i files", files.size()));
+    g_logger.info("Updating client, %i files", files.size());
 
     const auto& oldWriteDir = getWriteDir();
     setWriteDir(getWorkDir());
@@ -653,12 +653,12 @@ void ResourceManager::updateFiles(const std::set<std::string>& files) {
 
         if (dFile) {
             if (!writeFileBuffer(fileName, (const uint8_t*)dFile->response.data(), dFile->response.size(), true)) {
-                g_logger.error(stdext::format("Cannot write file: %s", fileName));
+                g_logger.error("Cannot write file: {}", fileName);
             } else {
-                //g_logger.info(stdext::format("Updated file: %s", fileName));
+                //g_logger.info("Updated file: {}", fileName);
             }
         } else {
-            g_logger.error(stdext::format("Cannot find file: %s in downloads", fileName));
+            g_logger.error("Cannot find file: {} in downloads", fileName);
         }
     }
     setWriteDir(oldWriteDir);
@@ -678,13 +678,13 @@ void ResourceManager::updateExecutable(std::string fileName)
 
     const auto dFile = g_http.getFile(fileName);
     if (!dFile)
-        g_logger.fatal(stdext::format("Cannot find executable: %s in downloads", fileName));
+        g_logger.fatal("Cannot find executable: {} in downloads", fileName);
 
     const auto& oldWriteDir = getWriteDir();
     setWriteDir(getWorkDir());
     const std::filesystem::path path(m_binaryPath);
     const auto newBinary = path.stem().string() + "-" + std::to_string(time(nullptr)) + path.extension().string();
-    g_logger.info(stdext::format("Updating binary file: %s", newBinary));
+    g_logger.info("Updating binary file: {}", newBinary);
     PHYSFS_file* file = PHYSFS_openWrite(newBinary.c_str());
     if (!file)
         return g_logger.fatal(stdext::format("can't open %s for writing: %s", newBinary, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));

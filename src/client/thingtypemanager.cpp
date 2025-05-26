@@ -105,7 +105,7 @@ bool ThingTypeManager::loadDat(std::string file)
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
+        g_logger.error("Failed to read dat '{}': {}'", file, e.what());
         return false;
     }
 }
@@ -140,7 +140,7 @@ bool ThingTypeManager::loadOtml(std::string file)
         }
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
+        g_logger.error("Failed to read dat otml '{}': {}'", file, e.what());
         return false;
     }
 }
@@ -207,7 +207,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         m_datLoaded = true;
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (Appearances): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (Appearances): {}", file, e.what());
         return false;
     }
 }
@@ -281,7 +281,7 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
         loadCreatureBank(m_monsterRaces, bossBank, true);
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (StaticData): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (StaticData): {}", file, e.what());
         return false;
     }
 
@@ -299,7 +299,7 @@ const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory categor
 const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category)
 {
     if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
-        g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
+        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
         return m_nullThingType;
     }
     return m_thingTypes[category][id];
@@ -439,7 +439,7 @@ ItemTypeList ThingTypeManager::findItemTypesByString(const std::string& name)
 const ItemTypePtr& ThingTypeManager::getItemType(uint16_t id)
 {
     if (id >= m_itemTypes.size() || m_itemTypes[id] == m_nullItemType) {
-        g_logger.error(stdext::format("invalid thing type, server id: %d", id));
+        g_logger.error("invalid thing type, server id: {}", id);
         return m_nullItemType;
     }
     return m_itemTypes[id];
@@ -483,7 +483,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
         fin->flush();
         fin->close();
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to save '{}': {}", fileName, e.what());
     }
 }
 
@@ -533,7 +533,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
         m_otbLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadOtb", file);
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (OTB file): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (OTB file): {}", file, e.what());
     }
 }
 
@@ -583,7 +583,7 @@ void ThingTypeManager::loadXml(const std::string& file)
         m_xmlLoaded = true;
         g_logger.debug("items.xml read successfully.");
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (XML file): {}", file, e.what());
     }
 }
 

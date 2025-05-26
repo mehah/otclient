@@ -66,7 +66,7 @@ UIWidget::~UIWidget()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
     if (!isDestroyed())
-        g_logger.warning(stdext::format("widget '%s' was not explicitly destroyed", m_id));
+        g_logger.warning("widget '{}' was not explicitly destroyed", m_id);
 #endif
 }
 
@@ -893,7 +893,7 @@ void UIWidget::internalDestroy()
 void UIWidget::destroy()
 {
     if (isDestroyed())
-        g_logger.warning(stdext::format("attempt to destroy widget '%s' (%s) two times", m_id, m_source));
+        g_logger.warning("attempt to destroy widget '{}' ({}) two times", m_id, m_source);
 
     // hold itself reference
     const UIWidgetPtr self = static_self_cast<UIWidget>();
@@ -1052,7 +1052,7 @@ bool UIWidget::setRect(const Rect& rect)
 
     /*
     if(rect.width() > 8192 || rect.height() > 8192) {
-        g_logger.error(stdext::format("attempt to set huge rect size (%s) for %s", stdext::to_string(rect), m_id));
+        g_logger.error("attempt to set huge rect size ({}) for {}", stdext::to_string(rect), m_id);
         return false;
     }
     */

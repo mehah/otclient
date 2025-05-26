@@ -92,7 +92,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
     if (!timeout) // lua is not working with default values
         timeout = 5;
     if (data.empty()) {
-        g_logger.error(stdext::format("Invalid post request for %s, empty data, use get instead", url));
+        g_logger.error("Invalid post request for {}, empty data, use get instead", url);
         return -1;
     }
 
@@ -530,7 +530,7 @@ void HttpSession::onTimeout(const std::error_code& ec)
 
 void HttpSession::onError(const std::string& ec, const std::string& /*details*/) const
 {
-    g_logger.error(stdext::format("%s", ec));
+    g_logger.error("{}", ec);
     m_result->error = stdext::format("%s", ec);
     m_result->finished = true;
     m_callback(m_result);
@@ -798,7 +798,7 @@ void WebsocketSession::on_close(const std::error_code& ec)
 
 void WebsocketSession::onError(const std::string& ec, const std::string& /*details*/)
 {
-    g_logger.error(stdext::format("WebsocketSession error %s", ec));
+    g_logger.error("WebsocketSession error {}", ec);
     m_closed = true;
     m_callback(WebsocketCallbackType::ERROR_, "close_code::error " + ec);
 }
@@ -806,7 +806,7 @@ void WebsocketSession::onError(const std::string& ec, const std::string& /*detai
 void WebsocketSession::onTimeout(const std::error_code& ec)
 {
     if (!ec) {
-        g_logger.error(stdext::format("WebsocketSession ontimeout %s", ec.message()));
+        g_logger.error("WebsocketSession ontimeout {}", ec.message());
         m_closed = true;
         m_callback(WebsocketCallbackType::ERROR_, "close_code::ontimeout " + ec.message());
         close();
