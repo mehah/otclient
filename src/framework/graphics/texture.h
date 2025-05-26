@@ -80,7 +80,7 @@ protected:
     Size m_size;
     Timer m_lastTimeUsage;
 
-    uint16_t m_transformMatrixId = 0;
+    uint16_t m_transformMatrixId{ 0 };
 
     ImagePtr m_image;
 

@@ -95,7 +95,7 @@ void PainterShaderProgram::setTextureMatrix(const Matrix3Ptr& textureMatrix)
         return;
 
     bind();
-    setUniformValue(TEXTURE_MATRIX_UNIFORM, *textureMatrix);
+    setUniformValue(TEXTURE_MATRIX_UNIFORM, textureMatrix ? *textureMatrix : DEFAULT_MATRIX3);
     m_textureMatrix = textureMatrix;
 }
 
