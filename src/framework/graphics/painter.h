@@ -121,7 +121,6 @@ protected:
     Matrix3 m_textureMatrix;
 
     BlendEquation m_blendEquation{ BlendEquation::ADD };
-    TexturePtr m_texture{ nullptr };
     bool m_alphaWriting{ false };
     uint32_t m_glTextureId{ 0 };
 

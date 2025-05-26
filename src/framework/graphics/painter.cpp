@@ -68,11 +68,7 @@ void Painter::drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode)
     if (vertexCount == 0)
         return;
 
-    const bool textured = coordsBuffer.getTextureCoordCount() > 0 && m_texture;
-
-    // skip drawing of empty textures
-    if (textured && m_texture->isEmpty())
-        return;
+    const bool textured = coordsBuffer.getTextureCoordCount() > 0 && m_glTextureId > 0;
 
     m_drawProgram = m_shaderProgram ? m_shaderProgram : textured ? m_drawTexturedProgram.get() : m_drawSolidColorProgram.get();
 
@@ -191,17 +187,16 @@ void Painter::setClipRect(const Rect& clipRect)
 
 void Painter::setTexture(const TexturePtr& texture)
 {
-    if (m_texture == texture)
-        return;
-
-    m_texture = texture;
     if (!texture) {
         m_glTextureId = 0;
         return;
     }
 
-    setTextureMatrix(texture->getTransformMatrix());
+    if (m_glTextureId == texture->getId())
+        return;
+
     m_glTextureId = texture->getId();
+    setTextureMatrix(texture->getTransformMatrix());
     updateGlTexture();
 }
 
