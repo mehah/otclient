@@ -722,9 +722,15 @@ void ProtocolGame::parseRequestPurchaseData(const InputMessagePtr& msg)
 
 void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
 {
+    using enum Otc::ResourceTypes_t;
     const auto type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
-    const uint64_t value = msg->getU64();
-    m_localPlayer->setResourceBalance(type, value);
+    if (type >= RESOURCE_CHARM && type <= RESOURCE_MAX_MINOR_CHARM) {
+        const uint32_t value = msg->getU32();
+        m_localPlayer->setResourceBalance(type, value);
+    } else {
+        const uint64_t value = msg->getU64();
+        m_localPlayer->setResourceBalance(type, value);
+    }
 }
 
 void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)

@@ -205,7 +205,7 @@ namespace Proto
         GameServerSendImbuementWindow = 235,
         GameServerSendCloseImbuementWindow = 236,
         GameServerSendError = 237,
-        GameServerResourceBalance = 238,
+        GameServerResourceBalance = 238, // 0xEE
         GameServerWorldTime = 239,
         GameServerQuestLog = 240,
         GameServerQuestLine = 241,

@@ -348,7 +348,7 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
     }
 
     for (uint32_t i = 0, sum = 0, next_sum = sum + delta; i < 32; ++i, sum = next_sum, next_sum += delta) {
-        apply_rounds(outputMessage->getDataBuffer() - 2, encryptedSize, [&](uint32_t& left, uint32_t& right) {
+        apply_rounds(outputMessage->getHeaderBuffer(), encryptedSize, [&](uint32_t& left, uint32_t& right) {
             left += ((right << 4 ^ right >> 5) + right) ^ (sum + m_xteaKey[sum & 3]);
             right += ((left << 4 ^ left >> 5) + left) ^ (next_sum + m_xteaKey[(next_sum >> 11) & 3]);
         });
