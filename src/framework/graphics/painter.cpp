@@ -23,6 +23,8 @@
 #include "painter.h"
 
 #include "framework/graphics/texture.h"
+#include "framework/graphics/texturemanager.h"
+
 #include <framework/platform/platformwindow.h>
 
 #include "shader/shadersources.h"
@@ -196,7 +198,7 @@ void Painter::setTexture(const TexturePtr& texture)
         return;
 
     m_glTextureId = texture->getId();
-    setTextureMatrix(texture->getTransformMatrix());
+    setTextureMatrix(g_textures.getMatrixById(texture->getTransformMatrixId()));
     updateGlTexture();
 }
 

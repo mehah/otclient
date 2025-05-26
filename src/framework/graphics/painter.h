@@ -66,7 +66,7 @@ public:
     float getOpacity() const { return m_opacity; }
     bool getAlphaWriting() const { return m_alphaWriting; }
 
-    Matrix3 getTextureMatrix() const { return m_textureMatrix; }
+    const auto& getTextureMatrix() const { return m_textureMatrix; }
     Matrix3 getTransformMatrix(const Size& size) const;
     Matrix3 getTransformMatrix() const { return m_transformMatrix; }
     Matrix3 getProjectionMatrix() const { return m_projectionMatrix; }
@@ -91,7 +91,7 @@ public:
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram) { setShaderProgram(shaderProgram.get()); }
     void setCompositionMode(CompositionMode compositionMode);
 
-    void setTextureMatrix(const Matrix3& matrix) { if (m_textureMatrix != matrix) m_textureMatrix = matrix; }
+    void setTextureMatrix(const Matrix3Ptr& matrix) { if (m_textureMatrix != matrix) m_textureMatrix = matrix; }
     void setTransformMatrix(const Matrix3& matrix) { if (m_transformMatrix != matrix) m_transformMatrix = matrix; }
     void setProjectionMatrix(const Matrix3& matrix) { if (m_projectionMatrix != matrix) m_projectionMatrix = matrix; }
 
@@ -118,7 +118,7 @@ protected:
 
     Matrix3 m_transformMatrix;
     Matrix3 m_projectionMatrix;
-    Matrix3 m_textureMatrix;
+    Matrix3Ptr m_textureMatrix;
 
     BlendEquation m_blendEquation{ BlendEquation::ADD };
     bool m_alphaWriting{ false };
