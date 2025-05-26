@@ -53,7 +53,3 @@
 #define STATE_RPC_TEXT "github.com/mehah/otclient" // State Text
 #define RPC_LARGE_IMAGE "rpc-logo" // Large Image Name (Imported to API)
 #define RPC_LARGE_TEXT "OTClient - Redemption" // Large Text (Text showed at tooltip large image)
-
-#if defined(__EMSCRIPTEN__)
-#define FMT_ENFORCE_COMPILE_STRING 0
-#endif
