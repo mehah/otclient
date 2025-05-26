@@ -80,7 +80,7 @@ public:
     PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
 
     void setColor(const Color& color) { if (m_color != color) m_color = color; }
-    void setTexture(const TexturePtr& texture);
+    void setTexture(uint32_t textureId, uint16_t textureMatrixId);
     void setOpacity(const float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
     void setResolution(const Size& resolution, const Matrix3& projectionMatrix = DEFAULT_MATRIX3);
@@ -97,7 +97,7 @@ public:
 
     void resetState();
     void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
-    void resetTexture() { setTexture(nullptr); }
+    void resetTexture() { setTexture(0, 0); }
     void resetAlphaWriting() { setAlphaWriting(false); }
     void resetClipRect() { setClipRect({}); }
     void resetOpacity() { setOpacity(1.f); }

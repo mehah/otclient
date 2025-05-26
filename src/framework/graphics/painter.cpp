@@ -187,18 +187,18 @@ void Painter::setClipRect(const Rect& clipRect)
     updateGlClipRect();
 }
 
-void Painter::setTexture(const TexturePtr& texture)
+void Painter::setTexture(uint32_t textureId, uint16_t textureMatrixId)
 {
-    if (!texture) {
-        m_glTextureId = 0;
+    if (m_glTextureId == textureId)
+        return;
+
+    m_glTextureId = textureId;
+    if (textureId == 0) {
         return;
     }
 
-    if (m_glTextureId == texture->getId())
-        return;
-
-    m_glTextureId = texture->getId();
-    setTextureMatrix(g_textures.getMatrixById(texture->getTransformMatrixId()));
+    m_glTextureId = textureId;
+    setTextureMatrix(g_textures.getMatrixById(textureMatrixId));
     updateGlTexture();
 }
 

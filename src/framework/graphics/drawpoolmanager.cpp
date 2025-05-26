@@ -201,6 +201,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         return;
 
     std::scoped_lock l(pool->m_mutexDraw);
+
     if (pool->hasFrameBuffer()) {
         if (pool->m_repaint) {
             pool->m_repaint.store(false);
