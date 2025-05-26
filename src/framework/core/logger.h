@@ -26,6 +26,9 @@
 
 #include <fstream>
 
+#undef FMT_STRING
+#define FMT_STRING(s) s
+
 #include <fmt/format.h>
 
 struct LogMessage
