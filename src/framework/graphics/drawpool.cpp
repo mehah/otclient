@@ -334,7 +334,7 @@ void DrawPool::PoolState::execute() const {
     } else if (const auto txt = texture.lock()) {
         txt->create();
         g_painter->setTexture(txt->getId(), txt->getTransformMatrixId());
-    }
+    } else g_painter->resetTexture();
 }
 
 void DrawPool::setFramebuffer(const Size& size) {
