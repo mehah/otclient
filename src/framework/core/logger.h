@@ -26,18 +26,6 @@
 
 #include <fstream>
 
-#ifndef FMT_STRING
-#define FMT_STRING(s) s
-#endif
-
-#ifndef FMT_USE_CONSTEXPR
-#define FMT_USE_CONSTEXPR 0
-#endif
-
-#if defined(__EMSCRIPTEN__)
-#define FMT_ENFORCE_COMPILE_STRING 0
-#endif
-
 #include <fmt/format.h>
 
 struct LogMessage
