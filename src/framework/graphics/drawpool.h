@@ -186,7 +186,7 @@ protected:
         PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
         Color color{ Color::white };
-        TexturePtr texture;
+        TextureWeakPtr texture;
         uint32_t textureId{ 0 };
         uint16_t textureMatrixId{ 0 };
         size_t hash{ 0 };
@@ -385,7 +385,6 @@ private:
     struct
     {
         std::vector<std::shared_ptr<CoordsBuffer>> coords;
-        std::vector<TexturePtr> pendingTextures;
         uint_fast32_t last{ 0 };
     } m_coordsCache[2];
 
