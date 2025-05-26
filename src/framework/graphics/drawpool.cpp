@@ -333,9 +333,8 @@ void DrawPool::PoolState::execute() const {
     if (texture) {
         texture->create();
         g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
-    } else if (textureId > 0) {
+    } else
         g_painter->setTexture(textureId, textureMatrixId);
-    }
 }
 
 void DrawPool::setFramebuffer(const Size& size) {
