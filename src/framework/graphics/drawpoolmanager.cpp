@@ -220,7 +220,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         pool->m_framebuffer->draw();
         if (pool->m_afterDraw) pool->m_afterDraw();
     } else {
-        pool->m_repaint.store(false);
+        pool->m_repaint.store(false, std::memory_order_release);
         for (const auto& obj : pool->m_objectsDraw) {
             drawObject(obj);
         }
