@@ -87,8 +87,8 @@ void FrameBuffer::bind()
         g_painter->resetState();
     }
 
-    m_oldSize = std::move(g_painter->getResolution());
-    m_oldTextureMatrix = std::move(g_painter->getProjectionMatrix());
+    m_oldSize = g_painter->getResolution();
+    m_oldTextureMatrix = g_painter->getProjectionMatrix();
 
     g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
