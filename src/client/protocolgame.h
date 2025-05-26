@@ -308,6 +308,7 @@ private:
     void parseTaskHuntingData(const InputMessagePtr& msg);
     void parseExperienceTracker(const InputMessagePtr& msg);
     void parseLootContainers(const InputMessagePtr& msg);
+    void parseVirtue(const InputMessagePtr& msg); // @note: improve name
     void parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg);
     void parseCyclopediaHousesInfo(const InputMessagePtr& msg);
     void parseCyclopediaHouseList(const InputMessagePtr& msg);

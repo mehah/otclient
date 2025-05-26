@@ -2883,7 +2883,9 @@ VocationNames = {
     [5] = 'Master Sorcerer',
     [6] = 'Elder Druid',
     [7] = 'Royal Paladin',
-    [8] = 'Elite Knight'
+    [8] = 'Elite Knight',
+    [9] = 'Monk',
+    [10] = 'Exhalted Monk'
 }
 
 SpellGroups = {

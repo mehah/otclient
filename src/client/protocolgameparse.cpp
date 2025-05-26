@@ -437,6 +437,9 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                 case Proto::GameServerLootContainers:
                     parseLootContainers(msg);
                     break;
+                case Proto::GameServerVirtue: // @note: improve name
+                    parseVirtue(msg); // @note: improve name
+                    break;
                 case Proto::GameServerCyclopediaHouseAuctionMessage:
                     parseCyclopediaHouseAuctionMessage(msg);
                     break;
@@ -2342,6 +2345,9 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         // Defense info
         const uint16_t defense = msg->getU16();
         const uint16_t armor = msg->getU16();
+        if (g_game.getClientVersion() >= 1500) {
+            msg->getU16(); // getMantraTotal
+        }
         const double mitigation = msg->getDouble();
         const double dodge = msg->getDouble();
         const uint16_t damageReflection = msg->getU16();
@@ -3209,7 +3215,11 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
     for (auto i = 0; i < size; ++i) {
         msg->getU16(); // id
         msg->getU8(); // subtype
-        msg->getU16(); // count
+        if (g_game.getClientVersion() >= 1500) {
+            msg->getU8(); // count
+        } else {
+            msg->getU16(); // count
+        }
     }
 }
 
@@ -4024,6 +4034,31 @@ void ProtocolGame::parseLootContainers(const InputMessagePtr& msg)
     }
 
     g_lua.callGlobalField("g_game", "onQuickLootContainers", quickLootFallbackToMainContainer, lootList);
+}
+
+void ProtocolGame::parseVirtue(const InputMessagePtr& msg) { // @note: improve name
+    const uint8_t subtype = msg->getU8();
+
+    switch (subtype) {
+        case 0x00: { // Harmony
+            const uint8_t harmonyValue = msg->getU8();
+            g_lua.callGlobalField("g_game", "onHarmonyProtocol", harmonyValue);
+            break;
+        }
+        case 0x01: { // Serene
+            const bool isSerene = msg->getU8() == 0x01;
+            g_lua.callGlobalField("g_game", "onSereneProtocol", isSerene);
+            break;
+        }
+        case 0x02: { // Virtue
+            const uint8_t virtueValue = msg->getU8();
+            g_lua.callGlobalField("g_game", "onVirtueProtocol", virtueValue);
+            break;
+        }
+        default:
+            g_logger.error(stdext::format("Unknown virtue subtype: %d", subtype));
+            break;
+    }
 }
 
 void ProtocolGame::parseCyclopediaHouseAuctionMessage(const InputMessagePtr& msg)
@@ -4876,7 +4911,9 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             data.reflectPhysical = msg->getU16();
             data.armor = msg->getU16();
-
+            if (g_game.getClientVersion() >= 1500) {
+                msg->getU16();
+            }
             data.defense = msg->getU16();
             data.defenseEquipment = msg->getU16();
             data.defenseSkillType = msg->getU8();
@@ -5413,6 +5450,9 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
     }
 
     if (g_game.getClientVersion() >= 1282) {
+        lastAttribute = Otc::ITEM_DESC_CURRENTTIER;
+    }
+    if (g_game.getClientVersion() >= 1500) {
         lastAttribute = Otc::ITEM_DESC_LAST;
     }
 

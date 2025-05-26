@@ -170,6 +170,7 @@ namespace Proto
         GameServerFloorChangeUp = 190,
         GameServerFloorChangeDown = 191,
         GameServerLootContainers = 192,
+        GameServerVirtue = 193, // improve name
         GameServerCyclopediaHouseAuctionMessage = 195,
         GameServerCyclopediaHousesInfo = 198,
         GameServerCyclopediaHouseList = 199,
