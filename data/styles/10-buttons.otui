@@ -185,3 +185,24 @@ QtButton < UIButton
   $disabled:
     color: #dfdfdf88
     opacity: 0.8
+
+BigPremiumButton < UIButton
+  size: 128 37
+  image-source: /images/ui/getpremium
+  image-clip: 0 0 128 37
+  image-border: 3
+  $pressed:
+    image-clip: 0 37 128 37
+  $!on:
+    image-clip: 0 74 128 37
+  $disabled:
+    color: #dfdfdf88
+    opacity: 0.8
+
+MiniPremiumButton < UIButton
+  size: 26 22
+  image-source: /images/ui/miniStoreIcon
+  image-clip: 0 0 26 22
+  $pressed:
+    image-clip: 0 22 26 22
+

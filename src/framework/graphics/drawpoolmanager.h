@@ -99,7 +99,7 @@ public:
 
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
 
-    DrawPoolType getCurrentType() const { return getCurrentPool()->m_type; }
+    DrawPoolType getCurrentType() const;
 
     void repaint(const DrawPoolType drawPool) const {
         get(drawPool)->repaint();

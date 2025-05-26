@@ -42,6 +42,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
 
     m_mapSize = size;
     m_tileSize = tileSize;
+    m_pool->setScaleFactor(tileSize / g_gameConfig.getSpriteSize());
 
     m_lightData.tiles.resize(size.area());
     m_lightData.lights.clear();

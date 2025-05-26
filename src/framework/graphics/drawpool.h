@@ -150,6 +150,7 @@ public:
     }
 
     void resetBuffer() {
+        std::scoped_lock l(m_mutexDraw);
         for (auto& buffer : m_coordsCache) {
             buffer.coords.clear();
             buffer.last = 0;

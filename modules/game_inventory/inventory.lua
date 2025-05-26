@@ -89,7 +89,7 @@ end
 local function walkEvent()
     if modules.client_options.getOption('autoChaseOverride') then
         if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
-            selectPosture('stand', true)
+            selectPosture('stand', false)
         end
     end
 end

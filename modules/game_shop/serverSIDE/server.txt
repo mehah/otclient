@@ -1,30 +1,61 @@
-
 -- Instruction: 
--- creaturescripts.xml      <event type="extendedopcode" name="Shop" script="shop.lua" />
--- and in login.lua         player:registerEvent("Shop")
--- create sql table shop_history
--- set variables
--- set up function init(), add there items and categories, follow examples
--- set up callbacks at the bottom to add player item/outfit/whatever you want
-
 -- add json lib dofile('data/lib/json.lua')  in \data\lib\lib.lua
 
+--[[ SQL TABLE - ZNOTE AAC
 
---[[ SQL TABLE
-
-CREATE TABLE `shop_history` (
+CREATE TABLE `znote_accounts` (
   `id` int(11) NOT NULL,
+  `account_id` int(11) NOT NULL,
+  `ip` bigint(20) UNSIGNED NOT NULL,
+  `created` int(11) NOT NULL,
+  `points` int(11) DEFAULT 0,
+  `points_second` int(11) DEFAULT 0,
+  `cooldown` int(11) DEFAULT 0,
+  `active` tinyint(4) NOT NULL DEFAULT 0,
+  `active_email` tinyint(4) NOT NULL DEFAULT 0,
+  `activekey` int(11) NOT NULL DEFAULT 0,
+  `flag` varchar(20) NOT NULL,
+  `secret` char(16) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `shop_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `account` int(11) NOT NULL,
   `player` int(11) NOT NULL,
   `date` datetime NOT NULL,
   `title` varchar(100) NOT NULL,
-  `cost` int(11) NOT NULL,
-  `details` varchar(500) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `price` int(11) NOT NULL,
+  `costSecond` int(11) NOT NULL,
+  `count` int(11) NOT NULL DEFAULT '0',
+  `target` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`account`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`player`) REFERENCES `players` (`id`) ON DELETE CASCADE
+);
 
-ALTER TABLE `shop_history`
-  ADD PRIMARY KEY (`id`);
-ALTER TABLE `shop_history`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+CREATE TABLE IF NOT EXISTS `change_name_history` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `player_id` int(11) NOT NULL,
+    `last_name` varchar(30) NOT NULL,
+    `current_name` varchar(30) NOT NULL,
+    `changed_name_in` int(11) NOT NULL,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`player_id`) REFERENCES `players` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `player_deaths_backup` (
+  `player_id` int NOT NULL,
+  `time` bigint unsigned NOT NULL DEFAULT '0',
+  `level` int NOT NULL DEFAULT '1',
+  `killed_by` varchar(255) NOT NULL,
+  `is_player` tinyint NOT NULL DEFAULT '1',
+  `mostdamage_by` varchar(100) NOT NULL,
+  `mostdamage_is_player` tinyint NOT NULL DEFAULT '0',
+  `unjustified` tinyint NOT NULL DEFAULT '0',
+  `mostdamage_unjustified` tinyint NOT NULL DEFAULT '0',
+  FOREIGN KEY (`player_id`) REFERENCES `players`(`id`) ON DELETE CASCADE,
+  KEY `killed_by` (`killed_by`),
+  KEY `mostdamage_by` (`mostdamage_by`)
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
 
 ]]--
