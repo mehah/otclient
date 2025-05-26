@@ -84,6 +84,11 @@ public:
         fatal(fmt::format(fmtStr, std::forward<Args>(args)...));
     }
 
+    template<typename... Args>
+    void fine(fmt::format_string<Args...> fmtStr, Args&&... args) {
+        fine(fmt::format(fmtStr, std::forward<Args>(args)...));
+    }
+
     void fireOldMessages();
     void setLogFile(std::string_view file);
     void setOnLog(const OnLogCallback& onLog) { m_onLog = onLog; }
