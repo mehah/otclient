@@ -46,7 +46,7 @@ public:
     void setTime(const ticks_t time) { m_time = time; }
 
     const Size& getSize() const { return m_size; }
-    const auto getTransformMatrixId() const { return m_transformMatrixId; }
+    auto getTransformMatrixId() const { return m_transformMatrixId; }
 
     ticks_t getTime() const { return m_time; }
     uint32_t getId() const { return m_id; }
