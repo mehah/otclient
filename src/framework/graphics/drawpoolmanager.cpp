@@ -168,7 +168,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->m_repaint.load()) {
+    if (pool->m_repaint.load(std::memory_order_acquire)) {
         resetSelectedPool();
         return;
     }
@@ -203,8 +203,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     std::scoped_lock l(pool->m_mutexDraw);
 
     if (pool->hasFrameBuffer()) {
-        if (pool->m_repaint) {
-            pool->m_repaint.store(false);
+        if (pool->m_repaint.exchange(false, std::memory_order_acq_rel)) {
             pool->m_framebuffer->bind();
             for (const auto& obj : pool->m_objectsDraw)
                 drawObject(obj);
