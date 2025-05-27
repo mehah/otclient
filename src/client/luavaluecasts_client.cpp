@@ -1389,7 +1389,6 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     return 1;
 }
 
-// In src/client/luavaluecasts_client.cpp
 int push_luavalue(const CyclopediaCharacterDefenceStats& data)
 {
     g_lua.createTable(0, 20);
@@ -1468,7 +1467,6 @@ int push_luavalue(const CyclopediaCharacterDefenceStats& data)
     return 1;
 }
 
-// In src/client/luavaluecasts_client.cpp
 int push_luavalue(const CyclopediaCharacterMiscStats& data)
 {
     g_lua.createTable(0, 14);

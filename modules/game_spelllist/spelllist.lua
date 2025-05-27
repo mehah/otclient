@@ -122,6 +122,7 @@ function init()
     vocationBoxDruid = spelllistWindow:getChildById('vocationBoxDruid')
     vocationBoxPaladin = spelllistWindow:getChildById('vocationBoxPaladin')
     vocationBoxKnight = spelllistWindow:getChildById('vocationBoxKnight')
+    vocationBoxMonk = spelllistWindow:getChildById('vocationBoxMonk')
 
     groupBoxAny = spelllistWindow:getChildById('groupBoxAny')
     groupBoxAttack = spelllistWindow:getChildById('groupBoxAttack')
@@ -138,6 +139,7 @@ function init()
     vocationRadioGroup:addWidget(vocationBoxDruid)
     vocationRadioGroup:addWidget(vocationBoxPaladin)
     vocationRadioGroup:addWidget(vocationBoxKnight)
+    vocationRadioGroup:addWidget(vocationBoxMonk)
 
     groupRadioGroup = UIRadioGroup.create()
     groupRadioGroup:addWidget(groupBoxAny)
@@ -297,7 +299,7 @@ function updateSpellInformation(widget)
         for i = 1, #info.vocations do
             local vocationId = info.vocations[i]
             if vocationId <= 4 or not (table.find(info.vocations, (vocationId - 4))) then
-                vocation = vocation .. (vocation:len() == 0 and '' or ', ') .. VocationNames[vocationId]
+                vocation = vocation .. (vocation:len() == 0 and '' or ', ') .. vocationNamesByClientId[vocationId]
             end
         end
 
@@ -353,6 +355,8 @@ function toggleFilter(widget, selectedWidget)
             filters.vocationId = FILTER_VOCATION_PALADIN
         elseif boxId == 'vocationBoxKnight' then
             filters.vocationId = FILTER_VOCATION_KNIGHT
+        elseif boxId == 'vocationBoxMonk' then
+            filters.vocationId = FILTER_VOCATION_MONK
         end
     elseif widget == groupRadioGroup then
         local boxId = selectedWidget:getId()

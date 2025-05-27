@@ -51,6 +51,8 @@ void ProtocolGame::onConnect()
     Protocol::onConnect();
 
     m_localPlayer = g_game.getLocalPlayer();
+    if (g_game.getFeature(Otc::GameHeader1400))
+        enabelHeader1400();
 
     if (g_game.getFeature(Otc::GameProtocolChecksum))
         enableChecksum();
@@ -66,7 +68,9 @@ void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
     if (m_firstRecv) {
         m_firstRecv = false;
 
-        if (g_game.getFeature(Otc::GameMessageSizeCheck)) {
+        if (g_game.getFeature(Otc::GameHeader1400)) {
+            const int padding = inputMessage->getU8();
+        } else if (g_game.getFeature(Otc::GameMessageSizeCheck)) {
             const int size = inputMessage->getU16();
             if (size != inputMessage->getUnreadSize()) {
                 g_logger.traceError("invalid message size");

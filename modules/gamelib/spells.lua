@@ -1,37 +1,37 @@
 SpelllistSettings = {
     ['Default'] = {
-        iconFile = '/images/game/spells/defaultspells',
+        iconFile = '/images/game/spells/spell-icons-32x32',
         iconSize = {
             width = 32,
             height = 32
         },
         spellListWidth = 210,
         spellWindowWidth = 550,
-        spellOrder = {'Animate Dead', 'Annihilation', "Apprentice's Strike", 'Arrow Call', 'Avalanche', 'Berserk',
+        spellOrder = {'Animate Dead', 'Annihilation',"Avatar of Balance", "Apprentice's Strike", 'Arrow Call', 'Avalanche', "Balanced Brawl", 'Berserk',
                       'Blood Rage', 'Bruise Bane', 'Brutal Strike', 'Buzz', 'Cancel Invisibility', 'Challenge',
-                      'Chameleon', 'Charge', 'Chill Out', 'Conjure Arrow', 'Conjure Bolt', 'Conjure Explosive Arrow',
+                      'Chained Penance', 'Chameleon', 'Charge', 'Chill Out', 'Conjure Arrow', 'Conjure Bolt', 'Conjure Explosive Arrow',
                       'Conjure Piercing Bolt', 'Conjure Poisoned Arrow', 'Conjure Power Bolt', 'Conjure Sniper Arrow',
                       'Convince Creature', 'Creature Illusion', 'Cure Bleeding', 'Cure Burning', 'Cure Curse',
                       'Cure Electrification', 'Cure Poison', 'Cure Poison Rune', 'Curse', 'Death Strike',
-                      'Desintegrate', 'Destroy Field', 'Divine Caldera', 'Divine Healing', 'Divine Missile',
-                      'Electrify', 'Enchant Party', 'Enchant Spear', 'Enchant Staff', 'Energy Beam', 'Energy Field',
+                      'Desintegrate', 'Destroy Field', 'Devastating Knockout', 'Divine Caldera', 'Divine Healing', 'Divine Missile', 'Double Jab',
+                      'Electrify', 'Enchant Party', 'Enchant Spear', 'Enchant Staff', 'Enlighten Party', 'Energy Beam', 'Energy Field',
                       'Energy Strike', 'Energy Wall', 'Energy Wave', 'Energybomb', 'Envenom', 'Eternal Winter',
                       'Ethereal Spear', 'Explosion', 'Fierce Berserk', 'Find Person', 'Fire Field', 'Fire Wall',
-                      'Fire Wave', 'Fireball', 'Firebomb', 'Flame Strike', 'Food', 'Front Sweep', 'Great Energy Beam',
-                      'Great Fireball', 'Great Light', 'Groundshaker', 'Haste', 'Heal Friend', 'Heal Party',
+                      'Fire Wave', 'Fireball', 'Firebomb', 'Flame Strike', 'Flurry of Blows', 'Focus Harmony', 'Focus Serenity', 'Food', 'Forceful Uppercut', 'Front Sweep', 'Great Energy Beam',
+                      'Great Fireball', 'Great Light', 'Greater Flurry of Blows', 'Greater Tiger Clash', 'Groundshaker', 'Haste', 'Heal Friend', 'Heal Party',
                       'Heavy Magic Missile', 'Hells Core', 'Holy Flash', 'Holy Missile', 'Ice Strike', 'Ice Wave',
                       'Icicle', 'Ignite', 'Inflict Wound', 'Intense Healing', 'Intense Healing Rune', 'Intense Recovery',
                       'Intense Wound Cleansing', 'Invisibility', 'Levitate', 'Light', 'Light Healing',
                       'Light Magic Missile', 'Lightning', 'Magic Patch', 'Magic Rope', 'Magic Shield', 'Magic Wall',
-                      'Mass Healing', 'Mud Attack', 'Paralyze', 'Physical Strike', 'Poison Bomb', 'Poison Field',
+                      'Mass Healing', 'Mass Spirit Mend', 'Mentor Other', 'Mystic Repulse', 'Mud Attack', 'Paralyze', 'Physical Strike', 'Poison Bomb', 'Poison Field',
                       'Poison Wall', 'Practise Fire Wave', 'Practise Healing', 'Practise Magic Missile', 'Protect Party',
-                      'Protector', 'Rage of the Skies', 'Recovery', 'Salvation', 'Scorch',
-                      'Sharpshooter', 'Soulfire', 'Stalagmite', 'Stone Shower', 'Strong Energy Strike',
+                      'Protector', 'Rage of the Skies', 'Recovery', 'Restore Balance', 'Salvation', 'Scorch',
+                      'Sharpshooter', 'Soulfire', 'Spirit Mend', 'Spiritual Outburst', 'Stalagmite', 'Stone Shower', 'Strong Energy Strike',
                       'Strong Ethereal Spear', 'Strong Flame Strike', 'Strong Haste', 'Strong Ice Strike',
-                      'Strong Ice Wave', 'Strong Terra Strike', 'Sudden Death', 'Summon Creature', 'Swift Foot',
-                      'Terra Strike', 'Terra Wave', 'Thunderstorm', 'Train Party', 'Ultimate Energy Strike',
+                      'Strong Ice Wave', 'Strong Terra Strike', 'Sudden Death', 'Summon Creature', 'Summon Monk Familiar', 'Swift Foot', 'Swift Jab',
+                      'Terra Strike', 'Terra Wave', 'Thunderstorm', 'Tiger Clash', 'Train Party', 'Ultimate Energy Strike',
                       'Ultimate Flame Strike', 'Ultimate Healing', 'Ultimate Healing Rune', 'Ultimate Ice Strike',
-                      'Ultimate Light', 'Ultimate Terra Strike', 'Whirlwind Throw', 'Wild Growth', 'Wound Cleansing',
+                      'Ultimate Light', 'Ultimate Terra Strike', 'Virtue of Harmony', 'Virtue of Justice', 'Virtue of Sustain','Sweeping Takedown', 'Whirlwind Throw', 'Wild Growth', 'Wound Cleansing',
                       'Wrath of Nature'}
     } --[[,
   ['Custom'] =  {
@@ -2671,8 +2671,459 @@ SpellInfo = {
             vocations = {6}
         },
     -- /spells from version 13.10.12852
+    
 ]]
-
+        ["Avatar of Balance"] = {
+            words = "uteta res tio",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 7200000,
+            id = 217,
+            icon = "avatarofbalance",
+            mana = 1200,
+            level = 300,
+            group = {
+                [3] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Balanced Brawl"] = {
+            words = "exori mas res",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 10000,
+            id = 218,
+            icon = "balancedbrawl",
+            mana = 80,
+            level = 175,
+            group = {
+                [3] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Chained Penance"] = {
+            words = "exori med pug",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 4000,
+            id = 219,
+            icon = "chainedpenance",
+            mana = 180,
+            level = 70,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Devastating Knockout"] = {
+            words = "exori gran nia",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 4000,
+            id = 220,
+            icon = "devastatingknockout",
+            mana = 210,
+            level = 125,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Double Jab"] = {
+            words = "exori pug",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 4000,
+            id = 221,
+            icon = "doublejab",
+            mana = 35,
+            level = 16,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Enlighten Party"] = {
+            words = "utevo mas sio",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 5000,
+            id = 222,
+            icon = "enlightenparty",
+            mana = 75,
+            level = 32,
+            group = {
+                [2] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Flurry of Blows"] = {
+            words = "exori mas pug",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 4000,
+            id = 223,
+            icon = "flurryofblows",
+            mana = 125,
+            level = 35,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Focus Harmony"] = {
+            words = "utevo nia",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 4000,
+            id = 224,
+            icon = "focusharmony",
+            mana = 500,
+            level = 275,
+            group = {
+                [3] = 300000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Focus Serenity"] = {
+            words = "utamo tio",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 3600000,
+            id = 225,
+            icon = "focusserenity",
+            mana = 500,
+            level = 150,
+            group = {
+                [3] = 300000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Forceful Uppercut"] = {
+            words = "exori gran pug",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 40000,
+            id = 226,
+            icon = "forcefuluppercut",
+            mana = 325,
+            level = 110,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Greater Flurry of Blows"] = {
+            words = "exori gran mas pug",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 10000,
+            id = 227,
+            icon = "greaterflurryofblows",
+            mana = 315,
+            level = 90,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Greater Tiger Clash"] = {
+            words = "exori nia",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 8000,
+            id = 228,
+            icon = "greatertigerclash",
+            mana = 50,
+            level = 18,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Mass Spirit Mend"] = {
+            words = "exura mas nia",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 8000,
+            id = 229,
+            icon = "massspiritmend",
+            mana = 250,
+            level = 150,
+            group = {
+                [2] = 1000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Mentor Other"] = {
+            words = "uteta tio",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 50000,
+            id = 230,
+            icon = "mentorother",
+            mana = 110,
+            level = 150,
+            group = {
+                [3] = 1000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Mystic Repulse"] = {
+            words = "exori amp pug",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 14000,
+            id = 231,
+            icon = "mysticrepulse",
+            mana = 50,
+            level = 30,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Restore Balance"] = {
+            words = "exura tio sio",
+            parameter = true,
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 2000,
+            id = 232,
+            icon = "restorebalance",
+            mana = 120,
+            level = 18,
+            group = {
+                [2] = 1000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Spirit Mend"] = {
+            words = "exura gran tio",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 1000,
+            id = 233,
+            icon = "spiritmend",
+            mana = 210,
+            level = 80,
+            group = {
+                [2] = 1000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Spiritual Outburst"] = {
+            words = "exori gran mas nia",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 60000,
+            id = 234,
+            icon = "spiritualoutburst",
+            mana = 425,
+            level = 8,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Summon Monk Familiar"] = {
+            words = "utevo gran res tio",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 1200000,
+            id = 235,
+            icon = "summonmonkfamiliar",
+            mana = 1500,
+            level = 200,
+            group = {
+                [3] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Swift Jab"] = {
+            words = "exori infir pug",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 2000,
+            id = 236,
+            icon = "swiftjab",
+            mana = 3,
+            level = 2,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Tiger Clash"] = {
+            words = "exori infir nia",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 2000,
+            id = 237,
+            icon = "tigerclash",
+            mana = 35,
+            level = 2,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Virtue of Harmony"] = {
+            words = "utori virtu",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 10000,
+            id = 238,
+            icon = "virtueofharmony",
+            mana = 210,
+            level = 20,
+            group = {
+                [3] = 2000,
+            },
+            vocations = {
+                    5,
+                15
+            }
+        },
+        ["Virtue of Justice"] = {
+            words = "utito virtu",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 10000,
+            id = 239,
+            icon = "virtueofjustice",
+            mana = 210,
+            level = 20,
+            group = {
+                [3] = 2000,
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Virtue of Sustain"] = {
+            words = "utura tio",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 10000,
+            id = 240,
+            icon = "virtueofsustain",
+            mana = 210,
+            level = 20,
+            group = {
+                [3] = 2000,
+            },
+            vocations = {
+                5,
+                15
+            }
+        },
+        ["Sweeping Takedown"] = {
+            words = "exori mas nia",
+            type = "Instant",
+            premium = true,
+            soul = 0,
+            exhaustion = 8000,
+            id = 241,
+            icon = "sweepingtakedown",
+            mana = 195,
+            level = 60,
+            group = {
+                [1] = 2000
+            },
+            vocations = {
+                5,
+                15
+            }
+        }
     } --[[,
   ['Custom'] = {
     ['Chain Lighting'] =           {id = 1, words = 'exori chain vis',        description = 'Chained attack pattern lightning strike.',                     exhaustion = 2000,  premium = false, type = 'Instant', icon = 1,  mana = 650,  level = 90, soul = 0, group = {[1] = 2000}, vocations = {5}},
@@ -2871,21 +3322,32 @@ SpellIcons = {
     ['intensehealingrune'] = {74, 4},
     ['ultimatehealing'] = {1, 3},
     ['intensehealing'] = {7, 2},
-    ['lighthealing'] = {6, 1}
-}
-
-VocationNames = {
-    [0] = 'None',
-    [1] = 'Sorcerer',
-    [2] = 'Druid',
-    [3] = 'Paladin',
-    [4] = 'Knight',
-    [5] = 'Master Sorcerer',
-    [6] = 'Elder Druid',
-    [7] = 'Royal Paladin',
-    [8] = 'Elite Knight',
-    [9] = 'Monk',
-    [10] = 'Exhalted Monk'
+    ['lighthealing'] = {6, 1},
+    ['virtueofsustain'] = {179, 240},
+    ['sweepingtakedown'] = {174, 241},
+    ['avatarofbalance'] = {155, 217},
+    ['balancedbrawl'] = {156, 218},
+    ['chainedpenance'] = {157, 219},
+    ['devastatingknockout'] = {158, 220},
+    ['doublejab'] = {159, 221},
+    ['enlightenparty'] = {160, 222},
+    ['flurryofblows'] = {161, 223},
+    ['focusharmony'] = {162, 224},
+    ['focusserenity'] = {163, 225},
+    ['forcefuluppercut'] = {164,226},
+    ['greaterflurryofblows'] = {165,227},
+    ['greatertigerclash'] = {166,228},
+    ['massspiritmend'] = {167,229},
+    ['mentorother'] = {168,230},
+    ['mysticrepulse'] = {169,231},
+    ['restorebalance'] = {170,232},
+    ['spiritmend'] = {171,233},
+    ['spiritualoutburst'] = {172,234},
+    ['summonmonkfamiliar'] = {173,235},
+    ['swiftjab'] = {175,236},
+    ['tigerclash'] = {176,237},
+    ['virtueofharmony'] = {177,238},
+    ['virtueofjustice'] = {178,239},
 }
 
 SpellGroups = {
@@ -2897,7 +3359,8 @@ SpellGroups = {
     [6] = 'Focus',
     [7] = 'Ultimate Strikes',
     [8] = 'Great Beams',
-    [9] = 'Bursts of Nature'
+    [9] = 'Bursts of Nature',
+    [10] = 'Virtue'
 }
 
 Spells = {}
@@ -3033,9 +3496,7 @@ function Spells.getGroupIds(spell)
 end
 
 function Spells.getImageClip(id, profile)
-    return (((id - 1) % 12) * SpelllistSettings[profile].iconSize.width) .. ' ' ..
-               ((math.ceil(id / 12) - 1) * SpelllistSettings[profile].iconSize.height) .. ' ' ..
-               SpelllistSettings[profile].iconSize.width .. ' ' .. SpelllistSettings[profile].iconSize.height
+    return (id - 1) * SpelllistSettings[profile].iconSize.width .. " 0 32 32"
 end
 
 function Spells.getIconFileByProfile(profile)

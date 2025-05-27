@@ -31,6 +31,7 @@ Panel
   anchors.right: parent.right
   focusable: false
   phantom: true
+  margin-left: 5
   Panel
     id:contentsPanel2
     anchors.fill: parent
@@ -159,6 +160,28 @@ Panel
       id: progressRectBurstOfNature
       anchors.fill: groupIconBurstOfNature
       !tooltip: tr('Burst of Nature')
+
+    SpellGroupIcon
+      id: groupIconVirtue
+      image-clip: 180 0 20 20
+      anchors.top: parent.top
+      anchors.left: groupIconBurstOfNature.right
+      margin-left: 3
+      $on:
+        image-clip: 180 20 20 20
+
+    SpellProgressRect
+      id: progressRectVirtue
+      anchors.fill: groupIconVirtue
+      !tooltip: tr('Virtue')
+
+    VerticalSeparator
+      id: separator
+      anchors.top: parent.top
+      anchors.left: groupIconVirtue.right
+      margin-left: 5
+      margin-top: 2
+      height: 22
 
     Panel
       id: cooldownPanel

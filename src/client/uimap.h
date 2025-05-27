@@ -51,6 +51,7 @@ public:
     void setDrawLights(const bool enable) { m_mapView->setDrawLights(enable); }
     void setLimitVisibleDimension(const bool enable) { m_mapView->setLimitVisibleDimension(enable); updateVisibleDimension(); }
     void setDrawManaBar(const bool enable) { m_mapView->setDrawManaBar(enable); }
+    void setDrawHarmony(const bool enable) { m_mapView->setDrawHarmony(enable); }
     void setKeepAspectRatio(bool enable);
     void setShader(const std::string_view name, const float fadein, const float fadeout) { m_mapView->setShader(name, fadein, fadeout); }
     void setMinimumAmbientLight(const float intensity) { m_mapView->setMinimumAmbientLight(intensity); }

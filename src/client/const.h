@@ -46,8 +46,9 @@ namespace Otc
         DrawBars = 1 << 2,
         DrawNames = 1 << 3,
         DrawManaBar = 1 << 4,
+        DrawHarmony = 1 << 5,
         DrawThingsAndLights = DrawThings | DrawLights,
-        DrawCreatureInfo = DrawBars | DrawNames | DrawManaBar,
+        DrawCreatureInfo = DrawBars | DrawNames | DrawManaBar | DrawHarmony,
     };
 
     enum DatOpts : uint8_t
@@ -561,6 +562,7 @@ namespace Otc
         GameLatencyAdaptiveCamera = 124,
         GameMapCache = 125,
         GameForgeSkillStats = 126,
+        GameHeader1400 = 127,
         LastGameFeature
     };
 

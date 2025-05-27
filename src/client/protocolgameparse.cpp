@@ -1249,7 +1249,9 @@ void ProtocolGame::parseChallenge(const InputMessagePtr& msg)
 {
     const uint32_t timestamp = msg->getU32();
     const uint8_t random = msg->getU8();
-
+    if (g_game.getFeature(Otc::GameHeader1400)) {
+        msg->skipBytes(1);
+    }
     sendLoginPacket(timestamp, random);
 }
 
@@ -4042,12 +4044,12 @@ void ProtocolGame::parseVirtue(const InputMessagePtr& msg) { // @note: improve n
     switch (subtype) {
         case 0x00: { // Harmony
             const uint8_t harmonyValue = msg->getU8();
-            g_lua.callGlobalField("g_game", "onHarmonyProtocol", harmonyValue);
+            m_localPlayer->setHarmony(harmonyValue);
             break;
         }
         case 0x01: { // Serene
             const bool isSerene = msg->getU8() == 0x01;
-            g_lua.callGlobalField("g_game", "onSereneProtocol", isSerene);
+            m_localPlayer->setSerene(isSerene);
             break;
         }
         case 0x02: { // Virtue

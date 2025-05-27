@@ -110,18 +110,32 @@ InventorySlotPurse = 11
 InventorySlotFirst = 1
 InventorySlotLast = 10
 
+VocationsClient = {
+    None = 0,
+    Knight = 1,
+    Paladin = 2,
+    Sorcerer = 3,
+    Druid = 4,
+    Monk = 5,
+    EliteKnight = 11,
+    RoyalPaladin = 12,
+    MasterSorcerer = 13,
+    ElderDruid = 14,
+    ExhaltedMonk = 15,
+}
+
 vocationNamesByClientId = {
-    [0] = "No Vocation",
-    [1] = "Knight",
-    [2] = "Paladin",
-    [3] = "Sorcerer",
-    [4] = "Druid",
-    [9] = "Monk",
-    [10] = "Exhalted Monk",
-    [11]= "Elite Knight",
-    [12] = "Royal Paladin",
-    [13] = "Master Sorcerer",
-    [14] = "Elder Druid"
+    [VocationsClient.None] = "No Vocation",
+    [VocationsClient.Knight] = "Knight",
+    [VocationsClient.Paladin] = "Paladin",
+    [VocationsClient.Sorcerer] = "Sorcerer",
+    [VocationsClient.Druid] = "Druid",
+    [VocationsClient.Monk] = "Monk",
+    [VocationsClient.ExhaltedMonk] = "Exhalted Monk",
+    [VocationsClient.EliteKnight] = "Elite Knight",
+    [VocationsClient.RoyalPaladin] = "Royal Paladin",
+    [VocationsClient.MasterSorcerer] = "Master Sorcerer",
+    [VocationsClient.ElderDruid] = "Elder Druid"
 }
 
 function Player:isPartyLeader()
