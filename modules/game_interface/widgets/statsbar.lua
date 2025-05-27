@@ -1,5 +1,6 @@
 local statsBarTop
 local statsBarBottom
+local clientVersion = 0
 
 local statsBars = {}
 local statsBarDeepInfo = {}
@@ -245,7 +246,8 @@ end
 local function loadIcon(bitChanged, content, topmenu)
     local icon = g_ui.createWidget('ConditionWidget', content)
     icon:setId(Icons[bitChanged].id)
-    icon:setImageSource("/images/game/states/player-state-flags")
+    local imagen = clientVersion >= 1500 and "/images/game/states/player-state-flags1500" or "/images/game/states/player-state-flags"
+    icon:setImageSource(imagen)
     icon:setImageClip(((Icons[bitChanged].clip - 1) * 9) .. ' 0 9 9')
     local tooltip = Icons[bitChanged].tooltip
     if tooltip == "You are GoshnarTaint" then
@@ -551,12 +553,15 @@ function StatsBar.OnGameEnd()
     modules.game_inventory.getIconsPanelOff():destroyChildren()
 
     StatsBar.destroyAllIcons()
+    clientVersion = 0
 end
 
 function StatsBar.OnGameStart()
     StatsBar.loadSettings()
     StatsBar.reloadCurrentTab()
     modules.game_healthcircle.setStatsBarOption()
+    scheduleEvent(showMonkStats, 500)
+    clientVersion = g_game.getClientVersion()
 end
 
 function createStatsBarWidgets(statsBar)
