@@ -52,4 +52,8 @@
 #include <parallel_hashmap/phmap.h>
 #include <pugixml.hpp>
 
+#include <ixwebsocket/IXHttpClient.h>
+#include <ixwebsocket/IXWebSocket.h>
+#include <ixwebsocket/IXWebSocketMessage.h>
+
 using namespace std::literals;
