@@ -3078,7 +3078,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
         // finished monsters list (uint16 count + list of uint32 ids)
         const uint16_t finishedMonstersSize = msg->getU16();
         for (uint16_t i = 0; i < finishedMonstersSize; ++i) {
-            const uint16_t raceId = static_cast<uint16_t>(msg->getU32());
+            const auto raceId = static_cast<uint16_t>(msg->getU32());
             charmData.finishedMonsters.emplace_back(raceId);
         }
     } else {

@@ -147,7 +147,7 @@ void OutputMessage::writePaddingAmount()
 
 void OutputMessage::writeHeaderSize()
 {
-    uint16_t headerSize = static_cast<uint16_t>((m_messageSize - 4) / 8); // -4 for checksum
+    auto headerSize = static_cast<uint16_t>((m_messageSize - 4) / 8); // -4 for checksum
     prependU16(headerSize); // Uses writeULE16 and updates `m_headerPos` and `m_messageSize`
 }
 

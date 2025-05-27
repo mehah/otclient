@@ -217,13 +217,14 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
     if (m_sequencedPackets) {
         decompress = (m_inputMessage->getU32() & 1 << 31);
     } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        std::stringstream ss;
-        ss << std::hex << std::uppercase; // Configure to hexadecimal and uppercase letters
+        std::string headerHex;
+        headerHex.reserve(m_inputMessage->getHeaderSize() * 3); // 2 chars + space por byte
+
         for (size_t i = 0; i < m_inputMessage->getHeaderSize(); ++i) {
-            ss << std::setw(2) << std::setfill('0') << static_cast<int>(m_inputMessage->getBuffer()[i]) << " ";
+            fmt::format_to(std::back_inserter(headerHex), "{:02X} ", static_cast<uint8_t>(m_inputMessage->getBuffer()[i]));
         }
-        std::string headerHex = ss.str();
-        g_logger.traceError(stdext::format("got a network message with invalid checksum, header: %s, size: %i", headerHex, static_cast<int>(m_inputMessage->getMessageSize())));
+
+        g_logger.traceError(fmt::format("got a network message with invalid checksum, header: {}, size: {}", headerHex, static_cast<int>(m_inputMessage->getMessageSize())));
         return;
     }
 
@@ -236,7 +237,6 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 
     if (decompress) {
         static uint8_t zbuffer[InputMessage::BUFFER_MAXSIZE];
-        uint8_t inBuffer[InputMessage::BUFFER_MAXSIZE]{};
 
         m_zstream.next_in = m_inputMessage->getDataBuffer();
         m_zstream.next_out = zbuffer;
@@ -348,7 +348,7 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
     }
 
     for (uint32_t i = 0, sum = 0, next_sum = sum + delta; i < 32; ++i, sum = next_sum, next_sum += delta) {
-        apply_rounds(outputMessage->getXteaEncryptionBuffer(), encryptedSize, [&](uint32_t& left, uint32_t& right) {
+        apply_rounds(outputMessage->getXteaEncryptionBuffer(), encryptedSize, [&, sum, next_sum, this](uint32_t& left, uint32_t& right) mutable {
             left += ((right << 4 ^ right >> 5) + right) ^ (sum + m_xteaKey[sum & 3]);
             right += ((left << 4 ^ left >> 5) + left) ^ (next_sum + m_xteaKey[(next_sum >> 11) & 3]);
         });

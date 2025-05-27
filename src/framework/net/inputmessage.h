@@ -36,7 +36,7 @@ public:
         BUFFER_MAXSIZE = 65536
     };
 
-    inline auto getMaxHeaderSize()
+    inline auto getMaxHeaderSize() const
     {
         return m_maxHeaderSize;
     }
@@ -80,7 +80,9 @@ public:
     uint16_t getMessageSize() { return m_messageSize; }
 
     void setPaddingSize(uint8_t padding) { m_padding = padding; }
-    uint8_t getPaddingSize() { return m_padding; }
+    uint8_t getPaddingSize() const {
+        return m_padding;
+    }
 
     bool eof() { return (m_readPos - m_headerPos) >= m_messageSize; }
 
