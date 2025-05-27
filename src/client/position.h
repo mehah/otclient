@@ -33,6 +33,8 @@
 #include <string>
 #include <vector>
 
+#include <fmt/format.h>
+
 class Position
 {
 public:
