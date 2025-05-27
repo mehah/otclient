@@ -324,6 +324,7 @@ public:
 #endif
 
     void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, const LightViewPtr& lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
+
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor);
 
     uint16_t getId() { return m_id; }

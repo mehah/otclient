@@ -563,9 +563,14 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     if (animationPhase >= m_animationPhases)
         return;
 
-    const auto& texture = getTexture(animationPhase); // texture might not exists, neither its rects.
-    if (!texture)
-        return;
+    // It's not necessary to retrieve the texture here, since the lighting system doesn't use it.
+    // Also, this method runs on the Map and Light threads, which may cause a double free on the texture.
+    TexturePtr texture;
+    if (g_drawPool.getCurrentType() != DrawPoolType::LIGHT) {
+        texture = getTexture(animationPhase); // texture might not exists, neither its rects.
+        if (!texture)
+            return;
+    }
 
     const auto& textureData = m_textureData[animationPhase];
 
@@ -578,7 +583,7 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * g_gameConfig.getSpriteSize()) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
-    if (drawThings) {
+    if (drawThings && texture) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
 
         if (g_drawPool.shaderNeedFramebuffer())
