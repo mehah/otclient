@@ -212,7 +212,7 @@ void EventDispatcher::executeDeferEvents() {
             if (m_deferEventList.size() < thread->deferEvents.size())
                 m_deferEventList.swap(thread->deferEvents);
             if (!thread->deferEvents.empty()) {
-                m_deferEventList.insert(m_deferEventList.end(), make_move_iterator(thread->deferEvents.begin()), make_move_iterator(thread->deferEvents.end()));
+                std::ranges::move(thread->deferEvents, std::back_inserter(m_deferEventList));
                 thread->deferEvents.clear();
             }
         }
@@ -256,7 +256,7 @@ void EventDispatcher::mergeEvents() {
                 m_eventList.swap(thread->events);
 
             if (!thread->events.empty()) {
-                m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
+                std::ranges::move(thread->events, std::back_inserter(m_eventList));
                 thread->events.clear();
             }
         }
@@ -266,7 +266,7 @@ void EventDispatcher::mergeEvents() {
                 m_asyncEventList.swap(thread->asyncEvents);
 
             if (!thread->asyncEvents.empty()) {
-                m_asyncEventList.insert(m_asyncEventList.end(), make_move_iterator(thread->asyncEvents.begin()), make_move_iterator(thread->asyncEvents.end()));
+                std::ranges::move(thread->asyncEvents, std::back_inserter(m_asyncEventList));
                 thread->asyncEvents.clear();
             }
         }

@@ -294,7 +294,7 @@ private:
     {
         m_coords.clear();
         for (auto& objs : m_objects) {
-            m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            std::ranges::move(objs, std::back_inserter(m_objectsFlushed));
             objs.clear();
         }
     }
@@ -308,7 +308,7 @@ private:
                     m_objectsDraw.swap(m_objectsFlushed);
 
                 if (!m_objectsFlushed.empty())
-                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
+                    std::ranges::move(m_objectsFlushed, std::back_inserter(m_objectsDraw));
             }
 
             for (auto& objs : m_objects) {
@@ -316,7 +316,7 @@ private:
                     m_objectsDraw.swap(objs);
 
                 if (!objs.empty()) {
-                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+                    std::ranges::move(objs, std::back_inserter(m_objectsDraw));
                     objs.clear();
                 }
             }
