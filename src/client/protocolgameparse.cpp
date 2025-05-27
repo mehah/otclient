@@ -2963,7 +2963,8 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
     data.bestClass = msg->getString();
     data.currentLevel = msg->getU8();
 
-    if (g_game.getClientVersion() >= 1340) {
+    auto version = g_game.getClientVersion();
+    if (version >= 1340) {
         data.AnimusMasteryBonus = msg->getU16(); // Animus Mastery Bonus
         data.AnimusMasteryPoints = msg->getU16(); // Animus Mastery Points
     } else {
@@ -3016,7 +3017,7 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
         data.location = msg->getString();
     }
 
-    if (data.currentLevel > 3) {
+    if (data.currentLevel > 3 && version < 1412) {
         const bool hasCharm = static_cast<bool>(msg->getU8());
         if (hasCharm) {
             msg->getU8();
@@ -3032,45 +3033,89 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
 void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
 {
     BestiaryCharmsData charmData;
-    if (g_game.getClientVersion() >= 1405) {
+    auto version = g_game.getClientVersion();
+    if (version >= 1405) {
         charmData.points = msg->getU64();
+
     } else {
         charmData.points = msg->getU32();
     }
 
-    const uint8_t charmsAmount = msg->getU8();
-    for (auto i = 0; i < charmsAmount; ++i) {
-        CharmData charm;
-        charm.id = msg->getU8();
-        charm.name = msg->getString();
-        charm.description = msg->getString();
-        msg->getU8();
-        charm.unlockPrice = msg->getU16();
-        charm.unlocked = msg->getU8() == 1;
-        charm.asignedStatus = false;
-        charm.raceId = 0;
-        charm.removeRuneCost = 0;
+    if (version >= 1412) {
+        const uint8_t charmsAmount = msg->getU8();
+        for (uint8_t i = 0; i < charmsAmount; ++i) {
+            CharmData charm;
+            charm.id = msg->getU8();
+            const uint8_t tier = msg->getU8();
 
-        if (charm.unlocked) {
-            const bool asigned = static_cast<bool>(msg->getU8());
-            if (asigned) {
-                charm.asignedStatus = asigned;
-                charm.raceId = msg->getU16();
-                charm.removeRuneCost = msg->getU32();
+            charm.unlockPrice = 0; // not sent anymore
+            charm.unlocked = tier > 0;
+            charm.asignedStatus = false;
+            charm.raceId = 0;
+            charm.removeRuneCost = 0;
+
+            if (tier > 0) {
+                const bool assigned = msg->getU8() == 1;
+                if (assigned) {
+                    charm.asignedStatus = true;
+                    charm.raceId = msg->getU16();
+                    charm.removeRuneCost = msg->getU32();
+                }
+            } else {
+                msg->getU8(); // still reserved
             }
-        } else {
-            msg->getU8();
+
+            // name and description are no longer sent
+            charm.name = stdext::format("Charm %d", charm.id);
+            charm.description = stdext::format("Tier %d charm", tier);
+
+            charmData.charms.emplace_back(charm);
         }
 
-        charmData.charms.emplace_back(charm);
-    }
+        // available charm slots (uint8)
+        msg->getU8();
 
-    msg->getU8();
+        // finished monsters list (uint16 count + list of uint32 ids)
+        const uint16_t finishedMonstersSize = msg->getU16();
+        for (uint16_t i = 0; i < finishedMonstersSize; ++i) {
+            const uint16_t raceId = static_cast<uint16_t>(msg->getU32());
+            charmData.finishedMonsters.emplace_back(raceId);
+        }
+    } else {
+        const uint8_t charmsAmount = msg->getU8();
+        for (auto i = 0; i < charmsAmount; ++i) {
+            CharmData charm;
+            charm.id = msg->getU8();
+            charm.name = msg->getString();
+            charm.description = msg->getString();
+            msg->getU8();
+            charm.unlockPrice = msg->getU16();
+            charm.unlocked = msg->getU8() == 1;
+            charm.asignedStatus = false;
+            charm.raceId = 0;
+            charm.removeRuneCost = 0;
 
-    const uint16_t finishedMonstersSize = msg->getU16();
-    for (auto i = 0; i < finishedMonstersSize; ++i) {
-        const uint16_t raceId = msg->getU16();
-        charmData.finishedMonsters.emplace_back(raceId);
+            if (charm.unlocked) {
+                const bool asigned = static_cast<bool>(msg->getU8());
+                if (asigned) {
+                    charm.asignedStatus = asigned;
+                    charm.raceId = msg->getU16();
+                    charm.removeRuneCost = msg->getU32();
+                }
+            } else {
+                msg->getU8();
+            }
+
+            charmData.charms.emplace_back(charm);
+        }
+
+        msg->getU8();
+
+        const uint16_t finishedMonstersSize = msg->getU16();
+        for (auto i = 0; i < finishedMonstersSize; ++i) {
+            const uint16_t raceId = msg->getU16();
+            charmData.finishedMonsters.emplace_back(raceId);
+        }
     }
 
     g_game.processUpdateBestiaryCharmsData(charmData);
@@ -4104,7 +4149,10 @@ void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
         stashItems.push_back({ itemId, amount });
     }
 
-    msg->getU16(); // free slots
+    auto version = g_game.getProtocolVersion();
+    if (version < 1412) {
+        msg->getU16(); // free slots
+    }
 
     g_lua.callGlobalField("g_game", "onSupplyStashEnter", stashItems);
 }
@@ -4553,9 +4601,11 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < stashItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
-                const uint16_t classification = itemCreated->getClassification();
-
+                const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+                if (!thing) {
+                    continue;
+                }
+                const uint16_t classification = thing->getClassification();
                 uint8_t itemTier = 0;
                 if (classification > 0) {
                     itemTier = msg->getU8();

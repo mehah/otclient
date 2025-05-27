@@ -59,7 +59,7 @@ namespace Proto
         GameServerPing = 30,
         GameServerChallenge = 31,
         GameServerDeath = 40,
-        GameServerSupplyStash = 41,
+        GameServerSupplyStash = 41, // 0x29
         GameServerSpecialContainer = 42,
         GameServerPartyAnalyzer = 43,
 
@@ -183,12 +183,12 @@ namespace Proto
         GameServerVipAdd = 210,
         GameServerVipState = 211,
         GameServerVipLogout = 212,
-        GameServerBestiaryRaces = 213,
+        GameServerBestiaryRaces = 213, // 0xD5
         GameServerBestiaryOverview = 214,
         GameServerBestiaryMonsterData = 215,
         GameServerBestiaryCharmsData = 216,
         GameServerBestiaryEntryChanged = 217,
-        GameServerCyclopediaCharacterInfoData = 218,
+        GameServerCyclopediaCharacterInfoData = 218, // 0xDA
         GameServerTutorialHint = 220,
         GameServerAutomapFlag = 221,
         GameServerSendDailyRewardCollectionState = 222,
