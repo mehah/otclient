@@ -25,6 +25,8 @@
 #include <exception>
 #include <string>
 
+#include <fmt/format.h>
+
 namespace stdext
 {
     class exception : public std::exception
