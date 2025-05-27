@@ -26,6 +26,8 @@
 
 #include <fstream>
 
+#include <fmt/format.h>
+
 struct LogMessage
 {
     LogMessage(const Fw::LogLevel level, const std::string_view message, const std::size_t when) : level(level), message(message), when(when) {}
@@ -48,12 +50,39 @@ public:
     void log(Fw::LogLevel level, std::string_view message);
     void logFunc(Fw::LogLevel level, std::string_view message, std::string_view prettyFunction);
 
+    // Lua-compatible functions
     void fine(const std::string_view what) { log(Fw::LogFine, what); }
     void debug(const std::string_view what) { log(Fw::LogDebug, what); }
     void info(const std::string_view what) { log(Fw::LogInfo, what); }
     void warning(const std::string_view what) { log(Fw::LogWarning, what); }
     void error(const std::string_view what) { log(Fw::LogError, what); }
     void fatal(const std::string_view what) { log(Fw::LogFatal, what); }
+
+    // fmt-compatible overloads (for C++ only)
+    template<typename... Args>
+    void debug(fmt::format_string<Args...> fmtStr, Args&&... args) {
+        debug(fmt::format(fmtStr, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void info(fmt::format_string<Args...> fmtStr, Args&&... args) {
+        info(fmt::format(fmtStr, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void warning(fmt::format_string<Args...> fmtStr, Args&&... args) {
+        warning(fmt::format(fmtStr, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void error(fmt::format_string<Args...> fmtStr, Args&&... args) {
+        error(fmt::format(fmtStr, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    void fatal(fmt::format_string<Args...> fmtStr, Args&&... args) {
+        fatal(fmt::format(fmtStr, std::forward<Args>(args)...));
+    }
 
     void fireOldMessages();
     void setLogFile(std::string_view file);
