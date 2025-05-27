@@ -91,7 +91,7 @@ bool ResourceManager::setupUserWriteDir(const std::string& appWriteDirName)
     const std::string userDir = getUserDir();
     std::string dirName;
 #ifndef WIN32
-    dirName = stdext::format(".%s", appWriteDirName);
+    dirName = fmt::format(".{}", appWriteDirName);
 #else
     dirName = appWriteDirName;
 #endif
@@ -99,7 +99,11 @@ bool ResourceManager::setupUserWriteDir(const std::string& appWriteDirName)
 
     if (!PHYSFS_setWriteDir(writeDir.c_str())) {
         if (!PHYSFS_setWriteDir(userDir.c_str()) || !PHYSFS_mkdir(dirName.c_str())) {
-            g_logger.error(stdext::format("Unable to create write directory '%s': %s", writeDir, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+            g_logger.error(
+                "Unable to create write directory '{}': {}",
+                writeDir,
+                PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+            );
             return false;
         }
     }
@@ -109,7 +113,11 @@ bool ResourceManager::setupUserWriteDir(const std::string& appWriteDirName)
 bool ResourceManager::setWriteDir(const std::string& writeDir, bool)
 {
     if (!PHYSFS_setWriteDir(writeDir.c_str())) {
-        g_logger.error(stdext::format("Unable to set write directory '%s': %s", writeDir, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+        g_logger.error(
+            "Unable to set write directory '{}': {}",
+            writeDir,
+            PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+        );
         return false;
     }
 
@@ -139,7 +147,13 @@ bool ResourceManager::addSearchPath(const std::string& path, const bool pushFron
         }
 
         if (!found) {
-            //g_logger.error(stdext::format("Could not add '%s' to directory search path. Reason %s", path, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+            /*g_logger.error(
+                "Could not add '{}' to directory search path. Reason {}",
+                path,
+                PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+            );
+            */
+
             return false;
         }
     }
@@ -168,7 +182,11 @@ void ResourceManager::searchAndAddPackages(const std::string& packagesDir, const
             continue;
         std::string package = getRealDir(packagesDir) + "/" + file;
         if (!addSearchPath(package, true))
-            g_logger.error(stdext::format("Unable to read package '%s': %s", package, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+            g_logger.error(
+                "Unable to read package '{}': {}",
+                package,
+                PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+            );
     }
 }
 
@@ -256,7 +274,11 @@ bool ResourceManager::writeFileBuffer(const std::string& fileName, const uint8_t
 
         if (!PHYSFS_isDirectory(dirPath.c_str())) {
             if (!PHYSFS_mkdir(dirPath.c_str())) {
-                g_logger.error(stdext::format("Unable to create write directory '%s': %s", dirPath, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+                g_logger.error(
+                    "Unable to create write directory '{}': {}",
+                    dirPath,
+                    PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+                );
                 return false;
             }
         }
@@ -409,7 +431,7 @@ std::string ResourceManager::resolvePath(const std::string& path)
     }
 
     if (!(fullPath.starts_with("/")))
-        g_logger.traceWarning(stdext::format("the following file path is not fully resolved: %s", path));
+        g_logger.traceWarning(fmt::format("the following file path is not fully resolved: {}", path));
 
     stdext::replace_all(fullPath, "//", "/");
     return fullPath;
@@ -686,8 +708,14 @@ void ResourceManager::updateExecutable(std::string fileName)
     const auto newBinary = path.stem().string() + "-" + std::to_string(time(nullptr)) + path.extension().string();
     g_logger.info("Updating binary file: {}", newBinary);
     PHYSFS_file* file = PHYSFS_openWrite(newBinary.c_str());
-    if (!file)
-        return g_logger.fatal(stdext::format("can't open %s for writing: %s", newBinary, PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())));
+    if (!file) {
+        return g_logger.fatal(
+            "can't open {} for writing: {}",
+            newBinary,
+            PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode())
+        );
+    }
+
     PHYSFS_writeBytes(file, dFile->response.data(), dFile->response.size());
     PHYSFS_close(file);
     setWriteDir(oldWriteDir);

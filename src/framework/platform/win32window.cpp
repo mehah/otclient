@@ -963,7 +963,7 @@ void WIN32Window::setIcon(const std::string& file)
         const auto& image = Image::load(file);
 
         if (!image) {
-            g_logger.traceError(stdext::format("unable to load icon file %s", file));
+            g_logger.traceError("unable to load icon file {}", file);
             return;
         }
 

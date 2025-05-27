@@ -53,13 +53,13 @@ bool Module::load()
 
             const auto& dep = g_modules.getModule(depName);
             if (!dep)
-                throw Exception("dependency '%s' was not found", depName);
+                throw Exception("dependency '{}' was not found", depName);
 
             if (dep->hasDependency(m_name, true))
-                throw Exception("dependency '%s' is recursively depending on itself", depName);
+                throw Exception("dependency '{}' is recursively depending on itself", depName);
 
             if (!dep->isLoaded() && !dep->load())
-                throw Exception("dependency '%s' has failed to load", depName);
+                throw Exception("dependency '{}' has failed to load", depName);
         }
 
         if (m_sandboxed)
@@ -86,8 +86,8 @@ bool Module::load()
 
         m_loaded = true;
 
-        g_logger.debug(stdext::format("Loaded module '%s' (%s)", m_name,
-                       stdext::format("%.2fs", (stdext::millis() - startTime) / 1000.0)));
+        g_logger.debug( "Loaded module '{}' ({:.2f}s)", m_name, (stdext::millis() - startTime) / 1000.0
+);
     } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");

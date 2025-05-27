@@ -162,12 +162,12 @@ void LuaInterface::registerClassMemberField(const std::string_view className,
 
     if (getFunction) {
         pushCppFunction(getFunction);
-        setField(stdext::format("get_%s", field));
+        setField(fmt::format("get_{}", field));
     }
 
     if (setFunction) {
         pushCppFunction(setFunction);
-        setField(stdext::format("set_%s", field));
+        setField(fmt::format("set_{}", field));
     }
 
     pop();
@@ -331,9 +331,9 @@ void LuaInterface::loadFunction(const std::string_view buffer, const std::string
 
     std::string buf;
     if (buffer.starts_with("function"))
-        buf = stdext::format("__func = %s", buffer);
+        buf = fmt::format("__func = {}", buffer);
     else
-        buf = stdext::format("__func = function(self)\n%s\nend", buffer);
+        buf = fmt::format("__func = function(self)\n{}\nend", buffer);
 
     loadBuffer(buf, source);
     safeCall();
@@ -350,7 +350,7 @@ void LuaInterface::evaluateExpression(const std::string_view expression, const s
 {
     // evaluates the expression
     if (!expression.empty()) {
-        const auto& buffer = stdext::format("__exp = (%s)", expression);
+        const auto& buffer = fmt::format("__exp = ({})", expression);
         loadBuffer(buffer, source);
         safeCall();
 
@@ -637,7 +637,7 @@ int LuaInterface::luaCppFunctionCallback(lua_State*)
         while (g_lua.stackSize() > 0)
             g_lua.pop();
         numRets = 0;
-        g_lua.pushString(stdext::format("C++ call failed: %s", g_lua.traceback(e.what())));
+        g_lua.pushString(fmt::format("C++ call failed: {}", g_lua.traceback(e.what())));
         g_lua.error();
     }
 

@@ -388,7 +388,7 @@ void UIManager::importStyleFromOTML(const OTMLNodePtr& styleNode)
     if (!oldStyle || !oldStyle->valueAt("__unique", false) || unique) {
         const auto& originalStyle = getStyle(base);
         if (!originalStyle)
-            throw Exception("base style '%s', is not defined", base);
+            throw Exception("base style '{}', is not defined", base);
 
         const auto& style = originalStyle->clone();
         style->merge(styleNode);
@@ -586,7 +586,7 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
 {
     const auto& originalStyleNode = getStyle(widgetNode->tag());
     if (!originalStyleNode)
-        throw Exception("'%s' is not a defined style", widgetNode->tag());
+        throw Exception("'{}' is not a defined style", widgetNode->tag());
 
     const auto& styleNode = originalStyleNode->clone();
     styleNode->merge(widgetNode);
@@ -596,7 +596,7 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
     // call widget creation from lua
     const auto& widget = g_lua.callGlobalField<UIWidgetPtr>(widgetType, "create");
     if (!widget)
-        throw Exception("unable to create widget of type '%s'", widgetType);
+        throw Exception("unable to create widget of type '{}'", widgetType);
 
     if (parent)
         parent->addChild(widget);

@@ -226,10 +226,10 @@ SoundEffect::SoundEffect(ALCdevice* device) : m_device(device) {
     init(device);
     /* Query for Effect Extension */
     if (alcIsExtensionPresent(m_device, "ALC_EXT_EFX") == AL_FALSE) {
-        g_logger.error(stdext::format("unable to locate OpenAl EFX extension"));
+        g_logger.error("unable to locate OpenAl EFX extension");
     } else {
         if (!alGenEffects) {
-            g_logger.error(stdext::format("unable to load OpenAl EFX extension"));
+            g_logger.error("unable to load OpenAl EFX extension");
             return;
         }
         const auto effects = std::make_unique<ALuint[]>(1);

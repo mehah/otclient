@@ -82,7 +82,7 @@ void Image::savePNG(const std::string& fileName)
 {
     const auto& fin = g_resources.createFile(fileName);
     if (!fin)
-        throw Exception("failed to open file '%s' for write", fileName);
+        throw Exception("failed to open file '{}' for write", fileName);
 
     fin->cache();
     std::stringstream data;

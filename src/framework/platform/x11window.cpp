@@ -1026,7 +1026,7 @@ void X11Window::setIcon(const std::string& file)
         ImagePtr image = Image::load(file);
 
         if (!image) {
-            g_logger.traceError(stdext::format("unable to load icon file %s", file));
+            g_logger.traceError("unable to load icon file {}", file);
             return;
         }
 

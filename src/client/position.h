@@ -291,3 +291,11 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
     pos.z = z;
     return in;
 }
+
+// Auto format Position
+template <>
+struct fmt::formatter<Position> : fmt::formatter<std::string> {
+    auto format(const Position& pos, fmt::format_context& ctx) const {
+        return fmt::formatter<std::string>::format(pos.toString(), ctx);
+    }
+};

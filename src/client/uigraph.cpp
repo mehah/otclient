@@ -150,15 +150,16 @@ size_t UIGraph::createGraph()
 void UIGraph::addValue(const size_t index, const int value, const bool ignoreSmallValues)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format(
-            "[UIGraph::addValue (%s)] Graph of index %d out of bounds. Use:\n"
+        g_logger.warning(
+            "[UIGraph::addValue ({})] Graph of index {} out of bounds. Use:\n"
             "    if graph:getGraphsCount() == 0 then\n"
             "        graph:createGraph()\n"
             "        graph:setLineWidth(1, 1)\n"
             "        graph:setLineColor(1, \"#FF0000\")\n"
             "    end\n"
             "    graph:addValue(1,value)",
-            getId(), index));
+            getId(), index
+        );
 
         return;
     }
@@ -305,7 +306,7 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
         graph.infoLine[0] = Point(snappedX, dest.top());
         graph.infoLine[1] = Point(snappedX, dest.bottom());
 
-        graph.infoValue = stdext::format("%s %d", graph.infoText, value);
+        graph.infoValue = fmt::format("{} {}", graph.infoText, value);
 
         auto [minValueIter, maxValueIter] = std::ranges::minmax_element(graph.values);
         const auto minValue = static_cast<float>(*minValueIter);

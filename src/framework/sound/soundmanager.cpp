@@ -53,6 +53,7 @@ void SoundManager::init()
     // The alcOpenDevice call needs to be executed on Android main thread
     g_androidManager.attachToAppMainThread();
 #endif
+
     m_device = alcOpenDevice(nullptr);
     if (!m_device) {
         g_logger.error("unable to open audio device");
@@ -61,12 +62,12 @@ void SoundManager::init()
 
     m_context = alcCreateContext(m_device, nullptr);
     if (!m_context) {
-        g_logger.error(stdext::format("unable to create audio context: %s", alcGetString(m_device, alcGetError(m_device))));
+        g_logger.error(fmt::format("unable to create audio context: {}", alcGetString(m_device, alcGetError(m_device))));
         return;
     }
 
     if (alcMakeContextCurrent(m_context) != ALC_TRUE) {
-        g_logger.error(stdext::format("unable to make context current: %s", alcGetString(m_device, alcGetError(m_device))));
+        g_logger.error(fmt::format("unable to make context current: {}", alcGetString(m_device, alcGetError(m_device))));
     }
 }
 
@@ -416,7 +417,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
     // create the sound bank from protobuf file
     try {
         std::stringstream fileInputStream;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", directory, fileName)), fileInputStream);
+        g_resources.readFileStream(g_resources.resolvePath(fmt::format("{}{}", directory, fileName)), fileInputStream);
 
         // read the soundbank
         auto protobufSounds = sounds::Sounds();

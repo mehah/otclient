@@ -92,7 +92,7 @@ bool AnimatedText::merge(const AnimatedTextPtr& other)
     try {
         const int number = stdext::safe_cast<int>(m_cachedText.getText());
         const int otherNumber = stdext::safe_cast<int>(other->getCachedText().getText());
-        m_cachedText.setText(stdext::format("%d", number + otherNumber));
+        m_cachedText.setText(fmt::format("{}", number + otherNumber));
         return true;
     } catch (...) {
         return false;

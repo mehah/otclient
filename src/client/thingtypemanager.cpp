@@ -168,7 +168,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
 
         // load appearances.dat
         std::stringstream fin;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, appearancesFile)), fin);
+        g_resources.readFileStream(g_resources.resolvePath(fmt::format("{}{}", file, appearancesFile)), fin);
 
         auto appearancesLib = appearances::Appearances();
         if (!appearancesLib.ParseFromIstream(&fin)) {
@@ -260,7 +260,7 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
 
         // load staticdata.dat
         std::stringstream datFileStream;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, staticDataFile)), datFileStream);
+        g_resources.readFileStream(g_resources.resolvePath(fmt::format("{}{}", file, staticDataFile)), datFileStream);
         auto staticDataLib = staticdata::Staticdata();
         if (!staticDataLib.ParseFromIstream(&datFileStream)) {
             throw stdext::exception("Couldn't parse staticdata lib.");
@@ -293,7 +293,7 @@ const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory categor
     if (category < ThingLastCategory)
         return m_thingTypes[category];
 
-    throw Exception("invalid thing type category %d", category);
+    throw Exception("invalid thing type category {}", category);
 }
 
 const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category)
@@ -462,7 +462,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
     try {
         const auto& fin = g_resources.createFile(fileName);
         if (!fin)
-            throw Exception("failed to open file '%s' for write", fileName);
+            throw Exception("failed to open file '{}' for write", fileName);
 
         fin->cache();
 
@@ -546,7 +546,7 @@ void ThingTypeManager::loadXml(const std::string& file)
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(file.c_str());
         if (!result)
-            throw Exception("failed to parse '%s': '%s'", file, result.description());
+            throw Exception("failed to parse '{}': '{}'", file, result.description());
 
         pugi::xml_node root = doc.child("items");
         if (root.empty())

@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "../pch.h"
-
 namespace stdext
 {
     template <class _Kty>

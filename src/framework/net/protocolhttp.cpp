@@ -497,7 +497,7 @@ void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transfer
 void HttpSession::close()
 {
     m_result->canceled = true;
-    g_logger.error(stdext::format("HttpSession close"));
+    g_logger.error("HttpSession close");
     if (instance_uri.port == "443") {
         m_ssl.async_shutdown(
             [sft = shared_from_this()](
@@ -524,14 +524,14 @@ void HttpSession::close()
 void HttpSession::onTimeout(const std::error_code& ec)
 {
     if (!ec) {
-        onError(stdext::format("HttpSession ontimeout %s", ec.message()));
+        onError(fmt::format("HttpSession ontimeout {}", ec.message()));
     }
 }
 
 void HttpSession::onError(const std::string& ec, const std::string& /*details*/) const
 {
     g_logger.error("{}", ec);
-    m_result->error = stdext::format("%s", ec);
+    m_result->error = fmt::format("{}", ec);
     m_result->finished = true;
     m_callback(m_result);
 }
