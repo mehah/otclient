@@ -139,8 +139,8 @@ namespace Proto
         GameServerPremiumTrigger = 158,
         GameServerPlayerDataBasic = 159,
         GameServerPlayerData = 160,
-        GameServerPlayerSkills = 161,
-        GameServerPlayerState = 162,
+        GameServerPlayerSkills = 161, // 0xA1
+        GameServerPlayerState = 162, // 0xA2
         GameServerClearTarget = 163,
         GameServerSpellDelay = 164,
         GameServerSpellGroupDelay = 165,

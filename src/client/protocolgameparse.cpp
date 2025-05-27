@@ -2234,11 +2234,13 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 
 void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() >= 1281) {
+    const int version = g_game.getClientVersion();
+
+    if (version >= 1281) {
         // magic level
         const uint16_t magicLevel = msg->getU16();
         const uint16_t baseMagicLevel = msg->getU16();
-        msg->getU16(); // base + loyalty bonus(?)
+        msg->getU16(); // loyalty bonus
         const uint8_t percent = msg->getU16() / 100;
 
         m_localPlayer->setMagicLevel(magicLevel, percent);
@@ -2256,9 +2258,8 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         }
 
         uint16_t levelPercent = 0;
-
-        if (g_game.getClientVersion() >= 1281) {
-            msg->getU16(); // base + loyalty bonus(?)
+        if (version >= 1281) {
+            msg->getU16(); // loyalty
             levelPercent = msg->getU16() / 100;
         } else {
             levelPercent = msg->getU8();
@@ -2268,7 +2269,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
     }
 
-    if (g_game.getFeature(Otc::GameAdditionalSkills)) {
+    if (g_game.getFeature(Otc::GameAdditionalSkills) && version < 1412) {
         // Critical, Life Leech, Mana Leech
         for (int_fast32_t skill = Otc::CriticalChance; skill <= Otc::ManaLeechAmount; ++skill) {
             if (!g_game.getFeature(Otc::GameLeechAmount)) {
@@ -2288,9 +2289,9 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         msg->getU8();
     }
 
-    if (g_game.getClientVersion() >= 1281) {
-        // forge skill stats
-        const uint8_t lastSkill = g_game.getClientVersion() >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
+    if (version >= 1281 && version < 1412) {
+        // forge skill stats (pre-14.12)
+        const uint8_t lastSkill = version >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
         for (int_fast32_t skill = Otc::Fatal; skill < lastSkill; ++skill) {
             const uint16_t level = msg->getU16();
             const uint16_t baseLevel = msg->getU16();
@@ -2301,8 +2302,42 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         // bonus cap
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
-
         m_localPlayer->setTotalCapacity(capacity);
+
+    } else if (version >= 1412) {
+        const uint32_t capacity = msg->getU32();
+        msg->getU32(); // base capacity
+        m_localPlayer->setTotalCapacity(capacity);
+
+        msg->getU16(); // flat healing/damage bonus
+
+        msg->getU16(); // attack total
+        msg->getU8(); // element
+        msg->getDouble(); // element ratio
+        msg->getU8(); // element type
+
+        // Imbuement values
+        msg->getDouble(); // Life Leech
+        msg->getDouble(); // Mana Leech
+        msg->getDouble(); // Crit Chance
+        msg->getDouble(); // Crit Extra Damage
+        msg->getDouble(); // Onslaught
+
+        msg->getU16(); // Defense
+        msg->getU16(); // Armor
+        msg->getDouble(); // Mitigation
+        msg->getDouble(); // Dodge
+        msg->getU16(); // Reflection
+
+        const uint8_t absorbCount = msg->getU8();
+        for (uint8_t i = 0; i < absorbCount; ++i) {
+            msg->getU8(); // combat type
+            msg->getDouble(); // value
+        }
+
+        msg->getDouble(); // Momentum
+        msg->getDouble(); // Transcendence
+        msg->getDouble(); // Amplification
     }
 }
 
@@ -2312,6 +2347,7 @@ void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
     if (g_game.getClientVersion() >= 1281) {
         if (g_game.getClientVersion() >= 1405) {
             states = msg->getU64();
+            
         } else {
             states = msg->getU32();
         }
@@ -2996,7 +3032,11 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
 void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
 {
     BestiaryCharmsData charmData;
-    charmData.points = msg->getU32();
+    if (g_game.getClientVersion() >= 1405) {
+        charmData.points = msg->getU64();
+    } else {
+        charmData.points = msg->getU32();
+    }
 
     const uint8_t charmsAmount = msg->getU8();
     for (auto i = 0; i < charmsAmount; ++i) {
