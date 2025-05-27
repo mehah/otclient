@@ -38,6 +38,20 @@
       }
     },
     {
+      "name": "windows-debug-msbuild",
+      "inherits": "windows-debug",
+      "displayName": "Windows - Debug (msbuild)",
+      "description": "Windows Debug build using vcpkg-test manifest",
+      "generator": "Visual Studio 17 2022",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "DEBUG_LOG": "ON",
+        "ASAN_ENABLED": "ON",
+        "BUILD_STATIC_LIBRARY": "OFF",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
+      }
+    },
+    {
       "name": "linux-release",
       "displayName": "Linux - Release",
       "description": "Sets Ninja generator, compilers, build and install directory and set build type as release",
@@ -157,6 +171,10 @@
     {
       "name": "windows-debug",
       "configurePreset": "windows-debug"
+    },
+    {
+      "name": "windows-debug-msbuild",
+      "configurePreset": "windows-debug-msbuild"
     },
     {
       "name": "macos-release",
