@@ -5,7 +5,7 @@ project(otclient)
 # Options
 # *****************************************************************************
 if(CMAKE_BASE_NAME STREQUAL "em++")
-    set(WASM ON)
+	set(WASM ON)
 		message(STATUS "WASM: ON")
 endif()
 
@@ -194,6 +194,7 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(ixwebsocket CONFIG REQUIRED)
 
 if(APPLE)
 	# Required for Physfs
@@ -439,6 +440,30 @@ target_link_options(${PROJECT_NAME} PUBLIC -flto=auto)
 # *****************************************************************************
 # Includes and librarys
 # *****************************************************************************
+
+# Shared libraries used across all platforms (Windows, Linux, Android, WASM)
+# Centralized here to avoid redundancy and simplify maintenance.
+target_link_libraries(${PROJECT_NAME}
+	PRIVATE
+	protobuf
+	protobuf::libprotobuf
+	absl::log_internal_check_op
+	Threads::Threads
+	asio::asio
+	LibLZMA::LibLZMA
+	pugixml::pugixml
+	ixwebsocket::ixwebsocket
+
+	${STDUUID}
+	${ZLIB_LIBRARY}
+	${NLOHMANN_JSON_LIBRARY}
+	${GMP_LIBRARY}
+	${VORBIS_LIBRARY}
+	${VORBISFILE_LIBRARY}
+	${OGG_LIBRARY}
+	${PHYSFS_LIBRARY}
+)
+
 if(MSVC)
 
 	# Set variables to have Windows Vista Value so httplib will build 'inet_pton'
@@ -489,30 +514,20 @@ if(MSVC)
 		PRIVATE
 		${LUAJIT_LIBRARY}
 		${CMAKE_THREAD_LIBS_INIT}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
-		${NLOHMANN_JSON_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
-		${OGG_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${GMP_LIBRARY}
 		${OPENSSL_LIBRARIES}
 		${DBGHELP_LIBRARY}
-		${STDUUID}
 
-		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
-		Threads::Threads
 		GLEW::GLEW
-		asio::asio
 		OpenAL::OpenAL
 		LibLZMA::LibLZMA
 		winmm.lib
 		pugixml::pugixml
 		fmt::fmt-header-only
+		bcrypt
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
@@ -534,23 +549,12 @@ elseif(ANDROID)
 		PRIVATE
 		${LUA_LIBRARY}
 		${LUAJIT_LIBRARY}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
-		${NLOHMANN_JSON_LIBRARY}
 		${EGL_LIBRARY}
-		${OGG_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${GMP_LIBRARY}
 		${OpenAL_LIBRARY}
 		${OPENSSL_LIBRARIES}
-		${STDUUID}
 		${MINIZIP_LIBRARY}
 
-		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
-		Threads::Threads
-		asio::asio
 		OpenSLES
 		LibLZMA::LibLZMA
 		game-activity::game-activity
@@ -578,30 +582,19 @@ elseif(WASM)
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
 		${LUA_LIBRARY}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
 		${PROTOBUF_LIBRARY}
-		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
-		${OGG_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${GMP_LIBRARY}
-		${STDUUID}
 		${FOUNDATION}
 		${IOKIT}
 		${OPENSSL_LIBRARY}
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
-		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
 
-		Threads::Threads
-		asio::asio
 		# OpenAL::OpenAL (using emscripten openal api)
 		LibLZMA::LibLZMA
 		pugixml::pugixml
@@ -611,7 +604,6 @@ elseif(WASM)
 		httplib::httplib
 		fmt::fmt-header-only
 	)
-
 
 	get_property(linkflags TARGET ${PROJECT_NAME} PROPERTY LINK_FLAGS)
 
@@ -659,29 +651,18 @@ else() # Linux
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
 		${LUAJIT_LIBRARY}
-		${PHYSFS_LIBRARY}
-		${ZLIB_LIBRARY}
-		${NLOHMANN_JSON_LIBRARY}
 		${GLEW_LIBRARY}
 		${OPENGL_LIBRARIES}
 		${DirectX_LIBRARY}
 		${DirectX_LIBRARIES}
-		${OGG_LIBRARY}
-		${VORBISFILE_LIBRARY}
-		${VORBIS_LIBRARY}
-		${GMP_LIBRARY}
-		${STDUUID}
 		${FOUNDATION}
 		${IOKIT}
 		${OPENSSL_LIBRARY}
 		${OPENSSL_CRYPTO_LIBRARY}
 		${HTTPLIB_LIBRARY}
 
-		protobuf::libprotobuf protobuf
 		absl::log_internal_check_op
-		Threads::Threads
 		X11::X11
-		asio::asio
 		OpenAL::OpenAL
 		LibLZMA::LibLZMA
 		pugixml::pugixml
