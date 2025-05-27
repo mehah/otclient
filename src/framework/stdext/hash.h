@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include <parallel_hashmap/phmap.h>
+
 namespace stdext
 {
     template <class _Kty>
