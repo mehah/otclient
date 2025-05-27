@@ -47,7 +47,12 @@ void GarbageCollection::poll() {
         drawpoll();
 
     if (canCheck(lua_timer, LUA_TIME))
-        g_lua.collectGarbage();
+        lua();
+}
+
+void GarbageCollection::lua() {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
+    g_lua.collectGarbage();
 }
 
 void GarbageCollection::drawpoll() {
