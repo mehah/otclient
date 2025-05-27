@@ -253,7 +253,7 @@ void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
         return;
 
     if (g_map.isWidgetAttached(widget)) {
-        g_logger.error(stdext::format("Failed to attach widget %s, this widget is already attached to map.", widget->getId()));
+        g_logger.error("Failed to attach widget {}, this widget is already attached to map.", widget->getId());
         return;
     }
 

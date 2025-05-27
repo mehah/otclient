@@ -145,7 +145,7 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos, const
     int pattern_x = getNumPatternX();
     int pattern_y = getNumPatternY();
     if (pattern_x == 0 || pattern_y == 0) {
-        g_logger.warning(stdext::format("Failed to send magic effect %d. No sprites declared.", m_clientId));
+        g_logger.warning("Failed to send magic effect {}. No sprites declared.", m_clientId);
         return;
     }
 

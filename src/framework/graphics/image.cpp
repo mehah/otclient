@@ -43,7 +43,7 @@ ImagePtr Image::load(const std::string& file)
     try {
         return loadPNG(path);
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("unable to load image '%s': %s", path, e.what()));
+        g_logger.error("unable to load image '{}': {}", path, e.what());
     }
     return nullptr;
 }
@@ -82,7 +82,7 @@ void Image::savePNG(const std::string& fileName)
 {
     const auto& fin = g_resources.createFile(fileName);
     if (!fin)
-        throw Exception("failed to open file '%s' for write", fileName);
+        throw Exception("failed to open file '{}' for write", fileName);
 
     fin->cache();
     std::stringstream data;
@@ -271,7 +271,7 @@ ImagePtr Image::fromQRCode(const std::string& code, const int border)
 
         return image;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to encode qr-code: '%s': %s", code, e.what()));
+        g_logger.error("Failed to encode qr-code: '{}': {}", code, e.what());
     }
 
     return {};

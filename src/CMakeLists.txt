@@ -193,6 +193,7 @@ find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 if(APPLE)
 	# Required for Physfs
@@ -511,6 +512,7 @@ if(MSVC)
 		LibLZMA::LibLZMA
 		winmm.lib
 		pugixml::pugixml
+		fmt::fmt-header-only
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
@@ -556,6 +558,7 @@ elseif(ANDROID)
 		android
 		log
 		pugixml::pugixml
+		fmt::fmt-header-only
 	)
 
 elseif(WASM)
@@ -606,6 +609,7 @@ elseif(WASM)
 		OpenSSL::SSL
 		OpenSSL::Crypto
 		httplib::httplib
+		fmt::fmt
 	)
 
 
@@ -685,6 +689,7 @@ else() # Linux
 		OpenSSL::SSL
 		OpenSSL::Crypto
 		httplib::httplib
+		fmt::fmt-header-only
 	)
 
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")

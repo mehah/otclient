@@ -214,7 +214,10 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
     if (m_sequencedPackets) {
         decompress = (m_inputMessage->getU32() & 1 << 31);
     } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", static_cast<int>(m_inputMessage->getMessageSize())));
+        g_logger.traceError(
+            "got a network message with invalid checksum, size: {}",
+            static_cast<int>(m_inputMessage->getMessageSize())
+        );
         return;
     }
 
@@ -235,14 +238,14 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 
         const int32_t ret = inflate(&m_zstream, Z_FINISH);
         if (ret != Z_OK && ret != Z_STREAM_END) {
-            g_logger.traceError(stdext::format("failed to decompress message - %s", m_zstream.msg));
+            g_logger.traceError("failed to decompress message - {}", m_zstream.msg);
             return;
         }
 
         const uint32_t totalSize = m_zstream.total_out;
         inflateReset(&m_zstream);
         if (totalSize == 0) {
-            g_logger.traceError(stdext::format("invalid size of decompressed message - %i", totalSize));
+            g_logger.traceError("invalid size of decompressed message - %i", totalSize);
             return;
         }
 
