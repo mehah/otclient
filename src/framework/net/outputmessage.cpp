@@ -179,3 +179,8 @@ void OutputMessage::prependU16(uint16_t value)
     stdext::writeULE16(m_buffer + m_headerPos, value);
     m_messageSize += 2;
 }
+
+uint8_t* OutputMessage::getXteaEncryptionBuffer()
+{
+    return g_game.getClientVersion() >= 1405 ? getHeaderBuffer() : getDataBuffer() - 2;
+}

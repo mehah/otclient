@@ -59,6 +59,8 @@ public:
     void setWritePos(const uint16_t writePos) { m_writePos = writePos; }
     void setMessageSize(const uint16_t messageSize) { m_messageSize = messageSize; }
 
+    uint8_t* getXteaEncryptionBuffer();
+
 protected:
     uint8_t* getWriteBuffer() { return m_buffer + m_writePos; }
     uint8_t* getHeaderBuffer() { return m_buffer + m_headerPos; }
