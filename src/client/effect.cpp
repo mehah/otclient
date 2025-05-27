@@ -154,5 +154,5 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos, const
 }
 
 ThingType* Effect::getThingType() const {
-    return g_things.getThingType(m_clientId, ThingCategoryEffect).get();
+    return g_things.getRawThingType(m_clientId, ThingCategoryEffect);
 }

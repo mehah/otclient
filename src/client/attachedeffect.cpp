@@ -193,5 +193,5 @@ void AttachedEffect::move(const Position& fromPosition, const Position& toPositi
 }
 
 ThingType* AttachedEffect::getThingType() const {
-    return m_thingId > 0 ? g_things.getThingType(m_thingId, m_thingCategory).get() : nullptr;
+    return m_thingId > 0 ? g_things.getRawThingType(m_thingId, m_thingCategory) : nullptr;
 }
