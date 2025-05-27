@@ -32,9 +32,10 @@ public:
     enum
     {
         BUFFER_MAXSIZE = 65536,
-        MAX_STRING_LENGTH = 65536,
-        MAX_HEADER_SIZE = 7
+        MAX_STRING_LENGTH = 65536
     };
+
+    OutputMessage();
 
     void reset();
 
@@ -61,7 +62,7 @@ public:
 protected:
     uint8_t* getWriteBuffer() { return m_buffer + m_writePos; }
     uint8_t* getHeaderBuffer() { return m_buffer + m_headerPos; }
-    uint8_t* getDataBuffer() { return m_buffer + MAX_HEADER_SIZE; }
+    uint8_t* getDataBuffer() { return m_buffer + m_maxHeaderSize; }
 
     void writeChecksum();
     void writeSequence(uint32_t sequence);
@@ -76,8 +77,9 @@ private:
     bool canWrite(int bytes) const;
     void checkWrite(int bytes);
 
-    uint16_t m_headerPos{ MAX_HEADER_SIZE };
-    uint16_t m_writePos{ MAX_HEADER_SIZE };
+    uint8_t m_maxHeaderSize { 8 };
+    uint16_t m_headerPos{ m_maxHeaderSize };
+    uint16_t m_writePos{ m_maxHeaderSize };
     uint16_t m_messageSize{ 0 };
     uint8_t m_buffer[BUFFER_MAXSIZE];
 };

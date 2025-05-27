@@ -23,10 +23,19 @@
 #include <framework/net/outputmessage.h>
 #include <framework/util/crypt.h>
 
+#include "client/game.h"
+
+OutputMessage::OutputMessage() {
+    m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;
+    m_writePos = m_maxHeaderSize;
+    m_headerPos = m_maxHeaderSize;
+}
+
 void OutputMessage::reset()
 {
-    m_writePos = MAX_HEADER_SIZE;
-    m_headerPos = MAX_HEADER_SIZE;
+    m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;
+    m_writePos = m_maxHeaderSize;
+    m_headerPos = m_maxHeaderSize;
     m_messageSize = 0;
 }
 
