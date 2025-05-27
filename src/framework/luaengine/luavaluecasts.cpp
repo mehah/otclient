@@ -233,6 +233,12 @@ int push_luavalue(const Platform::Device& device)
     return 1;
 }
 
+int push_luavalue(const char* cstr)
+{
+    g_lua.pushString(cstr);
+    return 1;
+}
+
 bool luavalue_cast(const int index, Platform::Device& device)
 {
     if (g_lua.isTable(index)) {
