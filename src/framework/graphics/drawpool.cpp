@@ -329,12 +329,11 @@ void DrawPool::PoolState::execute() const {
     g_painter->setShaderProgram(shaderProgram);
     g_painter->setTransformMatrix(transformMatrix);
     if (action) action();
-    if (textureId > 0) {
+    if (texture) {
+        texture->create();
+        g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
+    } else
         g_painter->setTexture(textureId, textureMatrixId);
-    } else if (const auto txt = texture.lock()) {
-        txt->create();
-        g_painter->setTexture(txt->getId(), txt->getTransformMatrixId());
-    } else g_painter->resetTexture();
 }
 
 void DrawPool::setFramebuffer(const Size& size) {

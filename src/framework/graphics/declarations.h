@@ -55,7 +55,6 @@ class GraphicalApplicationContext;
 
 using ImagePtr = std::shared_ptr<Image>;
 using TexturePtr = std::shared_ptr<Texture>;
-using TextureWeakPtr = std::weak_ptr<Texture>;
 using AnimatedTexturePtr = std::shared_ptr<AnimatedTexture>;
 using BitmapFontPtr = std::shared_ptr<BitmapFont>;
 using CachedTextPtr = std::shared_ptr<CachedText>;

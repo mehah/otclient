@@ -463,7 +463,7 @@ public:
     float getOpacity() { return m_opacity; }
     void setPathable(bool var);
     int getExactHeight();
-    TexturePtr getTexture(int animationPhase);
+    const TexturePtr& getTexture(int animationPhase);
 
     std::string getName() { return m_name; }
     std::string getDescription() { return m_description; }

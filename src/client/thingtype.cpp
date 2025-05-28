@@ -563,8 +563,6 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     if (animationPhase >= m_animationPhases)
         return;
 
-    // It's not necessary to retrieve the texture here, since the lighting system doesn't use it.
-    // Also, this method runs on the Map and Light threads, which may cause a double free on the texture.
     TexturePtr texture;
     if (g_drawPool.getCurrentType() != DrawPoolType::LIGHT) {
         texture = getTexture(animationPhase); // texture might not exists, neither its rects.
@@ -597,7 +595,7 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     }
 }
 
-TexturePtr ThingType::getTexture(const int animationPhase)
+const TexturePtr& ThingType::getTexture(const int animationPhase)
 {
     if (m_null) return m_textureNull;
 

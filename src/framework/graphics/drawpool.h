@@ -186,7 +186,7 @@ protected:
         PainterShaderProgram* shaderProgram{ nullptr };
         std::function<void()> action{ nullptr };
         Color color{ Color::white };
-        TextureWeakPtr texture;
+        TexturePtr texture;
         uint32_t textureId{ 0 };
         uint16_t textureMatrixId{ 0 };
         size_t hash{ 0 };
