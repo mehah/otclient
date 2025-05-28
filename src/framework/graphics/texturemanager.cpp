@@ -132,7 +132,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
             g_resources.readFileStream(filePathEx, fin);
             texture = loadTexture(fin);
         } catch (const stdext::exception& e) {
-            g_logger.error(stdext::format("Unable to load texture '%s': %s", fileName, e.what()));
+            g_logger.error("Unable to load texture '{}': {}", fileName, e.what());
             texture = g_textures.getEmptyTexture();
         }
 

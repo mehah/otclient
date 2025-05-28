@@ -32,7 +32,7 @@
 
 AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("AttachedEffectManager::getInstance(%d, %d): invalid thing with id or category.", thingId, static_cast<uint8_t>(category)));
+        g_logger.error("AttachedEffectManager::getInstance({}, {}): invalid thing with id or category.", thingId, static_cast<uint8_t>(category));
         return nullptr;
     }
 

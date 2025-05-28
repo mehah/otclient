@@ -29,6 +29,11 @@
 
 Graphics g_graphics;
 
+inline std::string_view glString(GLenum name) {
+    const GLubyte* str = glGetString(name);
+    return str ? reinterpret_cast<const char*>(str) : "";
+}
+
 void Graphics::init()
 {
     if (const auto* v = reinterpret_cast<const char*>(glGetString(GL_VENDOR)))
@@ -43,14 +48,14 @@ void Graphics::init()
     if (const auto* v = reinterpret_cast<const char*>(glGetString(GL_EXTENSIONS)))
         m_extensions = v;
 
-    g_logger.info(stdext::format("GPU %s", glGetString(GL_RENDERER)));
-    g_logger.info(stdext::format("OpenGL %s", glGetString(GL_VERSION)));
+    g_logger.info("GPU {}", glString(GL_RENDERER));
+    g_logger.info("OpenGL {}", glString(GL_VERSION));
 
 #ifndef OPENGL_ES
     // init GL extensions
     const GLenum err = glewInit();
     if (err != GLEW_OK)
-        g_logger.fatal(stdext::format("Unable to init GLEW: %s", glewGetErrorString(err)));
+        g_logger.fatal("Unable to init GLEW: {}", glString(err));
 
     // overwrite framebuffer API if needed
     if (GLEW_EXT_framebuffer_object && !GLEW_ARB_framebuffer_object) {
