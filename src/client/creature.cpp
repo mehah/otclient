@@ -664,7 +664,7 @@ void Creature::nextWalkUpdate()
 void Creature::updateWalk()
 {
     const int stepDuration = getStepDuration(true);
-    const float stabilizeCam = isCameraFollowing() && g_window.vsyncEnabled() ? 8.5f - (stepDuration / 100.f) : 0.f;
+    const float stabilizeCam = isCameraFollowing() && g_window.vsyncEnabled() ? 6.f : 0.f;
     const float walkTicksPerPixel = (stepDuration + stabilizeCam) / static_cast<float>(g_gameConfig.getSpriteSize());
 
     const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, g_gameConfig.getSpriteSize());
