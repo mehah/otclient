@@ -4,6 +4,7 @@ local inventoryShrink = false
 local itemSlotsWithDuration = {}
 local updateSlotsDurationEvent = nil
 local DURATION_UPDATE_INTERVAL = 1000
+local pvpModeRadioGroup = nil 
 
 local function getInventoryUi()
     if inventoryShrink then
@@ -365,6 +366,13 @@ function inventoryController:onTerminate()
     if iconTopMenu then
         iconTopMenu:destroy()
         iconTopMenu = nil
+    end
+    if pvpModeRadioGroup then
+        disconnect(pvpModeRadioGroup, {
+            onSelectionChange = onSetPVPMode
+        })
+        pvpModeRadioGroup:destroy()
+        pvpModeRadioGroup = nil
     end
 end
 
