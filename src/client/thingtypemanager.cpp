@@ -307,7 +307,7 @@ const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const Thin
 
 ThingType* ThingTypeManager::getRawThingType(uint16_t id, ThingCategory category) {
     if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
-        g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
+        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
         return nullptr;
     }
     return m_thingTypes[category][id].get();
