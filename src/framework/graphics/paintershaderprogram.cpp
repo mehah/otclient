@@ -89,7 +89,7 @@ void PainterShaderProgram::setProjectionMatrix(const Matrix3& projectionMatrix)
     m_projectionMatrix = projectionMatrix;
 }
 
-void PainterShaderProgram::setTextureMatrix(const Matrix3Ptr& textureMatrix)
+void PainterShaderProgram::setTextureMatrix(const Matrix3* textureMatrix)
 {
     if (textureMatrix == m_textureMatrix)
         return;

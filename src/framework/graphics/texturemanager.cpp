@@ -181,10 +181,6 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
     return texture;
 }
 
-std::shared_ptr<Matrix3> TextureManager::getMatrixById(uint16_t id) {
-    return id < m_matrixCache.objects.size() ? m_matrixCache.objects[id] : nullptr;
-}
-
 Matrix3 toMatrix(const Size& size, const bool upsideDown) {
     if (upsideDown) {
         return { 1.0f / size.width(), 0.0f,                                                  0.0f,
@@ -195,6 +191,10 @@ Matrix3 toMatrix(const Size& size, const bool upsideDown) {
     return { 1.0f / size.width(), 0.0f, 0.0f,
         0.0f, 1.0f / size.height(), 0.0f,
         0.0f, 0.0f, 1.0f };
+}
+
+const Matrix3* TextureManager::getMatrixById(uint16_t id) {
+    return id < m_matrixCache.objects.size() ? m_matrixCache.objects[id].get() : nullptr;
 }
 
 uint16_t TextureManager::getMatrixId(const Size& size, bool upsidedown) {
@@ -210,7 +210,7 @@ uint16_t TextureManager::getMatrixId(const Size& size, bool upsidedown) {
 
     const auto id = m_matrixCache.objects.size();
     m_matrixCache.indexMap[hash] = id;
-    m_matrixCache.objects.emplace_back(std::make_shared<Matrix3>(toMatrix(size, upsidedown)));
+    m_matrixCache.objects.emplace_back(std::make_unique<Matrix3>(toMatrix(size, upsidedown)));
 
     return id;
 }

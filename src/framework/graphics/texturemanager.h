@@ -40,7 +40,7 @@ public:
     const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
     TexturePtr loadTexture(std::stringstream& file);
 
-    std::shared_ptr<Matrix3> getMatrixById(uint16_t id);
+    const Matrix3* getMatrixById(uint16_t id);
     uint16_t getMatrixId(const Size& size, bool upsidedown);
 
 private:
@@ -53,7 +53,7 @@ private:
     struct
     {
         std::unordered_map<size_t, uint16_t> indexMap;
-        std::vector<std::shared_ptr<Matrix3>> objects;
+        std::vector<std::unique_ptr<Matrix3>> objects;
     } m_matrixCache;
 
     friend class GarbageCollection;

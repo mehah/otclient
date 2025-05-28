@@ -91,7 +91,7 @@ public:
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram) { setShaderProgram(shaderProgram.get()); }
     void setCompositionMode(CompositionMode compositionMode);
 
-    void setTextureMatrix(const Matrix3Ptr& matrix) { if (m_textureMatrix != matrix) m_textureMatrix = matrix; }
+    void setTextureMatrix(const Matrix3* matrix) { if (m_textureMatrix != matrix) m_textureMatrix = matrix; }
     void setTransformMatrix(const Matrix3& matrix) { if (m_transformMatrix != matrix) m_transformMatrix = matrix; }
     void setProjectionMatrix(const Matrix3& matrix) { if (m_projectionMatrix != matrix) m_projectionMatrix = matrix; }
 
@@ -118,7 +118,7 @@ protected:
 
     Matrix3 m_transformMatrix;
     Matrix3 m_projectionMatrix;
-    Matrix3Ptr m_textureMatrix;
+    const Matrix3* m_textureMatrix = nullptr;
 
     BlendEquation m_blendEquation{ BlendEquation::ADD };
     bool m_alphaWriting{ false };
