@@ -562,9 +562,12 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     if (animationPhase >= m_animationPhases)
         return;
 
-    const auto& texture = getTexture(animationPhase); // texture might not exists, neither its rects.
-    if (!texture)
-        return;
+    TexturePtr texture;
+    if (g_drawPool.getCurrentType() != DrawPoolType::LIGHT) {
+        texture = getTexture(animationPhase); // texture might not exists, neither its rects.
+        if (!texture)
+            return;
+    }
 
     const auto& textureData = m_textureData[animationPhase];
 
@@ -577,7 +580,7 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
 
     const Rect screenRect(dest + (textureOffset - m_displacement - (m_size.toPoint() - Point(1)) * g_gameConfig.getSpriteSize()) * g_drawPool.getScaleFactor(), textureRect.size() * g_drawPool.getScaleFactor());
 
-    if (drawThings) {
+    if (drawThings && texture) {
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
 
         if (g_drawPool.shaderNeedFramebuffer())
@@ -591,7 +594,7 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     }
 }
 
-TexturePtr ThingType::getTexture(const int animationPhase)
+const TexturePtr& ThingType::getTexture(const int animationPhase)
 {
     if (m_null) return m_textureNull;
 

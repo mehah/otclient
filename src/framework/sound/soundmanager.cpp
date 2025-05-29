@@ -23,6 +23,7 @@
 #include "soundmanager.h"
 #include "soundbuffer.h"
 #include "soundeffect.h"
+#include "soundchannel.h"
 #include "soundfile.h"
 #include "streamsoundsource.h"
 #include "combinedsoundsource.h"
@@ -31,10 +32,9 @@
 #include <framework/core/asyncdispatcher.h>
 #include <framework/core/clock.h>
 #include <framework/core/resourcemanager.h>
+#include <framework/core/garbagecollection.h>
 #include <nlohmann/json.hpp>
 #include <sounds.pb.h>
-
-#include "soundchannel.h"
 
 using namespace otclient::protobuf;
 
@@ -154,7 +154,7 @@ void SoundManager::poll()
     // temp fix for memory leak
     if (soundsErased > 25) {
         soundsErased = 0;
-        g_lua.collectGarbage();
+        GarbageCollection::lua();
     }
 }
 
@@ -459,7 +459,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
             uint32_t effectId = protobufLocationAmbient.id();
             DelayedSoundEffects effects = {};
             for (const auto& delayedEffect : protobufLocationAmbient.delayed_effects()) {
-                effects.push_back({delayedEffect.numeric_sound_effect_id(), delayedEffect.delay_seconds()});
+                effects.push_back({ delayedEffect.numeric_sound_effect_id(), delayedEffect.delay_seconds() });
             }
 
             m_clientAmbientEffects.emplace(effectId, ClientLocationAmbient{
@@ -471,14 +471,14 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
 
         // deserialize item ambients
         for (const auto& protobufItemAmbient : protobufSounds.ambience_object_stream()) {
-            std::vector<uint32_t> itemClientIds = {};            
+            std::vector<uint32_t> itemClientIds = {};
             for (const auto& itemId : protobufItemAmbient.counted_appearance_types()) {
                 itemClientIds.push_back(itemId);
             }
 
             ItemCountSoundEffects soundEffects = {};
             for (const auto& soundEffect : protobufItemAmbient.sound_effects()) {
-                soundEffects.push_back({soundEffect.looping_sound_id(), soundEffect.count()});
+                soundEffects.push_back({ soundEffect.looping_sound_id(), soundEffect.count() });
             }
 
             uint32_t effectId = protobufItemAmbient.id();

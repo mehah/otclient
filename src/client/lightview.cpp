@@ -109,7 +109,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
         g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->resetTransformMatrix();
         g_painter->resetColor();
-        g_painter->setTexture(m_texture.get());
+        g_painter->setTexture(m_texture->getId(), m_texture->getTransformMatrixId());
         g_painter->drawCoords(m_coords);
     });
 

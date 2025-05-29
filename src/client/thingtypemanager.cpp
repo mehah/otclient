@@ -214,7 +214,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
 
 namespace {
     using RaceBank = google::protobuf::RepeatedPtrField<staticdata::Creature>;
-    
+
     void loadCreatureBank(RaceList& otcRaceList, const RaceBank& protobufRaceList, bool boss) {
         for (const auto& protobufRace : protobufRaceList) {
             // add race to vector
@@ -303,6 +303,14 @@ const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const Thin
         return m_nullThingType;
     }
     return m_thingTypes[category][id];
+}
+
+ThingType* ThingTypeManager::getRawThingType(uint16_t id, ThingCategory category) {
+    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
+        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
+        return nullptr;
+    }
+    return m_thingTypes[category][id].get();
 }
 
 ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const ThingCategory category)
