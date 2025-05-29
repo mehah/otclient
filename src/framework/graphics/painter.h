@@ -80,6 +80,7 @@ public:
     PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
 
     void setColor(const Color& color) { if (m_color != color) m_color = color; }
+    void setTexture(const TexturePtr&);
     void setTexture(uint32_t textureId, uint16_t textureMatrixId);
     void setOpacity(const float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
