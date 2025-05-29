@@ -76,7 +76,7 @@ private:
 class EventDispatcher
 {
 public:
-    EventDispatcher();
+    EventDispatcher() = default;
 
     void init();
     void shutdown();

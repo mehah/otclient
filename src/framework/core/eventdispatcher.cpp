@@ -31,13 +31,11 @@ EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 int16_t g_mainThreadId = stdext::getThreadId();
 int16_t g_eventThreadId = -1;
 
-EventDispatcher::EventDispatcher() {
+void EventDispatcher::init() {
     for (size_t i = 0; i < g_asyncDispatcher.get_thread_count(); ++i) {
         m_threads.emplace_back(std::make_unique<ThreadTask>());
     }
-}
-
-void EventDispatcher::init() {};
+};
 
 void EventDispatcher::shutdown()
 {
