@@ -197,7 +197,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 void DrawPoolManager::drawPool(const DrawPoolType type) {
     const auto pool = get(type);
 
-    if (!pool->isEnabled())
+    if (!pool->isEnabled() || !pool->isValid())
         return;
 
     std::scoped_lock l(pool->m_mutexDraw);
