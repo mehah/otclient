@@ -629,7 +629,7 @@ const TexturePtr& ThingType::getTexture(const int animationPhase)
         else g_asyncDispatcher.detach_task(std::move(action));
     }
 
-    return nullptr;
+    return m_textureNull;
 }
 
 void ThingType::loadTexture(const int animationPhase)
