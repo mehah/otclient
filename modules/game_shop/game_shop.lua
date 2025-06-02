@@ -169,7 +169,7 @@ function hideHistory()
     gameShopWindow:getChildById("history"):hide()
 end
 
-local entriesPerPage = 26
+local entriesPerPage = 25
 local currentPage = 1
 local totalPages = 1
 
@@ -417,28 +417,31 @@ function showOffers(id)
             widget.categoryId = id
 
             local imagePanel = widget:getChildById("imagePanel")
+            local image = imagePanel:getChildById("image")
+            local categoryId = offersCache[i].categoryId
+            local item = imagePanel:getChildById("item")
+            local outfit = imagePanel:getChildById("outfit")
+            local mount = imagePanel:getChildById("mount")
 
             if type(offersCache[i].id) == "string" then
-                local image = imagePanel:getChildById("image")
                 image:show()
                 image:setImageSource("/game_shop/images/" .. offersCache[i].id)
             elseif type(offersCache[i].id) == "number" then
-                local categoryId = offersCache[i].categoryId
                 widget.offerCategoryId = categoryId
                 if categoryId == CATEGORY_ITEM then
-                    local item = imagePanel:getChildById("item")
                     item:show()
                     item:setItemId(offersCache[i].id)
                     widget:getChildById("count"):show()
                 elseif categoryId == CATEGORY_OUTFIT then
-                    local outfit = imagePanel:getChildById("outfit")
                     currentOutfit.type = offersCache[i].id
                     outfit:show()
                     outfit:setOutfit(currentOutfit)
                 elseif categoryId == CATEGORY_MOUNT then
-                    local mount = imagePanel:getChildById("mount")
                     mount:show()
                     mount:setOutfit({type = offersCache[i].id})
+                elseif categoryId == CATEGORY_EXTRAS then
+                    item:show()
+                    item:setItemId(offersCache[i].id)
                 end
             end
 
@@ -531,7 +534,7 @@ function updateDescription(self)
         image:setImageSource("/game_shop/images/" .. self.data.id)
     elseif type(self.data.id) == "number" then
         local categoryId = self.offerCategoryId or self.data.offerCategoryId
-        if categoryId == CATEGORY_ITEM then
+        if table.contains({CATEGORY_ITEM, CATEGORY_EXTRAS}, categoryId) then
             item:show()
             item:setItemId(self.data.id)
         elseif categoryId == CATEGORY_OUTFIT then

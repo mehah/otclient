@@ -28,7 +28,32 @@ local ExtendedOPCodes = {
 
 local forbiddenWords = {
 'gm','adm','tutor','god','cm','admin','owner','g m','g o d','g0d','g 0 d','c m','administrator','senior','a d m',
-'Trainer','Devil My Cry','Lavahole','Deaththrower','A Carved Stone Tile','Acolyte Of The Cult','Adept Of The Cult','Amazon','Ancient Scarab','Ashmunrah','Assassin','Azure Frog','Badger','Bandit','Banshee','Barbarian Bloodwalker','Barbarian Brutetamer','Barbarian Headsplitter','Barbarian Skullhunter','Bat','Bear','Behemoth','Beholder','Betrayed Wraith','Black Knight','Black Sheep','Blightwalker','Blood Crab','Blue Butterfly','Blue Djinn','Bonebeast','Braindeath','Bug','Carniphila','Carrion Worm','Cave Rat','Centipede','Chakoya Toolshaper','Chakoya Tribewarden','Chakoya Windcaller','Chicken','Cobra','Coral Frog','Crab','Crimson Frog','Crocodile','Crypt Shambler','Crystal Spider','Cyclops','Dark Magician','Dark Monk','Dark Torturer','Deathslicer','Deer','Defiler','Demon Skeleton','Demon','Destroyer','Diabolic Imp','Dipthrah','Dog','Dragon Lord','Dragon','Dwarf Geomancer','Dwarf Guard','Dwarf Soldier','Dwarf','Dworc Fleshhunter','Dworc Venomsniper','Dworc Voodoomaster','Efreet','Elder Beholder','Elephant','Elf Arcanist','Elf Scout','Elf','Enlightened Of The Cult','Eye Of The Seven','Fire Devil','Fire Elemental','Flamethrower','Flamingo','Frost Dragon','Frost Giant','Frost Giantess','Frost Troll','Fury','Gargoyle','Gazer','Ghost','Ghoul','Giant Spider','Goblin','Green Djinn','Green Frog','Hand Of Cursed Fate','Hell Hole','Hellfire Fighter','Hellhound','Hero','Hunter','Husky','Hyaena','Hydra','Ice Golem','Ice Witch','Juggernaut','Kongra','Larva','Lich','Lion','Lizard Noble','Lizard Sentinel','Lizard Snakecharmer','Lizard Templar','Lost Soul','Magic Pillar','Magicthrower','Mahrdis','Mammoth','Marid','Massive Fire Elemental','Massive Water Elemental','Merlkin','Minotaur Archer','Minotaur Guard','Minotaur Mage','Minotaur','Monk','Morguthis','Mummy','Necromancer','Nightmare','Nomad','Novice Of The Cult','Omruc','Orc Berserker','Orc Leader','Orc Rider','Orc Shaman','Orc Spearman','Orc Warlord','Orc Warrior','Orc','Orchid Frog','Panda','Parrot','Penguin','Phantasm Summon','Phantasm','Pig','Pillar','Pirate Buccaneer','Pirate Corsair','Pirate Cutthroat','Pirate Ghost','Pirate Marauder','Pirate Skeleton','Plaguesmith','Plaguethrower','Poison Spider','Polar Bear','Priestess','Purple Butterfly','Quara Constrictor Scout','Quara Constrictor','Quara Hydromancer Scout','Quara Hydromancer','Quara Mantassin Scout','Quara Mantassin','Quara Pincher Scout','Quara Pincher','Quara Predator Scout','Quara Predator','Rabbit','Rahemos','Rat','Red Butterfly','Rotworm','Scarab','Scorpion','Seagull','Serpent Spawn','Sheep','Shredderthrower','Sibang','Silver Rabbit','Skeleton','Skunk','Slime','Smuggler','Snake','Son Of Verminor','Spectre','Spider','Spit Nettle','Stalker','Stone Golem','Swamp Troll','Tarantula','Terror Bird','Thalas','Thornback Tortoise','Tiger','Toad','Tortoise','Troll','Undead Dragon','Valkyrie','Vampire','Vashresamun','War wolf','Warlock','Wasp','Wild Warrior','Winter Wolf','Witch','Wolf','Wyvern','Yellow Butterfly','Yeti','Annihilon','Apprentice Sheng','Barbaria','Bones','Brutus Bloodbeard','Countess Sorrow','Deadeye Devious','Demodras','Dharalion','Dire Penguin','Dracola','Fernfang','Ferumbras','Fluffy','Foreman Kneebiter','General Murius','Ghazbaran','Golgordan','Grorlam','Hairman The Huge',	'Hellgorak','Koshei The Deathless','Latrivan','Lethal Lissy','Mad Technomancer','Madareth','Man In The Cave','Massacre','Minishabaal','Morgaroth','Mr. Punish','Munster','Necropharus','Orshabaal',	'Ron the Ripper','The Abomination','The Evil Eye','The Handmaiden','The Horned Fox','The Imperor','The Old Widow','The Plasmother','Thul','Tiquandas Revenge','Undead Minion','Ungreez','Ushuriel','Xenia','Zugurosh'
+'Trainer','Devil My Cry','Lavahole','Deaththrower','A Carved Stone Tile','Acolyte Of The Cult','Adept Of The Cult','Amazon','Ancient Scarab',
+'Ashmunrah','Assassin','Azure Frog','Badger','Bandit','Banshee','Barbarian Bloodwalker','Barbarian Brutetamer','Barbarian Headsplitter',
+'Barbarian Skullhunter','Bat','Bear','Behemoth','Beholder','Betrayed Wraith','Black Knight','Black Sheep','Blightwalker','Blood Crab',
+'Blue Butterfly','Blue Djinn','Bonebeast','Braindeath','Bug','Carniphila','Carrion Worm','Cave Rat','Centipede','Chakoya Toolshaper',
+'Chakoya Tribewarden','Chakoya Windcaller','Chicken','Cobra','Coral Frog','Crab','Crimson Frog','Crocodile','Crypt Shambler','Crystal Spider',
+'Cyclops','Dark Magician','Dark Monk','Dark Torturer','Deathslicer','Deer','Defiler','Demon Skeleton','Demon','Destroyer','Diabolic Imp',
+'Dipthrah','Dog','Dragon Lord','Dragon','Dwarf Geomancer','Dwarf Guard','Dwarf Soldier','Dwarf','Dworc Fleshhunter','Dworc Venomsniper',
+'Dworc Voodoomaster','Efreet','Elder Beholder','Elephant','Elf Arcanist','Elf Scout','Elf','Enlightened Of The Cult','Eye Of The Seven',
+'Fire Devil','Fire Elemental','Flamethrower','Flamingo','Frost Dragon','Frost Giant','Frost Giantess','Frost Troll','Fury','Gargoyle',
+'Gazer','Ghost','Ghoul','Giant Spider','Goblin','Green Djinn','Green Frog','Hand Of Cursed Fate','Hell Hole','Hellfire Fighter',
+'Hellhound','Hero','Hunter','Husky','Hyaena','Hydra','Ice Golem','Ice Witch','Juggernaut','Kongra','Larva','Lich','Lion','Lizard Noble',
+'Lizard Sentinel','Lizard Snakecharmer','Lizard Templar','Lost Soul','Magic Pillar','Magicthrower','Mahrdis','Mammoth','Marid',
+'Massive Fire Elemental','Massive Water Elemental','Merlkin','Minotaur Archer','Minotaur Guard','Minotaur Mage','Minotaur','Monk',
+'Morguthis','Mummy','Necromancer','Nightmare','Nomad','Novice Of The Cult','Omruc','Orc Berserker','Orc Leader','Orc Rider','Orc Shaman',
+'Orc Spearman','Orc Warlord','Orc Warrior','Orc','Orchid Frog','Panda','Parrot','Penguin','Phantasm Summon','Phantasm','Pig','Pillar',
+'Pirate Buccaneer','Pirate Corsair','Pirate Cutthroat','Pirate Ghost','Pirate Marauder','Pirate Skeleton','Plaguesmith','Plaguethrower',
+'Poison Spider','Polar Bear','Priestess','Purple Butterfly','Quara Constrictor Scout','Quara Constrictor','Quara Hydromancer Scout',
+'Quara Hydromancer','Quara Mantassin Scout','Quara Mantassin','Quara Pincher Scout','Quara Pincher','Quara Predator Scout','Quara Predator',
+'Rabbit','Rahemos','Rat','Red Butterfly','Rotworm','Scarab','Scorpion','Seagull','Serpent Spawn','Sheep','Shredderthrower','Sibang','Silver Rabbit',
+'Skeleton','Skunk','Slime','Smuggler','Snake','Son Of Verminor','Spectre','Spider','Spit Nettle','Stalker','Stone Golem','Swamp Troll','Tarantula',
+'Terror Bird','Thalas','Thornback Tortoise','Tiger','Toad','Tortoise','Troll','Undead Dragon','Valkyrie','Vampire','Vashresamun','War wolf',
+'Warlock','Wasp','Wild Warrior','Winter Wolf','Witch','Wolf','Wyvern','Yellow Butterfly','Yeti','Annihilon','Apprentice Sheng','Barbaria','Bones',
+'Brutus Bloodbeard','Countess Sorrow','Deadeye Devious','Demodras','Dharalion','Dire Penguin','Dracola','Fernfang','Ferumbras','Fluffy','Foreman Kneebiter',
+'General Murius','Ghazbaran','Golgordan','Grorlam','Hairman The Huge',	'Hellgorak','Koshei The Deathless','Latrivan','Lethal Lissy','Mad Technomancer','Madareth',
+'Man In The Cave','Massacre','Minishabaal','Morgaroth','Mr. Punish','Munster','Necropharus','Orshabaal',	'Ron the Ripper','The Abomination','The Evil Eye',
+'The Handmaiden','The Horned Fox','The Imperor','The Old Widow','The Plasmother','Thul','Tiquandas Revenge','Undead Minion','Ungreez','Ushuriel','Xenia','Zugurosh'
 }
 
 local maxWords = 5
@@ -233,6 +258,7 @@ function gameShopInitialize()
 	addItem("Mounts", "Jungle Saurian", 959, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nThousands of years ago, its ancestors ruled the world. Only recently, it found its way into Tibia. The Jungle Saurian likes to hide in dense wood and overturned trees.")
 	addItem("Mounts", "Jungle Tiger", 1093, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nAs seafaring began to expand, this noble big cat was also transported to other regions in Tibia. Influenced by the new environment and climatic changes, the fur of the Jungle Tiger has developed its extraordinary colouring over several generations.")
 	addItem("Mounts", "Lagoon Saurian", 961, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nThousands of years ago, its ancestors ruled the world. Only recently, it found its way into Tibia. The Lagoon Saurian feels most comfortable in torrential rivers and behind dangerous waterfalls.")
+	addItem("Mounts", "Leaf Locust", 1834, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nBorn from the buzzing chaos of nature's most untamed corners, the Night Locust, Leaf Locust, and Pearl Locust are said to be harbingers of fortune for their allies and heralds of despair for their foes. With their vibrant wings and shimmering shells, these eerie yet majestic creatures are exceptional mounts for adventurers who thrive in the wilds.")
 	addItem("Mounts", "Leafscuttler", 870, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nYou are fascinated by insectoid creatures and can picture yourself riding one during combat or just for travelling? The Leafscuttler will carry you through the Tibian wilderness with ease.")
 	addItem("Mounts", "Magic Carpet", 689, 900, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nThe Magic Carpet is the perfect mount for those who are too busy to take care of an animal mount or simply like to travel on a beautiful, magic hand-woven carpet.")
 	addItem("Mounts", "Magma Skull", 1686, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nForged from cursed bones and shadowed flame, this skull mount is only tamed by death itself.")
@@ -244,6 +270,7 @@ function gameShopInitialize()
 	addItem("Mounts", "Muffled Snowman", 1168, 900, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nWhen the nights are getting longer and freezing wind brings driving snow into the land, snowmen rise and shine on every corner. Lately, a peaceful, arcane creature has found shelter in one of them and used its magical power to call the Muffled Snowman into being. Wrap yourself up well and warmly and jump on the back of your new frosty companion.")
 	addItem("Mounts", "Mystic Raven", 1454, 690, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nGraceful and mysterious, ravens have long been symbols of magic. The Mystic Raven's plumage glows faintly, enchanted by forest spirits.")
 	addItem("Mounts", "Nethersteed", 629, 900, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nOnce a majestic and proud warhorse, the Nethersteed has fallen in a horrible battle many years ago. Driven by agony and pain, its spirit once again took possession of its rotten corpse to avenge its death. Stronger than ever, it seeks a master to join the battlefield, aiming for nothing but death and destruction.")
+	addItem("Mounts", "Night Locust", 1833, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nBorn from the buzzing chaos of nature's most untamed corners, the Night Locust, Leaf Locust, and Pearl Locust are said to be harbingers of fortune for their allies and heralds of despair for their foes. With their vibrant wings and shimmering shells, these eerie yet majestic creatures are exceptional mounts for adventurers who thrive in the wilds.")
 	addItem("Mounts", "Night Waccoon", 692, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nWaccoons are cuddly creatures that love nothing more than to be petted and snuggled! Share a hug, ruffle the fur of the Night Waccoon and scratch it behind its ears to make it happy.")
 	addItem("Mounts", "Nightdweller", 849, 870, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nIf you are more of an imp than an angel, you may prefer riding out on a Nightdweller to scare fellow Tibians on their festive strolls. Its devilish mask, claw-like hands and sharp hooves makes it the perfect companion for any daring adventurer who likes to stand out.")
 	addItem("Mounts", "Nightmarish Crocovile", 1185, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nTo the keen observer, the crocovile is clearly a relative of the crocodile, albeit their look suggests an even more aggressive nature. While it is true that the power of its massive and muscular body can not only crush enemies dead but also break through any gate like a battering ram, a crocovile is, above all, a steadfast companion showing unwavering loyalty to its owner.")
@@ -252,6 +279,7 @@ function gameShopInitialize()
 	addItem("Mounts", "Obsidian Shrine", 1493, 690, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nImbued with ancient divine energy, this shrine floats effortlessly. The Obsidian Shrine blesses its rider with peace and clarity.")
 	addItem("Mounts", "Obstinate Ox", 1674, 690, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nA symbol of raw power and determination. The Obstinate Ox is as loud as it is loyal.")
 	addItem("Mounts", "Parade Horse", 1578, 870, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nBred for ceremony and flair, this horse carries itself with grace and rhythm. Perfect for heroes who crave the spotlight.")
+	addItem("Mounts", "Pearl Locust", 1835, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nBorn from the buzzing chaos of nature's most untamed corners, the Night Locust, Leaf Locust, and Pearl Locust are said to be harbingers of fortune for their allies and heralds of despair for their foes. With their vibrant wings and shimmering shells, these eerie yet majestic creatures are exceptional mounts for adventurers who thrive in the wilds.")
 	addItem("Mounts", "Peony", 1440, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nThese graceful mounts are named after the vibrant flowers they resemble. They are calm, enduring, and add a blooming touch to your journey.")
 	addItem("Mounts", "Plumfish", 736, 570, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nIf the Plumfish moves its fins, it generates enough air pressure that it can even float over land. Its numerous eyes allow it to quickly detect dangers even in confusing situations and eliminate them with one powerful bite. If you watch your fingers, you are going to be good friends.")
 	addItem("Mounts", "Poisonbane", 650, 690, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nThe Poisonbane is out searching for the best bamboo in Tibia. Its heavy armour allows it to visit even the most dangerous places. Treat it nicely with its favourite food from time to time and it will become a loyal partner.")
@@ -267,6 +295,7 @@ function gameShopInitialize()
 	addItem("Mounts", "Rune Watcher", 1390, 870, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nSilent, patient and always on the lookout for rifts in reality, these beings are drawn to those who walk between worlds. The Rune Watcher will not falter.")
 	addItem("Mounts", "Rustwurm", 1446, 870, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nBurrowing from the depths of forgotten tunnels, this creature thrives in the shadows. The Rustwurm is as tough as steel and as fast as fear.")
 	addItem("Mounts", "Sanguine Frog", 1053, 690, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nFor centuries, humans and monsters have dumped their garbage in the swamps around Venore. The combination of old, rusty weapons, stale mana and broken runes have turned some of the swamp dwellers into gigantic frogs. Benefit from those mutations and make the Sanguine Frog a faithful mount for your adventures even beyond the bounds of the swamp.")
+	addItem("Mounts", "Satin Moth", 1836, 870, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nThe Satin Moth is a creature of ethereal grace, embodying the duality of delicacy and inner strength. It is said to symbolise enlightenment itself, carrying its rider towards the ultimate truth in an ever-chaotic world.")
 	addItem("Mounts", "Savanna Ostrich", 1324, 500, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nDespite their inability to fly, these strong-legged birds are lightning-fast and utterly reliable when crossing large distances over dry terrain.")
 	addItem("Mounts", "Scruffy Hyaena", 1335, 750, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nThese rugged animals are fearsome in packs and cunning when left alone. Riding one gives you not only speed but a fearsome reputation.")
 	addItem("Mounts", "Sea Devil", 734, 570, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nIf the Sea Devil moves its fins, it generates enough air pressure that it can even float over land. Its numerous eyes allow it to quickly detect dangers even in confusing situations and eliminate them with one powerful bite. If you watch your fingers, you are going to be good friends.")
@@ -306,11 +335,69 @@ function gameShopInitialize()
 	addItem("Mounts", "Zaoan Badger", 1249, 690, false, 1, "- only usable by purchasing character\n- provides character with a speed boost\n\nBadgers have been a staple of the Tibian fauna for a long time, and finally some daring souls have braved the challenge to tame some exceptional specimens - and succeeded! While the common badger you can encounter during your travels might seem like a rather unassuming creature, the Battle Badger, the Ether Badger, and the Zaoan Badger are fierce and mighty beasts, which are at your beck and call.")
 
 	addCategory("Cosmetics", "Outfits", 15, CATEGORY_OUTFIT)
-	addItem("Outfits", "Elementalist", 432, 450, false, 1, "The warm and cosy cloak of the Winter Warden outfit will keep you warm in every situation. Best thing, it is not only comfortable but fashionable as well. You will be the envy of any snow queen or king, guaranteed!")
-	addItem("Outfits", "Deepling", 463, 450, false, 1, "The Trailblazer is on a mission of enlightenment and carries the flame of wisdom near and far. The everlasting shine brightens the hearts and minds of all creatures its rays touch, bringing light even to the darkest corners of the world as a beacon of insight and knowledge.")
-	addItem("Outfits", "Insectoid", 465, 450, false, 1, "Do you worship warm temperatures and are opposed to the thought of long and dark winter nights? Do you refuse to spend countless evenings in front of your chimney while ice-cold wind whistles through the cracks and niches of your house? It is time to stop freezing and to become an honourable Sun Priest! With this stylish outfit, you can finally show the world your unconditional dedication and commitment to the sun!")
-	addItem("Outfits", "Entrepreneur", 472, 450, false, 1, "The mutated pumpkin is too weak for your mighty weapons? Time to show that evil vegetable how to scare the living daylight out of people! Put on a scary looking pumpkin on your head and spread terror and fear amongst the Tibian population.")
-
+	addOutfit("Full Arbalester Outfit", {male = 1449, female = 1450}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nArmed with a powerful crossbow, and gifted with steady hands as well as a sharp eye, the Arbalester is not one to be trifled with. Requiring both skill and strength to properly wield, the arbalest is a mighty tool in the hands of an able marksman, shooting deadly bolts across great distance.")	
+	addOutfit("Full Arena Champion Outfit", {male = 884, female = 885}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nFight your bloody battles in the arena and become a darling of the crowd. Once you have made it to the top and everyone is cheering your name, the fashionable outfit of an Arena Champion will show the world what you are made of.")
+	addOutfit("Full Armoured Archer Outfit", {male = 1618, female = 1619}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nArmoured Archers are the epitome of invisible danger. Silently and nimbly, they advance in the background. For hours, they wait patiently, almost motionless, for the decisive moment. Just to be perfectly present in a deadly second.")
+	addOutfit("Full Beastmaster Outfit", {male = 637, female = 636}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDo you have enough authority to make wild animals subservient to you? Become a Beastmaster and surround yourself with fearsome companions. When your beasts bare their teeth, your enemies will turn tails and run.")
+	addOutfit("Full Beekeeper Outfit", {male = 1776, female = 1777}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThis is eco-friendly. This is organic. This is a blast. Step into the shoes of a Beekeeper and command your bee army. Whether it's for relaxation or to create chaos in combat, the world is calling for a Beekeeper, and the bees will thank you. Fire at will, honeymaster!")
+	addOutfit("Full Blade Dancer Outfit", {male = 1745, female = 1746}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nEmbrace the Blade Dancer outfit, where grace meets might, each step a dance, each move a fight. Adorned with blades, it is not just attire, but a declaration of elegance as deadly as it is beautiful. You are the artist amidst the fray? Then this should be your choice.")
+	addOutfit("Full Breezy Garb Outfit", {male = 1245, female = 1246}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nEven the most eager adventurers and toughest warriors need some time to rest and recharge. Enjoy tranquility and peace as you picnic in good company at one of your favourite places in Tibia. Put on your Breezy Garb outfit, grab your walking stick, a basket filled with tasty snacks and then head out into nature!")
+	addOutfit("Full Celestial Avenger Outfit", {male = 1725, female = 1726}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nFor those who have been touched by the gods, their devotion and belief infuse their very being, transforming them into beacons of divine light. The Celestial Avenger outfit is a testament to this divine power, adorned with shimmering angelic wings that radiate an ethereal glow. This outfit is not just for show - it is a symbol of unwavering faith and an embodiment of the divine power that resides within its wearer. Execute divine justice, follow your devotion and belief, and become the Celestial Avenger!")
+	addOutfit("Full Ceremonial Garb Outfit", {male = 695, female = 694}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nIf you want to make a great entrance at a Tibian costume party, the Ceremonial Garb is certainly a good choice. With a drum over your shoulder and adorned with feathers you are perfectly dressed to lead a carnival parade through the streets of Thais.")
+	addOutfit("Full Champion Outfit", {male = 633, female = 632}, 570, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nProtect your body with heavy armour plates and spiky bones to teach your enemies the meaning of fear! The Champion outfit perfectly suits battle-hardened warriors who rely on their trusty sword and shield.")
+	addOutfit("Full Chaos Acolyte Outfit", {male = 665, female = 664}, 900, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nYou have always felt like the cat among the pigeons and have a fable for dark magic? The Chaos Acolyte outfit is a perfect way to express your inner nature. Show your commitment for the higher cause and wreak havoc on your enemies in this unique outfit.")
+	addOutfit("Full Conjurer Outfit", {male = 634, female = 635}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nYou recently graduated from the Magic Academy and want to bring your knowledge to good use? Congratulations, you are now an honourable disciple of magic! Open up a bottle of well-aged mana and treat yourself with the fashionable Conjurer outfit.")
+	addOutfit("Full Death Herald Outfit", {male = 667, female = 666}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDeath and decay are your ever-present companions? Your enemies are dropping like flies and your path is covered with their bodies? However, as decency demands, you want to at least give them a proper funeral? Then the Death Herald is just the right outfit for you.")
+	addOutfit("Full Doom Knight Outfit", {male = 1713, female = 1714}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Doom Knight, a silent and shrouded entity, embarked on a relentless odyssey, journeying through every valley on the other side and venturing into uncharted realms beyond. The passage of time has rendered this deadly figure unshakeable, an embodiment of unwavering determination in the face of all challenges.")
+	addOutfit("Full Dragon Knight Outfit", {male = 1444, female = 1445}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nA Dragon Knight is ready for everything, channeling the primordial might of the winged, ancient beasts into weapons and armour. Their imposing demeanour and impressive appearance are often enough to quell any animosity towards them, and those who still dare oppose them are not long for this world.")
+	addOutfit("Full Entrepreneur Outfit", {male = 472, female = 471}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nSlaughter through hordes of monsters during your early morning hunt and kiss the hand of Queen Eloise later on at the evening reception in her historical residence. With the Entrepreneur outfit you will cut a fine figure on every occasion.")
+	addOutfit("Full Evoker Outfit", {male = 725, female = 724}, 840, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDance around flickering fires in the Evoker outfit while singing unholy chants to praise witchcraft and wizardry. Your faithful bat will always be by your side.")
+	addOutfit("Full Fencer Outfit", {male = 1575, female = 1576}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThey are skilled, they are disciplined, they wield their weapon with deadly precision as a form of art. Fencers are true masters of the blade who can cut through anything and anyone in the blink of an eye. While being feared for their lethal attacks, they are also admired for their elegant and fierce style, their dashing looks. Do not be on the fence, be a fencer, or at least dress like one with this fashionable, cutting-edge outfit.")
+	addOutfit("Full Flamefury Mage Outfit", {male = 1680, female = 1681}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nFlame fury mages not only embraced the fury to fire, they became it! Relishing in purging destruction they don't just want to see the world burn, but be an active part in it. They just love the smell of sulphur in the morning!")
+	addOutfit("Full Forest Warden Outfit", {male = 1415, female = 1416}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Forest Warden watches over all living things in the woods, be they plants or beasts. They have a special connection to the earth they tread on, the air they breathe, and the wind which whispers around them. Naturally, the suit that they don is not made out of dead vegetation, but is a living being itself.")
+	addOutfit("Full Frost Tracer Outfit", {male = 1612, female = 1613}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nTheir imposing appearance alone made many experienced warriors shudder. Frost Tracers are true giants that are used to survive even under the most inhospitable circumstances. Tough, strong and untamable, they follow their own path through roughness and obscurity. Nobody wants to mess with one of their kind.")
+	addOutfit("Full Ghost Blade Outfit", {male = 1489, female = 1490}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nBeing a Ghost Blade means having mastered the way of the warrior. No matter the circumstances, these fighters retain full control over their body and mind, with the sole focus of vanquishing their foe. So great is their ability that they not only control the weapons in their hands perfectly, but two floating blades following them as well.")
+	addOutfit("Full Grove Keeper Outfit", {male = 908, female = 909}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nFeeling the springy grass under your feet and inhaling the spicy air of the forest is pure satisfaction for your soul? Every animal is your friend and you caringly look after trees and plants all the time? Then it is time to become one with nature: Become a Grove Keeper!")
+	addOutfit("Full Guidon Bearer Outfit", {male = 1186, female = 1187}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nCarrying the guidon of a unit, always marching in front, is not only an honour but also comes with great responsibility. Guidon bearers wield great power, they lead where others follow and keep the spirits of the troops up as they wave their flag against the golden suns of Tibia.")
+	addOutfit("Full Herbalist Outfit", {male = 1021, female = 1020}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Herbalist outfit is the perfect outfit for all herbs collectors. Those of you who are aware that you do not necessarily have to reach into the mouth of a hydra to get a hydra tongue and those who know exactly where to get blood- and shadow-herbs will find a matching outfit for their daily hobby. Show the world your affinity for herbs and impress your friends with your knowledge of medicine and potions.")
+	addOutfit("Full Herder Outfit", {male = 1279, female = 1280}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Herder is one with nature, being outside all day, watching carefully over his flock. If you like to spend time on picturesque meadows and are always looking for greener pastures, then this outfit is for you.")
+	addOutfit("Full Jouster Outfit", {male = 1331, female = 1332}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Jouster is all geared up for a tournament, ready to partake in festive activities involving friendly competition to prove their chivalry. However, being well-armoured, they are also a force to be reckoned with on the battlefield, especially with a trusty steed at their service.")
+	addOutfit("Full Lion of War Outfit", {male = 1206, female = 1207}, 1750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Lion of War has fought on countless battlefields and never lost once. Enemies tremble with fear when he batters his sword against his almighty shield. Realising that a Lion of War knows no mercy, his opponents often surrender before the battle even begins.")
+	addOutfit("Full Lupine Warden Outfit", {male = 899, female = 900}, 840, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDo you feel the adrenaline rushing through your veins when the sun goes down and a full moon lightens the night? Do you have the urge to hunt down your target no matter what? Unleash the beast inside of you and lead your friends to battle with the Lupine Warden outfit!")
+	addOutfit("Full Martial Artist Outfit", {male = 1837, female = 1838}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nForged in the crucible of hardship, the Martial Artist stands as a paragon of discipline and unyielding willpower. Wear the attire of those who have mastered both body and mind, channelling the spirit of a monk into your every move.")
+	addOutfit("Full Mercenary Outfit", {male = 1056, female = 1057}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Mercenary carries a powerful, razor-sharp axe on his shoulders that effortlessly cuts through any armour and bone. You should better tell your friends to keep a safe distance, since heads will roll over the blood-soaked battleground after a powerful swing of yours.\nConsidering the sheer size of this axe, it might even be possible to chop onions without shedding a tear.")
+	addOutfit("Full Merry Garb Outfit", {male = 1382, female = 1383}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nAre you ready for the festive season? Or feeling festive regardless of the time of year? Then the Merry Garb is perfect for you. Donning the outfit not only puts you in a mirthful mood, but spreads blitheness on your travels throughout the lands.")
+	addOutfit("Full Moth Cape Outfit", {male = 1338, female = 1339}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nIf you are fascinated by this particular group of insects and want to show your deep appreciation of these critters, the Moth Cape is for you. The wing-shaped coat and the antennae provide you with the feeling of being a moth without experiencing the downside of inevitably being drawn to light.")
+	addOutfit("Full Nordic Chieftain Outfit", {male = 1500, female = 1501}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nWhere others not dare to tread due to the biting cold and freezing winds, the Nordic Chieftain feels right at home. Braving the harsh conditions is possible due to a protective layer of warm clothing, as well as suitable armament to fend off any hostile wildlife. The helmet's massive horns are a tad heavy and unwieldy, but show the chieftain's status.")
+	addOutfit("Full Owl Keeper Outfit", {male = 1173, female = 1174}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nOwl Keepers are often referred to as spirits walking through the forest at night, mere shadows during the day. They are also said to be shamans, protecting the flora and fauna of the Tibian lands. You often see them wearing a stag's antlers on their head and in the company of an owl, for they are as wise and mysterious as these intriguing creatures.")
+	addOutfit("Full Pharaoh Outfit", {male = 955, female = 956}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nYou know how to read hieroglyphs? You admire the exceptional architectural abilities and the unsolved mysteries of an ancient high culture? Next time you pay a visit to your friends, tell them to prepare a bathtub full of milk and honey for you because a Pharaoh is now walking through the streets of Ankrahmun!")
+	addOutfit("Full Philosopher Outfit", {male = 873, female = 874}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDo you feel the urge to tell people what is really going on in the world? Do you know all answers to the important questions of life? Are you a true philosopher? Then dress like one to showcase the latest fashion for all wise theorists.")
+	addOutfit("Full Pumpkin Mummy Outfit", {male = 1127, female = 1128}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nIf you cannot decide whether to wrap yourself up as a mummy or flaunt an enormous pumpkin head for your next hunting party, why not combine both? The Pumpkin Mummy outfit is the perfect costume for scary nights and spooky days.")
+	addOutfit("Full Puppeteer Outfit", {male = 697, female = 696}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nAre you a fan of puppetry? You like to travel the world together with one or two little acting fellows? Or are you simply the one who likes to pull the strings? Then the Puppeteer outfit is the right choice for you.")
+	addOutfit("Full Ranger Outfit", {male = 684, female = 683}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nMost of the day, the Ranger is looking over his forest. He is taking care of all animals and plants and tries to keep everything in balance. Intruders are greeted by a warning shot from his deadly longbow. It is the perfect outfit for Paladins who live in close touch with nature.")
+	addOutfit("Full Royal Pumpkin Outfit", {male = 760, female = 759}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe mutated pumpkin is too weak for your mighty weapons? Time to show that evil vegetable how to scare the living daylight out of people! Put on a scary looking pumpkin on your head and spread terror and fear amongst the Tibian population.")
+	addOutfit("Full Rune Master Outfit", {male = 1384, female = 1385}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nA Rune Master has dedicated their whole life to the study and mastery of runes. They are intrigued by the ancient symbols, shrouded in mystery, and how their magic works. Rune Masters have a deep understanding of the awesome power they are wielding and can make use of the full potential of runes.")
+	addOutfit("Full Sea Dog Outfit", {male = 750, female = 749}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nAhoy mateys! Flaunt the swashbuckling Sea Dog outfit and strike a pose with your hook to impress both landlubbers and fellow pirates. Board your next ship in style!")
+	addOutfit("Full Seaweaver Outfit", {male = 733, female = 732}, 570, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Seaweaver outfit is the perfect choice if you want to show the world that you are indeed a son or a daughter of the submarine kingdom. You can almost feel the salty taste and the rough wind of the sea when wearing it.")
+	addOutfit("Full Shadowlotus Disciple Outfit", {male = 1581, female = 1582}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe path of the Shadowlotus Disciple is a lonesome and threatening one. Only those who forget their name will learn to sneak within shadows. And only those who will overcome their greatest fear can become a true master of assassination.")
+	addOutfit("Full Siege Master Outfit", {male = 1051, female = 1050}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nNeither thick stone walls nor heavily armoured gates can stop the Siege Master, who brings down hostile fortifications in the blink of an eye. Whenever he tenses his muscular arms to lift the powerful battering ram, his enemies' knees begin to buckle. It is the perfect outfit for those who also stand for brute strength and immense destruction.")
+	addOutfit("Full Sinister Archer Outfit", {male = 1102, female = 1103}, 120, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nFrom an early age, the Sinister Archer has been fascinated by people's dark machinations and perversions. Sinister Archers claim that they advocate the good and that they only use their arrows to pierce the hearts of those who have committed many crimes and misdeeds. However, they are still viewed by the public with much suspicion due to their dubious appearance. To keep their identity secret, they often hide themselves behind a skull-like face guard that can easily withstand even axe and club blows.")
+	addOutfit("Full Spirit Caller Outfit", {male = 699, female = 698}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nYou are in love with the deep soul of Mother Earth and prefer to walk in the shadows of her wooden children? Choose the Spirit Caller outfit to live in harmony with nature.")
+	addOutfit("Full Sun Priest Outfit", {male = 1023, female = 1024}, 750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDo you worship warm temperatures and are opposed to the thought of long and dark winter nights? Do you refuse to spend countless evenings in front of your chimney while ice-cold wind whistles through the cracks and niches of your house? It is time to stop freezing and to become an honourable Sun Priest! With this stylish outfit, you can finally show the world your unconditional dedication and commitment to the sun!")
+	addOutfit("Full Trailblazer Outfit", {male = 1292, female = 1293}, 600, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe Trailblazer is on a mission of enlightenment and carries the flame of wisdom near and far. The everlasting shine brightens the hearts and minds of all creatures its rays touch, bringing light even to the darkest corners of the world as a beacon of insight and knowledge.")
+	addOutfit("Full Trophy Hunter Outfit", {male = 957, female = 958}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nYou spend hours in the woods in search of wild and rare animals? Countless stuffed skulls of deer, wolves and other creatures are decorating your walls? Now you have the chance to present your trophies in public. Become a Trophy Hunter and cover your shoulders with the finest bear skulls!")
+	addOutfit("Full Veteran Paladin Outfit", {male = 1204, female = 1205}, 1750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nA Veteran Paladin has mastered the art of distance fighting. No matter how far away his prey may be, a marksman like the Veteran Paladin will always hit with extraordinary precision. No one can escape his keen hawk-eyed vision and even small stones become deadly weapons in his hands.")
+	addOutfit("Full Void Master Outfit", {male = 1202, female = 1203}, 1750, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nAccording to ancient rumours, the pulsating orb that the Void Master balances skilfully on the tip of his staff consists of powerful cosmic spheres. If you gaze too long into the infinite emptiness inside the orb, its powers will absorb your mind.")
+	addOutfit("Full Winged Druid Outfit", {male = 1831, female = 1832}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nWinged Druids are figures of both grace and menace. Wings that cut through the air like blades and an aura of unshakable determination make them a true force to be reckoned with. Harness the raw fury of nature and unleash its vengeance upon those who threaten it!")
+	addOutfit("Full Winter Warden Outfit", {male = 853, female = 852}, 870, false, 3, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nThe warm and cosy cloak of the Winter Warden outfit will keep you warm in every situation. Best thing, it is not only comfortable but fashionable as well. You will be the envy of any snow queen or king, guaranteed!")
+	addOutfit("Retro Citizen Outfit", {male = 974, female = 975}, 870, false, 0, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDo you still remember your first stroll through the streets of Thais? For old times' sake, walk the paths of Nostalgia as a Retro Citizen!")
+	addOutfit("Retro Hunter Outfit", {male = 972, female = 973}, 870, false, 0, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nWhenever you pick up your bow and spears, you walk down memory lane and think of your early days? Treat yourself with the fashionable Retro Hunter outfit and hunt some good old monsters from your childhood.")
+	addOutfit("Retro Knight Outfit", {male = 970, female = 971}, 870, false, 0, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nWho needs a fancy looking sword with bling-bling and ornaments? Back in the days, we survived without such unnecessary accessories! Time to show those younkers what a Retro Knight is made of.")
+	addOutfit("Retro Mage Outfit", {male = 968, female = 969}, 870, false, 0, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nDress up as a Retro Mage and you will always cut a fine figure on the battleground while eliminating your enemies with your magical powers the old-fashioned way.")
+	addOutfit("Retro Noble(wo)man Outfit", {male = 966, female = 967}, 870, false, 0, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n\nKing Tibianus has invited you to a summer ball and you have nothing to wear for this special event? Do not worry, the Retro Noble(wo)man outfit makes you a real eye catcher on every festive occasion.")
+	addOutfit("Retro Summoner Outfit", {male = 964, female = 965}, 870, false, 0, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nWhile the Retro Mage usually throws runes and mighty spells directly at the enemies, the Retro Summoner outfit might be the better choice for Tibians that prefer to send mighty summons to the battlefield to keep their enemies at distance.")
+	addOutfit("Retro Warrior Outfit", {male = 962, female = 963}, 870, false, 0, "- only usable by purchasing character\n- colours can be changed using the Outfit dialog\n- includes basic outfit and 2 addons which can be selected individually\n\nYou are fearless and strong as a behemoth but have problems finding the right outfit for your adventures? The Retro Warrior outfit is a must-have for all fashion-conscious old-school Tibians out there.")
+	
 	addCategory(nil, "Boosts", 17, CATEGORY_EXTRAS)
 	addItem("Boosts", "XP Boost", "XP_Boost", 30, false, 1, "Purchase a boost that increases the experience points your character gains from hunting by 50%!\n\n* only usable by purchasing character\n* lasts for 1 hour hunting time\n* paused if stamina falls under 14 hours\n* cannot be purchased if an XP boost is already active")
 
@@ -321,6 +408,9 @@ function gameShopInitialize()
 	
 	addCategory("Extras", "Useful Things", 24, CATEGORY_EXTRAS)
 	addItem("Useful Things", "Temple Teleport", "Temple_Teleport", 15, false, 1, "Teleports you instantly to your home temple.\n\n- only usable by purchasing character\n- use it to teleport you to your home temple\n- cannot be used while having a battle sign or a protection zone block")
+	addItem("Useful Things", "Magic Gold Converter", 31181, 15, false, 100, "Changes automatically either a stack of 100 gold pieces into 1 platinum coin, or a stack of 100 platinum coins into 1 crystal coin!\n\n* only usable by purchasing character\n* will be sent to your backpack\n* use it to activate or deactivate the automatic conversion\n* converts all stacks of 100 gold or platinum in the inventory whenever it is activated\n* usable for 100 conversions a piece")
+	addItem("Useful Things", "Gold Converter", 26378, 5, false, 100, "Changes either a stack of 100 gold pieces into 1 platinum coin, or a stack of 100 platinum coins into 1 crystal coin!\n\n* only usable by purchasing character\n* will be sent to your backpack\n* use it on a stack of 100 to change it to the superior currency\n* usable 100 times a piece")
+	addItem("Useful Things", "Premium Scroll", 16101, 250, false, 1, PREMIUM_DESCRIPTION)
 	
 	shopInitialized = true
 end
@@ -342,8 +432,10 @@ function addItem(parent, name, id, price, isSecondPrice, count, description)
 	end
 
 	local serverId = id
-	if type(id) == "number" and GAME_SHOP.categoriesId[parent] == CATEGORY_ITEM then
-		id = ItemType(id):getClientId()
+	if type(id) == "number" then
+		if GAME_SHOP.categoriesId[parent] == CATEGORY_ITEM or GAME_SHOP.categoriesId[parent] == CATEGORY_EXTRAS then
+			id = ItemType(id):getClientId()
+		end
 	end
 
 	table.insert(GAME_SHOP.offers[parent], {
@@ -357,6 +449,24 @@ function addItem(parent, name, id, price, isSecondPrice, count, description)
 		description = description,
 		categoryId = GAME_SHOP.categoriesId[parent]
 	})
+end
+
+function addOutfit(name, ids, price, isSecondPrice, count, description)
+    local parent = "Outfits"
+    if not GAME_SHOP.offers[parent] then
+        GAME_SHOP.offers[parent] = {}
+    end
+	
+    table.insert(GAME_SHOP.offers[parent], {
+        parent = parent,
+        name = name,
+        ids = ids,
+        price = price,
+        isSecondPrice = isSecondPrice,
+        count = count,
+        description = description,
+        categoryId = GAME_SHOP.categoriesId[parent]
+    })
 end
 
 function gameShopPurchase(player, offer)
@@ -468,7 +578,7 @@ end
 function defaultItemCallback(player, offer)
 	local inPz = player:getTile():hasFlag(TILESTATE_PROTECTIONZONE)
 	local inFight = player:isPzLocked() or player:getCondition(CONDITION_INFIGHT, CONDITIONID_DEFAULT)
-	if not inPz or inFight then
+	if not inPz and inFight then
 		return "Cannot be used while having a battle sign or a protection zone block."
 	end
 
@@ -486,9 +596,17 @@ function defaultItemCallback(player, offer)
 	if slots <= 0 then
 		return "You don't have enough space in backpack."
 	end
-
-	if player:addItem(offer.serverId, offer.count, false) then
-		return false
+	
+	if inPz then
+		if table.contains({"Magic Gold Converter", "Gold Converter"}, offer.name) then
+			player:addItem(offer.serverId, offer.count)
+			return false
+		else
+			player:addItem(offer.serverId, offer.count, false)
+			return false
+		end
+	else
+		return "You must be in protection zone."
 	end
 
 	return "Something went wrong, item couldn't be added."
@@ -501,7 +619,6 @@ function defaultBlessingCallback(player, offer)
 				for i = 1, 5 do
 					player:addBlessing(i)
 				end
-
 				return false
 			end
 		end
@@ -516,20 +633,23 @@ function defaultBlessingCallback(player, offer)
 end
 
 function defaultOutfitCallback(player, offer)
-	if player:hasOutfit(offer.id, offer.count) then
+	local id = offer.id
+	if offer.ids then
+		id = player:getSex() == PLAYERSEX_MALE and offer.ids.male or offer.ids.female
+	end
+	if player:hasOutfit(id, offer.count) then
 		return "You already have this outfit."
 	end
-
-	player:addOutfitAddon(offer.id, offer.count)
+	player:addOutfitAddon(id, offer.count)
 	return false
 end
 
 function defaultMountCallback(player, offer)
-	if player:hasMount(offer.id) then
+	if player:hasMount(Game.getMountIdByClientId(offer.id)) then
 		return "You already have this mount."
 	end
 
-	if not player:addMount(offer.id) then
+	if not player:addMount(Game.getMountIdByClientId(offer.id)) then
 		return "Something went wrong, mount cannot be added."
 	end
 
@@ -545,23 +665,29 @@ function defaultExtrasCallback(player, offer)
 		return defaultTeleportCallback(player)
 	elseif offer.name == "XP Boost" then
 		return defaultXPBoostCallback(player)
+	else
+		return defaultItemCallback(player, offer)
 	end
 
 	return "Something went wrong, extra service couldn't be executed."
 end
 
 function defaultChangeSexCallback(player)
-	local inPz = player:getTile():hasFlag(TILESTATE_PROTECTIONZONE)
 	local inFight = player:isPzLocked() or player:getCondition(CONDITION_INFIGHT, CONDITIONID_DEFAULT)
-	if not inPz or inFight then
+	if inFight then
 		return "Cannot be used while having a battle sign or a protection zone block."
 	end
 
     if not player:getGroup() then
         return "You can't do this."
     end
-
-    player:setSex(player:getSex() == PLAYERSEX_FEMALE and PLAYERSEX_MALE or PLAYERSEX_FEMALE)
+	
+	local inPz = player:getTile():hasFlag(TILESTATE_PROTECTIONZONE)
+	if inPz then
+		player:setSex(player:getSex() == PLAYERSEX_FEMALE and PLAYERSEX_MALE or PLAYERSEX_FEMALE)
+	else
+		return "You must be in protection zone."
+	end
 	
     local outfit = player:getOutfit()
     if player:getSex(player) == PLAYERSEX_MALE then
@@ -575,9 +701,8 @@ function defaultChangeSexCallback(player)
 end
 
 function defaultChangeNameCallback(player, offer)
-	local inPz = player:getTile():hasFlag(TILESTATE_PROTECTIONZONE)
 	local inFight = player:isPzLocked() or player:getCondition(CONDITION_INFIGHT, CONDITIONID_DEFAULT)
-	if not inPz or inFight then
+	if inFight then
 		return "Cannot be used while having a battle sign or a protection zone block."
 	end
 
@@ -594,12 +719,19 @@ function defaultChangeNameCallback(player, offer)
 	if getPlayerDatabaseInfo(v) then
 		return "Character name already taken."
 	end
-
+	
+	local inPz = player:getTile():hasFlag(TILESTATE_PROTECTIONZONE)
 	local lastName = player:getName()
-	db.query("UPDATE players SET name = "..db.escapeString(characterName).." WHERE name = "..db.escapeString(lastName)..";")
-	db.query("UPDATE player_deaths SET killed_by = "..db.escapeString(characterName)..", mostdamage_by = "..db.escapeString(characterName).." WHERE killed_by = "..db.escapeString(lastName).." OR mostdamage_by = "..db.escapeString(lastName)..";")
-	db.query("UPDATE player_deaths_backup SET killed_by = "..db.escapeString(characterName)..", mostdamage_by = "..db.escapeString(characterName).." WHERE killed_by = "..db.escapeString(lastName).." OR mostdamage_by = "..db.escapeString(lastName)..";")
-	db.query(string.format("INSERT INTO `change_name_history` (`player_id`, `last_name`, `current_name`, `changed_name_in`) VALUES (%d, %s, %s, %d)", player:getGuid(), db.escapeString(lastName), db.escapeString(characterName), os.time()))
+	
+	if inPz then
+		db.query("UPDATE players SET name = "..db.escapeString(characterName).." WHERE name = "..db.escapeString(lastName)..";")
+		db.query("UPDATE player_deaths SET killed_by = "..db.escapeString(characterName)..", mostdamage_by = "..db.escapeString(characterName).." WHERE killed_by = "..db.escapeString(lastName).." OR mostdamage_by = "..db.escapeString(lastName)..";")
+		db.query("UPDATE player_deaths_backup SET killed_by = "..db.escapeString(characterName)..", mostdamage_by = "..db.escapeString(characterName).." WHERE killed_by = "..db.escapeString(lastName).." OR mostdamage_by = "..db.escapeString(lastName)..";")
+		db.query(string.format("INSERT INTO `change_name_history` (`player_id`, `last_name`, `current_name`, `changed_name_in`) VALUES (%d, %s, %s, %d)", player:getGuid(), db.escapeString(lastName), db.escapeString(characterName), os.time()))
+	else
+		return "You must be in protection zone."
+	end
+	
 	return false
 end
 
@@ -783,7 +915,7 @@ function gameShopFetch(player)
 
     local isRookgaard = player:getVocation():getId() == 0
     local filteredCategories = {}
-    
+
     for _, category in ipairs(GAME_SHOP.categories) do
         if isRookgaard then
             if category.title == "Rookgaard Items" or category.title == "Premium Time" or category.title == "Boosts" then
@@ -809,6 +941,14 @@ function gameShopFetch(player)
                             offerCopy[k] = v
                         end
                     end
+                    if offer.parent == "Outfits" and offer.ids then
+                        if player:getSex() == PLAYERSEX_FEMALE then
+                            offerCopy.id = offer.ids.female
+                        else
+                            offerCopy.id = offer.ids.male
+                        end
+                        offerCopy.ids = nil
+                    end
                     table.insert(offersWithoutDesc, offerCopy)
                 end
                 player:sendExtendedOpcode(ExtendedOPCodes.CODE_GAMESHOP, json.encode({action = "fetchOffers", data = {category = category, offers = offersWithoutDesc}}))
@@ -822,6 +962,14 @@ function gameShopFetch(player)
                         if k ~= "description" then
                             offerCopy[k] = v
                         end
+                    end
+                    if offer.parent == "Outfits" and offer.ids then
+                        if player:getSex() == PLAYERSEX_FEMALE then
+                            offerCopy.id = offer.ids.female
+                        else
+                            offerCopy.id = offer.ids.male
+                        end
+                        offerCopy.ids = nil
                     end
                     table.insert(offersWithoutDesc, offerCopy)
                 end
@@ -927,7 +1075,7 @@ function gameShopTransferCoins(player, transfer)
 	end
 	
 	if SECOND_CURRENCY_ENABLED then
-		if amountSecond > getPoints(player) then
+		if amountSecond > getSecondCurrency(player) then
 			return errorMsg(player, "You don't have enough points!")
 		end
 	end

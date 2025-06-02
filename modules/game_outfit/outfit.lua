@@ -1,8 +1,3 @@
-local opcodeSystem = {
-    enable = false,
-    id = 213
-}
-
 local statesOutft ={
     available = 0,
     store = 1,
@@ -150,23 +145,6 @@ end
 local AppearanceData = {"preset", "outfit", "mount", "familiar", "wings", "aura", "effects", "shader", "healthBar", "title"}
 
 function init()
-    if opcodeSystem.enable then
-        ProtocolGame.registerExtendedOpcode(opcodeSystem.id, function(protocol, opcode, buffer)
-            local status, json_data = pcall(json.decode, buffer)
-
-            if not status then
-                g_logger.error("[Crafting] JSON error: " .. buffer)
-                return false
-            end
-
-            ServerData.auras = json_data.action
-            ServerData.wings = json_data.wings
-            ServerData.shaders = json_data.shader
-            ServerData.healthBars = json_data.HealthBar
-            ServerData.effects = json_data.effect
-            ServerData.title = json_data.title
-        end)
-    end
     connect(g_game, {
         onOpenOutfitWindow = create,
         onGameEnd = destroy
@@ -174,9 +152,6 @@ function init()
 end
 
 function terminate()
-    if opcodeSystem.enable then
-        ProtocolGame.unregisterExtendedOpcode(opcodeSystem.id)
-    end
     disconnect(g_game, {
         onOpenOutfitWindow = create,
         onGameEnd = destroy
@@ -1786,23 +1761,6 @@ function loadDefaultSettings()
     settings.currentPreset = 0
 end
 
-function sendAction(action, data)
-    local protocolGame = g_game.getProtocolGame()
-
-    if data == nil then
-        data = {}
-    end
-
-    if protocolGame then
-        protocolGame.sendExtendedJSONOpcode(protocolGame, opcodeSystem.id, {
-            action = action,
-            data = data
-        })
-    end
-
-    return
-end
-
 function accept()
     if g_game.getFeature(GamePlayerMounts) then
         local player = g_game.getLocalPlayer()
@@ -1822,14 +1780,5 @@ function accept()
         end
     end
     g_game.changeOutfit(tempOutfit)
-    if opcodeSystem.enable then
-        sendAction("changeOutfit", {
-            wingsName = lastSelectWings,
-            auraName = lastSelectAura,
-            shaderName = lastSelectShader,
-            titleName = lastSelectTitle,
-            EffectName = lastSelectEffects
-        })
-    end
     destroy()
 end

@@ -581,6 +581,9 @@ function clear()
         channelsWindow:destroy()
         channelsWindow = nil
     end
+    if g_game.getClientVersion() < 862 then
+        Keybind.delete("Dialogs", "Open Rule Violation")
+    end
 end
 
 function clearChannel(consoleTabBar)
@@ -2077,9 +2080,6 @@ function online()
 end
 
 function offline()
-    if g_game.getClientVersion() < 862 then
-        Keybind.delete("Dialogs", "Open Rule Violation")
-    end
     clear()
 end
 
