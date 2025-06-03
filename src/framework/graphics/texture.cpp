@@ -165,7 +165,7 @@ void Texture::createTexture()
     generateHash();
 }
 
-bool Texture::setupSize(const Size& size)
+bool Texture::setupSize(const Size& size, bool updateMatrix)
 {
     if (m_size == size)
         return true;
@@ -182,6 +182,9 @@ bool Texture::setupSize(const Size& size)
     }
 
     m_size = size;
+
+    if (updateMatrix)
+        setupTranformMatrix();
 
     return true;
 }

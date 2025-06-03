@@ -50,7 +50,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     m_pixels.resize(size.area() * 4);
 
     if (m_texture)
-        m_texture->setupSize(m_mapSize);
+        m_texture->setupSize(m_mapSize, true);
 }
 
 void LightView::addLightSource(const Point& pos, const Light& light, const float brightness)

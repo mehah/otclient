@@ -60,7 +60,7 @@ public:
     bool hasRepeat() const { return getProp(repeat); }
     bool hasMipmaps() const { return getProp(hasMipMaps); }
     virtual bool isAnimatedTexture() const { return false; }
-    bool setupSize(const Size& size);
+    bool setupSize(const Size& size, bool updateMatrix = false);
 
 protected:
     void bind();
