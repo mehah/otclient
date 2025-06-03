@@ -198,11 +198,7 @@ const Matrix3* TextureManager::getMatrixById(uint16_t id) {
 }
 
 uint16_t TextureManager::getMatrixId(const Size& size, bool upsidedown) {
-    size_t hash = 0;
-    stdext::hash_combine(hash, size.height());
-    stdext::hash_combine(hash, size.width());
-    stdext::hash_combine(hash, upsidedown);
-
+    const size_t hash = (static_cast<uint64_t>(size.height()) << 33) | (static_cast<uint64_t>(size.width()) << 1) | (upsidedown ? 1 : 0);
     auto it = m_matrixCache.indexMap.find(hash);
     if (it != m_matrixCache.indexMap.end()) {
         return it->second;
