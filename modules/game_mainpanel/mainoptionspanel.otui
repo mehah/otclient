@@ -10,22 +10,6 @@ PhantomMiniWindow
     margin-top: 8
     phantom: true
 
-    UIWidget
-      id: store
-
-      image-clip: 0 0 108 20
-      anchors.top: parent.top
-      anchors.left: parent.left
-
-      size: 108 20
-      layout:
-        type: verticalBox
-        cell-size: 108 20
-        cell-spacing: 2
-        flow: true
-      $pressed !disabled:
-        image-clip: 0 20 108 20
-
     Button
       size: 44 20
       image-source: /images/options/button_enlarge
@@ -46,7 +30,6 @@ PhantomMiniWindow
 
     UIWidget
       id: store
-
       image-clip: 0 0 108 20
       anchors.top: parent.top
       anchors.left: parent.left
@@ -65,7 +48,7 @@ PhantomMiniWindow
     Button
       id: resizer
       size: 44 20
-      image-source: /images/options/button_shrink
+      image-source: /images/options/button_enlarge
       image-clip: 0 0 44 20
       anchors.top: parent.top
       anchors.right: parent.right

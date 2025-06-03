@@ -454,7 +454,7 @@ void X11Window::internalCreateGLContext()
 
     m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, EGL_NO_CONTEXT, attrList);
     if (m_eglContext == EGL_NO_CONTEXT)
-        g_logger.fatal(stdext::format("Unable to create EGL context: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL context: {}", eglGetError());
 #else
     m_glxContext = glXCreateContext(m_display, m_visual, nullptr, True);
 
@@ -495,7 +495,7 @@ void X11Window::internalConnectGLContext()
 #ifdef OPENGL_ES
     m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_window, NULL);
     if (m_eglSurface == EGL_NO_SURFACE)
-        g_logger.fatal(stdext::format("Unable to create EGL surface: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL surface: {}", eglGetError());
     if (!eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext))
         g_logger.fatal("Unable to connect EGL context into X11 window");
 #else
@@ -1026,7 +1026,7 @@ void X11Window::setIcon(const std::string& file)
         ImagePtr image = Image::load(file);
 
         if (!image) {
-            g_logger.traceError(stdext::format("unable to load icon file %s", file));
+            g_logger.traceError("unable to load icon file {}", file);
             return;
         }
 

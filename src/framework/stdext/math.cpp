@@ -45,7 +45,7 @@ namespace stdext
                 a += buffer[i];
                 b += a;
             }
-            buffer += tlen; // Avança o ponteiro do buffer
+            buffer += tlen;
 
             a %= MOD_ADLER;
             b %= MOD_ADLER;
@@ -98,7 +98,7 @@ namespace stdext
         float v;
         do {
             v = normalRand(random_gen());
-        } while (v < 0.0f || v > 1.0f); // Garante que o valor está entre 0 e 1
+        } while (v < 0.0f || v > 1.0f);
 
         return static_cast<int32_t>(std::round(minNumber + v * (maxNumber - minNumber)));
     }

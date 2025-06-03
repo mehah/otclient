@@ -89,7 +89,7 @@ void Application::init(std::vector<std::string>& args, ApplicationContext* conte
         startupOptions += arg;
     }
     if (startupOptions.length() > 0)
-        g_logger.info(stdext::format("Startup options: %s", startupOptions));
+        g_logger.info("Startup options: {}", startupOptions);
 
     m_startupOptions = startupOptions;
     m_startupArgs = args;

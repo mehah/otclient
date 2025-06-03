@@ -26,7 +26,6 @@
 #include <charconv>
 
 #include "exception.h"
-#include "format.h"
 #include "types.h"
 
 #ifdef _MSC_VER

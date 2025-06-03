@@ -38,7 +38,7 @@ ServerPtr Server::create(int port)
     try {
         return std::make_shared<Server>(port);
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to initialize server: %s", e.what()));
+        g_logger.error("Failed to initialize server: {}", e.what());
         return nullptr;
     }
 }

@@ -121,7 +121,7 @@ T OTMLNode::value()
 {
     T ret;
     if (!stdext::cast(m_value, ret))
-        throw OTMLException(asOTMLNode(), stdext::format("failed to cast node value '%s' to type '%s'", m_value, stdext::demangle_type<T>()));
+        throw OTMLException(asOTMLNode(), fmt::format("failed to cast node value '{}' to type '{}'", m_value, stdext::demangle_type<T>()));
     return ret;
 }
 

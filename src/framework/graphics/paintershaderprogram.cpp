@@ -44,7 +44,7 @@ void PainterShaderProgram::setupUniforms()
 
     setUniformValue(TRANSFORM_MATRIX_UNIFORM, m_transformMatrix);
     setUniformValue(PROJECTION_MATRIX_UNIFORM, m_projectionMatrix);
-    setUniformValue(TEXTURE_MATRIX_UNIFORM, m_textureMatrix);
+    setUniformValue(TEXTURE_MATRIX_UNIFORM, m_textureMatrix ? *m_textureMatrix : DEFAULT_MATRIX3);
     setUniformValue(COLOR_UNIFORM, m_color);
     setUniformValue(OPACITY_UNIFORM, m_opacity);
     setUniformValue(TIME_UNIFORM, m_time);
@@ -89,13 +89,13 @@ void PainterShaderProgram::setProjectionMatrix(const Matrix3& projectionMatrix)
     m_projectionMatrix = projectionMatrix;
 }
 
-void PainterShaderProgram::setTextureMatrix(const Matrix3& textureMatrix)
+void PainterShaderProgram::setTextureMatrix(const Matrix3* textureMatrix)
 {
     if (textureMatrix == m_textureMatrix)
         return;
 
     bind();
-    setUniformValue(TEXTURE_MATRIX_UNIFORM, textureMatrix);
+    setUniformValue(TEXTURE_MATRIX_UNIFORM, textureMatrix ? *textureMatrix : DEFAULT_MATRIX3);
     m_textureMatrix = textureMatrix;
 }
 

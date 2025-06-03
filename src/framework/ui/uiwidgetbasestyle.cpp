@@ -41,7 +41,7 @@ void UIWidget::initBaseStyle()
     m_borderColor.set(Color::black);
 
     // generate an unique id, this is need because anchored layouts find widgets by id
-    m_id = stdext::format("widget%d", ++UID);
+    m_id = fmt::format("widget{}", ++UID);
 }
 
 void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)

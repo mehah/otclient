@@ -251,4 +251,8 @@ using Matrix4 = Matrix4x4;
 using Matrix3 = Matrix3x3;
 using Matrix2 = Matrix2x2;
 
+using Matrix4Ptr = std::shared_ptr<Matrix4x4>;
+using Matrix3Ptr = std::shared_ptr<Matrix3x3>;
+using Matrix2Ptr = std::shared_ptr<Matrix2x2>;
+
 const static Matrix3 DEFAULT_MATRIX3;

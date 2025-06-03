@@ -106,7 +106,7 @@ void UIGraph::clear()
 
 void UIGraph::setLineWidth(const size_t index, const int width) {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setLineWidth (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setLineWidth ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -150,15 +150,16 @@ size_t UIGraph::createGraph()
 void UIGraph::addValue(const size_t index, const int value, const bool ignoreSmallValues)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format(
-            "[UIGraph::addValue (%s)] Graph of index %d out of bounds. Use:\n"
+        g_logger.warning(
+            "[UIGraph::addValue ({})] Graph of index {} out of bounds. Use:\n"
             "    if graph:getGraphsCount() == 0 then\n"
             "        graph:createGraph()\n"
             "        graph:setLineWidth(1, 1)\n"
             "        graph:setLineColor(1, \"#FF0000\")\n"
             "    end\n"
             "    graph:addValue(1,value)",
-            getId(), index));
+            getId(), index
+        );
 
         return;
     }
@@ -181,7 +182,7 @@ void UIGraph::addValue(const size_t index, const int value, const bool ignoreSma
 void UIGraph::setLineColor(const size_t index, const Color& color)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setLineColor (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setLineColor ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -192,7 +193,7 @@ void UIGraph::setLineColor(const size_t index, const Color& color)
 void UIGraph::setInfoText(const size_t index, const std::string& text)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setInfoText (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setInfoText ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -203,7 +204,7 @@ void UIGraph::setInfoText(const size_t index, const std::string& text)
 void UIGraph::setGraphVisible(const size_t index, const bool visible)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setGraphVisible (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setGraphVisible ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -214,7 +215,7 @@ void UIGraph::setGraphVisible(const size_t index, const bool visible)
 void UIGraph::setInfoLineColor(const size_t index, const Color& color)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setInfoLineColor (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setInfoLineColor ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -225,7 +226,7 @@ void UIGraph::setInfoLineColor(const size_t index, const Color& color)
 void UIGraph::setTextBackground(const size_t index, const Color& color)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setTextBackground (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setTextBackground ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -305,7 +306,7 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
         graph.infoLine[0] = Point(snappedX, dest.top());
         graph.infoLine[1] = Point(snappedX, dest.bottom());
 
-        graph.infoValue = stdext::format("%s %d", graph.infoText, value);
+        graph.infoValue = fmt::format("{} {}", graph.infoText, value);
 
         auto [minValueIter, maxValueIter] = std::ranges::minmax_element(graph.values);
         const auto minValue = static_cast<float>(*minValueIter);

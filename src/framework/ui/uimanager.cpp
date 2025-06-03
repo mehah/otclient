@@ -312,7 +312,7 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
             g_lua.collectGarbage();
             for (const auto& widget : backupList) {
                 if (widget.use_count() != 1)
-                    g_logger.warning(stdext::format("widget '%s' destroyed but still have %d reference(s) left", widget->getId(), widget.use_count() - 1));
+                    g_logger.warning("widget '{}' destroyed but still have {} reference(s) left", widget->getId(), widget.use_count() - 1);
             }
         }, 1);
     }, 1000);
@@ -332,7 +332,7 @@ bool UIManager::importStyle(const std::string& fl, const bool checkDeviceStyles)
         for (const auto& styleNode : doc->children())
             importStyleFromOTML(styleNode);
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to import UI styles from '%s': %s", file, e.what()));
+        g_logger.error("Failed to import UI styles from '{}': {}", file, e.what());
         return false;
     }
 
@@ -381,14 +381,14 @@ void UIManager::importStyleFromOTML(const OTMLNodePtr& styleNode)
     if(!g_app.isRunning() && (oldStyle && !oldStyle->valueAt("__unique", false))) {
         auto it = m_styles.find(name);
         if(it != m_styles.end())
-            g_logger.warning(stdext::format("style '%s' is being redefined", name));
+            g_logger.warning("style '{}' is being redefined", name);
     }
     */
 
     if (!oldStyle || !oldStyle->valueAt("__unique", false) || unique) {
         const auto& originalStyle = getStyle(base);
         if (!originalStyle)
-            throw Exception("base style '%s', is not defined", base);
+            throw Exception("base style '{}', is not defined", base);
 
         const auto& style = originalStyle->clone();
         style->merge(styleNode);
@@ -473,7 +473,7 @@ OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::Ope
 
     const auto& doc = OTMLDocument::parse(g_resources.guessFilePath(rawName + "." + osName, "otui"));
     if (doc) {
-        g_logger.info(stdext::format("found os style '%s' for '%s'", osName, rawName));
+        g_logger.info("found os style '{}' for '{}'", osName, rawName);
         importStyleFromOTML(doc);
         return findMainWidgetNode(doc);
     }
@@ -487,7 +487,7 @@ OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::Dev
 
     const auto& doc = OTMLDocument::parse(g_resources.guessFilePath(rawName + "." + deviceName, "otui"));
     if (doc) {
-        g_logger.info(stdext::format("found device style '%s' for '%s'", deviceName, rawName));
+        g_logger.info("found device style '{}' for '{}'", deviceName, rawName);
         importStyleFromOTML(doc);
         return findMainWidgetNode(doc);
     }
@@ -520,24 +520,24 @@ UIWidgetPtr UIManager::loadUI(const std::string& file, const UIWidgetPtr& parent
             if (deviceWidgetNode)
                 widgetNode = deviceWidgetNode;
         } catch (stdext::exception& e) {
-            g_logger.fine(stdext::format("no device ui found for '%s', reason: '%s'", file, e.what()));
+            g_logger.fine("no device ui found for '{}', reason: '{}'", file, e.what());
         }
         try {
             const auto osWidgetNode = loadDeviceUI(file, device.os);
             if (osWidgetNode)
                 widgetNode = osWidgetNode;
         } catch (stdext::exception& e) {
-            g_logger.fine(stdext::format("no os ui found for '%s', reason: '%s'", file, e.what()));
+            g_logger.fine("no os ui found for '{}', reason: '{}'", file, e.what());
         }
 
         if (!widgetNode) {
-            g_logger.debug(stdext::format("failed to load a widget from '%s'", file));
+            g_logger.debug("failed to load a widget from '{}'", file);
             return nullptr;
         }
 
         return createWidgetFromOTML(widgetNode, parent);
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("failed to load UI from '%s': %s", file, e.what()));
+        g_logger.error("failed to load UI from '{}': {}", file, e.what());
         return nullptr;
     }
 }
@@ -566,7 +566,7 @@ UIWidgetPtr UIManager::loadUIFromString(const std::string& data, const UIWidgetP
 
         return widget;
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("failed to load UI from string: %s", e.what()));
+        g_logger.error("failed to load UI from string: {}", e.what());
         return nullptr;
     }
 }
@@ -577,7 +577,7 @@ UIWidgetPtr UIManager::createWidget(const std::string_view styleName, const UIWi
     try {
         return createWidgetFromOTML(node, parent);
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("failed to create widget from style '%s': %s", styleName, e.what()));
+        g_logger.error("failed to create widget from style '{}': {}", styleName, e.what());
         return nullptr;
     }
 }
@@ -586,7 +586,7 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
 {
     const auto& originalStyleNode = getStyle(widgetNode->tag());
     if (!originalStyleNode)
-        throw Exception("'%s' is not a defined style", widgetNode->tag());
+        throw Exception("'{}' is not a defined style", widgetNode->tag());
 
     const auto& styleNode = originalStyleNode->clone();
     styleNode->merge(widgetNode);
@@ -596,7 +596,7 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
     // call widget creation from lua
     const auto& widget = g_lua.callGlobalField<UIWidgetPtr>(widgetType, "create");
     if (!widget)
-        throw Exception("unable to create widget of type '%s'", widgetType);
+        throw Exception("unable to create widget of type '{}'", widgetType);
 
     if (parent)
         parent->addChild(widget);

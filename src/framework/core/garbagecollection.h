@@ -29,6 +29,10 @@ class GarbageCollection
 {
 public:
     static void poll();
+    static void lua();
+    static void texture();
+    static void drawpoll();
+    static void thingType();
 
 private:
     static bool canCheck(Timer& timer, const uint32_t delay) {
@@ -37,8 +41,4 @@ private:
         timer.restart();
         return true;
     }
-
-    static void texture();
-    static void drawpoll();
-    static void thingType();
 };

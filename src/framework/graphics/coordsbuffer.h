@@ -88,21 +88,11 @@ public:
     int getVertexCount() const { return m_vertexArray.vertexCount(); }
     int getTextureCoordCount() const { return m_textureCoordArray.vertexCount(); }
 
-    void cache();
-
     size_t size() const {
         return  std::max<size_t>(m_vertexArray.size(), m_textureCoordArray.size());
     }
 
-    bool isCached() const { return m_vertexArray.isCached() || m_textureCoordArray.isCached(); }
-    void enableCache() { m_canCache = true; }
-
-    HardwareBuffer* getHardwareVertexCache() const { return m_vertexArray.getHardwareCache(); }
-    HardwareBuffer* getHardwareTextureCoordCache() const { return m_textureCoordArray.getHardwareCache(); }
-
 private:
     VertexArray m_vertexArray;
     VertexArray m_textureCoordArray;
-
-    bool m_canCache{ false };
 };

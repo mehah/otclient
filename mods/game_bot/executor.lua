@@ -427,11 +427,6 @@ function executeBot(config, storage, tabs, msgCallback, saveConfigCallback, relo
           callback(iconId, duration)
         end
       end,
-      onSpellCooldown = function(iconId, duration)
-        for i, callback in ipairs(context._callbacks.onSpellCooldown) do
-          callback(iconId, duration)
-        end
-      end,
       onInventoryChange = function(player, slot, item, oldItem)
         for i, callback in ipairs(context._callbacks.onInventoryChange) do
           callback(player, slot, item, oldItem)

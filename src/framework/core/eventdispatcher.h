@@ -76,7 +76,7 @@ private:
 class EventDispatcher
 {
 public:
-    EventDispatcher();
+    EventDispatcher() = default;
 
     void init();
     void shutdown();
@@ -110,6 +110,7 @@ private:
         std::vector<Event> asyncEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
+        std::atomic_bool hasEvents;
     };
 
     inline void mergeEvents();
@@ -125,7 +126,7 @@ private:
     size_t m_pollEventsSize{};
     bool m_disabled{ false };
 
-    mutable std::vector<std::unique_ptr<ThreadTask>> m_threads;
+    std::vector<std::unique_ptr<ThreadTask>> m_threads;
 
     // Main Events
     std::vector<EventPtr> m_eventList;

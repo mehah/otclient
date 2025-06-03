@@ -87,14 +87,14 @@ void FrameBuffer::bind()
         g_painter->resetState();
     }
 
-    m_oldSize = std::move(g_painter->getResolution());
-    m_oldTextureMatrix = std::move(g_painter->getProjectionMatrix());
+    m_oldSize = g_painter->getResolution();
+    m_oldTextureMatrix = g_painter->getProjectionMatrix();
 
     g_painter->setResolution(getSize(), m_textureMatrix);
     g_painter->setAlphaWriting(m_useAlphaWriting);
 
     if (m_colorClear != Color::alpha) {
-        g_painter->setTexture(nullptr);
+        g_painter->resetTexture();
         g_painter->setColor(m_colorClear);
         g_painter->drawCoords(m_screenCoordsBuffer, DrawMode::TRIANGLE_STRIP);
     } else {
@@ -116,7 +116,7 @@ void FrameBuffer::draw()
 {
     if (m_disableBlend) glDisable(GL_BLEND);
     g_painter->setCompositionMode(m_compositeMode);
-    g_painter->setTexture(m_texture.get());
+    g_painter->setTexture(m_texture);
     g_painter->drawCoords(m_coordsBuffer, DrawMode::TRIANGLE_STRIP);
     g_painter->resetCompositionMode();
     if (m_disableBlend) glEnable(GL_BLEND);

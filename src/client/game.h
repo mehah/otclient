@@ -886,7 +886,7 @@ private:
     uint16_t m_mapUpdatedAt{ 0 };
     std::pair<uint16_t, Timer> m_mapUpdateTimer = { true, Timer{} };
 
-    uint8_t m_walkMaxSteps = { 1 };
+    uint8_t m_walkMaxSteps{ 1 };
     uint8_t m_openPvpSituations{ 0 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };

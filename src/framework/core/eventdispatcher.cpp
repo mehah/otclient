@@ -31,13 +31,11 @@ EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 int16_t g_mainThreadId = stdext::getThreadId();
 int16_t g_eventThreadId = -1;
 
-EventDispatcher::EventDispatcher() {
+void EventDispatcher::init() {
     for (size_t i = 0; i < g_asyncDispatcher.get_thread_count(); ++i) {
         m_threads.emplace_back(std::make_unique<ThreadTask>());
     }
-}
-
-void EventDispatcher::init() {};
+};
 
 void EventDispatcher::shutdown()
 {
@@ -73,6 +71,7 @@ void EventDispatcher::startEvent(const ScheduledEventPtr& event)
     }
 
     const auto& thread = getThreadTask();
+    thread->hasEvents.store(true, std::memory_order_release);
     std::scoped_lock l(thread->mutex);
     thread->scheduledEventList.emplace_back(event);
 }
@@ -85,6 +84,7 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
     assert(delay >= 0);
 
     const auto& thread = getThreadTask();
+    thread->hasEvents.store(true, std::memory_order_release);
     std::scoped_lock l(thread->mutex);
     return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 1));
 }
@@ -97,6 +97,7 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
     assert(delay > 0);
 
     const auto& thread = getThreadTask();
+    thread->hasEvents.store(true, std::memory_order_release);
     std::scoped_lock l(thread->mutex);
     return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 0));
 }
@@ -112,6 +113,7 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     }
 
     const auto& thread = getThreadTask();
+    thread->hasEvents.store(true, std::memory_order_release);
     std::scoped_lock l(thread->mutex);
     return thread->events.emplace_back(std::make_shared<Event>(callback));
 }
@@ -121,6 +123,7 @@ void EventDispatcher::asyncEvent(std::function<void()>&& callback) {
         return;
 
     const auto& thread = getThreadTask();
+    thread->hasEvents.store(true, std::memory_order_release);
     std::scoped_lock l(thread->mutex);
     thread->asyncEvents.emplace_back(std::move(callback));
 }
@@ -130,6 +133,7 @@ void EventDispatcher::deferEvent(const std::function<void()>& callback) {
         return;
 
     const auto& thread = getThreadTask();
+    thread->hasEvents.store(true, std::memory_order_release);
     std::scoped_lock l(thread->mutex);
     thread->deferEvents.emplace_back(callback);
 }
@@ -250,6 +254,9 @@ void EventDispatcher::executeScheduledEvents() {
 
 void EventDispatcher::mergeEvents() {
     for (const auto& thread : m_threads) {
+        if (!thread->hasEvents.exchange(false, std::memory_order_acquire))
+            continue;
+
         std::scoped_lock l(thread->mutex);
         if (!thread->events.empty()) {
             if (m_eventList.size() < thread->events.size())

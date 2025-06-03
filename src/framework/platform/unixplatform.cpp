@@ -118,7 +118,7 @@ std::string Platform::getCurrentDir()
 
 bool Platform::copyFile(std::string from, std::string to)
 {
-    return system(stdext::format("/bin/cp '%s' '%s'", from, to).c_str()) == 0;
+    return system(fmt::format("/bin/cp '{}' '{}'", from, to).c_str()) == 0;
 }
 
 bool Platform::fileExists(std::string file)
@@ -149,9 +149,9 @@ bool Platform::openUrl(std::string url, bool now)
 
     const auto& action = [url] {
 #if defined(__APPLE__)
-        return system(stdext::format("open %s", url).c_str()) == 0;
+        return system(fmt::format("open {}", url).c_str()) == 0;
 #else
-        return system(stdext::format("xdg-open %s", url).c_str()) == 0;
+        return system(fmt::format("xdg-open {}", url).c_str()) == 0;
 #endif
     };
 
@@ -166,7 +166,7 @@ bool Platform::openUrl(std::string url, bool now)
 bool Platform::openDir(std::string path, bool now)
 {
     const auto& action = [path] {
-        return system(stdext::format("xdg-open %s", path).c_str()) == 0;
+        return system(fmt::format("xdg-open {}", path).c_str()) == 0;
     };
 	
     if(now)

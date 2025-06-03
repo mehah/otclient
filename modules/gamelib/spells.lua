@@ -2893,9 +2893,9 @@ SpellGroups = {
     [4] = 'Special',
     [5] = 'Crippling',
     [6] = 'Focus',
-    [7] = 'UltimateStrikes',
+    [7] = 'UltimateStrike',
     [8] = 'GreatBeams',
-    [9] = 'BurstsOfNature'
+    [9] = 'BurstOfNature'
 }
 
 Spells = {}

@@ -32,7 +32,7 @@
 
 AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("AttachedEffectManager::getInstance(%d, %d): invalid thing with id or category.", thingId, static_cast<uint8_t>(category)));
+        g_logger.error("AttachedEffectManager::getInstance({}, {}): invalid thing with id or category.", thingId, static_cast<uint8_t>(category));
         return nullptr;
     }
 
@@ -193,5 +193,5 @@ void AttachedEffect::move(const Position& fromPosition, const Position& toPositi
 }
 
 ThingType* AttachedEffect::getThingType() const {
-    return m_thingId > 0 ? g_things.getThingType(m_thingId, m_thingCategory).get() : nullptr;
+    return m_thingId > 0 ? g_things.getRawThingType(m_thingId, m_thingCategory) : nullptr;
 }

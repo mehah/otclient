@@ -44,7 +44,7 @@ bool Config::load(const std::string& file)
 
         return true;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Unable to parse configuration file '%s': ", e.what()));
+        g_logger.error("Unable to parse configuration file '{}': ", e.what());
         return false;
     }
 }
