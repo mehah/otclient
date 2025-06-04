@@ -1,22 +1,47 @@
----
 name: Build - Docker
 
 on:
   workflow_dispatch:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - "Dockerfile"
+      - ".dockerignore"
+      - ".github/workflows/build-docker.yml"
+      - "src/**"
   push:
     branches: [ $default-branch ]
+    paths:
+      - "Dockerfile"
+      - ".dockerignore"
+      - ".github/workflows/build-docker.yml"
+      - "src/**"
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  docker:
+  cancel-runs:
+    if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@main
+        with:
+          access_token: ${{ github.token }}
+
+  docker:
+    name: Docker Build & Push
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: otclient-docker-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -30,15 +55,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Build and push Docker image
+      - name: Build and push Docker image with cache
         uses: docker/build-push-action@v5
         with:
           context: .

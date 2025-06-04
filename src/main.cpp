@@ -105,8 +105,9 @@ extern "C" {
         g_http.init();
 #endif
 
-        if (!g_lua.safeRunScript("init.lua"))
+        if (!g_lua.safeRunScript("init.lua")) {
             g_logger.fatal("Unable to run script init.lua!");
+        }
 
         // the run application main loop
         g_app.run();
