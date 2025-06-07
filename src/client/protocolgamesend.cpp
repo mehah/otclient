@@ -54,9 +54,11 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
         msg->addString(std::to_string(g_game.getClientVersion()));
     }
 
-    if (g_game.getFeature(Otc::GameContentRevision))
+    if (g_game.getClientVersion() >= 1334) {
+        msg->addString("appearancesHash");
+    } else if (g_game.getFeature(Otc::GameContentRevision)) {
         msg->addU16(g_things.getContentRevision());
-
+    }
     if (g_game.getFeature(Otc::GamePreviewState))
         msg->addU8(0);
 
@@ -96,6 +98,8 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
         msg->addU8(challengeRandom);
     }
 
+    if (g_game.getFeature(Otc::GameHeader1400))
+        enabelHeader1400();
     const auto& extended = callLuaField<std::string>("getLoginExtendedData");
     if (!extended.empty())
         msg->addString(extended);

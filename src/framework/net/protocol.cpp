@@ -120,19 +120,29 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
         m_recorder->addOutputPacket(outputMessage);
     }
 
+    // padding
+    if (m_header1400) {
+        outputMessage->writePaddingAmount();
+    }
 
     // encrypt
-    if (m_xteaEncryptionEnabled)
+    if (m_xteaEncryptionEnabled) {
         xteaEncrypt(outputMessage);
+    }
 
     // write checksum
-    if (m_sequencedPackets)
+    if (m_sequencedPackets) {
         outputMessage->writeSequence(m_packetNumber++);
-    else if (m_checksumEnabled)
+    } else if (m_checksumEnabled) {
         outputMessage->writeChecksum();
+    }
 
     // write message size
-    outputMessage->writeMessageSize();
+    if (m_header1400) {
+        outputMessage->writeHeaderSize();
+    } else {
+        outputMessage->writeMessageSize();
+    }
 
     onSend();
 
@@ -163,8 +173,11 @@ void Protocol::recv()
     int headerSize = 2; // 2 bytes for message size
     if (m_checksumEnabled)
         headerSize += 4; // 4 bytes for checksum
-    if (m_xteaEncryptionEnabled)
+    if (m_header1400) {
+        headerSize += 1; // 1 bytes for padding size
+    } else if (m_xteaEncryptionEnabled) {
         headerSize += 2; // 2 bytes for XTEA encrypted message size
+    }
     m_inputMessage->setHeaderSize(headerSize);
 
     // read the first 2 bytes which contain the message size
@@ -179,7 +192,7 @@ void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
-    const uint16_t remainingSize = m_inputMessage->readSize();
+    const uint16_t remainingSize = m_inputMessage->readSize() * 8 + 4;
 
     // read remaining message data
     if (m_connection)
@@ -203,7 +216,14 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
     if (m_sequencedPackets) {
         decompress = (m_inputMessage->getU32() & 1 << 31);
     } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", static_cast<int>(m_inputMessage->getMessageSize())));
+        std::string headerHex;
+        headerHex.reserve(m_inputMessage->getHeaderSize() * 3); // 2 chars + space por byte
+
+        for (size_t i = 0; i < m_inputMessage->getHeaderSize(); ++i) {
+            //fmt::format_to(std::back_inserter(headerHex), "{:02X} ", static_cast<uint8_t>(m_inputMessage->getBuffer()[i]));
+        }
+
+        //g_logger.traceError(fmt::format("got a network message with invalid checksum, header: {}, size: {}", headerHex, static_cast<int>(m_inputMessage->getMessageSize())));
         return;
     }
 
@@ -292,20 +312,31 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage) const
         });
     }
 
-    const uint16_t decryptedSize = inputMessage->getU16() + 2;
-    const int sizeDelta = decryptedSize - encryptedSize;
-    if (sizeDelta > 0 || -sizeDelta > encryptedSize) {
-        g_logger.traceError("invalid decrypted network message");
-        return false;
+    uint16_t decryptedSize;
+    if (m_header1400) {
+        const uint8_t paddingSize = inputMessage->getU8();
+        inputMessage->setPaddingSize(paddingSize);
+        decryptedSize = encryptedSize - paddingSize - 1;
+        inputMessage->setMessageSize(inputMessage->getHeaderSize() + decryptedSize);
+    } else {
+        decryptedSize = inputMessage->getU16() + 2;
+        const int sizeDelta = decryptedSize - encryptedSize;
+        if (sizeDelta > 0 || -sizeDelta > encryptedSize) {
+            g_logger.traceError("invalid decrypted network message");
+            return false;
+        }
+        inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
     }
 
-    inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
     return true;
 }
 
 void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
 {
-    outputMessage->writeMessageSize();
+    if (!m_header1400) {
+        outputMessage->writeMessageSize();
+    }
+
     uint16_t encryptedSize = outputMessage->getMessageSize();
 
     //add bytes until reach 8 multiple
@@ -316,7 +347,7 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
     }
 
     for (uint32_t i = 0, sum = 0, next_sum = sum + delta; i < 32; ++i, sum = next_sum, next_sum += delta) {
-        apply_rounds(outputMessage->getDataBuffer() - 2, encryptedSize, [&](uint32_t& left, uint32_t& right) {
+        apply_rounds(outputMessage->getXteaEncryptionBuffer(), encryptedSize, [&, sum, next_sum, this](uint32_t& left, uint32_t& right) mutable {
             left += ((right << 4 ^ right >> 5) + right) ^ (sum + m_xteaKey[sum & 3]);
             right += ((left << 4 ^ left >> 5) + left) ^ (next_sum + m_xteaKey[(next_sum >> 11) & 3]);
         });
@@ -350,8 +381,11 @@ void Protocol::onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet
         int headerSize = 2; // 2 bytes for message size
         if (m_checksumEnabled)
             headerSize += 4; // 4 bytes for checksum
-        if (m_xteaEncryptionEnabled)
+        if (m_header1400) {
+            headerSize += 1; // 1 bytes for padding size
+        } else if (m_xteaEncryptionEnabled) {
             headerSize += 2; // 2 bytes for XTEA encrypted message size
+        }
         m_inputMessage->setHeaderSize(headerSize);
         m_inputMessage->fillBuffer(packet->data(), 2);
         m_inputMessage->readSize();
@@ -364,14 +398,14 @@ void Protocol::onLocalDisconnected(std::error_code ec)
     if (m_disconnected)
         return;
     auto self(asProtocol());
-    #ifndef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
     post(g_ioService, [&, ec] {
         if (m_disconnected)
             return;
         m_disconnected = true;
         onError(ec);
     });
-    #endif
+#endif
 }
 
 void Protocol::onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packet)
@@ -379,7 +413,7 @@ void Protocol::onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packe
     if (m_disconnected)
         return;
     auto self(asProtocol());
-    #ifndef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
     post(g_ioService, [&, packet] {
         if (m_disconnected)
             return;
@@ -390,7 +424,7 @@ void Protocol::onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packe
         m_inputMessage->setMessageSize(packet->size());
         onRecv(m_inputMessage);
     });
-    #endif
+#endif
 }
 
 void Protocol::playRecord(PacketPlayerPtr player)

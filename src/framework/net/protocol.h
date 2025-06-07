@@ -70,6 +70,7 @@ public:
 
     void enableChecksum() { m_checksumEnabled = true; }
     void enabledSequencedPackets() { m_sequencedPackets = true; }
+    void enabelHeader1400() { m_header1400 = true; }
 
     virtual void send(const OutputMessagePtr& outputMessage);
     virtual void recv();
@@ -103,6 +104,7 @@ private:
     bool m_checksumEnabled{ false };
     bool m_sequencedPackets{ false };
     bool m_xteaEncryptionEnabled{ false };
+    bool m_header1400{ false };
 #ifdef __EMSCRIPTEN__
     WebConnectionPtr m_connection;
 #else

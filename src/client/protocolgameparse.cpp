@@ -1246,7 +1246,9 @@ void ProtocolGame::parseChallenge(const InputMessagePtr& msg)
 {
     const uint32_t timestamp = msg->getU32();
     const uint8_t random = msg->getU8();
-
+    if (g_game.getClientVersion() >= 1405) {
+        msg->skipBytes(1);
+    }
     sendLoginPacket(timestamp, random);
 }
 
