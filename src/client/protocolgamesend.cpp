@@ -41,6 +41,8 @@ void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& b
 
 void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint8_t challengeRandom)
 {
+    if (g_game.getFeature(Otc::GameHeader1400)) //temp
+        enabelHeader1400();
     const auto& msg = std::make_shared<OutputMessage>();
 
     msg->addU8(Proto::ClientPendingGame);
@@ -98,8 +100,7 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
         msg->addU8(challengeRandom);
     }
 
-    if (g_game.getFeature(Otc::GameHeader1400))
-        enabelHeader1400();
+
     const auto& extended = callLuaField<std::string>("getLoginExtendedData");
     if (!extended.empty())
         msg->addString(extended);
