@@ -3084,8 +3084,8 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
             }
 
             // name and description are no longer sent
-            charm.name = stdext::format("Charm %d", charm.id);
-            charm.description = stdext::format("Tier %d charm", tier);
+            charm.name = fmt::format("Charm {}", charm.id);
+            charm.description = fmt::format("Tier {} charm", tier);
 
             charmData.charms.emplace_back(charm);
         }
