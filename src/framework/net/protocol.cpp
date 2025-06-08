@@ -193,7 +193,16 @@ void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
-    const uint16_t remainingSize = m_inputMessage->readSize() * 8 + 4;
+    uint16_t remainingSize = m_inputMessage->readSize();
+    if (g_game.getClientVersion() >= 1405) {
+        remainingSize = remainingSize * 8 + 4;
+    }
+
+    constexpr uint32_t MAX_PACKET = InputMessage::BUFFER_MAXSIZE;
+    if (remainingSize == 0 || remainingSize > MAX_PACKET) {
+        g_logger.error(std::format("invalid packet size = {}", remainingSize));
+        return;
+    }
 
     // read remaining message data
     if (m_connection)
