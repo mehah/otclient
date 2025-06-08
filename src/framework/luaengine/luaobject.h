@@ -170,8 +170,7 @@ int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
     try {
         self = asLuaObject();
     } catch (...) {
-        g_logger.warning(stdext::format(
-            "(%s):luaCallLuaField: Calling lua during object construction is not allowed.", getClassName()));
+        g_logger.warning("({}):luaCallLuaField: Calling lua during object construction is not allowed.", getClassName());
         return 0;
     }
 

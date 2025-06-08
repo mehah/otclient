@@ -415,7 +415,7 @@ void MapView::updateVisibleTiles()
             for (auto i = 0; i < numThreads; ++i) {
                 auto& floorThread = m_floorThreads[i][fi];
                 floor.cachedVisibleTiles.tiles.insert(floor.cachedVisibleTiles.tiles.end(), std::make_move_iterator(floorThread.cachedVisibleTiles.tiles.begin()), std::make_move_iterator(floorThread.cachedVisibleTiles.tiles.end()));
-                floor.cachedVisibleTiles.shades.insert(floor.cachedVisibleTiles.tiles.end(), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.begin()), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.end()));
+                floor.cachedVisibleTiles.shades.insert(floor.cachedVisibleTiles.shades.end(), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.begin()), std::make_move_iterator(floorThread.cachedVisibleTiles.shades.end()));
             }
         }
     } else {

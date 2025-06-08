@@ -45,7 +45,7 @@ void GameConfig::init()
             }
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to read config otml '%s': %s'", fileName, e.what()));
+        g_logger.error("Failed to read config otml '{}': {}'", fileName, e.what());
     }
 }
 

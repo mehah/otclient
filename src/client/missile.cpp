@@ -111,5 +111,5 @@ void Missile::setId(uint32_t id)
 }
 
 ThingType* Missile::getThingType() const {
-    return g_things.getThingType(m_clientId, ThingCategoryMissile).get();
+    return g_things.getRawThingType(m_clientId, ThingCategoryMissile);
 }

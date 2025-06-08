@@ -25,6 +25,7 @@ ConsolePhantomLabel < UILabel
 
 ConsoleTabBar < MoveableTabBar
   height: 28
+  phantom: true
 
 ConsoleTabBarPanel < MoveableTabBarPanel
   id: consoleTab

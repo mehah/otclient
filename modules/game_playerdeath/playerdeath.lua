@@ -17,23 +17,25 @@ local deathTexts = {
 }
 
 deathController = Controller:new()
-deathController:setUI('deathwindow')
 function deathController:onInit()
     deathController:registerEvents(g_game, {
         onDeath = display,
-        onGameEnd = reset
     })
 end
 
 function deathController:onTerminate()
-    reset()
+   deathController.ui = destroyWindows()
 end
 
-function reset()
-    if deathController.ui then
+function deathController:onGameEnd()
+    deathController.ui = destroyWindows()
+end
+
+function destroyWindows()
+    if deathController.ui and not deathController.ui:isDestroyed() then
         deathController.ui:destroy()
-        deathController.ui = nil
     end
+    return nil
 end
 
 function display(deathType, penalty)
@@ -52,12 +54,8 @@ function displayDeadMessage()
 end
 
 function openWindow(deathType, penalty)
-    if deathController.ui then
-        deathController.ui:destroy()
-        return
-    end
-
-    deathController.ui = g_ui.createWidget('DeathWindow', rootWidget)
+    deathController.ui = destroyWindows()
+    deathController.ui = g_ui.displayUI('deathwindow', rootWidget)
 
     local textLabel = deathController.ui:getChildById('labelText')
     if deathType == DeathType.Regular then
@@ -81,13 +79,11 @@ function openWindow(deathType, penalty)
 
     local okFunc = function()
         CharacterList.doLogin()
-        okButton:getParent():destroy()
-        deathController.ui = nil
+        deathController.ui = destroyWindows()
     end
     local cancelFunc = function()
         g_game.safeLogout()
-        cancelButton:getParent():destroy()
-        deathController.ui = nil
+        deathController.ui = destroyWindows()
     end
 
     deathController.ui.onEnter = okFunc
@@ -102,10 +98,7 @@ function scheduleReconnect()
         return
     end
     deathController:scheduleEvent(function()
-        if deathController.ui then
-            deathController.ui:destroy()
-            deathController.ui = nil
-        end
+        deathController.ui = destroyWindows()
         g_game.cancelLogin()
         CharacterList.doLogin()
     end, 2000, 'scheduleAutoReconnect')

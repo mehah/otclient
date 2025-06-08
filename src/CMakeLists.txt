@@ -374,7 +374,6 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
 		framework/graphics/fontmanager.cpp
 		framework/graphics/framebuffer.cpp
 		framework/graphics/graphics.cpp
-		framework/graphics/hardwarebuffer.cpp
 		framework/graphics/image.cpp
 		framework/graphics/painter.cpp
 		framework/graphics/paintershaderprogram.cpp
@@ -609,7 +608,7 @@ elseif(WASM)
 		OpenSSL::SSL
 		OpenSSL::Crypto
 		httplib::httplib
-		fmt::fmt-header-only
+		fmt::fmt
 	)
 
 

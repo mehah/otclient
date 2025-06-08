@@ -50,7 +50,7 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     m_pixels.resize(size.area() * 4);
 
     if (m_texture)
-        m_texture->setupSize(m_mapSize);
+        m_texture->setupSize(m_mapSize, true);
 }
 
 void LightView::addLightSource(const Point& pos, const Light& light, const float brightness)
@@ -109,7 +109,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
         g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->resetTransformMatrix();
         g_painter->resetColor();
-        g_painter->setTexture(m_texture.get());
+        g_painter->setTexture(m_texture->getId(), m_texture->getTransformMatrixId());
         g_painter->drawCoords(m_coords);
     });
 

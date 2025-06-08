@@ -188,10 +188,10 @@ void Item::updatePatterns()
                     color = Otc::FluidPurple;
                     break;
                 case Otc::FluidBeer:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidOil:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidBlood:
                     color = Otc::FluidRed;
@@ -200,7 +200,7 @@ void Item::updatePatterns()
                     color = Otc::FluidGreen;
                     break;
                 case Otc::FluidMud:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidLemonade:
                     color = Otc::FluidYellow;
@@ -218,7 +218,7 @@ void Item::updatePatterns()
                     color = Otc::FluidYellow;
                     break;
                 case Otc::FluidRum:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidFruitJuice:
                     color = Otc::FluidYellow;
@@ -227,7 +227,7 @@ void Item::updatePatterns()
                     color = Otc::FluidWhite;
                     break;
                 case Otc::FluidTea:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidMead:
                     color = Otc::FluidOrange;
@@ -295,7 +295,7 @@ void Item::setId(uint32_t id)
 }
 
 ThingType* Item::getThingType() const {
-    return g_things.getThingType(m_clientId, ThingCategoryItem).get();
+    return g_things.getRawThingType(m_clientId, ThingCategoryItem);
 }
 
 #ifdef FRAMEWORK_EDITOR
@@ -387,11 +387,11 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                     m_attribs.set(attrib, in->getString());
                     break;
                 default:
-                    throw Exception("invalid item attribute %d", attrib);
+                    throw Exception("invalid item attribute {}", attrib);
             }
         }
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to unserialize OTBM item: %s", e.what()));
+        g_logger.error("Failed to unserialize OTBM item: {}", e.what());
     }
 }
 
