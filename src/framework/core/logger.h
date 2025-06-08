@@ -26,8 +26,6 @@
 
 #include <fstream>
 
-#include <fmt/format.h>
-
 struct LogMessage
 {
     LogMessage(const Fw::LogLevel level, const std::string_view message, const std::size_t when) : level(level), message(message), when(when) {}

@@ -38,6 +38,7 @@ function showBestiary()
 end
 
 Cyclopedia.Bestiary = {}
+Cyclopedia.BestiaryCache = Cyclopedia.BestiaryCache or {}
 Cyclopedia.Bestiary.Stage = STAGES.CATEGORY
 
 function Cyclopedia.SetBestiaryProgress(fit, firstBar, secondBar, thirdBar, killCount, firstGoal, secondGoal, thirdGoal)
@@ -134,6 +135,8 @@ function Cyclopedia.CreateCreatureItems(data)
 end
 
 function Cyclopedia.loadBestiarySelectedCreature(data)
+    Cyclopedia.BestiaryCache[data.id] = data
+
     local occurence = {
         [0] = 1,
         2,

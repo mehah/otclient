@@ -12,25 +12,34 @@ end
 Cyclopedia.Charms = {}
 
 local CHARMS = {
-    { ID = 9, IMAGE = "/game_cyclopedia/images/charms/9", TYPE = 1 },
-    { ID = 11, IMAGE = "/game_cyclopedia/images/charms/11", TYPE = 2 },
-    { ID = 10, IMAGE = "/game_cyclopedia/images/charms/10", TYPE = 3 },
-    { ID = 6, IMAGE = "/game_cyclopedia/images/charms/6", TYPE = 2 },
-    { ID = 8, IMAGE = "/game_cyclopedia/images/charms/8", TYPE = 2 },
-    { ID = 7, IMAGE = "/game_cyclopedia/images/charms/7", TYPE = 3 },
-    { ID = 5, IMAGE = "/game_cyclopedia/images/charms/5", TYPE = 4 },
-    { ID = 1, IMAGE = "/game_cyclopedia/images/charms/1", TYPE = 4 },
-    { ID = 3, IMAGE = "/game_cyclopedia/images/charms/3", TYPE = 4 },
-    { ID = 2, IMAGE = "/game_cyclopedia/images/charms/2", TYPE = 4 },
-    { ID = 0, IMAGE = "/game_cyclopedia/images/charms/0", TYPE = 4 },
-    { ID = 4, IMAGE = "/game_cyclopedia/images/charms/4", TYPE = 4 },
-    { ID = 16, IMAGE = "/game_cyclopedia/images/charms/16", TYPE = 5 },
-    { ID = 15, IMAGE = "/game_cyclopedia/images/charms/15", TYPE = 6 },
-    { ID = 17, IMAGE = "/game_cyclopedia/images/charms/17", TYPE = 6 },
-    { ID = 13, IMAGE = "/game_cyclopedia/images/charms/13", TYPE = 6 },
-    { ID = 12, IMAGE = "/game_cyclopedia/images/charms/12", TYPE = 6 },
-    { ID = 14, IMAGE = "/game_cyclopedia/images/charms/14", TYPE = 6 },
-    { ID = 18, IMAGE = "/game_cyclopedia/images/charms/18", TYPE = 6 },
+    { ID = 0, IMAGE = "/game_cyclopedia/images/charms/0", TYPE = 4, NAME = "Wound", DESCRIPTION = "Triggers on a creature with a certain chance and deals 5% of its initial hit points as physical damage once.", POINTS = {240, 360, 1200} },
+    { ID = 1, IMAGE = "/game_cyclopedia/images/charms/1", TYPE = 4, NAME = "Enflame", DESCRIPTION = "Triggers on a creature with a certain chance and deals 5% of its initial hit points as fire damage once.", POINTS = {400, 600, 2000} },
+    { ID = 2, IMAGE = "/game_cyclopedia/images/charms/2", TYPE = 4, NAME = "Poison", DESCRIPTION = "Triggers on a creature with a certain chance and deals 5% of its initial hit points as earth damage once.", POINTS = {240, 360, 1200} },
+    { ID = 3, IMAGE = "/game_cyclopedia/images/charms/3", TYPE = 4, NAME = "Freeze", DESCRIPTION = "Triggers on a creature with a certain chance and deals 5% of its initial hit points as ice damage once.", POINTS = {320, 480, 1600} },
+    { ID = 4, IMAGE = "/game_cyclopedia/images/charms/4", TYPE = 4, NAME = "Zap", DESCRIPTION = "Triggers on a creature with a certain chance and deals 5% of its initial hit points as energy damage once.", POINTS = {320, 480, 1600} },
+    { ID = 5, IMAGE = "/game_cyclopedia/images/charms/5", TYPE = 4, NAME = "Curse", DESCRIPTION = "Triggers on a creature with a certain chance and deals 5% of its initial hit points as death damage once.", POINTS = {360, 540, 1800} },
+    { ID = 6, IMAGE = "/game_cyclopedia/images/charms/6", TYPE = 2, NAME = "Cripple", DESCRIPTION = "Cripples the creature with a certain chance and paralyzes it for 10 seconds.", POINTS = {100, 150, 225} },
+    { ID = 7, IMAGE = "/game_cyclopedia/images/charms/7", TYPE = 3, NAME = "Parry", DESCRIPTION = "Any damage taken is reflected to the aggressor with a certain chance.", POINTS = {400, 600, 2000} },
+    { ID = 8, IMAGE = "/game_cyclopedia/images/charms/8", TYPE = 2, NAME = "Dodge", DESCRIPTION = "Dodges an attack with a certain chance without taking any damage at all.", POINTS = {240, 360, 1200} },
+    { ID = 9, IMAGE = "/game_cyclopedia/images/charms/9", TYPE = 1, NAME = "Adrenaline Burst", DESCRIPTION = "Bursts of adrenaline enhance your reflexes with a certain chance after you get hit and let you move faster for 10 seconds.", POINTS = {100, 150, 225} },
+    { ID = 10, IMAGE = "/game_cyclopedia/images/charms/10", TYPE = 3, NAME = "Numb", DESCRIPTION = "Numbs the creature with a certain chance after its attack and paralyzes the creature for 10 seconds.", POINTS = {100, 150, 225} },
+    { ID = 11, IMAGE = "/game_cyclopedia/images/charms/11", TYPE = 2, NAME = "Cleanse", DESCRIPTION = "Cleanses you from within with a certain chance after you get hit and removes one random active negative status effect and temporarily makes you immune against it.", POINTS = {100, 150, 225} },
+    { ID = 12, IMAGE = "/game_cyclopedia/images/charms/12", TYPE = 6, NAME = "Bless", DESCRIPTION = "Blesses you and reduces skill and xp loss by 10% when killed by the chosen creature.", POINTS = {100, 150, 225} },
+    { ID = 13, IMAGE = "/game_cyclopedia/images/charms/13", TYPE = 6, NAME = "Scavenge", DESCRIPTION = "Enhances your chances to successfully skin/dust a skinnable/dustable creature.", POINTS = {100, 150, 225} },
+    { ID = 14, IMAGE = "/game_cyclopedia/images/charms/14", TYPE = 6, NAME = "Gut", DESCRIPTION = "Gutting the creature yields 20% more creature products.", POINTS = {100, 150, 225} },
+    { ID = 15, IMAGE = "/game_cyclopedia/images/charms/15", TYPE = 6, NAME = "Low Blow", DESCRIPTION = "Adds 8% critical hit chance to attacks with critical hit weapons.", POINTS = {800, 1200, 4000} },
+    { ID = 16, IMAGE = "/game_cyclopedia/images/charms/16", TYPE = 5, NAME = "Divine Wrath", DESCRIPTION = "Triggers on a creature with a certain chance and deals 5% of its initial hit points as holy damage once.", POINTS = {600, 900, 3000} },
+    { ID = 17, IMAGE = "/game_cyclopedia/images/charms/17", TYPE = 6, NAME = "Vampiric Embrace", DESCRIPTION = "Adds 4% Life Leech to attacks if wearing equipment that provides life leech.", POINTS = {100, 150, 225} },
+    { ID = 18, IMAGE = "/game_cyclopedia/images/charms/18", TYPE = 6, NAME = "Void's Call", DESCRIPTION = "Adds 2% Mana Leech to attacks if wearing equipment that provides mana leech.", POINTS = {100, 150, 225} },
+
+    -- New charms (14.12+)
+    { ID = 19, IMAGE = "/game_cyclopedia/images/charms/19", TYPE = 6, NAME = "Savage Blow", DESCRIPTION = "Adds critical extra damage to attacks with critical hit weapons.", POINTS = {800, 1200, 4000}, MIN_VERSION = 1412 },
+    { ID = 20, IMAGE = "/game_cyclopedia/images/charms/20", TYPE = 6, NAME = "Fatal Hold", DESCRIPTION = "Prevents creatures from fleeing due to low health for 30 seconds.", POINTS = {100, 150, 225}, MIN_VERSION = 1412 },
+    { ID = 21, IMAGE = "/game_cyclopedia/images/charms/21", TYPE = 6, NAME = "Void Inversion", DESCRIPTION = "Chance to gain mana instead of losing it when taking Mana Drain damage.", POINTS = {100, 150, 225}, MIN_VERSION = 1412 },
+    { ID = 22, IMAGE = "/game_cyclopedia/images/charms/22", TYPE = 6, NAME = "Carnage", DESCRIPTION = "Killing a monster deals physical damage to others in a small radius.", POINTS = {600, 900, 3000}, MIN_VERSION = 1412 },
+    { ID = 23, IMAGE = "/game_cyclopedia/images/charms/23", TYPE = 6, NAME = "Overpower", DESCRIPTION = "Deals physical damage based on your maximum health.", POINTS = {600, 900, 3000}, MIN_VERSION = 1412 },
+    { ID = 24, IMAGE = "/game_cyclopedia/images/charms/24", TYPE = 6, NAME = "Overflux", DESCRIPTION = "Deals physical damage based on your maximum mana.", POINTS = {600, 900, 3000}, MIN_VERSION = 1412 },
+    { ID = 25, IMAGE = "/game_cyclopedia/images/charms/25", TYPE = 6, NAME = "Charm of the Void", DESCRIPTION = "Special charm with unique behavior.", POINTS = {0, 0, 0}, MIN_VERSION = 1412 },
 }
 
 function Cyclopedia.UpdateCharmsBalance(Value)
@@ -102,6 +111,11 @@ function Cyclopedia.CreateCharmItem(data)
 end
 
 function Cyclopedia.loadCharms(charmsData)
+    if not charmsData.charms then
+        g_logger.warning("Cyclopedia.loadCharms - charmsData.charms is nil, skipping loading")
+        return
+    end
+
     controllerCyclopedia.ui.CharmsBase.Value:setText(Cyclopedia.formatGold(charmsData.points))
 
     if UI == nil or UI.CharmList == nil then -- I know, don't change it
@@ -112,7 +126,21 @@ function Cyclopedia.loadCharms(charmsData)
 
     local raceIdNamePairs = {}
 
-    for _, raceId in ipairs(charmsData.finishedMonsters) do
+    local version = g_game.getClientVersion()
+
+    local monsterIds = {}
+
+    if version >= 1412 then
+        for id, data in pairs(Cyclopedia.BestiaryCache) do
+            if data.currentLevel and data.currentLevel >= 1 then
+                table.insert(monsterIds, id)
+            end
+        end
+    else
+        monsterIds = charmsData.finishedMonsters or {}
+    end
+
+    for _, raceId in ipairs(monsterIds) do
         local raceName = g_things.getRaceData(raceId).name
         if #raceName == 0 then
             raceName = string.format("unnamed_%d", raceId)
@@ -140,12 +168,31 @@ function Cyclopedia.loadCharms(charmsData)
 
     local formatedData = {}
 
+    local maxCharmId = 0
+    for _, charm in ipairs(CHARMS) do
+        if (not charm.MIN_VERSION) or (version >= charm.MIN_VERSION) then
+            if charm.ID > maxCharmId then
+                maxCharmId = charm.ID
+            end
+        end
+    end
+
     for _, charmData in pairs(charmsData.charms) do
-        local internalId = (charmData.id)
-        if internalId then
-            charmData.internalId = internalId
-            charmData.typePriority = CHARMS[internalId + 1].TYPE
-            table.insert(formatedData, charmData)
+        local internalId = charmData.id
+        if internalId and internalId <= maxCharmId then
+            local charmTemplate = CHARMS[internalId + 1]
+            if charmTemplate and (not charmTemplate.MIN_VERSION) or (version >= charmTemplate.MIN_VERSION) then
+                charmData.internalId = internalId
+                charmData.typePriority = charmTemplate.TYPE
+                charmData.name = charmTemplate.NAME
+                charmData.description = charmTemplate.DESCRIPTION
+                charmData.unlockPrice = charmTemplate.POINTS[#charmTemplate.POINTS]
+                table.insert(formatedData, charmData)
+            else
+                g_logger.error(string.format("Cyclopedia.loadCharms - unknown charm id %d", internalId))
+            end
+        else
+            g_logger.warning(string.format("Cyclopedia.loadCharms - skipping charm id %d for client version %d", internalId, version))
         end
     end
 
