@@ -164,7 +164,6 @@ endif()
 
 # Client options
 add_definitions(-DCLIENT)
-add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
 
