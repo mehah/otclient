@@ -74,7 +74,6 @@ void Texture::create()
     if (m_image) {
         createTexture();
         uploadPixels(m_image, getProp(buildMipmaps), getProp(compress));
-        setupTranformMatrix();
         m_image = nullptr;
     }
 }
@@ -165,7 +164,7 @@ void Texture::createTexture()
     generateHash();
 }
 
-bool Texture::setupSize(const Size& size, bool updateMatrix)
+bool Texture::setupSize(const Size& size)
 {
     if (m_size == size)
         return true;
@@ -183,8 +182,7 @@ bool Texture::setupSize(const Size& size, bool updateMatrix)
 
     m_size = size;
 
-    if (updateMatrix)
-        setupTranformMatrix();
+    setupTranformMatrix();
 
     return true;
 }
