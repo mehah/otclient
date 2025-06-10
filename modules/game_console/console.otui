@@ -290,13 +290,11 @@ Panel
 
   UIButton
     id: readOnlyButton
-    text-auto-resize: true
-    text: No Channel
+    text: ""
     anchors.right: parent.right
     anchors.top: parent.top
     margin-right: 5
     size: 96 18
-    text : ""
     image-clip: 0 0 96 18
     icon: /images/game/console/readOnly
     color: #dfdfdfff
