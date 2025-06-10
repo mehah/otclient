@@ -299,8 +299,8 @@ function init()
 			return true
 		end
 	end
-    consoleTabBar:setDropTarget(readOnlyButton, function(a, b)
-        activateReadOnlyMode(b:getText())
+    consoleTabBar:setDropTarget(readOnlyButton, function(target, draggedWidget)
+        activateReadOnlyMode(draggedWidget:getText())
     end)
     load()
 
