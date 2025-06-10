@@ -164,7 +164,6 @@ endif()
 
 # Client options
 add_definitions(-DCLIENT)
-add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
 
@@ -217,8 +216,8 @@ if(TOGGLE_FRAMEWORK_SOUND)
 		find_package(OpenAL CONFIG REQUIRED)
 	endif()
 	find_package(VorbisFile REQUIRED)
-	find_package(Vorbis REQUIRED)
-	find_package(Ogg REQUIRED)
+	find_package(Vorbis CONFIG REQUIRED)
+	find_package(Ogg CONFIG REQUIRED)
 endif()
 if(ANDROID)
 	set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
@@ -609,6 +608,9 @@ elseif(WASM)
 		OpenSSL::Crypto
 		httplib::httplib
 		fmt::fmt
+		Ogg::ogg
+		Vorbis::vorbisfile
+		Vorbis::vorbis
 	)
 
 
@@ -689,6 +691,9 @@ else() # Linux
 		OpenSSL::Crypto
 		httplib::httplib
 		fmt::fmt-header-only
+		Ogg::ogg
+		Vorbis::vorbisfile
+		Vorbis::vorbis
 	)
 
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")
