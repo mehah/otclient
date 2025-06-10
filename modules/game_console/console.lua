@@ -2371,12 +2371,14 @@ function toggleReadOnlyMode()
         consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
         readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
         readOnlyButton:setText("")
-        readOnlyButton:setIcon("/images/game/console/test")
+        readOnlyButton:setIcon("/images/game/console/readOnly")
+        readOnlyButton:setImageSource("")
     else
         consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
         readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorRight)
         readOnlyButton:removeAnchor(AnchorLeft)
         readOnlyButton:setIcon("")
+        readOnlyButton:setImageSource("/images/ui/console_button")
     end
     readOnlyModeEnabled = not readOnlyModeEnabled
 end

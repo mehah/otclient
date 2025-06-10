@@ -297,9 +297,8 @@ Panel
     margin-right: 5
     size: 96 18
     text : ""
-    image-source: /images/ui/console_button
     image-clip: 0 0 96 18
-    icon: /images/game/console/test
+    icon: /images/game/console/readOnly
     icon-clip: 0 0 96 16
     color: #dfdfdfff
     font: verdana-11px-rounded
