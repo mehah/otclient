@@ -299,7 +299,6 @@ Panel
     text : ""
     image-clip: 0 0 96 18
     icon: /images/game/console/readOnly
-    icon-clip: 0 0 96 16
     color: #dfdfdfff
     font: verdana-11px-rounded
     padding: 5
@@ -308,15 +307,12 @@ Panel
     text-auto-resize: false
     $checked:
       image-clip: 0 0 96 18
-      icon-clip: 0 16 96 16
       color: #dfdfdfff
 
     $on !checked:
       image-clip: 0 0 96 18
-      icon-clip: 0 16 96 16
       color: #dfdfdfff
-    $pressed:
-      icon-clip: 0 16 96 16
+
   UIButton
     id: sayModeButton
     image-source: /images/ui/console_say

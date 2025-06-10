@@ -213,6 +213,16 @@ local function onTabDragMove(tab, mousePos, mouseMoved)
         end
         if tab.tabBar.dropTarget then
             local dt = tab.tabBar.dropTarget
+            local hovered = dt:containsPoint(mousePos)
+            if hovered and not tab.tabBar.dropTargetHighlighted then
+                dt:setBorderColor('#FFFFFF')
+                dt:setBorderWidth(1)
+                tab.tabBar.dropTargetHighlighted = true
+            elseif not hovered and tab.tabBar.dropTargetHighlighted then
+                dt:setBorderColor('alpha')
+                dt:setBorderWidth(0)
+                tab.tabBar.dropTargetHighlighted = false
+            end
             local dtLimit = dt:getX() - tab.tabBar:getX() + dt:getWidth()
             if dtLimit > maxMargin then
                 maxMargin = dtLimit
@@ -252,6 +262,7 @@ function UIMoveableTabBar.create()
     tabbar.nextNavigation = nil
     tabbar.dropTarget = nil
     tabbar.dropCallback = nil
+    tabbar.dropTargetHighlighted = false
     tabbar.onGeometryChange = function()
         hideTabs(tabbar, true, tabbar.postTabs, 0)
         updateTabs(tabbar)
@@ -274,6 +285,7 @@ function UIMoveableTabBar:onDestroy()
     self.prevNavigation = nil
     self.dropTarget = nil
     self.dropCallback = nil
+    self.dropTargetHighlighted = false
 end
 
 function UIMoveableTabBar:setContentWidget(widget)
@@ -571,6 +583,14 @@ function UIMoveableTabBar:setNavigation(prevButton, nextButton)
 end
 
 function UIMoveableTabBar:setDropTarget(widget, callback)
+    if self.dropTarget and self.dropTarget ~= widget then
+        self.dropTarget.onDrop = nil
+        if self.dropTargetHighlighted then
+            self.dropTarget:setBorderColor('alpha')
+            self.dropTarget:setBorderWidth(0)
+            self.dropTargetHighlighted = false
+        end
+    end
     self.dropTarget = widget
     self.dropCallback = callback
     if widget then
@@ -580,6 +600,9 @@ function UIMoveableTabBar:setDropTarget(widget, callback)
                     callback(self, draggedWidget)
                 end
                 signalcall(self.onTabDrop, self, draggedWidget)
+                widget:setBorderColor('alpha')
+                widget:setBorderWidth(0)
+                self.dropTargetHighlighted = false
                 return true
             end
         end
