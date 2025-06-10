@@ -70,6 +70,9 @@ void Painter::drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode)
     if (vertexCount == 0)
         return;
 
+    if (coordsBuffer.getTextureCoordCount() > 0 && m_glTextureId == 0)
+        return;
+
     const bool textured = coordsBuffer.getTextureCoordCount() > 0 && m_glTextureId > 0;
 
     m_drawProgram = m_shaderProgram ? m_shaderProgram : textured ? m_drawTexturedProgram.get() : m_drawSolidColorProgram.get();
