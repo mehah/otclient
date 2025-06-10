@@ -300,9 +300,7 @@ function init()
 		end
 	end
     consoleTabBar:setDropTarget(readOnlyButton, function(a, b)
-        if b ~= defaultTab and b ~= serverTab then
-            activateReadOnlyMode(b:getText())
-        end
+        activateReadOnlyMode(b:getText())
     end)
     load()
 
@@ -1060,7 +1058,6 @@ function addTabText(text, speaktype, tab, creatureName)
         local readOnlyBuffer = readOnlyPanel:getChildById('panel')
         local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
         readOnlyLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
-        
         if speaktype.colored then
             readOnlyLabel:setColoredText(text)
         else
@@ -1274,20 +1271,19 @@ function processChannelTabMenu(tab, mousePos, mouseButton)
         menu:addOption(tr('Close'), function()
             removeTab(channelName)
         end)
-        if readOnlyModeEnabled and activeactiveReadOnlyTabName == channelName then
-            menu:addOption(tr("Close read-only"), function ()
-                clearReadOnlyTab()
-                toggleReadOnlyMode()
-            end)
-        else
-            menu:addOption(tr("Open read-only"), function ()
-                activateReadOnlyMode(channelName)
-            end)
-        end
         -- menu:addOption(tr('Show Server Messages'), function() --[[TODO]] end)
         menu:addSeparator()
     end
-
+    if readOnlyModeEnabled and activeactiveReadOnlyTabName == channelName then
+        menu:addOption(tr("Close read-only"), function()
+            clearReadOnlyTab()
+            toggleReadOnlyMode()
+        end)
+    else
+        menu:addOption(tr("Open read-only"), function()
+            activateReadOnlyMode(channelName)
+        end)
+    end
     if consoleTabBar:getCurrentTab() == tab then
         menu:addOption(tr('Clear Messages'), function()
             clearChannel(consoleTabBar)
@@ -2324,12 +2320,12 @@ function onReadOnlyMouseClick()
             toggleReadOnlyMode()
         end)
     else
-        contextMenu:addOption(tr("Open Read-Only Tab"), function()
-            local targetTab = consoleTabBar:getCurrentTab()
-            if targetTab then
-                activateReadOnlyMode(targetTab:getText())
-            end
-        end)
+        for _, tab in pairs(consoleTabBar.tabs) do
+            local tabName = tab:getText()
+            contextMenu:addOption(tr("Show " .. tabName), function()
+                activateReadOnlyMode(tabName)
+            end)
+        end
     end
     contextMenu:display(mousePos)
 end
@@ -2391,7 +2387,7 @@ function addClonedMenuOptions(sourceTab, targetMenu, excludedOptions)
     local currentWorldName = g_game.getWorldName()
     local currentCharacterName = g_game.getCharacterName()
     local currentChannelName = sourceTab:getText()
-    if not excludedOptions["close"] and sourceTab ~= defaultTab and sourceTab ~= serverTab then
+    if not excludedOptions["close"] then
         targetMenu:addOption(tr('Close'), function()
             removeTab(currentChannelName)
         end)
