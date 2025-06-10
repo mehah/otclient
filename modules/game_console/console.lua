@@ -1289,7 +1289,7 @@ function processChannelTabMenu(tab, mousePos, mouseButton)
             clearChannel(consoleTabBar)
         end)
         menu:addOption(tr('Save Messages'), function()
-            saveChannelMessages(tab, currentWorldName, currentCharacterName, currentChannelName)
+            saveChannelMessages(tab, worldName, characterName, channelName)
         end)
     end
 
