@@ -206,7 +206,19 @@ local function onTabDragMove(tab, mousePos, mouseMoved)
         -- update margins
         updateMargins(tab.tabBar)
         xoff = math.max(xoff, 0)
-        xoff = math.min(xoff, getMaxMargin(tab.tabBar, tab))
+        local maxMargin = getMaxMargin(tab.tabBar, tab)
+        local parentLimit = tab.tabBar:getParent():getWidth() - tab:getWidth()
+        if parentLimit > maxMargin then
+            maxMargin = parentLimit
+        end
+        if tab.tabBar.dropTarget then
+            local dt = tab.tabBar.dropTarget
+            local dtLimit = dt:getX() - tab.tabBar:getX() + dt:getWidth()
+            if dtLimit > maxMargin then
+                maxMargin = dtLimit
+            end
+        end
+        xoff = math.min(xoff, maxMargin)
         tab:setMarginLeft(xoff)
     end
 end
@@ -238,6 +250,8 @@ function UIMoveableTabBar.create()
     tabbar.postTabs = {}
     tabbar.prevNavigation = nil
     tabbar.nextNavigation = nil
+    tabbar.dropTarget = nil
+    tabbar.dropCallback = nil
     tabbar.onGeometryChange = function()
         hideTabs(tabbar, true, tabbar.postTabs, 0)
         updateTabs(tabbar)
@@ -253,9 +267,13 @@ function UIMoveableTabBar:onDestroy()
     if self.nextNavigation then
         self.nextNavigation:disable()
     end
-
+    if self.dropTarget then
+        self.dropTarget.onDrop = nil
+    end
     self.nextNavigation = nil
     self.prevNavigation = nil
+    self.dropTarget = nil
+    self.dropCallback = nil
 end
 
 function UIMoveableTabBar:setContentWidget(widget)
@@ -550,4 +568,20 @@ function UIMoveableTabBar:setNavigation(prevButton, nextButton)
         end
     end
     updateNavigation(self)
+end
+
+function UIMoveableTabBar:setDropTarget(widget, callback)
+    self.dropTarget = widget
+    self.dropCallback = callback
+    if widget then
+        widget.onDrop = function(target, draggedWidget, mousePos)
+            if draggedWidget and draggedWidget.tabBar == self then
+                if callback then
+                    callback(self, draggedWidget)
+                end
+                signalcall(self.onTabDrop, self, draggedWidget)
+                return true
+            end
+        end
+    end
 end
