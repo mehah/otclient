@@ -1,4 +1,3 @@
----
 name: Analysis - SonarCloud
 
 on:
@@ -12,7 +11,6 @@ env:
   VCPKG_BUILD_TYPE: release
   CMAKE_BUILD_PARALLEL_LEVEL: 2
   MAKEFLAGS: '-j 2'
-  NUMBER_OF_PROCESSORS: 2
 
 jobs:
   sonarcloud:
@@ -20,64 +18,71 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-      - uses: actions/checkout@main
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{github.event.pull_request.head.ref}}
-          repository: ${{github.event.pull_request.head.repo.full_name}}
-
-      - uses: actions/checkout@main
-        if: ${{ github.event_name == 'push' }}
-        with:
-          fetch-depth: 0
+          ref: ${{ github.event_name == 'push' && github.ref || github.event.pull_request.head.ref }}
+          repository: ${{ github.event_name == 'push' && github.repository || github.event.pull_request.head.repo.full_name }}
 
       - name: Install Linux Dependencies
-        run: >
-          sudo apt-get update && sudo apt-get install ccache libglew-dev libx11-dev linux-headers-$(uname -r)
-
-      - name: Switch to gcc-11
         run: |
-          sudo apt install gcc-11 g++-11
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 --slave /usr/bin/g++ g++ /usr/bin/g++-11 --slave /usr/bin/gcov gcov /usr/bin/gcov-11
+          sudo apt-get update
+          sudo apt-get install -y ccache libglew-dev libx11-dev linux-headers-$(uname -r)
+
+      - name: Switch to GCC 11
+        run: |
+          sudo apt install -y gcc-11 g++-11
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 100 \
+            --slave /usr/bin/g++ g++ /usr/bin/g++-11 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-11
           sudo update-alternatives --set gcc /usr/bin/gcc-11
 
-      - name: CCache
-        id: ccache
-        uses: actions/cache@main
+      - name: Detect CPU core count
+        id: cpu-count
+        run: echo "count=$(nproc)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache CCache
+        uses: actions/cache@v4
         with:
           path: $HOME/.ccache
-          key: ccache-${{ runner.os }}-${{ hashFiles('**/src') }}
+          key: ccache-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'vcpkg.json', 'src/**/*.cpp', 'src/**/*.h') }}
           restore-keys: |
-            ccache-${{ runner.os}}-
+            ccache-${{ runner.os }}-
 
-      - name: Sonar cache
-        uses: actions/cache@main
+      - name: Cache SonarCloud analysis data
+        uses: actions/cache@v4
         with:
           path: $HOME/.cfamily
-          key: sonar-${{ runner.os}}-${{ hashFiles('**/src') }}
+          key: sonar-cfamily-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'vcpkg.json', 'src/**/*.cpp', 'src/**/*.h') }}
           restore-keys: |
-            sonar-${{ runner.os}}-
+            sonar-cfamily-${{ runner.os }}-
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@main
+        uses: actions/cache@v4
         with:
           path: $HOME/.sonar/cache
-          key: sonar-${{ runner.os}}-${{ hashFiles('**/src') }}
+          key: sonar-packages-${{ runner.os }}
           restore-keys: |
-            sonar-${{ runner.os}}-
+            sonar-packages-${{ runner.os }}-
 
-      - name: Restore artifacts and install vcpkg
+      - name: Extract vcpkg commit ID
         id: vcpkg-step
         run: |
           vcpkgCommitId=$(grep '.builtin-baseline' vcpkg.json | awk -F: '{print $2}' | tr -d '," ')
-          echo "vcpkg commit ID: $vcpkgCommitId"
-          echo "name=vcpkgGitCommitId::$vcpkgCommitId" >> $env:GITHUB_OUTPUT
+          echo "vcpkgGitCommitId=$vcpkgCommitId" >> "$GITHUB_OUTPUT"
 
-      - name: Get vcpkg commit id from vcpkg.json
-        uses: lukka/run-vcpkg@main
+      - name: Cache vcpkg installed packages
+        uses: actions/cache@v4
         with:
-          vcpkgGitURL: "https://github.com/microsoft/vcpkg.git"
+          path: build/vcpkg_installed
+          key: vcpkg-installed-${{ runner.os }}-${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
+          restore-keys: |
+            vcpkg-installed-${{ runner.os }}-
+
+      - name: Setup vcpkg with baseline
+        uses: lukka/run-vcpkg@v11
+        with:
           vcpkgGitCommitId: ${{ steps.vcpkg-step.outputs.vcpkgGitCommitId }}
           vcpkgJsonIgnores: "['**/vcpkg/**', '**/browser/overlay-ports/**']"
 
@@ -87,7 +92,12 @@ jobs:
       - name: Generate compilation database
         run: |
           mkdir -p build
-          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" -DOPTIONS_ENABLE_CCACHE=ON -DSPEED_UP_BUILD_UNITY=OFF -S . -B build
+          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+                -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+                -DOPTIONS_ENABLE_CCACHE=ON \
+                -DSPEED_UP_BUILD_UNITY=OFF \
+                -S . -B build
 
       - name: Run PR sonar-scanner
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
@@ -97,13 +107,13 @@ jobs:
           BRANCH: ${{ github.event.pull_request.head.ref }}
         run: |
           sonar-scanner \
-            --define sonar.cfamily.threads="${{ env.NUMBER_OF_PROCESSORS  }}" \
+            --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }} \
             --define sonar.cfamily.cache.enabled=true \
             --define sonar.cfamily.cache.path="$HOME/.cfamily" \
             --define sonar.cfamily.compile-commands=build/compile_commands.json \
             --define sonar.pullrequest.key=${{ github.event.pull_request.number }} \
             --define sonar.pullrequest.branch=$BRANCH \
-            --define sonar.pullrequest.base=${{ github.event.pull_request.base_ref }}
+            --define sonar.pullrequest.base=${{ github.event.pull_request.base.ref }}
 
       - name: Run sonar-scanner
         if: ${{ github.event_name == 'push' }}
@@ -112,7 +122,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            --define sonar.cfamily.threads="${{ env.NUMBER_OF_PROCESSORS  }}" \
+            --define sonar.cfamily.threads=${{ steps.cpu-count.outputs.count }} \
             --define sonar.cfamily.cache.enabled=true \
             --define sonar.cfamily.cache.path="$HOME/.cfamily" \
             --define sonar.cfamily.compile-commands=build/compile_commands.json
