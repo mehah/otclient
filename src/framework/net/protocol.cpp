@@ -211,7 +211,7 @@ void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
 
     constexpr uint32_t MAX_PACKET = InputMessage::BUFFER_MAXSIZE;
     if (remainingSize == 0 || remainingSize > MAX_PACKET) {
-        g_logger.error(std::format("invalid packet size = {}", remainingSize));
+        g_logger.error(fmt::format("invalid packet size = {}", remainingSize));
         return;
     }
 
