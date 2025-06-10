@@ -331,9 +331,7 @@ void DrawPool::PoolState::execute() const {
     if (action) action();
     if (texture) {
         texture->create();
-        if (!texture->isEmpty()) {
-            g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
-        }
+        g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
     } else
         g_painter->setTexture(textureId, textureMatrixId);
 }
