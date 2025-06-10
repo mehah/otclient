@@ -565,7 +565,7 @@ function clear()
         lastChannelsOpen[char] = nil
     end
     g_settings.setNode('lastChannelsOpen', lastChannelsOpen)
-    if not gameBottomPanel:isVisible() then
+    if extendedViewButtonToggleChat and not gameBottomPanel:isVisible() then
         returnChat()
     end
     -- close channels
