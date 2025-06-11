@@ -39,6 +39,7 @@ ConsoleTabBarPanel < MoveableTabBarPanel
     padding-right: 12
     padding-left: 4
     padding-top: 4
+    padding-bottom: 4
     vertical-scrollbar: consoleScrollBar
     layout:
       type: verticalBox
@@ -98,6 +99,43 @@ Panel
     margin-top: 20
     padding: 1
     focusable: false
+
+  Panel
+    id: readOnlyPanel
+    anchors.top: prev.top
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.horizontalCenter
+    anchors.bottom: consoleTextEdit.top
+    margin-left: 2
+    margin-right: 6
+    margin-bottom: 4
+    padding: 1
+    focusable: false
+    ScrollablePanel
+      id: panel
+      anchors.fill: parent
+      margin-right: 12
+      vertical-scrollbar: consoleScrollBarReadOnlyPanel
+      image-source: /images/ui/3pixel_frame_borderimage
+      image-border: 4
+      padding: 1
+      padding-right: 12
+      padding-left: 4
+      padding-top: 4
+      padding-bottom: 4
+      inverted-scroll: true
+      layout:
+        type: verticalBox
+        align-bottom: true
+    VerticalQtScrollBar
+      id: consoleScrollBarReadOnlyPanel
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      step: 14
+      pixels-scroll: true
+      margin-top: 4
+      margin-bottom: 4
 
   ConsoleTabBar
     id: consoleTabBar
@@ -237,7 +275,7 @@ Panel
     !tooltip: tr('Ignore players')
     image-source: /images/ui/console_buttons
     image-clip: 0 32 16 16
-    anchors.right: parent.right
+    anchors.right: readOnlyButton.left
     anchors.bottom: consoleContentPanel.top
     margin-bottom: 5
     margin-right: 5
@@ -250,7 +288,30 @@ Panel
     $pressed:
       image-clip: 16 32 16 16
 
-  TabButton
+  UIButton
+    id: readOnlyButton
+    text: ""
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-right: 5
+    size: 96 18
+    image-clip: 0 0 96 18
+    icon: /images/game/console/readOnly
+    color: #dfdfdfff
+    font: verdana-11px-rounded
+    padding: 5
+    tab-spacing: 0
+    &ignoreTextResize: true
+    text-auto-resize: false
+    $checked:
+      image-clip: 0 0 96 18
+      color: #dfdfdfff
+
+    $on !checked:
+      image-clip: 0 0 96 18
+      color: #dfdfdfff
+
+  UIButton
     id: sayModeButton
     image-source: /images/ui/console_say
     image-clip: 0 0 18 18
