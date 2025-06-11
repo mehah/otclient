@@ -349,22 +349,31 @@ end
 
 function EnterGame.postEventScheduler()
     local requestType = 'eventschedule'
+    
     local onRecvInfo = function(message, err)
         if err then
             reportRequestWarning(requestType, "Bad Request.Game_entergame postEventScheduler1")
             return
         end
 
-        local bodyStart, _ = message:find('{')
-        local _, bodyEnd = message:find('%}%b{}')
+        -- Extract the first full JSON object from the message
+        local jsonString = message:match("{.*}")
+        if not jsonString then
+            reportRequestWarning(requestType, "Invalid JSON response format")
+            return
+        end
 
-        local jsonString = message:sub(bodyStart, bodyEnd)
+        local success, response = pcall(function() return json.decode(jsonString) end)
+        if not success or not response then
+            reportRequestWarning(requestType, "Failed to parse JSON response")
+            return
+        end
 
-        local response = json.decode(jsonString)
         if response.errorMessage then
             reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
         end
+
         modules.client_bottommenu.setEventsSchedulerTimestamp(response.lastupdatetimestamp)
         modules.client_bottommenu.setEventsSchedulerCalender(response.eventlist)
     end
