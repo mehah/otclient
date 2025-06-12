@@ -230,9 +230,9 @@ public:
     void setTextDrawOrder(const uint8_t order) { m_textDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
     void setBorderDrawOrder(const uint8_t order) { m_borderDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
 
+private:
     void deferLayoutUpdate();
 
-private:
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
 
