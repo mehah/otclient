@@ -73,7 +73,7 @@ function UICreatureButton:setup(creature, onlyOutfit)
 
     local creatureWidget = self:getChildById('creature')
     local labelWidget = self:getChildById('label')
-    local lifeBarWidget = self:getChildById('lifeBar')
+    --local lifeBarWidget = self:getChildById('lifeBar')
 
     labelWidget:setText(creature:getName())
     if onlyOutfit == true then
@@ -96,7 +96,7 @@ function UICreatureButton:update()
     elseif self.isFollowed then
         color = CreatureButtonColors.onFollowed
     end
-    color = self.isHovered and color.hovered or color.notHovered
+    --color = self.isHovered and color.hovered or color.notHovered
 
     if self.isHovered or self.isTarget or self.isFollowed then
         self.creature:showStaticSquare(color)
