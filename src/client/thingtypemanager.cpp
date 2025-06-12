@@ -148,6 +148,7 @@ bool ThingTypeManager::loadOtml(std::string file)
 bool ThingTypeManager::loadAppearances(const std::string& file)
 {
     try {
+        g_spriteAppearances.unload();
         int spritesCount = 0;
         std::string appearancesFile;
 
