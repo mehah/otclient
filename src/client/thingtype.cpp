@@ -476,6 +476,8 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
 
     m_animationPhases = 0;
     int totalSpritesCount = 0;
+    std::vector<Size> sizes;
+    std::vector<int> total_sprites;
 
     for (int i = 0; i < groupCount; ++i) {
         uint8_t frameGroupType = FrameGroupDefault;
@@ -485,6 +487,7 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
         const uint8_t width = fin->getU8();
         const uint8_t height = fin->getU8();
         m_size = { width, height };
+        sizes.emplace_back(m_size);
         if (width > 1 || height > 1) {
             m_realSize = fin->getU8();
         }
@@ -511,6 +514,7 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
         }
 
         const int totalSprites = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * groupAnimationsPhases;
+        total_sprites.push_back(totalSprites);
         if (totalSpritesCount + totalSprites > 4096)
             throw Exception("a thing type has more than 4096 sprites");
 
@@ -520,7 +524,50 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
 
         totalSpritesCount += totalSprites;
     }
-
+    if (sizes.size() > 1) {
+        bool hasDifferentSizes = false;
+        const Size& firstSize = sizes[0];
+        for (size_t i = 1; i < sizes.size(); ++i) {
+            if (sizes[i] != firstSize) {
+                hasDifferentSizes = true;
+                break;
+            }
+        }
+        if (hasDifferentSizes) {
+            g_logger.warning("[{}] g_game.getLocalPlayer():setOutfit({{type={}}})", __FUNCTION__, m_id);
+            for (const auto& s : sizes) {
+                m_size.setWidth(std::max<int>(m_size.width(), s.width()));
+                m_size.setHeight(std::max<int>(m_size.height(), s.height()));
+            }
+            const size_t expectedSize = m_size.area() * m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * m_animationPhases;
+            if (expectedSize != m_spritesIndex.size()) {
+                const std::vector sprites(std::move(m_spritesIndex));
+                m_spritesIndex.clear();
+                m_spritesIndex.reserve(expectedSize);
+                for (size_t i = 0, idx = 0; i < sizes.size(); ++i) {
+                    const int totalSprites = total_sprites[i];
+                    if (m_size == sizes[i]) {
+                        for (int j = 0; j < totalSprites; ++j) {
+                            m_spritesIndex.push_back(sprites[idx++]);
+                        }
+                        continue;
+                    }
+                    const size_t patterns = (totalSprites / sizes[i].area());
+                    for (size_t p = 0; p < patterns; ++p) {
+                        for (int x = 0; x < m_size.width(); ++x) {
+                            for (int y = 0; y < m_size.height(); ++y) {
+                                if (x < sizes[i].width() && y < sizes[i].height()) {
+                                    m_spritesIndex.push_back(sprites[idx++]);
+                                    continue;
+                                }
+                                m_spritesIndex.push_back(0);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
     m_textureData.resize(m_animationPhases);
 }
 
