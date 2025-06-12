@@ -96,7 +96,7 @@ function UICreatureButton:update()
     elseif self.isFollowed then
         color = CreatureButtonColors.onFollowed
     end
-    --color = self.isHovered and color.hovered or color.notHovered
+    color = self.isHovered and color.hovered or color.notHovered
 
     if self.isHovered or self.isTarget or self.isFollowed then
         self.creature:showStaticSquare(color)
