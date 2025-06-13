@@ -109,7 +109,7 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                     }
                     break;
                 case Proto::GameServerChallenge:
-                    parseChallenge(msg);
+                    parseLoginChallenge(msg);
                     break;
                 case Proto::GameServerDeath:
                     parseDeath(msg);
@@ -742,9 +742,15 @@ void ProtocolGame::parseRequestPurchaseData(const InputMessagePtr& msg)
 
 void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
 {
+    using enum Otc::ResourceTypes_t;
     const auto type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
-    const uint64_t value = msg->getU64();
-    m_localPlayer->setResourceBalance(type, value);
+    if (type >= RESOURCE_CHARM && type <= RESOURCE_MAX_MINOR_CHARM) {
+        const uint32_t value = msg->getU32();
+        m_localPlayer->setResourceBalance(type, value);
+    } else {
+        const uint64_t value = msg->getU64();
+        m_localPlayer->setResourceBalance(type, value);
+    }
 }
 
 void ProtocolGame::parseWorldTime(const InputMessagePtr& msg)
@@ -1247,10 +1253,14 @@ void ProtocolGame::parseSessionEnd(const InputMessagePtr& msg)
 void ProtocolGame::parsePing(const InputMessagePtr&) { g_game.processPing(); }
 void ProtocolGame::parsePingBack(const InputMessagePtr&) { g_game.processPingBack(); }
 
-void ProtocolGame::parseChallenge(const InputMessagePtr& msg)
+void ProtocolGame::parseLoginChallenge(const InputMessagePtr& msg)
 {
     const uint32_t timestamp = msg->getU32();
     const uint8_t random = msg->getU8();
+
+    if (g_game.getClientVersion() >= 1405) {
+        msg->skipBytes(1);
+    }
 
     sendLoginPacket(timestamp, random);
 }
@@ -2241,11 +2251,13 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 
 void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 {
-    if (g_game.getClientVersion() >= 1281) {
+    const int version = g_game.getClientVersion();
+
+    if (version >= 1281) {
         // magic level
         const uint16_t magicLevel = msg->getU16();
         const uint16_t baseMagicLevel = msg->getU16();
-        msg->getU16(); // base + loyalty bonus(?)
+        msg->getU16(); // loyalty bonus
         const uint8_t percent = msg->getU16() / 100;
 
         m_localPlayer->setMagicLevel(magicLevel, percent);
@@ -2263,9 +2275,8 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         }
 
         uint16_t levelPercent = 0;
-
-        if (g_game.getClientVersion() >= 1281) {
-            msg->getU16(); // base + loyalty bonus(?)
+        if (version >= 1281) {
+            msg->getU16(); // loyalty
             levelPercent = msg->getU16() / 100;
         } else {
             levelPercent = msg->getU8();
@@ -2275,7 +2286,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setBaseSkill(static_cast<Otc::Skill>(skill), baseLevel);
     }
 
-    if (g_game.getFeature(Otc::GameAdditionalSkills)) {
+    if (g_game.getFeature(Otc::GameAdditionalSkills) && version < 1412) {
         // Critical, Life Leech, Mana Leech
         for (int_fast32_t skill = Otc::CriticalChance; skill <= Otc::ManaLeechAmount; ++skill) {
             if (!g_game.getFeature(Otc::GameLeechAmount)) {
@@ -2295,9 +2306,9 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         msg->getU8();
     }
 
-    if (g_game.getClientVersion() >= 1281) {
-        // forge skill stats
-        const uint8_t lastSkill = g_game.getClientVersion() >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
+    if (version >= 1281 && version < 1412) {
+        // forge skill stats (pre-14.12)
+        const uint8_t lastSkill = version >= 1332 ? Otc::LastSkill : Otc::Momentum + 1;
         for (int_fast32_t skill = Otc::Fatal; skill < lastSkill; ++skill) {
             const uint16_t level = msg->getU16();
             const uint16_t baseLevel = msg->getU16();
@@ -2308,16 +2319,55 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         // bonus cap
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
-
         m_localPlayer->setTotalCapacity(capacity);
+
+    } else if (version >= 1412) {
+        const uint32_t capacity = msg->getU32();
+        msg->getU32(); // base capacity
+        m_localPlayer->setTotalCapacity(capacity);
+
+        msg->getU16(); // flat healing/damage bonus
+
+        msg->getU16(); // attack total
+        msg->getU8(); // element
+        msg->getDouble(); // element ratio
+        msg->getU8(); // element type
+
+        // Imbuement values
+        msg->getDouble(); // Life Leech
+        msg->getDouble(); // Mana Leech
+        msg->getDouble(); // Crit Chance
+        msg->getDouble(); // Crit Extra Damage
+        msg->getDouble(); // Onslaught
+
+        msg->getU16(); // Defense
+        msg->getU16(); // Armor
+        msg->getDouble(); // Mitigation
+        msg->getDouble(); // Dodge
+        msg->getU16(); // Reflection
+
+        const uint8_t absorbCount = msg->getU8();
+        for (uint8_t i = 0; i < absorbCount; ++i) {
+            msg->getU8(); // combat type
+            msg->getDouble(); // value
+        }
+
+        msg->getDouble(); // Momentum
+        msg->getDouble(); // Transcendence
+        msg->getDouble(); // Amplification
     }
 }
 
 void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
 {
-    uint32_t states;
+    uint64_t states;
     if (g_game.getClientVersion() >= 1281) {
-        states = msg->getU32();
+        if (g_game.getClientVersion() >= 1405) {
+            states = msg->getU64();
+            
+        } else {
+            states = msg->getU32();
+        }
         if (g_game.getFeature(Otc::GamePlayerStateCounter)) {
             msg->getU8(); // icons counter
         }
@@ -2931,7 +2981,8 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
     data.bestClass = msg->getString();
     data.currentLevel = msg->getU8();
 
-    if (g_game.getClientVersion() >= 1340) {
+    auto version = g_game.getClientVersion();
+    if (version >= 1340) {
         data.AnimusMasteryBonus = msg->getU16(); // Animus Mastery Bonus
         data.AnimusMasteryPoints = msg->getU16(); // Animus Mastery Points
     } else {
@@ -2984,7 +3035,7 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
         data.location = msg->getString();
     }
 
-    if (data.currentLevel > 3) {
+    if (data.currentLevel > 3 && version < 1412) {
         const bool hasCharm = static_cast<bool>(msg->getU8());
         if (hasCharm) {
             msg->getU8();
@@ -3000,41 +3051,89 @@ void ProtocolGame::parseBestiaryMonsterData(const InputMessagePtr& msg)
 void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
 {
     BestiaryCharmsData charmData;
-    charmData.points = msg->getU32();
+    auto version = g_game.getClientVersion();
+    if (version >= 1405) {
+        charmData.points = msg->getU64();
 
-    const uint8_t charmsAmount = msg->getU8();
-    for (auto i = 0; i < charmsAmount; ++i) {
-        CharmData charm;
-        charm.id = msg->getU8();
-        charm.name = msg->getString();
-        charm.description = msg->getString();
-        msg->getU8();
-        charm.unlockPrice = msg->getU16();
-        charm.unlocked = msg->getU8() == 1;
-        charm.asignedStatus = false;
-        charm.raceId = 0;
-        charm.removeRuneCost = 0;
-
-        if (charm.unlocked) {
-            const bool asigned = static_cast<bool>(msg->getU8());
-            if (asigned) {
-                charm.asignedStatus = asigned;
-                charm.raceId = msg->getU16();
-                charm.removeRuneCost = msg->getU32();
-            }
-        } else {
-            msg->getU8();
-        }
-
-        charmData.charms.emplace_back(charm);
+    } else {
+        charmData.points = msg->getU32();
     }
 
-    msg->getU8();
+    if (version >= 1412) {
+        const uint8_t charmsAmount = msg->getU8();
+        for (uint8_t i = 0; i < charmsAmount; ++i) {
+            CharmData charm;
+            charm.id = msg->getU8();
+            const uint8_t tier = msg->getU8();
 
-    const uint16_t finishedMonstersSize = msg->getU16();
-    for (auto i = 0; i < finishedMonstersSize; ++i) {
-        const uint16_t raceId = msg->getU16();
-        charmData.finishedMonsters.emplace_back(raceId);
+            charm.unlockPrice = 0; // not sent anymore
+            charm.unlocked = tier > 0;
+            charm.asignedStatus = false;
+            charm.raceId = 0;
+            charm.removeRuneCost = 0;
+
+            if (tier > 0) {
+                const bool assigned = msg->getU8() == 1;
+                if (assigned) {
+                    charm.asignedStatus = true;
+                    charm.raceId = msg->getU16();
+                    charm.removeRuneCost = msg->getU32();
+                }
+            } else {
+                msg->getU8(); // still reserved
+            }
+
+            // name and description are no longer sent
+            charm.name = fmt::format("Charm {}", charm.id);
+            charm.description = fmt::format("Tier {} charm", tier);
+
+            charmData.charms.emplace_back(charm);
+        }
+
+        // available charm slots (uint8)
+        msg->getU8();
+
+        // finished monsters list (uint16 count + list of uint32 ids)
+        const uint16_t finishedMonstersSize = msg->getU16();
+        for (uint16_t i = 0; i < finishedMonstersSize; ++i) {
+            const auto raceId = static_cast<uint16_t>(msg->getU32());
+            charmData.finishedMonsters.emplace_back(raceId);
+        }
+    } else {
+        const uint8_t charmsAmount = msg->getU8();
+        for (auto i = 0; i < charmsAmount; ++i) {
+            CharmData charm;
+            charm.id = msg->getU8();
+            charm.name = msg->getString();
+            charm.description = msg->getString();
+            msg->getU8();
+            charm.unlockPrice = msg->getU16();
+            charm.unlocked = msg->getU8() == 1;
+            charm.asignedStatus = false;
+            charm.raceId = 0;
+            charm.removeRuneCost = 0;
+
+            if (charm.unlocked) {
+                const bool asigned = static_cast<bool>(msg->getU8());
+                if (asigned) {
+                    charm.asignedStatus = asigned;
+                    charm.raceId = msg->getU16();
+                    charm.removeRuneCost = msg->getU32();
+                }
+            } else {
+                msg->getU8();
+            }
+
+            charmData.charms.emplace_back(charm);
+        }
+
+        msg->getU8();
+
+        const uint16_t finishedMonstersSize = msg->getU16();
+        for (auto i = 0; i < finishedMonstersSize; ++i) {
+            const uint16_t raceId = msg->getU16();
+            charmData.finishedMonsters.emplace_back(raceId);
+        }
     }
 
     g_game.processUpdateBestiaryCharmsData(charmData);
@@ -4068,7 +4167,10 @@ void ProtocolGame::parseSupplyStash(const InputMessagePtr& msg)
         stashItems.push_back({ itemId, amount });
     }
 
-    msg->getU16(); // free slots
+    auto version = g_game.getProtocolVersion();
+    if (version < 1412) {
+        msg->getU16(); // free slots
+    }
 
     g_lua.callGlobalField("g_game", "onSupplyStashEnter", stashItems);
 }
@@ -4517,9 +4619,11 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (auto i = 0; i < stashItemsCount; ++i) {
                 ItemSummary item;
                 const uint16_t itemId = msg->getU16();
-                const auto& itemCreated = Item::create(itemId);
-                const uint16_t classification = itemCreated->getClassification();
-
+                const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+                if (!thing) {
+                    continue;
+                }
+                const uint16_t classification = thing->getClassification();
                 uint8_t itemTier = 0;
                 if (classification > 0) {
                     itemTier = msg->getU8();
