@@ -123,7 +123,7 @@ UIWidget
       id: showExpiryInInvetory
       anchors.top: frames.bottom
       margin-top: 5
-      !text: tr('Show Expiry In Invetory')
+      !text: tr('Show Expiry In Inventory')
       !tooltip: tr('Check this box to see how much time or how many charges are left \non your equipped items')
 
     OptionCheckBoxMarked
