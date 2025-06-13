@@ -746,8 +746,7 @@ void UIWidget::updateLayout()
     if (isDestroyed())
         return;
 
-    if (m_layout)
-        m_layout->update();
+    deferLayoutUpdate();
 
     // children can affect the parent layout
     if (const auto& parent = getParent()) {
@@ -1016,8 +1015,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
     if (!layout)
         throw Exception("attempt to set a nil layout to a widget");
 
-    if (m_layout)
-        m_layout->disableUpdates();
+    deferLayoutUpdate();
 
     layout->setParent(static_self_cast<UIWidget>());
     layout->disableUpdates();
@@ -1029,9 +1027,7 @@ void UIWidget::setLayout(const UILayoutPtr& layout)
     }
 
     if (m_layout) {
-        m_layout->enableUpdates();
         m_layout->setParent(nullptr);
-        m_layout->update();
     }
 
     layout->enableUpdates();
@@ -1209,8 +1205,7 @@ void UIWidget::setAutoFocusPolicy(const Fw::AutoFocusPolicy policy)
 void UIWidget::setVirtualOffset(const Point& offset)
 {
     m_virtualOffset = offset;
-    if (m_layout)
-        m_layout->update();
+    deferLayoutUpdate();
 }
 
 bool UIWidget::isAnchored()
@@ -2011,18 +2006,18 @@ void UIWidget::setShader(const std::string_view name) {
 
 void UIWidget::repaint() { g_drawPool.repaint(DrawPoolType::FOREGROUND); }
 
-void UIWidget::disableUpdateTemporarily() {
-    if (hasProp(PropDisableUpdateTemporarily) || !m_layout)
+void UIWidget::deferLayoutUpdate() {
+    if (hasProp(PropDeferLayoutUpdate) || !m_layout)
         return;
 
-    setProp(PropDisableUpdateTemporarily, true);
+    setProp(PropDeferLayoutUpdate, true);
     m_layout->disableUpdates();
     g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
         if (self->m_layout) {
             self->m_layout->enableUpdates();
             self->m_layout->update();
         }
-        self->setProp(PropDisableUpdateTemporarily, false);
+        self->setProp(PropDeferLayoutUpdate, false);
     });
 }
 void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)
