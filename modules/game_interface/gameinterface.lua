@@ -1391,10 +1391,7 @@ end
 
 function testExtendedView(mode)
     local extendedView = mode == 2
-    modules.game_console.setExtendedView(extendedView)
     if extendedView then
-        local topMenuHeight = modules.client_topmenu.getTopMenu():getHeight()
-
         local buttons = {leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
                          leftDecreaseSidePanels}
         for _, button in ipairs(buttons) do
@@ -1458,12 +1455,12 @@ function testExtendedView(mode)
             end
         end
     end
-    -- create icons or destroy , depending on the view
-    modules.game_minimap.extendedView(extendedView)
-    modules.game_healthinfo.extendedView(extendedView)
-    modules.game_inventory.extendedView(extendedView)
-    scheduleEvent(function()
+    addEvent(function()
+        modules.game_console.setExtendedView(extendedView)
+        modules.game_minimap.extendedView(extendedView)
+        modules.game_healthinfo.extendedView(extendedView)
+        modules.game_inventory.extendedView(extendedView)
         modules.client_topmenu.extendedView(extendedView)
         modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
-    end, 100)
+    end)
 end

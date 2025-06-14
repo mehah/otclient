@@ -804,6 +804,9 @@ function updateCreatureEmblem(creature, emblemId) -- Update emblem
 end
 
 function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButton once you or monsters move
+    if not battlePanel then
+        return false
+    end
     battlePanel:disableUpdateTemporarily()
 
     local localPlayer = g_game.getLocalPlayer()
