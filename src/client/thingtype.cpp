@@ -534,7 +534,6 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
             }
         }
         if (hasDifferentSizes) {
-            g_logger.warning("[{}] g_game.getLocalPlayer():setOutfit({{type={}}})", __FUNCTION__, m_id);
             for (const auto& s : sizes) {
                 m_size.setWidth(std::max<int>(m_size.width(), s.width()));
                 m_size.setHeight(std::max<int>(m_size.height(), s.height()));
