@@ -50,7 +50,7 @@ function load(version)
         end
         if g_game.getFeature(GameLoadSprInsteadProtobuf) and version >= 1281 then
             local staticPath = resolvepath(string.format('/things/%d/appearances', version))
-            if not g_things.loadAppearancesDat(staticPath) then
+            if not g_things.loadAppearances(staticPath) then
                 errorList[#errorList + 1] = "Couldn't load appearances.dat"
             end
         end
