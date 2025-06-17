@@ -58,7 +58,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
     std::scoped_lock lock(sheet->m_mutex);
 
     try {
-        const auto& path = stdext::format("%s%s", g_spriteAppearances.getPath(), sheet->file);
+        const auto& path = fmt::format("{}{}", g_spriteAppearances.getPath(), sheet->file);
         if (!g_resources.fileExists(path))
             return false;
 
@@ -107,7 +107,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 
         lzma_ret ret = lzma_raw_decoder(&stream, filters);
         if (ret != LZMA_OK) {
-            throw stdext::exception(stdext::format("failed to initialize lzma raw decoder result: %d", ret));
+            throw stdext::exception(fmt::format("failed to initialize lzma raw decoder result: {}", ret));
         }
 
         stream.next_in = &fin->m_data.data()[fin->tell()];
@@ -117,7 +117,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 
         ret = lzma_code(&stream, LZMA_RUN);
         if (ret != LZMA_STREAM_END) {
-            throw stdext::exception(stdext::format("failed to decode lzma buffer result: %d", ret));
+            throw stdext::exception(fmt::format("failed to decode lzma buffer result: {}", ret));
         }
 
         lzma_end(&stream); // free memory
@@ -156,7 +156,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load single sprite sheet '%s': %s", sheet->file, e.what()));
+        g_logger.error("Failed to load single sprite sheet '{}': {}", sheet->file, e.what());
         return false;
     }
 }
@@ -226,7 +226,7 @@ ImagePtr SpriteAppearances::getSpriteImage(const int id)
 
         return image;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
+        g_logger.error("Failed to get sprite id {}: {}", id, e.what());
         return nullptr;
     }
 }

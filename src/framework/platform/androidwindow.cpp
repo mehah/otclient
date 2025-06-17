@@ -130,7 +130,7 @@ void AndroidWindow::internalCreateGLContext() {
 
     m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, EGL_NO_CONTEXT, attrList);
     if(m_eglContext == EGL_NO_CONTEXT )
-        g_logger.fatal(stdext::format("Unable to create EGL context: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL context: {}", eglGetError());
 
     internalConnectSurface();
 }
@@ -170,7 +170,7 @@ void AndroidWindow::internalCreateGLSurface() {
 
     m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_app->window, NULL);
     if(m_eglSurface == EGL_NO_SURFACE)
-        g_logger.fatal(stdext::format("Unable to create EGL surface: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL surface: {}", eglGetError());
 }
 
 void AndroidWindow::queryGlSize() {

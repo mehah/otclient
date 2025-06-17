@@ -79,7 +79,7 @@ bool Shader::compileSourceFile(const std::string_view sourceFile) const
         const auto& sourceCode = g_resources.readFileContents(sourceFile.data());
         return compileSourceCode(sourceCode);
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("unable to load shader source form file '%s': %s", sourceFile, e.what()));
+        g_logger.error("unable to load shader source form file '{}': {}", sourceFile, e.what());
     }
     return false;
 }

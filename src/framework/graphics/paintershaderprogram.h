@@ -59,7 +59,7 @@ public:
 
     void setTransformMatrix(const Matrix3& transformMatrix);
     void setProjectionMatrix(const Matrix3& projectionMatrix);
-    void setTextureMatrix(const Matrix3& textureMatrix);
+    void setTextureMatrix(const Matrix3* textureMatrix);
     void setColor(const Color& color);
     void setOpacity(float opacity);
     void setResolution(const Size& resolution);
@@ -89,7 +89,7 @@ private:
 
     Matrix3 m_transformMatrix;
     Matrix3 m_projectionMatrix;
-    Matrix3 m_textureMatrix;
+    const Matrix3* m_textureMatrix = nullptr;
 
     Size m_resolution;
 

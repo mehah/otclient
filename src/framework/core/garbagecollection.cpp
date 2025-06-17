@@ -38,16 +38,21 @@ Timer lua_timer, texture_timer, drawpool_timer, thingtype_timer;
 
 void GarbageCollection::poll() {
     if (canCheck(thingtype_timer, THINGTYPE_TIME))
-        g_asyncDispatcher.detach_task([] { thingType(); });
+        thingType();
 
     if (canCheck(texture_timer, TEXTURE_TIME))
-        g_asyncDispatcher.detach_task([] { texture(); });
+        texture();
 
     if (canCheck(drawpool_timer, DRAWPOOL_TIME))
         drawpoll();
 
     if (canCheck(lua_timer, LUA_TIME))
-        g_lua.collectGarbage();
+        lua();
+}
+
+void GarbageCollection::lua() {
+    std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
+    g_lua.collectGarbage();
 }
 
 void GarbageCollection::drawpoll() {
@@ -58,7 +63,7 @@ void GarbageCollection::drawpoll() {
 void GarbageCollection::texture() {
     static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
 
-    std::shared_lock l(g_textures.m_mutex);
+    std::scoped_lock l(g_textures.m_mutex, g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
 
     std::erase_if(g_textures.m_textures, [](const auto& item) {
         const auto& [key, tex] = item;
@@ -75,6 +80,7 @@ void GarbageCollection::thingType() {
         IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
         AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.
 
+    static std::vector<ThingTypePtr> thingTypesToUnload;
     static uint8_t category{ ThingLastCategory };
     static size_t index = 0;
 
@@ -84,12 +90,10 @@ void GarbageCollection::thingType() {
     const auto& thingTypes = g_things.m_thingTypes[category];
     const size_t limit = std::min<size_t>(index + AMOUNT_PER_CHECK, thingTypes.size());
 
-    std::vector<ThingTypePtr> thingsUnloaded;
-
     while (index < limit) {
         auto& thing = thingTypes[index];
         if (thing->hasTexture() && thing->getLastTimeUsage().ticksElapsed() > IDLE_TIME) {
-            thingsUnloaded.emplace_back(thing);
+            thingTypesToUnload.emplace_back(thing);
         }
         ++index;
     }
@@ -99,10 +103,11 @@ void GarbageCollection::thingType() {
         ++category;
     }
 
-    if (!thingsUnloaded.empty()) {
-        g_dispatcher.addEvent([thingsUnloaded = std::move(thingsUnloaded)] {
-            for (auto& thingType : thingsUnloaded)
-                thingType->unload();
-        });
+    if (!thingTypesToUnload.empty()) {
+        std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
+        for (auto& thingType : thingTypesToUnload) {
+            thingType->unload();
+        }
+        thingTypesToUnload.clear();
     }
 }

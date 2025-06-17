@@ -23,6 +23,8 @@
 #include "painter.h"
 
 #include "framework/graphics/texture.h"
+#include "framework/graphics/texturemanager.h"
+
 #include <framework/platform/platformwindow.h>
 
 #include "shader/shadersources.h"
@@ -62,17 +64,16 @@ Painter::Painter()
     PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 }
 
-void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
+void Painter::drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode)
 {
     const int vertexCount = coordsBuffer.getVertexCount();
     if (vertexCount == 0)
         return;
 
-    const bool textured = coordsBuffer.getTextureCoordCount() > 0 && m_texture;
-
-    // skip drawing of empty textures
-    if (textured && m_texture->isEmpty())
+    if (coordsBuffer.getTextureCoordCount() > 0 && m_glTextureId == 0)
         return;
+
+    const bool textured = coordsBuffer.getTextureCoordCount() > 0 && m_glTextureId > 0;
 
     m_drawProgram = m_shaderProgram ? m_shaderProgram : textured ? m_drawTexturedProgram.get() : m_drawSolidColorProgram.get();
 
@@ -85,34 +86,16 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
     m_drawProgram->setResolution(m_resolution);
     m_drawProgram->updateTime();
 
-    coordsBuffer.cache(); // Try to cache
-
     // only set texture coords arrays when needed
-    {
-        if (textured) {
-            m_drawProgram->setTextureMatrix(m_textureMatrix);
-            m_drawProgram->bindMultiTextures();
-
-            const auto* hardwareBuffer = coordsBuffer.getHardwareTextureCoordCache();
-            if (hardwareBuffer)
-                hardwareBuffer->bind();
-
-            m_drawProgram->setAttributeArray(PainterShaderProgram::TEXCOORD_ATTR, hardwareBuffer ? nullptr : coordsBuffer.getTextureCoordArray(), 2);
-        } else
-            PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
-    }
+    if (textured) {
+        m_drawProgram->setTextureMatrix(m_textureMatrix);
+        m_drawProgram->bindMultiTextures();
+        m_drawProgram->setAttributeArray(PainterShaderProgram::TEXCOORD_ATTR, coordsBuffer.getTextureCoordArray(), 2);
+    } else
+        PainterShaderProgram::disableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 
     // set vertex array
-    {
-        const auto* hardwareBuffer = coordsBuffer.getHardwareVertexCache();
-        if (hardwareBuffer)
-            hardwareBuffer->bind();
-
-        m_drawProgram->setAttributeArray(PainterShaderProgram::VERTEX_ATTR, hardwareBuffer ? nullptr : coordsBuffer.getVertexArray(), 2);
-    }
-
-    if (coordsBuffer.isCached())
-        HardwareBuffer::unbind(HardwareBuffer::Type::VERTEX_BUFFER);
+    m_drawProgram->setAttributeArray(PainterShaderProgram::VERTEX_ATTR, coordsBuffer.getVertexArray(), 2);
 
     // draw the element in coords buffers
     glDrawArrays(static_cast<GLenum>(drawMode), 0, vertexCount);
@@ -121,7 +104,7 @@ void Painter::drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode)
         PainterShaderProgram::enableAttributeArray(PainterShaderProgram::TEXCOORD_ATTR);
 }
 
-void Painter::drawLine(const std::vector<float>& vertex, const int size, const int width)
+void Painter::drawLine(const std::vector<float>& vertex, const int size, const int width) const
 {
     m_drawLineProgram->bind();
     m_drawLineProgram->setTransformMatrix(m_transformMatrix);
@@ -207,18 +190,22 @@ void Painter::setClipRect(const Rect& clipRect)
     updateGlClipRect();
 }
 
-void Painter::setTexture(Texture* texture)
+void Painter::setTexture(const TexturePtr& texture) {
+    if (texture) setTexture(texture->getId(), texture->getTransformMatrixId());
+    else resetTexture();
+}
+
+void Painter::setTexture(uint32_t textureId, uint16_t textureMatrixId)
 {
-    if (m_texture == texture)
+    if (m_glTextureId == textureId)
         return;
 
-    if (!(m_texture = texture)) {
-        m_glTextureId = 0;
+    m_glTextureId = textureId;
+    if (textureId == 0) {
         return;
     }
 
-    setTextureMatrix(texture->getTransformMatrix());
-    m_glTextureId = texture->getId();
+    setTextureMatrix(g_textures.getMatrixById(textureMatrixId));
     updateGlTexture();
 }
 

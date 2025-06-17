@@ -23,20 +23,13 @@
 #pragma once
 
 #include "declarations.h"
-#include "hardwarebuffer.h"
 
 class VertexArray
 {
 public:
-    static constexpr int CACHE_MIN_VERTICES_COUNT = 42;
-
     VertexArray(const size_t size = 64) { m_buffer.reserve(size); }
 
-    ~VertexArray()
-    {
-        if (m_hardwareBuffer)
-            delete m_hardwareBuffer;
-    }
+    ~VertexArray() = default;
 
     void addTriangle(const Point& a, const Point& b, const Point& c)
     {
@@ -148,40 +141,16 @@ public:
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
-    void append(const VertexArray* buffer)
-    {
+    void append(const VertexArray* buffer) {
         m_buffer.insert(m_buffer.end(), buffer->m_buffer.begin(), buffer->m_buffer.end());
     }
 
-    void clear()
-    {
-        m_buffer.clear();
-        m_cached = false;
-    }
+    void clear() { m_buffer.clear(); }
 
     const float* vertices() const { return m_buffer.data(); }
     int vertexCount() const { return m_buffer.size() / 2; }
     int size() const { return m_buffer.size(); }
 
-    // cache
-    void cache()
-    {
-        if (m_cached || m_buffer.size() < CACHE_MIN_VERTICES_COUNT) return;
-
-        if (!m_hardwareBuffer)
-            m_hardwareBuffer = new HardwareBuffer(HardwareBuffer::Type::VERTEX_BUFFER);
-
-        m_hardwareBuffer->bind();
-        m_hardwareBuffer->write(m_buffer.data(), m_buffer.size() * sizeof(float), HardwareBuffer::UsagePattern::DYNAMIC_DRAW);
-
-        m_cached = true;
-    }
-
-    bool isCached() const { return m_cached; }
-    HardwareBuffer* getHardwareCache() const { return m_hardwareBuffer; }
-
 private:
-    bool m_cached{ false };
     std::vector<float> m_buffer;
-    HardwareBuffer* m_hardwareBuffer = nullptr;
 };

@@ -26,7 +26,7 @@
 
 enum class TaskGroup : int8_t
 {
-    None = -1, // is outside the context of the dispatcher
+    NoGroup = -1, // is outside the context of the dispatcher
     Serial,
     GenericParallel,
     Last
@@ -34,7 +34,7 @@ enum class TaskGroup : int8_t
 
 enum class DispatcherType : uint8_t
 {
-    None,
+    NoType,
     Event,
     AsyncEvent,
     ScheduledEvent,
@@ -62,12 +62,12 @@ struct DispatcherContext
 
 private:
     void reset() {
-        group = TaskGroup::None;
-        type = DispatcherType::None;
+        group = TaskGroup::NoGroup;
+        type = DispatcherType::NoType;
     }
 
-    DispatcherType type = DispatcherType::None;
-    TaskGroup group = TaskGroup::None;
+    DispatcherType type = DispatcherType::NoType;
+    TaskGroup group = TaskGroup::NoGroup;
 
     friend class EventDispatcher;
 };
@@ -76,7 +76,7 @@ private:
 class EventDispatcher
 {
 public:
-    EventDispatcher();
+    EventDispatcher() = default;
 
     void init();
     void shutdown();
@@ -110,9 +110,7 @@ private:
         std::vector<Event> asyncEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
-
-        void try_lock();
-        void try_unlock();
+        std::atomic_bool hasEvents;
     };
 
     inline void mergeEvents();
@@ -128,7 +126,7 @@ private:
     size_t m_pollEventsSize{};
     bool m_disabled{ false };
 
-    mutable std::vector<std::unique_ptr<ThreadTask>> m_threads;
+    std::vector<std::unique_ptr<ThreadTask>> m_threads;
 
     // Main Events
     std::vector<EventPtr> m_eventList;

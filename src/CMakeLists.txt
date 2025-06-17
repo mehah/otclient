@@ -164,7 +164,6 @@ endif()
 
 # Client options
 add_definitions(-DCLIENT)
-add_definitions(-D_WIN32_WINNT=0x0501)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
 
@@ -193,6 +192,7 @@ find_package(STDUUID CONFIG REQUIRED)
 find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
 
 if(APPLE)
 	# Required for Physfs
@@ -216,8 +216,8 @@ if(TOGGLE_FRAMEWORK_SOUND)
 		find_package(OpenAL CONFIG REQUIRED)
 	endif()
 	find_package(VorbisFile REQUIRED)
-	find_package(Vorbis REQUIRED)
-	find_package(Ogg REQUIRED)
+	find_package(Vorbis CONFIG REQUIRED)
+	find_package(Ogg CONFIG REQUIRED)
 endif()
 if(ANDROID)
 	set(LUA_LIBRARY ${LUA_LIBRARY} ${Android_LIBRARIES}/liblua.a)
@@ -373,7 +373,6 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
 		framework/graphics/fontmanager.cpp
 		framework/graphics/framebuffer.cpp
 		framework/graphics/graphics.cpp
-		framework/graphics/hardwarebuffer.cpp
 		framework/graphics/image.cpp
 		framework/graphics/painter.cpp
 		framework/graphics/paintershaderprogram.cpp
@@ -511,6 +510,7 @@ if(MSVC)
 		LibLZMA::LibLZMA
 		winmm.lib
 		pugixml::pugixml
+		fmt::fmt-header-only
 	)
 elseif(ANDROID)
 	target_include_directories(${PROJECT_NAME}
@@ -556,6 +556,7 @@ elseif(ANDROID)
 		android
 		log
 		pugixml::pugixml
+		fmt::fmt-header-only
 	)
 
 elseif(WASM)
@@ -606,6 +607,10 @@ elseif(WASM)
 		OpenSSL::SSL
 		OpenSSL::Crypto
 		httplib::httplib
+		fmt::fmt
+		Ogg::ogg
+		Vorbis::vorbisfile
+		Vorbis::vorbis
 	)
 
 
@@ -685,6 +690,10 @@ else() # Linux
 		OpenSSL::SSL
 		OpenSSL::Crypto
 		httplib::httplib
+		fmt::fmt-header-only
+		Ogg::ogg
+		Vorbis::vorbisfile
+		Vorbis::vorbis
 	)
 
 	if(CMAKE_BUILD_TYPE STREQUAL "Debug")

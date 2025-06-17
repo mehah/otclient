@@ -258,6 +258,7 @@ local function loadIcon(bitChanged, content, topmenu)
     end
     icon:setTooltip(tooltip)
     icon:setImageSize(tosize("9 9"))
+    icon:setMarginRight(-1)
     if topmenu then
         icon:setMarginTop(5)
         icon:setMarginLeft(2)
@@ -667,4 +668,33 @@ function StatsBar.terminate()
     })
     
     StatsBar.destroyAllBars()
+end
+
+function StatsBar.onHungryChange(regenerationTime, alert)
+    local contents = getStatsBarsIconContent()
+    local info = Icons[PlayerStates.Hungry]
+    if regenerationTime <= alert then
+        for _, contentData in ipairs(contents) do
+            local icon = contentData.content:getChildById(info.id)
+            if not icon then
+                icon = g_ui.createWidget('ConditionWidget', contentData.content)
+                icon:setId(info.id)
+                icon:setImageSource("/images/game/states/player-state-flags")
+                icon:setImageClip(((info.clip - 1) * 9) .. ' 0 9 9')
+                icon:setTooltip(info.tooltip)
+                icon:setImageSize(tosize("9 9"))
+                if contentData.loadIconTransparent then
+                    icon:setMarginTop(5)
+                end
+            end
+        end
+    else
+        for _, contentData in ipairs(contents) do
+            local icon = contentData.content:getChildById(info.id)
+            if icon then
+                icon:destroy()
+                icon = nil
+            end
+        end
+    end
 end

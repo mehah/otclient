@@ -15,8 +15,6 @@ manaCircle = nil
 expCircle = nil
 skillCircle = nil
 
-g_ui.loadUI('game_healthcircle')
-
 healthCircleFront = nil
 manaCircleFront = nil
 expCircleFront = nil
@@ -39,6 +37,7 @@ distanceFromCenter = g_settings.getNumber('healthcircle_distfromcenter')
 opacityCircle = g_settings.getNumber('healthcircle_opacity', 0.35)
 
 function init()
+    g_ui.importStyle("game_healthcircle.otui")
     healthCircle = g_ui.createWidget('HealthCircle', mapPanel)
     manaCircle = g_ui.createWidget('ManaCircle', mapPanel)
     expCircle = g_ui.createWidget('ExpCircle', mapPanel)

@@ -80,8 +80,6 @@ private:
     float m_ignorePhysicsAfter;
     float m_elapsedTime{ 0 };
 
-    uint32_t m_frame{ 0 };
-
     CompositionMode m_compositionMode;
 
     bool m_finished{ false };

@@ -46,7 +46,7 @@ void Mouse::loadCursors(const std::string& filename)
                       stdext::resolve_path(cursorNode->valueAt("image"), cursorNode->source()),
                       cursorNode->valueAt<Point>("hot-spot"));
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("unable to load cursors file: %s", e.what()));
+        g_logger.error("unable to load cursors file: {}", e.what());
     }
 }
 
@@ -56,7 +56,7 @@ void Mouse::addCursor(const std::string& name, const std::string& file, const Po
     if (cursorId >= 0) {
         m_cursors[name] = cursorId;
     } else
-        g_logger.error(stdext::format("unable to load cursor %s", name));
+        g_logger.error("unable to load cursor {}", name);
 }
 
 bool Mouse::pushCursor(const std::string& name)
