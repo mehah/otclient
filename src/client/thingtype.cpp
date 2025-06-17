@@ -47,8 +47,61 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
     m_name = appearance.name();
     m_description = appearance.description();
 
-    const appearances::AppearanceFlags& flags = appearance.flags();
+    applyAppearanceFlags(appearance.flags());
 
+    if (!g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
+        m_animationPhases = 0;
+        int totalSpritesCount = 0;
+
+        for (const auto& framegroup : appearance.frame_group()) {
+            const int frameGroupType = framegroup.fixed_frame_group();
+            const auto& spriteInfo = framegroup.sprite_info();
+            const auto& animation = spriteInfo.animation();
+            spriteInfo.sprite_id(); // sprites
+            const auto& spritesPhases = animation.sprite_phase();
+
+            m_numPatternX = spriteInfo.pattern_width();
+            m_numPatternY = spriteInfo.pattern_height();
+            m_numPatternZ = spriteInfo.pattern_depth();
+            m_layers = spriteInfo.layers();
+            m_opaque = spriteInfo.is_opaque();
+
+            m_animationPhases += std::max<int>(1, spritesPhases.size());
+
+            if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
+                m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
+            }
+
+            // animations
+            if (spritesPhases.size() > 1) {
+                auto* animator = new Animator;
+                animator->unserializeAppearance(animation);
+
+                if (frameGroupType == FrameGroupMoving)
+                    m_animator = animator;
+                else if (frameGroupType == FrameGroupIdle || frameGroupType == FrameGroupInitial)
+                    m_idleAnimator = animator;
+            }
+
+            const int totalSprites = m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * std::max<int>(1, spritesPhases.size());
+
+            if (totalSpritesCount + totalSprites > 4096)
+                throw Exception("a thing type has more than 4096 sprites");
+
+            m_spritesIndex.resize(totalSpritesCount + totalSprites);
+            for (int j = totalSpritesCount, spriteId = 0; j < (totalSpritesCount + totalSprites); ++j, ++spriteId) {
+                m_spritesIndex[j] = spriteInfo.sprite_id(spriteId);
+            }
+
+            totalSpritesCount += totalSprites;
+        }
+
+        m_textureData.resize(m_animationPhases);
+    }
+}
+
+void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
+{
     if (flags.has_bank()) {
         m_groundSpeed = flags.bank().waypoints();
         m_flags |= ThingFlagAttrGround;
@@ -199,7 +252,14 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
         m_market.category = static_cast<ITEM_CATEGORY>(flags.market().category());
         m_market.tradeAs = flags.market().trade_as_object_id();
         m_market.showAs = flags.market().show_as_object_id();
-        m_market.name = m_name;
+        if (g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
+            // keep from tibia.dat
+            if (m_market.name.empty() && !flags.market().name().empty()) {
+                m_market.name = flags.market().name();
+            }
+        } else {
+            m_market.name = m_name;
+        }
 
         for (const int32_t voc : flags.market().restrict_to_profession()) {
             uint16_t vocBitMask = std::pow(2, voc - 1);
@@ -261,273 +321,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
     // reverse_addons_west
     // reverse_addons_south
     // reverse_addons_north
-
-    if (flags.has_wearout() && flags.wearout()) {
-        m_flags |= ThingFlagAttrWearOut;
-    }
-
-    if (flags.has_clockexpire() && flags.clockexpire()) {
-        m_flags |= ThingFlagAttrClockExpire;
-    }
-
-    if (flags.has_expire() && flags.expire()) {
-        m_flags |= ThingFlagAttrExpire;
-    }
-
-    if (flags.has_expirestop() && flags.expirestop()) {
-        m_flags |= ThingFlagAttrExpireStop;
-    }
-
-    if (flags.has_deco_kit() && flags.deco_kit()) {
-        m_flags |= ThingFlagAttrExpireStop;
-    }
-
-    // now lets parse sprite data
-    m_animationPhases = 0;
-    int totalSpritesCount = 0;
-
-    for (const auto& framegroup : appearance.frame_group()) {
-        const int frameGroupType = framegroup.fixed_frame_group();
-        const auto& spriteInfo = framegroup.sprite_info();
-        const auto& animation = spriteInfo.animation();
-        spriteInfo.sprite_id(); // sprites
-        const auto& spritesPhases = animation.sprite_phase();
-
-        m_numPatternX = spriteInfo.pattern_width();
-        m_numPatternY = spriteInfo.pattern_height();
-        m_numPatternZ = spriteInfo.pattern_depth();
-        m_layers = spriteInfo.layers();
-        m_opaque = spriteInfo.is_opaque();
-
-        m_animationPhases += std::max<int>(1, spritesPhases.size());
-
-        if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
-            m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
-        }
-
-        // animations
-        if (spritesPhases.size() > 1) {
-            auto* animator = new Animator;
-            animator->unserializeAppearance(animation);
-
-            if (frameGroupType == FrameGroupMoving)
-                m_animator = animator;
-            else if (frameGroupType == FrameGroupIdle || frameGroupType == FrameGroupInitial)
-                m_idleAnimator = animator;
-        }
-
-        const int totalSprites = m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * std::max<int>(1, spritesPhases.size());
-
-        if (totalSpritesCount + totalSprites > 4096)
-            throw Exception("a thing type has more than 4096 sprites");
-
-        m_spritesIndex.resize(totalSpritesCount + totalSprites);
-        for (int j = totalSpritesCount, spriteId = 0; j < (totalSpritesCount + totalSprites); ++j, ++spriteId) {
-            m_spritesIndex[j] = spriteInfo.sprite_id(spriteId);
-        }
-
-        totalSpritesCount += totalSprites;
-    }
-
-    m_textureData.resize(m_animationPhases);
-}
-
-void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
-{
-    if (flags.has_bank()) {
-        m_groundSpeed = flags.bank().waypoints();
-        m_flags |= ThingFlagAttrGround;
-    }
-
-    if (flags.has_clip() && flags.clip()) {
-        m_flags |= ThingFlagAttrGroundBorder;
-    }
-
-    if (flags.has_bottom()) {
-        m_flags |= ThingFlagAttrOnBottom;
-    }
-
-    if (flags.has_top()) {
-        m_flags |= ThingFlagAttrOnTop;
-    }
-
-    if (flags.has_container() && flags.container()) {
-        m_flags |= ThingFlagAttrContainer;
-    }
-
-    if (flags.has_cumulative() && flags.cumulative()) {
-        m_flags |= ThingFlagAttrStackable;
-    }
-
-    if (flags.has_multiuse() && flags.multiuse()) {
-        m_flags |= ThingFlagAttrMultiUse;
-    }
-
-    if (flags.has_forceuse() && flags.forceuse()) {
-        m_flags |= ThingFlagAttrForceUse;
-    }
-
-    if (flags.has_write()) {
-        m_flags |= ThingFlagAttrWritable;
-        m_maxTextLength = flags.write().max_text_length();
-    }
-
-    if (flags.has_write_once()) {
-        m_flags |= ThingFlagAttrWritableOnce;
-        m_maxTextLength = flags.write_once().max_text_length_once();
-    }
-
-    if (flags.has_liquidpool() && flags.liquidpool()) {
-        m_flags |= ThingFlagAttrSplash;
-    }
-
-    if (flags.has_unpass() && flags.unpass()) {
-        m_flags |= ThingFlagAttrNotWalkable;
-    }
-
-    if (flags.has_unmove() && flags.unmove()) {
-        m_flags |= ThingFlagAttrNotMoveable;
-    }
-
-    if (flags.has_unsight() && flags.unsight()) {
-        m_flags |= ThingFlagAttrBlockProjectile;
-    }
-
-    if (flags.has_avoid() && flags.avoid()) {
-        m_flags |= ThingFlagAttrNotPathable;
-    }
-
-    if (flags.has_take() && flags.take()) {
-        m_flags |= ThingFlagAttrPickupable;
-    }
-
-    if (flags.has_liquidcontainer() && flags.liquidcontainer()) {
-        m_flags |= ThingFlagAttrFluidContainer;
-    }
-
-    if (flags.has_hang() && flags.hang()) {
-        m_flags |= ThingFlagAttrHangable;
-    }
-
-    if (flags.has_hook()) {
-        const auto& hookDirection = flags.hook();
-        if (hookDirection.east()) {
-            m_flags |= ThingFlagAttrHookEast;
-        } else if (hookDirection.south()) {
-            m_flags |= ThingFlagAttrHookSouth;
-        }
-    }
-
-    if (flags.has_light()) {
-        m_flags |= ThingFlagAttrLight;
-        m_light = { static_cast<uint8_t>(flags.light().brightness()), static_cast<uint8_t>(flags.light().color()) };
-    }
-
-    if (flags.has_rotate() && flags.rotate()) {
-        m_flags |= ThingFlagAttrRotateable;
-    }
-
-    if (flags.has_dont_hide() && flags.dont_hide()) {
-        m_flags |= ThingFlagAttrDontHide;
-    }
-
-    if (flags.has_translucent() && flags.translucent()) {
-        m_flags |= ThingFlagAttrTranslucent;
-    }
-
-    if (flags.has_shift()) {
-        m_displacement = Point(flags.shift().x(), flags.shift().y());
-        m_flags |= ThingFlagAttrDisplacement;
-    }
-
-    if (flags.has_height()) {
-        m_elevation = flags.height().elevation();
-        m_flags |= ThingFlagAttrElevation;
-    }
-
-    if (flags.has_lying_object() && flags.lying_object()) {
-        m_flags |= ThingFlagAttrLyingCorpse;
-    }
-
-    if (flags.has_animate_always() && flags.animate_always()) {
-        m_flags |= ThingFlagAttrAnimateAlways;
-    }
-
-    if (flags.has_automap()) {
-        m_minimapColor = flags.automap().color();
-        m_flags |= ThingFlagAttrMinimapColor;
-    }
-
-    if (flags.has_lenshelp()) {
-        m_lensHelp = flags.lenshelp().id();
-        m_flags |= ThingFlagAttrLensHelp;
-    }
-
-    if (flags.has_fullbank() && flags.fullbank()) {
-        m_flags |= ThingFlagAttrFullGround;
-    }
-
-    if (flags.has_ignore_look() && flags.ignore_look()) {
-        m_flags |= ThingFlagAttrLook;
-    }
-
-    if (flags.has_clothes()) {
-        m_clothSlot = flags.clothes().slot();
-        m_flags |= ThingFlagAttrCloth;
-    }
-
-    if (flags.has_market()) {
-        m_market.category = static_cast<ITEM_CATEGORY>(flags.market().category());
-        m_market.tradeAs = flags.market().trade_as_object_id();
-        m_market.showAs = flags.market().show_as_object_id();
-        if (m_market.name.empty() && !flags.market().name().empty()) // keep from tibia.dat
-            m_market.name = flags.market().name();
-        for (const int32_t voc : flags.market().restrict_to_profession()) {
-            uint16_t vocBitMask = std::pow(2, voc - 1);
-            m_market.restrictVocation |= vocBitMask;
-        }
-
-        m_market.requiredLevel = flags.market().minimum_level();
-        m_flags |= ThingFlagAttrMarket;
-    }
-
-    if (flags.has_wrap() && flags.wrap()) {
-        m_flags |= ThingFlagAttrWrapable;
-    }
-
-    if (flags.has_unwrap() && flags.unwrap()) {
-        m_flags |= ThingFlagAttrUnwrapable;
-    }
-
-    if (flags.has_topeffect() && flags.topeffect()) {
-        m_flags |= ThingFlagAttrTopEffect;
-    }
-
-    if (flags.has_default_action()) {
-        m_defaultAction = static_cast<PLAYER_ACTION>(flags.default_action().action());
-    }
-
-    if (flags.npcsaledata_size() > 0) {
-        for (int i = 0; i < flags.npcsaledata_size(); ++i) {
-            NPCData data;
-            data.name = flags.npcsaledata(i).name();
-            data.location = flags.npcsaledata(i).location();
-            data.salePrice = flags.npcsaledata(i).sale_price();
-            data.buyPrice = flags.npcsaledata(i).buy_price();
-            data.currencyObjectTypeId = flags.npcsaledata(i).currency_object_type_id();
-            data.currencyQuestFlagDisplayName = flags.npcsaledata(i).currency_quest_flag_display_name();
-            m_npcData.push_back(data);
-        }
-        m_flags |= ThingFlagAttrNPC;
-    }
-
-    if (flags.has_show_off_socket() && flags.show_off_socket()) {
-        m_flags |= ThingFlagAttrPodium;
-    }
-
-    if (flags.has_upgradeclassification()) {
-        m_upgradeClassification = flags.upgradeclassification().upgrade_classification();
-    }
 
     if (flags.has_wearout() && flags.wearout()) {
         m_flags |= ThingFlagAttrWearOut;
