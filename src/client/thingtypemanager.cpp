@@ -148,7 +148,6 @@ bool ThingTypeManager::loadOtml(std::string file)
 bool ThingTypeManager::loadAppearances(const std::string& file)
 {
     try {
-        appearances::Appearances appearancesLib;
         if (!g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
             g_spriteAppearances.unload();
             int spritesCount = 0;
@@ -201,6 +200,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
             m_datLoaded = true;
         } else {
             std::stringstream datFileStream;
+            auto appearancesLib = appearances::Appearances();
             g_resources.readFileStream(g_resources.resolvePath(g_resources.guessFilePath(file, "dat")), datFileStream);
             if (!appearancesLib.ParseFromIstream(&datFileStream)) {
                 throw stdext::exception("Couldn't parse appearances.dat.");
