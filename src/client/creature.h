@@ -188,6 +188,7 @@ minHeight,
     std::string getText();
     void clearText() { setText("", Color::white); }
     bool canShoot(int distance);
+    std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> getIcons() { return m_icons; }
 
     bool isCameraFollowing() const {
         return m_cameraFollowing;
