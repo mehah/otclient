@@ -289,6 +289,31 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
     return false;
 }
 
+bool ThingTypeManager::loadAppearancesDat(const std::string& file)
+{
+    try {
+        std::stringstream datFileStream;
+        g_resources.readFileStream(g_resources.resolvePath(g_resources.guessFilePath(file, "dat")), datFileStream);
+        appearances::Appearances appearancesLib;
+        if (!appearancesLib.ParseFromIstream(&datFileStream))
+            throw stdext::exception("Couldn't parse appearances.dat.");
+
+        auto applyFlags = [this](const google::protobuf::RepeatedPtrField<appearances::Appearance>& list, ThingCategory category) {
+            for (const auto& appearance : list) {
+                const uint16_t id = appearance.id();
+                if (auto* type = getRawThingType(id, category)) {
+                    type->applyAppearanceFlags(appearance.flags());
+                }
+            }
+        };
+        applyFlags(appearancesLib.object(), ThingCategoryItem);
+        return true;
+    } catch (const std::exception& e) {
+        g_logger.error("Failed to load '{}' (appearances): {}", file, e.what());
+        return false;
+    }
+}
+
 const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory category)
 {
     if (category < ThingLastCategory)
