@@ -214,7 +214,7 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
         }
         return true;
     } catch (const std::exception& e) {
-        g_logger.error("Failed to load '{}' ({}): {}", file, "Appearances", e.what());
+        g_logger.error("Failed to load '{}' (Appearances): {}", file, e.what());
         return false;
     }
 }
