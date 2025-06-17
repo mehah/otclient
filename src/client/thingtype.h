@@ -317,6 +317,7 @@ public:
     void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
     void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
+    void applyAppearanceFlags(const appearances::AppearanceFlags& flags);
 
 #ifdef FRAMEWORK_EDITOR
     void serialize(const FileStreamPtr& fin);

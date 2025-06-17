@@ -47,8 +47,61 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
     m_name = appearance.name();
     m_description = appearance.description();
 
-    const appearances::AppearanceFlags& flags = appearance.flags();
+    applyAppearanceFlags(appearance.flags());
 
+    if (!g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
+        m_animationPhases = 0;
+        int totalSpritesCount = 0;
+
+        for (const auto& framegroup : appearance.frame_group()) {
+            const int frameGroupType = framegroup.fixed_frame_group();
+            const auto& spriteInfo = framegroup.sprite_info();
+            const auto& animation = spriteInfo.animation();
+            spriteInfo.sprite_id(); // sprites
+            const auto& spritesPhases = animation.sprite_phase();
+
+            m_numPatternX = spriteInfo.pattern_width();
+            m_numPatternY = spriteInfo.pattern_height();
+            m_numPatternZ = spriteInfo.pattern_depth();
+            m_layers = spriteInfo.layers();
+            m_opaque = spriteInfo.is_opaque();
+
+            m_animationPhases += std::max<int>(1, spritesPhases.size());
+
+            if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
+                m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
+            }
+
+            // animations
+            if (spritesPhases.size() > 1) {
+                auto* animator = new Animator;
+                animator->unserializeAppearance(animation);
+
+                if (frameGroupType == FrameGroupMoving)
+                    m_animator = animator;
+                else if (frameGroupType == FrameGroupIdle || frameGroupType == FrameGroupInitial)
+                    m_idleAnimator = animator;
+            }
+
+            const int totalSprites = m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * std::max<int>(1, spritesPhases.size());
+
+            if (totalSpritesCount + totalSprites > 4096)
+                throw Exception("a thing type has more than 4096 sprites");
+
+            m_spritesIndex.resize(totalSpritesCount + totalSprites);
+            for (int j = totalSpritesCount, spriteId = 0; j < (totalSpritesCount + totalSprites); ++j, ++spriteId) {
+                m_spritesIndex[j] = spriteInfo.sprite_id(spriteId);
+            }
+
+            totalSpritesCount += totalSprites;
+        }
+
+        m_textureData.resize(m_animationPhases);
+    }
+}
+
+void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
+{
     if (flags.has_bank()) {
         m_groundSpeed = flags.bank().waypoints();
         m_flags |= ThingFlagAttrGround;
@@ -199,7 +252,14 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
         m_market.category = static_cast<ITEM_CATEGORY>(flags.market().category());
         m_market.tradeAs = flags.market().trade_as_object_id();
         m_market.showAs = flags.market().show_as_object_id();
-        m_market.name = m_name;
+        if (g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
+            // keep from tibia.dat
+            if (m_market.name.empty() && !flags.market().name().empty()) {
+                m_market.name = flags.market().name();
+            }
+        } else {
+            m_market.name = m_name;
+        }
 
         for (const int32_t voc : flags.market().restrict_to_profession()) {
             uint16_t vocBitMask = std::pow(2, voc - 1);
@@ -281,55 +341,6 @@ void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCatego
     if (flags.has_deco_kit() && flags.deco_kit()) {
         m_flags |= ThingFlagAttrExpireStop;
     }
-
-    // now lets parse sprite data
-    m_animationPhases = 0;
-    int totalSpritesCount = 0;
-
-    for (const auto& framegroup : appearance.frame_group()) {
-        const int frameGroupType = framegroup.fixed_frame_group();
-        const auto& spriteInfo = framegroup.sprite_info();
-        const auto& animation = spriteInfo.animation();
-        spriteInfo.sprite_id(); // sprites
-        const auto& spritesPhases = animation.sprite_phase();
-
-        m_numPatternX = spriteInfo.pattern_width();
-        m_numPatternY = spriteInfo.pattern_height();
-        m_numPatternZ = spriteInfo.pattern_depth();
-        m_layers = spriteInfo.layers();
-        m_opaque = spriteInfo.is_opaque();
-
-        m_animationPhases += std::max<int>(1, spritesPhases.size());
-
-        if (const auto& sheet = g_spriteAppearances.getSheetBySpriteId(spriteInfo.sprite_id(0), false)) {
-            m_size = sheet->getSpriteSize() / g_gameConfig.getSpriteSize();
-        }
-
-        // animations
-        if (spritesPhases.size() > 1) {
-            auto* animator = new Animator;
-            animator->unserializeAppearance(animation);
-
-            if (frameGroupType == FrameGroupMoving)
-                m_animator = animator;
-            else if (frameGroupType == FrameGroupIdle || frameGroupType == FrameGroupInitial)
-                m_idleAnimator = animator;
-        }
-
-        const int totalSprites = m_layers * m_numPatternX * m_numPatternY * m_numPatternZ * std::max<int>(1, spritesPhases.size());
-
-        if (totalSpritesCount + totalSprites > 4096)
-            throw Exception("a thing type has more than 4096 sprites");
-
-        m_spritesIndex.resize(totalSpritesCount + totalSprites);
-        for (int j = totalSpritesCount, spriteId = 0; j < (totalSpritesCount + totalSprites); ++j, ++spriteId) {
-            m_spritesIndex[j] = spriteInfo.sprite_id(spriteId);
-        }
-
-        totalSpritesCount += totalSprites;
-    }
-
-    m_textureData.resize(m_animationPhases);
 }
 
 void ThingType::unserialize(const uint16_t clientId, const ThingCategory category, const FileStreamPtr& fin)
