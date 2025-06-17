@@ -1934,7 +1934,7 @@ void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t cr
 {
     const auto& creature = g_map.getCreatureById(creatureId);
     if (!creature) {
-        g_logger.traceError(stdext::format("ProtocolGame::addCreatureIcon: could not get creature with id %d", creatureId));
+        //g_logger.debug(stdext::format("ProtocolGame::addCreatureIcon: could not get creature with id {}", creatureId));
         return;
     }
 

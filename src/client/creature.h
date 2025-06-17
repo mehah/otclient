@@ -84,7 +84,7 @@ public:
     void setPassable(const bool passable) { m_passable = passable; }
     void setMountShader(std::string_view name);
     void setStaticWalking(uint16_t v);
-    void setIconsTexture(const std::string& filename);
+    void setIconsTexture(const std::string& filename, const Rect& clip, const uint16_t count);
     
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
     void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
@@ -249,7 +249,13 @@ private:
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
     TexturePtr m_typingIconTexture;
-    std::vector<TexturePtr> m_iconsTextures;
+    struct IconTexture
+    {
+        TexturePtr texture;
+        Rect clip;
+        uint16_t count{ 0 };
+    };
+    std::vector<IconTexture> m_iconsTextures;
 
     EventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
