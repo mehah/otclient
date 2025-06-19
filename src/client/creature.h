@@ -75,6 +75,7 @@ public:
     void setEmblem(uint8_t emblem);
     void setType(uint8_t type);
     void setIcon(uint8_t icon);
+    void setIcons(const std::vector<std::tuple<uint8_t, uint8_t, uint16_t>>& icons);
     void setSkullTexture(const std::string& filename);
     void setShieldTexture(const std::string& filename, bool blink);
     void setEmblemTexture(const std::string& filename);
@@ -83,7 +84,8 @@ public:
     void setPassable(const bool passable) { m_passable = passable; }
     void setMountShader(std::string_view name);
     void setStaticWalking(uint16_t v);
-
+    void setIconsTexture(const std::string& filename, const Rect& clip, const uint16_t count);
+    
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
     void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
     void onStartDetachEffect(const AttachedEffectPtr& effect) override;
@@ -186,6 +188,7 @@ minHeight,
     std::string getText();
     void clearText() { setText("", Color::white); }
     bool canShoot(int distance);
+    std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> getIcons() { return m_icons; }
 
     bool isCameraFollowing() const {
         return m_cameraFollowing;
@@ -247,6 +250,13 @@ private:
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
     TexturePtr m_typingIconTexture;
+    struct IconTexture
+    {
+        TexturePtr texture;
+        Rect clip;
+        uint16_t count{ 0 };
+    };
+    std::vector<IconTexture> m_iconsTextures;
 
     EventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
@@ -299,6 +309,7 @@ private:
     uint8_t m_icon{ Otc::NpcIconNone };
     uint8_t m_shield{ Otc::ShieldNone };
     uint8_t m_emblem{ Otc::EmblemNone };
+    std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> m_icons;
 
     // walk related
     uint8_t m_walkAnimationPhase{ 0 };

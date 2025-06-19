@@ -108,6 +108,21 @@ function getIconImagePath(iconId)
     return path
 end
 
+function getIconsImagePath(category)
+    if category == 1 then
+        return '/images/game/creatureicons/monsterIcons'
+    end
+    return '/images/game/creatureicons/CreatureIcons'
+end
+
+function Creature:onIconsChange(icon, category, count)
+    local imagePath = getIconsImagePath(category)
+    if imagePath then
+        local clipX = (icon - 1) * 11
+        self:setIconsTexture(imagePath, torect(clipX .. ' 0 11 11'), count)
+    end
+end
+
 function Creature:onSkullChange(skullId)
     local imagePath = getSkullImagePath(skullId)
     if imagePath then
