@@ -1291,7 +1291,7 @@ UIAnchorLayoutPtr UIWidget::getAnchoredLayout()
     return nullptr;
 }
 
-const UIAnchorList UIWidget::getAnchorsGroup() {
+UIAnchorList UIWidget::getAnchorsGroup() {
     if (const auto& layout = getAnchoredLayout()) {
         const auto& self = static_self_cast<UIWidget>();
         if (layout->hasAnchors(self)) {
