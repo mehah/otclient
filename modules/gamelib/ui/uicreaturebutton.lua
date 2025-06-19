@@ -178,7 +178,7 @@ function UICreatureButton:updateIcons(icons)
         return
     end
     for index, iconData in pairs(icons) do
-        if index >= 3 then
+        if index > 3 then
             break
         end
         local iconId = iconData[1] -- uint8_t icon
