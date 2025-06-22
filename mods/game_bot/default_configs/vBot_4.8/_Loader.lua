@@ -24,7 +24,7 @@ local luaFiles = {
   "extras",
   "cavebot",
   "playerlist",
-  --"BotServer", --currently 02/03/24 No websocket
+  "BotServer",
   "alarms",
   "Conditions",
   "Equipper",
