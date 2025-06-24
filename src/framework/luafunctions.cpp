@@ -527,6 +527,8 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getPaddingRect", &UIWidget::getPaddingRect);
     g_lua.bindClassMemberFunction<UIWidget>("getChildrenRect", &UIWidget::getChildrenRect);
     g_lua.bindClassMemberFunction<UIWidget>("getAnchoredLayout", &UIWidget::getAnchoredLayout);
+    g_lua.bindClassMemberFunction<UIWidget>("getAnchors", &UIWidget::getAnchors);
+    g_lua.bindClassMemberFunction<UIWidget>("getAnchorType", &UIWidget::getAnchorType);
     g_lua.bindClassMemberFunction<UIWidget>("getRootParent", &UIWidget::getRootParent);
     g_lua.bindClassMemberFunction<UIWidget>("getChildAfter", &UIWidget::getChildAfter);
     g_lua.bindClassMemberFunction<UIWidget>("getChildBefore", &UIWidget::getChildBefore);
@@ -767,7 +769,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getFont", &UIWidget::getFont);
     g_lua.bindClassMemberFunction<UIWidget>("getTextSize", &UIWidget::getTextSize);
     g_lua.bindClassMemberFunction<UIWidget>("hasShader", &UIWidget::hasShader);
-    g_lua.bindClassMemberFunction<UIWidget>("disableUpdateTemporarily", &UIWidget::disableUpdateTemporarily);
     g_lua.bindClassMemberFunction<UIWidget>("getNextWidget", &UIWidget::getNextWidget);
     g_lua.bindClassMemberFunction<UIWidget>("getPrevWidget", &UIWidget::getPrevWidget);
     g_lua.bindClassMemberFunction<UIWidget>("hasAnchoredLayout", &UIWidget::hasAnchoredLayout);

@@ -61,7 +61,7 @@ extern "C" {
 #if ENABLE_ENCRYPTION == 1 && ENABLE_ENCRYPTION_BUILDER == 1
         if (std::find(args.begin(), args.end(), "--encrypt") != args.end()) {
             g_lua.init();
-            g_resources.runEncryption(args.size() >= 3 ? args[2] :  std::string(ENCRYPTION_PASSWORD));
+            g_resources.runEncryption(args.size() >= 3 ? args[2] : std::string(ENCRYPTION_PASSWORD));
             std::cout << "Encryption complete" << std::endl;
 #ifdef WIN32
             MessageBoxA(NULL, "Encryption complete", "Success", 0);
@@ -77,6 +77,9 @@ extern "C" {
         // find script init.lua and run it
         if (!g_resources.discoverWorkDir("init.lua"))
             g_logger.fatal("Unable to find work directory, the application cannot be initialized.");
+
+        // initialize application framework and otclient
+        g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
 
 #ifndef ANDROID
 #if ENABLE_DISCORD_RPC == 1
@@ -98,8 +101,6 @@ extern "C" {
 #endif
 #endif
 
-        // initialize application framework and otclient
-        g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
         g_client.init(args);
 #ifdef FRAMEWORK_NET
         g_http.init();
