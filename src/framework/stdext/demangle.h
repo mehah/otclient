@@ -31,6 +31,16 @@ namespace stdext
     const char* demangle_name(const char* name);
 
     /// Returns the name of a class
+    template<typename T> std::string demangle_class(const T& obj)
+    {
+#ifdef _MSC_VER
+        return demangle_name(typeid(*obj).name()) + 6;
+#else
+        return demangle_name(typeid(*obj).name());
+#endif
+    }
+
+    /// Returns the name of a class
     template<typename T> std::string demangle_class()
     {
 #ifdef _MSC_VER
