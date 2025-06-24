@@ -33,14 +33,6 @@ function load(version)
             errorList[#errorList + 1] = "Couldn't load staticdata"
         end
     else
-        if g_game.getFeature(GameLoadSprInsteadProtobuf) then
-            local warningBox = displayErrorBox(tr('Warning'),
-                'Load spr instead protobuf it\'s unstable, use by yours risk!')
-            addEvent(function()
-                warningBox:raise()
-                warningBox:focus()
-            end)
-        end
         local datPath, sprPath
         if filename then
             datPath = resolvepath('/data/things/' .. filename)
@@ -55,6 +47,12 @@ function load(version)
         end
         if not g_sprites.loadSpr(sprPath) then
             errorList[#errorList + 1] = tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
+        end
+        if g_game.getFeature(GameLoadSprInsteadProtobuf) and version >= 1281 then
+            local staticPath = resolvepath(string.format('/things/%d/appearances', version))
+            if not g_things.loadAppearances(staticPath) then
+                g_logger.warning(string.format("[game_things.load()] Couldn't load /things/%d/appearances.dat, possible packets error.", version))
+            end
         end
     end
 
