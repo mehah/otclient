@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include <unordered_map>
 
  /// LuaObject, all script-able classes have it as base
  // @bindclass
@@ -86,6 +87,9 @@ public:
 
 private:
     int m_fieldsTableRef;
+    std::unordered_map<std::string, bool> m_events;
+
+    friend class LuaInterface;
 };
 
 extern int16_t g_luaThreadId;
@@ -171,7 +175,7 @@ int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
         self = asLuaObject();
     } catch (...) {
         g_logger.warning("({}):luaCallLuaField: Calling lua during object construction is not allowed.", getClassName());
-        return 0;
+        return -1;
     }
 
     // note that the field must be retrieved from this object lua value
@@ -188,7 +192,7 @@ int LuaObject::luaCallLuaField(const std::string_view field, const T&... args)
         return g_lua.signalCall(1 + numArgs);
     }
     g_lua.pop(2);
-    return 0;
+    return -1;
 }
 
 template<typename R, typename... T>
@@ -207,9 +211,19 @@ R LuaObject::callLuaField(const std::string_view field, const T&... args)
 template<typename... T>
 void LuaObject::callLuaField(const std::string_view field, const T&... args)
 {
+    const std::string fieldStr = field.data();
+
+    // Avoids unnecessary overhead by checking if the field is registered before invoking the Lua event.
+    auto it = m_events.find(fieldStr);
+    if (it != m_events.end() && !it->second)
+        return;
+
     const int rets = luaCallLuaField(field, args...);
     if (rets > 0)
         g_lua.pop(rets);
+
+    if (it == m_events.end())
+        m_events[fieldStr] = rets > -1;
 }
 
 template<typename T>
