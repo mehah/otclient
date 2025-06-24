@@ -660,7 +660,7 @@ std::string ResourceManager::selfChecksum() {
 }
 
 void ResourceManager::updateFiles(const std::set<std::string>& files) {
-    g_logger.info("Updating client, %i files", files.size());
+    g_logger.info("Updating client, {} files", files.size());
 
     const auto& oldWriteDir = getWriteDir();
     setWriteDir(getWorkDir());
@@ -684,6 +684,7 @@ void ResourceManager::updateFiles(const std::set<std::string>& files) {
         }
     }
     setWriteDir(oldWriteDir);
+    addSearchPath(getWorkDir(), true);
 }
 
 void ResourceManager::updateExecutable(std::string fileName)
