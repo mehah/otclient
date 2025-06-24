@@ -187,6 +187,9 @@ public:
     Rect getMarginRect();
     Rect getChildrenRect();
     UIAnchorLayoutPtr getAnchoredLayout();
+    UIAnchorList getAnchorsGroup();
+    std::vector<Fw::AnchorEdge> getAnchors();
+    Fw::AnchorEdge getAnchorType(Fw::AnchorEdge anchorType);
     bool hasAnchoredLayout() { return getAnchoredLayout() != nullptr; }
     UIWidgetPtr getRootParent();
     UIWidgetPtr getNextWidget() {
