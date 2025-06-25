@@ -193,7 +193,7 @@ namespace stdext
         for (auto&& part : std::views::split(str, separators)) {
             auto begin = part.begin();
             auto end = part.end();
-            if (begin != end) // evita strings vazias, se desejado
+            if (begin != end)
                 result.emplace_back(begin, end);
         }
 
