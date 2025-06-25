@@ -30,8 +30,6 @@ Module
 
     dofile 'json'
     dofile 'http'
-    dofile 'objectpool'
-
     Keybind.init()
   
   @onUnload: Keybind.terminate()

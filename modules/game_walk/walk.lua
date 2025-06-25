@@ -112,9 +112,9 @@ end
 
 --- Adds a walk event with an optional delay.
 local function addWalkEvent(dir, delay)
-    if g_clock.millis() - lastCancelWalkTime > 20 then
+    if os.time() - lastCancelWalkTime > 20 then
         cancelWalkEvent()
-        lastCancelWalkTime = g_clock.millis()
+        lastCancelWalkTime = os.time()
     end
 
     local action = function()

@@ -73,7 +73,7 @@ function UICreatureButton:setup(creature, onlyOutfit)
 
     local creatureWidget = self:getChildById('creature')
     local labelWidget = self:getChildById('label')
-    --local lifeBarWidget = self:getChildById('lifeBar')
+    local lifeBarWidget = self:getChildById('lifeBar')
 
     labelWidget:setText(creature:getName())
     if onlyOutfit == true then

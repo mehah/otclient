@@ -193,7 +193,8 @@ namespace stdext
         auto split_view = std::views::split(str, separators);
         result.reserve(std::distance(split_view.begin(), split_view.end()));
         for (auto&& part : split_view) {
-            result.emplace_back(part.begin(), part.end());
+            std::string_view sv(&*part.begin(), std::ranges::distance(part));
+            result.emplace_back(sv);
         }
         return result;
     }
