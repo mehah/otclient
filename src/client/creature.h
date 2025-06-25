@@ -85,7 +85,7 @@ public:
     void setMountShader(std::string_view name);
     void setStaticWalking(uint16_t v);
     void setIconsTexture(const std::string& filename, const Rect& clip, const uint16_t count);
-    
+
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
     void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
     void onStartDetachEffect(const AttachedEffectPtr& effect) override;
@@ -188,7 +188,11 @@ minHeight,
     std::string getText();
     void clearText() { setText("", Color::white); }
     bool canShoot(int distance);
-    std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> getIcons() { return m_icons; }
+
+    const auto& getIcons() {
+        static std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> vec;
+        return m_icons ? m_icons->iconEntries : vec;
+    }
 
     bool isCameraFollowing() const {
         return m_cameraFollowing;
@@ -240,9 +244,25 @@ private:
         uint16_t getDuration(const Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
+    struct IconRenderData
+    {
+        struct AtlasIconGroup
+        {
+            TexturePtr texture;
+            Rect clip;
+            uint16_t count{ 0 };
+        };
+
+        std::vector<AtlasIconGroup> atlasGroups;
+        std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> iconEntries; // (icon, category, count)
+        CachedText numberText;
+    };
+
     UIWidgetPtr m_widgetInformation;
 
     TilePtr m_walkingTile;
+
+    std::unique_ptr<IconRenderData> m_icons;
 
     TexturePtr m_skullTexture;
     TexturePtr m_shieldTexture;
@@ -250,13 +270,6 @@ private:
     TexturePtr m_typeTexture;
     TexturePtr m_iconTexture;
     TexturePtr m_typingIconTexture;
-    struct IconTexture
-    {
-        TexturePtr texture;
-        Rect clip;
-        uint16_t count{ 0 };
-    };
-    std::vector<IconTexture> m_iconsTextures;
 
     EventPtr m_walkUpdateEvent;
     ScheduledEventPtr m_walkFinishAnimEvent;
@@ -309,7 +322,6 @@ private:
     uint8_t m_icon{ Otc::NpcIconNone };
     uint8_t m_shield{ Otc::ShieldNone };
     uint8_t m_emblem{ Otc::EmblemNone };
-    std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> m_icons;
 
     // walk related
     uint8_t m_walkAnimationPhase{ 0 };
