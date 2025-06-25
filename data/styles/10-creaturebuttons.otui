@@ -37,6 +37,7 @@ CreatureButton < UICreatureButton
     color: #888888
     margin-left: 2
     phantom: true
+    text-auto-resize: true
 
   LifeProgressBar
     id: lifeBar
