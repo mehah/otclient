@@ -75,6 +75,7 @@ public:
     void setEmblem(uint8_t emblem);
     void setType(uint8_t type);
     void setIcon(uint8_t icon);
+    void setIcons(const std::vector<std::tuple<uint8_t, uint8_t, uint16_t>>& icons);
     void setSkullTexture(const std::string& filename);
     void setShieldTexture(const std::string& filename, bool blink);
     void setEmblemTexture(const std::string& filename);
@@ -83,6 +84,7 @@ public:
     void setPassable(const bool passable) { m_passable = passable; }
     void setMountShader(std::string_view name);
     void setStaticWalking(uint16_t v);
+    void setIconsTexture(const std::string& filename, const Rect& clip, const uint16_t count);
 
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
     void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
@@ -187,6 +189,11 @@ minHeight,
     void clearText() { setText("", Color::white); }
     bool canShoot(int distance);
 
+    const auto& getIcons() {
+        static std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> vec;
+        return m_icons ? m_icons->iconEntries : vec;
+    }
+
     bool isCameraFollowing() const {
         return m_cameraFollowing;
     }
@@ -237,9 +244,25 @@ private:
         uint16_t getDuration(const Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
+    struct IconRenderData
+    {
+        struct AtlasIconGroup
+        {
+            TexturePtr texture;
+            Rect clip;
+            uint16_t count{ 0 };
+        };
+
+        std::vector<AtlasIconGroup> atlasGroups;
+        std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> iconEntries; // (icon, category, count)
+        CachedText numberText;
+    };
+
     UIWidgetPtr m_widgetInformation;
 
     TilePtr m_walkingTile;
+
+    std::unique_ptr<IconRenderData> m_icons;
 
     TexturePtr m_skullTexture;
     TexturePtr m_shieldTexture;
