@@ -189,6 +189,7 @@ function online()
     showGameButtons()
 
     addEvent(function()
+        hide()
         local showPing = modules.client_options.getOption('showPing')
         local pingFeatureAvailable = g_game.getFeature(GameClientPing) or g_game.getFeature(GameExtendedClientPing)
         
