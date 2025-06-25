@@ -111,7 +111,6 @@ private:
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::mutex mutex;
         std::atomic_bool hasEvents;
-        std::atomic_bool hasDeferEvents;
     };
 
     inline void mergeEvents();
