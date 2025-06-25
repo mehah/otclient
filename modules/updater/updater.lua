@@ -161,6 +161,7 @@ local function updateFiles(data, keepCurrentFiles)
         g_app.restart()
       else
         if reloadModules then
+          g_textures.clearCache()
           g_modules.reloadModules()
         end
         Updater.abort()
@@ -211,7 +212,7 @@ function Updater.check(args)
     if updateData and (value > 60 or (not g_platform.isMobile() or not ALLOW_CUSTOM_SERVERS or not loadModulesFunc)) then -- gives 3s to set custom updater for mobile version
       return updateFiles(updateData)
     end
-    scheduledEvent = scheduleEvent(function() progressUpdater(value + 1) end, 50)
+    scheduledEvent = scheduleEvent(function() progressUpdater(value + 1) end, 100)
     updaterWindow.mainProgress:setPercent(value)
   end
   progressUpdater(0)
