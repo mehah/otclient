@@ -179,7 +179,7 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& c
     PoolState copy = getCurrentState();
     if (copy.color != color) copy.color = color;
     if (texture) {
-        if (texture->isEmpty()) {
+        if (texture->isEmpty() || m_type == DrawPoolType::FOREGROUND) {
             copy.texture = texture;
         } else {
             copy.textureId = texture->getId();
