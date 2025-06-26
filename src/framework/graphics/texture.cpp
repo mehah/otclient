@@ -223,12 +223,15 @@ void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixe
 ) const
 {
     GLenum format = 0;
+    GLenum internalFormat = GL_R8;
     switch (channels) {
         case 4:
             format = GL_RGBA;
+            internalFormat = GL_RGBA;
             break;
         case 3:
             format = GL_RGB;
+            internalFormat = GL_RGB;
             break;
         case 2:
             format = GL_LUMINANCE_ALPHA;
@@ -237,8 +240,6 @@ void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixe
             format = GL_LUMINANCE;
             break;
     }
-
-    GLenum internalFormat = GL_RGBA;
 
 #ifdef OPENGL_ES
     //TODO
