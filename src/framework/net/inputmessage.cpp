@@ -23,11 +23,20 @@
 #include "inputmessage.h"
 #include <framework/util/crypt.h>
 
+#include "client/game.h"
+
+InputMessage::InputMessage() {
+    m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;
+    m_headerPos = m_maxHeaderSize;
+    m_readPos = m_maxHeaderSize;
+}
+
 void InputMessage::reset()
 {
+    m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;
     m_messageSize = 0;
-    m_readPos = MAX_HEADER_SIZE;
-    m_headerPos = MAX_HEADER_SIZE;
+    m_readPos = m_maxHeaderSize;
+    m_headerPos = m_maxHeaderSize;
 }
 
 void InputMessage::setBuffer(const std::string& buffer)
@@ -112,8 +121,8 @@ void InputMessage::fillBuffer(const uint8_t* buffer, const uint16_t size)
 
 void InputMessage::setHeaderSize(const uint16_t size)
 {
-    assert(MAX_HEADER_SIZE - size >= 0);
-    m_headerPos = MAX_HEADER_SIZE - size;
+    assert(m_maxHeaderSize - size >= 0);
+    m_headerPos = m_maxHeaderSize - size;
     m_readPos = m_headerPos;
 }
 
