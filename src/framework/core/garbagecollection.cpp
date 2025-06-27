@@ -67,12 +67,20 @@ void GarbageCollection::texture() {
 
     std::erase_if(g_textures.m_textures, [](const auto& item) {
         const auto& [key, tex] = item;
-        return tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME;
-    });
+        if (tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME) {
+            tex->setCached(false);
+            return true;
+        }
+        return false;
+        });
 
     std::erase_if(g_textures.m_animatedTextures, [](const TexturePtr& tex) {
-        return tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME;
-    });
+        if (tex.use_count() == 1 && tex->m_lastTimeUsage.ticksElapsed() > IDLE_TIME) {
+            tex->setCached(false);
+            return true;
+        }
+        return false;
+        });
 }
 
 void GarbageCollection::thingType() {

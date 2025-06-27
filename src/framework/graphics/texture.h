@@ -59,6 +59,8 @@ public:
     bool isEmpty() const { return m_id == 0; }
     bool hasRepeat() const { return getProp(repeat); }
     bool hasMipmaps() const { return getProp(hasMipMaps); }
+    bool isCached() const { return getProp(cached); }
+    virtual void setCached(bool v) { setProp(cached, v); }
     virtual bool isAnimatedTexture() const { return false; }
     bool setupSize(const Size& size);
 
@@ -91,7 +93,8 @@ protected:
         upsideDown = 1 << 2,
         repeat = 1 << 3,
         compress = 1 << 4,
-        buildMipmaps = 1 << 5
+        buildMipmaps = 1 << 5,
+        cached = 1 << 6
     };
 
     uint16_t m_props{ 0 };
