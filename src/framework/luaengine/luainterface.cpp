@@ -247,6 +247,10 @@ int LuaInterface::luaObjectSetEvent(LuaInterface* lua)
     const auto& key = lua->toString(-2);
     assert(obj);
 
+    if (key.starts_with("on")) {
+        obj->m_events.emplace(key, true);
+    }
+
     lua->remove(-2); // removes key
     lua->insert(-2); // moves obj to the top
 
