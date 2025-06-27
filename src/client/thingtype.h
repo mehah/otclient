@@ -451,8 +451,10 @@ public:
     const Timer getLastTimeUsage() const { return m_lastTimeUsage; }
 
     void unload() {
-        for (auto& data : m_textureData)
+        for (auto& data : m_textureData) {
+            if (data.source) data.source->setCached(false);
             data.source = nullptr;
+        }
     }
 
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
