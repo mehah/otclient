@@ -190,11 +190,21 @@ namespace stdext
 
     [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators) {
         std::vector<std::string> result;
-        for (auto&& part : std::views::split(str, separators)) {
-            auto begin = part.begin();
-            auto end = part.end();
-            if (begin != end)
-                result.emplace_back(begin, end);
+
+        const char* begin = str.data();
+        const char* end = begin + str.size();
+        const char* p = begin;
+
+        while (p < end) {
+            const char* token_start = p;
+            while (p < end && separators.find(*p) == std::string_view::npos)
+                ++p;
+
+            if (p > token_start)
+                result.emplace_back(token_start, p - token_start);
+
+            while (p < end && separators.find(*p) != std::string_view::npos)
+                ++p;
         }
 
         return result;
