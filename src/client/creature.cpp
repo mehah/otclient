@@ -72,11 +72,15 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
             g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * g_drawPool.getScaleFactor(), Size(g_gameConfig.getSpriteSize() * g_drawPool.getScaleFactor())), m_staticSquareColor, std::max<int>(static_cast<int>(2 * g_drawPool.getScaleFactor()), 1));
         }
 
-        const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
+        auto _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
         auto oldScaleFactor = g_drawPool.getScaleFactor();
 
         g_drawPool.setScaleFactor(getScaleFactor() + (oldScaleFactor - 1.f));
+
+        if (oldScaleFactor != g_drawPool.getScaleFactor()) {
+            _dest -= ((Point(g_gameConfig.getSpriteSize()) + getDisplacement()) / 2) * (g_drawPool.getScaleFactor() - oldScaleFactor);
+        }
 
         internalDraw(_dest);
 
