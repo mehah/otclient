@@ -39,8 +39,12 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - <details>
   <summary>Details of optimizations with respect to OTClient by edubart: </summary>
 
+  - <details>
+    <summary>Draw Render</summary>
 
-  - C++20 ( v17 , Unity build and Manifest Mode (vcpkg.json) ) build in x32 and x64
+    https://github.com/user-attachments/assets/fe5f1d7f-7195-4d65-bca6-c2b5d62d3890
+
+    </details>
 
   - <details>
     <summary>Asynchronous texture loading</summary>
@@ -82,39 +86,15 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
     </details>
 
   - <details>
-    <summary>Less memory usage</summary>
+    <summary>Garbage Collection</summary>
 
       - **i ) Description**: 
-        ```async autoreload
-        highlightingPtr to stackPos
-        new async dispatcher (using bs thread_pool)
-        optimized updateChildrenIndexStates & updateLayout
-        removed ThingTypePtr
-        scoped object to raw pointer
-        shaderPtr to shaderId
-        and multiple optimizations
+        ```
+          Garbage Collection is the feature responsible for automatically managing memory by identifying and releasing objects that are no longer in use. This allows the client to maintain efficient memory usage, avoid unnecessary data accumulation, and improve overall stability.
         ```
 
 
     </details>
-
-  - <details>
-    <summary>New Lighting System with Fading</summary>
-
-      - **i ) Video**
-
-
-      https://github.com/kokekanon/otclient.readme/assets/114332266/de8ffd14-af8c-4cc0-b5b1-2e166243bffc
-
-
-    </details>
-
-  - Walking System Improvements
-
-
-  - Supports sequenced packages and compression
-
-  - Asserts load (Tibia 13)
 
   - <details>
     <summary>Improvements UIWidgets</summary>
@@ -127,21 +107,18 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
       - **ii ) Video**
 
+      https://github.com/user-attachments/assets/35c79819-b78b-4578-a4a2-af1235139807
 
-      https://github.com/kokekanon/otclient.readme/assets/114332266/eed1464a-ae4d-4cd6-9f22-c719b4f09766
-
-
-    </details>
-  - <details>
-    <summary>Force Effect Optimization</summary>
-
-      - **i ) Description :** will avoid drawing effects on certain occasions
 
     </details>
     
-  - updated libraries
+  - C++20 ( v17 , Unity build and Manifest Mode (vcpkg.json) ) build in x32 and x64
 
+  - Walking System Improvements
 
+  - Supports sequenced packages and compression
+
+  - Asserts load (Tibia 13)
 </details>
 
 - <details>
@@ -236,7 +213,6 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 
-- Drawpool 3
 - Tile Widget [Wiki](https://github.com/mehah/otclient/wiki/Tutorial-Attached-Effects)
 
 | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="250" alt="Haskanoid Video" style="max-width:250px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/raw/main/Picture/Attached%20Effect/Tile/003_particulas.gif?raw=true" width="310" alt="Space Invaders" style="max-width: 310px;"> |
