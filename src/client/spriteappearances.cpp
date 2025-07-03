@@ -32,6 +32,11 @@
 
 #include "lzma.h"
 
+constexpr size_t BYTES_IN_SPRITE_SHEET = 384 * 384 * 4;
+constexpr size_t LZMA_UNCOMPRESSED_SIZE = BYTES_IN_SPRITE_SHEET + 122;
+constexpr size_t LZMA_PROPS_SIZE = 5;
+constexpr size_t LZMA_HEADER_SIZE = LZMA_PROPS_SIZE + 8;
+
  // warnings related to protobuf
  // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
 
@@ -50,6 +55,20 @@ void SpriteAppearances::terminate()
     unload();
 }
 
+#pragma pack(push,1)
+struct BmpHeader {
+  uint16_t type;
+  uint32_t fileSize;
+  uint16_t r1, r2;
+  uint32_t dataOffset;
+  uint32_t dibHeaderSize;
+  int32_t  width;
+  int32_t  height;
+  uint16_t planes;
+  uint16_t bpp;
+};
+#pragma pack(pop)
+
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
     if (sheet->data)
@@ -58,105 +77,106 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
     std::scoped_lock lock(sheet->m_mutex);
 
     try {
-        const auto& path = fmt::format("{}{}", g_spriteAppearances.getPath(), sheet->file);
-        if (!g_resources.fileExists(path))
+        const auto& fullPath = fmt::format("{}{}", getPath(), sheet->file);
+        if (!g_resources.fileExists(fullPath)) {
             return false;
+        }
 
-        const auto& fin = g_resources.openFile(path);
+        auto fin = g_resources.openFile(fullPath);
         fin->cache(true);
-
-        const auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE); // uncompressed size, bmp file + 122 bytes header
 
         /*
            CIP's header, always 32 (0x20) bytes.
            Header format:
-           [0x00, X):          A variable number of NULL (0x00) bytes. The amount of pad-bytes can vary depending on how many
-                               bytes the "7-bit integer encoded LZMA file size" take.
+           [0x00, X):          A variable number of NULL (0x00) bytes.
            [X, X + 0x05):      The constant byte sequence [0x70 0x0A 0xFA 0x80 0x24]
-           [X + 0x05, 0x20]:   LZMA file size (Note: excluding the 32 bytes of this header) encoded as a 7-bit integer
-       */
+           [X + 0x05, 0x20]:   LZMA file size (excluding these 32 bytes) encoded as a 7-bit integer
+        */
 
+        auto decompressed = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE);
+
+        // Skip CIP header
         while (fin->getU8() == 0x00);
         fin->skip(4);
         while ((fin->getU8() & 0x80) == 0x80);
 
         const uint8_t lclppb = fin->getU8();
-
         lzma_options_lzma options{};
         options.lc = lclppb % 9;
+        options.lp = (lclppb / 9) % 5;
+        options.pb = (lclppb / 9) / 5;
 
-        const int remainder = lclppb / 9;
-        options.lp = remainder % 5;
-        options.pb = remainder / 5;
-
-        uint32_t dictionarySize = 0;
-        for (uint8_t i = 0; i < 4; ++i) {
-            dictionarySize += fin->getU8() << (i * 8);
+        uint32_t dictSize = 0;
+        for (int i = 0; i < 4; ++i) {
+            dictSize |= fin->getU8() << (8 * i);
         }
+        options.dict_size = dictSize;
 
-        options.dict_size = dictionarySize;
+        fin->skip(8); // Compressed size in header
 
-        fin->skip(8); // cip compressed size
-
-        lzma_stream stream = LZMA_STREAM_INIT;
-
+        // Initialize decoder raw LZMA1
+        lzma_stream strm = LZMA_STREAM_INIT;
         const lzma_filter filters[2] = {
-            lzma_filter{LZMA_FILTER_LZMA1, &options},
-            lzma_filter{LZMA_VLI_UNKNOWN, nullptr}
+            { LZMA_FILTER_LZMA1, &options },
+            { LZMA_VLI_UNKNOWN, nullptr }
         };
-
-        lzma_ret ret = lzma_raw_decoder(&stream, filters);
-        if (ret != LZMA_OK) {
-            throw stdext::exception(fmt::format("failed to initialize lzma raw decoder result: {}", ret));
+        if (lzma_raw_decoder(&strm, filters) != LZMA_OK) {
+            throw stdext::exception("lzma_raw_decoder failed");
         }
 
-        stream.next_in = &fin->m_data.data()[fin->tell()];
-        stream.next_out = decompressed.get();
-        stream.avail_in = fin->size();
-        stream.avail_out = LZMA_UNCOMPRESSED_SIZE;
+        // Prepare input
+        const size_t off = fin->tell();
+        const size_t remaining = fin->size() - off;
+        strm.next_in = fin->m_data.data() + off;
+        strm.avail_in = remaining;
+        strm.next_out = decompressed.get();
+        strm.avail_out = LZMA_UNCOMPRESSED_SIZE;
 
-        ret = lzma_code(&stream, LZMA_RUN);
+        lzma_ret ret = lzma_code(&strm, LZMA_FINISH);
+        lzma_end(&strm);
         if (ret != LZMA_STREAM_END) {
-            throw stdext::exception(fmt::format("failed to decode lzma buffer result: {}", ret));
+            throw stdext::exception(fmt::format("lzma_code failed: {}", ret));
         }
 
-        lzma_end(&stream); // free memory
+        auto hdr = reinterpret_cast<const BmpHeader*>(decompressed.get());
+        if (hdr->type != 0x4D42 || hdr->bpp != 32) {
+            throw std::runtime_error("invalid BMP in sprite sheet");
+        }
 
-        // pixel data start (bmp header end offset)
-        uint32_t data;
-        std::memcpy(&data, decompressed.get() + 10, sizeof(uint32_t));
+        sheet->widthPx   = hdr->width;
+        sheet->heightPx  = std::abs(hdr->height);
+        sheet->rowStride = sheet->widthPx * 4;
 
-        uint8_t* bufferStart = decompressed.get() + data;
+        uint8_t* pixelPtr = decompressed.get() + hdr->dataOffset;
+        const size_t pixelBytes = size_t(sheet->rowStride) * sheet->heightPx;
 
-        // reverse channels
-        for (uint8_t* itr = bufferStart; itr < bufferStart + BYTES_IN_SPRITE_SHEET; itr += 4) {
-            std::swap(*(itr + 0), *(itr + 2));
+        // reverse channels (B <-> R)
+        for (size_t i = 0; i < pixelBytes; i += 4) {
+            std::swap(pixelPtr[i], pixelPtr[i + 2]);
         }
 
         // flip vertically
-        for (int y = 0; y < 192; ++y) {
-            uint8_t* itr1 = &bufferStart[y * SPRITE_SHEET_WIDTH_BYTES];
-            uint8_t* itr2 = &bufferStart[(SpriteSheet::SIZE - y - 1) * SPRITE_SHEET_WIDTH_BYTES];
-
-            for (std::size_t x = 0; x < SPRITE_SHEET_WIDTH_BYTES; ++x) {
-                std::swap(*(itr1 + x), *(itr2 + x));
-            }
+        for (int y = 0; y < sheet->heightPx / 2; ++y) {
+            auto* top    = pixelPtr + y * sheet->rowStride;
+            auto* bottom = pixelPtr + (sheet->heightPx - 1 - y) * sheet->rowStride;
+            std::swap_ranges(top, top + sheet->rowStride, bottom);
         }
 
         // fix magenta
-        for (int offset = 0; offset < BYTES_IN_SPRITE_SHEET; offset += 4) {
-            std::memcpy(&data, bufferStart + offset, 4);
-            if (data == 0xFF00FF) {
-                std::memset(bufferStart + offset, 0x00, 4);
+        for (size_t offb = 0; offb < pixelBytes; offb += 4) {
+            uint32_t px;
+            std::memcpy(&px, pixelPtr + offb, 4);
+            if ((px & 0x00FFFFFFu) == 0x00FF00FFu) {
+                std::fill(pixelPtr + offb, pixelPtr + offb + 4, 0);
             }
         }
 
-        sheet->data = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE);
-        std::memcpy(sheet->data.get(), bufferStart, BYTES_IN_SPRITE_SHEET);
+        sheet->data = std::make_unique<uint8_t[]>(pixelBytes);
+        std::memcpy(sheet->data.get(), pixelPtr, pixelBytes);
 
         return true;
     } catch (const std::exception& e) {
-        g_logger.error("Failed to load single sprite sheet '{}': {}", sheet->file, e.what());
+        g_logger.error("Failed to load sprite sheet '{}': {}", sheet->file, e.what());
         return false;
     }
 }
@@ -204,13 +224,41 @@ ImagePtr SpriteAppearances::getSpriteImage(const int id)
 
         const int spriteOffset = id - sheet->firstId;
         const int allColumns = sheet->getColumns();
+        const int spriteHeight = size.height();
+        const int maxRows = sheet->heightPx / spriteHeight;
         const int spriteRow = std::floor(static_cast<float>(spriteOffset) / static_cast<float>(allColumns));
         const int spriteColumn = spriteOffset % allColumns;
 
-        const int spriteWidthBytes = size.width() * 4;
+        if (spriteColumn < 0 || spriteColumn >= allColumns ||
+                spriteRow    < 0 || spriteRow    >= maxRows)
+        {
+            g_logger.error(
+                "Sprite OOB! file={} layout={} sheet={}×{} sprite={}×{} "
+                "id={} firstId={} lastId={} offset={} > row={},column={} cols={}, rows={}",
+                sheet->file,
+                static_cast<int>(sheet->spriteLayout),
+                sheet->widthPx, sheet->heightPx,
+                size.width(), size.height(),
+                id, sheet->firstId, sheet->lastId,
+                spriteOffset, spriteRow, spriteColumn,
+                allColumns, maxRows
+            );
+            return nullptr;
+        }
 
-        for (int height = size.height() * spriteRow, offset = 0; height < size.height() + (spriteRow * size.height()); height++, offset++) {
-            std::memcpy(&pixelData[offset * spriteWidthBytes], &sheet->data[(height * SPRITE_SHEET_WIDTH_BYTES) + (spriteColumn * spriteWidthBytes)], spriteWidthBytes);
+        const int spriteWidthBytes = size.width() * 4;
+        const size_t rowBytes = sheet->rowStride;
+        const int startRow = spriteRow * spriteHeight;
+        for (int y = 0; y < spriteHeight; ++y) {
+            size_t srcOffset = size_t(startRow + y) * rowBytes
+                            + size_t(spriteColumn) * spriteWidthBytes;
+            uint8_t* dst = pixelData + size_t(y) * spriteWidthBytes;
+
+            assert(srcOffset + spriteWidthBytes <= size_t(rowBytes) * sheet->heightPx);
+
+            std::memcpy(dst,
+                        sheet->data.get() + srcOffset,
+                        spriteWidthBytes);
         }
 
         if (!image->hasTransparentPixel()) {

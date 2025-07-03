@@ -150,64 +150,113 @@ bool ThingTypeManager::loadAppearances(const std::string& file)
     try {
         if (!g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
             g_spriteAppearances.unload();
-            int spritesCount = 0;
+            g_spriteAppearances.setPath(file);
+
+            int maxSpriteId = 0;
             std::string appearancesFile;
-            json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
+
+            const auto contents = g_resources.readFileContents(
+                g_resources.resolvePath(
+                    g_resources.guessFilePath(file + "catalog-content", "json")
+                )
+            );
+            json document = json::parse(contents);
+
             for (const auto& obj : document) {
                 const auto& type = obj["type"];
                 if (type == "appearances") {
-                    appearancesFile = obj["file"];
-                } else if (type == "sprite") {
-                    int lastSpriteId = obj["lastspriteid"].get<int>();
-                    g_spriteAppearances.addSpriteSheet(std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>()));
-                    spritesCount = std::max<int>(spritesCount, lastSpriteId);
+                    appearancesFile = obj["file"].get<std::string>();
+                    continue;
                 }
+
+                if (type != "sprite") {
+                    continue;
+                }
+
+                // Extract paarameters from JSON object
+                const int firstId    = obj["firstspriteid"].get<int>();
+                const int jsonLastId = obj["lastspriteid"].get<int>();
+                const int jsonCount  = jsonLastId - firstId + 1;
+                const SpriteLayout layout = static_cast<SpriteLayout>(obj["spritetype"].get<int>());
+                const std::string fileName = obj["file"].get<std::string>();
+
+                auto sheet = std::make_shared<SpriteSheet>(firstId, jsonLastId, layout, fileName);
+                if (!g_spriteAppearances.loadSpriteSheet(sheet)) {
+                    g_logger.error("Failed to load sprite sheet '{}', skipping.", fileName);
+                    continue;
+                }
+
+                // Regulates lastId if the JSON declares more sprites than will fit
+                const Size spriteSize = sheet->getSpriteSize();
+                const int cols       = sheet->widthPx  / spriteSize.width();
+                const int rows       = sheet->heightPx / spriteSize.height();
+                const int totalCells = cols * rows;
+                if (jsonCount > totalCells) {
+                    sheet->lastId = firstId + totalCells - 1;
+                }
+
+                g_spriteAppearances.addSpriteSheet(sheet);
+                maxSpriteId = std::max<int>(maxSpriteId, sheet->lastId);
             }
-            g_spriteAppearances.setSpritesCount(spritesCount + 1);
-            g_spriteAppearances.setPath(file);
-            // load appearances.dat
+
+            g_spriteAppearances.setSpritesCount(maxSpriteId + 1);
+
             std::stringstream fin;
-            g_resources.readFileStream(g_resources.resolvePath(fmt::format("{}{}", file, appearancesFile)), fin);
-            auto appearancesLib = appearances::Appearances();
+            g_resources.readFileStream(
+                g_resources.resolvePath(fmt::format("{}{}", file, appearancesFile)),
+                fin
+            );
+            appearances::Appearances appearancesLib;
             if (!appearancesLib.ParseFromIstream(&fin)) {
                 throw stdext::exception("Couldn't parse appearances lib.");
             }
+
             for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
-                const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
-                switch (category) {
-                    case ThingCategoryItem: appearances = &appearancesLib.object(); break;
-                    case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
-                    case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
-                    case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
-                    default: return false;
+                const auto* appearances = [&]() {
+                    switch (category) {
+                        case ThingCategoryItem:     return &appearancesLib.object();
+                        case ThingCategoryCreature: return &appearancesLib.outfit();
+                        case ThingCategoryEffect:   return &appearancesLib.effect();
+                        case ThingCategoryMissile:  return &appearancesLib.missile();
+                        default:                    return (const google::protobuf::RepeatedPtrField<appearances::Appearance>*)nullptr;
+                    }
+                }();
+                if (!appearances) {
+                    return false;
                 }
-                // fix for custom asserts, where ids are not sorted.
-                uint32_t lastAppearanceId = 0;
-                for (const auto& appearance : *appearances) {
-                    if (appearance.id() > lastAppearanceId)
-                        lastAppearanceId = appearance.id();
+
+                uint32_t lastAppId = 0;
+                for (const auto& a : *appearances) {
+                    lastAppId = std::max<int>(lastAppId, static_cast<uint32_t>(a.id()));
                 }
+
                 auto& things = m_thingTypes[category];
                 things.clear();
-                things.resize(lastAppearanceId + 1, m_nullThingType);
+                things.resize(lastAppId + 1, m_nullThingType);
+
                 for (const auto& appearance : *appearances) {
-                    const auto& type = std::make_shared<ThingType>();
-                    const uint16_t id = appearance.id();
-                    type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
-                    m_thingTypes[category][id] = type;
+                    auto type = std::make_shared<ThingType>();
+                    type->unserializeAppearance(
+                        static_cast<uint16_t>(appearance.id()),
+                        static_cast<ThingCategory>(category),
+                        appearance
+                    );
+                    things[appearance.id()] = type;
                 }
             }
             m_datLoaded = true;
         } else {
-            std::stringstream datFileStream;
-            auto appearancesLib = appearances::Appearances();
-            g_resources.readFileStream(g_resources.resolvePath(g_resources.guessFilePath(file, "dat")), datFileStream);
-            if (!appearancesLib.ParseFromIstream(&datFileStream)) {
+            std::stringstream datStream;
+            g_resources.readFileStream(
+                g_resources.resolvePath(g_resources.guessFilePath(file, "dat")),
+                datStream
+            );
+            appearances::Appearances lib;
+            if (!lib.ParseFromIstream(&datStream)) {
                 throw stdext::exception("Couldn't parse appearances.dat.");
             }
-            for (const auto& appearance : appearancesLib.object()) {
-                const uint16_t id = appearance.id();
-                if (auto* type = getRawThingType(id, ThingCategoryItem)) {
+            for (const auto& appearance : lib.object()) {
+                if (auto* type = getRawThingType(appearance.id(), ThingCategoryItem)) {
                     type->applyAppearanceFlags(appearance.flags());
                 }
             }

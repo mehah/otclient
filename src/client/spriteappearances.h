@@ -61,7 +61,13 @@ public:
     }
 
     // 64 pixel width == 6 columns each 64x or 32 pixels, 12 columns
-    int getColumns() const { return SIZE / getSpriteSize().width(); }
+    int getColumns() const {
+        return widthPx / getSpriteSize().width();
+    }
+
+    int widthPx = 0;
+    int heightPx = 0;
+    int rowStride = 0;
 
     int firstId = 0;
     int lastId = 0;

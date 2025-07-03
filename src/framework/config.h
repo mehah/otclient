@@ -23,12 +23,6 @@
 #pragma once
 #include <obfuscate.h>
 
- // APPEARANCES
-#define BYTES_IN_SPRITE_SHEET 384 * 384 * 4
-#define LZMA_UNCOMPRESSED_SIZE BYTES_IN_SPRITE_SHEET + 122
-#define LZMA_HEADER_SIZE LZMA_PROPS_SIZE + 8
-#define SPRITE_SHEET_WIDTH_BYTES 384 * 4
-
 // ENCRYPTION SYSTEM
 // Enable client encryption
 #define ENABLE_ENCRYPTION 0
