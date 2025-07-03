@@ -227,6 +227,7 @@ if(ANDROID)
 	set(MINIZIP_INCLUDE_DIR ${MINIZIP_INCLUDE_DIR} ${Android_INCLUDES}/minizip)
 	set(MINIZIP_LIBRARY ${MINIZIP_LIBRARY} ${Android_LIBRARIES}/libminizip.a)
 	find_package(EGL REQUIRED)
+	find_package(game-activity REQUIRED CONFIG)
 else()
 	if(NOT WASM)
 		find_package(OpenGL REQUIRED)
@@ -527,9 +528,6 @@ elseif(ANDROID)
 		${NLOHMANN_JSON_INCLUDE_DIR}
 		${MINIZIP_INCLUDE_DIR}
 	)
-
-        find_package(game-activity REQUIRED CONFIG)
-
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
 		${LUA_LIBRARY}
