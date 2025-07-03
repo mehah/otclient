@@ -1,9 +1,9 @@
 #ifdef ANDROID
 
-#include <game-activity/GameActivity.cpp>
-#include <game-text-input/gametextinput.cpp>
+#include <game-activity/GameActivity.h>
+#include <game-text-input/gametextinput.h>
 extern "C" {
-  #include <game-activity/native_app_glue/android_native_app_glue.c>
+  #include <game-activity/native_app_glue/android_native_app_glue.h>
 }
 
 #endif
