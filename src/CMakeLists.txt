@@ -226,7 +226,6 @@ if(ANDROID)
 	set(OpenAL_LIBRARY ${OpenAL_LIBRARY} ${Android_LIBRARIES}/libopenal.a)
 	set(MINIZIP_INCLUDE_DIR ${MINIZIP_INCLUDE_DIR} ${Android_INCLUDES}/minizip)
 	set(MINIZIP_LIBRARY ${MINIZIP_LIBRARY} ${Android_LIBRARIES}/libminizip.a)
-	find_package(game-activity REQUIRED CONFIG)
 	find_package(EGL REQUIRED)
 else()
 	if(NOT WASM)
@@ -528,6 +527,9 @@ elseif(ANDROID)
 		${NLOHMANN_JSON_INCLUDE_DIR}
 		${MINIZIP_INCLUDE_DIR}
 	)
+
+        find_package(game-activity REQUIRED CONFIG)
+
 	target_link_libraries(${PROJECT_NAME}
 		PRIVATE
 		${LUA_LIBRARY}
