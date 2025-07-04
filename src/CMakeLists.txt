@@ -462,7 +462,7 @@ if(MSVC)
   if(BUILD_STATIC_LIBRARY)
     log_option_enabled("STATIC_LIBRARY")
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib")
-    find_package(Vorbis REQUIRED)
+    find_package(Vorbis CONFIG REQUIRED)
     set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
   else()
@@ -550,6 +550,8 @@ elseif(ANDROID)
           Threads::Threads
           asio::asio
           OpenSLES
+          Vorbis::vorbis
+          Vorbis::vorbisfile
           LibLZMA::LibLZMA
           game-activity::game-activity
           GLESv3
