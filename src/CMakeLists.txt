@@ -216,7 +216,7 @@ if(TOGGLE_FRAMEWORK_SOUND)
     find_package(OpenAL CONFIG REQUIRED)
   endif()
   find_package(VorbisFile REQUIRED)
-  find_package(Vorbis CONFIG REQUIRED)
+  find_package(Vorbis REQUIRED)
   find_package(Ogg CONFIG REQUIRED)
 endif()
 if(ANDROID)
@@ -502,7 +502,7 @@ if(MSVC)
           ${STDUUID}
 
           protobuf::libprotobuf protobuf
-          absl::base
+          absl::log_internal_check_op
           Threads::Threads
           GLEW::GLEW
           asio::asio
@@ -520,6 +520,7 @@ elseif(ANDROID)
           ${LUAJIT_INCLUDE_DIR}
           ${CMAKE_THREAD_LIBS_INIT}
           ${Protobuf_INCLUDE_DIRS}
+          ${VORBISFILE_INCLUDE_DIR}
           ${GMP_INCLUDE_DIR}
           ${OPENSSL_INCLUDE_DIR}
           ${PHYSFS_INCLUDE_DIR}
@@ -546,12 +547,10 @@ elseif(ANDROID)
           ${MINIZIP_LIBRARY}
 
           protobuf::libprotobuf protobuf
-          absl::base
+          absl::log_internal_check_op
           Threads::Threads
           asio::asio
           OpenSLES
-          Vorbis::vorbis
-          Vorbis::vorbisfile
           LibLZMA::LibLZMA
           game-activity::game-activity
           GLESv3
@@ -598,7 +597,7 @@ elseif(WASM)
           ${HTTPLIB_LIBRARY}
 
           protobuf::libprotobuf protobuf
-          absl::base
+          absl::log_internal_check_op
 
           Threads::Threads
           asio::asio
@@ -681,7 +680,7 @@ else() # Linux
           ${HTTPLIB_LIBRARY}
 
           protobuf::libprotobuf protobuf
-          absl::base
+          absl::log_internal_check_op
           Threads::Threads
           X11::X11
           asio::asio
