@@ -520,7 +520,6 @@ elseif(ANDROID)
           ${LUAJIT_INCLUDE_DIR}
           ${CMAKE_THREAD_LIBS_INIT}
           ${Protobuf_INCLUDE_DIRS}
-          ${VORBISFILE_INCLUDE_DIR}
           ${GMP_INCLUDE_DIR}
           ${OPENSSL_INCLUDE_DIR}
           ${PHYSFS_INCLUDE_DIR}
