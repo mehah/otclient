@@ -178,8 +178,6 @@ function hide()
     topMenu:hide()
     if modules.game_interface.currentViewMode == 2 then
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
-    else
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     end
 end
   
