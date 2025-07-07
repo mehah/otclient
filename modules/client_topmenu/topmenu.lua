@@ -180,7 +180,7 @@ function hide()
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     end
 end
-  
+
 function show()
     topMenu:show()
     topMenu:raise()
