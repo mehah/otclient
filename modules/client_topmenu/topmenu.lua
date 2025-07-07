@@ -176,13 +176,18 @@ end
 
 function hide()
     topMenu:hide()
-    modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
+    if modules.game_interface.currentViewMode == 2 then
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
+    end
 end
 
 function show()
     topMenu:show()
     topMenu:raise()
     topMenu:focus()
+    if modules.game_interface.currentViewMode == 2 then
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
+    end
 end
 
 function online()
