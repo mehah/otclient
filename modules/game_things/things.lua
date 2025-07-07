@@ -28,7 +28,6 @@ local function tryLoadDatWithFallbacks(datPath)
         { 1, 2, 3 }
     }
 
-    g_logger.setLevel(5)
     for _, combo in ipairs(combinations) do
         for _, idx in ipairs(combo) do
             g_game.enableFeature(featureFlags[idx])
@@ -38,7 +37,6 @@ local function tryLoadDatWithFallbacks(datPath)
             return true
         end
     end
-    g_logger.setLevel(1)
 
     return false
 end
@@ -64,9 +62,11 @@ local function load(version)
             sprPath = resolvepath('/data/things/' .. version .. '/Tibia')
         end
 
+        g_logger.setLevel(5)
         if not tryLoadDatWithFallbacks(datPath) then
             errorList[#errorList + 1] = tr('Unable to load dat file, please place a valid dat in \'%s.dat\'', datPath)
         end
+        g_logger.setLevel(1)
 
         if not g_sprites.loadSpr(sprPath) then
             errorList[#errorList + 1] = tr('Unable to load spr file, please place a valid spr in \'%s.spr\'', sprPath)
