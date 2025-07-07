@@ -174,30 +174,22 @@ function terminate()
     Keybind.delete("UI", "Toggle Top Menu")
 end
 
-function hide()  
-    topMenu:hide()  
-    if modules.game_interface.currentViewMode == 2 then  
-        scheduleEvent(function()  
-            if not topMenu:isVisible() then  
-                modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)  
-            end  
-        end, 1)  
-    else  
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)  
-    end  
-end  
+function hide()
+    topMenu:hide()
+    if modules.game_interface.currentViewMode == 2 then
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
+    else
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
+    end
+end
   
-function show()  
-    topMenu:show()  
-    topMenu:raise()  
-    topMenu:focus()  
-    if modules.game_interface.currentViewMode == 2 then  
-        scheduleEvent(function()  
-            if topMenu:isVisible() then  
-                modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
-            end  
-        end, 1)  
-    end  
+function show()
+    topMenu:show()
+    topMenu:raise()
+    topMenu:focus()
+    if modules.game_interface.currentViewMode == 2 then
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorBottom)
+    end
 end
 
 function online()
