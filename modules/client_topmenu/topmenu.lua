@@ -179,7 +179,7 @@ function hide()
     if modules.game_interface.currentViewMode == 2 then
         modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
     else
-        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'parent', AnchorTop)
+        modules.game_interface.getRootPanel():addAnchor(AnchorTop, 'topMenu', AnchorTop)
     end
 end
 
@@ -196,7 +196,9 @@ function online()
     showGameButtons()
 
     addEvent(function()
-        hide()
+        if modules.game_interface.currentViewMode ~= 2 and g_game.isOnline() then
+            hide()
+        end
         local showPing = modules.client_options.getOption('showPing')
         local pingFeatureAvailable = g_game.getFeature(GameClientPing) or g_game.getFeature(GameExtendedClientPing)
         
