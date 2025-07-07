@@ -28,6 +28,7 @@ local function tryLoadDatWithFallbacks(datPath)
         { 1, 2, 3 }
     }
 
+    g_logger.setLevel(5)
     for _, combo in ipairs(combinations) do
         for _, idx in ipairs(combo) do
             g_game.enableFeature(featureFlags[idx])
@@ -37,6 +38,7 @@ local function tryLoadDatWithFallbacks(datPath)
             return true
         end
     end
+    g_logger.setLevel(1)
 
     return false
 end
