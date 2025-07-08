@@ -259,6 +259,10 @@ function addStoreButton(id, description, image, callback, front)
     return createButton_large(id, description, image, callback, true, front)
 end
 
+function getButton(id)
+    return optionsController.ui.onPanel.options:recursiveGetChildById(id)
+end
+
 function toggleExtendedViewButtons(extended)
     local optionsPanel = optionsController.ui.onPanel.options
     local specialsPanel = optionsController.ui.onPanel.store

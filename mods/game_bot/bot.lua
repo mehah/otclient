@@ -182,6 +182,10 @@ function refresh()
   if not g_game.isOnline() or not settings[index].enabled then
     statusLabel:setOn(true)
     statusLabel:setText("Status: disabled\nPress off button to enable")
+    analyzerButton = modules.game_mainpanel.getButton("botAnalyzersButton")
+    if analyzerButton then
+      analyzerButton:destroy()
+    end
     return
   end
 
