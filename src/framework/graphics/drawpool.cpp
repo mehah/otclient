@@ -30,18 +30,15 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
-        }
-        else if (type == DrawPoolType::FOREGROUND) {
+        } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(10);
 
             // creates a temporary framebuffer with smoothing.
             pool->m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
         }
-    }
-    else if (type == DrawPoolType::LIGHT) {
+    } else if (type == DrawPoolType::LIGHT) {
         pool->m_hashCtrl = true;
-    }
-    else {
+    } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
         pool->setFPS(60);
     }
@@ -61,8 +58,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     if (m_type == DrawPoolType::FOREGROUND) {
         order = FIRST;
         agroup = false;
-    }
-    else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
+    } else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
         order = THIRD;
 
     if (agroup) {
@@ -76,8 +72,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
             coords->append(coordsBuffer.get());
         else
             addCoords(coords, method);
-    }
-    else {
+    } else {
         bool addNewObj = true;
 
         auto& list = m_objects[order];
@@ -99,8 +94,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
 
             if (coordsBuffer) {
                 draw.coords->append(coordsBuffer.get());
-            }
-            else
+            } else
                 addCoords(draw.coords.get(), method);
         }
     }
@@ -112,17 +106,13 @@ void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method)
 {
     if (method.type == DrawMethodType::BOUNDING_RECT) {
         buffer->addBoudingRect(method.dest, method.intValue);
-    }
-    else if (method.type == DrawMethodType::RECT) {
+    } else if (method.type == DrawMethodType::RECT) {
         buffer->addRect(method.dest, method.src);
-    }
-    else if (method.type == DrawMethodType::TRIANGLE) {
+    } else if (method.type == DrawMethodType::TRIANGLE) {
         buffer->addTriangle(method.a, method.b, method.c);
-    }
-    else if (method.type == DrawMethodType::UPSIDEDOWN_RECT) {
+    } else if (method.type == DrawMethodType::UPSIDEDOWN_RECT) {
         buffer->addUpsideDownRect(method.dest, method.src);
-    }
-    else if (method.type == DrawMethodType::REPEATED_RECT) {
+    } else if (method.type == DrawMethodType::REPEATED_RECT) {
         buffer->addRepeatedRects(method.dest, method.src);
     }
 }
@@ -167,11 +157,9 @@ bool DrawPool::updateHash(const DrawMethod& method, const TexturePtr& texture, c
             if (!method.a.isNull()) stdext::hash_union(hash, method.a.hash());
             if (!method.b.isNull()) stdext::hash_union(hash, method.b.hash());
             if (!method.c.isNull()) stdext::hash_union(hash, method.c.hash());
-        }
-        else if (method.type == DrawMethodType::BOUNDING_RECT) {
+        } else if (method.type == DrawMethodType::BOUNDING_RECT) {
             if (method.intValue) stdext::hash_combine(hash, method.intValue);
-        }
-        else {
+        } else {
             if (method.dest.isValid()) stdext::hash_union(hash, method.dest.hash());
             if (method.src.isValid()) stdext::hash_union(hash, method.src.hash());
         }
@@ -193,8 +181,7 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& c
     if (texture) {
         if (texture->isEmpty() || !texture->isCached()) {
             copy.texture = texture;
-        }
-        else {
+        } else {
             copy.textureId = texture->getId();
             copy.textureMatrixId = texture->getTransformMatrixId();
         }
@@ -238,8 +225,7 @@ void DrawPool::setShaderProgram(const PainterShaderProgramPtr& shaderProgram, co
 
         getCurrentState().shaderProgram = shaderProgram.get();
         getCurrentState().action = action;
-    }
-    else {
+    } else {
         getCurrentState().shaderProgram = nullptr;
         getCurrentState().action = nullptr;
     }
@@ -267,7 +253,7 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint()
 {
-    if (m_repaint)
+    if (!m_repaint.load(std::memory_order_acquire))
         return false;
 
     uint16_t refreshDelay = m_refreshDelay;
@@ -346,8 +332,7 @@ void DrawPool::PoolState::execute() const {
     if (texture) {
         texture->create();
         g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
-    }
-    else
+    } else
         g_painter->setTexture(textureId, textureMatrixId);
 }
 
@@ -392,7 +377,7 @@ void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->resize(size);
         frame->bind();
-        });
+    });
 }
 void DrawPool::releaseFrameBuffer(const Rect& dest)
 {
@@ -403,7 +388,7 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
         frame->release();
         drawState.execute();
         frame->draw(dest);
-        });
+    });
 
     if (hasFrameBuffer() && !dest.isNull()) m_hashCtrl.put(dest.hash());
     --m_bindedFramebuffers;

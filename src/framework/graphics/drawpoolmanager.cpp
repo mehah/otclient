@@ -196,19 +196,16 @@ void DrawPoolManager::commit(const DrawPoolType type)
     const auto pool = get(type);
 
     std::scoped_lock l(pool->m_mutexDraw);
-
-    pool->m_repaint = pool->canRepaint();
+    pool->release(pool->m_repaint = pool->canRepaint());
     if (pool->m_repaint) {
         pool->m_refreshTimer.restart();
     }
-
-    pool->release(pool->m_repaint);
 }
 
 void DrawPoolManager::drawObjects(DrawPool* pool) {
     const auto hasFramebuffer = pool->hasFrameBuffer();
 
-    if (hasFramebuffer && !pool->m_repaint.exchange(false, std::memory_order_acq_rel))
+    if (!pool->m_repaint.exchange(false, std::memory_order_acq_rel) && hasFramebuffer)
         return;
 
     std::scoped_lock l(pool->m_mutexDraw);
