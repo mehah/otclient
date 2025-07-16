@@ -168,7 +168,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (!alwaysDraw && pool->m_repaint.load(std::memory_order_acquire)) {
+    if (pool->m_repaint.load(std::memory_order_acquire)) {
         resetSelectedPool();
         return;
     }
