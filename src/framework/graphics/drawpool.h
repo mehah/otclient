@@ -320,10 +320,11 @@ private:
                     objs.clear();
                 }
             }
+
+            std::swap(m_coordsCache[0], m_coordsCache[1]);
         }
 
         m_objectsFlushed.clear();
-        std::swap(m_coordsCache[0], m_coordsCache[1]);
     }
 
     void resetOnlyOnceParameters() {
