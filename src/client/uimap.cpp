@@ -55,6 +55,7 @@ void UIMap::draw(const DrawPoolType drawPane) {
         }, m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect, Color::black);
     } else if (drawPane == DrawPoolType::LIGHT) {
         g_drawPool.preDraw(drawPane, [this] {
+            m_mapView->m_lightView->clear();
             m_mapView->drawLights();
             m_mapView->m_lightView->draw(m_mapView->m_posInfo.rect, m_mapView->m_posInfo.srcRect);
         }, true);
