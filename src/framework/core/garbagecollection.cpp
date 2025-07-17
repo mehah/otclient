@@ -51,7 +51,6 @@ void GarbageCollection::poll() {
 }
 
 void GarbageCollection::lua() {
-    std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
     g_lua.collectGarbage();
 }
 
@@ -62,8 +61,6 @@ void GarbageCollection::drawpoll() {
 
 void GarbageCollection::texture() {
     static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
-
-    std::scoped_lock l(g_textures.m_mutex, g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
 
     std::erase_if(g_textures.m_textures, [](const auto& item) {
         const auto& [key, tex] = item;
@@ -104,7 +101,6 @@ void GarbageCollection::thingType() {
     }
 
     if (!thingTypesToUnload.empty()) {
-        std::scoped_lock l(g_drawPool.get(DrawPoolType::MAP)->getMutex(), g_drawPool.get(DrawPoolType::FOREGROUND)->getMutex());
         for (auto& thingType : thingTypesToUnload) {
             thingType->unload();
         }

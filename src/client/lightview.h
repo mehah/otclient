@@ -41,7 +41,6 @@ public:
 
     void setGlobalLight(const Light& light)
     {
-        std::scoped_lock l(m_pool->getMutex());
         m_isDark = light.intensity < 250;
         m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
     }

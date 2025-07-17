@@ -139,8 +139,6 @@ public:
     void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
-    std::mutex& getMutex() { return m_mutexDraw; }
-
     bool isDrawing() const {
         return m_repaint.load(std::memory_order_acquire);
     }
@@ -162,7 +160,6 @@ public:
         if (repaint) {
             m_refreshTimer.restart();
 
-            std::scoped_lock l(m_mutexDraw);
             m_objectsDraw.clear();
             if (!m_objectsFlushed.empty()) {
                 if (m_objectsDraw.size() < m_objectsFlushed.size())
