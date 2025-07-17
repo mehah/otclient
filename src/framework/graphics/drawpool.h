@@ -142,7 +142,7 @@ public:
     std::mutex& getMutex() { return m_mutexDraw; }
 
     bool isDrawing() const {
-        return m_repaint;
+        return m_repaint.load(std::memory_order_acquire);
     }
 
     auto& getHashController() {
@@ -155,6 +155,38 @@ public:
             buffer.coords.clear();
             buffer.last = 0;
         }
+    }
+
+    void release() {
+        m_repaint.store(canRepaint(), std::memory_order_release);
+        std::scoped_lock l(m_mutexDraw);
+        m_objectsDraw.clear();
+
+        if (m_repaint) {
+            m_refreshTimer.restart();
+
+            if (!m_objectsFlushed.empty()) {
+                if (m_objectsDraw.size() < m_objectsFlushed.size())
+                    m_objectsDraw.swap(m_objectsFlushed);
+
+                if (!m_objectsFlushed.empty())
+                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
+            }
+
+            for (auto& objs : m_objects) {
+                if (m_objectsDraw.size() < objs.size())
+                    m_objectsDraw.swap(objs);
+
+                if (!objs.empty()) {
+                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+                    objs.clear();
+                }
+            }
+
+            std::swap(m_coordsCache[0], m_coordsCache[1]);
+        }
+
+        m_objectsFlushed.clear();
     }
 
 protected:
@@ -297,38 +329,6 @@ private:
             m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
             objs.clear();
         }
-    }
-
-    void release() {
-        m_repaint.store(canRepaint(), std::memory_order_release);
-        std::scoped_lock l(m_mutexDraw);
-        m_objectsDraw.clear();
-
-        if (m_repaint) {
-            m_refreshTimer.restart();
-
-            if (!m_objectsFlushed.empty()) {
-                if (m_objectsDraw.size() < m_objectsFlushed.size())
-                    m_objectsDraw.swap(m_objectsFlushed);
-
-                if (!m_objectsFlushed.empty())
-                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
-            }
-
-            for (auto& objs : m_objects) {
-                if (m_objectsDraw.size() < objs.size())
-                    m_objectsDraw.swap(objs);
-
-                if (!objs.empty()) {
-                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
-                    objs.clear();
-                }
-            }
-
-            std::swap(m_coordsCache[0], m_coordsCache[1]);
-        }
-
-        m_objectsFlushed.clear();
     }
 
     void resetOnlyOnceParameters() {
