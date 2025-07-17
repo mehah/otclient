@@ -84,5 +84,5 @@ private:
     CoordsBuffer m_coords;
     TexturePtr m_texture;
     LightData m_lightData;
-    std::vector<uint8_t> m_pixels[2];
+    std::array<std::vector<uint8_t>, 2> m_pixels;
 };
