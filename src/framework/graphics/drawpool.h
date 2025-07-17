@@ -299,10 +299,14 @@ private:
         }
     }
 
-    void release(const bool flush = true) {
+    void release() {
+        m_repaint.store(canRepaint(), std::memory_order_release);
+        std::scoped_lock l(m_mutexDraw);
         m_objectsDraw.clear();
 
-        if (flush) {
+        if (m_repaint) {
+            m_refreshTimer.restart();
+
             if (!m_objectsFlushed.empty()) {
                 if (m_objectsDraw.size() < m_objectsFlushed.size())
                     m_objectsDraw.swap(m_objectsFlushed);

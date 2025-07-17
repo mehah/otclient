@@ -187,19 +187,9 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (alwaysDraw)
         pool->repaint();
 
+    pool->release();
+
     resetSelectedPool();
-    commit(type);
-}
-
-void DrawPoolManager::commit(const DrawPoolType type)
-{
-    const auto pool = get(type);
-
-    std::scoped_lock l(pool->m_mutexDraw);
-    pool->release(pool->m_repaint = pool->canRepaint());
-    if (pool->m_repaint) {
-        pool->m_refreshTimer.restart();
-    }
 }
 
 void DrawPoolManager::drawObjects(DrawPool* pool) {
