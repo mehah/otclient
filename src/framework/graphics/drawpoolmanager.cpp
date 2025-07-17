@@ -168,7 +168,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->m_repaint.load(std::memory_order_acquire)) {
+    if (pool->isDrawing()) {
         resetSelectedPool();
         return;
     }
@@ -177,21 +177,44 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (f) f();
 
-    std::scoped_lock l(pool->m_mutexDraw);
-
     if (beforeRelease)
         beforeRelease();
 
-    if (pool->hasFrameBuffer())
-        pool->m_framebuffer->prepare(dest, src, colorClear);
+    if (alwaysDraw)
+        pool->repaint();
 
-    pool->release(pool->m_repaint = alwaysDraw || pool->canRepaint());
-
-    if (pool->m_repaint) {
-        pool->m_refreshTimer.restart();
+    if (pool->hasFrameBuffer()) {
+        addAction([pool, dest, src, colorClear] {
+            pool->m_framebuffer->prepare(dest, src, colorClear);
+        });
     }
 
+    pool->release();
+
     resetSelectedPool();
+}
+
+void DrawPoolManager::drawObjects(DrawPool* pool) {
+    const auto hasFramebuffer = pool->hasFrameBuffer();
+
+    if (!pool->m_repaint.exchange(false, std::memory_order_acq_rel) && hasFramebuffer)
+        return;
+
+    std::scoped_lock l(pool->m_mutexDraw);
+
+    if (hasFramebuffer)
+        pool->m_framebuffer->bind();
+
+    for (const auto& obj : pool->m_objectsDraw)
+        drawObject(obj);
+
+    if (hasFramebuffer) {
+        pool->m_framebuffer->release();
+
+        // Let's clean this up so that the cleaning is not done in another thread,
+        // and thus the CPU consumption will be partitioned.
+        pool->m_objectsDraw.clear();
+    }
 }
 
 void DrawPoolManager::drawPool(const DrawPoolType type) {
@@ -200,29 +223,13 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     if (!pool->isEnabled())
         return;
 
-    std::scoped_lock l(pool->m_mutexDraw);
+    drawObjects(pool);
 
     if (pool->hasFrameBuffer()) {
-        if (pool->m_repaint.exchange(false, std::memory_order_acq_rel)) {
-            pool->m_framebuffer->bind();
-            for (const auto& obj : pool->m_objectsDraw)
-                drawObject(obj);
-            pool->m_framebuffer->release();
-        }
-
-        // Let's clean this up so that the cleaning is not done in another thread,
-        // and thus the CPU consumption will be partitioned.
-        pool->m_objectsDraw.clear();
-
         g_painter->resetState();
 
         if (pool->m_beforeDraw) pool->m_beforeDraw();
         pool->m_framebuffer->draw();
         if (pool->m_afterDraw) pool->m_afterDraw();
-    } else {
-        pool->m_repaint.store(false, std::memory_order_release);
-        for (const auto& obj : pool->m_objectsDraw) {
-            drawObject(obj);
-        }
     }
 }

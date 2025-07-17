@@ -48,7 +48,8 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     m_lightData.tiles.resize(size.area());
     m_lightData.lights.clear();
 
-    m_pixels.resize(size.area() * 4);
+    for (auto& pixels : m_pixels)
+        pixels.resize(size.area() * 4);
 
     if (m_texture)
         m_texture->setupSize(m_mapSize);
@@ -93,15 +94,16 @@ void LightView::draw(const Rect& dest, const Rect& src)
     m_pool->getHashController().put(src.hash());
     m_pool->getHashController().put(m_globalLightColor.hash());
     if (m_pool->getHashController().wasModified()) {
-        std::scoped_lock l(m_pool->getMutex());
         updatePixels();
+        std::scoped_lock l(m_pool->getMutex());
+        m_pixels[0].swap(m_pixels[1]);
         pixelUpdated = true;
     }
     m_pool->getHashController().reset();
 
     g_drawPool.addAction([=, this] {
         if (pixelUpdated) {
-            m_texture->updatePixels(m_pixels.data());
+            m_texture->updatePixels(m_pixels[1].data());
             pixelUpdated = false;
         }
 
@@ -110,12 +112,9 @@ void LightView::draw(const Rect& dest, const Rect& src)
         g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->resetTransformMatrix();
         g_painter->resetColor();
-        g_painter->setTexture(m_texture->getId(), m_texture->getTransformMatrixId());
+        g_painter->setTexture(m_texture);
         g_painter->drawCoords(m_coords);
     });
-
-    m_lightData.lights.clear();
-    m_lightData.tiles.assign(m_mapSize.area(), {});
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
@@ -142,7 +141,7 @@ void LightView::updatePixels()
     const auto tileCenterOffset = m_tileSize / 2;
     const auto invTileSize = 1.0f / m_tileSize;
 
-    auto* pixelData = m_pixels.data();
+    auto* pixelData = m_pixels[0].data();
 
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {

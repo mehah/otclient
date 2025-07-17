@@ -49,6 +49,10 @@ public:
     bool isDark() const { return m_isDark; }
     bool isEnabled() const { return m_pool->isEnabled(); }
     void setEnabled(const bool v) { m_pool->setEnable(v); }
+    void clear() {
+        m_lightData.lights.clear();
+        m_lightData.tiles.assign(m_mapSize.area(), {});
+    }
 
 private:
     struct TileLight : Light
@@ -80,5 +84,5 @@ private:
     CoordsBuffer m_coords;
     TexturePtr m_texture;
     LightData m_lightData;
-    std::vector<uint8_t> m_pixels;
+    std::array<std::vector<uint8_t>, 2> m_pixels;
 };
