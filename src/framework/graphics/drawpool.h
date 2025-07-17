@@ -158,8 +158,8 @@ public:
     }
 
     void release() {
-        m_repaint.store(canRepaint(), std::memory_order_release);
         std::scoped_lock l(m_mutexDraw);
+        m_repaint = canRepaint();
         m_objectsDraw.clear();
 
         if (m_repaint) {

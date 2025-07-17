@@ -178,9 +178,6 @@ void GraphicalApplication::run()
 #endif
     // THREAD - POOL & MAP
     const auto& mapThread = g_asyncDispatcher.submit_task([this] {
-        const auto uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
-        const auto fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
-
         BS::multi_future<void> tasks;
 
         g_luaThreadId = g_eventThreadId = stdext::getThreadId();
