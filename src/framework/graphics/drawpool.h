@@ -158,13 +158,12 @@ public:
     }
 
     void release() {
-        std::scoped_lock l(m_mutexDraw);
-        m_repaint = canRepaint();
-        m_objectsDraw.clear();
-
-        if (m_repaint) {
+        const auto repaint = canRepaint();
+        if (repaint) {
             m_refreshTimer.restart();
 
+            std::scoped_lock l(m_mutexDraw);
+            m_objectsDraw.clear();
             if (!m_objectsFlushed.empty()) {
                 if (m_objectsDraw.size() < m_objectsFlushed.size())
                     m_objectsDraw.swap(m_objectsFlushed);
@@ -185,6 +184,7 @@ public:
 
             std::swap(m_coordsCache[0], m_coordsCache[1]);
         }
+        m_repaint.store(repaint, std::memory_order_release);
 
         m_objectsFlushed.clear();
     }
