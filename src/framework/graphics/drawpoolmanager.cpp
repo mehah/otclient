@@ -180,7 +180,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     if (beforeRelease)
         beforeRelease();
 
-    if (pool->hasFrameBuffer()) addAction([=] {
+    if (pool->hasFrameBuffer()) addAction([pool, dest, src, colorClear] {
         pool->m_framebuffer->prepare(dest, src, colorClear);
     });
 
