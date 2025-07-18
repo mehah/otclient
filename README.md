@@ -174,6 +174,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Client 12.85 ~ 12.92, 13.00 ~ 13.40 support (protobuf)
 - Market has been rewritten compatible with tfs and canary
 - Async Texture Loading
+- Atlas system groups sprites into shared atlas textures to minimize texture switches. Atlas entries are keyed by texture id and the sprite's source rectangle and are created after a texture is first loaded.
 - <details>
     <summary>Anti-Aliasing Mode Options</summary>
   - note : (Note: Smooth Retro will consume a little more GPU)
