@@ -1108,6 +1108,11 @@ function gameShopTransferCoins(player, transfer)
 		db.query("UPDATE `znote_accounts` set `points` = `points` - " .. amount .. " WHERE `id` = " .. aid)
 		db.query("UPDATE `znote_accounts` set `points` = `points` + " .. amount .. " WHERE `id` = " .. accountId)
 		
+        	if pointsCache[aid] then
+            		pointsCache[aid].points = pointsCache[aid].points - amount
+            		pointsCache[aid].time = os.time()
+        	end
+
 		db.asyncQuery("INSERT INTO `shop_history` VALUES (NULL, '" .. aid .. "', '" .. player:getGuid() .. "', NOW(), " .. escapeTitle .. ", " .. db.escapeString(-amount) .. ", 0, 1, " .. db.escapeString(receiver) .. ")")
 		db.asyncQuery("INSERT INTO `shop_history` VALUES (NULL, '" .. accountId .. "', '" .. GUID .. "', NOW(), " .. escapeTitle .. ", " .. db.escapeString(amount) .. ", 0, 1, " .. db.escapeString(player:getName()) .. ")")
 	end
@@ -1115,7 +1120,12 @@ function gameShopTransferCoins(player, transfer)
 	if amountSecond > 0 then
 		db.query("UPDATE `znote_accounts` set `points_second` = `points_second` - " .. amountSecond .. " WHERE `id` = " .. aid)
 		db.query("UPDATE `znote_accounts` set `points_second` = `points_second` + " .. amountSecond .. " WHERE `id` = " .. accountId)
-	
+
+        	if secondPointsCache[aid] then
+            		secondPointsCache[aid].points = secondPointsCache[aid].points - amountSecond
+            		secondPointsCache[aid].time = os.time()
+        	end
+
 		db.asyncQuery("INSERT INTO `shop_history` VALUES (NULL, '" .. aid .. "', '" .. player:getGuid() .. "', NOW(), " .. escapeTitle .. ", " .. db.escapeString(-amountSecond) .. ", 1, 1, " .. db.escapeString(receiver) .. ")")
 		db.asyncQuery("INSERT INTO `shop_history` VALUES (NULL, '" .. accountId .. "', '" .. GUID .. "', NOW(), " .. escapeTitle .. ", " .. db.escapeString(amountSecond) .. ", 1, 1, " .. db.escapeString(player:getName()) .. ")")
 	end
