@@ -386,6 +386,7 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
           framework/graphics/shader.cpp
           framework/graphics/shaderprogram.cpp
           framework/graphics/texture.cpp
+          framework/graphics/textureatlas.cpp
           framework/graphics/texturemanager.cpp
           framework/graphics/shadermanager.cpp
           framework/platform/win32window.cpp

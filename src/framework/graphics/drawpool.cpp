@@ -49,6 +49,13 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
+    TexturePtr drawTexture = texture;
+    if (texture && texture->isInAtlas()) {
+        if (method.src.isValid())
+            method.src.translate(texture->getAtlasRect().topLeft());
+        drawTexture = g_textures.getAtlasTexture();
+    }
+
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
         return;
 
@@ -64,7 +71,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     if (agroup) {
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
-            auto state = getState(texture, color);
+            auto state = getState(drawTexture, color);
             coords = m_objects[order].emplace_back(std::move(state), getCoordsBuffer()).coords.get();
         }
 
@@ -89,7 +96,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         }
 
         if (addNewObj) {
-            auto state = getState(texture, color);
+            auto state = getState(drawTexture, color);
             auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
 
             if (coordsBuffer) {
@@ -331,7 +338,10 @@ void DrawPool::PoolState::execute() const {
     if (action) action();
     if (texture) {
         texture->create();
-        g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
+        if (texture->isInAtlas())
+            g_painter->setTexture(g_textures.getAtlasTexture()->getId(), g_textures.getAtlasTexture()->getTransformMatrixId());
+        else
+            g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
     } else
         g_painter->setTexture(textureId, textureMatrixId);
 }

@@ -24,8 +24,10 @@
 
 #include "declarations.h"
 #include <framework/core/timer.h>
+#include <framework/util/rect.h>
+#include <memory>
 
-class Texture
+class Texture : public std::enable_shared_from_this<Texture>
 {
 public:
     Texture();
@@ -64,6 +66,9 @@ public:
     virtual bool isAnimatedTexture() const { return false; }
     bool setupSize(const Size& size);
 
+    bool isInAtlas() const { return m_inAtlas; }
+    const Rect& getAtlasRect() const { return m_atlasRect; }
+
 protected:
     void bind();
     void setupWrap() const;
@@ -101,6 +106,10 @@ protected:
     void setProp(const Prop prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
     bool getProp(const Prop prop) const { return m_props & prop; };
 
+    bool m_inAtlas{ false };
+    Rect m_atlasRect;
+
     friend class GarbageCollection;
     friend class TextureManager;
+    friend class TextureAtlas;
 };

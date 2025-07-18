@@ -162,6 +162,9 @@ void Texture::createTexture()
     assert(m_id != 0);
 
     generateHash();
+
+    if (m_image)
+        g_textures.addToAtlas(shared_from_this());
 }
 
 bool Texture::setupSize(const Size& size)

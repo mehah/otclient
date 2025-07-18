@@ -23,6 +23,7 @@
 #pragma once
 
 #include "texture.h"
+#include "textureatlas.h"
 #include <framework/core/declarations.h>
 
 class TextureManager
@@ -43,12 +44,18 @@ public:
     const Matrix3* getMatrixById(uint16_t id);
     uint16_t getMatrixId(const Size& size, bool upsidedown);
 
+    TexturePtr getAtlasTexture() { return m_atlas.getAtlasTexture(); }
+    bool addToAtlas(const TexturePtr& texture, Rect& rect) { return m_atlas.addTexture(texture, rect); }
+    bool addToAtlas(const TexturePtr& texture) { Rect r; return m_atlas.addTexture(texture, r); }
+
 private:
     std::unordered_map<std::string, TexturePtr> m_textures;
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;
     ScheduledEventPtr m_liveReloadEvent;
     std::shared_mutex m_mutex;
+
+    TextureAtlas m_atlas;
 
     struct
     {

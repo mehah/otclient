@@ -92,9 +92,13 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
         return;
     }
 
+    Rect s = src;
+    if (texture && texture->isInAtlas())
+        s.translate(texture->getAtlasRect().topLeft());
+
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{
         .type = DrawPool::DrawMethodType::RECT,
-        .dest = dest, .src = src
+        .dest = dest, .src = s
     }, condutor);
 }
 
@@ -105,9 +109,13 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
         return;
     }
 
+    Rect s = src;
+    if (texture && texture->isInAtlas())
+        s.translate(texture->getAtlasRect().topLeft());
+
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::UPSIDEDOWN_RECT, .dest =
                               dest,
-                              .src = src
+                              .src = s
                           }, condutor);
 }
 
@@ -118,9 +126,13 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
         return;
     }
 
+    Rect s = src;
+    if (texture && texture->isInAtlas())
+        s.translate(texture->getAtlasRect().topLeft());
+
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::REPEATED_RECT, .dest =
                               dest,
-                              .src = src
+                              .src = s
                           }, condutor);
 }
 
