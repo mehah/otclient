@@ -168,7 +168,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->isDrawState(DrawPoolState::DRAWING)) {
+    if (pool->isDrawState(DrawPoolState::READY) || pool->isDrawState(DrawPoolState::DRAWING)) {
         resetSelectedPool();
         return;
     }
