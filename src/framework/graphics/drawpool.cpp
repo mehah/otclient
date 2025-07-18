@@ -253,7 +253,7 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint()
 {
-    if (isDrawing())
+    if (isDrawState(DrawPoolState::DRAWING))
         return false;
 
     uint16_t refreshDelay = m_refreshDelay;

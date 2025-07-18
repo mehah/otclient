@@ -53,6 +53,14 @@ enum DrawOrder : uint8_t
     LAST
 };
 
+enum class DrawPoolState
+{
+    PREPARING,
+    READY,
+    DRAWING,
+    RENDERED,
+};
+
 struct DrawHashController
 {
     DrawHashController(bool agroup = false) : m_agroup(agroup) {}
@@ -139,8 +147,8 @@ public:
     void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
-    bool isDrawing() const {
-        return m_repaint.load(std::memory_order_acquire);
+    bool isDrawState(DrawPoolState state) const {
+        return m_drawState.load(std::memory_order_acquire) == state;
     }
 
     auto& getHashController() {
@@ -148,7 +156,7 @@ public:
     }
 
     void resetBuffer() {
-        std::scoped_lock l(m_mutexDraw);
+        waitUntilDrawFinished();
         for (auto& buffer : m_coordsCache) {
             buffer.coords.clear();
             buffer.last = 0;
@@ -160,13 +168,19 @@ public:
         if (repaint) {
             m_refreshTimer.restart();
 
+            waitUntilDrawFinished();
+            setDrawState(DrawPoolState::PREPARING);
+
             m_objectsDraw.clear();
             if (!m_objectsFlushed.empty()) {
                 if (m_objectsDraw.size() < m_objectsFlushed.size())
                     m_objectsDraw.swap(m_objectsFlushed);
 
                 if (!m_objectsFlushed.empty())
-                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
+                    m_objectsDraw.insert(
+                        m_objectsDraw.end(),
+                        make_move_iterator(m_objectsFlushed.begin()),
+                        make_move_iterator(m_objectsFlushed.end()));
             }
 
             for (auto& objs : m_objects) {
@@ -174,14 +188,17 @@ public:
                     m_objectsDraw.swap(objs);
 
                 if (!objs.empty()) {
-                    m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+                    m_objectsDraw.insert(
+                        m_objectsDraw.end(),
+                        make_move_iterator(objs.begin()),
+                        make_move_iterator(objs.end()));
                     objs.clear();
                 }
             }
 
             std::swap(m_coordsCache[0], m_coordsCache[1]);
+            setDrawState(DrawPoolState::READY);
         }
-        m_repaint.store(repaint, std::memory_order_release);
 
         m_objectsFlushed.clear();
     }
@@ -295,6 +312,18 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, const float angle) { rotate(p.x, p.y, angle); }
 
+    void waitUntilDrawFinished() {
+        while (isDrawState(DrawPoolState::DRAWING));
+    }
+
+    void waitUntilReadyToDraw() {
+        while (isDrawState(DrawPoolState::PREPARING));
+    }
+
+    void setDrawState(DrawPoolState state) {
+        m_drawState.store(state, std::memory_order_release);
+    }
+
     std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
     template<typename T>
@@ -401,8 +430,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic_bool m_repaint{ false };
-    std::mutex m_mutexDraw;
+    std::atomic<DrawPoolState> m_drawState = DrawPoolState::READY;
 
     friend class DrawPoolManager;
 };

@@ -168,7 +168,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->isDrawing()) {
+    if (pool->isDrawState(DrawPoolState::DRAWING)) {
         resetSelectedPool();
         return;
     }
@@ -197,8 +197,11 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 void DrawPoolManager::drawObjects(DrawPool* pool) {
     const auto hasFramebuffer = pool->hasFrameBuffer();
 
-    if (!pool->isDrawing() && hasFramebuffer)
+    if (!pool->isDrawState(DrawPoolState::READY) && hasFramebuffer)
         return;
+
+    pool->waitUntilReadyToDraw();
+    pool->setDrawState(DrawPoolState::DRAWING);
 
     if (hasFramebuffer)
         pool->m_framebuffer->bind();
@@ -214,7 +217,7 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         pool->m_objectsDraw.clear();
     }
 
-    pool->m_repaint.store(false, std::memory_order_release);
+    pool->setDrawState(DrawPoolState::RENDERED);
 }
 
 void DrawPoolManager::drawPool(const DrawPoolType type) {
