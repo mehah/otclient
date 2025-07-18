@@ -200,7 +200,7 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
     if (!pool->isDrawState(DrawPoolState::READY) && hasFramebuffer)
         return;
 
-    pool->waitUntilReadyToDraw();
+    pool->waitWhileStateIs(DrawPoolState::PREPARING);
     pool->setDrawState(DrawPoolState::DRAWING);
 
     if (hasFramebuffer)

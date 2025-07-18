@@ -156,7 +156,7 @@ public:
     }
 
     void resetBuffer() {
-        waitUntilDrawFinished();
+        waitWhileStateIs(DrawPoolState::DRAWING);
         for (auto& buffer : m_coordsCache) {
             buffer.coords.clear();
             buffer.last = 0;
@@ -168,7 +168,7 @@ public:
         if (repaint) {
             m_refreshTimer.restart();
 
-            waitUntilDrawFinished();
+            waitWhileStateIs(DrawPoolState::DRAWING);
             setDrawState(DrawPoolState::PREPARING);
 
             m_objectsDraw.clear();
@@ -312,12 +312,8 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, const float angle) { rotate(p.x, p.y, angle); }
 
-    void waitUntilDrawFinished() {
-        while (isDrawState(DrawPoolState::DRAWING));
-    }
-
-    void waitUntilReadyToDraw() {
-        while (isDrawState(DrawPoolState::PREPARING));
+    void waitWhileStateIs(DrawPoolState state) {
+        while (isDrawState(state));
     }
 
     void setDrawState(DrawPoolState state) {
