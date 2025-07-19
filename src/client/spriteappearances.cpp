@@ -52,10 +52,14 @@ void SpriteAppearances::terminate()
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
+    if (sheet->m_loadingState.load(std::memory_order_acquire) == SpriteLoadState::LOADING)
+        return false;
+
     if (sheet->data)
         return true;
 
-    std::scoped_lock lock(sheet->m_mutex);
+    if (sheet->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING)
+        return false;
 
     try {
         const auto& path = fmt::format("{}{}", g_spriteAppearances.getPath(), sheet->file);
@@ -154,8 +158,12 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
         sheet->data = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE);
         std::memcpy(sheet->data.get(), bufferStart, BYTES_IN_SPRITE_SHEET);
 
+        sheet->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
+
         return true;
     } catch (const std::exception& e) {
+        sheet->m_loadingState.store(SpriteLoadState::NONE, std::memory_order_release);
+
         g_logger.error("Failed to load single sprite sheet '{}': {}", sheet->file, e.what());
         return false;
     }

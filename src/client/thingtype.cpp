@@ -681,9 +681,7 @@ const TexturePtr& ThingType::getTexture(const int animationPhase)
             m_loading = false;
         };
 
-        if (g_game.getLocalPlayer() && g_game.getLocalPlayer()->isPendingGame())
-            g_dispatcher.asyncEvent(std::move(action));
-        else g_asyncDispatcher.detach_task(std::move(action));
+        g_asyncDispatcher.detach_task(std::move(action));
     }
 
     return m_textureNull;
@@ -728,8 +726,11 @@ void ThingType::loadTexture(const int animationPhase)
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
 
+                            if (!spriteImage)
+                                return;
+
                             // verifies that the first block in the lower right corner is transparent.
-                            if (!spriteImage || spriteImage->hasTransparentPixel()) {
+                            if (spriteImage->hasTransparentPixel()) {
                                 fullImage->setTransparentPixel(true);
                             }
 
@@ -749,8 +750,11 @@ void ThingType::loadTexture(const int animationPhase)
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
 
+                                    if (!spriteImage)
+                                        return;
+
                                     // verifies that the first block in the lower right corner is transparent.
-                                    if (h == 0 && w == 0 && (!spriteImage || spriteImage->hasTransparentPixel())) {
+                                    if (h == 0 && w == 0 && spriteImage->hasTransparentPixel()) {
                                         fullImage->setTransparentPixel(true);
                                     }
 
