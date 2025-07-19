@@ -73,12 +73,20 @@ public:
     bool isLoaded() { return m_loaded; }
 
 private:
-     struct FileStream_m {
-         FileStreamPtr file;
-         std::mutex mutex;
+    enum class SpriteLoadState
+    {
+        NONE,
+        LOADING,
+        LOADED
+    };
 
-         FileStream_m(FileStreamPtr f) : file(std::move(f)) {}
-     };
+    struct FileStream_m
+    {
+        FileStreamPtr file;
+        std::atomic<SpriteLoadState> m_loadingState = SpriteLoadState::NONE;
+
+        FileStream_m(FileStreamPtr f) : file(std::move(f)) {}
+    };
 
     void load();
     FileStreamPtr getSpriteFile() const {

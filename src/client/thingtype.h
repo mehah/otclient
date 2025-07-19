@@ -460,7 +460,7 @@ public:
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
 
     uint16_t getClassification() { return m_upgradeClassification; }
-    std::vector<uint32_t> getSprites() { return m_spritesIndex; }
+    const auto& getSprites() { return m_spritesIndex; }
 
     // additional
     float getOpacity() { return m_opacity; }

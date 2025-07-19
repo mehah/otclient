@@ -724,13 +724,14 @@ void ThingType::loadTexture(const int animationPhase)
                     if (!useCustomImage) {
                         if (protobufSupported) {
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
-                            const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
+                            auto spriteId = m_spritesIndex[spriteIndex];
+                            const auto& spriteImage = g_sprites.getSpriteImage(spriteId);
 
-                            if (!spriteImage)
+                            if (spriteId != 0 && !spriteImage)
                                 return;
 
                             // verifies that the first block in the lower right corner is transparent.
-                            if (spriteImage->hasTransparentPixel()) {
+                            if (!spriteImage || spriteImage->hasTransparentPixel()) {
                                 fullImage->setTransparentPixel(true);
                             }
 
@@ -748,13 +749,14 @@ void ThingType::loadTexture(const int animationPhase)
                             for (int h = 0; h < m_size.height(); ++h) {
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
-                                    const auto& spriteImage = g_sprites.getSpriteImage(m_spritesIndex[spriteIndex]);
+                                    auto spriteId = m_spritesIndex[spriteIndex];
+                                    const auto& spriteImage = g_sprites.getSpriteImage(spriteId);
 
-                                    if (!spriteImage)
+                                    if (spriteId != 0 && !spriteImage)
                                         return;
 
                                     // verifies that the first block in the lower right corner is transparent.
-                                    if (h == 0 && w == 0 && spriteImage->hasTransparentPixel()) {
+                                    if (h == 0 && w == 0 && (!spriteImage || spriteImage->hasTransparentPixel())) {
                                         fullImage->setTransparentPixel(true);
                                     }
 
