@@ -363,7 +363,9 @@ void Creature::internalDraw(Point dest, const Color& color)
             }
 
             int animationPhase = 0;
-            if (animationPhases > 1) {
+            if (auto* animator = getThingType()->getIdleAnimator(); animator && m_outfit.isItem()) {
+                animationPhase = animator->getPhase();
+            } else if (animationPhases > 1) {
                 animationPhase = (g_clock.millis() % (static_cast<long long>(animateTicks) * animationPhases)) / animateTicks;
             }
 
