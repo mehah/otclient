@@ -313,7 +313,7 @@ private:
     void rotate(const Point& p, const float angle) { rotate(p.x, p.y, angle); }
 
     void waitWhileStateIs(DrawPoolState state) {
-        while (isDrawState(state));
+        while (isDrawState(state)); // spinlock
     }
 
     void setDrawState(DrawPoolState state) {

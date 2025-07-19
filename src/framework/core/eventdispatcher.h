@@ -120,7 +120,7 @@ private:
         std::atomic<ThreadTaskEventState> state = ThreadTaskEventState::MERGED;
 
         void waitWhileStateIs(ThreadTaskEventState st) {
-            while (state.load(std::memory_order_acquire) == st);
+            while (state.load(std::memory_order_acquire) == st); // spinlock
         }
 
         void setState(ThreadTaskEventState st) {
