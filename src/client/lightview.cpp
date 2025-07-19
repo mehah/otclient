@@ -39,8 +39,6 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     if (!m_texture || (m_mapSize == size && m_tileSize == tileSize))
         return;
 
-    std::scoped_lock l(m_pool->getMutex());
-
     m_mapSize = size;
     m_tileSize = tileSize;
     m_pool->setScaleFactor(tileSize / g_gameConfig.getSpriteSize());
@@ -89,22 +87,20 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    static bool pixelUpdated = false;
+    bool updatePixel = false;
 
     m_pool->getHashController().put(src.hash());
     m_pool->getHashController().put(m_globalLightColor.hash());
     if (m_pool->getHashController().wasModified()) {
         updatePixels();
-        std::scoped_lock l(m_pool->getMutex());
         m_pixels[0].swap(m_pixels[1]);
-        pixelUpdated = true;
+        updatePixel = true;
     }
     m_pool->getHashController().reset();
 
     g_drawPool.addAction([=, this] {
-        if (pixelUpdated) {
+        if (updatePixel) {
             m_texture->updatePixels(m_pixels[1].data());
-            pixelUpdated = false;
         }
 
         updateCoords(dest, src);

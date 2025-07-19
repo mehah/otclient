@@ -147,6 +147,11 @@ void Map::cleanDynamicThings()
     for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].missiles.clear();
 
+    for (auto& floor : m_floors) {
+        floor.missiles.clear();
+        floor.tileBlocks.clear();
+    }
+
     cleanTexts();
 
     g_lua.collectGarbage();

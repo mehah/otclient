@@ -168,7 +168,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->isDrawing()) {
+    if (pool->isDrawState(DrawPoolState::READY) || pool->isDrawState(DrawPoolState::DRAWING)) {
         resetSelectedPool();
         return;
     }
@@ -197,10 +197,11 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 void DrawPoolManager::drawObjects(DrawPool* pool) {
     const auto hasFramebuffer = pool->hasFrameBuffer();
 
-    if (!pool->m_repaint.exchange(false, std::memory_order_acq_rel) && hasFramebuffer)
+    if (!pool->isDrawState(DrawPoolState::READY) && hasFramebuffer)
         return;
 
-    std::scoped_lock l(pool->m_mutexDraw);
+    pool->waitWhileStateIs(DrawPoolState::PREPARING);
+    pool->setDrawState(DrawPoolState::DRAWING);
 
     if (hasFramebuffer)
         pool->m_framebuffer->bind();
@@ -215,6 +216,8 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         // and thus the CPU consumption will be partitioned.
         pool->m_objectsDraw.clear();
     }
+
+    pool->setDrawState(DrawPoolState::RENDERED);
 }
 
 void DrawPoolManager::drawPool(const DrawPoolType type) {
