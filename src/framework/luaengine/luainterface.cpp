@@ -248,7 +248,7 @@ int LuaInterface::luaObjectSetEvent(LuaInterface* lua)
     assert(obj);
 
     if (key.starts_with("on")) {
-        obj->m_events.emplace(key, true);
+        obj->m_events[key] = true;
     }
 
     lua->remove(-2); // removes key
