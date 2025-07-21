@@ -1066,7 +1066,9 @@ function addTabText(text, speaktype, tab, creatureName)
         readOnlyLabel:setColor(speaktype.color)
     end
     if consoleTabBar:getCurrentTab() ~= tab then
-        changeNewNessageColor(tab)
+        if not (readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText()) then
+            changeNewNessageColor(tab)
+        end
     end
 
     label.highlightInfo = {}
@@ -2368,13 +2370,11 @@ end
 
 function toggleReadOnlyMode()
     if readOnlyModeEnabled then
-        consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
         readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
         readOnlyButton:setText("")
         readOnlyButton:setIcon("/images/game/console/readOnly")
         readOnlyButton:setImageSource("")
     else
-        consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
         readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorRight)
         readOnlyButton:removeAnchor(AnchorLeft)
         readOnlyButton:setIcon("")
