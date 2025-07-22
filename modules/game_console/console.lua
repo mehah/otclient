@@ -1277,7 +1277,6 @@ function processChannelTabMenu(tab, mousePos, mouseButton)
         menu:addOption(tr('Close'), function()
             removeTab(channelName)
         end)
-        -- menu:addOption(tr('Show Server Messages'), function() --[[TODO]] end)
         menu:addSeparator()
     end
     if readOnlyModeEnabled and activeactiveReadOnlyTabName == channelName then
@@ -2395,6 +2394,7 @@ function toggleReadOnlyMode()
         readOnlyButton:setText("")
         readOnlyButton:setIcon("/images/game/console/readOnly")
         readOnlyButton:setImageSource("")
+        activeactiveReadOnlyTabName = ""
     else
         consoleContentPanel:removeAnchor(AnchorRight)
         consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
@@ -2438,7 +2438,12 @@ function addClonedMenuOptions(sourceTab, targetMenu, excludedOptions)
     end
     if not excludedOptions["clear"] then
         targetMenu:addOption(tr('Clear Messages'), function()
-            clearChannel(consoleTabBar)
+            if readOnlyModeEnabled and activeactiveReadOnlyTabName == currentChannelName then
+                clearTabByName(currentChannelName)
+                copyMessagesToReadOnlyPanel(currentChannelName)
+            else
+                clearChannel(consoleTabBar)
+            end
         end)
     end
     if not excludedOptions["save"] then
@@ -2464,4 +2469,13 @@ function saveChannelMessages(tab, worldName, characterName, channelName)
     end
     g_resources.writeFileContents(filePath, table.concat(messageLines, '\n'))
     modules.game_textmessage.displayStatusMessage(tr('Channel appended to %s', fileName))
+end
+
+function clearTabByName(tabName)
+    local tab = getTab(tabName)
+    if tab then
+        local panel = consoleTabBar:getTabPanel(tab)
+        local consoleBuffer = panel:getChildById('consoleBuffer')
+        consoleBuffer:destroyChildren()
+    end
 end
