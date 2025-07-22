@@ -91,24 +91,25 @@ Panel
     id: consoleContentPanel
     anchors.top: parent.top
     anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.bottom: parent.bottom
+    anchors.right: parent.horizontalCenter
+    anchors.bottom: consoleTextEdit.top
     margin-left: 3
-    margin-right: 3
-    margin-bottom: 22
+    margin-right: 2
+    margin-bottom: 4
     margin-top: 20
     padding: 1
     focusable: false
 
   Panel
     id: readOnlyPanel
-    anchors.top: prev.top
+    anchors.top: parent.top
     anchors.left: parent.horizontalCenter
-    anchors.right: parent.horizontalCenter
+    anchors.right: parent.right
     anchors.bottom: consoleTextEdit.top
     margin-left: 2
     margin-right: 6
     margin-bottom: 4
+    margin-top: 20
     padding: 1
     focusable: false
     ScrollablePanel
@@ -313,14 +314,14 @@ Panel
 
   UIButton
     id: sayModeButton
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    margin-bottom: 3
+    size: 18 18
     image-source: /images/ui/console_say
     image-clip: 0 0 18 18
     !tooltip: tr('Set talk type')
     &sayMode: 2
-    size: 18 18
-    anchors.left: consoleContentPanel.left
-    anchors.bottom: parent.bottom
-    margin-bottom: 3
     @onClick: sayModeChange()
 
     $pressed:
@@ -344,14 +345,13 @@ Panel
 
   TopToggleButton
     id: toggleChat
-    !tooltip: tr('Disable chat mode, allow to walk using WASD')
-    color: #c0c0c0ff
-    font: cipsoftFont
-    !text: tr('Chat Off')
-    anchors.right: consoleContentPanel.right
+    anchors.right: parent.right
     anchors.bottom: parent.bottom
     margin-bottom: 3
     size: 64 18
+    color: #c0c0c0ff
+    font: cipsoftFont
+    !text: tr('Chat Off')
     &isChecked: false
     @onClick: |
       if self.isChecked then
