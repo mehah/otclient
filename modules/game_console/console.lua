@@ -198,6 +198,11 @@ function init()
     consoleTabBar:setContentWidget(consoleContentPanel)
     channels = {}
 
+    readOnlyPanel = consolePanel:getChildById('readOnlyPanel')
+    readOnlyPanel:hide()
+    consoleContentPanel:removeAnchor(AnchorRight)
+    consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
+
     consolePanel.onDragEnter = onDragEnter
     consolePanel.onDragLeave = onDragLeave
     consolePanel.onDragMove = onDragMove
@@ -1053,7 +1058,6 @@ function addTabText(text, speaktype, tab, creatureName)
     end
     
     label:setColor(speaktype.color)
-    -- consoleTabBar:blinkTab(tab)
     if readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText() then
         local readOnlyBuffer = readOnlyPanel:getChildById('panel')
         local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
@@ -1066,7 +1070,9 @@ function addTabText(text, speaktype, tab, creatureName)
         readOnlyLabel:setColor(speaktype.color)
     end
     if consoleTabBar:getCurrentTab() ~= tab then
-        changeNewNessageColor(tab)
+        if not (readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText()) then
+            changeNewNessageColor(tab)
+        end
     end
 
     label.highlightInfo = {}
@@ -1271,7 +1277,6 @@ function processChannelTabMenu(tab, mousePos, mouseButton)
         menu:addOption(tr('Close'), function()
             removeTab(channelName)
         end)
-        -- menu:addOption(tr('Show Server Messages'), function() --[[TODO]] end)
         menu:addSeparator()
     end
     if readOnlyModeEnabled and activeactiveReadOnlyTabName == channelName then
@@ -2298,6 +2303,21 @@ function activateReadOnlyMode(channelName)
     activeactiveReadOnlyTabName = channelName
     readOnlyButton:setText(activeactiveReadOnlyTabName)
     copyMessagesToReadOnlyPanel(channelName)
+    local tab = consoleTabBar:getTab(channelName)
+    if tab then
+        if tab.newMessageEvent then
+            removeEvent(tab.newMessageEvent)
+            tab.newMessageEvent = nil
+        end
+        if tab.isOnRedMessage then
+            if consoleTabBar:getCurrentTab() == tab then
+                tab:setColor('#dfdfdfff')
+            else
+                tab:setColor('#7f7f7fff')
+            end
+            tab.isOnRedMessage = false
+        end
+    end
     if not readOnlyModeEnabled then
         toggleReadOnlyMode()
     end
@@ -2368,13 +2388,20 @@ end
 
 function toggleReadOnlyMode()
     if readOnlyModeEnabled then
+        consoleContentPanel:removeAnchor(AnchorRight)
         consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
-        readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
+        readOnlyPanel:hide()
         readOnlyButton:setText("")
         readOnlyButton:setIcon("/images/game/console/readOnly")
         readOnlyButton:setImageSource("")
+        activeactiveReadOnlyTabName = ""
     else
+        consoleContentPanel:removeAnchor(AnchorRight)
         consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
+        readOnlyPanel:show()
+        readOnlyPanel:removeAnchor(AnchorLeft)
+        readOnlyPanel:removeAnchor(AnchorRight)
+        readOnlyPanel:addAnchor(AnchorLeft, "parent", AnchorHorizontalCenter)
         readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorRight)
         readOnlyButton:removeAnchor(AnchorLeft)
         readOnlyButton:setIcon("")
@@ -2411,7 +2438,12 @@ function addClonedMenuOptions(sourceTab, targetMenu, excludedOptions)
     end
     if not excludedOptions["clear"] then
         targetMenu:addOption(tr('Clear Messages'), function()
-            clearChannel(consoleTabBar)
+            if readOnlyModeEnabled and activeactiveReadOnlyTabName == currentChannelName then
+                clearTabByName(currentChannelName)
+                copyMessagesToReadOnlyPanel(currentChannelName)
+            else
+                clearChannel(consoleTabBar)
+            end
         end)
     end
     if not excludedOptions["save"] then
@@ -2437,4 +2469,13 @@ function saveChannelMessages(tab, worldName, characterName, channelName)
     end
     g_resources.writeFileContents(filePath, table.concat(messageLines, '\n'))
     modules.game_textmessage.displayStatusMessage(tr('Channel appended to %s', fileName))
+end
+
+function clearTabByName(tabName)
+    local tab = getTab(tabName)
+    if tab then
+        local panel = consoleTabBar:getTabPanel(tab)
+        local consoleBuffer = panel:getChildById('consoleBuffer')
+        consoleBuffer:destroyChildren()
+    end
 end
