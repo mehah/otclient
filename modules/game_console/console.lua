@@ -198,6 +198,11 @@ function init()
     consoleTabBar:setContentWidget(consoleContentPanel)
     channels = {}
 
+    readOnlyPanel = consolePanel:getChildById('readOnlyPanel')
+    readOnlyPanel:hide()
+    consoleContentPanel:removeAnchor(AnchorRight)
+    consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
+
     consolePanel.onDragEnter = onDragEnter
     consolePanel.onDragLeave = onDragLeave
     consolePanel.onDragMove = onDragMove
@@ -1053,7 +1058,6 @@ function addTabText(text, speaktype, tab, creatureName)
     end
     
     label:setColor(speaktype.color)
-    -- consoleTabBar:blinkTab(tab)
     if readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText() then
         local readOnlyBuffer = readOnlyPanel:getChildById('panel')
         local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
@@ -2300,6 +2304,21 @@ function activateReadOnlyMode(channelName)
     activeactiveReadOnlyTabName = channelName
     readOnlyButton:setText(activeactiveReadOnlyTabName)
     copyMessagesToReadOnlyPanel(channelName)
+    local tab = consoleTabBar:getTab(channelName)
+    if tab then
+        if tab.newMessageEvent then
+            removeEvent(tab.newMessageEvent)
+            tab.newMessageEvent = nil
+        end
+        if tab.isOnRedMessage then
+            if consoleTabBar:getCurrentTab() == tab then
+                tab:setColor('#dfdfdfff')
+            else
+                tab:setColor('#7f7f7fff')
+            end
+            tab.isOnRedMessage = false
+        end
+    end
     if not readOnlyModeEnabled then
         toggleReadOnlyMode()
     end
@@ -2370,11 +2389,19 @@ end
 
 function toggleReadOnlyMode()
     if readOnlyModeEnabled then
-        readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
+        consoleContentPanel:removeAnchor(AnchorRight)
+        consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
+        readOnlyPanel:hide()
         readOnlyButton:setText("")
         readOnlyButton:setIcon("/images/game/console/readOnly")
         readOnlyButton:setImageSource("")
     else
+        consoleContentPanel:removeAnchor(AnchorRight)
+        consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
+        readOnlyPanel:show()
+        readOnlyPanel:removeAnchor(AnchorLeft)
+        readOnlyPanel:removeAnchor(AnchorRight)
+        readOnlyPanel:addAnchor(AnchorLeft, "parent", AnchorHorizontalCenter)
         readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorRight)
         readOnlyButton:removeAnchor(AnchorLeft)
         readOnlyButton:setIcon("")
