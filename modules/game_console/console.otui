@@ -115,7 +115,6 @@ Panel
     ScrollablePanel
       id: panel
       anchors.fill: parent
-      margin-right: 12
       vertical-scrollbar: consoleScrollBarReadOnlyPanel
       image-source: /images/ui/3pixel_frame_borderimage
       image-border: 4
@@ -137,6 +136,7 @@ Panel
       pixels-scroll: true
       margin-top: 4
       margin-bottom: 4
+      margin-right: 4
 
   ConsoleTabBar
     id: consoleTabBar
