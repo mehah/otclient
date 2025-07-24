@@ -185,12 +185,7 @@ function updateHistory()
         widget:getChildById("price"):setText((history[i].price > 0 and "+" or "") .. comma_value(history[i].price))
         widget:getChildById("price"):setOn(history[i].price > 0)
         widget:getChildById("coin"):setOn(history[i].isSecondPrice)
-
-        if history[i].count > 1 then
-            widget:getChildById("description"):setText(history[i].count .. " " .. history[i].name)
-        else
-            widget:getChildById("description"):setText(history[i].name)
-        end
+        widget:getChildById("description"):setText(history[i].name)
     end
 
     historyPanel:getChildById("pageLabel"):setText("Page " .. currentPage .. "/" .. totalPages)

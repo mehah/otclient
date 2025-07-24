@@ -104,7 +104,7 @@ HistoryWidget < UIWidget
     id: date
     anchors.left: parent.left
     margin-left: 1
-    width: 150
+    width: 130
 
   VerticalSeparator
     anchors.top: parent.top
@@ -462,8 +462,9 @@ MainWindow
 
     HistoryHeader
       anchors.left: parent.left
+      text-align: center
       text: Date
-      size: 150 16
+      size: 131 16
 
     VerticalSeparator
       anchors.top: parent.top
@@ -473,6 +474,7 @@ MainWindow
     HistoryHeader
       anchors.left: prev.right
       margin-left: 1
+      text-align: center
       text: Balance
       size: 90 16
 
@@ -485,6 +487,7 @@ MainWindow
       anchors.left: prev.right
       anchors.right: parent.right
       margin-left: 1
+      text-align: center
       text: Description
       height: 16
 
