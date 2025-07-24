@@ -83,12 +83,9 @@ public:
     void poll();
 
     EventPtr addEvent(const std::function<void()>& callback);
-    void asyncEvent(std::function<void()>&& callback);
     void deferEvent(const std::function<void()>& callback);
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
-
-    void startEvent(const ScheduledEventPtr& event);
 
     const auto& context() const {
         return dispacherContext;
@@ -115,7 +112,6 @@ private:
 
         std::vector<EventPtr> events;
         std::vector<Event> deferEvents;
-        std::vector<Event> asyncEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
         std::atomic<ThreadTaskEventState> state = ThreadTaskEventState::MERGED;
 
@@ -130,12 +126,26 @@ private:
 
     inline void mergeEvents();
     inline void executeEvents();
-    inline void executeAsyncEvents();
     inline void executeDeferEvents();
     inline void executeScheduledEvents();
 
     const std::unique_ptr<ThreadTask>& getThreadTask() const {
         return m_threads[stdext::getThreadId() % m_threads.size()];
+    }
+
+    template<typename Result = void, typename Inserter>
+    Result pushThreadTask(Inserter inserter) {
+        const auto& thread = getThreadTask();
+        thread->waitWhileStateIs(ThreadTaskEventState::MERGING);
+        thread->setState(ThreadTaskEventState::ADDING);
+        if constexpr (std::is_void_v<Result>) {
+            inserter(thread);
+            thread->setState(ThreadTaskEventState::ADDED);
+        } else {
+            Result result = inserter(thread);
+            thread->setState(ThreadTaskEventState::ADDED);
+            return result;
+        }
     }
 
     size_t m_pollEventsSize{};
@@ -146,7 +156,6 @@ private:
     // Main Events
     std::vector<EventPtr> m_eventList;
     std::vector<Event> m_deferEventList;
-    std::vector<Event> m_asyncEventList;
     phmap::btree_multiset<ScheduledEventPtr, ScheduledEvent::Compare> m_scheduledEventList;
 };
 
