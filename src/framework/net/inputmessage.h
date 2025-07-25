@@ -29,15 +29,21 @@
 class InputMessage final : public LuaObject
 {
 public:
+    InputMessage();
+
     enum
     {
-        BUFFER_MAXSIZE = 65536,
-        MAX_HEADER_SIZE = 8
+        BUFFER_MAXSIZE = 65536
     };
+
+    inline auto getMaxHeaderSize() const
+    {
+        return m_maxHeaderSize;
+    }
 
     void setBuffer(const std::string& buffer);
     std::string_view getBuffer() { return std::string_view{ (char*)m_buffer + m_headerPos, m_messageSize }; }
-    std::string getBodyBuffer() { return std::string((char*)m_buffer + MAX_HEADER_SIZE, m_messageSize - getHeaderSize()); }
+    std::string getBodyBuffer() { return std::string((char*)m_buffer + m_maxHeaderSize, m_messageSize - getHeaderSize()); }
 
     void skipBytes(const uint16_t bytes) { m_readPos += bytes; }
     void setReadPos(const uint16_t readPos) { m_readPos = readPos; }
@@ -73,6 +79,11 @@ public:
     int getUnreadSize() { return m_messageSize - (m_readPos - m_headerPos); }
     uint16_t getMessageSize() { return m_messageSize; }
 
+    void setPaddingSize(uint8_t padding) { m_padding = padding; }
+    uint8_t getPaddingSize() const {
+        return m_padding;
+    }
+
     bool eof() { return (m_readPos - m_headerPos) >= m_messageSize; }
 
 protected:
@@ -84,8 +95,8 @@ protected:
 
     uint8_t* getReadBuffer() { return m_buffer + m_readPos; }
     uint8_t* getHeaderBuffer() { return m_buffer + m_headerPos; }
-    uint8_t* getDataBuffer() { return m_buffer + MAX_HEADER_SIZE; }
-    uint16_t getHeaderSize() const { return (MAX_HEADER_SIZE - m_headerPos); }
+    uint8_t* getDataBuffer() { return m_buffer + m_maxHeaderSize; }
+    uint16_t getHeaderSize() const { return (m_maxHeaderSize - m_headerPos); }
 
     uint16_t readSize() { return getU16(); }
     bool readChecksum();
@@ -97,8 +108,10 @@ private:
     void checkRead(int bytes);
     void checkWrite(int bytes);
 
-    uint16_t m_headerPos{ MAX_HEADER_SIZE };
-    uint16_t m_readPos{ MAX_HEADER_SIZE };
+    uint8_t m_maxHeaderSize = 8;
+    uint16_t m_headerPos{ m_maxHeaderSize };
+    uint16_t m_readPos{ m_maxHeaderSize };
     uint16_t m_messageSize{ 0 };
+    uint8_t m_padding{ 0 };
     uint8_t m_buffer[BUFFER_MAXSIZE]{};
 };

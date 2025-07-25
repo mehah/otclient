@@ -1,6 +1,6 @@
 game
   sprite-size: 32
-  last-supported-version: 1340
+  last-supported-version: 1412
   draw-typing: false
   typing-icon: /images/game/console/typing
   
