@@ -32,7 +32,6 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
             glCopyImageSubData(texture->getId(), GL_TEXTURE_2D, 0, 0, 0, 0,
                                m_atlas[tex.layer]->getId(), GL_TEXTURE_2D, 0, tex.x, tex.y, 0,
                                width, height, 1);
-            glBindTexture(GL_TEXTURE_2D, 0);
 
             tex.textureID = texture->getId();
             tex.lastUsed = now;
@@ -59,7 +58,6 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     glCopyImageSubData(textureID, GL_TEXTURE_2D, 0, 0, 0, 0,
                        m_atlas[region.layer]->getId(), GL_TEXTURE_2D, 0, region.x, region.y, 0,
                        width, height, 1);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     m_texturesCached.emplace(textureID, TextureInfo{
         .textureID = textureID,
@@ -88,9 +86,9 @@ void TextureAtlas::createNewLayer() {
     }
 
     auto texture = std::make_shared<Texture>(Size{ atlasWidth, atlasHeight });
+    texture->setCached(true);
     texture->setSmooth(false);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlasWidth, atlasHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     m_atlas.push_back(texture);
     FreeRegion newRegion = { 0, 0, atlasWidth, atlasHeight, static_cast<int>(m_atlas.size()) - 1 };

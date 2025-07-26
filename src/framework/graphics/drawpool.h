@@ -276,7 +276,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
+    void add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addAction(const std::function<void()>& action);
@@ -286,7 +286,7 @@ private:
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
     bool updateHash(const DrawMethod& method, const TexturePtr& texture, const Color& color, bool hasCoord);
-    PoolState getState(const TexturePtr& texture, const Color& color, const int8_t atlasLayer);
+    PoolState getState(const TexturePtr& texture, const Color& color);
 
     PoolState& getCurrentState() { return m_states[m_lastStateIndex]; }
     const PoolState& getCurrentState() const { return m_states[m_lastStateIndex]; }
