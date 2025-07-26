@@ -1358,8 +1358,8 @@ void ProtocolGame::sendPreyAction(const uint8_t slot, const uint8_t actionType, 
         msg->addU8(static_cast<uint8_t>(index));
     } else if (actionType == 4) {
         msg->addU16(index); // raceid
-        send(msg);
     }
+    send(msg);
 }
 
 void ProtocolGame::sendPreyRequest()
