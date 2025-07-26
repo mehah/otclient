@@ -391,7 +391,7 @@ void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
     addAction([this, size, frameIndex = m_bindedFramebuffers] {
         static const PoolState state;
 
-        state.execute();
+        state.execute(this);
 
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->resize(size);
@@ -405,7 +405,7 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
     addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = getCurrentState()] {
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->release();
-        drawState.execute();
+        drawState.execute(this);
         frame->draw(dest);
     });
 
