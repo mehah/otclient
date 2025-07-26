@@ -51,6 +51,9 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
+    if (!updateHash(method, texture, color, coordsBuffer != nullptr))
+        return;
+
     int8_t atlasLayer = -1;
     if (m_atlas && texture && texture->getId() > 0) {
         const auto& info = m_atlas->getTextureInfo(texture->getId());
@@ -59,9 +62,6 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
             atlasLayer = info.layer;
         }
     }
-
-    if (!updateHash(method, texture, color, coordsBuffer != nullptr, atlasLayer))
-        return;
 
     bool agroup = m_alwaysGroupDrawings || conductor.agroup;
 
