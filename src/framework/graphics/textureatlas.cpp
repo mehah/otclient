@@ -8,7 +8,12 @@ TextureAtlas::TextureAtlas(int width, int height, int layers) : atlasWidth(width
     createNewLayer();
 }
 
-void TextureAtlas::addTexture(GLuint textureID, int width, int height, int inactivityThreshold) {
+void TextureAtlas::addTexture(const TexturePtr& texture) {
+    const auto textureID = texture->getId();
+    const auto width = texture->getWidth();
+    const auto height = texture->getHeight();
+    const auto inactivityThreshold = 3600;
+
     if (width <= 0 || height <= 0 || width > atlasWidth || height > atlasHeight) {
         throw std::invalid_argument("Texture dimensions are invalid or exceed atlas dimensions.");
     }
@@ -24,12 +29,12 @@ void TextureAtlas::addTexture(GLuint textureID, int width, int height, int inact
             texList.pop_back();
 
             glBindTexture(GL_TEXTURE_2D, m_atlas[tex.layer]->getId());
-            glCopyImageSubData(textureID, GL_TEXTURE_2D, 0, 0, 0, 0,
+            glCopyImageSubData(texture->getId(), GL_TEXTURE_2D, 0, 0, 0, 0,
                                m_atlas[tex.layer]->getId(), GL_TEXTURE_2D, 0, tex.x, tex.y, 0,
                                width, height, 1);
             glBindTexture(GL_TEXTURE_2D, 0);
 
-            tex.textureID = textureID;
+            tex.textureID = texture->getId();
             tex.lastUsed = now;
             tex.active = true;
             tex.width = width;
@@ -44,7 +49,7 @@ void TextureAtlas::addTexture(GLuint textureID, int width, int height, int inact
             throw std::runtime_error("Unable to allocate texture: No space and maximum layers reached.");
         }
         createNewLayer();
-        return addTexture(textureID, width, height, inactivityThreshold);
+        return addTexture(texture);
     }
 
     FreeRegion region = bestRegionOpt.value();

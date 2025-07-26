@@ -120,7 +120,7 @@ private:
 public:
     TextureAtlas(int width, int height, int layers);
 
-    void addTexture(GLuint textureID, int width, int height, int inactivityThreshold);
+    void addTexture(const TexturePtr& texture);
 
     const auto& getAtlas(int layer) const {
         if (layer < 0 || layer >= static_cast<int>(m_atlas.size())) {

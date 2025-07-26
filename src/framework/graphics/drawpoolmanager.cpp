@@ -76,12 +76,7 @@ void DrawPoolManager::drawObject(DrawPool* pool, const DrawPool::DrawObject& obj
     if (obj.action) {
         obj.action();
     } else {
-        obj.state.execute();
-
-        if (pool->m_atlas && obj.state.texture) {
-            pool->m_atlas->addTexture(obj.state.texture->getId(), obj.state.texture->getWidth(), obj.state.texture->getHeight(), 3600);
-        }
-
+        obj.state.execute(pool);
         g_painter->drawCoords(*obj.coords, DrawMode::TRIANGLES);
     }
 }

@@ -337,7 +337,7 @@ void DrawPool::popTransformMatrix()
     m_transformMatrixStack.pop_back();
 }
 
-void DrawPool::PoolState::execute() const {
+void DrawPool::PoolState::execute(DrawPool* pool) const {
     g_painter->setColor(color);
     g_painter->setOpacity(opacity);
     g_painter->setCompositionMode(compositionMode);
@@ -349,6 +349,8 @@ void DrawPool::PoolState::execute() const {
     if (texture) {
         texture->create();
         g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
+        if (pool->m_atlas)
+            pool->m_atlas->addTexture(texture);
     } else
         g_painter->setTexture(textureId, textureMatrixId);
 }

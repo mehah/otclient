@@ -241,7 +241,7 @@ protected:
         size_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
-        void execute() const;
+        void execute(DrawPool* pool) const;
     };
 
     struct DrawObject
