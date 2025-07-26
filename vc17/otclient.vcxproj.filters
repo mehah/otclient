@@ -570,6 +570,9 @@
     <ClCompile Include="..\src\framework\net\packet_recorder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\graphics\textureatlas.cpp">
+      <Filter>Source Files\framework\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\framework\config.h">
@@ -1114,6 +1117,9 @@
     </ClInclude>
     <ClInclude Include="..\src\framework\net\packet_recorder.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\graphics\textureatlas.h">
+      <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

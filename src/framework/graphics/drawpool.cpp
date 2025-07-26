@@ -21,6 +21,7 @@
  */
 
 #include "drawpool.h"
+#include "textureatlas.h"
 
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
@@ -30,6 +31,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
+            pool->m_atlas = std::make_unique<TextureAtlas>(4096, 4096, 10);
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(10);
 
@@ -49,7 +51,16 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
-    if (!updateHash(method, texture, color, coordsBuffer != nullptr))
+    int8_t atlasLayer = -1;
+    if (m_atlas && texture && texture->getId() > 0) {
+        const auto& info = m_atlas->getTextureInfo(texture->getId());
+        if (info.active && method.src.isValid()) {
+            method.src = Rect(info.x + method.src.x(), info.y + method.src.y(), method.src.width(), method.src.height());
+            atlasLayer = info.layer;
+        }
+    }
+
+    if (!updateHash(method, texture, color, coordsBuffer != nullptr, atlasLayer))
         return;
 
     bool agroup = m_alwaysGroupDrawings || conductor.agroup;
@@ -64,7 +75,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     if (agroup) {
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
-            auto state = getState(texture, color);
+            auto state = getState(texture, color, atlasLayer);
             coords = m_objects[order].emplace_back(std::move(state), getCoordsBuffer()).coords.get();
         }
 
@@ -89,7 +100,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         }
 
         if (addNewObj) {
-            auto state = getState(texture, color);
+            auto state = getState(texture, color, atlasLayer);
             auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
 
             if (coordsBuffer) {
@@ -174,11 +185,17 @@ bool DrawPool::updateHash(const DrawMethod& method, const TexturePtr& texture, c
     return true;
 }
 
-DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
+DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color, const int8_t atlasLayer)
 {
     PoolState copy = getCurrentState();
+
     if (copy.color != color) copy.color = color;
-    if (texture) {
+
+    if (atlasLayer > -1) {
+        const auto& atlas = m_atlas->getAtlas(atlasLayer);
+        copy.textureId = atlas->getId();
+        copy.textureMatrixId = atlas->getTransformMatrixId();
+    } else if (texture) {
         if (texture->isEmpty() || !texture->isCached()) {
             copy.texture = texture;
         } else {

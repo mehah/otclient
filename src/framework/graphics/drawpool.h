@@ -33,6 +33,8 @@
 #include "../stdext/storage.h"
 #include <unordered_set>
 
+class TextureAtlas;
+
 enum class DrawPoolType : uint8_t
 {
     MAP,
@@ -235,6 +237,7 @@ protected:
         TexturePtr texture;
         uint32_t textureId{ 0 };
         uint16_t textureMatrixId{ 0 };
+        int8_t atlasLayer{ -1 };
         size_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
@@ -283,7 +286,7 @@ private:
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
     bool updateHash(const DrawMethod& method, const TexturePtr& texture, const Color& color, bool hasCoord);
-    PoolState getState(const TexturePtr& texture, const Color& color);
+    PoolState getState(const TexturePtr& texture, const Color& color, const int8_t atlasLayer);
 
     PoolState& getCurrentState() { return m_states[m_lastStateIndex]; }
     const PoolState& getCurrentState() const { return m_states[m_lastStateIndex]; }
@@ -427,6 +430,8 @@ private:
     std::function<void()> m_afterDraw;
 
     std::atomic<DrawPoolState> m_drawState = DrawPoolState::READY;
+
+    std::unique_ptr<TextureAtlas> m_atlas;
 
     friend class DrawPoolManager;
 };
