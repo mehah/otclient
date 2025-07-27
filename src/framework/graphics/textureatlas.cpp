@@ -83,16 +83,6 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     texture->m_atlas = this;
 }
 
-const TextureInfo& TextureAtlas::getTextureInfo(uint32_t id) {
-    auto it = m_texturesCached.find(id);
-    if (it == m_texturesCached.end()) {
-        static TextureInfo info;
-        return info;
-    }
-
-    return it->second;
-}
-
 void TextureAtlas::createNewLayer() {
     auto texture = std::make_shared<Texture>(Size{ m_atlasWidth, m_atlasHeight });
     texture->setCached(true);

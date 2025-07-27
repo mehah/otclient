@@ -59,11 +59,9 @@ public:
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id);
 
-    const auto& getAtlas(int layer) const {
+    const auto& getLayer(int layer) const {
         return m_layers[layer];
     }
-
-    const TextureInfo& getTextureInfo(uint32_t id);
 
     int getWidth() const { return m_atlasWidth; }
     int getHeight() const { return m_atlasHeight; }
