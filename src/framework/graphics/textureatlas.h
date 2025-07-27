@@ -16,9 +16,9 @@
 
 struct TextureInfo
 {
-    GLuint textureID;
-    int x, y, layer;
-    int width, height;
+    GLuint textureID = 0;
+    int x = -1, y = -1, layer = -1;
+    int width = -1, height = -1;
     bool active = false;
 };
 
