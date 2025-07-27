@@ -301,7 +301,7 @@ function refresh()
             toggleSkill('skillId' .. i, ativedAdditionalSkills)
         end
     end
-
+-- todo reload skills 14.12
     update()
     updateHeight()
 end
@@ -591,7 +591,7 @@ function onBaseSkillChange(localPlayer, id, baseLevel)
 end
 
 -- 14.12
-local function updateExperienceRate()
+local function updateExperienceRate(localPlayer)
     local baseRate = ExpRating[ExperienceRate.BASE] or 100
     local expRateTotal = baseRate
     
@@ -620,10 +620,9 @@ local function updateExperienceRate()
     end
     
     if (ExpRating[ExperienceRate.XP_BOOST] or 0) > 0 then
-        tooltip = tooltip .. string.format("\n- XP Boost: %d%% (h remaining)", ExpRating[ExperienceRate.XP_BOOST])
+        tooltip = tooltip .. string.format("\n- XP Boost: %d%% (%s h remaining)", ExpRating[ExperienceRate.XP_BOOST], formatTimeBySeconds(localPlayer:getStoreExpBoostTime()))
     end
-    
-    tooltip = tooltip .. string.format("\n- Stamina multiplier: x%.1f (h remaining)", staminaMultiplier / 100)
+    tooltip = tooltip .. string.format("\n- Stamina multiplier: x%.1f (%s h remaining)", staminaMultiplier / 100, formatTimeByMinutes(localPlayer:getStamina() - 2340))
     
     xpgainrate:setTooltip(tooltip)
     
@@ -640,7 +639,7 @@ end
 
 function onExperienceRateChange(localPlayer, type, value)
     ExpRating[type] = value
-    updateExperienceRate()
+    updateExperienceRate(localPlayer)
 end
 
    
@@ -716,8 +715,6 @@ function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critD
     setSkillValueTest('criticalChance', critChance, critChanceTooltips, true)
     setSkillValueTest('criticalExtraDamage', critDamage, critDamageTooltips, true)
     setSkillValueTest('onslaught', onslaught, onslaughtTooltips, true)
-
-
 end
 
 
@@ -756,7 +753,6 @@ function onDefenseInfoChange(localPlayer , defense, armor, mitigation, dodge, da
 
 end
 function onForgeBonusesChange(localPlayer, momentum, transcendence, amplification)
-    print(1)
     skillsWindow:recursiveGetChildById("separadorOnForgeBonusesChange"):setVisible(true)
     local momentumTooltip = "During combat, you have a +" .. math.floor(momentum * 10000) / 100 .. 
                            "% chance to trigger Momentum\n, which reduces all spell cooldowns by 2 seconds."

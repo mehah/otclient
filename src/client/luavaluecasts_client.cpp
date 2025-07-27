@@ -813,7 +813,7 @@ int push_luavalue(const BestiaryMonsterData& data) {
 }
 
 int push_luavalue(const CharmData& charm) {
-    g_lua.createTable(0, 7);
+    g_lua.createTable(0, 10);
     g_lua.pushInteger(charm.id);
     g_lua.setField("id");
     g_lua.pushString(charm.name);
@@ -830,6 +830,13 @@ int push_luavalue(const CharmData& charm) {
     g_lua.setField("raceId");
     g_lua.pushInteger(charm.removeRuneCost);
     g_lua.setField("removeRuneCost");
+    //if (g_game.getClientVersion() >= 1410) {
+        g_lua.pushInteger(charm.availableCharmSlots);
+        g_lua.setField("availableCharmSlots");
+        g_lua.pushInteger(charm.tier);
+        g_lua.setField("tier");
+   // }
+
     return 1;
 }
 
@@ -1389,7 +1396,6 @@ int push_luavalue(const CyclopediaCharacterOffenceStats& data)
     return 1;
 }
 
-// In src/client/luavaluecasts_client.cpp
 int push_luavalue(const CyclopediaCharacterDefenceStats& data)
 {
     g_lua.createTable(0, 20);
@@ -1468,7 +1474,6 @@ int push_luavalue(const CyclopediaCharacterDefenceStats& data)
     return 1;
 }
 
-// In src/client/luavaluecasts_client.cpp
 int push_luavalue(const CyclopediaCharacterMiscStats& data)
 {
     g_lua.createTable(0, 14);

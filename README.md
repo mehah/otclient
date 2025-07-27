@@ -12,7 +12,7 @@
 
 1. ![Logo](https://raw.githubusercontent.com/mehah/otclient/main/src/otcicon.ico)  [What is otclient?](#whatisotclient)
 2. 🚀 [Features](#features)
-6. <img height="16" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png" alt="Android"> [The Mobile Project](#themobileproject)
+6. <img height="16" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png"> [The Mobile Project](#themobileproject)
 3. 🔨 [Compiling](#compiling)
 4. 🐳 [Docker](#docker)
 5. 🩺 [Need help?](#need-help?)
@@ -151,7 +151,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/001_Bone.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/002_aura.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/003_particula.gif?raw=true" width="250" alt="Space Invaders" style="max-width: 250px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/001_Bone.gif?raw=true" width="200"  style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/002_aura.gif?raw=true" width="200"  style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Creature/003_particula.gif?raw=true" width="250" style="max-width: 250px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | ThingCategory Attached Effect | Texture(Png) Attached Effect | <center> Particule </center> |
 
@@ -215,7 +215,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 - Tile Widget [Wiki](https://github.com/mehah/otclient/wiki/Tutorial-Attached-Effects)
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="250" alt="Haskanoid Video" style="max-width:250px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/raw/main/Picture/Attached%20Effect/Tile/003_particulas.gif?raw=true" width="310" alt="Space Invaders" style="max-width: 310px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/001_attachedeffect.gif?raw=true" width="250"  style="max-width:250px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Attached%20Effect/Tile/002_widget.png?raw=true" width="200"  style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/raw/main/Picture/Attached%20Effect/Tile/003_particulas.gif?raw=true" width="310" style="max-width: 310px;"> |
 |-------------------------------------------|---------------|-------------------------|
 |<center>Title Attached Effect</center> | <center> Title Widget </center>| <center>Title Particule</center> |
 
@@ -248,12 +248,17 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
   In short, if the ping gets high, the camera moves slower, trying to keep up with the server's response time. If the ping goes down soon after, the camera will move faster. Of course, this all depends on your character's speed.
 </details>
 
+- <details>
+   <summary>Texture Atlas system</summary>
+  <br>
+
+</details>
 
 
 ##### 🙋 Community (Features)
 - Mobile Support [@tuliomagalhaes](https://github.com/tuliomagalhaes) & [@BenDol](https://github.com/BenDol) & [@SkullzOTS](https://github.com/SkullzOTS) 
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_ingame.png?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_interface.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/003_patrikq.jpg?raw=true" width="270" alt="Space Invaders" style="max-width: 270px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_ingame.png?raw=true" width="200"  style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/001_interface.png?raw=true" width="200"  style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Android/003_patrikq.jpg?raw=true" width="270" style="max-width: 270px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Interface | Density Pixel | Joystick (patrykq) |
 
@@ -271,7 +276,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Discord/001.png?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Discord/002_ingame.png?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Discord/003_future.png?raw=true" width="200" alt="Space Invaders" style="max-width: 200px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Discord/001.png?raw=true" width="200"  style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Discord/002_ingame.png?raw=true" width="200"  style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Discord/003_future.png?raw=true" width="200" style="max-width: 200px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Example interface | Example in game | future discord-game-sdk  |
 
@@ -280,7 +285,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - Access to widget children via widget.childId by [@Hugo0x1337](https://github.com/Hugo0x1337)
 - Shader System Fix (CTRL + Y) by [@FreshyPeshy](https://github.com/FreshyPeshy)
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/001_creature.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/003_map.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/002_mount.gif?raw=true" width="200" alt="Space Invaders" style="max-width: 200px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/001_creature.gif?raw=true" width="200"  style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/003_map.gif?raw=true" width="200"  style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/002_mount.gif?raw=true" width="200" style="max-width: 200px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | Creature | Map | Mount |
 
@@ -339,7 +344,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 <p align="center">
- <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/typing%20ico/001.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> 
+ <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/typing%20ico/001.gif?raw=true" width="200"  style="max-width:200px;"> 
 
 </p>
 
@@ -352,7 +357,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 </details>
 <p align="center">
- <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/smooth/001_smooth.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> 
+ <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/smooth/001_smooth.gif?raw=true" width="200"  style="max-width:200px;"> 
 
 </p>
 
@@ -408,7 +413,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 </details>
 
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/001_interface.png?raw=true" width="300" alt="Haskanoid Video" style="max-width:300px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/002_ingame.png?raw=true" width="300" alt="Peoplemon by Alex Stuart" style="max-width: 300px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/001_interface.png?raw=true" width="300" style="max-width:300px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Layout%2013/002_ingame.png?raw=true" width="300" style="max-width: 300px;"> |
 |-------------------------------------------|---------------|
 |<center> Interface </center> | <center>In-game</center> |
 - Imbuement tracker by [@Reyaleman](https://github.com/reyaleman)
@@ -437,7 +442,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 
 - Shader with Framebuffer  ([@SkullzOTS](https://github.com/SkullzOTS), [@Mryukiimaru](https://github.com/Mryukiimaru), [@JeanTheOne](https://github.com/JeanTheOne), [@KizaruHere](https://github.com/KizaruHere))
 
-| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/001_creature.gif?raw=true" width="200" alt="Haskanoid Video" style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/002_items.gif?raw=true" width="200" alt="Peoplemon by Alex Stuart" style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/003_UICreature.gif?raw=true" width="110" alt="Space Invaders" style="max-width: 110px;"> |
+| <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/001_creature.gif?raw=true" width="200"  style="max-width:200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/002_items.gif?raw=true" width="200"  style="max-width: 200px;"> | <img src="https://github.com/kokekanon/OTredemption-Picture-NODELETE/blob/main/Picture/Shader/Framebuffer/003_UICreature.gif?raw=true" width="110" style="max-width: 110px;"> |
 |-------------------------------------------|---------------|-------------------------|
 | <center>Creature.</center> |<center> Items</center> |<center> UICreature </center> |
 
@@ -454,7 +459,7 @@ Beyond of it's flexibility with scripts, otclient comes with tons of other featu
 - keybinds
 - Cam system
   
-## <a name="themobileproject"><img height="32" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png" alt="Android"> The Mobile Project </a>
+## <a name="themobileproject"><img height="32" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/android/android.png"> The Mobile Project </a>
 The Mobile Project
 This is a fork of edubart's otclient. The objective of this fork it's to develop a runnable otclient on mobiles devices.
 
@@ -534,9 +539,9 @@ Have found a bug? Please create an issue in our [bug tracker](https://github.com
 | TFS 1.5  <br> (8.0 / 8.60) 	| Downgrade nekiro / <br>MillhioreBT     	| [force-new-walking-formula: true](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L21)        <br>   [item-ticks-per-frame: 500](https://github.com/mehah/otclient/blob/cf7badda978de88cb3724615688e3d9da2ff4207/data/setup.otml#L32)        	| ✅             	|
 | TFS 1.4.2 <br> (10.98)   	| Release Otland              	|                                              	| ✅             	|
 | TFS 1.6  <br>(13.10)     	| Main repo <br> otland (2024)     	| [See wiki](https://github.com/mehah/otclient/wiki/Tutorial-to-Use-OTC-in-TFS-main) 	| ✅             	|
-| Canary  <br> (13.21 / 13.32 / 13.40)       	| OpenTibiaBr               	| [Assets , Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
-| Canary <br> (14.00 ~ 14.12)        	| OpenTibiaBr              	| [Assets ,  Enable HTTP login and port 80](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
-
+| Canary  <br> (13.21 / 13.32 / 13.40)       	| OpenTibiaBr               	| [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption)            	| ✅             	|
+| Canary <br> (14.00 ~ 14.12)        	| OpenTibiaBr              	| [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption)           	| ✅             	|
+| Canary <br> (15.00 ~ 15.10)        	| OpenTibiaBr              	| [See Wiki](https://docs.opentibiabr.com/opentibiabr/projects/otclient-redemption/about#how-to-connect-on-canary-with-otclient-redemption)           	| ❌             	|
 
 
 

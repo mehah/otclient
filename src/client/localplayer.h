@@ -68,6 +68,7 @@ public:
     void setCombatAbsorbValues(const std::map<uint8_t, double>& absorbValues);
     void setForgeBonuses(double momentum, double transcendence, double amplification);
     void setExperienceRate(Otc::ExperienceRate_t type, uint16_t value);
+    void setStoreExpBoostTime(uint16_t value);
 
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
@@ -87,6 +88,7 @@ public:
     uint16_t getBlessings() { return m_blessings; }
     uint16_t getRegenerationTime() { return m_regenerationTime; }
     uint16_t getOfflineTrainingTime() { return m_offlineTrainingTime; }
+    uint16_t getStoreExpBoostTime() { return m_offlineTrainingTime; }
 
     uint32_t getStates() { return m_states; }
     uint32_t getMana() { return m_mana; }
@@ -195,6 +197,7 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+    uint16_t m_storeExpBoostTime{ 0 };
 
     uint8_t m_attackElement{ 0 };
     uint8_t m_convertedElement{ 0 };

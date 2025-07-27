@@ -15,23 +15,42 @@ UIWidget
     Label
       id: TextBase
       text: "killin a monster has 10% chance to deal physical damage equal to 15& of its maximum health to all monsters in a small rabius"
-      width: 174
+      width: 165
       text-wrap: true
-
+      margin-top: 25
+      margin-right: 5
     BorderBox
       id: ItemBase
       image-source: /images/ui/panel_flat
       image-border: 10
-      width: 44
-      height: 45
-      margin-top: 20
-      margin-bottom: 20
+      size: 46 46
+      margin-top: 23
+      margin-bottom: 22
       phantom: true
+      border-width-top: 1
+      border-color-top: black
+      border-width-left: 1
+      border-color-left: black
+      border-width-bottom: 1
+      border-color-bottom: gray
+      border-width-right: 1
+      border-color-right: gray
       UIWidget
         size: 32 32
         id: image
         anchors.centerIn: parent
         phantom: true
+      UIWidget
+        id: lockedMask
+        size: 42 42
+        anchors.centerIn: parent
+        image-source: /images/ui/ditherpattern
+        phantom: true
+      UIWidget
+        id: border
+        anchors.centerIn: parent
+        phantom: true
+
     Panel
       id: verticalPanelUnLockClearChram
       width: 92
@@ -42,14 +61,28 @@ UIWidget
         anchors.left: parent.left
         anchors.right: parent.right
         text: UnLock
-      GoldLabel2
+        @onClick: modules.game_cyclopedia.Cyclopedia.actionCharmButton(self)
+      UIWidget
         id: PriceBaseCharm
         anchors.top: prev.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 20
-        text: Addon 1
         margin-top: 3
+        height: 20
+        image-source: /images/ui/item
+        image-border: 10
+        phantom: true
+        Label
+          id: Value
+          anchors.centerIn: parent
+          !text: tr('0')
+          text-auto-resize: true
+        UIWidget
+          id: Charm
+          anchors.left: Value.right
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 2
+          image-source: /game_cyclopedia/images/monster-icon-bonuspoints
 
       QtButton
         id: check
@@ -77,18 +110,12 @@ UIWidget
           !text: tr('0')
           text-auto-resize: true
         UIWidget
-          id: Charm
-          anchors.left: Value.right
-          anchors.verticalCenter: parent.verticalCenter
-          margin-left: 2
-          image-source: /game_cyclopedia/images/icon_charms
-        UIWidget
           id: Gold
           anchors.left: Value.right
           anchors.verticalCenter: parent.verticalCenter
           margin-left: 2
           image-source: /game_cyclopedia/images/icon_gold
-          visible: false
+          visible: true
     Panel
       id: PanelCreatureList
       width: 140
@@ -142,10 +169,11 @@ UIWidget
       QtButton 
         id: CreaturesLabel
         height: 20
-        text: select Creature
+        text: Select Creature
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
+        @onClick: modules.game_cyclopedia.Cyclopedia.actionSelectCharmButton(self)
       BorderBox
         id: InfoBase
         anchors.top: prev.bottom
@@ -296,3 +324,4 @@ UIWidget
         anchors.right: prev.right
         step: 50
         pixels-scroll: true
+        margin-right: -2

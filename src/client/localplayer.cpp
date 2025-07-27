@@ -632,3 +632,11 @@ void LocalPlayer::setExperienceRate(Otc::ExperienceRate_t type, uint16_t value)
 
     callLuaField("onExperienceRateChange", type, value);
 }
+
+void LocalPlayer::setStoreExpBoostTime(uint16_t value)
+{
+    if (m_storeExpBoostTime == value)
+        return;
+
+    m_storeExpBoostTime = value;
+}

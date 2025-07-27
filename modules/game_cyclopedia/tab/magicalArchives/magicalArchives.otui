@@ -42,7 +42,7 @@ UIWidget
     Label
       id: deleteme
       anchors.centerIn: parent
-      !text: tr("\nrequires modification of protobuf")
+      !text: tr("\nis this in the protobuf ?\n in http post ? \nor modify gamelib/spells.lua?")
       font-scale: 2
       margin-top: 12
       text-auto-resize: true

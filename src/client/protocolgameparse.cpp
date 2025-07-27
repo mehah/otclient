@@ -2239,7 +2239,7 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
     const uint16_t training = g_game.getFeature(Otc::GameOfflineTrainingTime) ? msg->getU16() : 0;
 
     if (g_game.getClientVersion() >= 1097) {
-        msg->getU16(); // xp boost time (seconds)
+        m_localPlayer->setStoreExpBoostTime(msg->getU16()); // xp boost time (seconds)
         msg->getU8(); // enables exp boost in the store
     }
 
@@ -2338,7 +2338,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setTotalCapacity(capacity);
     }
 
-    if (g_game.getClientVersion() >= 1412) {
+    if (g_game.getClientVersion() >= 1412) { // improve name with feature
         //msg->getU8(); //  GameConcotions ??
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity
@@ -3101,7 +3101,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
         charm.removeRuneCost = 0;
         if (g_game.getClientVersion() >= 1410) {
             charm.tier = msg->getU8();
-            charm.unlocked = static_cast<bool>(msg->getU8());
+            charm.unlocked = msg->getU8() == 1;
         } else {
             charm.name = msg->getString();
             charm.description = msg->getString();
@@ -3122,7 +3122,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
                 charm.removeRuneCost = msg->getU32();
             }
         } else if (g_game.getClientVersion() < 1410) {
-            msg->getU8();
+            msg->getU8(); // ??
         }
 
         charmData.charms.emplace_back(charm);
@@ -3131,7 +3131,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
     if (g_game.getClientVersion() >= 1410) {
         charmData.availableCharmSlots = msg->getU8();
     } else {
-        msg->getU8();
+        msg->getU8(); // ??
     }
 
     const uint16_t finishedMonstersSize = msg->getU16();

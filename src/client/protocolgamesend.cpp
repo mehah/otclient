@@ -1210,7 +1210,7 @@ void ProtocolGame::sendRequestStorePremiumBoost()
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);
     msg->addU8(Otc::Store_Type_Actions_t::OPEN_PREMIUM_BOOST);
-    msg->addU8(0);
+    msg->addU8(1);
     send(msg);
 }
 

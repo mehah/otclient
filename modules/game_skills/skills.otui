@@ -78,7 +78,7 @@ XpBoostButton < UIWidget
     image-source: /images/ui/button-storexp
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.top: prev.bottom
-    margin-top : -6
+    margin-top : -7
     @onClick: |
       modules.game_store.toggle()
       g_game.sendRequestStorePremiumBoost()
@@ -161,13 +161,12 @@ MiniWindow
 
     SkillButton
       id: regenerationTime
+      height: 15
       SkillNameLabel
-        !text: tr('Regeneration Time')
       SkillValueLabel
 
     SkillButton
       id: stamina
-      margin-top: -5
       SkillNameLabel
         !text: tr('Stamina')
       SkillValueLabel
@@ -567,3 +566,12 @@ MiniWindow
       SkillNameLabel
         !text: tr('Amplification')
       SkillValueLabel  
+
+  UIWidget
+    id: miniborder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 2
+    margin-bottom: 2
