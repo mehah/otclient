@@ -174,7 +174,7 @@ function fullscreen()
         fullscreenWidget = nil
         minimapWidget:setParent(mapController.ui.minimapBorder)
         minimapWidget:fill('parent')
-        mapController.ui:show(true)
+        mapController.ui:show()
         zoom = minimapWidget.zoomMinimap
         g_keyboard.unbindKeyDown('Escape')
         minimapWidget.fullMapView = false
@@ -267,7 +267,7 @@ function extendedView(extendedView)
         if not mainRightPanel:hasChild(mapController.ui) then
             mainRightPanel:insertChild(1, mapController.ui)
         end
-        mapController.ui:show(true)
+        mapController.ui:show()
 
     end
     mapController.ui.moveOnlyToMain = not extendedView

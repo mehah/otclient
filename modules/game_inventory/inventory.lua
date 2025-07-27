@@ -515,7 +515,7 @@ function extendedView(extendedView)
         if not mainRightPanel:hasChild(inventoryController.ui) then
             mainRightPanel:insertChild(3, inventoryController.ui)
         end
-        inventoryController.ui:show(true)
+        inventoryController.ui:show()
     end
     inventoryController.ui.moveOnlyToMain = not extendedView
 
