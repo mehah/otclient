@@ -113,7 +113,7 @@ private:
     void draw();
     void init(uint16_t spriteSize);
     void terminate() const;
-    void drawObject(const DrawPool::DrawObject& obj);
+    void drawObject(DrawPool* pool, const DrawPool::DrawObject& obj);
     void drawPool(DrawPoolType type);
     void drawObjects(DrawPool* pool);
 

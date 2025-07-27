@@ -368,6 +368,7 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
           framework/graphics/bitmapfont.cpp
           framework/graphics/cachedtext.cpp
           framework/graphics/coordsbuffer.cpp
+          framework/graphics/textureatlas.cpp
           framework/graphics/drawpool.cpp
           framework/graphics/drawpoolmanager.cpp
           framework/graphics/fontmanager.cpp

@@ -21,6 +21,7 @@
  */
 
 #include "drawpool.h"
+#include "textureatlas.h"
 
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
@@ -30,6 +31,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
+            pool->m_atlas = std::make_unique<TextureAtlas>();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(10);
 
@@ -47,8 +49,13 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
+void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
+    if (method.src.isValid() && texture && texture->getAtlasLayer() > -1) {
+        method.src = Rect(texture->getAtlasX() + method.src.x(), texture->getAtlasY() + method.src.y(), method.src.width(), method.src.height());
+        texture = texture->getAtlas()->getTexture(texture->getAtlasLayer());
+    }
+
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
         return;
 
@@ -177,9 +184,11 @@ bool DrawPool::updateHash(const DrawMethod& method, const TexturePtr& texture, c
 DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
 {
     PoolState copy = getCurrentState();
+
     if (copy.color != color) copy.color = color;
+
     if (texture) {
-        if (texture->isEmpty() || !texture->isCached()) {
+        if (texture->isEmpty() || !texture->isCached() || !texture->getAtlas() && m_atlas) {
             copy.texture = texture;
         } else {
             copy.textureId = texture->getId();
@@ -320,7 +329,7 @@ void DrawPool::popTransformMatrix()
     m_transformMatrixStack.pop_back();
 }
 
-void DrawPool::PoolState::execute() const {
+void DrawPool::PoolState::execute(DrawPool* pool) const {
     g_painter->setColor(color);
     g_painter->setOpacity(opacity);
     g_painter->setCompositionMode(compositionMode);
@@ -331,7 +340,10 @@ void DrawPool::PoolState::execute() const {
     if (action) action();
     if (texture) {
         texture->create();
-        g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
+        if (pool->m_atlas && !texture->getAtlas()) {
+            pool->m_atlas->addTexture(texture);
+        }
+        g_painter->setTexture(texture);
     } else
         g_painter->setTexture(textureId, textureMatrixId);
 }
@@ -372,7 +384,7 @@ void DrawPool::bindFrameBuffer(const Size& size, const Color& color)
     addAction([this, size, frameIndex = m_bindedFramebuffers] {
         static const PoolState state;
 
-        state.execute();
+        state.execute(this);
 
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->resize(size);
@@ -386,7 +398,7 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
     addAction([this, dest, frameIndex = m_bindedFramebuffers, drawState = getCurrentState()] {
         const auto& frame = getTemporaryFrameBuffer(frameIndex);
         frame->release();
-        drawState.execute();
+        drawState.execute(this);
         frame->draw(dest);
     });
 

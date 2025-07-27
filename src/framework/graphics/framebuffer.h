@@ -43,6 +43,10 @@ public:
     bool resize(const Size& size);
     bool isValid() const { return m_texture != nullptr; }
     bool canDraw() const;
+    bool isAutoClear() const { return m_autoClear; }
+    void setAutoClear(bool v) { m_autoClear = v; }
+    void setAlphaWriting(bool v) { m_useAlphaWriting = v; }
+    void setAutoResetState(bool v) { m_isScene = v; }
 
     TexturePtr getTexture() const { return m_texture; }
     TexturePtr extractTexture();
@@ -82,6 +86,7 @@ private:
     bool m_useAlphaWriting{ true };
     bool m_disableBlend{ false };
     bool m_isScene{ false };
+    bool m_autoClear{ true };
 
     Rect m_dest;
     Rect m_src;

@@ -33,6 +33,8 @@
 #include "../stdext/storage.h"
 #include <unordered_set>
 
+class TextureAtlas;
+
 enum class DrawPoolType : uint8_t
 {
     MAP,
@@ -238,7 +240,7 @@ protected:
         size_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
-        void execute() const;
+        void execute(DrawPool* pool) const;
     };
 
     struct DrawObject
@@ -273,7 +275,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
+    void add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
              const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addAction(const std::function<void()>& action);
@@ -427,6 +429,8 @@ private:
     std::function<void()> m_afterDraw;
 
     std::atomic<DrawPoolState> m_drawState = DrawPoolState::READY;
+
+    std::unique_ptr<TextureAtlas> m_atlas;
 
     friend class DrawPoolManager;
 };

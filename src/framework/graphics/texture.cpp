@@ -25,6 +25,7 @@
 #include "graphics.h"
 #include "image.h"
 #include "texturemanager.h"
+#include "textureatlas.h"
 
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
@@ -63,7 +64,8 @@ Texture::~Texture()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_id != 0) {
-        g_mainDispatcher.addEvent([id = m_id] {
+        g_mainDispatcher.addEvent([id = m_id, atlas = m_atlas]() mutable {
+            if (atlas) atlas->removeTexture(id);
             glDeleteTextures(1, &id);
         });
     }
