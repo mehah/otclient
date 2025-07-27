@@ -22,7 +22,6 @@ struct TextureInfo
     int layer = -1;
     int width = -1;
     int height = -1;
-    bool active = false;
 };
 
 struct FreeRegion

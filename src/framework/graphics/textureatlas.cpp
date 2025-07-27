@@ -19,7 +19,6 @@ void TextureAtlas::removeTexture(uint32_t id) {
 
     auto& info = it->second;
 
-    info.active = false;
     auto sizeKey = std::make_pair(info.width, info.height);
     m_inactiveTextures.try_emplace(sizeKey, std::vector<TextureInfo>())
         .first->second.emplace_back(std::move(info));
@@ -49,7 +48,6 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
                                width, height, 1);
 
             tex.textureID = texture->getId();
-            tex.active = true;
             m_texturesCached.emplace(textureID, std::move(tex));
             texture->m_atlas = this;
             texture->m_atlasX = tex.x;
@@ -80,8 +78,7 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
         .y = texture->m_atlasY = region.y,
         .layer = texture->m_atlasLayer = region.layer,
         .width = width,
-        .height = height,
-        .active = true
+        .height = height
     });
     texture->m_atlas = this;
 }
