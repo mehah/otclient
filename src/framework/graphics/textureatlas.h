@@ -1,6 +1,5 @@
 #pragma once
 
-#include <GL/glew.h>
 #include <unordered_map>
 #include <vector>
 #include <chrono>
@@ -16,7 +15,7 @@
 
 struct TextureInfo
 {
-    GLuint textureID = 0;
+    uint32_t textureID = 0;
     int x = -1;
     int y = -1;
     int layer = -1;
