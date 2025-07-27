@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ void SpriteManager::reload() {
 }
 
 void SpriteManager::load() {
-    m_spritesFiles.resize(g_asyncDispatcher.get_thread_count() * 2);
+    m_spritesFiles.resize(g_asyncDispatcher.get_thread_count());
     if (g_app.isLoadingAsyncTexture()) {
         for (auto& file : m_spritesFiles)
             file = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName));
@@ -88,7 +88,7 @@ bool SpriteManager::loadRegularSpr(std::string file)
         g_lua.callGlobalField("g_sprites", "onLoadSpr", file);
         return true;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
+        g_logger.error("Failed to load sprites from '{}': {}", file, e.what());
         return false;
     }
 }
@@ -98,7 +98,7 @@ bool SpriteManager::loadCwmSpr(std::string file)
     m_cwmSpritesMetadata.clear();
 
     if (g_gameConfig.getSpriteSize() <= 32) {
-        g_logger.error(stdext::format("Change your sprite size to 64x64 or larger for CWM support '%s'", file));
+        g_logger.error("Change your sprite size to 64x64 or larger for CWM support '{}'", file);
         return false;
     }
 
@@ -110,7 +110,7 @@ bool SpriteManager::loadCwmSpr(std::string file)
 
         const uint8_t version = spritesFile->getU8();
         if (version != 0x01) {
-            g_logger.error(stdext::format("Invalid CWM file version - %s", file));
+            g_logger.error("Invalid CWM file version - {}", file);
             return false;
         }
 
@@ -126,7 +126,7 @@ bool SpriteManager::loadCwmSpr(std::string file)
         m_spritesOffset = spritesFile->tell();
 
         if (m_spritesCount == 0) {
-            g_logger.error(stdext::format("Failed to load sprites from '%s' - no sprites", file));
+            g_logger.error("Failed to load sprites from '{}' - no sprites", file);
             return false;
         }
 
@@ -134,7 +134,7 @@ bool SpriteManager::loadCwmSpr(std::string file)
         g_lua.callGlobalField("g_sprites", "onLoadCWMSpr", file);
         return true;
     } catch (stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to load sprites from '%s': %s", file, e.what()));
+        g_logger.error("Failed to load sprites from '{}': {}", file, e.what());
         return false;
     }
 }
@@ -151,7 +151,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
     try {
         const auto& fin = g_resources.createFile(fileName);
         if (!fin)
-            throw Exception("failed to open file '%s' for write", fileName);
+            throw Exception("failed to open file '{}' for write", fileName);
 
         fin->cache();
 
@@ -193,7 +193,7 @@ void SpriteManager::saveSpr(const std::string& fileName)
         fin->flush();
         fin->close();
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to save '{}': {}", fileName, e.what());
     }
 }
 #endif
@@ -212,9 +212,15 @@ ImagePtr SpriteManager::getSpriteImage(const int id)
     }
 
     const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
-    if (const auto& sf = m_spritesFiles[threadId]) {
-        std::scoped_lock l(sf->mutex);
-        return m_spritesHd ? getSpriteImageHd(id, sf->file) : getSpriteImage(id, sf->file);
+    if (const auto& sf = m_spritesFiles[threadId % m_spritesFiles.size()]) {
+        if (sf->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING)
+            return nullptr;
+
+        auto image = m_spritesHd ? getSpriteImageHd(id, sf->file) : getSpriteImage(id, sf->file);
+
+        sf->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
+
+        return image;
     }
 
     return nullptr;
@@ -324,7 +330,7 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
 
         return image;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
+        g_logger.error("Failed to get sprite id {}: {}", id, e.what());
         return nullptr;
     }
 }

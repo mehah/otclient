@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -146,6 +146,11 @@ void Map::cleanDynamicThings()
 
     for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].missiles.clear();
+
+    for (auto& floor : m_floors) {
+        floor.missiles.clear();
+        floor.tileBlocks.clear();
+    }
 
     cleanTexts();
 
@@ -1429,7 +1434,7 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
                 if (width == 0)
                     width = lineLength;
                 if (width != lineLength) {
-                    g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern: %s", pattern));
+                    g_logger.error("Invalid pattern for getSpectatorsByPattern: {}", pattern);
                     return creatures;
                 }
                 height += 1;
@@ -1441,13 +1446,13 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
         if (width == 0)
             width = lineLength;
         if (width != lineLength) {
-            g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern: %s", pattern));
+            g_logger.error("Invalid pattern for getSpectatorsByPattern: {}", pattern);
             return creatures;
         }
         height += 1;
     }
     if (width % 2 != 1 || height % 2 != 1) {
-        g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern, width and height should be odd (height: %i width: %i)", height, width));
+        g_logger.error("Invalid pattern for getSpectatorsByPattern, width and height should be odd (height: %i width: %i)", height, width);
         return creatures;
     }
 

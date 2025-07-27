@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -80,6 +80,8 @@ public:
     void removeWidget(const UIWidgetPtr& widget) override;
 
     bool isUIAnchorLayout() override { return true; }
+
+    auto getAnchorsGroup() const { return m_anchorsGroups; }
 
 protected:
     bool internalUpdate() override;

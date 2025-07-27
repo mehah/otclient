@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,7 @@ int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpo
 {
     const auto& image = Image::load(file);
     if (!image) {
-        g_logger.traceError(stdext::format("unable to load cursor image file %s", file));
+        g_logger.traceError("unable to load cursor image file {}", file);
         return -1;
     }
 

@@ -40,6 +40,7 @@ function init()
     if g_game.isOnline() then
 
         addEvent(function()
+            online()
             setupActionBar()
             loadActionBar()
         end)
@@ -692,7 +693,11 @@ function setupHotkeys()
                 end
             elseif slot.text then
                 if slot.autoSend then
-                    g_game.talk(slot.text)
+                    if not modules.game_console.isChatEnabled() then
+                        g_game.talk(slot.text)
+                    else
+                        modules.game_console.sendMessage(slot.text)
+                    end
                 else
                     if not modules.game_console.isChatEnabled() then
                         modules.game_console.switchChatOnCall()

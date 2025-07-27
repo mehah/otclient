@@ -52,13 +52,17 @@ void SpriteAppearances::terminate()
 
 bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 {
+    if (sheet->m_loadingState.load(std::memory_order_acquire) == SpriteLoadState::LOADING)
+        return false;
+
     if (sheet->data)
         return true;
 
-    std::scoped_lock lock(sheet->m_mutex);
+    if (sheet->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING)
+        return false;
 
     try {
-        const auto& path = stdext::format("%s%s", g_spriteAppearances.getPath(), sheet->file);
+        const auto& path = fmt::format("{}{}", g_spriteAppearances.getPath(), sheet->file);
         if (!g_resources.fileExists(path))
             return false;
 
@@ -107,7 +111,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 
         lzma_ret ret = lzma_raw_decoder(&stream, filters);
         if (ret != LZMA_OK) {
-            throw stdext::exception(stdext::format("failed to initialize lzma raw decoder result: %d", ret));
+            throw stdext::exception(fmt::format("failed to initialize lzma raw decoder result: {}", ret));
         }
 
         stream.next_in = &fin->m_data.data()[fin->tell()];
@@ -117,7 +121,7 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
 
         ret = lzma_code(&stream, LZMA_RUN);
         if (ret != LZMA_STREAM_END) {
-            throw stdext::exception(stdext::format("failed to decode lzma buffer result: %d", ret));
+            throw stdext::exception(fmt::format("failed to decode lzma buffer result: {}", ret));
         }
 
         lzma_end(&stream); // free memory
@@ -154,9 +158,13 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
         sheet->data = std::make_unique<uint8_t[]>(LZMA_UNCOMPRESSED_SIZE);
         std::memcpy(sheet->data.get(), bufferStart, BYTES_IN_SPRITE_SHEET);
 
+        sheet->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
+
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load single sprite sheet '%s': %s", sheet->file, e.what()));
+        sheet->m_loadingState.store(SpriteLoadState::NONE, std::memory_order_release);
+
+        g_logger.error("Failed to load single sprite sheet '{}': {}", sheet->file, e.what());
         return false;
     }
 }
@@ -226,7 +234,7 @@ ImagePtr SpriteAppearances::getSpriteImage(const int id)
 
         return image;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to get sprite id %d: %s", id, e.what()));
+        g_logger.error("Failed to get sprite id {}: {}", id, e.what());
         return nullptr;
     }
 }

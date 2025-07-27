@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -177,9 +177,16 @@ bool DrawPool::updateHash(const DrawMethod& method, const TexturePtr& texture, c
 DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
 {
     PoolState copy = getCurrentState();
-    copy.texture = texture;
-    if (copy.color != color)
-        copy.color = color;
+    if (copy.color != color) copy.color = color;
+    if (texture) {
+        if (texture->isEmpty() || !texture->isCached()) {
+            copy.texture = texture;
+        } else {
+            copy.textureId = texture->getId();
+            copy.textureMatrixId = texture->getTransformMatrixId();
+        }
+    }
+
     return copy;
 }
 
@@ -246,7 +253,7 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint()
 {
-    if (m_repaint)
+    if (isDrawState(DrawPoolState::READY) || isDrawState(DrawPoolState::DRAWING))
         return false;
 
     uint16_t refreshDelay = m_refreshDelay;
@@ -322,8 +329,11 @@ void DrawPool::PoolState::execute() const {
     g_painter->setShaderProgram(shaderProgram);
     g_painter->setTransformMatrix(transformMatrix);
     if (action) action();
-    if (texture)
-        g_painter->setTexture(texture->create());
+    if (texture) {
+        texture->create();
+        g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
+    } else
+        g_painter->setTexture(textureId, textureMatrixId);
 }
 
 void DrawPool::setFramebuffer(const Size& size) {

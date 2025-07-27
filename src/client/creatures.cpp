@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,7 @@ void Spawn::load(pugi::xml_node node)
     CreatureTypePtr cType;
     for (pugi::xml_node cNode = node.child("monster"); cNode; cNode = cNode.next_sibling()) {
         if (cNode.name() != std::string("monster") && cNode.name() != std::string("npc"))
-            throw Exception("invalid spawn-subnode %s", cNode.name());
+            throw Exception("invalid spawn-subnode {}", cNode.name());
 
         std::string cName = cNode.attribute("name").as_string();
         stdext::tolower(cName);
@@ -121,10 +121,8 @@ void Spawn::addCreature(const Position& placePos, const CreatureTypePtr& cType)
     const Position& centerPos = getCenterPos();
     const int m_radius = getRadius();
     if (!isInZone(placePos, centerPos, m_radius)) {
-        g_logger.warning(stdext::format("cannot place creature at %s (spawn's center position: %s, spawn radius: %d) (increment radius)",
-                         stdext::to_string(placePos), stdext::to_string(centerPos),
-                         m_radius
-        ));
+        g_logger.warning("cannot place creature at {} (spawn's center position: {}, spawn radius: {}) (increment radius)", placePos, centerPos,
+                         m_radius);
         return;
     }
 
@@ -182,7 +180,7 @@ void CreatureManager::loadMonsters(const std::string& file)
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(file.c_str());
     if (!result)
-        throw Exception("cannot open monsters file '%s': '%s'", file, result.description());
+        throw Exception("cannot open monsters file '{}': '{}'", file, result.description());
 
     pugi::xml_node root = doc.first_child();
     if (!root || root.name() != std::string("monsters"))
@@ -212,7 +210,7 @@ void CreatureManager::loadNpcs(const std::string& folder)
         tmp += "/";
 
     if (!g_resources.directoryExists(tmp))
-        throw Exception("NPCs folder '%s' was not found.", folder);
+        throw Exception("NPCs folder '{}' was not found.", folder);
 
     const auto& fileList = g_resources.listDirectoryFiles(tmp);
     for (const auto& file : fileList)
@@ -235,7 +233,7 @@ void CreatureManager::loadSpawns(const std::string& fileName)
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(fileName.c_str());
         if (!result)
-            throw Exception("cannot load spawns xml file '%s: '%s'", fileName, result.description());
+            throw Exception("cannot load spawns xml file '{}: '{}'", fileName, result.description());
 
         pugi::xml_node root = doc.child("spawns");
         if (root.empty())
@@ -253,7 +251,7 @@ void CreatureManager::loadSpawns(const std::string& fileName)
         m_spawnLoaded = true;
         g_logger.debug("Spawns read successfully.");
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to load '{}': {}", fileName, e.what());
     }
 }
 
@@ -270,11 +268,11 @@ void CreatureManager::saveSpawns(const std::string& fileName)
         }
 
         if (!doc.save_file(("data" + fileName).c_str(), "\t", pugi::format_default, pugi::encoding_utf8)) {
-            throw Exception("failed to save spawns XML %s", fileName);
+            throw Exception("failed to save spawns XML {}", fileName);
         }
         g_logger.debug("Spawns saved successfully.");
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to save '{}': {}", fileName, e.what());
     }
 }
 
@@ -283,7 +281,7 @@ void CreatureManager::loadCreatureBuffer(const std::string& buffer)
     pugi::xml_document doc;
     auto result = doc.load_string(buffer.c_str());
     if (result.status != pugi::status_ok)
-        throw Exception("cannot load creature buffer: %s", result.description());
+        throw Exception("cannot load creature buffer: {}", result.description());
 
     pugi::xml_node root = doc.first_child();
 
@@ -345,7 +343,7 @@ const CreatureTypePtr& CreatureManager::getCreatureByName(std::string name)
                                  [=](const CreatureTypePtr& m) -> bool { return m->getName() == name; });
     if (it != m_creatures.end())
         return *it;
-    g_logger.warning(stdext::format("could not find creature with name: %s", name));
+    g_logger.warning("could not find creature with name: {}", name);
     return m_nullCreature;
 }
 
@@ -358,7 +356,7 @@ const CreatureTypePtr& CreatureManager::getCreatureByLook(int look)
     const auto it = std::find_if(m_creatures.begin(), m_creatures.end(), findFun);
     if (it != m_creatures.end())
         return *it;
-    g_logger.warning(stdext::format("could not find creature with looktype: %d", look));
+    g_logger.warning("could not find creature with looktype: {}", look);
     return m_nullCreature;
 }
 
@@ -367,7 +365,7 @@ SpawnPtr CreatureManager::getSpawn(const Position& centerPos)
     const auto it = m_spawns.find(centerPos);
     if (it != m_spawns.end())
         return it->second;
-    g_logger.debug(stdext::format("failed to find spawn at center %s", stdext::to_string(centerPos)));
+    g_logger.debug("failed to find spawn at center {}", centerPos);
     return nullptr;
 }
 

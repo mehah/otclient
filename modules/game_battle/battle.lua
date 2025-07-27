@@ -1,5 +1,5 @@
 -- Global Tables
-local binaryTree = {} -- BST
+local binaryTree = {}    -- BST
 local battleButtons = {} -- map of creature id
 
 -- Global variables that will inherit from init
@@ -10,6 +10,18 @@ local lastBattleButtonSwitched, lastCreatureSelected
 local hideButtons = {}
 
 local eventOnCheckCreature = nil
+
+local BattleButtonPool = ObjectPool.new(function()
+        local widget = g_ui.createWidget('BattleButton')
+        widget:show()
+        widget:setOn(true)
+        widget.onHoverChange = onBattleButtonHoverChange
+        widget.onMouseRelease = onBattleButtonMouseRelease
+        return widget
+    end,
+    function(obj)
+        battlePanel:removeChild(obj)
+    end)
 
 local function connecting()
     -- TODO: Just connect when you will be using
@@ -71,10 +83,10 @@ function init() -- Initiating the module (load)
     -- Binding Ctrl + B shortcut
     Keybind.new("Windows", "Show/hide battle list", "Ctrl+B", "")
     Keybind.bind("Windows", "Show/hide battle list", {
-      {
-        type = KEY_DOWN,
-        callback = toggle,
-      }
+        {
+            type = KEY_DOWN,
+            callback = toggle,
+        }
     })
 
     -- Disabling scrollbar auto hiding
@@ -94,14 +106,14 @@ function init() -- Initiating the module (load)
     end
 
     -- Adding Filter options
-    local options = {'hidePlayers', 'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty'}
+    local options = { 'hidePlayers', 'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty' }
     for i, v in ipairs(options) do
         hideButtons[v] = battleWindow:recursiveGetChildById(v)
     end
 
     -- Adding SortType and SortOrder options
-    local sortTypeOptions = {'Name', 'Distance', 'Age', 'Health'}
-    local sortOrderOptions = {'Asc.', 'Desc.'}
+    local sortTypeOptions = { 'Name', 'Distance', 'Age', 'Health' }
+    local sortOrderOptions = { 'Asc.', 'Desc.' }
 
     local sortTypeBox = battleWindow:recursiveGetChildById('sortTypeBox')
     for i, v in ipairs(sortTypeOptions) do
@@ -317,10 +329,6 @@ end
 function onGameStart()
     battleWindow:setupOnStart() -- load character window configuration
 
-    connect(LocalPlayer, {
-        onPositionChange = onCreaturePositionChange
-    })
-
     -- Temp fix
     scheduleEvent(checkCreatures, 200)
 end
@@ -473,7 +481,7 @@ end
 
 local function canBeSeen(creature)
     return creature and creature:canBeSeen() and creature:getPosition() and
-               modules.game_interface.getMapPanel():isInRange(creature:getPosition())
+        modules.game_interface.getMapPanel():isInRange(creature:getPosition())
 end
 
 local function getDistanceBetween(p1, p2) -- Calculate distance
@@ -546,10 +554,8 @@ function addCreature(creature, sortType) -- Insert a creature in our binary tree
         -- Binary Insertion
         local newIndex = binaryInsert(binaryTree, newCreature, BSComparatorSortType, sortType, true)
 
-        battleButton = g_ui.createWidget('BattleButton')
+        battleButton = BattleButtonPool:get()
         battleButton:setup(creature, true)
-        battleButton:show()
-        battleButton:setOn(true)
 
         battleButton.data = {}
         -- Batle Button insertion
@@ -557,8 +563,6 @@ function addCreature(creature, sortType) -- Insert a creature in our binary tree
             battleButton.data[i] = v
         end
 
-        battleButton.onHoverChange = onBattleButtonHoverChange
-        battleButton.onMouseRelease = onBattleButtonMouseRelease
         battleButtons[creatureId] = battleButton
 
         if creature == g_game.getAttackingCreature() then
@@ -595,7 +599,7 @@ function removeCreature(creature, all) -- Remove a single creature or all
         lastBattleButtonSwitched = nil
         for i, v in pairs(battleButtons) do
             -- v.creature:hideStaticSquare() -- Is this correct?
-            v:destroy()
+            BattleButtonPool:release(v)
         end
         battleButtons = {}
         return true
@@ -629,7 +633,7 @@ function removeCreature(creature, all) -- Remove a single creature or all
             end
             binaryTree[creatureListSize] = nil
             -- battleButton.creature:hideStaticSquare()
-            battleButton:destroy()
+            BattleButtonPool:release(battleButton)
             battleButtons[creatureId] = nil
             return true
         else
@@ -639,7 +643,7 @@ function removeCreature(creature, all) -- Remove a single creature or all
             end
             assert(index ~= nil,
                 'Not able to remove creature: id ' .. creatureId .. ' not found in binary search using ' .. sortType ..
-                    ' to find value ' .. msg .. '.')
+                ' to find value ' .. msg .. '.')
         end
     end
     return false
@@ -912,8 +916,8 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
                         else
                             assert(index ~= nil,
                                 'Not able to update Position Change. Creature: ' .. creature:getName() .. ' id ' ..
-                                    creatureId .. ' not found in binary search using ' .. sortType .. ' to find value ' ..
-                                    oldDistance .. '.\n')
+                                creatureId .. ' not found in binary search using ' .. sortType .. ' to find value ' ..
+                                oldDistance .. '.\n')
                         end
                     end
                 end
@@ -968,7 +972,7 @@ function onCreatureHealthPercentChange(creature, healthPercent, oldHealthPercent
             else
                 assert(index ~= nil,
                     'Not able to update HealthPercent Change. Creature: id ' .. creatureId ..
-                        ' not found in binary search using ' .. sortType .. ' to find value ' .. oldHealthPercent .. '.')
+                    ' not found in binary search using ' .. sortType .. ' to find value ' .. oldHealthPercent .. '.')
             end
         end
         battleButton:setLifeBarPercent(healthPercent)
@@ -999,7 +1003,7 @@ function onBattleButtonMouseRelease(self, mousePosition, mouseButton) -- Interac
     end
 
     if ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton) or
-        (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
+            (g_mouse.isPressed(MouseRightButton) and mouseButton == MouseLeftButton)) then
         mouseWidget.cancelNextRelease = true
         g_game.look(self.creature, true)
         return true
@@ -1064,7 +1068,7 @@ function toggle() -- Close/Open the battle window or Pressing Ctrl + B
     else
         if not battleWindow:getParent() then
             local panel = modules.game_interface
-                              .findContentPanelAvailable(battleWindow, battleWindow:getMinimumHeight())
+                .findContentPanelAvailable(battleWindow, battleWindow:getMinimumHeight())
             if not panel then
                 return
             end

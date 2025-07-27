@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,7 @@
 LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
+        m_texture->setCached(true);
         m_texture->setSmooth(true);
     });
 }
@@ -38,15 +39,15 @@ void LightView::resize(const Size& size, const uint16_t tileSize) {
     if (!m_texture || (m_mapSize == size && m_tileSize == tileSize))
         return;
 
-    std::scoped_lock l(m_pool->getMutex());
-
     m_mapSize = size;
     m_tileSize = tileSize;
+    m_pool->setScaleFactor(tileSize / g_gameConfig.getSpriteSize());
 
     m_lightData.tiles.resize(size.area());
     m_lightData.lights.clear();
 
-    m_pixels.resize(size.area() * 4);
+    for (auto& pixels : m_pixels)
+        pixels.resize(size.area() * 4);
 
     if (m_texture)
         m_texture->setupSize(m_mapSize);
@@ -86,21 +87,20 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    static bool pixelUpdated = false;
+    bool updatePixel = false;
 
     m_pool->getHashController().put(src.hash());
     m_pool->getHashController().put(m_globalLightColor.hash());
     if (m_pool->getHashController().wasModified()) {
-        std::scoped_lock l(m_pool->getMutex());
         updatePixels();
-        pixelUpdated = true;
+        m_pixels[0].swap(m_pixels[1]);
+        updatePixel = true;
     }
     m_pool->getHashController().reset();
 
     g_drawPool.addAction([=, this] {
-        if (pixelUpdated) {
-            m_texture->updatePixels(m_pixels.data());
-            pixelUpdated = false;
+        if (updatePixel) {
+            m_texture->updatePixels(m_pixels[1].data());
         }
 
         updateCoords(dest, src);
@@ -108,12 +108,9 @@ void LightView::draw(const Rect& dest, const Rect& src)
         g_painter->setCompositionMode(CompositionMode::MULTIPLY);
         g_painter->resetTransformMatrix();
         g_painter->resetColor();
-        g_painter->setTexture(m_texture.get());
+        g_painter->setTexture(m_texture);
         g_painter->drawCoords(m_coords);
     });
-
-    m_lightData.lights.clear();
-    m_lightData.tiles.assign(m_mapSize.area(), {});
 }
 
 void LightView::updateCoords(const Rect& dest, const Rect& src) {
@@ -140,7 +137,7 @@ void LightView::updatePixels()
     const auto tileCenterOffset = m_tileSize / 2;
     const auto invTileSize = 1.0f / m_tileSize;
 
-    auto* pixelData = m_pixels.data();
+    auto* pixelData = m_pixels[0].data();
 
     for (int y = 0; y < mapHeight; ++y) {
         for (int x = 0; x < mapWidth; ++x) {

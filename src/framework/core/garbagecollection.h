@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,10 @@ class GarbageCollection
 {
 public:
     static void poll();
+    static void lua();
+    static void texture();
+    static void drawpoll();
+    static void thingType();
 
 private:
     static bool canCheck(Timer& timer, const uint32_t delay) {
@@ -37,8 +41,4 @@ private:
         timer.restart();
         return true;
     }
-
-    static void texture();
-    static void drawpoll();
-    static void thingType();
 };

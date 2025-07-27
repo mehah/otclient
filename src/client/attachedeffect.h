@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ public:
     int8_t getLoop() { return m_loop; }
     void setLoop(const int8_t v) { m_loop = v; }
 
-    void setName(std::string_view n) { m_name = { n.data() }; }
+    void setName(std::string_view n) { m_name = n.data(); }
     std::string getName() { return m_name; }
 
     Otc::Direction getDirection() { return m_direction; }

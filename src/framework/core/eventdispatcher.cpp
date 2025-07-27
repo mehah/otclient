@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,11 +25,17 @@
 
 #include "timer.h"
 
+thread_local DispatcherContext EventDispatcher::dispacherContext;
+
 EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 int16_t g_mainThreadId = stdext::getThreadId();
 int16_t g_eventThreadId = -1;
 
-void EventDispatcher::init() {};
+void EventDispatcher::init() {
+    for (size_t i = 0; i < g_asyncDispatcher.get_thread_count(); ++i) {
+        m_threads.emplace_back(std::make_unique<ThreadTask>());
+    }
+}
 
 void EventDispatcher::shutdown()
 {
@@ -51,22 +57,6 @@ void EventDispatcher::poll()
     executeEvents();
     executeScheduledEvents();
     executeDeferEvents();
-    executeAsyncEvents();
-}
-
-void EventDispatcher::startEvent(const ScheduledEventPtr& event)
-{
-    if (m_disabled)
-        return;
-
-    if (!event) {
-        g_logger.error("EventDispatcher::startEvent called with null event");
-        return;
-    }
-
-    const auto& thread = getThreadTask();
-    std::scoped_lock lock(thread->mutex);
-    thread->scheduledEventList.emplace_back(event);
 }
 
 ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& callback, int delay)
@@ -76,9 +66,9 @@ ScheduledEventPtr EventDispatcher::scheduleEvent(const std::function<void()>& ca
 
     assert(delay >= 0);
 
-    const auto& thread = getThreadTask();
-    std::scoped_lock lock(thread->mutex);
-    return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 1));
+    return pushThreadTask<ScheduledEventPtr>([&](const std::unique_ptr<ThreadTask>& thread) {
+        return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 1));
+    });
 }
 
 ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callback, int delay)
@@ -88,9 +78,9 @@ ScheduledEventPtr EventDispatcher::cycleEvent(const std::function<void()>& callb
 
     assert(delay > 0);
 
-    const auto& thread = getThreadTask();
-    std::scoped_lock lock(thread->mutex);
-    return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 0));
+    return pushThreadTask<ScheduledEventPtr>([&](const std::unique_ptr<ThreadTask>& thread) {
+        return thread->scheduledEventList.emplace_back(std::make_shared<ScheduledEvent>(callback, delay, 0));
+    });
 }
 
 EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
@@ -103,27 +93,18 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
         return std::make_shared<Event>(nullptr);
     }
 
-    const auto& thread = getThreadTask();
-    std::scoped_lock lock(thread->mutex);
-    return thread->events.emplace_back(std::make_shared<Event>(callback));
-}
-
-void EventDispatcher::asyncEvent(std::function<void()>&& callback) {
-    if (m_disabled)
-        return;
-
-    const auto& thread = getThreadTask();
-    std::scoped_lock lock(thread->mutex);
-    thread->asyncEvents.emplace_back(std::move(callback));
+    return pushThreadTask<EventPtr>([&](const std::unique_ptr<ThreadTask>& thread) {
+        return thread->events.emplace_back(std::make_shared<Event>(callback));
+    });
 }
 
 void EventDispatcher::deferEvent(const std::function<void()>& callback) {
     if (m_disabled)
         return;
 
-    const auto& thread = getThreadTask();
-    std::scoped_lock lock(thread->mutex);
-    thread->deferEvents.emplace_back(callback);
+    pushThreadTask([&](const std::unique_ptr<ThreadTask>& thread) {
+        thread->deferEvents.emplace_back(callback);
+    });
 }
 
 void EventDispatcher::executeEvents() {
@@ -131,66 +112,39 @@ void EventDispatcher::executeEvents() {
         return;
     }
 
+    dispacherContext.group = TaskGroup::Serial;
+    dispacherContext.type = DispatcherType::Event;
+
     for (const auto& event : m_eventList)
         event->execute();
 
     m_eventList.clear();
-}
-
-std::vector<std::pair<uint64_t, uint64_t>> generatePartition(const size_t size) {
-    if (size == 0)
-        return {};
-
-    static const int threads = g_asyncDispatcher.get_thread_count();
-    std::vector<std::pair<uint64_t, uint64_t>> list;
-    list.reserve(threads);
-
-    const auto size_per_block = std::ceil(size / static_cast<float>(threads));
-    for (uint_fast64_t i = 0; i < size; i += size_per_block)
-        list.emplace_back(i, std::min<uint64_t >(size, i + size_per_block));
-
-    return list;
-}
-
-void EventDispatcher::executeAsyncEvents() {
-    if (m_asyncEventList.empty())
-        return;
-
-    const auto& partitions = generatePartition(m_asyncEventList.size());
-
-    BS::multi_future<void> retFuture;
-
-    if (partitions.size() > 1) {
-        const auto min = partitions[1].first;
-        const auto max = partitions[partitions.size() - 1].second;
-        retFuture = g_asyncDispatcher.submit_loop(min, max, [&](const unsigned int i) {  m_asyncEventList[i].execute();  });
-    }
-
-    const auto& [min, max] = partitions[0];
-    for (uint_fast64_t i = min; i < max; ++i)
-        m_asyncEventList[i].execute();
-
-    if (partitions.size() > 1)
-        retFuture.wait();
-
-    m_asyncEventList.clear();
+    dispacherContext.reset();
 }
 
 void EventDispatcher::executeDeferEvents() {
+    dispacherContext.group = TaskGroup::Serial;
+    dispacherContext.type = DispatcherType::DeferEvent;
+
     do {
         for (auto& event : m_deferEventList)
             event.execute();
         m_deferEventList.clear();
 
-        std::shared_lock l(m_sharedLock);
         for (const auto& thread : m_threads) {
-            std::scoped_lock lock(thread->mutex);
+            thread->waitWhileStateIs(ThreadTaskEventState::ADDING);
+            thread->setState(ThreadTaskEventState::MERGING);
+            if (m_deferEventList.size() < thread->deferEvents.size())
+                m_deferEventList.swap(thread->deferEvents);
             if (!thread->deferEvents.empty()) {
                 m_deferEventList.insert(m_deferEventList.end(), make_move_iterator(thread->deferEvents.begin()), make_move_iterator(thread->deferEvents.end()));
                 thread->deferEvents.clear();
             }
+            thread->setState(ThreadTaskEventState::MERGED);
         }
     } while (!m_deferEventList.empty());
+
+    dispacherContext.reset();
 }
 
 void EventDispatcher::executeScheduledEvents() {
@@ -201,6 +155,9 @@ void EventDispatcher::executeScheduledEvents() {
         const auto& scheduledEvent = *it;
         if (scheduledEvent->remainingTicks() > 0)
             break;
+
+        dispacherContext.type = scheduledEvent->maxCycles() > 0 ? DispatcherType::CycleEvent : DispatcherType::ScheduledEvent;
+        dispacherContext.group = TaskGroup::Serial;
 
         scheduledEvent->execute();
 
@@ -213,28 +170,29 @@ void EventDispatcher::executeScheduledEvents() {
     if (it != m_scheduledEventList.begin()) {
         m_scheduledEventList.erase(m_scheduledEventList.begin(), it);
     }
+
+    dispacherContext.reset();
 }
 
 void EventDispatcher::mergeEvents() {
-    std::shared_lock l(m_sharedLock);
     for (const auto& thread : m_threads) {
-        if (thread->mutex.try_lock()) {
+        thread->waitWhileStateIs(ThreadTaskEventState::ADDING);
+        thread->setState(ThreadTaskEventState::MERGING);
+        if (!thread->events.empty()) {
+            if (m_eventList.size() < thread->events.size())
+                m_eventList.swap(thread->events);
+
             if (!thread->events.empty()) {
                 m_eventList.insert(m_eventList.end(), make_move_iterator(thread->events.begin()), make_move_iterator(thread->events.end()));
                 thread->events.clear();
             }
-
-            if (!thread->asyncEvents.empty()) {
-                m_asyncEventList.insert(m_asyncEventList.end(), make_move_iterator(thread->asyncEvents.begin()), make_move_iterator(thread->asyncEvents.end()));
-                thread->asyncEvents.clear();
-            }
-
-            if (!thread->scheduledEventList.empty()) {
-                m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
-                thread->scheduledEventList.clear();
-            }
-
-            thread->mutex.unlock();
         }
+
+        if (!thread->scheduledEventList.empty()) {
+            m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
+            thread->scheduledEventList.clear();
+        }
+
+        thread->setState(ThreadTaskEventState::MERGED);
     }
 }

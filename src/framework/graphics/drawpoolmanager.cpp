@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -168,7 +168,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     select(type);
     const auto pool = getCurrentPool();
 
-    if (pool->m_repaint.load()) {
+    if (pool->isDrawState(DrawPoolState::READY) || pool->isDrawState(DrawPoolState::DRAWING)) {
         resetSelectedPool();
         return;
     }
@@ -177,21 +177,47 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (f) f();
 
-    std::scoped_lock l(pool->m_mutexDraw);
-
     if (beforeRelease)
         beforeRelease();
 
-    if (pool->hasFrameBuffer())
-        pool->m_framebuffer->prepare(dest, src, colorClear);
+    if (alwaysDraw)
+        pool->repaint();
 
-    pool->release(pool->m_repaint = alwaysDraw || pool->canRepaint());
-
-    if (pool->m_repaint) {
-        pool->m_refreshTimer.restart();
+    if (pool->hasFrameBuffer()) {
+        addAction([pool, dest, src, colorClear] {
+            pool->m_framebuffer->prepare(dest, src, colorClear);
+        });
     }
 
+    pool->release();
+
     resetSelectedPool();
+}
+
+void DrawPoolManager::drawObjects(DrawPool* pool) {
+    const auto hasFramebuffer = pool->hasFrameBuffer();
+
+    if (!pool->isDrawState(DrawPoolState::READY) && hasFramebuffer)
+        return;
+
+    pool->waitWhileStateIs(DrawPoolState::PREPARING);
+    pool->setDrawState(DrawPoolState::DRAWING);
+
+    if (hasFramebuffer)
+        pool->m_framebuffer->bind();
+
+    for (const auto& obj : pool->m_objectsDraw)
+        drawObject(obj);
+
+    if (hasFramebuffer) {
+        pool->m_framebuffer->release();
+
+        // Let's clean this up so that the cleaning is not done in another thread,
+        // and thus the CPU consumption will be partitioned.
+        pool->m_objectsDraw.clear();
+    }
+
+    pool->setDrawState(DrawPoolState::RENDERED);
 }
 
 void DrawPoolManager::drawPool(const DrawPoolType type) {
@@ -200,29 +226,13 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     if (!pool->isEnabled())
         return;
 
-    std::scoped_lock l(pool->m_mutexDraw);
+    drawObjects(pool);
+
     if (pool->hasFrameBuffer()) {
-        if (pool->m_repaint) {
-            pool->m_repaint.store(false);
-            pool->m_framebuffer->bind();
-            for (const auto& obj : pool->m_objectsDraw)
-                drawObject(obj);
-            pool->m_framebuffer->release();
-        }
-
-        // Let's clean this up so that the cleaning is not done in another thread,
-        // and thus the CPU consumption will be partitioned.
-        pool->m_objectsDraw.clear();
-
         g_painter->resetState();
 
         if (pool->m_beforeDraw) pool->m_beforeDraw();
         pool->m_framebuffer->draw();
         if (pool->m_afterDraw) pool->m_afterDraw();
-    } else {
-        pool->m_repaint.store(false);
-        for (const auto& obj : pool->m_objectsDraw) {
-            drawObject(obj);
-        }
     }
 }

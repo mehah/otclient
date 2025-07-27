@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ void UIWidget::initBaseStyle()
     m_borderColor.set(Color::black);
 
     // generate an unique id, this is need because anchored layouts find widgets by id
-    m_id = stdext::format("widget%d", ++UID);
+    m_id = fmt::format("widget{}", ++UID);
 }
 
 void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)

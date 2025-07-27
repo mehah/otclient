@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -936,7 +936,7 @@ void Tile::drawTexts(Point dest)
     if (m_timerText && g_clock.millis() < m_timer) {
         if (m_text && m_text->hasText())
             dest.y -= 8;
-        m_timerText->setText(stdext::format("%.01f", (m_timer - g_clock.millis()) / 1000.));
+        m_timerText->setText(fmt::format("{:.1f}", (m_timer - g_clock.millis()) / 1000.));
         m_timerText->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
         dest.y += 16;
     }

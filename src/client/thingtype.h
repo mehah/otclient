@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -317,6 +317,7 @@ public:
     void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
     void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
+    void applyAppearanceFlags(const appearances::AppearanceFlags& flags);
 
 #ifdef FRAMEWORK_EDITOR
     void serialize(const FileStreamPtr& fin);
@@ -324,6 +325,7 @@ public:
 #endif
 
     void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, const LightViewPtr& lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
+
     void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor);
 
     uint16_t getId() { return m_id; }
@@ -449,20 +451,22 @@ public:
     const Timer getLastTimeUsage() const { return m_lastTimeUsage; }
 
     void unload() {
-        m_textureData.clear();
-        m_textureData.resize(m_animationPhases);
+        for (auto& data : m_textureData) {
+            if (data.source) data.source->setCached(false);
+            data.source = nullptr;
+        }
     }
 
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
 
     uint16_t getClassification() { return m_upgradeClassification; }
-    std::vector<uint32_t> getSprites() { return m_spritesIndex; }
+    const auto& getSprites() { return m_spritesIndex; }
 
     // additional
     float getOpacity() { return m_opacity; }
     void setPathable(bool var);
     int getExactHeight();
-    TexturePtr getTexture(int animationPhase);
+    const TexturePtr& getTexture(int animationPhase);
 
     std::string getName() { return m_name; }
     std::string getDescription() { return m_description; }

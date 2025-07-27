@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,12 +40,21 @@ public:
     const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
     TexturePtr loadTexture(std::stringstream& file);
 
+    const Matrix3* getMatrixById(uint16_t id);
+    uint16_t getMatrixId(const Size& size, bool upsidedown);
+
 private:
     std::unordered_map<std::string, TexturePtr> m_textures;
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;
     ScheduledEventPtr m_liveReloadEvent;
     std::shared_mutex m_mutex;
+
+    struct
+    {
+        std::unordered_map<uint64_t, uint16_t> indexMap;
+        std::vector<std::unique_ptr<Matrix3>> objects;
+    } m_matrixCache;
 
     friend class GarbageCollection;
 };

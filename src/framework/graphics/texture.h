@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ public:
     Texture(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     virtual ~Texture();
 
-    virtual Texture* create();
+    virtual void create();
     void uploadPixels(const ImagePtr& image, bool buildMipmaps = false, bool compress = false);
     void updateImage(const ImagePtr& image);
     void updatePixels(uint8_t* pixels, int level = 0, int channels = 4, bool compress = false);
@@ -46,7 +46,7 @@ public:
     void setTime(const ticks_t time) { m_time = time; }
 
     const Size& getSize() const { return m_size; }
-    const Matrix3& getTransformMatrix() const { return m_transformMatrix; }
+    auto getTransformMatrixId() const { return m_transformMatrixId; }
 
     ticks_t getTime() const { return m_time; }
     uint32_t getId() const { return m_id; }
@@ -59,6 +59,8 @@ public:
     bool isEmpty() const { return m_id == 0; }
     bool hasRepeat() const { return getProp(repeat); }
     bool hasMipmaps() const { return getProp(hasMipMaps); }
+    bool isCached() const { return getProp(cached); }
+    virtual void setCached(bool v) { setProp(cached, v); }
     virtual bool isAnimatedTexture() const { return false; }
     bool setupSize(const Size& size);
 
@@ -80,7 +82,7 @@ protected:
     Size m_size;
     Timer m_lastTimeUsage;
 
-    Matrix3 m_transformMatrix = DEFAULT_MATRIX3;
+    uint16_t m_transformMatrixId{ 0 };
 
     ImagePtr m_image;
 
@@ -91,18 +93,13 @@ protected:
         upsideDown = 1 << 2,
         repeat = 1 << 3,
         compress = 1 << 4,
-        buildMipmaps = 1 << 5
+        buildMipmaps = 1 << 5,
+        cached = 1 << 6
     };
 
     uint16_t m_props{ 0 };
     void setProp(const Prop prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
     bool getProp(const Prop prop) const { return m_props & prop; };
-
-    static const Matrix3 toMatrix(const Size& size) {
-        return { 1.0f / size.width(), 0.0f, 0.0f,
-            0.0f, 1.0f / size.height(), 0.0f,
-            0.0f, 0.0f, 1.0f };
-    }
 
     friend class GarbageCollection;
     friend class TextureManager;

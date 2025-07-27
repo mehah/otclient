@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -178,9 +178,6 @@ void GraphicalApplication::run()
 #endif
     // THREAD - POOL & MAP
     const auto& mapThread = g_asyncDispatcher.submit_task([this] {
-        const auto uiPool = g_drawPool.get(DrawPoolType::FOREGROUND);
-        const auto fgMapPool = g_drawPool.get(DrawPoolType::FOREGROUND_MAP);
-
         BS::multi_future<void> tasks;
 
         g_luaThreadId = g_eventThreadId = stdext::getThreadId();
@@ -192,39 +189,24 @@ void GraphicalApplication::run()
                 continue;
             }
 
-            if (!m_drawEvents->canDraw(DrawPoolType::MAP)) {
-                if (uiPool->canRepaint())
-                    g_ui.render(DrawPoolType::FOREGROUND);
-                m_mapProcessFrameCounter.update();
-                continue;
+            if (m_drawEvents->canDraw(DrawPoolType::MAP)) {
+                m_drawEvents->preLoad();
+
+                for (const auto type : { DrawPoolType::LIGHT , DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {
+                    if (m_drawEvents->canDraw(type)) {
+                        tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
+                            m_drawEvents->draw(type);
+                        }));
+                    }
+                }
+
+                m_drawEvents->draw(DrawPoolType::MAP);
+
+                tasks.wait();
+                tasks.clear();
+            } else if (m_drawEvents->canDraw(DrawPoolType::FOREGROUND)) {
+                g_ui.render(DrawPoolType::FOREGROUND);
             }
-
-            m_drawEvents->preLoad();
-
-            tasks.clear();
-
-            if (m_drawEvents->canDraw(DrawPoolType::LIGHT)) {
-                tasks.emplace_back(g_asyncDispatcher.submit_task([this] {
-                    m_drawEvents->draw(DrawPoolType::LIGHT);
-                }));
-            }
-
-            if (uiPool->canRepaint()) {
-                tasks.emplace_back(g_asyncDispatcher.submit_task([this] {
-                    g_ui.render(DrawPoolType::FOREGROUND);
-                }));
-            }
-
-            if (fgMapPool->canRepaint()) {
-                tasks.emplace_back(g_asyncDispatcher.submit_task([this] {
-                    m_drawEvents->draw(DrawPoolType::CREATURE_INFORMATION);
-                    m_drawEvents->draw(DrawPoolType::FOREGROUND_MAP);
-                }));
-            }
-
-            m_drawEvents->draw(DrawPoolType::MAP);
-
-            tasks.wait();
 
             m_mapProcessFrameCounter.update();
         }

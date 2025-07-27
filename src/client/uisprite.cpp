@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,9 @@ void UISprite::setSpriteId(const int id)
     }
 
     const auto& image = g_sprites.getSpriteImage(id);
+    if (m_sprite) m_sprite->setCached(false);
     m_sprite = image ? std::make_shared<Texture>(image) : nullptr;
+    m_sprite->setCached(true);
 }
 
 void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)

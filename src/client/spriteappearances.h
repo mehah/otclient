@@ -35,6 +35,13 @@ enum class SpriteLayout
     TWO_BY_TWO = 3
 };
 
+enum class SpriteLoadState
+{
+    NONE,
+    LOADING,
+    LOADED
+};
+
 class SpriteSheet
 {
 public:
@@ -67,7 +74,7 @@ public:
     int lastId = 0;
 
     SpriteLayout spriteLayout = SpriteLayout::ONE_BY_ONE;
-    std::mutex m_mutex;
+    std::atomic<SpriteLoadState> m_loadingState = SpriteLoadState::NONE;
     std::unique_ptr<uint8_t[]> data;
     std::string file;
 };

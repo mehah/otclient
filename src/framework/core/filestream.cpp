@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -61,7 +61,11 @@ FileStream::~FileStream()
         close();
 }
 
-void FileStream::cache(bool useEnc)
+void FileStream::cache(bool
+#if ENABLE_ENCRYPTION == 1
+                       useEnc
+#endif
+)
 {
     m_caching = true;
 
@@ -350,7 +354,7 @@ std::string FileStream::getString()
 BinaryTreePtr FileStream::getBinaryTree()
 {
     if (const uint8_t byte = getU8(); byte != static_cast<uint8_t>(BinaryTree::Node::START))
-        throw Exception("failed to read node start (getBinaryTree): %d", byte);
+        throw Exception("failed to read node start (getBinaryTree): {}", byte);
 
     return  std::make_shared<BinaryTree>(shared_from_this());
 }
@@ -468,7 +472,7 @@ void FileStream::addString(const std::string_view v)
 
 void FileStream::throwError(const std::string_view message, const bool physfsError) const
 {
-    std::string completeMessage = stdext::format("in file '%s': %s", m_name, message);
+    std::string completeMessage = fmt::format("in file '{}': {}", m_name, message);
     if (physfsError)
         completeMessage += ": "s + PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
     throw Exception(completeMessage);

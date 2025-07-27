@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -157,6 +157,8 @@ private:
     asio::io_service& m_service;
     std::string m_url;
     std::string m_agent;
+    std::string m_read_buffer;
+    std::queue<std::pair<std::string, uint8_t>> m_pending_messages;
     bool m_enable_time_out_on_read_write;
     int m_timeout;
     HttpResult_ptr m_result;
@@ -165,6 +167,7 @@ private:
     asio::ip::tcp::socket m_socket;
     asio::ip::tcp::resolver m_resolver;
     bool m_closed{ false };
+    bool m_handshake_complete{ false };
     ParsedURI instance_uri;
 
     asio::ssl::context m_context{ asio::ssl::context::tlsv12_client };

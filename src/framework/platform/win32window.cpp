@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -349,11 +349,11 @@ void WIN32Window::internalCreateGLContext()
 
     m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_window, NULL);
     if (m_eglSurface == EGL_NO_SURFACE)
-        g_logger.fatal(stdext::format("Unable to create EGL surface: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL surface: {}", eglGetError());
 
     m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, EGL_NO_CONTEXT, contextAtrrList);
     if (m_eglContext == EGL_NO_CONTEXT)
-        g_logger.fatal(stdext::format("Unable to create EGL context: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL context: {}", eglGetError());
 
 #else
     static PIXELFORMATDESCRIPTOR pfd = { sizeof(PIXELFORMATDESCRIPTOR),
@@ -963,7 +963,7 @@ void WIN32Window::setIcon(const std::string& file)
         const auto& image = Image::load(file);
 
         if (!image) {
-            g_logger.traceError(stdext::format("unable to load icon file %s", file));
+            g_logger.traceError("unable to load icon file {}", file);
             return;
         }
 

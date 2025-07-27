@@ -513,9 +513,6 @@
     <ClCompile Include="..\src\client\spriteappearances.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\framework\graphics\hardwarebuffer.cpp">
-      <Filter>Source Files\framework\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\client\attachableobject.cpp">
       <Filter>Source Files\client</Filter>
     </ClCompile>
@@ -565,6 +562,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\framework\proxy\proxy_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\net\packet_player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\net\packet_recorder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -1040,9 +1043,6 @@
     <ClInclude Include="..\src\client\spriteappearances.h">
       <Filter>Header Files\client</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\framework\graphics\hardwarebuffer.h">
-      <Filter>Header Files\framework\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\framework\util\size.h">
       <Filter>Header Files\framework\util</Filter>
     </ClInclude>
@@ -1108,6 +1108,12 @@
     </ClInclude>
     <ClInclude Include="..\src\client\staticdata.h">
       <Filter>Header Files\client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\net\packet_player.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\net\packet_recorder.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

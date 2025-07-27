@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -111,5 +111,5 @@ void Missile::setId(uint32_t id)
 }
 
 ThingType* Missile::getThingType() const {
-    return g_things.getThingType(m_clientId, ThingCategoryMissile).get();
+    return g_things.getRawThingType(m_clientId, ThingCategoryMissile);
 }

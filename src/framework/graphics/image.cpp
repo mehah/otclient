@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ ImagePtr Image::load(const std::string& file)
     try {
         return loadPNG(path);
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("unable to load image '%s': %s", path, e.what()));
+        g_logger.error("unable to load image '{}': {}", path, e.what());
     }
     return nullptr;
 }
@@ -82,7 +82,7 @@ void Image::savePNG(const std::string& fileName)
 {
     const auto& fin = g_resources.createFile(fileName);
     if (!fin)
-        throw Exception("failed to open file '%s' for write", fileName);
+        throw Exception("failed to open file '{}' for write", fileName);
 
     fin->cache();
     std::stringstream data;
@@ -180,7 +180,7 @@ bool Image::nextMipmap()
 
     const int iw = m_size.width();
     const int ih = m_size.height();
-    if (iw == 1 && ih == 1)
+    if (iw == 1 && ih == 1 || m_pixels.empty())
         return false;
 
     const int ow = iw > 1 ? iw / 2 : 1;
@@ -271,7 +271,7 @@ ImagePtr Image::fromQRCode(const std::string& code, const int border)
 
         return image;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to encode qr-code: '%s': %s", code, e.what()));
+        g_logger.error("Failed to encode qr-code: '{}': {}", code, e.what());
     }
 
     return {};

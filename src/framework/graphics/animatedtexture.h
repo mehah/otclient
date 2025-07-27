@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,11 +34,16 @@ public:
     TexturePtr get(uint32_t& frame, Timer& timer);
     TexturePtr getCurrentFrame();
 
-    Texture* create() override;
+    void create() override;
     void buildHardwareMipmaps() override;
 
     void setSmooth(bool smooth) override;
     void setRepeat(bool repeat) override;
+    void setCached(bool v) override {
+        Texture::setCached(v);
+        for (const auto& frame : m_frames)
+            frame->setCached(v);
+    }
 
     uint32_t getNumPlays() const { return m_numPlays; }
     void setNumPlays(const uint32_t n) { m_numPlays = n; }

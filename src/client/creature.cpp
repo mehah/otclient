@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -72,11 +72,15 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
             g_drawPool.addBoundingRect(Rect(dest + (m_walkOffset - getDisplacement()) * g_drawPool.getScaleFactor(), Size(g_gameConfig.getSpriteSize() * g_drawPool.getScaleFactor())), m_staticSquareColor, std::max<int>(static_cast<int>(2 * g_drawPool.getScaleFactor()), 1));
         }
 
-        const auto& _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
+        auto _dest = dest + m_walkOffset * g_drawPool.getScaleFactor();
 
         auto oldScaleFactor = g_drawPool.getScaleFactor();
 
         g_drawPool.setScaleFactor(getScaleFactor() + (oldScaleFactor - 1.f));
+
+        if (oldScaleFactor != g_drawPool.getScaleFactor()) {
+            _dest -= ((Point(g_gameConfig.getSpriteSize()) + getDisplacement()) / 2) * (g_drawPool.getScaleFactor() - oldScaleFactor);
+        }
 
         internalDraw(_dest);
 
@@ -248,6 +252,20 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
     if (g_gameConfig.drawTyping() && getTyping() && m_typingIconTexture)
         g_drawPool.addTexturedPos(m_typingIconTexture, p.x + (nameSize.width() / 2.0) + 2, textRect.y() - 4);
+
+    if (g_game.getClientVersion() >= 1281 && m_icons && !m_icons->atlasGroups.empty()) {
+        int iconOffset = 0;
+        for (const auto& iconTex : m_icons->atlasGroups) {
+            if (!iconTex.texture) continue;
+            const Rect dest(backgroundRect.x() + 13.5 + 12, backgroundRect.y() + 5 + iconOffset * 14, iconTex.clip.size());
+            g_drawPool.addTexturedRect(dest, iconTex.texture, iconTex.clip);
+            m_icons->numberText.setText(std::to_string(iconTex.count));
+            const auto textSize = m_icons->numberText.getTextSize();
+            const Rect numberRect(dest.right() + 2, dest.y() + (dest.height() - textSize.height()) / 2, textSize);
+            m_icons->numberText.draw(numberRect, Color::white);
+            ++iconOffset;
+        }
+    }
 }
 
 void Creature::internalDraw(Point dest, const Color& color)
@@ -345,7 +363,9 @@ void Creature::internalDraw(Point dest, const Color& color)
             }
 
             int animationPhase = 0;
-            if (animationPhases > 1) {
+            if (auto* animator = getThingType()->getIdleAnimator(); animator && m_outfit.isItem()) {
+                animationPhase = animator->getPhase();
+            } else if (animationPhases > 1) {
                 animationPhase = (g_clock.millis() % (static_cast<long long>(animateTicks) * animationPhases)) / animateTicks;
             }
 
@@ -663,7 +683,9 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk()
 {
-    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
+    const int stepDuration = getStepDuration(true);
+    const float stabilizeCam = isCameraFollowing() && g_window.vsyncEnabled() ? 6.f : 0.f;
+    const float walkTicksPerPixel = (stepDuration + stabilizeCam) / static_cast<float>(g_gameConfig.getSpriteSize());
 
     const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, g_gameConfig.getSpriteSize());
 
@@ -838,12 +860,37 @@ void Creature::setBaseSpeed(const uint16_t baseSpeed)
 
 void Creature::setType(const uint8_t v) { if (m_type != v) callLuaField("onTypeChange", m_type = v); }
 void Creature::setIcon(const uint8_t v) { if (m_icon != v) callLuaField("onIconChange", m_icon = v); }
+void Creature::setIcons(const std::vector<std::tuple<uint8_t, uint8_t, uint16_t>>& icons)
+{
+    if (!m_icons) {
+        m_icons = std::make_unique<IconRenderData>();
+        m_icons->numberText.setFont(g_gameConfig.getStaticTextFont());
+        m_icons->numberText.setAlign(Fw::AlignCenter);
+    }
+
+    m_icons->atlasGroups.clear();
+    m_icons->iconEntries = icons;
+
+    for (const auto& [icon, category, count] : icons) {
+        callLuaField("onIconsChange", icon, category, count);
+    }
+}
 void Creature::setSkull(const uint8_t v) { if (m_skull != v) callLuaField("onSkullChange", m_skull = v); }
 void Creature::setShield(const uint8_t v) { if (m_shield != v) callLuaField("onShieldChange", m_shield = v); }
 void Creature::setEmblem(const uint8_t v) { if (m_emblem != v) callLuaField("onEmblemChange", m_emblem = v); }
 
 void Creature::setTypeTexture(const std::string& filename) { m_typeTexture = g_textures.getTexture(filename); }
 void Creature::setIconTexture(const std::string& filename) { m_iconTexture = g_textures.getTexture(filename); }
+void Creature::setIconsTexture(const std::string& filename, const Rect& clip, const uint16_t count)
+{
+    if (!m_icons) {
+        m_icons = std::make_unique<IconRenderData>();
+        m_icons->numberText.setFont(g_gameConfig.getStaticTextFont());
+        m_icons->numberText.setAlign(Fw::AlignCenter);
+    }
+
+    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ g_textures.getTexture(filename), clip, count });
+}
 void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
 void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
 
@@ -1019,11 +1066,11 @@ const Light& Creature::getLight() const
 }
 
 ThingType* Creature::getThingType() const {
-    return g_things.getThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory()).get();
+    return g_things.getRawThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory());
 }
 
 ThingType* Creature::getMountThingType() const {
-    return m_outfit.hasMount() ? g_things.getThingType(m_outfit.getMount(), ThingCategoryCreature).get() : nullptr;
+    return m_outfit.hasMount() ? g_things.getRawThingType(m_outfit.getMount(), ThingCategoryCreature) : nullptr;
 }
 
 uint16_t Creature::getCurrentAnimationPhase(const bool mount)

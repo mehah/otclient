@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,6 +51,14 @@ enum DrawOrder : uint8_t
     FOURTH, // TOP ~ TOP
     FIFTH,  // ABOVE ALL - MISSILE
     LAST
+};
+
+enum class DrawPoolState
+{
+    PREPARING,
+    READY,
+    DRAWING,
+    RENDERED,
 };
 
 struct DrawHashController
@@ -139,10 +147,8 @@ public:
     void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
-    std::mutex& getMutex() { return m_mutexDraw; }
-
-    bool isDrawing() const {
-        return m_repaint;
+    bool isDrawState(DrawPoolState state) const {
+        return m_drawState.load(std::memory_order_acquire) == state;
     }
 
     auto& getHashController() {
@@ -150,10 +156,51 @@ public:
     }
 
     void resetBuffer() {
+        waitWhileStateIs(DrawPoolState::DRAWING);
         for (auto& buffer : m_coordsCache) {
             buffer.coords.clear();
             buffer.last = 0;
         }
+    }
+
+    void release() {
+        const auto repaint = canRepaint();
+        if (repaint) {
+            m_refreshTimer.restart();
+
+            waitWhileStateIs(DrawPoolState::DRAWING);
+            setDrawState(DrawPoolState::PREPARING);
+
+            m_objectsDraw.clear();
+            if (!m_objectsFlushed.empty()) {
+                if (m_objectsDraw.size() < m_objectsFlushed.size())
+                    m_objectsDraw.swap(m_objectsFlushed);
+
+                if (!m_objectsFlushed.empty())
+                    m_objectsDraw.insert(
+                        m_objectsDraw.end(),
+                        make_move_iterator(m_objectsFlushed.begin()),
+                        make_move_iterator(m_objectsFlushed.end()));
+            }
+
+            for (auto& objs : m_objects) {
+                if (m_objectsDraw.size() < objs.size())
+                    m_objectsDraw.swap(objs);
+
+                if (!objs.empty()) {
+                    m_objectsDraw.insert(
+                        m_objectsDraw.end(),
+                        make_move_iterator(objs.begin()),
+                        make_move_iterator(objs.end()));
+                    objs.clear();
+                }
+            }
+
+            std::swap(m_coordsCache[0], m_coordsCache[1]);
+            setDrawState(DrawPoolState::READY);
+        }
+
+        m_objectsFlushed.clear();
     }
 
 protected:
@@ -186,6 +233,8 @@ protected:
         std::function<void()> action{ nullptr };
         Color color{ Color::white };
         TexturePtr texture;
+        uint32_t textureId{ 0 };
+        uint16_t textureMatrixId{ 0 };
         size_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
@@ -263,6 +312,14 @@ private:
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, const float angle) { rotate(p.x, p.y, angle); }
 
+    void waitWhileStateIs(DrawPoolState state) {
+        while (isDrawState(state)); // spinlock
+    }
+
+    void setDrawState(DrawPoolState state) {
+        m_drawState.store(state, std::memory_order_release);
+    }
+
     std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
     template<typename T>
@@ -294,24 +351,6 @@ private:
             m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
             objs.clear();
         }
-    }
-
-    void release(const bool flush = true) {
-        m_objectsDraw.clear();
-
-        if (flush) {
-            if (!m_objectsFlushed.empty())
-                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(m_objectsFlushed.begin()), make_move_iterator(m_objectsFlushed.end()));
-
-            for (auto& objs : m_objects) {
-                m_objectsDraw.insert(m_objectsDraw.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
-                objs.clear();
-            }
-        }
-        m_objectsFlushed.clear();
-
-        std::swap(m_coordsCache[0].coords, m_coordsCache[1].coords);
-        m_coordsCache[1].last = m_coordsCache[0].last;
     }
 
     void resetOnlyOnceParameters() {
@@ -387,8 +426,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic_bool m_repaint{ false };
-    std::mutex m_mutexDraw;
+    std::atomic<DrawPoolState> m_drawState = DrawPoolState::READY;
 
     friend class DrawPoolManager;
 };

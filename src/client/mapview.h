@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -204,7 +204,7 @@ protected:
 private:
     enum class FadeType
     {
-        NONE$, IN$, OUT$
+        NONE, FADE_IN, FADE_OUT
     };
 
     struct MapObject
@@ -323,7 +323,7 @@ private:
     bool m_shiftPressed{ false };
     bool m_multithreading{ false };
 
-    FadeType m_fadeType{ FadeType::NONE$ };
+    FadeType m_fadeType{ FadeType::NONE };
 
     AntialiasingMode m_antiAliasingMode{ ANTIALIASING_DISABLED };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,5 +51,19 @@
 #include <parallel_hashmap/btree.h>
 #include <parallel_hashmap/phmap.h>
 #include <pugixml.hpp>
+
+// FMT
+#include <fmt/chrono.h>
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/args.h>
+#include <fmt/ranges.h>
+
+// FMT Custom Formatter for Enums
+template <typename E>
+std::enable_if_t<std::is_enum_v<E>, std::underlying_type_t<E>>
+format_as(E e) {
+	return static_cast<std::underlying_type_t<E>>(e);
+}
 
 using namespace std::literals;

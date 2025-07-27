@@ -252,6 +252,9 @@ end
 function online()
     skillsWindow:setupOnStart() -- load character window configuration
     refresh()
+    if g_game.getFeature(GameEnterGameShowAppearance) then
+        skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
+    end
 end
 
 function refresh()
@@ -524,14 +527,31 @@ function onRegenerationChange(localPlayer, regenerationTime)
     if not g_game.getFeature(GamePlayerRegenerationTime) or regenerationTime < 0 then
         return
     end
+    local hours = math.floor(regenerationTime / 3600)
     local minutes = math.floor(regenerationTime / 60)
     local seconds = regenerationTime % 60
     if seconds < 10 then
         seconds = '0' .. seconds
     end
-
-    setSkillValue('regenerationTime', minutes .. ':' .. seconds)
-    checkAlert('regenerationTime', regenerationTime, false, 300)
+    if minutes < 10 then
+        minutes = '0' .. minutes
+    end
+    if hours < 10 then
+        hours = '0' .. hours
+    end
+    local fmt = ""
+    local alert = 300
+    if g_game.getFeature(GameEnterGameShowAppearance) then
+        fmt = string.format("%02d:%02d:%02d", hours, minutes, seconds)
+        alert = 0
+    else
+        fmt = string.format("%02d:%02d", minutes, seconds)
+    end
+    setSkillValue('regenerationTime', fmt)
+    checkAlert('regenerationTime', regenerationTime, false, alert)
+    if g_game.getFeature(GameEnterGameShowAppearance) then
+        modules.game_interface.StatsBar.onHungryChange(regenerationTime, alert)
+    end
 end
 
 function onSpeedChange(localPlayer, speed)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 #ifdef FRAMEWORK_EDITOR
 #include "itemtype.h"
 #include "creatures.h"
+#include <framework/core/binarytree.h>
 #endif
 
 #include <framework/core/filestream.h>
@@ -104,7 +105,7 @@ bool ThingTypeManager::loadDat(std::string file)
         g_lua.callGlobalField("g_things", "onLoadDat", file);
         return true;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to read dat '%s': %s'", file, e.what()));
+        g_logger.error("Failed to read dat '{}': {}'", file, e.what());
         return false;
     }
 }
@@ -139,7 +140,7 @@ bool ThingTypeManager::loadOtml(std::string file)
         }
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to read dat otml '%s': %s'", file, e.what()));
+        g_logger.error("Failed to read dat otml '{}': {}'", file, e.what());
         return false;
     }
 }
@@ -147,73 +148,80 @@ bool ThingTypeManager::loadOtml(std::string file)
 bool ThingTypeManager::loadAppearances(const std::string& file)
 {
     try {
-        int spritesCount = 0;
-        std::string appearancesFile;
-
-        json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
-        for (const auto& obj : document) {
-            const auto& type = obj["type"];
-            if (type == "appearances") {
-                appearancesFile = obj["file"];
-            } else if (type == "sprite") {
-                int lastSpriteId = obj["lastspriteid"].get<int>();
-                g_spriteAppearances.addSpriteSheet(std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>()));
-                spritesCount = std::max<int>(spritesCount, lastSpriteId);
+        if (!g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
+            g_spriteAppearances.unload();
+            int spritesCount = 0;
+            std::string appearancesFile;
+            json document = json::parse(g_resources.readFileContents(g_resources.resolvePath(g_resources.guessFilePath(file + "catalog-content", "json"))));
+            for (const auto& obj : document) {
+                const auto& type = obj["type"];
+                if (type == "appearances") {
+                    appearancesFile = obj["file"];
+                } else if (type == "sprite") {
+                    int lastSpriteId = obj["lastspriteid"].get<int>();
+                    g_spriteAppearances.addSpriteSheet(std::make_shared<SpriteSheet>(obj["firstspriteid"].get<int>(), lastSpriteId, static_cast<SpriteLayout>(obj["spritetype"].get<int>()), obj["file"].get<std::string>()));
+                    spritesCount = std::max<int>(spritesCount, lastSpriteId);
+                }
             }
-        }
-
-        g_spriteAppearances.setSpritesCount(spritesCount + 1);
-        g_spriteAppearances.setPath(file);
-
-        // load appearances.dat
-        std::stringstream fin;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, appearancesFile)), fin);
-
-        auto appearancesLib = appearances::Appearances();
-        if (!appearancesLib.ParseFromIstream(&fin)) {
-            throw stdext::exception("Couldn't parse appearances lib.");
-        }
-
-        for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
-            const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
-
-            switch (category) {
-                case ThingCategoryItem: appearances = &appearancesLib.object(); break;
-                case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
-                case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
-                case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
-                default: return false;
+            g_spriteAppearances.setSpritesCount(spritesCount + 1);
+            g_spriteAppearances.setPath(file);
+            // load appearances.dat
+            std::stringstream fin;
+            g_resources.readFileStream(g_resources.resolvePath(fmt::format("{}{}", file, appearancesFile)), fin);
+            auto appearancesLib = appearances::Appearances();
+            if (!appearancesLib.ParseFromIstream(&fin)) {
+                throw stdext::exception("Couldn't parse appearances lib.");
             }
-
-            // fix for custom asserts, where ids are not sorted.
-            uint32_t lastAppearanceId = 0;
-            for (const auto& appearance : *appearances) {
-                if (appearance.id() > lastAppearanceId)
-                    lastAppearanceId = appearance.id();
+            for (int category = ThingCategoryItem; category < ThingLastCategory; ++category) {
+                const google::protobuf::RepeatedPtrField<appearances::Appearance>* appearances = nullptr;
+                switch (category) {
+                    case ThingCategoryItem: appearances = &appearancesLib.object(); break;
+                    case ThingCategoryCreature: appearances = &appearancesLib.outfit(); break;
+                    case ThingCategoryEffect: appearances = &appearancesLib.effect(); break;
+                    case ThingCategoryMissile: appearances = &appearancesLib.missile(); break;
+                    default: return false;
+                }
+                // fix for custom asserts, where ids are not sorted.
+                uint32_t lastAppearanceId = 0;
+                for (const auto& appearance : *appearances) {
+                    if (appearance.id() > lastAppearanceId)
+                        lastAppearanceId = appearance.id();
+                }
+                auto& things = m_thingTypes[category];
+                things.clear();
+                things.resize(lastAppearanceId + 1, m_nullThingType);
+                for (const auto& appearance : *appearances) {
+                    const auto& type = std::make_shared<ThingType>();
+                    const uint16_t id = appearance.id();
+                    type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
+                    m_thingTypes[category][id] = type;
+                }
             }
-
-            auto& things = m_thingTypes[category];
-            things.clear();
-            things.resize(lastAppearanceId + 1, m_nullThingType);
-
-            for (const auto& appearance : *appearances) {
-                const auto& type = std::make_shared<ThingType>();
+            m_datLoaded = true;
+        } else {
+            std::stringstream datFileStream;
+            auto appearancesLib = appearances::Appearances();
+            g_resources.readFileStream(g_resources.resolvePath(g_resources.guessFilePath(file, "dat")), datFileStream);
+            if (!appearancesLib.ParseFromIstream(&datFileStream)) {
+                throw stdext::exception("Couldn't parse appearances.dat.");
+            }
+            for (const auto& appearance : appearancesLib.object()) {
                 const uint16_t id = appearance.id();
-                type->unserializeAppearance(id, static_cast<ThingCategory>(category), appearance);
-                m_thingTypes[category][id] = type;
+                if (auto* type = getRawThingType(id, ThingCategoryItem)) {
+                    type->applyAppearanceFlags(appearance.flags());
+                }
             }
         }
-        m_datLoaded = true;
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (Appearances): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (Appearances): {}", file, e.what());
         return false;
     }
 }
 
 namespace {
     using RaceBank = google::protobuf::RepeatedPtrField<staticdata::Creature>;
-    
+
     void loadCreatureBank(RaceList& otcRaceList, const RaceBank& protobufRaceList, bool boss) {
         for (const auto& protobufRace : protobufRaceList) {
             // add race to vector
@@ -259,7 +267,7 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
 
         // load staticdata.dat
         std::stringstream datFileStream;
-        g_resources.readFileStream(g_resources.resolvePath(stdext::format("%s%s", file, staticDataFile)), datFileStream);
+        g_resources.readFileStream(g_resources.resolvePath(fmt::format("{}{}", file, staticDataFile)), datFileStream);
         auto staticDataLib = staticdata::Staticdata();
         if (!staticDataLib.ParseFromIstream(&datFileStream)) {
             throw stdext::exception("Couldn't parse staticdata lib.");
@@ -280,7 +288,7 @@ bool ThingTypeManager::loadStaticData(const std::string& file)
         loadCreatureBank(m_monsterRaces, bossBank, true);
         return true;
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (StaticData): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (StaticData): {}", file, e.what());
         return false;
     }
 
@@ -292,16 +300,24 @@ const ThingTypeList& ThingTypeManager::getThingTypes(const ThingCategory categor
     if (category < ThingLastCategory)
         return m_thingTypes[category];
 
-    throw Exception("invalid thing type category %d", category);
+    throw Exception("invalid thing type category {}", category);
 }
 
 const ThingTypePtr& ThingTypeManager::getThingType(const uint16_t id, const ThingCategory category)
 {
     if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
-        g_logger.error(stdext::format("invalid thing type client id %d in category %d", id, category));
+        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
         return m_nullThingType;
     }
     return m_thingTypes[category][id];
+}
+
+ThingType* ThingTypeManager::getRawThingType(uint16_t id, ThingCategory category) {
+    if (category >= ThingLastCategory || id >= m_thingTypes[category].size()) {
+        g_logger.error("invalid thing type client id {} in category {}", id, static_cast<uint8_t>(category));
+        return nullptr;
+    }
+    return m_thingTypes[category][id].get();
 }
 
 ThingTypeList ThingTypeManager::findThingTypeByAttr(const ThingAttr attr, const ThingCategory category)
@@ -438,7 +454,7 @@ ItemTypeList ThingTypeManager::findItemTypesByString(const std::string& name)
 const ItemTypePtr& ThingTypeManager::getItemType(uint16_t id)
 {
     if (id >= m_itemTypes.size() || m_itemTypes[id] == m_nullItemType) {
-        g_logger.error(stdext::format("invalid thing type, server id: %d", id));
+        g_logger.error("invalid thing type, server id: {}", id);
         return m_nullItemType;
     }
     return m_itemTypes[id];
@@ -461,7 +477,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
     try {
         const auto& fin = g_resources.createFile(fileName);
         if (!fin)
-            throw Exception("failed to open file '%s' for write", fileName);
+            throw Exception("failed to open file '{}' for write", fileName);
 
         fin->cache();
 
@@ -482,7 +498,7 @@ void ThingTypeManager::saveDat(const std::string& fileName)
         fin->flush();
         fin->close();
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to save '{}': {}", fileName, e.what());
     }
 }
 
@@ -532,7 +548,7 @@ void ThingTypeManager::loadOtb(const std::string& file)
         m_otbLoaded = true;
         g_lua.callGlobalField("g_things", "onLoadOtb", file);
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (OTB file): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (OTB file): {}", file, e.what());
     }
 }
 
@@ -545,7 +561,7 @@ void ThingTypeManager::loadXml(const std::string& file)
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(file.c_str());
         if (!result)
-            throw Exception("failed to parse '%s': '%s'", file, result.description());
+            throw Exception("failed to parse '{}': '{}'", file, result.description());
 
         pugi::xml_node root = doc.child("items");
         if (root.empty())
@@ -582,7 +598,7 @@ void ThingTypeManager::loadXml(const std::string& file)
         m_xmlLoaded = true;
         g_logger.debug("items.xml read successfully.");
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s' (XML file): %s", file, e.what()));
+        g_logger.error("Failed to load '{}' (XML file): {}", file, e.what());
     }
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& b
         msg->addString(buffer);
         send(msg);
     } else {
-        g_logger.error(stdext::format("Unable to send extended opcode %d, extended opcodes are not enabled", opcode));
+        g_logger.error("Unable to send extended opcode {}, extended opcodes are not enabled", opcode);
     }
 }
 
@@ -1363,8 +1363,8 @@ void ProtocolGame::sendPreyAction(const uint8_t slot, const uint8_t actionType, 
         msg->addU8(static_cast<uint8_t>(index));
     } else if (actionType == 4) {
         msg->addU16(index); // raceid
-        send(msg);
     }
+    send(msg);
 }
 
 void ProtocolGame::sendPreyRequest()

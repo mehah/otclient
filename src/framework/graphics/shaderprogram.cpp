@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -65,7 +65,7 @@ bool ShaderProgram::addShaderFromSourceCode(ShaderType shaderType, const std::st
     if (shader->compileSourceCode(sourceCode))
         return addShader(shader);
 
-    g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
+    g_logger.error("failed to compile shader: {}", shader->log());
     return false;
 }
 
@@ -75,7 +75,7 @@ bool ShaderProgram::addShaderFromSourceFile(ShaderType shaderType, const std::st
     if (shader->compileSourceFile(sourceFile))
         return addShader(shader);
 
-    g_logger.error(stdext::format("failed to compile shader: %s", shader->log()));
+    g_logger.error("failed to compile shader: {}", shader->log());
     return false;
 }
 

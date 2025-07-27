@@ -159,6 +159,10 @@ violationWindow = nil
 violationReportTab = nil
 ignoredChannels = {}
 filters = {}
+local readOnlyButton = nil
+local readOnlyPanel = nil
+local activeactiveReadOnlyTabName = ""
+local readOnlyModeEnabled = false
 
 local communicationSettings = {
     useIgnoreList = true,
@@ -193,6 +197,11 @@ function init()
     consoleTabBar = consolePanel:getChildById('consoleTabBar')
     consoleTabBar:setContentWidget(consoleContentPanel)
     channels = {}
+
+    readOnlyPanel = consolePanel:getChildById('readOnlyPanel')
+    readOnlyPanel:hide()
+    consoleContentPanel:removeAnchor(AnchorRight)
+    consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
 
     consolePanel.onDragEnter = onDragEnter
     consolePanel.onDragLeave = onDragLeave
@@ -287,7 +296,17 @@ function init()
 
     -- toggle WASD
     consoleToggleChat = consolePanel:getChildById('toggleChat')
-    
+    readOnlyButton = consolePanel:getChildById("readOnlyButton")
+    readOnlyPanel = consolePanel:getChildById("readOnlyPanel")
+    function readOnlyButton.onMousePress(tab, mousePos, mouseButton)
+		if mouseButton == MouseRightButton then
+			onReadOnlyMouseClick()
+			return true
+		end
+	end
+    consoleTabBar:setDropTarget(readOnlyButton, function(target, draggedWidget)
+        activateReadOnlyMode(draggedWidget:getText())
+    end)
     load()
 
     if g_game.isOnline() then
@@ -450,7 +469,14 @@ function terminate()
     Keybind.delete("Chat Channel", "Open Help Channel")
     Keybind.delete("Chat", "Send current chat line")
     saveCommunicationSettings()
-
+    if readOnlyButton then
+        readOnlyButton:destroy()
+        readOnlyButton = nil
+    end
+    if readOnlyPanel then
+        readOnlyPanel:destroy()
+        readOnlyPanel = nil
+    end
     if channelsWindow then
         channelsWindow:destroy()
     end
@@ -473,6 +499,11 @@ function terminate()
     ownPrivateName = nil
     gameBottomPanel = nil
     Console = nil
+
+    clearReadOnlyTab()
+    if readOnlyModeEnabled then
+        toggleReadOnlyMode()
+    end
 end
 
 function save()
@@ -544,7 +575,7 @@ function clear()
         lastChannelsOpen[char] = nil
     end
     g_settings.setNode('lastChannelsOpen', lastChannelsOpen)
-    if not gameBottomPanel:isVisible() then
+    if extendedViewButtonToggleChat and not gameBottomPanel:isVisible() then
         returnChat()
     end
     -- close channels
@@ -580,6 +611,14 @@ function clear()
     if channelsWindow then
         channelsWindow:destroy()
         channelsWindow = nil
+    end
+    if g_game.getClientVersion() < 862 then
+        Keybind.delete("Dialogs", "Open Rule Violation")
+    end
+
+    clearReadOnlyTab()
+    if readOnlyModeEnabled then
+        toggleReadOnlyMode()
     end
 end
 
@@ -1029,9 +1068,21 @@ function addTabText(text, speaktype, tab, creatureName)
     end
     
     label:setColor(speaktype.color)
-    -- consoleTabBar:blinkTab(tab)
+    if readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText() then
+        local readOnlyBuffer = readOnlyPanel:getChildById('panel')
+        local readOnlyLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
+        readOnlyLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
+        if speaktype.colored then
+            readOnlyLabel:setColoredText(text)
+        else
+            readOnlyLabel:setText(text)
+        end
+        readOnlyLabel:setColor(speaktype.color)
+    end
     if consoleTabBar:getCurrentTab() ~= tab then
-        changeNewNessageColor(tab)
+        if not (readOnlyModeEnabled and activeactiveReadOnlyTabName == tab:getText()) then
+            changeNewNessageColor(tab)
+        end
     end
 
     label.highlightInfo = {}
@@ -1236,34 +1287,24 @@ function processChannelTabMenu(tab, mousePos, mouseButton)
         menu:addOption(tr('Close'), function()
             removeTab(channelName)
         end)
-        -- menu:addOption(tr('Show Server Messages'), function() --[[TODO]] end)
         menu:addSeparator()
     end
-
+    if readOnlyModeEnabled and activeactiveReadOnlyTabName == channelName then
+        menu:addOption(tr("Close read-only"), function()
+            clearReadOnlyTab()
+            toggleReadOnlyMode()
+        end)
+    else
+        menu:addOption(tr("Open read-only"), function()
+            activateReadOnlyMode(channelName)
+        end)
+    end
     if consoleTabBar:getCurrentTab() == tab then
         menu:addOption(tr('Clear Messages'), function()
             clearChannel(consoleTabBar)
         end)
         menu:addOption(tr('Save Messages'), function()
-            local panel = consoleTabBar:getTabPanel(tab)
-            local consoleBuffer = panel:getChildById('consoleBuffer')
-            local lines = {}
-            for _, label in pairs(consoleBuffer:getChildren()) do
-                table.insert(lines, label:getText())
-            end
-
-            local filename = worldName .. ' - ' .. characterName .. ' - ' .. channelName .. '.txt'
-            local filepath = '/' .. filename
-
-            -- extra information at the beginning
-            table.insert(lines, 1, os.date('\nChannel saved at %a %b %d %H:%M:%S %Y'))
-
-            if g_resources.fileExists(filepath) then
-                table.insert(lines, 1, protectedcall(g_resources.readFileContents, filepath) or '')
-            end
-
-            g_resources.writeFileContents(filepath, table.concat(lines, '\n'))
-            modules.game_textmessage.displayStatusMessage(tr('Channel appended to %s', filename))
+            saveChannelMessages(tab, worldName, characterName, channelName)
         end)
     end
 
@@ -2077,9 +2118,6 @@ function online()
 end
 
 function offline()
-    if g_game.getClientVersion() < 862 then
-        Keybind.delete("Dialogs", "Open Rule Violation")
-    end
     clear()
 end
 
@@ -2268,5 +2306,186 @@ function destroyButtonChat()
     if extendedViewButtonShowAlphaChat and not extendedViewButtonShowAlphaChat:isDestroyed() then
         extendedViewButtonShowAlphaChat:destroy()
         extendedViewButtonShowAlphaChat = nil
+    end
+end
+
+function activateReadOnlyMode(channelName)
+    activeactiveReadOnlyTabName = channelName
+    readOnlyButton:setText(activeactiveReadOnlyTabName)
+    copyMessagesToReadOnlyPanel(channelName)
+    local tab = consoleTabBar:getTab(channelName)
+    if tab then
+        if tab.newMessageEvent then
+            removeEvent(tab.newMessageEvent)
+            tab.newMessageEvent = nil
+        end
+        if tab.isOnRedMessage then
+            if consoleTabBar:getCurrentTab() == tab then
+                tab:setColor('#dfdfdfff')
+            else
+                tab:setColor('#7f7f7fff')
+            end
+            tab.isOnRedMessage = false
+        end
+    end
+    if not readOnlyModeEnabled then
+        toggleReadOnlyMode()
+    end
+end
+
+function onReadOnlyMouseClick()
+    local contextMenu = g_ui.createWidget("PopupMenu")
+    contextMenu:setGameMenu(true)
+    if readOnlyModeEnabled and activeactiveReadOnlyTabName ~= "" then
+        local sourceTab = consoleTabBar:getTab(activeactiveReadOnlyTabName)
+        if sourceTab then
+            addClonedMenuOptions(sourceTab, contextMenu, {
+                readonly = true,
+                close = true
+            })
+            contextMenu:addSeparator()
+        end
+        contextMenu:addOption(tr("Close Read-Only Tab"), function()
+            clearReadOnlyTab()
+            toggleReadOnlyMode()
+        end)
+    else
+        for _, tab in pairs(consoleTabBar.tabs) do
+            local tabName = tab:getText()
+            contextMenu:addOption(tr("Show " .. tabName), function()
+                activateReadOnlyMode(tabName)
+            end)
+        end
+    end
+    contextMenu:display(mousePos)
+end
+
+function copyMessagesToReadOnlyPanel(channelName)
+    local sourceTab = consoleTabBar:getTab(channelName)
+    if not sourceTab then
+        return
+    end
+    local readOnlyBuffer = readOnlyPanel:getChildById('panel')
+    for _, child in pairs(readOnlyBuffer:getChildren()) do
+        if child then
+            child:destroy()
+            child = nil
+        end
+    end
+    local sourcePanel = consoleTabBar:getTabPanel(sourceTab)
+    local sourceBuffer = sourcePanel:getChildById('consoleBuffer')
+    for _, sourceLabel in pairs(sourceBuffer:getChildren()) do
+        local clonedLabel = g_ui.createWidget('ConsoleLabel', readOnlyBuffer)
+        clonedLabel:setId('consoleLabel' .. readOnlyBuffer:getChildCount())
+        clonedLabel:setText(sourceLabel:getText())
+        clonedLabel:setColor(sourceLabel:getColor())
+        if sourceLabel.coloredText then
+            clonedLabel:setColoredText(sourceLabel:getColoredText())
+        end
+    end
+end
+
+function clearReadOnlyTab()
+    for _, child in pairs(readOnlyPanel:getChildById('panel'):getChildren()) do
+        if child then
+            child:destroy()
+            child = nil
+        end
+    end
+    readOnlyButton:setIcon("")
+    activeactiveReadOnlyTabName = ""
+end
+
+function toggleReadOnlyMode()
+    if readOnlyModeEnabled then
+        consoleContentPanel:removeAnchor(AnchorRight)
+        consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorRight)
+        readOnlyPanel:hide()
+        readOnlyButton:setText("")
+        readOnlyButton:setIcon("/images/game/console/readOnly")
+        readOnlyButton:setImageSource("")
+        activeactiveReadOnlyTabName = ""
+    else
+        consoleContentPanel:removeAnchor(AnchorRight)
+        consoleContentPanel:addAnchor(AnchorRight, "parent", AnchorHorizontalCenter)
+        readOnlyPanel:show()
+        readOnlyPanel:removeAnchor(AnchorLeft)
+        readOnlyPanel:removeAnchor(AnchorRight)
+        readOnlyPanel:addAnchor(AnchorLeft, "parent", AnchorHorizontalCenter)
+        readOnlyPanel:addAnchor(AnchorRight, "parent", AnchorRight)
+        readOnlyButton:removeAnchor(AnchorLeft)
+        readOnlyButton:setIcon("")
+        readOnlyButton:setImageSource("/images/ui/console_button")
+    end
+    readOnlyModeEnabled = not readOnlyModeEnabled
+end
+
+function addClonedMenuOptions(sourceTab, targetMenu, excludedOptions)
+    -- todo improve or move to \modules\corelib\ui\uipopupmenu.lua
+    excludedOptions = excludedOptions or {}
+    local currentWorldName = g_game.getWorldName()
+    local currentCharacterName = g_game.getCharacterName()
+    local currentChannelName = sourceTab:getText()
+    if not excludedOptions["close"] then
+        targetMenu:addOption(tr('Close'), function()
+            removeTab(currentChannelName)
+        end)
+    end
+    if not excludedOptions["readonly"] then
+        if readOnlyModeEnabled and activeactiveReadOnlyTabName == currentChannelName then
+            targetMenu:addOption(tr("Close read-only"), function()
+                clearReadOnlyTab()
+                toggleReadOnlyMode()
+            end)
+        else
+            targetMenu:addOption(tr("Open read-only"), function()
+                activateReadOnlyMode(currentChannelName)
+            end)
+        end
+    end
+    if not excludedOptions["separator1"] then
+        targetMenu:addSeparator()
+    end
+    if not excludedOptions["clear"] then
+        targetMenu:addOption(tr('Clear Messages'), function()
+            if readOnlyModeEnabled and activeactiveReadOnlyTabName == currentChannelName then
+                clearTabByName(currentChannelName)
+                copyMessagesToReadOnlyPanel(currentChannelName)
+            else
+                clearChannel(consoleTabBar)
+            end
+        end)
+    end
+    if not excludedOptions["save"] then
+        targetMenu:addOption(tr('Save Messages'), function()
+            saveChannelMessages(sourceTab, currentWorldName, currentCharacterName, currentChannelName)
+        end)
+    end
+end
+
+function saveChannelMessages(tab, worldName, characterName, channelName)
+    local tabPanel = consoleTabBar:getTabPanel(tab)
+    local consoleBuffer = tabPanel:getChildById('consoleBuffer')
+    local messageLines = {}
+    for _, label in pairs(consoleBuffer:getChildren()) do
+        table.insert(messageLines, label:getText())
+    end
+    local fileName = worldName .. ' - ' .. characterName .. ' - ' .. channelName .. '.txt'
+    local filePath = '/' .. fileName
+    table.insert(messageLines, 1, os.date('\nChannel saved at %a %b %d %H:%M:%S %Y'))
+    if g_resources.fileExists(filePath) then
+        local existingContent = protectedcall(g_resources.readFileContents, filePath) or ''
+        table.insert(messageLines, 1, existingContent)
+    end
+    g_resources.writeFileContents(filePath, table.concat(messageLines, '\n'))
+    modules.game_textmessage.displayStatusMessage(tr('Channel appended to %s', fileName))
+end
+
+function clearTabByName(tabName)
+    local tab = getTab(tabName)
+    if tab then
+        local panel = consoleTabBar:getTabPanel(tab)
+        local consoleBuffer = panel:getChildById('consoleBuffer')
+        consoleBuffer:destroyChildren()
     end
 end

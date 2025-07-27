@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -60,13 +60,13 @@ public:
     void clear(const Color& color);
     void clearRect(const Color& color, const Rect& rect);
 
-    void drawCoords(CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES);
-    void drawLine(const std::vector<float>& vertex, int size, int width);
+    void drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES);
+    void drawLine(const std::vector<float>& vertex, int size, int width) const;
 
     float getOpacity() const { return m_opacity; }
     bool getAlphaWriting() const { return m_alphaWriting; }
 
-    Matrix3 getTextureMatrix() const { return m_textureMatrix; }
+    const auto& getTextureMatrix() const { return m_textureMatrix; }
     Matrix3 getTransformMatrix(const Size& size) const;
     Matrix3 getTransformMatrix() const { return m_transformMatrix; }
     Matrix3 getProjectionMatrix() const { return m_projectionMatrix; }
@@ -80,7 +80,8 @@ public:
     PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
 
     void setColor(const Color& color) { if (m_color != color) m_color = color; }
-    void setTexture(Texture* texture);
+    void setTexture(const TexturePtr&);
+    void setTexture(uint32_t textureId, uint16_t textureMatrixId);
     void setOpacity(const float opacity) { m_opacity = opacity; }
     void setClipRect(const Rect& clipRect);
     void setResolution(const Size& resolution, const Matrix3& projectionMatrix = DEFAULT_MATRIX3);
@@ -91,13 +92,13 @@ public:
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram) { setShaderProgram(shaderProgram.get()); }
     void setCompositionMode(CompositionMode compositionMode);
 
-    void setTextureMatrix(const Matrix3& matrix) { if (m_textureMatrix != matrix) m_textureMatrix = matrix; }
+    void setTextureMatrix(const Matrix3* matrix) { if (m_textureMatrix != matrix) m_textureMatrix = matrix; }
     void setTransformMatrix(const Matrix3& matrix) { if (m_transformMatrix != matrix) m_transformMatrix = matrix; }
     void setProjectionMatrix(const Matrix3& matrix) { if (m_projectionMatrix != matrix) m_projectionMatrix = matrix; }
 
     void resetState();
     void resetBlendEquation() { setBlendEquation(BlendEquation::ADD); }
-    void resetTexture() { setTexture(nullptr); }
+    void resetTexture() { setTexture(0, 0); }
     void resetAlphaWriting() { setAlphaWriting(false); }
     void resetClipRect() { setClipRect({}); }
     void resetOpacity() { setOpacity(1.f); }
@@ -118,10 +119,9 @@ protected:
 
     Matrix3 m_transformMatrix;
     Matrix3 m_projectionMatrix;
-    Matrix3 m_textureMatrix;
+    const Matrix3* m_textureMatrix = nullptr;
 
     BlendEquation m_blendEquation{ BlendEquation::ADD };
-    Texture* m_texture{ nullptr };
     bool m_alphaWriting{ false };
     uint32_t m_glTextureId{ 0 };
 

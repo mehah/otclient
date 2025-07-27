@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -145,7 +145,7 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos, const
     int pattern_x = getNumPatternX();
     int pattern_y = getNumPatternY();
     if (pattern_x == 0 || pattern_y == 0) {
-        g_logger.warning(stdext::format("Failed to send magic effect %d. No sprites declared.", m_clientId));
+        g_logger.warning("Failed to send magic effect {}. No sprites declared.", m_clientId);
         return;
     }
 
@@ -154,5 +154,5 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos, const
 }
 
 ThingType* Effect::getThingType() const {
-    return g_things.getThingType(m_clientId, ThingCategoryEffect).get();
+    return g_things.getRawThingType(m_clientId, ThingCategoryEffect);
 }

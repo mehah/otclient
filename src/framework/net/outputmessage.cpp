@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@ void OutputMessage::addString(const std::string_view buffer)
 {
     const int len = buffer.length();
     if (len > MAX_STRING_LENGTH)
-        throw stdext::exception(stdext::format("string length > %d", MAX_STRING_LENGTH));
+        throw stdext::exception(fmt::format("string length > {}", MAX_STRING_LENGTH));
     checkWrite(len + 2);
     addU16(len);
     memcpy(m_buffer + m_writePos, buffer.data(), len);

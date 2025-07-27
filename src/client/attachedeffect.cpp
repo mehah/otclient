@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 
 AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
-        g_logger.error(stdext::format("AttachedEffectManager::getInstance(%d, %d): invalid thing with id or category.", thingId, static_cast<uint8_t>(category)));
+        g_logger.error("AttachedEffectManager::getInstance({}, {}): invalid thing with id or category.", thingId, static_cast<uint8_t>(category));
         return nullptr;
     }
 
@@ -54,7 +54,7 @@ AttachedEffectPtr AttachedEffect::clone()
     obj->m_fade.timer.restart();
 
     if (!obj->m_texturePath.empty()) {
-        if (obj->m_texture = g_textures.getTexture(obj->m_texturePath, obj->m_smooth)) {
+        if ((obj->m_texture = g_textures.getTexture(obj->m_texturePath, obj->m_smooth))) {
             if (obj->m_texture->isAnimatedTexture()) {
                 const auto& animatedTexture = std::static_pointer_cast<AnimatedTexture>(obj->m_texture);
                 animatedTexture->setOnMap(true);
@@ -193,5 +193,5 @@ void AttachedEffect::move(const Position& fromPosition, const Position& toPositi
 }
 
 ThingType* AttachedEffect::getThingType() const {
-    return m_thingId > 0 ? g_things.getThingType(m_thingId, m_thingCategory).get() : nullptr;
+    return m_thingId > 0 ? g_things.getRawThingType(m_thingId, m_thingCategory) : nullptr;
 }

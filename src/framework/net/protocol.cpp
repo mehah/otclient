@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -67,8 +67,19 @@ void Protocol::connect(const std::string_view host, const uint16_t port)
     }
 
     m_connection = std::make_shared<Connection>();
-    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
-    m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
+    std::weak_ptr<Protocol> weakSelf = asProtocol();
+    m_connection->setErrorCallback([weakSelf](auto&& err) {
+        if (auto self = weakSelf.lock()) {
+            self->onError(std::forward<decltype(err)>(err));
+        }
+    });
+    m_connection->connect(host, port, [weakSelf] {
+        if (auto self = weakSelf.lock()) {
+            if (!self->m_disconnected) {
+                self->onConnect();
+            }
+        }
+    });
 }
 #else
 void Protocol::connect(const std::string_view host, uint16_t port, bool gameWorld)
@@ -253,14 +264,14 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 
         const int32_t ret = inflate(&m_zstream, Z_FINISH);
         if (ret != Z_OK && ret != Z_STREAM_END) {
-            g_logger.traceError(stdext::format("failed to decompress message - %s", m_zstream.msg));
+            g_logger.traceError("failed to decompress message - {}", m_zstream.msg);
             return;
         }
 
         const uint32_t totalSize = m_zstream.total_out;
         inflateReset(&m_zstream);
         if (totalSize == 0) {
-            g_logger.traceError(stdext::format("invalid size of decompressed message - %i", totalSize));
+            g_logger.traceError("invalid size of decompressed message - %i", totalSize);
             return;
         }
 

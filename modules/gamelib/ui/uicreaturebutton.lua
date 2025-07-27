@@ -73,7 +73,7 @@ function UICreatureButton:setup(creature, onlyOutfit)
 
     local creatureWidget = self:getChildById('creature')
     local labelWidget = self:getChildById('label')
-    local lifeBarWidget = self:getChildById('lifeBar')
+    --local lifeBarWidget = self:getChildById('lifeBar')
 
     labelWidget:setText(creature:getName())
     if onlyOutfit == true then
@@ -87,6 +87,7 @@ function UICreatureButton:setup(creature, onlyOutfit)
 
     self:updateSkull(creature:getSkull())
     self:updateEmblem(creature:getEmblem())
+    self:updateIcons(creature:getIcons())
 end
 
 function UICreatureButton:update()
@@ -168,3 +169,26 @@ function UICreatureButton:setLifeBarPercent(percent)
 
     lifeBarWidget:setBackgroundColor(color)
 end
+
+function UICreatureButton:updateIcons(icons)
+    if not self.creature or not icons or #icons == 0 then
+        return
+    end
+    if not self.creature:isMonster() then
+        return
+    end
+    for index, iconData in pairs(icons) do
+        if index > 3 then
+            break
+        end
+        local iconId = iconData[1] -- uint8_t icon
+        -- local category = iconData[2] -- uint8_t category  
+        -- local count = iconData[3] -- uint16_t count
+        local widget = self:getChildById('iconsMonsterSlot' .. index)
+        if widget then
+            widget:setImageSource("/images/game/creatureicons/monsterIcons")
+            widget:setImageClip(torect((iconId - 1) * 11 .. ' 0 11 11'))
+        end
+    end
+end
+
