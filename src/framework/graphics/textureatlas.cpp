@@ -6,8 +6,8 @@
 TextureAtlas::TextureAtlas() : TextureAtlas(g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()) {}
 
 TextureAtlas::TextureAtlas(int width, int height) :
-    m_atlasWidth(std::max<int>(width, 16384)),
-    m_atlasHeight(std::max<int>(height, 16384)) {
+    m_atlasWidth(std::min<int>(width, 16384)),
+    m_atlasHeight(std::min<int>(height, 16384)) {
     createNewLayer();
 }
 
