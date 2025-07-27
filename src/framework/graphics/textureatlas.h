@@ -62,7 +62,7 @@ public:
         return m_layers[layer];
     }
 
-    TextureInfo getTextureInfo(uint32_t id);
+    const TextureInfo& getTextureInfo(uint32_t id);
 
     int getWidth() const { return m_atlasWidth; }
     int getHeight() const { return m_atlasHeight; }

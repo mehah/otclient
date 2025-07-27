@@ -15,7 +15,6 @@ void TextureAtlas::removeTexture(uint32_t id) {
     }
 
     auto& info = it->second;
-    if (!info.active) return;
 
     info.active = false;
     auto sizeKey = std::make_pair(info.width, info.height);
@@ -84,10 +83,11 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     texture->m_atlas = this;
 }
 
-TextureInfo TextureAtlas::getTextureInfo(uint32_t id) {
+const TextureInfo& TextureAtlas::getTextureInfo(uint32_t id) {
     auto it = m_texturesCached.find(id);
     if (it == m_texturesCached.end()) {
-        return {};
+        static TextureInfo info;
+        return info;
     }
 
     return it->second;

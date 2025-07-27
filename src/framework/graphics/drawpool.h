@@ -237,7 +237,6 @@ protected:
         TexturePtr texture;
         uint32_t textureId{ 0 };
         uint16_t textureMatrixId{ 0 };
-        int8_t atlasLayer{ -1 };
         size_t hash{ 0 };
 
         bool operator==(const PoolState& s2) const { return hash == s2.hash; }
