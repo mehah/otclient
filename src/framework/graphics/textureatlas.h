@@ -1,4 +1,5 @@
 #pragma once
+
 #include <GL/glew.h>
 #include <unordered_map>
 #include <vector>
@@ -10,6 +11,7 @@
 #include <iostream>
 #include <map>
 #include <algorithm>
+
 #include "declarations.h"
 
 struct TextureInfo
@@ -48,17 +50,25 @@ struct PairHash
 
 class TextureAtlas
 {
+public:
+    TextureAtlas(int width, int height, int layers);
+
+    void addTexture(const TexturePtr& texture);
+    void removeTexture(uint32_t id);
+
+    const auto& getAtlas(int layer) const {
+        if (layer < 0 || layer >= static_cast<int>(m_layers.size()))
+            throw std::out_of_range("Invalid layer index.");
+        return m_layers[layer];
+    }
+
+    TextureInfo getTextureInfo(uint32_t id);
+
+    int getWidth() const { return m_atlasWidth; }
+    int getHeight() const { return m_atlasHeight; }
+    int getLayerCount() const { return static_cast<int>(m_layers.size()); }
+
 private:
-    std::vector<TexturePtr> m_layers;
-    int m_atlasWidth, m_atlasHeight, m_maxLayers;
-
-    std::unordered_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
-    std::set<FreeRegion> m_freeRegions;
-    std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
-
-    uint16_t m_transformMatrixId{ 0 };
-    phmap::parallel_flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
-
     void createNewLayer();
 
     std::optional<FreeRegion> findBestRegion(int width, int height) {
@@ -78,51 +88,26 @@ private:
         m_freeRegions.erase(region);
         m_freeRegionsBySize[region.width * region.height].erase(region);
 
-        if (region.width > width) {
-            FreeRegion right = { region.x + width, region.y, region.width - width, height, region.layer };
-            if (right.width > 0 && right.height > 0) {
-                m_freeRegions.insert(right);
-                m_freeRegionsBySize[right.width * right.height].insert(right);
+        auto insertRegion = [&](int x, int y, int w, int h) {
+            if (w > 0 && h > 0) {
+                FreeRegion r = { x, y, w, h, region.layer };
+                m_freeRegions.insert(r);
+                m_freeRegionsBySize[w * h].insert(r);
             }
-        }
+        };
 
-        if (region.height > height) {
-            FreeRegion bottom = { region.x, region.y + height, width, region.height - height, region.layer };
-            if (bottom.width > 0 && bottom.height > 0) {
-                m_freeRegions.insert(bottom);
-                m_freeRegionsBySize[bottom.width * bottom.height].insert(bottom);
-            }
-        }
-
-        if (region.width > width && region.height > height) {
-            FreeRegion corner = { region.x + width, region.y + height, region.width - width, region.height - height, region.layer };
-            if (corner.width > 0 && corner.height > 0) {
-                m_freeRegions.insert(corner);
-                m_freeRegionsBySize[corner.width * corner.height].insert(corner);
-            }
-        }
+        insertRegion(region.x + width, region.y, region.width - width, height);
+        insertRegion(region.x, region.y + height, width, region.height - height);
+        insertRegion(region.x + width, region.y + height, region.width - width, region.height - height);
     }
 
-public:
-    TextureAtlas(int width, int height, int layers);
+    std::vector<TexturePtr> m_layers;
+    int m_atlasWidth;
+    int m_atlasHeight;
+    int m_maxLayers;
 
-    void addTexture(const TexturePtr& texture);
-    void removeTexture(uint32_t id);
-
-    const auto& getAtlas(int layer) const {
-        if (layer < 0 || layer >= static_cast<int>(m_layers.size())) {
-            throw std::out_of_range("Invalid layer index.");
-        }
-        return m_layers[layer];
-    }
-
-    auto getTransformMatrixId() const { return m_transformMatrixId; }
-    auto getWidth() const { return m_atlasWidth; }
-    auto getHeight() const { return m_atlasHeight; }
-
-    int getLayerCount() const {
-        return static_cast<int>(m_layers.size());
-    }
-
-    TextureInfo getTextureInfo(uint32_t id);
+    std::unordered_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
+    std::set<FreeRegion> m_freeRegions;
+    std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
+    phmap::parallel_flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
 };
