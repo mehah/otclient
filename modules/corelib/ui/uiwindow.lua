@@ -51,6 +51,6 @@ end
 function UIWindow:onDestroy()
     if self.hotkeyBlock then
         self.hotkeyBlock.release()
-        self.hotkeyBlock = nil
+        self.hotkeyBlock = false
     end
 end
