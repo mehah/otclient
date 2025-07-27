@@ -188,7 +188,7 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& c
     if (copy.color != color) copy.color = color;
 
     if (texture) {
-        if (texture->isEmpty() || !texture->isCached()) {
+        if (texture->isEmpty() || !texture->isCached() || !texture->getAtlas() && m_atlas) {
             copy.texture = texture;
         } else {
             copy.textureId = texture->getId();
@@ -340,8 +340,9 @@ void DrawPool::PoolState::execute(DrawPool* pool) const {
     if (action) action();
     if (texture) {
         texture->create();
-        if (pool->m_atlas)
+        if (pool->m_atlas && !texture->getAtlas()) {
             pool->m_atlas->addTexture(texture);
+        }
         g_painter->setTexture(texture);
     } else
         g_painter->setTexture(textureId, textureMatrixId);
