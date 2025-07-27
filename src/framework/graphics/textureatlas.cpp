@@ -5,10 +5,9 @@
 
 TextureAtlas::TextureAtlas() : TextureAtlas(g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()) {}
 
-TextureAtlas::TextureAtlas(int width, int height) : m_atlasWidth(width), m_atlasHeight(height) {
-    if (width <= 0 || height <= 0) {
-        throw std::invalid_argument("Invalid atlas dimensions or layer count.");
-    }
+TextureAtlas::TextureAtlas(int width, int height) :
+    m_atlasWidth(std::clamp<int>(width, 2048, 16384)),
+    m_atlasHeight(std::clamp<int>(width, 2048, 16384)) {
     createNewLayer();
 }
 
