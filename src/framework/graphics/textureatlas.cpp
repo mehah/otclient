@@ -1,50 +1,63 @@
 #include "textureatlas.h"
 #include "texturemanager.h"
 
-TextureAtlas::TextureAtlas(int width, int height, int layers) : atlasWidth(width), atlasHeight(height), maxLayers(layers) {
+TextureAtlas::TextureAtlas(int width, int height, int layers) : m_atlasWidth(width), m_atlasHeight(height), m_maxLayers(layers) {
     if (width <= 0 || height <= 0 || layers <= 0) {
         throw std::invalid_argument("Invalid atlas dimensions or layer count.");
     }
     createNewLayer();
 }
 
+void TextureAtlas::removeTexture(uint32_t id) {
+    auto it = m_texturesCached.find(id);
+    if (it == m_texturesCached.end()) {
+        return;
+    }
+
+    auto& info = it->second;
+    if (!info.active) return;
+
+    info.active = false;
+    auto sizeKey = std::make_pair(info.width, info.height);
+    m_inactiveTextures.try_emplace(sizeKey, std::vector<TextureInfo>())
+        .first->second.emplace_back(std::move(info));
+    m_texturesCached.erase(it);
+}
+
 void TextureAtlas::addTexture(const TexturePtr& texture) {
     const auto textureID = texture->getId();
     const auto width = texture->getWidth();
     const auto height = texture->getHeight();
-    const auto inactivityThreshold = 3600;
 
-    if (width <= 0 || height <= 0 || width > atlasWidth || height > atlasHeight) {
+    if (width <= 0 || height <= 0 || width > m_atlasWidth || height > m_atlasHeight) {
         throw std::invalid_argument("Texture dimensions are invalid or exceed atlas dimensions.");
     }
 
-    auto now = std::chrono::steady_clock::now();
-    removeExpiredInactiveTextures(inactivityThreshold);
-
     auto sizeKey = std::make_pair(width, height);
-    if (inactiveTextures.contains(sizeKey)) {
-        auto& texList = inactiveTextures[sizeKey];
+    auto it = m_inactiveTextures.find(sizeKey);
+    if (it != m_inactiveTextures.end()) {
+        auto& texList = it->second;
         if (!texList.empty()) {
-            TextureInfo tex = texList.back();
+            TextureInfo tex = std::move(texList.back());
             texList.pop_back();
 
-            glBindTexture(GL_TEXTURE_2D, m_atlas[tex.layer]->getId());
+            glBindTexture(GL_TEXTURE_2D, m_layers[tex.layer]->getId());
             glCopyImageSubData(texture->getId(), GL_TEXTURE_2D, 0, 0, 0, 0,
-                               m_atlas[tex.layer]->getId(), GL_TEXTURE_2D, 0, tex.x, tex.y, 0,
+                               m_layers[tex.layer]->getId(), GL_TEXTURE_2D, 0, tex.x, tex.y, 0,
                                width, height, 1);
 
             tex.textureID = texture->getId();
-            tex.lastUsed = now;
             tex.active = true;
-            tex.width = width;
-            tex.height = height;
+            m_texturesCached.emplace(textureID, std::move(tex));
+            texture->m_atlas = this;
+
             return;
         }
     }
 
     auto bestRegionOpt = findBestRegion(width, height);
     if (!bestRegionOpt.has_value()) {
-        if (static_cast<int>(m_atlas.size()) >= maxLayers) {
+        if (static_cast<int>(m_layers.size()) >= m_maxLayers) {
             throw std::runtime_error("Unable to allocate texture: No space and maximum layers reached.");
         }
         createNewLayer();
@@ -54,9 +67,9 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     FreeRegion region = bestRegionOpt.value();
     splitRegion(region, width, height);
 
-    glBindTexture(GL_TEXTURE_2D, m_atlas[region.layer]->getId());
+    glBindTexture(GL_TEXTURE_2D, m_layers[region.layer]->getId());
     glCopyImageSubData(textureID, GL_TEXTURE_2D, 0, 0, 0, 0,
-                       m_atlas[region.layer]->getId(), GL_TEXTURE_2D, 0, region.x, region.y, 0,
+                       m_layers[region.layer]->getId(), GL_TEXTURE_2D, 0, region.x, region.y, 0,
                        width, height, 1);
 
     m_texturesCached.emplace(textureID, TextureInfo{
@@ -66,9 +79,9 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
         .layer = region.layer,
         .width = width,
         .height = height,
-        .lastUsed = now,
         .active = true
     });
+    texture->m_atlas = this;
 }
 
 TextureInfo TextureAtlas::getTextureInfo(uint32_t id) {
@@ -81,17 +94,17 @@ TextureInfo TextureAtlas::getTextureInfo(uint32_t id) {
 }
 
 void TextureAtlas::createNewLayer() {
-    if (static_cast<int>(m_atlas.size()) >= maxLayers) {
+    if (static_cast<int>(m_layers.size()) >= m_maxLayers) {
         throw std::runtime_error("Atlas has reached the maximum number of layers.");
     }
 
-    auto texture = std::make_shared<Texture>(Size{ atlasWidth, atlasHeight });
+    auto texture = std::make_shared<Texture>(Size{ m_atlasWidth, m_atlasHeight });
     texture->setCached(true);
     texture->setSmooth(false);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, atlasWidth, atlasHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_atlasWidth, m_atlasHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-    m_atlas.push_back(texture);
-    FreeRegion newRegion = { 0, 0, atlasWidth, atlasHeight, static_cast<int>(m_atlas.size()) - 1 };
-    freeRegions.insert(newRegion);
-    freeRegionsBySize[atlasWidth * atlasHeight].insert(newRegion);
+    m_layers.push_back(texture);
+    FreeRegion newRegion = { 0, 0, m_atlasWidth, m_atlasHeight, static_cast<int>(m_layers.size()) - 1 };
+    m_freeRegions.insert(newRegion);
+    m_freeRegionsBySize[m_atlasWidth * m_atlasHeight].insert(newRegion);
 }

@@ -17,7 +17,6 @@ struct TextureInfo
     GLuint textureID;
     int x, y, layer;
     int width, height;
-    std::chrono::steady_clock::time_point lastUsed;
     bool active = false;
 };
 
@@ -50,30 +49,21 @@ struct PairHash
 class TextureAtlas
 {
 private:
-    std::vector<TexturePtr> m_atlas;
-    int atlasWidth, atlasHeight, maxLayers;
+    std::vector<TexturePtr> m_layers;
+    int m_atlasWidth, m_atlasHeight, m_maxLayers;
 
-    std::unordered_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> inactiveTextures;
-    std::set<FreeRegion> freeRegions;
-    std::map<int, std::set<FreeRegion>> freeRegionsBySize;
+    std::unordered_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
+    std::set<FreeRegion> m_freeRegions;
+    std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
 
     uint16_t m_transformMatrixId{ 0 };
     phmap::parallel_flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
 
     void createNewLayer();
 
-    void removeExpiredInactiveTextures(int inactivityThreshold) {
-        auto now = std::chrono::steady_clock::now();
-        for (auto& [size, texList] : inactiveTextures) {
-            std::erase_if(texList, [&now, inactivityThreshold](const TextureInfo& tex) {
-                return std::chrono::duration_cast<std::chrono::seconds>(now - tex.lastUsed).count() >= inactivityThreshold;
-            });
-        }
-    }
-
     std::optional<FreeRegion> findBestRegion(int width, int height) {
-        auto sizeIt = freeRegionsBySize.lower_bound(width * height);
-        while (sizeIt != freeRegionsBySize.end()) {
+        auto sizeIt = m_freeRegionsBySize.lower_bound(width * height);
+        while (sizeIt != m_freeRegionsBySize.end()) {
             for (const auto& region : sizeIt->second) {
                 if (region.canFit(width, height)) {
                     return region;
@@ -85,56 +75,53 @@ private:
     }
 
     void splitRegion(const FreeRegion& region, int width, int height) {
-        freeRegions.erase(region);
-        freeRegionsBySize[region.width * region.height].erase(region);
+        m_freeRegions.erase(region);
+        m_freeRegionsBySize[region.width * region.height].erase(region);
 
         if (region.width > width) {
             FreeRegion right = { region.x + width, region.y, region.width - width, height, region.layer };
             if (right.width > 0 && right.height > 0) {
-                freeRegions.insert(right);
-                freeRegionsBySize[right.width * right.height].insert(right);
+                m_freeRegions.insert(right);
+                m_freeRegionsBySize[right.width * right.height].insert(right);
             }
         }
 
         if (region.height > height) {
             FreeRegion bottom = { region.x, region.y + height, width, region.height - height, region.layer };
             if (bottom.width > 0 && bottom.height > 0) {
-                freeRegions.insert(bottom);
-                freeRegionsBySize[bottom.width * bottom.height].insert(bottom);
+                m_freeRegions.insert(bottom);
+                m_freeRegionsBySize[bottom.width * bottom.height].insert(bottom);
             }
         }
 
         if (region.width > width && region.height > height) {
             FreeRegion corner = { region.x + width, region.y + height, region.width - width, region.height - height, region.layer };
             if (corner.width > 0 && corner.height > 0) {
-                freeRegions.insert(corner);
-                freeRegionsBySize[corner.width * corner.height].insert(corner);
+                m_freeRegions.insert(corner);
+                m_freeRegionsBySize[corner.width * corner.height].insert(corner);
             }
         }
-    }
-
-    void compactAtlas() {
-        // Optional: implementar defragmentação aqui.
     }
 
 public:
     TextureAtlas(int width, int height, int layers);
 
     void addTexture(const TexturePtr& texture);
+    void removeTexture(uint32_t id);
 
     const auto& getAtlas(int layer) const {
-        if (layer < 0 || layer >= static_cast<int>(m_atlas.size())) {
+        if (layer < 0 || layer >= static_cast<int>(m_layers.size())) {
             throw std::out_of_range("Invalid layer index.");
         }
-        return m_atlas[layer];
+        return m_layers[layer];
     }
 
     auto getTransformMatrixId() const { return m_transformMatrixId; }
-    auto getWidth() const { return atlasWidth; }
-    auto getHeight() const { return atlasHeight; }
+    auto getWidth() const { return m_atlasWidth; }
+    auto getHeight() const { return m_atlasHeight; }
 
     int getLayerCount() const {
-        return static_cast<int>(m_atlas.size());
+        return static_cast<int>(m_layers.size());
     }
 
     TextureInfo getTextureInfo(uint32_t id);

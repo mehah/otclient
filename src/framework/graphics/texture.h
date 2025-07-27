@@ -25,6 +25,8 @@
 #include "declarations.h"
 #include <framework/core/timer.h>
 
+class TextureAtlas;
+
 class Texture
 {
 public:
@@ -86,6 +88,8 @@ protected:
 
     ImagePtr m_image;
 
+    TextureAtlas* m_atlas = nullptr;
+
     enum Prop : uint16_t
     {
         hasMipMaps = 1 << 0,
@@ -103,4 +107,5 @@ protected:
 
     friend class GarbageCollection;
     friend class TextureManager;
+    friend class TextureAtlas;
 };
