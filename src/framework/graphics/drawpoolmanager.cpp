@@ -219,6 +219,9 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         pool->m_objectsDraw.clear();
     }
 
+    if (pool->m_atlas)
+        pool->m_atlas->flush();
+
     pool->setDrawState(DrawPoolState::RENDERED);
 }
 

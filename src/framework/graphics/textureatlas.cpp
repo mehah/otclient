@@ -1,6 +1,7 @@
 #include "textureatlas.h"
 #include "texturemanager.h"
 #include "graphics.h"
+#include "framebuffer.h"
 
 TextureAtlas::TextureAtlas() : TextureAtlas(g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()) {}
 
@@ -42,17 +43,15 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
             TextureInfo tex = std::move(texList.back());
             texList.pop_back();
 
-            glBindTexture(GL_TEXTURE_2D, m_layers[tex.layer]->getId());
-            glCopyImageSubData(texture->getId(), GL_TEXTURE_2D, 0, 0, 0, 0,
-                               m_layers[tex.layer]->getId(), GL_TEXTURE_2D, 0, tex.x, tex.y, 0,
-                               width, height, 1);
-
             tex.textureID = texture->getId();
-            m_texturesCached.emplace(textureID, std::move(tex));
+            tex.transformMatrixId = texture->getTransformMatrixId();
             texture->m_atlas = this;
             texture->m_atlasX = tex.x;
             texture->m_atlasY = tex.y;
             texture->m_atlasLayer = tex.layer;
+
+            m_layers[tex.layer].textures.emplace_back(tex);
+            m_texturesCached.emplace(textureID, std::move(tex));
 
             return;
         }
@@ -67,30 +66,49 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     FreeRegion region = bestRegionOpt.value();
     splitRegion(region, width, height);
 
-    glBindTexture(GL_TEXTURE_2D, m_layers[region.layer]->getId());
-    glCopyImageSubData(textureID, GL_TEXTURE_2D, 0, 0, 0, 0,
-                       m_layers[region.layer]->getId(), GL_TEXTURE_2D, 0, region.x, region.y, 0,
-                       width, height, 1);
+    auto info = TextureInfo{
+       .textureID = textureID,
+       .x = texture->m_atlasX = region.x,
+       .y = texture->m_atlasY = region.y,
+       .layer = texture->m_atlasLayer = region.layer,
+       .width = static_cast<int16_t>(width),
+       .height = static_cast<int16_t>(height),
+       .transformMatrixId = texture->getTransformMatrixId()
+    };
 
-    m_texturesCached.emplace(textureID, TextureInfo{
-        .textureID = textureID,
-        .x = texture->m_atlasX = region.x,
-        .y = texture->m_atlasY = region.y,
-        .layer = texture->m_atlasLayer = region.layer,
-        .width = width,
-        .height = height
-    });
+    m_layers[region.layer].textures.emplace_back(info);
+    m_texturesCached.emplace(textureID, std::move(info));
+
     texture->m_atlas = this;
 }
 
 void TextureAtlas::createNewLayer() {
-    auto texture = std::make_shared<Texture>(Size{ m_atlasWidth, m_atlasHeight });
-    texture->setCached(true);
-    texture->setSmooth(false);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_atlasWidth, m_atlasHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    auto fbo = std::make_shared<FrameBuffer>();
+    fbo->resize({ m_atlasWidth, m_atlasHeight });
+    fbo->setAutoClear(false);
+    fbo->getTexture()->setSmooth(false);
+    fbo->getTexture()->setCached(true);
 
-    m_layers.push_back(texture);
+    m_layers.emplace_back(fbo);
     FreeRegion newRegion = { 0, 0, m_atlasWidth, m_atlasHeight, static_cast<int>(m_layers.size()) - 1 };
     m_freeRegions.insert(newRegion);
     m_freeRegionsBySize[m_atlasWidth * m_atlasHeight].insert(newRegion);
+}
+
+void TextureAtlas::flush() {
+    static CoordsBuffer buffer;
+    for (auto& layer : m_layers) {
+        if (!layer.textures.empty()) {
+            layer.framebuffer->bind();
+
+            for (const auto& texture : layer.textures) {
+                buffer.clear();
+                buffer.addRect({ texture.x, texture.y, Size{texture.width, texture.height} }, { 0,0, texture.width, texture.height });
+                g_painter->setTexture(texture.textureID, texture.transformMatrixId);
+                g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
+            }
+            layer.textures.clear();
+            layer.framebuffer->release();
+        }
+    }
 }

@@ -16,11 +16,12 @@
 struct TextureInfo
 {
     uint32_t textureID = 0;
-    int x = -1;
-    int y = -1;
-    int layer = -1;
-    int width = -1;
-    int height = -1;
+    int16_t x = -1;
+    int16_t y = -1;
+    int8_t layer = -1;
+    int16_t width = -1;
+    int16_t height = -1;
+    uint16_t transformMatrixId = 0;
 };
 
 struct FreeRegion
@@ -58,15 +59,22 @@ public:
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id);
 
-    const auto& getLayer(int layer) const {
-        return m_layers[layer];
+    auto getTexture(int layer) const {
+        return m_layers[layer].framebuffer->getTexture();
     }
 
     int getWidth() const { return m_atlasWidth; }
     int getHeight() const { return m_atlasHeight; }
     int getLayerCount() const { return static_cast<int>(m_layers.size()); }
 
+    void flush();
+
 private:
+    struct Layer
+    {
+        FrameBufferPtr framebuffer;
+        std::vector<TextureInfo> textures;
+    };
     void createNewLayer();
 
     std::optional<FreeRegion> findBestRegion(int width, int height) {
@@ -99,7 +107,7 @@ private:
         insertRegion(region.x + width, region.y + height, region.width - width, region.height - height);
     }
 
-    std::vector<TexturePtr> m_layers;
+    std::vector<Layer> m_layers;
     int m_atlasWidth;
     int m_atlasHeight;
 
@@ -107,4 +115,6 @@ private:
     phmap::flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
     std::set<FreeRegion> m_freeRegions;
     std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
+
+    friend class DrawPoolManager;
 };

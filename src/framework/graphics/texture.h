@@ -94,9 +94,9 @@ protected:
     ImagePtr m_image;
 
     TextureAtlas* m_atlas{ nullptr };
-    int m_atlasX{ -1 };
-    int m_atlasY{ -1 };
-    int m_atlasLayer{ -1 };
+    int16_t m_atlasX{ -1 };
+    int16_t m_atlasY{ -1 };
+    int8_t m_atlasLayer{ -1 };
 
     enum Prop : uint16_t
     {
