@@ -340,9 +340,9 @@ void DrawPool::PoolState::execute(DrawPool* pool) const {
     if (action) action();
     if (texture) {
         texture->create();
-        g_painter->setTexture(texture->getId(), texture->getTransformMatrixId());
         if (pool->m_atlas)
             pool->m_atlas->addTexture(texture);
+        g_painter->setTexture(texture);
     } else
         g_painter->setTexture(textureId, textureMatrixId);
 }
