@@ -66,6 +66,11 @@ public:
     virtual bool isAnimatedTexture() const { return false; }
     bool setupSize(const Size& size);
 
+    auto getAtlas() const { return m_atlas; }
+    auto getAtlasX() const { return m_atlasX; }
+    auto getAtlasY() const { return m_atlasY; }
+    auto getAtlasLayer() const { return m_atlasLayer; }
+
 protected:
     void bind();
     void setupWrap() const;
@@ -88,7 +93,10 @@ protected:
 
     ImagePtr m_image;
 
-    TextureAtlas* m_atlas = nullptr;
+    TextureAtlas* m_atlas{ nullptr };
+    int m_atlasX{ -1 };
+    int m_atlasY{ -1 };
+    int m_atlasLayer{ -1 };
 
     enum Prop : uint16_t
     {

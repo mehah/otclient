@@ -51,12 +51,9 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 
 void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
-    if (m_atlas && texture && !texture->isEmpty()) {
-        const auto& info = m_atlas->getTextureInfo(texture->getId());
-        if (info.active && method.src.isValid()) {
-            method.src = Rect(info.x + method.src.x(), info.y + method.src.y(), method.src.width(), method.src.height());
-            texture = m_atlas->getAtlas(info.layer);
-        }
+    if (m_atlas && method.src.isValid() && texture && texture->getAtlas()) {
+        method.src = Rect(texture->getAtlasX() + method.src.x(), texture->getAtlasY() + method.src.y(), method.src.width(), method.src.height());
+        texture = m_atlas->getAtlas(texture->getAtlasLayer());
     }
 
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))

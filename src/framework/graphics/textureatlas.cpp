@@ -52,6 +52,9 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
             tex.active = true;
             m_texturesCached.emplace(textureID, std::move(tex));
             texture->m_atlas = this;
+            texture->m_atlasX = tex.x;
+            texture->m_atlasY = tex.y;
+            texture->m_atlasLayer = tex.layer;
 
             return;
         }
@@ -73,9 +76,9 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
     m_texturesCached.emplace(textureID, TextureInfo{
         .textureID = textureID,
-        .x = region.x,
-        .y = region.y,
-        .layer = region.layer,
+        .x = texture->m_atlasX = region.x,
+        .y = texture->m_atlasY = region.y,
+        .layer = texture->m_atlasLayer = region.layer,
         .width = width,
         .height = height,
         .active = true

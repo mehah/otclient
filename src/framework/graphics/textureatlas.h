@@ -17,8 +17,11 @@
 struct TextureInfo
 {
     GLuint textureID = 0;
-    int x = -1, y = -1, layer = -1;
-    int width = -1, height = -1;
+    int x = -1;
+    int y = -1;
+    int layer = -1;
+    int width = -1;
+    int height = -1;
     bool active = false;
 };
 
@@ -105,7 +108,7 @@ private:
     int m_atlasHeight;
 
     phmap::flat_hash_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
-    phmap::parallel_flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
+    phmap::flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
     std::set<FreeRegion> m_freeRegions;
     std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
 };
