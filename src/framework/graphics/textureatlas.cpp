@@ -1,8 +1,11 @@
 #include "textureatlas.h"
 #include "texturemanager.h"
+#include "graphics.h"
 
-TextureAtlas::TextureAtlas(int width, int height, int layers) : m_atlasWidth(width), m_atlasHeight(height), m_maxLayers(layers) {
-    if (width <= 0 || height <= 0 || layers <= 0) {
+TextureAtlas::TextureAtlas() : TextureAtlas(g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()) {}
+
+TextureAtlas::TextureAtlas(int width, int height) : m_atlasWidth(width), m_atlasHeight(height) {
+    if (width <= 0 || height <= 0) {
         throw std::invalid_argument("Invalid atlas dimensions or layer count.");
     }
     createNewLayer();
@@ -56,9 +59,6 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
     auto bestRegionOpt = findBestRegion(width, height);
     if (!bestRegionOpt.has_value()) {
-        if (static_cast<int>(m_layers.size()) >= m_maxLayers) {
-            throw std::runtime_error("Unable to allocate texture: No space and maximum layers reached.");
-        }
         createNewLayer();
         return addTexture(texture);
     }
@@ -94,10 +94,6 @@ const TextureInfo& TextureAtlas::getTextureInfo(uint32_t id) {
 }
 
 void TextureAtlas::createNewLayer() {
-    if (static_cast<int>(m_layers.size()) >= m_maxLayers) {
-        throw std::runtime_error("Atlas has reached the maximum number of layers.");
-    }
-
     auto texture = std::make_shared<Texture>(Size{ m_atlasWidth, m_atlasHeight });
     texture->setCached(true);
     texture->setSmooth(false);

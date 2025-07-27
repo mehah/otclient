@@ -51,14 +51,13 @@ struct PairHash
 class TextureAtlas
 {
 public:
-    TextureAtlas(int width, int height, int layers);
+    TextureAtlas();
+    TextureAtlas(int width, int height);
 
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id);
 
     const auto& getAtlas(int layer) const {
-        if (layer < 0 || layer >= static_cast<int>(m_layers.size()))
-            throw std::out_of_range("Invalid layer index.");
         return m_layers[layer];
     }
 
@@ -104,10 +103,9 @@ private:
     std::vector<TexturePtr> m_layers;
     int m_atlasWidth;
     int m_atlasHeight;
-    int m_maxLayers;
 
-    std::unordered_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
+    phmap::flat_hash_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
+    phmap::parallel_flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
     std::set<FreeRegion> m_freeRegions;
     std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
-    phmap::parallel_flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
 };
