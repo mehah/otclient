@@ -85,6 +85,7 @@ void TextureAtlas::createNewLayer() {
     auto fbo = std::make_shared<FrameBuffer>();
     fbo->resize({ m_atlasWidth, m_atlasHeight });
     fbo->setAutoClear(false);
+    fbo->setAutoResetState(true);
     fbo->getTexture()->setSmooth(false);
     fbo->getTexture()->setCached(true);
 

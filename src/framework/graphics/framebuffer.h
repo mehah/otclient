@@ -46,6 +46,7 @@ public:
     bool isAutoClear() const { return m_autoClear; }
     void setAutoClear(bool v) { m_autoClear = v; }
     void setAlphaWriting(bool v) { m_useAlphaWriting = v; }
+    void setAutoResetState(bool v) { m_isScene = v; }
 
     TexturePtr getTexture() const { return m_texture; }
     TexturePtr extractTexture();
