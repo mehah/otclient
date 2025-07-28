@@ -31,7 +31,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
-            pool->m_atlas = std::make_unique<TextureAtlas>();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(10);
 
@@ -51,9 +50,14 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 
 void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
 {
-    if (method.src.isValid() && texture && texture->getAtlasLayer() > -1) {
-        method.src = Rect(texture->getAtlasX() + method.src.x(), texture->getAtlasY() + method.src.y(), method.src.width(), method.src.height());
-        texture = texture->getAtlas()->getTexture(texture->getAtlasLayer());
+    if (method.src.isValid() && texture) {
+        const auto& atlas = texture->getAtlas(m_atlas->getType());
+        if (atlas.z > -1) {
+            method.src = Rect(atlas.x + method.src.x(), atlas.y + method.src.y(), method.src.width(), method.src.height());
+            texture = m_atlas->getTexture(atlas.z);
+        } else {
+            if (true);
+        }
     }
 
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
@@ -188,7 +192,7 @@ DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& c
     if (copy.color != color) copy.color = color;
 
     if (texture) {
-        if (texture->isEmpty() || !texture->isCached()) {
+        if (texture->isEmpty() || !texture->canCacheInAtlas()) {
             copy.texture = texture;
         } else {
             copy.textureId = texture->getId();
@@ -341,7 +345,7 @@ void DrawPool::PoolState::execute(DrawPool* pool) const {
     if (texture) {
         texture->create();
         g_painter->setTexture(texture);
-        if (pool->m_atlas && !texture->isCached()) {
+        if (texture->canCacheInAtlas() && pool->m_atlas && !texture->isCached(pool->m_atlas->getType())) {
             pool->m_atlas->addTexture(texture);
         }
     } else

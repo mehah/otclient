@@ -61,8 +61,11 @@ void UISprite::setSpriteId(const int id)
         return;
     }
 
-    const auto& image = g_sprites.getSpriteImage(id);
-    m_sprite = image ? std::make_shared<Texture>(image) : nullptr;
+    m_sprite = nullptr;
+    if (const auto& image = g_sprites.getSpriteImage(id)) {
+        m_sprite = std::make_shared<Texture>(image);
+        m_sprite->allowAtlasCache();
+    }
 }
 
 void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)

@@ -39,9 +39,24 @@ void DrawPoolManager::init(const uint16_t spriteSize)
     if (spriteSize != 0)
         m_spriteSize = spriteSize;
 
+    auto atlasMap = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::MAP);
+    auto atlasForeground = std::make_shared<TextureAtlas>(Fw::TextureAtlasType::FOREGROUND, 4096, 4096);
+
     // Create Pools
     for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);) {
-        m_pools[i] = DrawPool::create(static_cast<DrawPoolType>(i));
+        auto pool = m_pools[i] = DrawPool::create(static_cast<DrawPoolType>(i));
+
+        switch (static_cast<DrawPoolType>(i)) {
+            case DrawPoolType::MAP:
+                pool->m_atlas = atlasMap;
+                break;
+
+            case DrawPoolType::FOREGROUND:
+            case DrawPoolType::FOREGROUND_MAP:
+            case DrawPoolType::CREATURE_INFORMATION:
+                pool->m_atlas = atlasForeground;
+                break;
+        }
     }
 }
 
@@ -239,5 +254,12 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
         if (pool->m_beforeDraw) pool->m_beforeDraw();
         pool->m_framebuffer->draw();
         if (pool->m_afterDraw) pool->m_afterDraw();
+    }
+}
+
+void DrawPoolManager::removeTextureFromAtlas(uint32_t id) {
+    for (auto pool : m_pools) {
+        if (pool->m_atlas)
+            pool->m_atlas->removeTexture(id);
     }
 }

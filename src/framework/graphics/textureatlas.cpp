@@ -3,9 +3,10 @@
 #include "graphics.h"
 #include "framebuffer.h"
 
-TextureAtlas::TextureAtlas() : TextureAtlas(g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()) {}
+TextureAtlas::TextureAtlas(Fw::TextureAtlasType type) : TextureAtlas(type, g_graphics.getMaxTextureSize(), g_graphics.getMaxTextureSize()) {}
 
-TextureAtlas::TextureAtlas(int width, int height) :
+TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int width, int height) :
+    m_type(type),
     m_atlasWidth(std::min<int>(width, 16384)),
     m_atlasHeight(std::min<int>(height, 16384)) {
     createNewLayer();
@@ -31,7 +32,6 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     const auto height = texture->getHeight();
 
     if (width <= 0 || height <= 0 || width >= m_atlasWidth || height >= m_atlasHeight) {
-        texture->m_atlas = this;
         return; // don't cache
     }
 
@@ -46,10 +46,9 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
             tex.textureID = texture->getId();
             tex.transformMatrixId = texture->getTransformMatrixId();
 
-            texture->m_atlas = this;
-            texture->m_atlasX = tex.x;
-            texture->m_atlasY = tex.y;
-            texture->m_atlasLayer = tex.layer;
+            texture->m_atlas[m_type].x = tex.x;
+            texture->m_atlas[m_type].y = tex.y;
+            texture->m_atlas[m_type].z = tex.layer;
 
             m_layers[tex.layer].textures.emplace_back(tex);
             m_texturesCached.emplace(textureID, std::move(tex));
@@ -69,9 +68,9 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
     auto info = TextureInfo{
        .textureID = textureID,
-       .x = texture->m_atlasX = region.x,
-       .y = texture->m_atlasY = region.y,
-       .layer = texture->m_atlasLayer = region.layer,
+       .x = texture->m_atlas[m_type].x = region.x,
+       .y = texture->m_atlas[m_type].y = region.y,
+       .layer = texture->m_atlas[m_type].z = region.layer,
        .width = static_cast<int16_t>(width),
        .height = static_cast<int16_t>(height),
        .transformMatrixId = texture->getTransformMatrixId()
@@ -79,8 +78,6 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
     m_layers[region.layer].textures.emplace_back(info);
     m_texturesCached.emplace(textureID, std::move(info));
-
-    texture->m_atlas = this;
 }
 
 void TextureAtlas::createNewLayer() {
@@ -101,7 +98,6 @@ void TextureAtlas::flush() {
     for (auto& layer : m_layers) {
         if (!layer.textures.empty()) {
             layer.framebuffer->bind();
-
             for (const auto& texture : layer.textures) {
                 g_painter->clearRect(Color::alpha, { texture.x, texture.y, Size{texture.width, texture.height} });
 

@@ -802,6 +802,7 @@ void ThingType::loadTexture(const int animationPhase)
         m_opaque = !fullImage->hasTransparentPixel();
 
     textureData.source = std::make_shared<Texture>(fullImage, true, false);
+    textureData.source->allowAtlasCache();
 }
 
 Size ThingType::getBestTextureDimension(int w, int h, const int count)

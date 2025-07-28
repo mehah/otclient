@@ -53,8 +53,8 @@ struct PairHash
 class TextureAtlas
 {
 public:
-    TextureAtlas();
-    TextureAtlas(int width, int height);
+    TextureAtlas(Fw::TextureAtlasType type);
+    TextureAtlas(Fw::TextureAtlasType type, int width, int height);
 
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id);
@@ -68,6 +68,8 @@ public:
     int getLayerCount() const { return static_cast<int>(m_layers.size()); }
 
     void flush();
+
+    auto getType() const { return m_type; }
 
 private:
     struct Layer
@@ -107,14 +109,13 @@ private:
         insertRegion(region.x + width, region.y + height, region.width - width, region.height - height);
     }
 
-    std::vector<Layer> m_layers;
+    Fw::TextureAtlasType m_type;
     int m_atlasWidth;
     int m_atlasHeight;
 
-    phmap::flat_hash_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
-    phmap::flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
+    std::vector<Layer> m_layers;
     std::set<FreeRegion> m_freeRegions;
     std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
-
-    friend class DrawPoolManager;
+    phmap::flat_hash_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
+    phmap::flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
 };
