@@ -66,7 +66,7 @@ public:
     bool canCacheInAtlas()const { return getProp(Prop::_allowAtlasCache); }
     bool setupSize(const Size& size);
 
-    void allowAtlasCache() { setProp(Prop::_allowAtlasCache, true); }
+    virtual void allowAtlasCache() { setProp(Prop::_allowAtlasCache, true); }
 
 protected:
     void bind();

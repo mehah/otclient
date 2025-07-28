@@ -52,6 +52,8 @@ public:
     bool isAnimatedTexture() const override { return true; }
     bool running() const { return m_animTimer.running(); }
 
+    void allowAtlasCache() override;
+
 private:
     std::vector<TexturePtr> m_frames;
     std::vector<uint16_t> m_framesDelay;

@@ -89,6 +89,11 @@ TexturePtr AnimatedTexture::getCurrentFrame() {
     return m_frames[m_currentFrame];
 }
 
+void AnimatedTexture::allowAtlasCache() {
+    for (const auto& frame : m_frames)
+        frame->allowAtlasCache();
+}
+
 void AnimatedTexture::create() {
     if (getCurrentFrame()->isEmpty()) {
         for (const auto& frame : m_frames)
