@@ -2338,7 +2338,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
         m_localPlayer->setTotalCapacity(capacity);
     }
 
-    if (g_game.getClientVersion() >= 1412) { // improve name with feature
+    if (g_game.getFeature(Otc::GameCharacterSkillStats)) {
         //msg->getU8(); //  GameConcotions ??
         const uint32_t capacity = msg->getU32(); // base + bonus capacity
         msg->getU32(); // base capacity

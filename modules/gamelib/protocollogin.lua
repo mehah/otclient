@@ -134,7 +134,7 @@ function ProtocolLogin:sendLoginPacket()
 
     self:send(msg)
     if g_game.getFeature(GameHeader1400) then
-        self:enabelHeader1400()
+        self:enableHeader1400()
     end
     if g_game.getFeature(GameLoginPacketEncryption) then
         self:enableXteaEncryption()

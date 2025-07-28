@@ -562,6 +562,7 @@ namespace Otc
         GameMapCache = 125,
         GameForgeSkillStats = 126,
         GameHeader1400 = 127,
+        GameCharacterSkillStats = 128,
         LastGameFeature
     };
 
