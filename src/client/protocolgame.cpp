@@ -52,7 +52,7 @@ void ProtocolGame::onConnect()
 
     m_localPlayer = g_game.getLocalPlayer();
     if (g_game.getFeature(Otc::GameHeader1400))
-        enabelHeader1400();
+        enableHeader1400();
 
     if (g_game.getFeature(Otc::GameProtocolChecksum))
         enableChecksum();

@@ -70,7 +70,7 @@ public:
 
     void enableChecksum() { m_checksumEnabled = true; }
     void enabledSequencedPackets() { m_sequencedPackets = true; }
-    void enabelHeader1400() { m_header1400 = true; }
+    void enableHeader1400() { m_header1400 = true; }
 
     virtual void send(const OutputMessagePtr& outputMessage);
     virtual void recv();

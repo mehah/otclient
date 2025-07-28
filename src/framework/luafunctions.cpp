@@ -951,7 +951,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Protocol>("enableXteaEncryption", &Protocol::enableXteaEncryption);
     g_lua.bindClassMemberFunction<Protocol>("enabledSequencedPackets", &Protocol::enabledSequencedPackets);
     g_lua.bindClassMemberFunction<Protocol>("enableChecksum", &Protocol::enableChecksum);
-    g_lua.bindClassMemberFunction<Protocol>("enabelHeader1400", &Protocol::enabelHeader1400);
+    g_lua.bindClassMemberFunction<Protocol>("enableHeader1400", &Protocol::enableHeader1400);
 
     // InputMessage
     g_lua.registerClass<InputMessage>();

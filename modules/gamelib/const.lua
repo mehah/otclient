@@ -219,7 +219,7 @@ GamePlayerFamiliars = 123
 GameLatencyAdaptiveCamera = 124
 GameMapCache = 125
 GameForgeSkillStats = 126
-GameHeader1400 = 127 --@ improve name
+GameHeader1400 = 127
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
