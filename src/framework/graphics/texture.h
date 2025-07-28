@@ -25,6 +25,8 @@
 #include "declarations.h"
 #include <framework/core/timer.h>
 
+class TextureAtlas;
+
 class Texture
 {
 public:
@@ -64,6 +66,11 @@ public:
     virtual bool isAnimatedTexture() const { return false; }
     bool setupSize(const Size& size);
 
+    auto getAtlas() const { return m_atlas; }
+    auto getAtlasX() const { return m_atlasX; }
+    auto getAtlasY() const { return m_atlasY; }
+    auto getAtlasLayer() const { return m_atlasLayer; }
+
 protected:
     void bind();
     void setupWrap() const;
@@ -86,6 +93,11 @@ protected:
 
     ImagePtr m_image;
 
+    TextureAtlas* m_atlas{ nullptr };
+    int16_t m_atlasX{ -1 };
+    int16_t m_atlasY{ -1 };
+    int8_t m_atlasLayer{ -1 };
+
     enum Prop : uint16_t
     {
         hasMipMaps = 1 << 0,
@@ -103,4 +115,5 @@ protected:
 
     friend class GarbageCollection;
     friend class TextureManager;
+    friend class TextureAtlas;
 };

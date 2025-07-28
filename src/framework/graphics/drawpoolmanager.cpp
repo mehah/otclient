@@ -24,6 +24,7 @@
 #include "declarations.h"
 #include "drawpool.h"
 #include "graphics.h"
+#include "textureatlas.h"
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
@@ -70,12 +71,12 @@ void DrawPoolManager::draw()
     }
 }
 
-void DrawPoolManager::drawObject(const DrawPool::DrawObject& obj)
+void DrawPoolManager::drawObject(DrawPool* pool, const DrawPool::DrawObject& obj)
 {
     if (obj.action) {
         obj.action();
     } else {
-        obj.state.execute();
+        obj.state.execute(pool);
         g_painter->drawCoords(*obj.coords, DrawMode::TRIANGLES);
     }
 }
@@ -206,8 +207,9 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
     if (hasFramebuffer)
         pool->m_framebuffer->bind();
 
-    for (const auto& obj : pool->m_objectsDraw)
-        drawObject(obj);
+    for (const auto& obj : pool->m_objectsDraw) {
+        drawObject(pool, obj);
+    }
 
     if (hasFramebuffer) {
         pool->m_framebuffer->release();
@@ -216,6 +218,9 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         // and thus the CPU consumption will be partitioned.
         pool->m_objectsDraw.clear();
     }
+
+    if (pool->m_atlas)
+        pool->m_atlas->flush();
 
     pool->setDrawState(DrawPoolState::RENDERED);
 }
