@@ -31,7 +31,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         if (type == DrawPoolType::MAP) {
             pool->m_framebuffer->m_useAlphaWriting = false;
             pool->m_framebuffer->disableBlend();
-            pool->m_atlas = std::make_unique<TextureAtlas>();
         } else if (type == DrawPoolType::FOREGROUND) {
             pool->setFPS(10);
 
