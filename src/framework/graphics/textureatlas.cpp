@@ -45,6 +45,7 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
             tex.textureID = texture->getId();
             tex.transformMatrixId = texture->getTransformMatrixId();
+
             texture->m_atlas = this;
             texture->m_atlasX = tex.x;
             texture->m_atlasY = tex.y;
@@ -88,7 +89,6 @@ void TextureAtlas::createNewLayer() {
     fbo->setAutoClear(false);
     fbo->setAutoResetState(true);
     fbo->getTexture()->setSmooth(false);
-    fbo->getTexture()->setCached(true);
 
     m_layers.emplace_back(fbo);
     FreeRegion newRegion = { 0, 0, m_atlasWidth, m_atlasHeight, static_cast<int>(m_layers.size()) - 1 };
@@ -103,10 +103,15 @@ void TextureAtlas::flush() {
             layer.framebuffer->bind();
 
             for (const auto& texture : layer.textures) {
+                g_painter->clearRect(Color::alpha, { texture.x, texture.y, Size{texture.width, texture.height} });
+
                 buffer.clear();
                 buffer.addRect({ texture.x, texture.y, Size{texture.width, texture.height} }, { 0,0, texture.width, texture.height });
                 g_painter->setTexture(texture.textureID, texture.transformMatrixId);
                 g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
+
+                glBindTexture(GL_TEXTURE_2D, 0);
+                glDeleteTextures(1, &texture.textureID);
             }
             layer.textures.clear();
             layer.framebuffer->release();

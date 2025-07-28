@@ -91,7 +91,7 @@ void TextureManager::liveReload()
             tex->uploadPixels(image, tex->hasMipmaps());
             tex->setTime(stdext::time());
         }
-        }, 1000);
+    }, 1000);
 }
 
 TexturePtr TextureManager::getTexture(const std::string& fileName, const bool smooth)
@@ -131,8 +131,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
             std::stringstream fin;
             g_resources.readFileStream(filePathEx, fin);
             texture = loadTexture(fin);
-        }
-        catch (const stdext::exception& e) {
+        } catch (const stdext::exception& e) {
             g_logger.error("Unable to load texture '{}': {}", fileName, e.what());
             texture = g_textures.getEmptyTexture();
         }
@@ -140,7 +139,6 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
         if (texture) {
             texture->setTime(stdext::time());
             texture->setSmooth(smooth);
-            texture->setCached(true);
             std::unique_lock l(m_mutex);
             m_textures[filePath] = texture;
         }
@@ -173,8 +171,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
             const auto& animatedTexture = std::make_shared<AnimatedTexture>(imageSize, frames, framesDelay, apng.num_plays);
             std::scoped_lock l(m_mutex);
             texture = m_animatedTextures.emplace_back(animatedTexture);
-        }
-        else {
+        } else {
             const auto& image = std::make_shared<Image>(imageSize, apng.bpp, apng.pdata);
             texture = std::make_shared<Texture>(image, false, false);
         }

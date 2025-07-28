@@ -65,8 +65,10 @@ Texture::~Texture()
 #endif
     if (g_graphics.ok() && m_id != 0) {
         g_mainDispatcher.addEvent([id = m_id, atlas = m_atlas]() mutable {
-            if (atlas) atlas->removeTexture(id);
-            glDeleteTextures(1, &id);
+            if (atlas)
+                atlas->removeTexture(id);
+            else
+                glDeleteTextures(1, &id);
         });
     }
 }

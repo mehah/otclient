@@ -62,9 +62,7 @@ void UISprite::setSpriteId(const int id)
     }
 
     const auto& image = g_sprites.getSpriteImage(id);
-    if (m_sprite) m_sprite->setCached(false);
     m_sprite = image ? std::make_shared<Texture>(image) : nullptr;
-    m_sprite->setCached(true);
 }
 
 void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
