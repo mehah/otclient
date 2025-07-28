@@ -109,9 +109,6 @@ void TextureAtlas::flush() {
                 buffer.addRect({ texture.x, texture.y, Size{texture.width, texture.height} }, { 0,0, texture.width, texture.height });
                 g_painter->setTexture(texture.textureID, texture.transformMatrixId);
                 g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
-
-                glBindTexture(GL_TEXTURE_2D, 0);
-                glDeleteTextures(1, &texture.textureID);
             }
             layer.textures.clear();
             layer.framebuffer->release();

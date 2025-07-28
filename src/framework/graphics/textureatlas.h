@@ -44,9 +44,9 @@ struct PairHash
 {
     template <typename T1, typename T2>
     std::size_t operator()(const std::pair<T1, T2>& pair) const {
-        std::hash<T1> hash1;
-        std::hash<T2> hash2;
-        return hash1(pair.first) ^ (hash2(pair.second) << 1);
+        auto hash = stdext::hash_int(pair.first);
+        stdext::hash_combine(hash, stdext::hash_int(pair.second));
+        return hash;
     }
 };
 
