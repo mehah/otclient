@@ -16,18 +16,16 @@ function comma_value(n)
 end
 
 function formatTimeBySeconds(totalSeconds)
-	local hours = math.floor(totalSeconds / 3600)
-	local remainingSeconds = totalSeconds % 3600
-	local minutes = math.floor(remainingSeconds / 60)
-
-	return string.format("%02d:%02d", hours, minutes)
+    local hours = math.floor(totalSeconds / 3600)
+    local remainingSeconds = totalSeconds % 3600
+    local minutes = math.floor(remainingSeconds / 60)
+    return string.format("%02d:%02d", hours, minutes)
 end
 
 function formatTimeByMinutes(totalMinutes)
-	local totalSeconds = totalMinutes * 60
-	local hours = math.floor(totalSeconds / 3600)
-	local remainingSeconds = totalSeconds % 3600
-	local minutes = math.floor(remainingSeconds / 60)
-
-	return string.format("%02d:%02d", hours, minutes)
+    local totalSeconds = totalMinutes * 60
+    local hours = math.floor(totalSeconds / 3600)
+    local remainingSeconds = totalSeconds % 3600
+    local minutes = math.floor(remainingSeconds / 60)
+    return string.format("%02d:%02d", hours, minutes)
 end

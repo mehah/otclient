@@ -36,11 +36,9 @@ controllerCyclopedia = Controller:new()
 controllerCyclopedia:setUI('game_cyclopedia')
 
 function controllerCyclopedia:onInit()
-
 end
 
 function controllerCyclopedia:onGameStart()
-
     if g_game.getClientVersion() >= 1310 then
         CyclopediaButton = modules.game_mainpanel.addToggleButton('CyclopediaButton', tr('Cyclopedia'),
             '/images/options/cooldowns', function() toggle("items") end, false, 7)

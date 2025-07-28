@@ -107,7 +107,6 @@ function ProtocolLogin:sendLoginPacket()
         msg:addString(g_graphics.getVersion())
     end
 
-
     -- add RSA encrypted auth token
     if g_game.getFeature(GameAuthenticator) then
         offset = msg:getMessageSize()

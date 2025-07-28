@@ -247,6 +247,15 @@ function update()
     else
         regenerationTime:show()
     end
+    local xpBoostButton = skillsWindow:recursiveGetChildById('xpBoostButton')
+    local xpGainRate = skillsWindow:recursiveGetChildById('xpGainRate')
+    if g_game.getFeature(GameExperienceBonus) then
+        xpBoostButton:show()
+        xpGainRate:show()
+    else
+        xpBoostButton:hide()
+        xpGainRate:hide()
+    end
 end
 
 function online()
