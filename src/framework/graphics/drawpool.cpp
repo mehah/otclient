@@ -33,6 +33,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
             pool->m_framebuffer->disableBlend();
             pool->m_atlas = std::make_unique<TextureAtlas>();
         } else if (type == DrawPoolType::FOREGROUND) {
+            pool->m_atlas = std::make_unique<TextureAtlas>(4096, 4096);
             pool->setFPS(10);
 
             // creates a temporary framebuffer with smoothing.

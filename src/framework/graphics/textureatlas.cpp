@@ -30,7 +30,11 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     const auto width = texture->getWidth();
     const auto height = texture->getHeight();
 
-    if (width <= 0 || height <= 0 || width >= m_atlasWidth || height >= m_atlasHeight) {
+    // limit: 25% w/h
+    const int maxTexWidth = m_atlasWidth / 2;
+    const int maxTexHeight = m_atlasHeight / 2;
+
+    if (width <= 0 || height <= 0 || width > maxTexWidth || height > maxTexHeight) {
         texture->m_atlas = this;
         return; // don't cache
     }
