@@ -452,7 +452,6 @@ public:
 
     void unload() {
         for (auto& data : m_textureData) {
-            if (data.source) data.source->setCached(false);
             data.source = nullptr;
         }
     }

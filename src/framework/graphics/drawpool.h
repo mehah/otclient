@@ -33,8 +33,6 @@
 #include "../stdext/storage.h"
 #include <unordered_set>
 
-class TextureAtlas;
-
 enum class DrawPoolType : uint8_t
 {
     MAP,
@@ -430,7 +428,7 @@ private:
 
     std::atomic<DrawPoolState> m_drawState = DrawPoolState::READY;
 
-    std::unique_ptr<TextureAtlas> m_atlas;
+    TextureAtlasPtr m_atlas;
 
     friend class DrawPoolManager;
 };

@@ -39,11 +39,6 @@ public:
 
     void setSmooth(bool smooth) override;
     void setRepeat(bool repeat) override;
-    void setCached(bool v) override {
-        Texture::setCached(v);
-        for (const auto& frame : m_frames)
-            frame->setCached(v);
-    }
 
     uint32_t getNumPlays() const { return m_numPlays; }
     void setNumPlays(const uint32_t n) { m_numPlays = n; }
@@ -56,6 +51,8 @@ public:
 
     bool isAnimatedTexture() const override { return true; }
     bool running() const { return m_animTimer.running(); }
+
+    void allowAtlasCache() override;
 
 private:
     std::vector<TexturePtr> m_frames;
