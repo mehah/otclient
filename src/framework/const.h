@@ -176,6 +176,13 @@ namespace Fw
         KeyLast
     };
 
+    enum TextureAtlasType
+    {
+        MAP = 0,
+        FOREGROUND,
+        LAST
+    };
+
     enum LogLevel : uint8_t
     {
         LogFine = 0,

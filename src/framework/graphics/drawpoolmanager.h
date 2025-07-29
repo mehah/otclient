@@ -107,6 +107,8 @@ public:
 
     bool isPreDrawing() const;
 
+    void removeTextureFromAtlas(uint32_t id);
+
 private:
     DrawPool* getCurrentPool() const;
 

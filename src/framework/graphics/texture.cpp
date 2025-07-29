@@ -30,6 +30,7 @@
 #include <framework/core/application.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include "drawpoolmanager.h"
 
  // UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
@@ -64,8 +65,8 @@ Texture::~Texture()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_id != 0) {
-        g_mainDispatcher.addEvent([id = m_id, atlas = m_atlas]() mutable {
-            if (atlas) atlas->removeTexture(id);
+        g_mainDispatcher.addEvent([id = m_id]() mutable {
+            g_drawPool.removeTextureFromAtlas(id);
             glDeleteTextures(1, &id);
         });
     }
