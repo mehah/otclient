@@ -164,6 +164,7 @@ MiniWindow
       id: regenerationTime
       height: 15
       SkillNameLabel
+        !text: tr('Regeneration Time')
       SkillValueLabel
 
     SkillButton

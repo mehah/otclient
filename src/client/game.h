@@ -532,7 +532,6 @@ struct CyclopediaCharacterDefenceStats
     std::vector<ElementalResistance> resistances;
 };
 
-// In a header file (e.g., src/client/luavaluecasts_client.h)
 struct CyclopediaCharacterMiscStats
 {
     double momentumTotal;
@@ -560,8 +559,6 @@ struct CyclopediaCharacterMiscStats
 
     std::vector<Concoction> concoctions;
 };
-
-int push_luavalue(const CyclopediaCharacterMiscStats& data);
 
 //@bindsingleton g_game
 class Game
