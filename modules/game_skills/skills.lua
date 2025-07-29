@@ -604,40 +604,47 @@ end
 local function updateExperienceRate(localPlayer)
     local baseRate = ExpRating[ExperienceRate.BASE] or 100
     local expRateTotal = baseRate
-    
+
     for type, value in pairs(ExpRating) do
         if type ~= ExperienceRate.BASE and type ~= ExperienceRate.STAMINA_MULTIPLIER then
             expRateTotal = expRateTotal + (value or 0)
         end
     end
-    
+
     local staminaMultiplier = ExpRating[ExperienceRate.STAMINA_MULTIPLIER] or 100
     expRateTotal = expRateTotal * staminaMultiplier / 100
-    
+
     local xpgainrate = skillsWindow:recursiveGetChildById("xpGainRate")
-    if not xpgainrate then return end
-    
+    if not xpgainrate then
+        return
+    end
+
     local widget = xpgainrate:getChildById("value")
-    if not widget then return end
-    
+    if not widget then
+        return
+    end
+
     widget:setText(math.floor(expRateTotal) .. "%")
-    
+
     local tooltip = string.format("Your current XP gain rate amounts to %d%%.", math.floor(expRateTotal))
-    tooltip = tooltip .. string.format("\nYour XP gain rate is calculated as follows:\n- Base XP gain rate %d%%", baseRate)
-    
+    tooltip = tooltip ..
+                  string.format("\nYour XP gain rate is calculated as follows:\n- Base XP gain rate %d%%", baseRate)
+
     if (ExpRating[ExperienceRate.VOUCHER] or 0) > 0 then
         tooltip = tooltip .. string.format("\n- Voucher: %d%%", ExpRating[ExperienceRate.VOUCHER])
     end
-    
+
     if (ExpRating[ExperienceRate.XP_BOOST] or 0) > 0 then
-        tooltip = tooltip .. string.format("\n- XP Boost: %d%% (%s h remaining)", ExpRating[ExperienceRate.XP_BOOST], formatTimeBySeconds(localPlayer:getStoreExpBoostTime()))
+        tooltip = tooltip .. string.format("\n- XP Boost: %d%% (%s h remaining)", ExpRating[ExperienceRate.XP_BOOST],
+            formatTimeBySeconds(localPlayer:getStoreExpBoostTime()))
     end
-    tooltip = tooltip .. string.format("\n- Stamina multiplier: x%.1f (%s h remaining)", staminaMultiplier / 100, formatTimeByMinutes(localPlayer:getStamina() - 2340))
-    
+    tooltip = tooltip .. string.format("\n- Stamina multiplier: x%.1f (%s h remaining)", staminaMultiplier / 100,
+        formatTimeByMinutes(localPlayer:getStamina() - 2340))
+
     xpgainrate:setTooltip(tooltip)
-    
+
     if expRateTotal == 0 then
-        widget:setColor("#ff4a4a") 
+        widget:setColor("#ff4a4a")
     elseif expRateTotal > 100 then
         widget:setColor("#00cc00")
     elseif expRateTotal < 100 then
@@ -652,14 +659,17 @@ function onExperienceRateChange(localPlayer, type, value)
     updateExperienceRate(localPlayer)
 end
 
-   
-local function setSkillValueTest(id, value, tooltip, showPercentage, color)
+local function setSkillValueWithTooltips(id, value, tooltip, showPercentage, color)
     local skill = skillsWindow:recursiveGetChildById(id)
-    if not skill then return end
+    if not skill then
+        return
+    end
     if value and value ~= 0 then
         skill:show()
         local widget = skill:getChildById('value')
-        if not widget then return end
+        if not widget then
+            return
+        end
         if color then
             widget:setColor(color)
         end
@@ -667,31 +677,30 @@ local function setSkillValueTest(id, value, tooltip, showPercentage, color)
             local percentValue = math.floor(value * 10000) / 100
             local sign = percentValue > 0 and "+ " or ""
             widget:setText(sign .. percentValue .. "%")
-            if percentValue < 0  then
+            if percentValue < 0 then
                 widget:setColor("#FF9854")
             end
         else
             widget:setText(tostring(value))
         end
-        
         if tooltip then
             skill:setTooltip(tooltip)
         end
-        
-
     else
         skill:hide()
     end
 end
 
 function onFlatDamageHealingChange(localPlayer, flatBonus)
-    local tooltips = "This flat bonus is the main source of your character's power, added \nto most of the damage and healing values you cause."
-    setSkillValueTest('damageHealing', flatBonus, tooltips, false)
+    local tooltips =
+        "This flat bonus is the main source of your character's power, added \nto most of the damage and healing values you cause."
+    setSkillValueWithTooltips('damageHealing', flatBonus, tooltips, false)
 end
 
-function onAttackInfoChange(localPlayer , attackValue, attackElement)
-    local  tooltips = "This is your character's basic attack power whenever you enter a \nfight with a weapon or your fists. It does not apply to any spells \nyou cast. The attack value is calculated from the weapon's attack\n value, the corresponding weapon skill, combat tactics, the bonus \nreceived from the Revelation Perks and the player's level. The \nvalue represents the average damage you would inflict on a\ncreature which had no kind of defence or protection."
-    setSkillValueTest('attackValue', attackValue, tooltips, false)
+function onAttackInfoChange(localPlayer, attackValue, attackElement)
+    local tooltips =
+        "This is your character's basic attack power whenever you enter a \nfight with a weapon or your fists. It does not apply to any spells \nyou cast. The attack value is calculated from the weapon's attack\n value, the corresponding weapon skill, combat tactics, the bonus \nreceived from the Revelation Perks and the player's level. The \nvalue represents the average damage you would inflict on a\ncreature which had no kind of defence or protection."
+    setSkillValueWithTooltips('attackValue', attackValue, tooltips, false)
     local skill = skillsWindow:recursiveGetChildById("attackValue")
     if skill then
         local element = clientCombat[attackElement]
@@ -702,13 +711,12 @@ function onAttackInfoChange(localPlayer , attackValue, attackElement)
                 height = 9
             })
         end
-
     end
 end
 
-function onConvertedDamageChange(localPlayer , convertedDamage, convertedElement)
-    setSkillValueTest('convertedDamage', convertedDamage, false, true)
-    setSkillValueTest('convertedElement', convertedElement, false, true) --unTest
+function onConvertedDamageChange(localPlayer, convertedDamage, convertedElement)
+    setSkillValueWithTooltips('convertedDamage', convertedDamage, false, true)
+    setSkillValueWithTooltips('convertedElement', convertedElement, false, true)
 end
 
 function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critDamage, onslaught)
@@ -720,61 +728,70 @@ function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critD
     local critDamageTooltips = "You get +1% of the damage dealt as mana"
     local onslaughtTooltips = "You get +1% of the damage dealt as hit points"
     skillsWindow:recursiveGetChildById("criticalHit"):setVisible(true)
-    setSkillValueTest('lifeLeech', lifeLeech, lifeLeechTooltips, true)
-    setSkillValueTest('manaLeech', manaLeech, manaLeechTooltips, true)
-    setSkillValueTest('criticalChance', critChance, critChanceTooltips, true)
-    setSkillValueTest('criticalExtraDamage', critDamage, critDamageTooltips, true)
-    setSkillValueTest('onslaught', onslaught, onslaughtTooltips, true)
+    setSkillValueWithTooltips('lifeLeech', lifeLeech, lifeLeechTooltips, true)
+    setSkillValueWithTooltips('manaLeech', manaLeech, manaLeechTooltips, true)
+    setSkillValueWithTooltips('criticalChance', critChance, critChanceTooltips, true)
+    setSkillValueWithTooltips('criticalExtraDamage', critDamage, critDamageTooltips, true)
+    setSkillValueWithTooltips('onslaught', onslaught, onslaughtTooltips, true)
 end
-
 
 local combatIdToWidgetId = {
-    [0] = "physicalResist", [1] = "fireResist", [2] = "earthResist",
-    [3] = "energyResist",   [4] = "IceResist",  [5] = "HolyResist",
-    [6] = "deathResist",    [7] = "HealingResist", [8] = "drowResist",
-    [9] = "lifedrainResist",[10] = "manadRainResist"
-  }
-  
-  function onCombatAbsorbValuesChange(localPlayer, absorbValues)
+    [0] = "physicalResist",
+    [1] = "fireResist",
+    [2] = "earthResist",
+    [3] = "energyResist",
+    [4] = "IceResist",
+    [5] = "HolyResist",
+    [6] = "deathResist",
+    [7] = "HealingResist",
+    [8] = "drowResist",
+    [9] = "lifedrainResist",
+    [10] = "manadRainResist"
+}
+
+function onCombatAbsorbValuesChange(localPlayer, absorbValues)
     for id, widgetId in pairs(combatIdToWidgetId) do
-      local skill = skillsWindow:recursiveGetChildById(widgetId)
-      if skill then
-        local value = absorbValues[id]
-        if value then
-          setSkillValueTest(widgetId, value, false, true,"#44AD25")
-        else
-          skill:hide()
+        local skill = skillsWindow:recursiveGetChildById(widgetId)
+        if skill then
+            local value = absorbValues[id]
+            if value then
+                setSkillValueWithTooltips(widgetId, value, false, true, "#44AD25")
+            else
+                skill:hide()
+            end
         end
-      end
     end
-  end
-function onDefenseInfoChange(localPlayer , defense, armor, mitigation, dodge, damageReflection)
+end
+function onDefenseInfoChange(localPlayer, defense, armor, mitigation, dodge, damageReflection)
     skillsWindow:recursiveGetChildById("separadorOnDefenseInfoChange"):setVisible(true)
-    local defenseToolstip = "When attacked, you have a +9.6% chance to trigger Dodge, which \nwill fully mitigate the damage."
-    local armorToolstip = "Mitigation reduces most of the damage you take and varies based\non your shielding skill, equipped weapon, chosen combat tactics \nand any mitigation multipliers acquired in your Wheel of Destiny."
+    local defenseToolstip =
+        "When attacked, you have a +9.6% chance to trigger Dodge, which \nwill fully mitigate the damage."
+    local armorToolstip =
+        "Mitigation reduces most of the damage you take and varies based\non your shielding skill, equipped weapon, chosen combat tactics \nand any mitigation multipliers acquired in your Wheel of Destiny."
     local mitigationToolstip = "This shows how well your armor protects you from all physical\nattacks."
-    local dodgetToolstip = "This is your protection against all physical attacks in close combat \nas well as all distance physical attacks. The higher the defence value, the less damage you will take from melee physical hits. The defence\n value is calculated from your shield and/or weapon\n defence and the corresponding skill. Careful! \nYour defence value protects you only from hits of two creatures in a single round."
-    setSkillValueTest('defenceValue', defense,defenseToolstip, false)
-    setSkillValueTest('armorValue', armor,armorToolstip, false)
-    setSkillValueTest('mitigation', mitigation,mitigationToolstip, true)
-    setSkillValueTest('dodge', dodge,dodgetToolstip, true)
-    setSkillValueTest('damageReflection', damageReflection,false, true)
-    
+    local dodgetToolstip =
+        "This is your protection against all physical attacks in close combat \nas well as all distance physical attacks. The higher the defence value, the less damage you will take from melee physical hits. The defence\n value is calculated from your shield and/or weapon\n defence and the corresponding skill. Careful! \nYour defence value protects you only from hits of two creatures in a single round."
+    setSkillValueWithTooltips('defenceValue', defense, defenseToolstip, false)
+    setSkillValueWithTooltips('armorValue', armor, armorToolstip, false)
+    setSkillValueWithTooltips('mitigation', mitigation, mitigationToolstip, true)
+    setSkillValueWithTooltips('dodge', dodge, dodgetToolstip, true)
+    setSkillValueWithTooltips('damageReflection', damageReflection, false, true)
 
 end
+
 function onForgeBonusesChange(localPlayer, momentum, transcendence, amplification)
     skillsWindow:recursiveGetChildById("separadorOnForgeBonusesChange"):setVisible(true)
-    local momentumTooltip = "During combat, you have a +" .. math.floor(momentum * 10000) / 100 .. 
-                           "% chance to trigger Momentum\n, which reduces all spell cooldowns by 2 seconds."
-    
-    local transcendenceTooltip = "During combat, you have a +" .. math.floor(transcendence * 10000) / 100 .. 
-                                "% chance to trigger\nTranscendence, which transforms your character into a vocation-\nspecific avatar for 7 seconds. " ..
-                                "While in this form, you will benefit\nfrom a 15% damage reduction and guaranteed critical hits that \ndeal an additional 15% damage."
-    
-    local amplificationTooltip = "Effects of tiered items are amplified by +" .. math.floor(amplification * 10000) / 100 .. "%."
-    
+    local momentumTooltip = "During combat, you have a +" .. math.floor(momentum * 10000) / 100 ..
+                                "% chance to trigger Momentum\n, which reduces all spell cooldowns by 2 seconds."
 
-    setSkillValueTest('momentum', momentum, momentumTooltip, true)
-    setSkillValueTest('transcendence', transcendence, transcendenceTooltip, true)
-    setSkillValueTest('amplification', amplification, amplificationTooltip, true) 
+    local transcendenceTooltip = "During combat, you have a +" .. math.floor(transcendence * 10000) / 100 ..
+                                     "% chance to trigger\nTranscendence, which transforms your character into a vocation-\nspecific avatar for 7 seconds. " ..
+                                     "While in this form, you will benefit\nfrom a 15% damage reduction and guaranteed critical hits that \ndeal an additional 15% damage."
+
+    local amplificationTooltip =
+        "Effects of tiered items are amplified by +" .. math.floor(amplification * 10000) / 100 .. "%."
+
+    setSkillValueWithTooltips('momentum', momentum, momentumTooltip, true)
+    setSkillValueWithTooltips('transcendence', transcendence, transcendenceTooltip, true)
+    setSkillValueWithTooltips('amplification', amplification, amplificationTooltip, true)
 end
