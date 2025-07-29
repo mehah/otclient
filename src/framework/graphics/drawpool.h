@@ -55,6 +55,7 @@ enum DrawOrder : uint8_t
 
 enum class DrawPoolState
 {
+    UNINITIALIZED,
     PREPARING,
     READY,
     DRAWING,
@@ -426,7 +427,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic<DrawPoolState> m_drawState = DrawPoolState::READY;
+    std::atomic<DrawPoolState> m_drawState = DrawPoolState::UNINITIALIZED;
 
     TextureAtlasPtr m_atlas;
 
