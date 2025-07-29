@@ -92,7 +92,8 @@ void DrawPoolManager::drawObject(DrawPool* pool, const DrawPool::DrawObject& obj
         obj.action();
     } else {
         obj.state.execute(pool);
-        g_painter->drawCoords(*obj.coords, DrawMode::TRIANGLES);
+        if (obj.coords)
+            g_painter->drawCoords(*obj.coords, DrawMode::TRIANGLES);
     }
 }
 
