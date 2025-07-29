@@ -98,6 +98,7 @@ void TextureAtlas::flush() {
     for (auto& layer : m_layers) {
         if (!layer.textures.empty()) {
             layer.framebuffer->bind();
+            glDisable(GL_BLEND);
             for (const auto& texture : layer.textures) {
                 g_painter->clearRect(Color::alpha, { texture.x, texture.y, Size{texture.width, texture.height} });
 
@@ -106,6 +107,7 @@ void TextureAtlas::flush() {
                 g_painter->setTexture(texture.textureID, texture.transformMatrixId);
                 g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
             }
+            glEnable(GL_BLEND);
             layer.textures.clear();
             layer.framebuffer->release();
         }
