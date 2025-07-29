@@ -256,10 +256,6 @@ controller:registerEvents(g_game, {
             g_game.enableFeature(GameForgeConvergence)
         end
 
-        if version >= 1400 then
-            g_game.enableFeature(GameHeader1400)
-        end
-
         if version >= 1410 then
             g_game.disableFeature(GameAdditionalSkills)
             g_game.disableFeature(GameForgeSkillStats)

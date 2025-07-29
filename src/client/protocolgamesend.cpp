@@ -41,8 +41,6 @@ void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& b
 
 void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint8_t challengeRandom)
 {
-    if (g_game.getFeature(Otc::GameHeader1400)) //temp
-        enableHeader1400();
     const auto& msg = std::make_shared<OutputMessage>();
 
     msg->addU8(Proto::ClientPendingGame);
@@ -56,11 +54,9 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
         msg->addString(std::to_string(g_game.getClientVersion()));
     }
 
-    if (g_game.getClientVersion() >= 1334) {
-        msg->addString("appearancesHash");
-    } else if (g_game.getFeature(Otc::GameContentRevision)) {
+    if (g_game.getFeature(Otc::GameContentRevision))
         msg->addU16(g_things.getContentRevision());
-    }
+
     if (g_game.getFeature(Otc::GamePreviewState))
         msg->addU8(0);
 

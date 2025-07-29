@@ -561,8 +561,7 @@ namespace Otc
         GameLatencyAdaptiveCamera = 124,
         GameMapCache = 125,
         GameForgeSkillStats = 126,
-        GameHeader1400 = 127,
-        GameCharacterSkillStats = 128,
+        GameCharacterSkillStats = 127,
         LastGameFeature
     };
 
