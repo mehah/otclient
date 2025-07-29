@@ -1,267 +1,267 @@
 local UI = nil
 local TypeCharmRadioGroup = nil
 Cyclopedia.Charms = {}
-local charmCategory_t =  {
-	CHARM_ALL = 0,
-	CHARM_MAJOR = 1,
-	CHARM_MINOR = 2,
+local charmCategory_t = {
+    CHARM_ALL = 0,
+    CHARM_MAJOR = 1,
+    CHARM_MINOR = 2
 };
 
 local charm_t = {
-	CHARM_UNDEFINED = 0,
-	CHARM_OFFENSIVE = 1,
-	CHARM_DEFENSIVE = 2,
-	CHARM_PASSIVE = 3,
+    CHARM_UNDEFINED = 0,
+    CHARM_OFFENSIVE = 1,
+    CHARM_DEFENSIVE = 2,
+    CHARM_PASSIVE = 3
 };
 local charmRune_t = {
-	CHARM_WOUND = 0,
-	CHARM_ENFLAME = 1,
-	CHARM_POISON = 2,
-	CHARM_FREEZE = 3,
-	CHARM_ZAP = 4,
-	CHARM_CURSE = 5,
-	CHARM_CRIPPLE = 6,
-	CHARM_PARRY = 7,
-	CHARM_DODGE = 8,
-	CHARM_ADRENALINE = 9,
-	CHARM_NUMB = 10,
-	CHARM_CLEANSE = 11,
-	CHARM_BLESS = 12,
-	CHARM_SCAVENGE = 13,
-	CHARM_GUT = 14,
-	CHARM_LOW = 15,
-	CHARM_DIVINE = 16,
-	CHARM_VAMP = 17,
-	CHARM_VOID = 18,
-	CHARM_SAVAGE = 19,
-	CHARM_FATAL = 20,
-	CHARM_VOIDINVERSION = 21,
-	CHARM_CARNAGE = 22,
-	CHARM_OVERPOWER = 23,
-	CHARM_OVERFLUX = 24,
+    CHARM_WOUND = 0,
+    CHARM_ENFLAME = 1,
+    CHARM_POISON = 2,
+    CHARM_FREEZE = 3,
+    CHARM_ZAP = 4,
+    CHARM_CURSE = 5,
+    CHARM_CRIPPLE = 6,
+    CHARM_PARRY = 7,
+    CHARM_DODGE = 8,
+    CHARM_ADRENALINE = 9,
+    CHARM_NUMB = 10,
+    CHARM_CLEANSE = 11,
+    CHARM_BLESS = 12,
+    CHARM_SCAVENGE = 13,
+    CHARM_GUT = 14,
+    CHARM_LOW = 15,
+    CHARM_DIVINE = 16,
+    CHARM_VAMP = 17,
+    CHARM_VOID = 18,
+    CHARM_SAVAGE = 19,
+    CHARM_FATAL = 20,
+    CHARM_VOIDINVERSION = 21,
+    CHARM_CARNAGE = 22,
+    CHARM_OVERPOWER = 23,
+    CHARM_OVERFLUX = 24
 }
 
 local charms = {
     [charmRune_t.CHARM_WOUND] = {
-      name = "Wound",
-      description = "Triggers on a creature with a chance to deal 5% of its initial HP as physical damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {240, 360, 1200}
+        name = "Wound",
+        description = "Triggers on a creature with a chance to deal 5% of its initial HP as physical damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {240, 360, 1200}
     },
     [charmRune_t.CHARM_ENFLAME] = {
-      name = "Enflame",
-      description = "Triggers on a creature with a chance to deal 5% of its initial HP as fire damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {400, 600, 2000}
+        name = "Enflame",
+        description = "Triggers on a creature with a chance to deal 5% of its initial HP as fire damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {400, 600, 2000}
     },
     [charmRune_t.CHARM_POISON] = {
-      name = "Poison",
-      description = "Triggers on a creature with a chance to deal 5% of its initial HP as earth damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {240, 360, 1200}
+        name = "Poison",
+        description = "Triggers on a creature with a chance to deal 5% of its initial HP as earth damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {240, 360, 1200}
     },
     [charmRune_t.CHARM_FREEZE] = {
-      name = "Freeze",
-      description = "Triggers on a creature with a chance to deal 5% of its initial HP as ice damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {320, 480, 1600}
+        name = "Freeze",
+        description = "Triggers on a creature with a chance to deal 5% of its initial HP as ice damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {320, 480, 1600}
     },
     [charmRune_t.CHARM_ZAP] = {
-      name = "Zap",
-      description = "Triggers on a creature with a chance to deal 5% of its initial HP as energy damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {320, 480, 1600}
+        name = "Zap",
+        description = "Triggers on a creature with a chance to deal 5% of its initial HP as energy damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {320, 480, 1600}
     },
     [charmRune_t.CHARM_CURSE] = {
-      name = "Curse",
-      description = "Triggers on a creature with a chance to deal 5% of its initial HP as death damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {360, 540, 1800}
+        name = "Curse",
+        description = "Triggers on a creature with a chance to deal 5% of its initial HP as death damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {360, 540, 1800}
     },
     [charmRune_t.CHARM_CRIPPLE] = {
-      name = "Cripple",
-      description = "Cripples the creature and paralyzes it for 10 seconds.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      chance = {6, 9, 12},
-      messageCancel = "You crippled a monster. (cripple charm)",
-      points = {100, 150, 225}
+        name = "Cripple",
+        description = "Cripples the creature and paralyzes it for 10 seconds.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        chance = {6, 9, 12},
+        messageCancel = "You crippled a monster. (cripple charm)",
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_PARRY] = {
-      name = "Parry",
-      description = "Reflects incoming damage back to the aggressor.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_DEFENSIVE,
-      chance = {5, 10, 11},
-      messageCancel = "You parried an attack. (parry charm)",
-      points = {400, 600, 2000}
+        name = "Parry",
+        description = "Reflects incoming damage back to the aggressor.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_DEFENSIVE,
+        chance = {5, 10, 11},
+        messageCancel = "You parried an attack. (parry charm)",
+        points = {400, 600, 2000}
     },
     [charmRune_t.CHARM_DODGE] = {
-      name = "Dodge",
-      description = "Dodges an attack with a chance, avoiding all damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_DEFENSIVE,
-      chance = {5, 10, 11},
-      messageCancel = "You dodged an attack. (dodge charm)",
-      points = {240, 360, 1200}
+        name = "Dodge",
+        description = "Dodges an attack with a chance, avoiding all damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_DEFENSIVE,
+        chance = {5, 10, 11},
+        messageCancel = "You dodged an attack. (dodge charm)",
+        points = {240, 360, 1200}
     },
     [charmRune_t.CHARM_ADRENALINE] = {
-      name = "Adrenaline Burst",
-      description = "Boosts movement speed for 10 seconds after being hit.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_DEFENSIVE,
-      chance = {6, 9, 12},
-      messageCancel = "Your movements where bursted. (adrenaline burst charm)",
-      points = {100, 150, 225}
+        name = "Adrenaline Burst",
+        description = "Boosts movement speed for 10 seconds after being hit.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_DEFENSIVE,
+        chance = {6, 9, 12},
+        messageCancel = "Your movements where bursted. (adrenaline burst charm)",
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_NUMB] = {
-      name = "Numb",
-      description = "Numbs the creature and paralyzes it for 10 seconds.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_DEFENSIVE,
-      chance = {6, 9, 12},
-      messageCancel = "You numbed a monster. (numb charm)",
-      points = {100, 150, 225}
+        name = "Numb",
+        description = "Numbs the creature and paralyzes it for 10 seconds.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_DEFENSIVE,
+        chance = {6, 9, 12},
+        messageCancel = "You numbed a monster. (numb charm)",
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_CLEANSE] = {
-      name = "Cleanse",
-      description = "Removes a negative status effect and grants temporary immunity.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_DEFENSIVE,
-      chance = {6, 9, 12},
-      messageCancel = "You purified an attack. (cleanse charm)",
-      points = {100, 150, 225}
+        name = "Cleanse",
+        description = "Removes a negative status effect and grants temporary immunity.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_DEFENSIVE,
+        chance = {6, 9, 12},
+        messageCancel = "You purified an attack. (cleanse charm)",
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_BLESS] = {
-      name = "Bless",
-      description = "Reduces skill and XP loss by 10% when killed by the chosen creature.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_PASSIVE,
-      percent = 10,
-      chance = {6, 9, 12},
-      points = {100, 150, 225}
+        name = "Bless",
+        description = "Reduces skill and XP loss by 10% when killed by the chosen creature.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_PASSIVE,
+        percent = 10,
+        chance = {6, 9, 12},
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_SCAVENGE] = {
-      name = "Scavenge",
-      description = "Enhances chances to successfully skin or dust a creature.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {60, 90, 120},
-      points = {100, 150, 225}
+        name = "Scavenge",
+        description = "Enhances chances to successfully skin or dust a creature.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {60, 90, 120},
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_GUT] = {
-      name = "Gut",
-      description = "Increases creature product yields by 20%.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {6, 9, 12},
-      points = {100, 150, 225}
+        name = "Gut",
+        description = "Increases creature product yields by 20%.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {6, 9, 12},
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_LOW] = {
-      name = "Low Blow",
-      description = "Adds 8% critical hit chance to attacks with critical hit weapons.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {4, 8, 9},
-      points = {800, 1200, 4000}
+        name = "Low Blow",
+        description = "Adds 8% critical hit chance to attacks with critical hit weapons.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {4, 8, 9},
+        points = {800, 1200, 4000}
     },
     [charmRune_t.CHARM_DIVINE] = {
-      name = "Divine Wrath",
-      description = "Triggers on a creature and deals 5% of its initial HP as holy damage.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {600, 900, 3000}
+        name = "Divine Wrath",
+        description = "Triggers on a creature and deals 5% of its initial HP as holy damage.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {600, 900, 3000}
     },
     [charmRune_t.CHARM_VAMP] = {
-      name = "Vampiric Embrace",
-      description = "Adds 4% life leech to attacks if using life-leeching equipment.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {1.6, 2.4, 3.2},
-      points = {100, 150, 225}
+        name = "Vampiric Embrace",
+        description = "Adds 4% life leech to attacks if using life-leeching equipment.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {1.6, 2.4, 3.2},
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_VOID] = {
-      name = "Void's Call",
-      description = "Adds 2% mana leech to attacks if using mana-leeching equipment.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {0.8, 1.2, 1.6},
-      points = {100, 150, 225}
+        name = "Void's Call",
+        description = "Adds 2% mana leech to attacks if using mana-leeching equipment.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {0.8, 1.2, 1.6},
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_SAVAGE] = {
-      name = "Savage Blow",
-      description = "Adds extra critical damage to attacks with critical hit weapons.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {20, 40, 44},
-      points = {800, 1200, 4000}
+        name = "Savage Blow",
+        description = "Adds extra critical damage to attacks with critical hit weapons.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {20, 40, 44},
+        points = {800, 1200, 4000}
     },
     [charmRune_t.CHARM_FATAL] = {
-      name = "Fatal Hold",
-      description = "Prevents creatures from fleeing due to low health for 30 seconds.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {30, 45, 60},
-      messageCancel = "Your enemy is not able to flee now for 30 seconds. (fatal hold charm)",
-      points = {100, 150, 225}
+        name = "Fatal Hold",
+        description = "Prevents creatures from fleeing due to low health for 30 seconds.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {30, 45, 60},
+        messageCancel = "Your enemy is not able to flee now for 30 seconds. (fatal hold charm)",
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_VOIDINVERSION] = {
-      name = "Void Inversion",
-      description = "Chance to gain mana instead of losing it when taking Mana Drain damage.",
-      category = charmCategory_t.CHARM_MINOR,
-      type = charm_t.CHARM_PASSIVE,
-      chance = {20, 30, 40},
-      points = {100, 150, 225}
+        name = "Void Inversion",
+        description = "Chance to gain mana instead of losing it when taking Mana Drain damage.",
+        category = charmCategory_t.CHARM_MINOR,
+        type = charm_t.CHARM_PASSIVE,
+        chance = {20, 30, 40},
+        points = {100, 150, 225}
     },
     [charmRune_t.CHARM_CARNAGE] = {
-      name = "Carnage",
-      description = "Killing a monster deals physical damage to others nearby.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 15,
-      chance = {10, 20, 22},
-      points = {600, 900, 3000}
+        name = "Carnage",
+        description = "Killing a monster deals physical damage to others nearby.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 15,
+        chance = {10, 20, 22},
+        points = {600, 900, 3000}
     },
     [charmRune_t.CHARM_OVERPOWER] = {
-      name = "Overpower",
-      description = "Deals physical damage based on your maximum health.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 5,
-      chance = {5, 10, 11},
-      points = {600, 900, 3000}
+        name = "Overpower",
+        description = "Deals physical damage based on your maximum health.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 5,
+        chance = {5, 10, 11},
+        points = {600, 900, 3000}
     },
     [charmRune_t.CHARM_OVERFLUX] = {
-      name = "Overflux",
-      description = "Deals physical damage based on your maximum mana.",
-      category = charmCategory_t.CHARM_MAJOR,
-      type = charm_t.CHARM_OFFENSIVE,
-      percent = 2.5,
-      chance = {5, 10, 11},
-      points = {600, 900, 3000}
+        name = "Overflux",
+        description = "Deals physical damage based on your maximum mana.",
+        category = charmCategory_t.CHARM_MAJOR,
+        type = charm_t.CHARM_OFFENSIVE,
+        percent = 2.5,
+        chance = {5, 10, 11},
+        points = {600, 900, 3000}
     }
-  }
-  
+}
+
 local isModernUI = false
 function showCharms()
     isModernUI = g_game.getClientVersion() >= 1410
@@ -345,31 +345,32 @@ function Cyclopedia.CreateCharmItem(data)
         local canAfford = data.unlockPrice <= UI.CharmsPoints
         value:setColor(canAfford and "#C0C0C0" or "#D33C3C")
     end
-    
+
     widget.category = charmData.category
-    
+
     if isModernUI and data.tier > 0 then
-        widget.charmBase.border:setImageSource("/game_cyclopedia/images/charms/border/backdrop_charmgrade"..data.tier)
+        widget.charmBase.border:setImageSource("/game_cyclopedia/images/charms/border/backdrop_charmgrade" .. data.tier)
     end
 end
 
 function Cyclopedia.loadCharms(charmsData)
-    if not UI then return end
+    if not UI then
+        return
+    end
     if isModernUI and not UI.mainPanelCharmsType then
         return
     end
     local CharmList = isModernUI and UI.mainPanelCharmsType.panelCharmList.CharmList or UI.CharmList
     local player = g_game.getLocalPlayer()
-    
+
     if isModernUI then
         local formatResourceBalance = function(resourceType, maxResourceType)
-            return string.format("%d/%d", 
-                player:getResourceBalance(resourceType),
+            return string.format("%d/%d", player:getResourceBalance(resourceType),
                 player:getResourceBalance(maxResourceType))
         end
-        
-        controllerCyclopedia.ui.CharmsBase.Value:setText(
-            formatResourceBalance(ResourceTypes.CHARM, ResourceTypes.MAX_CHARM))
+
+        controllerCyclopedia.ui.CharmsBase.Value:setText(formatResourceBalance(ResourceTypes.CHARM,
+            ResourceTypes.MAX_CHARM))
         controllerCyclopedia.ui.CharmsBase1410.Value:setText(
             formatResourceBalance(ResourceTypes.MINOR_CHARM, ResourceTypes.MAX_MINOR_CHARM))
     else
@@ -384,10 +385,15 @@ function Cyclopedia.loadCharms(charmsData)
     for _, raceId in ipairs(charmsData.finishedMonsters) do
         local raceData = g_things.getRaceData(raceId)
         local raceName = raceData.name ~= "" and raceData.name or string.format("unnamed_%d", raceId)
-        table.insert(raceIdNamePairs, { raceId = raceId, name = raceName })
+        table.insert(raceIdNamePairs, {
+            raceId = raceId,
+            name = raceName
+        })
     end
 
-    table.sort(raceIdNamePairs, function(a, b) return a.name:lower() < b.name:lower() end)
+    table.sort(raceIdNamePairs, function(a, b)
+        return a.name:lower() < b.name:lower()
+    end)
 
     for _, pair in ipairs(raceIdNamePairs) do
         table.insert(Cyclopedia.Charms.Monsters, pair.raceId)
@@ -408,7 +414,7 @@ function Cyclopedia.loadCharms(charmsData)
             table.insert(formattedData, charmData)
         end
     end
-    
+
     if isModernUI then
         table.sort(formattedData, function(a, b)
             local tierA, tierB = a.tier or 0, b.tier or 0
@@ -427,15 +433,14 @@ function Cyclopedia.loadCharms(charmsData)
     end
 
     for _, value in ipairs(formattedData) do
-        if value and value.name and value.description and 
-           value.internalId and value.typePriority then
+        if value and value.name and value.description and value.internalId and value.typePriority then
             local success, error = pcall(Cyclopedia.CreateCharmItem, value)
             if not success then
-                g_logger.error(string.format("Error creating charm item: %s for charm ID: %s (%s)", 
-                    error, tostring(value.internalId), tostring(value.name)))
+                g_logger.error(string.format("Error creating charm item: %s for charm ID: %s (%s)", error,
+                    tostring(value.internalId), tostring(value.name)))
             end
         else
-            g_logger.error(string.format("Incomplete charm data: ID: %s", 
+            g_logger.error(string.format("Incomplete charm data: ID: %s",
                 value and tostring(value.internalId or "unknown") or "nil"))
         end
     end
@@ -443,20 +448,20 @@ function Cyclopedia.loadCharms(charmsData)
     if isModernUI then
         local selectedWidget = TypeCharmRadioGroup:getSelectedWidget()
         if selectedWidget then
-            local charmCategory = selectedWidget:getId() == "MajorCharms" and 
-                charmCategory_t.CHARM_MAJOR or charmCategory_t.CHARM_MINOR
-            
+            local charmCategory = selectedWidget:getId() == "MajorCharms" and charmCategory_t.CHARM_MAJOR or
+                                      charmCategory_t.CHARM_MINOR
+
             for _, widget in ipairs(CharmList:getChildren()) do
                 widget:setVisible(widget.category == charmCategory)
             end
-            
+
             CharmList:getLayout():update()
         end
     end
 
-    local firstCharm = Cyclopedia.Charms.redirect and CharmList:getChildById(Cyclopedia.Charms.redirect) or 
-                      CharmList:getChildByIndex(1)
-    
+    local firstCharm = Cyclopedia.Charms.redirect and CharmList:getChildById(Cyclopedia.Charms.redirect) or
+                           CharmList:getChildByIndex(1)
+
     if firstCharm then
         Cyclopedia.selectCharm(firstCharm, firstCharm:isChecked())
         Cyclopedia.Charms.redirect = nil
@@ -508,11 +513,12 @@ local function updateUIColors(widget, UI_BASE)
         if charmEntry and charmEntry.points and charmEntry.points[widget.data.tier + 1] then
             local selectedWidget = TypeCharmRadioGroup:getSelectedWidget()
             if selectedWidget then
-                local charmCategory = selectedWidget:getId() == "MajorCharms" and 
-                ResourceTypes.CHARM or ResourceTypes.MINOR_CHARM
+                local charmCategory = selectedWidget:getId() == "MajorCharms" and ResourceTypes.CHARM or
+                                          ResourceTypes.MINOR_CHARM
                 local pointsValue = charmEntry.points[widget.data.tier + 1]
                 local canAfford = pointsValue <= player:getResourceBalance(charmCategory)
-                UI.InformationBase.verticalPanelUnLockClearChram.PriceBaseCharm.Value:setColor(canAfford and "#C0C0C0" or "#D33C3C")
+                UI.InformationBase.verticalPanelUnLockClearChram.PriceBaseCharm.Value:setColor(
+                    canAfford and "#C0C0C0" or "#D33C3C")
                 UI.InformationBase.verticalPanelUnLockClearChram.UnlockButton:setEnabled(canAfford)
             end
         else
@@ -527,9 +533,9 @@ local function updateUIColors(widget, UI_BASE)
             local canAfford = widget.data.removeRuneCost <= player:getResourceBalance(ResourceTypes.GOLD_EQUIPPED)
             priceValue:setColor(canAfford and "#C0C0C0" or "#D33C3C")
             UI_BASE.UnlockButton:setEnabled(canAfford)
-            
-            local priceText = (widget.data.unlocked and not widget.data.asignedStatus) and 0 or 
-                             comma_value(widget.data.removeRuneCost)
+
+            local priceText = (widget.data.unlocked and not widget.data.asignedStatus) and 0 or
+                                  comma_value(widget.data.removeRuneCost)
             priceValue:setText(priceText)
         elseif widget.icon == 0 then
             local canAfford = widget.data.unlockPrice <= UI.CharmsPoints
@@ -543,7 +549,7 @@ end
 local function setupCreatureList(widget, UI_BASE)
     if (widget.data.unlocked and not widget.data.asignedStatus) or isModernUI then
         UI_BASE.UnlockButton:setText("Select")
-        
+
         local color = "#484848"
         for index, raceId in ipairs(Cyclopedia.Charms.Monsters) do
             local creatureWidget = g_ui.createWidget("CharmCreatureName", UI_BASE.CreatureList)
@@ -557,13 +563,17 @@ local function setupCreatureList(widget, UI_BASE)
 
         UI_BASE.UnlockButton:setEnabled(false)
         UI_BASE.SearchEdit:setEnabled(true)
-        if UI_BASE.SearchLabel then UI_BASE.SearchLabel:setEnabled(true) end
+        if UI_BASE.SearchLabel then
+            UI_BASE.SearchLabel:setEnabled(true)
+        end
         UI_BASE.CreaturesLabel:setEnabled(true)
     end
 end
 
 local function setupModernVersionUpgrade(widget, UI_BASE)
-    if not isModernUI then return end
+    if not isModernUI then
+        return
+    end
 
     local charmId = widget.data.id
     local tier = widget.data.tier or 0
@@ -591,7 +601,6 @@ local function setupModernVersionUpgrade(widget, UI_BASE)
     end
 end
 
-
 function Cyclopedia.selectCharm(widget, isChecked)
     local UI_BASE = getUIBase()
     UI_BASE.CreatureList:destroyChildren()
@@ -605,7 +614,9 @@ function Cyclopedia.selectCharm(widget, isChecked)
         end
     end
 
-    if not isChecked then widget:setChecked(true) end
+    if not isChecked then
+        widget:setChecked(true)
+    end
 
     UI_BASE.TextBase:setText(widget.data.description)
     UI_BASE.ItemBase.image:setImageSource(widget.charmBase.image:getImageSource())
@@ -614,7 +625,8 @@ function Cyclopedia.selectCharm(widget, isChecked)
     if isModernUI then
         UI.InformationBase:setText(widget:getText())
         if widget.data.tier > 0 then
-            UI_BASE.ItemBase.border:setImageSource("/game_cyclopedia/images/charms/border/backdrop_charmgrade"..widget.data.tier)
+            UI_BASE.ItemBase.border:setImageSource("/game_cyclopedia/images/charms/border/backdrop_charmgrade" ..
+                                                       widget.data.tier)
             UI_BASE.ItemBase.lockedMask:setVisible(false)
         else
             UI_BASE.ItemBase.lockedMask:setVisible(true)
@@ -647,17 +659,23 @@ function Cyclopedia.selectCharm(widget, isChecked)
         creatureWidget:setText(formatCreatureName(g_things.getRaceData(widget.data.raceId).name))
         creatureWidget:setEnabled(false)
         creatureWidget:setColor("#707070")
-        
+
         UI_BASE.SearchEdit:setEnabled(false)
-        if UI_BASE.SearchLabel then UI_BASE.SearchLabel:setEnabled(false) end
+        if UI_BASE.SearchLabel then
+            UI_BASE.SearchLabel:setEnabled(false)
+        end
         UI_BASE.CreaturesLabel:setEnabled(false)
     end
 
     if not widget.data.unlocked then
         UI_BASE.UnlockButton:setText("Unlock")
         UI_BASE.SearchEdit:setEnabled(false)
-        if UI_BASE.SearchLabel then UI_BASE.SearchLabel:setEnabled(false) end
-        if not isModernUI then UI_BASE.CreaturesLabel:setEnabled(false) end
+        if UI_BASE.SearchLabel then
+            UI_BASE.SearchLabel:setEnabled(false)
+        end
+        if not isModernUI then
+            UI_BASE.CreaturesLabel:setEnabled(false)
+        end
     end
 
     setupModernVersionUpgrade(widget, UI_BASE)
@@ -665,7 +683,7 @@ end
 
 function Cyclopedia.selectCreatureCharm(widget, isChecked)
     local UI_BASE = {}
-    
+
     if isModernUI then
         UI_BASE.InfoBase = UI.InformationBase.panelSelectCreature.InfoBase
         UI_BASE.UnlockButton = UI.InformationBase.verticalPanelUnLockClearChram.UnlockButton
@@ -699,13 +717,12 @@ end
 
 function Cyclopedia.searchCharmMonster(text)
     local UI_BASE = {}
-    
+
     if isModernUI then
         UI_BASE.CreaturesBase = UI.InformationBase.PanelCreatureList.CreaturesBase
     else
         UI_BASE.CreaturesBase = UI.InformationBase.CreaturesBase
     end
-
 
     UI_BASE.CreaturesBase.CreatureList:destroyChildren()
 
@@ -759,7 +776,7 @@ function Cyclopedia.actionCharmButton(widget)
     if type == "Unlock" then
         local function yesCallback()
             if isModernUI then
-                g_game.BuyCharmRune(0,data.id,0)
+                g_game.BuyCharmRune(0, data.id, 0)
             else
                 g_game.BuyCharmRune(data.id)
             end
@@ -792,8 +809,7 @@ function Cyclopedia.actionCharmButton(widget)
                         callback = noCallback
                     },
                     anchor = AnchorHorizontalCenter
-                }, yesCallback, noCallback
-            )
+                }, yesCallback, noCallback)
         end
     end
     if type == "Select" or type == "Select Creature" then
@@ -829,8 +845,7 @@ function Cyclopedia.actionCharmButton(widget)
                         callback = noCallback
                     },
                     anchor = AnchorHorizontalCenter
-                }, yesCallback, noCallback
-            )
+                }, yesCallback, noCallback)
         end
     end
 
@@ -865,13 +880,12 @@ function Cyclopedia.actionCharmButton(widget)
                         callback = noCallback
                     },
                     anchor = AnchorHorizontalCenter
-                }, yesCallback, noCallback
-            )
+                }, yesCallback, noCallback)
         end
     end
     if isModernUI and type:match("^Upgrade") then
         local function yesCallback()
-            g_game.BuyCharmRune(0,data.id,0)
+            g_game.BuyCharmRune(0, data.id, 0)
             if confirmWindow then
                 confirmWindow:destroy()
                 confirmWindow = nil
@@ -899,19 +913,21 @@ function Cyclopedia.actionCharmButton(widget)
                         callback = noCallback
                     },
                     anchor = AnchorHorizontalCenter
-                }, yesCallback, noCallback
-            )
+                }, yesCallback, noCallback)
         end
     end
 end
 
 function onTypeCharmRadioGroup(radioGroup, selectedWidget)
-    local charmCategory = selectedWidget:getId() == "MajorCharms" and charmCategory_t.CHARM_MAJOR or charmCategory_t.CHARM_MINOR
+    local charmCategory = selectedWidget:getId() == "MajorCharms" and charmCategory_t.CHARM_MAJOR or
+                              charmCategory_t.CHARM_MINOR
     local CharmList = UI.mainPanelCharmsType.panelCharmList.CharmList
     if charmCategory == charmCategory_t.CHARM_MAJOR then
-        UI.InformationBase.verticalPanelUnLockClearChram.PriceBaseCharm.Charm:setImageSource("/game_cyclopedia/images/monster-icon-bonuspoints")
+        UI.InformationBase.verticalPanelUnLockClearChram.PriceBaseCharm.Charm:setImageSource(
+            "/game_cyclopedia/images/monster-icon-bonuspoints")
     else
-        UI.InformationBase.verticalPanelUnLockClearChram.PriceBaseCharm.Charm:setImageSource("/game_cyclopedia/images/minor-charm-echoes")
+        UI.InformationBase.verticalPanelUnLockClearChram.PriceBaseCharm.Charm:setImageSource(
+            "/game_cyclopedia/images/minor-charm-echoes")
     end
     for _, widget in ipairs(CharmList:getChildren()) do
         if widget.category == charmCategory then
@@ -920,7 +936,7 @@ function onTypeCharmRadioGroup(radioGroup, selectedWidget)
             widget:setVisible(false)
         end
     end
-    
+
     CharmList:getLayout():update()
 end
 
