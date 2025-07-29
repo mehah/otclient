@@ -66,7 +66,9 @@ void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
     if (m_firstRecv) {
         m_firstRecv = false;
 
-        if (g_game.getFeature(Otc::GameMessageSizeCheck)) {
+        if (g_game.getClientVersion() >= 1405) {
+            const int padding = inputMessage->getU8();
+        } else if (g_game.getFeature(Otc::GameMessageSizeCheck)) {
             const int size = inputMessage->getU16();
             if (size != inputMessage->getUnreadSize()) {
                 g_logger.traceError("invalid message size");
