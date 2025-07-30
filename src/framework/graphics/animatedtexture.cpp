@@ -94,6 +94,12 @@ void AnimatedTexture::allowAtlasCache() {
         frame->allowAtlasCache();
 }
 
+void AnimatedTexture::disallowAtlasCache() {
+    setProp(Prop::_allowAtlasCache, false);
+    for (const auto& frame : m_frames)
+        frame->disallowAtlasCache();
+}
+
 void AnimatedTexture::create() {
     if (getCurrentFrame()->isEmpty()) {
         for (const auto& frame : m_frames)

@@ -107,6 +107,25 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
         const auto it = m_textures.find(filePath);
         if (it != m_textures.end()) {
             texture = it->second;
+            // Always apply the requested smooth setting, even for cached textures
+            if (texture) {
+                texture->setSmooth(smooth);
+                // Handle atlas caching based on smooth setting
+                if (smooth) {
+                    if (texture->isAnimatedTexture()) {
+                        std::static_pointer_cast<AnimatedTexture>(texture)->disallowAtlasCache();
+                    } else {
+                        texture->disallowAtlasCache();
+                    }
+                } else {
+                    // Re-enable atlas caching for non-smooth textures
+                    if (texture->isAnimatedTexture()) {
+                        std::static_pointer_cast<AnimatedTexture>(texture)->allowAtlasCache();
+                    } else {
+                        texture->allowAtlasCache();
+                    }
+                }
+            }
         }
     }
 
@@ -139,7 +158,22 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
         if (texture) {
             texture->setTime(stdext::time());
             texture->setSmooth(smooth);
-            texture->allowAtlasCache();
+            
+            // Handle atlas caching based on smooth setting
+            if (smooth) {
+                if (texture->isAnimatedTexture()) {
+                    std::static_pointer_cast<AnimatedTexture>(texture)->disallowAtlasCache();
+                } else {
+                    texture->disallowAtlasCache();
+                }
+            } else {
+                if (texture->isAnimatedTexture()) {
+                    std::static_pointer_cast<AnimatedTexture>(texture)->allowAtlasCache();
+                } else {
+                    texture->allowAtlasCache();
+                }
+            }
+            
             std::unique_lock l(m_mutex);
             m_textures[filePath] = texture;
         }

@@ -170,8 +170,6 @@ void UIWidget::drawImage(const Rect& screenCoords)
         }
     }
 
-    // smooth is now enabled by default for all textures
-    //m_imageTexture->setSmooth(m_imageSmooth);
     const bool useRepeated = hasProp(PropImageBordered) || hasProp(PropImageRepeated);
 
     const auto& texture = m_imageTexture->isAnimatedTexture() && isImageIndividualAnimation() ?

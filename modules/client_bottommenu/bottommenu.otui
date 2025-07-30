@@ -30,6 +30,8 @@ Panel
   anchors.bottom: parent.bottom
   anchors.horizontalCenter: parent.horizontalCenter
   image-source: /images/ui/panel_top
+  image-smooth: false
+  image-fixed-ratio: true
   
   UIWidget
     phantom: true
@@ -62,7 +64,8 @@ Panel
       anchors.bottom: parent.bottom
       anchors.left: parent.left
       anchors.right: parent.right
-      opacity: 0.5
+      opacity: 0.7
+      image-smooth: false
 
   MiniQtWindow
     id: eventsWindow
@@ -83,6 +86,7 @@ Panel
       anchors.left: parent.left
       anchors.right: parent.right
       opacity: 0.5
+      image-smooth: false
 
     UIWidget
       anchors.top: parent.top
@@ -95,6 +99,7 @@ Panel
       margin-bottom: 8
       image-source: /images/ui/widget_border
       padding: 2
+      image-smooth: false
       @onClick: onClickOnCalendar()
 
       CalendarTopMark
@@ -103,6 +108,7 @@ Panel
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.horizontalCenter
+        image-smooth: false
 
       CalendarDay
         id: activeScheduleEvent
@@ -117,6 +123,7 @@ Panel
         anchors.right: parent.right
         anchors.left: parent.horizontalCenter
         margin-left: 1  
+        image-smooth: false
 
       CalendarDay
         id: upcomingScheduleEvent
@@ -144,7 +151,8 @@ Panel
       anchors.bottom: parent.bottom
       anchors.left: parent.left
       anchors.right: parent.right
-      opacity: 0.5
+      opacity: 0.7
+      image-smooth: false
 
     Panel
       anchors.top: parent.top
@@ -174,6 +182,7 @@ Panel
       anchors.horizontalCenter: prev.horizontalCenter
       anchors.top: prev.bottom
       margin-top: 3
+      image-smooth: false
 
     Panel
       anchors.top: parent.top
@@ -203,3 +212,4 @@ Panel
       anchors.horizontalCenter: prev.horizontalCenter
       anchors.top: prev.bottom
       margin-top: 3
+      image-smooth: false

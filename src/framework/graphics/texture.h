@@ -67,6 +67,7 @@ public:
     bool setupSize(const Size& size);
 
     virtual void allowAtlasCache() { setProp(Prop::_allowAtlasCache, true); }
+    virtual void disallowAtlasCache() { setProp(Prop::_allowAtlasCache, false); }
 
 protected:
     void bind();
