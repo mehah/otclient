@@ -85,7 +85,10 @@ void TextureAtlas::createNewLayer() {
     fbo->resize({ m_atlasWidth, m_atlasHeight });
     fbo->setAutoClear(false);
     fbo->setAutoResetState(true);
-    fbo->getTexture()->setSmooth(true);
+    // For MAP atlas, use nearest filtering to avoid border artifacts
+    // during smooth retro antialiasing where textures are upscaled
+    bool useSmooth = (m_type != Fw::TextureAtlasType::MAP);
+    fbo->getTexture()->setSmooth(useSmooth);
 
     m_layers.emplace_back(fbo);
     FreeRegion newRegion = { 0, 0, m_atlasWidth, m_atlasHeight, static_cast<int>(m_layers.size()) - 1 };
