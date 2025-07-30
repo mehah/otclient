@@ -217,10 +217,8 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
 
     pool->waitWhileStateIs(DrawPoolState::PREPARING);
     pool->setDrawState(DrawPoolState::DRAWING);
-    if (isRead) {
+    if (isRead)
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
-        pool->m_coordsCache[0].coords.swap(pool->m_coordsCache[1].coords);
-    }
     pool->setDrawState(DrawPoolState::RENDERED);
 
     for (auto& obj : pool->m_objectsDraw[1]) {
