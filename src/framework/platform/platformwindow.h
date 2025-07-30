@@ -27,6 +27,9 @@
 #include <framework/global.h>
 #include <framework/graphics/declarations.h>
 
+// Forward declaration
+class Color;
+
  //@bindsingleton g_window
 class PlatformWindow
 {
@@ -74,6 +77,22 @@ public:
     virtual void setIcon(const std::string& iconFile) = 0;
     virtual void setClipboardText(std::string_view text) = 0;
 
+     // Title bar color customization (Windows 10/11 only)
+    // Sets the title bar background color using the DWM API
+    // Note: This feature requires Windows 10 build 22000 or later
+    // On unsupported systems, the call will be ignored gracefully
+    virtual void setTitleBarColor(const Color& color) {}
+
+    // Convenience methods for setting title bar color
+    // Usage examples:
+    //   g_window.setTitleBarColor(255, 0, 0);           // Red (RGB 0-255)
+    //   g_window.setTitleBarColor(1.0f, 0.0f, 0.0f);    // Red (float 0.0-1.0)
+    //   g_window.setTitleBarColorRGB(0, 128, 255);       // Blue
+    //   g_window.setTitleBarColor(Color::darkBlue);      // Using predefined color
+    void setTitleBarColor(int r, int g, int b);
+    void setTitleBarColor(float r, float g, float b);
+    void setTitleBarColorRGB(uint8_t r, uint8_t g, uint8_t b);
+    
     virtual Size getDisplaySize() = 0;
     virtual std::string getClipboardText() = 0;
     virtual std::string getPlatformType() = 0;
