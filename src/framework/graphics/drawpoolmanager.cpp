@@ -213,12 +213,13 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 void DrawPoolManager::drawObjects(DrawPool* pool) {
     const auto hasFramebuffer = pool->hasFrameBuffer();
 
-    if (!pool->isDrawState(DrawPoolState::READY) && hasFramebuffer)
+    const auto isRead = pool->isDrawState(DrawPoolState::READY);
+    if (!isRead && hasFramebuffer)
         return;
 
     pool->waitWhileStateIs(DrawPoolState::PREPARING);
     pool->setDrawState(DrawPoolState::DRAWING);
-    auto objectsDraw = std::move(pool->m_objectsDraw);
+    auto objectsDraw = isRead && hasFramebuffer ? std::move(pool->m_objectsDraw) : pool->m_objectsDraw;
     pool->m_objectsDraw.reserve(objectsDraw.size());
     pool->setDrawState(DrawPoolState::RENDERED);
 
@@ -231,10 +232,6 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
 
     if (hasFramebuffer) {
         pool->m_framebuffer->release();
-
-        // Let's clean this up so that the cleaning is not done in another thread,
-        // and thus the CPU consumption will be partitioned.
-        pool->m_objectsDraw.clear();
     }
 
     if (pool->m_atlas)
