@@ -218,11 +218,14 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
 
     pool->waitWhileStateIs(DrawPoolState::PREPARING);
     pool->setDrawState(DrawPoolState::DRAWING);
+    auto objectsDraw = std::move(pool->m_objectsDraw);
+    pool->m_objectsDraw.reserve(objectsDraw.size());
+    pool->setDrawState(DrawPoolState::RENDERED);
 
     if (hasFramebuffer)
         pool->m_framebuffer->bind();
 
-    for (const auto& obj : pool->m_objectsDraw) {
+    for (const auto& obj : objectsDraw) {
         drawObject(pool, obj);
     }
 
@@ -236,8 +239,6 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
 
     if (pool->m_atlas)
         pool->m_atlas->flush();
-
-    pool->setDrawState(DrawPoolState::RENDERED);
 }
 
 void DrawPoolManager::drawPool(const DrawPoolType type) {
