@@ -85,7 +85,7 @@ void TextureAtlas::createNewLayer() {
     fbo->resize({ m_atlasWidth, m_atlasHeight });
     fbo->setAutoClear(false);
     fbo->setAutoResetState(true);
-    fbo->getTexture()->setSmooth(false);
+    fbo->getTexture()->setSmooth(true);
 
     m_layers.emplace_back(fbo);
     FreeRegion newRegion = { 0, 0, m_atlasWidth, m_atlasHeight, static_cast<int>(m_layers.size()) - 1 };
