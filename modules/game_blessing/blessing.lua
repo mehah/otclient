@@ -92,6 +92,8 @@ function onUpdateBlessDialog(data)
         label.text:setText(entry.playerBlessCount .. " (" .. entry.store .. ")")
         if totalCount >= 1 then
             label.enabled:setImageSource("images/" .. i .. "_on")
+        else
+            label.enabled:setImageSource("images/" .. i)
         end
     end
 

@@ -54,8 +54,11 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
         msg->addString(std::to_string(g_game.getClientVersion()));
     }
 
-    if (g_game.getFeature(Otc::GameContentRevision))
+    if (g_game.getClientVersion() >= 1334) {
+        msg->addString("appearancesHash");
+    } else if (g_game.getFeature(Otc::GameContentRevision)) {
         msg->addU16(g_things.getContentRevision());
+    }
 
     if (g_game.getFeature(Otc::GamePreviewState))
         msg->addU8(0);
@@ -1205,7 +1208,7 @@ void ProtocolGame::sendRequestStorePremiumBoost()
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);
     msg->addU8(Otc::Store_Type_Actions_t::OPEN_PREMIUM_BOOST);
-    msg->addU8(0);
+    msg->addU8(1);
     send(msg);
 }
 

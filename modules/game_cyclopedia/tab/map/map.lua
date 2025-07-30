@@ -14,6 +14,9 @@ function showMap()
     controllerCyclopedia.ui.CharmsBase:setVisible(false)
     controllerCyclopedia.ui.GoldBase:setVisible(true)
     controllerCyclopedia.ui.BestiaryTrackerButton:setVisible(false)
+    if g_game.getClientVersion() >= 1410 then
+        controllerCyclopedia.ui.CharmsBase1410:setVisible(false)
+    end
 end
 
 function Cyclopedia.loadMap()

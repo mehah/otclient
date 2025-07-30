@@ -241,10 +241,15 @@ struct CharmData
     bool asignedStatus;
     uint16_t raceId;
     uint32_t removeRuneCost;
+    uint8_t availableCharmSlots;
+    uint8_t tier;
 };
 
 struct BestiaryCharmsData
 {
+    uint64_t resetAllCharmsCost;
+    uint8_t availableCharmSlots;
+
     uint32_t points;
     std::vector<CharmData> charms;
     std::vector<uint16_t> finishedMonsters;
@@ -450,6 +455,111 @@ struct DailyRewardData
     uint8_t maxUnlockableDragons;
 };
 
+struct CyclopediaCharacterOffenceStats
+{
+    double critChance;
+    double critDamage;
+    double critDamageBase;
+    double critDamageImbuement;
+    double critDamageWheel;
+
+    double lifeLeech;
+    double lifeLeechBase;
+    double lifeLeechImbuement;
+    double lifeLeechWheel;
+
+    double manaLeech;
+    double manaLeechBase;
+    double manaLeechImbuement;
+    double manaLeechWheel;
+
+    double onslaught;
+    double onslaughtBase;
+    double onslaughtBonus;
+
+    double cleavePercent;
+
+    std::vector<uint16_t> perfectShotDamage;
+
+    uint16_t flatDamage;
+    uint16_t flatDamageBase;
+
+    uint16_t weaponAttack;
+    uint16_t weaponFlatModifier;
+    uint16_t weaponDamage;
+    uint8_t weaponSkillType;
+    uint16_t weaponSkillLevel;
+    uint16_t weaponSkillModifier;
+    uint8_t weaponElement;
+    double weaponElementDamage;
+    uint8_t weaponElementType;
+    std::vector<double> weaponAccuracy;
+};
+
+struct CyclopediaCharacterDefenceStats
+{
+    double dodgeTotal;
+    double dodgeBase;
+    double dodgeBonus;
+    double dodgeWheel;
+
+    uint32_t magicShieldCapacity;
+    uint16_t magicShieldCapacityFlat;
+    double magicShieldCapacityPercent;
+
+    uint16_t reflectPhysical;
+    uint16_t armor;
+
+    uint16_t defense;
+    uint16_t defenseEquipment;
+    uint8_t defenseSkillType;
+    uint16_t shieldingSkill;
+    uint16_t defenseWheel;
+
+    double mitigation;
+    double mitigationBase;
+    double mitigationEquipment;
+    double mitigationShield;
+    double mitigationWheel;
+    double mitigationCombatTactics;
+
+    struct ElementalResistance
+    {
+        uint8_t element;
+        double value;
+    };
+
+    std::vector<ElementalResistance> resistances;
+};
+
+struct CyclopediaCharacterMiscStats
+{
+    double momentumTotal;
+    double momentumBase;
+    double momentumBonus;
+    double momentumWheel;
+
+    double dodgeTotal;
+    double dodgeBase;
+    double dodgeBonus;
+    double dodgeWheel;
+
+    double damageReflectionTotal;
+    double damageReflectionBase;
+    double damageReflectionBonus;
+
+    uint8_t haveBlesses;
+    uint8_t totalBlesses;
+
+    struct Concoction
+    {
+        uint16_t id;
+        uint32_t duration;
+    };
+
+    std::vector<Concoction> concoctions;
+};
+
 //@bindsingleton g_game
 class Game
 {
@@ -555,7 +665,6 @@ protected:
 
     // cyclopedia
     static void processItemDetail(uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions);
-    static void processBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& bestiaryRaces);
     static void processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
                                                     const std::vector<std::tuple<uint8_t, uint16_t>>& combats);
     static void processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, double mitigation,
@@ -841,6 +950,9 @@ public:
     void requestOpenRewardHistory();
     void requestGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
     void sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& quests);
+    void processCyclopediaCharacterOffenceStats(const CyclopediaCharacterOffenceStats& data);
+    void processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefenceStats& data);
+    void processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStats& data);
 
     void updateMapLatency() {
         if (!m_mapUpdateTimer.first) {
