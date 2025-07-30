@@ -43,7 +43,7 @@ public:
     bool isThing() override { return true; }
 
     virtual void setId(uint32_t /*id*/) {}
-    virtual void setPosition(const Position& position, uint8_t stackPos = 0);
+    virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
 
     virtual uint32_t getId() { return m_clientId; }
     uint16_t getClientId() const { return m_clientId; }
@@ -176,6 +176,8 @@ public:
 
     bool hasShader() const { return m_shaderId > 0; }
 
+    void ungroup() { m_drawConductor.agroup = false; }
+
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
     virtual void onDisappear() {};
@@ -220,7 +222,7 @@ public:
         m_scale.speed = ms;
         m_scale.timer.restart();
     }
-
+	
     bool canAnimate() { return m_animate; }
     void setAnimate(bool aniamte) { m_animate = aniamte; }
 
@@ -248,7 +250,7 @@ protected:
     } m_scale;
 
     Position m_position;
-    DrawConductor m_drawConductor{ .order = THIRD };
+    DrawConductor m_drawConductor{ .agroup = false, .order = THIRD };
 
     uint16_t m_clientId{ 0 };
 

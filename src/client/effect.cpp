@@ -76,7 +76,8 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
     }
 
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
-        if (g_app.isDrawingEffectsOnTop()) {
+        if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
+            m_drawConductor.agroup = true;
             m_drawConductor.order = FOURTH;
         }
 
@@ -135,12 +136,12 @@ void Effect::setId(const uint32_t id)
     m_clientId = id;
 }
 
-void Effect::setPosition(const Position& position, const uint8_t stackPos)
+void Effect::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
 {
     if (m_clientId == 0)
         return;
 
-    Thing::setPosition(position, stackPos);
+    Thing::setPosition(position, stackPos, hasElevation);
     int pattern_x = getNumPatternX();
     int pattern_y = getNumPatternY();
     if (pattern_x == 0 || pattern_y == 0) {

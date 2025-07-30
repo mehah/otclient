@@ -457,6 +457,7 @@ void MapView::updateGeometry(const Size& visibleDimension)
 
     const auto optimize = maxAwareRange > 115;
 
+    m_pool->agroup(optimize);
     m_multithreading = optimize;
     while (maxAwareRange > 100) {
         maxAwareRange /= 2;

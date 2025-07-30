@@ -106,6 +106,7 @@ private:
 
 struct DrawConductor
 {
+    bool agroup{ false };
     uint8_t order{ FIRST };
 };
 
@@ -136,6 +137,8 @@ public:
     void repaint() { if (hasFrameBuffer()) m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
+
+    void agroup(const bool agroup) { m_alwaysGroupDrawings = agroup; }
 
     void setScaleFactor(const float scale) { m_scaleFactor = scale; }
     float getScaleFactor() const { return m_scaleFactor; }
@@ -389,6 +392,7 @@ private:
     const FrameBufferPtr& getTemporaryFrameBuffer(uint8_t index);
 
     bool m_enabled{ true };
+    bool m_alwaysGroupDrawings{ false };
 
     int_fast8_t m_bindedFramebuffers{ -1 };
 
