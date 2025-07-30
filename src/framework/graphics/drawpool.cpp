@@ -84,7 +84,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
 
     if (addNewObj) {
         auto state = getState(texture, color);
-        auto& draw = list.emplace_back(std::move(state));
+        auto& draw = list.emplace_back(std::move(state), std::move(getCoordsBuffer()));
 
         if (coordsBuffer) {
             draw.coords->append(coordsBuffer.get());
@@ -246,9 +246,6 @@ void DrawPool::resetState()
 
 bool DrawPool::canRepaint()
 {
-    if (isDrawState(DrawPoolState::READY) || isDrawState(DrawPoolState::DRAWING))
-        return false;
-
     uint16_t refreshDelay = m_refreshDelay;
     if (m_shaderRefreshDelay > 0 && (m_refreshDelay == 0 || m_shaderRefreshDelay < m_refreshDelay))
         refreshDelay = m_shaderRefreshDelay;
@@ -398,4 +395,19 @@ const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
     const auto& tempfb = m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
     tempfb->setSmooth(false);
     return tempfb;
+}
+
+std::unique_ptr<CoordsBuffer, DrawPool::CoordsBufferUPtrDeleter> DrawPool::getCoordsBuffer() {
+    CoordsBuffer* coordsBuffer = nullptr;
+
+    if (!m_coordsCache.empty()) {
+        coordsBuffer = m_coordsCache.back();
+        m_coordsCache.pop_back();
+    } else
+        coordsBuffer = new CoordsBuffer();
+
+    return std::unique_ptr<CoordsBuffer, DrawPool::CoordsBufferUPtrDeleter>(
+        coordsBuffer,
+        DrawPool::CoordsBufferUPtrDeleter{ this, stdext::getThreadId() }
+    );;
 }

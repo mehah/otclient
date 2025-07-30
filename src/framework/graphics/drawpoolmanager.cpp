@@ -90,7 +90,7 @@ void DrawPoolManager::drawObject(DrawPool* pool, const DrawPool::DrawObject& obj
 {
     if (obj.action) {
         obj.action();
-    } else {
+    } else if (obj.coords) {
         obj.state.execute(pool);
         g_painter->drawCoords(*obj.coords, DrawMode::TRIANGLES);
     }
@@ -212,21 +212,16 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
     if (!isRead && hasFramebuffer)
         return;
 
-    static std::vector<DrawPool::DrawObject> objectsDraw;
-
-    pool->waitWhileStateIs(DrawPoolState::PREPARING);
-    pool->setDrawState(DrawPoolState::DRAWING);
-    if (isRead && hasFramebuffer) {
-        objectsDraw = std::move(pool->m_objectsDraw);
-        pool->m_objectsDraw.reserve(objectsDraw.size());
-    } else
-        objectsDraw = pool->m_objectsDraw;
-    pool->setDrawState(DrawPoolState::RENDERED);
-
     if (hasFramebuffer)
         pool->m_framebuffer->bind();
 
-    for (const auto& obj : objectsDraw) {
+    pool->waitWhileStateIs(DrawPoolState::PREPARING);
+    pool->setDrawState(DrawPoolState::DRAWING);
+    if (isRead)
+        pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
+    pool->setDrawState(DrawPoolState::RENDERED);
+
+    for (auto& obj : pool->m_objectsDraw[1]) {
         drawObject(pool, obj);
     }
 

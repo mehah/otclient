@@ -59,7 +59,7 @@ enum class DrawPoolState
     PREPARING,
     READY,
     DRAWING,
-    RENDERED,
+    RENDERED
 };
 
 struct DrawHashController
@@ -164,25 +164,25 @@ public:
             waitWhileStateIs(DrawPoolState::DRAWING);
             setDrawState(DrawPoolState::PREPARING);
 
-            m_objectsDraw.clear();
+            m_objectsDraw[0].clear();
             if (!m_objectsFlushed.empty()) {
-                if (m_objectsDraw.size() < m_objectsFlushed.size())
-                    m_objectsDraw.swap(m_objectsFlushed);
+                if (m_objectsDraw[0].size() < m_objectsFlushed.size())
+                    m_objectsDraw[0].swap(m_objectsFlushed);
 
                 if (!m_objectsFlushed.empty())
-                    m_objectsDraw.insert(
-                        m_objectsDraw.end(),
+                    m_objectsDraw[0].insert(
+                        m_objectsDraw[0].end(),
                         make_move_iterator(m_objectsFlushed.begin()),
                         make_move_iterator(m_objectsFlushed.end()));
             }
 
             for (auto& objs : m_objects) {
-                if (m_objectsDraw.size() < objs.size())
-                    m_objectsDraw.swap(objs);
+                if (m_objectsDraw[0].size() < objs.size())
+                    m_objectsDraw[0].swap(objs);
 
                 if (!objs.empty()) {
-                    m_objectsDraw.insert(
-                        m_objectsDraw.end(),
+                    m_objectsDraw[0].insert(
+                        m_objectsDraw[0].end(),
                         make_move_iterator(objs.begin()),
                         make_move_iterator(objs.end()));
                     objs.clear();
@@ -196,6 +196,17 @@ public:
     }
 
 protected:
+
+    struct CoordsBufferUPtrDeleter
+    {
+        DrawPool* pool;
+        int16_t threadId;
+
+        void operator()(CoordsBuffer* ptr) const {
+            ptr->clear();
+            pool->m_coordsCache.emplace_back(ptr);
+        }
+    };
 
     enum class DrawMethodType
     {
@@ -236,9 +247,9 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state) : state(std::move(state)), coords(std::in_place) {}
+        DrawObject(PoolState&& state, std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter>&& coords) : coords(std::move(coords)), state(std::move(state)) {}
         std::function<void()> action{ nullptr };
-        std::optional<CoordsBuffer> coords;
+        std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter> coords;
         PoolState state;
     };
 
@@ -253,6 +264,7 @@ protected:
     };
 
 private:
+
     static DrawPool* create(DrawPoolType type);
     static void addCoords(CoordsBuffer& buffer, const DrawMethod& method);
 
@@ -311,6 +323,8 @@ private:
     void setDrawState(DrawPoolState state) {
         m_drawState.store(state, std::memory_order_release);
     }
+
+    std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter> getCoordsBuffer();
 
     template<typename T>
     void setParameter(std::string_view name, T&& value) {
@@ -396,7 +410,8 @@ private:
 
     std::vector<DrawObject> m_objects[static_cast<uint8_t>(LAST)];
     std::vector<DrawObject> m_objectsFlushed;
-    std::vector<DrawObject> m_objectsDraw;
+    std::array<std::vector<DrawObject>, 2> m_objectsDraw;
+    std::vector<CoordsBuffer*> m_coordsCache;
 
     stdext::map<std::string_view, std::any> m_parameters;
 

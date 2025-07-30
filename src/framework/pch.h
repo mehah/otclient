@@ -63,7 +63,7 @@
 template <typename E>
 std::enable_if_t<std::is_enum_v<E>, std::underlying_type_t<E>>
 format_as(E e) {
-	return static_cast<std::underlying_type_t<E>>(e);
+    return static_cast<std::underlying_type_t<E>>(e);
 }
 
 using namespace std::literals;
