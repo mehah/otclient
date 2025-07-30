@@ -79,13 +79,13 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 }
 
 void TextureAtlas::createNewLayer() {
-    auto fbo = std::make_shared<FrameBuffer>();
+    auto fbo = std::make_unique<FrameBuffer>();
     fbo->resize({ m_atlasWidth, m_atlasHeight });
     fbo->setAutoClear(false);
     fbo->setAutoResetState(true);
     fbo->getTexture()->setSmooth(false);
 
-    m_layers.emplace_back(fbo);
+    m_layers.emplace_back(std::move(fbo));
     FreeRegion newRegion = { 0, 0, m_atlasWidth, m_atlasHeight, static_cast<int>(m_layers.size()) - 1 };
     m_freeRegions.insert(newRegion);
     m_freeRegionsBySize[m_atlasWidth * m_atlasHeight].insert(newRegion);

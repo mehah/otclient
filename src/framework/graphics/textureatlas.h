@@ -86,7 +86,7 @@ public:
 private:
     struct Layer
     {
-        FrameBufferPtr framebuffer;
+        std::unique_ptr<FrameBuffer> framebuffer;
         std::vector<AtlasRegion*> textures;
     };
     void createNewLayer();
