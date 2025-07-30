@@ -53,7 +53,7 @@ public:
     bool running() const { return m_animTimer.running(); }
 
     void allowAtlasCache() override;
-    void disallowAtlasCache();
+    void disallowAtlasCache() override;
 
 private:
     std::vector<TexturePtr> m_frames;

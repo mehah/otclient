@@ -44,6 +44,8 @@ public:
     uint16_t getMatrixId(const Size& size, bool upsidedown);
 
 private:
+    void configureTextureAtlasCache(const TexturePtr& texture, bool smooth);
+
     std::unordered_map<std::string, TexturePtr> m_textures;
     std::vector<AnimatedTexturePtr> m_animatedTextures;
     TexturePtr m_emptyTexture;

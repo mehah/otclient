@@ -94,6 +94,25 @@ void TextureManager::liveReload()
     }, 1000);
 }
 
+void TextureManager::configureTextureAtlasCache(const TexturePtr& texture, bool smooth)
+{
+    if (!texture) return;
+    
+    if (smooth) {
+        if (texture->isAnimatedTexture()) {
+            std::static_pointer_cast<AnimatedTexture>(texture)->disallowAtlasCache();
+        } else {
+            texture->disallowAtlasCache();
+        }
+    } else {
+        if (texture->isAnimatedTexture()) {
+            std::static_pointer_cast<AnimatedTexture>(texture)->allowAtlasCache();
+        } else {
+            texture->allowAtlasCache();
+        }
+    }
+}
+
 TexturePtr TextureManager::getTexture(const std::string& fileName, const bool smooth)
 {
     TexturePtr texture;
@@ -110,21 +129,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
             // Always apply the requested smooth setting, even for cached textures
             if (texture) {
                 texture->setSmooth(smooth);
-                // Handle atlas caching based on smooth setting
-                if (smooth) {
-                    if (texture->isAnimatedTexture()) {
-                        std::static_pointer_cast<AnimatedTexture>(texture)->disallowAtlasCache();
-                    } else {
-                        texture->disallowAtlasCache();
-                    }
-                } else {
-                    // Re-enable atlas caching for non-smooth textures
-                    if (texture->isAnimatedTexture()) {
-                        std::static_pointer_cast<AnimatedTexture>(texture)->allowAtlasCache();
-                    } else {
-                        texture->allowAtlasCache();
-                    }
-                }
+                configureTextureAtlasCache(texture, smooth);
             }
         }
     }
@@ -158,21 +163,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
         if (texture) {
             texture->setTime(stdext::time());
             texture->setSmooth(smooth);
-            
-            // Handle atlas caching based on smooth setting
-            if (smooth) {
-                if (texture->isAnimatedTexture()) {
-                    std::static_pointer_cast<AnimatedTexture>(texture)->disallowAtlasCache();
-                } else {
-                    texture->disallowAtlasCache();
-                }
-            } else {
-                if (texture->isAnimatedTexture()) {
-                    std::static_pointer_cast<AnimatedTexture>(texture)->allowAtlasCache();
-                } else {
-                    texture->allowAtlasCache();
-                }
-            }
+            configureTextureAtlasCache(texture, smooth);
             
             std::unique_lock l(m_mutex);
             m_textures[filePath] = texture;
