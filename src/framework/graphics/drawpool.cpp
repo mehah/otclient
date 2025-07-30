@@ -40,7 +40,6 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     } else if (type == DrawPoolType::LIGHT) {
         pool->m_hashCtrl = true;
     } else {
-        pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
         pool->setFPS(60);
     }
 
@@ -64,8 +63,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
     uint8_t order = conductor.order;
     if (m_type == DrawPoolType::FOREGROUND) {
         order = FIRST;
-    } else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
-        order = THIRD;
+    }
 
     bool addNewObj = true;
 

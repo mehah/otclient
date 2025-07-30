@@ -93,20 +93,16 @@ void Item::drawLight(const Point& dest, const LightViewPtr& lightView) {
 void Item::setConductor()
 {
     if (isSingleGround()) {
-        m_drawConductor.agroup = true;
         m_drawConductor.order = FIRST;
-    } else if (isSingleGroundBorder() && !hasElevation()) {
-        m_drawConductor.agroup = true;
+    } else if (isSingleGroundBorder()) {
         m_drawConductor.order = SECOND;
-    }
+    } else if (isTopGround() || isTopGroundBorder())
+        m_drawConductor.order = THIRD;
 }
 
-void Item::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
+void Item::setPosition(const Position& position, const uint8_t stackPos)
 {
     Thing::setPosition(position, stackPos);
-
-    if (hasElevation || (m_drawConductor.agroup && stackPos > 0))
-        m_drawConductor.agroup = false;
 }
 
 int Item::getSubType()

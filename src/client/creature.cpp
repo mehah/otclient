@@ -295,7 +295,7 @@ void Creature::internalDraw(Point dest, const Color& color)
                         m_mountShader->setUniformValue(ShaderManager::MOUNT_ID_UNIFORM, m_outfit.getMount());
                     }*/);
                 }
-                getMountThingType()->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), color);
+                getMountThingType()->draw(dest, 0, m_numPatternX, 0, 0, getCurrentAnimationPhase(true), color, true, nullptr, m_drawConductor);
 
                 dest += getDisplacement() * g_drawPool.getScaleFactor();
             }
@@ -324,14 +324,14 @@ void Creature::internalDraw(Point dest, const Color& color)
                         g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
                     }
 
-                    datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color);
+                    datType->draw(dest, 0, m_numPatternX, yPattern, m_numPatternZ, animationPhase, color, true, nullptr, m_drawConductor);
 
                     if (m_drawOutfitColor && !replaceColorShader && getLayers() > 1) {
                         g_drawPool.setCompositionMode(CompositionMode::MULTIPLY);
-                        datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getHeadColor());
-                        datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getBodyColor());
-                        datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getLegsColor());
-                        datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getFeetColor());
+                        datType->draw(dest, SpriteMaskYellow, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getHeadColor(), true, nullptr, m_drawConductor);
+                        datType->draw(dest, SpriteMaskRed, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getBodyColor(), true, nullptr, m_drawConductor);
+                        datType->draw(dest, SpriteMaskGreen, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getLegsColor(), true, nullptr, m_drawConductor);
+                        datType->draw(dest, SpriteMaskBlue, m_numPatternX, yPattern, m_numPatternZ, animationPhase, m_outfit.getFeetColor(), true, nullptr, m_drawConductor);
                         g_drawPool.resetCompositionMode();
                     }
                 }
@@ -374,7 +374,7 @@ void Creature::internalDraw(Point dest, const Color& color)
 
             if (!replaceColorShader && hasShader())
                 g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
-            getThingType()->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, color);
+            getThingType()->draw(dest - (getDisplacement() * g_drawPool.getScaleFactor()), 0, 0, 0, 0, animationPhase, color, true, nullptr, m_drawConductor);
         }
     }
 
