@@ -52,8 +52,10 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
 {
     if (m_atlas && method.src.isValid() && texture && texture->isCached(m_atlas->getType())) {
         const auto& atlas = texture->getAtlas(m_atlas->getType());
-        method.src = Rect(atlas.x + method.src.x(), atlas.y + method.src.y(), method.src.width(), method.src.height());
-        texture = m_atlas->getTexture(atlas.z);
+        if (atlas->isEnabled()) {
+            method.src = Rect(atlas->x + method.src.x(), atlas->y + method.src.y(), method.src.width(), method.src.height());
+            texture = m_atlas->getTexture(atlas->layer);
+        }
     }
 
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))

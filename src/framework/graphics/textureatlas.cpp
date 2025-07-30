@@ -18,8 +18,10 @@ void TextureAtlas::removeTexture(uint32_t id) {
         return;
     }
 
+    it->second->enabled = false;
+
     auto sizeKey = std::make_pair(it->second->width, it->second->height);
-    m_inactiveTextures.try_emplace(sizeKey, std::vector<std::unique_ptr<TextureInfo>>())
+    m_inactiveTextures.try_emplace(sizeKey, std::vector<std::unique_ptr<AtlasRegion>>())
         .first->second.emplace_back(std::move(it->second));
     m_texturesCached.erase(it);
 }
@@ -43,10 +45,7 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
             tex->textureID = texture->getId();
             tex->transformMatrixId = texture->getTransformMatrixId();
-
-            texture->m_atlas[m_type].x = tex->x;
-            texture->m_atlas[m_type].y = tex->y;
-            texture->m_atlas[m_type].z = tex->layer;
+            texture->m_atlas[m_type] = tex.get();
 
             m_layers[tex->layer].textures.emplace_back(tex.get());
             m_texturesCached.emplace(textureID, std::move(tex));
@@ -64,16 +63,17 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     FreeRegion region = bestRegionOpt.value();
     splitRegion(region, width, height);
 
-    auto info = std::make_unique<TextureInfo>(TextureInfo{
-       .textureID = textureID,
-       .x = texture->m_atlas[m_type].x = region.x,
-       .y = texture->m_atlas[m_type].y = region.y,
-       .layer = texture->m_atlas[m_type].z = region.layer,
-       .width = static_cast<int16_t>(width),
-       .height = static_cast<int16_t>(height),
-       .transformMatrixId = texture->getTransformMatrixId()
-    });
+    auto info = std::make_unique<AtlasRegion>(
+        textureID,
+        region.x,
+        region.y,
+        region.layer,
+        static_cast<int16_t>(width),
+        static_cast<int16_t>(height),
+        texture->getTransformMatrixId()
+    );
 
+    texture->m_atlas[m_type] = info.get();
     m_layers[region.layer].textures.emplace_back(info.get());
     m_texturesCached.emplace(textureID, std::move(info));
 }
@@ -104,6 +104,8 @@ void TextureAtlas::flush() {
                 buffer.addRect({ texture->x, texture->y, Size{texture->width, texture->height} }, { 0,0, texture->width, texture->height });
                 g_painter->setTexture(texture->textureID, texture->transformMatrixId);
                 g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
+
+                texture->enabled.store(true, std::memory_order_release);
             }
             glEnable(GL_BLEND);
             layer.textures.clear();

@@ -13,15 +13,27 @@
 
 #include "declarations.h"
 
-struct TextureInfo
+class AtlasRegion
 {
-    uint32_t textureID = 0;
-    int16_t x = -1;
-    int16_t y = -1;
-    int8_t layer = -1;
-    int16_t width = -1;
-    int16_t height = -1;
-    uint16_t transformMatrixId = 0;
+public:
+    uint32_t textureID;
+    int16_t x;
+    int16_t y;
+    int8_t layer;
+    int16_t width;
+    int16_t height;
+    uint16_t transformMatrixId;
+    std::atomic_bool enabled = false;
+
+    bool isEnabled() const {
+        return enabled.load(std::memory_order_acquire);
+    }
+
+    AtlasRegion(uint32_t tid, int16_t x, int16_t y, int8_t layer,
+                int16_t width, int16_t height, uint16_t transformId)
+        : textureID(tid), x(x), y(y), layer(layer),
+        width(width), height(height), transformMatrixId(transformId) {
+    }
 };
 
 struct FreeRegion
@@ -75,7 +87,7 @@ private:
     struct Layer
     {
         FrameBufferPtr framebuffer;
-        std::vector<TextureInfo*> textures;
+        std::vector<AtlasRegion*> textures;
     };
     void createNewLayer();
 
@@ -116,6 +128,6 @@ private:
     std::vector<Layer> m_layers;
     std::set<FreeRegion> m_freeRegions;
     std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
-    phmap::flat_hash_map<std::pair<int, int>, std::vector<std::unique_ptr<TextureInfo>>, PairHash> m_inactiveTextures;
-    phmap::flat_hash_map<uint32_t, std::unique_ptr<TextureInfo>> m_texturesCached;
+    phmap::flat_hash_map<std::pair<int, int>, std::vector<std::unique_ptr<AtlasRegion>>, PairHash> m_inactiveTextures;
+    phmap::flat_hash_map<uint32_t, std::unique_ptr<AtlasRegion>> m_texturesCached;
 };

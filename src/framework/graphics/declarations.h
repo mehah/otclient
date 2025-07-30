@@ -53,6 +53,7 @@ class ApplicationDrawEvents;
 class ApplicationContext;
 class GraphicalApplicationContext;
 class TextureAtlas;
+class AtlasRegion;
 
 using ImagePtr = std::shared_ptr<Image>;
 using TexturePtr = std::shared_ptr<Texture>;
