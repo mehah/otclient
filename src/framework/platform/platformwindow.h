@@ -77,10 +77,10 @@ public:
     virtual void setIcon(const std::string& iconFile) = 0;
     virtual void setClipboardText(std::string_view text) = 0;
 
-     // Title bar color customization (Windows 10/11 only)
-    // Sets the title bar background color using the DWM API
-    // Note: This feature requires Windows 10 build 22000 or later
-    // On unsupported systems, the call will be ignored gracefully
+    // This method is intentionally left empty because title bar color customization
+    // is only supported on Windows 10/11 via the DWM API. On other platforms,
+    // or when not implemented in the derived class, this method does nothing.
+    // Derived classes should override this method to provide platform-specific behavior.
     virtual void setTitleBarColor(const Color& color) {}
 
     // Convenience methods for setting title bar color
