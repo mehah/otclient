@@ -73,6 +73,7 @@ public:
     void setVerticalSync(bool enable) override;
     void setIcon(const std::string& file) override;
     void setClipboardText(std::string_view text) override;
+    void setTitleBarColor(const Color& color) override;
 
     Size getDisplaySize() override;
     std::string getClipboardText() override;
