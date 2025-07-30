@@ -84,7 +84,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
 
     if (addNewObj) {
         auto state = getState(texture, color);
-        auto& draw = list.emplace_back(std::move(state), std::move(getCoordsBuffer()));
+        auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
 
         if (coordsBuffer) {
             draw.coords->append(coordsBuffer.get());
@@ -241,6 +241,7 @@ void DrawPool::resetState()
     getCurrentState() = {};
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
+    m_coordsCache[0].last = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
 
@@ -397,17 +398,12 @@ const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
     return tempfb;
 }
 
-std::unique_ptr<CoordsBuffer, DrawPool::CoordsBufferUPtrDeleter> DrawPool::getCoordsBuffer() {
-    CoordsBuffer* coordsBuffer = nullptr;
+std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer() {
+    if (++m_coordsCache[0].last > m_coordsCache[0].coords.size()) {
+        return  m_coordsCache[0].coords.emplace_back(std::make_shared<CoordsBuffer>());
+    }
 
-    if (!m_coordsCache.empty()) {
-        coordsBuffer = m_coordsCache.back();
-        m_coordsCache.pop_back();
-    } else
-        coordsBuffer = new CoordsBuffer();
-
-    return std::unique_ptr<CoordsBuffer, DrawPool::CoordsBufferUPtrDeleter>(
-        coordsBuffer,
-        DrawPool::CoordsBufferUPtrDeleter{ this, stdext::getThreadId() }
-    );;
+    const auto& coords = m_coordsCache[0].coords[m_coordsCache[0].last - 1];
+    coords->clear();
+    return coords;
 }

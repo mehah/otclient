@@ -197,17 +197,6 @@ public:
 
 protected:
 
-    struct CoordsBufferUPtrDeleter
-    {
-        DrawPool* pool;
-        int16_t threadId;
-
-        void operator()(CoordsBuffer* ptr) const {
-            ptr->clear();
-            pool->m_coordsCache.emplace_back(ptr);
-        }
-    };
-
     enum class DrawMethodType
     {
         RECT,
@@ -247,9 +236,9 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state, std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter>&& coords) : coords(std::move(coords)), state(std::move(state)) {}
+        DrawObject(PoolState&& state, const std::shared_ptr<CoordsBuffer>& coords) : coords(coords), state(std::move(state)) {}
         std::function<void()> action{ nullptr };
-        std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter> coords;
+        std::shared_ptr<CoordsBuffer> coords;
         PoolState state;
     };
 
@@ -324,7 +313,7 @@ private:
         m_drawState.store(state, std::memory_order_release);
     }
 
-    std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter> getCoordsBuffer();
+    std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
     template<typename T>
     void setParameter(std::string_view name, T&& value) {
@@ -411,7 +400,11 @@ private:
     std::vector<DrawObject> m_objects[static_cast<uint8_t>(LAST)];
     std::vector<DrawObject> m_objectsFlushed;
     std::array<std::vector<DrawObject>, 2> m_objectsDraw;
-    std::vector<CoordsBuffer*> m_coordsCache;
+    struct
+    {
+        std::vector<std::shared_ptr<CoordsBuffer>> coords;
+        uint_fast32_t last{ 0 };
+    } m_coordsCache[2];
 
     stdext::map<std::string_view, std::any> m_parameters;
 
