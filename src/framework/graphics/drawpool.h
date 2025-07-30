@@ -120,6 +120,8 @@ public:
         FPS20 = 1000 / 20,
         FPS60 = 1000 / 60;
 
+    ~DrawPool() { m_enabled = false; }
+
     void setEnable(const bool v) { m_enabled = v; }
 
     DrawPoolType getType() const { return m_type; }
@@ -203,8 +205,10 @@ protected:
         int16_t threadId;
 
         void operator()(CoordsBuffer* ptr) const {
-            ptr->clear();
-            pool->m_coordsCache.emplace_back(ptr);
+            if (pool->m_enabled) {
+                ptr->clear();
+                pool->m_coordsCache.emplace_back(ptr);
+            } else delete ptr;
         }
     };
 
