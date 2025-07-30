@@ -59,68 +59,52 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
         return;
 
-    bool agroup = m_alwaysGroupDrawings || conductor.agroup;
-
     uint8_t order = conductor.order;
     if (m_type == DrawPoolType::FOREGROUND) {
         order = FIRST;
-        agroup = false;
     } else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
         order = THIRD;
 
-    if (agroup) {
-        auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
-        if (!coords) {
-            auto state = getState(texture, color);
-            coords = m_objects[order].emplace_back(std::move(state), getCoordsBuffer()).coords.get();
+    bool addNewObj = true;
+
+    auto& list = m_objects[order];
+    if (!list.empty()) {
+        auto& prevObj = list.back();
+        if (prevObj.state == getCurrentState()) {
+            if (coordsBuffer)
+                prevObj.coords->append(coordsBuffer.get());
+            else
+                addCoords(*prevObj.coords, method);
+
+            addNewObj = false;
         }
+    }
 
-        if (coordsBuffer)
-            coords->append(coordsBuffer.get());
-        else
-            addCoords(coords, method);
-    } else {
-        bool addNewObj = true;
+    if (addNewObj) {
+        auto state = getState(texture, color);
+        auto& draw = list.emplace_back(std::move(state));
 
-        auto& list = m_objects[order];
-        if (!list.empty()) {
-            auto& prevObj = list.back();
-            if (prevObj.state == getCurrentState()) {
-                if (coordsBuffer)
-                    prevObj.coords->append(coordsBuffer.get());
-                else
-                    addCoords(prevObj.coords.get(), method);
-
-                addNewObj = false;
-            }
-        }
-
-        if (addNewObj) {
-            auto state = getState(texture, color);
-            auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
-
-            if (coordsBuffer) {
-                draw.coords->append(coordsBuffer.get());
-            } else
-                addCoords(draw.coords.get(), method);
-        }
+        if (coordsBuffer) {
+            draw.coords->append(coordsBuffer.get());
+        } else
+            addCoords(*draw.coords, method);
     }
 
     resetOnlyOnceParameters();
 }
 
-void DrawPool::addCoords(CoordsBuffer* buffer, const DrawMethod& method)
+void DrawPool::addCoords(CoordsBuffer& buffer, const DrawMethod& method)
 {
     if (method.type == DrawMethodType::BOUNDING_RECT) {
-        buffer->addBoudingRect(method.dest, method.intValue);
+        buffer.addBoudingRect(method.dest, method.intValue);
     } else if (method.type == DrawMethodType::RECT) {
-        buffer->addRect(method.dest, method.src);
+        buffer.addRect(method.dest, method.src);
     } else if (method.type == DrawMethodType::TRIANGLE) {
-        buffer->addTriangle(method.a, method.b, method.c);
+        buffer.addTriangle(method.a, method.b, method.c);
     } else if (method.type == DrawMethodType::UPSIDEDOWN_RECT) {
-        buffer->addUpsideDownRect(method.dest, method.src);
+        buffer.addUpsideDownRect(method.dest, method.src);
     } else if (method.type == DrawMethodType::REPEATED_RECT) {
-        buffer->addRepeatedRects(method.dest, method.src);
+        buffer.addRepeatedRects(method.dest, method.src);
     }
 }
 
@@ -247,7 +231,6 @@ void DrawPool::resetState()
     for (auto& objs : m_objects)
         objs.clear();
 
-    m_coords.clear();
     m_parameters.clear();
     m_objectsFlushed.clear();
 
@@ -256,7 +239,6 @@ void DrawPool::resetState()
     getCurrentState() = {};
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
-    m_coordsCache[0].last = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
 }
 
@@ -414,14 +396,4 @@ const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
     const auto& tempfb = m_temporaryFramebuffers.emplace_back(std::make_shared<FrameBuffer>());
     tempfb->setSmooth(false);
     return tempfb;
-}
-
-std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer() {
-    if (++m_coordsCache[0].last > m_coordsCache[0].coords.size()) {
-        return  m_coordsCache[0].coords.emplace_back(std::make_shared<CoordsBuffer>());
-    }
-
-    const auto& coords = m_coordsCache[0].coords[m_coordsCache[0].last - 1];
-    coords->clear();
-    return coords;
 }

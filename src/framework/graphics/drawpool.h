@@ -156,14 +156,6 @@ public:
         return m_hashCtrl;
     }
 
-    void resetBuffer() {
-        waitWhileStateIs(DrawPoolState::DRAWING);
-        for (auto& buffer : m_coordsCache) {
-            buffer.coords.clear();
-            buffer.last = 0;
-        }
-    }
-
     void release() {
         const auto repaint = canRepaint();
         if (repaint) {
@@ -197,7 +189,6 @@ public:
                 }
             }
 
-            std::swap(m_coordsCache[0], m_coordsCache[1]);
             setDrawState(DrawPoolState::READY);
         }
 
@@ -245,9 +236,9 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state, const std::shared_ptr<CoordsBuffer>& coords) : coords(coords), state(std::move(state)) {}
+        DrawObject(PoolState&& state) : state(std::move(state)), coords(std::in_place) {}
         std::function<void()> action{ nullptr };
-        std::shared_ptr<CoordsBuffer> coords;
+        std::optional<CoordsBuffer> coords;
         PoolState state;
     };
 
@@ -263,7 +254,7 @@ protected:
 
 private:
     static DrawPool* create(DrawPoolType type);
-    static void addCoords(CoordsBuffer* buffer, const DrawMethod& method);
+    static void addCoords(CoordsBuffer& buffer, const DrawMethod& method);
 
     enum STATE_TYPE : uint32_t
     {
@@ -321,8 +312,6 @@ private:
         m_drawState.store(state, std::memory_order_release);
     }
 
-    std::shared_ptr<CoordsBuffer> getCoordsBuffer();
-
     template<typename T>
     void setParameter(std::string_view name, T&& value) {
         m_parameters.emplace(name, value);
@@ -347,7 +336,6 @@ private:
 
     void flush()
     {
-        m_coords.clear();
         for (auto& objs : m_objects) {
             m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
             objs.clear();
@@ -410,13 +398,6 @@ private:
     std::vector<DrawObject> m_objectsFlushed;
     std::vector<DrawObject> m_objectsDraw;
 
-    struct
-    {
-        std::vector<std::shared_ptr<CoordsBuffer>> coords;
-        uint_fast32_t last{ 0 };
-    } m_coordsCache[2];
-
-    stdext::map<size_t, CoordsBuffer*> m_coords;
     stdext::map<std::string_view, std::any> m_parameters;
 
     float m_scaleFactor{ 1.f };

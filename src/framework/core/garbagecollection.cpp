@@ -31,7 +31,6 @@
 
 constexpr uint32_t LUA_TIME = 15 * 60 * 1000; // 15min
 constexpr uint32_t TEXTURE_TIME = 30 * 60 * 1000; // 30min
-constexpr uint32_t DRAWPOOL_TIME = 30 * 60 * 1000; // 30min
 constexpr uint32_t THINGTYPE_TIME = 2 * 1000; // 2seg
 
 Timer lua_timer, texture_timer, drawpool_timer, thingtype_timer;
@@ -43,20 +42,12 @@ void GarbageCollection::poll() {
     if (canCheck(texture_timer, TEXTURE_TIME))
         texture();
 
-    if (canCheck(drawpool_timer, DRAWPOOL_TIME))
-        drawpoll();
-
     if (canCheck(lua_timer, LUA_TIME))
         lua();
 }
 
 void GarbageCollection::lua() {
     g_lua.collectGarbage();
-}
-
-void GarbageCollection::drawpoll() {
-    for (int8_t i = -1; ++i < static_cast<uint8_t>(DrawPoolType::LAST);)
-        g_drawPool.get(static_cast<DrawPoolType>(i))->resetBuffer();
 }
 
 void GarbageCollection::texture() {

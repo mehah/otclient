@@ -75,7 +75,7 @@ private:
     struct Layer
     {
         FrameBufferPtr framebuffer;
-        std::vector<TextureInfo> textures;
+        std::vector<TextureInfo*> textures;
     };
     void createNewLayer();
 
@@ -116,6 +116,6 @@ private:
     std::vector<Layer> m_layers;
     std::set<FreeRegion> m_freeRegions;
     std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
-    phmap::flat_hash_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
-    phmap::flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
+    phmap::flat_hash_map<std::pair<int, int>, std::vector<std::unique_ptr<TextureInfo>>, PairHash> m_inactiveTextures;
+    phmap::flat_hash_map<uint32_t, std::unique_ptr<TextureInfo>> m_texturesCached;
 };

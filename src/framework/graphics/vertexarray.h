@@ -40,6 +40,7 @@ public:
         };
 
         const size_t size = sizeof(arr) / sizeof(int);
+        m_buffer.reserve(m_buffer.size() + size);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -60,6 +61,7 @@ public:
         };
 
         const size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.reserve(m_buffer.size() + size);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -80,6 +82,7 @@ public:
         };
 
         const size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.reserve(m_buffer.size() + size);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -100,6 +103,7 @@ public:
         };
 
         const size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.reserve(m_buffer.size() + size);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -118,6 +122,7 @@ public:
         };
 
         const size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.reserve(m_buffer.size() + size);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
@@ -138,10 +143,12 @@ public:
         };
 
         const size_t size = sizeof(arr) / sizeof(float);
+        m_buffer.reserve(m_buffer.size() + size);
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
     void append(const VertexArray* buffer) {
+        m_buffer.reserve(m_buffer.size() + buffer->size());
         m_buffer.insert(m_buffer.end(), buffer->m_buffer.begin(), buffer->m_buffer.end());
     }
 
