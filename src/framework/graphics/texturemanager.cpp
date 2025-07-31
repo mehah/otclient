@@ -139,7 +139,6 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
         if (texture) {
             texture->setTime(stdext::time());
             texture->allowAtlasCache();
-            texture->setSmooth(smooth);
             std::unique_lock l(m_mutex);
             m_textures[filePath] = texture;
         }
@@ -147,6 +146,9 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
 
     if (texture) {
         texture->m_lastTimeUsage.restart();
+        if (texture->isSmooth() != smooth) {
+            texture->setSmooth(smooth);
+        }
     }
 
     return texture;

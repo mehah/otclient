@@ -75,10 +75,10 @@ public:
     TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport = false);
 
     void addTexture(const TexturePtr& texture);
-    void removeTexture(uint32_t id);
+    void removeTexture(uint32_t id, bool smooth);
 
     auto getTexture(int layer, bool smooth) const {
-        return m_layers[smooth][layer].framebuffer->getTexture();
+        return m_filterGroups[smooth].layers[layer].framebuffer->getTexture();
     }
 
     Size getSize() const { return m_size; }
@@ -95,9 +95,9 @@ private:
     };
     void createNewLayer(bool smooth);
 
-    std::optional<FreeRegion> findBestRegion(int width, int height) {
-        auto sizeIt = m_freeRegionsBySize.lower_bound(width * height);
-        while (sizeIt != m_freeRegionsBySize.end()) {
+    std::optional<FreeRegion> findBestRegion(int width, int height, bool smooth) {
+        auto sizeIt = m_filterGroups[smooth].freeRegionsBySize.lower_bound(width * height);
+        while (sizeIt != m_filterGroups[smooth].freeRegionsBySize.end()) {
             for (const auto& region : sizeIt->second) {
                 if (region.canFit(width, height)) {
                     return region;
@@ -108,15 +108,15 @@ private:
         return std::nullopt;
     }
 
-    void splitRegion(const FreeRegion& region, int width, int height) {
-        m_freeRegions.erase(region);
-        m_freeRegionsBySize[region.width * region.height].erase(region);
+    void splitRegion(const FreeRegion& region, int width, int height, bool smooth) {
+        m_filterGroups[smooth].freeRegions.erase(region);
+        m_filterGroups[smooth].freeRegionsBySize[region.width * region.height].erase(region);
 
         auto insertRegion = [&](int x, int y, int w, int h) {
             if (w > 0 && h > 0) {
                 FreeRegion r = { x, y, w, h, region.layer };
-                m_freeRegions.insert(r);
-                m_freeRegionsBySize[w * h].insert(r);
+                m_filterGroups[smooth].freeRegions.insert(r);
+                m_filterGroups[smooth].freeRegionsBySize[w * h].insert(r);
             }
         };
 
@@ -128,10 +128,13 @@ private:
     Fw::TextureAtlasType m_type;
     Size m_size;
 
-    std::vector<Layer> m_layers[AtlasFilter::ATLAS_FILTER_COUNT];
+    struct
+    {
+        std::vector<Layer> layers;
+        std::set<FreeRegion> freeRegions;
+        std::map<int, std::set<FreeRegion>> freeRegionsBySize;
+        phmap::flat_hash_map<std::pair<int, int>, std::vector<std::unique_ptr<AtlasRegion>>, PairHash> inactiveTextures;
+    } m_filterGroups[AtlasFilter::ATLAS_FILTER_COUNT];
 
-    std::set<FreeRegion> m_freeRegions;
-    std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
-    phmap::flat_hash_map<std::pair<int, int>, std::vector<std::unique_ptr<AtlasRegion>>, PairHash> m_inactiveTextures;
     phmap::flat_hash_map<uint32_t, std::unique_ptr<AtlasRegion>> m_texturesCached;
 };

@@ -65,8 +65,8 @@ Texture::~Texture()
     assert(!g_app.isTerminated());
 #endif
     if (g_graphics.ok() && m_id != 0) {
-        g_mainDispatcher.addEvent([id = m_id]() mutable {
-            g_drawPool.removeTextureFromAtlas(id);
+        g_mainDispatcher.addEvent([id = m_id, smooth = isSmooth()]() mutable {
+            g_drawPool.removeTextureFromAtlas(id, smooth);
             glDeleteTextures(1, &id);
         });
     }
@@ -128,14 +128,15 @@ void Texture::setSmooth(const bool smooth)
     if (smooth == getProp(Prop::smooth))
         return;
 
-    if (!m_id) return;
-
     setProp(Prop::smooth, smooth);
+
+    if (!m_id) return;
 
     if (!canCacheInAtlas()) {
         bind();
         setupFilters();
-    }
+    } else
+        g_drawPool.removeTextureFromAtlas(m_id, !smooth);
 }
 
 void Texture::allowAtlasCache() {

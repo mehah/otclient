@@ -250,9 +250,9 @@ void DrawPoolManager::drawPool(const DrawPoolType type) {
     }
 }
 
-void DrawPoolManager::removeTextureFromAtlas(uint32_t id) {
+void DrawPoolManager::removeTextureFromAtlas(uint32_t id, bool smooth) {
     for (auto pool : m_pools) {
         if (pool->m_atlas)
-            pool->m_atlas->removeTexture(id);
+            pool->m_atlas->removeTexture(id, smooth);
     }
 }

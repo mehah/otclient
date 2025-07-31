@@ -11,7 +11,7 @@ TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSuppo
         createNewLayer(true);
 }
 
-void TextureAtlas::removeTexture(uint32_t id) {
+void TextureAtlas::removeTexture(uint32_t id, bool smooth) {
     auto it = m_texturesCached.find(id);
     if (it == m_texturesCached.end()) {
         return;
@@ -20,7 +20,7 @@ void TextureAtlas::removeTexture(uint32_t id) {
     it->second->enabled = false;
 
     auto sizeKey = std::make_pair(it->second->width, it->second->height);
-    m_inactiveTextures.try_emplace(sizeKey, std::vector<std::unique_ptr<AtlasRegion>>())
+    m_filterGroups[smooth].inactiveTextures.try_emplace(sizeKey, std::vector<std::unique_ptr<AtlasRegion>>())
         .first->second.emplace_back(std::move(it->second));
     m_texturesCached.erase(it);
 }
@@ -34,9 +34,11 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
         return; // don't cache
     }
 
+    auto& filterGroup = m_filterGroups[texture->isSmooth()];
+
     auto sizeKey = std::make_pair(width, height);
-    auto it = m_inactiveTextures.find(sizeKey);
-    if (it != m_inactiveTextures.end()) {
+    auto it = filterGroup.inactiveTextures.find(sizeKey);
+    if (it != filterGroup.inactiveTextures.end()) {
         auto& texList = it->second;
         if (!texList.empty()) {
             auto tex = std::move(texList.back());
@@ -46,21 +48,21 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
             tex->transformMatrixId = texture->getTransformMatrixId();
             texture->m_atlas[m_type] = tex.get();
 
-            m_layers[texture->isSmooth()][tex->layer].textures.emplace_back(tex.get());
+            filterGroup.layers[tex->layer].textures.emplace_back(tex.get());
             m_texturesCached.emplace(textureID, std::move(tex));
 
             return;
         }
     }
 
-    auto bestRegionOpt = findBestRegion(width, height);
+    auto bestRegionOpt = findBestRegion(width, height, texture->isSmooth());
     if (!bestRegionOpt.has_value()) {
         createNewLayer(texture->isSmooth());
         return addTexture(texture);
     }
 
     FreeRegion region = bestRegionOpt.value();
-    splitRegion(region, width, height);
+    splitRegion(region, width, height, texture->isSmooth());
 
     auto info = std::make_unique<AtlasRegion>(
         textureID,
@@ -73,7 +75,7 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     );
 
     texture->m_atlas[m_type] = info.get();
-    m_layers[texture->isSmooth()][region.layer].textures.emplace_back(info.get());
+    filterGroup.layers[region.layer].textures.emplace_back(info.get());
     m_texturesCached.emplace(textureID, std::move(info));
 }
 
@@ -84,16 +86,16 @@ void TextureAtlas::createNewLayer(bool smooth) {
     fbo->setAutoResetState(true);
     fbo->getTexture()->setSmooth(false);
 
-    m_layers[smooth].emplace_back(std::move(fbo));
-    FreeRegion newRegion = { 0, 0, m_size.width(), m_size.height(), static_cast<int>(m_layers[smooth].size()) - 1 };
-    m_freeRegions.insert(newRegion);
-    m_freeRegionsBySize[m_size.width() * m_size.height()].insert(newRegion);
+    m_filterGroups[smooth].layers.emplace_back(std::move(fbo));
+    FreeRegion newRegion = { 0, 0, m_size.width(), m_size.height(), static_cast<int>(m_filterGroups[smooth].layers.size()) - 1 };
+    m_filterGroups[smooth].freeRegions.insert(newRegion);
+    m_filterGroups[smooth].freeRegionsBySize[m_size.width() * m_size.height()].insert(newRegion);
 }
 
 void TextureAtlas::flush() {
     static CoordsBuffer buffer;
-    for (auto& filters : m_layers) {
-        for (auto& layer : filters) {
+    for (auto& group : m_filterGroups) {
+        for (auto& layer : group.layers) {
             if (!layer.textures.empty()) {
                 layer.framebuffer->bind();
                 glDisable(GL_BLEND);

@@ -32,6 +32,11 @@ void UIWidget::initImage() {}
 void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
+        if (node->tag() == "image-smooth")
+            setImageSmooth(node->value<bool>());
+    }
+
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source") {
             auto split = stdext::split<std::string>(node->value(), ":");
             if (split.size() == 0) split.emplace_back("none");
@@ -63,8 +68,6 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             setImageFixedRatio(node->value<bool>());
         else if (node->tag() == "image-repeated")
             setImageRepeated(node->value<bool>());
-        else if (node->tag() == "image-smooth")
-            setImageSmooth(node->value<bool>());
         else if (node->tag() == "image-color")
             setImageColor(node->value<Color>());
         else if (node->tag() == "image-border-top")
