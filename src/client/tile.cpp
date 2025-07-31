@@ -173,6 +173,8 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
+    drawElevation = 0;
+
     if (m_effects) {
         if (g_app.isDrawingEffectsOnTop())
             g_drawPool.setDrawOrder(DrawOrder::FOURTH);
@@ -186,7 +188,7 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
     if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
-            item->draw(dest, flags & Otc::DrawThings);
+            drawThing(item, dest, flags & Otc::DrawThings, drawElevation);
         }
     }
 }
