@@ -159,41 +159,56 @@ public:
     }
 
     void release() {
-        const auto repaint = canRepaint();
-        if (repaint) {
-            m_refreshTimer.restart();
+        if (!canRepaint()) {
+            m_objectsFlushed.clear();
+            return;
+        }
 
-            waitWhileStateIs(DrawPoolState::DRAWING);
-            setDrawState(DrawPoolState::PREPARING);
+        m_refreshTimer.restart();
 
-            m_objectsDraw[0].clear();
+        waitWhileStateIs(DrawPoolState::DRAWING);
+        setDrawState(DrawPoolState::PREPARING);
+
+        m_objectsDraw[0].clear();
+
+        // Mover objetos de m_objectsFlushed
+        if (!m_objectsFlushed.empty()) {
+            if (m_objectsDraw[0].size() < m_objectsFlushed.size())
+                m_objectsDraw[0].swap(m_objectsFlushed);
+
             if (!m_objectsFlushed.empty()) {
-                if (m_objectsDraw[0].size() < m_objectsFlushed.size())
-                    m_objectsDraw[0].swap(m_objectsFlushed);
-
-                if (!m_objectsFlushed.empty())
-                    m_objectsDraw[0].insert(
-                        m_objectsDraw[0].end(),
-                        make_move_iterator(m_objectsFlushed.begin()),
-                        make_move_iterator(m_objectsFlushed.end()));
+                m_objectsDraw[0].insert(
+                    m_objectsDraw[0].end(),
+                    std::make_move_iterator(m_objectsFlushed.begin()),
+                    std::make_move_iterator(m_objectsFlushed.end()));
             }
+        }
 
-            for (auto& objs : m_objects) {
-                if (m_objectsDraw[0].size() < objs.size())
-                    m_objectsDraw[0].swap(objs);
+        // Mover objetos de m_objects
+        for (auto& objs : m_objects) {
+            if (m_objectsDraw[0].size() < objs.size())
+                m_objectsDraw[0].swap(objs);
 
-                if (!objs.empty()) {
-                    m_objectsDraw[0].insert(
-                        m_objectsDraw[0].end(),
-                        make_move_iterator(objs.begin()),
-                        make_move_iterator(objs.end()));
-                    objs.clear();
+            if (!m_objectsDraw[0].empty() && !objs.empty()) {
+                auto& last = m_objectsDraw[0].back();
+                auto& first = objs.front();
+
+                if (last.state == first.state && last.coords && first.coords) {
+                    last.coords->append(first.coords.get());
+                    first.coords = nullptr;
                 }
             }
 
-            setDrawState(DrawPoolState::READY);
+            if (!objs.empty()) {
+                m_objectsDraw[0].insert(
+                    m_objectsDraw[0].end(),
+                    std::make_move_iterator(objs.begin()),
+                    std::make_move_iterator(objs.end()));
+                objs.clear();
+            }
         }
 
+        setDrawState(DrawPoolState::READY);
         m_objectsFlushed.clear();
     }
 
@@ -342,8 +357,23 @@ private:
     void flush()
     {
         m_coords.clear();
+
         for (auto& objs : m_objects) {
-            m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            if (!objs.empty() && !m_objectsFlushed.empty()) {
+                auto& last = m_objectsFlushed.back();
+                auto& first = objs.front();
+
+                if (last.state == first.state && last.coords && first.coords) {
+                    last.coords->append(first.coords.get());
+                    first.coords = nullptr;
+                }
+            }
+
+            m_objectsFlushed.insert(
+                m_objectsFlushed.end(),
+                std::make_move_iterator(objs.begin()),
+                std::make_move_iterator(objs.end())
+            );
             objs.clear();
         }
     }
