@@ -75,14 +75,12 @@ PhantomMiniWindow
         cell-spacing: 2
         flow: true
 
-    UIWidget
-      image-source: /images/ui/vertical_line_bright
+    VerticalSeparator
       anchors.top: options.top
       anchors.bottom: options.bottom
       anchors.left: store.right
       margin-left: 5
       phantom: true
-      width: 1
 
     UIWidget
       id: specials

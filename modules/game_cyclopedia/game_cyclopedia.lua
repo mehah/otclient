@@ -21,7 +21,7 @@ local ButtonBestiary = nil
 local tabStack = {}
 local previousType = nil
 local windowTypes = {}
-
+local magicalArchives = nil
 function toggle(defaultWindow)
     if not controllerCyclopedia.ui then
         return
@@ -58,6 +58,7 @@ function controllerCyclopedia:onGameStart()
         character = buttonSelection:recursiveGetChildById('character')
         bosstiary = buttonSelection:recursiveGetChildById('bosstiary')
         bossSlot = buttonSelection:recursiveGetChildById('bossSlot')
+        magicalArchives = buttonSelection:recursiveGetChildById('magicalArchives')
 
         windowTypes = {
             items = { obj = items, func = showItems },
@@ -67,7 +68,8 @@ function controllerCyclopedia:onGameStart()
             houses = { obj = houses, func = showHouse },
             character = { obj = character, func = showCharacter },
             bosstiary = { obj = bosstiary, func = showBosstiary },
-            bossSlot = { obj = bossSlot, func = showBossSlot }
+            bossSlot = { obj = bossSlot, func = showBossSlot },
+            magicalArchives = { obj = magicalArchives, func = showMagicalArchives },
         }
 
         g_ui.importStyle("cyclopedia_widgets")
@@ -93,6 +95,12 @@ function controllerCyclopedia:onGameStart()
             onUpdateCyclopediaCharacterItemSummary = Cyclopedia.loadCharacterItems,
             onParseCyclopediaCharacterAppearances = Cyclopedia.loadCharacterAppearances,
             onParseCyclopediaStoreSummary = Cyclopedia.onParseCyclopediaStoreSummary,
+-- character 14.10
+            onCyclopediaCharacterOffenceStats = Cyclopedia.onCyclopediaCharacterOffenceStats,
+            onCyclopediaCharacterDefenceStats = Cyclopedia.onCyclopediaCharacterDefenceStats,
+            onCyclopediaCharacterMiscStats = Cyclopedia.onCyclopediaCharacterMiscStats,
+
+
             -- charms
             onUpdateBestiaryCharmsData = Cyclopedia.loadCharms,
             -- items
@@ -193,7 +201,9 @@ function controllerCyclopedia:onGameStart()
         }})
 
     end
-
+    if g_game.getClientVersion() >= 1410 then
+        controllerCyclopedia.ui.CharmsBase.Icon:setImageSource("/game_cyclopedia/images/monster-icon-bonuspoints")
+    end
 end
 
 
@@ -227,6 +237,20 @@ function controllerCyclopedia:onTerminate()
         trackerMiniWindowBosstiary:destroy()
         trackerMiniWindowBosstiary = nil
     end
+
+    if CyclopediaButton then
+        CyclopediaButton:destroy()
+        CyclopediaButton = nil
+    end
+    if ButtonBossSlot then
+        ButtonBossSlot:destroy()
+        ButtonBossSlot = nil
+    end
+    if ButtonBestiary then
+        ButtonBestiary:destroy()
+        ButtonBestiary = nil
+    end
+    onTerminateCharm()
 end
 
 function hide()
@@ -257,7 +281,7 @@ function show(defaultWindow)
     controllerCyclopedia.ui:raise()
     controllerCyclopedia.ui:focus()
     SelectWindow(defaultWindow, false)
-    controllerCyclopedia.ui.GoldBase.Value:setText(Cyclopedia.formatGold(g_game.getLocalPlayer():getResourceBalance(1)))
+    controllerCyclopedia.ui.GoldBase.Value:setText(Cyclopedia.formatGold(g_game.getLocalPlayer():getResourceBalance()))
 end
 
 function toggleBack()

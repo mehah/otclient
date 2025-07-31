@@ -507,11 +507,6 @@ void Game::processItemDetail(const uint32_t itemId, const std::vector<std::tuple
     g_lua.callGlobalField("g_game", "onParseItemDetail", itemId, descriptions);
 }
 
-void Game::processBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& bestiaryRaces)
-{
-    g_lua.callGlobalField("g_game", "onParseBestiaryRaces", bestiaryRaces);
-}
-
 void Game::processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
                                                 const std::vector<std::tuple<uint8_t, uint16_t>>& combats)
 {
@@ -1999,3 +1994,19 @@ void Game::sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& que
 
     m_protocolGame->sendRequestTrackerQuestLog(quests);
 }
+
+void Game::processCyclopediaCharacterOffenceStats(const CyclopediaCharacterOffenceStats& data)
+{
+    g_lua.callGlobalField("g_game", "onCyclopediaCharacterOffenceStats", data);
+}
+
+void Game::processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefenceStats& data)
+{
+    g_lua.callGlobalField("g_game", "onCyclopediaCharacterDefenceStats", data);
+}
+
+void Game::processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStats& data)
+{
+    g_lua.callGlobalField("g_game", "onCyclopediaCharacterMiscStats", data);
+}
+

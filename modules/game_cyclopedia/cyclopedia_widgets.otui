@@ -710,6 +710,10 @@ CharmItem < UICheckBox
     image-source: /images/ui/item
     image-border: 10
     phantom: true
+    @onSetup: |
+      if g_game.getClientVersion() >= 1410 then
+        self:setVisible(false)
+      end
     Label
       id: Value
       anchors.centerIn: parent
@@ -736,8 +740,14 @@ CharmItem < UICheckBox
     margin-bottom: 7
     image-source: /images/ui/panel_flat
     image-border: 10
-    size: 37 37
     phantom: true
+    @onSetup: |
+      if g_game.getClientVersion() >= 1410 then
+        self:setSize("46 46")
+        self:setMarginBottom(-5)
+        else
+        self:setSize("37 37")
+      end
     UIWidget
       size: 32 32
       id: image
@@ -749,6 +759,22 @@ CharmItem < UICheckBox
       anchors.centerIn: parent
       image-source: /images/ui/ditherpattern
       phantom: true
+      @onSetup: |
+        if g_game.getClientVersion() >= 1410 then
+          self:setSize("43 43")
+        else
+          self:setSize("35 35")
+        end
+    UIWidget
+      id: border
+      anchors.centerIn: parent
+      phantom: true
+      @onSetup: |
+        if g_game.getClientVersion() >= 1410 then
+          self:setVisible(true)
+        else
+          self:setVisible(false)
+        end
 MarkListItem < ButtonBox
   icon-size: 11 11
   icon-offset: 3 3
