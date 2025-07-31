@@ -104,14 +104,6 @@ private:
     bool m_agroup{ false };
 };
 
-struct DrawConductor
-{
-    bool agroup{ false };
-    uint8_t order{ FIRST };
-};
-
-constexpr DrawConductor DEFAULT_DRAW_CONDUCTOR;
-
 class DrawPool
 {
 public:
@@ -283,8 +275,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
-             const CoordsBufferPtr& coordsBuffer = nullptr);
+    void add(const Color& color, TexturePtr texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addAction(const std::function<void()>& action);
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);

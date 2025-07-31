@@ -96,12 +96,12 @@ void DrawPoolManager::drawObject(DrawPool* pool, const DrawPool::DrawObject& obj
     }
 }
 
-void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color, const DrawConductor& condutor) const
+void DrawPoolManager::addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color) const
 {
-    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{}, condutor, coords);
+    getCurrentPool()->add(color, texture, DrawPool::DrawMethod{}, coords);
 }
 
-void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
+void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
     if (dest.isEmpty() || src.isEmpty()) {
         getCurrentPool()->resetOnlyOnceParameters();
@@ -111,10 +111,10 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{
         .type = DrawPool::DrawMethodType::RECT,
         .dest = dest, .src = src
-    }, condutor);
+    });
 }
 
-void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
+void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
     if (dest.isEmpty() || src.isEmpty()) {
         getCurrentPool()->resetOnlyOnceParameters();
@@ -124,10 +124,10 @@ void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TextureP
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::UPSIDEDOWN_RECT, .dest =
                               dest,
                               .src = src
-                          }, condutor);
+                          });
 }
 
-void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color, const DrawConductor& condutor) const
+void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
 {
     if (dest.isEmpty() || src.isEmpty()) {
         getCurrentPool()->resetOnlyOnceParameters();
@@ -137,20 +137,20 @@ void DrawPoolManager::addTexturedRepeatedRect(const Rect& dest, const TexturePtr
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::REPEATED_RECT, .dest =
                               dest,
                               .src = src
-                          }, condutor);
+                          });
 }
 
-void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color, const DrawConductor& condutor) const
+void DrawPoolManager::addFilledRect(const Rect& dest, const Color& color) const
 {
     if (dest.isEmpty()) {
         getCurrentPool()->resetOnlyOnceParameters();
         return;
     }
 
-    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::RECT, .dest = dest }, condutor);
+    getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{ .type = DrawPool::DrawMethodType::RECT, .dest = dest });
 }
 
-void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color, const DrawConductor& condutor) const
+void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color) const
 {
     if (a == b || a == c || b == c) {
         getCurrentPool()->resetOnlyOnceParameters();
@@ -162,10 +162,10 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
             .a = a,
             .b = b,
             .c = c
-     }, condutor);
+     });
 }
 
-void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, const uint16_t innerLineWidth, const DrawConductor& condutor) const
+void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, const uint16_t innerLineWidth) const
 {
     if (dest.isEmpty() || innerLineWidth == 0) {
         getCurrentPool()->resetOnlyOnceParameters();
@@ -176,7 +176,7 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, cons
         .type = DrawPool::DrawMethodType::BOUNDING_RECT,
         .dest = dest,
         .intValue = innerLineWidth
-    }, condutor);
+    });
 }
 
 void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear, const bool alwaysDraw)

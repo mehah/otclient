@@ -180,12 +180,16 @@ void UIWidget::drawImage(const Rect& screenCoords)
     const auto& texture = m_imageTexture->isAnimatedTexture() && isImageIndividualAnimation() ?
         std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->get(m_currentFrame, m_imageAnimatorTimer) : m_imageTexture;
 
+    g_drawPool.setDrawOrder(m_imageDrawOrder);
+
     for (const auto& [dest, src] : m_imageCoordsCache) {
         if (useRepeated)
-            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor, m_imageDrawConductor);
+            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor);
         else
-            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor, m_imageDrawConductor);
+            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor);
     }
+
+    g_drawPool.resetDrawOrder();
 }
 
 void UIWidget::setImageSource(const std::string_view source, const bool base64)

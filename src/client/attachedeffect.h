@@ -136,7 +136,7 @@ private:
     uint8_t m_speed{ 100 };
     uint8_t m_opacity{ 100 };
     uint8_t m_lastAnimation{ 0 };
-    DrawOrder m_drawOrder{ FIRST };
+    DrawOrder m_drawOrder{ THIRD };
 
     uint16_t m_id{ 0 };
     uint16_t m_duration{ 0 };

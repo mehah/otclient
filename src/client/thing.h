@@ -176,8 +176,6 @@ public:
 
     bool hasShader() const { return m_shaderId > 0; }
 
-    void ungroup() { m_drawConductor.agroup = false; }
-
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
     virtual void onDisappear() {};
@@ -250,7 +248,6 @@ protected:
     } m_scale;
 
     Position m_position;
-    DrawConductor m_drawConductor{ .agroup = false, .order = THIRD };
 
     uint16_t m_clientId{ 0 };
 

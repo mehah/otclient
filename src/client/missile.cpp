@@ -39,7 +39,7 @@ void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr&
             g_drawPool.setOpacity(g_client.getMissileAlpha(), true);
     }
 
-    getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView, m_drawConductor);
+    getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView);
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)

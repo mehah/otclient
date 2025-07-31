@@ -48,7 +48,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor, const CoordsBufferPtr& coordsBuffer)
+void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer)
 {
     if (m_atlas && method.src.isValid() && texture && texture->isCached(m_atlas->getType())) {
         const auto& atlas = texture->getAtlas(m_atlas->getType());
@@ -61,17 +61,9 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
         return;
 
-    bool agroup = m_alwaysGroupDrawings || conductor.agroup;
-
-    uint8_t order = conductor.order;
-    if (m_type == DrawPoolType::FOREGROUND) {
-        order = FIRST;
-    } else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
-        order = THIRD;
-
     auto& list = m_objects[m_currentDrawOrder];
 
-    if (agroup) {
+    if (m_alwaysGroupDrawings) {
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);

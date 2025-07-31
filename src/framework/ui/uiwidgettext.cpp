@@ -120,14 +120,16 @@ void UIWidget::drawText(const Rect& screenCoords)
     }
 
     g_drawPool.scale(m_fontScale);
+    g_drawPool.setDrawOrder(m_textDrawOrder);
     if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
-        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color, m_textDrawConductor);
+        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color);
     } else {
         const auto& texture = m_font->getTexture();
         for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
-            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
+            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
         }
     }
+    g_drawPool.resetDrawOrder();
     g_drawPool.scale(1.f); // reset scale
 }
 

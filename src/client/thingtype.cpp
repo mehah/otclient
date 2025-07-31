@@ -597,7 +597,7 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor) {
+void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color) {
     const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(m_size.area(), 2) * g_drawPool.getScaleFactor());
     const auto& p = (Point(size) - screenRect.size().toPoint()) / 2;
     const auto& destDiff = Rect(screenRect.topLeft() - p, Size{ size });
@@ -606,12 +606,12 @@ void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& scree
         // Debug
         // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
 
-        g_drawPool.addTexturedRect(Rect(p, screenRect.size()), texture, textureRect, color, conductor);
+        g_drawPool.addTexturedRect(Rect(p, screenRect.size()), texture, textureRect, color);
     } g_drawPool.releaseFrameBuffer(destDiff);
     g_drawPool.resetShaderProgram();
 }
 
-void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, const LightViewPtr& lightView, const DrawConductor& conductor)
+void ThingType::draw(const Point& dest, const int layer, const int xPattern, const int yPattern, const int zPattern, const int animationPhase, const Color& color, const bool drawThings, const LightViewPtr& lightView)
 {
     if (m_null)
         return;
@@ -641,9 +641,9 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
         const auto& newColor = m_opacity < 1.0f ? Color(color, m_opacity) : color;
 
         if (g_drawPool.shaderNeedFramebuffer())
-            drawWithFrameBuffer(texture, screenRect, textureRect, newColor, conductor);
+            drawWithFrameBuffer(texture, screenRect, textureRect, newColor);
         else
-            g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor, conductor);
+            g_drawPool.addTexturedRect(screenRect, texture, textureRect, newColor);
     }
 
     if (lightView && hasLight()) {

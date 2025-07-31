@@ -346,6 +346,5 @@ private:
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
 
-    DrawConductor m_shadowConductor{ .agroup = false, .order = FIFTH };
     DrawPool* m_pool;
 };

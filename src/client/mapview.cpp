@@ -160,7 +160,9 @@ void MapView::drawFloor()
 
         if (m_shadowFloorIntensity > 0 && z == cameraPosition.z + 1) {
             g_drawPool.setOpacity(m_shadowFloorIntensity, true);
-            g_drawPool.addFilledRect(m_rectDimension, Color::black, m_shadowConductor);
+            g_drawPool.setDrawOrder(DrawOrder::FIFTH);
+            g_drawPool.addFilledRect(m_rectDimension, Color::black);
+            g_drawPool.resetDrawOrder();
         }
 
         if (canFloorFade())

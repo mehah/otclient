@@ -81,13 +81,15 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     }
 
     if (m_color != Color::alpha) {
+        g_drawPool.setDrawOrder(m_textDrawOrder);
         if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
-            g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color, m_textDrawConductor);
+            g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color);
         } else {
             for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
-                g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
+                g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
             }
         }
+        g_drawPool.resetDrawOrder();
     }
 
     if (hasSelection()) {

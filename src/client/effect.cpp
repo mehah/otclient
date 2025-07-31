@@ -80,7 +80,7 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
 
-    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
+    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);
 }
 
 void Effect::onAppear()

@@ -159,7 +159,6 @@ private:
     ThingType* getThingType() const override;
 
     void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView = nullptr);
-    void setConductor();
 
     uint16_t m_countOrSubType{ 0 };
     uint32_t m_durationTime{ 0 };
