@@ -54,12 +54,14 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
         const auto& atlas = texture->getAtlas(m_atlas->getType());
         if (atlas->isEnabled()) {
             method.src = Rect(atlas->x + method.src.x(), atlas->y + method.src.y(), method.src.width(), method.src.height());
-            texture = m_atlas->getTexture(atlas->layer);
+            texture = m_atlas->getTexture(atlas->layer, texture->isSmooth());
         }
     }
 
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
         return;
+
+    bool agroup = m_alwaysGroupDrawings || conductor.agroup;
 
     uint8_t order = conductor.order;
     if (m_type == DrawPoolType::FOREGROUND) {
@@ -67,29 +69,43 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
     } else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
         order = THIRD;
 
-    bool addNewObj = true;
-
     auto& list = m_objects[order];
-    if (!list.empty()) {
-        auto& prevObj = list.back();
-        if (prevObj.state == getCurrentState()) {
-            if (coordsBuffer)
-                prevObj.coords->append(coordsBuffer.get());
-            else
-                addCoords(*prevObj.coords, method);
 
-            addNewObj = false;
+    if (agroup) {
+        auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
+        if (!coords) {
+            auto state = getState(texture, color);
+            coords = list.emplace_back(std::move(state), std::move(getCoordsBuffer())).coords.get();
         }
-    }
 
-    if (addNewObj) {
-        auto state = getState(texture, color);
-        auto& draw = list.emplace_back(std::move(state), std::move(getCoordsBuffer()));
+        if (coordsBuffer)
+            coords->append(coordsBuffer.get());
+        else
+            addCoords(*coords, method);
+    } else {
+        bool addNewObj = true;
 
-        if (coordsBuffer) {
-            draw.coords->append(coordsBuffer.get());
-        } else
-            addCoords(*draw.coords, method);
+        if (!list.empty()) {
+            auto& prevObj = list.back();
+            if (prevObj.state == getCurrentState()) {
+                if (coordsBuffer)
+                    prevObj.coords->append(coordsBuffer.get());
+                else
+                    addCoords(*prevObj.coords, method);
+
+                addNewObj = false;
+            }
+        }
+
+        if (addNewObj) {
+            auto state = getState(texture, color);
+            auto& draw = list.emplace_back(std::move(state), std::move(getCoordsBuffer()));
+
+            if (coordsBuffer) {
+                draw.coords->append(coordsBuffer.get());
+            } else
+                addCoords(*draw.coords, method);
+        }
     }
 
     resetOnlyOnceParameters();
@@ -233,6 +249,7 @@ void DrawPool::resetState()
     for (auto& objs : m_objects)
         objs.clear();
 
+    m_coords.clear();
     m_parameters.clear();
     m_objectsFlushed.clear();
 

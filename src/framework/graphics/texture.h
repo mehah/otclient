@@ -62,11 +62,12 @@ public:
     bool isEmpty() const { return m_id == 0; }
     bool hasRepeat() const { return getProp(repeat); }
     bool hasMipmaps() const { return getProp(hasMipMaps); }
+    bool isSmooth() const { return getProp(smooth); }
     bool isCached(Fw::TextureAtlasType type) const { return getAtlas(type) != nullptr; }
-    bool canCacheInAtlas()const { return getProp(Prop::_allowAtlasCache); }
+    bool canCacheInAtlas() const { return getProp(Prop::_allowAtlasCache); }
     bool setupSize(const Size& size);
 
-    virtual void allowAtlasCache() { setProp(Prop::_allowAtlasCache, true); }
+    virtual void allowAtlasCache();
 
 protected:
     void bind();

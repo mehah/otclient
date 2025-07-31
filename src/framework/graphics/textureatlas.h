@@ -62,22 +62,26 @@ struct PairHash
     }
 };
 
+enum AtlasFilter
+{
+    ATLAS_FILTER_NEAREST,
+    ATLAS_FILTER_LINEAR,
+    ATLAS_FILTER_COUNT
+};
+
 class TextureAtlas
 {
 public:
-    TextureAtlas(Fw::TextureAtlasType type);
-    TextureAtlas(Fw::TextureAtlasType type, int width, int height);
+    TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport = false);
 
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id);
 
-    auto getTexture(int layer) const {
-        return m_layers[layer].framebuffer->getTexture();
+    auto getTexture(int layer, bool smooth) const {
+        return m_layers[smooth][layer].framebuffer->getTexture();
     }
 
-    int getWidth() const { return m_atlasWidth; }
-    int getHeight() const { return m_atlasHeight; }
-    int getLayerCount() const { return static_cast<int>(m_layers.size()); }
+    Size getSize() const { return m_size; }
 
     void flush();
 
@@ -89,7 +93,7 @@ private:
         std::unique_ptr<FrameBuffer> framebuffer;
         std::vector<AtlasRegion*> textures;
     };
-    void createNewLayer();
+    void createNewLayer(bool smooth);
 
     std::optional<FreeRegion> findBestRegion(int width, int height) {
         auto sizeIt = m_freeRegionsBySize.lower_bound(width * height);
@@ -122,10 +126,10 @@ private:
     }
 
     Fw::TextureAtlasType m_type;
-    int m_atlasWidth;
-    int m_atlasHeight;
+    Size m_size;
 
-    std::vector<Layer> m_layers;
+    std::vector<Layer> m_layers[AtlasFilter::ATLAS_FILTER_COUNT];
+
     std::set<FreeRegion> m_freeRegions;
     std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
     phmap::flat_hash_map<std::pair<int, int>, std::vector<std::unique_ptr<AtlasRegion>>, PairHash> m_inactiveTextures;

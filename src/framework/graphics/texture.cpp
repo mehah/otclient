@@ -128,11 +128,21 @@ void Texture::setSmooth(const bool smooth)
     if (smooth == getProp(Prop::smooth))
         return;
 
-    setProp(Prop::smooth, smooth);
     if (!m_id) return;
 
-    bind();
-    setupFilters();
+    setProp(Prop::smooth, smooth);
+
+    if (!canCacheInAtlas()) {
+        bind();
+        setupFilters();
+    }
+}
+
+void Texture::allowAtlasCache() {
+    bool smooth = isSmooth();
+    if (smooth) setSmooth(false);
+    setProp(Prop::_allowAtlasCache, true);
+    setSmooth(smooth);
 }
 
 void Texture::setRepeat(const bool repeat)
@@ -140,8 +150,9 @@ void Texture::setRepeat(const bool repeat)
     if (getProp(Prop::repeat) == repeat)
         return;
 
-    setProp(Prop::repeat, repeat);
     if (!m_id) return;
+
+    setProp(Prop::repeat, repeat);
 
     bind();
     setupWrap();

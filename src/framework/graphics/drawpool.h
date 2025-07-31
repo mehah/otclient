@@ -354,6 +354,7 @@ private:
 
     void flush()
     {
+        m_coords.clear();
         for (auto& objs : m_objects) {
             m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
             objs.clear();
@@ -417,6 +418,7 @@ private:
     std::array<std::vector<DrawObject>, 2> m_objectsDraw;
     std::vector<CoordsBuffer*> m_coordsCache;
 
+    stdext::map<size_t, CoordsBuffer*> m_coords;
     stdext::map<std::string_view, std::any> m_parameters;
 
     float m_scaleFactor{ 1.f };

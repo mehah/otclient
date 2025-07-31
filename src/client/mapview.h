@@ -322,6 +322,7 @@ private:
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
     bool m_multithreading{ false };
+    bool m_drawCoveredThings{ false };
 
     FadeType m_fadeType{ FadeType::NONE };
 
