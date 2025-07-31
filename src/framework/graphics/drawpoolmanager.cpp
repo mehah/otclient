@@ -69,6 +69,7 @@ void DrawPoolManager::terminate() const
 }
 
 DrawPoolType DrawPoolManager::getCurrentType() const { return static_cast<DrawPoolType>(CURRENT_POOL); }
+bool DrawPoolManager::isValid() const { return CURRENT_POOL < static_cast<uint8_t>(DrawPoolType::LAST); }
 DrawPool* DrawPoolManager::getCurrentPool() const { return m_pools[CURRENT_POOL]; }
 void DrawPoolManager::select(DrawPoolType type) { CURRENT_POOL = static_cast<uint8_t>(type); }
 bool DrawPoolManager::isPreDrawing() const { return CURRENT_POOL != static_cast<uint8_t>(DrawPoolType::LAST); }
@@ -188,11 +189,11 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 
     if (f) f();
 
-    if (beforeRelease)
-        beforeRelease();
-
     if (alwaysDraw)
         pool->repaint();
+
+    if (beforeRelease)
+        beforeRelease();
 
     if (pool->hasFrameBuffer()) {
         addAction([pool, dest, src, colorClear] {
@@ -220,6 +221,10 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
     if (isRead)
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
     pool->setDrawState(DrawPoolState::RENDERED);
+
+    if (pool->m_type == DrawPoolType::CREATURE_INFORMATION) {
+        g_logger.info(std::to_string(pool->m_objectsDraw[1].size()));
+    }
 
     for (auto& obj : pool->m_objectsDraw[1]) {
         drawObject(pool, obj);

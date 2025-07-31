@@ -598,6 +598,7 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
+    bool m_atlased{ false };
 
 public:
     void resizeToText();

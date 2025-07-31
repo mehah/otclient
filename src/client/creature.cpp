@@ -225,6 +225,8 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         }
     }
 
+    g_drawPool.setDrawOrder(DrawOrder::SECOND);
+
     if (drawFlags & Otc::DrawNames) {
         m_name.draw(textRect, fillColor);
 
@@ -266,6 +268,8 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
             ++iconOffset;
         }
     }
+
+    g_drawPool.resetDrawOrder();
 }
 
 void Creature::internalDraw(Point dest, const Color& color)

@@ -24,6 +24,7 @@
 #include "uiwidget.h"
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
+#include <framework/graphics/textureatlas.h>
 #include <regex>
 
 void UIWidget::initText()
@@ -103,6 +104,12 @@ void UIWidget::drawText(const Rect& screenCoords)
 {
     if (m_drawText.empty() || m_color.aF() == 0.f || !m_font)
         return;
+
+    // Hack to fix font rendering in atlas
+    if (!m_atlased && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
+        m_atlased = true;
+        m_textCachedScreenCoords = {};
+    }
 
     if (screenCoords != m_textCachedScreenCoords) {
         m_textCachedScreenCoords = screenCoords;

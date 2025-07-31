@@ -150,6 +150,10 @@ public:
         return m_hashCtrl;
     }
 
+    const auto getAtlas() const {
+        return m_atlas.get();
+    }
+
     void release() {
         if (!canRepaint()) {
             m_objectsFlushed.clear();
