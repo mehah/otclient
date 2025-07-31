@@ -167,7 +167,6 @@ public:
 
         m_objectsDraw[0].clear();
 
-        // Mover objetos de m_objectsFlushed
         if (!m_objectsFlushed.empty()) {
             if (m_objectsDraw[0].size() < m_objectsFlushed.size())
                 m_objectsDraw[0].swap(m_objectsFlushed);
@@ -180,7 +179,6 @@ public:
             }
         }
 
-        // Mover objetos de m_objects
         for (auto& objs : m_objects) {
             if (m_objectsDraw[0].size() < objs.size())
                 m_objectsDraw[0].swap(objs);
