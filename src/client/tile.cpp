@@ -298,27 +298,13 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     m_things.insert(m_things.begin() + stackPos, thing);
 
-    // get the elevation status before analyze the new item.
-    const bool hasElev = hasElevation();
-
     setThingFlag(thing);
 
     if (size > g_gameConfig.getTileMaxThings())
         removeThing(m_things[g_gameConfig.getTileMaxThings()]);
 
-    // Do not change if you do not understand what is being done.
-    {
-        if (const auto& ground = getGround()) {
-            stackPos = std::max<int>(stackPos - 1, 0);
-            if (ground->isTopGround()) {
-                ground->ungroup();
-                thing->ungroup();
-            }
-        }
-    }
-
     updateThingStackPos();
-    thing->setPosition(m_position, stackPos, hasElev);
+    thing->setPosition(m_position, stackPos);
     thing->onAppear();
 
     updateElevation(thing, m_drawElevation);

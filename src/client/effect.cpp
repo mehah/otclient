@@ -134,12 +134,12 @@ void Effect::setId(const uint32_t id)
     m_clientId = id;
 }
 
-void Effect::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
+void Effect::setPosition(const Position& position, const uint8_t stackPos)
 {
     if (m_clientId == 0)
         return;
 
-    Thing::setPosition(position, stackPos, hasElevation);
+    Thing::setPosition(position, stackPos);
     int pattern_x = getNumPatternX();
     int pattern_y = getNumPatternY();
     if (pattern_x == 0 || pattern_y == 0) {

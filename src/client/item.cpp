@@ -101,12 +101,9 @@ void Item::setConductor()
     }
 }
 
-void Item::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
+void Item::setPosition(const Position& position, const uint8_t stackPos)
 {
     Thing::setPosition(position, stackPos);
-
-    if (hasElevation || (m_drawConductor.agroup && stackPos > 0))
-        m_drawConductor.agroup = false;
 }
 
 int Item::getSubType()
