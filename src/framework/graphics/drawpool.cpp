@@ -69,7 +69,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
     } else if (m_type == DrawPoolType::MAP && order == FIRST && !conductor.agroup)
         order = THIRD;
 
-    auto& list = m_objects[order];
+    auto& list = m_objects[m_currentDrawOrder];
 
     if (agroup) {
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;

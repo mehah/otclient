@@ -52,8 +52,17 @@ void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_
     if (flags == Otc::DrawLights)
         thing->drawLight(newDest, lightView);
     else {
+        if (thing->isSingleGround()) {
+            g_drawPool.setDrawOrder(DrawOrder::FIRST);
+        } else if (thing->isSingleGroundBorder()) {
+            g_drawPool.setDrawOrder(DrawOrder::SECOND);
+        } else
+            g_drawPool.setDrawOrder(DrawOrder::THIRD);
+
         thing->draw(newDest, flags & Otc::DrawThings, lightView);
         updateElevation(thing, drawElevation);
+
+        g_drawPool.resetDrawOrder();
     }
 }
 
@@ -123,6 +132,8 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
+    g_drawPool.setDrawOrder(DrawOrder::THIRD);
+
     bool localPlayerDrawed = false;
     if (hasCreatures()) {
         for (const auto& thing : m_things) {
@@ -153,6 +164,8 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
     if (!localPlayerDrawed && g_game.getLocalPlayer() && !g_game.getLocalPlayer()->isWalking() && g_game.getLocalPlayer()->getPosition() == m_position) {
         drawThing(g_game.getLocalPlayer(), dest, flags, drawElevation, lightView);
     }
+
+    g_drawPool.resetDrawOrder();
 }
 
 void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uint8_t drawElevation)
@@ -161,8 +174,13 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
         return;
 
     if (m_effects) {
+        if (g_app.isDrawingEffectsOnTop())
+            g_drawPool.setDrawOrder(DrawOrder::FOURTH);
+
         for (const auto& effect : *m_effects)
             drawThing(effect, dest, flags & Otc::DrawThings, drawElevation);
+
+        g_drawPool.resetDrawOrder();
     }
 
     if (hasTopItem()) {

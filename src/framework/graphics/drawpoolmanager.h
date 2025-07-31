@@ -61,6 +61,7 @@ public:
     void setClipRect(const Rect& clipRect, const bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
     void setBlendEquation(const BlendEquation equation, const bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
     void setCompositionMode(const CompositionMode mode, const bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
+    void setDrawOrder(DrawOrder order)const { getCurrentPool()->setDrawOrder(order); }
 
     bool shaderNeedFramebuffer() const { return getCurrentPool()->getCurrentState().shaderProgram && getCurrentPool()->getCurrentState().shaderProgram->useFramebuffer(); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
@@ -74,6 +75,7 @@ public:
     void resetClipRect() const { getCurrentPool()->resetClipRect(); }
     void resetShaderProgram() const { getCurrentPool()->resetShaderProgram(); }
     void resetCompositionMode() const { getCurrentPool()->resetCompositionMode(); }
+    void resetDrawOrder() const { getCurrentPool()->resetDrawOrder(); }
 
     void pushTransformMatrix() const { getCurrentPool()->pushTransformMatrix(); }
     void popTransformMatrix() const { getCurrentPool()->popTransformMatrix(); }

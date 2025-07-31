@@ -300,12 +300,14 @@ private:
 
     float getOpacity() const { return getCurrentState().opacity; }
     Rect getClipRect() { return getCurrentState().clipRect; }
+    auto getDrawOrder() const { return m_currentDrawOrder; }
 
     void setCompositionMode(CompositionMode mode, bool onlyOnce = false);
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false);
     void setClipRect(const Rect& clipRect, bool onlyOnce = false);
     void setOpacity(float opacity, bool onlyOnce = false);
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr);
+    void setDrawOrder(DrawOrder order) { m_currentDrawOrder = order; }
 
     void resetOpacity() { getCurrentState().opacity = 1.f; }
     void resetClipRect() { getCurrentState().clipRect = {}; }
@@ -313,6 +315,7 @@ private:
     void resetCompositionMode() { getCurrentState().compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { getCurrentState().blendEquation = BlendEquation::ADD; }
     void resetTransformMatrix() { getCurrentState().transformMatrix = DEFAULT_MATRIX3; }
+    void resetDrawOrder() { m_currentDrawOrder = DrawOrder::FIRST; }
 
     void pushTransformMatrix();
     void popTransformMatrix();
@@ -422,6 +425,7 @@ private:
     uint_fast8_t m_lastStateIndex{ 0 };
 
     DrawPoolType m_type{ DrawPoolType::LAST };
+    DrawOrder m_currentDrawOrder{ DrawOrder::FIRST };
 
     Timer m_refreshTimer;
 

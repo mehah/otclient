@@ -76,9 +76,6 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
     }
 
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
-        if (g_app.isDrawingEffectsOnTop())
-            m_drawConductor.order = FOURTH;
-
         if (drawThings && g_client.getEffectAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
