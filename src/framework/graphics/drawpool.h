@@ -199,19 +199,6 @@ public:
 
 protected:
 
-    struct CoordsBufferUPtrDeleter
-    {
-        DrawPool* pool;
-        int16_t threadId;
-
-        void operator()(CoordsBuffer* ptr) const {
-            if (pool->m_enabled) {
-                ptr->clear();
-                pool->m_coordsCache.emplace_back(ptr);
-            } else delete ptr;
-        }
-    };
-
     enum class DrawMethodType
     {
         RECT,
@@ -251,9 +238,9 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state, std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter>&& coords) : coords(std::move(coords)), state(std::move(state)) {}
+        DrawObject(PoolState&& state, std::shared_ptr<CoordsBuffer>&& coords) : coords(std::move(coords)), state(std::move(state)) {}
         std::function<void()> action{ nullptr };
-        std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter> coords;
+        std::shared_ptr<CoordsBuffer> coords;
         PoolState state;
     };
 
@@ -328,7 +315,7 @@ private:
         m_drawState.store(state, std::memory_order_release);
     }
 
-    std::unique_ptr<CoordsBuffer, CoordsBufferUPtrDeleter> getCoordsBuffer();
+    std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
     template<typename T>
     void setParameter(std::string_view name, T&& value) {

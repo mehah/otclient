@@ -75,7 +75,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
             auto state = getState(texture, color);
-            coords = list.emplace_back(std::move(state), std::move(getCoordsBuffer())).coords.get();
+            coords = list.emplace_back(std::move(state), getCoordsBuffer()).coords.get();
         }
 
         if (coordsBuffer)
@@ -99,7 +99,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
 
         if (addNewObj) {
             auto state = getState(texture, color);
-            auto& draw = list.emplace_back(std::move(state), std::move(getCoordsBuffer()));
+            auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
 
             if (coordsBuffer) {
                 draw.coords->append(coordsBuffer.get());
@@ -414,7 +414,7 @@ const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
     return tempfb;
 }
 
-std::unique_ptr<CoordsBuffer, DrawPool::CoordsBufferUPtrDeleter> DrawPool::getCoordsBuffer() {
+std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer() {
     CoordsBuffer* coordsBuffer = nullptr;
 
     if (!m_coordsCache.empty()) {
@@ -423,8 +423,12 @@ std::unique_ptr<CoordsBuffer, DrawPool::CoordsBufferUPtrDeleter> DrawPool::getCo
     } else
         coordsBuffer = new CoordsBuffer();
 
-    return std::unique_ptr<CoordsBuffer, DrawPool::CoordsBufferUPtrDeleter>(
-        coordsBuffer,
-        DrawPool::CoordsBufferUPtrDeleter{ this, stdext::getThreadId() }
-    );;
+    return std::shared_ptr<CoordsBuffer>(coordsBuffer, [this](CoordsBuffer* ptr) {
+        if (m_enabled) {
+            ptr->clear();
+            m_coordsCache.emplace_back(ptr);
+        } else {
+            delete ptr;
+        }
+    });
 }
