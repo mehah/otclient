@@ -5,38 +5,29 @@
 
 class SpinLock
 {
-    alignas(64) std::atomic_flag m_flag = ATOMIC_FLAG_INIT;
-    char padding[64 - sizeof(std::atomic_flag)];
+    alignas(64) std::atomic_bool m_flag{ false };
+    char m_padding[64 - sizeof(std::atomic_bool)];
 
 public:
     SpinLock() noexcept = default;
     SpinLock(const SpinLock&) = delete;
     SpinLock& operator=(const SpinLock&) = delete;
 
-    void lock() {
-        int spin = 1;
-        int yield_count = 0;
-
-        while (m_flag.test_and_set(std::memory_order_acquire)) {
-            for (int i = 0; i < spin; ++i)
+    void lock() noexcept {
+        for (;;) {
+            if (!m_flag.exchange(true, std::memory_order_acquire))
+                return;
+            while (m_flag.load(std::memory_order_relaxed))
                 cpu_relax();
-
-            if (spin < 512) {
-                spin *= 2;
-            } else if (++yield_count < 20) {
-                std::this_thread::yield();
-            } else {
-                std::this_thread::sleep_for(std::chrono::microseconds(100));
-            }
         }
     }
 
-    void unlock() {
-        m_flag.clear(std::memory_order_release);
+    void unlock() noexcept {
+        m_flag.store(false, std::memory_order_release);
     }
 
     bool try_lock() noexcept {
-        return !m_flag.test_and_set(std::memory_order_acquire);
+        return !m_flag.exchange(true, std::memory_order_acquire);
     }
 
     class Guard
@@ -53,7 +44,7 @@ public:
     };
 
 private:
-    static void cpu_relax() {
+    static inline void cpu_relax() {
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
 #include <immintrin.h>
         _mm_pause();

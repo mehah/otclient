@@ -23,6 +23,7 @@
 #pragma once
 
 #include "scheduledevent.h"
+#include <framework/util/spinlock.h>
 
 enum class TaskGroup : int8_t
 {
@@ -113,15 +114,7 @@ private:
         std::vector<EventPtr> events;
         std::vector<Event> deferEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
-        std::atomic<ThreadTaskEventState> state = ThreadTaskEventState::MERGED;
-
-        void waitWhileStateIs(ThreadTaskEventState st) {
-            while (state.load(std::memory_order_acquire) == st); // spinlock
-        }
-
-        void setState(ThreadTaskEventState st) {
-            state.store(st, std::memory_order_release);
-        }
+        SpinLock lock;
     };
 
     inline void mergeEvents();
@@ -136,14 +129,11 @@ private:
     template<typename Result = void, typename Inserter>
     Result pushThreadTask(Inserter inserter) {
         const auto& thread = getThreadTask();
-        thread->waitWhileStateIs(ThreadTaskEventState::MERGING);
-        thread->setState(ThreadTaskEventState::ADDING);
+        SpinLock::Guard guard(thread->lock);
         if constexpr (std::is_void_v<Result>) {
             inserter(thread);
-            thread->setState(ThreadTaskEventState::ADDED);
         } else {
             Result result = inserter(thread);
-            thread->setState(ThreadTaskEventState::ADDED);
             return result;
         }
     }
