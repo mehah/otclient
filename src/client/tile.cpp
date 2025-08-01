@@ -52,11 +52,13 @@ void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_
     if (flags == Otc::DrawLights)
         thing->drawLight(newDest, lightView);
     else {
-        if (thing->isSingleGround()) {
+        if (thing->isSingleGround())
             g_drawPool.setDrawOrder(DrawOrder::FIRST);
-        } else if (thing->isSingleGroundBorder()) {
+        else if (thing->isSingleGroundBorder())
             g_drawPool.setDrawOrder(DrawOrder::SECOND);
-        } else
+        else if (thing->isEffect() && g_app.isDrawingEffectsOnTop())
+            g_drawPool.setDrawOrder(DrawOrder::FOURTH);
+        else
             g_drawPool.setDrawOrder(DrawOrder::THIRD);
 
         thing->draw(newDest, flags & Otc::DrawThings, lightView);
@@ -176,13 +178,8 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
     drawElevation = 0;
 
     if (m_effects) {
-        if (g_app.isDrawingEffectsOnTop())
-            g_drawPool.setDrawOrder(DrawOrder::FOURTH);
-
         for (const auto& effect : *m_effects)
             drawThing(effect, dest, flags & Otc::DrawThings, drawElevation);
-
-        g_drawPool.resetDrawOrder();
     }
 
     if (hasTopItem()) {
