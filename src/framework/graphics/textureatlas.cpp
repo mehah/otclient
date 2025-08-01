@@ -84,7 +84,7 @@ void TextureAtlas::createNewLayer(bool smooth) {
     fbo->resize(m_size);
     fbo->setAutoClear(false);
     fbo->setAutoResetState(true);
-    fbo->getTexture()->setSmooth(false);
+    fbo->getTexture()->setSmooth(smooth);
 
     m_filterGroups[smooth].layers.emplace_back(std::move(fbo));
     FreeRegion newRegion = { 0, 0, m_size.width(), m_size.height(), static_cast<int>(m_filterGroups[smooth].layers.size()) - 1 };
