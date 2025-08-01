@@ -86,21 +86,23 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    bool updatePixel = false;
-
     m_pool->getHashController().put(src.hash());
     m_pool->getHashController().put(m_globalLightColor.hash());
     if (m_pool->getHashController().wasModified()) {
         updatePixels();
+
+        m_pool->waitWhileStateIs(DrawPoolState::UPDATING_BUFFER);
+        m_pool->setDrawState(DrawPoolState::SWAPPING_BUFFERS);
         m_pixels[0].swap(m_pixels[1]);
-        updatePixel = true;
+        m_pool->setDrawState(DrawPoolState::READY_TO_DRAW);
     }
     m_pool->getHashController().reset();
 
     g_drawPool.addAction([=, this] {
-        if (updatePixel) {
-            m_texture->updatePixels(m_pixels[1].data());
-        }
+        m_pool->waitWhileStateIs(DrawPoolState::SWAPPING_BUFFERS);
+        m_pool->setDrawState(DrawPoolState::UPDATING_BUFFER);
+        m_texture->updatePixels(m_pixels[1].data());
+        m_pool->setDrawState(DrawPoolState::READY_TO_SWAP);
 
         updateCoords(dest, src);
 

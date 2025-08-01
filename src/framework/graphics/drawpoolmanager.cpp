@@ -216,7 +216,7 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
     if (hasFramebuffer)
         pool->m_framebuffer->bind();
 
-    pool->waitWhileStateIs(DrawPoolState::COLLECTING);
+    pool->waitWhileStateIs(DrawPoolState::UPDATING_BUFFER);
     pool->setDrawState(DrawPoolState::SWAPPING_BUFFERS);
     if (isRead)
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);

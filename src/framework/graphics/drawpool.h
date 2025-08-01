@@ -56,7 +56,7 @@ enum DrawOrder : uint8_t
 enum class DrawPoolState
 {
     NOT_INITIALIZED,
-    COLLECTING,
+    UPDATING_BUFFER,
     READY_TO_SWAP,
     SWAPPING_BUFFERS,
     READY_TO_DRAW
@@ -166,7 +166,7 @@ public:
 
         m_refreshTimer.restart();
 
-        setDrawState(DrawPoolState::COLLECTING);
+        setDrawState(DrawPoolState::UPDATING_BUFFER);
         m_objectsDraw[0].clear();
 
         if (!m_objectsFlushed.empty()) {
@@ -205,6 +205,14 @@ public:
             }
         }
         setDrawState(DrawPoolState::READY_TO_SWAP);
+    }
+
+    void waitWhileStateIs(DrawPoolState state) {
+        while (isDrawState(state)); // spinlock
+    }
+
+    void setDrawState(DrawPoolState state) {
+        m_drawState.store(state, std::memory_order_release);
     }
 
 protected:
@@ -318,14 +326,6 @@ private:
     void rotate(float angle);
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, const float angle) { rotate(p.x, p.y, angle); }
-
-    void waitWhileStateIs(DrawPoolState state) {
-        while (isDrawState(state)); // spinlock
-    }
-
-    void setDrawState(DrawPoolState state) {
-        m_drawState.store(state, std::memory_order_release);
-    }
 
     std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
