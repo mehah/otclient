@@ -32,6 +32,11 @@ void UIWidget::initImage() {}
 void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
+        if (node->tag() == "image-smooth")
+            setImageSmooth(node->value<bool>());
+    }
+
+    for (const auto& node : styleNode->children()) {
         if (node->tag() == "image-source") {
             auto split = stdext::split<std::string>(node->value(), ":");
             if (split.size() == 0) split.emplace_back("none");
@@ -63,8 +68,6 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
             setImageFixedRatio(node->value<bool>());
         else if (node->tag() == "image-repeated")
             setImageRepeated(node->value<bool>());
-        else if (node->tag() == "image-smooth")
-            setImageSmooth(node->value<bool>());
         else if (node->tag() == "image-color")
             setImageColor(node->value<Color>());
         else if (node->tag() == "image-border-top")
@@ -177,12 +180,16 @@ void UIWidget::drawImage(const Rect& screenCoords)
     const auto& texture = m_imageTexture->isAnimatedTexture() && isImageIndividualAnimation() ?
         std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->get(m_currentFrame, m_imageAnimatorTimer) : m_imageTexture;
 
+    g_drawPool.setDrawOrder(m_imageDrawOrder);
+
     for (const auto& [dest, src] : m_imageCoordsCache) {
         if (useRepeated)
-            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor, m_imageDrawConductor);
+            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor);
         else
-            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor, m_imageDrawConductor);
+            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor);
     }
+
+    g_drawPool.resetDrawOrder();
 }
 
 void UIWidget::setImageSource(const std::string_view source, const bool base64)

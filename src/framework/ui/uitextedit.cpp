@@ -31,6 +31,7 @@
 #include "framework/graphics/drawpoolmanager.h"
 #include "uitranslator.h"
 #include <framework/graphics/fontmanager.h>
+#include <framework/graphics/textureatlas.h>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
@@ -73,6 +74,12 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     if (glyphsMustRecache)
         setProp(PropGlyphsMustRecache, false);
 
+    // Hack to fix font rendering in atlas
+    if (!m_atlased && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
+        m_atlased = true;
+        update();
+    }
+
     const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
     if (textLength == 0) {
         if (m_placeholderColor != Color::alpha && !m_placeholder.empty()) {
@@ -81,13 +88,15 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     }
 
     if (m_color != Color::alpha) {
+        g_drawPool.setDrawOrder(m_textDrawOrder);
         if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
-            g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color, m_textDrawConductor);
+            g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color);
         } else {
             for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
-                g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
+                g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
             }
         }
+        g_drawPool.resetDrawOrder();
     }
 
     if (hasSelection()) {
@@ -110,7 +119,7 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         constexpr int delay = 333;
         const ticks_t elapsed = g_clock.millis() - m_cursorTicks;
         if (elapsed <= delay) {
-            const auto& cursorRect = m_cursorPos > 0 ?
+            auto cursorRect = m_cursorPos > 0 ?
                 Rect(m_glyphsCoords[m_cursorPos - 1].first.right(), m_glyphsCoords[m_cursorPos - 1].first.top(), 1, m_font->getGlyphHeight())
                 :
                 Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
@@ -353,9 +362,20 @@ void UITextEdit::update(const bool focusCursor)
             glyphScreenCoords.setRight(textScreenCoords.right());
         }
 
+        TextureAtlas* atlas = nullptr;
+        if (g_drawPool.isValid())
+            atlas = g_drawPool.getAtlas();
+        else
+            atlas = g_drawPool.get(DrawPoolType::FOREGROUND)->getAtlas();
+
         // render glyph
         m_glyphsCoords[i].first = glyphScreenCoords;
         m_glyphsCoords[i].second = glyphTextureCoords;
+
+        if (atlas) {
+            if (const auto region = m_font->getTexture()->getAtlas(atlas->getType()))
+                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
+        }
 
         if (textColorsSize > 0) {
             coords->addRect(glyphScreenCoords, glyphTextureCoords);

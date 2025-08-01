@@ -132,15 +132,13 @@ void EventDispatcher::executeDeferEvents() {
         m_deferEventList.clear();
 
         for (const auto& thread : m_threads) {
-            thread->waitWhileStateIs(ThreadTaskEventState::ADDING);
-            thread->setState(ThreadTaskEventState::MERGING);
+            SpinLock::Guard guard(thread->lock);
             if (m_deferEventList.size() < thread->deferEvents.size())
                 m_deferEventList.swap(thread->deferEvents);
             if (!thread->deferEvents.empty()) {
                 m_deferEventList.insert(m_deferEventList.end(), make_move_iterator(thread->deferEvents.begin()), make_move_iterator(thread->deferEvents.end()));
                 thread->deferEvents.clear();
             }
-            thread->setState(ThreadTaskEventState::MERGED);
         }
     } while (!m_deferEventList.empty());
 
@@ -176,8 +174,7 @@ void EventDispatcher::executeScheduledEvents() {
 
 void EventDispatcher::mergeEvents() {
     for (const auto& thread : m_threads) {
-        thread->waitWhileStateIs(ThreadTaskEventState::ADDING);
-        thread->setState(ThreadTaskEventState::MERGING);
+        SpinLock::Guard guard(thread->lock);
         if (!thread->events.empty()) {
             if (m_eventList.size() < thread->events.size())
                 m_eventList.swap(thread->events);
@@ -192,7 +189,5 @@ void EventDispatcher::mergeEvents() {
             m_scheduledEventList.insert(make_move_iterator(thread->scheduledEventList.begin()), make_move_iterator(thread->scheduledEventList.end()));
             thread->scheduledEventList.clear();
         }
-
-        thread->setState(ThreadTaskEventState::MERGED);
     }
 }

@@ -29,6 +29,7 @@
 #include "framework/core/timer.h"
 #include <framework/core/graphicalapplication.h>
 #include <framework/platform/platformwindow.h>
+#include <framework/util/spinlock.h>
 
 #include "../stdext/storage.h"
 #include <unordered_set>
@@ -51,15 +52,6 @@ enum DrawOrder : uint8_t
     FOURTH, // TOP ~ TOP
     FIFTH,  // ABOVE ALL - MISSILE
     LAST
-};
-
-enum class DrawPoolState
-{
-    UNINITIALIZED,
-    PREPARING,
-    READY,
-    DRAWING,
-    RENDERED,
 };
 
 struct DrawHashController
@@ -104,14 +96,6 @@ private:
     bool m_agroup{ false };
 };
 
-struct DrawConductor
-{
-    bool agroup{ false };
-    uint8_t order{ FIRST };
-};
-
-constexpr DrawConductor DEFAULT_DRAW_CONDUCTOR;
-
 class DrawPool
 {
 public:
@@ -119,6 +103,8 @@ public:
         FPS10 = 1000 / 10,
         FPS20 = 1000 / 20,
         FPS60 = 1000 / 60;
+
+    ~DrawPool() { m_enabled = false; }
 
     void setEnable(const bool v) { m_enabled = v; }
 
@@ -148,61 +134,72 @@ public:
     void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
-    bool isDrawState(DrawPoolState state) const {
-        return m_drawState.load(std::memory_order_acquire) == state;
-    }
-
     auto& getHashController() {
         return m_hashCtrl;
     }
 
-    void resetBuffer() {
-        waitWhileStateIs(DrawPoolState::DRAWING);
-        for (auto& buffer : m_coordsCache) {
-            buffer.coords.clear();
-            buffer.last = 0;
-        }
+    const auto getAtlas() const {
+        return m_atlas.get();
+    }
+
+    bool shouldRepaint() const {
+        return m_shouldRepaint.load(std::memory_order_acquire);
     }
 
     void release() {
-        const auto repaint = canRepaint();
-        if (repaint) {
-            m_refreshTimer.restart();
+        SpinLock::Guard guard(m_threadLock);
 
-            waitWhileStateIs(DrawPoolState::DRAWING);
-            setDrawState(DrawPoolState::PREPARING);
+        if (!canRepaint()) {
+            for (auto& objs : m_objects)
+                objs.clear();
+            m_objectsFlushed.clear();
+            return;
+        }
 
-            m_objectsDraw.clear();
+        m_shouldRepaint.store(true, std::memory_order_release);
+
+        m_refreshTimer.restart();
+
+        m_objectsDraw[0].clear();
+
+        if (!m_objectsFlushed.empty()) {
+            if (m_objectsDraw[0].size() < m_objectsFlushed.size())
+                m_objectsDraw[0].swap(m_objectsFlushed);
+
             if (!m_objectsFlushed.empty()) {
-                if (m_objectsDraw.size() < m_objectsFlushed.size())
-                    m_objectsDraw.swap(m_objectsFlushed);
-
-                if (!m_objectsFlushed.empty())
-                    m_objectsDraw.insert(
-                        m_objectsDraw.end(),
-                        make_move_iterator(m_objectsFlushed.begin()),
-                        make_move_iterator(m_objectsFlushed.end()));
+                m_objectsDraw[0].insert(
+                    m_objectsDraw[0].end(),
+                    std::make_move_iterator(m_objectsFlushed.begin()),
+                    std::make_move_iterator(m_objectsFlushed.end()));
             }
+            m_objectsFlushed.clear();
+        }
 
-            for (auto& objs : m_objects) {
-                if (m_objectsDraw.size() < objs.size())
-                    m_objectsDraw.swap(objs);
+        for (auto& objs : m_objects) {
+            if (m_objectsDraw[0].size() < objs.size())
+                m_objectsDraw[0].swap(objs);
 
-                if (!objs.empty()) {
-                    m_objectsDraw.insert(
-                        m_objectsDraw.end(),
-                        make_move_iterator(objs.begin()),
-                        make_move_iterator(objs.end()));
-                    objs.clear();
+            if (!m_objectsDraw[0].empty() && !objs.empty()) {
+                auto& last = m_objectsDraw[0].back();
+                auto& first = objs.front();
+
+                if (last.state == first.state && last.coords && first.coords) {
+                    last.coords->append(first.coords.get());
+                    first.coords = nullptr;
                 }
             }
 
-            std::swap(m_coordsCache[0], m_coordsCache[1]);
-            setDrawState(DrawPoolState::READY);
+            if (!objs.empty()) {
+                m_objectsDraw[0].insert(
+                    m_objectsDraw[0].end(),
+                    std::make_move_iterator(objs.begin()),
+                    std::make_move_iterator(objs.end()));
+                objs.clear();
+            }
         }
-
-        m_objectsFlushed.clear();
     }
+
+    auto& getThreadLock() { return m_threadLock; }
 
 protected:
 
@@ -245,7 +242,7 @@ protected:
     struct DrawObject
     {
         DrawObject(std::function<void()> action) : action(std::move(action)) {}
-        DrawObject(PoolState&& state, const std::shared_ptr<CoordsBuffer>& coords) : coords(coords), state(std::move(state)) {}
+        DrawObject(PoolState&& state, std::shared_ptr<CoordsBuffer>&& coords) : coords(std::move(coords)), state(std::move(state)) {}
         std::function<void()> action{ nullptr };
         std::shared_ptr<CoordsBuffer> coords;
         PoolState state;
@@ -262,8 +259,9 @@ protected:
     };
 
 private:
+
     static DrawPool* create(DrawPoolType type);
-    static void addCoords(CoordsBuffer* buffer, const DrawMethod& method);
+    static void addCoords(CoordsBuffer& buffer, const DrawMethod& method);
 
     enum STATE_TYPE : uint32_t
     {
@@ -274,8 +272,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, TexturePtr texture, DrawMethod&& method, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR,
-             const CoordsBufferPtr& coordsBuffer = nullptr);
+    void add(const Color& color, TexturePtr texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addAction(const std::function<void()>& action);
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
@@ -291,12 +288,14 @@ private:
 
     float getOpacity() const { return getCurrentState().opacity; }
     Rect getClipRect() { return getCurrentState().clipRect; }
+    auto getDrawOrder() const { return m_currentDrawOrder; }
 
     void setCompositionMode(CompositionMode mode, bool onlyOnce = false);
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false);
     void setClipRect(const Rect& clipRect, bool onlyOnce = false);
     void setOpacity(float opacity, bool onlyOnce = false);
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, bool onlyOnce = false, const std::function<void()>& action = nullptr);
+    void setDrawOrder(DrawOrder order) { m_currentDrawOrder = order; }
 
     void resetOpacity() { getCurrentState().opacity = 1.f; }
     void resetClipRect() { getCurrentState().clipRect = {}; }
@@ -304,6 +303,7 @@ private:
     void resetCompositionMode() { getCurrentState().compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { getCurrentState().blendEquation = BlendEquation::ADD; }
     void resetTransformMatrix() { getCurrentState().transformMatrix = DEFAULT_MATRIX3; }
+    void resetDrawOrder() { m_currentDrawOrder = DrawOrder::FIRST; }
 
     void pushTransformMatrix();
     void popTransformMatrix();
@@ -312,14 +312,6 @@ private:
     void rotate(float angle);
     void rotate(float x, float y, float angle);
     void rotate(const Point& p, const float angle) { rotate(p.x, p.y, angle); }
-
-    void waitWhileStateIs(DrawPoolState state) {
-        while (isDrawState(state)); // spinlock
-    }
-
-    void setDrawState(DrawPoolState state) {
-        m_drawState.store(state, std::memory_order_release);
-    }
 
     std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
@@ -348,8 +340,23 @@ private:
     void flush()
     {
         m_coords.clear();
+
         for (auto& objs : m_objects) {
-            m_objectsFlushed.insert(m_objectsFlushed.end(), make_move_iterator(objs.begin()), make_move_iterator(objs.end()));
+            if (!objs.empty() && !m_objectsFlushed.empty()) {
+                auto& last = m_objectsFlushed.back();
+                auto& first = objs.front();
+
+                if (last.state == first.state && last.coords && first.coords) {
+                    last.coords->append(first.coords.get());
+                    first.coords = nullptr;
+                }
+            }
+
+            m_objectsFlushed.insert(
+                m_objectsFlushed.end(),
+                std::make_move_iterator(objs.begin()),
+                std::make_move_iterator(objs.end())
+            );
             objs.clear();
         }
     }
@@ -398,6 +405,7 @@ private:
     uint_fast8_t m_lastStateIndex{ 0 };
 
     DrawPoolType m_type{ DrawPoolType::LAST };
+    DrawOrder m_currentDrawOrder{ DrawOrder::FIRST };
 
     Timer m_refreshTimer;
 
@@ -408,13 +416,8 @@ private:
 
     std::vector<DrawObject> m_objects[static_cast<uint8_t>(LAST)];
     std::vector<DrawObject> m_objectsFlushed;
-    std::vector<DrawObject> m_objectsDraw;
-
-    struct
-    {
-        std::vector<std::shared_ptr<CoordsBuffer>> coords;
-        uint_fast32_t last{ 0 };
-    } m_coordsCache[2];
+    std::array<std::vector<DrawObject>, 2> m_objectsDraw;
+    std::vector<CoordsBuffer*> m_coordsCache;
 
     stdext::map<size_t, CoordsBuffer*> m_coords;
     stdext::map<std::string_view, std::any> m_parameters;
@@ -427,9 +430,10 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic<DrawPoolState> m_drawState = DrawPoolState::UNINITIALIZED;
+    SpinLock m_threadLock;
 
     TextureAtlasPtr m_atlas;
+    std::atomic_bool m_shouldRepaint;
 
     friend class DrawPoolManager;
 };

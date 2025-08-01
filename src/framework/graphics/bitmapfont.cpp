@@ -24,6 +24,7 @@
 #include "graphics.h"
 #include "image.h"
 #include "texturemanager.h"
+#include "textureatlas.h"
 
 #include <framework/otml/otml.h>
 
@@ -249,6 +250,11 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
             glyphScreenCoords.setRight(screenCoords.right());
         }
 
+        if (const auto atlas = g_drawPool.getAtlas()) {
+            if (const auto region = m_texture->getAtlas(atlas->getType()))
+                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
+        }
+
         // add glyph
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
     }
@@ -350,6 +356,11 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
             glyphScreenCoords.setRight(screenCoords.right());
         }
 
+        if (const auto atlas = g_drawPool.getAtlas()) {
+            if (const auto region = m_texture->getAtlas(atlas->getType()))
+                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
+        }
+
         // add glyph to color
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
     }
@@ -400,6 +411,7 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     }
 
     Point virtualPos(0, m_yOffset);
+
     lines = 0;
     for (int i = 0; i < textLength; ++i) {
         glyph = static_cast<uint8_t>(text[i]);

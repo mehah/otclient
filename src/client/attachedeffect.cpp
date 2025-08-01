@@ -117,16 +117,22 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
         if (lightView && m_light.intensity > 0)
             lightView->addLightSource(dest, m_light);
 
+        auto lastDrawOrder = g_drawPool.getDrawOrder();
+        g_drawPool.setDrawOrder(getDrawOrder());
+
         if (m_texture) {
             if (drawThing) {
                 const auto& size = (m_size.isUnset() ? m_texture->getSize() : m_size) * g_drawPool.getScaleFactor();
                 const auto& texture = m_texture->isAnimatedTexture() ? std::static_pointer_cast<AnimatedTexture>(m_texture)->get(m_frame, m_animationTimer) : m_texture;
                 const auto& rect = Rect(Point(), texture->getSize());
-                g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white, { .order = getDrawOrder() });
+
+                g_drawPool.addTexturedRect(Rect(point, size), texture, rect, Color::white);
             }
         } else {
-            getThingType()->draw(point, 0, m_direction, 0, 0, animation, Color::white, drawThing, lightView, { .order = getDrawOrder() });
+            getThingType()->draw(point, 0, m_direction, 0, 0, animation, Color::white, drawThing, lightView);
         }
+
+        g_drawPool.setDrawOrder(lastDrawOrder);
 
         if (m_pulse.height > 0 && m_pulse.speed > 0) {
             g_drawPool.setScaleFactor(scaleFactor);

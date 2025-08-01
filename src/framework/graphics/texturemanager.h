@@ -35,8 +35,8 @@ public:
     void clearCache();
     void liveReload();
 
-    void preload(const std::string& fileName, const bool smooth = true) { getTexture(fileName, smooth); }
-    TexturePtr getTexture(const std::string& fileName, bool smooth = true);
+    void preload(const std::string& fileName, const bool smooth = false) { getTexture(fileName, smooth); }
+    TexturePtr getTexture(const std::string& fileName, bool smooth = false);
     const TexturePtr& getEmptyTexture() { return m_emptyTexture; }
     TexturePtr loadTexture(std::stringstream& file);
 

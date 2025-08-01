@@ -86,20 +86,24 @@ void LightView::resetShade(const Point& pos)
 
 void LightView::draw(const Rect& dest, const Rect& src)
 {
-    bool updatePixel = false;
+    static std::atomic_bool updatePixel;
 
     m_pool->getHashController().put(src.hash());
     m_pool->getHashController().put(m_globalLightColor.hash());
     if (m_pool->getHashController().wasModified()) {
         updatePixels();
+
+        SpinLock::Guard guard(m_pool->getThreadLock());
         m_pixels[0].swap(m_pixels[1]);
-        updatePixel = true;
+        updatePixel.store(true, std::memory_order_release);
     }
     m_pool->getHashController().reset();
 
     g_drawPool.addAction([=, this] {
-        if (updatePixel) {
+        if (updatePixel.load(std::memory_order_acquire)) {
+            SpinLock::Guard guard(m_pool->getThreadLock());
             m_texture->updatePixels(m_pixels[1].data());
+            updatePixel = false;
         }
 
         updateCoords(dest, src);

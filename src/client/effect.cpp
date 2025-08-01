@@ -76,16 +76,11 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
     }
 
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
-        if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
-            m_drawConductor.agroup = true;
-            m_drawConductor.order = FOURTH;
-        }
-
         if (drawThings && g_client.getEffectAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
 
-    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
+    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);
 }
 
 void Effect::onAppear()
@@ -136,12 +131,12 @@ void Effect::setId(const uint32_t id)
     m_clientId = id;
 }
 
-void Effect::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
+void Effect::setPosition(const Position& position, const uint8_t stackPos)
 {
     if (m_clientId == 0)
         return;
 
-    Thing::setPosition(position, stackPos, hasElevation);
+    Thing::setPosition(position, stackPos);
     int pattern_x = getNumPatternX();
     int pattern_y = getNumPatternY();
     if (pattern_x == 0 || pattern_y == 0) {

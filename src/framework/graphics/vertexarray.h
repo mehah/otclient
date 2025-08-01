@@ -142,6 +142,7 @@ public:
     }
 
     void append(const VertexArray* buffer) {
+        m_buffer.reserve(m_buffer.size() + buffer->size());
         m_buffer.insert(m_buffer.end(), buffer->m_buffer.begin(), buffer->m_buffer.end());
     }
 

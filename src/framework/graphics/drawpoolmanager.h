@@ -45,13 +45,13 @@ public:
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white) const
     { addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color); }
 
-    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addFilledRect(const Rect& dest, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
-    void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1, const DrawConductor& condutor = DEFAULT_DRAW_CONDUCTOR) const;
+    void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
+    void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white) const;
+    void addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
+    void addTexturedRepeatedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
+    void addFilledRect(const Rect& dest, const Color& color = Color::white) const;
+    void addFilledTriangle(const Point& a, const Point& b, const Point& c, const Color& color = Color::white) const;
+    void addBoundingRect(const Rect& dest, const Color& color = Color::white, uint16_t innerLineWidth = 1) const;
     void addAction(const std::function<void()>& action) const { getCurrentPool()->addAction(action); }
 
     void bindFrameBuffer(const Size& size, const Color& color = Color::white) const { getCurrentPool()->bindFrameBuffer(size, color); }
@@ -61,6 +61,7 @@ public:
     void setClipRect(const Rect& clipRect, const bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
     void setBlendEquation(const BlendEquation equation, const bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
     void setCompositionMode(const CompositionMode mode, const bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
+    void setDrawOrder(DrawOrder order)const { getCurrentPool()->setDrawOrder(order); }
 
     bool shaderNeedFramebuffer() const { return getCurrentPool()->getCurrentState().shaderProgram && getCurrentPool()->getCurrentState().shaderProgram->useFramebuffer(); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
@@ -74,6 +75,7 @@ public:
     void resetClipRect() const { getCurrentPool()->resetClipRect(); }
     void resetShaderProgram() const { getCurrentPool()->resetShaderProgram(); }
     void resetCompositionMode() const { getCurrentPool()->resetCompositionMode(); }
+    void resetDrawOrder() const { getCurrentPool()->resetDrawOrder(); }
 
     void pushTransformMatrix() const { getCurrentPool()->pushTransformMatrix(); }
     void popTransformMatrix() const { getCurrentPool()->popTransformMatrix(); }
@@ -88,6 +90,9 @@ public:
     float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
     bool isScaled() const { return getCurrentPool()->isScaled(); }
     uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
+    const auto getAtlas() const { return getCurrentPool()->getAtlas(); }
+    bool isValid() const;
+    auto getDrawOrder() const { return getCurrentPool()->getDrawOrder(); }
 
     template<typename T>
     void setParameter(std::string_view name, T&& value) { getCurrentPool()->setParameter(name, value); }
@@ -107,7 +112,7 @@ public:
 
     bool isPreDrawing() const;
 
-    void removeTextureFromAtlas(uint32_t id);
+    void removeTextureFromAtlas(uint32_t id, bool smooth);
 
 private:
     DrawPool* getCurrentPool() const;

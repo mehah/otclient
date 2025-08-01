@@ -322,6 +322,7 @@ private:
     bool m_drawHighlightTarget{ false };
     bool m_shiftPressed{ false };
     bool m_multithreading{ false };
+    bool m_drawCoveredThings{ false };
 
     FadeType m_fadeType{ FadeType::NONE };
 
@@ -345,6 +346,5 @@ private:
     TilePtr m_lastHighlightTile;
     TexturePtr m_crosshairTexture;
 
-    DrawConductor m_shadowConductor{ .agroup = false, .order = FIFTH };
     DrawPool* m_pool;
 };

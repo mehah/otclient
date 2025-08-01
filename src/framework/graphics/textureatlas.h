@@ -13,15 +13,27 @@
 
 #include "declarations.h"
 
-struct TextureInfo
+class AtlasRegion
 {
-    uint32_t textureID = 0;
-    int16_t x = -1;
-    int16_t y = -1;
-    int8_t layer = -1;
-    int16_t width = -1;
-    int16_t height = -1;
-    uint16_t transformMatrixId = 0;
+public:
+    uint32_t textureID;
+    int16_t x;
+    int16_t y;
+    int8_t layer;
+    int16_t width;
+    int16_t height;
+    uint16_t transformMatrixId;
+    std::atomic_bool enabled = false;
+
+    bool isEnabled() const {
+        return enabled.load(std::memory_order_acquire);
+    }
+
+    AtlasRegion(uint32_t tid, int16_t x, int16_t y, int8_t layer,
+                int16_t width, int16_t height, uint16_t transformId)
+        : textureID(tid), x(x), y(y), layer(layer),
+        width(width), height(height), transformMatrixId(transformId) {
+    }
 };
 
 struct FreeRegion
@@ -50,22 +62,24 @@ struct PairHash
     }
 };
 
+enum AtlasFilter
+{
+    ATLAS_FILTER_NEAREST,
+    ATLAS_FILTER_LINEAR,
+    ATLAS_FILTER_COUNT
+};
+
 class TextureAtlas
 {
 public:
-    TextureAtlas(Fw::TextureAtlasType type);
-    TextureAtlas(Fw::TextureAtlasType type, int width, int height);
+    TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport = false);
 
     void addTexture(const TexturePtr& texture);
-    void removeTexture(uint32_t id);
+    void removeTexture(uint32_t id, bool smooth);
 
-    auto getTexture(int layer) const {
-        return m_layers[layer].framebuffer->getTexture();
-    }
+    TexturePtr getTexture(int layer, bool smooth) const;
 
-    int getWidth() const { return m_atlasWidth; }
-    int getHeight() const { return m_atlasHeight; }
-    int getLayerCount() const { return static_cast<int>(m_layers.size()); }
+    Size getSize() const { return m_size; }
 
     void flush();
 
@@ -74,14 +88,14 @@ public:
 private:
     struct Layer
     {
-        FrameBufferPtr framebuffer;
-        std::vector<TextureInfo> textures;
+        std::unique_ptr<FrameBuffer> framebuffer;
+        std::vector<AtlasRegion*> textures;
     };
-    void createNewLayer();
+    void createNewLayer(bool smooth);
 
-    std::optional<FreeRegion> findBestRegion(int width, int height) {
-        auto sizeIt = m_freeRegionsBySize.lower_bound(width * height);
-        while (sizeIt != m_freeRegionsBySize.end()) {
+    std::optional<FreeRegion> findBestRegion(int width, int height, bool smooth) {
+        auto sizeIt = m_filterGroups[smooth].freeRegionsBySize.lower_bound(width * height);
+        while (sizeIt != m_filterGroups[smooth].freeRegionsBySize.end()) {
             for (const auto& region : sizeIt->second) {
                 if (region.canFit(width, height)) {
                     return region;
@@ -92,15 +106,15 @@ private:
         return std::nullopt;
     }
 
-    void splitRegion(const FreeRegion& region, int width, int height) {
-        m_freeRegions.erase(region);
-        m_freeRegionsBySize[region.width * region.height].erase(region);
+    void splitRegion(const FreeRegion& region, int width, int height, bool smooth) {
+        m_filterGroups[smooth].freeRegions.erase(region);
+        m_filterGroups[smooth].freeRegionsBySize[region.width * region.height].erase(region);
 
         auto insertRegion = [&](int x, int y, int w, int h) {
             if (w > 0 && h > 0) {
                 FreeRegion r = { x, y, w, h, region.layer };
-                m_freeRegions.insert(r);
-                m_freeRegionsBySize[w * h].insert(r);
+                m_filterGroups[smooth].freeRegions.insert(r);
+                m_filterGroups[smooth].freeRegionsBySize[w * h].insert(r);
             }
         };
 
@@ -110,12 +124,15 @@ private:
     }
 
     Fw::TextureAtlasType m_type;
-    int m_atlasWidth;
-    int m_atlasHeight;
+    Size m_size;
 
-    std::vector<Layer> m_layers;
-    std::set<FreeRegion> m_freeRegions;
-    std::map<int, std::set<FreeRegion>> m_freeRegionsBySize;
-    phmap::flat_hash_map<std::pair<int, int>, std::vector<TextureInfo>, PairHash> m_inactiveTextures;
-    phmap::flat_hash_map<uint32_t, TextureInfo> m_texturesCached;
+    struct
+    {
+        std::vector<Layer> layers;
+        std::set<FreeRegion> freeRegions;
+        std::map<int, std::set<FreeRegion>> freeRegionsBySize;
+        phmap::flat_hash_map<std::pair<int, int>, std::vector<std::unique_ptr<AtlasRegion>>, PairHash> inactiveTextures;
+    } m_filterGroups[AtlasFilter::ATLAS_FILTER_COUNT];
+
+    phmap::flat_hash_map<uint32_t, std::unique_ptr<AtlasRegion>> m_texturesCached;
 };

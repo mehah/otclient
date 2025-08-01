@@ -52,8 +52,19 @@ void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_
     if (flags == Otc::DrawLights)
         thing->drawLight(newDest, lightView);
     else {
+        if (thing->isSingleGround())
+            g_drawPool.setDrawOrder(DrawOrder::FIRST);
+        else if (thing->isSingleGroundBorder())
+            g_drawPool.setDrawOrder(DrawOrder::SECOND);
+        else if (thing->isEffect() && g_app.isDrawingEffectsOnTop())
+            g_drawPool.setDrawOrder(DrawOrder::FOURTH);
+        else
+            g_drawPool.setDrawOrder(DrawOrder::THIRD);
+
         thing->draw(newDest, flags & Otc::DrawThings, lightView);
         updateElevation(thing, drawElevation);
+
+        g_drawPool.resetDrawOrder();
     }
 }
 
@@ -123,6 +134,8 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
+    const auto& newDest = dest - drawElevation * g_drawPool.getScaleFactor();
+
     bool localPlayerDrawed = false;
     if (hasCreatures()) {
         for (const auto& thing : m_things) {
@@ -137,6 +150,7 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
         }
     }
 
+    g_drawPool.setDrawOrder(DrawOrder::THIRD);
     for (const auto& creature : m_walkingCreatures) {
         const auto& cDest = Point(
             dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - creature->getDrawElevation()) * g_drawPool.getScaleFactor(),
@@ -148,6 +162,7 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
         else
             creature->draw(cDest, flags & Otc::DrawThings);
     }
+    g_drawPool.resetDrawOrder();
 
     // draw the local character if he is on a virtual tile, that is, his visual position is not the same as the server.
     if (!localPlayerDrawed && g_game.getLocalPlayer() && !g_game.getLocalPlayer()->isWalking() && g_game.getLocalPlayer()->getPosition() == m_position) {
@@ -160,6 +175,8 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
+    drawElevation = 0;
+
     if (m_effects) {
         for (const auto& effect : *m_effects)
             drawThing(effect, dest, flags & Otc::DrawThings, drawElevation);
@@ -168,7 +185,7 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
     if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
-            item->draw(dest, flags & Otc::DrawThings);
+            drawThing(item, dest, flags & Otc::DrawThings, drawElevation);
         }
     }
 }
@@ -298,27 +315,13 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     m_things.insert(m_things.begin() + stackPos, thing);
 
-    // get the elevation status before analyze the new item.
-    const bool hasElev = hasElevation();
-
     setThingFlag(thing);
 
     if (size > g_gameConfig.getTileMaxThings())
         removeThing(m_things[g_gameConfig.getTileMaxThings()]);
 
-    // Do not change if you do not understand what is being done.
-    {
-        if (const auto& ground = getGround()) {
-            stackPos = std::max<int>(stackPos - 1, 0);
-            if (ground->isTopGround()) {
-                ground->ungroup();
-                thing->ungroup();
-            }
-        }
-    }
-
     updateThingStackPos();
-    thing->setPosition(m_position, stackPos, hasElev);
+    thing->setPosition(m_position, stackPos);
     thing->onAppear();
 
     updateElevation(thing, m_drawElevation);

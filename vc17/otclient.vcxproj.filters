@@ -1121,6 +1121,9 @@
     <ClInclude Include="..\src\framework\graphics\textureatlas.h">
       <Filter>Header Files\framework\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\framework\util\spinlock.h">
+      <Filter>Header Files\framework\util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\otcicon.rc">

@@ -84,7 +84,7 @@ public:
     void setCount(const int count) { m_countOrSubType = count; updatePatterns(); }
     void setSubType(const int subType) { m_countOrSubType = subType; updatePatterns(); }
     void setColor(const Color& c) { if (m_color != c) m_color = c; }
-    void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false) override;
+    void setPosition(const Position& position, uint8_t stackPos = 0) override;
     void setTooltip(const std::string& str) { m_tooltip = str; }
     void setDurationTime(const uint32_t durationTime) { m_durationTime = durationTime; }
     void setCharges(const uint32_t charges) { m_charges = charges; }
@@ -159,7 +159,6 @@ private:
     ThingType* getThingType() const override;
 
     void internalDraw(int animationPhase, const Point& dest, const Color& color, bool drawThings, bool replaceColorShader, const LightViewPtr& lightView = nullptr);
-    void setConductor();
 
     uint16_t m_countOrSubType{ 0 };
     uint32_t m_durationTime{ 0 };

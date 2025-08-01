@@ -228,20 +228,20 @@ public:
     void addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback);
     void removeOnDestroyCallback(const std::string&);
 
-    void setBackgroundDrawOrder(const uint8_t order) { m_backgroundDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
-    void setImageDrawOrder(const uint8_t order) { m_imageDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
-    void setIconDrawOrder(const uint8_t order) { m_iconDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
-    void setTextDrawOrder(const uint8_t order) { m_textDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
-    void setBorderDrawOrder(const uint8_t order) { m_borderDrawConductor.order = std::min<uint8_t>(order, LAST - 1); }
+    void setBackgroundDrawOrder(const uint8_t order) { m_backgroundDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
+    void setImageDrawOrder(const uint8_t order) { m_imageDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
+    void setIconDrawOrder(const uint8_t order) { m_iconDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
+    void setTextDrawOrder(const uint8_t order) { m_textDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
+    void setBorderDrawOrder(const uint8_t order) { m_borderDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
 
 private:
     uint32_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
 
-    DrawConductor m_backgroundDrawConductor;
-    DrawConductor m_imageDrawConductor;
-    DrawConductor m_iconDrawConductor;
-    DrawConductor m_borderDrawConductor;
+    DrawOrder m_backgroundDrawOrder{ DrawOrder::FIRST };
+    DrawOrder m_imageDrawOrder{ DrawOrder::FIRST };
+    DrawOrder m_iconDrawOrder{ DrawOrder::FIRST };
+    DrawOrder m_borderDrawOrder{ DrawOrder::FIRST };
 
     // state managment
 protected:
@@ -385,7 +385,7 @@ protected:
     uint16_t m_autoRepeatDelay{ 500 };
     Point m_lastClickPosition;
 
-    DrawConductor m_textDrawConductor;
+    DrawOrder m_textDrawOrder{ DrawOrder::FIRST };
 
 public:
     void setX(const int x) { move(x, getY()); }
@@ -598,6 +598,7 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
+    bool m_atlased{ false };
 
 public:
     void resizeToText();

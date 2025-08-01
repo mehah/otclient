@@ -24,6 +24,7 @@
 #include "uiwidget.h"
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
+#include <framework/graphics/textureatlas.h>
 #include <regex>
 
 void UIWidget::initText()
@@ -104,6 +105,12 @@ void UIWidget::drawText(const Rect& screenCoords)
     if (m_drawText.empty() || m_color.aF() == 0.f || !m_font)
         return;
 
+    // Hack to fix font rendering in atlas
+    if (!m_atlased && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
+        m_atlased = true;
+        m_textCachedScreenCoords = {};
+    }
+
     if (screenCoords != m_textCachedScreenCoords) {
         m_textCachedScreenCoords = screenCoords;
 
@@ -120,14 +127,16 @@ void UIWidget::drawText(const Rect& screenCoords)
     }
 
     g_drawPool.scale(m_fontScale);
+    g_drawPool.setDrawOrder(m_textDrawOrder);
     if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
-        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color, m_textDrawConductor);
+        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color);
     } else {
         const auto& texture = m_font->getTexture();
         for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
-            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
+            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
         }
     }
+    g_drawPool.resetDrawOrder();
     g_drawPool.scale(1.f); // reset scale
 }
 
