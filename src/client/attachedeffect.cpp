@@ -117,6 +117,7 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
         if (lightView && m_light.intensity > 0)
             lightView->addLightSource(dest, m_light);
 
+        auto lastDrawOrder = g_drawPool.getDrawOrder();
         g_drawPool.setDrawOrder(getDrawOrder());
 
         if (m_texture) {
@@ -131,7 +132,7 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
             getThingType()->draw(point, 0, m_direction, 0, 0, animation, Color::white, drawThing, lightView);
         }
 
-        g_drawPool.resetDrawOrder();
+        g_drawPool.setDrawOrder(lastDrawOrder);
 
         if (m_pulse.height > 0 && m_pulse.speed > 0) {
             g_drawPool.setScaleFactor(scaleFactor);

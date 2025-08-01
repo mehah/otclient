@@ -134,8 +134,6 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
-    g_drawPool.setDrawOrder(DrawOrder::THIRD);
-
     const auto& newDest = dest - drawElevation * g_drawPool.getScaleFactor();
 
     bool localPlayerDrawed = false;
@@ -148,10 +146,11 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
                 localPlayerDrawed = true;
             }
 
-            thing->draw(newDest, flags & Otc::DrawThings, lightView);
+            drawThing(thing, dest, flags, drawElevation, lightView);
         }
     }
 
+    g_drawPool.setDrawOrder(DrawOrder::THIRD);
     for (const auto& creature : m_walkingCreatures) {
         const auto& cDest = Point(
             dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - creature->getDrawElevation()) * g_drawPool.getScaleFactor(),
@@ -163,13 +162,12 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
         else
             creature->draw(cDest, flags & Otc::DrawThings);
     }
+    g_drawPool.resetDrawOrder();
 
     // draw the local character if he is on a virtual tile, that is, his visual position is not the same as the server.
     if (!localPlayerDrawed && g_game.getLocalPlayer() && !g_game.getLocalPlayer()->isWalking() && g_game.getLocalPlayer()->getPosition() == m_position) {
-        g_game.getLocalPlayer()->draw(newDest, flags & Otc::DrawThings, lightView);
+        drawThing(g_game.getLocalPlayer(), dest, flags, drawElevation, lightView);
     }
-
-    g_drawPool.resetDrawOrder();
 }
 
 void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uint8_t drawElevation)

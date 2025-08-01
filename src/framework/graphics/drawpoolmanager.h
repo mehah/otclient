@@ -92,6 +92,7 @@ public:
     uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
     const auto getAtlas() const { return getCurrentPool()->getAtlas(); }
     bool isValid() const;
+    auto getDrawOrder() const { return getCurrentPool()->getDrawOrder(); }
 
     template<typename T>
     void setParameter(std::string_view name, T&& value) { getCurrentPool()->setParameter(name, value); }
