@@ -209,18 +209,18 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
 void DrawPoolManager::drawObjects(DrawPool* pool) {
     const auto hasFramebuffer = pool->hasFrameBuffer();
 
-    const auto isRead = pool->isDrawState(DrawPoolState::READY_TO_SWAP);
-    if (!isRead && hasFramebuffer)
+    const auto shouldRepaint = pool->shouldRepaint();
+    if (!shouldRepaint && hasFramebuffer)
         return;
 
     if (hasFramebuffer)
         pool->m_framebuffer->bind();
 
-    pool->waitWhileStateIs(DrawPoolState::UPDATING_BUFFER);
-    pool->setDrawState(DrawPoolState::SWAPPING_BUFFERS);
-    if (isRead)
+    if (shouldRepaint) {
+        SpinLock::Guard guard(pool->m_threadLock);
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
-    pool->setDrawState(DrawPoolState::READY_TO_DRAW);
+        pool->m_shouldRepaint.store(false, std::memory_order_release);
+    }
 
     for (auto& obj : pool->m_objectsDraw[1]) {
         drawObject(pool, obj);

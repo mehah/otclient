@@ -29,6 +29,7 @@
 #include "framework/core/timer.h"
 #include <framework/core/graphicalapplication.h>
 #include <framework/platform/platformwindow.h>
+#include <framework/util/spinlock.h>
 
 #include "../stdext/storage.h"
 #include <unordered_set>
@@ -51,15 +52,6 @@ enum DrawOrder : uint8_t
     FOURTH, // TOP ~ TOP
     FIFTH,  // ABOVE ALL - MISSILE
     LAST
-};
-
-enum class DrawPoolState
-{
-    NOT_INITIALIZED,
-    UPDATING_BUFFER,
-    READY_TO_SWAP,
-    SWAPPING_BUFFERS,
-    READY_TO_DRAW
 };
 
 struct DrawHashController
@@ -142,10 +134,6 @@ public:
     void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
-    bool isDrawState(DrawPoolState state) const {
-        return m_drawState.load(std::memory_order_acquire) == state;
-    }
-
     auto& getHashController() {
         return m_hashCtrl;
     }
@@ -154,8 +142,12 @@ public:
         return m_atlas.get();
     }
 
+    bool shouldRepaint() const {
+        return m_shouldRepaint.load(std::memory_order_acquire);
+    }
+
     void release() {
-        waitWhileStateIs(DrawPoolState::SWAPPING_BUFFERS);
+        SpinLock::Guard guard(m_threadLock);
 
         if (!canRepaint()) {
             for (auto& objs : m_objects)
@@ -164,9 +156,10 @@ public:
             return;
         }
 
+        m_shouldRepaint.store(true, std::memory_order_release);
+
         m_refreshTimer.restart();
 
-        setDrawState(DrawPoolState::UPDATING_BUFFER);
         m_objectsDraw[0].clear();
 
         if (!m_objectsFlushed.empty()) {
@@ -204,16 +197,9 @@ public:
                 objs.clear();
             }
         }
-        setDrawState(DrawPoolState::READY_TO_SWAP);
     }
 
-    void waitWhileStateIs(DrawPoolState state) {
-        while (isDrawState(state)); // spinlock
-    }
-
-    void setDrawState(DrawPoolState state) {
-        m_drawState.store(state, std::memory_order_release);
-    }
+    auto& getThreadLock() { return m_threadLock; }
 
 protected:
 
@@ -444,9 +430,10 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic<DrawPoolState> m_drawState = DrawPoolState::NOT_INITIALIZED;
+    SpinLock m_threadLock;
 
     TextureAtlasPtr m_atlas;
+    std::atomic_bool m_shouldRepaint;
 
     friend class DrawPoolManager;
 };
