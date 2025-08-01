@@ -55,11 +55,11 @@ enum DrawOrder : uint8_t
 
 enum class DrawPoolState
 {
-    UNINITIALIZED,
-    PREPARING,
-    READY,
-    DRAWING,
-    RENDERED
+    NOT_INITIALIZED,
+    COLLECTING,
+    READY_TO_SWAP,
+    SWAPPING_BUFFERS,
+    READY_TO_DRAW
 };
 
 struct DrawHashController
@@ -162,8 +162,8 @@ public:
 
         m_refreshTimer.restart();
 
-        waitWhileStateIs(DrawPoolState::DRAWING);
-        setDrawState(DrawPoolState::PREPARING);
+        waitWhileStateIs(DrawPoolState::SWAPPING_BUFFERS);
+        setDrawState(DrawPoolState::COLLECTING);
 
         m_objectsDraw[0].clear();
 
@@ -202,7 +202,7 @@ public:
             }
         }
 
-        setDrawState(DrawPoolState::READY);
+        setDrawState(DrawPoolState::READY_TO_SWAP);
         m_objectsFlushed.clear();
     }
 
@@ -443,7 +443,7 @@ private:
     std::function<void()> m_beforeDraw;
     std::function<void()> m_afterDraw;
 
-    std::atomic<DrawPoolState> m_drawState = DrawPoolState::UNINITIALIZED;
+    std::atomic<DrawPoolState> m_drawState = DrawPoolState::NOT_INITIALIZED;
 
     TextureAtlasPtr m_atlas;
 

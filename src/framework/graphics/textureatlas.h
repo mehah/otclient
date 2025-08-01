@@ -77,9 +77,7 @@ public:
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id, bool smooth);
 
-    auto getTexture(int layer, bool smooth) const {
-        return m_filterGroups[smooth].layers[layer].framebuffer->getTexture();
-    }
+    const TexturePtr& getTexture(int layer, bool smooth) const;
 
     Size getSize() const { return m_size; }
 
