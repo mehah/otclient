@@ -373,19 +373,16 @@ void UIWidget::drawBorder(const Rect& screenCoords) const
     // top
     if (m_borderWidth.top > 0) {
         const Rect borderRect(screenCoords.topLeft(), screenCoords.width(), m_borderWidth.top);
-        g_drawPool.resetDrawOrder();
     }
     // right
     if (m_borderWidth.right > 0) {
         const Rect borderRect(screenCoords.topRight() - Point(m_borderWidth.right - 1, 0), m_borderWidth.right, screenCoords.height());
         g_drawPool.addFilledRect(borderRect, m_borderColor.right);
-        g_drawPool.resetDrawOrder();
     }
     // bottom
     if (m_borderWidth.bottom > 0) {
         const Rect borderRect(screenCoords.bottomLeft() - Point(0, m_borderWidth.bottom - 1), screenCoords.width(), m_borderWidth.bottom);
         g_drawPool.addFilledRect(borderRect, m_borderColor.bottom);
-        g_drawPool.resetDrawOrder();
     }
     // left
     if (m_borderWidth.left > 0) {
