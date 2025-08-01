@@ -6,7 +6,7 @@
 class SpinLock
 {
     alignas(64) std::atomic_flag m_flag = ATOMIC_FLAG_INIT;
-    char padding[64 - sizeof(std::atomic_flag)]; // evita false sharing real
+    char padding[64 - sizeof(std::atomic_flag)];
 
 public:
     SpinLock() noexcept = default;
@@ -26,7 +26,7 @@ public:
             } else if (++yield_count < 20) {
                 std::this_thread::yield();
             } else {
-                std::this_thread::sleep_for(std::chrono::microseconds(100)); // último recurso
+                std::this_thread::sleep_for(std::chrono::microseconds(100));
             }
         }
     }
@@ -39,7 +39,6 @@ public:
         return !m_flag.test_and_set(std::memory_order_acquire);
     }
 
-    // RAII Guard
     class Guard
     {
     public:

@@ -108,7 +108,8 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         for (const auto& [dest, src] : m_glyphsSelectRectCache)
             g_drawPool.addFilledRect(dest, m_selectionBackgroundColor);
 
-        g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_selectionColor);
+        for (const auto& [dest, src] : m_glyphsSelectRectCache)
+            g_drawPool.addTexturedRect(dest, texture, src, m_selectionColor);
     }
 
     // render cursor
@@ -367,14 +368,14 @@ void UITextEdit::update(const bool focusCursor)
         else
             atlas = g_drawPool.get(DrawPoolType::FOREGROUND)->getAtlas();
 
+        // render glyph
+        m_glyphsCoords[i].first = glyphScreenCoords;
+        m_glyphsCoords[i].second = glyphTextureCoords;
+
         if (atlas) {
             if (const auto region = m_font->getTexture()->getAtlas(atlas->getType()))
                 glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
         }
-
-        // render glyph
-        m_glyphsCoords[i].first = glyphScreenCoords;
-        m_glyphsCoords[i].second = glyphTextureCoords;
 
         if (textColorsSize > 0) {
             coords->addRect(glyphScreenCoords, glyphTextureCoords);
