@@ -155,16 +155,18 @@ public:
     }
 
     void release() {
+        waitWhileStateIs(DrawPoolState::SWAPPING_BUFFERS);
+
         if (!canRepaint()) {
+            for (auto& objs : m_objects)
+                objs.clear();
             m_objectsFlushed.clear();
             return;
         }
 
         m_refreshTimer.restart();
 
-        waitWhileStateIs(DrawPoolState::SWAPPING_BUFFERS);
         setDrawState(DrawPoolState::COLLECTING);
-
         m_objectsDraw[0].clear();
 
         if (!m_objectsFlushed.empty()) {
@@ -177,6 +179,7 @@ public:
                     std::make_move_iterator(m_objectsFlushed.begin()),
                     std::make_move_iterator(m_objectsFlushed.end()));
             }
+            m_objectsFlushed.clear();
         }
 
         for (auto& objs : m_objects) {
@@ -201,9 +204,7 @@ public:
                 objs.clear();
             }
         }
-
         setDrawState(DrawPoolState::READY_TO_SWAP);
-        m_objectsFlushed.clear();
     }
 
 protected:
