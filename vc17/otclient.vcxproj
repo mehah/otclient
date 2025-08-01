@@ -673,6 +673,7 @@
     <ClInclude Include="..\src\framework\util\point.h" />
     <ClInclude Include="..\src\framework\util\rect.h" />
     <ClInclude Include="..\src\framework\util\size.h" />
+    <ClInclude Include="..\src\framework\util\spinlock.h" />
     <ClInclude Include="..\src\gitinfo.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,12 @@
 #pragma once
+
 #include <atomic>
 #include <thread>
 #include <chrono>
+
+#if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
+#include <immintrin.h>
+#endif
 
 class SpinLock
 {
@@ -46,7 +51,6 @@ public:
 private:
     static inline void cpu_relax() {
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
-#include <immintrin.h>
         _mm_pause();
 #elif defined(__aarch64__) || defined(__arm__)
         __asm__ __volatile__("yield");
