@@ -955,18 +955,21 @@ int getSmoothedElevation(const Creature* creature, const int currentElevation, c
 }
 
 int Creature::getDrawElevation() {
-    int elevation = 0;
     if (m_walkingTile) {
-        elevation = m_walkingTile->getDrawElevation();
+        int elevation = m_walkingTile->getDrawElevation();
 
         if (g_game.getFeature(Otc::GameSmoothWalkElevation)) {
             const float factor = std::clamp<float>(getWalkTicksElapsed() / static_cast<float>(m_stepCache.getDuration(m_lastStepDirection)), .0f, 1.f);
             elevation = getSmoothedElevation(this, elevation, factor);
         }
-    } else if (const auto& tile = getTile())
-        elevation = tile->getDrawElevation();
 
-    return elevation;
+        return elevation;
+    }
+
+    if (const auto& tile = g_map.getTile(getPosition()))
+        return tile->getDrawElevation();
+
+    return 0;
 }
 
 bool Creature::hasSpeedFormula() { return g_game.getFeature(Otc::GameNewSpeedLaw) && speedA != 0 && speedB != 0 && speedC != 0; }
