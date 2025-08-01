@@ -41,7 +41,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
         pool->m_hashCtrl = true;
     } else {
         pool->m_alwaysGroupDrawings = true; // CREATURE_INFORMATION & TEXT
-        pool->setFPS(60);
+        pool->setFPS(500);
     }
 
     pool->m_type = type;
