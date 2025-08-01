@@ -222,10 +222,6 @@ void DrawPoolManager::drawObjects(DrawPool* pool) {
         pool->m_objectsDraw[0].swap(pool->m_objectsDraw[1]);
     pool->setDrawState(DrawPoolState::RENDERED);
 
-    if (pool->m_type == DrawPoolType::CREATURE_INFORMATION) {
-        g_logger.info(std::to_string(pool->m_objectsDraw[1].size()));
-    }
-
     for (auto& obj : pool->m_objectsDraw[1]) {
         drawObject(pool, obj);
     }
