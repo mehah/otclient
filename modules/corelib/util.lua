@@ -455,3 +455,14 @@ end
 io.content = function(path)
     return g_resources.readFileContents('/' .. path)
 end
+
+function pdumpWidgetId(widget, indent)
+    indent = indent or ""
+    local children = widget:getChildren()
+    for i, child in ipairs(children) do
+        local prefix = (i == #children) and "`-- " or "|-- "
+        print(indent .. prefix .. child:getId())
+        local newIndent = (i == #children) and (indent .. "    ") or (indent .. "|   ")
+        pdumpWidgetId(child, newIndent)
+    end
+end
