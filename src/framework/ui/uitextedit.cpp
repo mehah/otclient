@@ -77,7 +77,7 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     // Hack to fix font rendering in atlas
     if (m_atlased > 0 && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
         --m_atlased;
-        update();
+        update(false, true);
     }
 
     const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
@@ -133,7 +133,7 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     }
 }
 
-void UITextEdit::update(const bool focusCursor)
+void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 {
     if (!getProp(PropUpdatesEnabled))
         return;
@@ -388,7 +388,7 @@ void UITextEdit::update(const bool focusCursor)
         m_colorCoordsBuffer.emplace_back(Color(rgba), crds);
     }
 
-    if (fireAreaUpdate)
+    if (!disableAreaUpdate && fireAreaUpdate)
         onTextAreaUpdate(m_textVirtualOffset, m_textVirtualSize, m_textTotalSize);
 
     repaint();
