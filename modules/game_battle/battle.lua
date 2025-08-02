@@ -99,6 +99,9 @@ function init() -- Initiating the module (load)
     battlePanel = battleWindow:recursiveGetChildById('battlePanel')
     filterPanel = battleWindow:recursiveGetChildById('filterPanel')
     toggleFilterButton = battleWindow:recursiveGetChildById('toggleFilterButton')
+    HorizontalSeparator = battleWindow:recursiveGetChildById('HorizontalSeparator')
+    contentsPanel = battleWindow:recursiveGetChildById('contentsPanel')
+    miniwindowScrollBar = battleWindow:recursiveGetChildById('miniwindowScrollBar')
 
     -- Hide/Show Filter Options
     local settings = g_settings.getNode('BattleList')
@@ -107,28 +110,13 @@ function init() -- Initiating the module (load)
     end
 
     -- Adding Filter options
-    local options = { 'hidePlayers', 'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty' }
+    local options = { 'hidePlayers', 'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty', 'hideKnights', 'hidePaladins', 'hideDruids', 'hideSorcerers', 'hideMonks', 'hideSummons', 'hideMembersOwnGuild' }
     for i, v in ipairs(options) do
         hideButtons[v] = battleWindow:recursiveGetChildById(v)
     end
 
-    -- Adding SortType and SortOrder options
-    local sortTypeOptions = { 'Name', 'Distance', 'Age', 'Health' }
-    local sortOrderOptions = { 'Asc.', 'Desc.' }
-
-    local sortTypeBox = battleWindow:recursiveGetChildById('sortTypeBox')
-    for i, v in ipairs(sortTypeOptions) do
-        sortTypeBox:addOption(v, v:lower())
-    end
-
-    local sortOrderBox = battleWindow:recursiveGetChildById('sortOrderBox')
-    for i, v in ipairs(sortOrderOptions) do
-        sortOrderBox:addOption(v, v:lower())
-    end
-    sortTypeBox:setCurrentOptionByData(getSortType())
-    sortTypeBox.onOptionChange = onChangeSortType
-    sortOrderBox:setCurrentOptionByData(getSortOrder())
-    sortOrderBox.onOptionChange = onChangeSortOrder
+    -- Reorganize filter buttons layout after setup (with small delay for OTUI setup)
+    scheduleEvent(reorganizeFilterButtons, 50)
 
     -- Adding mouse Widget
     mouseWidget = g_ui.createWidget('UIButton')
@@ -149,6 +137,52 @@ function init() -- Initiating the module (load)
     if g_game.isOnline() then
         battleWindow:setupOnStart()
     end
+end
+
+-- Function to reorganize filter buttons layout when some are hidden
+local function reorganizeFilterButtons()
+    if not filterPanel then return end
+
+    local filterRow1 = filterPanel:getChildById('filterRow1')
+    local filterRow2 = filterPanel:getChildById('filterRow2')
+
+    if not filterRow1 or not filterRow2 then return end
+
+    -- The correct order for the battle filter buttons (7 for row1, 5 for row2)
+    local orderedIds = {
+        'hidePlayers', 'hideKnights', 'hidePaladins', 'hideDruids', 'hideSorcerers', 'hideMonks', 'hideSummons',
+        'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty', 'hideMembersOwnGuild'
+    }
+
+    -- Remove all filter buttons from their current parents (only those belonging to MiniWindowBattle)
+    for _, id in ipairs(orderedIds) do
+        local btn = hideButtons[id]
+        if btn and btn:getParent() then
+            btn:getParent():removeChild(btn)
+        end
+    end
+
+    -- Add visible buttons back, 7 to row1, 5 to row2
+    local visibleButtons = {}
+    for _, id in ipairs(orderedIds) do
+        local btn = hideButtons[id]
+        if btn and btn:isVisible() then
+            table.insert(visibleButtons, btn)
+        end
+    end
+
+    for i, btn in ipairs(visibleButtons) do
+        if i <= 7 then
+            filterRow1:addChild(btn)
+        else
+            filterRow2:addChild(btn)
+        end
+    end
+
+    -- Update layouts
+    if filterRow1:getLayout() then filterRow1:getLayout():update() end
+    if filterRow2:getLayout() then filterRow2:getLayout():update() end
+    if filterPanel:getLayout() then filterPanel:getLayout():update() end
 end
 
 -- Binary Search, Insertion and Resort functions
@@ -330,6 +364,9 @@ end
 function onGameStart()
     battleWindow:setupOnStart() -- load character window configuration
 
+    -- Reorganize filter buttons layout based on client version
+    reorganizeFilterButtons()
+
     -- Temp fix
     scheduleEvent(checkCreatures, 200)
 end
@@ -468,16 +505,76 @@ function doCreatureFitFilters(creature) -- Check if creature fit current applied
     end -- or not localPlayer:hasSight(pos)
     for i, v in pairs(hideButtons) do
         if v:isChecked() then
-            if (i == 'hidePlayers' and creature:isPlayer()) or (i == 'hideNPCs' and creature:isNpc()) or
-                (i == 'hideMonsters' and creature:isMonster()) or
-                (i == 'hideSkulls' and (creature:isPlayer() and creature:getSkull() == SkullNone)) or
-                (i == 'hideParty' and creature:getShield() > ShieldWhiteBlue) then
+             if (i == 'hidePlayers' and creature:isPlayer()) or 
+               (i == 'hideNPCs' and creature:isNpc()) or
+               (i == 'hideMonsters' and creature:isMonster()) or
+               (i == 'hideSkulls' and (creature:isPlayer() and creature:getSkull() == SkullNone)) or
+               (i == 'hideParty' and creature:isPlayer() and (function()
+                   -- TODO: RESTORE WHEN PARTY FUNCTIONS IS IMPLEMENTED
+                   -- Original code to restore when localPlayer:getParty():getMembers() is available:
+                   --[[
+                   local party = localPlayer:getParty()
+                   if party then
+                       local partyMembers = party:getMembers()
+                       if partyMembers then
+                           for _, member in ipairs(partyMembers) do
+                               if member:getId() == creature:getId() then
+                                   return true
+                               end
+                           end
+                       end
+                   end
+                   return false
+                   --]]
+                   
+                   -- TEMPORARY FIX: Use shield-based party detection
+                   -- This checks if the creature has a party shield (may not be 100% accurate)
+                   local shield = creature:getShield()
+                   return shield and (shield == ShieldYellow or 
+                                    shield == ShieldYellowSharedExp or 
+                                    shield == ShieldYellowNoSharedExp or 
+                                    shield == ShieldBlue or 
+                                    shield == ShieldBlueNoSharedExpBlink or 
+                                    shield == ShieldBlueSharedExp or 
+                                    shield == ShieldYellowNoSharedExpBlink)
+               end)()) or
+               (i == 'hideKnights' and creature:isPlayer() and (function()
+                   local vocation = creature:getVocation()
+                   return vocation and (vocation == 1 or vocation == 11)
+               end)()) or
+               (i == 'hidePaladins' and creature:isPlayer() and (function()
+                   local vocation = creature:getVocation()
+                   return vocation and (vocation == 2 or vocation == 12)
+               end)()) or
+               (i == 'hideDruids' and creature:isPlayer() and (function()
+                   local vocation = creature:getVocation()
+                   return vocation and (vocation == 4 or vocation == 14)
+               end)()) or
+               (i == 'hideSorcerers' and creature:isPlayer() and (function()
+                   local vocation = creature:getVocation()
+                   return vocation and (vocation == 3 or vocation == 13)
+               end)()) or
+               (i == 'hideMonks' and creature:isPlayer() and (function()
+                   local vocation = creature:getVocation()
+                   --TODO: Check if vocation 5 and 15 are correct for Monks
+                   return vocation and (vocation == 5 or vocation == 15)
+               end)()) or
+               (i == 'hideSummons' and creature:isMonster() and (function()
+                   local masterId = creature:getMasterId()
+                   return masterId and masterId > 0
+               end)()) or
+               (i == 'hideMembersOwnGuild' and creature:isPlayer() and creature:getEmblem() == localPlayer:getEmblem() and creature:getEmblem() ~= EmblemNone) then
                 return false
             end
         end
     end
 
     return true
+end
+
+function onFilterButtonClick(button)
+    button:setChecked(not button:isChecked())
+    checkCreatures()
 end
 
 local function canBeSeen(creature)
@@ -669,17 +766,21 @@ function hideFilterPanel() -- Hide Filter panel
     filterPanel.originalHeight = filterPanel:getHeight()
     filterPanel:setHeight(0)
     toggleFilterButton:getParent():setMarginTop(0)
-    toggleFilterButton:setImageClip(torect('0 0 21 12'))
     setHidingFilters(true)
+    HorizontalSeparator:setVisible(false)
     filterPanel:setVisible(false)
+    contentsPanel:setMarginTop(-10)
+    miniwindowScrollBar:setMarginTop(-3)
 end
 
 function showFilterPanel() -- Show Filter panel
-    toggleFilterButton:getParent():setMarginTop(5)
+    toggleFilterButton:getParent():setMarginTop()
     filterPanel:setHeight(filterPanel.originalHeight)
-    toggleFilterButton:setImageClip(torect('21 0 21 12'))
     setHidingFilters(false)
+    HorizontalSeparator:setVisible(true)
     filterPanel:setVisible(true)
+    contentsPanel:setMarginTop(0)
+    miniwindowScrollBar:setMarginTop(0)
 end
 
 function toggleFilterPanel() -- Switching modes of filter panel (hide/show)

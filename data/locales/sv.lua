@@ -82,6 +82,7 @@ locale = {
     ["Banishment + Final Warning"] = "Bannlysning + Sista varning",
     ["Banishment"] = "Bannlysning",
     ["Battle"] = "Strid",
+    ["Battle List"] = "Stridslista",
     ["Browse Field"] = false,
     ["Browse"] = "Bläddra",
     ["Bug report sent."] = "Buggrapport Skickad.",

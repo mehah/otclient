@@ -202,6 +202,9 @@ minHeight,
         m_cameraFollowing = v;
     }
 
+    void setVocation(uint8_t vocation) { m_vocation = vocation; }
+    uint8_t getVocation() { return m_vocation; }
+
 protected:
     virtual void terminateWalk();
     virtual void onWalking() {};
@@ -351,6 +354,8 @@ private:
     bool m_isCovered{ false };
 
     StaticTextPtr m_text;
+
+    uint8_t m_vocation{ 0 };
 };
 
 // @bindclass
