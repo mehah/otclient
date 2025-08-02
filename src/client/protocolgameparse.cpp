@@ -2033,6 +2033,17 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
     data.dustLevel = msg->getU16();
 }
 
+void ProtocolGame::setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const
+{
+    const auto& creature = g_map.getCreatureById(creatureId);
+    if (!creature) {
+        return;
+    }
+
+    const uint8_t vocationId = msg->getU8();
+    creature->setVocation(vocationId);
+}
+
 void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const
 {
     const auto& creature = g_map.getCreatureById(creatureId);
@@ -2074,7 +2085,7 @@ void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
         case 11: // creature mana percent
         case 12: // creature show status
         case 13: // player vocation
-            msg->getU8();
+            setCreatureVocation(msg, creatureId);
             break;
         case 14: // creature icons
             addCreatureIcon(msg, creatureId);
@@ -3741,7 +3752,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                     creatureType = Proto::CreatureTypeSummonOther;
                 }
             } else if (creatureType == Proto::CreatureTypePlayer) {
-                msg->getU8(); // voc id
+                uint8_t vocationId = msg->getU8();
+                creature->setVocation(vocationId);
             }
         }
 

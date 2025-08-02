@@ -77,6 +77,7 @@ locale = {
     ["Banishment + Final Warning"] = "Banimento + Aviso final",
     ["Banishment"] = "Banimento",
     ["Battle"] = "Batalha",
+    ["Battle List"] = "Lista de Batalha",
     ["Browse Field"] = "Navegar Campo",
     ["Browse"] = "Navegar",
     ["Bug report sent."] = "Reporte de bug enviado.",
