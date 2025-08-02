@@ -20,7 +20,7 @@ local BattleButtonPool = ObjectPool.new(function()
         return widget
     end,
     function(obj)
-        obj:resetObjectPool()
+        obj:resetState()
         battlePanel:removeChild(obj)
     end)
 

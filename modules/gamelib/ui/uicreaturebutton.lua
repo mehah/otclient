@@ -192,7 +192,7 @@ function UICreatureButton:updateIcons(icons)
     end
 end
 
-function UICreatureButton:resetObjectPool()
+function UICreatureButton:resetState()
     self.isHovered = false
     self.isTarget = false
     self.isFollowed = false
