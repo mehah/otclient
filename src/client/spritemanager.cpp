@@ -205,20 +205,23 @@ void SpriteManager::unload()
     m_spritesFiles.clear();
 }
 
-ImagePtr SpriteManager::getSpriteImage(const int id)
+ImagePtr SpriteManager::getSpriteImage(const int id, bool& isLoading)
 {
     if (g_game.getProtocolVersion() >= 1281 && !g_game.getFeature(Otc::GameLoadSprInsteadProtobuf)) {
-        return g_spriteAppearances.getSpriteImage(id);
+        return g_spriteAppearances.getSpriteImage(id, isLoading);
     }
 
     const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
     if (const auto& sf = m_spritesFiles[threadId % m_spritesFiles.size()]) {
-        if (sf->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING)
+        if (g_app.isLoadingAsyncTexture() && sf->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING) {
+            isLoading = true;
             return nullptr;
+        }
 
         auto image = m_spritesHd ? getSpriteImageHd(id, sf->file) : getSpriteImage(id, sf->file);
 
-        sf->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
+        if (g_app.isLoadingAsyncTexture())
+            sf->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
 
         return image;
     }
