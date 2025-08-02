@@ -160,6 +160,10 @@ function UIMiniWindow:setupOnStart()
         else
             self:open(true)
         end
+    else
+        if self:getId() == "battleWindow" then
+            self:open(true)
+        end
     end
 
     local newParent = self:getParent()

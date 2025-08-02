@@ -192,3 +192,19 @@ function UICreatureButton:updateIcons(icons)
     end
 end
 
+function UICreatureButton:resetState()
+    self.isHovered = false
+    self.isTarget = false
+    self.isFollowed = false
+    if self.creature then
+        self.creature:hideStaticSquare()
+        self.creature = nil
+    end
+    self:getChildById('creature'):setBorderWidth(0)
+    self:getChildById('label'):setColor(CreatureButtonColors.onIdle.notHovered)
+    self:getChildById('skull'):setImageSource('')
+    self:getChildById('emblem'):setImageSource('')
+    for i = 1, 3 do
+        self:getChildById('iconsMonsterSlot' .. i):setImageSource('')
+    end
+end
