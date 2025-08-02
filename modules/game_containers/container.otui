@@ -68,7 +68,6 @@ ContainerWindow < MiniWindow
       type: grid
       cell-size: 34 34
       cell-spacing: 3
-      columns: 4
       flow: true
 
   UIWidget
