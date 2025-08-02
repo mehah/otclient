@@ -69,7 +69,12 @@ public:
     uint32_t getSignature() { return m_signature; }
     int getSpritesCount() { return m_spritesCount; }
 
-    ImagePtr getSpriteImage(int id);
+    ImagePtr getSpriteImage(int id) {
+        bool isLoading = false;
+        return  getSpriteImage(id, isLoading);
+    }
+
+    ImagePtr getSpriteImage(int id, bool& isLoading);
     bool isLoaded() { return m_loaded; }
 
 private:

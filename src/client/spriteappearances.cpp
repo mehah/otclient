@@ -175,7 +175,7 @@ void SpriteAppearances::unload()
     m_sheets.clear();
 }
 
-SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(const int id, const bool load /* = true */)
+SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(const int id, bool& isLoading, const bool load /* = true */)
 {
     if (id == 0) {
         return nullptr;
@@ -191,16 +191,18 @@ SpriteSheetPtr SpriteAppearances::getSheetBySpriteId(const int id, const bool lo
 
     const auto& sheet = *sheetIt;
 
-    if (load && !loadSpriteSheet(sheet))
+    if (load && !loadSpriteSheet(sheet)) {
+        isLoading = sheet->m_loadingState == SpriteLoadState::LOADING;
         return nullptr;
+    }
 
     return sheet;
 }
 
-ImagePtr SpriteAppearances::getSpriteImage(const int id)
+ImagePtr SpriteAppearances::getSpriteImage(const int id, bool& isLoading)
 {
     try {
-        const auto& sheet = getSheetBySpriteId(id);
+        const auto& sheet = getSheetBySpriteId(id, isLoading, true);
         if (!sheet) {
             return nullptr;
         }

@@ -725,9 +725,10 @@ void ThingType::loadTexture(const int animationPhase)
                         if (protobufSupported) {
                             const uint32_t spriteIndex = getSpriteIndex(-1, -1, spriteMask ? 1 : l, x, y, z, animationPhase);
                             auto spriteId = m_spritesIndex[spriteIndex];
-                            const auto& spriteImage = g_sprites.getSpriteImage(spriteId);
+                            bool isLoading = false;
+                            const auto& spriteImage = g_sprites.getSpriteImage(spriteId, isLoading);
 
-                            if (spriteId != 0 && !spriteImage)
+                            if (isLoading)
                                 return;
 
                             // verifies that the first block in the lower right corner is transparent.
@@ -750,9 +751,10 @@ void ThingType::loadTexture(const int animationPhase)
                                 for (int w = 0; w < m_size.width(); ++w) {
                                     const uint32_t spriteIndex = getSpriteIndex(w, h, spriteMask ? 1 : l, x, y, z, animationPhase);
                                     auto spriteId = m_spritesIndex[spriteIndex];
-                                    const auto& spriteImage = g_sprites.getSpriteImage(spriteId);
+                                    bool isLoading = false;
+                                    const auto& spriteImage = g_sprites.getSpriteImage(spriteId, isLoading);
 
-                                    if (spriteId != 0 && !spriteImage)
+                                    if (isLoading)
                                         return;
 
                                     // verifies that the first block in the lower right corner is transparent.

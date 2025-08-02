@@ -97,11 +97,19 @@ public:
     bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
     void saveSheetToFileBySprite(int id, const std::string& file);
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
-    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true);
+    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true) {
+        bool isLoading = false;
+        return getSheetBySpriteId(id, isLoading, load);
+    }
+    SpriteSheetPtr getSheetBySpriteId(int id, bool& isLoading, bool load = true);
 
     void addSpriteSheet(const SpriteSheetPtr& sheet) { m_sheets.emplace_back(sheet); }
 
-    ImagePtr getSpriteImage(int id);
+    ImagePtr getSpriteImage(int id) {
+        bool isLoading = false;
+        return getSpriteImage(id, isLoading);
+    }
+    ImagePtr getSpriteImage(int id, bool& isLoading);
     void saveSpriteToFile(int id, const std::string& file);
 
 private:
