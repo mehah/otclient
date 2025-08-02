@@ -213,7 +213,7 @@ ImagePtr SpriteManager::getSpriteImage(const int id, bool& isLoading)
 
     const auto threadId = g_app.isLoadingAsyncTexture() ? stdext::getThreadId() : 0;
     if (const auto& sf = m_spritesFiles[threadId % m_spritesFiles.size()]) {
-        if (g_app.isLoadingAsyncTexture() && sf->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING) {
+        if (sf->m_loadingState.exchange(SpriteLoadState::LOADING, std::memory_order_acq_rel) == SpriteLoadState::LOADING) {
             isLoading = true;
             return nullptr;
         }
@@ -273,8 +273,8 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
         int read = 0;
         bool hasAlpha = false;
 
-        constexpr int MAX_PIXEL_BLOCK = 4096;
-        uint8_t tempBuffer[MAX_PIXEL_BLOCK * 4]; // 4 = max channels
+        static constexpr int MAX_PIXEL_BLOCK = 4096;
+        static thread_local uint8_t tempBuffer[MAX_PIXEL_BLOCK * 4]; // 4 = max channels
 
         while (read < pixelDataSize && writePos < maxWriteSize) {
             const uint16_t transparentPixels = file->getU16();
