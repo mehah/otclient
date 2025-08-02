@@ -220,8 +220,7 @@ ImagePtr SpriteManager::getSpriteImage(const int id, bool& isLoading)
 
         auto image = m_spritesHd ? getSpriteImageHd(id, sf->file) : getSpriteImage(id, sf->file);
 
-        if (g_app.isLoadingAsyncTexture())
-            sf->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
+        sf->m_loadingState.store(SpriteLoadState::LOADED, std::memory_order_release);
 
         return image;
     }
