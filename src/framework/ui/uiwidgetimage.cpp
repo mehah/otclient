@@ -25,6 +25,7 @@
 #include <framework/graphics/animatedtexture.h>
 #include <framework/graphics/texture.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/graphics/textureatlas.h>
 #include <framework/util/crypt.h>
 
 void UIWidget::initImage() {}
@@ -92,6 +93,11 @@ void UIWidget::drawImage(const Rect& screenCoords)
     if (!m_imageTexture || !screenCoords.isValid())
         return;
 
+    // Hack to fix font rendering in atlas
+    if (!m_atlased && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
+        m_atlased = true;
+        m_imageCachedScreenCoords = {};
+    }
     // cache vertex buffers
     if (m_imageCachedScreenCoords != screenCoords) {
         m_imageCachedScreenCoords = screenCoords;
