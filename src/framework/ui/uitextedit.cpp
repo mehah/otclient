@@ -75,8 +75,8 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         setProp(PropGlyphsMustRecache, false);
 
     // Hack to fix font rendering in atlas
-    if (!m_atlased && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
-        m_atlased = true;
+    if (m_atlased > 0 && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
+        --m_atlased;
         update();
     }
 
