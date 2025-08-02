@@ -85,11 +85,14 @@ function UIMiniWindow:setup()
         end
     end
 
-    self:getChildById('lockButton').onClick = function()
-        if self:isDraggable() then
-            self:lock()
-        else
-            self:unlock()
+    local lockButton = self:getChildById('lockButton')
+    if lockButton then
+        lockButton.onClick = function()
+            if self:isDraggable() then
+                self:lock()
+            else
+                self:unlock()
+            end
         end
     end
 
