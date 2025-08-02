@@ -43,24 +43,27 @@ function onGameEditText(id, itemId, maxLength, text, writer, time)
         textItem:show()
     end
 
+    textItem:setBackgroundColor('#00000000')
     textItem:setItemId(itemId)
     textEdit:setMaxLength(maxLength)
     textEdit:setText(text)
     textEdit:setEditable(writeable)
     textEdit:setCursorVisible(writeable)
 
-    local desc = ''
+    local desc = tr('You read the following')
     if #writer > 0 then
-        desc = tr('You read the following, written by \n%s\n', writer)
+        desc = desc .. tr(', written by \n%s\n', writer)
         if #time > 0 then
             desc = desc .. tr('on %s.\n', time)
         end
     elseif #time > 0 then
-        desc = tr('You read the following, written on \n%s.\n', time)
+        desc = desc .. tr(', written on \n%s.\n', time)
+    else
+        desc = desc .. '.\n'
     end
 
     if #text == 0 and not writeable then
-        desc = tr('It is empty.')
+        desc = desc .. tr('It is empty.')
     elseif writeable then
         desc = desc .. tr('You can enter new text.')
     end
