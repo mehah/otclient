@@ -23,6 +23,7 @@
 #include "cachedtext.h"
 #include "fontmanager.h"
 #include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/textureatlas.h>
 
 CachedText::CachedText() : m_align(Fw::AlignCenter), m_coordsBuffer(std::make_shared<CoordsBuffer>()) {}
 
@@ -30,6 +31,12 @@ void CachedText::draw(const Rect& rect, const Color& color)
 {
     if (!m_font)
         return;
+
+    // Hack to fix font rendering in atlas
+    if (g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
+        m_lastAtlasRegion = m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType());
+        m_textScreenCoords = {};
+    }
 
     if (m_textScreenCoords != rect) {
         m_textScreenCoords = rect;

@@ -54,5 +54,7 @@ private:
     BitmapFontPtr m_font;
     Fw::AlignmentFlag m_align;
 
+    AtlasRegion* m_lastAtlasRegion = nullptr;
+
     CoordsBufferPtr m_coordsBuffer;
 };
