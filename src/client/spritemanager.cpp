@@ -244,6 +244,12 @@ ImagePtr SpriteManager::getSpriteImageHd(const int id, const FileStreamPtr& file
     return Image::loadPNG(buffer.data(), buffer.size());
 }
 
+uint16_t readU16FromBuffer(const uint8_t* data, size_t& offset) {
+    uint16_t val = data[offset] | (data[offset + 1] << 8);
+    offset += 2;
+    return val;
+}
+
 ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
 {
     if (id == 0 || !file)
@@ -266,21 +272,24 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
         const bool useAlpha = g_game.getFeature(Otc::GameSpritesAlphaChannel);
         const uint8_t channels = useAlpha ? 4 : 3;
 
+        static thread_local std::vector<uint8_t> spriteBuffer;
+        spriteBuffer.resize(pixelDataSize);
+        file->read(spriteBuffer.data(), pixelDataSize);
+
+        size_t offset = 0;
         auto image = std::make_shared<Image>(Size(spriteSize));
         uint8_t* pixels = image->getPixelData();
         int writePos = 0;
-        int read = 0;
         bool hasAlpha = false;
+        int transparentCount = 0;
 
         static constexpr int MAX_PIXEL_BLOCK = 4096;
-        static thread_local uint8_t tempBuffer[MAX_PIXEL_BLOCK * 4]; // 4 = max channels
+        static thread_local uint8_t tempBuffer[MAX_PIXEL_BLOCK * 4];
 
-        while (read < pixelDataSize && writePos < maxWriteSize) {
-            const uint16_t transparentPixels = file->getU16();
-            const uint16_t coloredPixels = file->getU16();
-            read += 4;
+        while (offset + 4 <= pixelDataSize && writePos < maxWriteSize) {
+            const uint16_t transparentPixels = readU16FromBuffer(spriteBuffer.data(), offset);
+            const uint16_t coloredPixels = readU16FromBuffer(spriteBuffer.data(), offset);
 
-            // Write transparent block
             const int transparentBytes = transparentPixels * 4;
             if (writePos + transparentBytes > maxWriteSize)
                 break;
@@ -288,44 +297,44 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
             std::memset(pixels + writePos, 0, transparentBytes);
             writePos += transparentBytes;
 
-            // Sanity limit to avoid buffer overflow
-            const int actualColoredPixels = std::min<int>(coloredPixels, MAX_PIXEL_BLOCK);
-
+            const int actualColoredPixels = (coloredPixels > MAX_PIXEL_BLOCK) ? MAX_PIXEL_BLOCK : coloredPixels;
             const int bytesToRead = actualColoredPixels * channels;
-            if (bytesToRead > 0)
-                file->read(tempBuffer, channels, actualColoredPixels);
 
-            for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += channels) {
-                pixels[writePos + 0] = tempBuffer[src + 0];
-                pixels[writePos + 1] = tempBuffer[src + 1];
-                pixels[writePos + 2] = tempBuffer[src + 2];
+            if (offset + bytesToRead > pixelDataSize)
+                break;
 
-                uint8_t alpha = useAlpha ? tempBuffer[src + 3] : 0xFF;
-                if (alpha != 0xFF)
-                    hasAlpha = true;
+            std::memcpy(tempBuffer, spriteBuffer.data() + offset, bytesToRead);
+            offset += bytesToRead;
 
-                pixels[writePos + 3] = alpha;
-                writePos += 4;
-            }
+            if (useAlpha) {
+                for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 4) {
+                    pixels[writePos + 0] = tempBuffer[src + 0];
+                    pixels[writePos + 1] = tempBuffer[src + 1];
+                    pixels[writePos + 2] = tempBuffer[src + 2];
+                    const uint8_t alpha = tempBuffer[src + 3];
+                    pixels[writePos + 3] = alpha;
 
-            read += coloredPixels * channels;
-        }
+                    if (alpha != 0xFF) hasAlpha = true;
+                    else if (transparentCount <= 4 && alpha == 0x00) ++transparentCount;
 
-        // Fill remaining as transparent
-        if (writePos < maxWriteSize)
-            std::memset(pixels + writePos, 0, maxWriteSize - writePos);
-
-        if (hasAlpha) {
-            image->setTransparentPixel(true);
-        } else {
-            int transparentCount = 0;
-            for (int i = 3; i < maxWriteSize; i += 4) {
-                if (pixels[i] == 0x00 && ++transparentCount > 4) {
-                    image->setTransparentPixel(true);
-                    break;
+                    writePos += 4;
+                }
+            } else {
+                for (int i = 0, src = 0; i < actualColoredPixels && writePos + 4 <= maxWriteSize; ++i, src += 3) {
+                    pixels[writePos + 0] = tempBuffer[src + 0];
+                    pixels[writePos + 1] = tempBuffer[src + 1];
+                    pixels[writePos + 2] = tempBuffer[src + 2];
+                    pixels[writePos + 3] = 0xFF;
+                    writePos += 4;
                 }
             }
         }
+
+        if (writePos < maxWriteSize)
+            std::memset(pixels + writePos, 0, maxWriteSize - writePos);
+
+        if (hasAlpha || transparentCount > 4)
+            image->setTransparentPixel(true);
 
         return image;
     } catch (const stdext::exception& e) {
