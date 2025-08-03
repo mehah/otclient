@@ -215,6 +215,7 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
+    m_atlased = 0;
     updateText();
     onFontChange(fontName);
 }

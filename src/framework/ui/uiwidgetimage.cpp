@@ -220,6 +220,8 @@ void UIWidget::setImageSource(const std::string_view source, const bool base64)
     if (!m_imageTexture)
         return;
 
+    m_atlased = 0;
+
     if (m_imageTexture->isAnimatedTexture()) {
         if (isImageIndividualAnimation()) {
             m_imageAnimatorTimer.restart();
