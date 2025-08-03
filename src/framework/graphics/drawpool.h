@@ -150,8 +150,9 @@ public:
         SpinLock::Guard guard(m_threadLock);
 
         if (!canRepaint()) {
-            for (auto& objs : m_objects)
+            for (auto& objs : m_objects) {
                 objs.clear();
+            }
             m_objectsFlushed.clear();
             return;
         }
@@ -289,7 +290,10 @@ private:
     float getOpacity() const { return getCurrentState().opacity; }
     Rect getClipRect() { return getCurrentState().clipRect; }
     auto getDrawOrder() const { return m_currentDrawOrder; }
+    uint8_t getThreadCount() const { return m_perThreadObjects.size(); }
 
+    void setThreadId(uint8_t id) { CURRENT_THREAD_ID = id; }
+    void setThreadCount(uint8_t count) { m_perThreadObjects.resize(count); }
     void setCompositionMode(CompositionMode mode, bool onlyOnce = false);
     void setBlendEquation(BlendEquation equation, bool onlyOnce = false);
     void setClipRect(const Rect& clipRect, bool onlyOnce = false);
@@ -414,7 +418,15 @@ private:
     std::vector<Matrix3> m_transformMatrixStack;
     std::vector<FrameBufferPtr> m_temporaryFramebuffers;
 
-    std::vector<DrawObject> m_objects[static_cast<uint8_t>(LAST)];
+    struct DrawObjectMethod
+    {
+        Color color;
+        DrawMethod method;
+        Texture* atlas;
+    };
+
+    std::vector<std::vector<DrawObjectMethod>> m_perThreadObjects;
+    std::array<std::vector<DrawObject>, static_cast<uint8_t>(LAST)> m_objects;
     std::vector<DrawObject> m_objectsFlushed;
     std::array<std::vector<DrawObject>, 2> m_objectsDraw;
     std::vector<CoordsBuffer*> m_coordsCache;
@@ -434,6 +446,8 @@ private:
 
     TextureAtlasPtr m_atlas;
     std::atomic_bool m_shouldRepaint;
+
+    static thread_local uint8_t CURRENT_THREAD_ID;
 
     friend class DrawPoolManager;
 };

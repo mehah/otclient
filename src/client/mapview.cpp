@@ -127,6 +127,25 @@ void MapView::drawFloor()
 
     const uint32_t flags = Otc::DrawThings;
 
+    g_drawPool.setThreadCount(m_multithreading ? g_asyncDispatcher.get_thread_count() : 1);
+
+    auto drawTile = [&](const TilePtr& tile, const Position& cameraUpFloor, const bool alwaysTransparent) {
+        uint32_t tileFlags = flags;
+
+        if (!m_drawViewportEdge && !tile->canRender(tileFlags, cameraPosition, m_viewport))
+            return;
+
+        if (alwaysTransparent) {
+            const bool inRange = tile->getPosition().isInRange(cameraUpFloor, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
+            g_drawPool.setOpacity(inRange ? .16 : .7);
+        }
+
+        tile->draw(transformPositionTo2D(tile->getPosition()), tileFlags);
+
+        if (alwaysTransparent)
+            g_drawPool.resetOpacity();
+    };
+
     for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
         const float fadeLevel = getFadeLevel(z);
         if (fadeLevel == 0.f) break;
@@ -138,22 +157,28 @@ void MapView::drawFloor()
 
         const auto& map = m_floors[z].cachedVisibleTiles;
 
-        for (const auto& tile : map.tiles) {
-            uint32_t tileFlags = flags;
+        if (m_multithreading) {
+            static BS::multi_future<void> tasks(g_drawPool.getThreadCount());
+            tasks.clear();
 
-            if (!m_drawViewportEdge && !tile->canRender(tileFlags, cameraPosition, m_viewport))
-                continue;
+            const auto chunkSize = map.tiles.size() / g_drawPool.getThreadCount();
 
-            if (alwaysTransparent) {
-                const bool inRange = tile->getPosition().isInRange(_camera, g_gameConfig.getTileTransparentFloorViewRange(), g_gameConfig.getTileTransparentFloorViewRange(), true);
-                g_drawPool.setOpacity(inRange ? .16 : .7);
+            for (auto i = 0; i < g_drawPool.getThreadCount(); ++i) {
+                const auto start = i * chunkSize;
+                const auto end = (i == g_drawPool.getThreadCount() - 1) ? map.tiles.size() : start + chunkSize;
+
+                tasks.emplace_back(g_asyncDispatcher.submit_task([=, this] {
+                    g_drawPool.select(DrawPoolType::MAP);
+                    g_drawPool.setThreadId(i);
+                    for (auto j = start; j < end; ++j) {
+                        drawTile(map.tiles[j], _camera, false);
+                    }
+                }));
             }
 
-            tile->draw(transformPositionTo2D(tile->getPosition()), tileFlags);
-
-            if (alwaysTransparent)
-                g_drawPool.resetOpacity();
-        }
+            tasks.wait();
+        } else for (const auto& tile : map.tiles)
+            drawTile(tile, _camera, alwaysTransparent);
 
         for (const auto& missile : g_map.getFloorMissiles(z))
             missile->draw(transformPositionTo2D(missile->getPosition()), true);

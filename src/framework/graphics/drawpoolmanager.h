@@ -57,6 +57,8 @@ public:
     void bindFrameBuffer(const Size& size, const Color& color = Color::white) const { getCurrentPool()->bindFrameBuffer(size, color); }
     void releaseFrameBuffer(const Rect& dest) const { getCurrentPool()->releaseFrameBuffer(dest); };
 
+    void setThreadId(uint8_t id) { getCurrentPool()->setThreadId(id); }
+    void setThreadCount(uint8_t count) const { getCurrentPool()->setThreadCount(count); }
     void setOpacity(const float opacity, const bool onlyOnce = false) const { getCurrentPool()->setOpacity(opacity, onlyOnce); }
     void setClipRect(const Rect& clipRect, const bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
     void setBlendEquation(const BlendEquation equation, const bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
@@ -67,6 +69,7 @@ public:
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const bool onlyOnce = false, const std::function<void()>& action = nullptr) const { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 
+    uint8_t getThreadCount() const { return getCurrentPool()->getThreadCount(); }
     float getOpacity() const { return getCurrentPool()->getOpacity(); }
     Rect getClipRect() const { return getCurrentPool()->getClipRect(); }
 

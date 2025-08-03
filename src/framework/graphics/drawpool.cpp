@@ -23,9 +23,12 @@
 #include "drawpool.h"
 #include "textureatlas.h"
 
+thread_local uint8_t DrawPool::CURRENT_THREAD_ID = 0;
+
 DrawPool* DrawPool::create(const DrawPoolType type)
 {
     auto pool = new DrawPool;
+    pool->setThreadCount(1);
     if (type == DrawPoolType::MAP || type == DrawPoolType::FOREGROUND) {
         pool->setFramebuffer({});
         if (type == DrawPoolType::MAP) {
@@ -58,6 +61,11 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
             if (method.src.isValid())
                 method.src = Rect(region->x + method.src.x(), region->y + method.src.y(), method.src.width(), method.src.height());
         }
+    }
+
+    if (textureAtlas && m_perThreadObjects.size() > 1) {
+        m_perThreadObjects[CURRENT_THREAD_ID].emplace_back(color, method, textureAtlas);
+        return;
     }
 
     if (!updateHash(method, texture, color, coordsBuffer != nullptr))
@@ -245,13 +253,15 @@ void DrawPool::resetState()
 {
     m_coords.clear();
     m_parameters.clear();
-
+    m_perThreadObjects.clear();
     m_hashCtrl.reset();
 
     getCurrentState() = {};
     m_lastFramebufferId = 0;
     m_shaderRefreshDelay = 0;
     m_scale = PlatformWindow::DEFAULT_DISPLAY_DENSITY;
+
+    CURRENT_THREAD_ID = 0;
 }
 
 bool DrawPool::canRepaint()
