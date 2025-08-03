@@ -272,7 +272,7 @@ private:
         STATE_BLEND_EQUATION = 1 << 4,
     };
 
-    void add(const Color& color, TexturePtr texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
+    void add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer = nullptr);
 
     void addAction(const std::function<void()>& action);
     void bindFrameBuffer(const Size& size, const Color& color = Color::white);
@@ -281,7 +281,7 @@ private:
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
     bool updateHash(const DrawMethod& method, const TexturePtr& texture, const Color& color, bool hasCoord);
-    PoolState getState(const TexturePtr& texture, const Color& color);
+    PoolState getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color);
 
     PoolState& getCurrentState() { return m_states[m_lastStateIndex]; }
     const PoolState& getCurrentState() const { return m_states[m_lastStateIndex]; }

@@ -598,7 +598,7 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
-    uint8_t m_atlased = 10; // attempts(hack) :P
+    uint8_t m_atlased = 100; // attempts(hack) :P
 
 public:
     void resizeToText();

@@ -48,12 +48,13 @@ DrawPool* DrawPool::create(const DrawPoolType type)
     return pool;
 }
 
-void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer)
+void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer)
 {
+    Texture* textureAtlas = nullptr;
     if (m_atlas && texture && texture->isCached(m_atlas->getType())) {
         const auto& atlas = texture->getAtlas(m_atlas->getType());
         if (atlas->isEnabled()) {
-            texture = m_atlas->getTexture(atlas->layer, texture->isSmooth());
+            textureAtlas = m_atlas->getTexture(atlas->layer, texture->isSmooth());
             if (method.src.isValid())
                 method.src = Rect(atlas->x + method.src.x(), atlas->y + method.src.y(), method.src.width(), method.src.height());
         }
@@ -67,7 +68,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
     if (m_alwaysGroupDrawings) {
         auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
         if (!coords) {
-            auto state = getState(texture, color);
+            auto state = getState(texture, textureAtlas, color);
             coords = list.emplace_back(std::move(state), getCoordsBuffer()).coords.get();
         }
 
@@ -91,7 +92,7 @@ void DrawPool::add(const Color& color, TexturePtr texture, DrawMethod&& method, 
         }
 
         if (addNewObj) {
-            auto state = getState(texture, color);
+            auto state = getState(texture, textureAtlas, color);
             auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
 
             if (coordsBuffer) {
@@ -176,13 +177,16 @@ bool DrawPool::updateHash(const DrawMethod& method, const TexturePtr& texture, c
     return true;
 }
 
-DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, const Color& color)
+DrawPool::PoolState DrawPool::getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color)
 {
     PoolState copy = getCurrentState();
 
     if (copy.color != color) copy.color = color;
 
-    if (texture) {
+    if (textureAtlas) {
+        copy.textureId = textureAtlas->getId();
+        copy.textureMatrixId = textureAtlas->getTransformMatrixId();
+    } else if (texture) {
         if (texture->isEmpty() || !texture->canCacheInAtlas() || texture->canCacheInAtlas() && m_atlas) {
             copy.texture = texture;
         } else {

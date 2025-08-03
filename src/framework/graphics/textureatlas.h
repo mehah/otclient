@@ -77,7 +77,7 @@ public:
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id, bool smooth);
 
-    TexturePtr getTexture(int layer, bool smooth) const;
+    Texture* getTexture(int layer, bool smooth) const;
 
     Size getSize() const { return m_size; }
 
