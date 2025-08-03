@@ -75,9 +75,9 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         setProp(PropGlyphsMustRecache, false);
 
     // Hack to fix font rendering in atlas
-    if (!m_atlased && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
-        m_atlased = true;
-        update();
+    if (g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
+        m_lastAtlasRegion = m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType());
+        update(false, true);
     }
 
     const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
@@ -133,7 +133,7 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     }
 }
 
-void UITextEdit::update(const bool focusCursor)
+void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 {
     if (!getProp(PropUpdatesEnabled))
         return;
@@ -362,15 +362,15 @@ void UITextEdit::update(const bool focusCursor)
             glyphScreenCoords.setRight(textScreenCoords.right());
         }
 
+        // render glyph
+        m_glyphsCoords[i].first = glyphScreenCoords;
+        m_glyphsCoords[i].second = glyphTextureCoords;
+
         TextureAtlas* atlas = nullptr;
         if (g_drawPool.isValid())
             atlas = g_drawPool.getAtlas();
         else
             atlas = g_drawPool.get(DrawPoolType::FOREGROUND)->getAtlas();
-
-        // render glyph
-        m_glyphsCoords[i].first = glyphScreenCoords;
-        m_glyphsCoords[i].second = glyphTextureCoords;
 
         if (atlas) {
             if (const auto region = m_font->getTexture()->getAtlas(atlas->getType()))
@@ -388,7 +388,7 @@ void UITextEdit::update(const bool focusCursor)
         m_colorCoordsBuffer.emplace_back(Color(rgba), crds);
     }
 
-    if (fireAreaUpdate)
+    if (!disableAreaUpdate && fireAreaUpdate)
         onTextAreaUpdate(m_textVirtualOffset, m_textVirtualSize, m_textTotalSize);
 
     repaint();

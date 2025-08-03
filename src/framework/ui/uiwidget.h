@@ -508,7 +508,7 @@ private:
     void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
     void configureBorderImage() { setProp(PropImageBordered, true); updateImageCache(); }
 
-    std::vector<std::pair<Rect, Rect>> m_imageCoordsCache;
+    CoordsBufferPtr m_imageCoordsCache;
 
     Rect m_imageCachedScreenCoords;
 
@@ -598,7 +598,7 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
-    bool m_atlased{ false };
+    AtlasRegion* m_lastAtlasRegion = nullptr;
 
 public:
     void resizeToText();

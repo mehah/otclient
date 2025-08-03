@@ -33,7 +33,7 @@ public:
     void drawSelf(DrawPoolType drawPane) override;
 
 private:
-    void update(bool focusCursor = false);
+    void update(bool focusCursor = false, bool disableAreaUpdate = false);
 
 public:
     void setCursorPos(int pos);

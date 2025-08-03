@@ -106,9 +106,9 @@ void UIWidget::drawText(const Rect& screenCoords)
         return;
 
     // Hack to fix font rendering in atlas
-    if (!m_atlased && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
-        m_atlased = true;
-        m_textCachedScreenCoords = {};
+    if (g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
+        m_lastAtlasRegion = m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType());
+        updateText();
     }
 
     if (screenCoords != m_textCachedScreenCoords) {
