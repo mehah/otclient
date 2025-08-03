@@ -23,16 +23,17 @@ public:
     int16_t width;
     int16_t height;
     uint16_t transformMatrixId;
-    std::atomic_bool enabled = false;
+    Texture* atlas;
+    std::atomic_bool enabled;
 
     bool isEnabled() const {
         return enabled.load(std::memory_order_acquire);
     }
 
     AtlasRegion(uint32_t tid, int16_t x, int16_t y, int8_t layer,
-                int16_t width, int16_t height, uint16_t transformId)
+                int16_t width, int16_t height, uint16_t transformId, Texture* atlas)
         : textureID(tid), x(x), y(y), layer(layer),
-        width(width), height(height), transformMatrixId(transformId) {
+        width(width), height(height), transformMatrixId(transformId), atlas(atlas) {
     }
 };
 
@@ -76,8 +77,6 @@ public:
 
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id, bool smooth);
-
-    Texture* getTexture(int layer, bool smooth) const;
 
     Size getSize() const { return m_size; }
 

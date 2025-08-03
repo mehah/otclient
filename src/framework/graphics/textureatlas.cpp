@@ -71,7 +71,8 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
         region.layer,
         static_cast<int16_t>(width),
         static_cast<int16_t>(height),
-        texture->getTransformMatrixId()
+        texture->getTransformMatrixId(),
+        m_filterGroups[texture->isSmooth()].layers[region.layer].framebuffer->getTexture().get()
     );
 
     texture->m_atlas[m_type] = info.get();
@@ -115,8 +116,4 @@ void TextureAtlas::flush() {
             }
         }
     }
-}
-
-Texture* TextureAtlas::getTexture(int layer, bool smooth) const {
-    return m_filterGroups[smooth].layers[layer].framebuffer->rawTexture();
 }
