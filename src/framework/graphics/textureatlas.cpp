@@ -118,5 +118,5 @@ void TextureAtlas::flush() {
 }
 
 Texture* TextureAtlas::getTexture(int layer, bool smooth) const {
-    return m_filterGroups[smooth].layers[layer].framebuffer->getTexture().get();
+    return m_filterGroups[smooth].layers[layer].framebuffer->rawTexture();
 }

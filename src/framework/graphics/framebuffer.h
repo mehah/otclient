@@ -49,6 +49,7 @@ public:
     void setAutoResetState(bool v) { m_isScene = v; }
 
     TexturePtr getTexture() const { return m_texture; }
+    Texture* rawTexture() const { return m_texture.get(); }
     TexturePtr extractTexture();
 
     Size getSize() const { return m_texture->getSize(); }
