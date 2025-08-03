@@ -198,7 +198,6 @@ function UICreatureButton:resetState()
     self.isFollowed = false
     if self.creature then
         self.creature:hideStaticSquare()
-        self.creature = nil
     end
     self:getChildById('creature'):setBorderWidth(0)
     self:getChildById('label'):setColor(CreatureButtonColors.onIdle.notHovered)
