@@ -94,8 +94,8 @@ void UIWidget::drawImage(const Rect& screenCoords)
         return;
 
     // Hack to fix font rendering in atlas
-    if (m_atlased > 0 && g_drawPool.getAtlas() && m_imageTexture->getAtlas(g_drawPool.getAtlas()->getType())) {
-        --m_atlased;
+    if (g_drawPool.getAtlas() && m_imageTexture->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
+        m_lastAtlasRegion = m_imageTexture->getAtlas(g_drawPool.getAtlas()->getType());
         updateImageCache();
     }
     // cache vertex buffers
@@ -219,8 +219,6 @@ void UIWidget::setImageSource(const std::string_view source, const bool base64)
 
     if (!m_imageTexture)
         return;
-
-    m_atlased = 0;
 
     if (m_imageTexture->isAnimatedTexture()) {
         if (isImageIndividualAnimation()) {

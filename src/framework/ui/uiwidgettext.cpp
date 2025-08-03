@@ -106,8 +106,8 @@ void UIWidget::drawText(const Rect& screenCoords)
         return;
 
     // Hack to fix font rendering in atlas
-    if (m_atlased > 0 && g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType())) {
-        --m_atlased;
+    if (g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
+        m_lastAtlasRegion = m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType());
         updateText();
     }
 
@@ -215,7 +215,6 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
-    m_atlased = 0;
     updateText();
     onFontChange(fontName);
 }
