@@ -362,15 +362,15 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
             glyphScreenCoords.setRight(textScreenCoords.right());
         }
 
+        // render glyph
+        m_glyphsCoords[i].first = glyphScreenCoords;
+        m_glyphsCoords[i].second = glyphTextureCoords;
+
         TextureAtlas* atlas = nullptr;
         if (g_drawPool.isValid())
             atlas = g_drawPool.getAtlas();
         else
             atlas = g_drawPool.get(DrawPoolType::FOREGROUND)->getAtlas();
-
-        // render glyph
-        m_glyphsCoords[i].first = glyphScreenCoords;
-        m_glyphsCoords[i].second = glyphTextureCoords;
 
         if (atlas) {
             if (const auto region = m_font->getTexture()->getAtlas(atlas->getType()))

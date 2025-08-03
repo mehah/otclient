@@ -28,7 +28,9 @@
 #include <framework/graphics/textureatlas.h>
 #include <framework/util/crypt.h>
 
-void UIWidget::initImage() {}
+void UIWidget::initImage() {
+    m_imageCoordsCache = std::make_shared<CoordsBuffer>();
+}
 
 void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
 {
@@ -88,6 +90,18 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
     }
 }
 
+void addImageRect(const TexturePtr& texture, const CoordsBufferPtr& coords, bool useRepeated, const Rect& dest, Rect src) {
+    if (const auto atlas = g_drawPool.getAtlas()) {
+        if (const auto region = texture->getAtlas(atlas->getType()))
+            src = Rect(region->x + src.x(), region->y + src.y(), src.width(), src.height());
+    }
+
+    if (useRepeated)
+        coords->addRepeatedRects(dest, src);
+    else
+        coords->addRect(dest, src);
+};
+
 void UIWidget::drawImage(const Rect& screenCoords)
 {
     if (!m_imageTexture || !screenCoords.isValid())
@@ -101,12 +115,14 @@ void UIWidget::drawImage(const Rect& screenCoords)
     // cache vertex buffers
     if (m_imageCachedScreenCoords != screenCoords) {
         m_imageCachedScreenCoords = screenCoords;
-        m_imageCoordsCache.clear();
+        m_imageCoordsCache->clear();
 
         Rect drawRect = screenCoords;
         drawRect.translate(m_imageRect.topLeft());
         if (m_imageRect.isValid())
             drawRect.resize(m_imageRect.size());
+
+        const bool useRepeated = hasProp(PropImageBordered) || hasProp(PropImageRepeated);
 
         auto clipRect = m_imageClipRect.isValid() ? m_imageClipRect : Rect(0, 0, m_imageTexture->getSize());
 
@@ -133,32 +149,32 @@ void UIWidget::drawImage(const Rect& screenCoords)
             // first the center
             if (centerSize.area() > 0) {
                 rectCoords = Rect(drawRect.left() + leftBorder.width(), drawRect.top() + topBorder.height(), centerSize);
-                m_imageCoordsCache.emplace_back(rectCoords, center);
+                addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, center);
             }
             // top left corner
             rectCoords = Rect(drawRect.topLeft(), topLeftCorner.size());
-            m_imageCoordsCache.emplace_back(rectCoords, topLeftCorner);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, topLeftCorner);
             // top
             rectCoords = Rect(drawRect.left() + topLeftCorner.width(), drawRect.topLeft().y, centerSize.width(), topBorder.height());
-            m_imageCoordsCache.emplace_back(rectCoords, topBorder);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, topBorder);
             // top right corner
             rectCoords = Rect(drawRect.left() + topLeftCorner.width() + centerSize.width(), drawRect.top(), topRightCorner.size());
-            m_imageCoordsCache.emplace_back(rectCoords, topRightCorner);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, topRightCorner);
             // left
             rectCoords = Rect(drawRect.left(), drawRect.top() + topLeftCorner.height(), leftBorder.width(), centerSize.height());
-            m_imageCoordsCache.emplace_back(rectCoords, leftBorder);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, leftBorder);
             // right
             rectCoords = Rect(drawRect.left() + leftBorder.width() + centerSize.width(), drawRect.top() + topRightCorner.height(), rightBorder.width(), centerSize.height());
-            m_imageCoordsCache.emplace_back(rectCoords, rightBorder);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, rightBorder);
             // bottom left corner
             rectCoords = Rect(drawRect.left(), drawRect.top() + topLeftCorner.height() + centerSize.height(), bottomLeftCorner.size());
-            m_imageCoordsCache.emplace_back(rectCoords, bottomLeftCorner);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, bottomLeftCorner);
             // bottom
             rectCoords = Rect(drawRect.left() + bottomLeftCorner.width(), drawRect.top() + topBorder.height() + centerSize.height(), centerSize.width(), bottomBorder.height());
-            m_imageCoordsCache.emplace_back(rectCoords, bottomBorder);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, bottomBorder);
             // bottom right corner
             rectCoords = Rect(drawRect.left() + bottomLeftCorner.width() + centerSize.width(), drawRect.top() + topRightCorner.height() + centerSize.height(), bottomRightCorner.size());
-            m_imageCoordsCache.emplace_back(rectCoords, bottomRightCorner);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, bottomRightCorner);
         } else {
             if (isImageFixedRatio()) {
                 Size textureSize = m_imageTexture->getSize(),
@@ -175,25 +191,19 @@ void UIWidget::drawImage(const Rect& screenCoords)
                 clipRect = Rect(texCoordsOffset, textureClipSize);
             }
 
-            m_imageCoordsCache.emplace_back(drawRect, clipRect);
+            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, drawRect, clipRect);
         }
     }
 
     // smooth is now enabled by default for all textures
     //m_imageTexture->setSmooth(m_imageSmooth);
-    const bool useRepeated = hasProp(PropImageBordered) || hasProp(PropImageRepeated);
 
     const auto& texture = m_imageTexture->isAnimatedTexture() && isImageIndividualAnimation() ?
         std::static_pointer_cast<AnimatedTexture>(m_imageTexture)->get(m_currentFrame, m_imageAnimatorTimer) : m_imageTexture;
 
     g_drawPool.setDrawOrder(m_imageDrawOrder);
 
-    for (const auto& [dest, src] : m_imageCoordsCache) {
-        if (useRepeated)
-            g_drawPool.addTexturedRepeatedRect(dest, texture, src, m_imageColor);
-        else
-            g_drawPool.addTexturedRect(dest, texture, src, m_imageColor);
-    }
+    g_drawPool.addTexturedCoordsBuffer(texture, m_imageCoordsCache, m_imageColor);
 
     g_drawPool.resetDrawOrder();
 }
