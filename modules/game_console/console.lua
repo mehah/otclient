@@ -623,7 +623,13 @@ function clear()
 end
 
 function clearChannel(consoleTabBar)
-    consoleTabBar:getCurrentTab().tabPanel:getChildById('consoleBuffer'):destroyChildren()
+    local currentTab = consoleTabBar:getCurrentTab()
+    local currentTabName = currentTab:getText()
+    currentTab.tabPanel:getChildById('consoleBuffer'):destroyChildren()
+    
+    if readOnlyModeEnabled and currentTabName == activeactiveReadOnlyTabName then
+        readOnlyPanel:getChildById('panel'):destroyChildren()
+    end
 end
 
 function setTextEditText(text)
