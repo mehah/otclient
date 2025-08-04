@@ -250,10 +250,8 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
             glyphScreenCoords.setRight(screenCoords.right());
         }
 
-        if (const auto atlas = g_drawPool.getAtlas()) {
-            if (const auto region = m_texture->getAtlas(atlas->getType()))
-                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
-        }
+        if (const auto region = m_texture->getAtlasRegion())
+            glyphTextureCoords.translate(region->x, region->y);
 
         // add glyph
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
@@ -356,10 +354,8 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
             glyphScreenCoords.setRight(screenCoords.right());
         }
 
-        if (const auto atlas = g_drawPool.getAtlas()) {
-            if (const auto region = m_texture->getAtlas(atlas->getType()))
-                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
-        }
+        if (const auto region = m_texture->getAtlasRegion())
+            glyphTextureCoords.translate(region->x, region->y);
 
         // add glyph to color
         coords->addRect(glyphScreenCoords, glyphTextureCoords);

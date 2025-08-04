@@ -231,6 +231,16 @@ void Texture::setupTranformMatrix()
     m_transformMatrixId = g_textures.getMatrixId(m_size, getProp(upsideDown));
 }
 
+const AtlasRegion* Texture::getAtlasRegion() const {
+    if (g_drawPool.isValid() && g_drawPool.getAtlas()) {
+        if (const auto region = m_atlas[g_drawPool.getAtlas()->getType()]) {
+            return region->isEnabled() ? region : nullptr;
+        }
+    }
+
+    return nullptr;
+}
+
 void Texture::setupPixels(const int level, const Size& size, const uint8_t* pixels, const int channels, const bool
 #ifndef OPENGL_ES
                           compress
