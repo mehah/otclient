@@ -51,7 +51,9 @@ void DrawPoolManager::init(const uint16_t spriteSize)
                 pool->m_atlas = atlasMap;
                 break;
 
-            case DrawPoolType::FOREGROUND:
+                // for now atlas in the UI will be disabled,
+                // there are some rendering bugs.
+                // case DrawPoolType::FOREGROUND:
             case DrawPoolType::FOREGROUND_MAP:
             case DrawPoolType::CREATURE_INFORMATION:
                 pool->m_atlas = atlasForeground;
