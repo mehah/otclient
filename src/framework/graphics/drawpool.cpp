@@ -51,12 +51,11 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer)
 {
     Texture* textureAtlas = nullptr;
-    if (m_atlas && texture && texture->isCached(m_atlas->getType())) {
-        const auto region = texture->getAtlas(m_atlas->getType());
-        if (region->isEnabled()) {
+    if (m_atlas && texture) {
+        if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
             textureAtlas = region->atlas;
             if (method.src.isValid())
-                method.src = Rect(region->x + method.src.x(), region->y + method.src.y(), method.src.width(), method.src.height());
+                method.src.translate(region->x, region->y);
         }
     }
 
@@ -332,7 +331,7 @@ void DrawPool::PoolState::execute(DrawPool* pool) const {
     if (texture) {
         texture->create();
         g_painter->setTexture(texture);
-        if (texture->canCacheInAtlas() && pool->m_atlas && !texture->isCached(pool->m_atlas->getType())) {
+        if (texture->canCacheInAtlas() && pool->m_atlas && !texture->getAtlasRegion(pool->m_atlas->getType())) {
             pool->m_atlas->addTexture(texture);
         }
     } else

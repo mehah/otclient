@@ -48,7 +48,8 @@ public:
     const Size& getSize() const { return m_size; }
     auto getTransformMatrixId() const { return m_transformMatrixId; }
 
-    const auto getAtlas(Fw::TextureAtlasType type) const { return m_atlas[type]; }
+    const auto getAtlasRegion(Fw::TextureAtlasType type) const { return m_atlas[type]; }
+    const AtlasRegion* getAtlasRegion() const;
 
     ticks_t getTime() const { return m_time; }
     uint32_t getId() const { return m_id; }
@@ -63,7 +64,6 @@ public:
     bool hasRepeat() const { return getProp(repeat); }
     bool hasMipmaps() const { return getProp(hasMipMaps); }
     bool isSmooth() const { return getProp(smooth); }
-    bool isCached(Fw::TextureAtlasType type) const { return getAtlas(type) != nullptr; }
     bool canCacheInAtlas() const { return getProp(Prop::_allowAtlasCache); }
     bool setupSize(const Size& size);
 
