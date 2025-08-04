@@ -300,27 +300,29 @@ void MapView::updateVisibleTiles()
 
     const auto prevFirstVisibleFloor = m_cachedFirstVisibleFloor;
 
+    // Always update floor visibility
+    m_cachedFirstVisibleFloor = calcFirstVisibleFloor(m_floorViewMode != ALWAYS);
+    m_cachedLastVisibleFloor = std::max<uint8_t>(m_cachedFirstVisibleFloor, calcLastVisibleFloor());
+
     if (m_lastCameraPosition != m_posInfo.camera) {
         if (m_lastCameraPosition.z != m_posInfo.camera.z) {
             onFloorChange(m_posInfo.camera.z, m_lastCameraPosition.z);
         }
-
-        const auto cachedFirstVisibleFloor = calcFirstVisibleFloor(m_floorViewMode != ALWAYS);
-        m_cachedFirstVisibleFloor = cachedFirstVisibleFloor;
-        m_cachedLastVisibleFloor = std::max<uint8_t>(cachedFirstVisibleFloor, calcLastVisibleFloor());
-
         m_floorMin = m_floorMax = m_posInfo.camera.z;
     }
 
-    auto cachedFirstVisibleFloor = m_cachedFirstVisibleFloor;
+    // Force update for all visible floors
+    g_drawPool.repaint(DrawPoolType::MAP);
+    g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
+
     if (m_floorViewMode == ALWAYS_WITH_TRANSPARENCY || canFloorFade()) {
-        cachedFirstVisibleFloor = calcFirstVisibleFloor(false);
+        m_cachedFirstVisibleFloor = calcFirstVisibleFloor(false);
     }
 
     // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
         m_fadeType = FadeType::NONE;
-        for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (int iz = m_cachedLastVisibleFloor; iz >= m_cachedFirstVisibleFloor; --iz) {
             m_floors[iz].fadingTimers.restart(m_floorFading);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
@@ -348,7 +350,7 @@ void MapView::updateVisibleTiles()
     const uint32_t numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
 
     auto processDiagonalRange = [&](std::vector<FloorData>& floors, uint32_t start, uint32_t end) {
-        for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= m_cachedFirstVisibleFloor; --iz) {
             auto& floor = floors[iz].cachedVisibleTiles;
 
             for (uint_fast32_t diagonal = start; diagonal < end; ++diagonal) {

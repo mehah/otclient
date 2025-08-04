@@ -274,6 +274,13 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
         thing->setPosition(m_position);
         thing->onAppear();
+
+        // Force update of all visible floors when adding effects
+        if (const auto& mapView = g_map.getMapView(0)) {
+            mapView->requestUpdateVisibleTiles();
+        }
+        g_drawPool.repaint(DrawPoolType::MAP);
+        g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
         return;
     }
 
