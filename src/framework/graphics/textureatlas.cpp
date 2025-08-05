@@ -3,12 +3,9 @@
 #include "graphics.h"
 #include "framebuffer.h"
 
-TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
+TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size) :
     m_type(type),
     m_size({ std::min<int>(size, 16384) }) {
-    createNewLayer(false);
-    if (smoothSupport)
-        createNewLayer(true);
 }
 
 void TextureAtlas::removeTexture(uint32_t id, bool smooth) {

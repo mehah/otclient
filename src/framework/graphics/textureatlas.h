@@ -73,7 +73,7 @@ enum AtlasFilter
 class TextureAtlas
 {
 public:
-    TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport = false);
+    TextureAtlas(Fw::TextureAtlasType type, int size);
 
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id, bool smooth);
