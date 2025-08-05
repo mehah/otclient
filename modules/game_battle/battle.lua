@@ -131,6 +131,32 @@ function init() -- Initiating the module (load)
         onGameStart = onGameStart
     })
 
+    --[[
+    Configure BattleList SubMenu Hidden Options
+    ]]--
+
+    -- Setup context menu button
+    local contextMenuButton = battleWindow:recursiveGetChildById('contextMenuButton')
+    if contextMenuButton then
+        contextMenuButton.onClick = function(widget, mousePos, mouseButton)
+            local menu = g_ui.createWidget('BattleListSubMenu')
+            menu:setGameMenu(true)
+            for _, choice in ipairs(menu:getChildren()) do
+                local choiceId = choice:getId()
+                if choiceId and choiceId ~= 'HorizontalSeparator' then
+                    choice.onCheckChange = function()
+                        onBattleListMenuAction(choiceId)
+                        menu:destroy()
+                    end
+                end
+            end
+            menu:display(mousePos)
+            return true
+        end
+    else
+        print("Warning: contextMenuButton not found in battleWindow")
+    end
+
     -- Determining Height and Setting up!
     battleWindow:setContentMinimumHeight(80)
     battleWindow:setup()
@@ -766,6 +792,7 @@ function hideFilterPanel() -- Hide Filter panel
     filterPanel.originalHeight = filterPanel:getHeight()
     filterPanel:setHeight(0)
     toggleFilterButton:getParent():setMarginTop(0)
+    toggleFilterButton:setOn(false)
     setHidingFilters(true)
     HorizontalSeparator:setVisible(false)
     filterPanel:setVisible(false)
@@ -777,6 +804,7 @@ function showFilterPanel() -- Show Filter panel
     toggleFilterButton:getParent():setMarginTop()
     filterPanel:setHeight(filterPanel.originalHeight)
     setHidingFilters(false)
+    toggleFilterButton:setOn(true)
     HorizontalSeparator:setVisible(true)
     filterPanel:setVisible(true)
     contentsPanel:setMarginTop(0)
@@ -1162,6 +1190,40 @@ end
 function onClose()
     battleButton:setOn(false)
     disconnecting()
+end
+
+function onBattleListMenuAction(actionId)
+    if actionId == 'editBattleListName' then
+        -- TODO: Implement edit battle list name functionality
+        print("Edit Name action triggered")
+    elseif actionId == 'openNewBattleList' then
+        -- TODO: Implement open secondary battle list functionality
+        print("Open secondary battle list action triggered")
+    elseif actionId == 'sortAscByDisplayTime' then
+        -- TODO: Implement sort ascending by display time functionality
+        print("Sort Ascending by Display Time action triggered")
+    elseif actionId == 'sortDescByDisplayTime' then
+        -- TODO: Implement sort descending by display time functionality
+        print("Sort Descending by Display Time action triggered")
+    elseif actionId == 'sortAscByDistance' then
+        -- TODO: Implement sort ascending by distance functionality
+        print("Sort Ascending by Distance action triggered")
+    elseif actionId == 'sortDescByDistance' then
+        -- TODO: Implement sort descending by distance functionality
+        print("Sort Descending by Distance action triggered")
+    elseif actionId == 'sortAscByHitPoints' then
+        -- TODO: Implement sort ascending by hit points functionality
+        print("Sort Ascending by Hit Points action triggered")
+    elseif actionId == 'sortDescByHitPoints' then
+        -- TODO: Implement sort descending by hit points functionality
+        print("Sort Descending by Hit Points action triggered")
+    elseif actionId == 'sortAscByName' then
+        -- TODO: Implement sort ascending by name functionality
+        print("Sort Ascending by Name action triggered")
+    elseif actionId == 'sortDescByName' then
+        -- TODO: Implement sort descending by name functionality
+        print("Sort Descending by Name action triggered")
+    end
 end
 
 function toggle() -- Close/Open the battle window or Pressing Ctrl + B
