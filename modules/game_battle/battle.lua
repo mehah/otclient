@@ -6,10 +6,83 @@ local battleButtons = {} -- map of creature id
 local battleWindow, battleButton, battlePanel, mouseWidget, filterPanel, toggleFilterButton
 local lastBattleButtonSwitched, lastCreatureSelected
 
+-- Default filter settings for ordering/sorting
+local BATTLE_FILTERS = {
+    -- Sort "Age"
+    ["sortAscByDisplayTime"] = false,
+    ["sortDescByDisplayTime"] = true,  -- Default sort option
+    -- Sort Distance
+    ["sortAscByDistance"] = false,
+    ["sortDescByDistance"] = false,
+    -- Sort HP
+    ["sortAscByHitPoints"] = false,
+    ["sortDescByHitPoints"] = false,
+    -- Sort Names
+    ["sortAscByName"] = false,
+    ["sortDescByName"] = false
+}
+
 -- Hide Buttons ("hidePlayers", "hideNPCs", "hideMonsters", "hideSkulls", "hideParty")
 local hideButtons = {}
 
 local eventOnCheckCreature = nil
+
+function loadFilters()
+    local settings = g_settings.getNode("BattleList")
+    if not settings or not settings['filters'] then
+        return BATTLE_FILTERS
+    end
+    return settings['filters']
+end
+
+function saveFilters()
+    g_settings.mergeNode('BattleList', { ['filters'] = loadFilters() })
+end
+
+function getFilter(filter)
+    local filters = loadFilters()
+    local value = filters[filter]
+    if value ~= nil then
+        return value
+    end
+    -- Fall back to default value if not found in saved settings
+    return BATTLE_FILTERS[filter] or false
+end
+
+function setFilter(filter)
+    local filters = loadFilters()
+    local value = filters[filter]
+    
+    -- If the filter doesn't exist in saved settings, get the default value
+    if value == nil then
+        value = BATTLE_FILTERS[filter]
+        if value == nil then
+            print("Filter " .. filter .. " not found in BATTLE_FILTERS table")
+            return false
+        end
+    end
+    
+    print("setFilter called for " .. filter .. " current value: " .. tostring(value))
+    
+    -- Handle mutual exclusivity for sort options
+    if filter:find("sortAscBy") or filter:find("sortDescBy") then
+        -- Turn off all other sort filters
+        for filterName, _ in pairs(BATTLE_FILTERS) do
+            if filterName ~= filter and (filterName:find("sortAscBy") or filterName:find("sortDescBy")) then
+                filters[filterName] = false
+            end
+        end
+    end
+    
+    filters[filter] = not value
+    print("setFilter setting " .. filter .. " to: " .. tostring(not value))
+    g_settings.mergeNode('BattleList', { ['filters'] = filters })
+    
+    -- Note: This filter system is for ordering/sorting only, not for visibility filters
+    -- The hideButtons remain separate and are handled by the existing onFilterButtonClick
+    
+    return true
+end
 
 local BattleButtonPool = ObjectPool.new(function()
         local widget = g_ui.createWidget('BattleButton')
@@ -144,7 +217,12 @@ function init() -- Initiating the module (load)
             for _, choice in ipairs(menu:getChildren()) do
                 local choiceId = choice:getId()
                 if choiceId and choiceId ~= 'HorizontalSeparator' then
+                    -- Set the current checked state based on filter value
+                    local filterValue = getFilter(choiceId)
+                    print("Setting " .. choiceId .. " to checked: " .. tostring(filterValue))
+                    choice:setChecked(filterValue)
                     choice.onCheckChange = function()
+                        print("CheckChange triggered for " .. choiceId)
                         onBattleListMenuAction(choiceId)
                         menu:destroy()
                     end
@@ -400,6 +478,7 @@ end
 function onGameEnd()
     battleWindow:setParent(nil, true)
     removeAllCreatures()
+    saveFilters()
 
     disconnecting()
 end
@@ -1200,29 +1279,37 @@ function onBattleListMenuAction(actionId)
         -- TODO: Implement open secondary battle list functionality
         print("Open secondary battle list action triggered")
     elseif actionId == 'sortAscByDisplayTime' then
-        -- TODO: Implement sort ascending by display time functionality
-        print("Sort Ascending by Display Time action triggered")
+        setFilter(actionId)
+        setSortType('age')
+        setSortOrder('A')
     elseif actionId == 'sortDescByDisplayTime' then
-        -- TODO: Implement sort descending by display time functionality
-        print("Sort Descending by Display Time action triggered")
+        setFilter(actionId)
+        setSortType('age')
+        setSortOrder('D')
     elseif actionId == 'sortAscByDistance' then
-        -- TODO: Implement sort ascending by distance functionality
-        print("Sort Ascending by Distance action triggered")
+        setFilter(actionId)
+        setSortType('distance')
+        setSortOrder('A')
     elseif actionId == 'sortDescByDistance' then
-        -- TODO: Implement sort descending by distance functionality
-        print("Sort Descending by Distance action triggered")
+        setFilter(actionId)
+        setSortType('distance')
+        setSortOrder('D')
     elseif actionId == 'sortAscByHitPoints' then
-        -- TODO: Implement sort ascending by hit points functionality
-        print("Sort Ascending by Hit Points action triggered")
+        setFilter(actionId)
+        setSortType('health')
+        setSortOrder('A')
     elseif actionId == 'sortDescByHitPoints' then
-        -- TODO: Implement sort descending by hit points functionality
-        print("Sort Descending by Hit Points action triggered")
+        setFilter(actionId)
+        setSortType('health')
+        setSortOrder('D')
     elseif actionId == 'sortAscByName' then
-        -- TODO: Implement sort ascending by name functionality
-        print("Sort Ascending by Name action triggered")
+        setFilter(actionId)
+        setSortType('name')
+        setSortOrder('A')
     elseif actionId == 'sortDescByName' then
-        -- TODO: Implement sort descending by name functionality
-        print("Sort Descending by Name action triggered")
+        setFilter(actionId)
+        setSortType('name')
+        setSortOrder('D')
     end
 end
 
