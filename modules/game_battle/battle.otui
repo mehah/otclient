@@ -321,3 +321,63 @@ MiniWindowBattle
       image-source: /images/ui/miniwindow/windowresizer
       image-smooth: false
       focusable: false
+
+BattleListMenuOption < ThickCheckBox
+  text-offset: 18 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+BattleListSubMenu < PopupMenu
+  id: battleListSubMenu
+  width: 304
+
+  BattleListMenuOption
+    id: editBattleListName
+    !text: tr('Edit Name')
+
+  BattleListMenuOption
+    id: openNewBattleList
+    !text: tr('Open secondary battle list')
+
+  HorizontalSeparator
+
+  BattleListMenuOption
+    id: sortAscByDisplayTime
+    !text: tr('Sort Ascending by Display Time')
+
+  BattleListMenuOption
+    id: sortDescByDisplayTime
+    !text: tr('Sort Descending by Display Time')
+
+  BattleListMenuOption
+    id: sortAscByDistance
+    !text: tr('Sort Ascending by Distance')
+
+  BattleListMenuOption
+    id: sortDescByDistance
+    !text: tr('Sort Descending by Distance')
+
+  BattleListMenuOption
+    id: sortAscByHitPoints
+    !text: tr('Sort Ascending by %% Hit Points')
+
+  BattleListMenuOption
+    id: sortDescByHitPoints
+    !text: tr('Sort Descending by %% Hit Points')
+
+  BattleListMenuOption
+    id: sortAscByName
+    !text: tr('Sort Ascending by Name')
+
+  BattleListMenuOption
+    id: sortDescByName
+    !text: tr('Sort Descending by Name')

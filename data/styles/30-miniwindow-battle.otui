@@ -81,15 +81,12 @@ MiniWindowBattle < UIMiniWindow
     margin-top: 3
     margin-right: 3
     image-source: /images/ui/miniwindow/exit-button-small-up
-    image-smooth: false
 
     $hover:
       image-source: /images/ui/miniwindow/exit-button-small-up
-      image-smooth: false
 
     $pressed:
       image-source: /images/ui/miniwindow/exit-button-small-down
-      image-smooth: false
 
   UIButton
     id: minimizeButton
@@ -97,60 +94,82 @@ MiniWindowBattle < UIMiniWindow
     anchors.right: closeButton.left
     margin-right: 1
     image-source: /images/ui/miniwindow/min-button-small-up
-    image-smooth: false
-    image-fixed-ratio: true
-    image-auto-resize: false
 
     $hover:
       image-source: /images/ui/miniwindow/min-button-small-up
-      image-smooth: false
-      image-fixed-ratio: true
-      image-auto-resize: false
 
     $pressed:
       image-source: /images/ui/miniwindow/min-button-small-down
-      image-smooth: false
-      image-fixed-ratio: true
-      image-auto-resize: false
 
     $on:
       image-source: /images/ui/miniwindow/max-button-small-up
-      image-smooth: false
-      image-fixed-ratio: true
-      image-auto-resize: false
 
     $on hover:
       image-source: /images/ui/miniwindow/max-button-small-up
-      image-smooth: false
-      image-fixed-ratio: true
-      image-auto-resize: false
 
     $on pressed:
       image-source: /images/ui/miniwindow/max-button-small-down
-      image-smooth: false
-      image-fixed-ratio: true
-      image-auto-resize: false
 
   UIButton
     id: toggleFilterButton
     anchors.top: minimizeButton.top
-    anchors.right: minimizeButton.right
-    margin-right: 15
+    anchors.right: minimizeButton.left
+    margin-right: 5
     image-source: /images/ui/miniwindow/button-expand-12x12-up
-    image-smooth: false
     @onClick: modules.game_battle.toggleFilterPanel()
 
     $hover:
       image-source: /images/ui/miniwindow/button-expand-12x12-up
-      image-smooth: false
 
     $pressed:
       image-source: /images/ui/miniwindow/button-expand-12x12-down
-      image-smooth: false
 
-    $active:
+    $on:
       image-source: /images/ui/miniwindow/button-expand-12x12-down
-      image-smooth: false
+
+    $on hover:
+      image-source: /images/ui/miniwindow/button-expand-12x12-down
+
+    $on pressed:
+      image-source: /images/ui/miniwindow/button-expand-12x12-up
+
+  UIButton
+    id: contextMenuButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 1
+    image-source: /images/ui/miniwindow/button-contextmenu-12x12-idle
+
+    $hover:
+      image-source: /images/ui/miniwindow/button-contextmenu-12x12-idle
+
+    $pressed:
+      image-source: /images/ui/miniwindow/button-contextmenu-12x12-pressed
+    
+  UIButton
+    id: lockButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 2
+    margin-top: -1
+    size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 98 0 14 14
+
+    $hover:
+      image-clip: 98 14 14 14
+
+    $pressed:
+      image-clip: 98 28 14 14
+
+    $on:
+      image-clip: 84 0 14 14
+
+    $on hover:
+      image-clip: 84 14 14 14
+
+    $on pressed:
+      image-clip: 84 28 14 14
 
   ResizeBorder
     id: bottomResizeBorder
@@ -176,10 +195,11 @@ MiniWindowContents < ScrollablePanel
   vertical-scrollbar: miniwindowScrollBar
   always-show-vertical-scrollbar: true
 
+
 BorderlessGameWindow < UIWindow
   focusable: false
   margin: 2
-
+  
 MiniQtScrollableWindow < UIMiniWindow
   icon-rect: 4 4 16 16
   width: 192
@@ -225,3 +245,5 @@ MiniQtScrollableWindow < UIMiniWindow
     margin-bottom: 5
     margin-right: 10
     vertical-scrollbar: miniwindowScrollBar
+
+  
