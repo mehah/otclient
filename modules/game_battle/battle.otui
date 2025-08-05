@@ -349,6 +349,8 @@ BattleListSubMenu < PopupMenu
     !text: tr('Open secondary battle list')
 
   HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
 
   BattleListMenuOption
     id: sortAscByDisplayTime
