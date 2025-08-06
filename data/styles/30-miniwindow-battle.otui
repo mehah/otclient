@@ -78,81 +78,116 @@ MiniWindowBattle < UIMiniWindow
     id: closeButton
     anchors.top: parent.top
     anchors.right: parent.right
-    margin-top: 3
+    margin-top: 2
     margin-right: 3
-    image-source: /images/ui/miniwindow/exit-button-small-up
+    size: 12 12
+    image-size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 28 0 14 14
 
     $hover:
-      image-source: /images/ui/miniwindow/exit-button-small-up
+      image-clip: 28 14 14 14
 
     $pressed:
-      image-source: /images/ui/miniwindow/exit-button-small-down
+      image-clip: 28 28 14 14
 
   UIButton
     id: minimizeButton
     anchors.top: closeButton.top
     anchors.right: closeButton.left
     margin-right: 1
-    image-source: /images/ui/miniwindow/min-button-small-up
+    size: 12 12
+    image-size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 0 0 14 14
 
     $hover:
-      image-source: /images/ui/miniwindow/min-button-small-up
+      image-clip: 0 14 14 14
 
     $pressed:
-      image-source: /images/ui/miniwindow/min-button-small-down
+      image-clip: 0 28 14 14
 
     $on:
-      image-source: /images/ui/miniwindow/max-button-small-up
+      image-clip: 14 0 14 14
 
     $on hover:
-      image-source: /images/ui/miniwindow/max-button-small-up
+      image-clip: 14 14 14 14
 
     $on pressed:
-      image-source: /images/ui/miniwindow/max-button-small-down
+      image-clip: 14 28 14 14
 
   UIButton
     id: toggleFilterButton
     anchors.top: minimizeButton.top
     anchors.right: minimizeButton.left
-    margin-right: 5
-    image-source: /images/ui/miniwindow/button-expand-12x12-up
+    margin-right: 7
+    margin-top: 0
+    size: 12 12
+    image-size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 56 0 14 14
     @onClick: modules.game_battle.toggleFilterPanel()
 
     $hover:
-      image-source: /images/ui/miniwindow/button-expand-12x12-up
+      image-clip: 56 14 14 14
 
     $pressed:
-      image-source: /images/ui/miniwindow/button-expand-12x12-down
+      image-clip: 56 28 14 14
 
     $on:
-      image-source: /images/ui/miniwindow/button-expand-12x12-down
+      image-clip: 56 28 14 14
 
     $on hover:
-      image-source: /images/ui/miniwindow/button-expand-12x12-down
+      image-clip: 56 28 14 14
 
     $on pressed:
-      image-source: /images/ui/miniwindow/button-expand-12x12-up
+      image-clip: 56 0 14 14
 
   UIButton
     id: contextMenuButton
     anchors.top: prev.top
     anchors.right: prev.left
-    margin-right: 1
-    image-source: /images/ui/miniwindow/button-contextmenu-12x12-idle
+    margin-right: 2
+    margin-top: 0
+    size: 12 12
+    image-size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 112 0 14 14
 
     $hover:
-      image-source: /images/ui/miniwindow/button-contextmenu-12x12-idle
+      image-clip: 112 14 14 14
 
     $pressed:
-      image-source: /images/ui/miniwindow/button-contextmenu-12x12-pressed
-    
+      image-clip: 112 28 14 14
+
+  UIButton
+    id: newWindowButton
+    anchors.top: prev.top
+    anchors.right: prev.left
+    margin-right: 2
+    margin-top: 0
+    size: 12 12
+    image-size: 14 14
+    image-source: /images/ui/miniwindow_buttons
+    image-clip: 126 0 14 14
+
+    $hover:
+      image-clip: 126 14 14 14
+
+    $pressed:
+      image-clip: 126 28 14 14
+
+    $on:
+      image-clip: 126 0 14 14
+
   UIButton
     id: lockButton
     anchors.top: prev.top
     anchors.right: prev.left
     margin-right: 2
-    margin-top: -1
-    size: 14 14
+    margin-top: 0
+    size: 12 12
+    image-size: 14 14
     image-source: /images/ui/miniwindow_buttons
     image-clip: 98 0 14 14
 
