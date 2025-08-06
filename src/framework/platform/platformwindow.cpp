@@ -39,6 +39,7 @@ X11Window window;
 
 #include <framework/core/clock.h>
 #include <framework/graphics/image.h>
+#include <framework/util/color.h>
 
 PlatformWindow& g_window = window;
 
@@ -61,6 +62,21 @@ int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpo
     }
 
     return internalLoadMouseCursor(image, hotSpot);
+}
+
+void PlatformWindow::setTitleBarColor(int r, int g, int b)
+{
+    setTitleBarColor(Color(r, g, b));
+}
+
+void PlatformWindow::setTitleBarColor(float r, float g, float b)
+{
+    setTitleBarColor(Color(r, g, b));
+}
+
+void PlatformWindow::setTitleBarColorRGB(uint8_t r, uint8_t g, uint8_t b)
+{
+    setTitleBarColor(Color(r, g, b));
 }
 
 void PlatformWindow::updateUnmaximizedCoords()
