@@ -759,24 +759,23 @@ function doCreatureFitFilters(creature) -- Check if creature fit current applied
                end)()) or
                (i == 'hideKnights' and creature:isPlayer() and (function()
                    local vocation = creature:getVocation()
-                   return vocation and (vocation == 1 or vocation == 11)
+                   return vocation and creature:isKnight()
                end)()) or
                (i == 'hidePaladins' and creature:isPlayer() and (function()
                    local vocation = creature:getVocation()
-                   return vocation and (vocation == 2 or vocation == 12)
+                   return vocation and creature:isPaladin()
                end)()) or
                (i == 'hideDruids' and creature:isPlayer() and (function()
                    local vocation = creature:getVocation()
-                   return vocation and (vocation == 4 or vocation == 14)
+                   return vocation and creature:isDruid()
                end)()) or
                (i == 'hideSorcerers' and creature:isPlayer() and (function()
                    local vocation = creature:getVocation()
-                   return vocation and (vocation == 3 or vocation == 13)
+                   return vocation and creature:isSorcerer()
                end)()) or
                (i == 'hideMonks' and creature:isPlayer() and (function()
                    local vocation = creature:getVocation()
-                   --TODO: Check if vocation 5 and 15 are correct for Monks
-                   return vocation and (vocation == 5 or vocation == 15)
+                   return vocation and creature:isMonk()
                end)()) or
                (i == 'hideSummons' and creature:isMonster() and (function()
                    local masterId = creature:getMasterId()
