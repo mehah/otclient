@@ -592,7 +592,7 @@ void UITextEdit::moveCursorVertically(bool)
 
 int UITextEdit::getTextPos(const Point& pos)
 {
-    const int textLength = m_text.length();
+    const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
 
     // find any glyph that is actually on the
     int candidatePos = -1;
