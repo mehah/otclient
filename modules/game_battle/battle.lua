@@ -10,7 +10,7 @@ local lastBattleButtonSwitched, lastCreatureSelected
 local BATTLE_FILTERS = {
     -- Sort "Age"
     ["sortAscByDisplayTime"] = false,
-    ["sortDescByDisplayTime"] = true,  -- Default sort option
+    ["sortDescByDisplayTime"] = false,  -- Default sort option
     -- Sort Distance
     ["sortAscByDistance"] = false,
     ["sortDescByDistance"] = false,
@@ -39,6 +39,86 @@ function saveFilters()
     g_settings.mergeNode('BattleList', { ['filters'] = loadFilters() })
 end
 
+-- Battle List Name functions
+function getBattleListName()
+    local settings = g_settings.getNode('BattleList')
+    if settings and settings['customName'] then
+        return settings['customName']
+    end
+    return tr('Battle List') -- Default name
+end
+
+function setBattleListName(name)
+    local settings = g_settings.getNode('BattleList') or {}
+    if name == nil or name == '' then
+        settings['customName'] = 'Battle List' -- Reset to default
+    else
+        settings['customName'] = name
+    end
+    g_settings.mergeNode('BattleList', settings)
+    updateBattleListTitle()
+end
+
+function updateBattleListTitle()
+    if battleWindow then
+        local titleLabel = battleWindow:recursiveGetChildById('miniwindowTitle')
+        if titleLabel then
+            titleLabel:setText(getBattleListName())
+        end
+    end
+end
+
+function openEditBattleListNameDialog()
+    local currentName = getBattleListName()
+    if currentName == tr('Battle List') then
+        currentName = ""  -- Show empty if it's the default
+    end
+    
+    -- Create the dialog using the new style
+    local changeListNameWindow = g_ui.displayUI('style/changeListName')
+    changeListNameWindow:show()
+    
+    -- Get the text input field and set current name
+    local nameInput = changeListNameWindow:getChildById('newBattleListName')
+    nameInput:setText(currentName)
+    nameInput:focus()
+    nameInput:selectAll()
+    
+    -- Close window function
+    local function closeWindow()
+        nameInput:setText('')
+        changeListNameWindow:setVisible(false)
+        changeListNameWindow:destroy()
+    end
+    
+    -- OK button callback
+    changeListNameWindow.buttonOk.onClick = function()
+        local newName = nameInput:getText()
+        setBattleListName(newName)
+        closeWindow()
+    end
+    
+    -- Cancel button callback
+    changeListNameWindow.closeButton.onClick = closeWindow
+    
+    -- Escape key callback
+    changeListNameWindow.onEscape = function()
+        closeWindow()
+    end
+    
+    -- Add Enter key support for OK and Escape for Cancel
+    nameInput.onKeyDown = function(widget, keyCode, keyboardModifiers)
+        if keyCode == KeyReturn or keyCode == KeyEnter then
+            changeListNameWindow.buttonOk.onClick()
+            return true
+        elseif keyCode == KeyEscape then
+            closeWindow()
+            return true
+        end
+        return false
+    end
+end
+
 function getFilter(filter)
     local filters = loadFilters()
     local value = filters[filter]
@@ -57,12 +137,9 @@ function setFilter(filter)
     if value == nil then
         value = BATTLE_FILTERS[filter]
         if value == nil then
-            print("Filter " .. filter .. " not found in BATTLE_FILTERS table")
             return false
         end
     end
-    
-    print("setFilter called for " .. filter .. " current value: " .. tostring(value))
     
     -- Handle mutual exclusivity for sort options
     if filter:find("sortAscBy") or filter:find("sortDescBy") then
@@ -75,7 +152,6 @@ function setFilter(filter)
     end
     
     filters[filter] = not value
-    print("setFilter setting " .. filter .. " to: " .. tostring(not value))
     g_settings.mergeNode('BattleList', { ['filters'] = filters })
     
     -- Note: This filter system is for ordering/sorting only, not for visibility filters
@@ -217,18 +293,38 @@ function init() -- Initiating the module (load)
             for _, choice in ipairs(menu:getChildren()) do
                 local choiceId = choice:getId()
                 if choiceId and choiceId ~= 'HorizontalSeparator' then
-                    -- Set the current checked state based on filter value
-                    local filterValue = getFilter(choiceId)
-                    print("Setting " .. choiceId .. " to checked: " .. tostring(filterValue))
-                    choice:setChecked(filterValue)
-                    choice.onCheckChange = function()
-                        print("CheckChange triggered for " .. choiceId)
-                        onBattleListMenuAction(choiceId)
-                        menu:destroy()
+                    if choiceId == 'editBattleListName' or choiceId == 'openNewBattleList' then
+                        -- Handle regular buttons (not checkboxes)
+                        choice.onClick = function()
+                            onBattleListMenuAction(choiceId)
+                            menu:destroy()
+                        end
+                    else
+                        -- Handle checkbox options
+                        local filterValue = getFilter(choiceId)
+                        choice:setChecked(filterValue)
+                        choice.onCheckChange = function()
+                            onBattleListMenuAction(choiceId)
+                            menu:destroy()
+                        end
                     end
                 end
             end
-            menu:display(mousePos)
+            
+            -- Calculate position to align menu's top-right corner with center of contextMenuButton
+            local buttonPos = widget:getPosition()
+            local buttonSize = widget:getSize()
+            local menuWidth = menu:getWidth()
+            
+            -- Center of the button
+            local buttonCenterX = buttonPos.x + buttonSize.width / 2
+            local buttonCenterY = buttonPos.y + buttonSize.height / 2
+            
+            -- Position menu so its top-right corner is at the button's center
+            local menuX = buttonCenterX - menuWidth
+            local menuY = buttonCenterY
+            
+            menu:display({x = menuX, y = menuY})
             return true
         end
     else
@@ -238,6 +334,21 @@ function init() -- Initiating the module (load)
     -- Determining Height and Setting up!
     battleWindow:setContentMinimumHeight(80)
     battleWindow:setup()
+    
+    -- Set the custom battle list name if it exists
+    updateBattleListTitle()
+    
+    -- Add context menu to the battle window
+    battleWindow.onMousePress = function(widget, mousePos, button)
+        if button == MouseRightButton then
+            local menu = g_ui.createWidget('PopupMenu')
+            menu:addOption('Edit Name', function() onBattleListMenuAction('editBattleListName') end)
+            menu:display(mousePos)
+            return true
+        end
+        return false
+    end
+    
     if g_game.isOnline() then
         battleWindow:setupOnStart()
     end
@@ -470,6 +581,9 @@ function onGameStart()
 
     -- Reorganize filter buttons layout based on client version
     reorganizeFilterButtons()
+    
+    -- Update battle list title in case it was customized
+    updateBattleListTitle()
 
     -- Temp fix
     scheduleEvent(checkCreatures, 200)
@@ -1273,8 +1387,7 @@ end
 
 function onBattleListMenuAction(actionId)
     if actionId == 'editBattleListName' then
-        -- TODO: Implement edit battle list name functionality
-        print("Edit Name action triggered")
+        openEditBattleListNameDialog()
     elseif actionId == 'openNewBattleList' then
         -- TODO: Implement open secondary battle list functionality
         print("Open secondary battle list action triggered")

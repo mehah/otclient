@@ -336,15 +336,29 @@ BattleListMenuOption < ThickCheckBox
   $disabled:
     color: #c0c0c0ff
 
+BattleListMenuButton < UIButton
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+  margin-left: 5
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
 BattleListSubMenu < PopupMenu
   id: battleListSubMenu
-  width: 304
+  width: 285
 
-  BattleListMenuOption
+  BattleListMenuButton
     id: editBattleListName
     !text: tr('Edit Name')
 
-  BattleListMenuOption
+  BattleListMenuButton
     id: openNewBattleList
     !text: tr('Open secondary battle list')
 
