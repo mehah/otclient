@@ -67,6 +67,16 @@ function init()
         contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
         contextMenuButton:setMarginRight(7)
     end
+    
+    -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
+    local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton.onClick = function()
+            if modules.game_cyclopedia then
+                modules.game_cyclopedia.show("character")
+            end
+        end
+    end
 
     refresh()
     skillsWindow:setup()
@@ -291,6 +301,16 @@ function online()
         contextMenuButton:setMarginRight(7)
     end
     
+    -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
+    local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton.onClick = function()
+            if modules.game_cyclopedia then
+                modules.game_cyclopedia.show("character")
+            end
+        end
+    end
+    
     refresh()
     if g_game.getFeature(GameEnterGameShowAppearance) then
         skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
@@ -414,6 +434,16 @@ function toggle()
             contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
             contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
             contextMenuButton:setMarginRight(7)
+        end
+        
+        -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
+        local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
+        if newWindowButton then
+            newWindowButton.onClick = function()
+                if modules.game_cyclopedia then
+                    modules.game_cyclopedia.show("character")
+                end
+            end
         end
         
         skillsWindow:open()
