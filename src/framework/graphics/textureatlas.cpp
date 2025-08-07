@@ -68,8 +68,7 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
         region.layer,
         static_cast<int16_t>(width),
         static_cast<int16_t>(height),
-        texture->getTransformMatrixId(),
-        m_filterGroups[texture->isSmooth()].layers[region.layer].framebuffer->getTexture().get()
+        texture->getTransformMatrixId()
     );
 
     texture->m_atlas[m_type] = info.get();
@@ -78,24 +77,19 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 }
 
 void TextureAtlas::createNewLayer(bool smooth) {
-    auto fbo = std::make_unique<FrameBuffer>();
-    fbo->setAutoClear(false);
-    fbo->setAutoResetState(true);
-    fbo->setSmooth(smooth);
-    fbo->resize(m_size);
-
     FreeRegion newRegion = { 0, 0, m_size.width(), m_size.height(), static_cast<int>(m_filterGroups[smooth].layers.size()) };
-
-    m_filterGroups[smooth].layers.emplace_back(std::move(fbo));
+    m_filterGroups[smooth].layers.emplace_back(std::make_unique<FrameBuffer>());
     m_filterGroups[smooth].freeRegions.insert(newRegion);
     m_filterGroups[smooth].freeRegionsBySize[m_size.width() * m_size.height()].insert(newRegion);
 }
 
 void TextureAtlas::flush() {
     static CoordsBuffer buffer;
-    for (auto& group : m_filterGroups) {
+    for (auto i = -1; ++i < AtlasFilter::ATLAS_FILTER_COUNT;) {
+        auto& group = m_filterGroups[i];
         for (auto& layer : group.layers) {
             if (!layer.textures.empty()) {
+                layer.init(m_size, i);
                 layer.framebuffer->bind();
                 glDisable(GL_BLEND);
                 for (const auto& texture : layer.textures) {
@@ -106,6 +100,7 @@ void TextureAtlas::flush() {
                     g_painter->setTexture(texture->textureID, texture->transformMatrixId);
                     g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
 
+                    texture->atlas = layer.framebuffer->getTexture().get();
                     texture->enabled.store(true, std::memory_order_release);
                 }
                 glEnable(GL_BLEND);
@@ -114,4 +109,12 @@ void TextureAtlas::flush() {
             }
         }
     }
+}
+
+void TextureAtlas::Layer::init(const Size& size, bool smooth) {
+    if (framebuffer->isValid()) return;
+    framebuffer->setAutoClear(false);
+    framebuffer->setAutoResetState(true);
+    framebuffer->setSmooth(smooth);
+    framebuffer->resize(size);
 }
