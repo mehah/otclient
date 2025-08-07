@@ -177,6 +177,8 @@ void MapView::drawFloor()
             }
 
             tasks.wait();
+
+            g_drawPool.join();
         } else for (const auto& tile : map.tiles)
             drawTile(tile, _camera, alwaysTransparent);
 

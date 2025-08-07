@@ -106,6 +106,7 @@ public:
     bool containsParameter(const std::string_view name) { return getCurrentPool()->containsParameter(name); }
 
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
+    void join() const { if (getCurrentPool()) getCurrentPool()->join(); }
 
     DrawPoolType getCurrentType() const;
 

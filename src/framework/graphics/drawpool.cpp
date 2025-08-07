@@ -63,8 +63,9 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         }
     }
 
-    if (textureAtlas && m_perThreadObjects.size() > 1) {
-        m_perThreadObjects[CURRENT_THREAD_ID].emplace_back(color, method, textureAtlas);
+    if (m_perThreadObjects.size() > 1) {
+        if (textureAtlas)
+            m_perThreadObjects[CURRENT_THREAD_ID].emplace_back(color, std::move(method), textureAtlas);
         return;
     }
 
@@ -92,6 +93,27 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
     }
 
     resetOnlyOnceParameters();
+}
+
+void DrawPool::join() {
+    for (auto& objs : m_perThreadObjects) {
+        for (const auto& obj : objs) {
+            if (!updateHash(obj.method, nullptr, obj.color, false))
+                continue;
+
+            auto& list = m_objects[DrawOrder::THIRD];
+            auto& state = getCurrentState();
+
+            if (!list.empty() && list.back().state == state) {
+                auto& last = list.back();
+                addCoords(*last.coords, obj.method);
+            } else {
+                auto& draw = list.emplace_back(getState(nullptr, obj.atlas, obj.color), getCoordsBuffer());
+                addCoords(*draw.coords, obj.method);
+            }
+        }
+        objs.clear();
+    }
 }
 
 void DrawPool::addCoords(CoordsBuffer& buffer, const DrawMethod& method)

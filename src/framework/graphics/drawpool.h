@@ -341,6 +341,8 @@ private:
             m_parameters.erase(it);
     }
 
+    void join();
+
     void flush()
     {
         m_coords.clear();
