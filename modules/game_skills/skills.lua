@@ -53,6 +53,21 @@ function init()
         skillSettings = {}
     end
 
+    -- Hide toggleFilterButton and adjust contextmenuButton anchors
+    local toggleFilterButton = skillsWindow:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+        toggleFilterButton:setOn(false)
+    end
+    
+    local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+    local minimizeButton = skillsWindow:recursiveGetChildById('minimizeButton')
+    if contextMenuButton and minimizeButton then
+        contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        contextMenuButton:setMarginRight(7)
+    end
+
     refresh()
     skillsWindow:setup()
     if g_game.isOnline() then
@@ -260,6 +275,22 @@ end
 
 function online()
     skillsWindow:setupOnStart() -- load character window configuration
+    
+    -- Hide toggleFilterButton and adjust contextmenuButton anchors
+    local toggleFilterButton = skillsWindow:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+        toggleFilterButton:setOn(false)
+    end
+    
+    local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+    local minimizeButton = skillsWindow:recursiveGetChildById('minimizeButton')
+    if contextMenuButton and minimizeButton then
+        contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        contextMenuButton:setMarginRight(7)
+    end
+    
     refresh()
     if g_game.getFeature(GameEnterGameShowAppearance) then
         skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
@@ -369,6 +400,22 @@ function toggle()
 
             panel:addChild(skillsWindow)
         end
+        
+        -- Hide toggleFilterButton and adjust contextmenuButton anchors
+        local toggleFilterButton = skillsWindow:recursiveGetChildById('toggleFilterButton')
+        if toggleFilterButton then
+            toggleFilterButton:setVisible(false)
+            toggleFilterButton:setOn(false)
+        end
+        
+        local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+        local minimizeButton = skillsWindow:recursiveGetChildById('minimizeButton')
+        if contextMenuButton and minimizeButton then
+            contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+            contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+            contextMenuButton:setMarginRight(7)
+        end
+        
         skillsWindow:open()
         skillsButton:setOn(true)
         updateHeight()

@@ -318,7 +318,7 @@ MiniWindowBattle
       anchors.left: parent.left
       margin-bottom: 0
       margin-left: 0
-      image-source: /images/ui/miniwindow/windowresizer
+      image-source: /images/ui/miniborder
       image-smooth: false
       focusable: false
 

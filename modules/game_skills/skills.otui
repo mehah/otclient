@@ -87,12 +87,32 @@ XpBoostButton < UIWidget
 
 MiniWindow
   id: skillWindow
-  !text: tr('Skills')
   height: 150
-  icon: /images/topbuttons/skills
   @onOpen: modules.game_skills.onMiniWindowOpen()
   @onClose: modules.game_skills.onMiniWindowClose()
   &save: true
+
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    image-source: /images/topbuttons/skills
+    image-rect: 0 0 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('Skills')
 
   MiniWindowContents
     padding-left: 5
@@ -330,7 +350,7 @@ MiniWindow
         !text: tr('Transcendence')
       SkillValueLabel
 
-// 14.12
+    // 14.12
     SmallSkillButton
       id: damageHealing
       visible: false
