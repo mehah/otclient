@@ -75,8 +75,8 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         setProp(PropGlyphsMustRecache, false);
 
     // Hack to fix font rendering in atlas
-    if (g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
-        m_lastAtlasRegion = m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType());
+    if (m_font->getTexture()->getAtlasRegion() != m_atlasRegion) {
+        m_atlasRegion = m_font->getTexture()->getAtlasRegion();
         update(false, true);
     }
 
@@ -366,16 +366,8 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
         m_glyphsCoords[i].first = glyphScreenCoords;
         m_glyphsCoords[i].second = glyphTextureCoords;
 
-        TextureAtlas* atlas = nullptr;
-        if (g_drawPool.isValid())
-            atlas = g_drawPool.getAtlas();
-        else
-            atlas = g_drawPool.get(DrawPoolType::FOREGROUND)->getAtlas();
-
-        if (atlas) {
-            if (const auto region = m_font->getTexture()->getAtlas(atlas->getType()))
-                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
-        }
+        if (m_atlasRegion)
+            glyphTextureCoords.translate(m_atlasRegion->x, m_atlasRegion->y);
 
         if (textColorsSize > 0) {
             coords->addRect(glyphScreenCoords, glyphTextureCoords);
@@ -600,7 +592,7 @@ void UITextEdit::moveCursorVertically(bool)
 
 int UITextEdit::getTextPos(const Point& pos)
 {
-    const int textLength = m_text.length();
+    const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
 
     // find any glyph that is actually on the
     int candidatePos = -1;

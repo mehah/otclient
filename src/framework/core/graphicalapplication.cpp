@@ -59,6 +59,9 @@ void GraphicalApplication::init(std::vector<std::string>& args, ApplicationConte
     g_window.init();
     g_window.hide();
 
+    // set the window title color
+    g_window.setTitleBarColor(Color::black);
+
     g_window.setOnResize([this](auto&& PH1) {
         if (!m_running) resize(PH1);
         else g_dispatcher.addEvent([&, PH1] { resize(PH1); });

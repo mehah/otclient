@@ -54,5 +54,7 @@ private:
     BitmapFontPtr m_font;
     Fw::AlignmentFlag m_align;
 
+    const AtlasRegion* m_atlasRegion = nullptr;
+
     CoordsBufferPtr m_coordsBuffer;
 };

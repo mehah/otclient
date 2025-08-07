@@ -598,7 +598,7 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
-    AtlasRegion* m_lastAtlasRegion = nullptr;
+    const AtlasRegion* m_atlasRegion = nullptr;
 
 public:
     void resizeToText();
