@@ -51,6 +51,7 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer)
 {
     Texture* textureAtlas = nullptr;
+
     if (m_atlas && texture) {
         if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
             textureAtlas = region->atlas;
@@ -63,42 +64,23 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         return;
 
     auto& list = m_objects[m_currentDrawOrder];
+    auto& state = getCurrentState();
 
-    if (m_alwaysGroupDrawings) {
-        auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
+    if (!list.empty() && list.back().state == state) {
+        auto& last = list.back();
+        coordsBuffer ? last.coords->append(coordsBuffer.get())
+            : addCoords(*last.coords, method);
+    } else if (m_alwaysGroupDrawings) {
+        auto& coords = m_coords.try_emplace(state.hash, nullptr).first->second;
         if (!coords) {
-            auto state = getState(texture, textureAtlas, color);
-            coords = list.emplace_back(std::move(state), getCoordsBuffer()).coords.get();
+            coords = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer()).coords.get();
         }
-
-        if (coordsBuffer)
-            coords->append(coordsBuffer.get());
-        else
-            addCoords(*coords, method);
+        coordsBuffer ? coords->append(coordsBuffer.get())
+            : addCoords(*coords, method);
     } else {
-        bool addNewObj = true;
-
-        if (!list.empty()) {
-            auto& prevObj = list.back();
-            if (prevObj.state == getCurrentState()) {
-                if (coordsBuffer)
-                    prevObj.coords->append(coordsBuffer.get());
-                else
-                    addCoords(*prevObj.coords, method);
-
-                addNewObj = false;
-            }
-        }
-
-        if (addNewObj) {
-            auto state = getState(texture, textureAtlas, color);
-            auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
-
-            if (coordsBuffer) {
-                draw.coords->append(coordsBuffer.get());
-            } else
-                addCoords(*draw.coords, method);
-        }
+        auto& draw = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer());
+        coordsBuffer ? draw.coords->append(coordsBuffer.get())
+            : addCoords(*draw.coords, method);
     }
 
     resetOnlyOnceParameters();
