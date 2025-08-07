@@ -4,6 +4,7 @@ Module
   author: andrefaramir, BeniS
   website: https://github.com/edubart/otclient
   sandboxed: true
+  dependencies: [ corelib ]
   scripts: [ battle ]
   @onLoad: init()
   @onUnload: terminate()
