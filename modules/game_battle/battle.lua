@@ -60,29 +60,41 @@ local BATTLE_FILTERS = {
 -- Battle List Manager for handling multiple battle list instances
 local BattleListManager = {
     instances = {},
-    nextId = 1
+    nextId = 1,
+    autoSaveEvent = nil,
+    isRestoring = false
 }
 
 function BattleListManager:saveInstancesState()
     local instancesData = {}
     for id, instance in pairs(self.instances) do
         if id ~= 0 then -- Don't save main instance as it's always created
+            local windowPos = instance.window and instance.window:getPosition()
+            local windowSize = instance.window and instance.window:getSize()
+            local isLocked = instance.window and instance.window:getSettings('locked') or false
             instancesData[id] = {
                 id = instance.id,
                 name = instance:getName(),
                 isOpen = instance.window and instance.window:isVisible(),
-                windowPos = instance.window and instance.window:getPosition(),
-                windowSize = instance.window and instance.window:getSize(),
-                isHidingFilters = instance:isHidingFilters()
+                windowPos = windowPos,
+                windowSize = windowSize,
+                isHidingFilters = instance:isHidingFilters(),
+                isLocked = isLocked
             }
             -- Make sure ALL instance settings are saved
             instance:saveFilters()
             instance:saveHideButtonStates()
-            print("DEBUG: Saved settings for instance", id, "- filters and hide buttons")
+            print("DEBUG: Saved settings for instance", id, ":")
+            print("  - name:", instance:getName())
+            print("  - isOpen:", instance.window and instance.window:isVisible())
+            print("  - windowPos:", windowPos)
+            print("  - windowSize:", windowSize)
+            print("  - isHidingFilters:", instance:isHidingFilters())
+            print("  - isLocked:", isLocked)
         end
     end
     g_settings.mergeNode('BattleListInstances', instancesData)
-    print("DEBUG: Saved", table.size(instancesData), "battle list instances state")
+    print("DEBUG: Saved", table.size(instancesData), "battle list instances state to g_settings")
 end
 
 function BattleListManager:restoreInstancesState()
@@ -92,6 +104,23 @@ function BattleListManager:restoreInstancesState()
         return
     end
     
+    -- Check if we already have non-main instances running
+    local hasExistingInstances = false
+    for id, instance in pairs(self.instances) do
+        if id ~= 0 then
+            hasExistingInstances = true
+            break
+        end
+    end
+    
+    if hasExistingInstances then
+        print("DEBUG: Non-main instances already exist, skipping restoration to avoid duplicates")
+        -- Clear the saved data since we're not restoring
+        g_settings.mergeNode('BattleListInstances', {})
+        return
+    end
+    
+    self.isRestoring = true
     print("DEBUG: Restoring battle list instances...")
     for id, data in pairs(instancesData) do
         if tonumber(id) and tonumber(id) > 0 then -- Only restore non-main instances
@@ -121,9 +150,18 @@ function BattleListManager:restoreInstancesState()
                         print("DEBUG: About to restore settings for instance. Old settings:")
                         print("  - filters:", oldSettings.filters)
                         print("  - hideButtons:", oldSettings.hideButtons)
+                        print("  - old customName:", oldSettings.customName)
                         
-                        g_settings.mergeNode(newSettingsKey, oldSettings)
-                        print("DEBUG: Copied settings from", oldSettingsKey, "to", newSettingsKey)
+                        -- Copy old settings but preserve the correct custom name from saved data
+                        local settingsToRestore = table.copy(oldSettings)
+                        settingsToRestore.customName = data.name  -- Ensure the saved name takes precedence
+                        
+                        g_settings.mergeNode(newSettingsKey, settingsToRestore)
+                        print("DEBUG: Copied settings from", oldSettingsKey, "to", newSettingsKey, "with name:", data.name)
+                        
+                        -- Update the instance name and title to reflect the restored name
+                        instance.name = data.name
+                        instance:updateTitle()
                         
                         -- Reload hide button states since they were copied to the new settings key
                         -- This needs to happen after createWindowForInstance has already called loadHideButtonStates
@@ -134,6 +172,9 @@ function BattleListManager:restoreInstancesState()
                             -- Also verify the filters were restored correctly
                             local restoredFilters = instance:loadFilters()
                             print("DEBUG: Restored filters for instance", instance.id, ":", restoredFilters)
+                            
+                            -- Load the lock state from the copied settings
+                            instance:loadLockState()
                         end, 50)
                     end
                     
@@ -145,6 +186,15 @@ function BattleListManager:restoreInstancesState()
                         instance.window:setSize(data.windowSize)
                     end
                     -- Instance was open, so keep it visible (this is the default anyway)
+                    
+                    -- Restore lock button state
+                    if data.isLocked then
+                        instance.window:lock(true) -- true = don't save during restoration
+                        print("DEBUG: Restored lock state (locked) for instance", instance.id)
+                    else
+                        instance.window:unlock(true) -- true = don't save during restoration
+                        print("DEBUG: Restored lock state (unlocked) for instance", instance.id)
+                    end
                     
                     -- Restore filter panel state after window is fully setup
                     scheduleEvent(function()
@@ -189,6 +239,8 @@ function BattleListManager:restoreInstancesState()
     -- Clear the old saved instances data since we've restored them with new IDs
     g_settings.mergeNode('BattleListInstances', {})
     print("DEBUG: Cleared old saved instances data after restoration")
+    
+    self.isRestoring = false
 end
 
 function BattleListManager:getMainInstance()
@@ -270,6 +322,34 @@ function BattleListManager:createWindowForInstance(instance)
         end
     end
     
+    -- Auto-save window position and size when changed during gameplay
+    newWindow.onGeometryChange = function()
+        if instance.id ~= 0 and not BattleListManager.isRestoring then -- Only for non-main instances and not during restoration
+            -- Save the current state to ensure window position is preserved
+            BattleListManager:saveInstancesState()
+            print("DEBUG: Auto-saved instance", instance.id, "window geometry")
+        end
+    end
+    
+    -- Auto-save lock state when lock button is clicked
+    local lockButton = newWindow:getChildById('lockButton')
+    if lockButton then
+        local originalOnClick = lockButton.onClick
+        lockButton.onClick = function()
+            if originalOnClick then
+                originalOnClick()
+            end
+            -- Save lock state after the lock/unlock action
+            if instance.id ~= 0 and not BattleListManager.isRestoring then
+                scheduleEvent(function()
+                    instance:saveLockState()
+                    BattleListManager:saveInstancesState()
+                    print("DEBUG: Auto-saved lock state for instance", instance.id)
+                end, 10)
+            end
+        end
+    end
+    
     -- Add right-click context menu to window
     newWindow.onMousePress = function(widget, mousePos, button)
         if button == MouseRightButton then
@@ -329,6 +409,31 @@ function BattleListManager:removeSavedInstanceState(id)
         instancesData[tostring(id)] = nil
         g_settings.mergeNode('BattleListInstances', instancesData)
         print("DEBUG: Removed saved state for battle list instance", id)
+    end
+end
+
+function BattleListManager:startPeriodicSave()
+    -- Cancel any existing auto-save
+    self:stopPeriodicSave()
+    
+    -- Set up auto-save every 30 seconds
+    self.autoSaveEvent = scheduleEvent(function()
+        if g_game.isOnline() and not self.isRestoring then
+            self:saveInstancesState()
+            print("DEBUG: Periodic auto-save completed")
+            -- Schedule the next save
+            self:startPeriodicSave()
+        end
+    end, 30000) -- 30 seconds
+    
+    print("DEBUG: Started periodic auto-save (every 30 seconds)")
+end
+
+function BattleListManager:stopPeriodicSave()
+    if self.autoSaveEvent then
+        removeEvent(self.autoSaveEvent)
+        self.autoSaveEvent = nil
+        print("DEBUG: Stopped periodic auto-save")
     end
 end
 
@@ -403,6 +508,33 @@ function BattleListInstance:saveHideButtonStates()
     end
     g_settings.mergeNode(self:getSettingsKey(), { ['hideButtons'] = hideButtonStates })
     print("DEBUG: Saved hide button states for instance", self.id, ":", hideButtonStates)
+end
+
+function BattleListInstance:saveLockState()
+    if self.window then
+        local isLocked = self.window:getSettings('locked') or false
+        g_settings.mergeNode(self:getSettingsKey(), { ['isLocked'] = isLocked })
+        print("DEBUG: Saved lock state for instance", self.id, ":", isLocked)
+    end
+end
+
+function BattleListInstance:loadLockState()
+    if not self.window then
+        return false
+    end
+    
+    local settings = g_settings.getNode(self:getSettingsKey())
+    if settings and settings['isLocked'] ~= nil then
+        local isLocked = settings['isLocked']
+        if isLocked then
+            self.window:lock(true) -- true = don't save during loading
+        else
+            self.window:unlock(true) -- true = don't save during loading
+        end
+        print("DEBUG: Loaded lock state for instance", self.id, ":", isLocked)
+        return isLocked
+    end
+    return false
 end
 
 function BattleListInstance:loadHideButtonStates()
@@ -553,6 +685,12 @@ function BattleListInstance:setName(name)
     end
     g_settings.mergeNode(self:getSettingsKey(), settings)
     self:updateTitle()
+    
+    -- Save the instances state immediately to preserve the name change
+    if self.id ~= 0 and not BattleListManager.isRestoring then -- Only for non-main instances and not during restoration
+        BattleListManager:saveInstancesState()
+        print("DEBUG: Auto-saved instance state after name change for instance", self.id, "new name:", name or tr('Battle List'))
+    end
 end
 
 function BattleListInstance:updateTitle()
@@ -578,7 +716,8 @@ function BattleListInstance:clearAllConfigurations()
             sortOrder = nil,
             hidingFilters = nil,
             customName = nil,
-            hideButtons = nil
+            hideButtons = nil,
+            isLocked = nil
         })
     end
     
@@ -608,6 +747,11 @@ function BattleListInstance:clearAllConfigurations()
         self:showFilterPanel()
     end
     
+    -- Unlock the window if it was locked
+    if self.window then
+        self.window:unlock()
+    end
+    
     -- Refresh creatures with new settings
     self:checkCreatures()
 end
@@ -626,7 +770,8 @@ function BattleListInstance:destroy(saveSettings)
                 sortOrder = nil,
                 hidingFilters = nil,
                 customName = nil,
-                hideButtons = nil
+                hideButtons = nil,
+                isLocked = nil
             })
         end
         print("DEBUG: Cleared configurations for battle list instance", self.id)
@@ -639,6 +784,7 @@ function BattleListInstance:destroy(saveSettings)
         -- Save current states before destroying
         self:saveFilters()
         self:saveHideButtonStates()
+        self:saveLockState()
         print("DEBUG: Preserving configurations for battle list instance", self.id)
     end
     
@@ -1662,6 +1808,9 @@ function onGameStart()
     -- Restore saved battle list instances
     BattleListManager:restoreInstancesState()
 
+    -- Set up periodic auto-save to prevent data loss
+    BattleListManager:startPeriodicSave()
+
     -- Initialize creatures for all instances (including main instance ID 0)
     scheduleEvent(function()
         for _, instance in pairs(BattleListManager.instances) do
@@ -1671,12 +1820,16 @@ function onGameStart()
 end
 
 function onGameEnd()
+    -- Stop periodic auto-save
+    BattleListManager:stopPeriodicSave()
+    
     battleWindow:setParent(nil, true)
     removeAllCreatures()
     saveFilters()
 
     -- Save state and clean up all battle list instances without clearing their configurations
     BattleListManager:saveInstancesState() -- This now saves all settings including filters and hide buttons
+    print("DEBUG: Final save on game end completed")
     for _, instance in pairs(BattleListManager.instances) do
         instance:removeAllCreatures()
         -- Settings are already saved by saveInstancesState(), just clean up UI elements
