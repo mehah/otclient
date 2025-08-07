@@ -213,6 +213,14 @@ function BattleListManager:createWindowForInstance(instance)
     instance.window = newWindow
     newWindow:setId('battleWindow_' .. instance.id)
     
+    -- Change icon for battle list instances (not the main battle list)
+    if instance.id ~= 0 then
+        local miniwindowIcon = newWindow:recursiveGetChildById('miniwindowIcon')
+        if miniwindowIcon then
+            miniwindowIcon:setImageSource('/images/game/battle/icon-battlelist-secondary-widget')
+        end
+    end
+    
     instance.panel = newWindow:recursiveGetChildById('battlePanel')
     instance.filterPanel = newWindow:recursiveGetChildById('filterPanel')
     instance.toggleFilterButton = newWindow:recursiveGetChildById('toggleFilterButton')
@@ -587,7 +595,12 @@ function BattleListInstance:updateTitle()
     if self.window then
         local titleLabel = self.window:recursiveGetChildById('miniwindowTitle')
         if titleLabel then
-            titleLabel:setText(self:getName())
+            local title = self:getName()
+            -- Limit title to 11 characters, replace last 3 with "..." if longer
+            if string.len(title) > 11 then
+                title = string.sub(title, 1, 8) .. "..."
+            end
+            titleLabel:setText(title)
         end
     end
 end
@@ -1143,7 +1156,12 @@ function updateBattleListTitle()
     if battleWindow then
         local titleLabel = battleWindow:recursiveGetChildById('miniwindowTitle')
         if titleLabel then
-            titleLabel:setText(getBattleListName())
+            local title = getBattleListName()
+            -- Limit title to 11 characters, replace last 3 with "..." if longer
+            if string.len(title) > 11 then
+                title = string.sub(title, 1, 8) .. "..."
+            end
+            titleLabel:setText(title)
         end
     end
 end
