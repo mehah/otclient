@@ -1,63 +1,48 @@
--- Global Tables for main battle list
-local binaryTree = {}    -- BST
-local battleButtons = {} -- map of creature id
-
--- Global variables that will inherit from init
+-- Global variables
+local binaryTree = {}
+local battleButtons = {}
 local battleWindow, battleButton, battlePanel, mouseWidget, filterPanel, toggleFilterButton
 local lastBattleButtonSwitched, lastCreatureSelected
+local hideButtons = {}
+local eventOnCheckCreature = nil
 
--- Forward declarations for functions used in BattleButtonPool
+-- Forward declarations
 local onBattleButtonHoverChange, onBattleButtonMouseRelease
-
--- Forward declaration for BattleListInstance
 BattleListInstance = nil
-
--- Battle Button Pool - will be initialized in init()
 BattleButtonPool = nil
 
--- Utility function for table copying
+-- Utility functions
 function table.copy(t)
     if type(t) ~= "table" then return t end
     local meta = getmetatable(t)
     local target = {}
     for k, v in pairs(t) do
-        if type(v) == "table" then
-            target[k] = table.copy(v)
-        else
-            target[k] = v
-        end
+        target[k] = type(v) == "table" and table.copy(v) or v
     end
     setmetatable(target, meta)
     return target
 end
 
--- Utility function for table size
 function table.size(t)
     if type(t) ~= "table" then return 0 end
     local count = 0
-    for _ in pairs(t) do
-        count = count + 1
-    end
+    for _ in pairs(t) do count = count + 1 end
     return count
 end
 
--- Default filter settings for ordering/sorting
+-- Default filter settings
 local BATTLE_FILTERS = {
-    -- Sort "Age"
     ["sortAscByDisplayTime"] = false,
-    ["sortDescByDisplayTime"] = false,  -- Default sort option
-    -- Sort Distance
+    ["sortDescByDisplayTime"] = false,
     ["sortAscByDistance"] = false,
     ["sortDescByDistance"] = false,
-    -- Sort HP
     ["sortAscByHitPoints"] = false,
     ["sortDescByHitPoints"] = false,
-    -- Sort Names
     ["sortAscByName"] = false,
     ["sortDescByName"] = false
 }
 
--- Battle List Manager for handling multiple battle list instances
+-- Battle List Manager
 local BattleListManager = {
     instances = {},
     nextId = 1,
@@ -68,35 +53,38 @@ local BattleListManager = {
 function BattleListManager:saveInstancesState()
     local instancesData = {}
     for id, instance in pairs(self.instances) do
-        if id ~= 0 then -- Don't save main instance as it's always created
+        if id ~= 0 then
             local windowPos = instance.window and instance.window:getPosition()
             local windowSize = instance.window and instance.window:getSize()
             local isLocked = false
+            local isMinimized = false
             if instance.window then
                 isLocked = instance.window:getSettings('locked') or false
-                -- Also check the lock button state as a fallback
                 local lockButton = instance.window:getChildById('lockButton')
                 if lockButton then
                     isLocked = lockButton:isOn()
+                end
+                -- Check if window is minimized (visible but collapsed)
+                if instance.window:isVisible() then
+                    isMinimized = instance.window:isOn()
                 end
             end
             instancesData[id] = {
                 id = instance.id,
                 name = instance:getName(),
                 isOpen = instance.window and instance.window:isVisible(),
+                isMinimized = isMinimized,
                 windowPos = windowPos,
                 windowSize = windowSize,
                 isHidingFilters = instance:isHidingFilters(),
                 isLocked = isLocked
             }
-            -- Make sure ALL instance settings are saved
             instance:saveFilters()
             instance:saveHideButtonStates()
             instance:saveLockState()
         end
     end
     
-    -- Always save main instance settings (including lock state)
     local mainInstance = self.instances[0]
     if mainInstance then
         mainInstance:saveLockState()
@@ -109,11 +97,8 @@ end
 
 function BattleListManager:restoreInstancesState()
     local instancesData = g_settings.getNode('BattleListInstances')
-    if not instancesData then
-        return
-    end
+    if not instancesData then return end
     
-    -- Check if we already have non-main instances running
     local hasExistingInstances = false
     for id, instance in pairs(self.instances) do
         if id ~= 0 then
@@ -123,71 +108,60 @@ function BattleListManager:restoreInstancesState()
     end
     
     if hasExistingInstances then
-        -- Clear the saved data since we're not restoring
         g_settings.mergeNode('BattleListInstances', {})
         return
     end
     
     self.isRestoring = true
     for id, data in pairs(instancesData) do
-        if tonumber(id) and tonumber(id) > 0 then -- Only restore non-main instances
-            -- Only restore instances that were actually open when the game ended
+        if tonumber(id) and tonumber(id) > 0 then
             if data.isOpen then
                 local oldSettingsKey = 'BattleList_' .. id
                 local oldSettings = g_settings.getNode(oldSettingsKey)
                 local shouldRestoreSettings = oldSettings ~= nil
                 
-                -- Create a fresh instance with the saved name
                 local customName = data.name and data.name ~= tr('Battle List') and data.name or nil
                 local instance = self:createNewInstance(customName)
                 
                 if instance and instance.window then
-                    -- If we have settings to restore, copy them to the new instance
                     if shouldRestoreSettings and oldSettings then
                         local newSettingsKey = instance:getSettingsKey()
-                        
-                        -- Copy old settings but preserve the correct custom name from saved data
                         local settingsToRestore = table.copy(oldSettings)
-                        settingsToRestore.customName = data.name  -- Ensure the saved name takes precedence
+                        settingsToRestore.customName = data.name
                         
                         g_settings.mergeNode(newSettingsKey, settingsToRestore)
                         
-                        -- Update the instance name and title to reflect the restored name
                         instance.name = data.name
                         instance:updateTitle()
                         
-                        -- Reload hide button states since they were copied to the new settings key
-                        -- This needs to happen after createWindowForInstance has already called loadHideButtonStates
                         scheduleEvent(function()
                             instance:loadHideButtonStates()
-                            
-                            -- Also verify the filters were restored correctly
-                            local restoredFilters = instance:loadFilters()
-                            
-                            -- Load the lock state from the copied settings
+                            instance:loadFilters()
                             instance:loadLockState()
                         end, 50)
                     end
                     
-                    -- Restore window properties
                     if data.windowPos then
                         instance.window:setPosition(data.windowPos)
                     end
                     if data.windowSize then
                         instance.window:setSize(data.windowSize)
                     end
-                    -- Instance was open, so keep it visible (this is the default anyway)
                     
-                    -- Restore lock button state
                     if data.isLocked then
-                        instance.window:lock(true) -- true = don't save during restoration
+                        instance.window:lock(true)
                     else
-                        instance.window:unlock(true) -- true = don't save during restoration
+                        instance.window:unlock(true)
                     end
                     
-                    -- Restore filter panel state after window is fully setup
+                    -- Restore minimized state if window was minimized
+                    if data.isMinimized then
+                        scheduleEvent(function()
+                            instance.window:minimize(true)
+                        end, 150)
+                    end
+                    
                     scheduleEvent(function()
-                        -- Ensure the panel has originalHeight set for proper show/hide functionality
                         if not instance.filterPanel.originalHeight then
                             instance.filterPanel.originalHeight = instance.filterPanel:getHeight()
                         end
@@ -197,33 +171,28 @@ function BattleListManager:restoreInstancesState()
                         else
                             instance:showFilterPanel()
                         end
-                    end, 100)
+                    end, 200)
                     
-                    -- Clean up the old settings since we've either restored them or don't need them
                     g_settings.set(oldSettingsKey, nil)
                 end
             else
-                -- Instance was closed when game ended, so we don't restore it but we should clean up its settings
                 local oldSettingsKey = 'BattleList_' .. id
                 g_settings.set(oldSettingsKey, nil)
             end
         end
     end
     
-    -- Clean up any remaining orphaned settings from previous sessions
     local allSettings = g_settings.getNode() or {}
     for key, _ in pairs(allSettings) do
         if type(key) == 'string' and key:match('^BattleList_%d+$') then
             local instanceId = tonumber(key:match('%d+'))
-            if instanceId and instanceId > 0 then -- Don't touch main instance (ID 0)
-                g_settings.set(key, nil) -- Remove orphaned settings
+            if instanceId and instanceId > 0 then
+                g_settings.set(key, nil)
             end
         end
     end
     
-    -- Clear the old saved instances data since we've restored them with new IDs
     g_settings.mergeNode('BattleListInstances', {})
-    
     self.isRestoring = false
 end
 
@@ -235,30 +204,21 @@ function BattleListManager:createNewInstance(customName)
     local instance = BattleListInstance:new(self.nextId, customName)
     self.instances[self.nextId] = instance
     self.nextId = self.nextId + 1
-    
-    -- Create the window for this instance
     self:createWindowForInstance(instance)
-    
     return instance
 end
 
 function BattleListManager:createWindowForInstance(instance)
-    -- Create a new battle window
     local newWindow = g_ui.loadUI('battle')
     instance.window = newWindow
-    
-    -- Set unique ID for this window
     newWindow:setId('battleWindow_' .. instance.id)
     
-    -- Get panels and controls
     instance.panel = newWindow:recursiveGetChildById('battlePanel')
     instance.filterPanel = newWindow:recursiveGetChildById('filterPanel')
     instance.toggleFilterButton = newWindow:recursiveGetChildById('toggleFilterButton')
     
-    -- Update the title
     instance:updateTitle()
     
-    -- Setup filter buttons for this instance
     local hideButtons = {}
     local options = { 'hidePlayers', 'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty', 'hideKnights', 'hidePaladins', 'hideDruids', 'hideSorcerers', 'hideMonks', 'hideSummons', 'hideMembersOwnGuild' }
     for i, v in ipairs(options) do
@@ -271,10 +231,8 @@ function BattleListManager:createWindowForInstance(instance)
     end
     instance.hideButtons = hideButtons
     
-    -- Load saved hide button states
     instance:loadHideButtonStates()
     
-    -- Setup context menu for this instance
     local contextMenuButton = newWindow:recursiveGetChildById('contextMenuButton')
     if contextMenuButton then
         contextMenuButton.onClick = function(widget, mousePos, mouseButton)
@@ -282,7 +240,6 @@ function BattleListManager:createWindowForInstance(instance)
         end
     end
     
-    -- Setup new window button for this instance
     local newWindowButton = newWindow:recursiveGetChildById('newWindowButton')
     if newWindowButton then
         newWindowButton.onClick = function()
@@ -290,35 +247,29 @@ function BattleListManager:createWindowForInstance(instance)
         end
     end
     
-    -- Setup toggle filter button
     if instance.toggleFilterButton then
         instance.toggleFilterButton.onClick = function()
             instance:toggleFilterPanel()
         end
     end
     
-    -- Setup window callbacks
     newWindow.onOpen = function()
         instance:onOpen()
     end
     
     newWindow.onClose = function()
         instance:onClose()
-        -- If this is not the main instance, destroy it completely when closed
         if instance.id ~= 0 then
-            instance:destroy(false) -- Clear settings when manually closed
+            instance:destroy(false)
         end
     end
     
-    -- Auto-save window position and size when changed during gameplay
     newWindow.onGeometryChange = function()
-        if instance.id ~= 0 and not BattleListManager.isRestoring then -- Only for non-main instances and not during restoration
-            -- Save the current state to ensure window position is preserved
+        if instance.id ~= 0 and not BattleListManager.isRestoring then
             BattleListManager:saveInstancesState()
         end
     end
     
-    -- Auto-save lock state when lock button is clicked
     local lockButton = newWindow:getChildById('lockButton')
     if lockButton then
         local originalOnClick = lockButton.onClick
@@ -326,7 +277,6 @@ function BattleListManager:createWindowForInstance(instance)
             if originalOnClick then
                 originalOnClick()
             end
-            -- Save lock state after the lock/unlock action for all instances
             if not BattleListManager.isRestoring then
                 scheduleEvent(function()
                     instance:saveLockState()
@@ -338,15 +288,14 @@ function BattleListManager:createWindowForInstance(instance)
         end
     end
     
-    -- Add right-click context menu to window
     newWindow.onMousePress = function(widget, mousePos, button)
         if button == MouseRightButton then
             local menu = g_ui.createWidget('PopupMenu')
             menu:addOption('Edit Name', function() instance:openEditNameDialog() end)
             menu:addOption('Create New Battle List', function() BattleListManager:createNewInstance() end)
-            if instance.id ~= 0 then -- Only show clear and close options for non-main instances
+            if instance.id ~= 0 then
                 menu:addOption('Clear Configurations', function() instance:clearAllConfigurations() end)
-                menu:addOption('Close Battle List', function() instance:destroy(false) end) -- Clear settings when manually closed
+                menu:addOption('Close Battle List', function() instance:destroy(false) end)
             end
             menu:display(mousePos)
             return true
@@ -354,21 +303,22 @@ function BattleListManager:createWindowForInstance(instance)
         return false
     end
     
-    -- Setup and show the window
     newWindow:setContentMinimumHeight(80)
     newWindow:setup()
     
-    -- Find available panel and show
     local panel = modules.game_interface.findContentPanelAvailable(newWindow, newWindow:getMinimumHeight())
     if panel then
         panel:addChild(newWindow)
         newWindow:open()
     end
     
-    -- Initial creature check for this instance
     if g_game.isOnline() then
         instance:checkCreatures()
     end
+end
+
+function BattleListManager:getMainInstance()
+    return self.instances[0]
 end
 
 function BattleListManager:getInstance(id)
@@ -382,8 +332,7 @@ end
 function BattleListManager:destroyInstance(id)
     local instance = self.instances[id]
     if instance then
-        instance:destroy(false) -- Clear settings when manually destroyed
-        -- Remove from saved instances state so it won't be restored
+        instance:destroy(false)
         self:removeSavedInstanceState(id)
     end
 end
@@ -397,17 +346,13 @@ function BattleListManager:removeSavedInstanceState(id)
 end
 
 function BattleListManager:startPeriodicSave()
-    -- Cancel any existing auto-save
     self:stopPeriodicSave()
-    
-    -- Set up auto-save every 30 seconds
     self.autoSaveEvent = scheduleEvent(function()
         if g_game.isOnline() and not self.isRestoring then
             self:saveInstancesState()
-            -- Schedule the next save
             self:startPeriodicSave()
         end
-    end, 30000) -- 30 seconds
+    end, 30000)
 end
 
 function BattleListManager:stopPeriodicSave()
@@ -439,7 +384,7 @@ function BattleListInstance:new(id, customName)
     instance.binaryTree = {}
     instance.battleButtons = {}
     instance.lastBattleButtonSwitched = nil
-    instance.lastAge = 0  -- Instance-specific age counter
+    instance.lastAge = 0
     instance.name = customName or tr('Battle List')
     instance.settings = {
         filters = table.copy(BATTLE_FILTERS),
@@ -453,8 +398,7 @@ function BattleListInstance:new(id, customName)
 end
 
 function BattleListInstance:getSettingsKey()
-    local key = 'BattleList_' .. self.id
-    return key
+    return 'BattleList_' .. self.id
 end
 
 function BattleListInstance:loadFilters()
@@ -471,9 +415,7 @@ function BattleListInstance:saveFilters()
 end
 
 function BattleListInstance:saveHideButtonStates()
-    if not self.hideButtons then 
-        return 
-    end
+    if not self.hideButtons then return end
     
     local hideButtonStates = {}
     for buttonName, button in pairs(self.hideButtons) do
@@ -487,13 +429,10 @@ end
 function BattleListInstance:saveLockState()
     if self.window then
         local isLocked = self.window:getSettings('locked') or false
-        
-        -- Also check the lock button state as a fallback
         local lockButton = self.window:getChildById('lockButton')
         if lockButton then
             isLocked = lockButton:isOn()
         end
-        
         g_settings.mergeNode(self:getSettingsKey(), { ['isLocked'] = isLocked })
     end
 end
@@ -506,30 +445,24 @@ function BattleListInstance:loadLockState()
     local settings = g_settings.getNode(self:getSettingsKey())
     if settings and settings['isLocked'] ~= nil then
         local isLocked = settings['isLocked']
-        
-        -- Set both the window settings and the button state
         local lockButton = self.window:getChildById('lockButton')
         if isLocked then
-            self.window:lock(true) -- true = don't save during loading
+            self.window:lock(true)
             if lockButton then
                 lockButton:setOn(true)
             end
         else
-            self.window:unlock(true) -- true = don't save during loading
+            self.window:unlock(true)
             if lockButton then
                 lockButton:setOn(false)
             end
         end
-        
         return isLocked
     end
     return false
 end
-
 function BattleListInstance:loadHideButtonStates()
-    if not self.hideButtons then 
-        return 
-    end
+    if not self.hideButtons then return end
     
     local settings = g_settings.getNode(self:getSettingsKey())
     if settings and settings['hideButtons'] then
@@ -562,7 +495,6 @@ function BattleListInstance:setFilter(filter)
         end
     end
     
-    -- Handle mutual exclusivity for sort options
     if filter:find("sortAscBy") or filter:find("sortDescBy") then
         for filterName, _ in pairs(BATTLE_FILTERS) do
             if filterName ~= filter and (filterName:find("sortAscBy") or filterName:find("sortDescBy")) then
@@ -574,7 +506,6 @@ function BattleListInstance:setFilter(filter)
     filters[filter] = not value
     g_settings.mergeNode(self:getSettingsKey(), { ['filters'] = filters })
     
-    -- Refresh battle list to apply new sorting immediately
     scheduleEvent(function()
         self:checkCreatures()
     end, 50)
@@ -585,7 +516,6 @@ end
 function BattleListInstance:getSortType()
     local filters = self:loadFilters()
     
-    -- Check which sort filter is currently active
     for filterName, isActive in pairs(filters) do
         if isActive and (filterName:find("sortAscBy") or filterName:find("sortDescBy")) then
             if filterName:find("DisplayTime") then
@@ -600,15 +530,11 @@ function BattleListInstance:getSortType()
         end
     end
     
-    -- Default to name if no sort filter is active
     return 'name'
 end
 
 function BattleListInstance:setSortType(state, oldSortType)
-    local settings = {}
-    settings['sortType'] = state
-    g_settings.mergeNode(self:getSettingsKey(), settings)
-    
+    g_settings.mergeNode(self:getSettingsKey(), { ['sortType'] = state })
     local order = self:getSortOrder()
     self:reSort(oldSortType, state, order, order)
 end
@@ -616,26 +542,17 @@ end
 function BattleListInstance:getSortOrder()
     local filters = self:loadFilters()
     
-    -- Check which sort filter is currently active
     for filterName, isActive in pairs(filters) do
         if isActive and (filterName:find("sortAscBy") or filterName:find("sortDescBy")) then
-            if filterName:find("sortAscBy") then
-                return 'A'  -- Ascending
-            else
-                return 'D'  -- Descending
-            end
+            return filterName:find("sortAscBy") and 'A' or 'D'
         end
     end
     
-    -- Default to ascending
     return 'A'
 end
 
 function BattleListInstance:setSortOrder(state, oldSortOrder)
-    local settings = {}
-    settings['sortOrder'] = state
-    g_settings.mergeNode(self:getSettingsKey(), settings)
-    
+    g_settings.mergeNode(self:getSettingsKey(), { ['sortOrder'] = state })
     self:reSort(false, false, oldSortOrder, state)
 end
 
@@ -657,16 +574,11 @@ end
 
 function BattleListInstance:setName(name)
     local settings = g_settings.getNode(self:getSettingsKey()) or {}
-    if name == nil or name == '' then
-        settings['customName'] = tr('Battle List')
-    else
-        settings['customName'] = name
-    end
+    settings['customName'] = (name == nil or name == '') and tr('Battle List') or name
     g_settings.mergeNode(self:getSettingsKey(), settings)
     self:updateTitle()
     
-    -- Save the instances state immediately to preserve the name change
-    if self.id ~= 0 and not BattleListManager.isRestoring then -- Only for non-main instances and not during restoration
+    if self.id ~= 0 and not BattleListManager.isRestoring then
         BattleListManager:saveInstancesState()
     end
 end
@@ -681,11 +593,9 @@ function BattleListInstance:updateTitle()
 end
 
 function BattleListInstance:clearAllConfigurations()
-    -- Clear saved settings by checking if node exists first
     local settingsKey = self:getSettingsKey()
     local settings = g_settings.getNode(settingsKey)
     if settings then
-        -- Clear individual settings instead of removing the entire node
         g_settings.mergeNode(settingsKey, {
             filters = nil,
             sortType = nil,
@@ -697,7 +607,6 @@ function BattleListInstance:clearAllConfigurations()
         })
     end
     
-    -- Reset to default settings
     self.settings = {
         filters = table.copy(BATTLE_FILTERS),
         sortType = 'name',
@@ -706,7 +615,6 @@ function BattleListInstance:clearAllConfigurations()
         customName = tr('Battle List')
     }
     
-    -- Reset filter buttons to unchecked state
     if self.hideButtons then
         for _, button in pairs(self.hideButtons) do
             if button then
@@ -715,31 +623,24 @@ function BattleListInstance:clearAllConfigurations()
         end
     end
     
-    -- Reset window title
     self:updateTitle()
     
-    -- Show filter panel if it was hidden
     if self.filterPanel and not self.filterPanel:isVisible() then
         self:showFilterPanel()
     end
     
-    -- Unlock the window if it was locked
     if self.window then
         self.window:unlock()
     end
     
-    -- Refresh creatures with new settings
     self:checkCreatures()
 end
 
 function BattleListInstance:destroy(saveSettings)
-    -- Only clear settings if explicitly requested (manual destruction)
-    -- Don't clear settings on game exit to preserve them for next session
     if not saveSettings then
         local settingsKey = self:getSettingsKey()
         local settings = g_settings.getNode(settingsKey)
         if settings then
-            -- Clear individual settings instead of removing the entire node
             g_settings.mergeNode(settingsKey, {
                 filters = nil,
                 sortType = nil,
@@ -751,50 +652,41 @@ function BattleListInstance:destroy(saveSettings)
             })
         end
         
-        -- Also remove from saved instances state so it won't be restored
-        if self.id ~= 0 then -- Don't remove main instance from saved state
+        if self.id ~= 0 then
             BattleListManager:removeSavedInstanceState(self.id)
         end
     else
-        -- Save current states before destroying
         self:saveFilters()
         self:saveHideButtonStates()
         self:saveLockState()
     end
     
-    -- Clean up battle buttons
     for i, v in pairs(self.battleButtons) do
         BattleButtonPool:release(v)
     end
     
     self.binaryTree = {}
     self.battleButtons = {}
-    
-    -- Clear instance-specific data
     self.settings = nil
     self.lastBattleButtonSwitched = nil
     
-    -- Only destroy window if it's not the main instance (ID 0)
-    -- The main instance window (battleWindow) is handled by terminate()
     if self.window and self.id ~= 0 then
         self.window:destroy()
         self.window = nil
     end
     
-    -- Clear references
     self.panel = nil
     self.filterPanel = nil
     self.toggleFilterButton = nil
     self.hideButtons = nil
     
-    -- Remove from manager
     BattleListManager.instances[self.id] = nil
 end
 
 -- Instance-specific methods
 function BattleListInstance:onFilterButtonClick(button)
     button:setChecked(not button:isChecked())
-    self:saveHideButtonStates() -- Save the button states
+    self:saveHideButtonStates()
     self:checkCreatures()
 end
 
@@ -839,21 +731,7 @@ function BattleListInstance:onMenuAction(actionId)
         self:openEditNameDialog()
     elseif actionId == 'openNewBattleList' then
         BattleListManager:createNewInstance()
-    elseif actionId == 'sortAscByDisplayTime' then
-        self:setFilter(actionId)
-    elseif actionId == 'sortDescByDisplayTime' then
-        self:setFilter(actionId)
-    elseif actionId == 'sortAscByDistance' then
-        self:setFilter(actionId)
-    elseif actionId == 'sortDescByDistance' then
-        self:setFilter(actionId)
-    elseif actionId == 'sortAscByHitPoints' then
-        self:setFilter(actionId)
-    elseif actionId == 'sortDescByHitPoints' then
-        self:setFilter(actionId)
-    elseif actionId == 'sortAscByName' then
-        self:setFilter(actionId)
-    elseif actionId == 'sortDescByName' then
+    else
         self:setFilter(actionId)
     end
 end
@@ -1233,11 +1111,7 @@ function BattleListInstance:swap(index, newIndex) -- Swap indexes of a given tab
     self.binaryTree[highest] = tmp
 end
 
--- Hide Buttons ("hidePlayers", "hideNPCs", "hideMonsters", "hideSkulls", "hideParty")
-local hideButtons = {}
-
-local eventOnCheckCreature = nil
-
+-- Global legacy functions for backward compatibility
 function loadFilters()
     local settings = g_settings.getNode("BattleList")
     if not settings or not settings['filters'] then
@@ -1250,22 +1124,17 @@ function saveFilters()
     g_settings.mergeNode('BattleList', { ['filters'] = loadFilters() })
 end
 
--- Battle List Name functions
 function getBattleListName()
     local settings = g_settings.getNode('BattleList')
     if settings and settings['customName'] then
         return settings['customName']
     end
-    return tr('Battle List') -- Default name
+    return tr('Battle List')
 end
 
 function setBattleListName(name)
     local settings = g_settings.getNode('BattleList') or {}
-    if name == nil or name == '' then
-        settings['customName'] = tr('Battle List') -- Reset to default
-    else
-        settings['customName'] = name
-    end
+    settings['customName'] = (name == nil or name == '') and tr('Battle List') or name
     g_settings.mergeNode('BattleList', settings)
     updateBattleListTitle()
 end
@@ -1279,30 +1148,19 @@ function updateBattleListTitle()
     end
 end
 
-
-
 function getFilter(filter)
-    -- Use main instance filters instead of global filters
     local mainInstance = BattleListManager:getMainInstance()
     if mainInstance then
         return mainInstance:getFilter(filter)
     end
-    
-    -- Fallback to global filters for backwards compatibility
     local filters = loadFilters()
-    local value = filters[filter]
-    if value ~= nil then
-        return value
-    end
-    -- Fall back to default value if not found in saved settings
-    return BATTLE_FILTERS[filter] or false
+    return filters[filter] ~= nil and filters[filter] or (BATTLE_FILTERS[filter] or false)
 end
 
 function setFilter(filter)
     local filters = loadFilters()
     local value = filters[filter]
     
-    -- If the filter doesn't exist in saved settings, get the default value
     if value == nil then
         value = BATTLE_FILTERS[filter]
         if value == nil then
@@ -1310,9 +1168,7 @@ function setFilter(filter)
         end
     end
     
-    -- Handle mutual exclusivity for sort options
     if filter:find("sortAscBy") or filter:find("sortDescBy") then
-        -- Turn off all other sort filters
         for filterName, _ in pairs(BATTLE_FILTERS) do
             if filterName ~= filter and (filterName:find("sortAscBy") or filterName:find("sortDescBy")) then
                 filters[filterName] = false
@@ -1323,19 +1179,12 @@ function setFilter(filter)
     filters[filter] = not value
     g_settings.mergeNode('BattleList', { ['filters'] = filters })
     
-    -- Note: This filter system is for ordering/sorting only, not for visibility filters
-    -- The hideButtons remain separate and are handled by the existing onFilterButtonClick
-    
     return true
 end
 
+-- Game event handlers
 local function connecting()
-    -- TODO: Just connect when you will be using
-
-    connect(LocalPlayer, {
-        onPositionChange = onCreaturePositionChange
-    })
-
+    connect(LocalPlayer, { onPositionChange = onCreaturePositionChange })
     connect(Creature, {
         onSkullChange = updateCreatureSkull,
         onEmblemChange = updateCreatureEmblem,
@@ -1345,12 +1194,8 @@ local function connecting()
         onAppear = onCreatureAppear,
         onDisappear = onCreatureDisappear
     })
-
-    connect(UIMap, {
-        onZoomChange = onZoomChange
-    })
-
-    -- Check creatures around you - update all instances
+    connect(UIMap, { onZoomChange = onZoomChange })
+    
     for _, instance in pairs(BattleListManager.instances) do
         instance:checkCreatures()
     end
@@ -1358,12 +1203,7 @@ local function connecting()
 end
 
 local function disconnecting(gameEvent)
-    -- TODO: Just disconnect what you're not using
-
-    disconnect(LocalPlayer, {
-        onPositionChange = onCreaturePositionChange
-    })
-
+    disconnect(LocalPlayer, { onPositionChange = onCreaturePositionChange })
     disconnect(Creature, {
         onSkullChange = updateCreatureSkull,
         onEmblemChange = updateCreatureEmblem,
@@ -1373,18 +1213,13 @@ local function disconnecting(gameEvent)
         onAppear = onCreatureAppear,
         onDisappear = onCreatureDisappear
     })
-
-    disconnect(UIMap, {
-        onZoomChange = onZoomChange
-    })
-
+    disconnect(UIMap, { onZoomChange = onZoomChange })
     return true
 end
 
-function init() -- Initiating the module (load)
-    -- Initialize Battle Button Pool - needs to be done after corelib is loaded
+function init()
+    -- Initialize Battle Button Pool
     if not ObjectPool then
-        -- Create a fallback implementation
         BattleButtonPool = {
             get = function()
                 local widget = g_ui.createWidget('BattleButton')
@@ -1399,7 +1234,8 @@ function init() -- Initiating the module (load)
             end
         }
     else
-        BattleButtonPool = ObjectPool.new(function()
+        BattleButtonPool = ObjectPool.new(
+            function()
                 local widget = g_ui.createWidget('BattleButton')
                 widget:show()
                 widget:setOn(true)
@@ -1408,18 +1244,12 @@ function init() -- Initiating the module (load)
                 return widget
             end,
             function(obj)
-                -- Reset the battle button state
-                if obj.creature then
-                    obj.creature = nil
-                end
-                if obj.data then
-                    obj.data = nil
-                end
+                if obj.creature then obj.creature = nil end
+                if obj.data then obj.data = nil end
                 obj.isTarget = false
                 obj.isFollowed = false
                 obj.isHovered = false
                 
-                -- Clear global references to this button
                 if lastBattleButtonSwitched == obj then
                     lastBattleButtonSwitched = nil
                 end
@@ -1427,20 +1257,21 @@ function init() -- Initiating the module (load)
                     lastCreatureSelected = nil
                 end
                 
-                -- Remove from parent if it has one
                 local parent = obj:getParent()
                 if parent then
                     parent:removeChild(obj)
                 end
             end)
-    end    g_ui.importStyle('battlebutton')
+    end
+    
+    g_ui.importStyle('battlebutton')
     battleButton = modules.game_mainpanel.addToggleButton('battleButton', tr('Battle') .. ' (Ctrl+B)',
         '/images/options/button_battlelist', toggle, false, 2)
     battleButton:setOn(true)
     battleWindow = g_ui.loadUI('battle')
 
-    -- Initialize the main battle list instance (ID 0)
-    BattleListManager.nextId = 1  -- Start secondary instances from ID 1
+    -- Initialize main instance
+    BattleListManager.nextId = 1
     local mainInstance = BattleListInstance:new(0, tr('Battle List'))
     mainInstance.window = battleWindow
     mainInstance.panel = battleWindow:recursiveGetChildById('battlePanel')
@@ -1453,65 +1284,47 @@ function init() -- Initiating the module (load)
     filterPanel = mainInstance.filterPanel
     toggleFilterButton = mainInstance.toggleFilterButton
 
-    -- Binding Ctrl + B shortcut
+    -- Setup keybind
     Keybind.new("Windows", "Show/hide battle list", "Ctrl+B", "")
-    Keybind.bind("Windows", "Show/hide battle list", {
-        {
-            type = KEY_DOWN,
-            callback = toggle,
-        }
-    })
+    Keybind.bind("Windows", "Show/hide battle list", {{ type = KEY_DOWN, callback = toggle }})
 
-    -- Disabling scrollbar auto hiding
+    -- Setup scrollbar
     local scrollbar = battleWindow:getChildById('miniwindowScrollBar')
-    scrollbar:mergeStyle({
-        ['$!on'] = {}
-    })
+    scrollbar:mergeStyle({ ['$!on'] = {} })
 
     HorizontalSeparator = battleWindow:recursiveGetChildById('HorizontalSeparator')
     contentsPanel = battleWindow:recursiveGetChildById('contentsPanel')
     miniwindowScrollBar = battleWindow:recursiveGetChildById('miniwindowScrollBar')
 
-    -- Hide/Show Filter Options
+    -- Setup filter panel
     local settings = g_settings.getNode(mainInstance:getSettingsKey())
     if settings and settings['hidingFilters'] then
         mainInstance:hideFilterPanel()
     end
 
-    -- Adding Filter options
+    -- Setup filter buttons
     local options = { 'hidePlayers', 'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty', 'hideKnights', 'hidePaladins', 'hideDruids', 'hideSorcerers', 'hideMonks', 'hideSummons', 'hideMembersOwnGuild' }
     for i, v in ipairs(options) do
         hideButtons[v] = battleWindow:recursiveGetChildById(v)
     end
     
-    -- Set up hideButtons for main instance
     mainInstance.hideButtons = hideButtons
-    
-    -- Load saved hide button states for main instance
     mainInstance:loadHideButtonStates()
-    
-    -- Load saved lock state for main instance
     mainInstance:loadLockState()
     
-    -- Set up auto-save for main instance lock button
+    -- Setup lock button
     local mainLockButton = battleWindow:getChildById('lockButton')
     if mainLockButton then
         local originalOnClick = mainLockButton.onClick
         mainLockButton.onClick = function()
-            if originalOnClick then
-                originalOnClick()
-            end
-            -- Save lock state after the lock/unlock action for main instance
-            scheduleEvent(function()
-                mainInstance:saveLockState()
-            end, 10)
+            if originalOnClick then originalOnClick() end
+            scheduleEvent(function() mainInstance:saveLockState() end, 10)
         end
     end
 
-    -- Reorganize filter buttons layout after setup (with small delay for OTUI setup)
     scheduleEvent(reorganizeFilterButtons, 50)
 
-    -- Adding mouse Widget
+    -- Setup mouse widget
     mouseWidget = g_ui.createWidget('UIButton')
     mouseWidget:setVisible(false)
     mouseWidget:setFocusable(false)
@@ -1524,38 +1337,25 @@ function init() -- Initiating the module (load)
         onGameStart = onGameStart
     })
 
-    --[[
-    Configure BattleList SubMenu Hidden Options
-    ]]--
-
-    -- Setup context menu button for main instance
+    -- Setup context menu
     local contextMenuButton = battleWindow:recursiveGetChildById('contextMenuButton')
     if contextMenuButton then
         contextMenuButton.onClick = function(widget, mousePos, mouseButton)
             return mainInstance:showContextMenu(widget, mousePos, mouseButton)
         end
-    else
-        print("Warning: contextMenuButton not found in battleWindow")
     end
     
-    -- Setup new window button for main instance
     local newWindowButton = battleWindow:recursiveGetChildById('newWindowButton')
     if newWindowButton then
         newWindowButton.onClick = function()
             BattleListManager:createNewInstance()
         end
-    else
-        print("Warning: newWindowButton not found in battleWindow")
     end
 
-    -- Determining Height and Setting up!
     battleWindow:setContentMinimumHeight(80)
     battleWindow:setup()
-    
-    -- Set the custom battle list name if it exists
     updateBattleListTitle()
     
-    -- Add context menu to the battle window
     battleWindow.onMousePress = function(widget, mousePos, button)
         if button == MouseRightButton then
             local menu = g_ui.createWidget('PopupMenu')
@@ -1571,22 +1371,18 @@ function init() -- Initiating the module (load)
     end
 end
 
--- Function to reorganize filter buttons layout when some are hidden
 local function reorganizeFilterButtons()
     if not filterPanel then return end
 
     local filterRow1 = filterPanel:getChildById('filterRow1')
     local filterRow2 = filterPanel:getChildById('filterRow2')
-
     if not filterRow1 or not filterRow2 then return end
 
-    -- The correct order for the battle filter buttons (7 for row1, 5 for row2)
     local orderedIds = {
         'hidePlayers', 'hideKnights', 'hidePaladins', 'hideDruids', 'hideSorcerers', 'hideMonks', 'hideSummons',
         'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty', 'hideMembersOwnGuild'
     }
 
-    -- Remove all filter buttons from their current parents (only those belonging to MiniWindowBattle)
     for _, id in ipairs(orderedIds) do
         local btn = hideButtons[id]
         if btn and btn:getParent() then
@@ -1594,7 +1390,6 @@ local function reorganizeFilterButtons()
         end
     end
 
-    -- Add visible buttons back, 7 to row1, 5 to row2
     local visibleButtons = {}
     for _, id in ipairs(orderedIds) do
         local btn = hideButtons[id]
@@ -1611,59 +1406,17 @@ local function reorganizeFilterButtons()
         end
     end
 
-    -- Update layouts
     if filterRow1:getLayout() then filterRow1:getLayout():update() end
     if filterRow2:getLayout() then filterRow2:getLayout():update() end
     if filterPanel:getLayout() then filterPanel:getLayout():update() end
 end
 
--- Binary Search, Insertion and Resort functions
-local function debugTables(sortType) -- Print both battlebutton and binarytree tables
-    local function getInfo(v, sortType)
-        local returnedInfo = v.id
-        if sortType then
-            if sortType == 'distance' then
-                returnedInfo = v.distance
-            elseif sortType == 'health' then
-                returnedInfo = v.healthpercent
-            elseif sortType == 'age' then
-                returnedInfo = v.age
-            else
-                returnedInfo = v.name
-            end
-        end
-        return returnedInfo
-    end
-
-    print('-----------------------------')
-    local msg = 'printing binaryTree: {'
-    for i, v in pairs(binaryTree) do
-        msg = msg .. '[' .. i .. '] = ' .. getInfo(v, 'name') .. ' [' .. getInfo(v, sortType) .. '],'
-    end
-    msg = msg .. '}'
-    print(msg)
-
-    msg = 'printing battleButtons: {'
-    for i, v in pairs(battleButtons) do
-        msg = msg .. '[' .. getInfo(v.data, 'name') .. '] = ' .. getInfo(v.data, sortType) .. ','
-    end
-    msg = msg .. '}'
-    print(msg)
-
-    return true
+-- Binary Search and utility functions
+function BSComparator(a, b)
+    return a > b and -1 or (a < b and 1 or 0)
 end
 
-function BSComparator(a, b) -- Default comparator function, we probably won't use it here.
-    if a > b then
-        return -1
-    elseif a < b then
-        return 1
-    else
-        return 0
-    end
-end
-
-function BSComparatorSortType(a, b, sortType, id) -- Comparator function by sortType (and id optionally)
+function BSComparatorSortType(a, b, sortType, id)
     local comparatorA, comparatorB
     if sortType == 'distance' then
         comparatorA, comparatorB = a.distance, (type(b) == 'table' and b.distance or b)
@@ -1684,28 +1437,19 @@ function BSComparatorSortType(a, b, sortType, id) -- Comparator function by sort
     elseif comparatorA < comparatorB then
         return 1
     else
-        if id then
-            if b and b.id and a.id > b.id then
-                return -1
-            elseif b and b.id and a.id < b.id then
-                return 1
-            end
+        if id and b and b.id then
+            return a.id > b.id and -1 or (a.id < b.id and 1 or 0)
         end
         return 0
     end
 end
 
-function binarySearch(tbl, value, comparator, ...) -- Binary Search function, to search a value in our binaryTree
-    if not comparator then
-        comparator = BSComparator
-    end
-
-    local mini = 1
-    local maxi = #tbl
-    local mid = 1
+function binarySearch(tbl, value, comparator, ...)
+    comparator = comparator or BSComparator
+    local mini, maxi = 1, #tbl
 
     while mini <= maxi do
-        mid = math.floor((maxi + mini) / 2)
+        local mid = math.floor((maxi + mini) / 2)
         local tmp_value = comparator(tbl[mid], value, ...)
 
         if tmp_value == 0 then
@@ -1719,19 +1463,13 @@ function binarySearch(tbl, value, comparator, ...) -- Binary Search function, to
     return nil
 end
 
-function binaryInsert(tbl, value, comparator, ...) -- Binary Insertion function, to insert a value in our binaryTree
-    if not comparator then
-        comparator = BSComparator
-    end
-
-    local mini = 1
-    local maxi = #tbl
-    local state = 0
-    local mid = 1
+function binaryInsert(tbl, value, comparator, ...)
+    comparator = comparator or BSComparator
+    local mini, maxi = 1, #tbl
+    local state, mid = 0, 1
 
     while mini <= maxi do
         mid = math.floor((maxi + mini) / 2)
-
         if comparator(tbl[mid], value, ...) < 0 then
             maxi, state = mid - 1, 0
         else
@@ -1739,39 +1477,7 @@ function binaryInsert(tbl, value, comparator, ...) -- Binary Insertion function,
         end
     end
     table.insert(tbl, mid + state, value)
-    return (mid + state)
-end
-
-local function swap(index, newIndex) -- Swap indexes of a given table
-    local highest = newIndex
-    local lowest = index
-
-    if index > newIndex then
-        highest = index
-        lowest = newIndex
-    end
-
-    local tmp = binaryTree[lowest]
-    binaryTree[lowest] = binaryTree[highest]
-    binaryTree[highest] = tmp
-end
-
-local function correctBattleButtons(sortOrder) -- Update battleButton index based upon our binary tree
-    -- Delegate to main instance
-    local mainInstance = BattleListManager.instances[0]
-    if mainInstance then
-        mainInstance:correctBattleButtons(sortOrder)
-    end
-    return true
-end
-
-local function reSort(oldSortType, newSortType, oldSortOrder, newSortOrder) -- Resort the binaryTree and update battlebuttons
-    -- Delegate to main instance
-    local mainInstance = BattleListManager.instances[0]
-    if mainInstance then
-        mainInstance:reSort(oldSortType, newSortType, oldSortOrder, newSortOrder)
-    end
-    return true
+    return mid + state
 end
 
 function onGameStart()
@@ -2137,18 +1843,23 @@ function onAttack(creature) -- Update battleButton once you're attacking a targe
         lastCreatureSelected = nil
     end
 
-    local battleButton = nil
-    if battleWindow:isVisible() then
-        local mainInstance = BattleListManager.instances[0]
-        if mainInstance then
-            battleButton = creature and (mainInstance.battleButtons[creature:getId()]) or lastBattleButtonSwitched
+    local foundBattleButton = false
+    
+    -- Update all battle list instances
+    for _, instance in pairs(BattleListManager.instances) do
+        if instance.window and instance.window:isVisible() then
+            local battleButton = creature and instance.battleButtons[creature:getId()] or nil
+            if battleButton then
+                battleButton.isTarget = creature and true or false
+                updateBattleButton(battleButton)
+                foundBattleButton = true
+                -- Don't break here - continue to update other instances
+            end
         end
     end
 
-    if battleButton then
-        battleButton.isTarget = creature and true or false
-        updateBattleButton(battleButton)
-    elseif creature then
+    -- If no battle button was found in any instance, show static square on creature
+    if not foundBattleButton and creature then
         creature:showStaticSquare(UICreatureButton.getCreatureButtonColors().onTargeted.notHovered)
     end
 
@@ -2161,20 +1872,26 @@ function onFollow(creature) -- Update battleButton once you're following a targe
         lastCreatureSelected = nil
     end
 
-    local battleButton = nil
-    if battleWindow:isVisible() then
-        local mainInstance = BattleListManager.instances[0]
-        if mainInstance then
-            battleButton = creature and mainInstance.battleButtons[creature:getId()] or lastBattleButtonSwitched
+    local foundBattleButton = false
+    
+    -- Update all battle list instances
+    for _, instance in pairs(BattleListManager.instances) do
+        if instance.window and instance.window:isVisible() then
+            local battleButton = creature and instance.battleButtons[creature:getId()] or nil
+            if battleButton then
+                battleButton.isFollowed = creature and true or false
+                updateBattleButton(battleButton)
+                foundBattleButton = true
+                -- Don't break here - continue to update other instances
+            end
         end
     end
 
-    if battleButton then
-        battleButton.isFollowed = creature and true or false
-        updateBattleButton(battleButton)
-    elseif creature then
+    -- If no battle button was found in any instance, show static square on creature
+    if not foundBattleButton and creature then
         creature:showStaticSquare(UICreatureButton.getCreatureButtonColors().onFollowed.notHovered)
     end
+    
     lastCreatureSelected = creature
 end
 
@@ -2461,12 +2178,33 @@ function updateBattleButton(battleButton) -- Update battleButton with attack/fol
     end
     
     battleButton:update()
-    if battleButton.isTarget or battleButton.isFollowed then
-        -- set new last battle button switched
-        if lastBattleButtonSwitched and lastBattleButtonSwitched ~= battleButton then
-            lastBattleButtonSwitched.isTarget = false
-            lastBattleButtonSwitched.isFollowed = false
-            updateBattleButton(lastBattleButtonSwitched)
+    
+    if battleButton.isTarget then
+        -- Clear target flag from all other battle buttons representing DIFFERENT creatures in all instances
+        local currentCreatureId = battleButton.creature:getId()
+        for _, instance in pairs(BattleListManager.instances) do
+            for _, otherBattleButton in pairs(instance.battleButtons) do
+                if otherBattleButton ~= battleButton and otherBattleButton.isTarget and 
+                   otherBattleButton.creature and otherBattleButton.creature:getId() ~= currentCreatureId then
+                    otherBattleButton.isTarget = false
+                    otherBattleButton:update()
+                end
+            end
+        end
+        lastBattleButtonSwitched = battleButton
+    end
+    
+    if battleButton.isFollowed then
+        -- Clear follow flag from all other battle buttons representing DIFFERENT creatures in all instances
+        local currentCreatureId = battleButton.creature:getId()
+        for _, instance in pairs(BattleListManager.instances) do
+            for _, otherBattleButton in pairs(instance.battleButtons) do
+                if otherBattleButton ~= battleButton and otherBattleButton.isFollowed and
+                   otherBattleButton.creature and otherBattleButton.creature:getId() ~= currentCreatureId then
+                    otherBattleButton.isFollowed = false
+                    otherBattleButton:update()
+                end
+            end
         end
         lastBattleButtonSwitched = battleButton
     end
