@@ -282,6 +282,14 @@ function BattleListManager:createWindowForInstance(instance)
         end
     end
     
+    -- Setup new window button for this instance
+    local newWindowButton = newWindow:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton.onClick = function()
+            BattleListManager:createNewInstance()
+        end
+    end
+    
     -- Setup toggle filter button
     if instance.toggleFilterButton then
         instance.toggleFilterButton.onClick = function()
@@ -1050,7 +1058,10 @@ function BattleListInstance:addCreature(creature, sortType)
     local creatureId = creature:getId()
     local battleButton = self.battleButtons[creatureId]
     if battleButton then
-        battleButton:update()
+        -- Safety check: don't update if creature is nil
+        if battleButton.creature then
+            battleButton:update()
+        end
     else
         if creature:getPosition() == nil then
             return
@@ -1078,12 +1089,16 @@ function BattleListInstance:addCreature(creature, sortType)
         
         if creature == g_game.getAttackingCreature() then
             battleButton.isTarget = true
-            battleButton:update()
+            if battleButton.creature then
+                battleButton:update()
+            end
         end
         
         if creature == g_game.getFollowingCreature() then
             battleButton.isFollowed = true
-            battleButton:update()
+            if battleButton.creature then
+                battleButton:update()
+            end
         end
         
         if self:isSortAsc() then
@@ -1403,6 +1418,14 @@ function init() -- Initiating the module (load)
                 obj.isTarget = false
                 obj.isFollowed = false
                 obj.isHovered = false
+                
+                -- Clear global references to this button
+                if lastBattleButtonSwitched == obj then
+                    lastBattleButtonSwitched = nil
+                end
+                if lastCreatureSelected and obj.creature == lastCreatureSelected then
+                    lastCreatureSelected = nil
+                end
                 
                 -- Remove from parent if it has one
                 local parent = obj:getParent()
@@ -2362,7 +2385,9 @@ function onCreatureHealthPercentChange(creature, healthPercent, oldHealthPercent
                     instance:correctBattleButtons()
                 end
             end
-            battleButton:update()
+            if battleButton.creature then
+                battleButton:update()
+            end
         end
         ::continue::
     end
@@ -2422,7 +2447,7 @@ function updateStaticSquare(battleButton) -- Update all static squares upon appe
     -- Update all battle list instances
     for _, instance in pairs(BattleListManager.instances) do
         for _, battleButton in pairs(instance.battleButtons) do
-            if battleButton.isTarget then
+            if battleButton.isTarget and battleButton.creature then
                 battleButton:update()
             end
         end
@@ -2430,6 +2455,11 @@ function updateStaticSquare(battleButton) -- Update all static squares upon appe
 end
 
 function updateBattleButton(battleButton) -- Update battleButton with attack/follow squares
+    -- Safety check: don't update if creature is nil
+    if not battleButton or not battleButton.creature then
+        return
+    end
+    
     battleButton:update()
     if battleButton.isTarget or battleButton.isFollowed then
         -- set new last battle button switched
@@ -2439,6 +2469,11 @@ function updateBattleButton(battleButton) -- Update battleButton with attack/fol
             updateBattleButton(lastBattleButtonSwitched)
         end
         lastBattleButtonSwitched = battleButton
+    end
+    
+    -- Clear lastBattleButtonSwitched if it's a released button
+    if lastBattleButtonSwitched and not lastBattleButtonSwitched.creature then
+        lastBattleButtonSwitched = nil
     end
 end
 
