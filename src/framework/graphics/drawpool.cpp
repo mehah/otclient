@@ -60,7 +60,7 @@ void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& m
         }
     }
 
-    if (!updateHash(method, texture, color, coordsBuffer != nullptr))
+    if (!updateHash(method, textureAtlas ? textureAtlas : texture.get(), color, coordsBuffer != nullptr))
         return;
 
     auto& list = m_objects[m_currentDrawOrder];
@@ -101,7 +101,7 @@ void DrawPool::addCoords(CoordsBuffer& buffer, const DrawMethod& method)
     }
 }
 
-bool DrawPool::updateHash(const DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord) {
+bool DrawPool::updateHash(const DrawMethod& method, const Texture* texture, const Color& color, const bool hasCoord) {
     auto& state = getCurrentState();
     state.hash = 0;
 
