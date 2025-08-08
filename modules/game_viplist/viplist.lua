@@ -800,11 +800,11 @@ function onVipListLabelMousePress(widget, mousePos, mouseButton)
 
     menu:addSeparator()
     if not globalSettings.hideOfflineVips then
-        menu:addOption(tr('Hide Offline'), function()
+        menu:addOption(tr('Hide offline VIPs'), function()
             hideOffline(true)
         end)
     else
-        menu:addOption(tr('Show Offline'), function()
+        menu:addOption(tr('Show offline VIPs'), function()
             hideOffline(false)
         end)
     end

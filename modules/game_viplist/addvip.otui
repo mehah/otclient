@@ -23,7 +23,7 @@ FloatingInputWindow
   
   Label
     id: descriptionText
-    !text: tr('Please enter a character name:')
+    !text: tr('Please enter a character name') .. ':'
     text-wrap: true
     text-auto-resize:true
     anchors.top: headerLabel.bottom

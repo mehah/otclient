@@ -563,8 +563,11 @@ end
 function setSkillTooltip(id, value)
     local skill = skillsWindow:recursiveGetChildById(id)
     if skill then
-        local widget = skill:getChildById('value')
-        widget:setTooltip(value)
+        if value then
+            skill:setTooltip(value)
+        else
+            skill:removeTooltip()
+        end
     end
 end
 
@@ -918,15 +921,31 @@ function checkExpSpeed()
 
     local currentExp = player:getExperience()
     local currentTime = g_clock.seconds()
-    if player.lastExps ~= nil then
-        player.expSpeed = (currentExp - player.lastExps[1][1]) / (currentTime - player.lastExps[1][2])
-        onLevelChange(player, player:getLevel(), player:getLevelPercent())
-    else
+    
+    if player.lastExps == nil then
         player.lastExps = {}
     end
+    
+    -- Always add the current data point
     table.insert(player.lastExps, {currentExp, currentTime})
     if #player.lastExps > 30 then
         table.remove(player.lastExps, 1)
+    end
+    
+    -- Calculate experience speed if we have enough data points
+    if #player.lastExps >= 2 then
+        local oldestEntry = player.lastExps[1]
+        local expGained = currentExp - oldestEntry[1]
+        local timeElapsed = currentTime - oldestEntry[2]
+        
+        if timeElapsed > 0 then
+            player.expSpeed = expGained / timeElapsed
+        else
+            player.expSpeed = 0
+        end
+        
+        onLevelChange(player, player:getLevel(), player:getLevelPercent())
+        onExperienceChange(player, player:getExperience()) -- Update experience tooltip
     end
 end
 
@@ -972,24 +991,84 @@ end
 
 function onExperienceChange(localPlayer, value)
     setSkillValue('experience', comma_value(value))
+    
+    -- Set tooltip with experience rate information when player is receiving experience
+    if localPlayer.expSpeed ~= nil then
+        local expPerHour = math.floor(localPlayer.expSpeed * 3600)
+        
+        -- Only show tooltip if we have a positive experience rate
+        if expPerHour > 0 then
+            local currentLevel = localPlayer:getLevel()
+            local currentExp = localPlayer:getExperience()
+            local nextLevelExp = expForLevel(currentLevel + 1)
+            local expNeeded = nextLevelExp - currentExp
+            
+            -- Only show time calculation if we actually need more experience
+            if expNeeded > 0 then
+                local hoursLeft = expNeeded / expPerHour
+                local minutesLeft = math.floor((hoursLeft - math.floor(hoursLeft)) * 60)
+                hoursLeft = math.floor(hoursLeft)
+                local expText = tr('%s of experience per hour', comma_value(expPerHour)) .. '\n' ..
+                               tr('Next level in %d hours and %d minutes', hoursLeft, minutesLeft)
+                setSkillTooltip('experience', expText)
+            else
+                -- Just show exp per hour if already at max level or calculation error
+                local expText = tr('%s of experience per hour', comma_value(expPerHour))
+                setSkillTooltip('experience', expText)
+            end
+        else
+            -- Check if player is not in battle (no battle icons) before showing experience left
+            local states = localPlayer:getStates()
+            local isInBattle = bit.band(states, PlayerStates.Swords) > 0 or bit.band(states, PlayerStates.RedSwords) > 0
+            
+            if not isInBattle then
+                -- Show experience left info when not receiving experience and not in battle
+                local currentLevel = localPlayer:getLevel()
+                local currentExp = localPlayer:getExperience()
+                local nextLevelExp = expForLevel(currentLevel + 1)
+                local expNeeded = nextLevelExp - currentExp
+                
+                if expNeeded > 0 then
+                    local expText = tr('%s XP for next level', comma_value(expNeeded))
+                    setSkillTooltip('experience', expText)
+                else
+                    -- Clear tooltip if at max level
+                    setSkillTooltip('experience', nil)
+                end
+            else
+                -- Clear tooltip if in battle
+                setSkillTooltip('experience', nil)
+            end
+        end
+    else
+        -- Check if player is not in battle (no battle icons) before showing experience left
+        local states = localPlayer:getStates()
+        local isInBattle = bit.band(states, PlayerStates.Swords) > 0 or bit.band(states, PlayerStates.RedSwords) > 0
+        
+        if not isInBattle then
+            -- Show experience left info when no experience speed data and not in battle
+            local currentLevel = localPlayer:getLevel()
+            local currentExp = localPlayer:getExperience()
+            local nextLevelExp = expForLevel(currentLevel + 1)
+            local expNeeded = nextLevelExp - currentExp
+            
+            if expNeeded > 0 then
+                local expText = tr('%s XP for next level', comma_value(expNeeded))
+                setSkillTooltip('experience', expText)
+            else
+                -- Clear tooltip if at max level
+                setSkillTooltip('experience', nil)
+            end
+        else
+            -- Clear tooltip if in battle
+            setSkillTooltip('experience', nil)
+        end
+    end
 end
 
 function onLevelChange(localPlayer, value, percent)
     setSkillValue('level', comma_value(value))
-    local text = tr('You have %s percent to go', 100 - percent) .. '\n' ..
-                     tr('%s of experience left', expToAdvance(localPlayer:getLevel(), localPlayer:getExperience()))
-
-    if localPlayer.expSpeed ~= nil then
-        local expPerHour = math.floor(localPlayer.expSpeed * 3600)
-        if expPerHour > 0 then
-            local nextLevelExp = expForLevel(localPlayer:getLevel() + 1)
-            local hoursLeft = (nextLevelExp - localPlayer:getExperience()) / expPerHour
-            local minutesLeft = math.floor((hoursLeft - math.floor(hoursLeft)) * 60)
-            hoursLeft = math.floor(hoursLeft)
-            text = text .. '\n' .. tr('%s of experience per hour', comma_value(expPerHour))
-            text = text .. '\n' .. tr('Next level in %d hours and %d minutes', hoursLeft, minutesLeft)
-        end
-    end
+    local text = tr('You have %s percent to go', 100 - percent)
 
     setSkillPercent('level', percent, text)
 end
