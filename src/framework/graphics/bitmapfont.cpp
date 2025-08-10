@@ -30,8 +30,8 @@
 
 #include "drawpoolmanager.h"
 
-static std::vector<Point> s_glyphsPositions(1);
-static std::vector<int> s_lineWidths(1);
+static thread_local std::vector<Point> s_glyphsPositions(1);
+static thread_local std::vector<int> s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
@@ -98,8 +98,8 @@ void BitmapFont::drawText(const std::string_view text, const Point& startPos, co
 void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color& color, const Fw::AlignmentFlag align)
 {
     Size textBoxSize;
-    const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
-    for (const auto& [dest, src] : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
+    calculateGlyphsPositions(text, align, s_glyphsPositions, &textBoxSize);
+    for (const auto& [dest, src] : getDrawTextCoords(text, textBoxSize, align, screenCoords, s_glyphsPositions)) {
         g_drawPool.addTexturedRect(dest, m_texture, src, color);
     }
 }
@@ -366,7 +366,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     }
 }
 
-const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, Size* textBoxSize) const
+void BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, std::vector<Point>& glyphsPositions, Size* textBoxSize) const
 {
     const int textLength = text.length();
     int maxLineWidth = 0;
@@ -377,12 +377,11 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     if (textLength == 0) {
         if (textBoxSize)
             textBoxSize->resize(0, m_glyphHeight);
-        return s_glyphsPositions;
     }
 
     // resize s_glyphsPositions vector when needed
-    if (textLength > static_cast<int>(s_glyphsPositions.size()))
-        s_glyphsPositions.resize(textLength);
+    if (textLength > static_cast<int>(glyphsPositions.size()))
+        glyphsPositions.resize(textLength);
 
     // calculate lines width
     if ((align & Fw::AlignRight || align & Fw::AlignHorizontalCenter) || textBoxSize) {
@@ -430,7 +429,7 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
         }
 
         // store current glyph topLeft
-        s_glyphsPositions[i] = virtualPos;
+        glyphsPositions[i] = virtualPos;
 
         // render only if the glyph is valid
         if (glyph >= 32 && glyph != static_cast<uint8_t>('\n')) {
@@ -442,14 +441,12 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
         textBoxSize->setWidth(maxLineWidth);
         textBoxSize->setHeight(virtualPos.y + m_glyphHeight);
     }
-
-    return s_glyphsPositions;
 }
 
 Size BitmapFont::calculateTextRectSize(const std::string_view text)
 {
     Size size;
-    calculateGlyphsPositions(text, Fw::AlignTopLeft, &size);
+    calculateGlyphsPositions(text, Fw::AlignTopLeft, s_glyphsPositions, &size);
     return size;
 }
 
