@@ -3,7 +3,7 @@
 #include "graphics.h"
 #include "framebuffer.h"
 
-constexpr uint8_t SMOOTH_PADDING = 4;
+constexpr uint8_t SMOOTH_PADDING = 2;
 
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
     m_type(type),
@@ -88,10 +88,10 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
 
 void TextureAtlas::createNewLayer(bool smooth) {
     auto fbo = std::make_unique<FrameBuffer>();
-    fbo->resize(m_size);
     fbo->setAutoClear(false);
     fbo->setAutoResetState(true);
-    fbo->getTexture()->setSmooth(smooth);
+    fbo->setSmooth(smooth);
+    fbo->resize(m_size);
 
     FreeRegion newRegion = { 0, 0, m_size.width(), m_size.height(), static_cast<int>(m_filterGroups[smooth].layers.size()) };
 
