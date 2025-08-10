@@ -69,7 +69,8 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
         return;
     }
 
-    std::string outmsg{ std::string{s_logPrefixes[level]} + message.data() };
+    std::string outmsg{ s_logPrefixes[level] };
+    outmsg.append(message);
 
 #ifdef ANDROID
     __android_log_print(ANDROID_LOG_INFO, "OTClientMobile", "%s", outmsg.c_str());
