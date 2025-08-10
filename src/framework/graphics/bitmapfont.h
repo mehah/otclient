@@ -71,9 +71,11 @@ public:
     int getGlyphHeight() const { return m_glyphHeight; }
     const Rect* getGlyphsTextureCoords() { return m_glyphsTextureCoords; }
     const Size* getGlyphsSize() { return m_glyphsSize; }
-    const TexturePtr& getTexture() { return m_texture; }
+    const TexturePtr& getTexture() const { return m_texture; }
     int getYOffset() const { return m_yOffset; }
     Size getGlyphSpacing() { return m_glyphSpacing; }
+
+    bool isAtAtlasRegion(const AtlasRegion* region) const;
 
 private:
     /// Calculates each font character by inspecting font bitmap

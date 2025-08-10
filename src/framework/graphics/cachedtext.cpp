@@ -33,7 +33,7 @@ void CachedText::draw(const Rect& rect, const Color& color)
         return;
 
     // Hack to fix font rendering in atlas
-    if (m_font->getTexture()->getAtlasRegion() != m_atlasRegion) {
+    if (!m_font->isAtAtlasRegion(m_atlasRegion)) {
         m_atlasRegion = m_font->getTexture()->getAtlasRegion();
         m_textScreenCoords = {};
     }

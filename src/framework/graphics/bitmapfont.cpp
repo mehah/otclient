@@ -552,3 +552,7 @@ void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const 
         }
     }
 }
+
+bool BitmapFont::isAtAtlasRegion(const AtlasRegion* region) const {
+    return m_texture && m_texture->getAtlasRegion() == region;
+}
