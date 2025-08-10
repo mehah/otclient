@@ -43,11 +43,11 @@ void ProxyManager::terminate()
     m_working = false;
     clear();
     m_guard.reset();
-    if (!m_thread.joinable()) {
+    if (m_thread.joinable()) {
         stdext::millisleep(100);
         m_io.stop();
+        m_thread.join();
     }
-    m_thread.join();
 }
 
 void ProxyManager::clear()
