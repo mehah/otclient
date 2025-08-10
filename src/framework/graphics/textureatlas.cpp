@@ -3,6 +3,8 @@
 #include "graphics.h"
 #include "framebuffer.h"
 
+constexpr uint8_t SMOOTH_PADDING = 4;
+
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
     m_type(type),
     m_size({ std::min<int>(size, 8192) }) {
@@ -55,19 +57,23 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
         }
     }
 
-    auto bestRegionOpt = findBestRegion(width, height, texture->isSmooth());
+    const int pad = texture->isSmooth() ? SMOOTH_PADDING : 0;
+    const int allocW = width + (pad * 2);
+    const int allocH = height + (pad * 2);
+
+    auto bestRegionOpt = findBestRegion(allocW, allocH, texture->isSmooth());
     if (!bestRegionOpt.has_value()) {
         createNewLayer(texture->isSmooth());
         return addTexture(texture);
     }
 
     FreeRegion region = bestRegionOpt.value();
-    splitRegion(region, width, height, texture->isSmooth());
+    splitRegion(region, allocW, allocH, texture->isSmooth());
 
     auto info = std::make_unique<AtlasRegion>(
         textureID,
-        region.x,
-        region.y,
+        region.x + pad,
+        region.y + pad,
         region.layer,
         static_cast<int16_t>(width),
         static_cast<int16_t>(height),
@@ -96,16 +102,34 @@ void TextureAtlas::createNewLayer(bool smooth) {
 
 void TextureAtlas::flush() {
     static CoordsBuffer buffer;
-    for (auto& group : m_filterGroups) {
+    for (auto i = -1; ++i < AtlasFilter::ATLAS_FILTER_COUNT;) {
+        auto& group = m_filterGroups[i];
+
+        const int pad = i == AtlasFilter::ATLAS_FILTER_LINEAR ? SMOOTH_PADDING : 0;
+
         for (auto& layer : group.layers) {
             if (!layer.textures.empty()) {
                 layer.framebuffer->bind();
                 glDisable(GL_BLEND);
                 for (const auto& texture : layer.textures) {
-                    g_painter->clearRect(Color::alpha, { texture->x, texture->y, Size{texture->width, texture->height} });
+                    const int x = texture->x;
+                    const int y = texture->y;
+                    const int w = texture->width;
+                    const int h = texture->height;
+
+                    const Rect dest = { x - pad, y - pad, Size{ w + pad * 2, h + pad * 2 } };
+
+                    g_painter->clearRect(Color::alpha, dest);
+
+                    if (pad > 0) {
+                        buffer.clear();
+                        buffer.addRect(dest, { -pad, -pad, w + pad * 2, h + pad * 2 });
+                        g_painter->setTexture(texture->textureID, texture->transformMatrixId);
+                        g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
+                    }
 
                     buffer.clear();
-                    buffer.addRect({ texture->x, texture->y, Size{texture->width, texture->height} }, { 0,0, texture->width, texture->height });
+                    buffer.addRect({ x, y, Size{ w, h } }, { 0, 0, w, h });
                     g_painter->setTexture(texture->textureID, texture->transformMatrixId);
                     g_painter->drawCoords(buffer, DrawMode::TRIANGLE_STRIP);
 
