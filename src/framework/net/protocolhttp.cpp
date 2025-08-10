@@ -48,11 +48,11 @@ void Http::terminate()
             session->close();
     }
     m_guard.reset();
-    if (!m_thread.joinable()) {
+    if (m_thread.joinable()) {
         stdext::millisleep(100);
         m_ios.stop();
+        m_thread.join();
     }
-    m_thread.join();
 }
 
 int Http::get(const std::string& url, int timeout)
