@@ -111,9 +111,9 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
     if (!screenCoords.isValid() || !m_texture)
         return list;
 
-    const int textLenght = text.length();
+    const int textLength = text.length();
 
-    for (int i = 0; i < textLenght; ++i) {
+    for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
@@ -189,9 +189,9 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
     if (!screenCoords.isValid() || !m_texture)
         return;
 
-    const int textLenght = text.length();
+    const int textLength = text.length();
 
-    for (int i = 0; i < textLenght; ++i) {
+    for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
@@ -269,7 +269,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     if (!screenCoords.isValid() || !m_texture)
         return;
 
-    const int textLenght = text.length();
+    const int textLength = text.length();
     const int textColorsSize = textColors.size();
 
     std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
@@ -277,7 +277,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     int32_t nextColorIndex = 0;
     int32_t colorIndex = -1;
     CoordsBufferPtr coords;
-    for (int i = 0; i < textLenght; ++i) {
+    for (int i = 0; i < textLength; ++i) {
         if (i >= nextColorIndex) {
             colorIndex = colorIndex + 1;
             if (colorIndex < textColorsSize) {
@@ -286,7 +286,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
             if (colorIndex + 1 < textColorsSize) {
                 nextColorIndex = textColors[colorIndex + 1].first;
             } else {
-                nextColorIndex = textLenght;
+                nextColorIndex = textLength;
             }
 
             if (!colorCoordsMap.contains(curColorRgba)) {
