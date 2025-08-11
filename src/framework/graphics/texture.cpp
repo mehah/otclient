@@ -151,9 +151,9 @@ void Texture::setRepeat(const bool repeat)
     if (getProp(Prop::repeat) == repeat)
         return;
 
-    if (!m_id) return;
-
     setProp(Prop::repeat, repeat);
+
+    if (!m_id) return;
 
     bind();
     setupWrap();
