@@ -75,7 +75,7 @@ public:
     int getYOffset() const { return m_yOffset; }
     Size getGlyphSpacing() { return m_glyphSpacing; }
 
-    bool isAtAtlasRegion(const AtlasRegion* region) const;
+    const AtlasRegion* getAtlasRegion() const;
 
 private:
     /// Calculates each font character by inspecting font bitmap
