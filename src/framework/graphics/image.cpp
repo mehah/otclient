@@ -57,6 +57,9 @@ ImagePtr Image::loadPNG(const char* data, const size_t size)
         free_apng(&apng);
     }
 
+    if (!image)
+        return nullptr;
+
     int cntTransparentPixel = 0;
     for (const auto& pixel : image->getPixels()) {
         if (pixel == 0 && ++cntTransparentPixel == 4) {
