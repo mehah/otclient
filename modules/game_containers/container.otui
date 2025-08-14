@@ -24,6 +24,7 @@ ContainerWindow < MiniWindow
     margin-right: 50
     font: verdana-11px-monochrome
     height: 13
+    color: #9d9d9dff
 
   UIItem
     id: containerItemWidget

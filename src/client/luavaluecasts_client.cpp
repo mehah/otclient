@@ -309,9 +309,11 @@ int push_luavalue(const Imbuement& i)
 
 int push_luavalue(const ImbuementTrackerItem& i)
 {
-    g_lua.createTable(0, 3);
+    g_lua.createTable(0, 4);
     g_lua.pushInteger(i.slot);
     g_lua.setField("slot");
+    g_lua.pushInteger(i.totalSlots);
+    g_lua.setField("totalSlots");
     g_lua.pushObject(i.item);
     g_lua.setField("item");
     g_lua.createTable(i.slots.size(), 0);
