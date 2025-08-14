@@ -4331,7 +4331,9 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
         std::map<uint8_t, ImbuementSlot> slots;
 
         const uint8_t slotsCount = msg->getU8(); // total amount of imbuing slots on item
+        item.totalSlots = slotsCount; // Store the total number of slots
         if (slotsCount == 0) {
+            itemList.emplace_back(item); // Still add the item even if it has no slots for completeness
             continue;
         }
 

@@ -48,6 +48,12 @@ ImbuementSlot < Panel
     color: #ffff00
     margin-top: 3
 
+ImbuementSlotInactive < Panel
+  image-source: /images/game/imbuing/slot_inactive
+  image-clip: 0 0 64 64
+  width: 34
+  height: 34
+
 InventoryItem < Panel
   height: 34
   margin-top: 3
@@ -72,33 +78,42 @@ InventoryItem < Panel
 
 ImbuementTracker < MiniWindow
   id: imbuementTracker
-  !text: tr('Imbuements')
-  icon: /images/icons/icon-imbuementtracker-widget
-  icon-offset: 4 2
-  icon-size: 12 12
   @onOpen: modules.game_imbuementtracker.onMiniWindowOpen()
   @onClose: modules.game_imbuementtracker.onMiniWindowClose()
 
-  UIButton
-    id: menuButton
-    anchors.top: prev.top
-    anchors.right: prev.left
-    margin-right: 2
-    size: 14 14
-    image-source: /images/ui/miniwindow_buttons
-    image-clip: 112 0 14 14
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    size: 12 12
+    image-source: /images/icons/icon-imbuementtracker-widget
+    image-smooth: false
 
-    $hover:
-      image-clip: 112 14 14 14
-
-    $pressed:
-      image-clip: 112 28 14 14
-
-    $on:
-      image-clip: 112 0 14 14
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('Imbuements')
+    color: #9d9d9dff
 
   MiniWindowContents
     id: contentsPanel
+    anchors.top: miniwindowTopBar.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: parent.bottom
+    margin-left: 3
+    margin-top: -2
+    margin-right: 1
+    vertical-scrollbar: miniwindowScrollBar
     padding-left: 5
     padding-right: 5
     padding-bottom: 3
