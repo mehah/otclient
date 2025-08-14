@@ -32,10 +32,7 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
     if (!canDraw() || isHided())
         return;
 
-    // It only starts to draw when the first effect as it is about to end.
-    if (m_animationTimer.ticksElapsed() < m_timeToStartDrawing)
-        return;
-
+    // Always draw effects regardless of timeToStartDrawing
     int animationPhase = 0;
     if (canAnimate()) {
         if (g_game.getFeature(Otc::GameEnhancedAnimations)) {
@@ -75,10 +72,16 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
             yPattern += getNumPatternY();
     }
 
+    // Always set draw order to top for effects
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
+        g_drawPool.setDrawOrder(DrawOrder::FOURTH);
         if (drawThings && g_client.getEffectAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
+
+    // Force redraw on every frame
+    g_drawPool.repaint(DrawPoolType::MAP);
+    g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
 
     getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);
 }
@@ -104,8 +107,25 @@ void Effect::onAppear()
 
     m_animationTimer.restart();
 
-    // schedule removal
-    g_dispatcher.scheduleEvent([self = asEffect()] { g_map.removeThing(self); }, m_duration);
+    // Force screen updates during effect duration
+    const int updateInterval = std::max<int>(m_duration / getAnimationPhases(), 50);
+    auto updateTimer = g_dispatcher.cycleEvent([self = asEffect()] {
+        // Force complete map update to handle all floors consistently
+        if (const auto& mapView = g_map.getMapView(0)) {
+            mapView->resetLastCamera();  // This forces a complete map update
+        }
+        g_map.notificateTileUpdate(self->getPosition(), self, Otc::OPERATION_ADD);
+        
+        // Force complete redraw
+        g_drawPool.repaint(DrawPoolType::MAP);
+        g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
+    }, updateInterval);
+
+    // schedule removal and stop updates
+    g_dispatcher.scheduleEvent([self = asEffect(), updateTimer] {
+        g_map.removeThing(self);
+        updateTimer->cancel();
+    }, m_duration);
 }
 
 bool Effect::waitFor(const EffectPtr& effect)
