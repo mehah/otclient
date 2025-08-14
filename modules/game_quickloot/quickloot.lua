@@ -213,6 +213,15 @@ function QuickLoot.Define()
         local loots = lootContainers
         local fallback = quickLootFallbackToMainContainer
 
+        -- Store lootContainers globally so other modules can access it
+        -- Store a copy to avoid interfering with the local variable
+        QuickLoot.lootContainers = {}
+        if lootContainers then
+            for i, container in ipairs(lootContainers) do
+                QuickLoot.lootContainers[i] = {container[1], container[2], container[3]}
+            end
+        end
+
         QuickLoot.loadFilterItems()
 
         local filter = {
