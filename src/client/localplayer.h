@@ -125,6 +125,7 @@ public:
 
     LocalPlayerPtr asLocalPlayer() { return static_self_cast<LocalPlayer>(); }
     bool isLocalPlayer() override { return true; }
+    bool isDead() const { return m_health <= 0; }
 
     void onPositionChange(const Position& newPos, const Position& oldPos) override;
 
