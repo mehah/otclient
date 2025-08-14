@@ -113,6 +113,7 @@ MiniWindow
     font: verdana-11px-monochrome
     height: 13
     !text: tr('Skills')
+    color: #9d9d9dff
 
   MiniWindowContents
     padding-left: 5
