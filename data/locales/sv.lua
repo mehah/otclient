@@ -229,6 +229,7 @@ locale = {
     ["Ok"] = "Ok",
     ["on %s.\\n"] = "den %s.\\n",
     ["Open"] = "Öppna",
+    ["Open: %d"] = "Öppna: %d",
     ["Open a private message channel"] = "Öppna en privat meddelandekanal",
     ["Open a private message channel:"] = "Öppna en privat meddelandekanal:",
     ["Open charlist automatically when starting client"] = "Öppna karaktärslista automatiskt när klienten startas",

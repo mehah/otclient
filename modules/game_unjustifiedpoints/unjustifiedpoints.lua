@@ -10,6 +10,10 @@ dayProgressBar = nil
 weekProgressBar = nil
 monthProgressBar = nil
 
+dayProgressBarBackground = nil
+weekProgressBarBackground = nil
+monthProgressBarBackground = nil
+
 daySkullWidget = nil
 weekSkullWidget = nil
 monthSkullWidget = nil
@@ -31,6 +35,20 @@ function init()
 
     contentsPanel = unjustifiedPointsWindow:getChildById('contentsPanel')
 
+    -- Set the title and icon in the header elements
+    local titleWidget = unjustifiedPointsWindow:getChildById('miniwindowTitle')
+    if titleWidget then
+        titleWidget:setText('Unjustified Points')
+    else
+        -- Fallback to old method if miniwindowTitle doesn't exist
+        unjustifiedPointsWindow:setText('Unjustified Points')
+    end
+
+    local iconWidget = unjustifiedPointsWindow:getChildById('miniwindowIcon')
+    if iconWidget then
+        iconWidget:setImageSource('/images/icons/icon-unjustified-points-widget')
+    end
+
     openPvpSituationsLabel = contentsPanel:getChildById('openPvpSituationsLabel')
     currentSkullWidget = contentsPanel:getChildById('currentSkullWidget')
     skullTimeLabel = contentsPanel:getChildById('skullTimeLabel')
@@ -38,9 +56,46 @@ function init()
     dayProgressBar = contentsPanel:getChildById('dayProgressBar')
     weekProgressBar = contentsPanel:getChildById('weekProgressBar')
     monthProgressBar = contentsPanel:getChildById('monthProgressBar')
+    
+    dayProgressBarBackground = contentsPanel:getChildById('dayProgressBarBackground')
+    weekProgressBarBackground = contentsPanel:getChildById('weekProgressBarBackground')
+    monthProgressBarBackground = contentsPanel:getChildById('monthProgressBarBackground')
+    
     daySkullWidget = contentsPanel:getChildById('daySkullWidget')
     weekSkullWidget = contentsPanel:getChildById('weekSkullWidget')
     monthSkullWidget = contentsPanel:getChildById('monthSkullWidget')
+
+    -- Hide buttons as requested
+    local toggleFilterButton = unjustifiedPointsWindow:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+    end
+    
+    local contextMenuButton = unjustifiedPointsWindow:recursiveGetChildById('contextMenuButton')
+    if contextMenuButton then
+        contextMenuButton:setVisible(false)
+    end
+    
+    local newWindowButton = unjustifiedPointsWindow:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton:setVisible(false)
+    end
+
+    -- Position lockButton where toggleFilterButton was (to the left of minimize button)
+    local lockButton = unjustifiedPointsWindow:recursiveGetChildById('lockButton')
+    local minimizeButton = unjustifiedPointsWindow:recursiveGetChildById('minimizeButton')
+    
+    if lockButton and minimizeButton then
+        lockButton:breakAnchors()
+        lockButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        lockButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        lockButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+        lockButton:setMarginTop(0)
+    end
+
+    unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
+        tr('Unjustified Points'), '/images/options/button_frags', toggle)
+    unjustifiedPointsButton:setOn(true)
 
     if g_game.isOnline() then
         online()
@@ -96,11 +151,8 @@ function toggle()
 end
 
 function online()
-    if g_game.getFeature(GameUnjustifiedPoints) and not unjustifiedPointsButton then
+    if g_game.getFeature(GameUnjustifiedPoints) then
         unjustifiedPointsWindow:setupOnStart() -- load character window configuration
-        unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
-            tr('Unjustified Points'), '/images/options/button_frags', toggle)
-        unjustifiedPointsButton:setOn(false)
     end
 
     refresh()
@@ -141,49 +193,74 @@ function onSkullChange(localPlayer, skull)
 end
 
 function onOpenPvpSituationsChange(amount)
-    openPvpSituationsLabel:setText(amount)
+    openPvpSituationsLabel:setText('Open: ' .. amount)
 end
 
-local function getColorByKills(kills)
-    if kills < 2 then
-        return 'red'
-    elseif kills < 3 then
-        return 'yellow'
+local function getImageByKills(kills)
+    if kills < 3 then
+        return '/images/ui/unjustified-points-bar-texture-green'
+    elseif kills < 5 then
+        return '/images/ui/unjustified-points-bar-texture-yellow'
     end
 
-    return 'green'
+    return '/images/ui/unjustified-points-bar-texture-red'
+end
+
+local function setProgressBarImage(progressBar, progressBarBackground, currentKills, maxKills, tooltip)
+    -- Set the value first (0 kills = 0% visible)
+    progressBar:setValue(currentKills, 0, maxKills)
+    progressBar:setVisible(true)
+    
+    -- Set tooltip on both progress bar and background so it's always visible
+    progressBar:setTooltip(tooltip)
+    if progressBarBackground then
+        progressBarBackground:setTooltip(tooltip)
+    end
+    
+    -- The background image is already set in the .otui file
+    -- We only need to control the foreground (fill) image
+    
+    -- If no kills, don't show any colored fill
+    if currentKills == 0 then
+        progressBar:setImageSource('')
+        progressBar:setVisible(false)
+        return
+    end
+    
+    -- Get the appropriate colored image for the fill
+    local imagePath = getImageByKills(currentKills)
+    
+    -- Set the foreground (fill) image
+    progressBar:setImageSource(imagePath)
+    progressBar:setImageBorder(1)
+    progressBar:setImageBorderTop(1)
+    progressBar:setImageBorderBottom(1)
 end
 
 function onUnjustifiedPointsChange(unjustifiedPoints)
     if unjustifiedPoints.skullTime == 0 then
-        skullTimeLabel:setText('No skull')
-        skullTimeLabel:setTooltip('You have no skull')
+        skullTimeLabel:setText('0 days')
+        skullTimeLabel:setTooltip('No Skull time active')
     else
         skullTimeLabel:setText(unjustifiedPoints.skullTime .. ' days')
         skullTimeLabel:setTooltip('Remaining skull time')
     end
 
-    dayProgressBar:setValue(unjustifiedPoints.killsDay, 0, 100)
-    dayProgressBar:setBackgroundColor(getColorByKills(unjustifiedPoints.killsDayRemaining))
-    dayProgressBar:setTooltip(string.format('Unjustified points gained during the last 24 hours.\n%i kill%s left.',
-                                            unjustifiedPoints.killsDayRemaining,
-                                            (unjustifiedPoints.killsDayRemaining == 1 and '' or 's')))
-    dayProgressBar:setText(string.format('%i kill%s left', unjustifiedPoints.killsDayRemaining,
-                                         (unjustifiedPoints.killsDayRemaining == 1 and '' or 's')))
+    -- Day progress bar with background image
+    local dayTooltip = string.format('Unjustified points gained during the last 24 hours.\n%i kill%s left.',
+                                      unjustifiedPoints.killsDayRemaining,
+                                      (unjustifiedPoints.killsDayRemaining == 1 and '' or 's'))
+    setProgressBarImage(dayProgressBar, dayProgressBarBackground, unjustifiedPoints.killsDay, 10, dayTooltip)
 
-    weekProgressBar:setValue(unjustifiedPoints.killsWeek, 0, 100)
-    weekProgressBar:setBackgroundColor(getColorByKills(unjustifiedPoints.killsWeekRemaining))
-    weekProgressBar:setTooltip(string.format('Unjustified points gained during the last 7 days.\n%i kill%s left.',
-                                             unjustifiedPoints.killsWeekRemaining,
-                                             (unjustifiedPoints.killsWeekRemaining == 1 and '' or 's')))
-    weekProgressBar:setText(string.format('%i kill%s left', unjustifiedPoints.killsWeekRemaining,
-                                          (unjustifiedPoints.killsWeekRemaining == 1 and '' or 's')))
+    -- Week progress bar with background image
+    local weekTooltip = string.format('Unjustified points gained during the last 7 days.\n%i kill%s left.',
+                                       unjustifiedPoints.killsWeekRemaining,
+                                       (unjustifiedPoints.killsWeekRemaining == 1 and '' or 's'))
+    setProgressBarImage(weekProgressBar, weekProgressBarBackground, unjustifiedPoints.killsWeek, 10, weekTooltip)
 
-    monthProgressBar:setValue(unjustifiedPoints.killsMonth, 0, 100)
-    monthProgressBar:setBackgroundColor(getColorByKills(unjustifiedPoints.killsMonthRemaining))
-    monthProgressBar:setTooltip(string.format('Unjustified points gained during the last 30 days.\n%i kill%s left.',
-                                              unjustifiedPoints.killsMonthRemaining,
-                                              (unjustifiedPoints.killsMonthRemaining == 1 and '' or 's')))
-    monthProgressBar:setText(string.format('%i kill%s left', unjustifiedPoints.killsMonthRemaining,
-                                           (unjustifiedPoints.killsMonthRemaining == 1 and '' or 's')))
+    -- Month progress bar with background image
+    local monthTooltip = string.format('Unjustified points gained during the last 30 days.\n%i kill%s left.',
+                                        unjustifiedPoints.killsMonthRemaining,
+                                        (unjustifiedPoints.killsMonthRemaining == 1 and '' or 's'))
+    setProgressBarImage(monthProgressBar, monthProgressBarBackground, unjustifiedPoints.killsMonth, 10, monthTooltip)
 end
