@@ -312,6 +312,7 @@ locale = {
     ["Offline Training"] = "Offline-Training",
     ["Ok"] = "Ok",
     ["Open"] = "Öffnen",
+    ["Open: %d"] = "Öffnen: %d",
     ["Open PvP"] = "Offenes PvP",
     ["Open PvP Situations"] = "PvP-Situationen öffnen",
     ["Open a private message channel"] = "Privaten Nachrichtenkanal öffnen",
