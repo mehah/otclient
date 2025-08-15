@@ -154,7 +154,7 @@ public:
 
     bool isRemoved() { return m_removed; }
     bool isInvisible() { return m_outfit.isEffect() && m_outfit.getAuxId() == 13; }
-    bool isDead() { return m_healthPercent <= 0; }
+    virtual bool isDead() { return m_healthPercent <= 0; }
     bool isFullHealth() { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
     bool isCreature() override { return true; }
