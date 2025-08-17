@@ -469,6 +469,10 @@ function terminate()
     Keybind.delete("Chat Channel", "Open Help Channel")
     Keybind.delete("Chat", "Send current chat line")
     saveCommunicationSettings()
+    clearReadOnlyTab()
+    if readOnlyModeEnabled then
+        toggleReadOnlyMode()
+    end
     if readOnlyButton then
         readOnlyButton:destroy()
         readOnlyButton = nil
@@ -499,11 +503,6 @@ function terminate()
     ownPrivateName = nil
     gameBottomPanel = nil
     Console = nil
-
-    clearReadOnlyTab()
-    if readOnlyModeEnabled then
-        toggleReadOnlyMode()
-    end
 end
 
 function save()
@@ -616,7 +615,6 @@ function clear()
         Keybind.delete("Dialogs", "Open Rule Violation")
     end
 
-    clearReadOnlyTab()
     if readOnlyModeEnabled then
         toggleReadOnlyMode()
     end
