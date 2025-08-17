@@ -616,7 +616,6 @@ function clear()
         Keybind.delete("Dialogs", "Open Rule Violation")
     end
 
-    clearReadOnlyTab()
     if readOnlyModeEnabled then
         toggleReadOnlyMode()
     end
