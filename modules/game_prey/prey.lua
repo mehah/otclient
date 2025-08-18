@@ -76,6 +76,49 @@ function init()
     preyTracker:setContentMaximumHeight(100)
     preyTracker:setContentMinimumHeight(47)
     preyTracker:hide()
+    
+    -- Hide buttons similar to unjustifiedpoints implementation
+    local toggleFilterButton = preyTracker:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+    end
+    
+    local contextMenuButton = preyTracker:recursiveGetChildById('contextMenuButton')
+    if contextMenuButton then
+        contextMenuButton:setVisible(false)
+    end
+    
+    local newWindowButton = preyTracker:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton:setVisible(false)
+    end
+    
+    -- Set up the miniwindow title and icon
+    local titleWidget = preyTracker:getChildById('miniwindowTitle')
+    if titleWidget then
+        titleWidget:setText('Preys')
+    else
+        -- Fallback to old method if miniwindowTitle doesn't exist
+        preyTracker:setText('Preys')
+    end
+    
+    local iconWidget = preyTracker:getChildById('miniwindowIcon')
+    if iconWidget then
+        iconWidget:setImageSource('/images/game/prey/icon-prey-widget')
+    end
+    
+    -- Position lockButton where toggleFilterButton was (to the left of minimize button)
+    local lockButton = preyTracker:recursiveGetChildById('lockButton')
+    local minimizeButton = preyTracker:recursiveGetChildById('minimizeButton')
+    
+    if lockButton and minimizeButton then
+        lockButton:breakAnchors()
+        lockButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        lockButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        lockButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+        lockButton:setMarginTop(0)
+    end
+    
     if g_game.isOnline() then
         check()
     end
@@ -215,6 +258,14 @@ function toggle()
         return hide()
     end
     show()
+end
+
+function onMiniWindowOpen()
+    -- Called when the MiniWindow is opened
+end
+
+function onMiniWindowClose()
+    -- Called when the MiniWindow is closed
 end
 
 function onPreyFreeRerolls(slot, timeleft)
