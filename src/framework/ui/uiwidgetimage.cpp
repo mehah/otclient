@@ -90,11 +90,9 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
     }
 }
 
-void addImageRect(const TexturePtr& texture, const CoordsBufferPtr& coords, bool useRepeated, const Rect& dest, Rect src) {
-    if (const auto atlas = g_drawPool.getAtlas()) {
-        if (const auto region = texture->getAtlas(atlas->getType()))
-            src = Rect(region->x + src.x(), region->y + src.y(), src.width(), src.height());
-    }
+void addImageRect(const AtlasRegion* region, const CoordsBufferPtr& coords, bool useRepeated, const Rect& dest, Rect src) {
+    if (region)
+        src.translate(region->x, region->y);
 
     if (useRepeated)
         coords->addRepeatedRects(dest, src);
@@ -108,8 +106,8 @@ void UIWidget::drawImage(const Rect& screenCoords)
         return;
 
     // Hack to fix font rendering in atlas
-    if (g_drawPool.getAtlas() && m_imageTexture->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
-        m_lastAtlasRegion = m_imageTexture->getAtlas(g_drawPool.getAtlas()->getType());
+    if (m_imageTexture->getAtlasRegion() != m_atlasRegion) {
+        m_atlasRegion = m_imageTexture->getAtlasRegion();
         updateImageCache();
     }
     // cache vertex buffers
@@ -149,32 +147,32 @@ void UIWidget::drawImage(const Rect& screenCoords)
             // first the center
             if (centerSize.area() > 0) {
                 rectCoords = Rect(drawRect.left() + leftBorder.width(), drawRect.top() + topBorder.height(), centerSize);
-                addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, center);
+                addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, center);
             }
             // top left corner
             rectCoords = Rect(drawRect.topLeft(), topLeftCorner.size());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, topLeftCorner);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, topLeftCorner);
             // top
             rectCoords = Rect(drawRect.left() + topLeftCorner.width(), drawRect.topLeft().y, centerSize.width(), topBorder.height());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, topBorder);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, topBorder);
             // top right corner
             rectCoords = Rect(drawRect.left() + topLeftCorner.width() + centerSize.width(), drawRect.top(), topRightCorner.size());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, topRightCorner);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, topRightCorner);
             // left
             rectCoords = Rect(drawRect.left(), drawRect.top() + topLeftCorner.height(), leftBorder.width(), centerSize.height());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, leftBorder);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, leftBorder);
             // right
             rectCoords = Rect(drawRect.left() + leftBorder.width() + centerSize.width(), drawRect.top() + topRightCorner.height(), rightBorder.width(), centerSize.height());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, rightBorder);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, rightBorder);
             // bottom left corner
             rectCoords = Rect(drawRect.left(), drawRect.top() + topLeftCorner.height() + centerSize.height(), bottomLeftCorner.size());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, bottomLeftCorner);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, bottomLeftCorner);
             // bottom
             rectCoords = Rect(drawRect.left() + bottomLeftCorner.width(), drawRect.top() + topBorder.height() + centerSize.height(), centerSize.width(), bottomBorder.height());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, bottomBorder);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, bottomBorder);
             // bottom right corner
             rectCoords = Rect(drawRect.left() + bottomLeftCorner.width() + centerSize.width(), drawRect.top() + topRightCorner.height() + centerSize.height(), bottomRightCorner.size());
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, rectCoords, bottomRightCorner);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, rectCoords, bottomRightCorner);
         } else {
             if (isImageFixedRatio()) {
                 Size textureSize = m_imageTexture->getSize(),
@@ -191,7 +189,7 @@ void UIWidget::drawImage(const Rect& screenCoords)
                 clipRect = Rect(texCoordsOffset, textureClipSize);
             }
 
-            addImageRect(m_imageTexture, m_imageCoordsCache, useRepeated, drawRect, clipRect);
+            addImageRect(m_atlasRegion, m_imageCoordsCache, useRepeated, drawRect, clipRect);
         }
     }
 

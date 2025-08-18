@@ -58,8 +58,8 @@ public:
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const;
 
     /// Calculate glyphs positions to use on render, also calculates textBoxSize if wanted
-    const std::vector<Point>& calculateGlyphsPositions(std::string_view text,
-                                                       Fw::AlignmentFlag align,
+    void calculateGlyphsPositions(std::string_view text,
+                                                       Fw::AlignmentFlag align, std::vector<Point>& glyphsPositions,
                                                        Size* textBoxSize = nullptr) const;
 
     /// Simulate render and calculate text size
@@ -71,9 +71,11 @@ public:
     int getGlyphHeight() const { return m_glyphHeight; }
     const Rect* getGlyphsTextureCoords() { return m_glyphsTextureCoords; }
     const Size* getGlyphsSize() { return m_glyphsSize; }
-    const TexturePtr& getTexture() { return m_texture; }
+    const TexturePtr& getTexture() const { return m_texture; }
     int getYOffset() const { return m_yOffset; }
     Size getGlyphSpacing() { return m_glyphSpacing; }
+
+    const AtlasRegion* getAtlasRegion() const;
 
 private:
     /// Calculates each font character by inspecting font bitmap

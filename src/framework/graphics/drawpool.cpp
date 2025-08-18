@@ -51,55 +51,36 @@ DrawPool* DrawPool::create(const DrawPoolType type)
 void DrawPool::add(const Color& color, const TexturePtr& texture, DrawMethod&& method, const CoordsBufferPtr& coordsBuffer)
 {
     Texture* textureAtlas = nullptr;
-    if (m_atlas && texture && texture->isCached(m_atlas->getType())) {
-        const auto region = texture->getAtlas(m_atlas->getType());
-        if (region->isEnabled()) {
+
+    if (m_atlas && texture) {
+        if (const auto region = texture->getAtlasRegion(m_atlas->getType())) {
             textureAtlas = region->atlas;
             if (method.src.isValid())
-                method.src = Rect(region->x + method.src.x(), region->y + method.src.y(), method.src.width(), method.src.height());
+                method.src.translate(region->x, region->y);
         }
     }
 
-    if (!updateHash(method, texture, color, coordsBuffer != nullptr))
+    if (!updateHash(method, textureAtlas ? textureAtlas : texture.get(), color, coordsBuffer != nullptr))
         return;
 
     auto& list = m_objects[m_currentDrawOrder];
+    auto& state = getCurrentState();
 
-    if (m_alwaysGroupDrawings) {
-        auto& coords = m_coords.try_emplace(getCurrentState().hash, nullptr).first->second;
+    if (!list.empty() && list.back().state == state) {
+        auto& last = list.back();
+        coordsBuffer ? last.coords->append(coordsBuffer.get())
+            : addCoords(*last.coords, method);
+    } else if (m_alwaysGroupDrawings) {
+        auto& coords = m_coords.try_emplace(state.hash, nullptr).first->second;
         if (!coords) {
-            auto state = getState(texture, textureAtlas, color);
-            coords = list.emplace_back(std::move(state), getCoordsBuffer()).coords.get();
+            coords = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer()).coords.get();
         }
-
-        if (coordsBuffer)
-            coords->append(coordsBuffer.get());
-        else
-            addCoords(*coords, method);
+        coordsBuffer ? coords->append(coordsBuffer.get())
+            : addCoords(*coords, method);
     } else {
-        bool addNewObj = true;
-
-        if (!list.empty()) {
-            auto& prevObj = list.back();
-            if (prevObj.state == getCurrentState()) {
-                if (coordsBuffer)
-                    prevObj.coords->append(coordsBuffer.get());
-                else
-                    addCoords(*prevObj.coords, method);
-
-                addNewObj = false;
-            }
-        }
-
-        if (addNewObj) {
-            auto state = getState(texture, textureAtlas, color);
-            auto& draw = list.emplace_back(std::move(state), getCoordsBuffer());
-
-            if (coordsBuffer) {
-                draw.coords->append(coordsBuffer.get());
-            } else
-                addCoords(*draw.coords, method);
-        }
+        auto& draw = list.emplace_back(getState(texture, textureAtlas, color), getCoordsBuffer());
+        coordsBuffer ? draw.coords->append(coordsBuffer.get())
+            : addCoords(*draw.coords, method);
     }
 
     resetOnlyOnceParameters();
@@ -120,7 +101,7 @@ void DrawPool::addCoords(CoordsBuffer& buffer, const DrawMethod& method)
     }
 }
 
-bool DrawPool::updateHash(const DrawMethod& method, const TexturePtr& texture, const Color& color, const bool hasCoord) {
+bool DrawPool::updateHash(const DrawMethod& method, const Texture* texture, const Color& color, const bool hasCoord) {
     auto& state = getCurrentState();
     state.hash = 0;
 
@@ -332,7 +313,7 @@ void DrawPool::PoolState::execute(DrawPool* pool) const {
     if (texture) {
         texture->create();
         g_painter->setTexture(texture);
-        if (texture->canCacheInAtlas() && pool->m_atlas && !texture->isCached(pool->m_atlas->getType())) {
+        if (texture->canCacheInAtlas() && pool->m_atlas && !texture->getAtlasRegion(pool->m_atlas->getType())) {
             pool->m_atlas->addTexture(texture);
         }
     } else

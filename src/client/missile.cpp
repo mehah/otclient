@@ -35,11 +35,13 @@ void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr&
     const float fraction = m_duration > 0 ? m_animationTimer.ticksElapsed() / m_duration : 1;
 
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
+        g_drawPool.setDrawOrder(DrawOrder::FOURTH);
         if (drawThings && g_client.getMissileAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getMissileAlpha(), true);
     }
 
     getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView);
+    g_drawPool.resetDrawOrder();
 }
 
 void Missile::setPath(const Position& fromPosition, const Position& toPosition)
@@ -61,9 +63,6 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     m_delta *= g_gameConfig.getSpriteSize();
     m_animationTimer.restart();
     m_distance = fromPosition.distance(toPosition);
-
-    { // Update Pattern
-    }
 
     // schedule removal
     g_dispatcher.scheduleEvent([self = asMissile()] { g_map.removeThing(self); }, m_duration);

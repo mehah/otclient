@@ -31,7 +31,7 @@ local zoomInButton = nil
 local zoomOutButton = nil
 local zoomLevel = 2
 
-local managerAccountsButton
+local managerAccountsButton = nil
 -- private functions
 local function addButton(id, description, icon, callback, panel, toggle, front)
     local class
@@ -120,7 +120,7 @@ function init()
         callback = toggle,
       }
     })
-    if Services.websites then
+    if Services.websites and not managerAccountsButton then
         managerAccountsButton = modules.client_topmenu.addTopRightRegularButton('hotkeysButton', tr('Manage Account'),
             nil, openManagerAccounts)
     end
@@ -156,7 +156,7 @@ function terminate()
         PingWidget:destroy()
         PingWidget = nil
     end
-    if managerAccountsButton then
+    if managerAccountsButton and not managerAccountsButton:isDestroyed() then
         managerAccountsButton:destroy()
         managerAccountsButton = nil
     end

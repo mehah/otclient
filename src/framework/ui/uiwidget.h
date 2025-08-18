@@ -575,7 +575,6 @@ private:
     void parseTextStyle(const OTMLNodePtr& styleNode);
 
     Rect m_textCachedScreenCoords;
-    std::vector<Point> m_glyphsPositionsCache;
     Size m_textSize;
 
 protected:
@@ -584,6 +583,8 @@ protected:
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
+
+    std::vector<Point> m_glyphsPositionsCache;
 
     std::string m_text;
     std::string m_drawText;
@@ -598,7 +599,7 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
-    AtlasRegion* m_lastAtlasRegion = nullptr;
+    const AtlasRegion* m_atlasRegion = nullptr;
 
 public:
     void resizeToText();

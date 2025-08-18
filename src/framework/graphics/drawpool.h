@@ -179,20 +179,22 @@ public:
             if (m_objectsDraw[0].size() < objs.size())
                 m_objectsDraw[0].swap(objs);
 
+            bool addFirst = true;
+
             if (!m_objectsDraw[0].empty() && !objs.empty()) {
                 auto& last = m_objectsDraw[0].back();
                 auto& first = objs.front();
 
                 if (last.state == first.state && last.coords && first.coords) {
                     last.coords->append(first.coords.get());
-                    first.coords = nullptr;
+                    addFirst = false;
                 }
             }
 
             if (!objs.empty()) {
                 m_objectsDraw[0].insert(
                     m_objectsDraw[0].end(),
-                    std::make_move_iterator(objs.begin()),
+                    std::make_move_iterator(objs.begin() + (addFirst ? 0 : 1)),
                     std::make_move_iterator(objs.end()));
                 objs.clear();
             }
@@ -280,7 +282,7 @@ private:
 
     void setFPS(const uint16_t fps) { m_refreshDelay = 1000 / fps; }
 
-    bool updateHash(const DrawMethod& method, const TexturePtr& texture, const Color& color, bool hasCoord);
+    bool updateHash(const DrawMethod& method, const Texture* texture, const Color& color, bool hasCoord);
     PoolState getState(const TexturePtr& texture, Texture* textureAtlas, const Color& color);
 
     PoolState& getCurrentState() { return m_states[m_lastStateIndex]; }
@@ -342,19 +344,20 @@ private:
         m_coords.clear();
 
         for (auto& objs : m_objects) {
+            bool addFirst = true;
             if (!objs.empty() && !m_objectsFlushed.empty()) {
                 auto& last = m_objectsFlushed.back();
                 auto& first = objs.front();
 
                 if (last.state == first.state && last.coords && first.coords) {
                     last.coords->append(first.coords.get());
-                    first.coords = nullptr;
+                    addFirst = false;
                 }
             }
 
             m_objectsFlushed.insert(
                 m_objectsFlushed.end(),
-                std::make_move_iterator(objs.begin()),
+                std::make_move_iterator(objs.begin() + (addFirst ? 0 : 1)),
                 std::make_move_iterator(objs.end())
             );
             objs.clear();

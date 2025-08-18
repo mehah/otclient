@@ -30,8 +30,8 @@
 
 #include "drawpoolmanager.h"
 
-static std::vector<Point> s_glyphsPositions(1);
-static std::vector<int> s_lineWidths(1);
+static thread_local std::vector<Point> s_glyphsPositions(1);
+static thread_local std::vector<int> s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
@@ -98,8 +98,8 @@ void BitmapFont::drawText(const std::string_view text, const Point& startPos, co
 void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords, const Color& color, const Fw::AlignmentFlag align)
 {
     Size textBoxSize;
-    const auto& glyphsPositions = calculateGlyphsPositions(text, align, &textBoxSize);
-    for (const auto& [dest, src] : getDrawTextCoords(text, textBoxSize, align, screenCoords, glyphsPositions)) {
+    calculateGlyphsPositions(text, align, s_glyphsPositions, &textBoxSize);
+    for (const auto& [dest, src] : getDrawTextCoords(text, textBoxSize, align, screenCoords, s_glyphsPositions)) {
         g_drawPool.addTexturedRect(dest, m_texture, src, color);
     }
 }
@@ -111,9 +111,9 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
     if (!screenCoords.isValid() || !m_texture)
         return list;
 
-    const int textLenght = text.length();
+    const int textLength = text.length();
 
-    for (int i = 0; i < textLenght; ++i) {
+    for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
@@ -189,9 +189,9 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
     if (!screenCoords.isValid() || !m_texture)
         return;
 
-    const int textLenght = text.length();
+    const int textLength = text.length();
 
-    for (int i = 0; i < textLenght; ++i) {
+    for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
 
         // skip invalid glyphs
@@ -250,10 +250,8 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
             glyphScreenCoords.setRight(screenCoords.right());
         }
 
-        if (const auto atlas = g_drawPool.getAtlas()) {
-            if (const auto region = m_texture->getAtlas(atlas->getType()))
-                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
-        }
+        if (const auto region = m_texture->getAtlasRegion())
+            glyphTextureCoords.translate(region->x, region->y);
 
         // add glyph
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
@@ -271,7 +269,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     if (!screenCoords.isValid() || !m_texture)
         return;
 
-    const int textLenght = text.length();
+    const int textLength = text.length();
     const int textColorsSize = textColors.size();
 
     std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
@@ -279,7 +277,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     int32_t nextColorIndex = 0;
     int32_t colorIndex = -1;
     CoordsBufferPtr coords;
-    for (int i = 0; i < textLenght; ++i) {
+    for (int i = 0; i < textLength; ++i) {
         if (i >= nextColorIndex) {
             colorIndex = colorIndex + 1;
             if (colorIndex < textColorsSize) {
@@ -288,7 +286,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
             if (colorIndex + 1 < textColorsSize) {
                 nextColorIndex = textColors[colorIndex + 1].first;
             } else {
-                nextColorIndex = textLenght;
+                nextColorIndex = textLength;
             }
 
             if (!colorCoordsMap.contains(curColorRgba)) {
@@ -356,10 +354,8 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
             glyphScreenCoords.setRight(screenCoords.right());
         }
 
-        if (const auto atlas = g_drawPool.getAtlas()) {
-            if (const auto region = m_texture->getAtlas(atlas->getType()))
-                glyphTextureCoords = Rect(region->x + glyphTextureCoords.x(), region->y + glyphTextureCoords.y(), glyphTextureCoords.width(), glyphTextureCoords.height());
-        }
+        if (const auto region = m_texture->getAtlasRegion())
+            glyphTextureCoords.translate(region->x, region->y);
 
         // add glyph to color
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
@@ -370,7 +366,7 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     }
 }
 
-const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, Size* textBoxSize) const
+void BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, std::vector<Point>& glyphsPositions, Size* textBoxSize) const
 {
     const int textLength = text.length();
     int maxLineWidth = 0;
@@ -381,12 +377,11 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
     if (textLength == 0) {
         if (textBoxSize)
             textBoxSize->resize(0, m_glyphHeight);
-        return s_glyphsPositions;
     }
 
     // resize s_glyphsPositions vector when needed
-    if (textLength > static_cast<int>(s_glyphsPositions.size()))
-        s_glyphsPositions.resize(textLength);
+    if (textLength > static_cast<int>(glyphsPositions.size()))
+        glyphsPositions.resize(textLength);
 
     // calculate lines width
     if ((align & Fw::AlignRight || align & Fw::AlignHorizontalCenter) || textBoxSize) {
@@ -434,7 +429,7 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
         }
 
         // store current glyph topLeft
-        s_glyphsPositions[i] = virtualPos;
+        glyphsPositions[i] = virtualPos;
 
         // render only if the glyph is valid
         if (glyph >= 32 && glyph != static_cast<uint8_t>('\n')) {
@@ -446,14 +441,12 @@ const std::vector<Point>& BitmapFont::calculateGlyphsPositions(const std::string
         textBoxSize->setWidth(maxLineWidth);
         textBoxSize->setHeight(virtualPos.y + m_glyphHeight);
     }
-
-    return s_glyphsPositions;
 }
 
 Size BitmapFont::calculateTextRectSize(const std::string_view text)
 {
     Size size;
-    calculateGlyphsPositions(text, Fw::AlignTopLeft, &size);
+    calculateGlyphsPositions(text, Fw::AlignTopLeft, s_glyphsPositions, &size);
     return size;
 }
 
@@ -558,4 +551,8 @@ void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const 
             it.first += newTextLen;
         }
     }
+}
+
+const AtlasRegion* BitmapFont::getAtlasRegion() const {
+    return m_texture ? m_texture->getAtlasRegion() : nullptr;
 }

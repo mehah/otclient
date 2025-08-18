@@ -33,8 +33,8 @@ void CachedText::draw(const Rect& rect, const Color& color)
         return;
 
     // Hack to fix font rendering in atlas
-    if (g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
-        m_lastAtlasRegion = m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType());
+    if (m_font->getAtlasRegion() != m_atlasRegion) {
+        m_atlasRegion = m_font->getAtlasRegion();
         m_textScreenCoords = {};
     }
 
@@ -49,7 +49,7 @@ void CachedText::draw(const Rect& rect, const Color& color)
 void CachedText::update()
 {
     if (m_font) {
-        m_glyphsPositions = m_font->calculateGlyphsPositions(m_text, m_align, &m_textSize);
+        m_font->calculateGlyphsPositions(m_text, m_align, m_glyphsPositions, &m_textSize);
     }
 
     m_textScreenCoords = {};

@@ -45,7 +45,7 @@ void UIWidget::updateText()
     }
 
     if (m_font)
-        m_glyphsPositionsCache = m_font->calculateGlyphsPositions(m_drawText, m_textAlign, &m_textSize);
+        m_font->calculateGlyphsPositions(m_drawText, m_textAlign, m_glyphsPositionsCache, &m_textSize);
 
     // update rect size
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
@@ -106,8 +106,8 @@ void UIWidget::drawText(const Rect& screenCoords)
         return;
 
     // Hack to fix font rendering in atlas
-    if (g_drawPool.getAtlas() && m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType()) != m_lastAtlasRegion) {
-        m_lastAtlasRegion = m_font->getTexture()->getAtlas(g_drawPool.getAtlas()->getType());
+    if (m_font->getAtlasRegion() != m_atlasRegion) {
+        m_atlasRegion = m_font->getAtlasRegion();
         updateText();
     }
 
