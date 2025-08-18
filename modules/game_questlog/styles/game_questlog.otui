@@ -124,11 +124,30 @@ QuestLogTracker < MiniWindow
   icon-size: 12 12
   @onOpen: modules.game_questlog.onOpenTracker()
   @onClose: modules.game_questlog.onCloseTracker()
+
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    size: 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    color: #9d9d9dff
+
   UIButton
     id: menuButton
-    anchors.top: prev.top
-    anchors.right: prev.left
-    margin-right: 2
     size: 14 14
     image-source: /images/ui/miniwindow_buttons
     image-clip: 112 0 14 14
@@ -142,24 +161,6 @@ QuestLogTracker < MiniWindow
     $on:
       image-clip: 112 0 14 14
 
-  UIButton
-    id: cyclopediaButton
-    anchors.top: prev.top
-    anchors.right: prev.left
-    margin-right: 2
-    size: 14 14
-    image-source: /images/ui/miniwindow_buttons
-    image-clip: 126 0 14 14
-
-    $hover:
-      image-clip: 126 14 14 14
-
-    $pressed:
-      image-clip: 126 28 14 14
-
-    $on:
-      image-clip: 126 0 14 14
-
   UIWidget
     id: miniborder
     anchors.bottom: parent.bottom
@@ -171,9 +172,18 @@ QuestLogTracker < MiniWindow
 
   MiniWindowContents
     id: contentsPanel
+    anchors.top: miniwindowTopBar.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: parent.bottom
+    margin-left: 3
+    margin-bottom: 3
+    margin-top: -2
+    margin-right: 1
+    vertical-scrollbar: miniwindowScrollBar
     padding-left: 5
     padding-right: 5
-    padding-bottom: 3
+    padding-top: 5
     layout: verticalBox
     Panel
       id: list

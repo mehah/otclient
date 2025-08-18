@@ -390,37 +390,107 @@ local function showQuestTracker()
         return
     end
     trackerMiniWindow = g_ui.createWidget('QuestLogTracker')
-    trackerMiniWindow.menuButton.onClick = function(widget, mousePos)
-        local menu = g_ui.createWidget('PopupMenu')
-        menu:setGameMenu(true)
-        menu:addOption('Remove All quest', function()
-            if settings[namePlayer] then
-                table.clear(settings[namePlayer])
-                sendQuestTracker(settings[namePlayer])
-                trackerMiniWindow.contentsPanel.list:getLayout():enableUpdates()
-                trackerMiniWindow.contentsPanel.list:getLayout():update()
-            end
-        end)
-        menu:addOption('Remove completed quests', function()
-            print("to-do")
-        end)
-        menu:addSeparator()
-        menu:addCheckBox('Automatically track new quests', false, function(a, b)
-            print(a, b)
-        end):disable()
-        menu:addCheckBox('Automatically untrack completed quests', false, function(a, b)
-            print(a, b)
-        end):disable()
+    
+    -- Hide all standard miniwindow buttons that we don't want
+    local toggleFilterButton = trackerMiniWindow:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+    end
+    
+    -- Hide the custom menuButton since we'll use the standard contextMenuButton
+    local menuButton = trackerMiniWindow:getChildById('menuButton')
+    if menuButton then
+        menuButton:setVisible(false)
+    end
+    
+    -- Set up the miniwindow title and icon
+    local titleWidget = trackerMiniWindow:getChildById('miniwindowTitle')
+    if titleWidget then
+        titleWidget:setText('Quest Tracker')
+    else
+        -- Fallback to old method if miniwindowTitle doesn't exist
+        trackerMiniWindow:setText('Quest Tracker')
+    end
+    
+    local iconWidget = trackerMiniWindow:getChildById('miniwindowIcon')
+    if iconWidget then
+        iconWidget:setImageSource('/images/topbuttons/icon-questtracker-widget')
+    end
+    
+    -- Position contextMenuButton where toggleFilterButton was (to the left of minimize button)
+    local contextMenuButton = trackerMiniWindow:recursiveGetChildById('contextMenuButton')
+    local minimizeButton = trackerMiniWindow:recursiveGetChildById('minimizeButton')
+    
+    if contextMenuButton and minimizeButton then
+        contextMenuButton:setVisible(true)
+        contextMenuButton:breakAnchors()
+        contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        contextMenuButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+        contextMenuButton:setMarginTop(0)
+        contextMenuButton:setSize({width = 12, height = 12})
+    end
+    
+    -- Position newWindowButton to the left of contextMenuButton
+    local newWindowButton = trackerMiniWindow:recursiveGetChildById('newWindowButton')
+    
+    if newWindowButton and contextMenuButton then
+        newWindowButton:setVisible(true)
+        newWindowButton:breakAnchors()
+        newWindowButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+        newWindowButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+        newWindowButton:setMarginRight(2)  -- Same margin as other buttons
+        newWindowButton:setMarginTop(0)
+    end
+    
+    -- Position lockButton to the left of newWindowButton
+    local lockButton = trackerMiniWindow:recursiveGetChildById('lockButton')
+    
+    if lockButton and newWindowButton then
+        lockButton:breakAnchors()
+        lockButton:addAnchor(AnchorTop, newWindowButton:getId(), AnchorTop)
+        lockButton:addAnchor(AnchorRight, newWindowButton:getId(), AnchorLeft)
+        lockButton:setMarginRight(2)  -- Same margin as other buttons
+        lockButton:setMarginTop(0)
+    end
 
-        menu:display(mousePos)
-        return true
+    -- Set up contextMenuButton click handler (moved from menuButton)
+    if contextMenuButton then
+        contextMenuButton.onClick = function(widget, mousePos)
+            local menu = g_ui.createWidget('PopupMenu')
+            menu:setGameMenu(true)
+            menu:addOption('Remove All quest', function()
+                if settings[namePlayer] then
+                    table.clear(settings[namePlayer])
+                    sendQuestTracker(settings[namePlayer])
+                    trackerMiniWindow.contentsPanel.list:getLayout():enableUpdates()
+                    trackerMiniWindow.contentsPanel.list:getLayout():update()
+                end
+            end)
+            menu:addOption('Remove completed quests', function()
+                print("to-do")
+            end)
+            menu:addSeparator()
+            menu:addCheckBox('Automatically track new quests', false, function(a, b)
+                print(a, b)
+            end):disable()
+            menu:addCheckBox('Automatically untrack completed quests', false, function(a, b)
+                print(a, b)
+            end):disable()
+
+            menu:display(mousePos)
+            return true
+        end
     end
-    trackerMiniWindow.cyclopediaButton.onClick = function()
-        show()
-        return true
+    
+    -- Set up newWindowButton click handler to open Quest Log window
+    if newWindowButton then
+        newWindowButton.onClick = function()
+            show()
+            return true
+        end
     end
-    trackerMiniWindow:moveChildToIndex(trackerMiniWindow.menuButton, 4)
-    trackerMiniWindow:moveChildToIndex(trackerMiniWindow.cyclopediaButton, 5)
+    
     trackerMiniWindow:setContentMinimumHeight(80)
     trackerMiniWindow:setup()
     toggleTracker()
