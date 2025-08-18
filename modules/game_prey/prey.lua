@@ -96,10 +96,10 @@ function init()
     -- Set up the miniwindow title and icon
     local titleWidget = preyTracker:getChildById('miniwindowTitle')
     if titleWidget then
-        titleWidget:setText('Preys')
+        titleWidget:setText('Prey')
     else
         -- Fallback to old method if miniwindowTitle doesn't exist
-        preyTracker:setText('Preys')
+        preyTracker:setText('Prey')
     end
     
     local iconWidget = preyTracker:getChildById('miniwindowIcon')
