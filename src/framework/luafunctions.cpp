@@ -909,10 +909,12 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ParticleEffectType>("getName", &ParticleEffectType::getName);
     g_lua.bindClassMemberFunction<ParticleEffectType>("getDescription", &ParticleEffectType::getDescription);
 
-    // UIParticles
-    g_lua.registerClass<UIParticles, UIWidget>();
-    g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });
-    g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
+    // UIParticles  
+    g_lua.registerClass<UIParticles, UIWidget>();  
+    g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });  
+    g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);  
+    g_lua.bindClassMemberFunction<UIParticles>("setEffect", &UIParticles::setEffect);
+    g_lua.bindClassMemberFunction<UIParticles>("clearEffects", &UIParticles::clearEffects);
 #endif
 
 #ifdef FRAMEWORK_NET
