@@ -84,6 +84,53 @@ local function removeNumber(key, id)
     end
 end
 
+-- Auto-untrack completed quests by checking all tracked quests
+local function autoUntrackCompletedQuests()
+    if not settings.autoUntrackCompleted or not settings[namePlayer] or not trackerMiniWindow then
+        return
+    end
+    
+    local removedMissionIds = {}
+    
+    -- Check all tracked missions for completion status
+    if trackerMiniWindow.contentsPanel and trackerMiniWindow.contentsPanel.list then
+        for i = trackerMiniWindow.contentsPanel.list:getChildCount(), 1, -1 do
+            local trackerLabel = trackerMiniWindow.contentsPanel.list:getChildByIndex(i)
+            if trackerLabel and trackerLabel.description then
+                local description = trackerLabel.description:getText()
+                local missionId = tonumber(trackerLabel:getId())
+                
+                -- Check if the mission is completed based on description text
+                local isCompleted = description and (
+                    string.find(string.lower(description), "%(completed%)") or
+                    (string.find(string.lower(description), "complete") and 
+                     (string.find(string.lower(description), "quest") or string.find(string.lower(description), "mission")))
+                )
+                
+                if isCompleted then
+                    table.insert(removedMissionIds, missionId)
+                    
+                    -- Remove from settings
+                    removeNumber(namePlayer, missionId)
+                    
+                    -- Remove from tracker display
+                    trackerLabel:destroy()
+                end
+            end
+        end
+    end
+    
+    if #removedMissionIds > 0 then
+        -- Update tracker layout
+        if trackerMiniWindow.contentsPanel and trackerMiniWindow.contentsPanel.list then
+            trackerMiniWindow.contentsPanel.list:getLayout():update()
+        end
+        
+        -- Save the updated settings
+        save()
+    end
+end
+
 local function load()
     if g_resources.fileExists(file) then
         local status, result = pcall(function()
@@ -186,6 +233,9 @@ local function rebuildTrackerFromSettings()
     if settings[namePlayer] and #settings[namePlayer] > 0 then
         sendQuestTracker(settings[namePlayer])
     end
+    
+    -- Check for completed quests to auto-untrack
+    scheduleEvent(autoUntrackCompletedQuests, 1000) -- Delay to ensure tracker is fully loaded
 end
 
 local function findQuestIdForMission(missionId)
@@ -599,28 +649,20 @@ local function showQuestTracker()
                     local removedMissionIds = {}
                     local completedMissionIds = {}
                     
-                    print("DEBUG: Starting remove completed missions...")
-                    print("DEBUG: Total tracked missions:", #settings[namePlayer])
-                    
                     -- Check for completed missions by looking for "(completed)" in their names/descriptions
                     -- and also check the isComplete property if available
                     for i, entry in ipairs(settings[namePlayer]) do
                         local missionId, missionName, missionDescription, questId = unpack(entry)
-                        print("DEBUG: Checking tracked mission #" .. i .. " - missionId=" .. tostring(missionId))
-                        print("DEBUG: Mission name: '" .. tostring(missionName) .. "'")
-                        print("DEBUG: Mission description: '" .. tostring(missionDescription) .. "'")
                         
                         local isCompleted = false
                         
                         -- Method 1: Check for "(completed)" string in mission name
                         if missionName and string.find(string.lower(missionName), "%(completed%)") then
-                            print("DEBUG: Mission " .. tostring(missionId) .. " has '(completed)' in name")
                             isCompleted = true
                         end
                         
                         -- Method 2: Check for "(completed)" string in mission description
                         if not isCompleted and missionDescription and string.find(string.lower(missionDescription), "%(completed%)") then
-                            print("DEBUG: Mission " .. tostring(missionId) .. " has '(completed)' in description")
                             isCompleted = true
                         end
                         
@@ -629,9 +671,7 @@ local function showQuestTracker()
                             local trackerLabel = trackerMiniWindow.contentsPanel.list:getChildById(tostring(missionId))
                             if trackerLabel and trackerLabel.description then
                                 local trackerText = trackerLabel.description:getText()
-                                print("DEBUG: Tracker label text: '" .. tostring(trackerText) .. "'")
                                 if trackerText and string.find(string.lower(trackerText), "%(completed%)") then
-                                    print("DEBUG: Mission " .. tostring(missionId) .. " has '(completed)' in tracker label")
                                     isCompleted = true
                                 end
                             end
@@ -652,11 +692,9 @@ local function showQuestTracker()
                                             -- Check mission text for "(completed)"
                                             local missionText = missionItem:getText()
                                             if missionText and string.find(string.lower(missionText), "%(completed%)") then
-                                                print("DEBUG: Mission " .. tostring(missionId) .. " has '(completed)' in loaded mission text")
                                                 table.insert(removedMissionIds, missionId)
                                                 table.insert(completedMissionIds, missionId)
                                             elseif missionItem.isComplete then
-                                                print("DEBUG: Mission " .. tostring(missionId) .. " is marked as isComplete")
                                                 table.insert(removedMissionIds, missionId)
                                                 table.insert(completedMissionIds, missionId)
                                             end
@@ -675,7 +713,6 @@ local function showQuestTracker()
                         
                         -- If we found completion through methods 1-3, mark for removal immediately
                         if isCompleted then
-                            print("DEBUG: Mission " .. tostring(missionId) .. " is COMPLETED, marking for removal")
                             table.insert(removedMissionIds, missionId)
                             table.insert(completedMissionIds, missionId)
                         end
@@ -687,20 +724,16 @@ local function showQuestTracker()
                             processCompletedMissionRemoval()
                         end, 100)
                     else
-                        print("DEBUG: No completed missions found through text search, checking quest log...")
                     end
                     
                     -- Function to process the actual removal
                     function processCompletedMissionRemoval()
-                        print("DEBUG: Processing removal of " .. #removedMissionIds .. " completed missions")
-                        
                         if #removedMissionIds > 0 then
                             -- Remove completed missions from settings
                             for j = #settings[namePlayer], 1, -1 do
                                 local checkMissionId = settings[namePlayer][j][1]
                                 for _, removedId in ipairs(removedMissionIds) do
                                     if checkMissionId == removedId then
-                                        print("DEBUG: Removing mission " .. tostring(checkMissionId) .. " from settings")
                                         table.remove(settings[namePlayer], j)
                                         break
                                     end
@@ -711,7 +744,6 @@ local function showQuestTracker()
                             for _, missionId in ipairs(removedMissionIds) do
                                 if missionToQuestMap[tonumber(missionId)] then
                                     missionToQuestMap[tonumber(missionId)] = nil
-                                    print("DEBUG: Removed mission " .. tostring(missionId) .. " from mapping")
                                 end
                             end
                             
@@ -722,7 +754,6 @@ local function showQuestTracker()
                             for _, missionId in ipairs(removedMissionIds) do
                                 local trackerLabel = trackerMiniWindow.contentsPanel.list:getChildById(tostring(missionId))
                                 if trackerLabel then
-                                    print("DEBUG: Destroying tracker label for mission " .. tostring(missionId))
                                     trackerLabel:destroy()
                                 end
                             end
@@ -751,21 +782,34 @@ local function showQuestTracker()
                             
                             -- Save the updated settings
                             save()
-                            
-                            print("DEBUG: Completed mission removal finished. Removed " .. #removedMissionIds .. " missions.")
-                        else
-                            print("DEBUG: No completed missions found to remove.")
                         end
                     end
                 end
             end)
             menu:addSeparator()
-            menu:addCheckBox('Automatically track new quests', false, function(a, b)
-                print(a, b)
-            end):disable()
-            menu:addCheckBox('Automatically untrack completed quests', false, function(a, b)
-                print(a, b)
-            end):disable()
+            menu:addCheckBox('Automatically track new quests', settings.autoTrackNewQuests or false, function(widget, checked)
+                settings.autoTrackNewQuests = checked
+                save()
+            end)
+            menu:addCheckBox('Automatically untrack completed quests', settings.autoUntrackCompleted or false, function(widget, checked)
+                settings.autoUntrackCompleted = checked
+                save()
+                
+                -- Start/stop periodic auto-untrack check
+                if checked then
+                    -- Start periodic check
+                    scheduleEvent(function()
+                        local function periodicAutoUntrack()
+                            autoUntrackCompletedQuests()
+                            -- Schedule next check
+                            if settings.autoUntrackCompleted then
+                                scheduleEvent(periodicAutoUntrack, 30000) -- 30 seconds
+                            end
+                        end
+                        periodicAutoUntrack()
+                    end, 1000) -- Start after 1 second
+                end
+            end)
 
             menu:display(mousePos)
             return true
@@ -789,6 +833,20 @@ local function showQuestTracker()
     end
     
     toggleTracker()
+    
+    -- Set up periodic auto-untrack check (every 30 seconds)
+    if settings.autoUntrackCompleted then
+        scheduleEvent(function()
+            local function periodicAutoUntrack()
+                autoUntrackCompletedQuests()
+                -- Schedule next check
+                if settings.autoUntrackCompleted then
+                    scheduleEvent(periodicAutoUntrack, 30000) -- 30 seconds
+                end
+            end
+            periodicAutoUntrack()
+        end, 5000) -- Start after 5 seconds
+    end
 end
 
 --[[=================================================
@@ -835,6 +893,24 @@ local function onQuestLine(questId, questMissions)
         itemCat.description = missionDescription
         setupQuestItemClickHandler(itemCat, false)
         categoryColor = categoryColor == COLORS.BASE_1 and COLORS.BASE_2 or COLORS.BASE_1
+        
+        -- Auto-track new quests if the setting is enabled
+        if settings.autoTrackNewQuests and not isIdInTracker(namePlayer, missionId) then
+            -- Check if this mission appears to be new (not completed)
+            local isCompleted = missionDescription and (
+                string.find(string.lower(missionDescription), "%(completed%)") or
+                string.find(string.lower(missionDescription), "complete") and string.find(string.lower(missionDescription), "quest")
+            )
+            
+            if not isCompleted then
+                -- Add the mission to tracker
+                addUniqueIdQuest(namePlayer, questId, missionId, missionName, missionDescription)
+                save()
+                
+                -- Rebuild tracker to show the new quest
+                rebuildTrackerFromSettings()
+            end
+        end
     end
     
     -- Auto-select the first mission but prevent checkbox updates during this automatic selection
@@ -918,6 +994,11 @@ local function onQuestTracker(remainingQuests, missions)
             -- Ignoring non-tracked mission from server
         end
     end
+    
+    -- Check for completed quests to auto-untrack after processing all missions
+    if settings.autoUntrackCompleted then
+        scheduleEvent(autoUntrackCompletedQuests, 500) -- Short delay to ensure all updates are processed
+    end
 end
 
 local function onUpdateQuestTracker(questId, missionId, questName, missionName, missionDesc)
@@ -941,6 +1022,27 @@ local function onUpdateQuestTracker(questId, missionId, questName, missionName, 
                     save() -- Save the updated description
                     break
                 end
+            end
+        end
+        
+        -- Auto-untrack completed quests if the setting is enabled
+        if settings.autoUntrackCompleted then
+            local isCompleted = missionDesc and (
+                string.find(string.lower(missionDesc), "%(completed%)") or
+                (string.find(string.lower(missionDesc), "complete") and 
+                 (string.find(string.lower(missionDesc), "quest") or string.find(string.lower(missionDesc), "mission")))
+            )
+            
+            if isCompleted then
+                -- Remove from settings
+                removeNumber(namePlayer, missionId)
+                save()
+                
+                -- Remove from tracker display
+                trackerLabel:destroy()
+                
+                -- Update tracker layout
+                trackerMiniWindow.contentsPanel.list:getLayout():update()
             end
         end
     end
@@ -1169,11 +1271,7 @@ function onQuestTrackerDescriptionClick(widget, mousePos, mouseButton)
             end
         end
         
-        -- Debug: Show which tracker item was clicked and its stored data
         local labelIndex = trackerLabel:getParent():getChildIndex(trackerLabel)
-        
-        -- Debug all tracker labels to see their state
-        debugTrackerLabels()
         
         -- Always open the Quest Log window
         show()
@@ -1302,6 +1400,14 @@ function questLogController:onGameStart()
     if g_game.getClientVersion() >= 1280 then
         namePlayer = g_game.getCharacterName():lower()
         settings = load() or {}
+        
+        -- Initialize default auto-tracking settings if they don't exist
+        if settings.autoTrackNewQuests == nil then
+            settings.autoTrackNewQuests = false
+        end
+        if settings.autoUntrackCompleted == nil then
+            settings.autoUntrackCompleted = false
+        end
         
         -- Initialize the player's settings if they don't exist
         if not settings[namePlayer] then
