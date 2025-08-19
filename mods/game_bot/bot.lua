@@ -42,6 +42,36 @@ function init()
   botWindow = g_ui.loadUI('bot', modules.game_interface.getLeftPanel())
   botWindow:setup()
 
+  -- Hide unwanted miniwindow buttons
+  local toggleFilterButton = botWindow:recursiveGetChildById('toggleFilterButton')
+  if toggleFilterButton then
+    toggleFilterButton:setVisible(false)
+  end
+  
+  local contextMenuButton = botWindow:recursiveGetChildById('contextMenuButton')
+  if contextMenuButton then
+    contextMenuButton:setVisible(false)
+  end
+  
+  local newWindowButton = botWindow:recursiveGetChildById('newWindowButton')
+  if newWindowButton then
+    newWindowButton:setVisible(false)
+  end
+  
+  -- Position lockButton where toggleFilterButton would be (to the left of minimize button)
+  local lockButton = botWindow:recursiveGetChildById('lockButton')
+  local minimizeButton = botWindow:recursiveGetChildById('minimizeButton')
+  
+  if lockButton and minimizeButton then
+    lockButton:setVisible(true)
+    lockButton:breakAnchors()
+    lockButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+    lockButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+    lockButton:setMarginRight(7)  -- Same margin as toggleFilterButton would have
+    lockButton:setMarginTop(0)
+    lockButton:setSize({width = 12, height = 12})
+  end
+
   contentsPanel = botWindow.contentsPanel
   configList = contentsPanel.config
   enableButton = contentsPanel.enableButton

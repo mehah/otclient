@@ -24,10 +24,32 @@ MiniWindow
   id: botWindow
   !text: tr('Bot')
   height: 600
-  icon: /images/topbuttons/bot
   @onClose: modules.game_bot.onMiniWindowClose()
   &save: true
   &autoOpen: 10
+
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    size: 12 12
+    image-source: /images/topbuttons/bot
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    color: #9d9d9dff
+    !text: tr('Bot')
 
   MiniWindowContents
     ComboBox
