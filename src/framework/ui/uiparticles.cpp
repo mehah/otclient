@@ -67,3 +67,14 @@ void UIParticles::addEffect(const std::string_view name)
     if (effect)
         m_effects.emplace_back(effect);
 }
+
+void UIParticles::setEffect(const std::string_view name)  
+{  
+    clearEffects();  
+    addEffect(name);  
+}  
+  
+void UIParticles::clearEffects()  
+{  
+    m_effects.clear();  
+}
