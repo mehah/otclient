@@ -113,7 +113,7 @@ BattleSorcerers < BattleIcon
 
 BattleMonks < BattleIcon
   @onSetup: |
-    if g_game.getClientVersion() >= 1402 then
+    if g_game.getClientVersion() >= 1500 then
       self:setVisible(true)
     else
       self:setVisible(false)
@@ -184,6 +184,10 @@ MiniWindow
     anchors.right: parent.right
     height: 40
     margin-left: 0
+    @onSetup: |
+      if g_game.getClientVersion() < 1500 then
+        self:setMarginLeft(30)
+      end
 
     Panel
       id: filterRow1
