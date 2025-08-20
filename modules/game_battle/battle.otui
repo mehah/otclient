@@ -145,7 +145,7 @@ BattleMembersOwnGuild < BattleIcon
     phantom: true
     image-source: /images/game/battle/icon-battlelist-own-guild
 
-MiniWindowBattle
+MiniWindow
   id: battleWindow
   height: 166
   image-smooth: false
@@ -182,7 +182,7 @@ MiniWindowBattle
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    height: 46
+    height: 40
     margin-left: 0
 
     Panel
@@ -266,32 +266,19 @@ MiniWindowBattle
         !tooltip: tr('Hide own guild members')
         @onClick: modules.game_battle.onFilterButtonClick(self)
 
-  VerticalScrollBar
-    id: miniwindowScrollBar
-    anchors.top: filterPanel.bottom
-    anchors.bottom: parent.bottom
-    anchors.right: parent.right
-    step: 14
-    margin-top: 3
-    margin-right: 3
-    margin-bottom: 3
-    pixels-scroll: true
-    $!on:
-      width: 0
-
   Panel
     height: 18
-    anchors.top: prev.bottom
+    anchors.top: filterPanel.bottom
     anchors.left: parent.left
-    anchors.right: miniwindowScrollBar.left
-    margin-top: -3
+    anchors.right: parent.right
+    margin-top: 0
 
   HorizontalSeparator
     id: HorizontalSeparator
-    anchors.top: filterPanel.bottom
+    anchors.top: prev.bottom
     anchors.left: parent.left
-    anchors.right: miniwindowScrollBar.left
-    margin-right: 1
+    anchors.right: parent.right
+    margin-right: 3
     margin-top: 0
     height: 2
     color: #cccccc
@@ -321,6 +308,15 @@ MiniWindowBattle
       image-source: /images/ui/miniborder
       image-smooth: false
       focusable: false
+      margin-bottom: 0
+      margin-left: 0
+      image-source: /images/ui/miniborder
+      image-smooth: false
+      focusable: false
+    margin-bottom: 3
+    pixels-scroll: true
+    $!on:
+      width: 0
 
 BattleListMenuOption < ThickCheckBox
   text-offset: 18 1

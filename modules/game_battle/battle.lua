@@ -225,6 +225,17 @@ function BattleListManager:createWindowForInstance(instance)
     instance.filterPanel = newWindow:recursiveGetChildById('filterPanel')
     instance.toggleFilterButton = newWindow:recursiveGetChildById('toggleFilterButton')
     
+    -- Setup scrollbar for this instance - use default MiniWindow behavior
+    local scrollbar = newWindow:getChildById('miniwindowScrollBar')
+    if scrollbar then
+        scrollbar:mergeStyle({ ['$!on'] = {} })
+    end
+    
+    -- Debug check for toggleFilterButton
+    if not instance.toggleFilterButton then
+        print("Warning: toggleFilterButton not found in battle instance " .. instance.id .. " UI")
+    end
+    
     instance:updateTitle()
     
     local hideButtons = {}
@@ -318,6 +329,13 @@ function BattleListManager:createWindowForInstance(instance)
     if panel then
         panel:addChild(newWindow)
         newWindow:open()
+    end
+    
+    -- Set initial scrollbar position for new instances (filters visible by default)
+    local scrollbar = newWindow:getChildById('miniwindowScrollBar')
+    if scrollbar then
+        -- Header (16px) + filterPanel height (46px) + spacing panel (18px) + separator (2px)
+        scrollbar:setMarginTop(82) -- 16 + 46 + 18 + 2 = 82
     end
     
     if g_game.isOnline() then
@@ -801,30 +819,49 @@ end
 function BattleListInstance:hideFilterPanel()
     self.filterPanel.originalHeight = self.filterPanel:getHeight()
     self.filterPanel:setHeight(0)
-    self.toggleFilterButton:getParent():setMarginTop(0)
-    self.toggleFilterButton:setOn(false)
+    if self.toggleFilterButton then
+        self.toggleFilterButton:getParent():setMarginTop(0)
+        self.toggleFilterButton:setOn(false)
+    end
     self:setHidingFilters(true)
     local HorizontalSeparator = self.window:recursiveGetChildById('HorizontalSeparator')
     if HorizontalSeparator then HorizontalSeparator:setVisible(false) end
     self.filterPanel:setVisible(false)
     local contentsPanel = self.window:recursiveGetChildById('contentsPanel')
-    if contentsPanel then contentsPanel:setMarginTop(-10) end
-    local miniwindowScrollBar = self.window:recursiveGetChildById('miniwindowScrollBar')
-    if miniwindowScrollBar then miniwindowScrollBar:setMarginTop(-3) end
+    -- Reduce margin by the full filter panel space: 46px (filter) + 18px (spacing) + 2px (separator) + 6px (margin) = 72px
+    if contentsPanel then contentsPanel:setMarginTop(-23) end
+    
+    -- Adjust scrollbar to start at header bottom when filter is hidden
+    local scrollbar = self.window:getChildById('miniwindowScrollBar')
+    if scrollbar then
+        scrollbar:setMarginTop(16) -- Default header height
+    end
 end
 
 function BattleListInstance:showFilterPanel()
-    self.toggleFilterButton:getParent():setMarginTop()
+    if self.toggleFilterButton then
+        self.toggleFilterButton:getParent():setMarginTop()
+        self.toggleFilterButton:setOn(true)
+    end
+    -- Ensure originalHeight is set, fallback to a default height
+    if not self.filterPanel.originalHeight then
+        self.filterPanel.originalHeight = 40  -- Default filter panel height
+    end
     self.filterPanel:setHeight(self.filterPanel.originalHeight)
     self:setHidingFilters(false)
-    self.toggleFilterButton:setOn(true)
     local HorizontalSeparator = self.window:recursiveGetChildById('HorizontalSeparator')
     if HorizontalSeparator then HorizontalSeparator:setVisible(true) end
     self.filterPanel:setVisible(true)
     local contentsPanel = self.window:recursiveGetChildById('contentsPanel')
     if contentsPanel then contentsPanel:setMarginTop(0) end
-    local miniwindowScrollBar = self.window:recursiveGetChildById('miniwindowScrollBar')
-    if miniwindowScrollBar then miniwindowScrollBar:setMarginTop(0) end
+    
+    -- Adjust scrollbar to start at filter panel bottom when filter is visible
+    local scrollbar = self.window:getChildById('miniwindowScrollBar')
+    if scrollbar then
+        -- Header (16px) + filterPanel height + spacing panel (18px) + separator (2px)
+        local totalMargin = 16 + self.filterPanel.originalHeight + 18 + 2
+        scrollbar:setMarginTop(totalMargin)
+    end
 end
 
 function BattleListInstance:setHidingFilters(state)
@@ -1295,6 +1332,12 @@ function init()
     mainInstance.panel = battleWindow:recursiveGetChildById('battlePanel')
     mainInstance.filterPanel = battleWindow:recursiveGetChildById('filterPanel')
     mainInstance.toggleFilterButton = battleWindow:recursiveGetChildById('toggleFilterButton')
+    
+    -- Debug check for toggleFilterButton
+    if not mainInstance.toggleFilterButton then
+        print("Warning: toggleFilterButton not found in battle window UI")
+    end
+    
     BattleListManager.instances[0] = mainInstance
     
     -- Store references for backward compatibility
@@ -1306,18 +1349,27 @@ function init()
     Keybind.new("Windows", "Show/hide battle list", "Ctrl+B", "")
     Keybind.bind("Windows", "Show/hide battle list", {{ type = KEY_DOWN, callback = toggle }})
 
-    -- Setup scrollbar
+    -- Setup scrollbar - use default MiniWindow behavior
     local scrollbar = battleWindow:getChildById('miniwindowScrollBar')
-    scrollbar:mergeStyle({ ['$!on'] = {} })
+    if scrollbar then
+        scrollbar:mergeStyle({ ['$!on'] = {} })
+    end
 
     HorizontalSeparator = battleWindow:recursiveGetChildById('HorizontalSeparator')
     contentsPanel = battleWindow:recursiveGetChildById('contentsPanel')
-    miniwindowScrollBar = battleWindow:recursiveGetChildById('miniwindowScrollBar')
+    miniwindowScrollBar = battleWindow:getChildById('miniwindowScrollBar')
 
     -- Setup filter panel
     local settings = g_settings.getNode(mainInstance:getSettingsKey())
     if settings and settings['hidingFilters'] then
         mainInstance:hideFilterPanel()
+    else
+        -- Set initial scrollbar position when filters are visible
+        local scrollbar = battleWindow:getChildById('miniwindowScrollBar')
+        if scrollbar then
+            -- Header (16px) + filterPanel height (46px) + spacing panel (18px) + separator (2px) + margin (6px)
+            scrollbar:setMarginTop(88) -- 16 + 46 + 18 + 2 + 6 = 88
+        end
     end
 
     -- Setup filter buttons
@@ -1367,6 +1419,13 @@ function init()
     if newWindowButton then
         newWindowButton.onClick = function()
             BattleListManager:createNewInstance()
+        end
+    end
+    
+    -- Setup toggleFilterButton onClick handler for main instance
+    if mainInstance.toggleFilterButton then
+        mainInstance.toggleFilterButton.onClick = function()
+            mainInstance:toggleFilterPanel()
         end
     end
 
