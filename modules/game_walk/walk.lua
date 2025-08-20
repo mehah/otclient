@@ -277,7 +277,7 @@ function bindWalkKey(key, dir)
     local gameRootPanel = modules.game_interface.getRootPanel()
 
     g_keyboard.bindKeyDown(key, function()
-        g_keyboard.setKeyDelay(key, 10)
+        g_keyboard.setKeyDelay(key, 1)
         changeWalkDir(dir)
     end, gameRootPanel, true)
 
