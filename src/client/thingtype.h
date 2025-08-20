@@ -262,11 +262,11 @@ struct ImbuementSlot
 
 struct ImbuementTrackerItem
 {
-    ImbuementTrackerItem() : slot(0), totalSlots(0) {}
-    ImbuementTrackerItem(const uint8_t slot) : slot(slot), totalSlots(0) {}
+    ImbuementTrackerItem() : slot(0) {}
+    ImbuementTrackerItem(const uint8_t slot) : slot(slot) {}
 
     uint8_t slot;
-    uint8_t totalSlots;
+    uint8_t totalSlots = 0;
     ItemPtr item;
     std::map<uint8_t, ImbuementSlot> slots;
 };

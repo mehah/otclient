@@ -203,7 +203,7 @@ minHeight,
     }
 
     void setVocation(uint8_t vocation) { m_vocation = vocation; }
-    uint8_t getVocation() { return m_vocation; }
+    const uint8_t getVocation() { return m_vocation; }
 
 protected:
     virtual void terminateWalk();

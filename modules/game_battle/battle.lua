@@ -231,9 +231,8 @@ function BattleListManager:createWindowForInstance(instance)
         scrollbar:mergeStyle({ ['$!on'] = {} })
     end
     
-    -- Debug check for toggleFilterButton
     if not instance.toggleFilterButton then
-        print("Warning: toggleFilterButton not found in battle instance " .. instance.id .. " UI")
+        g_logger.info("Battle: toggleFilterButton not found in battle instance " .. instance.id .. " UI")
     end
     
     instance:updateTitle()
@@ -1333,9 +1332,8 @@ function init()
     mainInstance.filterPanel = battleWindow:recursiveGetChildById('filterPanel')
     mainInstance.toggleFilterButton = battleWindow:recursiveGetChildById('toggleFilterButton')
     
-    -- Debug check for toggleFilterButton
     if not mainInstance.toggleFilterButton then
-        print("Warning: toggleFilterButton not found in battle window UI")
+        g_logger.info("Battle: toggleFilterButton not found in battle window UI")
     end
     
     BattleListManager.instances[0] = mainInstance
@@ -1392,8 +1390,6 @@ function init()
         end
     end
 
-    scheduleEvent(reorganizeFilterButtons, 50)
-
     -- Setup mouse widget
     mouseWidget = g_ui.createWidget('UIButton')
     mouseWidget:setVisible(false)
@@ -1446,46 +1442,6 @@ function init()
     if g_game.isOnline() then
         battleWindow:setupOnStart()
     end
-end
-
-local function reorganizeFilterButtons()
-    if not filterPanel then return end
-
-    local filterRow1 = filterPanel:getChildById('filterRow1')
-    local filterRow2 = filterPanel:getChildById('filterRow2')
-    if not filterRow1 or not filterRow2 then return end
-
-    local orderedIds = {
-        'hidePlayers', 'hideKnights', 'hidePaladins', 'hideDruids', 'hideSorcerers', 'hideMonks', 'hideSummons',
-        'hideNPCs', 'hideMonsters', 'hideSkulls', 'hideParty', 'hideMembersOwnGuild'
-    }
-
-    for _, id in ipairs(orderedIds) do
-        local btn = hideButtons[id]
-        if btn and btn:getParent() then
-            btn:getParent():removeChild(btn)
-        end
-    end
-
-    local visibleButtons = {}
-    for _, id in ipairs(orderedIds) do
-        local btn = hideButtons[id]
-        if btn and btn:isVisible() then
-            table.insert(visibleButtons, btn)
-        end
-    end
-
-    for i, btn in ipairs(visibleButtons) do
-        if i <= 7 then
-            filterRow1:addChild(btn)
-        else
-            filterRow2:addChild(btn)
-        end
-    end
-
-    if filterRow1:getLayout() then filterRow1:getLayout():update() end
-    if filterRow2:getLayout() then filterRow2:getLayout():update() end
-    if filterPanel:getLayout() then filterPanel:getLayout():update() end
 end
 
 -- Binary Search and utility functions
@@ -1560,9 +1516,6 @@ end
 function onGameStart()
     battleWindow:setupOnStart() -- load character window configuration
 
-    -- Reorganize filter buttons layout based on client version
-    reorganizeFilterButtons()
-    
     -- Update battle list title in case it was customized
     updateBattleListTitle()
     

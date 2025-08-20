@@ -425,16 +425,10 @@ function sortContainerItems(container, sortMode)
             return nameA:lower() > nameB:lower() 
         end)
     elseif sortMode == 'sortAscByWeight' then
-        -- TODO: Implement weight-based ascending sorting
-        -- This requires proper ItemType weight calculation accounting for stack sizes
-        -- Example approach: ItemType(item:getId()):getWeight(1) * item:getCount()
-        -- Need to investigate the correct API for getting item weights
+        -- TODO: Implement functionality to retrieve item weights and sort accordingly
         return
     elseif sortMode == 'sortDescByWeight' then
-        -- TODO: Implement weight-based descending sorting  
-        -- This requires proper ItemType weight calculation accounting for stack sizes
-        -- Example approach: ItemType(item:getId()):getWeight(1) * item:getCount()
-        -- Need to investigate the correct API for getting item weights
+        -- TODO: Implement weight-based sorting (descending)
         return
     elseif sortMode == 'sortAscByExpiry' then
         sortWithContainersFirst(items, function(a, b) 
@@ -647,6 +641,7 @@ function onContainersMenuAction(actionId)
     if isActionButton then
         -- Handle action buttons (non-toggle actions)
         if actionId == 'moveToObtainContainers' then
+            -- TODO: Need to create function to use quickloot sorting.
             return
         elseif actionId:find('sortAsc') or actionId:find('sortDesc') then
             -- When a sorting action is selected, automatically disable manual sort mode
@@ -722,6 +717,19 @@ function onContainersMenuAction(actionId)
                     end
                 end, 50) -- Small delay to ensure setting is saved first
             end
+        elseif actionId == 'moveNestedContainers' then
+            -- TODO: Implement functionality to automatically move nested containers (containers with items inside)
+            -- to specific locations or positions within containers. This feature should work in conjunction
+            -- with container sorting and could help organize containers by moving filled containers to
+            -- preferred positions (e.g., top of container, specific slots, etc.).
+            -- Implementation should consider:
+            -- 1. Identify containers that have items inside (nested containers)
+            -- 2. Define target positions/rules for where to move them
+            -- 3. Handle conflicts with existing sorting modes
+            -- 4. Respect manual sort mode settings
+            -- 5. Provide user feedback on move operations
+            
+            -- For now, just toggle the setting - actual move functionality to be implemented
         end
         
         -- Save the new state to settings

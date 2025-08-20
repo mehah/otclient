@@ -180,95 +180,76 @@ MiniWindow
     id: filterPanel
     margin-top: 20
     anchors.top: parent.top
-    anchors.left: parent.left
-    anchors.right: parent.right
-    height: 40
-    margin-left: 0
-    @onSetup: |
-      if g_game.getClientVersion() < 1500 then
-        self:setMarginLeft(30)
-      end
+    anchors.horizontalCenter: parent.horizontalCenter
+    height: 46
+    width: 130
+    layout:
+      type: grid
+      flow: true
+      cell-spacing: 2
+      num-columns: 6
+      cell-size: 20 20
+      fit-children: false
 
-    Panel
-      id: filterRow1
-      anchors.top: parent.top
-      anchors.horizontalCenter: parent.horizontalCenter
-      height: 20
-      width: 154
-      layout:
-        type: horizontalBox
-        spacing: 2
+    BattlePlayers
+      id: hidePlayers
+      !tooltip: tr('Hide players')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattlePlayers
-        id: hidePlayers
-        !tooltip: tr('Hide players')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleKnights
+      id: hideKnights
+      !tooltip: tr('Hide knights')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleKnights
-        id: hideKnights
-        !tooltip: tr('Hide knights')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattlePaladins
+      id: hidePaladins
+      !tooltip: tr('Hide paladins')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattlePaladins
-        id: hidePaladins
-        !tooltip: tr('Hide paladins')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleDruids
+      id: hideDruids
+      !tooltip: tr('Hide druids')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleDruids
-        id: hideDruids
-        !tooltip: tr('Hide druids')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleSorcerers
+      id: hideSorcerers
+      !tooltip: tr('Hide sorcerers')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleSorcerers
-        id: hideSorcerers
-        !tooltip: tr('Hide sorcerers')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleMonks
+      id: hideMonks
+      !tooltip: tr('Hide monks')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleMonks
-        id: hideMonks
-        !tooltip: tr('Hide monks')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleSummons
+      id: hideSummons
+      !tooltip: tr('Hide summons')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleSummons
-        id: hideSummons
-        !tooltip: tr('Hide summons')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleNPCs
+      id: hideNPCs
+      !tooltip: tr('Hide Npcs')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-    Panel
-      id: filterRow2
-      anchors.top: filterRow1.bottom
-      anchors.horizontalCenter: parent.horizontalCenter
-      margin-top: 3
-      height: 20
-      width: 154
-      layout:
-        type: horizontalBox
-        spacing: 2
+    BattleMonsters
+      id: hideMonsters
+      !tooltip: tr('Hide monsters')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleNPCs
-        id: hideNPCs
-        !tooltip: tr('Hide Npcs')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleSkulls
+      id: hideSkulls
+      !tooltip: tr('Hide non-skull players')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleMonsters
-        id: hideMonsters
-        !tooltip: tr('Hide monsters')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleParty
+      id: hideParty
+      !tooltip: tr('Hide party members')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
-      BattleSkulls
-        id: hideSkulls
-        !tooltip: tr('Hide non-skull players')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
-
-      BattleParty
-        id: hideParty
-        !tooltip: tr('Hide party members')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
-
-      BattleMembersOwnGuild
-        id: hideMembersOwnGuild
-        !tooltip: tr('Hide own guild members')
-        @onClick: modules.game_battle.onFilterButtonClick(self)
+    BattleMembersOwnGuild
+      id: hideMembersOwnGuild
+      !tooltip: tr('Hide own guild members')
+      @onClick: modules.game_battle.onFilterButtonClick(self)
 
   Panel
     height: 18
