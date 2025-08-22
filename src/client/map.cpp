@@ -176,6 +176,12 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, const int16_t sta
         if (m_floatingEffect || !thing->isEffect() || tile->getGround()) {
             tile->addThing(thing, stackPos);
             notificateTileUpdate(pos, thing, Otc::OPERATION_ADD);
+            
+            // Force screen update when adding effects
+            if (thing->isEffect()) {
+                g_drawPool.repaint(DrawPoolType::MAP);
+                g_drawPool.repaint(DrawPoolType::FOREGROUND_MAP);
+            }
         }
     }
 }
