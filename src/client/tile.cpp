@@ -624,7 +624,7 @@ bool Tile::isCompletelyCovered(const uint8_t firstFloor, const bool resetCache)
     if ((m_isCompletelyCovered & idChecked) == 0) {
         m_isCompletelyCovered |= idChecked;
         bool isLoading = false;
-        if (g_map.__isCompletelyCovered(m_position, isLoading, firstFloor)) {
+        if (g_map.isCompletelyCovered(m_position, isLoading, firstFloor)) {
             m_isCompletelyCovered |= idState;
             m_isCovered |= idChecked; // Set covered is Checked
             m_isCovered |= idState;
@@ -651,7 +651,7 @@ bool Tile::isCovered(const int8_t firstFloor)
     if ((m_isCovered & idChecked) == 0) {
         m_isCovered |= idChecked;
         bool isLoading = false;
-        if (g_map.__isCovered(m_position, isLoading, firstFloor))
+        if (g_map.isCovered(m_position, isLoading, firstFloor))
             m_isCovered |= idState;
 
         if (isLoading) {

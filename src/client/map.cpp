@@ -660,7 +660,7 @@ bool Map::isLookPossible(const Position& pos)
     return tile && tile->isLookPossible();
 }
 
-bool Map::__isCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
+bool Map::isCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
 {
     // check for tiles on top of the postion
     Position tilePos = pos;
@@ -685,7 +685,7 @@ bool Map::__isCovered(const Position& pos, bool& isLoading, const uint8_t firstF
     return false;
 }
 
-bool Map::__isCompletelyCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
+bool Map::isCompletelyCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
 {
     const auto& checkTile = getTile(pos);
     Position tilePos = pos;
