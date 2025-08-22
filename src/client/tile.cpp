@@ -623,10 +623,18 @@ bool Tile::isCompletelyCovered(const uint8_t firstFloor, const bool resetCache)
     const uint32_t idState = 1 << (firstFloor + g_gameConfig.getMapMaxZ());
     if ((m_isCompletelyCovered & idChecked) == 0) {
         m_isCompletelyCovered |= idChecked;
-        if (g_map.isCompletelyCovered(m_position, firstFloor)) {
+        bool isLoading = false;
+        if (g_map.isCompletelyCovered(m_position, isLoading, firstFloor)) {
             m_isCompletelyCovered |= idState;
             m_isCovered |= idChecked; // Set covered is Checked
             m_isCovered |= idState;
+        }
+
+        if (isLoading) {
+            m_isCompletelyCovered &= ~idState;
+            m_isCovered &= ~idChecked;
+            m_isCovered &= ~idState;
+            return false;
         }
     }
 
@@ -642,8 +650,15 @@ bool Tile::isCovered(const int8_t firstFloor)
 
     if ((m_isCovered & idChecked) == 0) {
         m_isCovered |= idChecked;
-        if (g_map.isCovered(m_position, firstFloor))
+        bool isLoading = false;
+        if (g_map.isCovered(m_position, isLoading, firstFloor))
             m_isCovered |= idState;
+
+        if (isLoading) {
+            m_isCovered &= ~idChecked;
+            m_isCovered &= ~idState;
+            return false;
+        }
     }
 
     return (m_isCovered & idState) == idState;
@@ -878,9 +893,6 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (thing->isFullGround())
         m_thingTypeFlag |= FULL_GROUND;
 
-    if (thing->isOpaque())
-        m_thingTypeFlag |= IS_OPAQUE;
-
     if (thing->hasElevation())
         ++m_elevation;
 }
@@ -1004,4 +1016,25 @@ bool Tile::canShoot(int distance)
     if (distance > 0 && std::max<int>(std::abs(m_position.x - playerPos.x), std::abs(m_position.y - playerPos.y)) > distance)
         return false;
     return g_map.isSightClear(playerPos, m_position);
+}
+
+bool Tile::isFullyOpaque() {
+    if (isFullGround())
+        return true;
+
+    for (const auto& thing : m_things) {
+        if (thing->isOpaque())
+            return true;
+    }
+
+    return false;
+}
+
+bool Tile::isLoading() const {
+    for (const auto& thing : m_things) {
+        if (thing->isLoading())
+            return true;
+    }
+
+    return false;
 }

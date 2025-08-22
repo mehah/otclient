@@ -233,8 +233,9 @@ ImagePtr SpriteAppearances::getSpriteImage(const int id, bool& isLoading)
         if (!image->hasTransparentPixel()) {
             // The image must be more than 4 pixels transparent to be considered transparent.
             uint8_t cntTrans = 0;
-            for (const uint8_t pixel : image->getPixels()) {
-                if (pixel == 0x00 && ++cntTrans > 4) {
+            const auto& buf = image->getPixels();
+            for (size_t i = 3, n = buf.size(); i < n; i += 4) {
+                if (buf[i] == 0x00 && ++cntTrans > 4) {
                     image->setTransparentPixel(true);
                     break;
                 }

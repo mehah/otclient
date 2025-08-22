@@ -660,13 +660,18 @@ bool Map::isLookPossible(const Position& pos)
     return tile && tile->isLookPossible();
 }
 
-bool Map::isCovered(const Position& pos, const uint8_t firstFloor)
+bool Map::isCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
 {
     // check for tiles on top of the postion
     Position tilePos = pos;
     while (tilePos.coveredUp() && tilePos.z >= firstFloor) {
         // the below tile is covered when the above tile has a full opaque
         if (const auto& tile = getTile(tilePos)) {
+            if (tile->isLoading()) {
+                isLoading = true;
+                return false;
+            }
+
             if (tile->isFullyOpaque())
                 return true;
         }
@@ -680,7 +685,7 @@ bool Map::isCovered(const Position& pos, const uint8_t firstFloor)
     return false;
 }
 
-bool Map::isCompletelyCovered(const Position& pos, const uint8_t firstFloor)
+bool Map::isCompletelyCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
 {
     const auto& checkTile = getTile(pos);
     Position tilePos = pos;
@@ -711,6 +716,11 @@ bool Map::isCompletelyCovered(const Position& pos, const uint8_t firstFloor)
         for (auto x = -1; ++x < 2 && !done;) {
             for (auto y = -1; ++y < 2 && !done;) {
                 const auto& tile = getTile(tilePos.translated(-x, -y));
+                if (tile && tile->isLoading()) {
+                    isLoading = true;
+                    return false;
+                }
+
                 if (!tile || !tile->isFullyOpaque()) {
                     covered = false;
                     done = true;
