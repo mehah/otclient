@@ -290,6 +290,8 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
             const uint16_t transparentPixels = readU16FromBuffer(spriteBuffer.data(), offset);
             const uint16_t coloredPixels = readU16FromBuffer(spriteBuffer.data(), offset);
 
+            transparentCount += transparentPixels;
+
             const int transparentBytes = transparentPixels * 4;
             if (writePos + transparentBytes > maxWriteSize)
                 break;
@@ -330,8 +332,10 @@ ImagePtr SpriteManager::getSpriteImage(const int id, const FileStreamPtr& file)
             }
         }
 
-        if (writePos < maxWriteSize)
+        if (writePos < maxWriteSize) {
             std::memset(pixels + writePos, 0, maxWriteSize - writePos);
+            transparentCount += maxWriteSize - writePos;
+        }
 
         if (hasAlpha || transparentCount > 4)
             image->setTransparentPixel(true);

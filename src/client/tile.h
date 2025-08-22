@@ -70,7 +70,7 @@ enum TileThingType : uint32_t
     HAS_DISPLACEMENT = 1 << 5,
     IS_NOT_PATHAB = 1 << 6,
     ELEVATION = 1 << 7,
-    IS_OPAQUE = 1 << 8,
+    // IS_OPAQUE = 1 << 8,
     HAS_LIGHT = 1 << 9,
     HAS_TALL_THINGS = 1 << 10,
     HAS_WIDE_THINGS = 1 << 11,
@@ -137,13 +137,14 @@ public:
     bool isClickable();
     bool isPathable() { return (m_thingTypeFlag & NOT_PATHABLE) == 0; }
     bool isFullGround() { return m_thingTypeFlag & FULL_GROUND; }
-    bool isFullyOpaque() { return m_thingTypeFlag & IS_OPAQUE; }
+    bool isFullyOpaque();
     bool isSingleDimension() { return (m_thingTypeFlag & NOT_SINGLE_DIMENSION) == 0 && m_walkingCreatures.empty(); }
     bool isLookPossible() { return (m_thingTypeFlag & BLOCK_PROJECTTILE) == 0; }
     bool isEmpty() { return m_things.empty(); }
     bool isDrawable() { return !isEmpty() || !m_walkingCreatures.empty() || hasEffect() || hasAttachedEffects(); }
     bool isCovered(int8_t firstFloor);
     bool isCompletelyCovered(uint8_t firstFloor, bool resetCache);
+    bool isLoading() const;
 
     bool hasBlockingCreature() const;
 

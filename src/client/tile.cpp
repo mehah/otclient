@@ -878,9 +878,6 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (thing->isFullGround())
         m_thingTypeFlag |= FULL_GROUND;
 
-    if (thing->isOpaque())
-        m_thingTypeFlag |= IS_OPAQUE;
-
     if (thing->hasElevation())
         ++m_elevation;
 }
@@ -1004,4 +1001,25 @@ bool Tile::canShoot(int distance)
     if (distance > 0 && std::max<int>(std::abs(m_position.x - playerPos.x), std::abs(m_position.y - playerPos.y)) > distance)
         return false;
     return g_map.isSightClear(playerPos, m_position);
+}
+
+bool Tile::isFullyOpaque() {
+    if (isFullGround())
+        return true;
+
+    for (const auto& thing : m_things) {
+        if (thing->isOpaque())
+            return true;
+    }
+
+    return false;
+}
+
+bool Tile::isLoading() const {
+    for (const auto& thing : m_things) {
+        if (thing->isLoading())
+            return true;
+    }
+
+    return false;
 }
