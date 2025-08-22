@@ -1016,12 +1016,19 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 
-    if (isCameraFollowing() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
-        if (m_lastMapDuration == -1)
-            m_lastMapDuration = ((g_game.mapUpdatedAt() + 9) / 10) * 10;
+    if (isCameraFollowing() && isLocalPlayer()) {
+        const auto& localPlayer = static_self_cast<LocalPlayer>();
+        if (localPlayer->isPreWalking()) {
+            if (g_game.getFeature(Otc::GameLatencyAdaptiveCamera)) {
+                if (m_lastMapDuration == -1)
+                    m_lastMapDuration = ((g_game.mapUpdatedAt() + 9) / 10) * 10;
 
-        // stabilizes camera transition with server response time to keep movement fluid.
-        duration = std::max<int>(duration, m_lastMapDuration);
+                // stabilizes camera transition with server response time to keep movement fluid.
+                duration = std::max<int>(duration, m_lastMapDuration);
+            } else {
+                duration += 5 * localPlayer->getPreWalkingSize();
+            }
+        }
     }
 
     return duration;

@@ -132,6 +132,7 @@ public:
 
     Position getPosition() override { return isPreWalking() ? m_preWalks.back() : m_position; }
     void resetPreWalk() { m_preWalks.clear(); }
+    auto getPreWalkingSize() { return m_preWalks.size(); }
 
 private:
     struct Skill
