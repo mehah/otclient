@@ -267,8 +267,18 @@ public:
     void setCentralPosition(const Position& centralPosition);
 
     bool isLookPossible(const Position& pos);
-    bool isCovered(const Position& pos, uint8_t firstFloor = 0);
-    bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0);
+    bool isCovered(const Position& pos, uint8_t firstFloor = 0) {
+        bool isLoading = false;
+        return __isCovered(pos, isLoading, firstFloor);
+    }
+
+    bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0) {
+        bool isLoading = false;
+        return __isCompletelyCovered(pos, isLoading, firstFloor);
+    }
+
+    bool __isCovered(const Position& pos, bool& isLoading, uint8_t firstFloor = 0);
+    bool __isCompletelyCovered(const Position& pos, bool& isLoading, uint8_t firstFloor = 0);
     bool isAwareOfPosition(const Position& pos) const { return isAwareOfPosition(pos, m_awareRange); }
     bool isAwareOfPosition(const Position& pos, const AwareRange& awareRange) const;
 
