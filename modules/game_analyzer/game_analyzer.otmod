@@ -1,0 +1,14 @@
+Module
+  name: game_analyzer
+  sandboxed: true
+  scripts: [ game_analyzer ]
+  reloadable: true
+  autoload: true
+  dependencies:
+    - game_interface
+  @onLoad: |
+    dofile 'game_analyzer'
+    GameAnalyzer.init()
+
+  @onUnload: |
+    GameAnalyzer.terminate()
