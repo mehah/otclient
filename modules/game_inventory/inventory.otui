@@ -127,13 +127,18 @@ PhantomMiniWindow
         image-clip: 20 20 20 20
     UICheckBox
       id: expert
-      image-source: /images/inventory/buttons_general
-      image-clip: 0 140 20 20
+      image-source: /data/images/inventory/button-expert-up
       anchors.right: standPosture.right
       anchors.top: followPosture.bottom
       phantom: false
       margin-top: 4
       size: 20 20
+
+      $checked:
+        image-source: /data/images/inventory/button-expert-down
+
+      $disabled:
+        image-source: /data/images/inventory/button-expert-disabled
 
 
     UICheckBox
@@ -539,14 +544,19 @@ PhantomMiniWindow
 
     UIWidget
       id: expert
-      image-source: /images/inventory/buttons_general
-      image-clip: 20 140 12 12
+      image-source: /data/images/inventory/button-expert-up
       anchors.left: changeSize.left
       anchors.bottom: soulAndCapacity.bottom
       phantom: false
       size: 12 12
       @onClick: |
         expertMode()
+
+      $checked:
+        image-source: /data/images/inventory/button-expert-down
+
+      $disabled:
+        image-source: /data/images/inventory/button-expert-disabled
 
     Button
       id: blessings

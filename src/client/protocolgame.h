@@ -245,6 +245,7 @@ private:
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
     void parseOpenForge(const InputMessagePtr& msg);
+    void setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const;
     void addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const;
     void parseCloseForgeWindow(const InputMessagePtr& msg);
     void parseCreatureData(const InputMessagePtr& msg);

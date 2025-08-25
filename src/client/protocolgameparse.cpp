@@ -1174,11 +1174,11 @@ void ProtocolGame::parseStoreError(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)
 {
-    const uint8_t killsDay = msg->getU8();
-    const uint8_t killsDayRemaining = msg->getU8();
-    const uint8_t killsWeek = msg->getU8();
+    const uint8_t killsDay = msg->getU8(); //dayProgress %
+    const uint8_t killsDayRemaining = msg->getU8(); 
+    const uint8_t killsWeek = msg->getU8(); //weekProgress %
     const uint8_t killsWeekRemaining = msg->getU8();
-    const uint8_t killsMonth = msg->getU8();
+    const uint8_t killsMonth = msg->getU8(); //monthProgress %
     const uint8_t killsMonthRemaining = msg->getU8();
     const uint8_t skullTime = msg->getU8();
 
@@ -2033,6 +2033,17 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
     data.dustLevel = msg->getU16();
 }
 
+void ProtocolGame::setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const
+{
+    const auto& creature = g_map.getCreatureById(creatureId);
+    if (!creature) {
+        return;
+    }
+
+    const uint8_t vocationId = msg->getU8();
+    creature->setVocation(vocationId);
+}
+
 void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const
 {
     const auto& creature = g_map.getCreatureById(creatureId);
@@ -2074,7 +2085,7 @@ void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
         case 11: // creature mana percent
         case 12: // creature show status
         case 13: // player vocation
-            msg->getU8();
+            setCreatureVocation(msg, creatureId);
             break;
         case 14: // creature icons
             addCreatureIcon(msg, creatureId);
@@ -3741,7 +3752,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                     creatureType = Proto::CreatureTypeSummonOther;
                 }
             } else if (creatureType == Proto::CreatureTypePlayer) {
-                msg->getU8(); // voc id
+                uint8_t vocationId = msg->getU8();
+                creature->setVocation(vocationId);
             }
         }
 
@@ -4319,7 +4331,9 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
         std::map<uint8_t, ImbuementSlot> slots;
 
         const uint8_t slotsCount = msg->getU8(); // total amount of imbuing slots on item
+        item.totalSlots = slotsCount; // Store the total number of slots
         if (slotsCount == 0) {
+            itemList.emplace_back(item); // Still add the item even if it has no slots for completeness
             continue;
         }
 

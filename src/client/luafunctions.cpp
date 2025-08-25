@@ -625,6 +625,9 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<Creature>("clearText", &Creature::clearText);
     g_lua.bindClassMemberFunction<Creature>("canShoot", &Creature::canShoot);
 
+    g_lua.bindClassMemberFunction<Creature>("setVocation", &Creature::setVocation);
+    g_lua.bindClassMemberFunction<Creature>("getVocation", &Creature::getVocation);
+
 #ifdef FRAMEWORK_EDITOR
     g_lua.registerClass<ItemType>();
     g_lua.bindClassMemberFunction<ItemType>("getServerId", &ItemType::getServerId);

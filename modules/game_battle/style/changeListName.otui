@@ -1,0 +1,84 @@
+MainWindow
+  id: changeListNameWindow
+  size: 359 132
+  padding: 3
+  visible: false
+  anchors.centerIn: parent
+  margin-left: 100
+  margin-top: 20
+
+  Label
+    id: headerLabel
+    !text: tr('Edit Name')
+    text-align: center
+    font: verdana-11px-antialised
+    color: #909090
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: -5
+    height: 20
+  
+  Label
+    id: descriptionText
+    !text: tr('Enter a new name for this list. Leave empty to \nreset the name:')
+    text-wrap: true
+    text-auto-resize:true
+    anchors.top: headerLabel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 10
+    margin-left: 13
+
+  TextEdit
+    id: newBattleListName
+    size: 150 16
+    anchors.top: descriptionText.bottom
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin: 7
+    margin-right: 13
+    margin-left: 13
+    text-align: left
+    text-offset: -18 0
+
+  Label
+    height: 38
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  HorizontalSeparator
+    id: separatorBox 
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: newBattleListName.bottom
+    margin-top: 13
+    margin-right: 13
+    margin-left: 13
+
+  StoreButton
+    id: closeButton
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    anchors.top: separatorBox.bottom
+    margin-right: 12
+    margin-bottom: 7
+    margin-top: 10
+    !text: tr('Cancel')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff
+
+  StoreButton
+    id: buttonOk
+    anchors.right: closeButton.left
+    anchors.bottom: parent.bottom
+    anchors.top: separatorBox.bottom
+    margin-right: 10
+    margin-bottom: 7
+    margin-top: 10
+    !text: tr('Ok')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff

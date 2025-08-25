@@ -41,20 +41,40 @@ VipGroupList < UIWidget
 
 MiniWindow
   id: vipWindow
-  !text: tr('VIP List')
-  height: 100
-  icon: /images/topbuttons/viplist
+  height: 150
   @onOpen: modules.game_viplist.onMiniWindowOpen()
   @onClose: modules.game_viplist.onMiniWindowClose()
   &save: true
 
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    image-source: /images/topbuttons/viplist
+    image-rect: 0 0 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('VIP')
+    color: #9d9d9dff
+
   MiniWindowContents
-    layout: verticalBox
     padding-left: 5
     padding-right: 5
-    padding-bottom: 1
+    layout: verticalBox
     &onMousePress: modules.game_viplist.onVipListMousePress
-
+  
   UIWidget
     id: miniborder
     anchors.bottom: parent.bottom
