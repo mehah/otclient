@@ -23,7 +23,8 @@ function init()
         onGameStart = online,
         onGameEnd = offline,
         onUnjustifiedPointsChange = onUnjustifiedPointsChange,
-        onOpenPvpSituationsChange = onOpenPvpSituationsChange
+        onOpenPvpSituationsChange = onOpenPvpSituationsChange,
+        onAttackingCreatureChange = onAttack
     })
     connect(LocalPlayer, {
         onSkullChange = onSkullChange
@@ -107,7 +108,8 @@ function terminate()
         onGameStart = online,
         onGameEnd = offline,
         onUnjustifiedPointsChange = onUnjustifiedPointsChange,
-        onOpenPvpSituationsChange = onOpenPvpSituationsChange
+        onOpenPvpSituationsChange = onOpenPvpSituationsChange,
+        onAttackingCreatureChange = onOpenPvpSituationsChange
     })
     disconnect(LocalPlayer, {
         onSkullChange = onSkullChange
@@ -193,32 +195,51 @@ function onSkullChange(localPlayer, skull)
 end
 
 function onOpenPvpSituationsChange(amount)
-    openPvpSituationsLabel:setText('Open: ' .. amount)
+    -- This shows the actual open PvP situations count
+    local validAmount = tonumber(amount) or 0
+    openPvpSituationsLabel:setText('Open: ' .. validAmount)
 end
 
-local function getImageByKills(kills)
-    if kills < 3 then
-        return '/images/ui/unjustified-points-bar-texture-green'
-    elseif kills < 5 then
-        return '/images/ui/unjustified-points-bar-texture-yellow'
+local function getImageByKills(kills, maxKills, period)
+    if period == 'day' then
+        -- Day: 1/3 or 2/6 of max = green, 2/3 or 4/6 of max = orange, 3/3 or 6/6 of max = red
+        if kills <= maxKills / 3 then
+            return '/images/ui/unjustified-points-bar-texture-green'
+        elseif kills <= maxKills * 2 / 3 then
+            return '/images/ui/unjustified-points-bar-texture-yellow'
+        else
+            return '/images/ui/unjustified-points-bar-texture-red'
+        end
+    elseif period == 'week' then
+        -- Week: up to 2/5 or 4/10 of max = green, 3/5 or 6/10 of max = orange, 4-5/5 or 8-10/10 of max = red
+        if kills <= math.floor(maxKills * 2 / 5) then
+            return '/images/ui/unjustified-points-bar-texture-green'
+        elseif kills <= math.floor(maxKills * 3 / 5) then
+            return '/images/ui/unjustified-points-bar-texture-yellow'
+        else
+            return '/images/ui/unjustified-points-bar-texture-red'
+        end
+    elseif period == 'month' then
+        -- Month: up to 4/10 or 8/20 of max = green, 5-8/10 or 10-16/20 = orange, 9-10/10 or 17-20/20 = red
+        if kills <= math.floor(maxKills * 4 / 10) then
+            return '/images/ui/unjustified-points-bar-texture-green'
+        elseif kills <= math.floor(maxKills * 8 / 10) then
+            return '/images/ui/unjustified-points-bar-texture-yellow'
+        else
+            return '/images/ui/unjustified-points-bar-texture-red'
+        end
     end
-
-    return '/images/ui/unjustified-points-bar-texture-red'
+    
+    -- Fallback to green
+    return '/images/ui/unjustified-points-bar-texture-green'
 end
 
-local function setProgressBarImage(progressBar, progressBarBackground, currentKills, maxKills, tooltip)
-    -- Set the value first (0 kills = 0% visible)
-    progressBar:setValue(currentKills, 0, maxKills)
-    progressBar:setVisible(true)
-    
+local function setProgressBarImage(progressBar, progressBarBackground, currentKills, maxKills, tooltip, period)
     -- Set tooltip on both progress bar and background so it's always visible
     progressBar:setTooltip(tooltip)
     if progressBarBackground then
         progressBarBackground:setTooltip(tooltip)
     end
-    
-    -- The background image is already set in the .otui file
-    -- We only need to control the foreground (fill) image
     
     -- If no kills, don't show any colored fill
     if currentKills == 0 then
@@ -227,8 +248,22 @@ local function setProgressBarImage(progressBar, progressBarBackground, currentKi
         return
     end
     
-    -- Get the appropriate colored image for the fill
-    local imagePath = getImageByKills(currentKills)
+    progressBar:setVisible(true)
+    
+    -- Calculate the percentage and set the progress bar width accordingly
+    local percentage = currentKills / maxKills
+    local backgroundWidth = progressBarBackground:getWidth()
+    local foregroundWidth = math.floor(backgroundWidth * percentage)
+    
+    -- Break current anchors and set fixed width
+    progressBar:breakAnchors()
+    progressBar:addAnchor(AnchorTop, progressBarBackground:getId(), AnchorTop)
+    progressBar:addAnchor(AnchorLeft, progressBarBackground:getId(), AnchorLeft)
+    progressBar:setWidth(foregroundWidth)
+    progressBar:setHeight(progressBarBackground:getHeight())
+    
+    -- Get the appropriate colored image for the fill based on period and maxKills
+    local imagePath = getImageByKills(currentKills, maxKills, period)
     
     -- Set the foreground (fill) image
     progressBar:setImageSource(imagePath)
@@ -238,6 +273,12 @@ local function setProgressBarImage(progressBar, progressBarBackground, currentKi
 end
 
 function onUnjustifiedPointsChange(unjustifiedPoints)
+    -- DEBUG: Let's see what all the unjustified points data contains
+    print("DEBUG: unjustified Points data:")
+    for key, value in pairs(unjustifiedPoints) do
+        print("  " .. key .. " = " .. tostring(value))
+    end
+    
     if unjustifiedPoints.skullTime == 0 then
         skullTimeLabel:setText('0 days')
         skullTimeLabel:setTooltip('No Skull time active')
@@ -246,21 +287,37 @@ function onUnjustifiedPointsChange(unjustifiedPoints)
         skullTimeLabel:setTooltip('Remaining skull time')
     end
 
+    -- Check if player has red skull to determine max kill thresholds
+    local localPlayer = g_game.getLocalPlayer()
+    local hasRedSkull = localPlayer and localPlayer:getSkull() == SkullRed
+    
+    -- Set base thresholds: 3 daily, 5 weekly, 10 monthly for red skull
+    -- Double these amounts (6, 10, 20) for black skull when player already has red skull
+    local maxDayKills = hasRedSkull and 6 or 3
+    local maxWeekKills = hasRedSkull and 10 or 5
+    local maxMonthKills = hasRedSkull and 20 or 10
+
+    -- Calculate actual kills based on remaining kills vs max kills
+    -- If you have 2 kills remaining out of 3 max, you have 1 kill (3-2=1)
+    local actualDayKills = math.max(0, maxDayKills - (unjustifiedPoints.killsDayRemaining or maxDayKills))
+    local actualWeekKills = math.max(0, maxWeekKills - (unjustifiedPoints.killsWeekRemaining or maxWeekKills))
+    local actualMonthKills = math.max(0, maxMonthKills - (unjustifiedPoints.killsMonthRemaining or maxMonthKills))
+
     -- Day progress bar with background image
     local dayTooltip = string.format('Unjustified points gained during the last 24 hours.\n%i kill%s left.',
                                       unjustifiedPoints.killsDayRemaining,
                                       (unjustifiedPoints.killsDayRemaining == 1 and '' or 's'))
-    setProgressBarImage(dayProgressBar, dayProgressBarBackground, unjustifiedPoints.killsDay, 10, dayTooltip)
+    setProgressBarImage(dayProgressBar, dayProgressBarBackground, actualDayKills, maxDayKills, dayTooltip, 'day')
 
     -- Week progress bar with background image
     local weekTooltip = string.format('Unjustified points gained during the last 7 days.\n%i kill%s left.',
                                        unjustifiedPoints.killsWeekRemaining,
                                        (unjustifiedPoints.killsWeekRemaining == 1 and '' or 's'))
-    setProgressBarImage(weekProgressBar, weekProgressBarBackground, unjustifiedPoints.killsWeek, 10, weekTooltip)
+    setProgressBarImage(weekProgressBar, weekProgressBarBackground, actualWeekKills, maxWeekKills, weekTooltip, 'week')
 
     -- Month progress bar with background image
     local monthTooltip = string.format('Unjustified points gained during the last 30 days.\n%i kill%s left.',
                                         unjustifiedPoints.killsMonthRemaining,
                                         (unjustifiedPoints.killsMonthRemaining == 1 and '' or 's'))
-    setProgressBarImage(monthProgressBar, monthProgressBarBackground, unjustifiedPoints.killsMonth, 10, monthTooltip)
+    setProgressBarImage(monthProgressBar, monthProgressBarBackground, actualMonthKills, maxMonthKills, monthTooltip, 'month')
 end
