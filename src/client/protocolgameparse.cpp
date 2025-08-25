@@ -1174,11 +1174,11 @@ void ProtocolGame::parseStoreError(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)
 {
-    const uint8_t killsDay = msg->getU8();
-    const uint8_t killsDayRemaining = msg->getU8();
-    const uint8_t killsWeek = msg->getU8();
+    const uint8_t killsDay = msg->getU8(); //dayProgress %
+    const uint8_t killsDayRemaining = msg->getU8(); 
+    const uint8_t killsWeek = msg->getU8(); //weekProgress %
     const uint8_t killsWeekRemaining = msg->getU8();
-    const uint8_t killsMonth = msg->getU8();
+    const uint8_t killsMonth = msg->getU8(); //monthProgress %
     const uint8_t killsMonthRemaining = msg->getU8();
     const uint8_t skullTime = msg->getU8();
 

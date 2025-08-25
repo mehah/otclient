@@ -11,7 +11,7 @@ SkullProgressBar < ProgressBar
   image-border-bottom: 1
 
 SkullProgressBarBackground < UIWidget
-  height: 5
+  height: 4
   margin: 13 23 0 10
   anchors.top: prev.bottom
   anchors.left: parent.left
@@ -22,7 +22,7 @@ SkullProgressBarBackground < UIWidget
   image-border-bottom: 1
 
 SkullProgressBarForeground < ProgressBar
-  height: 5
+  height: 4
   anchors.top: parent.top
   anchors.left: parent.left
   anchors.right: parent.right
