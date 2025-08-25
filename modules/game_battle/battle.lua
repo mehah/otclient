@@ -1878,12 +1878,22 @@ function onAttack(creature) -- Update battleButton once you're attacking a targe
     -- Update all battle list instances
     for _, instance in pairs(BattleListManager.instances) do
         if instance.window and instance.window:isVisible() then
-            local battleButton = creature and instance.battleButtons[creature:getId()] or nil
-            if battleButton then
-                battleButton.isTarget = creature and true or false
-                updateBattleButton(battleButton)
-                foundBattleButton = true
-                -- Don't break here - continue to update other instances
+            if creature then
+                -- Setting a new target
+                local battleButton = instance.battleButtons[creature:getId()]
+                if battleButton then
+                    battleButton.isTarget = true
+                    updateBattleButton(battleButton)
+                    foundBattleButton = true
+                end
+            else
+                -- No target (attack cancelled), clear all target flags
+                for _, battleButton in pairs(instance.battleButtons) do
+                    if battleButton.isTarget then
+                        battleButton.isTarget = false
+                        updateBattleButton(battleButton)
+                    end
+                end
             end
         end
     end
