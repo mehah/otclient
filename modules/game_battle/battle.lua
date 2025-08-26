@@ -32,7 +32,7 @@ end
 
 -- Default filter settings
 local BATTLE_FILTERS = {
-    ["sortAscByDisplayTime"] = false,
+    ["sortAscByDisplayTime"] = true,
     ["sortDescByDisplayTime"] = false,
     ["sortAscByDistance"] = false,
     ["sortDescByDistance"] = false,
@@ -878,7 +878,26 @@ function BattleListInstance:isHidingFilters()
 end
 
 function BattleListInstance:onOpen()
-    -- Instance-specific connection logic if needed
+    -- Ensure default filters are applied for new instances
+    local filters = self:loadFilters()
+    local hasAnySortFilter = false
+    
+    -- Check if any sort filter is already active
+    for filterName, isActive in pairs(filters) do
+        if isActive and (filterName:find("sortAscBy") or filterName:find("sortDescBy")) then
+            hasAnySortFilter = true
+            break
+        end
+    end
+    
+    -- If no sort filter is active, apply the default
+    if not hasAnySortFilter then
+        filters["sortAscByDisplayTime"] = true
+        g_settings.mergeNode(self:getSettingsKey(), { ['filters'] = filters })
+        scheduleEvent(function()
+            self:checkCreatures()
+        end, 100)
+    end
 end
 
 function BattleListInstance:onClose()
@@ -1298,18 +1317,16 @@ function init()
                 return widget
             end,
             function(obj)
-                if obj.creature then obj.creature = nil end
                 if obj.data then obj.data = nil end
-                obj.isTarget = false
-                obj.isFollowed = false
-                obj.isHovered = false
-                
+            
                 if lastBattleButtonSwitched == obj then
                     lastBattleButtonSwitched = nil
                 end
                 if lastCreatureSelected and obj.creature == lastCreatureSelected then
                     lastCreatureSelected = nil
                 end
+
+                obj:resetState()
                 
                 local parent = obj:getParent()
                 if parent then
@@ -2265,6 +2282,30 @@ end
 function onOpen()
     battleButton:setOn(true)
     connecting()
+    
+    -- Ensure default filters are applied for the main battle list
+    local mainInstance = BattleListManager.instances[0]
+    if mainInstance then
+        local filters = mainInstance:loadFilters()
+        local hasAnySortFilter = false
+        
+        -- Check if any sort filter is already active
+        for filterName, isActive in pairs(filters) do
+            if isActive and (filterName:find("sortAscBy") or filterName:find("sortDescBy")) then
+                hasAnySortFilter = true
+                break
+            end
+        end
+        
+        -- If no sort filter is active, apply the default
+        if not hasAnySortFilter then
+            filters["sortAscByDisplayTime"] = true
+            g_settings.mergeNode(mainInstance:getSettingsKey(), { ['filters'] = filters })
+            scheduleEvent(function()
+                mainInstance:checkCreatures()
+            end, 100)
+        end
+    end
 end
 
 function onClose()

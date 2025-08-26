@@ -94,9 +94,9 @@ function init()
         lockButton:setMarginTop(0)
     end
 
-    unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
-        tr('Unjustified Points'), '/images/options/button_frags', toggle)
-    unjustifiedPointsButton:setOn(true)
+    if unjustifiedPointsButton then
+        unjustifiedPointsButton:setOn(true)
+    end
 
     if g_game.isOnline() then
         online()
@@ -153,8 +153,11 @@ function toggle()
 end
 
 function online()
-    if g_game.getFeature(GameUnjustifiedPoints) then
+    if g_game.getFeature(GameUnjustifiedPoints) and not unjustifiedPointsButton then
         unjustifiedPointsWindow:setupOnStart() -- load character window configuration
+        unjustifiedPointsButton = modules.game_mainpanel.addToggleButton('unjustifiedPointsButton',
+        tr('Unjustified Points'), '/images/options/button_frags', toggle)
+        unjustifiedPointsButton:setOn(false)
     end
 
     refresh()

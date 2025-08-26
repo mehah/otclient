@@ -288,6 +288,7 @@ MiniWindow
       SkillPercentPanel
         
     HorizontalSeparator
+      id: separadorOnOffenceInfoChange
       margin-top: 5
       margin-bottom: 5
 
@@ -419,6 +420,7 @@ MiniWindow
       SkillNameLabel
         !text: tr('Onslaught')
       SkillValueLabel
+      
     HorizontalSeparator
       id: separadorOnDefenseInfoChange
       margin-top: 5      
@@ -499,7 +501,6 @@ MiniWindow
         margin-right: 12
       ImageAbsorb
         image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-healing-resist
-    
     SmallSkillButton
       id: drowResist
       visible: false
@@ -527,11 +528,6 @@ MiniWindow
         margin-right: 12
       ImageAbsorb
         image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-manadrain-resist
-
-
-
-
-
     SmallSkillButton
       id: defenceValue
       visible: false
@@ -591,6 +587,7 @@ MiniWindow
       SkillValueLabel  
   
     HorizontalSeparator
+      id: HorizontalSeparator
       margin-top: 5
       margin-bottom: 15
 
@@ -652,7 +649,7 @@ SkillsListSubMenu < PopupMenu
     !text: tr('Stamina')
 
   SkillsSubMenuOption
-    id: showOffilineTraining
+    id: showOfflineTraining
     !text: tr('Offline Training')
 
   SkillsSubMenuOption
@@ -688,6 +685,7 @@ SkillsListSubMenu < PopupMenu
     !text: tr('Fishing')
 
   HorizontalSeparator
+    id: HorizontalSeparator
     margin-top: 2
     margin-bottom: 3
 
@@ -704,6 +702,7 @@ SkillsListSubMenu < PopupMenu
     !text: tr('Misc. Stats')
   
   HorizontalSeparator
+    id: HorizontalSeparator
     margin-top: 2
     margin-bottom: 3
   

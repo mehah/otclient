@@ -981,7 +981,6 @@ end
 
 function destroyAddGroupWindow()
     if addGroupWindow then
-        addGroupWindow:setVisible(false)
         addGroupWindow:destroy()
         addGroupWindow = nil
     end
