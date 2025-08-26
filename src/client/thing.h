@@ -145,6 +145,7 @@ public:
     bool isTopEffect() { return getThingType()->isTopEffect(); }
     bool isPodium() const { return getThingType()->isPodium(); }
     bool isOpaque() const { return getThingType()->isOpaque(); }
+    bool isLoading() const { return getThingType()->isLoading(); }
     bool isSingleDimension() const { return getThingType()->isSingleDimension(); }
     bool isTall(const bool useRealSize = false) const { return getThingType()->isTall(useRealSize); }
 

@@ -687,9 +687,7 @@ void Creature::nextWalkUpdate()
 
 void Creature::updateWalk()
 {
-    const int stepDuration = getStepDuration(true);
-    const float stabilizeCam = isCameraFollowing() && g_window.vsyncEnabled() ? 10.f - (fmod(stepDuration, 100.f) / 10.f) : 0.f;
-    const float walkTicksPerPixel = (stepDuration + stabilizeCam) / static_cast<float>(g_gameConfig.getSpriteSize());
+    const float walkTicksPerPixel = getStepDuration(true) / static_cast<float>(g_gameConfig.getSpriteSize());
 
     const int totalPixelsWalked = std::min<int>(m_walkTimer.ticksElapsed() / walkTicksPerPixel, g_gameConfig.getSpriteSize());
 
@@ -1016,12 +1014,9 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
 
-    if (isCameraFollowing() && g_game.getFeature(Otc::GameLatencyAdaptiveCamera) && static_self_cast<LocalPlayer>()->isPreWalking()) {
-        if (m_lastMapDuration == -1)
-            m_lastMapDuration = ((g_game.mapUpdatedAt() + 9) / 10) * 10;
-
-        // stabilizes camera transition with server response time to keep movement fluid.
-        duration = std::max<int>(duration, m_lastMapDuration);
+    if (isCameraFollowing() && isLocalPlayer()) {
+        const auto& localPlayer = static_self_cast<LocalPlayer>();
+        duration += 10 * std::max<int>(1, localPlayer->getPreWalkingSize());
     }
 
     return duration;

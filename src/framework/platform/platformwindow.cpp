@@ -191,10 +191,12 @@ void PlatformWindow::releaseAllKeys()
 void PlatformWindow::fireKeysPress()
 {
     // avoid massive checks
-    if (m_keyPressTimer.ticksElapsed() < 10)
+    if (m_keyPressTimer.ticksElapsed() < 2)
         return;
+
     m_keyPressTimer.restart();
 
+    const auto now = g_clock.millis();
     for (size_t keyCode = 0; keyCode < Fw::KeyLast; ++keyCode) {
         auto& keyInfo = m_keyInfo[keyCode];
 
@@ -205,14 +207,14 @@ void PlatformWindow::fireKeysPress()
 
         const ticks_t lastPressTicks = keyInfo.lastTicks;
         const ticks_t firstKeyPress = keyInfo.firstTicks;
-        if (g_clock.millis() - lastPressTicks >= keyInfo.delay) {
+        if (now - lastPressTicks >= keyInfo.delay) {
             if (m_onInputEvent) {
                 m_inputEvent.reset(Fw::KeyPressInputEvent);
                 m_inputEvent.keyCode = static_cast<Fw::Key>(keyCode);
-                m_inputEvent.autoRepeatTicks = g_clock.millis() - firstKeyPress;
+                m_inputEvent.autoRepeatTicks = now - firstKeyPress;
                 m_onInputEvent(m_inputEvent);
             }
-            keyInfo.lastTicks = g_clock.millis();
+            keyInfo.lastTicks = now;
         }
     }
 }
