@@ -268,6 +268,15 @@ function BattleListManager:createWindowForInstance(instance)
     if instance.toggleFilterButton then
         instance.toggleFilterButton.onClick = function()
             instance:toggleFilterPanel()
+            restrictResize()
+            
+            local minHeight = 80
+            if not instance:isHidingFilters() then
+                minHeight = minHeight + 60
+            end
+            if newWindow:getHeight() < minHeight then
+                newWindow:setHeight(minHeight)
+            end
         end
     end
     
@@ -322,6 +331,39 @@ function BattleListManager:createWindowForInstance(instance)
     end
     
     newWindow:setContentMinimumHeight(80)
+    
+    -- Define resize restriction function
+    local function restrictResize()
+        local originalOnResize = newWindow.onResize
+        newWindow.onResize = function(...)
+            if originalOnResize then
+                originalOnResize(...)
+            end
+            
+            local minHeight = 80
+            if not instance:isHidingFilters() then
+                minHeight = minHeight + 60
+            end
+            if newWindow:getHeight() < minHeight then
+                newWindow:setHeight(minHeight)
+            end
+        end
+    end
+    restrictResize()
+    
+    local originalOnMinimize = newWindow.onMinimize
+    local originalOnMaximize = newWindow.onMaximize
+    
+    newWindow.onMinimize = function(...)
+        if originalOnMinimize then originalOnMinimize(...) end
+        newWindow.onResize = nil
+    end
+    
+    newWindow.onMaximize = function(...)
+        if originalOnMaximize then originalOnMaximize(...) end
+        restrictResize()
+    end
+    
     newWindow:setup()
     
     local panel = modules.game_interface.findContentPanelAvailable(newWindow, newWindow:getMinimumHeight())
@@ -835,6 +877,22 @@ function BattleListInstance:hideFilterPanel()
     if scrollbar then
         scrollbar:setMarginTop(16) -- Default header height
     end
+    
+    -- Update resize restrictions
+    if self.window.onResize then
+        local function restrictResize()
+            self.window.onResize = function()
+                local minHeight = 80 -- Base minimum height
+                if not self:isHidingFilters() then
+                    minHeight = minHeight + 60 -- Add extra height for visible filters
+                end
+                if self.window:getHeight() < minHeight then
+                    self.window:setHeight(minHeight)
+                end
+            end
+        end
+        restrictResize()
+    end
 end
 
 function BattleListInstance:showFilterPanel()
@@ -860,6 +918,22 @@ function BattleListInstance:showFilterPanel()
         -- Header (16px) + filterPanel height + spacing panel (18px) + separator (2px)
         local totalMargin = 16 + self.filterPanel.originalHeight + 18 + 2
         scrollbar:setMarginTop(totalMargin)
+    end
+    
+    -- Update resize restrictions
+    if self.window.onResize then
+        local function restrictResize()
+            self.window.onResize = function()
+                local minHeight = 80 -- Base minimum height
+                if not self:isHidingFilters() then
+                    minHeight = minHeight + 60 -- Add extra height for visible filters
+                end
+                if self.window:getHeight() < minHeight then
+                    self.window:setHeight(minHeight)
+                end
+            end
+        end
+        restrictResize()
     end
 end
 
@@ -1435,14 +1509,56 @@ function init()
         end
     end
     
+    battleWindow:setContentMinimumHeight(80)
+    
+    -- Define resize restriction function
+    local function restrictResize()
+        local originalOnResize = battleWindow.onResize
+        battleWindow.onResize = function(...)
+            if originalOnResize then
+                originalOnResize(...)
+            end
+            
+            local minHeight = 80
+            if not mainInstance:isHidingFilters() then
+                minHeight = minHeight + 60
+            end
+            if battleWindow:getHeight() < minHeight then
+                battleWindow:setHeight(minHeight)
+            end
+        end
+    end
+    
     -- Setup toggleFilterButton onClick handler for main instance
     if mainInstance.toggleFilterButton then
         mainInstance.toggleFilterButton.onClick = function()
             mainInstance:toggleFilterPanel()
+            restrictResize()
+            
+            local minHeight = 80
+            if not mainInstance:isHidingFilters() then
+                minHeight = minHeight + 60
+            end
+            if battleWindow:getHeight() < minHeight then
+                battleWindow:setHeight(minHeight)
+            end
         end
     end
-
-    battleWindow:setContentMinimumHeight(80)
+    restrictResize()
+    
+    local originalOnMinimize = battleWindow.onMinimize
+    local originalOnMaximize = battleWindow.onMaximize
+    
+    battleWindow.onMinimize = function(...)
+        if originalOnMinimize then originalOnMinimize(...) end
+        battleWindow.onResize = nil
+    end
+    
+    battleWindow.onMaximize = function(...)
+        if originalOnMaximize then originalOnMaximize(...) end
+        restrictResize()
+    end
+    
     battleWindow:setup()
     updateBattleListTitle()
     
