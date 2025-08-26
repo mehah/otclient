@@ -289,13 +289,13 @@ function onUnjustifiedPointsChange(unjustifiedPoints)
 
     -- Check if player has red skull to determine max kill thresholds
     local localPlayer = g_game.getLocalPlayer()
-    local hasRedSkull = localPlayer and localPlayer:getSkull() == SkullRed
-    
+    local hasRedBlackSkull = localPlayer and localPlayer:getSkull() == SkullRed or localPlayer:getSkull() == SkullBlack
+
     -- Set base thresholds: 3 daily, 5 weekly, 10 monthly for red skull
     -- Double these amounts (6, 10, 20) for black skull when player already has red skull
-    local maxDayKills = hasRedSkull and 6 or 3
-    local maxWeekKills = hasRedSkull and 10 or 5
-    local maxMonthKills = hasRedSkull and 20 or 10
+    local maxDayKills = hasRedBlackSkull and 6 or 3
+    local maxWeekKills = hasRedBlackSkull and 10 or 5
+    local maxMonthKills = hasRedBlackSkull and 20 or 10
 
     -- Calculate actual kills based on remaining kills vs max kills
     -- If you have 2 kills remaining out of 3 max, you have 1 kill (3-2=1)
