@@ -272,13 +272,7 @@ local function setProgressBarImage(progressBar, progressBarBackground, currentKi
     progressBar:setImageBorderBottom(1)
 end
 
-function onUnjustifiedPointsChange(unjustifiedPoints)
-    -- DEBUG: Let's see what all the unjustified points data contains
-    print("DEBUG: unjustified Points data:")
-    for key, value in pairs(unjustifiedPoints) do
-        print("  " .. key .. " = " .. tostring(value))
-    end
-    
+function onUnjustifiedPointsChange(unjustifiedPoints)    
     if unjustifiedPoints.skullTime == 0 then
         skullTimeLabel:setText('0 days')
         skullTimeLabel:setTooltip('No Skull time active')
