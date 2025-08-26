@@ -1079,16 +1079,51 @@ function onContainerOpen(container, previousContainer)
     local maxHeightOffset = container:hasPages() and 65 or 30
     containerWindow:setContentMaximumHeight(cellSize.height * layout:getNumLines() + maxHeightOffset)
 
+    -- Define resize restriction function
+    local function restrictResize()
+        containerWindow.onResize = function()
+            local minHeight = cellSize.height + 30
+            if container:hasPages() then
+                minHeight = minHeight + 35
+            end
+            if containerWindow:getHeight() < minHeight then
+                containerWindow:setHeight(minHeight)
+            end
+        end
+    end
+    restrictResize()
+
+    -- Remove resize restriction on minimize, restore on maximize
+    containerWindow.onMinimize = function()
+        local pagePanel = containerWindow:getChildById('pagePanel')
+        if pagePanel and pagePanel:isVisible() then
+            pagePanel.wasVisibleBeforeMinimize = true
+            pagePanel:setVisible(false)
+        end
+        containerWindow.onResize = nil
+    end
+
+    containerWindow.onMaximize = function()
+        local pagePanel = containerWindow:getChildById('pagePanel')
+        if pagePanel and pagePanel.wasVisibleBeforeMinimize then
+            pagePanel:setVisible(true)
+            pagePanel.wasVisibleBeforeMinimize = nil
+        end
+        restrictResize()
+    end
+
     if not previousContainer then
         local panel = modules.game_interface.findContentPanelAvailable(containerWindow, cellSize.height)
         panel:addChild(containerWindow)
     end
 
-    -- Always set the content height based on the current container's content
+    -- Always set the content height based on the current container's content, with a minimum of one row
+    local minRows = 1
     if modules.client_options.getOption('openMaximized') then
-        containerWindow:setContentHeight(cellSize.height * layout:getNumLines())
+        local numLines = math.max(layout:getNumLines(), minRows)
+        containerWindow:setContentHeight(cellSize.height * numLines)
     else
-        local filledLines = math.max(math.ceil(container:getItemsCount() / layout:getNumColumns()), 1)
+        local filledLines = math.max(math.ceil(container:getItemsCount() / layout:getNumColumns()), minRows)
         containerWindow:setContentHeight(filledLines * cellSize.height)
     end
 

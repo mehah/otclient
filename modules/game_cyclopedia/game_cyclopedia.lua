@@ -346,47 +346,46 @@ function controllerCyclopedia:onGameStart()
             type = KEY_DOWN,
             callback = Cyclopedia.toggleBestiaryTracker
         }})
-
+        
+        -- Initialize cached tracker data for immediate loading with delay to ensure character name is available
+        scheduleEvent(function()
+            local char = g_game.getCharacterName()
+            if char and #char > 0 then
+                -- Only clear data if character has changed
+                if currentCharacter and currentCharacter ~= char then
+                    if Cyclopedia.clearTrackerDataForCharacterChange then
+                        Cyclopedia.clearTrackerDataForCharacterChange()
+                    end
+                end
+                
+                -- Update current character
+                currentCharacter = char
+                
+                -- Initialize tracker data for current character
+                Cyclopedia.initializeTrackerData()
+                
+                -- Populate any visible trackers with cached data
+                Cyclopedia.populateVisibleTrackersWithCachedData()
+                
+                -- Request fresh bestiary data from server
+                g_game.requestBestiary()
+                
+                -- Additional refresh after delays to ensure everything is loaded
+                scheduleEvent(function()
+                    Cyclopedia.populateVisibleTrackersWithCachedData()
+                    Cyclopedia.refreshAllVisibleTrackers()
+                end, 500)
+                
+                -- Final fallback check
+                scheduleEvent(function()
+                    Cyclopedia.refreshAllVisibleTrackers()
+                end, 2000)
+            end
+        end, 500)
     end
     if g_game.getClientVersion() >= 1410 then
         controllerCyclopedia.ui.CharmsBase.Icon:setImageSource("/game_cyclopedia/images/monster-icon-bonuspoints")
     end
-    
-    -- Initialize cached tracker data for immediate loading with delay to ensure character name is available
-    scheduleEvent(function()
-        local char = g_game.getCharacterName()
-        if char and #char > 0 then
-            -- Only clear data if character has changed
-            if currentCharacter and currentCharacter ~= char then
-                if Cyclopedia.clearTrackerDataForCharacterChange then
-                    Cyclopedia.clearTrackerDataForCharacterChange()
-                end
-            end
-            
-            -- Update current character
-            currentCharacter = char
-            
-            -- Initialize tracker data for current character
-            Cyclopedia.initializeTrackerData()
-            
-            -- Populate any visible trackers with cached data
-            Cyclopedia.populateVisibleTrackersWithCachedData()
-            
-            -- Request fresh bestiary data from server
-            g_game.requestBestiary()
-            
-            -- Additional refresh after delays to ensure everything is loaded
-            scheduleEvent(function()
-                Cyclopedia.populateVisibleTrackersWithCachedData()
-                Cyclopedia.refreshAllVisibleTrackers()
-            end, 500)
-            
-            -- Final fallback check
-            scheduleEvent(function()
-                Cyclopedia.refreshAllVisibleTrackers()
-            end, 2000)
-        end
-    end, 500)
 end
 
 
