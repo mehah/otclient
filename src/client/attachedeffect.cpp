@@ -118,7 +118,8 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
             lightView->addLightSource(dest, m_light);
 
         auto lastDrawOrder = g_drawPool.getDrawOrder();
-        g_drawPool.setDrawOrder(getDrawOrder());
+        if (g_drawPool.getCurrentType() == DrawPoolType::MAP)
+            g_drawPool.setDrawOrder(getDrawOrder());
 
         if (m_texture) {
             if (drawThing) {
