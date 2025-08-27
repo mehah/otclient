@@ -39,6 +39,9 @@ function init()
                                                                    '/images/options/button_skills', toggle, false, 1)
     skillsButton:setOn(true)
     skillsWindow = g_ui.loadUI('skills')
+    
+    -- Set minimum height for skills window
+    skillsWindow:setContentMinimumHeight(80)
 
     Keybind.new("Windows", "Show/hide skills windows", "Alt+S", "")
     Keybind.bind("Windows", "Show/hide skills windows", {
@@ -956,6 +959,7 @@ end
 
 function updateHeight()
     local maximumHeight = 8 -- margin top and bottom
+    local minimumHeight = 80 -- ensure minimum height is maintained
 
     if g_game.isOnline() then
         local char = g_game.getCharacterName()
@@ -981,7 +985,7 @@ function updateHeight()
     end
 
     local contentsPanel = skillsWindow:getChildById('contentsPanel')
-    skillsWindow:setContentMinimumHeight(44)
+    skillsWindow:setContentMinimumHeight(math.max(minimumHeight, 44))
     skillsWindow:setContentMaximumHeight(maximumHeight)
 end
 

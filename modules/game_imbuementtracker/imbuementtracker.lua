@@ -54,6 +54,9 @@ function initialize()
     })
     
     imbuementTracker = g_ui.createWidget('ImbuementTracker', modules.game_interface.getRightPanel())
+    
+    -- Set minimum height for imbuement tracker window
+    imbuementTracker:setContentMinimumHeight(80)
 
     -- Hide toggleFilterButton and adjust button positioning
     local toggleFilterButton = imbuementTracker:recursiveGetChildById('toggleFilterButton')
