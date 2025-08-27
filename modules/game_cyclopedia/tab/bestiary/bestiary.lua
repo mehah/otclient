@@ -955,17 +955,17 @@ function Cyclopedia.onParseCyclopediaTracker(trackerType, data)
 end
 
 local BESTIATYTRACKER_FILTERS = {
-    ["sortByName"] = true,
+    ["sortByName"] = false,
     ["ShortByPercentage"] = false,
-    ["sortByKills"] = false,
+    ["sortByKills"] = true,
     ["sortByAscending"] = true,
     ["sortByDescending"] = false
 }
 
 local BOSSTIARYTRACKER_FILTERS = {
-    ["sortByName"] = true,
+    ["sortByName"] = false,
     ["ShortByPercentage"] = false,
-    ["sortByKills"] = false,
+    ["sortByKills"] = true,
     ["sortByAscending"] = true,
     ["sortByDescending"] = false
 }
@@ -983,6 +983,11 @@ function Cyclopedia.loadTrackerFilters(trackerType)
     
     local settings = g_settings.getNode(charFilterKey)
     if not settings or not settings['filters'] then
+        -- Save default filters for first time use
+        g_settings.mergeNode(charFilterKey, {
+            ['filters'] = defaultFilters,
+            ['character'] = char
+        })
         return defaultFilters
     end
     return settings['filters']
@@ -1296,7 +1301,7 @@ function Cyclopedia.createTrackerContextMenu(trackerType, mousePos)
     -- Set default selections
     local filters = Cyclopedia.loadTrackerFilters(trackerType)
     
-    -- Set sorting method (default: sortByName)
+    -- Set sorting method (default: sortByKills)
     if filters.sortByName then
         menu:getChildById('sortByName'):setChecked(true)
     elseif filters.ShortByPercentage then
@@ -1304,7 +1309,7 @@ function Cyclopedia.createTrackerContextMenu(trackerType, mousePos)
     elseif filters.sortByKills then
         menu:getChildById('sortByKills'):setChecked(true)
     else
-        menu:getChildById('sortByName'):setChecked(true)
+        menu:getChildById('sortByKills'):setChecked(true)
     end
     
     -- Set sorting direction (default: ascending)
@@ -1315,11 +1320,11 @@ function Cyclopedia.createTrackerContextMenu(trackerType, mousePos)
     end
 
     -- Add click handlers for menu options
-    menu:getChildById('sortByName').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByName', true) end
-    menu:getChildById('ShortByPercentage').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'ShortByPercentage', true) end
-    menu:getChildById('sortByKills').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByKills', true) end
-    menu:getChildById('sortByAscending').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByAscending', true) end
-    menu:getChildById('sortByDescending').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByDescending', true) end
+    menu:getChildById('sortByName').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByName', true); menu:destroy() end
+    menu:getChildById('ShortByPercentage').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'ShortByPercentage', true); menu:destroy() end
+    menu:getChildById('sortByKills').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByKills', true); menu:destroy() end
+    menu:getChildById('sortByAscending').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByAscending', true); menu:destroy() end
+    menu:getChildById('sortByDescending').onClick = function() Cyclopedia.setTrackerFilter(trackerType, 'sortByDescending', true); menu:destroy() end
 
     menu:display(mousePos)
     return true

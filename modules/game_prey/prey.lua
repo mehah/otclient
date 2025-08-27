@@ -73,8 +73,8 @@ function init()
     preyWindow:hide()
     preyTracker = g_ui.createWidget('PreyTracker', modules.game_interface.getRightPanel())
     preyTracker:setup()
-    preyTracker:setContentMaximumHeight(100)
-    preyTracker:setContentMinimumHeight(47)
+    preyTracker:setContentMaximumHeight(110)
+    preyTracker:setContentMinimumHeight(70)
     preyTracker:hide()
     
     -- Hide buttons similar to unjustifiedpoints implementation
@@ -360,7 +360,7 @@ function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
     local tracker = preyTracker.contentsPanel[slot]
     if tracker then
         tracker:hide()
-        preyTracker:setContentMaximumHeight(preyTracker:getHeight() - 20)
+        preyTracker:setContentMaximumHeight(preyTracker:getHeight())
     end
     -- main window
     local prey = preyWindow[slot]
