@@ -5,6 +5,7 @@ local battleWindow, battleButton, battlePanel, mouseWidget, filterPanel, toggleF
 local lastBattleButtonSwitched, lastCreatureSelected
 local hideButtons = {}
 local eventOnCheckCreature = nil
+local eventsConnected = false
 
 -- Forward declarations
 local onBattleButtonHoverChange, onBattleButtonMouseRelease
@@ -952,6 +953,11 @@ function BattleListInstance:isHidingFilters()
 end
 
 function BattleListInstance:onOpen()
+    -- Ensure events are connected when opening any battle list instance
+    if g_game.isOnline() then
+        connecting()
+    end
+    
     -- Ensure default filters are applied for new instances
     local filters = self:loadFilters()
     local hasAnySortFilter = false
@@ -978,7 +984,26 @@ function BattleListInstance:onClose()
     -- Don't clear instance configurations when window is closed during normal operation
     -- Only clear when explicitly requested through clearAllConfigurations()
     
-    -- Instance-specific disconnection logic if needed
+    -- Check if we need to disconnect global events when this instance closes
+    scheduleEvent(function()
+        -- Check if main battle list is closed and no other instances are open
+        local mainInstance = BattleListManager.instances[0]
+        local isMainClosed = not mainInstance or not mainInstance.window or not mainInstance.window:isVisible()
+        
+        if isMainClosed then
+            local hasOpenInstances = false
+            for id, instance in pairs(BattleListManager.instances) do
+                if id ~= 0 and instance.window and instance.window:isVisible() then
+                    hasOpenInstances = true
+                    break
+                end
+            end
+            
+            if not hasOpenInstances then
+                disconnecting()
+            end
+        end
+    end, 10) -- Small delay to ensure window state is updated
 end
 
 function BattleListInstance:checkCreatures()
@@ -1330,7 +1355,11 @@ function setFilter(filter)
 end
 
 -- Game event handlers
-local function connecting()
+function connecting()
+    if eventsConnected then
+        return true
+    end
+    
     connect(LocalPlayer, { onPositionChange = onCreaturePositionChange })
     connect(Creature, {
         onSkullChange = updateCreatureSkull,
@@ -1343,13 +1372,19 @@ local function connecting()
     })
     connect(UIMap, { onZoomChange = onZoomChange })
     
+    eventsConnected = true
+    
     for _, instance in pairs(BattleListManager.instances) do
         instance:checkCreatures()
     end
     return true
 end
 
-local function disconnecting(gameEvent)
+function disconnecting(gameEvent)
+    if not eventsConnected then
+        return true
+    end
+    
     disconnect(LocalPlayer, { onPositionChange = onCreaturePositionChange })
     disconnect(Creature, {
         onSkullChange = updateCreatureSkull,
@@ -1361,6 +1396,8 @@ local function disconnecting(gameEvent)
         onDisappear = onCreatureDisappear
     })
     disconnect(UIMap, { onZoomChange = onZoomChange })
+    
+    eventsConnected = false
     return true
 end
 
@@ -2426,7 +2463,19 @@ end
 
 function onClose()
     battleButton:setOn(false)
-    disconnecting()
+    
+    -- Only disconnect global events if there are no other battle list instances open
+    local hasOpenInstances = false
+    for id, instance in pairs(BattleListManager.instances) do
+        if id ~= 0 and instance.window and instance.window:isVisible() then
+            hasOpenInstances = true
+            break
+        end
+    end
+    
+    if not hasOpenInstances then
+        disconnecting()
+    end
 end
 
 
@@ -2434,6 +2483,11 @@ function toggle() -- Close/Open the battle window or Pressing Ctrl + B
     if battleButton:isOn() then
         battleWindow:close()
     else
+        -- Ensure events are connected when opening the main battle window
+        if g_game.isOnline() then
+            connecting()
+        end
+        
         if not battleWindow:getParent() then
             local panel = modules.game_interface
                 .findContentPanelAvailable(battleWindow, battleWindow:getMinimumHeight())
@@ -2502,4 +2556,7 @@ function terminate() -- Terminating the Module (unload)
         onGameStart = onGameStart
     })
     disconnecting()
+    
+    -- Reset connection state
+    eventsConnected = false
 end
