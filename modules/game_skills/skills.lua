@@ -292,6 +292,7 @@ function refresh()
     local hasAdditionalSkills = g_game.getFeature(GameAdditionalSkills)
     for i = Skill.Fist, Skill.Transcendence do
         onSkillChange(player, i, player:getSkillLevel(i), player:getSkillLevelPercent(i))
+
         if i > Skill.Fishing then
             local ativedAdditionalSkills = hasAdditionalSkills
             if ativedAdditionalSkills then

@@ -59,6 +59,7 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
     } else if (g_game.getFeature(Otc::GameContentRevision)) {
         msg->addU16(g_things.getContentRevision());
     }
+
     if (g_game.getFeature(Otc::GamePreviewState))
         msg->addU8(0);
 
@@ -97,7 +98,6 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
         msg->addU32(challengeTimestamp);
         msg->addU8(challengeRandom);
     }
-
 
     const auto& extended = callLuaField<std::string>("getLoginExtendedData");
     if (!extended.empty())

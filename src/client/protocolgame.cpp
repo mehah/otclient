@@ -51,6 +51,7 @@ void ProtocolGame::onConnect()
     Protocol::onConnect();
 
     m_localPlayer = g_game.getLocalPlayer();
+
     if (g_game.getFeature(Otc::GameProtocolChecksum))
         enableChecksum();
 

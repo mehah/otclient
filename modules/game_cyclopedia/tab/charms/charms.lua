@@ -351,8 +351,6 @@ function Cyclopedia.CreateCharmItem(data)
     if isModernUI and data.tier > 0 then
         widget.charmBase.border:setImageSource("/game_cyclopedia/images/charms/border/backdrop_charmgrade" .. data.tier)
     end
-    
-    widget.category = charms[data.id].category
 end
 
 function Cyclopedia.loadCharms(charmsData)
@@ -375,23 +373,6 @@ function Cyclopedia.loadCharms(charmsData)
             ResourceTypes.MAX_CHARM))
         controllerCyclopedia.ui.CharmsBase1410.Value:setText(
             formatResourceBalance(ResourceTypes.MINOR_CHARM, ResourceTypes.MAX_MINOR_CHARM))
-    else
-        controllerCyclopedia.ui.CharmsBase.Value:setText(Cyclopedia.formatGold(charmsData.points))
-    end
-
-    local CharmList = g_game.getClientVersion() >= 1410 and UI.mainPanelCharmsType.panelCharmList.CharmList or UI.CharmList
-    local player = g_game.getLocalPlayer()
-    
-    if g_game.getClientVersion() >= 1410 then
-        local mainCharmValue = string.format("%d/%d", 
-            player:getResourceBalance(ResourceTypes.CHARM),
-            player:getResourceBalance(ResourceTypes.MAX_CHARM))
-        controllerCyclopedia.ui.CharmsBase.Value:setText(mainCharmValue)
-        
-        local minorCharmValue = string.format("%d/%d", 
-            player:getResourceBalance(ResourceTypes.MINOR_CHARM),
-            player:getResourceBalance(ResourceTypes.MAX_MINOR_CHARM))
-        controllerCyclopedia.ui.CharmsBase1410.Value:setText(minorCharmValue)
     else
         controllerCyclopedia.ui.CharmsBase.Value:setText(Cyclopedia.formatGold(charmsData.points))
     end
@@ -999,19 +980,4 @@ function Cyclopedia.actionSelectCharmButton(widget)
                 }, yesCallback, noCallback)
         end
     end
-end
-
-function onTypeCharmRadioGroup(radioGroup, selectedWidget)
-    local charmCategory = selectedWidget:getId() == "MajorCharms" and charmCategory_t.CHARM_MAJOR or charmCategory_t.CHARM_MINOR
-    local CharmList = UI.mainPanelCharmsType.panelCharmList.CharmList
-    
-    for _, widget in ipairs(CharmList:getChildren()) do
-        if widget.category == charmCategory then
-            widget:setVisible(true)
-        else
-            widget:setVisible(false)
-        end
-    end
-    
-    CharmList:getLayout():update()
 end
