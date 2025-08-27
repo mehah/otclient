@@ -226,5 +226,6 @@ private:
     double m_momentum{ 0 };
     double m_transcendence{ 0 };
     double m_amplification{ 0 };
+
     friend class Game;
 };

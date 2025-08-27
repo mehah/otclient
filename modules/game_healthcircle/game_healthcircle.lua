@@ -69,6 +69,7 @@ function init()
     manaCircleFront = g_ui.createWidget('ManaCircleFront', mapPanel)
     expCircleFront = g_ui.createWidget('ExpCircleFront', mapPanel)
     skillCircleFront = g_ui.createWidget('SkillCircleFront', mapPanel)
+
     imageSizeBroad = healthCircle:getHeight()
     imageSizeThin = healthCircle:getWidth()
     extraImageSizeBroad = healthCircleExtra:getHeight()
@@ -104,7 +105,6 @@ function init()
         skillCircleFront:setVisible(false)
     end
 
-
     -- Add option window in options module
     addToOptionsModule()
 
@@ -136,9 +136,7 @@ function terminate()
     expCircleFront:destroy()
     expCircleFront = nil
     skillCircleFront:destroy()
-    
     skillCircleFront = nil
-
 
     terminateOnHpAndMpChange()
     terminateOnGeometryChange()
@@ -201,14 +199,9 @@ end
 function terminateOnLoginChange()
     disconnect(g_game, {
         onGameStart = whenMapResizeChange,
-        onOpenWheelWindow = onOpenWheelWindow,
-
     })
 end
-function onOpenWheelWindow(data)
-pdump(data)
-    
-end
+
 function whenHealthChange()
     if g_game.isOnline() then
         -- Fix By TheMaoci ~ if your server doesn't have this properly implemented,
@@ -397,8 +390,6 @@ function whenSkillsChange()
     end
 end
 
-
-
 function whenMapResizeChange()
     if g_game.isOnline() then
 
@@ -438,7 +429,6 @@ function whenMapResizeChange()
                 skillCircleFront:setX(math.floor(mapPanel:getWidth() / 2 - imageSizeBroad / 2))
                 skillCircle:setY(math.floor(mapPanel:getHeight() / 2 + barDistance) + distanceFromCenter)
             end
-
         else
             healthCircleFront:setX(mapPanel:getX() + mapPanel:getWidth() / 2 - imageSizeThin - barDistance -
                                        distanceFromCenter)
@@ -473,8 +463,6 @@ function whenMapResizeChange()
                 skillCircleFront:setX(mapPanel:getX() + mapPanel:getWidth() / 2 - imageSizeBroad / 2)
                 skillCircle:setY(mapPanel:getY() + mapPanel:getHeight() / 2 + barDistance + distanceFromCenter)
             end
-
-
         end
 
         whenHealthChange()
@@ -482,10 +470,9 @@ function whenMapResizeChange()
         if isExpCircle or isSkillCircle then
             whenSkillsChange()
         end
-
-
     end
 end
+
 -------------------------------------------------
 -- Controls---------------------------------------
 -------------------------------------------------
@@ -610,9 +597,9 @@ function setCircleOpacity(value)
     expCircleFront:setOpacity(value)
     skillCircle:setOpacity(value)
     skillCircleFront:setOpacity(value)
+
     g_settings.set('healthcircle_opacity', value)
 end
-
 
 -------------------------------------------------
 -- Option Settings--------------------------------
@@ -726,7 +713,7 @@ function onSereneProtocol(test)
     print("onSereneProtocol", test)
 
 end
-function onHarmonyProtocol(test)
-    print("onHarmonyProtocol",test)
 
+function onHarmonyProtocol(test)
+    print("onHarmonyProtocol", test)
 end
