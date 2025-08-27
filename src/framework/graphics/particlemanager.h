@@ -30,6 +30,8 @@ class ParticleManager
 public:
     bool importParticle(std::string file);
     ParticleEffectPtr createEffect(std::string_view name);
+    bool removeEffect(const ParticleEffectPtr& particle);
+
     void terminate();
 
     void poll();
