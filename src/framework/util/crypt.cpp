@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -115,7 +115,7 @@ std::string Crypt::base64Decode(const std::string_view& encoded_string) {
 }
 
 std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key) {
-    if (key.empty()) return buffer; // Evita divisão por zero e falhas
+    if (key.empty()) return buffer;
 
     std::string out(buffer);
     size_t keySize = key.size();
@@ -171,17 +171,14 @@ std::string Crypt::_encrypt(const std::string& decrypted_string, const bool useM
 {
     uint32_t sum = stdext::adler32(reinterpret_cast<const uint8_t*>(decrypted_string.data()), decrypted_string.size());
 
-    // Usa `reserve()` para evitar realocações desnecessárias
     std::string tmp;
     tmp.reserve(4 + decrypted_string.size());
 
-    tmp.append(4, '\0');  // Reserva espaço para o checksum
-    tmp.append(decrypted_string); // Adiciona a string original
+    tmp.append(4, '\0'); 
+    tmp.append(decrypted_string);
 
-    // Escreve o checksum nas 4 primeiras posições
     stdext::writeULE32(reinterpret_cast<uint8_t*>(&tmp[0]), sum);
 
-    // Executa XOR e Base64 na string final
     return base64Encode(xorCrypt(tmp, getCryptKey(useMachineUUID)));
 }
 
@@ -191,15 +188,12 @@ std::string Crypt::_decrypt(const std::string& encrypted_string, const bool useM
     std::string tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
 
     if (tmp.size() < 4)
-        return {};  // Retorna string vazia se não há espaço suficiente para o checksum
+        return {};
 
-    // Lê o checksum da string descriptografada
     uint32_t readsum = stdext::readULE32(reinterpret_cast<const uint8_t*>(tmp.data()));
 
-    // Obtém a string original sem os primeiros 4 bytes
     std::string decrypted_string = tmp.substr(4);
 
-    // Valida a integridade da mensagem
     uint32_t sum = stdext::adler32(reinterpret_cast<const uint8_t*>(decrypted_string.data()), decrypted_string.size());
 
     return (readsum == sum) ? decrypted_string : std::string();

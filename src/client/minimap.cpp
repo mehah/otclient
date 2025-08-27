@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -86,7 +86,7 @@ void Minimap::terminate() { clean(); }
 
 void Minimap::clean()
 {
-    std::scoped_lock lock(m_lock);
+    SpinLock::Guard lock(m_lock);
     for (uint_fast8_t i = 0; i <= g_gameConfig.getMapMaxZ(); ++i)
         m_tileBlocks[i].clear();
 }
@@ -215,7 +215,7 @@ const MinimapTile& Minimap::getTile(const Position& pos)
 
 std::pair<MinimapBlock_ptr, MinimapTile> Minimap::threadGetTile(const Position& pos)
 {
-    std::scoped_lock lock(m_lock);
+    SpinLock::Guard lock(m_lock);
 
     if (pos.z <= g_gameConfig.getMapMaxZ() && hasBlock(pos)) {
         const auto& block = m_tileBlocks[pos.z][getBlockIndex(pos)];
@@ -298,7 +298,7 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
         }
         return true;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
+        g_logger.error("failed to load OTMM minimap: {}", e.what());
         return false;
     }
 }
@@ -369,7 +369,7 @@ bool Minimap::loadOtmm(const std::string& fileName)
         fin->close();
         return true;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("failed to load OTMM minimap: %s", e.what()));
+        g_logger.error("failed to load OTMM minimap: {}", e.what());
         return false;
     }
 }
@@ -429,6 +429,6 @@ void Minimap::saveOtmm(const std::string& fileName)
 
         fin->close();
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("failed to save OTMM minimap: %s", e.what()));
+        g_logger.error("failed to save OTMM minimap: {}", e.what());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -146,6 +146,11 @@ void Map::cleanDynamicThings()
 
     for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].missiles.clear();
+
+    for (auto& floor : m_floors) {
+        floor.missiles.clear();
+        floor.tileBlocks.clear();
+    }
 
     cleanTexts();
 
@@ -655,13 +660,18 @@ bool Map::isLookPossible(const Position& pos)
     return tile && tile->isLookPossible();
 }
 
-bool Map::isCovered(const Position& pos, const uint8_t firstFloor)
+bool Map::isCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
 {
     // check for tiles on top of the postion
     Position tilePos = pos;
     while (tilePos.coveredUp() && tilePos.z >= firstFloor) {
         // the below tile is covered when the above tile has a full opaque
         if (const auto& tile = getTile(tilePos)) {
+            if (tile->isLoading()) {
+                isLoading = true;
+                return false;
+            }
+
             if (tile->isFullyOpaque())
                 return true;
         }
@@ -675,7 +685,7 @@ bool Map::isCovered(const Position& pos, const uint8_t firstFloor)
     return false;
 }
 
-bool Map::isCompletelyCovered(const Position& pos, const uint8_t firstFloor)
+bool Map::isCompletelyCovered(const Position& pos, bool& isLoading, const uint8_t firstFloor)
 {
     const auto& checkTile = getTile(pos);
     Position tilePos = pos;
@@ -706,6 +716,11 @@ bool Map::isCompletelyCovered(const Position& pos, const uint8_t firstFloor)
         for (auto x = -1; ++x < 2 && !done;) {
             for (auto y = -1; ++y < 2 && !done;) {
                 const auto& tile = getTile(tilePos.translated(-x, -y));
+                if (tile && tile->isLoading()) {
+                    isLoading = true;
+                    return false;
+                }
+
                 if (!tile || !tile->isFullyOpaque()) {
                     covered = false;
                     done = true;
@@ -1429,7 +1444,7 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
                 if (width == 0)
                     width = lineLength;
                 if (width != lineLength) {
-                    g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern: %s", pattern));
+                    g_logger.error("Invalid pattern for getSpectatorsByPattern: {}", pattern);
                     return creatures;
                 }
                 height += 1;
@@ -1441,13 +1456,13 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
         if (width == 0)
             width = lineLength;
         if (width != lineLength) {
-            g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern: %s", pattern));
+            g_logger.error("Invalid pattern for getSpectatorsByPattern: {}", pattern);
             return creatures;
         }
         height += 1;
     }
     if (width % 2 != 1 || height % 2 != 1) {
-        g_logger.error(stdext::format("Invalid pattern for getSpectatorsByPattern, width and height should be odd (height: %i width: %i)", height, width));
+        g_logger.error("Invalid pattern for getSpectatorsByPattern, width and height should be odd (height: %i width: %i)", height, width);
         return creatures;
     }
 

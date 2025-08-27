@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,54 +23,85 @@
 #pragma once
 
 #include "scheduledevent.h"
+#include <framework/util/spinlock.h>
+
+enum class TaskGroup : int8_t
+{
+    NoGroup = -1, // is outside the context of the dispatcher
+    Serial,
+    GenericParallel,
+    Last
+};
+
+enum class DispatcherType : uint8_t
+{
+    NoType,
+    Event,
+    AsyncEvent,
+    ScheduledEvent,
+    CycleEvent,
+    DeferEvent
+};
+
+struct DispatcherContext
+{
+    bool isGroup(const TaskGroup _group) const {
+        return group == _group;
+    }
+
+    bool isAsync() const {
+        return type == DispatcherType::AsyncEvent;
+    }
+
+    auto getGroup() const {
+        return group;
+    }
+
+    auto getType() const {
+        return type;
+    }
+
+private:
+    void reset() {
+        group = TaskGroup::NoGroup;
+        type = DispatcherType::NoType;
+    }
+
+    DispatcherType type = DispatcherType::NoType;
+    TaskGroup group = TaskGroup::NoGroup;
+
+    friend class EventDispatcher;
+};
 
 // @bindsingleton g_dispatcher
 class EventDispatcher
 {
 public:
-    EventDispatcher() {
-        m_threads.emplace_back(std::make_unique<ThreadTask>());
-    }
+    EventDispatcher() = default;
 
     void init();
     void shutdown();
     void poll();
 
     EventPtr addEvent(const std::function<void()>& callback);
-    void asyncEvent(std::function<void()>&& callback);
     void deferEvent(const std::function<void()>& callback);
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
-    void startEvent(const ScheduledEventPtr& event);
-
-private:
-    inline void mergeEvents();
-    inline void executeEvents();
-    inline void executeAsyncEvents();
-    inline void executeDeferEvents();
-    inline void executeScheduledEvents();
-
-    const auto& getThreadTask() const {
-        const auto id = stdext::getThreadId();
-        bool grow = false;
-
-        {
-            std::shared_lock l(m_sharedLock);
-            grow = id >= static_cast<int16_t>(m_threads.size());
-        }
-
-        if (grow) {
-            std::unique_lock l(m_sharedLock);
-            for (auto i = static_cast<int16_t>(m_threads.size()); i <= id; ++i)
-                m_threads.emplace_back(std::make_unique<ThreadTask>());
-        }
-
-        return m_threads[id];
+    const auto& context() const {
+        return dispacherContext;
     }
 
-    size_t m_pollEventsSize{};
-    bool m_disabled{ false };
+private:
+    thread_local static DispatcherContext dispacherContext;
+
+    enum class ThreadTaskEventState
+    {
+        ADDING,
+        ADDED,
+        MERGING,
+        MERGED,
+    };;
 
     // Thread Events
     struct ThreadTask
@@ -82,17 +113,39 @@ private:
 
         std::vector<EventPtr> events;
         std::vector<Event> deferEvents;
-        std::vector<Event> asyncEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
-        std::mutex mutex;
+        SpinLock lock;
     };
-    mutable std::vector<std::unique_ptr<ThreadTask>> m_threads;
-    mutable std::shared_mutex m_sharedLock;
+
+    inline void mergeEvents();
+    inline void executeEvents();
+    inline void executeDeferEvents();
+    inline void executeScheduledEvents();
+
+    const std::unique_ptr<ThreadTask>& getThreadTask() const {
+        return m_threads[stdext::getThreadId() % m_threads.size()];
+    }
+
+    template<typename Result = void, typename Inserter>
+    Result pushThreadTask(Inserter inserter) {
+        const auto& thread = getThreadTask();
+        SpinLock::Guard guard(thread->lock);
+        if constexpr (std::is_void_v<Result>) {
+            inserter(thread);
+        } else {
+            Result result = inserter(thread);
+            return result;
+        }
+    }
+
+    size_t m_pollEventsSize{};
+    bool m_disabled{ false };
+
+    std::vector<std::unique_ptr<ThreadTask>> m_threads;
 
     // Main Events
     std::vector<EventPtr> m_eventList;
     std::vector<Event> m_deferEventList;
-    std::vector<Event> m_asyncEventList;
     phmap::btree_multiset<ScheduledEventPtr, ScheduledEvent::Compare> m_scheduledEventList;
 };
 

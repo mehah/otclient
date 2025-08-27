@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ public:
     TexturePtr get(uint32_t& frame, Timer& timer);
     TexturePtr getCurrentFrame();
 
-    Texture* create() override;
+    void create() override;
     void buildHardwareMipmaps() override;
 
     void setSmooth(bool smooth) override;
@@ -51,6 +51,8 @@ public:
 
     bool isAnimatedTexture() const override { return true; }
     bool running() const { return m_animTimer.running(); }
+
+    void allowAtlasCache() override;
 
 private:
     std::vector<TexturePtr> m_frames;

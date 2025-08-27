@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,16 @@ namespace stdext
 {
     /// Demangle names for GNU g++ compiler
     const char* demangle_name(const char* name);
+
+    /// Returns the name of a class
+    template<typename T> std::string demangle_class(const T& obj)
+    {
+#ifdef _MSC_VER
+        return demangle_name(typeid(*obj).name()) + 6;
+#else
+        return demangle_name(typeid(*obj).name());
+#endif
+    }
 
     /// Returns the name of a class
     template<typename T> std::string demangle_class()

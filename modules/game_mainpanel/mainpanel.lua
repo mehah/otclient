@@ -14,58 +14,70 @@ local COLORS = {
     BASE_2 = "#414141"
 }
 
-function reloadMainPanelSizes()
-    local main = modules.game_interface.getMainRightPanel()
-    local rightPanel = modules.game_interface.getRightPanel()
+local PANEL_CONSTANTS = {
+    ICON_WIDTH = 18,
+    ICON_HEIGHT = 18,
+    MAX_ICONS_PER_ROW = {
+        OPTIONS = 5,
+        SPECIALS = 2,
+        STORE = 1
+    },
+    MULTI_STORE_HEIGHT = 20,
+    HEIGHT_EXTRA_ONPANEL = -5,
+    HEIGHT_EXTRA_SHRINK = 5
+}
 
-    if not main or not rightPanel then
+local optionsShrink = false
+
+local function calculatePanelHeight(panel, max_icons_per_row)
+    local icon_count = 0
+    for _, icon in ipairs(panel:getChildren()) do
+        if icon:isVisible() then
+            icon_count = icon_count + 1
+        end
+    end
+    local rows = math.ceil(icon_count / max_icons_per_row)
+    local height = (rows * PANEL_CONSTANTS.ICON_HEIGHT) + (rows * 3)
+    return height, icon_count
+end
+
+function reloadMainPanelSizes()
+    local main_panel = modules.game_interface.getMainRightPanel()
+    local right_panel = modules.game_interface.getRightPanel()
+    if not main_panel or not right_panel then
         return
     end
-    
-    local height = 1
-    local function calculatePanelHeight(icon_count, max_icons_per_row, icon_size)
-        local rows = math.ceil(icon_count / max_icons_per_row)
-        return (rows * icon_size) + (rows * 3)
-    end
-
-    for _, panel in ipairs(main:getChildren()) do
+    local total_height = 1
+    for _, panel in ipairs(main_panel:getChildren()) do
         if panel.panelHeight ~= nil then
             if panel:isVisible() then
                 panel:setHeight(panel.panelHeight)
-                height = height + panel.panelHeight
-
-                if panel:getId() == 'mainoptionspanel' and panel:isOn() then
-             
-                    local function calculatePanelHeightFromPanel(panel, icon_width, icon_height, max_icons_per_row)
-                        local icon_count = 0
-                        for _, icon in ipairs(panel:getChildren()) do
-                            if icon:isVisible() then
-                                icon_count = icon_count + 1
-                            end
+                total_height = total_height + panel.panelHeight
+                if panel:getId() == 'mainoptionspanel' then
+                    if panel:isOn() then
+                        local options_panel = optionsController.ui.onPanel.options
+                        local options_height, options_count =
+                            calculatePanelHeight(options_panel, PANEL_CONSTANTS.MAX_ICONS_PER_ROW.OPTIONS)
+                        local specials_panel = optionsController.ui.onPanel.specials
+                        local specials_height, specials_count =
+                            calculatePanelHeight(specials_panel, PANEL_CONSTANTS.MAX_ICONS_PER_ROW.SPECIALS)
+                        local store_panel = panel.onPanel.store
+                        local store_height, store_count = calculatePanelHeight(store_panel,
+                            PANEL_CONSTANTS.MAX_ICONS_PER_ROW.STORE)
+                        if store_count > 0 then
+                            store_height = store_count * PANEL_CONSTANTS.MULTI_STORE_HEIGHT + (store_count - 1) * 2
                         end
-
-                        local rows = math.ceil(icon_count / max_icons_per_row)
-                        return (rows * icon_height) + (rows * 3) 
-                    end
-
-                    local options_panel = optionsController.ui.onPanel.options
-                    local options_height = calculatePanelHeightFromPanel(options_panel, 18, 18, 5) 
-
-                    local specials_panel = optionsController.ui.onPanel.specials
-                    local specials_height = calculatePanelHeightFromPanel(specials_panel, 18, 18, 2) 
-
-                    local max_panel_height = math.max(options_height, specials_height)
-                    panel:setHeight(panel:getHeight() + max_panel_height)
-                    height = height + options_height
-
-                    local store_panel = panel.onPanel.store
-                    local store_height = calculatePanelHeightFromPanel(store_panel, 18, 18, 1) 
-
-                    store_panel:setHeight(store_height)
-                    height = height + store_height
-
-                    if store_panel:getChildCount() >= 2 then
-                        height = height + 15 
+                        local combined_height = store_height + math.max(options_height, specials_height)
+                        local extra_height = PANEL_CONSTANTS.HEIGHT_EXTRA_ONPANEL
+                        if store_count >= 2 then
+                            extra_height = extra_height - (store_count - 1) * 5
+                        end
+                        combined_height = combined_height + extra_height
+                        store_panel:setHeight(store_height)
+                        panel:setHeight(combined_height + panel.panelHeight)
+                        total_height = total_height + combined_height
+                    else
+                        total_height = total_height + PANEL_CONSTANTS.HEIGHT_EXTRA_SHRINK
                     end
                 end
             else
@@ -73,28 +85,22 @@ function reloadMainPanelSizes()
             end
         end
     end
-
-    main:setHeight(height)
-    rightPanel:fitAll()
+    main_panel:setHeight(total_height)
+    right_panel:fitAll()
 end
 
--- @ Options
-local optionsShrink = false
 local function refreshOptionsSizes()
     if optionsShrink then
         optionsController.ui:setOn(false)
-        optionsController.ui.onPanel:hide()
         optionsController.ui.offPanel:show()
     else
         optionsController.ui:setOn(true)
-        optionsController.ui.onPanel:show()
         optionsController.ui.offPanel:hide()
     end
     reloadMainPanelSizes()
 end
 
 local function createButton_large(id, description, image, callback, special, front)
-    -- fast version
     local panel = optionsController.ui.onPanel.store
 
     storeAmount = storeAmount + 1
@@ -178,7 +184,7 @@ function toggleStore()
     if  g_game.getFeature(GameIngameStore) then
         modules.game_store.toggle() -- cipsoft packets
     else
-        modules.game_shop.toggle() -- custom from v8
+        modules.game_shop.toggle() -- custom
     end
 end
 
@@ -253,6 +259,10 @@ function addStoreButton(id, description, image, callback, front)
     return createButton_large(id, description, image, callback, true, front)
 end
 
+function getButton(id)
+    return optionsController.ui.onPanel.options:recursiveGetChildById(id)
+end
+
 function toggleExtendedViewButtons(extended)
     local optionsPanel = optionsController.ui.onPanel.options
     local specialsPanel = optionsController.ui.onPanel.store
@@ -285,7 +295,7 @@ function toggleExtendedViewButtons(extended)
                 end
             end
         end
-        optionsController.ui:show(true)
+        optionsController.ui:show()
         optionsController.ui:setHeight(28)
         local mainRightPanel = modules.game_interface.getMainRightPanel()
         if mainRightPanel:hasChild(optionsController.ui) then

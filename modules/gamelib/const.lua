@@ -216,9 +216,10 @@ GameAllowCustomBotScripts = 120
 GameColorizedLootValue = 121
 GameAllowPreWalk = 122
 GamePlayerFamiliars = 123
-GameLatencyAdaptiveCamera = 124
+-- = 124
 GameMapCache = 125
 GameForgeSkillStats = 126
+GameCharacterSkillStats = 127
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
@@ -460,7 +461,15 @@ CyclopediaCharacterInfoTypes = {
 }
 
 StoreConst = {
-   InstantRewardAccess = 233,
+    InstantRewardAccess = 233,
+}
+
+ExperienceRate = {
+    BASE = 0,
+    VOUCHER = 1,
+    LOW_LEVEL = 2,
+    XP_BOOST = 3,
+    STAMINA_MULTIPLIER = 4
 }
 
 ExperienceRate = {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
 {
     const auto& file = g_resources.openFile(filename);
     if (!file)
-        throw Exception("unable to open %s", filename);
+        throw Exception("unable to open {}", filename);
 
     // cache file buffer to avoid lags from hard drive
     file->cache();
@@ -42,7 +42,7 @@ SoundFilePtr SoundFile::loadSoundFile(const std::string& filename)
         if (oggSoundFile->prepareOgg())
             return oggSoundFile;
     } else
-        throw Exception("unknown sound file format %s", filename);
+        throw Exception("unknown sound file format {}", filename);
 
     return nullptr;
 }

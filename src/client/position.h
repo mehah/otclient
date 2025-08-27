@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,8 @@
 #include <ostream>
 #include <string>
 #include <vector>
+
+#include <fmt/format.h>
 
 class Position
 {
@@ -291,3 +293,11 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
     pos.z = z;
     return in;
 }
+
+// Auto format Position
+template <>
+struct fmt::formatter<Position> : fmt::formatter<std::string> {
+    auto format(const Position& pos, fmt::format_context& ctx) const {
+        return fmt::formatter<std::string>::format(pos.toString(), ctx);
+    }
+};

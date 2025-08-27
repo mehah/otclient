@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,9 @@
 #include <framework/core/timer.h>
 #include <framework/global.h>
 #include <framework/graphics/declarations.h>
+
+// Forward declaration
+class Color;
 
  //@bindsingleton g_window
 class PlatformWindow
@@ -74,6 +77,22 @@ public:
     virtual void setIcon(const std::string& iconFile) = 0;
     virtual void setClipboardText(std::string_view text) = 0;
 
+    // This method is intentionally left empty because title bar color customization
+    // is only supported on Windows 10/11 via the DWM API. On other platforms,
+    // or when not implemented in the derived class, this method does nothing.
+    // Derived classes should override this method to provide platform-specific behavior.
+    virtual void setTitleBarColor(const Color& color) {}
+
+    // Convenience methods for setting title bar color
+    // Usage examples:
+    //   g_window.setTitleBarColor(255, 0, 0);           // Red (RGB 0-255)
+    //   g_window.setTitleBarColor(1.0f, 0.0f, 0.0f);    // Red (float 0.0-1.0)
+    //   g_window.setTitleBarColorRGB(0, 128, 255);       // Blue
+    //   g_window.setTitleBarColor(Color::darkBlue);      // Using predefined color
+    void setTitleBarColor(int r, int g, int b);
+    void setTitleBarColor(float r, float g, float b);
+    void setTitleBarColorRGB(uint8_t r, uint8_t g, uint8_t b);
+    
     virtual Size getDisplaySize() = 0;
     virtual std::string getClipboardText() = 0;
     virtual std::string getPlatformType() = 0;

@@ -35,6 +35,13 @@ enum class SpriteLayout
     TWO_BY_TWO = 3
 };
 
+enum class SpriteLoadState
+{
+    NONE,
+    LOADING,
+    LOADED
+};
+
 class SpriteSheet
 {
 public:
@@ -67,7 +74,7 @@ public:
     int lastId = 0;
 
     SpriteLayout spriteLayout = SpriteLayout::ONE_BY_ONE;
-    std::mutex m_mutex;
+    std::atomic<SpriteLoadState> m_loadingState = SpriteLoadState::NONE;
     std::unique_ptr<uint8_t[]> data;
     std::string file;
 };
@@ -90,11 +97,19 @@ public:
     bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
     void saveSheetToFileBySprite(int id, const std::string& file);
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
-    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true);
+    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true) {
+        bool isLoading = false;
+        return getSheetBySpriteId(id, isLoading, load);
+    }
+    SpriteSheetPtr getSheetBySpriteId(int id, bool& isLoading, bool load = true);
 
     void addSpriteSheet(const SpriteSheetPtr& sheet) { m_sheets.emplace_back(sheet); }
 
-    ImagePtr getSpriteImage(int id);
+    ImagePtr getSpriteImage(int id) {
+        bool isLoading = false;
+        return getSpriteImage(id, isLoading);
+    }
+    ImagePtr getSpriteImage(int id, bool& isLoading);
     void saveSpriteToFile(int id, const std::string& file);
 
 private:

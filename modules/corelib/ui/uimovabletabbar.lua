@@ -206,7 +206,29 @@ local function onTabDragMove(tab, mousePos, mouseMoved)
         -- update margins
         updateMargins(tab.tabBar)
         xoff = math.max(xoff, 0)
-        xoff = math.min(xoff, getMaxMargin(tab.tabBar, tab))
+        local maxMargin = getMaxMargin(tab.tabBar, tab)
+        local parentLimit = tab.tabBar:getParent():getWidth() - tab:getWidth()
+        if parentLimit > maxMargin then
+            maxMargin = parentLimit
+        end
+        if tab.tabBar.dropTarget then
+            local dt = tab.tabBar.dropTarget
+            local hovered = dt:containsPoint(mousePos)
+            if hovered and not tab.tabBar.dropTargetHighlighted then
+                dt:setBorderColor('#FFFFFF')
+                dt:setBorderWidth(1)
+                tab.tabBar.dropTargetHighlighted = true
+            elseif not hovered and tab.tabBar.dropTargetHighlighted then
+                dt:setBorderColor('alpha')
+                dt:setBorderWidth(0)
+                tab.tabBar.dropTargetHighlighted = false
+            end
+            local dtLimit = dt:getX() - tab.tabBar:getX() + dt:getWidth()
+            if dtLimit > maxMargin then
+                maxMargin = dtLimit
+            end
+        end
+        xoff = math.min(xoff, maxMargin)
         tab:setMarginLeft(xoff)
     end
 end
@@ -238,6 +260,9 @@ function UIMoveableTabBar.create()
     tabbar.postTabs = {}
     tabbar.prevNavigation = nil
     tabbar.nextNavigation = nil
+    tabbar.dropTarget = nil
+    tabbar.dropCallback = nil
+    tabbar.dropTargetHighlighted = false
     tabbar.onGeometryChange = function()
         hideTabs(tabbar, true, tabbar.postTabs, 0)
         updateTabs(tabbar)
@@ -253,9 +278,14 @@ function UIMoveableTabBar:onDestroy()
     if self.nextNavigation then
         self.nextNavigation:disable()
     end
-
+    if self.dropTarget then
+        self.dropTarget.onDrop = nil
+    end
     self.nextNavigation = nil
     self.prevNavigation = nil
+    self.dropTarget = nil
+    self.dropCallback = nil
+    self.dropTargetHighlighted = false
 end
 
 function UIMoveableTabBar:setContentWidget(widget)
@@ -550,4 +580,31 @@ function UIMoveableTabBar:setNavigation(prevButton, nextButton)
         end
     end
     updateNavigation(self)
+end
+
+function UIMoveableTabBar:setDropTarget(widget, callback)
+    if self.dropTarget and self.dropTarget ~= widget then
+        self.dropTarget.onDrop = nil
+        if self.dropTargetHighlighted then
+            self.dropTarget:setBorderColor('alpha')
+            self.dropTarget:setBorderWidth(0)
+            self.dropTargetHighlighted = false
+        end
+    end
+    self.dropTarget = widget
+    self.dropCallback = callback
+    if widget then
+        widget.onDrop = function(target, draggedWidget, mousePos)
+            if draggedWidget and draggedWidget.tabBar == self then
+                if callback then
+                    callback(self, draggedWidget)
+                end
+                signalcall(self.onTabDrop, self, draggedWidget)
+                widget:setBorderColor('alpha')
+                widget:setBorderWidth(0)
+                self.dropTargetHighlighted = false
+                return true
+            end
+        end
+    end
 end

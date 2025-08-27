@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ public:
     void setExperienceRate(Otc::ExperienceRate_t type, uint16_t value);
     void setHarmony(uint8_t harmony);
     void setSerene(bool serene);
-
+    void setStoreExpBoostTime(uint16_t value);
 
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
@@ -91,6 +91,7 @@ public:
     uint16_t getBlessings() { return m_blessings; }
     uint16_t getRegenerationTime() { return m_regenerationTime; }
     uint16_t getOfflineTrainingTime() { return m_offlineTrainingTime; }
+    uint16_t getStoreExpBoostTime() { return m_offlineTrainingTime; }
 
     uint32_t getStates() { return m_states; }
     uint32_t getMana() { return m_mana; }
@@ -135,6 +136,7 @@ public:
 
     Position getPosition() override { return isPreWalking() ? m_preWalks.back() : m_position; }
     void resetPreWalk() { m_preWalks.clear(); }
+    auto getPreWalkingSize() { return m_preWalks.size(); }
 
 private:
     struct Skill
@@ -201,6 +203,7 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+    uint16_t m_storeExpBoostTime{ 0 };
 
     uint8_t m_attackElement{ 0 };
     uint8_t m_convertedElement{ 0 };
@@ -223,6 +226,5 @@ private:
     double m_momentum{ 0 };
     double m_transcendence{ 0 };
     double m_amplification{ 0 };
-
     friend class Game;
 };

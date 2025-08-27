@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -101,3 +101,8 @@ int push_luavalue(const DailyRewardItem& item);
 int push_luavalue(const DailyRewardBundle& bundle);
 int push_luavalue(const DailyRewardDay& day);
 int push_luavalue(const DailyRewardData& data);
+
+// forge
+int push_luavalue(const ForgeOpenData& data);
+int push_luavalue(const ForgeTransferData& data);
+int push_luavalue(const ForgeItemInfo& data);

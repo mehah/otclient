@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -66,7 +66,7 @@ UIWidget::~UIWidget()
 #ifndef NDEBUG
     assert(!g_app.isTerminated());
     if (!isDestroyed())
-        g_logger.warning(stdext::format("widget '%s' was not explicitly destroyed", m_id));
+        g_logger.warning("widget '{}' was not explicitly destroyed", m_id);
 #endif
 }
 
@@ -504,7 +504,7 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, const int index)
     const size_t childrenSize = m_children.size();
 
     if (static_cast<size_t>(index) - 1 >= childrenSize) {
-        g_logger.traceError(stdext::format("moving %s to index %d on %s", child->getId(), index, m_id));
+        g_logger.traceError("moving {} to index {} on {}", child->getId(), index, m_id);
         return;
     }
 
@@ -650,7 +650,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
         for (const auto& node : styleNode->children()) {
             if (node->tag()[0] == '!') {
                 std::string tag = node->tag().substr(1);
-                std::string code = stdext::format("tostring(%s)", node->value());
+                std::string code = fmt::format("tostring({})", node->value());
                 std::string origin = "@" + node->source() + ": [" + node->tag() + "]";
                 g_lua.evaluateExpression(code, origin);
                 std::string value = g_lua.popString();
@@ -674,7 +674,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
 
         setProp(PropFirstOnStyle, false);
     } catch (stdext::exception& e) {
-        g_logger.traceError(stdext::format("failed to apply style to widget '%s': %s", m_id, e.what()));
+        g_logger.traceError("failed to apply style to widget '{}': {}", m_id, e.what());
     }
     setProp(PropLoadingStyle, false);
 }
@@ -687,7 +687,7 @@ void UIWidget::addAnchor(const Fw::AnchorEdge anchoredEdge, const std::string_vi
     if (const auto& anchorLayout = getAnchoredLayout())
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), anchoredEdge, hookedWidgetId, hookedEdge);
     else
-        g_logger.traceError(stdext::format("cannot add anchors to widget '%s': the parent doesn't use anchors layout", m_id));
+        g_logger.traceError("cannot add anchors to widget '{}': the parent doesn't use anchors layout", m_id);
 }
 
 void UIWidget::removeAnchor(const Fw::AnchorEdge anchoredEdge)
@@ -704,7 +704,7 @@ void UIWidget::centerIn(const std::string_view hookedWidgetId)
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorHorizontalCenter, hookedWidgetId, Fw::AnchorHorizontalCenter);
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorVerticalCenter, hookedWidgetId, Fw::AnchorVerticalCenter);
     } else
-        g_logger.traceError(stdext::format("cannot add anchors to widget '%s': the parent doesn't use anchors layout", m_id));
+        g_logger.traceError("cannot add anchors to widget '{}': the parent doesn't use anchors layout", m_id);
 }
 
 void UIWidget::fill(const std::string_view hookedWidgetId)
@@ -718,7 +718,7 @@ void UIWidget::fill(const std::string_view hookedWidgetId)
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorTop, hookedWidgetId, Fw::AnchorTop);
         anchorLayout->addAnchor(static_self_cast<UIWidget>(), Fw::AnchorBottom, hookedWidgetId, Fw::AnchorBottom);
     } else
-        g_logger.traceError(stdext::format("cannot add anchors to widget '%s': the parent doesn't use anchors layout", m_id));
+        g_logger.traceError("cannot add anchors to widget '{}': the parent doesn't use anchors layout", m_id);
 }
 
 void UIWidget::breakAnchors()
@@ -893,7 +893,7 @@ void UIWidget::internalDestroy()
 void UIWidget::destroy()
 {
     if (isDestroyed())
-        g_logger.warning(stdext::format("attempt to destroy widget '%s' (%s) two times", m_id, m_source));
+        g_logger.warning("attempt to destroy widget '{}' ({}) two times", m_id, m_source);
 
     // hold itself reference
     const UIWidgetPtr self = static_self_cast<UIWidget>();
@@ -1052,7 +1052,7 @@ bool UIWidget::setRect(const Rect& rect)
 
     /*
     if(rect.width() > 8192 || rect.height() > 8192) {
-        g_logger.error(stdext::format("attempt to set huge rect size (%s) for %s", stdext::to_string(rect), m_id));
+        g_logger.error("attempt to set huge rect size ({}) for {}", stdext::to_string(rect), m_id);
         return false;
     }
     */
@@ -1097,7 +1097,7 @@ void UIWidget::setStyle(const std::string_view styleName)
 {
     OTMLNodePtr styleNode = g_ui.getStyle(styleName);
     if (!styleNode) {
-        g_logger.traceError(stdext::format("unable to retrieve style '%s': not a defined style", styleName));
+        g_logger.traceError("unable to retrieve style '{}': not a defined style", styleName);
         return;
     }
     styleNode = styleNode->clone();
@@ -1289,6 +1289,40 @@ UIAnchorLayoutPtr UIWidget::getAnchoredLayout()
         return layout->static_self_cast<UIAnchorLayout>();
 
     return nullptr;
+}
+
+UIAnchorList UIWidget::getAnchorsGroup() {
+    if (const auto& layout = getAnchoredLayout()) {
+        const auto& self = static_self_cast<UIWidget>();
+        if (layout->hasAnchors(self)) {
+            const auto& anchors = layout->getAnchorsGroup()[self]->getAnchors();
+            return anchors;
+        }
+    }
+
+    return {};
+}
+
+std::vector<Fw::AnchorEdge> UIWidget::getAnchors() {
+    const auto& anchors = getAnchorsGroup();
+    std::vector<Fw::AnchorEdge> anchorsVec;
+    anchorsVec.reserve(anchors.size());
+    for (const auto& anchor : anchors) {
+        anchorsVec.emplace_back(anchor->getAnchoredEdge());
+    }
+
+    return anchorsVec;
+}
+
+Fw::AnchorEdge UIWidget::getAnchorType(Fw::AnchorEdge anchorType) {
+    const auto& anchors = getAnchorsGroup();
+    for (const auto& anchor : anchors) {
+        if (anchor->getAnchoredEdge() == anchorType) {
+            return anchor->getHookedEdge();
+        }
+    }
+
+    return Fw::AnchorNone;
 }
 
 UIWidgetPtr UIWidget::getRootParent()

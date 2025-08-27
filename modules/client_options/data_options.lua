@@ -44,10 +44,10 @@ return {
     },
     openMaximized                     = false,
     backgroundFrameRate               = {
-        value = 201,
+        value = 501,
         action = function(value, options, controller, panels, extraWidgets)
             local text, v = value, value
-            if value <= 0 or value >= 201 then
+            if value <= 0 or value >= 501 then
                 text = 'max'
                 v = 0
             end

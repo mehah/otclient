@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -56,7 +56,7 @@ bool Platform::spawnProcess(std::string process, const std::vector<std::string>&
 {
     std::string commandLine;
     for (const auto& arg : args)
-        commandLine += stdext::format(" \"%s\"", arg);
+        commandLine += fmt::format(" \"{}\"", arg);
 
     stdext::replace_all(process, "/", "\\");
     if (!process.ends_with(".exe"))
@@ -429,7 +429,7 @@ std::string Platform::getOSName()
             }
         }
 
-        ret += stdext::format(" (build %d)", osvi.dwBuildNumber);
+        ret += fmt::format(" (build {})", osvi.dwBuildNumber);
 
         if (osvi.dwMajorVersion >= 6) {
             if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)

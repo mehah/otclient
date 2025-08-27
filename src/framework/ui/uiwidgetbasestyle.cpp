@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ void UIWidget::initBaseStyle()
     m_borderColor.set(Color::black);
 
     // generate an unique id, this is need because anchored layouts find widgets by id
-    m_id = stdext::format("widget%d", ++UID);
+    m_id = fmt::format("widget{}", ++UID);
 }
 
 void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
@@ -359,32 +359,38 @@ void UIWidget::drawBackground(const Rect& screenCoords) const
         drawRect.translate(m_backgroundRect.topLeft());
         if (m_backgroundRect.isValid())
             drawRect.resize(m_backgroundRect.size());
-        g_drawPool.addFilledRect(drawRect, m_backgroundColor, m_backgroundDrawConductor);
+
+        g_drawPool.setDrawOrder(m_backgroundDrawOrder);
+        g_drawPool.addFilledRect(drawRect, m_backgroundColor);
+        g_drawPool.resetDrawOrder();
     }
 }
 
 void UIWidget::drawBorder(const Rect& screenCoords) const
 {
+    g_drawPool.setDrawOrder(m_borderDrawOrder);
+
     // top
     if (m_borderWidth.top > 0) {
         const Rect borderRect(screenCoords.topLeft(), screenCoords.width(), m_borderWidth.top);
-        g_drawPool.addFilledRect(borderRect, m_borderColor.top, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.top);
     }
     // right
     if (m_borderWidth.right > 0) {
         const Rect borderRect(screenCoords.topRight() - Point(m_borderWidth.right - 1, 0), m_borderWidth.right, screenCoords.height());
-        g_drawPool.addFilledRect(borderRect, m_borderColor.right, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.right);
     }
     // bottom
     if (m_borderWidth.bottom > 0) {
         const Rect borderRect(screenCoords.bottomLeft() - Point(0, m_borderWidth.bottom - 1), screenCoords.width(), m_borderWidth.bottom);
-        g_drawPool.addFilledRect(borderRect, m_borderColor.bottom, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.bottom);
     }
     // left
     if (m_borderWidth.left > 0) {
         const Rect borderRect(screenCoords.topLeft(), m_borderWidth.left, screenCoords.height());
-        g_drawPool.addFilledRect(borderRect, m_borderColor.left, m_borderDrawConductor);
+        g_drawPool.addFilledRect(borderRect, m_borderColor.left);
     }
+    g_drawPool.resetDrawOrder();
 }
 
 void UIWidget::drawIcon(const Rect& screenCoords) const
@@ -406,7 +412,9 @@ void UIWidget::drawIcon(const Rect& screenCoords) const
             drawRect.alignIn(screenCoords, m_iconAlign);
     }
     drawRect.translate(m_iconOffset);
-    g_drawPool.addTexturedRect(drawRect, m_icon, m_iconClipRect, m_iconColor, m_iconDrawConductor);
+    g_drawPool.setDrawOrder(m_iconDrawOrder);
+    g_drawPool.addTexturedRect(drawRect, m_icon, m_iconClipRect, m_iconColor);
+    g_drawPool.resetDrawOrder();
 }
 
 void UIWidget::setIcon(const std::string& iconFile)

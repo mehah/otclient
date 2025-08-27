@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 #include "uiwidget.h"
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
+#include <framework/graphics/textureatlas.h>
 #include <regex>
 
 void UIWidget::initText()
@@ -44,7 +45,7 @@ void UIWidget::updateText()
     }
 
     if (m_font)
-        m_glyphsPositionsCache = m_font->calculateGlyphsPositions(m_drawText, m_textAlign, &m_textSize);
+        m_font->calculateGlyphsPositions(m_drawText, m_textAlign, m_glyphsPositionsCache, &m_textSize);
 
     // update rect size
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
@@ -104,6 +105,12 @@ void UIWidget::drawText(const Rect& screenCoords)
     if (m_drawText.empty() || m_color.aF() == 0.f || !m_font)
         return;
 
+    // Hack to fix font rendering in atlas
+    if (m_font->getAtlasRegion() != m_atlasRegion) {
+        m_atlasRegion = m_font->getAtlasRegion();
+        updateText();
+    }
+
     if (screenCoords != m_textCachedScreenCoords) {
         m_textCachedScreenCoords = screenCoords;
 
@@ -120,14 +127,16 @@ void UIWidget::drawText(const Rect& screenCoords)
     }
 
     g_drawPool.scale(m_fontScale);
+    g_drawPool.setDrawOrder(m_textDrawOrder);
     if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
-        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color, m_textDrawConductor);
+        g_drawPool.addTexturedCoordsBuffer(m_font->getTexture(), m_coordsBuffer, m_color);
     } else {
         const auto& texture = m_font->getTexture();
         for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
-            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color, m_textDrawConductor);
+            g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
         }
     }
+    g_drawPool.resetDrawOrder();
     g_drawPool.scale(1.f); // reset scale
 }
 

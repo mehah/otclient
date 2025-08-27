@@ -42,13 +42,13 @@ void crashHandler(int signum, siginfo_t* info, void* secret)
     g_logger.error("Application crashed");
 
     std::stringstream ss;
-    ss << stdext::format("app name: %s\n", g_app.getName());
-    ss << stdext::format("app version: %s\n", g_app.getVersion());
-    ss << stdext::format("build compiler: %s\n", BUILD_COMPILER);
-    ss << stdext::format("build date: %s\n", __DATE__);
-    ss << stdext::format("build type: %s\n", BUILD_TYPE);
-    ss << stdext::format("build revision: %s (%s)\n", BUILD_REVISION, BUILD_COMMIT);
-    ss << stdext::format("crash date: %s\n", stdext::date_time_string());
+    ss << fmt::format("app name: {}\n", g_app.getName());
+    ss << fmt::format("app version: {}\n", g_app.getVersion());
+    ss << fmt::format("build compiler: {}\n", BUILD_COMPILER);
+    ss << fmt::format("build date: {}\n", __DATE__);
+    ss << fmt::format("build type: {}\n", BUILD_TYPE);
+    ss << fmt::format("build revision: {} ({})\n", BUILD_REVISION, BUILD_COMMIT);
+    ss << fmt::format("crash date: {}\n", stdext::date_time_string());
     ss.flags(std::ios::hex | std::ios::showbase);
 
     ucontext_t context = *(ucontext_t*)secret;
@@ -112,7 +112,7 @@ void crashHandler(int signum, siginfo_t* info, void* secret)
         fout << ss.str();
         fout << "\n";
         fout.close();
-        g_logger.info(stdext::format("Crash report saved to file %s", fileName));
+        g_logger.info("Crash report saved to file {}", fileName);
     } else
         g_logger.error("Failed to save crash report!");
 

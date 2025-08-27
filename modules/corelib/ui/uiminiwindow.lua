@@ -160,6 +160,10 @@ function UIMiniWindow:setupOnStart()
         else
             self:open(true)
         end
+    else
+        if self:getId() == "battleWindow" then
+            self:open(true)
+        end
     end
 
     local newParent = self:getParent()
@@ -249,6 +253,7 @@ function UIMiniWindow:onDragLeave(droppedWidget, mousePos)
             self.movedWidget = nil
         end
     end
+    return true
 end
 
 function UIMiniWindow:onDragMove(mousePos, mouseMoved)

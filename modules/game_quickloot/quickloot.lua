@@ -51,9 +51,9 @@ function quickLootController:onGameStart()
     if not g_game.getFeature(GameThingQuickLoot) then
         return
     end
-
-    QuickLoot.mouseGrabberWidget = g_ui.createWidget("UIWidget")
-
+    if not QuickLoot.mouseGrabberWidget then
+        QuickLoot.mouseGrabberWidget = g_ui.createWidget("UIWidget")
+    end
     QuickLoot.mouseGrabberWidget:setVisible(false)
     QuickLoot.mouseGrabberWidget:setFocusable(false)
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -53,13 +53,13 @@ bool Module::load()
 
             const auto& dep = g_modules.getModule(depName);
             if (!dep)
-                throw Exception("dependency '%s' was not found", depName);
+                throw Exception("dependency '{}' was not found", depName);
 
             if (dep->hasDependency(m_name, true))
-                throw Exception("dependency '%s' is recursively depending on itself", depName);
+                throw Exception("dependency '{}' is recursively depending on itself", depName);
 
             if (!dep->isLoaded() && !dep->load())
-                throw Exception("dependency '%s' has failed to load", depName);
+                throw Exception("dependency '{}' has failed to load", depName);
         }
 
         if (m_sandboxed)
@@ -86,8 +86,8 @@ bool Module::load()
 
         m_loaded = true;
 
-        g_logger.debug(stdext::format("Loaded module '%s' (%s)", m_name,
-                       stdext::format("%.2fs", (stdext::millis() - startTime) / 1000.0)));
+        g_logger.debug( "Loaded module '{}' ({:.2f}s)", m_name, (stdext::millis() - startTime) / 1000.0
+);
     } catch (const stdext::exception& e) {
         // remove from package.loaded
         g_lua.getGlobalField("package", "loaded");
@@ -97,7 +97,7 @@ bool Module::load()
 
         if (m_sandboxed)
             g_lua.resetGlobalEnvironment();
-        g_logger.error(stdext::format("Unable to load module '%s': %s", m_name, e.what()));
+        g_logger.error("Unable to load module '{}': {}", m_name, e.what());
 
         g_modules.m_currentModule = nullptr;
 
@@ -109,7 +109,7 @@ bool Module::load()
     for (const auto& modName : m_loadLaterModules) {
         const auto& dep = g_modules.getModule(modName);
         if (!dep)
-            g_logger.error(stdext::format("Unable to find module '%s' required by '%s'", modName, m_name));
+            g_logger.error("Unable to find module '{}' required by '{}'", modName, m_name);
         else if (!dep->isLoaded())
             dep->load();
     }
@@ -138,7 +138,7 @@ void Module::unload()
         } catch (const stdext::exception& e) {
             if (m_sandboxed)
                 g_lua.resetGlobalEnvironment();
-            g_logger.error(stdext::format("Unable to unload module '%s': %s", m_name, e.what()));
+            g_logger.error("Unable to unload module '{}': {}", m_name, e.what());
         }
 
         // clear all env references
@@ -153,7 +153,7 @@ void Module::unload()
         g_lua.pop();
 
         m_loaded = false;
-        //g_logger.info(stdext::format("Unloaded module '%s'", m_name));
+        //g_logger.info("Unloaded module '{}'", m_name);
         g_modules.updateModuleLoadOrder(asModule());
     }
 }

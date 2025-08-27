@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 #include "declarations.h"
 #include "gameconfig.h"
 #include <framework/graphics/declarations.h>
+#include <framework/util/spinlock.h>
 
 constexpr uint8_t MMBLOCK_SIZE = 64;
 constexpr uint8_t OTMM_VERSION = 1;
@@ -107,7 +108,7 @@ private:
     bool hasBlock(const Position& pos) { return m_tileBlocks[pos.z].contains(getBlockIndex(pos)); }
     MinimapBlock& getBlock(const Position& pos)
     {
-        std::scoped_lock lock(m_lock);
+        SpinLock::Guard lock(m_lock);
         auto& ptr = m_tileBlocks[pos.z][getBlockIndex(pos)];
         if (!ptr)
             ptr = std::make_shared<MinimapBlock>();
@@ -129,7 +130,7 @@ private:
     }
     uint32_t getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }
     std::vector<std::unordered_map<uint32_t, MinimapBlock_ptr>> m_tileBlocks;
-    std::mutex m_lock;
+    SpinLock m_lock;
 };
 
 extern Minimap g_minimap;

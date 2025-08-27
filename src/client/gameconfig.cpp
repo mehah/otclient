@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ void GameConfig::init()
             }
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to read config otml '%s': %s'", fileName, e.what()));
+        g_logger.error("Failed to read config otml '{}': {}'", fileName, e.what());
     }
 }
 
@@ -154,9 +154,7 @@ void GameConfig::loadPlayerNode(const OTMLNodePtr& mainNode) {
 
 void GameConfig::loadRenderNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
-        if (node->tag() == "draw-covered-things")
-            m_drawCoveredThings = node->value<bool>();
-        else if (node->tag() == "invisible-ticks-per-frame")
+        if (node->tag() == "invisible-ticks-per-frame")
             m_invisibleTicksPerFrame = node->value<int>();
         else if (node->tag() == "item-ticks-per-frame")
             m_itemTicksPerFrame = node->value<int>();

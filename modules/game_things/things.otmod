@@ -4,5 +4,5 @@ Module
   reloadable: false
   sandboxed: true
   scripts: [things]
-  @onLoad: init()
-  @onUnload: terminate()
+  @onLoad: ThingsLoaderController:init()
+  @onUnload: ThingsLoaderController:terminate()

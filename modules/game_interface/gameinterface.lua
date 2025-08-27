@@ -1032,6 +1032,7 @@ function moveStackableItem(item, toPos)
     local count = item:getCount()
 
     countWindow = g_ui.createWidget('CountWindow', rootWidget)
+    countWindow.hotkeyBlock = modules.game_hotkeys.createHotkeyBlock("stackable_item_dialog")
     local itembox = countWindow:getChildById('item')
     local scrollbar = countWindow:getChildById('countScrollBar')
     itembox:setItemId(item:getId())
@@ -1097,13 +1098,11 @@ function moveStackableItem(item, toPos)
         g_game.move(item, toPos, itembox:getItemCount())
         okButton:getParent():destroy()
         countWindow = nil
-        modules.game_hotkeys.enableHotkeys(true)
     end
     local cancelButton = countWindow:getChildById('buttonCancel')
     local cancelFunc = function()
         cancelButton:getParent():destroy()
         countWindow = nil
-        modules.game_hotkeys.enableHotkeys(true)
     end
 
     countWindow.onEnter = moveFunc
@@ -1111,8 +1110,6 @@ function moveStackableItem(item, toPos)
 
     okButton.onClick = moveFunc
     cancelButton.onClick = cancelFunc
-
-    modules.game_hotkeys.enableHotkeys(false)
 end
 
 function onSelectPanel(self, checked)
@@ -1391,10 +1388,7 @@ end
 
 function testExtendedView(mode)
     local extendedView = mode == 2
-    modules.game_console.setExtendedView(extendedView)
     if extendedView then
-        local topMenuHeight = modules.client_topmenu.getTopMenu():getHeight()
-
         local buttons = {leftIncreaseSidePanels, rightIncreaseSidePanels, rightDecreaseSidePanels,
                          leftDecreaseSidePanels}
         for _, button in ipairs(buttons) do
@@ -1458,12 +1452,12 @@ function testExtendedView(mode)
             end
         end
     end
-    -- create icons or destroy , depending on the view
-    modules.game_minimap.extendedView(extendedView)
-    modules.game_healthinfo.extendedView(extendedView)
-    modules.game_inventory.extendedView(extendedView)
-    scheduleEvent(function()
+    addEvent(function()
+        modules.game_console.setExtendedView(extendedView)
+        modules.game_minimap.extendedView(extendedView)
+        modules.game_healthinfo.extendedView(extendedView)
+        modules.game_inventory.extendedView(extendedView)
         modules.client_topmenu.extendedView(extendedView)
         modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
-    end, 100)
+    end)
 end

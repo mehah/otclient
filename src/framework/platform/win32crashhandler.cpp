@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -122,9 +122,9 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
         pSym->MaxNameLength = 254;
 
         if (SymGetSymFromAddr(process, sf.AddrPC.Offset, &Disp, pSym))
-            ss << stdext::format("    %d: %s(%s+%#0lx) [0x%016lX]\n", count, modname, pSym->Name, Disp, sf.AddrPC.Offset);
+            ss << fmt::format("    {}: {}({}+%#0lx) [0x%016lX]\n", count, modname, pSym->Name, Disp, sf.AddrPC.Offset);
         else
-            ss << stdext::format("    %d: %s [0x%016lX]\n", count, modname, sf.AddrPC.Offset);
+            ss << fmt::format("    {}: {} [0x%016lX]\n", count, modname, sf.AddrPC.Offset);
         ++count;
     }
     GlobalFree(pSym);
@@ -132,50 +132,65 @@ void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
 
 LONG CALLBACK ExceptionHandler(const LPEXCEPTION_POINTERS e)
 {
-    // generate crash report
     SymInitialize(GetCurrentProcess(), nullptr, TRUE);
-    std::stringstream ss;
-    ss << "== application crashed\n";
-    ss << stdext::format("app name: %s\n", g_app.getName());
-    ss << stdext::format("app version: %s\n", g_app.getVersion());
-    ss << stdext::format("build compiler: %s - %s\n", g_app.getBuildCompiler(), g_app.getBuildArch());
-    ss << stdext::format("build date: %s\n", g_app.getBuildDate());
-    ss << stdext::format("build type: %s\n", g_app.getBuildType());
-    ss << stdext::format("build revision: %s (%s)\n", g_app.getBuildRevision(), g_app.getBuildCommit());
-    ss << stdext::format("crash date: %s\n", stdext::date_time_string());
-    ss << stdext::format("exception: %s (0x%08lx)\n", getExceptionName(e->ExceptionRecord->ExceptionCode), e->ExceptionRecord->ExceptionCode);
-    ss << stdext::format("exception address: 0x%08lx\n", (size_t)e->ExceptionRecord->ExceptionAddress);
-    ss << stdext::format("  backtrace:\n");
-    Stacktrace(e, ss);
-    ss << "\n";
+
+    std::string crashReport = fmt::format(
+        "== application crashed\n"
+        "app name: {}\n"
+        "app version: {}\n"
+        "build compiler: {} - {}\n"
+        "build date: {}\n"
+        "build type: {}\n"
+        "build revision: {} ({})\n"
+        "crash date: {}\n"
+        "exception: {} (0x{:08X})\n"
+        "exception address: 0x{:08X}\n"
+        "  backtrace:\n",
+        g_app.getName(),
+        g_app.getVersion(),
+        g_app.getBuildCompiler(), g_app.getBuildArch(),
+        g_app.getBuildDate(),
+        g_app.getBuildType(),
+        g_app.getBuildRevision(), g_app.getBuildCommit(),
+        stdext::date_time_string(),
+        getExceptionName(e->ExceptionRecord->ExceptionCode), e->ExceptionRecord->ExceptionCode,
+        reinterpret_cast<std::uintptr_t>(e->ExceptionRecord->ExceptionAddress)
+    );
+
+    std::stringstream oss;
+    oss << crashReport;
+    Stacktrace(e, oss);
+    oss << "\n";
+
     SymCleanup(GetCurrentProcess());
 
-    // print in stdout
-    g_logger.info(ss.str());
+    g_logger.info(oss.str());
 
-    // write stacktrace to crashreport.log
     char dir[MAX_PATH];
-    GetCurrentDirectory(sizeof(dir) - 1, dir);
-    const std::string fileName = stdext::format("%s\\crashreport.log", dir);
-    std::ofstream fout(fileName.data(), std::ios::out | std::ios::app);
-    if (fout.is_open() && fout.good()) {
-        fout << ss.str();
+    DWORD len = GetCurrentDirectory(sizeof(dir), dir);
+    if (len == 0 || len >= sizeof(dir)) {
+        g_logger.error("Failed to get current directory for crash report");
+        return EXCEPTION_CONTINUE_SEARCH;
+    }
+
+    std::string fileName = fmt::format("{}\\crashreport.log", dir);
+
+    std::ofstream fout(fileName, std::ios::out | std::ios::app);
+    if (fout.is_open()) {
+        fout << oss.str();
         fout.close();
-        g_logger.info(stdext::format("Crash report saved to file %s", fileName));
-    } else
-        g_logger.error("Failed to save crash report!");
+        g_logger.info("Crash report saved to file {}", fileName);
+    } else {
+        g_logger.error("Failed to save crash report to {}", fileName);
+    }
 
-    // inform the user
-    const std::string msg = stdext::format(
+    std::string msg = fmt::format(
         "The application has crashed.\n\n"
-        "A crash report has been written to:\n"
-        "%s", fileName.data());
-    MessageBox(nullptr, msg.data(), "Application crashed", 0);
+        "A crash report has been written to:\n{}",
+        fileName
+    );
+    MessageBoxA(nullptr, msg.c_str(), "Application crashed", MB_OK | MB_ICONERROR);
 
-    // this seems to silently close the application
-    //return EXCEPTION_EXECUTE_HANDLER;
-
-    // this triggers the microsoft "application has crashed" error dialog
     return EXCEPTION_CONTINUE_SEARCH;
 }
 

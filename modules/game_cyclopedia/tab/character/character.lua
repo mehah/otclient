@@ -1479,7 +1479,6 @@ local  function getWeaponSkillName(skillType)
             end
             
             local sign = percentValue >= 0 and "+" or ""
-            print(percentValue)
             table.insert(stats, {
                 name = "     " .. elementInfo.id,
                 parent = "right", 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -532,7 +532,6 @@ struct CyclopediaCharacterDefenceStats
     std::vector<ElementalResistance> resistances;
 };
 
-// In a header file (e.g., src/client/luavaluecasts_client.h)
 struct CyclopediaCharacterMiscStats
 {
     double momentumTotal;
@@ -561,7 +560,27 @@ struct CyclopediaCharacterMiscStats
     std::vector<Concoction> concoctions;
 };
 
-int push_luavalue(const CyclopediaCharacterMiscStats& data);
+struct ForgeItemInfo
+{
+    uint16_t id{ 0 };
+    uint8_t tier{ 0 };
+    uint16_t count{ 0 };
+};
+
+struct ForgeTransferData
+{
+    std::vector<ForgeItemInfo> donors;
+    std::vector<ForgeItemInfo> receivers;
+};
+
+struct ForgeOpenData
+{
+    std::vector<ForgeItemInfo> fusionItems;
+    std::vector<std::vector<ForgeItemInfo>> convergenceFusion;
+    std::vector<ForgeTransferData> transfers;
+    std::vector<ForgeTransferData> convergenceTransfers;
+    uint16_t dustLevel{ 0 };
+};
 
 //@bindsingleton g_game
 class Game
@@ -1001,7 +1020,7 @@ private:
     uint16_t m_mapUpdatedAt{ 0 };
     std::pair<uint16_t, Timer> m_mapUpdateTimer = { true, Timer{} };
 
-    uint8_t m_walkMaxSteps = { 1 };
+    uint8_t m_walkMaxSteps{ 1 };
     uint8_t m_openPvpSituations{ 0 };
     uint16_t m_serverBeat{ 50 };
     uint16_t m_pingDelay{ 1000 };

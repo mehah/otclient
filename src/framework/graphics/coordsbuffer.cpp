@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -65,13 +65,4 @@ void CoordsBuffer::addRepeatedRects(const Rect& dest, const Rect& src)
             m_textureCoordArray.addRect(partialSrc);
         }
     }
-}
-
-void CoordsBuffer::cache()
-{
-    if (!m_canCache)
-        return;
-
-    m_vertexArray.cache();
-    m_textureCoordArray.cache();
 }

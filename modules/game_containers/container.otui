@@ -60,9 +60,21 @@ ContainerWindow < MiniWindow
       anchors.right: parent.right
 
   MiniWindowContents
-    padding-left: 5
+    padding-left: 6
+    padding-top: 6
+    padding-right: 6
+    padding-bottom: 6
     layout:
       type: grid
       cell-size: 34 34
       cell-spacing: 3
       flow: true
+
+  UIWidget
+    id: miniborder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 4
+    margin-bottom: 4

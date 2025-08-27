@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -267,8 +267,18 @@ public:
     void setCentralPosition(const Position& centralPosition);
 
     bool isLookPossible(const Position& pos);
-    bool isCovered(const Position& pos, uint8_t firstFloor = 0);
-    bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0);
+    bool isCovered(const Position& pos, uint8_t firstFloor = 0) {
+        bool isLoading = false;
+        return isCovered(pos, isLoading, firstFloor);
+    }
+
+    bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0) {
+        bool isLoading = false;
+        return isCompletelyCovered(pos, isLoading, firstFloor);
+    }
+
+    bool isCovered(const Position& pos, bool& isLoading, uint8_t firstFloor = 0);
+    bool isCompletelyCovered(const Position& pos, bool& isLoading, uint8_t firstFloor = 0);
     bool isAwareOfPosition(const Position& pos) const { return isAwareOfPosition(pos, m_awareRange); }
     bool isAwareOfPosition(const Position& pos, const AwareRange& awareRange) const;
 

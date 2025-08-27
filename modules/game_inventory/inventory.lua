@@ -4,6 +4,7 @@ local inventoryShrink = false
 local itemSlotsWithDuration = {}
 local updateSlotsDurationEvent = nil
 local DURATION_UPDATE_INTERVAL = 1000
+local pvpModeRadioGroup = nil 
 
 local function getInventoryUi()
     if inventoryShrink then
@@ -366,6 +367,13 @@ function inventoryController:onTerminate()
         iconTopMenu:destroy()
         iconTopMenu = nil
     end
+    if pvpModeRadioGroup then
+        disconnect(pvpModeRadioGroup, {
+            onSelectionChange = onSetPVPMode
+        })
+        pvpModeRadioGroup:destroy()
+        pvpModeRadioGroup = nil
+    end
 end
 
 function onSetSafeFight(self, checked)
@@ -507,7 +515,7 @@ function extendedView(extendedView)
         if not mainRightPanel:hasChild(inventoryController.ui) then
             mainRightPanel:insertChild(3, inventoryController.ui)
         end
-        inventoryController.ui:show(true)
+        inventoryController.ui:show()
     end
     inventoryController.ui.moveOnlyToMain = not extendedView
 

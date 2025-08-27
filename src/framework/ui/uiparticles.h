@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,11 @@ class UIParticles final : public UIWidget
 public:
     void drawSelf(DrawPoolType drawPane) override;
 
-    void addEffect(std::string_view name);
+    void addEffect(std::string_view name); // add an effect by name, acumulating the effects
+
+    void setEffect(const std::string_view name); // set the effect by name, if the effect is not added, it will be added
+
+    void clearEffects(); // clear all effects
 
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 

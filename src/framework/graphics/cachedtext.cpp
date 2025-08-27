@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
 #include "cachedtext.h"
 #include "fontmanager.h"
 #include <framework/graphics/drawpoolmanager.h>
+#include <framework/graphics/textureatlas.h>
 
 CachedText::CachedText() : m_align(Fw::AlignCenter), m_coordsBuffer(std::make_shared<CoordsBuffer>()) {}
 
@@ -30,6 +31,12 @@ void CachedText::draw(const Rect& rect, const Color& color)
 {
     if (!m_font)
         return;
+
+    // Hack to fix font rendering in atlas
+    if (m_font->getAtlasRegion() != m_atlasRegion) {
+        m_atlasRegion = m_font->getAtlasRegion();
+        m_textScreenCoords = {};
+    }
 
     if (m_textScreenCoords != rect) {
         m_textScreenCoords = rect;
@@ -42,7 +49,7 @@ void CachedText::draw(const Rect& rect, const Color& color)
 void CachedText::update()
 {
     if (m_font) {
-        m_glyphsPositions = m_font->calculateGlyphsPositions(m_text, m_align, &m_textSize);
+        m_font->calculateGlyphsPositions(m_text, m_align, m_glyphsPositions, &m_textSize);
     }
 
     m_textScreenCoords = {};

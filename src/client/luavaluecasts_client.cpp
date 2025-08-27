@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -813,7 +813,7 @@ int push_luavalue(const BestiaryMonsterData& data) {
 }
 
 int push_luavalue(const CharmData& charm) {
-    g_lua.createTable(0, 7);
+    g_lua.createTable(0, 10);
     g_lua.pushInteger(charm.id);
     g_lua.setField("id");
     g_lua.pushString(charm.name);
@@ -830,6 +830,13 @@ int push_luavalue(const CharmData& charm) {
     g_lua.setField("raceId");
     g_lua.pushInteger(charm.removeRuneCost);
     g_lua.setField("removeRuneCost");
+    //if (g_game.getClientVersion() >= 1410) {
+        g_lua.pushInteger(charm.availableCharmSlots);
+        g_lua.setField("availableCharmSlots");
+        g_lua.pushInteger(charm.tier);
+        g_lua.setField("tier");
+   // }
+
     return 1;
 }
 
@@ -1521,5 +1528,74 @@ int push_luavalue(const CyclopediaCharacterMiscStats& data)
     }
     g_lua.setField("concoctions");
 
+    return 1;
+}
+
+int push_luavalue(const ForgeItemInfo& item) {
+    g_lua.createTable(0, 3);
+    g_lua.pushInteger(item.id);
+    g_lua.setField("id");
+    g_lua.pushInteger(item.tier);
+    g_lua.setField("tier");
+    g_lua.pushInteger(item.count);
+    g_lua.setField("count");
+    return 1;
+}
+
+int push_luavalue(const ForgeTransferData& data) {
+    g_lua.createTable(0, 2);
+    g_lua.createTable(data.donors.size(), 0);
+    for (size_t i = 0; i < data.donors.size(); ++i) {
+        push_luavalue(data.donors[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("donors");
+
+    g_lua.createTable(data.receivers.size(), 0);
+    for (size_t i = 0; i < data.receivers.size(); ++i) {
+        push_luavalue(data.receivers[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("receivers");
+    return 1;
+}
+
+int push_luavalue(const ForgeOpenData& data) {
+    g_lua.createTable(0, 5);
+
+    g_lua.createTable(data.fusionItems.size(), 0);
+    for (size_t i = 0; i < data.fusionItems.size(); ++i) {
+        push_luavalue(data.fusionItems[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("fusionItems");
+
+    g_lua.createTable(data.convergenceFusion.size(), 0);
+    for (size_t i = 0; i < data.convergenceFusion.size(); ++i) {
+        g_lua.createTable(data.convergenceFusion[i].size(), 0);
+        for (size_t j = 0; j < data.convergenceFusion[i].size(); ++j) {
+            push_luavalue(data.convergenceFusion[i][j]);
+            g_lua.rawSeti(j + 1);
+        }
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("convergenceFusion");
+
+    g_lua.createTable(data.transfers.size(), 0);
+    for (size_t i = 0; i < data.transfers.size(); ++i) {
+        push_luavalue(data.transfers[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("transfers");
+
+    g_lua.createTable(data.convergenceTransfers.size(), 0);
+    for (size_t i = 0; i < data.convergenceTransfers.size(); ++i) {
+        push_luavalue(data.convergenceTransfers[i]);
+        g_lua.rawSeti(i + 1);
+    }
+    g_lua.setField("convergenceTransfers");
+
+    g_lua.pushInteger(data.dustLevel);
+    g_lua.setField("dustLevel");
     return 1;
 }

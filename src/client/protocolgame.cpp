@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -51,9 +51,6 @@ void ProtocolGame::onConnect()
     Protocol::onConnect();
 
     m_localPlayer = g_game.getLocalPlayer();
-    if (g_game.getFeature(Otc::GameHeader1400))
-        enabelHeader1400();
-
     if (g_game.getFeature(Otc::GameProtocolChecksum))
         enableChecksum();
 
@@ -68,7 +65,7 @@ void ProtocolGame::onRecv(const InputMessagePtr& inputMessage)
     if (m_firstRecv) {
         m_firstRecv = false;
 
-        if (g_game.getFeature(Otc::GameHeader1400)) {
+        if (g_game.getClientVersion() >= 1405) {
             const int padding = inputMessage->getU8();
         } else if (g_game.getFeature(Otc::GameMessageSizeCheck)) {
             const int size = inputMessage->getU16();

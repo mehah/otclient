@@ -34,8 +34,8 @@ function bonusDescription(bonusType, bonusValue, bonusGrade)
         return 'XP bonus (' .. bonusGrade .. '/10)'
     elseif bonusType == PREY_BONUS_IMPROVED_LOOT then
         return 'Loot bonus (' .. bonusGrade .. '/10)'
-    elseif bonusType == PREY_BONUS_DAMAGE_BOOST then
-        return '-'
+    else
+        return 'Unknown bonus'
     end
     return 'Unknown bonus'
 end

@@ -15,8 +15,6 @@ manaCircle = nil
 expCircle = nil
 skillCircle = nil
 
-g_ui.loadUI('game_healthcircle')
-
 healthCircleFront = nil
 manaCircleFront = nil
 expCircleFront = nil
@@ -58,6 +56,7 @@ monkCircleOffsetLeft = g_settings.getNumber('healthcircle_monkcircle_offset_left
 monkCircleOffsetRight = g_settings.getNumber('healthcircle_monkcircle_offset_right', -65)
 
 function init()
+    g_ui.importStyle("game_healthcircle.otui")
     healthCircle = g_ui.createWidget('HealthCircle', mapPanel)
     healthCircleExtra = g_ui.createWidget('HealthCircleExtra', mapPanel)
     manaCircle = g_ui.createWidget('ManaCircle', mapPanel)

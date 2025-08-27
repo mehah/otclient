@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,6 @@
 #include <charconv>
 
 #include "exception.h"
-#include "format.h"
 #include "types.h"
 
 #ifdef _MSC_VER
@@ -191,12 +190,23 @@ namespace stdext
 
     [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators) {
         std::vector<std::string> result;
-        auto split_view = std::views::split(str, separators);
-        result.reserve(std::distance(split_view.begin(), split_view.end()));
-        for (auto&& part : split_view) {
-            std::string_view sv(&*part.begin(), std::ranges::distance(part));
-            result.emplace_back(sv);
+
+        const char* begin = str.data();
+        const char* end = begin + str.size();
+        const char* p = begin;
+
+        while (p < end) {
+            const char* token_start = p;
+            while (p < end && separators.find(*p) == std::string_view::npos)
+                ++p;
+
+            if (p > token_start)
+                result.emplace_back(token_start, p - token_start);
+
+            while (p < end && separators.find(*p) != std::string_view::npos)
+                ++p;
         }
+
         return result;
     }
 }

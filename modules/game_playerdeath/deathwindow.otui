@@ -1,4 +1,4 @@
-DeathWindow < MainWindow
+MainWindow
   id: deathWindow
   !text: tr('You are dead')
   &baseWidth: 350

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -73,13 +73,13 @@ OTMLNodePtr OTMLNode::at(const std::string_view childTag)
         }
     }
 
-    throw OTMLException(asOTMLNode(), stdext::format("child node with tag '%s' not found", childTag));
+    throw OTMLException(asOTMLNode(), fmt::format("child node with tag '{}' not found", childTag));
 }
 
 OTMLNodePtr OTMLNode::atIndex(const int childIndex)
 {
     if (childIndex >= size() || childIndex < 0)
-        throw OTMLException(asOTMLNode(), stdext::format("child node with index '%d' not found", childIndex));
+        throw OTMLException(asOTMLNode(), fmt::format("child node with index '{}' not found", childIndex));
     return m_children[childIndex];
 }
 

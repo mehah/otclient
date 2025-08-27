@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -79,7 +79,7 @@ bool Shader::compileSourceFile(const std::string_view sourceFile) const
         const auto& sourceCode = g_resources.readFileContents(sourceFile.data());
         return compileSourceCode(sourceCode);
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("unable to load shader source form file '%s': %s", sourceFile, e.what()));
+        g_logger.error("unable to load shader source form file '{}': {}", sourceFile, e.what());
     }
     return false;
 }

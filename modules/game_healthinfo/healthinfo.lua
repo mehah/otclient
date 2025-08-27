@@ -54,7 +54,7 @@ function extendedView(extendedView)
         if not mainRightPanel:hasChild(healthManaController.ui) then
             mainRightPanel:insertChild(2, healthManaController.ui)
         end
-        healthManaController.ui:show(true)
+        healthManaController.ui:show()
     end
     healthManaController.ui.moveOnlyToMain = not extendedView
 end
