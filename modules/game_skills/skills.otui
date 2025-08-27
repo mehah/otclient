@@ -87,12 +87,33 @@ XpBoostButton < UIWidget
 
 MiniWindow
   id: skillWindow
-  !text: tr('Skills')
   height: 150
-  icon: /images/topbuttons/skills
   @onOpen: modules.game_skills.onMiniWindowOpen()
   @onClose: modules.game_skills.onMiniWindowClose()
   &save: true
+
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    image-source: /images/topbuttons/skills
+    image-rect: 0 0 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('Skills')
+    color: #9d9d9dff
 
   MiniWindowContents
     padding-left: 5
@@ -267,6 +288,7 @@ MiniWindow
       SkillPercentPanel
         
     HorizontalSeparator
+      id: separadorOnOffenceInfoChange
       margin-top: 5
       margin-bottom: 5
 
@@ -330,7 +352,7 @@ MiniWindow
         !text: tr('Transcendence')
       SkillValueLabel
 
-// 14.12
+    // 14.12
     SmallSkillButton
       id: damageHealing
       visible: false
@@ -398,6 +420,7 @@ MiniWindow
       SkillNameLabel
         !text: tr('Onslaught')
       SkillValueLabel
+      
     HorizontalSeparator
       id: separadorOnDefenseInfoChange
       margin-top: 5      
@@ -478,7 +501,6 @@ MiniWindow
         margin-right: 12
       ImageAbsorb
         image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-healing-resist
-    
     SmallSkillButton
       id: drowResist
       visible: false
@@ -506,11 +528,6 @@ MiniWindow
         margin-right: 12
       ImageAbsorb
         image-source: /game_cyclopedia/images/bestiary/icons/monster-icon-manadrain-resist
-
-
-
-
-
     SmallSkillButton
       id: defenceValue
       visible: false
@@ -568,6 +585,11 @@ MiniWindow
       SkillNameLabel
         !text: tr('Amplification')
       SkillValueLabel  
+  
+    HorizontalSeparator
+      id: HorizontalSeparator
+      margin-top: 5
+      margin-bottom: 15
 
   UIWidget
     id: miniborder
@@ -577,3 +599,113 @@ MiniWindow
     size: 14 14
     margin-left: 2
     margin-bottom: 2
+
+SkillsSubMenuOption < ThickCheckBox
+  text-offset: 18 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+SkillsListOption < UIButton
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+  margin-left: 5
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+SkillsListSubMenu < PopupMenu
+  id: skillsListSubMenu
+  width: 285
+
+  SkillsListOption
+    id: resetExperienceCounter
+    !text: tr('Reset Experience Counter')
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  SkillsSubMenuOption
+    id: showLevel
+    !text: tr('Level')
+
+  SkillsSubMenuOption
+    id: showStamina
+    !text: tr('Stamina')
+
+  SkillsSubMenuOption
+    id: showOfflineTraining
+    !text: tr('Offline Training')
+
+  SkillsSubMenuOption
+    id: showMagic
+    !text: tr('Magic')
+
+  SkillsSubMenuOption
+    id: showFist
+    !text: tr('Fist')
+
+  SkillsSubMenuOption
+    id: showClub
+    !text: tr('Club')
+
+  SkillsSubMenuOption
+    id: showSword
+    !text: tr('Sword')
+
+  SkillsSubMenuOption
+    id: showAxe
+    !text: tr('Axe')
+
+  SkillsSubMenuOption
+    id: showDistance
+    !text: tr('Distance')
+  
+  SkillsSubMenuOption
+    id: showShielding
+    !text: tr('Shielding')
+
+  SkillsSubMenuOption
+    id: showFishing
+    !text: tr('Fishing')
+
+  HorizontalSeparator
+    id: HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  SkillsSubMenuOption
+    id: showOffenceStats
+    !text: tr('Offence Stats')
+
+  SkillsSubMenuOption
+    id: showDefenceStats
+    !text: tr('Defence Stats')
+
+  SkillsSubMenuOption
+    id: showMiscStats
+    !text: tr('Misc. Stats')
+  
+  HorizontalSeparator
+    id: HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+  
+  SkillsSubMenuOption
+    id: showAllSkillBars
+    !text: tr('Show all Skill Bars')

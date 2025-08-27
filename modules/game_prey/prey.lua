@@ -73,9 +73,52 @@ function init()
     preyWindow:hide()
     preyTracker = g_ui.createWidget('PreyTracker', modules.game_interface.getRightPanel())
     preyTracker:setup()
-    preyTracker:setContentMaximumHeight(100)
-    preyTracker:setContentMinimumHeight(47)
+    preyTracker:setContentMaximumHeight(110)
+    preyTracker:setContentMinimumHeight(70)
     preyTracker:hide()
+    
+    -- Hide buttons similar to unjustifiedpoints implementation
+    local toggleFilterButton = preyTracker:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+    end
+    
+    local contextMenuButton = preyTracker:recursiveGetChildById('contextMenuButton')
+    if contextMenuButton then
+        contextMenuButton:setVisible(false)
+    end
+    
+    local newWindowButton = preyTracker:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton:setVisible(false)
+    end
+    
+    -- Set up the miniwindow title and icon
+    local titleWidget = preyTracker:getChildById('miniwindowTitle')
+    if titleWidget then
+        titleWidget:setText('Prey')
+    else
+        -- Fallback to old method if miniwindowTitle doesn't exist
+        preyTracker:setText('Prey')
+    end
+    
+    local iconWidget = preyTracker:getChildById('miniwindowIcon')
+    if iconWidget then
+        iconWidget:setImageSource('/images/game/prey/icon-prey-widget')
+    end
+    
+    -- Position lockButton where toggleFilterButton was (to the left of minimize button)
+    local lockButton = preyTracker:recursiveGetChildById('lockButton')
+    local minimizeButton = preyTracker:recursiveGetChildById('minimizeButton')
+    
+    if lockButton and minimizeButton then
+        lockButton:breakAnchors()
+        lockButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        lockButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        lockButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+        lockButton:setMarginTop(0)
+    end
+    
     if g_game.isOnline() then
         check()
     end
@@ -217,6 +260,14 @@ function toggle()
     show()
 end
 
+function onMiniWindowOpen()
+    -- Called when the MiniWindow is opened
+end
+
+function onMiniWindowClose()
+    -- Called when the MiniWindow is closed
+end
+
 function onPreyFreeRerolls(slot, timeleft)
     local prey = preyWindow['slot' .. (slot + 1)]
     local percent = (timeleft / (20 * 60)) * 100
@@ -309,7 +360,7 @@ function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
     local tracker = preyTracker.contentsPanel[slot]
     if tracker then
         tracker:hide()
-        preyTracker:setContentMaximumHeight(preyTracker:getHeight() - 20)
+        preyTracker:setContentMaximumHeight(preyTracker:getHeight())
     end
     -- main window
     local prey = preyWindow[slot]

@@ -49,6 +49,41 @@ function controllerVip:onInit()
     end
     refresh()
     vipWindow:setup()
+
+    -- Hide toggleFilterButton and adjust contextMenuButton anchors
+    local toggleFilterButton = vipWindow:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+        toggleFilterButton:setOn(false)
+    end
+    
+    local contextMenuButton = vipWindow:recursiveGetChildById('contextMenuButton')
+    local minimizeButton = vipWindow:recursiveGetChildById('minimizeButton')
+    if contextMenuButton and minimizeButton then
+        contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        contextMenuButton:setMarginRight(7)
+        
+        -- Add onClick handler for context menu
+        contextMenuButton.onClick = function(widget, mousePos, mouseButton)
+            return onVipListMousePress(widget, mousePos or widget:getPosition(), MouseRightButton)
+        end
+    end
+    
+    -- Adjust lockButton anchors to be at the left of contextMenuButton
+    local lockButton = vipWindow:recursiveGetChildById('lockButton')
+    if lockButton and contextMenuButton then
+        lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+        lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+        lockButton:setMarginRight(2)
+    end
+    
+    -- Hide newWindowButton
+    local newWindowButton = vipWindow:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton:setVisible(false)
+    end
+
     if g_game.isOnline() then
         vipWindow:setupOnStart()
     end
@@ -173,8 +208,45 @@ function onMiniWindowClose()
 end
 
 function createAddWindow()
-    if not addVipWindow then
-        addVipWindow = g_ui.displayUI('addvip')
+    if addVipWindow then
+        addVipWindow:destroy()
+        addVipWindow = nil
+    end
+    
+    addVipWindow = g_ui.displayUI('addvip')
+    addVipWindow:show()
+    
+    local nameInput = addVipWindow:getChildById('name')
+    nameInput:setText('')
+    nameInput:focus()
+    
+    local function closeWindow()
+        nameInput:setText('')
+        addVipWindow:setVisible(false)
+        addVipWindow:destroy()
+        addVipWindow = nil
+    end
+    
+    addVipWindow.buttonOk.onClick = function()
+        local playerName = nameInput:getText()
+        if playerName and playerName ~= '' then
+            g_game.addVip(playerName)
+        end
+        closeWindow()
+    end
+    
+    addVipWindow.closeButton.onClick = closeWindow
+    addVipWindow.onEscape = closeWindow
+    
+    nameInput.onKeyDown = function(widget, keyCode, keyboardModifiers)
+        if keyCode == KeyReturn or keyCode == KeyEnter then
+            addVipWindow.buttonOk.onClick()
+            return true
+        elseif keyCode == KeyEscape then
+            closeWindow()
+            return true
+        end
+        return false
     end
 end
 
@@ -289,14 +361,23 @@ end
 
 function destroyAddWindow()
     if addVipWindow then
+        addVipWindow:setVisible(false)
         addVipWindow:destroy()
         addVipWindow = nil
     end
 end
 
 function addVip()
-    g_game.addVip(addVipWindow:getChildById('name'):getText())
-    destroyAddWindow()
+    -- This function is now handled by the FloatingInputWindow's button events
+    -- The actual VIP addition is done in createAddWindow's buttonOk.onClick
+    if addVipWindow then
+        local nameInput = addVipWindow:getChildById('name')
+        local playerName = nameInput:getText()
+        if playerName and playerName ~= '' then
+            g_game.addVip(playerName)
+            destroyAddWindow()
+        end
+    end
 end
 
 function removeVip(widgetOrName)
@@ -579,17 +660,8 @@ function onVipListMousePress(widget, mousePos, mouseButton)
     end)
 
     menu:addSeparator()
-    if not globalSettings.hideOfflineVips then
-        menu:addOption(tr('Hide Offline'), function()
-            hideOffline(true)
-        end)
-    else
-        menu:addOption(tr('Show Offline'), function()
-            hideOffline(false)
-        end)
-    end
 
-    if g_game.getFeature(GameVipGroups) then
+        if g_game.getFeature(GameVipGroups) then
         menu:addOption(tr('Add new group'), function()
             createAddGroupWindow()
         end)
@@ -602,17 +674,28 @@ function onVipListMousePress(widget, mousePos, mouseButton)
         end)
     end
 
+    if not (getSortedBy() == 'type') then
+        menu:addOption(tr('Sort by type'), function()
+            sortBy('type')
+        end)
+    end
+
     if not (getSortedBy() == 'status') then
         menu:addOption(tr('Sort by status'), function()
             sortBy('status')
         end)
     end
 
-    if not (getSortedBy() == 'type') then
-        menu:addOption(tr('Sort by type'), function()
-            sortBy('type')
+    if not globalSettings.hideOfflineVips then
+        menu:addOption(tr('Hide offline VIPs'), function()
+            hideOffline(true)
+        end)
+    else
+        menu:addOption(tr('Show offline VIPs'), function()
+            hideOffline(false)
         end)
     end
+
     if g_game.getFeature(GameVipGroups) then
         if not globalSettings.showGrouped then
             menu:addOption(tr('Show groups'), function()
@@ -626,7 +709,31 @@ function onVipListMousePress(widget, mousePos, mouseButton)
             end)
         end
     end
-    menu:display(mousePos)
+    
+    -- Calculate proper menu position
+    local menuPos = {x = mousePos.x, y = mousePos.y}
+    local menuSize = menu:getSize()
+    local screenSize = g_window.getSize()
+    
+    -- Adjust horizontal position if menu would go off screen
+    if menuPos.x + menuSize.width > screenSize.width then
+        menuPos.x = screenSize.width - menuSize.width
+    end
+    
+    -- Adjust vertical position if menu would go off screen
+    if menuPos.y + menuSize.height > screenSize.height then
+        menuPos.y = screenSize.height - menuSize.height
+    end
+    
+    -- Ensure menu doesn't go off the left or top edges
+    if menuPos.x < 0 then
+        menuPos.x = 0
+    end
+    if menuPos.y < 0 then
+        menuPos.y = 0
+    end
+    
+    menu:display(menuPos)
 
     return true
 end
@@ -693,11 +800,11 @@ function onVipListLabelMousePress(widget, mousePos, mouseButton)
 
     menu:addSeparator()
     if not globalSettings.hideOfflineVips then
-        menu:addOption(tr('Hide Offline'), function()
+        menu:addOption(tr('Hide offline VIPs'), function()
             hideOffline(true)
         end)
     else
-        menu:addOption(tr('Show Offline'), function()
+        menu:addOption(tr('Show offline VIPs'), function()
             hideOffline(false)
         end)
     end
@@ -733,7 +840,30 @@ function onVipListLabelMousePress(widget, mousePos, mouseButton)
         end)
     end
 
-    menu:display(mousePos)
+    -- Calculate proper menu position
+    local menuPos = {x = mousePos.x, y = mousePos.y}
+    local menuSize = menu:getSize()
+    local screenSize = g_window.getSize()
+    
+    -- Adjust horizontal position if menu would go off screen
+    if menuPos.x + menuSize.width > screenSize.width then
+        menuPos.x = screenSize.width - menuSize.width
+    end
+    
+    -- Adjust vertical position if menu would go off screen
+    if menuPos.y + menuSize.height > screenSize.height then
+        menuPos.y = screenSize.height - menuSize.height
+    end
+    
+    -- Ensure menu doesn't go off the left or top edges
+    if menuPos.x < 0 then
+        menuPos.x = 0
+    end
+    if menuPos.y < 0 then
+        menuPos.y = 0
+    end
+
+    menu:display(menuPos)
 
     return true
 end
@@ -752,29 +882,104 @@ function createAddGroupWindow()
             'You have already reached the maximum of groups you can create yourself.')
         return
     end
-    if not addGroupWindow then
-        addGroupWindow = g_ui.displayUI('addgroup')
-        addGroupWindow:setText(tr(addGroupWindow:getText(), maxVipGroups))
+    
+    if addGroupWindow then
+        addGroupWindow:destroy()
+        addGroupWindow = nil
+    end
+    
+    addGroupWindow = g_ui.displayUI('addgroup')
+    addGroupWindow:show()
+    
+    local nameInput = addGroupWindow:getChildById('name')
+    nameInput:setText('')
+    nameInput:focus()
+    
+    local function closeWindow()
+        destroyAddGroupWindow()
+    end
+    
+    -- The OK button click is handled by the OTUI @onClick event
+    -- Just set up the close button and escape handlers
+    addGroupWindow.closeButton.onClick = closeWindow
+    addGroupWindow.onEscape = closeWindow
+    
+    nameInput.onKeyDown = function(widget, keyCode, keyboardModifiers)
+        if keyCode == KeyReturn or keyCode == KeyEnter then
+            addGroup() -- Call the main addGroup function
+            return true
+        elseif keyCode == KeyEscape then
+            closeWindow()
+            return true
+        end
+        return false
     end
 end
 
 function createEditGroupWindow(groupName, groupId)
-    if not addGroupWindow then
-        addGroupWindow = g_ui.displayUI('addgroup')
-        addGroupWindow:setText('Edit VIP group')
-        addGroupWindow.header:setText('Please enter a group name:')
-        addGroupWindow.name:setText(groupName)
-        function addGroupWindow.onEnter()
-            editGroup(groupId)
+    if addGroupWindow then
+        addGroupWindow:destroy()
+        addGroupWindow = nil
+    end
+    
+    addGroupWindow = g_ui.displayUI('addgroup')
+    addGroupWindow:show()
+    
+    -- Update header text for edit mode
+    local headerLabel = addGroupWindow:getChildById('headerLabel')
+    if headerLabel then
+        headerLabel:setText(tr('Edit VIP Group'))
+    end
+    
+    local nameInput = addGroupWindow:getChildById('name')
+    nameInput:setText(groupName)
+    nameInput:focus()
+    nameInput:selectAll()
+    
+    local function closeWindow()
+        nameInput:setText('')
+        addGroupWindow:setVisible(false)
+        addGroupWindow:destroy()
+        addGroupWindow = nil
+    end
+    
+    addGroupWindow.buttonOk.onClick = function()
+        local newGroupName = nameInput:getText()
+        if newGroupName and newGroupName ~= '' then
+            g_game.editVipGroups(2, groupId, newGroupName)
         end
-        function addGroupWindow.okButton.onClick()
-            editGroup(groupId)
+        closeWindow()
+    end
+    
+    addGroupWindow.closeButton.onClick = closeWindow
+    addGroupWindow.onEscape = closeWindow
+    
+    nameInput.onKeyDown = function(widget, keyCode, keyboardModifiers)
+        if keyCode == KeyReturn or keyCode == KeyEnter then
+            addGroupWindow.buttonOk.onClick()
+            return true
+        elseif keyCode == KeyEscape then
+            closeWindow()
+            return true
         end
+        return false
     end
 end
 
 function addGroup()
-    g_game.editVipGroups(1, 0, addGroupWindow:getChildById('name'):getText())
+    -- This function is called from the OTUI @onClick event
+    -- Get the input from the current addGroupWindow
+    if addGroupWindow then
+        local nameInput = addGroupWindow:getChildById('name')
+        local groupName = nameInput:getText()
+        if groupName and groupName ~= '' then
+            g_game.editVipGroups(1, 0, groupName)
+            destroyAddGroupWindow()
+        end
+    end
+end
+
+function destroyAddGroupWindow()
     if addGroupWindow then
         addGroupWindow:destroy()
         addGroupWindow = nil

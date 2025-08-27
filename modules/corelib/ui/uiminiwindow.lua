@@ -41,6 +41,12 @@ function UIMiniWindow:minimize(dontSave)
     self.maximizedHeight = self:getHeight()
     self:setHeight(self.minimizedHeight)
 
+    -- Hide miniborder when minimizing
+    local miniborder = self:recursiveGetChildById('miniborder')
+    if miniborder then
+        miniborder:setVisible(false)
+    end
+
     if not dontSave then
         self:setSettings({
             minimized = true
@@ -57,6 +63,12 @@ function UIMiniWindow:maximize(dontSave)
     self:getChildById('bottomResizeBorder'):show()
     self:getChildById('minimizeButton'):setOn(false)
     self:setHeight(self:getSettings('height') or self.maximizedHeight)
+
+    -- Show miniborder when maximizing
+    local miniborder = self:recursiveGetChildById('miniborder')
+    if miniborder then
+        miniborder:setVisible(true)
+    end
 
     if not dontSave then
         self:setSettings({
@@ -85,11 +97,14 @@ function UIMiniWindow:setup()
         end
     end
 
-    self:getChildById('lockButton').onClick = function()
-        if self:isDraggable() then
-            self:lock()
-        else
-            self:unlock()
+    local lockButton = self:getChildById('lockButton')
+    if lockButton then
+        lockButton.onClick = function()
+            if self:isDraggable() then
+                self:lock()
+            else
+                self:unlock()
+            end
         end
     end
 
