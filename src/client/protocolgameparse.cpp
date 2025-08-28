@@ -3330,11 +3330,23 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
     const uint16_t size = msg->getU16();
     for (auto i = 0; i < size; ++i) {
         msg->getU16(); // id
-        msg->getU8(); // subtype
+        msg->getU8();   // subtype/tier
+        uint32_t count = 0;
         if (g_game.getClientVersion() >= 1500) {
-            msg->getU8(); // count
+            uint8_t firstByte = msg->getU8();
+            if (firstByte < 0x40) {
+                count = firstByte;
+            } else if (firstByte < 0x80) {
+                uint8_t secondByte = msg->getU8();
+                count = ((firstByte - 64) << 8) + secondByte;
+            } else {
+                uint8_t byte1 = msg->getU8();
+                uint8_t byte2 = msg->getU8();
+                uint8_t byte3 = msg->getU8();
+                count = (byte1 << 16) + (byte2 << 8) + byte3;
+            }
         } else {
-            msg->getU16(); // count
+            msg->getU16();
         }
     }
 }
