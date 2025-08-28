@@ -1,0 +1,28 @@
+
+MiniWindow
+  id: analyzerWindow
+  !text: tr('Analytics')
+  height: 63
+  @onOpen: modules.game_analyzer.onMiniWindowOpen()
+  @onClose: modules.game_analyzer.onMiniWindowClose()
+  &save: true
+
+  MiniWindowContents
+    UIWidget
+      id: expAnalyzerButton
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      image-source: /images/ui/tabbutton_new_shadowed
+      height: 21
+      !text: tr('XP Analyzer')
+      margin-top: 6
+      margin-left: 4
+      margin-right: 4
+      @onClick: modules.game_analyzer.toggleAnalyzer(self)
+      $checked:
+        image-clip: 0 21 114 21
+        text-offset: 0 1
+      $!checked:
+        image-clip: 0 0 114 21
+        text-offset: 0 0
