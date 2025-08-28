@@ -198,7 +198,7 @@ end
 
 function terminateOnLoginChange()
     disconnect(g_game, {
-        onGameStart = whenMapResizeChange,
+        onGameStart = whenMapResizeChange
     })
 end
 
@@ -711,7 +711,6 @@ end
 
 function onSereneProtocol(test)
     print("onSereneProtocol", test)
-
 end
 
 function onHarmonyProtocol(test)
