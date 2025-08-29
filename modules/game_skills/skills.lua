@@ -747,24 +747,33 @@ function online()
     if g_game.getFeature(GameEnterGameShowAppearance) then
         skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
         skillsWindow:recursiveGetChildById('experience'):getChildByIndex(1):setText('XP')
-        
-        local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
-        if g_game.getClientVersion() < 1310 and newWindowButton then
-            newWindowButton:setVisible(false)
-            skillsWindow:recursiveGetChildById('separadorOnForgeBonusesChange'):setVisible(false)
-            skillsWindow:recursiveGetChildById('separadorOnDefenseInfoChange'):setVisible(false)
-            skillsWindow:recursiveGetChildById('separadorOnOffenceInfoChange'):setVisible(false)
+    end
 
-            local lockButton = skillsWindow:recursiveGetChildById('lockButton')
-            local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
-            
-            if lockButton and contextMenuButton then
-                lockButton:breakAnchors()
-                lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
-                lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
-                lockButton:setMarginRight(2)
-                lockButton:setMarginTop(0)
-            end
+    local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
+    if g_game.getClientVersion() < 1310 and newWindowButton then
+        newWindowButton:setVisible(false)
+        local sepForge = skillsWindow:recursiveGetChildById('separadorOnForgeBonusesChange')
+        if sepForge and sepForge:isVisible() then
+            sepForge:setVisible(false)
+        end
+        local sepDefense = skillsWindow:recursiveGetChildById('separadorOnDefenseInfoChange')
+        if sepDefense and sepDefense:isVisible() then
+            sepDefense:setVisible(false)
+        end
+        local sepOffence = skillsWindow:recursiveGetChildById('separadorOnOffenceInfoChange')
+        if sepOffence and sepOffence:isVisible() then
+            sepOffence:setVisible(false)
+        end
+
+        local lockButton = skillsWindow:recursiveGetChildById('lockButton')
+        local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+        
+        if lockButton and contextMenuButton then
+            lockButton:breakAnchors()
+            lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+            lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+            lockButton:setMarginRight(2)
+            lockButton:setMarginTop(0)
         end
     end
     
