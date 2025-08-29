@@ -78,6 +78,24 @@ function init()
     
     -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
     local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
+    
+    -- Check client version to handle newWindowButton visibility and lockButton positioning
+    if g_game.getClientVersion() < 1310 and newWindowButton then
+        newWindowButton:setVisible(false)
+        
+        -- Position lockButton to the left of contextMenuButton
+        local lockButton = skillsWindow:recursiveGetChildById('lockButton')
+        local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+        
+        if lockButton and contextMenuButton then
+            lockButton:breakAnchors()
+            lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+            lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+            lockButton:setMarginRight(2)  -- Smaller margin for buttons side by side
+            lockButton:setMarginTop(0)
+        end
+    end
+    
     if newWindowButton then
         newWindowButton.onClick = function()
             if modules.game_cyclopedia then
@@ -375,7 +393,9 @@ end
 function areOffenceStatsVisible()
     local offenceStats = {
         'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
-        'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange'
+        'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange',
+        'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
+        'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
     }
     for _, skillId in pairs(offenceStats) do
         local skill = skillsWindow:recursiveGetChildById(skillId)
@@ -389,7 +409,9 @@ end
 function toggleOffenceStatsVisibility()
     local offenceStats = {
         'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
-        'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange'
+        'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange',
+        'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
+        'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
     }
     local shouldShow = not areOffenceStatsVisible()
     
@@ -725,8 +747,20 @@ function online()
     -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
     local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
 
-    if g_game.getClientVersion() < 1310 then
-        newWindowButton:hide()
+    if g_game.getClientVersion() < 1310 and newWindowButton then
+        newWindowButton:setVisible(false)
+        
+        -- Position lockButton to the left of contextMenuButton
+        local lockButton = skillsWindow:recursiveGetChildById('lockButton')
+        local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+        
+        if lockButton and contextMenuButton then
+            lockButton:breakAnchors()
+            lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+            lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+            lockButton:setMarginRight(2)  -- Smaller margin for buttons side by side
+            lockButton:setMarginTop(0)
+        end
     end
 
     if newWindowButton then
@@ -797,12 +831,13 @@ function refresh()
         -- Hide offense stats
         local offenceStats = {
             'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
-            'skillId13', 'skillId14', 'skillId15', 'skillId16'
+            'skillId13', 'skillId14', 'skillId15', 'skillId16', 'criticalHit', 'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
+            'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
         }
         for _, skillId in pairs(offenceStats) do
             local skill = skillsWindow:recursiveGetChildById(skillId)
             if skill then
-                skill:hide()
+                skill:setVisible(false)
             end
         end
         
@@ -816,7 +851,7 @@ function refresh()
         for _, skillId in pairs(defenceStats) do
             local skill = skillsWindow:recursiveGetChildById(skillId)
             if skill then
-                skill:hide()
+                skill:setVisible(false)
             end
         end
         
@@ -827,7 +862,7 @@ function refresh()
         for _, skillId in pairs(miscStats) do
             local skill = skillsWindow:recursiveGetChildById(skillId)
             if skill then
-                skill:hide()
+                skill:setVisible(false)
             end
         end
         
@@ -839,7 +874,7 @@ function refresh()
         for _, separatorId in pairs(additionalSeparators) do
             local separator = skillsWindow:recursiveGetChildById(separatorId)
             if separator then
-                separator:hide()
+                separator:setVisible(false)
             end
         end
         
@@ -851,13 +886,13 @@ function refresh()
             local children = widget:getChildren()
             for _, child in pairs(children) do
                 if child:getClassName() == 'HorizontalSeparator' and (not child:getId() or child:getId() == '') then
-                    child:hide()
+                    child:setVisible(false)
                 elseif child:getClassName() == 'UIWidget' and (not child:getId() or child:getId() == '') then
                     -- Additional check for widgets that might be separators
                     local childHeight = child:getHeight()
                     local childChildrenCount = #child:getChildren()
                     if childHeight <= 15 and childChildrenCount == 0 then
-                        child:hide()
+                        child:setVisible(false)
                     end
                 end
                 -- Recursively check children
@@ -918,7 +953,9 @@ function loadSkillsVisibilitySettings()
         if settings['offenceStats_visible'] ~= nil then
             local offenceStats = {
                 'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
-                'skillId13', 'skillId14', 'skillId15', 'skillId16'
+                'skillId13', 'skillId14', 'skillId15', 'skillId16',
+                'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
+                'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
             }
             for _, skillId in pairs(offenceStats) do
                 local skill = skillsWindow:recursiveGetChildById(skillId)
@@ -1029,6 +1066,24 @@ function toggle()
         
         -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
         local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
+        
+        -- Check client version to handle newWindowButton visibility and lockButton positioning
+        if g_game.getClientVersion() < 1310 and newWindowButton then
+            newWindowButton:setVisible(false)
+            
+            -- Position lockButton to the left of contextMenuButton
+            local lockButton = skillsWindow:recursiveGetChildById('lockButton')
+            local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+            
+            if lockButton and contextMenuButton then
+                lockButton:breakAnchors()
+                lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+                lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+                lockButton:setMarginRight(2)  -- Smaller margin for buttons side by side
+                lockButton:setMarginTop(0)
+            end
+        end
+        
         if newWindowButton then
             newWindowButton.onClick = function()
                 if modules.game_cyclopedia then
@@ -1459,6 +1514,11 @@ end
 function onFlatDamageHealingChange(localPlayer, flatBonus)
     -- Don't show flat damage/healing stats for older client versions
     if g_game.getClientVersion() < 1412 then
+        -- Ensure the element is hidden for older clients
+        local skill = skillsWindow:recursiveGetChildById('damageHealing')
+        if skill then
+            skill:setVisible(false)
+        end
         return
     end
     
@@ -1470,6 +1530,11 @@ end
 function onAttackInfoChange(localPlayer, attackValue, attackElement)
     -- Don't show attack info stats for older client versions
     if g_game.getClientVersion() < 1412 then
+        -- Ensure the element is hidden for older clients
+        local skill = skillsWindow:recursiveGetChildById('attackValue')
+        if skill then
+            skill:setVisible(false)
+        end
         return
     end
     
@@ -1492,6 +1557,15 @@ end
 function onConvertedDamageChange(localPlayer, convertedDamage, convertedElement)
     -- Don't show converted damage stats for older client versions
     if g_game.getClientVersion() < 1412 then
+        -- Ensure elements are hidden for older clients
+        local convertedDamageSkill = skillsWindow:recursiveGetChildById('convertedDamage')
+        local convertedElementSkill = skillsWindow:recursiveGetChildById('convertedElement')
+        if convertedDamageSkill then
+            convertedDamageSkill:setVisible(false)
+        end
+        if convertedElementSkill then
+            convertedElementSkill:setVisible(false)
+        end
         return
     end
     
@@ -1502,6 +1576,20 @@ end
 function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critDamage, onslaught)
     -- Don't show imbuement stats for older client versions
     if g_game.getClientVersion() < 1412 then
+        -- Ensure elements are hidden for older clients
+        local criticalHit = skillsWindow:recursiveGetChildById('criticalHit')
+        local lifeLeechSkill = skillsWindow:recursiveGetChildById('lifeLeech')
+        local manaLeechSkill = skillsWindow:recursiveGetChildById('manaLeech')
+        local criticalChanceSkill = skillsWindow:recursiveGetChildById('criticalChance')
+        local criticalExtraDamageSkill = skillsWindow:recursiveGetChildById('criticalExtraDamage')
+        local onslaughtSkill = skillsWindow:recursiveGetChildById('onslaught')
+        
+        if criticalHit then criticalHit:setVisible(false) end
+        if lifeLeechSkill then lifeLeechSkill:setVisible(false) end
+        if manaLeechSkill then manaLeechSkill:setVisible(false) end
+        if criticalChanceSkill then criticalChanceSkill:setVisible(false) end
+        if criticalExtraDamageSkill then criticalExtraDamageSkill:setVisible(false) end
+        if onslaughtSkill then onslaughtSkill:setVisible(false) end
         return
     end
     
