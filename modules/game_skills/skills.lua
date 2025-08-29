@@ -20,7 +20,19 @@ local statsCache = {
     mitigation = 0,
     dodge = 0,
     damageReflection = 0,
-    combatAbsorbValues = {},
+    combatAbsorbValues = {
+        [0] = 0, -- physicalResist
+        [1] = 0, -- fireResist
+        [2] = 0, -- earthResist
+        [3] = 0, -- energyResist
+        [4] = 0, -- IceResist
+        [5] = 0, -- HolyResist
+        [6] = 0, -- deathResist
+        [7] = 0, -- HealingResist
+        [8] = 0, -- drowResist
+        [9] = 0, -- lifedrainResist
+        [10] = 0 -- manadRainResist
+    },
     momentum = 0,
     transcendence = 0,
     amplification = 0
@@ -705,14 +717,14 @@ end
 function update()
     local offlineTraining = skillsWindow:recursiveGetChildById('offlineTraining')
     if not g_game.getFeature(GameOfflineTrainingTime) then
-        offlineTraining:hide()
+        offlineTraining:setVisible(false)
     else
         offlineTraining:show()
     end
 
     local regenerationTime = skillsWindow:recursiveGetChildById('regenerationTime')
     if not g_game.getFeature(GamePlayerRegenerationTime) then
-        regenerationTime:hide()
+        regenerationTime:setVisible(false)
     else
         regenerationTime:show()
     end
@@ -722,8 +734,8 @@ function update()
         xpBoostButton:show()
         xpGainRate:show()
     else
-        xpBoostButton:hide()
-        xpGainRate:hide()
+        xpBoostButton:setVisible(false)
+        xpGainRate:setVisible(false)
     end
 end
 
@@ -1265,7 +1277,7 @@ local function setSkillValueWithTooltips(id, value, tooltip, showPercentage, col
         
         for _, statId in pairs(oldClientStats) do
             if id == statId then
-                skill:hide()
+                skill:setVisible(false)
                 return
             end
         end
@@ -1279,7 +1291,7 @@ local function setSkillValueWithTooltips(id, value, tooltip, showPercentage, col
             for groupName, groupStats in pairs({offence = SKILL_GROUPS.offence, defence = SKILL_GROUPS.defence, misc = SKILL_GROUPS.misc}) do
                 for _, statId in pairs(groupStats) do
                     if id == statId and settings[groupName .. 'Stats_visible'] == false then
-                        skill:hide()
+                        skill:setVisible(false)
                         return
                     end
                 end
@@ -1309,22 +1321,17 @@ local function setSkillValueWithTooltips(id, value, tooltip, showPercentage, col
         if tooltip then
             skill:setTooltip(tooltip)
         end
+    elseif string.find(id, "separador") then
+        -- Separators should be shown when the group is visible, regardless of value
+        skill:show()
     else
-        skill:hide()
+        skill:setVisible(false)
     end
 end
 
 function onFlatDamageHealingChange(localPlayer, flatBonus)
     -- Cache the data regardless of visibility
     statsCache.flatDamageHealing = flatBonus or 0
-    
-    if g_game.getClientVersion() < 1412 then
-        local skill = skillsWindow:recursiveGetChildById('damageHealing')
-        if skill then
-            skill:setVisible(false)
-        end
-        return
-    end
     
     local char = g_game.getCharacterName()
     if char and skillSettings and skillSettings[char] and skillSettings[char]['offenceStats_visible'] ~= false then
@@ -1338,14 +1345,6 @@ function onAttackInfoChange(localPlayer, attackValue, attackElement)
     -- Cache the data regardless of visibility
     statsCache.attackValue = attackValue or 0
     statsCache.attackElement = attackElement or 0
-    
-    if g_game.getClientVersion() < 1412 then
-        local skill = skillsWindow:recursiveGetChildById('attackValue')
-        if skill then
-            skill:setVisible(false)
-        end
-        return
-    end
     
     local char = g_game.getCharacterName()
     if char and skillSettings and skillSettings[char] and skillSettings[char]['offenceStats_visible'] ~= false then
@@ -1368,17 +1367,6 @@ function onConvertedDamageChange(localPlayer, convertedDamage, convertedElement)
     statsCache.convertedDamage = convertedDamage or 0
     statsCache.convertedElement = convertedElement or 0
     
-    if g_game.getClientVersion() < 1412 then
-        local skills = {'convertedDamage', 'convertedElement'}
-        for _, skillId in pairs(skills) do
-            local skill = skillsWindow:recursiveGetChildById(skillId)
-            if skill then
-                skill:setVisible(false)
-            end
-        end
-        return
-    end
-    
     setSkillValueWithTooltips('convertedDamage', convertedDamage, false, true)
     setSkillValueWithTooltips('convertedElement', convertedElement, false, true)
 end
@@ -1390,17 +1378,6 @@ function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critD
     statsCache.critChance = critChance or 0
     statsCache.critDamage = critDamage or 0
     statsCache.onslaught = onslaught or 0
-    
-    if g_game.getClientVersion() < 1412 then
-        local skills = {'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'}
-        for _, skillId in pairs(skills) do
-            local skill = skillsWindow:recursiveGetChildById(skillId)
-            if skill then
-                skill:setVisible(false)
-            end
-        end
-        return
-    end
     
     local char = g_game.getCharacterName()
     if char and skillSettings and skillSettings[char] and skillSettings[char]['offenceStats_visible'] ~= false then
@@ -1441,20 +1418,15 @@ function onCombatAbsorbValuesChange(localPlayer, absorbValues)
     -- Cache the data regardless of visibility
     statsCache.combatAbsorbValues = absorbValues or {}
     
-    -- Don't show combat absorb values for older client versions
-    if g_game.getClientVersion() < 1412 then
-        return
-    end
-    
     for id, widgetId in pairs(combatIdToWidgetId) do
         local skill = skillsWindow:recursiveGetChildById(widgetId)
         if skill then
-            local value = absorbValues[id]
-            if value then
-                setSkillValueWithTooltips(widgetId, value, false, true, "#44AD25")
-            else
-                skill:hide()
-            end
+                local value = absorbValues[id]
+                if value ~= nil then
+                    setSkillValueWithTooltips(widgetId, value, false, true, "#44AD25")
+                else
+                    skill:setVisible(false)
+                end
         end
     end
 end
@@ -1466,13 +1438,13 @@ function onDefenseInfoChange(localPlayer, defense, armor, mitigation, dodge, dam
     statsCache.dodge = dodge or 0
     statsCache.damageReflection = damageReflection or 0
     
-    if g_game.getClientVersion() < 1412 then
-        return
-    end
-    
+    -- Show separator if defense stats are visible
     local char = g_game.getCharacterName()
     if char and skillSettings and skillSettings[char] and skillSettings[char]['defenceStats_visible'] ~= false then
-        skillsWindow:recursiveGetChildById("separadorOnDefenseInfoChange"):setVisible(true)
+        local separator = skillsWindow:recursiveGetChildById("separadorOnDefenseInfoChange")
+        if separator then
+            separator:setVisible(true)
+        end
     end
     
     local tooltips = {
@@ -1494,10 +1466,6 @@ function onForgeBonusesChange(localPlayer, momentum, transcendence, amplificatio
     statsCache.momentum = momentum or 0
     statsCache.transcendence = transcendence or 0
     statsCache.amplification = amplification or 0
-    
-    if g_game.getClientVersion() < 1412 then
-        return
-    end
     
     local char = g_game.getCharacterName()
     if char and skillSettings and skillSettings[char] and skillSettings[char]['miscStats_visible'] ~= false then
