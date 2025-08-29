@@ -71,8 +71,6 @@ void UIMissile::setMissile(const MissilePtr& e)
 
 void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
-    UIWidget::onStyleApply(styleName, styleNode);
-
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "missile-id")
             setMissileId(node->value<int>());
@@ -85,6 +83,7 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
         else if (node->tag() == "direction")
             setDirection(static_cast<Otc::Direction>(node->value<int>()));
     }
+    UIWidget::onStyleApply(styleName, styleNode);
 }
 
 void UIMissile::setShader(std::string_view name) {
