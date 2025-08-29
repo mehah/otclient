@@ -118,3 +118,9 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
             m_alwaysShowCount = node->value<bool>();
     }
 }
+
+void UIItem::setShader(std::string_view name) {
+    if (getItem()) getItem()->setShader(name);
+}
+
+bool UIItem::hasShader() { return getItem() ? getItem()->getShader() != nullptr : false; }

@@ -86,3 +86,9 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
             setDirection(static_cast<Otc::Direction>(node->value<int>()));
     }
 }
+
+void UIMissile::setShader(std::string_view name) {
+    if (getMissile()) getMissile()->setShader(name);
+}
+
+bool UIMissile::hasShader() { return getMissile() ? getMissile()->getShader() != nullptr : false; }

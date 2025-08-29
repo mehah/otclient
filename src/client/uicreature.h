@@ -41,6 +41,9 @@ public:
     void setCenter(const bool v) { m_center = v; }
     bool isCentered() { return m_center; }
 
+    void setShader(std::string_view name) override;
+    bool hasShader() override;
+
     /*
     // @ note:
     this did not work:

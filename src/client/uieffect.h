@@ -43,6 +43,9 @@ public:
     bool isVirtual() { return m_virtual; }
     bool isEffectVisible() { return m_effectVisible; }
 
+    void setShader(std::string_view name) override;
+    bool hasShader() override;
+
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 

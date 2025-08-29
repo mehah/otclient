@@ -68,3 +68,9 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
         }
     }
 }
+
+void UICreature::setShader(std::string_view name) {
+    if (getCreature()) getCreature()->setShader(name);
+}
+
+bool UICreature::hasShader() { return getCreature() ? getCreature()->getShader() != nullptr : false; }

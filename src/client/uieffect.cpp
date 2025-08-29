@@ -83,3 +83,9 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
             m_showId = node->value<bool>();
     }
 }
+
+void UIEffect::setShader(std::string_view name) {
+    if (getEffect()) getEffect()->setShader(name);
+}
+
+bool UIEffect::hasShader() { return getEffect() ? getEffect()->getShader() != nullptr : false; }
