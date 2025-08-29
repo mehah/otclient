@@ -26,6 +26,7 @@
 #include <client/client.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include <framework/graphics/shadermanager.h>
 
 void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
@@ -79,6 +80,9 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
         if (drawThings && g_client.getEffectAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
+
+    if (hasShader())
+        g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
 
     getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);
 }

@@ -26,6 +26,7 @@
 #include "tile.h"
 #include <client/client.h>
 #include <framework/core/eventdispatcher.h>
+#include <framework/graphics/shadermanager.h>
 
 void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
@@ -39,6 +40,9 @@ void Missile::draw(const Point& dest, const bool drawThings, const LightViewPtr&
         if (drawThings && g_client.getMissileAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getMissileAlpha(), true);
     }
+
+    if (hasShader())
+        g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
 
     getThingType()->draw(dest + m_delta * fraction * g_drawPool.getScaleFactor(), 0, m_numPatternX, m_numPatternY, 0, 0, Color::white, drawThings, lightView);
     g_drawPool.resetDrawOrder();
