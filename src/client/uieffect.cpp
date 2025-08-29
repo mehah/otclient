@@ -60,6 +60,8 @@ void UIEffect::setEffectId(const int id)
         if (!m_effect)
             m_effect = std::make_shared<Effect>();
         m_effect->setId(id);
+        if (m_effect)
+            m_effect->setShader(m_shaderName);
     }
 }
 
@@ -85,6 +87,7 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
 }
 
 void UIEffect::setShader(std::string_view name) {
+    m_shaderName = name;
     if (getEffect()) getEffect()->setShader(name);
 }
 

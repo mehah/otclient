@@ -61,6 +61,9 @@ void UIMissile::setMissileId(const int id)
             m_missile = std::make_shared<Missile>();
         m_missile->setId(id);
         m_missile->setDirection(Otc::South);
+
+        if (m_missile)
+            m_missile->setShader(m_shaderName);
     }
 }
 
@@ -87,6 +90,7 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
 }
 
 void UIMissile::setShader(std::string_view name) {
+    m_shaderName = name;
     if (getMissile()) getMissile()->setShader(name);
 }
 

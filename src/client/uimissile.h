@@ -51,6 +51,7 @@ public:
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
+    std::string m_shaderName;
     MissilePtr m_missile;
     bool m_virtual{ false };
     bool m_showId{ false };

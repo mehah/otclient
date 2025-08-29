@@ -65,6 +65,8 @@ public:
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
     Outfit getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
+
+    std::string m_shaderName;
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };
     bool m_center{ false };

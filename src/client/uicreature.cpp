@@ -41,6 +41,8 @@ void UICreature::setOutfit(const Outfit& outfit)
         m_creature = std::make_shared<Creature>();
     m_creature->setDirection(Otc::South);
     m_creature->setOutfit(outfit);
+    if (m_creature)
+        m_creature->setShader(m_shaderName);
 }
 
 void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
@@ -69,6 +71,7 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
 }
 
 void UICreature::setShader(std::string_view name) {
+    m_shaderName = name;
     if (getCreature()) getCreature()->setShader(name);
 }
 

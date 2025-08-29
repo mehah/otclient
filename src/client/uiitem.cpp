@@ -75,6 +75,9 @@ void UIItem::setItemId(const int id)
     else
         m_item = Item::create(id);
 
+    if (m_item)
+        m_item->setShader(m_shaderName);
+
     callLuaField("onItemChange");
 }
 
@@ -120,6 +123,7 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
 }
 
 void UIItem::setShader(std::string_view name) {
+    m_shaderName = name;
     if (getItem()) getItem()->setShader(name);
 }
 
