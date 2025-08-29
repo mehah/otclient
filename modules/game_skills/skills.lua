@@ -823,6 +823,14 @@ function refresh()
     updateHeight()
     hideOldClientStats()
     loadSkillsVisibilitySettings()
+    -- Always show default Offence, Defence, and Misc stats when loading window
+    onFlatDamageHealingChange(player, statsCache.flatDamageHealing)
+    onAttackInfoChange(player, statsCache.attackValue, statsCache.attackElement)
+    onConvertedDamageChange(player, statsCache.convertedDamage, statsCache.convertedElement)
+    onImbuementsChange(player, statsCache.lifeLeech, statsCache.manaLeech, statsCache.critChance, statsCache.critDamage, statsCache.onslaught)
+    onDefenseInfoChange(player, statsCache.defense, statsCache.armor, statsCache.mitigation, statsCache.dodge, statsCache.damageReflection)
+    onCombatAbsorbValuesChange(player, statsCache.combatAbsorbValues)
+    onForgeBonusesChange(player, statsCache.momentum, statsCache.transcendence, statsCache.amplification)
 end
 
 function loadSkillsVisibilitySettings()
