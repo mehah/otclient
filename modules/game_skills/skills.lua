@@ -79,23 +79,6 @@ function init()
     -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
     local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
     
-    -- Check client version to handle newWindowButton visibility and lockButton positioning
-    if g_game.getClientVersion() < 1310 and newWindowButton then
-        newWindowButton:setVisible(false)
-        
-        -- Position lockButton to the left of contextMenuButton
-        local lockButton = skillsWindow:recursiveGetChildById('lockButton')
-        local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
-        
-        if lockButton and contextMenuButton then
-            lockButton:breakAnchors()
-            lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
-            lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
-            lockButton:setMarginRight(2)  -- Smaller margin for buttons side by side
-            lockButton:setMarginTop(0)
-        end
-    end
-    
     if newWindowButton then
         newWindowButton.onClick = function()
             if modules.game_cyclopedia then
@@ -177,22 +160,6 @@ function showSkillsContextMenu(widget, mousePos, mouseButton)
         local miscStatsOption = menu:getChildById('showMiscStats')
         if miscStatsOption then
             miscStatsOption:setVisible(false)
-        end
-        
-        -- Hide horizontal separators related to the stats options
-        -- Since all stats are hidden, hide all separators except the first one
-        local children = menu:getChildren()
-        local separatorCount = 0
-        
-        for i, child in ipairs(children) do
-            -- Check if this is a horizontal separator by class name or id
-            if child:getClassName() == 'HorizontalSeparator' or child:getId() == 'HorizontalSeparator' then
-                separatorCount = separatorCount + 1
-                -- Keep the first separator (after Reset Experience Counter), hide the rest
-                if separatorCount > 1 then
-                    child:setVisible(false)
-                end
-            end
         end
     end
 
@@ -391,6 +358,11 @@ function resetExperienceCounter()
 end
 
 function areOffenceStatsVisible()
+    -- Offense stats are not available for older client versions
+    if g_game.getClientVersion() < 1412 then
+        return false
+    end
+    
     local offenceStats = {
         'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
         'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange',
@@ -407,6 +379,11 @@ function areOffenceStatsVisible()
 end
 
 function toggleOffenceStatsVisibility()
+    -- Don't toggle offense stats for older client versions
+    if g_game.getClientVersion() < 1412 then
+        return
+    end
+    
     local offenceStats = {
         'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
         'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange',
@@ -432,6 +409,11 @@ function toggleOffenceStatsVisibility()
 end
 
 function areDefenceStatsVisible()
+    -- Defense stats are not available for older client versions
+    if g_game.getClientVersion() < 1412 then
+        return false
+    end
+    
     local defenceStats = {
         'physicalResist', 'fireResist', 'earthResist', 'energyResist', 'IceResist', 
         'HolyResist', 'deathResist', 'HealingResist', 'drowResist', 'lifedrainResist', 
@@ -448,6 +430,11 @@ function areDefenceStatsVisible()
 end
 
 function toggleDefenceStatsVisibility()
+    -- Don't toggle defense stats for older client versions
+    if g_game.getClientVersion() < 1412 then
+        return
+    end
+    
     local defenceStats = {
         'physicalResist', 'fireResist', 'earthResist', 'energyResist', 'IceResist', 
         'HolyResist', 'deathResist', 'HealingResist', 'drowResist', 'lifedrainResist', 
@@ -473,6 +460,11 @@ function toggleDefenceStatsVisibility()
 end
 
 function areMiscStatsVisible()
+    -- Misc stats are not available for older client versions
+    if g_game.getClientVersion() < 1412 then
+        return false
+    end
+    
     local miscStats = {
         'momentum', 'transcendence', 'amplification', 'separadorOnForgeBonusesChange'
     }
@@ -486,6 +478,11 @@ function areMiscStatsVisible()
 end
 
 function toggleMiscStatsVisibility()
+    -- Don't toggle misc stats for older client versions
+    if g_game.getClientVersion() < 1412 then
+        return
+    end
+    
     local miscStats = {
         'momentum', 'transcendence', 'amplification', 'separadorOnForgeBonusesChange'
     }
@@ -747,22 +744,6 @@ function online()
     -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
     local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
 
-    if g_game.getClientVersion() < 1310 and newWindowButton then
-        newWindowButton:setVisible(false)
-        
-        -- Position lockButton to the left of contextMenuButton
-        local lockButton = skillsWindow:recursiveGetChildById('lockButton')
-        local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
-        
-        if lockButton and contextMenuButton then
-            lockButton:breakAnchors()
-            lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
-            lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
-            lockButton:setMarginRight(2)  -- Smaller margin for buttons side by side
-            lockButton:setMarginTop(0)
-        end
-    end
-
     if newWindowButton then
         newWindowButton.onClick = function()
             if modules.game_cyclopedia then
@@ -774,7 +755,31 @@ function online()
     refresh()
     if g_game.getFeature(GameEnterGameShowAppearance) then
         skillsWindow:recursiveGetChildById('regenerationTime'):getChildByIndex(1):setText('Food')
+        skillsWindow:recursiveGetChildById('experience'):getChildByIndex(1):setText('XP')
+        if g_game.getClientVersion() < 1310 and newWindowButton then
+            newWindowButton:setVisible(false)
+            skillsWindow:recursiveGetChildById('separadorOnForgeBonusesChange'):setVisible(false)
+            skillsWindow:recursiveGetChildById('separadorOnDefenseInfoChange'):setVisible(false)
+            skillsWindow:recursiveGetChildById('separadorOnOffenceInfoChange'):setVisible(false)
+
+            -- Position lockButton to the left of contextMenuButton
+            local lockButton = skillsWindow:recursiveGetChildById('lockButton')
+            local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
+            
+            if lockButton and contextMenuButton then
+                lockButton:breakAnchors()
+                lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+                lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+                lockButton:setMarginRight(2)  -- Smaller margin for buttons side by side
+                lockButton:setMarginTop(0)
+            end
+        end
     end
+    
+    -- Load visibility settings after UI is fully initialized
+    scheduleEvent(function() 
+        loadSkillsVisibilitySettings() 
+    end, 100)
 end
 
 function refresh()
@@ -832,7 +837,7 @@ function refresh()
         local offenceStats = {
             'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
             'skillId13', 'skillId14', 'skillId15', 'skillId16', 'criticalHit', 'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
-            'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
+            'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught', 'separadorOnOffenceInfoChange'
         }
         for _, skillId in pairs(offenceStats) do
             local skill = skillsWindow:recursiveGetChildById(skillId)
@@ -863,18 +868,6 @@ function refresh()
             local skill = skillsWindow:recursiveGetChildById(skillId)
             if skill then
                 skill:setVisible(false)
-            end
-        end
-        
-        -- Hide additional separator elements that might be visible
-        local additionalSeparators = {
-            'criticalHit', 'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
-            'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
-        }
-        for _, separatorId in pairs(additionalSeparators) do
-            local separator = skillsWindow:recursiveGetChildById(separatorId)
-            if separator then
-                separator:setVisible(false)
             end
         end
         
@@ -950,10 +943,24 @@ function loadSkillsVisibilitySettings()
     -- Load group visibility settings (these still control entire skill visibility)
     -- Skip loading these settings for older client versions
     if g_game.getClientVersion() >= 1412 then
+        -- Set default visibility for group stats if not set
+        if settings['offenceStats_visible'] == nil then
+            settings['offenceStats_visible'] = true  -- Default to visible
+            g_settings.setNode('skills-hide', skillSettings)
+        end
+        if settings['defenceStats_visible'] == nil then
+            settings['defenceStats_visible'] = true  -- Default to visible
+            g_settings.setNode('skills-hide', skillSettings)
+        end
+        if settings['miscStats_visible'] == nil then
+            settings['miscStats_visible'] = true  -- Default to visible
+            g_settings.setNode('skills-hide', skillSettings)
+        end
+        
         if settings['offenceStats_visible'] ~= nil then
             local offenceStats = {
                 'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
-                'skillId13', 'skillId14', 'skillId15', 'skillId16',
+                'skillId13', 'skillId14', 'skillId15', 'skillId16', 'separadorOnOffenceInfoChange',
                 'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
                 'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
             }
@@ -1066,23 +1073,6 @@ function toggle()
         
         -- Add onClick handler to newWindowButton to open Cyclopedia Character tab
         local newWindowButton = skillsWindow:recursiveGetChildById('newWindowButton')
-        
-        -- Check client version to handle newWindowButton visibility and lockButton positioning
-        if g_game.getClientVersion() < 1310 and newWindowButton then
-            newWindowButton:setVisible(false)
-            
-            -- Position lockButton to the left of contextMenuButton
-            local lockButton = skillsWindow:recursiveGetChildById('lockButton')
-            local contextMenuButton = skillsWindow:recursiveGetChildById('contextMenuButton')
-            
-            if lockButton and contextMenuButton then
-                lockButton:breakAnchors()
-                lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
-                lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
-                lockButton:setMarginRight(2)  -- Smaller margin for buttons side by side
-                lockButton:setMarginTop(0)
-            end
-        end
         
         if newWindowButton then
             newWindowButton.onClick = function()
@@ -1469,6 +1459,8 @@ local function setSkillValueWithTooltips(id, value, tooltip, showPercentage, col
         local statsToHide = {
             'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
             'skillId13', 'skillId14', 'skillId15', 'skillId16', -- offense stats
+            'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
+            'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught', -- more offense stats
             'physicalResist', 'fireResist', 'earthResist', 'energyResist', 'IceResist', 
             'HolyResist', 'deathResist', 'HealingResist', 'drowResist', 'lifedrainResist', 
             'manadRainResist', 'defenceValue', 'armorValue', 'mitigation', 'dodge', 
@@ -1480,6 +1472,56 @@ local function setSkillValueWithTooltips(id, value, tooltip, showPercentage, col
             if id == statId then
                 skill:hide()
                 return
+            end
+        end
+    end
+    
+    -- Check user's group visibility preferences for newer client versions
+    if g_game.getClientVersion() >= 1412 then
+        local char = g_game.getCharacterName()
+        if char and skillSettings and skillSettings[char] then
+            local settings = skillSettings[char]
+            
+            -- Check if this stat belongs to offense stats group
+            local offenceStats = {
+                'skillId7', 'skillId8', 'skillId9', 'skillId10', 'skillId11', 'skillId12', 
+                'skillId13', 'skillId14', 'skillId15', 'skillId16',
+                'damageHealing', 'attackValue', 'convertedDamage', 'convertedElement',
+                'criticalHit', 'lifeLeech', 'manaLeech', 'criticalChance', 'criticalExtraDamage', 'onslaught'
+            }
+            
+            for _, statId in pairs(offenceStats) do
+                if id == statId and settings['offenceStats_visible'] == false then
+                    skill:hide()
+                    return
+                end
+            end
+            
+            -- Check if this stat belongs to defense stats group
+            local defenceStats = {
+                'physicalResist', 'fireResist', 'earthResist', 'energyResist', 'IceResist', 
+                'HolyResist', 'deathResist', 'HealingResist', 'drowResist', 'lifedrainResist', 
+                'manadRainResist', 'defenceValue', 'armorValue', 'mitigation', 'dodge', 
+                'damageReflection'
+            }
+            
+            for _, statId in pairs(defenceStats) do
+                if id == statId and settings['defenceStats_visible'] == false then
+                    skill:hide()
+                    return
+                end
+            end
+            
+            -- Check if this stat belongs to misc stats group
+            local miscStats = {
+                'momentum', 'transcendence', 'amplification'
+            }
+            
+            for _, statId in pairs(miscStats) do
+                if id == statId and settings['miscStats_visible'] == false then
+                    skill:hide()
+                    return
+                end
             end
         end
     end
@@ -1522,6 +1564,11 @@ function onFlatDamageHealingChange(localPlayer, flatBonus)
         return
     end
     
+    -- Only show separator if offense stats are visible
+    local char = g_game.getCharacterName()
+    if char and skillSettings and skillSettings[char] and skillSettings[char]['offenceStats_visible'] ~= false then
+        skillsWindow:recursiveGetChildById("separadorOnOffenceInfoChange"):setVisible(true)
+    end
     local tooltips =
         "This flat bonus is the main source of your character's power, added \nto most of the damage and healing values you cause."
     setSkillValueWithTooltips('damageHealing', flatBonus, tooltips, false)
@@ -1538,6 +1585,11 @@ function onAttackInfoChange(localPlayer, attackValue, attackElement)
         return
     end
     
+    -- Only show separator if offense stats are visible
+    local char = g_game.getCharacterName()
+    if char and skillSettings and skillSettings[char] and skillSettings[char]['offenceStats_visible'] ~= false then
+        skillsWindow:recursiveGetChildById("separadorOnOffenceInfoChange"):setVisible(true)
+    end
     local tooltips =
         "This is your character's basic attack power whenever you enter a \nfight with a weapon or your fists. It does not apply to any spells \nyou cast. The attack value is calculated from the weapon's attack\n value, the corresponding weapon skill, combat tactics, the bonus \nreceived from the Revelation Perks and the player's level. The \nvalue represents the average damage you would inflict on a\ncreature which had no kind of defence or protection."
     setSkillValueWithTooltips('attackValue', attackValue, tooltips, false)
@@ -1593,6 +1645,11 @@ function onImbuementsChange(localPlayer, lifeLeech, manaLeech, critChance, critD
         return
     end
     
+    -- Only show separator if offense stats are visible
+    local char = g_game.getCharacterName()
+    if char and skillSettings and skillSettings[char] and skillSettings[char]['offenceStats_visible'] ~= false then
+        skillsWindow:recursiveGetChildById("separadorOnOffenceInfoChange"):setVisible(true)
+    end
     local lifeLeechTooltips =
         "You have a +11.4% chance to trigger Onslaught, granting you 60% increased damage for all attacks."
     local manaLeechTooltips = "You have a +1% chance to cause +1% extra damage."
@@ -1646,7 +1703,10 @@ function onDefenseInfoChange(localPlayer, defense, armor, mitigation, dodge, dam
         return
     end
     
-    skillsWindow:recursiveGetChildById("separadorOnDefenseInfoChange"):setVisible(true)
+    -- Only show separator if defense stats are visible
+    if skillSettings[char] and skillSettings[char]['defenseStats_visible'] ~= false then
+        skillsWindow:recursiveGetChildById("separadorOnDefenseInfoChange"):setVisible(true)
+    end
     local defenseToolstip =
         "When attacked, you have a +9.6% chance to trigger Dodge, which \nwill fully mitigate the damage."
     local armorToolstip =
@@ -1668,7 +1728,10 @@ function onForgeBonusesChange(localPlayer, momentum, transcendence, amplificatio
         return
     end
     
-    skillsWindow:recursiveGetChildById("separadorOnForgeBonusesChange"):setVisible(true)
+    -- Only show separator if misc stats are visible
+    if skillSettings[char] and skillSettings[char]['miscStats_visible'] ~= false then
+        skillsWindow:recursiveGetChildById("separadorOnForgeBonusesChange"):setVisible(true)
+    end
     local momentumTooltip = "During combat, you have a +" .. math.floor(momentum * 10000) / 100 ..
                                 "% chance to trigger Momentum\n, which reduces all spell cooldowns by 2 seconds."
 
