@@ -218,8 +218,8 @@ public:
     UIWidgetList recursiveGetChildrenByStyleName(std::string_view styleName);
     UIWidgetPtr backwardsGetWidgetById(std::string_view id);
 
-    void setShader(std::string_view name);
-    bool hasShader() { return m_shader != nullptr; }
+    virtual void setShader(std::string_view name);
+    virtual bool hasShader() { return m_shader != nullptr; }
 
     void setProp(FlagProp prop, bool v, bool callEvent = false);
     bool hasProp(const FlagProp prop) { return (m_flagsProp & prop); }

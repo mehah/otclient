@@ -45,9 +45,13 @@ public:
     bool isVirtual() { return m_virtual; }
     bool isMissileVisible() { return m_missileVisible; }
 
+    void setShader(std::string_view name) override;
+    bool hasShader() override;
+
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
+    std::string m_shaderName;
     MissilePtr m_missile;
     bool m_virtual{ false };
     bool m_showId{ false };
