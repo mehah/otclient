@@ -310,10 +310,12 @@ end
 
 function EnterGame.postCacheInfo()
     local requestType = 'cacheinfo'
+
     local onRecvInfo = function(message, err)
+        -- Guard: if UI is destroyed, do nothing
+        if not enterGame then return end
 
         if err then
-            -- onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
             reportRequestWarning(requestType, "Bad Request. Game_entergame postCacheInfo1")
             return
         end
@@ -335,13 +337,15 @@ function EnterGame.postCacheInfo()
             return
         end
 
+        -- Guard: check modules.client_topmenu still exists
+        if not modules or not modules.client_topmenu then return end
+
         modules.client_topmenu.setPlayersOnline(response.playersonline)
         modules.client_topmenu.setDiscordStreams(response.discord_online)
         modules.client_topmenu.setYoutubeStreams(response.gamingyoutubestreams)
         modules.client_topmenu.setYoutubeViewers(response.gamingyoutubeviewer)
         modules.client_topmenu.setLinkYoutube(response.youtube_link)
         modules.client_topmenu.setLinkDiscord(response.discord_link)
-
     end
 
     HTTP.post(Services.status, json.encode({
@@ -629,7 +633,17 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     G.requestId = math.random(1)
 
     local http = LoginHttp.create()
-    http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
+        http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
+        connect(loadBox, {
+            onCancel = function(msgbox)
+                loadBox = nil
+                G.requestId = 0
+                if http and http.cancel then
+                    http:cancel()
+                end
+                EnterGame.show()
+            end
+        })
 end
 
 function printTable(t)
