@@ -633,7 +633,17 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     G.requestId = math.random(1)
 
     local http = LoginHttp.create()
-    http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
+        http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
+        connect(loadBox, {
+            onCancel = function(msgbox)
+                loadBox = nil
+                G.requestId = 0
+                if http and http.cancel then
+                    http:cancel()
+                end
+                EnterGame.show()
+            end
+        })
 end
 
 function printTable(t)
