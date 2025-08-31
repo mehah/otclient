@@ -109,8 +109,8 @@ static void impliedEndOnStart(const std::string& newTag, std::stack<std::shared_
     int guard = 0;
     while (popped && st.size() > 1 && guard++ < 32) {
         popped = false;
-        if (st.top()->type != NodeType::Element) break;
-        const std::string& open = st.top()->tag;
+        if (st.top()->getType() != NodeType::Element) break;
+        const std::string& open = st.top()->getTag();
         if (open == "p" && kPCloseOn.count(newTag)) { st.pop(); popped = true; continue; }
         if (open == "li" && newTag == "li") { st.pop(); popped = true; continue; }
         if ((open == "dt" && (newTag == "dt" || newTag == "dd")) ||
@@ -137,7 +137,7 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
     auto push_node = [&](std::shared_ptr<HtmlNode> node) {
         node->parent = st.top();
         st.top()->children.push_back(node);
-        
+
         auto doc = root;
         if (node->type == NodeType::Element) {
             if (!node->tag.empty() && node->tag != "root")
@@ -184,14 +184,13 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
                 }
                 continue;
             }
-            
+
             ++i;
             size_t nameStart = i;
             while (i < N && is_name_char((unsigned char)s[i])) ++i;
             std::string tag = s.substr(nameStart, i - nameStart);
             ascii_tolower_inplace(tag);
 
-            
             impliedEndOnStart(tag, st);
 
             auto node = std::make_shared<HtmlNode>();
