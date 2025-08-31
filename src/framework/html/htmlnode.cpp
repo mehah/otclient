@@ -10,8 +10,7 @@ std::string HtmlNode::getAttr(const std::string& name) const {
 size_t HtmlNode::indexInParent() const {
     if (auto p = parent.lock()) {
         for (size_t i = 0; i < p->children.size(); ++i) {
-            if (p->children[i].get() == this)
-                return i;
+            if (p->children[i].get() == this) return i;
         }
     }
     return 0;
@@ -20,9 +19,7 @@ size_t HtmlNode::indexInParent() const {
 bool HtmlNode::isOnlyChild() const {
     if (auto p = parent.lock()) {
         size_t count = 0;
-        for (const auto& child : p->children) {
-            if (child->type == NodeType::Element) ++count;
-        }
+        for (const auto& child : p->children) if (child->type == NodeType::Element) ++count;
         return count == 1;
     }
     return false;
@@ -30,10 +27,8 @@ bool HtmlNode::isOnlyChild() const {
 
 bool HtmlNode::isLastChild() const {
     if (auto p = parent.lock()) {
-        for (int i = static_cast<int>(p->children.size()) - 1; i >= 0; --i) {
-            if (p->children[i]->type == NodeType::Element) {
-                return p->children[i].get() == this;
-            }
+        for (int i = (int)p->children.size() - 1; i >= 0; --i) {
+            if (p->children[i]->type == NodeType::Element) return p->children[i].get() == this;
         }
     }
     return false;
@@ -45,8 +40,8 @@ bool HtmlNode::isEmpty() const {
     return true;
 }
 
-int HtmlNode::indexAmongElementsCached() const {
-    if (cacheIdxAmongElements >= 0) return cacheIdxAmongElements;
+int HtmlNode::indexAmongElements() const {
+    if (cacheIndexAmongElements >= 0) return cacheIndexAmongElements;
     int idx = 0;
     if (auto p = parent.lock()) {
         for (const auto& c : p->children) {
@@ -56,12 +51,12 @@ int HtmlNode::indexAmongElementsCached() const {
             }
         }
     }
-    cacheIdxAmongElements = idx;
+    cacheIndexAmongElements = idx;
     return idx;
 }
 
-int HtmlNode::indexAmongTypeCached() const {
-    if (cacheIdxAmongType >= 0) return cacheIdxAmongType;
+int HtmlNode::indexAmongType() const {
+    if (cacheIndexAmongType >= 0) return cacheIndexAmongType;
     int idx = 0;
     if (auto p = parent.lock()) {
         for (const auto& c : p->children) {
@@ -71,8 +66,14 @@ int HtmlNode::indexAmongTypeCached() const {
             }
         }
     }
-    cacheIdxAmongType = idx;
+    cacheIndexAmongType = idx;
     return idx;
+}
+
+std::shared_ptr<HtmlNode> HtmlNode::documentRoot() const {
+    std::shared_ptr<HtmlNode> cur = const_cast<HtmlNode*>(this)->shared_from_this();
+    while (cur->parent.lock()) cur = cur->parent.lock();
+    return cur;
 }
 
 std::vector<std::shared_ptr<HtmlNode>> HtmlNode::querySelectorAll(const std::string& selector) {
