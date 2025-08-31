@@ -23,3 +23,5 @@
 #pragma once
 
 #include <framework/global.h>
+
+class HtmlNode;
