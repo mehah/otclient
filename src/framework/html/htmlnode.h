@@ -5,15 +5,15 @@
 #include <memory>
 #include <algorithm>
 
-inline void ascii_tolower_inplace(std::string& s){ for(auto& c: s) if(c>='A' && c<='Z') c = char(c - 'A' + 'a'); }
-inline std::string ascii_tolower_copy(std::string s){ ascii_tolower_inplace(s); return s; }
+inline void ascii_tolower_inplace(std::string& s) { for (auto& c : s) if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a'); }
+inline std::string ascii_tolower_copy(std::string s) { ascii_tolower_inplace(s); return s; }
 
 enum class NodeType { Element, Text, Comment, Doctype };
 
 class HtmlNode : public std::enable_shared_from_this<HtmlNode>
 {
 public:
-    NodeType type { NodeType::Element };
+    NodeType type{ NodeType::Element };
     std::string tag; // lowercased for elements
     std::unordered_map<std::string, std::string> attributes; // keys lowercased
     std::vector<std::string> classList;

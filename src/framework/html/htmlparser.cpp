@@ -4,8 +4,8 @@
 #include <unordered_set>
 #include <cctype>
 
-static inline bool is_space(unsigned char c){ return c==' '||c=='\n'||c=='\t'||c=='\r'||c=='\f'; }
-static inline bool is_name_char(unsigned char c){ return std::isalnum(c) || c=='-' || c==':' || c=='_'; }
+static inline bool is_space(unsigned char c) { return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'; }
+static inline bool is_name_char(unsigned char c) { return std::isalnum(c) || c == '-' || c == ':' || c == '_'; }
 
 static const std::unordered_set<std::string> kVoid = {
     "area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"
@@ -17,45 +17,43 @@ static const std::unordered_set<std::string> kPCloseOn = {
     "pre","section","table","ul","figure","figcaption","menu"
 };
 
-static void skip_ws(const std::string& s, size_t& i){
+static void skip_ws(const std::string& s, size_t& i) {
     while (i < s.size() && is_space((unsigned char)s[i])) ++i;
 }
 
-static std::string read_until(const std::string& s, size_t& i, char end){
+static std::string read_until(const std::string& s, size_t& i, char end) {
     size_t start = i;
     while (i < s.size() && s[i] != end) ++i;
     return s.substr(start, i - start);
 }
 
-static std::string html_entity_decode(const std::string& s){
+static std::string html_entity_decode(const std::string& s) {
     std::string out; out.reserve(s.size());
-    for(size_t i=0;i<s.size();){
-        if(s[i] != '&'){ out.push_back(s[i++]); continue; }
-        size_t semi = s.find(';', i+1);
-        if(semi == std::string::npos){ out.push_back(s[i++]); continue; }
-        std::string ent = s.substr(i+1, semi-(i+1));
+    for (size_t i = 0; i < s.size();) {
+        if (s[i] != '&') { out.push_back(s[i++]); continue; }
+        size_t semi = s.find(';', i + 1);
+        if (semi == std::string::npos) { out.push_back(s[i++]); continue; }
+        std::string ent = s.substr(i + 1, semi - (i + 1));
         std::string rep;
-        if(ent == "amp") rep="&";
-        else if(ent == "lt") rep="<";
-        else if(ent == "gt") rep=">";
-        else if(ent == "quot") rep="\"";
-        else if(ent == "apos") rep="'";
-        else if(!ent.empty() && ent[0] == '#'){
+        if (ent == "amp") rep = "&";
+        else if (ent == "lt") rep = "<";
+        else if (ent == "gt") rep = ">";
+        else if (ent == "quot") rep = "\"";
+        else if (ent == "apos") rep = "'";
+        else if (!ent.empty() && ent[0] == '#') {
             long code = 0;
-            if(ent.size()>=2 && (ent[1]=='x' || ent[1]=='X')){
-                try{ code = std::stol(ent.substr(2), nullptr, 16); } catch(...) { code = 0; }
-            }else{
-                try{ code = std::stol(ent.substr(1), nullptr, 10); } catch(...) { code = 0; }
+            if (ent.size() >= 2 && (ent[1] == 'x' || ent[1] == 'X')) {
+                try { code = std::stol(ent.substr(2), nullptr, 16); } catch (...) { code = 0; }
+            } else {
+                try { code = std::stol(ent.substr(1), nullptr, 10); } catch (...) { code = 0; }
             }
-            if(code > 0 && code <= 0x10FFFF){
+            if (code > 0 && code <= 0x10FFFF) {
                 unsigned int c = (unsigned int)code;
-                if(c <= 0x7F) rep.push_back(char(c));
-                else if(c <= 0x7FF){ rep.push_back(char(0xC0 | (c>>6))); rep.push_back(char(0x80 | (c & 0x3F))); }
-                else if(c <= 0xFFFF){ rep.push_back(char(0xE0 | (c>>12))); rep.push_back(char(0x80 | ((c>>6)&0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
-                else { rep.push_back(char(0xF0 | (c>>18))); rep.push_back(char(0x80 | ((c>>12)&0x3F))); rep.push_back(char(0x80 | ((c>>6)&0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
+                if (c <= 0x7F) rep.push_back(char(c));
+                else if (c <= 0x7FF) { rep.push_back(char(0xC0 | (c >> 6))); rep.push_back(char(0x80 | (c & 0x3F))); } else if (c <= 0xFFFF) { rep.push_back(char(0xE0 | (c >> 12))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); } else { rep.push_back(char(0xF0 | (c >> 18))); rep.push_back(char(0x80 | ((c >> 12) & 0x3F))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
             }
         }
-        if(rep.empty()){ out.push_back(s[i++]); continue; }
+        if (rep.empty()) { out.push_back(s[i++]); continue; }
         out += rep; i = semi + 1;
     }
     return out;
@@ -67,7 +65,7 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
 {
     while (i < s.size()) {
         skip_ws(s, i);
-        if (i >= s.size() || s[i] == '>' || (s[i] == '/' && i+1 < s.size() && s[i+1] == '>')) break;
+        if (i >= s.size() || s[i] == '>' || (s[i] == '/' && i + 1 < s.size() && s[i + 1] == '>')) break;
 
         size_t keyStart = i;
         while (i < s.size() && is_name_char((unsigned char)s[i])) ++i;
@@ -106,7 +104,7 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
     }
 }
 
-static void impliedEndOnStart(const std::string& newTag, std::stack<std::shared_ptr<HtmlNode>>& st){
+static void impliedEndOnStart(const std::string& newTag, std::stack<std::shared_ptr<HtmlNode>>& st) {
     bool popped = true;
     int guard = 0;
     while (popped && st.size() > 1 && guard++ < 32) {
@@ -128,7 +126,7 @@ static void impliedEndOnStart(const std::string& newTag, std::stack<std::shared_
 std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
     auto root = std::make_shared<HtmlNode>();
     root->type = NodeType::Element;
-    root->tag  = "root";
+    root->tag = "root";
 
     std::stack<std::shared_ptr<HtmlNode>> st;
     st.push(root);
@@ -136,7 +134,7 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
     const std::string& s = html;
     size_t i = 0, N = s.size();
 
-    auto push_node = [&](std::shared_ptr<HtmlNode> node){
+    auto push_node = [&](std::shared_ptr<HtmlNode> node) {
         node->parent = st.top();
         st.top()->children.push_back(node);
         // Indices on root
@@ -163,15 +161,15 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
                 continue;
             }
             if (i + 2 < N && s.compare(i, 2, "<!") == 0) {
-                size_t gt = s.find('>', i+2);
+                size_t gt = s.find('>', i + 2);
                 auto node = std::make_shared<HtmlNode>();
                 node->type = NodeType::Doctype;
-                node->text = (gt == std::string::npos) ? s.substr(i+2) : s.substr(i+2, gt - (i+2));
+                node->text = (gt == std::string::npos) ? s.substr(i + 2) : s.substr(i + 2, gt - (i + 2));
                 push_node(node);
                 i = (gt == std::string::npos) ? N : gt + 1;
                 continue;
             }
-            if (i + 1 < N && s[i+1] == '/') {
+            if (i + 1 < N && s[i + 1] == '/') {
                 i += 2;
                 size_t start = i;
                 while (i < N && is_name_char((unsigned char)s[i])) ++i;
@@ -198,7 +196,7 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
 
             auto node = std::make_shared<HtmlNode>();
             node->type = NodeType::Element;
-            node->tag  = tag;
+            node->tag = tag;
 
             skip_ws(s, i);
             parseAttributes(node->attributes, node->classList, s, i);
@@ -206,7 +204,7 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
             bool isRaw = (tag == "script" || tag == "style");
             bool selfClosing = false;
             if (i < N && s[i] == '/') { selfClosing = true; ++i; }
-            if (i < N && s[i] == '>') ++i;
+            if (i < N&& s[i] == '>') ++i;
 
             push_node(node);
 

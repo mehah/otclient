@@ -177,7 +177,7 @@ struct Selector
         return false;
     }
 
-    static bool matchesSimple(const std::shared_ptr<HtmlNode>& node, const SimpleSelector& s) {
+    bool matchesSimple(const std::shared_ptr<HtmlNode>& node, const SimpleSelector& s) const {
         if (!node || node->type != NodeType::Element) return false;
         if (!s.tag.empty() && s.tag != "*" && node->tag != s.tag) return false;
         if (!s.id.empty() && node->getAttr("id") != s.id) return false;
@@ -327,7 +327,7 @@ static void seedCandidates(std::shared_ptr<HtmlNode> root, const Selector& sel, 
 static bool matchFrom(const std::shared_ptr<HtmlNode>& node, const Selector& sel, size_t idx) {
     if (!node || idx >= sel.steps.size()) return false;
     const auto& step = sel.steps[idx];
-    if (!Selector::matchesSimple(node, step.simple)) return false;
+    if (!sel.matchesSimple(node, step.simple)) return false;
     if (idx + 1 == sel.steps.size()) return true;
     const auto& next = sel.steps[idx + 1];
     switch (next.combinatorToPrev) {
