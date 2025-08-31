@@ -37,7 +37,7 @@ struct SimpleSelector
     std::string id;
     std::vector<std::string> classes;
     std::vector<AttrTest> attrs;
-    std::string pseudo;
+    std::vector<std::string> pseudos;
 };
 
 struct SelectorStep
@@ -109,8 +109,7 @@ struct Selector
                 while (i < tok.size() && tok[i] != ']') ++i; if (i < tok.size()) ++i;
                 s.attrs.push_back({ key,val,op });
             } else if (c == ':') {
-                s.pseudo = tok.substr(i + 1);
-                break;
+                ++i; size_t ps = i; while (i < tok.size() && tok[i] != ':') ++i; s.pseudos.push_back(tok.substr(ps, i - ps));
             } else ++i;
         }
         return s;
@@ -189,114 +188,123 @@ struct Selector
             if (a.op == AttrTest::Op::Present) { if (!node->hasAttr(a.key)) return false; } else if (!attrMatch(node->getAttr(a.key), a)) return false;
         }
 
-        if (!s.pseudo.empty()) {
-            if (s.pseudo == "root") { return node->parent.expired(); }
-            if (s.pseudo == "scope") { return g_qs_scope && node.get() == g_qs_scope; }
-            if (s.pseudo == "first-child") {
-                if (auto p = node->parent.lock()) {
-                    for (const auto& c : p->children) if (c->type == NodeType::Element) return c.get() == node.get();
-                } return false;
-            }
-            if (s.pseudo == "last-child") {
-                if (auto p = node->parent.lock()) {
-                    for (auto it = p->children.rbegin(); it != p->children.rend(); ++it) if ((*it)->type == NodeType::Element) return (*it).get() == node.get();
-                } return false;
-            }
-            if (s.pseudo == "only-child") {
-                if (auto p = node->parent.lock()) {
-                    int cnt = 0; for (const auto& c : p->children) if (c->type == NodeType::Element) ++cnt;
-                    return cnt == 1;
-                } return false;
-            }
-            if (s.pseudo == "empty") {
-                for (const auto& c : node->children) {
-                    if (c->type == NodeType::Element) return false;
-                    if (c->type == NodeType::Text && !c->text.empty()) return false;
+        if (!s.pseudos.empty()) {
+            auto testPseudo = [&](const std::string& pseudo)->bool {
+                if (pseudo == "root") { return node->parent.expired(); }
+                if (pseudo == "scope") { return g_qs_scope && node.get() == g_qs_scope; }
+                if (pseudo == "first-child") {
+                    if (auto p = node->parent.lock()) {
+                        for (const auto& c : p->children) if (c->type == NodeType::Element) return c.get() == node.get();
+                    } return false;
+                }
+                if (pseudo == "last-child") {
+                    if (auto p = node->parent.lock()) {
+                        for (auto it = p->children.rbegin(); it != p->children.rend(); ++it) if ((*it)->type == NodeType::Element) return (*it).get() == node.get();
+                    } return false;
+                }
+                if (pseudo == "only-child") {
+                    if (auto p = node->parent.lock()) {
+                        int cnt = 0; for (const auto& c : p->children) if (c->type == NodeType::Element) ++cnt;
+                        return cnt == 1;
+                    } return false;
+                }
+                if (pseudo == "only-of-type") {
+                    if (auto p = node->parent.lock()) {
+                        int cnt = 0; for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) ++cnt;
+                        return cnt == 1;
+                    } return false;
+                }
+                if (pseudo == "empty") {
+                    for (const auto& c : node->children) {
+                        if (c->type == NodeType::Element) return false;
+                        if (c->type == NodeType::Text && !c->text.empty()) return false;
+                    }
+                    return true;
+                }
+                if (pseudo.rfind("nth-child(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(10, pseudo.size() - 11);
+                    int idx = node->indexAmongElements();
+                    return matchesNth(idx, inside);
+                }
+                if (pseudo.rfind("nth-last-child(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(15, pseudo.size() - 16);
+                    int idx = 0, total = 0;
+                    if (auto p = node->parent.lock()) {
+                        for (const auto& c : p->children) if (c->type == NodeType::Element) ++total;
+                        for (const auto& c : p->children) if (c->type == NodeType::Element) {
+                            ++idx;
+                            if (c.get() == node.get()) break;
+                        }
+                    }
+                    int lastIdx = (total - idx) + 1;
+                    return matchesNth(lastIdx, inside);
+                }
+                if (pseudo == "first-of-type") {
+                    if (auto p = node->parent.lock()) {
+                        for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) return c.get() == node.get();
+                    } return false;
+                }
+                if (pseudo == "last-of-type") {
+                    if (auto p = node->parent.lock()) {
+                        for (auto it = p->children.rbegin(); it != p->children.rend(); ++it) if ((*it)->type == NodeType::Element && (*it)->tag == node->tag) return (*it).get() == node.get();
+                    } return false;
+                }
+                if (pseudo.rfind("nth-of-type(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(12, pseudo.size() - 13);
+                    int idx = node->indexAmongType();
+                    return matchesNth(idx, inside);
+                }
+                if (pseudo.rfind("nth-last-of-type(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(17, pseudo.size() - 18);
+                    int idx = 0, total = 0;
+                    if (auto p = node->parent.lock()) {
+                        for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) ++total;
+                        for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) {
+                            ++idx;
+                            if (c.get() == node.get()) break;
+                        }
+                    }
+                    int lastIdx = (total - idx) + 1;
+                    return matchesNth(lastIdx, inside);
+                }
+                if (pseudo.rfind("not(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(4, pseudo.size() - 5);
+                    for (const auto& part : splitSelectorList(inside)) {
+                        const Selector& neg = getOrParseSelector(part);
+                        if (!neg.steps.empty() && matchesSimple(node, neg.steps[0].simple)) return false;
+                    }
+                    return true;
+                }
+                if (pseudo.rfind("is(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(3, pseudo.size() - 4);
+                    for (const auto& part : splitSelectorList(inside)) {
+                        const Selector& tmp = getOrParseSelector(part);
+                        if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
+                    } return false;
+                }
+                if (pseudo.rfind("where(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(6, pseudo.size() - 7);
+                    for (const auto& part : splitSelectorList(inside)) {
+                        const Selector& tmp = getOrParseSelector(part);
+                        if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
+                    } return false;
+                }
+                if (pseudo.rfind("has(", 0) == 0 && pseudo.back() == ')') {
+                    std::string inside = pseudo.substr(4, pseudo.size() - 5);
+                    const Selector& inner = getOrParseSelector(inside);
+                    if (inner.steps.empty()) return false;
+                    std::vector<std::shared_ptr<HtmlNode>> stack;
+                    for (auto& c : node->children) if (isElement(c)) stack.push_back(c);
+                    while (!stack.empty()) {
+                        auto cur = stack.back(); stack.pop_back();
+                        if (matchFrom(cur, inner, 0)) return true;
+                        for (auto& c : cur->children) if (isElement(c)) stack.push_back(c);
+                    }
+                    return false;
                 }
                 return true;
-            }
-            if (s.pseudo.rfind("nth-child(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(10, s.pseudo.size() - 11);
-                int idx = node->indexAmongElements();
-                return matchesNth(idx, inside);
-            }
-            if (s.pseudo.rfind("nth-last-child(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(15, s.pseudo.size() - 16);
-                int idx = 0, total = 0;
-                if (auto p = node->parent.lock()) {
-                    for (const auto& c : p->children) if (c->type == NodeType::Element) ++total;
-                    for (const auto& c : p->children) if (c->type == NodeType::Element) {
-                        ++idx;
-                        if (c.get() == node.get()) break;
-                    }
-                }
-                int lastIdx = (total - idx) + 1;
-                return matchesNth(lastIdx, inside);
-            }
-
-            if (s.pseudo == "first-of-type") {
-                if (auto p = node->parent.lock()) {
-                    for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) return c.get() == node.get();
-                } return false;
-            }
-            if (s.pseudo == "last-of-type") {
-                if (auto p = node->parent.lock()) {
-                    for (auto it = p->children.rbegin(); it != p->children.rend(); ++it) if ((*it)->type == NodeType::Element && (*it)->tag == node->tag) return (*it).get() == node.get();
-                } return false;
-            }
-            if (s.pseudo.rfind("nth-of-type(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(12, s.pseudo.size() - 13);
-                int idx = node->indexAmongType();
-                return matchesNth(idx, inside);
-            }
-            if (s.pseudo.rfind("nth-last-of-type(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(17, s.pseudo.size() - 18);
-                int idx = 0, total = 0;
-                if (auto p = node->parent.lock()) {
-                    for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) ++total;
-                    for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) {
-                        ++idx;
-                        if (c.get() == node.get()) break;
-                    }
-                }
-                int lastIdx = (total - idx) + 1;
-                return matchesNth(lastIdx, inside);
-            }
-
-            if (s.pseudo.rfind("not(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(4, s.pseudo.size() - 5);
-                for (const auto& part : splitSelectorList(inside)) {
-                    const Selector& neg = getOrParseSelector(part);
-                    if (!neg.steps.empty() && matchesSimple(node, neg.steps[0].simple)) return false;
-                }
-            }
-            if (s.pseudo.rfind("is(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(3, s.pseudo.size() - 4);
-                for (const auto& part : splitSelectorList(inside)) {
-                    const Selector& tmp = getOrParseSelector(part);
-                    if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
-                } return false;
-            }
-            if (s.pseudo.rfind("where(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(6, s.pseudo.size() - 7);
-                for (const auto& part : splitSelectorList(inside)) {
-                    const Selector& tmp = getOrParseSelector(part);
-                    if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
-                } return false;
-            }
-            if (s.pseudo.rfind("has(", 0) == 0 && s.pseudo.back() == ')') {
-                std::string inside = s.pseudo.substr(4, s.pseudo.size() - 5);
-                const Selector& inner = getOrParseSelector(inside);
-                if (inner.steps.empty()) return false;
-                std::vector<std::shared_ptr<HtmlNode>> stack;
-                for (auto& c : node->children) if (isElement(c)) stack.push_back(c);
-                while (!stack.empty()) {
-                    auto cur = stack.back(); stack.pop_back();
-                    if (matchFrom(cur, inner, 0)) return true;
-                    for (auto& c : cur->children) if (isElement(c)) stack.push_back(c);
-                }
-                return false;
-            }
+            };
+            for (const auto& pseudo : s.pseudos) { if (!testPseudo(pseudo)) return false; }
         }
         return true;
     }

@@ -40,8 +40,10 @@ bool HtmlNode::isLastChild() const {
 }
 
 bool HtmlNode::isEmpty() const {
-    if (!text.empty()) return false;
-    for (const auto& c : children) if (c->type == NodeType::Element) return false;
+    for (const auto& c : children) {
+        if (c->type == NodeType::Element) return false;
+        if (c->type == NodeType::Text && !c->text.empty()) return false;
+    }
     return true;
 }
 
