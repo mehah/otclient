@@ -185,7 +185,9 @@ struct Selector
             bool ok = false; for (const auto& t : node->classList) { if (t == cls) { ok = true; break; } }
             if (!ok) return false;
         }
-        for (const auto& a : s.attrs) if (!attrMatch(node->getAttr(a.key), a)) return false;
+        for (const auto& a : s.attrs) {
+            if (a.op == AttrTest::Op::Present) { if (!node->hasAttr(a.key)) return false; } else if (!attrMatch(node->getAttr(a.key), a)) return false;
+        }
 
         if (!s.pseudo.empty()) {
             if (s.pseudo == "root") { return node->parent.expired(); }
@@ -207,14 +209,31 @@ struct Selector
                 } return false;
             }
             if (s.pseudo == "empty") {
-                for (const auto& c : node->children) if (c->type == NodeType::Element) return false;
-                return node->text.empty();
+                for (const auto& c : node->children) {
+                    if (c->type == NodeType::Element) return false;
+                    if (c->type == NodeType::Text && !c->text.empty()) return false;
+                }
+                return true;
             }
             if (s.pseudo.rfind("nth-child(", 0) == 0 && s.pseudo.back() == ')') {
                 std::string inside = s.pseudo.substr(10, s.pseudo.size() - 11);
                 int idx = node->indexAmongElements();
                 return matchesNth(idx, inside);
             }
+            if (s.pseudo.rfind("nth-last-child(", 0) == 0 && s.pseudo.back() == ')') {
+                std::string inside = s.pseudo.substr(15, s.pseudo.size() - 16);
+                int idx = 0, total = 0;
+                if (auto p = node->parent.lock()) {
+                    for (const auto& c : p->children) if (c->type == NodeType::Element) ++total;
+                    for (const auto& c : p->children) if (c->type == NodeType::Element) {
+                        ++idx;
+                        if (c.get() == node.get()) break;
+                    }
+                }
+                int lastIdx = (total - idx) + 1;
+                return matchesNth(lastIdx, inside);
+            }
+
             if (s.pseudo == "first-of-type") {
                 if (auto p = node->parent.lock()) {
                     for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) return c.get() == node.get();
@@ -230,6 +249,20 @@ struct Selector
                 int idx = node->indexAmongType();
                 return matchesNth(idx, inside);
             }
+            if (s.pseudo.rfind("nth-last-of-type(", 0) == 0 && s.pseudo.back() == ')') {
+                std::string inside = s.pseudo.substr(17, s.pseudo.size() - 18);
+                int idx = 0, total = 0;
+                if (auto p = node->parent.lock()) {
+                    for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) ++total;
+                    for (const auto& c : p->children) if (c->type == NodeType::Element && c->tag == node->tag) {
+                        ++idx;
+                        if (c.get() == node.get()) break;
+                    }
+                }
+                int lastIdx = (total - idx) + 1;
+                return matchesNth(lastIdx, inside);
+            }
+
             if (s.pseudo.rfind("not(", 0) == 0 && s.pseudo.back() == ')') {
                 std::string inside = s.pseudo.substr(4, s.pseudo.size() - 5);
                 for (const auto& part : splitSelectorList(inside)) {

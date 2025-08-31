@@ -32,6 +32,8 @@ public:
 
     std::string getAttr(const std::string& name) const;
 
+    bool hasAttr(const std::string& name) const;
+
     size_t indexInParent() const;
     bool isOnlyChild() const;
     bool isLastChild() const;

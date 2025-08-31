@@ -7,6 +7,11 @@ std::string HtmlNode::getAttr(const std::string& name) const {
     return (it != attributes.end()) ? it->second : "";
 }
 
+bool HtmlNode::hasAttr(const std::string& name) const {
+    auto key = ascii_tolower_copy(name);
+    return attributes.find(key) != attributes.end();
+}
+
 size_t HtmlNode::indexInParent() const {
     if (auto p = parent.lock()) {
         for (size_t i = 0; i < p->children.size(); ++i) {
