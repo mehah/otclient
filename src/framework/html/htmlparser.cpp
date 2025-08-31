@@ -1,8 +1,28 @@
+/*
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "htmlparser.h"
+#include "htmlnode.h"
 #include <stack>
-#include <string_view>
-#include <unordered_set>
-#include <cctype>
 
 static inline bool is_space(unsigned char c) { return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'; }
 static inline bool is_name_char(unsigned char c) { return std::isalnum(c) || c == '-' || c == ':' || c == '_'; }
@@ -43,14 +63,19 @@ static std::string html_entity_decode(const std::string& s) {
         else if (!ent.empty() && ent[0] == '#') {
             long code = 0;
             if (ent.size() >= 2 && (ent[1] == 'x' || ent[1] == 'X')) {
-                try { code = std::stol(ent.substr(2), nullptr, 16); } catch (...) { code = 0; }
-            } else {
-                try { code = std::stol(ent.substr(1), nullptr, 10); } catch (...) { code = 0; }
+                try { code = std::stol(ent.substr(2), nullptr, 16); }
+                catch (...) { code = 0; }
+            }
+            else {
+                try { code = std::stol(ent.substr(1), nullptr, 10); }
+                catch (...) { code = 0; }
             }
             if (code > 0 && code <= 0x10FFFF) {
                 unsigned int c = (unsigned int)code;
                 if (c <= 0x7F) rep.push_back(char(c));
-                else if (c <= 0x7FF) { rep.push_back(char(0xC0 | (c >> 6))); rep.push_back(char(0x80 | (c & 0x3F))); } else if (c <= 0xFFFF) { rep.push_back(char(0xE0 | (c >> 12))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); } else { rep.push_back(char(0xF0 | (c >> 18))); rep.push_back(char(0x80 | ((c >> 12) & 0x3F))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
+                else if (c <= 0x7FF) { rep.push_back(char(0xC0 | (c >> 6))); rep.push_back(char(0x80 | (c & 0x3F))); }
+                else if (c <= 0xFFFF) { rep.push_back(char(0xE0 | (c >> 12))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
+                else { rep.push_back(char(0xF0 | (c >> 18))); rep.push_back(char(0x80 | ((c >> 12) & 0x3F))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
             }
         }
         if (rep.empty()) { out.push_back(s[i++]); continue; }
@@ -60,8 +85,8 @@ static std::string html_entity_decode(const std::string& s) {
 }
 
 static void parseAttributes(std::unordered_map<std::string, std::string>& out,
-                            std::vector<std::string>& classList,
-                            const std::string& s, size_t& i)
+    std::vector<std::string>& classList,
+    const std::string& s, size_t& i)
 {
     while (i < s.size()) {
         skip_ws(s, i);
@@ -81,12 +106,14 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
                 char q = s[i++];
                 value = read_until(s, i, q);
                 if (i < s.size() && s[i] == q) ++i;
-            } else {
+            }
+            else {
                 size_t vstart = i;
                 while (i < s.size() && !is_space((unsigned char)s[i]) && s[i] != '>' && s[i] != '/') ++i;
                 value = s.substr(vstart, i - vstart);
             }
-        } else {
+        }
+        else {
             value = "";
         }
         value = html_entity_decode(value);
@@ -104,7 +131,7 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
     }
 }
 
-static void impliedEndOnStart(const std::string& newTag, std::stack<std::shared_ptr<HtmlNode>>& st) {
+static void impliedEndOnStart(const std::string& newTag, std::stack<HtmlNodePtr>& st) {
     bool popped = true;
     int guard = 0;
     while (popped && st.size() > 1 && guard++ < 32) {
@@ -114,27 +141,33 @@ static void impliedEndOnStart(const std::string& newTag, std::stack<std::shared_
         if (open == "p" && kPCloseOn.count(newTag)) { st.pop(); popped = true; continue; }
         if (open == "li" && newTag == "li") { st.pop(); popped = true; continue; }
         if ((open == "dt" && (newTag == "dt" || newTag == "dd")) ||
-            (open == "dd" && (newTag == "dt" || newTag == "dd"))) { st.pop(); popped = true; continue; }
+            (open == "dd" && (newTag == "dt" || newTag == "dd"))) {
+            st.pop(); popped = true; continue;
+        }
         if (open == "tr" && (newTag == "tr" || newTag == "tbody" || newTag == "thead" || newTag == "tfoot")) { st.pop(); popped = true; continue; }
         if ((open == "th" && (newTag == "th" || newTag == "td")) ||
-            (open == "td" && (newTag == "td" || newTag == "th"))) { st.pop(); popped = true; continue; }
+            (open == "td" && (newTag == "td" || newTag == "th"))) {
+            st.pop(); popped = true; continue;
+        }
         if ((open == "option" && (newTag == "option" || newTag == "optgroup")) ||
-            (open == "optgroup" && newTag == "optgroup")) { st.pop(); popped = true; continue; }
+            (open == "optgroup" && newTag == "optgroup")) {
+            st.pop(); popped = true; continue;
+        }
     }
 }
 
-std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
+HtmlNodePtr parseHtml(const std::string& html) {
     auto root = std::make_shared<HtmlNode>();
     root->type = NodeType::Element;
     root->tag = "root";
 
-    std::stack<std::shared_ptr<HtmlNode>> st;
+    std::stack<HtmlNodePtr> st;
     st.push(root);
 
     const std::string& s = html;
     size_t i = 0, N = s.size();
 
-    auto push_node = [&](std::shared_ptr<HtmlNode> node) {
+    auto push_node = [&](HtmlNodePtr node) {
         node->parent = st.top();
         st.top()->children.push_back(node);
 
@@ -146,7 +179,7 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
             if (!idv.empty()) doc->idIndex[idv] = node;
             if (!node->classList.empty()) for (auto& cls : node->classList) doc->classIndex[cls].push_back(node);
         }
-    };
+        };
 
     while (i < N) {
         if (s[i] == '<') {
@@ -219,16 +252,19 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
                         tnode->text = s.substr(i);
                         push_node(tnode);
                         i = N;
-                    } else {
+                    }
+                    else {
                         tnode->text = s.substr(i, closePos - i);
                         push_node(tnode);
                         i = closePos + endTag.size();
                     }
-                } else {
+                }
+                else {
                     st.push(node);
                 }
             }
-        } else {
+        }
+        else {
             size_t start = i;
             size_t lt = s.find('<', i);
             if (lt == std::string::npos) lt = N;

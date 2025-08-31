@@ -1,9 +1,27 @@
+/*
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #pragma once
-#include <string>
-#include <vector>
-#include <unordered_map>
-#include <memory>
-#include <algorithm>
+#include "declarations.h"
 
 inline void ascii_tolower_inplace(std::string& s) { for (auto& c : s) if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a'); }
 inline std::string ascii_tolower_copy(std::string s) { ascii_tolower_inplace(s); return s; }
@@ -13,24 +31,22 @@ enum class NodeType { Element, Text, Comment, Doctype };
 class HtmlNode : public std::enable_shared_from_this<HtmlNode>
 {
 public:
-    // === Public accessors to private state ===
     NodeType getType() const { return type; }
     const std::string& getTag() const { return tag; }
     const std::unordered_map<std::string, std::string>& getAttributesMap() const { return attributes; }
     const std::vector<std::string>& getClassList() const { return classList; }
-    const std::vector<std::shared_ptr<HtmlNode>>& getChildren() const { return children; }
+    const std::vector<HtmlNodePtr>& getChildren() const { return children; }
     const std::weak_ptr<HtmlNode>& getParent() const { return parent; }
     const std::string& getRawText() const { return text; }
 
-    // Indexed lookup helpers (read‑only views over the document root indices)
-    std::shared_ptr<HtmlNode> getById(const std::string& id) const {
+    HtmlNodePtr getById(const std::string& id) const {
         auto root = documentRoot();
         auto it = root->idIndex.find(id);
         if (it == root->idIndex.end()) return nullptr;
         return it->second.lock();
     }
-    std::vector<std::shared_ptr<HtmlNode>> getByClass(const std::string& cls) const {
-        std::vector<std::shared_ptr<HtmlNode>> out;
+    std::vector<HtmlNodePtr> getByClass(const std::string& cls) const {
+        std::vector<HtmlNodePtr> out;
         auto root = documentRoot();
         auto it = root->classIndex.find(cls);
         if (it == root->classIndex.end()) return out;
@@ -38,8 +54,8 @@ public:
         for (auto& w : it->second) { if (auto sp = w.lock()) out.push_back(sp); }
         return out;
     }
-    std::vector<std::shared_ptr<HtmlNode>> getByTag(const std::string& t) const {
-        std::vector<std::shared_ptr<HtmlNode>> out;
+    std::vector<HtmlNodePtr> getByTag(const std::string& t) const {
+        std::vector<HtmlNodePtr> out;
         auto root = documentRoot();
         auto it = root->tagIndex.find(t);
         if (it == root->tagIndex.end()) return out;
@@ -47,7 +63,7 @@ public:
         for (auto& w : it->second) { if (auto sp = w.lock()) out.push_back(sp); }
         return out;
     }
-std::string getAttr(const std::string& name) const;
+    std::string getAttr(const std::string& name) const;
     std::string getText() const;
 
     bool hasAttr(const std::string& name) const;
@@ -60,14 +76,12 @@ std::string getAttr(const std::string& name) const;
     int indexAmongElements() const;
     int indexAmongType() const;
 
-    std::shared_ptr<HtmlNode> documentRoot() const;
+    HtmlNodePtr documentRoot() const;
 
-    std::vector<std::shared_ptr<HtmlNode>> querySelectorAll(const std::string& selector);
-    std::shared_ptr<HtmlNode> querySelector(const std::string& selector);
+    std::vector<HtmlNodePtr> querySelectorAll(const std::string& selector);
+    HtmlNodePtr querySelector(const std::string& selector);
 
-
-    // Friends allowed to build/maintain internal structures efficiently
-    friend std::shared_ptr<HtmlNode> parseHtml(const std::string& html);
+    friend HtmlNodePtr parseHtml(const std::string& html);
     friend void invalidateIndexCachesUp(HtmlNode* n);
 
 private:
@@ -75,7 +89,7 @@ private:
     std::string tag;
     std::unordered_map<std::string, std::string> attributes;
     std::vector<std::string> classList;
-    std::vector<std::shared_ptr<HtmlNode>> children;
+    std::vector<HtmlNodePtr> children;
     std::string text;
     std::weak_ptr<HtmlNode> parent;
 

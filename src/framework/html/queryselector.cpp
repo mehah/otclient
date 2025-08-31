@@ -1,20 +1,35 @@
+/*
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "queryselector.h"
-#include <algorithm>
-#include <cctype>
-#include <functional>
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
+#include "htmlnode.h"
 
 struct Selector;
 static const Selector& getOrParseSelector(const std::string&);
-static bool matchFrom(const std::shared_ptr<HtmlNode>&, const Selector&, size_t);
+static bool matchFrom(const HtmlNodePtr&, const Selector&, size_t);
 
 thread_local const HtmlNode* g_qs_scope = nullptr;
 
-static bool isDescendantOf(const std::shared_ptr<HtmlNode>& node, const HtmlNode* scope) {
+static bool isDescendantOf(const HtmlNodePtr& node, const HtmlNode* scope) {
     auto p = node;
     while (p) {
         if (p.get() == scope) return true;
@@ -25,7 +40,7 @@ static bool isDescendantOf(const std::shared_ptr<HtmlNode>& node, const HtmlNode
 
 static inline bool isSpace(unsigned char c) { return std::isspace(c); }
 static inline bool isAlphaNum_(unsigned char c) { return std::isalnum(c) || c == '-' || c == '_'; }
-static inline bool isElement(const std::shared_ptr<HtmlNode>& n) { return n && n->getType() == NodeType::Element; }
+static inline bool isElement(const HtmlNodePtr& n) { return n && n->getType() == NodeType::Element; }
 
 struct PtrHash { size_t operator()(const HtmlNode* p) const noexcept { return std::hash<const void*>{}(p); } };
 struct PtrEq { bool operator()(const HtmlNode* a, const HtmlNode* b) const noexcept { return a == b; } };
@@ -182,7 +197,7 @@ struct Selector
         return false;
     }
 
-    bool matchesSimple(const std::shared_ptr<HtmlNode>& node, const SimpleSelector& s) const {
+    bool matchesSimple(const HtmlNodePtr& node, const SimpleSelector& s) const {
         if (!node || node->getType() != NodeType::Element) return false;
         if (!s.tag.empty() && s.tag != "*" && node->getTag() != s.tag) return false;
         if (!s.id.empty() && node->getAttr("id") != s.id) return false;
@@ -299,7 +314,7 @@ struct Selector
                     std::string inside = pseudo.substr(4, pseudo.size() - 5);
                     const Selector& inner = getOrParseSelector(inside);
                     if (inner.steps.empty()) return false;
-                    std::vector<std::shared_ptr<HtmlNode>> stack;
+                    std::vector<HtmlNodePtr> stack;
                     for (auto& c : node->getChildren()) if (isElement(c)) stack.push_back(c);
                     while (!stack.empty()) {
                         auto cur = stack.back(); stack.pop_back();
@@ -325,11 +340,11 @@ static const Selector& getOrParseSelector(const std::string& s) {
     return pos->second;
 }
 
-static bool matchFrom(const std::shared_ptr<HtmlNode>& node, const Selector& sel, size_t idx);
+static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx);
 
 static inline bool isUniversal(const std::string& tag) { return tag.empty() || tag == "*"; }
 
-static void seedCandidates(std::shared_ptr<HtmlNode> root, const Selector& sel, std::vector<std::shared_ptr<HtmlNode>>& out) {
+static void seedCandidates(HtmlNodePtr root, const Selector& sel, std::vector<HtmlNodePtr>& out) {
     if (sel.steps.empty()) return;
     const auto& right = sel.steps[0].simple;
     auto doc = root->documentRoot();
@@ -349,7 +364,7 @@ static void seedCandidates(std::shared_ptr<HtmlNode> root, const Selector& sel, 
         }
         if (!out.empty()) {
             if (!isUniversal(right.tag)) {
-                std::vector<std::shared_ptr<HtmlNode>> filtered;
+                std::vector<HtmlNodePtr> filtered;
                 for (auto& n : out)
                     if (n->getTag() == right.tag) filtered.push_back(n);
                 out.swap(filtered);
@@ -366,7 +381,7 @@ static void seedCandidates(std::shared_ptr<HtmlNode> root, const Selector& sel, 
         if (!out.empty()) return;
     }
 
-    std::vector<std::shared_ptr<HtmlNode>> st{ root };
+    std::vector<HtmlNodePtr> st{ root };
     while (!st.empty()) {
         auto cur = st.back(); st.pop_back();
         if (isElement(cur)) out.push_back(cur);
@@ -374,7 +389,7 @@ static void seedCandidates(std::shared_ptr<HtmlNode> root, const Selector& sel, 
     }
 }
 
-static bool matchFrom(const std::shared_ptr<HtmlNode>& node, const Selector& sel, size_t idx) {
+static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx) {
     if (!node || idx >= sel.steps.size()) return false;
     const auto& step = sel.steps[idx];
     if (!sel.matchesSimple(node, step.simple)) return false;
@@ -422,8 +437,8 @@ static bool matchFrom(const std::shared_ptr<HtmlNode>& node, const Selector& sel
     return false;
 }
 
-std::vector<std::shared_ptr<HtmlNode>> querySelectorAll(std::shared_ptr<HtmlNode> root, const std::string& selectorStr) {
-    std::vector<std::shared_ptr<HtmlNode>> results;
+std::vector<HtmlNodePtr> querySelectorAll(HtmlNodePtr root, const std::string& selectorStr) {
+    std::vector<HtmlNodePtr> results;
     std::unordered_set<const HtmlNode*, PtrHash, PtrEq> seen;
     auto lists = Selector::splitSelectorList(selectorStr);
     if (lists.empty()) return results;
@@ -432,7 +447,7 @@ std::vector<std::shared_ptr<HtmlNode>> querySelectorAll(std::shared_ptr<HtmlNode
     for (const auto& part : lists) {
         const Selector& sel = getOrParseSelector(part);
         if (sel.steps.empty()) continue;
-        std::vector<std::shared_ptr<HtmlNode>> seeds;
+        std::vector<HtmlNodePtr> seeds;
         seedCandidates(root, sel, seeds);
         for (auto& node : seeds) {
             if (matchFrom(node, sel, 0)) {
@@ -444,7 +459,7 @@ std::vector<std::shared_ptr<HtmlNode>> querySelectorAll(std::shared_ptr<HtmlNode
     return results;
 }
 
-std::shared_ptr<HtmlNode> querySelector(std::shared_ptr<HtmlNode> root, const std::string& selectorStr) {
+HtmlNodePtr querySelector(HtmlNodePtr root, const std::string& selectorStr) {
     auto lists = Selector::splitSelectorList(selectorStr);
     if (lists.empty()) return nullptr;
 
@@ -452,7 +467,7 @@ std::shared_ptr<HtmlNode> querySelector(std::shared_ptr<HtmlNode> root, const st
     for (const auto& part : lists) {
         const Selector& sel = getOrParseSelector(part);
         if (sel.steps.empty()) continue;
-        std::vector<std::shared_ptr<HtmlNode>> seeds;
+        std::vector<HtmlNodePtr> seeds;
         seedCandidates(root, sel, seeds);
         for (auto& node : seeds) {
             if (matchFrom(node, sel, 0)) {

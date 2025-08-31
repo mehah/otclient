@@ -1,5 +1,26 @@
+/*
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "htmlnode.h"
-#include "queryselector.h"
 
 std::string HtmlNode::getAttr(const std::string& name) const {
     auto key = ascii_tolower_copy(name);
@@ -77,32 +98,32 @@ int HtmlNode::indexAmongType() const {
     return idx;
 }
 
-std::shared_ptr<HtmlNode> HtmlNode::documentRoot() const {
-    std::shared_ptr<HtmlNode> cur = const_cast<HtmlNode*>(this)->shared_from_this();
+HtmlNodePtr HtmlNode::documentRoot() const {
+    HtmlNodePtr cur = const_cast<HtmlNode*>(this)->shared_from_this();
     while (cur->parent.lock()) cur = cur->parent.lock();
     return cur;
 }
 
-std::vector<std::shared_ptr<HtmlNode>> HtmlNode::querySelectorAll(const std::string& selector) {
+std::vector<HtmlNodePtr> HtmlNode::querySelectorAll(const std::string& selector) {
     return ::querySelectorAll(this->shared_from_this(), selector);
 }
 
-std::shared_ptr<HtmlNode> HtmlNode::querySelector(const std::string& selector) {
+HtmlNodePtr HtmlNode::querySelector(const std::string& selector) {
     return ::querySelector(this->shared_from_this(), selector);
 }
 
 std::string HtmlNode::getText() const {
     switch (type) {
-        case NodeType::Text:
-            return text;
-        case NodeType::Element: {
-            std::string out;
-            for (const auto& c : children) {
-                out += c->getText();
-            }
-            return out;
+    case NodeType::Text:
+        return text;
+    case NodeType::Element: {
+        std::string out;
+        for (const auto& c : children) {
+            out += c->getText();
         }
-        default:
-            return "";
+        return out;
+    }
+    default:
+        return "";
     }
 }
