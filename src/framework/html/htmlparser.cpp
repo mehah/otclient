@@ -137,7 +137,7 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
     auto push_node = [&](std::shared_ptr<HtmlNode> node) {
         node->parent = st.top();
         st.top()->children.push_back(node);
-        // Indices on root
+        
         auto doc = root;
         if (node->type == NodeType::Element) {
             if (!node->tag.empty() && node->tag != "root")
@@ -184,14 +184,14 @@ std::shared_ptr<HtmlNode> parseHtml(const std::string& html) {
                 }
                 continue;
             }
-            // start tag
+            
             ++i;
             size_t nameStart = i;
             while (i < N && is_name_char((unsigned char)s[i])) ++i;
             std::string tag = s.substr(nameStart, i - nameStart);
             ascii_tolower_inplace(tag);
 
-            // implied closing before opening a new tag
+            
             impliedEndOnStart(tag, st);
 
             auto node = std::make_shared<HtmlNode>();

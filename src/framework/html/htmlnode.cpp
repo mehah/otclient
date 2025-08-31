@@ -18,7 +18,7 @@ size_t HtmlNode::indexInParent() const {
             if (p->children[i].get() == this) return i;
         }
     }
-    return 0;
+    return size_t(-1);
 }
 
 bool HtmlNode::isOnlyChild() const {

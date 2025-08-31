@@ -8,13 +8,23 @@
 #include <unordered_set>
 #include <vector>
 
-// Forward declarations so methods can reference them
+
 struct Selector;
 static const Selector& getOrParseSelector(const std::string&);
 static bool matchFrom(const std::shared_ptr<HtmlNode>&, const Selector&, size_t);
 
-// Scope pseudo support
+
 thread_local const HtmlNode* g_qs_scope = nullptr;
+
+
+static bool isDescendantOf(const std::shared_ptr<HtmlNode>& node, const HtmlNode* scope) {
+    auto p = node;
+    while (p) {
+        if (p.get() == scope) return true;
+        p = p->parent.lock();
+    }
+    return false;
+}
 
 static inline bool isSpace(unsigned char c) { return std::isspace(c); }
 static inline bool isAlphaNum_(unsigned char c) { return std::isalnum(c) || c == '-' || c == '_'; }
@@ -26,14 +36,14 @@ struct PtrEq { bool operator()(const HtmlNode* a, const HtmlNode* b) const noexc
 struct AttrTest
 {
     enum class Op { Present, Equals, Includes, Prefix, Suffix, Substr, DashMatch };
-    std::string key; // lowercased
+    std::string key; 
     std::string val;
     Op op = Op::Present;
 };
 
 struct SimpleSelector
 {
-    std::string tag; // lowercased or "*"
+    std::string tag; 
     std::string id;
     std::vector<std::string> classes;
     std::vector<AttrTest> attrs;
@@ -44,12 +54,12 @@ struct SelectorStep
 {
     enum class Combinator { Descendant, Child, Adjacent, Sibling };
     SimpleSelector simple;
-    Combinator combinatorToPrev = Combinator::Descendant; // RIGHT-TO-LEFT
+    Combinator combinatorToPrev = Combinator::Descendant; 
 };
 
 struct Selector
 {
-    // steps[0] = rightmost
+    
     std::vector<SelectorStep> steps;
 
     static std::vector<std::string> splitSelectorList(const std::string& s) {
@@ -310,7 +320,7 @@ struct Selector
     }
 };
 
-// ---- Parse cache (must come AFTER Selector is defined) ----
+
 static const Selector& getOrParseSelector(const std::string& s) {
     static std::unordered_map<std::string, Selector> cache;
     auto it = cache.find(s);
@@ -320,7 +330,7 @@ static const Selector& getOrParseSelector(const std::string& s) {
     return pos->second;
 }
 
-// Forward declaration
+
 static bool matchFrom(const std::shared_ptr<HtmlNode>& node, const Selector& sel, size_t idx);
 
 static inline bool isUniversal(const std::string& tag) { return tag.empty() || tag == "*"; }
@@ -332,13 +342,17 @@ static void seedCandidates(std::shared_ptr<HtmlNode> root, const Selector& sel, 
 
     if (!right.id.empty()) {
         auto it = doc->idIndex.find(right.id);
-        if (it != doc->idIndex.end()) { if (auto sp = it->second.lock()) if (isElement(sp)) out.push_back(sp); }
+        if (it != doc->idIndex.end()) {
+            if (auto sp = it->second.lock()) {
+                if (isElement(sp) && (!g_qs_scope || isDescendantOf(sp, g_qs_scope))) out.push_back(sp);
+            }
+        }
         return;
     }
     if (!right.classes.empty()) {
         auto it = doc->classIndex.find(right.classes[0]);
         if (it != doc->classIndex.end()) {
-            for (auto& w : it->second) if (auto sp = w.lock()) if (isElement(sp)) out.push_back(sp);
+            for (auto& w : it->second) if (auto sp = w.lock()) if (isElement(sp) && (!g_qs_scope || isDescendantOf(sp, g_qs_scope))) out.push_back(sp);
             if (!out.empty()) {
                 if (!isUniversal(right.tag)) {
                     std::vector<std::shared_ptr<HtmlNode>> filtered;
@@ -352,11 +366,11 @@ static void seedCandidates(std::shared_ptr<HtmlNode> root, const Selector& sel, 
     if (!isUniversal(right.tag)) {
         auto it = doc->tagIndex.find(right.tag);
         if (it != doc->tagIndex.end()) {
-            for (auto& w : it->second) if (auto sp = w.lock()) if (isElement(sp)) out.push_back(sp);
+            for (auto& w : it->second) if (auto sp = w.lock()) if (isElement(sp) && (!g_qs_scope || isDescendantOf(sp, g_qs_scope))) out.push_back(sp);
             if (!out.empty()) return;
         }
     }
-    // Fallback: collect all elements under root
+    
     std::vector<std::shared_ptr<HtmlNode>> st{ root };
     while (!st.empty()) {
         auto cur = st.back(); st.pop_back();
