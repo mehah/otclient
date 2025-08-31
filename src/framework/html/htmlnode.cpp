@@ -90,3 +90,19 @@ std::vector<std::shared_ptr<HtmlNode>> HtmlNode::querySelectorAll(const std::str
 std::shared_ptr<HtmlNode> HtmlNode::querySelector(const std::string& selector) {
     return ::querySelector(this->shared_from_this(), selector);
 }
+
+std::string HtmlNode::getText() const {
+    switch (type) {
+        case NodeType::Text:
+            return text;
+        case NodeType::Element: {
+            std::string out;
+            for (const auto& c : children) {
+                out += c->getText();
+            }
+            return out;
+        }
+        default:
+            return "";
+    }
+}

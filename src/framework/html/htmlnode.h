@@ -14,23 +14,22 @@ class HtmlNode : public std::enable_shared_from_this<HtmlNode>
 {
 public:
     NodeType type{ NodeType::Element };
-    std::string tag; 
-    std::unordered_map<std::string, std::string> attributes; 
+    std::string tag;
+    std::unordered_map<std::string, std::string> attributes;
     std::vector<std::string> classList;
     std::vector<std::shared_ptr<HtmlNode>> children;
     std::string text;
     std::weak_ptr<HtmlNode> parent;
 
-    
     std::unordered_map<std::string, std::weak_ptr<HtmlNode>> idIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    
     mutable int cacheIndexAmongElements = -1;
     mutable int cacheIndexAmongType = -1;
 
     std::string getAttr(const std::string& name) const;
+    std::string getText() const;
 
     bool hasAttr(const std::string& name) const;
 
@@ -47,8 +46,6 @@ public:
     std::vector<std::shared_ptr<HtmlNode>> querySelectorAll(const std::string& selector);
     std::shared_ptr<HtmlNode> querySelector(const std::string& selector);
 };
-
-
 
 inline void invalidateIndexCachesUp(HtmlNode* n) {
     while (n) {
