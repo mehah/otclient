@@ -22,20 +22,24 @@
 
 #pragma once
 #include "declarations.h"
+#include <cstdint>
 
 namespace css {
+    enum SelectorEventFlags : uint32_t { SEF_None = 0, SEF_Hover = 1u << 0, SEF_Focus = 1u << 1, SEF_Active = 1u << 2, SEF_FocusWithin = 1u << 3, SEF_FocusVisible = 1u << 4, SEF_Visited = 1u << 5, SEF_Checked = 1u << 6, SEF_Disabled = 1u << 7, SEF_Enabled = 1u << 8 };
+    struct SelectorMeta { uint32_t events{ SEF_None }; std::vector<std::string> pseudos; };
     struct Declaration
     {
-        std::string property;   // lowercased
-        std::string value;      // raw value
+        std::string property;
+        std::string value;
         bool important{ false };
     };
 
     struct Rule
     {
         std::vector<std::string> selectors;
+        std::vector<SelectorMeta> selectorMeta;
         std::vector<Declaration> decls;
-        int order{ 0 }; // source order
+        int order{ 0 };
     };
 
     struct StyleSheet
