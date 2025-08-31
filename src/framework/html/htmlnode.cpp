@@ -2,7 +2,8 @@
 #include "queryselector.h"
 
 std::string HtmlNode::getAttr(const std::string& name) const {
-    auto it = attributes.find(name);
+    auto key = ascii_tolower_copy(name);
+    auto it = attributes.find(key);
     return (it != attributes.end()) ? it->second : "";
 }
 
@@ -20,7 +21,7 @@ bool HtmlNode::isOnlyChild() const {
     if (auto p = parent.lock()) {
         size_t count = 0;
         for (const auto& child : p->children) {
-            if (child->tag != "text") ++count;
+            if (child->type == NodeType::Element) ++count;
         }
         return count == 1;
     }
@@ -30,7 +31,7 @@ bool HtmlNode::isOnlyChild() const {
 bool HtmlNode::isLastChild() const {
     if (auto p = parent.lock()) {
         for (int i = static_cast<int>(p->children.size()) - 1; i >= 0; --i) {
-            if (p->children[i]->tag != "text") {
+            if (p->children[i]->type == NodeType::Element) {
                 return p->children[i].get() == this;
             }
         }
@@ -39,13 +40,45 @@ bool HtmlNode::isLastChild() const {
 }
 
 bool HtmlNode::isEmpty() const {
-    return text.empty() && children.empty();
+    if (!text.empty()) return false;
+    for (const auto& c : children) if (c->type == NodeType::Element) return false;
+    return true;
+}
+
+int HtmlNode::indexAmongElementsCached() const {
+    if (cacheIdxAmongElements >= 0) return cacheIdxAmongElements;
+    int idx = 0;
+    if (auto p = parent.lock()) {
+        for (const auto& c : p->children) {
+            if (c->type == NodeType::Element) {
+                ++idx;
+                if (c.get() == this) break;
+            }
+        }
+    }
+    cacheIdxAmongElements = idx;
+    return idx;
+}
+
+int HtmlNode::indexAmongTypeCached() const {
+    if (cacheIdxAmongType >= 0) return cacheIdxAmongType;
+    int idx = 0;
+    if (auto p = parent.lock()) {
+        for (const auto& c : p->children) {
+            if (c->type == NodeType::Element && c->tag == tag) {
+                ++idx;
+                if (c.get() == this) break;
+            }
+        }
+    }
+    cacheIdxAmongType = idx;
+    return idx;
 }
 
 std::vector<std::shared_ptr<HtmlNode>> HtmlNode::querySelectorAll(const std::string& selector) {
-    return ::querySelectorAll(std::shared_ptr<HtmlNode>(this, [](HtmlNode*) {}), selector);
+    return ::querySelectorAll(this->shared_from_this(), selector);
 }
 
 std::shared_ptr<HtmlNode> HtmlNode::querySelector(const std::string& selector) {
-    return ::querySelector(std::shared_ptr<HtmlNode>(this, [](HtmlNode*) {}), selector);
+    return ::querySelector(this->shared_from_this(), selector);
 }
