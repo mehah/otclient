@@ -426,6 +426,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_ui", "displayUI", &UIManager::displayUI, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidget", &UIManager::createWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidgetFromOTML", &UIManager::createWidgetFromOTML, &g_ui);
+    g_lua.bindSingletonFunction("g_ui", "createWidgetFromHTML", &UIManager::createWidgetFromHTML, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getRootWidget", &UIManager::getRootWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getDraggingWidget", &UIManager::getDraggingWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getPressedWidget", &UIManager::getPressedWidget, &g_ui);
@@ -909,10 +910,10 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ParticleEffectType>("getName", &ParticleEffectType::getName);
     g_lua.bindClassMemberFunction<ParticleEffectType>("getDescription", &ParticleEffectType::getDescription);
 
-    // UIParticles  
-    g_lua.registerClass<UIParticles, UIWidget>();  
-    g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });  
-    g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);  
+    // UIParticles
+    g_lua.registerClass<UIParticles, UIWidget>();
+    g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });
+    g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
     g_lua.bindClassMemberFunction<UIParticles>("setEffect", &UIParticles::setEffect);
     g_lua.bindClassMemberFunction<UIParticles>("clearEffects", &UIParticles::clearEffects);
 #endif

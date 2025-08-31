@@ -591,6 +591,9 @@
     <ClCompile Include="..\src\framework\html\cssparser.cpp">
       <Filter>Source Files\framework\html</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\html\htmlmanager.cpp">
+      <Filter>Source Files\framework\html</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\framework\config.h">
@@ -1155,6 +1158,9 @@
       <Filter>Header Files\framework\html</Filter>
     </ClInclude>
     <ClInclude Include="..\src\framework\html\declarations.h">
+      <Filter>Header Files\framework\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\html\htmlmanager.h">
       <Filter>Header Files\framework\html</Filter>
     </ClInclude>
   </ItemGroup>

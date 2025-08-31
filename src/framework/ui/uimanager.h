@@ -58,6 +58,7 @@ public:
     UIWidgetPtr displayUI(const std::string& file) { return loadUI(file, m_rootWidget); }
     UIWidgetPtr createWidget(std::string_view styleName, const UIWidgetPtr& parent);
     UIWidgetPtr createWidgetFromOTML(const OTMLNodePtr& widgetNode, const UIWidgetPtr& parent);
+    UIWidgetPtr createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent);
 
     void setMouseReceiver(const UIWidgetPtr& widget) { m_mouseReceiver = widget; }
     void setKeyboardReceiver(const UIWidgetPtr& widget) { m_keyboardReceiver = widget; }

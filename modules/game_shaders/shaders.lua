@@ -127,10 +127,16 @@ function ShaderController:onInit()
     Keybind.new('Windows', 'show/hide Shader Windows', HOTKEY, '')
     Keybind.bind('Windows', 'show/hide Shader Windows', {
         {
-          type = KEY_DOWN,
-          callback = function() ShaderController.ui:setVisible(not ShaderController.ui:isVisible()) end,
-         }
+            type = KEY_DOWN,
+            callback = function() ShaderController.ui:setVisible(not ShaderController.ui:isVisible()) end,
+        }
     })
+
+    local path = '/' .. self.name .. '/shaders.html';
+
+    addEvent(function()
+        g_ui.createWidgetFromHTML(g_resources.readFileContents('/' .. path))
+    end)
 end
 
 function ShaderController:onTerminate()
