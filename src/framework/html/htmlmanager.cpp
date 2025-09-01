@@ -159,28 +159,33 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const
         } else readNode(node, root);
     }
 
-    for (const auto& rule : sheet.rules) {
-        const auto& selectors = stdext::join(rule.selectors);
-        const auto& nodes = dom->querySelectorAll(selectors);
+    auto parseStyle = [&](css::StyleSheet sheet, bool checkRuleExist) {
+        for (const auto& rule : sheet.rules) {
+            const auto& selectors = stdext::join(rule.selectors);
+            const auto& nodes = dom->querySelectorAll(selectors);
 
-        if (nodes.empty()) {
-            g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
-            continue;
-        }
+            if (checkRuleExist && nodes.empty()) {
+                g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
+                continue;
+            }
 
-        for (const auto& node : dom->querySelectorAll(stdext::join(rule.selectors))) {
-            if (node->getWidget()) {
-                auto otml = std::make_shared<OTMLNode>();
-                for (const auto& decl : rule.decls) {
-                    auto declOtml = std::make_shared<OTMLNode>();
-                    declOtml->setTag(decl.property);
-                    declOtml->setValue(decl.value);
-                    otml->addChild(declOtml);
+            for (const auto& node : dom->querySelectorAll(stdext::join(rule.selectors))) {
+                if (node->getWidget()) {
+                    auto otml = std::make_shared<OTMLNode>();
+                    for (const auto& decl : rule.decls) {
+                        auto declOtml = std::make_shared<OTMLNode>();
+                        declOtml->setTag(decl.property);
+                        declOtml->setValue(decl.value);
+                        otml->addChild(declOtml);
+                    }
+                    node->getWidget()->mergeStyle(otml);
                 }
-                node->getWidget()->mergeStyle(otml);
             }
         }
-    }
+    };
+
+    parseStyle(GLOBAL_STYLE, false);
+    parseStyle(sheet, true);
 
     return root;
 }
