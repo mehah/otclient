@@ -28,6 +28,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
+#include <framework/html/htmlnode.h>
 #include <framework/platform/platformwindow.h>
 
 #include <algorithm>
@@ -2072,4 +2073,151 @@ void UIWidget::removeOnDestroyCallback(const std::string& id)
     const auto it = m_onDestroyCallbacks.find(id);
     if (it != m_onDestroyCallbacks.end())
         m_onDestroyCallbacks.erase(it);
+}
+
+int widthFitContent(UIWidget* widget) {
+    auto maxChildWidth = 0;
+    static std::function<void(UIWidget*, int& maxChildWidth)> getWidth = [](UIWidget* widget, int& maxChildWidth) ->void {
+        for (const auto& child : widget->getChildren()) {
+            if (child->getWidth() > maxChildWidth)
+                maxChildWidth = child->getWidth();
+            getWidth(child.get(), maxChildWidth);
+        }
+    };
+    getWidth(widget, maxChildWidth);
+    return maxChildWidth;
+}
+
+int heightFitContent(UIWidget* widget) {
+    auto height = 0;
+    widget->getAnchors();
+    static std::function<void(UIWidget*, int& maxChildWidth)> fnc = [](UIWidget* widget, int& height) ->void {
+        /*for (const auto& child : widget->getChildren()) {
+            child->getAnchors();
+
+            if (child->getHeight() > height)
+                height = child->getHeight();
+            fnc(child.get(), height);
+        }*/
+    };
+    fnc(widget, height);
+    return height;
+}
+
+void UIWidget::setHeight(std::string heightStr) {
+    stdext::trim(heightStr);
+    stdext::tolower(heightStr);
+
+    auto height = stdext::to_number(heightStr);
+
+    if (heightStr == "auto" || heightStr == "fit-content") {
+        setProp(PropFitHeight, true);
+        scheduleHtmlStyleUpdate();
+    } else if (heightStr.ends_with("em")) {
+    } else if (heightStr.ends_with("%")) {
+    } else /*px*/ {
+        setProp(PropFitHeight, false);
+        setHeight_px(height);
+    }
+}
+
+void UIWidget::setWidth(std::string widthStr) {
+    stdext::trim(widthStr);
+    stdext::tolower(widthStr);
+
+    auto width = stdext::to_number(widthStr);
+
+    if (widthStr == "auto") {
+        if (m_displayType == DisplayType::Block) {
+            if (m_parent) setWidth_px(m_parent->getWidth());
+        } else {
+            setProp(PropFitWidth, true);
+            scheduleHtmlStyleUpdate();
+        }
+    } else if (widthStr == "fit-content") {
+        setProp(PropFitWidth, true);
+        scheduleHtmlStyleUpdate();
+    } else if (widthStr.ends_with("em")) {
+    } else if (widthStr.ends_with("%")) {
+    } else /*px*/ {
+        setProp(PropFitWidth, false);
+        setWidth_px(width);
+    }
+}
+
+void UIWidget::setDisplay(DisplayType type) {
+    m_displayType = type;
+    scheduleHtmlStyleUpdate();
+}
+
+void UIWidget::scheduleHtmlStyleUpdate() {
+    if (hasProp(PropUpdateStyleHtml))
+        return;
+
+    setProp(PropUpdateStyleHtml, true);
+    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
+        self->updateStyleHtml();
+        self->setProp(PropUpdateStyleHtml, false);
+    });
+}
+
+void UIWidget::updateStyleHtml() {
+    if (!isOnHtml())
+        return;
+
+    breakAnchors();
+
+    if (m_displayType == DisplayType::None) {
+        setVisible(false);
+        return;
+    }
+
+    if (!hasAnchoredLayout())
+        return;
+
+    if (getChildIndex() == 1 || m_htmlNode->getAttr("anchor") == "parent") {
+        addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+    } else {
+        auto prev = getPrevWidget();
+        if (prev && prev->getDisplay() == DisplayType::Block) {
+            addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
+        } else {
+            addAnchor(Fw::AnchorLeft, "prev", Fw::AnchorRight);
+            addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
+        }
+    }
+
+    if (hasProp(PropFitHeight)) {
+        auto startPixel = 0;
+        auto endPixel = 0;
+        for (const auto& child : getChildren()) {
+            if (child->m_rect.topLeft().y < startPixel || startPixel == 0)
+                startPixel = child->m_rect.topLeft().y;
+            if (child->m_rect.bottomLeft().y > endPixel || endPixel == 0)
+                endPixel = child->m_rect.bottomLeft().y;
+        }
+
+        auto height = endPixel - startPixel;
+        setHeight_px(height);
+
+        setProp(PropFitHeight, false);
+    }
+
+    if (hasProp(PropFitWidth)) {
+        auto startPixel = 0;
+        auto endPixel = 0;
+        for (const auto& child : getChildren()) {
+            if (child->m_rect.topLeft().x < startPixel || startPixel == 0)
+                startPixel = child->m_rect.topLeft().x;
+            if (child->m_rect.topRight().x > endPixel || endPixel == 0)
+                endPixel = child->m_rect.topRight().x;
+        }
+
+        auto width = endPixel - startPixel;
+        setWidth_px(width);
+
+        setProp(PropFitWidth, false);
+    }
 }

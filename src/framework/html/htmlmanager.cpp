@@ -116,35 +116,6 @@ void parseStyle(const UIWidgetPtr& widget, const HtmlNodePtr& node) {
     stdext::trim(style);
 }
 
-void  parseAndSetDisplayAttr(const HtmlNodePtr& node) {
-    const auto& widget = node->getWidget();
-    if (widget->hasAnchoredLayout()) {
-        if (widget->getWidth() == 0)
-            widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
-
-        if (widget->getChildIndex() == 1 || node->getAttr("anchor") == "parent") {
-            node->getWidget()->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-            node->getWidget()->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
-        } else {
-            auto prev = node->getPrev();
-            if (prev && prev->getStyle("display") == "block") {
-                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-                widget->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
-            } else {
-                widget->addAnchor(Fw::AnchorLeft, "prev", Fw::AnchorRight);
-                widget->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
-            }
-        }
-    }
-
-    if (!node->getStyle())
-        return;
-
-    const auto& display = node->getStyle("display");
-    if (display == "none")
-        widget->setVisible(false);
-}
-
 void parseAndSetFloatStyle(const HtmlNodePtr& node) {
     if (!node->getStyle())
         return;
@@ -195,8 +166,8 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     const auto& styleName = g_ui.getStyleName(translateStyleName(node->getTag(), node));
 
     auto widget = g_ui.createWidget(styleName.empty() ? "UIWidget" : styleName, parent);
-    widget->setOnHtml(true);
     node->setWidget(widget);
+    widget->setHtmlNode(node);
 
     if (node->getType() == NodeType::Text) {
         widget->setTextAutoResize(true);
@@ -236,11 +207,13 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     return widget;
 }
 
-UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
+static uint32_t ID = 0;
+
+uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
     auto html = g_resources.readFileContents(htmlPath);
     auto root = parseHtml(html);
     if (root->getChildren().empty())
-        return nullptr;
+        return 0;
 
     std::vector<css::StyleSheet> sheets;
 
@@ -288,7 +261,7 @@ UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
         parseStyle(sheet, true);
 
     const auto& all = root->querySelectorAll("*");
-    for (const auto& node : all) {
+    for (const auto& node : std::views::reverse(all)) {
         if (node->getWidget() && node->getStyle()) {
             node->getWidget()->mergeStyle(node->getStyle());
         }
@@ -296,12 +269,27 @@ UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
 
     for (const auto& node : all) {
         if (node->getWidget()) {
-            parseAndSetDisplayAttr(node);
             parseAndSetFloatStyle(node);
         }
     }
 
-    return parent;
+    auto id = ++ID;
+    m_nodes.emplace(id, root);
+
+    return id;
+}
+
+void HtmlManager::destroy(uint32_t id) {
+    auto it = m_nodes.find(id);
+    if (it == m_nodes.end())
+        return;
+
+    for (const auto& node : it->second->getChildren()) {
+        if (node->getWidget())
+            node->getWidget()->destroy();
+    }
+
+    m_nodes.erase(it);
 }
 
 void HtmlManager::setGlobalStyle(const std::string& style) {

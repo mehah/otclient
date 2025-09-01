@@ -225,4 +225,62 @@ namespace stdext
 
         return result;
     }
+
+    long long to_number(std::string_view s) {
+        const char* p = s.data();
+        const char* end = p + s.size();
+
+        long long num = 0;
+        bool found = false;
+        bool negative = false;
+
+        while (p < end) {
+            unsigned char c = static_cast<unsigned char>(*p++);
+            if (!found && c == '-') {
+                negative = true;       
+            } else if (c >= '0' && c <= '9') {
+                found = true;
+                num = num * 10 + (c - '0'); 
+            }
+        }
+
+        if (!found) return 0;
+        return negative ? -num : num;
+    }
+
+    std::vector<long long> extractNumbers(std::string_view s) {
+        std::vector<long long> out;
+        out.reserve(s.size() / 3);
+
+        const char* p = s.data();
+        const char* end = p + s.size();
+
+        long long val = 0;
+        bool building = false;
+        bool neg = false;
+
+        while (p < end) {
+            unsigned char c = static_cast<unsigned char>(*p);
+
+            if (c >= '0' && c <= '9') {
+                if (!building) { building = true; val = 0; }
+                val = val * 10 + (c - '0');
+            } else {
+                if (building) {
+                    out.emplace_back(neg ? -val : val);
+                    building = false;
+                    neg = false;
+                    val = 0;
+                } else {
+                    neg = (c == '-');
+                }
+            }
+            ++p;
+        }
+
+        if (building) out.emplace_back(neg ? -val : val);
+        if (out.empty()) out.emplace_back(0);
+
+        return out;
+    }
 }

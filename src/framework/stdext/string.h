@@ -60,6 +60,9 @@ namespace stdext
     std::wstring latin1_to_utf16(std::string_view src);
 #endif
 
+    long long to_number(std::string_view s);
+    std::vector<long long> extractNumbers(std::string_view s);
+
     // always returns at least one element in vector
     [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators = " ");
     template<typename T> std::vector<T> split(const std::string_view str, const std::string_view separators = " ")

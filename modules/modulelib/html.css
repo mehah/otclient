@@ -1,3 +1,14 @@
+* {
+    width: auto;
+    height: auto;
+    display: inline;
+}
+
+select {
+    width: 22;
+    height: 19;
+}
+
 br {
     display: block;
     height: 15;
@@ -22,10 +33,6 @@ hr {
 
 input[type=password] {
     text-hidden: true;
-}
-
-label {
-    text-auto-resize: true
 }
 
 textarea {

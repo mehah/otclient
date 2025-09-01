@@ -437,6 +437,7 @@ void Application::registerLuaFunctions()
 
     g_lua.registerSingletonClass("g_html");
     g_lua.bindSingletonFunction("g_html", "load", &HtmlManager::load, &g_html);
+    g_lua.bindSingletonFunction("g_html", "destroy", &HtmlManager::destroy, &g_html);
     g_lua.bindSingletonFunction("g_html", "setGlobalStyle", &HtmlManager::setGlobalStyle, &g_html);
 
     // FontManager
@@ -778,7 +779,6 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getNextWidget", &UIWidget::getNextWidget);
     g_lua.bindClassMemberFunction<UIWidget>("getPrevWidget", &UIWidget::getPrevWidget);
     g_lua.bindClassMemberFunction<UIWidget>("hasAnchoredLayout", &UIWidget::hasAnchoredLayout);
-    g_lua.bindClassMemberFunction<UIWidget>("setOnHtml", &UIWidget::setOnHtml);
     g_lua.bindClassMemberFunction<UIWidget>("isOnHtml", &UIWidget::isOnHtml);
 
     g_lua.bindClassMemberFunction<UIWidget>("setBackgroundDrawOrder", &UIWidget::setBackgroundDrawOrder);

@@ -107,7 +107,7 @@ parseCss(io.content('modulelib/html.css'), OFICIAL_HTML_CSS, false)
 g_html.setGlobalStyle(io.content('modulelib/html.css'))
 
 function HtmlLoader(path, parent, controller)
-    HTML_PATH = path
+    --[[HTML_PATH = path
 
     local cssList = {}
     table.insertall(cssList, OFICIAL_HTML_CSS)
@@ -188,7 +188,7 @@ function HtmlLoader(path, parent, controller)
                 removeEvent(event)
             end
         end, WATCH_CYCLE_CHECK_MS)
-    end
+    end]]
 
     return root
 end
