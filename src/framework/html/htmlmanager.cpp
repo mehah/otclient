@@ -6,6 +6,7 @@
 #include "htmlparser.h"
 #include "cssparser.h"
 #include <framework/core/resourcemanager.h>
+#include <ranges>
 
 HtmlManager g_html;
 css::StyleSheet GLOBAL_STYLE;
@@ -42,8 +43,14 @@ void parseAttrPropList(const std::string& attrStr, const OTMLNodePtr& parent) {
         const auto& attr = stdext::split(data, ":");
         if (attr.size() > 1) {
             auto nodeAttr = std::make_shared<OTMLNode>();
-            nodeAttr->setTag(attr[0]);
-            nodeAttr->setValue(attr[1]);
+            auto tag = attr[0];
+            auto value = attr[1];
+
+            stdext::trim(tag);
+            stdext::trim(value);
+
+            nodeAttr->setTag(tag);
+            nodeAttr->setValue(value);
             parent->addChild(nodeAttr);
         }
     }
@@ -109,6 +116,74 @@ void parseStyle(const UIWidgetPtr& widget, const HtmlNodePtr& node) {
     stdext::trim(style);
 }
 
+void  parseAndSetDisplayAttr(const HtmlNodePtr& node) {
+    if (node->getWidget()->hasAnchoredLayout()) {
+        if (node->getWidget()->getChildIndex() == 1 || node->getAttr("anchor") == "parent") {
+            node->getWidget()->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            node->getWidget()->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+        } else {
+            auto prev = node->getPrev();
+            if (prev && prev->getStyle("display") == "block") {
+                node->getWidget()->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                node->getWidget()->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
+            } else {
+                node->getWidget()->addAnchor(Fw::AnchorLeft, "prev", Fw::AnchorRight);
+                node->getWidget()->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
+            }
+        }
+    }
+
+    if (!node->getStyle())
+        return;
+
+    const auto& display = node->getStyle("display");
+    if (display == "none")
+        node->getWidget()->setVisible(false);
+}
+
+void parseAndSetFloatStyle(const HtmlNodePtr& node) {
+    if (!node->getStyle())
+        return;
+
+    const auto& propFloat = node->getStyle("float");
+
+    if (propFloat.empty() || !node->getWidget()->hasAnchoredLayout()) {
+        return;
+    }
+
+    if (propFloat == "right") {
+        std::string anchor = "parent";
+        auto anchorType = Fw::AnchorRight;
+        for (auto& child : node->getParent()->getChildren()) {
+            if (child != node && child->getStyle()) {
+                const auto& chield_propFloat = child->getStyle("float");
+                if (chield_propFloat == "right") {
+                    anchor = child->getWidget()->getId();
+                    anchorType = Fw::AnchorLeft;
+                    break;
+                }
+            }
+        }
+
+        node->getWidget()->removeAnchor(Fw::AnchorLeft);
+        node->getWidget()->addAnchor(Fw::AnchorRight, anchor, anchorType);
+    } else if (propFloat == "left") {
+        std::string anchor = "parent";
+        auto anchorType = Fw::AnchorLeft;
+        for (auto& child : node->getParent()->getChildren()) {
+            const auto& chield_propFloat = child->getStyle("float");
+            if (chield_propFloat == "right") {
+                anchor = child->getWidget()->getId();
+                anchorType = Fw::AnchorRight;
+                break;
+            }
+        }
+
+        node->getWidget()->removeAnchor(Fw::AnchorRight);
+        node->getWidget()->addAnchor(Fw::AnchorLeft, anchor, anchorType);
+    }
+}
+
 UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     const auto& styleName = g_ui.getStyleName(translateStyleName(node->getTag(), node));
 
@@ -125,11 +200,13 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         } else if (attr == "style") {
             auto otml = std::make_shared<OTMLNode>();
             parseAttrPropList(value, otml);
-            widget->mergeStyle(otml);
+            node->setStyle(otml);
         } else if (attr == "layout") {
             auto otml = std::make_shared<OTMLNode>();
-            otml->setTag("layout");
-            parseAttrPropList(value, otml);
+            auto layout = std::make_shared<OTMLNode>();
+            layout->setTag("layout");
+            parseAttrPropList(value, layout);
+            otml->addChild(layout);
             widget->mergeStyle(otml);
         } else if (attr == "class") {
             for (const auto& className : stdext::split(value, " ")) {
@@ -149,17 +226,18 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     return widget;
 }
 
-UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const UIWidgetPtr& parent) {
+UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
     auto html = g_resources.readFileContents(htmlPath);
-    auto dom = parseHtml(html);
-    if (dom->getChildren().empty())
+    auto root = parseHtml(html);
+    if (root->getChildren().empty())
         return nullptr;
 
     std::vector<css::StyleSheet> sheets;
 
-    auto root = g_ui.createWidget("UIWidget", nullptr);
+    if (!parent)
+        parent = g_ui.createWidget("UIWidget", nullptr);
 
-    for (const auto& node : dom->getChildren()) {
+    for (const auto& node : root->getChildren()) {
         if (node->getTag() == "style") {
             sheets.emplace_back(css::parse(node->getText()));
         } else if (node->getTag() == "link") {
@@ -172,7 +250,7 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const
     auto parseStyle = [&](css::StyleSheet sheet, bool checkRuleExist) {
         for (const auto& rule : sheet.rules) {
             const auto& selectors = stdext::join(rule.selectors);
-            const auto& nodes = dom->querySelectorAll(selectors);
+            const auto& nodes = root->querySelectorAll(selectors);
 
             if (checkRuleExist && nodes.empty()) {
                 g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
@@ -181,14 +259,15 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const
 
             for (const auto& node : nodes) {
                 if (node->getWidget()) {
-                    auto otml = std::make_shared<OTMLNode>();
+                    if (!node->getStyle())
+                        node->setStyle(std::make_shared<OTMLNode>());
+
                     for (const auto& decl : rule.decls) {
                         auto declOtml = std::make_shared<OTMLNode>();
                         declOtml->setTag(decl.property);
                         declOtml->setValue(decl.value);
-                        otml->addChild(declOtml);
+                        node->getStyle()->addChild(declOtml);
                     }
-                    node->getWidget()->mergeStyle(otml);
                 }
             }
         }
@@ -198,7 +277,18 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const
     for (const auto& sheet : sheets)
         parseStyle(sheet, true);
 
-    return root;
+    const auto& all = root->querySelectorAll("*");
+    for (const auto& node : std::ranges::reverse_view(all)) {
+        if (node->getWidget()) {
+            if (node->getStyle())
+                node->getWidget()->mergeStyle(node->getStyle());
+
+            parseAndSetDisplayAttr(node);
+            parseAndSetFloatStyle(node);
+        }
+    }
+
+    return parent;
 }
 
 void HtmlManager::setGlobalStyle(const std::string& style) {

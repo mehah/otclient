@@ -19,7 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 #include "htmlnode.h"
+#include <framework/otml/otml.h>
 
 std::string HtmlNode::getAttr(const std::string& name) const {
     auto key = ascii_tolower_copy(name);
@@ -101,6 +103,14 @@ HtmlNodePtr HtmlNode::documentRoot() const {
     HtmlNodePtr cur = const_cast<HtmlNode*>(this)->shared_from_this();
     while (cur->parent.lock()) cur = cur->parent.lock();
     return cur;
+}
+
+std::string HtmlNode::getStyle(std::string_view styleName) const {
+    if (m_styles) {
+        if (const auto& style = m_styles->get(styleName))
+            return style->value();
+    }
+    return "";
 }
 
 std::vector<HtmlNodePtr> HtmlNode::querySelectorAll(const std::string& selector) {

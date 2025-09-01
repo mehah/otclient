@@ -136,7 +136,7 @@ function ShaderController:onInit()
 
 
     addEvent(function()
-        g_ui.createWidgetFromHTML('/' .. path)
+        g_html.load('/' .. path, g_ui.getRootWidget())
     end)
 end
 

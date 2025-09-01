@@ -616,7 +616,3 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
     widget->callLuaField("onSetup");
     return widget;
 }
-
-UIWidgetPtr UIManager::createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent) {
-    return g_html.createWidgetFromHTML(html, parent ? parent : g_ui.getRootWidget());
-}

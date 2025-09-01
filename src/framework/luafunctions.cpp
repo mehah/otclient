@@ -427,7 +427,6 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_ui", "displayUI", &UIManager::displayUI, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidget", &UIManager::createWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "createWidgetFromOTML", &UIManager::createWidgetFromOTML, &g_ui);
-    g_lua.bindSingletonFunction("g_ui", "createWidgetFromHTML", &UIManager::createWidgetFromHTML, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getRootWidget", &UIManager::getRootWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getDraggingWidget", &UIManager::getDraggingWidget, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "getPressedWidget", &UIManager::getPressedWidget, &g_ui);
@@ -437,7 +436,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_ui", "isKeyboardGrabbed", &UIManager::isKeyboardGrabbed, &g_ui);
 
     g_lua.registerSingletonClass("g_html");
-    g_lua.bindSingletonFunction("g_html", "createWidgetFromHTML", &HtmlManager::createWidgetFromHTML, &g_html);
+    g_lua.bindSingletonFunction("g_html", "load", &HtmlManager::load, &g_html);
     g_lua.bindSingletonFunction("g_html", "setGlobalStyle", &HtmlManager::setGlobalStyle, &g_html);
 
     // FontManager

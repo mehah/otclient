@@ -23,6 +23,7 @@
 #pragma once
 #include "declarations.h"
 #include <framework/ui/declarations.h>
+#include <framework/otml/declarations.h>
 
 inline void ascii_tolower_inplace(std::string& s) { for (auto& c : s) if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a'); }
 inline std::string ascii_tolower_copy(std::string s) { ascii_tolower_inplace(s); return s; }
@@ -33,12 +34,12 @@ class HtmlNode : public std::enable_shared_from_this<HtmlNode>
 {
 public:
     NodeType getType() const { return type; }
-    const std::string& getTag() const { return tag; }
-    const std::unordered_map<std::string, std::string>& getAttributesMap() const { return attributes; }
-    const std::vector<std::string>& getClassList() const { return classList; }
-    const std::vector<HtmlNodePtr>& getChildren() const { return children; }
-    const std::weak_ptr<HtmlNode>& getParent() const { return parent; }
-    const std::string& getRawText() const { return text; }
+    const auto& getTag() const { return tag; }
+    const auto& getAttributesMap() const { return attributes; }
+    const auto& getClassList() const { return classList; }
+    const auto& getChildren() const { return children; }
+    const auto& getRawText() const { return text; }
+    const auto getParent() const { return parent.lock(); }
 
     HtmlNodePtr getById(const std::string& id) const {
         auto root = documentRoot();
@@ -88,8 +89,13 @@ public:
     const UIWidgetPtr& getWidget() const { return m_widget; }
     void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
 
-    const HtmlNodePtr& getPrev() const { return prev.lock(); }
-    const HtmlNodePtr& getNext() const { return next.lock(); }
+    HtmlNodePtr getPrev() const { return prev.lock(); }
+    HtmlNodePtr getNext() const { return next.lock(); }
+
+    const auto& getStyle() const { return m_styles; }
+
+    std::string getStyle(std::string_view style) const;
+    void setStyle(const OTMLNodePtr& style) { m_styles = style; }
 
 public:
     bool isHovered{ false };
@@ -110,6 +116,7 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
+    OTMLNodePtr m_styles;
     UIWidgetPtr m_widget;
 
     mutable int cacheIndexAmongElements = -1;
