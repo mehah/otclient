@@ -47,6 +47,7 @@ namespace stdext
     void ucwords(std::string& str);
     void eraseWhiteSpace(std::string& str);
     void replace_all(std::string& str, std::string_view search, std::string_view replacement);
+    std::string join(const std::vector<std::string>& vec, const std::string& sep = ",");
 
     [[nodiscard]] bool is_valid_utf8(std::string_view src);
     [[nodiscard]] std::string utf8_to_latin1(std::string_view src);

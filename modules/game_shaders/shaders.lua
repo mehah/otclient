@@ -134,8 +134,9 @@ function ShaderController:onInit()
 
     local path = '/' .. self.name .. '/shaders.html';
 
+
     addEvent(function()
-        g_ui.createWidgetFromHTML(g_resources.readFileContents('/' .. path))
+        g_ui.createWidgetFromHTML('/' .. path)
     end)
 end
 

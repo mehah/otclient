@@ -43,6 +43,7 @@
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
+#include "framework/html/htmlmanager.h"
 #endif
 
 #ifdef FRAMEWORK_SOUND
@@ -434,6 +435,10 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_ui", "isDrawingDebugBoxes", &UIManager::isDrawingDebugBoxes, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "isMouseGrabbed", &UIManager::isMouseGrabbed, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "isKeyboardGrabbed", &UIManager::isKeyboardGrabbed, &g_ui);
+
+    g_lua.registerSingletonClass("g_html");
+    g_lua.bindSingletonFunction("g_html", "createWidgetFromHTML", &HtmlManager::createWidgetFromHTML, &g_html);
+    g_lua.bindSingletonFunction("g_html", "setGlobalStyle", &HtmlManager::setGlobalStyle, &g_html);
 
     // FontManager
     g_lua.registerSingletonClass("g_fonts");

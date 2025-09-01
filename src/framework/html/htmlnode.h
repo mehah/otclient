@@ -22,6 +22,7 @@
 
 #pragma once
 #include "declarations.h"
+#include <framework/ui/declarations.h>
 
 inline void ascii_tolower_inplace(std::string& s) { for (auto& c : s) if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a'); }
 inline std::string ascii_tolower_copy(std::string s) { ascii_tolower_inplace(s); return s; }
@@ -84,6 +85,9 @@ public:
     friend HtmlNodePtr parseHtml(const std::string& html);
     friend void invalidateIndexCachesUp(HtmlNode* n);
 
+    const UIWidgetPtr& getWidget() const { return m_widget; }
+    void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
+
 public:
     bool isHovered{ false };
     bool isFocused{ false };
@@ -100,6 +104,8 @@ private:
     std::unordered_map<std::string, std::weak_ptr<HtmlNode>> idIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
+
+    UIWidgetPtr m_widget;
 
     mutable int cacheIndexAmongElements = -1;
     mutable int cacheIndexAmongType = -1;

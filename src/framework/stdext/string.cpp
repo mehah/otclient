@@ -186,6 +186,22 @@ namespace stdext
         }
     }
 
+    std::string join(const std::vector<std::string>& vec, const std::string& sep) {
+        if (vec.empty()) return {};
+
+        size_t total_size = (vec.size() - 1) * sep.size();
+        for (const auto& s : vec) total_size += s.size();
+
+        std::string result;
+        result.reserve(total_size);
+
+        for (size_t i = 0; i < vec.size(); ++i) {
+            if (i > 0) result += sep;
+            result += vec[i];
+        }
+        return result;
+    }
+
     void eraseWhiteSpace(std::string& str) { std::erase_if(str, isspace); }
 
     [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators) {

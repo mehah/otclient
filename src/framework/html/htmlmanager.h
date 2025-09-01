@@ -6,7 +6,8 @@
 class HtmlManager
 {
 public:
-    UIWidgetPtr createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent);
+    UIWidgetPtr createWidgetFromHTML(const std::string& htmlPath, const UIWidgetPtr& parent);
+    void setGlobalStyle(const std::string& style);
 };
 
 extern HtmlManager g_html;

@@ -4,8 +4,11 @@
 
 #include "htmlnode.h"
 #include "htmlparser.h"
+#include "cssparser.h"
+#include <framework/core/resourcemanager.h>
 
 HtmlManager g_html;
+css::StyleSheet GLOBAL_STYLE;
 
 static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = {
     {"offset-x", "image-offset-x"},
@@ -111,25 +114,7 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
 
     auto widget = g_ui.createWidget(styleName.empty() ? "UIWidget" : styleName, parent);
     widget->setOnHtml(true);
-
-    /*
-    if attr:starts('on') then
-            parseEvents(el, widget, attr:lower(), v, controller)
-        elseif attr == 'anchor' then
-            -- ignore
-        elseif attr == 'style' then
-            parseStyle(widget, el)
-        elseif attr == 'layout' then
-            parseLayout(widget, el)
-        elseif attr == 'class' then
-            for _, className in pairs(v:split(' ')) do
-                local css = g_ui.getStyle(className)
-                if css then
-                    widget:mergeStyle(css)
-                end
-            end
-        else
-    */
+    node->setWidget(widget);
 
     for (const auto [key, value] : node->getAttributesMap()) {
         const auto& attr = translateAttribute(styleName, node->getTag(), key);
@@ -157,18 +142,49 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     return widget;
 }
 
-UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent) {
+UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const UIWidgetPtr& parent) {
+    auto html = g_resources.readFileContents(htmlPath);
     auto dom = parseHtml(html);
     if (dom->getChildren().empty())
         return nullptr;
+
+    css::StyleSheet sheet;
 
     auto root = g_ui.createWidget("UIWidget", parent);
 
     for (const auto& node : dom->getChildren()) {
         if (node->getTag() == "style") {
+            sheet = css::parse(node->getText());
         } else if (node->getTag() == "link") {
         } else readNode(node, root);
     }
 
+    for (const auto& rule : sheet.rules) {
+        const auto& selectors = stdext::join(rule.selectors);
+        const auto& nodes = dom->querySelectorAll(selectors);
+
+        if (nodes.empty()) {
+            g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
+            continue;
+        }
+
+        for (const auto& node : dom->querySelectorAll(stdext::join(rule.selectors))) {
+            if (node->getWidget()) {
+                auto otml = std::make_shared<OTMLNode>();
+                for (const auto& decl : rule.decls) {
+                    auto declOtml = std::make_shared<OTMLNode>();
+                    declOtml->setTag(decl.property);
+                    declOtml->setValue(decl.value);
+                    otml->addChild(declOtml);
+                }
+                node->getWidget()->mergeStyle(otml);
+            }
+        }
+    }
+
     return root;
+}
+
+void HtmlManager::setGlobalStyle(const std::string& style) {
+    GLOBAL_STYLE = css::parse(style);
 }

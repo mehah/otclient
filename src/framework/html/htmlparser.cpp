@@ -19,6 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 #include "htmlparser.h"
 #include "htmlnode.h"
 #include <stack>
@@ -245,16 +246,20 @@ HtmlNodePtr parseHtml(const std::string& html) {
                     size_t closePos = std::string::npos;
                     std::string endTag = "</" + tag + ">";
                     closePos = s.find(endTag, i);
+
                     auto tnode = std::make_shared<HtmlNode>();
                     tnode->type = NodeType::Text;
+
                     if (closePos == std::string::npos) {
                         tnode->text = s.substr(i);
-                        push_node(tnode);
+                        tnode->parent = node;
+                        node->children.push_back(tnode);
                         i = N;
                     }
                     else {
                         tnode->text = s.substr(i, closePos - i);
-                        push_node(tnode);
+                        tnode->parent = node;
+                        node->children.push_back(tnode);
                         i = closePos + endTag.size();
                     }
                 }

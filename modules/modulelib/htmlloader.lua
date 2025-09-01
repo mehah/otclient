@@ -104,6 +104,7 @@ local function readNode(el, parent, controller, watchList)
 end
 
 parseCss(io.content('modulelib/html.css'), OFICIAL_HTML_CSS, false)
+g_html.setGlobalStyle(io.content('modulelib/html.css'))
 
 function HtmlLoader(path, parent, controller)
     HTML_PATH = path
