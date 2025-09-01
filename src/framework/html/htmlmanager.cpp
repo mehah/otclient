@@ -117,18 +117,22 @@ void parseStyle(const UIWidgetPtr& widget, const HtmlNodePtr& node) {
 }
 
 void  parseAndSetDisplayAttr(const HtmlNodePtr& node) {
-    if (node->getWidget()->hasAnchoredLayout()) {
-        if (node->getWidget()->getChildIndex() == 1 || node->getAttr("anchor") == "parent") {
+    const auto& widget = node->getWidget();
+    if (widget->hasAnchoredLayout()) {
+        if (widget->getWidth() == 0)
+            widget->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+
+        if (widget->getChildIndex() == 1 || node->getAttr("anchor") == "parent") {
             node->getWidget()->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
             node->getWidget()->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         } else {
             auto prev = node->getPrev();
             if (prev && prev->getStyle("display") == "block") {
-                node->getWidget()->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-                node->getWidget()->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
+                widget->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                widget->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
             } else {
-                node->getWidget()->addAnchor(Fw::AnchorLeft, "prev", Fw::AnchorRight);
-                node->getWidget()->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
+                widget->addAnchor(Fw::AnchorLeft, "prev", Fw::AnchorRight);
+                widget->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
             }
         }
     }
@@ -138,7 +142,7 @@ void  parseAndSetDisplayAttr(const HtmlNodePtr& node) {
 
     const auto& display = node->getStyle("display");
     if (display == "none")
-        node->getWidget()->setVisible(false);
+        widget->setVisible(false);
 }
 
 void parseAndSetFloatStyle(const HtmlNodePtr& node) {
