@@ -294,7 +294,7 @@ UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
         }
     }
 
-    for (const auto& node : std::ranges::reverse_view(all)) {
+    for (const auto& node : all) {
         if (node->getWidget()) {
             parseAndSetDisplayAttr(node);
             parseAndSetFloatStyle(node);
