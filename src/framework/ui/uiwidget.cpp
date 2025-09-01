@@ -2190,12 +2190,12 @@ void UIWidget::updateStyleHtml() {
     }
 
     if (hasProp(PropFitHeight)) {
-        auto startPixel = 0;
-        auto endPixel = 0;
+        auto startPixel = m_rect.topLeft().y;
+        auto endPixel = m_rect.bottomLeft().y;
         for (const auto& child : getChildren()) {
-            if (child->m_rect.topLeft().y < startPixel || startPixel == 0)
+            if (child->m_rect.topLeft().y < startPixel)
                 startPixel = child->m_rect.topLeft().y;
-            if (child->m_rect.bottomLeft().y > endPixel || endPixel == 0)
+            if (child->m_rect.bottomLeft().y > endPixel)
                 endPixel = child->m_rect.bottomLeft().y;
         }
 
@@ -2206,12 +2206,12 @@ void UIWidget::updateStyleHtml() {
     }
 
     if (hasProp(PropFitWidth)) {
-        auto startPixel = 0;
-        auto endPixel = 0;
+        auto startPixel = m_rect.topLeft().x;
+        auto endPixel = m_rect.topRight().x;
         for (const auto& child : getChildren()) {
-            if (child->m_rect.topLeft().x < startPixel || startPixel == 0)
+            if (child->m_rect.topLeft().x < startPixel)
                 startPixel = child->m_rect.topLeft().x;
-            if (child->m_rect.topRight().x > endPixel || endPixel == 0)
+            if (child->m_rect.topRight().x > endPixel)
                 endPixel = child->m_rect.topRight().x;
         }
 
