@@ -139,6 +139,10 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         }
     }
 
+    for (const auto& child : node->getChildren()) {
+        readNode(child, widget);
+    }
+
     return widget;
 }
 
@@ -169,7 +173,7 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const
                 continue;
             }
 
-            for (const auto& node : dom->querySelectorAll(stdext::join(rule.selectors))) {
+            for (const auto& node : nodes) {
                 if (node->getWidget()) {
                     auto otml = std::make_shared<OTMLNode>();
                     for (const auto& decl : rule.decls) {

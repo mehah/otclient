@@ -88,6 +88,9 @@ public:
     const UIWidgetPtr& getWidget() const { return m_widget; }
     void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
 
+    const HtmlNodePtr& getPrev() const { return prev.lock(); }
+    const HtmlNodePtr& getNext() const { return next.lock(); }
+
 public:
     bool isHovered{ false };
     bool isFocused{ false };
@@ -100,6 +103,8 @@ private:
     std::vector<HtmlNodePtr> children;
     std::string text;
     std::weak_ptr<HtmlNode> parent;
+    std::weak_ptr<HtmlNode> prev;
+    std::weak_ptr<HtmlNode> next;
 
     std::unordered_map<std::string, std::weak_ptr<HtmlNode>> idIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;

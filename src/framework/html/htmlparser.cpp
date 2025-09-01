@@ -168,8 +168,16 @@ HtmlNodePtr parseHtml(const std::string& html) {
     size_t i = 0, N = s.size();
 
     auto push_node = [&](HtmlNodePtr node) {
-        node->parent = st.top();
-        st.top()->children.push_back(node);
+        auto parent = st.top();
+
+        if (!parent->children.empty()) {
+            auto last = parent->children.back();
+            last->next = node;
+            node->prev = last;
+        }
+
+        node->parent = parent;
+        parent->children.push_back(node);
 
         auto doc = root;
         if (node->type == NodeType::Element) {
@@ -177,7 +185,8 @@ HtmlNodePtr parseHtml(const std::string& html) {
                 doc->tagIndex[node->tag].push_back(node);
             std::string idv = node->getAttr("id");
             if (!idv.empty()) doc->idIndex[idv] = node;
-            if (!node->classList.empty()) for (auto& cls : node->classList) doc->classIndex[cls].push_back(node);
+            if (!node->classList.empty())
+                for (auto& cls : node->classList) doc->classIndex[cls].push_back(node);
         }
         };
 
@@ -253,12 +262,22 @@ HtmlNodePtr parseHtml(const std::string& html) {
                     if (closePos == std::string::npos) {
                         tnode->text = s.substr(i);
                         tnode->parent = node;
+                        if (!node->children.empty()) {
+                            auto lastChild = node->children.back();
+                            lastChild->next = tnode;
+                            tnode->prev = lastChild;
+                        }
                         node->children.push_back(tnode);
                         i = N;
                     }
                     else {
                         tnode->text = s.substr(i, closePos - i);
                         tnode->parent = node;
+                        if (!node->children.empty()) {
+                            auto lastChild = node->children.back();
+                            lastChild->next = tnode;
+                            tnode->prev = lastChild;
+                        }
                         node->children.push_back(tnode);
                         i = closePos + endTag.size();
                     }
