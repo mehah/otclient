@@ -253,7 +253,7 @@ UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
         } else readNode(node, parent);
     }
 
-    auto parseStyle = [&](css::StyleSheet sheet, bool checkRuleExist) {
+    auto parseStyle = [&](const css::StyleSheet& sheet, bool checkRuleExist) {
         for (const auto& rule : sheet.rules) {
             const auto& selectors = stdext::join(rule.selectors);
             const auto& nodes = root->querySelectorAll(selectors);
@@ -286,7 +286,7 @@ UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
     const auto& all = root->querySelectorAll("*");
     for (const auto& node : all) {
         if (node->getWidget() && node->getStyle()) {
-            node->getWidget()->mergeStyle(node->getStyle());;
+            node->getWidget()->mergeStyle(node->getStyle());
         }
     }
 

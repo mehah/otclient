@@ -142,7 +142,7 @@ std::string HtmlNode::textContent() const {
     case NodeType::Text:
         return text;
     case NodeType::Element: {
-        std::string out;
+        std::string out = text;
         for (const auto& c : children) {
             out += c->textContent();
         }
