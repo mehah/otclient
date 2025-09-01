@@ -152,15 +152,18 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const
     if (dom->getChildren().empty())
         return nullptr;
 
-    css::StyleSheet sheet;
+    std::vector<css::StyleSheet> sheets;
 
-    auto root = g_ui.createWidget("UIWidget", parent);
+    auto root = g_ui.createWidget("UIWidget", nullptr);
 
     for (const auto& node : dom->getChildren()) {
         if (node->getTag() == "style") {
-            sheet = css::parse(node->getText());
+            sheets.emplace_back(css::parse(node->getText()));
         } else if (node->getTag() == "link") {
-        } else readNode(node, root);
+            if (node->hasAttr("href")) {
+                sheets.emplace_back(css::parse(g_resources.readFileContents(node->getAttr("href"))));
+            }
+        } else readNode(node, parent);
     }
 
     auto parseStyle = [&](css::StyleSheet sheet, bool checkRuleExist) {
@@ -189,7 +192,8 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& htmlPath, const
     };
 
     parseStyle(GLOBAL_STYLE, false);
-    parseStyle(sheet, true);
+    for (const auto& sheet : sheets)
+        parseStyle(sheet, true);
 
     return root;
 }
