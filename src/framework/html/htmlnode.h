@@ -90,8 +90,8 @@ public:
     const UIWidgetPtr& getWidget() const { return m_widget; }
     void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
 
-    HtmlNodePtr getPrev() const;
-    HtmlNodePtr getNext() const;
+    HtmlNodePtr getPrev() const { return prev.lock(); }
+    HtmlNodePtr getNext() const { return next.lock(); }
 
     const auto& getStyle() const { return m_styles; }
 

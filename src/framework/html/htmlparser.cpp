@@ -279,20 +279,30 @@ HtmlNodePtr parseHtml(const std::string& html) {
             size_t lt = s.find('<', i);
             if (lt == std::string::npos) lt = N;
             std::string txt = s.substr(start, lt - start);
+
             if (!txt.empty()) {
-                auto parent = st.top();
                 std::string decoded = html_entity_decode(txt);
 
-                if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
-                    parent->text += decoded;
+                bool onlyWhitespace = true;
+                for (char c : decoded) {
+                    if (!is_space((unsigned char)c)) { onlyWhitespace = false; break; }
                 }
-                else {
-                    auto t = std::make_shared<HtmlNode>();
-                    t->type = NodeType::Text;
-                    t->text = decoded;
-                    push_node(t);
+
+                if (!decoded.empty() && !onlyWhitespace) {
+                    auto parent = st.top();
+
+                    if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
+                        parent->text += decoded;
+                    }
+                    else {
+                        auto t = std::make_shared<HtmlNode>();
+                        t->type = NodeType::Text;
+                        t->text = decoded;
+                        push_node(t);
+                    }
                 }
             }
+
             i = lt;
         }
     }
