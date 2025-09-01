@@ -113,6 +113,22 @@ std::string HtmlNode::getStyle(std::string_view styleName) const {
     return "";
 }
 
+HtmlNodePtr HtmlNode::getPrev() const {
+    auto p = prev.lock();
+    while (p && p->getType() != NodeType::Element) {
+        p = p->prev.lock();
+    }
+    return (p && p->getType() == NodeType::Element) ? p : nullptr;
+}
+
+HtmlNodePtr HtmlNode::getNext() const {
+    auto n = next.lock();
+    while (n && n->getType() != NodeType::Element) {
+        n = n->next.lock();
+    }
+    return (n && n->getType() == NodeType::Element) ? n : nullptr;
+}
+
 std::vector<HtmlNodePtr> HtmlNode::querySelectorAll(const std::string& selector) {
     return ::querySelectorAll(this->shared_from_this(), selector);
 }
@@ -121,14 +137,14 @@ HtmlNodePtr HtmlNode::querySelector(const std::string& selector) {
     return ::querySelector(this->shared_from_this(), selector);
 }
 
-std::string HtmlNode::getText() const {
+std::string HtmlNode::textContent() const {
     switch (type) {
     case NodeType::Text:
         return text;
     case NodeType::Element: {
         std::string out;
         for (const auto& c : children) {
-            out += c->getText();
+            out += c->textContent();
         }
         return out;
     }

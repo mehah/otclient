@@ -7,12 +7,14 @@
         width: 200;
     }
 
-    select {
+    select,
+    label {
         margin-bottom: 5;
+        display: block;
     }
 </style>
 
-<div focusable="false" class="content" anchor="parent" layout="type: verticalBox; fit-children: true">
+<div focusable="false" class="content" anchor="parent">
     <label style="text-align: center; margin-top: 10">Shaders Map/Outfit/Mount</label>
     <hr />
     <select id="mapComboBox" onchange="self:onMapComboBoxChange(event)"></select>

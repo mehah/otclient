@@ -166,6 +166,8 @@ void parseAndSetFloatStyle(const HtmlNodePtr& node) {
         }
 
         node->getWidget()->removeAnchor(Fw::AnchorLeft);
+        node->getWidget()->removeAnchor(Fw::AnchorRight);
+
         node->getWidget()->addAnchor(Fw::AnchorRight, anchor, anchorType);
     } else if (propFloat == "left") {
         std::string anchor = "parent";
@@ -179,6 +181,7 @@ void parseAndSetFloatStyle(const HtmlNodePtr& node) {
             }
         }
 
+        node->getWidget()->removeAnchor(Fw::AnchorLeft);
         node->getWidget()->removeAnchor(Fw::AnchorRight);
         node->getWidget()->addAnchor(Fw::AnchorLeft, anchor, anchorType);
     }
@@ -217,8 +220,7 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     }
 
     for (const auto& child : node->getChildren()) {
-        if (child->getType() == NodeType::Element)
-            readNode(child, widget);
+        readNode(child, widget);
     }
 
     widget->setText(node->getText());
@@ -278,11 +280,14 @@ UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
         parseStyle(sheet, true);
 
     const auto& all = root->querySelectorAll("*");
+    for (const auto& node : all) {
+        if (node->getWidget() && node->getStyle()) {
+            node->getWidget()->mergeStyle(node->getStyle());;
+        }
+    }
+
     for (const auto& node : std::ranges::reverse_view(all)) {
         if (node->getWidget()) {
-            if (node->getStyle())
-                node->getWidget()->mergeStyle(node->getStyle());
-
             parseAndSetDisplayAttr(node);
             parseAndSetFloatStyle(node);
         }

@@ -66,7 +66,8 @@ public:
         return out;
     }
     std::string getAttr(const std::string& name) const;
-    std::string getText() const;
+    std::string textContent() const;
+    std::string getText() const { return text; }
 
     bool hasAttr(const std::string& name) const;
 
@@ -89,8 +90,8 @@ public:
     const UIWidgetPtr& getWidget() const { return m_widget; }
     void setWidget(const UIWidgetPtr& widget) { m_widget = widget; }
 
-    HtmlNodePtr getPrev() const { return prev.lock(); }
-    HtmlNodePtr getNext() const { return next.lock(); }
+    HtmlNodePtr getPrev() const;
+    HtmlNodePtr getNext() const;
 
     const auto& getStyle() const { return m_styles; }
 
