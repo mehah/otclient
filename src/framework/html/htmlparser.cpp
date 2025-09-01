@@ -157,6 +157,10 @@ static void impliedEndOnStart(const std::string& newTag, std::stack<HtmlNodePtr>
 }
 
 HtmlNodePtr parseHtml(const std::string& html) {
+    static const std::unordered_set<std::string> kTextOnly = {
+        "script", "style", "title", "textarea", "option"
+    };
+
     auto root = std::make_shared<HtmlNode>();
     root->type = NodeType::Element;
     root->tag = "root";
@@ -256,29 +260,12 @@ HtmlNodePtr parseHtml(const std::string& html) {
                     std::string endTag = "</" + tag + ">";
                     closePos = s.find(endTag, i);
 
-                    auto tnode = std::make_shared<HtmlNode>();
-                    tnode->type = NodeType::Text;
-
                     if (closePos == std::string::npos) {
-                        tnode->text = s.substr(i);
-                        tnode->parent = node;
-                        if (!node->children.empty()) {
-                            auto lastChild = node->children.back();
-                            lastChild->next = tnode;
-                            tnode->prev = lastChild;
-                        }
-                        node->children.push_back(tnode);
+                        node->text = s.substr(i);
                         i = N;
                     }
                     else {
-                        tnode->text = s.substr(i, closePos - i);
-                        tnode->parent = node;
-                        if (!node->children.empty()) {
-                            auto lastChild = node->children.back();
-                            lastChild->next = tnode;
-                            tnode->prev = lastChild;
-                        }
-                        node->children.push_back(tnode);
+                        node->text = s.substr(i, closePos - i);
                         i = closePos + endTag.size();
                     }
                 }
@@ -293,10 +280,18 @@ HtmlNodePtr parseHtml(const std::string& html) {
             if (lt == std::string::npos) lt = N;
             std::string txt = s.substr(start, lt - start);
             if (!txt.empty()) {
-                auto t = std::make_shared<HtmlNode>();
-                t->type = NodeType::Text;
-                t->text = html_entity_decode(txt);
-                push_node(t);
+                auto parent = st.top();
+                std::string decoded = html_entity_decode(txt);
+
+                if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
+                    parent->text += decoded;
+                }
+                else {
+                    auto t = std::make_shared<HtmlNode>();
+                    t->type = NodeType::Text;
+                    t->text = decoded;
+                    push_node(t);
+                }
             }
             i = lt;
         }

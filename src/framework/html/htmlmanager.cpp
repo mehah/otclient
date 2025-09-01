@@ -194,6 +194,12 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     widget->setOnHtml(true);
     node->setWidget(widget);
 
+    if (node->getType() == NodeType::Text) {
+        widget->setTextAutoResize(true);
+    }
+
+    widget->setText(node->getText());
+
     for (const auto [key, value] : node->getAttributesMap()) {
         const auto& attr = translateAttribute(styleName, node->getTag(), key);
 
@@ -223,8 +229,6 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         readNode(child, widget);
     }
 
-    widget->setText(node->getText());
-
     return widget;
 }
 
@@ -241,7 +245,7 @@ UIWidgetPtr HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
 
     for (const auto& node : root->getChildren()) {
         if (node->getTag() == "style") {
-            sheets.emplace_back(css::parse(node->getText()));
+            sheets.emplace_back(css::parse(node->textContent()));
         } else if (node->getTag() == "link") {
             if (node->hasAttr("href")) {
                 sheets.emplace_back(css::parse(g_resources.readFileContents(node->getAttr("href"))));
