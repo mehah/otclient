@@ -140,8 +140,11 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     }
 
     for (const auto& child : node->getChildren()) {
-        readNode(child, widget);
+        if (child->getType() == NodeType::Element)
+            readNode(child, widget);
     }
+
+    widget->setText(node->getText());
 
     return widget;
 }
