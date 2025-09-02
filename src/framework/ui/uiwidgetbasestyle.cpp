@@ -222,6 +222,15 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "initial") display = DisplayType::Initial;
             else if (v == "inherit") display = DisplayType::Inherit;
             setDisplay(display);
+        } else if (node->tag() == "float") {
+            auto v = node->value<std::string>();
+            stdext::tolower(v);
+            FloatType type = FloatType::None;
+            if (v == "left") type = FloatType::Left;
+            else if (v == "right") type = FloatType::Right;
+            else if (v == "inline-start") type = FloatType::InlineStart;
+            else if (v == "inline-end") type = FloatType::InlineEnd;
+            setFloat(type);
         } else if (node->tag() == "margin-top")
             setMarginTop(node->value<int>());
         else if (node->tag() == "margin-right")

@@ -116,52 +116,6 @@ void parseStyle(const UIWidgetPtr& widget, const HtmlNodePtr& node) {
     stdext::trim(style);
 }
 
-void parseAndSetFloatStyle(const HtmlNodePtr& node) {
-    if (!node->getStyle())
-        return;
-
-    const auto& propFloat = node->getStyle("float");
-
-    if (propFloat.empty() || !node->getWidget()->hasAnchoredLayout()) {
-        return;
-    }
-
-    if (propFloat == "right") {
-        std::string anchor = "parent";
-        auto anchorType = Fw::AnchorRight;
-        for (auto& child : node->getParent()->getChildren()) {
-            if (child != node && child->getStyle()) {
-                const auto& chield_propFloat = child->getStyle("float");
-                if (chield_propFloat == "right") {
-                    anchor = child->getWidget()->getId();
-                    anchorType = Fw::AnchorLeft;
-                    break;
-                }
-            }
-        }
-
-        node->getWidget()->removeAnchor(Fw::AnchorLeft);
-        node->getWidget()->removeAnchor(Fw::AnchorRight);
-
-        node->getWidget()->addAnchor(Fw::AnchorRight, anchor, anchorType);
-    } else if (propFloat == "left") {
-        std::string anchor = "parent";
-        auto anchorType = Fw::AnchorLeft;
-        for (auto& child : node->getParent()->getChildren()) {
-            const auto& chield_propFloat = child->getStyle("float");
-            if (chield_propFloat == "right") {
-                anchor = child->getWidget()->getId();
-                anchorType = Fw::AnchorRight;
-                break;
-            }
-        }
-
-        node->getWidget()->removeAnchor(Fw::AnchorLeft);
-        node->getWidget()->removeAnchor(Fw::AnchorRight);
-        node->getWidget()->addAnchor(Fw::AnchorLeft, anchor, anchorType);
-    }
-}
-
 UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     const auto& styleName = g_ui.getStyleName(translateStyleName(node->getTag(), node));
 
@@ -264,12 +218,6 @@ uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
     for (const auto& node : std::views::reverse(all)) {
         if (node->getWidget() && node->getStyle()) {
             node->getWidget()->mergeStyle(node->getStyle());
-        }
-    }
-
-    for (const auto& node : all) {
-        if (node->getWidget()) {
-            parseAndSetFloatStyle(node);
         }
     }
 

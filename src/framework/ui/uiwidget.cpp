@@ -2145,11 +2145,6 @@ void UIWidget::setWidth(std::string widthStr) {
     }
 }
 
-void UIWidget::setDisplay(DisplayType type) {
-    m_displayType = type;
-    scheduleHtmlStyleUpdate();
-}
-
 void UIWidget::scheduleHtmlStyleUpdate() {
     if (hasProp(PropUpdateStyleHtml))
         return;
@@ -2175,7 +2170,33 @@ void UIWidget::updateStyleHtml() {
     if (!hasAnchoredLayout())
         return;
 
-    if (getChildIndex() == 1 || m_htmlNode->getAttr("anchor") == "parent") {
+    if (m_floatType == FloatType::Right) {
+        std::string anchor = "parent";
+        auto anchorType = Fw::AnchorRight;
+
+        if (const auto& prev = getPrevWidget()) {
+            if (prev->m_floatType == FloatType::Right) {
+                anchor = prev->getId();
+                anchorType = Fw::AnchorLeft;
+            }
+        }
+
+        addAnchor(Fw::AnchorRight, anchor, anchorType);
+        addAnchor(Fw::AnchorTop, anchor, Fw::AnchorTop);
+    } else if (m_floatType == FloatType::Left) {
+        std::string anchor = "parent";
+        auto anchorType = Fw::AnchorLeft;
+
+        if (const auto& prev = getPrevWidget()) {
+            if (prev->m_floatType == FloatType::Left) {
+                anchor = prev->getId();
+                anchorType = Fw::AnchorRight;
+            }
+        }
+
+        addAnchor(Fw::AnchorLeft, anchor, anchorType);
+        addAnchor(Fw::AnchorTop, anchor, Fw::AnchorTop);
+    } else if (getChildIndex() == 1 || m_htmlNode->getAttr("anchor") == "parent") {
         addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
         addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
     } else {
@@ -2190,34 +2211,23 @@ void UIWidget::updateStyleHtml() {
     }
 
     if (hasProp(PropFitHeight)) {
-        auto startPixel = m_rect.topLeft().y;
-        auto endPixel = m_rect.bottomLeft().y;
+        auto height = m_rect.bottomLeft().y - m_rect.topLeft().y;
         for (const auto& child : getChildren()) {
-            if (child->m_rect.topLeft().y < startPixel)
-                startPixel = child->m_rect.topLeft().y;
-            if (child->m_rect.bottomLeft().y > endPixel)
-                endPixel = child->m_rect.bottomLeft().y;
+            height = std::max<int>(height, child->m_rect.bottomLeft().y);
         }
 
-        auto height = endPixel - startPixel;
         setHeight_px(height);
 
         setProp(PropFitHeight, false);
     }
 
     if (hasProp(PropFitWidth)) {
-        auto startPixel = m_rect.topLeft().x;
-        auto endPixel = m_rect.topRight().x;
+        auto width = m_rect.topRight().x - m_rect.topLeft().x;
         for (const auto& child : getChildren()) {
-            if (child->m_rect.topLeft().x < startPixel)
-                startPixel = child->m_rect.topLeft().x;
-            if (child->m_rect.topRight().x > endPixel)
-                endPixel = child->m_rect.topRight().x;
+            width = std::max<int>(width, child->m_rect.topRight().x);
         }
 
-        auto width = endPixel - startPixel;
         setWidth_px(width);
-
         setProp(PropFitWidth, false);
     }
 }

@@ -99,6 +99,15 @@ enum class DisplayType : uint8_t
     Inherit
 };
 
+enum class FloatType : uint8_t
+{
+    None,
+    Left,
+    Right,
+    InlineStart,
+    InlineEnd
+};
+
 // @bindclass
 class UIWidget : public LuaObject
 {
@@ -123,6 +132,7 @@ protected:
     Size m_maxSize;
 
     DisplayType m_displayType = DisplayType::Inline;
+    FloatType m_floatType = FloatType::None;
 
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;
@@ -201,7 +211,8 @@ public:
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
-    void setDisplay(DisplayType type);
+    void setDisplay(DisplayType type) { m_displayType = type; scheduleHtmlStyleUpdate(); }
+    void setFloat(FloatType type) { m_floatType = type; scheduleHtmlStyleUpdate(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
 
     bool isOnHtml() { return m_htmlNode != nullptr; }
@@ -211,6 +222,7 @@ public:
     bool hasChild(const UIWidgetPtr& child);
     int getChildIndex(const UIWidgetPtr& child = nullptr) { return child ? (child->getParent().get() == this ? child->m_childIndex : -1) : m_childIndex; }
     auto getDisplay() { return m_displayType; }
+    auto getFloat() { return m_floatType; }
 
     Rect getPaddingRect();
     Rect getMarginRect();
