@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "htmlmanager.h"
 #include <framework/ui/uimanager.h>
 #include <framework/ui/ui.h>
@@ -34,22 +56,14 @@ static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = 
     {"src", "image-source"}
 };
 
-void parseAttrPropList(const std::string& attrStr, std::unordered_map<std::string, std::string>& parent) {
-    auto attrs = stdext::split(attrStr, ";");
-
-    for (auto data : attrs) {
+void parseAttrPropList(const std::string& attrsStr, std::unordered_map<std::string, std::string>& attrsMap) {
+    for (auto& data : stdext::split(attrsStr, ";")) {
         stdext::trim(data);
-
-        const auto& attr = stdext::split(data, ":");
+        auto attr = stdext::split(data, ":");
         if (attr.size() > 1) {
-            auto nodeAttr = std::make_shared<OTMLNode>();
-            auto tag = attr[0];
-            auto value = attr[1];
-
-            stdext::trim(tag);
-            stdext::trim(value);
-
-            parent[tag] = value;
+            stdext::trim(attr[0]);
+            stdext::trim(attr[1]);
+            attrsMap[attr[0]] = attr[1];
         }
     }
 }
@@ -107,13 +121,6 @@ std::string translateStyleName(const std::string& styleName, const HtmlNodePtr& 
     return styleName;
 }
 
-void parseStyle(const UIWidgetPtr& widget, const HtmlNodePtr& node) {
-    if (!node->hasAttr("style")) return;
-
-    auto style = node->getAttr("style");
-    stdext::trim(style);
-}
-
 UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     const auto& styleName = g_ui.getStyleName(translateStyleName(node->getTag(), node));
 
@@ -121,11 +128,10 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     node->setWidget(widget);
     widget->setHtmlNode(node);
 
-    if (node->getType() == NodeType::Text) {
+    if (!node->getText().empty()) {
         widget->setTextAutoResize(true);
+        widget->setText(node->getText());
     }
-
-    widget->setText(node->getText());
 
     for (const auto [key, value] : node->getAttributesMap()) {
         const auto& attr = translateAttribute(styleName, node->getTag(), key);
@@ -136,24 +142,25 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         } else if (attr == "style") {
             parseAttrPropList(value, node->getAttrStyles());
         } else if (attr == "layout") {
-            std::unordered_map<std::string, std::string> styles;
-            parseAttrPropList(value, styles);
-
             auto otml = std::make_shared<OTMLNode>();
             auto layout = std::make_shared<OTMLNode>();
+
+            std::unordered_map<std::string, std::string> styles;
+            parseAttrPropList(value, styles);
             for (const auto [tag, value] : styles) {
                 auto nodeAttr = std::make_shared<OTMLNode>();
                 nodeAttr->setTag(tag);
                 nodeAttr->setValue(value);
                 layout->addChild(nodeAttr);
             }
+
             layout->setTag("layout");
             otml->addChild(layout);
             widget->mergeStyle(otml);
         } else if (attr == "class") {
             for (const auto& className : stdext::split(value, " ")) {
-                const auto& style = g_ui.getStyle(className);
-                if (style) widget->mergeStyle(style);
+                if (const auto& style = g_ui.getStyle(className))
+                    widget->mergeStyle(style);
             }
         }
     }
@@ -165,18 +172,16 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     return widget;
 }
 
-static uint32_t ID = 0;
-
 uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
-    auto html = g_resources.readFileContents(htmlPath);
-    auto root = parseHtml(html);
+    auto htmlContent = g_resources.readFileContents(htmlPath);
+    auto root = parseHtml(htmlContent);
     if (root->getChildren().empty())
         return 0;
 
     std::vector<css::StyleSheet> sheets;
 
     if (!parent)
-        parent = g_ui.createWidget("UIWidget", nullptr);
+        parent = g_ui.getRootWidget();
 
     for (const auto& node : root->getChildren()) {
         if (node->getTag() == "style") {
@@ -235,10 +240,8 @@ uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
         }
     }
 
-    auto id = ++ID;
-    m_nodes.emplace(id, root);
-
-    return id;
+    static uint32_t ID = 0;
+    return m_nodes.emplace(++ID, root).first->first;
 }
 
 void HtmlManager::destroy(uint32_t id) {
