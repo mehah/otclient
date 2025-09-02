@@ -273,6 +273,11 @@ set(SOURCE_FILES
         framework/net/protocolhttp.cpp
         framework/net/httplogin.cpp
         framework/net/server.cpp
+        framework/html/queryselector.cpp
+        framework/html/htmlnode.cpp
+        framework/html/htmlparser.cpp
+        framework/html/htmlmanager.cpp
+        framework/html/cssparser.cpp
         framework/otml/otmldocument.cpp
         framework/otml/otmlemitter.cpp
         framework/otml/otmlexception.cpp
