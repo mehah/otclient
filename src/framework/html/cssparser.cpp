@@ -289,6 +289,10 @@ namespace css {
                     }
                     trim_inplace(tmp);
                     val = tmp;
+
+                    if (prop.starts_with("--"))
+                        prop.erase(0, 2);
+
                     out.push_back({ prop, val, important });
                 }
                 if (i < N && s[i] == ';') ++i;
