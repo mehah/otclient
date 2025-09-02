@@ -2194,12 +2194,12 @@ void UIWidget::updateStyleHtml() {
         }
 
         if (hasProp(PropFitWidth)) {
-            auto width = m_rect.topRight().x - m_rect.topLeft().x;
+            auto width = m_rect.topLeft().x;
             for (const auto& child : getChildren()) {
                 width = std::max<int>(width, child->m_rect.topRight().x);
             }
 
-            setWidth_px(width);
+            setWidth_px(width - m_rect.topLeft().x);
             setProp(PropFitWidth, false);
         }
     });
