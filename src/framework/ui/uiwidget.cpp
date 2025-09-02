@@ -2184,22 +2184,30 @@ void UIWidget::updateStyleHtml() {
     g_dispatcher.deferEvent([this, self = static_self_cast<UIWidget>()] {
         if (hasProp(PropFitHeight)) {
             auto height = m_rect.topLeft().y;
+            auto extra = 0;
             for (const auto& child : getChildren()) {
-                height = std::max<int>(height, child->m_rect.bottomLeft().y);
+                if (child->m_rect.bottomLeft().y > height) {
+                    height = child->m_rect.bottomLeft().y;
+                    extra = child->getMarginBottom();
+                }
             }
 
-            setHeight_px(height - m_rect.topLeft().y);
+            setHeight_px((height - m_rect.topLeft().y) + extra);
 
             setProp(PropFitHeight, false);
         }
 
         if (hasProp(PropFitWidth)) {
             auto width = m_rect.topLeft().x;
+            auto extra = 0;
             for (const auto& child : getChildren()) {
-                width = std::max<int>(width, child->m_rect.topRight().x);
+                if (child->m_rect.topRight().x > width) {
+                    width = child->m_rect.topRight().x;
+                    extra = child->getMarginRight();
+                }
             }
 
-            setWidth_px(width - m_rect.topLeft().x);
+            setWidth_px((width - m_rect.topLeft().x) + extra);
             setProp(PropFitWidth, false);
         }
     });
