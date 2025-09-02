@@ -34,7 +34,7 @@ static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = 
     {"src", "image-source"}
 };
 
-void parseAttrPropList(const std::string& attrStr, const OTMLNodePtr& parent) {
+void parseAttrPropList(const std::string& attrStr, std::unordered_map<std::string, std::string>& parent) {
     auto attrs = stdext::split(attrStr, ";");
 
     for (auto data : attrs) {
@@ -49,9 +49,7 @@ void parseAttrPropList(const std::string& attrStr, const OTMLNodePtr& parent) {
             stdext::trim(tag);
             stdext::trim(value);
 
-            nodeAttr->setTag(tag);
-            nodeAttr->setValue(value);
-            parent->addChild(nodeAttr);
+            parent[tag] = value;
         }
     }
 }
@@ -136,14 +134,20 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         } else if (attr == "anchor") {
             // ignore
         } else if (attr == "style") {
-            auto otml = std::make_shared<OTMLNode>();
-            parseAttrPropList(value, otml);
-            node->setStyle(otml);
+            parseAttrPropList(value, node->getAttrStyles());
         } else if (attr == "layout") {
+            std::unordered_map<std::string, std::string> styles;
+            parseAttrPropList(value, styles);
+
             auto otml = std::make_shared<OTMLNode>();
             auto layout = std::make_shared<OTMLNode>();
+            for (const auto [tag, value] : styles) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(tag);
+                nodeAttr->setValue(value);
+                layout->addChild(nodeAttr);
+            }
             layout->setTag("layout");
-            parseAttrPropList(value, layout);
             otml->addChild(layout);
             widget->mergeStyle(otml);
         } else if (attr == "class") {
@@ -196,14 +200,8 @@ uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
 
             for (const auto& node : nodes) {
                 if (node->getWidget()) {
-                    if (!node->getStyle())
-                        node->setStyle(std::make_shared<OTMLNode>());
-
                     for (const auto& decl : rule.decls) {
-                        auto declOtml = std::make_shared<OTMLNode>();
-                        declOtml->setTag(decl.property);
-                        declOtml->setValue(decl.value);
-                        node->getStyle()->addChild(declOtml);
+                        node->getStyles()[decl.property] = decl.value;
                     }
                 }
             }
@@ -216,8 +214,24 @@ uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
 
     const auto& all = root->querySelectorAll("*");
     for (const auto& node : std::views::reverse(all)) {
-        if (node->getWidget() && node->getStyle()) {
-            node->getWidget()->mergeStyle(node->getStyle());
+        if (node->getWidget()) {
+            auto styles = std::make_shared<OTMLNode>();
+
+            for (const auto [tag, value] : node->getStyles()) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(tag);
+                nodeAttr->setValue(value);
+                styles->addChild(nodeAttr);
+            }
+
+            for (const auto [tag, value] : node->getAttrStyles()) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(tag);
+                nodeAttr->setValue(value);
+                styles->addChild(nodeAttr);
+            }
+
+            node->getWidget()->mergeStyle(styles);
         }
     }
 

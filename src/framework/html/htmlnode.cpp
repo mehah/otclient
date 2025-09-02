@@ -106,10 +106,17 @@ HtmlNodePtr HtmlNode::documentRoot() const {
 }
 
 std::string HtmlNode::getStyle(std::string_view styleName) const {
-    if (m_styles) {
-        if (const auto& style = m_styles->get(styleName))
-            return style->value();
+    auto name = std::string{ styleName };
+    {
+        auto it = m_attrStyles.find(name);
+        if (it != m_attrStyles.end())
+            return it->second;
     }
+
+    auto it = m_styles.find(name);
+    if (it != m_styles.end())
+        return it->second;
+
     return "";
 }
 
@@ -123,16 +130,16 @@ HtmlNodePtr HtmlNode::querySelector(const std::string& selector) {
 
 std::string HtmlNode::textContent() const {
     switch (type) {
-    case NodeType::Text:
-        return text;
-    case NodeType::Element: {
-        std::string out = text;
-        for (const auto& c : children) {
-            out += c->textContent();
+        case NodeType::Text:
+            return text;
+        case NodeType::Element: {
+            std::string out = text;
+            for (const auto& c : children) {
+                out += c->textContent();
+            }
+            return out;
         }
-        return out;
-    }
-    default:
-        return "";
+        default:
+            return "";
     }
 }

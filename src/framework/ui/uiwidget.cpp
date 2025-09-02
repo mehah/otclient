@@ -2075,35 +2075,6 @@ void UIWidget::removeOnDestroyCallback(const std::string& id)
         m_onDestroyCallbacks.erase(it);
 }
 
-int widthFitContent(UIWidget* widget) {
-    auto maxChildWidth = 0;
-    static std::function<void(UIWidget*, int& maxChildWidth)> getWidth = [](UIWidget* widget, int& maxChildWidth) ->void {
-        for (const auto& child : widget->getChildren()) {
-            if (child->getWidth() > maxChildWidth)
-                maxChildWidth = child->getWidth();
-            getWidth(child.get(), maxChildWidth);
-        }
-    };
-    getWidth(widget, maxChildWidth);
-    return maxChildWidth;
-}
-
-int heightFitContent(UIWidget* widget) {
-    auto height = 0;
-    widget->getAnchors();
-    static std::function<void(UIWidget*, int& maxChildWidth)> fnc = [](UIWidget* widget, int& height) ->void {
-        /*for (const auto& child : widget->getChildren()) {
-            child->getAnchors();
-
-            if (child->getHeight() > height)
-                height = child->getHeight();
-            fnc(child.get(), height);
-        }*/
-    };
-    fnc(widget, height);
-    return height;
-}
-
 void UIWidget::setHeight(std::string heightStr) {
     stdext::trim(heightStr);
     stdext::tolower(heightStr);
@@ -2213,7 +2184,7 @@ void UIWidget::updateStyleHtml() {
     if (hasProp(PropFitHeight)) {
         auto height = m_rect.bottomLeft().y - m_rect.topLeft().y;
         for (const auto& child : getChildren()) {
-            height = std::max<int>(height, child->m_rect.bottomLeft().y);
+            height = std::max<int>(height, child->m_rect.topLeft().y);
         }
 
         setHeight_px(height);

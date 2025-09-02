@@ -93,10 +93,13 @@ public:
     HtmlNodePtr getPrev() const { return prev.lock(); }
     HtmlNodePtr getNext() const { return next.lock(); }
 
-    const auto& getStyle() const { return m_styles; }
+    auto& getStyles() { return m_styles; }
 
     std::string getStyle(std::string_view style) const;
-    void setStyle(const OTMLNodePtr& style) { m_styles = style; }
+    void setStyles(const std::unordered_map<std::string, std::string>& style) { m_styles = style; }
+
+    auto& getAttrStyles() { return m_attrStyles; }
+    void setAttrStyles(const std::unordered_map<std::string, std::string>& style) { m_attrStyles = style; }
 
 public:
     bool isHovered{ false };
@@ -117,7 +120,8 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    OTMLNodePtr m_styles;
+    std::unordered_map<std::string, std::string> m_styles;
+    std::unordered_map<std::string, std::string> m_attrStyles;
     UIWidgetPtr m_widget;
 
     mutable int cacheIndexAmongElements = -1;
