@@ -181,12 +181,12 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     if (widget->isOnHtml()) {
         for (const auto& anchor : anchorGroup->getAnchors()) {
             if (const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget)) {
-                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft) {
+                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft || anchor->getAnchoredEdge() == Fw::AnchorRight && anchor->getHookedEdge() == Fw::AnchorRight) {
                     extraMarginTop += hookedWidget->getMarginBottom();
                     extraMarginBottom += hookedWidget->getMarginTop();
                     break;
                 }
-                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorRight) {
+                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorRight || anchor->getAnchoredEdge() == Fw::AnchorRight && anchor->getHookedEdge() == Fw::AnchorLeft) {
                     extraMarginTop -= hookedWidget->getMarginTop();
                     extraMarginBottom -= hookedWidget->getMarginBottom();
                     break;
@@ -242,20 +242,39 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 newRect.moveVerticalCenter(point + widget->getMarginTop() - widget->getMarginBottom());
                 verticalMoved = true;
                 break;
-            case Fw::AnchorTop:
+            case Fw::AnchorTop: {
+                auto margin = widget->getMarginTop();
+                if (widget->isOnHtml()) {
+                    if (widget->getMarginBottom() > 0 && hookedWidget->getMarginBottom() > 0)
+                        margin = std::max<int>(margin, hookedWidget->getMarginBottom());
+                    else
+                        margin += hookedWidget->getMarginBottom();
+                }
+
                 if (!verticalMoved) {
-                    newRect.moveTop(point + (widget->getMarginTop() + extraMarginTop));
+                    newRect.moveTop(point + (margin + extraMarginTop));
                     verticalMoved = true;
                 } else
-                    newRect.setTop(point + (widget->getMarginTop() + extraMarginTop));
+                    newRect.setTop(point + (margin + extraMarginTop));
                 break;
-            case Fw::AnchorBottom:
+            }
+
+            case Fw::AnchorBottom: {
+                auto margin = widget->getMarginBottom();
+                if (widget->isOnHtml()) {
+                    if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
+                        margin = std::max<int>(margin, hookedWidget->getMarginTop());
+                    else
+                        margin += hookedWidget->getMarginTop();
+                }
+
                 if (!verticalMoved) {
-                    newRect.moveBottom(point - (widget->getMarginBottom() + extraMarginBottom));
+                    newRect.moveBottom(point - (margin + extraMarginBottom));
                     verticalMoved = true;
                 } else
-                    newRect.setBottom(point - (widget->getMarginBottom() + extraMarginBottom));
+                    newRect.setBottom(point - (margin + extraMarginBottom));
                 break;
+            }
             default:
                 break;
         }

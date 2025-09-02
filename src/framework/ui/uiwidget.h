@@ -30,6 +30,7 @@
 #include <framework/graphics/declarations.h>
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otmlnode.h>
+#include <framework/html/declarations.h>
 
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/texture.h"
@@ -73,7 +74,38 @@ enum FlagProp : uint32_t
     PropImageIndividualAnimation = 1 << 23,
     PropUpdateChildrenIndexStates = 1 << 24,
     PropDisableUpdateTemporarily = 1 << 25,
-    PropOnHTML = 1 << 26
+    PropUpdateStyleHtml = 1 << 26,
+    PropFitWidth = 1 << 27,
+    PropFitHeight = 1 << 28
+};
+
+enum class DisplayType : uint8_t
+{
+    None,
+    Block,
+    Inline,
+    InlineBlock,
+    Flex,
+    InlineFlex,
+    Grid,
+    InlineGrid,
+    Table,
+    TableRow,
+    TableCell,
+    ListItem,
+    RunIn,
+    Contents,
+    Initial,
+    Inherit
+};
+
+enum class FloatType : uint8_t
+{
+    None,
+    Left,
+    Right,
+    InlineStart,
+    InlineEnd
 };
 
 // @bindclass
@@ -99,12 +131,16 @@ protected:
     Size m_minSize;
     Size m_maxSize;
 
+    DisplayType m_displayType = DisplayType::Inline;
+    FloatType m_floatType = FloatType::None;
+
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;
     UIWidgetList m_children;
     UIWidgetList m_lockedChildren;
     UIWidgetPtr m_focusedChild;
     OTMLNodePtr m_style;
+    HtmlNodePtr m_htmlNode;
 
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
     std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
@@ -175,14 +211,19 @@ public:
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
+    void setDisplay(DisplayType type) { m_displayType = type; scheduleHtmlStyleUpdate(); }
+    void setFloat(FloatType type) { m_floatType = type; scheduleHtmlStyleUpdate(); }
+    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
 
-    void setOnHtml(const bool v) { setProp(PropOnHTML, v); }
-    bool isOnHtml() { return hasProp(PropOnHTML); }
+    bool isOnHtml() { return m_htmlNode != nullptr; }
 
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
     bool hasChild(const UIWidgetPtr& child);
     int getChildIndex(const UIWidgetPtr& child = nullptr) { return child ? (child->getParent().get() == this ? child->m_childIndex : -1) : m_childIndex; }
+    auto getDisplay() { return m_displayType; }
+    auto getFloat() { return m_floatType; }
+
     Rect getPaddingRect();
     Rect getMarginRect();
     Rect getChildrenRect();
@@ -248,6 +289,7 @@ protected:
     void repaint();
     bool setState(Fw::WidgetState state, bool on);
     bool hasState(Fw::WidgetState state);
+    void scheduleHtmlStyleUpdate();
 
 private:
     void internalDestroy();
@@ -255,6 +297,7 @@ private:
     void updateStates();
     void updateChildrenIndexStates();
     void updateStyle();
+    void updateStyleHtml();
 
     OTMLNodePtr m_stateStyle;
     int32_t m_states{ Fw::DefaultState };
@@ -390,8 +433,10 @@ protected:
 public:
     void setX(const int x) { move(x, getY()); }
     void setY(const int y) { move(getX(), y); }
-    void setWidth(const int width) { resize(width, getHeight()); }
-    void setHeight(const int height) { resize(getWidth(), height); }
+    void setWidth(std::string widthStr);
+    void setHeight(std::string heightStr);
+    void setWidth_px(const int width) { resize(width, getHeight()); }
+    void setHeight_px(const int height) { resize(getWidth(), height); }
     void setSize(const Size& size) { resize(size.width(), size.height()); }
     void setMinWidth(const int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
     void setMaxWidth(const int maxWidth) { m_maxSize.setWidth(maxWidth); setRect(m_rect); }
