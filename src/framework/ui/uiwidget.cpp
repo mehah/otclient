@@ -2181,24 +2181,26 @@ void UIWidget::updateStyleHtml() {
         }
     }
 
-    if (hasProp(PropFitHeight)) {
-        auto height = m_rect.bottomLeft().y - m_rect.topLeft().y;
-        for (const auto& child : getChildren()) {
-            height = std::max<int>(height, child->m_rect.topLeft().y);
+    g_dispatcher.deferEvent([this, self = static_self_cast<UIWidget>()] {
+        if (hasProp(PropFitHeight)) {
+            auto height = m_rect.topLeft().y;
+            for (const auto& child : getChildren()) {
+                height = std::max<int>(height, child->m_rect.bottomLeft().y);
+            }
+
+            setHeight_px(height - m_rect.topLeft().y);
+
+            setProp(PropFitHeight, false);
         }
 
-        setHeight_px(height);
+        if (hasProp(PropFitWidth)) {
+            auto width = m_rect.topRight().x - m_rect.topLeft().x;
+            for (const auto& child : getChildren()) {
+                width = std::max<int>(width, child->m_rect.topRight().x);
+            }
 
-        setProp(PropFitHeight, false);
-    }
-
-    if (hasProp(PropFitWidth)) {
-        auto width = m_rect.topRight().x - m_rect.topLeft().x;
-        for (const auto& child : getChildren()) {
-            width = std::max<int>(width, child->m_rect.topRight().x);
+            setWidth_px(width);
+            setProp(PropFitWidth, false);
         }
-
-        setWidth_px(width);
-        setProp(PropFitWidth, false);
-    }
+    });
 }
