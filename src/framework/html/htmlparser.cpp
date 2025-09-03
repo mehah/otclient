@@ -26,6 +26,11 @@
 
 static inline bool is_space(unsigned char c) { return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'; }
 static inline bool is_name_char(unsigned char c) { return std::isalnum(c) || c == '-' || c == ':' || c == '_'; }
+static inline bool is_attr_name_char(unsigned char c) {
+    return std::isalnum(c) || c == '-' || c == ':' || c == '_' ||
+        c == '*' || c == '@' || c == '.' || c == '[' || c == ']' ||
+        c == '(' || c == ')' || c == '#';
+}
 
 static const std::unordered_set<std::string> kVoid = {
     "area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"
@@ -63,19 +68,14 @@ static std::string html_entity_decode(const std::string& s) {
         else if (!ent.empty() && ent[0] == '#') {
             long code = 0;
             if (ent.size() >= 2 && (ent[1] == 'x' || ent[1] == 'X')) {
-                try { code = std::stol(ent.substr(2), nullptr, 16); }
-                catch (...) { code = 0; }
-            }
-            else {
-                try { code = std::stol(ent.substr(1), nullptr, 10); }
-                catch (...) { code = 0; }
+                try { code = std::stol(ent.substr(2), nullptr, 16); } catch (...) { code = 0; }
+            } else {
+                try { code = std::stol(ent.substr(1), nullptr, 10); } catch (...) { code = 0; }
             }
             if (code > 0 && code <= 0x10FFFF) {
                 unsigned int c = (unsigned int)code;
                 if (c <= 0x7F) rep.push_back(char(c));
-                else if (c <= 0x7FF) { rep.push_back(char(0xC0 | (c >> 6))); rep.push_back(char(0x80 | (c & 0x3F))); }
-                else if (c <= 0xFFFF) { rep.push_back(char(0xE0 | (c >> 12))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
-                else { rep.push_back(char(0xF0 | (c >> 18))); rep.push_back(char(0x80 | ((c >> 12) & 0x3F))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
+                else if (c <= 0x7FF) { rep.push_back(char(0xC0 | (c >> 6))); rep.push_back(char(0x80 | (c & 0x3F))); } else if (c <= 0xFFFF) { rep.push_back(char(0xE0 | (c >> 12))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); } else { rep.push_back(char(0xF0 | (c >> 18))); rep.push_back(char(0x80 | ((c >> 12) & 0x3F))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
             }
         }
         if (rep.empty()) { out.push_back(s[i++]); continue; }
@@ -93,7 +93,7 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
         if (i >= s.size() || s[i] == '>' || (s[i] == '/' && i + 1 < s.size() && s[i + 1] == '>')) break;
 
         size_t keyStart = i;
-        while (i < s.size() && is_name_char((unsigned char)s[i])) ++i;
+        while (i < s.size() && is_attr_name_char((unsigned char)s[i])) ++i;
         if (i == keyStart) { ++i; continue; }
         std::string key = s.substr(keyStart, i - keyStart);
         ascii_tolower_inplace(key);
@@ -106,14 +106,12 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
                 char q = s[i++];
                 value = read_until(s, i, q);
                 if (i < s.size() && s[i] == q) ++i;
-            }
-            else {
+            } else {
                 size_t vstart = i;
                 while (i < s.size() && !is_space((unsigned char)s[i]) && s[i] != '>' && s[i] != '/') ++i;
                 value = s.substr(vstart, i - vstart);
             }
-        }
-        else {
+        } else {
             value = "";
         }
         value = html_entity_decode(value);
@@ -192,7 +190,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
             if (!node->classList.empty())
                 for (auto& cls : node->classList) doc->classIndex[cls].push_back(node);
         }
-        };
+    };
 
     while (i < N) {
         if (s[i] == '<') {
@@ -263,18 +261,15 @@ HtmlNodePtr parseHtml(const std::string& html) {
                     if (closePos == std::string::npos) {
                         node->text = s.substr(i);
                         i = N;
-                    }
-                    else {
+                    } else {
                         node->text = s.substr(i, closePos - i);
                         i = closePos + endTag.size();
                     }
-                }
-                else {
+                } else {
                     st.push(node);
                 }
             }
-        }
-        else {
+        } else {
             size_t start = i;
             size_t lt = s.find('<', i);
             if (lt == std::string::npos) lt = N;
@@ -293,8 +288,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
 
                     if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
                         parent->text += decoded;
-                    }
-                    else {
+                    } else {
                         auto t = std::make_shared<HtmlNode>();
                         t->type = NodeType::Text;
                         t->text = decoded;
