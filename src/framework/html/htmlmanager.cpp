@@ -280,5 +280,5 @@ void HtmlManager::destroy(uint32_t id) {
 }
 
 void HtmlManager::setGlobalStyle(const std::string& stylePath) {
-    GLOBAL_STYLE = css::parse(g_resources.readFileContents("/corelib/html.css"));
+    GLOBAL_STYLE = css::parse(g_resources.readFileContents(stylePath));
 }
