@@ -181,6 +181,9 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     if (widget->isOnHtml()) {
         for (const auto& anchor : anchorGroup->getAnchors()) {
             if (const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget)) {
+                if (widget->getDisplay() == DisplayType::Inline)
+                    break;
+
                 if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft || anchor->getAnchoredEdge() == Fw::AnchorRight && anchor->getHookedEdge() == Fw::AnchorRight) {
                     extraMarginTop += hookedWidget->getMarginBottom();
                     extraMarginBottom += hookedWidget->getMarginTop();
@@ -245,10 +248,14 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             case Fw::AnchorTop: {
                 auto margin = widget->getMarginTop();
                 if (widget->isOnHtml()) {
-                    if (widget->getMarginBottom() > 0 && hookedWidget->getMarginBottom() > 0)
-                        margin = std::max<int>(margin, hookedWidget->getMarginBottom());
-                    else
-                        margin += hookedWidget->getMarginBottom();
+                    if (widget->getDisplay() == DisplayType::Inline)
+                        margin = 0;
+                    else {
+                        if (widget->getMarginBottom() > 0 && hookedWidget->getMarginBottom() > 0)
+                            margin = std::max<int>(margin, hookedWidget->getMarginBottom());
+                        else
+                            margin += hookedWidget->getMarginBottom();
+                    }
                 }
 
                 if (!verticalMoved) {
@@ -262,10 +269,14 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             case Fw::AnchorBottom: {
                 auto margin = widget->getMarginBottom();
                 if (widget->isOnHtml()) {
-                    if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
-                        margin = std::max<int>(margin, hookedWidget->getMarginTop());
-                    else
-                        margin += hookedWidget->getMarginTop();
+                    if (widget->getDisplay() == DisplayType::Inline)
+                        margin = 0;
+                    else {
+                        if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
+                            margin = std::max<int>(margin, hookedWidget->getMarginTop());
+                        else
+                            margin += hookedWidget->getMarginTop();
+                    }
                 }
 
                 if (!verticalMoved) {
