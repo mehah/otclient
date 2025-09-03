@@ -181,7 +181,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     if (widget->isOnHtml()) {
         for (const auto& anchor : anchorGroup->getAnchors()) {
             if (const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget)) {
-                if (widget->getDisplay() == DisplayType::Inline)
+                if (widget->getFloat() == FloatType::None)
                     break;
 
                 if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft || anchor->getAnchoredEdge() == Fw::AnchorRight && anchor->getHookedEdge() == Fw::AnchorRight) {

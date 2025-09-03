@@ -213,7 +213,7 @@ public:
     void setVirtualOffset(const Point& offset);
     void setDisplay(DisplayType type) { m_displayType = type; scheduleHtmlStyleUpdate(); }
     void setFloat(FloatType type) { m_floatType = type; scheduleHtmlStyleUpdate(); }
-    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
+    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleHtmlStyleUpdate(); }
 
     bool isOnHtml() { return m_htmlNode != nullptr; }
 
