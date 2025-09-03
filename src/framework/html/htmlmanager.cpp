@@ -121,6 +121,22 @@ std::string translateStyleName(const std::string& styleName, const HtmlNodePtr& 
     return styleName;
 }
 
+void createRadioGroup(const HtmlNodePtr& node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
+    const auto& name = node->getAttr("name");
+    if (name.empty())
+        return;
+
+    UIWidgetPtr group;
+    auto it = groups.find(name);
+    if (it == groups.end()) {
+        group = groups
+            .emplace(name, g_lua.callGlobalField<UIWidgetPtr>("UIRadioGroup", "create"))
+            .first->second;
+    } else group = it->second;
+
+    group->callLuaField("addWidget", node->getWidget());
+}
+
 UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     const auto& styleName = g_ui.getStyleName(translateStyleName(node->getTag(), node));
 
@@ -219,6 +235,7 @@ uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
     for (const auto& sheet : sheets)
         parseStyle(sheet, true);
 
+    std::unordered_map<std::string, UIWidgetPtr> groups;
     const auto& all = root->querySelectorAll("*");
     for (const auto& node : std::views::reverse(all)) {
         if (node->getWidget()) {
@@ -239,6 +256,9 @@ uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
             }
 
             node->getWidget()->mergeStyle(styles);
+
+            if (node->getTag() == "input" && node->getAttr("type") == "radio")
+                createRadioGroup(node, groups);
         }
     }
 
@@ -259,6 +279,6 @@ void HtmlManager::destroy(uint32_t id) {
     m_nodes.erase(it);
 }
 
-void HtmlManager::setGlobalStyle(const std::string& style) {
-    GLOBAL_STYLE = css::parse(style);
+void HtmlManager::setGlobalStyle(const std::string& stylePath) {
+    GLOBAL_STYLE = css::parse(g_resources.readFileContents("/corelib/html.css"));
 }
