@@ -2182,33 +2182,39 @@ void UIWidget::updateStyleHtml() {
     }
 
     g_dispatcher.deferEvent([this, self = static_self_cast<UIWidget>()] {
-        if (hasProp(PropFitHeight)) {
-            auto height = m_rect.topLeft().y;
-            auto extra = 0;
+        if (hasProp(PropFitWidth)) {
+            auto start = 0;
+            auto end = 0;
             for (const auto& child : getChildren()) {
-                if (child->m_rect.bottomLeft().y > height) {
-                    height = child->m_rect.bottomLeft().y;
-                    extra = child->getMarginBottom();
+                if (child->m_rect.topLeft().x < start || start == 0) {
+                    start = child->m_rect.topLeft().x - child->getMarginLeft();
+                }
+
+                if (child->m_rect.topRight().x > end) {
+                    end = child->m_rect.topRight().x + child->getMarginRight();
                 }
             }
 
-            setHeight_px((height - m_rect.topLeft().y) + extra);
-
-            setProp(PropFitHeight, false);
+            setWidth_px(end - start);
+            setProp(PropFitWidth, false);
         }
 
-        if (hasProp(PropFitWidth)) {
-            auto width = m_rect.topLeft().x;
-            auto extra = 0;
+        if (hasProp(PropFitHeight)) {
+            auto start = 0;
+            auto end = 0;
             for (const auto& child : getChildren()) {
-                if (child->m_rect.topRight().x > width) {
-                    width = child->m_rect.topRight().x;
-                    extra = child->getMarginRight();
+                if (child->m_rect.topLeft().y < start || start == 0) {
+                    start = child->m_rect.topLeft().y - child->getMarginTop();
+                }
+
+                if (child->m_rect.bottomLeft().y > end) {
+                    end = child->m_rect.bottomLeft().y + child->getMarginBottom();
                 }
             }
 
-            setWidth_px((width - m_rect.topLeft().x) + extra);
-            setProp(PropFitWidth, false);
+            setHeight_px(end - start);
+
+            setProp(PropFitHeight, false);
         }
     });
 }
