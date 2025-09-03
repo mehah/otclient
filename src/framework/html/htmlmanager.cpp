@@ -162,6 +162,8 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
                 if (const auto& style = g_ui.getStyle(className))
                     widget->mergeStyle(style);
             }
+        } else {
+            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value);
         }
     }
 
