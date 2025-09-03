@@ -2171,8 +2171,7 @@ void UIWidget::updateStyleHtml() {
         addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
         addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
     } else {
-        auto prev = getPrevWidget();
-        if (prev && prev->getDisplay() == DisplayType::Block) {
+        if (getDisplay() == DisplayType::Block) {
             addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
             addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
         } else {
