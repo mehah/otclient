@@ -2180,10 +2180,13 @@ void UIWidget::updateStyleHtml() {
         }
     }
 
+    if (getChildren().empty() || !hasProp(PropFitWidth) && !hasProp(PropFitHeight))
+        return;
+
     g_dispatcher.deferEvent([this, self = static_self_cast<UIWidget>()] {
         if (hasProp(PropFitWidth)) {
-            auto start = 0;
-            auto end = 0;
+            auto start = m_rect.topLeft().x - getMarginLeft();
+            auto end = m_rect.topRight().x + getMarginRight();
             for (const auto& child : getChildren()) {
                 if (child->m_rect.topLeft().x < start || start == 0) {
                     start = child->m_rect.topLeft().x - child->getMarginLeft();
@@ -2199,8 +2202,8 @@ void UIWidget::updateStyleHtml() {
         }
 
         if (hasProp(PropFitHeight)) {
-            auto start = 0;
-            auto end = 0;
+            auto start = m_rect.topLeft().x - getMarginTop();
+            auto end = m_rect.bottomLeft().x + getMarginBottom();
             for (const auto& child : getChildren()) {
                 if (child->m_rect.topLeft().y < start || start == 0) {
                     start = child->m_rect.topLeft().y - child->getMarginTop();
