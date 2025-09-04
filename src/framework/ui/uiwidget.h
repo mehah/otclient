@@ -108,6 +108,16 @@ enum class FloatType : uint8_t
     InlineEnd
 };
 
+enum class ClearType : uint8_t
+{
+    None,
+    Left,
+    Right,
+    Both,
+    InlineStart,
+    InlineEnd
+};
+
 // @bindclass
 class UIWidget : public LuaObject
 {
@@ -133,6 +143,7 @@ protected:
 
     DisplayType m_displayType = DisplayType::Inline;
     FloatType m_floatType = FloatType::None;
+    ClearType m_clearType = ClearType::None;
 
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;
@@ -213,6 +224,7 @@ public:
     void setVirtualOffset(const Point& offset);
     void setDisplay(DisplayType type) { m_displayType = type; scheduleHtmlStyleUpdate(); }
     void setFloat(FloatType type) { m_floatType = type; scheduleHtmlStyleUpdate(); }
+    void setClear(ClearType type) { m_clearType = type; scheduleHtmlStyleUpdate(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleHtmlStyleUpdate(); }
 
     bool isOnHtml() { return m_htmlNode != nullptr; }
