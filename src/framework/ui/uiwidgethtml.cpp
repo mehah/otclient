@@ -19,7 +19,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 #include "uiwidget.h"
 #include <framework/html/htmlnode.h>
 #include <framework/core/eventdispatcher.h>
@@ -68,13 +67,44 @@ namespace {
         bool hasRight = false;
     };
 
-    FlowCtx computeFlowContext(UIWidget* self, DisplayType parentDisplay, FloatType effFloat) {
+    inline void anchorToParentTL(UIWidget* self) {
+        self->removeAnchor(Fw::AnchorLeft);
+        self->removeAnchor(Fw::AnchorTop);
+        self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+    }
+
+    inline UIWidget* pickLower(UIWidget* a, UIWidget* b) {
+        if (!a) return b;
+        if (!b) return a;
+        const auto ay = a->getRect().bottomLeft().y;
+        const auto by = b->getRect().bottomLeft().y;
+        return (by > ay) ? b : a;
+    }
+
+    inline void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+        w->removeAnchor(Fw::AnchorLeft);
+        w->addAnchor(Fw::AnchorLeft, std::string(toId), edge);
+    }
+    inline void setRightAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+        w->removeAnchor(Fw::AnchorRight);
+        w->addAnchor(Fw::AnchorRight, std::string(toId), edge);
+    }
+    inline void setTopAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+        w->removeAnchor(Fw::AnchorTop);
+        w->addAnchor(Fw::AnchorTop, std::string(toId), edge);
+    }
+
+    FlowCtx computeFlowContext(UIWidget* self, DisplayType /*parentDisplay*/, FloatType effFloat) {
         FlowCtx ctx;
         if (!self->getParent()) return ctx;
 
         int i = 0;
         for (const auto& c : self->getParent()->getChildren()) {
             if (c.get() == self) break;
+
+            if (c->getDisplay() == DisplayType::None) { ++i; continue; }
+
             const FloatType cf = mapLogicalFloat(c->getFloat());
             if (cf == FloatType::None) {
                 ctx.prevNonFloat = c.get(); ctx.prevNonFloatIdx = i;
@@ -91,39 +121,19 @@ namespace {
         return ctx;
     }
 
-    inline void anchorToParentTL(UIWidget* self) {
-        self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-        self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
-    }
-
-    inline UIWidget* pickLower(UIWidget* a, UIWidget* b) {
-        if (!a) return b;
-        if (!b) return a;
-        const auto ay = a->getRect().bottomLeft().y;
-        const auto by = b->getRect().bottomLeft().y;
-        return (by > ay) ? b : a;
-    }
-
     bool applyClear(UIWidget* self, const FlowCtx& ctx, ClearType effClear) {
-        bool topCleared = false;
-        UIWidget* clearTarget = nullptr;
+        if (effClear == ClearType::None) return false;
 
-        if (effClear == ClearType::Both) {
-            clearTarget = pickLower(ctx.lastLeftFloat, ctx.lastRightFloat);
-        } else if (effClear == ClearType::Left) {
-            clearTarget = ctx.lastLeftFloat;
-        } else if (effClear == ClearType::Right) {
-            clearTarget = ctx.lastRightFloat;
-        }
+        UIWidget* target = nullptr;
+        if (effClear == ClearType::Both)      target = pickLower(ctx.lastLeftFloat, ctx.lastRightFloat);
+        else if (effClear == ClearType::Left) target = ctx.lastLeftFloat;
+        else /* Right */                      target = ctx.lastRightFloat;
 
-        if (clearTarget) {
-            self->addAnchor(Fw::AnchorTop, clearTarget->getId(), Fw::AnchorBottom);
-            topCleared = true;
-        } else if (effClear != ClearType::None) {
-            self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
-            topCleared = true;
+        if (target) {
+            setTopAnchor(self, target->getId(), Fw::AnchorBottom);
+            return true;
         }
-        return topCleared;
+        return false;
     }
 
     void applyFloat(UIWidget* self, const FlowCtx& ctx, FloatType effFloat, bool topCleared) {
@@ -137,36 +147,27 @@ namespace {
             && !isInlineLike(ctx.prevNonFloat->getDisplay());
 
         if (ctx.lastFloatSameSide) {
-            self->addAnchor(isLeftF ? Fw::AnchorLeft : Fw::AnchorRight,
-                            ctx.lastFloatSameSide->getId(),
-                            isLeftF ? Fw::AnchorRight : Fw::AnchorLeft);
-            if (!topCleared)
-                self->addAnchor(Fw::AnchorTop, ctx.lastFloatSameSide->getId(), Fw::AnchorTop);
+            if (isLeftF) setLeftAnchor(self, ctx.lastFloatSameSide->getId(), Fw::AnchorRight);
+            else         setRightAnchor(self, ctx.lastFloatSameSide->getId(), Fw::AnchorLeft);
+            if (!topCleared) setTopAnchor(self, ctx.lastFloatSameSide->getId(), Fw::AnchorTop);
         } else if (!isLeftF && blockAfterLeftSameLine) {
-            self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
-            if (!topCleared)
-                self->addAnchor(Fw::AnchorTop, ctx.prevNonFloat->getId(), Fw::AnchorTop);
-
-            if (ctx.prevNonFloat) {
-                ctx.prevNonFloat->removeAnchor(Fw::AnchorRight);
-                ctx.prevNonFloat->addAnchor(Fw::AnchorRight, self->getId(), Fw::AnchorLeft);
-            }
+            setRightAnchor(self, "parent", Fw::AnchorRight);
+            if (!topCleared && ctx.prevNonFloat)
+                setTopAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorTop);
         } else {
-            self->addAnchor(isLeftF ? Fw::AnchorLeft : Fw::AnchorRight,
-                            "parent",
-                            isLeftF ? Fw::AnchorLeft : Fw::AnchorRight);
-            if (!topCleared)
-                self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+            if (isLeftF) setLeftAnchor(self, "parent", Fw::AnchorLeft);
+            else         setRightAnchor(self, "parent", Fw::AnchorRight);
+            if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
         }
     }
 
     void applyFlex(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
         if (!ctx.prevNonFloat) {
-            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-            if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+            setLeftAnchor(self, "parent", Fw::AnchorLeft);
+            if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
         } else {
-            self->addAnchor(Fw::AnchorLeft, ctx.prevNonFloat->getId(), Fw::AnchorRight);
-            if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.prevNonFloat->getId(), Fw::AnchorTop);
+            setLeftAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorRight);
+            if (!topCleared) setTopAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorTop);
         }
     }
 
@@ -174,29 +175,33 @@ namespace {
         if (!ctx.prevNonFloat) {
             anchorToParentTL(self);
         } else {
-            self->addAnchor(Fw::AnchorLeft, ctx.prevNonFloat->getId(), Fw::AnchorRight);
-            if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.prevNonFloat->getId(), Fw::AnchorTop);
+            setLeftAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorRight);
+            if (!topCleared) setTopAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorTop);
         }
     }
 
     void applyInline(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
         if (!ctx.prevNonFloat) {
             if (ctx.hasLeft) {
-                self->addAnchor(Fw::AnchorLeft, ctx.lastLeftFloat->getId(), Fw::AnchorRight);
-                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                setLeftAnchor(self, ctx.lastLeftFloat->getId(), Fw::AnchorRight);
+                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
             } else if (ctx.hasRight) {
-                self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
-                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                setRightAnchor(self, "parent", Fw::AnchorRight);
+                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
             } else {
                 anchorToParentTL(self);
             }
         } else {
             if (isInlineLike(ctx.prevNonFloat->getDisplay())) {
+                self->removeAnchor(Fw::AnchorLeft);
                 self->addAnchor(Fw::AnchorLeft, "prev", Fw::AnchorRight);
-                if (!topCleared) self->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
+                if (!topCleared) {
+                    self->removeAnchor(Fw::AnchorTop);
+                    self->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
+                }
             } else {
-                self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-                if (!topCleared) self->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
+                setLeftAnchor(self, "parent", Fw::AnchorLeft);
+                if (!topCleared) setTopAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorBottom);
             }
         }
     }
@@ -204,18 +209,18 @@ namespace {
     void applyBlock(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
         if (!ctx.prevNonFloat) {
             if (ctx.hasLeft) {
-                self->addAnchor(Fw::AnchorLeft, ctx.lastLeftFloat->getId(), Fw::AnchorRight);
-                self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
-                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                setLeftAnchor(self, ctx.lastLeftFloat->getId(), Fw::AnchorRight);
+                setRightAnchor(self, "parent", Fw::AnchorRight);
+                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
             } else if (ctx.hasRight) {
-                self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
-                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                setRightAnchor(self, "parent", Fw::AnchorRight);
+                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
             } else {
                 anchorToParentTL(self);
             }
         } else {
-            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-            if (!topCleared) self->addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
+            setLeftAnchor(self, "parent", Fw::AnchorLeft);
+            if (!topCleared) setTopAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorBottom);
         }
     }
 
@@ -225,30 +230,38 @@ namespace {
 
         g_dispatcher.deferEvent([self_w = self->static_self_cast<UIWidget>()] {
             UIWidget* self = self_w.get();
+            const auto& kids = self->getChildren();
+            if (kids.empty()) {
+                self->setProp(PropFitWidth, false);
+                self->setProp(PropFitHeight, false);
+                return;
+            }
 
             if (self->hasProp(PropFitWidth)) {
-                auto start = self->getRect().topLeft().x - self->getMarginLeft();
-                auto end = self->getRect().topRight().x + self->getMarginRight();
-                for (const auto& c : self->getChildren()) {
-                    if (c->getRect().topLeft().x < start || start == 0)
-                        start = c->getRect().topLeft().x - c->getMarginLeft();
-                    if (c->getRect().topRight().x > end)
-                        end = c->getRect().topRight().x + c->getMarginRight();
+                int start = (std::numeric_limits<int>::max)();
+                int end = (std::numeric_limits<int>::min)();
+                for (const auto& c : kids) {
+                    const int left = c->getRect().topLeft().x - c->getMarginLeft();
+                    const int right = c->getRect().topRight().x + c->getMarginRight();
+                    if (left < start) start = left;
+                    if (right > end)   end = right;
                 }
-                self->setWidth_px(end - start);
+                if (start != (std::numeric_limits<int>::max)() && end >= start)
+                    self->setWidth_px(end - start);
                 self->setProp(PropFitWidth, false);
             }
 
             if (self->hasProp(PropFitHeight)) {
-                auto start = self->getRect().topLeft().y - self->getMarginTop();
-                auto end = self->getRect().bottomLeft().y + self->getMarginBottom();
-                for (const auto& c : self->getChildren()) {
-                    if (c->getRect().topLeft().y < start || start == 0)
-                        start = c->getRect().topLeft().y - c->getMarginTop();
-                    if (c->getRect().bottomLeft().y > end)
-                        end = c->getRect().bottomLeft().y + c->getMarginBottom();
+                int start = (std::numeric_limits<int>::max)();
+                int end = (std::numeric_limits<int>::min)();
+                for (const auto& c : kids) {
+                    const int top = c->getRect().topLeft().y - c->getMarginTop();
+                    const int bottom = c->getRect().bottomLeft().y + c->getMarginBottom();
+                    if (top < start) start = top;
+                    if (bottom > end)   end = bottom;
                 }
-                self->setHeight_px(end - start);
+                if (start != (std::numeric_limits<int>::max)() && end >= start)
+                    self->setHeight_px(end - start);
                 self->setProp(PropFitHeight, false);
             }
         });
@@ -261,13 +274,15 @@ void UIWidget::setHeight(std::string heightStr) {
 
     auto height = stdext::to_number(heightStr);
 
+    setProp(PropFitHeight, false);
     if (heightStr == "auto" || heightStr == "fit-content") {
         setProp(PropFitHeight, true);
         scheduleHtmlStyleUpdate();
     } else if (heightStr.ends_with("em")) {
+        setHeight_px(height);
     } else if (heightStr.ends_with("%")) {
+        setHeight_px(height);
     } else /*px*/ {
-        setProp(PropFitHeight, false);
         setHeight_px(height);
     }
 }
@@ -278,6 +293,7 @@ void UIWidget::setWidth(std::string widthStr) {
 
     auto width = stdext::to_number(widthStr);
 
+    setProp(PropFitWidth, false);
     if (widthStr == "auto") {
         if (m_displayType == DisplayType::Block) {
             if (m_parent) setWidth_px(m_parent->getWidth());
@@ -289,9 +305,10 @@ void UIWidget::setWidth(std::string widthStr) {
         setProp(PropFitWidth, true);
         scheduleHtmlStyleUpdate();
     } else if (widthStr.ends_with("em")) {
+        setWidth_px(width);
     } else if (widthStr.ends_with("%")) {
+        setWidth_px(width);
     } else /*px*/ {
-        setProp(PropFitWidth, false);
         setWidth_px(width);
     }
 }
@@ -323,8 +340,8 @@ void UIWidget::updateStyleHtml() {
         return;
 
     if (m_htmlNode->getAttr("anchor") == "parent") {
-        addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-        addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+        setLeftAnchor(this, "parent", Fw::AnchorLeft);
+        setTopAnchor(this, "parent", Fw::AnchorTop);
         applyFitContentIfNeeded(this);
         return;
     }
