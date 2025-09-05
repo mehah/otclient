@@ -410,6 +410,7 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
           framework/ui/uiwidgetbasestyle.cpp
           framework/ui/uiwidgetimage.cpp
           framework/ui/uiwidgettext.cpp
+          framework/ui/uiwidgethtml.cpp
           framework/ui/uiqrcode.cpp
   )
 endif()

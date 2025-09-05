@@ -594,6 +594,9 @@
     <ClCompile Include="..\src\framework\html\htmlmanager.cpp">
       <Filter>Source Files\framework\html</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\framework\ui\uiwidgethtml.cpp">
+      <Filter>Source Files\framework\ui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\framework\config.h">

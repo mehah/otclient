@@ -490,6 +490,7 @@
     <ClCompile Include="..\src\framework\ui\uiverticallayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidget.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidgetbasestyle.cpp" />
+    <ClCompile Include="..\src\framework\ui\uiwidgethtml.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidgetimage.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidgettext.cpp" />
     <ClCompile Include="..\src\framework\util\color.cpp" />
