@@ -28,12 +28,8 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
+
 #include <framework/platform/platformwindow.h>
-
-#include <algorithm>
-
-#include <ranges>
-
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
 
