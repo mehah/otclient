@@ -213,7 +213,25 @@ function BattleListManager:createWindowForInstance(instance)
     local newWindow = g_ui.loadUI('battle')
     instance.window = newWindow
     newWindow:setId('battleWindow_' .. instance.id)
-    
+
+    -- Define resize restriction function
+    local function restrictResize()
+        local originalOnResize = newWindow.onResize
+        newWindow.onResize = function(...)
+            if originalOnResize then
+                originalOnResize(...)
+            end
+            
+            local minHeight = 80
+            if not instance:isHidingFilters() then
+                minHeight = minHeight + 60
+            end
+            if newWindow:getHeight() < minHeight then
+                newWindow:setHeight(minHeight)
+            end
+        end
+    end
+
     -- Change icon for battle list instances (not the main battle list)
     if instance.id ~= 0 then
         local miniwindowIcon = newWindow:recursiveGetChildById('miniwindowIcon')
@@ -332,24 +350,7 @@ function BattleListManager:createWindowForInstance(instance)
     end
     
     newWindow:setContentMinimumHeight(80)
-    
-    -- Define resize restriction function
-    local function restrictResize()
-        local originalOnResize = newWindow.onResize
-        newWindow.onResize = function(...)
-            if originalOnResize then
-                originalOnResize(...)
-            end
-            
-            local minHeight = 80
-            if not instance:isHidingFilters() then
-                minHeight = minHeight + 60
-            end
-            if newWindow:getHeight() < minHeight then
-                newWindow:setHeight(minHeight)
-            end
-        end
-    end
+
     restrictResize()
     
     local originalOnMinimize = newWindow.onMinimize
