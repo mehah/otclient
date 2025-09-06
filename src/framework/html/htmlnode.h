@@ -117,8 +117,8 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_styles;
-    std::unordered_map<std::string, std::string> m_attrStyles;
+    std::unordered_map<std::string, std::map<std::string, std::string>> m_styles;
+    std::map<std::string, std::string> m_attrStyles;
     UIWidgetPtr m_widget;
 
     mutable int cacheIndexAmongElements = -1;

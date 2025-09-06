@@ -110,7 +110,7 @@ std::string cssToState(const std::string& css) {
     return "";
 }
 
-void parseAttrPropList(const std::string& attrsStr, std::unordered_map<std::string, std::string>& attrsMap) {
+void parseAttrPropList(const std::string& attrsStr, std::map<std::string, std::string>& attrsMap) {
     for (auto& data : stdext::split(attrsStr, ";")) {
         stdext::trim(data);
         auto attr = stdext::split(data, ":");
@@ -210,7 +210,7 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
             auto otml = std::make_shared<OTMLNode>();
             auto layout = std::make_shared<OTMLNode>();
 
-            std::unordered_map<std::string, std::string> styles;
+            std::map<std::string, std::string> styles;
             parseAttrPropList(value, styles);
             for (const auto [tag, value] : styles) {
                 auto nodeAttr = std::make_shared<OTMLNode>();

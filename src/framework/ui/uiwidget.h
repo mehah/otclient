@@ -76,7 +76,8 @@ enum FlagProp : uint32_t
     PropDisableUpdateTemporarily = 1 << 25,
     PropApplyAnchorAlignment = 1 << 26,
     PropFitWidth = 1 << 27,
-    PropFitHeight = 1 << 28
+    PropFitHeight = 1 << 28,
+    PropAutoWidth = 1 << 29
 };
 
 enum class DisplayType : uint8_t

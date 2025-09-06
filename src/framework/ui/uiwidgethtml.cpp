@@ -258,12 +258,13 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     };
 
     setFitProp(false);
+    setProp(PropAutoWidth, false);
 
     switch (unit) {
         case Unit::Auto: {
             if (isWidth) {
                 if (m_displayType == DisplayType::Block) {
-                    if (m_parent) setPx(m_parent->getWidth());
+                    if (m_parent) setProp(PropAutoWidth, true);
                 } else {
                     setFitProp(true);
                 }
@@ -290,7 +291,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
         case Unit::Invalid:
         default: {
             setPx(static_cast<int>(std::round(num)));
-            break;
+            return;
         }
     }
 
@@ -323,19 +324,8 @@ void UIWidget::updateSize() {
     if (m_updateId == UPDATE_EPOCH)
         return;
 
-    if (m_children.empty()) {
-        setProp(PropFitWidth, false);
-        setProp(PropFitHeight, false);
-        return;
-    }
-
-    int start_w = (std::numeric_limits<int>::max)();
-    int end_w = (std::numeric_limits<int>::min)();
-    int start_h = (std::numeric_limits<int>::max)();
-    int end_h = (std::numeric_limits<int>::min)();
-
     static auto updateRect = [](UIWidget* c, int& start_w, int& end_w, int& start_h, int& end_h, auto&& updateRect)->void {
-        if (!c->m_children.empty() && (c->hasProp(PropFitWidth) || c->hasProp(PropFitHeight))) {
+        if (c->m_updateId != UPDATE_EPOCH && !c->m_children.empty() && (c->hasProp(PropFitWidth) || c->hasProp(PropFitHeight))) {
             for (auto& w : c->m_children) {
                 updateRect(w.get(), start_w, end_w, start_h, end_h, updateRect);
             }
@@ -365,6 +355,22 @@ void UIWidget::updateSize() {
             if (bottom > end_h)  end_h = bottom;
         }
     };
+
+    if (hasProp(PropAutoWidth)) {
+        if (m_parent)
+            setWidth_px(m_parent->getWidth() - getMarginLeft());
+    }
+
+    if (m_children.empty()) {
+        setProp(PropFitWidth, false);
+        setProp(PropFitHeight, false);
+        return;
+    }
+
+    int start_w = (std::numeric_limits<int>::max)();
+    int end_w = (std::numeric_limits<int>::min)();
+    int start_h = (std::numeric_limits<int>::max)();
+    int end_h = (std::numeric_limits<int>::min)();
     updateRect(this, start_w, end_w, start_h, end_h, updateRect);
 }
 
