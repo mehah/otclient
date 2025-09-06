@@ -113,9 +113,11 @@ std::string HtmlNode::getStyle(std::string_view styleName) const {
             return it->second;
     }
 
-    auto it = m_styles.find(name);
-    if (it != m_styles.end())
-        return it->second;
+    for (const auto& [key, styles] : m_styles) {
+        auto it = styles.find(name);
+        if (it != styles.end())
+            return it->second;
+    }
 
     return "";
 }

@@ -25,8 +25,17 @@
 #include <cstdint>
 
 namespace css {
-    enum SelectorEventFlags : uint32_t { SEF_None = 0, SEF_Hover = 1u << 0, SEF_Focus = 1u << 1, SEF_Active = 1u << 2, SEF_FocusWithin = 1u << 3, SEF_FocusVisible = 1u << 4, SEF_Visited = 1u << 5, SEF_Checked = 1u << 6, SEF_Disabled = 1u << 7, SEF_Enabled = 1u << 8 };
-    struct SelectorMeta { uint32_t events{ SEF_None }; std::vector<std::string> pseudos; };
+    struct PseudoInfo
+    {
+        std::string name;
+        bool negated{ false };
+    };
+
+    struct SelectorMeta
+    {
+        std::vector<PseudoInfo> pseudos;
+    };
+
     struct Declaration
     {
         std::string property;

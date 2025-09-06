@@ -19,13 +19,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 #include "cssparser.h"
 #include "htmlnode.h"
 #include "queryselector.h"
 
 namespace css {
     namespace detail {
+        static void collect_pseudos(const std::string& sel, std::vector<PseudoInfo>& outPseudos, bool negated = false);
         static std::vector<std::string> split_selector_list(const std::string&);
 
         static inline void trim_inplace(std::string& s) {
@@ -38,7 +38,6 @@ namespace css {
             for (auto& c : s) if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a');
         }
 
-        static uint32_t name_to_flag(const std::string& lower) { if (lower == "hover")return SEF_Hover; if (lower == "focus")return SEF_Focus; if (lower == "active")return SEF_Active; if (lower == "focus-within")return SEF_FocusWithin; if (lower == "focus-visible")return SEF_FocusVisible; if (lower == "visited")return SEF_Visited; if (lower == "checked")return SEF_Checked; if (lower == "disabled")return SEF_Disabled; if (lower == "enabled")return SEF_Enabled; return SEF_None; }
         static std::tuple<int, int, int> specificity_of(const std::string& sel);
 
         static bool is_ident_start(char c) {
@@ -53,7 +52,76 @@ namespace css {
             return best;
         }
 
-        static uint32_t collect_event_flags(const std::string& sel, std::vector<std::string>* outPseudos = nullptr);
+        static void collect_pseudos(const std::string& sel,
+                            std::vector<PseudoInfo>& outPseudos,
+                            bool negated)
+        {
+            for (size_t i = 0; i < sel.size();) {
+                char ch = sel[i];
+                if (ch == '"' || ch == '\'') {
+                    char qq = ch; ++i;
+                    while (i < sel.size() && sel[i] != qq) {
+                        if (sel[i] == '\\' && i + 1 < sel.size()) i += 2;
+                        else ++i;
+                    }
+                    if (i < sel.size()) ++i;
+                    continue;
+                }
+                if (ch == '[') {
+                    ++i; int depth = 1;
+                    while (i < sel.size() && depth > 0) {
+                        if (sel[i] == '"' || sel[i] == '\'') {
+                            char qq = sel[i++]; while (i < sel.size() && sel[i] != qq) {
+                                if (sel[i] == '\\' && i + 1 < sel.size()) i += 2; else ++i;
+                            }
+                            if (i < sel.size()) ++i;
+                        } else if (sel[i] == '[') { ++depth; ++i; } else if (sel[i] == ']') { --depth; ++i; } else { ++i; }
+                    }
+                    continue;
+                }
+                if (ch == ':') {
+                    size_t col = 1; ++i;
+                    if (i < sel.size() && sel[i] == ':') { ++col; ++i; }
+                    size_t ns = i;
+                    while (i < sel.size() && (std::isalnum((unsigned char)sel[i]) || sel[i] == '-' || sel[i] == '_')) ++i;
+                    std::string name = sel.substr(ns, i - ns);
+                    ascii_tolower_inplace_local(name);
+
+                    if (col == 1) {
+                        if (i < sel.size() && sel[i] == '(') {
+                            ++i; size_t cs = i; int depth = 1; bool in_str = false; char qq = 0;
+                            for (; i < sel.size(); ++i) {
+                                char ch2 = sel[i];
+                                if (in_str) {
+                                    if (ch2 == qq) in_str = false;
+                                    else if (ch2 == '\\' && i + 1 < sel.size()) ++i;
+                                    continue;
+                                }
+                                if (ch2 == '"' || ch2 == '\'') { in_str = true; qq = ch2; continue; }
+                                if (ch2 == '(') ++depth;
+                                else if (ch2 == ')') { if (--depth == 0) { ++i; break; } }
+                            }
+                            std::string inside = sel.substr(cs, (i - cs - 1));
+
+                            if (name == "not") {
+                                auto parts = split_selector_list(inside);
+                                for (const auto& part : parts) collect_pseudos(part, outPseudos, true);
+                            } else if (name == "is" || name == "has" || name == "where") {
+                                auto parts = split_selector_list(inside);
+                                for (const auto& part : parts) collect_pseudos(part, outPseudos, negated);
+                            } else {
+                                outPseudos.push_back({ name, negated });
+                            }
+                        } else {
+                            outPseudos.push_back({ name, negated });
+                        }
+                    }
+                    continue;
+                }
+                ++i;
+            }
+        }
+
         static std::vector<std::string> split_selector_list(const std::string& s) {
             std::vector<std::string> parts;
             std::string cur;
@@ -92,71 +160,96 @@ namespace css {
             return parts;
         }
 
-        static uint32_t collect_event_flags(const std::string& sel, std::vector<std::string>* outPseudos) {
-            uint32_t flags = SEF_None;
-            const std::string& sref = sel;
-            for (size_t i = 0; i < sref.size();) {
-                char ch = sref[i];
+        static std::string strip_pseudos_for_filter(const std::string& sel);
+
+        static std::string join_selector_list_after_strip(const std::string& inside) {
+            auto parts = split_selector_list(inside);
+            std::string out;
+            bool any = false;
+            for (size_t k = 0; k < parts.size(); ++k) {
+                std::string p = strip_pseudos_for_filter(parts[k]);
+                detail::trim_inplace(p);
+                if (p == "*") p.clear();
+                if (!p.empty()) {
+                    if (any) out.push_back(',');
+                    out += p;
+                    any = true;
+                }
+            }
+            return out;
+        }
+
+        static std::string strip_pseudos_for_filter(const std::string& sel) {
+            std::string out;
+            const std::string& s = sel;
+            size_t i = 0, N = s.size();
+            while (i < N) {
+                char ch = s[i];
                 if (ch == '"' || ch == '\'') {
-                    char qq = ch; ++i;
-                    while (i < sref.size() && sref[i] != qq) {
-                        if (sref[i] == '\\' && i + 1 < sref.size()) i += 2;
-                        else ++i;
+                    size_t start = i++;
+                    while (i < N && s[i] != ch) {
+                        if (s[i] == '\\' && i + 1 < N) i += 2; else ++i;
                     }
-                    if (i < sref.size()) ++i;
+                    if (i < N) ++i;
+                    out.append(s, start, i - start);
                     continue;
                 }
                 if (ch == '[') {
-                    ++i; int depth = 1;
-                    while (i < sref.size() && depth > 0) {
-                        if (sref[i] == '"' || sref[i] == '\'') {
-                            char qq = sref[i++];
-                            while (i < sref.size() && sref[i] != qq) {
-                                if (sref[i] == '\\' && i + 1 < sref.size()) i += 2;
-                                else ++i;
+                    size_t start = i++; int depth = 1;
+                    while (i < N && depth > 0) {
+                        if (s[i] == '"' || s[i] == '\'') {
+                            char qq = s[i++]; while (i < N && s[i] != qq) {
+                                if (s[i] == '\\' && i + 1 < N) i += 2; else ++i;
                             }
-                            if (i < sref.size()) ++i;
-                        } else if (sref[i] == '[') { ++depth; ++i; } else if (sref[i] == ']') { --depth; ++i; } else { ++i; }
+                            if (i < N) ++i;
+                        } else if (s[i] == '[') { ++depth; ++i; } else if (s[i] == ']') { --depth; ++i; } else { ++i; }
                     }
+                    out.append(s, start, i - start);
                     continue;
                 }
                 if (ch == ':') {
-                    size_t col = 1; ++i;
-                    if (i < sref.size() && sref[i] == ':') { ++col; ++i; }
+                    ++i;
+                    if (i < N && s[i] == ':') { ++i; continue; }
                     size_t ns = i;
-                    while (i < sref.size() && (std::isalnum((unsigned char)sref[i]) || sref[i] == '-' || sref[i] == '_')) ++i;
-                    std::string name = sref.substr(ns, i - ns);
+                    while (i < N && (std::isalnum((unsigned char)s[i]) || s[i] == '-' || s[i] == '_')) ++i;
+                    std::string name = s.substr(ns, i - ns);
                     ascii_tolower_inplace_local(name);
-                    if (outPseudos) outPseudos->push_back(name);
-                    if (col == 1) {
-                        flags |= name_to_flag(name);
-                        if (i < sref.size() && sref[i] == '(') {
-                            ++i; size_t cs = i; int depth = 1; bool in_str = false; char qq = 0;
-                            for (; i < sref.size(); ++i) {
-                                char ch2 = sref[i];
-                                if (in_str) {
-                                    if (ch2 == qq) in_str = false;
-                                    else if (ch2 == '\\' && i + 1 < sref.size()) ++i;
-                                    continue;
-                                }
-                                if (ch2 == '"' || ch2 == '\'') { in_str = true; qq = ch2; continue; }
-                                if (ch2 == '(') ++depth;
-                                else if (ch2 == ')') { if (--depth == 0) { ++i; break; } }
+
+                    if (i < N && s[i] == '(') {
+                        ++i; size_t cs = i; int depth = 1; bool in_str = false; char qq = 0;
+                        for (; i < N; ++i) {
+                            char c2 = s[i];
+                            if (in_str) {
+                                if (c2 == qq) in_str = false;
+                                else if (c2 == '\\' && i + 1 < N) ++i;
+                                continue;
                             }
-                            std::string inside = sref.substr(cs, (i - cs - 1));
-                            if (name == "not" || name == "is" || name == "has" || name == "where") {
-                                auto parts = split_selector_list(inside);
-                                for (const auto& part : parts) {
-                                    flags |= collect_event_flags(part, outPseudos);
-                                }
+                            if (c2 == '"' || c2 == '\'') { in_str = true; qq = c2; continue; }
+                            if (c2 == '(') ++depth;
+                            else if (c2 == ')') { if (--depth == 0) { ++i; break; } }
+                        }
+                        std::string inside = s.substr(cs, (i - cs - 1));
+
+                        if (name == "not" || name == "is" || name == "has" || name == "where") {
+                            std::string inner = join_selector_list_after_strip(inside);
+                            detail::trim_inplace(inner);
+                            if (!inner.empty()) {
+                                out.push_back(':');
+                                out += name;
+                                out.push_back('(');
+                                out += inner;
+                                out.push_back(')');
                             }
                         }
                     }
                     continue;
                 }
+                out.push_back(ch);
                 ++i;
             }
-            return flags;
+            detail::trim_inplace(out);
+            if (out.empty()) out = "*";
+            return out;
         }
 
         static std::string strip_comments(const std::string& in) {
@@ -318,6 +411,7 @@ namespace css {
         std::string no_comments = strip_comments(cssText);
         auto blocks = extract_blocks(no_comments);
         int order = 0;
+
         std::function<void(const std::vector<RawBlock>&)> processBlocks;
         processBlocks = [&](const std::vector<RawBlock>& items) {
             for (const auto& rb : items) {
@@ -328,12 +422,18 @@ namespace css {
                 }
                 auto selectors = split_selector_list(rb.selectors);
                 if (selectors.empty()) continue;
+
                 Rule r;
-                r.selectors = selectors;
+                r.selectors.reserve(selectors.size());
                 r.selectorMeta.reserve(selectors.size());
+
                 for (const auto& s : selectors) {
                     SelectorMeta meta;
-                    meta.events = collect_event_flags(s, &meta.pseudos);
+                    collect_pseudos(s, meta.pseudos);
+                    std::string base = strip_pseudos_for_filter(s);
+                    trim_inplace(base);
+                    if (base.empty()) base = "*";
+                    r.selectors.push_back(std::move(base));
                     r.selectorMeta.push_back(std::move(meta));
                 }
                 r.decls = parse_decls(rb.block);

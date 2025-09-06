@@ -96,10 +96,7 @@ public:
     auto& getStyles() { return m_styles; }
 
     std::string getStyle(std::string_view style) const;
-    void setStyles(const std::unordered_map<std::string, std::string>& style) { m_styles = style; }
-
     auto& getAttrStyles() { return m_attrStyles; }
-    void setAttrStyles(const std::unordered_map<std::string, std::string>& style) { m_attrStyles = style; }
 
 public:
     bool isHovered{ false };
@@ -120,7 +117,7 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    std::unordered_map<std::string, std::string> m_styles;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::string>> m_styles;
     std::unordered_map<std::string, std::string> m_attrStyles;
     UIWidgetPtr m_widget;
 
