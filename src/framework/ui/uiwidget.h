@@ -74,7 +74,7 @@ enum FlagProp : uint32_t
     PropImageIndividualAnimation = 1 << 23,
     PropUpdateChildrenIndexStates = 1 << 24,
     PropDisableUpdateTemporarily = 1 << 25,
-    PropUpdateStyleHtml = 1 << 26,
+    PropApplyAnchorAlignment = 1 << 26,
     PropFitWidth = 1 << 27,
     PropFitHeight = 1 << 28
 };
@@ -224,10 +224,10 @@ public:
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
-    void setDisplay(DisplayType type) { m_displayType = type; scheduleHtmlStyleUpdate(); }
-    void setFloat(FloatType type) { m_floatType = type; scheduleHtmlStyleUpdate(); }
-    void setClear(ClearType type) { m_clearType = type; scheduleHtmlStyleUpdate(); }
-    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleHtmlStyleUpdate(); }
+    void setDisplay(DisplayType type) { m_displayType = type; scheduleAnchorAlignment(); }
+    void setFloat(FloatType type) { m_floatType = type; scheduleAnchorAlignment(); }
+    void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
+    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
 
     bool isOnHtml() { return m_htmlNode != nullptr; }
 
@@ -303,7 +303,7 @@ protected:
     void repaint();
     bool setState(Fw::WidgetState state, bool on);
     bool hasState(Fw::WidgetState state);
-    void scheduleHtmlStyleUpdate();
+    void scheduleAnchorAlignment();
 
 private:
     void internalDestroy();
@@ -311,7 +311,7 @@ private:
     void updateStates();
     void updateChildrenIndexStates();
     void updateStyle();
-    void updateStyleHtml();
+    void applyAnchorAlignment();
 
     OTMLNodePtr m_stateStyle;
     int32_t m_states{ Fw::DefaultState };

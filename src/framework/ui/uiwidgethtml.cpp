@@ -301,7 +301,6 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     };
 
     setFitProp(false);
-    setProp(PropFixedSize, true);
 
     switch (unit) {
         case Unit::Auto: {
@@ -309,21 +308,18 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
                 if (m_displayType == DisplayType::Block) {
                     if (m_parent) setPx(m_parent->getWidth());
                 } else {
-                    setProp(PropFixedSize, false);
                     setFitProp(true);
-                    scheduleHtmlStyleUpdate();
+                    scheduleAnchorAlignment();
                 }
             } else {
-                setProp(PropFixedSize, false);
                 setFitProp(true);
-                scheduleHtmlStyleUpdate();
+                scheduleAnchorAlignment();
             }
             break;
         }
         case Unit::FitContent: {
-            setProp(PropFixedSize, false);
             setFitProp(true);
-            scheduleHtmlStyleUpdate();
+            scheduleAnchorAlignment();
             break;
         }
         case Unit::Percent: {
@@ -345,18 +341,18 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     }
 }
 
-void UIWidget::scheduleHtmlStyleUpdate() {
-    if (hasProp(PropUpdateStyleHtml))
+void UIWidget::scheduleAnchorAlignment() {
+    if (hasProp(PropApplyAnchorAlignment))
         return;
 
-    setProp(PropUpdateStyleHtml, true);
+    setProp(PropApplyAnchorAlignment, true);
     g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        self->updateStyleHtml();
-        self->setProp(PropUpdateStyleHtml, false);
+        self->applyAnchorAlignment();
+        self->setProp(PropApplyAnchorAlignment, false);
     });
 }
 
-void UIWidget::updateStyleHtml() {
+void UIWidget::applyAnchorAlignment() {
     if (!isOnHtml())
         return;
 
