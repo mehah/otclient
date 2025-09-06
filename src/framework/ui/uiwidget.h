@@ -118,6 +118,8 @@ enum class ClearType : uint8_t
     InlineEnd
 };
 
+enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
+
 // @bindclass
 class UIWidget : public LuaObject
 {
@@ -445,8 +447,9 @@ protected:
 public:
     void setX(const int x) { move(x, getY()); }
     void setY(const int y) { move(getX(), y); }
-    void setWidth(std::string widthStr);
-    void setHeight(std::string heightStr);
+
+    void setHeight(std::string heightStr) { applyDimension(false, std::move(heightStr)); }
+    void setWidth(std::string widthStr) { applyDimension(true, std::move(widthStr)); }
     void setWidth_px(const int width) { resize(width, getHeight()); }
     void setHeight_px(const int height) { resize(getWidth(), height); }
     void setSize(const Size& size) { resize(size.width(), size.height()); }
@@ -561,6 +564,7 @@ public:
 private:
     void initImage();
     void parseImageStyle(const OTMLNodePtr& styleNode);
+    void applyDimension(bool isWidth, std::string valueStr);
 
     void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
     void configureBorderImage() { setProp(PropImageBordered, true); updateImageCache(); }

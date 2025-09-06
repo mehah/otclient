@@ -266,50 +266,82 @@ namespace {
             }
         });
     }
-}
 
-void UIWidget::setHeight(std::string heightStr) {
-    stdext::trim(heightStr);
-    stdext::tolower(heightStr);
+    static Unit detectUnit(std::string_view s) {
+        if (s == "auto") return Unit::Auto;
+        if (s == "fit-content") return Unit::FitContent;
+        if (s.ends_with("px")) return Unit::Px;
+        if (s.ends_with("em")) return Unit::Em;
+        if (s.ends_with("%"))  return Unit::Percent;
+        return Unit::Px;
+    }
 
-    auto height = stdext::to_number(heightStr);
-
-    setProp(PropFitHeight, false);
-    if (heightStr == "auto" || heightStr == "fit-content") {
-        setProp(PropFitHeight, true);
-        scheduleHtmlStyleUpdate();
-    } else if (heightStr.ends_with("em")) {
-        setHeight_px(height);
-    } else if (heightStr.ends_with("%")) {
-        setHeight_px(height);
-    } else /*px*/ {
-        setHeight_px(height);
+    static std::string_view numericPart(std::string_view s) {
+        if (s.ends_with("px") || s.ends_with("em")) return s.substr(0, s.size() - 2);
+        if (s.ends_with("%")) return s.substr(0, s.size() - 1);
+        return s;
     }
 }
 
-void UIWidget::setWidth(std::string widthStr) {
-    stdext::trim(widthStr);
-    stdext::tolower(widthStr);
+void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
+    stdext::trim(valueStr);
+    stdext::tolower(valueStr);
 
-    auto width = stdext::to_number(widthStr);
+    const std::string_view sv = valueStr;
+    const Unit unit = detectUnit(sv);
+    const auto num = stdext::to_number(std::string(numericPart(sv)));
 
-    setProp(PropFitWidth, false);
-    if (widthStr == "auto") {
-        if (m_displayType == DisplayType::Block) {
-            if (m_parent) setWidth_px(m_parent->getWidth());
-        } else {
-            setProp(PropFitWidth, true);
-            scheduleHtmlStyleUpdate();
+    auto setFitProp = [&](bool on) {
+        if (isWidth) setProp(PropFitWidth, on);
+        else         setProp(PropFitHeight, on);
+    };
+    auto setPx = [&](int px) {
+        if (isWidth) setWidth_px(px);
+        else         setHeight_px(px);
+    };
+
+    setFitProp(false);
+    setProp(PropFixedSize, true);
+
+    switch (unit) {
+        case Unit::Auto: {
+            if (isWidth) {
+                if (m_displayType == DisplayType::Block) {
+                    if (m_parent) setPx(m_parent->getWidth());
+                } else {
+                    setProp(PropFixedSize, false);
+                    setFitProp(true);
+                    scheduleHtmlStyleUpdate();
+                }
+            } else {
+                setProp(PropFixedSize, false);
+                setFitProp(true);
+                scheduleHtmlStyleUpdate();
+            }
+            break;
         }
-    } else if (widthStr == "fit-content") {
-        setProp(PropFitWidth, true);
-        scheduleHtmlStyleUpdate();
-    } else if (widthStr.ends_with("em")) {
-        setWidth_px(width);
-    } else if (widthStr.ends_with("%")) {
-        setWidth_px(width);
-    } else /*px*/ {
-        setWidth_px(width);
+        case Unit::FitContent: {
+            setProp(PropFixedSize, false);
+            setFitProp(true);
+            scheduleHtmlStyleUpdate();
+            break;
+        }
+        case Unit::Percent: {
+            if (m_parent) {
+                const int base = isWidth ? m_parent->getWidth() : m_parent->getHeight();
+                setPx(static_cast<int>(std::round(base * (num / 100.0))));
+            } else {
+                setPx(0);
+            }
+            break;
+        }
+        case Unit::Em:
+        case Unit::Px:
+        case Unit::Invalid:
+        default: {
+            setPx(static_cast<int>(std::round(num)));
+            break;
+        }
     }
 }
 
