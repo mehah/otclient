@@ -143,6 +143,8 @@ protected:
     Size m_minSize;
     Size m_maxSize;
 
+    uint32_t m_updateId = 0;
+
     DisplayType m_displayType = DisplayType::Inline;
     FloatType m_floatType = FloatType::None;
     ClearType m_clearType = ClearType::None;
@@ -312,6 +314,9 @@ private:
     void updateChildrenIndexStates();
     void updateStyle();
     void applyAnchorAlignment();
+
+    void scheduleUpdateSize();
+    void updateSize();
 
     OTMLNodePtr m_stateStyle;
     int32_t m_states{ Fw::DefaultState };

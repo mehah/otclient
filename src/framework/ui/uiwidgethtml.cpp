@@ -224,49 +224,6 @@ namespace {
         }
     }
 
-    void applyFitContentIfNeeded(UIWidget* self) {
-        if (self->getChildren().empty() || (!self->hasProp(PropFitWidth) && !self->hasProp(PropFitHeight)))
-            return;
-
-        g_dispatcher.deferEvent([self_w = self->static_self_cast<UIWidget>()] {
-            UIWidget* self = self_w.get();
-            const auto& kids = self->getChildren();
-            if (kids.empty()) {
-                self->setProp(PropFitWidth, false);
-                self->setProp(PropFitHeight, false);
-                return;
-            }
-
-            if (self->hasProp(PropFitWidth)) {
-                int start = (std::numeric_limits<int>::max)();
-                int end = (std::numeric_limits<int>::min)();
-                for (const auto& c : kids) {
-                    const int left = c->getRect().topLeft().x - c->getMarginLeft();
-                    const int right = c->getRect().topRight().x + c->getMarginRight();
-                    if (left < start) start = left;
-                    if (right > end)   end = right;
-                }
-                if (start != (std::numeric_limits<int>::max)() && end >= start)
-                    self->setWidth_px(end - start);
-                self->setProp(PropFitWidth, false);
-            }
-
-            if (self->hasProp(PropFitHeight)) {
-                int start = (std::numeric_limits<int>::max)();
-                int end = (std::numeric_limits<int>::min)();
-                for (const auto& c : kids) {
-                    const int top = c->getRect().topLeft().y - c->getMarginTop();
-                    const int bottom = c->getRect().bottomLeft().y + c->getMarginBottom();
-                    if (top < start) start = top;
-                    if (bottom > end)   end = bottom;
-                }
-                if (start != (std::numeric_limits<int>::max)() && end >= start)
-                    self->setHeight_px(end - start);
-                self->setProp(PropFitHeight, false);
-            }
-        });
-    }
-
     static Unit detectUnit(std::string_view s) {
         if (s == "auto") return Unit::Auto;
         if (s == "fit-content") return Unit::FitContent;
@@ -309,17 +266,14 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
                     if (m_parent) setPx(m_parent->getWidth());
                 } else {
                     setFitProp(true);
-                    scheduleAnchorAlignment();
                 }
             } else {
                 setFitProp(true);
-                scheduleAnchorAlignment();
             }
             break;
         }
         case Unit::FitContent: {
             setFitProp(true);
-            scheduleAnchorAlignment();
             break;
         }
         case Unit::Percent: {
@@ -339,6 +293,79 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
             break;
         }
     }
+
+    scheduleUpdateSize();
+}
+
+namespace {
+    static uint32_t UPDATE_EPOCH = 1;
+    static bool FLUSH_PENDING = false;
+    std::vector<UIWidgetPtr> WIDGET_QUEUE;
+}
+
+void UIWidget::scheduleUpdateSize() {
+    WIDGET_QUEUE.emplace_back(static_self_cast<UIWidget>());
+    if (FLUSH_PENDING)
+        return;
+
+    FLUSH_PENDING = true;
+    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
+        for (const auto& widget : WIDGET_QUEUE)
+            widget->updateSize();
+
+        WIDGET_QUEUE.clear();
+        FLUSH_PENDING = false;
+        ++UPDATE_EPOCH;
+    });
+}
+
+void UIWidget::updateSize() {
+    if (m_updateId == UPDATE_EPOCH)
+        return;
+
+    if (m_children.empty()) {
+        setProp(PropFitWidth, false);
+        setProp(PropFitHeight, false);
+        return;
+    }
+
+    int start_w = (std::numeric_limits<int>::max)();
+    int end_w = (std::numeric_limits<int>::min)();
+    int start_h = (std::numeric_limits<int>::max)();
+    int end_h = (std::numeric_limits<int>::min)();
+
+    static auto updateRect = [](UIWidget* c, int& start_w, int& end_w, int& start_h, int& end_h, auto&& updateRect)->void {
+        if (!c->m_children.empty() && (c->hasProp(PropFitWidth) || c->hasProp(PropFitHeight))) {
+            for (auto& w : c->m_children) {
+                updateRect(w.get(), start_w, end_w, start_h, end_h, updateRect);
+            }
+
+            if (c->hasProp(PropFitWidth)) {
+                if (start_w != (std::numeric_limits<int>::max)() && end_w >= start_w)
+                    c->setWidth_px(end_w - start_w);
+                c->setProp(PropFitWidth, false);
+            }
+
+            if (c->hasProp(PropFitHeight)) {
+                if (start_h != (std::numeric_limits<int>::max)() && end_h >= start_h)
+                    c->setHeight_px(end_h - start_h);
+                c->setProp(PropFitHeight, false);
+            }
+
+            c->m_updateId = UPDATE_EPOCH;
+        } else {
+            const int left = c->getRect().topLeft().x - c->getMarginLeft();
+            const int right = c->getRect().topRight().x + c->getMarginRight();
+            if (left < start_w) start_w = left;
+            if (right > end_w)    end_w = right;
+
+            const int top = c->getRect().topLeft().y - c->getMarginTop();
+            const int bottom = c->getRect().bottomLeft().y + c->getMarginBottom();
+            if (top < start_h) start_h = top;
+            if (bottom > end_h)  end_h = bottom;
+        }
+    };
+    updateRect(this, start_w, end_w, start_h, end_h, updateRect);
 }
 
 void UIWidget::scheduleAnchorAlignment() {
@@ -370,7 +397,6 @@ void UIWidget::applyAnchorAlignment() {
     if (m_htmlNode->getAttr("anchor") == "parent") {
         setLeftAnchor(this, "parent", Fw::AnchorLeft);
         setTopAnchor(this, "parent", Fw::AnchorTop);
-        applyFitContentIfNeeded(this);
         return;
     }
 
@@ -397,6 +423,4 @@ void UIWidget::applyAnchorAlignment() {
     } else {
         applyBlock(this, ctx, topCleared);
     }
-
-    applyFitContentIfNeeded(this);
 }
