@@ -207,55 +207,12 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         widget->setText(node->getText());
     }
 
-    bool loadChildren = true;
     if (node->getChildren().size() == 1 && node->getChildren()[0]->getType() == NodeType::Text) {
-        loadChildren = false;
         const auto& text = node->getChildren()[0]->getText();
         if (!text.empty() && node->getAttr("text").empty())
             node->setAttr("text", text);
-    }
-
-    for (const auto [key, v] : node->getAttributesMap()) {
-        auto attr = key;
-        auto value = v;
-        translateAttribute(styleName, node->getTag(), attr, value);
-
-        if (attr.starts_with("on")) {
-            // lua call
-        } else if (attr == "anchor") {
-            // ignore
-        } else if (attr == "style") {
-            parseAttrPropList(value, node->getAttrStyles());
-        } else if (attr == "layout") {
-            auto otml = std::make_shared<OTMLNode>();
-            auto layout = std::make_shared<OTMLNode>();
-
-            std::map<std::string, std::string> styles;
-            parseAttrPropList(value, styles);
-            for (const auto [tag, value] : styles) {
-                auto nodeAttr = std::make_shared<OTMLNode>();
-                nodeAttr->setTag(tag);
-                nodeAttr->setValue(value);
-                layout->addChild(nodeAttr);
-            }
-
-            layout->setTag("layout");
-            otml->addChild(layout);
-            widget->mergeStyle(otml);
-        } else if (attr == "class") {
-            for (const auto& className : stdext::split(value, " ")) {
-                if (const auto& style = g_ui.getStyle(className))
-                    widget->mergeStyle(style);
-            }
-        } else {
-            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value);
-        }
-    }
-
-    if (loadChildren) {
-        for (const auto& child : node->getChildren()) {
-            readNode(child, widget);
-        }
+    } else for (const auto& child : node->getChildren()) {
+        readNode(child, widget);
     }
 
     return widget;
@@ -343,33 +300,73 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
     std::unordered_map<std::string, UIWidgetPtr> groups;
     const auto& all = root->querySelectorAll("*");
     for (const auto& node : std::views::reverse(all)) {
-        if (node->getWidget()) {
-            auto styles = std::make_shared<OTMLNode>();
+        if (const auto widget = node->getWidget().get()) {
+            for (const auto [key, v] : node->getAttributesMap()) {
+                auto attr = key;
+                auto value = v;
+                translateAttribute(widget->getStyleName(), node->getTag(), attr, value);
 
-            for (const auto [key, stylesMap] : node->getStyles()) {
-                auto meta = styles;
-                if (key != "styles") {
-                    meta = std::make_shared<OTMLNode>();
-                    meta->setTag(key);
-                    styles->addChild(meta);
-                }
+                if (attr.starts_with("on")) {
+                    // lua call
+                } else if (attr == "anchor") {
+                    // ignore
+                } else if (attr == "style") {
+                    parseAttrPropList(value, node->getAttrStyles());
+                } else if (attr == "layout") {
+                    auto otml = std::make_shared<OTMLNode>();
+                    auto layout = std::make_shared<OTMLNode>();
 
-                for (const auto [tag, value] : stylesMap) {
-                    auto nodeAttr = std::make_shared<OTMLNode>();
-                    nodeAttr->setTag(tag);
-                    nodeAttr->setValue(value);
-                    meta->addChild(nodeAttr);
+                    std::map<std::string, std::string> styles;
+                    parseAttrPropList(value, styles);
+                    for (const auto [tag, value] : styles) {
+                        auto nodeAttr = std::make_shared<OTMLNode>();
+                        nodeAttr->setTag(tag);
+                        nodeAttr->setValue(value);
+                        layout->addChild(nodeAttr);
+                    }
+
+                    layout->setTag("layout");
+                    otml->addChild(layout);
+                    widget->mergeStyle(otml);
+                } else if (attr == "class") {
+                    for (const auto& className : stdext::split(value, " ")) {
+                        if (const auto& style = g_ui.getStyle(className))
+                            widget->mergeStyle(style);
+                    }
+                } else {
+                    widget->callLuaField("__applyOrBindHtmlAttribute", attr, value);
                 }
             }
 
-            for (const auto [tag, value] : node->getAttrStyles()) {
+            auto styles = std::make_shared<OTMLNode>();
+
+            auto attrs = node->getAttrStyles();
+
+            for (const auto [key, stylesMap] : node->getStyles()) {
+                if (key != "styles") {
+                    auto meta = std::make_shared<OTMLNode>();
+                    meta->setTag(key);
+                    styles->addChild(meta);
+
+                    for (const auto [tag, value] : stylesMap) {
+                        auto nodeAttr = std::make_shared<OTMLNode>();
+                        nodeAttr->setTag(tag);
+                        nodeAttr->setValue(value);
+                        meta->addChild(nodeAttr);
+                    }
+                } else for (const auto [tag, value] : stylesMap) {
+                    attrs[tag] = value;
+                }
+            }
+
+            for (const auto [tag, value] : attrs) {
                 auto nodeAttr = std::make_shared<OTMLNode>();
                 nodeAttr->setTag(tag);
                 nodeAttr->setValue(value);
                 styles->addChild(nodeAttr);
             }
 
-            node->getWidget()->mergeStyle(styles);
+            widget->mergeStyle(styles);
 
             if (node->getTag() == "input" && node->getAttr("type") == "radio")
                 createRadioGroup(node, groups);
