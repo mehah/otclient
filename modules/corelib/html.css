@@ -45,6 +45,8 @@ textarea {
     height: 128;
 }
 
+
+
 h1,
 h2,
 h3,
@@ -101,4 +103,68 @@ h5 * {
 h6,
 h6 * {
     --font-scale: 0.3;
+}
+
+table,
+thead,
+tbody,
+tfoot,
+tr,
+td,
+th {
+    width: fit-content;
+    height: fit-content;
+}
+
+td,
+th {
+    padding: 1;
+}
+
+table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tbody {
+    display: table-row-group;
+}
+
+tfoot {
+    display: table-footer-group;
+}
+
+tr {
+    display: table-row;
+}
+
+td {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+th {
+    display: table-cell;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+colgroup {
+    display: table-column-group;
+}
+
+col {
+    display: table-column;
+}
+
+caption {
+    display: table-caption;
+    text-align: center;
+    caption-side: top;
 }
