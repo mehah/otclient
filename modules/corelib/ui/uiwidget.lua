@@ -68,6 +68,11 @@ local function START_WATCH_LIST()
 end
 
 function UIWidget:__applyOrBindHtmlAttribute(attr, value)
+    if attr == 'image-source' then
+        value = '/modules/' .. G_CONTROLLER_CALLED.name .. '/' .. value
+        print(value)
+    end
+
     local setterName = ''
     for _, _name in pairs(attr:trim():split('-')) do
         setterName = setterName .. _name:gsub("^%l", string.upper)
@@ -114,5 +119,165 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value)
     else
         local _name = string.sub(setterName, 1, 1):lower() .. string.sub(setterName, 2, -1)
         self[_name] = value
+    end
+end
+
+local EVENTS_TRANSLATED = {
+    onstyleapply     = 'onStyleApply',
+    ondestroy        = 'onDestroy',
+    onidchange       = 'onIdChange',
+    onwidthchange    = 'onWidthChange',
+    onheightchange   = 'onHeightChange',
+    onresize         = 'onResize',
+    onenabled        = 'onEnabled',
+    onpropertychange = 'onPropertyChange',
+    ongeometrychange = 'onGeometryChange',
+    onlayoutupdate   = 'onLayoutUpdate',
+    onfocus          = 'onFocusChange',
+    onchildfocus     = 'onChildFocusChange',
+    onhover          = 'onHoverChange',
+    onvisibility     = 'onVisibilityChange',
+    ondragenter      = 'onDragEnter',
+    ondragleave      = 'onDragLeave',
+    ondragmove       = 'onDragMove',
+    ondrop           = 'onDrop',
+    onkeytext        = 'onKeyText',
+    onkeydown        = 'onKeyDown',
+    onkeypress       = 'onKeyPress',
+    onkeyup          = 'onKeyUp',
+    onmousepress     = 'onMousePress',
+    onmouserelease   = 'onMouseRelease',
+    onmousemove      = 'onMouseMove',
+    onmousewheel     = 'onMouseWheel',
+    onclick          = 'onClick',
+    ondoubleclick    = 'onDoubleClick',
+    oncreate         = 'onCreate',
+    onsetup          = 'onSetup',
+    ontextareaupdate = 'onTextAreaUpdate',
+    onfontchange     = 'onFontChange',
+    ontextchange     = 'onTextChange',
+    onescape         = 'onEscape',
+}
+
+local parseEvents = function(widget, eventName, callStr, controller)
+    local eventCall = loadstring('return function(self, event) ' .. callStr .. ' end')()
+    local event = { target = widget }
+    local function execEventCall()
+        eventCall(controller, event)
+    end
+
+    if eventName == 'onchange' then
+        if widget.__class == 'UIComboBox' then
+            controller:registerEvents(widget, {
+                onOptionChange = function(widget, text, data)
+                    event.name = 'onOptionChange'
+                    event.text = text
+                    event.data = data
+                    execEventCall()
+                end
+            })
+        elseif widget.__class == 'UIRadioGroup' then
+            controller:registerEvents(widget, {
+                onSelectionChange = function(widget, selectedWidget, previousSelectedWidget)
+                    event.name = 'onSelectionChange'
+                    event.selectedWidget = selectedWidget
+                    event.previousSelectedWidget = previousSelectedWidget
+                    execEventCall()
+                end
+            })
+        elseif widget.__class == 'UICheckBox' then
+            controller:registerEvents(widget, {
+                onCheckChange = function(widget, checked)
+                    event.name = 'onCheckChange'
+                    event.checked = checked
+                    execEventCall()
+                end
+            })
+        elseif widget.__class == 'UIScrollBar' then
+            controller:registerEvents(widget, {
+                onValueChange = function(widget, value, delta)
+                    event.name = 'onValueChange'
+                    event.value = value
+                    event.delta = delta
+                    execEventCall()
+                end
+            })
+        elseif widget.setValue then
+            controller:registerEvents(widget, {
+                onValueChange = function(widget, value)
+                    event.name = 'onValueChange'
+                    event.value = value
+                    execEventCall()
+                end
+            })
+        else
+            controller:registerEvents(widget, {
+                onTextChange = function(widget, value)
+                    event.name = 'onTextChange'
+                    event.value = value
+                    execEventCall()
+                end
+            })
+        end
+
+        return
+    end
+
+    local trEventName = EVENTS_TRANSLATED[eventName]
+    if not trEventName then
+        pwarning('[' .. HTML_PATH .. ']:' .. el.name .. ' Event ' .. eventName .. ' does not exist.')
+        return
+    end
+
+    local data = {}
+    data[trEventName] = function(widget, value)
+        event.name = trEventName
+        event.value = value
+        execEventCall()
+    end
+
+    controller:registerEvents(widget, data)
+end
+
+function UIWidget:onCreateByHTML(attrs)
+    for attr, v in pairs(attrs) do
+        if attr:starts('on') then
+            parseEvents(self, attr:lower(), v, G_CONTROLLER_CALLED)
+            return
+        end
+    end
+    local getFncSet = function(exp)
+        local f = loadstring('return function(self, value) ' .. exp .. '=value end')
+        return f and f() or nil
+    end
+
+    if attrs['*checked'] then
+        local set = getFncSet(attrs['*checked'])
+        if set then
+            G_CONTROLLER_CALLED:registerEvents(self, {
+                onCheckChange = function(widget, value)
+                    set(G_CONTROLLER_CALLED, value)
+                end
+            })
+        end
+    end
+
+    if attrs['*value'] then
+        local set = getFncSet(attrs['*value'])
+        if set then
+            if self.getCurrentOption then
+                G_CONTROLLER_CALLED:registerEvents(self, {
+                    onOptionChange = function(widget, text, data)
+                        set(G_CONTROLLER_CALLED, data)
+                    end
+                })
+            else
+                G_CONTROLLER_CALLED:registerEvents(self, {
+                    onTextChange = function(widget, value)
+                        set(G_CONTROLLER_CALLED, value)
+                    end
+                })
+            end
+        end
     end
 end

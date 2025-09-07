@@ -62,11 +62,13 @@ Controller = {
     extendedOpcodes = nil,
     opcodes = nil,
     events = nil,
-    htmlRoot = nil,
+    htmlId = nil,
     keyboardAnchor = nil,
     scheduledEvents = nil,
     keyboardEvents = nil
 }
+
+G_CONTROLLER_CALLED = nil
 
 function Controller:new()
     local module = g_modules.getCurrentModule()
@@ -131,15 +133,16 @@ function Controller:loadHtml(path, parent)
         path = path .. suffix
     end
 
+    G_CONTROLLER_CALLED = self
+
     self:setUI(path, parent)
-    self.htmlRoot = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
-    self.ui = self.htmlRoot.widget
+    self.htmlId = g_html.load(self.name, path, g_ui.getRootWidget())
+    self.ui = g_html.getWidget(self.htmlId);
 end
 
 function Controller:destroyUI()
-    if self.htmlRoot ~= nil then
-        self.htmlRoot.widget = nil
-        self.htmlRoot = nil
+    if self.htmlId ~= nil then
+        g_html.destroy(self.htmlId)
     end
 
     if self.ui then
@@ -159,11 +162,11 @@ function Controller:destroyUI()
 end
 
 function Controller:findElements(query)
-    return self.htmlRoot and self.htmlRoot:find(query:trim()) or {}
+    return self.htmlId and self.htmlId:find(query:trim()) or {}
 end
 
 function Controller:findWidgets(query)
-    return self.htmlRoot and self.htmlRoot:findWidgets(query:trim()) or {}
+    return self.htmlId and self.htmlId:findWidgets(query:trim()) or {}
 end
 
 function Controller:findElement(query)
@@ -251,7 +254,7 @@ function Controller:terminate()
     self.keyboardEvents = nil
     self.keyboardAnchor = nil
     self.scheduledEvents = nil
-    self.htmlRoot = nil
+    self.htmlId = nil
 
     self.__onGameStart = nil
     self.__onGameEnd = nil

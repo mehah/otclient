@@ -28,9 +28,10 @@
 class HtmlManager
 {
 public:
-    uint32_t load(const std::string& htmlPath, UIWidgetPtr parent);
+    uint32_t load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent);
     void destroy(uint32_t id);
     void setGlobalStyle(const std::string& style);
+    UIWidgetPtr getWidget(uint32_t htmlId);
 
 private:
     stdext::map<uint32_t, HtmlNodePtr> m_nodes;

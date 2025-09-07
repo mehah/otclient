@@ -29,6 +29,7 @@
 #include "cssparser.h"
 #include <framework/core/resourcemanager.h>
 #include <ranges>
+#include <framework/core/modulemanager.h>
 
 HtmlManager g_html;
 css::StyleSheet GLOBAL_STYLE;
@@ -198,10 +199,13 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     node->setWidget(widget);
     widget->setHtmlNode(node);
 
+    widget->callLuaField("onCreateByHTML", node->getAttributesMap());
+
     for (const auto [key, value] : node->getAttributesMap()) {
         const auto& attr = translateAttribute(styleName, node->getTag(), key);
 
         if (attr.starts_with("on")) {
+            // lua call
         } else if (attr == "anchor") {
             // ignore
         } else if (attr == "style") {
@@ -244,8 +248,9 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     return widget;
 }
 
-uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
-    auto htmlContent = g_resources.readFileContents(htmlPath);
+uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
+    auto path = "/modules/" + moduleName + "/";
+    auto htmlContent = path + g_resources.readFileContents(path + htmlPath);
     auto root = parseHtml(htmlContent);
     if (root->getChildren().empty())
         return 0;
@@ -260,7 +265,7 @@ uint32_t HtmlManager::load(const std::string& htmlPath, UIWidgetPtr parent) {
             sheets.emplace_back(css::parse(node->textContent()));
         } else if (node->getTag() == "link") {
             if (node->hasAttr("href")) {
-                sheets.emplace_back(css::parse(g_resources.readFileContents(node->getAttr("href"))));
+                sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
             }
         } else readNode(node, parent);
     }
@@ -386,4 +391,16 @@ void HtmlManager::destroy(uint32_t id) {
 
 void HtmlManager::setGlobalStyle(const std::string& stylePath) {
     GLOBAL_STYLE = css::parse(g_resources.readFileContents(stylePath));
+}
+
+UIWidgetPtr HtmlManager::getWidget(uint32_t id) {
+    auto it = m_nodes.find(id);
+    if (it != m_nodes.end()) {
+        for (const auto& node : it->second->getChildren()) {
+            if (node->getWidget())
+                return node->getWidget();
+        }
+    }
+
+    return nullptr;
 }

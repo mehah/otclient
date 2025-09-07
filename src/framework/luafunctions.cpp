@@ -439,6 +439,7 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_html", "load", &HtmlManager::load, &g_html);
     g_lua.bindSingletonFunction("g_html", "destroy", &HtmlManager::destroy, &g_html);
     g_lua.bindSingletonFunction("g_html", "setGlobalStyle", &HtmlManager::setGlobalStyle, &g_html);
+    g_lua.bindSingletonFunction("g_html", "getWidget", &HtmlManager::getWidget, &g_html);
 
     // FontManager
     g_lua.registerSingletonClass("g_fonts");
