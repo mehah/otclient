@@ -244,7 +244,10 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         widget->setText(node->getText());
     }
 
-    for (const auto& child : node->getChildren()) {
+    if (node->getChildren().size() && node->getChildren()[0]->getType() == NodeType::Text) {
+        widget->setTextAutoResize(true);
+        widget->setText(node->getChildren()[0]->getText());
+    } else for (const auto& child : node->getChildren()) {
         readNode(child, widget);
     }
 
@@ -332,46 +335,37 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
 
     std::unordered_map<std::string, UIWidgetPtr> groups;
     const auto& all = root->querySelectorAll("*");
-    for (const auto& n : std::views::reverse(all)) {
-        if (n->getWidget()) {
-            auto node = n;
-            for (int i = 0; ++i <= 2;) {
-                if (i == 2) {
-                    if (node->getChildren().size() == 1 && node->getChildren()[0]->getType() == NodeType::Text)
-                        node = node->getChildren()[0];
-                    else break;
+    for (const auto& node : std::views::reverse(all)) {
+        if (node->getWidget()) {
+            auto styles = std::make_shared<OTMLNode>();
+
+            for (const auto [key, stylesMap] : node->getStyles()) {
+                auto meta = styles;
+                if (key != "styles") {
+                    meta = std::make_shared<OTMLNode>();
+                    meta->setTag(key);
+                    styles->addChild(meta);
                 }
 
-                auto styles = std::make_shared<OTMLNode>();
-
-                for (const auto [key, stylesMap] : node->getStyles()) {
-                    auto meta = styles;
-                    if (key != "styles") {
-                        meta = std::make_shared<OTMLNode>();
-                        meta->setTag(key);
-                        styles->addChild(meta);
-                    }
-
-                    for (const auto [tag, value] : stylesMap) {
-                        auto nodeAttr = std::make_shared<OTMLNode>();
-                        nodeAttr->setTag(tag);
-                        nodeAttr->setValue(value);
-                        meta->addChild(nodeAttr);
-                    }
-                }
-
-                for (const auto [tag, value] : node->getAttrStyles()) {
+                for (const auto [tag, value] : stylesMap) {
                     auto nodeAttr = std::make_shared<OTMLNode>();
                     nodeAttr->setTag(tag);
                     nodeAttr->setValue(value);
-                    styles->addChild(nodeAttr);
+                    meta->addChild(nodeAttr);
                 }
-
-                node->getWidget()->mergeStyle(styles);
-
-                if (node->getTag() == "input" && node->getAttr("type") == "radio")
-                    createRadioGroup(node, groups);
             }
+
+            for (const auto [tag, value] : node->getAttrStyles()) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(tag);
+                nodeAttr->setValue(value);
+                styles->addChild(nodeAttr);
+            }
+
+            node->getWidget()->mergeStyle(styles);
+
+            if (node->getTag() == "input" && node->getAttr("type") == "radio")
+                createRadioGroup(node, groups);
         }
     }
 

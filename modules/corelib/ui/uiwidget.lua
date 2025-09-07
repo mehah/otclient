@@ -86,14 +86,14 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value)
         local vStr = value
         local f = loadstring('return function(self, target) return ' .. vStr .. ' end')
         local fnc = f()
-        value = fnc(controller)
+        value = fnc(G_CONTROLLER_CALLED)
 
         watchObj = {
             widget = self,
             res = value,
             method = nil,
             fnc = function(self)
-                local value = fnc(controller, self.widget)
+                local value = fnc(G_CONTROLLER_CALLED, self.widget)
                 if value ~= self.res then
                     self.method(self.widget, value)
                     self.res = value
