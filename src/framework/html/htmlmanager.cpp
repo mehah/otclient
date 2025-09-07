@@ -245,7 +245,6 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     }
 
     if (node->getChildren().size() && node->getChildren()[0]->getType() == NodeType::Text) {
-        widget->setTextAutoResize(true);
         widget->setText(node->getChildren()[0]->getText());
     } else for (const auto& child : node->getChildren()) {
         readNode(child, widget);
