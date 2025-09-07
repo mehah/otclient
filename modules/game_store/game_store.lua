@@ -1083,38 +1083,81 @@ function transferPoints()
     destroyWindow(transferPointsWindow)
     transferPointsWindow = g_ui.displayUI('style/transferpoints')
     transferPointsWindow:show()
+
     local playerBalance = g_game.getLocalPlayer():getResourceBalance(ResourceTypes.COIN_TRANSFERRABLE)
     fixServerNoSend0xF2()
     local coinsBalance2, coinsBalance1  = getCoinsBalance()
+
     if playerBalance == 0 then
         playerBalance = coinsBalance1 -- temp fix canary 1340
     end
+
+    g_logger.info("TransferPoints | Player balance inicial: " .. tostring(playerBalance))
+    g_logger.info("TransferPoints | CoinsBalance1: " .. tostring(coinsBalance1) .. " | CoinsBalance2: " .. tostring(coinsBalance2))
+
     transferPointsWindow.giftable:setText(formatNumberWithCommas(playerBalance))
-    transferPointsWindow.amountBar:setValue(100)
-    transferPointsWindow.amountBar:setMinimum(0)
+
+    -- CONFIGURAÇÃO DA AMOUNTBAR
+    local initialValue = 0
+    local minimumValue = 0
+    if playerBalance >= 25 then
+        initialValue = 25
+        minimumValue = 25
+    end
+
+    transferPointsWindow.amountBar:setStep(25)
+    transferPointsWindow.amountBar:setMinimum(minimumValue)
     transferPointsWindow.amountBar:setMaximum(playerBalance)
+    transferPointsWindow.amountBar:setValue(initialValue)
+
+    -- Inicializa também o campo de texto para mostrar o valor correto
+    transferPointsWindow.amount:setText(formatNumberWithCommas(initialValue))
+
+    -- DESABILITAR O ARRASTAR DO SLIDER
+    local sliderButton = transferPointsWindow.amountBar:getChildById('sliderButton')
+    if sliderButton then
+        sliderButton:setEnabled(false)
+        sliderButton:setVisible(false)
+    end
 
     transferPointsWindow.onEscape = function()
         destroyWindow(transferPointsWindow)
+        g_logger.info("TransferPoints | Janela fechada via Escape")
     end
+
     transferPointsWindow.amountBar.onValueChange = function()
-        transferPointsWindow.amount:setText(formatNumberWithCommas(transferPointsWindow.amountBar:getValue()))
+        local val = transferPointsWindow.amountBar:getValue()
+        transferPointsWindow.amount:setText(formatNumberWithCommas(val))
+        g_logger.info("TransferPoints | AmountBar value changed: " .. tostring(val))
     end
+
     transferPointsWindow.closeButton.onClick = function()
         destroyWindow(transferPointsWindow)
+        g_logger.info("TransferPoints | Janela fechada via CloseButton")
     end
+
     transferPointsWindow.buttonOk.onClick = function()
         local receipient = transferPointsWindow.transferPointsText:getText():trim()
-        if receipient:len() < 3 then
-            return
-        end
         local amount = transferPointsWindow.amountBar:getValue()
-        if amount < 1 or playerBalance < amount then
+
+        g_logger.info("TransferPoints | Tentando transferir | Recipient: " .. receipient .. " | Amount: " .. tostring(amount))
+
+        if receipient:len() < 3 then
+            g_logger.info("TransferPoints | Nome do destinatário inválido")
             return
         end
+        if amount < 1 or playerBalance < amount then
+            g_logger.info("TransferPoints | Quantidade inválida ou insuficiente | PlayerBalance: " .. tostring(playerBalance) .. " | Amount: " .. tostring(amount))
+            return
+        end
+
         g_game.transferCoins(receipient, amount)
+        g_logger.info("TransferPoints | Transferência enviada | Recipient: " .. receipient .. " | Amount: " .. tostring(amount))
+        destroyWindow(transferPointsWindow)
     end
 end
+
+
 
 -- /*=============================================
 -- =            Search Button            =
