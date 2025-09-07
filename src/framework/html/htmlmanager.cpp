@@ -174,7 +174,7 @@ std::string translateStyleName(const std::string& styleName, const HtmlNodePtr& 
     return styleName;
 }
 
-void createRadioGroup(const HtmlNodePtr& node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
+void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
     const auto& name = node->getAttr("name");
     if (name.empty())
         return;
@@ -189,6 +189,59 @@ void createRadioGroup(const HtmlNodePtr& node, std::unordered_map<std::string, U
 
     group->callLuaField("addWidget", node->getWidget());
 }
+
+void parseStyle(const auto& root, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
+    static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
+        for (const auto& child : n->getChildren()) {
+            if (!child->hasAttr("id")) {
+                child->getStyles()[style][decl.property] = decl.value;
+            }
+            self(child, decl, style, self);
+        }
+    };
+
+    for (const auto& rule : sheet.rules) {
+        const auto& selectors = stdext::join(rule.selectors);
+        const auto& nodes = root->querySelectorAll(selectors);
+
+        if (checkRuleExist && nodes.empty()) {
+            g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
+            continue;
+        }
+
+        for (const auto& node : nodes) {
+            if (node->getWidget()) {
+                bool hasMeta = false;
+                for (const auto& metas : rule.selectorMeta) {
+                    for (const auto& state : metas.pseudos) {
+                        for (const auto& decl : rule.decls) {
+                            std::string style = "$";
+                            if (state.negated)
+                                style += "!";
+                            style += state.name;
+
+                            node->getStyles()[style][decl.property] = decl.value;
+                            if (isInheritable(decl.property)) {
+                                setChildrenStyles(node, decl, style, setChildrenStyles);
+                            }
+                        }
+                        hasMeta = true;
+                    }
+                }
+
+                if (hasMeta)
+                    continue;
+
+                for (const auto& decl : rule.decls) {
+                    node->getStyles()["styles"][decl.property] = decl.value;
+                    if (isInheritable(decl.property)) {
+                        setChildrenStyles(node, decl, "styles", setChildrenStyles);
+                    }
+                }
+            }
+        }
+    }
+};
 
 UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
@@ -218,6 +271,78 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     return widget;
 }
 
+void prepareWidget(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
+    for (const auto [key, v] : node->getAttributesMap()) {
+        auto attr = key;
+        auto value = v;
+        translateAttribute(widget->getStyleName(), node->getTag(), attr, value);
+
+        if (attr.starts_with("on")) {
+            // lua call
+        } else if (attr == "anchor") {
+            // ignore
+        } else if (attr == "style") {
+            parseAttrPropList(value, node->getAttrStyles());
+        } else if (attr == "layout") {
+            auto otml = std::make_shared<OTMLNode>();
+            auto layout = std::make_shared<OTMLNode>();
+
+            std::map<std::string, std::string> styles;
+            parseAttrPropList(value, styles);
+            for (const auto [tag, value] : styles) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(tag);
+                nodeAttr->setValue(value);
+                layout->addChild(nodeAttr);
+            }
+
+            layout->setTag("layout");
+            otml->addChild(layout);
+            widget->mergeStyle(otml);
+        } else if (attr == "class") {
+            for (const auto& className : stdext::split(value, " ")) {
+                if (const auto& style = g_ui.getStyle(className))
+                    widget->mergeStyle(style);
+            }
+        } else {
+            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value);
+        }
+    }
+
+    auto styles = std::make_shared<OTMLNode>();
+
+    auto attrs = node->getAttrStyles();
+
+    for (const auto [key, stylesMap] : node->getStyles()) {
+        if (key != "styles") {
+            auto meta = std::make_shared<OTMLNode>();
+            meta->setTag(key);
+            styles->addChild(meta);
+
+            for (const auto [tag, value] : stylesMap) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(tag);
+                nodeAttr->setValue(value);
+                meta->addChild(nodeAttr);
+            }
+        } else for (const auto [tag, value] : stylesMap) {
+            attrs[tag] = value;
+        }
+    }
+
+    for (const auto [tag, value] : attrs) {
+        auto nodeAttr = std::make_shared<OTMLNode>();
+        nodeAttr->setTag(tag);
+        nodeAttr->setValue(value);
+        styles->addChild(nodeAttr);
+    }
+
+    widget->mergeStyle(styles);
+
+    if (node->getTag() == "input" && node->getAttr("type") == "radio")
+        createRadioGroup(node, groups);
+}
+
 uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
     auto path = "/modules/" + moduleName + "/";
     auto htmlContent = g_resources.readFileContents(path + htmlPath);
@@ -240,136 +365,15 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
         } else readNode(node, parent);
     }
 
-    auto parseStyle = [&](const css::StyleSheet& sheet, bool checkRuleExist) {
-        static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
-            for (const auto& child : n->getChildren()) {
-                if (!child->hasAttr("id")) {
-                    child->getStyles()[style][decl.property] = decl.value;
-                }
-                self(child, decl, style, self);
-            }
-        };
-
-        for (const auto& rule : sheet.rules) {
-            const auto& selectors = stdext::join(rule.selectors);
-            const auto& nodes = root->querySelectorAll(selectors);
-
-            if (checkRuleExist && nodes.empty()) {
-                g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
-                continue;
-            }
-
-            for (const auto& node : nodes) {
-                if (node->getWidget()) {
-                    bool hasMeta = false;
-                    for (const auto& metas : rule.selectorMeta) {
-                        for (const auto& state : metas.pseudos) {
-                            for (const auto& decl : rule.decls) {
-                                std::string style = "$";
-                                if (state.negated)
-                                    style += "!";
-                                style += state.name;
-
-                                node->getStyles()[style][decl.property] = decl.value;
-                                if (isInheritable(decl.property)) {
-                                    setChildrenStyles(node, decl, style, setChildrenStyles);
-                                }
-                            }
-                            hasMeta = true;
-                        }
-                    }
-
-                    if (hasMeta)
-                        continue;
-
-                    for (const auto& decl : rule.decls) {
-                        node->getStyles()["styles"][decl.property] = decl.value;
-                        if (isInheritable(decl.property)) {
-                            setChildrenStyles(node, decl, "styles", setChildrenStyles);
-                        }
-                    }
-                }
-            }
-        }
-    };
-
-    parseStyle(GLOBAL_STYLE, false);
+    parseStyle(root, htmlPath, GLOBAL_STYLE, false);
     for (const auto& sheet : sheets)
-        parseStyle(sheet, true);
+        parseStyle(root, htmlPath, sheet, true);
 
     std::unordered_map<std::string, UIWidgetPtr> groups;
     const auto& all = root->querySelectorAll("*");
     for (const auto& node : std::views::reverse(all)) {
         if (const auto widget = node->getWidget().get()) {
-            for (const auto [key, v] : node->getAttributesMap()) {
-                auto attr = key;
-                auto value = v;
-                translateAttribute(widget->getStyleName(), node->getTag(), attr, value);
-
-                if (attr.starts_with("on")) {
-                    // lua call
-                } else if (attr == "anchor") {
-                    // ignore
-                } else if (attr == "style") {
-                    parseAttrPropList(value, node->getAttrStyles());
-                } else if (attr == "layout") {
-                    auto otml = std::make_shared<OTMLNode>();
-                    auto layout = std::make_shared<OTMLNode>();
-
-                    std::map<std::string, std::string> styles;
-                    parseAttrPropList(value, styles);
-                    for (const auto [tag, value] : styles) {
-                        auto nodeAttr = std::make_shared<OTMLNode>();
-                        nodeAttr->setTag(tag);
-                        nodeAttr->setValue(value);
-                        layout->addChild(nodeAttr);
-                    }
-
-                    layout->setTag("layout");
-                    otml->addChild(layout);
-                    widget->mergeStyle(otml);
-                } else if (attr == "class") {
-                    for (const auto& className : stdext::split(value, " ")) {
-                        if (const auto& style = g_ui.getStyle(className))
-                            widget->mergeStyle(style);
-                    }
-                } else {
-                    widget->callLuaField("__applyOrBindHtmlAttribute", attr, value);
-                }
-            }
-
-            auto styles = std::make_shared<OTMLNode>();
-
-            auto attrs = node->getAttrStyles();
-
-            for (const auto [key, stylesMap] : node->getStyles()) {
-                if (key != "styles") {
-                    auto meta = std::make_shared<OTMLNode>();
-                    meta->setTag(key);
-                    styles->addChild(meta);
-
-                    for (const auto [tag, value] : stylesMap) {
-                        auto nodeAttr = std::make_shared<OTMLNode>();
-                        nodeAttr->setTag(tag);
-                        nodeAttr->setValue(value);
-                        meta->addChild(nodeAttr);
-                    }
-                } else for (const auto [tag, value] : stylesMap) {
-                    attrs[tag] = value;
-                }
-            }
-
-            for (const auto [tag, value] : attrs) {
-                auto nodeAttr = std::make_shared<OTMLNode>();
-                nodeAttr->setTag(tag);
-                nodeAttr->setValue(value);
-                styles->addChild(nodeAttr);
-            }
-
-            widget->mergeStyle(styles);
-
-            if (node->getTag() == "input" && node->getAttr("type") == "radio")
-                createRadioGroup(node, groups);
+            prepareWidget(widget, node.get(), groups);
         }
     }
 
