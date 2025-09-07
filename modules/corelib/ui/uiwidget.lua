@@ -70,7 +70,6 @@ end
 function UIWidget:__applyOrBindHtmlAttribute(attr, value)
     if attr == 'image-source' then
         value = '/modules/' .. G_CONTROLLER_CALLED.name .. '/' .. value
-        print(value)
     end
 
     local setterName = ''

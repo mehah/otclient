@@ -867,6 +867,7 @@ void UIWidget::internalDestroy()
         m_layout->setParent(nullptr);
         m_layout = nullptr;
     }
+    m_htmlNode = nullptr;
     m_parent = nullptr;
     m_lockedChildren.clear();
     m_childrenById.clear();
