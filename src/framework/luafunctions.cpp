@@ -788,6 +788,9 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setTextDrawOrder", &UIWidget::setTextDrawOrder);
     g_lua.bindClassMemberFunction<UIWidget>("setBorderDrawOrder", &UIWidget::setBorderDrawOrder);
 
+    g_lua.bindClassMemberFunction<UIWidget>("querySelectorAll", &UIWidget::querySelectorAll);
+    g_lua.bindClassMemberFunction<UIWidget>("querySelector", &UIWidget::querySelector);
+
     // UILayout
     g_lua.registerClass<UILayout>();
     g_lua.bindClassMemberFunction<UILayout>("update", &UILayout::update);

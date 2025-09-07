@@ -28,6 +28,7 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/luaengine/luainterface.h>
 #include <framework/otml/otmlnode.h>
+#include <framework/html/htmlnode.h>
 
 #include <framework/platform/platformwindow.h>
 #include "framework/graphics/drawpoolmanager.h"
@@ -2069,4 +2070,28 @@ void UIWidget::removeOnDestroyCallback(const std::string& id)
     const auto it = m_onDestroyCallbacks.find(id);
     if (it != m_onDestroyCallbacks.end())
         m_onDestroyCallbacks.erase(it);
+}
+
+std::vector<UIWidgetPtr> UIWidget::querySelectorAll(const std::string& selector) {
+    std::vector<UIWidgetPtr> list;
+    if (!m_htmlNode)
+        return list;
+
+    const auto& nodeList = m_htmlNode->querySelectorAll(selector);
+    list.reserve(nodeList.size());
+    for (const auto& node : nodeList) {
+        if (const auto& widget = node->getWidget())
+            list.emplace_back(widget);
+    }
+
+    return list;
+}
+
+UIWidgetPtr UIWidget::querySelector(const std::string& selector) {
+    const auto& node = m_htmlNode->querySelector(selector);
+    if (node) {
+        if (const auto& widget = node->getWidget())
+            return widget;
+    }
+    return nullptr;
 }

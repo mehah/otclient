@@ -161,22 +161,12 @@ function Controller:destroyUI()
     end
 end
 
-function Controller:findElements(query)
-    return self.htmlId and self.htmlId:find(query:trim()) or {}
+function Controller:findWidget(query)
+    return self.ui and self.ui:querySelector(query:trim())
 end
 
 function Controller:findWidgets(query)
-    return self.htmlId and self.htmlId:findWidgets(query:trim()) or {}
-end
-
-function Controller:findElement(query)
-    local els = self:findElements(query)
-    return #els > 0 and els[1] or nil
-end
-
-function Controller:findWidget(query)
-    local els = self:findWidgets(query)
-    return #els > 0 and els[1] or nil
+    return self.ui and self.ui:querySelectorAll(query:trim())
 end
 
 function Controller:loadUI(name, parent)

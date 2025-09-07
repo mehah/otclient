@@ -193,6 +193,9 @@ void createRadioGroup(const HtmlNodePtr& node, std::unordered_map<std::string, U
 }
 
 UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
+    if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
+        return nullptr;
+
     const auto& styleName = g_ui.getStyleName(translateStyleName(node->getTag(), node));
 
     auto widget = g_ui.createWidget(styleName.empty() ? "UIWidget" : styleName, parent);

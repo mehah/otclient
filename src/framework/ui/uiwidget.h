@@ -282,6 +282,9 @@ public:
     UIWidgetList recursiveGetChildrenByStyleName(std::string_view styleName);
     UIWidgetPtr backwardsGetWidgetById(std::string_view id);
 
+    std::vector<UIWidgetPtr> querySelectorAll(const std::string& selector);
+    UIWidgetPtr querySelector(const std::string& selector);
+
     virtual void setShader(std::string_view name);
     virtual bool hasShader() { return m_shader != nullptr; }
 
