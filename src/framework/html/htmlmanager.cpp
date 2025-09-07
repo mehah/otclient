@@ -250,7 +250,7 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
 
 uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
     auto path = "/modules/" + moduleName + "/";
-    auto htmlContent = path + g_resources.readFileContents(path + htmlPath);
+    auto htmlContent = g_resources.readFileContents(path + htmlPath);
     auto root = parseHtml(htmlContent);
     if (root->getChildren().empty())
         return 0;
