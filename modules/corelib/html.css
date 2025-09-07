@@ -3,9 +3,24 @@
     width: auto;
 }
 
+input,
+textarea {
+    --text-auto-resize: false;
+}
+
 input[type=radio],
 input[type=checkbox] {
     --text-auto-resize: true;
+}
+
+input[type=password] {
+    --text-hidden: true;
+}
+
+textarea {
+    white-space: pre;
+    width: 128;
+    height: 128;
 }
 
 select {
@@ -35,14 +50,11 @@ hr {
     margin-bottom: 8;
 }
 
-input[type=password] {
-    --text-hidden: true;
-}
 
-textarea {
-    white-space: pre;
-    width: 128;
-    height: 128;
+span,
+label {
+    --text-auto-resize: true;
+    text-align: left;
 }
 
 
@@ -145,14 +157,12 @@ tr {
 
 td {
     display: table-cell;
-    vertical-align: middle;
 }
 
 th {
     display: table-cell;
     font-weight: bold;
     text-align: center;
-    vertical-align: middle;
 }
 
 colgroup {

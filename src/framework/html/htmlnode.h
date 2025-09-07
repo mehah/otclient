@@ -66,6 +66,7 @@ public:
         return out;
     }
     std::string getAttr(const std::string& name) const;
+    void setAttr(const std::string& name, const std::string& value);
     std::string textContent() const;
     std::string getText() const { return text; }
 

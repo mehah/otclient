@@ -29,6 +29,11 @@ std::string HtmlNode::getAttr(const std::string& name) const {
     return (it != attributes.end()) ? it->second : "";
 }
 
+void HtmlNode::setAttr(const std::string& name, const std::string& value) {
+    auto key = ascii_tolower_copy(name);
+    attributes[key] = value;
+}
+
 bool HtmlNode::hasAttr(const std::string& name) const {
     auto key = ascii_tolower_copy(name);
     return attributes.find(key) != attributes.end();

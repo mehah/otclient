@@ -172,7 +172,6 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         setProp(PropTextWrap, true);
         if (whiteSpace == "normal") {
             stdext::trim(m_text);
-            setTextWrap(true);
         } else if (whiteSpace == "nowrap") {
             std::string out;
             out.reserve(m_text.size());
@@ -193,8 +192,6 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
             }
 
             m_text.swap(out);
-            setProp(PropTextWrap, false);
-        } else if (whiteSpace == "pre") {
             setProp(PropTextWrap, false);
         }
     }

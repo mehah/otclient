@@ -161,10 +161,10 @@ local EVENTS_TRANSLATED = {
 }
 
 local parseEvents = function(widget, eventName, callStr, controller)
-    local eventCall = loadstring('return function(self, event) ' .. callStr .. ' end')()
+    local eventCall = loadstring('return function(self, event, target) ' .. callStr .. ' end')()
     local event = { target = widget }
     local function execEventCall()
-        eventCall(controller, event)
+        eventCall(controller, event, widget)
     end
 
     if eventName == 'onchange' then

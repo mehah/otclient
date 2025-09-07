@@ -202,6 +202,19 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
 
     widget->callLuaField("onCreateByHTML", node->getAttributesMap());
 
+    if (!node->getText().empty()) {
+        widget->setTextAutoResize(true);
+        widget->setText(node->getText());
+    }
+
+    bool loadChildren = true;
+    if (node->getChildren().size() == 1 && node->getChildren()[0]->getType() == NodeType::Text) {
+        loadChildren = false;
+        const auto& text = node->getChildren()[0]->getText();
+        if (!text.empty() && node->getAttr("text").empty())
+            node->setAttr("text", text);
+    }
+
     for (const auto [key, v] : node->getAttributesMap()) {
         auto attr = key;
         auto value = v;
@@ -239,15 +252,10 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         }
     }
 
-    if (!node->getText().empty()) {
-        widget->setTextAutoResize(true);
-        widget->setText(node->getText());
-    }
-
-    if (node->getChildren().size() && node->getChildren()[0]->getType() == NodeType::Text) {
-        widget->setText(node->getChildren()[0]->getText());
-    } else for (const auto& child : node->getChildren()) {
-        readNode(child, widget);
+    if (loadChildren) {
+        for (const auto& child : node->getChildren()) {
+            readNode(child, widget);
+        }
     }
 
     return widget;
