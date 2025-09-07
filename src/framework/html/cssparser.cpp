@@ -28,6 +28,25 @@ namespace css {
         static void collect_pseudos(const std::string& sel, std::vector<PseudoInfo>& outPseudos, bool negated = false);
         static std::vector<std::string> split_selector_list(const std::string&);
 
+        static const std::unordered_set<std::string> kEventPseudos = {
+            "hover","focus","active","focus-visible","focus-within",
+            "checked","disabled","enabled","pressed","dragging"
+        };
+
+        static inline bool isNthLike(const std::string& name) {
+            return name.rfind("nth-child", 0) == 0
+                || name.rfind("nth-last-child", 0) == 0
+                || name.rfind("nth-of-type", 0) == 0
+                || name.rfind("nth-last-of-type", 0) == 0;
+        }
+
+        static inline bool isStructuralPseudo(const std::string& name) {
+            if (isNthLike(name)) return true;
+            return name == "first-child" || name == "last-child" || name == "only-child"
+                || name == "only-of-type" || name == "first-of-type" || name == "last-of-type"
+                || name == "empty" || name == "root" || name == "scope";
+        }
+
         static inline void trim_inplace(std::string& s) {
             size_t a = 0; while (a < s.size() && (unsigned char)s[a] <= ' ') ++a;
             size_t b = s.size(); while (b > a && (unsigned char)s[b - 1] <= ' ') --b;
@@ -56,6 +75,18 @@ namespace css {
                             std::vector<PseudoInfo>& outPseudos,
                             bool negated)
         {
+            static const std::unordered_set<std::string> kEventPseudos = {
+                "hover","focus","active","focus-visible","focus-within",
+                "checked","disabled","enabled","pressed","dragging"
+            };
+
+            auto isNthLike = [](const std::string& name) {
+                return name.rfind("nth-child", 0) == 0
+                    || name.rfind("nth-last-child", 0) == 0
+                    || name.rfind("nth-of-type", 0) == 0
+                    || name.rfind("nth-last-of-type", 0) == 0;
+            };
+
             for (size_t i = 0; i < sel.size();) {
                 char ch = sel[i];
                 if (ch == '"' || ch == '\'') {
@@ -110,10 +141,12 @@ namespace css {
                                 auto parts = split_selector_list(inside);
                                 for (const auto& part : parts) collect_pseudos(part, outPseudos, negated);
                             } else {
-                                outPseudos.push_back({ name, negated });
+                                if (kEventPseudos.count(name))
+                                    outPseudos.push_back({ name, negated });
                             }
                         } else {
-                            outPseudos.push_back({ name, negated });
+                            if (kEventPseudos.count(name))
+                                outPseudos.push_back({ name, negated });
                         }
                     }
                     continue;
@@ -180,6 +213,24 @@ namespace css {
         }
 
         static std::string strip_pseudos_for_filter(const std::string& sel) {
+            static const std::unordered_set<std::string> kEventPseudos = {
+                "hover","focus","active","focus-visible","focus-within",
+                "checked","disabled","enabled","pressed","dragging"
+            };
+
+            auto isNthLike = [](const std::string& name) {
+                return name.rfind("nth-child", 0) == 0
+                    || name.rfind("nth-last-child", 0) == 0
+                    || name.rfind("nth-of-type", 0) == 0
+                    || name.rfind("nth-last-of-type", 0) == 0;
+            };
+            auto isStructural = [&](const std::string& name) {
+                if (isNthLike(name)) return true;
+                return name == "first-child" || name == "last-child" || name == "only-child"
+                    || name == "only-of-type" || name == "first-of-type" || name == "last-of-type"
+                    || name == "empty" || name == "root" || name == "scope";
+            };
+
             std::string out;
             const std::string& s = sel;
             size_t i = 0, N = s.size();
@@ -240,6 +291,12 @@ namespace css {
                                 out += inner;
                                 out.push_back(')');
                             }
+                        } else if (isNthLike(name)) {
+                            out.push_back(':'); out += name; out.push_back('('); out += inside; out.push_back(')');
+                        }
+                    } else {
+                        if (isStructural(name)) {
+                            out.push_back(':'); out += name;
                         }
                     }
                     continue;

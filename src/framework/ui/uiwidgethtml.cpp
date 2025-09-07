@@ -57,6 +57,24 @@ namespace {
         }
     }
 
+    inline bool breakLine(DisplayType d) {
+        switch (d) {
+            case DisplayType::Block:
+            case DisplayType::Flex:
+            case DisplayType::Grid:
+            case DisplayType::ListItem:
+            case DisplayType::Table:
+            case DisplayType::TableCaption:
+            case DisplayType::TableHeaderGroup:
+            case DisplayType::TableRowGroup:
+            case DisplayType::TableFooterGroup:
+            case DisplayType::TableRow:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     inline bool isTableContainer(DisplayType d) {
         return d == DisplayType::Table
             || d == DisplayType::TableRowGroup
@@ -415,42 +433,43 @@ void UIWidget::updateSize() {
     if (m_updateId == UPDATE_EPOCH)
         return;
 
-    static auto updateRect = [](UIWidget* c, int& start_w, int& end_w, int& start_h, int& end_h, auto&& updateRect)->void {
+    static auto updateRect = [](UIWidget* c, int& width, int& height, auto&& updateRect)->void {
         if (c->m_updateId != UPDATE_EPOCH && !c->m_children.empty() && (c->hasProp(PropFitWidth) || c->hasProp(PropFitHeight))) {
             for (auto& w : c->m_children) {
-                updateRect(w.get(), start_w, end_w, start_h, end_h, updateRect);
+                updateRect(w.get(), width, height, updateRect);
             }
 
             if (c->hasProp(PropFitWidth)) {
-                c->setWidth_px((end_w - start_w) + c->getPaddingLeft() + c->getPaddingRight());
+                c->setWidth_px(width + c->getPaddingLeft() + c->getPaddingRight());
                 c->setProp(PropFitWidth, false);
             }
 
             if (c->hasProp(PropFitHeight)) {
-                c->setHeight_px((end_h - start_h) + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom());
+                c->setHeight_px(height + (c->m_children.size() + 1) + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom());
                 c->setProp(PropFitHeight, false);
             }
 
             c->m_updateId = UPDATE_EPOCH;
         } else {
-            const int left = c->getRect().topLeft().x - c->getMarginLeft();
-            const int right = 5 + c->getRect().topRight().x + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight();
-            if (left < start_w) start_w = left;
-            if (right > end_w) end_w = right;
+            const int c_width = c->getWidth() + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight() - c->getMarginLeft();
+            if (breakLine(c->getDisplay())) {
+                if (c_width > width)
+                    width = c_width;
+            } else
+                width += c_width;
 
-            const int top = c->getRect().topLeft().y - c->getMarginTop();
-            const int bottom = 2 + c->getRect().bottomLeft().y + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom();
+            const int c_height = c->getHeight() + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom() - c->getMarginTop();
 
-            if (top < start_h) start_h = top;
-            if (bottom > end_h)  end_h = bottom;
-
-            g_logger.info("id: {} top: {} bottom: {}", c->getId(), top, bottom);
+            if (breakLine(c->getDisplay())) {
+                height += c_height;
+            } else
+                if (c_height > height)
+                    height = c_height;
         }
     };
 
-    auto width = m_rect.bottomRight().x;
-
     if (hasProp(PropAutoWidth)) {
+        auto width = 0;
         auto parent = m_parent;
         while (parent) {
             if (parent->getWidth() > 0) {
@@ -462,14 +481,6 @@ void UIWidget::updateSize() {
         }
         if (width > 0)
             setWidth_px(width - getMarginLeft());
-    } else { // hack to fix auto based children
-        if (hasProp(PropFitWidth)) {
-            setWidth_px(g_window.getDisplayWidth());
-        }
-
-        if (hasProp(PropFitHeight)) {
-            setHeight_px(g_window.getDisplayHeight());
-        }
     }
 
     if (m_children.empty()) {
@@ -478,11 +489,9 @@ void UIWidget::updateSize() {
         return;
     }
 
-    int start_w = (std::numeric_limits<int>::max)();
-    int end_w = 0;
-    int start_h = (std::numeric_limits<int>::max)();
-    int end_h = 0;
-    updateRect(this, start_w, end_w, start_h, end_h, updateRect);
+    int width = 0;
+    int height = 0;
+    updateRect(this, width, height, updateRect);
 }
 
 void UIWidget::scheduleAnchorAlignment() {
@@ -535,7 +544,7 @@ void UIWidget::applyAnchorAlignment() {
         applyFlex(this, ctx, topCleared);
     } else if (isGridContainer(parentDisplay)) {
         applyGridOrTable(this, ctx, topCleared);
-    } else if (isTableBox(parentDisplay) || isTableBox(m_displayType)) {
+    } else if (isTableBox(parentDisplay)) {
         switch (parentDisplay) {
             case DisplayType::Table: {
                 if (m_displayType == DisplayType::TableCaption)

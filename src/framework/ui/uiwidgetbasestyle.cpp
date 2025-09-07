@@ -214,13 +214,21 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "grid") display = DisplayType::Grid;
             else if (v == "inline-grid") display = DisplayType::InlineGrid;
             else if (v == "table") display = DisplayType::Table;
+            else if (v == "table-row-group") display = DisplayType::TableRowGroup;
+            else if (v == "table-header-group") display = DisplayType::TableHeaderGroup;
+            else if (v == "table-footer-group") display = DisplayType::TableFooterGroup;
             else if (v == "table-row") display = DisplayType::TableRow;
             else if (v == "table-cell") display = DisplayType::TableCell;
+            else if (v == "table-column-group") display = DisplayType::TableColumnGroup;
+            else if (v == "table-column") display = DisplayType::TableColumn;
+            else if (v == "table-caption") display = DisplayType::TableCaption;
             else if (v == "list-item") display = DisplayType::ListItem;
             else if (v == "run-in") display = DisplayType::RunIn;
             else if (v == "contents") display = DisplayType::Contents;
             else if (v == "initial") display = DisplayType::Initial;
             else if (v == "inherit") display = DisplayType::Inherit;
+            else throw OTMLException(node, fmt::format("Invalid display value '{}'", v));
+
             setDisplay(display);
         } else if (node->tag() == "float") {
             auto v = node->value<std::string>();
