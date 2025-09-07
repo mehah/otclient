@@ -123,33 +123,31 @@ void parseAttrPropList(const std::string& attrsStr, std::map<std::string, std::s
     }
 }
 
-std::string translateAttribute(const std::string& styleName, const std::string& tagName, const std::string& attr) {
+void translateAttribute(const std::string& styleName, const std::string& tagName, std::string& attr, std::string& value) {
     if (attr == "*style") {
-        return "*mergeStyle";
-    }
-
-    if (attr == "*if") {
-        return "*visible";
+        attr = "*mergeStyle";
+    } else if (attr == "*if") {
+        attr = "*visible";
+    } else if (attr == "disabled") {
+        attr = "enabled";
+        if (value == "disabled" || value == "true")
+            value = "false";
     }
 
     if (styleName != "CheckBox" && styleName != "ComboBox") {
         if (attr == "*value") {
-            return "*text";
-        }
-
-        if (attr == "value") {
-            return "text";
+            attr = "*text";
+        } else if (attr == "value") {
+            attr = "text";
         }
     }
 
     if (tagName == "img") {
         auto it = IMG_ATTR_TRANSLATED.find(attr);
         if (it != IMG_ATTR_TRANSLATED.end()) {
-            return it->second;
+            attr = it->second;
         }
     }
-
-    return attr;
 }
 
 std::string translateStyleName(const std::string& styleName, const HtmlNodePtr& el) {
@@ -204,8 +202,10 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
 
     widget->callLuaField("onCreateByHTML", node->getAttributesMap());
 
-    for (const auto [key, value] : node->getAttributesMap()) {
-        const auto& attr = translateAttribute(styleName, node->getTag(), key);
+    for (const auto [key, v] : node->getAttributesMap()) {
+        auto attr = key;
+        auto value = v;
+        translateAttribute(styleName, node->getTag(), attr, value);
 
         if (attr.starts_with("on")) {
             // lua call

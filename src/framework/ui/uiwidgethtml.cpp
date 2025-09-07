@@ -458,14 +458,16 @@ void UIWidget::updateSize() {
 
             c->m_updateId = UPDATE_EPOCH;
         } else {
-            const int c_width = c->getWidth() + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight() - c->getMarginLeft();
+            const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
+
+            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight();
             if (breakLine(c->getDisplay())) {
                 if (c_width > width)
                     width = c_width;
             } else
                 width += c_width;
 
-            const int c_height = c->getHeight() + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom() - c->getMarginTop();
+            const int c_height = std::max<int>(textSize.height(), c->getHeight()) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
 
             if (breakLine(c->getDisplay())) {
                 height += c_height;

@@ -100,8 +100,10 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value)
                 end
             end
         }
-    elseif value == '' or value == setterName then
+    elseif value == '' or value == 'true' or value == setterName then
         value = true
+    elseif value == 'false' then
+        value = false
     end
 
     value = tonumber(value) or toboolean(value) or value
@@ -245,6 +247,7 @@ function UIWidget:onCreateByHTML(attrs)
             return
         end
     end
+
     local getFncSet = function(exp)
         local f = loadstring('return function(self, value) ' .. exp .. '=value end')
         return f and f() or nil
