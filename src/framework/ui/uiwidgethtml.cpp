@@ -429,6 +429,13 @@ void UIWidget::scheduleUpdateSize() {
     });
 }
 
+void UIWidget::setDisplay(DisplayType type) {
+    m_displayType = type;
+    const bool show = m_displayType != DisplayType::None;
+    setVisible(show);
+    if (show)scheduleAnchorAlignment();
+}
+
 void UIWidget::updateSize() {
     if (m_updateId == UPDATE_EPOCH)
         return;
@@ -512,10 +519,8 @@ void UIWidget::applyAnchorAlignment() {
     breakAnchors();
 
     if (m_displayType == DisplayType::None) {
-        setVisible(false);
         return;
     }
-    setVisible(true);
 
     if (!hasAnchoredLayout())
         return;

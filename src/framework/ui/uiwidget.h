@@ -233,7 +233,7 @@ public:
     void setAutoFocusPolicy(Fw::AutoFocusPolicy policy);
     void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
-    void setDisplay(DisplayType type) { m_displayType = type; scheduleAnchorAlignment(); }
+    void setDisplay(DisplayType type);
     void setFloat(FloatType type) { m_floatType = type; scheduleAnchorAlignment(); }
     void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
