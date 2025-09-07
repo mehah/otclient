@@ -79,7 +79,7 @@ static const std::unordered_map<std::string, std::string> cssMap = {
     {"@media", "mobile"}
 };
 
-static constexpr std::array<std::string_view, 19> kProps = {
+static const std::unordered_set<std::string_view> kProps = {
     "color",
     "cursor",
     "direction",
@@ -101,17 +101,17 @@ static constexpr std::array<std::string_view, 19> kProps = {
     "writing-mode"
 };
 
-static inline bool isInheritable(std::string_view prop) {
-    return std::binary_search(kProps.begin(), kProps.end(), prop);
+static inline bool isInheritable(std::string_view prop) noexcept {
+    return kProps.find(prop) != kProps.end();
 }
 
-std::string cssToState(const std::string& css) {
-    if (auto it = cssMap.find(css); it != cssMap.end())
+std::string cssToState(std::string_view css) {
+    if (auto it = cssMap.find(css.data()); it != cssMap.end())
         return it->second;
     return "";
 }
 
-void parseAttrPropList(const std::string& attrsStr, std::map<std::string, std::string>& attrsMap) {
+void parseAttrPropList(std::string_view attrsStr, std::map<std::string, std::string>& attrsMap) {
     for (auto& data : stdext::split(attrsStr, ";")) {
         stdext::trim(data);
         auto attr = stdext::split(data, ":");
@@ -123,7 +123,7 @@ void parseAttrPropList(const std::string& attrsStr, std::map<std::string, std::s
     }
 }
 
-void translateAttribute(const std::string& styleName, const std::string& tagName, std::string& attr, std::string& value) {
+void translateAttribute(std::string_view styleName, std::string_view tagName, std::string& attr, std::string& value) {
     if (attr == "*style") {
         attr = "*mergeStyle";
     } else if (attr == "*if") {
@@ -150,7 +150,7 @@ void translateAttribute(const std::string& styleName, const std::string& tagName
     }
 }
 
-std::string translateStyleName(const std::string& styleName, const HtmlNodePtr& el) {
+std::string_view translateStyleName(std::string_view styleName, const HtmlNodePtr& el) {
     if (styleName == "select") {
         return "QtComboBox";
     }
@@ -191,10 +191,10 @@ void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWi
 }
 
 void parseStyle(const auto& root, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
-    static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
+    static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, std::string_view style, const auto& self) -> void {
         for (const auto& child : n->getChildren()) {
             if (!child->hasAttr("id")) {
-                child->getStyles()[style][decl.property] = decl.value;
+                child->getStyles()[style.data()][decl.property] = decl.value;
             }
             self(child, decl, style, self);
         }
@@ -289,7 +289,7 @@ void prepareWidget(UIWidget* widget, HtmlNode* node, std::unordered_map<std::str
 
             std::map<std::string, std::string> styles;
             parseAttrPropList(value, styles);
-            for (const auto [tag, value] : styles) {
+            for (const auto& [tag, value] : styles) {
                 auto nodeAttr = std::make_shared<OTMLNode>();
                 nodeAttr->setTag(tag);
                 nodeAttr->setValue(value);
