@@ -331,34 +331,42 @@ void UIWidget::updateSize() {
             }
 
             if (c->hasProp(PropFitWidth)) {
-                if (start_w != (std::numeric_limits<int>::max)() && end_w >= start_w)
-                    c->setWidth_px(end_w - start_w);
+                c->setWidth_px((end_w - start_w) + c->getPaddingLeft() + c->getPaddingRight());
                 c->setProp(PropFitWidth, false);
             }
 
             if (c->hasProp(PropFitHeight)) {
-                if (start_h != (std::numeric_limits<int>::max)() && end_h >= start_h)
-                    c->setHeight_px(end_h - start_h);
+                c->setHeight_px((end_h - start_h) + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom());
                 c->setProp(PropFitHeight, false);
             }
 
             c->m_updateId = UPDATE_EPOCH;
         } else {
             const int left = c->getRect().topLeft().x - c->getMarginLeft();
-            const int right = c->getRect().topRight().x + c->getMarginRight();
+            const int right = c->getRect().topRight().x + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight();
             if (left < start_w) start_w = left;
             if (right > end_w)    end_w = right;
 
             const int top = c->getRect().topLeft().y - c->getMarginTop();
-            const int bottom = c->getRect().bottomLeft().y + c->getMarginBottom();
+            const int bottom = c->getRect().bottomLeft().y + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom();
             if (top < start_h) start_h = top;
             if (bottom > end_h)  end_h = bottom;
         }
     };
 
     if (hasProp(PropAutoWidth)) {
-        if (m_parent)
-            setWidth_px(m_parent->getWidth() - getMarginLeft());
+        auto width = 0;
+        auto parent = m_parent;
+        while (parent) {
+            if (parent->getWidth() > 0) {
+                width = parent->getWidth();
+                break;
+            }
+
+            parent = parent->m_parent;
+        }
+        if (width > 0)
+            setWidth_px(width - getMarginLeft());
     }
 
     if (m_children.empty()) {
