@@ -32,6 +32,7 @@ public:
     void destroy(uint32_t id);
     void setGlobalStyle(const std::string& style);
     UIWidgetPtr getWidget(uint32_t htmlId);
+    void terminate() { m_nodes.clear(); }
 
 private:
     stdext::map<uint32_t, HtmlNodePtr> m_nodes;
