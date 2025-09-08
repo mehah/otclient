@@ -125,6 +125,15 @@ enum class ClearType : uint8_t
     InlineEnd
 };
 
+enum class TextAlignH : uint8_t
+{
+    Default,
+    Left,
+    Right,
+    Center,
+    Justify
+};
+
 enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
 
 // @bindclass
@@ -239,6 +248,8 @@ public:
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
 
     bool isOnHtml() { return m_htmlNode != nullptr; }
+
+    const auto& getHtmlNode() const { return m_htmlNode; }
 
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);

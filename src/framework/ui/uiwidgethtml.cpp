@@ -535,6 +535,26 @@ void UIWidget::applyAnchorAlignment() {
 
     const DisplayType parentDisplay = m_parent ? m_parent->m_displayType : DisplayType::Block;
 
+    if (parentDisplay == DisplayType::InlineBlock || parentDisplay == DisplayType::Block || parentDisplay == DisplayType::TableCell) {
+        if (m_childIndex == 1) {
+            bool anchored = false;
+            if (m_parent->getHtmlNode()->getStyle("text-align") == "center" || m_parent->getHtmlNode()->getStyle("justify-content") == "center") {
+                anchored = true;
+                addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+            }
+
+            if (m_parent->getHtmlNode()->getStyle("align-items") == "center") {
+                anchored = true;
+                addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+            }
+
+            if (anchored) {
+                addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+                return;
+            }
+        }
+    }
+
     FloatType effFloat = mapLogicalFloat(m_floatType);
     if (isFlexContainer(parentDisplay) || isGridContainer(parentDisplay) || isTableContainer(parentDisplay)) {
         effFloat = FloatType::None;
