@@ -311,7 +311,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
 
     auto styles = std::make_shared<OTMLNode>();
 
-    auto attrs = node->getAttrStyles();
+    std::map<std::string, std::string> stylesMerge;
 
     for (const auto [key, stylesMap] : node->getStyles()) {
         if (key != "styles") {
@@ -319,20 +319,24 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
             meta->setTag(key);
             styles->addChild(meta);
 
-            for (const auto [tag, value] : stylesMap) {
+            for (const auto [prop, value] : stylesMap) {
                 auto nodeAttr = std::make_shared<OTMLNode>();
-                nodeAttr->setTag(tag);
+                nodeAttr->setTag(prop);
                 nodeAttr->setValue(value);
                 meta->addChild(nodeAttr);
             }
-        } else for (const auto [tag, value] : stylesMap) {
-            attrs[tag] = value;
+        } else for (const auto [prop, value] : stylesMap) {
+            stylesMerge[prop] = value;
         }
     }
 
-    for (const auto [tag, value] : attrs) {
+    for (const auto& [prop, value] : node->getAttrStyles()) {
+        stylesMerge[prop] = value;
+    }
+
+    for (const auto [prop, value] : stylesMerge) {
         auto nodeAttr = std::make_shared<OTMLNode>();
-        nodeAttr->setTag(tag);
+        nodeAttr->setTag(prop);
         nodeAttr->setValue(value);
         styles->addChild(nodeAttr);
     }
