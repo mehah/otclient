@@ -243,7 +243,7 @@ void applyStyleSheet(const auto& root, std::string_view htmlPath, const css::Sty
     }
 };
 
-UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
+UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes) {
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
         return nullptr;
 
@@ -260,13 +260,12 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
         widget->setText(node->getText());
     }
 
-    if (node->getChildren().size() == 1 && node->getChildren()[0]->getType() == NodeType::Text) {
-        const auto& text = node->getChildren()[0]->getText();
-        if (!text.empty() && node->getAttr("text").empty())
-            node->setAttr("text", text);
-    } else for (const auto& child : node->getChildren()) {
-        createWidgetFromNode(child, widget);
+    for (const auto& child : node->getChildren()) {
+        createWidgetFromNode(child, widget, textNodes);
     }
+
+    if (node->getType() == NodeType::Text)
+        textNodes.emplace_back(node);
 
     return widget;
 }
@@ -348,13 +347,17 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
 }
 
 uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
+    static std::vector<css::StyleSheet> sheets;
+    static std::vector<HtmlNodePtr> textNodes;
+
+    sheets.clear();
+    textNodes.clear();
+
     auto path = "/modules/" + moduleName + "/";
     auto htmlContent = g_resources.readFileContents(path + htmlPath);
     auto root = parseHtml(htmlContent);
     if (root->getChildren().empty())
         return 0;
-
-    std::vector<css::StyleSheet> sheets;
 
     if (!parent)
         parent = g_ui.getRootWidget();
@@ -366,7 +369,7 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
             if (node->hasAttr("href")) {
                 sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
             }
-        } else createWidgetFromNode(node, parent);
+        } else createWidgetFromNode(node, parent, textNodes);
     }
 
     for (const auto& sheet : GLOBAL_STYLES)
@@ -374,7 +377,9 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
     for (const auto& sheet : sheets)
         applyStyleSheet(root, htmlPath, sheet, true);
 
-    const auto& all = root->querySelectorAll("*");
+    auto all = root->querySelectorAll("*");
+    all.reserve(all.size() + textNodes.size());
+    all.insert(all.end(), textNodes.begin(), textNodes.end());
     for (const auto& node : std::views::reverse(all)) {
         if (const auto widget = node->getWidget().get()) {
             applyAttributesAndStyles(widget, node.get(), root->getGroups());
