@@ -389,7 +389,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
         case Unit::Percent: {
             if (m_parent) {
                 const int base = isWidth ? m_parent->getWidth() : m_parent->getHeight();
-                setPx(static_cast<int>(std::round(base * (num / 100.0))));
+                setPx(static_cast<int>(std::round(base * (num / 100.0))) + getPaddingLeft() + getPaddingRight());
             } else {
                 setPx(0);
             }
@@ -399,7 +399,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
         case Unit::Px:
         case Unit::Invalid:
         default: {
-            setPx(static_cast<int>(std::round(num)));
+            setPx(static_cast<int>(std::round(num)) + getPaddingLeft() + getPaddingRight());
             return;
         }
     }
@@ -447,7 +447,7 @@ void UIWidget::updateSize() {
             }
 
             if (c->hasProp(PropFitWidth)) {
-                c->setWidth_px(width + c->getPaddingLeft() + c->getPaddingRight());
+                c->setWidth_px(width + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight());
                 c->setProp(PropFitWidth, false);
             }
 
@@ -460,7 +460,7 @@ void UIWidget::updateSize() {
         } else {
             const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
-            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight();
+            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight();
             if (breakLine(c->getDisplay())) {
                 if (c_width > width)
                     width = c_width;
@@ -482,7 +482,7 @@ void UIWidget::updateSize() {
         auto parent = m_parent;
         while (parent) {
             if (parent->getWidth() > 0) {
-                width = parent->getWidth();
+                width = parent->getWidth() - parent->getPaddingLeft() - parent->getPaddingBottom();
                 break;
             }
 
