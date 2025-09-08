@@ -5492,15 +5492,18 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
 
     for (auto i = 0; i < itemsSentCount; ++i) {
         const uint16_t itemId = msg->getU16();
-        const auto& item = Item::create(itemId);
-
-        uint8_t itemClass = 0;
-        if (item && item->getClassification() > 0) {
-            itemClass = msg->getU8();
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        if (!thing) {
+            continue;
+        }
+        const uint16_t classification = thing->getClassification();
+        uint8_t itemTier = 0;
+        if (classification > 0) {
+            itemTier = msg->getU8();
         }
 
         const uint16_t count = msg->getU16();
-        depotItems.push_back({ itemId, count, itemClass });
+        depotItems.push_back({ itemId, count, itemTier });
     }
 
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, -1, -1);
@@ -5527,10 +5530,14 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
 void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
 {
     const uint16_t itemId = msg->getU16();
+    uint8_t itemTier = 0;
     if (g_game.getClientVersion() >= 1281) {
-        const auto& item = Item::create(itemId);
-        if (item && item->getClassification() > 0) {
-            msg->getU8(); // ?
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        if (thing) {
+            const uint16_t classification = thing->getClassification();
+            if (classification > 0) {
+                itemTier = msg->getU8();
+            }
         }
     }
 
@@ -5608,7 +5615,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
         saleStatsList.push_back({ tmp, Otc::MARKETACTION_SELL, transactions, totalPrice, highestPrice, lowestPrice });
     }
 
-    g_lua.callGlobalField("g_game", "onMarketDetail", itemId, descriptions, purchaseStatsList, saleStatsList);
+    g_lua.callGlobalField("g_game", "onMarketDetail", itemId, descriptions, purchaseStatsList, saleStatsList, itemTier);
 }
 
 MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint8_t action, const uint16_t var)
@@ -5616,12 +5623,16 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     const uint32_t timestamp = msg->getU32();
     const uint16_t counter = msg->getU16();
     uint16_t itemId = 0;
+    uint8_t itemTier = 0;
     if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS || var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         itemId = msg->getU16();
         if (g_game.getClientVersion() >= 1281) {
-            const auto& item = Item::create(itemId);
-            if (item && item->getClassification() > 0) {
-                msg->getU8();
+            const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+            if (thing) {
+                const uint16_t classification = thing->getClassification();
+                if (classification > 0) {
+                    itemTier = msg->getU8();
+                }
             }
         }
     } else {
@@ -5639,9 +5650,9 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
         playerName = msg->getString();
     }
 
-    g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
+    g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var, itemTier);
     return { .timestamp = timestamp, .counter = counter, .action = action, .itemId = itemId, .amount = amount, .price = price,
-        .playerName = playerName, .state = state, .var = var
+        .playerName = playerName, .state = state, .var = var, .itemTier = itemTier
     };
 }
 

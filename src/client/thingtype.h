@@ -302,6 +302,7 @@ struct MarketOffer
     std::string playerName;
     uint8_t state = 0;
     uint16_t var = 0;
+    uint8_t itemTier = 0;
 };
 
 struct Light
