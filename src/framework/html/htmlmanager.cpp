@@ -32,7 +32,7 @@
 #include <framework/core/modulemanager.h>
 
 HtmlManager g_html;
-css::StyleSheet GLOBAL_STYLE;
+std::vector<css::StyleSheet> GLOBAL_STYLES;
 
 static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = {
     {"offset-x", "image-offset-x"},
@@ -369,7 +369,8 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
         } else createWidgetFromNode(node, parent);
     }
 
-    applyStyleSheet(root, htmlPath, GLOBAL_STYLE, false);
+    for (const auto& sheet : GLOBAL_STYLES)
+        applyStyleSheet(root, htmlPath, sheet, false);
     for (const auto& sheet : sheets)
         applyStyleSheet(root, htmlPath, sheet, true);
 
@@ -401,8 +402,8 @@ void HtmlManager::destroy(uint32_t id) {
     m_nodes.erase(it);
 }
 
-void HtmlManager::loadGlobalStyle(const std::string& stylePath) {
-    GLOBAL_STYLE = css::parse(g_resources.readFileContents(stylePath));
+void HtmlManager::addGlobalStyle(const std::string& stylePath) {
+    GLOBAL_STYLES.emplace_back(css::parse(g_resources.readFileContents(stylePath)));
 }
 
 UIWidgetPtr HtmlManager::getRootWidget(uint32_t id) {
