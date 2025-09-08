@@ -137,7 +137,7 @@ function Controller:loadHtml(path, parent)
 
     self:setUI(path, parent)
     self.htmlId = g_html.load(self.name, path, g_ui.getRootWidget())
-    self.ui = g_html.getWidget(self.htmlId);
+    self.ui = g_html.getRootWidget(self.htmlId);
 end
 
 function Controller:destroyUI()

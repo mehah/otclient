@@ -190,7 +190,7 @@ void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWi
     group->callLuaField("addWidget", node->getWidget());
 }
 
-void parseStyle(const auto& root, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
+void applyStyleSheet(const auto& root, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
     static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, std::string_view style, const auto& self) -> void {
         for (const auto& child : n->getChildren()) {
             if (!child->hasAttr("id")) {
@@ -243,7 +243,7 @@ void parseStyle(const auto& root, std::string_view htmlPath, const css::StyleShe
     }
 };
 
-UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
+UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
         return nullptr;
 
@@ -265,13 +265,13 @@ UIWidgetPtr readNode(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
         if (!text.empty() && node->getAttr("text").empty())
             node->setAttr("text", text);
     } else for (const auto& child : node->getChildren()) {
-        readNode(child, widget);
+        createWidgetFromNode(child, widget);
     }
 
     return widget;
 }
 
-void prepareWidget(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
+void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
     for (const auto [key, v] : node->getAttributesMap()) {
         auto attr = key;
         auto value = v;
@@ -362,18 +362,18 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
             if (node->hasAttr("href")) {
                 sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
             }
-        } else readNode(node, parent);
+        } else createWidgetFromNode(node, parent);
     }
 
-    parseStyle(root, htmlPath, GLOBAL_STYLE, false);
+    applyStyleSheet(root, htmlPath, GLOBAL_STYLE, false);
     for (const auto& sheet : sheets)
-        parseStyle(root, htmlPath, sheet, true);
+        applyStyleSheet(root, htmlPath, sheet, true);
 
     std::unordered_map<std::string, UIWidgetPtr> groups;
     const auto& all = root->querySelectorAll("*");
     for (const auto& node : std::views::reverse(all)) {
         if (const auto widget = node->getWidget().get()) {
-            prepareWidget(widget, node.get(), groups);
+            applyAttributesAndStyles(widget, node.get(), groups);
         }
     }
 
@@ -394,11 +394,11 @@ void HtmlManager::destroy(uint32_t id) {
     m_nodes.erase(it);
 }
 
-void HtmlManager::setGlobalStyle(const std::string& stylePath) {
+void HtmlManager::loadGlobalStyle(const std::string& stylePath) {
     GLOBAL_STYLE = css::parse(g_resources.readFileContents(stylePath));
 }
 
-UIWidgetPtr HtmlManager::getWidget(uint32_t id) {
+UIWidgetPtr HtmlManager::getRootWidget(uint32_t id) {
     auto it = m_nodes.find(id);
     if (it != m_nodes.end()) {
         for (const auto& node : it->second->getChildren()) {

@@ -30,8 +30,8 @@ class HtmlManager
 public:
     uint32_t load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent);
     void destroy(uint32_t id);
-    void setGlobalStyle(const std::string& style);
-    UIWidgetPtr getWidget(uint32_t htmlId);
+    void loadGlobalStyle(const std::string& style);
+    UIWidgetPtr getRootWidget(uint32_t htmlId);
     void terminate() { m_nodes.clear(); }
 
 private:
