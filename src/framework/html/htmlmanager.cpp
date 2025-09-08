@@ -105,8 +105,8 @@ static inline bool isInheritable(std::string_view prop) noexcept {
     return kProps.find(prop) != kProps.end();
 }
 
-std::string cssToState(std::string_view css) {
-    if (auto it = cssMap.find(css.data()); it != cssMap.end())
+std::string cssToState(const std::string& css) {
+    if (auto it = cssMap.find(css); it != cssMap.end())
         return it->second;
     return "";
 }
@@ -191,10 +191,10 @@ void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWi
 }
 
 void applyStyleSheet(const auto& root, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
-    static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, std::string_view style, const auto& self) -> void {
+    static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
         for (const auto& child : n->getChildren()) {
             if (!child->hasAttr("id")) {
-                child->getStyles()[style.data()][decl.property] = decl.value;
+                child->getStyles()[style][decl.property] = decl.value;
             }
             self(child, decl, style, self);
         }
