@@ -68,8 +68,10 @@ local function START_WATCH_LIST()
 end
 
 function UIWidget:__applyOrBindHtmlAttribute(attr, value)
+    local controller = G_CONTROLLER_CALLED
+
     if attr == 'image-source' then
-        value = '/modules/' .. G_CONTROLLER_CALLED.name .. '/' .. value
+        value = '/modules/' .. controller.name .. '/' .. value
     end
 
     local setterName = ''
@@ -86,14 +88,14 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value)
         local vStr = value
         local f = loadstring('return function(self, target) return ' .. vStr .. ' end')
         local fnc = f()
-        value = fnc(G_CONTROLLER_CALLED)
+        value = fnc(controller)
 
         watchObj = {
             widget = self,
             res = value,
             method = nil,
             fnc = function(self)
-                local value = fnc(G_CONTROLLER_CALLED, self.widget)
+                local value = fnc(controller, self.widget)
                 if value ~= self.res then
                     self.method(self.widget, value)
                     self.res = value
@@ -241,9 +243,10 @@ local parseEvents = function(widget, eventName, callStr, controller)
 end
 
 function UIWidget:onCreateByHTML(attrs)
+    local controller = G_CONTROLLER_CALLED
     for attr, v in pairs(attrs) do
         if attr:starts('on') then
-            parseEvents(self, attr:lower(), v, G_CONTROLLER_CALLED)
+            parseEvents(self, attr:lower(), v, controller)
             return
         end
     end
@@ -256,9 +259,9 @@ function UIWidget:onCreateByHTML(attrs)
     if attrs['*checked'] then
         local set = getFncSet(attrs['*checked'])
         if set then
-            G_CONTROLLER_CALLED:registerEvents(self, {
+            controller:registerEvents(self, {
                 onCheckChange = function(widget, value)
-                    set(G_CONTROLLER_CALLED, value)
+                    set(controller, value)
                 end
             })
         end
@@ -268,15 +271,15 @@ function UIWidget:onCreateByHTML(attrs)
         local set = getFncSet(attrs['*value'])
         if set then
             if self.getCurrentOption then
-                G_CONTROLLER_CALLED:registerEvents(self, {
+                controller:registerEvents(self, {
                     onOptionChange = function(widget, text, data)
-                        set(G_CONTROLLER_CALLED, data)
+                        set(controller, data)
                     end
                 })
             else
-                G_CONTROLLER_CALLED:registerEvents(self, {
+                controller:registerEvents(self, {
                     onTextChange = function(widget, value)
-                        set(G_CONTROLLER_CALLED, value)
+                        set(controller, value)
                     end
                 })
             end

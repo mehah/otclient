@@ -369,11 +369,10 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
     for (const auto& sheet : sheets)
         applyStyleSheet(root, htmlPath, sheet, true);
 
-    std::unordered_map<std::string, UIWidgetPtr> groups;
     const auto& all = root->querySelectorAll("*");
     for (const auto& node : std::views::reverse(all)) {
         if (const auto widget = node->getWidget().get()) {
-            applyAttributesAndStyles(widget, node.get(), groups);
+            applyAttributesAndStyles(widget, node.get(), root->getGroups());
         }
     }
 
@@ -389,6 +388,10 @@ void HtmlManager::destroy(uint32_t id) {
     for (const auto& node : it->second->getChildren()) {
         if (node->getWidget())
             node->getWidget()->destroy();
+    }
+
+    for (const auto& [name, group] : it->second->getGroups()) {
+        group->destroy();
     }
 
     m_nodes.erase(it);

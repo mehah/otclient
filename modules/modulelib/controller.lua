@@ -138,11 +138,14 @@ function Controller:loadHtml(path, parent)
     self:setUI(path, parent)
     self.htmlId = g_html.load(self.name, path, g_ui.getRootWidget())
     self.ui = g_html.getRootWidget(self.htmlId);
+
+    G_CONTROLLER_CALLED = nil
 end
 
 function Controller:destroyUI()
     if self.htmlId ~= nil then
         g_html.destroy(self.htmlId)
+        self.ui = nil
     end
 
     if self.ui then
@@ -232,7 +235,7 @@ function Controller:terminate()
     end
 
     if self.ui ~= nil then
-        self.ui:destroy()
+        self:destroyUI()
     end
 
     self.ui = nil
