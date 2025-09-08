@@ -460,7 +460,7 @@ void UIWidget::updateSize() {
         } else {
             const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
-            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight();
+            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
             if (breakLine(c->getDisplay())) {
                 if (c_width > width)
                     width = c_width;
