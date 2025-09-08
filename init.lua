@@ -60,7 +60,7 @@ if not g_resources.addSearchPath(g_resources.getWorkDir() .. 'modules', true) th
     g_logger.fatal('Unable to add modules directory to the search path.')
 end
 
-g_html.loadGlobalStyle('/modules/corelib/html.css')
+g_html.addGlobalStyle('/modules/corelib/html.css')
 
 -- try to add mods path too
 g_resources.addSearchPath(g_resources.getWorkDir() .. 'mods', true)
