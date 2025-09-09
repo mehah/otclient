@@ -436,6 +436,23 @@ void UIWidget::setDisplay(DisplayType type) {
     if (show)scheduleAnchorAlignment();
 }
 
+void updateWidth(UIWidget* widget, int width) {
+    width -= widget->getMarginLeft();
+    for (const auto& child : widget->getChildren()) {
+        if (const auto node = child->getHtmlNode().get()) {
+            const auto& widthStr = node->getStyle("width");
+            if (widthStr == "auto") {
+                updateWidth(child.get(), width);
+            } else if (detectUnit(widthStr) == Unit::Percent) {
+                const auto num = stdext::to_number(std::string(numericPart(widthStr)));
+                updateWidth(child.get(), std::round(width * (num / 100.0)));
+            }
+        }
+    }
+
+    widget->setWidth_px(width);
+}
+
 void UIWidget::updateSize() {
     if (m_updateId == UPDATE_EPOCH)
         return;
@@ -488,8 +505,9 @@ void UIWidget::updateSize() {
 
             parent = parent->m_parent;
         }
-        if (width > 0)
-            setWidth_px(width - getMarginLeft());
+        if (width > 0) {
+            updateWidth(this, width);
+        }
     }
 
     if (m_children.empty()) {
