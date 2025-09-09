@@ -24,6 +24,10 @@
 #include <framework/core/eventdispatcher.h>
 
 namespace {
+    static uint32_t UPDATE_EPOCH = 1;
+    static bool FLUSH_PENDING = false;
+    std::vector<UIWidgetPtr> WIDGET_QUEUE;
+
     inline bool isInlineLike(DisplayType d) {
         switch (d) {
             case DisplayType::Inline:
@@ -347,6 +351,87 @@ namespace {
         if (s.ends_with("%")) return s.substr(0, s.size() - 1);
         return s;
     }
+
+    void updateDimension(UIWidget* widget, int width, int height) {
+        bool checkChildren = false;
+
+        if (widget->hasProp(PropWidthPercent) || widget->hasProp(PropWidthAuto)) {
+            width -= (widget->getMarginLeft() + widget->getMarginRight());
+            if (widget->getWidthHtml().updateId != UPDATE_EPOCH) {
+                if (widget->hasProp(PropWidthPercent))
+                    width = std::round(width * (widget->getWidthHtml().value / 100.0));
+
+                widget->setWidth_px(width);
+                widget->getWidthHtml().updateId = UPDATE_EPOCH;
+                widget->getWidthHtml().valueCalculed = width;
+
+                widget->setProp(PropWidthAuto, false);
+                widget->setProp(PropWidthPercent, false);
+
+                checkChildren = true;
+            }
+        }
+
+        if (widget->hasProp(PropHeightPercent) && widget->getHeightHtml().updateId != UPDATE_EPOCH) {
+            height = std::round(height * (widget->getHeightHtml().value / 100.0));
+            widget->setHeight_px(height);
+            widget->getHeightHtml().valueCalculed = height;
+            widget->getHeightHtml().updateId = UPDATE_EPOCH;
+            widget->setProp(PropHeightPercent, false);
+
+            checkChildren = true;
+        }
+
+        if (checkChildren) {
+            for (const auto& child : widget->getChildren()) {
+                if (child->getWidthHtml().unit == Unit::Auto ||
+                    child->getWidthHtml().unit == Unit::Percent ||
+                    child->getHeightHtml().unit == Unit::Percent) {
+                    updateDimension(child.get(), width, height);
+                }
+            }
+        }
+    }
+
+    void fitContent(UIWidget* c, int& width, int& height) {
+        if ((c->hasProp(PropFitWidth) || c->hasProp(PropFitHeight)) && !c->getChildren().empty() &&
+            (c->getWidthHtml().updateId != UPDATE_EPOCH || c->getHeightHtml().updateId != UPDATE_EPOCH)) {
+            for (auto& w : c->getChildren()) {
+                fitContent(w.get(), width, height);
+            }
+
+            if (c->hasProp(PropFitWidth) && c->getWidthHtml().updateId != UPDATE_EPOCH) {
+                c->setWidth_px(width + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight());
+                c->setProp(PropFitWidth, false);
+                c->getWidthHtml().valueCalculed = c->getWidth();
+                c->getWidthHtml().updateId = UPDATE_EPOCH;
+            }
+
+            if (c->hasProp(PropFitHeight) && c->getHeightHtml().updateId != UPDATE_EPOCH) {
+                c->setHeight_px(height + (c->getChildren().size() + 1) + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom());
+                c->setProp(PropFitHeight, false);
+                c->getHeightHtml().valueCalculed = c->getHeight();
+                c->getHeightHtml().updateId = UPDATE_EPOCH;
+            }
+        } else {
+            const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
+
+            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
+            if (breakLine(c->getDisplay())) {
+                if (c_width > width)
+                    width = c_width;
+            } else
+                width += c_width;
+
+            const int c_height = std::max<int>(textSize.height(), c->getHeight()) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
+
+            if (breakLine(c->getDisplay())) {
+                height += c_height;
+            } else
+                if (c_height > height)
+                    height = c_height;
+        }
+    };
 }
 
 void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
@@ -355,43 +440,43 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
 
     const std::string_view sv = valueStr;
     const Unit unit = detectUnit(sv);
-    const auto num = stdext::to_number(std::string(numericPart(sv)));
+    int16_t num = stdext::to_number(std::string(numericPart(sv)));
+    int16_t valueCalculed = -1;
 
     auto setFitProp = [&](bool on) {
         if (isWidth) setProp(PropFitWidth, on);
         else         setProp(PropFitHeight, on);
     };
     auto setPx = [&](int px) {
-        if (isWidth) setWidth_px(px);
-        else         setHeight_px(px);
     };
 
     setFitProp(false);
-    setProp(PropAutoWidth, false);
+    setProp(PropWidthAuto, false);
+    setProp(isWidth ? PropWidthPercent : PropHeightPercent, false);
 
     switch (unit) {
         case Unit::Auto: {
             if (isWidth) {
                 if (m_displayType == DisplayType::Block) {
-                    if (m_parent) setProp(PropAutoWidth, true);
+                    if (m_parent) setProp(PropWidthAuto, true);
                 } else {
                     setFitProp(true);
                 }
             } else {
                 setFitProp(true);
             }
+            scheduleUpdateSize();
             break;
         }
         case Unit::FitContent: {
             setFitProp(true);
+            scheduleUpdateSize();
             break;
         }
         case Unit::Percent: {
-            if (m_parent) {
-                const int base = isWidth ? m_parent->getWidth() : m_parent->getHeight();
-                setPx(static_cast<int>(std::round(base * (num / 100.0))) + getPaddingLeft() + getPaddingRight());
-            } else {
-                setPx(0);
+            if (m_displayType != DisplayType::Inline) {
+                setProp(isWidth ? PropWidthPercent : PropHeightPercent, true);
+                scheduleUpdateSize();
             }
             break;
         }
@@ -399,18 +484,21 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
         case Unit::Px:
         case Unit::Invalid:
         default: {
-            setPx(static_cast<int>(std::round(num)) + getPaddingLeft() + getPaddingRight());
-            return;
+            valueCalculed = num = static_cast<int>(std::round(num)) + getPaddingLeft() + getPaddingRight();
+            if (isWidth) setWidth_px(num);
+            else         setHeight_px(num);
+            break;
         }
     }
 
-    scheduleUpdateSize();
-}
-
-namespace {
-    static uint32_t UPDATE_EPOCH = 1;
-    static bool FLUSH_PENDING = false;
-    std::vector<UIWidgetPtr> WIDGET_QUEUE;
+    if (m_htmlNode) {
+        if (isWidth) {
+            m_width = { unit , num, valueCalculed };
+        } else {
+            m_height = { unit , num, valueCalculed };
+        }
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = valueStr;
+    }
 }
 
 void UIWidget::scheduleUpdateSize() {
@@ -436,77 +524,32 @@ void UIWidget::setDisplay(DisplayType type) {
     if (show)scheduleAnchorAlignment();
 }
 
-void updateWidth(UIWidget* widget, int width) {
-    width -= widget->getMarginLeft();
-    for (const auto& child : widget->getChildren()) {
-        if (const auto node = child->getHtmlNode().get()) {
-            const auto& widthStr = node->getStyle("width");
-            if (widthStr == "auto") {
-                updateWidth(child.get(), width);
-            } else if (detectUnit(widthStr) == Unit::Percent) {
-                const auto num = stdext::to_number(std::string(numericPart(widthStr)));
-                updateWidth(child.get(), std::round(width * (num / 100.0)));
-            }
-        }
-    }
-
-    widget->setWidth_px(width);
-}
-
 void UIWidget::updateSize() {
-    if (m_updateId == UPDATE_EPOCH)
-        return;
-
-    static auto updateRect = [](UIWidget* c, int& width, int& height, auto&& updateRect)->void {
-        if (c->m_updateId != UPDATE_EPOCH && !c->m_children.empty() && (c->hasProp(PropFitWidth) || c->hasProp(PropFitHeight))) {
-            for (auto& w : c->m_children) {
-                updateRect(w.get(), width, height, updateRect);
-            }
-
-            if (c->hasProp(PropFitWidth)) {
-                c->setWidth_px(width + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight());
-                c->setProp(PropFitWidth, false);
-            }
-
-            if (c->hasProp(PropFitHeight)) {
-                c->setHeight_px(height + (c->m_children.size() + 1) + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom());
-                c->setProp(PropFitHeight, false);
-            }
-
-            c->m_updateId = UPDATE_EPOCH;
-        } else {
-            const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
-
-            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
-            if (breakLine(c->getDisplay())) {
-                if (c_width > width)
-                    width = c_width;
-            } else
-                width += c_width;
-
-            const int c_height = std::max<int>(textSize.height(), c->getHeight()) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
-
-            if (breakLine(c->getDisplay())) {
-                height += c_height;
-            } else
-                if (c_height > height)
-                    height = c_height;
-        }
-    };
-
-    if (hasProp(PropAutoWidth)) {
-        auto width = 0;
+    if ((hasProp(PropWidthAuto) || hasProp(PropWidthPercent)) && m_width.updateId != UPDATE_EPOCH || (hasProp(PropHeightPercent) && m_height.updateId != UPDATE_EPOCH)) {
+        auto width = -1;
+        auto height = -1;
         auto parent = m_parent;
         while (parent) {
-            if (parent->getWidth() > 0) {
-                width = parent->getWidth() - parent->getPaddingLeft() - parent->getPaddingBottom();
-                break;
+            if ((hasProp(PropWidthAuto) || hasProp(PropWidthPercent)) && parent->getWidthHtml().valueCalculed > -1) {
+                width = parent->getWidthHtml().valueCalculed;
             }
+
+            if (hasProp(PropHeightPercent) && parent->getHeightHtml().valueCalculed > -1) {
+                height = parent->getHeightHtml().valueCalculed;
+            }
+
+            if (hasProp(PropWidthPercent) && hasProp(PropHeightPercent) && width > -1 && height > -1 ||
+                hasProp(PropWidthAuto) && hasProp(PropHeightPercent) && width > -1 && height > -1 ||
+                hasProp(PropWidthAuto) && width > -1 ||
+                hasProp(PropWidthPercent) && width > -1 ||
+                hasProp(PropHeightPercent) && height > -1)
+                break;
 
             parent = parent->m_parent;
         }
-        if (width > 0) {
-            updateWidth(this, width);
+
+        if (width > -1 || height > -1) {
+            updateDimension(this, width, height);
         }
     }
 
@@ -518,7 +561,7 @@ void UIWidget::updateSize() {
 
     int width = 0;
     int height = 0;
-    updateRect(this, width, height, updateRect);
+    fitContent(this, width, height);
 }
 
 void UIWidget::scheduleAnchorAlignment() {
@@ -556,7 +599,7 @@ void UIWidget::applyAnchorAlignment() {
     if (parentDisplay == DisplayType::InlineBlock || parentDisplay == DisplayType::Block || parentDisplay == DisplayType::TableCell) {
         if (m_childIndex == 1) {
             bool anchored = false;
-            if (m_parent->getHtmlNode()->getStyle("text-align") == "center" || m_parent->getHtmlNode()->getStyle("justify-content") == "center") {
+            if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getHtmlNode()->getStyle("text-align") == "center" || m_htmlNode->getType() == NodeType::Element && m_parent->getHtmlNode()->getStyle("justify-content") == "center") {
                 anchored = true;
                 addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
             }

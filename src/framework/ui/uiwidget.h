@@ -46,7 +46,7 @@ struct EdgeGroup
     T left;
 };
 
-enum FlagProp : uint32_t
+enum FlagProp : uint64_t
 {
     PropTextWrap = 1 << 0,
     PropTextVerticalAutoResize = 1 << 1,
@@ -77,7 +77,9 @@ enum FlagProp : uint32_t
     PropApplyAnchorAlignment = 1 << 26,
     PropFitWidth = 1 << 27,
     PropFitHeight = 1 << 28,
-    PropAutoWidth = 1 << 29
+    PropWidthAuto = 1 << 29,
+    PropWidthPercent = 1 << 30,
+    PropHeightPercent = static_cast<uint64_t>(1) << 31,
 };
 
 enum class DisplayType : uint8_t
@@ -136,6 +138,14 @@ enum class TextAlignH : uint8_t
 
 enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
 
+struct SizeUnit
+{
+    Unit unit = Unit::Px;
+    int16_t value = 0;
+    int16_t valueCalculed = -1;
+    uint32_t updateId = 0;
+};
+
 // @bindclass
 class UIWidget : public LuaObject
 {
@@ -159,11 +169,12 @@ protected:
     Size m_minSize;
     Size m_maxSize;
 
-    uint32_t m_updateId = 0;
-
     DisplayType m_displayType = DisplayType::Inline;
     FloatType m_floatType = FloatType::None;
     ClearType m_clearType = ClearType::None;
+
+    SizeUnit m_width;
+    SizeUnit m_height;
 
     UILayoutPtr m_layout;
     UIWidgetPtr m_parent;
@@ -246,10 +257,11 @@ public:
     void setFloat(FloatType type) { m_floatType = type; scheduleAnchorAlignment(); }
     void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
-
     bool isOnHtml() { return m_htmlNode != nullptr; }
 
     const auto& getHtmlNode() const { return m_htmlNode; }
+    auto& getWidthHtml() { return m_width; }
+    auto& getHeightHtml() { return m_height; }
 
     bool isAnchored();
     bool isChildLocked(const UIWidgetPtr& child);
@@ -313,7 +325,7 @@ public:
     void setBorderDrawOrder(const uint8_t order) { m_borderDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
 
 private:
-    uint32_t m_flagsProp{ 0 };
+    uint64_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
 
     DrawOrder m_backgroundDrawOrder{ DrawOrder::FIRST };
