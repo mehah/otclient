@@ -247,6 +247,16 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "both") clear = ClearType::Both;
             else if (v == "inline-start") clear = ClearType::InlineStart;
             else if (v == "inline-end") clear = ClearType::InlineEnd;
+        } else if (node->tag() == "justify-items") {
+            auto v = node->value<std::string>();
+            JustifyItemsType justify = JustifyItemsType::Normal;
+
+            if (v == "center") justify = JustifyItemsType::Center;
+            else if (v == "left" || v == "flex-start" || v == "start" || v == "inline-start")
+                justify = JustifyItemsType::Left;
+            else if (v == "right" || v == "flex-end" || v == "end" || v == "inline-end")
+                justify = JustifyItemsType::Right;
+            setJustifyItems(justify);
         } else if (node->tag() == "margin-top")
             setMarginTop(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "margin-right")

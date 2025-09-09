@@ -127,13 +127,12 @@ enum class ClearType : uint8_t
     InlineEnd
 };
 
-enum class TextAlignH : uint8_t
+enum class JustifyItemsType : uint8_t
 {
-    Default,
-    Left,
-    Right,
+    Normal,
     Center,
-    Justify
+    Left,
+    Right
 };
 
 enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
@@ -172,6 +171,7 @@ protected:
     DisplayType m_displayType = DisplayType::Inline;
     FloatType m_floatType = FloatType::None;
     ClearType m_clearType = ClearType::None;
+    JustifyItemsType m_JustifyItems = JustifyItemsType::Normal;
 
     SizeUnit m_width;
     SizeUnit m_height;
@@ -256,6 +256,7 @@ public:
     void setDisplay(DisplayType type);
     void setFloat(FloatType type) { m_floatType = type; scheduleAnchorAlignment(); }
     void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
+    void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
     bool isOnHtml() { return m_htmlNode != nullptr; }
 
@@ -269,6 +270,7 @@ public:
     int getChildIndex(const UIWidgetPtr& child = nullptr) { return child ? (child->getParent().get() == this ? child->m_childIndex : -1) : m_childIndex; }
     auto getDisplay() { return m_displayType; }
     auto getFloat() { return m_floatType; }
+    auto getJustifyItems() { return m_JustifyItems; }
 
     Rect getPaddingRect();
     Rect getMarginRect();

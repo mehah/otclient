@@ -28,6 +28,19 @@ namespace {
     static bool FLUSH_PENDING = false;
     std::vector<UIWidgetPtr> WIDGET_QUEUE;
 
+    inline bool supportsJustifyItems(DisplayType d) {
+        switch (d) {
+            case DisplayType::Block:
+            case DisplayType::InlineBlock:
+            case DisplayType::Grid:
+            case DisplayType::InlineGrid:
+            case DisplayType::TableCell:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     inline bool ignoreSizeByFloat(DisplayType d) {
         switch (d) {
             case DisplayType::Block:
@@ -102,6 +115,12 @@ namespace {
             || d == DisplayType::TableHeaderGroup
             || d == DisplayType::TableFooterGroup
             || d == DisplayType::TableRow;
+    }
+
+    inline FloatType mapLogicalJustifyItem(JustifyItemsType j) {
+        if (j == JustifyItemsType::Left) return FloatType::Left;
+        if (j == JustifyItemsType::Right)   return FloatType::Right;
+        return FloatType::None;
     }
 
     inline FloatType mapLogicalFloat(FloatType f) {
@@ -235,7 +254,13 @@ namespace {
 
             if (c->getDisplay() == DisplayType::None) { ++i; continue; }
 
-            const FloatType cf = mapLogicalFloat(c->getFloat());
+            FloatType cf = mapLogicalFloat(c->getFloat());
+            if (cf == FloatType::None) {
+                if (c->getParent()->getJustifyItems() != JustifyItemsType::Normal && supportsJustifyItems(c->getDisplay())) {
+                    cf = mapLogicalJustifyItem(c->getParent()->getJustifyItems());
+                }
+            }
+
             if (cf == FloatType::None) {
                 ctx.prevNonFloat = c.get(); ctx.prevNonFloatIdx = i;
             } else if (cf == FloatType::Left) {
@@ -616,7 +641,7 @@ void UIWidget::applyAnchorAlignment() {
     if (parentDisplay == DisplayType::InlineBlock || parentDisplay == DisplayType::Block || parentDisplay == DisplayType::TableCell) {
         if (m_childIndex == 1) {
             bool anchored = false;
-            if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getHtmlNode()->getStyle("text-align") == "center" || m_htmlNode->getType() == NodeType::Element && m_parent->getHtmlNode()->getStyle("justify-content") == "center") {
+            if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getTextAlign() == Fw::AlignCenter || m_htmlNode->getType() == NodeType::Element && m_parent->getJustifyItems() == JustifyItemsType::Center) {
                 anchored = true;
                 addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
             }
@@ -633,8 +658,12 @@ void UIWidget::applyAnchorAlignment() {
         }
     }
 
-    FloatType effFloat = mapLogicalFloat(m_floatType);
-    if (isFlexContainer(parentDisplay) || isGridContainer(parentDisplay) || isTableContainer(parentDisplay)) {
+    FloatType effFloat = mapLogicalFloat(getFloat());
+    if (effFloat == FloatType::None) {
+        if (m_parent->m_JustifyItems != JustifyItemsType::Normal && supportsJustifyItems(m_displayType)) {
+            effFloat = mapLogicalJustifyItem(m_parent->m_JustifyItems);
+        }
+    } else if (isFlexContainer(parentDisplay) || isGridContainer(parentDisplay) || isTableContainer(parentDisplay)) {
         effFloat = FloatType::None;
     }
 
