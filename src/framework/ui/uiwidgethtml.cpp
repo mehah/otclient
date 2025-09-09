@@ -443,14 +443,14 @@ namespace {
             }
 
             if (c->hasProp(PropFitWidth) && c->getWidthHtml().updateId != UPDATE_EPOCH) {
-                c->setWidth_px(width + c->getMarginRight() + c->getPaddingLeft() + c->getPaddingRight());
+                c->setWidth_px(width + c->getPaddingLeft() + c->getPaddingRight());
                 c->setProp(PropFitWidth, false);
                 c->getWidthHtml().valueCalculed = c->getWidth();
                 c->getWidthHtml().updateId = UPDATE_EPOCH;
             }
 
             if (c->hasProp(PropFitHeight) && c->getHeightHtml().updateId != UPDATE_EPOCH) {
-                c->setHeight_px(height + (c->getChildren().size() + 1) + c->getMarginBottom() + c->getPaddingTop() + c->getPaddingBottom());
+                c->setHeight_px(height + (c->getChildren().size() + 1) + c->getPaddingTop() + c->getPaddingBottom());
                 c->setProp(PropFitHeight, false);
                 c->getHeightHtml().valueCalculed = c->getHeight();
                 c->getHeightHtml().updateId = UPDATE_EPOCH;
