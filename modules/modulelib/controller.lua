@@ -142,6 +142,16 @@ function Controller:loadHtml(path, parent)
     G_CONTROLLER_CALLED = nil
 end
 
+function Controller:unloadHtml()
+    if self.htmlId == nil then
+        error('HTML unload operation failed: no HTML was previously loaded.')
+        return
+    end
+
+    g_html.destroy(self.htmlId)
+    self.ui = nil
+end
+
 function Controller:destroyUI()
     if self.htmlId ~= nil then
         g_html.destroy(self.htmlId)
