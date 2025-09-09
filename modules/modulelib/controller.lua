@@ -150,6 +150,7 @@ function Controller:unloadHtml()
 
     g_html.destroy(self.htmlId)
     self.ui = nil
+    self.htmlId = nil
 end
 
 function Controller:destroyUI()
