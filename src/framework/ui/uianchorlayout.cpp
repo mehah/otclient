@@ -250,7 +250,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 if (widget->isOnHtml()) {
                     if (widget->getDisplay() == DisplayType::Inline)
                         margin = 0;
-                    else {
+                    else if (widget->getParent() != hookedWidget) {
                         if (widget->getMarginBottom() > 0 && hookedWidget->getMarginBottom() > 0)
                             margin = std::max<int>(margin, hookedWidget->getMarginBottom());
                         else
@@ -271,7 +271,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 if (widget->isOnHtml()) {
                     if (widget->getDisplay() == DisplayType::Inline)
                         margin = 0;
-                    else {
+                    else if (widget->getParent() != hookedWidget) {
                         if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
                             margin = std::max<int>(margin, hookedWidget->getMarginTop());
                         else
