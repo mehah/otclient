@@ -99,8 +99,6 @@ public:
     std::string getStyle(std::string_view style) const;
     auto& getAttrStyles() { return m_attrStyles; }
 
-    auto& getGroups() { return m_groups; }
-
 public:
     bool isHovered{ false };
     bool isFocused{ false };
@@ -123,8 +121,6 @@ private:
     std::unordered_map<std::string, std::map<std::string, std::string>> m_styles;
     std::map<std::string, std::string> m_attrStyles;
     UIWidgetPtr m_widget;
-
-    std::unordered_map<std::string, UIWidgetPtr> m_groups;
 
     mutable int cacheIndexAmongElements = -1;
     mutable int cacheIndexAmongType = -1;

@@ -26,7 +26,6 @@
 
 #include "htmlnode.h"
 #include "htmlparser.h"
-#include "cssparser.h"
 #include <framework/core/resourcemanager.h>
 #include <ranges>
 #include <framework/core/modulemanager.h>
@@ -190,19 +189,17 @@ void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWi
     group->callLuaField("addWidget", node->getWidget());
 }
 
-void applyStyleSheet(const auto& root, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
+void applyStyleSheet(HtmlNode* node, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
     static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
         for (const auto& child : n->getChildren()) {
-            if (!child->hasAttr("id")) {
-                child->getStyles()[style][decl.property] = decl.value;
-            }
+            child->getStyles()[style][decl.property] = decl.value;
             self(child, decl, style, self);
         }
     };
 
     for (const auto& rule : sheet.rules) {
         const auto& selectors = stdext::join(rule.selectors);
-        const auto& nodes = root->querySelectorAll(selectors);
+        const auto& nodes = node->querySelectorAll(selectors);
 
         if (checkRuleExist && nodes.empty()) {
             g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
@@ -346,48 +343,72 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         createRadioGroup(node, groups);
 }
 
-uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
-    static std::vector<css::StyleSheet> sheets;
+DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist) {
     static std::vector<HtmlNodePtr> textNodes;
-
-    sheets.clear();
     textNodes.clear();
 
     auto path = "/modules/" + moduleName + "/";
-    auto htmlContent = g_resources.readFileContents(path + htmlPath);
-    auto root = parseHtml(htmlContent);
-    if (root->getChildren().empty())
-        return 0;
 
-    if (!parent)
-        parent = g_ui.getRootWidget();
-
-    for (const auto& node : root->getChildren()) {
+    for (const auto& node : node->getChildren()) {
         if (node->getTag() == "style") {
-            sheets.emplace_back(css::parse(node->textContent()));
+            root.sheets.emplace_back(css::parse(node->textContent()));
         } else if (node->getTag() == "link") {
             if (node->hasAttr("href")) {
-                sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
+                root.sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
             }
         } else createWidgetFromNode(node, parent, textNodes);
     }
 
     for (const auto& sheet : GLOBAL_STYLES)
-        applyStyleSheet(root, htmlPath, sheet, false);
-    for (const auto& sheet : sheets)
-        applyStyleSheet(root, htmlPath, sheet, true);
+        applyStyleSheet(node.get(), htmlPath, sheet, false);
+    for (const auto& sheet : root.sheets)
+        applyStyleSheet(node.get(), htmlPath, sheet, checkRuleExist);
 
-    auto all = root->querySelectorAll("*");
+    auto all = node->querySelectorAll("*");
     all.reserve(all.size() + textNodes.size());
     all.insert(all.end(), textNodes.begin(), textNodes.end());
     for (const auto& node : std::views::reverse(all)) {
         if (const auto widget = node->getWidget().get()) {
-            applyAttributesAndStyles(widget, node.get(), root->getGroups());
+            applyAttributesAndStyles(widget, node.get(), root.groups);
         }
     }
 
+    return root;
+}
+
+uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
+    auto path = "/modules/" + moduleName + "/";
+    auto htmlContent = g_resources.readFileContents(path + htmlPath);
+
+    auto root = DataRoot{ parseHtml(htmlContent), moduleName };
+
+    if (root.node->getChildren().empty())
+        return 0;
+
+    if (!parent)
+        parent = g_ui.getRootWidget();
+
     static uint32_t ID = 0;
-    return m_nodes.emplace(++ID, root).first->first;
+    return m_nodes.emplace(++ID, readNode(root, root.node, parent, moduleName, htmlPath, false)).first->first;
+}
+
+UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId) {
+    auto it = m_nodes.find(htmlId);
+    if (it == m_nodes.end()) {
+        nullptr;
+    }
+
+    auto node = parseHtml(html);
+
+    auto root = readNode(it->second, node, parent, it->second.moduleName, "", false);
+    parent->refreshHtml();
+
+    for (const auto& node : node->getChildren()) {
+        if (node->getWidget())
+            return node->getWidget();
+    }
+
+    return nullptr;
 }
 
 void HtmlManager::destroy(uint32_t id) {
@@ -395,12 +416,12 @@ void HtmlManager::destroy(uint32_t id) {
     if (it == m_nodes.end())
         return;
 
-    for (const auto& node : it->second->getChildren()) {
+    for (const auto& node : it->second.node->getChildren()) {
         if (node->getWidget())
             node->getWidget()->destroy();
     }
 
-    for (const auto& [name, group] : it->second->getGroups()) {
+    for (const auto& [name, group] : it->second.groups) {
         group->destroy();
     }
 
@@ -414,7 +435,7 @@ void HtmlManager::addGlobalStyle(const std::string& stylePath) {
 UIWidgetPtr HtmlManager::getRootWidget(uint32_t id) {
     auto it = m_nodes.find(id);
     if (it != m_nodes.end()) {
-        for (const auto& node : it->second->getChildren()) {
+        for (const auto& node : it->second.node->getChildren()) {
             if (node->getWidget())
                 return node->getWidget();
         }

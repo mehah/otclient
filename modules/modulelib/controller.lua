@@ -183,6 +183,13 @@ function Controller:findWidgets(query)
     return self.ui and self.ui:querySelectorAll(query:trim())
 end
 
+function Controller:createWidgetFromHTML(html, parent)
+    G_CONTROLLER_CALLED = self
+    local widget = g_html.createWidgetFromHTML(html, parent, self.htmlId)
+    G_CONTROLLER_CALLED = nil
+    return widget
+end
+
 function Controller:loadUI(name, parent)
     if self.ui then
         return

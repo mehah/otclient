@@ -476,6 +476,17 @@ namespace {
     };
 }
 
+void UIWidget::refreshHtml() {
+    auto parent = this;
+    while (parent && parent->isOnHtml()) {
+        if (parent->m_width.unit != Unit::Em && parent->m_width.unit != Unit::Px)
+            parent->applyDimension(true, parent->m_width.unit, parent->m_width.value);
+        if (parent->m_height.unit != Unit::Em && parent->m_height.unit != Unit::Px)
+            parent->applyDimension(false, parent->m_height.unit, parent->m_width.value);
+        parent = parent->m_parent.get();
+    }
+}
+
 void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     stdext::trim(valueStr);
     stdext::tolower(valueStr);
@@ -483,14 +494,20 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     const std::string_view sv = valueStr;
     const Unit unit = detectUnit(sv);
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
-    int16_t valueCalculed = -1;
+    applyDimension(isWidth, unit, num);
+    if (m_htmlNode)
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = valueStr;
+}
 
+void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
     auto setFitProp = [&](bool on) {
         if (isWidth) setProp(PropFitWidth, on);
         else         setProp(PropFitHeight, on);
     };
     auto setPx = [&](int px) {
     };
+
+    int16_t valueCalculed = -1;
 
     setFitProp(false);
     setProp(PropWidthAuto, false);
@@ -526,20 +543,19 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
         case Unit::Px:
         case Unit::Invalid:
         default: {
-            valueCalculed = num = static_cast<int>(std::round(num)) + getPaddingLeft() + getPaddingRight();
-            if (isWidth) setWidth_px(num);
-            else         setHeight_px(num);
+            valueCalculed = value = static_cast<int>(std::round(value)) + getPaddingLeft() + getPaddingRight();
+            if (isWidth) setWidth_px(value);
+            else         setHeight_px(value);
             break;
         }
     }
 
     if (m_htmlNode) {
         if (isWidth) {
-            m_width = { unit , num, valueCalculed };
+            m_width = { unit , value, valueCalculed };
         } else {
-            m_height = { unit , num, valueCalculed };
+            m_height = { unit , value, valueCalculed };
         }
-        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = valueStr;
     }
 }
 

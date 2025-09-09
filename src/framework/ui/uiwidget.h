@@ -605,6 +605,8 @@ private:
     void initImage();
     void parseImageStyle(const OTMLNodePtr& styleNode);
     void applyDimension(bool isWidth, std::string valueStr);
+    void applyDimension(bool isWidth, Unit unit, int16_t value);
+    void refreshHtml();
 
     void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
     void configureBorderImage() { setProp(PropImageBordered, true); updateImageCache(); }
@@ -612,6 +614,8 @@ private:
     CoordsBufferPtr m_imageCoordsCache;
 
     Rect m_imageCachedScreenCoords;
+
+    friend class HtmlManager;
 
 protected:
     void drawImage(const Rect& screenCoords);

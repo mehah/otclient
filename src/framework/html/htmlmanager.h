@@ -24,6 +24,15 @@
 
 #include "declarations.h"
 #include <framework/ui/declarations.h>
+#include "cssparser.h"
+
+struct DataRoot
+{
+    HtmlNodePtr node;
+    std::string moduleName;
+    std::vector<css::StyleSheet> sheets;
+    std::unordered_map<std::string, UIWidgetPtr> groups;
+};
 
 class HtmlManager
 {
@@ -33,9 +42,13 @@ public:
     void addGlobalStyle(const std::string& style);
     UIWidgetPtr getRootWidget(uint32_t htmlId);
     void terminate() { m_nodes.clear(); }
+    UIWidgetPtr createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId);
 
 private:
-    stdext::map<uint32_t, HtmlNodePtr> m_nodes;
+
+    DataRoot readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist);
+
+    stdext::map<uint32_t, DataRoot> m_nodes;
 };
 
 extern HtmlManager g_html;

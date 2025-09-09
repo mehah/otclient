@@ -71,9 +71,4 @@ namespace css {
                          const StyleSheet& sheet,
                          std::unordered_map<const HtmlNode*, StyleMap>& out,
                          const CascadeOptions& opts = {});
-
-    StyleMap computeStyleFor(const HtmlNodePtr& root,
-                             const HtmlNodePtr& element,
-                             const StyleSheet& sheet,
-                             const CascadeOptions& opts = {});
 }

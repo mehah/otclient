@@ -252,7 +252,7 @@ function UIWidget:onCreateByHTML(attrs)
     end
 
     local getFncSet = function(exp)
-        local f = loadstring('return function(self, value) ' .. exp .. '=value end')
+        local f = loadstring('return function(self, value, target) ' .. exp .. '=value end')
         return f and f() or nil
     end
 
@@ -261,7 +261,7 @@ function UIWidget:onCreateByHTML(attrs)
         if set then
             controller:registerEvents(self, {
                 onCheckChange = function(widget, value)
-                    set(controller, value)
+                    set(controller, value, widget)
                 end
             })
         end
@@ -273,13 +273,13 @@ function UIWidget:onCreateByHTML(attrs)
             if self.getCurrentOption then
                 controller:registerEvents(self, {
                     onOptionChange = function(widget, text, data)
-                        set(controller, data)
+                        set(controller, data, widget)
                     end
                 })
             else
                 controller:registerEvents(self, {
                     onTextChange = function(widget, value)
-                        set(controller, value)
+                        set(controller, value, widget)
                     end
                 })
             end
