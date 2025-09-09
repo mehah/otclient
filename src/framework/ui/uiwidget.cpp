@@ -33,6 +33,7 @@
 #include <framework/platform/platformwindow.h>
 #include "framework/graphics/drawpoolmanager.h"
 #include "framework/graphics/shadermanager.h"
+#include <framework/html/htmlmanager.h>
 
 UIWidget::UIWidget()
 {
@@ -152,6 +153,19 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
 
         g_drawPool.setOpacity(oldOpacity);
     }
+}
+
+UIWidgetPtr UIWidget::append(const std::string& html) {
+    if (!isOnHtml()) return nullptr;
+    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlId);
+}
+
+UIWidgetPtr UIWidget::prepend(const std::string& html) {
+    if (!isOnHtml()) return nullptr;
+    auto widget = g_html.createWidgetFromHTML(html, nullptr, m_htmlId);
+    insertChild(1, widget);
+    refreshHtml(true);
+    return widget;
 }
 
 void UIWidget::addChild(const UIWidgetPtr& child)

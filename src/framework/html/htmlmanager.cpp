@@ -240,7 +240,7 @@ void applyStyleSheet(HtmlNode* node, std::string_view htmlPath, const css::Style
     }
 };
 
-UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes) {
+UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName) {
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
         return nullptr;
 
@@ -249,8 +249,9 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
     auto widget = g_ui.createWidget(styleName.empty() ? "UIWidget" : styleName, parent);
     node->setWidget(widget);
     widget->setHtmlNode(node);
+    widget->setHtmlId(htmlId);
 
-    widget->callLuaField("onCreateByHTML", node->getAttributesMap());
+    widget->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName);
 
     if (!node->getText().empty()) {
         widget->setTextAutoResize(true);
@@ -258,7 +259,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
     }
 
     for (const auto& child : node->getChildren()) {
-        createWidgetFromNode(child, widget, textNodes);
+        createWidgetFromNode(child, widget, textNodes, htmlId, moduleName);
     }
 
     if (node->getType() == NodeType::Text)
@@ -267,7 +268,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
     return widget;
 }
 
-void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
+void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups, const std::string& moduleName) {
     for (const auto [key, v] : node->getAttributesMap()) {
         auto attr = key;
         auto value = v;
@@ -301,7 +302,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
                     widget->mergeStyle(style);
             }
         } else {
-            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value);
+            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value, moduleName);
         }
     }
 
@@ -343,7 +344,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         createRadioGroup(node, groups);
 }
 
-DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist) {
+DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId) {
     static std::vector<HtmlNodePtr> textNodes;
     textNodes.clear();
 
@@ -356,7 +357,7 @@ DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UI
             if (node->hasAttr("href")) {
                 root.sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
             }
-        } else createWidgetFromNode(node, parent, textNodes);
+        } else createWidgetFromNode(node, parent, textNodes, htmlId, moduleName);
     }
 
     for (const auto& sheet : GLOBAL_STYLES)
@@ -369,7 +370,7 @@ DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UI
     all.insert(all.end(), textNodes.begin(), textNodes.end());
     for (const auto& node : std::views::reverse(all)) {
         if (const auto widget = node->getWidget().get()) {
-            applyAttributesAndStyles(widget, node.get(), root.groups);
+            applyAttributesAndStyles(widget, node.get(), root.groups, moduleName);
         }
     }
 
@@ -389,7 +390,8 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
         parent = g_ui.getRootWidget();
 
     static uint32_t ID = 0;
-    return m_nodes.emplace(++ID, readNode(root, root.node, parent, moduleName, htmlPath, false)).first->first;
+    ++ID;
+    return m_nodes.emplace(ID, readNode(root, root.node, parent, moduleName, htmlPath, false, ID)).first->first;
 }
 
 UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId) {
@@ -400,7 +402,7 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
 
     auto node = parseHtml(html);
 
-    auto root = readNode(it->second, node, parent, it->second.moduleName, "", false);
+    auto root = readNode(it->second, node, parent, it->second.moduleName, "", false, htmlId);
     parent->refreshHtml();
 
     for (const auto& node : node->getChildren()) {

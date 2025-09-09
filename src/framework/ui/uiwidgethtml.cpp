@@ -476,7 +476,13 @@ namespace {
     };
 }
 
-void UIWidget::refreshHtml() {
+void UIWidget::refreshHtml(bool childrenTo) {
+    if (childrenTo && isOnHtml()) {
+        for (const auto& child : m_children) {
+            child->setDisplay(m_displayType);
+        }
+    }
+
     auto parent = this;
     while (parent && parent->isOnHtml()) {
         if (parent->m_width.unit != Unit::Em && parent->m_width.unit != Unit::Px)

@@ -67,8 +67,8 @@ local function START_WATCH_LIST()
     end, WATCH_CYCLE_CHECK_MS)
 end
 
-function UIWidget:__applyOrBindHtmlAttribute(attr, value)
-    local controller = G_CONTROLLER_CALLED
+function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName)
+    local controller = G_CONTROLLER_CALLED[controllerName]
 
     if attr == 'image-source' then
         value = '/modules/' .. controller.name .. '/' .. value
@@ -242,8 +242,8 @@ local parseEvents = function(widget, eventName, callStr, controller)
     controller:registerEvents(widget, data)
 end
 
-function UIWidget:onCreateByHTML(attrs)
-    local controller = G_CONTROLLER_CALLED
+function UIWidget:onCreateByHTML(attrs, controllerName)
+    local controller = G_CONTROLLER_CALLED[controllerName]
     for attr, v in pairs(attrs) do
         if attr:starts('on') then
             parseEvents(self, attr:lower(), v, controller)

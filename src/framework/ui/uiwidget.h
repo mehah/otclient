@@ -160,6 +160,12 @@ protected:
     friend class UIManager;
 
     std::string m_id;
+    uint32_t m_htmlId = 0;
+    UIWidgetPtr m_parent;
+    UIWidgetList m_children;
+    HtmlNodePtr m_htmlNode;
+    OTMLNodePtr m_style;
+
     std::string m_source;
     int16_t m_childIndex{ -1 };
 
@@ -177,12 +183,9 @@ protected:
     SizeUnit m_height;
 
     UILayoutPtr m_layout;
-    UIWidgetPtr m_parent;
-    UIWidgetList m_children;
+
     UIWidgetList m_lockedChildren;
     UIWidgetPtr m_focusedChild;
-    OTMLNodePtr m_style;
-    HtmlNodePtr m_htmlNode;
 
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
     std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
@@ -196,6 +199,8 @@ protected:
     friend class UIVerticalLayout;
 
 public:
+    UIWidgetPtr append(const std::string& html);
+    UIWidgetPtr prepend(const std::string& html);
     void addChild(const UIWidgetPtr& child);
     void insertChild(int32_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
@@ -258,6 +263,9 @@ public:
     void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
+    void setHtmlId(uint32_t id) { m_htmlId = id; }
+
+    auto getHtmlId() const { return m_htmlId; }
     bool isOnHtml() { return m_htmlNode != nullptr; }
 
     const auto& getHtmlNode() const { return m_htmlNode; }
@@ -606,7 +614,7 @@ private:
     void parseImageStyle(const OTMLNodePtr& styleNode);
     void applyDimension(bool isWidth, std::string valueStr);
     void applyDimension(bool isWidth, Unit unit, int16_t value);
-    void refreshHtml();
+    void refreshHtml(bool childrenTo = false);
 
     void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
     void configureBorderImage() { setProp(PropImageBordered, true); updateImageCache(); }

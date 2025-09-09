@@ -45,8 +45,7 @@ public:
     UIWidgetPtr createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId);
 
 private:
-
-    DataRoot readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist);
+    DataRoot readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId);
 
     stdext::map<uint32_t, DataRoot> m_nodes;
 };

@@ -68,7 +68,7 @@ Controller = {
     keyboardEvents = nil
 }
 
-G_CONTROLLER_CALLED = nil
+G_CONTROLLER_CALLED = {}
 
 function Controller:new()
     local module = g_modules.getCurrentModule()
@@ -84,6 +84,9 @@ function Controller:new()
     }
     setmetatable(obj, self)
     self.__index = self
+
+    G_CONTROLLER_CALLED[obj.name] = obj
+
     return obj
 end
 
@@ -133,13 +136,9 @@ function Controller:loadHtml(path, parent)
         path = path .. suffix
     end
 
-    G_CONTROLLER_CALLED = self
-
     self:setUI(path, parent)
     self.htmlId = g_html.load(self.name, path, g_ui.getRootWidget())
     self.ui = g_html.getRootWidget(self.htmlId);
-
-    G_CONTROLLER_CALLED = nil
 end
 
 function Controller:unloadHtml()
@@ -184,9 +183,7 @@ function Controller:findWidgets(query)
 end
 
 function Controller:createWidgetFromHTML(html, parent)
-    G_CONTROLLER_CALLED = self
     local widget = g_html.createWidgetFromHTML(html, parent, self.htmlId)
-    G_CONTROLLER_CALLED = nil
     return widget
 end
 
