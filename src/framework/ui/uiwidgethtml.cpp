@@ -28,6 +28,23 @@ namespace {
     static bool FLUSH_PENDING = false;
     std::vector<UIWidgetPtr> WIDGET_QUEUE;
 
+    inline bool ignoreSizeByFloat(DisplayType d) {
+        switch (d) {
+            case DisplayType::Block:
+            case DisplayType::InlineBlock:
+            case DisplayType::Table:
+            case DisplayType::TableRow:
+            case DisplayType::TableRowGroup:
+            case DisplayType::TableHeaderGroup:
+            case DisplayType::TableFooterGroup:
+            case DisplayType::TableColumnGroup:
+            case DisplayType::TableColumn:
+                return true;
+            default:
+                return false;
+        }
+    }
+
     inline bool isInlineLike(DisplayType d) {
         switch (d) {
             case DisplayType::Inline:
@@ -413,7 +430,7 @@ namespace {
                 c->getHeightHtml().valueCalculed = c->getHeight();
                 c->getHeightHtml().updateId = UPDATE_EPOCH;
             }
-        } else {
+        } else if (c->getFloat() == FloatType::None || !ignoreSizeByFloat(c->getDisplay())) {
             const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
             const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
