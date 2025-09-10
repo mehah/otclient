@@ -155,17 +155,23 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
     }
 }
 
+UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
+    if (!isOnHtml()) return nullptr;
+    auto widget = g_html.createWidgetFromHTML(html, nullptr, m_htmlId);
+    insertChild(index, widget);
+    m_htmlNode->insert(widget->m_htmlNode, index);
+
+    refreshHtml(true);
+    return widget;
+}
+
 UIWidgetPtr UIWidget::append(const std::string& html) {
     if (!isOnHtml()) return nullptr;
     return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlId);
 }
 
 UIWidgetPtr UIWidget::prepend(const std::string& html) {
-    if (!isOnHtml()) return nullptr;
-    auto widget = g_html.createWidgetFromHTML(html, nullptr, m_htmlId);
-    insertChild(1, widget);
-    refreshHtml(true);
-    return widget;
+    return insert(1, html);
 }
 
 void UIWidget::addChild(const UIWidgetPtr& child)
@@ -200,6 +206,10 @@ void UIWidget::addChild(const UIWidgetPtr& child)
 
     // add to layout and updates it
     m_layout->addWidget(child);
+    if (m_htmlNode) {
+        m_htmlNode->append(child->m_htmlNode);
+        refreshHtml();
+    }
 
     // update new child states
     child->updateStates();
@@ -265,6 +275,10 @@ void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
 
     // add to layout and updates it
     m_layout->addWidget(child);
+    if (m_htmlNode) {
+        m_htmlNode->insert(child->m_htmlNode, index);
+        refreshHtml();
+    }
 
     // update new child states
     child->updateStates();
@@ -304,6 +318,11 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
 
         if (m_layout)
             m_layout->removeWidget(child);
+
+        if (m_htmlNode) {
+            m_htmlNode->remove(child->m_htmlNode);
+            refreshHtml();
+        }
 
         // remove access to child via widget.childId
         if (child->hasProp(PropCustomId)) {
@@ -466,6 +485,12 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
     m_children.erase(it);
     m_children.emplace_front(child);
 
+    if (m_htmlNode) {
+        m_htmlNode->remove(child->m_htmlNode);
+        m_htmlNode->prepend(child->m_htmlNode);
+        refreshHtml();
+    }
+
     { // cache index
         for (int i = (child->m_childIndex = 1), s = m_children.size(); i < s; ++i)
             m_children[i]->m_childIndex = i + 1;
@@ -491,6 +516,12 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
 
     m_children.erase(it);
     m_children.emplace_back(child);
+
+    if (m_htmlNode) {
+        m_htmlNode->remove(child->m_htmlNode);
+        m_htmlNode->append(child->m_htmlNode);
+        refreshHtml();
+    }
 
     { // cache index
         for (int i = child->m_childIndex - 1, s = m_children.size(); i < s; ++i)
@@ -528,6 +559,12 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, const int index)
     m_children.erase(it);
     m_children.insert(m_children.begin() + (index - 1), child);
 
+    if (m_htmlNode) {
+        m_htmlNode->remove(child->m_htmlNode);
+        m_htmlNode->insert(child->m_htmlNode, index - 1);
+        refreshHtml();
+    }
+
     { // cache index
         auto start = child->m_childIndex;
         auto end = index;
@@ -551,9 +588,14 @@ void UIWidget::reorderChildren(const std::vector<UIWidgetPtr>& childrens) {
     }
 
     m_children.clear();
+    if (m_htmlNode) m_htmlNode->clear();
     for (const auto& children : childrens) {
         m_children.push_back(children);
+        if (m_htmlNode)
+            m_htmlNode->append(children->m_htmlNode);
     }
+
+    refreshHtml();
 
     updateChildrenIndexStates();
     updateLayout();
@@ -882,7 +924,12 @@ void UIWidget::internalDestroy()
         m_layout->setParent(nullptr);
         m_layout = nullptr;
     }
-    m_htmlNode = nullptr;
+
+    if (m_htmlNode) {
+        m_htmlNode->destroy();
+        m_htmlNode = nullptr;
+    }
+
     m_parent = nullptr;
     m_lockedChildren.clear();
     m_childrenById.clear();

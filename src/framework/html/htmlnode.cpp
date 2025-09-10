@@ -150,3 +150,230 @@ std::string HtmlNode::textContent() const {
             return "";
     }
 }
+
+void HtmlNode::append(const HtmlNodePtr& child) {
+    attachChild(child, children.size());
+}
+
+void HtmlNode::prepend(const HtmlNodePtr& child) {
+    attachChild(child, 0);
+}
+
+void HtmlNode::insert(const HtmlNodePtr& child, size_t pos) {
+    if (pos > children.size()) pos = children.size();
+    attachChild(child, pos);
+}
+
+void HtmlNode::detachFromCurrentParent(const HtmlNodePtr& child) {
+    if (!child) return;
+    auto oldParent = child->parent.lock();
+    if (!oldParent) return;
+
+    auto& vec = oldParent->children;
+    for (size_t i = 0; i < vec.size(); ++i) {
+        if (vec[i].get() == child.get()) {
+            // conserta prev/next dos vizinhos
+            auto left = (i > 0) ? vec[i - 1] : nullptr;
+            auto right = (i + 1 < vec.size()) ? vec[i + 1] : nullptr;
+            if (left)  left->next.reset();
+            if (right) right->prev.reset();
+            if (left && right) {
+                left->next = right;
+                right->prev = left;
+            }
+            vec.erase(vec.begin() + i);
+            break;
+        }
+    }
+    child->parent.reset();
+    child->prev.reset();
+    child->next.reset();
+
+    invalidateIndexCachesUp(oldParent.get());
+}
+
+void HtmlNode::attachChild(const HtmlNodePtr& child, size_t pos) {
+    if (!child) return;
+
+    // se já tinha outro pai, destacamos primeiro
+    if (auto oldParent = child->parent.lock()) {
+        if (oldParent.get() != this) {
+            detachFromCurrentParent(child);
+        } else {
+            // mesmo pai: precisamos removê-lo antes de reinserir em outra posição
+            auto& vec = children;
+            for (size_t i = 0; i < vec.size(); ++i) {
+                if (vec[i].get() == child.get()) {
+                    // ajusta vizinhos
+                    auto left = (i > 0) ? vec[i - 1] : nullptr;
+                    auto right = (i + 1 < vec.size()) ? vec[i + 1] : nullptr;
+                    if (left)  left->next.reset();
+                    if (right) right->prev.reset();
+                    if (left && right) {
+                        left->next = right;
+                        right->prev = left;
+                    }
+                    vec.erase(vec.begin() + i);
+                    if (pos > vec.size()) pos = vec.size();
+                    break;
+                }
+            }
+        }
+    }
+
+    // ligações prev/next ao inserir
+    if (!children.empty()) {
+        if (pos == 0) {
+            child->next = children.front();
+            children.front()->prev = child;
+        } else if (pos == children.size()) {
+            child->prev = children.back();
+            children.back()->next = child;
+        } else {
+            auto before = children[pos - 1];
+            auto after = children[pos];
+            child->prev = before;
+            child->next = after;
+            before->next = child;
+            after->prev = child;
+        }
+    }
+
+    child->parent = shared_from_this();
+    children.insert(children.begin() + pos, child);
+
+    // registra índices do documento (para semeadura de querySelector)
+    registerInIndexes(child);
+
+    // caches de :nth-*
+    invalidateIndexCachesUp(this);
+}
+
+void HtmlNode::registerInIndexes(const HtmlNodePtr& child) {
+    if (!child || child->type != NodeType::Element) return;
+    auto root = documentRoot();
+
+    if (!child->tag.empty() && child->tag != "root")
+        root->tagIndex[child->tag].push_back(child);
+
+    std::string idv = child->getAttr("id");
+    if (!idv.empty())
+        root->idIndex[idv] = child;
+
+    if (!child->classList.empty())
+        for (auto& cls : child->classList)
+            root->classIndex[cls].push_back(child);
+}
+
+void HtmlNode::unregisterSubtreeFromIndexes(const HtmlNodePtr& node) {
+    if (!node) return;
+    auto root = documentRoot();
+
+    auto prune_vec = [](auto& vec, const HtmlNode* target) {
+        vec.erase(std::remove_if(vec.begin(), vec.end(),
+                  [&](const std::weak_ptr<HtmlNode>& w) {
+            auto sp = w.lock();
+            return !sp || sp.get() == target;
+        }), vec.end());
+    };
+
+    std::vector<HtmlNodePtr> stack{ node };
+    while (!stack.empty()) {
+        auto cur = stack.back(); stack.pop_back();
+
+        if (cur->type == NodeType::Element) {
+            if (!cur->tag.empty() && cur->tag != "root") {
+                auto it = root->tagIndex.find(cur->tag);
+                if (it != root->tagIndex.end()) prune_vec(it->second, cur.get());
+            }
+            std::string idv = cur->getAttr("id");
+            if (!idv.empty()) {
+                auto it = root->idIndex.find(idv);
+                if (it != root->idIndex.end() && !it->second.expired() && it->second.lock().get() == cur.get())
+                    root->idIndex.erase(it);
+            }
+            if (!cur->classList.empty()) {
+                for (auto& cls : cur->classList) {
+                    auto it = root->classIndex.find(cls);
+                    if (it != root->classIndex.end()) prune_vec(it->second, cur.get());
+                }
+            }
+        }
+
+        for (auto& c : cur->children) stack.push_back(c);
+    }
+}
+
+void HtmlNode::destroy() {
+    auto self = shared_from_this();
+    auto p = parent.lock();
+    if (!p) return;
+
+    unregisterSubtreeFromIndexes(self);
+
+    auto& vec = p->children;
+    for (size_t i = 0; i < vec.size(); ++i) {
+        if (vec[i].get() == this) {
+            auto left = (i > 0) ? vec[i - 1] : nullptr;
+            auto right = (i + 1 < vec.size()) ? vec[i + 1] : nullptr;
+            if (left)  left->next.reset();
+            if (right) right->prev.reset();
+            if (left && right) {
+                left->next = right;
+                right->prev = left;
+            }
+            vec.erase(vec.begin() + i);
+            break;
+        }
+    }
+
+    parent.reset();
+    prev.reset();
+    next.reset();
+
+    invalidateIndexCachesUp(p.get());
+}
+
+void HtmlNode::remove(const HtmlNodePtr& child) {
+    if (!child) return;
+    auto it = std::find_if(children.begin(), children.end(),
+        [&](const HtmlNodePtr& c) { return c.get() == child.get(); });
+    if (it == children.end()) return;
+
+    child->unregisterSubtreeFromIndexes(child);
+
+    auto left = (it != children.begin()) ? *(it - 1) : nullptr;
+    auto right = (std::next(it) != children.end()) ? *(it + 1) : nullptr;
+    if (left)  left->next.reset();
+    if (right) right->prev.reset();
+    if (left && right) {
+        left->next = right;
+        right->prev = left;
+    }
+
+    children.erase(it);
+
+    child->parent.reset();
+    child->prev.reset();
+    child->next.reset();
+
+    invalidateIndexCachesUp(this);
+}
+
+void HtmlNode::clear() {
+    if (children.empty()) return;
+
+    auto root = documentRoot();
+
+    // Remove todos filhos da árvore de índices
+    for (auto& child : children) {
+        unregisterSubtreeFromIndexes(child);
+        child->parent.reset();
+        child->prev.reset();
+        child->next.reset();
+    }
+
+    children.clear();
+
+    invalidateIndexCachesUp(this);
+}

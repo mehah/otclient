@@ -199,6 +199,7 @@ protected:
     friend class UIVerticalLayout;
 
 public:
+    UIWidgetPtr insert(int32_t index, const std::string& html);
     UIWidgetPtr append(const std::string& html);
     UIWidgetPtr prepend(const std::string& html);
     void addChild(const UIWidgetPtr& child);

@@ -403,11 +403,11 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
     auto node = parseHtml(html);
 
     auto root = readNode(it->second, node, parent, it->second.moduleName, "", false, htmlId);
-    parent->refreshHtml();
 
     for (const auto& node : node->getChildren()) {
-        if (node->getWidget())
+        if (node->getWidget()) {
             return node->getWidget();
+        }
     }
 
     return nullptr;

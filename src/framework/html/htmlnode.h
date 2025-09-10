@@ -99,6 +99,13 @@ public:
     std::string getStyle(std::string_view style) const;
     auto& getAttrStyles() { return m_attrStyles; }
 
+    void append(const HtmlNodePtr& child);
+    void prepend(const HtmlNodePtr& child);
+    void insert(const HtmlNodePtr& child, size_t pos);
+    void destroy();
+    void remove(const HtmlNodePtr& child);
+    void clear();
+
 public:
     bool isHovered{ false };
     bool isFocused{ false };
@@ -124,6 +131,12 @@ private:
 
     mutable int cacheIndexAmongElements = -1;
     mutable int cacheIndexAmongType = -1;
+
+private:
+    void attachChild(const HtmlNodePtr& child, size_t pos);
+    void registerInIndexes(const HtmlNodePtr& child);
+    void unregisterSubtreeFromIndexes(const HtmlNodePtr& node);
+    void detachFromCurrentParent(const HtmlNodePtr& child);
 };
 
 inline void invalidateIndexCachesUp(HtmlNode* n) {
