@@ -602,12 +602,21 @@ void UIWidget::updateSize() {
                 height = parent->getHeightHtml().valueCalculed;
             }
 
-            if (hasProp(PropWidthPercent) && hasProp(PropHeightPercent) && width > -1 && height > -1 ||
-                hasProp(PropWidthAuto) && hasProp(PropHeightPercent) && width > -1 && height > -1 ||
-                hasProp(PropWidthAuto) && width > -1 ||
-                hasProp(PropWidthPercent) && width > -1 ||
-                hasProp(PropHeightPercent) && height > -1)
-                break;
+            if (hasProp(PropWidthPercent) && hasProp(PropHeightPercent)) {
+                if (width > -1 && height > -1)
+                    break;
+            } else if (hasProp(PropWidthAuto) && hasProp(PropHeightPercent)) {
+                if (width > -1 && height > -1)
+                    break;
+            } else if (hasProp(PropWidthAuto)) {
+                if (width > -1)
+                    break;
+            } else if (hasProp(PropWidthPercent)) {
+                if (width > -1)
+                    break;
+            } else if (hasProp(PropHeightPercent))
+                if (height > -1)
+                    break;
 
             parent = parent->m_parent;
         }
