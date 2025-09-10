@@ -248,6 +248,7 @@ public:
     void setStyle(std::string_view styleName);
     void setStyleFromNode(const OTMLNodePtr& styleNode);
     void setEnabled(bool enabled);
+    void setDisabled(bool disabled) { setEnabled(!disabled); }
     void setVisible(bool visible);
     void setOn(bool on);
     void setChecked(bool checked);
