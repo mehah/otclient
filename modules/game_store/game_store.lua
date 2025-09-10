@@ -1128,7 +1128,9 @@ function transferPoints()
 
     transferPointsWindow.amountBar:setStep(25)
     transferPointsWindow.amountBar:setMinimum(minimumValue)
-    transferPointsWindow.amountBar:setMaximum(playerBalance)
+    -- Garantir múltiplo de 25 para o máximo
+    local maxStep = math.floor(playerBalance / 25) * 25
+    transferPointsWindow.amountBar:setMaximum(maxStep)
     transferPointsWindow.amountBar:setValue(initialValue)
     transferPointsWindow.amount:setText(formatNumberWithCommas(initialValue))
 
@@ -1144,9 +1146,11 @@ function transferPoints()
     end
 
     transferPointsWindow.amountBar.onValueChange = function()
-        local val = transferPointsWindow.amountBar:getValue()
+        local rawVal = transferPointsWindow.amountBar:getValue()
+        local val = math.floor(rawVal / 25) * 25
+        transferPointsWindow.amountBar:setValue(val)
         transferPointsWindow.amount:setText(formatNumberWithCommas(val))
-        g_logger.info("TransferPoints | AmountBar value changed: " .. tostring(val))
+        g_logger.info("TransferPoints | AmountBar value adjusted: " .. tostring(val))
     end
 
     transferPointsWindow.closeButton.onClick = function()
