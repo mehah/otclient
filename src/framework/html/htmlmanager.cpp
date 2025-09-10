@@ -406,13 +406,13 @@ void HtmlManager::destroy(uint32_t id) {
     if (it == m_nodes.end())
         return;
 
-    std::vector<UIWidgetPtr> widgets;
+    std::vector<UIWidget*> widgets;
     widgets.reserve(it->second.node->getChildren().size());
     for (const auto& node : it->second.node->getChildren()) {
-        if (node->getWidget()) widgets.emplace_back(node->getWidget());
+        if (const auto widget = node->getWidget().get()) widgets.emplace_back(widget);
     }
 
-    for (const auto& widget : widgets)
+    for (auto widget : widgets)
         widget->destroy();
 
     for (const auto& [name, group] : it->second.groups) {
