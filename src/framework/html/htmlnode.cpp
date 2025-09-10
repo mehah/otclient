@@ -172,7 +172,6 @@ void HtmlNode::detachFromCurrentParent(const HtmlNodePtr& child) {
     auto& vec = oldParent->children;
     for (size_t i = 0; i < vec.size(); ++i) {
         if (vec[i].get() == child.get()) {
-            // conserta prev/next dos vizinhos
             auto left = (i > 0) ? vec[i - 1] : nullptr;
             auto right = (i + 1 < vec.size()) ? vec[i + 1] : nullptr;
             if (left)  left->next.reset();
@@ -195,16 +194,13 @@ void HtmlNode::detachFromCurrentParent(const HtmlNodePtr& child) {
 void HtmlNode::attachChild(const HtmlNodePtr& child, size_t pos) {
     if (!child) return;
 
-    // se já tinha outro pai, destacamos primeiro
     if (auto oldParent = child->parent.lock()) {
         if (oldParent.get() != this) {
             detachFromCurrentParent(child);
         } else {
-            // mesmo pai: precisamos removê-lo antes de reinserir em outra posição
             auto& vec = children;
             for (size_t i = 0; i < vec.size(); ++i) {
                 if (vec[i].get() == child.get()) {
-                    // ajusta vizinhos
                     auto left = (i > 0) ? vec[i - 1] : nullptr;
                     auto right = (i + 1 < vec.size()) ? vec[i + 1] : nullptr;
                     if (left)  left->next.reset();
@@ -221,7 +217,6 @@ void HtmlNode::attachChild(const HtmlNodePtr& child, size_t pos) {
         }
     }
 
-    // ligações prev/next ao inserir
     if (!children.empty()) {
         if (pos == 0) {
             child->next = children.front();
@@ -242,10 +237,7 @@ void HtmlNode::attachChild(const HtmlNodePtr& child, size_t pos) {
     child->parent = shared_from_this();
     children.insert(children.begin() + pos, child);
 
-    // registra índices do documento (para semeadura de querySelector)
     registerInIndexes(child);
-
-    // caches de :nth-*
     invalidateIndexCachesUp(this);
 }
 
@@ -364,8 +356,6 @@ void HtmlNode::clear() {
     if (children.empty()) return;
 
     auto root = documentRoot();
-
-    // Remove todos filhos da árvore de índices
     for (auto& child : children) {
         unregisterSubtreeFromIndexes(child);
         child->parent.reset();
