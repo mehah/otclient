@@ -230,15 +230,15 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else throw OTMLException(node, fmt::format("Invalid display value '{}'", v));
 
             setDisplay(display);
-        } else if (node->tag() == "float") {
+        } else if (node->tag() == "overflow") {
             auto v = node->value<std::string>();
             stdext::tolower(v);
-            FloatType type = FloatType::None;
-            if (v == "left") type = FloatType::Left;
-            else if (v == "right") type = FloatType::Right;
-            else if (v == "inline-start") type = FloatType::InlineStart;
-            else if (v == "inline-end") type = FloatType::InlineEnd;
-            setFloat(type);
+            OverflowType type = OverflowType::Visible;
+            if (v == "hidden") type = OverflowType::Hidden;
+            else if (v == "scroll") type = OverflowType::Scroll;
+            else if (v == "auto") type = OverflowType::Auto;
+            else if (v == "clip") type = OverflowType::Clip;
+            setOverflow(type);
         } else if (node->tag() == "clear") {
             auto v = node->value<std::string>();
             ClearType clear = ClearType::None;

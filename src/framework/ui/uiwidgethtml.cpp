@@ -117,12 +117,6 @@ namespace {
             || d == DisplayType::TableRow;
     }
 
-    inline FloatType mapLogicalJustifyItem(JustifyItemsType j) {
-        if (j == JustifyItemsType::Left) return FloatType::Left;
-        if (j == JustifyItemsType::Right)   return FloatType::Right;
-        return FloatType::None;
-    }
-
     inline FloatType mapLogicalFloat(FloatType f) {
         if (f == FloatType::InlineStart) return FloatType::Left;
         if (f == FloatType::InlineEnd)   return FloatType::Right;
@@ -254,13 +248,7 @@ namespace {
 
             if (c->getDisplay() == DisplayType::None) { ++i; continue; }
 
-            FloatType cf = mapLogicalFloat(c->getFloat());
-            if (cf == FloatType::None) {
-                if (c->getParent()->getJustifyItems() != JustifyItemsType::Normal && supportsJustifyItems(c->getDisplay())) {
-                    cf = mapLogicalJustifyItem(c->getParent()->getJustifyItems());
-                }
-            }
-
+            const FloatType cf = mapLogicalFloat(c->getFloat());
             if (cf == FloatType::None) {
                 ctx.prevNonFloat = c.get(); ctx.prevNonFloatIdx = i;
             } else if (cf == FloatType::Left) {
@@ -455,7 +443,7 @@ namespace {
                 c->getHeightHtml().valueCalculed = c->getHeight();
                 c->getHeightHtml().updateId = UPDATE_EPOCH;
             }
-        } else/* if (c->getFloat() == FloatType::None || !ignoreSizeByFloat(c->getDisplay()))*/ {
+        } else if (c->getFloat() == FloatType::None || !ignoreSizeByFloat(c->getDisplay())) {
             const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
             const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
@@ -670,31 +658,41 @@ void UIWidget::applyAnchorAlignment() {
     const DisplayType parentDisplay = m_parent ? m_parent->m_displayType : DisplayType::Block;
 
     if (parentDisplay == DisplayType::InlineBlock || parentDisplay == DisplayType::Block || parentDisplay == DisplayType::TableCell) {
-        const auto anchor = m_childIndex == 1 ? "parent" : "prev";
-
         bool anchored = false;
-        if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getTextAlign() == Fw::AlignCenter || m_htmlNode->getType() == NodeType::Element && m_parent->getJustifyItems() == JustifyItemsType::Center) {
+        if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getTextAlign() == Fw::AlignCenter) {
             anchored = true;
-            addAnchor(Fw::AnchorHorizontalCenter, anchor, Fw::AnchorHorizontalCenter);
+            addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
         }
 
-        /*if (m_parent->getHtmlNode()->getStyle("align-items") == "center") {
+        if (m_htmlNode->getType() == NodeType::Element) {
+            if (m_parent->getJustifyItems() == JustifyItemsType::Center) {
+                anchored = true;
+                addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+            } if (m_parent->getJustifyItems() == JustifyItemsType::Left) {
+                anchored = true;
+                addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            } else if (m_parent->getJustifyItems() == JustifyItemsType::Right) {
+                anchored = true;
+                addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+            }
+        }
+
+        if (m_parent->getHtmlNode()->getStyle("align-items") == "center") {
             anchored = true;
-            addAnchor(Fw::AnchorVerticalCenter, anchor, Fw::AnchorVerticalCenter);
-        }*/
+            addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+        }
 
         if (anchored) {
-            addAnchor(Fw::AnchorTop, anchor, Fw::AnchorTop);
+            if (m_childIndex == 1)
+                addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+            else
+                addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
             return;
         }
     }
 
     FloatType effFloat = mapLogicalFloat(getFloat());
-    if (effFloat == FloatType::None) {
-        if (m_parent->m_JustifyItems != JustifyItemsType::Normal && supportsJustifyItems(m_displayType)) {
-            effFloat = mapLogicalJustifyItem(m_parent->m_JustifyItems);
-        }
-    } else if (isFlexContainer(parentDisplay) || isGridContainer(parentDisplay) || isTableContainer(parentDisplay)) {
+    if (isFlexContainer(parentDisplay) || isGridContainer(parentDisplay) || isTableContainer(parentDisplay)) {
         effFloat = FloatType::None;
     }
 

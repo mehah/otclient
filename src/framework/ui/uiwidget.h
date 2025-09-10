@@ -137,6 +137,15 @@ enum class JustifyItemsType : uint8_t
 
 enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
 
+enum class OverflowType : uint8_t
+{
+    Visible,
+    Hidden,
+    Scroll,
+    Auto,
+    Clip
+};
+
 struct SizeUnit
 {
     Unit unit = Unit::Px;
@@ -178,6 +187,7 @@ protected:
     FloatType m_floatType = FloatType::None;
     ClearType m_clearType = ClearType::None;
     JustifyItemsType m_JustifyItems = JustifyItemsType::Normal;
+    OverflowType m_overflowType = OverflowType::Visible;
 
     SizeUnit m_width;
     SizeUnit m_height;
@@ -266,6 +276,8 @@ public:
     void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
+    void setOverflow(OverflowType type) { m_overflowType = type; scheduleAnchorAlignment(); }
+
     void setHtmlId(uint32_t id) { m_htmlId = id; }
 
     auto getHtmlId() const { return m_htmlId; }

@@ -70,8 +70,10 @@ UIWidget::~UIWidget()
 
 void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
 {
+    auto clipping = isClipping() || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll);
+
     Rect oldClipRect;
-    if (isClipping()) {
+    if (clipping) {
         oldClipRect = g_drawPool.getClipRect();
         g_drawPool.setClipRect(visibleRect);
     }
@@ -84,7 +86,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     drawSelf(drawPane);
 
     if (!m_children.empty()) {
-        if (isClipping())
+        if (clipping)
             g_drawPool.setClipRect(visibleRect.intersection(getPaddingRect()));
 
         drawChildren(visibleRect, drawPane);
@@ -93,7 +95,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     if (m_rotation != 0.0f)
         g_drawPool.popTransformMatrix();
 
-    if (isClipping()) {
+    if (clipping) {
         g_drawPool.setClipRect(oldClipRect);
     }
 }
@@ -131,8 +133,10 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
             continue;
 
         const auto& childVisibleRect = visibleRect.intersection(child->getRect());
-        if (!childVisibleRect.isValid())
-            continue;
+        if (!isOnHtml() || (m_overflowType == OverflowType::Hidden || m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll)) {
+            if (!childVisibleRect.isValid())
+                continue;
+        }
 
         // store current graphics opacity
         const float oldOpacity = g_drawPool.getOpacity();
