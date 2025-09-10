@@ -340,12 +340,13 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         createRadioGroup(node, groups);
 }
 
-DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId) {
+UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId) {
     static std::vector<HtmlNodePtr> textNodes;
     textNodes.clear();
 
     auto path = "/modules/" + moduleName + "/";
 
+    UIWidgetPtr widget;
     for (const auto& node : node->getChildren()) {
         if (node->getTag() == "style") {
             root.sheets.emplace_back(css::parse(node->textContent()));
@@ -353,7 +354,7 @@ DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UI
             if (node->hasAttr("href")) {
                 root.sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
             }
-        } else createWidgetFromNode(node, parent, textNodes, htmlId, moduleName);
+        } else widget = createWidgetFromNode(node, parent, textNodes, htmlId, moduleName);
     }
 
     for (const auto& sheet : GLOBAL_STYLES)
@@ -370,7 +371,7 @@ DataRoot HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UI
         }
     }
 
-    return root;
+    return widget;
 }
 
 uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
@@ -387,7 +388,8 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
 
     static uint32_t ID = 0;
     ++ID;
-    return m_nodes.emplace(ID, readNode(root, root.node, parent, moduleName, htmlPath, false, ID)).first->first;
+    readNode(root, root.node, parent, moduleName, htmlPath, false, ID);
+    return m_nodes.emplace(ID, root).first->first;
 }
 
 UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId) {
@@ -396,17 +398,7 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
         nullptr;
     }
 
-    auto node = parseHtml(html);
-
-    auto root = readNode(it->second, node, parent, it->second.moduleName, "", false, htmlId);
-
-    for (const auto& node : node->getChildren()) {
-        if (node->getWidget()) {
-            return node->getWidget();
-        }
-    }
-
-    return nullptr;
+    return readNode(it->second, parseHtml(html), parent, it->second.moduleName, "", false, htmlId);
 }
 
 void HtmlManager::destroy(uint32_t id) {

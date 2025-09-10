@@ -423,43 +423,43 @@ namespace {
         }
     }
 
-    void fitContent(UIWidget* c, int& width, int& height) {
-        if ((c->hasProp(PropFitWidth) || c->hasProp(PropFitHeight)) && !c->getChildren().empty() &&
-            (c->getWidthHtml().updateId != UPDATE_EPOCH || c->getHeightHtml().updateId != UPDATE_EPOCH)) {
-            for (auto& w : c->getChildren()) {
-                fitContent(w.get(), width, height);
+    void fitContent(UIWidget* w, int& width, int& height) {
+        if ((w->hasProp(PropFitWidth) || w->hasProp(PropFitHeight)) && !w->getChildren().empty() &&
+            (w->getWidthHtml().updateId != UPDATE_EPOCH || w->getHeightHtml().updateId != UPDATE_EPOCH)) {
+            if (w->getFloat() == FloatType::None || !ignoreSizeByFloat(w->getDisplay())) {
+                for (auto& c : w->getChildren()) {
+                    const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
+
+                    const int c_width = std::max<int>(textSize.width(), c->getWidthHtml().valueCalculed) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
+                    if (breakLine(c->getDisplay())) {
+                        if (c_width > width)
+                            width = c_width;
+                    } else
+                        width += c_width;
+
+                    const int c_height = std::max<int>(textSize.height(), c->getHeightHtml().valueCalculed) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
+
+                    if (breakLine(c->getDisplay())) {
+                        height += c_height;
+                    } else
+                        if (c_height > height)
+                            height = c_height;
+                }
             }
 
-            if (c->hasProp(PropFitWidth) && c->getWidthHtml().updateId != UPDATE_EPOCH) {
-                c->setWidth_px(width + c->getPaddingLeft() + c->getPaddingRight());
-                c->setProp(PropFitWidth, false);
-                c->getWidthHtml().valueCalculed = c->getWidth();
-                c->getWidthHtml().updateId = UPDATE_EPOCH;
+            if (w->hasProp(PropFitWidth) && w->getWidthHtml().updateId != UPDATE_EPOCH) {
+                w->setWidth_px(width + w->getPaddingLeft() + w->getPaddingRight());
+                w->setProp(PropFitWidth, false);
+                w->getWidthHtml().valueCalculed = w->getWidth();
+                w->getWidthHtml().updateId = UPDATE_EPOCH;
             }
 
-            if (c->hasProp(PropFitHeight) && c->getHeightHtml().updateId != UPDATE_EPOCH) {
-                c->setHeight_px(height + (c->getChildren().size() + 1) + c->getPaddingTop() + c->getPaddingBottom());
-                c->setProp(PropFitHeight, false);
-                c->getHeightHtml().valueCalculed = c->getHeight();
-                c->getHeightHtml().updateId = UPDATE_EPOCH;
+            if (w->hasProp(PropFitHeight) && w->getHeightHtml().updateId != UPDATE_EPOCH) {
+                w->setHeight_px(height + w->getPaddingTop() + w->getPaddingBottom());
+                w->setProp(PropFitHeight, false);
+                w->getHeightHtml().valueCalculed = w->getHeight();
+                w->getHeightHtml().updateId = UPDATE_EPOCH;
             }
-        } else if (c->getFloat() == FloatType::None || !ignoreSizeByFloat(c->getDisplay())) {
-            const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
-
-            const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
-            if (breakLine(c->getDisplay())) {
-                if (c_width > width)
-                    width = c_width;
-            } else
-                width += c_width;
-
-            const int c_height = std::max<int>(textSize.height(), c->getHeight()) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
-
-            if (breakLine(c->getDisplay())) {
-                height += c_height;
-            } else
-                if (c_height > height)
-                    height = c_height;
         }
     };
 }
@@ -476,7 +476,7 @@ void UIWidget::refreshHtml(bool childrenTo) {
         if (parent->m_width.unit != Unit::Em && parent->m_width.unit != Unit::Px)
             parent->applyDimension(true, parent->m_width.unit, parent->m_width.value);
         if (parent->m_height.unit != Unit::Em && parent->m_height.unit != Unit::Px)
-            parent->applyDimension(false, parent->m_height.unit, parent->m_width.value);
+            parent->applyDimension(false, parent->m_height.unit, parent->m_height.value);
         parent = parent->m_parent.get();
     }
 }

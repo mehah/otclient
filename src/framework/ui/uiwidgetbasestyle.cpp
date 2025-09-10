@@ -239,6 +239,15 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "auto") type = OverflowType::Auto;
             else if (v == "clip") type = OverflowType::Clip;
             setOverflow(type);
+        } else if (node->tag() == "float") {
+            auto v = node->value<std::string>();
+            stdext::tolower(v);
+            FloatType type = FloatType::None;
+            if (v == "left") type = FloatType::Left;
+            else if (v == "right") type = FloatType::Right;
+            else if (v == "inline-start") type = FloatType::InlineStart;
+            else if (v == "inline-end") type = FloatType::InlineEnd;
+            setFloat(type);
         } else if (node->tag() == "clear") {
             auto v = node->value<std::string>();
             ClearType clear = ClearType::None;

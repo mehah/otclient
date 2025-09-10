@@ -13,6 +13,8 @@
     --border-draw-order: 0;
     --background-draw-order: 0;
     --image-color: white;
+    text-align: left;
+    overflow: visible;
 }
 
 input,
@@ -66,7 +68,6 @@ hr {
 span,
 label {
     --text-auto-resize: true;
-    text-align: left;
 }
 
 
