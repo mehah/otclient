@@ -455,7 +455,7 @@ namespace {
                 c->getHeightHtml().valueCalculed = c->getHeight();
                 c->getHeightHtml().updateId = UPDATE_EPOCH;
             }
-        } else if (c->getFloat() == FloatType::None || !ignoreSizeByFloat(c->getDisplay())) {
+        } else/* if (c->getFloat() == FloatType::None || !ignoreSizeByFloat(c->getDisplay()))*/ {
             const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
             const int c_width = std::max<int>(textSize.width(), c->getWidth()) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
