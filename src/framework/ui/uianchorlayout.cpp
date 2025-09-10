@@ -228,6 +228,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 horizontalMoved = true;
                 break;
             case Fw::AnchorLeft:
+
                 if (!horizontalMoved) {
                     newRect.moveLeft(point + widget->getMarginLeft());
                     horizontalMoved = true;
@@ -256,6 +257,9 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                         else
                             margin += hookedWidget->getMarginBottom();
                     }
+
+                    // Fix anchor position
+                    extraMarginTop += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
                 }
 
                 if (!verticalMoved) {
