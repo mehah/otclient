@@ -481,6 +481,7 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
                 animationEvent = nil
             end
             fixServerNoSend0xF2()
+            g_game.sendRequestStorePremiumBoost() --reabrir a store para parar de bugar a compra da xpboost
         end, 2000)
     end
 end
