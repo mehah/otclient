@@ -1,6 +1,18 @@
 * {
     height: auto;
     width: auto;
+    color: white;
+    background-color: alpha;
+    opacity: 1.0;
+    rotate: 0;
+    --icon-color: white;
+    --icon-align: none;
+    --text-draw-order: 0;
+    --image-draw-order: 0;
+    --icon-draw-order: 0;
+    --border-draw-order: 0;
+    --background-draw-order: 0;
+    --image-color: white;
 }
 
 input,
