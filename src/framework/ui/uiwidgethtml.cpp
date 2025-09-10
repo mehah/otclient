@@ -661,22 +661,22 @@ void UIWidget::applyAnchorAlignment() {
     const DisplayType parentDisplay = m_parent ? m_parent->m_displayType : DisplayType::Block;
 
     if (parentDisplay == DisplayType::InlineBlock || parentDisplay == DisplayType::Block || parentDisplay == DisplayType::TableCell) {
-        if (m_childIndex == 1) {
-            bool anchored = false;
-            if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getTextAlign() == Fw::AlignCenter || m_htmlNode->getType() == NodeType::Element && m_parent->getJustifyItems() == JustifyItemsType::Center) {
-                anchored = true;
-                addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
-            }
+        const auto anchor = m_childIndex == 1 ? "parent" : "prev";
 
-            if (m_parent->getHtmlNode()->getStyle("align-items") == "center") {
-                anchored = true;
-                addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
-            }
+        bool anchored = false;
+        if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getTextAlign() == Fw::AlignCenter || m_htmlNode->getType() == NodeType::Element && m_parent->getJustifyItems() == JustifyItemsType::Center) {
+            anchored = true;
+            addAnchor(Fw::AnchorHorizontalCenter, anchor, Fw::AnchorHorizontalCenter);
+        }
 
-            if (anchored) {
-                addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
-                return;
-            }
+        /*if (m_parent->getHtmlNode()->getStyle("align-items") == "center") {
+            anchored = true;
+            addAnchor(Fw::AnchorVerticalCenter, anchor, Fw::AnchorVerticalCenter);
+        }*/
+
+        if (anchored) {
+            addAnchor(Fw::AnchorTop, anchor, Fw::AnchorTop);
+            return;
         }
     }
 
