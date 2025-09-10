@@ -174,6 +174,17 @@ UIWidgetPtr UIWidget::prepend(const std::string& html) {
     return insert(1, html);
 }
 
+size_t UIWidget::remove(const std::string& queryString) {
+    if (!isOnHtml()) return 0;
+
+    const auto& nodes = querySelectorAll(queryString);
+    for (const auto& node : nodes) {
+        node->destroy();
+    }
+
+    return nodes.size();
+}
+
 void UIWidget::addChild(const UIWidgetPtr& child)
 {
     if (!child) {
