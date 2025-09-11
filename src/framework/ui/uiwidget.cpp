@@ -2068,10 +2068,13 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
         }
     }
 
-    widgetList.emplace_back(static_self_cast<UIWidget>());
+    if (!isIgnoreEvent()) {
+        widgetList.emplace_back(static_self_cast<UIWidget>());
 
-    if (!isPhantom())
-        ret = true;
+        if (!isPhantom())
+            ret = true;
+    }
+
     return ret;
 }
 

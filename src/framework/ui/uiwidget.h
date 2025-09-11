@@ -80,6 +80,7 @@ enum FlagProp : uint64_t
     PropWidthAuto = 1 << 29,
     PropWidthPercent = 1 << 30,
     PropHeightPercent = static_cast<uint64_t>(1) << 31,
+    PropIgnoreMouseEvent = static_cast<uint64_t>(1) << 32,
 };
 
 enum class DisplayType : uint8_t
@@ -277,6 +278,7 @@ public:
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
     void setOverflow(OverflowType type) { m_overflowType = type; scheduleAnchorAlignment(); }
+    void setIgnoreEvent(const bool v) { setProp(PropIgnoreMouseEvent, v); }
 
     void setHtmlId(uint32_t id) { m_htmlId = id; }
 
@@ -447,6 +449,7 @@ public:
     bool isClipping() { return hasProp(PropClipping); }
     bool isDestroyed() { return hasProp(PropDestroyed); }
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
+    bool isIgnoreEvent() { return hasProp(PropIgnoreMouseEvent); }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
     bool isLastChild() { return m_parent && m_childIndex == static_cast<int32_t>(m_parent->m_children.size()); }

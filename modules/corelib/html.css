@@ -17,9 +17,8 @@
     overflow: visible;
 }
 
-input,
-textarea {
-    --text-auto-resize: false;
+button {
+    text-align: center;
 }
 
 input[type=radio],

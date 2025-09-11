@@ -258,8 +258,12 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
         createWidgetFromNode(child, widget, textNodes, htmlId, moduleName);
     }
 
-    if (node->getType() == NodeType::Text)
+    if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);
+        widget->setIgnoreEvent(true);
+        widget->setFocusable(false);
+        widget->setPhantom(true);
+    }
 
     return widget;
 }
@@ -354,7 +358,8 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
             if (node->hasAttr("href")) {
                 root.sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
             }
-        } else widget = createWidgetFromNode(node, parent, textNodes, htmlId, moduleName);
+        } else if (node->getTag() == "html")
+            widget = createWidgetFromNode(node, parent, textNodes, htmlId, moduleName);
     }
 
     for (const auto& sheet : GLOBAL_STYLES)
