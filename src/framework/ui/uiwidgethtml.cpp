@@ -648,12 +648,27 @@ void UIWidget::applyAnchorAlignment() {
         }
 
         if (anchored) {
-            if (m_childIndex == 1)
+            auto findPrevNonFloat = [this]() -> UIWidget* {
+                if (!m_parent) return nullptr;
+                for (int i = m_childIndex - 2; i >= 0; --i) {
+                    if (const auto sib = m_parent->getChildren()[i].get()) {
+                        if (sib->getDisplay() != DisplayType::None && mapLogicalFloat(sib->getFloat()) == FloatType::None)
+                            return sib;
+                    }
+                }
+                return nullptr;
+            };
+
+            UIWidget* ref = findPrevNonFloat();
+
+            if (!ref) {
                 addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
-            else if (isInlineLike(m_displayType) && isInlineLike(getPrevWidget()->getDisplay()))
-                addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
-            else
-                addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
+            } else {
+                if (isInlineLike(m_displayType) && isInlineLike(ref->getDisplay()))
+                    addAnchor(Fw::AnchorTop, ref->getId(), Fw::AnchorTop);
+                else
+                    addAnchor(Fw::AnchorTop, ref->getId(), Fw::AnchorBottom);
+            }
             return;
         }
     }
