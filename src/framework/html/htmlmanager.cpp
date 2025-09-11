@@ -247,7 +247,16 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
     widget->setHtmlNode(node);
     widget->setHtmlId(htmlId);
 
-    widget->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName);
+    if (node->getType() == NodeType::Text) {
+        textNodes.emplace_back(node);
+        widget->setIgnoreEvent(true);
+        widget->setFocusable(false);
+        widget->setPhantom(true);
+    }
+
+    if (node->isExpression()) {
+        node->setAttr("*text", node->getText());
+    }
 
     if (!node->getText().empty()) {
         widget->setTextAutoResize(true);
@@ -258,12 +267,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
         createWidgetFromNode(child, widget, textNodes, htmlId, moduleName);
     }
 
-    if (node->getType() == NodeType::Text) {
-        textNodes.emplace_back(node);
-        widget->setIgnoreEvent(true);
-        widget->setFocusable(false);
-        widget->setPhantom(true);
-    }
+    widget->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName);
 
     return widget;
 }

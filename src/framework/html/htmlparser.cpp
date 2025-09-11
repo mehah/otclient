@@ -289,10 +289,61 @@ HtmlNodePtr parseHtml(const std::string& html) {
                     if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
                         parent->text += decoded;
                     } else {
-                        auto t = std::make_shared<HtmlNode>();
-                        t->type = NodeType::Text;
-                        t->text = decoded;
-                        push_node(t);
+                        size_t p = 0;
+                        while (p < decoded.size()) {
+                            size_t open = decoded.find("{{", p);
+                            if (open == std::string::npos) {
+                                std::string literal = decoded.substr(p);
+                                if (!literal.empty()) {
+                                    auto t = std::make_shared<HtmlNode>();
+                                    t->type = NodeType::Text;
+                                    t->text = literal;
+                                    t->setExpression(false);
+                                    push_node(t);
+                                }
+                                break;
+                            }
+
+                            if (open > p) {
+                                std::string literal = decoded.substr(p, open - p);
+                                if (!literal.empty()) {
+                                    auto t = std::make_shared<HtmlNode>();
+                                    t->type = NodeType::Text;
+                                    t->text = literal;
+                                    t->setExpression(false);
+                                    push_node(t);
+                                }
+                            }
+
+                            size_t close = decoded.find("}}", open + 2);
+                            if (close == std::string::npos) {
+                                std::string literal = decoded.substr(open);
+                                if (!literal.empty()) {
+                                    auto t = std::make_shared<HtmlNode>();
+                                    t->type = NodeType::Text;
+                                    t->text = literal;
+                                    t->setExpression(false);
+                                    push_node(t);
+                                }
+                                break;
+                            }
+
+                            std::string expr = decoded.substr(open + 2, close - (open + 2));
+                            size_t l = 0, r = expr.size();
+                            while (l < r && (unsigned char)expr[l] <= ' ') ++l;
+                            while (r > l && (unsigned char)expr[r - 1] <= ' ') --r;
+                            expr = expr.substr(l, r - l);
+
+                            if (!expr.empty()) {
+                                auto t = std::make_shared<HtmlNode>();
+                                t->type = NodeType::Text;
+                                t->text = expr;
+                                t->setExpression(true);
+                                push_node(t);
+                            }
+
+                            p = close + 2;
+                        }
                     }
                 }
             }

@@ -106,10 +106,13 @@ public:
     void remove(const HtmlNodePtr& child);
     void clear();
 
-public:
     bool isHovered{ false };
     bool isFocused{ false };
     bool isActive{ false };
+
+    bool isExpression() const { return m_isExpression; }
+    void setExpression(bool v) { m_isExpression = v; }
+
 private:
     NodeType type{ NodeType::Element };
     std::string tag;
@@ -131,6 +134,8 @@ private:
 
     mutable int cacheIndexAmongElements = -1;
     mutable int cacheIndexAmongType = -1;
+
+    bool m_isExpression{ false };
 
 private:
     void attachChild(const HtmlNodePtr& child, size_t pos);
