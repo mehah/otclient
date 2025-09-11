@@ -285,3 +285,8 @@ function UIWidget:onCreateByHTML(attrs, controllerName)
         end
     end
 end
+
+function UIWidget:__scriptHtml(moduleName, script)
+    local f = loadstring('return function(self) ' .. script .. ' end')
+    f()(G_CONTROLLER_CALLED[moduleName])
+end

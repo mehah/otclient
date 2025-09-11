@@ -354,6 +354,8 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
 
     auto path = "/modules/" + moduleName + "/";
 
+    std::string script;
+
     UIWidgetPtr widget;
     for (const auto& el : node->getChildren()) {
         if (el->getTag() == "style") {
@@ -362,11 +364,11 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
             if (el->hasAttr("href")) {
                 root.sheets.emplace_back(css::parse(g_resources.readFileContents(path + el->getAttr("href"))));
             }
+        } else if (el->getTag() == "script") {
+            script = el->getText();
         } else if (el->getTag() == "html") {
-            if (isDynamic) {
-                for (const auto& n : el->getChildren())
-                    widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName);
-            } else  widget = createWidgetFromNode(el, parent, textNodes, htmlId, moduleName);
+            for (const auto& n : el->getChildren())
+                widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName);
         }
     }
 
@@ -383,6 +385,9 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
             applyAttributesAndStyles(widget, node.get(), root.groups, moduleName);
         }
     }
+
+    if (widget && !script.empty())
+        widget->callLuaField("__scriptHtml", moduleName, script);
 
     return widget;
 }
