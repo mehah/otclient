@@ -217,6 +217,7 @@ namespace {
             if (c.get() == self) break;
 
             if (c->getDisplay() == DisplayType::None) { ++i; continue; }
+            if (!c->getResultConditionIf()) { ++i; continue; }
 
             const FloatType cf = mapLogicalFloat(c->getFloat());
             if (cf == FloatType::None) {
@@ -540,9 +541,7 @@ void UIWidget::scheduleUpdateSize() {
 
 void UIWidget::setDisplay(DisplayType type) {
     m_displayType = type;
-    const bool show = m_displayType != DisplayType::None;
-    setVisible(show);
-    if (show)scheduleAnchorAlignment();
+    scheduleAnchorAlignment();
 }
 
 void UIWidget::updateSize() {
@@ -652,7 +651,9 @@ void UIWidget::applyAnchorAlignment() {
                 if (!m_parent) return nullptr;
                 for (int i = m_childIndex - 2; i >= 0; --i) {
                     if (const auto sib = m_parent->getChildren()[i].get()) {
-                        if (sib->getDisplay() != DisplayType::None && mapLogicalFloat(sib->getFloat()) == FloatType::None)
+                        if (sib->getDisplay() != DisplayType::None &&
+                            sib->getResultConditionIf() &&
+                            mapLogicalFloat(sib->getFloat()) == FloatType::None)
                             return sib;
                     }
                 }

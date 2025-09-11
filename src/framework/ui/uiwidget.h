@@ -282,6 +282,7 @@ public:
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
     void setResultConditionIf(bool v) {
         setProp(PropConditionIf, v);
+        scheduleAnchorAlignment();
     }
 
     bool getResultConditionIf() { return hasProp(PropConditionIf); }

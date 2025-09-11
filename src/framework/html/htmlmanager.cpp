@@ -273,43 +273,6 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 }
 
 void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups, const std::string& moduleName) {
-    for (const auto [key, v] : node->getAttributesMap()) {
-        auto attr = key;
-        auto value = v;
-        translateAttribute(widget->getStyleName(), node->getTag(), attr, value);
-
-        if (attr.starts_with("on")) {
-            // lua call
-        } else if (attr == "anchor") {
-            // ignore
-        } else if (attr == "style") {
-            parseAttrPropList(value, node->getAttrStyles());
-        } else if (attr == "layout") {
-            auto otml = std::make_shared<OTMLNode>();
-            auto layout = std::make_shared<OTMLNode>();
-
-            std::map<std::string, std::string> styles;
-            parseAttrPropList(value, styles);
-            for (const auto& [tag, value] : styles) {
-                auto nodeAttr = std::make_shared<OTMLNode>();
-                nodeAttr->setTag(tag);
-                nodeAttr->setValue(value);
-                layout->addChild(nodeAttr);
-            }
-
-            layout->setTag("layout");
-            otml->addChild(layout);
-            widget->mergeStyle(otml);
-        } else if (attr == "class") {
-            for (const auto& className : stdext::split(value, " ")) {
-                if (const auto& style = g_ui.getStyle(className))
-                    widget->mergeStyle(style);
-            }
-        } else {
-            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value, moduleName);
-        }
-    }
-
     auto styles = std::make_shared<OTMLNode>();
 
     std::map<std::string, std::string> stylesMerge;
@@ -346,6 +309,43 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
 
     if (node->getTag() == "input" && node->getAttr("type") == "radio")
         createRadioGroup(node, groups);
+
+    for (const auto [key, v] : node->getAttributesMap()) {
+        auto attr = key;
+        auto value = v;
+        translateAttribute(widget->getStyleName(), node->getTag(), attr, value);
+
+        if (attr.starts_with("on")) {
+            // lua call
+        } else if (attr == "anchor") {
+            // ignore
+        } else if (attr == "style") {
+            parseAttrPropList(value, node->getAttrStyles());
+        } else if (attr == "layout") {
+            auto otml = std::make_shared<OTMLNode>();
+            auto layout = std::make_shared<OTMLNode>();
+
+            std::map<std::string, std::string> styles;
+            parseAttrPropList(value, styles);
+            for (const auto& [tag, value] : styles) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(tag);
+                nodeAttr->setValue(value);
+                layout->addChild(nodeAttr);
+            }
+
+            layout->setTag("layout");
+            otml->addChild(layout);
+            widget->mergeStyle(otml);
+        } else if (attr == "class") {
+            for (const auto& className : stdext::split(value, " ")) {
+                if (const auto& style = g_ui.getStyle(className))
+                    widget->mergeStyle(style);
+            }
+        } else {
+            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value, moduleName);
+        }
+    }
 }
 
 UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, bool isDynamic, uint32_t htmlId) {
