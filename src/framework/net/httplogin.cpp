@@ -292,8 +292,6 @@ bool LoginHttp::parseJsonResponse(const std::string& body) {
     if (cancelled.load()) return false;
     json responseJson;
     try {
-        //Force reproduce #1034 issue. Remove after finish tests
-        std::this_thread::sleep_for(std::chrono::seconds(5));
         if (cancelled.load()) return false;
         responseJson = json::parse(body);
     } catch (...) {
