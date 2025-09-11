@@ -28,36 +28,6 @@ namespace {
     static bool FLUSH_PENDING = false;
     std::vector<UIWidgetPtr> WIDGET_QUEUE;
 
-    inline bool supportsJustifyItems(DisplayType d) {
-        switch (d) {
-            case DisplayType::Block:
-            case DisplayType::InlineBlock:
-            case DisplayType::Grid:
-            case DisplayType::InlineGrid:
-            case DisplayType::TableCell:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    inline bool ignoreSizeByFloat(DisplayType d) {
-        switch (d) {
-            case DisplayType::Block:
-            case DisplayType::InlineBlock:
-            case DisplayType::Table:
-            case DisplayType::TableRow:
-            case DisplayType::TableRowGroup:
-            case DisplayType::TableHeaderGroup:
-            case DisplayType::TableFooterGroup:
-            case DisplayType::TableColumnGroup:
-            case DisplayType::TableColumn:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     inline bool isInlineLike(DisplayType d) {
         switch (d) {
             case DisplayType::Inline:
@@ -426,8 +396,8 @@ namespace {
     void fitContent(UIWidget* w, int& width, int& height) {
         if ((w->hasProp(PropFitWidth) || w->hasProp(PropFitHeight)) && !w->getChildren().empty() &&
             (w->getWidthHtml().updateId != UPDATE_EPOCH || w->getHeightHtml().updateId != UPDATE_EPOCH)) {
-            if (w->getFloat() == FloatType::None || !ignoreSizeByFloat(w->getDisplay())) {
-                for (auto& c : w->getChildren()) {
+            for (auto& c : w->getChildren()) {
+                if (c->getFloat() == FloatType::None) {
                     const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
                     const int c_width = std::max<int>(textSize.width(), c->getWidthHtml().valueCalculed) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
