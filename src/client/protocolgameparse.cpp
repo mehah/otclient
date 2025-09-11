@@ -5492,14 +5492,13 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
 
     for (auto i = 0; i < itemsSentCount; ++i) {
         const uint16_t itemId = msg->getU16();
-        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
-        if (!thing) {
-            continue;
-        }
-        const uint16_t classification = thing->getClassification();
         uint8_t itemTier = 0;
-        if (classification > 0) {
-            itemTier = msg->getU8();
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        if (thing) {
+            const uint16_t classification = thing->getClassification();
+            if (classification > 0) {
+                itemTier = msg->getU8();
+            }
         }
 
         const uint16_t count = msg->getU16();
@@ -5659,17 +5658,21 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
 void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
 {
     uint16_t var = 0;
+    uint8_t itemTier = 0;
     if (g_game.getClientVersion() >= 1281) {
         var = msg->getU8();
         if (var == 3) {
-            var = msg->getU16();
-            const auto& item = Item::create(var);
-            if (item && item->getClassification() > 0) {
-                msg->getU8();
+            var = msg->getU16(); // itemId
+            const auto& thing = g_things.getThingType(var, ThingCategoryItem);
+            if (thing) {
+                const uint16_t classification = thing->getClassification();
+                if (classification > 0) {
+                    itemTier = msg->getU8();
+                }
             }
         }
     } else {
-        var = msg->getU16();
+        var = msg->getU16(); // itemId
     }
 
     const uint32_t buyOfferCount = msg->getU32();
@@ -5688,7 +5691,7 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     std::vector<std::string> nameOffers;
 
     for (const auto& offer : offers) {
-        std::vector<uint64_t> intOffer = { offer.action, offer.amount, offer.counter, offer.itemId, offer.price, offer.state, offer.timestamp, offer.var };
+        std::vector<uint64_t> intOffer = { offer.action, offer.amount, offer.counter, offer.itemId, offer.price, offer.state, offer.timestamp, offer.var, offer.itemTier };
         const auto& playerName = offer.playerName;
         intOffers.push_back(intOffer);
         nameOffers.push_back(playerName);

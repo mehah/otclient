@@ -67,7 +67,7 @@ function MarketProtocol.sendMarketBrowse(browseId, itemId, tier)
                 msg:addU8(tier)
             end
         else
-            msg:addU16(tier)
+            msg:addU16(itemId)
         end
         send(msg)
     else
@@ -76,8 +76,16 @@ function MarketProtocol.sendMarketBrowse(browseId, itemId, tier)
 end
 
 function MarketProtocol.sendMarketBrowseMyOffers()
-    MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 0, 0)
+    if g_game.getClientVersion() >= 1251 then
+        MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 0, 0)
+    else
+        MarketProtocol.sendMarketBrowse(0, MarketRequest.OldMyOffers, 0)
+    end
 end
 function MarketProtocol.sendMarketBrowseOfferHistory()
-    MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 0, 0)
+    if g_game.getClientVersion() >= 1251 then
+        MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 0, 0)
+    else
+        MarketProtocol.sendMarketBrowse(0, MarketRequest.OldMyHistory, 0)
+    end
 end

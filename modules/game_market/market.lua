@@ -83,6 +83,7 @@ marketOffers = {}
 marketItems = {}
 information = {}
 currentItems = {}
+local MarketOffers2 = {}
 lastCreatedOffer = 0
 fee = 0
 averagePrice = 0
@@ -190,6 +191,7 @@ local function addOffer(offer, offerType)
     if not offer then
         return false
     end
+    local version = g_game.getClientVersion()
     local id = offer:getId()
     local player = offer:getPlayer()
     local amount = offer:getAmount()
@@ -198,7 +200,9 @@ local function addOffer(offer, offerType)
     local itemName = offer:getItem():getMarketData().name
     local action = offer:getState()
     local tier = offer:getTier() or 0
-
+    local MyOffers = (version >= 1251) and MarketRequest.MyOffers or MarketRequest.OldMyOffers
+    local MyHistory = (version >= 1251) and MarketRequest.MyHistory or MarketRequest.OldMyHistory
+    
     buyOfferTable:toggleSorting(false)
     sellOfferTable:toggleSorting(false)
 
@@ -217,7 +221,7 @@ local function addOffer(offer, offerType)
         end
 
         local row = nil
-        if offer.var == MarketRequest.MyOffers then
+        if offer.var == MyOffers then
             row = buyMyOfferTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
@@ -230,7 +234,7 @@ local function addOffer(offer, offerType)
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
             }})
-        elseif offer.var == MarketRequest.MyHistory then
+        elseif offer.var == MyHistory then
             row = buyMyHistoryTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
@@ -268,7 +272,7 @@ local function addOffer(offer, offerType)
         end
 
         local row = nil
-        if offer.var == MarketRequest.MyOffers then
+        if offer.var == MyOffers then
             row = sellMyOfferTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
@@ -281,7 +285,7 @@ local function addOffer(offer, offerType)
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
             }})
-        elseif offer.var == MarketRequest.MyHistory then
+        elseif offer.var == MyHistory then
             row = sellMyHistoryTable:addRow({{
                 text = itemName .. " (Tier " .. tier .. ")"
             }, {
@@ -1548,6 +1552,12 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
     if g_game.isOnline() then
         marketWindow:lock()
         marketWindow:show()
+        if not g_game.getFeature(GameThingUpgradeClassification) then
+            classList:hide()
+            tierList:hide()
+            classList:setHeight(0)
+            tierList:setHeight(0)
+        end
     end
 end
 
@@ -1558,8 +1568,6 @@ end
 function Market.onMarketDetail(itemId, descriptions, purchaseStats, saleStats, itemTier)
     updateDetails(itemId, descriptions, purchaseStats, saleStats, itemTier)
 end
-
-MarketOffers2 = {}
 
 function Market.onMarketBrowse(intOffers, nameOffers)
     updateOffers(MarketOffers2)
