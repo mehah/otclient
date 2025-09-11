@@ -69,9 +69,11 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     }
     // load styles used by all widgets
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "inheritText") {
-            if (m_htmlNode && node->value<bool>())
-                setText(m_htmlNode->getText());
+        if (node->tag() == "inherit-text") {
+            if (m_htmlNode && node->value<bool>()) {
+                setText(m_htmlNode->textContent());
+                destroyChildren();
+            }
         } else if (node->tag() == "background-draw-order")
             setBackgroundDrawOrder(node->value<int>());
         else if (node->tag() == "border-draw-order")

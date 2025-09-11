@@ -18,6 +18,7 @@
 }
 
 button {
+    --inherit-text: true;
     text-align: center;
 }
 
