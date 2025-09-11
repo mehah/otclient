@@ -101,7 +101,7 @@ private:
         ADDED,
         MERGING,
         MERGED,
-    };;
+    };
 
     // Thread Events
     struct ThreadTask
