@@ -188,7 +188,7 @@ protected:
     FloatType m_floatType = FloatType::None;
     ClearType m_clearType = ClearType::None;
     JustifyItemsType m_JustifyItems = JustifyItemsType::Normal;
-    OverflowType m_overflowType = OverflowType::Visible;
+    OverflowType m_overflowType = OverflowType::Hidden;
 
     SizeUnit m_width;
     SizeUnit m_height;
