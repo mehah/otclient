@@ -393,27 +393,26 @@ namespace {
         }
     }
 
-    void fitContent(UIWidget* w, int& width, int& height) {
+    void fitContent(UIWidget* w) {
         if ((w->hasProp(PropFitWidth) || w->hasProp(PropFitHeight)) && !w->getChildren().empty() &&
             (w->getWidthHtml().updateId != UPDATE_EPOCH || w->getHeightHtml().updateId != UPDATE_EPOCH)) {
+            int width = 0;
+            int height = 0;
             for (auto& c : w->getChildren()) {
                 if (c->getFloat() == FloatType::None) {
                     const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
-                    const int c_width = std::max<int>(textSize.width(), c->getWidthHtml().valueCalculed) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
+                    const int c_width = std::max<int>(textSize.width(), std::max<int>(c->getWidth(), c->getWidthHtml().valueCalculed)) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
                     if (breakLine(c->getDisplay())) {
                         if (c_width > width)
                             width = c_width;
-                    } else
-                        width += c_width;
+                    } else  width += c_width;
 
-                    const int c_height = std::max<int>(textSize.height(), c->getHeightHtml().valueCalculed) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
-
-                    if (breakLine(c->getDisplay())) {
+                    const int c_height = std::max<int>(textSize.height(), std::max<int>(c->getHeight(), c->getHeightHtml().valueCalculed)) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
+                    if (breakLine(c->getDisplay()) || c->getPrevWidget() && breakLine(c->getPrevWidget()->getDisplay())) {
                         height += c_height;
-                    } else
-                        if (c_height > height)
-                            height = c_height;
+                    } else if (c_height > height)
+                        height = c_height;
                 }
             }
 
@@ -590,9 +589,7 @@ void UIWidget::updateSize() {
         return;
     }
 
-    int width = 0;
-    int height = 0;
-    fitContent(this, width, height);
+    fitContent(this);
 }
 
 void UIWidget::scheduleAnchorAlignment() {
