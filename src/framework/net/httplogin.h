@@ -59,6 +59,8 @@ public:
                                   const std::string& email,
                                   const std::string& password);
 
+    void cancel();
+
     enum Result : int { Success = 200, Error = -1 };
 
 private:
@@ -66,4 +68,5 @@ private:
     std::string worlds;
     std::string session;
     std::string errorMessage;
+    std::atomic<bool> cancelled;
 };
