@@ -106,9 +106,9 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName)
         value = true
     elseif value == 'false' then
         value = false
+    else
+        value = tonumber(value) or toboolean(value) or value
     end
-
-    value = tonumber(value) or toboolean(value) or value
 
     local method = self['set' .. setterName]
     if method then
@@ -247,7 +247,6 @@ function UIWidget:onCreateByHTML(attrs, controllerName)
     for attr, v in pairs(attrs) do
         if attr:starts('on') then
             parseEvents(self, attr:lower(), v, controller)
-            return
         end
     end
 

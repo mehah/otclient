@@ -81,6 +81,7 @@ enum FlagProp : uint64_t
     PropWidthPercent = 1 << 30,
     PropHeightPercent = static_cast<uint64_t>(1) << 31,
     PropIgnoreMouseEvent = static_cast<uint64_t>(1) << 32,
+    PropConditionIf = static_cast<uint64_t>(1) << 33,
 };
 
 enum class DisplayType : uint8_t
@@ -278,7 +279,12 @@ public:
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
     void setOverflow(OverflowType type) { m_overflowType = type; scheduleAnchorAlignment(); }
-    void setIgnoreEvent(const bool v) { setProp(PropIgnoreMouseEvent, v); }
+    void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
+    void setResultConditionIf(bool v) {
+        setProp(PropConditionIf, v);
+    }
+
+    bool getResultConditionIf() { return hasProp(PropConditionIf); }
 
     void setHtmlId(uint32_t id) { m_htmlId = id; }
 

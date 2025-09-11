@@ -51,6 +51,7 @@ UIWidget::UIWidget()
     setProp(PropVisible, true, false);
     setProp(PropFocusable, true, false);
     setProp(PropFirstOnStyle, true, false);
+    setProp(PropConditionIf, true, false);
 
     m_clickTimer.stop();
 
@@ -131,19 +132,19 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
             continue;
 
         auto childVisibleRect = visibleRect;
+        if (child->getDisplay() == DisplayType::None || !child->getResultConditionIf())
+            continue;
 
-        if (child->getDisplay() != DisplayType::None) {
-            if (!child->isOnHtml() && !child->getRect().isValid())
+        if (!child->isOnHtml() && !child->getRect().isValid())
+            continue;
+
+        childVisibleRect = visibleRect.intersection(child->getRect());
+        if (!childVisibleRect.isValid()) {
+            if (m_overflowType != OverflowType::Visible) {
                 continue;
-
-            auto childVisibleRect = visibleRect.intersection(child->getRect());
-            if (!childVisibleRect.isValid()) {
-                if (m_overflowType != OverflowType::Visible) {
-                    continue;
-                }
-
-                childVisibleRect = visibleRect;
             }
+
+            childVisibleRect = visibleRect;
         }
 
         // store current graphics opacity

@@ -126,7 +126,7 @@ void translateAttribute(std::string_view styleName, std::string_view tagName, st
     if (attr == "*style") {
         attr = "*mergeStyle";
     } else if (attr == "*if") {
-        attr = "*visible";
+        attr = "*condition-if";
     }
 
     if (styleName != "CheckBox" && styleName != "ComboBox") {
