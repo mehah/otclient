@@ -88,7 +88,7 @@ public:
     uint16_t getBlessings() { return m_blessings; }
     uint16_t getRegenerationTime() { return m_regenerationTime; }
     uint16_t getOfflineTrainingTime() { return m_offlineTrainingTime; }
-    uint16_t getStoreExpBoostTime() { return m_offlineTrainingTime; }
+    uint16_t getStoreExpBoostTime() { return m_storeExpBoostTime; }
 
     uint32_t getStates() { return m_states; }
     uint32_t getMana() { return m_mana; }
