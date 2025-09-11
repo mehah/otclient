@@ -70,10 +70,8 @@ UIWidget::~UIWidget()
 
 void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
 {
-    auto clipping = isClipping() || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll);
-
     Rect oldClipRect;
-    if (clipping) {
+    if (isClipping()) {
         oldClipRect = g_drawPool.getClipRect();
         g_drawPool.setClipRect(visibleRect);
     }
@@ -86,7 +84,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     drawSelf(drawPane);
 
     if (!m_children.empty()) {
-        if (clipping)
+        if (isClipping())
             g_drawPool.setClipRect(visibleRect.intersection(getPaddingRect()));
 
         drawChildren(visibleRect, drawPane);
@@ -95,7 +93,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     if (m_rotation != 0.0f)
         g_drawPool.popTransformMatrix();
 
-    if (clipping) {
+    if (isClipping()) {
         g_drawPool.setClipRect(oldClipRect);
     }
 }
@@ -126,23 +124,19 @@ void UIWidget::drawSelf(const DrawPoolType drawPane)
 
 void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane)
 {
-    const auto hiddenChildren = !isOnHtml() || (m_overflowType == OverflowType::Hidden || m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll);
-
     // draw children
     for (const auto& child : m_children) {
         // render only visible children with a valid rect inside parent rect
-        if (!child || !child->isExplicitlyVisible() || child->getOpacity() <= Fw::MIN_ALPHA)
+        if (!child || !child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() <= Fw::MIN_ALPHA)
             continue;
 
-        auto childVisibleRect = visibleRect;
-
-        if (hiddenChildren && child->m_overflowType != OverflowType::Visible) {
-            if (!child->getRect().isValid())
+        auto childVisibleRect = visibleRect.intersection(child->getRect());
+        if (!childVisibleRect.isValid()) {
+            if (m_overflowType != OverflowType::Visible) {
                 continue;
+            }
 
-            childVisibleRect = visibleRect.intersection(child->getRect());
-            if (!childVisibleRect.isValid())
-                continue;
+            childVisibleRect = visibleRect;
         }
 
         // store current graphics opacity

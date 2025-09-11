@@ -629,12 +629,10 @@ void UIWidget::applyAnchorAlignment() {
 
     if (parentDisplay == DisplayType::InlineBlock || parentDisplay == DisplayType::Block || parentDisplay == DisplayType::TableCell) {
         bool anchored = false;
-        if ((m_displayType == DisplayType::Inline || m_displayType == DisplayType::InlineBlock) && m_parent->getTextAlign() == Fw::AlignCenter) {
+        if (isInlineLike(m_displayType) && m_parent->getTextAlign() == Fw::AlignCenter) {
             anchored = true;
             addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
-        }
-
-        if (m_htmlNode->getType() == NodeType::Element) {
+        } else if (m_htmlNode->getType() == NodeType::Element) {
             if (m_parent->getJustifyItems() == JustifyItemsType::Center) {
                 anchored = true;
                 addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
@@ -655,6 +653,8 @@ void UIWidget::applyAnchorAlignment() {
         if (anchored) {
             if (m_childIndex == 1)
                 addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+            else if (isInlineLike(m_displayType) && isInlineLike(getPrevWidget()->getDisplay()))
+                addAnchor(Fw::AnchorTop, "prev", Fw::AnchorTop);
             else
                 addAnchor(Fw::AnchorTop, "prev", Fw::AnchorBottom);
             return;

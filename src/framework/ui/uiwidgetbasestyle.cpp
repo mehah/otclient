@@ -245,6 +245,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "auto") type = OverflowType::Auto;
             else if (v == "clip") type = OverflowType::Clip;
             setOverflow(type);
+            setClipping(type == OverflowType::Clip || type == OverflowType::Scroll || type == OverflowType::Hidden);
         } else if (node->tag() == "float") {
             auto v = node->value<std::string>();
             stdext::tolower(v);

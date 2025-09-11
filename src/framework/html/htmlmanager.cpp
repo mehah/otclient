@@ -344,22 +344,26 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         createRadioGroup(node, groups);
 }
 
-UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId) {
+UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, bool isDynamic, uint32_t htmlId) {
     static std::vector<HtmlNodePtr> textNodes;
     textNodes.clear();
 
     auto path = "/modules/" + moduleName + "/";
 
     UIWidgetPtr widget;
-    for (const auto& node : node->getChildren()) {
-        if (node->getTag() == "style") {
-            root.sheets.emplace_back(css::parse(node->textContent()));
-        } else if (node->getTag() == "link") {
-            if (node->hasAttr("href")) {
-                root.sheets.emplace_back(css::parse(g_resources.readFileContents(path + node->getAttr("href"))));
+    for (const auto& el : node->getChildren()) {
+        if (el->getTag() == "style") {
+            root.sheets.emplace_back(css::parse(el->textContent()));
+        } else if (el->getTag() == "link") {
+            if (el->hasAttr("href")) {
+                root.sheets.emplace_back(css::parse(g_resources.readFileContents(path + el->getAttr("href"))));
             }
-        } else if (node->getTag() == "html")
-            widget = createWidgetFromNode(node, parent, textNodes, htmlId, moduleName);
+        } else if (el->getTag() == "html") {
+            if (isDynamic) {
+                for (const auto& n : el->getChildren())
+                    widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName);
+            } else  widget = createWidgetFromNode(el, parent, textNodes, htmlId, moduleName);
+        }
     }
 
     for (const auto& sheet : GLOBAL_STYLES)
@@ -393,7 +397,7 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
 
     static uint32_t ID = 0;
     ++ID;
-    readNode(root, root.node, parent, moduleName, htmlPath, false, ID);
+    readNode(root, root.node, parent, moduleName, htmlPath, false, false, ID);
     return m_nodes.emplace(ID, root).first->first;
 }
 
@@ -403,7 +407,12 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
         nullptr;
     }
 
-    return readNode(it->second, parseHtml(html), parent, it->second.moduleName, "", false, htmlId);
+    auto parse = parseHtml("<html>" + html + "</html>");
+    readNode(it->second, parse, parent, it->second.moduleName, "", false, true, htmlId);
+    if (auto node = parse->querySelector("html > *"))
+        return node->getWidget();
+
+    return  nullptr;
 }
 
 void HtmlManager::destroy(uint32_t id) {

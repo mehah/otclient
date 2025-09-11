@@ -175,28 +175,6 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     Rect newRect = widget->getRect();
     bool verticalMoved = false;
     bool horizontalMoved = false;
-    auto extraMarginTop = 0;
-    auto extraMarginBottom = 0;
-
-    /*if (widget->isOnHtml() && widget->getFloat() != FloatType::None) {
-        for (const auto& anchor : anchorGroup->getAnchors()) {
-            if (const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget)) {
-                if (hookedWidget == parentWidget)
-                    continue;
-
-                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft || anchor->getAnchoredEdge() == Fw::AnchorRight && anchor->getHookedEdge() == Fw::AnchorRight) {
-                    extraMarginTop += hookedWidget->getMarginBottom();
-                    extraMarginBottom += hookedWidget->getMarginTop();
-                    break;
-                }
-                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorRight || anchor->getAnchoredEdge() == Fw::AnchorRight && anchor->getHookedEdge() == Fw::AnchorLeft) {
-                    extraMarginTop -= hookedWidget->getMarginTop();
-                    extraMarginBottom -= hookedWidget->getMarginBottom();
-                    break;
-                }
-            }
-        }
-    }   */
 
     // calculates new rect based on anchors
     for (const auto& anchor : anchorGroup->getAnchors()) {
@@ -263,14 +241,14 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                     }
 
                     // Fix anchor position
-                    extraMarginTop += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
+                    margin += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
                 }
 
                 if (!verticalMoved) {
-                    newRect.moveTop(point + (margin + extraMarginTop));
+                    newRect.moveTop(point + margin);
                     verticalMoved = true;
                 } else
-                    newRect.setTop(point + (margin + extraMarginTop));
+                    newRect.setTop(point + margin);
                 break;
             }
 
@@ -290,10 +268,10 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 }
 
                 if (!verticalMoved) {
-                    newRect.moveBottom(point - (margin + extraMarginBottom));
+                    newRect.moveBottom(point - margin);
                     verticalMoved = true;
                 } else
-                    newRect.setBottom(point - (margin + extraMarginBottom));
+                    newRect.setBottom(point - margin);
                 break;
             }
             default:
