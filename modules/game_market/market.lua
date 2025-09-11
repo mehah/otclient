@@ -1300,6 +1300,18 @@ function Market.refreshItemsWidget(selectItem)
     end
     radioItemSet = UIRadioGroup.create()
 
+    table.sort(currentItems, function(a, b)
+        local amountA = Market.getDepotCount(a.marketData.tradeAs)
+        local amountB = Market.getDepotCount(b.marketData.tradeAs)
+        if amountA > 0 and amountB <= 0 then
+            return true
+        elseif amountA <= 0 and amountB > 0 then
+            return false
+        else
+            return a.marketData.tradeAs < b.marketData.tradeAs
+        end
+    end)
+
     local select = nil
     for i = 1, #currentItems do
         local item = currentItems[i]
