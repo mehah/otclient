@@ -127,16 +127,23 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
     // draw children
     for (const auto& child : m_children) {
         // render only visible children with a valid rect inside parent rect
-        if (!child || !child->isExplicitlyVisible() || !child->getRect().isValid() || child->getOpacity() <= Fw::MIN_ALPHA)
+        if (!child || !child->isExplicitlyVisible() || child->getOpacity() <= Fw::MIN_ALPHA)
             continue;
 
-        auto childVisibleRect = visibleRect.intersection(child->getRect());
-        if (!childVisibleRect.isValid()) {
-            if (m_overflowType != OverflowType::Visible) {
-                continue;
-            }
+        auto childVisibleRect = visibleRect;
 
-            childVisibleRect = visibleRect;
+        if (child->getDisplay() != DisplayType::None) {
+            if (!child->isOnHtml() && !child->getRect().isValid())
+                continue;
+
+            auto childVisibleRect = visibleRect.intersection(child->getRect());
+            if (!childVisibleRect.isValid()) {
+                if (m_overflowType != OverflowType::Visible) {
+                    continue;
+                }
+
+                childVisibleRect = visibleRect;
+            }
         }
 
         // store current graphics opacity
