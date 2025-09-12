@@ -11,6 +11,15 @@ panels = {
     miscHelp = nil,
     keybindsPanel = nil
 }
+
+-- Hook into application exit to ensure settings are saved
+local function onAppExit()
+    g_settings.save()
+end
+
+-- Register the exit hook when the module is loaded
+connect(g_app, { onExit = onAppExit })
+
 -- LuaFormatter off
 local buttons = { {
 
@@ -122,42 +131,15 @@ local function setupComboBox()
     lootControlModeCombobox:addOption('Loot: Left', 2)
     
     lootControlModeCombobox.onOptionChange = function(comboBox, option)
-        local selectedOption = comboBox:getCurrentOption().data
-        setOption('lootControlMode', selectedOption)
-        g_settings.set('lootControlMode', selectedOption)
+        setOption('lootControlMode', comboBox:getCurrentOption().data)
     end
 
     mouseControlModeCombobox.onOptionChange = function(comboBox, option)
         local selectedOption = comboBox:getCurrentOption().data
-        if selectedOption == 1 then
-            -- Classic Controls selected
-            setOption('classicControl', true)
-            setOption('smartLeftClick', false)
-            
-            -- Ensure the loot control mode is set to 0 (Loot: Right) by default
-            -- when switching to Classic Controls for the first time
-            if not lootControlModeCombobox:isVisible() then
-                setOption('lootControlMode', 0)
-                g_settings.set('lootControlMode', 0)
-                lootControlModeCombobox:setCurrentOption(0)
-            end
-            
-            lootControlModeCombobox:setVisible(true)
-            g_settings.set('classicControl', true)
-            g_settings.set('smartLeftClick', false)
-        elseif selectedOption == 0 then
-            setOption('classicControl', false)
-            setOption('smartLeftClick', false)
-            lootControlModeCombobox:setVisible(false)
-            g_settings.set('classicControl', false)
-            g_settings.set('smartLeftClick', false)
-        elseif selectedOption == 2 then
-            setOption('classicControl', false)
-            setOption('smartLeftClick', true)
-            lootControlModeCombobox:setVisible(false)
-            g_settings.set('classicControl', false)
-            g_settings.set('smartLeftClick', true)
-        end
+        setOption('mouseControlMode', selectedOption)
+        
+        -- The mouseControlMode action handler will take care of updating
+        -- classicControl and smartLeftClick, and their UI visibility
     end
 
     for k, t in pairs({ 'None', 'Antialiasing', 'Smooth Retro' }) do
@@ -214,48 +196,72 @@ local function setup()
         local v = obj.value
 
         if type(v) == 'boolean' then
-            setOption(k, g_settings.getBoolean(k), true)
+            local value = g_settings.getBoolean(k)
+            setOption(k, value, true)
         elseif type(v) == 'number' then
-            setOption(k, g_settings.getNumber(k), true)
+            local value = g_settings.getNumber(k)
+            setOption(k, value, true)
         elseif type(v) == 'string' then
-            setOption(k, g_settings.getString(k), true)
+            local value = g_settings.getString(k)
+            setOption(k, value, true)
         end
     end
     
-    -- Set initial mouse control mode
-    local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
-    local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
-    
-    -- Explicitly hide lootControlMode combobox initially
-    if lootControlModeCombobox then
-        lootControlModeCombobox:setVisible(false)
-    end
-    
-    if mouseControlModeCombobox then
-        local mode = 0
-        if getOption('classicControl') then
-            mode = 1
-            lootControlModeCombobox:setVisible(true)
-        elseif getOption('smartLeftClick') then
-            mode = 2
-            lootControlModeCombobox:setVisible(false)
+    -- Special handling for mouseControlMode to ensure it's in sync with the underlying options
+    local mouseControlMode = g_settings.getNumber('mouseControlMode')
+    if mouseControlMode ~= nil then
+        setOption('mouseControlMode', mouseControlMode, true)
+    else
+        -- Derive from classicControl and smartLeftClick if mouseControlMode isn't set
+        local classicControl = g_settings.getBoolean('classicControl')
+        local smartLeftClick = g_settings.getBoolean('smartLeftClick')
+        
+        if classicControl then
+            setOption('mouseControlMode', 1, true)
+        elseif smartLeftClick then
+            setOption('mouseControlMode', 2, true)
         else
-            lootControlModeCombobox:setVisible(false)
+            setOption('mouseControlMode', 0, true)
         end
-        mouseControlModeCombobox:setCurrentOption(mode)
     end
     
-    -- Set initial loot control mode
-    if lootControlModeCombobox then
-        local lootMode = getOption('lootControlMode')
-        -- Ensure lootControlMode is 0 (Loot: Right) by default if not previously set
-        if getOption('classicControl') and (lootMode == nil or lootMode < 0 or lootMode > 2) then
-            lootMode = 0
-            setOption('lootControlMode', lootMode)
-            g_settings.set('lootControlMode', lootMode)
+    -- Schedule combobox updates to ensure they happen after UI setup is complete
+    scheduleEvent(function()
+        local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+        local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+        
+        if mouseControlModeCombobox then
+            -- Use setCurrentOptionByData for more precise control
+            for i = 0, 2 do
+                if i == options.mouseControlMode.value then
+                    mouseControlModeCombobox:setCurrentOptionByData(i)
+                    break
+                end
+            end
         end
-        lootControlModeCombobox:setCurrentOption(lootMode)
-    end
+        
+        if lootControlModeCombobox then
+            -- Use setCurrentOptionByData for more precise control
+            for i = 0, 2 do
+                if i == options.lootControlMode.value then
+                    lootControlModeCombobox:setCurrentOptionByData(i)
+                    break
+                end
+            end
+        end
+        
+        -- Update loot control mode visibility
+        if lootControlModeCombobox and mouseControlModeCombobox then
+            if options.mouseControlMode.value == 1 then
+                lootControlModeCombobox:setVisible(true)
+            else
+                lootControlModeCombobox:setVisible(false)
+            end
+        end
+    end, 100)
+    
+    -- Ensure settings are saved
+    g_settings.save()
 end
 
 
@@ -299,6 +305,31 @@ function controller:onInit()
 
     configureCharacterCategories()
     addEvent(setup)
+    
+    -- Add a special delayed event to update comboboxes after everything is loaded
+    scheduleEvent(function()
+        local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+        local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+        
+        if mouseControlModeCombobox then
+            for i = 0, 2 do
+                if i == options.mouseControlMode.value then
+                    mouseControlModeCombobox:setCurrentOptionByData(i)
+                    break
+                end
+            end
+        end
+        
+        if lootControlModeCombobox then
+            for i = 0, 2 do
+                if i == options.lootControlMode.value then
+                    lootControlModeCombobox:setCurrentOptionByData(i)
+                    break
+                end
+            end
+        end
+    end, 1000)  -- 1 second delay to make sure everything is loaded
+    
     init_binds()
 
     Keybind.new("UI", "Toggle Fullscreen", "Ctrl+Shift+F", "")
@@ -335,6 +366,12 @@ function controller:onInit()
 end
 
 function controller:onTerminate()
+    -- Make sure all settings are saved before terminating
+    g_settings.save()
+    
+    -- Disconnect from app exit
+    disconnect(g_app, { onExit = onAppExit })
+    
     extraWidgets.optionsButton:destroy()
     extraWidgets.audioButton:destroy()
     panels = {}
@@ -412,7 +449,13 @@ function show()
 end
 
 function hide()
+    -- Save all settings when closing the options window
+    g_settings.save()
     controller.ui:hide()
+end
+
+function saveOptions()
+    g_settings.save()
 end
 
 function toggle()
