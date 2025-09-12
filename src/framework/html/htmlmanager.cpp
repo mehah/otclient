@@ -292,60 +292,6 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 }
 
 void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups, const std::string& moduleName) {
-    auto styles = std::make_shared<OTMLNode>();
-
-    std::map<std::string, std::string> stylesMerge;
-
-    for (const auto [key, stylesMap] : node->getStyles()) {
-        if (key != "styles") {
-            auto meta = std::make_shared<OTMLNode>();
-            meta->setTag(key);
-            styles->addChild(meta);
-
-            for (const auto [prop, value] : stylesMap) {
-                auto nodeAttr = std::make_shared<OTMLNode>();
-                nodeAttr->setTag(prop);
-                nodeAttr->setValue(value);
-                meta->addChild(nodeAttr);
-            }
-        } else for (const auto [prop, value] : stylesMap) {
-            stylesMerge[prop] = value;
-        }
-    }
-
-    for (const auto [key, stylesMap] : node->getStyles()) {
-        if (key != "styles") {
-            auto meta = std::make_shared<OTMLNode>();
-            meta->setTag(key);
-            styles->addChild(meta);
-
-            for (const auto [prop, value] : stylesMap) {
-                auto nodeAttr = std::make_shared<OTMLNode>();
-                nodeAttr->setTag(prop);
-                nodeAttr->setValue(value);
-                meta->addChild(nodeAttr);
-            }
-        } else for (const auto [prop, value] : stylesMap) {
-            stylesMerge[prop] = value;
-        }
-    }
-
-    for (const auto& [prop, value] : node->getAttrStyles()) {
-        stylesMerge[prop] = value;
-    }
-
-    for (const auto [prop, value] : stylesMerge) {
-        auto nodeAttr = std::make_shared<OTMLNode>();
-        nodeAttr->setTag(prop);
-        nodeAttr->setValue(value);
-        styles->addChild(nodeAttr);
-    }
-
-    widget->mergeStyle(styles);
-
-    if (node->getTag() == "input" && node->getAttr("type") == "radio")
-        createRadioGroup(node, groups);
-
     for (const auto [key, v] : node->getAttributesMap()) {
         auto attr = key;
         auto value = v;
@@ -382,16 +328,53 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
             widget->callLuaField("__applyOrBindHtmlAttribute", attr, value, moduleName, node->toString());
         }
     }
+
+    auto styles = std::make_shared<OTMLNode>();
+
+    std::map<std::string, std::string> stylesMerge;
+
+    for (const auto [key, stylesMap] : node->getStyles()) {
+        if (key != "styles") {
+            auto meta = std::make_shared<OTMLNode>();
+            meta->setTag(key);
+            styles->addChild(meta);
+
+            for (const auto [prop, value] : stylesMap) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(prop);
+                nodeAttr->setValue(value);
+                meta->addChild(nodeAttr);
+            }
+        } else for (const auto [prop, value] : stylesMap) {
+            stylesMerge[prop] = value;
+        }
+    }
+
+    for (const auto& [prop, value] : node->getAttrStyles()) {
+        stylesMerge[prop] = value;
+    }
+
+    for (const auto [prop, value] : stylesMerge) {
+        auto nodeAttr = std::make_shared<OTMLNode>();
+        nodeAttr->setTag(prop);
+        nodeAttr->setValue(value);
+        styles->addChild(nodeAttr);
+    }
+
+    widget->mergeStyle(styles);
+
+    if (node->getTag() == "input" && node->getAttr("type") == "radio")
+        createRadioGroup(node, groups);
 }
 
 UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, bool isDynamic, uint32_t htmlId) {
-    static std::vector<HtmlNodePtr> textNodes;
-    textNodes.clear();
-
     auto path = "/modules/" + moduleName + "/";
 
     std::string script;
     std::string scriptStr;
+
+    std::vector<HtmlNodePtr> textNodes;
+    textNodes.reserve(10);
 
     UIWidgetPtr widget;
     for (const auto& el : node->getChildren()) {
@@ -414,7 +397,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
     if (!widget)
         return nullptr;
 
-    auto afterLocal = [=]() mutable {
+    auto afterLocal = [=, textNodes = std::move(textNodes)]() mutable {
         const auto rootNode = isDynamic ? root.node.get() : nullptr;
         const auto mainNode = widget->getHtmlNode().get();
 
@@ -496,10 +479,13 @@ void HtmlManager::destroy(uint32_t id) {
         return;
 
     std::vector<UIWidget*> widgets;
-    widgets.reserve(it->second.node->getChildren().size());
-    for (const auto& node : it->second.node->getChildren()) {
-        if (const auto widget = node->getWidget().get())
-            widgets.emplace_back(widget);
+
+    if (const auto& html = it->second.node->querySelector("html")) {
+        widgets.reserve(html->getChildren().size());
+        for (const auto& node : html->getChildren()) {
+            if (const auto widget = node->getWidget().get())
+                widgets.emplace_back(widget);
+        }
     }
 
     for (auto widget : widgets)

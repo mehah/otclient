@@ -158,6 +158,11 @@ void UIAnchorLayout::removeWidget(const UIWidgetPtr& widget)
     removeAnchors(widget);
 }
 
+inline bool isInlineish(UIWidget* w) {
+    auto d = w->getDisplay();
+    return d == DisplayType::Inline || d == DisplayType::InlineBlock;
+}
+
 bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first)
 {
     const auto& parentWidget = getParentWidget();
@@ -175,6 +180,14 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     Rect newRect = widget->getRect();
     bool verticalMoved = false;
     bool horizontalMoved = false;
+
+    int realMarginTop = 0;
+    if (widget->isOnHtml() && widget->getPrevWidget() == nullptr && isInlineish(widget.get())) {
+        realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
+        for (auto p = widget->getNextWidget(); p && isInlineish(p.get()); p = p->getNextWidget())
+            if (p->getDisplay() == DisplayType::InlineBlock)
+                realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
+    }
 
     // calculates new rect based on anchors
     for (const auto& anchor : anchorGroup->getAnchors()) {
@@ -228,16 +241,18 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 auto margin = widget->getMarginTop();
                 if (widget->isOnHtml()) {
                     if (parentWidget != hookedWidget) {
-                        if (widget->getFloat() != FloatType::None) {
+                        if (isInlineish(widget.get())) {
+                            margin = realMarginTop;
+                        } else if (widget->getFloat() != FloatType::None) {
                             margin -= hookedWidget->getMarginTop();
-                        } else if (widget->getDisplay() == DisplayType::Inline) {
-                            margin = 0;
                         } else {
                             if (widget->getMarginBottom() > 0 && hookedWidget->getMarginBottom() > 0)
                                 margin = std::max<int>(margin, hookedWidget->getMarginBottom());
                             else
                                 margin += hookedWidget->getMarginBottom();
                         }
+                    } else if (isInlineish(widget.get())) {
+                        margin = realMarginTop;
                     }
 
                     // Fix anchor position
