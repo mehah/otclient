@@ -24,6 +24,7 @@ return {
         end
     },
     classicControl                    = g_platform.isMobile() and true or false,
+    smartLeftClick                    = false,
     smartWalk                         = false,
     autoChaseOverride                 = true,
     moveStack                         = false,

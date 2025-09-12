@@ -24,10 +24,22 @@ UIWidget
       margin-top: 0
       visible: false
 
-    OptionCheckBox
-      id: classicControl
-      !text: tr('Classic control')
-
+    Label
+      id: mouseControlLabel
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      text-align: left
+      !text: tr('Mouse Control:')
+      width: 100
+      
+    ComboBox
+      id: mouseControlMode
+      anchors.left: mouseControlLabel.right
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 5
+      !tooltip: tr('Regular Controls: Right-click opens menu, use Ctrl+Click for direct item use\nClassic Controls: Right-click for direct use\nLeft Smart-Click: Left-click for direct item use, look at non-walkable objects, or walk to walkable objects. Right-click opens menu')
+      
       $mobile:
         visible: false
 
