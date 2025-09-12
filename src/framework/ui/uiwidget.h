@@ -289,7 +289,6 @@ public:
 
     void setHtmlRootId(uint32_t id) { m_htmlRootId = id; }
     auto getHtmlRootId() const { return m_htmlRootId; }
-    auto getHtmlId() { return isOnHtml() ? m_htmlNode->getAttr("id") : ""; }
 
     bool isOnHtml() { return m_htmlNode != nullptr; }
     const auto& getHtmlNode() const { return m_htmlNode; }
