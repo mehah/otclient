@@ -564,10 +564,11 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
     menu:setGameMenu(true)
 
     local classic = modules.client_options.getOption('classicControl')
+    local smartLeftClick = modules.client_options.getOption('smartLeftClick')
     local mobile = g_platform.isMobile()
     local shortcut = nil
 
-    if not classic and not mobile then
+    if not classic and not mobile and not smartLeftClick then
         shortcut = '(Shift)'
     else
         shortcut = nil
@@ -889,7 +890,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 modules.game_shortcuts.resetShortcuts()
                 g_game.attack(attackCreature)
                 return true
-            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 modules.game_shortcuts.resetShortcuts()
                 g_game.attack(creatureThing)
                 return true
@@ -900,7 +901,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 modules.game_shortcuts.resetShortcuts()
                 g_game.follow(attackCreature)
                 return true
-            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 modules.game_shortcuts.resetShortcuts()
                 g_game.follow(creatureThing)
                 return true
@@ -911,6 +912,83 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             return true
         end
     elseif not modules.client_options.getOption('classicControl') then
+        local smartLeftClick = modules.client_options.getOption('smartLeftClick')
+        
+        if smartLeftClick and mouseButton == MouseLeftButton and keyboardModifiers == KeyboardNoModifier then
+            if attackCreature then
+                g_game.attack(attackCreature)
+                return true
+            elseif creatureThing and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
+                g_game.attack(creatureThing)
+                return true
+            elseif useThing then
+                -- Special handling for usable items with Unpass/Unmove flags
+                if useThing:isUsable() and (useThing:isNotWalkable() or useThing:isNotMoveable()) then
+                    -- Only use the item, don't look at it
+                    if useThing:isContainer() then
+                        if useThing:getParentContainer() then
+                            g_game.open(useThing, useThing:getParentContainer())
+                        else
+                            g_game.open(useThing)
+                        end
+                        return true
+                    elseif useThing:isMultiUse() then
+                        startUseWith(useThing)
+                        return true
+                    else
+                        g_game.use(useThing)
+                        return true
+                    end
+                end
+                
+                -- Standard handling for other usable items
+                if useThing:isContainer() then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                    else
+                        g_game.open(useThing)
+                    end
+                    return true
+                elseif useThing:isMultiUse() then
+                    startUseWith(useThing)
+                    return true
+                else
+                    local useResult = g_game.use(useThing)
+                    
+                    if useResult ~= nil then
+                        return true
+                    end
+                end
+            end
+            
+            if lookThing then
+                local lookPosition = lookThing:getPosition()
+                local lookTile = nil
+                
+                if lookPosition and lookPosition.x ~= 0 then
+                    lookTile = g_map.getTile(lookPosition)
+                end
+                
+                -- For walkable tiles, we want to walk
+                if lookTile and lookTile:isWalkable() and autoWalkPos then
+                    local player = g_game.getLocalPlayer()
+                    player:autoWalk(autoWalkPos)
+                    return true
+                else
+                    -- We don't need to check for usable items with Unpass/Unmove flags here anymore
+                    -- since we handled them in the section above
+                    g_game.look(lookThing)
+                    return true
+                end
+            end
+            
+            if autoWalkPos then
+                local player = g_game.getLocalPlayer()
+                player:autoWalk(autoWalkPos)
+                return true
+            end
+        end
+        
         if keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
             createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             return true
@@ -920,19 +998,26 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             return true
         elseif useThing and keyboardModifiers == KeyboardCtrlModifier and
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
-            if useThing:isContainer() then
-                if useThing:getParentContainer() then
-                    g_game.open(useThing, useThing:getParentContainer())
-                else
-                    g_game.open(useThing)
-                end
-                return true
-            elseif useThing:isMultiUse() then
-                startUseWith(useThing)
+            local smartLeftClick = modules.client_options.getOption('smartLeftClick')
+            
+            if smartLeftClick then
+                createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 return true
             else
-                g_game.use(useThing)
-                return true
+                if useThing:isContainer() then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                    else
+                        g_game.open(useThing)
+                    end
+                    return true
+                elseif useThing:isMultiUse() then
+                    startUseWith(useThing)
+                    return true
+                else
+                    g_game.use(useThing)
+                    return true
+                end
             end
             return true
         elseif useThing and useThing:isContainer() and keyboardModifiers == KeyboardCtrlShiftModifier and
@@ -943,7 +1028,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(attackCreature)
             return true
-        elseif creatureThing and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
+        elseif creatureThing and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(creatureThing)
             return true
@@ -951,22 +1036,104 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
 
         -- classic control
     else
-        if useThing and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton and
-            not g_mouse.isPressed(MouseLeftButton) then
+        local lootControlMode = modules.client_options.getOption('lootControlMode')
+        
+        -- Handle loot options based on lootControlMode
+        -- Handle "Loot: Left" option - we need to process this before autowalk
+        if lootControlMode == 2 and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseLeftButton then
+            -- Always try to use quick loot for any container or item
+            if useThing then
+                -- For corpses or any container, try to quick loot
+                local isCorpseOrContainer = useThing:isContainer() or useThing:isLyingCorpse()
+                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and isCorpseOrContainer then
+                    g_game.sendQuickLoot(1, useThing)
+                    return true
+                end
+                
+                -- If it's a pickupable item, pick it up
+                if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+            end
+            
+            -- If we can't quick loot, pick up any pickupable item
+            if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+                g_game.move(lookThing, lookThing:getPosition(), 1)
+                return true
+            end
+        end
+        
+        -- Handle other loot options
+        if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+            -- Loot: Right - Default behavior
+            if lootControlMode == 0 and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
+                -- For regular items, just move them
+                -- Allow the following container handling to handle corpses
+                local isCorpseOrContainer = useThing and (useThing:isContainer() or useThing:isLyingCorpse())
+                if not isCorpseOrContainer then
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+                -- For containers/corpses, we'll continue to the container handling below,
+                -- which will allow both quicklooting and opening
+            -- Loot: SHIFT+Right - Only execute quickloot with SHIFT pressed
+            elseif lootControlMode == 1 and keyboardModifiers == KeyboardShiftModifier and mouseButton == MouseRightButton then
+                -- Try to use quick loot for any container or item
+                -- Check for containers and corpses
+                local isCorpseOrContainer = lookThing and (lookThing:isContainer() or lookThing:isLyingCorpse())
+                
+                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and isCorpseOrContainer then
+                    g_game.sendQuickLoot(1, lookThing)
+                    return true
+                else
+                    -- Fall back to regular move if quick loot is not available
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+            end
+        end
+        
+        if useThing and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
+            -- Remove the check for left mouse button being pressed to fix the issue
+            -- where right click stops working after a brief time
             local player = g_game.getLocalPlayer()
             if attackCreature and attackCreature ~= player then
                 g_game.attack(attackCreature)
                 return true
-            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 g_game.attack(creatureThing)
                 return true
-            elseif useThing:isContainer() then
-                if useThing:getParentContainer() then
-                    g_game.open(useThing, useThing:getParentContainer())
-                    return true
-                else
-                    g_game.open(useThing)
-                    return true
+            elseif useThing:isContainer() or useThing:isLyingCorpse() then
+                -- Handle both regular containers and corpses based on loot control mode
+                -- For Loot: Right, only perform quickloot (don't open container)
+                if lootControlMode == 0 and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
+                    if useThing:isLyingCorpse() or useThing:isContainer() then
+                        g_game.sendQuickLoot(1, useThing)
+                        return true
+                    end
+                end
+                
+                -- For Loot: SHIFT+Right, regular right-click only opens corpses (no quickloot)
+                if lootControlMode == 1 then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                        return true
+                    else
+                        g_game.open(useThing)
+                        return true
+                    end
+                end
+                
+                -- For regular containers that aren't corpses, open them
+                if not useThing:isLyingCorpse() then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                        return true
+                    else
+                        g_game.open(useThing)
+                        return true
+                    end
                 end
             elseif useThing:isMultiUse() then
                 startUseWith(useThing)
@@ -974,6 +1141,25 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             else
                 g_game.use(useThing)
                 return true
+            end
+            return true
+        elseif useThing and keyboardModifiers == KeyboardShiftModifier and mouseButton == MouseRightButton then
+            -- SHIFT+Right click behavior depends on loot control mode
+            if lootControlMode == 0 and (useThing:isContainer() or useThing:isLyingCorpse()) then
+                -- For Loot: Right mode, SHIFT+Right opens corpses without quicklooting
+                if useThing:getParentContainer() then
+                    g_game.open(useThing, useThing:getParentContainer())
+                    return true
+                else
+                    g_game.open(useThing)
+                    return true
+                end
+            elseif lootControlMode == 1 and (useThing:isContainer() or useThing:isLyingCorpse()) then
+                -- For Loot: SHIFT+Right mode, SHIFT+Right only quickloots without opening
+                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
+                    g_game.sendQuickLoot(1, useThing)
+                    return true
+                end
             end
             return true
         elseif useThing and useThing:isContainer() and keyboardModifiers == KeyboardCtrlShiftModifier and
@@ -996,7 +1182,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(attackCreature)
             return true
-        elseif creatureThing and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
+        elseif creatureThing and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(creatureThing)
             return true
@@ -1007,10 +1193,27 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
     player:stopAutoWalk()
 
     if autoWalkPos and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseLeftButton then
-        player:autoWalk(autoWalkPos)
-        if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
-            g_game.setChaseMode(DontChase)
-            return true
+        -- In Classic Control with Loot: Left option, we want to avoid walking when trying to loot
+        local classicControl = modules.client_options.getOption('classicControl')
+        local lootControlMode = modules.client_options.getOption('lootControlMode')
+        
+        if classicControl and lootControlMode == 2 then
+            -- Check if there's a corpse or item we should be looting instead of walking
+            -- If not, proceed with autowalk
+            local isCorpseOrContainer = useThing and (useThing:isContainer() or useThing:isLyingCorpse())
+            
+            if not isCorpseOrContainer and 
+               not (lookThing and not lookThing:isCreature() and lookThing:isPickupable()) then
+                player:autoWalk(autoWalkPos)
+                if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
+                    g_game.setChaseMode(DontChase)
+                end
+            end
+        else
+            player:autoWalk(autoWalkPos)
+            if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
+                g_game.setChaseMode(DontChase)
+            end
         end
         return true
     end
