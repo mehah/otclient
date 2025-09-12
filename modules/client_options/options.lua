@@ -102,6 +102,7 @@ local function setupComboBox()
     local framesRarityCombobox = panels.interface:recursiveGetChildById('frames')
     local vocationPresetsCombobox = panels.keybindsPanel:recursiveGetChildById('list')
     local listKeybindsPanel = panels.keybindsPanel:recursiveGetChildById('list')
+    local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
 
     for k, v in pairs({ { 'Disabled', 'disabled' }, { 'Default', 'default' }, { 'Full', 'full' } }) do
         crosshairCombo:addOption(v[1], v[2])
@@ -111,6 +112,23 @@ local function setupComboBox()
         setOption('crosshair', comboBox:getCurrentOption().data)
     end
 
+    mouseControlModeCombobox:addOption('Regular Controls', 0)
+    mouseControlModeCombobox:addOption('Classic Controls', 1)
+    mouseControlModeCombobox:addOption('Left Smart-Click', 2)
+
+    mouseControlModeCombobox.onOptionChange = function(comboBox, option)
+        local selectedOption = comboBox:getCurrentOption().data
+        if selectedOption == 1 then
+            setOption('classicControl', true)
+            setOption('smartLeftClick', false)
+        elseif selectedOption == 0 then
+            setOption('classicControl', false)
+            setOption('smartLeftClick', false)
+        elseif selectedOption == 2 then
+            setOption('classicControl', false)
+            setOption('smartLeftClick', true)
+        end
+    end
 
     for k, t in pairs({ 'None', 'Antialiasing', 'Smooth Retro' }) do
         antialiasingModeCombobox:addOption(t, k - 1)
@@ -172,6 +190,18 @@ local function setup()
         elseif type(v) == 'string' then
             setOption(k, g_settings.getString(k), true)
         end
+    end
+    
+    -- Set initial mouse control mode
+    local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+    if mouseControlModeCombobox then
+        local mode = 0 -- Default to Regular Controls
+        if getOption('classicControl') then
+            mode = 1 -- Classic Controls
+        elseif getOption('smartLeftClick') then
+            mode = 2
+        end
+        mouseControlModeCombobox:setCurrentOption(mode)
     end
 end
 
