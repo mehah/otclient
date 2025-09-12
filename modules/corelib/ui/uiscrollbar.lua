@@ -273,8 +273,8 @@ function UIScrollBar:setStep(step)
     self.step = step
 end
 
-function UIScrollBar:pixelsScroll()
-    self.pixelsScroll = true
+function UIScrollBar:setPixelsScroll(v)
+    self.pixelsScroll = v
 end
 
 function UIScrollBar:setOrientation(orientation)

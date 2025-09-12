@@ -105,6 +105,10 @@ function UIHTML:onLayoutUpdate()
 end
 
 function UIHTML:onMouseWheel(mousePos, mouseWheel)
+    if not self.verticalScrollBar or self.horizontalScrollBar then
+        return false
+    end
+
     if self.verticalScrollBar then
         if not self.verticalScrollBar:isOn() then
             return false
