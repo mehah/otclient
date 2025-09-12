@@ -32,215 +32,220 @@
 #include <framework/core/eventdispatcher.h>
 
 HtmlManager g_html;
-std::vector<css::StyleSheet> GLOBAL_STYLES;
 
-static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = {
-    {"offset-x", "image-offset-x"},
-    {"offset-y", "image-offset-y"},
-    {"offset", "image-offset"},
-    {"width", "image-width"},
-    {"height", "image-height"},
-    {"size", "image-size"},
-    {"rect", "image-rect"},
-    {"clip", "image-clip"},
-    {"fixed-ratio", "image-fixed-ratio"},
-    {"repeated", "image-repeated"},
-    {"smooth", "image-smooth"},
-    {"color", "image-color"},
-    {"border-top", "image-border-top"},
-    {"border-right", "image-border-right"},
-    {"border-bottom", "image-border-bottom"},
-    {"border-left", "image-border-left"},
-    {"border", "image-border"},
-    {"auto-resize", "image-auto-resize"},
-    {"individual-animation", "image-individual-animation"},
-    {"src", "image-source"}
-};
+namespace {
+    uint_fast32_t LAST_UNIQUE_ID = 0;
+    std::vector<css::StyleSheet> GLOBAL_STYLES;
+    std::unordered_set<std::string> GLOBAL_IDS;
 
-static const std::unordered_map<std::string, std::string> cssMap = {
-    {"active", "active"},
-    {"focus", "focus"},
-    {"hover", "hover"},
-    {"pressed", "pressed"},
-    {"checked", "checked"},
-    {"disabled", "disabled"},
-    {"first-child", "first"},
-    {"middle", "middle"},
-    {"last-child", "last"},
-    {"nth-child(even)", "alternate"},
-    {"nth-child(odd)", "alternate"},
-    {"on", "on"},
-    {"[aria-pressed='true']", "on"},
-    {"[data-on]", "on"},
-    {"dragging", "dragging"},
-    {"hidden", "hidden"},
-    {"[hidden]", "hidden"},
-    {"mobile", "mobile"},
-    {"@media", "mobile"}
-};
-
-static const std::unordered_set<std::string_view> kProps = {
-    "color",
-    "cursor",
-    "direction",
-    "font",
-    "font-family",
-    "font-size",
-    "font-style",
-    "font-variant",
-    "font-weight",
-    "letter-spacing",
-    "line-height",
-    "text-align",
-    "text-indent",
-    "text-transform",
-    "unicode-bidi",
-    "visibility",
-    "white-space",
-    "word-spacing",
-    "writing-mode"
-};
-
-static inline bool isInheritable(std::string_view prop) noexcept {
-    return kProps.find(prop) != kProps.end();
-}
-
-std::string cssToState(const std::string& css) {
-    if (auto it = cssMap.find(css); it != cssMap.end())
-        return it->second;
-    return "";
-}
-
-void parseAttrPropList(std::string_view attrsStr, std::map<std::string, std::string>& attrsMap) {
-    for (auto& data : stdext::split(attrsStr, ";")) {
-        stdext::trim(data);
-        auto attr = stdext::split(data, ":");
-        if (attr.size() > 1) {
-            stdext::trim(attr[0]);
-            stdext::trim(attr[1]);
-            attrsMap[attr[0]] = attr[1];
-        }
-    }
-}
-
-void translateAttribute(std::string_view styleName, std::string_view tagName, std::string& attr, std::string& value) {
-    if (attr == "*style") {
-        attr = "*mergeStyle";
-    } else if (attr == "*if") {
-        attr = "*condition-if";
-    }
-
-    if (styleName != "CheckBox" && styleName != "ComboBox") {
-        if (attr == "*value") {
-            attr = "*text";
-        } else if (attr == "value") {
-            attr = "text";
-        }
-    }
-
-    if (tagName == "img") {
-        auto it = IMG_ATTR_TRANSLATED.find(attr);
-        if (it != IMG_ATTR_TRANSLATED.end()) {
-            attr = it->second;
-        }
-    }
-}
-
-std::string_view translateStyleName(std::string_view styleName, const HtmlNodePtr& el) {
-    if (styleName == "select") {
-        return "QtComboBox";
-    }
-
-    if (styleName == "hr") {
-        return "HorizontalSeparator";
-    }
-
-    if (styleName == "input") {
-        const auto& type = el->getAttr("type");
-        if (type == "checkbox" || type == "radio") {
-            return "QtCheckBox";
-        }
-        return "TextEdit";
-    }
-
-    if (styleName == "textarea") {
-        return "MultilineTextEdit";
-    }
-
-    return styleName;
-}
-
-void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
-    const auto& name = node->getAttr("name");
-    if (name.empty())
-        return;
-
-    UIWidgetPtr group;
-    auto it = groups.find(name);
-    if (it == groups.end()) {
-        group = groups
-            .emplace(name, g_lua.callGlobalField<UIWidgetPtr>("UIRadioGroup", "create"))
-            .first->second;
-    } else group = it->second;
-
-    group->callLuaField("addWidget", node->getWidget());
-}
-
-void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist, bool isDynamic) {
-    static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
-        if (n->getType() == NodeType::Element)
-            n->getInheritableStyles()[style][decl.property] = decl.value;
-        for (const auto& child : n->getChildren()) {
-            child->getStyles()[style][decl.property] = decl.value;
-            self(child, decl, style, self);
-        }
+    static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = {
+        {"offset-x", "image-offset-x"},
+        {"offset-y", "image-offset-y"},
+        {"offset", "image-offset"},
+        {"width", "image-width"},
+        {"height", "image-height"},
+        {"size", "image-size"},
+        {"rect", "image-rect"},
+        {"clip", "image-clip"},
+        {"fixed-ratio", "image-fixed-ratio"},
+        {"repeated", "image-repeated"},
+        {"smooth", "image-smooth"},
+        {"color", "image-color"},
+        {"border-top", "image-border-top"},
+        {"border-right", "image-border-right"},
+        {"border-bottom", "image-border-bottom"},
+        {"border-left", "image-border-left"},
+        {"border", "image-border"},
+        {"auto-resize", "image-auto-resize"},
+        {"individual-animation", "image-individual-animation"},
+        {"src", "image-source"}
     };
 
-    for (const auto& rule : sheet.rules) {
-        const auto& selectors = stdext::join(rule.selectors);
-        const auto& nodes = (root ? root : mainNode)->querySelectorAll(selectors);
+    static const std::unordered_map<std::string, std::string> cssMap = {
+        {"active", "active"},
+        {"focus", "focus"},
+        {"hover", "hover"},
+        {"pressed", "pressed"},
+        {"checked", "checked"},
+        {"disabled", "disabled"},
+        {"first-child", "first"},
+        {"middle", "middle"},
+        {"last-child", "last"},
+        {"nth-child(even)", "alternate"},
+        {"nth-child(odd)", "alternate"},
+        {"on", "on"},
+        {"[aria-pressed='true']", "on"},
+        {"[data-on]", "on"},
+        {"dragging", "dragging"},
+        {"hidden", "hidden"},
+        {"[hidden]", "hidden"},
+        {"mobile", "mobile"},
+        {"@media", "mobile"}
+    };
 
-        if (checkRuleExist && nodes.empty()) {
-            g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
-            continue;
+    static const std::unordered_set<std::string_view> kProps = {
+        "color",
+        "cursor",
+        "direction",
+        "font",
+        "font-family",
+        "font-size",
+        "font-style",
+        "font-variant",
+        "font-weight",
+        "letter-spacing",
+        "line-height",
+        "text-align",
+        "text-indent",
+        "text-transform",
+        "unicode-bidi",
+        "visibility",
+        "white-space",
+        "word-spacing",
+        "writing-mode"
+    };
+
+    static inline bool isInheritable(std::string_view prop) noexcept {
+        return kProps.find(prop) != kProps.end();
+    }
+
+    std::string cssToState(const std::string& css) {
+        if (auto it = cssMap.find(css); it != cssMap.end())
+            return it->second;
+        return "";
+    }
+
+    void parseAttrPropList(std::string_view attrsStr, std::map<std::string, std::string>& attrsMap) {
+        for (auto& data : stdext::split(attrsStr, ";")) {
+            stdext::trim(data);
+            auto attr = stdext::split(data, ":");
+            if (attr.size() > 1) {
+                stdext::trim(attr[0]);
+                stdext::trim(attr[1]);
+                attrsMap[attr[0]] = attr[1];
+            }
+        }
+    }
+
+    void translateAttribute(std::string_view styleName, std::string_view tagName, std::string& attr, std::string& value) {
+        if (attr == "*style") {
+            attr = "*mergeStyle";
+        } else if (attr == "*if") {
+            attr = "*condition-if";
         }
 
-        for (const auto& node : nodes) {
-            if (root && node.get() != mainNode)
+        if (styleName != "CheckBox" && styleName != "ComboBox") {
+            if (attr == "*value") {
+                attr = "*text";
+            } else if (attr == "value") {
+                attr = "text";
+            }
+        }
+
+        if (tagName == "img") {
+            auto it = IMG_ATTR_TRANSLATED.find(attr);
+            if (it != IMG_ATTR_TRANSLATED.end()) {
+                attr = it->second;
+            }
+        }
+    }
+
+    std::string_view translateStyleName(std::string_view styleName, const HtmlNodePtr& el) {
+        if (styleName == "select") {
+            return "QtComboBox";
+        }
+
+        if (styleName == "hr") {
+            return "HorizontalSeparator";
+        }
+
+        if (styleName == "input") {
+            const auto& type = el->getAttr("type");
+            if (type == "checkbox" || type == "radio") {
+                return "QtCheckBox";
+            }
+            return "TextEdit";
+        }
+
+        if (styleName == "textarea") {
+            return "MultilineTextEdit";
+        }
+
+        return styleName;
+    }
+
+    void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
+        const auto& name = node->getAttr("name");
+        if (name.empty())
+            return;
+
+        UIWidgetPtr group;
+        auto it = groups.find(name);
+        if (it == groups.end()) {
+            group = groups
+                .emplace(name, g_lua.callGlobalField<UIWidgetPtr>("UIRadioGroup", "create"))
+                .first->second;
+        } else group = it->second;
+
+        group->callLuaField("addWidget", node->getWidget());
+    }
+
+    void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist, bool isDynamic) {
+        static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
+            if (n->getType() == NodeType::Element)
+                n->getInheritableStyles()[style][decl.property] = decl.value;
+            for (const auto& child : n->getChildren()) {
+                child->getStyles()[style][decl.property] = decl.value;
+                self(child, decl, style, self);
+            }
+        };
+
+        for (const auto& rule : sheet.rules) {
+            const auto& selectors = stdext::join(rule.selectors);
+            const auto& nodes = (root ? root : mainNode)->querySelectorAll(selectors);
+
+            if (checkRuleExist && nodes.empty()) {
+                g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
                 continue;
+            }
 
-            if (node->getWidget()) {
-                bool hasMeta = false;
-                for (const auto& metas : rule.selectorMeta) {
-                    for (const auto& state : metas.pseudos) {
-                        for (const auto& decl : rule.decls) {
-                            std::string style = "$";
-                            if (state.negated)
-                                style += "!";
-                            style += state.name;
-
-                            node->getStyles()[style][decl.property] = decl.value;
-                            if (!isDynamic && isInheritable(decl.property)) {
-                                setChildrenStyles(node, decl, style, setChildrenStyles);
-                            }
-                        }
-                        hasMeta = true;
-                    }
-                }
-
-                if (hasMeta)
+            for (const auto& node : nodes) {
+                if (root && node.get() != mainNode)
                     continue;
 
-                for (const auto& decl : rule.decls) {
-                    node->getStyles()["styles"][decl.property] = decl.value;
-                    if (!isDynamic && isInheritable(decl.property)) {
-                        setChildrenStyles(node, decl, "styles", setChildrenStyles);
+                if (node->getWidget()) {
+                    bool hasMeta = false;
+                    for (const auto& metas : rule.selectorMeta) {
+                        for (const auto& state : metas.pseudos) {
+                            for (const auto& decl : rule.decls) {
+                                std::string style = "$";
+                                if (state.negated)
+                                    style += "!";
+                                style += state.name;
+
+                                node->getStyles()[style][decl.property] = decl.value;
+                                if (!isDynamic && isInheritable(decl.property)) {
+                                    setChildrenStyles(node, decl, style, setChildrenStyles);
+                                }
+                            }
+                            hasMeta = true;
+                        }
+                    }
+
+                    if (hasMeta)
+                        continue;
+
+                    for (const auto& decl : rule.decls) {
+                        node->getStyles()["styles"][decl.property] = decl.value;
+                        if (!isDynamic && isInheritable(decl.property)) {
+                            setChildrenStyles(node, decl, "styles", setChildrenStyles);
+                        }
                     }
                 }
             }
         }
-    }
-};
+    };
+}
 
 UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName) {
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
@@ -250,6 +255,14 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     auto widget = g_ui.createWidget(styleName.empty() ? "UIWidget" : styleName, parent);
     node->setWidget(widget);
+
+    const auto& id = node->getAttr("id");
+    if (!id.empty()) {
+        if (!GLOBAL_IDS.emplace(id).second) {
+            node->setAttr("widget-id", "html" + std::to_string(++LAST_UNIQUE_ID));
+        }
+    }
+
     widget->setHtmlNode(node);
     widget->setHtmlId(htmlId);
 
