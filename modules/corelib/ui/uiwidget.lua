@@ -67,7 +67,7 @@ local function START_WATCH_LIST()
     end, WATCH_CYCLE_CHECK_MS)
 end
 
-function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName)
+function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
     if attr == 'image-source' then
@@ -86,9 +86,26 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName)
         setterName = setterName:sub(2):gsub("^%l", string.upper)
 
         local vStr = value
-        local f = loadstring('return function(self, target) return ' .. vStr .. ' end')
+        local f, syntaxErr = loadstring('return function(self, target) return ' .. vStr .. ' end',
+            ("controller:%s"):format(controllerName))
+        if not f then
+            pwarning(syntaxErr)
+            print(('[widget:%] attr: %'):format(self:getId(), attr), vStr)
+            return
+        end
         local fnc = f()
-        value = fnc(controller)
+
+        local sucess, value = xpcall(function()
+            return fnc(controller)
+        end, function(e) return "Erro: " .. tostring(e) end)
+
+        if not sucess then
+            pwarning(("[Script runtime error]\n%s"):format(value))
+            print('[widget:' .. self:getId() .. '] attr: ' .. attr, vStr)
+            print('HTML: ' .. NODE_STR)
+            pwarning("------------")
+            return
+        end
 
         watchObj = {
             widget = self,
@@ -162,11 +179,29 @@ local EVENTS_TRANSLATED = {
     onescape         = 'onEscape',
 }
 
-local parseEvents = function(widget, eventName, callStr, controller)
-    local eventCall = loadstring('return function(self, event, target) ' .. callStr .. ' end')()
+local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
+    local f, syntaxErr = loadstring('return function(self, event, target) ' .. callStr .. ' end',
+        ("controller:%s"):format(controller.name))
+    if not f then
+        pwarning(syntaxErr)
+        print(('[widget:%] event: %'):format(widget:getId(), eventName), callStr)
+        return
+    end
+
+    local eventCall = f()
     local event = { target = widget }
     local function execEventCall()
-        eventCall(controller, event, widget)
+        local sucess, resultOrErr = xpcall(function()
+            return eventCall(controller, event, widget)
+        end, function(e) return "Erro: " .. tostring(e) end)
+
+        if not sucess then
+            pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
+            print('[widget:' .. widget:getId() .. '] event: ' .. eventName, callStr)
+            print('HTML: ' .. NODE_STR)
+            pwarning("------------")
+            return
+        end
     end
 
     if eventName == 'onchange' then
@@ -242,43 +277,80 @@ local parseEvents = function(widget, eventName, callStr, controller)
     controller:registerEvents(widget, data)
 end
 
-function UIWidget:onCreateByHTML(attrs, controllerName)
+function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
     for attr, v in pairs(attrs) do
         if attr:starts('on') then
-            parseEvents(self, attr:lower(), v, controller)
+            parseEvents(self, attr:lower(), v, controller, NODE_STR)
         end
     end
 
-    local getFncSet = function(exp)
-        local f = loadstring('return function(self, value, target) ' .. exp .. '=value end')
-        return f and f() or nil
+    local getFncSet = function(attr)
+        local exp = attrs[attr]
+        local f, syntaxErr = loadstring('return function(self, value, target) ' .. exp .. '=value end',
+            ("controller:%s"):format(controller.name))
+
+        if not f then
+            pwarning(syntaxErr)
+            print('Attr: ' .. attr, exp)
+            print('HTML: ' .. NODE_STR)
+            return
+        end
+
+        return f() or nil
     end
 
     if attrs['*checked'] then
-        local set = getFncSet(attrs['*checked'])
+        local set = getFncSet('*checked')
         if set then
             controller:registerEvents(self, {
                 onCheckChange = function(widget, value)
-                    set(controller, value, widget)
+                    local sucess, resultOrErr = xpcall(function()
+                        return set(controller, value, widget)
+                    end, function(e) return "Erro: " .. tostring(e) end)
+
+                    if not sucess then
+                        pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
+                        print('Attr: *checked', attrs['*checked'])
+                        print('HTML: ' .. NODE_STR)
+                        pwarning("------------")
+                    end
                 end
             })
         end
     end
 
     if attrs['*value'] then
-        local set = getFncSet(attrs['*value'])
+        local set = getFncSet('*value')
         if set then
             if self.getCurrentOption then
                 controller:registerEvents(self, {
                     onOptionChange = function(widget, text, data)
-                        set(controller, data, widget)
+                        local sucess, resultOrErr = xpcall(function()
+                            return set(controller, data, widget)
+                        end, function(e) return "Erro: " .. tostring(e) end)
+
+                        if not sucess then
+                            pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
+                            print('Attr: *value', attrs['*value'])
+                            print('HTML: ' .. NODE_STR)
+                            pwarning("------------")
+                        end
                     end
                 })
             else
                 controller:registerEvents(self, {
                     onTextChange = function(widget, value)
-                        set(controller, value, widget)
+                        local sucess, resultOrErr = xpcall(function()
+                            return set(controller, value, widget)
+                        end, function(e) return "Erro: " .. tostring(e) end)
+
+                        if not sucess then
+                            pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
+                            print('Attr: *value', attrs['*value'])
+                            print('HTML: ' .. NODE_STR)
+                            pwarning("------------")
+                        end
                     end
                 })
             end
@@ -286,7 +358,21 @@ function UIWidget:onCreateByHTML(attrs, controllerName)
     end
 end
 
-function UIWidget:__scriptHtml(moduleName, script)
-    local f = loadstring('return function(self) ' .. script .. ' end')
-    f()(G_CONTROLLER_CALLED[moduleName])
+function UIWidget:__scriptHtml(moduleName, script, NODE_STR)
+    local f, syntaxErr = loadstring('return function(self) ' .. script .. ' end', ("controller:%s"):format(moduleName))
+    if not f then
+        pwarning(syntaxErr)
+        print(NODE_STR)
+        return
+    end
+    local sucess, resultOrErr = xpcall(function()
+        return f()(G_CONTROLLER_CALLED[moduleName])
+    end, function(e) return "Erro: " .. tostring(e) end)
+
+    if not sucess then
+        pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
+        print('HTML: ' .. NODE_STR)
+        pwarning("------------")
+        return
+    end
 end

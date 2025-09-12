@@ -367,3 +367,46 @@ void HtmlNode::clear() {
 
     invalidateIndexCachesUp(this);
 }
+
+std::string HtmlNode::toString(bool recursive) const {
+    switch (type) {
+        case NodeType::Text:
+            return text;
+
+        case NodeType::Comment:
+            return "<!--" + text + "-->";
+
+        case NodeType::Doctype:
+            return "<!" + text + ">";
+
+        case NodeType::Element: {
+            if (tag == "root") {
+                std::string out;
+                for (const auto& c : children)
+                    out += c->toString(recursive);
+                return out;
+            }
+
+            std::string out = "<" + tag;
+            for (const auto& [k, v] : attributes) {
+                out += " " + k;
+                if (!v.empty())
+                    out += "=\"" + v + "\"";
+            }
+            if (children.empty() && text.empty()) {
+                out += " />";
+                return out;
+            }
+            out += ">";
+
+            if (recursive) {
+                for (const auto& c : children)
+                    out += c->toString(recursive);
+            }
+            out += text;
+            out += "</" + tag + ">";
+            return out;
+        }
+    }
+    return "";
+}

@@ -113,6 +113,8 @@ public:
     bool isExpression() const { return m_isExpression; }
     void setExpression(bool v) { m_isExpression = v; }
 
+    std::string toString(bool recursive = true) const;
+
 private:
     NodeType type{ NodeType::Element };
     std::string tag;
