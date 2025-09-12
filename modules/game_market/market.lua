@@ -53,6 +53,9 @@ offerTypeList = nil
 categoryList = nil
 subCategoryList = nil
 slotFilterList = nil
+local classList = nil
+local tierList = nil
+local selectedTier = 0
 createOfferButton = nil
 buyButton = nil
 sellButton = nil
@@ -80,6 +83,7 @@ marketOffers = {}
 marketItems = {}
 information = {}
 currentItems = {}
+local MarketOffers2 = {}
 lastCreatedOffer = 0
 fee = 0
 averagePrice = 0
@@ -187,6 +191,7 @@ local function addOffer(offer, offerType)
     if not offer then
         return false
     end
+    local version = g_game.getClientVersion()
     local id = offer:getId()
     local player = offer:getPlayer()
     local amount = offer:getAmount()
@@ -194,7 +199,10 @@ local function addOffer(offer, offerType)
     local timestamp = offer:getTimeStamp()
     local itemName = offer:getItem():getMarketData().name
     local action = offer:getState()
-
+    local tier = offer:getTier() or 0
+    local MyOffers = (version >= 1251) and MarketRequest.MyOffers or MarketRequest.OldMyOffers
+    local MyHistory = (version >= 1251) and MarketRequest.MyHistory or MarketRequest.OldMyHistory
+    
     buyOfferTable:toggleSorting(false)
     sellOfferTable:toggleSorting(false)
 
@@ -213,9 +221,9 @@ local function addOffer(offer, offerType)
         end
 
         local row = nil
-        if offer.var == MarketRequest.MyOffers then
+        if offer.var == MyOffers then
             row = buyMyOfferTable:addRow({{
-                text = itemName
+                text = itemName .. " (Tier " .. tier .. ")"
             }, {
                 text = price * amount
             }, {
@@ -226,9 +234,9 @@ local function addOffer(offer, offerType)
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
             }})
-        elseif offer.var == MarketRequest.MyHistory then
+        elseif offer.var == MyHistory then
             row = buyMyHistoryTable:addRow({{
-                text = itemName
+                text = itemName .. " (Tier " .. tier .. ")"
             }, {
                 text = price * amount
             }, {
@@ -264,9 +272,9 @@ local function addOffer(offer, offerType)
         end
 
         local row = nil
-        if offer.var == MarketRequest.MyOffers then
+        if offer.var == MyOffers then
             row = sellMyOfferTable:addRow({{
-                text = itemName
+                text = itemName .. " (Tier " .. tier .. ")"
             }, {
                 text = price * amount
             }, {
@@ -277,9 +285,9 @@ local function addOffer(offer, offerType)
                 text = string.gsub(os.date('%c', timestamp), ' ', '  '),
                 sortvalue = timestamp
             }})
-        elseif offer.var == MarketRequest.MyHistory then
+        elseif offer.var == MyHistory then
             row = sellMyHistoryTable:addRow({{
-                text = itemName
+                text = itemName .. " (Tier " .. tier .. ")"
             }, {
                 text = price * amount
             }, {
@@ -409,7 +417,7 @@ local function updateOffers(offers)
     end
 end
 
-local function updateDetails(itemId, descriptions, purchaseStats, saleStats)
+local function updateDetails(itemId, descriptions, purchaseStats, saleStats, itemTier)
     local purchaseOfferStatistic = {}
     local saleOfferStatistic = {}
     if not selectedItem then
@@ -566,11 +574,12 @@ local function updateSelectedItem(widget)
     Market.resetCreateOffer()
     if Market.isItemSelected() then
         selectedItem:setItem(selectedItem.item.displayItem)
+        ItemsDatabase.setTier(selectedItem, selectedTier)
         nameLabel:setText(selectedItem.item.marketData.name)
         clearOffers()
 
         Market.enableCreateOffer(true) -- update offer types
-        MarketProtocol.sendMarketBrowse(MarketRequest.BrowseItem, selectedItem.item.marketData.tradeAs) -- send browsed msg
+        MarketProtocol.sendMarketBrowse(MarketRequest.BrowseItem, selectedItem.item.marketData.tradeAs , selectedTier)
     else
         Market.clearSelectedItem()
     end
@@ -771,6 +780,16 @@ local function onChangeSubCategory(combobox, option)
 end
 
 local function onChangeSlotFilter(combobox, option)
+    Market.updateCurrentItems()
+end
+
+local function onChangeTier(combobox, option)
+    selectedTier = tonumber(combobox:getCurrentOption().data) or 0
+    Market.updateCurrentItems()
+end
+
+local function onChangeClassification(combobox, option)
+    -- todo, I don't know how it works.
     Market.updateCurrentItems()
 end
 
@@ -1036,11 +1055,15 @@ local function initInterface()
     categoryList:setCurrentOption(getMarketCategoryName(MarketCategory.First))
     subCategoryList:setEnabled(false)
 
+    classList = browsePanel:getChildById("classComboBox")
+    tierList = browsePanel:getChildById("tierComboBox")
+
     -- hook item filters
     categoryList.onOptionChange = onChangeCategory
     subCategoryList.onOptionChange = onChangeSubCategory
     slotFilterList.onOptionChange = onChangeSlotFilter
-
+    classList.onOptionChange = onChangeClassification
+    tierList.onOptionChange = onChangeTier
     -- setup tables
     buyOfferTable = itemOffersPanel:recursiveGetChildById('buyingTable')
     sellOfferTable = itemOffersPanel:recursiveGetChildById('sellingTable')
@@ -1171,6 +1194,7 @@ function Market.clearSelectedItem()
         radioItemSet:selectWidget(nil)
         nameLabel:setText('No item selected.')
         selectedItem:setItem(nil)
+        ItemsDatabase.setTier(selectedItem, 0)
         selectedItem.item = nil
         selectedItem.ref:setChecked(false)
         selectedItem.ref = nil
@@ -1191,8 +1215,14 @@ function Market.isOfferSelected(type)
     return selectedOffer[type] and not selectedOffer[type]:isNull()
 end
 
-function Market.getDepotCount(itemId)
-    return information.depotItems[itemId] and information.depotItems[itemId].itemCount or 0
+function Market.getDepotCount(itemId, tier)
+    if not tier then
+        tier = selectedTier
+    end
+    if information.depotItems[itemId] and information.depotItems[itemId][tier] then
+        return information.depotItems[itemId][tier].itemCount
+    end
+    return 0
 end
 
 function Market.enableCreateOffer(enable)
@@ -1270,6 +1300,18 @@ function Market.refreshItemsWidget(selectItem)
     end
     radioItemSet = UIRadioGroup.create()
 
+    table.sort(currentItems, function(a, b)
+        local amountA = Market.getDepotCount(a.marketData.tradeAs)
+        local amountB = Market.getDepotCount(b.marketData.tradeAs)
+        if amountA > 0 and amountB <= 0 then
+            return true
+        elseif amountA <= 0 and amountB > 0 then
+            return false
+        else
+            return a.marketData.tradeAs < b.marketData.tradeAs
+        end
+    end)
+
     local select = nil
     for i = 1, #currentItems do
         local item = currentItems[i]
@@ -1284,7 +1326,7 @@ function Market.refreshItemsWidget(selectItem)
 
         local itemWidget = itemBox:getChildById('item')
         itemWidget:setItem(item.displayItem)
-
+        ItemsDatabase.setTier(itemWidget, selectedTier)
         local amount = Market.getDepotCount(item.marketData.tradeAs)
         if amount > 0 then
             itemWidget:setText(amount)
@@ -1426,9 +1468,12 @@ function Market.createNewOffer()
         Market.displayMessage(errorMsg)
         return
     end
-
-    local itemTier = Item.create(spriteId):getClassification()
-    g_game.createMarketOffer(type, spriteId, itemTier, amount, piecePrice, anonymous)
+    if g_game.getFeature(GameThingUpgradeClassification) then
+        g_game.createMarketOffer(type, spriteId, selectedTier, amount, piecePrice, anonymous)
+    else
+        local itemTier = g_things.getThingType(spriteId, ThingCategoryItem):getClassification()
+        g_game.createMarketOffer(type, spriteId, itemTier, amount, piecePrice, anonymous)
+    end
     lastCreatedOffer = os.time()
     Market.resetCreateOffer()
 end
@@ -1481,18 +1526,18 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
         for i = 1, #depotItems do
             local itemId = depotItems[i][1]
             local count = depotItems[i][2]
-            local itClass = depotItems[i][3]
-            if g_game.getClientVersion() > 1281 then
-                if itemId and count and tonumber(itClass) >= 0 then
-                    depotItemsLua[itemId] = {
+            local tier = depotItems[i][3]
+            if itemId and count then
+                depotItemsLua[itemId] = depotItemsLua[itemId] or {}
+                if g_game.getClientVersion() > 1281 then
+                    depotItemsLua[itemId][tier] = {
                         itemCount = count,
-                        itemClass = itClass
+                        itemTier  = tier
                     }
-                end
-            else
-                if itemId and count then
-                    depotItemsLua[itemId] = {
-                        itemCount = count
+                else
+                    depotItemsLua[itemId][0] = {
+                        itemCount = count,
+                        itemTier  = 0
                     }
                 end
             end
@@ -1519,6 +1564,12 @@ function Market.onMarketEnter(depotItems, offers, balance, vocation)
     if g_game.isOnline() then
         marketWindow:lock()
         marketWindow:show()
+        if not g_game.getFeature(GameThingUpgradeClassification) then
+            classList:hide()
+            tierList:hide()
+            classList:setHeight(0)
+            tierList:setHeight(0)
+        end
     end
 end
 
@@ -1526,21 +1577,18 @@ function Market.onMarketLeave()
     Market.close(false)
 end
 
-function Market.onMarketDetail(itemId, descriptions, purchaseStats, saleStats)
-    updateDetails(itemId, descriptions, purchaseStats, saleStats)
+function Market.onMarketDetail(itemId, descriptions, purchaseStats, saleStats, itemTier)
+    updateDetails(itemId, descriptions, purchaseStats, saleStats, itemTier)
 end
-
-MarketOffers2 = {}
 
 function Market.onMarketBrowse(intOffers, nameOffers)
-    local tmpOffers = MarketOffers2
+    updateOffers(MarketOffers2)
     MarketOffers2 = {}
-    updateOffers(tmpOffers)
 end
 
-function Market.onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var)
+function Market.onMarketReadOffer(action, amount, counter, itemId, playerName, price, state, timestamp, var, itemTier)
     table.insert(MarketOffers2, MarketOffer.new({timestamp, counter}, action, Item.create(itemId), amount, price,
-                                                playerName, state, var))
+                                                playerName, state, var, itemTier))
 end
 
 function Market.onResourcesBalanceChange(value, oldBalance, resourceType)

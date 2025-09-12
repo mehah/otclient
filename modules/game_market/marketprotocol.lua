@@ -56,17 +56,18 @@ end
 
 -- sending protocols
 
-function MarketProtocol.sendMarketBrowse(browseId, browseType)
+function MarketProtocol.sendMarketBrowse(browseId, itemId, tier)
     if g_game.getFeature(GamePlayerMarket) then
         local msg = OutputMessage.create()
         msg:addU8(ClientOpcodes.ClientMarketBrowse)
         if g_game.getClientVersion() >= 1251 then
             msg:addU8(browseId)
-            if browseType > 0 then
-                msg:addU16(browseType)
+            msg:addU16(itemId)
+            if g_game.getFeature(GameThingUpgradeClassification) then
+                msg:addU8(tier)
             end
         else
-            msg:addU16(browseType)
+            msg:addU16(itemId)
         end
         send(msg)
     else
@@ -75,8 +76,16 @@ function MarketProtocol.sendMarketBrowse(browseId, browseType)
 end
 
 function MarketProtocol.sendMarketBrowseMyOffers()
-    MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 0)
+    if g_game.getClientVersion() >= 1251 then
+        MarketProtocol.sendMarketBrowse(MarketRequest.MyOffers, 0, 0)
+    else
+        MarketProtocol.sendMarketBrowse(0, MarketRequest.OldMyOffers, 0)
+    end
 end
 function MarketProtocol.sendMarketBrowseOfferHistory()
-    MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 0)
+    if g_game.getClientVersion() >= 1251 then
+        MarketProtocol.sendMarketBrowse(MarketRequest.MyHistory, 0, 0)
+    else
+        MarketProtocol.sendMarketBrowse(0, MarketRequest.OldMyHistory, 0)
+    end
 end
