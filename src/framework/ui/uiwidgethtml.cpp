@@ -22,6 +22,7 @@
 #include "uiwidget.h"
 #include <framework/html/htmlnode.h>
 #include <framework/core/eventdispatcher.h>
+#include "uimanager.h"
 
 namespace {
     static uint32_t UPDATE_EPOCH = 1;
@@ -410,6 +411,7 @@ namespace {
                     } else  width += c_width;
 
                     const int c_height = std::max<int>(textSize.height(), std::max<int>(c->getHeight(), c->getHeightHtml().valueCalculed)) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
+
                     if (breakLine(c->getDisplay()) || c->getPrevWidget() && breakLine(c->getPrevWidget()->getDisplay())) {
                         height += c_height;
                     } else if (c_height > height)
@@ -537,6 +539,30 @@ void UIWidget::scheduleUpdateSize() {
         FLUSH_PENDING = false;
         ++UPDATE_EPOCH;
     });
+}
+
+void UIWidget::setOverflow(OverflowType type) {
+    if (m_overflowType == type)
+        return;
+
+    m_overflowType = type;
+
+    scheduleAnchorAlignment();
+
+    // Only Vertical
+    if (type == OverflowType::Scroll) {
+        auto scrollWidget = g_ui.createWidget("VerticalScrollBar", nullptr);
+        callLuaField("setVerticalScrollBar", scrollWidget);
+
+        scrollWidget->setDisplay(m_displayType);
+        m_parent->insertChild(getChildIndex() + 1, scrollWidget);
+
+        scrollWidget->addAnchor(Fw::AnchorTop, m_id, Fw::AnchorTop);
+        scrollWidget->addAnchor(Fw::AnchorRight, m_id, Fw::AnchorRight);
+        scrollWidget->addAnchor(Fw::AnchorBottom, m_id, Fw::AnchorBottom);
+        scrollWidget->callLuaField("setStep", 48);
+        scrollWidget->callLuaField("pixelsScroll");
+    }
 }
 
 void UIWidget::setDisplay(DisplayType type) {

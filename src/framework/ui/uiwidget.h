@@ -278,7 +278,7 @@ public:
     void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type; scheduleAnchorAlignment(); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
-    void setOverflow(OverflowType type) { m_overflowType = type; scheduleAnchorAlignment(); }
+    void setOverflow(OverflowType type);
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
     void setResultConditionIf(bool v) {
         setProp(PropConditionIf, v);

@@ -253,7 +253,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     const auto& styleName = g_ui.getStyleName(translateStyleName(node->getTag(), node));
 
-    auto widget = g_ui.createWidget(styleName.empty() ? "UIWidget" : styleName, parent);
+    auto widget = g_ui.createWidget(styleName.empty() ? "UIHTML" : styleName, parent);
     node->setWidget(widget);
 
     const auto& id = node->getAttr("id");
