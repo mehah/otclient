@@ -99,12 +99,17 @@ public:
     std::string getStyle(std::string_view style) const;
     auto& getAttrStyles() { return m_attrStyles; }
 
+    auto& getInheritableStyles() {
+        return m_inheritableStyles;
+    }
+
     void append(const HtmlNodePtr& child);
     void prepend(const HtmlNodePtr& child);
     void insert(const HtmlNodePtr& child, size_t pos);
     void destroy();
     void remove(const HtmlNodePtr& child);
     void clear();
+    void setParent(const HtmlNodePtr& node) { parent = node; }
 
     bool isHovered{ false };
     bool isFocused{ false };
@@ -131,6 +136,8 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
     std::unordered_map<std::string, std::map<std::string, std::string>> m_styles;
+    std::unordered_map<std::string, std::map<std::string, std::string>> m_inheritableStyles;
+
     std::map<std::string, std::string> m_attrStyles;
     UIWidgetPtr m_widget;
 

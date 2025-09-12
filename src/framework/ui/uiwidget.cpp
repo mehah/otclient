@@ -172,15 +172,14 @@ UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
     if (!isOnHtml()) return nullptr;
     auto widget = g_html.createWidgetFromHTML(html, nullptr, m_htmlId);
     insertChild(index, widget);
-    m_htmlNode->insert(widget->m_htmlNode, index);
-
-    refreshHtml(true);
     return widget;
 }
 
 UIWidgetPtr UIWidget::append(const std::string& html) {
     if (!isOnHtml()) return nullptr;
-    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlId);
+    auto widget = g_html.createWidgetFromHTML(html, nullptr, m_htmlId);
+    addChild(widget);
+    return widget;
 }
 
 UIWidgetPtr UIWidget::prepend(const std::string& html) {
@@ -301,7 +300,7 @@ void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
     m_layout->addWidget(child);
     if (m_htmlNode) {
         m_htmlNode->insert(child->m_htmlNode, index);
-        refreshHtml();
+        refreshHtml(true);
     }
 
     // update new child states
@@ -345,7 +344,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
 
         if (m_htmlNode) {
             m_htmlNode->remove(child->m_htmlNode);
-            refreshHtml();
+            refreshHtml(true);
         }
 
         // remove access to child via widget.childId
@@ -512,7 +511,7 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
     if (m_htmlNode) {
         m_htmlNode->remove(child->m_htmlNode);
         m_htmlNode->prepend(child->m_htmlNode);
-        refreshHtml();
+        refreshHtml(true);
     }
 
     { // cache index
@@ -544,7 +543,7 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
     if (m_htmlNode) {
         m_htmlNode->remove(child->m_htmlNode);
         m_htmlNode->append(child->m_htmlNode);
-        refreshHtml();
+        refreshHtml(true);
     }
 
     { // cache index
@@ -586,7 +585,7 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, const int index)
     if (m_htmlNode) {
         m_htmlNode->remove(child->m_htmlNode);
         m_htmlNode->insert(child->m_htmlNode, index - 1);
-        refreshHtml();
+        refreshHtml(true);
     }
 
     { // cache index

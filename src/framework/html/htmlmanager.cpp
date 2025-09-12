@@ -29,6 +29,7 @@
 #include <framework/core/resourcemanager.h>
 #include <ranges>
 #include <framework/core/modulemanager.h>
+#include <framework/core/eventdispatcher.h>
 
 HtmlManager g_html;
 std::vector<css::StyleSheet> GLOBAL_STYLES;
@@ -185,7 +186,7 @@ void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWi
     group->callLuaField("addWidget", node->getWidget());
 }
 
-void applyStyleSheet(HtmlNode* node, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
+void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
     static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
         for (const auto& child : n->getChildren()) {
             child->getStyles()[style][decl.property] = decl.value;
@@ -195,7 +196,7 @@ void applyStyleSheet(HtmlNode* node, std::string_view htmlPath, const css::Style
 
     for (const auto& rule : sheet.rules) {
         const auto& selectors = stdext::join(rule.selectors);
-        const auto& nodes = node->querySelectorAll(selectors);
+        const auto& nodes = (root ? root : mainNode)->querySelectorAll(selectors);
 
         if (checkRuleExist && nodes.empty()) {
             g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
@@ -203,6 +204,9 @@ void applyStyleSheet(HtmlNode* node, std::string_view htmlPath, const css::Style
         }
 
         for (const auto& node : nodes) {
+            if (root && node.get() != mainNode)
+                continue;
+
             if (node->getWidget()) {
                 bool hasMeta = false;
                 for (const auto& metas : rule.selectorMeta) {
@@ -369,27 +373,43 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
             script = el->getText();
             scriptStr = el->toString();
         } else if (el->getTag() == "html") {
-            for (const auto& n : el->getChildren())
+            for (const auto& n : el->getChildren()) {
                 widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName);
+            }
         }
     }
 
-    for (const auto& sheet : GLOBAL_STYLES)
-        applyStyleSheet(node.get(), htmlPath, sheet, false);
-    for (const auto& sheet : root.sheets)
-        applyStyleSheet(node.get(), htmlPath, sheet, checkRuleExist);
+    if (!widget)
+        return nullptr;
 
-    auto all = node->querySelectorAll("*");
-    all.reserve(all.size() + textNodes.size());
-    all.insert(all.end(), textNodes.begin(), textNodes.end());
-    for (const auto& node : std::views::reverse(all)) {
-        if (const auto widget = node->getWidget().get()) {
-            applyAttributesAndStyles(widget, node.get(), root.groups, moduleName);
+    auto afterLocal = [=]() mutable {
+        const auto rootNode = isDynamic ? root.node.get() : nullptr;
+        const auto mainNode = widget->getHtmlNode().get();
+        for (const auto& sheet : GLOBAL_STYLES)
+            applyStyleSheet(rootNode, mainNode, htmlPath, sheet, false);
+        for (const auto& sheet : root.sheets)
+            applyStyleSheet(rootNode, mainNode, htmlPath, sheet, checkRuleExist);
+
+        auto all = node->querySelectorAll("*");
+        if (isDynamic)
+            all.emplace_back(widget->getHtmlNode());
+        all.reserve(all.size() + textNodes.size());
+        all.insert(all.end(), textNodes.begin(), textNodes.end());
+        for (const auto& node : std::views::reverse(all)) {
+            if (const auto w = node->getWidget().get()) {
+                applyAttributesAndStyles(w, node.get(), root.groups, moduleName);
+            }
         }
-    }
 
-    if (widget && !script.empty())
-        widget->callLuaField("__scriptHtml", moduleName, script, scriptStr);
+        if (widget && !script.empty())
+            widget->callLuaField("__scriptHtml", moduleName, script, scriptStr);
+    };
+
+    if (isDynamic) {
+        // The afterload is deferred, because in order to process the CSS of the dynamic element,
+        // it needs to be attached to its parent — and that only happens later, when it is added to the widget.
+        g_dispatcher.deferEvent(afterLocal);
+    } else afterLocal();
 
     return widget;
 }
@@ -419,10 +439,10 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
     }
 
     auto parse = parseHtml("<html>" + html + "</html>");
-    readNode(it->second, parse, parent, it->second.moduleName, "", false, true, htmlId);
-    if (auto node = parse->querySelector("html > :first"))
+    readNode(it->second, parse, nullptr, it->second.moduleName, "", false, true, htmlId);
+    if (auto node = parse->querySelector("html > :first")) {
         return node->getWidget();
-
+    }
     return  nullptr;
 }
 
