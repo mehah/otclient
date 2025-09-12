@@ -124,22 +124,39 @@ local function setupComboBox()
     lootControlModeCombobox.onOptionChange = function(comboBox, option)
         local selectedOption = comboBox:getCurrentOption().data
         setOption('lootControlMode', selectedOption)
+        g_settings.set('lootControlMode', selectedOption)
     end
 
     mouseControlModeCombobox.onOptionChange = function(comboBox, option)
         local selectedOption = comboBox:getCurrentOption().data
         if selectedOption == 1 then
+            -- Classic Controls selected
             setOption('classicControl', true)
             setOption('smartLeftClick', false)
+            
+            -- Ensure the loot control mode is set to 0 (Loot: Right) by default
+            -- when switching to Classic Controls for the first time
+            if not lootControlModeCombobox:isVisible() then
+                setOption('lootControlMode', 0)
+                g_settings.set('lootControlMode', 0)
+                lootControlModeCombobox:setCurrentOption(0)
+            end
+            
             lootControlModeCombobox:setVisible(true)
+            g_settings.set('classicControl', true)
+            g_settings.set('smartLeftClick', false)
         elseif selectedOption == 0 then
             setOption('classicControl', false)
             setOption('smartLeftClick', false)
             lootControlModeCombobox:setVisible(false)
+            g_settings.set('classicControl', false)
+            g_settings.set('smartLeftClick', false)
         elseif selectedOption == 2 then
             setOption('classicControl', false)
             setOption('smartLeftClick', true)
             lootControlModeCombobox:setVisible(false)
+            g_settings.set('classicControl', false)
+            g_settings.set('smartLeftClick', true)
         end
     end
 
@@ -205,9 +222,15 @@ local function setup()
         end
     end
     
-        -- Set initial mouse control mode
+    -- Set initial mouse control mode
     local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
     local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+    
+    -- Explicitly hide lootControlMode combobox initially
+    if lootControlModeCombobox then
+        lootControlModeCombobox:setVisible(false)
+    end
+    
     if mouseControlModeCombobox then
         local mode = 0
         if getOption('classicControl') then
@@ -225,6 +248,12 @@ local function setup()
     -- Set initial loot control mode
     if lootControlModeCombobox then
         local lootMode = getOption('lootControlMode')
+        -- Ensure lootControlMode is 0 (Loot: Right) by default if not previously set
+        if getOption('classicControl') and (lootMode == nil or lootMode < 0 or lootMode > 2) then
+            lootMode = 0
+            setOption('lootControlMode', lootMode)
+            g_settings.set('lootControlMode', lootMode)
+        end
         lootControlModeCombobox:setCurrentOption(lootMode)
     end
 end
