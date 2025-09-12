@@ -873,6 +873,9 @@ void Creature::setSpeed(uint16_t speed)
         } else m_calculatedStepSpeed = 1;
     }
 
+    if (isLocalPlayer())
+        static_self_cast<LocalPlayer>()->registerAdjustInvalidPosEvent();
+
     // speed can change while walking (utani hur, paralyze, etc..)
     if (m_walking)
         nextWalkUpdate();

@@ -41,6 +41,9 @@ public:
     void setCenter(const bool v) { m_center = v; }
     bool isCentered() { return m_center; }
 
+    void setShader(std::string_view name) override;
+    bool hasShader() override;
+
     /*
     // @ note:
     this did not work:
@@ -62,6 +65,8 @@ public:
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
     Outfit getOutfit() { if (!m_creature) setOutfit({}); return m_creature->getOutfit(); }
+
+    std::string m_shaderName;
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };
     bool m_center{ false };

@@ -75,6 +75,9 @@ void UIItem::setItemId(const int id)
     else
         m_item = Item::create(id);
 
+    if (m_item)
+        m_item->setShader(m_shaderName);
+
     callLuaField("onItemChange");
 }
 
@@ -101,8 +104,6 @@ void UIItem::setItem(const ItemPtr& item)
 
 void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
-    UIWidget::onStyleApply(styleName, styleNode);
-
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "item-id")
             setItemId(node->value<int>());
@@ -117,4 +118,13 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
         else if (node->tag() == "always-show-count")
             m_alwaysShowCount = node->value<bool>();
     }
+
+    UIWidget::onStyleApply(styleName, styleNode);
 }
+
+void UIItem::setShader(std::string_view name) {
+    m_shaderName = name;
+    if (getItem()) getItem()->setShader(name);
+}
+
+bool UIItem::hasShader() { return getItem() ? getItem()->getShader() != nullptr : false; }

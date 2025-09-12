@@ -1,52 +1,87 @@
-MainWindow
-  size: 360 121
-  text: Add VIP group (User-Created groups left: %s)
-  text-offset: 0 1
+FloatingInputWindow 
+  id: addGroupWindow
+  size: 359 115
+  padding: 3
+  visible: false
+  anchors.centerIn: parent
+  margin-left: 100
+  margin-top: 20
   @onEnter: modules.game_viplist.addGroup()
-  @onEscape: |
-    self:destroy()
-    modules.game_viplist.addGroupWindow = nil
+  @onEscape: modules.game_viplist.destroyAddGroupWindow()
 
   Label
-    id: header
-    !text: tr('Please enter a group name:')
+    id: headerLabel
+    !text: tr('Add VIP Group')
+    text-align: center
+    font: verdana-11px-antialised
+    color: #909090
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    text-auto-resize: true
-    margin-top: -7
-    margin-left: -1
+    margin-top: -5
+    height: 20
+  
+  Label
+    id: descriptionText
+    !text: tr('Please enter a group name:')
+    text-wrap: true
+    text-auto-resize:true
+    anchors.top: headerLabel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 10
+    margin-left: 13
 
   TextEdit
     id: name
-    size: 328 16
-    anchors.top: prev.bottom
-    anchors.left: parent.left
+    size: 150 16
+    anchors.top: descriptionText.bottom
     anchors.right: parent.right
-    margin-top: 5
-    padding-top: 0
+    anchors.left: parent.left
+    margin: 7
+    margin-right: 13
+    margin-left: 13
+    text-align: left
+    text-offset: 0 -2
     max-length: 40
 
-  HorizontalSeparator
+  Label
+    height: 38
+    anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    anchors.bottom: next.top
-    margin-bottom: 11
 
-  Button
-    id: okButton
-    !text: tr('Ok')
-    anchors.right: next.left
-    anchors.bottom: parent.bottom
-    margin-right: 11
-    margin-bottom: 6
-    @onClick: modules.game_viplist.addGroup()
+  HorizontalSeparator
+    id: separatorBox 
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: name.bottom
+    margin-top: 13
+    margin-right: 13
+    margin-left: 13
 
-  Button
-    !text: tr('Cancel')
+  StoreButton
+    id: closeButton
     anchors.right: parent.right
     anchors.bottom: parent.bottom
-    margin-bottom: 6
-    @onClick: |
-      self:getParent():destroy()
-      modules.game_viplist.addGroupWindow = nil
+    margin-right: 12
+    margin-bottom: 7
+    margin-top: 10
+    !text: tr('Cancel')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff
+    @onClick: modules.game_viplist.destroyAddGroupWindow()
+
+  StoreButton
+    id: buttonOk
+    anchors.right: closeButton.left
+    anchors.bottom: parent.bottom
+    margin-right: 10
+    margin-bottom: 7
+    margin-top: 10
+    !text: tr('Ok')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff
+    @onClick: modules.game_viplist.addGroup()

@@ -266,6 +266,7 @@ struct ImbuementTrackerItem
     ImbuementTrackerItem(const uint8_t slot) : slot(slot) {}
 
     uint8_t slot;
+    uint8_t totalSlots = 0;
     ItemPtr item;
     std::map<uint8_t, ImbuementSlot> slots;
 };
@@ -301,6 +302,7 @@ struct MarketOffer
     std::string playerName;
     uint8_t state = 0;
     uint16_t var = 0;
+    uint8_t itemTier = 0;
 };
 
 struct Light

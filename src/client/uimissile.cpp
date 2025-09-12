@@ -61,6 +61,9 @@ void UIMissile::setMissileId(const int id)
             m_missile = std::make_shared<Missile>();
         m_missile->setId(id);
         m_missile->setDirection(Otc::South);
+
+        if (m_missile)
+            m_missile->setShader(m_shaderName);
     }
 }
 
@@ -71,8 +74,6 @@ void UIMissile::setMissile(const MissilePtr& e)
 
 void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
-    UIWidget::onStyleApply(styleName, styleNode);
-
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "missile-id")
             setMissileId(node->value<int>());
@@ -85,4 +86,12 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
         else if (node->tag() == "direction")
             setDirection(static_cast<Otc::Direction>(node->value<int>()));
     }
+    UIWidget::onStyleApply(styleName, styleNode);
 }
+
+void UIMissile::setShader(std::string_view name) {
+    m_shaderName = name;
+    if (getMissile()) getMissile()->setShader(name);
+}
+
+bool UIMissile::hasShader() { return getMissile() ? getMissile()->getShader() != nullptr : false; }

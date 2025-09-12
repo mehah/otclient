@@ -1177,11 +1177,11 @@ void ProtocolGame::parseStoreError(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseUnjustifiedStats(const InputMessagePtr& msg)
 {
-    const uint8_t killsDay = msg->getU8();
-    const uint8_t killsDayRemaining = msg->getU8();
-    const uint8_t killsWeek = msg->getU8();
+    const uint8_t killsDay = msg->getU8(); //dayProgress %
+    const uint8_t killsDayRemaining = msg->getU8(); 
+    const uint8_t killsWeek = msg->getU8(); //weekProgress %
     const uint8_t killsWeekRemaining = msg->getU8();
-    const uint8_t killsMonth = msg->getU8();
+    const uint8_t killsMonth = msg->getU8(); //monthProgress %
     const uint8_t killsMonthRemaining = msg->getU8();
     const uint8_t skullTime = msg->getU8();
 
@@ -2036,6 +2036,17 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
     data.dustLevel = msg->getU16();
 }
 
+void ProtocolGame::setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const
+{
+    const auto& creature = g_map.getCreatureById(creatureId);
+    if (!creature) {
+        return;
+    }
+
+    const uint8_t vocationId = msg->getU8();
+    creature->setVocation(vocationId);
+}
+
 void ProtocolGame::addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const
 {
     const auto& creature = g_map.getCreatureById(creatureId);
@@ -2077,7 +2088,7 @@ void ProtocolGame::parseCreatureData(const InputMessagePtr& msg)
         case 11: // creature mana percent
         case 12: // creature show status
         case 13: // player vocation
-            msg->getU8();
+            setCreatureVocation(msg, creatureId);
             break;
         case 14: // creature icons
             addCreatureIcon(msg, creatureId);
@@ -3763,7 +3774,8 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                     creatureType = Proto::CreatureTypeSummonOther;
                 }
             } else if (creatureType == Proto::CreatureTypePlayer) {
-                msg->getU8(); // voc id
+                uint8_t vocationId = msg->getU8();
+                creature->setVocation(vocationId);
             }
         }
 
@@ -4366,7 +4378,9 @@ void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
         std::map<uint8_t, ImbuementSlot> slots;
 
         const uint8_t slotsCount = msg->getU8(); // total amount of imbuing slots on item
+        item.totalSlots = slotsCount; // Store the total number of slots
         if (slotsCount == 0) {
+            itemList.emplace_back(item); // Still add the item even if it has no slots for completeness
             continue;
         }
 
@@ -5527,15 +5541,17 @@ void ProtocolGame::parseMarketEnter(const InputMessagePtr& msg)
 
     for (auto i = 0; i < itemsSentCount; ++i) {
         const uint16_t itemId = msg->getU16();
-        const auto& item = Item::create(itemId);
-
-        uint8_t itemClass = 0;
-        if (item && item->getClassification() > 0) {
-            itemClass = msg->getU8();
+        uint8_t itemTier = 0;
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        if (thing) {
+            const uint16_t classification = thing->getClassification();
+            if (classification > 0) {
+                itemTier = msg->getU8();
+            }
         }
 
         const uint16_t count = msg->getU16();
-        depotItems.push_back({ itemId, count, itemClass });
+        depotItems.push_back({ itemId, count, itemTier });
     }
 
     g_lua.callGlobalField("g_game", "onMarketEnter", depotItems, offers, -1, -1);
@@ -5562,10 +5578,14 @@ void ProtocolGame::parseMarketEnterOld(const InputMessagePtr& msg)
 void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
 {
     const uint16_t itemId = msg->getU16();
+    uint8_t itemTier = 0;
     if (g_game.getClientVersion() >= 1281) {
-        const auto& item = Item::create(itemId);
-        if (item && item->getClassification() > 0) {
-            msg->getU8(); // ?
+        const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+        if (thing) {
+            const uint16_t classification = thing->getClassification();
+            if (classification > 0) {
+                itemTier = msg->getU8();
+            }
         }
     }
 
@@ -5646,7 +5666,7 @@ void ProtocolGame::parseMarketDetail(const InputMessagePtr& msg)
         saleStatsList.push_back({ tmp, Otc::MARKETACTION_SELL, transactions, totalPrice, highestPrice, lowestPrice });
     }
 
-    g_lua.callGlobalField("g_game", "onMarketDetail", itemId, descriptions, purchaseStatsList, saleStatsList);
+    g_lua.callGlobalField("g_game", "onMarketDetail", itemId, descriptions, purchaseStatsList, saleStatsList, itemTier);
 }
 
 MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint8_t action, const uint16_t var)
@@ -5654,12 +5674,16 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
     const uint32_t timestamp = msg->getU32();
     const uint16_t counter = msg->getU16();
     uint16_t itemId = 0;
+    uint8_t itemTier = 0;
     if (var == Otc::OLD_MARKETREQUEST_MY_OFFERS || var == Otc::MARKETREQUEST_OWN_OFFERS || var == Otc::OLD_MARKETREQUEST_MY_HISTORY || var == Otc::MARKETREQUEST_OWN_HISTORY) {
         itemId = msg->getU16();
         if (g_game.getClientVersion() >= 1281) {
-            const auto& item = Item::create(itemId);
-            if (item && item->getClassification() > 0) {
-                msg->getU8();
+            const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
+            if (thing) {
+                const uint16_t classification = thing->getClassification();
+                if (classification > 0) {
+                    itemTier = msg->getU8();
+                }
             }
         }
     } else {
@@ -5677,26 +5701,30 @@ MarketOffer ProtocolGame::readMarketOffer(const InputMessagePtr& msg, const uint
         playerName = msg->getString();
     }
 
-    g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var);
+    g_lua.callGlobalField("g_game", "onMarketReadOffer", action, amount, counter, itemId, playerName, price, state, timestamp, var, itemTier);
     return { .timestamp = timestamp, .counter = counter, .action = action, .itemId = itemId, .amount = amount, .price = price,
-        .playerName = playerName, .state = state, .var = var
+        .playerName = playerName, .state = state, .var = var, .itemTier = itemTier
     };
 }
 
 void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
 {
     uint16_t var = 0;
+    uint8_t itemTier = 0;
     if (g_game.getClientVersion() >= 1281) {
         var = msg->getU8();
         if (var == 3) {
-            var = msg->getU16();
-            const auto& item = Item::create(var);
-            if (item && item->getClassification() > 0) {
-                msg->getU8();
+            var = msg->getU16(); // itemId
+            const auto& thing = g_things.getThingType(var, ThingCategoryItem);
+            if (thing) {
+                const uint16_t classification = thing->getClassification();
+                if (classification > 0) {
+                    itemTier = msg->getU8();
+                }
             }
         }
     } else {
-        var = msg->getU16();
+        var = msg->getU16(); // itemId
     }
 
     const uint32_t buyOfferCount = msg->getU32();
@@ -5715,7 +5743,7 @@ void ProtocolGame::parseMarketBrowse(const InputMessagePtr& msg)
     std::vector<std::string> nameOffers;
 
     for (const auto& offer : offers) {
-        std::vector<uint64_t> intOffer = { offer.action, offer.amount, offer.counter, offer.itemId, offer.price, offer.state, offer.timestamp, offer.var };
+        std::vector<uint64_t> intOffer = { offer.action, offer.amount, offer.counter, offer.itemId, offer.price, offer.state, offer.timestamp, offer.var, offer.itemTier };
         const auto& playerName = offer.playerName;
         intOffers.push_back(intOffer);
         nameOffers.push_back(playerName);

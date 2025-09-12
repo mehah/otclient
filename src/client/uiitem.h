@@ -49,9 +49,13 @@ public:
     bool isVirtual() { return m_virtual; }
     bool isItemVisible() { return m_itemVisible; }
 
+    void setShader(std::string_view name) override;
+    bool hasShader() override;
+
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
+    std::string m_shaderName;
     ItemPtr m_item;
     bool m_virtual{ false };
     bool m_showId{ false };

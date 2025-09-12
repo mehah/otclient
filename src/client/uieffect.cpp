@@ -60,6 +60,8 @@ void UIEffect::setEffectId(const int id)
         if (!m_effect)
             m_effect = std::make_shared<Effect>();
         m_effect->setId(id);
+        if (m_effect)
+            m_effect->setShader(m_shaderName);
     }
 }
 
@@ -70,8 +72,6 @@ void UIEffect::setEffect(const EffectPtr& e)
 
 void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
-    UIWidget::onStyleApply(styleName, styleNode);
-
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "effect-id")
             setEffectId(node->value<int>());
@@ -82,4 +82,13 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
         else if (node->tag() == "show-id")
             m_showId = node->value<bool>();
     }
+
+    UIWidget::onStyleApply(styleName, styleNode);
 }
+
+void UIEffect::setShader(std::string_view name) {
+    m_shaderName = name;
+    if (getEffect()) getEffect()->setShader(name);
+}
+
+bool UIEffect::hasShader() { return getEffect() ? getEffect()->getShader() != nullptr : false; }

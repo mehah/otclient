@@ -67,7 +67,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
         return;
     }
 
-    cancelAjustInvalidPosEvent();
+    cancelAdjustInvalidPosEvent();
     m_preWalks.clear();
     m_serverWalk = true;
 
@@ -80,13 +80,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
 
     const auto& oldPos = getPosition();
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
-
-    cancelAjustInvalidPosEvent();
-    m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
-        m_preWalks.clear();
-        g_game.resetMapUpdatedAt();
-        m_ajustInvalidPosEvent = nullptr;
-    }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
+    registerAdjustInvalidPosEvent();
 }
 
 void LocalPlayer::onWalking() {
@@ -104,10 +98,19 @@ void LocalPlayer::onWalking() {
     }
 }
 
-void LocalPlayer::cancelAjustInvalidPosEvent() {
-    if (!m_ajustInvalidPosEvent) return;
-    m_ajustInvalidPosEvent->cancel();
-    m_ajustInvalidPosEvent = nullptr;
+void LocalPlayer::registerAdjustInvalidPosEvent() {
+    cancelAdjustInvalidPosEvent();
+    m_adjustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
+        m_preWalks.clear();
+        g_game.resetMapUpdatedAt();
+        m_adjustInvalidPosEvent = nullptr;
+    }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
+}
+
+void LocalPlayer::cancelAdjustInvalidPosEvent() {
+    if (!m_adjustInvalidPosEvent) return;
+    m_adjustInvalidPosEvent->cancel();
+    m_adjustInvalidPosEvent = nullptr;
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -143,8 +146,8 @@ void LocalPlayer::cancelWalk(const Otc::Direction direction)
 
     g_map.notificateCameraMove(m_walkOffset);
 
-    if (m_ajustInvalidPosEvent) {
-        m_ajustInvalidPosEvent->execute();
+    if (m_adjustInvalidPosEvent) {
+        m_adjustInvalidPosEvent->execute();
     }
 
     lockWalk();
