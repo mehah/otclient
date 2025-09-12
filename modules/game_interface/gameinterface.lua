@@ -1106,19 +1106,23 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 return true
             elseif useThing:isContainer() or useThing:isLyingCorpse() then
                 -- Handle both regular containers and corpses
-                -- If it's Loot: Right, perform quickloot before opening
+                -- For Loot: Right, only perform quickloot (don't open container)
                 if lootControlMode == 0 and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
-                    g_game.sendQuickLoot(1, useThing)
-                    -- Don't return here, we want to also open the container
+                    if useThing:isLyingCorpse() or useThing:isContainer() then
+                        g_game.sendQuickLoot(1, useThing)
+                        return true
+                    end
                 end
                 
-                -- Open the container after quicklooting
-                if useThing:getParentContainer() then
-                    g_game.open(useThing, useThing:getParentContainer())
-                    return true
-                else
-                    g_game.open(useThing)
-                    return true
+                -- For regular containers that aren't corpses, open them
+                if not useThing:isLyingCorpse() then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                        return true
+                    else
+                        g_game.open(useThing)
+                        return true
+                    end
                 end
             elseif useThing:isMultiUse() then
                 startUseWith(useThing)
@@ -1126,6 +1130,18 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             else
                 g_game.use(useThing)
                 return true
+            end
+            return true
+        elseif useThing and keyboardModifiers == KeyboardShiftModifier and mouseButton == MouseRightButton then
+            -- SHIFT+Right click opens corpses without quicklooting (for Loot: Right mode)
+            if lootControlMode == 0 and (useThing:isContainer() or useThing:isLyingCorpse()) then
+                if useThing:getParentContainer() then
+                    g_game.open(useThing, useThing:getParentContainer())
+                    return true
+                else
+                    g_game.open(useThing)
+                    return true
+                end
             end
             return true
         elseif useThing and useThing:isContainer() and keyboardModifiers == KeyboardCtrlShiftModifier and
