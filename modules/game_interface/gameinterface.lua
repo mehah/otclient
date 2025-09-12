@@ -1105,11 +1105,22 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 g_game.attack(creatureThing)
                 return true
             elseif useThing:isContainer() or useThing:isLyingCorpse() then
-                -- Handle both regular containers and corpses
+                -- Handle both regular containers and corpses based on loot control mode
                 -- For Loot: Right, only perform quickloot (don't open container)
                 if lootControlMode == 0 and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
                     if useThing:isLyingCorpse() or useThing:isContainer() then
                         g_game.sendQuickLoot(1, useThing)
+                        return true
+                    end
+                end
+                
+                -- For Loot: SHIFT+Right, regular right-click only opens corpses (no quickloot)
+                if lootControlMode == 1 then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                        return true
+                    else
+                        g_game.open(useThing)
                         return true
                     end
                 end
@@ -1133,13 +1144,20 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             end
             return true
         elseif useThing and keyboardModifiers == KeyboardShiftModifier and mouseButton == MouseRightButton then
-            -- SHIFT+Right click opens corpses without quicklooting (for Loot: Right mode)
+            -- SHIFT+Right click behavior depends on loot control mode
             if lootControlMode == 0 and (useThing:isContainer() or useThing:isLyingCorpse()) then
+                -- For Loot: Right mode, SHIFT+Right opens corpses without quicklooting
                 if useThing:getParentContainer() then
                     g_game.open(useThing, useThing:getParentContainer())
                     return true
                 else
                     g_game.open(useThing)
+                    return true
+                end
+            elseif lootControlMode == 1 and (useThing:isContainer() or useThing:isLyingCorpse()) then
+                -- For Loot: SHIFT+Right mode, SHIFT+Right only quickloots without opening
+                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
+                    g_game.sendQuickLoot(1, useThing)
                     return true
                 end
             end
