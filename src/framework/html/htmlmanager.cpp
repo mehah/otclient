@@ -264,7 +264,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
     }
 
     widget->setHtmlNode(node);
-    widget->setHtmlId(htmlId);
+    widget->setHtmlRootId(htmlId);
 
     if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);

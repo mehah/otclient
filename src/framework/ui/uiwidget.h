@@ -171,7 +171,7 @@ protected:
     friend class UIManager;
 
     std::string m_id;
-    uint32_t m_htmlId = 0;
+    uint32_t m_htmlRootId = 0;
     UIWidgetPtr m_parent;
     UIWidgetList m_children;
     HtmlNodePtr m_htmlNode;
@@ -287,11 +287,11 @@ public:
 
     bool getResultConditionIf() { return hasProp(PropConditionIf); }
 
-    void setHtmlId(uint32_t id) { m_htmlId = id; }
+    void setHtmlRootId(uint32_t id) { m_htmlRootId = id; }
+    auto getHtmlRootId() const { return m_htmlRootId; }
+    auto getHtmlId() { return isOnHtml() ? m_htmlNode->getAttr("id") : ""; }
 
-    auto getHtmlId() const { return m_htmlId; }
     bool isOnHtml() { return m_htmlNode != nullptr; }
-
     const auto& getHtmlNode() const { return m_htmlNode; }
     auto& getWidthHtml() { return m_width; }
     auto& getHeightHtml() { return m_height; }
