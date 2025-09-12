@@ -67,6 +67,43 @@ local function START_WATCH_LIST()
     end, WATCH_CYCLE_CHECK_MS)
 end
 
+local function ExprHandlerError(runtime, error, widget, controller, nodeStr, onError)
+    if runtime then
+        error = "[Script runtime error]\n" .. error
+    end
+    if onError then error = error .. '\n' .. onError() end
+    error = error .. '\nWidget[#' .. widget:getId() .. ']:\n\n' .. nodeStr
+    pwarning(error .. "\n\n------------------------------------")
+end
+
+local function getFncByExpr(exp, nodeStr, widget, controller, onError)
+    local f, syntaxErr = loadstring(exp,
+        ("Controller: %s | %s"):format(controller.name, controller.dataUI.name))
+
+    if not f then
+        ExprHandlerError(false, syntaxErr, widget, controller, nodeStr, onError)
+        return
+    end
+
+    return f()
+end
+
+local function execFnc(f, args, widget, controller, nodeStr, onError)
+    if not f or not args then
+        return
+    end
+
+    local success, value = xpcall(function()
+        return f(unpack(args))
+    end, function(e) return "Erro: " .. tostring(e) end)
+
+    if not success then
+        ExprHandlerError(true, value, widget, controller, nodeStr, onError)
+    end
+
+    return value, success
+end
+
 function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
@@ -85,27 +122,17 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
     if isBinding then
         setterName = setterName:sub(2):gsub("^%l", string.upper)
 
-        local vStr = value
-        local f, syntaxErr = loadstring('return function(self, target) return ' .. vStr .. ' end',
-            ("controller:%s"):format(controllerName))
-        if not f then
-            pwarning(syntaxErr)
-            print(('[widget:%] attr: %'):format(self:getId(), attr), vStr)
-            return
-        end
-        local fnc = f()
+        local success = false
+        local fnc = getFncByExpr('return function(self, target) return ' .. value .. ' end',
+            NODE_STR, self, controller, function()
+                return ('Attribute Error[%s]: %s'):format(attr, value)
+            end)
 
-        local sucess, value = xpcall(function()
-            return fnc(controller)
-        end, function(e) return "Erro: " .. tostring(e) end)
+        value, success = execFnc(fnc, { controller }, self, controller, NODE_STR, function()
+            return ('Attribute Error[%s]: %s'):format(attr, value)
+        end)
 
-        if not sucess then
-            pwarning(("[Script runtime error]\n%s"):format(value))
-            print('[widget:' .. self:getId() .. '] attr: ' .. attr, vStr)
-            print('HTML: ' .. NODE_STR)
-            pwarning("------------")
-            return
-        end
+        if not success then return end
 
         watchObj = {
             widget = self,
@@ -180,28 +207,16 @@ local EVENTS_TRANSLATED = {
 }
 
 local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
-    local f, syntaxErr = loadstring('return function(self, event, target) ' .. callStr .. ' end',
-        ("controller:%s"):format(controller.name))
-    if not f then
-        pwarning(syntaxErr)
-        print(('[widget:%] event: %'):format(widget:getId(), eventName), callStr)
-        return
-    end
+    local fnc = getFncByExpr('return function(self, event, target) ' .. callStr .. ' end',
+        NODE_STR, widget, controller, function()
+            return ('Event Error[%s]: %s'):format(eventName, callStr)
+        end)
 
-    local eventCall = f()
     local event = { target = widget }
     local function execEventCall()
-        local sucess, resultOrErr = xpcall(function()
-            return eventCall(controller, event, widget)
-        end, function(e) return "Erro: " .. tostring(e) end)
-
-        if not sucess then
-            pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
-            print('[widget:' .. widget:getId() .. '] event: ' .. eventName, callStr)
-            print('HTML: ' .. NODE_STR)
-            pwarning("------------")
-            return
-        end
+        execFnc(fnc, { controller, event, widget }, widget, controller, NODE_STR, function()
+            return ('Event Error[%s]: %s'):format(eventName, callStr)
+        end)
     end
 
     if eventName == 'onchange' then
@@ -285,72 +300,46 @@ function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
         end
     end
 
-    local getFncSet = function(attr)
-        local exp = attrs[attr]
-        local f, syntaxErr = loadstring('return function(self, value, target) ' .. exp .. '=value end',
-            ("controller:%s"):format(controller.name))
-
-        if not f then
-            pwarning(syntaxErr)
-            print('Attr: ' .. attr, exp)
-            print('HTML: ' .. NODE_STR)
-            return
-        end
-
-        return f() or nil
+    local getFncSet = function(attrName)
+        local exp = attrs[attrName]
+        return getFncByExpr('return function(self, value, target) ' .. exp .. '=value end',
+            NODE_STR, self, controller, function()
+                return ('Attribute error[%s]: %s'):format(attrName, exp)
+            end)
     end
 
-    if attrs['*checked'] then
-        local set = getFncSet('*checked')
+    local attrName = '*checked'
+    if attrs[attrName] then
+        local set = getFncSet(attrName)
         if set then
             controller:registerEvents(self, {
                 onCheckChange = function(widget, value)
-                    local sucess, resultOrErr = xpcall(function()
-                        return set(controller, value, widget)
-                    end, function(e) return "Erro: " .. tostring(e) end)
-
-                    if not sucess then
-                        pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
-                        print('Attr: *checked', attrs['*checked'])
-                        print('HTML: ' .. NODE_STR)
-                        pwarning("------------")
-                    end
+                    execFnc(set, { controller, value, widget }, self, controller, NODE_STR, function()
+                        return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
+                    end)
                 end
             })
         end
     end
 
+    attrName = '*value'
     if attrs['*value'] then
-        local set = getFncSet('*value')
+        local set = getFncSet(attrName)
         if set then
             if self.getCurrentOption then
                 controller:registerEvents(self, {
                     onOptionChange = function(widget, text, data)
-                        local sucess, resultOrErr = xpcall(function()
-                            return set(controller, data, widget)
-                        end, function(e) return "Erro: " .. tostring(e) end)
-
-                        if not sucess then
-                            pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
-                            print('Attr: *value', attrs['*value'])
-                            print('HTML: ' .. NODE_STR)
-                            pwarning("------------")
-                        end
+                        execFnc(set, { controller, data, widget }, self, controller, NODE_STR, function()
+                            return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
+                        end)
                     end
                 })
             else
                 controller:registerEvents(self, {
                     onTextChange = function(widget, value)
-                        local sucess, resultOrErr = xpcall(function()
-                            return set(controller, value, widget)
-                        end, function(e) return "Erro: " .. tostring(e) end)
-
-                        if not sucess then
-                            pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
-                            print('Attr: *value', attrs['*value'])
-                            print('HTML: ' .. NODE_STR)
-                            pwarning("------------")
-                        end
+                        execFnc(set, { controller, value, widget }, self, controller, NODE_STR, function()
+                            return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
+                        end)
                     end
                 })
             end
@@ -359,20 +348,9 @@ function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
 end
 
 function UIWidget:__scriptHtml(moduleName, script, NODE_STR)
-    local f, syntaxErr = loadstring('return function(self) ' .. script .. ' end', ("controller:%s"):format(moduleName))
-    if not f then
-        pwarning(syntaxErr)
-        print(NODE_STR)
-        return
-    end
-    local sucess, resultOrErr = xpcall(function()
-        return f()(G_CONTROLLER_CALLED[moduleName])
-    end, function(e) return "Erro: " .. tostring(e) end)
+    local controller = G_CONTROLLER_CALLED[moduleName]
+    local fnc = getFncByExpr('return function(self) ' .. script .. ' end',
+        NODE_STR, self, controller)
 
-    if not sucess then
-        pwarning(("[Script runtime error]\n%s"):format(resultOrErr))
-        print('HTML: ' .. NODE_STR)
-        pwarning("------------")
-        return
-    end
+    execFnc(fnc, { controller }, self, controller, NODE_STR)
 end

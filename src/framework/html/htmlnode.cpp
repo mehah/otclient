@@ -371,7 +371,7 @@ void HtmlNode::clear() {
 std::string HtmlNode::toString(bool recursive) const {
     switch (type) {
         case NodeType::Text:
-            return text;
+            return "{{" + text + "}}";
 
         case NodeType::Comment:
             return "<!--" + text + "-->";
