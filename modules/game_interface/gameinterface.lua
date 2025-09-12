@@ -564,10 +564,11 @@ function createThingMenu(menuPosition, lookThing, useThing, creatureThing)
     menu:setGameMenu(true)
 
     local classic = modules.client_options.getOption('classicControl')
+    local smartLeftClick = modules.client_options.getOption('smartLeftClick')
     local mobile = g_platform.isMobile()
     local shortcut = nil
 
-    if not classic and not mobile then
+    if not classic and not mobile and not smartLeftClick then
         shortcut = '(Shift)'
     else
         shortcut = nil
@@ -889,7 +890,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 modules.game_shortcuts.resetShortcuts()
                 g_game.attack(attackCreature)
                 return true
-            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 modules.game_shortcuts.resetShortcuts()
                 g_game.attack(creatureThing)
                 return true
@@ -900,7 +901,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 modules.game_shortcuts.resetShortcuts()
                 g_game.follow(attackCreature)
                 return true
-            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 modules.game_shortcuts.resetShortcuts()
                 g_game.follow(creatureThing)
                 return true
@@ -911,6 +912,83 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             return true
         end
     elseif not modules.client_options.getOption('classicControl') then
+        local smartLeftClick = modules.client_options.getOption('smartLeftClick')
+        
+        if smartLeftClick and mouseButton == MouseLeftButton and keyboardModifiers == KeyboardNoModifier then
+            if attackCreature then
+                g_game.attack(attackCreature)
+                return true
+            elseif creatureThing and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
+                g_game.attack(creatureThing)
+                return true
+            elseif useThing then
+                -- Special handling for usable items with Unpass/Unmove flags
+                if useThing:isUsable() and (useThing:isNotWalkable() or useThing:isNotMoveable()) then
+                    -- Only use the item, don't look at it
+                    if useThing:isContainer() then
+                        if useThing:getParentContainer() then
+                            g_game.open(useThing, useThing:getParentContainer())
+                        else
+                            g_game.open(useThing)
+                        end
+                        return true
+                    elseif useThing:isMultiUse() then
+                        startUseWith(useThing)
+                        return true
+                    else
+                        g_game.use(useThing)
+                        return true
+                    end
+                end
+                
+                -- Standard handling for other usable items
+                if useThing:isContainer() then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                    else
+                        g_game.open(useThing)
+                    end
+                    return true
+                elseif useThing:isMultiUse() then
+                    startUseWith(useThing)
+                    return true
+                else
+                    local useResult = g_game.use(useThing)
+                    
+                    if useResult ~= nil then
+                        return true
+                    end
+                end
+            end
+            
+            if lookThing then
+                local lookPosition = lookThing:getPosition()
+                local lookTile = nil
+                
+                if lookPosition and lookPosition.x ~= 0 then
+                    lookTile = g_map.getTile(lookPosition)
+                end
+                
+                -- For walkable tiles, we want to walk
+                if lookTile and lookTile:isWalkable() and autoWalkPos then
+                    local player = g_game.getLocalPlayer()
+                    player:autoWalk(autoWalkPos)
+                    return true
+                else
+                    -- We don't need to check for usable items with Unpass/Unmove flags here anymore
+                    -- since we handled them in the section above
+                    g_game.look(lookThing)
+                    return true
+                end
+            end
+            
+            if autoWalkPos then
+                local player = g_game.getLocalPlayer()
+                player:autoWalk(autoWalkPos)
+                return true
+            end
+        end
+        
         if keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
             createThingMenu(menuPosition, lookThing, useThing, creatureThing)
             return true
@@ -920,19 +998,26 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             return true
         elseif useThing and keyboardModifiers == KeyboardCtrlModifier and
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
-            if useThing:isContainer() then
-                if useThing:getParentContainer() then
-                    g_game.open(useThing, useThing:getParentContainer())
-                else
-                    g_game.open(useThing)
-                end
-                return true
-            elseif useThing:isMultiUse() then
-                startUseWith(useThing)
+            local smartLeftClick = modules.client_options.getOption('smartLeftClick')
+            
+            if smartLeftClick then
+                createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                 return true
             else
-                g_game.use(useThing)
-                return true
+                if useThing:isContainer() then
+                    if useThing:getParentContainer() then
+                        g_game.open(useThing, useThing:getParentContainer())
+                    else
+                        g_game.open(useThing)
+                    end
+                    return true
+                elseif useThing:isMultiUse() then
+                    startUseWith(useThing)
+                    return true
+                else
+                    g_game.use(useThing)
+                    return true
+                end
             end
             return true
         elseif useThing and useThing:isContainer() and keyboardModifiers == KeyboardCtrlShiftModifier and
@@ -943,7 +1028,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(attackCreature)
             return true
-        elseif creatureThing and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
+        elseif creatureThing and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(creatureThing)
             return true
@@ -957,7 +1042,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             if attackCreature and attackCreature ~= player then
                 g_game.attack(attackCreature)
                 return true
-            elseif creatureThing and creatureThing ~= player and creatureThing:getPosition().z == autoWalkPos.z then
+            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 g_game.attack(creatureThing)
                 return true
             elseif useThing:isContainer() then
@@ -996,7 +1081,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(attackCreature)
             return true
-        elseif creatureThing and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
+        elseif creatureThing and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z and g_keyboard.isAltPressed() and
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.attack(creatureThing)
             return true
