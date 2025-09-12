@@ -186,8 +186,10 @@ void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWi
     group->callLuaField("addWidget", node->getWidget());
 }
 
-void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
+void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist, bool isDynamic) {
     static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
+        if (n->getType() == NodeType::Element)
+            n->getInheritableStyles()[style][decl.property] = decl.value;
         for (const auto& child : n->getChildren()) {
             child->getStyles()[style][decl.property] = decl.value;
             self(child, decl, style, self);
@@ -218,7 +220,7 @@ void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPa
                             style += state.name;
 
                             node->getStyles()[style][decl.property] = decl.value;
-                            if (isInheritable(decl.property)) {
+                            if (!isDynamic && isInheritable(decl.property)) {
                                 setChildrenStyles(node, decl, style, setChildrenStyles);
                             }
                         }
@@ -231,7 +233,7 @@ void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPa
 
                 for (const auto& decl : rule.decls) {
                     node->getStyles()["styles"][decl.property] = decl.value;
-                    if (isInheritable(decl.property)) {
+                    if (!isDynamic && isInheritable(decl.property)) {
                         setChildrenStyles(node, decl, "styles", setChildrenStyles);
                     }
                 }
@@ -280,6 +282,23 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
     auto styles = std::make_shared<OTMLNode>();
 
     std::map<std::string, std::string> stylesMerge;
+
+    for (const auto [key, stylesMap] : node->getStyles()) {
+        if (key != "styles") {
+            auto meta = std::make_shared<OTMLNode>();
+            meta->setTag(key);
+            styles->addChild(meta);
+
+            for (const auto [prop, value] : stylesMap) {
+                auto nodeAttr = std::make_shared<OTMLNode>();
+                nodeAttr->setTag(prop);
+                nodeAttr->setValue(value);
+                meta->addChild(nodeAttr);
+            }
+        } else for (const auto [prop, value] : stylesMap) {
+            stylesMerge[prop] = value;
+        }
+    }
 
     for (const auto [key, stylesMap] : node->getStyles()) {
         if (key != "styles") {
@@ -385,19 +404,31 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
     auto afterLocal = [=]() mutable {
         const auto rootNode = isDynamic ? root.node.get() : nullptr;
         const auto mainNode = widget->getHtmlNode().get();
+
         for (const auto& sheet : GLOBAL_STYLES)
-            applyStyleSheet(rootNode, mainNode, htmlPath, sheet, false);
-        for (const auto& sheet : root.sheets)
-            applyStyleSheet(rootNode, mainNode, htmlPath, sheet, checkRuleExist);
+            applyStyleSheet(rootNode, mainNode, htmlPath, sheet, false, isDynamic);
 
         auto all = node->querySelectorAll("*");
-        if (isDynamic)
-            all.emplace_back(widget->getHtmlNode());
         all.reserve(all.size() + textNodes.size());
         all.insert(all.end(), textNodes.begin(), textNodes.end());
+        if (isDynamic) {
+            all.emplace_back(widget->getHtmlNode());
+            for (auto& node : all) {
+                node->getInheritableStyles() = mainNode->getParent()->getInheritableStyles();
+                for (const auto& [styleName, styleMap] : node->getInheritableStyles()) {
+                    for (auto& [style, value] : styleMap)
+                        node->getStyles()[styleName][style] = value;
+                }
+            }
+        }
+
+        for (const auto& sheet : root.sheets)
+            applyStyleSheet(rootNode, mainNode, htmlPath, sheet, checkRuleExist, isDynamic);
+
         for (const auto& node : std::views::reverse(all)) {
             if (const auto w = node->getWidget().get()) {
                 applyAttributesAndStyles(w, node.get(), root.groups, moduleName);
+                w->scheduleAnchorAlignment();
             }
         }
 

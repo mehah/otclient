@@ -437,7 +437,7 @@ namespace {
 void UIWidget::refreshHtml(bool childrenTo) {
     if (childrenTo && isOnHtml()) {
         for (const auto& child : m_children) {
-            child->setDisplay(m_displayType);
+            child->scheduleAnchorAlignment();
         }
     }
 
