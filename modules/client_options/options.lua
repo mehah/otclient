@@ -103,6 +103,7 @@ local function setupComboBox()
     local vocationPresetsCombobox = panels.keybindsPanel:recursiveGetChildById('list')
     local listKeybindsPanel = panels.keybindsPanel:recursiveGetChildById('list')
     local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+    local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
 
     for k, v in pairs({ { 'Disabled', 'disabled' }, { 'Default', 'default' }, { 'Full', 'full' } }) do
         crosshairCombo:addOption(v[1], v[2])
@@ -116,17 +117,29 @@ local function setupComboBox()
     mouseControlModeCombobox:addOption('Classic Controls', 1)
     mouseControlModeCombobox:addOption('Left Smart-Click', 2)
 
+    lootControlModeCombobox:addOption('Loot: Right', 0)
+    lootControlModeCombobox:addOption('Loot: SHIFT+Right', 1)
+    lootControlModeCombobox:addOption('Loot: Left', 2)
+    
+    lootControlModeCombobox.onOptionChange = function(comboBox, option)
+        local selectedOption = comboBox:getCurrentOption().data
+        setOption('lootControlMode', selectedOption)
+    end
+
     mouseControlModeCombobox.onOptionChange = function(comboBox, option)
         local selectedOption = comboBox:getCurrentOption().data
         if selectedOption == 1 then
             setOption('classicControl', true)
             setOption('smartLeftClick', false)
+            lootControlModeCombobox:setVisible(true)
         elseif selectedOption == 0 then
             setOption('classicControl', false)
             setOption('smartLeftClick', false)
+            lootControlModeCombobox:setVisible(false)
         elseif selectedOption == 2 then
             setOption('classicControl', false)
             setOption('smartLeftClick', true)
+            lootControlModeCombobox:setVisible(false)
         end
     end
 
@@ -192,16 +205,27 @@ local function setup()
         end
     end
     
-    -- Set initial mouse control mode
+        -- Set initial mouse control mode
     local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+    local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
     if mouseControlModeCombobox then
-        local mode = 0 -- Default to Regular Controls
+        local mode = 0
         if getOption('classicControl') then
-            mode = 1 -- Classic Controls
+            mode = 1
+            lootControlModeCombobox:setVisible(true)
         elseif getOption('smartLeftClick') then
             mode = 2
+            lootControlModeCombobox:setVisible(false)
+        else
+            lootControlModeCombobox:setVisible(false)
         end
         mouseControlModeCombobox:setCurrentOption(mode)
+    end
+    
+    -- Set initial loot control mode
+    if lootControlModeCombobox then
+        local lootMode = getOption('lootControlMode')
+        lootControlModeCombobox:setCurrentOption(lootMode)
     end
 end
 

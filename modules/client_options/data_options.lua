@@ -25,6 +25,7 @@ return {
     },
     classicControl                    = g_platform.isMobile() and true or false,
     smartLeftClick                    = false,
+    lootControlMode                   = 0,
     smartWalk                         = false,
     autoChaseOverride                 = true,
     moveStack                         = false,

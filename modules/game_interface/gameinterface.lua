@@ -1036,8 +1036,67 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
 
         -- classic control
     else
-        if useThing and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton and
-            not g_mouse.isPressed(MouseLeftButton) then
+        local lootControlMode = modules.client_options.getOption('lootControlMode')
+        
+        -- Handle loot options based on lootControlMode
+        -- Handle "Loot: Left" option - we need to process this before autowalk
+        if lootControlMode == 2 and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseLeftButton then
+            -- Always try to use quick loot for any container or item
+            if useThing then
+                -- For corpses or any container, try to quick loot
+                local isCorpseOrContainer = useThing:isContainer() or useThing:isLyingCorpse()
+                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and isCorpseOrContainer then
+                    g_game.sendQuickLoot(1, useThing)
+                    return true
+                end
+                
+                -- If it's a pickupable item, pick it up
+                if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+            end
+            
+            -- If we can't quick loot, pick up any pickupable item
+            if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+                g_game.move(lookThing, lookThing:getPosition(), 1)
+                return true
+            end
+        end
+        
+        -- Handle other loot options
+        if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+            -- Loot: Right - Default behavior
+            if lootControlMode == 0 and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
+                -- For regular items, just move them
+                -- Allow the following container handling to handle corpses
+                local isCorpseOrContainer = useThing and (useThing:isContainer() or useThing:isLyingCorpse())
+                if not isCorpseOrContainer then
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+                -- For containers/corpses, we'll continue to the container handling below,
+                -- which will allow both quicklooting and opening
+            -- Loot: SHIFT+Right - Only execute quickloot with SHIFT pressed
+            elseif lootControlMode == 1 and keyboardModifiers == KeyboardShiftModifier and mouseButton == MouseRightButton then
+                -- Try to use quick loot for any container or item
+                -- Check for containers and corpses
+                local isCorpseOrContainer = lookThing and (lookThing:isContainer() or lookThing:isLyingCorpse())
+                
+                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and isCorpseOrContainer then
+                    g_game.sendQuickLoot(1, lookThing)
+                    return true
+                else
+                    -- Fall back to regular move if quick loot is not available
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+            end
+        end
+        
+        if useThing and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
+            -- Remove the check for left mouse button being pressed to fix the issue
+            -- where right click stops working after a brief time
             local player = g_game.getLocalPlayer()
             if attackCreature and attackCreature ~= player then
                 g_game.attack(attackCreature)
@@ -1045,7 +1104,15 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 g_game.attack(creatureThing)
                 return true
-            elseif useThing:isContainer() then
+            elseif useThing:isContainer() or useThing:isLyingCorpse() then
+                -- Handle both regular containers and corpses
+                -- If it's Loot: Right, perform quickloot before opening
+                if lootControlMode == 0 and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
+                    g_game.sendQuickLoot(1, useThing)
+                    -- Don't return here, we want to also open the container
+                end
+                
+                -- Open the container after quicklooting
                 if useThing:getParentContainer() then
                     g_game.open(useThing, useThing:getParentContainer())
                     return true
@@ -1092,10 +1159,27 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
     player:stopAutoWalk()
 
     if autoWalkPos and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseLeftButton then
-        player:autoWalk(autoWalkPos)
-        if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
-            g_game.setChaseMode(DontChase)
-            return true
+        -- In Classic Control with Loot: Left option, we want to avoid walking when trying to loot
+        local classicControl = modules.client_options.getOption('classicControl')
+        local lootControlMode = modules.client_options.getOption('lootControlMode')
+        
+        if classicControl and lootControlMode == 2 then
+            -- Check if there's a corpse or item we should be looting instead of walking
+            -- If not, proceed with autowalk
+            local isCorpseOrContainer = useThing and (useThing:isContainer() or useThing:isLyingCorpse())
+            
+            if not isCorpseOrContainer and 
+               not (lookThing and not lookThing:isCreature() and lookThing:isPickupable()) then
+                player:autoWalk(autoWalkPos)
+                if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
+                    g_game.setChaseMode(DontChase)
+                end
+            end
+        else
+            player:autoWalk(autoWalkPos)
+            if g_game.isAttacking() and g_game.getChaseMode() == ChaseOpponent then
+                g_game.setChaseMode(DontChase)
+            end
         end
         return true
     end
