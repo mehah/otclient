@@ -23,9 +23,24 @@ return {
             g_window.setFullscreen(value)
         end
     },
-    classicControl                    = g_platform.isMobile() and true or false,
-    smartLeftClick                    = false,
-    lootControlMode                   = 0,
+    classicControl                    = {
+        value = g_platform.isMobile() and true or false,
+        action = function(value, options, controller, panels, extraWidgets)
+            -- Set by mouseControlMode combobox
+        end
+    },
+    smartLeftClick                    = {
+        value = false,
+        action = function(value, options, controller, panels, extraWidgets)
+            -- Set by mouseControlMode combobox
+        end
+    },
+    lootControlMode                   = {
+        value = 0, -- Default to "Loot: Right"
+        action = function(value, options, controller, panels, extraWidgets)
+            -- Set by lootControlMode combobox
+        end
+    },
     smartWalk                         = false,
     autoChaseOverride                 = true,
     moveStack                         = false,
