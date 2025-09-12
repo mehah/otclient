@@ -263,7 +263,7 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
 
     local trEventName = EVENTS_TRANSLATED[eventName]
     if not trEventName then
-        pwarning('[' .. HTML_PATH .. ']:' .. el.name .. ' Event ' .. eventName .. ' does not exist.')
+        pwarning('[' .. controller.dataUI.name .. ']:' .. widget:getId() .. ' Event ' .. eventName .. ' does not exist.')
         return
     end
 
