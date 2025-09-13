@@ -579,6 +579,21 @@ void UIWidget::setDisplay(DisplayType type) {
     scheduleAnchorAlignment();
 }
 
+void UIWidget::ensureUniqueId() {
+    static uint_fast32_t LAST_UNIQUE_ID = 0;
+    if (!m_htmlNode)
+        return;
+
+    const auto& id = m_htmlNode->getAttr("id");
+    if (id.empty())
+        return;
+
+    const auto parentNode = m_parent ? m_parent->getHtmlNode() : nullptr;
+    if (parentNode && parentNode->getById(id) != m_htmlNode) {
+        setId("html" + std::to_string(++LAST_UNIQUE_ID));
+    } else setId(id);
+}
+
 void UIWidget::updateSize() {
     if (!isAnchorable()) return;
     if ((hasProp(PropWidthAuto) || hasProp(PropWidthPercent)) && m_width.updateId != UPDATE_EPOCH || (hasProp(PropHeightPercent) && m_height.updateId != UPDATE_EPOCH)) {

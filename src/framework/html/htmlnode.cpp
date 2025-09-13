@@ -22,6 +22,7 @@
 
 #include "htmlnode.h"
 #include <framework/otml/otml.h>
+#include <framework/ui/uiwidget.h>
 
 std::string HtmlNode::getAttr(const std::string& name) const {
     auto key = ascii_tolower_copy(name);
@@ -239,6 +240,9 @@ void HtmlNode::attachChild(const HtmlNodePtr& child, size_t pos) {
 
     registerInIndexes(child);
     invalidateIndexCachesUp(this);
+
+    if (m_widget)
+        m_widget->ensureUniqueId();
 }
 
 void HtmlNode::registerInIndexes(const HtmlNodePtr& child) {

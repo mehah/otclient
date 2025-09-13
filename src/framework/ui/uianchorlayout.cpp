@@ -256,7 +256,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                     }
 
                     if (isInlineish(widget.get())) {
-                        margin += widget->getLineHeight().valueCalculed;
+                        margin += widget->getLineHeight().valueCalculed - hookedWidget->getLineHeight().valueCalculed;
                     }
 
                     // Fix anchor position

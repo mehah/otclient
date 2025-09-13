@@ -34,7 +34,6 @@
 HtmlManager g_html;
 
 namespace {
-    uint_fast32_t LAST_UNIQUE_ID = 0;
     std::vector<css::StyleSheet> GLOBAL_STYLES;
 
     static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = {
@@ -258,6 +257,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     node->setWidget(widget);
 
+    widget->ensureUniqueId();
     widget->setHtmlNode(node);
     widget->setHtmlRootId(htmlId);
 
@@ -288,15 +288,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
             }
         }
 
-        std::unordered_set<std::string> uniqueIds;
         for (const auto& child : node->getChildren()) {
-            const auto& id = child->getAttr("id");
-            if (!id.empty()) {
-                if (!uniqueIds.emplace(id).second) {
-                    child->setAttr("widget-id", "html" + std::to_string(++LAST_UNIQUE_ID));
-                }
-            }
-
             createWidgetFromNode(child, widget, textNodes, htmlId, moduleName, isDynamic, widgets);
         }
     }
@@ -316,7 +308,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
             // lua call
         } else if (attr == "anchor") {
             // ignore
-        } else if (attr == "style") {
+        } else if (attr == "style" || attr == "id") {
             // executed before
         } else if (attr == "layout") {
             auto otml = std::make_shared<OTMLNode>();

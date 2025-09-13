@@ -366,7 +366,7 @@ public:
     void setIconDrawOrder(const uint8_t order) { m_iconDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
     void setTextDrawOrder(const uint8_t order) { m_textDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
     void setBorderDrawOrder(const uint8_t order) { m_borderDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
-
+    void ensureUniqueId();
 private:
     uint64_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
