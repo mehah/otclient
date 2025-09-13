@@ -171,6 +171,7 @@ protected:
     friend class UIManager;
 
     std::string m_id;
+    std::string m_htmlId;
     uint32_t m_htmlRootId = 0;
     UIWidgetPtr m_parent;
     UIWidgetList m_children;
@@ -198,6 +199,8 @@ protected:
 
     UIWidgetList m_lockedChildren;
     UIWidgetPtr m_focusedChild;
+
+    bool m_anchorable{ true };
 
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
     std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
@@ -285,10 +288,16 @@ public:
         scheduleAnchorAlignment();
     }
 
+    void setAnchorable(bool v) { m_anchorable = v; }
+    bool isAnchorable() const { return m_anchorable; }
+
     bool getResultConditionIf() { return hasProp(PropConditionIf); }
 
     void setHtmlRootId(uint32_t id) { m_htmlRootId = id; }
     auto getHtmlRootId() const { return m_htmlRootId; }
+
+    void setHtmlId(const std::string& id) { m_htmlId = id; }
+    auto getHtmlId() const { return m_htmlId; }
 
     bool isOnHtml() { return m_htmlNode != nullptr; }
     const auto& getHtmlNode() const { return m_htmlNode; }

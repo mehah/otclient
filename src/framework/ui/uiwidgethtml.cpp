@@ -218,7 +218,7 @@ namespace {
             if (c.get() == self) break;
 
             if (c->getDisplay() == DisplayType::None) { ++i; continue; }
-            if (!c->getResultConditionIf()) { ++i; continue; }
+            if (!c->getResultConditionIf() || !c->isAnchorable()) { ++i; continue; }
 
             const FloatType cf = mapLogicalFloat(c->getFloat());
             if (cf == FloatType::None) {
@@ -552,6 +552,7 @@ void UIWidget::setOverflow(OverflowType type) {
     if (type == OverflowType::Scroll) {
         auto scrollWidget = g_ui.createWidget("VerticalScrollBar", nullptr);
         scrollWidget->setDisplay(m_displayType);
+        scrollWidget->setAnchorable(false);
         m_parent->insertChild(getChildIndex() + 1, scrollWidget);
         callLuaField("setVerticalScrollBar", scrollWidget);
 
@@ -569,6 +570,7 @@ void UIWidget::setDisplay(DisplayType type) {
 }
 
 void UIWidget::updateSize() {
+    if (!isAnchorable()) return;
     if ((hasProp(PropWidthAuto) || hasProp(PropWidthPercent)) && m_width.updateId != UPDATE_EPOCH || (hasProp(PropHeightPercent) && m_height.updateId != UPDATE_EPOCH)) {
         auto width = -1;
         auto height = -1;
@@ -627,7 +629,7 @@ void UIWidget::scheduleAnchorAlignment() {
 }
 
 void UIWidget::applyAnchorAlignment() {
-    if (!isOnHtml())
+    if (!isOnHtml() || !isAnchorable())
         return;
 
     breakAnchors();
@@ -676,7 +678,7 @@ void UIWidget::applyAnchorAlignment() {
                 for (int i = m_childIndex - 2; i >= 0; --i) {
                     if (const auto sib = m_parent->getChildren()[i].get()) {
                         if (sib->getDisplay() != DisplayType::None &&
-                            sib->getResultConditionIf() &&
+                            sib->getResultConditionIf() && sib->isAnchorable() &&
                             mapLogicalFloat(sib->getFloat()) == FloatType::None)
                             return sib;
                     }

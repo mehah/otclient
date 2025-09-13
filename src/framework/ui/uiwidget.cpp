@@ -286,7 +286,7 @@ void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
 
     { // cache index
         child->m_childIndex = index + 1;
-        for (auto i = child->m_childIndex; i < childrenSize; ++i)
+        for (auto i = child->m_childIndex; i < m_children.size(); ++i)
             m_children[i]->m_childIndex = i + 1;
     }
 

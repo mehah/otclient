@@ -184,7 +184,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     int realMarginTop = 0;
     if (widget->isOnHtml() && widget->getPrevWidget() == nullptr && isInlineish(widget.get())) {
         realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
-        for (auto p = widget->getNextWidget(); p && isInlineish(p.get()); p = p->getNextWidget())
+        for (auto p = widget->getNextWidget(); p && p->isAnchorable() && isInlineish(p.get()); p = p->getNextWidget())
             if (p->getDisplay() == DisplayType::InlineBlock)
                 realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
     }
