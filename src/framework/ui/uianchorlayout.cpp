@@ -182,7 +182,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     bool horizontalMoved = false;
 
     int realMarginTop = 0;
-    if (widget->isOnHtml() && widget->getPrevWidget() == nullptr && isInlineish(widget.get())) {
+    if (widget->isOnHtml() && (widget->getPrevWidget() == nullptr || widget->getPrevWidget()->getDisplay() == DisplayType::Block) && isInlineish(widget.get())) {
         realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
         for (auto p = widget->getNextWidget(); p && p->isAnchorable() && isInlineish(p.get()); p = p->getNextWidget())
             if (p->getDisplay() == DisplayType::InlineBlock)
@@ -245,7 +245,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                             margin = realMarginTop;
                         } else if (widget->getFloat() != FloatType::None) {
                             margin -= hookedWidget->getMarginTop();
-                        } else {
+                        } else  if (hookedWidget->getDisplay() == DisplayType::Block) {
                             if (widget->getMarginBottom() > 0 && hookedWidget->getMarginBottom() > 0)
                                 margin = std::max<int>(margin, hookedWidget->getMarginBottom());
                             else
@@ -278,7 +278,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                         margin -= hookedWidget->getMarginBottom();
                     } else if (widget->getDisplay() == DisplayType::Inline) {
                         margin = 0;
-                    } else {
+                    } else if (hookedWidget->getDisplay() == DisplayType::Block) {
                         if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
                             margin = std::max<int>(margin, hookedWidget->getMarginTop());
                         else
