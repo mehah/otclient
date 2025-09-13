@@ -40,6 +40,7 @@ public:
     uint32_t load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent);
     void destroy(uint32_t id);
     void addGlobalStyle(const std::string& style);
+    const DataRoot* getRoot(uint32_t htmlId);
     UIWidgetPtr getRootWidget(uint32_t htmlId);
     void terminate() { m_nodes.clear(); }
     UIWidgetPtr createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId);

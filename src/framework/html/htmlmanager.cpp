@@ -257,9 +257,9 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     node->setWidget(widget);
 
-    widget->ensureUniqueId();
     widget->setHtmlNode(node);
     widget->setHtmlRootId(htmlId);
+    widget->ensureUniqueId();
 
     if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);
@@ -459,9 +459,9 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
         parent = g_ui.getRootWidget();
 
     static uint32_t ID = 0;
-    ++ID;
-    readNode(root, root.node, parent, moduleName, htmlPath, false, false, ID);
-    return m_nodes.emplace(ID, std::move(root)).first->first;
+    auto& rootEmplaced = m_nodes.emplace(++ID, std::move(root)).first->second;
+    readNode(rootEmplaced, rootEmplaced.node, parent, moduleName, htmlPath, false, false, ID);
+    return ID;
 }
 
 UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId) {
@@ -507,10 +507,18 @@ void HtmlManager::addGlobalStyle(const std::string& stylePath) {
     GLOBAL_STYLES.emplace_back(css::parse(g_resources.readFileContents(stylePath)));
 }
 
-UIWidgetPtr HtmlManager::getRootWidget(uint32_t id) {
+const DataRoot* HtmlManager::getRoot(uint32_t id) {
     auto it = m_nodes.find(id);
     if (it != m_nodes.end()) {
-        if (const auto& firstNode = it->second.node->querySelector("html > :first")) {
+        return &it->second;
+    }
+
+    return nullptr;
+}
+
+UIWidgetPtr HtmlManager::getRootWidget(uint32_t id) {
+    if (const auto root = getRoot(id)) {
+        if (const auto& firstNode = root->node->querySelector("html > :first")) {
             return firstNode->getWidget();
         }
     }

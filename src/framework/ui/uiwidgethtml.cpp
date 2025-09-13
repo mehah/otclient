@@ -23,6 +23,7 @@
 #include <framework/html/htmlnode.h>
 #include <framework/core/eventdispatcher.h>
 #include "uimanager.h"
+#include <framework/html/htmlmanager.h>
 
 namespace {
     static uint32_t UPDATE_EPOCH = 1;
@@ -590,7 +591,13 @@ void UIWidget::ensureUniqueId() {
 
     const auto parentNode = m_parent ? m_parent->getHtmlNode() : nullptr;
     if (parentNode && parentNode->getById(id) != m_htmlNode) {
-        setId("html" + std::to_string(++LAST_UNIQUE_ID));
+        const std::string newId = "html" + std::to_string(++LAST_UNIQUE_ID);
+        setId(newId);
+
+        if (const auto root = g_html.getRoot(m_htmlRootId)) {
+            g_logger.warning("[" + root->moduleName + "] Duplicate id '" + id + "' detected. "
+                             "Widget id reassigned to '" + newId + "'.");
+        }
     } else setId(id);
 }
 
