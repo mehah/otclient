@@ -255,6 +255,10 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                         margin = realMarginTop;
                     }
 
+                    if (isInlineish(widget.get())) {
+                        margin += widget->getLineHeight().valueCalculed;
+                    }
+
                     // Fix anchor position
                     margin += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
                 }

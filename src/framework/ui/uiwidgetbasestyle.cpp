@@ -273,6 +273,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "right" || v == "flex-end" || v == "end" || v == "inline-end")
                 justify = JustifyItemsType::Right;
             setJustifyItems(justify);
+        } else if (node->tag() == "line-height") {
+            setLineHeight(node->value<std::string>());
         } else if (node->tag() == "margin-top")
             setMarginTop(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "margin-right")

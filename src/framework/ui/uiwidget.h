@@ -194,6 +194,7 @@ protected:
 
     SizeUnit m_width;
     SizeUnit m_height;
+    SizeUnit m_lineHeight;
 
     UILayoutPtr m_layout;
 
@@ -745,6 +746,7 @@ protected:
     std::vector<std::pair<Color, CoordsBufferPtr>> m_colorCoordsBuffer;
 
     float m_fontScale{ 1.f };
+
     const AtlasRegion* m_atlasRegion = nullptr;
 
 public:
@@ -762,6 +764,8 @@ public:
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(std::string_view fontName);
     void setFontScale(const float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }
+    void setLineHeight(std::string height);
+    const auto& getLineHeight() { return m_lineHeight; }
 
     std::string getText() { return m_text; }
     std::string getDrawText() { return m_drawText; }

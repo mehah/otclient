@@ -452,6 +452,16 @@ void UIWidget::refreshHtml(bool childrenTo) {
     }
 }
 
+void UIWidget::setLineHeight(std::string valueStr) {
+    stdext::trim(valueStr);
+    stdext::tolower(valueStr);
+
+    const std::string_view sv = valueStr;
+    const Unit unit = detectUnit(sv);
+    int16_t num = stdext::to_number(std::string(numericPart(sv)));
+    m_lineHeight = { unit, num, num };
+}
+
 void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     stdext::trim(valueStr);
     stdext::tolower(valueStr);
