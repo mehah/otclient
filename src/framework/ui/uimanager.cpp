@@ -31,6 +31,7 @@
 #include <framework/platform/platformwindow.h>
 
 #include "framework/graphics/graphics.h"
+#include <framework/html/htmlmanager.h>
 
 UIManager g_ui;
 

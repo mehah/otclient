@@ -106,6 +106,12 @@
     <Filter Include="Source Files\framework\discord">
       <UniqueIdentifier>{ec2d9dd0-52dd-4258-83be-2ceb7ec02b73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\framework\html">
+      <UniqueIdentifier>{366a401a-0ee2-47e6-8a4a-3bc9b741af90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\framework\html">
+      <UniqueIdentifier>{40cbde11-ac2f-4cb9-96f7-f2f1c428f27c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\framework\luafunctions.cpp">
@@ -572,6 +578,24 @@
     </ClCompile>
     <ClCompile Include="..\src\framework\graphics\textureatlas.cpp">
       <Filter>Source Files\framework\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\html\htmlnode.cpp">
+      <Filter>Source Files\framework\html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\html\htmlparser.cpp">
+      <Filter>Source Files\framework\html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\html\queryselector.cpp">
+      <Filter>Source Files\framework\html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\html\cssparser.cpp">
+      <Filter>Source Files\framework\html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\html\htmlmanager.cpp">
+      <Filter>Source Files\framework\html</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\framework\ui\uiwidgethtml.cpp">
+      <Filter>Source Files\framework\ui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1123,6 +1147,24 @@
     </ClInclude>
     <ClInclude Include="..\src\framework\util\spinlock.h">
       <Filter>Header Files\framework\util</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\html\htmlparser.h">
+      <Filter>Header Files\framework\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\html\queryselector.h">
+      <Filter>Header Files\framework\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\html\htmlnode.h">
+      <Filter>Header Files\framework\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\html\cssparser.h">
+      <Filter>Header Files\framework\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\html\declarations.h">
+      <Filter>Header Files\framework\html</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\framework\html\htmlmanager.h">
+      <Filter>Header Files\framework\html</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

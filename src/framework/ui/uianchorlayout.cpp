@@ -158,6 +158,11 @@ void UIAnchorLayout::removeWidget(const UIWidgetPtr& widget)
     removeAnchors(widget);
 }
 
+inline bool isInlineish(UIWidget* w) {
+    auto d = w->getDisplay();
+    return d == DisplayType::Inline || d == DisplayType::InlineBlock;
+}
+
 bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first)
 {
     const auto& parentWidget = getParentWidget();
@@ -175,24 +180,13 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     Rect newRect = widget->getRect();
     bool verticalMoved = false;
     bool horizontalMoved = false;
-    auto extraMarginTop = 0;
-    auto extraMarginBottom = 0;
 
-    if (widget->isOnHtml()) {
-        for (const auto& anchor : anchorGroup->getAnchors()) {
-            if (const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget)) {
-                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorLeft) {
-                    extraMarginTop += hookedWidget->getMarginBottom();
-                    extraMarginBottom += hookedWidget->getMarginTop();
-                    break;
-                }
-                if (anchor->getAnchoredEdge() == Fw::AnchorLeft && anchor->getHookedEdge() == Fw::AnchorRight) {
-                    extraMarginTop -= hookedWidget->getMarginTop();
-                    extraMarginBottom -= hookedWidget->getMarginBottom();
-                    break;
-                }
-            }
-        }
+    int realMarginTop = 0;
+    if (widget->isOnHtml() && (widget->getPrevWidget() == nullptr || widget->getPrevWidget()->getDisplay() == DisplayType::Block) && isInlineish(widget.get())) {
+        realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
+        for (auto p = widget->getNextWidget(); p && p->isAnchorable() && isInlineish(p.get()); p = p->getNextWidget())
+            if (p->getDisplay() == DisplayType::InlineBlock)
+                realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
     }
 
     // calculates new rect based on anchors
@@ -225,6 +219,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 horizontalMoved = true;
                 break;
             case Fw::AnchorLeft:
+
                 if (!horizontalMoved) {
                     newRect.moveLeft(point + widget->getMarginLeft());
                     horizontalMoved = true;
@@ -242,20 +237,62 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 newRect.moveVerticalCenter(point + widget->getMarginTop() - widget->getMarginBottom());
                 verticalMoved = true;
                 break;
-            case Fw::AnchorTop:
+            case Fw::AnchorTop: {
+                auto margin = widget->getMarginTop();
+                if (widget->isOnHtml()) {
+                    if (parentWidget != hookedWidget) {
+                        if (isInlineish(widget.get())) {
+                            margin = realMarginTop;
+                        } else if (widget->getFloat() != FloatType::None) {
+                            margin -= hookedWidget->getMarginTop();
+                        } else  if (hookedWidget->getDisplay() == DisplayType::Block) {
+                            if (widget->getMarginBottom() > 0 && hookedWidget->getMarginBottom() > 0)
+                                margin = std::max<int>(margin, hookedWidget->getMarginBottom());
+                            else
+                                margin += hookedWidget->getMarginBottom();
+                        }
+                    } else if (isInlineish(widget.get())) {
+                        margin = realMarginTop;
+                    }
+
+                    if (isInlineish(widget.get())) {
+                        margin += widget->getLineHeight().valueCalculed - hookedWidget->getLineHeight().valueCalculed;
+                    }
+
+                    // Fix anchor position
+                    margin += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
+                }
+
                 if (!verticalMoved) {
-                    newRect.moveTop(point + (widget->getMarginTop() + extraMarginTop));
+                    newRect.moveTop(point + margin);
                     verticalMoved = true;
                 } else
-                    newRect.setTop(point + (widget->getMarginTop() + extraMarginTop));
+                    newRect.setTop(point + margin);
                 break;
-            case Fw::AnchorBottom:
+            }
+
+            case Fw::AnchorBottom: {
+                auto margin = widget->getMarginBottom();
+                if (parentWidget != hookedWidget) {
+                    if (widget->getFloat() != FloatType::None) {
+                        margin -= hookedWidget->getMarginBottom();
+                    } else if (widget->getDisplay() == DisplayType::Inline) {
+                        margin = 0;
+                    } else if (hookedWidget->getDisplay() == DisplayType::Block) {
+                        if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
+                            margin = std::max<int>(margin, hookedWidget->getMarginTop());
+                        else
+                            margin += hookedWidget->getMarginTop();
+                    }
+                }
+
                 if (!verticalMoved) {
-                    newRect.moveBottom(point - (widget->getMarginBottom() + extraMarginBottom));
+                    newRect.moveBottom(point - margin);
                     verticalMoved = true;
                 } else
-                    newRect.setBottom(point - (widget->getMarginBottom() + extraMarginBottom));
+                    newRect.setBottom(point - margin);
                 break;
+            }
             default:
                 break;
         }
