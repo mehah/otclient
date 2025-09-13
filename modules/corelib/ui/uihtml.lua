@@ -43,6 +43,9 @@ function UIHTML:updateScrollBars()
 
     local scrollbar = self.verticalScrollBar
     if scrollbar then
+        scrollbar:setDisplay(self:getDisplay())
+        scrollbar:setVisible(self:isVisible())
+
         if self.inverted then
             scrollbar:setMinimum(-scrollHeight)
             scrollbar:setMaximum(0)
