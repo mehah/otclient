@@ -98,6 +98,8 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
             setFont(node->value());
         else if (node->tag() == "font-scale")
             setFontScale(node->value<float>());
+        else if (node->tag() == "font-size")
+            setFontScale(node->value<int>() / 10.f);
     }
 }
 

@@ -88,6 +88,7 @@ namespace {
         "direction",
         "font",
         "font-family",
+        "font-scale",
         "font-size",
         "font-style",
         "font-variant",
@@ -106,6 +107,15 @@ namespace {
 
     static inline bool isInheritable(std::string_view prop) noexcept {
         return kProps.find(prop) != kProps.end();
+    }
+
+    void setChildrenStyles(HtmlNode* n, const std::string& style, const std::string& prop, const std::string& value) {
+        if (n->getType() == NodeType::Element)
+            n->getInheritableStyles()[style][prop] = value;
+        for (const auto& child : n->getChildren()) {
+            child->getStyles()[style][prop] = value;
+            setChildrenStyles(child.get(), style, prop, value);
+        }
     }
 
     std::string cssToState(const std::string& css) {
@@ -190,15 +200,6 @@ namespace {
     }
 
     void applyStyleSheet(HtmlNode* root, HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist, bool isDynamic) {
-        static const auto setChildrenStyles = [](const HtmlNodePtr& n, const css::Declaration& decl, const std::string& style, const auto& self) -> void {
-            if (n->getType() == NodeType::Element)
-                n->getInheritableStyles()[style][decl.property] = decl.value;
-            for (const auto& child : n->getChildren()) {
-                child->getStyles()[style][decl.property] = decl.value;
-                self(child, decl, style, self);
-            }
-        };
-
         for (const auto& rule : sheet.rules) {
             const auto& selectors = stdext::join(rule.selectors);
             const auto& nodes = (root ? root : mainNode)->querySelectorAll(selectors);
@@ -224,7 +225,7 @@ namespace {
 
                                 node->getStyles()[style][decl.property] = decl.value;
                                 if (!isDynamic && isInheritable(decl.property)) {
-                                    setChildrenStyles(node, decl, style, setChildrenStyles);
+                                    setChildrenStyles(node.get(), style, decl.property, decl.value);
                                 }
                             }
                             hasMeta = true;
@@ -237,7 +238,7 @@ namespace {
                     for (const auto& decl : rule.decls) {
                         node->getStyles()["styles"][decl.property] = decl.value;
                         if (!isDynamic && isInheritable(decl.property)) {
-                            setChildrenStyles(node, decl, "styles", setChildrenStyles);
+                            setChildrenStyles(node.get(), "styles", decl.property, decl.value);
                         }
                     }
                 }
@@ -246,7 +247,7 @@ namespace {
     };
 }
 
-UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName, std::vector<UIWidgetPtr>& widgets) {
+UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName, bool isDynamic, std::vector<UIWidgetPtr>& widgets) {
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
         return nullptr;
 
@@ -277,6 +278,16 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
     }
 
     if (!node->getChildren().empty()) {
+        const auto& styleValue = node->getAttr("style");
+        if (!styleValue.empty()) {
+            parseAttrPropList(styleValue, node->getAttrStyles());
+            for (const auto& [prop, value] : node->getAttrStyles()) {
+                if (!isDynamic && isInheritable(prop)) {
+                    setChildrenStyles(node.get(), "styles", prop, value);
+                }
+            }
+        }
+
         std::unordered_set<std::string> uniqueIds;
         for (const auto& child : node->getChildren()) {
             const auto& id = child->getAttr("id");
@@ -286,7 +297,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
                 }
             }
 
-            createWidgetFromNode(child, widget, textNodes, htmlId, moduleName, widgets);
+            createWidgetFromNode(child, widget, textNodes, htmlId, moduleName, isDynamic, widgets);
         }
     }
 
@@ -306,7 +317,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         } else if (attr == "anchor") {
             // ignore
         } else if (attr == "style") {
-            parseAttrPropList(value, node->getAttrStyles());
+            // executed before
         } else if (attr == "layout") {
             auto otml = std::make_shared<OTMLNode>();
             auto layout = std::make_shared<OTMLNode>();
@@ -395,7 +406,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
             scriptStr = el->toString();
         } else if (el->getTag() == "html") {
             for (const auto& n : el->getChildren()) {
-                widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName, widgets);
+                widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName, isDynamic, widgets);
             }
         }
     }
