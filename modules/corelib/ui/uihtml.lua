@@ -34,6 +34,10 @@ function UIHTML:onStyleApply(styleName, styleNode)
 end
 
 function UIHTML:updateScrollBars()
+    if not self.verticalScrollBar and not self.horizontalScrollBar then
+        return
+    end
+
     local scrollWidth = math.max(self:getChildrenRect().width - self:getPaddingRect().width, 0)
     local scrollHeight = math.max(self:getChildrenRect().height - self:getPaddingRect().height, 0)
 
