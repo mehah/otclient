@@ -587,11 +587,11 @@ void UIWidget::updateSize() {
         auto parent = m_parent;
         while (parent) {
             if ((hasProp(PropWidthAuto) || hasProp(PropWidthPercent)) && parent->getWidthHtml().valueCalculed > -1) {
-                width = parent->getWidthHtml().valueCalculed;
+                width = parent->getWidthHtml().valueCalculed - parent->getPaddingLeft() - parent->getPaddingRight();
             }
 
             if (hasProp(PropHeightPercent) && parent->getHeightHtml().valueCalculed > -1) {
-                height = parent->getHeightHtml().valueCalculed;
+                height = parent->getHeightHtml().valueCalculed - parent->getPaddingTop() - parent->getPaddingBottom();
             }
 
             if (hasProp(PropWidthPercent) && hasProp(PropHeightPercent)) {
