@@ -181,21 +181,6 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     bool verticalMoved = false;
     bool horizontalMoved = false;
 
-    UIWidgetPtr virtualParentWidget = nullptr;
-    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute) {
-        newRect.moveTop(-widget->getPositions().top.value);
-        newRect.moveLeft(-widget->getPositions().left.value);
-
-        if (widget->getPositions().left.value != 0)
-            newRect.moveRight(-widget->getPositions().right.value);
-
-        if (widget->getPositions().top.value != 0)
-            newRect.moveBottom(-widget->getPositions().bottom.value);
-
-        if (widget->getPositionType() == PositionType::Absolute)
-            virtualParentWidget = widget->getVirtualParent();
-    }
-
     int realMarginTop = 0;
     if (widget->isOnHtml() && (widget->getPrevWidget() == nullptr || widget->getPrevWidget()->getDisplay() == DisplayType::Block) && isInlineish(widget.get())) {
         realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
@@ -203,6 +188,8 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             if (p->getDisplay() == DisplayType::InlineBlock)
                 realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
     }
+
+    const auto& virtualParentWidget = widget->getPositionType() == PositionType::Absolute ? widget->getVirtualParent() : nullptr;
 
     // calculates new rect based on anchors
     for (const auto& anchor : anchorGroup->getAnchors()) {
@@ -214,7 +201,8 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             parentWidget = anchor->getAnchoredEdge() == Fw::AnchorTop && widget->getPositions().top.unit != Unit::Auto ||
                 anchor->getAnchoredEdge() == Fw::AnchorLeft && widget->getPositions().left.unit != Unit::Auto ||
                 anchor->getAnchoredEdge() == Fw::AnchorRight && widget->getPositions().right.unit != Unit::Auto ||
-                anchor->getAnchoredEdge() == Fw::AnchorBottom && widget->getPositions().bottom.unit != Unit::Auto ? virtualParentWidget : getParentWidget();
+                anchor->getAnchoredEdge() == Fw::AnchorBottom && widget->getPositions().bottom.unit != Unit::Auto ?
+                virtualParentWidget : getParentWidget();
         }
 
         // determine hooked widget
@@ -240,20 +228,31 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 newRect.moveHorizontalCenter(point + widget->getMarginLeft() - widget->getMarginRight());
                 horizontalMoved = true;
                 break;
-            case Fw::AnchorLeft:
+            case Fw::AnchorLeft: {
+                auto margin = widget->getMarginLeft();
+                if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
+                    margin += widget->getPositions().left.value;
+
                 if (!horizontalMoved) {
-                    newRect.moveLeft(point + widget->getMarginLeft());
+                    newRect.moveLeft(point + margin);
                     horizontalMoved = true;
                 } else
-                    newRect.setLeft(point + widget->getMarginLeft());
+                    newRect.setLeft(point + margin);
                 break;
-            case Fw::AnchorRight:
+            }
+            case Fw::AnchorRight: {
+                auto margin = widget->getMarginRight();
+                if (widget->getPositions().left.unit == Unit::Auto &&
+                        (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
+                    margin += widget->getPositions().right.value;
+
                 if (!horizontalMoved) {
-                    newRect.moveRight(point - widget->getMarginRight());
+                    newRect.moveRight(point - margin);
                     horizontalMoved = true;
                 } else
-                    newRect.setRight(point - widget->getMarginRight());
+                    newRect.setRight(point - margin);
                 break;
+            }
             case Fw::AnchorVerticalCenter:
                 newRect.moveVerticalCenter(point + widget->getMarginTop() - widget->getMarginBottom());
                 verticalMoved = true;
@@ -282,6 +281,9 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                     if (isInlineish(widget.get())) {
                         margin += widget->getLineHeight().valueCalculed - hookedWidget->getLineHeight().valueCalculed;
                     }
+
+                    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
+                        margin += widget->getPositions().top.value;
 
                     // Fix anchor position
                     margin += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
@@ -312,6 +314,10 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                     if (hookedWidget->getPositionType() == PositionType::Relative)
                         margin += hookedWidget->getPositions().bottom.value;
                 }
+
+                if (widget->getPositions().top.unit == Unit::Auto &&
+    (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
+                    margin += widget->getPositions().bottom.value;
 
                 if (!verticalMoved) {
                     newRect.moveBottom(point - margin);

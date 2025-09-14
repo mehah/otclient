@@ -787,17 +787,19 @@ void UIWidget::applyAnchorAlignment() {
         if (isInline && m_parent->getTextAlign() == Fw::AlignCenter ||
             !isInline && m_parent->getJustifyItems() == JustifyItemsType::Center) {
             addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
-        } else if (isInline && m_parent->getTextAlign() == Fw::AlignLeft ||
+        } else if (m_positionType != PositionType::Absolute) {
+            if (isInline && m_parent->getTextAlign() == Fw::AlignLeft ||
                 !isInline && m_parent->getJustifyItems() == JustifyItemsType::Left) {
-            addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
-        } else if (isInline && m_parent->getTextAlign() == Fw::AlignRight ||
-                !isInline && m_parent->getJustifyItems() == JustifyItemsType::Right) {
-            addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
-        } else anchored = false;
+                addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            } else if (isInline && m_parent->getTextAlign() == Fw::AlignRight ||
+                    !isInline && m_parent->getJustifyItems() == JustifyItemsType::Right) {
+                addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+            } else anchored = false;
 
-        if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
-            anchored = true;
-            addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+            if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
+                anchored = true;
+                addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+            }
         }
 
         if (anchored) {
@@ -829,6 +831,22 @@ void UIWidget::applyAnchorAlignment() {
             }
             return;
         }
+    }
+
+    if (m_positionType == PositionType::Absolute) {
+        if (getPositions().top.unit == Unit::Auto && getPositions().bottom.unit != Unit::Auto) {
+            addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
+        } else {
+            addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+        }
+
+        if (getPositions().left.unit == Unit::Auto && getPositions().right.unit != Unit::Auto) {
+            addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+        } else {
+            addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        }
+
+        return;
     }
 
     const ClearType effClear = mapLogicalClear(m_clearType);
