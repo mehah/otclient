@@ -942,13 +942,18 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 end
                 
                 -- Standard handling for other usable items
-                if useThing:isContainer() then
+                -- For containers (including corpses), only execute quicklooting with Smart Left-Click
+                -- Exception: If container has a parent container, open it instead of quicklooting
+                if useThing:isContainer() or useThing:isLyingCorpse() then
                     if useThing:getParentContainer() then
+                        -- For containers inside other containers, we want to open them, not quickloot
                         g_game.open(useThing, useThing:getParentContainer())
-                    else
-                        g_game.open(useThing)
+                        return true
+                    elseif g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
+                        -- For containers in the world (not inside another container), quickloot
+                        g_game.sendQuickLoot(1, useThing)
+                        return true
                     end
-                    return true
                 elseif useThing:isMultiUse() then
                     startUseWith(useThing)
                     return true
@@ -1001,8 +1006,14 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             local smartLeftClick = modules.client_options.getOption('smartLeftClick')
             
             if smartLeftClick then
-                createThingMenu(menuPosition, lookThing, useThing, creatureThing)
-                return true
+                -- For containers in the world, Ctrl+Left Click opens them
+                if (useThing:isContainer() or useThing:isLyingCorpse()) and not useThing:getParentContainer() then
+                    g_game.open(useThing)
+                    return true
+                else
+                    createThingMenu(menuPosition, lookThing, useThing, creatureThing)
+                    return true
+                end
             else
                 if useThing:isContainer() then
                     if useThing:getParentContainer() then
