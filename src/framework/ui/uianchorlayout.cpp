@@ -182,11 +182,30 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     bool horizontalMoved = false;
 
     int realMarginTop = 0;
-    if (widget->isOnHtml() && (widget->getPrevWidget() == nullptr || widget->getPrevWidget()->getDisplay() == DisplayType::Block) && isInlineish(widget.get())) {
-        realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
-        for (auto p = widget->getNextWidget(); p && p->isAnchorable() && p->getPositionType() != PositionType::Absolute && isInlineish(p.get()); p = p->getNextWidget())
-            if (p->getDisplay() == DisplayType::InlineBlock)
-                realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
+    int ajustCenterPos = 0;
+    if (widget->isOnHtml()) {
+        const auto isInline = isInlineish(widget.get());
+        bool getMargin = false, getCenterPos = false;
+        if ((widget->getPrevWidget() == nullptr || widget->getPrevWidget()->getDisplay() == DisplayType::Block) && isInline) {
+            realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
+            getMargin = true;
+        }
+
+        if (isInline && (parentWidget->getTextAlign() == Fw::AlignCenter || parentWidget->getJustifyItems() == JustifyItemsType::Center)) {
+            if (!widget->getPrevWidget() || !isInlineish(widget->getPrevWidget().get())) {
+                getCenterPos = true;
+                ajustCenterPos += (widget->getPaddingLeft() + widget->getPaddingRight()) / 2;
+            }
+        }
+        if (getMargin || getCenterPos) {
+            for (auto p = widget->getNextWidget(); p && p->isAnchorable() && p->getPositionType() != PositionType::Absolute && isInlineish(p.get()); p = p->getNextWidget()) {
+                if (getCenterPos)
+                    ajustCenterPos += p->getWidth() + p->getMarginLeft() + p->getPaddingLeft() + p->getPaddingRight();
+
+                if (getMargin && p->getDisplay() == DisplayType::InlineBlock)
+                    realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
+            }
+        }
     }
 
     const auto& virtualParentWidget = widget->getPositionType() == PositionType::Absolute ? widget->getVirtualParent() : nullptr;
@@ -224,13 +243,26 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
 
         const int point = anchor->getHookedPoint(hookedWidget, parentWidget);
         switch (anchor->getAnchoredEdge()) {
-            case Fw::AnchorHorizontalCenter:
-                newRect.moveHorizontalCenter(point + widget->getMarginLeft() - widget->getMarginRight());
+            case Fw::AnchorHorizontalCenter: {
+                auto margin = widget->getMarginLeft() - widget->getMarginRight();
+                if (widget->isOnHtml()) {
+                    if (ajustCenterPos > 0) {
+                        margin = -(ajustCenterPos / 2);
+                    }
+                }
+
+                newRect.moveHorizontalCenter(point + margin);
                 horizontalMoved = true;
                 break;
-            case Fw::AnchorLeft: {
+            }case Fw::AnchorLeft: {
                 auto margin = widget->getMarginLeft();
                 if (widget->isOnHtml()) {
+                    if (parentWidget != hookedWidget) {
+                        if (isInlineish(hookedWidget.get())) {
+                            margin += hookedWidget->getPaddingLeft() + hookedWidget->getPaddingRight();
+                        }
+                    }
+
                     if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
                         margin += widget->getPositions().left.value;
                 }

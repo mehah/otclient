@@ -524,6 +524,9 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         case Unit::Px:
         case Unit::Invalid:
         default: {
+            if (isOnHtml())
+                value += getPaddingLeft() + getPaddingRight();
+
             valueCalculed = value;
 
             if (isWidth) setWidth_px(value);
@@ -789,14 +792,23 @@ void UIWidget::applyAnchorAlignment() {
 
         if (isInline && m_parent->getTextAlign() == Fw::AlignCenter ||
             !isInline && m_parent->getJustifyItems() == JustifyItemsType::Center) {
-            addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
+            if (ctx.prevNonFloat)
+                setLeftAnchor(this, ctx.prevNonFloat->getId(), Fw::AnchorRight);
+            else
+                addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
         } else if (m_positionType != PositionType::Absolute) {
             if (isInline && m_parent->getTextAlign() == Fw::AlignLeft ||
                 !isInline && m_parent->getJustifyItems() == JustifyItemsType::Left) {
-                addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                if (ctx.prevNonFloat)
+                    setLeftAnchor(this, ctx.prevNonFloat->getId(), Fw::AnchorRight);
+                else
+                    addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
             } else if (isInline && m_parent->getTextAlign() == Fw::AlignRight ||
                     !isInline && m_parent->getJustifyItems() == JustifyItemsType::Right) {
-                addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                if (ctx.prevNonFloat)
+                    setRightAnchor(this, "next", Fw::AnchorLeft);
+                else
+                    addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
             } else anchored = false;
 
             if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
@@ -806,31 +818,13 @@ void UIWidget::applyAnchorAlignment() {
         }
 
         if (anchored) {
-            auto findPrevNonFloat = [this]() -> UIWidget* {
-                if (!m_parent) return nullptr;
-                for (int i = m_childIndex - 2; i >= 0; --i) {
-                    if (const auto sib = m_parent->getChildren()[i].get()) {
-                        if (sib->getDisplay() != DisplayType::None &&
-                            sib->getResultConditionIf() && sib->isAnchorable() &&
-                            mapLogicalFloat(sib->getFloat()) == FloatType::None)
-                            return sib;
-                    }
-                }
-                return nullptr;
-            };
-
-            UIWidget* ref = nullptr;
-            if (m_positionType != PositionType::Absolute) {
-                ref = findPrevNonFloat();
-            }
-
-            if (!ref) {
+            if (!ctx.prevNonFloat) {
                 addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             } else {
-                if (isInlineLike(m_displayType) && isInlineLike(ref->getDisplay()))
-                    addAnchor(Fw::AnchorTop, ref->getId(), Fw::AnchorTop);
+                if (isInlineLike(m_displayType) && isInlineLike(ctx.prevNonFloat->getDisplay()))
+                    addAnchor(Fw::AnchorTop, ctx.prevNonFloat->getId(), Fw::AnchorTop);
                 else
-                    addAnchor(Fw::AnchorTop, ref->getId(), Fw::AnchorBottom);
+                    addAnchor(Fw::AnchorTop, ctx.prevNonFloat->getId(), Fw::AnchorBottom);
             }
             return;
         }
