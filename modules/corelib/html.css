@@ -41,6 +41,7 @@ textarea {
 select {
     min-width: 24;
     min-height: 12;
+    text-align: center;
 }
 
 br {

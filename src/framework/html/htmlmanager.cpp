@@ -246,7 +246,21 @@ namespace {
     };
 }
 
+bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
+    if (!parent->getHtmlNode())return true;
+
+    if (parent->getHtmlNode()->getTag() == "select") {
+        parent->callLuaField("addOptionFromHtml", node->textContent(), node->getAttr("value"));
+        return false;
+    }
+
+    return true;
+}
+
 UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName, bool isDynamic, std::vector<UIWidgetPtr>& widgets) {
+    if (!checkSpecialCase(node, parent))
+        return nullptr;
+
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
         return nullptr;
 

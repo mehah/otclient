@@ -98,6 +98,10 @@ function UIComboBox:addOption(text, data)
     return index
 end
 
+function UIComboBox:addOptionFromHtml(text, value)
+    return self:addOption(text, value)
+end
+
 function UIComboBox:removeOption(text)
     for i, v in ipairs(self.options) do
         if v.text == text then
@@ -190,14 +194,6 @@ end
 
 function UIComboBox:canMouseScroll()
     return self.mouseScroll
-end
-
-function UIComboBox:HTML_onReadNodes(nodes)
-    for _, el in pairs(nodes) do
-        self:addOption(el:getcontent(), el.attributes.value)
-    end
-
-    return false
 end
 
 function UIComboBox:getCurrentIndex()

@@ -158,6 +158,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setEnabled(node->value<bool>());
         else if (node->tag() == "visible")
             setVisible(node->value<bool>());
+        else if (node->tag() == "visibility")
+            setVisible(node->value<std::string>() == "visible");
         else if (node->tag() == "checked")
             setChecked(node->value<bool>());
         else if (node->tag() == "draggable")
