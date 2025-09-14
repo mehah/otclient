@@ -181,10 +181,21 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     bool verticalMoved = false;
     bool horizontalMoved = false;
 
+    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute) {
+        newRect.moveTop(-widget->getPositions().top.value);
+        newRect.moveLeft(-widget->getPositions().left.value);
+
+        if (widget->getPositions().left.value != 0)
+            newRect.moveRight(-widget->getPositions().right.value);
+
+        if (widget->getPositions().top.value != 0)
+            newRect.moveBottom(-widget->getPositions().bottom.value);
+    }
+
     int realMarginTop = 0;
     if (widget->isOnHtml() && (widget->getPrevWidget() == nullptr || widget->getPrevWidget()->getDisplay() == DisplayType::Block) && isInlineish(widget.get())) {
         realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
-        for (auto p = widget->getNextWidget(); p && p->isAnchorable() && isInlineish(p.get()); p = p->getNextWidget())
+        for (auto p = widget->getNextWidget(); p && p->isAnchorable() && p->getPositionType() == PositionType::Static && isInlineish(p.get()); p = p->getNextWidget())
             if (p->getDisplay() == DisplayType::InlineBlock)
                 realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
     }
@@ -219,7 +230,6 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 horizontalMoved = true;
                 break;
             case Fw::AnchorLeft:
-
                 if (!horizontalMoved) {
                     newRect.moveLeft(point + widget->getMarginLeft());
                     horizontalMoved = true;
@@ -251,6 +261,9 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                             else
                                 margin += hookedWidget->getMarginBottom();
                         }
+
+                        if (hookedWidget->getPositionType() == PositionType::Relative)
+                            margin -= hookedWidget->getPositions().top.value;
                     } else if (isInlineish(widget.get())) {
                         margin = realMarginTop;
                     }
@@ -284,6 +297,9 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                         else
                             margin += hookedWidget->getMarginTop();
                     }
+
+                    if (hookedWidget->getPositionType() == PositionType::Relative)
+                        margin += hookedWidget->getPositions().bottom.value;
                 }
 
                 if (!verticalMoved) {

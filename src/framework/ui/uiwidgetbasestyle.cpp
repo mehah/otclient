@@ -207,7 +207,12 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setBorderColorBottom(node->value<Color>());
         else if (node->tag() == "border-color-left")
             setBorderColorLeft(node->value<Color>());
-        else if (node->tag() == "display") {
+        else if (node->tag() == "top" || node->tag() == "bottom" || node->tag() == "left" || node->tag() == "right") {
+            auto v = node->value<std::string>();
+            stdext::trim(v);
+            stdext::tolower(v);
+            setPositions(node->tag(), v);
+        } else if (node->tag() == "display") {
             auto v = node->value<std::string>();
             stdext::tolower(v);
             DisplayType display = DisplayType::Initial;
@@ -246,6 +251,15 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "clip") type = OverflowType::Clip;
             setOverflow(type);
             setClipping(type == OverflowType::Clip || type == OverflowType::Scroll || type == OverflowType::Hidden);
+        } else if (node->tag() == "position") {
+            auto v = node->value<std::string>();
+            stdext::tolower(v);
+
+            PositionType type = PositionType::Static;
+            if (v == "absolute") type = PositionType::Absolute;
+            else if (v == "relative") type = PositionType::Relative;
+
+            setPositionType(type);
         } else if (node->tag() == "float") {
             auto v = node->value<std::string>();
             stdext::tolower(v);

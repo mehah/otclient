@@ -154,6 +154,18 @@ struct SizeUnit
     int16_t value = 0;
     int16_t valueCalculed = -1;
     uint32_t updateId = 0;
+    SizeUnit() = default;
+    SizeUnit(int16_t v)
+        : unit(Unit::Px), value(v) {}
+    SizeUnit(Unit u, int16_t v, int16_t vCalc = -1, uint32_t updId = 0)
+        : unit(u), value(v), valueCalculed(vCalc), updateId(updId) {}
+};
+
+enum class PositionType : uint8_t
+{
+    Static,
+    Absolute,
+    Relative
 };
 
 // @bindclass
@@ -191,10 +203,12 @@ protected:
     ClearType m_clearType = ClearType::None;
     JustifyItemsType m_JustifyItems = JustifyItemsType::Normal;
     OverflowType m_overflowType = OverflowType::Hidden;
+    PositionType m_positionType = PositionType::Static;
 
     SizeUnit m_width;
     SizeUnit m_height;
     SizeUnit m_lineHeight;
+    EdgeGroup<SizeUnit> m_positions;
 
     UILayoutPtr m_layout;
 
@@ -284,6 +298,11 @@ public:
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
     void setOverflow(OverflowType type);
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
+    void setPositionType(PositionType t) { m_positionType = t; scheduleAnchorAlignment(); }
+    void setPositions(std::string_view type, std::string_view value);
+
+    auto& getPositions() { return m_positions; }
+
     void setResultConditionIf(bool v) {
         setProp(PropConditionIf, v);
         scheduleAnchorAlignment();
@@ -300,6 +319,8 @@ public:
     void setHtmlId(const std::string& id) { m_htmlId = id; }
     auto getHtmlId() const { return m_htmlId; }
 
+    auto getPositionType() { return m_positionType; }
+
     bool isOnHtml() { return m_htmlNode != nullptr; }
     const auto& getHtmlNode() const { return m_htmlNode; }
     auto& getWidthHtml() { return m_width; }
@@ -312,6 +333,8 @@ public:
     auto getDisplay() { return m_displayType; }
     auto getFloat() { return m_floatType; }
     auto getJustifyItems() { return m_JustifyItems; }
+
+    UIWidget* getVirtualParent() const;
 
     Rect getPaddingRect();
     Rect getMarginRect();

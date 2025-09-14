@@ -293,8 +293,6 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
         }
     }
 
-    widget->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName, node->toString());
-
     return widget;
 }
 
@@ -374,7 +372,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         createRadioGroup(node, groups);
 }
 
-UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, bool isDynamic, uint32_t htmlId) {
+UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& htmlNode, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, bool isDynamic, uint32_t htmlId) {
     auto path = "/modules/" + moduleName + "/";
 
     std::string script;
@@ -386,7 +384,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
     widgets.reserve(32);
 
     UIWidgetPtr widget;
-    for (const auto& el : node->getChildren()) {
+    for (const auto& el : htmlNode->getChildren()) {
         if (el->getTag() == "style") {
             root.sheets.emplace_back(css::parse(el->textContent()));
         } else if (el->getTag() == "link") {
@@ -402,6 +400,9 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
             }
         }
     }
+
+    if (widget && !script.empty())
+        widget->callLuaField("__scriptHtml", moduleName, script, scriptStr);
 
     if (!widget)
         return nullptr;
@@ -428,12 +429,12 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& node, const
             applyStyleSheet(rootNode, mainNode, htmlPath, sheet, checkRuleExist, isDynamic);
 
         for (const auto& widget : std::views::reverse(widgets)) {
-            applyAttributesAndStyles(widget.get(), widget->getHtmlNode().get(), root.groups, moduleName);
-            widget->scheduleAnchorAlignment();
+            const auto node = widget->getHtmlNode().get();
+            const auto w = widget.get();
+            applyAttributesAndStyles(w, node, root.groups, moduleName);
+            w->scheduleAnchorAlignment();
+            w->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName, node->toString());
         }
-
-        if (widget && !script.empty())
-            widget->callLuaField("__scriptHtml", moduleName, script, scriptStr);
     };
 
     if (isDynamic) {
