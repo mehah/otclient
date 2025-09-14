@@ -915,10 +915,13 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
         local smartLeftClick = modules.client_options.getOption('smartLeftClick')
         
         if smartLeftClick and mouseButton == MouseLeftButton and keyboardModifiers == KeyboardNoModifier then
-            if attackCreature then
+            local player = g_game.getLocalPlayer()
+            
+            -- Handle creature attacks first
+            if attackCreature and attackCreature ~= player then
                 g_game.attack(attackCreature)
                 return true
-            elseif creatureThing and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
+            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
                 g_game.attack(creatureThing)
                 return true
             elseif useThing then
@@ -945,6 +948,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 -- For containers (including corpses), only execute quicklooting with Smart Left-Click
                 -- Exception: If container has a parent container, open it instead of quicklooting
                 if useThing:isContainer() or useThing:isLyingCorpse() then
+                    -- Prioritize containers/corpses even if there are creatures on the same tile
                     if useThing:getParentContainer() then
                         -- For containers inside other containers, we want to open them, not quickloot
                         g_game.open(useThing, useThing:getParentContainer())
@@ -1006,7 +1010,8 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
             local smartLeftClick = modules.client_options.getOption('smartLeftClick')
             
             if smartLeftClick then
-                -- For containers in the world, Ctrl+Left Click opens them
+                local player = g_game.getLocalPlayer()
+                -- For containers in the world, Ctrl+Left Click opens them even if there's a creature
                 if (useThing:isContainer() or useThing:isLyingCorpse()) and not useThing:getParentContainer() then
                     g_game.open(useThing)
                     return true
