@@ -1053,132 +1053,155 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
         -- classic control
     else
         local lootControlMode = modules.client_options.getOption('lootControlMode')
+        local player = g_game.getLocalPlayer()
         
-        -- Handle loot options based on lootControlMode
-        -- Handle "Loot: Left" option - we need to process this before autowalk
-        if lootControlMode == 2 and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseLeftButton then
-            -- Always try to use quick loot for any container or item
-            if useThing then
-                -- For corpses or any container, try to quick loot
-                local isCorpseOrContainer = useThing:isContainer() or useThing:isLyingCorpse()
-                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and isCorpseOrContainer then
-                    g_game.sendQuickLoot(1, useThing)
+        -- ###############################
+        -- ### MODE 0: LOOT RIGHT CLICK ##
+        -- ###############################
+        if lootControlMode == 0 then
+            -- Right click with no modifiers: main loot functionality
+            if mouseButton == MouseRightButton and keyboardModifiers == KeyboardNoModifier then
+                -- Handle creature attacks first (match Smart Left-Click behavior)
+                if attackCreature and attackCreature ~= player then
+                    g_game.attack(attackCreature)
                     return true
+                elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
+                    g_game.attack(creatureThing)
+                    return true
+                elseif useThing then
+                    -- For containers/corpses
+                    if useThing:isContainer() or useThing:isLyingCorpse() then
+                        -- For containers inside other containers, we want to open them
+                        if useThing:getParentContainer() then
+                            g_game.open(useThing, useThing:getParentContainer())
+                            return true
+                        elseif g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
+                            -- For containers in the world, quickloot
+                            g_game.sendQuickLoot(1, useThing)
+                            return true
+                        end
+                    elseif useThing:isMultiUse() then
+                        startUseWith(useThing)
+                        return true
+                    else
+                        g_game.use(useThing)
+                        return true
+                    end
                 end
                 
-                -- If it's a pickupable item, pick it up
+                -- Handle pickupable items if no container/corpse was handled
                 if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
                     g_game.move(lookThing, lookThing:getPosition(), 1)
                     return true
                 end
             end
             
-            -- If we can't quick loot, pick up any pickupable item
-            if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
-                g_game.move(lookThing, lookThing:getPosition(), 1)
-                return true
-            end
-        end
-        
-        -- Handle other loot options
-        if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
-            -- Loot: Right - Default behavior
-            if lootControlMode == 0 and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
-                -- For regular items, just move them
-                -- Allow the following container handling to handle corpses
-                local isCorpseOrContainer = useThing and (useThing:isContainer() or useThing:isLyingCorpse())
-                if not isCorpseOrContainer then
-                    g_game.move(lookThing, lookThing:getPosition(), 1)
-                    return true
-                end
-                -- For containers/corpses, we'll continue to the container handling below,
-                -- which will allow both quicklooting and opening
-            -- Loot: SHIFT+Right - Only execute quickloot with SHIFT pressed
-            elseif lootControlMode == 1 and keyboardModifiers == KeyboardShiftModifier and mouseButton == MouseRightButton then
-                -- Try to use quick loot for any container or item
-                -- Check for containers and corpses
-                local isCorpseOrContainer = lookThing and (lookThing:isContainer() or lookThing:isLyingCorpse())
-                
-                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot and isCorpseOrContainer then
-                    g_game.sendQuickLoot(1, lookThing)
-                    return true
-                else
-                    -- Fall back to regular move if quick loot is not available
-                    g_game.move(lookThing, lookThing:getPosition(), 1)
-                    return true
+            -- SHIFT+Right click: opens containers without quicklooting
+            if mouseButton == MouseRightButton and keyboardModifiers == KeyboardShiftModifier then
+                if useThing then
+                    if useThing:isContainer() or useThing:isLyingCorpse() then
+                        if useThing:getParentContainer() then
+                            g_game.open(useThing, useThing:getParentContainer())
+                        else
+                            g_game.open(useThing)
+                        end
+                        return true
+                    elseif useThing:isMultiUse() then
+                        startUseWith(useThing)
+                        return true
+                    else
+                        g_game.use(useThing)
+                        return true
+                    end
                 end
             end
-        end
         
-        if useThing and keyboardModifiers == KeyboardNoModifier and mouseButton == MouseRightButton then
-            -- Remove the check for left mouse button being pressed to fix the issue
-            -- where right click stops working after a brief time
-            local player = g_game.getLocalPlayer()
-            if attackCreature and attackCreature ~= player then
-                g_game.attack(attackCreature)
-                return true
-            elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
-                g_game.attack(creatureThing)
-                return true
-            elseif useThing:isContainer() or useThing:isLyingCorpse() then
-                -- Handle both regular containers and corpses based on loot control mode
-                -- For Loot: Right, only perform quickloot (don't open container)
-                if lootControlMode == 0 and g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
-                    if useThing:isLyingCorpse() or useThing:isContainer() then
+        -- #################################
+        -- ### MODE 1: LOOT SHIFT+RIGHT  ###
+        -- #################################
+        elseif lootControlMode == 1 then
+            -- Right click with no modifiers: use or open containers
+            if mouseButton == MouseRightButton and keyboardModifiers == KeyboardNoModifier then
+                -- Handle creature attacks first
+                if attackCreature and attackCreature ~= player then
+                    g_game.attack(attackCreature)
+                    return true
+                elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
+                    g_game.attack(creatureThing)
+                    return true
+                elseif useThing then
+                    -- For containers
+                    if useThing:isContainer() or useThing:isLyingCorpse() then
+                        if useThing:getParentContainer() then
+                            g_game.open(useThing, useThing:getParentContainer())
+                        else
+                            g_game.open(useThing)
+                        end
+                        return true
+                    elseif useThing:isMultiUse() then
+                        startUseWith(useThing)
+                        return true
+                    else
+                        g_game.use(useThing)
+                        return true
+                    end
+                end
+            end
+            
+            -- SHIFT+Right click: quickloot on containers
+            if mouseButton == MouseRightButton and keyboardModifiers == KeyboardShiftModifier then
+                if useThing and (useThing:isContainer() or useThing:isLyingCorpse()) then
+                    if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
                         g_game.sendQuickLoot(1, useThing)
                         return true
                     end
                 end
                 
-                -- For Loot: SHIFT+Right, regular right-click only opens corpses (no quickloot)
-                if lootControlMode == 1 then
-                    if useThing:getParentContainer() then
-                        g_game.open(useThing, useThing:getParentContainer())
-                        return true
-                    else
-                        g_game.open(useThing)
-                        return true
+                -- Handle pickupable items
+                if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+            end
+            
+        -- #############################
+        -- ### MODE 2: LOOT LEFT     ###
+        -- #############################
+        elseif lootControlMode == 2 then
+            -- Left click with no modifiers: main loot functionality
+            if mouseButton == MouseLeftButton and keyboardModifiers == KeyboardNoModifier then
+                -- Handle creature attacks first (match Smart Left-Click behavior)
+                if attackCreature and attackCreature ~= player then
+                    g_game.attack(attackCreature)
+                    return true
+                elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
+                    g_game.attack(creatureThing)
+                    return true
+                elseif useThing then
+                    -- For containers/corpses
+                    if useThing:isContainer() or useThing:isLyingCorpse() then
+                        -- For containers inside other containers, we want to open them
+                        if useThing:getParentContainer() then
+                            g_game.open(useThing, useThing:getParentContainer())
+                            return true
+                        elseif g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
+                            -- For containers in the world, quickloot
+                            g_game.sendQuickLoot(1, useThing)
+                            return true
+                        end
                     end
                 end
                 
-                -- For regular containers that aren't corpses, open them
-                if not useThing:isLyingCorpse() then
-                    if useThing:getParentContainer() then
-                        g_game.open(useThing, useThing:getParentContainer())
-                        return true
-                    else
-                        g_game.open(useThing)
-                        return true
-                    end
-                end
-            elseif useThing:isMultiUse() then
-                startUseWith(useThing)
-                return true
-            else
-                g_game.use(useThing)
-                return true
-            end
-            return true
-        elseif useThing and keyboardModifiers == KeyboardShiftModifier and mouseButton == MouseRightButton then
-            -- SHIFT+Right click behavior depends on loot control mode
-            if lootControlMode == 0 and (useThing:isContainer() or useThing:isLyingCorpse()) then
-                -- For Loot: Right mode, SHIFT+Right opens corpses without quicklooting
-                if useThing:getParentContainer() then
-                    g_game.open(useThing, useThing:getParentContainer())
-                    return true
-                else
-                    g_game.open(useThing)
-                    return true
-                end
-            elseif lootControlMode == 1 and (useThing:isContainer() or useThing:isLyingCorpse()) then
-                -- For Loot: SHIFT+Right mode, SHIFT+Right only quickloots without opening
-                if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
-                    g_game.sendQuickLoot(1, useThing)
+                -- Handle pickupable items if no container/corpse was handled
+                if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
+                    g_game.move(lookThing, lookThing:getPosition(), 1)
                     return true
                 end
             end
-            return true
-        elseif useThing and useThing:isContainer() and keyboardModifiers == KeyboardCtrlShiftModifier and
+        end
+        
+        -- Common key combinations for all Classic Control modes
+        if useThing and useThing:isContainer() and keyboardModifiers == KeyboardCtrlShiftModifier and
             (mouseButton == MouseLeftButton or mouseButton == MouseRightButton) then
             g_game.open(useThing)
             return true
