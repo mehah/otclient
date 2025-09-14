@@ -230,9 +230,10 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
                 break;
             case Fw::AnchorLeft: {
                 auto margin = widget->getMarginLeft();
-                if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
-                    margin += widget->getPositions().left.value;
-
+                if (widget->isOnHtml()) {
+                    if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
+                        margin += widget->getPositions().left.value;
+                }
                 if (!horizontalMoved) {
                     newRect.moveLeft(point + margin);
                     horizontalMoved = true;
@@ -242,9 +243,11 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
             }
             case Fw::AnchorRight: {
                 auto margin = widget->getMarginRight();
-                if (widget->getPositions().left.unit == Unit::Auto &&
-                        (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
-                    margin += widget->getPositions().right.value;
+                if (widget->isOnHtml()) {
+                    if (widget->getPositions().left.unit == Unit::Auto &&
+                            (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
+                        margin += widget->getPositions().right.value;
+                }
 
                 if (!horizontalMoved) {
                     newRect.moveRight(point - margin);
@@ -299,25 +302,27 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
 
             case Fw::AnchorBottom: {
                 auto margin = widget->getMarginBottom();
-                if (parentWidget != hookedWidget) {
-                    if (widget->getFloat() != FloatType::None) {
-                        margin -= hookedWidget->getMarginBottom();
-                    } else if (widget->getDisplay() == DisplayType::Inline) {
-                        margin = 0;
-                    } else if (hookedWidget->getDisplay() == DisplayType::Block) {
-                        if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
-                            margin = std::max<int>(margin, hookedWidget->getMarginTop());
-                        else
-                            margin += hookedWidget->getMarginTop();
+                if (widget->isOnHtml()) {
+                    if (parentWidget != hookedWidget) {
+                        if (widget->getFloat() != FloatType::None) {
+                            margin -= hookedWidget->getMarginBottom();
+                        } else if (widget->getDisplay() == DisplayType::Inline) {
+                            margin = 0;
+                        } else if (hookedWidget->getDisplay() == DisplayType::Block) {
+                            if (widget->getMarginBottom() > 0 && hookedWidget->getMarginTop() > 0)
+                                margin = std::max<int>(margin, hookedWidget->getMarginTop());
+                            else
+                                margin += hookedWidget->getMarginTop();
+                        }
+
+                        if (hookedWidget->getPositionType() == PositionType::Relative)
+                            margin += hookedWidget->getPositions().bottom.value;
                     }
 
-                    if (hookedWidget->getPositionType() == PositionType::Relative)
-                        margin += hookedWidget->getPositions().bottom.value;
+                    if (widget->getPositions().top.unit == Unit::Auto &&
+        (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
+                        margin += widget->getPositions().bottom.value;
                 }
-
-                if (widget->getPositions().top.unit == Unit::Auto &&
-    (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute))
-                    margin += widget->getPositions().bottom.value;
 
                 if (!verticalMoved) {
                     newRect.moveBottom(point - margin);

@@ -440,7 +440,9 @@ namespace {
 }
 
 void UIWidget::refreshHtml(bool childrenTo) {
-    if (childrenTo && isOnHtml()) {
+    if (isOnHtml()) return;
+
+    if (childrenTo) {
         for (const auto& child : m_children) {
             child->scheduleAnchorAlignment();
         }
@@ -522,7 +524,8 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         case Unit::Px:
         case Unit::Invalid:
         default: {
-            valueCalculed = value = static_cast<int>(std::round(value)) + getPaddingLeft() + getPaddingRight();
+            valueCalculed = value;
+
             if (isWidth) setWidth_px(value);
             else         setHeight_px(value);
             break;
