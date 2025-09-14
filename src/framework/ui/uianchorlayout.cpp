@@ -165,7 +165,7 @@ inline bool isInlineish(UIWidget* w) {
 
 bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroupPtr& anchorGroup, UIWidgetPtr first)
 {
-    const auto& parentWidget = getParentWidget();
+    auto parentWidget = getParentWidget();
     if (!parentWidget)
         return false;
 
@@ -181,6 +181,7 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
     bool verticalMoved = false;
     bool horizontalMoved = false;
 
+    UIWidgetPtr virtualParentWidget = nullptr;
     if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute) {
         newRect.moveTop(-widget->getPositions().top.value);
         newRect.moveLeft(-widget->getPositions().left.value);
@@ -190,12 +191,15 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
 
         if (widget->getPositions().top.value != 0)
             newRect.moveBottom(-widget->getPositions().bottom.value);
+
+        if (widget->getPositionType() == PositionType::Absolute)
+            virtualParentWidget = widget->getVirtualParent();
     }
 
     int realMarginTop = 0;
     if (widget->isOnHtml() && (widget->getPrevWidget() == nullptr || widget->getPrevWidget()->getDisplay() == DisplayType::Block) && isInlineish(widget.get())) {
         realMarginTop = widget->getDisplay() == DisplayType::InlineBlock ? widget->getMarginTop() : 0;
-        for (auto p = widget->getNextWidget(); p && p->isAnchorable() && p->getPositionType() == PositionType::Static && isInlineish(p.get()); p = p->getNextWidget())
+        for (auto p = widget->getNextWidget(); p && p->isAnchorable() && p->getPositionType() != PositionType::Absolute && isInlineish(p.get()); p = p->getNextWidget())
             if (p->getDisplay() == DisplayType::InlineBlock)
                 realMarginTop = std::max<int>(realMarginTop, p->getMarginTop());
     }
@@ -205,6 +209,13 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
         // skip invalid anchors
         if (anchor->getHookedEdge() == Fw::AnchorNone)
             continue;
+
+        if (widget->getPositionType() == PositionType::Absolute) {
+            parentWidget = anchor->getAnchoredEdge() == Fw::AnchorTop && widget->getPositions().top.unit != Unit::Auto ||
+                anchor->getAnchoredEdge() == Fw::AnchorLeft && widget->getPositions().left.unit != Unit::Auto ||
+                anchor->getAnchoredEdge() == Fw::AnchorRight && widget->getPositions().right.unit != Unit::Auto ||
+                anchor->getAnchoredEdge() == Fw::AnchorBottom && widget->getPositions().bottom.unit != Unit::Auto ? virtualParentWidget : getParentWidget();
+        }
 
         // determine hooked widget
         const auto& hookedWidget = anchor->getHookedWidget(widget, parentWidget);

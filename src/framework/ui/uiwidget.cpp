@@ -53,6 +53,7 @@ UIWidget::UIWidget()
     setProp(PropFirstOnStyle, true, false);
     setProp(PropConditionIf, true, false);
 
+    m_positions.set(Unit::Auto);
     m_clickTimer.stop();
 
     initBaseStyle();

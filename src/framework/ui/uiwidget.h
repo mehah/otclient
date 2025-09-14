@@ -155,6 +155,8 @@ struct SizeUnit
     int16_t valueCalculed = -1;
     uint32_t updateId = 0;
     SizeUnit() = default;
+    SizeUnit(Unit u)
+        : unit(u) {}
     SizeUnit(int16_t v)
         : unit(Unit::Px), value(v) {}
     SizeUnit(Unit u, int16_t v, int16_t vCalc = -1, uint32_t updId = 0)
@@ -334,7 +336,7 @@ public:
     auto getFloat() { return m_floatType; }
     auto getJustifyItems() { return m_JustifyItems; }
 
-    UIWidget* getVirtualParent() const;
+    UIWidgetPtr getVirtualParent() const;
 
     Rect getPaddingRect();
     Rect getMarginRect();

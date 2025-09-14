@@ -107,11 +107,6 @@ namespace {
         UIWidget* lastRightFloat = nullptr;
         UIWidget* lastFloatSameSide = nullptr;
 
-        std::string_view topParent;
-        std::string_view leftParent;
-        std::string_view rightParent;
-        std::string_view bottomParent;
-
         int prevNonFloatIdx = -1;
         int lastLeftIdx = -1;
         int lastRightIdx = -1;
@@ -219,12 +214,6 @@ namespace {
     FlowCtx computeFlowContext(UIWidget* self, DisplayType /*parentDisplay*/, FloatType effFloat) {
         FlowCtx ctx;
 
-        const auto& virtualParent = self->getVirtualParent();
-
-        ctx.topParent = self->getPositions().top.unit != Unit::Auto ? "parent" : virtualParent->getId();
-        ctx.leftParent = self->getPositions().left.unit != Unit::Auto ? "parent" : virtualParent->getId();
-        ctx.rightParent = self->getPositions().left.unit != Unit::Auto ? "parent" : virtualParent->getId();
-
         if (self->getPositionType() == PositionType::Absolute)
             return ctx;
 
@@ -233,7 +222,7 @@ namespace {
             if (c.get() == self) break;
 
             if (c->getDisplay() == DisplayType::None) { ++i; continue; }
-            if (!c->getResultConditionIf() || !c->isAnchorable()) { ++i; continue; }
+            if (!c->getResultConditionIf() || !c->isAnchorable() || c->getPositionType() == PositionType::Absolute) { ++i; continue; }
 
             const FloatType cf = mapLogicalFloat(c->getFloat());
             if (cf == FloatType::None) {
@@ -635,13 +624,13 @@ void UIWidget::ensureUniqueId() {
 }
 
 // needs to be cached
-UIWidget* UIWidget::getVirtualParent() const {
+UIWidgetPtr UIWidget::getVirtualParent() const {
     if (m_positionType != PositionType::Absolute)
-        return m_parent.get();
+        return m_parent;
 
-    auto parent = m_parent.get();
+    auto parent = m_parent;
     while (parent->m_positionType == PositionType::Static) {
-        parent = parent->m_parent.get();
+        parent = parent->m_parent;
     }
 
     return parent;
@@ -800,10 +789,10 @@ void UIWidget::applyAnchorAlignment() {
             addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
         } else if (isInline && m_parent->getTextAlign() == Fw::AlignLeft ||
                 !isInline && m_parent->getJustifyItems() == JustifyItemsType::Left) {
-            addAnchor(Fw::AnchorLeft, ctx.leftParent, Fw::AnchorLeft);
+            addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
         } else if (isInline && m_parent->getTextAlign() == Fw::AlignRight ||
                 !isInline && m_parent->getJustifyItems() == JustifyItemsType::Right) {
-            addAnchor(Fw::AnchorRight, ctx.rightParent, Fw::AnchorRight);
+            addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
         } else anchored = false;
 
         if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
@@ -831,7 +820,7 @@ void UIWidget::applyAnchorAlignment() {
             }
 
             if (!ref) {
-                addAnchor(Fw::AnchorTop, ctx.topParent, Fw::AnchorTop);
+                addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             } else {
                 if (isInlineLike(m_displayType) && isInlineLike(ref->getDisplay()))
                     addAnchor(Fw::AnchorTop, ref->getId(), Fw::AnchorTop);
