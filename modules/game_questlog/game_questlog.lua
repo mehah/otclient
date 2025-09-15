@@ -486,6 +486,7 @@ function show()
     if not questLogController.ui then
         return
     end
+    questLogController.ui:centerIn('parent')
     g_game.requestQuestLog()
     questLogController.ui:show()
     questLogController.ui:raise()
@@ -1355,7 +1356,6 @@ end
 function questLogController:onInit()
     g_ui.importStyle("styles/game_questlog.otui")
     questLogController:loadHtml('game_questlog.html')
-    questLogController.ui:centerIn('parent')
     hide()
 
     UITextList.questLogList = questLogController.ui.panelQuestLog.areaPanelQuestList.questList
@@ -1364,10 +1364,10 @@ function questLogController:onInit()
     UITextList.questLogInfo:setBackgroundColor('#363636')
 
     UITextEdit.search = questLogController.ui.panelQuestLog.textEditSearchQuest
-    UIlabel.numberQuestComplete = questLogController.ui.panelQuestLog.filterPanel.lblCompleteNumber
-    UIlabel.numberQuestHidden = questLogController.ui.panelQuestLog.filterPanel.lblHiddenNumber
-    UICheckBox.showComplete = questLogController.ui.panelQuestLog.filterPanel.checkboxShowComplete
-    UICheckBox.showShidden = questLogController.ui.panelQuestLog.filterPanel.checkboxShowShidden
+    UIlabel.numberQuestComplete = questLogController:findWidget("#lblCompleteNumber")
+    UIlabel.numberQuestHidden = questLogController:findWidget("#lblHiddenNumber")
+    UICheckBox.showComplete = questLogController:findWidget("#checkboxShowComplete")
+    UICheckBox.showShidden = questLogController:findWidget("#checkboxShowShidden")
     UICheckBox.showInQuestTracker = questLogController.ui.panelQuestLineSelected.checkboxShowInQuestTracker
 
     questLogController:registerEvents(g_game, {

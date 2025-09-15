@@ -1,8 +1,8 @@
 <link href="game_questlog.css" />
 <html>
-<window id="main" anchor="parent" class="questLog-window" text="Quest Log" onescape="self:close()">
+<window id="main" anchor="parent" class="questLog-window" title="Quest Log" onescape="self:close()">
 
-  <minipanel id="panelQuestLog" text="Quest Log" focusable="false" class="content-left" anchor="parent"
+  <minipanel id="panelQuestLog" title="Quest Log" focusable="false" class="content-left" anchor="parent"
     layout="type: verticalBox;spacing:5">
     <TextListQuestLog id="areaPanelQuestList" class="quest-list"></TextListQuestLog>
     <select id="comboBoxFilter" onchange="self:onFilterQuestLog(event)">
@@ -14,32 +14,41 @@
     <TextEditQuestLog id="textEditSearchQuest" type="text" class="search-box" placeholder="Type to search">
     </TextEditQuestLog>
 
-    <div id="filterPanel"
-      layout="type: grid;cell-size: 158 22;num-lines:2;num-columns: 3;cell-spacing: 0;flow: false;fit-children: false"
-      class="filter">
-      <input id="checkboxShowComplete" type="checkbox" class="checkbox-group" text="Quest Log"
-        onchange="self:filterQuestListShowComplete(event)" checked /> Show Completed
-      <label class="text-right text-offset-normal">Quests completed:</label>
-      <label id="lblCompleteNumber" class="text-left" textOffset="5 -1">0</label>
-      <input id="checkboxShowShidden" type="checkbox" class="checkbox-group" text="Quest Log"
-        onchange="self:filterQuestListShowHidden(event)" />Show hidden
-      <label class="text-right text-offset-normal">Quests hidden:</label>
-      <label id="lblHiddenNumber" class="text-left" textOffset="5 -2">0</label>
-    </div>
+    <table class="filter-table">
+      <tr>
+        <td class="col1">
+          <input type="checkbox" id="checkboxShowComplete" checked text="Show completed">
+        </td>
+        <td class="col2" text="Quests completed:"></td>
+        <td class="col3" id="lblCompleteNumber"></td>
+      </tr>
+      <tr>
+        <td class="col1">
+          <input type="checkbox" id="checkboxShowHidden" text="Show hidden">
+        </td>
+        <td class="col2" text="Quests hidden:"></td>
+        <td class="col3" id="lblHiddenNumber" ></td>
+      </tr>
+    </table>
+    
+    
   </minipanel>
 
-  <minipanel id="panelQuestLineSelected" class="content-right" anchor="parent" text="No quest line Selected"
+  <minipanel id="panelQuestLineSelected" class="content-right" anchor="parent" title="No quest line Selected"
     layout="type: verticalBox;">
-    <TextListQuestLog id="ScrollAreaQuestList" style="height: 200"></TextListQuestLog>
+    <TextListQuestLog id="ScrollAreaQuestList" ></TextListQuestLog>
     <MultiLineQuestLog id="panelQuestInfo" class="quest-info"></MultiLineQuestLog>
-    <input id="checkboxShowInQuestTracker" type="checkbox" style="text-offset: 18 0;"
-      onchange="self:onCheckChangeQuestTracker(event)" />Show in quest tracker
+    <input id="checkboxShowInQuestTracker" type="checkbox" 
+      onchange="self:onCheckChangeQuestTracker(event)" text="Show in quest tracker" />
   </minipanel>
 
   <HorizontalSeparator class="separator"></HorizontalSeparator>
-  <Qtbutton id="trackerButton" class="questLogButton" style="margin-top:12;" onclick="self:toggleMiniWindowsTracker()">
-    Quest Tracker</Qtbutton>
-  <Qtbutton class="questLogButton" style="float: right;" onclick="self:close()">Close</Qtbutton>
+
+  <div id="buttonsPanel" class="buttons" focusable="false">
+    <button id="trackerButton" onclick="self:toggleMiniWindowsTracker()" text="Quest Tracker"></button>
+    <button id="closeButton" onclick="self:close()" text="Close"></button>
+  </div>
+
 </window>
 
 </html>

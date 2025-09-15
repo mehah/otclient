@@ -70,3 +70,61 @@
   text-align: left;
   margin-left: 12;
 }
+.buttons {
+  width: 100%;
+  height: 20px;
+  margin-top: 5px;
+  padding: 0 6px;
+}
+
+#trackerButton {
+  float: right;
+  margin-right: 15;
+}
+
+#closeButton {
+  float: left;
+}
+
+#ScrollAreaQuestList {
+  height: 200px;
+}
+  
+#checkboxShowInQuestTracker {
+  margin-top: 5px;
+}
+  
+.table-window {
+  width: 100%;
+  height: 120;
+  font: verdana-11px-antialised;
+  color: #c0c0c0;
+}
+  
+.filter-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+  
+.filter-table td {
+  padding: 4;
+  height: 22;
+  vertical-align: middle;
+}
+  
+.filter-table .col1 {
+  width: 60%;
+  text-align: left;
+} 
+  
+.filter-table .col2 {
+  width: 30%;
+  text-align: right;
+  --text-offset: 0 -5;
+}
+  
+.filter-table .col3 {
+  width: 10%;
+  text-align: right;
+  --text-offset: 0 -5;
+}
