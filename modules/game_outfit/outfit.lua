@@ -1776,7 +1776,13 @@ function accept()
     end
     if g_game.getFeature(GamePlayerFamiliars) then
         if settings.currentPreset > 0 then
-            settings.presets[settings.currentPreset].familiar = window.configure.familiar.check:isChecked()
+            -- Check if familiar configuration exists before accessing it
+            if window.configure.familiar and window.configure.familiar.check then
+                settings.presets[settings.currentPreset].familiar = window.configure.familiar.check:isChecked()
+            else
+                -- Default to false if the familiar check doesn't exist
+                settings.presets[settings.currentPreset].familiar = false
+            end
         end
     end
     g_game.changeOutfit(tempOutfit)
