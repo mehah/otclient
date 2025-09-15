@@ -68,7 +68,9 @@ Controller = {
     keyboardEvents = nil
 }
 
-G_CONTROLLER_CALLED = {}
+if not G_CONTROLLER_CALLED then
+    G_CONTROLLER_CALLED = {}
+end
 
 function Controller:new()
     local module = g_modules.getCurrentModule()
