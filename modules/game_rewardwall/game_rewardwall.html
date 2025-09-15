@@ -1,37 +1,35 @@
 <link href="game_rewardwall.css" />
 <html>
-<window id="rewardWallWindow" anchor="parent" class="reward-wall-window" text="Reward Wall"
+<window id="rewardWallWindow" anchor="parent" class="reward-wall-window" title="Reward Wall"
   onescape="self:onClickToggle()" layout="type: verticalBox;spacing:10">
   <!-- History Panel -->
-  <minipanel id="historyPanel" text="History" class="history-panel">
+  <minipanel id="historyPanel" title="History" class="history-panel">
     <TextListWithScroll id="historyList" class="history-list"></TextListWithScroll>
   </minipanel>
 
   <!-- Resting Area Bonuses Panel -->
-  <minipanel id="restingAreaPanel" text="Resting Area Bonuses" class="content-panel" anchor="parent">
+  <minipanel id="restingAreaPanel" title="Resting Area Bonuses" class="content-panel" anchor="parent">
     <div id="restingAreaInfo" layout="type: verticalBox;spacing:5" class="resting-area-info">
       <img src="images/icon-rewardstreak-default" id="rewardStreakIcon" class="resting-area-icon"
-        onhover="self:onhoverStatusPlayer(event)" />2
-      <UIWidget id="timeLeft" class="resting-area-time" onhover="self:onhoverStatusPlayer(event)">2 min</UIWidget>
+        onhover="self:onhoverStatusPlayer(event)" text="2" />
+      <UIWidget id="timeLeft" class="resting-area-time" onhover="self:onhoverStatusPlayer(event)" text="2 min"></UIWidget>
       <GoldLabel2 id="restingAreaGold" class="resting-area-gold" onhover="self:onhoverStatusPlayer(event)"></GoldLabel2>
     </div>
 
     <div id="bonusIcons" anchor="parent" layout="type: horizontalBox;spacing:4" class="bonus-icons-container">
-      <imgBonuses id="bonusIcon1" style="icon-clip: 0 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
-      <imgBonuses id="bonusIcon2" style="icon-clip: 64 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
-      <imgBonuses id="bonusIcon3" style="icon-clip: 128 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
-      <imgBonuses id="bonusIcon4" style="icon-clip: 192 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
-      <imgBonuses id="bonusIcon5" style="icon-clip: 256 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
-      <imgBonuses id="bonusIcon6" style="icon-clip: 320 0 64 64;" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon1" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon2" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon3" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon4" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon5" onhover="self:onhoverBonus(event)"></imgBonuses>
+      <imgBonuses id="bonusIcon6" onhover="self:onhoverBonus(event)"></imgBonuses>
     </div>
 
-    <label id="streakWarning" anchor="parent" class="info-label premium-message">
-      Great! You benefit from the best possible rewards and bonuses due to your premium status.
-    </label>
+    <label id="streakWarning" class="info-label premium-message" text="Great! You benefit from the best possible rewards and bonuses due to your premium status."></label>
   </minipanel>
 
   <!-- Daily Rewards Panel -->
-  <minipanel id="dailyRewardsPanel" text="Daily Rewards" class="daily-rewards-panel"
+  <minipanel id="dailyRewardsPanel" title="Daily Rewards" class="daily-rewards-panel"
     layout="type: horizontalBox;spacing:-1;">
     <div id="reward1" layout="type: verticalBox;spacing:5" class="reward-item">
       <RewardButton3 id="rewardButton1" class="reward-button" onhover="self:onhoverRewardType(event)"
@@ -85,9 +83,7 @@
 
   <!-- Premium Status Panel -->
   <QtPanel id="premiumStatus" class="premium-panel">
-    <label id="premiumMessage" anchor="parent" class="info-label premium-info2">
-      Great! You benefit from the best possible rewards and bonuses due to your premium status.
-    </label>
+    <pre id="premiumMessage" anchor="parent" class="info-label premium-info2" text="Great! You benefit from the best possible rewards and bonuses \n due to your premium status."></pre>
     <BigPremiumButton id="premiumButton" class="premium-button" onclick="self:onClickSendStoreRewardWall()">
     </BigPremiumButton>
   </QtPanel>
