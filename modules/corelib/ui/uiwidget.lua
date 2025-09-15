@@ -19,6 +19,11 @@ function UIWidget:setMargin(...)
     end
 end
 
+function UIWidget:setTitle(title)
+    self:setText(title)
+    self:setTextAlign(AlignTopCenter)
+end
+
 function UIWidget:parseColoredText(text, default_color)
     default_color = default_color or "#ffffff"
     local result, last_pos = "", 1
