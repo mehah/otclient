@@ -437,10 +437,24 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
 
 void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transferred)
 {
-    auto on_done_read = [this] {
+    auto on_done_read = [this]() {
         m_timer.cancel();
         const auto& data = m_response.data();
-        m_result->response.append(buffers_begin(data), buffers_end(data));
+        std::string fullResponse(asio::buffers_begin(data), asio::buffers_end(data));
+
+		size_t jsonStart = fullResponse.find('{');
+		if (jsonStart != std::string::npos) {
+			// Find the end of JSON (last '}')
+			size_t jsonEnd = fullResponse.rfind('}');
+			if (jsonEnd != std::string::npos) {
+				m_result->response = fullResponse.substr(jsonStart, jsonEnd - jsonStart + 1);
+			} else {
+				m_result->response = fullResponse.substr(jsonStart);
+			}
+        } else {
+            m_result->response = fullResponse;
+        }
+        
         m_result->finished = true;
         m_callback(m_result);
     };
