@@ -953,6 +953,10 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                         -- For containers inside other containers, we want to open them, not quickloot
                         g_game.open(useThing, useThing:getParentContainer())
                         return true
+                    elseif useThing:isPickupable() then
+                        -- For pickupable containers like quivers, backpacks, etc., open them instead of quicklooting
+                        g_game.open(useThing)
+                        return true
                     elseif g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
                         -- For containers in the world (not inside another container), quickloot
                         g_game.sendQuickLoot(1, useThing)
@@ -1074,6 +1078,10 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                         -- For containers inside other containers, we want to open them
                         if useThing:getParentContainer() then
                             g_game.open(useThing, useThing:getParentContainer())
+                            return true
+                        elseif useThing:isPickupable() then
+                            -- For pickupable containers like quivers, backpacks, etc., open them instead of quicklooting
+                            g_game.open(useThing)
                             return true
                         elseif g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
                             -- For containers in the world, quickloot
