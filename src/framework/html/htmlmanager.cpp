@@ -98,7 +98,7 @@ namespace {
         "text-indent",
         "text-transform",
         "unicode-bidi",
-        "visibility",
+        /*"visibility",*/
         "white-space",
         "word-spacing",
         "writing-mode"

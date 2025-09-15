@@ -1,0 +1,11 @@
+window,
+minipanel {
+    text-align: top;
+    color: #c0c0c0
+}
+
+window>*,
+minipanel>* {
+    color: white;
+    text-align: left;
+}

@@ -5,7 +5,6 @@
         margin: 200;
         width: 200;
         padding: 10;
-        visibility: hidden;
     }
 
     select {
@@ -14,12 +13,13 @@
 </style>
 <html>
 
-<div focusable="false" class="content" anchor="parent" layout="type: verticalBox; fit-children: true">
+<minipanel focusable="false" class="content" anchor="parent" text="Shaders"
+    layout="type: verticalBox; fit-children: true">
     <label style="text-align: center; margin-top: 10">Shaders Map/Outfit/Mount</label>
     <hr />
     <select id="mapComboBox" onchange="self:onMapComboBoxChange(event)"></select>
     <select id="outfitComboBox" onchange="self:onOutfitComboBoxChange(event)"></select>
     <select id="mountComboBox" onchange="self:onMountComboBoxChange(event)"></select>
-</div>
+</minipanel>
 
 </html>
