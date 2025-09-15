@@ -320,7 +320,15 @@ function CharacterList.create(characters, account, otui)
             local outfit = {type = characterInfo.outfitid, head = characterInfo.headcolor, body = characterInfo.torsocolor, legs = characterInfo.legscolor, feet = characterInfo.detailcolor, addons = characterInfo.addonsflags}
             creature:setOutfit(outfit)
             creature:setDirection(2)
+        
             creatureDisplay:setCreature(creature)
+
+            -- Get the creature size from its appearance data
+            creatureDisplay:setPadding(0)
+            -- The creature size is determined by the ThingType of the outfit
+            -- We use a single parameter for setCreatureSize which handles proportional scaling
+            creatureDisplay:setCreatureSize(90) -- Use a base size that will be scaled properly
+            creatureDisplay:setCenter(false) -- Center the creature in the display
 
             local mainCharacter = widget:getChildById('mainCharacter', characterList)
             if characterInfo.main then
