@@ -1168,33 +1168,58 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
         -- ### MODE 2: LOOT LEFT     ###
         -- #############################
         elseif lootControlMode == 2 then
-            -- Left click with no modifiers: main loot functionality
+            -- Left click with no modifiers: ONLY for loot functionality
             if mouseButton == MouseLeftButton and keyboardModifiers == KeyboardNoModifier then
-                -- Handle creature attacks first (match Smart Left-Click behavior)
-                if attackCreature and attackCreature ~= player then
-                    g_game.attack(attackCreature)
-                    return true
-                elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
-                    g_game.attack(creatureThing)
-                    return true
-                elseif useThing then
-                    -- For containers/corpses
-                    if useThing:isContainer() or useThing:isLyingCorpse() then
-                        -- For containers inside other containers, we want to open them
-                        if useThing:getParentContainer() then
-                            g_game.open(useThing, useThing:getParentContainer())
-                            return true
-                        elseif g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
-                            -- For containers in the world, quickloot
+                -- ONLY for quicklooting and picking up items, NOT for attacking
+                if useThing then
+                    -- ONLY quickloot containers/corpses in the game world
+                    if (useThing:isContainer() or useThing:isLyingCorpse()) and not useThing:getParentContainer() then
+                        -- Only handle containers that are in the game world (not in inventory)
+                        if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
                             g_game.sendQuickLoot(1, useThing)
                             return true
                         end
                     end
                 end
                 
-                -- Handle pickupable items if no container/corpse was handled
+                -- Handle pickupable items in the game world
                 if lookThing and not lookThing:isCreature() and lookThing:isPickupable() then
                     g_game.move(lookThing, lookThing:getPosition(), 1)
+                    return true
+                end
+            end
+            
+            -- Right click for Loot: Left mode - use items instead of showing context menu
+            if mouseButton == MouseRightButton and keyboardModifiers == KeyboardNoModifier then
+                -- Handle creature attacks first
+                if attackCreature and attackCreature ~= player then
+                    g_game.attack(attackCreature)
+                    return true
+                elseif creatureThing and creatureThing ~= player and autoWalkPos and creatureThing:getPosition().z == autoWalkPos.z then
+                    g_game.attack(creatureThing)
+                    return true
+                -- Use the item if it's a container in inventory or use other items
+                elseif useThing then
+                    if useThing:isContainer() or useThing:isLyingCorpse() then
+                        if useThing:getParentContainer() then
+                            g_game.open(useThing, useThing:getParentContainer())
+                            return true
+                        else
+                            g_game.open(useThing)
+                            return true
+                        end
+                    elseif useThing:isMultiUse() then
+                        startUseWith(useThing)
+                        return true
+                    else
+                        g_game.use(useThing)
+                        return true
+                    end
+                end
+                
+                -- Only show context menu when no usable item is present
+                if not useThing then
+                    createThingMenu(menuPosition, lookThing, useThing, creatureThing)
                     return true
                 end
             end
