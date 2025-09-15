@@ -925,6 +925,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 g_game.attack(creatureThing)
                 return true
             elseif useThing then
+                -- Handle interactive items first, without looking at them
                 -- Special handling for usable items with Unpass/Unmove flags
                 if useThing:isUsable() and (useThing:isNotWalkable() or useThing:isNotMoveable()) then
                     -- Only use the item, don't look at it
@@ -972,9 +973,27 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                         return true
                     end
                 end
+                
+                -- If we couldn't use the item through any of the above methods,
+                -- but it's pickupable, try to pick it up (like in Classic Control mode)
+                if useThing:isPickupable() then
+                    g_game.move(useThing, useThing:getPosition(), 1)
+                    return true
+                end
+                
+                -- If we couldn't use or pick up the item, try to walk to its position if possible
+                local position = useThing:getPosition()
+                if position and position.x ~= 0 and autoWalkPos then
+                    local player = g_game.getLocalPlayer()
+                    player:autoWalk(autoWalkPos)
+                    return true
+                end
+                
+                return true
             end
             
-            if lookThing then
+            -- Only look at things if no usable item was found
+            if lookThing and lookThing ~= useThing then
                 local lookPosition = lookThing:getPosition()
                 local lookTile = nil
                 
@@ -988,8 +1007,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                     player:autoWalk(autoWalkPos)
                     return true
                 else
-                    -- We don't need to check for usable items with Unpass/Unmove flags here anymore
-                    -- since we handled them in the section above
+                    -- Only look at the thing if we haven't used it already
                     g_game.look(lookThing)
                     return true
                 end
