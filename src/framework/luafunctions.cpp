@@ -674,6 +674,11 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setPaddingLeft", &UIWidget::setPaddingLeft);
     g_lua.bindClassMemberFunction<UIWidget>("setOpacity", &UIWidget::setOpacity);
     g_lua.bindClassMemberFunction<UIWidget>("setRotation", &UIWidget::setRotation);
+    g_lua.bindClassMemberFunction<UIWidget>("setTop", &UIWidget::setTop);
+    g_lua.bindClassMemberFunction<UIWidget>("setBottom", &UIWidget::setBottom);
+    g_lua.bindClassMemberFunction<UIWidget>("setRight", &UIWidget::setRight);
+    g_lua.bindClassMemberFunction<UIWidget>("setLeft", &UIWidget::setLeft);
+
     g_lua.bindClassMemberFunction<UIWidget>("getX", &UIWidget::getX);
     g_lua.bindClassMemberFunction<UIWidget>("getY", &UIWidget::getY);
     g_lua.bindClassMemberFunction<UIWidget>("getPosition", &UIWidget::getPosition);
