@@ -1367,7 +1367,7 @@ function questLogController:onInit()
     UIlabel.numberQuestComplete = questLogController:findWidget("#lblCompleteNumber")
     UIlabel.numberQuestHidden = questLogController:findWidget("#lblHiddenNumber")
     UICheckBox.showComplete = questLogController:findWidget("#checkboxShowComplete")
-    UICheckBox.showShidden = questLogController:findWidget("#checkboxShowShidden")
+    UICheckBox.showShidden = questLogController:findWidget("#checkboxShowHidden")
     UICheckBox.showInQuestTracker = questLogController.ui.panelQuestLineSelected.checkboxShowInQuestTracker
 
     questLogController:registerEvents(g_game, {

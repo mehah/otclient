@@ -17,14 +17,14 @@
     <table class="filter-table">
       <tr>
         <td class="col1">
-          <input type="checkbox" id="checkboxShowComplete" checked text="Show completed">
+          <input type="checkbox" id="checkboxShowComplete" checked text="Show completed" onchange="self:filterQuestListShowComplete(event)">
         </td>
         <td class="col2" text="Quests completed:"></td>
         <td class="col3" id="lblCompleteNumber"></td>
       </tr>
       <tr>
         <td class="col1">
-          <input type="checkbox" id="checkboxShowHidden" text="Show hidden">
+          <input type="checkbox" id="checkboxShowHidden" text="Show hidden" onchange="self:filterQuestListShowHidden(event)">
         </td>
         <td class="col2" text="Quests hidden:"></td>
         <td class="col3" id="lblHiddenNumber" ></td>

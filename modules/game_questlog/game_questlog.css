@@ -1,66 +1,65 @@
 .questLog-window {
-  width: 790;
-  height: 639;
+  width: 790px;
+  height: 639px;
   font: verdana-11px-antialised;
-  opacity: 1;
   display: block;
   color: #929292
 }
 
 .content-left {
-  width: 367;
-  height: 551;
-  margin-left: 5;
+  width: 367px;
+  height: 551px;
+  margin-left: 5px;
 }
 
 .content-right {
-  width: 375;
-  height: 551;
+  width: 375px;
+  height: 551px;
   background-color: #404040;
-  margin-bottom: 10;
-  margin-left: 395;
+  margin-bottom: 10px;
+  margin-left: 395px;
   display: block;
 }
 
 .search-box {
-  width: 270;
+  width: 270px;
 }
 
 .filter {
-  height: 40;
-  margin-left: 5;
+  height: 40px;
+  margin-left: 5px;
 }
 
 .checkbox-group {
   display: flex;
   white-space: pre;
-  text-offset: 18 -3;
+  --text-offset: 18 -3;
 
 }
 
 .questLogButton {
   font: cipsoftFont;
-  text-auto-resize: true;
+  --text-auto-resize: true;
 }
 
 .separator {
   display: block;
-  margin-top: 5;
-  margin-left: 5;
+  margin-top: 5px;
+  margin-left: 5px;
   width: 99%;
 }
 
 .quest-list {
   border-width: 1;
   border-color: #00000077;
-  height: 425;
+  height: 425px;
   background-color: #404040;
 }
 
 .quest-info {
-  margin-top: 5;
+  margin-top: 5px;
   background-color: #363636;
-  height: 300;
+  height: 300px;
 }
 
 .text-right {
@@ -69,7 +68,7 @@
 
 .text-left {
   text-align: left;
-  margin-left: 12;
+  margin-left: 12px;
 }
 .buttons {
   width: 100%;
@@ -80,7 +79,7 @@
 
 #trackerButton {
   float: right;
-  margin-right: 2;
+  margin-right: 2px;
 }
 
 #closeButton {
@@ -97,7 +96,7 @@
   
 .table-window {
   width: 100%;
-  height: 120;
+  height: 120px;
   font: verdana-11px-antialised;
   color: #c0c0c0;
 }
@@ -108,9 +107,8 @@
 }
   
 .filter-table td {
-  padding: 4;
-  height: 22;
-  vertical-align: middle;
+  padding: 4px;
+  height: 22px;
 }
   
 .filter-table .col1 {

@@ -1,45 +1,39 @@
 .reward-wall-window {
-  width: 541;
-  height: 489;
-  font: verdana-11px-antialised;
-  opacity: 1;
+  width: 541px;
+  height: 489px;
   display: block;
   color: #929292;
 }
 
 .history-panel {
-  height: 432;
-  --visible: false;
+  height: 432px;
 }
 
 .history-list {
   background-color: #363636;
   display: block;
   border-color: #00000077;
-  border-width: 1;
-  --focusable: false;
+  border-width: 1px;
   width: 98%;
 }
 
 .content-panel {
-  width: 506;
-  height: 120;
-  margin-left: 5;
-  margin-top: -5;
-  --focusable: false;
+  width: 506px;
+  height: 120px;
+  margin-left: 5px;
+  margin-top: -5px;
 }
 
 .resting-area-info {
-  margin-left: -10;
-  height: 108;
-  width: 108;
-  --focusable: false;
+  margin-left: -10px;
+  height: 108px;
+  width: 108px;
 }
 
 .resting-area-icon {
-  margin-left: 44;
-  width: 22;
-  height: 55;
+  margin-left: 44px;
+  width: 22px;
+  height: 55px;
   --image-size: 66 44;
   --image-fixed-ratio: true;
   --text-offset: 25 -7;
@@ -62,76 +56,73 @@
   --icon-clip: 64 0 64 64;
   width: 100%;
 }
+
 #bonusIcon3 {
   --icon-clip: 128 0 64 64;
   width: 100%;
-height: 64;
 }
+
 #bonusIcon4 {
   --icon-clip: 192 0 64 64;
   width: 100%;
 }
+
 #bonusIcon5 {
   --icon-clip: 256 0 64 64;
   width: 100%;
 }
+
 #bonusIcon6 {
   --icon-clip: 320 0 64 64;
-width: 100%;
+  width: 100%;
 }
+
 .resting-area-gold {
   size: 22 20;
   margin-left: 27;
 }
 
 .bonus-icons-container {
-  margin-left: 90;
+  margin-left: 90px;
   border-color: #00000077;
-  height: 71;
-  --focusable: false;
-  
+  height: 71px;
 }
-
 
 .premium-message {
   border-color: #00000077;
-  height: 38;
-  width: 170;
-  margin-top: 70;
-  margin-left: 111;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+  height: 38px;
+  width: 400px;
+  margin-top: 70px;
+  margin-left: 111px;
+  --text-auto-resize: false;
 }
 
 .daily-rewards-panel {
-  height: 123;
-  padding-left: 25;
+  height: 123px;
+  padding-left: 25px;
 }
 
 .reward-item {
-  width: 68;
-  height: 95;
-  margin-top: -9;
-  --focusable: false;
+  width: 68px;
+  height: 95px;
+  margin-top: -9px;
 }
 
 .reward-button {
-  width: 68;
-  height: 68;
+  width: 68px;
+  height: 68px;
 }
 
 .reward-label {
-  width: 68;
-  height: 22;
-  --focusable: false;
+  width: 68px;
+  height: 22px;
 }
 
 .reward-arrow {
   --image-offset: 1 25;
   --image-clip: 0 0 5 7;
-  width: 5;
-  height: 7;
+  width: 5px;
+  height: 7px;
   --image-auto-resize: false;
   --image-size: 5 7;
 }
@@ -142,8 +133,8 @@ width: 100%;
 }
 
 .premium-panel {
-  height: 35;
-  width: 22;
+  height: 35px;
+  width: 22px;
 }
 
 .info-label {
@@ -151,10 +142,10 @@ width: 100%;
 }
 
 .premium-info2 {
-  height: 38;
-  width: 350;
-  margin-left: -0;
-  margin-top: -5;
+  height: 38px;
+  width: 350px;
+  margin-left: -0px;
+  margin-top: -5px;
 }
 
 .premium-button {
@@ -162,53 +153,50 @@ width: 100%;
 }
 
 .infoPanel {
-  height: 92;
+  height: 92px;
   text-align: left
 }
-
 
 .free-info {
   text-align: top-left;
   text-wrap: true;
-  width: 255;
+  width: 255px;
   color: #808080;
 }
 
 .premium-info {
-  margin-left: 58;
+  margin-left: 58px;
   text-align: top-left;
   text-wrap: true;
-  width: 255;
+  width: 255px;
 }
 
 .footer-panel {
-  width: 506;
-  height: 126;
-  margin-left: 5;
-  --focusable: false;
+  width: 506px;
+  height: 126px;
+  margin-left: 5px;
 }
 
 .footer-separator {
-  width: 540;
-
+  width: 540px;
 }
 
 .footer-gold-1 {
-  width: 30;
-  height: 22;
-  margin-top: 120;
+  width: 30px;
+  height: 22px;
+  margin-top: 120px;
 }
 
 .footer-gold-2 {
-  height: 22;
-  width: 50;
-  margin-left: 5;
-  margin-top: 10;
+  height: 22px;
+  width: 50px;
+  margin-left: 5px;
+  margin-top: 10px;
 }
 
 .instant-reward-button {
-  margin-top: 10;
-  margin-left: 5;
+  margin-top: 10px;
+  margin-left: 5px;
 }
 
 .action-button {
@@ -216,26 +204,11 @@ width: 100%;
   --text-auto-resize: true;
 }
 .close-button {
-  margin-left: 5;
+  margin-left: 5px;
   float: right;
 
 }
 .history-button {
   float: right;
-  margin-right: 10;
+  margin-right: 10px;
 }
-
-
-/* not work 
-#footerGold2 #gold {
-  image-source: /game_rewardwall/images/instant-reward-access-icon;
-  image-size: 12 12;
-  image-offset: -5 0;
-}
-
-.footer-gold-2 #gold {
-  image-source: /game_rewardwall/images/instant-reward-access-icon;
-  image-size: 12 12;
-  image-offset: -5 0;
-}
-  */
