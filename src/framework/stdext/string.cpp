@@ -233,18 +233,31 @@ namespace stdext
         long long num = 0;
         bool found = false;
         bool negative = false;
+        int frac = 0;        // parte depois do ponto
+        bool hasFrac = false;
 
         while (p < end) {
             unsigned char c = static_cast<unsigned char>(*p++);
             if (!found && c == '-') {
-                negative = true;       
+                negative = true;
             } else if (c >= '0' && c <= '9') {
                 found = true;
-                num = num * 10 + (c - '0'); 
+                if (!hasFrac) {
+                    num = num * 10 + (c - '0');
+                } else {
+                    if (frac == 0) frac = c - '0'; // só olha o primeiro dígito decimal
+                }
+            } else if (c == '.') {
+                hasFrac = true;
             }
         }
 
         if (!found) return 0;
+
+        if (hasFrac && frac >= 5) {
+            num += 1;
+        }
+
         return negative ? -num : num;
     }
 
