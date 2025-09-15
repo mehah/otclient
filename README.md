@@ -263,10 +263,11 @@ https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e
 #### 🙋 Community (Features)
 
 <details>
-  <summary>🕹️ Discord RPC — @SkullzOTS *(Doesn't work with CMAKE)*</summary>
+  <summary>🕹️ Discord RPC — @SkullzOTS</summary>
 
 - by [@SkullzOTS](https://github.com/SkullzOTS)  
-- Enable via [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43): set `ENABLE_DISCORD_RPC` to **1** and configure the other definitions  
+- To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43), set **1** in `TOGGLE_DISCORD_RPC` and configure the others definitions
+- If using CMake then set `-DTOGGLE_DISCORD_RPC=ON`
 - Step-by-step on **YouTube**: https://www.youtube.com/watch?v=zCHYtRlD58g
 
 <p align="center">
