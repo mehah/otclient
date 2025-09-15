@@ -85,7 +85,9 @@ function Controller:new()
     setmetatable(obj, self)
     self.__index = self
 
-    G_CONTROLLER_CALLED[obj.name] = obj
+    if obj.name then
+        G_CONTROLLER_CALLED[obj.name] = obj
+    end
 
     return obj
 end
