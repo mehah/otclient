@@ -33,6 +33,14 @@ function UIHTML:onStyleApply(styleName, styleNode)
     end
 end
 
+function UIHTML:onVisibilityChange()
+    local scrollbar = self.verticalScrollBar
+    if scrollbar then
+        scrollbar:setDisplay(self:getDisplay())
+        scrollbar:setVisible(self:isVisible())
+    end
+end
+
 function UIHTML:updateScrollBars()
     if not self.verticalScrollBar and not self.horizontalScrollBar then
         return
@@ -43,9 +51,6 @@ function UIHTML:updateScrollBars()
 
     local scrollbar = self.verticalScrollBar
     if scrollbar then
-        scrollbar:setDisplay(self:getDisplay())
-        scrollbar:setVisible(self:isVisible())
-
         if self.inverted then
             scrollbar:setMinimum(-scrollHeight)
             scrollbar:setMaximum(0)

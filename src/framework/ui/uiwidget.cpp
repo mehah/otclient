@@ -51,7 +51,6 @@ UIWidget::UIWidget()
     setProp(PropVisible, true, false);
     setProp(PropFocusable, true, false);
     setProp(PropFirstOnStyle, true, false);
-    setProp(PropConditionIf, true, false);
 
     m_positions.set(Unit::Auto);
     m_clickTimer.stop();
@@ -135,7 +134,7 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
             continue;
 
         auto childVisibleRect = visibleRect;
-        if (child->getDisplay() == DisplayType::None || !child->getResultConditionIf())
+        if (child->getDisplay() == DisplayType::None)
             continue;
 
         if (!child->isOnHtml() && !child->getRect().isValid())

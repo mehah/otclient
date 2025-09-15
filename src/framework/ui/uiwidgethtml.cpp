@@ -222,7 +222,7 @@ namespace {
             if (c.get() == self) break;
 
             if (c->getDisplay() == DisplayType::None) { ++i; continue; }
-            if (!c->getResultConditionIf() || !c->isAnchorable() || c->getPositionType() == PositionType::Absolute) { ++i; continue; }
+            if (!c->isAnchorable() || c->getPositionType() == PositionType::Absolute) { ++i; continue; }
 
             const FloatType cf = mapLogicalFloat(c->getFloat());
             if (cf == FloatType::None) {
@@ -604,8 +604,17 @@ void UIWidget::setPositions(std::string_view type, std::string_view value) {
 }
 
 void UIWidget::setDisplay(DisplayType type) {
+    if (m_displayType == type)
+        return;
+
+    auto old = m_displayType;
     m_displayType = type;
     scheduleAnchorAlignment();
+
+    if (type == DisplayType::None) {
+        setVisible(false);
+    } else if (old == DisplayType::None)
+        setVisible(true);
 }
 
 void UIWidget::ensureUniqueId() {

@@ -80,8 +80,7 @@ enum FlagProp : uint64_t
     PropWidthAuto = 1 << 29,
     PropWidthPercent = 1 << 30,
     PropHeightPercent = static_cast<uint64_t>(1) << 31,
-    PropIgnoreMouseEvent = static_cast<uint64_t>(1) << 32,
-    PropConditionIf = static_cast<uint64_t>(1) << 33,
+    PropIgnoreMouseEvent = static_cast<uint64_t>(1) << 32
 };
 
 enum class DisplayType : uint8_t
@@ -201,6 +200,7 @@ protected:
     Size m_maxSize;
 
     DisplayType m_displayType = DisplayType::Inline;
+    DisplayType m_originalDisplayType = DisplayType::Inline;
     FloatType m_floatType = FloatType::None;
     ClearType m_clearType = ClearType::None;
     JustifyItemsType m_JustifyItems = JustifyItemsType::Normal;
@@ -306,14 +306,17 @@ public:
     auto& getPositions() { return m_positions; }
 
     void setResultConditionIf(bool v) {
-        setProp(PropConditionIf, v);
-        scheduleAnchorAlignment();
+        if (v && m_displayType != DisplayType::None)
+            return;
+
+        if (!v)
+            m_originalDisplayType = m_displayType;
+
+        setDisplay(v ? m_originalDisplayType : DisplayType::None);
     }
 
     void setAnchorable(bool v) { m_anchorable = v; }
     bool isAnchorable() const { return m_anchorable; }
-
-    bool getResultConditionIf() { return hasProp(PropConditionIf); }
 
     void setHtmlRootId(uint32_t id) { m_htmlRootId = id; }
     auto getHtmlRootId() const { return m_htmlRootId; }
