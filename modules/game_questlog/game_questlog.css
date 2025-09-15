@@ -18,7 +18,7 @@
   height: 551;
   background-color: #404040;
   margin-bottom: 10;
-  margin-left: 385;
+  margin-left: 395;
   display: block;
 }
 
@@ -46,7 +46,8 @@
 .separator {
   display: block;
   margin-top: 5;
-  width: 760;
+  margin-left: 5;
+  width: 99%;
 }
 
 .quest-list {
@@ -79,7 +80,7 @@
 
 #trackerButton {
   float: right;
-  margin-right: 15;
+  margin-right: 2;
 }
 
 #closeButton {
