@@ -247,7 +247,7 @@ namespace {
 }
 
 bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
-    if (!parent->getHtmlNode())return true;
+    if (!parent || !parent->getHtmlNode())return true;
 
     if (parent->getHtmlNode()->getTag() == "select") {
         parent->callLuaField("addOptionFromHtml", node->textContent(), node->getAttr("value"));
