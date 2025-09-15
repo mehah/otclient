@@ -963,10 +963,6 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                         g_game.sendQuickLoot(1, useThing)
                         return true
                     end
-                elseif useThing:isWritable() then
-                    -- Handle writable items specially (letters, parchments, etc.)
-                    g_game.use(useThing)
-                    return true
                 elseif useThing:isMultiUse() then
                     startUseWith(useThing)
                     return true
