@@ -4,8 +4,8 @@ minipanel {
     color: #c0c0c0
 }
 
-window>*,
-minipanel>* {
-    color: white;
+window *,
+minipanel * {
     text-align: left;
+    color: white;
 }
