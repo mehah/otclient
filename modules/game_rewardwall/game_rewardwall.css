@@ -1,6 +1,6 @@
 .reward-wall-window {
   width: 541;
-  height: 575;
+  height: 489;
   font: verdana-11px-antialised;
   opacity: 1;
   display: block;
@@ -8,8 +8,8 @@
 }
 
 .history-panel {
-  height: 443;
-  visible: false;
+  height: 432;
+  --visible: false;
 }
 
 .history-list {
@@ -18,11 +18,12 @@
   border-color: #00000077;
   border-width: 1;
   --focusable: false;
+  width: 98%;
 }
 
 .content-panel {
   width: 506;
-  height: 126;
+  height: 120;
   margin-left: 5;
   margin-top: -5;
   --focusable: false;
@@ -88,22 +89,24 @@ width: 100%;
   border-color: #00000077;
   height: 71;
   --focusable: false;
+  
 }
 
 
 .premium-message {
-  text-align: center;
-  text-wrap: true;
-  white-space: normal;
   border-color: #00000077;
   height: 38;
-  width: 370;
+  width: 170;
   margin-top: 70;
-  margin-left: 110;
+  margin-left: 111;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .daily-rewards-panel {
-  height: 133;
+  height: 123;
+  padding-left: 25;
 }
 
 .reward-item {
@@ -139,18 +142,19 @@ width: 100%;
 }
 
 .premium-panel {
-  height: 55;
+  height: 35;
   width: 22;
 }
 
 .info-label {
-  white-space: pre;
+  white-space: pre-wrap;
 }
 
 .premium-info2 {
   height: 38;
   width: 350;
-  margin-left: -0
+  margin-left: -0;
+  margin-top: -5;
 }
 
 .premium-button {
@@ -158,7 +162,7 @@ width: 100%;
 }
 
 .infoPanel {
-  height: 104;
+  height: 92;
   text-align: left
 }
 
@@ -181,19 +185,18 @@ width: 100%;
   width: 506;
   height: 126;
   margin-left: 5;
-  margin-top: -5;
-  padding-bottom: 5;
   --focusable: false;
 }
 
 .footer-separator {
-  width: 506;
+  width: 540;
+
 }
 
 .footer-gold-1 {
   width: 30;
   height: 22;
-  margin-top: 10;
+  margin-top: 120;
 }
 
 .footer-gold-2 {
@@ -212,15 +215,17 @@ width: 100%;
   font: cipsoftFont;
   --text-auto-resize: true;
 }
-
-.history-button {
-  float: right;
-  margin-right: 44;
-}
-
 .close-button {
   margin-left: 5;
+  float: right;
+
 }
+.history-button {
+  float: right;
+  margin-right: 10;
+}
+
+
 /* not work 
 #footerGold2 #gold {
   image-source: /game_rewardwall/images/instant-reward-access-icon;

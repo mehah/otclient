@@ -1,14 +1,14 @@
 <link href="game_rewardwall.css" />
 <html>
 <window id="rewardWallWindow" anchor="parent" class="reward-wall-window" title="Reward Wall"
-  onescape="self:onClickToggle()" layout="type: verticalBox;spacing:10">
+  onescape="self:onClickToggle()" layout="type: verticalBox;spacing:5">
   <!-- History Panel -->
   <minipanel id="historyPanel" title="History" class="history-panel">
     <TextListWithScroll id="historyList" class="history-list"></TextListWithScroll>
   </minipanel>
 
   <!-- Resting Area Bonuses Panel -->
-  <minipanel id="restingAreaPanel" title="Resting Area Bonuses" class="content-panel" anchor="parent">
+  <minipanel id="restingAreaPanel" title="Resting Area Bonuses" class="content-panel" >
     <div id="restingAreaInfo" layout="type: verticalBox;spacing:5" class="resting-area-info">
       <img src="images/icon-rewardstreak-default" id="rewardStreakIcon" class="resting-area-icon"
         onhover="self:onhoverStatusPlayer(event)" text="2" />
@@ -25,7 +25,7 @@
       <imgBonuses id="bonusIcon6" onhover="self:onhoverBonus(event)"></imgBonuses>
     </div>
 
-    <label id="streakWarning" class="info-label premium-message" text="Great! You benefit from the best possible rewards and bonuses due to your premium status."></label>
+    <label id="streakWarning" class="info-label premium-message" text="Great! You benefit from the best possible rewards and bonuses  &#10;  due to your premium status"></label>
   </minipanel>
 
   <!-- Daily Rewards Panel -->
@@ -93,17 +93,16 @@
     <label id="free" anchor="parent" class="free-info"></label>
     <label id="premium" class="premium-info"></label>
   </QtPanel>
+  <HorizontalSeparator id="footerSeparator" class="footer-separator"></HorizontalSeparator>
 
   <!-- Footer Panel -->
   <div id="footerPanel" class="footer-panel" anchor="parent">
-    <HorizontalSeparator id="footerSeparator" class="footer-separator"></HorizontalSeparator>
     <GoldLabel2 id="footerGold1" anchor="parent" class="footer-gold-1"></GoldLabel2>
     <GoldLabel2 id="footerGold2" class="footer-gold-2"> </GoldLabel2>
     <MiniPremiumButton id="instantRewardButton" class="instant-reward-button"
       onclick="self:onClickbuyInstantRewardAccess()"></MiniPremiumButton>
-    <Qtbutton id="historyButton" class="action-button history-button" onclick="self:onClickshowHistory()">History
-    </Qtbutton>
-    <Qtbutton id="closeButton" class="action-button close-button" onclick="self:onClickToggle()">Close</Qtbutton>
+    <button id="closeButton" class="action-button close-button" onclick="self:onClickToggle()" text="Close"></button>
+    <button id="historyButton" class="action-button history-button" onclick="self:onClickshowHistory()" text="History"></button>
   </div>
 </window>
 
