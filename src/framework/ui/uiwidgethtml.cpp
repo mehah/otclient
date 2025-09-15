@@ -824,7 +824,7 @@ void UIWidget::applyAnchorAlignment() {
                 anchored = true;
                 addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
             }
-        }
+        } else anchored = false;
 
         if (anchored) {
             if (!ctx.prevNonFloat) {
