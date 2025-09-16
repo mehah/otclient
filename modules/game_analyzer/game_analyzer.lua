@@ -16,7 +16,7 @@ expHourStart = 0
 expTimeElapsed = 0
 
 function GameAnalyzer.init()
-    print("Init Game Analyzer")
+    --print("Init Game Analyzer")
     analyzerButton = modules.game_mainpanel.addToggleButton('analyzerButton', 
                                                             tr('Open analytics selector window'),
                                                             '/images/options/analyzers',
@@ -26,6 +26,39 @@ function GameAnalyzer.init()
     analyzerWindow = g_ui.loadUI('game_analyzer')
     analyzerWindow:setup()
     setupAnalyzerWindowResize()
+    
+    -- Hide toggleFilterButton and adjust contextMenuButton anchors
+    local toggleFilterButton = analyzerWindow:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+        toggleFilterButton:setOn(false)
+    end
+    
+    local contextMenuButton = analyzerWindow:recursiveGetChildById('contextMenuButton')
+    local minimizeButton = analyzerWindow:recursiveGetChildById('minimizeButton')
+    if contextMenuButton and minimizeButton then
+        contextMenuButton:breakAnchors()
+        contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        contextMenuButton:setMarginRight(7)
+        contextMenuButton:setMarginTop(0)
+    end
+    
+    -- Adjust lockButton anchors to be at the left of contextMenuButton
+    local lockButton = analyzerWindow:recursiveGetChildById('lockButton')
+    if lockButton and contextMenuButton then
+        lockButton:breakAnchors()
+        lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+        lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+        lockButton:setMarginRight(2)
+        lockButton:setMarginTop(0)
+    end
+    
+    -- Hide newWindowButton
+    local newWindowButton = analyzerWindow:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton:setVisible(false)
+    end
     
     expAnalyzerInit()
     
@@ -58,6 +91,39 @@ function expAnalyzerInit()
     expAnalyzerWindow = g_ui.loadUI('game_exp_analyzer')
     expAnalyzerWindow:setup()
     setupExpAnalyzerWindowResize()
+
+    -- Hide toggleFilterButton and adjust contextMenuButton anchors
+    local toggleFilterButton = expAnalyzerWindow:recursiveGetChildById('toggleFilterButton')
+    if toggleFilterButton then
+        toggleFilterButton:setVisible(false)
+        toggleFilterButton:setOn(false)
+    end
+    
+    local contextMenuButton = expAnalyzerWindow:recursiveGetChildById('contextMenuButton')
+    local minimizeButton = expAnalyzerWindow:recursiveGetChildById('minimizeButton')
+    if contextMenuButton and minimizeButton then
+        contextMenuButton:breakAnchors()
+        contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+        contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+        contextMenuButton:setMarginRight(7)
+        contextMenuButton:setMarginTop(0)
+    end
+    
+    -- Adjust lockButton anchors to be at the left of contextMenuButton
+    local lockButton = expAnalyzerWindow:recursiveGetChildById('lockButton')
+    if lockButton and contextMenuButton then
+        lockButton:breakAnchors()
+        lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+        lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+        lockButton:setMarginRight(2)
+        lockButton:setMarginTop(0)
+    end
+    
+    -- Hide newWindowButton
+    local newWindowButton = expAnalyzerWindow:recursiveGetChildById('newWindowButton')
+    if newWindowButton then
+        newWindowButton:setVisible(false)
+    end
 
     -- Add onOpen handler to ensure button stays in active state
     expAnalyzerWindow.onOpen = function()
@@ -142,7 +208,7 @@ end
 function loadContentPanel()
     contentPanel = modules.game_interface.findContentPanelAvailable(analyzerWindow, analyzerWindow:getMinimumHeight())
     if not contentPanel then
-        print("No content panel available")
+        --print("No content panel available")
         return
     end
 end
@@ -220,7 +286,7 @@ function toggleFromAnalyzer(analyzer)
     if analyzerConfig and analyzerConfig.toggle then
         analyzerConfig.toggle(analyzer)
     else
-        print("Toggle function for " .. analyzerType .. " not found")
+       --print("Toggle function for " .. analyzerType .. " not found")
     end
 end
 
@@ -277,7 +343,7 @@ function calculateExpPerHour(exp, expStart, timeElapsed, expHourStart)
     end
     
     local expPerHour = math.floor((expGained / timeElapsed) * 3600)
-    print("Exp Per Hour: " .. expPerHour)
+    --print("Exp Per Hour: " .. expPerHour)
     
     -- Handle negative values properly
     if expPerHour < 0 then

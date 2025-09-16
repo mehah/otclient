@@ -29,14 +29,6 @@ MiniWindow
     !text: tr('Analytics')
     color: #9d9d9dff
 
-  UIButton
-    id: toggleFilterButton
-    visible: false
-
-  UIButton
-    id: newWindowButton
-    visible: false
-
   MiniWindowContents
     id: contentsPanel
     anchors.top: miniwindowTopBar.bottom
@@ -48,10 +40,10 @@ MiniWindow
     margin-top: -2
     margin-right: 1
     vertical-scrollbar: miniwindowScrollBar
-    padding-left: 6
-    padding-top: 6
-    padding-right: 6
-    padding-bottom: 6
+    padding-left: 1
+    padding-top: 1
+    padding-right: 1
+    padding-bottom: 3
     
     QtButton
       id: expAnalyzerButton
