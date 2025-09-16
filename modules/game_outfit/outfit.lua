@@ -114,6 +114,11 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
                 button.outfit:setOutfit({
                     type = modules.game_attachedeffects.thingId(itemData[1])
                 })
+                button.outfit:setPadding(-20)
+                button.outfit:setMarginLeft(8)
+                button.outfit:setCenter(true)
+                button.outfit:setCreatureSize(g_things.getThingType(tempOutfit.type, ThingCategoryCreature):getRealSize() + 148)
+
             elseif Category == 2 then
                 button.outfit:setOutfit(previewCreature:getCreature():getOutfit())
                 button.outfit:getCreature():attachEffect(g_attachedEffects.getById(itemData[1]))
@@ -861,11 +866,10 @@ function showOutfits()
         button.outfit:setOutfit(outfit)
         
         local thingType = g_things.getThingType(outfit.type, ThingCategoryCreature)
-        button.outfit:setPadding(-8)
+        button.outfit:setPadding(-20)
+        button.outfit:setMarginLeft(8)
         button.outfit:setCenter(true)
-        if thingType:getRealSize() > 0 then
-            button.outfit:setCreatureSize(thingType:getRealSize() + 64)
-        end
+        button.outfit:setCreatureSize(thingType:getRealSize() + 148)
 
         local state = outfitData[4]
         if state then
@@ -922,11 +926,12 @@ function showMounts()
         })
 
         local thingType = g_things.getThingType(mountData[1], ThingCategoryCreature)
-        button.outfit:setPadding(-8)
+        button.outfit:setPadding(-30)
+        button.outfit:setMarginLeft(8)
+        button.outfit:setMarginTop(8)
+        button.outfit:setSize("48 48")
         button.outfit:setCenter(true)
-        if thingType:getRealSize() > 0 then
-            button.outfit:setCreatureSize(thingType:getRealSize() + 64)
-        end
+        button.outfit:setCreatureSize(thingType:getRealSize() + 148)
 
         button.name:setText(mountData[2])
         if tempOutfit.mount == mountData[1] then
@@ -985,8 +990,19 @@ function showFamiliars()
         button.outfit:setOutfit({
             type = familiarData[1]
         })
-
+        
+        local thingType = g_things.getThingType(familiarData[1], ThingCategoryCreature)
+        
         button.name:setText(familiarData[2])
+        
+        -- Add proper sizing for the 64x64 UICreature
+        button.outfit:setPadding(-30)
+        button.outfit:setMarginLeft(8)
+        button.outfit:setMarginTop(8)
+        button.outfit:setSize("48 48")
+        button.outfit:setCenter(true)
+        button.outfit:setCreatureSize(thingType:getRealSize() + 148)
+        
         if tempOutfit.familiar == familiarData[1] then
             focused = familiarData[1]
         end
@@ -1028,6 +1044,12 @@ function showShaders()
             type = tempOutfit.type,
             addons = tempOutfit.addons
         })
+
+        button.outfit:setPadding(-20)
+        button.outfit:setMarginLeft(8)
+        button.outfit:setCenter(true)
+        button.outfit:setCreatureSize(g_things.getThingType(tempOutfit.type, ThingCategoryCreature):getRealSize() + 148)
+
         button.outfit:getCreature():setShader("Outfit - Default")
         button.name:setText("Outfit - Default")
         if tempOutfit.shaders == "Outfit - Default" then
@@ -1045,6 +1067,12 @@ function showShaders()
                 addons = tempOutfit.addons
 
             })
+
+            button.outfit:setPadding(-20)
+            button.outfit:setMarginLeft(8)
+            button.outfit:setCenter(true)
+            button.outfit:setCreatureSize(g_things.getThingType(tempOutfit.type, ThingCategoryCreature):getRealSize() + 148)
+    
             button.outfit:getCreature():setShader(shaderData[2])
 
             button.name:setText(shaderData[2])
@@ -1776,7 +1804,13 @@ function accept()
     end
     if g_game.getFeature(GamePlayerFamiliars) then
         if settings.currentPreset > 0 then
-            settings.presets[settings.currentPreset].familiar = window.configure.familiar.check:isChecked()
+            -- Check if familiar configuration exists before accessing it
+            if window.configure.familiar and window.configure.familiar.check then
+                settings.presets[settings.currentPreset].familiar = window.configure.familiar.check:isChecked()
+            else
+                -- Default to false if the familiar check doesn't exist
+                settings.presets[settings.currentPreset].familiar = false
+            end
         end
     end
     g_game.changeOutfit(tempOutfit)
