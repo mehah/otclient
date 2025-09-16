@@ -265,7 +265,7 @@ https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e
 <details>
   <summary>🕹️ Discord RPC — @SkullzOTS</summary>
 
-- by [@SkullzOTS](https://github.com/SkullzOTS) and [@libergod](https://github.com/libergod)
+- by [@SkullzOTS](https://github.com/SkullzOTS), [@surfaceflinger](https://github.com/surfaceflinger) and [@libergod](https://github.com/libergod)
 - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43), set **1** in `TOGGLE_DISCORD_RPC` and configure the others definitions
 - If using CMake execute: 
   - Removes Content of Build Folder if needed
