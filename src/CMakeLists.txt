@@ -1,4 +1,3 @@
-
 project(otclient)
 
 # *****************************************************************************
@@ -210,7 +209,11 @@ if(NOT OPENSSL_FOUND)
 endif()
 if(TOGGLE_DISCORD_RPC AND NOT ANDROID)
 	find_package(DiscordRPC REQUIRED)
-	add_compile_definitions(-DTOGGLE_DISCORD_RPC=1)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE TOGGLE_DISCORD_RPC=1)
+	log_option_enabled("Discord Rich Presence")
+else()
+	target_compile_definitions(${PROJECT_NAME} PRIVATE TOGGLE_DISCORD_RPC=0)
+	log_option_disabled("Discord Rich Presence")
 endif()
 if(TOGGLE_DIRECTX)
   find_package(DirectX REQUIRED)

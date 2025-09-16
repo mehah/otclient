@@ -265,9 +265,15 @@ https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e
 <details>
   <summary>🕹️ Discord RPC — @SkullzOTS</summary>
 
-- by [@SkullzOTS](https://github.com/SkullzOTS)  
+- by [@SkullzOTS](https://github.com/SkullzOTS) and [@libergod](https://github.com/libergod)
 - To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43), set **1** in `TOGGLE_DISCORD_RPC` and configure the others definitions
-- If using CMake then set `-DTOGGLE_DISCORD_RPC=ON`
+- If using CMake execute: 
+  - Removes Content of Build Folder if needed
+  - `if (Test-Path -Path build) { Remove-Item -Path build -Recurse -Force; New-Item -Path build -ItemType Directory }` 
+  - Configure CMake
+  - `cmake -B build -G "Ninja" -DTOGGLE_DISCORD_RPC=ON`
+  - Build it
+  - `cmake --build build`
 - Step-by-step on **YouTube**: https://www.youtube.com/watch?v=zCHYtRlD58g
 
 <p align="center">
