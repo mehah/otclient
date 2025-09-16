@@ -1,41 +1,71 @@
 MiniWindow
   id: expAnalyzerWindow
-  !text: tr('XP Analyzer')
-  height: 63
+  height: 80
   &save: true
   
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    image-source: /images/icons/icon-progressanalyser-widget
+    image-rect: 0 0 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('XP Analyzer')
+    color: #9d9d9dff
+
+  UIButton
+    id: toggleFilterButton
+    visible: false
+
+  UIButton
+    id: newWindowButton
+    visible: false
+  
   MiniWindowContents
-  SkillNameLabel
-    id: expGainLabel
-    font: verdana-11px-monochrome
-    !text: tr('XP Gain:')
-    anchors.left: parent.left
-    anchors.top: parent.top
-    anchors.bottom: parent.bottom
-    margin-top: 25
-    margin-left: 10
+    SkillNameLabel
+      id: expGainLabel
+      font: verdana-11px-monochrome
+      !text: tr('XP Gain:')
+      anchors.left: parent.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-left: 10
 
-  SkillValueLabel
-    id: expGainValue
-    !text: tr('0')
-    font: verdana-11px-monochrome
-    text-align: topright
-    anchors.left: expGainLabel.right
-    margin-top: 25
-    margin-right: 25
+    SkillValueLabel
+      id: expGainValue
+      !text: tr('0')
+      font: verdana-11px-monochrome
+      text-align: topright
+      anchors.left: expGainLabel.right
+      margin-top: 5
+      margin-right: 25
 
-  SkillNameLabel
-    id: expHourLabel
-    !text: tr('XP/h:')
-    font: verdana-11px-monochrome
-    margin-top: 40
-    margin-left: 10
+    SkillNameLabel
+      id: expHourLabel
+      !text: tr('XP/h:')
+      font: verdana-11px-monochrome
+      margin-top: 20
+      margin-left: 10
 
-  SkillValueLabel
-    id: expHourValue
-    !text: tr('0')
-    font: verdana-11px-monochrome
-    text-align: topright
-    anchors.left: expHourLabel.right
-    margin-top: 40
-    margin-right: 25
+    SkillValueLabel
+      id: expHourValue
+      !text: tr('0')
+      font: verdana-11px-monochrome
+      text-align: topright
+      anchors.left: expHourLabel.right
+      margin-top: 20
+      margin-right: 25
