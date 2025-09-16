@@ -23,7 +23,7 @@
 #include "discord.h"
 
 #ifndef ANDROID
-#if TOGGLE_DISCORD_RPC == 1
+#if ENABLE_DISCORD_RPC == 1
 #include <framework/core/eventdispatcher.h>
 #include <time.h>
 #include <chrono>

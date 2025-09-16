@@ -42,8 +42,8 @@
 
 // DISCORD RPC (https://discord.com/developers/applications)
 // Enable Discord Rich Presence
-#ifndef TOGGLE_DISCORD_RPC
-    #define TOGGLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
+#ifndef ENABLE_DISCORD_RPC
+    #define ENABLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
 #endif
 #define RPC_API_KEY "1060650448522051664" // Your API Key
 // RPC Configs (https://youtu.be/zCHYtRlD58g) step by step to config your rich presence

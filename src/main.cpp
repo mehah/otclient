@@ -29,7 +29,7 @@
 #include <framework/luaengine/luainterface.h>
 
 #ifndef ANDROID
-#if TOGGLE_DISCORD_RPC == 1
+#if ENABLE_DISCORD_RPC == 1
 #include <framework/discord/discord.h>
 #endif
 #endif
@@ -82,7 +82,7 @@ extern "C" {
         g_app.init(args, new GraphicalApplicationContext(g_gameConfig.getSpriteSize(), ApplicationDrawEventsPtr(&g_client)));
 
 #ifndef ANDROID
-#if TOGGLE_DISCORD_RPC == 1
+#if ENABLE_DISCORD_RPC == 1
         std::function<bool()> canUpdate = []() -> bool { return g_game.isOnline(); };
         std::function<void(std::string&)> onUpdate = [](std::string& info) {
 #if SHOW_CHARACTER_NAME_RPC == 1
