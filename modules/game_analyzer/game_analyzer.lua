@@ -73,17 +73,6 @@ function GameAnalyzer.init()
         onPingBack = refresh
     })
     
-    -- Add an onClose handler to update all analyzer buttons
-    analyzerWindow.onClose = function()
-        local buttons = analyzerWindow:getChildren()
-        for _, button in pairs(buttons) do
-            if button:getId():find("AnalyzerButton") then
-                button:setChecked(false)
-                button:setOn(false)
-            end
-        end
-    end
-    
     refresh()
 end
 
@@ -171,6 +160,9 @@ function expAnalyzerTerminate()
 end
 
 function GameAnalyzer.terminate()
+    -- Don't close windows here, just destroy them
+    -- The visible state will be saved thanks to &save: true in OTUI
+    
     analyzerButton:destroy()
     analyzerWindow:destroy()
     expAnalyzerTerminate()
@@ -202,7 +194,19 @@ function onMiniWindowOpen()
 end
 
 function onMiniWindowClose()
-    analyzerButton:setOn(false)
+    -- Reset the button state when the window is closed
+    if analyzerButton then
+        analyzerButton:setOn(false)
+    end
+    
+    -- Also reset all inner analyzer buttons
+    local buttons = analyzerWindow:getChildren()
+    for _, button in pairs(buttons) do
+        if button:getId():find("AnalyzerButton") then
+            button:setChecked(false)
+            button:setOn(false)
+        end
+    end
 end
 
 function loadContentPanel()
@@ -211,13 +215,25 @@ function loadContentPanel()
         --print("No content panel available")
         return
     end
+    
+    -- If window should be visible (saved state), add it to the content panel
+    if analyzerWindow:isVisible() then
+        contentPanel:addChild(analyzerWindow)
+        
+        -- Update button state to match window state
+        if analyzerButton then
+            analyzerButton:setOn(true)
+        end
+    end
 end
 
 function GameAnalyzer.toggle()
     if analyzerButton:isOn() then
+        -- If button is on (pressed), close the window
+        -- onMiniWindowClose will handle resetting the button state
         analyzerWindow:close()
-        analyzerWindow:setOn(false)
     else
+        -- If button is off, open the window
         if not analyzerWindow:getParent() then
             contentPanel:addChild(analyzerWindow)
         end
@@ -228,6 +244,18 @@ end
 
 function online()
     analyzerButton:show()
+    
+    -- If window should be visible (saved state), restore it
+    if analyzerWindow:isVisible() then
+        if not analyzerWindow:getParent() then
+            contentPanel:addChild(analyzerWindow)
+        end
+        analyzerWindow:open()
+        analyzerButton:setOn(true)
+    else
+        analyzerButton:setOn(false)
+    end
+    
     refresh()
     expStart = nil
     expHourStart = 0
@@ -235,8 +263,13 @@ function online()
 end
 
 function offline()
+    -- Save the current visibility state (already handled by &save: true in OTUI)
+    -- Hide the button but preserve window state
     analyzerButton:hide()
+    
+    -- Remove from parent but don't close (which would reset the visible state)
     analyzerWindow:setParent(nil, true)
+    
     expStart = nil
     expHourStart = 0
     expTimeElapsed = 0
