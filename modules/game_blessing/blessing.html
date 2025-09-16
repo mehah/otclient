@@ -1,6 +1,7 @@
 <style>
   /* Main window styling */
   .blessings-window {
+    position: relative;
     width: 615px;
     height: 460px;
   }
@@ -11,6 +12,7 @@
     height: 110px;
     margin-top: 10px;
     padding-left: 25px;
+    display: block;
   }
 
   .promo-panel {
@@ -64,6 +66,9 @@
   .buttons {
     height: 20px;
     margin-top: 5px;
+    position: absolute;
+    bottom: 0;
+    right: 0;
   }
 
   .buttons button {
@@ -90,35 +95,33 @@
 </style>
 
 <html>
-<Window id="main" class="blessings-window" title="Blessings" layout="type: verticalBox" onescape="self:close()">
+<Window id="main" class="blessings-window" title="Blessings" onescape="self:close()">
 
   <!-- History Panel (initially hidden) -->
-  <minipanel id="historyPanel" class="history-panel" title="History" *visible="false">
+  <div id="historyPanel" class="history-panel minipanel" title="History" *if="false">
     <TextList id="historyScrollArea" class="history-scroll">
     </TextList>
-  </minipanel>
+  </div>
 
   <!-- Blessing Records Panel -->
-  <minipanel id="blessingsRecordPanel" class="record-panel" title="Record of Blessings" layout="type: horizontalBox">
-  </minipanel>
+  <div id="blessingsRecordPanel" class="record-panel minipanel" title="Record of Blessings"
+    layout="type: horizontalBox">
+  </div>
 
   <!-- Promotion Status Panel -->
-  <minipanel id="promotionPanel" class="promo-panel" title="Promotion and Premium Status">
+  <div id="promotionPanel" class="promo-panel minipanel" title="Promotion and Premium Status">
     <label id="promotionStatusLabel"></label>
     <BigPremiumButton id="premium_only" onclick="self:onClickSendStore()" *on="not g_game:getLocalPlayer():isPremium()">
     </BigPremiumButton>
-  </minipanel>
+  </div>
 
   <!-- Death Penalty Panel -->
-  <minipanel id="deathPenaltyPanel" class="death-panel" title="Effect on Death Penalty">
+  <div id="deathPenaltyPanel" class="death-panel minipanel" title="Effect on Death Penalty">
     <label id="fightRulesLabel" class="justified"></label>
     <label id="expLossLabel" class="justified"></label>
     <label id="containerLossLabel" class="justified"></label>
     <label id="equipmentLossLabel" class="justified"></label>
-  </minipanel>
-
-  <!-- Separator -->
-  <HorizontalSeparator class="full-separator" />
+  </div>
 
   <!-- Action Buttons -->
   <div id="buttonsPanel" class="buttons" focusable="false">
