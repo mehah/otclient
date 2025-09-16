@@ -1115,9 +1115,6 @@ function transferPoints()
         playerBalance = transferableCoins -- temp fix canary 1340
     end
 
-    g_logger.info("TransferPoints | Player balance inicial: " .. tostring(playerBalance))
-    g_logger.info("TransferPoints | NormalCoins: " .. tostring(normalCoins) .. " | TransferableCoins: " .. tostring(transferableCoins))
-
     transferPointsWindow.giftable:setText(formatNumberWithCommas(playerBalance))
 
     local initialValue, minimumValue = 0, 0
@@ -1142,7 +1139,6 @@ function transferPoints()
 
     transferPointsWindow.onEscape = function()
         destroyWindow(transferPointsWindow)
-        g_logger.info("TransferPoints | Janela fechada via Escape")
     end
 
     transferPointsWindow.amountBar.onValueChange = function()
@@ -1150,31 +1146,24 @@ function transferPoints()
         local val = math.floor(rawVal / 25) * 25
         transferPointsWindow.amountBar:setValue(val)
         transferPointsWindow.amount:setText(formatNumberWithCommas(val))
-        g_logger.info("TransferPoints | AmountBar value adjusted: " .. tostring(val))
     end
 
     transferPointsWindow.closeButton.onClick = function()
         destroyWindow(transferPointsWindow)
-        g_logger.info("TransferPoints | Janela fechada via CloseButton")
     end
 
     transferPointsWindow.buttonOk.onClick = function()
         local receipient = transferPointsWindow.transferPointsText:getText():trim()
         local amount = transferPointsWindow.amountBar:getValue()
 
-        g_logger.info("TransferPoints | Tentando transferir | Recipient: " .. receipient .. " | Amount: " .. tostring(amount))
-
         if receipient:len() < 3 then
-            g_logger.info("TransferPoints | Nome do destinatário inválido")
             return
         end
         if amount < 1 or playerBalance < amount then
-            g_logger.info("TransferPoints | Quantidade inválida ou insuficiente | PlayerBalance: " .. tostring(playerBalance) .. " | Amount: " .. tostring(amount))
             return
         end
 
         g_game.transferCoins(receipient, amount)
-        g_logger.info("TransferPoints | Transferência enviada | Recipient: " .. receipient .. " | Amount: " .. tostring(amount))
         destroyWindow(transferPointsWindow)
     end
 end
