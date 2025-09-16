@@ -1,11 +1,41 @@
 
 MiniWindow
   id: analyzerWindow
-  !text: tr('Analytics')
-  height: 63
+  height: 80
   @onOpen: modules.game_analyzer.onMiniWindowOpen()
   @onClose: modules.game_analyzer.onMiniWindowClose()
   &save: true
+
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    image-source: /images/icons/icon-analyticsselector-widget
+    image-rect: 0 0 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('Analytics')
+    color: #9d9d9dff
+
+  UIButton
+    id: toggleFilterButton
+    visible: false
+
+  UIButton
+    id: newWindowButton
+    visible: false
 
   MiniWindowContents
     UIWidget
