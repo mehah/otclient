@@ -185,18 +185,29 @@ function onExperienceChange(player, exp, oldExp)
                 expHourStart = g_clock.seconds()
             end
             
-            timeElapsed = g_clock.seconds() - expHourStart
+            local timeElapsed = g_clock.seconds() - expHourStart
             expHourValue:setText(calculateExpPerHour(exp, expStart, timeElapsed, expHourStart))
         end
     end
 end
 
-function calculateExpPerHour(exp, expStart, currentTime, expHourStart)
+function calculateExpPerHour(exp, expStart, timeElapsed, expHourStart)
     local expGained = exp - expStart
-    local timeElapsed = currentTime - expHourStart
-    local expPerHour = math.floor((expGained / timeElapsed) * 3600) + 0
+    
+    -- Ensure we don't divide by zero
+    if timeElapsed <= 0 then
+        return "0"
+    end
+    
+    local expPerHour = math.floor((expGained / timeElapsed) * 3600)
     print("Exp Per Hour: " .. expPerHour)
-    return comma_value(expPerHour)
+    
+    -- Handle negative values properly
+    if expPerHour < 0 then
+        return "-" .. comma_value(math.abs(expPerHour))
+    else
+        return comma_value(expPerHour)
+    end
 end
 
 function getFirstWordBeforeCapital(str)
