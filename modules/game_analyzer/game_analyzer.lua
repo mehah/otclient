@@ -216,15 +216,8 @@ function loadContentPanel()
         return
     end
     
-    -- If window should be visible (saved state), add it to the content panel
-    if analyzerWindow:isVisible() then
-        contentPanel:addChild(analyzerWindow)
-        
-        -- Update button state to match window state
-        if analyzerButton then
-            analyzerButton:setOn(true)
-        end
-    end
+    -- Let setupOnStart handle window placement when we go online
+    -- This ensures windows are placed exactly where they were before
 end
 
 function GameAnalyzer.toggle()
@@ -234,6 +227,7 @@ function GameAnalyzer.toggle()
         analyzerWindow:close()
     else
         -- If button is off, open the window
+        -- Add to content panel if it doesn't have a parent
         if not analyzerWindow:getParent() then
             contentPanel:addChild(analyzerWindow)
         end
@@ -245,15 +239,36 @@ end
 function online()
     analyzerButton:show()
     
-    -- If window should be visible (saved state), restore it
+    -- Setup window using saved position and state
     if analyzerWindow:isVisible() then
         if not analyzerWindow:getParent() then
             contentPanel:addChild(analyzerWindow)
         end
-        analyzerWindow:open()
+        
+        -- Setup the window based on saved character settings
+        analyzerWindow:setupOnStart()
+        
+        -- Ensure button state matches window state
         analyzerButton:setOn(true)
     else
         analyzerButton:setOn(false)
+    end
+    
+    -- Also setup experience analyzer window if it's visible
+    if expAnalyzerWindow and expAnalyzerWindow:isVisible() then
+        if not expAnalyzerWindow:getParent() then
+            contentPanel:addChild(expAnalyzerWindow)
+        end
+        
+        -- Setup the window based on saved character settings
+        expAnalyzerWindow:setupOnStart()
+        
+        -- Update the button state
+        local button = analyzerWindow:recursiveGetChildById('expAnalyzerButton')
+        if button then
+            button:setChecked(true)
+            button:setOn(true)
+        end
     end
     
     refresh()
@@ -325,6 +340,7 @@ end
 
 function GameExpAnalyzerToggle(analyzer)
     if analyzer:isChecked() then
+        -- If window doesn't have a parent, add it to content panel
         if not expAnalyzerWindow:getParent() then
             contentPanel:addChild(expAnalyzerWindow)
         end
@@ -335,6 +351,9 @@ function GameExpAnalyzerToggle(analyzer)
         
         -- Open the window after setting button state
         expAnalyzerWindow:open()
+        
+        -- Let setupOnStart handle window placement if needed
+        expAnalyzerWindow:setupOnStart()
     else
         -- Ensure the button is in inactive state
         analyzer:setOn(false)
