@@ -49,12 +49,12 @@ function expAnalyzerInit()
 
     expHourStart = g_clock.seconds()
     
-    local expGainValue = expAnalyzerWindow:getChildById('expGainValue')
+    local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
     if expGainValue then
         expGainValue:setText(0)
     end
 
-    local expHourValue = expAnalyzerWindow:getChildById('expHourValue')
+    local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
     if expHourValue then
         expHourValue:setText(0)
     end
@@ -171,7 +171,7 @@ end
 
 function onExperienceChange(player, exp, oldExp)
     if expAnalyzerWindow then
-        local expGainValue = expAnalyzerWindow:getChildById('expGainValue')
+        local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
         if expGainValue then
             if expStart == nil then
                 expStart = exp
@@ -179,7 +179,7 @@ function onExperienceChange(player, exp, oldExp)
             expGainValue:setText(exp - expStart)
         end
 
-        local expHourValue = expAnalyzerWindow:getChildById('expHourValue')
+        local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
         if expHourValue then
             if expHourStart == 0 then
                 expHourStart = g_clock.seconds()
