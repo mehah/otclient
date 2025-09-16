@@ -2,6 +2,8 @@ MiniWindow
   id: expAnalyzerWindow
   height: 80
   &save: true
+  @onOpen: modules.game_analyzer.expAnalyzerWindow.onOpen()
+  @onClose: modules.game_analyzer.expAnalyzerWindow.onClose()
   
   UIWidget
     id: miniwindowIcon
@@ -35,13 +37,27 @@ MiniWindow
     visible: false
   
   MiniWindowContents
+    id: contentsPanel
+    anchors.top: miniwindowTopBar.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: parent.bottom
+    margin-left: 3
+    margin-bottom: 3
+    margin-top: -2
+    margin-right: 1
+    vertical-scrollbar: miniwindowScrollBar
+    padding-left: 6
+    padding-top: 6
+    padding-right: 6
+    padding-bottom: 6
+    
     SkillNameLabel
       id: expGainLabel
       font: verdana-11px-monochrome
       !text: tr('XP Gain:')
       anchors.left: parent.left
       anchors.top: parent.top
-      anchors.bottom: parent.bottom
       margin-top: 5
       margin-left: 10
 
@@ -69,3 +85,12 @@ MiniWindow
       anchors.left: expHourLabel.right
       margin-top: 20
       margin-right: 25
+  
+  UIWidget
+    id: miniborder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 4
+    margin-bottom: 4

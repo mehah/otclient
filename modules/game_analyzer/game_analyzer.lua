@@ -24,8 +24,8 @@ function GameAnalyzer.init()
 
     analyzerButton:setOn(false)
     analyzerWindow = g_ui.loadUI('game_analyzer')
-    analyzerWindow:disableResize()
     analyzerWindow:setup()
+    setupAnalyzerWindowResize()
     
     expAnalyzerInit()
     
@@ -39,13 +39,43 @@ function GameAnalyzer.init()
         onGameEnd = offline,
         onPingBack = refresh
     })
+    
+    -- Add an onClose handler to update all analyzer buttons
+    analyzerWindow.onClose = function()
+        local buttons = analyzerWindow:getChildren()
+        for _, button in pairs(buttons) do
+            if button:getId():find("AnalyzerButton") then
+                button:setChecked(false)
+                button:setOn(false)
+            end
+        end
+    end
+    
     refresh()
 end
 
 function expAnalyzerInit()
     expAnalyzerWindow = g_ui.loadUI('game_exp_analyzer')
-    expAnalyzerWindow:disableResize()
     expAnalyzerWindow:setup()
+    setupExpAnalyzerWindowResize()
+
+    -- Add onOpen handler to ensure button stays in active state
+    expAnalyzerWindow.onOpen = function()
+        local button = analyzerWindow:recursiveGetChildById('expAnalyzerButton')
+        if button then
+            button:setChecked(true)
+            button:setOn(true)
+        end
+    end
+
+    -- Add onClose handler to update button state
+    expAnalyzerWindow.onClose = function()
+        local button = analyzerWindow:recursiveGetChildById('expAnalyzerButton')
+        if button then
+            button:setChecked(false)
+            button:setOn(false)
+        end
+    end
 
     expHourStart = g_clock.seconds()
     
@@ -61,6 +91,13 @@ function expAnalyzerInit()
 end
 
 function expAnalyzerTerminate()
+    -- Update button state before destroying window
+    local button = analyzerWindow:recursiveGetChildById('expAnalyzerButton')
+    if button then
+        button:setChecked(false)
+        button:setOn(false)
+    end
+    
     expAnalyzerWindow:destroy()
     expStart = nil
     expHourStart = nil
@@ -85,6 +122,17 @@ end
 
 function onMiniWindowOpen()
     analyzerButton:setOn(true)
+    
+    -- Check all analyzer windows and update their buttons
+    if expAnalyzerWindow and expAnalyzerWindow:isVisible() then
+        local button = analyzerWindow:recursiveGetChildById('expAnalyzerButton')
+        if button then
+            button:setChecked(true)
+            button:setOn(true)
+        end
+    end
+    
+    -- Add similar checks for other analyzer windows as they are implemented
 end
 
 function onMiniWindowClose()
@@ -139,10 +187,28 @@ function refresh()
     end
 
     onExperienceChange(player, player:getExperience())
+    
+    -- Update all button states based on window visibility
+    -- XP Analyzer
+    if expAnalyzerWindow and expAnalyzerWindow:isVisible() then
+        local button = analyzerWindow:recursiveGetChildById('expAnalyzerButton')
+        if button then
+            button:setChecked(true)
+            button:setOn(true)
+        end
+    end
+    
+    -- As other analyzers are implemented, add their button state checks here
 end
 
 function toggleAnalyzer(analyzer)
-    analyzer:setChecked(not analyzer:isChecked())
+    -- Toggle checked state
+    local newState = not analyzer:isChecked()
+    analyzer:setChecked(newState)
+    
+    -- Make sure setOn is also toggled the same way
+    analyzer:setOn(newState)
+    
     toggleFromAnalyzer(analyzer)
 end
 
@@ -163,8 +229,19 @@ function GameExpAnalyzerToggle(analyzer)
         if not expAnalyzerWindow:getParent() then
             contentPanel:addChild(expAnalyzerWindow)
         end
+        
+        -- Ensure the button stays in active state
+        analyzer:setOn(true)
+        analyzer:setChecked(true)
+        
+        -- Open the window after setting button state
         expAnalyzerWindow:open()
     else
+        -- Ensure the button is in inactive state
+        analyzer:setOn(false)
+        analyzer:setChecked(false)
+        
+        -- Close the window after setting button state
         expAnalyzerWindow:close()
     end
 end
@@ -216,4 +293,88 @@ function getFirstWordBeforeCapital(str)
         firstWord = firstWord:sub(1, 1):upper() .. firstWord:sub(2)
     end
     return firstWord
+end
+
+-- Function to create toggle handlers for future analyzers
+function createAnalyzerToggleFunction(analyzerName, analyzerWindow)
+    return function(analyzer)
+        if analyzer:isChecked() then
+            if not analyzerWindow:getParent() then
+                contentPanel:addChild(analyzerWindow)
+            end
+            analyzerWindow:open()
+            
+            -- Ensure button stays in active state
+            analyzer:setOn(true)
+            analyzer:setChecked(true)
+        else
+            analyzerWindow:close()
+            
+            -- Ensure button is in inactive state
+            analyzer:setOn(false)
+            analyzer:setChecked(false)
+        end
+    end
+end
+
+-- Format numbers with commas
+function comma_value(amount)
+    local formatted = tostring(amount)
+    local k
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then
+            break
+        end
+    end
+    return formatted
+end
+
+-- Resize control functions
+function setupAnalyzerWindowResize()
+    -- Define resize restriction function
+    local function restrictResize()
+        analyzerWindow.onResize = function()
+            local minHeight = 80 -- Minimum window height
+            local maxHeight = 250 -- Maximum window height
+            
+            if analyzerWindow:getHeight() < minHeight then
+                analyzerWindow:setHeight(minHeight)
+            elseif analyzerWindow:getHeight() > maxHeight then
+                analyzerWindow:setHeight(maxHeight)
+            end
+        end
+    end
+    restrictResize()
+
+    -- Remove resize restriction on minimize, restore on maximize
+    analyzerWindow.onMinimize = function()
+        analyzerWindow.onResize = nil
+    end
+
+    analyzerWindow.onMaximize = function()
+        restrictResize()
+    end
+end
+
+function setupExpAnalyzerWindowResize()
+    -- Define resize restriction function
+    local function restrictResize()
+        expAnalyzerWindow.onResize = function()
+            local minHeight = 80 -- Minimum window height
+            if expAnalyzerWindow:getHeight() < minHeight then
+                expAnalyzerWindow:setHeight(minHeight)
+            end
+        end
+    end
+    restrictResize()
+
+    -- Remove resize restriction on minimize, restore on maximize
+    expAnalyzerWindow.onMinimize = function()
+        expAnalyzerWindow.onResize = nil
+    end
+
+    expAnalyzerWindow.onMaximize = function()
+        restrictResize()
+    end
 end
