@@ -244,9 +244,17 @@ function GameAnalyzer.calculateRawExperience(modifiedExp, expRateTotal)
     -- If expRateTotal is not provided or invalid, compute it from known modifiers
     if not expRateTotal or expRateTotal <= 0 then
         -- Try to compute total rate from stored ExpRating
-        local computedRate = GameAnalyzer.calculateTotalExpRate() or 100
-        if g_logger and g_logger.debug then
-            g_logger.debug(string.format("[ExpAnalyzer] calculateRawExperience: expRateTotal missing, using computedRate=%.2f", computedRate))
+        local computedRate = GameAnalyzer.calculateTotalExpRate()
+        -- calculateTotalExpRate may return 0 in some edge cases; ensure we have a safe default
+        if not computedRate or computedRate <= 0 then
+            if g_logger and g_logger.debug then
+                g_logger.debug(string.format("[ExpAnalyzer] calculateRawExperience: computedRate invalid (%.2f), falling back to 100", computedRate or -1))
+            end
+            computedRate = 100
+        else
+            if g_logger and g_logger.debug then
+                g_logger.debug(string.format("[ExpAnalyzer] calculateRawExperience: expRateTotal missing, using computedRate=%.2f", computedRate))
+            end
         end
         expRateTotal = computedRate
     end
@@ -406,9 +414,23 @@ function online()
     end
     
     refresh()
+    -- Re-initialize tracking variables when coming online to avoid stale values
     expStart = nil
-    expHourStart = 0
+    rawExpTotal = 0
+    expHourStart = g_clock.seconds()
     expTimeElapsed = 0
+
+    -- Ensure UI fields are reset to "0" to avoid showing weird values after login
+    if expAnalyzerWindow then
+        local rawExpGainValue = expAnalyzerWindow:recursiveGetChildById('rawExpGainValue')
+        if rawExpGainValue then rawExpGainValue:setText("0") end
+        local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
+        if expGainValue then expGainValue:setText("0") end
+        local rawExpHourValue = expAnalyzerWindow:recursiveGetChildById('rawExpHourValue')
+        if rawExpHourValue then rawExpHourValue:setText("0") end
+        local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
+        if expHourValue then expHourValue:setText("0") end
+    end
 end
 
 function offline()
@@ -419,9 +441,23 @@ function offline()
     -- Remove from parent but don't close (which would reset the visible state)
     analyzerWindow:setParent(nil, true)
     
+    -- Re-initialize tracking variables when going offline
     expStart = nil
+    rawExpTotal = 0
     expHourStart = 0
     expTimeElapsed = 0
+
+    -- Reset UI fields to zero so stale values are not shown on next login
+    if expAnalyzerWindow then
+        local rawExpGainValue = expAnalyzerWindow:recursiveGetChildById('rawExpGainValue')
+        if rawExpGainValue then rawExpGainValue:setText("0") end
+        local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
+        if expGainValue then expGainValue:setText("0") end
+        local rawExpHourValue = expAnalyzerWindow:recursiveGetChildById('rawExpHourValue')
+        if rawExpHourValue then rawExpHourValue:setText("0") end
+        local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
+        if expHourValue then expHourValue:setText("0") end
+    end
 end
 
 function refresh()
@@ -432,6 +468,16 @@ function refresh()
 
     if expStart == nil then
         expStart = player:getExperience()
+    end
+
+    -- If we haven't gained experience since expStart, ensure rawExpTotal is zero
+    if expStart and player:getExperience() == expStart then
+        rawExpTotal = 0
+        -- Update UI to reflect reset
+        if expAnalyzerWindow then
+            local rawExpGainValue = expAnalyzerWindow:recursiveGetChildById('rawExpGainValue')
+            if rawExpGainValue then rawExpGainValue:setText("0") end
+        end
     end
 
     onExperienceChange(player, player:getExperience())
@@ -479,23 +525,19 @@ function GameExpAnalyzerToggle(analyzer)
             contentPanel:addChild(expAnalyzerWindow)
         end
         
-        -- Reset tracking variables when opening window
+        -- Initialize tracking variables if they haven't been set yet.
+        -- Do NOT reset existing values on normal window close/open so the user keeps history.
         local player = g_game.getLocalPlayer()
         if player then
-            expStart = player:getExperience()
-            rawExpTotal = 0
-            expHourStart = g_clock.seconds()
-            
-            -- Reset all displayed values to 0
-            local rawExpGainValue = expAnalyzerWindow:recursiveGetChildById('rawExpGainValue')
-            local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
-            local rawExpHourValue = expAnalyzerWindow:recursiveGetChildById('rawExpHourValue')
-            local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
-            
-            if rawExpGainValue then rawExpGainValue:setText('0') end
-            if expGainValue then expGainValue:setText('0') end
-            if rawExpHourValue then rawExpHourValue:setText('0') end
-            if expHourValue then expHourValue:setText('0') end
+            if expStart == nil then
+                expStart = player:getExperience()
+            end
+            if rawExpTotal == nil then
+                rawExpTotal = 0
+            end
+            if expHourStart == 0 then
+                expHourStart = g_clock.seconds()
+            end
         end
         
         -- Ensure the button stays in active state
@@ -541,6 +583,11 @@ function onExperienceChange(player, exp, oldExp)
                 expStart = exp
                 rawExpTotal = 0
                 expHourStart = g_clock.seconds()
+                -- Ensure UI shows 0 for raw exp on init
+                if expAnalyzerWindow then
+                    local rawExpGainValue = expAnalyzerWindow:recursiveGetChildById('rawExpGainValue')
+                    if rawExpGainValue then rawExpGainValue:setText("0") end
+                end
             end
             
             -- Accumulate raw experience gain
@@ -583,9 +630,12 @@ function onExperienceChange(player, exp, oldExp)
             expHourStart = g_clock.seconds()
         end
         local timeElapsed = g_clock.seconds() - expHourStart
-        if timeElapsed > 0 then
+        -- Only compute per-hour when at least 1 second has passed to avoid large spikes
+        if timeElapsed >= 1 then
             local rawExpPerHour = GameAnalyzer.calculateRawExpPerHour(rawExpTotal, timeElapsed)
             rawExpHourValue:setText(rawExpPerHour)
+        else
+            rawExpHourValue:setText("0")
         end
     end
 
@@ -596,10 +646,13 @@ function onExperienceChange(player, exp, oldExp)
             expHourStart = g_clock.seconds()
         end
         local timeElapsed = g_clock.seconds() - expHourStart
-        if timeElapsed > 0 then
+        -- Only compute per-hour when at least 1 second has passed to avoid large spikes
+        if timeElapsed >= 1 then
             local expGained = (expStart and (exp - expStart)) or 0
             local expPerHour = GameAnalyzer.calculateExpPerHour(expGained, timeElapsed)
             expHourValue:setText(expPerHour)
+        else
+            expHourValue:setText("0")
         end
     end
     end
