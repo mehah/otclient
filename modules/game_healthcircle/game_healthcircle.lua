@@ -20,6 +20,22 @@ manaCircleFront = nil
 expCircleFront = nil
 skillCircleFront = nil
 
+
+healthCircleExtra = nil
+healthCircleExtraFront = nil
+
+extraImageSizeBroad = 0
+extraImageSizeThin = 0
+
+extraCircleOffsetX = -60
+extraCircleOffsetY = 8
+
+healthCircleVirtue = nil
+virtueOffsetX = -42
+virtueOffsetY = 105
+virtueImageSizeBroad = 0
+virtueImageSizeThin = 0
+
 optionPanel = nil
 
 isHealthCircle = not g_settings.getBoolean('healthcircle_hpcircle')
@@ -36,20 +52,30 @@ end
 distanceFromCenter = g_settings.getNumber('healthcircle_distfromcenter')
 opacityCircle = g_settings.getNumber('healthcircle_opacity', 0.35)
 
+monkCircleOffsetLeft = g_settings.getNumber('healthcircle_monkcircle_offset_left', 0)
+monkCircleOffsetRight = g_settings.getNumber('healthcircle_monkcircle_offset_right', -65)
+
 function init()
     g_ui.importStyle("game_healthcircle.otui")
     healthCircle = g_ui.createWidget('HealthCircle', mapPanel)
+    healthCircleExtra = g_ui.createWidget('HealthCircleExtra', mapPanel)
     manaCircle = g_ui.createWidget('ManaCircle', mapPanel)
     expCircle = g_ui.createWidget('ExpCircle', mapPanel)
     skillCircle = g_ui.createWidget('SkillCircle', mapPanel)
 
     healthCircleFront = g_ui.createWidget('HealthCircleFront', mapPanel)
+    healthCircleExtraFront = g_ui.createWidget('HealthCircleExtraFront', mapPanel)
+    healthCircleVirtue = g_ui.createWidget('HealthCircleVirtue', mapPanel)
     manaCircleFront = g_ui.createWidget('ManaCircleFront', mapPanel)
     expCircleFront = g_ui.createWidget('ExpCircleFront', mapPanel)
     skillCircleFront = g_ui.createWidget('SkillCircleFront', mapPanel)
 
     imageSizeBroad = healthCircle:getHeight()
     imageSizeThin = healthCircle:getWidth()
+    extraImageSizeBroad = healthCircleExtra:getHeight()
+    extraImageSizeThin = healthCircleExtra:getWidth()
+    virtueImageSizeBroad = healthCircleVirtue:getHeight()
+    virtueImageSizeThin = healthCircleVirtue:getWidth()
 
     whenMapResizeChange()
     initOnHpAndMpChange()
@@ -59,6 +85,9 @@ function init()
     if not isHealthCircle then
         healthCircle:setVisible(false)
         healthCircleFront:setVisible(false)
+        healthCircleExtra:setVisible(false)
+        healthCircleExtraFront:setVisible(false)
+        healthCircleVirtue:setVisible(false)
     end
 
     if not isManaCircle then
@@ -96,6 +125,12 @@ function terminate()
 
     healthCircleFront:destroy()
     healthCircleFront = nil
+    healthCircleExtra:destroy()
+    healthCircleExtra = nil
+    healthCircleExtraFront:destroy()
+    healthCircleExtraFront = nil
+    healthCircleVirtue:destroy()
+    healthCircleVirtue = nil
     manaCircleFront:destroy()
     manaCircleFront = nil
     expCircleFront:destroy()
@@ -154,7 +189,10 @@ end
 
 function initOnLoginChange()
     connect(g_game, {
-        onGameStart = whenMapResizeChange
+        onGameStart = whenMapResizeChange,
+        onVirtueProtocol = onVirtueProtocol,
+        onSereneProtocol = onSereneProtocol,
+        onHarmonyProtocol = onHarmonyProtocol,
     })
 end
 
@@ -176,6 +214,9 @@ function whenHealthChange()
         local yhppc = math.floor(imageSizeBroad * (1 - (healthPercent / 100)))
         local restYhppc = imageSizeBroad - yhppc
 
+        local yhppcExtra = math.floor(extraImageSizeBroad * (1 - (healthPercent / 100)))
+        local restYhppcExtra = extraImageSizeBroad - yhppcExtra
+
         healthCircleFront:setY(healthCircle:getY() + yhppc)
         healthCircleFront:setHeight(restYhppc)
         healthCircleFront:setImageClip({
@@ -183,6 +224,15 @@ function whenHealthChange()
             y = yhppc,
             width = imageSizeThin,
             height = restYhppc
+        })
+
+        healthCircleExtraFront:setY(healthCircleExtra:getY() + yhppcExtra)
+        healthCircleExtraFront:setHeight(restYhppcExtra)
+        healthCircleExtraFront:setImageClip({
+            x = 0,
+            y = yhppcExtra,
+            width = extraImageSizeThin,
+            height = restYhppcExtra
         })
 
         healthCircle:setHeight(yhppc)
@@ -193,18 +243,32 @@ function whenHealthChange()
             height = yhppc
         })
 
+        healthCircleExtra:setHeight(yhppcExtra)
+        healthCircleExtra:setImageClip({
+            x = 0,
+            y = 0,
+            width = extraImageSizeThin,
+            height = yhppcExtra
+        })
+
         if healthPercent > 92 then
             healthCircleFront:setImageColor('#00BC00')
+            healthCircleExtraFront:setImageColor('#BE713E')
         elseif healthPercent > 60 then
             healthCircleFront:setImageColor('#50A150')
+            healthCircleExtraFront:setImageColor('#BE713E')
         elseif healthPercent > 30 then
             healthCircleFront:setImageColor('#A1A100')
+            healthCircleExtraFront:setImageColor('#BE713E')
         elseif healthPercent > 8 then
             healthCircleFront:setImageColor('#BF0A0A')
+            healthCircleExtraFront:setImageColor('#BE713E')
         elseif healthPercent > 3 then
             healthCircleFront:setImageColor('#910F0F')
+            healthCircleExtraFront:setImageColor('#BE713E')
         else
             healthCircleFront:setImageColor('#850C0C')
+            healthCircleExtraFront:setImageColor('#BE713E')
         end
     end
 end
@@ -342,8 +406,14 @@ function whenMapResizeChange()
             healthCircle:setX(math.floor(mapPanel:getWidth() / 2 - barDistance - imageSizeThin) - distanceFromCenter)
             manaCircle:setX(math.floor((mapPanel:getWidth() / 2 + barDistance)) + distanceFromCenter)
 
+            healthCircleExtra:setX(healthCircle:getX() + imageSizeThin + extraCircleOffsetX)
+            healthCircleExtraFront:setX(healthCircleExtra:getX())
+            healthCircleVirtue:setX(healthCircleExtra:getX() + extraImageSizeThin + virtueOffsetX)
             healthCircle:setY(mapPanel:getHeight() / 2 - imageSizeBroad / 2 + 0)
             manaCircle:setY(mapPanel:getHeight() / 2 - imageSizeBroad / 2 + 0)
+            healthCircleExtra:setY(healthCircle:getY() + extraCircleOffsetY)
+            healthCircleExtraFront:setY(healthCircleExtra:getY())
+            healthCircleVirtue:setY(healthCircleExtra:getY() + virtueOffsetY)
 
             if isExpCircle then
                 expCircleFront:setY(math.floor(mapPanel:getHeight() / 2 - barDistance - imageSizeThin) -
@@ -368,8 +438,15 @@ function whenMapResizeChange()
                                   distanceFromCenter)
             manaCircle:setX(mapPanel:getX() + mapPanel:getWidth() / 2 + barDistance + distanceFromCenter)
 
+            healthCircleExtra:setX(healthCircle:getX() + imageSizeThin + extraCircleOffsetX)
+            healthCircleExtraFront:setX(healthCircleExtra:getX())
+            healthCircleVirtue:setX(healthCircleExtra:getX() + extraImageSizeThin + virtueOffsetX)
+
             healthCircle:setY(mapPanel:getY() + mapPanel:getHeight() / 2 - imageSizeBroad / 2)
             manaCircle:setY(mapPanel:getY() + mapPanel:getHeight() / 2 - imageSizeBroad / 2)
+            healthCircleExtra:setY(healthCircle:getY() + extraCircleOffsetY)
+            healthCircleExtraFront:setY(healthCircleExtra:getY())
+            healthCircleVirtue:setY(healthCircleExtra:getY() + virtueOffsetY)
 
             if isExpCircle then
                 expCircleFront:setY(mapPanel:getY() + mapPanel:getHeight() / 2 - imageSizeThin - barDistance -
@@ -406,10 +483,16 @@ function setHealthCircle(value)
     if value then
         healthCircle:setVisible(true)
         healthCircleFront:setVisible(true)
+        healthCircleExtra:setVisible(true)
+        healthCircleExtraFront:setVisible(true)
+        healthCircleVirtue:setVisible(true)
         whenMapResizeChange()
     else
         healthCircle:setVisible(false)
         healthCircleFront:setVisible(false)
+        healthCircleExtra:setVisible(false)
+        healthCircleExtraFront:setVisible(false)
+        healthCircleVirtue:setVisible(false)
     end
 
     g_settings.set('healthcircle_hpcircle', not value)
@@ -462,6 +545,26 @@ function setSkillCircle(value)
     g_settings.set('healthcircle_skillcircle', value)
 end
 
+
+function setMonkCircleSide(side)
+    if side ~= 'left' and side ~= 'right' then return end
+    monkCircleSide = side
+    whenMapResizeChange()
+    g_settings.set('healthcircle_monkcircle_side', side)
+end
+
+function setMonkCircleOffsetLeft(value)
+    monkCircleOffsetLeft = value
+    whenMapResizeChange()
+    g_settings.set('healthcircle_monkcircle_offset_left', value)
+end
+
+function setMonkCircleOffsetRight(value)
+    monkCircleOffsetRight = value
+    whenMapResizeChange()
+    g_settings.set('healthcircle_monkcircle_offset_right', value)
+end
+
 function setSkillType(skill)
     if not skillsLoaded then
         return
@@ -485,6 +588,9 @@ end
 function setCircleOpacity(value)
     healthCircle:setOpacity(value)
     healthCircleFront:setOpacity(value)
+    healthCircleExtra:setOpacity(value)
+    healthCircleExtraFront:setOpacity(value)
+    healthCircleVirtue:setOpacity(value)
     manaCircle:setOpacity(value)
     manaCircleFront:setOpacity(value)
     expCircle:setOpacity(value)
@@ -597,4 +703,16 @@ function destroyOptionsModule()
 
     modules.client_options.removeButton("Interface", "HP/MP Circle")
     optionPanel = nil
+end
+
+function onVirtueProtocol(test)
+    print("onVirtueProtocol", test)
+end
+
+function onSereneProtocol(test)
+    print("onSereneProtocol", test)
+end
+
+function onHarmonyProtocol(test)
+    print("onHarmonyProtocol", test)
 end

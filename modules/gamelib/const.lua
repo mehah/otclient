@@ -471,4 +471,12 @@ ExperienceRate = {
     XP_BOOST = 3,
     STAMINA_MULTIPLIER = 4
 }
+
+ExperienceRate = {
+    BASE = 0,
+    VOUCHER = 1,
+    LOW_LEVEL = 2,
+    XP_BOOST = 3,
+    STAMINA_MULTIPLIER = 4
+}
 -- @}
