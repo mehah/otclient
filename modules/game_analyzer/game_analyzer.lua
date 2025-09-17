@@ -7,6 +7,7 @@ Analyzers = {
     },
 }
 
+local ExpRating = {}
 contentPanel = nil
 analyzerButton = nil
 analyzerWindow = nil
@@ -66,6 +67,7 @@ function GameAnalyzer.init()
 
     connect(LocalPlayer, {
         onExperienceChange = onExperienceChange,
+        onExperienceRateChange = onExperienceRateChange
     })
     connect(g_game, {
         onGameStart = online,
@@ -159,6 +161,11 @@ function expAnalyzerTerminate()
     expTimeElapsed = 0
 end
 
+function onExperienceRateChange(localPlayer, type, value)
+    ExpRating[type] = value
+    updateExperienceRate(localPlayer)
+end
+
 function GameAnalyzer.terminate()
     -- Don't close windows here, just destroy them
     -- The visible state will be saved thanks to &save: true in OTUI
@@ -168,6 +175,7 @@ function GameAnalyzer.terminate()
     expAnalyzerTerminate()
     disconnect(LocalPlayer, {
         onExperienceChange = onExperienceChange,
+        onExperienceRateChange = onExperienceRateChange
     })
     disconnect(g_game, {
         onGameStart = online,
@@ -383,6 +391,20 @@ function onExperienceChange(player, exp, oldExp)
             local timeElapsed = g_clock.seconds() - expHourStart
             expHourValue:setText(calculateExpPerHour(exp, expStart, timeElapsed, expHourStart))
         end
+        
+        -- Calculate and update next level info
+        local nextLevelValue = expAnalyzerWindow:recursiveGetChildById('nextLevelValue')
+        local progressBar = expAnalyzerWindow:recursiveGetChildById('expToNextLvlBar')
+        
+        if nextLevelValue and progressBar then
+            local percent, expNeeded = calculateNextLevelPercent(player)
+            
+            -- Update next level value with experience needed
+            nextLevelValue:setText(comma_value(expNeeded))
+            
+            -- Update progress bar with percentage to next level
+            progressBar:setPercent(percent)
+        end
     end
 end
 
@@ -446,6 +468,33 @@ function comma_value(amount)
         end
     end
     return formatted
+end
+
+-- Calculate experience required for a specific level
+function expForLevel(level)
+    return math.floor((50 * level * level * level) / 3 - 100 * level * level + (850 * level) / 3 - 200)
+end
+
+-- Calculate experience needed to advance to the next level
+function expToAdvance(currentLevel, currentExp)
+    return expForLevel(currentLevel + 1) - currentExp
+end
+
+-- Calculate percentage to next level
+function calculateNextLevelPercent(player)
+    local currentLevel = player:getLevel()
+    local currentExp = player:getExperience()
+    local nextLevelExp = expForLevel(currentLevel + 1)
+    local prevLevelExp = expForLevel(currentLevel)
+    
+    -- Calculate the experience needed for this level and how much we've gained
+    local expNeeded = nextLevelExp - prevLevelExp
+    local expGained = currentExp - prevLevelExp
+    
+    -- Calculate the percentage (0-100)
+    local percent = math.min(math.floor((expGained / expNeeded) * 100), 100)
+    
+    return percent, expNeeded - expGained
 end
 
 -- Resize control functions
