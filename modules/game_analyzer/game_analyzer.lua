@@ -1,5 +1,14 @@
 GameAnalyzer = {}
 
+-- Import ExperienceRate constants
+ExperienceRate = {
+    BASE = 0,
+    VOUCHER = 1,
+    LOW_LEVEL = 2,
+    XP_BOOST = 3,
+    STAMINA_MULTIPLIER = 4
+}
+
 Analyzers = {
     GameExpAnalyzer = {
         name = "Experience",
@@ -12,9 +21,50 @@ contentPanel = nil
 analyzerButton = nil
 analyzerWindow = nil
 expAnalyzerWindow = nil
-expStart = nil
-expHourStart = 0
-expTimeElapsed = 0
+expStart = nil       -- Track experience when window opens
+rawExpTotal = 0      -- Track total raw experience gained
+expHourStart = 0     -- Track when we started measuring
+
+-- Create a global alias for the function
+function updateExperienceRate(localPlayer)
+    return GameAnalyzer.updateExperienceRate(localPlayer)
+end
+
+-- Create global aliases for other functions that might be called
+function calculateRawExperience(modifiedExp, expRateTotal)
+    return GameAnalyzer.calculateRawExperience(modifiedExp, expRateTotal)
+end
+
+function calculateRawExpPerHour(rawExpGained, timeElapsed)
+    return GameAnalyzer.calculateRawExpPerHour(rawExpGained, timeElapsed)
+end
+
+function calculateExpPerHour(expGained, timeElapsed)
+    return GameAnalyzer.calculateExpPerHour(expGained, timeElapsed)
+end
+
+function calculateNextLevelPercent(player)
+    return GameAnalyzer.calculateNextLevelPercent(player)
+end
+
+function safeNumber(str)
+    if not str or str == "" then
+        return 0
+    end
+    
+    -- Remove commas
+    local cleanStr = string.gsub(str, ",", "")
+    
+    -- Call tonumber directly instead of using pcall
+    local result = tonumber(cleanStr)
+    
+    -- Return the result or 0 if it's nil
+    return result or 0
+end
+
+function comma_value(amount)
+    return GameAnalyzer.comma_value(amount)
+end
 
 function GameAnalyzer.init()
     --print("Init Game Analyzer")
@@ -67,7 +117,7 @@ function GameAnalyzer.init()
 
     connect(LocalPlayer, {
         onExperienceChange = onExperienceChange,
-        onExperienceRateChange = onExperienceRateChange
+        onExperienceRateChange = GameAnalyzer.onExperienceRateChange
     })
     connect(g_game, {
         onGameStart = online,
@@ -82,6 +132,17 @@ function expAnalyzerInit()
     expAnalyzerWindow = g_ui.loadUI('game_exp_analyzer')
     expAnalyzerWindow:setup()
     setupExpAnalyzerWindowResize()
+
+    -- Reset tracking variables
+    expStart = nil
+    rawExpTotal = 0
+    expHourStart = 0
+    
+    -- Initialize values with string "0"
+    expAnalyzerWindow:recursiveGetChildById('rawExpGainValue'):setText("0")
+    expAnalyzerWindow:recursiveGetChildById('expGainValue'):setText("0")
+    expAnalyzerWindow:recursiveGetChildById('rawExpHourValue'):setText("0")
+    expAnalyzerWindow:recursiveGetChildById('expHourValue'):setText("0")
 
     -- Hide toggleFilterButton and adjust contextMenuButton anchors
     local toggleFilterButton = expAnalyzerWindow:recursiveGetChildById('toggleFilterButton')
@@ -135,16 +196,11 @@ function expAnalyzerInit()
     end
 
     expHourStart = g_clock.seconds()
-    
-    local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
-    if expGainValue then
-        expGainValue:setText(0)
-    end
-
-    local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
-    if expHourValue then
-        expHourValue:setText(0)
-    end
+    -- Initialize values with string "0"
+    expAnalyzerWindow:recursiveGetChildById('rawExpGainValue'):setText("0")
+    expAnalyzerWindow:recursiveGetChildById('expGainValue'):setText("0")
+    expAnalyzerWindow:recursiveGetChildById('rawExpHourValue'):setText("0")
+    expAnalyzerWindow:recursiveGetChildById('expHourValue'):setText("0")
 end
 
 function expAnalyzerTerminate()
@@ -155,15 +211,79 @@ function expAnalyzerTerminate()
         button:setOn(false)
     end
     
-    expAnalyzerWindow:destroy()
+    -- Reset all tracking variables
     expStart = nil
-    expHourStart = nil
-    expTimeElapsed = 0
+    rawExpTotal = 0
+    expHourStart = 0
+    
+    expAnalyzerWindow:destroy()
 end
 
-function onExperienceRateChange(localPlayer, type, value)
+function GameAnalyzer.updateExperienceRate(localPlayer)
+    -- This function follows a similar pattern to the one in skills.lua
+    local baseRate = ExpRating[ExperienceRate.BASE] or 100
+    local expRateTotal = baseRate
+
+    for type, value in pairs(ExpRating) do
+        if type ~= ExperienceRate.BASE and type ~= ExperienceRate.STAMINA_MULTIPLIER then
+            expRateTotal = expRateTotal + (value or 0)
+        end
+    end
+
+    local staminaMultiplier = ExpRating[ExperienceRate.STAMINA_MULTIPLIER] or 100
+    expRateTotal = expRateTotal * staminaMultiplier / 100
+    
+    return expRateTotal
+end
+
+-- Calculate raw experience from modified experience
+function GameAnalyzer.calculateRawExperience(modifiedExp, expRateTotal)
+    -- Reverse the experience modifier calculation
+    -- If modifiedExp = rawExp * (expRateTotal/100)
+    -- Then rawExp = modifiedExp * 100 / expRateTotal
+    if not expRateTotal or expRateTotal <= 0 then
+        return modifiedExp -- If no rate, return the modified value
+    end
+    
+    -- Calculate raw experience - make sure we're dividing correctly
+    -- For example: 100 exp with 150% rate should return 67 raw exp (100 * 100 / 150)
+    local rawExp = math.floor(modifiedExp * 100 / expRateTotal)
+    return rawExp
+end
+
+-- Calculate the experience rate from all modifiers
+-- This is useful for showing the total XP boost percentage
+function GameAnalyzer.calculateTotalExpRate()
+    local baseRate = ExpRating[ExperienceRate.BASE] or 100
+    local voucherRate = ExpRating[ExperienceRate.VOUCHER] or 0
+    local lowLevelRate = ExpRating[ExperienceRate.LOW_LEVEL] or 0
+    local xpBoostRate = ExpRating[ExperienceRate.XP_BOOST] or 0
+    local staminaMultiplier = ExpRating[ExperienceRate.STAMINA_MULTIPLIER] or 100
+    
+    -- Calculate the total percentage before stamina multiplier
+    local subtotal = baseRate + voucherRate + lowLevelRate + xpBoostRate
+    
+    -- Apply stamina multiplier (it's a percentage of the subtotal)
+    local totalRate = (subtotal * staminaMultiplier) / 100
+    
+    -- Return the total rate and the percentage increase over base
+    local increasePercent = math.floor(totalRate - 100)
+    
+    return totalRate, increasePercent
+end
+
+function GameAnalyzer.onExperienceRateChange(localPlayer, type, value)
+    -- Store the new experience rate value
     ExpRating[type] = value
-    updateExperienceRate(localPlayer)
+    
+    -- Log rate change to console for debugging
+    g_logger.debug("Experience rate changed: " .. type .. " = " .. value)
+    
+    -- If expAnalyzerWindow is visible, update the experience values with new rate
+    if expAnalyzerWindow and expAnalyzerWindow:isVisible() and localPlayer then
+        -- Update experience values with new rate
+        onExperienceChange(localPlayer, localPlayer:getExperience())
+    end
 end
 
 function GameAnalyzer.terminate()
@@ -175,7 +295,7 @@ function GameAnalyzer.terminate()
     expAnalyzerTerminate()
     disconnect(LocalPlayer, {
         onExperienceChange = onExperienceChange,
-        onExperienceRateChange = onExperienceRateChange
+        onExperienceRateChange = GameAnalyzer.onExperienceRateChange
     })
     disconnect(g_game, {
         onGameStart = online,
@@ -353,6 +473,25 @@ function GameExpAnalyzerToggle(analyzer)
             contentPanel:addChild(expAnalyzerWindow)
         end
         
+        -- Reset tracking variables when opening window
+        local player = g_game.getLocalPlayer()
+        if player then
+            expStart = player:getExperience()
+            rawExpTotal = 0
+            expHourStart = g_clock.seconds()
+            
+            -- Reset all displayed values to 0
+            local rawExpGainValue = expAnalyzerWindow:recursiveGetChildById('rawExpGainValue')
+            local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
+            local rawExpHourValue = expAnalyzerWindow:recursiveGetChildById('rawExpHourValue')
+            local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
+            
+            if rawExpGainValue then rawExpGainValue:setText('0') end
+            if expGainValue then expGainValue:setText('0') end
+            if rawExpHourValue then rawExpHourValue:setText('0') end
+            if expHourValue then expHourValue:setText('0') end
+        end
+        
         -- Ensure the button stays in active state
         analyzer:setOn(true)
         analyzer:setChecked(true)
@@ -374,33 +513,79 @@ end
 
 function onExperienceChange(player, exp, oldExp)
     if expAnalyzerWindow then
-        local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
-        if expGainValue then
+        -- Get the current experience rate total
+        local expRateTotal = GameAnalyzer.updateExperienceRate(player)
+        
+        -- Calculate raw experience values
+        local expDiff = exp - (oldExp or exp)
+        
+        -- Only process positive experience gains
+        if expDiff > 0 then
+            -- Calculate the equivalent raw experience gain
+            local rawExpDiff = GameAnalyzer.calculateRawExperience(expDiff, expRateTotal)
+            
+            -- Initialize tracking variables if needed
             if expStart == nil then
                 expStart = exp
-            end
-            expGainValue:setText(exp - expStart)
-        end
-
-        local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
-        if expHourValue then
-            if expHourStart == 0 then
+                rawExpTotal = 0
                 expHourStart = g_clock.seconds()
             end
             
-            local timeElapsed = g_clock.seconds() - expHourStart
-            expHourValue:setText(calculateExpPerHour(exp, expStart, timeElapsed, expHourStart))
+            -- Accumulate raw experience gain
+            rawExpTotal = rawExpTotal + rawExpDiff
+            
+            -- Update the UI
+            local rawExpGainValue = expAnalyzerWindow:recursiveGetChildById('rawExpGainValue')
+            if rawExpGainValue then
+                rawExpGainValue:setText(GameAnalyzer.comma_value(rawExpTotal))
+            end
+            
+            -- Update standard experience gain
+            local expGainValue = expAnalyzerWindow:recursiveGetChildById('expGainValue')
+            if expGainValue then
+                expGainValue:setText(GameAnalyzer.comma_value(exp - expStart))
+            end
+
+            -- Calculate and update raw experience per hour
+            local rawExpHourValue = expAnalyzerWindow:recursiveGetChildById('rawExpHourValue')
+            if rawExpHourValue then
+                if expHourStart == 0 then
+                    expHourStart = g_clock.seconds()
+                end
+                
+                local timeElapsed = g_clock.seconds() - expHourStart
+                if timeElapsed > 0 then
+                    -- Use our tracked rawExpTotal directly
+                    local rawExpPerHour = GameAnalyzer.calculateRawExpPerHour(rawExpTotal, timeElapsed)
+                    rawExpHourValue:setText(rawExpPerHour)
+                end
+            end
+            
+            -- Calculate and update standard experience per hour
+            local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
+            if expHourValue then
+                if expHourStart == 0 then
+                    expHourStart = g_clock.seconds()
+                end
+                
+                local timeElapsed = g_clock.seconds() - expHourStart
+                if timeElapsed > 0 then
+                    local expGained = exp - expStart
+                    local expPerHour = GameAnalyzer.calculateExpPerHour(expGained, timeElapsed)
+                    expHourValue:setText(expPerHour)
+                end
+            end
         end
-        
+
         -- Calculate and update next level info
         local nextLevelValue = expAnalyzerWindow:recursiveGetChildById('nextLevelValue')
         local progressBar = expAnalyzerWindow:recursiveGetChildById('expToNextLvlBar')
         
         if nextLevelValue and progressBar then
-            local percent, expNeeded = calculateNextLevelPercent(player)
+            local percent, expNeeded = GameAnalyzer.calculateNextLevelPercent(player)
             
             -- Update next level value with experience needed
-            nextLevelValue:setText(comma_value(expNeeded))
+            nextLevelValue:setText(GameAnalyzer.comma_value(expNeeded))
             
             -- Update progress bar with percentage to next level
             progressBar:setPercent(percent)
@@ -408,22 +593,35 @@ function onExperienceChange(player, exp, oldExp)
     end
 end
 
-function calculateExpPerHour(exp, expStart, timeElapsed, expHourStart)
-    local expGained = exp - expStart
-    
+function GameAnalyzer.calculateExpPerHour(expGained, timeElapsed)
     -- Ensure we don't divide by zero
     if timeElapsed <= 0 then
         return "0"
     end
     
     local expPerHour = math.floor((expGained / timeElapsed) * 3600)
-    --print("Exp Per Hour: " .. expPerHour)
     
     -- Handle negative values properly
     if expPerHour < 0 then
-        return "-" .. comma_value(math.abs(expPerHour))
+        return "-" .. GameAnalyzer.comma_value(math.abs(expPerHour))
     else
-        return comma_value(expPerHour)
+        return GameAnalyzer.comma_value(expPerHour)
+    end
+end
+
+function GameAnalyzer.calculateRawExpPerHour(rawExpGained, timeElapsed)
+    -- Ensure we don't divide by zero
+    if timeElapsed <= 0 then
+        return "0"
+    end
+    
+    local rawExpPerHour = math.floor((rawExpGained / timeElapsed) * 3600)
+    
+    -- Handle negative values properly
+    if rawExpPerHour < 0 then
+        return "-" .. GameAnalyzer.comma_value(math.abs(rawExpPerHour))
+    else
+        return GameAnalyzer.comma_value(rawExpPerHour)
     end
 end
 
@@ -457,8 +655,24 @@ function createAnalyzerToggleFunction(analyzerName, analyzerWindow)
     end
 end
 
+-- Safely convert a string to a number
+function GameAnalyzer.safeNumber(str)
+    if not str or str == "" then
+        return 0
+    end
+    
+    -- Remove commas
+    local cleanStr = string.gsub(str, ",", "")
+    
+    -- Call tonumber directly
+    local result = tonumber(cleanStr)
+    
+    -- Return the result or 0 if it's nil
+    return result or 0
+end
+
 -- Format numbers with commas
-function comma_value(amount)
+function GameAnalyzer.comma_value(amount)
     local formatted = tostring(amount)
     local k
     while true do
@@ -481,7 +695,7 @@ function expToAdvance(currentLevel, currentExp)
 end
 
 -- Calculate percentage to next level
-function calculateNextLevelPercent(player)
+function GameAnalyzer.calculateNextLevelPercent(player)
     local currentLevel = player:getLevel()
     local currentExp = player:getExperience()
     local nextLevelExp = expForLevel(currentLevel + 1)
