@@ -1,6 +1,6 @@
 MiniWindow
   id: expAnalyzerWindow
-  height: 80
+  height: 140
   &save: true
   @onOpen: modules.game_analyzer.expAnalyzerWindow.onOpen()
   @onClose: modules.game_analyzer.expAnalyzerWindow.onClose()
@@ -97,7 +97,7 @@ MiniWindow
     
     SkillNameLabel
       id: rawExpHourLabel
-      !text: tr('XP/h:')
+      !text: tr('Raw XP/h:')
       font: verdana-11px-monochrome
       margin-top: 41
       margin-left: 10
@@ -114,7 +114,7 @@ MiniWindow
 
     SkillNameLabel
       id: expHourLabel
-      !text: tr('Raw XP/h:')
+      !text: tr('XP/h:')
       font: verdana-11px-monochrome
       margin-top: 59
       margin-left: 10
