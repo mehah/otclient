@@ -1250,6 +1250,11 @@ local function updateExperienceRate(localPlayer)
         tooltip = tooltip .. string.format("\n- XP Boost: %d%% (%s h remaining)", ExpRating[ExperienceRate.XP_BOOST],
             formatTimeBySeconds(localPlayer:getStoreExpBoostTime()))
     end
+
+    if (ExpRating[ExperienceRate.LOW_LEVEL] or 0) > 0 then
+        tooltip = tooltip .. string.format("\n- Low Level Bonus: %d%%", ExpRating[ExperienceRate.LOW_LEVEL])
+    end
+
     tooltip = tooltip .. string.format("\n- Stamina multiplier: x%.1f (%s h remaining)", staminaMultiplier / 100,
         formatTimeByMinutes(localPlayer:getStamina() - 2340))
 

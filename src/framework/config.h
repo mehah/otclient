@@ -41,9 +41,10 @@
 #define ENCRYPTION_HEADER AY_OBFUSCATE("SET_YOUR_HEADER_HERE")
 
 // DISCORD RPC (https://discord.com/developers/applications)
-// Note: Only for VSSolution, doesn't work with CMAKE
 // Enable Discord Rich Presence
-#define ENABLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
+#ifndef ENABLE_DISCORD_RPC
+    #define ENABLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
+#endif
 #define RPC_API_KEY "1060650448522051664" // Your API Key
 // RPC Configs (https://youtu.be/zCHYtRlD58g) step by step to config your rich presence
 #define SHOW_CHARACTER_NAME_RPC 1 // 1 to enable | 0 to disable
