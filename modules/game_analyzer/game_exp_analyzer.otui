@@ -27,30 +27,62 @@ MiniWindow
     height: 13
     !text: tr('XP Analyzer')
     color: #9d9d9dff
-  
+    
+  VerticalScrollBar
+    id: miniwindowScrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 14
+    margin-top: 16
+    margin-right: 3
+    margin-bottom: 3
+    pixels-scroll: true
+    always-visible: true
+
   MiniWindowContents
     id: contentsPanel
     anchors.top: miniwindowTopBar.bottom
     anchors.left: parent.left
     anchors.right: miniwindowScrollBar.left
     anchors.bottom: parent.bottom
-    margin-left: 3
+    margin-left: 1
     margin-bottom: 3
     margin-top: -2
     margin-right: 1
     vertical-scrollbar: miniwindowScrollBar
-    padding-left: 6
-    padding-top: 6
-    padding-right: 6
+    always-vertical-scrollbar: true
+    padding-left: 1
+    padding-top: 1
+    padding-right: 1
     padding-bottom: 6
     
+    SkillNameLabel
+      id: rawExpGainLabel
+      font: verdana-11px-monochrome
+      !text: tr('Raw XP Gain:')
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-top: 5
+      margin-left: 10
+
+    SkillValueLabel
+      id: rawExpGainValue
+      !text: tr('0')
+      font: verdana-11px-monochrome
+      text-align: topright
+      anchors.right: parent.right
+      anchors.left: rawExpGainLabel.right
+      margin-top: 5
+      margin-right: 4
+
     SkillNameLabel
       id: expGainLabel
       font: verdana-11px-monochrome
       !text: tr('XP Gain:')
       anchors.left: parent.left
       anchors.top: parent.top
-      margin-top: 5
+      margin-top: 23
       margin-left: 10
 
     SkillValueLabel
@@ -58,15 +90,33 @@ MiniWindow
       !text: tr('0')
       font: verdana-11px-monochrome
       text-align: topright
+      anchors.right: parent.right
       anchors.left: expGainLabel.right
-      margin-top: 5
-      margin-right: 25
+      margin-top: 23
+      margin-right: 4
+    
+    SkillNameLabel
+      id: rawExpHourLabel
+      !text: tr('XP/h:')
+      font: verdana-11px-monochrome
+      margin-top: 41
+      margin-left: 10
+
+    SkillValueLabel
+      id: rawExpHourValue
+      !text: tr('0')
+      font: verdana-11px-monochrome
+      text-align: topright
+      anchors.right: parent.right
+      anchors.left: rawExpHourLabel.right
+      margin-top: 41
+      margin-right: 4
 
     SkillNameLabel
       id: expHourLabel
-      !text: tr('XP/h:')
+      !text: tr('Raw XP/h:')
       font: verdana-11px-monochrome
-      margin-top: 20
+      margin-top: 59
       margin-left: 10
 
     SkillValueLabel
@@ -74,10 +124,48 @@ MiniWindow
       !text: tr('0')
       font: verdana-11px-monochrome
       text-align: topright
+      anchors.right: parent.right
       anchors.left: expHourLabel.right
+      margin-top: 59
+      margin-right: 4
+
+    SkillNameLabel
+      id: nextLevelLabel
+      !text: tr('Next Level:')
+      font: verdana-11px-monochrome
+      margin-top: 77
+      margin-left: 10
+
+    SkillValueLabel
+      id: nextLevelValue
+      !text: tr('-')
+      font: verdana-11px-monochrome
+      text-align: topright
+      anchors.right: parent.right
+      anchors.left: nextLevelLabel.right
+      margin-top: 77
+      margin-right: 4
+    
+    ProgressBar
+      id: expToNextLvlBar
+      anchors.right: parent.right
+      anchors.left: parent.left
+      anchors.top: nextLevelValue.top
       margin-top: 20
-      margin-right: 25
+      margin-left: 10
+      margin-right: 4
+      height: 6
+      background-color: #008600
+      phantom: false
   
+    HorizontalSeparator
+      anchors.right: parent.right
+      anchors.left: parent.left
+      anchors.top: expToNextLvlBar.top
+      margin-top: 13
+      margin-left: 5
+      margin-left: 10
+
   UIWidget
     id: miniborder
     anchors.bottom: parent.bottom
