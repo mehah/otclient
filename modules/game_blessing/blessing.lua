@@ -23,7 +23,7 @@ function BlessingController:onGameStart()
 end
 
 function BlessingController:onGameEnd()
-    if BlessingController.ui:isVisible() then
+    if g_game.getClientVersion() >= 1000 and BlessingController.ui:isVisible() then
         BlessingController.ui:hide()
     end
 end
@@ -48,7 +48,6 @@ function setHistoryView()
     ui.promotionPanel:hide()
     ui.deathPenaltyPanel:hide()
     ui.historyPanel:show()
-    ui.historyPanel:setHeight(397)
     ui.buttonsPanel.historyButton:setText("Back")
 end
 

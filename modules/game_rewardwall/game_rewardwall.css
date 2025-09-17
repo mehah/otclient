@@ -1,12 +1,13 @@
 .reward-wall-window {
+  position: relative;
   width: 541px;
-  height: 489px;
+  height: 495px;
   display: block;
   color: #929292;
 }
 
 .history-panel {
-  height: 432px;
+  height: 445px;
 }
 
 .history-list {
@@ -18,8 +19,8 @@
 }
 
 .content-panel {
-  width: 506px;
-  height: 120px;
+  width: 529px;
+  height: 136px;
   margin-left: 5px;
   margin-top: -5px;
 }
@@ -98,7 +99,7 @@
 }
 
 .daily-rewards-panel {
-  height: 123px;
+  height: 139px;
   padding-left: 25px;
 }
 

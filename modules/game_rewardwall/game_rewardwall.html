@@ -3,12 +3,12 @@
 <window id="rewardWallWindow" anchor="parent" class="reward-wall-window" title="Reward Wall"
   onescape="self:onClickToggle()" layout="type: verticalBox;spacing:5">
   <!-- History Panel -->
-  <minipanel id="historyPanel" title="History" class="history-panel" *visible="false">
+  <div id="historyPanel" title="History" class="history-panel minipanel" *visible="false">
     <TextListWithScroll id="historyList" class="history-list" ></TextListWithScroll>
-  </minipanel>
+  </div>
 
   <!-- Resting Area Bonuses Panel -->
-  <minipanel id="restingAreaPanel" title="Resting Area Bonuses" class="content-panel" >
+  <div id="restingAreaPanel" title="Resting Area Bonuses" class="content-panel minipanel" focusable="false">
     <div id="restingAreaInfo" layout="type: verticalBox;spacing:5" class="resting-area-info">
       <img src="images/icon-rewardstreak-default" id="rewardStreakIcon" class="resting-area-icon"
         onhover="self:onhoverStatusPlayer(event)" text="2" />
@@ -26,10 +26,10 @@
     </div>
 
     <label id="streakWarning" class="info-label premium-message" text="Great! You benefit from the best possible rewards and bonuses  &#10;  due to your premium status"></label>
-  </minipanel>
+  </div>
 
   <!-- Daily Rewards Panel -->
-  <minipanel id="dailyRewardsPanel" title="Daily Rewards" class="daily-rewards-panel"
+  <div id="dailyRewardsPanel" title="Daily Rewards" focusable="false" class="daily-rewards-panel minipanel"
     layout="type: horizontalBox;spacing:-1;">
     <div id="reward1" layout="type: verticalBox;spacing:5" class="reward-item" focusable="false">
       <RewardButton3 id="rewardButton1" class="reward-button" onhover="self:onhoverRewardType(event)"
@@ -79,7 +79,7 @@
       <div id="rewardGold7" class="reward-label" onhover="self:onhoverStatusReward(event)"></div>
     </div>
     <img src="images/icon-rewardarrow-loop-inactive" id="arrowLoop" class="reward-arrow-loop" />
-  </minipanel>
+  </div>
 
   <!-- Premium Status Panel -->
   <QtPanel id="premiumStatus" class="premium-panel">

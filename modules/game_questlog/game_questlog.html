@@ -2,7 +2,7 @@
 <html>
 <window id="main" anchor="parent" class="questLog-window" title="Quest Log" onescape="self:close()">
 
-  <minipanel id="panelQuestLog" title="Quest Log" focusable="false" class="content-left" anchor="parent"
+  <div id="panelQuestLog" title="Quest Log" focusable="false" class="content-left minipanel" anchor="parent"
     layout="type: verticalBox;spacing:5">
     <TextListQuestLog id="areaPanelQuestList" class="quest-list"></TextListQuestLog>
     <select id="comboBoxFilter" onchange="self:onFilterQuestLog(event)">
@@ -30,17 +30,15 @@
         <td class="col3" id="lblHiddenNumber" ></td>
       </tr>
     </table>
-    
-    
-  </minipanel>
+  </div>
 
-  <minipanel id="panelQuestLineSelected" class="content-right" anchor="parent" title="No quest line Selected"
+  <div id="panelQuestLineSelected" focusable="false" class="content-right minipanel" anchor="parent" title="No quest line Selected"
     layout="type: verticalBox;">
     <TextListQuestLog id="ScrollAreaQuestList" ></TextListQuestLog>
     <MultiLineQuestLog id="panelQuestInfo" class="quest-info"></MultiLineQuestLog>
     <input id="checkboxShowInQuestTracker" type="checkbox" 
       onchange="self:onCheckChangeQuestTracker(event)" text="Show in quest tracker" />
-  </minipanel>
+  </div>
 
   <HorizontalSeparator class="separator"></HorizontalSeparator>
 
