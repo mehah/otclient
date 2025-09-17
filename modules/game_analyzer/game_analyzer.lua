@@ -241,8 +241,14 @@ function GameAnalyzer.calculateRawExperience(modifiedExp, expRateTotal)
     -- Reverse the experience modifier calculation
     -- If modifiedExp = rawExp * (expRateTotal/100)
     -- Then rawExp = modifiedExp * 100 / expRateTotal
+    -- If expRateTotal is not provided or invalid, compute it from known modifiers
     if not expRateTotal or expRateTotal <= 0 then
-        return modifiedExp -- If no rate, return the modified value
+        -- Try to compute total rate from stored ExpRating
+        local computedRate = GameAnalyzer.calculateTotalExpRate() or 100
+        if g_logger and g_logger.debug then
+            g_logger.debug(string.format("[ExpAnalyzer] calculateRawExperience: expRateTotal missing, using computedRate=%.2f", computedRate))
+        end
+        expRateTotal = computedRate
     end
     
     -- Calculate raw experience - make sure we're dividing correctly
@@ -523,6 +529,12 @@ function onExperienceChange(player, exp, oldExp)
         if expDiff > 0 then
             -- Calculate the equivalent raw experience gain
             local rawExpDiff = GameAnalyzer.calculateRawExperience(expDiff, expRateTotal)
+
+            -- Debug: log values so we can verify the rate and calculation
+            if g_logger and g_logger.debug then
+                local rates = string.format("expRateTotal=%.2f", (expRateTotal or -1))
+                g_logger.debug(string.format("[ExpAnalyzer] exp=%d oldExp=%s expDiff=%d %s rawExpDiff=%d", exp, tostring(oldExp), expDiff, rates, rawExpDiff))
+            end
             
             -- Initialize tracking variables if needed
             if expStart == nil then
@@ -546,35 +558,7 @@ function onExperienceChange(player, exp, oldExp)
                 expGainValue:setText(GameAnalyzer.comma_value(exp - expStart))
             end
 
-            -- Calculate and update raw experience per hour
-            local rawExpHourValue = expAnalyzerWindow:recursiveGetChildById('rawExpHourValue')
-            if rawExpHourValue then
-                if expHourStart == 0 then
-                    expHourStart = g_clock.seconds()
-                end
-                
-                local timeElapsed = g_clock.seconds() - expHourStart
-                if timeElapsed > 0 then
-                    -- Use our tracked rawExpTotal directly
-                    local rawExpPerHour = GameAnalyzer.calculateRawExpPerHour(rawExpTotal, timeElapsed)
-                    rawExpHourValue:setText(rawExpPerHour)
-                end
-            end
-            
-            -- Calculate and update standard experience per hour
-            local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
-            if expHourValue then
-                if expHourStart == 0 then
-                    expHourStart = g_clock.seconds()
-                end
-                
-                local timeElapsed = g_clock.seconds() - expHourStart
-                if timeElapsed > 0 then
-                    local expGained = exp - expStart
-                    local expPerHour = GameAnalyzer.calculateExpPerHour(expGained, timeElapsed)
-                    expHourValue:setText(expPerHour)
-                end
-            end
+            -- ...existing code... (per-hour updates moved below)
         end
 
         -- Calculate and update next level info
@@ -590,6 +574,34 @@ function onExperienceChange(player, exp, oldExp)
             -- Update progress bar with percentage to next level
             progressBar:setPercent(percent)
         end
+    -- Update per-hour displays every time (so they decrease over time)
+    -- This block runs inside the `if expAnalyzerWindow then` guard above
+    -- Calculate and update raw experience per hour
+    local rawExpHourValue = expAnalyzerWindow:recursiveGetChildById('rawExpHourValue')
+    if rawExpHourValue then
+        if expHourStart == 0 then
+            expHourStart = g_clock.seconds()
+        end
+        local timeElapsed = g_clock.seconds() - expHourStart
+        if timeElapsed > 0 then
+            local rawExpPerHour = GameAnalyzer.calculateRawExpPerHour(rawExpTotal, timeElapsed)
+            rawExpHourValue:setText(rawExpPerHour)
+        end
+    end
+
+    -- Calculate and update standard experience per hour
+    local expHourValue = expAnalyzerWindow:recursiveGetChildById('expHourValue')
+    if expHourValue then
+        if expHourStart == 0 then
+            expHourStart = g_clock.seconds()
+        end
+        local timeElapsed = g_clock.seconds() - expHourStart
+        if timeElapsed > 0 then
+            local expGained = (expStart and (exp - expStart)) or 0
+            local expPerHour = GameAnalyzer.calculateExpPerHour(expGained, timeElapsed)
+            expHourValue:setText(expPerHour)
+        end
+    end
     end
 end
 
