@@ -170,9 +170,12 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setFocusable(node->value<bool>());
         else if (node->tag() == "auto-focus")
             setAutoFocusPolicy(Fw::translateAutoFocusPolicy(node->value()));
-        else if (node->tag() == "phantom")
-            setPhantom(node->value<bool>());
-        else if (node->tag() == "size")
+        else if (node->tag() == "phantom" || node->tag() == "pointer-events") {
+            if (node->tag() == "pointer-events")
+                setPhantom(node->value<std::string>() == "none");
+            else
+                setPhantom(node->value<bool>());
+        } else if (node->tag() == "size")
             setSize(node->value<Size>());
         else if (node->tag() == "fixed-size")
             setFixedSize(node->value<bool>());
