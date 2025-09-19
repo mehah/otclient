@@ -299,7 +299,73 @@ namespace {
         }
     }
 
+    inline int calcOuterWidth(UIWidget* w) {
+        const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
+        const int contentW = std::max<int>(textSz.width(),
+                              std::max<int>(w->getWidth(),
+                                           w->isOnHtml() ? w->getWidthHtml().valueCalculed : -1));
+        return contentW
+            + w->getMarginLeft() + w->getMarginRight()
+            + w->getPaddingLeft() + w->getPaddingRight();
+    }
+
+    inline int calcOuterHeight(UIWidget* w) {
+        const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
+        const int contentH = std::max<int>(textSz.height(),
+                              std::max<int>(w->getHeight(),
+                                           w->isOnHtml() ? w->getHeightHtml().valueCalculed : -1));
+        return contentH
+            + w->getMarginTop() + w->getMarginBottom()
+            + w->getPaddingTop() + w->getPaddingBottom();
+    }
+
+    inline int parentInnerWidth(UIWidget* p) {
+        const int pw = p->isOnHtml() ? p->getWidthHtml().valueCalculed : p->getWidth();
+        return std::max<int>(0, pw - p->getPaddingLeft() - p->getPaddingRight());
+    }
+
+    inline int currentInlineRunWidth(UIWidget* self) {
+        auto* parent = self->getParent().get();
+        if (!parent) return 0;
+        int run = 0;
+        for (const auto& c : parent->getChildren()) {
+            if (c.get() == self) break;
+            if (c->getDisplay() == DisplayType::None) continue;
+            if (!c->isAnchorable() || c->getPositionType() == PositionType::Absolute) continue;
+
+            const auto cf = mapLogicalFloat(c->getFloat());
+            if (cf != FloatType::None) continue;
+
+            if (breakLine(c->getDisplay())) {
+                run = 0;
+                continue;
+            }
+            if (isInlineLike(c->getDisplay())) {
+                run += calcOuterWidth(c.get());
+            } else {
+                run = 0;
+            }
+        }
+        return run;
+    }
+
     void applyInline(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
+        if (auto* parent = self->getParent().get()) {
+            const int innerW = parentInnerWidth(parent);
+            if (innerW > 0) {
+                const int runBefore = currentInlineRunWidth(self);
+                const int nextRun = runBefore + calcOuterWidth(self);
+                if (nextRun > innerW) {
+                    setLeftAnchor(self, "parent", Fw::AnchorLeft);
+                    if (!topCleared) {
+                        if (ctx.prevNonFloat) setTopAnchor(self, ctx.prevNonFloat->getId(), Fw::AnchorBottom);
+                        else                  setTopAnchor(self, "parent", Fw::AnchorTop);
+                    }
+                    return;
+                }
+            }
+        }
+
         if (!ctx.prevNonFloat) {
             if (ctx.hasLeft) {
                 setLeftAnchor(self, ctx.lastLeftFloat->getId(), Fw::AnchorRight);

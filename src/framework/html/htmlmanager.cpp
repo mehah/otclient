@@ -291,17 +291,17 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
         widget->setText(node->getText());
     }
 
-    if (!node->getChildren().empty()) {
-        const auto& styleValue = node->getAttr("style");
-        if (!styleValue.empty()) {
-            parseAttrPropList(styleValue, node->getAttrStyles());
-            for (const auto& [prop, value] : node->getAttrStyles()) {
-                if (!isDynamic && isInheritable(prop)) {
-                    setChildrenStyles(node.get(), "styles", prop, value);
-                }
+    const auto& styleValue = node->getAttr("style");
+    if (!styleValue.empty()) {
+        parseAttrPropList(styleValue, node->getAttrStyles());
+        for (const auto& [prop, value] : node->getAttrStyles()) {
+            if (!isDynamic && isInheritable(prop)) {
+                setChildrenStyles(node.get(), "styles", prop, value);
             }
         }
+    }
 
+    if (!node->getChildren().empty()) {
         for (const auto& child : node->getChildren()) {
             createWidgetFromNode(child, widget, textNodes, htmlId, moduleName, isDynamic, widgets);
         }
