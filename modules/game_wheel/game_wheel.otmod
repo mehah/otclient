@@ -1,0 +1,12 @@
+Module  
+  name: game_wheel  
+  description: Wheel of Destiny interface module  
+  author: OTClient team  
+  website: https://github.com/edubart/otclient  
+  sandboxed: true  
+  scripts: [ game_wheel ]  
+  @onLoad: |  
+    dofile 'game_wheel'  
+    controllerWheel:init()  
+  @onUnload: |  
+    controllerWheel:terminate()
