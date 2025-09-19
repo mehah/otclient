@@ -446,7 +446,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const HtmlNodePtr& htmlNode, c
             const auto node = widget->getHtmlNode().get();
             const auto w = widget.get();
             applyAttributesAndStyles(w, node, root.groups, moduleName);
-            w->scheduleAnchorAlignment();
+            w->scheduleHtmlTask(PropApplyAnchorAlignment);
             w->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName, node->toString());
         }
     };

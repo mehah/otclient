@@ -444,7 +444,7 @@ void UIWidget::refreshHtml(bool childrenTo) {
 
     if (childrenTo) {
         for (const auto& child : m_children) {
-            child->scheduleAnchorAlignment();
+            child->scheduleHtmlTask(PropApplyAnchorAlignment);
         }
     }
 
@@ -505,18 +505,18 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
             } else {
                 setFitProp(true);
             }
-            scheduleUpdateSize();
+            scheduleHtmlTask(PropUpdateSize);
             break;
         }
         case Unit::FitContent: {
             setFitProp(true);
-            scheduleUpdateSize();
+            scheduleHtmlTask(PropUpdateSize);
             break;
         }
         case Unit::Percent: {
             if (m_displayType != DisplayType::Inline) {
                 setProp(isWidth ? PropWidthPercent : PropHeightPercent, true);
-                scheduleUpdateSize();
+                scheduleHtmlTask(PropUpdateSize);
             }
             break;
         }
@@ -544,15 +544,39 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
     }
 }
 
-void UIWidget::scheduleUpdateSize() {
-    WIDGET_QUEUE.emplace_back(static_self_cast<UIWidget>());
+void UIWidget::scheduleHtmlTask(FlagProp prop) {
+    bool schedule = false;
+
+    switch (prop) {
+        case PropUpdateSize:
+        case PropApplyAnchorAlignment:
+            schedule = true;
+            break;
+
+        default: return;
+    }
+
+    if (schedule && !hasProp(PropApplyAnchorAlignment) && !hasProp(PropUpdateSize))
+        WIDGET_QUEUE.emplace_back(static_self_cast<UIWidget>());
+
+    setProp(prop, true);
+
     if (FLUSH_PENDING)
         return;
 
     FLUSH_PENDING = true;
     g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        for (const auto& widget : WIDGET_QUEUE)
-            widget->updateSize();
+        for (const auto& widget : WIDGET_QUEUE) {
+            if (widget->hasProp(PropUpdateSize)) {
+                widget->updateSize();
+                widget->setProp(PropUpdateSize, false);
+            }
+
+            if (widget->hasProp(PropApplyAnchorAlignment)) {
+                widget->applyAnchorAlignment();
+                widget->setProp(PropApplyAnchorAlignment, false);
+            }
+        }
 
         WIDGET_QUEUE.clear();
         FLUSH_PENDING = false;
@@ -566,7 +590,7 @@ void UIWidget::setOverflow(OverflowType type) {
 
     m_overflowType = type;
 
-    scheduleAnchorAlignment();
+    scheduleHtmlTask(PropApplyAnchorAlignment);
 
     // Only Vertical
     if (type == OverflowType::Scroll) {
@@ -609,7 +633,7 @@ void UIWidget::setDisplay(DisplayType type) {
 
     auto old = m_displayType;
     m_displayType = type;
-    scheduleAnchorAlignment();
+    scheduleHtmlTask(PropApplyAnchorAlignment);
 
     if (type == DisplayType::None) {
         setVisible(false);
@@ -753,17 +777,6 @@ void UIWidget::updateSize() {
     }
 
     fitContent(this);
-}
-
-void UIWidget::scheduleAnchorAlignment() {
-    if (hasProp(PropApplyAnchorAlignment))
-        return;
-
-    setProp(PropApplyAnchorAlignment, true);
-    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        self->applyAnchorAlignment();
-        self->setProp(PropApplyAnchorAlignment, false);
-    });
 }
 
 void UIWidget::applyAnchorAlignment() {

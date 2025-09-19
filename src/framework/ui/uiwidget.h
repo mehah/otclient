@@ -80,7 +80,8 @@ enum FlagProp : uint64_t
     PropWidthAuto = 1 << 29,
     PropWidthPercent = 1 << 30,
     PropHeightPercent = static_cast<uint64_t>(1) << 31,
-    PropIgnoreMouseEvent = static_cast<uint64_t>(1) << 32
+    PropIgnoreMouseEvent = static_cast<uint64_t>(1) << 32,
+    PropUpdateSize = static_cast<uint64_t>(1) << 33,
 };
 
 enum class DisplayType : uint8_t
@@ -294,13 +295,13 @@ public:
     void setAutoRepeatDelay(const int delay) { m_autoRepeatDelay = delay; }
     void setVirtualOffset(const Point& offset);
     void setDisplay(DisplayType type);
-    void setFloat(FloatType type) { m_floatType = type; scheduleAnchorAlignment(); }
-    void setClear(ClearType type) { m_clearType = type; scheduleAnchorAlignment(); }
-    void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type; scheduleAnchorAlignment(); }
-    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; scheduleAnchorAlignment(); }
+    void setFloat(FloatType type) { m_floatType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setClear(ClearType type) { m_clearType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setOverflow(OverflowType type);
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
-    void setPositionType(PositionType t) { m_positionType = t; scheduleAnchorAlignment(); }
+    void setPositionType(PositionType t) { m_positionType = t;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setPositions(std::string_view type, std::string_view value);
 
     auto& getPositions() { return m_positions; }
@@ -409,7 +410,6 @@ protected:
     void repaint();
     bool setState(Fw::WidgetState state, bool on);
     bool hasState(Fw::WidgetState state);
-    void scheduleAnchorAlignment();
 
 private:
     void internalDestroy();
@@ -417,10 +417,10 @@ private:
     void updateStates();
     void updateChildrenIndexStates();
     void updateStyle();
-    void applyAnchorAlignment();
 
-    void scheduleUpdateSize();
     void updateSize();
+    void applyAnchorAlignment();
+    void scheduleHtmlTask(FlagProp prop);
 
     OTMLNodePtr m_stateStyle;
     int32_t m_states{ Fw::DefaultState };
@@ -559,10 +559,10 @@ public:
     void setX(const int x) { move(x, getY()); }
     void setY(const int y) { move(getX(), y); }
 
-    void setTop(int v) { m_positions.top.unit = Unit::Px; m_positions.top.value = v; scheduleAnchorAlignment(); updateLayout(); }
-    void setBottom(int v) { m_positions.top.unit = Unit::Px; m_positions.bottom.value = v; scheduleAnchorAlignment(); updateLayout(); }
-    void setLeft(int v) { m_positions.top.unit = Unit::Px; m_positions.left.value = v; scheduleAnchorAlignment(); updateLayout(); }
-    void setRight(int v) { m_positions.top.unit = Unit::Px; m_positions.right.value = v; scheduleAnchorAlignment(); updateLayout(); }
+    void setTop(int v) { m_positions.top.unit = Unit::Px; m_positions.top.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setBottom(int v) { m_positions.top.unit = Unit::Px; m_positions.bottom.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setLeft(int v) { m_positions.top.unit = Unit::Px; m_positions.left.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
+    void setRight(int v) { m_positions.top.unit = Unit::Px; m_positions.right.value = v;  scheduleHtmlTask(PropApplyAnchorAlignment); updateLayout(); }
 
     void setHeight(std::string heightStr) { applyDimension(false, std::move(heightStr)); }
     void setWidth(std::string widthStr) { applyDimension(true, std::move(widthStr)); }
