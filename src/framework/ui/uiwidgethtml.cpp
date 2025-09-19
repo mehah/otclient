@@ -28,7 +28,7 @@
 namespace {
     static uint32_t UPDATE_EPOCH = 1;
     static bool FLUSH_PENDING = false;
-    std::vector<UIWidgetPtr> WIDGET_QUEUE;
+    static std::vector<UIWidgetPtr> WIDGET_QUEUE;
 
     inline bool isInlineLike(DisplayType d) {
         switch (d) {
@@ -481,45 +481,30 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
 }
 
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
-    auto setFitProp = [&](bool on) {
-        if (isWidth) setProp(PropFitWidth, on);
-        else         setProp(PropFitHeight, on);
-    };
-    auto setPx = [&](int px) {
-    };
-
     int16_t valueCalculed = -1;
 
-    setFitProp(false);
-    setProp(PropWidthAuto, false);
-    setProp(isWidth ? PropWidthPercent : PropHeightPercent, false);
+    bool updateFitProp = false;
+    bool updateSizePercentProp = false;
+    bool updateWidthAuto = false;
 
     switch (unit) {
         case Unit::Auto: {
-            if (isWidth) {
-                if (m_displayType == DisplayType::Block) {
-                    if (m_parent) setProp(PropWidthAuto, true);
-                } else {
-                    setFitProp(true);
-                }
+            if (isWidth && m_displayType == DisplayType::Block) {
+                updateWidthAuto = m_parent != nullptr;
             } else {
-                setFitProp(true);
+                updateFitProp = true;
             }
-            scheduleHtmlTask(PropUpdateSize);
             break;
         }
         case Unit::FitContent: {
-            setFitProp(true);
-            scheduleHtmlTask(PropUpdateSize);
+            updateFitProp = true;
             break;
         }
         case Unit::Percent: {
-            if (m_displayType != DisplayType::Inline) {
-                setProp(isWidth ? PropWidthPercent : PropHeightPercent, true);
-                scheduleHtmlTask(PropUpdateSize);
-            }
+            updateSizePercentProp = m_displayType != DisplayType::Inline;
             break;
         }
+
         case Unit::Em:
         case Unit::Px:
         case Unit::Invalid:
@@ -535,13 +520,22 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         }
     }
 
-    if (m_htmlNode) {
-        if (isWidth) {
-            m_width = { unit , value, valueCalculed };
-        } else {
-            m_height = { unit , value, valueCalculed };
-        }
+    if (!isOnHtml())
+        return;
+
+    if (isWidth) {
+        setProp(PropWidthAuto, updateWidthAuto);
+        setProp(PropFitWidth, updateFitProp);
+        setProp(PropWidthPercent, updateSizePercentProp);
+        m_width = { unit , value, valueCalculed };
+    } else {
+        setProp(PropFitHeight, updateFitProp);
+        setProp(PropHeightPercent, updateSizePercentProp);
+        m_height = { unit , value, valueCalculed };
     }
+
+    if (updateSizePercentProp || updateWidthAuto || updateFitProp)
+        scheduleHtmlTask(PropUpdateSize);
 }
 
 void UIWidget::scheduleHtmlTask(FlagProp prop) {
