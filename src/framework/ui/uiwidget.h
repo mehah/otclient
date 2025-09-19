@@ -75,13 +75,8 @@ enum FlagProp : uint64_t
     PropUpdateChildrenIndexStates = 1 << 24,
     PropDisableUpdateTemporarily = 1 << 25,
     PropApplyAnchorAlignment = 1 << 26,
-    PropFitWidth = 1 << 27,
-    PropFitHeight = 1 << 28,
-    PropWidthAuto = 1 << 29,
-    PropWidthPercent = 1 << 30,
-    PropHeightPercent = static_cast<uint64_t>(1) << 31,
-    PropIgnoreMouseEvent = static_cast<uint64_t>(1) << 32,
-    PropUpdateSize = static_cast<uint64_t>(1) << 33,
+    PropUpdateSize = 1 << 27,
+    PropIgnoreMouseEvent = 1 << 28
 };
 
 enum class DisplayType : uint8_t
@@ -150,17 +145,31 @@ enum class OverflowType : uint8_t
 
 struct SizeUnit
 {
+    bool needsUpdate(Unit _unit) {
+        return pendingUpdate && unit == _unit;
+    }
+
+    bool needsUpdate(Unit _unit, uint32_t _version) {
+        return pendingUpdate && unit == _unit && version != _version;
+    }
+
+    void applyUpdate(int16_t v, uint32_t newVersion) {
+        valueCalculed = v;
+        version = newVersion;
+        pendingUpdate = false;
+    }
+
+    SizeUnit() = default;
+    SizeUnit(Unit u) : unit(u) {}
+    SizeUnit(int16_t v) : unit(Unit::Px), value(v) {}
+    SizeUnit(Unit u, int16_t v, int16_t valueCalculed, uint32_t needUpdate)
+        : unit(u), value(v), valueCalculed(valueCalculed), pendingUpdate(needUpdate) {}
+
     Unit unit = Unit::Px;
     int16_t value = 0;
     int16_t valueCalculed = -1;
-    uint32_t updateId = 0;
-    SizeUnit() = default;
-    SizeUnit(Unit u)
-        : unit(u) {}
-    SizeUnit(int16_t v)
-        : unit(Unit::Px), value(v) {}
-    SizeUnit(Unit u, int16_t v, int16_t vCalc = -1, uint32_t updId = 0)
-        : unit(u), value(v), valueCalculed(vCalc), updateId(updId) {}
+    uint32_t version = 0;
+    bool pendingUpdate = false;
 };
 
 enum class PositionType : uint8_t

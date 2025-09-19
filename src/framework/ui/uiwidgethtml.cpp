@@ -26,7 +26,7 @@
 #include <framework/html/htmlmanager.h>
 
 namespace {
-    static uint32_t UPDATE_EPOCH = 1;
+    static uint32_t VERSION_EPOCH = 1;
     static bool FLUSH_PENDING = false;
     static std::vector<UIWidgetPtr> WIDGET_QUEUE;
 
@@ -361,30 +361,24 @@ namespace {
     void updateDimension(UIWidget* widget, int width, int height) {
         bool checkChildren = false;
 
-        if (widget->hasProp(PropWidthPercent) || widget->hasProp(PropWidthAuto)) {
+        if (widget->getWidthHtml().needsUpdate(Unit::Percent) || widget->getWidthHtml().needsUpdate(Unit::Auto)) {
             width -= (widget->getMarginLeft() + widget->getMarginRight());
-            if (widget->getWidthHtml().updateId != UPDATE_EPOCH) {
-                if (widget->hasProp(PropWidthPercent))
+
+            if (widget->getWidthHtml().version != VERSION_EPOCH) {
+                if (widget->getWidthHtml().needsUpdate(Unit::Percent))
                     width = std::round(width * (widget->getWidthHtml().value / 100.0));
 
                 widget->setWidth_px(width);
-                widget->getWidthHtml().updateId = UPDATE_EPOCH;
-                widget->getWidthHtml().valueCalculed = width;
-
-                widget->setProp(PropWidthAuto, false);
-                widget->setProp(PropWidthPercent, false);
+                widget->getWidthHtml().applyUpdate(width, VERSION_EPOCH);
 
                 checkChildren = true;
             }
         }
 
-        if (widget->hasProp(PropHeightPercent) && widget->getHeightHtml().updateId != UPDATE_EPOCH) {
+        if (widget->getHeightHtml().needsUpdate(Unit::Percent, VERSION_EPOCH)) {
             height = std::round(height * (widget->getHeightHtml().value / 100.0));
             widget->setHeight_px(height);
-            widget->getHeightHtml().valueCalculed = height;
-            widget->getHeightHtml().updateId = UPDATE_EPOCH;
-            widget->setProp(PropHeightPercent, false);
-
+            widget->getHeightHtml().applyUpdate(height, VERSION_EPOCH);
             checkChildren = true;
         }
 
@@ -398,45 +392,6 @@ namespace {
             }
         }
     }
-
-    void fitContent(UIWidget* w) {
-        if ((w->hasProp(PropFitWidth) || w->hasProp(PropFitHeight)) && !w->getChildren().empty() &&
-            (w->getWidthHtml().updateId != UPDATE_EPOCH || w->getHeightHtml().updateId != UPDATE_EPOCH)) {
-            int width = 0;
-            int height = 0;
-            for (auto& c : w->getChildren()) {
-                if (c->getFloat() == FloatType::None && c->getPositionType() != PositionType::Absolute) {
-                    const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
-
-                    const int c_width = std::max<int>(textSize.width(), std::max<int>(c->getWidth(), c->getWidthHtml().valueCalculed)) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
-                    if (breakLine(c->getDisplay())) {
-                        if (c_width > width)
-                            width = c_width;
-                    } else  width += c_width;
-
-                    const int c_height = std::max<int>(textSize.height(), std::max<int>(c->getHeight(), c->getHeightHtml().valueCalculed)) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
-                    if (breakLine(c->getDisplay()) || c->getPrevWidget() && breakLine(c->getPrevWidget()->getDisplay())) {
-                        height += c_height;
-                    } else if (c_height > height)
-                        height = c_height;
-                }
-            }
-
-            if (w->hasProp(PropFitWidth) && w->getWidthHtml().updateId != UPDATE_EPOCH) {
-                w->setWidth_px(width + w->getPaddingLeft() + w->getPaddingRight());
-                w->setProp(PropFitWidth, false);
-                w->getWidthHtml().valueCalculed = w->getWidth();
-                w->getWidthHtml().updateId = UPDATE_EPOCH;
-            }
-
-            if (w->hasProp(PropFitHeight) && w->getHeightHtml().updateId != UPDATE_EPOCH) {
-                w->setHeight_px(height + w->getPaddingTop() + w->getPaddingBottom());
-                w->setProp(PropFitHeight, false);
-                w->getHeightHtml().valueCalculed = w->getHeight();
-                w->getHeightHtml().updateId = UPDATE_EPOCH;
-            }
-        }
-    };
 }
 
 void UIWidget::refreshHtml(bool childrenTo) {
@@ -465,7 +420,7 @@ void UIWidget::setLineHeight(std::string valueStr) {
     const std::string_view sv = valueStr;
     const Unit unit = detectUnit(sv);
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
-    m_lineHeight = { unit, num, num };
+    m_lineHeight = { unit, num, num, true };
 }
 
 void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
@@ -483,25 +438,24 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
     int16_t valueCalculed = -1;
 
-    bool updateFitProp = false;
-    bool updateSizePercentProp = false;
-    bool updateWidthAuto = false;
+    bool needUpdate = false;
 
     switch (unit) {
         case Unit::Auto: {
             if (isWidth && m_displayType == DisplayType::Block) {
-                updateWidthAuto = m_parent != nullptr;
+                needUpdate = m_parent != nullptr;
             } else {
-                updateFitProp = true;
+                unit = Unit::FitContent;
+                needUpdate = true;
             }
             break;
         }
         case Unit::FitContent: {
-            updateFitProp = true;
+            needUpdate = true;
             break;
         }
         case Unit::Percent: {
-            updateSizePercentProp = m_displayType != DisplayType::Inline;
+            needUpdate = m_displayType != DisplayType::Inline;
             break;
         }
 
@@ -524,17 +478,12 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         return;
 
     if (isWidth) {
-        setProp(PropWidthAuto, updateWidthAuto);
-        setProp(PropFitWidth, updateFitProp);
-        setProp(PropWidthPercent, updateSizePercentProp);
-        m_width = { unit , value, valueCalculed };
+        m_width = { unit , value, valueCalculed, needUpdate };
     } else {
-        setProp(PropFitHeight, updateFitProp);
-        setProp(PropHeightPercent, updateSizePercentProp);
-        m_height = { unit , value, valueCalculed };
+        m_height = { unit , value, valueCalculed, needUpdate };
     }
 
-    if (updateSizePercentProp || updateWidthAuto || updateFitProp)
+    if (needUpdate)
         scheduleHtmlTask(PropUpdateSize);
 }
 
@@ -574,7 +523,7 @@ void UIWidget::scheduleHtmlTask(FlagProp prop) {
 
         WIDGET_QUEUE.clear();
         FLUSH_PENDING = false;
-        ++UPDATE_EPOCH;
+        ++VERSION_EPOCH;
     });
 }
 
@@ -672,17 +621,14 @@ UIWidgetPtr UIWidget::getVirtualParent() const {
 void UIWidget::updateSize() {
     if (!isAnchorable()) return;
 
-    auto widthNeedUpdate = m_width.updateId != UPDATE_EPOCH;
-    auto heightNeedUpdate = m_height.updateId != UPDATE_EPOCH;
-
     if (m_positionType == PositionType::Absolute) {
         const bool L = m_positions.left.unit != Unit::Auto;
         const bool R = m_positions.right.unit != Unit::Auto;
         const bool T = m_positions.top.unit != Unit::Auto;
         const bool B = m_positions.bottom.unit != Unit::Auto;
 
-        const auto updateWidth = widthNeedUpdate && hasProp(PropWidthAuto) && L && R;
-        const auto updateHeigth = heightNeedUpdate && hasProp(PropFitHeight) && T && B;
+        const auto updateWidth = m_width.needsUpdate(Unit::Auto, VERSION_EPOCH) && L && R;
+        const auto updateHeigth = m_height.needsUpdate(Unit::FitContent, VERSION_EPOCH) && T && B;
 
         if (updateWidth || updateHeigth) {
             static auto pxW = [](const SizeUnit& u, int pW) { return u.unit == Unit::Percent ? (pW * int(u.value)) / 100 : int(u.value); };
@@ -700,10 +646,7 @@ void UIWidget::updateSize() {
                     - (m_positions.right.unit == Unit::Percent ? (pW * m_positions.right.value) / 100 : m_positions.right.value)
                     - (getPaddingLeft() + getPaddingRight());
                 setWidth_px(std::max<int>(0, w));
-                getWidthHtml().updateId = UPDATE_EPOCH;
-                getWidthHtml().valueCalculed = getWidth();
-                setProp(PropWidthAuto, false);
-                widthNeedUpdate = false;
+                m_width.applyUpdate(getWidth(), VERSION_EPOCH);
             }
 
             if (updateHeigth) {
@@ -712,47 +655,41 @@ void UIWidget::updateSize() {
                     - (m_positions.bottom.unit == Unit::Percent ? (pH * m_positions.bottom.value) / 100 : m_positions.bottom.value)
                     - (getPaddingTop() + getPaddingBottom());
                 setHeight_px(std::max<int>(0, h));
-                getHeightHtml().updateId = UPDATE_EPOCH;
-                getHeightHtml().valueCalculed = getHeight();
-                setProp(PropFitHeight, false);
-                heightNeedUpdate = false;
+                m_height.applyUpdate(getHeight(), VERSION_EPOCH);
             }
         }
     }
 
-    if ((hasProp(PropWidthAuto) || hasProp(PropWidthPercent)) && widthNeedUpdate || (hasProp(PropHeightPercent) && heightNeedUpdate)) {
+    const bool widthNeedsUpdate = m_width.needsUpdate(Unit::Auto, VERSION_EPOCH) || m_width.needsUpdate(Unit::Percent, VERSION_EPOCH);
+    const bool heightNeedsUpdate = m_height.needsUpdate(Unit::Percent, VERSION_EPOCH);
+
+    if (widthNeedsUpdate || heightNeedsUpdate) {
         auto width = -1;
         auto height = -1;
         auto parent = m_parent;
         while (parent) {
-            if (m_positionType == PositionType::Absolute && m_parent->m_positionType == PositionType::Static) {
+            if (m_positionType == PositionType::Absolute && parent->m_positionType == PositionType::Static) {
                 parent = parent->m_parent;
                 continue;
             }
 
-            if (widthNeedUpdate && (hasProp(PropWidthAuto) || hasProp(PropWidthPercent))) {
+            if (widthNeedsUpdate) {
                 auto v = (parent->isOnHtml() ? parent->getWidthHtml().valueCalculed : parent->getWidth());
                 if (v > -1) width = v - parent->getPaddingLeft() - parent->getPaddingRight();
             }
 
-            if (heightNeedUpdate && hasProp(PropHeightPercent)) {
+            if (heightNeedsUpdate) {
                 auto v = (parent->isOnHtml() ? parent->getHeightHtml().valueCalculed : parent->getHeight());
                 if (v > -1) height = v - parent->getPaddingTop() - parent->getPaddingBottom();
             }
 
-            if (hasProp(PropWidthPercent) && hasProp(PropHeightPercent)) {
+            if (widthNeedsUpdate && heightNeedsUpdate) {
                 if (width > -1 && height > -1)
                     break;
-            } else if (hasProp(PropWidthAuto) && hasProp(PropHeightPercent)) {
-                if (width > -1 && height > -1)
-                    break;
-            } else if (hasProp(PropWidthAuto)) {
+            } else if (widthNeedsUpdate) {
                 if (width > -1)
                     break;
-            } else if (hasProp(PropWidthPercent)) {
-                if (width > -1)
-                    break;
-            } else if (hasProp(PropHeightPercent))
+            } else if (heightNeedsUpdate)
                 if (height > -1)
                     break;
 
@@ -765,12 +702,42 @@ void UIWidget::updateSize() {
     }
 
     if (m_children.empty()) {
-        setProp(PropFitWidth, false);
-        setProp(PropFitHeight, false);
+        m_width.pendingUpdate = false;
+        m_height.pendingUpdate = false;
         return;
     }
 
-    fitContent(this);
+    if (m_width.needsUpdate(Unit::FitContent, VERSION_EPOCH) || m_width.needsUpdate(Unit::FitContent, VERSION_EPOCH)) {
+        int width = 0;
+        int height = 0;
+        for (auto& c : getChildren()) {
+            if (c->getFloat() == FloatType::None && c->getPositionType() != PositionType::Absolute) {
+                const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
+
+                const int c_width = std::max<int>(textSize.width(), std::max<int>(c->getWidth(), c->getWidthHtml().valueCalculed)) + c->getMarginRight() + c->getMarginLeft() + c->getPaddingLeft() + c->getPaddingRight();
+                if (breakLine(c->getDisplay())) {
+                    if (c_width > width)
+                        width = c_width;
+                } else  width += c_width;
+
+                const int c_height = std::max<int>(textSize.height(), std::max<int>(c->getHeight(), c->getHeightHtml().valueCalculed)) + c->getMarginBottom() + c->getMarginTop() + c->getPaddingTop() + c->getPaddingBottom();
+                if (breakLine(c->getDisplay()) || c->getPrevWidget() && breakLine(c->getPrevWidget()->getDisplay())) {
+                    height += c_height;
+                } else if (c_height > height)
+                    height = c_height;
+            }
+        }
+
+        if (m_width.needsUpdate(Unit::FitContent, VERSION_EPOCH)) {
+            setWidth_px(width + getPaddingLeft() + getPaddingRight());
+            m_width.applyUpdate(getWidth(), VERSION_EPOCH);
+        }
+
+        if (m_height.needsUpdate(Unit::FitContent, VERSION_EPOCH)) {
+            setHeight_px(height + getPaddingTop() + getPaddingBottom());
+            m_height.applyUpdate(getHeight(), VERSION_EPOCH);
+        }
+    }
 }
 
 void UIWidget::applyAnchorAlignment() {
