@@ -1484,15 +1484,12 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 
 UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool wantsPhantom)
 {
-    if (!containsPaddingPoint(childPos))
-        return nullptr;
-
     for (auto& child : std::ranges::reverse_view(m_children)) {
-        if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
+        if (child->isExplicitlyVisible()) {
             if (const auto& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
                 return subChild;
 
-            if (wantsPhantom || !child->isPhantom())
+            if (child->containsPoint(childPos) && (wantsPhantom || !child->isPhantom()))
                 return child;
         }
     }
@@ -1528,16 +1525,14 @@ UIWidgetList UIWidget::recursiveGetChildren()
 
 UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
 {
-    if (!containsPaddingPoint(childPos))
-        return {};
-
     UIWidgetList children;
     for (auto& child : std::ranges::reverse_view(m_children)) {
-        if (child->isExplicitlyVisible() && child->containsPoint(childPos)) {
+        if (child->isExplicitlyVisible()) {
             if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
 
-            children.emplace_back(child);
+            if (child->containsPoint(childPos))
+                children.emplace_back(child);
         }
     }
 
@@ -1547,15 +1542,14 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
 UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
 {
     UIWidgetList children;
-    if (!containsPaddingPoint(childPos))
-        return children;
 
     for (auto& child : std::ranges::reverse_view(m_children)) {
-        if (child->isExplicitlyVisible() && child->containsMarginPoint(childPos)) {
+        if (child->isExplicitlyVisible()) {
             UIWidgetList subChildren = child->recursiveGetChildrenByMarginPos(childPos);
             if (!subChildren.empty())
                 children.insert(children.end(), subChildren.begin(), subChildren.end());
-            children.emplace_back(child);
+            if (child->containsMarginPoint(childPos))
+                children.emplace_back(child);
         }
     }
     return children;
