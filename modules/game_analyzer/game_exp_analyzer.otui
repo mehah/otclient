@@ -165,6 +165,21 @@ MiniWindow
       margin-top: 13
       margin-left: 5
       margin-left: 10
+  
+    UIGraph
+      id: expGraphAnalyzer
+      anchors.right: parent.right
+      anchors.left: parent.left
+      anchors.top: prev.top
+      height: 100
+      capacity: 400
+      margin-top: 5
+      margin-left: 5
+      margin-right: 5
+      background-color: #383636
+      padding: 5
+      font: verdana-11px-rounded
+      image-source: /images/ui/graph_background-v2
 
   UIWidget
     id: miniborder
