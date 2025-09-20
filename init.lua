@@ -60,6 +60,9 @@ if not g_resources.addSearchPath(g_resources.getWorkDir() .. 'modules', true) th
     g_logger.fatal('Unable to add modules directory to the search path.')
 end
 
+g_html.addGlobalStyle('/data/styles/html.css')
+g_html.addGlobalStyle('/data/styles/custom.css')
+
 -- try to add mods path too
 g_resources.addSearchPath(g_resources.getWorkDir() .. 'mods', true)
 
@@ -104,7 +107,7 @@ local function loadModules()
     end
 
     -- uncomment the line below so that modules are reloaded when modified. (Note: Use only mod dev)
-    --g_modules.enableAutoReload()
+    -- g_modules.enableAutoReload()
 end
 
 -- run updater, must use data.zip

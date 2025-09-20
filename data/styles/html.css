@@ -1,0 +1,195 @@
+* {
+    height: auto;
+    width: auto;
+    color: white;
+    background-color: alpha;
+    opacity: 1.0;
+    rotate: 0;
+    text-align: left;
+    overflow: visible;
+    display: inline;
+    --icon-color: white;
+    --icon-align: none;
+    --text-draw-order: 0;
+    --image-draw-order: 0;
+    --icon-draw-order: 0;
+    --border-draw-order: 0;
+    --background-draw-order: 0;
+    --image-color: white;
+}
+
+button {
+    --inherit-text: true;
+    text-align: center;
+}
+
+input[type=radio],
+input[type=checkbox] {
+    --text-auto-resize: true;
+}
+
+input[type=password] {
+    --text-hidden: true;
+}
+
+textarea {
+    white-space: pre;
+    width: 128;
+    height: 128;
+}
+
+select {
+    min-width: 24;
+    min-height: 12;
+    text-align: center;
+}
+
+br {
+    display: block;
+    height: 15;
+}
+
+div {
+    display: block;
+}
+
+pre {
+    display: block;
+    white-space: pre;
+    margin: 16 0;
+}
+
+hr {
+    display: block;
+    height: 1;
+    margin-top: 8;
+    margin-bottom: 8;
+}
+
+
+span,
+label {
+    --text-auto-resize: true;
+}
+
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    display: block;
+    margin-top: 11;
+    margin-bottom: 11;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+h1,
+h1 *,
+h2,
+h2 *,
+h3,
+h3 *,
+h4,
+h4 *,
+h5,
+h5 *,
+h6,
+h6 * {
+    font: terminus-14px-bold;
+}
+
+h1,
+h1 * {
+    --font-scale: 2.0;
+}
+
+h2,
+h2 * {
+    --font-scale: 1.5;
+}
+
+h3,
+h3 * {
+    --font-scale: 1;
+}
+
+h4,
+h4 * {
+    --font-scale: 0.8;
+}
+
+h5,
+h5 * {
+    --font-scale: 0.5;
+}
+
+h6,
+h6 * {
+    --font-scale: 0.3;
+}
+
+table,
+thead,
+tbody,
+tfoot,
+tr,
+td,
+th {
+    width: fit-content;
+    height: fit-content;
+}
+
+td,
+th {
+    padding: 1;
+}
+
+table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 2px;
+}
+
+thead {
+    display: table-header-group;
+}
+
+tbody {
+    display: table-row-group;
+}
+
+tfoot {
+    display: table-footer-group;
+}
+
+tr {
+    display: table-row;
+}
+
+td {
+    display: table-cell;
+}
+
+th {
+    display: table-cell;
+    font-weight: bold;
+    text-align: center;
+}
+
+colgroup {
+    display: table-column-group;
+}
+
+col {
+    display: table-column;
+}
+
+caption {
+    display: table-caption;
+    text-align: center;
+    caption-side: top;
+}

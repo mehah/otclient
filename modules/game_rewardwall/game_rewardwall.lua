@@ -396,6 +396,7 @@ function show()
     rewardWallController.ui:show()
     rewardWallController.ui:raise()
     rewardWallController.ui:focus()
+    rewardWallController.ui:centerIn('parent')
     connectOnServerError()
     premiumStatusWindwos(g_game.getLocalPlayer():isPremium())
 end
@@ -423,7 +424,6 @@ function toggle()
 end
 
 local function fixCssIncompatibility() -- temp
-    rewardWallController.ui:centerIn('parent') -- mainWindows to the center of the screen
     rewardWallController.ui.historyPanel.historyList:fill('parent')
 
     -- note: I don't know how to edit children in css

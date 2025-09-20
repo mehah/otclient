@@ -12,6 +12,7 @@
         FRAMEWORK_NET;
         FRAMEWORK_SOUND;
         BUILD_TYPE="RelWithDebInfo";
+        NOMINMAX;
     </PREPROCESSOR_DEFS>
 
     <OTCLIENT_LIBDEPS>

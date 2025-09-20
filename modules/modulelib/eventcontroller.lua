@@ -48,7 +48,7 @@ function EventController:destroy()
 end
 
 function EventController:isWidget()
-    return self.actor.addChild ~= nil
+    return self.actor and self.actor.addChild ~= nil
 end
 
 function EventController:actorIsDestroyed()
