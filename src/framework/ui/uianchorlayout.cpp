@@ -265,6 +265,9 @@ bool UIAnchorLayout::updateWidget(const UIWidgetPtr& widget, const UIAnchorGroup
 
                     if (widget->getPositionType() == PositionType::Relative || widget->getPositionType() == PositionType::Absolute)
                         margin += widget->getPositions().left.value;
+
+                    // Fix anchor position
+                    margin += (anchor->getAnchoredEdge() == anchor->getHookedEdge() ? 0 : 1);
                 }
                 if (!horizontalMoved) {
                     newRect.moveLeft(point + margin);

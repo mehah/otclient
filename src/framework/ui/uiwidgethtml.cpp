@@ -30,7 +30,7 @@ namespace {
     static bool FLUSH_PENDING = false;
     static std::vector<UIWidgetPtr> WIDGET_QUEUE;
 
-    inline bool isInlineLike(DisplayType d) {
+    static bool isInlineLike(DisplayType d) {
         switch (d) {
             case DisplayType::Inline:
             case DisplayType::InlineBlock:
@@ -39,14 +39,14 @@ namespace {
             default: return false;
         }
     }
-    inline bool isFlexContainer(DisplayType d) {
+    static bool isFlexContainer(DisplayType d) {
         return d == DisplayType::Flex || d == DisplayType::InlineFlex;
     }
-    inline bool isGridContainer(DisplayType d) {
+    static bool isGridContainer(DisplayType d) {
         return d == DisplayType::Grid || d == DisplayType::InlineGrid;
     }
 
-    inline bool isTableBox(DisplayType d) {
+    static bool isTableBox(DisplayType d) {
         switch (d) {
             case DisplayType::Table:
             case DisplayType::TableRowGroup:
@@ -63,7 +63,7 @@ namespace {
         }
     }
 
-    inline bool breakLine(DisplayType d) {
+    static bool breakLine(DisplayType d) {
         switch (d) {
             case DisplayType::Block:
             case DisplayType::Flex:
@@ -81,7 +81,7 @@ namespace {
         }
     }
 
-    inline bool isTableContainer(DisplayType d) {
+    static bool isTableContainer(DisplayType d) {
         return d == DisplayType::Table
             || d == DisplayType::TableRowGroup
             || d == DisplayType::TableHeaderGroup
@@ -89,12 +89,12 @@ namespace {
             || d == DisplayType::TableRow;
     }
 
-    inline FloatType mapLogicalFloat(FloatType f) {
+    static FloatType mapLogicalFloat(FloatType f) {
         if (f == FloatType::InlineStart) return FloatType::Left;
         if (f == FloatType::InlineEnd)   return FloatType::Right;
         return f;
     }
-    inline ClearType mapLogicalClear(ClearType c) {
+    static ClearType mapLogicalClear(ClearType c) {
         if (c == ClearType::InlineStart) return ClearType::Left;
         if (c == ClearType::InlineEnd)   return ClearType::Right;
         return c;
@@ -114,14 +114,14 @@ namespace {
         bool hasRight = false;
     };
 
-    inline void anchorToParentTL(UIWidget* self) {
+    static void anchorToParentTL(UIWidget* self) {
         self->removeAnchor(Fw::AnchorLeft);
         self->removeAnchor(Fw::AnchorTop);
         self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
         self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
     }
 
-    void applyTableChild(UIWidget* self, const FlowCtx& ctx, bool topCleared)
+    static void applyTableChild(UIWidget* self, const FlowCtx& ctx, bool topCleared)
     {
         self->removeAnchor(Fw::AnchorLeft);
         self->removeAnchor(Fw::AnchorRight);
@@ -139,7 +139,7 @@ namespace {
         }
     }
 
-    void applyTableRowGroupChild(UIWidget* self, const FlowCtx& ctx, bool topCleared)
+    static void applyTableRowGroupChild(UIWidget* self, const FlowCtx& ctx, bool topCleared)
     {
         self->removeAnchor(Fw::AnchorLeft);
         self->removeAnchor(Fw::AnchorRight);
@@ -155,7 +155,7 @@ namespace {
         }
     }
 
-    void applyTableRowChild(UIWidget* self, const FlowCtx& ctx, bool topCleared)
+    static void applyTableRowChild(UIWidget* self, const FlowCtx& ctx, bool topCleared)
     {
         self->removeAnchor(Fw::AnchorTop);
         self->removeAnchor(Fw::AnchorBottom);
@@ -171,7 +171,7 @@ namespace {
         }
     }
 
-    void applyTableCaption(UIWidget* self, const FlowCtx& /*ctx*/, bool /*topCleared*/)
+    static void applyTableCaption(UIWidget* self, const FlowCtx& /*ctx*/, bool /*topCleared*/)
     {
         self->removeAnchor(Fw::AnchorLeft);
         self->removeAnchor(Fw::AnchorRight);
@@ -182,7 +182,7 @@ namespace {
         self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
     }
 
-    void applyTableColumnLike(UIWidget* self)
+    static void applyTableColumnLike(UIWidget* self)
     {
         self->removeAnchor(Fw::AnchorLeft);
         self->removeAnchor(Fw::AnchorTop);
@@ -190,7 +190,7 @@ namespace {
         self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
     }
 
-    inline UIWidget* pickLower(UIWidget* a, UIWidget* b) {
+    static UIWidget* pickLower(UIWidget* a, UIWidget* b) {
         if (!a) return b;
         if (!b) return a;
         const auto ay = a->getRect().bottomLeft().y;
@@ -198,20 +198,20 @@ namespace {
         return (by > ay) ? b : a;
     }
 
-    inline void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+    static void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->removeAnchor(Fw::AnchorLeft);
         w->addAnchor(Fw::AnchorLeft, std::string(toId), edge);
     }
-    inline void setRightAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+    static void setRightAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->removeAnchor(Fw::AnchorRight);
         w->addAnchor(Fw::AnchorRight, std::string(toId), edge);
     }
-    inline void setTopAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+    static void setTopAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->removeAnchor(Fw::AnchorTop);
         w->addAnchor(Fw::AnchorTop, std::string(toId), edge);
     }
 
-    FlowCtx computeFlowContext(UIWidget* self, DisplayType /*parentDisplay*/, FloatType effFloat) {
+    static FlowCtx computeFlowContext(UIWidget* self, DisplayType /*parentDisplay*/, FloatType effFloat) {
         FlowCtx ctx;
 
         if (self->getPositionType() == PositionType::Absolute)
@@ -255,7 +255,7 @@ namespace {
         return false;
     }
 
-    void applyFloat(UIWidget* self, const FlowCtx& ctx, FloatType effFloat, bool topCleared) {
+    static void applyFloat(UIWidget* self, const FlowCtx& ctx, FloatType effFloat, bool topCleared) {
         const bool isLeftF = (effFloat == FloatType::Left);
 
         const bool blockAfterLeftSameLine =
@@ -280,7 +280,7 @@ namespace {
         }
     }
 
-    void applyFlex(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
+    static void applyFlex(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
         if (!ctx.prevNonFloat) {
             setLeftAnchor(self, "parent", Fw::AnchorLeft);
             if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
@@ -290,7 +290,7 @@ namespace {
         }
     }
 
-    void applyGridOrTable(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
+    static void applyGridOrTable(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
         if (!ctx.prevNonFloat) {
             anchorToParentTL(self);
         } else {
@@ -299,7 +299,7 @@ namespace {
         }
     }
 
-    inline int calcOuterWidth(UIWidget* w) {
+    static int calcOuterWidth(UIWidget* w) {
         const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
         const int contentW = std::max<int>(textSz.width(),
                               std::max<int>(w->getWidth(),
@@ -309,7 +309,7 @@ namespace {
             + w->getPaddingLeft() + w->getPaddingRight();
     }
 
-    inline int calcOuterHeight(UIWidget* w) {
+    static int calcOuterHeight(UIWidget* w) {
         const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
         const int contentH = std::max<int>(textSz.height(),
                               std::max<int>(w->getHeight(),
@@ -319,15 +319,18 @@ namespace {
             + w->getPaddingTop() + w->getPaddingBottom();
     }
 
-    inline int parentInnerWidth(UIWidget* p) {
+    static int parentInnerWidth(UIWidget* p) {
         const int pw = p->isOnHtml() ? p->getWidthHtml().valueCalculed : p->getWidth();
         return std::max<int>(0, pw - p->getPaddingLeft() - p->getPaddingRight());
     }
 
-    inline int currentInlineRunWidth(UIWidget* self) {
+    static int currentInlineRunWidth(UIWidget* self) {
         auto* parent = self->getParent().get();
         if (!parent) return 0;
+
         int run = 0;
+        int lastTop = std::numeric_limits<int>::min();
+
         for (const auto& c : parent->getChildren()) {
             if (c.get() == self) break;
             if (c->getDisplay() == DisplayType::None) continue;
@@ -336,14 +339,16 @@ namespace {
             const auto cf = mapLogicalFloat(c->getFloat());
             if (cf != FloatType::None) continue;
 
-            if (breakLine(c->getDisplay())) {
-                run = 0;
-                continue;
-            }
+            if (breakLine(c->getDisplay())) { run = 0; lastTop = std::numeric_limits<int>::min(); continue; }
+
             if (isInlineLike(c->getDisplay())) {
+                const int ct = c->getRect().topLeft().y;
+                if (lastTop == std::numeric_limits<int>::min()) lastTop = ct;
+                if (ct > lastTop) { run = 0; lastTop = ct; }
                 run += calcOuterWidth(c.get());
             } else {
                 run = 0;
+                lastTop = std::numeric_limits<int>::min();
             }
         }
         return run;
