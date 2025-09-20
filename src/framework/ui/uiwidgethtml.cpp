@@ -466,7 +466,8 @@ namespace {
 }
 
 void UIWidget::refreshHtml(bool childrenTo) {
-    if (isOnHtml()) return;
+    if (!isOnHtml())
+        return;
 
     if (childrenTo) {
         for (const auto& child : m_children) {
@@ -554,8 +555,13 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         m_height = { unit , value, valueCalculed, needUpdate };
     }
 
-    if (needUpdate)
+    if (needUpdate) {
         scheduleHtmlTask(PropUpdateSize);
+    }
+
+    for (const auto& child : m_children) {
+        child->scheduleHtmlTask(PropApplyAnchorAlignment);
+    }
 }
 
 void UIWidget::scheduleHtmlTask(FlagProp prop) {
