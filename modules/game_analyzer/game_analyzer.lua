@@ -128,10 +128,25 @@ function GameAnalyzer.init()
     refresh()
 end
 
+local drawGraph = function(graph, value)
+    if graph:getGraphsCount() == 0 then
+        graph:createGraph()
+        graph:setLineWidth(1, 1)
+        graph:setLineColor(1, "#FF0000")
+    end
+    graph:addValue(1, value)
+end
+
 function expAnalyzerInit()
     expAnalyzerWindow = g_ui.loadUI('game_exp_analyzer')
     expAnalyzerWindow:setup()
     setupExpAnalyzerWindowResize()
+
+    local graphExp = expAnalyzerWindow:recursiveGetChildById('expGraphAnalyzer')
+    if graphExp then
+        --graphExp:setTitle("XP/h")
+        drawGraph(graphExp, 0)
+    end
 
     -- Reset tracking variables
     expStart = nil
@@ -268,6 +283,7 @@ end
 -- Calculate the experience rate from all modifiers
 -- This is useful for showing the total XP boost percentage
 function GameAnalyzer.calculateTotalExpRate()
+    -- TODO: Needs to add Core (Soul Pit modifier and Events e.g "Bewitched", "Colours of Magic" modifier)
     local baseRate = ExpRating[ExperienceRate.BASE] or 100
     local voucherRate = ExpRating[ExperienceRate.VOUCHER] or 0
     local lowLevelRate = ExpRating[ExperienceRate.LOW_LEVEL] or 0

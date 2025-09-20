@@ -88,6 +88,7 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
         if (!m_title.empty())
             m_font->drawText(m_title, dest, Color::white, Fw::AlignTopCenter);
         if (m_showLabes) {
+            // TODO: Change position of texts (Now they are in corners)
             m_font->drawText(m_lastValue, dest, Color::white, Fw::AlignTopRight);
             m_font->drawText(m_maxValue, dest, Color::white, Fw::AlignTopLeft);
             m_font->drawText(m_minValue, dest, Color::white, Fw::AlignBottomLeft);
