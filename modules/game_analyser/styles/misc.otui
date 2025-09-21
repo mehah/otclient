@@ -1,0 +1,259 @@
+EmptyData < Panel
+  size: 153 24
+  UIWidget
+    id: hierarchy
+    size: 7 7
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 10
+    margin-left: 5
+    image-source: /images/ui/hierarchy-branch
+    phantom: true
+  Label
+    id: name
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    !text: tr('No data yet')
+    margin-top: -3
+    margin-left: 4
+    text-auto-resize: true
+    color: #c0c0c0
+    font: Verdana Bold-11px
+    phantom: true
+
+MiscTracker < Panel
+  size: 153 24
+  margin-top: 2
+  UIWidget
+    id: tooltip
+    tooltip-delayed: true
+    anchors.fill: parent
+  UIWidget
+    id: hierarchy
+    size: 7 7
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 9
+    margin-left: 3
+    phantom: true
+    image-source: /images/ui/hierarchy-branch
+  UIWidget
+    id: effects
+    size: 22 22
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-left: 2
+    phantom: true
+    image-source: /images/game/cyclopedia/monster-bonus-effects/monster-bonus-effects-0
+  Label
+    id: name
+    anchors.top: prev.top
+    anchors.left: prev.right
+    size: 85 24
+    margin-left: 3
+    text-align: left
+    color: #c0c0c0
+    font: Verdana Bold-11px
+    phantom: true
+    text-overflow-length: 12
+  Label
+    id: total
+    size: 26 24
+    anchors.top: prev.top
+    anchors.right: parent.right
+    margin-top: 4
+    text-align: right
+    color: #c0c0c0
+    font: Verdana Bold-11px
+    phantom: true
+    text-auto-resize: true
+
+MiniWindow
+  id: miscAnalyzerMiniWindow
+  &type: 'miscAnalyzer'
+  !text: tr('Misc Analyser')
+  height: 185
+  icon-source: /images/icons/icons-vocations
+  icon-clip: 0 0 9 9
+  icon-size: 9 9
+  icon-offset: 2 0
+  &save: true
+  &autoOpen: true
+  @onExtra: onMiscAnalyzerExtra(g_window.getMousePosition())
+
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    size: 12 12
+    image-source: /images/icons/icons-vocations
+    image-clip: 0 0 9 9
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    color: #9d9d9dff
+    !text: tr('Misc Analyser')
+
+  ScrollablePanel
+    id: contentsPanel
+    anchors.fill: parent
+    margin: 16 18 5 5
+    vertical-scrollbar: miniwindowScrollBar
+
+    Label
+      !text: tr('Session:')
+      anchors.top: parent.top
+      anchors.left: parent.left
+      text-auto-resize: true
+      color: #c0c0c0
+      font: Verdana Bold-11px
+
+    Label
+      id: session
+      !text: tr('00:00h')
+      anchors.top: parent.top
+      anchors.right: parent.right
+      text-auto-resize: true
+      color: #c0c0c0
+      font: Verdana Bold-11px
+
+    Label
+      id: charmTypeLabel
+      !text: tr('Charm')
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 6
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #c0c0c0
+
+    Panel
+      id: charmTypes
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 3
+      width: 153
+      layout:
+        type: verticalBox
+        fit-children: true
+      EmptyData
+  
+    HorizontalSeparator
+      id: charmSeparator
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 3
+
+    Label
+      !text: tr('Imbuement')
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 4
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #c0c0c0
+    Panel
+      id: imbuementTypes
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 3
+      width: 153
+      layout:
+        type: verticalBox
+        fit-children: true
+      EmptyData
+
+    HorizontalSeparator
+      id: imbuementSeparator
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 3
+    
+    Label
+      !text: tr('Item Upgrade')
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 4
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #c0c0c0
+    Panel
+      id: specialTypes
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 3
+      width: 153
+      layout:
+        type: verticalBox
+        fit-children: true
+      EmptyData
+  
+    HorizontalSeparator
+      id: specialSeparator
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 3
+    
+    Panel
+      id: overviewPanel
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      margin-top: 3
+      width: 153
+      visible: false
+      layout:
+        type: verticalBox
+        fit-children: true
+
+      Label
+        !text: tr('Overview')
+        margin-top: 6
+        text-auto-resize: true
+        text-align: center
+        font: Verdana Bold-11px
+        color: #c0c0c0
+
+      Label
+        id: description
+        margin-top: 6
+        text-align: left
+        font: Verdana Bold-11px
+        color: #c0c0c0
+        text-auto-resize: true
+        text-wrap: true
+        !text: tr("No data yet")
+    
+
+  UIWidget
+    id: miniborder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 2
+    margin-bottom: 2
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 3
+    minimum: 90
+    margin-left: 3
+    margin-right: 3
