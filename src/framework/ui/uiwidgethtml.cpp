@@ -791,7 +791,7 @@ void UIWidget::updateSize() {
         return;
     }
 
-    if (m_width.needsUpdate(Unit::FitContent, VERSION_EPOCH) || m_width.needsUpdate(Unit::FitContent, VERSION_EPOCH)) {
+    if (m_width.needsUpdate(Unit::FitContent, VERSION_EPOCH) || m_height.needsUpdate(Unit::FitContent, VERSION_EPOCH)) {
         int width = 0;
         int height = 0;
         for (auto& c : getChildren()) {
