@@ -239,12 +239,22 @@ function onlineAnalyser()
 end
 
 function offlineAnalyser()
-  HuntingAnalyser:saveConfigJson()
-  ImpactAnalyser:saveConfigJson()
-  InputAnalyser:saveConfigJson()
-  XPAnalyser:saveConfigJson()
-  DropTrackerAnalyser:saveConfigJson()
-  saveGainAndWastConfigJson()
+  -- Only save if we have a valid player and can still write to filesystem
+  local player = g_game.getLocalPlayer()
+  if player then
+    -- Ensure the characterdata directory exists before saving anything
+    local characterDir = "/characterdata/" .. player:getId()
+    pcall(function() g_resources.makeDir("/characterdata") end)
+    pcall(function() g_resources.makeDir(characterDir) end)
+    
+    -- Use pcall to safely attempt saves, catching any filesystem errors
+    pcall(function() HuntingAnalyser:saveConfigJson() end)
+    pcall(function() ImpactAnalyser:saveConfigJson() end)
+    pcall(function() InputAnalyser:saveConfigJson() end)
+    pcall(function() XPAnalyser:saveConfigJson() end)
+    pcall(function() DropTrackerAnalyser:saveConfigJson() end)
+    pcall(function() saveGainAndWastConfigJson() end)
+  end
   BossCooldown.cooldown = {}
 end
 
@@ -429,6 +439,11 @@ function saveGainAndWastConfigJson()
   local player = g_game.getLocalPlayer()
   if not player then return end
   
+  -- Ensure the characterdata directory exists
+  local characterDir = "/characterdata/" .. player:getId()
+  pcall(function() g_resources.makeDir("/characterdata") end)
+  pcall(function() g_resources.makeDir(characterDir) end)
+  
   local config = {
     gainGaugeTarget = LootAnalyser:getTarget(),
     gainGaugeVisible = LootAnalyser:gaugeIsVisible(),
@@ -447,7 +462,16 @@ function saveGainAndWastConfigJson()
   if result:len() > 100 * 1024 * 1024 then
     return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
   end
-  g_resources.writeFileContents(file, result)
+  
+  -- Safely attempt to write the file, ignoring errors during logout
+  local writeStatus, writeError = pcall(function()
+    return g_resources.writeFileContents(file, result)
+  end)
+  
+  if not writeStatus then
+    -- Log the error but don't spam the console during normal logout
+    g_logger.debug("Could not save GainAndWaste config during logout: " .. tostring(writeError))
+  end
 end
 
 function checkNumber(self, text)

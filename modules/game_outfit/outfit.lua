@@ -1764,7 +1764,15 @@ end
 function saveSettings()
     if not g_resources.fileExists(settingsFile) then
         g_resources.makeDir("/settings")
-        g_resources.writeFileContents(settingsFile, "[]")
+        -- Safely attempt to write initial file
+        local writeStatus, writeError = pcall(function()
+            return g_resources.writeFileContents(settingsFile, "[]")
+        end)
+        
+        if not writeStatus then
+            g_logger.debug("Could not create outfit settings file during logout: " .. tostring(writeError))
+            return
+        end
     end
 
     local fullSettings = {}
@@ -1791,7 +1799,14 @@ function saveSettings()
         return
     end
 
-    g_resources.writeFileContents(settingsFile, json.encode(fullSettings))
+    -- Safely attempt to write the settings file
+    local writeStatus, writeError = pcall(function()
+        return g_resources.writeFileContents(settingsFile, json.encode(fullSettings))
+    end)
+    
+    if not writeStatus then
+        g_logger.debug("Could not save outfit settings during logout: " .. tostring(writeError))
+    end
 end
 
 function loadSettings()
