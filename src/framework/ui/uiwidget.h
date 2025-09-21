@@ -430,6 +430,7 @@ private:
     void updateSize();
     void applyAnchorAlignment();
     void scheduleHtmlTask(FlagProp prop);
+    void refreshAnchorAlignment(bool onlyChild = false);
 
     OTMLNodePtr m_stateStyle;
     int32_t m_states{ Fw::DefaultState };

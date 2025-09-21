@@ -559,8 +559,15 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         scheduleHtmlTask(PropUpdateSize);
     }
 
+    refreshAnchorAlignment(true);
+}
+
+void UIWidget::refreshAnchorAlignment(bool onlyChild) {
+    if (!onlyChild)
+        scheduleHtmlTask(PropApplyAnchorAlignment);
+
     for (const auto& child : m_children) {
-        child->scheduleHtmlTask(PropApplyAnchorAlignment);
+        child->refreshAnchorAlignment();
     }
 }
 
