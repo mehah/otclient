@@ -52,6 +52,36 @@ function XPAnalyser.create()
 		return
 	end
 
+	-- Hide buttons we don't want
+	local toggleFilterButton = XPAnalyser.window:recursiveGetChildById('toggleFilterButton')
+	if toggleFilterButton then
+		toggleFilterButton:setVisible(false)
+	end
+	
+	local newWindowButton = XPAnalyser.window:recursiveGetChildById('newWindowButton')
+	if newWindowButton then
+		newWindowButton:setVisible(false)
+	end
+
+	-- Position contextMenuButton where toggleFilterButton was (to the left of minimize button)
+	local contextMenuButton = XPAnalyser.window:recursiveGetChildById('contextMenuButton')
+	local minimizeButton = XPAnalyser.window:recursiveGetChildById('minimizeButton')
+	
+	if contextMenuButton and minimizeButton then
+		contextMenuButton:setVisible(true)
+		contextMenuButton:breakAnchors()
+		contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+		contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+		contextMenuButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+		contextMenuButton:setMarginTop(0)
+		
+		-- Set up contextMenuButton click handler to show our menu
+		contextMenuButton.onClick = function(widget, mousePos)
+			local pos = mousePos or g_window.getMousePosition()
+			return onXPExtra(pos)
+		end
+	end
+
 	XPAnalyser.launchTime = g_clock.millis()
 	XPAnalyser.session = 0
 
@@ -324,11 +354,11 @@ function onXPExtra(mousePosition)
 	menu:setGameMenu(true)
 	menu:addOption(tr('Reset Data'), function() XPAnalyser:reset(); return end)
 	menu:addSeparator()
-	menu:addCheckBoxOption(tr('Show Raw XP'), function() XPAnalyser:setRawXPVisible(not rawXpVisible) end, "", rawXpVisible)
+	menu:addCheckBox(tr('Show Raw XP'), rawXpVisible, function() XPAnalyser:setRawXPVisible(not rawXpVisible) end)
 	menu:addSeparator()
 	menu:addOption(tr('Set XP Per Hour Target'), function() XPAnalyser:openTargetConfig() return end)
-	menu:addCheckBoxOption(tr('XP Per Hour Gauge'), function() XPAnalyser:setGaugeVisible(not gaugeVisible) end, "", gaugeVisible)
-	menu:addCheckBoxOption(tr('XP Per Hour Graph'), function() XPAnalyser:setGraphVisible(not graphVisible) end, "", graphVisible)
+	menu:addCheckBox(tr('XP Per Hour Gauge'), gaugeVisible, function() XPAnalyser:setGaugeVisible(not gaugeVisible) end)
+	menu:addCheckBox(tr('XP Per Hour Graph'), graphVisible, function() XPAnalyser:setGraphVisible(not graphVisible) end)
 	menu:display(mousePosition)
   return true
 end
