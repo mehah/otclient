@@ -192,6 +192,35 @@ HtmlNodePtr parseHtml(const std::string& html) {
         }
     };
 
+    auto attach_front = [&](HtmlNodePtr parent, HtmlNodePtr node) {
+        node->parent.reset();
+        node->prev.reset();
+        node->next.reset();
+
+        if (!parent->children.empty()) {
+            auto first = parent->children.front();
+            node->next = first;
+            first->prev = node;
+            parent->children.insert(parent->children.begin(), node);
+        } else {
+            parent->children.push_back(node);
+        }
+        node->parent = parent;
+
+        auto doc = root;
+        if (node->type == NodeType::Element) {
+            if (!node->tag.empty() && node->tag != "root")
+                doc->tagIndex[node->tag].push_back(node);
+            std::string idv = node->getAttr("id");
+            if (!idv.empty()) doc->idIndex[idv] = node;
+            if (!node->classList.empty())
+                for (auto& cls : node->classList) doc->classIndex[cls].push_back(node);
+        }
+    };
+
+    std::vector<HtmlNodePtr> hoistedRaw;
+    hoistedRaw.reserve(10);
+
     while (i < N) {
         if (s[i] == '<') {
             if (i + 3 < N && s.compare(i, 4, "<!--") == 0) {
@@ -249,8 +278,6 @@ HtmlNodePtr parseHtml(const std::string& html) {
             if (i < N && s[i] == '/') { selfClosing = true; ++i; }
             if (i < N&& s[i] == '>') ++i;
 
-            push_node(node);
-
             bool isVoid = kVoid.count(tag) > 0;
             if (!selfClosing && !isVoid) {
                 if (isRaw) {
@@ -265,9 +292,18 @@ HtmlNodePtr parseHtml(const std::string& html) {
                         node->text = s.substr(i, closePos - i);
                         i = closePos + endTag.size();
                     }
+
+                    if (st.top() != root) {
+                        hoistedRaw.push_back(node);
+                    } else {
+                        push_node(node);
+                    }
                 } else {
+                    push_node(node);
                     st.push(node);
                 }
+            } else {
+                push_node(node);
             }
         } else {
             size_t start = i;
@@ -353,5 +389,12 @@ HtmlNodePtr parseHtml(const std::string& html) {
     }
 
     while (st.size() > 1) st.pop();
+
+    if (!hoistedRaw.empty()) {
+        for (auto it = hoistedRaw.rbegin(); it != hoistedRaw.rend(); ++it) {
+            attach_front(root, *it);
+        }
+    }
+
     return root;
 }

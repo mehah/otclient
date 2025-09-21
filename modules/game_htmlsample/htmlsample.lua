@@ -32,8 +32,15 @@ function HtmlSample:onInit()
             local cor = cores[math.random(#cores)]
             local largura = math.random(10, 50)
             self.ui:append(string.format(
-                '<div style="display: inline-block; width: %dpx; height: 50px; background-color: %s;"></div>',
-                largura, cor
+                [[
+                    <style>
+                        div {
+                            background-color: %s;
+                            display: inline-block;
+                        }
+                    </style>
+                    <div style="width: %dpx; height: 50px;"></div>
+                ]], cor, largura
             ))
         end
     end
