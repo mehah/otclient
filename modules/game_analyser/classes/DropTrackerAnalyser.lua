@@ -27,6 +27,52 @@ end
 
 function DropTrackerAnalyser:create()
 	DropTrackerAnalyser.window = openedWindows['dropButton']
+	
+	if not DropTrackerAnalyser.window then
+		return
+	end
+
+	-- Hide buttons we don't want
+	local toggleFilterButton = DropTrackerAnalyser.window:recursiveGetChildById('toggleFilterButton')
+	if toggleFilterButton then
+		toggleFilterButton:setVisible(false)
+	end
+	
+	local newWindowButton = DropTrackerAnalyser.window:recursiveGetChildById('newWindowButton')
+	if newWindowButton then
+		newWindowButton:setVisible(false)
+	end
+
+	-- Position contextMenuButton where toggleFilterButton was (to the left of minimize button)
+	local contextMenuButton = DropTrackerAnalyser.window:recursiveGetChildById('contextMenuButton')
+	local minimizeButton = DropTrackerAnalyser.window:recursiveGetChildById('minimizeButton')
+	
+	if contextMenuButton and minimizeButton then
+		contextMenuButton:setVisible(true)
+		contextMenuButton:breakAnchors()
+		contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+		contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+		contextMenuButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+		contextMenuButton:setMarginTop(0)
+		
+		-- Set up contextMenuButton click handler to show our menu
+		contextMenuButton.onClick = function(widget, mousePos)
+			local pos = mousePos or g_window.getMousePosition()
+			return onDropExtra(pos)
+		end
+	end
+
+	-- Position lockButton to the left of contextMenuButton
+	local lockButton = DropTrackerAnalyser.window:recursiveGetChildById('lockButton')
+	
+	if lockButton and contextMenuButton then
+		lockButton:setVisible(true)
+		lockButton:breakAnchors()
+		lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+		lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+		lockButton:setMarginRight(2)  -- Same margin as in miniwindow style
+		lockButton:setMarginTop(0)
+	end
 
 	DropTrackerAnalyser.launchTime = g_clock.millis()
 	DropTrackerAnalyser.session = 0
