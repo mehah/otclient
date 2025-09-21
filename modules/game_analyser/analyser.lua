@@ -35,6 +35,42 @@ function init()
   analyserMiniWindow:close()
   analyserMiniWindow:setup()
 
+  -- Hide buttons we don't want in the main analyser selector window
+  local toggleFilterButton = analyserMiniWindow:recursiveGetChildById('toggleFilterButton')
+  if toggleFilterButton then
+    toggleFilterButton:setVisible(false)
+  end
+  
+  local newWindowButton = analyserMiniWindow:recursiveGetChildById('newWindowButton')
+  if newWindowButton then
+    newWindowButton:setVisible(false)
+  end
+
+  -- Position contextMenuButton where toggleFilterButton was (to the left of minimize button)
+  local contextMenuButton = analyserMiniWindow:recursiveGetChildById('contextMenuButton')
+  local minimizeButton = analyserMiniWindow:recursiveGetChildById('minimizeButton')
+  
+  if contextMenuButton and minimizeButton then
+    contextMenuButton:setVisible(true)
+    contextMenuButton:breakAnchors()
+    contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+    contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+    contextMenuButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+    contextMenuButton:setMarginTop(0)
+  end
+
+  -- Position lockButton to the left of contextMenuButton
+  local lockButton = analyserMiniWindow:recursiveGetChildById('lockButton')
+  
+  if lockButton and contextMenuButton then
+    lockButton:setVisible(true)
+    lockButton:breakAnchors()
+    lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+    lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+    lockButton:setMarginRight(2)  -- Same margin as in miniwindow style
+    lockButton:setMarginTop(0)
+  end
+
   configPopupWindow["lootButton"] = g_ui.displayUI('styles/lootTarget')
   configPopupWindow["lootButton"]:hide()
 
@@ -361,9 +397,13 @@ function onExperienceChange(localPlayer, value)
 end
 
 function onUpdateExperience(rawExp, exp)
-  HuntingAnalyser:addRawXPGain(rawExp)
+  -- Both rawExp and exp might already have rate modifiers applied
+  -- We need to calculate the true raw experience value (base rate only)
+  
+  -- For raw XP gain, we'll use the exp value and remove all rate modifiers to get true base XP
+  HuntingAnalyser:addRawXPGain(exp)  -- This will be processed by calculateRawXP() internally
   HuntingAnalyser:addXpGain(exp)
-  XPAnalyser:addRawXPGain(rawExp)
+  XPAnalyser:addRawXPGain(exp)       -- This will be processed by calculateRawXP() internally  
   XPAnalyser:addXpGain(exp)
 end
 

@@ -16,6 +16,20 @@ local function tokformat(value)
     end
 end
 
+-- Function to calculate raw XP from modified XP (removing all rate bonuses)
+local function calculateRawXP(modifiedExp)
+    if not modules.game_skills then
+        return modifiedExp  -- Fallback if skills module not available
+    end
+    
+    local totalMultiplier = modules.game_skills.getTotalExpRateMultiplier()
+    if totalMultiplier > 0 then
+        return math.floor(modifiedExp / totalMultiplier)
+    else
+        return modifiedExp
+    end
+end
+
 if not XPAnalyser then
 	XPAnalyser = {
 		launchTime = 0,
@@ -82,6 +96,18 @@ function XPAnalyser.create()
 		end
 	end
 
+	-- Position lockButton to the left of contextMenuButton
+	local lockButton = XPAnalyser.window:recursiveGetChildById('lockButton')
+	
+	if lockButton and contextMenuButton then
+		lockButton:setVisible(true)
+		lockButton:breakAnchors()
+		lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+		lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+		lockButton:setMarginRight(2)  -- Same margin as in miniwindow style
+		lockButton:setMarginTop(0)
+	end
+
 	XPAnalyser.launchTime = g_clock.millis()
 	XPAnalyser.session = 0
 
@@ -112,7 +138,7 @@ function XPAnalyser:reset(allTimeDps, allTimeHps)
 	if XPAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		XPAnalyser.window.contentsPanel.graphPanel:createGraph()
 		XPAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		XPAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#00EB00")
+		XPAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red) --"#f55e5e"
 	end
 	
 	XPAnalyser.window.contentsPanel.graphPanel:addValue(1, 0)
@@ -233,7 +259,7 @@ function XPAnalyser:updateExpensiveUI()
 	if XPAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		XPAnalyser.window.contentsPanel.graphPanel:createGraph()
 		XPAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		XPAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#00EB00")
+		XPAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red) --"#f55e5e"
 	end
 	XPAnalyser.window.contentsPanel.graphPanel:addValue(1, math.max(0,XPAnalyser.xpHour))
 
@@ -315,7 +341,9 @@ end
 
 -- updaters
 function XPAnalyser:addRawXPGain(value) 
-	XPAnalyser.rawXPGain = XPAnalyser.rawXPGain + value
+	-- Calculate the actual raw XP by removing rate modifiers
+	local actualRawXP = calculateRawXP(value)
+	XPAnalyser.rawXPGain = XPAnalyser.rawXPGain + actualRawXP
 	XPAnalyser:updateWindow()
 end
 

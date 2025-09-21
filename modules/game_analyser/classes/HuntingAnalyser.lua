@@ -18,6 +18,20 @@ local function tokformat(value)
     end
 end
 
+-- Function to calculate raw XP from modified XP (removing all rate bonuses)
+local function calculateRawXP(modifiedExp)
+    if not modules.game_skills then
+        return modifiedExp  -- Fallback if skills module not available
+    end
+    
+    local totalMultiplier = modules.game_skills.getTotalExpRateMultiplier()
+    if totalMultiplier > 0 then
+        return math.floor(modifiedExp / totalMultiplier)
+    else
+        return modifiedExp
+    end
+end
+
 local valueInSeconds = function(t)
     local d = 0
     local time = 0
@@ -100,6 +114,52 @@ function HuntingAnalyser:create()
 
 	-- private
 	HuntingAnalyser.window = openedWindows['huntingButton']
+	
+	if not HuntingAnalyser.window then
+		return
+	end
+
+	-- Hide buttons we don't want
+	local toggleFilterButton = HuntingAnalyser.window:recursiveGetChildById('toggleFilterButton')
+	if toggleFilterButton then
+		toggleFilterButton:setVisible(false)
+	end
+	
+	local newWindowButton = HuntingAnalyser.window:recursiveGetChildById('newWindowButton')
+	if newWindowButton then
+		newWindowButton:setVisible(false)
+	end
+
+	-- Position contextMenuButton where toggleFilterButton was (to the left of minimize button)
+	local contextMenuButton = HuntingAnalyser.window:recursiveGetChildById('contextMenuButton')
+	local minimizeButton = HuntingAnalyser.window:recursiveGetChildById('minimizeButton')
+	
+	if contextMenuButton and minimizeButton then
+		contextMenuButton:setVisible(true)
+		contextMenuButton:breakAnchors()
+		contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+		contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+		contextMenuButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+		contextMenuButton:setMarginTop(0)
+		
+		-- Set up contextMenuButton click handler to show our menu
+		contextMenuButton.onClick = function(widget, mousePos)
+			local pos = mousePos or g_window.getMousePosition()
+			return onHuntingExtra(pos)
+		end
+	end
+
+	-- Position lockButton to the left of contextMenuButton
+	local lockButton = HuntingAnalyser.window:recursiveGetChildById('lockButton')
+	
+	if lockButton and contextMenuButton then
+		lockButton:setVisible(true)
+		lockButton:breakAnchors()
+		lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+		lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+		lockButton:setMarginRight(2)  -- Same margin as in miniwindow style
+		lockButton:setMarginTop(0)
+	end
 end
 
 function onHuntingExtra(mousePosition)
@@ -418,7 +478,9 @@ function HuntingAnalyser:setDamageTicks(value) HuntingAnalyser.damageTicks = val
 
 -- updaters
 function HuntingAnalyser:addRawXPGain(value) 
-	HuntingAnalyser.rawXPGain = HuntingAnalyser.rawXPGain + value
+	-- Calculate the actual raw XP by removing rate modifiers
+	local actualRawXP = calculateRawXP(value)
+	HuntingAnalyser.rawXPGain = HuntingAnalyser.rawXPGain + actualRawXP
 	HuntingAnalyser:updateWindow()
 end
 
