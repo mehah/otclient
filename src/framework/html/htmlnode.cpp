@@ -414,3 +414,63 @@ std::string HtmlNode::toString(bool recursive) const {
     }
     return "";
 }
+
+HtmlNodePtr HtmlNode::clone(bool deep) const {
+    auto n = std::make_shared<HtmlNode>();
+
+    n->type = this->type;
+    n->tag = this->tag;
+    n->attributes = this->attributes;
+    n->classList = this->classList;
+    n->text = this->text;
+
+    n->m_styles = this->m_styles;
+    n->m_inheritableStyles = this->m_inheritableStyles;
+    n->m_attrStyles = this->m_attrStyles;
+
+    n->isHovered = this->isHovered;
+    n->isFocused = this->isFocused;
+    n->isActive = this->isActive;
+
+    n->m_isExpression = this->m_isExpression;
+
+    n->cacheIndexAmongElements = -1;
+    n->cacheIndexAmongType = -1;
+
+    if (deep) {
+        HtmlNodePtr last;
+        for (const auto& ch : this->children) {
+            auto c = ch->clone(true);
+            c->parent = n;
+            if (last) {
+                last->next = c;
+                c->prev = last;
+            }
+            n->children.push_back(c);
+            last = c;
+        }
+    }
+
+    rebuildIndexes(n);
+    return n;
+}
+
+void HtmlNode::rebuildIndexes(const HtmlNodePtr& root) {
+    root->idIndex.clear();
+    root->classIndex.clear();
+    root->tagIndex.clear();
+
+    std::vector<HtmlNodePtr> st{ root };
+    while (!st.empty()) {
+        auto cur = st.back(); st.pop_back();
+        if (cur->type == NodeType::Element) {
+            if (!cur->tag.empty() && cur->tag != "root")
+                root->tagIndex[cur->tag].push_back(cur);
+            std::string idv = cur->getAttr("id");
+            if (!idv.empty()) root->idIndex[idv] = cur;
+            for (auto& cls : cur->classList)
+                root->classIndex[cls].push_back(cur);
+        }
+        for (auto& c : cur->children) st.push_back(c);
+    }
+}

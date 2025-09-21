@@ -119,6 +119,7 @@ public:
     void setExpression(bool v) { m_isExpression = v; }
 
     std::string toString(bool recursive = true) const;
+    HtmlNodePtr clone(bool deep = true) const;
 
 private:
     NodeType type{ NodeType::Element };
@@ -147,6 +148,7 @@ private:
     bool m_isExpression{ false };
 
 private:
+    static void rebuildIndexes(const HtmlNodePtr& root);
     void attachChild(const HtmlNodePtr& child, size_t pos);
     void registerInIndexes(const HtmlNodePtr& child);
     void unregisterSubtreeFromIndexes(const HtmlNodePtr& node);

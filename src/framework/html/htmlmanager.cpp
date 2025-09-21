@@ -34,7 +34,7 @@
 HtmlManager g_html;
 
 namespace {
-    std::vector<css::StyleSheet> GLOBAL_STYLES;
+    static std::vector<css::StyleSheet> GLOBAL_STYLES;
 
     static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = {
         {"offset-x", "image-offset-x"},
