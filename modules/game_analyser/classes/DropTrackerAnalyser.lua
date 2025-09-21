@@ -348,6 +348,11 @@ function DropTrackerAnalyser:saveConfigJson()
 	local player = g_game.getLocalPlayer()
 	if not player then return end
 
+	-- Ensure the characterdata directory exists
+	local characterDir = "/characterdata/" .. player:getId()
+	pcall(function() g_resources.makeDir("/characterdata") end)
+	pcall(function() g_resources.makeDir(characterDir) end)
+
 	local file = "/characterdata/" .. player:getId() .. "/itemtracking.json"
 	local status, result = pcall(function() return json.encode(config, 2) end)
 	if not status then
@@ -358,6 +363,14 @@ function DropTrackerAnalyser:saveConfigJson()
 		return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
 	end
 
-	g_resources.writeFileContents(file, result)
+	-- Safely attempt to write the file, ignoring errors during logout
+	local writeStatus, writeError = pcall(function()
+		return g_resources.writeFileContents(file, result)
+	end)
+	
+	if not writeStatus then
+		-- Log the error but don't spam the console during normal logout
+		g_logger.debug("Could not save DropTrackerAnalyser config during logout: " .. tostring(writeError))
+	end
 end
 
