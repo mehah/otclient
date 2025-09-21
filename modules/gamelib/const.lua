@@ -471,4 +471,9 @@ ExperienceRate = {
     XP_BOOST = 3,
     STAMINA_MULTIPLIER = 4
 }
+
+PriceTypeEnum = {
+	Market = 0,
+	Leader = 1,
+}
 -- @}
