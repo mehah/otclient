@@ -5,6 +5,7 @@ if not configPopupWindow then
 end
 
 openedWindows = {}
+cancelNextRelease = nil
 
 local analyserWindows = {
   huntingButton = 'styles/hunting',

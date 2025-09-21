@@ -279,16 +279,19 @@ function onBossExtra(mousePosition)
 	local player = g_game.getLocalPlayer()
 	if not player then return false end
 
+	local sortByCooldown = BossCooldown.sort == 0
+	local sortByName = BossCooldown.sort == 1
+
 	local menu = g_ui.createWidget('PopupMenu')
 	menu:setGameMenu(true)
-	menu:addCheckBoxOption(tr('sort by cooldown'), function()
+	menu:addCheckBox(tr('sort by cooldown'), sortByCooldown, function()
 		BossCooldown.sort = 0
 		BossCooldown:updateWindow()
-	end, "", BossCooldown.sort == 0)
-	menu:addCheckBoxOption(tr('sort by name'), function()
+	end)
+	menu:addCheckBox(tr('sort by name'), sortByName, function()
 		BossCooldown.sort = 1
 		BossCooldown:updateWindow()
-	end, "", BossCooldown.sort == 1)
+	end)
 
 	menu:display(mousePosition)
 	return true

@@ -107,13 +107,16 @@ function onLootingExtra(mousePosition)
     return false
   end
 
+  local gaugeVisible = LootAnalyser.window.contentsPanel.targetLabel:isVisible()
+  local graphVisible = LootAnalyser.window.contentsPanel.graphPanel:isVisible()
+
 	local menu = g_ui.createWidget('PopupMenu')
 	menu:setGameMenu(true)
 	menu:addOption(tr('Reset Data'), function() LootAnalyser:reset(); return end)
 	menu:addSeparator()
 	menu:addOption(tr('Set Loot Per Hour Target'), function() LootAnalyser:openTargetConfig() return end)
-	menu:addCheckBoxOption(tr('Loot Per Hour Gauge'), function() LootAnalyser:setLootPerHourGauge(not LootAnalyser.window.contentsPanel.targetLabel:isVisible()) end, "", LootAnalyser.window.contentsPanel.targetLabel:isVisible())
-	menu:addCheckBoxOption(tr('Loot Per Hour Graph'), function() LootAnalyser:setLootPerHourGraph(not LootAnalyser.window.contentsPanel.graphPanel:isVisible()) end, "", LootAnalyser.window.contentsPanel.graphPanel:isVisible())
+	menu:addCheckBox(tr('Loot Per Hour Gauge'), gaugeVisible, function() LootAnalyser:setLootPerHourGauge(not gaugeVisible) end)
+	menu:addCheckBox(tr('Loot Per Hour Graph'), graphVisible, function() LootAnalyser:setLootPerHourGraph(not graphVisible) end)
 	menu:display(mousePosition)
   return true
 end

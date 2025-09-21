@@ -110,13 +110,16 @@ function onSupplyExtra(mousePosition)
     return false
   end
 
+  local gaugeVisible = SupplyAnalyser.window.contentsPanel.targetLabel:isVisible()
+  local graphVisible = SupplyAnalyser.window.contentsPanel.graphPanel:isVisible()
+
 	local menu = g_ui.createWidget('PopupMenu')
 	menu:setGameMenu(true)
 	menu:addOption(tr('Reset Data'), function() SupplyAnalyser:reset() return end)
 	menu:addSeparator()
 	menu:addOption(tr('Set Supply Per Hour Target'), function() SupplyAnalyser:openTargetConfig() return end)
-	menu:addCheckBoxOption(tr('Supply Per Hour Gauge'), function() SupplyAnalyser:setSupplyPerHourGauge(not SupplyAnalyser.window.contentsPanel.targetLabel:isVisible()) end, "", SupplyAnalyser.window.contentsPanel.targetLabel:isVisible())
-	menu:addCheckBoxOption(tr('Supply Per Hour Graph'), function() SupplyAnalyser:setSupplyPerHourGraph(not SupplyAnalyser.window.contentsPanel.graphPanel:isVisible()) end, "", SupplyAnalyser.window.contentsPanel.graphPanel:isVisible())
+	menu:addCheckBox(tr('Supply Per Hour Gauge'), gaugeVisible, function() SupplyAnalyser:setSupplyPerHourGauge(not gaugeVisible) end)
+	menu:addCheckBox(tr('Supply Per Hour Graph'), graphVisible, function() SupplyAnalyser:setSupplyPerHourGraph(not graphVisible) end)
 	menu:display(mousePosition)
   return true
 end

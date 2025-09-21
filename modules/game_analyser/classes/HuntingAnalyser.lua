@@ -168,13 +168,13 @@ function onHuntingExtra(mousePosition)
     return false
   end
 
+  local rawXpVisible = HuntingAnalyser.window.contentsPanel.rawXpGain:isVisible()
+
 	local menu = g_ui.createWidget('PopupMenu')
 	menu:setGameMenu(true)
 	menu:addOption(tr('Start New Session'), function() modules.game_analyser.startNewSession() return end)
 	menu:addSeparator()
-	menu:addCheckBoxOption(tr('Show Raw XP'), function()
-		HuntingAnalyser:setShowBaseXp(not HuntingAnalyser.window.contentsPanel.rawXpGain:isVisible())
-	end, "", HuntingAnalyser.window.contentsPanel.rawXpGain:isVisible())
+	menu:addCheckBox(tr('Show Raw XP'), rawXpVisible, function() HuntingAnalyser:setShowBaseXp(not rawXpVisible) end)
 	menu:addSeparator()
 	menu:addOption(tr('Copy to Clipboard'), function() HuntingAnalyser:clipboardData() end)
 	menu:addOption(tr('Save to File'), function() HuntingAnalyser:saveToFile() end)
@@ -570,17 +570,17 @@ function HuntingAnalyser:clipboardData()
 
 	local text = "Session data: From " .. os.date('%Y-%m-%d, %H:%M:%S', HuntingAnalyser.session) .." to ".. os.date('%Y-%m-%d, %H:%M:%S')
 	text = text .. "\nSession: " .. string.format("%02d:%02dh", hours, minutes)
-	text = text .. "\nRaw XP Gain: " .. format_thousand(HuntingAnalyser.rawXPGain)
-	text = text .. "\nXP Gain: " .. format_thousand(HuntingAnalyser.xpGain)
-	text = text .. "\nXP/h: " .. format_thousand(HuntingAnalyser.xpHour)
-	text = text .. "\nRaw XP/h: " .. format_thousand(HuntingAnalyser.rawXpHour)
-	text = text .. "\nLoot: " .. format_thousand(HuntingAnalyser.loot)
-	text = text .. "\nSupplies: " .. format_thousand(HuntingAnalyser.supplies)
-	text = text .. "\nBalance: " .. format_thousand(HuntingAnalyser.balance)
-	text = text .. "\nDamage: " .. format_thousand(HuntingAnalyser.damage)
-	text = text .. "\nDamage/h: " .. format_thousand(HuntingAnalyser.damageHour)
-	text = text .. "\nHealing: " .. format_thousand(HuntingAnalyser.healing)
-	text = text .. "\nHealing/h: " .. format_thousand(HuntingAnalyser.healingHour)
+	text = text .. "\nRaw XP Gain: " .. formatMoney(HuntingAnalyser.rawXPGain, ",")
+	text = text .. "\nXP Gain: " .. formatMoney(HuntingAnalyser.xpGain, ",")
+	text = text .. "\nXP/h: " .. formatMoney(HuntingAnalyser.xpHour, ",")
+	text = text .. "\nRaw XP/h: " .. formatMoney(HuntingAnalyser.rawXpHour, ",")
+	text = text .. "\nLoot: " .. formatMoney(HuntingAnalyser.loot, ",")
+	text = text .. "\nSupplies: " .. formatMoney(HuntingAnalyser.supplies, ",")
+	text = text .. "\nBalance: " .. formatMoney(HuntingAnalyser.balance, ",")
+	text = text .. "\nDamage: " .. formatMoney(HuntingAnalyser.damage, ",")
+	text = text .. "\nDamage/h: " .. formatMoney(HuntingAnalyser.damageHour, ",")
+	text = text .. "\nHealing: " .. formatMoney(HuntingAnalyser.healing, ",")
+	text = text .. "\nHealing/h: " .. formatMoney(HuntingAnalyser.healingHour, ",")
 	text = text .. "\nKilled Monsters: "
 	if table.empty(HuntingAnalyser.killedMonsters) then
 		text = text .. "\n\tNone"
@@ -620,17 +620,17 @@ function HuntingAnalyser:saveToFile()
 
 	local text = "Session data: From " .. os.date('%Y-%m-%d, %H:%M:%S', HuntingAnalyser.session) .." to ".. os.date('%Y-%m-%d, %H:%M:%S')
 	text = text .. "\nSession: " .. string.format("%02d:%02dh", hours, minutes)
-	text = text .. "\nRaw XP Gain: " .. format_thousand(HuntingAnalyser.rawXPGain)
-	text = text .. "\nXP Gain: " .. format_thousand(HuntingAnalyser.xpGain)
-	text = text .. "\nXP/h: " .. format_thousand(HuntingAnalyser.xpHour)
-	text = text .. "\nRaw XP/h: " .. format_thousand(HuntingAnalyser.rawXpHour)
-	text = text .. "\nLoot: " .. format_thousand(HuntingAnalyser.loot)
-	text = text .. "\nSupplies: " .. format_thousand(HuntingAnalyser.supplies)
-	text = text .. "\nBalance: " .. format_thousand(HuntingAnalyser.balance)
-	text = text .. "\nDamage: " .. format_thousand(HuntingAnalyser.damage)
-	text = text .. "\nDamage/h: " .. format_thousand(HuntingAnalyser.damageHour)
-	text = text .. "\nHealing: " .. format_thousand(HuntingAnalyser.healing)
-	text = text .. "\nHealing/h: " .. format_thousand(HuntingAnalyser.healingHour)
+	text = text .. "\nRaw XP Gain: " .. formatMoney(HuntingAnalyser.rawXPGain, ",")
+	text = text .. "\nXP Gain: " .. formatMoney(HuntingAnalyser.xpGain, ",")
+	text = text .. "\nXP/h: " .. formatMoney(HuntingAnalyser.xpHour, ",")
+	text = text .. "\nRaw XP/h: " .. formatMoney(HuntingAnalyser.rawXpHour, ",")
+	text = text .. "\nLoot: " .. formatMoney(HuntingAnalyser.loot, ",")
+	text = text .. "\nSupplies: " .. formatMoney(HuntingAnalyser.supplies, ",")
+	text = text .. "\nBalance: " .. formatMoney(HuntingAnalyser.balance, ",")
+	text = text .. "\nDamage: " .. formatMoney(HuntingAnalyser.damage, ",")
+	text = text .. "\nDamage/h: " .. formatMoney(HuntingAnalyser.damageHour, ",")
+	text = text .. "\nHealing: " .. formatMoney(HuntingAnalyser.healing, ",")
+	text = text .. "\nHealing/h: " .. formatMoney(HuntingAnalyser.healingHour, ",")
 	text = text .. "\nKilled Monsters: "
 	if table.empty(HuntingAnalyser.killedMonsters) then
 		text = text .. "\n\tNone"
@@ -704,15 +704,12 @@ function HuntingAnalyser:saveToJson()
 	local filename = 'Hunting_Session_' .. os.date('%Y-%m-%d', HuntingAnalyser.session) .. '_' .. HuntingAnalyser.session/1000 .. '.json'
 	local filepath = filename
 
-	g_resources.writeFileContents(filepath, text)
-	modules.game_textmessage.displayStatusMessage(tr('Hunting Session data has been saved to location \'%s\'', filename))
-
 	local status, result = pcall(function() return json.encode(huntingData, 2) end)
 	if not status then
-		return onError("Error while saving hunting analyzer profile settings. Data won't be saved. Details: " .. result)
+		return g_logger.error("Error while saving hunting analyzer profile settings. Data won't be saved. Details: " .. result)
  	end
 	if result:len() > 100 * 1024 * 1024 then
-		return onError("Something went wrong, file is above 100MB, won't be saved")
+		return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
 	end
 	g_resources.writeFileContents(filepath, result)
 	modules.game_textmessage.displayStatusMessage(tr('Hunting Session data has been saved to location \'%s\'', filename))
@@ -751,7 +748,11 @@ function HuntingAnalyser:loadConfigJson()
 		return
 	end
 
-	HuntingAnalyser.showBaseXp = false
+	-- Set default configuration
+	local config = {
+		showBaseXp = false
+	}
+
 	local file = "/characterdata/" .. player:getId() .. "/huntingsessionanalyser.json"
 	if g_resources.fileExists(file) then
 		local status, result = pcall(function()
@@ -762,9 +763,10 @@ function HuntingAnalyser:loadConfigJson()
 			return g_logger.error("Error while reading characterdata file. Details: " .. result)
 		end
 
-		HuntingAnalyser.showBaseXp = result.showBaseXp
+		config = result
 	end
 
+	HuntingAnalyser.showBaseXp = config.showBaseXp
 	HuntingAnalyser:setShowBaseXp(HuntingAnalyser.showBaseXp)
 end
 
