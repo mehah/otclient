@@ -329,7 +329,7 @@ namespace {
         if (!parent) return 0;
 
         int run = 0;
-        int lastTop = std::numeric_limits<int>::min();
+        int lastTop = INT_MIN;
 
         for (const auto& c : parent->getChildren()) {
             if (c.get() == self) break;
@@ -339,16 +339,16 @@ namespace {
             const auto cf = mapLogicalFloat(c->getFloat());
             if (cf != FloatType::None) continue;
 
-            if (breakLine(c->getDisplay())) { run = 0; lastTop = std::numeric_limits<int>::min(); continue; }
+            if (breakLine(c->getDisplay())) { run = 0; lastTop = INT_MIN; continue; }
 
             if (isInlineLike(c->getDisplay())) {
                 const int ct = c->getRect().topLeft().y;
-                if (lastTop == std::numeric_limits<int>::min()) lastTop = ct;
+                if (lastTop == INT_MIN) lastTop = ct;
                 if (ct > lastTop) { run = 0; lastTop = ct; }
                 run += calcOuterWidth(c.get());
             } else {
                 run = 0;
-                lastTop = std::numeric_limits<int>::min();
+                lastTop = INT_MIN;
             }
         }
         return run;
