@@ -96,7 +96,8 @@
         "DEBUG_LOG": "ON",
         "ASAN_ENABLED": "ON",
         "BUILD_STATIC_LIBRARY": "OFF",
-        "VCPKG_TARGET_TRIPLET": "x64-windows"
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "SPEED_UP_BUILD_UNITY": "OFF"
       },
       "architecture": {
         "value": "x64",

@@ -52,6 +52,11 @@
 #include <parallel_hashmap/phmap.h>
 #include <pugixml.hpp>
 
+#include <ixwebsocket/IXHttp.h>
+#include <ixwebsocket/IXHttpClient.h>
+#include <ixwebsocket/IXWebSocket.h>
+#include <ixwebsocket/IXWebSocketMessage.h>
+
 // FMT
 #include <fmt/chrono.h>
 #include <fmt/core.h>
