@@ -20,6 +20,7 @@
     "stduuid",
     "zlib",
     "bshoshany-thread-pool",
+    "boost-locale",
     "fmt",
     {
       "name": "luajit",
