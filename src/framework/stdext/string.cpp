@@ -24,6 +24,8 @@
 #include <ranges>
 #include <vector>
 #include <charconv>
+#include <boost/locale/encoding.hpp>
+#include <boost/locale/encoding_utf.hpp>
 
 #include "exception.h"
 #include "types.h"
@@ -79,81 +81,74 @@ namespace stdext
     }
 
     [[nodiscard]] bool is_valid_utf8(std::string_view src) {
-        for (size_t i = 0; i < src.size();) {
-            unsigned char c = src[i];
-            size_t bytes = (c < 0x80) ? 1 : (c < 0xE0) ? 2 : (c < 0xF0) ? 3 : (c < 0xF5) ? 4 : 0;
-            if (!bytes || i + bytes > src.size() || (bytes > 1 && (src[i + 1] & 0xC0) != 0x80))
-                return false;
-            i += bytes;
+        try {
+            boost::locale::conv::utf_to_utf<char32_t>(src.data(), src.data() + src.size(), boost::locale::conv::stop);
+            return true;
+        } catch (const boost::locale::conv::conversion_error&) {
+            return false;
         }
-        return true;
     }
 
     [[nodiscard]] std::string utf8_to_latin1(std::string_view src) {
-        std::string out;
-        out.reserve(src.size()); // Reserve memory to avoid multiple allocations
-        for (size_t i = 0; i < src.size(); ++i) {
-            uint8_t c = static_cast<uint8_t>(src[i]);
-            if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09) {
-                out += c;
-            } else if (c == 0xc2 || c == 0xc3) {
-                if (i + 1 < src.size()) {
-                    uint8_t c2 = static_cast<uint8_t>(src[++i]);
-                    out += (c == 0xc2) ? c2 : (c2 + 64);
-                }
-            } else {
-                // Skip multi-byte characters
-                while (i + 1 < src.size() && (src[i + 1] & 0xC0) == 0x80) {
-                    ++i;
-                }
-            }
+        try {
+            return boost::locale::conv::between(src.data(), src.data() + src.size(), "ISO-8859-1", "UTF-8", boost::locale::conv::skip);
+        } catch (const boost::locale::conv::conversion_error&) {
+            return {};
+        } catch (const boost::locale::conv::invalid_charset_error&) {
+            return {};
         }
-        return out;
     }
 
     [[nodiscard]] std::string latin1_to_utf8(std::string_view src) {
-        std::string out;
-        out.reserve(src.size() * 2); // Reserve space to reduce allocations
-        for (uint8_t c : src) {
-            if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09) {
-                out += c; // Directly append ASCII characters
-            } else {
-                out.push_back(0xc2 + (c > 0xbf));
-                out.push_back(0x80 + (c & 0x3f));
-            }
+        try {
+            return boost::locale::conv::between(src.data(), src.data() + src.size(), "UTF-8", "ISO-8859-1", boost::locale::conv::stop);
+        } catch (const boost::locale::conv::conversion_error&) {
+            return {};
+        } catch (const boost::locale::conv::invalid_charset_error&) {
+            return {};
         }
-        return out;
     }
 
 #ifdef WIN32
-#include <winsock2.h>
-#include <windows.h>
-
     std::wstring utf8_to_utf16(const std::string_view src)
     {
-        constexpr size_t BUFFER_SIZE = 65536;
-
-        std::wstring res;
-        wchar_t out[BUFFER_SIZE];
-        if (MultiByteToWideChar(CP_UTF8, 0, src.data(), -1, out, BUFFER_SIZE))
-            res = out;
-        return res;
+        try {
+            return boost::locale::conv::utf_to_utf<wchar_t>(src.data(), src.data() + src.size(), boost::locale::conv::stop);
+        } catch (const boost::locale::conv::conversion_error&) {
+            return {};
+        }
     }
 
     std::string utf16_to_utf8(const std::wstring_view src)
     {
-        constexpr size_t BUFFER_SIZE = 65536;
-
-        std::string res;
-        char out[BUFFER_SIZE];
-        if (WideCharToMultiByte(CP_UTF8, 0, src.data(), -1, out, BUFFER_SIZE, nullptr, nullptr))
-            res = out;
-        return res;
+        try {
+            return boost::locale::conv::utf_to_utf<char>(src.data(), src.data() + src.size(), boost::locale::conv::stop);
+        } catch (const boost::locale::conv::conversion_error&) {
+            return {};
+        }
     }
 
-    std::wstring latin1_to_utf16(const std::string_view src) { return utf8_to_utf16(latin1_to_utf8(src)); }
+    std::wstring latin1_to_utf16(const std::string_view src)
+    {
+        try {
+            return boost::locale::conv::to_utf<wchar_t>(src.data(), src.data() + src.size(), "ISO-8859-1", boost::locale::conv::stop);
+        } catch (const boost::locale::conv::conversion_error&) {
+            return {};
+        } catch (const boost::locale::conv::invalid_charset_error&) {
+            return {};
+        }
+    }
 
-    std::string utf16_to_latin1(const std::wstring_view src) { return utf8_to_latin1(utf16_to_utf8(src)); }
+    std::string utf16_to_latin1(const std::wstring_view src)
+    {
+        try {
+            return boost::locale::conv::from_utf(src.data(), src.data() + src.size(), "ISO-8859-1", boost::locale::conv::skip);
+        } catch (const boost::locale::conv::conversion_error&) {
+            return {};
+        } catch (const boost::locale::conv::invalid_charset_error&) {
+            return {};
+        }
+    }
 #endif
 
     void tolower(std::string& str) { std::ranges::transform(str, str.begin(), ::tolower); }
