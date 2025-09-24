@@ -5,6 +5,7 @@
     "asio",
     "abseil",
     "cpp-httplib",
+    "cppcodec",
     "discord-rpc",
     "liblzma",
     "libobfuscate",
