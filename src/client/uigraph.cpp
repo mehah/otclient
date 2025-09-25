@@ -88,10 +88,32 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
         if (!m_title.empty())
             m_font->drawText(m_title, dest, Color::white, Fw::AlignTopCenter);
         if (m_showLabes) {
-            // TODO: Change position of texts (Now they are in corners)
-            m_font->drawText(m_lastValue, dest, Color::white, Fw::AlignTopRight);
-            m_font->drawText(m_maxValue, dest, Color::white, Fw::AlignTopLeft);
-            m_font->drawText(m_minValue, dest, Color::white, Fw::AlignBottomLeft);
+            // Apply 90-degree counterclockwise rotation (-π/2 radians) for Y-axis labels
+            const float rotationAngle = -1.5707963267948966f; // -π/2 radians (90 degrees counterclockwise)
+            
+            // Position max value at top-left with negative left alignment (more to the left)
+            g_drawPool.pushTransformMatrix();
+            Point maxPoint(dest.left() - 10, dest.top() + 0); // Adjusted position for rotated text
+            g_drawPool.rotate(maxPoint, rotationAngle);
+            Rect maxRect(maxPoint.x - 50, maxPoint.y - 5, 100, 10);
+            m_font->drawText(m_maxValue, maxRect, Color::white, Fw::AlignCenter);
+            g_drawPool.popTransformMatrix();
+            
+            // Position min value at bottom-left with same negative left alignment as max value
+            g_drawPool.pushTransformMatrix();
+            Point minPoint(dest.left() - 10, dest.bottom() - 0); // Adjusted position for rotated text
+            g_drawPool.rotate(minPoint, rotationAngle);
+            Rect minRect(minPoint.x - 50, minPoint.y - 5, 100, 10);
+            m_font->drawText(m_minValue, minRect, Color::white, Fw::AlignCenter);
+            g_drawPool.popTransformMatrix();
+            
+            // Position average value centered vertically between max and min on the left side
+            g_drawPool.pushTransformMatrix();
+            Point avgPoint(dest.left() - 10, dest.verticalCenter()); // Adjusted position for rotated text
+            g_drawPool.rotate(avgPoint, rotationAngle);
+            Rect avgRect(avgPoint.x - 50, avgPoint.y - 5, 100, 10);
+            m_font->drawText(m_avgValue, avgRect, Color::white, Fw::AlignCenter);
+            g_drawPool.popTransformMatrix();
         }
     }
 
@@ -272,12 +294,22 @@ void UIGraph::cacheGraphs()
                 }
             }
 
-            m_minValue = std::to_string(static_cast<int>(minValue));
-            m_maxValue = std::to_string(static_cast<int>(maxValue));
-            if (!m_graphs[0].values.empty())
-                m_lastValue = std::to_string(m_graphs[0].values.back());
-            else
+            m_minValue = formatNumber(static_cast<int>(minValue));
+            m_maxValue = formatNumber(static_cast<int>(maxValue));
+            if (!m_graphs[0].values.empty()) {
+                m_lastValue = formatNumber(m_graphs[0].values.back());
+                
+                // Calculate average from all values in the first graph
+                float sum = 0.0f;
+                for (const auto& value : m_graphs[0].values) {
+                    sum += value;
+                }
+                float avgValue = sum / static_cast<float>(m_graphs[0].values.size());
+                m_avgValue = formatNumber(static_cast<int>(avgValue));
+            } else {
                 m_lastValue = "0";
+                m_avgValue = "0";
+            }
         }
 
         m_needsUpdate = false;
@@ -307,7 +339,7 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
         graph.infoLine[0] = Point(snappedX, dest.top());
         graph.infoLine[1] = Point(snappedX, dest.bottom());
 
-        graph.infoValue = fmt::format("{} {}", graph.infoText, value);
+        graph.infoValue = fmt::format("{} {}", graph.infoText, formatNumber(value));
 
         auto [minValueIter, maxValueIter] = std::ranges::minmax_element(graph.values);
         const auto minValue = static_cast<float>(*minValueIter);
@@ -429,4 +461,38 @@ void UIGraph::onVisibilityChange(const bool visible)
 {
     UIWidget::onVisibilityChange(visible);
     m_needsUpdate = visible;
+}
+
+std::string UIGraph::formatNumber(const int value)
+{
+    const int absValue = std::abs(value);
+    
+    if (absValue >= 100000000) {
+        // B notation for values >= 100,000,000
+        const float billions = static_cast<float>(value) / 1000000000.0f;
+        if (billions >= 10.0f) {
+            return std::to_string(static_cast<int>(billions)) + "B";
+        } else {
+            return fmt::format("{:.1f}B", billions);
+        }
+    } else if (absValue >= 100000) {
+        // M notation for values >= 100,000
+        const float millions = static_cast<float>(value) / 1000000.0f;
+        if (millions >= 10.0f) {
+            return std::to_string(static_cast<int>(millions)) + "M";
+        } else {
+            return fmt::format("{:.1f}M", millions);
+        }
+    } else if (absValue >= 1000) {
+        // K notation for values >= 1,000
+        const float thousands = static_cast<float>(value) / 1000.0f;
+        if (thousands >= 10.0f) {
+            return std::to_string(static_cast<int>(thousands)) + "K";
+        } else {
+            return fmt::format("{:.1f}K", thousands);
+        }
+    }
+    
+    // Return original number as string for values < 1,000
+    return std::to_string(value);
 }
