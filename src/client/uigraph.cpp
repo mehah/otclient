@@ -81,38 +81,58 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             if (m_showInfo && isHovered()) {
                 g_drawPool.addFilledRect(graph.infoRectBg, graph.infoTextBg);
                 g_drawPool.addFilledRect(graph.infoRectIcon, graph.lineColor);
-                m_font->drawText(graph.infoValue, graph.infoRect, Color::black, Fw::AlignLeftCenter);
+                m_font->drawText(graph.infoValue, graph.infoRect, Color::lightGray, Fw::AlignLeftCenter);
             }
         }
 
         if (!m_title.empty())
-            m_font->drawText(m_title, dest, Color::white, Fw::AlignTopCenter);
+            m_font->drawText(m_title, dest, Color::lightGray, Fw::AlignTopCenter);
         if (m_showLabes) {
-            // Apply 90-degree counterclockwise rotation (-π/2 radians) for Y-axis labels
-            const float rotationAngle = -1.5707963267948966f; // -π/2 radians (90 degrees counterclockwise)
+            const float rotationAngle = -1.5707963267948966f;
             
-            // Position max value at top-left with negative left alignment (more to the left)
             g_drawPool.pushTransformMatrix();
-            Point maxPoint(dest.left() - 10, dest.top() + 0); // Adjusted position for rotated text
+            Point maxPoint(dest.left() - 10, dest.top() + 0);
             g_drawPool.rotate(maxPoint, rotationAngle);
-            Rect maxRect(maxPoint.x - 50, maxPoint.y - 5, 100, 10);
-            m_font->drawText(m_maxValue, maxRect, Color::white, Fw::AlignCenter);
+            Rect maxRect(maxPoint.x - 50, maxPoint.y - 8, 100, 16);
+            m_font->drawText(m_maxValue, Rect(maxRect.x()-1, maxRect.y()-1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x()+1, maxRect.y()-1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x()-1, maxRect.y()+1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x()+1, maxRect.y()+1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y()-1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y()+1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x()-1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x()+1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, maxRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
             
-            // Position min value at bottom-left with same negative left alignment as max value
             g_drawPool.pushTransformMatrix();
-            Point minPoint(dest.left() - 10, dest.bottom() - 0); // Adjusted position for rotated text
+            Point minPoint(dest.left() - 10, dest.bottom() - 0);
             g_drawPool.rotate(minPoint, rotationAngle);
-            Rect minRect(minPoint.x - 50, minPoint.y - 5, 100, 10);
-            m_font->drawText(m_minValue, minRect, Color::white, Fw::AlignCenter);
+            Rect minRect(minPoint.x - 50, minPoint.y - 8, 100, 16);
+            m_font->drawText(m_minValue, Rect(minRect.x()-1, minRect.y()-1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x()+1, minRect.y()-1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x()-1, minRect.y()+1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x()+1, minRect.y()+1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y()-1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y()+1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x()-1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x()+1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, minRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
             
-            // Position average value centered vertically between max and min on the left side
             g_drawPool.pushTransformMatrix();
-            Point avgPoint(dest.left() - 10, dest.verticalCenter()); // Adjusted position for rotated text
+            Point avgPoint(dest.left() - 10, dest.verticalCenter());
             g_drawPool.rotate(avgPoint, rotationAngle);
-            Rect avgRect(avgPoint.x - 50, avgPoint.y - 5, 100, 10);
-            m_font->drawText(m_avgValue, avgRect, Color::white, Fw::AlignCenter);
+            Rect avgRect(avgPoint.x - 50, avgPoint.y - 8, 100, 16);
+            m_font->drawText(m_avgValue, Rect(avgRect.x()-1, avgRect.y()-1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x()+1, avgRect.y()-1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x()-1, avgRect.y()+1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x()+1, avgRect.y()+1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y()-1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y()+1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x()-1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x()+1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, avgRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
         }
     }
@@ -272,12 +292,15 @@ void UIGraph::cacheGraphs()
             const auto graphHeight = static_cast<float>(rect.height());
 
             float minValue = 0.0f;
-            float maxValue = 0.0f;
+            float maxValue = 1.0f;
+            bool hasValues = false;
+            
             for (auto& graph : m_graphs) {
                 if (graph.values.empty())
                     continue;
 
                 graph.points.clear();
+                hasValues = true;
 
                 auto [minValueIter, maxValueIter] = std::ranges::minmax_element(graph.values);
                 minValue = *minValueIter;
@@ -294,8 +317,13 @@ void UIGraph::cacheGraphs()
                 }
             }
 
-            m_minValue = formatNumber(static_cast<int>(minValue));
-            m_maxValue = formatNumber(static_cast<int>(maxValue));
+            if (hasValues) {
+                m_minValue = formatNumber(static_cast<int>(minValue));
+                m_maxValue = formatNumber(static_cast<int>(maxValue));
+            } else {
+                m_minValue = "0";
+                m_maxValue = "1";
+            }
             if (!m_graphs[0].values.empty()) {
                 m_lastValue = formatNumber(m_graphs[0].values.back());
                 
@@ -308,8 +336,14 @@ void UIGraph::cacheGraphs()
                 m_avgValue = formatNumber(static_cast<int>(avgValue));
             } else {
                 m_lastValue = "0";
-                m_avgValue = "0";
+                m_avgValue = "0.5";
             }
+        } else {
+            // Set default values when no graphs exist
+            m_minValue = "0";
+            m_maxValue = "1";
+            m_lastValue = "0";
+            m_avgValue = "0.5";
         }
 
         m_needsUpdate = false;
@@ -467,16 +501,16 @@ std::string UIGraph::formatNumber(const int value)
 {
     const int absValue = std::abs(value);
     
-    if (absValue >= 100000000) {
-        // B notation for values >= 100,000,000
+    if (absValue >= 1000000000) {
+        // B notation for values >= 1,000,000,000
         const float billions = static_cast<float>(value) / 1000000000.0f;
         if (billions >= 10.0f) {
             return std::to_string(static_cast<int>(billions)) + "B";
         } else {
             return fmt::format("{:.1f}B", billions);
         }
-    } else if (absValue >= 100000) {
-        // M notation for values >= 100,000
+    } else if (absValue >= 1000000) {
+        // M notation for values >= 1,000,000
         const float millions = static_cast<float>(value) / 1000000.0f;
         if (millions >= 10.0f) {
             return std::to_string(static_cast<int>(millions)) + "M";
