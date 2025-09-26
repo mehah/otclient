@@ -481,7 +481,7 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
                 animationEvent = nil
             end
             fixServerNoSend0xF2()
-            g_game.sendRequestStorePremiumBoost() --reabrir a store para parar de bugar a compra da xpboost
+            g_game.sendRequestStorePremiumBoost() -- fix: request and refresh store to prevent XP Boost purchase bug
         end, 2000)
     end
 end
@@ -903,7 +903,6 @@ function chooseOffert(self, focusedChild)
         local priceLabel = offerPanel:getChildById('lblPrice')
         priceLabel:setText(offer.price)
 
-        -- 👇 Ajuste: garantir que nunca apareça "0x"
         local itemCount = (offer.count and offer.count > 0) and offer.count or 1
         if itemCount > 1 then
             offerPanel:getChildById('btnBuy'):setText("Buy " .. itemCount .. "x")
@@ -1010,7 +1009,6 @@ function chooseOffert(self, focusedChild)
                 coinType
             )
 
-            -- 👇 aqui normalizamos o count
             local itemCountConfirm = (offer.count and offer.count > 0) and offer.count or 1
             local detailsMessage = string.format(
                 "%dx %s\nPrice: %d %s",
