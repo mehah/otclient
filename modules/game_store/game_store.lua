@@ -1133,8 +1133,8 @@ function transferPoints()
 
     local sliderButton = transferPointsWindow.amountBar:getChildById('sliderButton')
     if sliderButton then
-        sliderButton:setEnabled(false)
-        sliderButton:setVisible(false)
+        sliderButton:setEnabled(true)
+        sliderButton:setVisible(true)
     end
 
     transferPointsWindow.onEscape = function()
