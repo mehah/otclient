@@ -1141,7 +1141,8 @@ function transferPoints()
         destroyWindow(transferPointsWindow)
     end
 
-    transferPointsWindow.amountBar.onValueChange = function()
+    local lastDisplayedValue = initialValue
+    transferPointsWindow.amountBar.onValueChange = function(scrollbar, value)
         local rawVal = transferPointsWindow.amountBar:getValue()
         local val = math.floor(rawVal / 25) * 25
         transferPointsWindow.amountBar:setValue(val)
