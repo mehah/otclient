@@ -169,15 +169,13 @@ local function getCoinsBalance()
         return tonumber(cleanNumber) or 0
     end
 
-    -- Normal (não transferíveis)
+    -- get coins: normal (non transferableCoins) | transfer(transferableCoins))
     local lblNormal = controllerShop.ui.lblCoins.lblTibiaCoins
-    -- Transferíveis
     local lblTransfer = controllerShop.ui.lblCoins.lblTibiaTransfer
 
     local normalCoins = lblNormal and extractNumber(lblNormal:getText()) or 0
     local transferableCoins = lblTransfer and extractNumber(lblTransfer:getText()) or 0
 
-    -- Retorno padronizado: normal primeiro, transferíveis depois
     return normalCoins, transferableCoins
 end
 
@@ -485,7 +483,7 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
                 animationEvent = nil
             end
             fixServerNoSend0xF2()
-            g_game.sendRequestStorePremiumBoost() --reabrir a store para parar de bugar a compra da xpboost
+            g_game.sendRequestStorePremiumBoost() -- fix: request and refresh store to prevent XP Boost purchase bug
         end, 2000)
     end
 end
@@ -896,7 +894,7 @@ function chooseOffert(self, focusedChild)
     end
     fixServerNoSend0xF2()
 
-    -- 👇 agora padronizado
+    -- example use getCoinsBalance
     local normalCoins, transferableCoins = getCoinsBalance()
     local offerStackPanel = panel:getChildById('StackOffers')
     offerStackPanel:destroyChildren()
@@ -960,7 +958,6 @@ function chooseOffert(self, focusedChild)
             end
         end
 
-        -- 👇 Confirmação corrigida
         offerPanel:getChildById('btnBuy').onClick = function(widget)
             if acceptWindow then
                 destroyWindow(acceptWindow)
@@ -1108,7 +1105,6 @@ function transferPoints()
     local playerBalance = g_game.getLocalPlayer():getResourceBalance(ResourceTypes.COIN_TRANSFERRABLE)
     fixServerNoSend0xF2()
 
-    -- 👇 agora padronizado
     local normalCoins, transferableCoins = getCoinsBalance()
 
     if playerBalance == 0 then
@@ -1125,8 +1121,7 @@ function transferPoints()
 
     transferPointsWindow.amountBar:setStep(25)
     transferPointsWindow.amountBar:setMinimum(minimumValue)
-    -- Garantir múltiplo de 25 para o máximo
-    local maxStep = math.floor(playerBalance / 25) * 25
+    local maxStep = math.floor(playerBalance / 25) * 25 -- coins multiple 25
     transferPointsWindow.amountBar:setMaximum(maxStep)
     transferPointsWindow.amountBar:setValue(initialValue)
     transferPointsWindow.amount:setText(formatNumberWithCommas(initialValue))

@@ -1261,7 +1261,7 @@ void ProtocolGame::sendTransferCoins(const std::string_view recipient, const uin
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientTransferCoins);
     msg->addString(recipient);
-    msg->addU32(amount); // mudadado para 32 bits pois o server espera 32 bits
+    msg->addU32(amount); // the server receive in unit32
     send(msg);
 }
 
