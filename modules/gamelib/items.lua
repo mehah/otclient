@@ -91,7 +91,7 @@ function ItemsDatabase.setColorLootMessage(text)
 end
 
 function ItemsDatabase.setTier(widget, item)
-    if not g_game.getFeature(GameThingUpgradeClassification) or not widget then
+    if not g_game.getFeature(GameThingUpgradeClassification) or not widget or not widget.tier then
         return
     end
     local tier = type(item) == "number" and item or (item and item:getTier()) or 0

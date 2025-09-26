@@ -263,10 +263,17 @@ https://github.com/kokekanon/otclient.readme/assets/114332266/16aaa78b-fc55-4c6e
 #### 🙋 Community (Features)
 
 <details>
-  <summary>🕹️ Discord RPC — @SkullzOTS *(Doesn't work with CMAKE)*</summary>
+  <summary>🕹️ Discord RPC — @SkullzOTS</summary>
 
-- by [@SkullzOTS](https://github.com/SkullzOTS)  
-- Enable via [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43): set `ENABLE_DISCORD_RPC` to **1** and configure the other definitions  
+- by [@SkullzOTS](https://github.com/SkullzOTS), [@surfaceflinger](https://github.com/surfaceflinger) and [@libergod](https://github.com/libergod)
+- To enable just go to [config.h](https://github.com/mehah/otclient/blob/main/src/framework/config.h#L43), set **1** in `ENABLE_DISCORD_RPC` and configure the others definitions
+- If using CMake execute: 
+  - Removes Content of Build Folder if needed
+  - `if (Test-Path -Path build) { Remove-Item -Path build -Recurse -Force; New-Item -Path build -ItemType Directory }` 
+  - Configure CMake
+  - `cmake -B build -G "Ninja" -DENABLE_DISCORD_RPC=ON`
+  - Build it
+  - `cmake --build build`
 - Step-by-step on **YouTube**: https://www.youtube.com/watch?v=zCHYtRlD58g
 
 <p align="center">

@@ -373,13 +373,13 @@ MiniWindow
       visible: false
       id: convertedDamage
       SkillNameLabel
-        !text: tr('converted Damage')
+        !text: tr('Converted Damage')
       SkillValueLabel
     SmallSkillButton
       visible: false
       id: convertedElement
       SkillNameLabel
-        !text: tr('converted Element')
+        !text: tr('Converted Element')
       SkillValueLabel
       
     SmallSkillButton
@@ -523,7 +523,7 @@ MiniWindow
       id: manadRainResist
       visible: false
       SkillNameLabel
-        !text: tr('manadrain')
+        !text: tr('Manadrain')
       SkillValueLabel
         margin-right: 12
       ImageAbsorb

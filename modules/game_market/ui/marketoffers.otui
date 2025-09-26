@@ -33,7 +33,7 @@ Panel
     border-width: 1
     border-color: #000000
 
-  UIItem
+  Item
     id: selectedItem
     phantom: true
     size: 34 34

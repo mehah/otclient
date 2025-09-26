@@ -1,4 +1,3 @@
-
 project(otclient)
 
 # *****************************************************************************
@@ -15,6 +14,7 @@ option(TOGGLE_FRAMEWORK_XML "Use XML " ON)
 option(TOGGLE_FRAMEWORK_NET "Use NET " ON)
 option(TOGGLE_FRAMEWORK_EDITOR "Use Editor " OFF)
 option(TOGGLE_DIRECTX "Use DX9 support" OFF)
+option(ENABLE_DISCORD_RPC "Use Discord Rich Presence" OFF)
 option(TOGGLE_BIN_FOLDER "Use build/bin folder for generate compilation files" OFF)
 option(DEBUG_LOG "Enable Debug Log" OFF)
 option(ASAN_ENABLED "Build this target with AddressSanitizer" OFF)
@@ -166,7 +166,6 @@ endif()
 add_definitions(-DCLIENT)
 add_definitions(${FRAMEWORK_DEFINITIONS})
 add_definitions(-D"VERSION=${VERSION}")
-
 # === Build options ===
 message(STATUS "Build type: " ${CMAKE_BUILD_TYPE})
 add_definitions(-D"BUILD_TYPE=\\\"${CMAKE_BUILD_TYPE}\\\"")
@@ -207,6 +206,14 @@ if(WIN32)
 endif(WIN32)
 if(NOT OPENSSL_FOUND)
   find_package(GMP REQUIRED)
+endif()
+if(ENABLE_DISCORD_RPC AND NOT ANDROID)
+	find_package(DiscordRPC REQUIRED)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_DISCORD_RPC=1)
+	log_option_enabled("Discord Rich Presence")
+else()
+	target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_DISCORD_RPC=0)
+	log_option_disabled("Discord Rich Presence")
 endif()
 if(TOGGLE_DIRECTX)
   find_package(DirectX REQUIRED)
@@ -715,6 +722,9 @@ else() # Linux
     )
   endif()
 
+endif()
+if(ENABLE_DISCORD_RPC AND NOT ANDROID)
+	target_link_libraries(${PROJECT_NAME} PRIVATE ${DISCORDRPC_LIBRARY})
 endif()
 
 # *****************************************************************************

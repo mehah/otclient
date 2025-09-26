@@ -4,7 +4,7 @@ MarketOffer.__index = MarketOffer
 local OFFER_TIMESTAMP = 1
 local OFFER_COUNTER = 2
 
-MarketOffer.new = function(offerId, t, item, amount, price, playerName, state, var)
+MarketOffer.new = function(offerId, t, item, amount, price, playerName, state, var, itemTier)
     local offer = {
         id = {},
         type = nil,
@@ -13,7 +13,8 @@ MarketOffer.new = function(offerId, t, item, amount, price, playerName, state, v
         price = 0,
         player = '',
         state = 0,
-        var = nil
+        var = nil,
+        itemTier = 0
     }
 
     if not offerId or type(offerId) ~= 'table' then
@@ -43,6 +44,7 @@ MarketOffer.new = function(offerId, t, item, amount, price, playerName, state, v
     end
     offer.state = state
     offer.var = var
+    offer.itemTier = itemTier
 
     setmetatable(offer, MarketOffer)
     return offer
@@ -155,4 +157,8 @@ function MarketOffer:getCounter()
         return
     end
     return self.id[OFFER_COUNTER]
+end
+
+function MarketOffer:getTier()
+    return self.itemTier
 end
