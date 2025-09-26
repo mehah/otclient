@@ -182,6 +182,7 @@ add_definitions(-D"BUILD_REVISION=\\\"${BUILD_REVISION}\\\"")
 find_package(OpenSSL QUIET)
 find_package(PhysFS REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(PNG REQUIRED)
 find_package(phmap REQUIRED)
 find_package(absl CONFIG REQUIRED)
 find_package(Protobuf REQUIRED)
@@ -512,6 +513,7 @@ if(MSVC)
           ${CMAKE_THREAD_LIBS_INIT}
           ${PHYSFS_LIBRARY}
           ${ZLIB_LIBRARY}
+          PNG::PNG
           ${NLOHMANN_JSON_LIBRARY}
           ${OPENGL_LIBRARIES}
           ${DirectX_LIBRARY}
@@ -558,6 +560,7 @@ elseif(ANDROID)
           ${LUAJIT_LIBRARY}
           ${PHYSFS_LIBRARY}
           ${ZLIB_LIBRARY}
+          PNG::PNG
           ${NLOHMANN_JSON_LIBRARY}
           ${EGL_LIBRARY}
           ${OGG_LIBRARY}
@@ -605,6 +608,7 @@ elseif(WASM)
           ${LUA_LIBRARY}
           ${PHYSFS_LIBRARY}
           ${ZLIB_LIBRARY}
+          PNG::PNG
           ${PROTOBUF_LIBRARY}
           ${NLOHMANN_JSON_LIBRARY}
           ${GLEW_LIBRARY}
