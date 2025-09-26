@@ -429,6 +429,15 @@ function XPAnalyser:setRawXPVisible(value)
 
 	XPAnalyser.rawXpVisible = value
 	XPAnalyser:checkAnchos()
+	
+	-- Adjust window maximum height based on raw XP visibility
+	if value then
+		XPAnalyser.window:setContentMaximumHeight(255)  -- Show Raw XP active (taller)
+		XPAnalyser.window:setHeight(255)
+	else
+		XPAnalyser.window:setContentMaximumHeight(225)  -- Show Raw XP inactive (shorter)
+		XPAnalyser.window:setHeight(225)
+	end
 end
 
 function XPAnalyser:setGaugeVisible(value)
