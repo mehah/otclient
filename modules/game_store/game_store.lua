@@ -1143,10 +1143,14 @@ function transferPoints()
 
     local lastDisplayedValue = initialValue
     transferPointsWindow.amountBar.onValueChange = function(scrollbar, value)
-        local rawVal = transferPointsWindow.amountBar:getValue()
-        local val = math.floor(rawVal / 25) * 25
-        transferPointsWindow.amountBar:setValue(val)
-        transferPointsWindow.amount:setText(formatNumberWithCommas(val))
+        -- Round to the nearest multiple of 25
+        local val = math.floor((value + 12) / 25) * 25
+        
+        -- Only update the display if the value has changed
+        if val ~= lastDisplayedValue then
+            lastDisplayedValue = val
+            transferPointsWindow.amount:setText(formatNumberWithCommas(val))
+        end
     end
 
     transferPointsWindow.closeButton.onClick = function()
