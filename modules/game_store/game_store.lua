@@ -481,6 +481,7 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
                 animationEvent = nil
             end
             fixServerNoSend0xF2()
+            g_game.sendRequestStorePremiumBoost() -- fix: request and refresh store to prevent XP Boost purchase bug
         end, 2000)
     end
 end
@@ -902,8 +903,9 @@ function chooseOffert(self, focusedChild)
         local priceLabel = offerPanel:getChildById('lblPrice')
         priceLabel:setText(offer.price)
 
-        if offer.count and offer.count > 0 then
-            offerPanel:getChildById('btnBuy'):setText("Buy " .. offer.count .. "x")
+        local itemCount = (offer.count and offer.count > 0) and offer.count or 1
+        if itemCount > 1 then
+            offerPanel:getChildById('btnBuy'):setText("Buy " .. itemCount .. "x")
         end
 
         if product.configurable then
@@ -960,6 +962,7 @@ function chooseOffert(self, focusedChild)
         end
         
 
+        -- 👇 Confirmação corrigida
         offerPanel:getChildById('btnBuy').onClick = function(widget)
             if acceptWindow then
                 destroyWindow(acceptWindow)
@@ -997,22 +1000,36 @@ function chooseOffert(self, focusedChild)
             local function cancelFunc()
                 destroyWindow(acceptWindow)
             end
-            local coinType = isTransferable and "transferable coins" or "regular coins"
-            local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, offer.price, coinType)
-            local detailsMessage = string.format("%dx %s\nPrice: %d %s", offer.count or 1, product.name, offer.price, coinType)
-            local data = getProductData(product)
 
-            acceptWindow = displayGeneralSHOPBox(tr('Confirmation of Purchase'), confirmationMessage, detailsMessage, {
+            local coinType = isTransferable and "transferable coins" or "regular coins"
+            local confirmationMessage = string.format(
+                'Do you want to buy the product "%s" for %d %s?', 
+                product.name, 
+                offer.price, 
+                coinType
+            )
+
+            local itemCountConfirm = (offer.count and offer.count > 0) and offer.count or 1
+            local detailsMessage = string.format(
+                "%dx %s\nPrice: %d %s",
+                itemCountConfirm,
+                product.name,
+                offer.price,
+                coinType
+            )
+
+            acceptWindow = displayGeneralSHOPBox(
+                tr('Confirmation of Purchase'),
+                confirmationMessage,
+                detailsMessage,
                 {
-                    text = tr('Buy'),
-                    callback = acceptFunc
+                    { text = tr('Buy'), callback = acceptFunc },
+                    { text = tr('Cancel'), callback = cancelFunc },
+                    anchor = AnchorHorizontalCenter
                 },
-                {
-                    text = tr('Cancel'),
-                    callback = cancelFunc
-                },
-                anchor = AnchorHorizontalCenter
-            }, acceptFunc, cancelFunc)
+                acceptFunc,
+                cancelFunc
+            )
             if data then
                 createProductImage(acceptWindow.Box, data)
             end
