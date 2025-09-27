@@ -23,7 +23,170 @@ return {
             g_window.setFullscreen(value)
         end
     },
-    classicControl                    = g_platform.isMobile() and true or false,
+    classicControl                    = {
+        value = g_platform.isMobile() and true or false,
+        action = function(value, options, controller, panels, extraWidgets)
+            -- Update the mouseControlMode based on this option
+            local mouseControlMode = 0
+            if value == true then
+                mouseControlMode = 1
+                -- Update settings directly to ensure persistence
+                g_settings.set('mouseControlMode', mouseControlMode)
+                options.mouseControlMode.value = mouseControlMode
+                
+                -- Update loot control visibility
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    lootControlModeCombobox:setVisible(true)
+                end
+            elseif options.smartLeftClick.value == true then
+                mouseControlMode = 2
+                -- Update settings directly to ensure persistence
+                g_settings.set('mouseControlMode', mouseControlMode)
+                options.mouseControlMode.value = mouseControlMode
+                
+                -- Update loot control visibility
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    lootControlModeCombobox:setVisible(false)
+                end
+            else
+                mouseControlMode = 0
+                -- Update settings directly to ensure persistence
+                g_settings.set('mouseControlMode', mouseControlMode)
+                options.mouseControlMode.value = mouseControlMode
+                
+                -- Update loot control visibility
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    lootControlModeCombobox:setVisible(false)
+                end
+            end
+            
+            local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+            if mouseControlModeCombobox then
+                mouseControlModeCombobox:setCurrentOption(mouseControlMode, true)
+            end
+        end
+    },
+    smartLeftClick                    = {
+        value = false,
+        action = function(value, options, controller, panels, extraWidgets)
+            -- Update the mouseControlMode based on this option
+            local mouseControlMode = 0
+            if options.classicControl.value == true then
+                mouseControlMode = 1
+                -- Update settings directly to ensure persistence
+                g_settings.set('mouseControlMode', mouseControlMode)
+                options.mouseControlMode.value = mouseControlMode
+                
+                -- Update loot control visibility
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    lootControlModeCombobox:setVisible(true)
+                end
+            elseif value == true then
+                mouseControlMode = 2
+                -- Update settings directly to ensure persistence
+                g_settings.set('mouseControlMode', mouseControlMode)
+                options.mouseControlMode.value = mouseControlMode
+                
+                -- Update loot control visibility
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    lootControlModeCombobox:setVisible(false)
+                end
+            else
+                mouseControlMode = 0
+                -- Update settings directly to ensure persistence
+                g_settings.set('mouseControlMode', mouseControlMode)
+                options.mouseControlMode.value = mouseControlMode
+                
+                -- Update loot control visibility
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    lootControlModeCombobox:setVisible(false)
+                end
+            end
+            
+            local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+            if mouseControlModeCombobox then
+                mouseControlModeCombobox:setCurrentOption(mouseControlMode, true)
+            end
+        end
+    },
+    mouseControlMode                  = {
+        value = 0, -- Default to "Regular Controls"
+        action = function(value, options, controller, panels, extraWidgets)
+            -- We need a small delay to ensure the UI updates correctly
+            scheduleEvent(function()
+                -- Update the mouseControlMode combobox - get it fresh each time
+                local mouseControlModeCombobox = panels.generalPanel:recursiveGetChildById('mouseControlMode')
+                if mouseControlModeCombobox then
+                    -- Force the combobox to select the right option
+                    for i = 0, 2 do
+                        if i == value then
+                            mouseControlModeCombobox:setCurrentOptionByData(i)
+                            break
+                        end
+                    end
+                end
+                
+                -- Update loot control mode visibility based on selection
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    if value == 1 then
+                        lootControlModeCombobox:setVisible(true)
+                    else
+                        lootControlModeCombobox:setVisible(false)
+                    end
+                end
+            end, 50)
+            
+            -- Also update the underlying options
+            if value == 0 then
+                options.classicControl.value = false
+                options.smartLeftClick.value = false
+                g_settings.set('classicControl', false)
+                g_settings.set('smartLeftClick', false)
+            elseif value == 1 then
+                options.classicControl.value = true
+                options.smartLeftClick.value = false
+                g_settings.set('classicControl', true)
+                g_settings.set('smartLeftClick', false)
+            elseif value == 2 then
+                options.classicControl.value = false
+                options.smartLeftClick.value = true
+                g_settings.set('classicControl', false)
+                g_settings.set('smartLeftClick', true)
+            end
+            
+            -- Force save
+            g_settings.save()
+        end
+    },
+    lootControlMode                   = {
+        value = 0, -- Default to "Loot: Right"
+        action = function(value, options, controller, panels, extraWidgets)
+            -- We need a small delay to ensure the UI updates correctly
+            scheduleEvent(function()
+                -- Update the lootControlMode combobox - get it fresh each time
+                local lootControlModeCombobox = panels.generalPanel:recursiveGetChildById('lootControlMode')
+                if lootControlModeCombobox then
+                    -- Force the combobox to select the right option
+                    for i = 0, 2 do
+                        if i == value then
+                            lootControlModeCombobox:setCurrentOptionByData(i)
+                            break
+                        end
+                    end
+                end
+            end, 50)
+            
+            -- Force save
+            g_settings.save()
+        end
+    },
     smartWalk                         = false,
     autoChaseOverride                 = true,
     moveStack                         = false,
