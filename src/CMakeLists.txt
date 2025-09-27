@@ -192,6 +192,7 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(ixwebsocket CONFIG REQUIRED)
 
 if(APPLE)
   # Required for Physfs
@@ -520,7 +521,9 @@ if(MSVC)
           OpenAL::OpenAL
           LibLZMA::LibLZMA
           winmm.lib
+          bcrypt.lib
           pugixml::pugixml
+          ixwebsocket::ixwebsocket
           fmt::fmt-header-only
   )
 elseif(ANDROID)
@@ -569,6 +572,7 @@ elseif(ANDROID)
           android
           log
           pugixml::pugixml
+          ixwebsocket::ixwebsocket
           fmt::fmt-header-only
   )
 
@@ -616,6 +620,7 @@ elseif(WASM)
           # OpenAL::OpenAL (using emscripten openal api)
           LibLZMA::LibLZMA
           pugixml::pugixml
+          ixwebsocket::ixwebsocket
           ZLIB::ZLIB
           OpenSSL::SSL
           OpenSSL::Crypto
@@ -699,6 +704,7 @@ else() # Linux
           OpenAL::OpenAL
           LibLZMA::LibLZMA
           pugixml::pugixml
+          ixwebsocket::ixwebsocket
           ZLIB::ZLIB
           OpenSSL::SSL
           OpenSSL::Crypto

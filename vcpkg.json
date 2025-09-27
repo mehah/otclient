@@ -21,6 +21,7 @@
     "zlib",
     "bshoshany-thread-pool",
     "fmt",
+    "ixwebsocket",
     {
       "name": "luajit",
       "platform": "!android & !wasm32"
