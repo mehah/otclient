@@ -95,6 +95,32 @@ clientCombat[combatStates.CLIENT_COMBAT_DROWN] = {  path = '/game_cyclopedia/ima
 clientCombat[combatStates.CLIENT_COMBAT_LIFEDRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-lifedrain-resist', id = 'Lifedrain ' }
 clientCombat[combatStates.CLIENT_COMBAT_MANADRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-manadrain-resist', id = 'Manadrain' }
 
+combatStates= {
+	CLIENT_COMBAT_PHYSICAL = 0,
+	CLIENT_COMBAT_FIRE = 1,
+	CLIENT_COMBAT_EARTH = 2,
+	CLIENT_COMBAT_ENERGY = 3,
+	CLIENT_COMBAT_ICE = 4,
+	CLIENT_COMBAT_HOLY = 5,
+	CLIENT_COMBAT_DEATH = 6,
+	CLIENT_COMBAT_HEALING = 7,
+	CLIENT_COMBAT_DROWN = 8,
+	CLIENT_COMBAT_LIFEDRAIN = 9,
+	CLIENT_COMBAT_MANADRAIN = 10,
+}
+clientCombat ={}
+clientCombat[combatStates.CLIENT_COMBAT_PHYSICAL] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-physical-resist', id = 'Physical' }
+clientCombat[combatStates.CLIENT_COMBAT_FIRE] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-fire-resist', id = 'Fire' }
+clientCombat[combatStates.CLIENT_COMBAT_EARTH] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-earth-resist', id = 'Earth' }
+clientCombat[combatStates.CLIENT_COMBAT_ENERGY] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-energy-resist', id = 'Energy' }
+clientCombat[combatStates.CLIENT_COMBAT_ICE] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-ice-resist', id = 'Ice' }
+clientCombat[combatStates.CLIENT_COMBAT_HOLY] = {path = '/game_cyclopedia/images/bestiary/icons/monster-icon-holy-resist', id = 'Holy' }
+clientCombat[combatStates.CLIENT_COMBAT_DEATH] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-death-resist', id = 'Death' }
+clientCombat[combatStates.CLIENT_COMBAT_HEALING] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-healing-resist', id = 'Healing' }
+clientCombat[combatStates.CLIENT_COMBAT_DROWN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-drowning-resist', id = 'Drown' }
+clientCombat[combatStates.CLIENT_COMBAT_LIFEDRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-lifedrain-resist', id = 'Lifedrain ' }
+clientCombat[combatStates.CLIENT_COMBAT_MANADRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-manadrain-resist', id = 'Manadrain' }
+
 InventorySlotOther = 0
 InventorySlotHead = 1
 InventorySlotNeck = 2
@@ -111,16 +137,32 @@ InventorySlotPurse = 11
 InventorySlotFirst = 1
 InventorySlotLast = 10
 
+VocationsClient = {
+    None = 0,
+    Knight = 1,
+    Paladin = 2,
+    Sorcerer = 3,
+    Druid = 4,
+    Monk = 5,
+    EliteKnight = 11,
+    RoyalPaladin = 12,
+    MasterSorcerer = 13,
+    ElderDruid = 14,
+    ExhaltedMonk = 15,
+}
+
 vocationNamesByClientId = {
-    [0] = "No Vocation",
-    [1] = "Knight",
-    [2] = "Paladin",
-    [3] = "Sorcerer",
-    [4] = "Druid",
-    [11]= "Elite Knight",
-    [12] = "Royal Paladin",
-    [13] = "Master Sorcerer",
-    [14] = "Elder Druid"
+    [VocationsClient.None] = "No Vocation",
+    [VocationsClient.Knight] = "Knight",
+    [VocationsClient.Paladin] = "Paladin",
+    [VocationsClient.Sorcerer] = "Sorcerer",
+    [VocationsClient.Druid] = "Druid",
+    [VocationsClient.Monk] = "Monk",
+    [VocationsClient.ExhaltedMonk] = "Exhalted Monk",
+    [VocationsClient.EliteKnight] = "Elite Knight",
+    [VocationsClient.RoyalPaladin] = "Royal Paladin",
+    [VocationsClient.MasterSorcerer] = "Master Sorcerer",
+    [VocationsClient.ElderDruid] = "Elder Druid"
 }
 
 function Player:isPartyLeader()

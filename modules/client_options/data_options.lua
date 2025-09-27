@@ -308,6 +308,12 @@ return {
             end
         end
     },
+    displayHarmony                       = {
+        value = true,
+        action = function(value, options, controller, panels, extraWidgets)
+            panels.gameMapPanel:setDrawHarmony(value)
+        end
+    },
     displayText                       = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
