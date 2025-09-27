@@ -28,7 +28,6 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/image.h>
 #include <framework/graphics/texture.h>
-#include <zlib.h>
 
 Minimap g_minimap;
 static MinimapTile nulltile;

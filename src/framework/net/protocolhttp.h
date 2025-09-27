@@ -30,8 +30,6 @@
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 
-#include <zlib.h>
-
  //  result
 class HttpSession;
 

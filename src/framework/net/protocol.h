@@ -30,7 +30,6 @@
 
 #include <framework/luaengine/luaobject.h>
 #include <framework/proxy/proxy.h>
-#include <zlib.h>
 
  // @bindclass
 class Protocol : public LuaObject

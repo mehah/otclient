@@ -32,15 +32,13 @@
 #include <openssl/err.h>
 #include <openssl/rsa.h>
 #endif
-#include <zlib.h>
 
-#include <algorithm>
+#include <cppcodec/base64_rfc4648.hpp>
 
 #include "framework/core/graphicalapplication.h"
 #include <openssl/sha.h>
 
-static constexpr std::string_view base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-static inline bool is_base64(const uint8_t c) { return (isalnum(c) || (c == '+') || (c == '/')); }
+constexpr std::size_t CHECKSUM_BYTES = sizeof(uint32_t);
 
 Crypt g_crypt;
 
@@ -71,59 +69,25 @@ Crypt::~Crypt()
 }
 
 std::string Crypt::base64Encode(const std::string& decoded_string) {
-    size_t encoded_size = 4 * ((decoded_string.size() + 2) / 3);
-    std::string ret;
-    ret.reserve(encoded_size);
-
-    int val = 0, valb = -6;
-    for (uint8_t c : decoded_string) {
-        val = (val << 8) + c;
-        valb += 8;
-        while (valb >= 0) {
-            ret.push_back(base64_chars[(val >> valb) & 0x3F]);
-            valb -= 6;
-        }
-    }
-
-    while (valb > -6) {
-        ret.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
-        valb -= 6;
-    }
-
-    while (ret.size() % 4) ret.push_back('=');
-    return ret;
+    return cppcodec::base64_rfc4648::encode(decoded_string);
 }
 
 std::string Crypt::base64Decode(const std::string_view& encoded_string) {
-    std::vector<int> T(256, -1);
-    for (int i = 0; i < 64; i++) T[base64_chars[i]] = i;
-
-    std::string ret;
-    ret.reserve(encoded_string.size() * 3 / 4);
-
-    int val = 0, valb = -8;
-    for (uint8_t c : encoded_string) {
-        if (T[c] == -1) break;
-        val = (val << 6) + T[c];
-        valb += 6;
-        if (valb >= 0) {
-            ret.push_back((val >> valb) & 0xFF);
-            valb -= 8;
-        }
+    try {
+        return cppcodec::base64_rfc4648::decode<std::string>(encoded_string);
+    } catch (const std::invalid_argument&) {
+        return {};
     }
-    return ret;
 }
 
-std::string Crypt::xorCrypt(const std::string& buffer, const std::string& key) {
-    if (key.empty()) return buffer;
+void Crypt::xorCrypt(std::string& buffer, const std::string& key)
+{
+    if (key.empty())
+        return;
 
-    std::string out(buffer);
-    size_t keySize = key.size();
-
-    std::transform(out.begin(), out.end(), out.begin(),
-                   [&](char c) { return c ^ key[(&c - &out[0]) % keySize]; });
-
-    return out;
+    const size_t keySize = key.size();
+    for (size_t i = 0; i < buffer.size(); ++i)
+        buffer[i] ^= key[i % keySize];
 }
 
 std::string Crypt::genUUID() {
@@ -169,34 +133,37 @@ std::string Crypt::getCryptKey(const bool useMachineUUID) const
 
 std::string Crypt::_encrypt(const std::string& decrypted_string, const bool useMachineUUID)
 {
-    uint32_t sum = stdext::adler32(reinterpret_cast<const uint8_t*>(decrypted_string.data()), decrypted_string.size());
+    const uint32_t sum = stdext::computeChecksum(
+        { reinterpret_cast<const uint8_t*>(decrypted_string.data()),
+          decrypted_string.size() });
 
-    std::string tmp;
-    tmp.reserve(4 + decrypted_string.size());
-
-    tmp.append(4, '\0'); 
+    std::string tmp(CHECKSUM_BYTES, '\0');
     tmp.append(decrypted_string);
 
-    stdext::writeULE32(reinterpret_cast<uint8_t*>(&tmp[0]), sum);
+    stdext::writeULE32(reinterpret_cast<uint8_t*>(tmp.data()), sum);
 
-    return base64Encode(xorCrypt(tmp, getCryptKey(useMachineUUID)));
+    const auto key = getCryptKey(useMachineUUID);
+    xorCrypt(tmp, key);
+    return base64Encode(tmp);
 }
 
 std::string Crypt::_decrypt(const std::string& encrypted_string, const bool useMachineUUID)
 {
     std::string decoded = base64Decode(encrypted_string);
-    std::string tmp = xorCrypt(decoded, getCryptKey(useMachineUUID));
-
-    if (tmp.size() < 4)
+    if (decoded.size() < CHECKSUM_BYTES)
         return {};
 
-    uint32_t readsum = stdext::readULE32(reinterpret_cast<const uint8_t*>(tmp.data()));
+    const auto key = getCryptKey(useMachineUUID);
+    xorCrypt(decoded, key);
 
-    std::string decrypted_string = tmp.substr(4);
+    const uint32_t readsum =
+        stdext::readULE32(reinterpret_cast<const uint8_t*>(decoded.data()));
+    decoded.erase(0, CHECKSUM_BYTES);
 
-    uint32_t sum = stdext::adler32(reinterpret_cast<const uint8_t*>(decrypted_string.data()), decrypted_string.size());
+    const uint32_t sum = stdext::computeChecksum(
+        { reinterpret_cast<const uint8_t*>(decoded.data()), decoded.size() });
 
-    return (readsum == sum) ? decrypted_string : std::string();
+    return (readsum == sum) ? std::move(decoded) : std::string();
 }
 
 void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
@@ -332,45 +299,4 @@ std::string Crypt::sha1Encrypt(const std::string& input) {
         oss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(byte);
 
     return oss.str();
-}
-
-void Crypt::sha1Block(const uint8_t* block, uint32_t* H)
-{
-    uint32_t W[80];
-    for (int i = 0; i < 16; ++i) {
-        const size_t offset = i << 2;
-        W[i] = block[offset] << 24 | block[offset + 1] << 16 | block[offset + 2] << 8 | block[offset + 3];
-    }
-
-    for (int i = 16; i < 80; ++i) {
-        W[i] = stdext::circularShift(1, W[i - 3] ^ W[i - 8] ^ W[i - 14] ^ W[i - 16]);
-    }
-
-    uint32_t A = H[0], B = H[1], C = H[2], D = H[3], E = H[4];
-
-    for (int i = 0; i < 20; ++i) {
-        const uint32_t tmp = stdext::circularShift(5, A) + ((B & C) | ((~B) & D)) + E + W[i] + 0x5A827999;
-        E = D; D = C; C = stdext::circularShift(30, B); B = A; A = tmp;
-    }
-
-    for (int i = 20; i < 40; ++i) {
-        const uint32_t tmp = stdext::circularShift(5, A) + (B ^ C ^ D) + E + W[i] + 0x6ED9EBA1;
-        E = D; D = C; C = stdext::circularShift(30, B); B = A; A = tmp;
-    }
-
-    for (int i = 40; i < 60; ++i) {
-        const uint32_t tmp = stdext::circularShift(5, A) + ((B & C) | (B & D) | (C & D)) + E + W[i] + 0x8F1BBCDC;
-        E = D; D = C; C = stdext::circularShift(30, B); B = A; A = tmp;
-    }
-
-    for (int i = 60; i < 80; ++i) {
-        const uint32_t tmp = stdext::circularShift(5, A) + (B ^ C ^ D) + E + W[i] + 0xCA62C1D6;
-        E = D; D = C; C = stdext::circularShift(30, B); B = A; A = tmp;
-    }
-
-    H[0] += A;
-    H[1] += B;
-    H[2] += C;
-    H[3] += D;
-    H[4] += E;
 }
