@@ -153,6 +153,8 @@ public:
     bool isWalking() { return m_walking; }
 
     bool isRemoved() { return m_removed; }
+    bool isRemoved() const { return m_removed; }
+    const Position& getOldPosition() const { return m_oldPosition; }
     bool isInvisible() { return m_outfit.isEffect() && m_outfit.getAuxId() == 13; }
     bool isDead() { return m_healthPercent <= 0; }
     bool isFullHealth() { return m_healthPercent == 100; }
@@ -210,6 +212,9 @@ protected:
     virtual void onWalking() {};
     void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
+
+    void setOldPositionSilently(const Position& pos) { m_oldPosition = pos; }
+    void setRemovedSilently(const bool removed) { m_removed = removed; }
 
     ThingType* getThingType() const override;
     ThingType* getMountThingType() const;

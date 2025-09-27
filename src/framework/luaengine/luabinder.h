@@ -169,8 +169,10 @@ namespace luabinder
     {
         auto mf = std::mem_fn(f);
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
-            if (!obj)
-                throw LuaException("failed to call a member function because the passed object is nil");
+            if (!obj) {
+                g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+                return Ret{};
+            }
             return mf(obj.get(), args...);
         };
     }
@@ -179,8 +181,10 @@ namespace luabinder
     {
         auto mf = std::mem_fn(f);
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable {
-            if (!obj)
-                throw LuaException("failed to call a member function because the passed object is nil");
+            if (!obj) {
+                g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+                return;
+            }
             mf(obj.get(), args...);
         };
     }
@@ -232,5 +236,48 @@ namespace luabinder
             lua->remove(1);
             return mf(obj, lua);
         };
+    }
+
+    template<typename Ret, typename C, typename... Args>
+    std::function<Ret(const std::shared_ptr<C>&, const Args&...)>
+    make_mem_func(Ret (C::*f)(Args...) const)
+    {
+        auto mf = std::mem_fn(f);
+        return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
+            if (!obj) {
+                g_logger.warning("Lua warning: member function call skipped because the passed object is nil");
+                return Ret{};
+            }
+            return mf(obj.get(), args...); 
+        };
+    }
+
+    template<typename C, typename Ret, class FC, typename... Args>
+    LuaCppFunction bind_mem_fun(Ret (FC::*f)(Args...) const)
+    {
+        using Tuple = std::tuple<std::shared_ptr<FC>, typename stdext::remove_const_ref<Args>::type...>;
+        auto lambda = make_mem_func<Ret, FC>(f);
+        return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
+                                    decltype(lambda),
+                                    Tuple>(lambda);
+    }
+
+    template<typename Ret, typename C, typename... Args>
+    std::function<Ret(const Args&...)>
+    make_mem_func_singleton(Ret (C::*f)(Args...) const, C* instance)
+    {
+        auto mf = std::mem_fn(f);
+        return [=](Args... args) mutable -> Ret { return mf(instance, args...); };
+    }
+
+    template<typename C, typename Ret, class FC, typename... Args>
+    LuaCppFunction bind_singleton_mem_fun(Ret (FC::*f)(Args...) const, C* instance)
+    {
+        using Tuple = std::tuple<typename stdext::remove_const_ref<Args>::type...>;
+        assert(instance);
+        auto lambda = make_mem_func_singleton<Ret, FC>(f, static_cast<FC*>(instance));
+        return bind_fun_specializer<typename stdext::remove_const_ref<Ret>::type,
+                                    decltype(lambda),
+                                    Tuple>(lambda);
     }
 }
