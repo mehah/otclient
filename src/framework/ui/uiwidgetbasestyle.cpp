@@ -26,6 +26,7 @@
 #include "uitranslator.h"
 #include "uiverticallayout.h"
 #include "uiwidget.h"
+#include <framework/html/htmlnode.h>
 
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/texture.h>
@@ -68,7 +69,12 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     }
     // load styles used by all widgets
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "background-draw-order")
+        if (node->tag() == "inherit-text") {
+            if (m_htmlNode && node->value<bool>()) {
+                setText(m_htmlNode->textContent());
+                destroyChildren();
+            }
+        } else if (node->tag() == "background-draw-order")
             setBackgroundDrawOrder(node->value<int>());
         else if (node->tag() == "border-draw-order")
             setBorderDrawOrder(node->value<int>());
@@ -89,17 +95,17 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         else if (node->tag() == "pos")
             setPosition(node->value<Point>());
         else if (node->tag() == "width")
-            setWidth(node->value<int>());
+            setWidth(node->value<std::string>());
         else if (node->tag() == "height")
-            setHeight(node->value<int>());
+            setHeight(node->value<std::string>());
         else if (node->tag() == "min-width")
-            setMinWidth(node->value<int>());
+            setMinWidth(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "max-width")
-            setMaxWidth(node->value<int>());
+            setMaxWidth(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "min-height")
-            setMinHeight(node->value<int>());
+            setMinHeight(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "max-height")
-            setMaxHeight(node->value<int>());
+            setMaxHeight(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "rect")
             setRect(node->value<Rect>());
         else if (node->tag() == "background")
@@ -152,6 +158,8 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setEnabled(node->value<bool>());
         else if (node->tag() == "visible")
             setVisible(node->value<bool>());
+        else if (node->tag() == "visibility")
+            setVisible(node->value<std::string>() == "visible");
         else if (node->tag() == "checked")
             setChecked(node->value<bool>());
         else if (node->tag() == "draggable")
@@ -162,9 +170,12 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setFocusable(node->value<bool>());
         else if (node->tag() == "auto-focus")
             setAutoFocusPolicy(Fw::translateAutoFocusPolicy(node->value()));
-        else if (node->tag() == "phantom")
-            setPhantom(node->value<bool>());
-        else if (node->tag() == "size")
+        else if (node->tag() == "phantom" || node->tag() == "pointer-events") {
+            if (node->tag() == "pointer-events")
+                setPhantom(node->value<std::string>() == "none");
+            else
+                setPhantom(node->value<bool>());
+        } else if (node->tag() == "size")
             setSize(node->value<Size>());
         else if (node->tag() == "fixed-size")
             setFixedSize(node->value<bool>());
@@ -177,20 +188,20 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         else if (node->tag() == "border") {
             const auto& split = stdext::split(node->value(), " ");
             if (split.size() == 2) {
-                setBorderWidth(stdext::safe_cast<int>(split[0]));
+                setBorderWidth(stdext::to_number(stdext::safe_cast<std::string>(split[0])));
                 setBorderColor(stdext::safe_cast<Color>(split[1]));
             } else
                 throw OTMLException(node, "border param must have its width followed by its color");
         } else if (node->tag() == "border-width")
-            setBorderWidth(node->value<int>());
-        else if (node->tag() == "border-width-top")
-            setBorderWidthTop(node->value<int>());
-        else if (node->tag() == "border-width-right")
-            setBorderWidthRight(node->value<int>());
-        else if (node->tag() == "border-width-bottom")
-            setBorderWidthBottom(node->value<int>());
-        else if (node->tag() == "border-width-left")
-            setBorderWidthLeft(node->value<int>());
+            setBorderWidth(stdext::to_number(node->value<std::string>()));
+        else if (node->tag() == "border-width-top" || node->tag() == "border-top-width")
+            setBorderWidthTop(stdext::to_number(node->value<std::string>()));
+        else if (node->tag() == "border-width-right" || node->tag() == "border-right-width")
+            setBorderWidthRight(stdext::to_number(node->value<std::string>()));
+        else if (node->tag() == "border-width-bottom" || node->tag() == "border-bottom-width")
+            setBorderWidthBottom(stdext::to_number(node->value<std::string>()));
+        else if (node->tag() == "border-width-left" || node->tag() == "border-left-width")
+            setBorderWidthLeft(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "border-color")
             setBorderColor(node->value<Color>());
         else if (node->tag() == "border-color-top")
@@ -201,77 +212,159 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setBorderColorBottom(node->value<Color>());
         else if (node->tag() == "border-color-left")
             setBorderColorLeft(node->value<Color>());
-        else if (node->tag() == "margin-top")
-            setMarginTop(node->value<int>());
+        else if (node->tag() == "top" || node->tag() == "bottom" || node->tag() == "left" || node->tag() == "right") {
+            auto v = node->value<std::string>();
+            stdext::trim(v);
+            stdext::tolower(v);
+            setPositions(node->tag(), v);
+        } else if (node->tag() == "display") {
+            auto v = node->value<std::string>();
+            stdext::tolower(v);
+            DisplayType display = DisplayType::Initial;
+            if (v == "none") display = DisplayType::None;
+            else if (v == "block") display = DisplayType::Block;
+            else if (v == "inline") display = DisplayType::Inline;
+            else if (v == "inline-block") display = DisplayType::InlineBlock;
+            else if (v == "flex") display = DisplayType::Flex;
+            else if (v == "inline-flex") display = DisplayType::InlineFlex;
+            else if (v == "grid") display = DisplayType::Grid;
+            else if (v == "inline-grid") display = DisplayType::InlineGrid;
+            else if (v == "table") display = DisplayType::Table;
+            else if (v == "table-row-group") display = DisplayType::TableRowGroup;
+            else if (v == "table-header-group") display = DisplayType::TableHeaderGroup;
+            else if (v == "table-footer-group") display = DisplayType::TableFooterGroup;
+            else if (v == "table-row") display = DisplayType::TableRow;
+            else if (v == "table-cell") display = DisplayType::TableCell;
+            else if (v == "table-column-group") display = DisplayType::TableColumnGroup;
+            else if (v == "table-column") display = DisplayType::TableColumn;
+            else if (v == "table-caption") display = DisplayType::TableCaption;
+            else if (v == "list-item") display = DisplayType::ListItem;
+            else if (v == "run-in") display = DisplayType::RunIn;
+            else if (v == "contents") display = DisplayType::Contents;
+            else if (v == "initial") display = DisplayType::Initial;
+            else if (v == "inherit") display = DisplayType::Inherit;
+            else throw OTMLException(node, fmt::format("Invalid display value '{}'", v));
+
+            setDisplay(display);
+        } else if (node->tag() == "overflow") {
+            auto v = node->value<std::string>();
+            stdext::tolower(v);
+            OverflowType type = OverflowType::Visible;
+            if (v == "hidden") type = OverflowType::Hidden;
+            else if (v == "scroll") type = OverflowType::Scroll;
+            else if (v == "auto") type = OverflowType::Auto;
+            else if (v == "clip") type = OverflowType::Clip;
+            setOverflow(type);
+            setClipping(type == OverflowType::Clip || type == OverflowType::Scroll || type == OverflowType::Hidden);
+        } else if (node->tag() == "position") {
+            auto v = node->value<std::string>();
+            stdext::tolower(v);
+
+            PositionType type = PositionType::Static;
+            if (v == "absolute") type = PositionType::Absolute;
+            else if (v == "relative") type = PositionType::Relative;
+
+            setPositionType(type);
+        } else if (node->tag() == "float") {
+            auto v = node->value<std::string>();
+            stdext::tolower(v);
+            FloatType type = FloatType::None;
+            if (v == "left") type = FloatType::Left;
+            else if (v == "right") type = FloatType::Right;
+            else if (v == "inline-start") type = FloatType::InlineStart;
+            else if (v == "inline-end") type = FloatType::InlineEnd;
+            setFloat(type);
+        } else if (node->tag() == "clear") {
+            auto v = node->value<std::string>();
+            ClearType clear = ClearType::None;
+            if (v == "left") clear = ClearType::Left;
+            else if (v == "right") clear = ClearType::Right;
+            else if (v == "both") clear = ClearType::Both;
+            else if (v == "inline-start") clear = ClearType::InlineStart;
+            else if (v == "inline-end") clear = ClearType::InlineEnd;
+        } else if (node->tag() == "justify-items") {
+            auto v = node->value<std::string>();
+            JustifyItemsType justify = JustifyItemsType::Normal;
+
+            if (v == "center") justify = JustifyItemsType::Center;
+            else if (v == "left" || v == "flex-start" || v == "start" || v == "inline-start")
+                justify = JustifyItemsType::Left;
+            else if (v == "right" || v == "flex-end" || v == "end" || v == "inline-end")
+                justify = JustifyItemsType::Right;
+            setJustifyItems(justify);
+        } else if (node->tag() == "line-height") {
+            setLineHeight(node->value<std::string>());
+        } else if (node->tag() == "margin-top")
+            setMarginTop(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "margin-right")
-            setMarginRight(node->value<int>());
+            setMarginRight(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "margin-bottom")
-            setMarginBottom(node->value<int>());
+            setMarginBottom(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "margin-left")
-            setMarginLeft(node->value<int>());
+            setMarginLeft(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "margin") {
             std::string marginDesc = node->value();
             std::vector<std::string> split = stdext::split(marginDesc, " ");
             if (split.size() == 4) {
-                setMarginTop(stdext::safe_cast<int>(split[0]));
-                setMarginRight(stdext::safe_cast<int>(split[1]));
-                setMarginBottom(stdext::safe_cast<int>(split[2]));
-                setMarginLeft(stdext::safe_cast<int>(split[3]));
+                setMarginTop(stdext::to_number(stdext::safe_cast<std::string>(split[0])));
+                setMarginRight(stdext::to_number(stdext::safe_cast<std::string>(split[1])));
+                setMarginBottom(stdext::to_number(stdext::safe_cast<std::string>(split[2])));
+                setMarginLeft(stdext::to_number(stdext::safe_cast<std::string>(split[3])));
             } else if (split.size() == 3) {
-                int marginTop = stdext::safe_cast<int>(split[0]);
-                int marginHorizontal = stdext::safe_cast<int>(split[1]);
-                int marginBottom = stdext::safe_cast<int>(split[2]);
+                int marginTop = stdext::to_number(stdext::safe_cast<std::string>(split[0]));
+                int marginHorizontal = stdext::to_number(stdext::safe_cast<std::string>(split[1]));
+                int marginBottom = stdext::to_number(stdext::safe_cast<std::string>(split[2]));
                 setMarginTop(marginTop);
                 setMarginRight(marginHorizontal);
                 setMarginBottom(marginBottom);
                 setMarginLeft(marginHorizontal);
             } else if (split.size() == 2) {
-                int marginVertical = stdext::safe_cast<int>(split[0]);
-                int marginHorizontal = stdext::safe_cast<int>(split[1]);
+                int marginVertical = stdext::to_number(stdext::safe_cast<std::string>(split[0]));
+                int marginHorizontal = stdext::to_number(stdext::safe_cast<std::string>(split[1]));
                 setMarginTop(marginVertical);
                 setMarginRight(marginHorizontal);
                 setMarginBottom(marginVertical);
                 setMarginLeft(marginHorizontal);
             } else if (split.size() == 1) {
-                int margin = stdext::safe_cast<int>(split[0]);
+                int margin = stdext::to_number(stdext::safe_cast<std::string>(split[0]));
                 setMarginTop(margin);
                 setMarginRight(margin);
                 setMarginBottom(margin);
                 setMarginLeft(margin);
             }
         } else if (node->tag() == "padding-top")
-            setPaddingTop(node->value<int>());
+            setPaddingTop(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "padding-right")
-            setPaddingRight(node->value<int>());
+            setPaddingRight(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "padding-bottom")
-            setPaddingBottom(node->value<int>());
+            setPaddingBottom(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "padding-left")
-            setPaddingLeft(node->value<int>());
+            setPaddingLeft(stdext::to_number(node->value<std::string>()));
         else if (node->tag() == "padding") {
             std::string paddingDesc = node->value();
             std::vector<std::string> split = stdext::split(paddingDesc, " ");
             if (split.size() == 4) {
-                setPaddingTop(stdext::safe_cast<int>(split[0]));
-                setPaddingRight(stdext::safe_cast<int>(split[1]));
-                setPaddingBottom(stdext::safe_cast<int>(split[2]));
-                setPaddingLeft(stdext::safe_cast<int>(split[3]));
+                setPaddingTop(stdext::to_number(stdext::safe_cast<std::string>(split[0])));
+                setPaddingRight(stdext::to_number(stdext::safe_cast<std::string>(split[1])));
+                setPaddingBottom(stdext::to_number(stdext::safe_cast<std::string>(split[2])));
+                setPaddingLeft(stdext::to_number(stdext::safe_cast<std::string>(split[3])));
             } else if (split.size() == 3) {
-                int paddingTop = stdext::safe_cast<int>(split[0]);
-                int paddingHorizontal = stdext::safe_cast<int>(split[1]);
-                int paddingBottom = stdext::safe_cast<int>(split[2]);
+                int paddingTop = stdext::to_number(stdext::safe_cast<std::string>(split[0]));
+                int paddingHorizontal = stdext::to_number(stdext::safe_cast<std::string>(split[1]));
+                int paddingBottom = stdext::to_number(stdext::safe_cast<std::string>(split[2]));
                 setPaddingTop(paddingTop);
                 setPaddingRight(paddingHorizontal);
                 setPaddingBottom(paddingBottom);
                 setPaddingLeft(paddingHorizontal);
             } else if (split.size() == 2) {
-                int paddingVertical = stdext::safe_cast<int>(split[0]);
-                int paddingHorizontal = stdext::safe_cast<int>(split[1]);
+                int paddingVertical = stdext::to_number(stdext::safe_cast<std::string>(split[0]));
+                int paddingHorizontal = stdext::to_number(stdext::safe_cast<std::string>(split[1]));
                 setPaddingTop(paddingVertical);
                 setPaddingRight(paddingHorizontal);
                 setPaddingBottom(paddingVertical);
                 setPaddingLeft(paddingHorizontal);
             } else if (split.size() == 1) {
-                int padding = stdext::safe_cast<int>(split[0]);
+                int padding = stdext::to_number(stdext::safe_cast<std::string>(split[0]));
                 setPaddingTop(padding);
                 setPaddingRight(padding);
                 setPaddingBottom(padding);

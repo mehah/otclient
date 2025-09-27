@@ -25,6 +25,7 @@
 #include <framework/graphics/drawpoolmanager.h>
 #include <framework/graphics/fontmanager.h>
 #include <framework/graphics/textureatlas.h>
+#include <framework/html/htmlnode.h>
 #include <regex>
 
 void UIWidget::initText()
@@ -97,6 +98,8 @@ void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
             setFont(node->value());
         else if (node->tag() == "font-scale")
             setFontScale(node->value<float>());
+        else if (node->tag() == "font-size")
+            setFontScale(node->value<int>() / 10.f);
     }
 }
 
@@ -162,10 +165,43 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 
     const std::string oldText = m_text;
     m_text = _text;
+
+    if (isOnHtml()) {
+        auto whiteSpace = m_htmlNode->getStyle("white-space");
+        if (whiteSpace.empty())
+            whiteSpace = "nowrap";
+
+        setProp(PropTextWrap, true);
+        if (whiteSpace == "normal") {
+            stdext::trim(m_text);
+        } else if (whiteSpace == "nowrap") {
+            std::string out;
+            out.reserve(m_text.size());
+            bool lastWasSpace = false;
+            for (char c : m_text) {
+                if (c == '\n' || c == '\r' || c == '\t') {
+                    c = ' ';
+                }
+
+                if (c == ' ') {
+                    if (lastWasSpace) continue;
+                    lastWasSpace = true;
+                } else {
+                    lastWasSpace = false;
+                }
+
+                out.push_back(c);
+            }
+
+            m_text.swap(out);
+            setProp(PropTextWrap, false);
+        }
+    }
+
     updateText();
 
     if (!dontFireLuaCall) {
-        onTextChange(_text, oldText);
+        onTextChange(m_text, oldText);
     }
 }
 

@@ -22,50 +22,33 @@
 
 #pragma once
 
- // common C headers
-#include <cassert>
-#include <cmath>
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include "declarations.h"
+#include <framework/ui/declarations.h>
+#include "cssparser.h"
 
-// common STL headers
-#include <algorithm>
-#include <array>
-#include <deque>
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <list>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <typeinfo>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-#include <ranges>
+struct DataRoot
+{
+    HtmlNodePtr node;
+    std::string moduleName;
+    std::vector<css::StyleSheet> sheets;
+    std::unordered_map<std::string, UIWidgetPtr> groups;
+};
 
-#include <parallel_hashmap/btree.h>
-#include <parallel_hashmap/phmap.h>
-#include <pugixml.hpp>
+class HtmlManager
+{
+public:
+    uint32_t load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent);
+    void destroy(uint32_t id);
+    void addGlobalStyle(const std::string& style);
+    const DataRoot* getRoot(uint32_t htmlId);
+    UIWidgetPtr getRootWidget(uint32_t htmlId);
+    void terminate() { m_nodes.clear(); }
+    UIWidgetPtr createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId);
 
-// FMT
-#include <fmt/chrono.h>
-#include <fmt/core.h>
-#include <fmt/format.h>
-#include <fmt/args.h>
-#include <fmt/ranges.h>
+private:
+    UIWidgetPtr readNode(DataRoot& root, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, bool isDynamic, uint32_t htmlId);
 
-// FMT Custom Formatter for Enums
-template <typename E>
-std::enable_if_t<std::is_enum_v<E>, std::underlying_type_t<E>>
-format_as(E e) {
-    return static_cast<std::underlying_type_t<E>>(e);
-}
+    stdext::map<uint32_t, DataRoot> m_nodes;
+};
 
-using namespace std::literals;
+extern HtmlManager g_html;

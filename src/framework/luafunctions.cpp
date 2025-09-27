@@ -43,6 +43,7 @@
 #include "framework/input/mouse.h"
 #include "framework/platform/platformwindow.h"
 #include "framework/ui/ui.h"
+#include "framework/html/htmlmanager.h"
 #endif
 
 #ifdef FRAMEWORK_SOUND
@@ -434,6 +435,13 @@ void Application::registerLuaFunctions()
     g_lua.bindSingletonFunction("g_ui", "isMouseGrabbed", &UIManager::isMouseGrabbed, &g_ui);
     g_lua.bindSingletonFunction("g_ui", "isKeyboardGrabbed", &UIManager::isKeyboardGrabbed, &g_ui);
 
+    g_lua.registerSingletonClass("g_html");
+    g_lua.bindSingletonFunction("g_html", "load", &HtmlManager::load, &g_html);
+    g_lua.bindSingletonFunction("g_html", "destroy", &HtmlManager::destroy, &g_html);
+    g_lua.bindSingletonFunction("g_html", "addGlobalStyle", &HtmlManager::addGlobalStyle, &g_html);
+    g_lua.bindSingletonFunction("g_html", "getRootWidget", &HtmlManager::getRootWidget, &g_html);
+    g_lua.bindSingletonFunction("g_html", "createWidgetFromHTML", &HtmlManager::createWidgetFromHTML, &g_html);
+
     // FontManager
     g_lua.registerSingletonClass("g_fonts");
     g_lua.bindSingletonFunction("g_fonts", "clearFonts", &FontManager::clearFonts, &g_fonts);
@@ -501,13 +509,18 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("hideChildren", &UIWidget::hideChildren);
     g_lua.bindClassMemberFunction<UIWidget>("showChildren", &UIWidget::showChildren);
     g_lua.bindClassMemberFunction<UIWidget>("setId", &UIWidget::setId);
+    g_lua.bindClassMemberFunction<UIWidget>("setWidgetId", &UIWidget::setId);
     g_lua.bindClassMemberFunction<UIWidget>("setParent", &UIWidget::setParent);
     g_lua.bindClassMemberFunction<UIWidget>("setLayout", &UIWidget::setLayout);
     g_lua.bindClassMemberFunction<UIWidget>("setRect", &UIWidget::setRect);
     g_lua.bindClassMemberFunction<UIWidget>("setStyle", &UIWidget::setStyle);
     g_lua.bindClassMemberFunction<UIWidget>("setStyleFromNode", &UIWidget::setStyleFromNode);
     g_lua.bindClassMemberFunction<UIWidget>("setEnabled", &UIWidget::setEnabled);
+    g_lua.bindClassMemberFunction<UIWidget>("setDisabled", &UIWidget::setDisabled);
     g_lua.bindClassMemberFunction<UIWidget>("setVisible", &UIWidget::setVisible);
+    g_lua.bindClassMemberFunction<UIWidget>("setDisplay", &UIWidget::setDisplay);
+    g_lua.bindClassMemberFunction<UIWidget>("getDisplay", &UIWidget::getDisplay);
+    g_lua.bindClassMemberFunction<UIWidget>("setConditionIf", &UIWidget::setResultConditionIf);
     g_lua.bindClassMemberFunction<UIWidget>("setOn", &UIWidget::setOn);
     g_lua.bindClassMemberFunction<UIWidget>("setChecked", &UIWidget::setChecked);
     g_lua.bindClassMemberFunction<UIWidget>("setFocusable", &UIWidget::setFocusable);
@@ -520,6 +533,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setAutoRepeatDelay", &UIWidget::setAutoRepeatDelay);
     g_lua.bindClassMemberFunction<UIWidget>("setVirtualOffset", &UIWidget::setVirtualOffset);
     g_lua.bindClassMemberFunction<UIWidget>("isVisible", &UIWidget::isVisible);
+    g_lua.bindClassMemberFunction<UIWidget>("isEffectivelyVisible", &UIWidget::isEffectivelyVisible);
     g_lua.bindClassMemberFunction<UIWidget>("isChildLocked", &UIWidget::isChildLocked);
     g_lua.bindClassMemberFunction<UIWidget>("hasChild", &UIWidget::hasChild);
     g_lua.bindClassMemberFunction<UIWidget>("getChildIndex", &UIWidget::getChildIndex);
@@ -660,6 +674,11 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("setPaddingLeft", &UIWidget::setPaddingLeft);
     g_lua.bindClassMemberFunction<UIWidget>("setOpacity", &UIWidget::setOpacity);
     g_lua.bindClassMemberFunction<UIWidget>("setRotation", &UIWidget::setRotation);
+    g_lua.bindClassMemberFunction<UIWidget>("setTop", &UIWidget::setTop);
+    g_lua.bindClassMemberFunction<UIWidget>("setBottom", &UIWidget::setBottom);
+    g_lua.bindClassMemberFunction<UIWidget>("setRight", &UIWidget::setRight);
+    g_lua.bindClassMemberFunction<UIWidget>("setLeft", &UIWidget::setLeft);
+
     g_lua.bindClassMemberFunction<UIWidget>("getX", &UIWidget::getX);
     g_lua.bindClassMemberFunction<UIWidget>("getY", &UIWidget::getY);
     g_lua.bindClassMemberFunction<UIWidget>("getPosition", &UIWidget::getPosition);
@@ -773,14 +792,20 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getNextWidget", &UIWidget::getNextWidget);
     g_lua.bindClassMemberFunction<UIWidget>("getPrevWidget", &UIWidget::getPrevWidget);
     g_lua.bindClassMemberFunction<UIWidget>("hasAnchoredLayout", &UIWidget::hasAnchoredLayout);
-    g_lua.bindClassMemberFunction<UIWidget>("setOnHtml", &UIWidget::setOnHtml);
     g_lua.bindClassMemberFunction<UIWidget>("isOnHtml", &UIWidget::isOnHtml);
+    g_lua.bindClassMemberFunction<UIWidget>("append", &UIWidget::append);
+    g_lua.bindClassMemberFunction<UIWidget>("prepend", &UIWidget::prepend);
+    g_lua.bindClassMemberFunction<UIWidget>("insert", &UIWidget::insert);
+    g_lua.bindClassMemberFunction<UIWidget>("remove", &UIWidget::remove);
 
     g_lua.bindClassMemberFunction<UIWidget>("setBackgroundDrawOrder", &UIWidget::setBackgroundDrawOrder);
     g_lua.bindClassMemberFunction<UIWidget>("setImageDrawOrder", &UIWidget::setImageDrawOrder);
     g_lua.bindClassMemberFunction<UIWidget>("setIconDrawOrder", &UIWidget::setIconDrawOrder);
     g_lua.bindClassMemberFunction<UIWidget>("setTextDrawOrder", &UIWidget::setTextDrawOrder);
     g_lua.bindClassMemberFunction<UIWidget>("setBorderDrawOrder", &UIWidget::setBorderDrawOrder);
+
+    g_lua.bindClassMemberFunction<UIWidget>("querySelectorAll", &UIWidget::querySelectorAll);
+    g_lua.bindClassMemberFunction<UIWidget>("querySelector", &UIWidget::querySelector);
 
     // UILayout
     g_lua.registerClass<UILayout>();
@@ -909,10 +934,10 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<ParticleEffectType>("getName", &ParticleEffectType::getName);
     g_lua.bindClassMemberFunction<ParticleEffectType>("getDescription", &ParticleEffectType::getDescription);
 
-    // UIParticles  
-    g_lua.registerClass<UIParticles, UIWidget>();  
-    g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });  
-    g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);  
+    // UIParticles
+    g_lua.registerClass<UIParticles, UIWidget>();
+    g_lua.bindClassStaticFunction<UIParticles>("create", [] { return std::make_shared<UIParticles>(); });
+    g_lua.bindClassMemberFunction<UIParticles>("addEffect", &UIParticles::addEffect);
     g_lua.bindClassMemberFunction<UIParticles>("setEffect", &UIParticles::setEffect);
     g_lua.bindClassMemberFunction<UIParticles>("clearEffects", &UIParticles::clearEffects);
 #endif

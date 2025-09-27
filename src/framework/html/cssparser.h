@@ -21,51 +21,54 @@
  */
 
 #pragma once
+#include "declarations.h"
+#include <cstdint>
 
- // common C headers
-#include <cassert>
-#include <cmath>
-#include <cstddef>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+namespace css {
+    struct PseudoInfo
+    {
+        std::string name;
+        bool negated{ false };
+    };
 
-// common STL headers
-#include <algorithm>
-#include <array>
-#include <deque>
-#include <functional>
-#include <iomanip>
-#include <iostream>
-#include <list>
-#include <map>
-#include <memory>
-#include <sstream>
-#include <string>
-#include <string_view>
-#include <tuple>
-#include <typeinfo>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-#include <ranges>
+    struct SelectorMeta
+    {
+        std::vector<PseudoInfo> pseudos;
+    };
 
-#include <parallel_hashmap/btree.h>
-#include <parallel_hashmap/phmap.h>
-#include <pugixml.hpp>
+    struct Declaration
+    {
+        std::string property;
+        std::string value;
+        bool important{ false };
+    };
 
-// FMT
-#include <fmt/chrono.h>
-#include <fmt/core.h>
-#include <fmt/format.h>
-#include <fmt/args.h>
-#include <fmt/ranges.h>
+    struct Rule
+    {
+        std::vector<std::string> selectors;
+        std::vector<SelectorMeta> selectorMeta;
+        std::vector<Declaration> decls;
+        int order{ 0 };
+    };
 
-// FMT Custom Formatter for Enums
-template <typename E>
-std::enable_if_t<std::is_enum_v<E>, std::underlying_type_t<E>>
-format_as(E e) {
-    return static_cast<std::underlying_type_t<E>>(e);
+    struct StyleSheet
+    {
+        std::vector<Rule> rules;
+    };
+
+    using StyleMap = std::unordered_map<std::string, std::string>;
+
+    struct CascadeOptions
+    {
+        bool parse_inline_style{ true };
+        bool media_always_true{ true };
+    };
+
+    StyleSheet parse(const std::string& cssText);
+    std::vector<Declaration> parseDeclarationList(const std::string& block);
+
+    void applyStyleSheet(const HtmlNodePtr& root,
+                         const StyleSheet& sheet,
+                         std::unordered_map<const HtmlNode*, StyleMap>& out,
+                         const CascadeOptions& opts = {});
 }
-
-using namespace std::literals;

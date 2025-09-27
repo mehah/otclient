@@ -31,6 +31,7 @@
 #include <framework/platform/platformwindow.h>
 
 #include "framework/graphics/graphics.h"
+#include <framework/html/htmlmanager.h>
 
 UIManager g_ui;
 
@@ -38,6 +39,7 @@ void UIManager::init()
 {
     // creates root widget
     m_rootWidget = std::make_shared<UIWidget>();
+    m_rootWidget->m_positionType = PositionType::Relative;
     m_rootWidget->setId("root");
     m_mouseReceiver = m_rootWidget;
     m_keyboardReceiver = m_rootWidget;
