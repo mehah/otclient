@@ -426,6 +426,11 @@
     <ClCompile Include="..\src\framework\graphics\texture.cpp" />
     <ClCompile Include="..\src\framework\graphics\textureatlas.cpp" />
     <ClCompile Include="..\src\framework\graphics\texturemanager.cpp" />
+    <ClCompile Include="..\src\framework\html\cssparser.cpp" />
+    <ClCompile Include="..\src\framework\html\htmlmanager.cpp" />
+    <ClCompile Include="..\src\framework\html\htmlnode.cpp" />
+    <ClCompile Include="..\src\framework\html\htmlparser.cpp" />
+    <ClCompile Include="..\src\framework\html\queryselector.cpp" />
     <ClCompile Include="..\src\framework\input\mouse.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luaexception.cpp" />
     <ClCompile Include="..\src\framework\luaengine\luainterface.cpp" />
@@ -485,6 +490,7 @@
     <ClCompile Include="..\src\framework\ui\uiverticallayout.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidget.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidgetbasestyle.cpp" />
+    <ClCompile Include="..\src\framework\ui\uiwidgethtml.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidgetimage.cpp" />
     <ClCompile Include="..\src\framework\ui\uiwidgettext.cpp" />
     <ClCompile Include="..\src\framework\util\color.cpp" />
@@ -595,6 +601,12 @@
     <ClInclude Include="..\src\framework\graphics\textureatlas.h" />
     <ClInclude Include="..\src\framework\graphics\texturemanager.h" />
     <ClInclude Include="..\src\framework\graphics\vertexarray.h" />
+    <ClInclude Include="..\src\framework\html\cssparser.h" />
+    <ClInclude Include="..\src\framework\html\declarations.h" />
+    <ClInclude Include="..\src\framework\html\htmlmanager.h" />
+    <ClInclude Include="..\src\framework\html\htmlnode.h" />
+    <ClInclude Include="..\src\framework\html\htmlparser.h" />
+    <ClInclude Include="..\src\framework\html\queryselector.h" />
     <ClInclude Include="..\src\framework\input\mouse.h" />
     <ClInclude Include="..\src\framework\luaengine\declarations.h" />
     <ClInclude Include="..\src\framework\luaengine\luabinder.h" />

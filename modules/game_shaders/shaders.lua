@@ -49,7 +49,7 @@ local MAP_SHADERS = { {
     frag = 'shaders/fragment/noise.frag'
 } }
 
-OUTFIT_SHADERS = { {
+local OUTFIT_SHADERS = { {
     name = 'Outfit - Default',
     frag = nil
 }, {
@@ -74,7 +74,7 @@ OUTFIT_SHADERS = { {
     frag = 'shaders/fragment/outline.frag'
 } }
 
-MOUNT_SHADERS = { {
+local MOUNT_SHADERS = { {
     name = 'Mount - Default',
     frag = nil
 }, {
@@ -127,9 +127,15 @@ function ShaderController:onInit()
     Keybind.new('Windows', 'show/hide Shader Windows', HOTKEY, '')
     Keybind.bind('Windows', 'show/hide Shader Windows', {
         {
-          type = KEY_DOWN,
-          callback = function() ShaderController.ui:setVisible(not ShaderController.ui:isVisible()) end,
-         }
+            type = KEY_DOWN,
+            callback = function()
+                if ShaderController.ui then
+                    ShaderController:unloadHtml()
+                else
+                    ShaderController:open()
+                end
+            end,
+        }
     })
 end
 
@@ -140,20 +146,6 @@ end
 
 function ShaderController:onGameStart()
     attachShaders()
-
-    self:loadHtml('shaders.html', modules.game_interface.getMapPanel())
-
-    for _, opts in pairs(MAP_SHADERS) do
-        self.ui.mapComboBox:addOption(opts.name, opts)
-    end
-
-    for _, opts in pairs(OUTFIT_SHADERS) do
-        self.ui.outfitComboBox:addOption(opts.name, opts)
-    end
-
-    for _, opts in pairs(MOUNT_SHADERS) do
-        self.ui.mountComboBox:addOption(opts.name, opts)
-    end
 end
 
 function ShaderController:onMapComboBoxChange(event)
@@ -177,5 +169,21 @@ function ShaderController:onMountComboBoxChange(event)
     local player = g_game.getLocalPlayer()
     if player then
         player:setMountShader(event.text)
+    end
+end
+
+function ShaderController:open()
+    self:loadHtml('shaders.html', modules.game_interface.getMapPanel())
+
+    for _, opts in pairs(MAP_SHADERS) do
+        self.ui.mapComboBox:addOption(opts.name, opts)
+    end
+
+    for _, opts in pairs(OUTFIT_SHADERS) do
+        self.ui.outfitComboBox:addOption(opts.name, opts)
+    end
+
+    for _, opts in pairs(MOUNT_SHADERS) do
+        self.ui.mountComboBox:addOption(opts.name, opts)
     end
 end

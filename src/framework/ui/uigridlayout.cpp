@@ -113,7 +113,7 @@ bool UIGridLayout::internalUpdate()
     if (m_fitChildren && preferredHeight != parentWidget->getHeight()) {
         // must set the preferred height later
         g_dispatcher.deferEvent([=] {
-            parentWidget->setHeight(preferredHeight);
+            parentWidget->setHeight_px(preferredHeight);
         });
     }
 

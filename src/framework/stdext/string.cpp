@@ -56,7 +56,7 @@ namespace stdext
         localtime_r(&tnow, &ts);
 #endif
 
-        char date[20];  // Reduce buffer size based on expected format
+        char date[20];
         if (std::strftime(date, sizeof(date), format, &ts) == 0)
             throw std::runtime_error("Failed to format date-time string");
 
@@ -64,9 +64,9 @@ namespace stdext
     }
 
     [[nodiscard]] std::string dec_to_hex(uint64_t num) {
-        char buffer[17]; // 16 characters for a uint64_t in hex + null terminator
+        char buffer[17];
         auto [ptr, ec] = std::to_chars(buffer, buffer + sizeof(buffer) - 1, num, 16);
-        *ptr = '\0'; // Null-terminate the string
+        *ptr = '\0';
         return std::string(buffer);
     }
 
@@ -91,7 +91,7 @@ namespace stdext
 
     [[nodiscard]] std::string utf8_to_latin1(std::string_view src) {
         std::string out;
-        out.reserve(src.size()); // Reserve memory to avoid multiple allocations
+        out.reserve(src.size());
         for (size_t i = 0; i < src.size(); ++i) {
             uint8_t c = static_cast<uint8_t>(src[i]);
             if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09) {
@@ -102,7 +102,6 @@ namespace stdext
                     out += (c == 0xc2) ? c2 : (c2 + 64);
                 }
             } else {
-                // Skip multi-byte characters
                 while (i + 1 < src.size() && (src[i + 1] & 0xC0) == 0x80) {
                     ++i;
                 }
@@ -113,10 +112,10 @@ namespace stdext
 
     [[nodiscard]] std::string latin1_to_utf8(std::string_view src) {
         std::string out;
-        out.reserve(src.size() * 2); // Reserve space to reduce allocations
+        out.reserve(src.size() * 2);
         for (uint8_t c : src) {
             if ((c >= 32 && c < 128) || c == 0x0d || c == 0x0a || c == 0x09) {
-                out += c; // Directly append ASCII characters
+                out += c;
             } else {
                 out.push_back(0xc2 + (c > 0xbf));
                 out.push_back(0x80 + (c & 0x3f));
@@ -186,6 +185,22 @@ namespace stdext
         }
     }
 
+    std::string join(const std::vector<std::string>& vec, const std::string& sep) {
+        if (vec.empty()) return {};
+
+        size_t total_size = (vec.size() - 1) * sep.size();
+        for (const auto& s : vec) total_size += s.size();
+
+        std::string result;
+        result.reserve(total_size);
+
+        for (size_t i = 0; i < vec.size(); ++i) {
+            if (i > 0) result += sep;
+            result += vec[i];
+        }
+        return result;
+    }
+
     void eraseWhiteSpace(std::string& str) { std::erase_if(str, isspace); }
 
     [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators) {
@@ -208,5 +223,76 @@ namespace stdext
         }
 
         return result;
+    }
+
+    long long to_number(std::string_view s) {
+        const char* p = s.data();
+        const char* end = p + s.size();
+
+        long long num = 0;
+        bool found = false;
+        bool negative = false;
+        int frac = 0;
+        bool hasFrac = false;
+
+        while (p < end) {
+            unsigned char c = static_cast<unsigned char>(*p++);
+            if (!found && c == '-') {
+                negative = true;
+            } else if (c >= '0' && c <= '9') {
+                found = true;
+                if (!hasFrac) {
+                    num = num * 10 + (c - '0');
+                } else {
+                    if (frac == 0) frac = c - '0';
+                }
+            } else if (c == '.') {
+                hasFrac = true;
+            }
+        }
+
+        if (!found) return 0;
+
+        if (hasFrac && frac >= 5) {
+            num += 1;
+        }
+
+        return negative ? -num : num;
+    }
+
+    std::vector<long long> extractNumbers(std::string_view s) {
+        std::vector<long long> out;
+        out.reserve(s.size() / 3);
+
+        const char* p = s.data();
+        const char* end = p + s.size();
+
+        long long val = 0;
+        bool building = false;
+        bool neg = false;
+
+        while (p < end) {
+            unsigned char c = static_cast<unsigned char>(*p);
+
+            if (c >= '0' && c <= '9') {
+                if (!building) { building = true; val = 0; }
+                val = val * 10 + (c - '0');
+            } else {
+                if (building) {
+                    out.emplace_back(neg ? -val : val);
+                    building = false;
+                    neg = false;
+                    val = 0;
+                } else {
+                    neg = (c == '-');
+                }
+            }
+            ++p;
+        }
+
+        if (building) out.emplace_back(neg ? -val : val);
+        if (out.empty()) out.emplace_back(0);
+
+        return out;
     }
 }
