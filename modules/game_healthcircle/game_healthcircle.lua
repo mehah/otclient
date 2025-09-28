@@ -345,15 +345,22 @@ function whenManaChange()
 
         local ymppc = math.floor(imageSizeBroad * (1 - (manaPercent / 100)))
         local restYmppc = imageSizeBroad - ymppc
+        if restYmppc <= 0 then
+            manaCircleFront:setVisible(false)
+        else
+            manaCircleFront:setVisible(isManaCircle)
 
-        manaCircleFront:setY(manaCircle:getY() + ymppc)
-        manaCircleFront:setHeight(restYmppc)
-        manaCircleFront:setImageClip({
-            x = 0,
-            y = ymppc,
-            width = imageSizeThin,
-            height = restYmppc
-        })
+            if isManaCircle then
+                manaCircleFront:setY(manaCircle:getY() + ymppc)
+                manaCircleFront:setHeight(restYmppc)
+                manaCircleFront:setImageClip({
+                    x = 0,
+                    y = ymppc,
+                    width = imageSizeThin,
+                    height = restYmppc
+                })
+            end
+        end
 
         manaCircle:setHeight(ymppc)
         manaCircle:setImageClip({
