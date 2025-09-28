@@ -45,6 +45,7 @@ public:
     void setExperience(uint64_t experience);
     void setLevel(uint16_t level, uint8_t levelPercent);
     void setMana(uint32_t mana, uint32_t maxMana);
+    void setManaShield(uint32_t manaShield, uint32_t maxManaShield);
     void setMagicLevel(uint16_t magicLevel, uint16_t magicLevelPercent);
     void setBaseMagicLevel(uint16_t baseMagicLevel);
     void setSoul(uint8_t soul);
@@ -93,6 +94,8 @@ public:
     uint32_t getStates() { return m_states; }
     uint32_t getMana() { return m_mana; }
     uint32_t getMaxMana() { return m_maxMana; }
+    uint32_t getManaShield() { return m_manaShield; }
+    uint32_t getMaxManaShield() { return m_maxManaShield; }
     uint32_t getHealth() { return m_health; }
     uint32_t getMaxHealth() { return m_maxHealth; }
     uint64_t getExperience() { return m_experience; }
@@ -192,6 +195,8 @@ private:
     uint8_t m_levelPercent{ 0 };
     uint32_t m_mana{ 0 };
     uint32_t m_maxMana{ 0 };
+    uint32_t m_manaShield{ 0 };
+    uint32_t m_maxManaShield{ 0 };
     uint16_t m_magicLevel{ 0 };
     uint16_t m_magicLevelPercent{ 0 };
     uint16_t m_baseMagicLevel{ 0 };
