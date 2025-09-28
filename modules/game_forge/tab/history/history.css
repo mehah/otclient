@@ -1,0 +1,63 @@
+.history-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    background-color: #404040;
+    --border-width-top: 1;
+    --border-color-top: black;
+    --border-width-left: 1;
+    --border-color-left: black;
+    --border-width-bottom: 1;
+    --border-color-bottom: #747474;
+    --border-width-right: 1;
+    --border-color-right: #747474;
+  }
+
+  .history-list {
+    display: block;
+    width: 100%;
+    height: 96%;
+    overflow: scroll;
+    margin-top: 15px;
+  }
+
+  .header-widget {
+    position: absolute;
+    top: 0px;
+    size: 166 16;
+    --border-width-bottom: 1;
+    --border-color-bottom: #292a29;
+    background-color: #363636;
+    --text-offset: 5 0;
+    --border-width-top: 1;
+    --border-color-top: black;
+  }
+
+  .header-date {
+    left: 0px;
+  }
+
+  .header-action {
+    left: 150px;
+  }
+
+  .header-details {
+    left: 300px;
+  }
+
+  .separator-vertical {
+    position: absolute;
+    top: 0px;
+    width: 2px;
+    height: 100%;
+    display: block;
+  }
+
+  .separator-1 {
+    left: 149px;
+  }
+
+  .separator-2 {
+    left: 299px;
+  }

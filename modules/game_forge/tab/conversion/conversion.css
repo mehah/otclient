@@ -1,0 +1,73 @@
+.conversion-container {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 480px;
+    height: 312px;
+    display: inline-block;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+  }
+
+  .conversion-columns {
+    width: 153px;
+    height: 260px;
+    white-space: normal;
+    display: inline-block;
+  }
+
+  .conversion-requirement {
+    position: relative;
+    top: 5px;
+    left: 40px;
+    width: 66px;
+  }
+
+  .conversion-flow-arrow {
+    position: relative;
+    left: 60px;
+    width: 25px;
+    height: 14px;
+    display: block;
+    margin-top: 15px;
+  }
+
+  .conversion-action-button {
+    height: 73px;
+    width: 86px;
+    position: relative;
+    left: 30px;
+    top: 10px;
+    display: block;
+  }
+
+  .conversion-note {
+    margin-top: 15px;
+    margin-left: 35px;
+    display: inline-block;
+  }
+
+  .conversion-row {
+    display: flex;
+    white-space: nowrap;
+    word-break: break-word;
+  }
+
+  .conversion-note--inline {
+    display: block;
+    width: 50px;
+    text-align: center;
+  }
+
+  .conversion-output-item {
+    display: inline;
+    width: 12px;
+  }
+
+  .info-panel--Conversion {
+    display: block;
+    margin-top: 5px;
+    width: 448px;
+    height: 29px;
+  }

@@ -1,0 +1,73 @@
+<html>
+<div id="transfer" anchor="parent" class="transfer-container forge-tab" layout="type: verticalBox; spacing: 5">
+  <div class="minipanel forge-selection-area forge-selection-area--primary transfer-selection-area" title="Select Items for the Transfer">
+    <div class="forge-slot-grid UIScrollArea" layout="type: grid; cell-size: 36 38;flow: true"></div>
+    <div class="forge-selection-side" >
+      <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
+      <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
+      <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
+      <input class="forge-convergence-checkbox" type="checkbox" text="Convergence" onchange="self:onCheckChangeConvergence(event)"/>
+    </div>
+    <div class="forge-slot-grid UIScrollArea" style="margin-left:-5px" layout="type: grid; cell-size: 36 38;flow: true"></div>
+  </div>
+
+  <div id="test" class="minipanel forge-selection-area forge-selection-area--secondary transfer-result-area" focusable="false" title="Transfer Requirements">
+    <div class="forge-result-placeholder" focusable="false">
+      <div class="forge-required-block">
+        <div class="forge-card">
+          <UIItem class="forge-item-icon"></UIItem>
+          <img class="forge-question-icon" src="/images/ui/icon-questionmark" />
+        </div>
+        <div class="forge-counter">
+          <Label class="forge-full-width-label" text="0 / 1"></Label>
+        </div>
+      </div>
+
+      <div class="forge-required-block" style="margin-left: 5px;">
+        <div class="forge-card">
+          <UIItem class="forge-item-icon"></UIItem>
+          <img class="forge-question-icon" src="/images/ui/icon-questionmark" />
+        </div>
+        <div class="forge-counter">
+          <Label class="forge-full-width-label" text="160"></Label>
+        <img class="resource-icon" src="images/icon-currency-dust" />
+
+        </div>
+      </div>
+
+      <div class="forge-required-block" style="margin-left: 5px;">
+        <div class="forge-card">
+          <UIItem class="forge-item-icon"></UIItem>
+          <img class="forge-question-icon" src="/images/ui/icon-questionmark" />
+        </div>
+        <div class="forge-counter">
+          <Label class="forge-full-width-label" text="???"></Label>
+        <img class="resource-icon" src="images/icon-currency-exaltedcore" />
+
+        </div>
+      </div>
+    </div>
+
+    <img class="flow-arrow" style="left: 190px; top: 35px;" src="/images/arrows/icon-arrow-rightlarge" />
+    <div class="transfer-result-summary">
+      <UIButton class="forge-action-button forge-action-button--large">
+        <UIItem class="forge-result-item" style="left: 20px;"></UIItem>
+        <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
+        <UIItem class="forge-result-item" style="left: 0px;"></UIItem>
+        <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
+      </UIButton>
+      <div anchor="prev" class="forge-result-cost">
+        <Label class="forge-full-width-label" text="???"></Label>
+        <img class="resource-icon" src="/images/game/prey/prey_gold" />
+      </div>
+    </div>
+  </div>
+
+  <qtpanel id="transfer-info-panel" class="info-panel">
+    <div anchor="parent" class="info-row" style="height: auto;">
+      <label class="info-text" text="You can transfer the tier of an item to another item of the same classification."></label>
+    </div>
+  </qtpanel>
+</div>
+</html>
+
