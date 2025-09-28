@@ -151,9 +151,7 @@ function Controller:unloadHtml()
         return
     end
 
-    g_html.destroy(self.htmlId)
-    self.ui = nil
-    self.htmlId = nil
+    self:destroyUI()
 end
 
 function Controller:destroyUI()
@@ -284,6 +282,11 @@ function Controller:registerEvents(actor, events)
 
     local evt = EventController:new(actor, events)
     table.insert(self.events[self.currentTypeEvent], evt)
+
+    -- fix html lazy loading
+    if actor and actor.isOnHtml and actor:isOnHtml() then
+        evt:connect()
+    end
 
     return evt
 end
