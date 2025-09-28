@@ -22,6 +22,7 @@ end
 function UIWidget:setTitle(title)
     self:setText(title)
     self:setTextAlign(AlignTopCenter)
+    self:setColor("#c0c0c0")
 end
 
 function UIWidget:parseColoredText(text, default_color)

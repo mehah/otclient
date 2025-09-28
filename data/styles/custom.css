@@ -1,11 +1,4 @@
 window,
 minipanel {
-    text-align: top;
-    color: #c0c0c0
-}
-
-window *,
-minipanel * {
-    text-align: left;
-    color: white;
+  position: relative;
 }
