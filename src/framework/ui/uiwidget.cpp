@@ -71,10 +71,8 @@ UIWidget::~UIWidget()
 
 void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
 {
-    auto clipping = isClipping() || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll);
-
     Rect oldClipRect;
-    if (clipping) {
+    if (isClipping()) {
         oldClipRect = g_drawPool.getClipRect();
         g_drawPool.setClipRect(visibleRect);
     }
@@ -87,7 +85,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     drawSelf(drawPane);
 
     if (!m_children.empty()) {
-        if (clipping)
+        if (isClipping())
             g_drawPool.setClipRect(visibleRect.intersection(getPaddingRect()));
 
         drawChildren(visibleRect, drawPane);
@@ -96,7 +94,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     if (m_rotation != 0.0f)
         g_drawPool.popTransformMatrix();
 
-    if (clipping) {
+    if (isClipping()) {
         g_drawPool.setClipRect(oldClipRect);
     }
 }
@@ -1484,6 +1482,9 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 
 UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool wantsPhantom)
 {
+    if (isClipping() && !containsPaddingPoint(childPos))
+        return nullptr;
+
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible()) {
             if (const auto& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
@@ -1526,6 +1527,9 @@ UIWidgetList UIWidget::recursiveGetChildren()
 UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
 {
     UIWidgetList children;
+    if (isClipping() && !containsPaddingPoint(childPos))
+        return children;
+
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible()) {
             if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
@@ -1542,6 +1546,8 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
 UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
 {
     UIWidgetList children;
+    if (isClipping() && !containsPaddingPoint(childPos))
+        return children;
 
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible()) {
