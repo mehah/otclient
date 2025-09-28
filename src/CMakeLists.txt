@@ -192,6 +192,7 @@ find_package(pugixml CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(Boost REQUIRED COMPONENTS locale)
 
 if(APPLE)
   # Required for Physfs
@@ -522,6 +523,7 @@ if(MSVC)
           winmm.lib
           pugixml::pugixml
           fmt::fmt-header-only
+          Boost::locale
   )
 elseif(ANDROID)
   target_include_directories(${PROJECT_NAME}
@@ -570,6 +572,7 @@ elseif(ANDROID)
           log
           pugixml::pugixml
           fmt::fmt-header-only
+          Boost::locale
   )
 
 elseif(WASM)
@@ -624,6 +627,7 @@ elseif(WASM)
           Ogg::ogg
           Vorbis::vorbisfile
           Vorbis::vorbis
+          Boost::locale
   )
 
 
@@ -707,6 +711,7 @@ else() # Linux
           Ogg::ogg
           Vorbis::vorbisfile
           Vorbis::vorbis
+          Boost::locale
   )
 
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
