@@ -784,9 +784,16 @@ function Cyclopedia.internalCreateItem(data)
 
         -- Setup drop tracker if available
         if UI.InfoBase.TrackCheck then
+            -- Temporarily disable the callback to prevent unwanted triggers
+            local originalCallback = UI.InfoBase.TrackCheck.onCheckChange
+            UI.InfoBase.TrackCheck.onCheckChange = nil
+            
+            UI.InfoBase.TrackCheck.itemId = data:getId()  -- Store item ID for callback
             local inTracker = Cyclopedia.Items.isInDropTracker(data:getId())
             UI.InfoBase.TrackCheck:setChecked(inTracker)
-            UI.InfoBase.TrackCheck.itemId = data:getId()  -- Store item ID for callback
+            
+            -- Restore the callback
+            UI.InfoBase.TrackCheck.onCheckChange = originalCallback
         end
 
         -- Setup quick sell whitelist if available
