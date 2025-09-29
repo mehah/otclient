@@ -10,6 +10,29 @@ if not string.capitalize then
     end
 end
 
+-- Missing utility functions
+local function formatMoney(value, separator)
+    return comma_value(tostring(value))
+end
+
+local function getItemServerName(itemId)
+    local thingType = g_things.getThingType(itemId, ThingCategoryItem)
+    if thingType then
+        return thingType:getName()
+    end
+    return "Unknown Item"
+end
+
+local function short_text(text, maxLength)
+    if not text then
+        return ""
+    end
+    if string.len(text) > maxLength then
+        return text:sub(1, maxLength - 3) .. "..."
+    end
+    return text
+end
+
 if not DropTrackerAnalyser then
 	DropTrackerAnalyser = {
 		launchTime = 0,
@@ -58,7 +81,7 @@ function DropTrackerAnalyser:create()
 		-- Set up contextMenuButton click handler to show our menu
 		contextMenuButton.onClick = function(widget, mousePos)
 			local pos = mousePos or g_window.getMousePosition()
-			return onDropExtra(pos)
+			return onDropTrackerExtra(pos)
 		end
 	end
 
@@ -79,6 +102,41 @@ function DropTrackerAnalyser:create()
 	DropTrackerAnalyser.autoTrackAboveValue = 0
 
 	DropTrackerAnalyser.trackedItems = {}
+	
+	-- Load tracked items from both DropTracker config and Cyclopedia
+	DropTrackerAnalyser:loadConfigJson()
+end
+
+function DropTrackerAnalyser:isInDropTracker(itemId)
+	return DropTrackerAnalyser.trackedItems[itemId] ~= nil
+end
+
+function DropTrackerAnalyser:managerDropItem(itemId, shouldTrack)
+	if shouldTrack then
+		-- Add item to tracking
+		if not DropTrackerAnalyser.trackedItems[itemId] then
+			DropTrackerAnalyser.trackedItems[itemId] = {
+				monsterDrop = {},
+				recordStartTimestamp = os.time(),
+				dropCount = 0,
+				persistent = true
+			}
+		else
+			-- Make sure existing tracked item is persistent
+			DropTrackerAnalyser.trackedItems[itemId].persistent = true
+		end
+	else
+		-- Remove item from tracking
+		if DropTrackerAnalyser.trackedItems[itemId] then
+			DropTrackerAnalyser.trackedItems[itemId] = nil
+		end
+	end
+	
+	-- Update the display
+	DropTrackerAnalyser:updateWindow()
+	
+	-- Save the configuration
+	DropTrackerAnalyser:saveConfigJson()
 end
 
 function DropTrackerAnalyser:checkTracker()
@@ -367,6 +425,32 @@ function DropTrackerAnalyser:loadConfigJson()
   table.clear(DropTrackerAnalyser.trackedItems)
 	for _, i in pairs(config.trackedItems) do
 		DropTrackerAnalyser.trackedItems[i.objectType] = {monsterDrop = {}, recordStartTimestamp = i.recordStartTimestamp, dropCount = i.dropCount, persistent = true}
+	end
+
+	-- Load tracked items from Cyclopedia configuration
+	local cyclopediaFile = "/characterdata/" .. player:getId() .. "/itemprices.json"
+	if g_resources.fileExists(cyclopediaFile) then
+		local status, result = pcall(function()
+			return json.decode(g_resources.readFileContents(cyclopediaFile))
+		end)
+
+		if status and result and result["dropTrackerItems"] then
+			-- Add items marked for tracking in Cyclopedia that aren't already tracked
+			for itemIdStr, isTracked in pairs(result["dropTrackerItems"]) do
+				if isTracked then
+					local itemId = tonumber(itemIdStr)
+					if itemId and not DropTrackerAnalyser.trackedItems[itemId] then
+						-- Add item as persistent tracked item
+						DropTrackerAnalyser.trackedItems[itemId] = {
+							monsterDrop = {}, 
+							recordStartTimestamp = os.time(), 
+							dropCount = 0, 
+							persistent = true
+						}
+					end
+				end
+			end
+		end
 	end
 
 	DropTrackerAnalyser.autoTrackAboveValue = config.autoTrackAboveValue
