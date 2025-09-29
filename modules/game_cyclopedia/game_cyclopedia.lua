@@ -457,6 +457,11 @@ function controllerCyclopedia:onTerminate()
     -- Clear character tracking on module termination
     currentCharacter = nil
     
+    -- Save items data if available
+    if Cyclopedia and Cyclopedia.Items and Cyclopedia.Items.terminate then
+        Cyclopedia.Items.terminate()
+    end
+    
     onTerminateCharm()
 end
 
