@@ -1100,7 +1100,7 @@ end
 
 function Cyclopedia.Items.updateItemVisualFeedback(itemId, isTracked)
     -- Update visual feedback for all widgets in the item list with this ID
-    if UI.ItemListBase and UI.ItemListBase.List then
+    if UI and UI.ItemListBase and UI.ItemListBase.List then
         for _, widget in pairs(UI.ItemListBase.List:getChildren()) do
             if widget:getId() == tostring(itemId) and widget.Name then
                 if isTracked then
@@ -1128,6 +1128,52 @@ function Cyclopedia.Items.isInDropTracker(itemId)
     end
     
     return false
+end
+
+-- Helper functions for Drop Tracker integration (avoiding circular dependencies)
+function Cyclopedia.Items.removeFromDropTrackerDirectly(itemId)
+    -- Remove from our JSON backup without calling back to game_analyser
+    if itemsData["dropTrackerItems"] then
+        itemsData["dropTrackerItems"][tostring(itemId)] = nil
+        Cyclopedia.Items.saveJson()
+    end
+    
+    -- Update visual feedback for all items with this ID
+    Cyclopedia.Items.updateItemVisualFeedback(itemId, false)
+end
+
+function Cyclopedia.Items.refreshCurrentItem()
+    -- Force refresh the currently displayed item's tracking state
+    if UI and UI.InfoBase and UI.InfoBase.TrackCheck and UI.InfoBase.TrackCheck.itemId then
+        local itemId = UI.InfoBase.TrackCheck.itemId
+        
+        -- Temporarily disable the callback to prevent unwanted triggers
+        local originalCallback = UI.InfoBase.TrackCheck.onCheckChange
+        UI.InfoBase.TrackCheck.onCheckChange = nil
+        
+        local inTracker = Cyclopedia.Items.isInDropTracker(itemId)
+        UI.InfoBase.TrackCheck:setChecked(inTracker)
+        
+        -- Restore the callback
+        UI.InfoBase.TrackCheck.onCheckChange = originalCallback
+    end
+end
+
+function Cyclopedia.Items.removeAllFromDropTrackerDirectly()
+    -- Clear all drop tracker items from our JSON backup without calling back to game_analyser
+    if itemsData then
+        itemsData["dropTrackerItems"] = {}
+        Cyclopedia.Items.saveJson()
+    end
+    
+    -- Update visual feedback for all items in the list
+    if UI and UI.ItemListBase and UI.ItemListBase.List then
+        for _, widget in pairs(UI.ItemListBase.List:getChildren()) do
+            if widget.Name then
+                widget.Name:setColor("#c0c0c0")  -- Reset to default color
+            end
+        end
+    end
 end
 
 -- Safe wrapper functions for module compatibility
