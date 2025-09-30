@@ -168,6 +168,7 @@ function Cyclopedia.Items.showItemPrice(item)
 	end
 	
 	if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
+        -- Set value for the Market Average display
 		UI.InfoBase.MarketGoldPriceBase.Value:setText(comma_value(avgMarket))
 	end
 
@@ -176,24 +177,36 @@ function Cyclopedia.Items.showItemPrice(item)
 		isMarketPrice = true
 	end
 
-	local resulting = avgMarket
-	if item.getDefaultValue then
-		local success, defaultValue = pcall(function() return item:getDefaultValue() end)
-		if success and defaultValue then
-			resulting = isMarketPrice and avgMarket or defaultValue
+	-- Get NPC value
+	local npcValue = 0
+	if item and item.getNpcSaleData then
+		local success, npcSaleData = pcall(function() return item:getNpcSaleData() end)
+		if success and npcSaleData and #npcSaleData > 0 then
+			-- Get the highest buy price from NPCs (what NPCs will pay us for the item)
+			for _, npcData in ipairs(npcSaleData) do
+				if npcData.buyPrice and npcData.buyPrice > npcValue then
+					npcValue = npcData.buyPrice
+				end
+			end
 		end
 	end
-	
-	if resulting == 0 then
-		resulting = avgMarket
-	end
 
+	-- Priority 1: Custom value always takes precedence
+	local resulting = 0
 	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(item:getId())] then
 		resulting = itemsData["customSalePrices"][tostring(item:getId())]
 		if UI.InfoBase.OwnValueEdit then
 			UI.InfoBase.OwnValueEdit:setText(tostring(resulting))
 		end
 	else
+		-- Priority 2 & 3: Use selected loot value source
+		if isMarketPrice then
+			resulting = avgMarket  -- Use market price
+		else
+			resulting = npcValue   -- Use NPC price
+		end
+		
+		-- Clear custom value field since no custom value is set
 		if UI.InfoBase.OwnValueEdit then
 			UI.InfoBase.OwnValueEdit:clearText(true)
 		end
@@ -241,21 +254,33 @@ function Cyclopedia.Items.getCurrentItemValue(item)
 		isMarketPrice = true
 	end
 
-	local resulting = avgMarket
-	if item.getDefaultValue then
-		local success, defaultValue = pcall(function() return item:getDefaultValue() end)
-		if success and defaultValue then
-			resulting = isMarketPrice and avgMarket or defaultValue
+	-- Get NPC value
+	local npcValue = 0
+	if item and item.getNpcSaleData then
+		local success, npcSaleData = pcall(function() return item:getNpcSaleData() end)
+		if success and npcSaleData and #npcSaleData > 0 then
+			-- Get the highest buy price from NPCs (what NPCs will pay us for the item)
+			for _, npcData in ipairs(npcSaleData) do
+				if npcData.buyPrice and npcData.buyPrice > npcValue then
+					npcValue = npcData.buyPrice
+				end
+			end
+		end
+	end
+
+	-- Priority 1: Custom value always takes precedence
+	local resulting = 0
+	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(item:getId())] then
+		resulting = itemsData["customSalePrices"][tostring(item:getId())]
+	else
+		-- Priority 2 & 3: Use selected loot value source
+		if isMarketPrice then
+			resulting = avgMarket  -- Use market price
+		else
+			resulting = npcValue   -- Use NPC price
 		end
 	end
 	
-	if resulting == 0 then
-		resulting = avgMarket
-	end
-
-	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(item:getId())] then
-		resulting = itemsData["customSalePrices"][tostring(item:getId())]
-	end
 	return resulting
 end
 
@@ -294,24 +319,36 @@ function Cyclopedia.Items.showItemPriceFromThingType(thingType)
 		isMarketPrice = true
 	end
 
-	local resulting = avgMarket
-	if thingType.getDefaultValue then
-		local success, defaultValue = pcall(function() return thingType:getDefaultValue() end)
-		if success and defaultValue then
-			resulting = isMarketPrice and avgMarket or defaultValue
+	-- Get NPC value
+	local npcValue = 0
+	if thingType and thingType.getNpcSaleData then
+		local success, npcSaleData = pcall(function() return thingType:getNpcSaleData() end)
+		if success and npcSaleData and #npcSaleData > 0 then
+			-- Get the highest buy price from NPCs (what NPCs will pay us for the item)
+			for _, npcData in ipairs(npcSaleData) do
+				if npcData.buyPrice and npcData.buyPrice > npcValue then
+					npcValue = npcData.buyPrice
+				end
+			end
 		end
 	end
-	
-	if resulting == 0 then
-		resulting = avgMarket
-	end
 
+	-- Priority 1: Custom value always takes precedence
+	local resulting = 0
 	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(itemId)] then
 		resulting = itemsData["customSalePrices"][tostring(itemId)]
 		if UI.InfoBase.OwnValueEdit then
 			UI.InfoBase.OwnValueEdit:setText(tostring(resulting))
 		end
 	else
+		-- Priority 2 & 3: Use selected loot value source
+		if isMarketPrice then
+			resulting = avgMarket  -- Use market price
+		else
+			resulting = npcValue   -- Use NPC price
+		end
+		
+		-- Clear custom value field since no custom value is set
 		if UI.InfoBase.OwnValueEdit then
 			UI.InfoBase.OwnValueEdit:clearText(true)
 		end
@@ -426,13 +463,10 @@ function Cyclopedia.Items.onChangeCustomPrice(widget)
 
 		itemsData["customSalePrices"] = newItemList["customSalePrices"]
 		Cyclopedia.Items.showItemPriceSafe(item)
-		local itemDefaultValue = 0
-		if item.getDefaultValue then
-			local success, defaultValue = pcall(function() return item:getDefaultValue() end)
-			if success and defaultValue then
-				itemDefaultValue = defaultValue
-			end
-		end
+		
+		-- Get the current item value (NPC or market based on selection)
+		local itemDefaultValue = Cyclopedia.Items.getCurrentItemValue(item)
+		
 		if player.updateCyclopediaCustomPrice then
 			player:updateCyclopediaCustomPrice(itemId, itemDefaultValue)
 		end
