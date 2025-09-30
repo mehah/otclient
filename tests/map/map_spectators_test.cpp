@@ -292,3 +292,41 @@ TEST(MapSpectators, AggregationMatchesLegacyTraversal)
 
     EXPECT_EQ(expected, actual);
 }
+
+TEST(MapSpectators, RangeFiltering)
+{
+    const Position center(101, 101, 8);
+
+    Map map;
+    map.m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
+    map.m_centralPosition = center;
+
+    const auto centerTile = map.createTile(center);
+    const auto adjTile = map.createTile(center.translated(-1, -1));
+    const auto farTile = map.createTile(center.translated(2, 2));
+
+    auto c1 = makeCreature(1, center);
+    auto c2 = makeCreature(2, adjTile->getPosition());
+    auto c3 = makeCreature(3, farTile->getPosition());
+
+    centerTile->addThing(c1, -1);
+    adjTile->addThing(c2, -1);
+    farTile->addThing(c3, -1);
+
+    map.m_knownCreatures.emplace(c1->getId(), c1);
+    map.m_knownCreatures.emplace(c2->getId(), c2);
+    map.m_knownCreatures.emplace(c3->getId(), c3);
+
+    {
+        const auto nearSpectators = map.getSpectatorsInRangeEx(center, /*multiFloor=*/false,
+                                                               /*minX=*/1, /*maxX=*/1,
+                                                               /*minY=*/1, /*maxY=*/1);
+        EXPECT_LE(nearSpectators.size(), 2u);
+    }
+
+    {
+        const auto farSpectators = map.getSpectatorsInRangeEx(center, /*multiFloor=*/false,
+                                                              2, 2, 2, 2);
+        EXPECT_EQ(farSpectators.size(), 3u);
+    }
+}
