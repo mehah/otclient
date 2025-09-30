@@ -562,11 +562,6 @@ function HuntingAnalyser:addLootedItems(item, name)
 				
 				price = resulting
 			end
-			
-			-- Final fallback for non-coin items with no pricing information
-			if price == 0 then
-				price = 1
-			end
 		end
 		
 		HuntingAnalyser.loot = HuntingAnalyser.loot + (price * count)
