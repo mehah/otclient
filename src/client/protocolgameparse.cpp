@@ -4483,10 +4483,11 @@ void ProtocolGame::parseUpdateSupplyTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateLootTracker(const InputMessagePtr& msg)
 {
-    getItem(msg); // item
-    msg->getString(); // item name
+    const auto item = getItem(msg); // item
+    const auto itemName = msg->getString(); // item name
 
-    // TODO: implement loot tracker usage
+    // Call the onLootStats callback to expose the data to Lua
+    g_lua.callGlobalField("g_game", "onLootStats", item, itemName);
 }
 
 void ProtocolGame::parseBestiaryEntryChanged(const InputMessagePtr& msg)

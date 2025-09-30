@@ -263,7 +263,71 @@ function LootAnalyser:addLootedItems(item, name)
 	end
 
 	local count = item:getCount()
-	itemInfo.basePrice = modules.game_cyclopedia.CyclopediaItems.getCurrentItemValue(item)
+	
+	-- Special handling for coins - they have fixed inherent values
+	local price = 0
+	if itemId == 3031 then  -- Gold coin
+		price = 1
+	elseif itemId == 3035 then  -- Platinum coin (worth 100 gold)
+		price = 100
+	elseif itemId == 3043 then  -- Crystal coin (worth 10,000 gold)
+		price = 10000
+	else
+		-- For non-coin items, try to get price from various sources
+		-- Try to get price from Cyclopedia module if available
+		if Cyclopedia and Cyclopedia.Items and Cyclopedia.Items.getCurrentItemValue then
+			price = Cyclopedia.Items.getCurrentItemValue(item)
+		else
+			-- Implement the same logic as Cyclopedia.Items.getCurrentItemValue for fallback
+			-- This follows the exact pattern: prioritize NPC value unless item is marked for market pricing
+			
+			local avgMarket = 0
+			-- Try to get market average price
+			if item.getMeanPrice then
+				local success, result = pcall(function() return item:getMeanPrice() end)
+				if success and result then
+					avgMarket = result
+				end
+			elseif item.getAverageMarketValue then
+				local success, result = pcall(function() return item:getAverageMarketValue() end)
+				if success and result then
+					avgMarket = result
+				end
+			end
+			
+			-- Default to using NPC value (since we can't access itemsData to check market preference)
+			local resulting = avgMarket
+			if item.getDefaultValue then
+				local success, defaultValue = pcall(function() return item:getDefaultValue() end)
+				if success and defaultValue then
+					-- Use NPC value as primary choice (mimicking Cyclopedia when not marked for market)
+					resulting = defaultValue
+				end
+			end
+			
+			-- If no valid NPC price found, use market price as fallback
+			if resulting == 0 then
+				resulting = avgMarket
+			end
+			
+			-- If still no price, try default buy price as last resort
+			if resulting == 0 and item.getDefaultBuyPrice then
+				local success, result = pcall(function() return item:getDefaultBuyPrice() end)
+				if success and result then
+					resulting = result
+				end
+			end
+			
+			price = resulting
+		end
+		
+		-- Final fallback for non-coin items with no pricing information
+		if price == 0 then
+			price = 1
+		end
+	end
+	
+	itemInfo.basePrice = price
 	itemInfo.count = itemInfo.count + count
 
 	-- update balance
