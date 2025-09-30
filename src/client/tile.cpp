@@ -211,6 +211,9 @@ void Tile::clean()
 
     m_thingTypeFlag = 0;
 
+    m_firstCreatureIndex = -1;
+    m_lastCreatureIndex = -1;
+
 #ifdef FRAMEWORK_EDITOR
     m_flags = 0;
 #endif
@@ -447,6 +450,10 @@ void Tile::appendSpectators(std::vector<CreaturePtr>& out) const
     for (; it != end; ++it) {
         const auto& thing = *it;
         if (thing->isCreature()) {
+            if (thing->getPosition() != m_position) {
+                continue;
+            }
+
             out.emplace_back(thing->static_self_cast<Creature>());
         }
     }

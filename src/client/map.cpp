@@ -631,6 +631,8 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
 {
     std::vector<CreaturePtr> creatures;
     creatures.reserve(m_knownCreatures.size());
+    std::unordered_set<uint32_t> seenIds;
+    seenIds.reserve(m_knownCreatures.size());
 
     uint8_t minZRange = 0;
     uint8_t maxZRange = 0;
@@ -651,7 +653,19 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
         for (int y = startY; y <= endY; ++y) {
             for (int x = startX; x <= endX; ++x) {
                 if (const auto& tile = getTile(Position(x, y, z)); tile && tile->hasCreatures()) {
+                    const auto sizeBeforeAppend = creatures.size();
+
                     tile->appendSpectators(creatures);
+
+                    auto it = creatures.begin() + sizeBeforeAppend;
+                    while (it != creatures.end()) {
+                        const auto& creature = *it;
+                        if (!creature || !seenIds.insert(creature->getId()).second) {
+                            it = creatures.erase(it);
+                            continue;
+                        }
+                        ++it;
+                    }
                 }
             }
         }
@@ -1472,6 +1486,8 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
     }
 
     p = 0;
+    std::unordered_set<uint32_t> seenIds;
+    seenIds.reserve(m_knownCreatures.size());
     for (int y = centerPos.y - height / 2, endy = centerPos.y + height / 2; y <= endy; ++y) {
         for (int x = centerPos.x - width / 2, endx = centerPos.x + width / 2; x <= endx; ++x) {
             if (!finalPattern[p++]) {
@@ -1481,7 +1497,19 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
             if (!tile || !tile->hasCreatures()) {
                 continue;
             }
+
+            const auto sizeBeforeAppend = creatures.size();
             tile->appendSpectators(creatures);
+
+            auto it = creatures.begin() + sizeBeforeAppend;
+            while (it != creatures.end()) {
+                const auto& creature = *it;
+                if (!creature || !seenIds.insert(creature->getId()).second) {
+                    it = creatures.erase(it);
+                    continue;
+                }
+                ++it;
+            }
         }
     }
     return creatures;

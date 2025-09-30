@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <cstdint>
 
 #define private public
 #define protected public
@@ -123,12 +122,35 @@ std::vector<CreaturePtr> expectedSpectatorsFromTile(Tile& tile)
     return { creatures.rbegin(), creatures.rend() };
 }
 
+std::pair<int16_t, int16_t> expectedCreatureSpan(const Tile& tile)
+{
+    int16_t first = -1;
+    int16_t last = -1;
+
+    for (int16_t i = 0; i < static_cast<int16_t>(tile.m_things.size()); ++i) {
+        if (!tile.m_things[i]->isCreature()) {
+            continue;
+        }
+
+        if (first == -1) {
+            first = i;
+        }
+
+        last = i;
+    }
+
+    return { first, last };
+}
+
 } // namespace
 
 TEST(TileSpectators, AppendSpectatorsMatchesThingOrder)
 {
     const Position position(100, 100, 7);
     Tile tile(position);
+
+    EXPECT_FALSE(tile.hasCreatures());
+    EXPECT_TRUE(tile.getCreatures().empty());
 
     auto first = makeCreature(1, position);
     auto second = makeCreature(2, position);
@@ -159,6 +181,8 @@ TEST(TileSpectators, CreatureRangeTracksMixedInsertions)
     const Position position(200, 200, 7);
     Tile tile(position);
 
+    tile.addThing(makeItem(position), -1);
+
     tile.addThing(makeItem(position), 0);
 
     auto bottom = makeCreature(1, position);
@@ -183,22 +207,66 @@ TEST(TileSpectators, CreatureRangeTracksMixedInsertions)
 
     EXPECT_EQ(expected, actual);
 
-    int16_t expectedFirst = -1;
-    int16_t expectedLast = -1;
-    for (int16_t i = 0; i < static_cast<int16_t>(tile.m_things.size()); ++i) {
-        if (!tile.m_things[i]->isCreature()) {
-            continue;
-        }
-
-        if (expectedFirst == -1) {
-            expectedFirst = i;
-        }
-
-        expectedLast = i;
-    }
-
+    const auto [expectedFirst, expectedLast] = expectedCreatureSpan(tile);
     EXPECT_EQ(expectedFirst, tile.m_firstCreatureIndex);
     EXPECT_EQ(expectedLast, tile.m_lastCreatureIndex);
+}
+
+TEST(TileSpectators, RemovingCreaturesUpdatesSpan)
+{
+    const Position position(210, 210, 7);
+    Tile tile(position);
+
+    auto first = makeCreature(1, position);
+    auto second = makeCreature(2, position);
+
+    tile.addThing(makeItem(position), -1);
+    tile.addThing(first, -1);
+    tile.addThing(makeItem(position), -1);
+    tile.addThing(second, -1);
+
+    ASSERT_TRUE(tile.hasCreatures());
+
+    const auto expectedBeforeRemoval = expectedSpectatorsFromTile(tile);
+    ASSERT_FALSE(expectedBeforeRemoval.empty());
+
+    std::vector<CreaturePtr> actualBeforeRemoval;
+    tile.appendSpectators(actualBeforeRemoval);
+    EXPECT_EQ(expectedBeforeRemoval, actualBeforeRemoval);
+
+    const auto forwardBeforeRemoval = tile.getCreatures();
+    ASSERT_EQ(expectedBeforeRemoval.size(), forwardBeforeRemoval.size());
+    EXPECT_EQ(expectedBeforeRemoval.back(), forwardBeforeRemoval.front());
+
+    const auto [expectedFirst, expectedLast] = expectedCreatureSpan(tile);
+    EXPECT_EQ(expectedFirst, tile.m_firstCreatureIndex);
+    EXPECT_EQ(expectedLast, tile.m_lastCreatureIndex);
+
+    ASSERT_TRUE(tile.removeThing(first));
+    EXPECT_TRUE(tile.hasCreatures());
+
+    const auto expectedAfterFirstRemoval = expectedSpectatorsFromTile(tile);
+    ASSERT_FALSE(expectedAfterFirstRemoval.empty());
+
+    std::vector<CreaturePtr> actualAfterFirstRemoval;
+    tile.appendSpectators(actualAfterFirstRemoval);
+    EXPECT_EQ(expectedAfterFirstRemoval, actualAfterFirstRemoval);
+
+    const auto forwardAfterFirstRemoval = tile.getCreatures();
+    ASSERT_EQ(expectedAfterFirstRemoval.size(), forwardAfterFirstRemoval.size());
+    EXPECT_EQ(expectedAfterFirstRemoval.back(), forwardAfterFirstRemoval.front());
+
+    const auto [expectedFirstAfterRemoval, expectedLastAfterRemoval] = expectedCreatureSpan(tile);
+    EXPECT_EQ(expectedFirstAfterRemoval, tile.m_firstCreatureIndex);
+    EXPECT_EQ(expectedLastAfterRemoval, tile.m_lastCreatureIndex);
+
+    ASSERT_TRUE(tile.removeThing(second));
+    EXPECT_FALSE(tile.hasCreatures());
+    EXPECT_TRUE(tile.getCreatures().empty());
+
+    const auto [expectedFirstAfterSecondRemoval, expectedLastAfterSecondRemoval] = expectedCreatureSpan(tile);
+    EXPECT_EQ(expectedFirstAfterSecondRemoval, tile.m_firstCreatureIndex);
+    EXPECT_EQ(expectedLastAfterSecondRemoval, tile.m_lastCreatureIndex);
 }
 
 TEST(MapSpectators, AggregatesCreaturesFromTiles)
@@ -318,15 +386,102 @@ TEST(MapSpectators, RangeFiltering)
     map.m_knownCreatures.emplace(c3->getId(), c3);
 
     {
-        const auto nearSpectators = map.getSpectatorsInRangeEx(center, /*multiFloor=*/false,
-                                                               /*minX=*/1, /*maxX=*/1,
-                                                               /*minY=*/1, /*maxY=*/1);
-        EXPECT_LE(nearSpectators.size(), 2u);
+        const auto nearSpectators = map.getSpectatorsInRangeEx(center, false, 1, 1, 1, 1);
+        const std::vector<CreaturePtr> expected{ c2, c1 };
+        EXPECT_EQ(expected, nearSpectators);
     }
 
     {
-        const auto farSpectators = map.getSpectatorsInRangeEx(center, /*multiFloor=*/false,
-                                                              2, 2, 2, 2);
-        EXPECT_EQ(farSpectators.size(), 3u);
+        const auto farSpectators = map.getSpectatorsInRangeEx(center, false, 2, 2, 2, 2);
+        const std::vector<CreaturePtr> expected{ c2, c1, c3 };
+        EXPECT_EQ(expected, farSpectators);
     }
+}
+
+TEST(MapSpectators, CreatureOrderingIsDeterministic)
+{
+    const Position center(180, 280, 7);
+
+    Map map;
+    map.m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
+    map.m_centralPosition = center;
+
+    const auto westTile = map.createTile(center.translated(-1, 0));
+    const auto centerTile = map.createTile(center);
+    const auto eastTile = map.createTile(center.translated(1, 0));
+
+    auto west = makeCreature(1, westTile->getPosition());
+    auto middle = makeCreature(2, centerTile->getPosition());
+    auto east = makeCreature(3, eastTile->getPosition());
+
+    westTile->addThing(west, -1);
+    centerTile->addThing(middle, -1);
+    eastTile->addThing(east, -1);
+
+    map.m_knownCreatures.emplace(west->getId(), west);
+    map.m_knownCreatures.emplace(middle->getId(), middle);
+    map.m_knownCreatures.emplace(east->getId(), east);
+
+    const auto expected = std::vector<CreaturePtr>{ west, middle, east };
+
+    const auto spectators = map.getSpectatorsInRangeEx(center, false, 1, 1, 0, 0);
+    ASSERT_EQ(expected.size(), spectators.size());
+    EXPECT_EQ(expected, spectators);
+
+    const auto repeated = map.getSpectatorsInRangeEx(center, false, 1, 1, 0, 0);
+    EXPECT_EQ(spectators, repeated);
+}
+
+TEST(MapSpectators, MultiFloorRangeIncludesVerticalNeighbors)
+{
+    const Position center(190, 290, 8);
+
+    Map map;
+    map.m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
+    map.m_centralPosition = center;
+
+    const auto belowTile = map.createTile(center.translated(0, 0, -1));
+    const auto centerTile = map.createTile(center);
+    const auto aboveTile = map.createTile(center.translated(0, 0, 1));
+
+    auto below = makeCreature(11, belowTile->getPosition());
+    auto middle = makeCreature(12, centerTile->getPosition());
+    auto above = makeCreature(13, aboveTile->getPosition());
+
+    belowTile->addThing(below, -1);
+    centerTile->addThing(middle, -1);
+    aboveTile->addThing(above, -1);
+
+    map.m_knownCreatures.emplace(below->getId(), below);
+    map.m_knownCreatures.emplace(middle->getId(), middle);
+    map.m_knownCreatures.emplace(above->getId(), above);
+
+    const auto spectators = map.getSpectatorsInRangeEx(center, true, 0, 0, 0, 0);
+    const auto expected = std::vector<CreaturePtr>{ below, middle, above };
+
+    ASSERT_EQ(expected.size(), spectators.size());
+    EXPECT_EQ(expected, spectators);
+}
+
+TEST(MapSpectators, UniqueCreatures)
+{
+    const Position center(220, 320, 7);
+
+    Map map;
+    map.m_floors.resize(g_gameConfig.getMapMaxZ() + 1);
+    map.m_centralPosition = center;
+
+    const auto firstTile = map.createTile(center);
+    const auto secondTile = map.createTile(center.translated(1, 0));
+
+    auto shared = makeCreature(42, firstTile->getPosition());
+
+    firstTile->addThing(shared, -1);
+    secondTile->addThing(shared, -1);
+
+    map.m_knownCreatures.emplace(shared->getId(), shared);
+
+    const auto spectators = map.getSpectatorsInRangeEx(center, false, 1, 1, 0, 0);
+    ASSERT_EQ(1u, spectators.size());
+    EXPECT_EQ(shared, spectators.front());
 }
