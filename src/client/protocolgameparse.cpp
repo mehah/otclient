@@ -2990,13 +2990,17 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
 {
-    msg->getString(); // monster name
-    getOutfit(msg, false);
+    const std::string monsterName = msg->getString(); // monster name
+    const Outfit monsterOutfit = getOutfit(msg, false);
 
     const uint8_t corpseItemsSize = msg->getU8();
+    std::vector<ItemPtr> dropItems;
     for (auto i = 0; i < corpseItemsSize; ++i) {
-        getItem(msg);
+        dropItems.push_back(getItem(msg));
     }
+
+    // Fire the Lua callback with monster kill data
+    g_lua.callGlobalField("g_game", "onKillTracker", monsterName, monsterOutfit, dropItems);
 }
 
 void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
