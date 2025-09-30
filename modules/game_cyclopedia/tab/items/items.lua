@@ -190,6 +190,11 @@ function Cyclopedia.Items.showItemPrice(item)
 			end
 		end
 	end
+	
+	-- If no NPC buy price found, fallback to market average price
+	if npcValue == 0 then
+		npcValue = avgMarket
+	end
 
 	-- Priority 1: Custom value always takes precedence
 	local resulting = 0
@@ -267,6 +272,11 @@ function Cyclopedia.Items.getCurrentItemValue(item)
 			end
 		end
 	end
+	
+	-- If no NPC buy price found, fallback to market average price
+	if npcValue == 0 then
+		npcValue = avgMarket
+	end
 
 	-- Priority 1: Custom value always takes precedence
 	local resulting = 0
@@ -331,6 +341,11 @@ function Cyclopedia.Items.showItemPriceFromThingType(thingType)
 				end
 			end
 		end
+	end
+	
+	-- If no NPC buy price found, fallback to market average price
+	if npcValue == 0 then
+		npcValue = avgMarket
 	end
 
 	-- Priority 1: Custom value always takes precedence
