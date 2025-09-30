@@ -41,6 +41,33 @@ local function short_text(text, maxLength)
     return text
 end
 
+-- Helper function to get item color based on value
+local function getItemColor(itemId)
+    local thingType = g_things.getThingType(itemId, ThingCategoryItem)
+    if thingType then
+        local price = thingType:getMeanPrice() or 0
+        if price >= 1000000 then
+            return "#ffff00"  -- yellow
+        elseif price >= 100000 then
+            return "#ff00ff"  -- purple/magenta
+        elseif price >= 10000 then
+            return "#0080ff"  -- blue
+        elseif price >= 1000 then
+            return "#00ff00"  -- green
+        elseif price >= 50 then
+            return "#808080"  -- grey
+        else
+            return "#ffffff"  -- white
+        end
+    end
+    return "#ffffff"  -- default white
+end
+
+-- Helper function to append colored text to a table
+local function setStringColor(textTable, text, color)
+    table.insert(textTable, "{" .. text .. ", " .. color .. "}")
+end
+
 if not DropTrackerAnalyser then
 	DropTrackerAnalyser = {
 		launchTime = 0,
@@ -205,6 +232,15 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 			widget.itemName:setText(string.capitalize(short_text(getItemServerName(itemId), 13)))
 			widget.drops:setText(formatMoney(config.dropCount, ","))
 
+			-- Add right-click context menu
+			widget.onMousePress = function(self, mousePos, mouseButton)
+				if mouseButton == MouseRightButton then
+					DropTrackerAnalyser:showItemContextMenu(self, mousePos, itemId)
+					return true
+				end
+				return false
+			end
+
 			for _, monsterDrop in ipairs(config.monsterDrop) do
 				local monsterWidget = g_ui.createWidget('MonsterPanel', widget.dropMonster)
 				monsterWidget.monster:setOutfit(monsterDrop.outfit)
@@ -220,6 +256,17 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 			-- check it to not be removed
 			widget.drops:setText(formatMoney(config.dropCount, ","))
 			widget.toBeRemoved = nil
+
+			-- Ensure right-click context menu is available
+			if not widget.onMousePress then
+				widget.onMousePress = function(self, mousePos, mouseButton)
+					if mouseButton == MouseRightButton then
+						DropTrackerAnalyser:showItemContextMenu(self, mousePos, itemId)
+						return true
+					end
+					return false
+				end
+			end
 
 			local toBeRemoved = {}
 			for id, monsterDrop in ipairs(config.monsterDrop) do
@@ -289,14 +336,26 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 end
 
 function DropTrackerAnalyser:sendDropedItems(msg, textMessageConsole)
+    -- Convert table to string if necessary
+    local msgText = msg
+    local consoleText = textMessageConsole
+    
+    if type(msg) == "table" then
+        msgText = table.concat(msg, "")
+    end
+    
+    if type(textMessageConsole) == "table" then
+        consoleText = table.concat(textMessageConsole, "")
+    end
+    
     modules.game_textmessage.messagesPanel.statusLabel:setVisible(true)
-    modules.game_textmessage.messagesPanel.statusLabel:setColoredText(msg)
+    modules.game_textmessage.messagesPanel.statusLabel:setColoredText(msgText)
     scheduleEvent(function()
       modules.game_textmessage.messagesPanel.statusLabel:setVisible(false)
     end, 3000)
 
     local tabName = (modules.game_console.getTabByName("Loot") and "Loot" or "Server Log")
-    modules.game_console.addText(textMessageConsole, MessageModes.ChannelManagement, tabName)
+    modules.game_console.addText(consoleText, MessageModes.ChannelManagement, tabName)
 end
 
 function DropTrackerAnalyser:tryAddingMonsterDrop(item, monsterName, monsterOutfit, dropItems, dropedItems)
@@ -337,6 +396,29 @@ function DropTrackerAnalyser:checkMonsterKilled(monsterName, monsterOutfit, drop
 		DropTrackerAnalyser:tryAddingMonsterDrop(item, monsterName, monsterOutfit, dropItems, dropedItems)
 	end
 
+	if #dropedItems ~= 0 then
+		local textMessage = {}
+		local textMessageConsole = {}
+		local first = true
+		setStringColor(textMessage, "Valuable loot:", "#f0b400")
+		setStringColor(textMessageConsole, " Valuable loot:", "#f0b400")
+		for _, itemId in pairs(dropedItems) do
+			local name = getItemServerName(itemId)
+			if not first then
+				setStringColor(textMessage, ",", getItemColor(itemId))
+				setStringColor(textMessageConsole, ",", getItemColor(itemId))
+			else
+				first = false
+			end
+			setStringColor(textMessage, " "..name, getItemColor(itemId))
+			setStringColor(textMessageConsole, " "..name, getItemColor(itemId))
+		end
+
+		setStringColor(textMessage, " dropped by "..monsterName.."!", "#f0b400")
+		setStringColor(textMessageConsole, " dropped by "..monsterName.."!", "#f0b400")
+		DropTrackerAnalyser:sendDropedItems(textMessage, textMessageConsole)
+	end
+
 	if not table.empty(dropedItems) then
 		DropTrackerAnalyser:updateWindow(true)
 	end
@@ -347,6 +429,90 @@ end
 function DropTrackerAnalyser:isInDropTracker(itemId)
 	local tracker = DropTrackerAnalyser.trackedItems[itemId]
 	return tracker and tracker.persistent
+end
+
+function DropTrackerAnalyser:removeItem(itemId)
+	-- Remove item from our tracking
+	if DropTrackerAnalyser.trackedItems[itemId] then
+		DropTrackerAnalyser.trackedItems[itemId] = nil
+	end
+	
+	-- Update Cyclopedia using direct helper functions (avoiding circular dependency)
+	-- Try both access patterns to find the correct one
+	local cyclopediaItems = nil
+	if Cyclopedia and Cyclopedia.Items then
+		cyclopediaItems = Cyclopedia.Items
+	elseif modules.game_cyclopedia and modules.game_cyclopedia.Items then
+		cyclopediaItems = modules.game_cyclopedia.Items
+	elseif modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items then
+		cyclopediaItems = modules.game_cyclopedia.Cyclopedia.Items
+	end
+	
+	if cyclopediaItems and cyclopediaItems.removeFromDropTrackerDirectly then
+		cyclopediaItems.removeFromDropTrackerDirectly(itemId)
+		
+		-- Also refresh the current item display if available
+		if cyclopediaItems.refreshCurrentItem then
+			cyclopediaItems.refreshCurrentItem()
+		end
+	end
+	
+	-- Update the display
+	DropTrackerAnalyser:updateWindow(true)
+	
+	-- Save the configuration
+	DropTrackerAnalyser:saveConfigJson()
+end
+
+function DropTrackerAnalyser:removeAllItems()
+	-- Get all tracked item IDs for individual visual feedback if needed
+	local itemIds = {}
+	for itemId, _ in pairs(DropTrackerAnalyser.trackedItems) do
+		table.insert(itemIds, itemId)
+	end
+	
+	-- Clear all tracked items
+	DropTrackerAnalyser.trackedItems = {}
+	
+	-- Update Cyclopedia using direct helper functions (avoiding circular dependency)
+	-- Use the same access pattern that worked for removeItem
+	local cyclopediaItems = nil
+	if Cyclopedia and Cyclopedia.Items then
+		cyclopediaItems = Cyclopedia.Items
+	elseif modules.game_cyclopedia and modules.game_cyclopedia.Items then
+		cyclopediaItems = modules.game_cyclopedia.Items
+	elseif modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items then
+		cyclopediaItems = modules.game_cyclopedia.Cyclopedia.Items
+	end
+	
+	if cyclopediaItems and cyclopediaItems.removeAllFromDropTrackerDirectly then
+		cyclopediaItems.removeAllFromDropTrackerDirectly()
+		
+		-- Also refresh the current item display if available
+		if cyclopediaItems.refreshCurrentItem then
+			cyclopediaItems.refreshCurrentItem()
+		end
+	end
+	
+	-- Update the display
+	DropTrackerAnalyser:updateWindow(true)
+	
+	-- Save the configuration
+	DropTrackerAnalyser:saveConfigJson()
+end
+
+function DropTrackerAnalyser:showItemContextMenu(widget, mousePos, itemId)
+	local menu = g_ui.createWidget('PopupMenu')
+	
+	menu:addOption('Remove', function()
+		DropTrackerAnalyser:removeItem(itemId)
+	end)
+	
+	menu:addOption('Remove All', function()
+		DropTrackerAnalyser:removeAllItems()
+	end)
+	
+	menu:display(mousePos)
 end
 
 function onDropTrackerExtra(mousePosition)
@@ -474,7 +640,7 @@ function DropTrackerAnalyser:saveConfigJson()
 	end)
 	
 	if not writeStatus then
-		g_logger.debug("Could not save DropTrackerAnalyser config during logout: " .. tostring(writeError))
+		-- Silently handle write errors during logout
 	end
 end
 
