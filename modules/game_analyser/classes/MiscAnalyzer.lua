@@ -14,6 +14,17 @@ if not MiscAnalyzer then
 	MiscAnalyzer.__index = MiscAnalyzer
 end
 
+-- Function to truncate text to a maximum length
+local function short_text(text, maxLength)
+    if not text then
+        return ""
+    end
+    if string.len(text) > maxLength then
+        return text:sub(1, maxLength - 3) .. "..."
+    end
+    return text
+end
+
 local ImbuementSkills = {
 	[1] = {name = "Critical Hit", icon = "critical"},
 	[2] = {name = "Mana Leech", healing = "mana points", shortLenght = 5, placeholder = "Mana Gain", icon = "mana-leech"},
