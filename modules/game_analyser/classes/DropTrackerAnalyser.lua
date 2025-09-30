@@ -102,13 +102,6 @@ function DropTrackerAnalyser:create()
 	DropTrackerAnalyser.autoTrackAboveValue = 0
 
 	DropTrackerAnalyser.trackedItems = {}
-	
-	-- Load tracked items from both DropTracker config and Cyclopedia
-	DropTrackerAnalyser:loadConfigJson()
-end
-
-function DropTrackerAnalyser:isInDropTracker(itemId)
-	return DropTrackerAnalyser.trackedItems[itemId] ~= nil
 end
 
 function DropTrackerAnalyser:managerDropItem(itemId, shouldTrack)
@@ -133,7 +126,7 @@ function DropTrackerAnalyser:managerDropItem(itemId, shouldTrack)
 	end
 	
 	-- Update the display
-	DropTrackerAnalyser:updateWindow()
+	DropTrackerAnalyser:updateWindow(true)
 	
 	-- Save the configuration
 	DropTrackerAnalyser:saveConfigJson()
@@ -156,14 +149,14 @@ function DropTrackerAnalyser:checkTracker()
 	end
 
 	if needUpdate then
-		DropTrackerAnalyser:updateWindow()
+		DropTrackerAnalyser:updateWindow(true)
 	end
 end
 
-function DropTrackerAnalyser:reset(resetAutoTrack)
+function DropTrackerAnalyser:reset(isLogin)
 	DropTrackerAnalyser.launchTime = g_clock.millis()
 	DropTrackerAnalyser.session = 0
-	if resetAutoTrack then
+	if not isLogin then
 		DropTrackerAnalyser.autoTrackAboveValue = 0
 	end
 
@@ -173,7 +166,7 @@ function DropTrackerAnalyser:reset(resetAutoTrack)
 		end
 	end
 
-	DropTrackerAnalyser:updateWindow()
+	DropTrackerAnalyser:updateWindow(true)
 end
 
 function DropTrackerAnalyser:updateWindow(ignoreVisible)
@@ -285,7 +278,7 @@ end
 function DropTrackerAnalyser:managerDropItem(itemId, checked)
 	if not checked then
 		DropTrackerAnalyser.trackedItems[itemId] = nil
-		DropTrackerAnalyser:updateWindow()
+		DropTrackerAnalyser:updateWindow(true)
 		return
 	end
 
@@ -294,7 +287,7 @@ function DropTrackerAnalyser:managerDropItem(itemId, checked)
 	else
 		DropTrackerAnalyser.trackedItems[itemId] = {monsterDrop = {}, recordStartTimestamp = os.time(), dropCount = 0, persistent = true}
 	end
-	DropTrackerAnalyser:updateWindow()
+	DropTrackerAnalyser:updateWindow(true)
 end
 
 function DropTrackerAnalyser:sendDropedItems(msg, textMessageConsole)
@@ -365,7 +358,7 @@ function DropTrackerAnalyser:checkMonsterKilled(monsterName, monsterOutfit, drop
 		DropTrackerAnalyser:sendDropedItems(textMessage, textMessageConsole)
 	end
 
-	DropTrackerAnalyser:updateWindow()
+	DropTrackerAnalyser:updateWindow(true)
 end
 
 function DropTrackerAnalyser:isInDropTracker(itemId)
@@ -403,12 +396,13 @@ function DropTrackerAnalyser:loadConfigJson()
 		trackedItems = {},
 	}
 
-	if not g_game.isOnline() then return end
-	
 	local player = g_game.getLocalPlayer()
-	if not player then return end
+	if not player then 
+		return 
+	end
 
-	local file = "/characterdata/" .. player:getId() .. "/itemtracking.json"
+	local playerId = player:getId()
+	local file = "/characterdata/" .. playerId .. "/itemtracking.json"
 	if g_resources.fileExists(file) then
 		local status, result = pcall(function()
 			return json.decode(g_resources.readFileContents(file))
@@ -421,14 +415,13 @@ function DropTrackerAnalyser:loadConfigJson()
 		config = result
 	end
 
-	-- set droped
   table.clear(DropTrackerAnalyser.trackedItems)
 	for _, i in pairs(config.trackedItems) do
 		DropTrackerAnalyser.trackedItems[i.objectType] = {monsterDrop = {}, recordStartTimestamp = i.recordStartTimestamp, dropCount = i.dropCount, persistent = true}
 	end
 
 	-- Load tracked items from Cyclopedia configuration
-	local cyclopediaFile = "/characterdata/" .. player:getId() .. "/itemprices.json"
+	local cyclopediaFile = "/characterdata/" .. playerId .. "/itemprices.json"
 	if g_resources.fileExists(cyclopediaFile) then
 		local status, result = pcall(function()
 			return json.decode(g_resources.readFileContents(cyclopediaFile))
@@ -454,7 +447,7 @@ function DropTrackerAnalyser:loadConfigJson()
 	end
 
 	DropTrackerAnalyser.autoTrackAboveValue = config.autoTrackAboveValue
-	DropTrackerAnalyser:updateWindow()
+	DropTrackerAnalyser:updateWindow(true)
 end
 
 function DropTrackerAnalyser:saveConfigJson()
@@ -473,10 +466,10 @@ function DropTrackerAnalyser:saveConfigJson()
 		end
 	end
 
-	if not g_game.isOnline() then return end
-	
 	local player = g_game.getLocalPlayer()
-	if not player then return end
+	if not player then 
+		return 
+	end
 
 	-- Ensure the characterdata directory exists
 	local characterDir = "/characterdata/" .. player:getId()
@@ -493,13 +486,11 @@ function DropTrackerAnalyser:saveConfigJson()
 		return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
 	end
 
-	-- Safely attempt to write the file, ignoring errors during logout
 	local writeStatus, writeError = pcall(function()
 		return g_resources.writeFileContents(file, result)
 	end)
 	
 	if not writeStatus then
-		-- Log the error but don't spam the console during normal logout
 		g_logger.debug("Could not save DropTrackerAnalyser config during logout: " .. tostring(writeError))
 	end
 end
