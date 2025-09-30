@@ -1,13 +1,21 @@
--- Add capitalize function to string library if it doesn't exist
-if not string.capitalize then
-    function string.capitalize(str)
-        if not str or str == "" then
-            return str
-        end
-        return str:gsub("(%l)(%w*)", function(first, rest)
-            return first:upper() .. rest
-        end)
+-- Add capitalize function to string library (force override)
+function string.capitalize(str)
+    if not str or str == "" then
+        return str
     end
+    
+    -- Split by spaces, capitalize each word, then join back
+    local words = {}
+    for word in str:gmatch("%S+") do
+        if word:len() > 0 then
+            -- Convert word to lowercase, then capitalize first letter
+            local lowerWord = word:lower()
+            local capitalizedWord = lowerWord:sub(1, 1):upper() .. lowerWord:sub(2)
+            table.insert(words, capitalizedWord)
+        end
+    end
+    
+    return table.concat(words, " ")
 end
 
 -- Missing utility functions
@@ -164,6 +172,9 @@ function DropTrackerAnalyser:reset(isLogin)
 		if config.monsterDrop then
 			config.monsterDrop = {}
 		end
+		-- Reset drop count and update timestamp for new session
+		config.dropCount = 0
+		config.recordStartTimestamp = os.time()
 	end
 
 	DropTrackerAnalyser:updateWindow(true)
@@ -197,7 +208,8 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 			for _, monsterDrop in ipairs(config.monsterDrop) do
 				local monsterWidget = g_ui.createWidget('MonsterPanel', widget.dropMonster)
 				monsterWidget.monster:setOutfit(monsterDrop.outfit)
-				monsterWidget.name:setText(string.capitalize(monsterDrop.monsterName))
+				local capitalizedName = string.capitalize(monsterDrop.monsterName)
+				monsterWidget.name:setText(capitalizedName)
 				monsterWidget.drops:setText("(" ..formatMoney(monsterDrop.count, ",") .. ")")
 				monsterDrop.widget = monsterWidget
 			end
@@ -216,7 +228,8 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 					-- if there is no monsterWidget set, then we need to create it
 					local monsterWidget = g_ui.createWidget('MonsterPanel', widget.dropMonster)
 					monsterWidget.monster:setOutfit(monsterDrop.outfit)
-					monsterWidget.name:setText(string.capitalize(monsterDrop.monsterName))
+					local capitalizedName = string.capitalize(monsterDrop.monsterName)
+					monsterWidget.name:setText(capitalizedName)
 					monsterWidget.drops:setText("(" ..formatMoney(monsterDrop.count, ",") .. ")")
 					-- we also save the reference for later on use
 					monsterDrop.widget = monsterWidget
@@ -275,21 +288,6 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 	end
 end
 
-function DropTrackerAnalyser:managerDropItem(itemId, checked)
-	if not checked then
-		DropTrackerAnalyser.trackedItems[itemId] = nil
-		DropTrackerAnalyser:updateWindow(true)
-		return
-	end
-
-	if DropTrackerAnalyser.trackedItems[itemId] then
-		DropTrackerAnalyser.trackedItems[itemId] = nil
-	else
-		DropTrackerAnalyser.trackedItems[itemId] = {monsterDrop = {}, recordStartTimestamp = os.time(), dropCount = 0, persistent = true}
-	end
-	DropTrackerAnalyser:updateWindow(true)
-end
-
 function DropTrackerAnalyser:sendDropedItems(msg, textMessageConsole)
     modules.game_textmessage.messagesPanel.statusLabel:setVisible(true)
     modules.game_textmessage.messagesPanel.statusLabel:setColoredText(msg)
@@ -304,23 +302,29 @@ end
 function DropTrackerAnalyser:tryAddingMonsterDrop(item, monsterName, monsterOutfit, dropItems, dropedItems)
 	local itemId = item:getId()
 	local tracker = DropTrackerAnalyser.trackedItems[itemId]
-	local itemPrice = item:getPriceValue() and item:getPriceValue() or 0
-	if not tracker and DropTrackerAnalyser.autoTrackAboveValue == 0 then
-		return
-	elseif DropTrackerAnalyser.autoTrackAboveValue > 0 and DropTrackerAnalyser.autoTrackAboveValue <= itemPrice then
-		tracker = DropTrackerAnalyser.trackedItems[itemId]
-		if not tracker then
-			DropTrackerAnalyser.trackedItems[itemId] = {monsterDrop = {}, recordStartTimestamp = os.time(), dropCount = 0, persistent = false}
-			tracker = DropTrackerAnalyser.trackedItems[itemId]
-		end
-	elseif not tracker then
+	local itemPrice = item:getMeanPrice() and item:getMeanPrice() or 0
+	
+	-- Check if item is explicitly tracked
+	if tracker then
+		-- Item is explicitly being tracked
+		dropedItems[#dropedItems + 1] = itemId
+		tracker.dropCount = tracker.dropCount + item:getCount()
+		tracker.recordStartTimestamp = os.time()
+		tracker.monsterDrop[#tracker.monsterDrop + 1] = {monsterName = monsterName, outfit = monsterOutfit, time = os.time(), count = item:getCount()}
 		return
 	end
-
-	dropedItems[#dropedItems + 1] = itemId
-	tracker.dropCount = tracker.dropCount + item:getCount()
-	tracker.recordStartTimestamp = os.time()
-	tracker.monsterDrop[#tracker.monsterDrop + 1] = {monsterName = monsterName, outfit = monsterOutfit, time = os.time(), count = item:getCount()}
+	
+	-- Check if item should be auto-tracked based on value
+	if DropTrackerAnalyser.autoTrackAboveValue > 0 and itemPrice >= DropTrackerAnalyser.autoTrackAboveValue then
+		-- Auto-track this valuable item (non-persistent)
+		DropTrackerAnalyser.trackedItems[itemId] = {monsterDrop = {}, recordStartTimestamp = os.time(), dropCount = 0, persistent = false}
+		tracker = DropTrackerAnalyser.trackedItems[itemId]
+		
+		dropedItems[#dropedItems + 1] = itemId
+		tracker.dropCount = tracker.dropCount + item:getCount()
+		tracker.recordStartTimestamp = os.time()
+		tracker.monsterDrop[#tracker.monsterDrop + 1] = {monsterName = monsterName, outfit = monsterOutfit, time = os.time(), count = item:getCount()}
+	end
 end
 
 function DropTrackerAnalyser:checkMonsterKilled(monsterName, monsterOutfit, dropItems)
@@ -328,37 +332,16 @@ function DropTrackerAnalyser:checkMonsterKilled(monsterName, monsterOutfit, drop
 		return true
 	end
 
-	DropTrackerAnalyser.autoTrackAboveValue = tonumber(DropTrackerAnalyser.autoTrackAboveValue) or 1
-
 	local dropedItems = {}
 	for _, item in pairs(dropItems) do
 		DropTrackerAnalyser:tryAddingMonsterDrop(item, monsterName, monsterOutfit, dropItems, dropedItems)
 	end
 
-	if #dropedItems ~= 0 then
-		local textMessage = {}
-		local textMessageConsole = {}
-		local first = true
-		setStringColor(textMessage, "Valuable loot:", "#f0b400")
-		setStringColor(textMessageConsole, " Valuable loot:", "#f0b400")
-		for _, itemId in pairs(dropedItems) do
-			local name = getItemServerName(itemId)
-			if not first then
-				setStringColor(textMessage, ",", getItemColor(itemId))
-				setStringColor(textMessageConsole, ",", getItemColor(itemId))
-			else
-				first = false
-			end
-			setStringColor(textMessage, " "..name, getItemColor(itemId))
-			setStringColor(textMessageConsole, " "..name, getItemColor(itemId))
-		end
-
-		setStringColor(textMessage, " dropped by "..monsterName.."!", "#f0b400")
-		setStringColor(textMessageConsole, " dropped by "..monsterName.."!", "#f0b400")
-		DropTrackerAnalyser:sendDropedItems(textMessage, textMessageConsole)
+	if not table.empty(dropedItems) then
+		DropTrackerAnalyser:updateWindow(true)
 	end
 
-	DropTrackerAnalyser:updateWindow(true)
+	return true
 end
 
 function DropTrackerAnalyser:isInDropTracker(itemId)
