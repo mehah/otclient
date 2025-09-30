@@ -285,8 +285,8 @@ TEST(MapSpectators, AggregatesCreaturesFromTiles)
     tile->addThing(first, -1);
     tile->addThing(second, -1);
 
-    map.m_knownCreatures.emplace(first->getId(), first);
-    map.m_knownCreatures.emplace(second->getId(), second);
+    map.m_knownCreatures.try_emplace(first->getId(), first);
+    map.m_knownCreatures.try_emplace(second->getId(), second);
 
     const auto expected = expectedSpectatorsFromTile(*tile);
 
@@ -347,10 +347,10 @@ TEST(MapSpectators, AggregationMatchesLegacyTraversal)
     northTile->addThing(third, -1);
     aboveTile->addThing(fourth, -1);
 
-    map.m_knownCreatures.emplace(first->getId(), first);
-    map.m_knownCreatures.emplace(second->getId(), second);
-    map.m_knownCreatures.emplace(third->getId(), third);
-    map.m_knownCreatures.emplace(fourth->getId(), fourth);
+    map.m_knownCreatures.try_emplace(first->getId(), first);
+    map.m_knownCreatures.try_emplace(second->getId(), second);
+    map.m_knownCreatures.try_emplace(third->getId(), third);
+    map.m_knownCreatures.try_emplace(fourth->getId(), fourth);
 
     const bool multiFloor = true;
     const int range = 3;
@@ -381,9 +381,9 @@ TEST(MapSpectators, RangeFiltering)
     adjTile->addThing(c2, -1);
     farTile->addThing(c3, -1);
 
-    map.m_knownCreatures.emplace(c1->getId(), c1);
-    map.m_knownCreatures.emplace(c2->getId(), c2);
-    map.m_knownCreatures.emplace(c3->getId(), c3);
+    map.m_knownCreatures.try_emplace(c1->getId(), c1);
+    map.m_knownCreatures.try_emplace(c2->getId(), c2);
+    map.m_knownCreatures.try_emplace(c3->getId(), c3);
 
     {
         const auto nearSpectators = map.getSpectatorsInRangeEx(center, false, 1, 1, 1, 1);
@@ -418,9 +418,9 @@ TEST(MapSpectators, CreatureOrderingIsDeterministic)
     centerTile->addThing(middle, -1);
     eastTile->addThing(east, -1);
 
-    map.m_knownCreatures.emplace(west->getId(), west);
-    map.m_knownCreatures.emplace(middle->getId(), middle);
-    map.m_knownCreatures.emplace(east->getId(), east);
+    map.m_knownCreatures.try_emplace(west->getId(), west);
+    map.m_knownCreatures.try_emplace(middle->getId(), middle);
+    map.m_knownCreatures.try_emplace(east->getId(), east);
 
     const auto expected = std::vector<CreaturePtr>{ west, middle, east };
 
@@ -452,9 +452,9 @@ TEST(MapSpectators, MultiFloorRangeIncludesVerticalNeighbors)
     centerTile->addThing(middle, -1);
     aboveTile->addThing(above, -1);
 
-    map.m_knownCreatures.emplace(below->getId(), below);
-    map.m_knownCreatures.emplace(middle->getId(), middle);
-    map.m_knownCreatures.emplace(above->getId(), above);
+    map.m_knownCreatures.try_emplace(below->getId(), below);
+    map.m_knownCreatures.try_emplace(middle->getId(), middle);
+    map.m_knownCreatures.try_emplace(above->getId(), above);
 
     const auto spectators = map.getSpectatorsInRangeEx(center, true, 0, 0, 0, 0);
     const auto expected = std::vector<CreaturePtr>{ below, middle, above };
@@ -479,7 +479,7 @@ TEST(MapSpectators, UniqueCreatures)
     firstTile->addThing(shared, -1);
     secondTile->addThing(shared, -1);
 
-    map.m_knownCreatures.emplace(shared->getId(), shared);
+    map.m_knownCreatures.try_emplace(shared->getId(), shared);
 
     const auto spectators = map.getSpectatorsInRangeEx(center, false, 1, 1, 0, 0);
     ASSERT_EQ(1u, spectators.size());
