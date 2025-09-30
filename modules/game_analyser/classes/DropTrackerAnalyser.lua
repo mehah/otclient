@@ -352,10 +352,18 @@ function DropTrackerAnalyser:sendDropedItems(msg, textMessageConsole)
     modules.game_textmessage.messagesPanel.statusLabel:setColoredText(msgText)
     scheduleEvent(function()
       modules.game_textmessage.messagesPanel.statusLabel:setVisible(false)
-    end, 3000)
+    end, 6000)
 
-    local tabName = (modules.game_console.getTabByName("Loot") and "Loot" or "Server Log")
-    modules.game_console.addText(consoleText, MessageModes.ChannelManagement, tabName)
+    -- Check if Loot tab exists, if not use Server Log as fallback
+    local lootTab = modules.game_console.getTab("Loot")
+    local tabName = (lootTab and lootTab ~= nil) and "Loot" or "Server Log"
+    -- Create a simple message type object for console display
+    local msgType = {
+        color = "#FFFFFF",
+        consoleTab = tabName
+    }
+	-- TODO: Add HTML support
+    --modules.game_console.addText(consoleText, msgType, tabName)
 end
 
 function DropTrackerAnalyser:tryAddingMonsterDrop(item, monsterName, monsterOutfit, dropItems, dropedItems)
