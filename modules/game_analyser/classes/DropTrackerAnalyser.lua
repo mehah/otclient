@@ -335,21 +335,12 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 	end
 end
 
-function DropTrackerAnalyser:sendDropedItems(plainMessage, consoleMessage)
-    -- Display the plain message on screen - displayMessage will apply proper coloring
+function DropTrackerAnalyser:sendDropedItems(consoleMessage)
+    -- Now that textmessage.lua handles colored formatting for ValuableLoot,
+    -- we can use the same colored message for both screen and console
     if g_game.isOnline() then
-        modules.game_textmessage.displayMessage(MessageModes.Loot, plainMessage)
+        modules.game_textmessage.displayMessage(MessageModes.ValuableLoot, consoleMessage)
     end
-
-    local tabName = (modules.game_console.getTab("Loot") and "Loot" or "Server Log")
-    -- Create a custom message type that supports colored text but doesn't trigger loot-specific processing
-    local customLootType = {
-        color = TextColors.white,
-        consoleTab = 'Loot',
-        colored = true,
-        consoleOption = 'showInfoMessagesInConsole'
-    }
-    modules.game_console.addText(consoleMessage, customLootType, tabName)
 end
 
 function DropTrackerAnalyser:tryAddingMonsterDrop(item, monsterName, monsterOutfit, dropItems, dropedItems)
@@ -391,30 +382,32 @@ function DropTrackerAnalyser:checkMonsterKilled(monsterName, monsterOutfit, drop
 	end
 
 	if #dropedItems ~= 0 then
-		local statusMessage = "{Valuable loot:, #f0b400}"
 		local consoleMessage = "{Valuable loot:, #f0b400}"
-		local plainMessage = "Valuable loot:"  -- For screen display to let displayMessage handle coloring
+		
 		local first = true
 		for _, itemId in pairs(dropedItems) do
 			local name = getItemServerName(itemId)
+			-- Ensure we have valid data before processing
+			if not name or name == "" then
+				name = "Unknown Item"
+			end
+			if not itemId or itemId == 0 then
+				itemId = 0
+			end
+			
 			if not first then
-				statusMessage = statusMessage .. "{,, #f0b400}"
 				consoleMessage = consoleMessage .. "{,, #f0b400}"
-				plainMessage = plainMessage .. ","
 			else
 				first = false
 			end
-			-- Use the ItemsDatabase approach for individual items to get proper color
-			local itemColoredText = ItemsDatabase.setColorLootMessage("{" .. itemId .. "|" .. name .. "}")
-			statusMessage = statusMessage .. "{ , #f0b400}" .. itemColoredText
-			consoleMessage = consoleMessage .. "{ , #f0b400}" .. itemColoredText
-			plainMessage = plainMessage .. " {" .. itemId .. "|" .. name .. "}"
+			
+			-- Use the server loot message format that ItemsDatabase.setColorLootMessage expects
+			consoleMessage = consoleMessage .. "{ , #f0b400}{" .. itemId .. "|" .. name .. "}"
 		end
 
-		statusMessage = statusMessage .. "{ dropped by " .. monsterName .. "!, #f0b400}"
 		consoleMessage = consoleMessage .. "{ dropped by " .. monsterName .. "!, #f0b400}"
-		plainMessage = plainMessage .. " dropped by " .. monsterName .. "!"
-		DropTrackerAnalyser:sendDropedItems(plainMessage, consoleMessage)
+		
+		DropTrackerAnalyser:sendDropedItems(consoleMessage)
 	end
 
 	if not table.empty(dropedItems) then
