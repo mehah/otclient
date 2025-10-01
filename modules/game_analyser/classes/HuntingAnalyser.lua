@@ -283,6 +283,10 @@ function HuntingAnalyser:updateWindow(ignoreVisible)
 	end
 
 	local contentsPanel = HuntingAnalyser.window.contentsPanel
+	if not contentsPanel then
+		return
+	end
+	
 	local session = HuntingAnalyser.session
 	if session == 0 then
 		contentsPanel.session:setText("00:00h")
@@ -602,15 +606,55 @@ function HuntingAnalyser:addLootedItems(item, name)
 	HuntingAnalyser.lootedItemsName[name] = HuntingAnalyser.lootedItemsName[name] + count
 end
 
+-- Function to get NPC sale price (what NPCs sell items for - supply cost)
+local function getNpcSupplyPrice(item)
+	if not item then
+		return 0
+	end
+	
+	local npcSalePrice = 0
+	
+	-- Try to get NPC sale data (what NPCs sell to players)
+	if item.getNpcSaleData then
+		local success, npcSaleData = pcall(function() return item:getNpcSaleData() end)
+		if success and npcSaleData and #npcSaleData > 0 then
+			-- Get the highest sale price from NPCs (most expensive option that NPCs charge us for the item)
+			for _, npcData in ipairs(npcSaleData) do
+				if npcData.salePrice and npcData.salePrice > npcSalePrice then
+					npcSalePrice = npcData.salePrice
+				end
+			end
+		end
+	end
+	
+	-- If no NPC sale price found, try market price as fallback
+	if npcSalePrice == 0 then
+		if item.getMeanPrice then
+			local success, result = pcall(function() return item:getMeanPrice() end)
+			if success and result then
+				npcSalePrice = result
+			end
+		elseif item.getAverageMarketValue then
+			local success, result = pcall(function() return item:getAverageMarketValue() end)
+			if success and result then
+				npcSalePrice = result
+			end
+		end
+	end
+	
+	return npcSalePrice
+end
+
 function HuntingAnalyser:addSuppliesItems(itemId)
 	local supplyItemInfo = HuntingAnalyser.suppliesItems[itemId]
 	if not HuntingAnalyser.suppliesItems[itemId] then
 		-- only at the first time a supply item is added, it will
 		-- have to create a dummy item in order to retrieve the
-		-- item default buy price value
+		-- item NPC sale price value
 
 		local itemPtr = Item.create(itemId, 1)
-		HuntingAnalyser.suppliesItems[itemId] = { count = 0, price = itemPtr:getDefaultBuyPrice() }
+		local price = getNpcSupplyPrice(itemPtr)
+		HuntingAnalyser.suppliesItems[itemId] = { count = 0, price = price }
 		supplyItemInfo = HuntingAnalyser.suppliesItems[itemId]
 		itemPtr = nil
 	end
