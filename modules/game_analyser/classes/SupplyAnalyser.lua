@@ -266,7 +266,7 @@ function SupplyAnalyser:reset()
 	end
 	
 	-- Update all UI elements immediately to reflect the reset (like HuntingAnalyser does)
-	SupplyAnalyser:updateWindow(false, true)  -- updateScroll=false, ignoreVisible=true
+	SupplyAnalyser:updateWindow(true, true)  -- updateScroll=true, ignoreVisible=true
 end
 
 function SupplyAnalyser:checkBalance()
@@ -324,17 +324,47 @@ function SupplyAnalyser:updateWindow(updateScroll, ignoreVisible)
 
 	local numOfItems = 0
 	local numOfLines = 0
-	for _, __ in pairs(contentsPanel.lootedItems:getChildren()) do
-		numOfItems = numOfItems + 1
-		if numOfItems == 4 then
-			numOfItems = 0
-			numOfLines = numOfLines + 1
+	
+	-- Clear the items panel if items table is empty (similar to LootAnalyser)
+	if table.empty(SupplyAnalyser.items) and #contentsPanel.lootedItems:getChildren() > 0 then
+		contentsPanel.lootedItems:destroyChildren()
+		contentsPanel.lootedItems:setVisible(false)
+		contentsPanel.separatorLootedItems:setVisible(false)
+	else
+		-- Process existing items and create/update widgets
+		local itemCounts = {}
+		for _, itemInfo in pairs(SupplyAnalyser.items) do
+			if not itemCounts[itemInfo.itemId] then
+				itemCounts[itemInfo.itemId] = 1
+			else
+				itemCounts[itemInfo.itemId] = itemCounts[itemInfo.itemId] + 1
+			end
 		end
-	end
-
-	if numOfItems > 0 then
-		contentsPanel.lootedItems:setVisible(true)
-		contentsPanel.separatorLootedItems:setVisible(true)
+		
+		for itemId, count in pairs(itemCounts) do
+			local widget = contentsPanel.lootedItems:getChildById(tostring(itemId))
+			if not widget then
+				widget = g_ui.createWidget('LootItem', contentsPanel.lootedItems)
+				widget:setId(itemId)
+				widget:setItemId(itemId)
+			end
+			
+			widget:setItemCount(count)
+			local itemPtr = Item.create(itemId, 1)
+			local value = getCurrentPrice(itemPtr)
+			widget:setTooltip(string.format("%s (Value: %sgp, Sum: %sgp)", getItemServerName(itemId), formatMoney(value, ","), formatMoney(value * count, ",")))
+			
+			numOfItems = numOfItems + 1
+			if numOfItems == 4 then
+				numOfItems = 0
+				numOfLines = numOfLines + 1
+			end
+		end
+		
+		if numOfItems > 0 or numOfLines > 0 then
+			contentsPanel.lootedItems:setVisible(true)
+			contentsPanel.separatorLootedItems:setVisible(true)
+		end
 	end
 
 	numOfLines = not table.empty(SupplyAnalyser.items) and numOfLines + 1 or 0
