@@ -20,6 +20,35 @@ local analyserWindows = {
   miscButton = 'styles/misc'
 }
 
+-- Utility function to get combat name from effect ID
+function getCombatName(effectId)
+  if not effectId then
+    return "Unknown"
+  end
+  
+  -- Use the clientCombat table from player.lua
+  if clientCombat and clientCombat[effectId] then
+    return clientCombat[effectId].id or "Unknown"
+  end
+  
+  -- Fallback names if clientCombat is not available
+  local combatNames = {
+    [0] = "Physical",
+    [1] = "Fire", 
+    [2] = "Earth",
+    [3] = "Energy",
+    [4] = "Ice",
+    [5] = "Holy",
+    [6] = "Death",
+    [7] = "Healing",
+    [8] = "Drown",
+    [9] = "Lifedrain",
+    [10] = "Manadrain"
+  }
+  
+  return combatNames[effectId] or "Unknown"
+end
+
 -- objects
 function init()
 

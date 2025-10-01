@@ -477,4 +477,9 @@ PriceTypeEnum = {
 	Market = 0,
 	Leader = 1,
 }
+
+-- Analyzer constants
+ANALYZER_HEAL = 0
+ANALYZER_DAMAGE_DEALT = 1
+ANALYZER_DAMAGE_RECEIVED = 2
 -- @}
