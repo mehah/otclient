@@ -354,6 +354,42 @@ namespace {
         return run;
     }
 
+    static UIWidget* tallestInlineInCurrentLine(UIWidget* self) {
+        auto* parent = self->getParent().get();
+        if (!parent) return nullptr;
+
+        const auto children = parent->getChildren();
+
+        int idx = -1;
+        for (int i = 0; i < static_cast<int>(children.size()); ++i) {
+            if (children[i].get() == self) { idx = i; break; }
+        }
+        if (idx <= 0) return nullptr;
+
+        UIWidget* tallest = nullptr;
+        int best = -1;
+
+        for (int j = idx - 1; j >= 0; --j) {
+            const auto& sp = children[j];
+            if (!sp) continue;
+
+            UIWidget* c = sp.get();
+
+            if (c->getDisplay() == DisplayType::None) continue;
+            if (!c->isAnchorable() || c->getPositionType() == PositionType::Absolute) continue;
+
+            const auto cf = mapLogicalFloat(c->getFloat());
+            if (cf != FloatType::None) break;
+            if (breakLine(c->getDisplay())) break;
+            if (!isInlineLike(c->getDisplay())) break;
+
+            const int h = calcOuterHeight(c);
+            if (h > best) { best = h; tallest = c; }
+        }
+
+        return tallest;
+    }
+
     void applyInline(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
         if (auto* parent = self->getParent().get()) {
             const int innerW = parentInnerWidth(parent);
@@ -397,6 +433,15 @@ namespace {
     }
 
     void applyBlock(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
+        if (ctx.prevNonFloat && isInlineLike(ctx.prevNonFloat->getDisplay())) {
+            if (auto* tallest = tallestInlineInCurrentLine(self)) {
+                setLeftAnchor(self, "parent", Fw::AnchorLeft);
+                if (!topCleared)
+                    setTopAnchor(self, tallest->getId(), Fw::AnchorBottom);
+                return;
+            }
+        }
+
         if (!ctx.prevNonFloat) {
             if (ctx.hasLeft) {
                 setLeftAnchor(self, ctx.lastLeftFloat->getId(), Fw::AnchorRight);
