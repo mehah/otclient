@@ -659,7 +659,7 @@ void UIWidget::setOverflow(OverflowType type) {
 }
 
 void UIWidget::setPositions(std::string_view type, std::string_view value) {
-    const Unit unit = detectUnit(type);
+    const Unit unit = detectUnit(value);
     int16_t v = stdext::to_number(std::string(numericPart(value)));
 
     if (type == "top") {
