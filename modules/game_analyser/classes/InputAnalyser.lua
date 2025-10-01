@@ -176,6 +176,11 @@ function InputAnalyser:create()
 		contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
 		contextMenuButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
 		contextMenuButton:setMarginTop(0)
+		
+		-- Set up the click handler for the context menu
+		contextMenuButton.onClick = function(widget, mousePosition)
+			return onInputExtra(mousePosition)
+		end
 	end
 
 	-- Position lockButton to the left of contextMenuButton
