@@ -406,8 +406,20 @@ function HuntingAnalyser:updateWindow(ignoreVisible)
 	end
 
 	local currentDamagePerHour = getPerHourValue(HuntingAnalyser.damage)
-	if not contentsPanel.damageHour.lastValue or contentsPanel.damageHour.lastValue ~= currentDamagePerHour then
-		HuntingAnalyser.damageHour = currentDamagePerHour
+	
+	-- Calculate damage per hour like XP/h (continuously updating)
+	local _duration = math.floor((g_clock.millis() - HuntingAnalyser.launchTime)/1000)
+	if _duration > 0 then
+		HuntingAnalyser.damageHour = math.floor((HuntingAnalyser.damage * 3600) / _duration)
+	else
+		HuntingAnalyser.damageHour = 0
+	end
+	
+	if HuntingAnalyser.damageHour ~= HuntingAnalyser.damageHour then
+		HuntingAnalyser.damageHour = 0
+	end
+	
+	if not contentsPanel.damageHour.lastValue or contentsPanel.damageHour.lastValue ~= HuntingAnalyser.damageHour then
 		if HuntingAnalyser.damageHour > 1000000 then
 			contentsPanel.damageHour:setText(formatMoney(tokformat(HuntingAnalyser.damageHour), ","))
 		else
@@ -426,8 +438,15 @@ function HuntingAnalyser:updateWindow(ignoreVisible)
 	end
 
 	local curHPS = valueInSeconds(HuntingAnalyser.healingTicks)
-	HuntingAnalyser.healingHour = HuntingAnalyser.healingHour > curHPS and HuntingAnalyser.healingHour or curHPS
-	if not tonumber(HuntingAnalyser.healingHour) then
+	
+	-- Calculate healing per hour like XP/h (continuously updating)
+	if _duration > 0 then
+		HuntingAnalyser.healingHour = math.floor((HuntingAnalyser.healing * 3600) / _duration)
+	else
+		HuntingAnalyser.healingHour = 0
+	end
+	
+	if HuntingAnalyser.healingHour ~= HuntingAnalyser.healingHour then
 		HuntingAnalyser.healingHour = 0
 	end
 
