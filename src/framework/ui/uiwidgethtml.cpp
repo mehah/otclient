@@ -112,6 +112,9 @@ namespace {
         int lastRightIdx = -1;
         bool hasLeft = false;
         bool hasRight = false;
+
+        int inlineRunWidthBefore = 0;
+        UIWidget* tallestInlineInLine = nullptr;
     };
 
     static void anchorToParentTL(UIWidget* self) {
@@ -198,6 +201,12 @@ namespace {
         return (by > ay) ? b : a;
     }
 
+    static bool shouldSkipForFlow(UIWidget* c) {
+        return c->getDisplay() == DisplayType::None
+            || !c->isAnchorable()
+            || c->getPositionType() == PositionType::Absolute;
+    }
+
     static void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->removeAnchor(Fw::AnchorLeft);
         w->addAnchor(Fw::AnchorLeft, std::string(toId), edge);
@@ -211,32 +220,75 @@ namespace {
         w->addAnchor(Fw::AnchorTop, std::string(toId), edge);
     }
 
+    static int calcOuterWidth(UIWidget* w) {
+        const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
+        const int contentW = std::max<int>(textSz.width(),
+                              std::max<int>(w->getWidth(),
+                                           w->isOnHtml() ? w->getWidthHtml().valueCalculed : -1));
+        return contentW
+            + w->getMarginLeft() + w->getMarginRight()
+            + w->getPaddingLeft() + w->getPaddingRight();
+    }
+
+    static int calcOuterHeight(UIWidget* w) {
+        const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
+        const int contentH = std::max<int>(textSz.height(),
+                              std::max<int>(w->getHeight(),
+                                           w->isOnHtml() ? w->getHeightHtml().valueCalculed : -1));
+        return contentH
+            + w->getMarginTop() + w->getMarginBottom()
+            + w->getPaddingTop() + w->getPaddingBottom();
+    }
+
     static FlowCtx computeFlowContext(UIWidget* self, DisplayType /*parentDisplay*/, FloatType effFloat) {
         FlowCtx ctx;
+        if (self->getPositionType() == PositionType::Absolute) return ctx;
+        auto* parent = self->getParent().get();
+        if (!parent) return ctx;
 
-        if (self->getPositionType() == PositionType::Absolute)
-            return ctx;
+        int runWidth = 0;
+        int lastTop = INT_MIN;
+        UIWidget* tallest = nullptr;
+        int tallestH = -1;
 
         int i = 0;
-        for (const auto& c : self->getParent()->getChildren()) {
-            if (c.get() == self) break;
-
-            if (c->getDisplay() == DisplayType::None) { ++i; continue; }
-            if (!c->isAnchorable() || c->getPositionType() == PositionType::Absolute) { ++i; continue; }
+        for (const auto& sp : parent->getChildren()) {
+            UIWidget* c = sp.get();
+            if (c == self) break;
+            if (shouldSkipForFlow(c)) { ++i; continue; }
 
             const FloatType cf = mapLogicalFloat(c->getFloat());
             if (cf == FloatType::None) {
-                ctx.prevNonFloat = c.get(); ctx.prevNonFloatIdx = i;
+                ctx.prevNonFloat = c; ctx.prevNonFloatIdx = i;
             } else if (cf == FloatType::Left) {
-                ctx.lastLeftFloat = c.get();  ctx.lastLeftIdx = i;
+                ctx.lastLeftFloat = c; ctx.lastLeftIdx = i;
             } else if (cf == FloatType::Right) {
-                ctx.lastRightFloat = c.get(); ctx.lastRightIdx = i;
+                ctx.lastRightFloat = c; ctx.lastRightIdx = i;
             }
-            if (cf == effFloat) ctx.lastFloatSameSide = c.get();
+            if (cf == effFloat) ctx.lastFloatSameSide = c;
+
+            if (cf == FloatType::None) {
+                if (breakLine(c->getDisplay())) {
+                    runWidth = 0; lastTop = INT_MIN; tallest = nullptr; tallestH = -1;
+                } else if (isInlineLike(c->getDisplay())) {
+                    const int ct = c->getRect().topLeft().y;
+                    if (lastTop == INT_MIN) lastTop = ct;
+                    if (ct > lastTop) { runWidth = 0; lastTop = ct; tallest = nullptr; tallestH = -1; }
+                    const int cw = calcOuterWidth(c);
+                    const int ch = calcOuterHeight(c);
+                    runWidth += cw;
+                    if (ch > tallestH) { tallestH = ch; tallest = c; }
+                } else {
+                    runWidth = 0; lastTop = INT_MIN; tallest = nullptr; tallestH = -1;
+                }
+            }
             ++i;
         }
+
         ctx.hasLeft = (ctx.lastLeftFloat != nullptr);
         ctx.hasRight = (ctx.lastRightFloat != nullptr);
+        ctx.inlineRunWidthBefore = runWidth;
+        ctx.tallestInlineInLine = tallest;
         return ctx;
     }
 
@@ -299,95 +351,21 @@ namespace {
         }
     }
 
-    static int calcOuterWidth(UIWidget* w) {
-        const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
-        const int contentW = std::max<int>(textSz.width(),
-                              std::max<int>(w->getWidth(),
-                                           w->isOnHtml() ? w->getWidthHtml().valueCalculed : -1));
-        return contentW
-            + w->getMarginLeft() + w->getMarginRight()
-            + w->getPaddingLeft() + w->getPaddingRight();
-    }
-
-    static int calcOuterHeight(UIWidget* w) {
-        const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
-        const int contentH = std::max<int>(textSz.height(),
-                              std::max<int>(w->getHeight(),
-                                           w->isOnHtml() ? w->getHeightHtml().valueCalculed : -1));
-        return contentH
-            + w->getMarginTop() + w->getMarginBottom()
-            + w->getPaddingTop() + w->getPaddingBottom();
-    }
-
     static int parentInnerWidth(UIWidget* p) {
         const int pw = p->isOnHtml() ? p->getWidthHtml().valueCalculed : p->getWidth();
         return std::max<int>(0, pw - p->getPaddingLeft() - p->getPaddingRight());
     }
 
     static int currentInlineRunWidth(UIWidget* self) {
-        auto* parent = self->getParent().get();
-        if (!parent) return 0;
-
-        int run = 0;
-        int lastTop = INT_MIN;
-
-        for (const auto& c : parent->getChildren()) {
-            if (c.get() == self) break;
-            if (c->getDisplay() == DisplayType::None) continue;
-            if (!c->isAnchorable() || c->getPositionType() == PositionType::Absolute) continue;
-
-            const auto cf = mapLogicalFloat(c->getFloat());
-            if (cf != FloatType::None) continue;
-
-            if (breakLine(c->getDisplay())) { run = 0; lastTop = INT_MIN; continue; }
-
-            if (isInlineLike(c->getDisplay())) {
-                const int ct = c->getRect().topLeft().y;
-                if (lastTop == INT_MIN) lastTop = ct;
-                if (ct > lastTop) { run = 0; lastTop = ct; }
-                run += calcOuterWidth(c.get());
-            } else {
-                run = 0;
-                lastTop = INT_MIN;
-            }
-        }
-        return run;
+        const FloatType effFloat = mapLogicalFloat(self->getFloat());
+        auto ctx = computeFlowContext(self, self->getParent()->getDisplay(), effFloat);
+        return ctx.inlineRunWidthBefore;
     }
 
     static UIWidget* tallestInlineInCurrentLine(UIWidget* self) {
-        auto* parent = self->getParent().get();
-        if (!parent) return nullptr;
-
-        const auto children = parent->getChildren();
-
-        int idx = -1;
-        for (int i = 0; i < static_cast<int>(children.size()); ++i) {
-            if (children[i].get() == self) { idx = i; break; }
-        }
-        if (idx <= 0) return nullptr;
-
-        UIWidget* tallest = nullptr;
-        int best = -1;
-
-        for (int j = idx - 1; j >= 0; --j) {
-            const auto& sp = children[j];
-            if (!sp) continue;
-
-            UIWidget* c = sp.get();
-
-            if (c->getDisplay() == DisplayType::None) continue;
-            if (!c->isAnchorable() || c->getPositionType() == PositionType::Absolute) continue;
-
-            const auto cf = mapLogicalFloat(c->getFloat());
-            if (cf != FloatType::None) break;
-            if (breakLine(c->getDisplay())) break;
-            if (!isInlineLike(c->getDisplay())) break;
-
-            const int h = calcOuterHeight(c);
-            if (h > best) { best = h; tallest = c; }
-        }
-
-        return tallest;
+        const FloatType effFloat = mapLogicalFloat(self->getFloat());
+        auto ctx = computeFlowContext(self, self->getParent()->getDisplay(), effFloat);
+        return ctx.tallestInlineInLine;
     }
 
     void applyInline(UIWidget* self, const FlowCtx& ctx, bool topCleared) {
