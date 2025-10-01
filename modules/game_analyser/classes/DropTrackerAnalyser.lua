@@ -335,35 +335,21 @@ function DropTrackerAnalyser:updateWindow(ignoreVisible)
 	end
 end
 
-function DropTrackerAnalyser:sendDropedItems(msg, textMessageConsole)
-    -- Convert table to string if necessary
-    local msgText = msg
-    local consoleText = textMessageConsole
-    
-    if type(msg) == "table" then
-        msgText = table.concat(msg, "")
+function DropTrackerAnalyser:sendDropedItems(plainMessage, consoleMessage)
+    -- Display the plain message on screen - displayMessage will apply proper coloring
+    if g_game.isOnline() then
+        modules.game_textmessage.displayMessage(MessageModes.Loot, plainMessage)
     end
-    
-    if type(textMessageConsole) == "table" then
-        consoleText = table.concat(textMessageConsole, "")
-    end
-    
-    modules.game_textmessage.messagesPanel.statusLabel:setVisible(true)
-    modules.game_textmessage.messagesPanel.statusLabel:setColoredText(msgText)
-    scheduleEvent(function()
-      modules.game_textmessage.messagesPanel.statusLabel:setVisible(false)
-    end, 6000)
 
-    -- Check if Loot tab exists, if not use Server Log as fallback
-    local lootTab = modules.game_console.getTab("Loot")
-    local tabName = (lootTab and lootTab ~= nil) and "Loot" or "Server Log"
-    -- Create a simple message type object for console display
-    local msgType = {
-        color = "#FFFFFF",
-        consoleTab = tabName
+    local tabName = (modules.game_console.getTab("Loot") and "Loot" or "Server Log")
+    -- Create a custom message type that supports colored text but doesn't trigger loot-specific processing
+    local customLootType = {
+        color = TextColors.white,
+        consoleTab = 'Loot',
+        colored = true,
+        consoleOption = 'showInfoMessagesInConsole'
     }
-	-- TODO: Add HTML support
-    --modules.game_console.addText(consoleText, msgType, tabName)
+    modules.game_console.addText(consoleMessage, customLootType, tabName)
 end
 
 function DropTrackerAnalyser:tryAddingMonsterDrop(item, monsterName, monsterOutfit, dropItems, dropedItems)
@@ -405,26 +391,30 @@ function DropTrackerAnalyser:checkMonsterKilled(monsterName, monsterOutfit, drop
 	end
 
 	if #dropedItems ~= 0 then
-		local textMessage = {}
-		local textMessageConsole = {}
+		local statusMessage = "{Valuable loot:, #f0b400}"
+		local consoleMessage = "{Valuable loot:, #f0b400}"
+		local plainMessage = "Valuable loot:"  -- For screen display to let displayMessage handle coloring
 		local first = true
-		setStringColor(textMessage, "Valuable loot:", "#f0b400")
-		setStringColor(textMessageConsole, " Valuable loot:", "#f0b400")
 		for _, itemId in pairs(dropedItems) do
 			local name = getItemServerName(itemId)
 			if not first then
-				setStringColor(textMessage, ",", getItemColor(itemId))
-				setStringColor(textMessageConsole, ",", getItemColor(itemId))
+				statusMessage = statusMessage .. "{,, #f0b400}"
+				consoleMessage = consoleMessage .. "{,, #f0b400}"
+				plainMessage = plainMessage .. ","
 			else
 				first = false
 			end
-			setStringColor(textMessage, " "..name, getItemColor(itemId))
-			setStringColor(textMessageConsole, " "..name, getItemColor(itemId))
+			-- Use the ItemsDatabase approach for individual items to get proper color
+			local itemColoredText = ItemsDatabase.setColorLootMessage("{" .. itemId .. "|" .. name .. "}")
+			statusMessage = statusMessage .. "{ , #f0b400}" .. itemColoredText
+			consoleMessage = consoleMessage .. "{ , #f0b400}" .. itemColoredText
+			plainMessage = plainMessage .. " {" .. itemId .. "|" .. name .. "}"
 		end
 
-		setStringColor(textMessage, " dropped by "..monsterName.."!", "#f0b400")
-		setStringColor(textMessageConsole, " dropped by "..monsterName.."!", "#f0b400")
-		DropTrackerAnalyser:sendDropedItems(textMessage, textMessageConsole)
+		statusMessage = statusMessage .. "{ dropped by " .. monsterName .. "!, #f0b400}"
+		consoleMessage = consoleMessage .. "{ dropped by " .. monsterName .. "!, #f0b400}"
+		plainMessage = plainMessage .. " dropped by " .. monsterName .. "!"
+		DropTrackerAnalyser:sendDropedItems(plainMessage, consoleMessage)
 	end
 
 	if not table.empty(dropedItems) then

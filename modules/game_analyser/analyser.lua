@@ -379,33 +379,40 @@ function toggleAnalysers(buttonId)
 end
 
 function onExperienceChange(localPlayer, value)
+  -- This function is called when the player's total experience changes
+  -- We should track the experience progression here
+  
+  -- Calculate XP gain BEFORE setting up start exp
+  local previousExp = XPAnalyser.lastExp
+  
+  -- Setup start experience if this is the first time
   HuntingAnalyser:setupStartExp(value)
   XPAnalyser:setupStartExp(value)
   
-  -- Calculate XP gain from experience change
-  -- Use XPAnalyser.lastExp since both analyzers should track the same XP values
-  if XPAnalyser.lastExp and value > XPAnalyser.lastExp then
-    local gain = value - XPAnalyser.lastExp
+  -- Calculate XP gain from experience change using the previous value
+  -- Only calculate gain if we have a previous value and current value is higher
+  if previousExp and previousExp > 0 and value > previousExp then
+    local gain = value - previousExp
     HuntingAnalyser:addRawXPGain(gain)
     HuntingAnalyser:addXpGain(gain)
     XPAnalyser:addRawXPGain(gain)
     XPAnalyser:addXpGain(gain)
   end
   
-  -- Store the current experience for next comparison in both analyzers
+  -- Update the last experience for next comparison
   XPAnalyser.lastExp = value
   HuntingAnalyser.lastExp = value
 end
 
 function onUpdateExperience(rawExp, exp)
-  -- Both rawExp and exp might already have rate modifiers applied
-  -- We need to calculate the true raw experience value (base rate only)
+  -- This function might be called with the XP gain amount directly
+  -- If rawExp and exp represent gains (not totals), we should use them directly
   
-  -- For raw XP gain, we'll use the exp value and remove all rate modifiers to get true base XP
-  HuntingAnalyser:addRawXPGain(exp)  -- This will be processed by calculateRawXP() internally
-  HuntingAnalyser:addXpGain(exp)
-  XPAnalyser:addRawXPGain(exp)       -- This will be processed by calculateRawXP() internally  
-  XPAnalyser:addXpGain(exp)
+  -- TEMPORARILY DISABLED: Testing if onExperienceChange is sufficient
+  -- HuntingAnalyser:addRawXPGain(exp)  -- This will be processed by calculateRawXP() internally
+  -- HuntingAnalyser:addXpGain(exp)
+  -- XPAnalyser:addRawXPGain(exp)       -- This will be processed by calculateRawXP() internally  
+  -- XPAnalyser:addXpGain(exp)
 end
 
 function onLootStats(item, name)

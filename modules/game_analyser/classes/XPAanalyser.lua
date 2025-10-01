@@ -186,10 +186,16 @@ function XPAnalyser:updateWindow(ignoreVisible)
 end
 
 function XPAnalyser:setupStartExp(value)
+	--print("[DEBUG] XPAnalyser:setupStartExp called with value:", value)
+	--print("[DEBUG] Current startExp:", XPAnalyser.startExp)
 	if XPAnalyser.startExp == 0 then
+		--print("[DEBUG] Setting up initial XP values")
 		XPAnalyser.launchTime = g_clock.millis()
 		XPAnalyser.startExp = value
 		XPAnalyser.lastExp = value  -- Initialize for XP gain tracking
+		--print("[DEBUG] Set startExp and lastExp to:", value)
+	else
+		--print("[DEBUG] startExp already set, skipping initialization")
 	end
 end
 
@@ -280,12 +286,7 @@ function XPAnalyser:updateExpensiveUI()
 	XPAnalyser:updateNextLevel(hoursLeft, minutesLeft)
 
 	-- Update graph (expensive operation)
-	if XPAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
-		XPAnalyser.window.contentsPanel.graphPanel:createGraph()
-		XPAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		XPAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red) --"#f55e5e"
-	end
-	XPAnalyser.window.contentsPanel.graphPanel:addValue(1, math.max(0,XPAnalyser.xpHour))
+	XPAnalyser:updateGraph()
 
 	-- Update level percentage
 	if player then
@@ -307,6 +308,44 @@ function XPAnalyser:updateExpensiveUI()
 
 	-- Update tooltip
 	XPAnalyser:updateTooltip()
+end
+
+function XPAnalyser:updateGraph()
+	if not XPAnalyser.window or not XPAnalyser.window.contentsPanel or not XPAnalyser.window.contentsPanel.graphPanel then
+		return
+	end
+	
+	-- Ensure graph exists before adding value
+	if XPAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
+		XPAnalyser.window.contentsPanel.graphPanel:createGraph()
+		XPAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
+		XPAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
+	end
+	XPAnalyser.window.contentsPanel.graphPanel:addValue(1, math.max(0, XPAnalyser.xpHour))
+end
+
+function XPAnalyser:updateGraphics()
+	-- Update xpHour calculations first using same pattern as other analyzers
+	local _duration = math.floor((g_clock.millis() - XPAnalyser.launchTime)/1000)
+	
+	if _duration > 0 then
+		XPAnalyser.xpHour = math.floor((XPAnalyser.xpGain * 3600) / _duration)
+		XPAnalyser.rawXpHour = math.floor((XPAnalyser.rawXPGain * 3600) / _duration)
+	else
+		XPAnalyser.xpHour = 0
+		XPAnalyser.rawXpHour = 0
+	end
+
+	if XPAnalyser.xpGain == 0 then
+		XPAnalyser.xpHour = 0
+	end
+
+	if XPAnalyser.rawXPGain == 0 then
+		XPAnalyser.rawXpHour = 0
+	end
+
+	-- Use the new graph update method
+	XPAnalyser:updateGraph()
 end
 
 function XPAnalyser:forceUpdateUI()
@@ -365,14 +404,21 @@ end
 
 -- updaters
 function XPAnalyser:addRawXPGain(value) 
+	--print("[DEBUG] XPAnalyser:addRawXPGain called with value:", value)
 	-- Calculate the actual raw XP by removing rate modifiers
 	local actualRawXP = calculateRawXP(value)
+	--print("[DEBUG] Calculated actualRawXP:", actualRawXP)
 	XPAnalyser.rawXPGain = XPAnalyser.rawXPGain + actualRawXP
+	--print("[DEBUG] Total rawXPGain now:", XPAnalyser.rawXPGain)
+	XPAnalyser:updateGraphics()
 	XPAnalyser:updateWindow()
 end
 
 function XPAnalyser:addXpGain(value) 
+	--print("[DEBUG] XPAnalyser:addXpGain called with value:", value)
 	XPAnalyser.xpGain = XPAnalyser.xpGain + value
+	--print("[DEBUG] Total xpGain now:", XPAnalyser.xpGain)
+	XPAnalyser:updateGraphics()
 	XPAnalyser:updateWindow()
 end
 
