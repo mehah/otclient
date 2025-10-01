@@ -3,17 +3,37 @@ local function formatMoney(value, separator)
     return comma_value(tostring(value))
 end
 
-local function tokformat(value)
-    -- Simple number formatting - could be enhanced if needed
-    if value >= 1000000000 then
-        return string.format("%.1fB", value / 1000000000)
-    elseif value >= 1000000 then
-        return string.format("%.1fM", value / 1000000)
-    elseif value >= 1000 then
-        return string.format("%.1fK", value / 1000)
-    else
-        return tostring(value)
+-- Enhanced number formatting function for large values
+local function formatLargeNumber(value)
+    if not value or value == 0 then
+        return "0"
     end
+    
+    local absValue = math.abs(value)
+    local isNegative = value < 0
+    local prefix = isNegative and "-" or ""
+    
+    if absValue >= 1000000000 then
+        -- Billions (B)
+        local billions = absValue / 1000000000
+        return prefix .. string.format("%.2fB", billions)
+    elseif absValue >= 1000000 then
+        -- Millions (M)
+        local millions = absValue / 1000000
+        return prefix .. string.format("%.2fM", millions)
+    elseif absValue >= 1000 then
+        -- Thousands (K)
+        local thousands = absValue / 1000
+        return prefix .. string.format("%.2fK", thousands)
+    else
+        -- Less than 1000, show as-is
+        return prefix .. tostring(math.floor(absValue))
+    end
+end
+
+local function tokformat(value)
+    -- Legacy function - kept for compatibility, redirects to formatLargeNumber
+    return formatLargeNumber(value)
 end
 
 if not SupplyAnalyser then
@@ -140,7 +160,7 @@ function SupplyAnalyser:reset()
 	if SupplyAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		SupplyAnalyser.window.contentsPanel.graphPanel:createGraph()
 		SupplyAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		SupplyAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#0096c8")
+		SupplyAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
 	end
 	
 	SupplyAnalyser.window.contentsPanel.graphPanel:addValue(1, 0)
@@ -236,7 +256,7 @@ function SupplyAnalyser:updateGraphics()
 	if SupplyAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		SupplyAnalyser.window.contentsPanel.graphPanel:createGraph()
 		SupplyAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		SupplyAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#0096c8")
+		SupplyAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
 	end
 	SupplyAnalyser.window.contentsPanel.graphPanel:addValue(1, SupplyAnalyser.goldHour)
 	-- ignore graph value
