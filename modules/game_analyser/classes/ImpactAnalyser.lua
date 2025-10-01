@@ -222,7 +222,7 @@ function ImpactAnalyser:reset(allTimeDps, allTimeHps)
 	if ImpactAnalyser.window.contentsPanel.graphHealPanel:getGraphsCount() == 0 then
 		ImpactAnalyser.window.contentsPanel.graphHealPanel:createGraph()
 		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineWidth(1, 1)
-		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineColor(1, "#5ff75f")
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineColor(1, "#f75f5f")
 	end
 	
 	ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, 0)
@@ -318,7 +318,7 @@ function ImpactAnalyser:updateWindow(ignoreVisible)
 	if contentsPanel.graphHealPanel:getGraphsCount() == 0 then
 		contentsPanel.graphHealPanel:createGraph()
 		contentsPanel.graphHealPanel:setLineWidth(1, 1)
-		contentsPanel.graphHealPanel:setLineColor(1, "#00EB00")
+		contentsPanel.graphHealPanel:setLineColor(1, "#f75f5f")
 	end
 	contentsPanel.graphHealPanel:addValue(1, curHPS)
 
@@ -358,7 +358,7 @@ function ImpactAnalyser:updateGraphics()
 	if ImpactAnalyser.window.contentsPanel.graphHealPanel:getGraphsCount() == 0 then
 		ImpactAnalyser.window.contentsPanel.graphHealPanel:createGraph()
 		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineWidth(1, 1)
-		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineColor(1, "#00EB00")
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineColor(1, "#f75f5f")
 	end
 	ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, curHPS)
 end
