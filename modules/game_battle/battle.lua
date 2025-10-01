@@ -2140,6 +2140,47 @@ function updateCreatureEmblem(creature, emblemId) -- Update emblem
     end
 end
 
+local function rebuildBattleList(instance)
+  scheduleEvent(function()
+    if not instance.panel or not g_game.isOnline() then return end
+
+    instance.panel:disableUpdateTemporarily()
+
+    local player = g_game.getLocalPlayer()
+    local pos = player and player:getPosition()
+    if not pos then return end
+
+    instance:removeAllCreatures()
+
+    local spectators = g_map.getSpectators(pos, false, true) or {}
+
+    if #spectators == 0 then
+      spectators = modules.game_interface.getMapPanel():getSpectators() or {}
+    end
+
+    local sortType = instance:getSortType()
+
+    for _, creature in ipairs(spectators) do
+      if instance:doCreatureFitFilters(creature) then
+        instance:addCreature(creature, sortType)
+      end
+    end
+
+    instance:correctBattleButtons()
+
+    for id, btn in pairs(instance.battleButtons) do
+      local mob = btn.creature or g_map.getCreatureById(id)
+      if mob and mob:getPosition() then
+        btn:setVisible(canBeSeen(mob))
+      end
+    end
+
+    if instance.panel.enableUpdate then
+      instance.panel:enableUpdate()
+    end
+  end)
+end
+
 function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButton once you or monsters move
     local localPlayer = g_game.getLocalPlayer()
     if not localPlayer then
@@ -2160,9 +2201,7 @@ function onCreaturePositionChange(creature, newPos, oldPos) -- Update battleButt
             -- If it's the local player moving
             if creature:isLocalPlayer() then
                 if oldPos and newPos and newPos.z ~= oldPos.z then
-                    addEvent(function() -- fix for old protocols
-                        instance:checkCreatures()
-                    end)
+                    rebuildBattleList(instance)
                 elseif oldPos and newPos and (newPos.x ~= oldPos.x or newPos.y ~= oldPos.y) then
                     -- Distance will change when moving, recalculate and move to correct index
                     if #instance.binaryTree > 0 and sortType == 'distance' then
