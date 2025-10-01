@@ -124,6 +124,11 @@ function BossCooldown:checkTicks()
 
 	self.lastTick = os.time() + 1
 
+	-- Check if window and contentsPanel exist before accessing
+	if not self.window or not self.window.contentsPanel or not self.window.contentsPanel.bosses then
+		return
+	end
+
 	local layout = self.window.contentsPanel.bosses:getLayout()
 	local needUpdate = false
 	for _, widget in ipairs(self.widgets) do

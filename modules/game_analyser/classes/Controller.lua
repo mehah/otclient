@@ -42,10 +42,12 @@ function ControllerAnalyser:startEvent()
             LootAnalyser:checkLootHour()
             ImpactAnalyser:updateWindow()
             InputAnalyser:checkDPS()
-            XPAnalyser:checkExpHour()
+            if XPAnalyser then
+                XPAnalyser:checkExpHour()
+            end
             DropTrackerAnalyser:checkTracker()
             MiscAnalyzer:updateWindow()
-            SupplyAnalyser:updateGraphics()
+            SupplyAnalyser:checkSupplyHour()
         end
 	end, 1000)
 	ControllerAnalyser.event2000 = cycleEvent(function()
@@ -58,7 +60,9 @@ function ControllerAnalyser:startEvent()
         if g_game.isOnline() then
             LootAnalyser:updateGraphics()
             SupplyAnalyser:updateGraphics()
-            XPAnalyser:updateWindow()
+            if XPAnalyser then
+                XPAnalyser:updateWindow()
+            end
         end
 	end, 60*1000)
 
