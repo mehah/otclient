@@ -223,7 +223,7 @@ MiniWindow
       id: graphHorizontal
       size: 140 9
       image-auto-resize: true
-      image-source: /images/game/analyzer/graphHorizontal
+      image-source: /images/game/analyzer/graphDpsHorizontal
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-left: 7
@@ -426,7 +426,7 @@ MiniWindow
       id: graphHPSHorizontal
       size: 140 9
       image-auto-resize: true
-      image-source: /images/game/analyzer/graphHorizontal
+      image-source: /images/game/analyzer/graphDpsHorizontal
       anchors.top: prev.bottom
       anchors.left: parent.left
       margin-left: 7

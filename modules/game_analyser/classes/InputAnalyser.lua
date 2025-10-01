@@ -223,7 +223,7 @@ function InputAnalyser:reset()
 	if InputAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		InputAnalyser.window.contentsPanel.graphPanel:createGraph()
 		InputAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f36500")
+		InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f75f5f")
 	end
 	
 	InputAnalyser.window.contentsPanel.graphPanel:addValue(1, 0)
@@ -380,7 +380,7 @@ function InputAnalyser:checkDPS()
 	if InputAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		InputAnalyser.window.contentsPanel.graphPanel:createGraph()
 		InputAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f36500")
+		InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f75f5f")
 	end
 	InputAnalyser.window.contentsPanel.graphPanel:addValue(1, InputAnalyser.curDPS)
 end
@@ -443,6 +443,7 @@ function onInputExtra(mousePosition)
 	local menu = g_ui.createWidget('PopupMenu')
 	menu:setGameMenu(true)
 	menu:addOption(tr('Reset Data'), function() InputAnalyser:reset() return end)
+	menu:addOption(tr('Show Session Values'), function() end)
 	menu:addSeparator()
 	menu:addCheckBox(tr('Show Damage Graph'), graphVisible, function()
 		InputAnalyser:setDamageGraph(not graphVisible, true)
