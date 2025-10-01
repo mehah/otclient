@@ -3,6 +3,34 @@ local function formatMoney(value, separator)
     return comma_value(tostring(value))
 end
 
+-- Enhanced number formatting function for large values
+local function formatLargeNumber(value)
+    if not value or value == 0 then
+        return "0"
+    end
+    
+    local absValue = math.abs(value)
+    local isNegative = value < 0
+    local prefix = isNegative and "-" or ""
+    
+    if absValue >= 1000000000 then
+        -- Billions (B)
+        local billions = absValue / 1000000000
+        return prefix .. string.format("%.2fB", billions)
+    elseif absValue >= 1000000 then
+        -- Millions (M)
+        local millions = absValue / 1000000
+        return prefix .. string.format("%.2fM", millions)
+    elseif absValue >= 1000 then
+        -- Thousands (K)
+        local thousands = absValue / 1000
+        return prefix .. string.format("%.2fK", thousands)
+    else
+        -- Less than 1000, show as-is
+        return prefix .. tostring(math.floor(absValue))
+    end
+end
+
 if not ImpactAnalyser then
 	ImpactAnalyser = {
 		launchTime = 0,

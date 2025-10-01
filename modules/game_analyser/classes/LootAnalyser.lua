@@ -3,6 +3,51 @@ local function formatMoney(value, separator)
     return comma_value(tostring(value))
 end
 
+-- Enhanced number formatting function for large values
+local function formatLargeNumber(value)
+    if not value then
+        return "0"
+    end
+    
+    -- Ensure we have a number
+    local numValue = tonumber(value)
+    if not numValue or numValue == 0 then
+        return "0"
+    end
+    
+    local absValue = math.abs(numValue)
+    local isNegative = numValue < 0
+    local prefix = isNegative and "-" or ""
+    
+    -- Debug logging
+    print("formatLargeNumber: input=" .. tostring(value) .. ", numValue=" .. tostring(numValue) .. ", absValue=" .. tostring(absValue))
+    
+    if absValue >= 1000000000 then
+        -- Billions (B)
+        local billions = absValue / 1000000000
+        local result = prefix .. string.format("%.2fB", billions)
+        print("formatLargeNumber: billions result=" .. result)
+        return result
+    elseif absValue >= 1000000 then
+        -- Millions (M)
+        local millions = absValue / 1000000
+        local result = prefix .. string.format("%.2fM", millions)
+        print("formatLargeNumber: millions result=" .. result)
+        return result
+    elseif absValue >= 1000 then
+        -- Thousands (K)
+        local thousands = absValue / 1000
+        local result = prefix .. string.format("%.2fK", thousands)
+        print("formatLargeNumber: thousands result=" .. result)
+        return result
+    else
+        -- Less than 1000, show as-is
+        local result = prefix .. tostring(math.floor(absValue))
+        print("formatLargeNumber: small number result=" .. result)
+        return result
+    end
+end
+
 -- Add capitalize function to string library if it doesn't exist
 if not string.capitalize then
     function string.capitalize(str)
@@ -38,7 +83,7 @@ local targetMaxMargin = 142
 
 
 function LootAnalyser:create()
-	LootAnalyser.launchTime = 0
+	LootAnalyser.launchTime = g_clock.millis()
 	LootAnalyser.session = 0
 	LootAnalyser.goldValue = 0
 	LootAnalyser.goldHour = 0
@@ -137,7 +182,7 @@ function LootAnalyser:reset()
 	if LootAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		LootAnalyser.window.contentsPanel.graphPanel:createGraph()
 		LootAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		LootAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#ffca38")
+		LootAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
 	end
 	
 	LootAnalyser.window.contentsPanel.graphPanel:addValue(1, 0)
@@ -193,7 +238,7 @@ function LootAnalyser:updateWindow(updateScroll, ignoreVisible)
 	local contentsPanel = LootAnalyser.window.contentsPanel
 
 	contentsPanel.gold:setText(formatMoney(LootAnalyser.goldValue, ","))
-	contentsPanel.goldHour:setText(formatMoney(math.floor(LootAnalyser.goldHour), ","))
+	contentsPanel.goldHour:setText(formatLargeNumber(math.floor(LootAnalyser.goldHour)))
 	contentsPanel.goldTarget:setText(formatMoney(LootAnalyser.target, ","))
 
 	if LootAnalyser.target == 0 and LootAnalyser.goldHour == 0 then
@@ -238,20 +283,93 @@ function LootAnalyser:updateWindow(updateScroll, ignoreVisible)
 end
 
 function LootAnalyser:updateGraphics()
-	local uptime = math.floor((g_clock.millis() - LootAnalyser.launchTime)/1000)
-	if uptime < 5*60 then
-		LootAnalyser.goldHour = LootAnalyser.goldValue
+	-- Update goldHour calculations first using same pattern as XP Analyser
+	local _duration = math.floor((g_clock.millis() - LootAnalyser.launchTime)/1000)
+	
+	if _duration > 0 then
+		LootAnalyser.goldHour = math.floor((LootAnalyser.goldValue * 3600) / _duration)
 	else
-		LootAnalyser.goldHour = math.floor((LootAnalyser.goldValue/uptime)*3600)
+		LootAnalyser.goldHour = 0
 	end
 
+	if LootAnalyser.goldValue == 0 then
+		LootAnalyser.goldHour = 0
+	end
+
+	-- Use the new graph update method
+	LootAnalyser:updateGraph()
+end
+
+function LootAnalyser:checkLootHour()
+	-- Called by Controller timer every 1000ms
+	-- This provides periodic updates to keep the analyzer current
+	
+	if not LootAnalyser.window then
+		--print("LootAnalyser:checkLootHour - no window")
+		return
+	end
+	
+	-- Update goldHour calculations using the same pattern as XP Analyser
+	local _duration = math.floor((g_clock.millis() - LootAnalyser.launchTime)/1000)
+	
+	if _duration > 0 then
+		LootAnalyser.goldHour = math.floor((LootAnalyser.goldValue * 3600) / _duration)
+	else
+		LootAnalyser.goldHour = 0
+	end
+
+	if LootAnalyser.goldValue == 0 then
+		LootAnalyser.goldHour = 0
+	end
+	
+	-- Debug info
+	--print(string.format("LootAnalyser:checkLootHour - goldValue: %d, goldHour: %d, duration: %d", LootAnalyser.goldValue, LootAnalyser.goldHour, _duration))
+	
+	-- Always update UI elements and graph (like XP Analyser does)
+	LootAnalyser:updateBasicUI()
+	LootAnalyser:updateGraph()
+end
+
+function LootAnalyser:updateBasicUI()
+	if not LootAnalyser.window or not LootAnalyser.window.contentsPanel then
+		return
+	end
+	
+	local contentsPanel = LootAnalyser.window.contentsPanel
+	
+	-- Update the Per Hour display
+	if contentsPanel.goldHour then
+		contentsPanel.goldHour:setText(formatLargeNumber(math.floor(LootAnalyser.goldHour)))
+	end
+	
+	-- Update target gauge
+	if contentsPanel.lootTargetBG and contentsPanel.lootTargetBG.lootArrow then
+		if LootAnalyser.target == 0 and LootAnalyser.goldHour == 0 then
+			contentsPanel.lootTargetBG.lootArrow:setMarginLeft(targetMaxMargin / 2)
+		else
+			local target = math.max(1, LootAnalyser.target)
+			local current = LootAnalyser.goldHour
+			local percent = (current * 71) / target
+			contentsPanel.lootTargetBG.lootArrow:setMarginLeft(math.min(targetMaxMargin, math.ceil(percent)))
+		end
+
+		-- Update tooltip
+		contentsPanel.lootTargetBG:setTooltip(string.format("Current: %d\nTarget: %d", LootAnalyser.goldHour, LootAnalyser.target))
+	end
+end
+
+function LootAnalyser:updateGraph()
+	if not LootAnalyser.window or not LootAnalyser.window.contentsPanel or not LootAnalyser.window.contentsPanel.graphPanel then
+		return
+	end
+	
 	-- Ensure graph exists before adding value
 	if LootAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		LootAnalyser.window.contentsPanel.graphPanel:createGraph()
 		LootAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		LootAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#ffca38")
+		LootAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
 	end
-	LootAnalyser.window.contentsPanel.graphPanel:addValue(1, LootAnalyser.goldHour)
+	LootAnalyser.window.contentsPanel.graphPanel:addValue(1, math.max(0, LootAnalyser.goldHour))
 end
 
 function LootAnalyser:addLootedItems(item, name)

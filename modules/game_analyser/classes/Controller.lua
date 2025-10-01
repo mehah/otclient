@@ -39,6 +39,7 @@ function ControllerAnalyser:startEvent()
         if g_game.isOnline() then
             HuntingAnalyser:updateWindow()
             LootAnalyser:checkBalance()
+            LootAnalyser:checkLootHour()
             ImpactAnalyser:updateWindow()
             InputAnalyser:checkDPS()
             XPAnalyser:checkExpHour()
