@@ -15,14 +15,30 @@ end
 
 
 function ControllerAnalyser:startEvent()
-	HuntingAnalyser.session = os.time()
-    LootAnalyser.session = os.time()
-    SupplyAnalyser.session = os.time()
-    ImpactAnalyser.session = os.time()
-    InputAnalyser.session = os.time()
-    XPAnalyser.session = os.time()
-    DropTrackerAnalyser.session = os.time()
-    MiscAnalyzer.session = os.time()
+	if HuntingAnalyser then
+		HuntingAnalyser.session = os.time()
+	end
+    if LootAnalyser then
+		LootAnalyser.session = os.time()
+	end
+    if SupplyAnalyser then
+		SupplyAnalyser.session = os.time()
+	end
+    if ImpactAnalyser then
+		ImpactAnalyser.session = os.time()
+	end
+    if InputAnalyser then
+		InputAnalyser.session = os.time()
+	end
+    if XPAnalyser then
+		XPAnalyser.session = os.time()
+	end
+    if DropTrackerAnalyser then
+		DropTrackerAnalyser.session = os.time()
+	end
+    if MiscAnalyzer then
+		MiscAnalyzer.session = os.time()
+	end
 
 	if ControllerAnalyser.eventGraph then ControllerAnalyser.eventGraph:cancel() end
 	if ControllerAnalyser.event250 then ControllerAnalyser.event250:cancel() end
@@ -31,35 +47,59 @@ function ControllerAnalyser:startEvent()
 
     ControllerAnalyser.event250 = cycleEvent(function()
         if g_game.isOnline() then
-            BossCooldown:checkTicks()
+            if BossCooldown then
+				BossCooldown:checkTicks()
+			end
         end
 	end, 250)
 
     ControllerAnalyser.event1000 = cycleEvent(function()
         if g_game.isOnline() then
-            HuntingAnalyser:updateWindow()
-            LootAnalyser:checkBalance()
-            LootAnalyser:checkLootHour()
-            ImpactAnalyser:updateWindow()
-            InputAnalyser:checkDPS()
+            if HuntingAnalyser then
+                HuntingAnalyser:updateWindow()
+            end
+            if LootAnalyser then
+                LootAnalyser:checkBalance()
+                LootAnalyser:checkLootHour()
+            end
+            if ImpactAnalyser then
+                ImpactAnalyser:updateWindow()
+            end
+            if InputAnalyser then
+                InputAnalyser:checkDPS()
+            end
             if XPAnalyser then
                 XPAnalyser:checkExpHour()
             end
-            DropTrackerAnalyser:checkTracker()
-            MiscAnalyzer:updateWindow()
-            SupplyAnalyser:checkSupplyHour()
+            if DropTrackerAnalyser then
+                DropTrackerAnalyser:checkTracker()
+            end
+            if MiscAnalyzer then
+                MiscAnalyzer:updateWindow()
+            end
+            if SupplyAnalyser then
+                SupplyAnalyser:checkSupplyHour()
+            end
         end
 	end, 1000)
 	ControllerAnalyser.event2000 = cycleEvent(function()
         if g_game.isOnline() then
-            InputAnalyser:updateWindow()
-            SupplyAnalyser:checkBalance()
+            if InputAnalyser then
+                InputAnalyser:updateWindow()
+            end
+            if SupplyAnalyser then
+                SupplyAnalyser:checkBalance()
+            end
         end
 	end, 2000)
 	ControllerAnalyser.eventGraph = cycleEvent(function()
         if g_game.isOnline() then
-            LootAnalyser:updateGraphics()
-            SupplyAnalyser:updateGraphics()
+            if LootAnalyser then
+                LootAnalyser:updateGraphics()
+            end
+            if SupplyAnalyser then
+                SupplyAnalyser:updateGraphics()
+            end
             if XPAnalyser then
                 XPAnalyser:updateWindow()
             end
@@ -67,6 +107,10 @@ function ControllerAnalyser:startEvent()
 	end, 60*1000)
 
 
-    ImpactAnalyser:checkAnchos()
-    InputAnalyser:checkAnchos()
+    if ImpactAnalyser then
+        ImpactAnalyser:checkAnchos()
+    end
+    if InputAnalyser then
+        InputAnalyser:checkAnchos()
+    end
 end
