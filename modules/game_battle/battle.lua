@@ -2088,12 +2088,22 @@ function onFollow(creature) -- Update battleButton once you're following a targe
     -- Update all battle list instances
     for _, instance in pairs(BattleListManager.instances) do
         if instance.window and instance.window:isVisible() then
-            local battleButton = creature and instance.battleButtons[creature:getId()] or nil
-            if battleButton then
-                battleButton.isFollowed = creature and true or false
-                updateBattleButton(battleButton)
-                foundBattleButton = true
-                -- Don't break here - continue to update other instances
+            if creature then
+                local battleButton = creature and instance.battleButtons[creature:getId()] or nil
+                if battleButton then
+                    battleButton.isFollowed = creature and true or false
+                    updateBattleButton(battleButton)
+                    foundBattleButton = true
+                    -- Don't break here - continue to update other instances
+                end
+            else
+                -- No follow (follow cancelled), clear all follow flags
+                for _, battleButton in pairs(instance.battleButtons) do
+                    if battleButton.isFollowed then
+                        battleButton.isFollowed = false
+                        updateBattleButton(battleButton)
+                    end
+                end
             end
         end
     end
