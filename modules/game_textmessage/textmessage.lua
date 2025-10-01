@@ -60,6 +60,13 @@ MessageSettings = {
         screenTarget = 'highCenterLabel',
         consoleOption = 'showInfoMessagesInConsole',
         colored = true
+    },
+    valuableLoot = {
+        color = TextColors.white,
+        consoleTab = 'Loot',
+        screenTarget = 'statusLabel',
+        consoleOption = 'showInfoMessagesInConsole',
+        colored = true
     }
 }
 
@@ -104,6 +111,7 @@ MessageTypes = {
     [MessageModes.BoostedCreature] = MessageSettings.centerWhite,
     [MessageModes.OfflineTrainning] = MessageSettings.centerWhite,
     [MessageModes.Transaction] = MessageSettings.centerWhite,
+    [MessageModes.ValuableLoot] = MessageSettings.valuableLoot,
 
     [254] = MessageSettings.private
 }
@@ -151,7 +159,7 @@ function displayMessage(mode, text)
 
     if msgtype.consoleTab ~= nil and
         (msgtype.consoleOption == nil or modules.client_options.getOption(msgtype.consoleOption)) then
-        if msgtype == MessageSettings.loot then
+        if msgtype == MessageSettings.loot or msgtype == MessageSettings.valuableLoot then
             local lootColoredText = ItemsDatabase.setColorLootMessage(text)
             modules.game_console.addText(lootColoredText, msgtype, tr("Server Log"))
             modules.game_console.addText(lootColoredText, msgtype, tr(msgtype.consoleTab))
@@ -164,7 +172,7 @@ function displayMessage(mode, text)
         local label = messagesPanel:recursiveGetChildById(msgtype.screenTarget)
         if msgtype == MessageSettings.loot and not modules.client_options.getOption('showLootMessagesOnScreen') then
             return
-        elseif msgtype == MessageSettings.loot then
+        elseif msgtype == MessageSettings.loot or msgtype == MessageSettings.valuableLoot then
             local coloredText = ItemsDatabase.setColorLootMessage(text)
             label:setColoredText(coloredText)
         else
