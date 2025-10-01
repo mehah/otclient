@@ -40,6 +40,15 @@ local function tokformat(value)
     return formatLargeNumber(value)
 end
 
+-- Function to get item name by ID
+local function getItemServerName(itemId)
+    local thingType = g_things.getThingType(itemId, ThingCategoryItem)
+    if thingType then
+        return thingType:getName()
+    end
+    return "Unknown Item"
+end
+
 if not SupplyAnalyser then
 	SupplyAnalyser = {
 		launchTime = 0,
@@ -60,7 +69,7 @@ end
 local targetMaxMargin = 142
 
 function SupplyAnalyser:create()
-	SupplyAnalyser.launchTime = 0
+	SupplyAnalyser.launchTime = g_clock.millis()
 	SupplyAnalyser.session = 0
 	SupplyAnalyser.goldValue = 0
 	SupplyAnalyser.goldHour = 0
@@ -120,12 +129,43 @@ function SupplyAnalyser:create()
 	end
 end
 
+-- Function to get NPC sale price (what NPCs sell items for - supply cost)
 local function getCurrentPrice(itemPtr)
-	local value = itemPtr:getDefaultBuyPrice()
-	if value == 0 then
-		value = itemPtr:getAverageMarketValue()
+	if not itemPtr then
+		return 0
 	end
-	return value
+	
+	local npcSalePrice = 0
+	
+	-- Try to get NPC sale data (what NPCs sell to players)
+	if itemPtr.getNpcSaleData then
+		local success, npcSaleData = pcall(function() return itemPtr:getNpcSaleData() end)
+		if success and npcSaleData and #npcSaleData > 0 then
+			-- Get the highest sale price from NPCs (most expensive option that NPCs charge us for the item)
+			for _, npcData in ipairs(npcSaleData) do
+				if npcData.salePrice and npcData.salePrice > npcSalePrice then
+					npcSalePrice = npcData.salePrice
+				end
+			end
+		end
+	end
+	
+	-- If no NPC sale price found, try market price as fallback
+	if npcSalePrice == 0 then
+		if itemPtr.getMeanPrice then
+			local success, result = pcall(function() return itemPtr:getMeanPrice() end)
+			if success and result then
+				npcSalePrice = result
+			end
+		elseif itemPtr.getAverageMarketValue then
+			local success, result = pcall(function() return itemPtr:getAverageMarketValue() end)
+			if success and result then
+				npcSalePrice = result
+			end
+		end
+	end
+	
+	return npcSalePrice
 end
 
 function onSupplyExtra(mousePosition)
@@ -149,6 +189,7 @@ function onSupplyExtra(mousePosition)
 end
 
 function SupplyAnalyser:reset()
+	-- Reset all data values
 	SupplyAnalyser.launchTime = g_clock.millis()
 	SupplyAnalyser.session = 0
 	SupplyAnalyser.goldValue = 0
@@ -158,22 +199,22 @@ function SupplyAnalyser:reset()
 	SupplyAnalyser.forceUpdateBalance = false
 	SupplyAnalyser.updateBalance = true
 
-	SupplyAnalyser.window.contentsPanel.graphPanel:clear()
-	
-	-- Initialize graph if it doesn't exist
-	if SupplyAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
-		SupplyAnalyser.window.contentsPanel.graphPanel:createGraph()
-		SupplyAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		SupplyAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
+	-- Clear and reset the graph
+	if SupplyAnalyser.window and SupplyAnalyser.window.contentsPanel and SupplyAnalyser.window.contentsPanel.graphPanel then
+		SupplyAnalyser.window.contentsPanel.graphPanel:clear()
+		
+		-- Initialize graph if it doesn't exist
+		if SupplyAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
+			SupplyAnalyser.window.contentsPanel.graphPanel:createGraph()
+			SupplyAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
+			SupplyAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
+		end
+		
+		SupplyAnalyser.window.contentsPanel.graphPanel:addValue(1, 0)
 	end
 	
-	SupplyAnalyser.window.contentsPanel.graphPanel:addValue(1, 0)
-	SupplyAnalyser.window.contentsPanel.lootedItems:setVisible(false)
-	SupplyAnalyser.window.contentsPanel.separatorLootedItems:setVisible(false)
-
-	SupplyAnalyser.window.contentsPanel.lootedItems:destroyChildren()
-
-	SupplyAnalyser:updateWindow(true)
+	-- Update all UI elements immediately to reflect the reset (like HuntingAnalyser does)
+	SupplyAnalyser:updateWindow(false, true)  -- updateScroll=false, ignoreVisible=true
 end
 
 function SupplyAnalyser:checkBalance()
@@ -211,7 +252,7 @@ function SupplyAnalyser:updateWindow(updateScroll, ignoreVisible)
 
 	local contentsPanel = SupplyAnalyser.window.contentsPanel
 	contentsPanel.gold:setText(formatMoney(goldValue, ","))
-	contentsPanel.goldHour:setText(formatMoney(goldHour, ","))
+	contentsPanel.goldHour:setText(formatLargeNumber(math.floor(goldHour)))
 	contentsPanel.goldTarget:setText(formatMoney(target, ","))
 
 	if target == 0 and goldHour == 0 then
@@ -249,22 +290,89 @@ function SupplyAnalyser:updateWindow(updateScroll, ignoreVisible)
 end
 
 function SupplyAnalyser:updateGraphics()
-	local uptime = math.floor((g_clock.millis() - SupplyAnalyser.launchTime)/1000)
-	if uptime < 5*60 then
-		SupplyAnalyser.goldHour = SupplyAnalyser.goldValue
+	-- Update goldHour calculations first using same pattern as LootAnalyser
+	local _duration = math.floor((g_clock.millis() - SupplyAnalyser.launchTime)/1000)
+	
+	if _duration > 0 then
+		SupplyAnalyser.goldHour = math.floor((SupplyAnalyser.goldValue * 3600) / _duration)
 	else
-		SupplyAnalyser.goldHour = math.ceil((SupplyAnalyser.goldValue/uptime)*3600)
+		SupplyAnalyser.goldHour = 0
 	end
 
+	if SupplyAnalyser.goldValue == 0 then
+		SupplyAnalyser.goldHour = 0
+	end
+
+	-- Use the new graph update method
+	SupplyAnalyser:updateGraph()
+end
+
+function SupplyAnalyser:checkSupplyHour()
+	-- Called by Controller timer every 1000ms
+	-- This provides periodic updates to keep the analyzer current
+	
+	if not SupplyAnalyser.window then
+		return
+	end
+	
+	-- Update goldHour calculations using the same pattern as LootAnalyser
+	local _duration = math.floor((g_clock.millis() - SupplyAnalyser.launchTime)/1000)
+	
+	if _duration > 0 then
+		SupplyAnalyser.goldHour = math.floor((SupplyAnalyser.goldValue * 3600) / _duration)
+	else
+		SupplyAnalyser.goldHour = 0
+	end
+
+	if SupplyAnalyser.goldValue == 0 then
+		SupplyAnalyser.goldHour = 0
+	end
+	
+	-- Always update UI elements and graph (like LootAnalyser does)
+	SupplyAnalyser:updateBasicUI()
+	SupplyAnalyser:updateGraph()
+end
+
+function SupplyAnalyser:updateBasicUI()
+	if not SupplyAnalyser.window or not SupplyAnalyser.window.contentsPanel then
+		return
+	end
+	
+	local contentsPanel = SupplyAnalyser.window.contentsPanel
+	
+	-- Update the Per Hour display
+	if contentsPanel.goldHour then
+		contentsPanel.goldHour:setText(formatLargeNumber(math.floor(SupplyAnalyser.goldHour)))
+	end
+	
+	-- Update target gauge
+	if contentsPanel.supplyTargetBG and contentsPanel.supplyTargetBG.supplyArrow then
+		if SupplyAnalyser.target == 0 and SupplyAnalyser.goldHour == 0 then
+			contentsPanel.supplyTargetBG.supplyArrow:setMarginLeft(targetMaxMargin / 2)
+		else
+			local target = math.max(1, SupplyAnalyser.target)
+			local current = SupplyAnalyser.goldHour
+			local percent = (current * 71) / target
+			contentsPanel.supplyTargetBG.supplyArrow:setMarginLeft(math.min(targetMaxMargin, math.ceil(percent)))
+		end
+
+		-- Update tooltip
+		contentsPanel.supplyTargetBG:setTooltip(string.format("Current: %d\nTarget: %d", SupplyAnalyser.goldHour, SupplyAnalyser.target))
+	end
+end
+
+function SupplyAnalyser:updateGraph()
+	if not SupplyAnalyser.window or not SupplyAnalyser.window.contentsPanel or not SupplyAnalyser.window.contentsPanel.graphPanel then
+		return
+	end
+	
 	-- Ensure graph exists before adding value
 	if SupplyAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
 		SupplyAnalyser.window.contentsPanel.graphPanel:createGraph()
 		SupplyAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
 		SupplyAnalyser.window.contentsPanel.graphPanel:setLineColor(1, TextColors.red)
 	end
-	SupplyAnalyser.window.contentsPanel.graphPanel:addValue(1, SupplyAnalyser.goldHour)
-	-- ignore graph value
-	SupplyAnalyser.goldHour = math.ceil((SupplyAnalyser.goldValue/uptime)*3600)
+	SupplyAnalyser.window.contentsPanel.graphPanel:addValue(1, math.max(0, SupplyAnalyser.goldHour))
 end
 
 function SupplyAnalyser:getItemCount(itemId)

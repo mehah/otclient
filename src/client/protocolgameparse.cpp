@@ -4476,9 +4476,10 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateSupplyTracker(const InputMessagePtr& msg)
 {
-    msg->getU16(); // item client ID
+    const auto itemId = msg->getU16(); // item client ID
 
-    // TODO: implement supply tracker usage
+    // Call the onSupplyTracker callback to expose the data to Lua
+    g_lua.callGlobalField("g_game", "onSupplyTracker", itemId);
 }
 
 void ProtocolGame::parseUpdateLootTracker(const InputMessagePtr& msg)
