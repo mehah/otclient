@@ -239,6 +239,18 @@ function HuntingAnalyser:reset()
 	HuntingAnalyser.healingTicks = {}
 	HuntingAnalyser.damageTicks = {}
 	HuntingAnalyser.lootedItemsName = {}
+	
+	-- Reset Input Analyser and Impact Analyser when resetting Hunting Analyser
+	if InputAnalyser then
+		InputAnalyser:reset()
+		InputAnalyser:updateWindow(true)
+	end
+	
+	if ImpactAnalyser then
+		ImpactAnalyser:reset()
+		ImpactAnalyser:updateWindow(true)
+	end
+	
 	HuntingAnalyser:updateWindow(true)  -- Pass ignoreVisible=true to force update
 
 	-- g_game.resetExperienceData() -- Function doesn't exist, removing call

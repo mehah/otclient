@@ -307,7 +307,7 @@ function InputAnalyser:updateWindow(ignoreVisible)
 
 		count = count + 1
 		widget:setId(monsterName)
-		widget.name:setText(short_text(string.capitalize(monsterName), 11))
+		widget.name:setText(short_text(string.capitalize(monsterName), 15))
 		widget:setTooltip(string.capitalize(monsterName))
 		local percent = (damageMonster * 100) / InputAnalyser.total
 		widget.desc:setText(string.format("%.1f", percent) .. "%")
