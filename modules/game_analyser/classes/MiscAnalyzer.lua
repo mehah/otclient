@@ -1,3 +1,49 @@
+-- Missing utility functions
+local function formatMoney(value, separator)
+    return comma_value(tostring(value))
+end
+
+-- Enhanced number formatting function with new K, KK suffixes
+local function formatLargeNumber(value)
+    if not value then
+        return "0"
+    end
+    
+    -- Ensure we have a number
+    local numValue = tonumber(value)
+    if not numValue or numValue == 0 then
+        return "0"
+    end
+    
+    local absValue = math.abs(numValue)
+    local isNegative = numValue < 0
+    local prefix = isNegative and "-" or ""
+    
+    if absValue >= 100000000 then
+        -- Values 100,000,000+ use KK notation
+        -- Example: 100,700,000 = 1,007KK, 345,666,000 = 3,456KK
+        local kkValue = math.floor(absValue / 100000)
+        return prefix .. comma_value(tostring(kkValue)) .. "KK"
+    elseif absValue >= 10000000 then
+        -- Values 10,000,000 to 99,999,999 use K notation  
+        -- Example: 16,667,000 = 16,667K
+        local kValue = math.floor(absValue / 1000)
+        return prefix .. comma_value(tostring(kValue)) .. "K"
+    else
+        -- Values 1 to 9,999,999 show as is
+        return prefix .. comma_value(tostring(math.floor(absValue)))
+    end
+end
+
+-- Compatibility functions for MiscAnalyzer
+local function format_thousand(value, useComma)
+    return formatLargeNumber(value)
+end
+
+local function numberToStr(value)
+    return formatLargeNumber(value)
+end
+
 if not MiscAnalyzer then
 	MiscAnalyzer = {
 		launchTime = 0,
