@@ -307,7 +307,7 @@ public:
     void setFloat(FloatType type) { m_floatType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setClear(ClearType type) { m_clearType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
-    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
     void setOverflow(OverflowType type);
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
     void setPositionType(PositionType t) { m_positionType = t;  scheduleHtmlTask(PropApplyAnchorAlignment); }
