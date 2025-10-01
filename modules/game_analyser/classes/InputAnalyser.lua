@@ -111,6 +111,12 @@ local obj = {
 	damageTicks = {},
 	damageEffect = {},
 
+	-- Session data storage for 60 minutes
+	sessionDamageTicks = {},
+	sessionMode = false,
+	sessionMinuteData = {}, -- Array to store DPS data per minute for the graph
+	lastMinuteUpdate = 0, -- Track when we last updated minute data
+
 	graphVisible = true,
 	typesVisible = true,
 	sourceVisible = true,
@@ -145,6 +151,39 @@ local valueInSeconds = function(t)
 		end
     end
     return math.ceil(d/((now-time)/1000))
+end
+
+-- Function to handle session data for 60 minutes
+local valueInSessionMode = function(t)
+    local d = 0
+    local time = 0
+    local now = g_clock.millis()
+    local sessionDuration = 60 * 60 * 1000 -- 60 minutes in milliseconds
+    
+    if #t > 0 then
+        local itemsToBeRemoved = 0
+        for i, v in ipairs(t) do
+            if now - v.tick <= sessionDuration then
+                if time == 0 then
+                    time = v.tick
+                end
+                d = d + v.amount
+            else
+                itemsToBeRemoved = itemsToBeRemoved + 1
+            end
+        end
+
+        -- Remove expired items
+        for i = 1, itemsToBeRemoved do
+            table.remove(t, 1)
+        end
+    end
+    
+    if time > 0 then
+        return math.ceil(d/((now-time)/1000))
+    else
+        return 0
+    end
 end
 
 function InputAnalyser:create()
@@ -197,6 +236,7 @@ function InputAnalyser:create()
 
 	InputAnalyser.launchTime = g_clock.millis()
 	InputAnalyser.session = 0
+	InputAnalyser.lastMinuteUpdate = g_clock.millis() -- Initialize minute tracking
 
 	InputAnalyser.total = 0
 	InputAnalyser.maxDPS = 0
@@ -204,6 +244,8 @@ function InputAnalyser:create()
 	InputAnalyser.inputValues = {}
 	InputAnalyser.damageEffect = {}
 	InputAnalyser.damageTicks = {}
+	InputAnalyser.sessionDamageTicks = {}
+	InputAnalyser.sessionMinuteData = {}
 end
 
 function InputAnalyser:reset()
@@ -216,6 +258,9 @@ function InputAnalyser:reset()
 	InputAnalyser.inputValues = {}
 	InputAnalyser.damageEffect = {}
 	InputAnalyser.damageTicks = {}
+	InputAnalyser.sessionDamageTicks = {}
+	InputAnalyser.sessionMinuteData = {}
+	InputAnalyser.lastMinuteUpdate = g_clock.millis()
 
 	InputAnalyser.window.contentsPanel.graphPanel:clear()
 	
@@ -365,7 +410,13 @@ function InputAnalyser:updateWindow(ignoreVisible)
 end
 
 function InputAnalyser:checkDPS()
-	local curDPS = valueInSeconds(InputAnalyser.damageTicks)
+	local curDPS = 0
+	if InputAnalyser.sessionMode then
+		curDPS = valueInSessionMode(InputAnalyser.sessionDamageTicks)
+	else
+		curDPS = valueInSeconds(InputAnalyser.damageTicks)
+	end
+	
 	if not curDPS or not tonumber(curDPS) then curDPS = 0 end
 	InputAnalyser.curDPS = curDPS
 	local lastDps = tonumber(InputAnalyser.maxDPS) or 1
@@ -382,7 +433,60 @@ function InputAnalyser:checkDPS()
 		InputAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
 		InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f75f5f")
 	end
-	InputAnalyser.window.contentsPanel.graphPanel:addValue(1, InputAnalyser.curDPS)
+	
+	-- Only add current DPS to graph if in normal mode
+	-- Session mode will rebuild the entire graph when switched
+	if not InputAnalyser.sessionMode then
+		InputAnalyser.window.contentsPanel.graphPanel:addValue(1, InputAnalyser.curDPS)
+	end
+	
+	-- Update minute data for session tracking
+	InputAnalyser:updateMinuteData()
+end
+
+function InputAnalyser:updateMinuteData()
+	local now = g_clock.millis()
+	local minuteInMs = 60 * 1000
+	
+	-- Initialize if first time
+	if InputAnalyser.lastMinuteUpdate == 0 then
+		InputAnalyser.lastMinuteUpdate = now
+		return
+	end
+	
+	-- Check if a minute has passed
+	if now - InputAnalyser.lastMinuteUpdate >= minuteInMs then
+		-- Calculate DPS for the past minute using session data
+		local minuteDPS = 0
+		local minuteStart = InputAnalyser.lastMinuteUpdate
+		local totalDamage = 0
+		
+		for _, tick in ipairs(InputAnalyser.sessionDamageTicks) do
+			if tick.tick >= minuteStart and tick.tick < now then
+				totalDamage = totalDamage + tick.amount
+			end
+		end
+		
+		minuteDPS = totalDamage / 60 -- Damage per second for that minute
+		
+		-- Add to minute data array
+		table.insert(InputAnalyser.sessionMinuteData, {
+			timestamp = now,
+			dps = minuteDPS
+		})
+		
+		-- Keep only last 60 minutes of data
+		while #InputAnalyser.sessionMinuteData > 60 do
+			table.remove(InputAnalyser.sessionMinuteData, 1)
+		end
+		
+		-- Update the graph if we're in session mode
+		if InputAnalyser.sessionMode then
+			InputAnalyser.window.contentsPanel.graphPanel:addValue(1, minuteDPS)
+		end
+		
+		InputAnalyser.lastMinuteUpdate = now
+	end
 end
 
 
@@ -397,7 +501,9 @@ function InputAnalyser:addInputDamage(amount, effect, target)
 	InputAnalyser.inputValues[target][effect] = InputAnalyser.inputValues[target][effect] + amount
 	InputAnalyser.total = InputAnalyser.total + amount
 
-	InputAnalyser.damageTicks[#InputAnalyser.damageTicks + 1] = {amount = amount, tick = g_clock.millis()}
+	local currentTime = g_clock.millis()
+	InputAnalyser.damageTicks[#InputAnalyser.damageTicks + 1] = {amount = amount, tick = currentTime}
+	InputAnalyser.sessionDamageTicks[#InputAnalyser.sessionDamageTicks + 1] = {amount = amount, tick = currentTime}
 
 	if not InputAnalyser.damageEffect[effect] then
 		InputAnalyser.damageEffect[effect] = 0
@@ -443,7 +549,13 @@ function onInputExtra(mousePosition)
 	local menu = g_ui.createWidget('PopupMenu')
 	menu:setGameMenu(true)
 	menu:addOption(tr('Reset Data'), function() InputAnalyser:reset() return end)
-	menu:addOption(tr('Show Session Values'), function() end)
+	
+	-- Toggle between "Show Session Values" and "Show Current Values" based on current mode
+	local sessionOptionText = InputAnalyser.sessionMode and tr('Show Current Values') or tr('Show Session Values')
+	menu:addOption(sessionOptionText, function()
+		InputAnalyser:toggleSessionMode()
+	end)
+	
 	menu:addSeparator()
 	menu:addCheckBox(tr('Show Damage Graph'), graphVisible, function()
 		InputAnalyser:setDamageGraph(not graphVisible, true)
@@ -515,6 +627,45 @@ function InputAnalyser:setDamageSource(value, check)
 	end
 end
 
+function InputAnalyser:toggleSessionMode()
+	InputAnalyser.sessionMode = not InputAnalyser.sessionMode
+	
+	local horizontalGraph = InputAnalyser.window.contentsPanel.horizontalGraph
+	
+	-- Clear and rebuild graph with appropriate data
+	InputAnalyser.window.contentsPanel.graphPanel:clear()
+	if InputAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
+		InputAnalyser.window.contentsPanel.graphPanel:createGraph()
+		InputAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
+		InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f75f5f")
+	end
+	
+	if InputAnalyser.sessionMode then
+		-- Switch to session mode: change image and show minute-by-minute data
+		horizontalGraph:setImageSource('/images/game/analyzer/graphHorizontal')
+		InputAnalyser.window.contentsPanel.graphPanel:setCapacity(3600) -- 60 minutes worth of data points
+		
+		-- Add all historical minute data to graph
+		for _, minuteData in ipairs(InputAnalyser.sessionMinuteData) do
+			InputAnalyser.window.contentsPanel.graphPanel:addValue(1, minuteData.dps)
+		end
+		
+		-- If no session data exists yet, add current DPS to start the graph properly
+		if #InputAnalyser.sessionMinuteData == 0 then
+			local currentDPS = valueInSeconds(InputAnalyser.damageTicks) or 0
+			InputAnalyser.window.contentsPanel.graphPanel:addValue(1, currentDPS)
+		end
+	else
+		-- Switch back to normal mode: restore original image and show current DPS
+		horizontalGraph:setImageSource('/images/game/analyzer/graphDpsHorizontal')
+		InputAnalyser.window.contentsPanel.graphPanel:setCapacity(400) -- Default capacity
+		
+		-- Add current DPS value
+		local currentDPS = valueInSeconds(InputAnalyser.damageTicks) or 0
+		InputAnalyser.window.contentsPanel.graphPanel:addValue(1, currentDPS)
+	end
+end
+
 function InputAnalyser:clipboardData()
 
 	local text = "Received Damage"
@@ -583,6 +734,12 @@ function InputAnalyser:loadConfigJson()
 	InputAnalyser:setDamageGraph(config.showDamageGraph, false)
 	InputAnalyser:setDamageSource(config.showDamageSources, false)
 	InputAnalyser:setDamageTypes(config.showDamageTypes, false)
+	
+	-- Load session mode state
+	if config.showSessionValues then
+		InputAnalyser.sessionMode = false -- Start false so toggle works correctly
+		InputAnalyser:toggleSessionMode()
+	end
 
 	InputAnalyser:checkAnchos()
 end
@@ -600,7 +757,7 @@ function InputAnalyser:saveConfigJson()
 		showDamageGraph = InputAnalyser:damageGraphIsVisible(),
 		showDamageSources = InputAnalyser:damageSourceIsVisible(),
 		showDamageTypes = InputAnalyser:damageTypesIsVisible(),
-		showSessionValues = false,
+		showSessionValues = InputAnalyser.sessionMode,
 	}
 
 	local file = "/characterdata/" .. player:getId() .. "/damageinputanalyser.json"
