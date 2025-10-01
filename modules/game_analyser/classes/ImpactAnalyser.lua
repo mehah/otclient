@@ -59,6 +59,14 @@ if not ImpactAnalyser then
 		healingTotal = 0,
 		maxHPS = 0,
 
+		-- Session data storage for 60 minutes
+		sessionDamageTicks = {},
+		sessionHealingTicks = {},
+		sessionMode = false,
+		sessionDPSMinuteData = {}, -- Array to store DPS data per minute for the graph
+		sessionHPSMinuteData = {}, -- Array to store HPS data per minute for the graph
+		lastMinuteUpdate = 0, -- Track when we last updated minute data
+
 		-- private
 		window = nil,
 	}
@@ -110,6 +118,39 @@ local valueInSeconds = function(t)
     return math.ceil(d/((now-time)/1000))
 end
 
+-- Function to handle session data for 60 minutes
+local valueInSessionMode = function(t)
+    local d = 0
+    local time = 0
+    local now = g_clock.millis()
+    local sessionDuration = 60 * 60 * 1000 -- 60 minutes in milliseconds
+    
+    if #t > 0 then
+        local itemsToBeRemoved = 0
+        for i, v in ipairs(t) do
+            if now - v.tick <= sessionDuration then
+                if time == 0 then
+                    time = v.tick
+                end
+                d = d + v.amount
+            else
+                itemsToBeRemoved = itemsToBeRemoved + 1
+            end
+        end
+
+        -- Remove expired items
+        for i = 1, itemsToBeRemoved do
+            table.remove(t, 1)
+        end
+    end
+    
+    if time > 0 then
+        return math.ceil(d/((now-time)/1000))
+    else
+        return 0
+    end
+end
+
 function ImpactAnalyser:create()
 	ImpactAnalyser.launchTime = 0
 	ImpactAnalyser.session = 0
@@ -132,6 +173,13 @@ function ImpactAnalyser:create()
 
 	ImpactAnalyser.healingTotal = 0
 	ImpactAnalyser.maxHPS = 0
+	
+	-- Initialize session tracking
+	ImpactAnalyser.sessionDamageTicks = {}
+	ImpactAnalyser.sessionHealingTicks = {}
+	ImpactAnalyser.sessionDPSMinuteData = {}
+	ImpactAnalyser.sessionHPSMinuteData = {}
+	ImpactAnalyser.lastMinuteUpdate = g_clock.millis()
 
 	-- private
 	ImpactAnalyser.window = openedWindows['impactButton']
@@ -202,6 +250,13 @@ function ImpactAnalyser:reset(allTimeDps, allTimeHps)
 	ImpactAnalyser.damageTicks = {}
 	ImpactAnalyser.healingTicks = {}
 	ImpactAnalyser.damageEffect = {}
+	
+	-- Reset session data
+	ImpactAnalyser.sessionDamageTicks = {}
+	ImpactAnalyser.sessionHealingTicks = {}
+	ImpactAnalyser.sessionDPSMinuteData = {}
+	ImpactAnalyser.sessionHPSMinuteData = {}
+	ImpactAnalyser.lastMinuteUpdate = g_clock.millis()
 
 	ImpactAnalyser.healingTotal = 0
 
@@ -239,12 +294,19 @@ function ImpactAnalyser:updateWindow(ignoreVisible)
 
 	contentsPanel.dmg:setText(formatMoney(ImpactAnalyser.damageTotal, ","))
 	contentsPanel.allTimeHigh:setText(formatMoney(ImpactAnalyser.allTimeHightDps, ","))
-	local curHPS = valueInSeconds(ImpactAnalyser.damageTicks)
-	if not curHPS then curHPS = 0 end
-	ImpactAnalyser.maxDPS = ImpactAnalyser.maxDPS > curHPS and ImpactAnalyser.maxDPS or curHPS
+	
+	local curDPS = 0
+	if ImpactAnalyser.sessionMode then
+		curDPS = valueInSessionMode(ImpactAnalyser.sessionDamageTicks)
+	else
+		curDPS = valueInSeconds(ImpactAnalyser.damageTicks)
+	end
+	
+	if not curDPS then curDPS = 0 end
+	ImpactAnalyser.maxDPS = ImpactAnalyser.maxDPS > curDPS and ImpactAnalyser.maxDPS or curDPS
 
 	contentsPanel.maxDps:setText(formatMoney(ImpactAnalyser.maxDPS, ","))
-	contentsPanel.dps:setText(formatMoney(curHPS, ","))
+	contentsPanel.dps:setText(formatMoney(curDPS, ","))
 
 	contentsPanel.targetDps:setText(formatMoney(ImpactAnalyser.targetDPS, ","))
 	-- movido pro check de 15s
@@ -254,18 +316,22 @@ function ImpactAnalyser:updateWindow(ignoreVisible)
 		contentsPanel.graphDpsPanel:setLineWidth(1, 1)
 		contentsPanel.graphDpsPanel:setLineColor(1, "#f75f5f")
 	end
-	contentsPanel.graphDpsPanel:addValue(1, curHPS)
+	
+	-- Only add current DPS to graph if in normal mode
+	if not ImpactAnalyser.sessionMode then
+		contentsPanel.graphDpsPanel:addValue(1, curDPS)
+	end
 
 	if ImpactAnalyser.targetDPS == 1 and ImpactAnalyser.curHPS == 0 then
 		ImpactAnalyser.window.contentsPanel.dpsBG.dpsArrow:setMarginLeft(targetMaxMargin / 2)
 	else
 		local target = math.max(1, ImpactAnalyser.targetDPS)
-		local current = curHPS
+		local current = curDPS
 		local percent = (current * 71) / target
 		ImpactAnalyser.window.contentsPanel.dpsBG.dpsArrow:setMarginLeft(math.min(targetMaxMargin, math.ceil(percent)))
 	end
 
-	ImpactAnalyser.window.contentsPanel.dpsBG:setTooltip(string.format("Current: %d\nTarget: %d", curHPS, ImpactAnalyser.targetDPS))
+	ImpactAnalyser.window.contentsPanel.dpsBG:setTooltip(string.format("Current: %d\nTarget: %d", curDPS, ImpactAnalyser.targetDPS))
 
 	----------------------- DAMAGE TYPE -----------------------------
 	for _, child in pairs(contentsPanel.dmgTypes:getChildren()) do
@@ -305,7 +371,13 @@ function ImpactAnalyser:updateWindow(ignoreVisible)
 	contentsPanel.hpsTotal:setText(formatMoney(ImpactAnalyser.healingTotal, ","))
 	contentsPanel.allTimeHighHealing:setText(formatMoney(ImpactAnalyser.allTimeHightHps, ","))
 
-	local curHPS = valueInSeconds(ImpactAnalyser.healingTicks)
+	local curHPS = 0
+	if ImpactAnalyser.sessionMode then
+		curHPS = valueInSessionMode(ImpactAnalyser.sessionHealingTicks)
+	else
+		curHPS = valueInSeconds(ImpactAnalyser.healingTicks)
+	end
+	
 	if not curHPS then curHPS = 0 end
 	ImpactAnalyser.maxHPS = ImpactAnalyser.maxHPS > curHPS and ImpactAnalyser.maxHPS or curHPS
 
@@ -320,7 +392,11 @@ function ImpactAnalyser:updateWindow(ignoreVisible)
 		contentsPanel.graphHealPanel:setLineWidth(1, 1)
 		contentsPanel.graphHealPanel:setLineColor(1, "#f75f5f")
 	end
-	contentsPanel.graphHealPanel:addValue(1, curHPS)
+	
+	-- Only add current HPS to graph if in normal mode
+	if not ImpactAnalyser.sessionMode then
+		contentsPanel.graphHealPanel:addValue(1, curHPS)
+	end
 
 	if ImpactAnalyser.targetHPS == 1 and ImpactAnalyser.curHPS == 0 then
 		ImpactAnalyser.window.contentsPanel.hpsBG.hpsArrow:setMarginLeft(targetMaxMargin / 2)
@@ -332,6 +408,73 @@ function ImpactAnalyser:updateWindow(ignoreVisible)
 	end
 
 	ImpactAnalyser.window.contentsPanel.hpsBG:setTooltip(string.format("Current: %d\nTarget: %d", curHPS, ImpactAnalyser.targetHPS))
+	
+	-- Update minute data for session tracking
+	ImpactAnalyser:updateMinuteData()
+end
+
+function ImpactAnalyser:updateMinuteData()
+	local now = g_clock.millis()
+	local minuteInMs = 60 * 1000
+	
+	-- Initialize if first time
+	if ImpactAnalyser.lastMinuteUpdate == 0 then
+		ImpactAnalyser.lastMinuteUpdate = now
+		return
+	end
+	
+	-- Check if a minute has passed
+	if now - ImpactAnalyser.lastMinuteUpdate >= minuteInMs then
+		-- Calculate DPS for the past minute using session data
+		local minuteDPS = 0
+		local minuteHPS = 0
+		local minuteStart = ImpactAnalyser.lastMinuteUpdate
+		local totalDamage = 0
+		local totalHealing = 0
+		
+		for _, tick in ipairs(ImpactAnalyser.sessionDamageTicks) do
+			if tick.tick >= minuteStart and tick.tick < now then
+				totalDamage = totalDamage + tick.amount
+			end
+		end
+		
+		for _, tick in ipairs(ImpactAnalyser.sessionHealingTicks) do
+			if tick.tick >= minuteStart and tick.tick < now then
+				totalHealing = totalHealing + tick.amount
+			end
+		end
+		
+		minuteDPS = totalDamage / 60 -- Damage per second for that minute
+		minuteHPS = totalHealing / 60 -- Healing per second for that minute
+		
+		-- Add to minute data arrays
+		table.insert(ImpactAnalyser.sessionDPSMinuteData, {
+			timestamp = now,
+			dps = minuteDPS
+		})
+		
+		table.insert(ImpactAnalyser.sessionHPSMinuteData, {
+			timestamp = now,
+			hps = minuteHPS
+		})
+		
+		-- Keep only last 60 minutes of data
+		while #ImpactAnalyser.sessionDPSMinuteData > 60 do
+			table.remove(ImpactAnalyser.sessionDPSMinuteData, 1)
+		end
+		
+		while #ImpactAnalyser.sessionHPSMinuteData > 60 do
+			table.remove(ImpactAnalyser.sessionHPSMinuteData, 1)
+		end
+		
+		-- Update the graphs if we're in session mode
+		if ImpactAnalyser.sessionMode then
+			ImpactAnalyser.window.contentsPanel.graphDpsPanel:addValue(1, minuteDPS)
+			ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, minuteHPS)
+		end
+		
+		ImpactAnalyser.lastMinuteUpdate = now
+	end
 end
 
 function ImpactAnalyser:updateGraphics()
@@ -368,7 +511,11 @@ function ImpactAnalyser:addDealDamage(amount, effect)
 		ImpactAnalyser.allTimeHightDps = amount
 	end
 	ImpactAnalyser.damageTotal = ImpactAnalyser.damageTotal + amount
-	ImpactAnalyser.damageTicks[#ImpactAnalyser.damageTicks + 1] = {amount = amount, tick = g_clock.millis()}
+	
+	local currentTime = g_clock.millis()
+	ImpactAnalyser.damageTicks[#ImpactAnalyser.damageTicks + 1] = {amount = amount, tick = currentTime}
+	ImpactAnalyser.sessionDamageTicks[#ImpactAnalyser.sessionDamageTicks + 1] = {amount = amount, tick = currentTime}
+	
 	if not ImpactAnalyser.damageEffect[effect] then
 		ImpactAnalyser.damageEffect[effect] = 0
 	end
@@ -381,7 +528,10 @@ function ImpactAnalyser:addHealing(amount)
 		ImpactAnalyser.allTimeHightHps = amount
 	end
 	ImpactAnalyser.healingTotal = ImpactAnalyser.healingTotal + amount
-	ImpactAnalyser.healingTicks[#ImpactAnalyser.healingTicks + 1] = {amount = amount, tick = g_clock.millis()}
+	
+	local currentTime = g_clock.millis()
+	ImpactAnalyser.healingTicks[#ImpactAnalyser.healingTicks + 1] = {amount = amount, tick = currentTime}
+	ImpactAnalyser.sessionHealingTicks[#ImpactAnalyser.sessionHealingTicks + 1] = {amount = amount, tick = currentTime}
 end
 
 
@@ -401,7 +551,13 @@ function onImpactExtra(mousePosition)
 	menu:setGameMenu(true)
 	menu:addOption(tr('Reset Data'), function() ImpactAnalyser:reset(false) return end)
 	menu:addOption(tr('Reset All-Time High'), function() ImpactAnalyser:setAllTimeHightDps(0);ImpactAnalyser:setAllTimeHightHps(0) end)
-	menu:addOption(tr('Show Session Values'), function() end)
+	
+	-- Toggle between "Show Session Values" and "Show Current Values" based on current mode
+	local sessionOptionText = ImpactAnalyser.sessionMode and tr('Show Current Values') or tr('Show Session Values')
+	menu:addOption(sessionOptionText, function()
+		ImpactAnalyser:toggleSessionMode()
+	end)
+	
 	menu:addSeparator()
 	menu:addOption(tr('Set DPS target'), function() ImpactAnalyser:openTargetConfig(true) end)
 	menu:addCheckBox(tr('DPS gauge'), dpsGaugeVisible, function()
@@ -424,6 +580,71 @@ function onImpactExtra(mousePosition)
 	end)
 	menu:display(mousePosition)
   return true
+end
+
+function ImpactAnalyser:toggleSessionMode()
+	ImpactAnalyser.sessionMode = not ImpactAnalyser.sessionMode
+	
+	local horizontalGraphDPS = ImpactAnalyser.window.contentsPanel.graphHorizontal
+	local horizontalGraphHPS = ImpactAnalyser.window.contentsPanel.graphHPSHorizontal
+	
+	-- Clear and rebuild graphs with appropriate data
+	ImpactAnalyser.window.contentsPanel.graphDpsPanel:clear()
+	ImpactAnalyser.window.contentsPanel.graphHealPanel:clear()
+	
+	if ImpactAnalyser.window.contentsPanel.graphDpsPanel:getGraphsCount() == 0 then
+		ImpactAnalyser.window.contentsPanel.graphDpsPanel:createGraph()
+		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setLineWidth(1, 1)
+		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setLineColor(1, "#f75f5f")
+	end
+	
+	if ImpactAnalyser.window.contentsPanel.graphHealPanel:getGraphsCount() == 0 then
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:createGraph()
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineWidth(1, 1)
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineColor(1, "#f75f5f")
+	end
+	
+	if ImpactAnalyser.sessionMode then
+		-- Switch to session mode: change images and show minute-by-minute data
+		horizontalGraphDPS:setImageSource('/images/game/analyzer/graphHorizontal')
+		horizontalGraphHPS:setImageSource('/images/game/analyzer/graphHorizontal')
+		
+		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setCapacity(3600) -- 60 minutes worth of data points
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:setCapacity(3600) -- 60 minutes worth of data points
+		
+		-- Add all historical minute data to graphs
+		for _, minuteData in ipairs(ImpactAnalyser.sessionDPSMinuteData) do
+			ImpactAnalyser.window.contentsPanel.graphDpsPanel:addValue(1, minuteData.dps)
+		end
+		
+		for _, minuteData in ipairs(ImpactAnalyser.sessionHPSMinuteData) do
+			ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, minuteData.hps)
+		end
+		
+		-- If no session data exists yet, add current DPS/HPS to start the graphs properly
+		if #ImpactAnalyser.sessionDPSMinuteData == 0 then
+			local currentDPS = valueInSeconds(ImpactAnalyser.damageTicks) or 0
+			ImpactAnalyser.window.contentsPanel.graphDpsPanel:addValue(1, currentDPS)
+		end
+		
+		if #ImpactAnalyser.sessionHPSMinuteData == 0 then
+			local currentHPS = valueInSeconds(ImpactAnalyser.healingTicks) or 0
+			ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, currentHPS)
+		end
+	else
+		-- Switch back to normal mode: restore original images and show current DPS/HPS
+		horizontalGraphDPS:setImageSource('/images/game/analyzer/graphDpsHorizontal')
+		horizontalGraphHPS:setImageSource('/images/game/analyzer/graphDpsHorizontal')
+		
+		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setCapacity(400) -- Default capacity
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:setCapacity(400) -- Default capacity
+		
+		-- Add current DPS/HPS values
+		local curDPS = valueInSeconds(ImpactAnalyser.damageTicks) or 0
+		local curHPS = valueInSeconds(ImpactAnalyser.healingTicks) or 0
+		ImpactAnalyser.window.contentsPanel.graphDpsPanel:addValue(1, curDPS)
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, curHPS)
+	end
 end
 
 function ImpactAnalyser:openTargetConfig(isDps)
@@ -592,7 +813,7 @@ function ImpactAnalyser:loadConfigJson()
 		hpsGaugeTargetValue = 1,
 		maxDamageImpact = 0,
 		maxHealingImpact = 0,
-		showSessionValues = true,
+		showSessionValues = false,
 	}
 
 	local player = g_game.getLocalPlayer()
@@ -618,6 +839,12 @@ function ImpactAnalyser:loadConfigJson()
 	ImpactAnalyser.allTimeHightHps = config.maxHealingImpact
 	ImpactAnalyser.targetDPS = config.dpsGaugeTargetValue
 	ImpactAnalyser.targetHPS = config.hpsGaugeTargetValue
+	
+	-- Load session mode state
+	if config.showSessionValues then
+		ImpactAnalyser.sessionMode = false -- Start false so toggle works correctly
+		ImpactAnalyser:toggleSessionMode()
+	end
 
 	ImpactAnalyser:checkAnchos()
 end
@@ -640,7 +867,7 @@ function ImpactAnalyser:saveConfigJson()
 		hpsGaugeTargetValue = checkFinite(ImpactAnalyser.targetHPS),
 		maxDamageImpact = checkFinite(ImpactAnalyser.allTimeHightDps),
 		maxHealingImpact = checkFinite(ImpactAnalyser.allTimeHightHps),
-		showSessionValues = true,
+		showSessionValues = ImpactAnalyser.sessionMode,
 	}
 
 	local player = g_game.getLocalPlayer()
