@@ -295,8 +295,9 @@ MessageModes = {
     OfflineTrainning = 54,
     Transaction = 55,
     Potion = 56,
+    ValuableLoot = 57,
 
-    Last = 57,
+    Last = 58,
     Invalid = 255
 }
 
