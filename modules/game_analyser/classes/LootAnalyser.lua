@@ -3,7 +3,7 @@ local function formatMoney(value, separator)
     return comma_value(tostring(value))
 end
 
--- Enhanced number formatting function for large values
+-- Enhanced number formatting function with new K, KK suffixes
 local function formatLargeNumber(value)
     if not value then
         return "0"
@@ -19,32 +19,19 @@ local function formatLargeNumber(value)
     local isNegative = numValue < 0
     local prefix = isNegative and "-" or ""
     
-    -- Debug logging
-    print("formatLargeNumber: input=" .. tostring(value) .. ", numValue=" .. tostring(numValue) .. ", absValue=" .. tostring(absValue))
-    
-    if absValue >= 1000000000 then
-        -- Billions (B)
-        local billions = absValue / 1000000000
-        local result = prefix .. string.format("%.2fB", billions)
-        print("formatLargeNumber: billions result=" .. result)
-        return result
-    elseif absValue >= 1000000 then
-        -- Millions (M)
-        local millions = absValue / 1000000
-        local result = prefix .. string.format("%.2fM", millions)
-        print("formatLargeNumber: millions result=" .. result)
-        return result
-    elseif absValue >= 1000 then
-        -- Thousands (K)
-        local thousands = absValue / 1000
-        local result = prefix .. string.format("%.2fK", thousands)
-        print("formatLargeNumber: thousands result=" .. result)
-        return result
+    if absValue >= 100000000 then
+        -- Values 100,000,000+ use KK notation
+        -- Example: 100,700,000 = 1,007KK, 345,666,000 = 3,456KK
+        local kkValue = math.floor(absValue / 100000)
+        return prefix .. comma_value(tostring(kkValue)) .. "KK"
+    elseif absValue >= 10000000 then
+        -- Values 10,000,000 to 99,999,999 use K notation  
+        -- Example: 16,667,000 = 16,667K
+        local kValue = math.floor(absValue / 1000)
+        return prefix .. comma_value(tostring(kValue)) .. "K"
     else
-        -- Less than 1000, show as-is
-        local result = prefix .. tostring(math.floor(absValue))
-        print("formatLargeNumber: small number result=" .. result)
-        return result
+        -- Values 1 to 9,999,999 show as is
+        return prefix .. comma_value(tostring(math.floor(absValue)))
     end
 end
 
@@ -269,7 +256,7 @@ function LootAnalyser:updateWindow(updateScroll, ignoreVisible)
 				widget:setItemId(itemId)
 			end
 			widget:setItemCount(info.count)
-			widget:setTooltip(string.format("%s (Value: %dgp, Sum: %dgp)", string.capitalize(info.name), info.basePrice, info.basePrice * info.count))
+			widget:setTooltip(string.format("%s (Count: %s, Value: %dgp, Sum: %dgp)", string.capitalize(info.name), formatLargeNumber(info.count), info.basePrice, info.basePrice * info.count))
 			numOfItems = numOfItems + 1
 			if numOfItems == 4 then
 				numOfItems = 0
