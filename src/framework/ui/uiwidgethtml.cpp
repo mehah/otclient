@@ -372,7 +372,7 @@ namespace {
         if (auto* parent = self->getParent().get()) {
             const int innerW = getParentInnerWidth(parent);
             if (innerW > 0) {
-                const int runBefore = getCurrentLineWidth(self);
+                const int runBefore = ctx.lineWidthBefore;
                 const int nextRun = runBefore + computeOuterWidth(self);
                 if (nextRun > innerW) {
                     setLeftAnchor(self, "parent", Fw::AnchorLeft);
@@ -412,7 +412,7 @@ namespace {
 
     void applyBlock(UIWidget* self, const FlowContext& ctx, bool topCleared) {
         if (ctx.lastNormalWidget && isInlineLike(ctx.lastNormalWidget->getDisplay())) {
-            if (auto* tallest = getTallestWidgetInLine(self)) {
+            if (auto* tallest = ctx.tallestInlineWidget) {
                 setLeftAnchor(self, "parent", Fw::AnchorLeft);
                 if (!topCleared)
                     setTopAnchor(self, tallest->getId(), Fw::AnchorBottom);
