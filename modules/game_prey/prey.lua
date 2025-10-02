@@ -37,6 +37,7 @@ local refreshRaceList
 local setRaceSelection
 local updateRaceSelectionDisplay
 local restoreRaceListItemBackground
+local setWidgetTreePhantom
 local updatePickSpecificPreyButton
 local refreshRerollButtonState
 
@@ -985,6 +986,18 @@ function resetPreyPreviewWidget(preview)
     end
 end
 
+setWidgetTreePhantom = function(widget, phantom)
+    if not widget or widget:isDestroyed() then
+        return
+    end
+
+    widget:setPhantom(phantom)
+
+    for _, child in pairs(widget:getChildren()) do
+        setWidgetTreePhantom(child, phantom)
+    end
+end
+
 function setInactiveMode(slot, showFullList, prey)
     prey = prey or getPreySlotWidget(slot)
     if not prey or not prey.inactive then
@@ -995,6 +1008,7 @@ function setInactiveMode(slot, showFullList, prey)
 
     if inactive.list then
         inactive.list:setVisible(not showFullList)
+        setWidgetTreePhantom(inactive.list, showFullList)
     end
 
     if inactive.fullList then
@@ -1264,11 +1278,17 @@ restoreRaceListItemBackground = function(widget)
         if widget.checkedBackground then
             widget:setBackgroundColor(widget.checkedBackground)
         end
+        if widget.checkedTextColor then
+            widget:setColor(widget.checkedTextColor)
+        end
         return
     end
 
     if widget.baseBackground then
         widget:setBackgroundColor(widget.baseBackground)
+    end
+    if widget.baseTextColor then
+        widget:setColor(widget.baseTextColor)
     end
 end
 
@@ -1404,7 +1424,10 @@ refreshRaceList = function(slot)
             item.preySlot = slot
             item.baseBackground = useAlternate and backgroundB or backgroundA
             item.checkedBackground = '#585858'
+            item.baseTextColor = '#c0c0c0'
+            item.checkedTextColor = '#ffffff'
             item:setBackgroundColor(item.baseBackground)
+            item:setColor(item.baseTextColor)
             item.onCheckChange = function(widget)
                 restoreRaceListItemBackground(widget)
             end
@@ -1489,6 +1512,14 @@ function onPreyRaceListItemClicked(widget)
         return
     end
     setRaceSelection(widget.preySlot, widget, false)
+end
+
+function onPreyRaceListItemHoverChange(widget, hovered)
+    if not widget or widget:isDestroyed() then
+        return
+    end
+
+    restoreRaceListItemBackground(widget)
 end
 
 local suppressOptionCheckHandler = false
