@@ -810,6 +810,8 @@ void UIWidget::applyAnchorAlignment() {
     if (!hasAnchoredLayout())
         return;
 
+    disableUpdateTemporarily();
+
     if (m_htmlNode->getAttr("anchor") == "parent") {
         setLeftAnchor(this, "parent", Fw::AnchorLeft);
         setTopAnchor(this, "parent", Fw::AnchorTop);
