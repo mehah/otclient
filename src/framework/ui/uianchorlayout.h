@@ -32,15 +32,22 @@ public:
     virtual ~UIAnchor() = default; // fix clang warning
 
     UIAnchor(const Fw::AnchorEdge anchoredEdge, const std::string_view hookedWidgetId, const Fw::AnchorEdge hookedEdge) :
-        m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::string{ hookedWidgetId })
-    {
-    }
+        m_anchoredEdge(anchoredEdge), m_hookedEdge(hookedEdge), m_hookedWidgetId(std::string{ hookedWidgetId }) {}
 
     Fw::AnchorEdge getAnchoredEdge() const { return m_anchoredEdge; }
     Fw::AnchorEdge getHookedEdge() const { return m_hookedEdge; }
 
     virtual UIWidgetPtr getHookedWidget(const UIWidgetPtr& widget, const UIWidgetPtr& parentWidget);
     virtual int getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr& parentWidget);
+
+    const auto& getHookdWidgetId() const {
+        return m_hookedWidgetId;
+    }
+
+    void setHook(Fw::AnchorEdge hookedEdge, std::string_view hookedWidgetId) {
+        m_hookedEdge = hookedEdge;
+        m_hookedWidgetId = hookedWidgetId;
+    }
 
 protected:
     Fw::AnchorEdge m_anchoredEdge;
@@ -54,6 +61,7 @@ public:
     UIAnchorGroup() = default;
 
     void addAnchor(const UIAnchorPtr& anchor);
+    bool addAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge);
     const UIAnchorList& getAnchors() { return m_anchors; }
     bool isUpdated() const { return m_updated; }
     void setUpdated(const bool updated) { m_updated = updated; }
