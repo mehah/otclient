@@ -19,11 +19,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#include "uiwidget.h"
-#include <framework/html/htmlnode.h>
 #include <framework/core/eventdispatcher.h>
-#include "uimanager.h"
 #include <framework/html/htmlmanager.h>
+#include <framework/html/htmlnode.h>
+#include "uimanager.h"
+#include "uiwidget.h"
 
 namespace {
     inline uint32_t SIZE_VERSION_COUNTER = 1;
@@ -47,20 +47,11 @@ namespace {
     }
 
     constexpr bool isTableBox(DisplayType d) noexcept {
-        switch (d) {
-            case DisplayType::Table:
-            case DisplayType::TableRowGroup:
-            case DisplayType::TableHeaderGroup:
-            case DisplayType::TableFooterGroup:
-            case DisplayType::TableRow:
-            case DisplayType::TableCell:
-            case DisplayType::TableColumnGroup:
-            case DisplayType::TableColumn:
-            case DisplayType::TableCaption:
-                return true;
-            default:
-                return false;
-        }
+        return isTableContainer(d)
+            || d == DisplayType::TableCell
+            || d == DisplayType::TableColumnGroup
+            || d == DisplayType::TableColumn
+            || d == DisplayType::TableCaption;
     }
 
     constexpr bool breakLine(DisplayType d) noexcept {
