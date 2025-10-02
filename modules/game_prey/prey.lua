@@ -861,7 +861,7 @@ local function getDisplayedRerollPrice(slot)
     return getRerollPriceFromPanel(prey.active) or getRerollPriceFromPanel(prey.inactive) or rerollPrice
 end
 
-local function refreshRerollButtonState(slot)
+function refreshRerollButtonState(slot)
     local prey = getPreySlotWidget(slot)
     if not prey then
         return
