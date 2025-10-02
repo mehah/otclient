@@ -632,17 +632,18 @@ function InputAnalyser:toggleSessionMode()
 	
 	local horizontalGraph = InputAnalyser.window.contentsPanel.horizontalGraph
 	
-	-- Clear and rebuild graph with appropriate data
-	InputAnalyser.window.contentsPanel.graphPanel:clear()
-	if InputAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
-		InputAnalyser.window.contentsPanel.graphPanel:createGraph()
-		InputAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
-		InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f75f5f")
-	end
-	
 	if InputAnalyser.sessionMode then
 		-- Switch to session mode: change image and show minute-by-minute data
 		horizontalGraph:setImageSource('/images/game/analyzer/graphHorizontal')
+		
+		-- Clear and rebuild graph with session data
+		InputAnalyser.window.contentsPanel.graphPanel:clear()
+		if InputAnalyser.window.contentsPanel.graphPanel:getGraphsCount() == 0 then
+			InputAnalyser.window.contentsPanel.graphPanel:createGraph()
+			InputAnalyser.window.contentsPanel.graphPanel:setLineWidth(1, 1)
+			InputAnalyser.window.contentsPanel.graphPanel:setLineColor(1, "#f75f5f")
+		end
+		
 		InputAnalyser.window.contentsPanel.graphPanel:setCapacity(3600) -- 60 minutes worth of data points
 		
 		-- Add all historical minute data to graph
@@ -656,13 +657,12 @@ function InputAnalyser:toggleSessionMode()
 			InputAnalyser.window.contentsPanel.graphPanel:addValue(1, currentDPS)
 		end
 	else
-		-- Switch back to normal mode: restore original image and show current DPS
+		-- Switch back to normal mode: restore original image and continue with existing graph
 		horizontalGraph:setImageSource('/images/game/analyzer/graphDpsHorizontal')
 		InputAnalyser.window.contentsPanel.graphPanel:setCapacity(400) -- Default capacity
 		
-		-- Add current DPS value
-		local currentDPS = valueInSeconds(InputAnalyser.damageTicks) or 0
-		InputAnalyser.window.contentsPanel.graphPanel:addValue(1, currentDPS)
+		-- Don't clear the graph - let it continue from where it was before session mode
+		-- The checkDPS() function will continue adding values automatically
 	end
 end
 
