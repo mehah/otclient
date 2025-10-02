@@ -31,6 +31,7 @@
 #include "luavaluecasts_client.h"
 #include "map.h"
 #include "missile.h"
+#include "outfit.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include <ctime>
@@ -5794,10 +5795,20 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
 void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg)
 {
     const uint16_t bossesOnTrackerSize = msg->getU16();
+    std::vector<std::tuple<uint32_t, uint64_t, std::string, Outfit>> cooldownData;
+    
     for (auto i = 0; i < bossesOnTrackerSize; ++i) {
-        msg->getU32(); // bossRaceId
-        msg->getU64(); // Boss cooldown in seconds
+        const uint32_t bossRaceId = msg->getU32(); // bossRaceId
+        const uint64_t cooldownTime = msg->getU64(); // Boss cooldown in seconds
+        
+        // Create data structure expected by Lua: {bossId, cooldown, name, outfit}
+        // Note: name and outfit will be handled by Lua side since we don't have
+        // direct access to monster data by race ID on client side
+        cooldownData.emplace_back(bossRaceId, cooldownTime, std::string(""), Outfit());
     }
+    
+    // Call the Lua callback with the cooldown data
+    g_lua.callGlobalField("g_game", "onBossCooldown", cooldownData);
 }
 
 void ProtocolGame::parseBosstiaryEntryChanged(const InputMessagePtr& msg)
