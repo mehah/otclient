@@ -360,7 +360,6 @@ InactivePreyPanel < Panel
     image-source: /images/ui/panel_flat
     image-border: 1
     visible: false
-    clipping: true
 
     Label
       id: placeholder
