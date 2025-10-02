@@ -1264,11 +1264,23 @@ restoreRaceListItemBackground = function(widget)
         if widget.checkedBackground then
             widget:setBackgroundColor(widget.checkedBackground)
         end
+        if widget.checkedBorderColor then
+            widget:setBorderColor(widget.checkedBorderColor)
+        end
+        if widget.checkedTextColor then
+            widget:setColor(widget.checkedTextColor)
+        end
         return
     end
 
     if widget.baseBackground then
         widget:setBackgroundColor(widget.baseBackground)
+    end
+    if widget.baseBorderColor then
+        widget:setBorderColor(widget.baseBorderColor)
+    end
+    if widget.baseTextColor then
+        widget:setColor(widget.baseTextColor)
     end
 end
 
@@ -1404,7 +1416,13 @@ refreshRaceList = function(slot)
             item.preySlot = slot
             item.baseBackground = useAlternate and backgroundB or backgroundA
             item.checkedBackground = '#585858'
+            item.baseBorderColor = 'alpha'
+            item.checkedBorderColor = '#6fb1e9ff'
+            item.baseTextColor = '#c0c0c0'
+            item.checkedTextColor = '#ffffff'
             item:setBackgroundColor(item.baseBackground)
+            item:setBorderColor(item.baseBorderColor)
+            item:setColor(item.baseTextColor)
             item.onCheckChange = function(widget)
                 restoreRaceListItemBackground(widget)
             end
@@ -1489,6 +1507,14 @@ function onPreyRaceListItemClicked(widget)
         return
     end
     setRaceSelection(widget.preySlot, widget, false)
+end
+
+function onPreyRaceListItemHoverChange(widget, hovered)
+    if not widget or widget:isDestroyed() then
+        return
+    end
+
+    restoreRaceListItemBackground(widget)
 end
 
 local suppressOptionCheckHandler = false
