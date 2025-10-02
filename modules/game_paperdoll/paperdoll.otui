@@ -1,0 +1,83 @@
+PaperDollWindow < UIWidget
+  id: paperdoll
+  anchors.left: parent.left
+  anchors.top: parent.top
+  size: 170 180
+  image-source: /images/ui/outfits/minipanel
+  image-border: 20
+  color: #929292
+  text-align: top
+  text-offset: 0 3
+
+  Label
+    id: title
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 4
+    color: #C1C1C1
+    !text: tr('Paperdoll')
+
+  UICreature
+    id: avatar
+    size: 96 96
+    anchors.top: title.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 6
+    creature-center: true
+    creature-size: 64
+
+  UIWidget
+    id: grid
+    anchors.top: avatar.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 3
+    layout:
+      type: grid
+      cell-size: 34 34
+      cell-spacing: 3
+      flow: true
+
+    -- Row 1
+    Item
+      id: slot1
+      tooltip: Head
+    Item
+      id: slot2
+      tooltip: Neck
+    Item
+      id: slot3
+      tooltip: Back
+
+    -- Row 2
+    Item
+      id: slot4
+      tooltip: Body
+    Item
+      id: slot5
+      tooltip: Right
+    Item
+      id: slot6
+      tooltip: Left
+
+    -- Row 3
+    Item
+      id: slot7
+      tooltip: Legs
+    Item
+      id: slot8
+      tooltip: Feet
+    Item
+      id: slot9
+      tooltip: Finger
+
+    -- Row 4
+    Item
+      id: slot10
+      tooltip: Ammo
+    Item
+      id: slot11
+      tooltip: Purse
+    UIWidget
+      -- spacer

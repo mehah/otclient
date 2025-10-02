@@ -1,0 +1,9 @@
+Module
+  name: game_paperdoll
+  description: Paperdoll preview with equipment overlays
+  author: CursorAgent
+  website: https://github.com/edubart/otclient
+  sandboxed: true
+  scripts: [ paperdoll ]
+  @onLoad: init()
+  @onUnload: terminate()
