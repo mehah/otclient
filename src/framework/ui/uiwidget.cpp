@@ -2150,12 +2150,12 @@ void UIWidget::disableUpdateTemporarily() {
 
     setProp(PropDisableUpdateTemporarily, true);
     m_layout->disableUpdates();
-    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        if (self->m_layout) {
-            self->m_layout->enableUpdates();
-            self->m_layout->update();
+    g_dispatcher.deferEvent([this, self = static_self_cast<UIWidget>()] {
+        if (m_layout) {
+            m_layout->enableUpdates();
+            updateLayout();
         }
-        self->setProp(PropDisableUpdateTemporarily, false);
+        setProp(PropDisableUpdateTemporarily, false);
     });
 }
 void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)

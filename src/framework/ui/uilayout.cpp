@@ -41,7 +41,7 @@ void UILayout::update()
     } while(parent);
     */
 
-    if (m_updateDisabled)
+    if (isUpdateDisabled())
         return;
 
     if (m_updating) {
@@ -57,7 +57,7 @@ void UILayout::update()
 
 void UILayout::updateLater()
 {
-    if (m_updateDisabled || m_updateScheduled)
+    if (isUpdateDisabled() || m_updateScheduled)
         return;
 
     if (!getParentWidget())
