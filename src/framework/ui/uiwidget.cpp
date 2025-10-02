@@ -71,10 +71,8 @@ UIWidget::~UIWidget()
 
 void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
 {
-    auto clipping = isClipping() || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll);
-
     Rect oldClipRect;
-    if (clipping) {
+    if (isClipping()) {
         oldClipRect = g_drawPool.getClipRect();
         g_drawPool.setClipRect(visibleRect);
     }
@@ -87,7 +85,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     drawSelf(drawPane);
 
     if (!m_children.empty()) {
-        if (clipping)
+        if (isClipping())
             g_drawPool.setClipRect(visibleRect.intersection(getPaddingRect()));
 
         drawChildren(visibleRect, drawPane);
@@ -96,7 +94,7 @@ void UIWidget::draw(const Rect& visibleRect, const DrawPoolType drawPane)
     if (m_rotation != 0.0f)
         g_drawPool.popTransformMatrix();
 
-    if (clipping) {
+    if (isClipping()) {
         g_drawPool.setClipRect(oldClipRect);
     }
 }
@@ -808,6 +806,20 @@ void UIWidget::breakAnchors()
         anchorLayout->removeAnchors(static_self_cast<UIWidget>());
 }
 
+void UIWidget::resetAnchors()
+{
+    if (isDestroyed())
+        return;
+
+    if (const auto& anchorLayout = getAnchoredLayout()) {
+        auto it = anchorLayout->getAnchorsGroup().find(static_self_cast<UIWidget>());
+        if (it == anchorLayout->getAnchorsGroup().end())
+            return;
+
+        it->second->reset();
+    }
+}
+
 void UIWidget::updateParentLayout()
 {
     if (isDestroyed())
@@ -1377,11 +1389,9 @@ UIAnchorLayoutPtr UIWidget::getAnchoredLayout()
 
 UIAnchorList UIWidget::getAnchorsGroup() {
     if (const auto& layout = getAnchoredLayout()) {
-        const auto& self = static_self_cast<UIWidget>();
-        if (layout->hasAnchors(self)) {
-            const auto& anchors = layout->getAnchorsGroup()[self]->getAnchors();
-            return anchors;
-        }
+        auto it = layout->getAnchorsGroup().find(static_self_cast<UIWidget>());
+        if (it != layout->getAnchorsGroup().end())
+            return it->second->getAnchors();
     }
 
     return {};
@@ -1484,6 +1494,9 @@ UIWidgetPtr UIWidget::recursiveGetChildById(const std::string_view id)
 
 UIWidgetPtr UIWidget::recursiveGetChildByPos(const Point& childPos, const bool wantsPhantom)
 {
+    if (isClipping() && !containsPaddingPoint(childPos))
+        return nullptr;
+
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible()) {
             if (const auto& subChild = child->recursiveGetChildByPos(childPos, wantsPhantom))
@@ -1526,6 +1539,9 @@ UIWidgetList UIWidget::recursiveGetChildren()
 UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
 {
     UIWidgetList children;
+    if (isClipping() && !containsPaddingPoint(childPos))
+        return children;
+
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible()) {
             if (const UIWidgetList& subChildren = child->recursiveGetChildrenByPos(childPos); !subChildren.empty())
@@ -1542,6 +1558,8 @@ UIWidgetList UIWidget::recursiveGetChildrenByPos(const Point& childPos)
 UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
 {
     UIWidgetList children;
+    if (isClipping() && !containsPaddingPoint(childPos))
+        return children;
 
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyVisible()) {
@@ -2132,12 +2150,12 @@ void UIWidget::disableUpdateTemporarily() {
 
     setProp(PropDisableUpdateTemporarily, true);
     m_layout->disableUpdates();
-    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        if (self->m_layout) {
-            self->m_layout->enableUpdates();
-            self->m_layout->update();
+    g_dispatcher.deferEvent([this, self = static_self_cast<UIWidget>()] {
+        if (m_layout) {
+            m_layout->enableUpdates();
+            updateLayout();
         }
-        self->setProp(PropDisableUpdateTemporarily, false);
+        setProp(PropDisableUpdateTemporarily, false);
     });
 }
 void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)

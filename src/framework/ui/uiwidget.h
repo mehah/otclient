@@ -264,6 +264,7 @@ public:
     void fill(std::string_view hookedWidgetId);
     void centerIn(std::string_view hookedWidgetId);
     void breakAnchors();
+    void resetAnchors();
     void updateParentLayout();
     void updateLayout();
     void lock();
@@ -307,7 +308,7 @@ public:
     void setFloat(FloatType type) { m_floatType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setClear(ClearType type) { m_clearType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
-    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
     void setOverflow(OverflowType type);
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
     void setPositionType(PositionType t) { m_positionType = t;  scheduleHtmlTask(PropApplyAnchorAlignment); }
@@ -500,7 +501,7 @@ public:
     bool isPhantom() { return hasProp(PropPhantom); }
     bool isDraggable() { return hasProp(PropDraggable); }
     bool isFixedSize() { return hasProp(PropFixedSize); }
-    bool isClipping() { return hasProp(PropClipping); }
+    bool isClipping() { return hasProp(PropClipping) || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll); }
     bool isDestroyed() { return hasProp(PropDestroyed); }
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
     bool isIgnoreEvent() { return hasProp(PropIgnoreMouseEvent); }

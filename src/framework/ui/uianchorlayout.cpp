@@ -105,6 +105,26 @@ void UIAnchorGroup::addAnchor(const UIAnchorPtr& anchor)
     m_anchors.emplace_back(anchor);
 }
 
+bool UIAnchorGroup::addAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
+{
+    // duplicated anchors must be replaced
+    for (const auto& anchor : m_anchors) {
+        if (anchor->getAnchoredEdge() == anchoredEdge) {
+            if (anchor->getHookdWidgetId() == hookedWidgetId && anchor->getHookedEdge() == hookedEdge)
+                return false;
+
+            anchor->setHook(hookedEdge, hookedWidgetId);
+            return true;
+        }
+    }
+
+    if (hookedWidgetId == "none")
+        return false;
+
+    m_anchors.emplace_back(std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge));
+    return true;
+}
+
 void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge anchoredEdge,
                                const std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
 {
@@ -117,16 +137,16 @@ void UIAnchorLayout::addAnchor(const UIWidgetPtr& anchoredWidget, Fw::AnchorEdge
     if (!anchorGroup)
         anchorGroup = std::make_shared<UIAnchorGroup>();
 
-    anchorGroup->addAnchor(std::make_shared<UIAnchor>(anchoredEdge, hookedWidgetId, hookedEdge));
-
-    // layout must be updated because a new anchor got in
-    update();
+    if (anchorGroup->addAnchor(anchoredEdge, hookedWidgetId, hookedEdge)) {
+        // layout must be updated because a new anchor got in
+        update();
+    }
 }
 
 void UIAnchorLayout::removeAnchors(const UIWidgetPtr& anchoredWidget)
 {
-    m_anchorsGroups.erase(anchoredWidget);
-    update();
+    if (m_anchorsGroups.erase(anchoredWidget) > 0)
+        update();
 }
 
 bool UIAnchorLayout::hasAnchors(const UIWidgetPtr& anchoredWidget) const
