@@ -46,6 +46,14 @@ namespace {
         return d == DisplayType::Grid || d == DisplayType::InlineGrid;
     }
 
+    constexpr bool isTableContainer(DisplayType d) {
+        return d == DisplayType::Table
+            || d == DisplayType::TableRowGroup
+            || d == DisplayType::TableHeaderGroup
+            || d == DisplayType::TableFooterGroup
+            || d == DisplayType::TableRow;
+    }
+
     constexpr bool isTableBox(DisplayType d) noexcept {
         return isTableContainer(d)
             || d == DisplayType::TableCell
@@ -70,14 +78,6 @@ namespace {
             default:
                 return false;
         }
-    }
-
-    static inline bool isTableContainer(DisplayType d) {
-        return d == DisplayType::Table
-            || d == DisplayType::TableRowGroup
-            || d == DisplayType::TableHeaderGroup
-            || d == DisplayType::TableFooterGroup
-            || d == DisplayType::TableRow;
     }
 
     constexpr FloatType mapLogicalFloat(FloatType f) noexcept {
@@ -107,27 +107,6 @@ namespace {
         int lineWidthBefore = 0;
         UIWidget* tallestInlineWidget = nullptr;
     };
-
-    inline void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
-        w->addAnchor(Fw::AnchorLeft, toId, edge);
-    }
-
-    inline void setRightAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
-        w->addAnchor(Fw::AnchorRight, toId, edge);
-    }
-
-    inline void setTopAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
-        w->addAnchor(Fw::AnchorTop, toId, edge);
-    }
-
-    inline void setBottomAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
-        w->addAnchor(Fw::AnchorBottom, toId, edge);
-    }
-
-    inline void anchorToParentTopLeft(UIWidget* self) noexcept {
-        setLeftAnchor(self, "parent", Fw::AnchorLeft);
-        setTopAnchor(self, "parent", Fw::AnchorTop);
-    }
 
     inline UIWidget* chooseLowerWidget(UIWidget* a, UIWidget* b) noexcept {
         if (!a) return b;
@@ -240,7 +219,7 @@ namespace {
         if (!target)
             return false;
 
-        setTopAnchor(self, target->getId().c_str(), Fw::AnchorBottom);
+        self->addAnchor(Fw::AnchorTop, target->getId().c_str(), Fw::AnchorBottom);
         return true;
     }
 
@@ -255,81 +234,81 @@ namespace {
             && !isInlineLike(ctx.lastNormalWidget->getDisplay());
 
         if (ctx.lastFloatOnSameSide) {
-            if (isLeftF) setLeftAnchor(self, ctx.lastFloatOnSameSide->getId().c_str(), Fw::AnchorRight);
-            else         setRightAnchor(self, ctx.lastFloatOnSameSide->getId().c_str(), Fw::AnchorLeft);
-            if (!topCleared) setTopAnchor(self, ctx.lastFloatOnSameSide->getId().c_str(), Fw::AnchorTop);
+            if (isLeftF) self->addAnchor(Fw::AnchorLeft, ctx.lastFloatOnSameSide->getId().c_str(), Fw::AnchorRight);
+            else         self->addAnchor(Fw::AnchorRight, ctx.lastFloatOnSameSide->getId().c_str(), Fw::AnchorLeft);
+            if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.lastFloatOnSameSide->getId().c_str(), Fw::AnchorTop);
         } else if (!isLeftF && blockAfterLeftSameLine) {
-            setRightAnchor(self, "parent", Fw::AnchorRight);
+            self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
             if (!topCleared && ctx.lastNormalWidget)
-                setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
+                self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
         } else {
-            if (isLeftF) setLeftAnchor(self, "parent", Fw::AnchorLeft);
-            else         setRightAnchor(self, "parent", Fw::AnchorRight);
-            if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
+            if (isLeftF) self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            else         self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+            if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         }
     }
 
     static inline void applyFlex(UIWidget* self, const FlowContext& ctx, bool topCleared) {
         if (!ctx.lastNormalWidget) {
-            setLeftAnchor(self, "parent", Fw::AnchorLeft);
-            if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
+            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         } else {
-            setLeftAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
-            if (!topCleared) setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
+            self->addAnchor(Fw::AnchorLeft, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
+            if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
         }
     }
 
     static inline void applyGridOrTable(UIWidget* self, const FlowContext& ctx, bool topCleared) {
         if (!ctx.lastNormalWidget) {
-            anchorToParentTopLeft(self);
+            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft); self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         } else {
-            setLeftAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
-            if (!topCleared) setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
+            self->addAnchor(Fw::AnchorLeft, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
+            if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
         }
     }
 
     static inline void applyTableChild(UIWidget* self, const FlowContext& ctx, bool topCleared) {
-        setLeftAnchor(self, "parent", Fw::AnchorLeft);
-        setRightAnchor(self, "parent", Fw::AnchorRight);
+        self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
 
         if (!ctx.lastNormalWidget) {
-            setTopAnchor(self, "parent", Fw::AnchorTop);
+            self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         } else if (!topCleared) {
-            setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
+            self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
         }
     }
 
     static inline void applyTableRowGroupChild(UIWidget* self, const FlowContext& ctx, bool topCleared) {
-        setLeftAnchor(self, "parent", Fw::AnchorLeft);
-        setRightAnchor(self, "parent", Fw::AnchorRight);
+        self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
 
         if (!ctx.lastNormalWidget) {
-            setTopAnchor(self, "parent", Fw::AnchorTop);
+            self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         } else if (!topCleared) {
-            setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
+            self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
         }
     }
 
     static inline void applyTableRowChild(UIWidget* self, const FlowContext& ctx, bool topCleared) {
-        setTopAnchor(self, "parent", Fw::AnchorTop);
-        setBottomAnchor(self, "parent", Fw::AnchorBottom);
+        self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+        self->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
 
         if (!ctx.lastNormalWidget) {
-            setLeftAnchor(self, "parent", Fw::AnchorLeft);
+            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
         } else {
-            setLeftAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
+            self->addAnchor(Fw::AnchorLeft, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
         }
     }
 
     static inline void applyTableCaption(UIWidget* self, const FlowContext&, bool) {
-        setLeftAnchor(self, "parent", Fw::AnchorLeft);
-        setRightAnchor(self, "parent", Fw::AnchorRight);
-        setTopAnchor(self, "parent", Fw::AnchorTop);
+        self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+        self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
     }
 
     static inline void applyTableColumnLike(UIWidget* self) {
-        setLeftAnchor(self, "parent", Fw::AnchorLeft);
-        setTopAnchor(self, "parent", Fw::AnchorTop);
+        self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
     }
 
     void applyInline(UIWidget* self, const FlowContext& ctx, bool topCleared) {
@@ -338,10 +317,10 @@ namespace {
             if (innerW > 0) {
                 const int nextRun = ctx.lineWidthBefore + computeOuterWidth(self);
                 if (nextRun > innerW) {
-                    setLeftAnchor(self, "parent", Fw::AnchorLeft);
+                    self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
                     if (!topCleared) {
-                        if (ctx.lastNormalWidget) setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
-                        else                      setTopAnchor(self, "parent", Fw::AnchorTop);
+                        if (ctx.lastNormalWidget) self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
+                        else                      self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
                     }
                     return;
                 }
@@ -350,21 +329,21 @@ namespace {
 
         if (!ctx.lastNormalWidget) {
             if (ctx.hasLeftFloat) {
-                setLeftAnchor(self, ctx.lastLeftFloat->getId().c_str(), Fw::AnchorRight);
-                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
+                self->addAnchor(Fw::AnchorLeft, ctx.lastLeftFloat->getId().c_str(), Fw::AnchorRight);
+                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             } else if (ctx.hasRightFloat) {
-                setRightAnchor(self, "parent", Fw::AnchorRight);
-                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
+                self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             } else {
-                anchorToParentTopLeft(self);
+                self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft); self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             }
         } else {
             if (isInlineLike(ctx.lastNormalWidget->getDisplay())) {
-                setLeftAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
-                if (!topCleared) setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
+                self->addAnchor(Fw::AnchorLeft, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
+                if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
             } else {
-                setLeftAnchor(self, "parent", Fw::AnchorLeft);
-                if (!topCleared) setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
+                self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+                if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
             }
         }
     }
@@ -372,27 +351,27 @@ namespace {
     void applyBlock(UIWidget* self, const FlowContext& ctx, bool topCleared) {
         if (ctx.lastNormalWidget && isInlineLike(ctx.lastNormalWidget->getDisplay())) {
             if (auto* tallest = ctx.tallestInlineWidget) {
-                setLeftAnchor(self, "parent", Fw::AnchorLeft);
+                self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
                 if (!topCleared)
-                    setTopAnchor(self, tallest->getId().c_str(), Fw::AnchorBottom);
+                    self->addAnchor(Fw::AnchorTop, tallest->getId().c_str(), Fw::AnchorBottom);
                 return;
             }
         }
 
         if (!ctx.lastNormalWidget) {
             if (ctx.hasLeftFloat) {
-                setLeftAnchor(self, ctx.lastLeftFloat->getId().c_str(), Fw::AnchorRight);
-                setRightAnchor(self, "parent", Fw::AnchorRight);
-                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
+                self->addAnchor(Fw::AnchorLeft, ctx.lastLeftFloat->getId().c_str(), Fw::AnchorRight);
+                self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             } else if (ctx.hasRightFloat) {
-                setRightAnchor(self, "parent", Fw::AnchorRight);
-                if (!topCleared) setTopAnchor(self, "parent", Fw::AnchorTop);
+                self->addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
+                if (!topCleared) self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             } else {
-                anchorToParentTopLeft(self);
+                self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft); self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
             }
         } else {
-            setLeftAnchor(self, "parent", Fw::AnchorLeft);
-            if (!topCleared) setTopAnchor(self, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
+            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorBottom);
         }
     }
 
@@ -802,8 +781,8 @@ void UIWidget::applyAnchorAlignment() {
         return;
 
     if (m_htmlNode->getAttr("anchor") == "parent") {
-        setLeftAnchor(this, "parent", Fw::AnchorLeft);
-        setTopAnchor(this, "parent", Fw::AnchorTop);
+        addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+        addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         return;
     }
 
@@ -824,20 +803,20 @@ void UIWidget::applyAnchorAlignment() {
         if (isInline && m_parent->getTextAlign() == Fw::AlignCenter ||
             !isInline && m_parent->getJustifyItems() == JustifyItemsType::Center) {
             if (ctx.lastNormalWidget)
-                setLeftAnchor(this, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
+                addAnchor(Fw::AnchorLeft, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
             else
                 addAnchor(Fw::AnchorHorizontalCenter, "parent", Fw::AnchorHorizontalCenter);
         } else if (m_positionType != PositionType::Absolute) {
             if (isInline && m_parent->getTextAlign() == Fw::AlignLeft ||
                 !isInline && m_parent->getJustifyItems() == JustifyItemsType::Left) {
                 if (ctx.lastNormalWidget)
-                    setLeftAnchor(this, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
+                    addAnchor(Fw::AnchorLeft, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
                 else
                     addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
             } else if (isInline && m_parent->getTextAlign() == Fw::AlignRight ||
                     !isInline && m_parent->getJustifyItems() == JustifyItemsType::Right) {
                 if (ctx.lastNormalWidget)
-                    setRightAnchor(this, "next", Fw::AnchorLeft);
+                    addAnchor(Fw::AnchorRight, "next", Fw::AnchorLeft);
                 else
                     addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
             } else anchored = false;
