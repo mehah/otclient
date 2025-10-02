@@ -1430,12 +1430,10 @@ refreshRaceList = function(slot)
             item.preySlot = slot
             item.baseBackground = useAlternate and backgroundB or backgroundA
             item.checkedBackground = '#585858'
-            item.baseBorderColor = 'alpha'
             item.checkedBorderColor = '#6fb1e9ff'
             item.baseTextColor = '#c0c0c0'
             item.checkedTextColor = '#ffffff'
             item:setBackgroundColor(item.baseBackground)
-            item:setBorderColor(item.baseBorderColor)
             item:setColor(item.baseTextColor)
             item.onCheckChange = function(widget)
                 restoreRaceListItemBackground(widget)
