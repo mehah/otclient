@@ -57,6 +57,7 @@ protected:
 
     std::string m_shaderName;
     ItemPtr m_item;
+    uint32_t m_itemId{ 0 };
     bool m_virtual{ false };
     bool m_showId{ false };
     bool m_itemVisible{ true };
