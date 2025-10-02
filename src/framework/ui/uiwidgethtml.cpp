@@ -26,11 +26,11 @@
 #include <framework/html/htmlmanager.h>
 
 namespace {
-    static uint32_t SIZE_VERSION_COUNTER = 1;
-    static bool pendingFlush = false;
-    static std::vector<UIWidgetPtr> pendingWidgets;
+    inline uint32_t SIZE_VERSION_COUNTER = 1;
+    inline bool pendingFlush = false;
+    inline std::vector<UIWidgetPtr> pendingWidgets;
 
-    static inline bool isInlineLike(DisplayType d) {
+    constexpr bool isInlineLike(DisplayType d) noexcept {
         switch (d) {
             case DisplayType::Inline:
             case DisplayType::InlineBlock:
@@ -39,14 +39,14 @@ namespace {
             default: return false;
         }
     }
-    static inline bool isFlexContainer(DisplayType d) {
+    constexpr bool isFlexContainer(DisplayType d) noexcept {
         return d == DisplayType::Flex || d == DisplayType::InlineFlex;
     }
-    static inline bool isGridContainer(DisplayType d) {
+    constexpr bool isGridContainer(DisplayType d) noexcept {
         return d == DisplayType::Grid || d == DisplayType::InlineGrid;
     }
 
-    static inline bool isTableBox(DisplayType d) {
+    constexpr bool isTableBox(DisplayType d) noexcept {
         switch (d) {
             case DisplayType::Table:
             case DisplayType::TableRowGroup:
@@ -63,7 +63,7 @@ namespace {
         }
     }
 
-    static inline bool breakLine(DisplayType d) {
+    constexpr bool breakLine(DisplayType d) noexcept {
         switch (d) {
             case DisplayType::Block:
             case DisplayType::Flex:
@@ -89,12 +89,12 @@ namespace {
             || d == DisplayType::TableRow;
     }
 
-    static inline FloatType mapLogicalFloat(FloatType f) {
+    constexpr FloatType mapLogicalFloat(FloatType f) noexcept {
         if (f == FloatType::InlineStart) return FloatType::Left;
         if (f == FloatType::InlineEnd)   return FloatType::Right;
         return f;
     }
-    static inline ClearType mapLogicalClear(ClearType c) {
+    constexpr ClearType mapLogicalClear(ClearType c) noexcept {
         if (c == ClearType::InlineStart) return ClearType::Left;
         if (c == ClearType::InlineEnd)   return ClearType::Right;
         return c;
@@ -117,28 +117,28 @@ namespace {
         UIWidget* tallestInlineWidget = nullptr;
     };
 
-    static inline void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+    inline void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
         w->addAnchor(Fw::AnchorLeft, toId, edge);
     }
 
-    static inline void setRightAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+    inline void setRightAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
         w->addAnchor(Fw::AnchorRight, toId, edge);
     }
 
-    static inline void setTopAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+    inline void setTopAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
         w->addAnchor(Fw::AnchorTop, toId, edge);
     }
 
-    static inline void setBottomAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
+    inline void setBottomAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) noexcept {
         w->addAnchor(Fw::AnchorBottom, toId, edge);
     }
 
-    static inline void anchorToParentTopLeft(UIWidget* self) {
+    inline void anchorToParentTopLeft(UIWidget* self) noexcept {
         setLeftAnchor(self, "parent", Fw::AnchorLeft);
         setTopAnchor(self, "parent", Fw::AnchorTop);
     }
 
-    static inline UIWidget* chooseLowerWidget(UIWidget* a, UIWidget* b) {
+    inline UIWidget* chooseLowerWidget(UIWidget* a, UIWidget* b) noexcept {
         if (!a) return b;
         if (!b) return a;
         const auto ay = a->getRect().bottomLeft().y;
@@ -146,13 +146,13 @@ namespace {
         return (by > ay) ? b : a;
     }
 
-    static inline bool skipInFlow(UIWidget* c) {
+    inline bool skipInFlow(UIWidget* c) noexcept {
         return c->getDisplay() == DisplayType::None
             || !c->isAnchorable()
             || c->getPositionType() == PositionType::Absolute;
     }
 
-    static inline int computeOuterSize(UIWidget* w, bool horizontal) {
+    [[nodiscard]] inline int computeOuterSize(UIWidget* w, bool horizontal) noexcept {
         const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
         const int contentPrimary = horizontal ? textSz.width() : textSz.height();
         const int widgetPrimary = horizontal ? w->getWidth() : w->getHeight();
@@ -163,15 +163,15 @@ namespace {
             return base + w->getMarginLeft() + w->getMarginRight() + w->getPaddingLeft() + w->getPaddingRight();
         return base + w->getMarginTop() + w->getMarginBottom() + w->getPaddingTop() + w->getPaddingBottom();
     }
-    static inline int computeOuterWidth(UIWidget* w) { return computeOuterSize(w, true); }
-    static inline int computeOuterHeight(UIWidget* w) { return computeOuterSize(w, false); }
+    [[nodiscard]] inline int computeOuterWidth(UIWidget* w) noexcept { return computeOuterSize(w, true); }
+    [[nodiscard]] inline int computeOuterHeight(UIWidget* w) noexcept { return computeOuterSize(w, false); }
 
-    static inline int getParentInnerWidth(UIWidget* p) {
+    [[nodiscard]] inline int getParentInnerWidth(UIWidget* p) noexcept {
         const int pw = p->isOnHtml() ? p->getWidthHtml().valueCalculed : p->getWidth();
         return std::max<int>(0, pw - p->getPaddingLeft() - p->getPaddingRight());
     }
 
-    static inline Unit detectUnit(std::string_view s) {
+    [[nodiscard]] constexpr Unit detectUnit(std::string_view s) noexcept {
         if (s == "auto") return Unit::Auto;
         if (s == "fit-content") return Unit::FitContent;
         if (s.ends_with("px")) return Unit::Px;
@@ -180,7 +180,7 @@ namespace {
         return Unit::Px;
     }
 
-    static inline std::string_view numericPart(std::string_view s) {
+    [[nodiscard]] constexpr std::string_view numericPart(std::string_view s) noexcept {
         if (s.ends_with("px") || s.ends_with("em")) return s.substr(0, s.size() - 2);
         if (s.ends_with("%")) return s.substr(0, s.size() - 1);
         return s;
