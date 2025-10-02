@@ -237,11 +237,11 @@ namespace {
         else if (effClear == ClearType::Left) target = ctx.lastLeftFloat;
         else                                  target = ctx.lastRightFloat;
 
-        if (target) {
-            setTopAnchor(self, target->getId().c_str(), Fw::AnchorBottom);
-            return true;
-        }
-        return false;
+        if (!target)
+            return false;
+
+        setTopAnchor(self, target->getId().c_str(), Fw::AnchorBottom);
+        return true;
     }
 
     static inline void applyFloat(UIWidget* self, const FlowContext& ctx, FloatType effFloat, bool topCleared) {
