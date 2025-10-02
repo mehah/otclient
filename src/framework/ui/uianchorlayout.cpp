@@ -108,12 +108,12 @@ void UIAnchorGroup::addAnchor(const UIAnchorPtr& anchor)
 bool UIAnchorGroup::addAnchor(Fw::AnchorEdge anchoredEdge, std::string_view hookedWidgetId, Fw::AnchorEdge hookedEdge)
 {
     // duplicated anchors must be replaced
-    for (auto& other : m_anchors) {
-        if (other->getAnchoredEdge() == anchoredEdge) {
-            if (other->getHookdWidgetId() == hookedWidgetId && other->getHookedEdge() == hookedEdge)
+    for (const auto& anchor : m_anchors) {
+        if (anchor->getAnchoredEdge() == anchoredEdge) {
+            if (anchor->getHookdWidgetId() == hookedWidgetId && anchor->getHookedEdge() == hookedEdge)
                 return false;
 
-            other->setHook(anchoredEdge, hookedWidgetId);
+            anchor->setHook(hookedEdge, hookedWidgetId);
             return true;
         }
     }
