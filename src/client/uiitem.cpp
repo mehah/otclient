@@ -104,6 +104,8 @@ void UIItem::setItemSubType(const int subType)
 void UIItem::setItem(const ItemPtr& item)
 {
     m_item = item;
+    if (item)
+        m_itemId = item->getClientId();
 
     callLuaField("onItemChange");
 }
