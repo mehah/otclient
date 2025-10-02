@@ -901,7 +901,11 @@ function refreshRerollButtonState(slot)
 end
 
 local function showListRerollConfirmation(slot)
-    local price = getDisplayedRerollPrice(slot) or 0
+    local price = getDisplayedRerollPrice(slot)
+
+    if price == nil then
+        price = rerollPrice or 0
+    end
 
     if price <= 0 then
         g_game.preyAction(slot, PREY_ACTION_LISTREROLL, 0)
