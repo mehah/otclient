@@ -117,40 +117,20 @@ namespace {
         UIWidget* tallestInlineWidget = nullptr;
     };
 
-    static inline void setLeftAnchor(UIWidget* w, const std::string& toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorLeft);
+    static inline void setLeftAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->addAnchor(Fw::AnchorLeft, toId, edge);
     }
-    static inline void setLeftAnchor(UIWidget* w, const char* toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorLeft);
-        w->addAnchor(Fw::AnchorLeft, std::string(toId), edge);
-    }
 
-    static inline void setRightAnchor(UIWidget* w, const std::string& toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorRight);
+    static inline void setRightAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->addAnchor(Fw::AnchorRight, toId, edge);
     }
-    static inline void setRightAnchor(UIWidget* w, const char* toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorRight);
-        w->addAnchor(Fw::AnchorRight, std::string(toId), edge);
-    }
 
-    static inline void setTopAnchor(UIWidget* w, const std::string& toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorTop);
+    static inline void setTopAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->addAnchor(Fw::AnchorTop, toId, edge);
     }
-    static inline void setTopAnchor(UIWidget* w, const char* toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorTop);
-        w->addAnchor(Fw::AnchorTop, std::string(toId), edge);
-    }
 
-    static inline void setBottomAnchor(UIWidget* w, const std::string& toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorBottom);
+    static inline void setBottomAnchor(UIWidget* w, std::string_view toId, Fw::AnchorEdge edge) {
         w->addAnchor(Fw::AnchorBottom, toId, edge);
-    }
-    static inline void setBottomAnchor(UIWidget* w, const char* toId, Fw::AnchorEdge edge) {
-        w->removeAnchor(Fw::AnchorBottom);
-        w->addAnchor(Fw::AnchorBottom, std::string(toId), edge);
     }
 
     static inline void anchorToParentTopLeft(UIWidget* self) {
@@ -821,7 +801,7 @@ void UIWidget::applyAnchorAlignment() {
     if (!isOnHtml() || !isAnchorable())
         return;
 
-    breakAnchors();
+    resetAnchors();
 
     if (m_displayType == DisplayType::None) {
         return;

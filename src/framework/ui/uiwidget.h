@@ -264,6 +264,7 @@ public:
     void fill(std::string_view hookedWidgetId);
     void centerIn(std::string_view hookedWidgetId);
     void breakAnchors();
+    void resetAnchors();
     void updateParentLayout();
     void updateLayout();
     void lock();
