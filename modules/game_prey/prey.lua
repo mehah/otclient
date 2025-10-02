@@ -848,17 +848,29 @@ local function getDisplayedRerollPrice(slot)
         return rerollPrice
     end
 
-    local activePrice = prey.active and prey.active:isVisible() and getRerollPriceFromPanel(prey.active)
-    if activePrice ~= nil then
-        return activePrice
+    local function getPrice(panel, requireVisibility)
+        if not panel then
+            return nil
+        end
+
+        if requireVisibility and panel.isVisible and not panel:isVisible() then
+            return nil
+        end
+
+        return getRerollPriceFromPanel(panel)
     end
 
-    local inactivePrice = prey.inactive and prey.inactive:isVisible() and getRerollPriceFromPanel(prey.inactive)
-    if inactivePrice ~= nil then
-        return inactivePrice
+    local price = getPrice(prey.active, true) or getPrice(prey.inactive, true)
+    if price ~= nil then
+        return price
     end
 
-    return getRerollPriceFromPanel(prey.active) or getRerollPriceFromPanel(prey.inactive) or rerollPrice
+    price = getPrice(prey.active, false) or getPrice(prey.inactive, false)
+    if price ~= nil then
+        return price
+    end
+
+    return rerollPrice
 end
 
 function refreshRerollButtonState(slot)
