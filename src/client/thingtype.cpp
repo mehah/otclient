@@ -500,7 +500,7 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
         m_size = { width, height };
         sizes.emplace_back(m_size);
         if (width > 1 || height > 1) {
-            m_realSize = fin->getU8();
+            m_realSize = std::max<int>(m_realSize, fin->getU8());
         }
 
         m_layers = fin->getU8();

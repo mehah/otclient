@@ -120,7 +120,7 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
     if (!canDraw())
         return;
 
-    uint8_t frameSize = getExactSize();
+    uint8_t frameSize = getRealSize();
     if (size > 0)
         frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
 
