@@ -25,14 +25,10 @@ if not BossCooldown then
 	BossCooldown = {
 		launchTime = 0,
 		lastTick = 0,
-
 		sort = 0,
 		search = '',
-
 		cooldown = {},
 		widgets = {},
-
-		-- private
 		window = nil,
 	}
 	BossCooldown.__index = BossCooldown
@@ -56,7 +52,6 @@ function BossCooldown.create()
 		return
 	end
 
-	-- Hide buttons we don't want
 	local toggleFilterButton = BossCooldown.window:recursiveGetChildById('toggleFilterButton')
 	if toggleFilterButton then
 		toggleFilterButton:setVisible(false)
@@ -67,7 +62,6 @@ function BossCooldown.create()
 		newWindowButton:setVisible(false)
 	end
 
-	-- Position contextMenuButton where toggleFilterButton was (to the left of minimize button)
 	local contextMenuButton = BossCooldown.window:recursiveGetChildById('contextMenuButton')
 	local minimizeButton = BossCooldown.window:recursiveGetChildById('minimizeButton')
 	
@@ -76,17 +70,15 @@ function BossCooldown.create()
 		contextMenuButton:breakAnchors()
 		contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
 		contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
-		contextMenuButton:setMarginRight(7)  -- Same margin as toggleFilterButton had
+		contextMenuButton:setMarginRight(7)
 		contextMenuButton:setMarginTop(0)
 		
-		-- Set up contextMenuButton click handler to show our menu
 		contextMenuButton.onClick = function(widget, mousePos)
 			local pos = mousePos or g_window.getMousePosition()
 			return onBossExtra(pos)
 		end
 	end
 
-	-- Position lockButton to the left of contextMenuButton
 	local lockButton = BossCooldown.window:recursiveGetChildById('lockButton')
 	
 	if lockButton and contextMenuButton then
@@ -94,7 +86,7 @@ function BossCooldown.create()
 		lockButton:breakAnchors()
 		lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
 		lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
-		lockButton:setMarginRight(2)  -- Same margin as in miniwindow style
+		lockButton:setMarginRight(2)
 		lockButton:setMarginTop(0)
 	end
 
@@ -219,33 +211,18 @@ function BossCooldown:updateWindow()
 
 	local c = 1
 	for _, info in ipairs(BossCooldown.cooldown) do
-		-- Debug: Log boss information with more detail
-		print("Creating boss widget for:")
-		print("  - name:", info.name or "nil")
-		print("  - bossId:", info.bossId or "nil") 
-		print("  - cooldown:", info.cooldown or "nil")
-		print("  - outfit:", info.outfit and "present" or "missing")
-		
 		local widget = g_ui.createWidget('BossInfo', contentsPanel.bosses)
 		
-		-- Get child elements properly
 		local creatureWidget = widget:recursiveGetChildById('creature')
 		local bossNameLabel = widget:recursiveGetChildById('bossName')
 		local bossCooldownLabel = widget:recursiveGetChildById('bossNCooldown')
 		
-		-- Debug: Check if child widgets were found
-		print("Child widgets found - creature:", creatureWidget and "yes" or "no", 
-		      "bossName:", bossNameLabel and "yes" or "no", 
-		      "bossCooldown:", bossCooldownLabel and "yes" or "no")
-		
-		-- Handle outfit data
 		if creatureWidget then
 			if info.outfit then
 				creatureWidget:setOutfit(info.outfit)
 			else
-				-- Fallback outfit if no outfit data is provided
 				local fallbackOutfit = {
-					type = 130, -- Default human outfit
+					type = 130,
 					head = 0,
 					body = 0,
 					legs = 0,
@@ -256,24 +233,20 @@ function BossCooldown:updateWindow()
 			end
 		end
 		
-		-- Set boss name
 		if bossNameLabel then
 			local bossName = info.name
 			
-			-- If name is empty or nil, use fallback
 			if not bossName or bossName == "" or bossName:trim() == "" then
 				bossName = "Boss " .. (info.bossId or "Unknown")
 			end
 			
 			local displayName = short_text(string.capitalize(bossName), 13)
-			print("Setting boss name to:", displayName)
 			bossNameLabel:setText(displayName)
 			widget:setTooltip(string.capitalize(bossName))
 		else
 			widget:setTooltip("Unknown Boss")
 		end
 		widget.onClick = function()
-			-- Open the cyclopedia at the Bosstiary tab
 			if modules.game_cyclopedia then
 				modules.game_cyclopedia.show("bosstiary")
 			end
@@ -305,7 +278,6 @@ function BossCooldown:updateWindow()
 		end
 
 		-- TODO: Implement tracker cooldown functionality when game_trackers module is available
-		-- modules.game_trackers.BossTracker.checkTrackerCooldown(info.name, info.cooldown)
 
 		widget.tick = resttime
 		widget.name = info.name
@@ -319,16 +291,8 @@ end
 
 function BossCooldown:setupCooldown(cooldown)
 	BossCooldown.cooldown = {}
-	print("BossCooldown:setupCooldown called with", #cooldown, "entries")
 	
 	for i, cooldown in pairs(cooldown) do
-		print("Processing cooldown entry", i, ":")
-		print("  [1] bossId:", cooldown[1])
-		print("  [2] cooldown:", cooldown[2])
-		print("  [3] name:", cooldown[3])
-		print("  [4] outfit:", cooldown[4] and type(cooldown[4]) or "nil")
-		
-		-- Get race data from g_things using the boss race ID
 		local raceData = g_things.getRaceData(cooldown[1])
 		
 		local bossEntry = {
@@ -337,10 +301,6 @@ function BossCooldown:setupCooldown(cooldown)
 			name = raceData and raceData.name or "", 
 			outfit = raceData and raceData.outfit or nil
 		}
-		
-		print("Race data found for ID", cooldown[1], ":")
-		print("  - name:", bossEntry.name)
-		print("  - outfit:", bossEntry.outfit and "present" or "missing")
 		
 		BossCooldown.cooldown[#BossCooldown.cooldown + 1] = bossEntry
 	end
@@ -395,14 +355,11 @@ function toggleBossCDFocus(visible)
 	elseif widget then
 		widget:setPhantom(false)
 		widget.onClick = function() 
-			-- m_interface.toggleInternalFocus() -- Function doesn't exist, commenting out
 			toggleBossCDFocus(not visible) 
 		end
 	end
-	-- m_interface.toggleFocus(visible, "bosscooldown") -- Function doesn't exist, commenting out
+
 	if visible then
-		BossCooldown.window:setBorderWidth(2)
-		BossCooldown.window:setBorderColor('white')
 		local text = BossCooldown.window.contentsPanel.searchText
 		text:focus()
 	else
