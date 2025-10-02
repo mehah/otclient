@@ -18,6 +18,7 @@ ui = {
     panels = {}
 }
 forgeController = Controller:new()
+local forgeButton
 
 local function loadTabFragment(tabName)
     local fragment = io.content(('modules/%s/tab/%s/%s.html'):format(forgeController.name, tabName, tabName))
@@ -48,7 +49,8 @@ local function hideAllPanels()
     end
 end
 
-function forgeController:onInit()
+local function toggle(self)
+    g_game.forgeRequest()
     forgeController:loadHtml('game_forge.html')
     g_ui.importStyle("otui/style.otui")
     self.modeFusion, self.modeTransfer = false, false
@@ -68,6 +70,13 @@ function forgeController:onInit()
     end
 
     SelectWindow("fusionMenu")
+end
+
+function forgeController:onInit()
+    if not forgeButton then
+        forgeButton = modules.game_mainpanel.addToggleButton('forgeButton', tr('Open Exaltation Forge'),
+            '/images/options/button-exaltation-forge.png', function() toggle(self) end)
+    end
 end
 
 function SelectWindow(type, isBackButtonPress)

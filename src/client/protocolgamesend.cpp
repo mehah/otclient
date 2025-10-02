@@ -1196,7 +1196,7 @@ void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, c
     send(msg);
 }
 
-void ProtocolGame::sendRequestStoreHome() 
+void ProtocolGame::sendRequestStoreHome()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);
@@ -1367,6 +1367,12 @@ void ProtocolGame::sendPreyAction(const uint8_t slot, const uint8_t actionType, 
 
 void ProtocolGame::sendPreyRequest()
 {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}
+
+void ProtocolGame::sendForgeRequest(Otc::ForgeAction_t actionType) {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientPreyRequest);
     send(msg);

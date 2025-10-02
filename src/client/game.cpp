@@ -1768,6 +1768,13 @@ void Game::preyRequest()
     m_protocolGame->sendPreyRequest();
 }
 
+void Game::forgeRequest()
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendForgeRequest();
+}
+
 void Game::applyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
 {
     if (!canPerformGameAction())
