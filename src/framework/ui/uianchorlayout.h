@@ -65,6 +65,7 @@ public:
     const UIAnchorList& getAnchors() { return m_anchors; }
     bool isUpdated() const { return m_updated; }
     void setUpdated(const bool updated) { m_updated = updated; }
+    void reset() { m_anchors.clear(); }
 
 private:
     UIAnchorList m_anchors;
@@ -89,7 +90,7 @@ public:
 
     bool isUIAnchorLayout() override { return true; }
 
-    auto getAnchorsGroup() const { return m_anchorsGroups; }
+    const auto& getAnchorsGroup() const { return m_anchorsGroups; }
 
 protected:
     bool internalUpdate() override;

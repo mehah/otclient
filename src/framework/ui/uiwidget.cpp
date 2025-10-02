@@ -806,6 +806,20 @@ void UIWidget::breakAnchors()
         anchorLayout->removeAnchors(static_self_cast<UIWidget>());
 }
 
+void UIWidget::resetAnchors()
+{
+    if (isDestroyed())
+        return;
+
+    if (const auto& anchorLayout = getAnchoredLayout()) {
+        auto it = anchorLayout->getAnchorsGroup().find(static_self_cast<UIWidget>());
+        if (it == anchorLayout->getAnchorsGroup().end())
+            return;
+
+        it->second->reset();
+    }
+}
+
 void UIWidget::updateParentLayout()
 {
     if (isDestroyed())
@@ -1375,11 +1389,9 @@ UIAnchorLayoutPtr UIWidget::getAnchoredLayout()
 
 UIAnchorList UIWidget::getAnchorsGroup() {
     if (const auto& layout = getAnchoredLayout()) {
-        const auto& self = static_self_cast<UIWidget>();
-        if (layout->hasAnchors(self)) {
-            const auto& anchors = layout->getAnchorsGroup()[self]->getAnchors();
-            return anchors;
-        }
+        auto it = layout->getAnchorsGroup().find(static_self_cast<UIWidget>());
+        if (it != layout->getAnchorsGroup().end())
+            return it->second->getAnchors();
     }
 
     return {};
@@ -2138,12 +2150,12 @@ void UIWidget::disableUpdateTemporarily() {
 
     setProp(PropDisableUpdateTemporarily, true);
     m_layout->disableUpdates();
-    g_dispatcher.deferEvent([self = static_self_cast<UIWidget>()] {
-        if (self->m_layout) {
-            self->m_layout->enableUpdates();
-            self->m_layout->update();
+    g_dispatcher.deferEvent([this, self = static_self_cast<UIWidget>()] {
+        if (m_layout) {
+            m_layout->enableUpdates();
+            updateLayout();
         }
-        self->setProp(PropDisableUpdateTemporarily, false);
+        setProp(PropDisableUpdateTemporarily, false);
     });
 }
 void UIWidget::addOnDestroyCallback(const std::string& id, const std::function<void()>&& callback)
