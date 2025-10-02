@@ -38,6 +38,7 @@ local setRaceSelection
 local updateRaceSelectionDisplay
 local restoreRaceListItemBackground
 local updatePickSpecificPreyButton
+local refreshRerollButtonState
 
 function bonusDescription(bonusType, bonusValue, bonusGrade)
     if bonusType == PREY_BONUS_DAMAGE_BOOST then
@@ -471,18 +472,24 @@ end
 function onPreyRerollPrice(price)
     rerollPrice = price
     local t = { 'slot1', 'slot2', 'slot3' }
-    for i, slot in pairs(t) do
+    for index, slot in ipairs(t) do
         local panel = preyWindow[slot]
-        for j, state in pairs({ panel.active, panel.inactive }) do
-            local price = state.reroll.price.text
-            local progressBar = state.reroll.button.time
-            if progressBar:getText() ~= 'Free' then
-                price:setText(comma_value(rerollPrice))
-            else
-                price:setText('0')
-                progressBar:setPercent(0)
+        if panel then
+            for j, state in pairs({ panel.active, panel.inactive }) do
+                if state and state.reroll and state.reroll.price and state.reroll.button then
+                    local priceWidget = state.reroll.price.text
+                    local progressBar = state.reroll.button.time
+                    if progressBar:getText() ~= 'Free' then
+                        priceWidget:setText(comma_value(rerollPrice))
+                    else
+                        priceWidget:setText('0')
+                        progressBar:setPercent(0)
+                    end
+                end
             end
         end
+
+        refreshRerollButtonState(index - 1)
     end
 end
 
@@ -495,16 +502,20 @@ function setTimeUntilFreeReroll(slot, timeUntilFreeReroll) -- minutes
     timeUntilFreeReroll = timeUntilFreeReroll > 720000 and 0 or timeUntilFreeReroll
     local desc = timeleftTranslation(timeUntilFreeReroll)
     for i, panel in pairs({ prey.active, prey.inactive }) do
-        local reroll = panel.reroll.button.time
-        reroll:setPercent(percent)
-        reroll:setText(desc)
-        local price = panel.reroll.price.text
-        if timeUntilFreeReroll > 0 then
-            price:setText(comma_value(rerollPrice))
-        else
-            price:setText('Free')
+        if panel and panel.reroll and panel.reroll.button and panel.reroll.price then
+            local reroll = panel.reroll.button.time
+            reroll:setPercent(percent)
+            reroll:setText(desc)
+            local price = panel.reroll.price.text
+            if timeUntilFreeReroll > 0 then
+                price:setText(comma_value(rerollPrice))
+            else
+                price:setText('Free')
+            end
         end
     end
+
+    refreshRerollButtonState(slot)
 end
 
 function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
@@ -557,11 +568,12 @@ function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
     raceEntriesBySlot[slot] = nil
     selectedRaceEntryBySlot[slot] = nil
     selectedRaceWidgetBySlot[slot] = nil
-    local rerollButton = prey.inactive.reroll.button.rerollButton
-    rerollButton:setImageSource('/images/game/prey/prey_reroll_blocked')
-    rerollButton:disable()
-    rerollButton.onClick = function()
-        showListRerollConfirmation(slot)
+    local rerollButton = prey.inactive.reroll and prey.inactive.reroll.button and
+        prey.inactive.reroll.button.rerollButton
+    if rerollButton then
+        rerollButton.onClick = function()
+            showListRerollConfirmation(slot)
+        end
     end
 
     setPickSpecificPreyBonus(slot)
@@ -803,44 +815,109 @@ local function getPlayerTotalGold()
     return (bankGold or 0) + (inventoryGold or 0)
 end
 
+local function getRerollPriceFromPanel(panel)
+    if not panel or not panel.reroll or not panel.reroll.price then
+        return nil
+    end
+
+    local priceWidget = panel.reroll.price.text
+    if not priceWidget then
+        return nil
+    end
+
+    local text = priceWidget:getText()
+    if not text or text == '' then
+        return nil
+    end
+
+    if text:lower() == 'free' then
+        return 0
+    end
+
+    local digits = text:gsub('[^%d]', '')
+    if digits == '' then
+        return nil
+    end
+
+    return tonumber(digits)
+end
+
 local function getDisplayedRerollPrice(slot)
     local prey = getPreySlotWidget(slot)
     if not prey then
         return rerollPrice
     end
 
-    local function parsePanel(panel)
-        if not panel or not panel:isVisible() or not panel.reroll or not panel.reroll.price then
+    local function getPrice(panel, requireVisibility)
+        if not panel then
             return nil
         end
 
-        local priceWidget = panel.reroll.price.text
-        if not priceWidget then
+        if requireVisibility and panel.isVisible and not panel:isVisible() then
             return nil
         end
 
-        local text = priceWidget:getText()
-        if not text or text == '' then
-            return nil
-        end
-
-        if text:lower() == 'free' then
-            return 0
-        end
-
-        local digits = text:gsub('[^%d]', '')
-        if digits == '' then
-            return nil
-        end
-
-        return tonumber(digits)
+        return getRerollPriceFromPanel(panel)
     end
 
-    return parsePanel(prey.active) or parsePanel(prey.inactive) or rerollPrice
+    local price = getPrice(prey.active, true) or getPrice(prey.inactive, true)
+    if price ~= nil then
+        return price
+    end
+
+    price = getPrice(prey.active, false) or getPrice(prey.inactive, false)
+    if price ~= nil then
+        return price
+    end
+
+    return rerollPrice
+end
+
+function refreshRerollButtonState(slot)
+    local prey = getPreySlotWidget(slot)
+    if not prey then
+        return
+    end
+
+    local totalGold = getPlayerTotalGold()
+
+    local function updatePanel(panel)
+        if not panel or not panel.reroll or not panel.reroll.button then
+            return
+        end
+
+        local button = panel.reroll.button.rerollButton
+        if not button then
+            return
+        end
+
+        local price = getRerollPriceFromPanel(panel)
+        if price == nil then
+            price = rerollPrice
+        end
+
+        local isFree = price == nil or price <= 0
+        local canAfford = isFree or totalGold >= price
+
+        if canAfford then
+            button:setImageSource('/images/game/prey/prey_reroll')
+            button:enable()
+        else
+            button:setImageSource('/images/game/prey/prey_reroll_blocked')
+            button:disable()
+        end
+    end
+
+    updatePanel(prey.active)
+    updatePanel(prey.inactive)
 end
 
 local function showListRerollConfirmation(slot)
-    local price = getDisplayedRerollPrice(slot) or 0
+    local price = getDisplayedRerollPrice(slot)
+
+    if price == nil then
+        price = rerollPrice or 0
+    end
 
     if price <= 0 then
         g_game.preyAction(slot, PREY_ACTION_LISTREROLL, 0)
@@ -1613,9 +1690,12 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
     selectedRaceWidgetBySlot[slot] = nil
     setPickSpecificPreyBonus(slot)
     prey.title:setText(tr('Select monster'))
-    local rerollButton = prey.inactive.reroll.button.rerollButton
-    rerollButton.onClick = function()
-        showListRerollConfirmation(slot)
+    local rerollButton = prey.inactive.reroll and prey.inactive.reroll.button and
+        prey.inactive.reroll.button.rerollButton
+    if rerollButton then
+        rerollButton.onClick = function()
+            showListRerollConfirmation(slot)
+        end
     end
     local list = prey.inactive.list
     list:destroyChildren()
@@ -1672,9 +1752,12 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
     selectedRaceWidgetBySlot[slot] = nil
     setPickSpecificPreyBonus(slot)
     prey.title:setText(tr('Select monster'))
-    local rerollButton = prey.inactive.reroll.button.rerollButton
-    rerollButton.onClick = function()
-        showListRerollConfirmation(slot)
+    local rerollButton = prey.inactive.reroll and prey.inactive.reroll.button and
+        prey.inactive.reroll.button.rerollButton
+    if rerollButton then
+        rerollButton.onClick = function()
+            showListRerollConfirmation(slot)
+        end
     end
     local list = prey.inactive.list
     list:destroyChildren()
@@ -1789,6 +1872,12 @@ function Prey.onResourcesBalanceChange(balance, oldBalance, type)
     if player then
         preyWindow.wildCards:setText(tostring(player:getResourceBalance(ResourceTypes.PREY_WILDCARDS)))
         preyWindow.gold:setText(comma_value(player:getTotalMoney()))
+    end
+
+    if type == ResourceTypes.BANK_BALANCE or type == ResourceTypes.GOLD_EQUIPPED then
+        for slot = 0, 2 do
+            refreshRerollButtonState(slot)
+        end
     end
 end
 
