@@ -37,6 +37,7 @@ local refreshRaceList
 local setRaceSelection
 local updateRaceSelectionDisplay
 local restoreRaceListItemBackground
+local setWidgetTreePhantom
 local updatePickSpecificPreyButton
 local refreshRerollButtonState
 
@@ -985,6 +986,18 @@ function resetPreyPreviewWidget(preview)
     end
 end
 
+setWidgetTreePhantom = function(widget, phantom)
+    if not widget or widget:isDestroyed() then
+        return
+    end
+
+    widget:setPhantom(phantom)
+
+    for _, child in pairs(widget:getChildren()) do
+        setWidgetTreePhantom(child, phantom)
+    end
+end
+
 function setInactiveMode(slot, showFullList, prey)
     prey = prey or getPreySlotWidget(slot)
     if not prey or not prey.inactive then
@@ -995,6 +1008,7 @@ function setInactiveMode(slot, showFullList, prey)
 
     if inactive.list then
         inactive.list:setVisible(not showFullList)
+        setWidgetTreePhantom(inactive.list, showFullList)
     end
 
     if inactive.fullList then
