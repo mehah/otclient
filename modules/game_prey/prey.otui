@@ -607,6 +607,7 @@ PreyCreatureListItem < UICheckBox
   text-offset: 4 0
   size-policy-horizontal: expanding
   @onClick: modules.game_prey.onPreyRaceListItemClicked(self)
+  @onHoverChange: modules.game_prey.onPreyRaceListItemHoverChange(self)
 
   $checked on:
     background-color: #1c4d75ff
