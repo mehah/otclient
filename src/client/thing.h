@@ -233,8 +233,10 @@ protected:
         if (!hasAttachedEffects()) return;
 
         for (const auto& effect : m_data->attachedEffects) {
-            if (effect->getThingType() && (effect->getThingType()->isCreature() || effect->getThingType()->isMissile()))
-                effect->m_direction = dir;
+            if (!effect->getThingType())
+                continue;
+            // Allow attached effects to follow direction for any thing type (creature, missile, item overlays, etc.)
+            effect->m_direction = dir;
         }
     }
 
