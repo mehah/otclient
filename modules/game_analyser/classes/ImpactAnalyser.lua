@@ -588,26 +588,26 @@ function ImpactAnalyser:toggleSessionMode()
 	local horizontalGraphDPS = ImpactAnalyser.window.contentsPanel.graphHorizontal
 	local horizontalGraphHPS = ImpactAnalyser.window.contentsPanel.graphHPSHorizontal
 	
-	-- Clear and rebuild graphs with appropriate data
-	ImpactAnalyser.window.contentsPanel.graphDpsPanel:clear()
-	ImpactAnalyser.window.contentsPanel.graphHealPanel:clear()
-	
-	if ImpactAnalyser.window.contentsPanel.graphDpsPanel:getGraphsCount() == 0 then
-		ImpactAnalyser.window.contentsPanel.graphDpsPanel:createGraph()
-		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setLineWidth(1, 1)
-		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setLineColor(1, "#f75f5f")
-	end
-	
-	if ImpactAnalyser.window.contentsPanel.graphHealPanel:getGraphsCount() == 0 then
-		ImpactAnalyser.window.contentsPanel.graphHealPanel:createGraph()
-		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineWidth(1, 1)
-		ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineColor(1, "#f75f5f")
-	end
-	
 	if ImpactAnalyser.sessionMode then
 		-- Switch to session mode: change images and show minute-by-minute data
 		horizontalGraphDPS:setImageSource('/images/game/analyzer/graphHorizontal')
 		horizontalGraphHPS:setImageSource('/images/game/analyzer/graphHorizontal')
+		
+		-- Clear and rebuild graphs with session data
+		ImpactAnalyser.window.contentsPanel.graphDpsPanel:clear()
+		ImpactAnalyser.window.contentsPanel.graphHealPanel:clear()
+		
+		if ImpactAnalyser.window.contentsPanel.graphDpsPanel:getGraphsCount() == 0 then
+			ImpactAnalyser.window.contentsPanel.graphDpsPanel:createGraph()
+			ImpactAnalyser.window.contentsPanel.graphDpsPanel:setLineWidth(1, 1)
+			ImpactAnalyser.window.contentsPanel.graphDpsPanel:setLineColor(1, "#f75f5f")
+		end
+		
+		if ImpactAnalyser.window.contentsPanel.graphHealPanel:getGraphsCount() == 0 then
+			ImpactAnalyser.window.contentsPanel.graphHealPanel:createGraph()
+			ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineWidth(1, 1)
+			ImpactAnalyser.window.contentsPanel.graphHealPanel:setLineColor(1, "#f75f5f")
+		end
 		
 		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setCapacity(3600) -- 60 minutes worth of data points
 		ImpactAnalyser.window.contentsPanel.graphHealPanel:setCapacity(3600) -- 60 minutes worth of data points
@@ -632,18 +632,15 @@ function ImpactAnalyser:toggleSessionMode()
 			ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, currentHPS)
 		end
 	else
-		-- Switch back to normal mode: restore original images and show current DPS/HPS
+		-- Switch back to normal mode: restore original images and continue with existing graphs
 		horizontalGraphDPS:setImageSource('/images/game/analyzer/graphDpsHorizontal')
 		horizontalGraphHPS:setImageSource('/images/game/analyzer/graphDpsHorizontal')
 		
 		ImpactAnalyser.window.contentsPanel.graphDpsPanel:setCapacity(400) -- Default capacity
 		ImpactAnalyser.window.contentsPanel.graphHealPanel:setCapacity(400) -- Default capacity
 		
-		-- Add current DPS/HPS values
-		local curDPS = valueInSeconds(ImpactAnalyser.damageTicks) or 0
-		local curHPS = valueInSeconds(ImpactAnalyser.healingTicks) or 0
-		ImpactAnalyser.window.contentsPanel.graphDpsPanel:addValue(1, curDPS)
-		ImpactAnalyser.window.contentsPanel.graphHealPanel:addValue(1, curHPS)
+		-- Don't clear the graphs - let them continue from where they were before session mode
+		-- The updateWindow() function will continue adding values automatically
 	end
 end
 
