@@ -1278,9 +1278,6 @@ restoreRaceListItemBackground = function(widget)
         if widget.checkedBackground then
             widget:setBackgroundColor(widget.checkedBackground)
         end
-        if widget.checkedBorderColor then
-            widget:setBorderColor(widget.checkedBorderColor)
-        end
         if widget.checkedTextColor then
             widget:setColor(widget.checkedTextColor)
         end
@@ -1289,9 +1286,6 @@ restoreRaceListItemBackground = function(widget)
 
     if widget.baseBackground then
         widget:setBackgroundColor(widget.baseBackground)
-    end
-    if widget.baseBorderColor then
-        widget:setBorderColor(widget.baseBorderColor)
     end
     if widget.baseTextColor then
         widget:setColor(widget.baseTextColor)
@@ -1430,7 +1424,6 @@ refreshRaceList = function(slot)
             item.preySlot = slot
             item.baseBackground = useAlternate and backgroundB or backgroundA
             item.checkedBackground = '#585858'
-            item.checkedBorderColor = '#6fb1e9ff'
             item.baseTextColor = '#c0c0c0'
             item.checkedTextColor = '#ffffff'
             item:setBackgroundColor(item.baseBackground)
