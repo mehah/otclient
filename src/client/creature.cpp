@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -122,23 +122,22 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
 
     const int baseSprite = g_gameConfig.getSpriteSize();
     const int nativeSize = std::max<int>(getRealSize(), getExactSize());
-    const int fbSize = std::max<int>(nativeSize, 2 * baseSprite);
+    const int tileCount = 2;
+    const int fbSize = tileCount * baseSprite;
 
     g_drawPool.bindFrameBuffer(fbSize); {
-        Point p;
-        if (center) {
-            const int off = (fbSize - nativeSize) / 2 + (nativeSize - baseSprite);
-            p = Point(off) + getDisplacement();
-        } else {
-            p = Point(nativeSize - baseSprite) + getDisplacement();
-        }
+        Point p = center
+            ? Point((fbSize - nativeSize) / 2 + (nativeSize - baseSprite)) + getDisplacement()
+            : Point(fbSize - baseSprite) + getDisplacement();
 
         internalDraw(p);
         if (isMarked())           internalDraw(p, getMarkedColor());
         else if (isHighlighted()) internalDraw(p, getHighlightColor());
     }
 
-    g_drawPool.releaseFrameBuffer(destRect);
+    Rect out = destRect;
+    if (size > 0) out = Rect(destRect.topLeft(), Size(size, size));
+    g_drawPool.releaseFrameBuffer(out);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, const int drawFlags)
