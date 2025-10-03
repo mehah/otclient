@@ -20,7 +20,9 @@
     left: 0px;
     right: 0px;
     height: 16px;
-    display: flex;
+    display: grid;
+    grid-template-columns: 150px 2px 80px 2px 1fr;
+    column-gap: 4px;
     align-items: center;
     background-color: #363636;
     --border-width-bottom: 1;
@@ -34,14 +36,16 @@
     display: flex;
     align-items: center;
     padding: 0 5px;
+    box-sizing: border-box;
     --text-offset: 5 0;
     text-align: left;
+    width: 100%;
   }
 
   .history-header > .separator-vertical {
     height: 100%;
     width: 2px;
-    margin: 0 2px;
+    margin: 0;
   }
 
   .header-date {
@@ -55,8 +59,7 @@
   }
 
   .header-details {
-    flex: 1 1 auto;
-    min-width: 0;
+    width: 100%;
   }
 
     .history-list {
@@ -78,7 +81,6 @@
       height: 28px;
       display: flex;
       align-items: center;
-      justify-content: center;
       padding: 0 10px;
       background-color: #363636;
       --border-width-top: 1;
@@ -94,6 +96,10 @@
     .history-page-label {
       flex: 1;
       text-align: center;
+    }
+
+    #nextPageButton {
+      margin-left: auto;
     }
 
   #historyList Label {
