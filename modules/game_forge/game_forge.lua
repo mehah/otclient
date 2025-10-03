@@ -93,6 +93,26 @@ local historyActionLabels = {
     [4] = tr('Increase Limit')
 }
 
+local function measureWidgetContentWidth(widget)
+    if not widget or widget:isDestroyed() then
+        return 0
+    end
+
+    local width = 0
+    if widget.getTextSize then
+        local textSize = widget:getTextSize()
+        if textSize and textSize.width then
+            width = textSize.width
+        end
+    end
+
+    if widget.getPaddingLeft then
+        width = width + (widget:getPaddingLeft() or 0) + (widget:getPaddingRight() or 0)
+    end
+
+    return width
+end
+
 local function formatHistoryDate(timestamp)
     if not timestamp or timestamp == 0 then
         return tr('Unknown')
@@ -106,11 +126,34 @@ local function resolveHistoryList(panel)
         return nil
     end
 
-    if panel.historyList then
+    if panel.historyList and not panel.historyList:isDestroyed() then
         return panel.historyList
     end
 
-    return panel:getChildById('historyList')
+    local list = panel:getChildById('historyList')
+    if list then
+        panel.historyList = list
+    end
+    return list
+end
+
+local function resolveHistoryHeader(panel)
+    if not panel then
+        return nil
+    end
+
+    if panel.historyHeaderAction and not panel.historyHeaderAction:isDestroyed() then
+        return panel.historyHeaderAction
+    end
+
+    local header = panel.historyHeader or panel:getChildById('historyHeader')
+    if not header then
+        return nil
+    end
+
+    panel.historyHeader = header
+    panel.historyHeaderAction = header:getChildById('historyHeaderAction') or header.historyHeaderAction
+    return panel.historyHeaderAction
 end
 
 local function registerResourceConfig(resourceType, config)
@@ -333,6 +376,10 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
 
     historyListWidget:destroyChildren()
 
+    local headerAction = resolveHistoryHeader(historyPanel)
+    local maxActionWidth = measureWidgetContentWidth(headerAction)
+    local actionLabels = {}
+
     if historyList and #historyList > 0 then
         for _, entry in ipairs(historyList) do
             local row = g_ui.createWidget('HistoryForgePanel', historyListWidget)
@@ -345,6 +392,11 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
                 local actionLabel = row:getChildById('action')
                 if actionLabel then
                     actionLabel:setText(historyActionLabels[entry.actionType] or tr('Unknown'))
+                    local actionWidth = measureWidgetContentWidth(actionLabel)
+                    if actionWidth > 0 then
+                        maxActionWidth = math.max(maxActionWidth or 0, actionWidth)
+                        table.insert(actionLabels, actionLabel)
+                    end
                 end
 
                 local detailLabel = row:getChildById('details')
@@ -364,6 +416,11 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
             local actionLabel = emptyRow:getChildById('action')
             if actionLabel then
                 actionLabel:setText(tr('No history'))
+                local actionWidth = measureWidgetContentWidth(actionLabel)
+                if actionWidth > 0 then
+                    maxActionWidth = math.max(maxActionWidth or 0, actionWidth)
+                    table.insert(actionLabels, actionLabel)
+                end
             end
 
             local detailLabel = emptyRow:getChildById('details')
@@ -386,6 +443,18 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     local nextButton = historyPanel.nextPageButton or historyPanel:getChildById('nextPageButton')
     if nextButton then
         nextButton:setVisible(lastPage > page)
+    end
+
+    if maxActionWidth and maxActionWidth > 0 then
+        if headerAction then
+            headerAction:setWidth(maxActionWidth)
+        end
+
+        for _, label in ipairs(actionLabels) do
+            if not label:isDestroyed() then
+                label:setWidth(maxActionWidth)
+            end
+        end
     end
 end
 

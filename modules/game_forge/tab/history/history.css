@@ -52,6 +52,7 @@
   .header-action {
     flex: 0 0 auto;
     white-space: nowrap;
+    margin-right: 5px;
   }
 
   .header-details {
@@ -100,24 +101,5 @@
   }
 
   #historyList > * {
-    display: flex;
-    align-items: flex-start;
-    padding: 2px 5px;
-  }
-
-  #historyList > * > Label#date {
-    flex: 0 0 150px;
-  }
-
-  #historyList > * > Label#action {
-    flex: 0 0 auto;
-    white-space: nowrap;
-    margin-right: 5px;
-    width: auto;
-    min-width: 0;
-  }
-
-  #historyList > * > Label#details {
-    flex: 1 1 auto;
-    min-width: 0;
+    padding: 2px 0;
   }
