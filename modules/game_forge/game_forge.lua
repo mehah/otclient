@@ -88,9 +88,9 @@ local forgeResourceConfig = {}
 local historyActionLabels = {
     [0] = tr('Fusion'),
     [1] = tr('Transfer'),
-    [2] = tr('Dust to Sliver'),
-    [3] = tr('Sliver to Core'),
-    [4] = tr('Increase Limit')
+    [2] = tr('Conversion'),
+    [3] = tr('Conversion'),
+    [4] = tr('Conversion')
 }
 
 local function measureWidgetContentWidth(widget)

@@ -2,8 +2,11 @@ HistoryForgePanel < UIWidget
   size: 0 20
   focusable: false
   padding: 0
+  layout: anchor
   anchors.left: parent.left
   anchors.right: parent.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
   Label
     id: date
     !text: tr('Date')
