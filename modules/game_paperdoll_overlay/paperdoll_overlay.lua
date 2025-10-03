@@ -183,6 +183,16 @@ function controller:onGameStart()
         end
         lastDirIdx = dirIdx
       end
+      -- Inventory sync: ensure overlays attach/detach even if onInventoryChange isn't fired
+      for s = InventorySlotFirst, InventorySlotLast do
+        local it = p:getInventoryItem(s)
+        local curr = state.current[s]
+        local currId = curr
+        local itId = it and it:getId() or nil
+        if itId ~= currId then
+          updateSlotOverlay(p, s, it)
+        end
+      end
     end, 200, cycleName)
   end
 end
