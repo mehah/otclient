@@ -18,6 +18,11 @@ ui = {
     panels = {}
 }
 forgeController = Controller:new()
+forgeController.historyState = {
+    page = 1,
+    lastPage = 1,
+    currentCount = 0
+}
 local forgeButton
 
 local forgeResourceTypes = {
@@ -79,6 +84,34 @@ local forgeStatusConfigs = {
 }
 
 local forgeResourceConfig = {}
+
+local historyActionLabels = {
+    [0] = tr('Fusion'),
+    [1] = tr('Transfer'),
+    [2] = tr('Dust to Sliver'),
+    [3] = tr('Sliver to Core'),
+    [4] = tr('Increase Limit')
+}
+
+local function formatHistoryDate(timestamp)
+    if not timestamp or timestamp == 0 then
+        return tr('Unknown')
+    end
+
+    return os.date('%Y-%m-%d, %H:%M:%S', timestamp)
+end
+
+local function resolveHistoryList(panel)
+    if not panel then
+        return nil
+    end
+
+    if panel.historyList then
+        return panel.historyList
+    end
+
+    return panel:getChildById('historyList')
+end
 
 local function registerResourceConfig(resourceType, config)
     if not resourceType or forgeResourceConfig[resourceType] == config then
@@ -278,8 +311,82 @@ function forgeController:getCurrentWindow()
 end
 
 function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
-    g_logger.info("page " ..
-        page .. " lastPage " .. lastPage .. " currentCount " .. currentCount .. " historyList " .. #historyList) -- DEBUG
+    local state = forgeController.historyState or {}
+    page = math.max(tonumber(page) or 1, 1)
+    lastPage = math.max(tonumber(lastPage) or page, 1)
+    currentCount = tonumber(currentCount) or 0
+
+    state.page = page
+    state.lastPage = lastPage
+    state.currentCount = currentCount
+    forgeController.historyState = state
+
+    local historyPanel = forgeController:loadTab('history')
+    if not historyPanel then
+        return
+    end
+
+    local historyListWidget = resolveHistoryList(historyPanel)
+    if not historyListWidget then
+        return
+    end
+
+    historyListWidget:destroyChildren()
+
+    if historyList and #historyList > 0 then
+        for _, entry in ipairs(historyList) do
+            local row = g_ui.createWidget('HistoryForgePanel', historyListWidget)
+            if row then
+                local dateLabel = row:getChildById('date')
+                if dateLabel then
+                    dateLabel:setText(formatHistoryDate(entry.createdAt))
+                end
+
+                local actionLabel = row:getChildById('action')
+                if actionLabel then
+                    actionLabel:setText(historyActionLabels[entry.actionType] or tr('Unknown'))
+                end
+
+                local detailLabel = row:getChildById('details')
+                if detailLabel then
+                    detailLabel:setText(entry.description or '')
+                end
+            end
+        end
+    else
+        local emptyRow = g_ui.createWidget('HistoryForgePanel', historyListWidget)
+        if emptyRow then
+            local dateLabel = emptyRow:getChildById('date')
+            if dateLabel then
+                dateLabel:setText('-')
+            end
+
+            local actionLabel = emptyRow:getChildById('action')
+            if actionLabel then
+                actionLabel:setText(tr('No history'))
+            end
+
+            local detailLabel = emptyRow:getChildById('details')
+            if detailLabel then
+                detailLabel:setText(tr('There are no forge history entries to display.'))
+            end
+        end
+    end
+
+    local pageLabel = historyPanel.historyPageLabel or historyPanel:getChildById('historyPageLabel')
+    if pageLabel then
+        pageLabel:setText(string.format(tr('Page %d/%d'), page, lastPage))
+    end
+
+    local prevButton = historyPanel.previousPageButton or historyPanel:getChildById('previousPageButton')
+    if prevButton then
+        prevButton:setVisible(page > 1)
+    end
+
+    local nextButton = historyPanel.nextPageButton or historyPanel:getChildById('nextPageButton')
+    if nextButton then
+        nextButton:setVisible(lastPage > page)
+    end
 end
 
 function forgeController:onTerminate()

@@ -8,6 +8,14 @@
 
   <img class="separator-vertical separator-1" src="/images/ui/separator_vertical"/>
   <img class="separator-vertical separator-2" src="/images/ui/separator_vertical"/>
+
+  <UIWidget id="historyFooter" class="history-footer">
+    <UIButton id="previousPageButton" class="history-button" text="Previous Page"
+      visible="false" onclick="self:onHistoryPreviousPage()" />
+    <UIWidget id="historyPageLabel" class="history-page-label" text="Page 1/1"></UIWidget>
+    <UIButton id="nextPageButton" class="history-button" text="Next Page"
+      onclick="self:onHistoryNextPage()" />
+  </UIWidget>
 </div>
 </html>
 

@@ -14,13 +14,16 @@
     --border-color-right: #747474;
   }
 
-  .history-list {
-    display: block;
-    width: 100%;
-    height: 96%;
-    overflow: scroll;
-    margin-top: 15px;
-  }
+    .history-list {
+      position: absolute;
+      top: 18px;
+      left: 0px;
+      right: 0px;
+      bottom: 28px;
+      display: block;
+      overflow: auto;
+      padding: 2px;
+    }
 
   .header-widget {
     position: absolute;
@@ -46,18 +49,44 @@
     left: 300px;
   }
 
-  .separator-vertical {
-    position: absolute;
-    top: 0px;
-    width: 2px;
-    height: 100%;
-    display: block;
-  }
+    .separator-vertical {
+      position: absolute;
+      top: 0px;
+      bottom: 28px;
+      width: 2px;
+      display: block;
+    }
 
   .separator-1 {
     left: 149px;
   }
 
-  .separator-2 {
-    left: 299px;
-  }
+    .separator-2 {
+      left: 299px;
+    }
+
+    .history-footer {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+      background-color: #363636;
+      --border-width-top: 1;
+      --border-color-top: #292a29;
+    }
+
+    .history-button {
+      width: 110px;
+      height: 22px;
+      margin: 0 8px;
+    }
+
+    .history-page-label {
+      flex: 1;
+      text-align: center;
+    }
