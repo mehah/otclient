@@ -325,3 +325,90 @@ function table.remove_if(t, fnc)
     end
     return t;
 end
+
+-- table.watchList
+-- Watches an array-like table (1..N) for structural changes
+-- Detects inserts, removes and moves between scans
+-- Keys can be taken from ops.keyOf(item) or by default the item reference itself
+function table.watchList(realList, ops)
+  local self = {}
+  local keyOf      = (ops and ops.keyOf) or function(x) return x end
+  local beginBatch = ops and ops.beginBatch
+  local endBatch   = ops and ops.endBatch
+  local onInsert   = ops and ops.onInsert
+  local onRemove   = ops and ops.onRemove
+  local onMove     = ops and ops.onMove
+
+  self.list  = realList
+  self.prev  = {}
+  self.prevK = {}
+
+  for i = 1, #realList do
+    self.prev[i]  = realList[i]
+    self.prevK[i] = keyOf(realList[i])
+  end
+
+  local function copyKeys(src)
+    local dst = {}
+    for i = 1, #src do dst[i] = src[i] end
+    return dst
+  end
+
+  local function buildIndexMap(keys)
+    local m = {}
+    for i = 1, #keys do m[keys[i]] = i end
+    return m
+  end
+
+  function self:scan()
+    local curr = self.list
+    local wantK = {}
+    for i = 1, #curr do wantK[i] = keyOf(curr[i]) end
+
+    if beginBatch then beginBatch() end
+
+    local curK = copyKeys(self.prevK)
+    local idxByKey = buildIndexMap(curK)
+
+    local i = 1
+    while i <= #wantK do
+      local want = wantK[i]
+      if curK[i] == want then
+        i = i + 1
+      else
+        local j = idxByKey[want]
+        if j then
+          if onMove then onMove(j, i, curr[i]) end
+          local movedKey = table.remove(curK, j)
+          table.insert(curK, i, movedKey)
+          if j > i then
+            for p = i + 1, j do idxByKey[curK[p]] = p end
+          else
+            for p = j, i do idxByKey[curK[p]] = p end
+          end
+          idxByKey[movedKey] = i
+          i = i + 1
+        else
+          if onInsert then onInsert(i, curr[i]) end
+          table.insert(curK, i, want)
+          for p = i, #curK do idxByKey[curK[p]] = p end
+          i = i + 1
+        end
+      end
+    end
+
+    for k = #curK, #wantK + 1, -1 do
+      if onRemove then onRemove(k, self.prev[k]) end
+      idxByKey[curK[k]] = nil
+      table.remove(curK, k)
+    end
+
+    if endBatch then endBatch() end
+
+    self.prev  = {}
+    for k = 1, #curr do self.prev[k] = curr[k] end
+    self.prevK = wantK
+  end
+
+  return self
+end

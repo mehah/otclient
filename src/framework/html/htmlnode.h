@@ -80,6 +80,11 @@ public:
     int indexAmongElements() const;
     int indexAmongType() const;
 
+    std::string innerHTML() const;
+    std::string outerHTML() const;
+    void setInnerHTML(const std::string& html);
+    void setOuterHTML(const std::string& html);
+
     HtmlNodePtr documentRoot() const;
 
     std::vector<HtmlNodePtr> querySelectorAll(const std::string& selector);

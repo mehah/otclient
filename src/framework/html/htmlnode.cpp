@@ -24,6 +24,7 @@
 #include <framework/otml/otml.h>
 #include <framework/ui/uiwidget.h>
 #include <framework/html/queryselector.h>
+#include "htmlparser.h"
 
 std::string HtmlNode::getAttr(const std::string& name) const {
     auto key = ascii_tolower_copy(name);
@@ -473,5 +474,76 @@ void HtmlNode::rebuildIndexes(const HtmlNodePtr& root) {
                 root->classIndex[cls].push_back(cur);
         }
         for (auto& c : cur->children) st.push_back(c);
+    }
+}
+
+static inline bool isRawTextContainer(const std::string& tag) {
+    return tag == "script" || tag == "style" || tag == "title" || tag == "textarea" || tag == "option";
+}
+
+std::string HtmlNode::innerHTML() const {
+    if (type == NodeType::Text || type == NodeType::Comment || type == NodeType::Doctype) {
+        return toString(true);
+    }
+    std::string out;
+    out.reserve(128);
+    for (const auto& c : children) {
+        out += c->toString(true);
+    }
+    if (!text.empty()) out += text;
+    return out;
+}
+
+std::string HtmlNode::outerHTML() const {
+    return toString(true);
+}
+
+void HtmlNode::setInnerHTML(const std::string& html) {
+    if (type != NodeType::Element) return;
+
+    if (isRawTextContainer(tag)) {
+        clear();
+        text = html;
+        invalidateIndexCachesUp(this);
+        return;
+    }
+
+    auto container = parseHtml("<html>" + html + "</html>");
+    auto rootEl = container ? container->querySelector("html") : nullptr;
+
+    clear();
+    text.clear();
+
+    if (!rootEl) { invalidateIndexCachesUp(this); return; }
+
+    size_t pos = 0;
+    for (const auto& ch : rootEl->getChildren()) {
+        append(ch->clone(true));
+        ++pos;
+    }
+    if (!rootEl->getRawText().empty())
+        append(std::make_shared<HtmlNode>(*rootEl));
+}
+
+void HtmlNode::setOuterHTML(const std::string& html) {
+    auto p = parent.lock();
+    if (!p) {
+        setInnerHTML(html);
+        return;
+    }
+
+    auto container = parseHtml("<div>" + html + "</div>");
+    auto rootEl = container ? container->querySelector("div") : nullptr;
+
+    size_t idx = indexInParent();
+    if (idx == size_t(-1)) return;
+
+    p->remove(shared_from_this());
+
+    if (!rootEl) return;
+
+    size_t insertAt = idx;
+    for (const auto& ch : rootEl->getChildren()) {
+        p->insert(ch->clone(true), insertAt++);
     }
 }
