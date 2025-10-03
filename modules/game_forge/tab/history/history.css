@@ -42,21 +42,21 @@
     height: 100%;
     width: 2px;
     margin: 0 2px;
-    flex: 0 0 auto;
   }
 
   .header-date {
-    flex: 0 0 150px;
+    width: 150px;
   }
 
   .header-action {
-    flex: 0 0 auto;
+    width: 80px;
     white-space: nowrap;
     margin-right: 5px;
   }
 
   .header-details {
     flex: 1 1 auto;
+    min-width: 0;
   }
 
     .history-list {
