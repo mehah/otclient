@@ -170,7 +170,7 @@ end
 
 local function setWindowState(window, enabled)
     if window.obj then
-        window.obj:setOn(enabled)
+        window.obj:setOn(not enabled)
         if enabled then
             window.obj:enable()
         else
