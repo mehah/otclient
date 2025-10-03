@@ -600,8 +600,13 @@ UIWidgetPtr UIManager::createWidgetFromOTML(const OTMLNodePtr& widgetNode, const
     if (!widget)
         throw Exception("unable to create widget of type '{}'", widgetType);
 
-    if (parent)
-        parent->addChild(widget);
+    if (parent) {
+        if (parent->m_insertChildIndex > -1) {
+            parent->insertChild(parent->m_insertChildIndex, widget);
+            parent->m_insertChildIndex = -1;
+        } else
+            parent->addChild(widget);
+    }
 
     widget->callLuaField("onCreate");
 

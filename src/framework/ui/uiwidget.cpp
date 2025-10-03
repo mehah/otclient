@@ -170,16 +170,13 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
 
 UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
     if (!isOnHtml()) return nullptr;
-    auto widget = g_html.createWidgetFromHTML(html, nullptr, m_htmlRootId);
-    insertChild(index, widget);
-    return widget;
+    m_insertChildIndex = index;
+    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
 }
 
 UIWidgetPtr UIWidget::append(const std::string& html) {
     if (!isOnHtml()) return nullptr;
-    auto widget = g_html.createWidgetFromHTML(html, nullptr, m_htmlRootId);
-    addChild(widget);
-    return widget;
+    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
 }
 
 UIWidgetPtr UIWidget::prepend(const std::string& html) {

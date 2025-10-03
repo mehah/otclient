@@ -209,7 +209,7 @@ namespace {
             }
 
             for (const auto& node : nodes) {
-                if (node->getWidget()) {
+                if (node->getWidget() && !node->isStyleResolved()) {
                     bool hasMeta = false;
                     for (const auto& metas : rule.selectorMeta) {
                         for (const auto& state : metas.pseudos) {
@@ -243,8 +243,16 @@ namespace {
     };
 }
 
-bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
-    if (!parent || !parent->getHtmlNode())return true;
+bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName) {
+    if (!parent || !parent->getHtmlNode())
+        return true;
+
+    if (!node->getAttr("*for").empty()) {
+        const auto condition = node->getAttr("*for");
+        node->removeAttr("*for");
+        parent->callLuaField("__childFor", moduleName, condition, node->outerHTML(), parent->getChildren().size() + 1);
+        return false;
+    }
 
     if (parent->getHtmlNode()->getTag() == "select") {
         parent->callLuaField("addOptionFromHtml", node->textContent(), node->getAttr("value"));
@@ -255,7 +263,7 @@ bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent) {
 }
 
 UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName, std::vector<UIWidgetPtr>& widgets) {
-    if (!checkSpecialCase(node, parent))
+    if (!checkSpecialCase(node, parent, moduleName))
         return nullptr;
 
     if (node->getType() == NodeType::Comment || node->getType() == NodeType::Doctype)
@@ -350,7 +358,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         auto value = v;
         translateAttribute(widget->getStyleName(), node->getTag(), attr, value);
 
-        if (attr.starts_with("on")) {
+        if (attr.starts_with("on") || attr.starts_with("*for")) {
             // lua call
         } else if (attr == "anchor") {
             // ignore
@@ -381,9 +389,11 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
             widget->callLuaField("__applyOrBindHtmlAttribute", attr, value, moduleName, node->toString());
         }
     }
+
+    node->setStyleResolved(true);
 }
 
-UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, bool isDynamic, uint32_t htmlId) {
+UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId) {
     auto path = "/modules/" + moduleName + "/";
 
     std::string script;
@@ -395,7 +405,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     widgets.reserve(32);
 
     UIWidgetPtr widget;
-    for (const auto& el : root.node->getChildren()) {
+    for (const auto& el : (root.dynamicNode ? root.dynamicNode : root.node)->getChildren()) {
         if (el->getTag() == "style") {
             root.sheets.emplace_back(css::parse(el->textContent()));
         } else if (el->getTag() == "link") {
@@ -412,47 +422,38 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
         }
     }
 
-    if (widget && !script.empty())
-        widget->callLuaField("__scriptHtml", moduleName, script, scriptStr);
-
     if (!widget)
         return nullptr;
 
-    auto afterLocal = [=, textNodes = std::move(textNodes), widgets = std::move(widgets)]() mutable {
-        const auto mainNode = widget->getHtmlNode().get();
+    if (widget && !script.empty())
+        widget->callLuaField("__scriptHtml", moduleName, script, scriptStr);
 
-        for (const auto& sheet : GLOBAL_STYLES)
-            applyStyleSheet(mainNode, htmlPath, sheet, false);
+    const auto mainNode = widget->getHtmlNode().get();
 
-        if (isDynamic) {
-            for (auto& widget : widgets) {
-                auto node = widget->getHtmlNode().get();
-                node->getInheritableStyles() = mainNode->getParent()->getInheritableStyles();
-                for (const auto& [styleName, styleMap] : node->getInheritableStyles()) {
-                    for (auto& [style, value] : styleMap)
-                        node->getStyles()[styleName][style] = value;
-                }
+    for (const auto& sheet : GLOBAL_STYLES)
+        applyStyleSheet(mainNode, htmlPath, sheet, false);
+
+    if (root.dynamicNode) {
+        for (auto& widget : widgets) {
+            auto node = widget->getHtmlNode().get();
+            node->getInheritableStyles() = parent->getHtmlNode()->getInheritableStyles();
+            for (const auto& [styleName, styleMap] : node->getInheritableStyles()) {
+                for (auto& [style, value] : styleMap)
+                    node->getStyles()[styleName][style] = value;
             }
         }
+    }
 
-        for (const auto& sheet : root.sheets)
-            applyStyleSheet(mainNode, htmlPath, sheet, checkRuleExist);
+    for (const auto& sheet : root.sheets)
+        applyStyleSheet(mainNode, htmlPath, sheet, checkRuleExist);
 
-        for (const auto& widget : std::views::reverse(widgets)) {
-            const auto node = widget->getHtmlNode().get();
-            const auto w = widget.get();
-            applyAttributesAndStyles(w, node, root.groups, moduleName);
-            w->scheduleHtmlTask(PropApplyAnchorAlignment);
-            w->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName, node->toString());
-        }
-    };
-
-    if (isDynamic) {
-        // The afterload is deferred, because in order to process the CSS of the dynamic element,
-        // it needs to be attached to its parent and that only happens later, when it is added to the widget.
-
-        g_dispatcher.deferEvent(afterLocal);
-    } else afterLocal();
+    for (const auto& widget : std::views::reverse(widgets)) {
+        const auto node = widget->getHtmlNode().get();
+        const auto w = widget.get();
+        applyAttributesAndStyles(w, node, root.groups, moduleName);
+        w->scheduleHtmlTask(PropApplyAnchorAlignment);
+        w->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName, node->toString());
+    }
 
     return widget;
 }
@@ -461,7 +462,7 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
     auto path = "/modules/" + moduleName + "/";
     auto htmlContent = g_resources.readFileContents(path + htmlPath);
 
-    auto root = DataRoot{ parseHtml(htmlContent), moduleName };
+    auto root = DataRoot{ parseHtml(htmlContent), nullptr, moduleName };
 
     if (root.node->getChildren().empty())
         return 0;
@@ -471,7 +472,7 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
 
     static uint32_t ID = 0;
     auto& rootEmplaced = m_nodes.emplace(++ID, std::move(root)).first->second;
-    readNode(rootEmplaced, parent, moduleName, htmlPath, false, false, ID);
+    readNode(rootEmplaced, parent, moduleName, htmlPath, false, ID);
     return ID;
 }
 
@@ -482,9 +483,9 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
     }
 
     auto rootCopy = it->second;
-    rootCopy.node = parseHtml("<html>" + html + "</html>");
+    rootCopy.dynamicNode = parseHtml("<html>" + html + "</html>");
 
-    readNode(rootCopy, nullptr, it->second.moduleName, "", false, true, htmlId);
+    readNode(rootCopy, parent, it->second.moduleName, "", false, htmlId);
     if (auto node = rootCopy.node->querySelector("html > :first")) {
         return node->getWidget();
     }

@@ -1,7 +1,11 @@
 HtmlSample = Controller:new()
 function HtmlSample:onInit()
+          self.items = {
+    {name='renato'}, {name='diego'}
+  }
     self:loadHtml('htmlsample.html')
     self:equalizerEffect()
+
 end
 
 function HtmlSample:addPlayer(name)

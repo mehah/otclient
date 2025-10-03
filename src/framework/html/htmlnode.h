@@ -66,6 +66,8 @@ public:
         return out;
     }
     std::string getAttr(const std::string& name) const;
+    bool removeAttr(const std::string& name);
+
     void setAttr(const std::string& name, const std::string& value);
     std::string textContent() const;
     std::string getText() const { return text; }
@@ -123,6 +125,9 @@ public:
     bool isExpression() const { return m_isExpression; }
     void setExpression(bool v) { m_isExpression = v; }
 
+    bool isStyleResolved() const { return m_styleResolved; }
+    void setStyleResolved(bool v) { m_styleResolved = v; }
+
     std::string toString(bool recursive = true) const;
     HtmlNodePtr clone(bool deep = true) const;
 
@@ -151,6 +156,7 @@ private:
     mutable int cacheIndexAmongType = -1;
 
     bool m_isExpression{ false };
+    bool m_styleResolved{ false };
 
 private:
     static void rebuildIndexes(const HtmlNodePtr& root);

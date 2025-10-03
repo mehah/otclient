@@ -32,6 +32,11 @@ std::string HtmlNode::getAttr(const std::string& name) const {
     return (it != attributes.end()) ? it->second : "";
 }
 
+bool HtmlNode::removeAttr(const std::string& name) {
+    auto key = ascii_tolower_copy(name);
+    return attributes.erase(key);
+}
+
 void HtmlNode::setAttr(const std::string& name, const std::string& value) {
     auto key = ascii_tolower_copy(name);
     attributes[key] = value;

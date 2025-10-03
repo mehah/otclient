@@ -53,6 +53,10 @@
   self:cycleEvent(function()
       self.playerName = math.random()
   end, 10)
+
+  self.items = {
+    {name='renato'}, {name='diego'}
+  }
 </script>
 <html>
   <window class="content" anchor="parent" *title="self.title">
@@ -64,6 +68,10 @@
     <div id="players" class="form"></div>
     <div style="margin-top: 10">Player name is: {{self.playerName}}</div>
     <div><button onclick="self:addPlayer(self.playerName)">Add</button></div>
+
+    <div *for="local item in self.items">
+      <span style="color: red">{{item.name}}</span>
+    </div>
 
     <div class="equalizerEffect">
       <div class="line"></div>
