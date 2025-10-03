@@ -1,5 +1,5 @@
 HistoryForgePanel < UIWidget
-  size: 0 20
+  size: 0 36
   focusable: false
   padding: 0
   layout: anchor
