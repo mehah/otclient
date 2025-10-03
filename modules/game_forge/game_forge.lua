@@ -277,8 +277,9 @@ function forgeController:getCurrentWindow()
     return self.currentWindowType and windowTypes[self.currentWindowType]
 end
 
-function onBrowseForgeHistory(page, lastPage, history)
-    g_logger.info("page " .. page .. " lastPage " .. lastPage) -- DEBUG
+function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
+    g_logger.info("page " ..
+        page .. " lastPage " .. lastPage .. " currentCount " .. currentCount .. " historyList " .. #historyList) -- DEBUG
 end
 
 function forgeController:onTerminate()
