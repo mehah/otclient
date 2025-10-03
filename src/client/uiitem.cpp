@@ -41,6 +41,10 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
     drawImage(m_rect);
 
     if (m_itemVisible && m_item) {
+        if (m_item->getClientId() != m_itemId) {
+            m_item->setId(m_itemId);
+        }
+
         const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
 
         g_drawPool.bindFrameBuffer(exactSize);
@@ -68,6 +72,8 @@ void UIItem::drawSelf(const DrawPoolType drawPane)
 
 void UIItem::setItemId(const int id)
 {
+    m_itemId = id;
+
     if (id == 0)
         m_item = nullptr;
     else if (m_item)
@@ -98,6 +104,8 @@ void UIItem::setItemSubType(const int subType)
 void UIItem::setItem(const ItemPtr& item)
 {
     m_item = item;
+    if (item)
+        m_itemId = item->getClientId();
 
     callLuaField("onItemChange");
 }
