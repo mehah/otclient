@@ -1,10 +1,14 @@
 HistoryForgePanel < UIWidget
-  size: 468 20
+  size: 0 20
+  focusable: false
+  padding: 0
+  layout: anchor
   Label
     id: date
     !text: tr('Date')
     width: 150
     anchors.top: parent.top
+    anchors.bottom: parent.bottom
     anchors.left: parent.left
     text-align: left
     margin-left: 5
@@ -12,17 +16,23 @@ HistoryForgePanel < UIWidget
   Label
     id: action
     !text: tr('Action')
-    width: 150
     anchors.top: parent.top
+    anchors.bottom: parent.bottom
     anchors.left: prev.right
+    width: 80
     text-align: left
     margin-top: 1
+    margin-left: 5
+    margin-right: 5
   Label
     id: details
     !text: tr('Details')
-    width: 220
     anchors.top: parent.top
+    anchors.bottom: parent.bottom
     anchors.left: prev.right
+    anchors.right: parent.right
     text-align: left
     margin-top: 1
-    border: 1 red
+    margin-left: 5
+    margin-right: 5
+    text-wrap: true
