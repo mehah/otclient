@@ -31,4 +31,3 @@ HistoryForgePanel < UIWidget
     text-align: left
     margin-top: 1
     margin-right: 5
-    text-wrap: wordBreak
