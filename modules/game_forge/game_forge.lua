@@ -91,6 +91,10 @@ local forgeStatusConfigs = {
 
 local forgeResourceConfig = {}
 
+local fusionTabContext
+local fusionSelectionRadioGroup
+local fusionConvergenceRadioGroup
+
 local historyActionLabels = {
     [0] = tr('Fusion'),
     [1] = tr('Transfer'),
@@ -199,11 +203,160 @@ local function resetWindowTypes()
     end
 end
 
+local function invalidateFusionContext()
+    fusionTabContext = nil
+
+    if fusionSelectionRadioGroup then
+        fusionSelectionRadioGroup:destroy()
+        fusionSelectionRadioGroup = nil
+    end
+
+    if fusionConvergenceRadioGroup then
+        fusionConvergenceRadioGroup:destroy()
+        fusionConvergenceRadioGroup = nil
+    end
+end
+
+local function resolveScrollContents(widget)
+    if not widget or widget:isDestroyed() then
+        return nil
+    end
+
+    if widget.getChildById then
+        local contents = widget:getChildById('contentsPanel')
+        if contents and not contents:isDestroyed() then
+            return contents
+        end
+    end
+
+    return widget
+end
+
+local function getChildrenByStyleName(widget, styleName)
+    if not widget or widget:isDestroyed() then
+        return {}
+    end
+
+    local children = widget:recursiveGetChildrenByStyleName(styleName)
+    if type(children) ~= 'table' then
+        return {}
+    end
+
+    local results = {}
+    for _, child in ipairs(children) do
+        if child and not child:isDestroyed() then
+            table.insert(results, child)
+        end
+    end
+
+    return results
+end
+
+local function getFirstChildByStyleName(widget, styleName)
+    local children = getChildrenByStyleName(widget, styleName)
+    return children[1]
+end
+
+local function resolveFusionTabContext()
+    local panel = forgeController:loadTab('fusion')
+    if not panel then
+        return nil
+    end
+
+    if not fusionTabContext or fusionTabContext.panel ~= panel or panel:isDestroyed() then
+        local resultArea = panel.test or panel:recursiveGetChildById('test')
+        local selectionPanel = panel.fusionSelectionArea or getFirstChildByStyleName(panel, 'fusion-selection-area')
+        local convergenceSection = panel.fusionConvergenceSection
+            or (resultArea and resultArea.fusionConvergenceSection)
+            or getFirstChildByStyleName(resultArea, 'fusion-convergence-section')
+        fusionTabContext = {
+            panel = panel,
+            selectionPanel = selectionPanel,
+            selectionItemsPanel = nil,
+            targetItem = getFirstChildByStyleName(panel, 'fusion-slot-item'),
+            resultArea = resultArea,
+            placeholder = getFirstChildByStyleName(resultArea, 'forge-result-placeholder'),
+            convergenceSection = convergenceSection,
+            fusionButton = nil,
+            fusionButtonItem = nil,
+            fusionButtonItemTo = nil,
+            convergenceItemsPanel = nil,
+            dustAmountLabel = nil,
+            costLabel = nil
+        }
+    end
+
+    if not fusionTabContext.selectionPanel or fusionTabContext.selectionPanel:isDestroyed() then
+        fusionTabContext.selectionPanel = panel.fusionSelectionArea or getFirstChildByStyleName(panel, 'fusion-selection-area')
+        fusionTabContext.selectionItemsPanel = nil
+    end
+
+    if fusionTabContext.selectionPanel and (not fusionTabContext.selectionItemsPanel or fusionTabContext.selectionItemsPanel:isDestroyed()) then
+        local selectionGrid = fusionTabContext.selectionPanel.fusionSelectionGrid
+            or panel.fusionSelectionGrid
+        if not selectionGrid then
+            local selectionGrids = getChildrenByStyleName(fusionTabContext.selectionPanel, 'forge-slot-grid')
+            selectionGrid = selectionGrids[1]
+        end
+        fusionTabContext.selectionItemsPanel = resolveScrollContents(selectionGrid)
+    end
+
+    if fusionTabContext.resultArea and (not fusionTabContext.fusionButton or fusionTabContext.fusionButton:isDestroyed()) then
+        local actionButton = getFirstChildByStyleName(fusionTabContext.resultArea, 'forge-action-button')
+        if actionButton then
+            fusionTabContext.fusionButton = actionButton
+            local resultItems = getChildrenByStyleName(actionButton, 'forge-result-item')
+            fusionTabContext.fusionButtonItem = resultItems[1]
+            fusionTabContext.fusionButtonItemTo = resultItems[2]
+        end
+    end
+
+    if fusionTabContext.resultArea and (not fusionTabContext.costLabel or fusionTabContext.costLabel:isDestroyed()) then
+        local costContainer = getFirstChildByStyleName(fusionTabContext.resultArea, 'fusion-result-cost')
+        if costContainer then
+            local labels = getChildrenByStyleName(costContainer, 'forge-full-width-label')
+            fusionTabContext.costLabel = labels[1]
+        end
+    end
+
+    if fusionTabContext.convergenceSection and (not fusionTabContext.convergenceItemsPanel or fusionTabContext.convergenceItemsPanel:isDestroyed()) then
+        local convergenceGrid = fusionTabContext.convergenceSection.fusionConvergenceGrid
+            or (fusionTabContext.resultArea and fusionTabContext.resultArea.fusionConvergenceGrid)
+        if not convergenceGrid then
+            convergenceGrid = getFirstChildByStyleName(fusionTabContext.convergenceSection, 'forge-slot-grid')
+        end
+        fusionTabContext.convergenceItemsPanel = resolveScrollContents(convergenceGrid)
+        local labels = getChildrenByStyleName(fusionTabContext.convergenceSection, 'forge-full-width-label')
+        fusionTabContext.dustAmountLabel = labels[1]
+    end
+
+    return fusionTabContext
+end
+
+local function onFusionSelectionChange(_, selectedWidget)
+    if not selectedWidget or selectedWidget:isDestroyed() then
+        forgeController:resetFusionConversionPanel()
+        return
+    end
+
+    forgeController:configureFusionConversionPanel(selectedWidget)
+end
+
+local function onFusionConvergenceSelectionChange(_, selectedWidget)
+    if not selectedWidget or selectedWidget:isDestroyed() then
+        forgeController.fusionSelectedItem = nil
+        return
+    end
+
+    forgeController.fusionSelectedItem = selectedWidget.fusionItemInfo
+end
+
 local function show(self, skipRequest)
     local needsReload = not self.ui or self.ui:isDestroyed()
     if needsReload then
         self:loadHtml('game_forge.html')
         ui.panels = {}
+        invalidateFusionContext()
     end
 
     if not self.ui then
@@ -498,6 +651,7 @@ function forgeController:onGameStart()
     if not self.ui or self.ui:isDestroyed() then
         self:loadHtml('game_forge.html')
         ui.panels = {}
+        invalidateFusionContext()
     end
 
     resetWindowTypes()
@@ -543,4 +697,328 @@ function g_game.onOpenForge(openData)
     end
 
     forgeController:updateResourceBalances()
+    forgeController:updateFusionItems()
+end
+
+function forgeController:configureFusionConversionPanel(selectedWidget)
+    if not selectedWidget or not selectedWidget.itemPtr then
+        return
+    end
+
+    local context = resolveFusionTabContext()
+    if not context then
+        return
+    end
+
+    if context.convergenceSection and (not context.convergenceItemsPanel or context.convergenceItemsPanel:isDestroyed()) then
+        context.convergenceItemsPanel = resolveScrollContents(
+            getFirstChildByStyleName(context.convergenceSection, 'forge-slot-grid')
+        )
+    end
+
+    local itemPtr = selectedWidget.itemPtr
+    local itemWidget = selectedWidget.item
+    local itemCount = 1
+    if itemWidget and itemWidget.getItemCount then
+        itemCount = tonumber(itemWidget:getItemCount()) or itemCount
+    elseif itemPtr and itemPtr.getCount then
+        itemCount = tonumber(itemPtr:getCount()) or itemCount
+    elseif itemPtr and itemPtr.getCountOrSubType then
+        itemCount = tonumber(itemPtr:getCountOrSubType()) or itemCount
+    end
+    local itemTier = itemPtr:getTier() or 0
+
+    self.fusionItem = itemPtr
+    self.fusionItemCount = itemCount
+
+    if context.targetItem then
+        context.targetItem:setItemId(itemPtr:getId())
+        context.targetItem:setItemCount(itemCount)
+        ItemsDatabase.setTier(context.targetItem, itemPtr)
+    end
+
+    if context.placeholder then
+        context.placeholder:setVisible(false)
+    end
+
+    if context.convergenceSection then
+        context.convergenceSection:setVisible(true)
+    end
+
+    if context.fusionButtonItem then
+        context.fusionButtonItem:setItemId(itemPtr:getId())
+        context.fusionButtonItem:setItemCount(1)
+        ItemsDatabase.setTier(context.fusionButtonItem, math.max(itemTier - 1, 0))
+    end
+
+    if context.fusionButtonItemTo then
+        context.fusionButtonItemTo:setItemId(itemPtr:getId())
+        context.fusionButtonItemTo:setItemCount(1)
+        ItemsDatabase.setTier(context.fusionButtonItemTo, itemTier + 1)
+    end
+
+    if context.convergenceItemsPanel then
+        context.convergenceItemsPanel:destroyChildren()
+    end
+
+    if fusionConvergenceRadioGroup then
+        fusionConvergenceRadioGroup:destroy()
+        fusionConvergenceRadioGroup = nil
+    end
+
+    fusionConvergenceRadioGroup = UIRadioGroup.create()
+    fusionConvergenceRadioGroup.onSelectionChange = onFusionConvergenceSelectionChange
+
+    self.fusionSelectedItem = nil
+
+    local player = g_game.getLocalPlayer()
+    local dustRequirement = (self.openData and tonumber(self.openData.convergenceDustFusion)) or tonumber(self.convergenceDustFusion) or 0
+    local priceList = self.fusionPrices or (self.openData and self.openData.fusionPrices) or {}
+    local price = 0
+
+    if type(priceList) == 'table' then
+        price = tonumber(priceList[itemTier + 1]) or tonumber(priceList[itemTier]) or 0
+    end
+
+    if context.dustAmountLabel and player then
+        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        local hasEnoughDust = dustRequirement <= 0 or dustBalance >= dustRequirement
+        context.dustAmountLabel:setColor(hasEnoughDust and '$var-text-cip-color' or '#d33c3c')
+    end
+
+    self.fusionPrice = price
+
+    if context.costLabel then
+        context.costLabel:setText(formatGoldAmount(price))
+        if player then
+            local totalMoney = player:getTotalMoney() or 0
+            context.costLabel:setColor(totalMoney >= price and '$var-text-cip-color' or '#d33c3c')
+        end
+    end
+
+    local convergenceData = self.convergenceFusion or {}
+    if context.convergenceItemsPanel then
+        for _, option in ipairs(convergenceData) do
+            if type(option) == 'table' then
+                for _, fusionInfo in ipairs(option) do
+                    if type(fusionInfo) == 'table' and fusionInfo.id then
+                        local widget = g_ui.createWidget('UICheckBox', context.convergenceItemsPanel)
+                        if widget then
+                            widget:setText('')
+                            widget:setFocusable(true)
+                            widget:setHeight(36)
+                            widget:setWidth(36)
+                            widget:setMargin(2)
+
+                            local itemDisplay = g_ui.createWidget('UIItem', widget)
+                            if itemDisplay then
+                                itemDisplay:fill('parent')
+                                itemDisplay:setItemId(fusionInfo.id)
+                                if fusionInfo.count and fusionInfo.count > 0 then
+                                    itemDisplay:setItemCount(fusionInfo.count)
+                                end
+                                ItemsDatabase.setTier(itemDisplay, fusionInfo.tier or 0)
+                                widget.item = itemDisplay
+                            end
+
+                            widget.fusionItemInfo = fusionInfo
+                            fusionConvergenceRadioGroup:addWidget(widget)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    local firstWidget = fusionConvergenceRadioGroup:getFirstWidget()
+    if firstWidget then
+        fusionConvergenceRadioGroup:selectWidget(firstWidget, true)
+        onFusionConvergenceSelectionChange(fusionConvergenceRadioGroup, firstWidget)
+    end
+end
+
+function forgeController:resetFusionConversionPanel()
+    local context = resolveFusionTabContext()
+    if not context then
+        return
+    end
+
+    self.fusionItem = nil
+    self.fusionItemCount = nil
+    self.fusionSelectedItem = nil
+
+    if context.targetItem then
+        context.targetItem:setItemId(0)
+        context.targetItem:setItemCount(0)
+        ItemsDatabase.setTier(context.targetItem, 0)
+    end
+
+    if context.placeholder then
+        context.placeholder:setVisible(true)
+    end
+
+    if context.convergenceSection then
+        context.convergenceSection:setVisible(false)
+    end
+
+    if context.fusionButtonItem then
+        context.fusionButtonItem:setItemId(0)
+        context.fusionButtonItem:setItemCount(0)
+        ItemsDatabase.setTier(context.fusionButtonItem, 0)
+    end
+
+    if context.fusionButtonItemTo then
+        context.fusionButtonItemTo:setItemId(0)
+        context.fusionButtonItemTo:setItemCount(0)
+        ItemsDatabase.setTier(context.fusionButtonItemTo, 0)
+    end
+
+    if context.convergenceItemsPanel then
+        context.convergenceItemsPanel:destroyChildren()
+    end
+
+    if fusionConvergenceRadioGroup then
+        fusionConvergenceRadioGroup:destroy()
+        fusionConvergenceRadioGroup = nil
+    end
+
+    if context.dustAmountLabel then
+        context.dustAmountLabel:setColor('$var-text-cip-color')
+    end
+
+    if context.costLabel then
+        context.costLabel:setText('???')
+        context.costLabel:setColor('$var-text-cip-color')
+    end
+end
+
+function forgeController:updateFusionItems(fusionData)
+    local context = resolveFusionTabContext()
+    if not context then
+        return
+    end
+
+    if context.selectionPanel and (not context.selectionItemsPanel or context.selectionItemsPanel:isDestroyed()) then
+        local selectionGrids = getChildrenByStyleName(context.selectionPanel, 'forge-slot-grid')
+        context.selectionItemsPanel = resolveScrollContents(selectionGrids[1])
+    end
+
+    self:resetFusionConversionPanel()
+
+    local itemsPanel = context.selectionItemsPanel
+    if not itemsPanel then
+        return
+    end
+
+    itemsPanel:destroyChildren()
+
+    if fusionSelectionRadioGroup then
+        fusionSelectionRadioGroup:destroy()
+        fusionSelectionRadioGroup = nil
+    end
+
+    fusionSelectionRadioGroup = UIRadioGroup.create()
+    fusionSelectionRadioGroup:clearSelected()
+    fusionSelectionRadioGroup.onSelectionChange = onFusionSelectionChange
+
+    local data = fusionData
+    if not data then
+        if self.modeFusion then
+            data = self.convergenceFusion
+        else
+            data = self.fusionItems
+        end
+    end
+
+    local function applySelectionHighlight(widget, checked)
+        if not widget or widget:isDestroyed() then
+            return
+        end
+
+        if checked then
+            widget:setBorderWidth(1)
+            widget:setBorderColor('#ffffff')
+        else
+            widget:setBorderWidth(0)
+        end
+    end
+
+    local function appendItem(info)
+        if type(info) ~= 'table' or not info.id or info.id <= 0 then
+            return
+        end
+
+        local widget = g_ui.createWidget('UICheckBox', itemsPanel)
+        if not widget then
+            return
+        end
+
+        widget:setText('')
+        widget:setFocusable(true)
+        widget:setSize('36 36')
+        widget:setBorderWidth(0)
+        widget:setBorderColor('#ffffff')
+
+        widget.onCheckChange = function(self, checked)
+            applySelectionHighlight(self, checked)
+        end
+
+        local frame = g_ui.createWidget('UIWidget', widget)
+        frame:setSize('34 34')
+        frame:setMarginLeft(1)
+        frame:setMarginTop(1)
+        frame:addAnchor(AnchorTop, 'parent', AnchorTop)
+        frame:addAnchor(AnchorLeft, 'parent', AnchorLeft)
+        frame:setImageSource('/images/ui/item')
+        frame:setPhantom(true)
+        frame:setFocusable(false)
+
+        local itemWidget = g_ui.createWidget('UIItem', widget)
+        itemWidget:setSize('32 32')
+        itemWidget:setMarginTop(2)
+        itemWidget:addAnchor(AnchorTop, 'parent', AnchorTop)
+        itemWidget:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
+        itemWidget:setPhantom(true)
+        itemWidget:setVirtual(true)
+        itemWidget:setShowCount(true)
+
+        local itemPtr = Item.create(info.id, info.count or 1)
+        itemPtr:setTier(info.tier or 0)
+
+        itemWidget:setItem(itemPtr)
+        itemWidget:setItemCount(info.count or itemPtr:getCount())
+        ItemsDatabase.setTier(itemWidget, info.tier or 0)
+
+        widget.item = itemWidget
+        widget.itemPtr = itemPtr
+        widget.fusionItemInfo = info
+
+        applySelectionHighlight(widget, widget:isChecked())
+
+        fusionSelectionRadioGroup:addWidget(widget)
+    end
+
+    local function processEntries(entries)
+        if type(entries) ~= 'table' then
+            return
+        end
+
+        for _, entry in ipairs(entries) do
+            if type(entry) == 'table' then
+                if entry.id then
+                    appendItem(entry)
+                else
+                    processEntries(entry)
+                end
+            end
+        end
+    end
+
+    processEntries(data or {})
+
+    local firstWidget = fusionSelectionRadioGroup:getFirstWidget()
+    if firstWidget then
+        fusionSelectionRadioGroup:selectWidget(firstWidget, true)
+        onFusionSelectionChange(fusionSelectionRadioGroup, firstWidget)
+    end
 end

@@ -16,6 +16,7 @@ function forgeController:onCheckChangeConvergence(widget)
         local fusionLabel = self.modeFusion and 'Convergence Fusion' or 'Fusion'
         local title = string.format('Further Items Needed For %s', fusionLabel)
         ui.panels.fusion.test:setTitle(title)
+        self:updateFusionItems()
     elseif window.panel == 'transfer' then
         local transferLabel = self.modeTransfer and 'Convergence transfer requeriments' or 'Transfer Requirements'
         ui.panels.transfer.test:setTitle(transferLabel)
