@@ -108,7 +108,7 @@
   <!-- Promotion Status Panel -->
   <div id="promotionPanel" class="promo-panel minipanel" title="Promotion and Premium Status">
     <label id="promotionStatusLabel"></label>
-    <BigPremiumButton id="premium_only" onclick="self:onClickSendStore()" *on="g_game.isOnline() and not g_game:getLocalPlayer():isPremium()">
+    <BigPremiumButton id="premium_only" onclick="self:onClickSendStore()" *on="(g_game:getLocalPlayer() and not g_game:getLocalPlayer():isPremium()) or false">
     </BigPremiumButton>
   </div>
 
