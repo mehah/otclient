@@ -434,6 +434,14 @@ namespace Otc
         PREY_UNLOCK_STORE = 1,
         PREY_UNLOCK_NONE = 2,
     };
+    enum class ForgeAction_t : uint8_t
+    {
+        FUSION = 0,
+        TRANSFER = 1,
+        DUST2SLIVER = 2,
+        SLIVER2CORE = 3,
+        INCREASELIMIT = 4,
+    };
 
     enum GameFeature : uint8_t
     {
