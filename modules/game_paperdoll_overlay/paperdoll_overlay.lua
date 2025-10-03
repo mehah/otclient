@@ -121,7 +121,7 @@ end
 local controller = Controller:new()
 local lastDirIdx = nil
 local cycleName = "paperdoll_dir"
-local suppressedInvisible = false
+local invisByCreature = {}
 
 local function isInvisible(outfit)
   -- Protocol sets invisible as: lookType=0 and lookTypeEx=0 -> auxType=13 (effect id)
@@ -145,19 +145,22 @@ function controller:onGameStart()
       updateSlotOverlay(player, slot, item)
     end
     ,
-    onOutfitChange = function(player, outfit)
+    onOutfitChange = function(creature, outfit)
+      -- LocalPlayer-only overlay management; other creatures handled by server effects
+      local lp = g_game.getLocalPlayer()
+      if not lp or creature ~= lp then return end
       local inv = isInvisible(outfit)
-      if inv and not suppressedInvisible then
-        detachAllOverlays(player)
-        suppressedInvisible = true
+      local cid = creature:getId()
+      if inv and not invisByCreature[cid] then
+        detachAllOverlays(creature)
+        invisByCreature[cid] = true
         return
       end
-      if not inv and suppressedInvisible then
-        -- restore overlays for current items
+      if not inv and invisByCreature[cid] then
         for s = InventorySlotFirst, InventorySlotLast do
-          updateSlotOverlay(player, s, player:getInventoryItem(s))
+          updateSlotOverlay(creature, s, creature:getInventoryItem(s))
         end
-        suppressedInvisible = false
+        invisByCreature[cid] = false
       end
     end
   }):execute()
