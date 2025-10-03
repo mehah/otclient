@@ -327,9 +327,10 @@ function table.remove_if(t, fnc)
 end
 
 -- table.watchList
--- Watches an array-like table (1..N) for structural changes
--- Detects inserts, removes and moves between scans
--- Keys can be taken from ops.keyOf(item) or by default the item reference itself
+-- Watches an array-like table (1..N) for structural changes.
+-- Detects inserts, removes and moves between scans.
+-- Keys can be taken from ops.keyOf(item) or by default the item reference itself.
+-- initial inserts can be emitted via ops.initialScan = true or w:scan(true).
 function table.watchList(realList, ops)
   local self = {}
   local keyOf      = (ops and ops.keyOf) or function(x) return x end
@@ -360,7 +361,18 @@ function table.watchList(realList, ops)
     return m
   end
 
-  function self:scan()
+  function self:scan(initial)
+    if initial then
+      if beginBatch then beginBatch() end
+      if onInsert then
+        for i = 1, #self.list do
+          onInsert(i, self.list[i])
+        end
+      end
+      if endBatch then endBatch() end
+      return
+    end
+
     local curr = self.list
     local wantK = {}
     for i = 1, #curr do wantK[i] = keyOf(curr[i]) end
@@ -408,6 +420,10 @@ function table.watchList(realList, ops)
     self.prev  = {}
     for k = 1, #curr do self.prev[k] = curr[k] end
     self.prevK = wantK
+  end
+
+  if ops and ops.initialScan then
+    self:scan(true)
   end
 
   return self
