@@ -47,7 +47,13 @@ end
 
 local function formatDustAmount(value)
     local numericValue = tonumber(value) or 0
-    return string.format('%d/100', numericValue)
+    local maxDust = (forgeController and forgeController.maxDustLevel) or 100
+
+    if maxDust <= 0 then
+        return tostring(numericValue)
+    end
+
+    return string.format('%d/%d', numericValue, maxDust)
 end
 
 local forgeStatusConfigs = {
@@ -193,7 +199,7 @@ local function resetWindowTypes()
     end
 end
 
-local function show(self)
+local function show(self, skipRequest)
     local needsReload = not self.ui or self.ui:isDestroyed()
     if needsReload then
         self:loadHtml('game_forge.html')
@@ -204,7 +210,9 @@ local function show(self)
         return
     end
 
-    g_game.forgeRequest()
+    if not skipRequest then
+        g_game.forgeRequest()
+    end
 
     for _, config in ipairs(forgeStatusConfigs) do
         config.widget = nil
@@ -275,8 +283,8 @@ function forgeController:toggle()
     toggle(self)
 end
 
-function forgeController:show()
-    show(self)
+function forgeController:show(skipRequest)
+    show(self, skipRequest)
 end
 
 function forgeController:hide()
@@ -513,4 +521,26 @@ function forgeController:onGameEnd()
     if forgeButton then
         forgeButton:setOn(false)
     end
+end
+
+function g_game.onOpenForge(openData)
+    openData = openData or {}
+
+    forgeController.openData = openData
+    forgeController.fusionItems = openData.fusionItems or {}
+    forgeController.convergenceFusion = openData.convergenceFusion or {}
+    forgeController.transfers = openData.transfers or {}
+    forgeController.convergenceTransfers = openData.convergenceTransfers or {}
+    local dustLevel = tonumber(openData.dustLevel) or 0
+    forgeController.maxDustLevel = dustLevel > 0 and dustLevel or forgeController.maxDustLevel or 0
+
+    forgeController.modeFusion = false
+    forgeController.modeTransfer = false
+
+    local shouldShow = not forgeController.ui or forgeController.ui:isDestroyed() or not forgeController.ui:isVisible()
+    if shouldShow then
+        forgeController:show(true)
+    end
+
+    forgeController:updateResourceBalances()
 end
