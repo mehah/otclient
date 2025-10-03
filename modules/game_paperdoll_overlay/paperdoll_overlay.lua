@@ -60,7 +60,7 @@ local function ensureEffects(slot, itemId, dirPaths)
     if path then
       local effId = makeEffectId(slot, itemId, i)
       if not g_attachedEffects.getById(effId) then
-        g_attachedEffects.registerByImage(effId, ThingCategoryItem, path, true)
+        g_attachedEffects.registerByImage(effId, "paperdll", path, true)
         local eff = g_attachedEffects.getById(effId)
         if eff then
           eff:setOnTop(true)
