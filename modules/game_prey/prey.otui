@@ -364,7 +364,7 @@ InactivePreyPanel < Panel
     Label
       id: placeholder
       anchors.centerIn: parent
-      font: verdana-9px-rounded
+      font: verdana-11px-rounded
       text-align: center
       !text: tr('No creature selected')
       color: #cfcfcf
