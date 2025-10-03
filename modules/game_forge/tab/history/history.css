@@ -14,6 +14,50 @@
     --border-color-right: #747474;
   }
 
+  .history-header {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    background-color: #363636;
+    --border-width-bottom: 1;
+    --border-color-bottom: #292a29;
+    --border-width-top: 1;
+    --border-color-top: black;
+  }
+
+  .history-header > .header-widget {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    --text-offset: 5 0;
+    text-align: left;
+  }
+
+  .history-header > .separator-vertical {
+    height: 100%;
+    width: 2px;
+    margin: 0 2px;
+    flex: 0 0 auto;
+  }
+
+  .header-date {
+    flex: 0 0 150px;
+  }
+
+  .header-action {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .header-details {
+    flex: 1 1 auto;
+  }
+
     .history-list {
       position: absolute;
       top: 18px;
@@ -22,47 +66,7 @@
       bottom: 28px;
       display: block;
       overflow: auto;
-      padding: 2px;
-    }
-
-  .header-widget {
-    position: absolute;
-    top: 0px;
-    size: 166 16;
-    --border-width-bottom: 1;
-    --border-color-bottom: #292a29;
-    background-color: #363636;
-    --text-offset: 5 0;
-    --border-width-top: 1;
-    --border-color-top: black;
-  }
-
-  .header-date {
-    left: 0px;
-  }
-
-  .header-action {
-    left: 150px;
-  }
-
-  .header-details {
-    left: 300px;
-  }
-
-    .separator-vertical {
-      position: absolute;
-      top: 0px;
-      bottom: 28px;
-      width: 2px;
-      display: block;
-    }
-
-  .separator-1 {
-    left: 149px;
-  }
-
-    .separator-2 {
-      left: 299px;
+      padding: 2px 2px 2px 0;
     }
 
     .history-footer {
@@ -93,4 +97,27 @@
 
   #historyList Label {
     text-wrap: wordBreak;
+  }
+
+  #historyList > * {
+    display: flex;
+    align-items: flex-start;
+    padding: 2px 5px;
+  }
+
+  #historyList > * > Label#date {
+    flex: 0 0 150px;
+  }
+
+  #historyList > * > Label#action {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin-right: 5px;
+    width: auto;
+    min-width: 0;
+  }
+
+  #historyList > * > Label#details {
+    flex: 1 1 auto;
+    min-width: 0;
   }

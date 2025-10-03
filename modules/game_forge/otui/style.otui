@@ -15,7 +15,6 @@ HistoryForgePanel < UIWidget
   Label
     id: action
     !text: tr('Action')
-    width: 150
     anchors.top: parent.top
     anchors.bottom: parent.bottom
     anchors.left: prev.right
