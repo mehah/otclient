@@ -217,6 +217,21 @@ local function invalidateFusionContext()
     end
 end
 
+local function resolveScrollContents(widget)
+    if not widget or widget:isDestroyed() then
+        return nil
+    end
+
+    if widget.getChildById then
+        local contents = widget:getChildById('contentsPanel')
+        if contents and not contents:isDestroyed() then
+            return contents
+        end
+    end
+
+    return widget
+end
+
 local function getChildrenByStyleName(widget, styleName)
     if not widget or widget:isDestroyed() then
         return {}
@@ -248,33 +263,36 @@ local function resolveFusionTabContext()
         return nil
     end
 
-    if fusionTabContext and fusionTabContext.panel == panel and not panel:isDestroyed() then
-        return fusionTabContext
+    if not fusionTabContext or fusionTabContext.panel ~= panel or panel:isDestroyed() then
+        local resultArea = panel.test or panel:recursiveGetChildById('test')
+        fusionTabContext = {
+            panel = panel,
+            selectionPanel = nil,
+            selectionItemsPanel = nil,
+            targetItem = getFirstChildByStyleName(panel, 'fusion-slot-item'),
+            resultArea = resultArea,
+            placeholder = getFirstChildByStyleName(resultArea, 'forge-result-placeholder'),
+            convergenceSection = getFirstChildByStyleName(resultArea, 'fusion-convergence-section'),
+            fusionButton = nil,
+            fusionButtonItem = nil,
+            fusionButtonItemTo = nil,
+            convergenceItemsPanel = nil,
+            dustAmountLabel = nil,
+            costLabel = nil
+        }
     end
 
-    local resultArea = panel.test or panel:recursiveGetChildById('test')
-    fusionTabContext = {
-        panel = panel,
-        selectionPanel = getFirstChildByStyleName(panel, 'fusion-selection-area'),
-        selectionItemsPanel = nil,
-        targetItem = getFirstChildByStyleName(panel, 'fusion-slot-item'),
-        resultArea = resultArea,
-        placeholder = getFirstChildByStyleName(resultArea, 'forge-result-placeholder'),
-        convergenceSection = getFirstChildByStyleName(resultArea, 'fusion-convergence-section'),
-        fusionButton = nil,
-        fusionButtonItem = nil,
-        fusionButtonItemTo = nil,
-        convergenceItemsPanel = nil,
-        dustAmountLabel = nil,
-        costLabel = nil
-    }
+    if not fusionTabContext.selectionPanel or fusionTabContext.selectionPanel:isDestroyed() then
+        fusionTabContext.selectionPanel = getFirstChildByStyleName(panel, 'fusion-selection-area')
+        fusionTabContext.selectionItemsPanel = nil
+    end
 
-    if fusionTabContext.selectionPanel then
+    if fusionTabContext.selectionPanel and (not fusionTabContext.selectionItemsPanel or fusionTabContext.selectionItemsPanel:isDestroyed()) then
         local selectionGrids = getChildrenByStyleName(fusionTabContext.selectionPanel, 'forge-slot-grid')
-        fusionTabContext.selectionItemsPanel = selectionGrids[1]
+        fusionTabContext.selectionItemsPanel = resolveScrollContents(selectionGrids[1])
     end
 
-    if fusionTabContext.resultArea then
+    if fusionTabContext.resultArea and (not fusionTabContext.fusionButton or fusionTabContext.fusionButton:isDestroyed()) then
         local actionButton = getFirstChildByStyleName(fusionTabContext.resultArea, 'forge-action-button')
         if actionButton then
             fusionTabContext.fusionButton = actionButton
@@ -282,7 +300,9 @@ local function resolveFusionTabContext()
             fusionTabContext.fusionButtonItem = resultItems[1]
             fusionTabContext.fusionButtonItemTo = resultItems[2]
         end
+    end
 
+    if fusionTabContext.resultArea and (not fusionTabContext.costLabel or fusionTabContext.costLabel:isDestroyed()) then
         local costContainer = getFirstChildByStyleName(fusionTabContext.resultArea, 'fusion-result-cost')
         if costContainer then
             local labels = getChildrenByStyleName(costContainer, 'forge-full-width-label')
@@ -290,8 +310,10 @@ local function resolveFusionTabContext()
         end
     end
 
-    if fusionTabContext.convergenceSection then
-        fusionTabContext.convergenceItemsPanel = getFirstChildByStyleName(fusionTabContext.convergenceSection, 'forge-slot-grid')
+    if fusionTabContext.convergenceSection and (not fusionTabContext.convergenceItemsPanel or fusionTabContext.convergenceItemsPanel:isDestroyed()) then
+        fusionTabContext.convergenceItemsPanel = resolveScrollContents(
+            getFirstChildByStyleName(fusionTabContext.convergenceSection, 'forge-slot-grid')
+        )
         local labels = getChildrenByStyleName(fusionTabContext.convergenceSection, 'forge-full-width-label')
         fusionTabContext.dustAmountLabel = labels[1]
     end
@@ -676,6 +698,12 @@ function forgeController:configureFusionConversionPanel(selectedWidget)
         return
     end
 
+    if context.convergenceSection and (not context.convergenceItemsPanel or context.convergenceItemsPanel:isDestroyed()) then
+        context.convergenceItemsPanel = resolveScrollContents(
+            getFirstChildByStyleName(context.convergenceSection, 'forge-slot-grid')
+        )
+    end
+
     local itemPtr = selectedWidget.itemPtr
     local itemWidget = selectedWidget.item
     local itemCount = 1
@@ -856,6 +884,11 @@ function forgeController:updateFusionItems(fusionData)
     local context = resolveFusionTabContext()
     if not context then
         return
+    end
+
+    if context.selectionPanel and (not context.selectionItemsPanel or context.selectionItemsPanel:isDestroyed()) then
+        local selectionGrids = getChildrenByStyleName(context.selectionPanel, 'forge-slot-grid')
+        context.selectionItemsPanel = resolveScrollContents(selectionGrids[1])
     end
 
     self:resetFusionConversionPanel()
