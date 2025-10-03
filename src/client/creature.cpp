@@ -121,7 +121,9 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
         return;
 
     const int baseSprite = g_gameConfig.getSpriteSize();
-    const int nativeSize = std::max<int>(getRealSize(), getExactSize());
+    const int nativeSize = g_gameConfig.isUseCropSizeForUIDraw() 
+        ? getExactSize()
+        : std::max<int>(getRealSize(), getExactSize());
     const int tileCount = 2;
     const int fbSize = tileCount * baseSprite;
 
