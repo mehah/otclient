@@ -427,7 +427,17 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     if (widget && !script.empty())
         widget->callLuaField("__scriptHtml", moduleName, script, scriptStr);
 
-    const auto mainNode = widget->getHtmlNode().get();
+    const auto mainNode = root.node.get();
+
+    if (isDynamic) {
+        bool insertWithOrder = parent->m_insertChildIndex > -1;
+        if (insertWithOrder) {
+            parent->getHtmlNode()->insert(widget->getHtmlNode(), parent->m_insertChildIndex - 1);
+        } else {
+            parent->getHtmlNode()->append(widget->getHtmlNode());
+        }
+        parent->refreshHtml(insertWithOrder);
+    }
 
     for (const auto& sheet : GLOBAL_STYLES)
         applyStyleSheet(mainNode, htmlPath, sheet, false);
@@ -485,12 +495,7 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
 
     auto rootCopy = it->second;
     rootCopy.dynamicNode = parseHtml("<html>" + html + "</html>");
-
-    readNode(rootCopy, parent, it->second.moduleName, "", false, htmlId);
-    if (auto node = rootCopy.node->querySelector("html > :first")) {
-        return node->getWidget();
-    }
-    return  nullptr;
+    return readNode(rootCopy, parent, it->second.moduleName, "", false, htmlId);
 }
 
 void HtmlManager::destroy(uint32_t id) {
