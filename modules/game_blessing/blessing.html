@@ -95,7 +95,7 @@
 <Window id="main" class="blessings-window" title="Blessings" onescape="self:close()">
 
   <!-- History Panel (initially hidden) -->
-  <div id="historyPanel" anchor="parent" class="history-panel minipanel" title="History" *visible="self.historyButtonText == 'History'">
+  <div id="historyPanel" anchor="parent" class="history-panel minipanel" title="History" *if="self.historyButtonText == 'History'">
     <div id="historyScrollArea" class="history-scroll">
     </div>
   </div>
