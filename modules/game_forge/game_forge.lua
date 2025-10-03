@@ -187,18 +187,37 @@ local function hideAllPanels()
     end
 end
 
-local function toggle(self)
+local function resetWindowTypes()
+    for key in pairs(windowTypes) do
+        windowTypes[key] = nil
+    end
+end
+
+local function show(self)
+    local needsReload = not self.ui or self.ui:isDestroyed()
+    if needsReload then
+        self:loadHtml('game_forge.html')
+        ui.panels = {}
+    end
+
+    if not self.ui then
+        return
+    end
+
     g_game.forgeRequest()
-    forgeController:loadHtml('game_forge.html')
+
     for _, config in ipairs(forgeStatusConfigs) do
         config.widget = nil
     end
-    g_ui.importStyle("otui/style.otui")
+
     self.modeFusion, self.modeTransfer = false, false
+
+    resetWindowTypes()
 
     for _, tabName in ipairs(TAB_ORDER) do
         self:loadTab(tabName)
     end
+
     hideAllPanels()
 
     local buttonPanel = self.ui.buttonPanel
@@ -210,8 +229,58 @@ local function toggle(self)
         }
     end
 
-    SelectWindow("fusionMenu")
+    self.ui:centerIn('parent')
+    self.ui:show()
+    self.ui:raise()
+    self.ui:focus()
+
+    if forgeButton then
+        forgeButton:setOn(true)
+    end
+
+    SelectWindow('fusionMenu')
     self:updateResourceBalances()
+end
+
+local function hide()
+    if not forgeController.ui then
+        return
+    end
+
+    forgeController.ui:hide()
+
+    if forgeButton then
+        forgeButton:setOn(false)
+    end
+end
+
+function forgeController:close()
+    hide()
+end
+
+local function toggle(self)
+    if not self.ui or self.ui:isDestroyed() then
+        show(self)
+        return
+    end
+
+    if self.ui:isVisible() then
+        hide()
+    else
+        show(self)
+    end
+end
+
+function forgeController:toggle()
+    toggle(self)
+end
+
+function forgeController:show()
+    show(self)
+end
+
+function forgeController:hide()
+    hide()
 end
 
 local function updateStatusConfig(controller, config, player)
@@ -320,6 +389,8 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     lastPage = math.max(tonumber(lastPage) or page, 1)
     currentCount = tonumber(currentCount) or 0
 
+    lastPage = lastPage > 1 and lastPage - 1 or lastPage
+
     state.page = page
     state.lastPage = lastPage
     state.currentCount = currentCount
@@ -338,9 +409,11 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     historyListWidget:destroyChildren()
 
     if historyList and #historyList > 0 then
-        for _, entry in ipairs(historyList) do
+        for index, entry in ipairs(historyList) do
             local row = g_ui.createWidget('HistoryForgePanel', historyListWidget)
             if row then
+                local rowBackground = index % 2 == 1 and '#484848' or '#414141'
+                row:setBackgroundColor(rowBackground)
                 local dateLabel = row:getChildById('date')
                 if dateLabel then
                     dateLabel:setText(formatHistoryDate(entry.createdAt))
@@ -383,6 +456,7 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
         historyPanel.historyPageLabel = pageLabel
     end
     if pageLabel then
+        g_logger.info(page .. "/" .. lastPage)
         pageLabel:setText(tr('Page %d/%d', page, lastPage))
     end
 
@@ -412,7 +486,31 @@ function forgeController:onTerminate()
 end
 
 function forgeController:onGameStart()
+    g_ui.importStyle('otui/style.otui')
+    if not self.ui or self.ui:isDestroyed() then
+        self:loadHtml('game_forge.html')
+        ui.panels = {}
+    end
+
+    resetWindowTypes()
+
+    if self.ui then
+        self.ui:hide()
+    end
+
+    self.historyState = {
+        page = 1,
+        lastPage = 1,
+        currentCount = 0
+    }
 end
 
 function forgeController:onGameEnd()
+    if self.ui and self.ui:isVisible() then
+        self.ui:hide()
+    end
+
+    if forgeButton then
+        forgeButton:setOn(false)
+    end
 end

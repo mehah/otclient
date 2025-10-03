@@ -1,5 +1,5 @@
 HistoryForgePanel < UIWidget
-  size: 0 36
+  size: 0 29
   focusable: false
   padding: 0
   layout: anchor
@@ -22,7 +22,7 @@ HistoryForgePanel < UIWidget
     width: 80
     text-align: left
     margin-top: 1
-    margin-left: 5
+    margin-left: 0
     margin-right: 5
   Label
     id: details
