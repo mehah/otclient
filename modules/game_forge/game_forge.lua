@@ -918,6 +918,19 @@ function forgeController:updateFusionItems(fusionData)
         end
     end
 
+    local function applySelectionHighlight(widget, checked)
+        if not widget or widget:isDestroyed() then
+            return
+        end
+
+        if checked then
+            widget:setBorderWidth(1)
+            widget:setBorderColor('#ffffff')
+        else
+            widget:setBorderWidth(0)
+        end
+    end
+
     local function appendItem(info)
         if type(info) ~= 'table' or not info.id or info.id <= 0 then
             return
@@ -928,15 +941,17 @@ function forgeController:updateFusionItems(fusionData)
             return
         end
 
-        widget:setStyle('fusion-item-box')
         widget:setText('')
         widget:setFocusable(true)
         widget:setSize('36 36')
-        widget:setBorderColor('#ffffff')
         widget:setBorderWidth(0)
+        widget:setBorderColor('#ffffff')
+
+        widget.onCheckChange = function(self, checked)
+            applySelectionHighlight(self, checked)
+        end
 
         local frame = g_ui.createWidget('UIWidget', widget)
-        frame:setStyle('fusion-item-box__frame')
         frame:setSize('34 34')
         frame:setMarginLeft(1)
         frame:setMarginTop(1)
@@ -947,14 +962,13 @@ function forgeController:updateFusionItems(fusionData)
         frame:setFocusable(false)
 
         local itemWidget = g_ui.createWidget('UIItem', widget)
-        itemWidget:setStyle('fusion-item-box__item')
         itemWidget:setSize('32 32')
         itemWidget:setMarginTop(2)
         itemWidget:addAnchor(AnchorTop, 'parent', AnchorTop)
         itemWidget:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
         itemWidget:setPhantom(true)
         itemWidget:setVirtual(true)
-        itemWidget:setShowCount(false)
+        itemWidget:setShowCount(true)
 
         local itemPtr = Item.create(info.id, info.count or 1)
         itemPtr:setTier(info.tier or 0)
@@ -966,6 +980,8 @@ function forgeController:updateFusionItems(fusionData)
         widget.item = itemWidget
         widget.itemPtr = itemPtr
         widget.fusionItemInfo = info
+
+        applySelectionHighlight(widget, widget:isChecked())
 
         fusionSelectionRadioGroup:addWidget(widget)
     end
