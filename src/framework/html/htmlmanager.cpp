@@ -296,16 +296,6 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
         widget->setText(node->getText());
     }
 
-    const auto& styleValue = node->getAttr("style");
-    if (!styleValue.empty()) {
-        parseAttrPropList(styleValue, node->getAttrStyles());
-        for (const auto& [prop, value] : node->getAttrStyles()) {
-            if (isInheritable(prop)) {
-                setChildrenStyles(node.get(), "styles", prop, value);
-            }
-        }
-    }
-
     if (!node->getChildren().empty()) {
         for (const auto& child : node->getChildren()) {
             createWidgetFromNode(child, widget, textNodes, htmlId, moduleName, widgets);
@@ -404,8 +394,10 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     textNodes.reserve(32);
     widgets.reserve(32);
 
+    bool isDynamic = root.dynamicNode != nullptr;
+
     UIWidgetPtr widget;
-    for (const auto& el : (root.dynamicNode ? root.dynamicNode : root.node)->getChildren()) {
+    for (const auto& el : (isDynamic ? root.dynamicNode : root.node)->getChildren()) {
         if (el->getTag() == "style") {
             root.sheets.emplace_back(css::parse(el->textContent()));
         } else if (el->getTag() == "link") {
@@ -417,6 +409,13 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
             scriptStr = el->toString();
         } else if (el->getTag() == "html") {
             for (const auto& n : el->getChildren()) {
+                if (isDynamic) {
+                    n->getInheritableStyles() = parent->getHtmlNode()->getInheritableStyles();
+                    for (const auto& [styleName, styleMap] : n->getInheritableStyles()) {
+                        for (auto& [style, value] : styleMap)
+                            n->getStyles()[styleName][style] = value;
+                    }
+                }
                 widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName, widgets);
             }
         }
@@ -433,19 +432,21 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     for (const auto& sheet : GLOBAL_STYLES)
         applyStyleSheet(mainNode, htmlPath, sheet, false);
 
-    if (root.dynamicNode) {
-        for (auto& widget : widgets) {
-            auto node = widget->getHtmlNode().get();
-            node->getInheritableStyles() = parent->getHtmlNode()->getInheritableStyles();
-            for (const auto& [styleName, styleMap] : node->getInheritableStyles()) {
-                for (auto& [style, value] : styleMap)
-                    node->getStyles()[styleName][style] = value;
+    for (const auto& sheet : root.sheets)
+        applyStyleSheet(mainNode, htmlPath, sheet, checkRuleExist);
+
+    for (const auto& widget : widgets) {
+        const auto node = widget->getHtmlNode().get();
+        const auto& styleValue = node->getAttr("style");
+        if (!styleValue.empty()) {
+            parseAttrPropList(styleValue, node->getAttrStyles());
+            for (const auto& [prop, value] : node->getAttrStyles()) {
+                if (isInheritable(prop)) {
+                    setChildrenStyles(node, "styles", prop, value);
+                }
             }
         }
     }
-
-    for (const auto& sheet : root.sheets)
-        applyStyleSheet(mainNode, htmlPath, sheet, checkRuleExist);
 
     for (const auto& widget : std::views::reverse(widgets)) {
         const auto node = widget->getHtmlNode().get();
