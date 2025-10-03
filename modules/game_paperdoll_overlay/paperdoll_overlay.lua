@@ -121,6 +121,21 @@ end
 local controller = Controller:new()
 local lastDirIdx = nil
 local cycleName = "paperdoll_dir"
+local suppressedInvisible = false
+
+local function isInvisible(outfit)
+  -- Protocol sets invisible as: lookType=0 and lookTypeEx=0 -> auxType=13 (effect id)
+  return outfit and outfit.type == 0 and outfit.auxType == 13
+end
+
+local function detachAllOverlays(player)
+  for _, effId in pairs(state.activeEffect) do
+    if effId and player:getAttachedEffectById(effId) then
+      player:detachEffectById(effId)
+    end
+  end
+  state.activeEffect = {}
+end
 
 function init() end
 
@@ -128,6 +143,22 @@ function controller:onGameStart()
   self:registerEvents(LocalPlayer, {
     onInventoryChange = function(player, slot, item, oldItem)
       updateSlotOverlay(player, slot, item)
+    end
+    ,
+    onOutfitChange = function(player, outfit)
+      local inv = isInvisible(outfit)
+      if inv and not suppressedInvisible then
+        detachAllOverlays(player)
+        suppressedInvisible = true
+        return
+      end
+      if not inv and suppressedInvisible then
+        -- restore overlays for current items
+        for s = InventorySlotFirst, InventorySlotLast do
+          updateSlotOverlay(player, s, player:getInventoryItem(s))
+        end
+        suppressedInvisible = false
+      end
     end
   }):execute()
 
