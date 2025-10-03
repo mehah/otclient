@@ -1533,6 +1533,19 @@ int push_luavalue(const CyclopediaCharacterMiscStats& data)
     return 1;
 }
 
+int push_luavalue(const ForgeHistory& item) {
+    g_lua.createTable(0, 4);
+    g_lua.pushInteger(item.createdAt);
+    g_lua.setField("createdAt");
+    g_lua.pushInteger(item.actionType);
+    g_lua.setField("actionType");
+    g_lua.pushString(item.description);
+    g_lua.setField("description");
+    g_lua.pushInteger(item.bonus);
+    g_lua.setField("bonus");
+    return 1;
+}
+
 int push_luavalue(const ForgeItemInfo& item) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(item.id);

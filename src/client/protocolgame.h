@@ -137,6 +137,7 @@ public:
     void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void sendPreyRequest();
     void sendForgeRequest(Otc::ForgeAction_t actionType = Otc::ForgeAction_t::FUSION);
+    void sendForgeBrowseHistoryRequest(uint16_t page);
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
     void sendCloseImbuingWindow();
@@ -248,6 +249,7 @@ private:
     void parseOpenForge(const InputMessagePtr& msg);
     void setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const;
     void addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const;
+    void parseBrowseForgeHistory(const InputMessagePtr& msg);
     void parseCloseForgeWindow(const InputMessagePtr& msg);
     void parseCreatureData(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);

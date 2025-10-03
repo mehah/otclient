@@ -1378,6 +1378,14 @@ void ProtocolGame::sendForgeRequest(Otc::ForgeAction_t actionType) {
     send(msg);
 }
 
+void ProtocolGame::sendForgeBrowseHistoryRequest(uint16_t page) {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeBrowseHistory);
+    msg->addU8(page);
+    g_logger.info("sendForgeBrowseHistoryRequest page {}", page);
+    send(msg);
+}
+
 void ProtocolGame::sendApplyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
 {
     const auto& msg = std::make_shared<OutputMessage>();

@@ -1775,6 +1775,13 @@ void Game::forgeRequest()
     m_protocolGame->sendForgeRequest();
 }
 
+void Game::sendForgeBrowseHistoryRequest(uint16_t page)
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendForgeBrowseHistoryRequest(page);
+}
+
 void Game::applyImbuement(const uint8_t slot, const uint32_t imbuementId, const bool protectionCharm)
 {
     if (!canPerformGameAction())

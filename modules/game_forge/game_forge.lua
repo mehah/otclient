@@ -1,8 +1,8 @@
--- Todo 
+-- Todo
 -- change to TypeScript
 
 local windowTypes = {}
-local TAB_ORDER = {'fusion', 'transfer', 'conversion', 'history'}
+local TAB_ORDER = { 'fusion', 'transfer', 'conversion', 'history' }
 local TAB_CONFIG = {
     fusion = {
         modeProperty = 'modeFusion'
@@ -214,6 +214,10 @@ function forgeController:updateResourceBalances(resourceType)
 end
 
 function forgeController:onInit()
+    connect(g_game, {
+        onBrowseForgeHistory = onBrowseForgeHistory
+    })
+
     if not forgeButton then
         forgeButton = modules.game_mainpanel.addToggleButton('forgeButton', tr('Open Exaltation Forge'),
             '/images/options/button-exaltation-forge.png', function() toggle(self) end)
@@ -249,6 +253,12 @@ function SelectWindow(type, isBackButtonPress)
         panel:show()
         panel:raise()
     end
+
+    if type == "historyMenu" then
+        if not isBackButtonPress then
+            g_game.sendForgeBrowseHistoryRequest(1)
+        end
+    end
 end
 
 function forgeController:loadTab(tabName)
@@ -267,9 +277,18 @@ function forgeController:getCurrentWindow()
     return self.currentWindowType and windowTypes[self.currentWindowType]
 end
 
-function forgeController:onTerminate()
+function onBrowseForgeHistory(page, lastPage, history)
+    g_logger.info("page " .. page .. " lastPage " .. lastPage) -- DEBUG
 end
+
+function forgeController:onTerminate()
+    disconnect(g_game, {
+        onBrowseForgeHistory = onBrowseForgeHistory
+    })
+end
+
 function forgeController:onGameStart()
 end
+
 function forgeController:onGameEnd()
 end

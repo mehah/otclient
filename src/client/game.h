@@ -560,6 +560,14 @@ struct CyclopediaCharacterMiscStats
     std::vector<Concoction> concoctions;
 };
 
+struct ForgeHistory
+{
+    uint32_t createdAt;
+    uint8_t actionType;
+    std::string description;
+    uint8_t bonus;
+};
+
 struct ForgeItemInfo
 {
     uint16_t id{ 0 };
@@ -929,6 +937,7 @@ public:
 
     // forge related
     void forgeRequest();
+    void sendForgeBrowseHistoryRequest(uint16_t page);
 
     // imbuing related
     void applyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
