@@ -187,6 +187,17 @@ local function hideAllPanels()
     end
 end
 
+local function hide()
+    if not forgeController.ui then
+        return
+    end
+    forgeController.ui:hide()
+end
+
+function forgeController:close()
+    hide()
+end
+
 local function toggle(self)
     g_game.forgeRequest()
     forgeController:loadHtml('game_forge.html')
@@ -340,9 +351,11 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     historyListWidget:destroyChildren()
 
     if historyList and #historyList > 0 then
-        for _, entry in ipairs(historyList) do
+        for index, entry in ipairs(historyList) do
             local row = g_ui.createWidget('HistoryForgePanel', historyListWidget)
             if row then
+                local rowBackground = index % 2 == 1 and '#484848' or '#414141'
+                row:setBackgroundColor(rowBackground)
                 local dateLabel = row:getChildById('date')
                 if dateLabel then
                     dateLabel:setText(formatHistoryDate(entry.createdAt))
