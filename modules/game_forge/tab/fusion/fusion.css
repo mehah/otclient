@@ -4,6 +4,32 @@
     --icon: /images/ui/icon-questionmark
   }
 
+  .fusion-item-box {
+    size: 36 36;
+    border-width: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  .fusion-item-box:checked {
+    border-width: 1;
+    border-color: #ffffff;
+  }
+
+  .fusion-item-box__frame {
+    size: 34 34;
+    margin-left: 1;
+    margin-top: 1;
+    image-source: /images/ui/item;
+    phantom: true;
+  }
+
+  .fusion-item-box__item {
+    size: 32 32;
+    margin-top: 2;
+    phantom: true;
+  }
+
   .fusion-slot-item {
     size: 65 65;
   }
