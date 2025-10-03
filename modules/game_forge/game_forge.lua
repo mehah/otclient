@@ -320,6 +320,8 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     lastPage = math.max(tonumber(lastPage) or page, 1)
     currentCount = tonumber(currentCount) or 0
 
+    lastPage = lastPage > 1 and lastPage - 1 or lastPage
+
     state.page = page
     state.lastPage = lastPage
     state.currentCount = currentCount
@@ -383,6 +385,7 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
         historyPanel.historyPageLabel = pageLabel
     end
     if pageLabel then
+        g_logger.info(page .. "/" .. lastPage)
         pageLabel:setText(tr('Page %d/%d', page, lastPage))
     end
 
