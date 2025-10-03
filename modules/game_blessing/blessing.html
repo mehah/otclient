@@ -95,20 +95,20 @@
 <Window id="main" class="blessings-window" title="Blessings" onescape="self:close()">
 
   <!-- History Panel (initially hidden) -->
-  <div id="historyPanel" class="history-panel minipanel" title="History" *if="self.historyButtonText == 'History'">
+  <div id="historyPanel" anchor="parent" class="history-panel minipanel" title="History" *visible="self.historyButtonText == 'History'">
     <div id="historyScrollArea" class="history-scroll">
     </div>
   </div>
 
   <!-- Blessing Records Panel -->
-  <div id="blessingsRecordPanel" class="record-panel minipanel" title="Record of Blessings"
+  <div id="blessingsRecordPanel" anchor="parent" class="record-panel minipanel" title="Record of Blessings"
     layout="type: horizontalBox">
   </div>
 
   <!-- Promotion Status Panel -->
   <div id="promotionPanel" class="promo-panel minipanel" title="Promotion and Premium Status">
     <label id="promotionStatusLabel"></label>
-    <BigPremiumButton id="premium_only" onclick="self:onClickSendStore()" *on="not g_game:getLocalPlayer():isPremium()">
+    <BigPremiumButton id="premium_only" onclick="self:onClickSendStore()" *on="g_game.isOnline() and not g_game:getLocalPlayer():isPremium()">
     </BigPremiumButton>
   </div>
 
