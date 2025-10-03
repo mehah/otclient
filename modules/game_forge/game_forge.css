@@ -35,10 +35,18 @@
   --image-clip: 0 34 116 34;
 }
 
-.forge-btn.btn-fusion { --image-source: "/game_forge/images/fusionButton"; }
-.forge-btn.btn-transfer { --image-source: "/game_forge/images/transferButton"; }
-.forge-btn.btn-conversion { --image-source: "/game_forge/images/conversionButton"; }
-.forge-btn.btn-history { --image-source: "/game_forge/images/historyButton"; }
+.forge-btn.btn-fusion {
+  --image-source: "/game_forge/images/fusionButton";
+}
+.forge-btn.btn-transfer {
+  --image-source: "/game_forge/images/transferButton";
+}
+.forge-btn.btn-conversion {
+  --image-source: "/game_forge/images/conversionButton";
+}
+.forge-btn.btn-history {
+  --image-source: "/game_forge/images/historyButton";
+}
 
 .content-area {
   position: absolute;
@@ -74,9 +82,15 @@
   margin-left: 0;
 }
 
-.status-item.status-primary { width: 130px; }
-.status-item.status-secondary { width: 80px; }
-.status-item.status-tertiary { width: 55px; }
+.status-item.status-primary {
+  width: 130px;
+}
+.status-item.status-secondary {
+  width: 80px;
+}
+.status-item.status-tertiary {
+  width: 55px;
+}
 
 .resource-icon {
   float: right;
@@ -164,6 +178,7 @@
 }
 
 .forge-card {
+  position: relative;
   display: block;
   width: 66px;
   height: 66px;
@@ -171,16 +186,17 @@
 }
 
 .forge-item-icon {
-  width: 50px;
-  height: 50px;
+  width: 64px;
+  height: 64px;
 }
 
 .forge-question-icon {
   width: 8px;
   height: 21px;
-  position: relative;
-  left: -20px;
-  top: 25px;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  transform: translate(-50%, -50%);
 }
 
 .forge-counter {
@@ -196,6 +212,7 @@
   width: 100%;
   height: 100%;
   text-align: center;
+  align-items: center;
 }
 
 .forge-result-placeholder {
@@ -217,7 +234,7 @@
   --image-source: /images/ui/button;
   --image-color: #dfdfdf;
   --image-border: 3;
-  opacity: 1.0;
+  opacity: 1;
 }
 
 .forge-action-button:pressed {
