@@ -265,14 +265,18 @@ local function resolveFusionTabContext()
 
     if not fusionTabContext or fusionTabContext.panel ~= panel or panel:isDestroyed() then
         local resultArea = panel.test or panel:recursiveGetChildById('test')
+        local selectionPanel = panel.fusionSelectionArea or getFirstChildByStyleName(panel, 'fusion-selection-area')
+        local convergenceSection = panel.fusionConvergenceSection
+            or (resultArea and resultArea.fusionConvergenceSection)
+            or getFirstChildByStyleName(resultArea, 'fusion-convergence-section')
         fusionTabContext = {
             panel = panel,
-            selectionPanel = nil,
+            selectionPanel = selectionPanel,
             selectionItemsPanel = nil,
             targetItem = getFirstChildByStyleName(panel, 'fusion-slot-item'),
             resultArea = resultArea,
             placeholder = getFirstChildByStyleName(resultArea, 'forge-result-placeholder'),
-            convergenceSection = getFirstChildByStyleName(resultArea, 'fusion-convergence-section'),
+            convergenceSection = convergenceSection,
             fusionButton = nil,
             fusionButtonItem = nil,
             fusionButtonItemTo = nil,
@@ -283,13 +287,18 @@ local function resolveFusionTabContext()
     end
 
     if not fusionTabContext.selectionPanel or fusionTabContext.selectionPanel:isDestroyed() then
-        fusionTabContext.selectionPanel = getFirstChildByStyleName(panel, 'fusion-selection-area')
+        fusionTabContext.selectionPanel = panel.fusionSelectionArea or getFirstChildByStyleName(panel, 'fusion-selection-area')
         fusionTabContext.selectionItemsPanel = nil
     end
 
     if fusionTabContext.selectionPanel and (not fusionTabContext.selectionItemsPanel or fusionTabContext.selectionItemsPanel:isDestroyed()) then
-        local selectionGrids = getChildrenByStyleName(fusionTabContext.selectionPanel, 'forge-slot-grid')
-        fusionTabContext.selectionItemsPanel = resolveScrollContents(selectionGrids[1])
+        local selectionGrid = fusionTabContext.selectionPanel.fusionSelectionGrid
+            or panel.fusionSelectionGrid
+        if not selectionGrid then
+            local selectionGrids = getChildrenByStyleName(fusionTabContext.selectionPanel, 'forge-slot-grid')
+            selectionGrid = selectionGrids[1]
+        end
+        fusionTabContext.selectionItemsPanel = resolveScrollContents(selectionGrid)
     end
 
     if fusionTabContext.resultArea and (not fusionTabContext.fusionButton or fusionTabContext.fusionButton:isDestroyed()) then
@@ -311,9 +320,12 @@ local function resolveFusionTabContext()
     end
 
     if fusionTabContext.convergenceSection and (not fusionTabContext.convergenceItemsPanel or fusionTabContext.convergenceItemsPanel:isDestroyed()) then
-        fusionTabContext.convergenceItemsPanel = resolveScrollContents(
-            getFirstChildByStyleName(fusionTabContext.convergenceSection, 'forge-slot-grid')
-        )
+        local convergenceGrid = fusionTabContext.convergenceSection.fusionConvergenceGrid
+            or (fusionTabContext.resultArea and fusionTabContext.resultArea.fusionConvergenceGrid)
+        if not convergenceGrid then
+            convergenceGrid = getFirstChildByStyleName(fusionTabContext.convergenceSection, 'forge-slot-grid')
+        end
+        fusionTabContext.convergenceItemsPanel = resolveScrollContents(convergenceGrid)
         local labels = getChildrenByStyleName(fusionTabContext.convergenceSection, 'forge-full-width-label')
         fusionTabContext.dustAmountLabel = labels[1]
     end
@@ -946,6 +958,7 @@ function forgeController:updateFusionItems(fusionData)
         widget:setSize('36 36')
         widget:setBorderWidth(0)
         widget:setBorderColor('#ffffff')
+        widget:addClass('fusion-item-box')
 
         widget.onCheckChange = function(self, checked)
             applySelectionHighlight(self, checked)
@@ -960,6 +973,7 @@ function forgeController:updateFusionItems(fusionData)
         frame:setImageSource('/images/ui/item')
         frame:setPhantom(true)
         frame:setFocusable(false)
+        frame:addClass('fusion-item-box__frame')
 
         local itemWidget = g_ui.createWidget('UIItem', widget)
         itemWidget:setSize('32 32')
@@ -969,6 +983,7 @@ function forgeController:updateFusionItems(fusionData)
         itemWidget:setPhantom(true)
         itemWidget:setVirtual(true)
         itemWidget:setShowCount(true)
+        itemWidget:addClass('fusion-item-box__item')
 
         local itemPtr = Item.create(info.id, info.count or 1)
         itemPtr:setTier(info.tier or 0)

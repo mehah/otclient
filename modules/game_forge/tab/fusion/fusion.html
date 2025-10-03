@@ -1,8 +1,9 @@
 <html>
 <div id="fusion" anchor="parent" class="fusion-container forge-tab" layout="type: verticalBox; spacing: 5">
-  <div class="minipanel forge-selection-area forge-selection-area--primary fusion-selection-area"
+  <div id="fusionSelectionArea" class="minipanel forge-selection-area forge-selection-area--primary fusion-selection-area"
     title="Select Item For Fusion">
-    <div class="slot-grid forge-slot-grid UIScrollArea" layout="type: grid; cell-size: 36 38;flow: true"></div>
+    <div id="fusionSelectionGrid" class="slot-grid forge-slot-grid UIScrollArea"
+      layout="type: grid; cell-size: 36 38;flow: true"></div>
     <div class="forge-selection-side" style="margin-left: 0px;">
       <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
       <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
@@ -75,8 +76,10 @@
       </table>
     </div>
 
-    <div anchor="parent" class="fusion-convergence-section" *visible="self.modeFusion">
-      <div class="slot-grid forge-slot-grid UIScrollArea" layout="type: grid; cell-size: 36 38;flow: true"></div>
+    <div id="fusionConvergenceSection" anchor="parent" class="fusion-convergence-section"
+      *visible="self.modeFusion">
+      <div id="fusionConvergenceGrid" class="slot-grid forge-slot-grid UIScrollArea"
+        layout="type: grid; cell-size: 36 38;flow: true"></div>
       <div class="forge-required-block forge-required-block--offset">
         <div class="forge-card">
           <UIItem class="forge-item-icon"></UIItem>
