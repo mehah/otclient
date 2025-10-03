@@ -1,22 +1,51 @@
 <html>
-<div id="history" class="history-container" anchor="parent">
-  <TextList id="historyList" anchor="parent" class="history-list"></TextList>
+  <div id="history" class="history-container" anchor="parent">
+    <TextList id="historyList" anchor="parent" class="history-list"></TextList>
 
-  <UIWidget id="historyHeader" anchor="parent" class="history-header">
-    <Label id="historyHeaderDate" class="header-widget header-date" text="Date"></Label>
-    <img class="separator-vertical" src="/images/ui/separator_vertical"/>
-    <Label id="historyHeaderAction" class="header-widget header-action" text="Action"></Label>
-    <img class="separator-vertical" src="/images/ui/separator_vertical"/>
-    <Label id="historyHeaderDetails" class="header-widget header-details" text="Details"></Label>
-  </UIWidget>
+    <UIWidget
+      anchor="parent"
+      class="header-widget header-date"
+      text="Date"
+    ></UIWidget>
+    <UIWidget
+      anchor="parent"
+      class="header-widget header-action"
+      text="Action"
+    ></UIWidget>
+    <UIWidget
+      anchor="parent"
+      class="header-widget header-details"
+      text="Details"
+    ></UIWidget>
 
-  <UIWidget id="historyFooter" class="history-footer">
-    <UIButton id="previousPageButton" class="history-button" text="Previous Page"
-      visible="false" onclick="self:onHistoryPreviousPage()" />
-    <UIWidget id="historyPageLabel" class="history-page-label" text="Page 1/1"></UIWidget>
-    <UIButton id="nextPageButton" class="history-button" text="Next Page"
-      onclick="self:onHistoryNextPage()" />
-  </UIWidget>
-</div>
+    <img
+      class="separator-vertical separator-1"
+      src="/images/ui/separator_vertical"
+    />
+    <img
+      class="separator-vertical separator-2"
+      src="/images/ui/separator_vertical"
+    />
+
+    <UIWidget id="historyFooter" class="history-footer">
+      <UIButton
+        id="previousPageButton"
+        class="history-button history-button-previous"
+        text="Previous Page"
+        visible="false"
+        onclick="self:onHistoryPreviousPage()"
+      />
+      <UIWidget
+        id="historyPageLabel"
+        class="history-page-label"
+        text="Page 1/1"
+      ></UIWidget>
+      <UIButton
+        id="nextPageButton"
+        class="history-button history-button-next"
+        text="Next Page"
+        onclick="self:onHistoryNextPage()"
+      />
+    </UIWidget>
+  </div>
 </html>
-
