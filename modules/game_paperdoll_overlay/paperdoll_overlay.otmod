@@ -1,0 +1,8 @@
+Module
+  name: game_paperdoll_overlay
+  description: Paperdoll overlay via images (paperdll)
+  author: You
+  sandboxed: true
+  scripts: [ paperdoll_overlay ]
+  @onLoad: init()
+  @onUnload: terminate()
