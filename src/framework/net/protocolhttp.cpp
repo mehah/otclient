@@ -50,8 +50,8 @@ void Http::terminate()
     m_guard.reset();
     if (!m_thread.joinable()) {
         stdext::millisleep(100);
-        m_ios.stop();
     }
+    m_ios.stop();
     m_thread.join();
 }
 
