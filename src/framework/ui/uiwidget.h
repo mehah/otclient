@@ -250,6 +250,7 @@ public:
     void addChild(const UIWidgetPtr& child);
     void insertChild(int32_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
+    void removeChildByIndex(uint32_t index);
     void focusChild(const UIWidgetPtr& child, Fw::FocusReason reason);
     void focusNextChild(Fw::FocusReason reason, bool rotate = false);
     void focusPreviousChild(Fw::FocusReason reason, bool rotate = false);

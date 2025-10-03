@@ -328,9 +328,9 @@ end
 
 -- table.watchList
 -- Watches an array-like table (1..N) for structural changes.
--- Detects inserts, removes and moves between scans.
--- Keys can be taken from ops.keyOf(item) or by default the item reference itself.
--- initial inserts can be emitted via ops.initialScan = true or w:scan(true).
+-- Emits only inserts and removes (no move callbacks).
+-- Keys come from ops.keyOf(item) or default to the item reference itself.
+-- initial inserts via ops.initialScan = true or w:scan(true).
 function table.watchList(realList, ops)
   local self = {}
   local keyOf      = (ops and ops.keyOf) or function(x) return x end
@@ -338,7 +338,6 @@ function table.watchList(realList, ops)
   local endBatch   = ops and ops.endBatch
   local onInsert   = ops and ops.onInsert
   local onRemove   = ops and ops.onRemove
-  local onMove     = ops and ops.onMove
 
   self.list  = realList
   self.prev  = {}
@@ -365,9 +364,7 @@ function table.watchList(realList, ops)
     if initial then
       if beginBatch then beginBatch() end
       if onInsert then
-        for i = 1, #self.list do
-          onInsert(i, self.list[i])
-        end
+        for i = 1, #self.list do onInsert(i, self.list[i]) end
       end
       if endBatch then endBatch() end
       return
@@ -379,7 +376,25 @@ function table.watchList(realList, ops)
 
     if beginBatch then beginBatch() end
 
-    local curK = copyKeys(self.prevK)
+    local prevK = self.prevK
+    local prev  = self.prev
+
+    local wantSet = {}
+    for i = 1, #wantK do wantSet[wantK[i]] = true end
+
+    if onRemove then
+      for i = #prevK, 1, -1 do
+        local k = prevK[i]
+        if not wantSet[k] then onRemove(i, prev[i]) end
+      end
+    end
+
+    local curK = {}
+    for i = 1, #prevK do
+      local k = prevK[i]
+      if wantSet[k] then curK[#curK + 1] = k end
+    end
+
     local idxByKey = buildIndexMap(curK)
 
     local i = 1
@@ -390,7 +405,6 @@ function table.watchList(realList, ops)
       else
         local j = idxByKey[want]
         if j then
-          if onMove then onMove(j, i, curr[i]) end
           local movedKey = table.remove(curK, j)
           table.insert(curK, i, movedKey)
           if j > i then
@@ -409,15 +423,9 @@ function table.watchList(realList, ops)
       end
     end
 
-    for k = #curK, #wantK + 1, -1 do
-      if onRemove then onRemove(k, self.prev[k]) end
-      idxByKey[curK[k]] = nil
-      table.remove(curK, k)
-    end
-
     if endBatch then endBatch() end
 
-    self.prev  = {}
+    self.prev = {}
     for k = 1, #curr do self.prev[k] = curr[k] end
     self.prevK = wantK
   end

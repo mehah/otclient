@@ -132,17 +132,11 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
     local isBinding = setterName:starts('*')
     if isBinding then
         setterName = setterName:sub(2):gsub("^%l", string.upper)        
-        print('return function(self, target '..FOR_CTX.__keys..') return ' .. value .. ' end')
         local success = false
         local fnc = getFncByExpr('return function(self, target '..FOR_CTX.__keys..') return ' .. value .. ' end',
             NODE_STR, self, controller, function()
                 return ('Attribute Error[%s]: %s'):format(attr, value)
             end)
-
-            for _, v in pairs(FOR_CTX.__values) do
-                print(_, v)
-            end
-
         value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR, function()
             return ('Attribute Error[%s]: %s'):format(attr, value)
         end)
@@ -398,7 +392,7 @@ function ngfor_exec(content, env, fn)
   end
   if not variable or not iterable then return end
 
-  local order = { variable, "index", "first", "last", "even", "odd" }
+  local order = { variable, "index" --[[, "first", "last", "even", "odd"]] }
   for i = 1, #aliases do order[#order+1] = aliases[i].name end
   local keys_str = ','..table.concat(order, ",")
 
@@ -406,18 +400,18 @@ function ngfor_exec(content, env, fn)
   local evalIterable, evalIf, evalKey
 
   if is51 then
-    local li, erri = loadstring("return " .. iterable, "for_iterable")
+    local li, erri = load("return " .. iterable, "for_iterable")
     if not li then error(erri) end
     evalIterable = function(e) setfenv(li, e); return li() end
 
     if ifCond then
-      local lf, errf = loadstring("return " .. ifCond, "for_if")
+      local lf, errf = load("return " .. ifCond, "for_if")
       if not lf then error(errf) end
       evalIf = function(e) setfenv(lf, e); return lf() end
     end
 
     if trackBy then
-      local lk, errk = loadstring("return " .. trackBy, "for_key")
+      local lk, errk = load("return " .. trackBy, "for_key")
       if not lk then error(errk) end
       evalKey = function(e) setfenv(lk, e); return lk() end
     end
@@ -450,7 +444,7 @@ function ngfor_exec(content, env, fn)
       first = (i == 1),
       last  = (i == count),
       even  = (i % 2 == 0),
-      odd   = (i % 2 == 1),
+      odd   = (i % 2 == 1)
     }
     for a = 1, #aliases do
       locals[aliases[a].name] = locals[aliases[a].source]
@@ -463,6 +457,7 @@ function ngfor_exec(content, env, fn)
       pass = ok and cond
     end
 
+
     if pass then
       local values = {}
       for idx = 1, #order do
@@ -473,18 +468,21 @@ function ngfor_exec(content, env, fn)
         __values = values,
         __key    = evalKey and (pcall(evalKey, menv) and evalKey(menv) or nil) or nil
       })
-    end
+    end    
   end
+
+  return list, keys_str
 end
 
-function UIWidget:__childFor(moduleName, expr, html, childindex)
+function UIWidget:__childFor(moduleName, expr, html, index)
     local controller = G_CONTROLLER_CALLED[moduleName]
     local widget = self
     local env = {
         self = controller
     }
 
-    ngfor_exec(expr, env, function(c)
+    local childindex = index
+    local list, keys = ngfor_exec(expr, env, function(c)
         childindex = childindex + 1
         FOR_CTX.__keys = c.__keys;
         FOR_CTX.__values = c.__values;
@@ -492,4 +490,31 @@ function UIWidget:__childFor(moduleName, expr, html, childindex)
         FOR_CTX.__keys = '';
         FOR_CTX.__values = {};
     end)
+
+    if list ~= nil then
+        local watch = table.watchList(list, {
+            onInsert = function(i,it)
+                FOR_CTX.__keys = keys;
+                FOR_CTX.__values = {it, i};
+                widget:insert(index + i, html)
+                FOR_CTX.__keys = '';              
+                FOR_CTX.__values = {};
+            end,
+            onRemove = function(i)       
+                print(i)
+                widget:removeChildByIndex(index+i)
+            end
+        })
+
+        local watchObj = {
+            watchList = watch,
+            widget = widget,
+            fnc = function(self)
+                self.watchList:scan()
+            end
+        }
+
+        table.insert(WATCH_LIST, watchObj)
+        START_WATCH_LIST()
+    end
 end

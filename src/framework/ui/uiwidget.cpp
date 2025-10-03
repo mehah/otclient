@@ -307,6 +307,12 @@ void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
     g_ui.onWidgetAppear(child);
 }
 
+void UIWidget::removeChildByIndex(uint32_t index) {
+    if (const auto& child = getChildByIndex(index)) {
+        removeChild(child);
+    }
+}
+
 void UIWidget::removeChild(const UIWidgetPtr& child)
 {
     // remove from children list
