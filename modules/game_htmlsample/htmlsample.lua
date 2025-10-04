@@ -2,7 +2,7 @@ HtmlSample = Controller:new()
 function HtmlSample:onInit()
     self:loadHtml('htmlsample.html')
     self:equalizerEffect()
-    self.items = {}
+    self.players = {}
 end
 
 function HtmlSample:addPlayer(name)
@@ -10,14 +10,19 @@ function HtmlSample:addPlayer(name)
     return
    end
 
-   table.insert(self.items, {
+   table.insert(self.players, {
     name = name,
     lookType = self.lookType
    })
 end
 
+function HtmlSample:removePlayer(index)
+    print('removePlayer', index)
+    table.remove(self.players, index)
+end
+
 function HtmlSample:equalizerEffect()
-    --[[local widgets = self:findWidgets('.line')
+    local widgets = self:findWidgets('.line')
 
     for _, widget in pairs(widgets) do
         local minV = math.random(0, 30)
@@ -43,5 +48,5 @@ function HtmlSample:equalizerEffect()
             widget:setHeight(10 + value)
             widget:setTop(89 - value)
         end, 30)
-    end]]
+    end
 end

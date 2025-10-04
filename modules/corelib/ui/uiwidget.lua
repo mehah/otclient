@@ -56,6 +56,10 @@ local function START_WATCH_LIST()
 
     WATCH_EVENT = cycleEvent(function()
         table.remove_if(WATCH_LIST, function(i, obj)
+            if not obj or not obj.widget then
+                return true
+            end
+
             local isDestroyed = obj.widget:isDestroyed()
             if isDestroyed then
                 obj.widget = nil
@@ -149,7 +153,7 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
             method = nil,
             values = FOR_CTX.__values,
             fnc = function(self)
-                local value = fnc(controller, self.widget, unpack(self.values))
+                local value = fnc(controller, self.widget, self.values and unpack(self.values))
                 if value ~= self.res then
                     self.method(self.widget, value)
                     self.res = value
@@ -325,7 +329,7 @@ function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
         if set then
             controller:registerEvents(self, {
                 onCheckChange = function(widget, value)
-                    execFnc(set, { controller, value, widget }, self, controller, NODE_STR, function()
+                    execFnc(set, { controller, value, widget, widget.__for_values and unpack(widget.__for_values) }, self, controller, NODE_STR, function()
                         return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
                     end)
                 end
@@ -340,7 +344,7 @@ function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
             if self.getCurrentOption then
                 controller:registerEvents(self, {
                     onOptionChange = function(widget, text, data)
-                        execFnc(set, { controller, data, widget }, self, controller, NODE_STR, function()
+                        execFnc(set, { controller, data, widget, widget.__for_values and unpack(widget.__for_values) }, self, controller, NODE_STR, function()
                             return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
                         end)
                     end
@@ -348,7 +352,7 @@ function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
             else
                 controller:registerEvents(self, {
                     onTextChange = function(widget, value)
-                        execFnc(set, { controller, value, widget }, self, controller, NODE_STR, function()
+                        execFnc(set, { controller, value, widget, widget.__for_values and unpack(widget.__for_values) }, self, controller, NODE_STR, function()
                             return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
                         end)
                     end
@@ -487,23 +491,36 @@ function UIWidget:__childFor(moduleName, expr, html, index)
             local childindex = index
             local list, keys = ngfor_exec(expr, env, function(c)
                 childindex = childindex + 1
-                FOR_CTX.__keys = c.__keys;
-                FOR_CTX.__values = c.__values;
-                widget:insert(childindex, html)
-                FOR_CTX.__keys = '';
-                FOR_CTX.__values = {};
+                FOR_CTX.__keys = c.__keys
+                FOR_CTX.__values = c.__values
+                widget:insert(childindex, html).__for_values = FOR_CTX.__values
+                FOR_CTX.__keys = ''
+                FOR_CTX.__values = {}
             end)
 
             local watch = table.watchList(list, {
-                onInsert = function(i,it)
+                onInsert = function(i, it)
                     FOR_CTX.__keys = keys;
                     FOR_CTX.__values = {it, i};
-                    widget:insert(index + i, html)
-                    FOR_CTX.__keys = '';              
-                    FOR_CTX.__values = {};
+                    widget:insert(index + i, html).__for_values = FOR_CTX.__values
+                    FOR_CTX.__keys = ''          
+                    FOR_CTX.__values = {}
                 end,
-                onRemove = function(i)       
-                    widget:removeChildByIndex(index+i)
+                onRemove = function(i)   
+                    local child = widget:getChildByIndex(index + i)
+                    local nextChild = child:getNextWidget()
+
+                    widget:removeChild(child)
+                    
+                    local childIndex = index + i
+                    while nextChild do
+                        if not nextChild.__for_values then
+                            break
+                        end
+                        nextChild.__for_values[2] = childIndex
+                        childIndex = childIndex + 1
+                        nextChild = nextChild:getNextWidget()
+                    end
                 end
             })
 

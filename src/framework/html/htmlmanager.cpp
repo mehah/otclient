@@ -250,7 +250,7 @@ bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent, const 
     if (!node->getAttr("*for").empty()) {
         const auto condition = node->getAttr("*for");
         node->removeAttr("*for");
-        parent->callLuaField("__childFor", moduleName, condition, node->outerHTML(), parent->getChildren().size() + 1);
+        parent->callLuaField("__childFor", moduleName, condition, node->outerHTML(), parent->getChildren().size());
         return false;
     }
 

@@ -3,7 +3,7 @@
     position: relative;
     background-color: red;
     width: 500;
-    height: 300;
+    height: 400;
   }
 
   .form {
@@ -56,9 +56,8 @@
   }
 
   #players div uicreature {
-    --creature-size: 64;
-    width: 64;
-    height: 64;
+    --creature-size: 32;
+    width: 20%;
   }
 
   #players > div:hover {
@@ -66,12 +65,15 @@
   }
 
   #players > div {
-    height: 50px;
+    height: 32px;
+  }
+
+  .playerName {
+    width: 80%;
   }
 
   #players div div {
     display: inline-block;
-    width: 50%;
     height: 100%;
     align-items: center;
     text-align: center;
@@ -80,9 +82,6 @@
 <script type="text">
   self.title = "HTML/CSS";
   self.msg = "Welcome to HTML/CSS";
-  self:cycleEvent(function()
-      self.lookType = math.random(1, 300)
-  end, 100)
 </script>
 <html>
   <window class="content" anchor="parent" *title="self.title">
@@ -106,7 +105,7 @@
       </div>
     </div>
     <div id="players" class="form">
-      <div *for="local player in self.items" onclick="print(1)">
+      <div *for="local player in self.players">
         <div onclick="print(player.name)">
           <uicreature
             *outfit="{type = player.lookType}"
@@ -114,6 +113,12 @@
           ></uicreature>
         </div>
         <div class="playerName">{{player.name}}</div>
+        <button
+          style="width: 10; height: 100%"
+          onclick="self:removePlayer(index)"
+        >
+          X
+        </button>
       </div>
     </div>
     <div class="equalizerEffect">
