@@ -13,6 +13,13 @@
     margin-top: 30;
   }
 
+  .form > div > uicreature {
+    --creature-size: 98;
+    width: 64;
+    height: 64;
+    background-color: blue;
+  }
+
   #players {
     background-color: black;
     overflow: scroll;
@@ -81,8 +88,8 @@
   <window class="content" anchor="parent" *title="self.title">
     <div style="margin: 30px; text-align: center">{{self.msg}}</div>
     <div class="form">
-      <div style="width: 50%; background-color: red">
-        <div bac>
+      <div style="width: 70%; display: inline-block">
+        <div>
           <label style="padding: 3">Name:</label>
           <input type="text" *value="self.playerName" style="margin-left: 26" />
         </div>
@@ -91,7 +98,7 @@
           <input type="text" *value="self.lookType" />
         </div>
       </div>
-      <div>
+      <div style="display: inline-block">
         <uicreature *outfit="{type = self.lookType}" />
       </div>
       <div>
