@@ -190,6 +190,7 @@ MiniWindow
 
     SkillButton
       id: stamina
+      margin-top: -5
       SkillNameLabel
         !text: tr('Stamina')
       SkillValueLabel
