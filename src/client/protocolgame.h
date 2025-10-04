@@ -136,6 +136,7 @@ public:
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
     void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void sendPreyRequest();
+    void sendOpenPortableForge();
     void sendForgeRequest(Otc::ForgeAction_t actionType);
     void sendForgeBrowseHistoryRequest(uint16_t page);
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);

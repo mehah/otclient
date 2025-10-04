@@ -37,6 +37,14 @@ local forgeResourceTypes = {
     cores = ResourceTypes and ResourceTypes.FORGE_CORES or 72
 }
 
+local forgeActions = {
+    FUSION = 0,
+    TRANSFER = 1,
+    DUST2SLIVER = 2,
+    SLIVER2CORE = 3,
+    INCREASELIMIT = 4,
+}
+
 local function defaultResourceFormatter(value)
     local numericValue = tonumber(value) or 0
     return tostring(numericValue)
@@ -434,7 +442,7 @@ local function show(self, skipRequest)
     end
 
     if not skipRequest then
-        g_game.forgeRequest()
+        g_game.openPortableForgeRequest()
     end
 
     for _, config in ipairs(forgeStatusConfigs) do
@@ -748,13 +756,20 @@ function forgeController:onConversion(conversionType)
         return
     end
 
-    if conversionType == 2 then
+    local player = g_game.getLocalPlayer()
+    if conversionType == forgeActions.DUST2SLIVER then
         local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
         if dustBalance <= 60 then
             return
         end
-
-
+        g_game.forgeRequest(conversionType)
+        return
+    end
+    if conversionType == forgeActions.SLIVER2CORE then
+        local sliverBalance = player:getResourceBalance(forgeResourceTypes.sliver) or 0
+        if sliverBalance <= 50 then
+            return
+        end
         g_game.forgeRequest(conversionType)
         return
     end

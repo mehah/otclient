@@ -1768,6 +1768,13 @@ void Game::preyRequest()
     m_protocolGame->sendPreyRequest();
 }
 
+void Game::openPortableForgeRequest()
+{
+    if (!canPerformGameAction())
+        return;
+    m_protocolGame->sendOpenPortableForge();
+}
+
 void Game::forgeRequest(Otc::ForgeAction_t actionType)
 {
     if (!canPerformGameAction())

@@ -1372,9 +1372,16 @@ void ProtocolGame::sendPreyRequest()
     send(msg);
 }
 
-void ProtocolGame::sendForgeRequest(Otc::ForgeAction_t actionType) {
+void ProtocolGame::sendOpenPortableForge() {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientPreyRequest);
+    send(msg);
+}
+
+void ProtocolGame::sendForgeRequest(Otc::ForgeAction_t actionType) {
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientForgeEnter);
+    msg->addU8(static_cast<uint8_t>(actionType));
     send(msg);
 }
 
@@ -1382,7 +1389,6 @@ void ProtocolGame::sendForgeBrowseHistoryRequest(uint16_t page) {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientForgeBrowseHistory);
     msg->addU8(page);
-    g_logger.info("sendForgeBrowseHistoryRequest page {}", page);
     send(msg);
 }
 

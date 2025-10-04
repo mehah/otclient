@@ -936,6 +936,7 @@ public:
     void preyRequest();
 
     // forge related
+    void openPortableForgeRequest();
     void forgeRequest(Otc::ForgeAction_t actionType);
     void sendForgeBrowseHistoryRequest(uint16_t page);
 
