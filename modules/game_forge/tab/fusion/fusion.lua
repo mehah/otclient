@@ -458,6 +458,18 @@ function FusionTab.onToggleFusionCore(controller, coreType)
     FusionTab.updateFusionCoreButtons(controller)
 end
 
+local function updateFusionResultCostLabel(prices, itemPtr, tier)
+    if not prices or not itemPtr or not tier then
+        return
+    end
+
+    local price = resolveForgePrice(prices, itemPtr, tier)
+    local resultCostLabel = g_ui.getRootWidget():recursiveGetChildById('fusionResultCostLabel')
+    if resultCostLabel and not resultCostLabel:isDestroyed() then
+        resultCostLabel:setText(formatGoldAmount(price))
+    end
+end
+
 function FusionTab.configureConversionPanel(controller, selectedWidget)
     if not selectedWidget or not selectedWidget.itemPtr then
         return
@@ -498,6 +510,7 @@ function FusionTab.configureConversionPanel(controller, selectedWidget)
         g_logger.info(">> selectedItemIcon id: " ..
             itemPtr:getId() .. " tier: " .. itemTier .. " target tier: " .. itemTier + 1)
         ItemsDatabase.setTier(context.selectedItemIcon, selectedPreview)
+        updateFusionResultCostLabel(controller.fusionPrices, itemPtr, itemTier)
     end
 
     if context.targetItem then
