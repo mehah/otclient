@@ -61,6 +61,89 @@ local function cloneValue(value)
     return value
 end
 
+local function normalizeTierPriceEntries(entries)
+    local prices = {}
+    if type(entries) ~= 'table' then
+        return prices
+    end
+
+    for _, entry in ipairs(entries) do
+        if type(entry) == 'table' then
+            local tierId = tonumber(entry.tier) or tonumber(entry.tierId) or tonumber(entry.id)
+            local price = tonumber(entry.price) or tonumber(entry.cost) or tonumber(entry.value)
+            if tierId then
+                prices[tierId + 1] = price or 0
+            end
+        end
+    end
+
+    return prices
+end
+
+local function normalizeClassPriceEntries(entries)
+    local pricesByClass = {}
+    if type(entries) ~= 'table' then
+        return pricesByClass
+    end
+
+    for _, classInfo in ipairs(entries) do
+        if type(classInfo) == 'table' then
+            local classId = tonumber(classInfo.classId) or tonumber(classInfo.id) or tonumber(classInfo.classification)
+            if classId then
+                pricesByClass[classId] = normalizeTierPriceEntries(classInfo.tiers)
+            end
+        end
+    end
+
+    return pricesByClass
+end
+
+local function normalizeFusionGradeEntries(entries)
+    local values = {}
+    if type(entries) ~= 'table' then
+        return values
+    end
+
+    for _, entry in ipairs(entries) do
+        if type(entry) == 'table' then
+            local tierId = tonumber(entry.tier) or tonumber(entry.tierId) or tonumber(entry.id)
+            if tierId then
+                local value = tonumber(entry.exaltedCores) or tonumber(entry.cores) or tonumber(entry.value)
+                values[tierId + 1] = value or 0
+            end
+        end
+    end
+
+    return values
+end
+
+local function resolveForgePrice(priceMap, itemPtr, itemTier)
+    if type(priceMap) ~= 'table' then
+        return 0
+    end
+
+    local tierIndex = (tonumber(itemTier) or 0) + 1
+
+    local directValue = priceMap[tierIndex] or priceMap[tierIndex - 1]
+    if directValue ~= nil then
+        return tonumber(directValue) or 0
+    end
+
+    local classification = itemPtr and itemPtr.getClassification and itemPtr:getClassification()
+    if classification then
+        local classPrices = priceMap[classification] or priceMap[tostring(classification)]
+        if type(classPrices) ~= 'table' then
+            classPrices = priceMap[classification + 1]
+        end
+
+        if type(classPrices) == 'table' then
+            return tonumber(classPrices[tierIndex]) or tonumber(classPrices[tierIndex - 1]) or 0
+        end
+    end
+
+    return 0
+end
+
 local function defaultResourceFormatter(value)
     local numericValue = tonumber(value) or 0
     return tostring(numericValue)
@@ -1176,6 +1259,76 @@ function forgeController:setInitialValues(openData)
     end
 end
 
+function forgeController:applyForgeConfiguration(config)
+    if type(config) ~= 'table' then
+        return
+    end
+
+    self.forgeConfiguration = cloneValue(config)
+
+    local initial = {}
+
+    local classPrices = normalizeClassPriceEntries(config.classPrices or config.fusionPrices)
+    if next(classPrices) then
+        initial.fusionPrices = classPrices
+    end
+
+    local convergenceFusion = normalizeTierPriceEntries(config.convergenceFusionPrices)
+    if next(convergenceFusion) then
+        initial.convergenceFusionPrices = convergenceFusion
+    end
+
+    local convergenceTransfer = normalizeTierPriceEntries(config.convergenceTransferPrices)
+    if next(convergenceTransfer) then
+        initial.convergenceTransferPrices = convergenceTransfer
+    end
+
+    local fusionGrades = normalizeFusionGradeEntries(config.fusionGrades or config.fusionNormalValues)
+    if next(fusionGrades) then
+        initial.fusionNormalValues = fusionGrades
+    end
+
+    local fusionConvergenceValues = normalizeTierPriceEntries(config.fusionConvergenceValues)
+    if next(fusionConvergenceValues) then
+        initial.fusionConvergenceValues = fusionConvergenceValues
+    end
+
+    local transferNormalValues = normalizeTierPriceEntries(config.transferNormalValues)
+    if next(transferNormalValues) then
+        initial.transferNormalValues = transferNormalValues
+    end
+
+    local transferConvergenceValues = normalizeTierPriceEntries(config.transferConvergenceValues)
+    if next(transferConvergenceValues) then
+        initial.transferConvergenceValues = transferConvergenceValues
+    end
+
+    local numericFields = {
+        normalDustFusion = config.normalDustFusion,
+        convergenceDustFusion = config.convergenceDustFusion,
+        normalDustTransfer = config.normalDustTransfer,
+        convergenceDustTransfer = config.convergenceDustTransfer,
+        fusionChanceBase = config.fusionChanceBase,
+        fusionChanceImproved = config.fusionChanceImproved,
+        fusionReduceTierLoss = config.fusionReduceTierLoss,
+        dustPercent = config.dustPercent,
+        dustToSliver = config.dustToSliver,
+        sliverToCore = config.sliverToCore,
+        dustPercentUpgrade = config.dustPercentUpgrade,
+        maxDustLevel = config.maxDustLevel or config.maxDust,
+        maxDustCap = config.maxDustCap,
+    }
+
+    for key, value in pairs(numericFields) do
+        local numericValue = tonumber(value)
+        if numericValue then
+            initial[key] = numericValue
+        end
+    end
+
+    self:setInitialValues(initial)
+end
+
 function g_game.onOpenForge(openData)
     forgeController:setInitialValues(openData)
     forgeController:updateDustLevelLabel()
@@ -1189,6 +1342,10 @@ function g_game.onOpenForge(openData)
 
     forgeController:updateResourceBalances()
     forgeController:updateFusionItems()
+end
+
+function g_game.forgeData(config)
+    forgeController:applyForgeConfiguration(config)
 end
 
 function forgeController:configureFusionConversionPanel(selectedWidget)
@@ -1277,11 +1434,7 @@ function forgeController:configureFusionConversionPanel(selectedWidget)
     local dustRequirement = (self.openData and tonumber(self.openData.convergenceDustFusion)) or
         tonumber(self.convergenceDustFusion) or 0
     local priceList = self.fusionPrices or (self.openData and self.openData.fusionPrices) or {}
-    local price = 0
-
-    if type(priceList) == 'table' then
-        price = tonumber(priceList[itemTier + 1]) or tonumber(priceList[itemTier]) or 0
-    end
+    local price = resolveForgePrice(priceList, itemPtr, itemTier)
 
     if context.dustAmountLabel and player then
         local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0

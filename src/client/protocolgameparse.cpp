@@ -26,6 +26,7 @@
 #include "framework/net/inputmessage.h"
 
 #include "attachedeffectmanager.h"
+#include "game.h"
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
@@ -1848,75 +1849,102 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
 
 void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
 {
+    ForgeConfigData forgeConfig;
+
     const uint8_t classSize = msg->getU8();
+    forgeConfig.classPrices.reserve(classSize);
     for (auto i = 0; i < classSize; ++i) {
-        msg->getU8(); // class id
+        ForgeClassTierPrices classEntry;
+        classEntry.classId = msg->getU8();
 
         // tiers
         const uint8_t tiersSize = msg->getU8();
+        classEntry.tiers.reserve(tiersSize);
         for (auto j = 0; j < tiersSize; ++j) {
-            msg->getU8(); // tier id
-            msg->getU64(); // upgrade cost
+            ForgeTierPrice tierEntry;
+            tierEntry.tier = msg->getU8();
+            tierEntry.price = msg->getU64();
+            classEntry.tiers.emplace_back(tierEntry);
         }
+
+        forgeConfig.classPrices.emplace_back(classEntry);
     }
 
-    if (g_game.getFeature(Otc::GameDynamicForgeVariables)) {
+    const bool hasDynamicForgeVariables = g_game.getFeature(Otc::GameDynamicForgeVariables);
+    forgeConfig.hasConvergence = g_game.getFeature(Otc::GameForgeConvergence);
+
+    if (hasDynamicForgeVariables) {
         const uint8_t grades = msg->getU8();
+        forgeConfig.fusionGrades.reserve(grades);
         for (auto i = 0; i < grades; ++i) {
-            msg->getU8(); // Tier
-            msg->getU8(); // Exalted cores
+            ForgeGradeData gradeEntry;
+            gradeEntry.tier = msg->getU8();
+            gradeEntry.exaltedCores = msg->getU8();
+            forgeConfig.fusionGrades.emplace_back(gradeEntry);
         }
 
-        if (g_game.getFeature(Otc::GameForgeConvergence)) {
+        if (forgeConfig.hasConvergence) {
             // Convergence fusion prices per tier
-            const uint8_t totalConvergenceFusion = msg->getU8(); // total size count
+            const uint8_t totalConvergenceFusion = msg->getU8();
+            forgeConfig.convergenceFusionPrices.reserve(totalConvergenceFusion);
             for (auto i = 0; i < totalConvergenceFusion; ++i) {
-                msg->getU8(); // tier id
-                msg->getU64(); // upgrade cost
+                ForgeTierPrice priceEntry;
+                priceEntry.tier = msg->getU8();
+                priceEntry.price = msg->getU64();
+                forgeConfig.convergenceFusionPrices.emplace_back(priceEntry);
             }
 
             // Convergence transfer prices per tier
-            const uint8_t totalConvergenceTransfer = msg->getU8(); // total size count
+            const uint8_t totalConvergenceTransfer = msg->getU8();
+            forgeConfig.convergenceTransferPrices.reserve(totalConvergenceTransfer);
             for (auto i = 0; i < totalConvergenceTransfer; ++i) {
-                msg->getU8(); // tier id
-                msg->getU64(); // upgrade cost
+                ForgeTierPrice priceEntry;
+                priceEntry.tier = msg->getU8();
+                priceEntry.price = msg->getU64();
+                forgeConfig.convergenceTransferPrices.emplace_back(priceEntry);
             }
         }
 
-        msg->getU8(); // Dust Percent
-        msg->getU8(); // Dust To Sleaver
-        msg->getU8(); // Sliver To Core
-        msg->getU8(); // Dust Percent Upgrade
+        forgeConfig.dustPercent = msg->getU8();
+        forgeConfig.dustToSliver = msg->getU8();
+        forgeConfig.sliverToCore = msg->getU8();
+        forgeConfig.dustPercentUpgrade = msg->getU8();
         if (g_game.getClientVersion() >= 1316) {
-            msg->getU16(); // Max Dust
-            msg->getU16(); // Max Dust Cap
+            forgeConfig.maxDustLevel = msg->getU16();
+            forgeConfig.maxDustCap = msg->getU16();
         } else {
-            msg->getU8(); // Max Dust
-            msg->getU8(); // Max Dust Cap
+            forgeConfig.maxDustLevel = msg->getU8();
+            forgeConfig.maxDustCap = msg->getU8();
         }
-        msg->getU8(); // Dust Normal Fusion
-        if (g_game.getFeature(Otc::GameForgeConvergence)) {
-            msg->getU8(); // Dust Convergence Fusion
+        forgeConfig.normalDustFusion = msg->getU8();
+        if (forgeConfig.hasConvergence) {
+            forgeConfig.convergenceDustFusion = msg->getU8();
         }
-        msg->getU8(); // Dust Normal Transfer
-        if (g_game.getFeature(Otc::GameForgeConvergence)) {
-            msg->getU8(); // Dust Convergence Transfer
+        forgeConfig.normalDustTransfer = msg->getU8();
+        if (forgeConfig.hasConvergence) {
+            forgeConfig.convergenceDustTransfer = msg->getU8();
         }
-        msg->getU8(); // Chance Base
-        msg->getU8(); // Chance Improved
-        msg->getU8(); // Reduce Tier Loss
+        forgeConfig.fusionChanceBase = msg->getU8();
+        forgeConfig.fusionChanceImproved = msg->getU8();
+        forgeConfig.fusionReduceTierLoss = msg->getU8();
+
+        g_lua.callGlobalField("g_game", "forgeData", forgeConfig);
     } else {
         uint8_t totalForgeValues = 11;
         if (g_game.getClientVersion() >= 1316) {
             totalForgeValues = 13;
         }
 
-        if (g_game.getFeature(Otc::GameForgeConvergence)) {
+        if (forgeConfig.hasConvergence) {
             totalForgeValues = totalForgeValues + 2;
         }
 
         for (auto i = 0; i < totalForgeValues; ++i) {
             msg->getU8(); // Forge values
+        }
+
+        if (!forgeConfig.classPrices.empty()) {
+            g_lua.callGlobalField("g_game", "forgeData", forgeConfig);
         }
     }
 }
