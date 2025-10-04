@@ -62,6 +62,7 @@ Controller = {
     extendedOpcodes = nil,
     opcodes = nil,
     events = nil,
+    uiEvents = nil,
     htmlId = nil,
     keyboardAnchor = nil,
     scheduledEvents = nil,
@@ -78,6 +79,7 @@ function Controller:new()
         name = module and module:getName() or nil,
         currentTypeEvent = TypeEvent.MODULE_INIT,
         events = {},
+        uiEvents = {},
         scheduledEvents = {},
         keyboardEvents = {},
         attrs = {},
@@ -165,15 +167,11 @@ function Controller:destroyUI()
         self.ui = nil
     end
 
-    for type, events in pairs(self.events) do
-        table.remove_if(events, function(i, event)
-            local canRemove = event:actorIsDestroyed()
-            if canRemove then
-                event:destroy() -- force destroy
-            end
-            return canRemove
-        end)
+    for _, event in pairs(self.uiEvents) do
+        event:destroy()
     end
+
+    self.uiEvents = {}
 end
 
 function Controller:findWidget(query)
@@ -283,12 +281,30 @@ function Controller:registerEvents(actor, events)
     local evt = EventController:new(actor, events)
     table.insert(self.events[self.currentTypeEvent], evt)
 
+    return evt
+end
+
+function Controller:registerUIEvents(actor, events)
+    local evt = EventController:new(actor, events)
+    table.insert(self.uiEvents, evt)
+
     -- fix html lazy loading
     if actor and actor.isOnHtml and actor:isOnHtml() then
         evt:connect()
     end
 
     return evt
+end
+
+function Controller:checkWidgetsDestroyed()
+    table.remove_if(self.uiEvents, function(i, e)
+        if e:actorIsDestroyed() then
+            e:disconnect()
+            return true
+        end
+
+        return false
+    end)
 end
 
 function Controller:registerExtendedOpcode(opcode, fnc)

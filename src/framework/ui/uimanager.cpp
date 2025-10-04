@@ -358,14 +358,26 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
         updateHoveredWidget();
 
     if (m_pressedWidget == widget) {
-        if (widget->isOnHtml())
-            updatePressedWidgetHTML(UIWidgetList{});
-        else
-            updatePressedWidget(nullptr);
+        updatePressedWidget(nullptr);
     }
 
     if (m_draggingWidget == widget)
         updateDraggingWidget(nullptr);
+
+    if (widget->isOnHtml()) {
+        { // Pressed Widgets
+            auto it = std::find(m_pressedWidgets.begin(), m_pressedWidgets.end(), widget);
+            if (it != m_pressedWidgets.end()) {
+                m_pressedWidgets.erase(it);
+            }
+        }
+        {  // Hovered Widgets
+            auto it = std::find(m_hoveredWidgets.begin(), m_hoveredWidgets.end(), widget);
+            if (it != m_hoveredWidgets.end()) {
+                m_hoveredWidgets.erase(it);
+            }
+        }
+    }
 
     // Avoid the garbage collector
     if (!g_modules.isAutoReloadEnabled())

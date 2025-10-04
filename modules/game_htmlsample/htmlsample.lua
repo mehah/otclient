@@ -6,22 +6,21 @@ function HtmlSample:onInit()
 end
 
 function HtmlSample:addPlayer(name)
-   if not name or name.length == 0 then
-    return
-   end
+    if not name or #name == 0 then
+        return
+    end
 
-   table.insert(self.players, {
-    name = name,
-    lookType = self.lookType
-   })
-   
-   self.playerName = ''
+    table.insert(self.players, {
+        name = name,
+        lookType = self.lookType
+    })
+
+    self.playerName = ''
 end
 
 function HtmlSample:removePlayer(index)
     table.remove(self.players, index)
 end
-
 
 function HtmlSample:equalizerEffect()
     local widgets = self:findWidgets('.line')

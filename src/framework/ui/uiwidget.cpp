@@ -965,11 +965,6 @@ void UIWidget::internalDestroy()
         m_layout = nullptr;
     }
 
-    if (m_htmlNode) {
-        m_htmlNode->destroy();
-        m_htmlNode = nullptr;
-    }
-
     m_parent = nullptr;
     m_lockedChildren.clear();
     m_childrenById.clear();
@@ -987,6 +982,11 @@ void UIWidget::internalDestroy()
     releaseLuaFieldsTable();
 
     g_ui.onWidgetDestroy(static_self_cast<UIWidget>());
+
+    if (m_htmlNode) {
+        m_htmlNode->destroy();
+        m_htmlNode = nullptr;
+    }
 }
 
 void UIWidget::destroy()
