@@ -295,8 +295,9 @@ MessageModes = {
     OfflineTrainning = 54,
     Transaction = 55,
     Potion = 56,
+    ValuableLoot = 57,
 
-    Last = 57,
+    Last = 58,
     Invalid = 255
 }
 
@@ -471,4 +472,14 @@ ExperienceRate = {
     XP_BOOST = 3,
     STAMINA_MULTIPLIER = 4
 }
+
+PriceTypeEnum = {
+	Market = 0,
+	Leader = 1,
+}
+
+-- Analyzer constants
+ANALYZER_HEAL = 0
+ANALYZER_DAMAGE_DEALT = 1
+ANALYZER_DAMAGE_RECEIVED = 2
 -- @}

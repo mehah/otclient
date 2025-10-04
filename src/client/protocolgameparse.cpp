@@ -31,6 +31,7 @@
 #include "luavaluecasts_client.h"
 #include "map.h"
 #include "missile.h"
+#include "outfit.h"
 #include "thingtypemanager.h"
 #include "tile.h"
 #include <ctime>
@@ -2990,13 +2991,17 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
 {
-    msg->getString(); // monster name
-    getOutfit(msg, false);
+    const std::string monsterName = msg->getString(); // monster name
+    const Outfit monsterOutfit = getOutfit(msg, false);
 
     const uint8_t corpseItemsSize = msg->getU8();
+    std::vector<ItemPtr> dropItems;
     for (auto i = 0; i < corpseItemsSize; ++i) {
-        getItem(msg);
+        dropItems.push_back(getItem(msg));
     }
+
+    // Fire the Lua callback with monster kill data
+    g_lua.callGlobalField("g_game", "onKillTracker", monsterName, monsterOutfit, dropItems);
 }
 
 void ProtocolGame::parseVipAdd(const InputMessagePtr& msg)
@@ -4435,16 +4440,21 @@ void ProtocolGame::parseRestingAreaState(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateImpactTracker(const InputMessagePtr& msg)
 {
-    const uint8_t type = msg->getU8();
-    msg->getU32(); // amount
-    if (type == 1) {
-        msg->getU8(); // Element
-    } else if (type == 2) {
-        msg->getU8(); // Element
-        msg->getString(); // Name
+    const uint8_t analyzerType = msg->getU8();
+    const uint32_t amount = msg->getU32();
+    
+    uint8_t effect = 0;  // Default effect for healing
+    std::string target = "";  // Default empty target
+    
+    if (analyzerType == 1) {  // ANALYZER_DAMAGE_DEALT
+        effect = msg->getU8();  // Element/combat type
+    } else if (analyzerType == 2) {  // ANALYZER_DAMAGE_RECEIVED
+        effect = msg->getU8();  // Element/combat type
+        target = msg->getString();  // Target name
     }
-
-    // TODO: implement impact tracker usage
+    
+    // Call the onImpactTracker callback to expose the data to Lua
+    g_lua.callGlobalField("g_game", "onImpactTracker", analyzerType, amount, effect, target);
 }
 
 void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
@@ -4472,17 +4482,19 @@ void ProtocolGame::parseItemsPrice(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateSupplyTracker(const InputMessagePtr& msg)
 {
-    msg->getU16(); // item client ID
+    const auto itemId = msg->getU16(); // item client ID
 
-    // TODO: implement supply tracker usage
+    // Call the onSupplyTracker callback to expose the data to Lua
+    g_lua.callGlobalField("g_game", "onSupplyTracker", itemId);
 }
 
 void ProtocolGame::parseUpdateLootTracker(const InputMessagePtr& msg)
 {
-    getItem(msg); // item
-    msg->getString(); // item name
+    const auto item = getItem(msg); // item
+    const auto itemName = msg->getString(); // item name
 
-    // TODO: implement loot tracker usage
+    // Call the onLootStats callback to expose the data to Lua
+    g_lua.callGlobalField("g_game", "onLootStats", item, itemName);
 }
 
 void ProtocolGame::parseBestiaryEntryChanged(const InputMessagePtr& msg)
@@ -5783,10 +5795,20 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
 void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg)
 {
     const uint16_t bossesOnTrackerSize = msg->getU16();
+    std::vector<std::tuple<uint32_t, uint64_t, std::string, Outfit>> cooldownData;
+    
     for (auto i = 0; i < bossesOnTrackerSize; ++i) {
-        msg->getU32(); // bossRaceId
-        msg->getU64(); // Boss cooldown in seconds
+        const uint32_t bossRaceId = msg->getU32(); // bossRaceId
+        const uint64_t cooldownTime = msg->getU64(); // Boss cooldown in seconds
+        
+        // Create data structure expected by Lua: {bossId, cooldown, name, outfit}
+        // Note: name and outfit will be handled by Lua side since we don't have
+        // direct access to monster data by race ID on client side
+        cooldownData.emplace_back(bossRaceId, cooldownTime, std::string(""), Outfit());
     }
+    
+    // Call the Lua callback with the cooldown data
+    g_lua.callGlobalField("g_game", "onBossCooldown", cooldownData);
 }
 
 void ProtocolGame::parseBosstiaryEntryChanged(const InputMessagePtr& msg)

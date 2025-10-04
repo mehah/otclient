@@ -1,0 +1,5 @@
+Font
+  name: verdana-8px-rounded
+  texture: verdana-8px-rounded_actionbar
+  height: 12
+  glyph-size: 12 12
