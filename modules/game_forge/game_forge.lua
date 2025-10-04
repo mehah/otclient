@@ -37,6 +37,14 @@ local forgeResourceTypes = {
     cores = ResourceTypes and ResourceTypes.FORGE_CORES or 72
 }
 
+local forgeActions = {
+    FUSION = 0,
+    TRANSFER = 1,
+    DUST2SLIVER = 2,
+    SLIVER2CORE = 3,
+    INCREASELIMIT = 4,
+}
+
 local function defaultResourceFormatter(value)
     local numericValue = tonumber(value) or 0
     return tostring(numericValue)
@@ -434,7 +442,7 @@ local function show(self, skipRequest)
     end
 
     if not skipRequest then
-        g_game.forgeRequest()
+        g_game.openPortableForgeRequest()
     end
 
     for _, config in ipairs(forgeStatusConfigs) do
@@ -551,6 +559,22 @@ function forgeController:updateResourceBalances(resourceType)
     if not resourceType or resourceType == forgeResourceTypes.cores then
         self:updateFusionCoreButtons()
     end
+end
+
+function forgeController:updateDustLevelLabel(panel)
+    panel = panel or (ui.panels and ui.panels['conversion'])
+    if not panel or panel:isDestroyed() then
+        return
+    end
+
+    local dustLevelLabel = panel:recursiveGetChildById('forgeDustLevel')
+    if not dustLevelLabel or dustLevelLabel:isDestroyed() then
+        return
+    end
+
+    local maxDustLevel = tonumber(self.maxDustLevel) or 0
+    local displayedDustLevel = maxDustLevel - 75
+    dustLevelLabel:setText(tostring(displayedDustLevel))
 end
 
 function forgeController:updateFusionCoreButtons()
@@ -743,6 +767,42 @@ function forgeController:updateFusionCoreButtons()
     context.lastTierSelection = selectedTier
 end
 
+function forgeController:onConversion(conversionType)
+    if not self.ui then
+        return
+    end
+
+    local player = g_game.getLocalPlayer()
+    if conversionType == forgeActions.DUST2SLIVER then
+        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        if dustBalance <= 60 then
+            return
+        end
+        g_game.forgeRequest(conversionType)
+        return
+    end
+    if conversionType == forgeActions.SLIVER2CORE then
+        local sliverBalance = player:getResourceBalance(forgeResourceTypes.sliver) or 0
+        if sliverBalance <= 50 then
+            return
+        end
+        g_game.forgeRequest(conversionType)
+        return
+    end
+
+    if conversionType == forgeActions.INCREASELIMIT then
+        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        local maxDustLevel = self.maxDustLevel or 0
+        local currentNecessaryDust = maxDustLevel - 75
+
+        if dustBalance < currentNecessaryDust then
+            return
+        end
+        g_game.forgeRequest(conversionType)
+        return
+    end
+end
+
 function forgeController:onToggleFusionCore(coreType)
     if not self.ui then
         return
@@ -860,12 +920,18 @@ end
 
 function forgeController:loadTab(tabName)
     if ui.panels[tabName] then
+        if tabName == 'conversion' then
+            self:updateDustLevelLabel(ui.panels[tabName])
+        end
         return ui.panels[tabName]
     end
 
     local panel = loadTabFragment(tabName)
     if panel then
         ui.panels[tabName] = panel
+        if tabName == 'conversion' then
+            self:updateDustLevelLabel(panel)
+        end
     end
     return panel
 end
@@ -1022,7 +1088,7 @@ function g_game.onOpenForge(openData)
     forgeController.convergenceTransfers = openData.convergenceTransfers or {}
     local dustLevel = tonumber(openData.dustLevel) or 0
     forgeController.maxDustLevel = dustLevel > 0 and dustLevel or forgeController.maxDustLevel or 0
-
+    forgeController:updateDustLevelLabel()
     forgeController.modeFusion = false
     forgeController.modeTransfer = false
 
