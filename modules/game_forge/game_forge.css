@@ -175,6 +175,7 @@
 
 .forge-required-block {
   width: 66px;
+  margin-left: 8px;
 }
 
 .forge-card {
@@ -223,9 +224,13 @@
 
 .forge-result-item {
   position: relative;
-  top: 15px;
   pointer-events: none;
+  size: 80 80;
+}
+
+.forge-result-item-fusion {
   size: 32 32;
+  top: 15px;
 }
 
 .forge-action-button {
@@ -245,6 +250,7 @@
 .forge-action-button--large {
   height: 64px;
   width: 132px;
+  position: relative;
 }
 
 .forge-action-arrow {
@@ -257,9 +263,9 @@
 
 .forge-action-overlay {
   pointer-events: none;
-  position: relative;
+  position: absolute;
   left: 2px;
-  top: -31px;
+  top: 0px;
   height: 61px;
   width: 128px;
   --image-border: 3;
