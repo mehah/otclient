@@ -49,7 +49,7 @@ public:
         m_clientId = 1;
     }
 
-    bool isItem() override { return true; }
+    bool isItem() const override { return true; }
 
     ThingType* getThingType() const override
     {

@@ -459,7 +459,7 @@ std::vector<CreaturePtr> Tile::getCreatures()
 {
     std::vector<CreaturePtr> creatures;
     appendSpectators(creatures);
-    std::reverse(creatures.begin(), creatures.end());
+    std::ranges::reverse(creatures);
     return creatures;
 }
 

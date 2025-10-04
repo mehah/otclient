@@ -57,139 +57,456 @@ public:
     int getStackPos();
     int getStackPriority();
 
-    virtual bool isItem() { return false; }
-    virtual bool isEffect() { return false; }
-    virtual bool isMissile() { return false; }
-    virtual bool isCreature() { return false; }
+    virtual bool isItem() const { return false; }
+    virtual bool isEffect() const { return false; }
+    virtual bool isMissile() const { return false; }
+    virtual bool isCreature() const { return false; }
 
-    virtual bool isNpc() { return false; }
-    virtual bool isMonster() { return false; }
-    virtual bool isPlayer() { return false; }
-    virtual bool isLocalPlayer() { return false; }
+    virtual bool isNpc() const { return false; }
+    virtual bool isMonster() const { return false; }
+    virtual bool isPlayer() const { return false; }
+    virtual bool isLocalPlayer() const { return false; }
 
-    Animator* getAnimator() const { auto t = getThingType(); return t ? t->getAnimator() : nullptr; }
-    Animator* getIdleAnimator() const { auto t = getThingType(); return t ? t->getIdleAnimator() : nullptr; }
-
-    virtual Point getDisplacement() const { auto t = getThingType(); return t ? t->getDisplacement() : Point(); }
-    virtual int getDisplacementX() const { auto t = getThingType(); return t ? t->getDisplacementX() : 0; }
-    virtual int getDisplacementY() const { auto t = getThingType(); return t ? t->getDisplacementY() : 0; }
-    virtual int getExactSize(const int layer = 0, const int xPattern = 0, const int yPattern = 0, const int zPattern = 0, const int animationPhase = 0) { auto t = getThingType(); return t ? t->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase) : 0; }
-
-    virtual const Light& getLight() const { 
-        auto t = getThingType(); 
-        if (t) return t->getLight(); 
-        static const Light kEmptyLight; 
-        return kEmptyLight; 
+    Animator* getAnimator() const {
+        if (const auto t = getThingType(); t)
+            return t->getAnimator();
+        return nullptr;
     }
-    virtual bool hasLight() const { auto t = getThingType(); return t ? t->hasLight() : false; }
+    Animator* getIdleAnimator() const {
+        if (const auto t = getThingType(); t)
+            return t->getIdleAnimator();
+        return nullptr;
+    }
 
-    const MarketData& getMarketData() { 
-        auto t = getThingType(); 
-        if (t) return t->getMarketData(); 
+    virtual Point getDisplacement() const {
+        if (const auto t = getThingType(); t)
+            return t->getDisplacement();
+        return Point();
+    }
+    virtual int getDisplacementX() const {
+        if (const auto t = getThingType(); t)
+            return t->getDisplacementX();
+        return 0;
+    }
+    virtual int getDisplacementY() const {
+        if (const auto t = getThingType(); t)
+            return t->getDisplacementY();
+        return 0;
+    }
+    virtual int getExactSize(const int layer = 0, const int xPattern = 0, const int yPattern = 0, const int zPattern = 0, const int animationPhase = 0) {
+        if (const auto t = getThingType(); t)
+            return t->getExactSize(layer, xPattern, yPattern, zPattern, animationPhase);
+        return 0;
+    }
+
+    virtual const Light& getLight() const {
+        if (const auto t = getThingType(); t)
+            return t->getLight();
+        static const Light kEmptyLight;
+        return kEmptyLight;
+    }
+    virtual bool hasLight() const {
+        if (const auto t = getThingType(); t)
+            return t->hasLight();
+        return false;
+    }
+
+    const MarketData& getMarketData() const {
+        if (const auto t = getThingType(); t)
+            return t->getMarketData();
         static const MarketData kEmptyMarketData{};
-        return kEmptyMarketData; 
+        return kEmptyMarketData;
     }
-    const std::vector<NPCData>& getNpcSaleData() { 
-        auto t = getThingType(); 
-        if (t) return t->getNpcSaleData(); 
-        static const std::vector<NPCData> kEmptyNpcData; 
-        return kEmptyNpcData; 
+    const std::vector<NPCData>& getNpcSaleData() const {
+        if (const auto t = getThingType(); t)
+            return t->getNpcSaleData();
+        static const std::vector<NPCData> kEmptyNpcData;
+        return kEmptyNpcData;
     }
-    int getMeanPrice() { auto t = getThingType(); return t ? t->getMeanPrice() : 0; }
-    const Size& getSize() const { 
-        auto t = getThingType(); 
-        if (t) return t->getSize(); 
-        static const Size kEmptySize; 
-        return kEmptySize; 
+    int getMeanPrice() const {
+        if (const auto t = getThingType(); t)
+            return t->getMeanPrice();
+        return 0;
+    }
+    const Size& getSize() const {
+        if (const auto t = getThingType(); t)
+            return t->getSize();
+        static const Size kEmptySize;
+        return kEmptySize;
+    }
+    int getWidth() const {
+        if (const auto t = getThingType(); t)
+            return t->getWidth();
+        return 0;
+    }
+    int getHeight() const {
+        if (const auto t = getThingType(); t)
+            return t->getHeight();
+        return 0;
+    }
+    int getRealSize() const {
+        if (const auto t = getThingType(); t)
+            return t->getRealSize();
+        return 0;
+    }
+    int getLayers() const {
+        if (const auto t = getThingType(); t)
+            return t->getLayers();
+        return 0;
+    }
+    int getNumPatternX() const {
+        if (const auto t = getThingType(); t)
+            return t->getNumPatternX();
+        return 0;
+    }
+    int getNumPatternY() const {
+        if (const auto t = getThingType(); t)
+            return t->getNumPatternY();
+        return 0;
+    }
+    int getNumPatternZ() const {
+        if (const auto t = getThingType(); t)
+            return t->getNumPatternZ();
+        return 0;
+    }
+    int getAnimationPhases() const {
+        if (const auto t = getThingType(); t)
+            return t->getAnimationPhases();
+        return 0;
+    }
+    int getGroundSpeed() const {
+        if (const auto t = getThingType(); t)
+            return t->getGroundSpeed();
+        return 0;
+    }
+    int getMaxTextLength() const {
+        if (const auto t = getThingType(); t)
+            return t->getMaxTextLength();
+        return 0;
+    }
+    int getMinimapColor() const {
+        if (const auto t = getThingType(); t)
+            return t->getMinimapColor();
+        return 0;
+    }
+    int getLensHelp() const {
+        if (const auto t = getThingType(); t)
+            return t->getLensHelp();
+        return 0;
+    }
+    int getElevation() const {
+        if (const auto t = getThingType(); t)
+            return t->getElevation();
+        return 0;
     }
 
-    int getWidth() const { auto t = getThingType(); return t ? t->getWidth() : 0; }
-    int getHeight() const { auto t = getThingType(); return t ? t->getHeight() : 0; }
-    int getRealSize() const { auto t = getThingType(); return t ? t->getRealSize() : 0; }
-    int getLayers() const { auto t = getThingType(); return t ? t->getLayers() : 0; }
-    int getNumPatternX()const { auto t = getThingType(); return t ? t->getNumPatternX() : 0; }
-    int getNumPatternY()const { auto t = getThingType(); return t ? t->getNumPatternY() : 0; }
-    int getNumPatternZ()const { auto t = getThingType(); return t ? t->getNumPatternZ() : 0; }
-    int getAnimationPhases()const { auto t = getThingType(); return t ? t->getAnimationPhases() : 0; }
-    int getGroundSpeed() const { auto t = getThingType(); return t ? t->getGroundSpeed() : 0; }
-    int getMaxTextLength()const { auto t = getThingType(); return t ? t->getMaxTextLength() : 0; }
-    int getMinimapColor()const { auto t = getThingType(); return t ? t->getMinimapColor() : 0; }
-    int getLensHelp()const { auto t = getThingType(); return t ? t->getLensHelp() : 0; }
-    int getElevation() const { auto t = getThingType(); return t ? t->getElevation() : 0; }
+    int getClothSlot() const {
+        if (const auto t = getThingType(); t)
+            return t->getClothSlot();
+        return 0;
+    }
 
-    int getClothSlot() { auto t = getThingType(); return t ? t->getClothSlot() : 0; }
+    bool blockProjectile() const {
+        if (const auto t = getThingType(); t)
+            return t->blockProjectile();
+        return false;
+    }
 
-    bool blockProjectile() const { auto t = getThingType(); return t ? t->blockProjectile() : false; }
+    virtual bool isContainer() const {
+        if (const auto t = getThingType(); t)
+            return t->isContainer();
+        return false;
+    }
 
-    virtual bool isContainer() { auto t = getThingType(); return t ? t->isContainer() : false; }
+    bool isCommon() const { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
 
-    bool isCommon() { return !isGround() && !isGroundBorder() && !isOnTop() && !isCreature() && !isOnBottom(); }
+    bool isTopGround() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isTopGround();
+        return false;
+    }
+    bool isTopGroundBorder() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isTopGroundBorder();
+        return false;
+    }
+    bool isSingleGround() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isSingleGround();
+        return false;
+    }
+    bool isSingleGroundBorder() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isSingleGroundBorder();
+        return false;
+    }
+    bool isGround() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isGround();
+        return false;
+    }
+    bool isGroundBorder() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isGroundBorder();
+        return false;
+    }
+    bool isOnBottom() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isOnBottom();
+        return false;
+    }
+    bool isOnTop() const {
+        if (const auto t = getThingType(); !isCreature() && t)
+            return t->isOnTop();
+        return false;
+    }
 
-    bool isTopGround() { auto t = getThingType(); return !isCreature() && t && t->isTopGround(); }
-    bool isTopGroundBorder() { auto t = getThingType(); return !isCreature() && t && t->isTopGroundBorder(); }
-    bool isSingleGround() { auto t = getThingType(); return !isCreature() && t && t->isSingleGround(); }
-    bool isSingleGroundBorder() { auto t = getThingType(); return !isCreature() && t && t->isSingleGroundBorder(); }
-    bool isGround() { auto t = getThingType(); return !isCreature() && t && t->isGround(); }
-    bool isGroundBorder() { auto t = getThingType(); return !isCreature() && t && t->isGroundBorder(); }
-    bool isOnBottom() { auto t = getThingType(); return !isCreature() && t && t->isOnBottom(); }
-    bool isOnTop() { auto t = getThingType(); return !isCreature() && t && t->isOnTop(); }
+    bool isMarketable() const {
+        if (const auto t = getThingType(); t)
+            return t->isMarketable();
+        return false;
+    }
+    bool isStackable() const {
+        if (const auto t = getThingType(); t)
+            return t->isStackable();
+        return false;
+    }
+    bool isFluidContainer() const {
+        if (const auto t = getThingType(); t)
+            return t->isFluidContainer();
+        return false;
+    }
+    bool isForceUse() const {
+        if (const auto t = getThingType(); t)
+            return t->isForceUse();
+        return false;
+    }
+    bool isMultiUse() const {
+        if (const auto t = getThingType(); t)
+            return t->isMultiUse();
+        return false;
+    }
+    bool isWritable() const {
+        if (const auto t = getThingType(); t)
+            return t->isWritable();
+        return false;
+    }
+    bool isChargeable() const {
+        if (const auto t = getThingType(); t)
+            return t->isChargeable();
+        return false;
+    }
+    bool isWritableOnce() const {
+        if (const auto t = getThingType(); t)
+            return t->isWritableOnce();
+        return false;
+    }
+    bool isSplash() const {
+        if (const auto t = getThingType(); t)
+            return t->isSplash();
+        return false;
+    }
+    bool isNotWalkable() const {
+        if (const auto t = getThingType(); t)
+            return t->isNotWalkable();
+        return false;
+    }
+    bool isNotMoveable() const {
+        if (const auto t = getThingType(); t)
+            return t->isNotMoveable();
+        return false;
+    }
+    bool isMoveable() const {
+        if (const auto t = getThingType(); t)
+            return !t->isNotMoveable();
+        return false;
+    }
+    bool isNotPathable() const {
+        if (const auto t = getThingType(); t)
+            return t->isNotPathable();
+        return false;
+    }
+    bool isPickupable() const {
+        if (const auto t = getThingType(); t)
+            return t->isPickupable();
+        return false;
+    }
+    bool isHangable() const {
+        if (const auto t = getThingType(); t)
+            return t->isHangable();
+        return false;
+    }
+    bool isHookSouth() const {
+        if (const auto t = getThingType(); t)
+            return t->isHookSouth();
+        return false;
+    }
+    bool isHookEast() const {
+        if (const auto t = getThingType(); t)
+            return t->isHookEast();
+        return false;
+    }
+    bool isRotateable() const {
+        if (const auto t = getThingType(); t)
+            return t->isRotateable();
+        return false;
+    }
+    bool isDontHide() const {
+        if (const auto t = getThingType(); t)
+            return t->isDontHide();
+        return false;
+    }
+    bool isTranslucent() const {
+        if (const auto t = getThingType(); t)
+            return t->isTranslucent();
+        return false;
+    }
+    bool isLyingCorpse() const {
+        if (const auto t = getThingType(); t)
+            return t->isLyingCorpse();
+        return false;
+    }
+    bool isAnimateAlways() const {
+        if (const auto t = getThingType(); t)
+            return t->isAnimateAlways();
+        return false;
+    }
+    bool isFullGround() const {
+        if (const auto t = getThingType(); t)
+            return t->isFullGround();
+        return false;
+    }
+    bool isIgnoreLook() const {
+        if (const auto t = getThingType(); t)
+            return t->isIgnoreLook();
+        return false;
+    }
+    bool isCloth() const {
+        if (const auto t = getThingType(); t)
+            return t->isCloth();
+        return false;
+    }
+    bool isUsable() const {
+        if (const auto t = getThingType(); t)
+            return t->isUsable();
+        return false;
+    }
+    bool isWrapable() const {
+        if (const auto t = getThingType(); t)
+            return t->isWrapable();
+        return false;
+    }
+    bool isUnwrapable() const {
+        if (const auto t = getThingType(); t)
+            return t->isUnwrapable();
+        return false;
+    }
+    bool isTopEffect() const {
+        if (const auto t = getThingType(); t)
+            return t->isTopEffect();
+        return false;
+    }
+    bool isPodium() const {
+        if (const auto t = getThingType(); t)
+            return t->isPodium();
+        return false;
+    }
+    bool isOpaque() const {
+        if (const auto t = getThingType(); t)
+            return t->isOpaque();
+        return false;
+    }
+    bool isLoading() const {
+        if (const auto t = getThingType(); t)
+            return t->isLoading();
+        return false;
+    }
+    bool isSingleDimension() const {
+        if (const auto t = getThingType(); t)
+            return t->isSingleDimension();
+        return false;
+    }
+    bool isTall(const bool useRealSize = false) const {
+        if (const auto t = getThingType(); t)
+            return t->isTall(useRealSize);
+        return false;
+    }
 
-    bool isMarketable() { auto t = getThingType(); return t ? t->isMarketable() : false; }
-    bool isStackable() { auto t = getThingType(); return t ? t->isStackable() : false; }
-    bool isFluidContainer() { auto t = getThingType(); return t ? t->isFluidContainer() : false; }
-    bool isForceUse() { auto t = getThingType(); return t ? t->isForceUse() : false; }
-    bool isMultiUse() { auto t = getThingType(); return t ? t->isMultiUse() : false; }
-    bool isWritable() { auto t = getThingType(); return t ? t->isWritable() : false; }
-    bool isChargeable() { auto t = getThingType(); return t ? t->isChargeable() : false; }
-    bool isWritableOnce() { auto t = getThingType(); return t ? t->isWritableOnce() : false; }
-    bool isSplash() { auto t = getThingType(); return t ? t->isSplash() : false; }
-    bool isNotWalkable() { auto t = getThingType(); return t ? t->isNotWalkable() : false; }
-    bool isNotMoveable() { auto t = getThingType(); return t ? t->isNotMoveable() : false; }
-    bool isMoveable() { auto t = getThingType(); return t ? !t->isNotMoveable() : false; }
-    bool isNotPathable() { auto t = getThingType(); return t ? t->isNotPathable() : false; }
-    bool isPickupable() { auto t = getThingType(); return t ? t->isPickupable() : false; }
-    bool isHangable() { auto t = getThingType(); return t ? t->isHangable() : false; }
-    bool isHookSouth() { auto t = getThingType(); return t ? t->isHookSouth() : false; }
-    bool isHookEast() { auto t = getThingType(); return t ? t->isHookEast() : false; }
-    bool isRotateable() { auto t = getThingType(); return t ? t->isRotateable() : false; }
-    bool isDontHide() { auto t = getThingType(); return t ? t->isDontHide() : false; }
-    bool isTranslucent() { auto t = getThingType(); return t ? t->isTranslucent() : false; }
-    bool isLyingCorpse() { auto t = getThingType(); return t ? t->isLyingCorpse() : false; }
-    bool isAnimateAlways() { auto t = getThingType(); return t ? t->isAnimateAlways() : false; }
-    bool isFullGround() { auto t = getThingType(); return t ? t->isFullGround() : false; }
-    bool isIgnoreLook() { auto t = getThingType(); return t ? t->isIgnoreLook() : false; }
-    bool isCloth() { auto t = getThingType(); return t ? t->isCloth() : false; }
-    bool isUsable() { auto t = getThingType(); return t ? t->isUsable() : false; }
-    bool isWrapable() { auto t = getThingType(); return t ? t->isWrapable() : false; }
-    bool isUnwrapable() { auto t = getThingType(); return t ? t->isUnwrapable() : false; }
-    bool isTopEffect() { auto t = getThingType(); return t ? t->isTopEffect() : false; }
-    bool isPodium() const { auto t = getThingType(); return t ? t->isPodium() : false; }
-    bool isOpaque() const { auto t = getThingType(); return t ? t->isOpaque() : false; }
-    bool isLoading() const { auto t = getThingType(); return t ? t->isLoading() : false; }
-    bool isSingleDimension() const { auto t = getThingType(); return t ? t->isSingleDimension() : false; }
-    bool isTall(const bool useRealSize = false) const { auto t = getThingType(); return t ? t->isTall(useRealSize) : false; }
+    bool hasMiniMapColor() const {
+        if (const auto t = getThingType(); t)
+            return t->hasMiniMapColor();
+        return false;
+    }
+    bool hasLensHelp() const {
+        if (const auto t = getThingType(); t)
+            return t->hasLensHelp();
+        return false;
+    }
+    bool hasDisplacement() const {
+        if (const auto t = getThingType(); t)
+            return t->hasDisplacement();
+        return false;
+    }
+    bool hasElevation() const {
+        if (const auto t = getThingType(); t)
+            return t->hasElevation();
+        return false;
+    }
+    bool hasAction() const {
+        if (const auto t = getThingType(); t)
+            return t->hasAction();
+        return false;
+    }
+    bool hasWearOut() const {
+        if (const auto t = getThingType(); t)
+            return t->hasWearOut();
+        return false;
+    }
+    bool hasClockExpire() const {
+        if (const auto t = getThingType(); t)
+            return t->hasClockExpire();
+        return false;
+    }
+    bool hasExpire() const {
+        if (const auto t = getThingType(); t)
+            return t->hasExpire();
+        return false;
+    }
+    bool hasExpireStop() const {
+        if (const auto t = getThingType(); t)
+            return t->hasExpireStop();
+        return false;
+    }
+    bool hasAnimationPhases() const {
+        if (const auto t = getThingType(); t)
+            return t->getAnimationPhases() > 1;
+        return false;
+    }
+    bool isDecoKit() const {
+        if (const auto t = getThingType(); t)
+            return t->isDecoKit();
+        return false;
+    }
 
-    bool hasMiniMapColor() const { auto t = getThingType(); return t ? t->hasMiniMapColor() : false; }
-    bool hasLensHelp() const { auto t = getThingType(); return t ? t->hasLensHelp() : false; }
-    bool hasDisplacement() const { auto t = getThingType(); return t ? t->hasDisplacement() : false; }
-    bool hasElevation() const { auto t = getThingType(); return t ? t->hasElevation() : false; }
-    bool hasAction() const { auto t = getThingType(); return t ? t->hasAction() : false; }
-    bool hasWearOut() const { auto t = getThingType(); return t ? t->hasWearOut() : false; }
-    bool hasClockExpire() const { auto t = getThingType(); return t ? t->hasClockExpire() : false; }
-    bool hasExpire() const { auto t = getThingType(); return t ? t->hasExpire() : false; }
-    bool hasExpireStop() const { auto t = getThingType(); return t ? t->hasExpireStop() : false; }
-    bool hasAnimationPhases() const { auto t = getThingType(); return t ? t->getAnimationPhases() > 1 : false; }
-    bool isDecoKit() const { auto t = getThingType(); return t ? t->isDecoKit() : false; }
+    PLAYER_ACTION getDefaultAction() const {
+        if (const auto t = getThingType(); t)
+            return t->getDefaultAction();
+        return static_cast<PLAYER_ACTION>(0);
+    }
 
-    PLAYER_ACTION getDefaultAction() { auto t = getThingType(); return t ? t->getDefaultAction() : static_cast<PLAYER_ACTION>(0); }
-
-    uint16_t getClassification() { auto t = getThingType(); return t ? t->getClassification() : 0; }
+    uint16_t getClassification() const {
+        if (const auto t = getThingType(); t)
+            return t->getClassification();
+        return 0;
+    }
 
     void canDraw(const bool canDraw) { m_canDraw = canDraw; }
 
     bool canDraw(const Color& color = Color::white) const {
-        auto t = getThingType();
-        return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && t && t->getOpacity() > Fw::MIN_ALPHA;
+        if (const auto t = getThingType(); t) {
+            return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && t->getOpacity() > Fw::MIN_ALPHA;
+        }
+        return false;
     }
 
     void setShader(std::string_view name);
