@@ -121,7 +121,7 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
         return;
 
     const int baseSprite = g_gameConfig.getSpriteSize();
-    const int nativeSize = g_gameConfig.isUseCropSizeForUIDraw() 
+    const int nativeSize = g_gameConfig.isUseCropSizeForUIDraw()
         ? getExactSize()
         : std::max<int>(getRealSize(), getExactSize());
     const int tileCount = 2;
@@ -811,7 +811,9 @@ void Creature::setOutfit(const Outfit& outfit)
     if (m_outfit.isInvalid())
         m_outfit.setCategory(m_outfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
 
-    m_clientId = getThingType()->getId();
+    if (const auto thingType = getThingType())
+        m_clientId = thingType->getId();
+    else m_clientId = 0;
 
     if (m_outfit.hasMount()) {
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
