@@ -425,9 +425,9 @@ void UIWidget::refreshHtml(bool childrenTo) {
 
     auto parent = this;
     while (parent && parent->isOnHtml()) {
-        if (parent->m_width.unit != Unit::Em && parent->m_width.unit != Unit::Px)
+        if (parent->m_width.unit == Unit::FitContent)
             parent->applyDimension(true, parent->m_width.unit, parent->m_width.value);
-        if (parent->m_height.unit != Unit::Em && parent->m_height.unit != Unit::Px)
+        if (parent->m_height.unit == Unit::FitContent)
             parent->applyDimension(false, parent->m_height.unit, parent->m_height.value);
         parent = parent->m_parent.get();
     }
@@ -700,14 +700,28 @@ void UIWidget::updateSize() {
                 continue;
             }
 
-            if (widthNeedsUpdate) {
-                auto v = (parent->isOnHtml() ? parent->getWidthHtml().valueCalculed : parent->getWidth());
-                if (v > -1) width = v - parent->getPaddingLeft() - parent->getPaddingRight();
+            if (widthNeedsUpdate && width == -1) {
+                if (parent->isOnHtml()) {
+                    if ((parent->getWidthHtml().unit == Unit::Percent) && parent->getWidthHtml().valueCalculed == -1) {
+                        parent->updateSize();
+                    }
+                    width = parent->getWidthHtml().valueCalculed;
+                } else width = parent->getWidth();
+
+                if (width > -1)
+                    width -= parent->getPaddingLeft() + parent->getPaddingRight();
             }
 
-            if (heightNeedsUpdate) {
-                auto v = (parent->isOnHtml() ? parent->getHeightHtml().valueCalculed : parent->getHeight());
-                if (v > -1) height = v - parent->getPaddingTop() - parent->getPaddingBottom();
+            if (heightNeedsUpdate && height == -1) {
+                if (parent->isOnHtml()) {
+                    if (parent->getHeightHtml().unit == Unit::Percent && parent->getHeightHtml().valueCalculed == -1) {
+                        parent->updateSize();
+                    }
+                    height = parent->getHeightHtml().valueCalculed;
+                } else height = parent->getHeight();
+
+                if (height > -1)
+                    height -= parent->getPaddingTop() + parent->getPaddingBottom();
             }
 
             if (widthNeedsUpdate && heightNeedsUpdate) {
@@ -820,12 +834,12 @@ void UIWidget::applyAnchorAlignment() {
                 else
                     addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
             } else anchored = false;
-
-            if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
-                anchored = true;
-                addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
-            }
         } else anchored = false;
+
+        if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
+            anchored = true;
+            addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+        }
 
         if (anchored) {
             if (!ctx.lastNormalWidget) {

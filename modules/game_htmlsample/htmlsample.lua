@@ -2,12 +2,24 @@ HtmlSample = Controller:new()
 function HtmlSample:onInit()
     self:loadHtml('htmlsample.html')
     self:equalizerEffect()
+    self.players = {}
 end
 
 function HtmlSample:addPlayer(name)
-    self:findWidget('#players'):append(string.format([[
-        <div>%s</div>
-    ]], name))
+    if not name or #name == 0 then
+        return
+    end
+
+    table.insert(self.players, {
+        name = name,
+        lookType = self.lookType
+    })
+
+    self.playerName = ''
+end
+
+function HtmlSample:removePlayer(index)
+    table.remove(self.players, index)
 end
 
 function HtmlSample:equalizerEffect()
@@ -23,8 +35,11 @@ function HtmlSample:equalizerEffect()
 
         local value = math.random(minV, maxV)
         local dir   = (math.random(0, 1) == 0) and -1 or 1
-
         self:cycleEvent(function()
+            if widget:isDestroyed() then
+                return false
+            end
+
             value = value + dir * speed
             if value >= maxV then
                 value = maxV
