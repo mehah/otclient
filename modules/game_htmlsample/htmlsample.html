@@ -8,7 +8,7 @@
   .form {
     display: inline-block;
     width: 50%;
-    height: 20%;
+    height: 30%;
     margin-top: 30;
   }
 
@@ -44,31 +44,50 @@
   }
 
   #players > :nth-child(odd) {
-    background-color: aqua;
+    background-color: rgb(134, 127, 134);
+  }
+
+  #players div uicreature {
+    --creature-size: 64;
+    width: 64;
+    height: 64;
+  }
+
+  #players div div {
+    background-color: antiquewhite;
   }
 </style>
 <script type="text">
   self.title = "HTML/CSS";
   self.msg = "Welcome to HTML/CSS";
   self:cycleEvent(function()
-      self.playerName = math.random()
-  end, 10)
+      self.lookType = math.random(1, 300)
+  end, 250)
 </script>
 <html>
   <window class="content" anchor="parent" *title="self.title">
     <div style="margin: 30px; text-align: center">{{self.msg}}</div>
     <div class="form">
-      <label style="padding: 3">Name:</label>
-      <input type="text" *value="self.playerName" />
+      <div>
+        <label style="padding: 3">Name:</label>
+        <input type="text" *value="self.playerName" style="margin-left: 26" />
+      </div>
+      <div>
+        <label style="padding: 3">Look type:</label>
+        <input type="text" *value="self.lookType" />
+      </div>
+      <div><button onclick="self:addPlayer(self.playerName)">Add</button></div>
     </div>
     <div id="players" class="form">
-      <div *for="local item in self.items">
-        <span style="color: red">{{item.name}}</span>
+      <div *for="local player in self.items">
+        <div>
+          <uicreature *outfit="{type = player.lookType}"></uicreature>
+        </div>
+        <div class="playerName" style="background-color: red">
+          {{player.name}}
+        </div>
       </div>
     </div>
-    <div style="margin-top: 10">Player name is: {{self.playerName}}</div>
-    <div><button onclick="self:addPlayer(self.playerName)">Add</button></div>
-
     <div class="equalizerEffect">
       <div class="line"></div>
       <div class="line"></div>

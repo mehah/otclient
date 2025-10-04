@@ -244,7 +244,7 @@ struct Selector
             }
             if (pseudo.rfind("nth-child(", 0) == 0 && pseudo.back() == ')') {
                 std::string inside = pseudo.substr(10, pseudo.size() - 11);
-                int idx = node->indexAmongElements() + 1; // CSS é 1-based
+                int idx = node->indexAmongElements() + 1;
                 return matchesNth(idx, inside);
             }
             if (pseudo.rfind("nth-last-child(", 0) == 0 && pseudo.back() == ')') {
@@ -272,7 +272,7 @@ struct Selector
             }
             if (pseudo.rfind("nth-of-type(", 0) == 0 && pseudo.back() == ')') {
                 std::string inside = pseudo.substr(12, pseudo.size() - 13);
-                int idx = node->indexAmongType() + 1; // CSS é 1-based
+                int idx = node->indexAmongType() + 1;
                 return matchesNth(idx, inside);
             }
             if (pseudo.rfind("nth-last-of-type(", 0) == 0 && pseudo.back() == ')') {

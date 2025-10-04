@@ -481,40 +481,43 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         self = controller
     }
 
-    local childindex = index
-    local list, keys = ngfor_exec(expr, env, function(c)
-        childindex = childindex + 1
-        FOR_CTX.__keys = c.__keys;
-        FOR_CTX.__values = c.__values;
-        widget:insert(childindex, html)
-        FOR_CTX.__keys = '';
-        FOR_CTX.__values = {};
-    end)
-
-    if list ~= nil then
-        local watch = table.watchList(list, {
-            onInsert = function(i,it)
-                FOR_CTX.__keys = keys;
-                FOR_CTX.__values = {it, i};
-                widget:insert(index + i, html)
-                FOR_CTX.__keys = '';              
+    local scan = function(self)
+        if not self.watchList then
+            local childindex = index
+            local list, keys = ngfor_exec(expr, env, function(c)
+                childindex = childindex + 1
+                FOR_CTX.__keys = c.__keys;
+                FOR_CTX.__values = c.__values;
+                widget:insert(childindex, html)
+                FOR_CTX.__keys = '';
                 FOR_CTX.__values = {};
-            end,
-            onRemove = function(i)       
-                print(i)
-                widget:removeChildByIndex(index+i)
-            end
-        })
+            end)
 
-        local watchObj = {
-            watchList = watch,
-            widget = widget,
-            fnc = function(self)
-                self.watchList:scan()
-            end
-        }
+            local watch = table.watchList(list, {
+                onInsert = function(i,it)
+                    FOR_CTX.__keys = keys;
+                    FOR_CTX.__values = {it, i};
+                    widget:insert(index + i, html)
+                    FOR_CTX.__keys = '';              
+                    FOR_CTX.__values = {};
+                end,
+                onRemove = function(i)       
+                    widget:removeChildByIndex(index+i)
+                end
+            })
 
-        table.insert(WATCH_LIST, watchObj)
-        START_WATCH_LIST()
+            self.watchList = watch
+        end
+        
+        self.watchList:scan()
     end
+
+    local watchObj = {
+        widget = widget,
+        fnc = scan
+    }
+
+    table.insert(WATCH_LIST, watchObj)
+    START_WATCH_LIST()
+
 end

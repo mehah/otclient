@@ -59,7 +59,8 @@ public:
     std::vector<HtmlNodePtr> getByTag(const std::string& t) const {
         std::vector<HtmlNodePtr> out;
         auto root = documentRoot();
-        auto it = root->tagIndex.find(t);
+        auto key = ascii_tolower_copy(t);
+        auto it = root->tagIndex.find(key);
         if (it == root->tagIndex.end()) return out;
         out.reserve(it->second.size());
         for (auto& w : it->second) { if (auto sp = w.lock()) out.push_back(sp); }
@@ -162,6 +163,7 @@ private:
     static void rebuildIndexes(const HtmlNodePtr& root);
     void attachChild(const HtmlNodePtr& child, size_t pos);
     void registerInIndexes(const HtmlNodePtr& child);
+    void registerSubtreeInIndexes(const HtmlNodePtr& node);
     void unregisterSubtreeFromIndexes(const HtmlNodePtr& node);
     void detachFromCurrentParent(const HtmlNodePtr& child);
 };

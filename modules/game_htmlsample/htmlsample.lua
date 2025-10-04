@@ -1,16 +1,19 @@
 HtmlSample = Controller:new()
 function HtmlSample:onInit()
-          self.items = {
-            {name='renato'},
-            {name='diego'}
-    }
     self:loadHtml('htmlsample.html')
     self:equalizerEffect()
-
+    self.items = {}
 end
 
 function HtmlSample:addPlayer(name)
-   table.insert(self.items, {name = name})
+   if not name or name.length == 0 then
+    return
+   end
+
+   table.insert(self.items, {
+    name = name,
+    lookType = self.lookType
+   })
 end
 
 function HtmlSample:equalizerEffect()
