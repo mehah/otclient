@@ -67,19 +67,6 @@ function ConversionTab.updateDustLevelLabel(controller, panel, dustLevel, depend
         g_logger.info("forgeIncreaseDustNextLevelLabel > " .. dustLevelValue + 1)
     end
 
-    local forgeDustAmount = panel:recursiveGetChildById('forgeDustAmount')
-    if forgeDustAmount and not forgeDustAmount:isDestroyed() then
-        local player = g_game.getLocalPlayer()
-        local resourceTypes = dependencies.resourceTypes or {}
-        local dustType = resourceTypes.dust
-        local dust = 0
-        if player and dustType then
-            dust = player:getResourceBalance(dustType) or 0
-        end
-        forgeDustAmount:setText(("%d/%d"):format(dust, dustLevelValue))
-
-        g_logger.info("forgeDustAmount > " .. ("%d/%d"):format(dust, dustLevelValue))
-    end
 end
 
 function ConversionTab.onConversion(controller, conversionType, dependencies)
