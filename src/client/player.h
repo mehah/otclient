@@ -32,5 +32,5 @@ public:
     ~Player() override = default;
 
     PlayerPtr asPlayer() { return static_self_cast<Player>(); }
-    bool isPlayer() override { return true; }
+    bool isPlayer() const override { return true; }
 };

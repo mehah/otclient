@@ -36,6 +36,22 @@
 #include <framework/core/graphicalapplication.h>
 #include <framework/ui/uiwidget.h>
 #include <queue>
+#include <unordered_set>
+
+namespace
+{
+void cleanNewSpectators(std::vector<CreaturePtr>& creatures, std::unordered_set<uint32_t>& seenIds, const std::size_t startIndex)
+{
+    auto it = creatures.begin() + startIndex;
+    while (it != creatures.end()) {
+        if (const auto& creature = *it; !creature || !seenIds.insert(creature->getId()).second) {
+            it = creatures.erase(it);
+            continue;
+        }
+        ++it;
+    }
+}
+}
 
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
@@ -649,26 +665,23 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
     const int startX = centerPos.x - minXRange;
     const int endX = centerPos.x + maxXRange;
 
-    for (int z = startZ; z <= endZ; ++z) {
+    const auto appendSpectatorsFromLayer = [&](const int z) {
         for (int y = startY; y <= endY; ++y) {
             for (int x = startX; x <= endX; ++x) {
-                if (const auto& tile = getTile(Position(x, y, z)); tile && tile->hasCreatures()) {
-                    const auto sizeBeforeAppend = creatures.size();
-
-                    tile->appendSpectators(creatures);
-
-                    auto it = creatures.begin() + sizeBeforeAppend;
-                    while (it != creatures.end()) {
-                        const auto& creature = *it;
-                        if (!creature || !seenIds.insert(creature->getId()).second) {
-                            it = creatures.erase(it);
-                            continue;
-                        }
-                        ++it;
-                    }
+                const auto tile = getTile(Position(x, y, z));
+                if (!tile || !tile->hasCreatures()) {
+                    continue;
                 }
+
+                const auto sizeBeforeAppend = creatures.size();
+                tile->appendSpectators(creatures);
+                cleanNewSpectators(creatures, seenIds, sizeBeforeAppend);
             }
         }
+    };
+
+    for (int z = startZ; z <= endZ; ++z) {
+        appendSpectatorsFromLayer(z);
     }
     return creatures;
 }
@@ -1490,26 +1503,20 @@ std::vector<CreaturePtr> Map::getSpectatorsByPattern(const Position& centerPos, 
     seenIds.reserve(m_knownCreatures.size());
     for (int y = centerPos.y - height / 2, endy = centerPos.y + height / 2; y <= endy; ++y) {
         for (int x = centerPos.x - width / 2, endx = centerPos.x + width / 2; x <= endx; ++x) {
-            if (!finalPattern[p++]) {
+            const auto enabled = finalPattern[p];
+            ++p;
+            if (!enabled) {
                 continue;
             }
-            const TilePtr& tile = getTile(Position(x, y, centerPos.z));
+
+            const auto tile = getTile(Position(x, y, centerPos.z));
             if (!tile || !tile->hasCreatures()) {
                 continue;
             }
 
             const auto sizeBeforeAppend = creatures.size();
             tile->appendSpectators(creatures);
-
-            auto it = creatures.begin() + sizeBeforeAppend;
-            while (it != creatures.end()) {
-                const auto& creature = *it;
-                if (!creature || !seenIds.insert(creature->getId()).second) {
-                    it = creatures.erase(it);
-                    continue;
-                }
-                ++it;
-            }
+            cleanNewSpectators(creatures, seenIds, sizeBeforeAppend);
         }
     }
     return creatures;

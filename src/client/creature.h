@@ -159,7 +159,7 @@ public:
     bool isDead() { return m_healthPercent <= 0; }
     bool isFullHealth() { return m_healthPercent == 100; }
     bool canBeSeen() { return !isInvisible() || isPlayer(); }
-    bool isCreature() override { return true; }
+    bool isCreature() const override { return true; }
     bool isCovered() { return m_isCovered; }
 
     void setCovered(bool covered);
@@ -367,12 +367,12 @@ private:
 class Npc final : public Creature
 {
 public:
-    bool isNpc() override { return true; }
+    bool isNpc() const override { return true; }
 };
 
 // @bindclass
 class Monster final : public Creature
 {
 public:
-    bool isMonster() override { return true; }
+    bool isMonster() const override { return true; }
 };
