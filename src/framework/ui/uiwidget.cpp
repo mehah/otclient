@@ -226,7 +226,7 @@ void UIWidget::addChild(const UIWidgetPtr& child)
 
     // add to layout and updates it
     m_layout->addWidget(child);
-    if (m_htmlNode) {
+    if (m_htmlNode && child->m_htmlNode) {
         m_htmlNode->append(child->m_htmlNode);
         refreshHtml();
     }
@@ -295,7 +295,7 @@ void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
 
     // add to layout and updates it
     m_layout->addWidget(child);
-    if (m_htmlNode) {
+    if (m_htmlNode && child->m_htmlNode) {
         m_htmlNode->insert(child->m_htmlNode, index);
         refreshHtml(true);
     }
@@ -345,7 +345,7 @@ void UIWidget::removeChild(const UIWidgetPtr& child)
         if (m_layout)
             m_layout->removeWidget(child);
 
-        if (m_htmlNode) {
+        if (m_htmlNode && child->m_htmlNode) {
             m_htmlNode->remove(child->m_htmlNode);
             refreshHtml(true);
         }
@@ -511,7 +511,7 @@ void UIWidget::lowerChild(const UIWidgetPtr& child)
     m_children.erase(it);
     m_children.emplace_front(child);
 
-    if (m_htmlNode) {
+    if (m_htmlNode && child->m_htmlNode) {
         m_htmlNode->remove(child->m_htmlNode);
         m_htmlNode->prepend(child->m_htmlNode);
         refreshHtml(true);
@@ -543,7 +543,7 @@ void UIWidget::raiseChild(const UIWidgetPtr& child)
     m_children.erase(it);
     m_children.emplace_back(child);
 
-    if (m_htmlNode) {
+    if (m_htmlNode && child->m_htmlNode) {
         m_htmlNode->remove(child->m_htmlNode);
         m_htmlNode->append(child->m_htmlNode);
         refreshHtml(true);
@@ -585,7 +585,7 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, const int index)
     m_children.erase(it);
     m_children.insert(m_children.begin() + (index - 1), child);
 
-    if (m_htmlNode) {
+    if (m_htmlNode && child->m_htmlNode) {
         m_htmlNode->remove(child->m_htmlNode);
         m_htmlNode->insert(child->m_htmlNode, index - 1);
         refreshHtml(true);

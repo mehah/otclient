@@ -17,7 +17,7 @@ function HtmlSample:addPlayer(name)
 end
 
 function HtmlSample:equalizerEffect()
-    local widgets = self:findWidgets('.line')
+    --[[local widgets = self:findWidgets('.line')
 
     for _, widget in pairs(widgets) do
         local minV = math.random(0, 30)
@@ -43,5 +43,5 @@ function HtmlSample:equalizerEffect()
             widget:setHeight(10 + value)
             widget:setTop(89 - value)
         end, 30)
-    end
+    end]]
 end

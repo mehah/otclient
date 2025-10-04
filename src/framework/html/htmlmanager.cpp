@@ -394,7 +394,8 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     textNodes.reserve(32);
     widgets.reserve(32);
 
-    bool isDynamic = root.dynamicNode != nullptr;
+    const bool isDynamic = root.dynamicNode != nullptr;
+    const bool insertWithOrder = parent->m_insertChildIndex > -1;
 
     UIWidgetPtr widget;
     for (const auto& el : (isDynamic ? root.dynamicNode : root.node)->getChildren()) {
@@ -430,13 +431,11 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     const auto mainNode = root.node.get();
 
     if (isDynamic) {
-        bool insertWithOrder = parent->m_insertChildIndex > -1;
         if (insertWithOrder) {
             parent->getHtmlNode()->insert(widget->getHtmlNode(), parent->m_insertChildIndex - 1);
         } else {
             parent->getHtmlNode()->append(widget->getHtmlNode());
         }
-        parent->refreshHtml(insertWithOrder);
     }
 
     for (const auto& sheet : GLOBAL_STYLES)
@@ -464,6 +463,10 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
         applyAttributesAndStyles(w, node, root.groups, moduleName);
         w->scheduleHtmlTask(PropApplyAnchorAlignment);
         w->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName, node->toString());
+    }
+
+    if (isDynamic) {
+        parent->refreshHtml(insertWithOrder);
     }
 
     return widget;

@@ -425,9 +425,9 @@ void UIWidget::refreshHtml(bool childrenTo) {
 
     auto parent = this;
     while (parent && parent->isOnHtml()) {
-        if (parent->m_width.unit != Unit::Em && parent->m_width.unit != Unit::Px)
+        if (parent->m_width.unit == Unit::FitContent)
             parent->applyDimension(true, parent->m_width.unit, parent->m_width.value);
-        if (parent->m_height.unit != Unit::Em && parent->m_height.unit != Unit::Px)
+        if (parent->m_height.unit == Unit::FitContent)
             parent->applyDimension(false, parent->m_height.unit, parent->m_height.value);
         parent = parent->m_parent.get();
     }
