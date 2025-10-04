@@ -490,15 +490,6 @@ function FusionTab.configureConversionPanel(controller, selectedWidget)
     controller.fusionItem = itemPtr
     controller.fusionItemCount = itemCount
 
-    if context.targetItem then
-        local targetPreview = Item.create(itemPtr:getId(), 1)
-        targetPreview:setTier(itemTier + 1)
-        g_logger.info(">>> id: " .. itemPtr:getId() .. " tier: " .. itemTier .. " target tier: " .. itemTier + 1)
-        context.targetItem:setItem(targetPreview)
-        context.targetItem:setItemCount(1)
-        ItemsDatabase.setTier(context.targetItem, targetPreview)
-    end
-
     if context.selectedItemIcon then
         local selectedPreview = Item.create(itemPtr:getId(), itemCount)
         selectedPreview:setTier(itemTier)
@@ -507,6 +498,14 @@ function FusionTab.configureConversionPanel(controller, selectedWidget)
         g_logger.info(">> selectedItemIcon id: " ..
             itemPtr:getId() .. " tier: " .. itemTier .. " target tier: " .. itemTier + 1)
         ItemsDatabase.setTier(context.selectedItemIcon, selectedPreview)
+    end
+
+    if context.targetItem then
+        local targetDisplay = Item.create(itemPtr:getId(), itemCount)
+        targetDisplay:setTier(itemTier)
+        context.targetItem:setItem(targetDisplay)
+        context.targetItem:setItemCount(itemCount)
+        ItemsDatabase.setTier(context.targetItem, targetDisplay)
     end
 
     if context.selectedItemQuestion then
