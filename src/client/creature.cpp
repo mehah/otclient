@@ -122,7 +122,7 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
 
     const int baseSprite = g_gameConfig.getSpriteSize();
     const int nativeSize = g_gameConfig.isUseCropSizeForUIDraw()
-        ? getExactSize()
+        ? getExactSize(0, 0, 0)
         : std::max<int>(getRealSize(), getExactSize());
     const int tileCount = 2;
     const int fbSize = tileCount * baseSprite;
@@ -1111,15 +1111,19 @@ int Creature::getExactSize(int layer, int /*xPattern*/, int yPattern, int zPatte
 
     uint8_t exactSize = 0;
     if (m_outfit.isCreature()) {
-        const int numPatternY = getNumPatternY();
         const int layers = getLayers();
 
         zPattern = m_outfit.hasMount() ? 1 : 0;
 
-        for (yPattern = 0; yPattern < numPatternY; ++yPattern) {
-            if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
-                continue;
+        if (yPattern > 0) {
+            for (int pattern = 0; pattern < yPattern; ++pattern) {
+                if (pattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
+                    continue;
 
+                for (layer = 0; layer < layers; ++layer)
+                    exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
+            }
+        } else {
             for (layer = 0; layer < layers; ++layer)
                 exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
         }
