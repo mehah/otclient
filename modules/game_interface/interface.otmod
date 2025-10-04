@@ -51,5 +51,6 @@ Module
     - game_cyclopedia
     - game_creatureinformation
     - game_rewardwall
+    - game_forge
   @onLoad: init()
   @onUnload: terminate()

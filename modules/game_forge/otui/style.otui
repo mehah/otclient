@@ -1,0 +1,28 @@
+HistoryForgePanel < UIWidget
+  size: 468 20
+  Label
+    id: date
+    !text: tr('Date')
+    width: 150
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-align: left
+    margin-left: 5
+    margin-top: 1
+  Label
+    id: action
+    !text: tr('Action')
+    width: 150
+    anchors.top: parent.top
+    anchors.left: prev.right
+    text-align: left
+    margin-top: 1
+  Label
+    id: details
+    !text: tr('Details')
+    width: 220
+    anchors.top: parent.top
+    anchors.left: prev.right
+    text-align: left
+    margin-top: 1
+    border: 1 red

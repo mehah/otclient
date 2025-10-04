@@ -1,0 +1,9 @@
+Module
+  name: game_forge
+  description: game_forge
+  author: game_forge
+  website: game_forge
+  scripts: [ game_forge.lua, callbackHtml.lua, tab/fusion/fusion.lua, tab/history/history.lua,tab/transfer/transfer.lua , tab/conversion/conversion.lua  ]
+  sandboxed: true
+  @onLoad: forgeController:init()
+  @onUnload: forgeController:terminate()

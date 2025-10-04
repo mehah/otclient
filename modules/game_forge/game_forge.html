@@ -1,0 +1,56 @@
+﻿<link href="game_forge.css" />
+<link href="tab/conversion/conversion.css" />
+<link href="tab/fusion/fusion.css" />
+<link href="tab/history/history.css" />
+<link href="tab/transfer/transfer.css" />
+<html>
+<window class="forge-window" title="Exaltation Forge" >
+  <!-- Navigation buttons -->
+  <div id="buttonPanel" class="button-panel" layout="type: horizontalBox;spacing:0">
+    <Button id="fusionBtn" class="forge-btn btn-fusion" onclick="self:loadMenu('fusionMenu')">
+    </Button>
+
+    <Button id="transferBtn" class="forge-btn btn-transfer" onclick="self:loadMenu('transferMenu')">
+    </Button>
+
+    <Button id="conversionBtn" class="forge-btn btn-conversion" onclick="self:loadMenu('conversionMenu')">
+    </Button>
+
+    <Button id="historyBtn" class="forge-btn btn-history" onclick="self:loadMenu('historyMenu')">
+    </Button>
+  </div>
+
+  <!-- Main content area -->
+  <div id="content" class="content-area" ></div>
+
+  <!-- Separator -->
+  <hr class="separator HorizontalSeparator" />
+
+  <!-- Status bar with resources -->
+  <div class="status-bar">
+    <div class="status-item status-primary">
+      <img class="resource-icon" src="/images/game/prey/prey_gold" />
+      <label class="resource-amount" text="199"></label>
+    </div>
+
+    <div class="status-item status-secondary">
+      <img class="resource-icon" src="images/icon-currency-dust" />
+      <label class="resource-amount" text="0/100"></label>
+    </div>
+
+    <div class="status-item status-tertiary">
+      <img class="resource-icon" src="images/icon-currency-sliver" />
+      <label class="resource-amount" text="0"></label>
+    </div>
+
+    <div class="status-item status-tertiary">
+      <img class="resource-icon" src="images/icon-currency-exaltedcore" />
+      <label class="resource-amount" text="0"></label>
+    </div>
+
+    <button class="close-btn" text="Close" onclick="self:close()"></button>
+  </div>
+</window>
+
+</html>
+

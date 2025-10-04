@@ -1,0 +1,141 @@
+<html>
+<div id="fusion" anchor="parent" class="fusion-container forge-tab" layout="type: verticalBox; spacing: 5">
+  <div class="minipanel forge-selection-area forge-selection-area--primary fusion-selection-area"
+    title="Select Item For Fusion">
+    <div class="slot-grid forge-slot-grid UIScrollArea" layout="type: grid; cell-size: 36 38;flow: true"></div>
+    <div class="forge-selection-side" style="margin-left: 0px;">
+      <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
+      <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
+      <img class="forge-arrow-large" src="/images/arrows/icon-arrow-rightlarge" />
+      <input class="forge-convergence-checkbox" type="checkbox" text="Convergence"
+        onchange="self:onCheckChangeConvergence(event)" />
+    </div>
+    <UIWidget class="fusion-target-slot">
+      <UIItem class="fusion-slot-item"></UIItem>
+    </UIWidget>
+  </div>
+
+  <div id="test" class="minipanel forge-selection-area forge-selection-area--secondary fusion-result-area"
+    focusable="false" title="Further Items Needed For fusion">
+    <div class="forge-result-placeholder" focusable="false" *visible="not self.modeFusion">
+      <div class="forge-required-block">
+        <div class="forge-card">
+          <UIItem class="forge-item-icon"></UIItem>
+          <img class="forge-question-icon" src="/images/ui/icon-questionmark" />
+        </div>
+        <div class="forge-counter">
+          <Label class="forge-full-width-label" text="0 / 1"></Label>
+          
+        </div>
+      </div>
+
+      <div class="forge-required-block" style="margin-left: 5px;">
+        <div class="forge-card">
+          <UIItem class="forge-item-icon"></UIItem>
+          <img class="forge-question-icon" src="/images/ui/icon-questionmark" />
+        </div>
+        <div class="forge-counter">
+          <Label class="forge-full-width-label" text="100"></Label>
+        <img class="resource-icon" src="images/icon-currency-dust" />
+
+        </div>
+      </div>
+
+      <table class="fusion-stats">
+        <tr>
+          <td text="Success Rate:"></td>
+          <td text="50%"></td>
+        </tr>
+        <tr>
+          <td>
+            <button class="fusion-stat-button" text="Improve to 65%" disabled></button>
+          </td>
+          <td>
+            <div class="status-item status-tertiary fusion-cost">
+              <label class="resource-amount" text="0"></label>
+              <img class="resource-icon" src="images/icon-currency-exaltedcore" style="image-offset: 8 6;" />
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td text="Tier Loss:"></td>
+          <td text="100%"></td>
+        </tr>
+        <tr>
+          <td>
+            <button class="fusion-stat-button" text="Reduce to 50%" disabled></button>
+          </td>
+          <td>
+            <div class="status-item status-tertiary fusion-cost">
+              <label class="resource-amount" text="111"></label>
+              <img class="resource-icon" src="images/icon-currency-exaltedcore" style="image-offset: 8 6;" />
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div anchor="parent" class="fusion-convergence-section" *visible="self.modeFusion">
+      <div class="slot-grid forge-slot-grid UIScrollArea" layout="type: grid; cell-size: 36 38;flow: true"></div>
+      <div class="forge-required-block forge-required-block--offset">
+        <div class="forge-card">
+          <UIItem class="forge-item-icon"></UIItem>
+          <img class="forge-question-icon" src="/images/ui/icon-questionmark" />
+        </div>
+        <div class="forge-counter">
+          <Label class="forge-full-width-label" text="0 / 1"></Label>
+        </div>
+      </div>
+    </div>
+    <img class="flow-arrow" style="left: 55px; top: 35px;" src="/images/arrows/icon-arrow-rightlarge" />
+    <div class="fusion-result-summary">
+      <UIButton class="forge-action-button forge-action-button--large">
+        <UIItem class="forge-result-item" style="left: 20px; icon:/images/ui/icon-questionmark"></UIItem>
+        <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
+        <UIItem class="forge-result-item" style="left: 0px;icon:/images/ui/icon-questionmark"></UIItem>
+        <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
+      </UIButton>
+      <div anchor="prev" class="forge-result-cost">
+        <Label class="forge-full-width-label" text="???"></Label>
+        <img class="resource-icon" src="/images/game/prey/prey_gold" />
+      </div>
+    </div>
+  </div>
+
+  <qtpanel id="fusion-info-panel" class="info-panel">
+    <div anchor="parent" class="info-row" style="height: 15px;">
+      <label class="info-text" style="float: left;"
+        text="The aim of a fusion is to increase the tier of an item."></label>
+      <img class="info-icon" src="/images/icons/show_gui_help_grey"
+        tooltip="Two items can be fused in order to increase the tier of one of them.
+The two items need to have the same name as well as the same tier and may not be imbued. In addition, further ingredients are needed. If a fusion attempt fails, one of the items remains unchanged. The tier of the second item will be reduced by one. If the item had no tier, it will be consumed. If a fusion attempt is successful, the tier of one of the items increases, while the second item will be consumed." />
+    </div>
+    <div class="info-row" style="height: 15px;">
+      <label class="info-text" style="float: left;"
+        text="The classification of an item defines its maximum tier."></label>
+      <img class="info-icon" src="/images/icons/show_gui_help_grey" tooltip="Items of classification 4 can be upgraded up to tier 10.
+Items of classification 3 can be upgraded up to tier 3.
+Items of classification 2 can be upgraded up to tier 2.
+Items of classification 1 can be upgraded up to tier 1.
+Items with no classification cannot be upgraded." />
+    </div>
+    <div class="info-row" style="height: 15px;">
+      <label class="info-text" style="float: left;"
+        text="If two items are fused, you can spend exaltation cores."></label>
+      <img class="info-icon" src="/images/icons/show_gui_help_grey"
+        tooltip="You can spend up to two exaltation cores. One to increase your chance of a successful fusion and/or one to grant you a chance to keep the tier of the second item. If the second item has tier 0, an exaltation core will reduce the chance that the item will be consumed." />
+    </div>
+    <div class="info-row" style="height: 15px;">
+      <label class="info-text" style="float: left;" text="Items with a tier grant unique bonuses."></label>
+      <img class="info-icon" src="/images/icons/show_gui_help_grey" tooltip="The bonus granted by an item's tier depends on its function, with higher tiers increasing the chance of triggering these effects:
+- Weapons grant a chance to deal 60% more damage.
+- Armors grant a chance to fully mitigate the damage from an attack.
+- Helmets grant a chance to reduce all cooldowns during combat.
+- Legs grant a chance to trigger Transcendence, turning your character into an avatar for a few seconds, providing damage reduction and enhanced critical hits.
+- Boots amplify the effects of other tiered items." />
+    </div>
+  </qtpanel>
+</div>
+
+</html>
+

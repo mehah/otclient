@@ -114,7 +114,9 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
     local controller = G_CONTROLLER_CALLED[controllerName]
 
     if attr == 'image-source' then
-        value = '/modules/' .. controller.name .. '/' .. value
+        if not value:starts('/') and not value:starts('base64:') then
+            value = '/modules/' .. controller.name .. '/' .. value
+        end
     end
 
     local setterName = ''

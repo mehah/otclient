@@ -1,0 +1,283 @@
+.forge-window {
+  position: relative;
+  width: 500px;
+  height: 405px;
+}
+
+.button-panel {
+  position: absolute;
+  top: -4px;
+  left: 20px;
+  width: 468px;
+  height: 36px;
+  --background-color: #404040;
+  --border-width-top: 1;
+  --border-color-top: black;
+  --border-width-left: 1;
+  --border-color-left: black;
+  --border-width-bottom: 1;
+  --border-color-bottom: #747474;
+  --border-width-right: 1;
+  --border-color-right: #747474;
+  --border-draw-order: 2;
+}
+
+.forge-btn {
+  width: 97px;
+  height: 34px;
+  margin-top: 2px;
+  --image-clip: 0 0 116 34;
+}
+
+.forge-btn:pressed,
+.forge-btn:checked,
+.forge-btn:not(:on) {
+  --image-clip: 0 34 116 34;
+}
+
+.forge-btn.btn-fusion { --image-source: "/game_forge/images/fusionButton"; }
+.forge-btn.btn-transfer { --image-source: "/game_forge/images/transferButton"; }
+.forge-btn.btn-conversion { --image-source: "/game_forge/images/conversionButton"; }
+.forge-btn.btn-history { --image-source: "/game_forge/images/historyButton"; }
+
+.content-area {
+  position: absolute;
+  left: 21px;
+  top: 37px;
+  width: 466px;
+  height: 311px;
+}
+
+.separator {
+  position: absolute;
+  left: 22px;
+  top: 346px;
+  width: 464px;
+}
+
+.status-bar {
+  position: absolute;
+  left: 22px;
+  top: 364px;
+  width: 465px;
+  height: 21px;
+}
+
+.status-item {
+  float: left;
+  height: 100%;
+  margin-left: 5px;
+  --image-source: "/images/ui/test/button-verydarkgrey-down";
+}
+
+.status-item:first-child {
+  margin-left: 0;
+}
+
+.status-item.status-primary { width: 130px; }
+.status-item.status-secondary { width: 80px; }
+.status-item.status-tertiary { width: 55px; }
+
+.resource-icon {
+  float: right;
+  margin-right: 5px;
+  --image-size: 9 9;
+  --image-offset: 0 6;
+}
+
+.resource-amount {
+  display: block;
+  float: right;
+  width: 49px;
+  height: 100%;
+  margin-right: 5px;
+  text-align: right;
+}
+
+.close-btn {
+  float: right;
+  width: 40px;
+  height: 100%;
+}
+
+/* SHARED STYLES - ALL COMMON CLASSES HERE */
+.forge-tab {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  width: 100%;
+}
+
+.forge-selection-area {
+  display: flex;
+  align-items: flex-start;
+}
+
+.forge-selection-area--primary {
+  height: 111px;
+}
+
+.forge-selection-area--secondary {
+  height: 119px;
+}
+
+.forge-slot-grid {
+  width: 165px;
+  height: 82px;
+  overflow: scroll;
+  background-color: #404040;
+  --border-width-top: 1;
+  --border-color-top: black;
+  --border-width-left: 1;
+  --border-color-left: black;
+  --border-width-bottom: 1;
+  --border-color-bottom: #747474;
+  --border-width-right: 1;
+  --border-color-right: #747474;
+  flex-shrink: 0;
+}
+
+.forge-selection-side {
+  width: 127px;
+  padding-top: 21px;
+  flex-shrink: 0;
+}
+
+.forge-arrow-large {
+  size: 15 25;
+  margin-left: 5px;
+}
+
+.forge-selection-side .forge-arrow-large:nth-of-type(1) {
+  margin-left: 41px;
+}
+
+.forge-convergence-checkbox {
+  position: relative;
+  left: 5px;
+  top: 15px;
+}
+
+.forge-required-block {
+  width: 66px;
+}
+
+.forge-card {
+  display: block;
+  width: 66px;
+  height: 66px;
+  --image-source: /images/ui/test/button-verydarkgrey-down;
+}
+
+.forge-item-icon {
+  width: 50px;
+  height: 50px;
+}
+
+.forge-question-icon {
+  width: 8px;
+  height: 21px;
+  position: relative;
+  left: -20px;
+  top: 25px;
+}
+
+.forge-counter {
+  margin-top: 2px;
+  display: block;
+  width: 66px;
+  height: 20px;
+  --image-source: /images/ui/test/button-verydarkgrey-down;
+}
+
+.forge-full-width-label {
+  display: block;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.forge-result-placeholder {
+  display: flex;
+  pointer-events: none;
+  --phantom: true;
+}
+
+.forge-result-item {
+  position: relative;
+  top: 15px;
+  pointer-events: none;
+  size: 32 32;
+}
+
+.forge-action-button {
+  --image-clip: 0 0 22 23;
+  --text-offset: 1 1;
+  --image-source: /images/ui/button;
+  --image-color: #dfdfdf;
+  --image-border: 3;
+  opacity: 1.0;
+}
+
+.forge-action-button:pressed {
+  --image-clip: 0 46 22 23;
+  --text-offset: 1 1;
+}
+
+.forge-action-button--large {
+  height: 64px;
+  width: 132px;
+}
+
+.forge-action-arrow {
+  position: relative;
+  left: 0px;
+  top: 25px;
+  pointer-events: none;
+  size: 15 7;
+}
+
+.forge-action-overlay {
+  pointer-events: none;
+  position: relative;
+  left: 2px;
+  top: -31px;
+  height: 61px;
+  width: 128px;
+  --image-border: 3;
+}
+
+.forge-result-cost {
+  margin-left: 1px;
+  display: block;
+  width: 131px;
+  height: 20px;
+  --image-source: /images/ui/test/button-verydarkgrey-down;
+}
+
+.info-panel {
+  height: 54px;
+}
+
+.info-row {
+  display: block;
+  width: 96%;
+  height: auto;
+}
+
+.info-text {
+  display: block;
+  width: 90%;
+  white-space: normal;
+}
+
+.info-icon {
+  float: right;
+}
+
+.flow-arrow {
+  position: relative;
+  size: 15 25;
+  display: inline-block;
+}
