@@ -26,7 +26,7 @@
 #include "framework/net/inputmessage.h"
 
 #include "attachedeffectmanager.h"
-#include "game.h"
+
 #include "item.h"
 #include "localplayer.h"
 #include "luavaluecasts_client.h"
@@ -1928,7 +1928,7 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         forgeConfig.fusionChanceImproved = msg->getU8();
         forgeConfig.fusionReduceTierLoss = msg->getU8();
 
-        g_lua.callGlobalField("g_game", "forgeData", forgeConfig);
+
     } else {
         uint8_t totalForgeValues = 11;
         if (g_game.getClientVersion() >= 1316) {
@@ -1942,11 +1942,9 @@ void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)
         for (auto i = 0; i < totalForgeValues; ++i) {
             msg->getU8(); // Forge values
         }
-
-        if (!forgeConfig.classPrices.empty()) {
-            g_lua.callGlobalField("g_game", "forgeData", forgeConfig);
-        }
     }
+
+    g_lua.callGlobalField("g_game", "forgeData", forgeConfig);
 }
 
 void ProtocolGame::parseCreatureMark(const InputMessagePtr& msg)

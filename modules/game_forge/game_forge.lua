@@ -978,7 +978,8 @@ end
 
 function forgeController:onInit()
     connect(g_game, {
-        onBrowseForgeHistory = onBrowseForgeHistory
+        onBrowseForgeHistory = onBrowseForgeHistory,
+        forgeData = forgeData,
     })
 
     if not forgeButton then
@@ -1119,7 +1120,6 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
         historyPanel.historyPageLabel = pageLabel
     end
     if pageLabel then
-        g_logger.info(page .. "/" .. lastPage)
         pageLabel:setText(tr('Page %d/%d', page, lastPage))
     end
 
@@ -1144,7 +1144,8 @@ end
 
 function forgeController:onTerminate()
     disconnect(g_game, {
-        onBrowseForgeHistory = onBrowseForgeHistory
+        onBrowseForgeHistory = onBrowseForgeHistory,
+        forgeData = forgeData,
     })
 end
 
@@ -1323,6 +1324,7 @@ function forgeController:applyForgeConfiguration(config)
         local numericValue = tonumber(value)
         if numericValue then
             initial[key] = numericValue
+            g_logger.info("Setting initial value for " .. key .. " to " .. tostring(numericValue))
         end
     end
 
@@ -1344,7 +1346,7 @@ function g_game.onOpenForge(openData)
     forgeController:updateFusionItems()
 end
 
-function g_game.forgeData(config)
+function forgeData(config)
     forgeController:applyForgeConfiguration(config)
 end
 
