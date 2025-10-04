@@ -14,6 +14,8 @@ function HtmlSample:addPlayer(name)
     name = name,
     lookType = self.lookType
    })
+   
+   self.playerName = ''
 end
 
 function HtmlSample:removePlayer(index)
