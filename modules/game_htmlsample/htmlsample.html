@@ -5,6 +5,7 @@
     width: 500;
     height: 300;
   }
+
   .form {
     display: inline-block;
     width: 50%;
@@ -80,15 +81,22 @@
   <window class="content" anchor="parent" *title="self.title">
     <div style="margin: 30px; text-align: center">{{self.msg}}</div>
     <div class="form">
-      <div>
-        <label style="padding: 3">Name:</label>
-        <input type="text" *value="self.playerName" style="margin-left: 26" />
+      <div style="width: 50%; background-color: red">
+        <div bac>
+          <label style="padding: 3">Name:</label>
+          <input type="text" *value="self.playerName" style="margin-left: 26" />
+        </div>
+        <div>
+          <label style="padding: 3">Look type:</label>
+          <input type="text" *value="self.lookType" />
+        </div>
       </div>
       <div>
-        <label style="padding: 3">Look type:</label>
-        <input type="text" *value="self.lookType" />
+        <uicreature *outfit="{type = self.lookType}" />
       </div>
-      <div><button onclick="self:addPlayer(self.playerName)">Add</button></div>
+      <div>
+        <button onclick="self:addPlayer(self.playerName)">Add</button>
+      </div>
     </div>
     <div id="players" class="form">
       <div *for="local player in self.items">

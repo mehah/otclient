@@ -701,12 +701,26 @@ void UIWidget::updateSize() {
             }
 
             if (widthNeedsUpdate && width == -1) {
-                auto v = (parent->isOnHtml() ? parent->getWidthHtml().valueCalculed : parent->getWidth());
+                int v = parent->getWidth();
+                if (parent->isOnHtml()) {
+                    if (parent->getWidthHtml().unit == Unit::Percent && parent->getWidthHtml().valueCalculed == -1) {
+                        parent->updateSize();
+                        v = parent->getWidthHtml().valueCalculed;
+                    }
+                }
+
                 if (v > -1) width = v - parent->getPaddingLeft() - parent->getPaddingRight();
             }
 
             if (heightNeedsUpdate && height == -1) {
-                auto v = (parent->isOnHtml() ? parent->getHeightHtml().valueCalculed : parent->getHeight());
+                int v = parent->getHeight();
+                if (parent->isOnHtml()) {
+                    if (parent->getHeightHtml().unit == Unit::Percent && parent->getHeightHtml().valueCalculed == -1) {
+                        parent->updateSize();
+                        v = parent->getHeightHtml().valueCalculed;
+                    }
+                }
+
                 if (v > -1) height = v - parent->getPaddingTop() - parent->getPaddingBottom();
             }
 
