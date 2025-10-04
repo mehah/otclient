@@ -167,11 +167,12 @@ local function formatDustAmount(value)
             or tonumber(forgeController.currentDustLevel)
             or maxDust
     end
-
     if not maxDust or maxDust <= 0 then
         return tostring(numericValue)
     end
 
+
+    g_logger.info(">>" .. string.format('%d/%d', numericValue, maxDust))
     return string.format('%d/%d', numericValue, maxDust)
 end
 
@@ -669,28 +670,44 @@ function forgeController:updateResourceBalances(resourceType)
     end
 end
 
-function forgeController:updateDustLevelLabel(panel)
+function forgeController:updateDustLevelLabel(panel, dustLevel)
+    g_logger.info(">>>>updateDustLevelLabel")
     panel = panel or (ui.panels and ui.panels['conversion'])
     if not panel or panel:isDestroyed() then
         return
     end
+
+    g_logger.info(">>>>updateDustLevelLabel")
 
     local dustLevelLabel = panel:recursiveGetChildById('forgeDustLevel')
     if not dustLevelLabel or dustLevelLabel:isDestroyed() then
         return
     end
 
-    local dustLevelValue = tonumber(self.currentDustLevel) or tonumber(self.maxDustLevel) or 0
+    local dustLevelValue = dustLevel or tonumber(self.currentDustLevel) or tonumber(self.maxDustLevel) or 0
     local displayedDustLevel = math.max(dustLevelValue - 75, 0)
     dustLevelLabel:setText(tostring(displayedDustLevel))
+    g_logger.info("displayedDustLevel > " .. displayedDustLevel)
 
     local forgeIncreaseDustCurrentLevelLabel = panel:recursiveGetChildById('forgeIncreaseDustCurrentLevel')
     if forgeIncreaseDustCurrentLevelLabel and not forgeIncreaseDustCurrentLevelLabel:isDestroyed() then
         forgeIncreaseDustCurrentLevelLabel:setText(("Raise limit from %d"):format(dustLevelValue))
+
+        g_logger.info("forgeIncreaseDustCurrentLevelLabel > " .. dustLevelValue)
     end
     local forgeIncreaseDustNextLevelLabel = panel:recursiveGetChildById('forgeIncreaseDustNextLevel')
     if forgeIncreaseDustNextLevelLabel and not forgeIncreaseDustNextLevelLabel:isDestroyed() then
         forgeIncreaseDustNextLevelLabel:setText(("to %d"):format(dustLevelValue + 1))
+        g_logger.info("forgeIncreaseDustNextLevelLabel > " .. dustLevelValue + 1)
+    end
+
+    local forgeDustAmount = panel:recursiveGetChildById('forgeDustAmount')
+    if forgeDustAmount and not forgeDustAmount:isDestroyed() then
+        local player = g_game.getLocalPlayer()
+        local dust = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        forgeDustAmount:setText(("%d/%d"):format(dust, dustLevelValue))
+
+        g_logger.info("forgeDustAmount > " .. ("%d/%d"):format(dust, dustLevelValue))
     end
 end
 
@@ -918,6 +935,10 @@ function forgeController:onConversion(conversionType)
         g_game.forgeRequest(conversionType)
         return
     end
+
+    forgeController:updateFusionCoreButtons()
+    forgeController:updateResourceBalances(forgeResourceTypes.dust)
+    forgeController:updateDustLevelLabel()
 end
 
 function forgeController:onToggleFusionCore(coreType)
@@ -1270,7 +1291,7 @@ function forgeController:setInitialValues(openData)
         self.currentDustLevel = self.maxDustLevel
     end
 
-    forgeController:updateDustLevelLabel()
+    forgeController:updateDustLevelLabel(ui.panels and ui.panels['conversion'], maxDustLevel)
 end
 
 function forgeController:applyForgeConfiguration(config)
@@ -1346,7 +1367,7 @@ end
 
 function g_game.onOpenForge(openData)
     forgeController:setInitialValues(openData)
-    forgeController:updateDustLevelLabel()
+    forgeController:updateDustLevelLabel(ui.panels and ui.panels['conversion'])
     forgeController.modeFusion = false
     forgeController.modeTransfer = false
 
