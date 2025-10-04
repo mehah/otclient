@@ -45,6 +45,22 @@ local forgeActions = {
     INCREASELIMIT = 4,
 }
 
+local function cloneValue(value)
+    if type(value) == 'table' then
+        if table and type(table.recursivecopy) == 'function' then
+            return table.recursivecopy(value)
+        end
+
+        local copy = {}
+        for key, child in pairs(value) do
+            copy[key] = cloneValue(child)
+        end
+        return copy
+    end
+
+    return value
+end
+
 local function defaultResourceFormatter(value)
     local numericValue = tonumber(value) or 0
     return tostring(numericValue)
@@ -61,9 +77,16 @@ end
 
 local function formatDustAmount(value)
     local numericValue = tonumber(value) or 0
-    local maxDust = (forgeController and forgeController.maxDustLevel) or 100
+    local maxDust = 100
 
-    if maxDust <= 0 then
+    if forgeController then
+        maxDust = tonumber(forgeController.maxDustCap)
+            or tonumber(forgeController.maxDustLevel)
+            or tonumber(forgeController.currentDustLevel)
+            or maxDust
+    end
+
+    if not maxDust or maxDust <= 0 then
         return tostring(numericValue)
     end
 
@@ -572,8 +595,8 @@ function forgeController:updateDustLevelLabel(panel)
         return
     end
 
-    local maxDustLevel = tonumber(self.maxDustLevel) or 0
-    local displayedDustLevel = maxDustLevel - 75
+    local dustLevelValue = tonumber(self.currentDustLevel) or tonumber(self.maxDustLevel) or 0
+    local displayedDustLevel = math.max(dustLevelValue - 75, 0)
     dustLevelLabel:setText(tostring(displayedDustLevel))
 end
 
@@ -792,7 +815,7 @@ function forgeController:onConversion(conversionType)
 
     if conversionType == forgeActions.INCREASELIMIT then
         local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
-        local maxDustLevel = self.maxDustLevel or 0
+        local maxDustLevel = tonumber(self.currentDustLevel) or tonumber(self.maxDustLevel) or 0
         local currentNecessaryDust = maxDustLevel - 75
 
         if dustBalance < currentNecessaryDust then
@@ -1078,16 +1101,83 @@ function forgeController:onGameEnd()
     end
 end
 
-function g_game.onOpenForge(openData)
-    openData = openData or {}
+function forgeController:setInitialValues(openData)
+    if type(openData) ~= 'table' then
+        openData = {}
+    end
 
-    forgeController.openData = openData
-    forgeController.fusionItems = openData.fusionItems or {}
-    forgeController.convergenceFusion = openData.convergenceFusion or {}
-    forgeController.transfers = openData.transfers or {}
-    forgeController.convergenceTransfers = openData.convergenceTransfers or {}
-    local dustLevel = tonumber(openData.dustLevel) or 0
-    forgeController.maxDustLevel = dustLevel > 0 and dustLevel or forgeController.maxDustLevel or 0
+    self.openData = cloneValue(openData)
+
+    self.initialValues = {}
+
+    for key, value in pairs(openData) do
+        if type(key) == 'string' then
+            self.initialValues[key] = cloneValue(value)
+        end
+    end
+
+    self.fusionItems = cloneValue(openData.fusionItems or self.fusionItems or {})
+    self.convergenceFusion = cloneValue(openData.convergenceFusion or self.convergenceFusion or {})
+    self.transfers = cloneValue(openData.transfers or self.transfers or {})
+    self.convergenceTransfers = cloneValue(openData.convergenceTransfers or self.convergenceTransfers or {})
+
+    local trackedKeys = {
+        'fusionPrices',
+        'convergenceFusionPrices',
+        'transferPrices',
+        'convergenceTransferPrices',
+        'normalDustFusion',
+        'convergenceDustFusion',
+        'normalDustTransfer',
+        'convergenceDustTransfer',
+        'fusionChanceBase',
+        'fusionChanceImproved',
+        'fusionReduceTierLoss',
+        'fusionNormalValues',
+        'fusionConvergenceValues',
+        'transferNormalValues',
+        'transferConvergenceValues'
+    }
+
+    for _, key in ipairs(trackedKeys) do
+        if openData[key] ~= nil then
+            self[key] = cloneValue(openData[key])
+        end
+    end
+
+    local maxDustLevel = tonumber(openData.maxDustLevel)
+        or tonumber(openData.maxDust)
+        or tonumber(openData.dustLevelCap)
+        or tonumber(openData.dustCap)
+        or tonumber(openData.dustLevel)
+
+    if maxDustLevel and maxDustLevel >= 0 then
+        self.maxDustLevel = maxDustLevel
+    end
+
+    local currentDustLevel = tonumber(openData.currentDustLevel)
+        or tonumber(openData.dustLevel)
+
+    if currentDustLevel and currentDustLevel >= 0 then
+        self.currentDustLevel = currentDustLevel
+    end
+
+    local maxDustCap = tonumber(openData.maxDustCap)
+    if maxDustCap and maxDustCap >= 0 then
+        self.maxDustCap = maxDustCap
+    end
+
+    if (not self.maxDustLevel or self.maxDustLevel <= 0) and self.currentDustLevel then
+        self.maxDustLevel = self.currentDustLevel
+    end
+
+    if (not self.currentDustLevel or self.currentDustLevel <= 0) and self.maxDustLevel then
+        self.currentDustLevel = self.maxDustLevel
+    end
+end
+
+function g_game.onOpenForge(openData)
+    forgeController:setInitialValues(openData)
     forgeController:updateDustLevelLabel()
     forgeController.modeFusion = false
     forgeController.modeTransfer = false
