@@ -743,6 +743,23 @@ function forgeController:updateFusionCoreButtons()
     context.lastTierSelection = selectedTier
 end
 
+function forgeController:onConversion(conversionType)
+    if not self.ui then
+        return
+    end
+
+    if conversionType == 2 then
+        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        if dustBalance <= 60 then
+            return
+        end
+
+
+        g_game.forgeRequest(conversionType)
+        return
+    end
+end
+
 function forgeController:onToggleFusionCore(coreType)
     if not self.ui then
         return

@@ -936,7 +936,7 @@ public:
     void preyRequest();
 
     // forge related
-    void forgeRequest();
+    void forgeRequest(Otc::ForgeAction_t actionType);
     void sendForgeBrowseHistoryRequest(uint16_t page);
 
     // imbuing related

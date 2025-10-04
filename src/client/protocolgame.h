@@ -136,7 +136,7 @@ public:
     void sendMarketAcceptOffer(uint32_t timestamp, uint16_t counter, uint16_t amount);
     void sendPreyAction(uint8_t slot, uint8_t actionType, uint16_t index);
     void sendPreyRequest();
-    void sendForgeRequest(Otc::ForgeAction_t actionType = Otc::ForgeAction_t::FUSION);
+    void sendForgeRequest(Otc::ForgeAction_t actionType);
     void sendForgeBrowseHistoryRequest(uint16_t page);
     void sendApplyImbuement(uint8_t slot, uint32_t imbuementId, bool protectionCharm);
     void sendClearImbuement(uint8_t slot);
@@ -387,7 +387,7 @@ private:
     bool m_gameInitialized{ false };
     bool m_mapKnown{ false };
     bool m_firstRecv{ true };
-    bool m_record {false};
+    bool m_record{ false };
 
     std::string m_accountName;
     std::string m_accountPassword;
