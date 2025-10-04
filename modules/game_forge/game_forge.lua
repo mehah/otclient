@@ -605,7 +605,6 @@ function forgeController:applyForgeConfiguration(config)
         local numericValue = tonumber(value)
         if numericValue then
             initial[key] = numericValue
-            g_logger.info("Setting initial value for " .. key .. " to " .. tostring(numericValue))
         end
     end
 

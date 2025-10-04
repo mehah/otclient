@@ -296,7 +296,8 @@ function FusionTab.updateFusionCoreButtons(controller)
     end
 
     if not successButton and not tierButton then
-        local successBaseText = resolveBaseText(context.successRateBaseText, successRateLabel, '50%', false, lastSuccessSelection)
+        local successBaseText = resolveBaseText(context.successRateBaseText, successRateLabel, '50%', false,
+            lastSuccessSelection)
         local tierBaseText = resolveBaseText(context.tierLossBaseText, tierLossLabel, '100%', false, lastTierSelection)
         context.successRateBaseText = successBaseText
         context.tierLossBaseText = tierBaseText
@@ -339,7 +340,8 @@ function FusionTab.updateFusionCoreButtons(controller)
         selections.tier = false
         setButtonState(successButton, false, false)
         setButtonState(tierButton, false, false)
-        local successBaseText = resolveBaseText(context.successRateBaseText, successRateLabel, '50%', false, lastSuccessSelection)
+        local successBaseText = resolveBaseText(context.successRateBaseText, successRateLabel, '50%', false,
+            lastSuccessSelection)
         local tierBaseText = resolveBaseText(context.tierLossBaseText, tierLossLabel, '100%', false, lastTierSelection)
         context.successRateBaseText = successBaseText
         context.tierLossBaseText = tierBaseText
@@ -381,7 +383,8 @@ function FusionTab.updateFusionCoreButtons(controller)
     setButtonState(successButton, selectedSuccess, successEnabled)
     setButtonState(tierButton, selectedTier, tierEnabled)
 
-    local successBaseText = resolveBaseText(context.successRateBaseText, successRateLabel, '50%', selectedSuccess, lastSuccessSelection)
+    local successBaseText = resolveBaseText(context.successRateBaseText, successRateLabel, '50%', selectedSuccess,
+        lastSuccessSelection)
     local tierBaseText = resolveBaseText(context.tierLossBaseText, tierLossLabel, '100%', selectedTier, lastTierSelection)
 
     context.successRateBaseText = successBaseText
@@ -412,7 +415,8 @@ function FusionTab.onToggleFusionCore(controller, coreType)
     if coreType == 'success' then
         button = context.successCoreButton
         if not button or button:isDestroyed() then
-            context.successCoreButton = context.panel and context.panel:recursiveGetChildById('fusionImproveButton') or nil
+            context.successCoreButton = context.panel and context.panel:recursiveGetChildById('fusionImproveButton') or
+                nil
             button = context.successCoreButton
         end
     else
@@ -489,6 +493,7 @@ function FusionTab.configureConversionPanel(controller, selectedWidget)
     if context.targetItem then
         local targetPreview = Item.create(itemPtr:getId(), 1)
         targetPreview:setTier(itemTier + 1)
+        g_logger.info(">>> id: " .. itemPtr:getId() .. " tier: " .. itemTier .. " target tier: " .. itemTier + 1)
         context.targetItem:setItem(targetPreview)
         context.targetItem:setItemCount(1)
         ItemsDatabase.setTier(context.targetItem, targetPreview)
@@ -499,6 +504,8 @@ function FusionTab.configureConversionPanel(controller, selectedWidget)
         selectedPreview:setTier(itemTier)
         context.selectedItemIcon:setItem(selectedPreview)
         context.selectedItemIcon:setItemCount(itemCount)
+        g_logger.info(">> selectedItemIcon id: " ..
+            itemPtr:getId() .. " tier: " .. itemTier .. " target tier: " .. itemTier + 1)
         ItemsDatabase.setTier(context.selectedItemIcon, selectedPreview)
     end
 
@@ -521,6 +528,9 @@ function FusionTab.configureConversionPanel(controller, selectedWidget)
         context.fusionButtonItemTo:setItemId(itemPtr:getId())
         context.fusionButtonItemTo:setItemCount(1)
         ItemsDatabase.setTier(context.fusionButtonItemTo, itemTier + 1)
+
+        g_logger.info(">> fusionButtonItemTo id: " ..
+            itemPtr:getId() .. " tier: " .. itemTier .. " target tier: " .. itemTier + 1)
     end
 
     if context.convergenceItemsPanel then
@@ -799,10 +809,12 @@ function FusionTab.updateFusionItems(controller, fusionData)
         itemWidget:setShowCount(true)
         local itemPtr = Item.create(info.id, info.count or 1)
         itemPtr:setTier(info.tier or 0)
+        g_logger.info("item id: " .. itemPtr:getId() .. " tier: " .. itemPtr:getTier())
         itemWidget:setItem(itemPtr)
         itemWidget:setItemCount(info.count or itemPtr:getCount())
-        ItemsDatabase.setRarityItem(itemWidget, itemWidget:getItem())
-        ItemsDatabase.setTier(itemWidget, info.tier or 0)
+        ItemsDatabase.setRarityItem(itemWidget, itemPtr)
+        ItemsDatabase.setTier(itemWidget, itemPtr)
+
 
         widget.item = itemWidget
         widget.itemPtr = itemPtr

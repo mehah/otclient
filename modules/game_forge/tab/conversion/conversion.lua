@@ -31,7 +31,6 @@ function ConversionTab.formatDustAmount(controller, value)
         return tostring(numericValue)
     end
 
-    g_logger.info(">>" .. string.format('%d/%d', numericValue, maxDust))
     return string.format('%d/%d', numericValue, maxDust)
 end
 
@@ -42,8 +41,6 @@ function ConversionTab.updateDustLevelLabel(controller, panel, dustLevel, depend
         return
     end
 
-    g_logger.info(">>>>updateDustLevelLabel")
-
     local dustLevelLabel = panel:recursiveGetChildById('forgeDustLevel')
     if not dustLevelLabel or dustLevelLabel:isDestroyed() then
         return
@@ -53,20 +50,15 @@ function ConversionTab.updateDustLevelLabel(controller, panel, dustLevel, depend
         or tonumber(controller.maxDustLevel) or 0
     local displayedDustLevel = math.max(dustLevelValue - 75, 0)
     dustLevelLabel:setText(tostring(displayedDustLevel))
-    g_logger.info("displayedDustLevel > " .. displayedDustLevel)
 
     local forgeIncreaseDustCurrentLevelLabel = panel:recursiveGetChildById('forgeIncreaseDustCurrentLevel')
     if forgeIncreaseDustCurrentLevelLabel and not forgeIncreaseDustCurrentLevelLabel:isDestroyed() then
         forgeIncreaseDustCurrentLevelLabel:setText(("Raise limit from %d"):format(dustLevelValue))
-
-        g_logger.info("forgeIncreaseDustCurrentLevelLabel > " .. dustLevelValue)
     end
     local forgeIncreaseDustNextLevelLabel = panel:recursiveGetChildById('forgeIncreaseDustNextLevel')
     if forgeIncreaseDustNextLevelLabel and not forgeIncreaseDustNextLevelLabel:isDestroyed() then
         forgeIncreaseDustNextLevelLabel:setText(("to %d"):format(dustLevelValue + 1))
-        g_logger.info("forgeIncreaseDustNextLevelLabel > " .. dustLevelValue + 1)
     end
-
 end
 
 function ConversionTab.onConversion(controller, conversionType, dependencies)
@@ -157,8 +149,6 @@ function ConversionTab.applyInitialValues(controller, openData)
     local maxDustLevel = tonumber(openData.maxDustLevel)
         or tonumber(openData.maxDust)
         or tonumber(openData.dustLevel)
-
-    g_logger.info("maxDustLevel: " .. tostring(maxDustLevel))
 
     if maxDustLevel and maxDustLevel >= 0 then
         controller.maxDustLevel = maxDustLevel
