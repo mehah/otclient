@@ -22,6 +22,7 @@ game
     shield-blink-ticks: 500
     volatile-square-duration: 1000
     adjust-creature-information-based-crop-size: false
+    use-crop-size-for-ui-draw: true
     diagonal-walk-speed: 3
 
   player

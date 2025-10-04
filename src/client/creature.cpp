@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -120,21 +120,26 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
     if (!canDraw())
         return;
 
-    uint8_t frameSize = std::max<uint8_t>(getRealSize(), getExactSize());
-    if (size > 0)
-        frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
+    const int baseSprite = g_gameConfig.getSpriteSize();
+    const int nativeSize = g_gameConfig.isUseCropSizeForUIDraw() 
+        ? getExactSize()
+        : std::max<int>(getRealSize(), getExactSize());
+    const int tileCount = 2;
+    const int fbSize = tileCount * baseSprite;
 
-    g_drawPool.bindFrameBuffer(frameSize); {
-        auto p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
-        if (center)
-            p /= 2;
+    g_drawPool.bindFrameBuffer(fbSize); {
+        Point p = center
+            ? Point((fbSize - nativeSize) / 2 + (nativeSize - baseSprite)) + getDisplacement()
+            : Point(fbSize - baseSprite) + getDisplacement();
 
         internalDraw(p);
-        if (isMarked())
-            internalDraw(p, getMarkedColor());
-        else if (isHighlighted())
-            internalDraw(p, getHighlightColor());
-    } g_drawPool.releaseFrameBuffer(destRect);
+        if (isMarked())           internalDraw(p, getMarkedColor());
+        else if (isHighlighted()) internalDraw(p, getHighlightColor());
+    }
+
+    Rect out = destRect;
+    if (size > 0) out = Rect(destRect.topLeft(), Size(size, size));
+    g_drawPool.releaseFrameBuffer(out);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, const int drawFlags)
