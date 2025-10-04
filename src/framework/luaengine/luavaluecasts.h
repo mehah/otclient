@@ -96,15 +96,21 @@ inline bool luavalue_cast(const int index, int64_t& v)
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 
-#ifdef __APPLE__
-// ulong
-inline int push_luavalue(ulong v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, ulong& v)
+// unsigned long
+#if defined(__APPLE__)
+using lua_unsigned_long = ulong;
+#else
+using lua_unsigned_long = unsigned long;
+#endif
+
+inline int push_luavalue(const lua_unsigned_long v) { push_luavalue(static_cast<double>(v)); return 1; }
+inline bool luavalue_cast(const int index, lua_unsigned_long& v)
 {
     double d;
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
-#endif
+
+#undef lua_unsigned_long
 
 // uint64
 inline int push_luavalue(const uint64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
