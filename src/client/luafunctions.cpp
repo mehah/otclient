@@ -1001,6 +1001,7 @@ void Client::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UICreature>("getCreatureSize", &UICreature::getCreatureSize);
     // note: check function
     g_lua.bindClassMemberFunction<UICreature>("getDirection", &UICreature::getDirection);
+    g_lua.bindClassMemberFunction<UICreature>("setDirection", &UICreature::setDirection);
     g_lua.bindClassMemberFunction<UICreature>("setCenter", &UICreature::setCenter);
     g_lua.bindClassMemberFunction<UICreature>("isCentered", &UICreature::isCentered);
 

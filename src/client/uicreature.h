@@ -31,7 +31,14 @@ class UICreature final : public UIWidget
 public:
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setCreature(const CreaturePtr& creature) { m_creature = creature; }
+    void setCreature(const CreaturePtr& creature) {
+        m_creature = creature;
+        if (m_creature) {
+            m_direction = m_creature->getDirection();
+            m_outfit = m_creature->getOutfit();
+        } else
+            m_outfit = {};
+    }
     void setOutfit(const Outfit& outfit);
 
     CreaturePtr getCreature() { return m_creature; }
@@ -61,6 +68,13 @@ public:
         }
         return Otc::InvalidDirection;
     }
+
+    void setDirection(Otc::Direction dir) {
+        m_direction = dir;
+        if (m_creature)
+            m_creature->setDirection(dir);
+    }
+
     // @
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
@@ -69,5 +83,7 @@ protected:
     std::string m_shaderName;
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };
+    Otc::Direction m_direction{ Otc::South };
+    Outfit m_outfit;
     bool m_center{ false };
 };
