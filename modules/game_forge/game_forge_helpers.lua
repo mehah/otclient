@@ -83,20 +83,16 @@ function Helpers.resolveForgePrice(priceMap, itemPtr, itemTier)
 
     local tierIndex = (tonumber(itemTier) or 0) + 1
 
-    local directValue = priceMap[tierIndex] or priceMap[tierIndex - 1]
-    if directValue ~= nil then
-        return tonumber(directValue) or 0
-    end
+    local classification = itemPtr and itemPtr.getClassification and itemPtr:getClassification() or 0
+    if classification <= 0 then return 0 end
 
-    local classification = itemPtr and itemPtr.getClassification and itemPtr:getClassification()
-    if classification then
-        local classPrices = priceMap[classification] or priceMap[tostring(classification)]
-        if type(classPrices) ~= 'table' then
-            classPrices = priceMap[classification + 1]
-        end
-
-        if type(classPrices) == 'table' then
-            return tonumber(classPrices[tierIndex]) or tonumber(classPrices[tierIndex - 1]) or 0
+    for class, tiers in pairs(priceMap) do
+        if class == classification then
+            for tier, price in pairs(tiers) do
+                if tier == tierIndex then
+                    return tonumber(price) or 0
+                end
+            end
         end
     end
 

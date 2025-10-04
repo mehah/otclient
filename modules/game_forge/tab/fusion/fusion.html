@@ -36,7 +36,7 @@
         />
       </div>
       <UIWidget id="selected-fusion-target" class="fusion-target-slot">
-        <UIItem class="fusion-slot-item"></UIItem>
+        <UIItem id="fusionTargetItemPreview" class="fusion-slot-item"></UIItem>
       </UIWidget>
     </div>
 
@@ -177,7 +177,11 @@
           <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
         </UIButton>
         <div anchor="prev" class="forge-result-cost">
-          <label class="forge-full-width-label" text="???"></label>
+          <label
+            id="fusionResultCostLabel"
+            class="forge-full-width-label"
+            text="???"
+          ></label>
           <img class="resource-icon" src="/images/game/prey/prey_gold" />
         </div>
       </div>
