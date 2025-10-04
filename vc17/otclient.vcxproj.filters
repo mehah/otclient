@@ -108,6 +108,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\framework\luafunctions.cpp">
       <Filter>Source Files\framework</Filter>
     </ClCompile>
