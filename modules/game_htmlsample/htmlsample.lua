@@ -35,8 +35,11 @@ function HtmlSample:equalizerEffect()
 
         local value = math.random(minV, maxV)
         local dir   = (math.random(0, 1) == 0) and -1 or 1
-
         self:cycleEvent(function()
+            if widget:isDestroyed() then
+                return false
+            end
+
             value = value + dir * speed
             if value >= maxV then
                 value = maxV

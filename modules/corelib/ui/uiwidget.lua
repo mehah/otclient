@@ -45,41 +45,10 @@ function UIWidget:parseColoredText(text, default_color)
     self:setColoredText(result)
 end
 
-local WATCH_LIST = {}
-local WATCH_CYCLE_CHECK_MS = 50
-local WATCH_EVENT = nil
 local FOR_CTX = {
     __keys = '',
     __values = {}
 }
-
-local function START_WATCH_LIST()
-    if WATCH_EVENT ~= nil or #WATCH_LIST == 0 then
-        return
-    end
-
-    WATCH_EVENT = cycleEvent(function()
-        table.remove_if(WATCH_LIST, function(i, obj)
-            if not obj or not obj.widget then
-                return true
-            end
-
-            local isDestroyed = obj.widget:isDestroyed()
-            if isDestroyed then
-                obj.widget = nil
-            else
-                obj.fnc(obj)
-            end
-
-            return isDestroyed
-        end)
-
-        if #WATCH_LIST == 0 then
-            removeEvent(WATCH_EVENT)
-            WATCH_EVENT = nil
-        end
-    end, WATCH_CYCLE_CHECK_MS)
-end
 
 local function ExprHandlerError(runtime, error, widget, controller, nodeStr, onError)
     if runtime then
@@ -174,8 +143,7 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
 
         if watchObj then
             watchObj.method = method
-            table.insert(WATCH_LIST, watchObj)
-            START_WATCH_LIST()
+            WidgetWatch.register(watchObj)
         end
     else
         local _name = string.sub(setterName, 1, 1):lower() .. string.sub(setterName, 2, -1)
@@ -490,12 +458,11 @@ end
 
 function UIWidget:__childFor(moduleName, expr, html, index)
     local controller = G_CONTROLLER_CALLED[moduleName]
-    local widget = self
-    local env = {
-        self = controller
-    }
-
     local scan = function(self)
+        local env = {
+            self = controller
+        }
+        local widget = self.widget
         if not self.watchList then
             local childindex = index
             local list, keys = ngfor_exec(expr, env, function(c)
@@ -547,11 +514,8 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         self.watchList:scan()
     end
 
-    local watchObj = {
-        widget = widget,
+    WidgetWatch.register({
+        widget = self,
         fnc = scan
-    }
-
-    table.insert(WATCH_LIST, watchObj)
-    START_WATCH_LIST()
+    })
 end

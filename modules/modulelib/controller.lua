@@ -172,6 +172,7 @@ function Controller:destroyUI()
     end
 
     self.uiEvents = {}
+    WidgetWatch.update() -- Prevent warnings from stale widget references in the watch list.
 end
 
 function Controller:findWidget(query)
@@ -340,7 +341,7 @@ local function registerScheduledEvent(controller, fncRef, fnc, delay, name)
 
     local evt = nil
     local action = function()
-        fnc()
+        local res = fnc()
 
         if fncRef == scheduleEvent then
             if name then
@@ -348,6 +349,8 @@ local function registerScheduledEvent(controller, fncRef, fnc, delay, name)
             else
                 table.removevalue(controller.scheduledEvents[currentType], evt)
             end
+        elseif res == false then
+            removeEvent(evt)
         end
     end
 
