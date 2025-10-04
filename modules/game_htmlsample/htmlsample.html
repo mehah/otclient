@@ -112,8 +112,11 @@
       </div>
     </div>
     <div id="players" class="form">
-      <div *for="local player in self.players">
-        <div onclick="print(player.name)">
+      <div
+        *for="local player in self.players"
+        onclick="print('Player: '.. player.name)"
+      >
+        <div>
           <uicreature
             *outfit="{type = player.lookType}"
             center="true"
