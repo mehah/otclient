@@ -394,8 +394,7 @@ static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx) 
     const auto& step = sel.steps[idx];
     if (!sel.matchesSimple(node, step.simple)) return false;
     if (idx + 1 == sel.steps.size()) return true;
-    const auto& next = sel.steps[idx + 1];
-    switch (next.combinatorToPrev) {
+    switch (step.combinatorToPrev) {
         case SelectorStep::Combinator::Descendant: {
             auto p = node->getParent();
             while (p) { if (matchFrom(p, sel, idx + 1)) return true; p = p->getParent(); }

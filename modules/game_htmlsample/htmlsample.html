@@ -48,14 +48,25 @@
   }
 
   #players div uicreature {
-    --creature-size: 64;
+    --creature-size: 98;
     width: 64;
     height: 64;
+  }
+
+  #players > div:hover {
+    background-color: yellow;
+  }
+
+  #players > div {
+    height: 50px;
   }
 
   #players div div {
     display: inline-block;
     width: 50%;
+    height: 100%;
+    align-items: center;
+    text-align: center;
   }
 </style>
 <script type="text">
@@ -63,7 +74,7 @@
   self.msg = "Welcome to HTML/CSS";
   self:cycleEvent(function()
       self.lookType = math.random(1, 300)
-  end, 250)
+  end, 100)
 </script>
 <html>
   <window class="content" anchor="parent" *title="self.title">
@@ -82,11 +93,12 @@
     <div id="players" class="form">
       <div *for="local player in self.items">
         <div>
-          <uicreature *outfit="{type = player.lookType}"></uicreature>
+          <uicreature
+            *outfit="{type = player.lookType}"
+            center="true"
+          ></uicreature>
         </div>
-        <div class="playerName" style="background-color: red">
-          {{player.name}}
-        </div>
+        <div class="playerName">{{player.name}}</div>
       </div>
     </div>
     <div class="equalizerEffect">

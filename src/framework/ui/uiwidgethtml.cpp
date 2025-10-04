@@ -700,12 +700,12 @@ void UIWidget::updateSize() {
                 continue;
             }
 
-            if (widthNeedsUpdate) {
+            if (widthNeedsUpdate && width == -1) {
                 auto v = (parent->isOnHtml() ? parent->getWidthHtml().valueCalculed : parent->getWidth());
                 if (v > -1) width = v - parent->getPaddingLeft() - parent->getPaddingRight();
             }
 
-            if (heightNeedsUpdate) {
+            if (heightNeedsUpdate && height == -1) {
                 auto v = (parent->isOnHtml() ? parent->getHeightHtml().valueCalculed : parent->getHeight());
                 if (v > -1) height = v - parent->getPaddingTop() - parent->getPaddingBottom();
             }
@@ -820,12 +820,12 @@ void UIWidget::applyAnchorAlignment() {
                 else
                     addAnchor(Fw::AnchorRight, "parent", Fw::AnchorRight);
             } else anchored = false;
-
-            if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
-                anchored = true;
-                addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
-            }
         } else anchored = false;
+
+        if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
+            anchored = true;
+            addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+        }
 
         if (anchored) {
             if (!ctx.lastNormalWidget) {
