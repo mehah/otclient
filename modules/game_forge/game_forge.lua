@@ -45,29 +45,34 @@ local forgeActions = {
     INCREASELIMIT = 4,
 }
 
-local function defaultResourceFormatter(value)
-    local numericValue = tonumber(value) or 0
-    return tostring(numericValue)
-end
+local conversionTab = require('modules.game_forge.tab.conversion.conversion')
+local helpers = require('modules.game_forge.game_forge_helpers')
 
-local function formatGoldAmount(value)
-    local numericValue = tonumber(value) or 0
-    if type(comma_value) == 'function' then
-        return comma_value(tostring(numericValue))
-    end
+conversionTab.registerDependencies(forgeController, {
+    resourceTypes = forgeResourceTypes,
+    actions = forgeActions
+})
 
-    return tostring(numericValue)
-end
+local cloneValue = helpers.cloneValue
+local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
+local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
+local normalizeFusionGradeEntries = helpers.normalizeFusionGradeEntries
+local resolveForgePrice = helpers.resolveForgePrice
+local defaultResourceFormatter = helpers.defaultResourceFormatter
+local formatGoldAmount = helpers.formatGoldAmount
+local formatHistoryDate = helpers.formatHistoryDate
+local resolveHistoryList = helpers.resolveHistoryList
+local resolveStatusWidget = helpers.resolveStatusWidget
+local resolveScrollContents = helpers.resolveScrollContents
+local getChildrenByStyleName = helpers.getChildrenByStyleName
+local getFirstChildByStyleName = helpers.getFirstChildByStyleName
 
 local function formatDustAmount(value)
-    local numericValue = tonumber(value) or 0
-    local maxDust = (forgeController and forgeController.maxDustLevel) or 100
+    return conversionTab.formatDustAmount(forgeController, value)
+end
 
-    if maxDust <= 0 then
-        return tostring(numericValue)
-    end
-
-    return string.format('%d/%d', numericValue, maxDust)
+local function loadTabFragment(tabName)
+    return helpers.loadTabFragment(forgeController, tabName)
 end
 
 local forgeStatusConfigs = {
@@ -105,6 +110,8 @@ local forgeStatusConfigs = {
 
 local forgeResourceConfig = {}
 
+helpers.handleInitialValues(forgeStatusConfigs, forgeResourceConfig)
+
 local fusionTabContext
 local fusionSelectionRadioGroup
 local fusionConvergenceRadioGroup
@@ -116,81 +123,6 @@ local historyActionLabels = {
     [3] = tr('Conversion'),
     [4] = tr('Conversion')
 }
-
-local function formatHistoryDate(timestamp)
-    if not timestamp or timestamp == 0 then
-        return tr('Unknown')
-    end
-
-    return os.date('%Y-%m-%d, %H:%M:%S', timestamp)
-end
-
-local function resolveHistoryList(panel)
-    if not panel then
-        return nil
-    end
-
-    if panel.historyList and not panel.historyList:isDestroyed() then
-        return panel.historyList
-    end
-
-    local list = panel:getChildById('historyList')
-    if list then
-        panel.historyList = list
-    end
-    return list
-end
-
-local function registerResourceConfig(resourceType, config)
-    if not resourceType or forgeResourceConfig[resourceType] == config then
-        return
-    end
-
-    forgeResourceConfig[resourceType] = config
-end
-
-for _, config in ipairs(forgeStatusConfigs) do
-    if config.resourceType then
-        registerResourceConfig(config.resourceType, config)
-    end
-
-    if config.eventResourceTypes then
-        for _, resourceType in ipairs(config.eventResourceTypes) do
-            registerResourceConfig(resourceType, config)
-        end
-    end
-end
-
-local function resolveStatusWidget(controller, config)
-    if config.widget then
-        if config.widget:isDestroyed() then
-            config.widget = nil
-        else
-            return config.widget
-        end
-    end
-
-    if not controller.ui then
-        return nil
-    end
-
-    local widget = controller:findWidget(config.selector)
-    if widget then
-        config.widget = widget
-    end
-
-    return widget
-end
-
-local function loadTabFragment(tabName)
-    local fragment = io.content(('modules/%s/tab/%s/%s.html'):format(forgeController.name, tabName, tabName))
-    local container = forgeController.ui.content:prepend(fragment)
-    local panel = container and container[tabName]
-    if panel and panel.hide then
-        panel:hide()
-    end
-    return panel
-end
 
 local function setWindowState(window, enabled)
     if window.obj then
@@ -229,46 +161,6 @@ local function invalidateFusionContext()
         fusionConvergenceRadioGroup:destroy()
         fusionConvergenceRadioGroup = nil
     end
-end
-
-local function resolveScrollContents(widget)
-    if not widget or widget:isDestroyed() then
-        return nil
-    end
-
-    if widget.getChildById then
-        local contents = widget:getChildById('contentsPanel')
-        if contents and not contents:isDestroyed() then
-            return contents
-        end
-    end
-
-    return widget
-end
-
-local function getChildrenByStyleName(widget, styleName)
-    if not widget or widget:isDestroyed() then
-        return {}
-    end
-
-    local children = widget:recursiveGetChildrenByStyleName(styleName)
-    if type(children) ~= 'table' then
-        return {}
-    end
-
-    local results = {}
-    for _, child in ipairs(children) do
-        if child and not child:isDestroyed() then
-            table.insert(results, child)
-        end
-    end
-
-    return results
-end
-
-local function getFirstChildByStyleName(widget, styleName)
-    local children = getChildrenByStyleName(widget, styleName)
-    return children[1]
 end
 
 local function resolveFusionTabContext()
@@ -561,20 +453,8 @@ function forgeController:updateResourceBalances(resourceType)
     end
 end
 
-function forgeController:updateDustLevelLabel(panel)
-    panel = panel or (ui.panels and ui.panels['conversion'])
-    if not panel or panel:isDestroyed() then
-        return
-    end
-
-    local dustLevelLabel = panel:recursiveGetChildById('forgeDustLevel')
-    if not dustLevelLabel or dustLevelLabel:isDestroyed() then
-        return
-    end
-
-    local maxDustLevel = tonumber(self.maxDustLevel) or 0
-    local displayedDustLevel = maxDustLevel - 75
-    dustLevelLabel:setText(tostring(displayedDustLevel))
+function forgeController:updateDustLevelLabel(panel, dustLevel)
+    conversionTab.updateDustLevelLabel(self, panel, dustLevel)
 end
 
 function forgeController:updateFusionCoreButtons()
@@ -768,39 +648,7 @@ function forgeController:updateFusionCoreButtons()
 end
 
 function forgeController:onConversion(conversionType)
-    if not self.ui then
-        return
-    end
-
-    local player = g_game.getLocalPlayer()
-    if conversionType == forgeActions.DUST2SLIVER then
-        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
-        if dustBalance <= 60 then
-            return
-        end
-        g_game.forgeRequest(conversionType)
-        return
-    end
-    if conversionType == forgeActions.SLIVER2CORE then
-        local sliverBalance = player:getResourceBalance(forgeResourceTypes.sliver) or 0
-        if sliverBalance <= 50 then
-            return
-        end
-        g_game.forgeRequest(conversionType)
-        return
-    end
-
-    if conversionType == forgeActions.INCREASELIMIT then
-        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
-        local maxDustLevel = self.maxDustLevel or 0
-        local currentNecessaryDust = maxDustLevel - 75
-
-        if dustBalance < currentNecessaryDust then
-            return
-        end
-        g_game.forgeRequest(conversionType)
-        return
-    end
+    conversionTab.onConversion(self, conversionType)
 end
 
 function forgeController:onToggleFusionCore(coreType)
@@ -872,7 +720,8 @@ end
 
 function forgeController:onInit()
     connect(g_game, {
-        onBrowseForgeHistory = onBrowseForgeHistory
+        onBrowseForgeHistory = onBrowseForgeHistory,
+        forgeData = forgeData,
     })
 
     if not forgeButton then
@@ -920,18 +769,14 @@ end
 
 function forgeController:loadTab(tabName)
     if ui.panels[tabName] then
-        if tabName == 'conversion' then
-            self:updateDustLevelLabel(ui.panels[tabName])
-        end
+        conversionTab.onTabLoaded(self, tabName, ui.panels[tabName])
         return ui.panels[tabName]
     end
 
     local panel = loadTabFragment(tabName)
     if panel then
         ui.panels[tabName] = panel
-        if tabName == 'conversion' then
-            self:updateDustLevelLabel(panel)
-        end
+        conversionTab.onTabLoaded(self, tabName, panel)
     end
     return panel
 end
@@ -1013,7 +858,6 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
         historyPanel.historyPageLabel = pageLabel
     end
     if pageLabel then
-        g_logger.info(page .. "/" .. lastPage)
         pageLabel:setText(tr('Page %d/%d', page, lastPage))
     end
 
@@ -1038,7 +882,8 @@ end
 
 function forgeController:onTerminate()
     disconnect(g_game, {
-        onBrowseForgeHistory = onBrowseForgeHistory
+        onBrowseForgeHistory = onBrowseForgeHistory,
+        forgeData = forgeData,
     })
 end
 
@@ -1078,17 +923,127 @@ function forgeController:onGameEnd()
     end
 end
 
-function g_game.onOpenForge(openData)
-    openData = openData or {}
+function forgeController:setInitialValues(openData)
+    if type(openData) ~= 'table' then
+        openData = {}
+    end
 
-    forgeController.openData = openData
-    forgeController.fusionItems = openData.fusionItems or {}
-    forgeController.convergenceFusion = openData.convergenceFusion or {}
-    forgeController.transfers = openData.transfers or {}
-    forgeController.convergenceTransfers = openData.convergenceTransfers or {}
-    local dustLevel = tonumber(openData.dustLevel) or 0
-    forgeController.maxDustLevel = dustLevel > 0 and dustLevel or forgeController.maxDustLevel or 0
-    forgeController:updateDustLevelLabel()
+    self.openData = cloneValue(openData)
+
+    self.initialValues = {}
+
+    for key, value in pairs(openData) do
+        if type(key) == 'string' then
+            self.initialValues[key] = cloneValue(value)
+        end
+    end
+
+    self.fusionItems = cloneValue(openData.fusionItems or self.fusionItems or {})
+    self.convergenceFusion = cloneValue(openData.convergenceFusion or self.convergenceFusion or {})
+    self.transfers = cloneValue(openData.transfers or self.transfers or {})
+    self.convergenceTransfers = cloneValue(openData.convergenceTransfers or self.convergenceTransfers or {})
+
+    local trackedKeys = {
+        'fusionPrices',
+        'convergenceFusionPrices',
+        'transferPrices',
+        'convergenceTransferPrices',
+        'normalDustFusion',
+        'convergenceDustFusion',
+        'normalDustTransfer',
+        'convergenceDustTransfer',
+        'fusionChanceBase',
+        'fusionChanceImproved',
+        'fusionReduceTierLoss',
+        'fusionNormalValues',
+        'fusionConvergenceValues',
+        'transferNormalValues',
+        'transferConvergenceValues'
+    }
+
+    for _, key in ipairs(trackedKeys) do
+        if openData[key] ~= nil then
+            self[key] = cloneValue(openData[key])
+        end
+    end
+
+    conversionTab.applyInitialValues(self, openData)
+end
+
+function forgeController:applyForgeConfiguration(config)
+    if type(config) ~= 'table' then
+        return
+    end
+
+    self.forgeConfiguration = cloneValue(config)
+
+    local initial = {}
+
+    local classPrices = normalizeClassPriceEntries(config.classPrices or config.fusionPrices)
+    if next(classPrices) then
+        initial.fusionPrices = classPrices
+    end
+
+    local convergenceFusion = normalizeTierPriceEntries(config.convergenceFusionPrices)
+    if next(convergenceFusion) then
+        initial.convergenceFusionPrices = convergenceFusion
+    end
+
+    local convergenceTransfer = normalizeTierPriceEntries(config.convergenceTransferPrices)
+    if next(convergenceTransfer) then
+        initial.convergenceTransferPrices = convergenceTransfer
+    end
+
+    local fusionGrades = normalizeFusionGradeEntries(config.fusionGrades or config.fusionNormalValues)
+    if next(fusionGrades) then
+        initial.fusionNormalValues = fusionGrades
+    end
+
+    local fusionConvergenceValues = normalizeTierPriceEntries(config.fusionConvergenceValues)
+    if next(fusionConvergenceValues) then
+        initial.fusionConvergenceValues = fusionConvergenceValues
+    end
+
+    local transferNormalValues = normalizeTierPriceEntries(config.transferNormalValues)
+    if next(transferNormalValues) then
+        initial.transferNormalValues = transferNormalValues
+    end
+
+    local transferConvergenceValues = normalizeTierPriceEntries(config.transferConvergenceValues)
+    if next(transferConvergenceValues) then
+        initial.transferConvergenceValues = transferConvergenceValues
+    end
+
+    local numericFields = {
+        normalDustFusion = config.normalDustFusion,
+        convergenceDustFusion = config.convergenceDustFusion,
+        normalDustTransfer = config.normalDustTransfer,
+        convergenceDustTransfer = config.convergenceDustTransfer,
+        fusionChanceBase = config.fusionChanceBase,
+        fusionChanceImproved = config.fusionChanceImproved,
+        fusionReduceTierLoss = config.fusionReduceTierLoss,
+        dustPercent = config.dustPercent,
+        dustToSliver = config.dustToSliver,
+        sliverToCore = config.sliverToCore,
+        dustPercentUpgrade = config.dustPercentUpgrade,
+        maxDustLevel = config.maxDustLevel or config.maxDust,
+        maxDustCap = config.maxDustCap,
+    }
+
+    for key, value in pairs(numericFields) do
+        local numericValue = tonumber(value)
+        if numericValue then
+            initial[key] = numericValue
+            g_logger.info("Setting initial value for " .. key .. " to " .. tostring(numericValue))
+        end
+    end
+
+    self:setInitialValues(initial)
+end
+
+function g_game.onOpenForge(openData)
+    forgeController:setInitialValues(openData)
+    conversionTab.onOpenForge(forgeController)
     forgeController.modeFusion = false
     forgeController.modeTransfer = false
 
@@ -1099,6 +1054,10 @@ function g_game.onOpenForge(openData)
 
     forgeController:updateResourceBalances()
     forgeController:updateFusionItems()
+end
+
+function forgeData(config)
+    forgeController:applyForgeConfiguration(config)
 end
 
 function forgeController:configureFusionConversionPanel(selectedWidget)
@@ -1187,11 +1146,7 @@ function forgeController:configureFusionConversionPanel(selectedWidget)
     local dustRequirement = (self.openData and tonumber(self.openData.convergenceDustFusion)) or
         tonumber(self.convergenceDustFusion) or 0
     local priceList = self.fusionPrices or (self.openData and self.openData.fusionPrices) or {}
-    local price = 0
-
-    if type(priceList) == 'table' then
-        price = tonumber(priceList[itemTier + 1]) or tonumber(priceList[itemTier]) or 0
-    end
+    local price = resolveForgePrice(priceList, itemPtr, itemTier)
 
     if context.dustAmountLabel and player then
         local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
