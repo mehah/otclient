@@ -163,8 +163,7 @@ local function formatDustAmount(value)
     local maxDust = 100
 
     if forgeController then
-        maxDust = tonumber(forgeController.maxDustCap)
-            or tonumber(forgeController.maxDustLevel)
+        maxDust = tonumber(forgeController.maxDustLevel)
             or tonumber(forgeController.currentDustLevel)
             or maxDust
     end
@@ -255,17 +254,20 @@ local function registerResourceConfig(resourceType, config)
     forgeResourceConfig[resourceType] = config
 end
 
-for _, config in ipairs(forgeStatusConfigs) do
-    if config.resourceType then
-        registerResourceConfig(config.resourceType, config)
-    end
+local function handleInitialValues()
+    for _, config in ipairs(forgeStatusConfigs) do
+        if config.resourceType then
+            registerResourceConfig(config.resourceType, config)
+        end
 
-    if config.eventResourceTypes then
-        for _, resourceType in ipairs(config.eventResourceTypes) do
-            registerResourceConfig(resourceType, config)
+        if config.eventResourceTypes then
+            for _, resourceType in ipairs(config.eventResourceTypes) do
+                registerResourceConfig(resourceType, config)
+            end
         end
     end
 end
+handleInitialValues()
 
 local function resolveStatusWidget(controller, config)
     if config.widget then
@@ -681,6 +683,15 @@ function forgeController:updateDustLevelLabel(panel)
     local dustLevelValue = tonumber(self.currentDustLevel) or tonumber(self.maxDustLevel) or 0
     local displayedDustLevel = math.max(dustLevelValue - 75, 0)
     dustLevelLabel:setText(tostring(displayedDustLevel))
+
+    local forgeIncreaseDustCurrentLevelLabel = panel:recursiveGetChildById('forgeIncreaseDustCurrentLevel')
+    if forgeIncreaseDustCurrentLevelLabel and not forgeIncreaseDustCurrentLevelLabel:isDestroyed() then
+        forgeIncreaseDustCurrentLevelLabel:setText(("Raise limit from %d"):format(dustLevelValue))
+    end
+    local forgeIncreaseDustNextLevelLabel = panel:recursiveGetChildById('forgeIncreaseDustNextLevel')
+    if forgeIncreaseDustNextLevelLabel and not forgeIncreaseDustNextLevelLabel:isDestroyed() then
+        forgeIncreaseDustNextLevelLabel:setText(("to %d"):format(dustLevelValue + 1))
+    end
 end
 
 function forgeController:updateFusionCoreButtons()
@@ -1231,9 +1242,9 @@ function forgeController:setInitialValues(openData)
 
     local maxDustLevel = tonumber(openData.maxDustLevel)
         or tonumber(openData.maxDust)
-        or tonumber(openData.dustLevelCap)
-        or tonumber(openData.dustCap)
         or tonumber(openData.dustLevel)
+
+    g_logger.info("maxDustLevel: " .. maxDustLevel)
 
     if maxDustLevel and maxDustLevel >= 0 then
         self.maxDustLevel = maxDustLevel
@@ -1258,6 +1269,8 @@ function forgeController:setInitialValues(openData)
     if (not self.currentDustLevel or self.currentDustLevel <= 0) and self.maxDustLevel then
         self.currentDustLevel = self.maxDustLevel
     end
+
+    forgeController:updateDustLevelLabel()
 end
 
 function forgeController:applyForgeConfiguration(config)
