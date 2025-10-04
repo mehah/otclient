@@ -169,12 +169,14 @@ local function getCoinsBalance()
         return tonumber(cleanNumber) or 0
     end
 
-    local lblCoins = controllerShop.ui.lblCoins.lblTibiaCoins
+    -- get coins: normal (non transferableCoins) | transfer(transferableCoins))
+    local lblNormal = controllerShop.ui.lblCoins.lblTibiaCoins
     local lblTransfer = controllerShop.ui.lblCoins.lblTibiaTransfer
 
-    local coins1 = lblCoins and extractNumber(lblCoins:getText()) or 0
-    local coins2 = lblTransfer and extractNumber(lblTransfer:getText()) or 0
-    return coins1, coins2
+    local normalCoins = lblNormal and extractNumber(lblNormal:getText()) or 0
+    local transferableCoins = lblTransfer and extractNumber(lblTransfer:getText()) or 0
+
+    return normalCoins, transferableCoins
 end
 
 local function fixServerNoSend0xF2()
@@ -481,6 +483,7 @@ function onParseStoreGetPurchaseStatus(purchaseStatus)
                 animationEvent = nil
             end
             fixServerNoSend0xF2()
+            g_game.sendRequestStorePremiumBoost() -- fix: request and refresh store to prevent XP Boost purchase bug
         end, 2000)
     end
 end
@@ -531,8 +534,7 @@ function onParseStoreCreateProducts(storeProducts)
             local coinsBalance2, coinsBalance1 = getCoinsBalance()
             local isTransferable = subOffer.coinType == GameStore.CoinType.Transferable
             local price = subOffer.price
-            local balance = isTransferable and coinsBalance1 or coinsBalance2
-
+            local balance = isTransferable and coinsBalance1 or (coinsBalance1 + coinsBalance2)
             priceLabel:setColor(balance < price and "#d33c3c" or "white")
 
             if isTransferable then
@@ -891,7 +893,9 @@ function chooseOffert(self, focusedChild)
         createProductImage(imagePanel, data)
     end
     fixServerNoSend0xF2()
-    local coinsBalance2, coinsBalance1 = getCoinsBalance()
+
+    -- example use getCoinsBalance
+    local normalCoins, transferableCoins = getCoinsBalance()
     local offerStackPanel = panel:getChildById('StackOffers')
     offerStackPanel:destroyChildren()
 
@@ -902,8 +906,9 @@ function chooseOffert(self, focusedChild)
         local priceLabel = offerPanel:getChildById('lblPrice')
         priceLabel:setText(offer.price)
 
-        if offer.count and offer.count > 0 then
-            offerPanel:getChildById('btnBuy'):setText("Buy " .. offer.count .. "x")
+        local itemCount = (offer.count and offer.count > 0) and offer.count or 1
+        if itemCount > 1 then
+            offerPanel:getChildById('btnBuy'):setText("Buy " .. itemCount .. "x")
         end
 
         if product.configurable then
@@ -911,7 +916,7 @@ function chooseOffert(self, focusedChild)
         end
 
         local isTransferable = offer.coinType == GameStore.CoinType.Transferable
-        local currentBalance = isTransferable and coinsBalance1 or coinsBalance2
+        local currentBalance = isTransferable and transferableCoins or (normalCoins + transferableCoins)
 
         if isTransferable then
             priceLabel:setIcon("/game_store/images/icon-tibiacointransferable")
@@ -926,99 +931,113 @@ function chooseOffert(self, focusedChild)
             priceLabel:setColor("white")
             offerPanel:getChildById('btnBuy'):enable()
         end
+
         if offer.disabled then
             local btnBuy = offerPanel:getChildById('btnBuy')
             btnBuy:disable()
             btnBuy:setOpacity(0.8)
-        
             local lblDescription = panel:getChildById('lblDescription')
             lblDescription:parseColoredText(string.format(
                 "[color=#ff0000]The product is currently not available for this character. See the buy button tooltip for details.[/color]\n\n-%s",
                 description
             ))
-        
-            -- Add tooltip overlay if reasonIdDisable exists
             if offer.reasonIdDisable then
                 local tooltipOverlay = g_ui.createWidget('UIWidget', offerPanel)
                 tooltipOverlay:setId('tooltipOverlay')
                 tooltipOverlay:setFocusable(false)
                 tooltipOverlay:setSize(btnBuy:getSize())
                 tooltipOverlay:setPosition(btnBuy:getPosition())
-        
-                local reasonText = oldProtocol and offer.reasonIdDisable 
-                    or reasonCategory[offer.reasonIdDisable + 1]
-        
+                local reasonText = oldProtocol and offer.reasonIdDisable or reasonCategory[offer.reasonIdDisable + 1]
                 tooltipOverlay:parseColoreDisplayToolTip(string.format(
                     "[color=#ff0000]The product is not available for this character:\n\n- %s[/color]",
                     reasonText
                 ))
-        
                 tooltipOverlay:setOpacity(0)
                 tooltipOverlay:addAnchor(AnchorLeft, btnBuy:getId(), AnchorLeft)
                 tooltipOverlay:addAnchor(AnchorTop, btnBuy:getId(), AnchorTop)
             end
         end
-        
 
+        -- 👇 Confirmação corrigida
         offerPanel:getChildById('btnBuy').onClick = function(widget)
             if acceptWindow then
                 destroyWindow(acceptWindow)
             end
 
-            if product.configurable or product.name == "Character Name Change" then -- test with canary , need improve identifier
+            if product.configurable or product.name == "Character Name Change" then
                 return displayChangeName(offer)
             end
 
-            if product.name == "Hireling Apprentice" then -- test with canary , need improve identifier
+            if product.name == "Hireling Apprentice" then
                 return displayErrorBox(controllerShop.ui:getText(), "not yet, UI missing")
             end
 
             local function acceptFunc()
                 fixServerNoSend0xF2()
-                local latestBalance2, latestBalance1 = getCoinsBalance()
-                local latestCurrentBalance = isTransferable and latestBalance1 or latestBalance2
+                local latestNormal, latestTransferable = getCoinsBalance()
+                local latestCurrentBalance = isTransferable and latestTransferable or (latestNormal + latestTransferable)
+
                 if latestCurrentBalance >= offer.price then
                     g_game.buyStoreOffer(offer.id, GameStore.ClientOfferTypes.CLIENT_STORE_OFFER_OTHER)
-                    local closeWindow = function()
-                        destroyWindow(processingWindow)
-                    end
+                    local closeWindow = function() destroyWindow(processingWindow) end
                     controllerShop.ui:hide()
-                    processingWindow = displayGeneralBox('Processing purchase.', 'Your purchase is being processed',
-                    {
-                      { text = tr('ok'),  callback = closeWindow },
-                      anchor = 50
-                    }, closeWindow, closeWindow)
-
+                    processingWindow = displayGeneralBox(
+                        'Processing purchase.', 
+                        'Your purchase is being processed',
+                        {
+                          { text = tr('ok'),  callback = closeWindow },
+                          anchor = 50
+                        }, 
+                        closeWindow, 
+                        closeWindow
+                    )
                 else
                     displayErrorBox(controllerShop.ui:getText(), tr("You don't have enough coins"))
                 end
                 destroyWindow(acceptWindow)
             end
+
             local function cancelFunc()
                 destroyWindow(acceptWindow)
             end
-            local coinType = isTransferable and "transferable coins" or "regular coins"
-            local confirmationMessage = string.format('Do you want to buy the product "%s" for %d %s?', product.name, offer.price, coinType)
-            local detailsMessage = string.format("%dx %s\nPrice: %d %s", offer.count or 1, product.name, offer.price, coinType)
-            local data = getProductData(product)
 
-            acceptWindow = displayGeneralSHOPBox(tr('Confirmation of Purchase'), confirmationMessage, detailsMessage, {
+            local coinType = isTransferable and "transferable coins" or "regular coins"
+            local confirmationMessage = string.format(
+                'Do you want to buy the product "%s" for %d %s?', 
+                product.name, 
+                offer.price, 
+                coinType
+            )
+
+            local itemCountConfirm = (offer.count and offer.count > 0) and offer.count or 1
+            local detailsMessage = string.format(
+                "%dx %s\nPrice: %d %s",
+                itemCountConfirm,
+                product.name,
+                offer.price,
+                coinType
+            )
+
+            acceptWindow = displayGeneralSHOPBox(
+                tr('Confirmation of Purchase'),
+                confirmationMessage,
+                detailsMessage,
                 {
-                    text = tr('Buy'),
-                    callback = acceptFunc
+                    { text = tr('Buy'), callback = acceptFunc },
+                    { text = tr('Cancel'), callback = cancelFunc },
+                    anchor = AnchorHorizontalCenter
                 },
-                {
-                    text = tr('Cancel'),
-                    callback = cancelFunc
-                },
-                anchor = AnchorHorizontalCenter
-            }, acceptFunc, cancelFunc)
+                acceptFunc,
+                cancelFunc
+            )
             if data then
                 createProductImage(acceptWindow.Box, data)
             end
         end
     end
 end
+
+
 -- /*=============================================
 -- =            Home                             =
 -- =============================================*/
@@ -1083,38 +1102,75 @@ function transferPoints()
     destroyWindow(transferPointsWindow)
     transferPointsWindow = g_ui.displayUI('style/transferpoints')
     transferPointsWindow:show()
+
     local playerBalance = g_game.getLocalPlayer():getResourceBalance(ResourceTypes.COIN_TRANSFERRABLE)
     fixServerNoSend0xF2()
-    local coinsBalance2, coinsBalance1  = getCoinsBalance()
+
+    local normalCoins, transferableCoins = getCoinsBalance()
+
     if playerBalance == 0 then
-        playerBalance = coinsBalance1 -- temp fix canary 1340
+        playerBalance = transferableCoins -- temp fix canary 1340
     end
+
     transferPointsWindow.giftable:setText(formatNumberWithCommas(playerBalance))
-    transferPointsWindow.amountBar:setValue(100)
-    transferPointsWindow.amountBar:setMinimum(0)
-    transferPointsWindow.amountBar:setMaximum(playerBalance)
+
+    local initialValue, minimumValue = 0, 0
+    if playerBalance >= 25 then
+        initialValue = 25
+        minimumValue = 25
+    end
+
+    transferPointsWindow.amountBar:setStep(25)
+    transferPointsWindow.amountBar:setMinimum(minimumValue)
+    local maxStep = math.floor(playerBalance / 25) * 25 -- coins multiple 25
+    transferPointsWindow.amountBar:setMaximum(maxStep)
+    transferPointsWindow.amountBar:setValue(initialValue)
+    transferPointsWindow.amount:setText(formatNumberWithCommas(initialValue))
+
+    local sliderButton = transferPointsWindow.amountBar:getChildById('sliderButton')
+    if sliderButton then
+        sliderButton:setEnabled(true)
+        sliderButton:setVisible(true)
+    end
 
     transferPointsWindow.onEscape = function()
         destroyWindow(transferPointsWindow)
     end
-    transferPointsWindow.amountBar.onValueChange = function()
-        transferPointsWindow.amount:setText(formatNumberWithCommas(transferPointsWindow.amountBar:getValue()))
+
+    local lastDisplayedValue = initialValue
+    transferPointsWindow.amountBar.onValueChange = function(scrollbar, value)
+        -- Round to the nearest multiple of 25
+        local val = math.floor((value + 12) / 25) * 25
+        
+        -- Only update the display if the value has changed
+        if val ~= lastDisplayedValue then
+            lastDisplayedValue = val
+            transferPointsWindow.amount:setText(formatNumberWithCommas(val))
+        end
     end
+
     transferPointsWindow.closeButton.onClick = function()
         destroyWindow(transferPointsWindow)
     end
+
     transferPointsWindow.buttonOk.onClick = function()
         local receipient = transferPointsWindow.transferPointsText:getText():trim()
+        local amount = transferPointsWindow.amountBar:getValue()
+
         if receipient:len() < 3 then
             return
         end
-        local amount = transferPointsWindow.amountBar:getValue()
         if amount < 1 or playerBalance < amount then
             return
         end
+
         g_game.transferCoins(receipient, amount)
+        destroyWindow(transferPointsWindow)
     end
 end
+
+
+
 
 -- /*=============================================
 -- =            Search Button            =

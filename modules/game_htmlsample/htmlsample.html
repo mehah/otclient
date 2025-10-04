@@ -1,0 +1,80 @@
+<style>
+  .content {
+    position: relative;
+    background-color: red;
+    width: 500;
+    height: 300;
+  }
+  .form {
+    display: inline-block;
+    width: 50%;
+    height: 20%;
+    margin-top: 30;
+  }
+
+  #players {
+    background-color: black;
+    overflow: scroll;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0;
+  }
+
+  .equalizerEffect {
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    height: 100px;
+  }
+
+  .equalizerEffect > .line {
+    position: relative;
+    width: 15;
+    top: 80;
+    margin-left: 30;
+    background-color: yellow;
+    bottom: 0;
+    display: inline-block;
+  }
+
+  .equalizerEffect > .line:nth-child(odd) {
+    background-color: rgb(202, 75, 202);
+  }
+
+  #players > *:nth-child(odd) {
+    background-color: aqua;
+  }
+</style>
+<script type="text">
+  self.title = "HTML/CSS";
+  self.msg = "Welcome to HTML/CSS";
+  self:cycleEvent(function()
+      self.playerName = math.random()
+  end, 10)
+</script>
+<html>
+  <window class="content" anchor="parent" *title="self.title">
+    <div style="margin: 30px; text-align: center">{{self.msg}}</div>
+    <div class="form">
+      <label style="padding: 3">Name:</label>
+      <input type="text" *value="self.playerName" />
+    </div>
+    <div id="players" class="form"></div>
+    <div style="margin-top: 10">Player name is: {{self.playerName}}</div>
+    <div><button onclick="self:addPlayer(self.playerName)">Add</button></div>
+
+    <div class="equalizerEffect">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+    <div class="footer">
+      <button onclick="alert('HTML/CSS V2.0b')">About</button>
+      <button style="float: right" onclick="self:unloadHtml()">Close</button>
+    </div>
+  </window>
+</html>

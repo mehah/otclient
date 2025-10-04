@@ -62,11 +62,15 @@ Controller = {
     extendedOpcodes = nil,
     opcodes = nil,
     events = nil,
-    htmlRoot = nil,
+    htmlId = nil,
     keyboardAnchor = nil,
     scheduledEvents = nil,
     keyboardEvents = nil
 }
+
+if not G_CONTROLLER_CALLED then
+    G_CONTROLLER_CALLED = {}
+end
 
 function Controller:new()
     local module = g_modules.getCurrentModule()
@@ -82,6 +86,11 @@ function Controller:new()
     }
     setmetatable(obj, self)
     self.__index = self
+
+    if obj.name then
+        G_CONTROLLER_CALLED[obj.name] = obj
+    end
+
     return obj
 end
 
@@ -132,14 +141,23 @@ function Controller:loadHtml(path, parent)
     end
 
     self:setUI(path, parent)
-    self.htmlRoot = HtmlLoader('/' .. self.name .. '/' .. path, parent, self)
-    self.ui = self.htmlRoot.widget
+    self.htmlId = g_html.load(self.name, path, g_ui.getRootWidget())
+    self.ui = g_html.getRootWidget(self.htmlId);
+end
+
+function Controller:unloadHtml()
+    if self.htmlId == nil then
+        error('HTML unload operation failed: no HTML was previously loaded.')
+        return
+    end
+
+    self:destroyUI()
 end
 
 function Controller:destroyUI()
-    if self.htmlRoot ~= nil then
-        self.htmlRoot.widget = nil
-        self.htmlRoot = nil
+    if self.htmlId ~= nil then
+        g_html.destroy(self.htmlId)
+        self.ui = nil
     end
 
     if self.ui then
@@ -158,22 +176,17 @@ function Controller:destroyUI()
     end
 end
 
-function Controller:findElements(query)
-    return self.htmlRoot and self.htmlRoot:find(query:trim()) or {}
+function Controller:findWidget(query)
+    return self.ui and self.ui:querySelector(query:trim())
 end
 
 function Controller:findWidgets(query)
-    return self.htmlRoot and self.htmlRoot:findWidgets(query:trim()) or {}
+    return self.ui and self.ui:querySelectorAll(query:trim())
 end
 
-function Controller:findElement(query)
-    local els = self:findElements(query)
-    return #els > 0 and els[1] or nil
-end
-
-function Controller:findWidget(query)
-    local els = self:findWidgets(query)
-    return #els > 0 and els[1] or nil
+function Controller:createWidgetFromHTML(html, parent)
+    local widget = g_html.createWidgetFromHTML(html, parent, self.htmlId)
+    return widget
 end
 
 function Controller:loadUI(name, parent)
@@ -239,7 +252,7 @@ function Controller:terminate()
     end
 
     if self.ui ~= nil then
-        self.ui:destroy()
+        self:destroyUI()
     end
 
     self.ui = nil
@@ -251,7 +264,7 @@ function Controller:terminate()
     self.keyboardEvents = nil
     self.keyboardAnchor = nil
     self.scheduledEvents = nil
-    self.htmlRoot = nil
+    self.htmlId = nil
 
     self.__onGameStart = nil
     self.__onGameEnd = nil
@@ -269,6 +282,11 @@ function Controller:registerEvents(actor, events)
 
     local evt = EventController:new(actor, events)
     table.insert(self.events[self.currentTypeEvent], evt)
+
+    -- fix html lazy loading
+    if actor and actor.isOnHtml and actor:isOnHtml() then
+        evt:connect()
+    end
 
     return evt
 end
