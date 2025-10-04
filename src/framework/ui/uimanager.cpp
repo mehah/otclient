@@ -236,22 +236,54 @@ void UIManager::updateHoveredWidget(const bool now)
             return;
 
         m_hoverUpdateScheduled = false;
-        //if(!g_window.isMouseButtonPressed(Fw::MouseLeftButton) && !g_window.isMouseButtonPressed(Fw::MouseRightButton)) {
-        auto hoveredWidget = m_rootWidget->recursiveGetChildByPos(g_window.getMousePosition(), false);
-        if (hoveredWidget && !hoveredWidget->isEnabled())
-            hoveredWidget = nullptr;
-        //}
 
-        if (hoveredWidget != m_hoveredWidget) {
-            const UIWidgetPtr oldHovered = m_hoveredWidget;
-            m_hoveredWidget = hoveredWidget;
-            if (oldHovered) {
-                oldHovered->updateState(Fw::HoverState);
-                oldHovered->onHoverChange(false);
+        const auto& mousePos = g_window.getMousePosition();
+        auto hoveredWidget = m_rootWidget->recursiveGetChildByPos(mousePos, false);
+
+        if (hoveredWidget && hoveredWidget->isOnHtml()) {
+            UIWidgetList newHovered;
+            m_mouseReceiver->propagateOnMouseEvent(mousePos, newHovered);
+
+            for (const auto& p : m_hoveredWidgets) {
+                UIWidget* w = p.get();
+
+                bool still = std::any_of(newHovered.begin(), newHovered.end(),
+                                         [&](const UIWidgetPtr& p) { return p.get() == w; });
+                if (!still) {
+                    w->updateState(Fw::HoverState, false);
+                    w->onHoverChange(false);
+                }
             }
-            if (hoveredWidget) {
-                hoveredWidget->updateState(Fw::HoverState);
-                hoveredWidget->onHoverChange(true);
+
+            for (const auto& p : newHovered) {
+                if (!hoveredWidget->isEnabled())
+                    continue;
+
+                UIWidget* w = p.get();
+                bool was = std::any_of(m_hoveredWidgets.begin(), m_hoveredWidgets.end(),
+                                       [&](const UIWidgetPtr& q) { return q.get() == w; });
+                if (!was) {
+                    w->updateState(Fw::HoverState, true);
+                    w->onHoverChange(true);
+                }
+            }
+
+            m_hoveredWidgets = std::move(newHovered);
+        } else {
+            if (hoveredWidget && !hoveredWidget->isEnabled())
+                hoveredWidget = nullptr;
+
+            if (hoveredWidget != m_hoveredWidget) {
+                const UIWidgetPtr oldHovered = m_hoveredWidget;
+                m_hoveredWidget = hoveredWidget;
+                if (oldHovered) {
+                    oldHovered->updateState(Fw::HoverState);
+                    oldHovered->onHoverChange(false);
+                }
+                if (hoveredWidget) {
+                    hoveredWidget->updateState(Fw::HoverState);
+                    hoveredWidget->onHoverChange(true);
+                }
             }
         }
     };

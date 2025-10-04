@@ -426,7 +426,7 @@ protected:
 
 private:
     void internalDestroy();
-    void updateState(Fw::WidgetState state);
+    void updateState(Fw::WidgetState state, bool newState = false);
     void updateStates();
     void updateChildrenIndexStates();
     void updateStyle();

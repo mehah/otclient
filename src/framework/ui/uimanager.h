@@ -91,6 +91,9 @@ private:
     UIWidgetPtr m_draggingWidget;
     UIWidgetPtr m_hoveredWidget;
     UIWidgetPtr m_pressedWidget;
+
+    UIWidgetList m_hoveredWidgets;
+
     bool m_hoverUpdateScheduled{ false };
     bool m_drawDebugBoxes{ false };
     stdext::map<std::string, OTMLNodePtr> m_styles;
