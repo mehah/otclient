@@ -450,10 +450,6 @@ void Tile::appendSpectators(std::vector<CreaturePtr>& out) const
     for (; it != end; ++it) {
         const auto& thing = *it;
         if (thing->isCreature()) {
-            if (thing->getPosition() != m_position) {
-                continue;
-            }
-
             out.emplace_back(thing->static_self_cast<Creature>());
         }
     }
