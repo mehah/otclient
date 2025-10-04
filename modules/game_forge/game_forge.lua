@@ -46,126 +46,33 @@ local forgeActions = {
 }
 
 local conversionTab = require('modules.game_forge.tab.conversion.conversion')
+local helpers = require('modules.game_forge.game_forge_helpers')
+
 conversionTab.registerDependencies(forgeController, {
     resourceTypes = forgeResourceTypes,
     actions = forgeActions
 })
 
-local function cloneValue(value)
-    if type(value) == 'table' then
-        if table and type(table.recursivecopy) == 'function' then
-            return table.recursivecopy(value)
-        end
-
-        local copy = {}
-        for key, child in pairs(value) do
-            copy[key] = cloneValue(child)
-        end
-        return copy
-    end
-
-    return value
-end
-
-local function normalizeTierPriceEntries(entries)
-    local prices = {}
-    if type(entries) ~= 'table' then
-        return prices
-    end
-
-    for _, entry in ipairs(entries) do
-        if type(entry) == 'table' then
-            local tierId = tonumber(entry.tier) or tonumber(entry.tierId) or tonumber(entry.id)
-            local price = tonumber(entry.price) or tonumber(entry.cost) or tonumber(entry.value)
-            if tierId then
-                prices[tierId + 1] = price or 0
-            end
-        end
-    end
-
-    return prices
-end
-
-local function normalizeClassPriceEntries(entries)
-    local pricesByClass = {}
-    if type(entries) ~= 'table' then
-        return pricesByClass
-    end
-
-    for _, classInfo in ipairs(entries) do
-        if type(classInfo) == 'table' then
-            local classId = tonumber(classInfo.classId) or tonumber(classInfo.id) or tonumber(classInfo.classification)
-            if classId then
-                pricesByClass[classId] = normalizeTierPriceEntries(classInfo.tiers)
-            end
-        end
-    end
-
-    return pricesByClass
-end
-
-local function normalizeFusionGradeEntries(entries)
-    local values = {}
-    if type(entries) ~= 'table' then
-        return values
-    end
-
-    for _, entry in ipairs(entries) do
-        if type(entry) == 'table' then
-            local tierId = tonumber(entry.tier) or tonumber(entry.tierId) or tonumber(entry.id)
-            if tierId then
-                local value = tonumber(entry.exaltedCores) or tonumber(entry.cores) or tonumber(entry.value)
-                values[tierId + 1] = value or 0
-            end
-        end
-    end
-
-    return values
-end
-
-local function resolveForgePrice(priceMap, itemPtr, itemTier)
-    if type(priceMap) ~= 'table' then
-        return 0
-    end
-
-    local tierIndex = (tonumber(itemTier) or 0) + 1
-
-    local directValue = priceMap[tierIndex] or priceMap[tierIndex - 1]
-    if directValue ~= nil then
-        return tonumber(directValue) or 0
-    end
-
-    local classification = itemPtr and itemPtr.getClassification and itemPtr:getClassification()
-    if classification then
-        local classPrices = priceMap[classification] or priceMap[tostring(classification)]
-        if type(classPrices) ~= 'table' then
-            classPrices = priceMap[classification + 1]
-        end
-
-        if type(classPrices) == 'table' then
-            return tonumber(classPrices[tierIndex]) or tonumber(classPrices[tierIndex - 1]) or 0
-        end
-    end
-
-    return 0
-end
-
-local function defaultResourceFormatter(value)
-    local numericValue = tonumber(value) or 0
-    return tostring(numericValue)
-end
-
-local function formatGoldAmount(value)
-    local numericValue = tonumber(value) or 0
-    if type(comma_value) == 'function' then
-        return comma_value(tostring(numericValue))
-    end
-
-    return tostring(numericValue)
-end
+local cloneValue = helpers.cloneValue
+local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
+local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
+local normalizeFusionGradeEntries = helpers.normalizeFusionGradeEntries
+local resolveForgePrice = helpers.resolveForgePrice
+local defaultResourceFormatter = helpers.defaultResourceFormatter
+local formatGoldAmount = helpers.formatGoldAmount
+local formatHistoryDate = helpers.formatHistoryDate
+local resolveHistoryList = helpers.resolveHistoryList
+local resolveStatusWidget = helpers.resolveStatusWidget
+local resolveScrollContents = helpers.resolveScrollContents
+local getChildrenByStyleName = helpers.getChildrenByStyleName
+local getFirstChildByStyleName = helpers.getFirstChildByStyleName
 
 local function formatDustAmount(value)
     return conversionTab.formatDustAmount(forgeController, value)
+end
+
+local function loadTabFragment(tabName)
+    return helpers.loadTabFragment(forgeController, tabName)
 end
 
 local forgeStatusConfigs = {
@@ -203,6 +110,8 @@ local forgeStatusConfigs = {
 
 local forgeResourceConfig = {}
 
+helpers.handleInitialValues(forgeStatusConfigs, forgeResourceConfig)
+
 local fusionTabContext
 local fusionSelectionRadioGroup
 local fusionConvergenceRadioGroup
@@ -214,84 +123,6 @@ local historyActionLabels = {
     [3] = tr('Conversion'),
     [4] = tr('Conversion')
 }
-
-local function formatHistoryDate(timestamp)
-    if not timestamp or timestamp == 0 then
-        return tr('Unknown')
-    end
-
-    return os.date('%Y-%m-%d, %H:%M:%S', timestamp)
-end
-
-local function resolveHistoryList(panel)
-    if not panel then
-        return nil
-    end
-
-    if panel.historyList and not panel.historyList:isDestroyed() then
-        return panel.historyList
-    end
-
-    local list = panel:getChildById('historyList')
-    if list then
-        panel.historyList = list
-    end
-    return list
-end
-
-local function registerResourceConfig(resourceType, config)
-    if not resourceType or forgeResourceConfig[resourceType] == config then
-        return
-    end
-
-    forgeResourceConfig[resourceType] = config
-end
-
-local function handleInitialValues()
-    for _, config in ipairs(forgeStatusConfigs) do
-        if config.resourceType then
-            registerResourceConfig(config.resourceType, config)
-        end
-
-        if config.eventResourceTypes then
-            for _, resourceType in ipairs(config.eventResourceTypes) do
-                registerResourceConfig(resourceType, config)
-            end
-        end
-    end
-end
-handleInitialValues()
-
-local function resolveStatusWidget(controller, config)
-    if config.widget then
-        if config.widget:isDestroyed() then
-            config.widget = nil
-        else
-            return config.widget
-        end
-    end
-
-    if not controller.ui then
-        return nil
-    end
-
-    local widget = controller:findWidget(config.selector)
-    if widget then
-        config.widget = widget
-    end
-
-    return widget
-end
-
-local function loadTabFragment(tabName)
-    local fragment = io.content(('modules/%s/tab/%s/%s.html'):format(forgeController.name, tabName, tabName))
-    local container = forgeController.ui.content:prepend(fragment)
-    local panel = container and container[tabName]
-    if panel and panel.hide then
-        panel:hide()
-    end
-    return panel
-end
 
 local function setWindowState(window, enabled)
     if window.obj then
@@ -330,46 +161,6 @@ local function invalidateFusionContext()
         fusionConvergenceRadioGroup:destroy()
         fusionConvergenceRadioGroup = nil
     end
-end
-
-local function resolveScrollContents(widget)
-    if not widget or widget:isDestroyed() then
-        return nil
-    end
-
-    if widget.getChildById then
-        local contents = widget:getChildById('contentsPanel')
-        if contents and not contents:isDestroyed() then
-            return contents
-        end
-    end
-
-    return widget
-end
-
-local function getChildrenByStyleName(widget, styleName)
-    if not widget or widget:isDestroyed() then
-        return {}
-    end
-
-    local children = widget:recursiveGetChildrenByStyleName(styleName)
-    if type(children) ~= 'table' then
-        return {}
-    end
-
-    local results = {}
-    for _, child in ipairs(children) do
-        if child and not child:isDestroyed() then
-            table.insert(results, child)
-        end
-    end
-
-    return results
-end
-
-local function getFirstChildByStyleName(widget, styleName)
-    local children = getChildrenByStyleName(widget, styleName)
-    return children[1]
 end
 
 local function resolveFusionTabContext()
