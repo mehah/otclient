@@ -74,8 +74,7 @@
 
         <div class="forge-required-block" style="margin-left: 5px">
           <div class="forge-card">
-            <UIItem class="forge-item-icon"></UIItem>
-            <img class="forge-question-icon" src="images/icon-currency-dust" />
+            <UIItem id="fusionItemDust" class="forge-item-icon"></UIItem>
           </div>
           <div class="forge-counter">
             <label class="forge-full-width-label" text="100"></label>
@@ -86,19 +85,20 @@
         <table class="fusion-stats">
           <tr>
             <td text="Success Rate:"></td>
-            <td text="50%"></td>
+            <td id="fusionSuccessRateValue" text="50%"></td>
           </tr>
           <tr>
             <td>
               <button
+                id="fusionImproveButton"
                 class="fusion-stat-button"
                 text="Improve to 65%"
-                disabled
+                onclick="self:onToggleFusionCore('success')"
               ></button>
             </td>
             <td>
               <div class="status-item status-tertiary fusion-cost">
-                <label class="resource-amount" text="0"></label>
+                <label class="resource-amount" text="1"></label>
                 <img
                   class="resource-icon"
                   src="images/icon-currency-exaltedcore"
@@ -109,19 +109,20 @@
           </tr>
           <tr>
             <td text="Tier Loss:"></td>
-            <td text="100%"></td>
+            <td id="fusionTierLossValue" text="100%"></td>
           </tr>
           <tr>
             <td>
               <button
+                id="fusionReduceButton"
                 class="fusion-stat-button"
                 text="Reduce to 50%"
-                disabled
+                onclick="self:onToggleFusionCore('tier')"
               ></button>
             </td>
             <td>
               <div class="status-item status-tertiary fusion-cost">
-                <label class="resource-amount" text="111"></label>
+                <label class="resource-amount" text="1"></label>
                 <img
                   class="resource-icon"
                   src="images/icon-currency-exaltedcore"

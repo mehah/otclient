@@ -4,53 +4,71 @@
 <link href="tab/history/history.css" />
 <link href="tab/transfer/transfer.css" />
 <html>
-  <window class="forge-window" title="Exaltation Forge" anchor="parent">
-  <!-- Navigation buttons -->
-  <div id="buttonPanel" class="button-panel" layout="type: horizontalBox;spacing:0">
-    <Button id="fusionBtn" class="forge-btn btn-fusion" onclick="self:loadMenu('fusionMenu')">
-    </Button>
+  <window class="forge-window" title="Exaltation Forge" onescape="self:close()">
+    <!-- Navigation buttons -->
+    <div
+      id="buttonPanel"
+      class="button-panel"
+      layout="type: horizontalBox;spacing:0"
+    >
+      <button
+        id="fusionBtn"
+        class="forge-btn btn-fusion"
+        onclick="self:loadMenu('fusionMenu')"
+      ></button>
 
-    <Button id="transferBtn" class="forge-btn btn-transfer" onclick="self:loadMenu('transferMenu')">
-    </Button>
+      <button
+        id="transferBtn"
+        class="forge-btn btn-transfer"
+        onclick="self:loadMenu('transferMenu')"
+      ></button>
 
-    <Button id="conversionBtn" class="forge-btn btn-conversion" onclick="self:loadMenu('conversionMenu')">
-    </Button>
+      <button
+        id="conversionBtn"
+        class="forge-btn btn-conversion"
+        onclick="self:loadMenu('conversionMenu')"
+      ></button>
 
-    <Button id="historyBtn" class="forge-btn btn-history" onclick="self:loadMenu('historyMenu')">
-    </Button>
-  </div>
-
-  <!-- Main content area -->
-  <div id="content" class="content-area" ></div>
-
-  <!-- Separator -->
-  <hr class="separator HorizontalSeparator" />
-
-  <!-- Status bar with resources -->
-  <div class="status-bar">
-    <div class="status-item status-primary">
-      <img class="resource-icon" src="/images/game/prey/prey_gold" />
-      <label id="forgeGoldAmount" class="resource-amount" text="0"></label>
+      <button
+        id="historyBtn"
+        class="forge-btn btn-history"
+        onclick="self:loadMenu('historyMenu')"
+      ></button>
     </div>
 
-    <div class="status-item status-secondary">
-      <img class="resource-icon" src="images/icon-currency-dust" />
-      <label id="forgeDustAmount" class="resource-amount" text="0/100"></label>
+    <!-- Main content area -->
+    <div id="content" class="content-area"></div>
+
+    <!-- Separator -->
+    <hr class="separator HorizontalSeparator" />
+
+    <!-- Status bar with resources -->
+    <div class="status-bar">
+      <div class="status-item status-primary">
+        <img class="resource-icon" src="/images/game/prey/prey_gold" />
+        <label id="forgeGoldAmount" class="resource-amount" text="0"></label>
+      </div>
+
+      <div class="status-item status-secondary">
+        <img class="resource-icon" src="images/icon-currency-dust" />
+        <label
+          id="forgeDustAmount"
+          class="resource-amount"
+          text="0/100"
+        ></label>
+      </div>
+
+      <div class="status-item status-tertiary">
+        <img class="resource-icon" src="images/icon-currency-sliver" />
+        <label id="forgeSliverAmount" class="resource-amount" text="0"></label>
+      </div>
+
+      <div class="status-item status-tertiary">
+        <img class="resource-icon" src="images/icon-currency-exaltedcore" />
+        <label id="forgeCoreAmount" class="resource-amount" text="0"></label>
+      </div>
+
+      <button class="close-btn" text="Close" onclick="self:close()"></button>
     </div>
-
-    <div class="status-item status-tertiary">
-      <img class="resource-icon" src="images/icon-currency-sliver" />
-      <label id="forgeSliverAmount" class="resource-amount" text="0"></label>
-    </div>
-
-    <div class="status-item status-tertiary">
-      <img class="resource-icon" src="images/icon-currency-exaltedcore" />
-      <label id="forgeCoreAmount" class="resource-amount" text="0"></label>
-    </div>
-
-    <button class="close-btn" text="Close" onclick="self:close()"></button>
-  </div>
-</window>
-
+  </window>
 </html>
-
