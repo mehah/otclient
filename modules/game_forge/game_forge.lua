@@ -907,12 +907,21 @@ function forgeController:onConversion(conversionType)
     end
 
     local player = g_game.getLocalPlayer()
+    if not player then
+        return
+    end
+    local function finalizeConversion()
+        self:updateFusionCoreButtons()
+        self:updateResourceBalances(forgeResourceTypes.dust)
+        self:updateDustLevelLabel()
+    end
     if conversionType == forgeActions.DUST2SLIVER then
         local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
         if dustBalance <= 60 then
             return
         end
         g_game.forgeRequest(conversionType)
+        finalizeConversion()
         return
     end
     if conversionType == forgeActions.SLIVER2CORE then
@@ -921,6 +930,7 @@ function forgeController:onConversion(conversionType)
             return
         end
         g_game.forgeRequest(conversionType)
+        finalizeConversion()
         return
     end
 
@@ -928,17 +938,32 @@ function forgeController:onConversion(conversionType)
         local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
         local maxDustLevel = tonumber(self.currentDustLevel) or tonumber(self.maxDustLevel) or 0
         local currentNecessaryDust = maxDustLevel - 75
+        local maxDustCap = tonumber(self.maxDustCap) or 0
+
+        if maxDustCap > 0 and maxDustLevel >= maxDustCap then
+            return
+        end
 
         if dustBalance < currentNecessaryDust then
             return
         end
         g_game.forgeRequest(conversionType)
+
+        local newDustLevel = maxDustLevel + 1
+        if maxDustCap > 0 then
+            newDustLevel = math.min(newDustLevel, maxDustCap)
+        end
+
+        self.currentDustLevel = newDustLevel
+        if not self.maxDustLevel or self.maxDustLevel < newDustLevel then
+            self.maxDustLevel = newDustLevel
+        end
+
+        finalizeConversion()
         return
     end
 
-    forgeController:updateFusionCoreButtons()
-    forgeController:updateResourceBalances(forgeResourceTypes.dust)
-    forgeController:updateDustLevelLabel()
+    finalizeConversion()
 end
 
 function forgeController:onToggleFusionCore(coreType)
