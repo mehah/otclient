@@ -561,6 +561,22 @@ function forgeController:updateResourceBalances(resourceType)
     end
 end
 
+function forgeController:updateDustLevelLabel(panel)
+    panel = panel or (ui.panels and ui.panels['conversion'])
+    if not panel or panel:isDestroyed() then
+        return
+    end
+
+    local dustLevelLabel = panel:recursiveGetChildById('forgeDustLevel')
+    if not dustLevelLabel or dustLevelLabel:isDestroyed() then
+        return
+    end
+
+    local maxDustLevel = tonumber(self.maxDustLevel) or 0
+    local displayedDustLevel = maxDustLevel - 75
+    dustLevelLabel:setText(tostring(displayedDustLevel))
+end
+
 function forgeController:updateFusionCoreButtons()
     if not self.ui then
         return
@@ -773,6 +789,18 @@ function forgeController:onConversion(conversionType)
         g_game.forgeRequest(conversionType)
         return
     end
+
+    if conversionType == forgeActions.INCREASELIMIT then
+        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        local maxDustLevel = self.maxDustLevel or 0
+        local currentNecessaryDust = maxDustLevel - 75
+
+        if dustBalance < currentNecessaryDust then
+            return
+        end
+        g_game.forgeRequest(conversionType)
+        return
+    end
 end
 
 function forgeController:onToggleFusionCore(coreType)
@@ -892,12 +920,18 @@ end
 
 function forgeController:loadTab(tabName)
     if ui.panels[tabName] then
+        if tabName == 'conversion' then
+            self:updateDustLevelLabel(ui.panels[tabName])
+        end
         return ui.panels[tabName]
     end
 
     local panel = loadTabFragment(tabName)
     if panel then
         ui.panels[tabName] = panel
+        if tabName == 'conversion' then
+            self:updateDustLevelLabel(panel)
+        end
     end
     return panel
 end
@@ -1054,7 +1088,7 @@ function g_game.onOpenForge(openData)
     forgeController.convergenceTransfers = openData.convergenceTransfers or {}
     local dustLevel = tonumber(openData.dustLevel) or 0
     forgeController.maxDustLevel = dustLevel > 0 and dustLevel or forgeController.maxDustLevel or 0
-
+    forgeController:updateDustLevelLabel()
     forgeController.modeFusion = false
     forgeController.modeTransfer = false
 
