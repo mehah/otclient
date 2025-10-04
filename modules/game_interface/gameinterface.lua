@@ -926,8 +926,7 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                 return true
             elseif useThing then
                 -- Handle interactive items first, without looking at them
-                -- Special handling for usable items with Unpass/Unmove flags
-                if useThing:isUsable() and (useThing:isNotWalkable() or useThing:isNotMoveable()) then
+                if useThing:isUsable() then
                     -- Only use the item, don't look at it
                     if useThing:isContainer() then
                         if useThing:getParentContainer() then
@@ -1105,6 +1104,9 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                             -- For containers in the world, quickloot
                             g_game.sendQuickLoot(1, useThing)
                             return true
+                        else
+                            g_game.open(useThing)
+                            return true
                         end
                     elseif useThing:isMultiUse() then
                         startUseWith(useThing)
@@ -1203,6 +1205,9 @@ function processMouseAction(menuPosition, mouseButton, autoWalkPos, lookThing, u
                         -- Only handle containers that are in the game world (not in inventory)
                         if g_game.getFeature(GameThingQuickLoot) and modules.game_quickloot then
                             g_game.sendQuickLoot(1, useThing)
+                            return true
+                        else
+                            g_game.open(useThing)
                             return true
                         end
                     end

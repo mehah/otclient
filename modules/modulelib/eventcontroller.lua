@@ -59,6 +59,10 @@ function EventController:isDestroyed()
     return self.actor == nil
 end
 
+function EventController:getActor()
+    return self.actor
+end
+
 function EventController:execute(name, ...)
     if name == nil then
         for name, act in pairs(self.events) do

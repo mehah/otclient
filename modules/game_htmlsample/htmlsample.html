@@ -5,16 +5,20 @@
     width: 500;
     height: 300;
   }
+
   .form {
     display: inline-block;
     width: 50%;
-    height: 20%;
+    height: 40%;
     margin-top: 30;
   }
 
-  #players {
-    background-color: black;
-    overflow: scroll;
+  .form > div > uicreature {
+    --creature-size: 64;
+    width: 64;
+    height: 64;
+    background-color: blue;
+    border: 1px red;
   }
 
   .footer {
@@ -43,28 +47,87 @@
     background-color: rgb(202, 75, 202);
   }
 
-  #players > *:nth-child(odd) {
-    background-color: aqua;
+  #players > :nth-child(odd) {
+    background-color: rgb(134, 127, 134);
+  }
+
+  #players {
+    background-color: black;
+    overflow: scroll;
+  }
+
+  #players div uicreature {
+    --creature-size: 32;
+    padding-left: 5px;
+  }
+
+  #players > div:hover {
+    background-color: rgb(104, 106, 241);
+  }
+
+  #players > div {
+    height: 32px;
+  }
+
+  #players div div {
+    display: inline-block;
+    width: 20%;
+    height: 100%;
+    align-items: center;
+  }
+
+  #players .playerName {
+    width: 60%;
+  }
+
+  #players .buttonRemovePlayer {
+    width: 10;
+    height: 100%;
+    line-height: 3;
   }
 </style>
 <script type="text">
   self.title = "HTML/CSS";
   self.msg = "Welcome to HTML/CSS";
-  self:cycleEvent(function()
-      self.playerName = math.random()
-  end, 10)
 </script>
 <html>
   <window class="content" anchor="parent" *title="self.title">
-    <div style="margin: 30px; text-align: center">{{self.msg}}</div>
+    <div style="margin: 10px; text-align: center">{{self.msg}}</div>
     <div class="form">
-      <label style="padding: 3">Name:</label>
-      <input type="text" *value="self.playerName" />
+      <div style="width: 70%; display: inline-block">
+        <div>
+          <label style="padding: 3">Name:</label>
+          <input type="text" *value="self.playerName" style="margin-left: 26" />
+        </div>
+        <div>
+          <label style="padding: 3">Look type:</label>
+          <input type="text" *value="self.lookType" />
+        </div>
+      </div>
+      <div style="display: inline-block">
+        <uicreature *outfit="{type = self.lookType}" />
+      </div>
+      <div>
+        <button onclick="self:addPlayer(self.playerName)">Add</button>
+      </div>
     </div>
-    <div id="players" class="form"></div>
-    <div style="margin-top: 10">Player name is: {{self.playerName}}</div>
-    <div><button onclick="self:addPlayer(self.playerName)">Add</button></div>
-
+    <div id="players" class="form">
+      <div
+        *for="local player in self.players"
+        onclick="print('Player: '.. player.name)"
+      >
+        <div>
+          <uicreature
+            *outfit="{type = player.lookType}"
+            center="true"
+          ></uicreature>
+        </div>
+        <div class="playerName">{{player.name}}</div>
+        <button class="buttonRemovePlayer" onclick="self:removePlayer(index)">
+          X
+        </button>
+      </div>
+    </div>
     <div class="equalizerEffect">
       <div class="line"></div>
       <div class="line"></div>
@@ -73,7 +136,7 @@
       <div class="line"></div>
     </div>
     <div class="footer">
-      <button onclick="alert('HTML/CSS V2.0b')">About</button>
+      <button onclick="alert('HTML/CSS V.3b')">About</button>
       <button style="float: right" onclick="self:unloadHtml()">Close</button>
     </div>
   </window>

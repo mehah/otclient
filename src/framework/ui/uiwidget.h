@@ -232,6 +232,8 @@ protected:
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
     std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
 
+    int m_insertChildIndex = -1;
+
     Timer m_clickTimer;
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };
@@ -248,6 +250,7 @@ public:
     void addChild(const UIWidgetPtr& child);
     void insertChild(int32_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
+    void removeChildByIndex(uint32_t index);
     void focusChild(const UIWidgetPtr& child, Fw::FocusReason reason);
     void focusNextChild(Fw::FocusReason reason, bool rotate = false);
     void focusPreviousChild(Fw::FocusReason reason, bool rotate = false);
@@ -423,7 +426,7 @@ protected:
 
 private:
     void internalDestroy();
-    void updateState(Fw::WidgetState state);
+    void updateState(Fw::WidgetState state, bool newState = false);
     void updateStates();
     void updateChildrenIndexStates();
     void updateStyle();
