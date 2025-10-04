@@ -19,9 +19,9 @@ function HtmlSample:addPlayer(name)
 end
 
 function HtmlSample:removePlayer(index)
-    print('removePlayer', index)
     table.remove(self.players, index)
 end
+
 
 function HtmlSample:equalizerEffect()
     local widgets = self:findWidgets('.line')
