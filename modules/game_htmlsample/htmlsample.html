@@ -14,7 +14,7 @@
   }
 
   .form > div > uicreature {
-    --creature-size: 128;
+    --creature-size: 64;
     width: 64;
     height: 64;
     background-color: blue;
@@ -56,7 +56,7 @@
   }
 
   #players div uicreature {
-    --creature-size: 98;
+    --creature-size: 64;
     width: 64;
     height: 64;
   }
@@ -106,8 +106,8 @@
       </div>
     </div>
     <div id="players" class="form">
-      <div *for="local player in self.items">
-        <div>
+      <div *for="local player in self.items" onclick="print(1)">
+        <div onclick="print(player.name)">
           <uicreature
             *outfit="{type = player.lookType}"
             center="true"

@@ -223,8 +223,9 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
         end)
 
     local event = { target = widget }
+    local forCtx = FOR_CTX.__values
     local function execEventCall()
-        execFnc(fnc, { controller, event, widget, unpack(FOR_CTX.__values) }, widget, controller, NODE_STR, function()
+        execFnc(fnc, { controller, event, widget, unpack(forCtx) }, widget, controller, NODE_STR, function()
             return ('Event Error[%s]: %s'):format(eventName, callStr)
         end)
     end

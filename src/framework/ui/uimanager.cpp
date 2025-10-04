@@ -89,15 +89,25 @@ void UIManager::inputEvent(const InputEvent& event)
             m_keyboardReceiver->propagateOnKeyUp(event.keyCode, event.keyboardModifiers);
             break;
         case Fw::MousePressInputEvent:
+            m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
+
             if (event.mouseButton == Fw::MouseLeftButton && m_mouseReceiver->isVisible()) {
                 auto pressedWidget = m_mouseReceiver->recursiveGetChildByPos(event.mousePos, false);
-                if (pressedWidget && !pressedWidget->isEnabled())
-                    pressedWidget = nullptr;
 
-                updatePressedWidget(pressedWidget, event.mousePos);
+                bool isOnHTML = false;
+                if (pressedWidget) {
+                    isOnHTML = pressedWidget->isOnHtml();
+
+                    if (!pressedWidget->isEnabled())
+                        pressedWidget = nullptr;
+                }
+
+                if (isOnHTML)
+                    updatePressedWidgetHTML(pressedWidget ? widgetList : UIWidgetList{}, event.mousePos);
+                else
+                    updatePressedWidget(pressedWidget, event.mousePos);
             }
 
-            m_mouseReceiver->propagateOnMouseEvent(event.mousePos, widgetList);
             for (const auto& widget : widgetList) {
                 widget->recursiveFocus(Fw::MouseFocusReason);
                 if (widget->onMousePress(event.mousePos, event.mouseButton))
@@ -129,8 +139,12 @@ void UIManager::inputEvent(const InputEvent& event)
                 }
             }
 
-            if (m_pressedWidget && event.mouseButton == Fw::MouseLeftButton)
-                updatePressedWidget(nullptr, event.mousePos, !accepted);
+            if (m_pressedWidget && event.mouseButton == Fw::MouseLeftButton) {
+                if (m_pressedWidget->isOnHtml())
+                    updatePressedWidgetHTML(UIWidgetList{}, event.mousePos, !accepted);
+                else
+                    updatePressedWidget(nullptr, event.mousePos, !accepted);
+            }
             break;
         }
         case Fw::MouseMoveInputEvent:
@@ -173,6 +187,29 @@ void UIManager::inputEvent(const InputEvent& event)
             break;
         default:
             break;
+    }
+}
+
+void  UIManager::updatePressedWidgetHTML(const UIWidgetList& newPressed, const Point& clickedPos, bool fireClicks) {
+    auto oldPressedWidgets = std::move(m_pressedWidgets);
+    m_pressedWidgets = newPressed;
+    m_pressedWidget = !newPressed.empty() ? newPressed.front() : nullptr;
+
+    for (const auto& p : newPressed) {
+        const auto w = p.get();
+        if (!w->isEnabled())
+            continue;
+
+        w->updateState(Fw::PressedState, true);
+    }
+
+    for (const auto& p : std::views::reverse(oldPressedWidgets)) {
+        const auto w = p.get();
+
+        if (fireClicks && w->isEnabled() && w->containsPoint(clickedPos))
+            w->onClick(clickedPos);
+
+        w->updateState(Fw::PressedState, false);
     }
 }
 
@@ -244,8 +281,8 @@ void UIManager::updateHoveredWidget(const bool now)
             UIWidgetList newHovered;
             m_mouseReceiver->propagateOnMouseEvent(mousePos, newHovered);
 
-            for (const auto& p : m_hoveredWidgets) {
-                UIWidget* w = p.get();
+            for (const auto& p : std::views::reverse(m_hoveredWidgets)) {
+                const auto w = p.get();
 
                 bool still = std::any_of(newHovered.begin(), newHovered.end(),
                                          [&](const UIWidgetPtr& p) { return p.get() == w; });
@@ -256,10 +293,10 @@ void UIManager::updateHoveredWidget(const bool now)
             }
 
             for (const auto& p : newHovered) {
-                if (!hoveredWidget->isEnabled())
+                const auto w = p.get();
+                if (!w->isEnabled())
                     continue;
 
-                UIWidget* w = p.get();
                 bool was = std::any_of(m_hoveredWidgets.begin(), m_hoveredWidgets.end(),
                                        [&](const UIWidgetPtr& q) { return q.get() == w; });
                 if (!was) {
@@ -320,8 +357,12 @@ void UIManager::onWidgetDestroy(const UIWidgetPtr& widget)
     if (m_hoveredWidget == widget)
         updateHoveredWidget();
 
-    if (m_pressedWidget == widget)
-        updatePressedWidget(nullptr);
+    if (m_pressedWidget == widget) {
+        if (widget->isOnHtml())
+            updatePressedWidgetHTML(UIWidgetList{});
+        else
+            updatePressedWidget(nullptr);
+    }
 
     if (m_draggingWidget == widget)
         updateDraggingWidget(nullptr);
