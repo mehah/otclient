@@ -43,7 +43,7 @@ public:
 
     CreaturePtr getCreature() { return m_creature; }
     uint8_t getCreatureSize() { return m_creatureSize; }
-    void setCreatureSize(const uint8_t size) { m_creatureSize = size; }
+    void setCreatureSize(const uint8_t size) { setSize(m_creatureSize = size); }
 
     void setCenter(const bool v) { m_center = v; }
     bool isCentered() { return m_center; }
