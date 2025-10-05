@@ -80,15 +80,19 @@ namespace {
         }
     }
 
-    static inline bool widthRequiresContainingBlock(DisplayType d) {
+    static inline bool widthAutoFillsContainingBlock(DisplayType d) {
         switch (d) {
             case DisplayType::Block:
             case DisplayType::ListItem:
             case DisplayType::Flex:
             case DisplayType::Grid:
+                return true;
+
             case DisplayType::InlineBlock:
             case DisplayType::InlineFlex:
             case DisplayType::InlineGrid:
+            case DisplayType::Inline:
+            case DisplayType::Contents:
             case DisplayType::Table:
             case DisplayType::TableCaption:
             case DisplayType::TableRowGroup:
@@ -96,19 +100,13 @@ namespace {
             case DisplayType::TableFooterGroup:
             case DisplayType::TableRow:
             case DisplayType::TableCell:
-                return true;
-
-            case DisplayType::Inline:
-            case DisplayType::Contents:
             case DisplayType::TableColumn:
             case DisplayType::TableColumnGroup:
             case DisplayType::None:
             case DisplayType::Initial:
             case DisplayType::Inherit:
-                return false;
-
             case DisplayType::RunIn:
-                return true;
+                return false;
         }
         return false;
     }
@@ -538,7 +536,7 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
 
     switch (unit) {
         case Unit::Auto: {
-            if (isWidth && widthRequiresContainingBlock(m_displayType)) {
+            if (isWidth && widthAutoFillsContainingBlock(m_displayType)) {
                 needUpdate = m_parent != nullptr;
             } else {
                 unit = Unit::FitContent;
