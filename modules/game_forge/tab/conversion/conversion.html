@@ -6,8 +6,7 @@
           <UIItem class="forge-item-icon" style="item-id: 37160"></UIItem>
         </div>
         <div class="forge-counter">
-          <label class="forge-full-width-label" text="60"></label>
-          <img class="resource-icon" src="images/icon-currency-dust" />
+          <div class="forge-full-width-label" text="60"></div>
         </div>
       </div>
       <img
@@ -20,7 +19,7 @@
       >
         <UIItem class="forge-result-item" style="item-id: 37109"></UIItem>
       </UIButton>
-      <label class="conversion-note" text="generate 3"></label>
+      <label class="conversion-note" text="Generate 3"></label>
       <img class="conversion-output-item" src="images/icon-currency-sliver" />
     </div>
 
@@ -34,8 +33,7 @@
           <UIItem class="forge-item-icon" style="item-id: 37109"></UIItem>
         </div>
         <div class="forge-counter">
-          <label class="forge-full-width-label" text="50"></label>
-          <img class="resource-icon" src="images/icon-currency-sliver" />
+          <div class="forge-full-width-label" text="50"></div>
         </div>
       </div>
       <img
@@ -64,13 +62,13 @@
         <div class="forge-card">
           <UIItem class="forge-item-icon" style="item-id: 37160"></UIItem>
         </div>
-        <div class="forge-counter">
-          <label
-            id="forgeDustLevel"
-            class="forge-full-width-label"
-            text="0"
-          ></label>
-          <img class="resource-icon" src="images/icon-currency-dust" />
+        <div
+          class="forge-counter"
+          style="align-items: center; text-align: center"
+        >
+          <div style="align-items: center; text-align: center">
+            {{self.conversionNecessaryDustToIncrease}}
+          </div>
         </div>
       </div>
       <img
@@ -97,25 +95,17 @@
           "
         ></UIItem>
       </UIButton>
-      <label
+      <div
         id="forgeIncreaseDustCurrentLevel"
         class="conversion-note--inline"
-        text="Raise limit from 100"
-        style="position: relative; left: 15px; margin-top: 15"
-      ></label>
-      <div class="conversion-row">
-        <img
-          class="conversion-output-item"
-          style="margin-left: 15px"
-          src="images/icon-currency-dust"
-        />
-
-        <label
-          id="forgeIncreaseDustNextLevel"
-          class="conversion-note--inline"
-          text="to 101"
-        ></label>
-        <img class="conversion-output-item" src="images/icon-currency-dust" />
+        style="
+          margin-top: 15px;
+          align-items: center;
+          text-align: center;
+          width: 100%;
+        "
+      >
+        {{self.conversionRaiseFrom}}
       </div>
     </div>
 

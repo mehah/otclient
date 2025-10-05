@@ -44,28 +44,32 @@
 
     <!-- Status bar with resources -->
     <div class="status-bar">
-      <div class="status-item status-primary">
-        <img class="resource-icon" src="/images/game/prey/prey_gold" />
-        <label id="forgeGoldAmount" class="resource-amount" text="0"></label>
+      <div class="status-item status-primary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="/images/game/prey/prey_gold" />
+          {{self.currentGold}}
+        </div>
       </div>
 
-      <div class="status-item status-secondary">
-        <img class="resource-icon" src="images/icon-currency-dust" />
-        <label
-          id="forgeDustAmount"
-          class="resource-amount"
-          text="0/100"
-        ></label>
+      <div class="status-item status-secondary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="images/icon-currency-dust" />
+          {{self.currentDustLevel}}
+        </div>
       </div>
 
-      <div class="status-item status-tertiary">
-        <img class="resource-icon" src="images/icon-currency-sliver" />
-        <label id="forgeSliverAmount" class="resource-amount" text="0"></label>
+      <div class="status-item status-tertiary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="images/icon-currency-sliver" />
+          {{self.currentSlivers}}
+        </div>
       </div>
 
-      <div class="status-item status-tertiary">
-        <img class="resource-icon" src="images/icon-currency-exaltedcore" />
-        <label id="forgeCoreAmount" class="resource-amount" text="0"></label>
+      <div class="status-item status-tertiary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="images/icon-currency-exaltedcore" />
+          {{self.currentExaltedCores}}
+        </div>
       </div>
 
       <button class="close-btn" text="Close" onclick="self:close()"></button>

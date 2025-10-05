@@ -145,24 +145,6 @@ function Helpers.registerResourceConfig(resourceConfig, resourceType, config)
     resourceConfig[resourceType] = config
 end
 
-function Helpers.handleInitialValues(statusConfigs, resourceConfig)
-    if type(statusConfigs) ~= 'table' or type(resourceConfig) ~= 'table' then
-        return
-    end
-
-    for _, config in ipairs(statusConfigs) do
-        if config.resourceType then
-            Helpers.registerResourceConfig(resourceConfig, config.resourceType, config)
-        end
-
-        if config.eventResourceTypes then
-            for _, resourceType in ipairs(config.eventResourceTypes) do
-                Helpers.registerResourceConfig(resourceConfig, resourceType, config)
-            end
-        end
-    end
-end
-
 function Helpers.resolveStatusWidget(controller, config)
     if config.widget then
         if config.widget:isDestroyed() then

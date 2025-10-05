@@ -1,6 +1,3 @@
--- Todo
--- change to TypeScript
-
 local windowTypes = {}
 local TAB_ORDER = { 'fusion', 'transfer', 'conversion', 'history' }
 local TAB_CONFIG = {
@@ -40,14 +37,9 @@ local forgeActions = {
     INCREASELIMIT = 4,
 }
 
-local conversionTab = require('modules.game_forge.tab.conversion.conversion')
 local fusionTab = require('modules.game_forge.tab.fusion.fusion')
 local helpers = require('modules.game_forge.game_forge_helpers')
 
-conversionTab.registerDependencies(forgeController, {
-    resourceTypes = forgeResourceTypes,
-    actions = forgeActions
-})
 fusionTab.registerDependencies(forgeController, {
     resourceTypes = forgeResourceTypes
 })
@@ -56,60 +48,18 @@ local cloneValue = helpers.cloneValue
 local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
 local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
 local normalizeFusionGradeEntries = helpers.normalizeFusionGradeEntries
-local resolveForgePrice = helpers.resolveForgePrice
 local defaultResourceFormatter = helpers.defaultResourceFormatter
 local formatGoldAmount = helpers.formatGoldAmount
 local formatHistoryDate = helpers.formatHistoryDate
-local resolveHistoryList = helpers.resolveHistoryList
 local resolveStatusWidget = helpers.resolveStatusWidget
-local resolveScrollContents = helpers.resolveScrollContents
-local getChildrenByStyleName = helpers.getChildrenByStyleName
-local getFirstChildByStyleName = helpers.getFirstChildByStyleName
-
-local function formatDustAmount(value)
-    return conversionTab.formatDustAmount(forgeController, value)
-end
 
 local function loadTabFragment(tabName)
     return helpers.loadTabFragment(forgeController, tabName)
 end
 
-local forgeStatusConfigs = {
-    {
-        selector = '#forgeGoldAmount',
-        formatter = formatGoldAmount,
-        getValue = function(player)
-            if not player then
-                return 0
-            end
-
-            return player:getTotalMoney() or 0
-        end,
-        eventResourceTypes = {
-            ResourceTypes and ResourceTypes.BANK_BALANCE or 0,
-            ResourceTypes and ResourceTypes.GOLD_EQUIPPED or 1
-        }
-    },
-    {
-        selector = '#forgeDustAmount',
-        formatter = formatDustAmount,
-        resourceType = forgeResourceTypes.dust
-    },
-    {
-        selector = '#forgeSliverAmount',
-        formatter = defaultResourceFormatter,
-        resourceType = forgeResourceTypes.sliver
-    },
-    {
-        selector = '#forgeCoreAmount',
-        formatter = defaultResourceFormatter,
-        resourceType = forgeResourceTypes.cores
-    }
-}
 
 local forgeResourceConfig = {}
 
-helpers.handleInitialValues(forgeStatusConfigs, forgeResourceConfig)
 
 local historyActionLabels = {
     [0] = tr('Fusion'),
@@ -158,10 +108,6 @@ local function show(self, skipRequest)
 
     if not skipRequest then
         g_game.openPortableForgeRequest()
-    end
-
-    for _, config in ipairs(forgeStatusConfigs) do
-        config.widget = nil
     end
 
     self.modeFusion, self.modeTransfer = false, false
@@ -266,26 +212,14 @@ function forgeController:updateResourceBalances(resourceType)
         if config then
             updateStatusConfig(self, config, player)
         end
-    else
-        for _, config in ipairs(forgeStatusConfigs) do
-            updateStatusConfig(self, config, player)
-        end
     end
     if not resourceType or resourceType == forgeResourceTypes.cores then
         self:updateFusionCoreButtons()
     end
 end
 
-function forgeController:updateDustLevelLabel(panel, dustLevel)
-    conversionTab.updateDustLevelLabel(self, panel, dustLevel)
-end
-
 function forgeController:updateFusionCoreButtons()
     fusionTab.updateFusionCoreButtons(self)
-end
-
-function forgeController:onConversion(conversionType)
-    conversionTab.onConversion(self, conversionType)
 end
 
 function forgeController:onToggleFusionCore(coreType)
@@ -343,14 +277,12 @@ end
 
 function forgeController:loadTab(tabName)
     if ui.panels[tabName] then
-        conversionTab.onTabLoaded(self, tabName, ui.panels[tabName])
         return ui.panels[tabName]
     end
 
     local panel = loadTabFragment(tabName)
     if panel then
         ui.panels[tabName] = panel
-        conversionTab.onTabLoaded(self, tabName, panel)
     end
     return panel
 end
@@ -491,10 +423,11 @@ function forgeController:setInitialValues(openData)
             self[key] = cloneValue(openData[key])
         end
     end
-
-    conversionTab.applyInitialValues(self, openData)
 end
 
+forgeController.conversionNecessaryDustToIncrease = 25
+forgeController.conversionRaiseFrom = 100
+forgeController.conversionRaiseTo = 101
 function forgeController:applyForgeConfiguration(config)
     if type(config) ~= 'table' then
         return
@@ -559,15 +492,88 @@ function forgeController:applyForgeConfiguration(config)
         local numericValue = tonumber(value)
         if numericValue then
             initial[key] = numericValue
+
+            g_logger.info("key: " .. tostring(key) .. " value: " .. tostring(numericValue))
         end
     end
+
+    local maxDustLevel = numericFields.maxDustLevel or 0
+    forgeController.conversionNecessaryDustToIncrease = math.max((maxDustLevel - 75), 25)
+    forgeController.conversionRaiseFrom = ("Raise limit from %d to %d"):format(maxDustLevel, maxDustLevel + 1)
+    forgeController.maxDustLevel = maxDustLevel
+    local player = g_game.getLocalPlayer()
+    forgeController.currentDust = player:getResourceBalance(forgeResourceTypes.dust) or 0
+
+    forgeController.currentDustLevel = ("%d / %d"):format(forgeController.currentDust, maxDustLevel)
+    forgeController.currentSlivers = player:getResourceBalance(forgeResourceTypes.sliver) or 0
+    forgeController.currentExaltedCores = player:getResourceBalance(forgeResourceTypes.cores) or 0
+    forgeController.currentGold = formatGoldAmount(player:getTotalMoney() or 0)
+    forgeController.maxDustCap = tonumber(numericFields.maxDustCap) or 225
 
     self:setInitialValues(initial)
 end
 
+function forgeController:onConversion(conversionType, dependencies)
+    if not self or not self.ui then
+        return
+    end
+
+    local player = g_game.getLocalPlayer()
+    if not player then
+        return
+    end
+
+    if conversionType == forgeActions.DUST2SLIVER then
+        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        g_logger.info("dustBalance: " .. dustBalance)
+        if dustBalance <= 60 then
+            return
+        end
+        g_game.forgeRequest(conversionType)
+        return
+    end
+
+    if conversionType == forgeActions.SLIVER2CORE then
+        local sliverBalance = player:getResourceBalance(forgeResourceTypes.sliver) or 0
+        g_logger.info("sliverBalance: " .. sliverBalance)
+        if sliverBalance <= 50 then
+            return
+        end
+        g_game.forgeRequest(conversionType)
+        return
+    end
+
+    if conversionType == forgeActions.INCREASELIMIT then
+        local dustBalance = player:getResourceBalance(forgeResourceTypes.dust) or 0
+        local currentNecessaryDust = self.conversionNecessaryDustToIncrease
+        local maxDustCap = forgeController.maxDustCap
+        local maxDustLevel = forgeController.maxDustLevel
+
+
+        g_logger.info("dustBalance: " ..
+            dustBalance ..
+            " currentNecessaryDust: " ..
+            currentNecessaryDust ..
+            " maxDustLevel: " .. tostring(maxDustLevel) .. " maxDustCap: " .. tostring(maxDustCap))
+
+        if maxDustCap > 0 and maxDustLevel >= maxDustCap then
+            return
+        end
+
+        if dustBalance < currentNecessaryDust then
+            return
+        end
+        g_game.forgeRequest(conversionType)
+
+        local newDustLevel = maxDustLevel + 1
+        if maxDustCap > 0 then
+            newDustLevel = math.min(newDustLevel, maxDustCap)
+        end
+    end
+end
+
 function g_game.onOpenForge(openData)
     forgeController:setInitialValues(openData)
-    conversionTab.onOpenForge(forgeController)
     forgeController.modeFusion = false
     forgeController.modeTransfer = false
 

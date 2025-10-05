@@ -66,13 +66,14 @@
 .status-bar {
   position: absolute;
   left: 22px;
-  top: 364px;
+  bottom: 0px;
   width: 465px;
   height: 21px;
+  display: flex;
 }
 
 .status-item {
-  float: left;
+  /* float: left; */
   height: 100%;
   margin-left: 5px;
   --image-source: "/images/ui/test/button-verydarkgrey-down";
@@ -80,6 +81,7 @@
 
 .status-item:first-child {
   margin-left: 0;
+  background-color: blue;
 }
 
 .status-item.status-primary {
@@ -93,10 +95,20 @@
 }
 
 .resource-icon {
-  float: right;
+  /* float: right; */
   margin-right: 5px;
   --image-size: 9 9;
   --image-offset: 0 6;
+}
+
+.resource-bottom-container {
+  align-items: center;
+  padding: 0 4px;
+}
+
+.resource-bottom {
+  display: flex;
+  align-items: center;
 }
 
 .resource-amount {
@@ -109,9 +121,9 @@
 }
 
 .close-btn {
-  float: right;
   width: 40px;
   height: 100%;
+  margin-left: 40px;
 }
 
 /* SHARED STYLES - ALL COMMON CLASSES HERE */
@@ -206,14 +218,17 @@
   width: 66px;
   height: 20px;
   --image-source: /images/ui/test/button-verydarkgrey-down;
+  text-align: center;
+  align-items: center;
 }
 
 .forge-full-width-label {
-  display: block;
+  /* display: block; */
   width: 100%;
   height: 100%;
   text-align: center;
   align-items: center;
+  display: flex;
 }
 
 .forge-result-placeholder {
