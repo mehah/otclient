@@ -464,12 +464,10 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         local env = { self = controller }
         local widget = self.widget
 
-        -- sempre reavalia o iterável
         local isFirst = (self.watchList == nil)
         local childindex = index
 
         local list, keys = ngfor_exec(expr, env, function(c)
-            -- só cria os filhos na primeira passagem
             if not isFirst then return end
             childindex                                   = childindex + 1
             FOR_CTX.__keys                               = c.__keys
@@ -509,7 +507,6 @@ function UIWidget:__childFor(moduleName, expr, html, index)
             })
             self.watchList = watch
         else
-            -- **a linha que resolve o seu problema**:
             self.watchList.list = list
         end
 
