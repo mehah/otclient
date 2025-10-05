@@ -24,6 +24,9 @@ local showFamiliarCheck = nil
 local colorBoxes = {}
 local currentColorBox = nil
 
+local previewCreature = nil
+local previewFamiliar = nil
+
 ignoreNextOutfitWindow = 0
 local floorTiles = 7
 local settingsFile = "/settings/outfit.json"
@@ -535,7 +538,11 @@ function destroy()
         colorBoxes = {}
         currentColorBox = nil
         previewCreature:destroy()
-        previewCreature = nil    
+        previewCreature = nil
+        if previewFamiliar then
+            previewFamiliar:destroy()
+            previewFamiliar = nil
+        end
         if appearanceGroup then
             appearanceGroup:destroy()
             appearanceGroup = nil
