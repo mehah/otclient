@@ -2079,22 +2079,19 @@ bool UIWidget::propagateOnKeyUp(const uint8_t keyCode, const int keyboardModifie
     return onKeyUp(keyCode, keyboardModifiers);
 }
 
-bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList)
+bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList, bool checkContainsPoint)
 {
-    if (isClipping() && !containsPaddingPoint(mousePos))
-        return false;
-
     bool ret = false;
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyEnabled() && child->isExplicitlyVisible()) {
-            if (child->propagateOnMouseEvent(mousePos, widgetList)) {
+            if (child->propagateOnMouseEvent(mousePos, widgetList, true)) {
                 ret = true;
                 break;
             }
         }
     }
 
-    if (containsPoint(mousePos) && !isIgnoreEvent()) {
+    if (!isIgnoreEvent() && (!checkContainsPoint || containsPoint(mousePos))) {
         widgetList.emplace_back(static_self_cast<UIWidget>());
 
         if (!isPhantom() && !isOnHtml() || isDraggable())

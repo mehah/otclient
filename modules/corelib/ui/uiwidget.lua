@@ -461,28 +461,32 @@ end
 function UIWidget:__childFor(moduleName, expr, html, index)
     local controller = G_CONTROLLER_CALLED[moduleName]
     local scan = function(self)
-        local env = {
-            self = controller
-        }
+        local env = { self = controller }
         local widget = self.widget
-        if not self.watchList then
-            local childindex = index
-            local list, keys = ngfor_exec(expr, env, function(c)
-                childindex = childindex + 1
-                FOR_CTX.__keys = c.__keys
-                FOR_CTX.__values = c.__values
-                widget:insert(childindex, html).__for_values = FOR_CTX.__values
-                FOR_CTX.__keys = ''
-                FOR_CTX.__values = {}
-            end)
 
+        -- sempre reavalia o iterável
+        local isFirst = (self.watchList == nil)
+        local childindex = index
+
+        local list, keys = ngfor_exec(expr, env, function(c)
+            -- só cria os filhos na primeira passagem
+            if not isFirst then return end
+            childindex                                   = childindex + 1
+            FOR_CTX.__keys                               = c.__keys
+            FOR_CTX.__values                             = c.__values
+            widget:insert(childindex, html).__for_values = FOR_CTX.__values
+            FOR_CTX.__keys                               = ''
+            FOR_CTX.__values                             = {}
+        end)
+
+        if isFirst then
             local watch = table.watchList(list, {
                 onInsert = function(i, it)
-                    FOR_CTX.__keys = keys;
-                    FOR_CTX.__values = { it, i };
+                    FOR_CTX.__keys                              = keys
+                    FOR_CTX.__values                            = { it, i }
                     widget:insert(index + i, html).__for_values = FOR_CTX.__values
-                    FOR_CTX.__keys = ''
-                    FOR_CTX.__values = {}
+                    FOR_CTX.__keys                              = ''
+                    FOR_CTX.__values                            = {}
                 end,
                 onRemove = function(i)
                     local child = widget:getChildByIndex(index + i)
@@ -490,27 +494,23 @@ function UIWidget:__childFor(moduleName, expr, html, index)
                         pwarning('onRemove: child(' .. index + i .. ') not found.')
                         return
                     end
-
                     local nextChild = child:getNextWidget()
-
                     widget:removeChild(child)
                     child:destroy()
-
                     controller:checkWidgetsDestroyed()
-
                     local childIndex = index + i
                     while nextChild do
-                        if not nextChild.__for_values then
-                            break
-                        end
+                        if not nextChild.__for_values then break end
                         nextChild.__for_values[2] = childIndex
                         childIndex = childIndex + 1
                         nextChild = nextChild:getNextWidget()
                     end
                 end
             })
-
             self.watchList = watch
+        else
+            -- **a linha que resolve o seu problema**:
+            self.watchList.list = list
         end
 
         self.watchList:scan()

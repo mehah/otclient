@@ -469,7 +469,7 @@ protected:
     bool propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers);
     bool propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks);
     bool propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers);
-    bool propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList);
+    bool propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList, bool checkContainsPoint = false);
     bool propagateOnMouseMove(const Point& mousePos, const Point& mouseMoved, UIWidgetList& widgetList);
 
     // function shortcuts
