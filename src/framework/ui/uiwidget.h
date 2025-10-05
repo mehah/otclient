@@ -432,6 +432,7 @@ private:
     void updateStyle();
 
     void updateSize();
+    void updateTableLayout();
     void applyAnchorAlignment();
     void scheduleHtmlTask(FlagProp prop);
     void refreshAnchorAlignment(bool onlyChild = false);
