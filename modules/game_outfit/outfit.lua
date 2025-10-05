@@ -171,6 +171,11 @@ function terminate()
     destroy()
 end
 
+function onOutfitChange(creature, outfit, oldOutfit)
+    -- Dummy function to handle engine callbacks
+    -- This prevents the "luaCallLuaField(onOutfitChange) is being called outside the context of the lua call" warnings
+end
+
 function onMovementChange(checkBox, checked)
     local walkingSpeed = checked and 1000 or 0 
 
@@ -1349,9 +1354,15 @@ function onFamiliarSelect(list, focusedChild, unfocusedChild, reason)
 
         deselectPreset()
 
-        previewFamiliar:setOutfit({
-            type = familiarType
-        })
+        -- Only set outfit if familiarType is valid (not 0/None)
+        if familiarType and familiarType > 0 then
+            previewFamiliar:setOutfit({
+                type = familiarType
+            })
+        else
+            -- Hide/clear the familiar when "None" is selected
+            previewFamiliar:setVisible(false)
+        end
 
         updatePreview()
 
