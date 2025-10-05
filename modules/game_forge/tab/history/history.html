@@ -19,12 +19,24 @@
       </table>
     </div>
 
-    <span class="history-footer">
-      <button onclick="self:onHistoryPreviousPage()">Previous Page</button>
+    <div class="history-footer">
+      <button
+        *disabled="self.historyMustDisplayPreviousButton"
+        class="history-footer-previous"
+        onclick="self:onHistoryPreviousPage()"
+      >
+        Previous Page
+      </button>
       <div class="history-page-label">
         {{self.historyCurrentPage}}/{{self.historyLastPage}}
       </div>
-      <button onclick="self:onHistoryNextPage()">Next Page</button>
-    </span>
+      <button
+        *disabled="self.historyMustDisplayNextButton"
+        class="history-footer-next"
+        onclick="self:onHistoryNextPage()"
+      >
+        Next Page
+      </button>
+    </div>
   </div>
 </html>

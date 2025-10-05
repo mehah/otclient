@@ -9,35 +9,45 @@
   --border-color-bottom: #747474;
   --border-width-right: 1;
   --border-color-right: #747474;
+  display: block;
+  width: 465px;
 }
 
 .history-list {
   height: 260px;
-  width: 465px;
+  width: 100%;
+  display: block;
 }
 
 .history-footer {
-  width: 465px;
-  display: inline;
   background-color: #363636;
-  background-color: red;
-  height: 32px;
+  height: 36px;
   align-items: center;
+  margin-top: 16px;
+  position: relative;
+}
+
+.history-footer-previous {
+  position: absolute;
+  left: 0px;
+  top: 6px;
+}
+
+.history-footer-next {
+  position: absolute;
+  right: 0px;
+  top: 6px;
 }
 
 .history-page-label {
-  padding-top: 5px;
+  text-align: center;
+  align-items: center;
 }
 
 .history-table {
   width: 100%;
   text-align: left;
   height: 100%;
-  overflow-x: scroll;
-}
-
-.history-table tr {
-  /* border: 2px #ffffff; */
 }
 
 .history-table tbody tr:nth-child(odd) {
