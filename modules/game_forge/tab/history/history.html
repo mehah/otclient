@@ -1,51 +1,42 @@
 <html>
-  <div id="history" class="history-container" anchor="parent">
-    <TextList id="historyList" anchor="parent" class="history-list"></TextList>
+  <div class="history-container" id="history" anchor="parent">
+    <div class="history-list">
+      <table class="history-table">
+        <thead style="background-color: #363636">
+          <tr>
+            <th style="width: 145px">Date</th>
+            <th style="width: 85px">Action</th>
+            <th style="width: 230px">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="height: 29px" *for="local row in (self.historyList or {})">
+            <td style="width: 145px">{{row.createdAt}}</td>
+            <td style="width: 85px">{{row.actionType}}</td>
+            <td style="width: 230px">{{row.description}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-    <UIWidget
-      anchor="parent"
-      class="header-widget header-date"
-      text="Date"
-    ></UIWidget>
-    <UIWidget
-      anchor="parent"
-      class="header-widget header-action"
-      text="Action"
-    ></UIWidget>
-    <UIWidget
-      anchor="parent"
-      class="header-widget header-details"
-      text="Details"
-    ></UIWidget>
-
-    <img
-      class="separator-vertical separator-1"
-      src="/images/ui/separator_vertical"
-    />
-    <img
-      class="separator-vertical separator-2"
-      src="/images/ui/separator_vertical"
-    />
-
-    <UIWidget id="historyFooter" class="history-footer">
-      <UIButton
-        id="previousPageButton"
-        class="history-button history-button-previous"
-        text="Previous Page"
-        visible="false"
+    <div class="history-footer">
+      <button
+        *disabled="self.historyMustDisablePreviousButton"
+        class="history-footer-previous"
         onclick="self:onHistoryPreviousPage()"
-      />
-      <UIWidget
-        id="historyPageLabel"
-        class="history-page-label"
-        text="Page 1/1"
-      ></UIWidget>
-      <UIButton
-        id="nextPageButton"
-        class="history-button history-button-next"
-        text="Next Page"
+      >
+        Previous Page
+      </button>
+      <div class="history-page-label">
+        {{self.historyCurrentPage}}/{{self.historyLastPage}}
+      </div>
+      <button
+        *disabled="self.historyMustDisableNextButton"
+        class="history-footer-next"
         onclick="self:onHistoryNextPage()"
-      />
-    </UIWidget>
+      >
+        Next Page
+      </button>
+    </div>
   </div>
 </html>
