@@ -1331,17 +1331,6 @@ void UIWidget::updateSize() {
         }
     }
 
-    if (m_displayType == DisplayType::Table) {
-        updateTableLayout();
-    } else if (isTableBox(m_displayType)) {
-        UIWidget* tableAncestor = m_parent.get();
-        while (tableAncestor && tableAncestor->m_displayType != DisplayType::Table) {
-            tableAncestor = tableAncestor->m_parent.get();
-        }
-        if (tableAncestor && tableAncestor->m_displayType == DisplayType::Table)
-            tableAncestor->updateTableLayout();
-    }
-
     if (m_children.empty()) {
         m_width.pendingUpdate = false;
         m_height.pendingUpdate = false;
@@ -1352,6 +1341,17 @@ void UIWidget::updateSize() {
         int width = 0;
         int height = 0;
         applyFitContentRecursive(this, width, height);
+    }
+
+    if (m_displayType == DisplayType::Table) {
+        updateTableLayout();
+    } else if (isTableBox(m_displayType)) {
+        UIWidget* tableAncestor = m_parent.get();
+        while (tableAncestor && tableAncestor->m_displayType != DisplayType::Table) {
+            tableAncestor = tableAncestor->m_parent.get();
+        }
+        if (tableAncestor && tableAncestor->m_displayType == DisplayType::Table)
+            tableAncestor->updateTableLayout();
     }
 }
 
