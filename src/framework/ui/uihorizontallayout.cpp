@@ -95,6 +95,8 @@ bool UIHorizontalLayout::internalUpdate()
         // must set the preferred width later
         g_dispatcher.deferEvent([=] {
             parentWidget->setWidth_px(preferredWidth);
+            parentWidget->getWidthHtml().value = preferredWidth;
+            parentWidget->getWidthHtml().valueCalculed = preferredWidth;
         });
     }
 
