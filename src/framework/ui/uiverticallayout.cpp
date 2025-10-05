@@ -97,7 +97,6 @@ bool UIVerticalLayout::internalUpdate()
         // must set the preferred width later
         g_dispatcher.deferEvent([=] {
             parentWidget->setHeight_px(preferredHeight);
-            parentWidget->getHeightHtml().valueCalculed = preferredHeight;
         });
     }
 

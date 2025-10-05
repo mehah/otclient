@@ -154,12 +154,7 @@ namespace {
     }
 
     [[nodiscard]] inline int computeOuterSize(UIWidget* w, bool horizontal) noexcept {
-        const auto textSz = w->getTextSize() + w->getTextOffset().toSize();
-        const int contentPrimary = horizontal ? textSz.width() : textSz.height();
-        const int widgetPrimary = horizontal ? w->getWidth() : w->getHeight();
-        const int htmlPrimary = w->isOnHtml() ? (horizontal ? w->getWidthHtml().valueCalculed
-                                                            : w->getHeightHtml().valueCalculed) : -1;
-        const int base = std::max<int>(contentPrimary, std::max<int>(widgetPrimary, htmlPrimary));
+        const int base = horizontal ? w->getWidth() : w->getHeight();
         if (horizontal)
             return base + w->getMarginLeft() + w->getMarginRight() + w->getPaddingLeft() + w->getPaddingRight();
         return base + w->getMarginTop() + w->getMarginBottom() + w->getPaddingTop() + w->getPaddingBottom();
@@ -168,7 +163,7 @@ namespace {
     [[nodiscard]] inline int computeOuterHeight(UIWidget* w) noexcept { return computeOuterSize(w, false); }
 
     [[nodiscard]] inline int getParentInnerWidth(UIWidget* p) noexcept {
-        const int pw = p->isOnHtml() ? p->getWidthHtml().valueCalculed : p->getWidth();
+        const int pw = p->getWidth();
         return std::max<int>(0, pw - p->getPaddingLeft() - p->getPaddingRight());
     }
 
@@ -445,7 +440,7 @@ namespace {
         for (auto& c : w->getChildren()) {
             if (c->getFloat() == FloatType::None && c->getPositionType() != PositionType::Absolute) {
                 uint8_t check = 2;
-                const int c_width = std::max<int>(c->getWidth(), c->getWidthHtml().valueCalculed) + c->getPaddingLeft() + c->getPaddingRight();
+                const int c_width = c->getWidth() + c->getPaddingLeft() + c->getPaddingRight();
                 if (c_width > 0) {
                     if (breakLine(c->getDisplay())) {
                         if (c_width > width)
@@ -455,7 +450,7 @@ namespace {
                     --check;
                 }
 
-                const int c_height = std::max<int>(c->getHeight(), c->getHeightHtml().valueCalculed) + c->getPaddingTop() + c->getPaddingBottom();
+                const int c_height = c->getHeight() + c->getPaddingTop() + c->getPaddingBottom();
                 if (c_height > 0) {
                     if (breakLine(c->getDisplay()) || c->getPrevWidget() && breakLine(c->getPrevWidget()->getDisplay())) {
                         height += c_height;
@@ -736,8 +731,8 @@ void UIWidget::updateSize() {
             auto parent = getVirtualParent();
             parent->updateSize();
 
-            const int pW = parent->isOnHtml() ? parent->getWidthHtml().valueCalculed : parent->getWidth();
-            const int pH = parent->isOnHtml() ? parent->getHeightHtml().valueCalculed : parent->getHeight();
+            const int pW = parent->getWidth();
+            const int pH = parent->getHeight();
 
             if (updateWidth) {
                 int w = pW
@@ -772,19 +767,13 @@ void UIWidget::updateSize() {
         }
 
         if (widthNeedsUpdate) {
-            if (parent->isOnHtml()) {
-                width = parent->getWidthHtml().valueCalculed;
-            } else width = parent->getWidth();
-
+            width = parent->getWidth();
             if (width > -1)
                 width -= parent->getPaddingLeft() + parent->getPaddingRight();
         }
 
         if (heightNeedsUpdate) {
-            if (parent->isOnHtml()) {
-                height = parent->getHeightHtml().valueCalculed;
-            } else height = parent->getHeight();
-
+            height = parent->getHeight();
             if (height > -1)
                 height -= parent->getPaddingTop() + parent->getPaddingBottom();
         }
