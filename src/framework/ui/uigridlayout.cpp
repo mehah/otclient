@@ -114,7 +114,6 @@ bool UIGridLayout::internalUpdate()
         // must set the preferred height later
         g_dispatcher.deferEvent([=] {
             parentWidget->setHeight_px(preferredHeight);
-            parentWidget->getHeightHtml().value = preferredHeight;
             parentWidget->getHeightHtml().valueCalculed = preferredHeight;
         });
     }
