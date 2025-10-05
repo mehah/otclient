@@ -406,16 +406,14 @@ namespace {
         auto& wHtml = widget->getWidthHtml();
         auto& hHtml = widget->getHeightHtml();
 
-        if (width > -1 && (wHtml.needsUpdate(Unit::Percent) || wHtml.needsUpdate(Unit::Auto))) {
-            if (wHtml.version != SIZE_VERSION_COUNTER) {
-                if (wHtml.needsUpdate(Unit::Percent))
-                    width = std::round(width * (wHtml.value / 100.0));
+        if (width > -1 && (wHtml.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER) || wHtml.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER))) {
+            if (wHtml.needsUpdate(Unit::Percent))
+                width = std::round(width * (wHtml.value / 100.0));
 
-                widget->setWidth_px(width);
-                wHtml.applyUpdate(width, SIZE_VERSION_COUNTER);
+            widget->setWidth_px(width);
+            wHtml.applyUpdate(width, SIZE_VERSION_COUNTER);
 
-                updateChildren = true;
-            }
+            updateChildren = true;
         }
 
         if (height > -1 && hHtml.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER)) {

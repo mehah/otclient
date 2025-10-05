@@ -58,6 +58,8 @@ void UIManager::terminate()
     m_styles.clear();
     m_destroyedWidgets.clear();
     m_checkEvent = nullptr;
+    m_hoveredWidgets.clear();
+    m_pressedWidgets.clear();
 }
 
 void UIManager::render(DrawPoolType drawPane) const
