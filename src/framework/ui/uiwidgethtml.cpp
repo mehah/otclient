@@ -80,6 +80,39 @@ namespace {
         }
     }
 
+    static inline bool widthRequiresContainingBlock(DisplayType d) {
+        switch (d) {
+            case DisplayType::Block:
+            case DisplayType::ListItem:
+            case DisplayType::Flex:
+            case DisplayType::Grid:
+            case DisplayType::InlineBlock:
+            case DisplayType::InlineFlex:
+            case DisplayType::InlineGrid:
+            case DisplayType::Table:
+            case DisplayType::TableCaption:
+            case DisplayType::TableRowGroup:
+            case DisplayType::TableHeaderGroup:
+            case DisplayType::TableFooterGroup:
+            case DisplayType::TableRow:
+            case DisplayType::TableCell:
+                return true;
+
+            case DisplayType::Inline:
+            case DisplayType::Contents:
+            case DisplayType::TableColumn:
+            case DisplayType::TableColumnGroup:
+            case DisplayType::None:
+            case DisplayType::Initial:
+            case DisplayType::Inherit:
+                return false;
+
+            case DisplayType::RunIn:
+                return true;
+        }
+        return false;
+    }
+
     constexpr FloatType mapLogicalFloat(FloatType f) noexcept {
         if (f == FloatType::InlineStart) return FloatType::Left;
         if (f == FloatType::InlineEnd)   return FloatType::Right;
@@ -505,7 +538,7 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
 
     switch (unit) {
         case Unit::Auto: {
-            if (isWidth && m_displayType == DisplayType::Block) {
+            if (isWidth && widthRequiresContainingBlock(m_displayType)) {
                 needUpdate = m_parent != nullptr;
             } else {
                 unit = Unit::FitContent;
