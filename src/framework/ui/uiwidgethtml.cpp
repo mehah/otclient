@@ -416,7 +416,7 @@ namespace {
                 const auto textSize = c->getTextSize() + c->getTextOffset().toSize();
 
                 uint8_t check = 2;
-                const int c_width = std::max<int>(textSize.width(), std::max<int>(c->getWidth(), c->getWidthHtml().valueCalculed)) + c->getPaddingRight();
+                const int c_width = std::max<int>(textSize.width(), std::max<int>(c->getWidth(), c->getWidthHtml().valueCalculed)) + c->getPaddingLeft() + c->getPaddingRight();
                 if (c_width > 0) {
                     if (breakLine(c->getDisplay())) {
                         if (c_width > width)
@@ -426,7 +426,7 @@ namespace {
                     --check;
                 }
 
-                const int c_height = std::max<int>(textSize.height(), std::max<int>(c->getHeight(), c->getHeightHtml().valueCalculed)) + c->getPaddingBottom();
+                const int c_height = std::max<int>(textSize.height(), std::max<int>(c->getHeight(), c->getHeightHtml().valueCalculed)) + c->getPaddingTop() + c->getPaddingBottom();
                 if (c_height > 0) {
                     if (breakLine(c->getDisplay()) || c->getPrevWidget() && breakLine(c->getPrevWidget()->getDisplay())) {
                         height += c_height;
