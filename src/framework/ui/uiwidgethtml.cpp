@@ -866,6 +866,7 @@ void UIWidget::applyAnchorAlignment() {
 
         if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
             addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+            return;
         }
 
         if (anchored) {
