@@ -96,6 +96,31 @@ inline bool luavalue_cast(const int index, int64_t& v)
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 
+inline int push_luavalue(const unsigned long v)
+{
+    if constexpr (sizeof(unsigned long) <= sizeof(uint32_t)) {
+        push_luavalue(static_cast<uint32_t>(v));
+    } else {
+        push_luavalue(static_cast<double>(v));
+    }
+    return 1;
+}
+
+inline bool luavalue_cast(const int index, unsigned long& v)
+{
+    if constexpr (sizeof(unsigned long) <= sizeof(uint32_t)) {
+        uint32_t temp;
+        const bool r = luavalue_cast(index, temp);
+        v = static_cast<unsigned long>(temp);
+        return r;
+    }
+
+    double temp;
+    const bool r = luavalue_cast(index, temp);
+    v = static_cast<unsigned long>(temp);
+    return r;
+}
+
 using lua_u64 = std::conditional_t<sizeof(unsigned long)==8, unsigned long, std::uint64_t>;
 using lua_unsigned_long = lua_u64;
 
