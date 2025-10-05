@@ -41,15 +41,16 @@
     </div>
 
     <div
-      id="test"
-      class="minipanel forge-selection-area forge-selection-area--secondary fusion-result-area"
+      class="minipanel forge-selection-area forge-selection-area--secondary"
       focusable="false"
       title="Further Items Needed For fusion"
+      style="width: 300px"
     >
       <div
         class="forge-result-placeholder"
         focusable="false"
         *visible="not self.modeFusion"
+        style=""
       >
         <div class="forge-required-block">
           <div class="forge-card">
@@ -82,60 +83,44 @@
           </div>
           <div class="forge-counter">
             <label class="forge-full-width-label" text="100"></label>
-            <img class="resource-icon" src="images/icon-currency-dust" />
           </div>
         </div>
 
-        <table class="fusion-stats">
-          <tr>
-            <td text="Success Rate:"></td>
-            <td id="fusionSuccessRateValue" text="50%"></td>
-          </tr>
-          <tr>
-            <td>
-              <button
-                id="fusionImproveButton"
-                class="fusion-stat-button"
-                text="Improve to 65%"
-                onclick="self:onToggleFusionCore('success')"
-              ></button>
-            </td>
-            <td>
-              <div class="status-item status-tertiary fusion-cost">
-                <label class="resource-amount" text="1"></label>
-                <img
-                  class="resource-icon"
-                  src="images/icon-currency-exaltedcore"
-                  style="image-offset: 8 6"
-                />
+        <div>
+          <div class="fusion-improve-container">
+            <div class="fusion-improve-container-text">
+              Success Rate:
+              <div class="fusion-improve-percent-text">50%</div>
+            </div>
+
+            <div class="fusion-improve-button-container">
+              <button style="margin: 0px">Increase to 65%</button>
+              <div class="fusion-improve-tax-container">
+                1
+                <div style="align-items: center">
+                  <img src="images/icon-currency-exaltedcore" />
+                </div>
               </div>
-            </td>
-          </tr>
-          <tr>
-            <td text="Tier Loss:"></td>
-            <td id="fusionTierLossValue" text="100%"></td>
-          </tr>
-          <tr>
-            <td>
-              <button
-                id="fusionReduceButton"
-                class="fusion-stat-button"
-                text="Reduce to 50%"
-                onclick="self:onToggleFusionCore('tier')"
-              ></button>
-            </td>
-            <td>
-              <div class="status-item status-tertiary fusion-cost">
-                <label class="resource-amount" text="1"></label>
-                <img
-                  class="resource-icon"
-                  src="images/icon-currency-exaltedcore"
-                  style="image-offset: 8 6"
-                />
+            </div>
+          </div>
+
+          <div class="fusion-improve-container" style="margin-top: 10px">
+            <div class="fusion-improve-container-text">
+              Tier Loss:
+              <div class="fusion-improve-percent-text">100%</div>
+            </div>
+
+            <div class="fusion-improve-button-container">
+              <button style="margin: 0px">Reduce to 50%</button>
+              <div class="fusion-improve-tax-container">
+                1
+                <div style="align-items: center">
+                  <img src="images/icon-currency-exaltedcore" />
+                </div>
               </div>
-            </td>
-          </tr>
-        </table>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -158,9 +143,10 @@
           </div>
         </div>
       </div>
+
       <img
         class="flow-arrow"
-        style="left: 48px; top: 35px"
+        style="left: 10px; top: 35px"
         src="/images/arrows/icon-arrow-rightlarge"
       />
       <div class="fusion-result-summary">
@@ -177,12 +163,10 @@
           <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
         </UIButton>
         <div anchor="prev" class="forge-result-cost">
-          <label
-            id="fusionResultCostLabel"
-            class="forge-full-width-label"
-            text="???"
-          ></label>
-          <img class="resource-icon" src="/images/game/prey/prey_gold" />
+          <div>
+            {{self.fusionPrice}}
+            <img class="resource-icon" src="/images/game/prey/prey_gold" />
+          </div>
         </div>
       </div>
     </div>

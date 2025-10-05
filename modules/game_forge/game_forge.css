@@ -235,6 +235,8 @@
   display: flex;
   pointer-events: none;
   --phantom: true;
+  width: 300px;
+  height: 90px;
 }
 
 .forge-result-item {

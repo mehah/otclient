@@ -80,3 +80,40 @@
   display: inline-block;
   margin-left: 10px;
 }
+
+.fusion-improve-container {
+  position: relative;
+  width: 135px;
+  height: 40px;
+}
+
+.fusion-improve-container-text {
+  display: flex;
+  position: relative;
+}
+
+.fusion-improve-percent-text {
+  position: absolute;
+  right: 5px;
+  top: 0px;
+  width: 20px;
+}
+
+.fusion-improve-button-container {
+  position: absolute;
+  display: flex;
+  width: 135px;
+  height: 22px;
+  bottom: 0px;
+  left: 0px;
+}
+
+.fusion-improve-tax-container {
+  display: flex;
+  position: absolute;
+  background-color: black;
+  height: 22px;
+  width: 25px;
+  right: 0;
+  padding-top: 5px;
+}
