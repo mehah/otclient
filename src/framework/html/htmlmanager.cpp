@@ -306,6 +306,16 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 }
 
 void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups, const std::string& moduleName) {
+    const auto& styleValue = node->getAttr("style");
+    if (!styleValue.empty()) {
+        parseAttrPropList(styleValue, node->getAttrStyles());
+        for (const auto& [prop, value] : node->getAttrStyles()) {
+            if (isInheritable(prop)) {
+                setChildrenStyles(node, "styles", prop, value);
+            }
+        }
+    }
+
     auto styles = std::make_shared<OTMLNode>();
 
     std::map<std::string, std::string> stylesMerge;
@@ -445,19 +455,11 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
         applyStyleSheet(mainNode, htmlPath, sheet, checkRuleExist);
 
     for (const auto& widget : widgets) {
-        const auto node = widget->getHtmlNode().get();
-        const auto& styleValue = node->getAttr("style");
-        if (!styleValue.empty()) {
-            parseAttrPropList(styleValue, node->getAttrStyles());
-            for (const auto& [prop, value] : node->getAttrStyles()) {
-                if (isInheritable(prop)) {
-                    setChildrenStyles(node, "styles", prop, value);
-                }
-            }
+        if (widget->isDestroyed()) {
+            // It is destroyed because the parent is inherit-text
+            continue;
         }
-    }
 
-    for (const auto& widget : std::views::reverse(widgets)) {
         const auto node = widget->getHtmlNode().get();
         const auto w = widget.get();
         applyAttributesAndStyles(w, node, root.groups, moduleName);
