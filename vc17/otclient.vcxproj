@@ -332,7 +332,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp">
+    <ClCompile Include="..\src\framework\pch.cpp">
       <IncludeInUnityFile>false</IncludeInUnityFile>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
