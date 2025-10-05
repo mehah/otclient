@@ -474,7 +474,11 @@ protected:
 
     // function shortcuts
 public:
-    void resize(const int width, const int height) { setRect(Rect(getPosition(), Size(width, height))); }
+    void resize(const int width, const int height) {
+        m_width.valueCalculed = width;
+        m_height.valueCalculed = height;
+        setRect(Rect(getPosition(), Size(width, height)));
+    }
     void move(int x, int y);
     void rotate(const float degrees) { setRotation(degrees); }
     void hide() { setVisible(false); }
@@ -582,7 +586,9 @@ public:
     void setWidth(std::string widthStr) { applyDimension(true, std::move(widthStr)); }
     void setWidth_px(const int width) { resize(width, getHeight()); }
     void setHeight_px(const int height) { resize(getWidth(), height); }
-    void setSize(const Size& size) { resize(size.width(), size.height()); }
+    void setSize(const Size& size) {
+        resize(size.width(), size.height());
+    }
     void setMinWidth(const int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
     void setMaxWidth(const int maxWidth) { m_maxSize.setWidth(maxWidth); setRect(m_rect); }
     void setMinHeight(const int minHeight) { m_minSize.setHeight(minHeight); setRect(m_rect); }
