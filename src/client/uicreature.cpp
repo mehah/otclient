@@ -58,7 +58,7 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
         if (node->tag() == "creature-center") {
             m_center = node->value<bool>();
         } else if (node->tag() == "creature-size") {
-            m_creatureSize = node->value<int>();
+            setCreatureSize(node->value<int>());
         } else if (node->tag() == "outfit-id") {
             auto outfit = getOutfit();
             outfit.setCategory(ThingCategoryCreature);
