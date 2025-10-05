@@ -371,7 +371,7 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
     forgeController.historyLastPage = lastPage
 
     forgeController.historyMustDisablePreviousButton = page <= 1
-    forgeController.historyMustDisableNextButton = page >= lastPage
+    forgeController.historyMustDisableNextButton = page == lastPage
 
     local historyPanel = forgeController:loadTab('history')
     if not historyPanel then

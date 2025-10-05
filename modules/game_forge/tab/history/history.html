@@ -21,7 +21,7 @@
 
     <div class="history-footer">
       <button
-        *disabled="self.historyMustDisplayPreviousButton"
+        *disabled="self.historyMustDisablePreviousButton"
         class="history-footer-previous"
         onclick="self:onHistoryPreviousPage()"
       >
@@ -31,7 +31,7 @@
         {{self.historyCurrentPage}}/{{self.historyLastPage}}
       </div>
       <button
-        *disabled="self.historyMustDisplayNextButton"
+        *disabled="self.historyMustDisableNextButton"
         class="history-footer-next"
         onclick="self:onHistoryNextPage()"
       >
