@@ -384,35 +384,6 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
         entry.description = entry.description or '-'
     end
     forgeController.historyList = historyList or {}
-    g_logger.info("forgeController.historyList: " ..
-        tostring(forgeController.historyList[1].createdAt .. " desc> " .. forgeController.historyList[1].description))
-
-    -- local pageLabel = historyPanel.historyPageLabel
-    -- if not pageLabel or pageLabel:isDestroyed() then
-    --     pageLabel = historyPanel:recursiveGetChildById('historyPageLabel')
-    --     historyPanel.historyPageLabel = pageLabel
-    -- end
-    -- if pageLabel then
-    --     pageLabel:setText(tr('Page %d/%d', page, lastPage))
-    -- end
-
-    -- local prevButton = historyPanel.previousPageButton
-    -- if not prevButton or prevButton:isDestroyed() then
-    --     prevButton = historyPanel:recursiveGetChildById('previousPageButton')
-    --     historyPanel.previousPageButton = prevButton
-    -- end
-    -- if prevButton then
-    --     prevButton:setVisible(page > 1)
-    -- end
-
-    -- local nextButton = historyPanel.nextPageButton
-    -- if not nextButton or nextButton:isDestroyed() then
-    --     nextButton = historyPanel:recursiveGetChildById('nextPageButton')
-    --     historyPanel.nextPageButton = nextButton
-    -- end
-    -- if nextButton then
-    --     nextButton:setVisible(lastPage > page)
-    -- end
 end
 
 function forgeController:onHistoryPreviousPage()
