@@ -359,99 +359,78 @@ function forgeController:getCurrentWindow()
     return self.currentWindowType and windowTypes[self.currentWindowType]
 end
 
+forgeController.historyCurrentPage = 1
+forgeController.historyLastPage = 1
 function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
-    local state = forgeController.historyState or {}
     page = math.max(tonumber(page) or 1, 1)
     lastPage = math.max(tonumber(lastPage) or page, 1)
     currentCount = tonumber(currentCount) or 0
-
     lastPage = lastPage > 1 and lastPage - 1 or lastPage
 
-    state.page = page
-    state.lastPage = lastPage
-    state.currentCount = currentCount
-    forgeController.historyState = state
-
+    forgeController.historyCurrentPage = page
+    forgeController.historyLastPage = lastPage
     local historyPanel = forgeController:loadTab('history')
     if not historyPanel then
         return
     end
 
-    local historyListWidget = resolveHistoryList(historyPanel)
-    if not historyListWidget then
+    for index, entry in ipairs(historyList) do
+        entry.createdAt = formatHistoryDate(entry.createdAt)
+        entry.actionType = historyActionLabels[entry.actionType]
+        entry.description = entry.description or '-'
+    end
+    forgeController.historyList = historyList or {}
+    g_logger.info("forgeController.historyList: " ..
+        tostring(forgeController.historyList[1].createdAt .. " desc> " .. forgeController.historyList[1].description))
+
+    -- local pageLabel = historyPanel.historyPageLabel
+    -- if not pageLabel or pageLabel:isDestroyed() then
+    --     pageLabel = historyPanel:recursiveGetChildById('historyPageLabel')
+    --     historyPanel.historyPageLabel = pageLabel
+    -- end
+    -- if pageLabel then
+    --     pageLabel:setText(tr('Page %d/%d', page, lastPage))
+    -- end
+
+    -- local prevButton = historyPanel.previousPageButton
+    -- if not prevButton or prevButton:isDestroyed() then
+    --     prevButton = historyPanel:recursiveGetChildById('previousPageButton')
+    --     historyPanel.previousPageButton = prevButton
+    -- end
+    -- if prevButton then
+    --     prevButton:setVisible(page > 1)
+    -- end
+
+    -- local nextButton = historyPanel.nextPageButton
+    -- if not nextButton or nextButton:isDestroyed() then
+    --     nextButton = historyPanel:recursiveGetChildById('nextPageButton')
+    --     historyPanel.nextPageButton = nextButton
+    -- end
+    -- if nextButton then
+    --     nextButton:setVisible(lastPage > page)
+    -- end
+end
+
+function forgeController:onHistoryPreviousPage()
+    local currentPage = forgeController.historyCurrentPage or 1
+    g_logger.info("onHistoryPreviousPage>Current page: " .. tostring(currentPage))
+    if currentPage <= 1 then
         return
     end
 
-    historyListWidget:destroyChildren()
+    g_game.sendForgeBrowseHistoryRequest(currentPage - 1)
+end
 
-    if historyList and #historyList > 0 then
-        for index, entry in ipairs(historyList) do
-            local row = g_ui.createWidget('HistoryForgePanel', historyListWidget)
-            if row then
-                local rowBackground = index % 2 == 1 and '#484848' or '#414141'
-                row:setBackgroundColor(rowBackground)
-                local dateLabel = row:getChildById('date')
-                if dateLabel then
-                    dateLabel:setText(formatHistoryDate(entry.createdAt))
-                end
+function forgeController:onHistoryNextPage()
+    local currentPage = forgeController.historyCurrentPage or 1
+    g_logger.info("onHistoryNextPage>Current page: " .. tostring(currentPage))
+    local lastPage = forgeController.historyLastPage or currentPage
 
-                local actionLabel = row:getChildById('action')
-                if actionLabel then
-                    actionLabel:setText(historyActionLabels[entry.actionType] or tr('Unknown'))
-                end
-
-                local detailLabel = row:getChildById('details')
-                if detailLabel then
-                    detailLabel:setText(entry.description or '')
-                end
-            end
-        end
-    else
-        local emptyRow = g_ui.createWidget('HistoryForgePanel', historyListWidget)
-        if emptyRow then
-            local dateLabel = emptyRow:getChildById('date')
-            if dateLabel then
-                dateLabel:setText('-')
-            end
-
-            local actionLabel = emptyRow:getChildById('action')
-            if actionLabel then
-                actionLabel:setText(tr('No history'))
-            end
-
-            local detailLabel = emptyRow:getChildById('details')
-            if detailLabel then
-                detailLabel:setText(tr('There are no forge history entries to display.'))
-            end
-        end
+    if currentPage >= lastPage then
+        return
     end
 
-    local pageLabel = historyPanel.historyPageLabel
-    if not pageLabel or pageLabel:isDestroyed() then
-        pageLabel = historyPanel:recursiveGetChildById('historyPageLabel')
-        historyPanel.historyPageLabel = pageLabel
-    end
-    if pageLabel then
-        pageLabel:setText(tr('Page %d/%d', page, lastPage))
-    end
-
-    local prevButton = historyPanel.previousPageButton
-    if not prevButton or prevButton:isDestroyed() then
-        prevButton = historyPanel:recursiveGetChildById('previousPageButton')
-        historyPanel.previousPageButton = prevButton
-    end
-    if prevButton then
-        prevButton:setVisible(page > 1)
-    end
-
-    local nextButton = historyPanel.nextPageButton
-    if not nextButton or nextButton:isDestroyed() then
-        nextButton = historyPanel:recursiveGetChildById('nextPageButton')
-        historyPanel.nextPageButton = nextButton
-    end
-    if nextButton then
-        nextButton:setVisible(lastPage > page)
-    end
+    g_game.sendForgeBrowseHistoryRequest(currentPage + 1)
 end
 
 function forgeController:onTerminate()
