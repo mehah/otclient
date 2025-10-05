@@ -96,6 +96,11 @@ inline bool luavalue_cast(const int index, int64_t& v)
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 
+using lua_u64 = std::conditional_t<sizeof(unsigned long)==8, unsigned long, std::uint64_t>;
+using lua_unsigned_long = lua_u64;
+
+static_assert(sizeof(lua_u64) == 8, "lua_u64 must be 64-bit");
+
 inline int push_luavalue(const unsigned long v)
 {
     if constexpr (sizeof(unsigned long) <= sizeof(uint32_t)) {
@@ -121,17 +126,14 @@ inline bool luavalue_cast(const int index, unsigned long& v)
     return r;
 }
 
-using lua_u64 = std::conditional_t<sizeof(unsigned long)==8, unsigned long, std::uint64_t>;
-using lua_unsigned_long = lua_u64;
-
-static_assert(sizeof(lua_u64) == 8, "lua_u64 must be 64-bit");
-
-inline int push_luavalue(lua_u64 v) {
+inline std::enable_if_t<!std::is_same_v<lua_u64, unsigned long>, int> push_luavalue(lua_u64 v)
+{
     push_luavalue(static_cast<double>(v));
     return 1;
 }
 
-inline bool luavalue_cast(int idx, lua_u64& v) {
+inline std::enable_if_t<!std::is_same_v<lua_u64, unsigned long>, bool> luavalue_cast(int idx, lua_u64& v)
+{
     double d;
     bool r = luavalue_cast(idx, d);
     v = static_cast<lua_u64>(d);
