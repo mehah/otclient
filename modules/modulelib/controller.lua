@@ -33,13 +33,15 @@ local function onGameEnd(self)
         self.events[TypeEvent.GAME_INIT] = nil
     end
 
-    local scheduledEventsList = self.scheduledEvents[TypeEvent.GAME_INIT]
+    local scheduledEventsList = self.scheduledEvents and self.scheduledEvents[TypeEvent.GAME_INIT]
     if scheduledEventsList then
         for _, eventId in pairs(scheduledEventsList) do
             removeEvent(eventId)
         end
 
-        self.scheduledEvents[TypeEvent.GAME_INIT] = nil
+        if self.scheduledEvents then
+            self.scheduledEvents[TypeEvent.GAME_INIT] = nil
+        end
     end
 
     if self.dataUI ~= nil and self.dataUI.onGameStart and self.ui then
@@ -242,7 +244,7 @@ function Controller:terminate()
         end
     end
 
-    for type, events in pairs(self.scheduledEvents) do
+    for type, events in pairs(self.scheduledEvents or {}) do
         if events ~= nil then
             for _, eventId in pairs(events) do
                 removeEvent(eventId)
@@ -327,14 +329,18 @@ end
 
 local function registerScheduledEvent(controller, fncRef, fnc, delay, name)
     local currentType = controller.currentTypeEvent
+    controller.scheduledEvents = controller.scheduledEvents or {}
     if controller.scheduledEvents[currentType] == nil then
         controller.scheduledEvents[currentType] = {}
     end
 
     local _rmvEvent = function()
-        if controller.scheduledEvents[currentType][name] then
-            removeEvent(controller.scheduledEvents[currentType][name])
-            controller.scheduledEvents[currentType][name] = nil
+        if not controller.scheduledEvents then return end
+        local list = controller.scheduledEvents[currentType]
+        if not list then return end
+        if name and list[name] then
+            removeEvent(list[name])
+            list[name] = nil
         end
     end
     _rmvEvent()
@@ -347,7 +353,9 @@ local function registerScheduledEvent(controller, fncRef, fnc, delay, name)
             if name then
                 _rmvEvent()
             else
-                table.removevalue(controller.scheduledEvents[currentType], evt)
+                if controller.scheduledEvents and controller.scheduledEvents[currentType] then
+                    table.removevalue(controller.scheduledEvents[currentType], evt)
+                end
             end
         elseif res == false then
             removeEvent(evt)
@@ -357,9 +365,13 @@ local function registerScheduledEvent(controller, fncRef, fnc, delay, name)
     evt = fncRef(action, delay)
 
     if name then
-        controller.scheduledEvents[currentType][name] = evt
+        if controller.scheduledEvents then
+            controller.scheduledEvents[currentType][name] = evt
+        end
     else
-        table.insert(controller.scheduledEvents[currentType], evt)
+        if controller.scheduledEvents and controller.scheduledEvents[currentType] then
+            table.insert(controller.scheduledEvents[currentType], evt)
+        end
     end
 
     return evt
