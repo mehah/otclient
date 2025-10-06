@@ -215,6 +215,13 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 end
 
 function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, membersData, membersName)
+	-- Check if server is telling us party is disbanded (empty data)
+	if not membersData or not next(membersData) or not membersName or #membersName == 0 then
+		print("PartyHuntAnalyser: Server indicates party is disbanded - clearing data")
+		PartyHuntAnalyser:reset()
+		return
+	end
+	
 	-- startTime appears to be the session duration in seconds, not actual start time
 	-- So we calculate the actual session start time
 	PartyHuntAnalyser.session = os.time() - startTime
@@ -244,7 +251,7 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	
 	-- If membersData keys are player IDs, use them directly
 	-- If they are positions (1,2,3...), we need to map them to the actual player IDs
-	-- But don't completely overwrite existing data - merge it instead
+	-- Server data is authoritative, so we can safely replace our data with server data
 	local newMembersData = membersData
 	
 	-- Convert membersName from array format to lookup table format
@@ -288,19 +295,40 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 		end
 	end
 	
-	-- Merge server data with existing manually tracked members
-	-- Server data takes priority for existing members, but preserve manually added ones
+	-- Server data is authoritative - replace our data with server data
+	-- This ensures that if a player left the party, they are removed from our tracking
+	local serverMemberIds = {}
 	for playerId, serverData in pairs(newMembersData) do
+		serverMemberIds[playerId] = true
 		PartyHuntAnalyser.membersData[playerId] = serverData
 		if newMembersName[playerId] then
 			PartyHuntAnalyser.membersName[playerId] = newMembersName[playerId]
 		end
 	end
 	
-	-- Update names for any existing members we have but server doesn't
+	-- Remove any members we have locally but server doesn't (they left the party)
+	local membersToRemove = {}
 	for playerId, existingData in pairs(PartyHuntAnalyser.membersData) do
-		if newMembersName[playerId] then
-			PartyHuntAnalyser.membersName[playerId] = newMembersName[playerId]
+		if not serverMemberIds[playerId] then
+			table.insert(membersToRemove, playerId)
+		end
+	end
+	
+	-- Remove members that are no longer in the party according to server
+	for _, playerId in ipairs(membersToRemove) do
+		local playerName = PartyHuntAnalyser.membersName[playerId] or "Unknown"
+		print("PartyHuntAnalyser: Server indicates " .. playerName .. " left party - removing")
+		
+		PartyHuntAnalyser.membersData[playerId] = nil
+		PartyHuntAnalyser.membersName[playerId] = nil
+		
+		-- Remove widget from UI
+		local contentsPanel = PartyHuntAnalyser.window.contentsPanel
+		if contentsPanel and contentsPanel.party then
+			local widget = contentsPanel.party:getChildById(playerId)
+			if widget then
+				widget:destroy()
+			end
 		end
 	end
 
@@ -429,27 +457,32 @@ function PartyHuntAnalyser:lootSplitter()
 end
 
 function onShieldChange(creature, shieldId)
-    -- Handle local player becoming party leader
+    -- Handle local player becoming party leader or leaving party
     if creature == g_game.getLocalPlayer() then
         if table.contains({ShieldYellow, ShieldYellowSharedExp, ShieldYellowNoSharedExpBlink}, shieldId) and not packetSend then
 			PartyHuntAnalyser.leader = true
             packetSend = true
             PartyHuntAnalyser:updateWindow(true)
         elseif shieldId == 0 and packetSend then
+			-- Local player left party - clear all party data
 			PartyHuntAnalyser.leader = false
             packetSend = false
             PartyHuntAnalyser.session = os.time()
             if PartyHuntAnalyser.event then PartyHuntAnalyser.event:cancel() end
+            
+            -- Clear all party members when local player leaves party
+            print("[PartyTracker] Local player left party - clearing all party data")
+            PartyHuntAnalyser:reset()
+            return
         end
     end
     
-    -- Only trigger party member detection for significant shield changes
-    -- that indicate joining or leaving a party (not just shield updates)
-    if creature:isPlayer() then
+    -- Only add new party members when they become visible, never remove based on visibility
+    if creature:isPlayer() and creature ~= g_game.getLocalPlayer() then
         local oldShield = creature.lastKnownShield or ShieldNone
         creature.lastKnownShield = shieldId
         
-        -- Check if this is a transition from/to party membership
+        -- Check if this player just joined the party (became party member from non-party state)
         local wasPartyMember = (oldShield == ShieldYellow or oldShield == ShieldYellowSharedExp or 
                                oldShield == ShieldYellowNoSharedExpBlink or oldShield == ShieldYellowNoSharedExp or 
                                oldShield == ShieldBlue or oldShield == ShieldBlueSharedExp or 
@@ -460,41 +493,27 @@ function onShieldChange(creature, shieldId)
                               shieldId == ShieldBlue or shieldId == ShieldBlueSharedExp or 
                               shieldId == ShieldBlueNoSharedExpBlink or shieldId == ShieldBlueNoSharedExp)
         
-        -- Only trigger if there's a meaningful change in party membership
-        if wasPartyMember ~= isPartyMember then
-            print("[PartyShieldChange] " .. creature:getName() .. " party status changed: " .. tostring(wasPartyMember) .. " -> " .. tostring(isPartyMember))
+        -- Only add new party members when they become visible with party shield
+        if not wasPartyMember and isPartyMember then
+            print("[PartyTracker] New party member detected: " .. creature:getName())
             
-            scheduleEvent(function()
-                -- Get current party members and trigger the event
-                local localPlayer = g_game.getLocalPlayer()
-                if not localPlayer then return end
+            -- Add this new party member to our tracking
+            local memberId = creature:getId()
+            if not PartyHuntAnalyser.membersData[memberId] then
+                PartyHuntAnalyser.membersData[memberId] = {
+                    0, -- memberID (not used in data array)
+                    1, -- highlight (active)
+                    0, -- loot
+                    0, -- supplies
+                    0, -- damage
+                    0  -- healing
+                }
+                PartyHuntAnalyser.membersName[memberId] = creature:getName()
+                print("PartyHuntAnalyser: Added new visible party member - " .. creature:getName() .. " (ID: " .. memberId .. ")")
                 
-                local currentMembers = {}
-                local spectators = g_map.getSpectators(localPlayer:getPosition(), false)
-                
-                for _, spec in ipairs(spectators) do
-                    if spec:isPlayer() then
-                        local shield = spec:getShield()
-                        -- Only include actual party members (exclude invitations)
-                        if shield == ShieldYellow or shield == ShieldYellowSharedExp or shield == ShieldYellowNoSharedExpBlink or 
-                           shield == ShieldYellowNoSharedExp or shield == ShieldBlue or shield == ShieldBlueSharedExp or 
-                           shield == ShieldBlueNoSharedExpBlink or shield == ShieldBlueNoSharedExp then
-                            table.insert(currentMembers, spec)
-                        end
-                    end
-                end
-                
-                -- Add local player if they have party shield
-                local localShield = localPlayer:getShield()
-                if localShield == ShieldYellow or localShield == ShieldYellowSharedExp or localShield == ShieldYellowNoSharedExpBlink or 
-                   localShield == ShieldYellowNoSharedExp or localShield == ShieldBlue or localShield == ShieldBlueSharedExp or 
-                   localShield == ShieldBlueNoSharedExpBlink or localShield == ShieldBlueNoSharedExp then
-                    table.insert(currentMembers, localPlayer)
-                end
-                
-                -- Trigger the party members change event
-                onPartyMembersChange(localPlayer, currentMembers)
-            end, 200) -- Slightly longer delay to ensure shield changes are complete
+                -- Update UI to show the new member
+                PartyHuntAnalyser:updateWindow(true)
+            end
         end
     end
 end
@@ -502,6 +521,7 @@ end
 function onPartyMembersChange(self, members)
 	if #members == 0 then
 		-- Party completely disbanded - reset everything
+		print("[PartyTracker] Party disbanded - resetting all data")
 		PartyHuntAnalyser:reset()
 
 		local contentsPanel = PartyHuntAnalyser.window.contentsPanel
@@ -510,22 +530,17 @@ function onPartyMembersChange(self, members)
 			contentsPanel.party:setHeight(61)
 		end
 	else
-		-- Party still exists but members may have changed
+		-- Party exists - preserve all existing members and add any new ones
 		local contentsPanel = PartyHuntAnalyser.window.contentsPanel
 		if contentsPanel and contentsPanel.party then
-			-- Get current member IDs from the party
-			local currentMemberIds = {}
+			-- Get current member IDs from the provided members list
+			local visibleMemberIds = {}
 			for _, member in ipairs(members) do
-				currentMemberIds[member:getId()] = true
+				visibleMemberIds[member:getId()] = member
 			end
 			
-			-- Add local player to current members (they might not be in the members list if they're the leader)
-			local localPlayer = g_game.getLocalPlayer()
-			if localPlayer then
-				currentMemberIds[localPlayer:getId()] = true
-			end
-			
-			-- Add new party members who joined
+			-- Add any new party members who aren't already tracked
+			local newMembersAdded = false
 			for _, member in ipairs(members) do
 				local memberId = member:getId()
 				if not PartyHuntAnalyser.membersData[memberId] then
@@ -540,54 +555,21 @@ function onPartyMembersChange(self, members)
 					}
 					PartyHuntAnalyser.membersName[memberId] = member:getName()
 					print("PartyHuntAnalyser: Added new party member - " .. member:getName() .. " (ID: " .. memberId .. ")")
+					newMembersAdded = true
+				else
+					-- Update name in case it changed
+					PartyHuntAnalyser.membersName[memberId] = member:getName()
 				end
 			end
 			
-			-- Also add local player if they have party shield and aren't already tracked
-			if localPlayer then
-				local localId = localPlayer:getId()
-				if currentMemberIds[localId] and not PartyHuntAnalyser.membersData[localId] then
-					PartyHuntAnalyser.membersData[localId] = {
-						0, -- memberID (not used in data array)
-						1, -- highlight (active)
-						0, -- loot
-						0, -- supplies
-						0, -- damage
-						0  -- healing
-					}
-					PartyHuntAnalyser.membersName[localId] = localPlayer:getName()
-					print("PartyHuntAnalyser: Added local player to party - " .. localPlayer:getName() .. " (ID: " .. localId .. ")")
-				end
-			end
-			
-			-- Remove widgets and data for players no longer in party
-			local playersToRemove = {}
-			for playerId, data in pairs(PartyHuntAnalyser.membersData) do
-				if not currentMemberIds[playerId] then
-					table.insert(playersToRemove, playerId)
-				end
-			end
-			
-			-- Remove the players that left
-			for _, playerId in ipairs(playersToRemove) do
-				local playerName = PartyHuntAnalyser.membersName[playerId] or "Unknown"
-				print("PartyHuntAnalyser: Removed party member - " .. playerName .. " (ID: " .. playerId .. ")")
-				
-				-- Remove from data structures
-				PartyHuntAnalyser.membersData[playerId] = nil
-				PartyHuntAnalyser.membersName[playerId] = nil
-				
-				-- Remove widget from UI
-				local widget = contentsPanel.party:getChildById(playerId)
-				if widget then
-					widget:destroy()
-				end
-			end
-			
-			-- Update the window to show changes (new members or removed members)
-			if #playersToRemove > 0 or #members > 0 then
+			-- Update the window to show changes only if new members were added
+			if newMembersAdded then
 				PartyHuntAnalyser:updateWindow(true)
 			end
+			
+			-- NOTE: We do NOT remove party members here when they're not visible
+			-- Party members should persist even when they move far away
+			-- Only the server data (onPartyAnalyzer) or explicit party disband should remove members
 		end
 	end
 end
