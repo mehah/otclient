@@ -45,12 +45,11 @@ namespace stdext
     inline void writeSLE32(uint8_t* addr, const int32_t value) { writeSLE16(addr + 2, value >> 16); writeSLE16(addr, static_cast<int16_t>(value)); }
     inline void writeSLE64(uint8_t* addr, const int64_t value) { writeSLE32(addr + 4, value >> 32); writeSLE32(addr, static_cast<int32_t>(value)); }
 
-    uint32_t adler32(const uint8_t* buffer, size_t size);
+    uint32_t computeChecksum(std::span<const uint8_t> data) noexcept;
     int random_range(int min, int max);
     float random_range(float min, float max);
     int32_t normal_random(int32_t minNumber, int32_t maxNumber);
     bool random_bool(double probability = 0.5);
     std::mt19937& random_gen();
 
-    inline static uint32_t circularShift(const int bits, const uint32_t value) { return (value << bits) | (value >> (32 - bits)); }
 }

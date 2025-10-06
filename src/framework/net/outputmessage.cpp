@@ -115,7 +115,8 @@ void OutputMessage::encryptRsa()
 
 void OutputMessage::writeChecksum()
 {
-    const uint32_t checksum = stdext::adler32(m_buffer + m_headerPos, m_messageSize);
+    const auto messageSize = static_cast<uInt>(m_messageSize);
+    const uint32_t checksum = stdext::computeChecksum({ m_buffer + m_headerPos, messageSize });
     assert(m_headerPos - 4 >= 0);
     m_headerPos -= 4;
     stdext::writeULE32(m_buffer + m_headerPos, checksum);

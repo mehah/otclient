@@ -29,6 +29,7 @@
 #include <framework/platform/platform.h>
 
 #include <set>
+#include <type_traits>
 
 template<typename T>
 int push_internal_luavalue(T v);
@@ -96,22 +97,50 @@ inline bool luavalue_cast(const int index, int64_t& v)
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 
-#ifdef __APPLE__
-// ulong
-inline int push_luavalue(ulong v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(int index, ulong& v)
-{
-    double d;
-    const bool r = luavalue_cast(index, d); v = d; return r;
-}
-#endif
+using lua_u64 = std::conditional_t<sizeof(unsigned long)==8, unsigned long, std::uint64_t>;
+using lua_unsigned_long = lua_u64;
 
-// uint64
-inline int push_luavalue(const uint64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
-inline bool luavalue_cast(const int index, uint64_t& v)
+static_assert(sizeof(lua_u64) == 8, "lua_u64 must be 64-bit");
+
+inline int push_luavalue(const unsigned long v)
+{
+    if constexpr (sizeof(unsigned long) <= sizeof(uint32_t)) {
+        push_luavalue(static_cast<uint32_t>(v));
+    } else {
+        push_luavalue(static_cast<double>(v));
+    }
+    return 1;
+}
+
+inline bool luavalue_cast(const int index, unsigned long& v)
+{
+    if constexpr (sizeof(unsigned long) <= sizeof(uint32_t)) {
+        uint32_t temp;
+        const bool r = luavalue_cast(index, temp);
+        v = static_cast<unsigned long>(temp);
+        return r;
+    }
+
+    double temp;
+    const bool r = luavalue_cast(index, temp);
+    v = static_cast<unsigned long>(temp);
+    return r;
+}
+
+template<typename T = lua_u64, std::enable_if_t<!std::is_same_v<T, unsigned long>, int> = 0>
+inline int push_luavalue(lua_u64 v)
+{
+    push_luavalue(static_cast<double>(v));
+    return 1;
+}
+
+template<typename T = lua_u64, std::enable_if_t<!std::is_same_v<T, unsigned long>, int> = 0>
+inline bool luavalue_cast(const int idx, lua_u64& v)
 {
     double d;
-    const bool r = luavalue_cast(index, d); v = d; return r;
+    const bool r = luavalue_cast(idx, d);
+    v = static_cast<lua_u64>(d);
+    return r;
 }
 
 // string

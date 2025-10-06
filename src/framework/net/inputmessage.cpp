@@ -129,7 +129,8 @@ void InputMessage::setHeaderSize(const uint16_t size)
 bool InputMessage::readChecksum()
 {
     const uint32_t receivedCheck = getU32();
-    const uint32_t checksum = stdext::adler32(m_buffer + m_readPos, getUnreadSize());
+    const auto unread = static_cast<uint32_t>(getUnreadSize());
+    const uint32_t checksum = stdext::computeChecksum({ m_buffer + m_readPos, unread });
     return receivedCheck == checksum;
 }
 

@@ -43,7 +43,7 @@ public:
 
     CreaturePtr getCreature() { return m_creature; }
     uint8_t getCreatureSize() { return m_creatureSize; }
-    void setCreatureSize(const uint8_t size) { m_creatureSize = size; }
+    void setCreatureSize(const uint8_t size) { setSize(m_creatureSize = size); }
 
     void setCenter(const bool v) { m_center = v; }
     bool isCentered() { return m_center; }
@@ -51,17 +51,6 @@ public:
     void setShader(std::string_view name) override;
     bool hasShader() override;
 
-    /*
-    // @ note:
-    this did not work:
-    UIcreature:getCreature():getDirection()
-    UIcreature:getDirection()
-    in game_outfit
-    function updatePreview()
-        local direction = previewCreature:getDirection()
-
-    plan b:
-    */
     Otc::Direction getDirection() {
         if (m_creature != nullptr) {
             return m_creature->getDirection();
@@ -85,5 +74,5 @@ protected:
     uint8_t m_creatureSize{ 0 };
     Otc::Direction m_direction{ Otc::South };
     Outfit m_outfit;
-    bool m_center{ false };
+    bool m_center{ true };
 };

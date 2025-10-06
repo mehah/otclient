@@ -2081,6 +2081,9 @@ bool UIWidget::propagateOnKeyUp(const uint8_t keyCode, const int keyboardModifie
 
 bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList, bool checkContainsPoint)
 {
+    if (isClipping() && !containsPaddingPoint(mousePos))
+        return false;
+
     bool ret = false;
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->isExplicitlyEnabled() && child->isExplicitlyVisible()) {
