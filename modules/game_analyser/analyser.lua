@@ -7,6 +7,10 @@ end
 openedWindows = {}
 cancelNextRelease = nil
 
+-- Party member tracking
+partyMemberCheckEvent = nil
+local lastPartyMembers = {}
+
 local analyserWindows = {
   huntingButton = 'styles/hunting',
   lootButton = 'styles/loot',
@@ -182,13 +186,18 @@ function init()
 
   connect(LocalPlayer, {
     onExperienceChange = onExperienceChange,
-    onLevelChange = onLevelChange,
-    onPartyMembersChange = onPartyMembersChange
+    onLevelChange = onLevelChange
   })
 
   connect(Creature, {
       onShieldChange = onShieldChange,
   })
+  
+  -- Set up party member tracking
+  if partyMemberCheckEvent then
+    partyMemberCheckEvent:cancel()
+  end
+  partyMemberCheckEvent = cycleEvent(checkPartyMembersChange, 1000)
 
   -- DEBUG: Auto-test XP gain after 5 seconds
   -- scheduleEvent(function()
@@ -235,13 +244,18 @@ function terminate()
   })
   disconnect(LocalPlayer, {
     onExperienceChange = onExperienceChange,
-    onLevelChange = onLevelChange,
-    onPartyMembersChange = onPartyMembersChange
+    onLevelChange = onLevelChange
   })
 
   disconnect(Creature, {
       onShieldChange = onShieldChange,
   })
+  
+  -- Clean up party member tracking
+  if partyMemberCheckEvent then
+    partyMemberCheckEvent:cancel()
+    partyMemberCheckEvent = nil
+  end
 
 end
 
@@ -572,6 +586,75 @@ end
 
 function onPartyAnalyzer(startTime, leaderID, lootType, membersData, membersName)
   PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, membersData, membersName)
+end
+
+function onPartyMembersChange(self, members)
+  PartyHuntAnalyser.onPartyMembersChange(self, members)
+end
+
+-- Alternative implementation that manually tracks party members through spectators
+function checkPartyMembersChange()
+  if not g_game.isOnline() then return end
+  
+  local localPlayer = g_game.getLocalPlayer()
+  if not localPlayer then return end
+  
+  -- Get current party members by checking shields of all visible players
+  local currentMembers = {}
+  local spectators = g_map.getSpectators(localPlayer:getPosition(), false)
+  
+  for _, creature in ipairs(spectators) do
+    if creature:isPlayer() then
+      local shield = creature:getShield()
+      -- Check if creature has ACTUAL party shield (exclude invitation shields)
+      -- ShieldWhiteYellow = pending invitation from player (not actual member)
+      -- ShieldWhiteBlue = pending invitation to player (not actual member)
+      if shield == ShieldYellow or shield == ShieldYellowSharedExp or shield == ShieldYellowNoSharedExpBlink or 
+         shield == ShieldYellowNoSharedExp or shield == ShieldBlue or shield == ShieldBlueSharedExp or 
+         shield == ShieldBlueNoSharedExpBlink or shield == ShieldBlueNoSharedExp then
+        table.insert(currentMembers, creature)
+      end
+    end
+  end
+  
+  -- Add local player if they have an ACTUAL party shield (not invitation)
+  local localShield = localPlayer:getShield()
+  if localShield == ShieldYellow or localShield == ShieldYellowSharedExp or localShield == ShieldYellowNoSharedExpBlink or 
+     localShield == ShieldYellowNoSharedExp or localShield == ShieldBlue or localShield == ShieldBlueSharedExp or 
+     localShield == ShieldBlueNoSharedExpBlink or localShield == ShieldBlueNoSharedExp then
+    table.insert(currentMembers, localPlayer)
+  end
+  
+  -- Compare with last known party members
+  local membersChanged = false
+  
+  -- Check if member count changed
+  if #currentMembers ~= #lastPartyMembers then
+    membersChanged = true
+  else
+    -- Check if any member IDs changed
+    local currentIds = {}
+    for _, member in ipairs(currentMembers) do
+      currentIds[member:getId()] = true
+    end
+    
+    for _, lastMember in ipairs(lastPartyMembers) do
+      if not currentIds[lastMember:getId()] then
+        membersChanged = true
+        break
+      end
+    end
+  end
+  
+  -- If members changed, call the handler
+  if membersChanged then
+    print("[PartyTracker] Party members changed: " .. #lastPartyMembers .. " -> " .. #currentMembers)
+    onPartyMembersChange(localPlayer, currentMembers)
+    lastPartyMembers = {}
+    for _, member in ipairs(currentMembers) do
+      table.insert(lastPartyMembers, member)
+    end
+  end
 end
 
 function onBossCooldown(cooldown)

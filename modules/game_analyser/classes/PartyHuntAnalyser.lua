@@ -36,7 +36,7 @@ local packetSend = false
 
 function PartyHuntAnalyser.create()
 	PartyHuntAnalyser.launchTime = g_clock.millis()
-	PartyHuntAnalyser.session = 0
+	PartyHuntAnalyser.session = os.time()
 
 	PartyHuntAnalyser.lootType = PriceTypeEnum.Market
 	PartyHuntAnalyser.leaderID = 0
@@ -100,13 +100,13 @@ function PartyHuntAnalyser.create()
 end
 
 function PartyHuntAnalyser:startEvent()
-	PartyHuntAnalyser.session = 0
+	PartyHuntAnalyser.session = os.time()
 	if PartyHuntAnalyser.event then PartyHuntAnalyser.event:cancel() end
 end
 
 function PartyHuntAnalyser:reset()
 	PartyHuntAnalyser.launchTime = g_clock.millis()
-	PartyHuntAnalyser.session = 0
+	PartyHuntAnalyser.session = os.time()
 
 	PartyHuntAnalyser.lootType = PriceTypeEnum.Market
 	PartyHuntAnalyser.leaderID = 0
@@ -135,10 +135,15 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 
     contentsPanel.lootType:setText(PartyHuntAnalyser.lootType == PriceTypeEnum.Market and "Market" or "Leader")
 
-	local duration = math.max(1, PartyHuntAnalyser.session )
-	local hours = math.floor(duration / 3600)
-	local minutes = math.floor((duration % 3600) / 60)
-	contentsPanel.session:setText(string.format("%02d:%02dh", hours, minutes))
+	local session = PartyHuntAnalyser.session
+	if session == 0 then
+		contentsPanel.session:setText("00:00h")
+	else
+		local duration = math.max(1, os.time() - session)
+		local hours = math.floor(duration / 3600)
+		local minutes = math.floor((duration % 3600) / 60)
+		contentsPanel.session:setText(string.format("%02d:%02dh", hours, minutes))
+	end
 
 	if not updateMembers then
 		return
@@ -160,24 +165,34 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 
 		c = c + 1
 
-		lootTotal = lootTotal + data[1]
-		supplyTotal = supplyTotal + data[2]
-		local playerBalance = data[1] - data[2]
-		local playerName = PartyHuntAnalyser.membersName[id] or "Unknow"
+		lootTotal = lootTotal + data[3]
+		supplyTotal = supplyTotal + data[4]
+		local playerBalance = data[3] - data[4]  -- loot - supplies
+		local playerName = PartyHuntAnalyser.membersName[id] or "Unknown"
+		
+		-- Debug: Check name lookup
+		if not PartyHuntAnalyser.membersName[id] then
+			print("PartyHuntAnalyser: Looking up name for ID " .. tostring(id) .. " - not found")
+			print("Available names in lookup table:")
+			for nameId, name in pairs(PartyHuntAnalyser.membersName) do
+				print("  ID " .. tostring(nameId) .. " (" .. type(nameId) .. ") = " .. tostring(name))
+			end
+		end
+		
 		widget.name:setText(playerName)
 		if not data[5] then
 			widget.name:setColor("#707070")
 		end
 		widget.balance:setText(comma_value(playerBalance))
 		widget.balance:setColor(playerBalance >= 0 and "#44ad25" or "#ff9854")
-		widget.damage:setText(comma_value(data[3]))
-		widget.healing:setText(comma_value(data[4]))
+		widget.damage:setText(comma_value(data[5]))
+		widget.healing:setText(comma_value(data[6]))
 		widget:setId(id)
 
 		local tooltipMessage = ""
-		tooltipMessage = setStringColor(tooltipMessage, tr("Loot: %s ", comma_value(data[1])), "#3f3f3f")
+		tooltipMessage = setStringColor(tooltipMessage, tr("Loot: %s ", comma_value(data[3])), "#3f3f3f")
 		tooltipMessage = setStringColor(tooltipMessage, "$\n", "yellow")
-		tooltipMessage = setStringColor(tooltipMessage, tr("Supplies: %s ", comma_value(data[2])), "#3f3f3f")
+		tooltipMessage = setStringColor(tooltipMessage, tr("Supplies: %s ", comma_value(data[4])), "#3f3f3f")
 		tooltipMessage = setStringColor(tooltipMessage, "$\n", "yellow")
 		tooltipMessage = setStringColor(tooltipMessage, tr("Balance: %s ", comma_value(playerBalance)), "#3f3f3f")
 		tooltipMessage = setStringColor(tooltipMessage, "$", "yellow")
@@ -200,17 +215,100 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 end
 
 function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, membersData, membersName)
-	PartyHuntAnalyser.session = startTime
+	-- startTime appears to be the session duration in seconds, not actual start time
+	-- So we calculate the actual session start time
+	PartyHuntAnalyser.session = os.time() - startTime
 	PartyHuntAnalyser.leaderID = leaderID
 	PartyHuntAnalyser.lootType = lootType
-	PartyHuntAnalyser.membersData = membersData
-	PartyHuntAnalyser.membersName = membersName
+	
+	-- Debug: Let's see what we're getting
+	print("PartyHuntAnalyser: Received data:")
+	print("  membersData type: " .. type(membersData))
+	print("  membersData:")
+	for k, v in pairs(membersData) do
+		print("    Key " .. tostring(k) .. " (" .. type(k) .. "):")
+		if type(v) == "table" then
+			for i, val in ipairs(v) do
+				print("      [" .. i .. "] = " .. tostring(val))
+			end
+		else
+			print("      Value: " .. tostring(v))
+		end
+	end
+	
+	print("  membersName type: " .. type(membersName))
+	print("  membersName:")
+	for k, v in pairs(membersName) do
+		print("    Key " .. tostring(k) .. " (" .. type(k) .. "): " .. tostring(v))
+	end
+	
+	-- If membersData keys are player IDs, use them directly
+	-- If they are positions (1,2,3...), we need to map them to the actual player IDs
+	-- But don't completely overwrite existing data - merge it instead
+	local newMembersData = membersData
+	
+	-- Convert membersName from array format to lookup table format
+	local newMembersName = {}
+	if membersName then
+		for i, memberInfo in ipairs(membersName) do
+			if type(memberInfo) == "table" then
+				local memberId = memberInfo[1]  -- First element is the ID
+				local memberName = memberInfo[2]  -- Second element is the name
+				newMembersName[memberId] = memberName
+				print("  Mapped ID " .. tostring(memberId) .. " to name '" .. tostring(memberName) .. "'")
+			end
+		end
+	end
+	
+	-- If membersData uses position keys (1,2,3...) but membersName uses player IDs,
+	-- we need to remap the membersData to use player IDs as keys
+	if membersName and type(newMembersData) == "table" then
+		local remappedData = {}
+		local memberIndex = 1
+		
+		-- Try to match positions in membersData with IDs from membersName
+		for i, memberInfo in ipairs(membersName) do
+			if type(memberInfo) == "table" then
+				local playerId = memberInfo[1]
+				local memberData = newMembersData[memberIndex]
+				if memberData then
+					remappedData[playerId] = memberData
+					print("  Remapped position " .. memberIndex .. " to player ID " .. tostring(playerId))
+					memberIndex = memberIndex + 1
+				end
+			end
+		end
+		
+		-- Only use remapped data if we successfully mapped something
+		if next(remappedData) then
+			newMembersData = remappedData
+			print("  Successfully remapped membersData to use player IDs as keys")
+		else
+			print("  Failed to remap membersData, keeping original")
+		end
+	end
+	
+	-- Merge server data with existing manually tracked members
+	-- Server data takes priority for existing members, but preserve manually added ones
+	for playerId, serverData in pairs(newMembersData) do
+		PartyHuntAnalyser.membersData[playerId] = serverData
+		if newMembersName[playerId] then
+			PartyHuntAnalyser.membersName[playerId] = newMembersName[playerId]
+		end
+	end
+	
+	-- Update names for any existing members we have but server doesn't
+	for playerId, existingData in pairs(PartyHuntAnalyser.membersData) do
+		if newMembersName[playerId] then
+			PartyHuntAnalyser.membersName[playerId] = newMembersName[playerId]
+		end
+	end
 
 	if PartyHuntAnalyser.event then PartyHuntAnalyser.event:cancel() end
 	PartyHuntAnalyser.event = cycleEvent(function()
 		if not g_game.isOnline() then return end
-		PartyHuntAnalyser.session = PartyHuntAnalyser.session + 1
-		--PartyHuntAnalyser:updateWindow(false)
+		-- Update the window to show current time
+		PartyHuntAnalyser:updateWindow(false)
 	end, 1000)
 
 	PartyHuntAnalyser:updateWindow(true)
@@ -261,15 +359,18 @@ end
 
 function PartyHuntAnalyser:clipboardData()
 
-	local duration = math.max(1, PartyHuntAnalyser.session )
-	local hours = math.floor(duration / 3600)
-	local minutes = math.floor((duration % 3600) / 60)
-
-	local final = "Session data: From " .. os.date('%Y-%m-%d, %H:%M:%S', os.time() - PartyHuntAnalyser.session) .." to ".. os.date('%Y-%m-%d, %H:%M:%S') .. "\n"
-	if PartyHuntAnalyser.session == 0 then
-		final = ""
+	local session = PartyHuntAnalyser.session
+	local final = ""
+	if session == 0 then
+		final = "Session: 00:00h"
+	else
+		local duration = math.max(1, os.time() - session)
+		local hours = math.floor(duration / 3600)
+		local minutes = math.floor((duration % 3600) / 60)
+		
+		final = "Session data: From " .. os.date('%Y-%m-%d, %H:%M:%S', session) .." to ".. os.date('%Y-%m-%d, %H:%M:%S') .. "\n"
+		final = final .. "Session: " .. string.format("%02d:%02dh", hours, minutes)
 	end
-	final = final .. "Session: " .. string.format("%02d:%02dh", hours, minutes)
 	final = final .. "\nLoot Type: " .. (PartyHuntAnalyser.lootType ~= PriceTypeEnum.Market and "Leader" or "Market")
 	final = final .. "\nLoot: " .. comma_value(PartyHuntAnalyser.loot)
 	final = final .. "\nSupplies: " .. comma_value(PartyHuntAnalyser.supplies)
@@ -277,14 +378,14 @@ function PartyHuntAnalyser:clipboardData()
 
 	--user data now
 	for id, data in pairs(PartyHuntAnalyser.membersData) do
-		local playerName = PartyHuntAnalyser.membersName[id] or "Unknow"
+		local playerName = PartyHuntAnalyser.membersName[id] or "Unknown"
 		final = final.. "\n".. playerName .. (id == PartyHuntAnalyser.leaderID and ' (Leader)' or '')
 
-		final = final.. "\n\tLoot: ".. comma_value(data[1])
-		final = final.. "\n\tSupplies: "..comma_value(data[2])
-		final = final.. "\n\tBalance: "..comma_value(data[1] - data[2])
-		final = final.. "\n\tDamage: "..comma_value(data[3])
-		final = final.. "\n\tHealing: "..comma_value(data[4])
+		final = final.. "\n\tLoot: ".. comma_value(data[3])
+		final = final.. "\n\tSupplies: "..comma_value(data[4])
+		final = final.. "\n\tBalance: "..comma_value(data[3] - data[4])
+		final = final.. "\n\tDamage: "..comma_value(data[5])
+		final = final.. "\n\tHealing: "..comma_value(data[6])
 	end
 
 	g_window.setClipboardText(final)
@@ -292,15 +393,18 @@ end
 
 function PartyHuntAnalyser:lootSplitter()
 
-	local duration = math.max(1, PartyHuntAnalyser.session )
-	local hours = math.floor(duration / 3600)
-	local minutes = math.floor((duration % 3600) / 60)
-
-	local final = "Session data: From " .. os.date('%Y-%m-%d, %H:%M:%S', os.time() - PartyHuntAnalyser.session) .." to ".. os.date('%Y-%m-%d, %H:%M:%S') .. "\n"
-	if PartyHuntAnalyser.session == 0 then
-		final = ""
+	local session = PartyHuntAnalyser.session
+	local final = ""
+	if session == 0 then
+		final = "Session: 00:00h"
+	else
+		local duration = math.max(1, os.time() - session)
+		local hours = math.floor(duration / 3600)
+		local minutes = math.floor((duration % 3600) / 60)
+		
+		final = "Session data: From " .. os.date('%Y-%m-%d, %H:%M:%S', session) .." to ".. os.date('%Y-%m-%d, %H:%M:%S') .. "\n"
+		final = final .. "Session: " .. string.format("%02d:%02dh", hours, minutes)
 	end
-	final = final .. "Session: " .. string.format("%02d:%02dh", hours, minutes)
 	final = final .. "\nLoot Type: " .. (PartyHuntAnalyser.lootType ~= PriceTypeEnum.Market and "Leader" or "Market")
 	final = final .. "\nLoot: " .. comma_value(PartyHuntAnalyser.loot)
 	final = final .. "\nSupplies: " .. comma_value(PartyHuntAnalyser.supplies)
@@ -308,14 +412,14 @@ function PartyHuntAnalyser:lootSplitter()
 
 	--user data now
 	for id, data in pairs(PartyHuntAnalyser.membersData) do
-		local playerName = PartyHuntAnalyser.membersName[id] or "Unknow"
+		local playerName = PartyHuntAnalyser.membersName[id] or "Unknown"
 		final = final.. "\n".. playerName .. (id == PartyHuntAnalyser.leaderID and ' (Leader)' or '')
 
-		final = final.. "\n\tLoot: ".. comma_value(data[1])
-		final = final.. "\n\tSupplies: "..comma_value(data[2])
-		final = final.. "\n\tBalance: "..comma_value(data[1] - data[2])
-		final = final.. "\n\tDamage: "..comma_value(data[3])
-		final = final.. "\n\tHealing: "..comma_value(data[4])
+		final = final.. "\n\tLoot: ".. comma_value(data[3])
+		final = final.. "\n\tSupplies: "..comma_value(data[4])
+		final = final.. "\n\tBalance: "..comma_value(data[3] - data[4])
+		final = final.. "\n\tDamage: "..comma_value(data[5])
+		final = final.. "\n\tHealing: "..comma_value(data[6])
 	end
 
 	local huntLogContent = modules.game_lootsplitter.lootsplitter.contentPanel:getChildById('huntLogContent')
@@ -333,7 +437,7 @@ function onShieldChange(creature, shieldId)
         elseif shieldId == 0 and packetSend then
 			PartyHuntAnalyser.leader = false
             packetSend = false
-            PartyHuntAnalyser.session = 0
+            PartyHuntAnalyser.session = os.time()
             if PartyHuntAnalyser.event then PartyHuntAnalyser.event:cancel() end
         end
     end
@@ -341,12 +445,93 @@ end
 
 function onPartyMembersChange(self, members)
 	if #members == 0 then
+		-- Party completely disbanded - reset everything
 		PartyHuntAnalyser:reset()
 
 		local contentsPanel = PartyHuntAnalyser.window.contentsPanel
 		if contentsPanel then
 			contentsPanel.party:destroyChildren()
 			contentsPanel.party:setHeight(61)
+		end
+	else
+		-- Party still exists but members may have changed
+		local contentsPanel = PartyHuntAnalyser.window.contentsPanel
+		if contentsPanel and contentsPanel.party then
+			-- Get current member IDs from the party
+			local currentMemberIds = {}
+			for _, member in ipairs(members) do
+				currentMemberIds[member:getId()] = true
+			end
+			
+			-- Add local player to current members (they might not be in the members list if they're the leader)
+			local localPlayer = g_game.getLocalPlayer()
+			if localPlayer then
+				currentMemberIds[localPlayer:getId()] = true
+			end
+			
+			-- Add new party members who joined
+			for _, member in ipairs(members) do
+				local memberId = member:getId()
+				if not PartyHuntAnalyser.membersData[memberId] then
+					-- New member joined - add them with default values
+					PartyHuntAnalyser.membersData[memberId] = {
+						0, -- memberID (not used in data array)
+						1, -- highlight (active)
+						0, -- loot
+						0, -- supplies
+						0, -- damage
+						0  -- healing
+					}
+					PartyHuntAnalyser.membersName[memberId] = member:getName()
+					print("PartyHuntAnalyser: Added new party member - " .. member:getName() .. " (ID: " .. memberId .. ")")
+				end
+			end
+			
+			-- Also add local player if they have party shield and aren't already tracked
+			if localPlayer then
+				local localId = localPlayer:getId()
+				if currentMemberIds[localId] and not PartyHuntAnalyser.membersData[localId] then
+					PartyHuntAnalyser.membersData[localId] = {
+						0, -- memberID (not used in data array)
+						1, -- highlight (active)
+						0, -- loot
+						0, -- supplies
+						0, -- damage
+						0  -- healing
+					}
+					PartyHuntAnalyser.membersName[localId] = localPlayer:getName()
+					print("PartyHuntAnalyser: Added local player to party - " .. localPlayer:getName() .. " (ID: " .. localId .. ")")
+				end
+			end
+			
+			-- Remove widgets and data for players no longer in party
+			local playersToRemove = {}
+			for playerId, data in pairs(PartyHuntAnalyser.membersData) do
+				if not currentMemberIds[playerId] then
+					table.insert(playersToRemove, playerId)
+				end
+			end
+			
+			-- Remove the players that left
+			for _, playerId in ipairs(playersToRemove) do
+				local playerName = PartyHuntAnalyser.membersName[playerId] or "Unknown"
+				print("PartyHuntAnalyser: Removed party member - " .. playerName .. " (ID: " .. playerId .. ")")
+				
+				-- Remove from data structures
+				PartyHuntAnalyser.membersData[playerId] = nil
+				PartyHuntAnalyser.membersName[playerId] = nil
+				
+				-- Remove widget from UI
+				local widget = contentsPanel.party:getChildById(playerId)
+				if widget then
+					widget:destroy()
+				end
+			end
+			
+			-- Update the window to show changes (new members or removed members)
+			if #playersToRemove > 0 or #members > 0 then
+				PartyHuntAnalyser:updateWindow(true)
+			end
 		end
 	end
 end
