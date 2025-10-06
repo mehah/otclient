@@ -714,6 +714,9 @@ function savePreset()
         -- TODO: Try changing square clipping size from Mehah PR
         window.presetsList[presetId].creature:setCreatureSize(thingType:getRealSize())
         window.presetsList[presetId].creature:setCenter(true)
+    elseif not g_game.getFeature(GameWingsAurasEffectsShader) then
+        window.presetsList[presetId].creature:setCreatureSize(thingType:getRealSize() + 32)
+        window.presetsList[presetId].creature:setCenter(true)
     else
         window.presetsList[presetId].creature:setCreatureSize(thingType:getRealSize())
         window.presetsList[presetId].creature:setCenter(true)
@@ -826,6 +829,9 @@ function showPresets()
             if (hasValidAE and presetWidget.creature:getCreatureSize() == 0) then
                 -- TODO: Try changing square clipping size from Mehah PR
                 presetWidget.creature:setCreatureSize(thingType:getRealSize())
+                presetWidget.creature:setCenter(true)
+            elseif not g_game.getFeature(GameWingsAurasEffectsShader) then
+                presetWidget.creature:setCreatureSize(thingType:getRealSize() + 32)
                 presetWidget.creature:setCenter(true)
             else
                 presetWidget.creature:setCreatureSize(thingType:getRealSize())
