@@ -1215,6 +1215,9 @@ void UIWidget::updateTableLayout()
 }
 
 void UIWidget::scheduleHtmlTask(FlagProp prop) {
+    if (!isOnHtml())
+        return;
+
     bool schedule = false;
 
     switch (prop) {

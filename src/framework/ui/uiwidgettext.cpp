@@ -203,6 +203,9 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
     if (!dontFireLuaCall) {
         onTextChange(m_text, oldText);
     }
+
+    if (m_parent)
+        m_parent->refreshHtml(true);
 }
 
 void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireLuaCall)
