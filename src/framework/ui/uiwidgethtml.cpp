@@ -317,7 +317,6 @@ namespace {
 
     static inline void applyTableRowChild(UIWidget* self, const FlowContext& ctx, bool topCleared) {
         self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
-        self->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
 
         if (!ctx.lastNormalWidget) {
             self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
@@ -627,67 +626,143 @@ namespace {
     }
 
     static inline void applyFitContentRecursive(UIWidget* w, int& width, int& height) {
-        for (auto& c : w->getChildren()) {
-            if (c->getFloat() == FloatType::None && c->getPositionType() != PositionType::Absolute) {
-                uint8_t check = 2;
-                const int c_width = c->getWidth() + c->getPaddingLeft() + c->getPaddingRight();
-                if (c_width > 0) {
-                    if (breakLine(c->getDisplay())) {
-                        if (c_width > width)
-                            width = c_width;
-                    } else
-                        width += c_width;
-                    --check;
-                }
+        int maxLineWidth = 0, totalHeight = 0, runWidth = 0, runHeight = 0;
 
-                const int c_height = c->getHeight() + c->getPaddingTop() + c->getPaddingBottom();
-                if (c_height > 0) {
-                    if (breakLine(c->getDisplay()) || c->getPrevWidget() && breakLine(c->getPrevWidget()->getDisplay())) {
-                        height += c_height;
-                    } else if (c_height > height)
-                        height = c_height;
-                    --check;
-                }
+        auto flushLine = [&]() {
+            if (runWidth > 0 || runHeight > 0) {
+                if (runWidth > maxLineWidth) maxLineWidth = runWidth;
+                totalHeight += runHeight;
+                runWidth = 0;
+                runHeight = 0;
+            }
+        };
 
-                if (check > 0)
-                    applyFitContentRecursive(c.get(), width, height);
+        for (auto& childPtr : w->getChildren()) {
+            UIWidget* c = childPtr.get();
+            if (c->getFloat() != FloatType::None || c->getPositionType() == PositionType::Absolute)
+                continue;
+
+            int childContentW = c->getWidth();
+            int childContentH = c->getHeight();
+
+            const auto& cwSpec = c->getWidthHtml();
+            const auto& chSpec = c->getHeightHtml();
+
+            const bool widthExplicit = (childContentW > 0) || (cwSpec.valueCalculed > -1);
+            const bool heightExplicit = (childContentH > 0) || (chSpec.valueCalculed > -1);
+
+            const bool widthContentDriven =
+                cwSpec.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) ||
+                cwSpec.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER) ||
+                cwSpec.needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER);
+
+            const bool heightContentDriven =
+                chSpec.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) ||
+                chSpec.needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER) ||
+                chSpec.needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER);
+
+            const DisplayType d = c->getDisplay();
+            const bool tableLike =
+                d == DisplayType::Table || d == DisplayType::TableRowGroup ||
+                d == DisplayType::TableHeaderGroup || d == DisplayType::TableFooterGroup ||
+                d == DisplayType::TableRow || d == DisplayType::TableCell ||
+                d == DisplayType::TableColumnGroup || d == DisplayType::TableColumn ||
+                d == DisplayType::TableCaption;
+
+            const bool layoutContentDriven =
+                tableLike || d == DisplayType::InlineBlock || d == DisplayType::Inline ||
+                d == DisplayType::Flex || d == DisplayType::InlineFlex ||
+                d == DisplayType::Grid || d == DisplayType::InlineGrid;
+
+            int subW = 0, subH = 0;
+            if ((!widthExplicit || widthContentDriven || layoutContentDriven) ||
+                (!heightExplicit || heightContentDriven || layoutContentDriven)) {
+                if (!c->getChildren().empty()) {
+                    applyFitContentRecursive(c, subW, subH);
+                }
+            }
+
+            if (childContentW <= 0 && cwSpec.valueCalculed > -1) {
+                childContentW = cwSpec.valueCalculed;
+            } else if (childContentW <= 0 && cwSpec.valueCalculed < 0) {
+                childContentW = subW;
+            } else {
+                if (subW > 0) childContentW = std::max(childContentW, subW);
+            }
+
+            // Resolver height
+            if (childContentH <= 0 && chSpec.valueCalculed > -1) {
+                childContentH = chSpec.valueCalculed;
+            } else if (childContentH <= 0 && chSpec.valueCalculed < 0) {
+                childContentH = subH;
+            } else {
+                if (subH > 0) childContentH = std::max(childContentH, subH);
+            }
+
+            const int childOuterW = std::max(0, childContentW) + c->getPaddingLeft() + c->getPaddingRight();
+            const int childOuterH = std::max(0, childContentH) + c->getPaddingTop() + c->getPaddingBottom();
+
+            if (breakLine(c->getDisplay())) {
+                flushLine();
+                if (childOuterW > maxLineWidth) maxLineWidth = childOuterW;
+                totalHeight += childOuterH;
+            } else {
+                runWidth += childOuterW;
+                if (childOuterH > runHeight) runHeight = childOuterH;
             }
         }
 
-        // only for child
-        const bool widthNeedsUpdate = w->getWidthHtml().needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) || w->getWidthHtml().needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER);
-        const bool heightNeedsUpdate = w->getHeightHtml().needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) || w->getHeightHtml().needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER);
+        flushLine();
 
-        if (w->getWidthHtml().needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER) || widthNeedsUpdate) {
-            w->setWidth_px(width + w->getPaddingLeft() + w->getPaddingRight());
+        if (maxLineWidth > width) width = maxLineWidth;
+        height += totalHeight;
+
+        const bool widthNeedsUpdate =
+            w->getWidthHtml().needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) ||
+            w->getWidthHtml().needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER) ||
+            w->getWidthHtml().needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER);
+
+        const bool heightNeedsUpdate =
+            w->getHeightHtml().needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) ||
+            w->getHeightHtml().needsUpdate(Unit::Percent, SIZE_VERSION_COUNTER) ||
+            w->getHeightHtml().needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER);
+
+        if (widthNeedsUpdate) {
+            const int paddedW = maxLineWidth + w->getPaddingLeft() + w->getPaddingRight();
+            w->setWidth_px(std::max(0, paddedW));
             w->getWidthHtml().applyUpdate(w->getWidth(), SIZE_VERSION_COUNTER);
         }
 
-        if (w->getHeightHtml().needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER) || heightNeedsUpdate) {
-            w->setHeight_px(height + w->getPaddingTop() + w->getPaddingBottom());
+        if (heightNeedsUpdate) {
+            const int paddedH = totalHeight + w->getPaddingTop() + w->getPaddingBottom();
+            w->setHeight_px(std::max(0, paddedH));
             w->getHeightHtml().applyUpdate(w->getHeight(), SIZE_VERSION_COUNTER);
         }
-    };
+    }
 }
 
 void UIWidget::refreshHtml(bool childrenTo) {
     if (!isOnHtml())
         return;
 
-    if (childrenTo) {
-        for (const auto& child : m_children) {
-            child->scheduleHtmlTask(PropApplyAnchorAlignment);
-        }
-    }
+    UIWidget* parent_fitWidth = nullptr;
+    UIWidget* parent_fitHeight = nullptr;
 
     auto parent = this;
     while (parent && parent->isOnHtml()) {
         if (parent->m_width.unit == Unit::FitContent)
-            parent->applyDimension(true, parent->m_width.unit, parent->m_width.value);
+            parent_fitWidth = parent;
         if (parent->m_height.unit == Unit::FitContent)
-            parent->applyDimension(false, parent->m_height.unit, parent->m_height.value);
+            parent_fitHeight = parent;
+
         parent = parent->m_parent.get();
     }
+
+    if (parent_fitWidth)
+        parent_fitWidth->applyDimension(true, parent_fitWidth->m_width.unit, parent_fitWidth->m_width.value);
+
+    if (parent_fitHeight)
+        parent_fitHeight->applyDimension(false, parent_fitHeight->m_height.unit, parent_fitHeight->m_height.value);
 }
 
 void UIWidget::setLineHeight(std::string valueStr) {
