@@ -501,18 +501,41 @@ function forgeController:applyForgeConfiguration(config)
         end
     end
 
-    local maxDustLevel = numericFields.maxDustLevel or 0
-    forgeController.conversionNecessaryDustToIncrease = math.max((maxDustLevel - 75), 25)
-    forgeController.conversionRaiseFrom = ("Raise limit from %d to %d"):format(maxDustLevel, maxDustLevel + 1)
-    forgeController.maxDustLevel = maxDustLevel
+    forgeController.maxDustCap = tonumber(numericFields.maxDustCap) or 225
+    forgeController.maxDustLevel = numericFields.maxDustLevel or 0
+    forgeController.conversionNecessaryDustToIncrease = math.max((forgeController.maxDustLevel - 75), 25)
+    if forgeController.maxDustLevel >= forgeController.maxDustCap then
+        forgeController.conversionRaiseFrom = "You have reached the maximum dust limit"
+    else
+        forgeController.conversionRaiseFrom = ("Raise limit from %d to %d"):format(forgeController.maxDustLevel,
+            forgeController.maxDustLevel + 1)
+    end
     local player = g_game.getLocalPlayer()
     forgeController.currentDust = player:getResourceBalance(forgeResourceTypes.dust) or 0
+    forgeController.dustToSliver = numericFields.dustToSliver or 3
+    forgeController.conversionNecessaryDustToSliver = 60
 
-    forgeController.currentDustLevel = ("%d / %d"):format(forgeController.currentDust, maxDustLevel)
+    forgeController.mustDisableConvertDustToSliverButton = forgeController.currentDust <
+        forgeController.conversionNecessaryDustToSliver
+    forgeController.conversionNecessaryDustToSliverLabel = forgeController.mustDisableConvertDustToSliverButton and "red" or
+        "white"
+
+    forgeController.mustDisableIncreaseDustLimitButton = forgeController.currentDust <
+        forgeController.conversionNecessaryDustToIncrease
+    forgeController.conversionNecessaryDustToIncreaseLabel = forgeController.mustDisableIncreaseDustLimitButton and "red" or
+        "white"
+
+    forgeController.currentDustLevel = ("%d / %d"):format(forgeController.currentDust, forgeController.maxDustLevel)
     forgeController.currentSlivers = player:getResourceBalance(forgeResourceTypes.sliver) or 0
+    forgeController.sliverToCore = numericFields.sliverToCore or 50
+    forgeController.mustDisableConvertSliverToCoreButton = forgeController.currentSlivers <
+        forgeController.sliverToCore
+    forgeController.mustDisableConvertSliverToCoreButton = forgeController.mustDisableIncreaseDustLimitButton and "red" or
+        "white"
+
+
     forgeController.currentExaltedCores = player:getResourceBalance(forgeResourceTypes.cores) or 0
     forgeController.currentGold = formatGoldAmount(player:getTotalMoney() or 0)
-    forgeController.maxDustCap = tonumber(numericFields.maxDustCap) or 225
 
     self:setInitialValues(initial)
 

@@ -6,7 +6,12 @@
           <UIItem class="forge-item-icon" style="item-id: 37160"></UIItem>
         </div>
         <div class="forge-counter">
-          <div class="forge-full-width-label" text="60"></div>
+          <div
+            class="forge-full-width-label"
+            *color="self.conversionNecessaryDustToSliverLabel"
+          >
+            {{self.conversionNecessaryDustToSliver}}
+          </div>
         </div>
       </div>
       <img
@@ -16,6 +21,8 @@
       <UIButton
         class="conversion-action-button forge-action-button"
         onclick="self:onConversion(2)"
+        *disabled="self.mustDisableConvertDustToSliverButton"
+        *opacity="self.mustDisableConvertDustToSliverButton and 0.5 or 1"
       >
         <UIItem class="forge-result-item" style="item-id: 37109"></UIItem>
       </UIButton>
@@ -33,7 +40,12 @@
           <UIItem class="forge-item-icon" style="item-id: 37109"></UIItem>
         </div>
         <div class="forge-counter">
-          <div class="forge-full-width-label" text="50"></div>
+          <label
+            class="forge-full-width-label"
+            *color="self.mustDisableConvertSliverToCoreButton"
+          >
+            {{self.sliverToCore}}
+          </label>
         </div>
       </div>
       <img
@@ -43,6 +55,8 @@
       <UIButton
         class="conversion-action-button forge-action-button"
         onclick="self:onConversion(3)"
+        *disabled="self.mustDisableConvertSliverToCoreButton"
+        *opacity="self.mustDisableConvertSliverToCoreButton and 0.5 or 1"
       >
         <UIItem class="forge-result-item" style="item-id: 37110"></UIItem>
       </UIButton>
@@ -66,9 +80,12 @@
           class="forge-counter"
           style="align-items: center; text-align: center"
         >
-          <div style="align-items: center; text-align: center">
+          <label
+            style="align-items: center; text-align: center"
+            *color="self.conversionNecessaryDustToIncreaseLabel"
+          >
             {{self.conversionNecessaryDustToIncrease}}
-          </div>
+          </label>
         </div>
       </div>
       <img
@@ -76,9 +93,11 @@
         src="/images/arrows/icon-arrow-downlarge"
       />
       <UIButton
+        *disabled="self.mustDisableIncreaseDustLimitButton"
         class="conversion-action-button forge-action-button"
         style="left: 5px; height: 73px; width: 128px"
         onclick="self:onConversion(4)"
+        *opacity="self.mustDisableIncreaseDustLimitButton and 0.5 or 1"
       >
         <UIItem
           class="forge-result-item"
@@ -111,10 +130,10 @@
 
     <qtpanel id="transfer-info-panel" class="info-panel--Conversion">
       <div anchor="parent" class="info-row">
-        <label
-          class="info-text"
-          text="You can transfer the tier of an item to another item of the same classification."
-        ></label>
+        <label class="info-text">
+          You can transfer the tier of an item to another item of the same
+          classification.
+        </label>
       </div>
     </qtpanel>
   </div>

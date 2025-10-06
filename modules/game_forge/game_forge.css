@@ -304,14 +304,16 @@
 .info-row {
   display: block;
   width: 96%;
-  height: 16px;
+  min-height: 16px;
   margin-left: 16px;
+  height: 100%;
 }
 
 .info-text {
   display: block;
   width: 90%;
   white-space: normal;
+  height: 100%;
 }
 
 .info-icon {
