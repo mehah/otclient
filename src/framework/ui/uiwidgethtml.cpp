@@ -557,7 +557,6 @@ namespace {
 
         int sum = 0; for (int w : widths) sum += w;
         if (sum > innerW && sum > 0) {
-            // escala simples proporcional
             double k = (double)innerW / (double)sum;
             int acc = 0;
             for (int i = 0; i < cols; ++i) {
@@ -690,7 +689,6 @@ namespace {
                 if (subW > 0) childContentW = std::max(childContentW, subW);
             }
 
-            // Resolver height
             if (childContentH <= 0 && chSpec.valueCalculed > -1) {
                 childContentH = chSpec.valueCalculed;
             } else if (childContentH <= 0 && chSpec.valueCalculed < 0) {
