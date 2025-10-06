@@ -2991,11 +2991,13 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseKillTracker(const InputMessagePtr& msg)
 {
-    const std::string monsterName = msg->getString(); // monster name
-    const Outfit monsterOutfit = getOutfit(msg, false);
-
+    const std::string& monsterName = msg->getString();
+    const Outfit& monsterOutfit = getOutfit(msg, false);
     const uint8_t corpseItemsSize = msg->getU8();
+
     std::vector<ItemPtr> dropItems;
+
+    dropItems.reserve(corpseItemsSize);
     for (auto i = 0; i < corpseItemsSize; ++i) {
         dropItems.push_back(getItem(msg));
     }
@@ -4300,28 +4302,36 @@ void ProtocolGame::parseSpecialContainer(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
 {
-    msg->getU32(); // session minutes
-    msg->getU32(); // leader ID
-    msg->getU8(); // price type
+    const uint32_t startTime = msg->getU32(); // session minutes
+    const uint32_t leaderID = msg->getU32(); // leader ID
+    const uint8_t lootType = msg->getU8(); // price type
 
     const uint8_t partyMembersSize = msg->getU8();
+    std::vector<std::tuple<uint32_t, uint8_t, uint64_t, uint64_t, uint64_t, uint64_t>> membersData;
     for (auto i = 0; i < partyMembersSize; ++i) {
-        msg->getU32(); // party member id
-        msg->getU8(); // highlight
-        msg->getU64(); // loot
-        msg->getU64(); // supply
-        msg->getU64(); // damage
-        msg->getU64(); // healing
+        const uint32_t memberID = msg->getU32(); // party member id
+        const uint8_t highlight = msg->getU8(); // highlight
+        const uint64_t loot = msg->getU64(); // loot
+        const uint64_t supply = msg->getU64(); // supply
+        const uint64_t damage = msg->getU64(); // damage
+        const uint64_t healing = msg->getU64(); // healing
+        
+        membersData.emplace_back(memberID, highlight, loot, supply, damage, healing);
     }
 
+    std::vector<std::tuple<uint32_t, std::string>> membersName;
     const bool hasNamesBool = static_cast<bool>(msg->getU8());
     if (hasNamesBool) {
         const uint8_t membersNameSize = msg->getU8();
         for (auto i = 0; i < membersNameSize; ++i) {
-            msg->getU32(); // party member id
-            msg->getString(); // party member name
+            const uint32_t memberID = msg->getU32(); // party member id
+            const std::string memberName = msg->getString(); // party member name
+            membersName.emplace_back(memberID, memberName);
         }
     }
+
+    // Call the Lua callback
+    g_lua.callGlobalField("g_game", "onPartyAnalyzer", startTime, leaderID, lootType, membersData, membersName);
 }
 
 void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)
@@ -4490,8 +4500,8 @@ void ProtocolGame::parseUpdateSupplyTracker(const InputMessagePtr& msg)
 
 void ProtocolGame::parseUpdateLootTracker(const InputMessagePtr& msg)
 {
-    const auto item = getItem(msg); // item
-    const auto itemName = msg->getString(); // item name
+    const auto& item = getItem(msg);
+    const auto& itemName = msg->getString();
 
     // Call the onLootStats callback to expose the data to Lua
     g_lua.callGlobalField("g_game", "onLootStats", item, itemName);
@@ -5795,16 +5805,13 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
 void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg)
 {
     const uint16_t bossesOnTrackerSize = msg->getU16();
-    std::vector<std::tuple<uint32_t, uint64_t, std::string, Outfit>> cooldownData;
+    std::vector<std::tuple<uint32_t, uint64_t, Outfit>> cooldownData;
     
     for (auto i = 0; i < bossesOnTrackerSize; ++i) {
         const uint32_t bossRaceId = msg->getU32(); // bossRaceId
         const uint64_t cooldownTime = msg->getU64(); // Boss cooldown in seconds
         
-        // Create data structure expected by Lua: {bossId, cooldown, name, outfit}
-        // Note: name and outfit will be handled by Lua side since we don't have
-        // direct access to monster data by race ID on client side
-        cooldownData.emplace_back(bossRaceId, cooldownTime, std::string(""), Outfit());
+        cooldownData.emplace_back(bossRaceId, cooldownTime, Outfit());
     }
     
     // Call the Lua callback with the cooldown data
