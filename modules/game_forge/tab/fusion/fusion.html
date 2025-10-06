@@ -86,7 +86,7 @@
           </div>
         </div>
 
-        <div>
+        <div style="width: 150px; height: 90px">
           <div class="fusion-improve-container">
             <div class="fusion-improve-container-text">
               Success Rate:
@@ -121,6 +121,35 @@
             </div>
           </div>
         </div>
+
+        <img
+          class="flow-arrow"
+          style="top: 35px"
+          src="/images/arrows/icon-arrow-rightlarge"
+        />
+        <div class="fusion-result-summary">
+          <UIButton class="forge-action-button forge-action-button--large">
+            <UIItem
+              class="forge-result-item forge-result-item-fusion"
+              style="left: 20px; icon: /images/ui/icon-questionmark"
+            ></UIItem>
+            <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
+            <UIItem
+              class="forge-result-item forge-result-item-fusion"
+              style="left: 0px; icon: /images/ui/icon-questionmark"
+            ></UIItem>
+            <img
+              class="forge-action-overlay"
+              src="/images/ui/ditherpattern64"
+            />
+          </UIButton>
+          <div anchor="prev" class="forge-result-cost">
+            <div>
+              {{self.fusionPrice}}
+              <img class="resource-icon" src="/images/game/prey/prey_gold" />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div
@@ -140,32 +169,6 @@
           </div>
           <div class="forge-counter">
             <label class="forge-full-width-label" text="130"></label>
-          </div>
-        </div>
-      </div>
-
-      <img
-        class="flow-arrow"
-        style="left: 10px; top: 35px"
-        src="/images/arrows/icon-arrow-rightlarge"
-      />
-      <div class="fusion-result-summary">
-        <UIButton class="forge-action-button forge-action-button--large">
-          <UIItem
-            class="forge-result-item forge-result-item-fusion"
-            style="left: 20px; icon: /images/ui/icon-questionmark"
-          ></UIItem>
-          <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
-          <UIItem
-            class="forge-result-item forge-result-item-fusion"
-            style="left: 0px; icon: /images/ui/icon-questionmark"
-          ></UIItem>
-          <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
-        </UIButton>
-        <div anchor="prev" class="forge-result-cost">
-          <div>
-            {{self.fusionPrice}}
-            <img class="resource-icon" src="/images/game/prey/prey_gold" />
           </div>
         </div>
       </div>

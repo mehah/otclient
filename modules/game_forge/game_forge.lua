@@ -156,6 +156,8 @@ end
 
 function forgeController:close()
     hide()
+
+    forgeController.fusionPrice = "???"
 end
 
 local function toggle(self)
@@ -570,6 +572,14 @@ function forgeController:onConversion(conversionType, dependencies)
             newDustLevel = math.min(newDustLevel, maxDustCap)
         end
     end
+end
+
+forgeController.fusionPrice = "???"
+local resolveForgePrice = helpers.resolveForgePrice
+function forgeController:getFusionPrice(prices, item, tier)
+    local price = resolveForgePrice(prices, item, tier)
+    forgeController.fusionPrice = formatGoldAmount(price)
+    g_logger.info(">> fusion price: " .. tostring(formatGoldAmount(price)) .. " >: " .. forgeController.fusionPrice)
 end
 
 function g_game.onOpenForge(openData)
