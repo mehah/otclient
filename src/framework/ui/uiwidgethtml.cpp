@@ -19,6 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#include <algorithm>
+#include <cmath>
+#include <functional>
 #include <framework/core/eventdispatcher.h>
 #include <framework/html/htmlmanager.h>
 #include <framework/html/htmlnode.h>
@@ -167,18 +170,22 @@ namespace {
         return std::max<int>(0, pw - p->getPaddingLeft() - p->getPaddingRight());
     }
 
+    [[nodiscard]] constexpr bool endsWith(std::string_view str, std::string_view suffix) noexcept {
+        return str.size() >= suffix.size() && str.substr(str.size() - suffix.size()) == suffix;
+    }
+
     [[nodiscard]] constexpr Unit detectUnit(std::string_view s) noexcept {
         if (s == "auto") return Unit::Auto;
         if (s == "fit-content") return Unit::FitContent;
-        if (s.ends_with("px")) return Unit::Px;
-        if (s.ends_with("em")) return Unit::Em;
-        if (s.ends_with("%"))  return Unit::Percent;
+        if (endsWith(s, "px")) return Unit::Px;
+        if (endsWith(s, "em")) return Unit::Em;
+        if (endsWith(s, "%"))  return Unit::Percent;
         return Unit::Px;
     }
 
     [[nodiscard]] constexpr std::string_view numericPart(std::string_view s) noexcept {
-        if (s.ends_with("px") || s.ends_with("em")) return s.substr(0, s.size() - 2);
-        if (s.ends_with("%")) return s.substr(0, s.size() - 1);
+        if (endsWith(s, "px") || endsWith(s, "em")) return s.substr(0, s.size() - 2);
+        if (endsWith(s, "%")) return s.substr(0, s.size() - 1);
         return s;
     }
 
@@ -546,8 +553,8 @@ namespace {
         int flexCount = 0;
         for (int i = 0; i < cols; ++i) if (widths[i] == 0) ++flexCount;
         if (flexCount > 0) {
-            int each = std::max(0, remaining / flexCount);
-            int leftover = std::max(0, remaining - each * flexCount);
+            int each = std::max<int>(0, remaining / flexCount);
+            int leftover = std::max<int>(0, remaining - each * flexCount);
             for (int i = 0; i < cols; ++i) if (widths[i] == 0) {
                 widths[i] = each + (leftover > 0 ? 1 : 0);
                 if (leftover > 0) --leftover;
@@ -560,15 +567,15 @@ namespace {
             double k = (double)innerW / (double)sum;
             int acc = 0;
             for (int i = 0; i < cols; ++i) {
-                widths[i] = std::max(1, (int)std::floor(widths[i] * k));
+                widths[i] = std::max<int>(1, (int)std::floor(widths[i] * k));
                 acc += widths[i];
             }
             int diff = innerW - acc;
             for (int i = 0; diff > 0 && i < cols; ++i, --diff) ++widths[i];
-            for (int i = 0; diff < 0 && i < cols; ++i, ++diff) widths[i] = std::max(1, widths[i] - 1);
+            for (int i = 0; diff < 0 && i < cols; ++i, ++diff) widths[i] = std::max<int>(1, widths[i] - 1);
         }
 
-        auto applyRow = [&](UIWidget* r) {
+        std::function<void(UIWidget*)> applyRow = [&](UIWidget* r) {
             int j = 0;
             for (const auto& cc : r->getChildren()) {
                 UIWidget* cell = cc.get();
@@ -576,7 +583,7 @@ namespace {
 
                 const int totalW = widths[j];
                 const int pad = cell->getPaddingLeft() + cell->getPaddingRight();
-                cell->setWidth_px(std::max(0, totalW - pad));
+                cell->setWidth_px(std::max<int>(0, totalW - pad));
 
                 if (++j >= cols) break;
             }
@@ -954,8 +961,8 @@ void UIWidget::updateTableLayout()
             std::size_t colSpan = parseSpanValue(node, "colspan", "");
             std::size_t rowSpan = parseSpanValue(node, "rowspan", "colrows");
 
-            colSpan = std::max<std::size_t>(1, std::min(colSpan, kMaxSpan));
-            rowSpan = std::max<std::size_t>(1, std::min(rowSpan, kMaxSpan));
+            colSpan = std::max<std::size_t>(1, std::min<std::size_t>(colSpan, kMaxSpan));
+            rowSpan = std::max<std::size_t>(1, std::min<std::size_t>(rowSpan, kMaxSpan));
 
             while (true) {
                 if (rowSpanOccupancy.size() < columnIndex + colSpan)
@@ -977,7 +984,7 @@ void UIWidget::updateTableLayout()
 
             columnCount = std::max(columnCount, columnIndex + colSpan);
 
-            const std::size_t effectiveRowSpan = std::max<std::size_t>(1, std::min(rowSpan, rows.size() - rowIndex));
+            const std::size_t effectiveRowSpan = std::max<std::size_t>(1, std::min<std::size_t>(rowSpan, rows.size() - rowIndex));
 
             const int marginX = cell->m_margin.left + cell->m_margin.right;
             const int paddingX = cell->m_padding.left + cell->m_padding.right;
