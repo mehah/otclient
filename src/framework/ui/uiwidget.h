@@ -145,11 +145,11 @@ enum class OverflowType : uint8_t
 
 struct SizeUnit
 {
-    bool needsUpdate(Unit _unit) {
+    bool needsUpdate(Unit _unit) const {
         return pendingUpdate && unit == _unit;
     }
 
-    bool needsUpdate(Unit _unit, uint32_t _version) {
+    bool needsUpdate(Unit _unit, uint32_t _version) const {
         return pendingUpdate && unit == _unit && version != _version;
     }
 
@@ -432,6 +432,7 @@ private:
     void updateStyle();
 
     void updateSize();
+    void updateTableLayout();
     void applyAnchorAlignment();
     void scheduleHtmlTask(FlagProp prop);
     void refreshAnchorAlignment(bool onlyChild = false);
@@ -475,8 +476,10 @@ protected:
     // function shortcuts
 public:
     void resize(const int width, const int height) {
-        m_width.valueCalculed = width;
-        m_height.valueCalculed = height;
+        if (m_width.unit == Unit::Px)
+            m_width.valueCalculed = width;
+        if (m_height.unit == Unit::Px)
+            m_height.valueCalculed = height;
         setRect(Rect(getPosition(), Size(width, height)));
     }
     void move(int x, int y);
@@ -587,6 +590,12 @@ public:
     void setWidth_px(const int width) { resize(width, getHeight()); }
     void setHeight_px(const int height) { resize(getWidth(), height); }
     void setSize(const Size& size) {
+        if (m_width.unit == Unit::Px)
+            m_width.valueCalculed = size.width();
+
+        if (m_height.unit == Unit::Px)
+            m_height.valueCalculed = size.height();
+
         resize(size.width(), size.height());
     }
     void setMinWidth(const int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
