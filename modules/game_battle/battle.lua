@@ -1242,10 +1242,12 @@ function BattleListInstance:correctBattleButtons(sortOrder)
     local index = 1
     for i = start, finish, increment do
         local v = self.binaryTree[i]
-        local battleButton = self.battleButtons[v.id]
-        if battleButton ~= nil then
-            self.panel:moveChildToIndex(battleButton, index)
-            index = index + 1
+        if v ~= nil and v.id ~= nil then
+            local battleButton = self.battleButtons[v.id]
+            if battleButton ~= nil then
+                self.panel:moveChildToIndex(battleButton, index)
+                index = index + 1
+            end
         end
     end
     return true
