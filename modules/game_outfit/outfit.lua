@@ -828,13 +828,11 @@ function showPresets()
 
             if (hasValidAE and presetWidget.creature:getCreatureSize() == 0) then
                 -- TODO: Try changing square clipping size from Mehah PR
-                presetWidget.creature:setCreatureSize(thingType:getRealSize())
                 presetWidget.creature:setCenter(true)
             elseif not g_game.getFeature(GameWingsAurasEffectsShader) then
                 presetWidget.creature:setCreatureSize(thingType:getRealSize() + 32)
                 presetWidget.creature:setCenter(true)
             else
-                presetWidget.creature:setCreatureSize(thingType:getRealSize())
                 presetWidget.creature:setCenter(true)
             end
 
@@ -1345,7 +1343,7 @@ function onFamiliarSelect(list, focusedChild, unfocusedChild, reason)
         else
             previewCreature:setMarginRight(0)
             previewFamiliar:setMarginLeft(0)
-            window.preview.panel.bars:setMarginRight(0)
+            window.preview.panel.bars:setMarginRight(20)
         end
 
         updateAppearanceText("familiar", focusedChild.name:getText())
@@ -1607,17 +1605,17 @@ function updatePreview()
         previewOutfit.mount = 0
     end
 
-    if not settings.showFamiliar then
+    if not settings.showFamiliar or previewOutfit.familiar == 0 then
         previewOutfit.familiar = 0
         previewCreature:setMarginRight(0)
         previewFamiliar:setMarginLeft(0)
-        window.preview.panel.bars:setMarginRight(0)
-        previewFamiliar:setVisible(settings.showFamiliar)
+        window.preview.panel.bars:setMarginRight(20)
+        previewFamiliar:setVisible(false)
     else
         if previewOutfit.familiar and previewOutfit.familiar > 0 then
             previewFamiliar:setVisible(true)
             previewCreature:setMarginRight(50)
-            window.preview.panel.bars:setMarginRight(50)
+            window.preview.panel.bars:setMarginRight(40)
             previewFamiliar:setCreatureSize(124)
             previewFamiliar:setCenter(true)
             previewFamiliar:setMarginLeft(70)
