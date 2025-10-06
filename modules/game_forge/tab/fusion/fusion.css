@@ -94,9 +94,7 @@
 
 .fusion-improve-percent-text {
   position: absolute;
-  right: 5px;
-  top: 0px;
-  width: 20px;
+  right: 0px;
 }
 
 .fusion-improve-button-container {
@@ -111,9 +109,15 @@
 .fusion-improve-tax-container {
   display: flex;
   position: absolute;
-  background-color: black;
+  /* background-color: black; */
   height: 22px;
   width: 25px;
   right: 0;
   padding-top: 5px;
+  --image-source: /images/ui/test/button-verydarkgrey-down;
+}
+
+.fusion-improve-label {
+  text-align: center;
+  align-items: center;
 }

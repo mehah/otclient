@@ -158,6 +158,8 @@ function forgeController:close()
     hide()
 
     forgeController.fusionPrice = "???"
+    forgeController.fusionChanceImprovedIsChecked = false
+    forgeController.fusionReduceTierLossIsChecked = false
 end
 
 local function toggle(self)
@@ -516,6 +518,81 @@ function forgeController:applyForgeConfiguration(config)
 
     forgeController.normalDustFusion = numericFields.normalDustFusion or 100
     forgeController.convergenceDustFusion = numericFields.convergenceDustFusion or 130
+
+    forgeController.fusionPlayerHasDustToNormalFusion = (forgeController.currentDust >= forgeController.normalDustFusion) and
+        "white" or "red"
+    forgeController.fusionPlayerHasDustToConvergenceFusion = (forgeController.currentDust >= forgeController.convergenceDustFusion) and
+        "white" or "red"
+
+    forgeController.fusionPlayerHasExaltedCoreToImproveRateSuccess = (forgeController.currentExaltedCores >= 1) and
+        "white" or "red"
+    forgeController.fusionPlayerHasExaltedCoreToReduceTierLoss = (forgeController.currentExaltedCores >= 1) and
+        "white" or "red"
+
+    forgeController.fusionDisableImproveRateSuccessButton = (forgeController.currentExaltedCores < 1)
+    forgeController.fusionDisableReduceTierLossButton = (forgeController.currentExaltedCores < 1)
+
+    forgeController.fusionReduceTierLoss = numericFields.fusionReduceTierLoss or 50
+    forgeController.fusionReduceTierLossLabel = ("Reduce to %d%%"):format(forgeController.fusionReduceTierLoss)
+
+    forgeController.fusionChanceBase = numericFields.fusionChanceBase or 50
+    forgeController.fusionTierLossChanceBase = 100
+    forgeController.fusionTierLossChanceBaseLabel = ("%d%%"):format(forgeController.fusionTierLossChanceBase)
+    forgeController.fusionChanceBaseLabel = ("%d%%"):format(forgeController.fusionChanceBase)
+
+    forgeController.fusionChanceImproved = numericFields.fusionChanceImproved or 15
+    forgeController.fusionChanceImprovedLabel = ("Increase to %d%%"):format(forgeController.fusionChanceImproved +
+        forgeController.fusionChanceBase)
+end
+
+forgeController.fusionChanceImprovedIsChecked = false
+forgeController.fusionReduceTierLossIsChecked = false
+function forgeController:onFusionImproveChanceChange(improveType)
+    if improveType == 1 then
+        self.fusionChanceImprovedIsChecked = not self.fusionChanceImprovedIsChecked
+        if self.fusionChanceImprovedIsChecked then
+            if self.currentExaltedCores == 1 then
+                self.fusionDisableReduceTierLossButton = true
+                self.fusionPlayerHasExaltedCoreToReduceTierLoss = "red"
+            end
+            self.fusionChanceBaseLabel = ("%d%%"):format(self.fusionChanceBase +
+                self.fusionChanceImproved)
+            self.fusionPlayerHasExaltedCoreToImproveRateSuccess = "green"
+        else
+            self.fusionPlayerHasExaltedCoreToImproveRateSuccess = (self.currentExaltedCores >= 1) and
+                "white" or "red"
+
+            self.fusionChanceBaseLabel = ("%d%%"):format(self.fusionChanceBase)
+
+            if self.fusionDisableReduceTierLossButton and not self.fusionReduceTierLossIsChecked then
+                self.fusionDisableReduceTierLossButton = false
+            end
+        end
+    end
+
+    if improveType == 2 then
+        self.fusionReduceTierLossIsChecked = not self.fusionReduceTierLossIsChecked
+        if self.fusionReduceTierLossIsChecked then
+            if self.currentExaltedCores == 1 then
+                self.fusionDisableImproveRateSuccessButton = true
+                self.fusionPlayerHasExaltedCoreToImproveRateSuccess = "red"
+            end
+
+            self.fusionPlayerHasExaltedCoreToReduceTierLoss = "green"
+
+            self.fusionTierLossChanceBaseLabel = ("%d%%"):format(self.fusionTierLossChanceBase -
+                self.fusionReduceTierLoss)
+        else
+            self.fusionPlayerHasExaltedCoreToReduceTierLoss = (self.currentExaltedCores >= 1) and
+                "white" or "red"
+
+            self.fusionTierLossChanceBaseLabel = ("%d%%"):format(self.fusionTierLossChanceBase)
+
+            if self.fusionDisableImproveRateSuccessButton and not self.fusionChanceImprovedIsChecked then
+                self.fusionDisableImproveRateSuccessButton = false
+            end
+        end
+    end
 end
 
 function forgeController:onConversion(conversionType, dependencies)

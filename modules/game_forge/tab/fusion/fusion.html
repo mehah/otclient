@@ -82,9 +82,11 @@
             ></UIItem>
           </div>
           <div class="forge-counter">
-            <div style="text-align: center; align-items: center">
-              {{self.normalDustFusion}}
-            </div>
+            <label
+              class="forge-full-width-label"
+              *color="self.fusionPlayerHasDustToNormalFusion"
+              >{{self.normalDustFusion}}</label
+            >
           </div>
         </div>
 
@@ -92,13 +94,28 @@
           <div class="fusion-improve-container">
             <div class="fusion-improve-container-text">
               Success Rate:
-              <div class="fusion-improve-percent-text">50%</div>
+              <label
+                class="fusion-improve-percent-text"
+                *color="self.fusionPlayerHasExaltedCoreToImproveRateSuccess"
+              >
+                {{self.fusionChanceBaseLabel}}
+              </label>
             </div>
 
             <div class="fusion-improve-button-container">
-              <button style="margin: 0px">Increase to 65%</button>
+              <button
+                onclick="self:onFusionImproveChanceChange(1)"
+                *disabled="self.fusionDisableImproveRateSuccessButton"
+              >
+                {{self.fusionChanceImprovedLabel}}
+              </button>
               <div class="fusion-improve-tax-container">
-                1
+                <p
+                  class="fusion-improve-label"
+                  *color="self.fusionPlayerHasExaltedCoreToImproveRateSuccess"
+                >
+                  1
+                </p>
                 <div style="align-items: center">
                   <img src="images/icon-currency-exaltedcore" />
                 </div>
@@ -109,13 +126,28 @@
           <div class="fusion-improve-container" style="margin-top: 10px">
             <div class="fusion-improve-container-text">
               Tier Loss:
-              <div class="fusion-improve-percent-text">100%</div>
+              <label
+                *color="self.fusionPlayerHasExaltedCoreToReduceTierLoss"
+                class="fusion-improve-percent-text"
+              >
+                {{self.fusionTierLossChanceBaseLabel}}
+              </label>
             </div>
 
             <div class="fusion-improve-button-container">
-              <button style="margin: 0px">Reduce to 50%</button>
+              <button
+                onclick="self:onFusionImproveChanceChange(2)"
+                *disabled="self.fusionDisableReduceTierLossButton"
+              >
+                {{self.fusionReduceTierLossLabel}}
+              </button>
               <div class="fusion-improve-tax-container">
-                1
+                <p
+                  class="fusion-improve-label"
+                  *color="self.fusionPlayerHasExaltedCoreToReduceTierLoss"
+                >
+                  1
+                </p>
                 <div style="align-items: center">
                   <img src="images/icon-currency-exaltedcore" />
                 </div>
@@ -142,9 +174,12 @@
             <UIItem class="forge-item-icon" style="item-id: 37160"></UIItem>
           </div>
           <div class="forge-counter">
-            <div style="text-align: center; align-items: center">
-              {{self.convergenceDustFusion}}
-            </div>
+            <label
+              class="forge-full-width-label"
+              *color="self.fusionPlayerHasDustToConvergenceFusion"
+            >
+              {{self.convergenceDustFusion}}</label
+            >
           </div>
         </div>
       </div>
@@ -168,16 +203,20 @@
           <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
         </UIButton>
         <div anchor="prev" class="forge-result-cost">
-          <div>
-            {{self.fusionPrice}}
-            <img class="resource-icon" src="/images/game/prey/prey_gold" />
+          <div style="align-items: center; text-align: center">
+            <p>{{self.fusionPrice}}</p>
+            <img
+              style="margin-bottom: 3px; margin-left: 2px"
+              class="resource-icon"
+              src="/images/game/prey/prey_gold"
+            />
           </div>
         </div>
       </div>
     </div>
 
     <qtpanel id="fusion-info-panel" class="info-panel">
-      <div anchor="parent" class="info-row" style="height: 15px">
+      <div anchor="parent" class="info-row">
         <label
           class="info-text"
           style="float: left"
@@ -187,7 +226,10 @@
           class="info-icon"
           src="/images/icons/show_gui_help_grey"
           tooltip="Two items can be fused in order to increase the tier of one of them.
-The two items need to have the same name as well as the same tier and may not be imbued. In addition, further ingredients are needed. If a fusion attempt fails, one of the items remains unchanged. The tier of the second item will be reduced by one. If the item had no tier, it will be consumed. If a fusion attempt is successful, the tier of one of the items increases, while the second item will be consumed."
+- The two items need to have the same name as well as the same tier and may not be imbued. In addition, further ingredients are needed.
+- If a fusion attempt fails, one of the items remains unchanged.
+- The tier of the second item will be reduced by one. If the item had no tier, it will be consumed.
+- If a fusion attempt is successful, the tier of one of the items increases, while the second item will be consumed."
         />
       </div>
       <div class="info-row" style="height: 15px">
@@ -199,11 +241,11 @@ The two items need to have the same name as well as the same tier and may not be
         <img
           class="info-icon"
           src="/images/icons/show_gui_help_grey"
-          tooltip="Items of classification 4 can be upgraded up to tier 10.
-Items of classification 3 can be upgraded up to tier 3.
-Items of classification 2 can be upgraded up to tier 2.
-Items of classification 1 can be upgraded up to tier 1.
-Items with no classification cannot be upgraded."
+          tooltip="- Items of classification 4 can be upgraded up to tier 10.
+- Items of classification 3 can be upgraded up to tier 3.
+- Items of classification 2 can be upgraded up to tier 2.
+- Items of classification 1 can be upgraded up to tier 1.
+- Items with no classification cannot be upgraded."
         />
       </div>
       <div class="info-row" style="height: 15px">
@@ -215,7 +257,9 @@ Items with no classification cannot be upgraded."
         <img
           class="info-icon"
           src="/images/icons/show_gui_help_grey"
-          tooltip="You can spend up to two exaltation cores. One to increase your chance of a successful fusion and/or one to grant you a chance to keep the tier of the second item. If the second item has tier 0, an exaltation core will reduce the chance that the item will be consumed."
+          tooltip="You can spend up to two exaltation cores.
+- One to increase your chance of a successful fusion and/or one to grant you a chance to keep the tier of the second item.
+- If the second item has tier 0, an exaltation core will reduce the chance that the item will be consumed."
         />
       </div>
       <div class="info-row" style="height: 15px">
