@@ -594,68 +594,10 @@ function onPartyMembersChange(self, members)
   PartyHuntAnalyser.onPartyMembersChange(self, members)
 end
 
--- Alternative implementation that manually tracks party members through spectators
+-- Simplified party checking - no longer needed as PartyState handles everything
 function checkPartyMembersChange()
-  if not g_game.isOnline() then return end
-  
-  local localPlayer = g_game.getLocalPlayer()
-  if not localPlayer then return end
-  
-  -- Check if local player has left the party
-  local localShield = localPlayer:getShield()
-  local localIsInParty = (localShield == ShieldYellow or localShield == ShieldYellowSharedExp or localShield == ShieldYellowNoSharedExpBlink or 
-     localShield == ShieldYellowNoSharedExp or localShield == ShieldBlue or localShield == ShieldBlueSharedExp or 
-     localShield == ShieldBlueNoSharedExpBlink or localShield == ShieldBlueNoSharedExp)
-  
-  -- If local player is no longer in party, clear all party data
-  if not localIsInParty and #lastPartyMembers > 0 then
-    print("[PartyTracker] Local player no longer in party - clearing all party data")
-    lastPartyMembers = {}
-    onPartyMembersChange(localPlayer, {})
-    return
-  end
-  
-  -- Only check for new visible party members, don't remove existing ones
-  if localIsInParty then
-    local spectators = g_map.getSpectators(localPlayer:getPosition(), false)
-    local newMembersFound = false
-    
-    -- Build a lookup of existing party member IDs
-    local existingMemberIds = {}
-    for _, member in ipairs(lastPartyMembers) do
-      existingMemberIds[member:getId()] = true
-    end
-    
-    -- Add local player to existing members if not already tracked
-    if not existingMemberIds[localPlayer:getId()] then
-      table.insert(lastPartyMembers, localPlayer)
-      existingMemberIds[localPlayer:getId()] = true
-      newMembersFound = true
-      print("[PartyTracker] Added local player to party tracking")
-    end
-    
-    -- Check for new visible party members
-    for _, creature in ipairs(spectators) do
-      if creature:isPlayer() and not existingMemberIds[creature:getId()] then
-        local shield = creature:getShield()
-        -- Check if creature has ACTUAL party shield (exclude invitation shields)
-        if shield == ShieldYellow or shield == ShieldYellowSharedExp or shield == ShieldYellowNoSharedExpBlink or 
-           shield == ShieldYellowNoSharedExp or shield == ShieldBlue or shield == ShieldBlueSharedExp or 
-           shield == ShieldBlueNoSharedExpBlink or shield == ShieldBlueNoSharedExp then
-          table.insert(lastPartyMembers, creature)
-          existingMemberIds[creature:getId()] = true
-          newMembersFound = true
-          print("[PartyTracker] Found new party member: " .. creature:getName())
-        end
-      end
-    end
-    
-    -- Only trigger update if new members were found
-    if newMembersFound then
-      print("[PartyTracker] New party members detected, updating party")
-      onPartyMembersChange(localPlayer, lastPartyMembers)
-    end
-  end
+  -- This function is now redundant as PartyState manages all party tracking
+  -- Keeping it for compatibility but it does nothing
 end
 
 function onBossCooldown(cooldown)
