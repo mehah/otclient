@@ -429,6 +429,7 @@ function PartyHuntAnalyser:lootSplitter()
 end
 
 function onShieldChange(creature, shieldId)
+    -- Handle local player becoming party leader
     if creature == g_game.getLocalPlayer() then
         if table.contains({ShieldYellow, ShieldYellowSharedExp, ShieldYellowNoSharedExpBlink}, shieldId) and not packetSend then
 			PartyHuntAnalyser.leader = true
@@ -439,6 +440,61 @@ function onShieldChange(creature, shieldId)
             packetSend = false
             PartyHuntAnalyser.session = os.time()
             if PartyHuntAnalyser.event then PartyHuntAnalyser.event:cancel() end
+        end
+    end
+    
+    -- Only trigger party member detection for significant shield changes
+    -- that indicate joining or leaving a party (not just shield updates)
+    if creature:isPlayer() then
+        local oldShield = creature.lastKnownShield or ShieldNone
+        creature.lastKnownShield = shieldId
+        
+        -- Check if this is a transition from/to party membership
+        local wasPartyMember = (oldShield == ShieldYellow or oldShield == ShieldYellowSharedExp or 
+                               oldShield == ShieldYellowNoSharedExpBlink or oldShield == ShieldYellowNoSharedExp or 
+                               oldShield == ShieldBlue or oldShield == ShieldBlueSharedExp or 
+                               oldShield == ShieldBlueNoSharedExpBlink or oldShield == ShieldBlueNoSharedExp)
+        
+        local isPartyMember = (shieldId == ShieldYellow or shieldId == ShieldYellowSharedExp or 
+                              shieldId == ShieldYellowNoSharedExpBlink or shieldId == ShieldYellowNoSharedExp or 
+                              shieldId == ShieldBlue or shieldId == ShieldBlueSharedExp or 
+                              shieldId == ShieldBlueNoSharedExpBlink or shieldId == ShieldBlueNoSharedExp)
+        
+        -- Only trigger if there's a meaningful change in party membership
+        if wasPartyMember ~= isPartyMember then
+            print("[PartyShieldChange] " .. creature:getName() .. " party status changed: " .. tostring(wasPartyMember) .. " -> " .. tostring(isPartyMember))
+            
+            scheduleEvent(function()
+                -- Get current party members and trigger the event
+                local localPlayer = g_game.getLocalPlayer()
+                if not localPlayer then return end
+                
+                local currentMembers = {}
+                local spectators = g_map.getSpectators(localPlayer:getPosition(), false)
+                
+                for _, spec in ipairs(spectators) do
+                    if spec:isPlayer() then
+                        local shield = spec:getShield()
+                        -- Only include actual party members (exclude invitations)
+                        if shield == ShieldYellow or shield == ShieldYellowSharedExp or shield == ShieldYellowNoSharedExpBlink or 
+                           shield == ShieldYellowNoSharedExp or shield == ShieldBlue or shield == ShieldBlueSharedExp or 
+                           shield == ShieldBlueNoSharedExpBlink or shield == ShieldBlueNoSharedExp then
+                            table.insert(currentMembers, spec)
+                        end
+                    end
+                end
+                
+                -- Add local player if they have party shield
+                local localShield = localPlayer:getShield()
+                if localShield == ShieldYellow or localShield == ShieldYellowSharedExp or localShield == ShieldYellowNoSharedExpBlink or 
+                   localShield == ShieldYellowNoSharedExp or localShield == ShieldBlue or localShield == ShieldBlueSharedExp or 
+                   localShield == ShieldBlueNoSharedExpBlink or localShield == ShieldBlueNoSharedExp then
+                    table.insert(currentMembers, localPlayer)
+                end
+                
+                -- Trigger the party members change event
+                onPartyMembersChange(localPlayer, currentMembers)
+            end, 200) -- Slightly longer delay to ensure shield changes are complete
         end
     end
 end

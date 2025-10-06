@@ -186,18 +186,19 @@ function init()
 
   connect(LocalPlayer, {
     onExperienceChange = onExperienceChange,
-    onLevelChange = onLevelChange
+    onLevelChange = onLevelChange,
+    onPartyMembersChange = onPartyMembersChange
   })
 
   connect(Creature, {
       onShieldChange = onShieldChange,
   })
   
-  -- Set up party member tracking
+  -- Set up party member tracking as backup (less frequent since shield changes trigger it)
   if partyMemberCheckEvent then
     partyMemberCheckEvent:cancel()
   end
-  partyMemberCheckEvent = cycleEvent(checkPartyMembersChange, 1000)
+  partyMemberCheckEvent = cycleEvent(checkPartyMembersChange, 5000) -- Every 5 seconds as backup
 
   -- DEBUG: Auto-test XP gain after 5 seconds
   -- scheduleEvent(function()
@@ -244,7 +245,8 @@ function terminate()
   })
   disconnect(LocalPlayer, {
     onExperienceChange = onExperienceChange,
-    onLevelChange = onLevelChange
+    onLevelChange = onLevelChange,
+    onPartyMembersChange = onPartyMembersChange
   })
 
   disconnect(Creature, {
@@ -649,7 +651,16 @@ function checkPartyMembersChange()
   -- If members changed, call the handler
   if membersChanged then
     print("[PartyTracker] Party members changed: " .. #lastPartyMembers .. " -> " .. #currentMembers)
-    onPartyMembersChange(localPlayer, currentMembers)
+    
+    -- Trigger the LocalPlayer's onPartyMembersChange event properly
+    -- This simulates the event that should come from the engine
+    if localPlayer.callLuaField then
+      localPlayer:callLuaField("onPartyMembersChange", currentMembers)
+    else
+      -- Fallback: call the function directly
+      onPartyMembersChange(localPlayer, currentMembers)
+    end
+    
     lastPartyMembers = {}
     for _, member in ipairs(currentMembers) do
       table.insert(lastPartyMembers, member)
