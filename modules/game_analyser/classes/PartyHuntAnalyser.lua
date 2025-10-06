@@ -153,7 +153,40 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 	local c = 0
 	for id, data in pairs(PartyHuntAnalyser.membersData) do
 		local widget = contentsPanel.party:getChildById(id)
+		
+		-- Check if this member is the leader - either by stored leaderID or by current shield color
 		local isLeader = (id == PartyHuntAnalyser.leaderID)
+		
+		-- Also check if this player is visible and has a leader shield (for real-time detection)
+		if not isLeader then
+			local localPlayer = g_game.getLocalPlayer()
+			if localPlayer then
+				local spectators = g_map.getSpectators(localPlayer:getPosition(), false)
+				for _, creature in ipairs(spectators) do
+					if creature:isPlayer() and creature:getId() == id then
+						local shield = creature:getShield()
+						local hasLeaderShield = (shield == ShieldYellow or shield == ShieldYellowSharedExp or shield == ShieldYellowNoSharedExpBlink)
+						if hasLeaderShield then
+							isLeader = true
+							-- Update stored leaderID for consistency
+							PartyHuntAnalyser.leaderID = id
+							print("PartyHuntAnalyser: Detected leader by visible shield: " .. creature:getName())
+						end
+						break
+					end
+				end
+				
+				-- Also check if the local player is the leader
+				if id == localPlayer:getId() then
+					local localShield = localPlayer:getShield()
+					local localHasLeaderShield = (localShield == ShieldYellow or localShield == ShieldYellowSharedExp or localShield == ShieldYellowNoSharedExpBlink)
+					if localHasLeaderShield then
+						isLeader = true
+						PartyHuntAnalyser.leaderID = id
+					end
+				end
+			end
+		end
 		
 		-- Check if widget exists and is the correct type
 		if not widget then
@@ -232,11 +265,32 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 end
 
 function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, membersData, membersName)
-	-- Check if server is telling us party is disbanded (empty data)
+	-- Don't immediately reset on empty data - server might be sending incomplete data during party changes
+	-- Only reset if we're certain the party is disbanded (check local player shield status)
 	if not membersData or not next(membersData) or not membersName or #membersName == 0 then
-		print("PartyHuntAnalyser: Server indicates party is disbanded - clearing data")
-		PartyHuntAnalyser:reset()
-		return
+		local localPlayer = g_game.getLocalPlayer()
+		if localPlayer then
+			local localShield = localPlayer:getShield()
+			local localIsInParty = (localShield == ShieldYellow or localShield == ShieldYellowSharedExp or 
+			                       localShield == ShieldYellowNoSharedExpBlink or localShield == ShieldYellowNoSharedExp or 
+			                       localShield == ShieldBlue or localShield == ShieldBlueSharedExp or 
+			                       localShield == ShieldBlueNoSharedExpBlink or localShield == ShieldBlueNoSharedExp)
+			
+			-- Only reset if local player is actually not in party
+			if not localIsInParty then
+				print("PartyHuntAnalyser: Server confirms party disbanded (no local party shield) - clearing data")
+				PartyHuntAnalyser:reset()
+				return
+			else
+				print("PartyHuntAnalyser: Server sent empty data but local player still in party - ignoring empty data")
+				return  -- Ignore empty data when player is still in party
+			end
+		else
+			-- No local player - can't verify, so reset to be safe
+			print("PartyHuntAnalyser: Server sent empty data and no local player - clearing data")
+			PartyHuntAnalyser:reset()
+			return
+		end
 	end
 	
 	-- startTime appears to be the session duration in seconds, not actual start time
@@ -246,7 +300,7 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	PartyHuntAnalyser.lootType = lootType
 	
 	-- Debug: Let's see what we're getting
-	print("PartyHuntAnalyser: Received data:")
+	print("PartyHuntAnalyser: Received valid party data:")
 	print("  membersData type: " .. type(membersData))
 	print("  membersData:")
 	for k, v in pairs(membersData) do
@@ -549,7 +603,7 @@ function PartyState:performUpdate()
         -- Add local player to visible list
         visiblePartyMembers[localId] = localPlayer
         
-        -- Check for visible party members
+        -- Check for visible party members and detect leader by shield
         for _, creature in ipairs(spectators) do
             if creature:isPlayer() and creature ~= localPlayer then
                 local shield = creature:getShield()
@@ -561,6 +615,13 @@ function PartyState:performUpdate()
                 if isPartyMember then
                     local memberId = creature:getId()
                     visiblePartyMembers[memberId] = creature
+                    
+                    -- Check if this visible member is the party leader (yellow shields)
+                    local memberIsLeader = (shield == ShieldYellow or shield == ShieldYellowSharedExp or shield == ShieldYellowNoSharedExpBlink)
+                    if memberIsLeader then
+                        PartyHuntAnalyser.leaderID = memberId
+                        print("[PartyState] Detected party leader by shield: " .. creature:getName() .. " (ID: " .. memberId .. ")")
+                    end
                     
                     if not PartyHuntAnalyser.membersData[memberId] then
                         PartyHuntAnalyser.membersData[memberId] = {0, 1, 0, 0, 0, 0}
