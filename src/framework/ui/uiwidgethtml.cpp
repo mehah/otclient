@@ -912,7 +912,7 @@ void UIWidget::updateTableLayout()
 
     constexpr std::size_t kMaxSpan = 1000;
 
-    auto parseSpanValue = [](const HtmlNodePtr& node, std::string_view primary, std::string_view fallback) -> std::size_t {
+    auto parseSpanValue = [kMaxSpan](const HtmlNodePtr& node, std::string_view primary, std::string_view fallback) -> std::size_t {
         if (!node)
             return 1;
 
