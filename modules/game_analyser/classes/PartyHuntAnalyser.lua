@@ -155,11 +155,30 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 	local c = 0
 	for id, data in pairs(PartyHuntAnalyser.membersData) do
 		local widget = contentsPanel.party:getChildById(id)
+		local isLeader = (id == PartyHuntAnalyser.leaderID)
+		
+		-- Check if widget exists and is the correct type
 		if not widget then
-			if id == PartyHuntAnalyser.leaderID then
+			-- Create new widget
+			if isLeader then
 				widget = g_ui.createWidget('LeaderInfo', contentsPanel.party)
 			else
 				widget = g_ui.createWidget('Info', contentsPanel.party)
+			end
+		else
+			-- Widget exists - check if we need to change the type
+			local widgetType = widget:getStyleName()
+			local expectedType = isLeader and 'LeaderInfo' or 'Info'
+			
+			if widgetType ~= expectedType then
+				-- Wrong widget type - destroy and recreate
+				widget:destroy()
+				if isLeader then
+					widget = g_ui.createWidget('LeaderInfo', contentsPanel.party)
+				else
+					widget = g_ui.createWidget('Info', contentsPanel.party)
+				end
+				print("PartyHuntAnalyser: Recreated widget for " .. (PartyHuntAnalyser.membersName[id] or "Unknown") .. " as " .. expectedType)
 			end
 		end
 
@@ -364,7 +383,14 @@ function onPartyHuntExtra(mousePosition)
 	local menu = g_ui.createWidget('PopupMenu')
 	menu:setGameMenu(true)
 
-	if table.contains({ShieldYellow, ShieldYellowSharedExp, ShieldYellowNoSharedExpBlink}, player:getShield()) then
+	local playerShield = player:getShield()
+	local isLeaderShield = table.contains({ShieldYellow, ShieldYellowSharedExp, ShieldYellowNoSharedExpBlink}, playerShield)
+	
+	print("PartyHuntExtra: Player shield = " .. tostring(playerShield) .. ", isLeaderShield = " .. tostring(isLeaderShield))
+	print("PartyHuntExtra: PartyHuntAnalyser.leader = " .. tostring(PartyHuntAnalyser.leader))
+	print("PartyHuntExtra: PartyHuntAnalyser.leaderID = " .. tostring(PartyHuntAnalyser.leaderID))
+
+	if isLeaderShield then
 		local lootType = PartyHuntAnalyser.lootType == PriceTypeEnum.Market and "Leader" or "Market"
 		menu:addOption(tr('Reset Data of Current Party Session'), function() g_game.sendPartyResetSession() return end)
 		menu:addOption(tr('Use %s Prices', lootType), function()
@@ -374,7 +400,7 @@ function onPartyHuntExtra(mousePosition)
 			end
 		return end)
 		menu:addSeparator()
-	elseif player:getShield() == ShieldNone then
+	elseif playerShield == ShieldNone then
 		menu:addOption(tr('Reset Data of Last Session'), function() PartyHuntAnalyser:reset(); PartyHuntAnalyser:startEvent() return end)
 	end
 
@@ -462,6 +488,28 @@ function onShieldChange(creature, shieldId)
         if table.contains({ShieldYellow, ShieldYellowSharedExp, ShieldYellowNoSharedExpBlink}, shieldId) and not packetSend then
 			PartyHuntAnalyser.leader = true
             packetSend = true
+            
+            -- Set local player as leader and add them to tracking
+            local localId = creature:getId()
+            PartyHuntAnalyser.leaderID = localId
+            print("PartyHuntAnalyser: Local player became party leader - ID: " .. localId .. ", Name: " .. creature:getName())
+            
+            -- Add local player to party tracking if not already there
+            if not PartyHuntAnalyser.membersData[localId] then
+                PartyHuntAnalyser.membersData[localId] = {
+                    0, -- memberID (not used in data array)
+                    1, -- highlight (active)
+                    0, -- loot
+                    0, -- supplies
+                    0, -- damage
+                    0  -- healing
+                }
+                PartyHuntAnalyser.membersName[localId] = creature:getName()
+                print("PartyHuntAnalyser: Added local player as party leader - " .. creature:getName() .. " (ID: " .. localId .. ")")
+            else
+                print("PartyHuntAnalyser: Local player already in tracking, updating to leader status")
+            end
+            
             PartyHuntAnalyser:updateWindow(true)
         elseif shieldId == 0 and packetSend then
 			-- Local player left party - clear all party data
@@ -539,10 +587,37 @@ function onPartyMembersChange(self, members)
 				visibleMemberIds[member:getId()] = member
 			end
 			
+			-- Check if local player should be included (if they're party leader or member)
+			local localPlayer = g_game.getLocalPlayer()
+			if localPlayer then
+				local localShield = localPlayer:getShield()
+				local localIsInParty = (localShield == ShieldYellow or localShield == ShieldYellowSharedExp or 
+				                       localShield == ShieldYellowNoSharedExpBlink or localShield == ShieldYellowNoSharedExp or 
+				                       localShield == ShieldBlue or localShield == ShieldBlueSharedExp or 
+				                       localShield == ShieldBlueNoSharedExpBlink or localShield == ShieldBlueNoSharedExp)
+				
+				if localIsInParty then
+					local localId = localPlayer:getId()
+					
+					-- Set leader status if local player has leader shield
+					local isLocalLeader = (localShield == ShieldYellow or localShield == ShieldYellowSharedExp or localShield == ShieldYellowNoSharedExpBlink)
+					if isLocalLeader then
+						PartyHuntAnalyser.leaderID = localId
+						PartyHuntAnalyser.leader = true
+						print("[PartyTracker] Local player detected as party leader in onPartyMembersChange")
+					end
+					
+					-- Add local player to visible members if not already there
+					if not visibleMemberIds[localId] then
+						visibleMemberIds[localId] = localPlayer
+						print("[PartyTracker] Added local player to visible members list")
+					end
+				end
+			end
+			
 			-- Add any new party members who aren't already tracked
 			local newMembersAdded = false
-			for _, member in ipairs(members) do
-				local memberId = member:getId()
+			for memberId, member in pairs(visibleMemberIds) do
 				if not PartyHuntAnalyser.membersData[memberId] then
 					-- New member joined - add them with default values
 					PartyHuntAnalyser.membersData[memberId] = {
