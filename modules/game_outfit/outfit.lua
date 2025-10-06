@@ -119,12 +119,7 @@ local function showSelectionList(data, tempValue, tempField, onSelectCallback)
                 })
                 
                 button.outfit:setMarginBottom(15)
-                local thingType = g_things.getThingType(tempOutfit.type, ThingCategoryCreature)
-                if thingType:getRealSize() > 0 then
-                    button.outfit:setCreatureSize(thingType:getRealSize())
-                else
-                    button.outfit:setCreatureSize(64)
-                end
+                button.outfit:setCenter(true)
 
             elseif Category == 2 then
                 button.outfit:setOutfit(previewCreature:getCreature():getOutfit())
@@ -947,13 +942,7 @@ function showMounts()
             type = mountData[1]
         })
 
-        local thingType = g_things.getThingType(mountData[1], ThingCategoryCreature)
         button.outfit:setCenter(true)
-        if thingType:getRealSize() > 0 then
-            button.outfit:setCreatureSize(thingType:getRealSize())
-        else
-            button.outfit:setCreatureSize(64)
-        end
 
         button.name:setText(mountData[2])
         if tempOutfit.mount == mountData[1] then
@@ -1012,18 +1001,10 @@ function showFamiliars()
         button.outfit:setOutfit({
             type = familiarData[1]
         })
-        
-        local thingType = g_things.getThingType(familiarData[1], ThingCategoryCreature)
-        
+                
         button.name:setText(familiarData[2])
-        
-        -- Add proper sizing for the 64x64 UICreature
+
         button.outfit:setCenter(true)
-        if thingType:getRealSize() > 0 then
-            button.outfit:setCreatureSize(thingType:getRealSize())
-        else
-            button.outfit:setCreatureSize(64)
-        end
         
         if tempOutfit.familiar == familiarData[1] then
             focused = familiarData[1]
@@ -1067,13 +1048,7 @@ function showShaders()
             addons = tempOutfit.addons
         })
 
-        button.outfit:setMarginBottom(15)
-        local thingType = g_things.getThingType(tempOutfit.type, ThingCategoryCreature)
-        if thingType:getRealSize() > 0 then
-            button.outfit:setCreatureSize(thingType:getRealSize())
-        else
-            button.outfit:setCreatureSize(64)
-        end
+        button.outfit:setCenter(true)
 
         button.outfit:getCreature():setShader("Outfit - Default")
         button.name:setText("Outfit - Default")
@@ -1093,13 +1068,7 @@ function showShaders()
 
             })
 
-            button.outfit:setMarginBottom(15)
-            local thingType = g_things.getThingType(tempOutfit.type, ThingCategoryCreature)
-            if thingType:getRealSize() > 0 then
-                button.outfit:setCreatureSize(thingType:getRealSize())
-            else
-                button.outfit:setCreatureSize(64)
-            end
+            button.outfit:setCenter(true)
     
             button.outfit:getCreature():setShader(shaderData[2])
 
