@@ -519,9 +519,9 @@ function PartyState:performUpdate()
     
     local localIsLeader = (localShield == ShieldYellow or localShield == ShieldYellowSharedExp or localShield == ShieldYellowNoSharedExpBlink)
     
-    -- If local player left party, reset everything
+    -- If LOCAL player left party, reset everything (only for the local player)
     if not localIsInParty and (PartyHuntAnalyser.leader or next(PartyHuntAnalyser.membersData)) then
-        print("[PartyState] Local player left party - resetting")
+        print("[PartyState] Local player left party - resetting only local data")
         PartyHuntAnalyser:reset()
         return
     end
@@ -541,10 +541,15 @@ function PartyState:performUpdate()
             print("[PartyState] Added local player to party: " .. localPlayer:getName())
         end
         
-        -- Check for visible party members
+        -- Get current visible party members
         local spectators = g_map.getSpectators(localPlayer:getPosition(), false)
+        local visiblePartyMembers = {}
         local newMembersFound = false
         
+        -- Add local player to visible list
+        visiblePartyMembers[localId] = localPlayer
+        
+        -- Check for visible party members
         for _, creature in ipairs(spectators) do
             if creature:isPlayer() and creature ~= localPlayer then
                 local shield = creature:getShield()
@@ -555,6 +560,8 @@ function PartyState:performUpdate()
                 
                 if isPartyMember then
                     local memberId = creature:getId()
+                    visiblePartyMembers[memberId] = creature
+                    
                     if not PartyHuntAnalyser.membersData[memberId] then
                         PartyHuntAnalyser.membersData[memberId] = {0, 1, 0, 0, 0, 0}
                         PartyHuntAnalyser.membersName[memberId] = creature:getName()
@@ -568,8 +575,68 @@ function PartyState:performUpdate()
             end
         end
         
+        -- Check if any tracked members are no longer visible AND no longer have party shields
+        -- This handles the case where someone left the party while visible
+        local membersToRemove = {}
+        for memberId, memberData in pairs(PartyHuntAnalyser.membersData) do
+            if not visiblePartyMembers[memberId] then
+                -- Member is not visible - check if they're still in party by checking spectators
+                local memberStillInParty = false
+                for _, creature in ipairs(spectators) do
+                    if creature:isPlayer() and creature:getId() == memberId then
+                        local shield = creature:getShield()
+                        local isPartyMember = (shield == ShieldYellow or shield == ShieldYellowSharedExp or 
+                                             shield == ShieldYellowNoSharedExpBlink or shield == ShieldYellowNoSharedExp or 
+                                             shield == ShieldBlue or shield == ShieldBlueSharedExp or 
+                                             shield == ShieldBlueNoSharedExpBlink or shield == ShieldBlueNoSharedExp)
+                        if isPartyMember then
+                            memberStillInParty = true
+                            break
+                        end
+                    end
+                end
+                
+                -- If member is visible but no longer has party shield, they left the party
+                if not memberStillInParty then
+                    -- Check if this member is visible with non-party shield (meaning they left)
+                    for _, creature in ipairs(spectators) do
+                        if creature:isPlayer() and creature:getId() == memberId then
+                            local shield = creature:getShield()
+                            local isPartyMember = (shield == ShieldYellow or shield == ShieldYellowSharedExp or 
+                                                 shield == ShieldYellowNoSharedExpBlink or shield == ShieldYellowNoSharedExp or 
+                                                 shield == ShieldBlue or shield == ShieldBlueSharedExp or 
+                                                 shield == ShieldBlueNoSharedExpBlink or shield == ShieldBlueNoSharedExp)
+                            if not isPartyMember and shield ~= ShieldNone then
+                                -- Player is visible but not in party anymore - they left
+                                table.insert(membersToRemove, memberId)
+                                print("[PartyState] Member " .. (PartyHuntAnalyser.membersName[memberId] or "Unknown") .. " left party (visible with non-party shield)")
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        
+        -- Remove members who left the party
+        for _, memberId in ipairs(membersToRemove) do
+            local memberName = PartyHuntAnalyser.membersName[memberId] or "Unknown"
+            PartyHuntAnalyser.membersData[memberId] = nil
+            PartyHuntAnalyser.membersName[memberId] = nil
+            
+            -- Remove widget from UI
+            local contentsPanel = PartyHuntAnalyser.window.contentsPanel
+            if contentsPanel and contentsPanel.party then
+                local widget = contentsPanel.party:getChildById(memberId)
+                if widget then
+                    widget:destroy()
+                end
+            end
+            print("[PartyState] Removed " .. memberName .. " from party tracking")
+        end
+        
         -- Update UI if changes were made
-        if newMembersFound then
+        if newMembersFound or #membersToRemove > 0 then
             PartyHuntAnalyser:updateWindow(true)
         end
     end
@@ -590,12 +657,12 @@ function onShieldChange(creature, shieldId)
         
         -- Only update if there's a significant state change
         if (not hasPartyData and isNowInParty) or (hasPartyData and not isNowInParty) or (wasLeader ~= isNowLeader) then
-            print("[PartyState] Shield change detected - scheduling update")
+            print("[PartyState] Local player shield change detected - scheduling update")
             PartyState:scheduleUpdate()
         end
     end
     
-    -- For other players, only schedule update if they might be joining the party
+    -- For other players, detect both joining AND leaving the party
     if creature:isPlayer() and creature ~= g_game.getLocalPlayer() then
         local oldShield = creature.lastKnownShield or ShieldNone
         creature.lastKnownShield = shieldId
@@ -610,9 +677,13 @@ function onShieldChange(creature, shieldId)
                               shieldId == ShieldBlue or shieldId == ShieldBlueSharedExp or 
                               shieldId == ShieldBlueNoSharedExpBlink or shieldId == ShieldBlueNoSharedExp)
         
-        -- Only schedule update if someone joined the party (not when they leave visually)
-        if not wasPartyMember and isPartyMember then
-            print("[PartyState] New party member shield detected - scheduling update")
+        -- Schedule update if someone joined OR left the party
+        if wasPartyMember ~= isPartyMember then
+            if wasPartyMember and not isPartyMember then
+                print("[PartyState] " .. creature:getName() .. " left party - scheduling update")
+            elseif not wasPartyMember and isPartyMember then
+                print("[PartyState] " .. creature:getName() .. " joined party - scheduling update")
+            end
             PartyState:scheduleUpdate()
         end
     end
