@@ -308,21 +308,21 @@ void UIManager::updateHoveredWidget(const bool now)
             }
 
             m_hoveredWidgets = std::move(newHovered);
-        } else {
-            if (hoveredWidget && !hoveredWidget->isEnabled())
-                hoveredWidget = nullptr;
+        }
 
-            if (hoveredWidget != m_hoveredWidget) {
-                const UIWidgetPtr oldHovered = m_hoveredWidget;
-                m_hoveredWidget = hoveredWidget;
-                if (oldHovered) {
-                    oldHovered->updateState(Fw::HoverState);
-                    oldHovered->onHoverChange(false);
-                }
-                if (hoveredWidget) {
-                    hoveredWidget->updateState(Fw::HoverState);
-                    hoveredWidget->onHoverChange(true);
-                }
+        if (hoveredWidget && !hoveredWidget->isEnabled())
+            hoveredWidget = nullptr;
+
+        if (hoveredWidget != m_hoveredWidget) {
+            const UIWidgetPtr oldHovered = m_hoveredWidget;
+            m_hoveredWidget = hoveredWidget;
+            if (oldHovered) {
+                oldHovered->updateState(Fw::HoverState);
+                oldHovered->onHoverChange(false);
+            }
+            if (hoveredWidget) {
+                hoveredWidget->updateState(Fw::HoverState);
+                hoveredWidget->onHoverChange(true);
             }
         }
     };
