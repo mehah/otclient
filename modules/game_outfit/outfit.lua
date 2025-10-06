@@ -1226,11 +1226,13 @@ function onPresetSelect(list, focusedChild, unfocusedChild, reason)
         updateAppearanceTexts(tempOutfit)
 
         updateAppearanceText("preset", preset.title)
-        updateAppearanceText("aura", modules.game_attachedeffects.getName(preset.auras))
-        updateAppearanceText("wings", modules.game_attachedeffects.getName(preset.wings))
-        updateAppearanceText("shader", preset.shaders or "Outfit - Default")
-        updateAppearanceText("effects", modules.game_attachedeffects.getName(preset.effects))
-
+        if g_game.getFeature(GameWingsAurasEffectsShader) then
+            updateAppearanceText("aura", modules.game_attachedeffects.getName(preset.auras))
+            updateAppearanceText("wings", modules.game_attachedeffects.getName(preset.wings))
+            updateAppearanceText("shader", preset.shaders or "Outfit - Default")
+            updateAppearanceText("effects", modules.game_attachedeffects.getName(preset.effects))
+        end
+        
         previewCreature:getCreature():clearAttachedEffects()
 
         if settings.showEffects and preset.effects then
