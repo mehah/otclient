@@ -513,6 +513,9 @@ function forgeController:applyForgeConfiguration(config)
     forgeController.maxDustCap = tonumber(numericFields.maxDustCap) or 225
 
     self:setInitialValues(initial)
+
+    forgeController.normalDustFusion = numericFields.normalDustFusion or 100
+    forgeController.convergenceDustFusion = numericFields.convergenceDustFusion or 130
 end
 
 function forgeController:onConversion(conversionType, dependencies)
@@ -551,13 +554,6 @@ function forgeController:onConversion(conversionType, dependencies)
         local maxDustCap = forgeController.maxDustCap
         local maxDustLevel = forgeController.maxDustLevel
 
-
-        g_logger.info("dustBalance: " ..
-            dustBalance ..
-            " currentNecessaryDust: " ..
-            currentNecessaryDust ..
-            " maxDustLevel: " .. tostring(maxDustLevel) .. " maxDustCap: " .. tostring(maxDustCap))
-
         if maxDustCap > 0 and maxDustLevel >= maxDustCap then
             return
         end
@@ -579,7 +575,6 @@ local resolveForgePrice = helpers.resolveForgePrice
 function forgeController:getFusionPrice(prices, item, tier)
     local price = resolveForgePrice(prices, item, tier)
     forgeController.fusionPrice = formatGoldAmount(price)
-    g_logger.info(">> fusion price: " .. tostring(formatGoldAmount(price)) .. " >: " .. forgeController.fusionPrice)
 end
 
 function g_game.onOpenForge(openData)

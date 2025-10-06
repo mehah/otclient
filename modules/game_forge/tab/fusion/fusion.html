@@ -82,7 +82,9 @@
             ></UIItem>
           </div>
           <div class="forge-counter">
-            <label class="forge-full-width-label" text="100"></label>
+            <div style="text-align: center; align-items: center">
+              {{self.normalDustFusion}}
+            </div>
           </div>
         </div>
 
@@ -121,35 +123,6 @@
             </div>
           </div>
         </div>
-
-        <img
-          class="flow-arrow"
-          style="top: 35px"
-          src="/images/arrows/icon-arrow-rightlarge"
-        />
-        <div class="fusion-result-summary">
-          <UIButton class="forge-action-button forge-action-button--large">
-            <UIItem
-              class="forge-result-item forge-result-item-fusion"
-              style="left: 20px; icon: /images/ui/icon-questionmark"
-            ></UIItem>
-            <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
-            <UIItem
-              class="forge-result-item forge-result-item-fusion"
-              style="left: 0px; icon: /images/ui/icon-questionmark"
-            ></UIItem>
-            <img
-              class="forge-action-overlay"
-              src="/images/ui/ditherpattern64"
-            />
-          </UIButton>
-          <div anchor="prev" class="forge-result-cost">
-            <div>
-              {{self.fusionPrice}}
-              <img class="resource-icon" src="/images/game/prey/prey_gold" />
-            </div>
-          </div>
-        </div>
       </div>
 
       <div
@@ -157,6 +130,7 @@
         anchor="parent"
         class="fusion-convergence-section"
         *visible="self.modeFusion"
+        style="width: 295px; height: 90px"
       >
         <div
           id="fusionConvergenceGrid"
@@ -168,7 +142,35 @@
             <UIItem class="forge-item-icon" style="item-id: 37160"></UIItem>
           </div>
           <div class="forge-counter">
-            <label class="forge-full-width-label" text="130"></label>
+            <div style="text-align: center; align-items: center">
+              {{self.convergenceDustFusion}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <img
+        class="flow-arrow"
+        style="top: 35px"
+        src="/images/arrows/icon-arrow-rightlarge"
+      />
+      <div class="fusion-result-summary">
+        <UIButton class="forge-action-button forge-action-button--large">
+          <UIItem
+            class="forge-result-item forge-result-item-fusion"
+            style="left: 20px; icon: /images/ui/icon-questionmark"
+          ></UIItem>
+          <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
+          <UIItem
+            class="forge-result-item forge-result-item-fusion"
+            style="left: 0px; icon: /images/ui/icon-questionmark"
+          ></UIItem>
+          <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
+        </UIButton>
+        <div anchor="prev" class="forge-result-cost">
+          <div>
+            {{self.fusionPrice}}
+            <img class="resource-icon" src="/images/game/prey/prey_gold" />
           </div>
         </div>
       </div>
