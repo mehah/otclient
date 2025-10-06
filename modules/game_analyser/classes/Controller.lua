@@ -39,6 +39,9 @@ function ControllerAnalyser:startEvent()
     if MiscAnalyzer then
 		MiscAnalyzer.session = os.time()
 	end
+    if PartyHuntAnalyser then
+		PartyHuntAnalyser.session = os.time()
+	end
 
 	if ControllerAnalyser.eventGraph then ControllerAnalyser.eventGraph:cancel() end
 	if ControllerAnalyser.event250 then ControllerAnalyser.event250:cancel() end
