@@ -1648,18 +1648,6 @@ int push_luavalue(const ForgeOpenData& data) {
 }
 
 int push_luavalue(const ForgeResultData& data) {
-    /*
-     ForgeResultData forgeResult;
-    forgeResult.actionType = msg->getU8();
-    forgeResult.convergence = msg->getU8() == 1;
-    forgeResult.success = msg->getU8() == 1;
-    forgeResult.leftItemId = msg->getU16();
-    forgeResult.leftTier = msg->getU8();
-    forgeResult.rightItemId = msg->getU16();
-    forgeResult.rightTier = msg->getU8();
-    forgeResult.bonus = 0;
-    forgeResult.coreCount = 0;
-    */
     g_lua.createTable(0, 8);
     g_lua.pushInteger(data.actionType);
     g_lua.setField("actionType");
