@@ -104,15 +104,20 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
     local isBinding = setterName:starts('*')
     if isBinding then
         setterName = setterName:sub(2):gsub("^%l", string.upper)
-        local success = false
+        local success = true
         local fnc = getFncByExpr('return function(self, target ' .. FOR_CTX.__keys .. ') return ' .. value .. ' end',
             NODE_STR, self, controller, function()
                 return ('Attribute Error[%s]: %s'):format(attr, value)
             end)
-        value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR,
-            function()
-                return ('Attribute Error[%s]: %s'):format(attr, value)
-            end)
+
+        if self:isVisible() then
+            value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR,
+                function()
+                    return ('Attribute Error[%s]: %s'):format(attr, value)
+                end)
+        else
+            value = nil
+        end
 
         if not success then return end
 
@@ -120,6 +125,7 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
             widget = self,
             res = value,
             method = nil,
+            methodName = setterName:lower(),
             values = FOR_CTX.__values,
             fnc = function(self)
                 local value = fnc(controller, self.widget, self.values and unpack(self.values))

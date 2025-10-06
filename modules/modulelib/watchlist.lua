@@ -13,7 +13,7 @@ function WidgetWatch.update()
         local isDestroyed = obj.widget:isDestroyed()
         if isDestroyed then
             obj.widget = nil
-        else
+        elseif obj.methodName == 'conditionif' or obj.methodName == 'visible' or obj.widget:isVisible() then
             obj.fnc(obj)
         end
 
