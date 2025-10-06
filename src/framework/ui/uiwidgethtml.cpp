@@ -734,13 +734,13 @@ namespace {
 
         if (widthNeedsUpdate) {
             const int paddedW = maxLineWidth + w->getPaddingLeft() + w->getPaddingRight();
-            w->setWidth_px(std::max(0, paddedW));
+            w->setWidth_px(std::max<int>(0, paddedW));
             w->getWidthHtml().applyUpdate(w->getWidth(), SIZE_VERSION_COUNTER);
         }
 
         if (heightNeedsUpdate) {
             const int paddedH = totalHeight + w->getPaddingTop() + w->getPaddingBottom();
-            w->setHeight_px(std::max(0, paddedH));
+            w->setHeight_px(std::max<int>(0, paddedH));
             w->getHeightHtml().applyUpdate(w->getHeight(), SIZE_VERSION_COUNTER);
         }
     }
@@ -904,7 +904,7 @@ void UIWidget::updateTableLayout()
         return;
 
     const int tablePaddingX = m_padding.left + m_padding.right;
-    const int tableContentWidth = getWidth() > 0 ? std::max(0, getWidth() - tablePaddingX) : 0;
+    const int tableContentWidth = getWidth() > 0 ? std::max<int>(0, getWidth() - tablePaddingX) : 0;
 
     struct TableCellInfo
     {
@@ -982,7 +982,7 @@ void UIWidget::updateTableLayout()
                     break;
             }
 
-            columnCount = std::max(columnCount, columnIndex + colSpan);
+            columnCount = std::max<std::size_t>(columnCount, columnIndex + colSpan);
 
             const std::size_t effectiveRowSpan = std::max<std::size_t>(1, std::min<std::size_t>(rowSpan, rows.size() - rowIndex));
 
@@ -993,7 +993,7 @@ void UIWidget::updateTableLayout()
             if (candidate < 0 && cell->m_width.valueCalculed > -1)
                 candidate = cell->m_width.valueCalculed;
 
-            candidate = std::max(candidate, 0) + marginX + paddingX;
+            candidate = std::max<int>(candidate, 0) + marginX + paddingX;
 
             bool fixedWidth = false;
             if (cell->m_width.unit == Unit::Px) {
@@ -1010,7 +1010,7 @@ void UIWidget::updateTableLayout()
             if (cell->m_height.unit == Unit::Px)
                 cellHeight = cell->m_height.value;
 
-            const int outerHeight = std::max(0, cellHeight) + cell->m_padding.top + cell->m_padding.bottom;
+            const int outerHeight = std::max<int>(0, cellHeight) + cell->m_padding.top + cell->m_padding.bottom;
 
             rowCellInfo[rowIndex].push_back(TableCellInfo{
                 cell,
@@ -1024,7 +1024,7 @@ void UIWidget::updateTableLayout()
 
             const std::size_t occupancyValue = effectiveRowSpan;
             for (std::size_t c = 0; c < colSpan; ++c)
-                rowSpanOccupancy[columnIndex + c] = std::max(rowSpanOccupancy[columnIndex + c], occupancyValue);
+                rowSpanOccupancy[columnIndex + c] = std::max<std::size_t>(rowSpanOccupancy[columnIndex + c], occupancyValue);
 
             columnIndex += colSpan;
         }
@@ -1048,14 +1048,14 @@ void UIWidget::updateTableLayout()
                 continue;
 
             if (span == 1) {
-                columnWidths[info.column] = std::max(columnWidths[info.column], info.requiredOuterWidth);
+                columnWidths[info.column] = std::max<int>(columnWidths[info.column], info.requiredOuterWidth);
                 if (info.widthFixed)
                     columnFixed[info.column] = true;
             } else {
                 const int perColumn = (info.requiredOuterWidth + static_cast<int>(span) - 1) / static_cast<int>(span);
                 for (std::size_t c = 0; c < span; ++c) {
                     const std::size_t column = info.column + c;
-                    columnWidths[column] = std::max(columnWidths[column], perColumn);
+                    columnWidths[column] = std::max<int>(columnWidths[column], perColumn);
                     if (info.widthFixed)
                         columnFixed[column] = true;
                 }
@@ -1069,7 +1069,7 @@ void UIWidget::updateTableLayout()
 
     int targetTotal = currentTotal;
     if (tableContentWidth > 0)
-        targetTotal = std::max(tableContentWidth, currentTotal);
+        targetTotal = std::max<int>(tableContentWidth, currentTotal);
 
     if (targetTotal > currentTotal && !columnWidths.empty()) {
         const int delta = targetTotal - currentTotal;
@@ -1134,8 +1134,8 @@ void UIWidget::updateTableLayout()
 
             const int marginX = cell->m_margin.left + cell->m_margin.right;
             const int paddingX = cell->m_padding.left + cell->m_padding.right;
-            const int targetOuterWidth = std::max(spanWidth - marginX, 0);
-            const int targetContentWidth = std::max(targetOuterWidth - paddingX, 0);
+            const int targetOuterWidth = std::max<int>(spanWidth - marginX, 0);
+            const int targetContentWidth = std::max<int>(targetOuterWidth - paddingX, 0);
 
             if ((cell->m_width.unit == Unit::Auto || cell->m_width.unit == Unit::FitContent || cell->m_width.unit == Unit::Percent) && spanWidth > 0) {
                 cell->setWidth_px(targetContentWidth);
@@ -1147,7 +1147,7 @@ void UIWidget::updateTableLayout()
                 distributedHeight = (info.outerHeight + static_cast<int>(info.rowSpan) - 1) / static_cast<int>(info.rowSpan);
 
             for (std::size_t r = 0; r < info.rowSpan && rowIndex + r < rowContentHeights.size(); ++r)
-                rowContentHeights[rowIndex + r] = std::max(rowContentHeights[rowIndex + r], distributedHeight);
+                rowContentHeights[rowIndex + r] = std::max<int>(rowContentHeights[rowIndex + r], distributedHeight);
         }
     }
 
@@ -1165,7 +1165,7 @@ void UIWidget::updateTableLayout()
             int explicitHeight = row->getHeight();
             if (explicitHeight < 0 && row->m_height.valueCalculed > -1)
                 explicitHeight = row->m_height.valueCalculed;
-            effectiveContentHeight = std::max(0, explicitHeight);
+            effectiveContentHeight = std::max<int>(0, explicitHeight);
         }
 
         const int rowOuterHeight = effectiveContentHeight + row->m_padding.top + row->m_padding.bottom + row->m_margin.top + row->m_margin.bottom;
@@ -1204,7 +1204,7 @@ void UIWidget::updateTableLayout()
         if (childHeight < 0 && child->m_height.valueCalculed > -1)
             childHeight = child->m_height.valueCalculed;
 
-        const int outerHeight = std::max(0, childHeight) + child->m_padding.top + child->m_padding.bottom + child->m_margin.top + child->m_margin.bottom;
+        const int outerHeight = std::max<int>(0, childHeight) + child->m_padding.top + child->m_padding.bottom + child->m_margin.top + child->m_margin.bottom;
         totalContentHeight += outerHeight;
     }
 
