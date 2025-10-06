@@ -4,6 +4,11 @@ local function formatMoney(value, separator)
     return comma_value(tostring(value))
 end
 
+-- Helper function to append colored text to a string
+local function setStringColor(textString, text, color)
+    return textString .. "[color=" .. color .. "]" .. text .. "[/color]"
+end
+
 if not PartyHuntAnalyser then
 	PartyHuntAnalyser = {
 		launchTime = 0,
@@ -77,7 +82,7 @@ function PartyHuntAnalyser.create()
 		-- Set up contextMenuButton click handler to show our menu
 		contextMenuButton.onClick = function(widget, mousePos)
 			local pos = mousePos or g_window.getMousePosition()
-			return onPartyExtra(pos)
+			return onPartyHuntExtra(pos)
 		end
 	end
 
@@ -169,14 +174,14 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 		widget.healing:setText(comma_value(data[4]))
 		widget:setId(id)
 
-		local tooltipMessage = {}
-		setStringColor(tooltipMessage, tr("Loot: %s ", comma_value(data[1])), "#3f3f3f")
-		setStringColor(tooltipMessage, "$\n", "yellow")
-		setStringColor(tooltipMessage, tr("Supplies: %s ", comma_value(data[2])), "#3f3f3f")
-		setStringColor(tooltipMessage, "$\n", "yellow")
-		setStringColor(tooltipMessage, tr("Balance: %s ", comma_value(playerBalance)), "#3f3f3f")
-		setStringColor(tooltipMessage, "$", "yellow")
-		widget.balance:setTooltip(tooltipMessage)
+		local tooltipMessage = ""
+		tooltipMessage = setStringColor(tooltipMessage, tr("Loot: %s ", comma_value(data[1])), "#3f3f3f")
+		tooltipMessage = setStringColor(tooltipMessage, "$\n", "yellow")
+		tooltipMessage = setStringColor(tooltipMessage, tr("Supplies: %s ", comma_value(data[2])), "#3f3f3f")
+		tooltipMessage = setStringColor(tooltipMessage, "$\n", "yellow")
+		tooltipMessage = setStringColor(tooltipMessage, tr("Balance: %s ", comma_value(playerBalance)), "#3f3f3f")
+		tooltipMessage = setStringColor(tooltipMessage, "$", "yellow")
+		widget.balance.parseColoreDisplay = tooltipMessage
 	end
 
 	contentsPanel.party:setHeight(40 + (c * 61))
@@ -205,7 +210,7 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	PartyHuntAnalyser.event = cycleEvent(function()
 		if not g_game.isOnline() then return end
 		PartyHuntAnalyser.session = PartyHuntAnalyser.session + 1
-		PartyHuntAnalyser:updateWindow(false)
+		--PartyHuntAnalyser:updateWindow(false)
 	end, 1000)
 
 	PartyHuntAnalyser:updateWindow(true)
@@ -324,9 +329,7 @@ function onShieldChange(creature, shieldId)
         if table.contains({ShieldYellow, ShieldYellowSharedExp, ShieldYellowNoSharedExpBlink}, shieldId) and not packetSend then
 			PartyHuntAnalyser.leader = true
             packetSend = true
-			g_game.doThing(false)
-            g_game.sendPartyLootPrice({})
-			g_game.doThing(true)
+            PartyHuntAnalyser:updateWindow(true)
         elseif shieldId == 0 and packetSend then
 			PartyHuntAnalyser.leader = false
             packetSend = false
