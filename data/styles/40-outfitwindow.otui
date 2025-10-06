@@ -108,6 +108,7 @@ SelectionButton < Panel
     id: outfit
     anchors.centerIn: parent
     size: 64 64
+    margin-bottom: 10
     phantom: true
   
   Panel

@@ -890,14 +890,8 @@ function showOutfits()
         outfit.healthBar = 0
         outfit.effects = 0
         button.outfit:setOutfit(outfit)
-        
-        local thingType = g_things.getThingType(outfit.type, ThingCategoryCreature)
+
         button.outfit:setCenter(true)
-        if thingType:getRealSize() > 0 then
-            button.outfit:setCreatureSize(thingType:getRealSize())
-        else
-            button.outfit:setCreatureSize(64)
-        end
 
         local state = outfitData[4]
         if state then
