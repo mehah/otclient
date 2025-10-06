@@ -1775,11 +1775,11 @@ void Game::openPortableForgeRequest()
     m_protocolGame->sendOpenPortableForge();
 }
 
-void Game::forgeRequest(Otc::ForgeAction_t actionType)
+void Game::forgeRequest(Otc::ForgeAction_t actionType, bool convergence, uint16_t firstItemid, uint8_t firstItemTier, uint16_t secondItemId, bool improveChance, bool tierLoss)
 {
     if (!canPerformGameAction())
         return;
-    m_protocolGame->sendForgeRequest(actionType);
+    m_protocolGame->sendForgeRequest(actionType, convergence, firstItemid, firstItemTier, secondItemId, improveChance, tierLoss);
 }
 
 void Game::sendForgeBrowseHistoryRequest(uint16_t page)

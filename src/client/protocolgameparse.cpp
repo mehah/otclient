@@ -271,6 +271,11 @@ void ProtocolGame::parseMessage(const InputMessagePtr& msg)
                         parseCreatureMark(msg);
                     }
                     break;
+                case Proto::GameServerForgeResult:
+                    if (g_game.getClientVersion() >= 1281) {
+                        parseForgeResult(msg);
+                    }
+                    break;
                 case Proto::GameServerTrappers:
                     if (g_game.getClientVersion() >= 1281) {
                         parseOpenForge(msg);
@@ -1845,6 +1850,36 @@ void ProtocolGame::parseDistanceMissile(const InputMessagePtr& msg)
     missile->setPath(fromPos, toPos);
 
     g_map.addThing(missile, fromPos);
+}
+
+void ProtocolGame::parseForgeResult(const InputMessagePtr& msg)
+{
+
+    ForgeResultData forgeResult;
+    forgeResult.actionType = msg->getU8();
+    forgeResult.convergence = msg->getU8() == 1;
+    forgeResult.success = msg->getU8() == 1;
+    forgeResult.leftItemId = msg->getU16();
+    forgeResult.leftTier = msg->getU8();
+    forgeResult.rightItemId = msg->getU16();
+    forgeResult.rightTier = msg->getU8();
+    forgeResult.bonus = 0;
+    forgeResult.coreCount = 0;
+
+    if (forgeResult.actionType == 1) {
+        msg->getU8(); // Bonus type always none for transfer
+    } else {
+        forgeResult.bonus = msg->getU8();// Roll fusion bonus
+        // Core kept
+        if (forgeResult.bonus == 2) {
+            forgeResult.coreCount = msg->getU8();
+        } else if (forgeResult.bonus >= 4 && forgeResult.bonus <= 8) {
+            forgeResult.leftItemId = msg->getU16();
+            forgeResult.leftTier = msg->getU8();
+        }
+    }
+
+    g_lua.callGlobalField("g_game", "forgeResultData", forgeResult);
 }
 
 void ProtocolGame::parseItemClasses(const InputMessagePtr& msg)

@@ -532,7 +532,7 @@ int push_luavalue(const StoreOffer& offer) {
             g_lua.pushString(offer.reasonIdDisable);
             g_lua.setField("reasonIdDisable");
         }
-    } else{
+    } else {
         g_lua.pushBoolean(offer.configurable);
         g_lua.setField("configurable");
     }
@@ -833,11 +833,11 @@ int push_luavalue(const CharmData& charm) {
     g_lua.pushInteger(charm.removeRuneCost);
     g_lua.setField("removeRuneCost");
     //if (g_game.getClientVersion() >= 1410) {
-        g_lua.pushInteger(charm.availableCharmSlots);
-        g_lua.setField("availableCharmSlots");
-        g_lua.pushInteger(charm.tier);
-        g_lua.setField("tier");
-   // }
+    g_lua.pushInteger(charm.availableCharmSlots);
+    g_lua.setField("availableCharmSlots");
+    g_lua.pushInteger(charm.tier);
+    g_lua.setField("tier");
+    // }
 
     return 1;
 }
@@ -1644,6 +1644,41 @@ int push_luavalue(const ForgeOpenData& data) {
 
     g_lua.pushInteger(data.dustLevel);
     g_lua.setField("dustLevel");
+    return 1;
+}
+
+int push_luavalue(const ForgeResultData& data) {
+    /*
+     ForgeResultData forgeResult;
+    forgeResult.actionType = msg->getU8();
+    forgeResult.convergence = msg->getU8() == 1;
+    forgeResult.success = msg->getU8() == 1;
+    forgeResult.leftItemId = msg->getU16();
+    forgeResult.leftTier = msg->getU8();
+    forgeResult.rightItemId = msg->getU16();
+    forgeResult.rightTier = msg->getU8();
+    forgeResult.bonus = 0;
+    forgeResult.coreCount = 0;
+    */
+    g_lua.createTable(0, 8);
+    g_lua.pushInteger(data.actionType);
+    g_lua.setField("actionType");
+    g_lua.pushBoolean(data.convergence);
+    g_lua.setField("convergence");
+    g_lua.pushBoolean(data.success);
+    g_lua.setField("success");
+    g_lua.pushInteger(data.leftItemId);
+    g_lua.setField("leftItemId");
+    g_lua.pushInteger(data.leftTier);
+    g_lua.setField("leftTier");
+    g_lua.pushInteger(data.rightItemId);
+    g_lua.setField("rightItemId");
+    g_lua.pushInteger(data.rightTier);
+    g_lua.setField("rightTier");
+    g_lua.pushInteger(data.bonus);
+    g_lua.setField("bonus");
+    g_lua.pushInteger(data.coreCount);
+    g_lua.setField("coreCount");
     return 1;
 }
 

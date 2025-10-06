@@ -599,6 +599,19 @@ struct ForgeClassTierPrices
     std::vector<ForgeTierPrice> tiers;
 };
 
+struct ForgeResultData
+{
+    uint8_t actionType{ 0 };
+    bool convergence{ false };
+    bool success{ false };
+    uint16_t leftItemId{ 0 };
+    uint8_t leftTier{ 0 };
+    uint16_t rightItemId{ 0 };
+    uint8_t rightTier{ 0 };
+    uint8_t bonus{ 0 };
+    uint8_t coreCount{ 0 };
+};
+
 struct ForgeConfigData
 {
     std::vector<ForgeClassTierPrices> classPrices;
@@ -977,7 +990,7 @@ public:
 
     // forge related
     void openPortableForgeRequest();
-    void forgeRequest(Otc::ForgeAction_t actionType);
+    void forgeRequest(Otc::ForgeAction_t actionType, bool convergence = false, uint16_t firstItemid = 0, uint8_t firstItemTier = 0, uint16_t secondItemId = 0, bool improveChance = false, bool tierLoss = false);
     void sendForgeBrowseHistoryRequest(uint16_t page);
 
     // imbuing related
