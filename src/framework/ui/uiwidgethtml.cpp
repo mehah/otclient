@@ -545,7 +545,7 @@ namespace {
 
         for (int i = 0; i < cols; ++i) {
             if (perc[i] > 0 && widths[i] == 0) {
-                widths[i] = std::max(0, (innerW * perc[i]) / 100);
+                widths[i] = std::max<int>(0, (innerW * perc[i]) / 100);
                 remaining -= widths[i];
             }
         }
@@ -693,7 +693,7 @@ namespace {
             } else if (childContentW <= 0 && cwSpec.valueCalculed < 0) {
                 childContentW = subW;
             } else {
-                if (subW > 0) childContentW = std::max(childContentW, subW);
+                if (subW > 0) childContentW = std::max<int>(childContentW, subW);
             }
 
             if (childContentH <= 0 && chSpec.valueCalculed > -1) {
@@ -701,11 +701,11 @@ namespace {
             } else if (childContentH <= 0 && chSpec.valueCalculed < 0) {
                 childContentH = subH;
             } else {
-                if (subH > 0) childContentH = std::max(childContentH, subH);
+                if (subH > 0) childContentH = std::max<int>(childContentH, subH);
             }
 
-            const int childOuterW = std::max(0, childContentW) + c->getPaddingLeft() + c->getPaddingRight();
-            const int childOuterH = std::max(0, childContentH) + c->getPaddingTop() + c->getPaddingBottom();
+            const int childOuterW = std::max<int>(0, childContentW) + c->getPaddingLeft() + c->getPaddingRight();
+            const int childOuterH = std::max<int>(0, childContentH) + c->getPaddingTop() + c->getPaddingBottom();
 
             if (breakLine(c->getDisplay())) {
                 flushLine();
