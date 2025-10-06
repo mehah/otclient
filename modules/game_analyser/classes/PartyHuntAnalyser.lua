@@ -161,10 +161,10 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 		local playerName = PartyHuntAnalyser.membersName[id] or "Unknow"
 		widget.name:setText(playerName)
 		if not data[5] then
-			widget.name:setColor("$var-cip-inactive-color")
+			widget.name:setColor("#707070")
 		end
 		widget.balance:setText(comma_value(playerBalance))
-		widget.balance:setColor(playerBalance >= 0 and "$var-text-cip-color-green" or "$var-text-cip-color-orange")
+		widget.balance:setColor(playerBalance >= 0 and "#44ad25" or "#ff9854")
 		widget.damage:setText(comma_value(data[3]))
 		widget.healing:setText(comma_value(data[4]))
 		widget:setId(id)
