@@ -1,11 +1,14 @@
 .fusion-target-slot {
   width: 158px;
   height: 82px;
-  --icon: /images/ui/icon-questionmark;
+  align-items: center;
+  justify-items: center;
+  position: relative;
 }
 
 .fusion-slot-item {
-  size: 65 65;
+  width: 60px;
+  height: 60px;
 }
 
 .fusion-stats {
@@ -79,6 +82,7 @@
   height: 85px;
   display: inline-block;
   margin-left: 10px;
+  width: 132px;
 }
 
 .fusion-improve-container {
@@ -109,7 +113,6 @@
 .fusion-improve-tax-container {
   display: flex;
   position: absolute;
-  /* background-color: black; */
   height: 22px;
   width: 25px;
   right: 0;

@@ -12,9 +12,37 @@
     >
       <div
         id="fusionSelectionGrid"
-        class="slot-grid forge-slot-grid UIScrollArea"
+        class="forge-slot-grid UIScrollArea"
         layout="type: grid; cell-size: 36 38;flow: true"
-      ></div>
+      >
+        <div *for="local item in (self.fusionItems or {})">
+          <div
+            class="fusion-items-to-select"
+            onclick="self:handleSelectItem(item, self.fusionPrices)"
+          >
+            <img
+              class="fusion-items-to-select-rarity"
+              *if="item.imagePath"
+              *image-source="item.imagePath"
+              *image-clip="item.rarityClipObject"
+              *border-width="1"
+              *border-color="self.selectedFusionItem and self.selectedFusionItem.key == item.key and 'white' or 'transparent'"
+            />
+
+            <UIItem
+              style="height: 32px; width: 32px; align-items: center"
+              *item-id="item.id"
+            ></UIItem>
+            <img
+              *if="item.tier>0"
+              class="fusion-items-to-select-tier"
+              src="/images/inventory/tiers-strip.png"
+              *image-clip="item.clip"
+            />
+            <label class="fusion-items-to-select-count">{{item.count}}</label>
+          </div>
+        </div>
+      </div>
       <div class="forge-selection-side" style="margin-left: 0px">
         <img
           class="forge-arrow-large"
@@ -35,9 +63,28 @@
           onchange="self:onCheckChangeConvergence(event)"
         />
       </div>
-      <UIWidget id="selected-fusion-target" class="fusion-target-slot">
-        <UIItem id="fusionTargetItemPreview" class="fusion-slot-item"></UIItem>
-      </UIWidget>
+      <div class="fusion-target-slot">
+        <div
+          *if="self.selectedFusionItemTarget"
+          class="fusion-items-to-select-target"
+        >
+          <UIItem
+            style="height: 64px; width: 64px; align-items: center"
+            *item-id="self.selectedFusionItemTarget.id"
+          ></UIItem>
+          <img
+            *if="self.selectedFusionItemTarget and self.selectedFusionItemTarget.tier > 0"
+            class="fusion-items-to-select-tier"
+            src="/images/inventory/tiers-strip.png"
+            *image-clip="self.selectedFusionItemTarget.clip"
+          />
+          <img
+            *visible="self.selectedFusionItemTarget.id == -1"
+            src="/images/ui/icon-questionmark"
+            style="position: absolute; top: 10px; left: 15px"
+          />
+        </div>
+      </div>
     </div>
 
     <div
@@ -50,26 +97,25 @@
         class="forge-result-placeholder"
         focusable="false"
         *visible="not self.modeFusion"
-        style=""
       >
         <div class="forge-required-block">
           <div class="forge-card">
             <UIItem
-              id="fusionSelectedItemIcon"
+              *if="self.selectedFusionItem"
               class="forge-item-icon forge-card-item"
+              *item-id="self.selectedFusionItem and self.selectedFusionItem.id or -1"
             ></UIItem>
             <img
-              id="fusionSelectedItemQuestion"
+              *if="self.selectedFusionItem.id == -1"
               class="forge-question-icon"
               src="/images/ui/icon-questionmark"
             />
           </div>
           <div class="forge-counter">
-            <label
-              id="fusionSelectedItemCounter"
-              class="forge-full-width-label"
-              text="0 / 1"
-            ></label>
+            <label id="fusionSelectedItemCounter" class="forge-full-width-label"
+              >{{self.selectedFusionItem and self.selectedFusionItem.count or
+              0}} / 1
+            </label>
           </div>
         </div>
 
@@ -190,17 +236,63 @@
         src="/images/arrows/icon-arrow-rightlarge"
       />
       <div class="fusion-result-summary">
-        <UIButton class="forge-action-button forge-action-button--large">
-          <UIItem
-            class="forge-result-item forge-result-item-fusion"
-            style="left: 20px; icon: /images/ui/icon-questionmark"
-          ></UIItem>
-          <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
-          <UIItem
-            class="forge-result-item forge-result-item-fusion"
-            style="left: 0px; icon: /images/ui/icon-questionmark"
-          ></UIItem>
-          <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
+        <UIButton
+          *disabled="not self.canTryFusion"
+          class="forge-action-button forge-action-button--large"
+          onclick="self:onTryFusion()"
+        >
+          <div class="fusion-result-preview-container">
+            <div class="fusion-result-preview-wrapper">
+              <img
+                *visible="self.selectedFusionItem.id == -1"
+                src="/images/ui/icon-questionmark"
+                style="position: absolute; top: 10px; left: 15px"
+              />
+
+              <div *if="self.selectedFusionItem.id ~= -1">
+                <UIItem
+                  style="height: 32px; width: 32px"
+                  *item-id="self.selectedFusionItem.id"
+                ></UIItem>
+                <img
+                  *if="self.selectedFusionItem.tier > 0"
+                  class="fusion-items-to-select-tier"
+                  src="/images/inventory/tiers-strip.png"
+                  *image-clip="self.selectedFusionItem.clip"
+                />
+              </div>
+            </div>
+            <img
+              class="forge-action-arrow"
+              style="position: absolute; left: 40px; top: 30px"
+              src="/images/arrows/icon_3arrows"
+            />
+            <div class="fusion-result-preview-wrapper-second">
+              <img
+                *visible="self.selectedFusionItemTarget.id == -1"
+                src="/images/ui/icon-questionmark"
+                style="position: absolute; top: 10px; left: 15px"
+              />
+
+              <div *if="self.selectedFusionItemTarget.id ~= -1">
+                <UIItem
+                  style="height: 32px; width: 32px"
+                  *item-id="self.selectedFusionItemTarget.id"
+                ></UIItem>
+                <img
+                  *if="self.selectedFusionItemTarget.tier > 0"
+                  class="fusion-items-to-select-tier"
+                  src="/images/inventory/tiers-strip.png"
+                  *image-clip="self.selectedFusionItemTarget.clip"
+                />
+              </div>
+            </div>
+          </div>
+          <img
+            *if="self.selectedFusionItemTarget.id == -1 or not self.canTryFusion"
+            class="forge-action-overlay"
+            src="/images/ui/ditherpattern64"
+          />
         </UIButton>
         <div anchor="prev" class="forge-result-cost">
           <div style="align-items: center; text-align: center">

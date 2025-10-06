@@ -95,7 +95,6 @@
 }
 
 .resource-icon {
-  /* float: right; */
   margin-right: 5px;
   --image-size: 9 9;
   --image-offset: 0 6;
@@ -325,4 +324,64 @@
   position: relative;
   size: 15 25;
   display: inline-block;
+}
+
+.fusion-items-to-select {
+  height: 34px;
+  width: 34px;
+  position: relative;
+  align-items: center;
+  margin-top: 2px;
+  margin-left: 2px;
+}
+.fusion-items-to-select-target {
+  height: 64px;
+  width: 64px;
+  position: relative;
+  margin-top: 0px;
+  margin-left: 0px;
+}
+
+.fusion-items-to-select-count {
+  position: absolute;
+  right: 2px;
+  bottom: 0px;
+}
+
+.fusion-items-to-select-tier {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  height: 10px;
+  width: 10px;
+}
+
+.fusion-items-to-select-rarity {
+  height: 34px;
+  width: 34px;
+}
+
+.fusion-result-preview-container {
+  align-items: center;
+  height: 64px;
+  width: 117px;
+  position: relative;
+  padding-left: 15px;
+  display: block;
+}
+
+.fusion-result-preview-wrapper {
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  position: relative;
+}
+
+.fusion-result-preview-wrapper-second {
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  position: absolute;
+  left: 64px;
+  top: 15px;
 }

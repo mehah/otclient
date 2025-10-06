@@ -37,12 +37,12 @@ local forgeActions = {
     INCREASELIMIT = 4,
 }
 
-local fusionTab = require('modules.game_forge.tab.fusion.fusion')
+-- local fusionTab = require('modules.game_forge.tab.fusion.fusion')
 local helpers = require('modules.game_forge.game_forge_helpers')
 
-fusionTab.registerDependencies(forgeController, {
-    resourceTypes = forgeResourceTypes
-})
+-- fusionTab.registerDependencies(forgeController, {
+--     resourceTypes = forgeResourceTypes
+-- })
 
 local cloneValue = helpers.cloneValue
 local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
@@ -99,7 +99,7 @@ local function show(self, skipRequest)
     if needsReload then
         self:loadHtml('game_forge.html')
         ui.panels = {}
-        fusionTab.invalidateContext(self)
+        -- fusionTab.invalidateContext(self)
     end
 
     if not self.ui then
@@ -154,12 +154,26 @@ local function hide()
     end
 end
 
+
+local baseSelectedFusionItem = {
+    id = -1,
+    tier = 0,
+    clip = {},
+    imagePath = nil,
+    rarityClipObject = nil,
+    count = 0
+}
+forgeController.selectedFusionItem = baseSelectedFusionItem
+forgeController.selectedFusionItemTarget = baseSelectedFusionItem
+
 function forgeController:close()
     hide()
 
     forgeController.fusionPrice = "???"
     forgeController.fusionChanceImprovedIsChecked = false
     forgeController.fusionReduceTierLossIsChecked = false
+    forgeController.selectedFusionItem = baseSelectedFusionItem
+    forgeController.selectedFusionItemTarget = baseSelectedFusionItem
 end
 
 local function toggle(self)
@@ -217,18 +231,18 @@ function forgeController:updateResourceBalances(resourceType)
             updateStatusConfig(self, config, player)
         end
     end
-    if not resourceType or resourceType == forgeResourceTypes.cores then
-        self:updateFusionCoreButtons()
-    end
+    -- if not resourceType or resourceType == forgeResourceTypes.cores then
+    --     self:updateFusionCoreButtons()
+    -- end
 end
 
-function forgeController:updateFusionCoreButtons()
-    fusionTab.updateFusionCoreButtons(self)
-end
+-- function forgeController:updateFusionCoreButtons()
+--     fusionTab.updateFusionCoreButtons(self)
+-- end
 
-function forgeController:onToggleFusionCore(coreType)
-    fusionTab.onToggleFusionCore(self, coreType)
-end
+-- function forgeController:onToggleFusionCore(coreType)
+--     fusionTab.onToggleFusionCore(self, coreType)
+-- end
 
 function forgeController:onInit()
     connect(g_game, {
@@ -356,7 +370,7 @@ function forgeController:onGameStart()
     if not self.ui or self.ui:isDestroyed() then
         self:loadHtml('game_forge.html')
         ui.panels = {}
-        fusionTab.invalidateContext(self)
+        -- fusionTab.invalidateContext(self)
     end
 
     resetWindowTypes()
@@ -371,7 +385,7 @@ function forgeController:onGameStart()
         currentCount = 0
     }
 
-    fusionTab.resetCoreSelections(self)
+    -- fusionTab.resetCoreSelections(self)
 end
 
 function forgeController:onGameEnd()
@@ -530,12 +544,17 @@ function forgeController:applyForgeConfiguration(config)
     forgeController.sliverToCore = numericFields.sliverToCore or 50
     forgeController.mustDisableConvertSliverToCoreButton = forgeController.currentSlivers <
         forgeController.sliverToCore
-    forgeController.mustDisableConvertSliverToCoreButton = forgeController.mustDisableIncreaseDustLimitButton and "red" or
+    forgeController.conversionNecessarySliverToCoreLabel = forgeController.mustDisableConvertSliverToCoreButton and "red" or
         "white"
 
+    g_logger.info("sliver:" ..
+        forgeController.currentSlivers ..
+        " necessary: " ..
+        forgeController.sliverToCore .. " bool: " .. tostring(forgeController.mustDisableConvertSliverToCoreButton))
 
     forgeController.currentExaltedCores = player:getResourceBalance(forgeResourceTypes.cores) or 0
-    forgeController.currentGold = formatGoldAmount(player:getTotalMoney() or 0)
+    forgeController.rawCurrentGold = player:getTotalMoney() or 0
+    forgeController.currentGold = formatGoldAmount(forgeController.rawCurrentGold)
 
     self:setInitialValues(initial)
 
@@ -671,10 +690,13 @@ function forgeController:onConversion(conversionType, dependencies)
 end
 
 forgeController.fusionPrice = "???"
+forgeController.rawFusionPrice = 0
 local resolveForgePrice = helpers.resolveForgePrice
-function forgeController:getFusionPrice(prices, item, tier)
-    local price = resolveForgePrice(prices, item, tier)
-    forgeController.fusionPrice = formatGoldAmount(price)
+function forgeController:getFusionPrice(prices, itemId, tier)
+    local itemPtr = Item.create(itemId, 1)
+    local price = resolveForgePrice(prices, itemPtr, tier)
+    self.rawFusionPrice = price
+    self.fusionPrice = formatGoldAmount(price)
 end
 
 function g_game.onOpenForge(openData)
@@ -688,21 +710,116 @@ function g_game.onOpenForge(openData)
     end
 
     forgeController:updateResourceBalances()
-    forgeController:updateFusionItems()
+
+    forgeController.fusionItems = cloneValue(openData.fusionItems or {})
+
+    for _, item in pairs(forgeController.fusionItems) do
+        item.key = ("%d_%d"):format(item.id, item.tier)
+        if item.tier > 0 then
+            item.clip = ItemsDatabase.getTierClip(item.tier)
+        end
+
+        local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
+        if imagePath then
+            item.imagePath = imagePath
+            item.rarityClipObject = rarityClipObject
+        end
+    end
+    g_logger.info("opendata: fusionItems: " .. #openData.fusionItems)
+end
+
+function forgeController:onTryFusion()
+    if not self.selectedFusionItem or self.selectedFusionItem.id == -1 then
+        return
+    end
+
+    if not self.selectedFusionItemTarget or self.selectedFusionItemTarget.id == -1 then
+        return
+    end
+
+    if self.rawFusionPrice <= 0 then
+        return
+    end
+
+    if not self.canTryFusion then
+        return
+    end
+
+    if tonumber(self.rawCurrentGold) < tonumber(self.rawFusionPrice) then
+        return
+    end
+
+    if self.currentDust < self.normalDustFusion then return end
+
+    g_game.forgeRequest(forgeActions.FUSION, false,
+        self.selectedFusionItem.id,
+        self.selectedFusionItem.tier,
+        self.selectedFusionItemTarget.id,
+        self.fusionChanceImprovedIsChecked,
+        self.fusionReduceTierLossIsChecked
+    )
+
+    self:close()
 end
 
 function forgeData(config)
     forgeController:applyForgeConfiguration(config)
 end
 
-function forgeController:configureFusionConversionPanel(selectedWidget)
-    fusionTab.configureConversionPanel(self, selectedWidget)
+forgeController.selectedFusionItemTarget = baseSelectedFusionItem
+function forgeController:handleSelectItem(selectedItem, fusionPrices)
+    if self.selectedFusionItem and self.selectedFusionItem.key == selectedItem.key then
+        self.selectedFusionItem = baseSelectedFusionItem
+        self.selectedFusionItemTarget = baseSelectedFusionItem
+        self.rawFusionPrice = 0
+        self.fusionPrice = "???"
+        return
+    end
+
+    for _, item in pairs(self.fusionItems) do
+        if item.key == selectedItem.key then
+            item.key = ("%d_%d"):format(item.id, item.tier)
+            g_logger.info("item.key>: " .. item.key .. " item.imagePath: " .. tostring(item.imagePath))
+            self.selectedFusionItem = cloneValue(item)
+            self.selectedFusionItemTarget = cloneValue(item)
+
+            if self.selectedFusionItemTarget.tier < 10 then
+                self.selectedFusionItemTarget.tier = self.selectedFusionItemTarget.tier + 1
+                self.selectedFusionItemTarget.clip = ItemsDatabase.getTierClip(self.selectedFusionItemTarget.tier)
+            end
+
+            local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(self.selectedFusionItemTarget.id)
+            if imagePath then
+                self.selectedFusionItemTarget.imagePath = imagePath
+                self.selectedFusionItemTarget.rarityClipObject = rarityClipObject
+            end
+            break
+        end
+    end
+
+    fusionPrices = fusionPrices or {}
+    self:getFusionPrice(fusionPrices, self.selectedFusionItem.id, self.selectedFusionItem.tier)
+
+    self.canTryFusion = self.rawFusionPrice > 0 and tonumber(self.rawCurrentGold) >= tonumber(self.rawFusionPrice) and
+        self.currentDust >= self.normalDustFusion
+
+    -- local widget = self:findWidget('#fusionTargetItemRight')
+    -- if widget then
+    --     widget:setItemId(self.selectedFusionItem and self.selectedFusionItem.id or -1)
+    --     local itemPtr = Item.create(self.selectedFusionItem.id, self.selectedFusionItem.count)
+    --     ItemsDatabase.setTier(widget, itemPtr)
+    --     ItemsDatabase.setRarityItem(widget, itemPtr)
+    -- end
 end
 
-function forgeController:resetFusionConversionPanel()
-    fusionTab.resetConversionPanel(self)
-end
+-- function forgeController:configureFusionConversionPanel(selectedWidget)
+--     fusionTab.configureConversionPanel(self, selectedWidget)
+-- end
 
-function forgeController:updateFusionItems(fusionData)
-    fusionTab.updateFusionItems(self, fusionData)
-end
+-- function forgeController:resetFusionConversionPanel()
+--     fusionTab.resetConversionPanel(self)
+-- end
+
+-- function forgeController:updateFusionItems(fusionData)
+--     fusionTab.updateFusionItems(self, fusionData)
+-- end
