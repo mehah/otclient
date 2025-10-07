@@ -127,9 +127,14 @@
       </div>
     </div>
     <div>
-      <input type="checkbox" *checked="self.showEffect" /> Show equalizer effect
+      <input
+        id="showEqualizerEffect"
+        type="checkbox"
+        *checked="self.showEqualizerEffect"
+      />
+      <label for="showEqualizerEffect">Show equalizer effect</label>
     </div>
-    <div class="equalizerEffect" *if="self.showEffect">
+    <div class="equalizerEffect" *visible="self.showEqualizerEffect">
       <div class="line"></div>
       <div class="line"></div>
       <div class="line"></div>
