@@ -300,6 +300,11 @@ end
 
 function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
+    for attr, v in pairs(attrs) do
+        if attr:starts('on') then
+            parseEvents(self, attr:lower(), v, controller, NODE_STR)
+        end
+    end
 
     local getFncSet = function(attrName)
         local exp = attrs[attrName]
@@ -347,12 +352,6 @@ function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
                     end
                 })
             end
-        end
-    end
-
-    for attr, v in pairs(attrs) do
-        if attr:starts('on') then
-            parseEvents(self, attr:lower(), v, controller, NODE_STR)
         end
     end
 end
