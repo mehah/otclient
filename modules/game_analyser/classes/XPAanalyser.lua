@@ -186,16 +186,10 @@ function XPAnalyser:updateWindow(ignoreVisible)
 end
 
 function XPAnalyser:setupStartExp(value)
-	--print("[DEBUG] XPAnalyser:setupStartExp called with value:", value)
-	--print("[DEBUG] Current startExp:", XPAnalyser.startExp)
 	if XPAnalyser.startExp == 0 then
-		--print("[DEBUG] Setting up initial XP values")
 		XPAnalyser.launchTime = g_clock.millis()
 		XPAnalyser.startExp = value
 		XPAnalyser.lastExp = value  -- Initialize for XP gain tracking
-		--print("[DEBUG] Set startExp and lastExp to:", value)
-	else
-		--print("[DEBUG] startExp already set, skipping initialization")
 	end
 end
 
@@ -404,20 +398,15 @@ end
 
 -- updaters
 function XPAnalyser:addRawXPGain(value) 
-	--print("[DEBUG] XPAnalyser:addRawXPGain called with value:", value)
 	-- Calculate the actual raw XP by removing rate modifiers
 	local actualRawXP = calculateRawXP(value)
-	--print("[DEBUG] Calculated actualRawXP:", actualRawXP)
 	XPAnalyser.rawXPGain = XPAnalyser.rawXPGain + actualRawXP
-	--print("[DEBUG] Total rawXPGain now:", XPAnalyser.rawXPGain)
 	XPAnalyser:updateGraphics()
 	XPAnalyser:updateWindow()
 end
 
 function XPAnalyser:addXpGain(value) 
-	--print("[DEBUG] XPAnalyser:addXpGain called with value:", value)
 	XPAnalyser.xpGain = XPAnalyser.xpGain + value
-	--print("[DEBUG] Total xpGain now:", XPAnalyser.xpGain)
 	XPAnalyser:updateGraphics()
 	XPAnalyser:updateWindow()
 end

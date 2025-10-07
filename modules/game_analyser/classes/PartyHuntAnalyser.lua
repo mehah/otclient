@@ -194,7 +194,6 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 							isLeader = true
 							-- Update stored leaderID for consistency
 							PartyHuntAnalyser.leaderID = id
-							print("PartyHuntAnalyser: Detected leader by visible shield: " .. creature:getName())
 						end
 						break
 					end
@@ -233,7 +232,6 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 				else
 					widget = g_ui.createWidget('Info', contentsPanel.party)
 				end
-				print("PartyHuntAnalyser: Recreated widget for " .. (PartyHuntAnalyser.membersName[id] or "Unknown") .. " as " .. expectedType)
 			end
 		end
 
@@ -243,16 +241,6 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 		supplyTotal = supplyTotal + data[4]
 		local playerBalance = data[3] - data[4]  -- loot - supplies
 		local playerName = PartyHuntAnalyser.membersName[id] or "Unknown"
-		
-		-- Debug: Check name lookup
-		if not PartyHuntAnalyser.membersName[id] then
-			print("PartyHuntAnalyser: Looking up name for ID " .. tostring(id) .. " - not found")
-			print("Available names in lookup table:")
-			for nameId, name in pairs(PartyHuntAnalyser.membersName) do
-				print("  ID " .. tostring(nameId) .. " (" .. type(nameId) .. ") = " .. tostring(name))
-			end
-		end
-		
 		widget.name:setText(playerName)
 		if not data[5] then
 			widget.name:setColor("#707070")
@@ -301,7 +289,6 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 			end
 		end
 		if isResetData then
-			print("PartyHuntAnalyser: Received reset data from server - performing local reset")
 			-- When server sends reset data, reset our local session but keep member tracking
 			PartyHuntAnalyser.session = os.time() - startTime
 			-- Don't reset membersData and membersName here - let the server data override them below
@@ -329,33 +316,21 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 			local hadRecentData = PartyHuntAnalyser.hadRecentPartyData and (timeSinceLastData < 10000) -- within 10 seconds
 			local isServerReset = localIsInParty and hadRecentData
 			
-			print("PartyHuntAnalyser: Empty data received - analyzing reset conditions:")
-			print("  localIsInParty: " .. tostring(localIsInParty))
-			print("  hadRecentData: " .. tostring(hadRecentData))
-			print("  timeSinceLastData: " .. tostring(timeSinceLastData))
-			print("  isLocalResetResponse: " .. tostring(isLocalResetResponse))
-			print("  isServerReset: " .. tostring(isServerReset))
-			
 			if isLocalResetResponse then
-				print("PartyHuntAnalyser: Received expected empty data response from server reset - clearing all data")
 				PartyHuntAnalyser.expectingResetResponse = false
 				PartyHuntAnalyser:reset()
 				return
 			elseif isServerReset then
-				print("PartyHuntAnalyser: Detected server-initiated reset (leader reset) - clearing all data")
 				PartyHuntAnalyser:reset()
 				return
 			elseif not localIsInParty then
-				print("PartyHuntAnalyser: Server confirms party disbanded (no local party shield) - clearing data")
 				PartyHuntAnalyser:reset()
 				return
 			else
-				print("PartyHuntAnalyser: Server sent empty data but local player still in party - ignoring empty data")
 				return  -- Ignore empty data when player is still in party
 			end
 		else
 			-- No local player - can't verify, so reset to be safe
-			print("PartyHuntAnalyser: Server sent empty data and no local player - clearing data")
 			PartyHuntAnalyser:reset()
 			return
 		end
@@ -374,16 +349,6 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	PartyHuntAnalyser.hadRecentPartyData = true
 	PartyHuntAnalyser.lastDataReceiveTime = g_clock.millis()
 	
-	-- Debug: Let's see what we're getting  
-	if isResetData then
-		print("PartyHuntAnalyser: Processing RESET data from server")
-	else
-		print("PartyHuntAnalyser: Received valid party data:")
-	end
-	print("  startTime: " .. tostring(startTime) .. ", leaderID: " .. tostring(leaderID) .. ", lootType: " .. tostring(lootType))
-	print("  membersData count: " .. table_size(membersData))
-	print("  membersName count: " .. (membersName and #membersName or 0))
-	
 	-- If membersData keys are player IDs, use them directly
 	-- If they are positions (1,2,3...), we need to map them to the actual player IDs
 	-- Server data is authoritative, so we can safely replace our data with server data
@@ -397,7 +362,6 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 				local memberId = memberInfo[1]  -- First element is the ID
 				local memberName = memberInfo[2]  -- Second element is the name
 				newMembersName[memberId] = memberName
-				print("  Mapped ID " .. tostring(memberId) .. " to name '" .. tostring(memberName) .. "'")
 			end
 		end
 	end
@@ -415,7 +379,6 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 				local memberData = newMembersData[memberIndex]
 				if memberData then
 					remappedData[playerId] = memberData
-					print("  Remapped position " .. memberIndex .. " to player ID " .. tostring(playerId))
 					memberIndex = memberIndex + 1
 				end
 			end
@@ -424,9 +387,6 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 		-- Only use remapped data if we successfully mapped something
 		if next(remappedData) then
 			newMembersData = remappedData
-			print("  Successfully remapped membersData to use player IDs as keys")
-		else
-			print("  Failed to remap membersData, keeping original")
 		end
 	end
 	
@@ -452,7 +412,6 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	-- Remove members that are no longer in the party according to server
 	for _, playerId in ipairs(membersToRemove) do
 		local playerName = PartyHuntAnalyser.membersName[playerId] or "Unknown"
-		print("PartyHuntAnalyser: Server indicates " .. playerName .. " left party - removing")
 		
 		PartyHuntAnalyser.membersData[playerId] = nil
 		PartyHuntAnalyser.membersName[playerId] = nil
@@ -551,7 +510,6 @@ function PartyHuntAnalyser:clipboardData()
 	for id, data in pairs(PartyHuntAnalyser.membersData) do
 		local playerName = PartyHuntAnalyser.membersName[id] or "Unknown"
 		final = final.. "\n".. playerName .. (id == PartyHuntAnalyser.leaderID and ' (Leader)' or '')
-
 		final = final.. "\n\tLoot: ".. comma_value(data[3])
 		final = final.. "\n\tSupplies: "..comma_value(data[4])
 		final = final.. "\n\tBalance: "..comma_value(data[3] - data[4])
@@ -585,7 +543,6 @@ function PartyHuntAnalyser:lootSplitter()
 	for id, data in pairs(PartyHuntAnalyser.membersData) do
 		local playerName = PartyHuntAnalyser.membersName[id] or "Unknown"
 		final = final.. "\n".. playerName .. (id == PartyHuntAnalyser.leaderID and ' (Leader)' or '')
-
 		final = final.. "\n\tLoot: ".. comma_value(data[3])
 		final = final.. "\n\tSupplies: "..comma_value(data[4])
 		final = final.. "\n\tBalance: "..comma_value(data[3] - data[4])

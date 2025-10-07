@@ -292,7 +292,6 @@ function LootAnalyser:checkLootHour()
 	-- This provides periodic updates to keep the analyzer current
 	
 	if not LootAnalyser.window then
-		--print("LootAnalyser:checkLootHour - no window")
 		return
 	end
 	
@@ -308,9 +307,6 @@ function LootAnalyser:checkLootHour()
 	if LootAnalyser.goldValue == 0 then
 		LootAnalyser.goldHour = 0
 	end
-	
-	-- Debug info
-	--print(string.format("LootAnalyser:checkLootHour - goldValue: %d, goldHour: %d, duration: %d", LootAnalyser.goldValue, LootAnalyser.goldHour, _duration))
 	
 	-- Always update UI elements and graph (like XP Analyser does)
 	LootAnalyser:updateBasicUI()
