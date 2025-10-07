@@ -122,6 +122,7 @@ function PartyHuntAnalyser:reset()
 
 	local contentsPanel = PartyHuntAnalyser.window:getChildById('contentsPanel')
 	contentsPanel.party:destroyChildren()
+	g_game.sendPartyAnalyzerReset()  -- Request fresh data from server
 	PartyHuntAnalyser:updateWindow(true, true)
 end
 
@@ -440,9 +441,9 @@ function onPartyHuntExtra(mousePosition)
 
 	if isLeaderShield then
 		local lootType = PartyHuntAnalyser.lootType == PriceTypeEnum.Market and "Leader" or "Market"
-		menu:addOption(tr('Reset Data of Current Party Session'), function() g_game.sendPartyResetSession() return end)
+		menu:addOption(tr('Reset Data of Current Party Session'), function() g_game.sendPartyAnalyzerReset() return end)
 		menu:addOption(tr('Use %s Prices', lootType), function()
-			g_game.sendPartyLootType(PartyHuntAnalyser.lootType == PriceTypeEnum.Market and PriceTypeEnum.Leader or PriceTypeEnum.Market)
+			g_game.sendPartyAnalyzerPriceType()
 			if PartyHuntAnalyser.lootType == PriceTypeEnum.Market then
 				modules.game_cyclopedia.CyclopediaItems.sendPartyLootItems()
 			end

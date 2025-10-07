@@ -1140,6 +1140,32 @@ void Game::partyShareExperience(const bool active)
     m_protocolGame->sendShareExperience(active);
 }
 
+void Game::sendPartyAnalyzerReset()
+{
+    this->sendPartyAnalyzerAction(1);
+}
+
+void Game::sendPartyAnalyzerPriceType()
+{
+    // server just toggles between Market/Leader
+    this->sendPartyAnalyzerAction(2);
+}
+
+void Game::sendPartyAnalyzerPriceValue()
+{
+    // For now, send empty items vector - the server will handle getting the prices
+    // This matches what the server code expects for PARTYANALYZERACTION_PRICEVALUE
+    this->sendPartyAnalyzerAction(3);
+}
+
+void Game::sendPartyAnalyzerAction(const uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPartyAnalyzerAction(action, items);
+}
+
 void Game::requestOutfit()
 {
     if (!canPerformGameAction())
