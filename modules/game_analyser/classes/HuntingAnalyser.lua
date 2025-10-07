@@ -252,9 +252,11 @@ function HuntingAnalyser:reset()
 	end
 
 	if PartyHuntAnalyser then
-		PartyHuntAnalyser:reset()
-		PartyHuntAnalyser:updateWindow(true, true)
-		g_game.sendPartyAnalyzerReset() -- Reset party hunt for all party members
+		print("HuntingAnalyser: Sending party analyzer reset to server")
+		PartyHuntAnalyser.expectingResetResponse = true
+		PartyHuntAnalyser.lastResetTime = g_clock.millis()
+		g_game.sendPartyAnalyzerReset() -- Reset party hunt for all party members - let server handle the reset
+		print("HuntingAnalyser: Party reset command sent - expecting server response")
 	end
 	
 	HuntingAnalyser:updateWindow(true)  -- Pass ignoreVisible=true to force update
