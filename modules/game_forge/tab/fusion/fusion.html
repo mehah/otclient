@@ -15,10 +15,10 @@
         class="forge-slot-grid UIScrollArea"
         layout="type: grid; cell-size: 36 38;flow: true"
       >
-        <div *for="local item in (self.fusionItems or {})">
+        <div *for="local item in (self.currentItemList or {})">
           <div
             class="fusion-items-to-select"
-            onclick="self:handleSelectItem(item, self.fusionPrices)"
+            onclick="self:handleSelectItem(item, self.fusionConvergence)"
           >
             <img
               class="fusion-items-to-select-rarity"
@@ -43,7 +43,7 @@
           </div>
         </div>
       </div>
-      <div class="forge-selection-side" style="margin-left: 0px">
+      <div class="forge-selection-side" style="margin-left: 15px">
         <img
           class="forge-arrow-large"
           src="/images/arrows/icon-arrow-rightlarge"
@@ -56,12 +56,17 @@
           class="forge-arrow-large"
           src="/images/arrows/icon-arrow-rightlarge"
         />
-        <input
-          class="forge-convergence-checkbox"
-          type="checkbox"
-          text="Convergence"
-          onchange="self:onCheckChangeConvergence(event)"
-        />
+        <div
+          style="display: flex; align-items: center; margin-top: 20px"
+          onclick="self:onCheckChangeConvergence(event)"
+        >
+          <input
+            id="fusion-convergence"
+            type="checkbox"
+            *checked="self.fusionConvergence"
+          />
+          <label for="fusion-convergence">Convergence</label>
+        </div>
       </div>
       <div class="fusion-target-slot">
         <div
@@ -70,7 +75,7 @@
         >
           <UIItem
             style="height: 64px; width: 64px; align-items: center"
-            *item-id="self.selectedFusionItemTarget.id"
+            *item-id="self.fusionConvergence and self.selectedFusionItem.id or self.selectedFusionItemTarget.id"
             shader="Outfit - cyclopedia-black"
           ></UIItem>
           <img
@@ -91,8 +96,9 @@
     <div
       class="minipanel forge-selection-area forge-selection-area--secondary"
       focusable="false"
-      title="Further Items Needed For fusion"
+      *title="self.fusionConvergenceTitle or 'Further Items Needed For fusion'"
       style="width: 300px"
+      id="fusionTitle"
     >
       <div
         class="forge-result-placeholder"
@@ -215,7 +221,35 @@
           id="fusionConvergenceGrid"
           class="slot-grid forge-slot-grid UIScrollArea"
           layout="type: grid; cell-size: 36 38;flow: true"
-        ></div>
+        >
+          <div *for="local item in (self.fusionConvergenceList or {})">
+            <div
+              class="fusion-items-to-select"
+              onclick="self:handleSelectConvergenceItem(item)"
+            >
+              <img
+                class="fusion-items-to-select-rarity"
+                *if="item.imagePath"
+                *image-source="item.imagePath"
+                *image-clip="item.rarityClipObject"
+                *border-width="1"
+                *border-color="self.selectedFusionConvergenceItem and self.selectedFusionConvergenceItem.key == item.key and 'white' or 'transparent'"
+              />
+
+              <UIItem
+                style="height: 32px; width: 32px; align-items: center"
+                *item-id="item.id"
+              ></UIItem>
+              <img
+                *if="item.tier>0"
+                class="fusion-items-to-select-tier"
+                src="/images/inventory/tiers-strip.png"
+                *image-clip="item.clip"
+              />
+              <label class="fusion-items-to-select-count">{{item.count}}</label>
+            </div>
+          </div>
+        </div>
         <div class="forge-required-block forge-required-block--offset">
           <div class="forge-card">
             <UIItem class="forge-item-icon" style="item-id: 37160"></UIItem>
@@ -278,7 +312,7 @@
               <div *if="self.selectedFusionItemTarget.id ~= -1">
                 <UIItem
                   style="height: 32px; width: 32px"
-                  *item-id="self.selectedFusionItemTarget.id"
+                  *item-id="self.fusionConvergence and self.selectedFusionItem.id orself.selectedFusionItemTarget.id"
                 ></UIItem>
                 <img
                   *if="self.selectedFusionItemTarget.tier > 0"
