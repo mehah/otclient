@@ -648,6 +648,9 @@ namespace {
             if (c->getFloat() != FloatType::None || c->getPositionType() == PositionType::Absolute)
                 continue;
 
+            if (c->getHtmlNode() && c->getHtmlNode()->getType() == NodeType::Text)
+                c->updateSize();
+
             int childContentW = c->getWidth();
             int childContentH = c->getHeight();
 

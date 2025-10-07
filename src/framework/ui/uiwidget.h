@@ -408,6 +408,8 @@ public:
     void setTextDrawOrder(const uint8_t order) { m_textDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
     void setBorderDrawOrder(const uint8_t order) { m_borderDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
     void ensureUniqueId();
+
+    void updateSize();
 private:
     uint64_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
@@ -418,6 +420,7 @@ private:
     DrawOrder m_borderDrawOrder{ DrawOrder::FIRST };
 
     // state managment
+
 protected:
     void repaint();
     bool setState(Fw::WidgetState state, bool on);
@@ -430,7 +433,6 @@ private:
     void updateChildrenIndexStates();
     void updateStyle();
 
-    void updateSize();
     void updateTableLayout();
     void applyAnchorAlignment();
     void scheduleHtmlTask(FlagProp prop);
