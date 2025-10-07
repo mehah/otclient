@@ -193,21 +193,25 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         if (whiteSpace.empty())
             whiteSpace = "normal";
 
-        setTextAutoResize(false);
+        setProp(PropTextHorizontalAutoResize, false);
+        setProp(PropTextVerticalAutoResize, false);
 
         auto originalText = m_text;
         { // get text size without wrap
+            m_textAlign = Fw::AlignTopLeft;
             trimSpacesAndNewlines(m_text);
-            setTextWrap(false);
+            setProp(PropTextWrap, false);
             updateText();
             m_textSizeNowrap = m_textSize;
         }
 
-        setTextWrap(true);
+        setProp(PropTextWrap, true);
         if (whiteSpace == "normal") {
             stdext::trim(m_text);
         } else if (whiteSpace == "nowrap") {
-            setTextAutoResize(true);
+            setProp(PropTextHorizontalAutoResize, true);
+            setProp(PropTextVerticalAutoResize, true);
+
             std::string out;
             out.reserve(m_text.size());
             bool lastWasSpace = false;

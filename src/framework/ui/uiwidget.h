@@ -820,14 +820,54 @@ public:
 
     void setText(std::string_view text, bool dontFireLuaCall = false);
     void setColoredText(std::string_view coloredText, bool dontFireLuaCall = false);
-    void setTextAlign(const Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
-    void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
-    void setTextWrap(const bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
-    void setTextAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
-    bool isTextAutoResize() { return hasProp(PropTextHorizontalAutoResize) && hasProp(PropTextVerticalAutoResize); }
+    void setTextAlign(const Fw::AlignmentFlag align) {
+        if (m_textAlign == align)
+            return;
+        m_textAlign = align;
+        updateText();
+    }
 
-    void setTextHorizontalAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
-    void setTextVerticalAutoResize(const bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    void setTextOffset(const Point& offset) {
+        if (m_textOffset == offset)
+            return;
+        m_textOffset = offset;
+        updateText();
+    }
+
+    void setTextWrap(const bool textWrap) {
+        if (hasProp(PropTextWrap) == textWrap)
+            return;
+        setProp(PropTextWrap, textWrap);
+        updateText();
+    }
+
+    void setTextAutoResize(const bool textAutoResize) {
+        bool changed = (hasProp(PropTextHorizontalAutoResize) != textAutoResize) ||
+            (hasProp(PropTextVerticalAutoResize) != textAutoResize);
+        if (!changed)
+            return;
+        setProp(PropTextHorizontalAutoResize, textAutoResize);
+        setProp(PropTextVerticalAutoResize, textAutoResize);
+        updateText();
+    }
+
+    bool isTextAutoResize() {
+        return hasProp(PropTextHorizontalAutoResize) && hasProp(PropTextVerticalAutoResize);
+    }
+
+    void setTextHorizontalAutoResize(const bool textAutoResize) {
+        if (hasProp(PropTextHorizontalAutoResize) == textAutoResize)
+            return;
+        setProp(PropTextHorizontalAutoResize, textAutoResize);
+        updateText();
+    }
+
+    void setTextVerticalAutoResize(const bool textAutoResize) {
+        if (hasProp(PropTextVerticalAutoResize) == textAutoResize)
+            return;
+        setProp(PropTextVerticalAutoResize, textAutoResize);
+        updateText();
+    }
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(std::string_view fontName);
     void setFontScale(const float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }

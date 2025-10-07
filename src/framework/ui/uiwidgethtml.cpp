@@ -1354,14 +1354,19 @@ UIWidgetPtr UIWidget::getVirtualParent() const {
 
     return parent;
 }
-
 void UIWidget::updateSize() {
     if (!isAnchorable()) return;
 
     if (m_htmlNode && m_htmlNode->getType() == NodeType::Text) {
         const auto& parentSize = m_parent->getSize();
 
-        auto height = parentSize.width() < m_textSizeNowrap.width() ? m_textSize.height() : m_textSizeNowrap.height();
+        auto height = m_textSizeNowrap.height();
+        if (parentSize.width() < m_textSizeNowrap.width()) {
+            if (isTextWrap() && m_rect.isValid()) {
+                const auto& text = m_font->wrapText(m_text, parentSize.width() - m_textOffset.x);
+                height *= std::count(text.begin(), text.end(), '\n') + 1;
+            }
+        }
 
         setSize({
             std::min<int>(parentSize.width(), m_textSizeNowrap.width()),
