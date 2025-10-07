@@ -39,7 +39,11 @@ if not PartyHuntAnalyser then
 		
 		-- Track when we're expecting a reset response
 		expectingResetResponse = false,
-		lastResetTime = 0
+		lastResetTime = 0,
+		
+		-- Track if we had party data recently (for detecting server resets)
+		hadRecentPartyData = false,
+		lastDataReceiveTime = 0
 	}
 	PartyHuntAnalyser.__index = PartyHuntAnalyser
 end
@@ -133,6 +137,10 @@ function PartyHuntAnalyser:reset()
 	-- Clear reset expectation flags
 	PartyHuntAnalyser.expectingResetResponse = false
 	PartyHuntAnalyser.lastResetTime = 0
+	
+	-- Clear data tracking flags
+	PartyHuntAnalyser.hadRecentPartyData = false
+	PartyHuntAnalyser.lastDataReceiveTime = 0
 
 	if PartyHuntAnalyser.event then PartyHuntAnalyser.event:cancel() end
 
@@ -317,8 +325,16 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 			
 			-- Also check if we previously had party data but now getting empty data while still in party
 			-- This indicates a server-initiated reset (leader clicked reset)
-			local hadDataBefore = next(PartyHuntAnalyser.membersData) ~= nil
-			local isServerReset = localIsInParty and hadDataBefore
+			local timeSinceLastData = g_clock.millis() - PartyHuntAnalyser.lastDataReceiveTime
+			local hadRecentData = PartyHuntAnalyser.hadRecentPartyData and (timeSinceLastData < 10000) -- within 10 seconds
+			local isServerReset = localIsInParty and hadRecentData
+			
+			print("PartyHuntAnalyser: Empty data received - analyzing reset conditions:")
+			print("  localIsInParty: " .. tostring(localIsInParty))
+			print("  hadRecentData: " .. tostring(hadRecentData))
+			print("  timeSinceLastData: " .. tostring(timeSinceLastData))
+			print("  isLocalResetResponse: " .. tostring(isLocalResetResponse))
+			print("  isServerReset: " .. tostring(isServerReset))
 			
 			if isLocalResetResponse then
 				print("PartyHuntAnalyser: Received expected empty data response from server reset - clearing all data")
@@ -353,6 +369,10 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	
 	-- Clear the reset expectation flag since we received valid data
 	PartyHuntAnalyser.expectingResetResponse = false
+	
+	-- Track that we received party data (for detecting future server resets)
+	PartyHuntAnalyser.hadRecentPartyData = true
+	PartyHuntAnalyser.lastDataReceiveTime = g_clock.millis()
 	
 	-- Debug: Let's see what we're getting  
 	if isResetData then
