@@ -23,12 +23,6 @@ button {
   text-align: center;
 }
 
-input[type="radio"],
-input[type="checkbox"],
-button {
-  --text-auto-resize: true;
-}
-
 input[type="password"] {
   --text-hidden: true;
 }

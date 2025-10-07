@@ -126,6 +126,14 @@
         </button>
       </div>
     </div>
+    <div style="background-color: red">
+      <input
+        type="checkbox"
+        *checked="self.showEffect"
+        onclick="self.showEffect = not self.showEffect"
+      />
+      Show equalizer effect
+    </div>
     <div class="equalizerEffect">
       <div class="line"></div>
       <div class="line"></div>
