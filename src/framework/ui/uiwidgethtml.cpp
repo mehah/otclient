@@ -1358,6 +1358,18 @@ UIWidgetPtr UIWidget::getVirtualParent() const {
 void UIWidget::updateSize() {
     if (!isAnchorable()) return;
 
+    if (m_htmlNode && m_htmlNode->getType() == NodeType::Text) {
+        const auto& parentSize = m_parent->getSize();
+
+        auto height = parentSize.width() < m_textSizeNowrap.width() ? m_textSize.height() : m_textSizeNowrap.height();
+
+        setSize({
+            std::min<int>(parentSize.width(), m_textSizeNowrap.width()),
+            height
+        });
+        return;
+    }
+
     if (m_positionType == PositionType::Absolute) {
         const bool L = m_positions.left.unit != Unit::Auto;
         const bool R = m_positions.right.unit != Unit::Auto;

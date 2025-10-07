@@ -778,6 +778,8 @@ public:
     int getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
     int getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
 
+    const auto& getTextSizeNoWrap() const { return m_textSizeNowrap; }
+
     // text related
 private:
     void initText();
@@ -785,6 +787,7 @@ private:
 
     Rect m_textCachedScreenCoords;
     Size m_textSize;
+    Size m_textSizeNowrap;
 
 protected:
     virtual void updateText();
