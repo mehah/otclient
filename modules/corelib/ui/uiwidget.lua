@@ -299,6 +299,8 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
 end
 
 function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
+    local controller = G_CONTROLLER_CALLED[controllerName]
+
     local getFncSet = function(attrName)
         local exp = attrs[attrName]
         return getFncByExpr('return function(self, value, target ' .. FOR_CTX.__keys .. ') ' .. exp .. '=value end',
@@ -348,7 +350,6 @@ function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
         end
     end
 
-    local controller = G_CONTROLLER_CALLED[controllerName]
     for attr, v in pairs(attrs) do
         if attr:starts('on') then
             parseEvents(self, attr:lower(), v, controller, NODE_STR)
