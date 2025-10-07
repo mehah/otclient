@@ -45,17 +45,6 @@ UIWidget
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: prev.bottom
-    margin-top: 7
-    height: 22
-
-    OptionCheckBox
-      id: showActionbar
-      !text: tr('Show action bar')
-
-  SmallReversedQtPanel
-    anchors.left: parent.left
-    anchors.right: parent.right
-    anchors.top: prev.bottom
     height: 22
     margin-top: 5
 
