@@ -147,7 +147,7 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    std::unordered_map <std::string, std::map<std::string, std::pair<std::string, bool>>> m_styles; // value, inheritable
+    std::unordered_map <std::string, std::map<std::string, std::pair<std::string, std::string>>> m_styles; // value, inheritable
     std::unordered_map<std::string, std::map<std::string, std::string>> m_inheritableStyles;
 
     std::map<std::string, std::string> m_attrStyles;

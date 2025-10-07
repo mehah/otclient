@@ -335,8 +335,7 @@ public:
     void setHtmlRootId(uint32_t id) { m_htmlRootId = id; }
     auto getHtmlRootId() const { return m_htmlRootId; }
 
-    void setHtmlId(const std::string& id) { m_htmlId = id; }
-    auto getHtmlId() const { return m_htmlId; }
+    auto getHtmlId() { return m_htmlId; }
 
     auto getPositionType() { return m_positionType; }
 

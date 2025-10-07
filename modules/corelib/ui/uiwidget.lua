@@ -133,18 +133,17 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             attr = attr:sub(2),
             values = FOR_CTX.__values,
             isInheritable = isInheritable,
+            htmlId = self:getHtmlId(),
             fnc = function(self)
                 local value = fnc(controller, self.widget, self.values and unpack(self.values))
                 if value ~= self.res then
                     self.method(self.widget, value)
                     if self.isInheritable then
-                        print(#self.widget:querySelectorAll(':node-all'), #self.widget:querySelectorAll('*'),
-                            #self.widget:querySelectorAll('div'))
                         local children = self.widget:querySelectorAll(':node-all')
                         for i = 1, #children do
                             local child = children[i]
-                            print(self.attr, child.inheritedStyles[self.attr] and 'sim' or 'nao')
-                            if child.inheritedStyles[self.attr] then
+                            local inheritedFromId = child.inheritedStyles[self.attr]
+                            if not inheritedFromId or inheritedFromId == self.htmlId then
                                 self.method(child, value)
                             end
                         end

@@ -110,12 +110,12 @@ namespace {
         return kProps.find(prop) != kProps.end();
     }
 
-    void setChildrenStyles(HtmlNode* n, const std::string& style, const std::string& prop, const std::string& value) {
+    void setChildrenStyles(std::string_view htmlId, HtmlNode* n, const std::string& style, const std::string& prop, const std::string& value) {
         if (n->getType() == NodeType::Element)
             n->getInheritableStyles()[style][prop] = value;
         for (const auto& child : n->getChildren()) {
-            child->getStyles()[style][prop] = { value , true };
-            setChildrenStyles(child.get(), style, prop, value);
+            child->getStyles()[style][prop] = { value , std::string{htmlId} };
+            setChildrenStyles(htmlId, child.get(), style, prop, value);
         }
     }
 
@@ -204,6 +204,7 @@ namespace {
         for (const auto& rule : sheet.rules) {
             const auto& selectors = stdext::join(rule.selectors);
             const auto& nodes = mainNode->querySelectorAll(selectors);
+            const auto is_all = selectors == "*";
 
             if (checkRuleExist && nodes.empty()) {
                 g_logger.warning("[{}][style] selector({}) no element was found.", htmlPath, selectors);
@@ -211,7 +212,8 @@ namespace {
             }
 
             for (const auto& node : nodes) {
-                if (node->getWidget() && !node->isStyleResolved()) {
+                const auto widget = node->getWidget().get();
+                if (widget && !node->isStyleResolved()) {
                     bool hasMeta = false;
                     for (const auto& metas : rule.selectorMeta) {
                         for (const auto& state : metas.pseudos) {
@@ -221,9 +223,9 @@ namespace {
                                     style += "!";
                                 style += state.name;
 
-                                node->getStyles()[style][decl.property] = { decl.value , false };
-                                if (isInheritable(decl.property)) {
-                                    setChildrenStyles(node.get(), style, decl.property, decl.value);
+                                node->getStyles()[style][decl.property] = { decl.value , "" };
+                                if (!is_all && isInheritable(decl.property)) {
+                                    setChildrenStyles(widget->getHtmlId(), node.get(), style, decl.property, decl.value);
                                 }
                             }
                             hasMeta = true;
@@ -234,9 +236,9 @@ namespace {
                         continue;
 
                     for (const auto& decl : rule.decls) {
-                        node->getStyles()["styles"][decl.property] = { decl.value , false };
-                        if (isInheritable(decl.property)) {
-                            setChildrenStyles(node.get(), "styles", decl.property, decl.value);
+                        node->getStyles()["styles"][decl.property] = { decl.value , "" };
+                        if (!is_all && isInheritable(decl.property)) {
+                            setChildrenStyles(widget->getHtmlId(), node.get(), "styles", decl.property, decl.value);
                         }
                     }
                 }
@@ -313,14 +315,14 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         parseAttrPropList(styleValue, node->getAttrStyles());
         for (const auto& [prop, value] : node->getAttrStyles()) {
             if (isInheritable(prop)) {
-                setChildrenStyles(node, "styles", prop, value);
+                setChildrenStyles(widget->getHtmlId(), node, "styles", prop, value);
             }
         }
     }
 
     auto styles = std::make_shared<OTMLNode>();
 
-    std::map<std::string, std::pair<std::string, bool>> stylesMerge;
+    std::map<std::string, std::pair<std::string, std::string>> stylesMerge;
 
     for (const auto [key, stylesMap] : node->getStyles()) {
         if (key != "styles") {
@@ -340,7 +342,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
     }
 
     for (const auto& [prop, value] : node->getAttrStyles()) {
-        stylesMerge[prop] = { value , false };
+        stylesMerge[prop] = { value , "" };
     }
 
     for (const auto [prop, value] : stylesMerge) {
@@ -392,11 +394,11 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
         }
     }
 
-    std::unordered_map<std::string, bool> inheritedStyles;
+    std::unordered_map<std::string, std::string> inheritedStyles;
     inheritedStyles.reserve(stylesMerge.size());
     for (const auto& [prop, value] : stylesMerge)
-        if (value.second)
-            inheritedStyles[prop] = true;
+        if (isInheritable(prop) && !value.second.empty())
+            inheritedStyles[prop] = value.second;
 
     widget->callLuaField("__onHtmlProcessFinished", inheritedStyles);
 
@@ -434,7 +436,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
                     n->getInheritableStyles() = parent->getHtmlNode()->getInheritableStyles();
                     for (const auto& [styleName, styleMap] : n->getInheritableStyles()) {
                         for (auto& [style, value] : styleMap)
-                            n->getStyles()[styleName][style] = { value , true };
+                            n->getStyles()[styleName][style] = { value , parent->getHtmlId() };
                     }
                 }
                 widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName, widgets);
