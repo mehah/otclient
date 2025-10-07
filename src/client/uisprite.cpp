@@ -23,61 +23,62 @@
 #include "uisprite.h"
 #include <client/spritemanager.h>
 #include <framework/graphics/texturemanager.h>
+#include <framework/otml/otmlnode.h>
 
 #include "framework/graphics/drawpool.h"
 #include "framework/graphics/drawpoolmanager.h"
 
 void UISprite::drawSelf(const DrawPoolType drawPane)
 {
-    if (drawPane != DrawPoolType::FOREGROUND)
-        return;
+	if (drawPane != DrawPoolType::FOREGROUND)
+		return;
 
-    // draw style components in order
-    if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
-        Rect backgroundDestRect = m_rect;
-        backgroundDestRect.expand(-m_borderWidth.top, -m_borderWidth.right, -m_borderWidth.bottom, -m_borderWidth.left);
-        drawBackground(m_rect);
-    }
+	// draw style components in order
+	if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
+		Rect backgroundDestRect = m_rect;
+		backgroundDestRect.expand(-m_borderWidth.top, -m_borderWidth.right, -m_borderWidth.bottom, -m_borderWidth.left);
+		drawBackground(m_rect);
+	}
 
-    drawImage(m_rect);
+	drawImage(m_rect);
 
-    if (m_spriteVisible && m_sprite) {
-        g_drawPool.addTexturedRect(getPaddingRect(), m_sprite, m_spriteColor);
-    }
+	if (m_spriteVisible && m_sprite) {
+		g_drawPool.addTexturedRect(getPaddingRect(), m_sprite, m_spriteColor);
+	}
 
-    drawBorder(m_rect);
-    drawIcon(m_rect);
-    drawText(m_rect);
+	drawBorder(m_rect);
+	drawIcon(m_rect);
+	drawText(m_rect);
 }
 
 void UISprite::setSpriteId(const int id)
 {
-    if (!g_sprites.isLoaded())
-        return;
+	if (!g_sprites.isLoaded())
+		return;
 
-    m_spriteId = id;
-    if (id == 0) {
-        m_sprite = nullptr;
-        return;
-    }
+	m_spriteId = id;
+	if (id == 0) {
+		m_sprite = nullptr;
+		return;
+	}
 
-    m_sprite = nullptr;
-    if (const auto& image = g_sprites.getSpriteImage(id)) {
-        m_sprite = std::make_shared<Texture>(image);
-        m_sprite->allowAtlasCache();
-    }
+	m_sprite = nullptr;
+	if (const auto& image = g_sprites.getSpriteImage(id)) {
+		m_sprite = std::make_shared<Texture>(image);
+		m_sprite->allowAtlasCache();
+	}
 }
 
 void UISprite::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
-    UIWidget::onStyleApply(styleName, styleNode);
+	UIWidget::onStyleApply(styleName, styleNode);
 
-    for (const auto& node : styleNode->children()) {
-        if (node->tag() == "sprite-id")
-            setSpriteId(node->value<int>());
-        else if (node->tag() == "sprite-visible")
-            setSpriteVisible(node->value<bool>());
-        else if (node->tag() == "sprite-color")
-            setSpriteColor(node->value<Color>());
-    }
+	for (const OTMLNodePtr& node : styleNode->children()) {
+		if (node->tag() == "sprite-id")
+			setSpriteId(node->value<int>());
+		else if (node->tag() == "sprite-visible")
+			setSpriteVisible(node->value<bool>());
+		else if (node->tag() == "sprite-color")
+			setSpriteColor(node->value<Color>());
+	}
 }

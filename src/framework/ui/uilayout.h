@@ -24,7 +24,7 @@
 
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
-#include <framework/otml/otml.h>
+#include <framework/otml/declarations.h>
 
 #include <utility>
 
@@ -32,34 +32,34 @@
 class UILayout : public LuaObject
 {
 public:
-    UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) {}
+	UILayout(UIWidgetPtr parentWidget) : m_parentWidget(std::move(parentWidget)) {}
 
-    void update();
-    void updateLater();
+	void update();
+	void updateLater();
 
-    virtual void applyStyle(const OTMLNodePtr& /*styleNode*/) {}
-    virtual void addWidget(const UIWidgetPtr& /*widget*/) {}
-    virtual void removeWidget(const UIWidgetPtr& /*widget*/) {}
-    void disableUpdates() { ++m_updateDisabled; }
-    void enableUpdates() { m_updateDisabled = std::max<int>(m_updateDisabled - 1, 0); }
+	virtual void applyStyle(const OTMLNodePtr& /*styleNode*/) {}
+	virtual void addWidget(const UIWidgetPtr& /*widget*/) {}
+	virtual void removeWidget(const UIWidgetPtr& /*widget*/) {}
+	void disableUpdates() { ++m_updateDisabled; }
+	void enableUpdates() { m_updateDisabled = std::max<int>(m_updateDisabled - 1, 0); }
 
-    void setParent(UIWidgetPtr parentWidget) { m_parentWidget = std::move(parentWidget); }
-    UIWidgetPtr getParentWidget() { return m_parentWidget; }
+	void setParent(UIWidgetPtr parentWidget) { m_parentWidget = std::move(parentWidget); }
+	UIWidgetPtr getParentWidget() { return m_parentWidget; }
 
-    bool isUpdateDisabled() { return m_updateDisabled > 0; }
-    bool isUpdating() { return m_updating; }
+	bool isUpdateDisabled() { return m_updateDisabled > 0; }
+	bool isUpdating() { return m_updating; }
 
-    virtual bool isUIAnchorLayout() { return false; }
-    virtual bool isUIBoxLayout() { return false; }
-    virtual bool isUIHorizontalLayout() { return false; }
-    virtual bool isUIVerticalLayout() { return false; }
-    virtual bool isUIGridLayout() { return false; }
+	virtual bool isUIAnchorLayout() { return false; }
+	virtual bool isUIBoxLayout() { return false; }
+	virtual bool isUIHorizontalLayout() { return false; }
+	virtual bool isUIVerticalLayout() { return false; }
+	virtual bool isUIGridLayout() { return false; }
 
 protected:
-    virtual bool internalUpdate() { return false; }
+	virtual bool internalUpdate() { return false; }
 
-    uint8_t m_updateDisabled{ 0 };
-    bool m_updating{ false };
-    bool m_updateScheduled{ false };
-    UIWidgetPtr m_parentWidget;
+	uint8_t m_updateDisabled{ 0 };
+	bool m_updating{ false };
+	bool m_updateScheduled{ false };
+	UIWidgetPtr m_parentWidget;
 };

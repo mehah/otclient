@@ -23,116 +23,117 @@
 #include "uiitem.h"
 #include "lightview.h"
 #include <framework/graphics/fontmanager.h>
+#include <framework/otml/otmlnode.h>
 
 UIItem::UIItem() { setProp(PropDraggable, true, false); }
 
 void UIItem::drawSelf(const DrawPoolType drawPane)
 {
-    if (drawPane != DrawPoolType::FOREGROUND)
-        return;
+	if (drawPane != DrawPoolType::FOREGROUND)
+		return;
 
-    // draw style components in order
-    if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
-        Rect backgroundDestRect = m_rect;
-        backgroundDestRect.expand(-m_borderWidth.top, -m_borderWidth.right, -m_borderWidth.bottom, -m_borderWidth.left);
-        drawBackground(m_rect);
-    }
+	// draw style components in order
+	if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
+		Rect backgroundDestRect = m_rect;
+		backgroundDestRect.expand(-m_borderWidth.top, -m_borderWidth.right, -m_borderWidth.bottom, -m_borderWidth.left);
+		drawBackground(m_rect);
+	}
 
-    drawImage(m_rect);
+	drawImage(m_rect);
 
-    if (m_itemVisible && m_item) {
-        if (m_item->getClientId() != m_itemId) {
-            m_item->setId(m_itemId);
-        }
+	if (m_itemVisible && m_item) {
+		if (m_item->getClientId() != m_itemId) {
+			m_item->setId(m_itemId);
+		}
 
-        const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
+		const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_item->getExactSize());
 
-        g_drawPool.bindFrameBuffer(exactSize);
-        m_item->setColor(m_color);
-        m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
-        g_drawPool.releaseFrameBuffer(getPaddingRect());
+		g_drawPool.bindFrameBuffer(exactSize);
+		m_item->setColor(m_color);
+		m_item->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_item->getDisplacement());
+		g_drawPool.releaseFrameBuffer(getPaddingRect());
 
-        if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
-            static constexpr Color STACK_COLOR(231, 231, 231);
-            const auto& count = m_item->getCountOrSubType();
-            const auto& countText = count < 1000 ? std::to_string(count) : fmt::format("{}k", count / 1000.f);
-            m_font->drawText(countText, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), STACK_COLOR, Fw::AlignBottomRight);
-        }
+		if (m_font && (m_alwaysShowCount || m_item->isStackable() || m_item->isChargeable()) && m_item->getCountOrSubType() > 1) {
+			static constexpr Color STACK_COLOR(231, 231, 231);
+			const auto& count = m_item->getCountOrSubType();
+			const auto& countText = count < 1000 ? std::to_string(count) : fmt::format("{}k", count / 1000.f);
+			m_font->drawText(countText, Rect(m_rect.topLeft(), m_rect.bottomRight() - Point(3, 0)), STACK_COLOR, Fw::AlignBottomRight);
+		}
 
 #ifdef FRAMEWORK_EDITOR
-        if (m_showId)
-            m_font->drawText(std::to_string(m_item->getServerId()), m_rect, Fw::AlignBottomRight);
+		if (m_showId)
+			m_font->drawText(std::to_string(m_item->getServerId()), m_rect, Fw::AlignBottomRight);
 #endif
-    }
+	}
 
-    drawBorder(m_rect);
-    drawIcon(m_rect);
-    drawText(m_rect);
+	drawBorder(m_rect);
+	drawIcon(m_rect);
+	drawText(m_rect);
 }
 
 void UIItem::setItemId(const int id)
 {
-    m_itemId = id;
+	m_itemId = id;
 
-    if (id == 0)
-        m_item = nullptr;
-    else if (m_item)
-        m_item->setId(id);
-    else
-        m_item = Item::create(id);
+	if (id == 0)
+		m_item = nullptr;
+	else if (m_item)
+		m_item->setId(id);
+	else
+		m_item = Item::create(id);
 
-    if (m_item)
-        m_item->setShader(m_shaderName);
+	if (m_item)
+		m_item->setShader(m_shaderName);
 
-    callLuaField("onItemChange");
+	callLuaField("onItemChange");
 }
 
 void UIItem::setItemCount(const int count)
 {
-    if (m_item) m_item->setCount(count);
+	if (m_item) m_item->setCount(count);
 
-    callLuaField("onItemChange");
+	callLuaField("onItemChange");
 }
 
 void UIItem::setItemSubType(const int subType)
 {
-    if (m_item) m_item->setSubType(subType);
+	if (m_item) m_item->setSubType(subType);
 
-    callLuaField("onItemChange");
+	callLuaField("onItemChange");
 }
 
 void UIItem::setItem(const ItemPtr& item)
 {
-    m_item = item;
-    if (item)
-        m_itemId = item->getClientId();
+	m_item = item;
+	if (item)
+		m_itemId = item->getClientId();
 
-    callLuaField("onItemChange");
+	callLuaField("onItemChange");
 }
 
 void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
-    for (const auto& node : styleNode->children()) {
-        if (node->tag() == "item-id")
-            setItemId(node->value<int>());
-        else if (node->tag() == "item-count")
-            setItemCount(node->value<int>());
-        else if (node->tag() == "item-visible")
-            setItemVisible(node->value<bool>());
-        else if (node->tag() == "virtual")
-            setVirtual(node->value<bool>());
-        else if (node->tag() == "show-id")
-            m_showId = node->value<bool>();
-        else if (node->tag() == "always-show-count")
-            m_alwaysShowCount = node->value<bool>();
-    }
+	for (const auto& node : styleNode->children()) {
+		if (node->tag() == "item-id")
+			setItemId(node->value<int>());
+		else if (node->tag() == "item-count")
+			setItemCount(node->value<int>());
+		else if (node->tag() == "item-visible")
+			setItemVisible(node->value<bool>());
+		else if (node->tag() == "virtual")
+			setVirtual(node->value<bool>());
+		else if (node->tag() == "show-id")
+			m_showId = node->value<bool>();
+		else if (node->tag() == "always-show-count")
+			m_alwaysShowCount = node->value<bool>();
+	}
 
-    UIWidget::onStyleApply(styleName, styleNode);
+	UIWidget::onStyleApply(styleName, styleNode);
 }
 
 void UIItem::setShader(std::string_view name) {
-    m_shaderName = name;
-    if (getItem()) getItem()->setShader(name);
+	m_shaderName = name;
+	if (getItem()) getItem()->setShader(name);
 }
 
 bool UIItem::hasShader() { return getItem() ? getItem()->getShader() != nullptr : false; }

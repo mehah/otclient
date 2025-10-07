@@ -23,18 +23,19 @@
 #include "uiboxlayout.h"
 
 #include "uiwidget.h"
+#include <framework/otml/otmlnode.h>
 #include <utility>
 
 UIBoxLayout::UIBoxLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
 void UIBoxLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
-    UILayout::applyStyle(styleNode);
+	UILayout::applyStyle(styleNode);
 
-    for (const auto& node : styleNode->children()) {
-        if (node->tag() == "spacing")
-            setSpacing(node->value<int>());
-        else if (node->tag() == "fit-children")
-            setFitChildren(node->value<bool>());
-    }
+	for (const auto& node : styleNode->children()) {
+		if (node->tag() == "spacing")
+			setSpacing(node->value<int>());
+		else if (node->tag() == "fit-children")
+			setFitChildren(node->value<bool>());
+	}
 }

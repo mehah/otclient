@@ -21,42 +21,42 @@
  */
 
 #include "uiqrcode.h"
-
+#include <framework/otml/otmlnode.h>
 #include <framework/graphics/image.h>
 
 void UIQrCode::parseCustomStyle(const OTMLNodePtr& styleNode)
 {
-    UIWidget::parseCustomStyle(styleNode);
+	UIWidget::parseCustomStyle(styleNode);
 
-    for (const auto& node : styleNode->children()) {
-        if (node->tag() == "code")
-            setCode(node->value(), getCodeBorder());
-        else if (node->tag() == "code-border")
-            setCodeBorder(node->value<int>());
-    }
+	for (const auto& node : styleNode->children()) {
+		if (node->tag() == "code")
+			setCode(node->value(), getCodeBorder());
+		else if (node->tag() == "code-border")
+			setCodeBorder(node->value<int>());
+	}
 }
 
 void UIQrCode::setCode(const std::string& code, const int border)
 {
-    if (code.empty()) {
-        m_imageTexture = nullptr;
-        m_qrCode = {};
-        return;
-    }
+	if (code.empty()) {
+		m_imageTexture = nullptr;
+		m_qrCode = {};
+		return;
+	}
 
-    m_qrCode = code;
-    m_imageTexture = std::make_shared<Texture>(Image::fromQRCode(code, border));
+	m_qrCode = code;
+	m_imageTexture = std::make_shared<Texture>(Image::fromQRCode(code, border));
 
-    if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
-        const auto& imageSize = m_imageTexture->getSize();
+	if (m_imageTexture && (!m_rect.isValid() || isImageAutoResize())) {
+		const auto& imageSize = m_imageTexture->getSize();
 
-        Size size = getSize();
-        if (size.width() <= 0 || hasProp(PropImageAutoResize))
-            size.setWidth(imageSize.width());
+		Size size = getSize();
+		if (size.width() <= 0 || hasProp(PropImageAutoResize))
+			size.setWidth(imageSize.width());
 
-        if (size.height() <= 0 || hasProp(PropImageAutoResize))
-            size.setHeight(imageSize.height());
+		if (size.height() <= 0 || hasProp(PropImageAutoResize))
+			size.setHeight(imageSize.height());
 
-        setSize(size);
-    }
+		setSize(size);
+	}
 }

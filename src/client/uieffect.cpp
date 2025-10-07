@@ -22,73 +22,74 @@
 
 #include "uieffect.h"
 #include "lightview.h"
+#include <framework/otml/otmlnode.h>
 
 UIEffect::UIEffect() { setProp(PropDraggable, true, false); }
 
 void UIEffect::drawSelf(const DrawPoolType drawPane)
 {
-    if (drawPane != DrawPoolType::FOREGROUND)
-        return;
+	if (drawPane != DrawPoolType::FOREGROUND)
+		return;
 
-    // draw style components in order
-    if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
-        Rect backgroundDestRect = m_rect;
-        backgroundDestRect.expand(-m_borderWidth.top, -m_borderWidth.right, -m_borderWidth.bottom, -m_borderWidth.left);
-        drawBackground(m_rect);
-    }
+	// draw style components in order
+	if (m_backgroundColor.aF() > Fw::MIN_ALPHA) {
+		Rect backgroundDestRect = m_rect;
+		backgroundDestRect.expand(-m_borderWidth.top, -m_borderWidth.right, -m_borderWidth.bottom, -m_borderWidth.left);
+		drawBackground(m_rect);
+	}
 
-    drawImage(m_rect);
+	drawImage(m_rect);
 
-    if (m_effectVisible && m_effect) {
-        const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_effect->getExactSize());
+	if (m_effectVisible && m_effect) {
+		const int exactSize = std::max<int>(g_gameConfig.getSpriteSize(), m_effect->getExactSize());
 
-        g_drawPool.bindFrameBuffer(exactSize);
-        m_effect->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_effect->getDisplacement());
-        g_drawPool.releaseFrameBuffer(getPaddingRect());
-    }
+		g_drawPool.bindFrameBuffer(exactSize);
+		m_effect->draw(Point(exactSize - g_gameConfig.getSpriteSize()) + m_effect->getDisplacement());
+		g_drawPool.releaseFrameBuffer(getPaddingRect());
+	}
 
-    drawBorder(m_rect);
-    drawIcon(m_rect);
-    drawText(m_rect);
+	drawBorder(m_rect);
+	drawIcon(m_rect);
+	drawText(m_rect);
 }
 
 void UIEffect::setEffectId(const int id)
 {
-    if (id == 0)
-        m_effect = nullptr;
-    else {
-        if (!m_effect)
-            m_effect = std::make_shared<Effect>();
-        m_effect->setId(id);
-        if (m_effect)
-            m_effect->setShader(m_shaderName);
-    }
+	if (id == 0)
+		m_effect = nullptr;
+	else {
+		if (!m_effect)
+			m_effect = std::make_shared<Effect>();
+		m_effect->setId(id);
+		if (m_effect)
+			m_effect->setShader(m_shaderName);
+	}
 }
 
 void UIEffect::setEffect(const EffectPtr& e)
 {
-    m_effect = e;
+	m_effect = e;
 }
 
 void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
 {
-    for (const auto& node : styleNode->children()) {
-        if (node->tag() == "effect-id")
-            setEffectId(node->value<int>());
-        else if (node->tag() == "effect-visible")
-            setEffectVisible(node->value<bool>());
-        else if (node->tag() == "virtual")
-            setVirtual(node->value<bool>());
-        else if (node->tag() == "show-id")
-            m_showId = node->value<bool>();
-    }
+	for (const auto& node : styleNode->children()) {
+		if (node->tag() == "effect-id")
+			setEffectId(node->value<int>());
+		else if (node->tag() == "effect-visible")
+			setEffectVisible(node->value<bool>());
+		else if (node->tag() == "virtual")
+			setVirtual(node->value<bool>());
+		else if (node->tag() == "show-id")
+			m_showId = node->value<bool>();
+	}
 
-    UIWidget::onStyleApply(styleName, styleNode);
+	UIWidget::onStyleApply(styleName, styleNode);
 }
 
 void UIEffect::setShader(std::string_view name) {
-    m_shaderName = name;
-    if (getEffect()) getEffect()->setShader(name);
+	m_shaderName = name;
+	if (getEffect()) getEffect()->setShader(name);
 }
 
 bool UIEffect::hasShader() { return getEffect() ? getEffect()->getShader() != nullptr : false; }

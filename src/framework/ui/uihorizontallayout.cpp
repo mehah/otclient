@@ -22,81 +22,82 @@
 
 #include "uihorizontallayout.h"
 #include <framework/core/eventdispatcher.h>
+#include <framework/otml/otmlnode.h>
 
 #include "uiwidget.h"
 #include <ranges>
 
 void UIHorizontalLayout::applyStyle(const OTMLNodePtr& styleNode)
 {
-    UIBoxLayout::applyStyle(styleNode);
+	UIBoxLayout::applyStyle(styleNode);
 
-    for (const auto& node : styleNode->children()) {
-        if (node->tag() == "align-right")
-            setAlignRight(node->value<bool>());
-    }
+	for (const auto& node : styleNode->children()) {
+		if (node->tag() == "align-right")
+			setAlignRight(node->value<bool>());
+	}
 }
 
 bool UIHorizontalLayout::internalUpdate()
 {
-    const auto& parentWidget = getParentWidget();
-    if (!parentWidget)
-        return false;
+	const auto& parentWidget = getParentWidget();
+	if (!parentWidget)
+		return false;
 
-    bool changed = false;
-    const auto& paddingRect = parentWidget->getPaddingRect();
-    Point pos = (m_alignRight) ? paddingRect.topRight() : paddingRect.topLeft();
-    int preferredWidth = 0;
+	bool changed = false;
+	const auto& paddingRect = parentWidget->getPaddingRect();
+	Point pos = (m_alignRight) ? paddingRect.topRight() : paddingRect.topLeft();
+	int preferredWidth = 0;
 
-    const auto& action = [&](const UIWidgetPtr& widget) {
-        if (!widget->isExplicitlyVisible())
-            return;
+	const auto& action = [&](const UIWidgetPtr& widget) {
+		if (!widget->isExplicitlyVisible())
+			return;
 
-        Size size = widget->getSize();
+		Size size = widget->getSize();
 
-        int gap = (m_alignRight) ? -(widget->getMarginRight() + widget->getWidth()) : widget->getMarginLeft();
-        pos.x += gap;
-        preferredWidth += gap;
+		int gap = (m_alignRight) ? -(widget->getMarginRight() + widget->getWidth()) : widget->getMarginLeft();
+		pos.x += gap;
+		preferredWidth += gap;
 
-        if (widget->isFixedSize()) {
-            if (widget->getTextAlign() & Fw::AlignTop) {
-                pos.y = paddingRect.top() + widget->getMarginTop();
-            } else if (widget->getTextAlign() & Fw::AlignBottom) {
-                pos.y = paddingRect.bottom() - widget->getHeight() - widget->getMarginBottom();
-                pos.y = std::max<int>(pos.y, paddingRect.top());
-            } else { // center it
-                pos.y = paddingRect.top() + (paddingRect.height() - (widget->getMarginTop() + widget->getHeight() + widget->getMarginBottom())) / 2;
-                pos.y = std::max<int>(pos.y, paddingRect.top());
-            }
-        } else {
-            // expand height
-            size.setHeight(paddingRect.height() - (widget->getMarginTop() + widget->getMarginBottom()));
-            pos.y = paddingRect.top() + (paddingRect.height() - size.height()) / 2;
-        }
+		if (widget->isFixedSize()) {
+			if (widget->getTextAlign() & Fw::AlignTop) {
+				pos.y = paddingRect.top() + widget->getMarginTop();
+			} else if (widget->getTextAlign() & Fw::AlignBottom) {
+				pos.y = paddingRect.bottom() - widget->getHeight() - widget->getMarginBottom();
+				pos.y = std::max<int>(pos.y, paddingRect.top());
+			} else { // center it
+				pos.y = paddingRect.top() + (paddingRect.height() - (widget->getMarginTop() + widget->getHeight() + widget->getMarginBottom())) / 2;
+				pos.y = std::max<int>(pos.y, paddingRect.top());
+			}
+		} else {
+			// expand height
+			size.setHeight(paddingRect.height() - (widget->getMarginTop() + widget->getMarginBottom()));
+			pos.y = paddingRect.top() + (paddingRect.height() - size.height()) / 2;
+		}
 
-        if (widget->setRect(Rect(pos - parentWidget->getVirtualOffset(), size)))
-            changed = true;
+		if (widget->setRect(Rect(pos - parentWidget->getVirtualOffset(), size)))
+			changed = true;
 
-        gap = (m_alignRight) ? -widget->getMarginLeft() : (widget->getWidth() + widget->getMarginRight());
-        gap += m_spacing;
-        pos.x += gap;
-        preferredWidth += gap;
-    };
+		gap = (m_alignRight) ? -widget->getMarginLeft() : (widget->getWidth() + widget->getMarginRight());
+		gap += m_spacing;
+		pos.x += gap;
+		preferredWidth += gap;
+	};
 
-    if (m_alignRight) {
-        for (auto& it : std::ranges::reverse_view(parentWidget->m_children))
-            action(it);
-    } else for (const auto& widget : parentWidget->m_children)
-        action(widget);
+	if (m_alignRight) {
+		for (auto& it : std::ranges::reverse_view(parentWidget->m_children))
+			action(it);
+	} else for (const auto& widget : parentWidget->m_children)
+		action(widget);
 
-    preferredWidth -= m_spacing;
-    preferredWidth += parentWidget->getPaddingLeft() + parentWidget->getPaddingRight();
+	preferredWidth -= m_spacing;
+	preferredWidth += parentWidget->getPaddingLeft() + parentWidget->getPaddingRight();
 
-    if (m_fitChildren && preferredWidth != parentWidget->getWidth()) {
-        // must set the preferred width later
-        g_dispatcher.deferEvent([=] {
-            parentWidget->setWidth_px(preferredWidth);
-        });
-    }
+	if (m_fitChildren && preferredWidth != parentWidget->getWidth()) {
+		// must set the preferred width later
+		g_dispatcher.deferEvent([=] {
+			parentWidget->setWidth_px(preferredWidth);
+		});
+	}
 
-    return changed;
+	return changed;
 }
