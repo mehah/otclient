@@ -4302,6 +4302,11 @@ void ProtocolGame::parseSpecialContainer(const InputMessagePtr& msg)
 
 void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
 {
+    // Check 1-second cooldown before executing callback
+    const ticks_t currentTime = stdext::millis();
+    const ticks_t cooldownPeriod = 1000; // 1 second in milliseconds
+    const bool shouldExecuteCallback = (currentTime - m_lastPartyAnalyzerCall >= cooldownPeriod);
+
     const uint32_t startTime = msg->getU32(); // session minutes
     const uint32_t leaderID = msg->getU32(); // leader ID
     const uint8_t lootType = msg->getU8(); // price type
@@ -4316,7 +4321,9 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
         const uint64_t damage = msg->getU64(); // damage
         const uint64_t healing = msg->getU64(); // healing
         
-        membersData.emplace_back(memberID, highlight, loot, supply, damage, healing);
+        if (shouldExecuteCallback) {
+            membersData.emplace_back(memberID, highlight, loot, supply, damage, healing);
+        }
     }
 
     std::vector<std::tuple<uint32_t, std::string>> membersName;
@@ -4326,12 +4333,17 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
         for (auto i = 0; i < membersNameSize; ++i) {
             const uint32_t memberID = msg->getU32(); // party member id
             const std::string memberName = msg->getString(); // party member name
-            membersName.emplace_back(memberID, memberName);
+            if (shouldExecuteCallback) {
+                membersName.emplace_back(memberID, memberName);
+            }
         }
     }
 
-    // Call the Lua callback
-    g_lua.callGlobalField("g_game", "onPartyAnalyzer", startTime, leaderID, lootType, membersData, membersName);
+    // Execute callback only if cooldown has expired
+    if (shouldExecuteCallback) {
+        m_lastPartyAnalyzerCall = currentTime;
+        g_lua.callGlobalField("g_game", "onPartyAnalyzer", startTime, leaderID, lootType, membersData, membersName);
+    }
 }
 
 void ProtocolGame::parseImbuementDurations(const InputMessagePtr& msg)

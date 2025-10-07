@@ -386,6 +386,8 @@ private:
     bool m_firstRecv{ true };
     bool m_record {false};
 
+    ticks_t m_lastPartyAnalyzerCall{ 0 };
+
     std::string m_accountName;
     std::string m_accountPassword;
     std::string m_authenticatorToken;
