@@ -9,6 +9,14 @@ local function setStringColor(textString, text, color)
     return textString .. "[color=" .. color .. "]" .. text .. "[/color]"
 end
 
+-- Helper function to get table size
+local function table_size(t)
+    if not t then return 0 end
+    local count = 0
+    for _ in pairs(t) do count = count + 1 end
+    return count
+end
+
 if not PartyHuntAnalyser then
 	PartyHuntAnalyser = {
 		launchTime = 0,
@@ -27,7 +35,11 @@ if not PartyHuntAnalyser then
 		-- private
 		window = nil,
 		event = nil,
-		leader = false
+		leader = false,
+		
+		-- Track when we're expecting a reset response
+		expectingResetResponse = false,
+		lastResetTime = 0
 	}
 	PartyHuntAnalyser.__index = PartyHuntAnalyser
 end
@@ -117,6 +129,10 @@ function PartyHuntAnalyser:reset()
 
 	PartyHuntAnalyser.membersData = {}
 	PartyHuntAnalyser.membersName = {}
+
+	-- Clear reset expectation flags
+	PartyHuntAnalyser.expectingResetResponse = false
+	PartyHuntAnalyser.lastResetTime = 0
 
 	if PartyHuntAnalyser.event then PartyHuntAnalyser.event:cancel() end
 
@@ -265,8 +281,27 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 end
 
 function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, membersData, membersName)
+	-- Check if this looks like a reset response (all important data is zeros)
+	local isResetData = false
+	if membersData and next(membersData) then
+		isResetData = true
+		for id, data in pairs(membersData) do
+			-- Check if all the important values are zero (loot[3], supplies[4], damage[5], healing[6])
+			if data[3] ~= 0 or data[4] ~= 0 or data[5] ~= 0 or data[6] ~= 0 then
+				isResetData = false
+				break
+			end
+		end
+		if isResetData then
+			print("PartyHuntAnalyser: Received reset data from server - performing local reset")
+			-- When server sends reset data, reset our local session but keep member tracking
+			PartyHuntAnalyser.session = os.time() - startTime
+			-- Don't reset membersData and membersName here - let the server data override them below
+		end
+	end
+	
 	-- Don't immediately reset on empty data - server might be sending incomplete data during party changes
-	-- Only reset if we're certain the party is disbanded (check local player shield status)
+	-- EXCEPT when we're expecting a reset response OR when we detect server-initiated reset
 	if not membersData or not next(membersData) or not membersName or #membersName == 0 then
 		local localPlayer = g_game.getLocalPlayer()
 		if localPlayer then
@@ -276,8 +311,25 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 			                       localShield == ShieldBlue or localShield == ShieldBlueSharedExp or 
 			                       localShield == ShieldBlueNoSharedExpBlink or localShield == ShieldBlueNoSharedExp)
 			
-			-- Only reset if local player is actually not in party
-			if not localIsInParty then
+			-- Check if we're expecting a reset response (within 5 seconds of sending reset command)
+			local timeSinceReset = g_clock.millis() - PartyHuntAnalyser.lastResetTime
+			local isLocalResetResponse = PartyHuntAnalyser.expectingResetResponse and (timeSinceReset < 5000)
+			
+			-- Also check if we previously had party data but now getting empty data while still in party
+			-- This indicates a server-initiated reset (leader clicked reset)
+			local hadDataBefore = next(PartyHuntAnalyser.membersData) ~= nil
+			local isServerReset = localIsInParty and hadDataBefore
+			
+			if isLocalResetResponse then
+				print("PartyHuntAnalyser: Received expected empty data response from server reset - clearing all data")
+				PartyHuntAnalyser.expectingResetResponse = false
+				PartyHuntAnalyser:reset()
+				return
+			elseif isServerReset then
+				print("PartyHuntAnalyser: Detected server-initiated reset (leader reset) - clearing all data")
+				PartyHuntAnalyser:reset()
+				return
+			elseif not localIsInParty then
 				print("PartyHuntAnalyser: Server confirms party disbanded (no local party shield) - clearing data")
 				PartyHuntAnalyser:reset()
 				return
@@ -299,26 +351,18 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	PartyHuntAnalyser.leaderID = leaderID
 	PartyHuntAnalyser.lootType = lootType
 	
-	-- Debug: Let's see what we're getting
-	print("PartyHuntAnalyser: Received valid party data:")
-	print("  membersData type: " .. type(membersData))
-	print("  membersData:")
-	for k, v in pairs(membersData) do
-		print("    Key " .. tostring(k) .. " (" .. type(k) .. "):")
-		if type(v) == "table" then
-			for i, val in ipairs(v) do
-				print("      [" .. i .. "] = " .. tostring(val))
-			end
-		else
-			print("      Value: " .. tostring(v))
-		end
-	end
+	-- Clear the reset expectation flag since we received valid data
+	PartyHuntAnalyser.expectingResetResponse = false
 	
-	print("  membersName type: " .. type(membersName))
-	print("  membersName:")
-	for k, v in pairs(membersName) do
-		print("    Key " .. tostring(k) .. " (" .. type(k) .. "): " .. tostring(v))
+	-- Debug: Let's see what we're getting  
+	if isResetData then
+		print("PartyHuntAnalyser: Processing RESET data from server")
+	else
+		print("PartyHuntAnalyser: Received valid party data:")
 	end
+	print("  startTime: " .. tostring(startTime) .. ", leaderID: " .. tostring(leaderID) .. ", lootType: " .. tostring(lootType))
+	print("  membersData count: " .. table_size(membersData))
+	print("  membersName count: " .. (membersName and #membersName or 0))
 	
 	-- If membersData keys are player IDs, use them directly
 	-- If they are positions (1,2,3...), we need to map them to the actual player IDs
@@ -441,8 +485,11 @@ function onPartyHuntExtra(mousePosition)
 	if isLeaderShield then
 		local lootType = PartyHuntAnalyser.lootType == PriceTypeEnum.Market and "Leader" or "Market"
 		menu:addOption(tr('Reset Data of Current Party Session'), function() 
-			PartyHuntAnalyser:reset()
+			print("PartyHuntAnalyser: Sending reset command to server (opcode 43, action 0)")
+			PartyHuntAnalyser.expectingResetResponse = true
+			PartyHuntAnalyser.lastResetTime = g_clock.millis()
 			g_game.sendPartyAnalyzerReset() 
+			print("PartyHuntAnalyser: Reset command sent - expecting server response with reset data")
 		return end)
 		menu:addOption(tr('Use %s Prices', lootType), function()
 			g_game.sendPartyAnalyzerPriceType()
