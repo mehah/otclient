@@ -105,6 +105,8 @@ namespace {
     };
 
     static inline bool isInheritable(std::string_view prop) noexcept {
+        if (prop.starts_with("*"))
+            prop.remove_prefix(1);
         return kProps.find(prop) != kProps.end();
     }
 
@@ -112,7 +114,7 @@ namespace {
         if (n->getType() == NodeType::Element)
             n->getInheritableStyles()[style][prop] = value;
         for (const auto& child : n->getChildren()) {
-            child->getStyles()[style][prop] = value;
+            child->getStyles()[style][prop] = { value , true };
             setChildrenStyles(child.get(), style, prop, value);
         }
     }
@@ -219,7 +221,7 @@ namespace {
                                     style += "!";
                                 style += state.name;
 
-                                node->getStyles()[style][decl.property] = decl.value;
+                                node->getStyles()[style][decl.property] = { decl.value , false };
                                 if (isInheritable(decl.property)) {
                                     setChildrenStyles(node.get(), style, decl.property, decl.value);
                                 }
@@ -232,7 +234,7 @@ namespace {
                         continue;
 
                     for (const auto& decl : rule.decls) {
-                        node->getStyles()["styles"][decl.property] = decl.value;
+                        node->getStyles()["styles"][decl.property] = { decl.value , false };
                         if (isInheritable(decl.property)) {
                             setChildrenStyles(node.get(), "styles", decl.property, decl.value);
                         }
@@ -318,7 +320,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
 
     auto styles = std::make_shared<OTMLNode>();
 
-    std::map<std::string, std::string> stylesMerge;
+    std::map<std::string, std::pair<std::string, bool>> stylesMerge;
 
     for (const auto [key, stylesMap] : node->getStyles()) {
         if (key != "styles") {
@@ -329,7 +331,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
             for (const auto [prop, value] : stylesMap) {
                 auto nodeAttr = std::make_shared<OTMLNode>();
                 nodeAttr->setTag(prop);
-                nodeAttr->setValue(value);
+                nodeAttr->setValue(value.first);
                 meta->addChild(nodeAttr);
             }
         } else for (const auto [prop, value] : stylesMap) {
@@ -338,13 +340,13 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
     }
 
     for (const auto& [prop, value] : node->getAttrStyles()) {
-        stylesMerge[prop] = value;
+        stylesMerge[prop] = { value , false };
     }
 
     for (const auto [prop, value] : stylesMerge) {
         auto nodeAttr = std::make_shared<OTMLNode>();
         nodeAttr->setTag(prop);
-        nodeAttr->setValue(value);
+        nodeAttr->setValue(value.first);
         styles->addChild(nodeAttr);
     }
 
@@ -386,9 +388,17 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
                     widget->mergeStyle(style);
             }
         } else {
-            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value, moduleName, node->toString());
+            widget->callLuaField("__applyOrBindHtmlAttribute", attr, value, isInheritable(attr), moduleName, node->toString());
         }
     }
+
+    std::unordered_map<std::string, bool> inheritedStyles;
+    inheritedStyles.reserve(stylesMerge.size());
+    for (const auto& [prop, value] : stylesMerge)
+        if (value.second)
+            inheritedStyles[prop] = true;
+
+    widget->callLuaField("__onHtmlProcessFinished", inheritedStyles);
 
     node->setStyleResolved(true);
 }
@@ -424,7 +434,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
                     n->getInheritableStyles() = parent->getHtmlNode()->getInheritableStyles();
                     for (const auto& [styleName, styleMap] : n->getInheritableStyles()) {
                         for (auto& [style, value] : styleMap)
-                            n->getStyles()[styleName][style] = value;
+                            n->getStyles()[styleName][style] = { value , true };
                     }
                 }
                 widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName, widgets);

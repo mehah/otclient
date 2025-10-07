@@ -87,7 +87,11 @@ local function execFnc(f, args, widget, controller, nodeStr, onError)
     return value, success
 end
 
-function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_STR)
+function UIWidget:__onHtmlProcessFinished(inheritedStyles)
+    self.inheritedStyles = inheritedStyles
+end
+
+function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
     if attr == 'image-source' then
@@ -126,11 +130,25 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
             res = value,
             method = nil,
             methodName = setterName:lower(),
+            attr = attr:sub(2),
             values = FOR_CTX.__values,
+            isInheritable = isInheritable,
             fnc = function(self)
                 local value = fnc(controller, self.widget, self.values and unpack(self.values))
                 if value ~= self.res then
                     self.method(self.widget, value)
+                    if self.isInheritable then
+                        print(#self.widget:querySelectorAll(':node-all'), #self.widget:querySelectorAll('*'),
+                            #self.widget:querySelectorAll('div'))
+                        local children = self.widget:querySelectorAll(':node-all')
+                        for i = 1, #children do
+                            local child = children[i]
+                            print(self.attr, child.inheritedStyles[self.attr] and 'sim' or 'nao')
+                            if child.inheritedStyles[self.attr] then
+                                self.method(child, value)
+                            end
+                        end
+                    end
                     self.res = value
                 end
             end

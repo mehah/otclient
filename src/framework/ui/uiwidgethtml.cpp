@@ -789,7 +789,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
     applyDimension(isWidth, unit, num);
     if (m_htmlNode)
-        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = valueStr;
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { valueStr , false };
 }
 
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {

@@ -129,7 +129,7 @@ std::string HtmlNode::getStyle(std::string_view styleName) const {
     for (const auto& [key, styles] : m_styles) {
         auto it = styles.find(name);
         if (it != styles.end())
-            return it->second;
+            return it->second.first;
     }
 
     return "";

@@ -77,7 +77,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 if (!m_htmlNode->getChildren().empty()) {
                     bool isExpression = m_htmlNode->getChildren()[0]->isExpression();
                     if (const auto root = g_html.getRoot(m_htmlRootId))
-                        callLuaField("__applyOrBindHtmlAttribute", std::string{ "*text" }, m_htmlNode->textContent(), root->moduleName, m_htmlNode->toString());
+                        callLuaField("__applyOrBindHtmlAttribute", std::string{ "*text" }, m_htmlNode->textContent(), false, root->moduleName, m_htmlNode->toString());
                 }
 
                 if (!isExpression)
