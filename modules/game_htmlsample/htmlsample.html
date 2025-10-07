@@ -110,11 +110,11 @@
             *for="local player in self.players"
             onclick="print('Player: '.. player.name)"
           >
-            <td style="background-color: red">
+            <td>
               <uicreature *outfit="{type = player.lookType}"></uicreature>
             </td>
             <td class="playerName">{{player.name}}</td>
-            <td style="background-color: red">
+            <td>
               <button
                 class="buttonRemovePlayer"
                 onclick="self:removePlayer(index)"
