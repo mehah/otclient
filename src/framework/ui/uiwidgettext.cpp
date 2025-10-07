@@ -193,7 +193,6 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         if (whiteSpace.empty())
             whiteSpace = "normal";
 
-        //m_textAlign = Fw::AlignmentFlag::AlignTopLeft;
         setTextAutoResize(false);
 
         auto originalText = m_text;
