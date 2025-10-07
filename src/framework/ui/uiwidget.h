@@ -534,6 +534,7 @@ public:
     UIWidgetPtr getFocusedChild() { return m_focusedChild; }
     UIWidgetPtr getHoveredChild();
     UIWidgetList getChildren() { return m_children; }
+    UIWidgetList getReverseChildren() { return UIWidgetList(m_children.rbegin(), m_children.rend()); }
     UIWidgetPtr getFirstChild() { return getChildByIndex(1); }
     UIWidgetPtr getLastChild() { return getChildByIndex(-1); }
     UILayoutPtr getLayout() { return m_layout; }

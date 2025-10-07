@@ -100,6 +100,11 @@ public:
 
     bool isValid() { return getThingType() != nullptr; }
 
+    bool hasWearOut() { return Thing::hasWearOut(); }
+    bool hasClockExpire() { return Thing::hasClockExpire(); }
+    bool hasExpire() { return Thing::hasExpire(); }
+    bool hasExpireStop() { return Thing::hasExpireStop(); }
+
     void setAsync(const bool enable) { m_async = enable; }
 
     ItemPtr clone();
