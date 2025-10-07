@@ -1,7 +1,10 @@
 HtmlSample = Controller:new()
+HtmlSample.showEqualizerEffect = true
+
 function HtmlSample:onInit()
     self:loadHtml('htmlsample.html')
     self:equalizerEffect()
+
     self.players = {}
 end
 
