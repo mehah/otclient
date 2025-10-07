@@ -131,11 +131,11 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             method = nil,
             methodName = setterName:lower(),
             attr = attr:sub(2),
-            values = FOR_CTX.__values,
             isInheritable = isInheritable,
             htmlId = self:getHtmlId(),
             fnc = function(self)
-                local value = fnc(controller, self.widget, self.values and unpack(self.values))
+                local extraValues = self.widget.__for_values and unpack(self.widget.__for_values)
+                local value = fnc(controller, self.widget, extraValues)
                 if value ~= self.res then
                     self.method(self.widget, value)
                     if self.isInheritable then
