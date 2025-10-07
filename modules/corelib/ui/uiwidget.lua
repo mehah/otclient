@@ -305,7 +305,6 @@ function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
             parseEvents(self, attr:lower(), v, controller, NODE_STR)
         elseif attr == "for" then
             if tagName == 'label' then
-                print(tagName, v)
                 local widgetRef = self:getParent():getChildById(v)
                 if widgetRef then
                     controller:registerUIEvents(self, {
