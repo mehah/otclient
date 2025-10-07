@@ -56,7 +56,6 @@ end
 -- objects
 function init()
 
-  print("Init Game Analyzer")
   analyserButton = modules.game_mainpanel.addToggleButton('analyzerButton', 
                                                             tr('Open analytics selector window'),
                                                             '/images/options/analyzers',
@@ -200,12 +199,6 @@ function init()
   end
   partyMemberCheckEvent = cycleEvent(checkPartyMembersChange, 5000) -- Every 5 seconds as backup
 
-  -- DEBUG: Auto-test XP gain after 5 seconds
-  -- scheduleEvent(function()
-  --   print("[DEBUG] Auto-testing XP gain...")
-  --   testXPGain()
-  -- end, 5000)
-
 end
 
 function terminate()
@@ -317,7 +310,6 @@ function onlineAnalyser()
   startNewSession(true)
 
   loadGainAndWastConfigJson()
-  --print("Analyser loaded in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds")
 end
 
 function offlineAnalyser()
@@ -688,10 +680,3 @@ end
 function onSpecialSkillActivated(skillId)
   MiscAnalyzer:onSpecialSkillActivated(skillId)
 end
-
--- DEBUG: Test function to manually trigger XP gain
--- function testXPGain()
---   print("[DEBUG] Testing XP gain manually...")
---   onUpdateExperience(100, 150) -- rawExp = 100, exp = 150
---   print("[DEBUG] XP gain test completed")
--- end
