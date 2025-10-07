@@ -47,7 +47,7 @@ end
 
 local FOR_CTX = {
     __keys = '',
-    __values = {}
+    __values = nil
 }
 
 local function ExprHandlerError(runtime, error, widget, controller, nodeStr, onError)
@@ -115,7 +115,8 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             end)
 
         if self:isVisible() then
-            value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR,
+            value, success = execFnc(fnc, { controller, self, FOR_CTX.__values and unpack(FOR_CTX.__values) }, self,
+                roller, NODE_STR,
                 function()
                     return ('Attribute Error[%s]: %s'):format(attr, value)
                 end)
@@ -133,9 +134,9 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             attr = attr:sub(2),
             isInheritable = isInheritable,
             htmlId = self:getHtmlId(),
-            valueExpr = FOR_CTX.__values,
+            valueExpr = FOR_CTX.__values or {},
             fnc = function(self)
-                local value = fnc(controller, self.widget, self.valueExpr and unpack(self.valueExpr))
+                local value = fnc(controller, self.widget, unpack(self.valueExpr))
                 if value ~= self.res then
                     self.method(self.widget, value)
                     if self.isInheritable then
@@ -222,7 +223,7 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
     local event = { target = widget }
     local forCtx = FOR_CTX.__values
     local function execEventCall()
-        execFnc(fnc, { controller, event, widget, unpack(forCtx) }, widget, controller, NODE_STR, function()
+        execFnc(fnc, { controller, event, widget, forCtx and unpack(forCtx) }, widget, controller, NODE_STR, function()
             return ('Event Error[%s]: %s'):format(eventName, callStr)
         end)
     end
@@ -508,7 +509,7 @@ function UIWidget:__childFor(moduleName, expr, html, index)
             FOR_CTX.__values                             = c.__values
             widget:insert(childindex, html).__for_values = FOR_CTX.__values
             FOR_CTX.__keys                               = ''
-            FOR_CTX.__values                             = {}
+            FOR_CTX.__values                             = nil
         end)
 
         if isFirst then
@@ -518,7 +519,7 @@ function UIWidget:__childFor(moduleName, expr, html, index)
                     FOR_CTX.__values                            = { it, i }
                     widget:insert(index + i, html).__for_values = FOR_CTX.__values
                     FOR_CTX.__keys                              = ''
-                    FOR_CTX.__values                            = {}
+                    FOR_CTX.__values                            = nil
                 end,
                 onRemove = function(i)
                     local child = widget:getChildByIndex(index + i)

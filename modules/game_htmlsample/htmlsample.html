@@ -64,7 +64,6 @@
 
   #players uicreature {
     --creature-size: 16;
-    text-align: center;
   }
 
   #players .buttonRemovePlayer {
@@ -100,6 +99,7 @@
       <table style="width: 100%">
         <thead>
           <tr>
+            <th></th>
             <th>Outfit</th>
             <th>Name</th>
             <th>Remove</th>
@@ -110,6 +110,7 @@
             *for="local player in self.players"
             onclick="print('Player: '.. player.name)"
           >
+            <td style="text-align: center">{{index}}</td>
             <td>
               <uicreature *outfit="{type = player.lookType}"></uicreature>
             </td>
