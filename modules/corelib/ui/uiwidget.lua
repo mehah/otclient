@@ -162,7 +162,9 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
 
     local method = self['set' .. setterName]
     if method then
-        method(self, value)
+        if value ~= nil then
+            method(self, value)
+        end
 
         if watchObj then
             watchObj.method = method

@@ -1249,6 +1249,9 @@ void UIWidget::setVisible(const bool visible)
         g_ui.onWidgetAppear(static_self_cast<UIWidget>());
     else
         g_ui.onWidgetDisappear(static_self_cast<UIWidget>());
+
+    if (m_parent)
+        m_parent->refreshHtml(true);
 }
 
 void UIWidget::setOn(const bool on)
