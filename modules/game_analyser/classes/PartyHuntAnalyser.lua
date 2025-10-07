@@ -472,6 +472,7 @@ function onPartyHuntExtra(mousePosition)
 		return end)
 		menu:addOption(tr('Use %s Prices', lootType), function()
 			g_game.sendPartyAnalyzerPriceType()
+			PartyHuntAnalyser:updateWindow(true)
 		return end)
 		menu:addSeparator()
 	end
