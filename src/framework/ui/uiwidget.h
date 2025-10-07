@@ -821,6 +821,8 @@ public:
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
     void setTextWrap(const bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
     void setTextAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    bool isTextAutoResize() { return hasProp(PropTextHorizontalAutoResize) && hasProp(PropTextVerticalAutoResize); }
+
     void setTextHorizontalAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
     void setTextVerticalAutoResize(const bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }

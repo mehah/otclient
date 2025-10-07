@@ -295,11 +295,6 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
         node->setAttr("*text", node->getText());
     }
 
-    if (!node->getText().empty()) {
-        widget->setTextAutoResize(true);
-        widget->setText(node->getText());
-    }
-
     if (!node->getChildren().empty()) {
         for (const auto& child : node->getChildren()) {
             createWidgetFromNode(child, widget, textNodes, htmlId, moduleName, widgets);
@@ -318,6 +313,11 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
                 setChildrenStyles(widget->getHtmlId(), node, "styles", prop, value);
             }
         }
+    }
+
+    // text node depends on style
+    if (!node->getText().empty()) {
+        widget->setText(node->getText());
     }
 
     auto styles = std::make_shared<OTMLNode>();
