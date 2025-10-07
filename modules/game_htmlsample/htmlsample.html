@@ -45,43 +45,30 @@
     background-color: rgb(202, 75, 202);
   }
 
-  #players > :nth-child(odd) {
-    background-color: rgb(134, 127, 134);
-  }
-
   #players {
     background-color: black;
     overflow: scroll;
   }
 
-  #players div uicreature {
-    --creature-size: 32;
-    padding-left: 5px;
+  #players thead tr {
+    background-color: rgb(151, 151, 165);
   }
 
-  #players > div:hover {
+  #players tbody tr:nth-child(odd) {
+    background-color: rgb(134, 127, 134);
+  }
+
+  #players tbody tr:hover {
     background-color: rgb(104, 106, 241);
   }
 
-  #players > div {
-    height: 32px;
-  }
-
-  #players div div {
-    display: inline-block;
-    width: 20%;
-    height: 100%;
-    align-items: center;
-  }
-
-  #players .playerName {
-    width: 60%;
+  #players uicreature {
+    --creature-size: 16;
+    text-align: center;
   }
 
   #players .buttonRemovePlayer {
-    width: 10;
-    height: 100%;
-    line-height: 3;
+    width: 5;
   }
 </style>
 <script type="text">
@@ -110,21 +97,34 @@
       </div>
     </div>
     <div id="players" class="form">
-      <div
-        *for="local player in self.players"
-        onclick="print('Player: '.. player.name)"
-      >
-        <div>
-          <uicreature
-            *outfit="{type = player.lookType}"
-            center="true"
-          ></uicreature>
-        </div>
-        <div class="playerName">{{player.name}}</div>
-        <button class="buttonRemovePlayer" onclick="self:removePlayer(index)">
-          X
-        </button>
-      </div>
+      <table style="width: 100%">
+        <thead>
+          <tr>
+            <th>Outfit</th>
+            <th>Name</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *for="local player in self.players"
+            onclick="print('Player: '.. player.name)"
+          >
+            <td style="background-color: red">
+              <uicreature *outfit="{type = player.lookType}"></uicreature>
+            </td>
+            <td class="playerName">{{player.name}}</td>
+            <td style="background-color: red">
+              <button
+                class="buttonRemovePlayer"
+                onclick="self:removePlayer(index)"
+              >
+                X
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     <div>
       <input
