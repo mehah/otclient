@@ -1361,7 +1361,7 @@ void UIWidget::updateSize() {
     if (!isAnchorable()) return;
 
     if (m_htmlNode && m_htmlNode->getType() == NodeType::Text) {
-        const auto& parentSize = m_parent->getSize();
+        const auto& parentSize = m_parent->m_width.unit == Unit::FitContent ? m_textSizeNowrap : m_parent->getSize();
 
         auto height = m_textSizeNowrap.height();
         if (parentSize.width() < m_textSizeNowrap.width()) {
