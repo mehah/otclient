@@ -8,7 +8,7 @@ NewHeadlessWindow
     anchors.top: parent.top
     anchors.horizontalCenter: parent.horizontalCenter
     margin-top: -33
-    image-source: /images/game/tutorial/backdrop_crestr
+    image-source: /images/game/tutorial/backdrop_crest
     phantom: true
   Panel
     id: contentPanel

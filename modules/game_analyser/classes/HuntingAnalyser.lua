@@ -253,6 +253,7 @@ function HuntingAnalyser:reset()
 
 	if PartyHuntAnalyser then
 		PartyHuntAnalyser:reset()
+		PartyHuntAnalyser:updateWindow(true, true)
 		g_game.sendPartyAnalyzerReset() -- Reset party hunt for all party members
 	end
 	
