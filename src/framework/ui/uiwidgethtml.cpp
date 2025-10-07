@@ -789,7 +789,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
     applyDimension(isWidth, unit, num);
     if (m_htmlNode)
-        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = valueStr;
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { valueStr , "" };
 }
 
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
@@ -1215,6 +1215,9 @@ void UIWidget::updateTableLayout()
 }
 
 void UIWidget::scheduleHtmlTask(FlagProp prop) {
+    if (!isOnHtml())
+        return;
+
     bool schedule = false;
 
     switch (prop) {
@@ -1315,13 +1318,15 @@ void UIWidget::ensureUniqueId() {
     if (!m_htmlNode)
         return;
 
+    const std::string newId = "html_" + std::to_string(++LAST_UNIQUE_ID);
+    m_htmlId = newId;
+
     const auto& id = m_htmlNode->getAttr("id");
     if (id.empty())
         return;
 
     const auto parentNode = m_parent ? m_parent->getHtmlNode() : nullptr;
     if (parentNode && parentNode->getById(id) != m_htmlNode) {
-        const std::string newId = "html" + std::to_string(++LAST_UNIQUE_ID);
         setId(newId);
 
         if (const auto root = g_html.getRoot(m_htmlRootId)) {
