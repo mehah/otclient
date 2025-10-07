@@ -87,7 +87,11 @@ local function execFnc(f, args, widget, controller, nodeStr, onError)
     return value, success
 end
 
-function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_STR)
+function UIWidget:__onHtmlProcessFinished(inheritedStyles)
+    self.inheritedStyles = inheritedStyles
+end
+
+function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
     if attr == 'image-source' then
@@ -106,15 +110,20 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
     local isBinding = setterName:starts('*')
     if isBinding then
         setterName = setterName:sub(2):gsub("^%l", string.upper)
-        local success = false
+        local success = true
         local fnc = getFncByExpr('return function(self, target ' .. FOR_CTX.__keys .. ') return ' .. value .. ' end',
             NODE_STR, self, controller, function()
                 return ('Attribute Error[%s]: %s'):format(attr, value)
             end)
-        value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR,
-            function()
-                return ('Attribute Error[%s]: %s'):format(attr, value)
-            end)
+
+        if self:isVisible() then
+            value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR,
+                function()
+                    return ('Attribute Error[%s]: %s'):format(attr, value)
+                end)
+        else
+            value = nil
+        end
 
         if not success then return end
 
@@ -122,11 +131,25 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, controllerName, NODE_S
             widget = self,
             res = value,
             method = nil,
+            methodName = setterName:lower(),
+            attr = attr:sub(2),
             values = FOR_CTX.__values,
+            isInheritable = isInheritable,
+            htmlId = self:getHtmlId(),
             fnc = function(self)
                 local value = fnc(controller, self.widget, self.values and unpack(self.values))
                 if value ~= self.res then
                     self.method(self.widget, value)
+                    if self.isInheritable then
+                        local children = self.widget:querySelectorAll(':node-all')
+                        for i = 1, #children do
+                            local child = children[i]
+                            local inheritedFromId = child.inheritedStyles[self.attr]
+                            if not inheritedFromId or inheritedFromId == self.htmlId then
+                                self.method(child, value)
+                            end
+                        end
+                    end
                     self.res = value
                 end
             end

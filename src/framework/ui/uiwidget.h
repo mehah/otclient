@@ -335,8 +335,7 @@ public:
     void setHtmlRootId(uint32_t id) { m_htmlRootId = id; }
     auto getHtmlRootId() const { return m_htmlRootId; }
 
-    void setHtmlId(const std::string& id) { m_htmlId = id; }
-    auto getHtmlId() const { return m_htmlId; }
+    auto getHtmlId() { return m_htmlId; }
 
     auto getPositionType() { return m_positionType; }
 
@@ -822,6 +821,8 @@ public:
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
     void setTextWrap(const bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
     void setTextAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    bool isTextAutoResize() { return hasProp(PropTextHorizontalAutoResize) && hasProp(PropTextVerticalAutoResize); }
+
     void setTextHorizontalAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
     void setTextVerticalAutoResize(const bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
