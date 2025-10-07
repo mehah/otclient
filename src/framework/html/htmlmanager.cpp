@@ -476,7 +476,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
         const auto w = widget.get();
         applyAttributesAndStyles(w, node, root.groups, moduleName);
         w->scheduleHtmlTask(PropApplyAnchorAlignment);
-        w->callLuaField("onCreateByHTML", node->getAttributesMap(), moduleName, node->toString());
+        w->callLuaField("onCreateByHTML", node->getTag(), node->getAttributesMap(), moduleName, node->toString());
     }
 
     if (isDynamic) {

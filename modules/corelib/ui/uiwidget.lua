@@ -298,11 +298,23 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
     controller:registerUIEvents(widget, data)
 end
 
-function UIWidget:onCreateByHTML(attrs, controllerName, NODE_STR)
+function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
     for attr, v in pairs(attrs) do
         if attr:starts('on') then
             parseEvents(self, attr:lower(), v, controller, NODE_STR)
+        elseif attr == "for" then
+            if tagName == 'label' then
+                print(tagName, v)
+                local widgetRef = self:getParent():getChildById(v)
+                if widgetRef then
+                    controller:registerUIEvents(self, {
+                        onClick = function(widget, value)
+                            widgetRef:onClick(g_window.getMousePosition())
+                        end
+                    })
+                end
+            end
         end
     end
 
