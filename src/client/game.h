@@ -779,10 +779,6 @@ public:
     void sendPartyAnalyzerPriceValue(); // For action 3, will get items from cyclopedia
     void sendPartyAnalyzerAction(uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items = {});
     
-private:
-    
-public:
-
     // outfit related
     void requestOutfit();
     void changeOutfit(const Outfit& outfit);

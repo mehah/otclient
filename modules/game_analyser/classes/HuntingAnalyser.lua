@@ -250,6 +250,11 @@ function HuntingAnalyser:reset()
 		ImpactAnalyser:reset()
 		ImpactAnalyser:updateWindow(true)
 	end
+
+	if PartyHuntAnalyser then
+		PartyHuntAnalyser:reset()
+		g_game.sendPartyAnalyzerReset() -- Reset party hunt for all party members
+	end
 	
 	HuntingAnalyser:updateWindow(true)  -- Pass ignoreVisible=true to force update
 

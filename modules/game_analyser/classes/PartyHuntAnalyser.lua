@@ -451,7 +451,11 @@ function onPartyHuntExtra(mousePosition)
 	end
 
 	menu:addOption(tr('Copy to Clipboard'), function() PartyHuntAnalyser:clipboardData() return end)
-	menu:addOption(tr('Copy to LootSplitter'), function() PartyHuntAnalyser:lootSplitter() return end)
+	
+	-- Only add loot splitter option if the module is available
+	if modules.game_lootsplitter then
+		menu:addOption(tr('Copy to LootSplitter'), function() PartyHuntAnalyser:lootSplitter() return end)
+	end
 
 	menu:display(mousePosition)
   return true
@@ -522,10 +526,15 @@ function PartyHuntAnalyser:lootSplitter()
 		final = final.. "\n\tHealing: "..comma_value(data[6])
 	end
 
-	local huntLogContent = modules.game_lootsplitter.lootsplitter.contentPanel:getChildById('huntLogContent')
-	huntLogContent:setText(final)
-	modules.game_lootsplitter.onGenerateButtonClick()
-	modules.game_lootsplitter.show(true)
+	-- Check if game_lootsplitter module is available
+	if modules.game_lootsplitter and modules.game_lootsplitter.lootsplitter then
+		local huntLogContent = modules.game_lootsplitter.lootsplitter.contentPanel:getChildById('huntLogContent')
+		if huntLogContent then
+			huntLogContent:setText(final)
+			modules.game_lootsplitter.onGenerateButtonClick()
+			modules.game_lootsplitter.show(true)
+		end
+	end
 end
 
 -- Party State Manager - Single source of truth for party tracking
