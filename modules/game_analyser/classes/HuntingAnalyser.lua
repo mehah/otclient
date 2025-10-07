@@ -252,11 +252,28 @@ function HuntingAnalyser:reset()
 	end
 
 	if PartyHuntAnalyser then
-		print("HuntingAnalyser: Sending party analyzer reset to server")
-		PartyHuntAnalyser.expectingResetResponse = true
-		PartyHuntAnalyser.lastResetTime = g_clock.millis()
-		g_game.sendPartyAnalyzerReset() -- Reset party hunt for all party members - let server handle the reset
-		print("HuntingAnalyser: Party reset command sent - expecting server response")
+		local player = g_game.getLocalPlayer()
+		if player then
+			local playerShield = player:getShield()
+			local isLeaderShield = (playerShield == ShieldYellow or playerShield == ShieldYellowSharedExp or playerShield == ShieldYellowNoSharedExpBlink)
+			
+			if isLeaderShield then
+				-- Player is party leader - send reset to server for all members
+				print("HuntingAnalyser: Player is party leader - sending reset to server for all members")
+				PartyHuntAnalyser.expectingResetResponse = true
+				PartyHuntAnalyser.lastResetTime = g_clock.millis()
+				g_game.sendPartyAnalyzerReset()
+				print("HuntingAnalyser: Party reset command sent to server")
+			else
+				-- Player is not leader or not in party - reset only locally
+				print("HuntingAnalyser: Player is not party leader - resetting only local party hunt data")
+				PartyHuntAnalyser:reset()
+			end
+		else
+			-- No player - reset locally
+			print("HuntingAnalyser: No local player - resetting local party hunt data")
+			PartyHuntAnalyser:reset()
+		end
 	end
 	
 	HuntingAnalyser:updateWindow(true)  -- Pass ignoreVisible=true to force update
