@@ -374,77 +374,30 @@ function LootAnalyser:addLootedItems(item, name)
 	elseif itemId == 3043 then  -- Crystal coin (worth 10,000 gold)
 		price = 10000
 	else
-		-- For non-coin items, try to get price from various sources using the same enhanced logic as Cyclopedia
-		-- Priority 1: Try to get price from Cyclopedia module using enhanced logic
-		if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items then
-			-- Check if this item has a custom price set in Cyclopedia
-			local itemId = item:getId()
-			local itemIdStr = tostring(itemId)
-			
-			-- Access the itemsData from Cyclopedia if possible
-			local cyclopediaModule = modules.game_cyclopedia
-			local hasCustomPrice = false
-			local isMarketPrice = false
-			
-			-- Try to access Cyclopedia's internal data (if accessible)
-			if cyclopediaModule.itemsData then
-				hasCustomPrice = cyclopediaModule.itemsData["customSalePrices"] and cyclopediaModule.itemsData["customSalePrices"][itemIdStr]
-				isMarketPrice = cyclopediaModule.itemsData["primaryLootValueSources"] and cyclopediaModule.itemsData["primaryLootValueSources"][itemIdStr]
-			end
-			
-			if hasCustomPrice then
-				-- Use custom price from Cyclopedia
-				price = cyclopediaModule.itemsData["customSalePrices"][itemIdStr]
-			else
-				-- Apply the same enhanced logic as Cyclopedia.Items.updateResultGoldValue
-				local avgMarket = 0
-				local npcValue = 0
-				
-				-- Get market average price
-				if item.getMeanPrice then
-					local success, result = pcall(function() return item:getMeanPrice() end)
-					if success and result then
-						avgMarket = result
-					end
-				elseif item.getAverageMarketValue then
-					local success, result = pcall(function() return item:getAverageMarketValue() end)
-					if success and result then
-						avgMarket = result
-					end
-				end
-				
-				-- Get NPC value using Cyclopedia's getNpcValue function if available
-				if modules.game_cyclopedia.Cyclopedia.Items.getNpcValue then
-					npcValue = modules.game_cyclopedia.Cyclopedia.Items.getNpcValue(item, true) -- true for buyPrice
-				elseif item.getDefaultValue then
-					local success, defaultValue = pcall(function() return item:getDefaultValue() end)
-					if success and defaultValue then
-						npcValue = defaultValue
-					end
-				end
-				
-				-- Apply the enhanced Cyclopedia logic
-				if isMarketPrice then
-					-- Market Average Value is selected
-					if avgMarket > 0 then
-						price = avgMarket
-					else
-						-- Enhancement: If market value is 0, fallback to NPC value
-						price = npcValue
-					end
-				else
-					-- NPC Buy Value is selected (default)
-					price = npcValue
-				end
-			end
-		end
+		-- For non-coin items, use the same exact logic as Cyclopedia.Items.updateResultGoldValue
+		local itemId = item:getId()
+		local itemIdStr = tostring(itemId)
 		
-		-- Fallback: If Cyclopedia is not available or didn't provide a value
-		if price == 0 then
+		-- Priority 1: Check if there's a custom price set in Cyclopedia
+		if modules.game_cyclopedia and modules.game_cyclopedia.itemsData and 
+		   modules.game_cyclopedia.itemsData["customSalePrices"] and 
+		   modules.game_cyclopedia.itemsData["customSalePrices"][itemIdStr] then
+			-- Use custom value from Cyclopedia
+			price = modules.game_cyclopedia.itemsData["customSalePrices"][itemIdStr]
+		else
+			-- Priority 2 & 3: Use selected loot value source (same logic as updateResultGoldValue)
+			local isMarketPrice = false
+			if modules.game_cyclopedia and modules.game_cyclopedia.itemsData and 
+			   modules.game_cyclopedia.itemsData["primaryLootValueSources"] and 
+			   modules.game_cyclopedia.itemsData["primaryLootValueSources"][itemIdStr] then
+				isMarketPrice = true
+			end
+			
+			-- Get the necessary values
 			local avgMarket = 0
 			local npcValue = 0
 			
-			-- Try to get market average price
+			-- Get market average price (same as Cyclopedia)
 			if item.getMeanPrice then
 				local success, result = pcall(function() return item:getMeanPrice() end)
 				if success and result then
@@ -457,27 +410,35 @@ function LootAnalyser:addLootedItems(item, name)
 				end
 			end
 			
-			-- Try to get NPC value
-			if item.getDefaultValue then
+			-- Get NPC value using the same function as Cyclopedia
+			if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and 
+			   modules.game_cyclopedia.Cyclopedia.Items and 
+			   modules.game_cyclopedia.Cyclopedia.Items.getNpcValue then
+				npcValue = modules.game_cyclopedia.Cyclopedia.Items.getNpcValue(item, true) -- true for buyPrice
+			elseif item.getDefaultValue then
 				local success, defaultValue = pcall(function() return item:getDefaultValue() end)
 				if success and defaultValue then
 					npcValue = defaultValue
 				end
 			end
 			
-			-- Enhanced fallback logic: prefer NPC, but fallback to market if NPC is 0
-			if npcValue > 0 then
-				price = npcValue
-			elseif avgMarket > 0 then
-				price = avgMarket
-			else
-				-- Last resort: try default buy price
-				if item.getDefaultBuyPrice then
-					local success, result = pcall(function() return item:getDefaultBuyPrice() end)
-					if success and result then
-						price = result
-					end
+			-- Apply the same enhanced logic as updateResultGoldValue
+			if isMarketPrice then
+				-- Market Average Value is selected
+				-- Enhancement: If market value is 0, fallback to NPC value
+				if avgMarket > 0 then
+					price = avgMarket
+				else
+					price = npcValue
 				end
+			else
+				-- NPC Buy Value is selected (default)
+				price = npcValue
+			end
+			
+			-- Final fallback: if all values are 0 or nil, set to 0
+			if not price or price == 0 then
+				price = 0
 			end
 		end
 	end
