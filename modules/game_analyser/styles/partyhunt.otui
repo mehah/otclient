@@ -242,7 +242,7 @@ MiniWindow
 
     Label
       id: lootType
-      !text: tr('Market')
+      !text: tr('Leader')
       anchors.top: session.bottom
       anchors.right: parent.right
       margin-top: 5
