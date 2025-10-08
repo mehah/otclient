@@ -37,13 +37,7 @@ local forgeActions = {
     INCREASELIMIT = 4,
 }
 
--- local fusionTab = require('modules.game_forge.tab.fusion.fusion')
 local helpers = require('modules.game_forge.game_forge_helpers')
-
--- fusionTab.registerDependencies(forgeController, {
---     resourceTypes = forgeResourceTypes
--- })
-
 local cloneValue = helpers.cloneValue
 local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
 local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
@@ -99,7 +93,6 @@ local function show(self, skipRequest)
     if needsReload then
         self:loadHtml('game_forge.html')
         ui.panels = {}
-        -- fusionTab.invalidateContext(self)
     end
 
     if not self.ui then
@@ -245,18 +238,7 @@ function forgeController:updateResourceBalances(resourceType)
             updateStatusConfig(self, config, player)
         end
     end
-    -- if not resourceType or resourceType == forgeResourceTypes.cores then
-    --     self:updateFusionCoreButtons()
-    -- end
 end
-
--- function forgeController:updateFusionCoreButtons()
---     fusionTab.updateFusionCoreButtons(self)
--- end
-
--- function forgeController:onToggleFusionCore(coreType)
---     fusionTab.onToggleFusionCore(self, coreType)
--- end
 
 function forgeController:onInit()
     self:registerEvents(g_game, {
@@ -418,7 +400,6 @@ function forgeController:onGameStart()
     if not self.ui or self.ui:isDestroyed() then
         self:loadHtml('game_forge.html')
         ui.panels = {}
-        -- fusionTab.invalidateContext(self)
     end
 
     resetWindowTypes()
@@ -432,8 +413,6 @@ function forgeController:onGameStart()
         lastPage = 1,
         currentCount = 0
     }
-
-    -- fusionTab.resetCoreSelections(self)
 end
 
 function forgeController:onGameEnd()
@@ -508,16 +487,11 @@ function forgeController:setInitialValues(openData)
         'fusionChanceBase',
         'fusionChanceImproved',
         'fusionReduceTierLoss',
-        -- 'fusionNormalValues',
-        -- 'fusionConvergenceValues',
-        -- 'transferNormalValues',
-        -- 'transferConvergenceValues'
     }
 
     for _, key in ipairs(trackedKeys) do
         if openData[key] ~= nil then
             self[key] = cloneValue(openData[key])
-            g_logger.info("k: " .. key .. " v: " .. tostring(self[key]))
         end
     end
 end
@@ -606,7 +580,6 @@ function forgeController:applyForgeConfiguration(config)
         local numericValue = tonumber(value)
         if numericValue then
             initial[key] = numericValue
-            g_logger.info("numeric, k: " .. key .. " v: " .. tostring(numericValue))
         end
     end
 
@@ -648,11 +621,6 @@ function forgeController:applyForgeConfiguration(config)
     forgeController.transferDustAmount = numericFields.normalDustTransfer or 0
     forgeController.transferDustAmountColor = forgeController:getColorByStatus(forgeController.currentDust <
         forgeController.transferDustAmount)
-
-    g_logger.info("<< " ..
-        forgeController.transferDustAmount
-        ..
-        ">> " .. " >>" .. forgeController.transferDustAmountColor)
 
     self:setInitialValues(initial)
 
