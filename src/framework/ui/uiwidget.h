@@ -317,8 +317,8 @@ public:
     void setPositionType(PositionType t) {
         m_positionType = t;
         if (m_positionType == PositionType::Absolute) {
-            m_width = m_height = SizeUnit{ Unit::FitContent, 0, -1, true };
-            scheduleHtmlTask(PropUpdateSize);
+            applyDimension(true, m_width.unit, m_width.value);
+            applyDimension(false, m_height.unit, m_height.value);
         }
 
         if (m_parent)

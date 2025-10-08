@@ -807,8 +807,8 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
     bool needUpdate = false;
 
     if (m_positionType == PositionType::Absolute && (unit == Unit::Auto || unit == Unit::Percent)) {
-        unit = Unit::FitContent;
-        value = 0;
+        if (isWidth && m_positions.right.unit == Unit::Auto || !isWidth && m_positions.bottom.unit == Unit::Auto)
+            unit = Unit::FitContent;
     }
 
     switch (unit) {
@@ -1389,31 +1389,45 @@ void UIWidget::updateSize() {
         const bool T = m_positions.top.unit != Unit::Auto;
         const bool B = m_positions.bottom.unit != Unit::Auto;
 
-        const auto updateWidth = m_width.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) && L && R;
-        const auto updateHeigth = m_height.needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER) && T && B;
+        const bool updateWidth = m_width.needsUpdate(Unit::Auto, SIZE_VERSION_COUNTER) && L && R;
+        const bool updateHeight = m_height.needsUpdate(Unit::FitContent, SIZE_VERSION_COUNTER) && T && B;
 
-        if (updateWidth || updateHeigth) {
+        if (updateWidth || updateHeight) {
             auto parent = getVirtualParent();
             parent->updateSize();
 
-            const int pW = parent->getWidth();
-            const int pH = parent->getHeight();
+            const int pContentW = parent->getWidth() - parent->getPaddingLeft() - parent->getPaddingRight();
+            const int pContentH = parent->getHeight() - parent->getPaddingTop() - parent->getPaddingBottom();
+
+            auto resolveH = [&](const SizeUnit& len, int base) -> int {
+                return (len.unit == Unit::Percent) ? (base * len.value) / 100 : len.value;
+            };
 
             if (updateWidth) {
-                int w = pW
-                    - (m_positions.left.unit == Unit::Percent ? (pW * m_positions.left.value) / 100 : m_positions.left.value)
-                    - (m_positions.right.unit == Unit::Percent ? (pW * m_positions.right.value) / 100 : m_positions.right.value)
-                    - (getPaddingLeft() + getPaddingRight());
-                setWidth_px(std::max<int>(0, w));
+                const int leftPx = resolveH(m_positions.left, pContentW);
+                const int rightPx = resolveH(m_positions.right, pContentW);
+
+                const int ml = getMarginLeft();
+                const int mr = getMarginRight();
+
+                int w = pContentW - leftPx - rightPx - ml - mr;
+                if (w < 0) w = 0;
+
+                setWidth_px(w);
                 m_width.applyUpdate(getWidth(), SIZE_VERSION_COUNTER);
             }
 
-            if (updateHeigth) {
-                int h = pH
-                    - (m_positions.top.unit == Unit::Percent ? (pH * m_positions.top.value) / 100 : m_positions.top.value)
-                    - (m_positions.bottom.unit == Unit::Percent ? (pH * m_positions.bottom.value) / 100 : m_positions.bottom.value)
-                    - (getPaddingTop() + getPaddingBottom());
-                setHeight_px(std::max<int>(0, h));
+            if (updateHeight) {
+                const int topPx = resolveH(m_positions.top, pContentH);
+                const int bottomPx = resolveH(m_positions.bottom, pContentH);
+
+                const int mt = getMarginTop();
+                const int mb = getMarginBottom();
+
+                int h = pContentH - topPx - bottomPx - mt - mb;
+                if (h < 0) h = 0;
+
+                setHeight_px(h);
                 m_height.applyUpdate(getHeight(), SIZE_VERSION_COUNTER);
             }
         }
