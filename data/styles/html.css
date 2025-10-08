@@ -20,7 +20,7 @@
 
 button {
   --inherit-text: true;
-  text-align: center;
+  text-align: center !important;
 }
 
 input[type="password"] {
