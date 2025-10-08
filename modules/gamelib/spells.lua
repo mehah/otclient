@@ -6,6 +6,10 @@ SpelllistSettings = {
             width = 32,
             height = 32
         },
+        iconSizeCooldown = {
+            width = 20,
+            height = 22
+        },
         spellListWidth = 210,
         spellWindowWidth = 550,
     } --[[,
@@ -530,4 +534,11 @@ function Spells.getImageClip(indexClip, profile)
         profile = "Default"
     end
     return indexClip * SpelllistSettings[profile].iconSize.width .. " 0 " .. SpelllistSettings[profile].iconSize.width .. " " .. SpelllistSettings[profile].iconSize.height
+end
+
+function Spells.getImageClipCooldown(indexClip, profile)
+    if profile == nil then
+        profile = "Default"
+    end
+    return indexClip * SpelllistSettings[profile].iconSizeCooldown.width .. " 0 " .. SpelllistSettings[profile].iconSizeCooldown.width .. " " .. SpelllistSettings[profile].iconSizeCooldown.height
 end
