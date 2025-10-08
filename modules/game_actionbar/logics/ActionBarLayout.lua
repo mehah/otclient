@@ -33,6 +33,9 @@ local function createActionBars()
 end
 
 function onCreateActionBars()
+    if #actionBars ~= 0 then
+        return true
+    end
     local gameMapPanel = modules.game_interface.gameMapPanel
     if not gameMapPanel then
         return true
