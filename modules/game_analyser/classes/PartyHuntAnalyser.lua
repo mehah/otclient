@@ -52,7 +52,7 @@ function PartyHuntAnalyser.create()
 	PartyHuntAnalyser.launchTime = g_clock.millis()
 	PartyHuntAnalyser.session = os.time()
 
-	PartyHuntAnalyser.lootType = PriceTypeEnum.Market
+	PartyHuntAnalyser.lootType = PriceTypeEnum.Leader
 	PartyHuntAnalyser.leaderID = 0
 	PartyHuntAnalyser.leader = false
 
@@ -277,6 +277,7 @@ function PartyHuntAnalyser:updateWindow(updateMembers, ignoreVisible)
 end
 
 function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, membersData, membersName)
+
 	-- Check if this looks like a reset response (all important data is zeros)
 	local isResetData = false
 	if membersData and next(membersData) then
@@ -464,15 +465,12 @@ function onPartyHuntExtra(mousePosition)
 	if isLeaderShield then
 		local lootType = PartyHuntAnalyser.lootType == PriceTypeEnum.Market and "Leader" or "Market"
 		menu:addOption(tr('Reset Data of Current Party Session'), function() 
-			print("PartyHuntAnalyser: Sending reset command to server (opcode 43, action 0)")
 			PartyHuntAnalyser.expectingResetResponse = true
 			PartyHuntAnalyser.lastResetTime = g_clock.millis()
 			g_game.sendPartyAnalyzerReset() 
-			print("PartyHuntAnalyser: Reset command sent - expecting server response with reset data")
 		return end)
 		menu:addOption(tr('Use %s Prices', lootType), function()
 			g_game.sendPartyAnalyzerPriceType()
-			PartyHuntAnalyser:updateWindow(true)
 		return end)
 		menu:addSeparator()
 	end
@@ -607,7 +605,6 @@ function PartyState:performUpdate()
     
     -- If LOCAL player left party, reset everything (only for the local player)
     if not localIsInParty and (PartyHuntAnalyser.leader or next(PartyHuntAnalyser.membersData)) then
-        print("[PartyState] Local player left party - resetting only local data")
         PartyHuntAnalyser:reset()
         return
     end
@@ -624,7 +621,6 @@ function PartyState:performUpdate()
         if not PartyHuntAnalyser.membersData[localId] then
             PartyHuntAnalyser.membersData[localId] = {0, 1, 0, 0, 0, 0}
             PartyHuntAnalyser.membersName[localId] = localPlayer:getName()
-            print("[PartyState] Added local player to party: " .. localPlayer:getName())
         end
         
         -- Get current visible party members
@@ -652,13 +648,11 @@ function PartyState:performUpdate()
                     local memberIsLeader = (shield == ShieldYellow or shield == ShieldYellowSharedExp or shield == ShieldYellowNoSharedExpBlink)
                     if memberIsLeader then
                         PartyHuntAnalyser.leaderID = memberId
-                        print("[PartyState] Detected party leader by shield: " .. creature:getName() .. " (ID: " .. memberId .. ")")
                     end
                     
                     if not PartyHuntAnalyser.membersData[memberId] then
                         PartyHuntAnalyser.membersData[memberId] = {0, 1, 0, 0, 0, 0}
                         PartyHuntAnalyser.membersName[memberId] = creature:getName()
-                        print("[PartyState] Added visible party member: " .. creature:getName())
                         newMembersFound = true
                     else
                         -- Update name in case it changed
@@ -702,7 +696,6 @@ function PartyState:performUpdate()
                             if not isPartyMember and shield ~= ShieldNone then
                                 -- Player is visible but not in party anymore - they left
                                 table.insert(membersToRemove, memberId)
-                                print("[PartyState] Member " .. (PartyHuntAnalyser.membersName[memberId] or "Unknown") .. " left party (visible with non-party shield)")
                                 break
                             end
                         end
@@ -725,7 +718,6 @@ function PartyState:performUpdate()
                     widget:destroy()
                 end
             end
-            print("[PartyState] Removed " .. memberName .. " from party tracking")
         end
         
         -- Update UI if changes were made
@@ -750,7 +742,6 @@ function onShieldChange(creature, shieldId)
         
         -- Only update if there's a significant state change
         if (not hasPartyData and isNowInParty) or (hasPartyData and not isNowInParty) or (wasLeader ~= isNowLeader) then
-            print("[PartyState] Local player shield change detected - scheduling update")
             PartyState:scheduleUpdate()
         end
     end
@@ -772,11 +763,6 @@ function onShieldChange(creature, shieldId)
         
         -- Schedule update if someone joined OR left the party
         if wasPartyMember ~= isPartyMember then
-            if wasPartyMember and not isPartyMember then
-                print("[PartyState] " .. creature:getName() .. " left party - scheduling update")
-            elseif not wasPartyMember and isPartyMember then
-                print("[PartyState] " .. creature:getName() .. " joined party - scheduling update")
-            end
             PartyState:scheduleUpdate()
         end
     end
@@ -784,6 +770,5 @@ end
 
 function onPartyMembersChange(self, members)
 	-- Simply delegate to the state manager for consistency
-	print("[PartyState] onPartyMembersChange called - delegating to state manager")
 	PartyState:scheduleUpdate()
 end
