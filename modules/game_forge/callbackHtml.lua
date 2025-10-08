@@ -20,7 +20,17 @@ function forgeController:onCheckChangeConvergence(widget)
         self.fusionConvergenceTitle = title
         self:updateFusionItems(self.fusionConvergence)
     elseif window.panel == 'transfer' then
+        self.transferConvergence = not self.transferConvergence
+        self[window.modeProperty] = self.transferConvergence
         local transferLabel = self.modeTransfer and 'Convergence transfer requeriments' or 'Transfer Requirements'
-        ui.panels.transfer.test:setTitle(transferLabel)
+        self.transferConvergenceTitle = transferLabel
+        self:updateFusionItems(self.transferConvergence, true)
+
+        if not self.transferConvergence then
+            self.transferDustAmount = self.normalDustTransfer
+        else
+            self.transferDustAmount = self.convergenceDustTransfer
+        end
+        self.transferDustAmountColor = self:getColorByStatus(self.currentDust < self.transferDustAmount)
     end
 end

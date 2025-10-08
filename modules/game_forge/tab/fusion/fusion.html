@@ -26,20 +26,23 @@
               *image-source="item.imagePath"
               *image-clip="item.rarityClipObject"
               *border-width="1"
-              *border-color="self.selectedFusionItem and self.selectedFusionItem.key == item.key and 'white' or 'transparent'"
+              *border-color="self.selectedFusionItem.key == item.key and 'white' or 'transparent'"
             />
 
             <UIItem
               style="height: 32px; width: 32px; align-items: center"
               *item-id="item.id"
             ></UIItem>
+            <label *if="item.tier>0" class="fusion-items-to-select-tier"
+              >{{item.tier}}</label
+            >
+            <label class="fusion-items-to-select-count">{{item.count}}</label>
             <img
-              *if="item.tier>0"
+              *if="item.tier > 0"
               class="fusion-items-to-select-tier"
               src="/images/inventory/tiers-strip.png"
               *image-clip="item.clip"
             />
-            <label class="fusion-items-to-select-count">{{item.count}}</label>
           </div>
         </div>
       </div>
@@ -72,14 +75,20 @@
         <div
           *if="self.selectedFusionItemTarget"
           class="fusion-items-to-select-target"
+          style="position: relative"
         >
           <UIItem
             style="height: 64px; width: 64px; align-items: center"
             *item-id="self.fusionConvergence and self.selectedFusionItem.id or self.selectedFusionItemTarget.id"
             shader="Outfit - cyclopedia-black"
           ></UIItem>
+          <label
+            *if="self.selectedFusionItemTarget.tier>0"
+            class="fusion-items-to-select-tier"
+            >{{self.selectedFusionItemTarget.tier}}</label
+          >
           <img
-            *if="self.selectedFusionItemTarget and self.selectedFusionItemTarget.tier > 0"
+            *if="self.selectedFusionItemTarget.tier > 0"
             class="fusion-items-to-select-tier"
             src="/images/inventory/tiers-strip.png"
             *image-clip="self.selectedFusionItemTarget.clip"
@@ -107,21 +116,29 @@
       >
         <div class="forge-required-block">
           <div class="forge-card">
-            <UIItem
-              *if="self.selectedFusionItem"
-              class="forge-item-icon forge-card-item"
-              *item-id="self.selectedFusionItem and self.selectedFusionItem.id or -1"
-            ></UIItem>
-            <img
-              *if="self.selectedFusionItem.id == -1"
-              class="forge-question-icon"
-              src="/images/ui/icon-questionmark"
-            />
+            <div style="position: relative">
+              <UIItem
+                *if="self.selectedFusionItem"
+                class="forge-item-icon forge-card-item"
+                *item-id="self.selectedFusionItem and self.selectedFusionItem.id or -1"
+              ></UIItem>
+              <label
+                *if="self.selectedFusionItem.tier > 0"
+                class="fusion-items-to-select-tier"
+                style="text-align: right"
+              >
+                {{self.selectedFusionItem.tier}}
+              </label>
+              <img
+                *if="self.selectedFusionItem.id == -1"
+                class="forge-question-icon"
+                src="/images/ui/icon-questionmark"
+              />
+            </div>
           </div>
           <div class="forge-counter">
             <label id="fusionSelectedItemCounter" class="forge-full-width-label"
-              >{{self.selectedFusionItem and self.selectedFusionItem.count or
-              0}} / 1
+              >{{self.selectedFusionItem.countLabel}}
             </label>
           </div>
         </div>
@@ -157,6 +174,7 @@
 
             <div class="fusion-improve-button-container">
               <button
+                style="text-align: center; align-items: center"
                 onclick="self:onFusionImproveChanceChange(1)"
                 *disabled="self.fusionDisableImproveRateSuccessButton"
               >
@@ -189,6 +207,7 @@
 
             <div class="fusion-improve-button-container">
               <button
+                style="text-align: center; align-items: center"
                 onclick="self:onFusionImproveChanceChange(2)"
                 *disabled="self.fusionDisableReduceTierLossButton"
               >
@@ -247,6 +266,9 @@
                 *image-clip="item.clip"
               />
               <label class="fusion-items-to-select-count">{{item.count}}</label>
+              <label *if="item.tier>0" class="fusion-items-to-select-tier"
+                >{{item.tier}}</label
+              >
             </div>
           </div>
         </div>
@@ -284,7 +306,10 @@
                 style="position: absolute; top: 10px; left: 15px"
               />
 
-              <div *if="self.selectedFusionItem.id ~= -1">
+              <div
+                *if="self.selectedFusionItem.id ~= -1"
+                style="position: relative"
+              >
                 <UIItem
                   style="height: 32px; width: 32px"
                   *item-id="self.selectedFusionItem.id"
@@ -295,6 +320,11 @@
                   src="/images/inventory/tiers-strip.png"
                   *image-clip="self.selectedFusionItem.clip"
                 />
+                <label
+                  *if="self.selectedFusionItem.tier>0"
+                  class="fusion-items-to-select-tier"
+                  >{{self.selectedFusionItem.tier}}</label
+                >
               </div>
             </div>
             <img
@@ -309,11 +339,19 @@
                 style="position: absolute; top: 10px; left: 15px"
               />
 
-              <div *if="self.selectedFusionItemTarget.id ~= -1">
+              <div
+                *if="self.selectedFusionItemTarget.id ~= -1"
+                style="position: relative"
+              >
                 <UIItem
                   style="height: 32px; width: 32px"
-                  *item-id="self.fusionConvergence and self.selectedFusionItem.id orself.selectedFusionItemTarget.id"
+                  *item-id="self.fusionConvergence and self.selectedFusionItem.id or self.selectedFusionItemTarget.id"
                 ></UIItem>
+                <label
+                  *if="self.selectedFusionItemTarget.tier>0"
+                  class="fusion-items-to-select-tier"
+                  >{{self.selectedFusionItemTarget.tier}}</label
+                >
                 <img
                   *if="self.selectedFusionItemTarget.tier > 0"
                   class="fusion-items-to-select-tier"
@@ -331,7 +369,9 @@
         </UIButton>
         <div anchor="prev" class="forge-result-cost">
           <div style="align-items: center; text-align: center">
-            <p>{{self.fusionPrice}}</p>
+            <label *color="self.fusionPriceColor or 'white'"
+              >{{self.fusionPrice}}</label
+            >
             <img
               style="margin-bottom: 3px; margin-left: 2px"
               class="resource-icon"
@@ -344,11 +384,9 @@
 
     <qtpanel id="fusion-info-panel" class="info-panel">
       <div anchor="parent" class="info-row">
-        <label
-          class="info-text"
-          style="float: left"
-          text="The aim of a fusion is to increase the tier of an item."
-        ></label>
+        <label class="info-text" style="float: left"
+          >The aim of a fusion is to increase the tier of an item.</label
+        >
         <img
           class="info-icon"
           src="/images/icons/show_gui_help_grey"
@@ -360,11 +398,9 @@
         />
       </div>
       <div class="info-row" style="height: 15px">
-        <label
-          class="info-text"
-          style="float: left"
-          text="The classification of an item defines its maximum tier."
-        ></label>
+        <label class="info-text" style="float: left"
+          >The classification of an item defines its maximum tier.</label
+        >
         <img
           class="info-icon"
           src="/images/icons/show_gui_help_grey"
@@ -376,11 +412,9 @@
         />
       </div>
       <div class="info-row" style="height: 15px">
-        <label
-          class="info-text"
-          style="float: left"
-          text="If two items are fused, you can spend exaltation cores."
-        ></label>
+        <label class="info-text" style="float: left"
+          >If two items are fused, you can spend exaltation cores.</label
+        >
         <img
           class="info-icon"
           src="/images/icons/show_gui_help_grey"
@@ -390,11 +424,9 @@
         />
       </div>
       <div class="info-row" style="height: 15px">
-        <label
-          class="info-text"
-          style="float: left"
-          text="Items with a tier grant unique bonuses."
-        ></label>
+        <label class="info-text" style="float: left"
+          >Items with a tier grant unique bonuses.</label
+        >
         <img
           class="info-icon"
           src="/images/icons/show_gui_help_grey"

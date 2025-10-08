@@ -157,29 +157,39 @@ end
 
 local baseSelectedFusionItem = {
     id = -1,
-    tier = 0,
+    tier = -1,
     clip = {},
     imagePath = nil,
     rarityClipObject = nil,
-    count = 0
+    count = 0,
+    countLabel = "0 / 1",
+    slot = -1
 }
-forgeController.selectedFusionItem = baseSelectedFusionItem
-forgeController.selectedFusionItemTarget = baseSelectedFusionItem
+forgeController.selectedFusionItem = cloneValue(baseSelectedFusionItem)
+forgeController.selectedFusionItemTarget = cloneValue(baseSelectedFusionItem)
+
+local function resetInfo()
+    forgeController.fusionPrice = "???"
+    forgeController.currentExaltedCoresPrice = "???"
+    forgeController.fusionChanceImprovedIsChecked = false
+    forgeController.fusionReduceTierLossIsChecked = false
+    forgeController.selectedFusionItem = cloneValue(baseSelectedFusionItem)
+    forgeController.selectedFusionConvergenceItem = cloneValue(baseSelectedFusionItem)
+    forgeController.selectedFusionItemTarget = cloneValue(baseSelectedFusionItem)
+    forgeController.fusionConvergence = false
+    forgeController.transferConvergence = false
+    forgeController.fusionConvergenceTitle = nil
+    forgeController.fusionConvergenceList = {}
+    forgeController.transferDustAmount = 100
+end
+
 
 function forgeController:close()
     hide()
 end
 
 local function toggle(self)
-    forgeController.fusionPrice = "???"
-    forgeController.fusionChanceImprovedIsChecked = false
-    forgeController.fusionReduceTierLossIsChecked = false
-    forgeController.selectedFusionItem = baseSelectedFusionItem
-    forgeController.selectedFusionConvergenceItem = baseSelectedFusionItem
-    forgeController.selectedFusionItemTarget = baseSelectedFusionItem
-    forgeController.fusionConvergence = false
-    forgeController.fusionConvergenceTitle = nil
-    forgeController.fusionConvergenceList = {}
+    resetInfo()
     if not self.ui or self.ui:isDestroyed() then
         show(self)
         return
@@ -201,15 +211,7 @@ function forgeController:show(skipRequest)
 end
 
 function forgeController:hide()
-    forgeController.fusionPrice = "???"
-    forgeController.fusionChanceImprovedIsChecked = false
-    forgeController.fusionReduceTierLossIsChecked = false
-    forgeController.selectedFusionItem = baseSelectedFusionItem
-    forgeController.selectedFusionConvergenceItem = baseSelectedFusionItem
-    forgeController.selectedFusionItemTarget = baseSelectedFusionItem
-    forgeController.fusionConvergence = false
-    forgeController.fusionConvergenceTitle = nil
-    forgeController.fusionConvergenceList = {}
+    resetInfo()
     hide()
 end
 
@@ -257,7 +259,7 @@ end
 -- end
 
 function forgeController:onInit()
-    connect(g_game, {
+    self:registerEvents(g_game, {
         onBrowseForgeHistory = onBrowseForgeHistory,
         forgeData = forgeData,
     })
@@ -274,6 +276,25 @@ function forgeController:onInit()
             end
         end
     })
+end
+
+local function handleParseFusionItems(items)
+    local parsedItems = cloneValue(items or {})
+
+    for i, item in pairs(parsedItems) do
+        item.key = ("%d_%d"):format(item.id, item.tier)
+        if item.tier > 0 then
+            item.clip = ItemsDatabase.getTierClip(item.tier)
+        end
+
+        local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
+        if imagePath then
+            item.imagePath = imagePath
+            item.rarityClipObject = rarityClipObject
+        end
+    end
+
+    return parsedItems
 end
 
 function SelectWindow(type, isBackButtonPress)
@@ -298,10 +319,27 @@ function SelectWindow(type, isBackButtonPress)
         panel:raise()
     end
 
+    resetInfo()
+
     if type == "historyMenu" then
         if not isBackButtonPress then
             g_game.sendForgeBrowseHistoryRequest(1)
         end
+    end
+
+    if type == "fusionMenu" then
+        forgeController.currentItemList = handleParseFusionItems(forgeController.fusionItems)
+        return
+    end
+
+    if type == "transferMenu" then
+        forgeController.transferItems.donors = handleParseFusionItems(forgeController.transferItems.donors)
+        forgeController.transferItems.receivers = handleParseFusionItems(forgeController.transferItems.receivers)
+        forgeController.convergenceTransferItems.donors = handleParseFusionItems(
+            forgeController.convergenceTransferItems.donors)
+        forgeController.convergenceTransferItems.receivers = handleParseFusionItems(
+            forgeController.convergenceTransferItems.receivers)
+        forgeController.currentItemList = forgeController.transferItems
     end
 end
 
@@ -350,7 +388,6 @@ end
 
 function forgeController:onHistoryPreviousPage()
     local currentPage = forgeController.historyCurrentPage or 1
-    g_logger.info("onHistoryPreviousPage>Current page: " .. tostring(currentPage))
     if currentPage <= 1 then
         return
     end
@@ -360,7 +397,6 @@ end
 
 function forgeController:onHistoryNextPage()
     local currentPage = forgeController.historyCurrentPage or 1
-    g_logger.info("onHistoryNextPage>Current page: " .. tostring(currentPage))
     local lastPage = forgeController.historyLastPage or currentPage
 
     if currentPage >= lastPage then
@@ -430,11 +466,41 @@ function forgeController:setInitialValues(openData)
     self.transfers = cloneValue(openData.transfers or self.transfers or {})
     self.convergenceTransfers = cloneValue(openData.convergenceTransfers or self.convergenceTransfers or {})
 
+    local transferItems = {
+        donors = {},
+        receivers = {}
+    }
+
+    local convergenceTransferItems = {
+        donors = {},
+        receivers = {}
+    }
+
+    for slot, currentType in pairs(self.transfers) do
+        for transferType in pairs(currentType) do
+            for __, item in pairs(currentType[transferType]) do
+                item.slot = slot
+                table.insert(transferItems[transferType], item)
+            end
+        end
+    end
+    for slot, currentType in pairs(self.convergenceTransfers) do
+        for transferType in pairs(currentType) do
+            for __, item in pairs(currentType[transferType]) do
+                item.slot = slot
+                table.insert(convergenceTransferItems[transferType], item)
+            end
+        end
+    end
+
+    self.transferItems = {}
+    self.transferItems.donors = transferItems.donors
+    self.transferItems.receivers = transferItems.receivers
+    self.convergenceTransferItems = {}
+    self.convergenceTransferItems.donors = convergenceTransferItems.donors
+    self.convergenceTransferItems.receivers = convergenceTransferItems.receivers
+
     local trackedKeys = {
-        'fusionPrices',
-        'convergenceFusionPrices',
-        'transferPrices',
-        'convergenceTransferPrices',
         'normalDustFusion',
         'convergenceDustFusion',
         'normalDustTransfer',
@@ -442,22 +508,27 @@ function forgeController:setInitialValues(openData)
         'fusionChanceBase',
         'fusionChanceImproved',
         'fusionReduceTierLoss',
-        'fusionNormalValues',
-        'fusionConvergenceValues',
-        'transferNormalValues',
-        'transferConvergenceValues'
+        -- 'fusionNormalValues',
+        -- 'fusionConvergenceValues',
+        -- 'transferNormalValues',
+        -- 'transferConvergenceValues'
     }
 
     for _, key in ipairs(trackedKeys) do
         if openData[key] ~= nil then
             self[key] = cloneValue(openData[key])
+            g_logger.info("k: " .. key .. " v: " .. tostring(self[key]))
         end
     end
 end
 
-forgeController.conversionNecessaryDustToIncrease = 25
-forgeController.conversionRaiseFrom = 100
-forgeController.conversionRaiseTo = 101
+forgeController.conversion = {}
+forgeController.general = {}
+
+function forgeController:getColorByStatus(status)
+    return status and "red" or "white"
+end
+
 function forgeController:applyForgeConfiguration(config)
     if type(config) ~= 'table' then
         return
@@ -467,20 +538,29 @@ function forgeController:applyForgeConfiguration(config)
 
     local initial = {}
 
-    local classPrices = normalizeClassPriceEntries(config.classPrices or config.fusionPrices)
+    local classPrices = normalizeClassPriceEntries(config.classPrices)
     if next(classPrices) then
-        initial.fusionPrices = classPrices
+        initial.classPrices = classPrices
     end
+
+    self.classPrices = classPrices or {}
+
+    self.transferPrices = config.transferPrices or {}
+
+    self.fusionGrades = config.fusionGrades or {}
 
     local convergenceFusion = normalizeTierPriceEntries(config.convergenceFusionPrices)
     if next(convergenceFusion) then
         initial.convergenceFusionPrices = convergenceFusion
     end
 
+    self.convergenceFusionPrices = convergenceFusion or {}
+
     local convergenceTransfer = normalizeTierPriceEntries(config.convergenceTransferPrices)
     if next(convergenceTransfer) then
         initial.convergenceTransferPrices = convergenceTransfer
     end
+    self.convergenceTransferPrices = convergenceTransfer or {}
 
     local fusionGrades = normalizeFusionGradeEntries(config.fusionGrades or config.fusionNormalValues)
     if next(fusionGrades) then
@@ -493,6 +573,7 @@ function forgeController:applyForgeConfiguration(config)
     end
 
     local transferNormalValues = normalizeTierPriceEntries(config.transferNormalValues)
+
     if next(transferNormalValues) then
         initial.transferNormalValues = transferNormalValues
     end
@@ -522,8 +603,7 @@ function forgeController:applyForgeConfiguration(config)
         local numericValue = tonumber(value)
         if numericValue then
             initial[key] = numericValue
-
-            g_logger.info("key: " .. tostring(key) .. " value: " .. tostring(numericValue))
+            g_logger.info("numeric, k: " .. key .. " v: " .. tostring(numericValue))
         end
     end
 
@@ -548,35 +628,44 @@ function forgeController:applyForgeConfiguration(config)
 
     forgeController.mustDisableIncreaseDustLimitButton = forgeController.currentDust <
         forgeController.conversionNecessaryDustToIncrease
-    forgeController.conversionNecessaryDustToIncreaseLabel = forgeController.mustDisableIncreaseDustLimitButton and "red" or
-        "white"
+    forgeController.conversionNecessaryDustToIncreaseLabel = forgeController:getColorByStatus(forgeController
+        .mustDisableIncreaseDustLimitButton)
 
     forgeController.currentDustLevel = ("%d / %d"):format(forgeController.currentDust, forgeController.maxDustLevel)
     forgeController.currentSlivers = player:getResourceBalance(forgeResourceTypes.sliver) or 0
     forgeController.sliverToCore = numericFields.sliverToCore or 50
     forgeController.mustDisableConvertSliverToCoreButton = forgeController.currentSlivers <
         forgeController.sliverToCore
-    forgeController.conversionNecessarySliverToCoreLabel = forgeController.mustDisableConvertSliverToCoreButton and "red" or
-        "white"
+    forgeController.conversionNecessarySliverToCoreLabel = forgeController:getColorByStatus(forgeController
+        .mustDisableConvertSliverToCoreButton)
 
     forgeController.currentExaltedCores = player:getResourceBalance(forgeResourceTypes.cores) or 0
     forgeController.rawCurrentGold = player:getTotalMoney() or 0
     forgeController.currentGold = formatGoldAmount(forgeController.rawCurrentGold)
+    forgeController.transferDustAmount = numericFields.normalDustTransfer or 0
+    forgeController.transferDustAmountColor = forgeController:getColorByStatus(forgeController.currentDust <
+        forgeController.transferDustAmount)
+
+    g_logger.info("<< " ..
+        forgeController.transferDustAmount
+        ..
+        ">> " .. " >>" .. forgeController.transferDustAmountColor)
 
     self:setInitialValues(initial)
 
     forgeController.normalDustFusion = numericFields.normalDustFusion or 100
     forgeController.convergenceDustFusion = numericFields.convergenceDustFusion or 130
 
-    forgeController.fusionPlayerHasDustToNormalFusion = (forgeController.currentDust >= forgeController.normalDustFusion) and
-        "white" or "red"
-    forgeController.fusionPlayerHasDustToConvergenceFusion = (forgeController.currentDust >= forgeController.convergenceDustFusion) and
-        "white" or "red"
+    forgeController.fusionPlayerHasDustToNormalFusion = forgeController:getColorByStatus(forgeController.currentDust <
+        forgeController.normalDustFusion)
+    forgeController.fusionPlayerHasDustToConvergenceFusion = forgeController:getColorByStatus(forgeController
+        .currentDust <
+        forgeController.convergenceDustFusion)
 
-    forgeController.fusionPlayerHasExaltedCoreToImproveRateSuccess = (forgeController.currentExaltedCores >= 1) and
-        "white" or "red"
-    forgeController.fusionPlayerHasExaltedCoreToReduceTierLoss = (forgeController.currentExaltedCores >= 1) and
-        "white" or "red"
+    forgeController.fusionPlayerHasExaltedCoreToImproveRateSuccess = forgeController:getColorByStatus(forgeController
+        .currentExaltedCores < 1)
+    forgeController.fusionPlayerHasExaltedCoreToReduceTierLoss = forgeController:getColorByStatus(forgeController
+        .currentExaltedCores < 1)
 
     forgeController.fusionDisableImproveRateSuccessButton = (forgeController.currentExaltedCores < 1)
     forgeController.fusionDisableReduceTierLossButton = (forgeController.currentExaltedCores < 1)
@@ -695,41 +784,49 @@ function forgeController:onConversion(conversionType, dependencies)
 end
 
 forgeController.fusionPrice = "???"
+forgeController.currentExaltedCoresPrice = "???"
 forgeController.rawFusionPrice = 0
-local resolveForgePrice = helpers.resolveForgePrice
-function forgeController:getFusionPrice(prices, itemId, tier, isConvergence)
+function forgeController:getFusionPrice(prices, itemId, currentTier, isConvergence, isTransfer)
     local price = 0
-    if not isConvergence then
-        local itemPtr = Item.create(itemId, 1)
-        price = resolveForgePrice(prices, itemPtr, tier)
-    else
-        for currentTier, tierPrice in pairs(prices) do
-            if tier == currentTier then
-                price = tierPrice or 0
+    local tierIndex = (tonumber(currentTier) or 0) + 1
+
+    if isTransfer and isConvergence then
+        for tier, _price in pairs(prices) do
+            if isConvergence then
+                tier = tier > 1 and (tier - 1) or tier
+            end
+            if currentTier == tier then
+                price = tonumber(_price) or 0
                 break
             end
         end
+    elseif isConvergence then
+        for tier, _price in pairs(prices) do
+            if tierIndex == tier then
+                price = tonumber(_price) or 0
+                break
+            end
+        end
+    else
+        local itemPtr = Item.create(itemId, 1)
+
+        local classification = itemPtr and itemPtr.getClassification and itemPtr:getClassification() or 0
+        if classification <= 0 then return 0 end
+
+        for class, tiers in pairs(prices) do
+            if class == classification then
+                for tier, _price in pairs(tiers) do
+                    if tier == tierIndex or (isTransfer and tier == currentTier) then
+                        price = tonumber(_price) or 0
+                        break
+                    end
+                end
+            end
+        end
     end
+
     self.rawFusionPrice = price
     self.fusionPrice = formatGoldAmount(price)
-end
-
-local function handleParseFusionItems(items)
-    local parsedItems = cloneValue(items or {})
-    for _, item in pairs(parsedItems) do
-        item.key = ("%d_%d"):format(item.id, item.tier)
-        if item.tier > 0 then
-            item.clip = ItemsDatabase.getTierClip(item.tier)
-        end
-
-        local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
-        if imagePath then
-            item.imagePath = imagePath
-            item.rarityClipObject = rarityClipObject
-        end
-    end
-
-    return parsedItems
 end
 
 local function handleParseConvergenceFusionItems(items)
@@ -774,7 +871,7 @@ function g_game.onOpenForge(openData)
     forgeController.currentItemList = forgeController.fusionItems
 end
 
-function forgeController:onTryFusion()
+function forgeController:onTryFusion(isTransfer)
     if not self.selectedFusionItem or self.selectedFusionItem.id == -1 then
         return
     end
@@ -795,9 +892,21 @@ function forgeController:onTryFusion()
         return
     end
 
-    if self.currentDust < self.normalDustFusion then return end
+    if isTransfer then
+        if self.currentExaltedCores < self.currentExaltedCoresPrice then
+            return
+        end
 
-    g_game.forgeRequest(forgeActions.FUSION, self.fusionConvergence,
+        if self.currentDust < self.transferDustAmount then
+            return
+        end
+    end
+
+    if self.currentDust < self.normalDustFusion then return end
+    local actionType = isTransfer and forgeActions.TRANSFER or forgeActions.FUSION
+    local isConvergence = self.fusionConvergence or self.transferConvergence
+
+    g_game.forgeRequest(actionType, isConvergence,
         self.selectedFusionItem.id,
         self.selectedFusionItem.tier,
         self.selectedFusionItemTarget.id,
@@ -812,25 +921,45 @@ function forgeData(config)
     forgeController:applyForgeConfiguration(config)
 end
 
-forgeController.selectedFusionItemTarget = baseSelectedFusionItem
+forgeController.selectedFusionItemTarget = cloneValue(baseSelectedFusionItem)
 forgeController.fusionConvergenceList = {}
-function forgeController:handleSelectItem(selectedItem, isConvergence)
+function forgeController:handleSelectItem(selectedItem, isConvergence, currentType)
     if self.selectedFusionItem and self.selectedFusionItem.key == selectedItem.key then
-        self.selectedFusionItem = baseSelectedFusionItem
-        self.selectedFusionItemTarget = baseSelectedFusionItem
+        self.selectedFusionItem = cloneValue(baseSelectedFusionItem)
         self.rawFusionPrice = 0
         self.fusionPrice = "???"
+        self.currentExaltedCoresPrice = "???"
         self.fusionConvergenceList = {}
-        self.selectedFusionConvergenceItem = baseSelectedFusionItem
         return
     end
+    self.selectedFusionConvergenceItem = cloneValue(baseSelectedFusionItem)
+    self.selectedFusionItemTarget = cloneValue(baseSelectedFusionItem)
 
-    for _, item in pairs(self.currentItemList) do
+    local list = self.currentItemList or {}
+
+    if currentType == "donors" or currentType == "receivers" then
+        list = self.currentItemList[currentType] or {}
+
+        local targetTier = isConvergence and selectedItem.tier or (selectedItem.tier - 1)
+        for _, values in pairs(self.fusionGrades) do
+            if values.tier == targetTier then
+                self.currentExaltedCoresPrice = values.exaltedCores
+                self.currentExaltedCoresPriceColor = self:getColorByStatus(self.currentExaltedCores <
+                    self.currentExaltedCoresPrice)
+                break
+            end
+        end
+    else
+        self.currentExaltedCoresPrice = "???"
+    end
+
+    for _, item in pairs(list) do
+        item.key = item.key or ("%d_%d"):format(item.id, item.tier)
         if item.key == selectedItem.key then
-            item.key = ("%d_%d"):format(item.id, item.tier)
+            item.countLabel = ("%d / %d"):format(item.count, 1)
             self.selectedFusionItem = cloneValue(item)
 
-            if not isConvergence then
+            if not isConvergence and not currentType then
                 self.selectedFusionItemTarget = cloneValue(item)
                 if self.selectedFusionItemTarget.tier < 10 then
                     self.selectedFusionItemTarget.tier = self.selectedFusionItemTarget.tier + 1
@@ -864,34 +993,69 @@ function forgeController:handleSelectItem(selectedItem, isConvergence)
             end
         end
         self.fusionConvergenceList = parsedConvergenceList
-    else
-        local prices = self.fusionPrices or {}
-        self:getFusionPrice(prices, self.selectedFusionItem.id, self.selectedFusionItem.tier)
-
-        self.canTryFusion = self.rawFusionPrice > 0 and tonumber(self.rawCurrentGold) >= tonumber(self.rawFusionPrice) and
-            self.currentDust >= self.normalDustFusion
     end
+    local prices = self.classPrices or {}
+
+    if currentType then
+        if isConvergence then
+            prices = self.convergenceTransferPrices or {}
+        end
+    else
+        if isConvergence then
+            prices = self.convergenceFusionPrices or {}
+        end
+    end
+
+    self:getFusionPrice(prices, self.selectedFusionItem.id, self.selectedFusionItem.tier, isConvergence, currentType)
+
+    self.canTryFusion = self.rawFusionPrice > 0 and tonumber(self.rawCurrentGold) >= tonumber(self.rawFusionPrice) and
+        self.currentDust >= self.normalDustFusion
+
+    if tonumber(self.currentExaltedCoresPrice) and self.currentExaltedCores < self.currentExaltedCoresPrice then
+        self.canTryFusion = false
+    end
+
+
+    self.fusionPriceColor = self:getColorByStatus(tonumber(self.rawCurrentGold) < tonumber(self.rawFusionPrice))
 end
 
-function forgeController:handleSelectConvergenceItem(selectedItem, isTransfer)
+function forgeController:handleSelectConvergenceItem(selectedItem, isConvergence, currentType)
     if self.selectedFusionConvergenceItem and self.selectedFusionConvergenceItem.key == selectedItem.key then
-        self.selectedFusionItem = baseSelectedFusionItem
-        self.selectedFusionConvergenceItem = baseSelectedFusionItem
-        self.selectedFusionItemTarget = baseSelectedFusionItem
+        self.selectedFusionItem = cloneValue(baseSelectedFusionItem)
         self.rawFusionPrice = 0
         self.fusionPrice = "???"
+        self.currentExaltedCoresPrice = "???"
         self.fusionConvergenceList = {}
         return
     end
+    self.selectedFusionConvergenceItem = cloneValue(baseSelectedFusionItem)
+    self.selectedFusionItemTarget = cloneValue(baseSelectedFusionItem)
 
-    for _, item in pairs(self.fusionConvergenceList) do
+    local list = self.fusionConvergenceList or {}
+    if currentType == "donors" or currentType == "receivers" then
+        if isConvergence then
+            list = self.convergenceTransferItems[currentType] or {}
+        else
+            list = self.currentItemList[currentType] or {}
+        end
+    end
+
+    for _, item in pairs(list) do
         if item.key == selectedItem.key then
-            item.key = ("%d_%d"):format(item.id, item.tier)
+            item.key = item.key or ("%d_%d"):format(item.id, item.tier)
+            item.countLabel = ("%d / %d"):format(item.count, 1)
             self.selectedFusionConvergenceItem = cloneValue(item)
             self.selectedFusionItemTarget = cloneValue(item)
 
             if self.selectedFusionItemTarget.tier < 10 then
                 self.selectedFusionItemTarget.tier = self.selectedFusionItemTarget.tier + 1
+                if currentType then
+                    if isConvergence then
+                        self.selectedFusionItemTarget.tier = self.selectedFusionItem.tier
+                    else
+                        self.selectedFusionItemTarget.tier = self.selectedFusionItem.tier - 1
+                    end
+                end
                 self.selectedFusionItemTarget.clip = ItemsDatabase.getTierClip(self.selectedFusionItemTarget.tier)
             end
 
@@ -903,25 +1067,29 @@ function forgeController:handleSelectConvergenceItem(selectedItem, isTransfer)
             break
         end
     end
-
-    local prices = self.convergenceFusionPrices or {}
-    self:getFusionPrice(prices, self.selectedFusionItem.id, self.selectedFusionItemTarget.tier, self.convergenceFusion)
-
     self.canTryFusion = self.rawFusionPrice > 0 and tonumber(self.rawCurrentGold) >= tonumber(self.rawFusionPrice) and
         self.currentDust >= self.convergenceDustFusion
 end
 
-function forgeController:updateFusionItems(isConvergence)
-    g_logger.info("updateFusionItems> isConvergence: " .. tostring(isConvergence))
-    self.selectedFusionItem = baseSelectedFusionItem
-    self.selectedFusionConvergenceItem = baseSelectedFusionItem
-    self.selectedFusionItemTarget = baseSelectedFusionItem
+function forgeController:updateFusionItems(isConvergence, isTransfer)
+    self.selectedFusionItem = cloneValue(baseSelectedFusionItem)
+    self.selectedFusionConvergenceItem = cloneValue(baseSelectedFusionItem)
+    self.selectedFusionItemTarget = cloneValue(baseSelectedFusionItem)
     self.rawFusionPrice = 0
     self.fusionPrice = "???"
+    self.currentExaltedCoresPrice = "???"
     self.fusionConvergenceList = {}
     if isConvergence then
-        self.currentItemList = self.convergenceFusionBySlot or {}
+        if not isTransfer then
+            self.currentItemList = self.convergenceFusionBySlot or {}
+        else
+            self.currentItemList = self.convergenceTransferItems or {}
+        end
     else
-        self.currentItemList = self.fusionItems or {}
+        if not isTransfer then
+            self.currentItemList = self.fusionItems or {}
+        else
+            self.currentItemList = self.transferItems or {}
+        end
     end
 end

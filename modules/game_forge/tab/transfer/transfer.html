@@ -12,7 +12,38 @@
       <div
         class="forge-slot-grid UIScrollArea"
         layout="type: grid; cell-size: 36 38;flow: true"
-      ></div>
+      >
+        <div *for="local item in (self.currentItemList.donors or {})">
+          <div
+            class="fusion-items-to-select"
+            onclick="self:handleSelectItem(item, self.transferConvergence, 'donors')"
+          >
+            <img
+              class="fusion-items-to-select-rarity"
+              *if="item.imagePath"
+              *image-source="item.imagePath"
+              *image-clip="item.rarityClipObject"
+              *border-width="1"
+              *border-color="self.selectedFusionItem and self.selectedFusionItem.key == item.key and 'white' or 'transparent'"
+            />
+
+            <UIItem
+              style="height: 32px; width: 32px; align-items: center"
+              *item-id="item.id"
+            ></UIItem>
+            <img
+              *if="item.tier>0"
+              class="fusion-items-to-select-tier"
+              src="/images/inventory/tiers-strip.png"
+              *image-clip="item.clip"
+            />
+            <label *if="item.tier>0" class="fusion-items-to-select-tier"
+              >{{item.tier}}</label
+            >
+            <label class="fusion-items-to-select-count">{{item.count}}</label>
+          </div>
+        </div>
+      </div>
       <div class="forge-selection-side">
         <img
           class="forge-arrow-large"
@@ -26,37 +57,90 @@
           class="forge-arrow-large"
           src="/images/arrows/icon-arrow-rightlarge"
         />
-        <input
-          class="forge-convergence-checkbox"
-          type="checkbox"
-          text="Convergence"
-          onchange="self:onCheckChangeConvergence(event)"
-        />
+        <div
+          style="display: flex; align-items: center; margin-top: 20px"
+          onclick="self:onCheckChangeConvergence(event)"
+        >
+          <input
+            id="transfer-convergence"
+            type="checkbox"
+            *checked="self.transferConvergence"
+          />
+          <label for="transfer-convergence">Convergence</label>
+        </div>
       </div>
       <div
         class="forge-slot-grid UIScrollArea"
-        style="margin-left: -5px"
         layout="type: grid; cell-size: 36 38;flow: true"
-      ></div>
+      >
+        <div
+          *for="local item in (self.currentItemList.receivers or {})"
+          *if="self.selectedFusionItem.id ~= -1 and self.selectedFusionItem.id ~= item.id and self.selectedFusionItem.slot == item.slot"
+        >
+          <div
+            class="fusion-items-to-select"
+            onclick="self:handleSelectConvergenceItem(item, self.transferConvergence,'receivers')"
+          >
+            <img
+              class="fusion-items-to-select-rarity"
+              *if="item.imagePath"
+              *image-source="item.imagePath"
+              *image-clip="item.rarityClipObject"
+              *border-width="1"
+              *border-color="self.selectedFusionConvergenceItem and self.selectedFusionConvergenceItem.key == item.key and 'white' or 'transparent'"
+            />
+
+            <UIItem
+              style="height: 32px; width: 32px; align-items: center"
+              *item-id="item.id"
+            ></UIItem>
+            <img
+              *if="item.tier>0"
+              class="fusion-items-to-select-tier"
+              src="/images/inventory/tiers-strip.png"
+              *image-clip="item.clip"
+            />
+            <label class="fusion-items-to-select-count">{{item.count}}</label>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div
-      id="test"
+      id="transferSelectionArea"
       class="minipanel forge-selection-area forge-selection-area--secondary transfer-result-area"
       focusable="false"
-      title="Transfer Requirements"
+      *title="self.transferConvergenceTitle or 'Transfer Requirements'"
     >
-      <div class="forge-result-placeholder" focusable="false">
+      <div
+        class="forge-result-placeholder"
+        focusable="false"
+        style="width: 220px; height: 90px"
+      >
         <div class="forge-required-block">
           <div class="forge-card">
-            <UIItem class="forge-item-icon"></UIItem>
-            <img
-              class="forge-question-icon"
-              src="/images/ui/icon-questionmark"
-            />
+            <div style="position: relative">
+              <UIItem
+                *if="self.selectedFusionItem"
+                class="forge-item-icon forge-card-item"
+                *item-id="self.selectedFusionItem and self.selectedFusionItem.id or -1"
+              ></UIItem>
+              <label
+                *if="self.selectedFusionItem.tier > 0"
+                class="fusion-items-to-select-tier"
+                >{{self.selectedFusionItem.tier}}</label
+              >
+              <img
+                *if="self.selectedFusionItem.id == -1"
+                class="forge-question-icon"
+                src="/images/ui/icon-questionmark"
+              />
+            </div>
           </div>
           <div class="forge-counter">
-            <label class="forge-full-width-label" text="0 / 1"></label>
+            <label class="forge-full-width-label"
+              >{{self.selectedFusionItem.countLabel}}</label
+            >
           </div>
         </div>
 
@@ -65,8 +149,11 @@
             <UIItem class="forge-item-icon" style="item-id: 37160"></UIItem>
           </div>
           <div class="forge-counter">
-            <label class="forge-full-width-label" text="100"></label>
-            <img class="resource-icon" src="images/icon-currency-dust" />
+            <label
+              class="forge-full-width-label"
+              *color="self.transferDustAmountColor or 'white'"
+              >{{self.transferDustAmount}}</label
+            >
           </div>
         </div>
 
@@ -75,32 +162,101 @@
             <UIItem class="forge-item-icon" style="item-id: 37110"></UIItem>
           </div>
           <div class="forge-counter">
-            <label class="forge-full-width-label" text="???"></label>
-            <img class="resource-icon" src="images/icon-currency-exaltedcore" />
+            <label
+              class="forge-full-width-label"
+              *color="self.currentExaltedCoresPriceColor or 'white'"
+              >{{self.currentExaltedCoresPrice or '???'}}</label
+            >
           </div>
         </div>
       </div>
 
       <img
         class="flow-arrow"
-        style="left: 182px; top: 35px"
+        style="left: 35px; top: 35px"
         src="/images/arrows/icon-arrow-rightlarge"
       />
       <div class="transfer-result-summary">
-        <UIButton class="forge-action-button forge-action-button--large">
-          <UIItem
-            class="forge-result-item forge-result-item-fusion"
-            style="left: 20px"
-          ></UIItem>
-          <img class="forge-action-arrow" src="/images/arrows/icon_3arrows" />
-          <UIItem
-            class="forge-result-item forge-result-item-fusion"
-            style="left: 0px"
-          ></UIItem>
-          <img class="forge-action-overlay" src="/images/ui/ditherpattern64" />
+        <UIButton
+          *disabled="not self.canTryFusion"
+          class="forge-action-button forge-action-button--large"
+          onclick="self:onTryFusion(true)"
+        >
+          <div class="fusion-result-preview-container">
+            <div class="fusion-result-preview-wrapper">
+              <img
+                *visible="self.selectedFusionItem.id == -1"
+                src="/images/ui/icon-questionmark"
+                style="position: absolute; top: 10px; left: 15px"
+              />
+
+              <div
+                *if="self.selectedFusionItem.id ~= -1"
+                style="position: relative"
+              >
+                <UIItem
+                  style="height: 32px; width: 32px"
+                  *item-id="self.selectedFusionItem.id"
+                ></UIItem>
+                <img
+                  *if="self.selectedFusionItem.tier > 0"
+                  class="fusion-items-to-select-tier"
+                  src="/images/inventory/tiers-strip.png"
+                  *image-clip="self.selectedFusionItem.clip"
+                />
+                <label
+                  *if="self.selectedFusionItem.tier>0"
+                  class="fusion-items-to-select-tier"
+                  >{{self.selectedFusionItem.tier}}</label
+                >
+              </div>
+            </div>
+            <img
+              class="forge-action-arrow"
+              style="position: absolute; left: 40px; top: 30px"
+              src="/images/arrows/icon_3arrows"
+            />
+            <div class="fusion-result-preview-wrapper-second">
+              <img
+                *visible="self.selectedFusionItemTarget.id == -1"
+                src="/images/ui/icon-questionmark"
+                style="position: absolute; top: 10px; left: 15px"
+              />
+
+              <div
+                *if="self.selectedFusionItemTarget.id ~= -1"
+                style="position: relative"
+              >
+                <UIItem
+                  style="height: 32px; width: 32px"
+                  *item-id="self.fusionConvergence and self.selectedFusionItem.id or self.selectedFusionItemTarget.id"
+                ></UIItem>
+                <label
+                  *if="self.selectedFusionItemTarget.tier>0"
+                  class="fusion-items-to-select-tier"
+                  >{{self.selectedFusionItemTarget.tier}}</label
+                >
+                <img
+                  *if="self.selectedFusionItemTarget.tier > 0"
+                  class="fusion-items-to-select-tier"
+                  src="/images/inventory/tiers-strip.png"
+                  *image-clip="self.selectedFusionItemTarget.clip"
+                />
+              </div>
+            </div>
+          </div>
+          <img
+            *if="self.selectedFusionItemTarget.id == -1 or not self.canTryFusion"
+            class="forge-action-overlay"
+            src="/images/ui/ditherpattern64"
+          />
         </UIButton>
         <div anchor="prev" class="forge-result-cost">
-          <label class="forge-full-width-label" text="???"></label>
+          <label
+            class="forge-full-width-label"
+            *color="self.fusionPriceColor or 'white'"
+            >{{self.fusionPrice}}</label
+          >
           <img class="resource-icon" src="/images/game/prey/prey_gold" />
         </div>
       </div>
@@ -108,10 +264,10 @@
 
     <qtpanel id="transfer-info-panel" class="info-panel">
       <div anchor="parent" class="info-row" style="height: auto">
-        <label
-          class="info-text"
-          text="You can transfer the tier of an item to another item of the same classification."
-        ></label>
+        <label class="info-text"
+          >You can transfer the tier of an item to another item of the same
+          classification.</label
+        >
       </div>
     </qtpanel>
   </div>
