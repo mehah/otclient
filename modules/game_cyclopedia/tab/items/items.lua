@@ -532,6 +532,13 @@ function Cyclopedia.Items.onChangeCustomPrice(widget)
 		UI.InfoBase.ResultGoldBase.Value:setText(comma_value(numericValue))
 	end
 	
+	-- Update rarity visual indicator based on custom value
+	if numericValue > 0 then
+		ItemsDatabase.setRarityItem(UI.InfoBase.ResultGoldBase.Rarity, numericValue)
+	else
+		UI.InfoBase.ResultGoldBase.Rarity:setImageSource("")
+	end
+	
 	if player.updateCyclopediaCustomPrice then
 		player:updateCyclopediaCustomPrice(itemId, numericValue)
 	end
