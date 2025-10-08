@@ -9,23 +9,18 @@ end
 
 function BlessingController:onGameStart()
     if g_game.getClientVersion() >= 1000 then
-        g_ui.importStyle("style.otui")
-        BlessingController:loadHtml('blessing.html')
-        BlessingController.ui:hide()
         BlessingController:registerEvents(g_game, {
             onUpdateBlessDialog = onUpdateBlessDialog
         })
     else
-        scheduleEvent(function()
+        BlessingController:scheduleEvent(function()
             g_modules.getModule("game_blessing"):unload()
-        end, 100)
+        end, 100, "unloadModule")
     end
 end
 
 function BlessingController:onGameEnd()
-    if g_game.getClientVersion() >= 1000 and BlessingController.ui:isVisible() then
-        BlessingController.ui:hide()
-    end
+    hide()
 end
 
 function BlessingController:close()
@@ -61,29 +56,26 @@ function setBlessingView()
 end
 
 function show()
-    if not BlessingController.ui then
-        return
-    end
+    g_ui.importStyle("style.otui")
+    BlessingController:loadHtml('blessing.html')
     g_game.requestBless()
-    BlessingController.ui:centerIn('parent')
     BlessingController.ui:show()
     BlessingController.ui:raise()
     BlessingController.ui:focus()
     setBlessingView()
+    BlessingController:scheduleEvent(function()
+        BlessingController.ui:centerIn('parent')
+    end, 1, "LazyHtml")
 end
 
 function hide()
-    if not BlessingController.ui then
-        return
+    if BlessingController.ui then
+        BlessingController:unloadHtml()
     end
-    BlessingController.ui:hide()
 end
 
 function toggle()
-    if not BlessingController.ui then
-        return
-    end
-    if BlessingController.ui:isVisible() then
+    if BlessingController.ui and BlessingController.ui:isVisible() then
         hide()
     else
         show()

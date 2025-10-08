@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -120,21 +120,26 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
     if (!canDraw())
         return;
 
-    uint8_t frameSize = getExactSize();
-    if (size > 0)
-        frameSize = std::max<int>(frameSize * (size / 100.f), 2 * g_gameConfig.getSpriteSize() * (size / 100.f));
+    const int baseSprite = g_gameConfig.getSpriteSize();
+    const int nativeSize = g_gameConfig.isUseCropSizeForUIDraw()
+        ? getExactSize(0, 0, 0)
+        : std::max<int>(getRealSize(), getExactSize());
+    const int tileCount = 2;
+    const int fbSize = tileCount * baseSprite;
 
-    g_drawPool.bindFrameBuffer(frameSize); {
-        auto p = Point(frameSize - g_gameConfig.getSpriteSize()) + getDisplacement();
-        if (center)
-            p /= 2;
+    g_drawPool.bindFrameBuffer(fbSize); {
+        Point p = center
+            ? Point((fbSize - nativeSize) / 2 + (nativeSize - baseSprite)) + getDisplacement()
+            : Point(fbSize - baseSprite) + getDisplacement();
 
         internalDraw(p);
-        if (isMarked())
-            internalDraw(p, getMarkedColor());
-        else if (isHighlighted())
-            internalDraw(p, getHighlightColor());
-    } g_drawPool.releaseFrameBuffer(destRect);
+        if (isMarked())           internalDraw(p, getMarkedColor());
+        else if (isHighlighted()) internalDraw(p, getHighlightColor());
+    }
+
+    Rect out = destRect;
+    if (size > 0) out = Rect(destRect.topLeft(), Size(size, size));
+    g_drawPool.releaseFrameBuffer(out);
 }
 
 void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, const int drawFlags)
@@ -806,7 +811,9 @@ void Creature::setOutfit(const Outfit& outfit)
     if (m_outfit.isInvalid())
         m_outfit.setCategory(m_outfit.getAuxId() > 0 ? ThingCategoryItem : ThingCategoryCreature);
 
-    m_clientId = getThingType()->getId();
+    if (const auto thingType = getThingType())
+        m_clientId = thingType->getId();
+    else m_clientId = 0;
 
     if (m_outfit.hasMount()) {
         m_numPatternZ = std::min<int>(1, getNumPatternZ() - 1);
@@ -1104,15 +1111,19 @@ int Creature::getExactSize(int layer, int /*xPattern*/, int yPattern, int zPatte
 
     uint8_t exactSize = 0;
     if (m_outfit.isCreature()) {
-        const int numPatternY = getNumPatternY();
         const int layers = getLayers();
 
         zPattern = m_outfit.hasMount() ? 1 : 0;
 
-        for (yPattern = 0; yPattern < numPatternY; ++yPattern) {
-            if (yPattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
-                continue;
+        if (yPattern > 0) {
+            for (int pattern = 0; pattern < yPattern; ++pattern) {
+                if (pattern > 0 && !(m_outfit.getAddons() & (1 << (yPattern - 1))))
+                    continue;
 
+                for (layer = 0; layer < layers; ++layer)
+                    exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
+            }
+        } else {
             for (layer = 0; layer < layers; ++layer)
                 exactSize = std::max<int>(exactSize, Thing::getExactSize(layer, 0, yPattern, zPattern, 0));
         }

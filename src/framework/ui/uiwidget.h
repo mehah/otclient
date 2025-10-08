@@ -145,11 +145,11 @@ enum class OverflowType : uint8_t
 
 struct SizeUnit
 {
-    bool needsUpdate(Unit _unit) {
+    bool needsUpdate(Unit _unit) const {
         return pendingUpdate && unit == _unit;
     }
 
-    bool needsUpdate(Unit _unit, uint32_t _version) {
+    bool needsUpdate(Unit _unit, uint32_t _version) const {
         return pendingUpdate && unit == _unit && version != _version;
     }
 
@@ -232,6 +232,8 @@ protected:
     stdext::map<std::string, UIWidgetPtr> m_childrenById;
     std::unordered_map<std::string, std::function<void()>> m_onDestroyCallbacks;
 
+    int m_insertChildIndex = -1;
+
     Timer m_clickTimer;
     Fw::FocusReason m_lastFocusReason{ Fw::ActiveFocusReason };
     Fw::AutoFocusPolicy m_autoFocusPolicy{ Fw::AutoFocusLast };
@@ -248,6 +250,7 @@ public:
     void addChild(const UIWidgetPtr& child);
     void insertChild(int32_t index, const UIWidgetPtr& child);
     void removeChild(const UIWidgetPtr& child);
+    void removeChildByIndex(uint32_t index);
     void focusChild(const UIWidgetPtr& child, Fw::FocusReason reason);
     void focusNextChild(Fw::FocusReason reason, bool rotate = false);
     void focusPreviousChild(Fw::FocusReason reason, bool rotate = false);
@@ -264,6 +267,7 @@ public:
     void fill(std::string_view hookedWidgetId);
     void centerIn(std::string_view hookedWidgetId);
     void breakAnchors();
+    void resetAnchors();
     void updateParentLayout();
     void updateLayout();
     void lock();
@@ -307,7 +311,7 @@ public:
     void setFloat(FloatType type) { m_floatType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setClear(ClearType type) { m_clearType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
-    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
     void setOverflow(OverflowType type);
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
     void setPositionType(PositionType t) { m_positionType = t;  scheduleHtmlTask(PropApplyAnchorAlignment); }
@@ -331,8 +335,7 @@ public:
     void setHtmlRootId(uint32_t id) { m_htmlRootId = id; }
     auto getHtmlRootId() const { return m_htmlRootId; }
 
-    void setHtmlId(const std::string& id) { m_htmlId = id; }
-    auto getHtmlId() const { return m_htmlId; }
+    auto getHtmlId() { return m_htmlId; }
 
     auto getPositionType() { return m_positionType; }
 
@@ -422,12 +425,13 @@ protected:
 
 private:
     void internalDestroy();
-    void updateState(Fw::WidgetState state);
+    void updateState(Fw::WidgetState state, bool newState = false);
     void updateStates();
     void updateChildrenIndexStates();
     void updateStyle();
 
     void updateSize();
+    void updateTableLayout();
     void applyAnchorAlignment();
     void scheduleHtmlTask(FlagProp prop);
     void refreshAnchorAlignment(bool onlyChild = false);
@@ -465,12 +469,18 @@ protected:
     bool propagateOnKeyDown(uint8_t keyCode, int keyboardModifiers);
     bool propagateOnKeyPress(uint8_t keyCode, int keyboardModifiers, int autoRepeatTicks);
     bool propagateOnKeyUp(uint8_t keyCode, int keyboardModifiers);
-    bool propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList);
+    bool propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widgetList, bool checkContainsPoint = false);
     bool propagateOnMouseMove(const Point& mousePos, const Point& mouseMoved, UIWidgetList& widgetList);
 
     // function shortcuts
 public:
-    void resize(const int width, const int height) { setRect(Rect(getPosition(), Size(width, height))); }
+    void resize(const int width, const int height) {
+        if (m_width.unit == Unit::Px)
+            m_width.valueCalculed = width;
+        if (m_height.unit == Unit::Px)
+            m_height.valueCalculed = height;
+        setRect(Rect(getPosition(), Size(width, height)));
+    }
     void move(int x, int y);
     void rotate(const float degrees) { setRotation(degrees); }
     void hide() { setVisible(false); }
@@ -500,7 +510,7 @@ public:
     bool isPhantom() { return hasProp(PropPhantom); }
     bool isDraggable() { return hasProp(PropDraggable); }
     bool isFixedSize() { return hasProp(PropFixedSize); }
-    bool isClipping() { return hasProp(PropClipping); }
+    bool isClipping() { return hasProp(PropClipping) || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll); }
     bool isDestroyed() { return hasProp(PropDestroyed); }
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
     bool isIgnoreEvent() { return hasProp(PropIgnoreMouseEvent); }
@@ -578,7 +588,15 @@ public:
     void setWidth(std::string widthStr) { applyDimension(true, std::move(widthStr)); }
     void setWidth_px(const int width) { resize(width, getHeight()); }
     void setHeight_px(const int height) { resize(getWidth(), height); }
-    void setSize(const Size& size) { resize(size.width(), size.height()); }
+    void setSize(const Size& size) {
+        if (m_width.unit == Unit::Px)
+            m_width.valueCalculed = size.width();
+
+        if (m_height.unit == Unit::Px)
+            m_height.valueCalculed = size.height();
+
+        resize(size.width(), size.height());
+    }
     void setMinWidth(const int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
     void setMaxWidth(const int maxWidth) { m_maxSize.setWidth(maxWidth); setRect(m_rect); }
     void setMinHeight(const int minHeight) { m_minSize.setHeight(minHeight); setRect(m_rect); }
@@ -803,6 +821,8 @@ public:
     void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
     void setTextWrap(const bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
     void setTextAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    bool isTextAutoResize() { return hasProp(PropTextHorizontalAutoResize) && hasProp(PropTextVerticalAutoResize); }
+
     void setTextHorizontalAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
     void setTextVerticalAutoResize(const bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }

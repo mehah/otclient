@@ -31,12 +31,19 @@ class UICreature final : public UIWidget
 public:
     void drawSelf(DrawPoolType drawPane) override;
 
-    void setCreature(const CreaturePtr& creature) { m_creature = creature; }
+    void setCreature(const CreaturePtr& creature) {
+        m_creature = creature;
+        if (m_creature) {
+            m_direction = m_creature->getDirection();
+            m_outfit = m_creature->getOutfit();
+        } else
+            m_outfit = {};
+    }
     void setOutfit(const Outfit& outfit);
 
     CreaturePtr getCreature() { return m_creature; }
     uint8_t getCreatureSize() { return m_creatureSize; }
-    void setCreatureSize(const uint8_t size) { m_creatureSize = size; }
+    void setCreatureSize(const uint8_t size) { setSize(m_creatureSize = size); }
 
     void setCenter(const bool v) { m_center = v; }
     bool isCentered() { return m_center; }
@@ -44,23 +51,19 @@ public:
     void setShader(std::string_view name) override;
     bool hasShader() override;
 
-    /*
-    // @ note:
-    this did not work:
-    UIcreature:getCreature():getDirection()
-    UIcreature:getDirection()
-    in game_outfit
-    function updatePreview()
-        local direction = previewCreature:getDirection()
-
-    plan b:
-    */
     Otc::Direction getDirection() {
         if (m_creature != nullptr) {
             return m_creature->getDirection();
         }
         return Otc::InvalidDirection;
     }
+
+    void setDirection(Otc::Direction dir) {
+        m_direction = dir;
+        if (m_creature)
+            m_creature->setDirection(dir);
+    }
+
     // @
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
@@ -69,5 +72,7 @@ protected:
     std::string m_shaderName;
     CreaturePtr m_creature;
     uint8_t m_creatureSize{ 0 };
-    bool m_center{ false };
+    Otc::Direction m_direction{ Otc::South };
+    Outfit m_outfit;
+    bool m_center{ true };
 };

@@ -59,13 +59,16 @@ public:
     std::vector<HtmlNodePtr> getByTag(const std::string& t) const {
         std::vector<HtmlNodePtr> out;
         auto root = documentRoot();
-        auto it = root->tagIndex.find(t);
+        auto key = ascii_tolower_copy(t);
+        auto it = root->tagIndex.find(key);
         if (it == root->tagIndex.end()) return out;
         out.reserve(it->second.size());
         for (auto& w : it->second) { if (auto sp = w.lock()) out.push_back(sp); }
         return out;
     }
     std::string getAttr(const std::string& name) const;
+    bool removeAttr(const std::string& name);
+
     void setAttr(const std::string& name, const std::string& value);
     std::string textContent() const;
     std::string getText() const { return text; }
@@ -79,6 +82,11 @@ public:
 
     int indexAmongElements() const;
     int indexAmongType() const;
+
+    std::string innerHTML() const;
+    std::string outerHTML() const;
+    void setInnerHTML(const std::string& html);
+    void setOuterHTML(const std::string& html);
 
     HtmlNodePtr documentRoot() const;
 
@@ -118,6 +126,9 @@ public:
     bool isExpression() const { return m_isExpression; }
     void setExpression(bool v) { m_isExpression = v; }
 
+    bool isStyleResolved() const { return m_styleResolved; }
+    void setStyleResolved(bool v) { m_styleResolved = v; }
+
     std::string toString(bool recursive = true) const;
     HtmlNodePtr clone(bool deep = true) const;
 
@@ -136,7 +147,7 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    std::unordered_map<std::string, std::map<std::string, std::string>> m_styles;
+    std::unordered_map <std::string, std::map<std::string, std::pair<std::string, std::string>>> m_styles; // value, inheritable
     std::unordered_map<std::string, std::map<std::string, std::string>> m_inheritableStyles;
 
     std::map<std::string, std::string> m_attrStyles;
@@ -146,11 +157,13 @@ private:
     mutable int cacheIndexAmongType = -1;
 
     bool m_isExpression{ false };
+    bool m_styleResolved{ false };
 
 private:
     static void rebuildIndexes(const HtmlNodePtr& root);
     void attachChild(const HtmlNodePtr& child, size_t pos);
     void registerInIndexes(const HtmlNodePtr& child);
+    void registerSubtreeInIndexes(const HtmlNodePtr& node);
     void unregisterSubtreeFromIndexes(const HtmlNodePtr& node);
     void detachFromCurrentParent(const HtmlNodePtr& child);
 };

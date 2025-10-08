@@ -59,18 +59,28 @@ function controller:onTerminate()
 end
 
 function getCategory(id)
-    return AttachedEffectManager.get(id).thingCategory
+    local effect = AttachedEffectManager.get(id)
+    if effect then
+        return effect.thingCategory
+    end
+    return nil
 end
 
 function getTexture(id)
-    if AttachedEffectManager.get(id).thingCategory == 5 then
-        return AttachedEffectManager.get(id).thingId
+    local effect = AttachedEffectManager.get(id)
+    if effect and effect.thingCategory == 5 then
+        return effect.thingId
     end
 end
 
 function getName(id)
     if type(id) == "number" then
-        return AttachedEffectManager.get(id).name
+        local effect = AttachedEffectManager.get(id)
+        if effect then
+            return effect.name
+        else
+            return "None"
+        end
     else
         return "None"
     end
@@ -78,7 +88,12 @@ end
 
 function thingId(id)
     if type(id) == "number" then
-        return AttachedEffectManager.get(id).thingId
+        local effect = AttachedEffectManager.get(id)
+        if effect then
+            return effect.thingId
+        else
+            return "None"
+        end
     else
         return "None"
     end

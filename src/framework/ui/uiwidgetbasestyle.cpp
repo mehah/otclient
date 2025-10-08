@@ -35,6 +35,7 @@
 #include <framework/core/eventdispatcher.h>
 
 #include <atomic>
+#include <framework/html/htmlmanager.h>
 
 void UIWidget::initBaseStyle()
 {
@@ -71,7 +72,17 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
     for (const auto& node : styleNode->children()) {
         if (node->tag() == "inherit-text") {
             if (m_htmlNode && node->value<bool>()) {
-                setText(m_htmlNode->textContent());
+                bool isExpression = false;
+
+                if (!m_htmlNode->getChildren().empty()) {
+                    bool isExpression = m_htmlNode->getChildren()[0]->isExpression();
+                    if (const auto root = g_html.getRoot(m_htmlRootId))
+                        callLuaField("__applyOrBindHtmlAttribute", std::string{ "*text" }, m_htmlNode->textContent(), false, root->moduleName, m_htmlNode->toString());
+                }
+
+                if (!isExpression)
+                    setText(m_htmlNode->textContent());
+
                 destroyChildren();
             }
         } else if (node->tag() == "background-draw-order")

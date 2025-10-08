@@ -24,6 +24,7 @@
 #include <framework/util/crypt.h>
 
 #include <utility>
+#include <openssl/ssl.h>
 
 #include "protocolhttp.h"
 
@@ -50,15 +51,15 @@ void Http::terminate()
     m_guard.reset();
     if (!m_thread.joinable()) {
         stdext::millisleep(100);
-        m_ios.stop();
     }
+    m_ios.stop();
     m_thread.join();
 }
 
 int Http::get(const std::string& url, int timeout)
 {
     if (!timeout) // lua is not working with default values
-        timeout = 5;
+        timeout = 2;
     int operationId = m_operationId++;
 
     asio::post(m_ios, [&, url, timeout, operationId] {
@@ -90,7 +91,7 @@ int Http::get(const std::string& url, int timeout)
 int Http::post(const std::string& url, const std::string& data, int timeout, bool isJson, bool checkContentLength)
 {
     if (!timeout) // lua is not working with default values
-        timeout = 5;
+        timeout = 2;
     if (data.empty()) {
         g_logger.error("Invalid post request for {}, empty data, use get instead", url);
         return -1;
@@ -126,7 +127,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
 int Http::download(const std::string& url, const std::string& path, int timeout)
 {
     if (!timeout) // lua is not working with default values
-        timeout = 5;
+        timeout = 2;
 
     int operationId = m_operationId++;
     asio::post(m_ios, [&, url, path, timeout, operationId] {
@@ -166,7 +167,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
 int Http::ws(const std::string& url, int timeout)
 {
     if (!timeout) // lua is not working with default values
-        timeout = 5;
+        timeout = 2;
     int operationId = m_operationId++;
 
     asio::post(m_ios, [&, url, timeout, operationId] {
@@ -239,20 +240,31 @@ void HttpSession::start()
     instance_uri = parseURI(m_url);
     const asio::ip::tcp::resolver::query query_resolver(instance_uri.domain, instance_uri.port);
 
+    m_timer.expires_after(std::chrono::seconds(m_timeout));
+    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) { sft->onTimeout(ec); });
+
     if (m_result->postData == "") {
-        m_request.append("GET " + instance_uri.query + " HTTP/1.1\r\n");
+        m_request.append("GET " + instance_uri.query + " HTTP/1.0\r\n");
         m_request.append("Host: " + instance_uri.domain + "\r\n");
         m_request.append("User-Agent: " + m_agent + "\r\n");
         m_request.append("Accept: */*\r\n");
+        m_request.append("Accept-Language: en-US,en;q=0.9\r\n");
+        m_request.append("Accept-Encoding: identity\r\n");
+        m_request.append("Cache-Control: no-cache\r\n");
+        m_request.append("Connection: close\r\n");
         for (const auto& ch : m_custom_header) {
             m_request.append(ch.first + ch.second + "\r\n");
         }
-        m_request.append("Connection: close\r\n\r\n");
+        m_request.append("\r\n");
     } else {
-        m_request.append("POST " + instance_uri.query + " HTTP/1.1\r\n");
+        m_request.append("POST " + instance_uri.query + " HTTP/1.0\r\n");
         m_request.append("Host: " + instance_uri.domain + "\r\n");
         m_request.append("User-Agent: " + m_agent + "\r\n");
         m_request.append("Accept: */*\r\n");
+        m_request.append("Accept-Language: en-US,en;q=0.9\r\n");
+        m_request.append("Accept-Encoding: identity\r\n");
+        m_request.append("Cache-Control: no-cache\r\n");
+        m_request.append("Connection: close\r\n");
         for (const auto& ch : m_custom_header) {
             m_request.append(ch.first + ch.second + "\r\n");
         }
@@ -262,13 +274,11 @@ void HttpSession::start()
             m_request.append("Content-Type: application/x-www-form-urlencoded\r\n");
         }
         m_request.append("Content-Length: " + std::to_string(m_result->postData.size()) + "\r\n");
-        m_request.append("Connection: close\r\n\r\n");
+        m_request.append("\r\n");
         m_request.append(m_result->postData);
     }
 
-    m_resolver.async_resolve(
-        query_resolver,
-        [sft = shared_from_this()](
+    m_resolver.async_resolve(instance_uri.domain, instance_uri.port, [sft = shared_from_this()](
         const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator) {
         sft->on_resolve(ec, std::move(iterator));
     });
@@ -282,73 +292,91 @@ void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver:
     }
 
     std::error_code _ec;
+
+    // Try to find IPv4 addresses first
+    asio::ip::tcp::resolver::iterator end;
+    asio::ip::tcp::resolver::iterator ipv4_it = end;
+    auto current = iterator;
+
+    while (current != end) {
+        if (!current->endpoint().address().is_v6()) {
+            ipv4_it = current;
+            break;
+        }
+        ++current;
+    }
+
+    // If no IPv4 found, use the original iterator (IPv6)
+    const auto& endpoint_to_use = (ipv4_it != end) ? ipv4_it : iterator;
+
+    g_logger.debug("Attempting connection to: {}:{}", instance_uri.domain, instance_uri.port);
+    
     if (instance_uri.port == "443") {
-        while (iterator != asio::ip::tcp::resolver::iterator()) {
-            m_ssl.lowest_layer().close();
-            m_ssl.lowest_layer().connect(*iterator++, _ec);
-            if (!_ec) {
-                const std::error_code __ec;
-                on_connect(__ec);
-                break;
-            }
-        }
+        // For HTTPS, use the SSL stream's underlying socket
+        m_ssl.lowest_layer().async_connect(*endpoint_to_use, [sft = shared_from_this()](
+            const std::error_code& ec) {
+            sft->on_connect(ec);
+        });
     } else {
-        while (iterator != asio::ip::tcp::resolver::iterator()) {
-            m_socket.close();
-            m_socket.connect(*iterator++, _ec);
-            if (!_ec) {
-                const std::error_code __ec;
-                on_connect(__ec);
-                break;
-            }
-        }
+        // For HTTP, use the regular socket
+        m_socket.async_connect(*endpoint_to_use, [sft = shared_from_this()](
+            const std::error_code& ec) {
+            sft->on_connect(ec);
+        });
     }
-
-    if (_ec) {
-        onError("HttpSession unable to resolve " + m_url + ": " + ec.message());
-        return;
-    }
-
-    m_timer.cancel();
-    m_timer.expires_after(std::chrono::seconds(m_timeout));
-    m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
 
 void HttpSession::on_connect(const std::error_code& ec)
 {
     if (ec) {
+        g_logger.error("TCP connection failed: {}", ec.message());
         onError("HttpSession unable to connect " + m_url + ": " + ec.message());
         return;
     }
 
+    g_logger.debug("TCP connection established to: {}:{}", instance_uri.domain, instance_uri.port);
+
     if (instance_uri.port == "443") {
-        m_ssl.set_verify_mode(asio::ssl::verify_peer);
-        m_ssl.set_verify_callback([](bool, const asio::ssl::verify_context&) { return true; });
+        g_logger.debug("Starting SSL handshake...");
+        m_ssl.set_verify_mode(asio::ssl::verify_none);
+        m_ssl.set_verify_callback([](bool, const asio::ssl::verify_context&) {
+            return true;
+        });
+        
+        // Set SNI (Server Name Indication)
         if (!SSL_set_tlsext_host_name(m_ssl.native_handle(), instance_uri.domain.c_str())) {
             const std::error_code _ec{ static_cast<int>(ERR_get_error()), asio::error::get_ssl_category() };
+            g_logger.error("Failed to set SNI hostname: {}", _ec.message());
             onError("HttpSession on SSL_set_tlsext_host_name unable to handshake " + m_url + ": " + _ec.message());
             return;
         }
+        
+        g_logger.debug("SNI hostname set to: {}", instance_uri.domain);
 
         m_ssl.async_handshake(asio::ssl::stream_base::client,
                               [sft = shared_from_this()](const std::error_code& ec) {
             if (ec) {
+                g_logger.error("SSL handshake failed: {} (category: {})", ec.message(), ec.category().name());
                 sft->onError("HttpSession unable to handshake " + sft->m_url + ": " + ec.message());
                 return;
             }
+            g_logger.debug("SSL handshake completed successfully");
             sft->on_write();
         });
     } else {
+        g_logger.debug("HTTP connection (non-SSL), proceeding with request");
         on_write();
     }
 
-    m_timer.cancel();
     m_timer.expires_after(std::chrono::seconds(m_timeout));
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
 
 void HttpSession::on_write()
 {
+    g_logger.debug("Sending HTTP request to: {}:{}", instance_uri.domain, instance_uri.port);
+    g_logger.debug("Request headers: {}", m_request.substr(0, std::min<size_t>(m_request.length(), size_t(200))));
+    
     if (instance_uri.port == "443") {
         async_write(m_ssl, asio::buffer(m_request), [sft = shared_from_this()]
         (const std::error_code& ec, const size_t bytes) { sft->on_request_sent(ec, bytes); });
@@ -357,7 +385,6 @@ void HttpSession::on_write()
         (const std::error_code& ec, const size_t bytes) {sft->on_request_sent(ec, bytes); });
     }
 
-    m_timer.cancel();
     m_timer.expires_after(std::chrono::seconds(m_timeout));
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
@@ -365,29 +392,46 @@ void HttpSession::on_write()
 void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_transferred*/)
 {
     if (ec) {
+        g_logger.error("Failed to send HTTP request: {}", ec.message());
         onError("HttpSession error on sending request " + m_url + ": " + ec.message());
         return;
     }
+
+    g_logger.debug("HTTP request sent successfully, waiting for response...");
 
     if (instance_uri.port == "443") {
         async_read_until(
             m_ssl, m_response, "\r\n\r\n",
             [this](const std::error_code& ec, const size_t size) {
             if (ec) {
+                g_logger.error("Failed to read HTTP headers: {}", ec.message());
                 onError("HttpSession error receiving header " + m_url + ": " + ec.message());
                 return;
             }
+            g_logger.debug("HTTP headers received ({} bytes)", size);
             std::string header(
                 buffers_begin(m_response.data()),
                 buffers_begin(m_response.data()) + size);
             m_response.consume(size);
 
-            const size_t pos = header.find("Content-Length: ");
-            if (pos != std::string::npos) {
+            // Check for Content-Length
+            const size_t contentLengthPos = header.find("Content-Length: ");
+            if (contentLengthPos != std::string::npos) {
                 const size_t len = std::strtoul(
-                    header.c_str() + pos + sizeof("Content-Length: ") - 1,
+                    header.c_str() + contentLengthPos + sizeof("Content-Length: ") - 1,
                     nullptr, 10);
-                m_result->size = len - m_response.size();
+                m_result->size = len;
+                g_logger.debug("Content-Length: {}", len);
+            } else {
+                // Check for Transfer-Encoding: chunked
+                const size_t transferEncodingPos = header.find("Transfer-Encoding: chunked");
+                if (transferEncodingPos != std::string::npos) {
+                    g_logger.debug("Server using chunked transfer encoding");
+                    m_result->size = 0; // Unknown size for chunked
+                } else {
+                    g_logger.warning("No Content-Length or Transfer-Encoding found in headers");
+                    m_result->size = 0; // Unknown size
+                }
             }
 
             async_read(m_ssl, m_response,
@@ -430,7 +474,6 @@ void HttpSession::on_request_sent(const std::error_code& ec, size_t /*bytes_tran
         });
     }
 
-    m_timer.cancel();
     m_timer.expires_after(std::chrono::seconds(m_timeout));
     m_timer.async_wait([sft = shared_from_this()](const std::error_code& ec) {sft->onTimeout(ec); });
 }
@@ -441,6 +484,7 @@ void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transfer
         m_timer.cancel();
         const auto& data = m_response.data();
         m_result->response.append(buffers_begin(data), buffers_end(data));
+		g_logger.debug("HTTP response received ({} bytes): {}", m_result->response.size(), m_result->response);
         m_result->finished = true;
         m_callback(m_result);
     };
@@ -456,7 +500,12 @@ void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transfer
     if (stdext::millis() > m_last_progress_update) {
         m_result->speed = (sum_bytes_speed_response) / ((stdext::millis() - (m_last_progress_update - 100)));
 
-        m_result->progress = (static_cast<double>(sum_bytes_response) / m_result->size) * 100;
+        if (m_result->size > 0) {
+            m_result->progress = (static_cast<double>(sum_bytes_response) / m_result->size) * 100;
+        } else {
+            // For chunked encoding or unknown size, just show bytes received
+            m_result->progress = std::min<int>(static_cast<double>(sum_bytes_response / 1024), 100.0); // Show KB received, max 100%
+        }
         m_last_progress_update = stdext::millis() + 100;
         sum_bytes_speed_response = 0;
         m_callback(m_result);
@@ -524,7 +573,9 @@ void HttpSession::close()
 void HttpSession::onTimeout(const std::error_code& ec)
 {
     if (!ec) {
-        onError(fmt::format("HttpSession ontimeout {}", ec.message()));
+        // Timer expired - this is an actual timeout
+        g_logger.error("HttpSession timeout after {} seconds", m_timeout);
+        onError("HttpSession timeout after " + std::to_string(m_timeout) + " seconds");
     }
 }
 
