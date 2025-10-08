@@ -3350,7 +3350,7 @@ void ProtocolGame::parsePlayerInventory(const InputMessagePtr& msg)
         const auto key = std::make_pair(itemId, tier);
         auto& entry = inventoryCounts[key];
         const uint32_t sum = static_cast<uint32_t>(entry) + amount;
-        entry = static_cast<uint16_t>(std::min<uint32_t>(sum, (std::numeric_limits<uint16_t>::max)()));
+        entry = static_cast<uint16_t>(std::min<uint32_t>(sum, std::numeric_limits<uint16_t>::max()));
     }
 
     if (const auto& localPlayer = g_game.getLocalPlayer()) {
