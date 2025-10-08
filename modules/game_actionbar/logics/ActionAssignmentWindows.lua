@@ -79,7 +79,7 @@ function assignSpell(button)
     end
     if button.cache.spellData and not button.cache.isRuneSpell then
         local spellData = button.cache.spellData
-        local spellId = SpellIcons[spellData.icon][1]
+        local spellId = spellData.icon.clientId
         local clip = Spells.getImageClipNormal(spellId, 'Default')
 
         previewWidget:setText("asd")
