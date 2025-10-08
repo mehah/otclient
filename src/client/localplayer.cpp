@@ -494,10 +494,11 @@ uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tie
     const auto key = std::make_pair(itemId, tier);
     const auto it = m_inventoryCountCache.find(key);
     if (it != m_inventoryCountCache.end()) {
-        total = (std::max)<uint32_t>(total, static_cast<uint32_t>(it->second));
+        total = std::max(total, static_cast<uint32_t>(it->second));
     }
 
-    const uint32_t clamped = (std::min)<uint32_t>(total, (std::numeric_limits<uint16_t>::max)());
+    const uint32_t maxUint16 = std::numeric_limits<uint16_t>::max();
+    const uint32_t clamped = std::min(total, maxUint16);
     return static_cast<uint16_t>(clamped);
 }
 
