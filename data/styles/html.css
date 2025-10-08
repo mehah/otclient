@@ -8,6 +8,8 @@
   text-align: left;
   overflow: visible;
   display: inline;
+  margin: 0;
+  padding: 0;
   --icon-color: white;
   --icon-align: none;
   --text-draw-order: 0;
