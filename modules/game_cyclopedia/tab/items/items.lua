@@ -283,9 +283,8 @@ function Cyclopedia.Items.showItemPrice(obj)
 		end
 	end
 
-	if UI.InfoBase.ResultGoldBase and UI.InfoBase.ResultGoldBase.Value then
-		UI.InfoBase.ResultGoldBase.Value:setText(comma_value(resulting))
-	end
+	-- Update ResultGoldBase.Value using the new calculation logic
+	Cyclopedia.Items.updateResultGoldValue(itemId, resulting, avgMarket, npcValue)
 
 	-- Update loot value source checkboxes
 	if UI.LootValue then
@@ -395,6 +394,69 @@ function Cyclopedia.Items.getCurrentItemValue(item)
 	end
 	
 	return resulting
+end
+
+-- Function to update ResultGoldBase.Value based on conditions
+function Cyclopedia.Items.updateResultGoldValue(itemId, customValue, avgMarket, npcValue)
+	if not UI.InfoBase.ResultGoldBase or not UI.InfoBase.ResultGoldBase.Value then
+		return
+	end
+	
+	local finalValue = customValue
+	
+	-- Check if OwnValueEdit field is empty (no custom value)
+	local ownValueText = ""
+	if UI.InfoBase.OwnValueEdit then
+		ownValueText = UI.InfoBase.OwnValueEdit:getText() or ""
+		ownValueText = ownValueText:gsub("%s+", "") -- Remove whitespace
+	end
+	
+	-- If OwnValueEdit is empty AND no custom value is stored
+	if #ownValueText == 0 and (not itemsData["customSalePrices"] or not itemsData["customSalePrices"][tostring(itemId)]) then
+		-- Check which loot value source is selected using the same logic as showItemPrice
+		local isMarketPrice = false
+		if itemsData["primaryLootValueSources"] and itemsData["primaryLootValueSources"][tostring(itemId)] then
+			isMarketPrice = true
+		end
+		
+		if isMarketPrice then
+			-- Use Market Average Value (MarketGoldPriceBase.Value)
+			if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
+				local marketValueText = UI.InfoBase.MarketGoldPriceBase.Value:getText() or "0"
+				marketValueText = marketValueText:gsub(",", "") -- Remove commas
+				local marketValue = tonumber(marketValueText) or avgMarket
+				finalValue = marketValue
+			else
+				finalValue = avgMarket
+			end
+		else
+			-- Use NPC Buy Value (getNpcValue function output, buyPrice)
+			finalValue = npcValue
+		end
+	end
+	
+	-- Update the ResultGoldBase.Value display
+	UI.InfoBase.ResultGoldBase.Value:setText(comma_value(finalValue))
+	
+	-- Update rarity visual indicator based on final value
+	if finalValue > 0 and UI.InfoBase.ResultGoldBase.Rarity then
+		ItemsDatabase.setRarityItem(UI.InfoBase.ResultGoldBase.Rarity, finalValue)
+	elseif UI.InfoBase.ResultGoldBase.Rarity then
+		UI.InfoBase.ResultGoldBase.Rarity:setImageSource("")
+	end
+	
+	return finalValue
+end
+
+-- External accessor function to get ResultGoldBase value directly
+function Cyclopedia.Items.getResultGoldValue()
+	if not UI.InfoBase.ResultGoldBase or not UI.InfoBase.ResultGoldBase.Value then
+		return 0
+	end
+	
+	local valueText = UI.InfoBase.ResultGoldBase.Value:getText() or "0"
+	valueText = valueText:gsub(",", "") -- Remove commas
+	return tonumber(valueText) or 0
 end
 
 function Cyclopedia.Items.onSourceValueChange(checked, npcSource)
@@ -527,17 +589,19 @@ function Cyclopedia.Items.onChangeCustomPrice(widget)
 
 	itemsData["customSalePrices"][itemIdStr] = numericValue
 	
-	-- Update result display
-	if UI.InfoBase.ResultGoldBase.Value then
-		UI.InfoBase.ResultGoldBase.Value:setText(comma_value(numericValue))
+	-- Update result display using our new logic
+	-- Get necessary values for the update function
+	local avgMarket = 0
+	local npcValue = 0
+	if item.getMeanPrice then
+		local success, result = pcall(function() return item:getMeanPrice() end)
+		if success and result then
+			avgMarket = result
+		end
 	end
+	npcValue = Cyclopedia.Items.getNpcValue(item, true)
 	
-	-- Update rarity visual indicator based on custom value
-	if numericValue > 0 then
-		ItemsDatabase.setRarityItem(UI.InfoBase.ResultGoldBase.Rarity, numericValue)
-	else
-		UI.InfoBase.ResultGoldBase.Rarity:setImageSource("")
-	end
+	Cyclopedia.Items.updateResultGoldValue(itemId, numericValue, avgMarket, npcValue)
 	
 	if player.updateCyclopediaCustomPrice then
 		player:updateCyclopediaCustomPrice(itemId, numericValue)
@@ -1302,8 +1366,34 @@ function Cyclopedia.Items.onChangeLootValue(self)
         npcCheck:setChecked(true)
     end
     
-    -- Refresh the price display using the last selected item
+    -- Update the primaryLootValueSources data structure
     if lastSelectedItem and lastSelectedItem.data then
+        local item = lastSelectedItem.Sprite:getItem()
+        if item then
+            local itemId = item:getId()
+            local currentItemID = tostring(itemId)
+            
+            if not itemsData["primaryLootValueSources"] then
+                itemsData["primaryLootValueSources"] = {}
+            end
+            
+            -- Update the data structure based on which checkbox is checked
+            if marketCheck:isChecked() then
+                -- Market checkbox is checked - add to market list
+                itemsData["primaryLootValueSources"][currentItemID] = "market"
+            else
+                -- NPC checkbox is checked - remove from market list (default to NPC)
+                itemsData["primaryLootValueSources"][currentItemID] = nil
+            end
+            
+            -- Update the player's market list on the server
+            local player = g_game.getLocalPlayer()
+            if player and player.updateCyclopediaMarketList then
+                player:updateCyclopediaMarketList(itemId, not marketCheck:isChecked()) -- true for NPC, false for market
+            end
+        end
+        
+        -- Refresh the price display using the last selected item
         Cyclopedia.Items.showItemPrice(lastSelectedItem.data)
     end
 end
