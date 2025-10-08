@@ -30,6 +30,10 @@ void UICreature::drawSelf(const DrawPoolType drawPane)
     UIWidget::drawSelf(drawPane);
 
     if (m_creature) {
+        if (m_creature->getClientId() == 0) {
+            m_creature->setOutfit(m_outfit);
+        }
+
         m_creature->setMarked(m_imageColor);
         m_creature->draw(getPaddingRect(), m_creatureSize, m_center);
     }
@@ -37,9 +41,12 @@ void UICreature::drawSelf(const DrawPoolType drawPane)
 
 void UICreature::setOutfit(const Outfit& outfit)
 {
+    m_outfit = outfit;
+
     if (!m_creature)
         m_creature = std::make_shared<Creature>();
-    m_creature->setDirection(Otc::South);
+
+    m_creature->setDirection(m_direction);
     m_creature->setOutfit(outfit);
     if (m_creature)
         m_creature->setShader(m_shaderName);
@@ -51,7 +58,7 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
         if (node->tag() == "creature-center") {
             m_center = node->value<bool>();
         } else if (node->tag() == "creature-size") {
-            m_creatureSize = node->value<int>();
+            setCreatureSize(node->value<int>());
         } else if (node->tag() == "outfit-id") {
             auto outfit = getOutfit();
             outfit.setCategory(ThingCategoryCreature);
@@ -65,6 +72,8 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
             getOutfit().setLegs(node->value<int>());
         } else if (node->tag() == "outfit-feet") {
             getOutfit().setFeet(node->value<int>());
+        } else if (node->tag() == "outfit-direction") {
+            m_direction = static_cast<Otc::Direction>(node->value<int>());
         }
     }
     UIWidget::onStyleApply(styleName, styleNode);

@@ -475,6 +475,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("addChild", &UIWidget::addChild);
     g_lua.bindClassMemberFunction<UIWidget>("insertChild", &UIWidget::insertChild);
     g_lua.bindClassMemberFunction<UIWidget>("removeChild", &UIWidget::removeChild);
+    g_lua.bindClassMemberFunction<UIWidget>("removeChildByIndex", &UIWidget::removeChildByIndex);
     g_lua.bindClassMemberFunction<UIWidget>("focusChild", &UIWidget::focusChild);
     g_lua.bindClassMemberFunction<UIWidget>("focusNextChild", &UIWidget::focusNextChild);
     g_lua.bindClassMemberFunction<UIWidget>("focusPreviousChild", &UIWidget::focusPreviousChild);
@@ -797,6 +798,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("prepend", &UIWidget::prepend);
     g_lua.bindClassMemberFunction<UIWidget>("insert", &UIWidget::insert);
     g_lua.bindClassMemberFunction<UIWidget>("remove", &UIWidget::remove);
+    g_lua.bindClassMemberFunction<UIWidget>("getHtmlId", &UIWidget::getHtmlId);
 
     g_lua.bindClassMemberFunction<UIWidget>("setBackgroundDrawOrder", &UIWidget::setBackgroundDrawOrder);
     g_lua.bindClassMemberFunction<UIWidget>("setImageDrawOrder", &UIWidget::setImageDrawOrder);

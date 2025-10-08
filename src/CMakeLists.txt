@@ -193,6 +193,8 @@ find_package(ZLIB REQUIRED)
 find_package(httplib CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 
+find_path(CPPCODEC_INCLUDE_DIRS "cppcodec/base32_crockford.hpp")
+
 if(APPLE)
   # Required for Physfs
   find_library(FOUNDATION Foundation REQUIRED)
@@ -499,6 +501,7 @@ if(MSVC)
           ${PHYSFS_INCLUDE_DIR}
           ${PARALLEL_HASHMAP_INCLUDE_DIRS}
           ${NLOHMANN_JSON_INCLUDE_DIR}
+          ${CPPCODEC_INCLUDE_DIRS}
   )
   target_link_libraries(${PROJECT_NAME}
           PRIVATE
@@ -544,6 +547,7 @@ elseif(ANDROID)
           ${PARALLEL_HASHMAP_INCLUDE_DIRS}
           ${NLOHMANN_JSON_INCLUDE_DIR}
           ${MINIZIP_INCLUDE_DIR}
+          ${CPPCODEC_INCLUDE_DIRS}
   )
   target_link_libraries(${PROJECT_NAME}
           PRIVATE
@@ -591,6 +595,7 @@ elseif(WASM)
           ${NLOHMANN_JSON_INCLUDE_DIR}
           ${OPENSSL_INCLUDE_DIR}
           ${BROWSER_INCLUDE_DIR}
+          ${CPPCODEC_INCLUDE_DIRS}
   )
   target_link_libraries(${PROJECT_NAME}
           PRIVATE
@@ -675,6 +680,7 @@ else() # Linux
           ${PARALLEL_HASHMAP_INCLUDE_DIRS}
           ${NLOHMANN_JSON_INCLUDE_DIR}
           ${OPENSSL_INCLUDE_DIR}
+          ${CPPCODEC_INCLUDE_DIRS}
   )
   target_link_libraries(${PROJECT_NAME}
           PRIVATE

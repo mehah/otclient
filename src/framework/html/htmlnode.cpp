@@ -24,11 +24,17 @@
 #include <framework/otml/otml.h>
 #include <framework/ui/uiwidget.h>
 #include <framework/html/queryselector.h>
+#include "htmlparser.h"
 
 std::string HtmlNode::getAttr(const std::string& name) const {
     auto key = ascii_tolower_copy(name);
     auto it = attributes.find(key);
     return (it != attributes.end()) ? it->second : "";
+}
+
+bool HtmlNode::removeAttr(const std::string& name) {
+    auto key = ascii_tolower_copy(name);
+    return attributes.erase(key);
 }
 
 void HtmlNode::setAttr(const std::string& name, const std::string& value) {
@@ -123,7 +129,7 @@ std::string HtmlNode::getStyle(std::string_view styleName) const {
     for (const auto& [key, styles] : m_styles) {
         auto it = styles.find(name);
         if (it != styles.end())
-            return it->second;
+            return it->second.first;
     }
 
     return "";
@@ -239,7 +245,7 @@ void HtmlNode::attachChild(const HtmlNodePtr& child, size_t pos) {
     child->parent = shared_from_this();
     children.insert(children.begin() + pos, child);
 
-    registerInIndexes(child);
+    registerSubtreeInIndexes(child);
     invalidateIndexCachesUp(this);
 
     if (m_widget)
@@ -249,10 +255,10 @@ void HtmlNode::attachChild(const HtmlNodePtr& child, size_t pos) {
 void HtmlNode::registerInIndexes(const HtmlNodePtr& child) {
     if (!child || child->type != NodeType::Element) return;
     auto root = documentRoot();
-
-    if (!child->tag.empty() && child->tag != "root")
-        root->tagIndex[child->tag].push_back(child);
-
+    if (!child->tag.empty() && child->tag != "root") {
+        auto key = ascii_tolower_copy(child->tag);
+        root->tagIndex[key].push_back(child);
+    }
     std::string idv = child->getAttr("id");
     if (!idv.empty())
         root->idIndex[idv] = child;
@@ -260,6 +266,27 @@ void HtmlNode::registerInIndexes(const HtmlNodePtr& child) {
     if (!child->classList.empty())
         for (auto& cls : child->classList)
             root->classIndex[cls].push_back(child);
+}
+
+void HtmlNode::registerSubtreeInIndexes(const HtmlNodePtr& node) {
+    if (!node) return;
+    auto root = documentRoot();
+    std::vector<HtmlNodePtr> st{ node };
+    while (!st.empty()) {
+        auto cur = st.back(); st.pop_back();
+        if (cur->type == NodeType::Element) {
+            if (!cur->tag.empty() && cur->tag != "root") {
+                auto key = ascii_tolower_copy(cur->tag);
+                root->tagIndex[key].push_back(cur);
+            }
+            std::string idv = cur->getAttr("id");
+            if (!idv.empty()) root->idIndex[idv] = cur;
+            if (!cur->classList.empty())
+                for (auto& cls : cur->classList)
+                    root->classIndex[cls].push_back(cur);
+        }
+        for (auto& c : cur->children) st.push_back(c);
+    }
 }
 
 void HtmlNode::unregisterSubtreeFromIndexes(const HtmlNodePtr& node) {
@@ -280,7 +307,7 @@ void HtmlNode::unregisterSubtreeFromIndexes(const HtmlNodePtr& node) {
 
         if (cur->type == NodeType::Element) {
             if (!cur->tag.empty() && cur->tag != "root") {
-                auto it = root->tagIndex.find(cur->tag);
+                auto it = root->tagIndex.find(ascii_tolower_copy(cur->tag));
                 if (it != root->tagIndex.end()) prune_vec(it->second, cur.get());
             }
             std::string idv = cur->getAttr("id");
@@ -466,12 +493,83 @@ void HtmlNode::rebuildIndexes(const HtmlNodePtr& root) {
         auto cur = st.back(); st.pop_back();
         if (cur->type == NodeType::Element) {
             if (!cur->tag.empty() && cur->tag != "root")
-                root->tagIndex[cur->tag].push_back(cur);
+                root->tagIndex[ascii_tolower_copy(cur->tag)].push_back(cur);
             std::string idv = cur->getAttr("id");
             if (!idv.empty()) root->idIndex[idv] = cur;
             for (auto& cls : cur->classList)
                 root->classIndex[cls].push_back(cur);
         }
         for (auto& c : cur->children) st.push_back(c);
+    }
+}
+
+static inline bool isRawTextContainer(const std::string& tag) {
+    return tag == "script" || tag == "style" || tag == "title" || tag == "textarea" || tag == "option";
+}
+
+std::string HtmlNode::innerHTML() const {
+    if (type == NodeType::Text || type == NodeType::Comment || type == NodeType::Doctype) {
+        return toString(true);
+    }
+    std::string out;
+    out.reserve(128);
+    for (const auto& c : children) {
+        out += c->toString(true);
+    }
+    if (!text.empty()) out += text;
+    return out;
+}
+
+std::string HtmlNode::outerHTML() const {
+    return toString(true);
+}
+
+void HtmlNode::setInnerHTML(const std::string& html) {
+    if (type != NodeType::Element) return;
+
+    if (isRawTextContainer(tag)) {
+        clear();
+        text = html;
+        invalidateIndexCachesUp(this);
+        return;
+    }
+
+    auto container = parseHtml("<html>" + html + "</html>");
+    auto rootEl = container ? container->querySelector("html") : nullptr;
+
+    clear();
+    text.clear();
+
+    if (!rootEl) { invalidateIndexCachesUp(this); return; }
+
+    size_t pos = 0;
+    for (const auto& ch : rootEl->getChildren()) {
+        append(ch->clone(true));
+        ++pos;
+    }
+    if (!rootEl->getRawText().empty())
+        append(std::make_shared<HtmlNode>(*rootEl));
+}
+
+void HtmlNode::setOuterHTML(const std::string& html) {
+    auto p = parent.lock();
+    if (!p) {
+        setInnerHTML(html);
+        return;
+    }
+
+    auto container = parseHtml("<div>" + html + "</div>");
+    auto rootEl = container ? container->querySelector("div") : nullptr;
+
+    size_t idx = indexInParent();
+    if (idx == size_t(-1)) return;
+
+    p->remove(shared_from_this());
+
+    if (!rootEl) return;
+
+    size_t insertAt = idx;
+    for (const auto& ch : rootEl->getChildren()) {
+        p->insert(ch->clone(true), insertAt++);
     }
 }
