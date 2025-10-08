@@ -509,15 +509,71 @@ function Cyclopedia.Items.onSourceValueChange(checked, npcSource)
 		end
 
 		itemsData["primaryLootValueSources"] = newItemList["primaryLootValueSources"]
-		currentPrice = Cyclopedia.Items.showItemPrice(item)
+		Cyclopedia.Items.showItemPrice(item)
 		if player.updateCyclopediaMarketList then
 			player:updateCyclopediaMarketList(itemId, true)
 		end
 	else
 		itemsData["primaryLootValueSources"][currentItemID] = "market"
-		currentPrice = Cyclopedia.Items.showItemPrice(item)
+		Cyclopedia.Items.showItemPrice(item)
 		if player.updateCyclopediaMarketList then
 			player:updateCyclopediaMarketList(itemId, false)
+		end
+	end
+
+	-- Get the actual value displayed in ResultGoldBase.Value (same logic as updateResultGoldValue)
+	if UI.InfoBase.ResultGoldBase and UI.InfoBase.ResultGoldBase.Value then
+		local valueText = UI.InfoBase.ResultGoldBase.Value:getText() or "0"
+		valueText = valueText:gsub(",", "") -- Remove commas
+		currentPrice = tonumber(valueText) or 0
+	else
+		-- Fallback: calculate using the same logic as updateResultGoldValue
+		local isMarketPrice = false
+		if itemsData["primaryLootValueSources"] and itemsData["primaryLootValueSources"][currentItemID] then
+			isMarketPrice = true
+		end
+		
+		-- Check if there's a custom price
+		if itemsData["customSalePrices"] and itemsData["customSalePrices"][currentItemID] then
+			currentPrice = itemsData["customSalePrices"][currentItemID]
+		else
+			-- Get the necessary values
+			local avgMarket = 0
+			local npcValue = 0
+			local marketOfferAverages = 0
+			
+			-- Get market offer averages (same as MarketGoldPriceBase.Value)
+			marketOfferAverages = Cyclopedia.Items.getMarketOfferAverages(itemId)
+			
+			-- Get market average price as fallback
+			if item.getMeanPrice then
+				local success, result = pcall(function() return item:getMeanPrice() end)
+				if success and result then
+					avgMarket = result
+				end
+			elseif item.getAverageMarketValue then
+				local success, result = pcall(function() return item:getAverageMarketValue() end)
+				if success and result then
+					avgMarket = result
+				end
+			end
+			
+			-- Get NPC value
+			npcValue = Cyclopedia.Items.getNpcValue(item, true)
+			
+			-- Apply the same logic as updateResultGoldValue
+			if isMarketPrice then
+				-- Market Average Value is selected
+				if marketOfferAverages > 0 then
+					currentPrice = marketOfferAverages
+				else
+					-- Enhancement: If market offer averages is 0, fallback to NPC value
+					currentPrice = npcValue
+				end
+			else
+				-- NPC Buy Value is selected (default)
+				currentPrice = npcValue
+			end
 		end
 	end
 
