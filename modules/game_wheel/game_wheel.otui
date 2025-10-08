@@ -17,21 +17,20 @@ MainWindow
       anchors.left: parent.left  
       margin-left: 5  
       size: 323 34  
-      image-source: /images/game/wheel/wod_clip  
-      icon-source: /images/game/wheel/icon-skillwheel-large  
+      image-source: /images/game/wheel/wheelMenu
       icon-align: left  
       icon-offset: 10 0  
-      !text: tr('Wheel of Destiny')  
+
       font: verdana-11px-antialised  
       text-align: center  
       text-offset: 15 0  
       @onClick: SelectWindow("wheelOfDestiny")  
         
       $!on:  
-        image-clip: 0 34 323 34  
+        image-clip: 0 0 323 34  
         
       $on:  
-        image-clip: 0 0 323 34  
+        image-clip: 0 34 323 34  
         
       $pressed:  
         image-clip: 0 0 323 34  
@@ -41,21 +40,19 @@ MainWindow
       anchors.top: wheelOfDestiny.top  
       anchors.left: wheelOfDestiny.right  
       size: 323 34  
-      image-source: /images/game/wheel/gem_clip  
-      icon-source: /images/game/wheel/icon-gematelier  
+      image-source: /images/game/wheel/gemMenu 
       icon-align: left  
       icon-offset: 10 0  
-      !text: tr('Gem Atelier')  
       font: verdana-11px-antialised  
       text-align: center  
       text-offset: 15 0  
       @onClick: SelectWindow("gemAtelier")  
         
       $!on:  
-        image-clip: 0 34 323 34  
+        image-clip: 0 0 323 34  
         
       $on:  
-        image-clip: 0 0 323 34  
+        image-clip: 0 34 323 34  
         
       $pressed:  
         image-clip: 0 0 323 34  
@@ -66,21 +63,19 @@ MainWindow
       anchors.left: gemAtelier.right  
       margin-right: 5  
       size: 323 34  
-      image-source: /images/game/wheel/frag_clip  
-      icon-source: /images/game/wheel/icon-fragmentworkshop  
+      image-source: /images/game/wheel/fragmentMenu 
       icon-align: left  
       icon-offset: 10 0  
-      !text: tr('Fragment Workshop')  
       font: verdana-11px-antialised  
       text-align: center  
       text-offset: 15 0  
       @onClick: SelectWindow("fragmentWorkshop")  
         
       $!on:  
-        image-clip: 0 34 323 34  
+        image-clip: 0 0 323 34  
         
       $on:  
-        image-clip: 0 0 323 34  
+        image-clip: 0 34 323 34  
         
       $pressed:  
         image-clip: 0 0 323 34  

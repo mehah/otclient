@@ -88,31 +88,31 @@ UIWidget
     id: backdropWheel  
     anchors.centerIn: parent  
     size: 522 522  
-    image-source: /images/game/wheel/wod/backdrop_skillwheel  
+    image-source: /images/game/wheel/backdrop_skillwheel
       
     UIWidget  
       id: largeBonusTL  
       anchors.top: parent.top  
       anchors.left: parent.left  
-      image-source: /images/game/wheel/wod/backdrop_skillwheel_largebonus_front0_TL.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png  
         
     UIWidget  
       id: largeBonusTR  
       anchors.top: parent.top  
       anchors.right: parent.right  
-      image-source: /images/game/wheel/wod/backdrop_skillwheel_largebonus_front0_TR.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png  
         
     UIWidget  
       id: largeBonusBL  
       anchors.bottom: parent.bottom  
       anchors.left: parent.left  
-      image-source: /images/game/wheel/wod/backdrop_skillwheel_largebonus_front0_BL.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png  
         
     UIWidget  
       id: largeBonusBR  
       anchors.bottom: parent.bottom  
       anchors.right: parent.right  
-      image-source: /images/game/wheel/wod/backdrop_skillwheel_largebonus_front0_BR.png  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png  
         
   UIWidget  
     id: vocationOverlay  

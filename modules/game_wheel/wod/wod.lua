@@ -27,11 +27,11 @@ local VocationConfig = {
     
     -- Images by vocation
     images = {
-        [1] = '/images/game/wheel/wod/backdrop_skillwheel_front_knight',
-        [2] = '/images/game/wheel/wod/backdrop_skillwheel_front_paladin',
-        [3] = '/images/game/wheel/wod/backdrop_skillwheel_front_sorc',
-        [4] = '/images/game/wheel/wod/backdrop_skillwheel_front_druid',
-        [5] = '/images/game/wheel/wod/backdrop_skillwheel_front_monk'
+        [1] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_knight',
+        [2] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_paladin',
+        [3] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_sorc',
+        [4] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_druid',
+        [5] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_monk'
     },
     
     -- Icon clips by vocation
