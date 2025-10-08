@@ -166,9 +166,9 @@ void UIProgressRect::showProgress(const bool showProgress)
 uint32_t UIProgressRect::getTimeElapsed()
 {
     if (m_running)
-        return std::min<uint32_t>(static_cast<uint32_t>(std::max<int64_t>(g_clock.millis() - m_startTime, 0)), m_duration);
+        return (std::min)(static_cast<uint32_t>((std::max)(g_clock.millis() - m_startTime, int64_t{ 0 })), m_duration);
 
-    return std::min(m_timeElapsed, m_duration);
+    return (std::min)(m_timeElapsed, m_duration);
 }
 
 void UIProgressRect::onStyleApply(const std::string_view styleName, const OTMLNodePtr& styleNode)
