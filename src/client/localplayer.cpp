@@ -494,12 +494,15 @@ uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tie
     const auto key = std::make_pair(itemId, tier);
     const auto it = m_inventoryCountCache.find(key);
     if (it != m_inventoryCountCache.end()) {
-        total = std::max(total, static_cast<uint32_t>(it->second));
+        if (it->second > total) {
+            total = it->second;
+        }
     }
-
-    const uint32_t maxUint16 = std::numeric_limits<uint16_t>::max();
-    const uint32_t clamped = std::min(total, maxUint16);
-    return static_cast<uint16_t>(clamped);
+    constexpr uint32_t maxUint16 = 65535;
+    if (total > maxUint16) {
+        total = maxUint16;
+    }
+    return static_cast<uint16_t>(total);
 }
 
 void LocalPlayer::setVocation(const uint8_t vocation)
