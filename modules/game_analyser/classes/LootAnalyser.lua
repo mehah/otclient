@@ -396,8 +396,16 @@ function LootAnalyser:addLootedItems(item, name)
 			-- Get the necessary values
 			local avgMarket = 0
 			local npcValue = 0
+			local marketOfferAverages = 0
 			
-			-- Get market average price (same as Cyclopedia)
+			-- Get market offer averages (same as MarketGoldPriceBase.Value in Cyclopedia)
+			if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and 
+			   modules.game_cyclopedia.Cyclopedia.Items and 
+			   modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages then
+				marketOfferAverages = modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages(itemId)
+			end
+			
+			-- Get market average price as fallback (same as getMeanPrice in Cyclopedia)
 			if item.getMeanPrice then
 				local success, result = pcall(function() return item:getMeanPrice() end)
 				if success and result then
@@ -425,10 +433,11 @@ function LootAnalyser:addLootedItems(item, name)
 			-- Apply the same enhanced logic as updateResultGoldValue
 			if isMarketPrice then
 				-- Market Average Value is selected
-				-- Enhancement: If market value is 0, fallback to NPC value
-				if avgMarket > 0 then
-					price = avgMarket
+				-- Use marketOfferAverages (same as MarketGoldPriceBase.Value), fallback to NPC if 0
+				if marketOfferAverages > 0 then
+					price = marketOfferAverages
 				else
+					-- Enhancement: If market offer averages is 0, fallback to NPC value
 					price = npcValue
 				end
 			else
