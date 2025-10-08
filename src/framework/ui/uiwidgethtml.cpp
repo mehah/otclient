@@ -806,6 +806,11 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
 
     bool needUpdate = false;
 
+    if (m_positionType == PositionType::Absolute && (unit == Unit::Auto || unit == Unit::Percent)) {
+        unit = Unit::FitContent;
+        value = 0;
+    }
+
     switch (unit) {
         case Unit::Auto: {
             if (isWidth && widthAutoFillsContainingBlock(m_displayType)) {

@@ -314,7 +314,16 @@ public:
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
     void setOverflow(OverflowType type);
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
-    void setPositionType(PositionType t) { m_positionType = t;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setPositionType(PositionType t) {
+        m_positionType = t;
+        if (m_positionType == PositionType::Absolute) {
+            m_width = m_height = SizeUnit{ Unit::FitContent, 0, -1, true };
+            scheduleHtmlTask(PropUpdateSize);
+        }
+
+        if (m_parent)
+            m_parent->refreshAnchorAlignment();
+    }
     void setPositions(std::string_view type, std::string_view value);
 
     auto& getPositions() { return m_positions; }
