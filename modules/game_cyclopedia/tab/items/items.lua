@@ -204,14 +204,34 @@ function Cyclopedia.Items.getMarketOfferAverages(itemId)
 end
 
 -- Advanced Item Value Functions
-function Cyclopedia.Items.showItemPrice(item)
-	if not item then
+function Cyclopedia.Items.showItemPrice(obj)
+	if not obj then
 		return 0
 	end
 
-	-- Use getMeanPrice() instead of getAverageMarketValue() with safety checks
+	-- Detect object type and get the necessary data
+	local item, thingType, itemId
+	if obj.getMarketData then
+		-- This is a ThingType object
+		thingType = obj
+		itemId = thingType:getId()
+		-- Create Item from ThingType for compatibility
+		item = Item.create(itemId)
+	else
+		-- This is an Item object
+		item = obj
+		itemId = item:getId()
+		thingType = g_things.getThingType(itemId, ThingCategoryItem)
+	end
+
+	-- Use getMeanPrice() with safety checks (prefer ThingType if available, fallback to Item)
 	local avgMarket = 0
-	if item and item.getMeanPrice then
+	if thingType and thingType.getMeanPrice then
+		local success, result = pcall(function() return thingType:getMeanPrice() end)
+		if success and result then
+			avgMarket = result
+		end
+	elseif item and item.getMeanPrice then
 		local success, result = pcall(function() return item:getMeanPrice() end)
 		if success and result then
 			avgMarket = result
@@ -225,17 +245,17 @@ function Cyclopedia.Items.showItemPrice(item)
 	
 	if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
         -- Calculate market offer averages: (sell offers average + buy offers average) / 2
-        local marketOfferAverages = Cyclopedia.Items.getMarketOfferAverages(item:getId())        
+        local marketOfferAverages = Cyclopedia.Items.getMarketOfferAverages(itemId)        
 		UI.InfoBase.MarketGoldPriceBase.Value:setText(comma_value(marketOfferAverages))
 	end
 
 	local isMarketPrice = false
-	if itemsData["primaryLootValueSources"] and itemsData["primaryLootValueSources"][tostring(item:getId())] then
+	if itemsData["primaryLootValueSources"] and itemsData["primaryLootValueSources"][tostring(itemId)] then
 		isMarketPrice = true
 	end
 
-	-- Get NPC value
-	local npcValue = Cyclopedia.Items.getNpcValue(item, true)
+	-- Get NPC value (use thingType if available, fallback to item)
+	local npcValue = Cyclopedia.Items.getNpcValue(thingType or item, true)
 	
 	-- If no NPC buy price found, fallback to market average price
 	if npcValue == 0 then
@@ -244,8 +264,8 @@ function Cyclopedia.Items.showItemPrice(item)
 
 	-- Priority 1: Custom value always takes precedence
 	local resulting = 0
-	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(item:getId())] then
-		resulting = itemsData["customSalePrices"][tostring(item:getId())]
+	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(itemId)] then
+		resulting = itemsData["customSalePrices"][tostring(itemId)]
 		if UI.InfoBase.OwnValueEdit then
 			UI.InfoBase.OwnValueEdit:setText(tostring(resulting))
 		end
@@ -329,46 +349,32 @@ function Cyclopedia.Items.getCurrentItemValue(item)
 	return resulting
 end
 
-function Cyclopedia.Items.showItemPriceSafe(obj)
-    -- Check if this is a ThingType or Item object and call the appropriate function
-    if obj and obj.getMarketData then
-        -- This looks like a ThingType object
-        return Cyclopedia.Items.showItemPriceFromThingType(obj)
-    else
-        -- This is an Item object or unknown, use the original function but with extra safety
-        return Cyclopedia.Items.showItemPrice(obj)
-    end
-end
-
-function Cyclopedia.Items.showItemPriceFromThingType(thingType)
-	if not UI or not UI.InfoBase or not UI.InfoBase.MarketGoldPriceBase or not thingType then
+function Cyclopedia.Items.getCurrentItemValue(item)
+	if not item then
 		return 0
 	end
 
-	-- Use getMeanPrice() from ThingType
+	-- Use getMeanPrice() instead of getAverageMarketValue() with safety checks
 	local avgMarket = 0
-	if thingType.getMeanPrice then
-		local success, result = pcall(function() return thingType:getMeanPrice() end)
+	if item.getMeanPrice then
+		local success, result = pcall(function() return item:getMeanPrice() end)
+		if success then
+			avgMarket = result or 0
+		end
+	elseif item.getAverageMarketValue then
+		local success, result = pcall(function() return item:getAverageMarketValue() end)
 		if success then
 			avgMarket = result or 0
 		end
 	end
-	
-	if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
-        -- Calculate market offer averages: (sell offers average + buy offers average) / 2
-        -- TODO: Here we set Average Market Price
-        local marketOfferAverages = Cyclopedia.Items.getMarketOfferAverages(itemId)
-		UI.InfoBase.MarketGoldPriceBase.Value:setText(comma_value(marketOfferAverages))
-	end
 
-	local itemId = thingType:getId()
 	local isMarketPrice = false
-	if itemsData["primaryLootValueSources"] and itemsData["primaryLootValueSources"][tostring(itemId)] then
+	if itemsData["primaryLootValueSources"] and itemsData["primaryLootValueSources"][tostring(item:getId())] then
 		isMarketPrice = true
 	end
 
 	-- Get NPC value
-	local npcValue = Cyclopedia.Items.getNpcValue(thingType, true)
+	local npcValue = Cyclopedia.Items.getNpcValue(item, true)
 	
 	-- If no NPC buy price found, fallback to market average price
 	if npcValue == 0 then
@@ -377,11 +383,8 @@ function Cyclopedia.Items.showItemPriceFromThingType(thingType)
 
 	-- Priority 1: Custom value always takes precedence
 	local resulting = 0
-	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(itemId)] then
-		resulting = itemsData["customSalePrices"][tostring(itemId)]
-		if UI.InfoBase.OwnValueEdit then
-			UI.InfoBase.OwnValueEdit:setText(tostring(resulting))
-		end
+	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(item:getId())] then
+		resulting = itemsData["customSalePrices"][tostring(item:getId())]
 	else
 		-- Priority 2 & 3: Use selected loot value source
 		if isMarketPrice then
@@ -389,28 +392,8 @@ function Cyclopedia.Items.showItemPriceFromThingType(thingType)
 		else
 			resulting = npcValue   -- Use NPC price
 		end
-		
-		-- Clear custom value field since no custom value is set
-		if UI.InfoBase.OwnValueEdit then
-			UI.InfoBase.OwnValueEdit:clearText(true)
-		end
 	end
-
-	if UI.InfoBase.ResultGoldBase and UI.InfoBase.ResultGoldBase.Value then
-		UI.InfoBase.ResultGoldBase.Value:setText(comma_value(resulting))
-	end
-
-	-- Update loot value source checkboxes
-	if UI.LootValue then
-		if isMarketPrice then
-			UI.LootValue.NpcBuyCheck:setChecked(false)
-			UI.LootValue.MarketCheck:setChecked(true)
-		else
-			UI.LootValue.NpcBuyCheck:setChecked(true)
-			UI.LootValue.MarketCheck:setChecked(false)
-		end
-	end
-
+	
 	return resulting
 end
 
@@ -504,7 +487,7 @@ function Cyclopedia.Items.onChangeCustomPrice(widget)
 		end
 
 		itemsData["customSalePrices"] = newItemList["customSalePrices"]
-		Cyclopedia.Items.showItemPriceSafe(item)
+		Cyclopedia.Items.showItemPrice(item)
 		
 		-- Get the current item value (NPC or market based on selection)
 		local itemDefaultValue = Cyclopedia.Items.getCurrentItemValue(item)
@@ -832,7 +815,7 @@ function Cyclopedia.internalCreateItem(data)
 
         -- Update item price display
         if data then
-            Cyclopedia.Items.showItemPriceFromThingType(data)
+            Cyclopedia.Items.showItemPrice(data)
         end
 
         if price > 0 then
@@ -1314,7 +1297,7 @@ function Cyclopedia.Items.onChangeLootValue(self)
     
     -- Refresh the price display using the last selected item
     if lastSelectedItem and lastSelectedItem.data then
-        Cyclopedia.Items.showItemPriceFromThingType(lastSelectedItem.data)
+        Cyclopedia.Items.showItemPrice(lastSelectedItem.data)
     end
 end
 
