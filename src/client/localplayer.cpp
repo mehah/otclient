@@ -497,7 +497,7 @@ uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tie
         total = std::max<uint32_t>(total, it->second);
     }
 
-    const uint32_t clamped = std::min<uint32_t>(total, std::numeric_limits<uint16_t>::max());
+    const uint32_t clamped = (std::min<uint32_t>)(total, std::numeric_limits<uint16_t>::max());
     return static_cast<uint16_t>(clamped);
 }
 
