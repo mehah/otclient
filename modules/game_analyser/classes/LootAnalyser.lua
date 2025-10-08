@@ -405,17 +405,16 @@ function LootAnalyser:addLootedItems(item, name)
 				marketOfferAverages = modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages(itemId)
 			end
 			
-			-- Get market average price as fallback (same as getMeanPrice in Cyclopedia)
+			-- Get market average price as fallback (use marketOfferAverages if getMeanPrice fails)
 			if item.getMeanPrice then
 				local success, result = pcall(function() return item:getMeanPrice() end)
 				if success and result then
 					avgMarket = result
+				else
+					avgMarket = marketOfferAverages  -- Use the same data as already obtained
 				end
-			elseif item.getAverageMarketValue then
-				local success, result = pcall(function() return item:getAverageMarketValue() end)
-				if success and result then
-					avgMarket = result
-				end
+			else
+				avgMarket = marketOfferAverages  -- Use getMarketOfferAverages data
 			end
 			
 			-- Get NPC value using the same function as Cyclopedia

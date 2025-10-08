@@ -617,19 +617,14 @@ function HuntingAnalyser:addLootedItems(item, name)
 				end
 			end
 			
-			-- Average Market Value
-			if item.getAverageMarketValue then
-				local success, result = pcall(function() return item:getAverageMarketValue() end)
-				if success and result then
-					avgMarketValue = result
-				else
-					-- TODO: getAverageMarketValue exists but failed or returned nil
-					-- This might indicate the function is not fully implemented
-					print(string.format("[LOOT DEBUG] DEBUG: getAverageMarketValue failed or returned nil: %s", tostring(result)))
-				end
+			-- Average Market Value using getMarketOfferAverages
+			local itemId = item:getId()
+			if itemId and modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and 
+			   modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages then
+				avgMarketValue = modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages(itemId)
 			else
-				-- TODO: getAverageMarketValue method not available - needs implementation
-				print(string.format("[LOOT DEBUG] DEBUG: getAverageMarketValue method not available"))
+				-- Fallback: getMarketOfferAverages method not available
+				print(string.format("[LOOT DEBUG] DEBUG: getMarketOfferAverages method not available"))
 			end
 			
 			-- Default Buy Price
@@ -681,10 +676,12 @@ local function getCurrentPrice(itemPtr)
 			if success and result then
 				avgMarket = result
 			end
-		elseif itemPtr.getAverageMarketValue then
-			local success, result = pcall(function() return itemPtr:getAverageMarketValue() end)
-			if success and result then
-				avgMarket = result
+		elseif itemPtr.getId then
+			-- Use getMarketOfferAverages for market data
+			local itemId = itemPtr:getId()
+			if itemId and modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and 
+			   modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages then
+				avgMarket = modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages(itemId)
 			end
 		end
 		
@@ -741,10 +738,12 @@ local function getCurrentPrice(itemPtr)
 				if success and result then
 					npcSalePrice = result
 				end
-			elseif itemPtr.getAverageMarketValue then
-				local success, result = pcall(function() return itemPtr:getAverageMarketValue() end)
-				if success and result then
-					npcSalePrice = result
+			elseif itemPtr.getId then
+				-- Use getMarketOfferAverages for market data
+				local itemId = itemPtr:getId()
+				if itemId and modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and 
+				   modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages then
+					npcSalePrice = modules.game_cyclopedia.Cyclopedia.Items.getMarketOfferAverages(itemId)
 				end
 			end
 		end
