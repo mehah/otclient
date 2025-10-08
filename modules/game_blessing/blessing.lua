@@ -1,6 +1,9 @@
 BlessingController = Controller:new()
 
 function BlessingController:onInit()
+    BlessingController:registerEvents(g_game, {
+        onBlessingsChange = onBlessingsChange
+    })
 end
 
 function BlessingController:onTerminate()
@@ -126,4 +129,8 @@ end
 function BlessingController:onClickSendStore()
     modules.game_store.toggle()
     g_game.sendRequestStorePremiumBoost()
+end
+
+function onBlessingsChange(blessings, blessVisualState)
+    modules.game_inventory.onBlessingsChange(blessings, blessVisualState)
 end
