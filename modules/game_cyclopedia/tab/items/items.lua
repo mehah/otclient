@@ -224,23 +224,10 @@ function Cyclopedia.Items.showItemPrice(obj)
 		thingType = g_things.getThingType(itemId, ThingCategoryItem)
 	end
 
-	-- Use getMeanPrice() with safety checks (prefer ThingType if available, fallback to Item)
+	-- Use getMarketOfferAverages() with safety checks
 	local avgMarket = 0
-	if thingType and thingType.getMeanPrice then
-		local success, result = pcall(function() return thingType:getMeanPrice() end)
-		if success and result then
-			avgMarket = result
-		end
-	elseif item and item.getMeanPrice then
-		local success, result = pcall(function() return item:getMeanPrice() end)
-		if success and result then
-			avgMarket = result
-		end
-	elseif item and item.getAverageMarketValue then
-		local success, result = pcall(function() return item:getAverageMarketValue() end)
-		if success and result then
-			avgMarket = result
-		end
+	if itemId then
+		avgMarket = Cyclopedia.Items.getMarketOfferAverages(itemId)
 	end
 	
 	if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
@@ -305,66 +292,11 @@ function Cyclopedia.Items.getCurrentItemValue(item)
 		return 0
 	end
 
-	-- Use getMeanPrice() instead of getAverageMarketValue() with safety checks
+	-- Use getMarketOfferAverages() with safety checks
 	local avgMarket = 0
-	if item.getMeanPrice then
-		local success, result = pcall(function() return item:getMeanPrice() end)
-		if success then
-			avgMarket = result or 0
-		end
-	elseif item.getAverageMarketValue then
-		local success, result = pcall(function() return item:getAverageMarketValue() end)
-		if success then
-			avgMarket = result or 0
-		end
-	end
-
-	local isMarketPrice = false
-	if itemsData["primaryLootValueSources"] and itemsData["primaryLootValueSources"][tostring(item:getId())] then
-		isMarketPrice = true
-	end
-
-	-- Get NPC value
-	local npcValue = Cyclopedia.Items.getNpcValue(item, true)
-	
-	-- If no NPC buy price found, fallback to market average price
-	if npcValue == 0 then
-		npcValue = avgMarket
-	end
-
-	-- Priority 1: Custom value always takes precedence
-	local resulting = 0
-	if itemsData["customSalePrices"] and itemsData["customSalePrices"][tostring(item:getId())] then
-		resulting = itemsData["customSalePrices"][tostring(item:getId())]
-	else
-		-- Priority 2 & 3: Use selected loot value source
-		if isMarketPrice then
-			resulting = avgMarket  -- Use market price
-		else
-			resulting = npcValue   -- Use NPC price
-		end
-	end
-	
-	return resulting
-end
-
-function Cyclopedia.Items.getCurrentItemValue(item)
-	if not item then
-		return 0
-	end
-
-	-- Use getMeanPrice() instead of getAverageMarketValue() with safety checks
-	local avgMarket = 0
-	if item.getMeanPrice then
-		local success, result = pcall(function() return item:getMeanPrice() end)
-		if success then
-			avgMarket = result or 0
-		end
-	elseif item.getAverageMarketValue then
-		local success, result = pcall(function() return item:getAverageMarketValue() end)
-		if success then
-			avgMarket = result or 0
-		end
+	local itemId = item:getId()
+	if itemId then
+		avgMarket = Cyclopedia.Items.getMarketOfferAverages(itemId)
 	end
 
 	local isMarketPrice = false
@@ -544,19 +476,7 @@ function Cyclopedia.Items.onSourceValueChange(checked, npcSource)
 			
 			-- Get market offer averages (same as MarketGoldPriceBase.Value)
 			marketOfferAverages = Cyclopedia.Items.getMarketOfferAverages(itemId)
-			
-			-- Get market average price as fallback
-			if item.getMeanPrice then
-				local success, result = pcall(function() return item:getMeanPrice() end)
-				if success and result then
-					avgMarket = result
-				end
-			elseif item.getAverageMarketValue then
-				local success, result = pcall(function() return item:getAverageMarketValue() end)
-				if success and result then
-					avgMarket = result
-				end
-			end
+			avgMarket = marketOfferAverages  -- Use the same value for consistency
 			
 			-- Get NPC value
 			npcValue = Cyclopedia.Items.getNpcValue(item, true)
@@ -664,15 +584,8 @@ function Cyclopedia.Items.onChangeCustomPrice(widget)
 	
 	-- Update result display using our new logic
 	-- Get necessary values for the update function
-	local avgMarket = 0
-	local npcValue = 0
-	if item.getMeanPrice then
-		local success, result = pcall(function() return item:getMeanPrice() end)
-		if success and result then
-			avgMarket = result
-		end
-	end
-	npcValue = Cyclopedia.Items.getNpcValue(item, true)
+	local avgMarket = Cyclopedia.Items.getMarketOfferAverages(itemId)
+	local npcValue = Cyclopedia.Items.getNpcValue(item, true)
 	
 	Cyclopedia.Items.updateResultGoldValue(itemId, numericValue, avgMarket, npcValue)
 	
