@@ -583,61 +583,88 @@ function HuntingAnalyser:addLootedItems(item, name)
 	if not data then
 		local price = 0
 		
+		-- Debug information for price determination
+		print(string.format("[LOOT DEBUG] === Item Price Analysis ==="))
+		print(string.format("[LOOT DEBUG] Item ID: %d, Name: %s, Count: %d", itemId, name, count))
+		
 		-- Special handling for coins - they have fixed inherent values
 		if itemId == 3031 then  -- Gold coin
 			price = 1
+			print(string.format("[LOOT DEBUG] Price Source: HARDCODED (Gold Coin) = %d", price))
 		elseif itemId == 3035 then  -- Platinum coin (worth 100 gold)
 			price = 100
+			print(string.format("[LOOT DEBUG] Price Source: HARDCODED (Platinum Coin) = %d", price))
 		elseif itemId == 3043 then  -- Crystal coin (worth 10,000 gold)
 			price = 10000
+			print(string.format("[LOOT DEBUG] Price Source: HARDCODED (Crystal Coin) = %d", price))
 		else
-			-- For non-coin items, try to get price from various sources
-			-- Try to get price from Cyclopedia module if available
-			if Cyclopedia and Cyclopedia.Items and Cyclopedia.Items.getCurrentItemValue then
-				price = Cyclopedia.Items.getCurrentItemValue(item)
-			else
-				-- Implement the same logic as Cyclopedia.Items.getCurrentItemValue for fallback
-				-- This follows the exact pattern: prioritize NPC value unless item is marked for market pricing
-				
-				local avgMarket = 0
-				-- Try to get market average price
-				if item.getMeanPrice then
-					local success, result = pcall(function() return item:getMeanPrice() end)
-					if success and result then
-						avgMarket = result
-					end
-				elseif item.getAverageMarketValue then
-					local success, result = pcall(function() return item:getAverageMarketValue() end)
-					if success and result then
-						avgMarket = result
-					end
-				end
-				
-				-- Default to using NPC value (since we can't access itemsData to check market preference)
-				local resulting = avgMarket
-				if item.getDefaultValue then
-					local success, defaultValue = pcall(function() return item:getDefaultValue() end)
-					if success and defaultValue then
-						-- Use NPC value as primary choice (mimicking Cyclopedia when not marked for market)
-						resulting = defaultValue
-					end
-				end
-				
-				-- If no valid NPC price found, use market price as fallback
-				if resulting == 0 then
-					resulting = avgMarket
-				end
-				
-				-- If still no price, try default buy price as last resort
-				if resulting == 0 and item.getDefaultBuyPrice then
-					local success, result = pcall(function() return item:getDefaultBuyPrice() end)
-					if success and result then
-						resulting = result
-					end
-				end
-				
-				price = resulting
+			-- Get all pricing values for non-coin items
+			local npcBuyValue = 0
+			local npcSellValue = 0
+			local meanPrice = 0
+			local avgMarketValue = 0
+			local defaultBuyPrice = 0
+			local cyclopediaValue = 0
+			
+			-- NPC Buy Value (what NPCs pay us for the item)
+			if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getNpcValue then
+				npcBuyValue = modules.game_cyclopedia.Cyclopedia.Items.getNpcValue(item, true)
 			end
+			
+			-- NPC Sell Value (what NPCs charge us for the item)
+			if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getNpcValue then
+				npcSellValue = modules.game_cyclopedia.Cyclopedia.Items.getNpcValue(item, false)
+			end
+						
+			-- Market Mean Price
+			if item.getMeanPrice then
+				local success, result = pcall(function() return item:getMeanPrice() end)
+				if success and result then
+					meanPrice = result
+				end
+			end
+			
+			-- Average Market Value
+			if item.getAverageMarketValue then
+				local success, result = pcall(function() return item:getAverageMarketValue() end)
+				if success and result then
+					avgMarketValue = result
+				else
+					-- TODO: getAverageMarketValue exists but failed or returned nil
+					-- This might indicate the function is not fully implemented
+					print(string.format("[LOOT DEBUG] DEBUG: getAverageMarketValue failed or returned nil: %s", tostring(result)))
+				end
+			else
+				-- TODO: getAverageMarketValue method not available - needs implementation
+				print(string.format("[LOOT DEBUG] DEBUG: getAverageMarketValue method not available"))
+			end
+			
+			-- Default Buy Price
+			if item.getDefaultBuyPrice then
+				local success, result = pcall(function() return item:getDefaultBuyPrice() end)
+				if success and result then
+					defaultBuyPrice = result
+				end
+			end
+			
+			-- Cyclopedia Current Item Value
+			if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getCurrentItemValue then
+				cyclopediaValue = modules.game_cyclopedia.Cyclopedia.Items.getCurrentItemValue(item)
+			end
+			
+			-- Display all values
+			print(string.format("[LOOT DEBUG] NPC Buy Value (NPCs pay us): %d", npcBuyValue))
+			print(string.format("[LOOT DEBUG] NPC Sell Value (NPCs charge us): %d", npcSellValue))
+			print(string.format("[LOOT DEBUG] Mean Price: %d", meanPrice))
+			print(string.format("[LOOT DEBUG] Average Market Value: %d", avgMarketValue))
+			print(string.format("[LOOT DEBUG] Default Buy Price: %d", defaultBuyPrice))
+			print(string.format("[LOOT DEBUG] Cyclopedia Current Value: %d", cyclopediaValue))
+			
+			-- Use Cyclopedia value as the final price
+			price = cyclopediaValue
+			print(string.format("[LOOT DEBUG] Final Price Used: %d", price))
+			print(string.format("[LOOT DEBUG] Total Value Added: %d (price %d × count %d)", price * count, price, count))
+			print(string.format("[LOOT DEBUG] ========================"))
 		end
 		
 		HuntingAnalyser.loot = HuntingAnalyser.loot + (price * count)
@@ -645,6 +672,12 @@ function HuntingAnalyser:addLootedItems(item, name)
 	else
 		data.count = data.count + count
 		HuntingAnalyser.loot = HuntingAnalyser.loot + (data.price * count)
+		print(string.format("[LOOT DEBUG] === Existing Item ==="))
+		print(string.format("[LOOT DEBUG] Item ID: %d, Name: %s", itemId, name))
+		print(string.format("[LOOT DEBUG] Adding Count: %d, Existing Price: %d", count, data.price))
+		print(string.format("[LOOT DEBUG] Value Added: %d (price %d × count %d)", data.price * count, data.price, count))
+		print(string.format("[LOOT DEBUG] New Total Count: %d", data.count))
+		print(string.format("[LOOT DEBUG] ==================="))
 	end
 
 	if not HuntingAnalyser.lootedItemsName[name] then
@@ -661,7 +694,7 @@ local function getNpcSupplyPrice(item)
 	end
 	
 	-- Try to get price from Cyclopedia module if available (respects user preference)
-	if Cyclopedia and Cyclopedia.Items and Cyclopedia.Items.getCurrentItemValue then
+	if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getCurrentItemValue then
 		-- For supplies, we need to modify the logic slightly:
 		-- When user selects "NPC Buy Value", we should use NPC sale price (what we pay for supplies)
 		-- When user selects "Market Average Value", we should use market average price
@@ -700,7 +733,7 @@ local function getNpcSupplyPrice(item)
 		end
 		
 		-- Use getCurrentItemValue to check user preference, then adapt for supplies
-		local currentValue = Cyclopedia.Items.getCurrentItemValue(item)
+		local currentValue = modules.game_cyclopedia.Cyclopedia.Items.getCurrentItemValue(item)
 		
 		-- If the current value equals market price, user prefers market pricing
 		if currentValue == avgMarket then

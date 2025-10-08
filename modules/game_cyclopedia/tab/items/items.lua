@@ -147,6 +147,62 @@ function Cyclopedia.ResetItemCategorySelection(list)
     end
 end
 
+-- Get NPC buy value for a ThingType or Item
+-- @param itemOrThingType: The Item or ThingType object (both have getNpcSaleData method)
+-- @param useBuyPrice: true for buyPrice (what NPCs pay us), false for salePrice (what NPCs charge us)
+function Cyclopedia.Items.getNpcValue(itemOrThingType, useBuyPrice)
+	local npcValue = 0
+	if useBuyPrice == nil then
+		useBuyPrice = true  -- Default to buyPrice for backward compatibility
+	end
+	
+	if itemOrThingType and itemOrThingType.getNpcSaleData then
+		local success, npcSaleData = pcall(function() return itemOrThingType:getNpcSaleData() end)
+		if success and npcSaleData and #npcSaleData > 0 then
+			if useBuyPrice then
+				-- Get the highest buy price from NPCs (what NPCs will pay us for the item)
+				for _, npcData in ipairs(npcSaleData) do
+					if npcData.buyPrice and npcData.buyPrice > npcValue then
+						npcValue = npcData.buyPrice
+					end
+				end
+			else
+				-- Get the highest sale price from NPCs (what NPCs charge us for the item)
+				-- Note: Using 'salePrice' (not 'sellPrice') based on actual API data
+				for _, npcData in ipairs(npcSaleData) do
+					if npcData.salePrice and npcData.salePrice > npcValue then
+						npcValue = npcData.salePrice
+					end
+				end
+			end
+		end
+	end
+	
+	return npcValue
+end
+
+-- Function to calculate market offer averages: (sell offers average + buy offers average) / 2
+function Cyclopedia.Items.getMarketOfferAverages(itemId)
+	-- TODO: Access market statistics from game_market module to get:
+	-- 1. Sell offers average price (from saleOfferStatistic in Market.updateDetails)
+	-- 2. Buy offers average price (from purchaseOfferStatistic in Market.updateDetails)
+	-- 3. Calculate (sellAverage + buyAverage) / 2
+	
+	-- The market statistics are processed in modules/game_market/market.lua in the updateDetails function
+	-- We need to either:
+	-- A) Add a public function in Market module to get averages for a specific itemId
+	-- B) Request market details for the itemId and cache the results
+	-- C) Access the market statistics data structures directly if they're made global
+	
+	-- Current market average calculation logic from market.lua (for reference):
+	-- if totalPrice > 0 and transactions > 0 then
+	--     averagePrice = math.floor(totalPrice / transactions)
+	-- end
+	
+	-- For now, return 0 until market statistics access is implemented
+	return 0
+end
+
 -- Advanced Item Value Functions
 function Cyclopedia.Items.showItemPrice(item)
 	if not item then
@@ -168,8 +224,9 @@ function Cyclopedia.Items.showItemPrice(item)
 	end
 	
 	if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
-        -- Set value for the Market Average display
-		UI.InfoBase.MarketGoldPriceBase.Value:setText(comma_value(avgMarket))
+        -- Calculate market offer averages: (sell offers average + buy offers average) / 2
+        local marketOfferAverages = Cyclopedia.Items.getMarketOfferAverages(item:getId())        
+		UI.InfoBase.MarketGoldPriceBase.Value:setText(comma_value(marketOfferAverages))
 	end
 
 	local isMarketPrice = false
@@ -178,18 +235,7 @@ function Cyclopedia.Items.showItemPrice(item)
 	end
 
 	-- Get NPC value
-	local npcValue = 0
-	if item and item.getNpcSaleData then
-		local success, npcSaleData = pcall(function() return item:getNpcSaleData() end)
-		if success and npcSaleData and #npcSaleData > 0 then
-			-- Get the highest buy price from NPCs (what NPCs will pay us for the item)
-			for _, npcData in ipairs(npcSaleData) do
-				if npcData.buyPrice and npcData.buyPrice > npcValue then
-					npcValue = npcData.buyPrice
-				end
-			end
-		end
-	end
+	local npcValue = Cyclopedia.Items.getNpcValue(item, true)
 	
 	-- If no NPC buy price found, fallback to market average price
 	if npcValue == 0 then
@@ -260,18 +306,7 @@ function Cyclopedia.Items.getCurrentItemValue(item)
 	end
 
 	-- Get NPC value
-	local npcValue = 0
-	if item and item.getNpcSaleData then
-		local success, npcSaleData = pcall(function() return item:getNpcSaleData() end)
-		if success and npcSaleData and #npcSaleData > 0 then
-			-- Get the highest buy price from NPCs (what NPCs will pay us for the item)
-			for _, npcData in ipairs(npcSaleData) do
-				if npcData.buyPrice and npcData.buyPrice > npcValue then
-					npcValue = npcData.buyPrice
-				end
-			end
-		end
-	end
+	local npcValue = Cyclopedia.Items.getNpcValue(item, true)
 	
 	-- If no NPC buy price found, fallback to market average price
 	if npcValue == 0 then
@@ -320,7 +355,10 @@ function Cyclopedia.Items.showItemPriceFromThingType(thingType)
 	end
 	
 	if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
-		UI.InfoBase.MarketGoldPriceBase.Value:setText(comma_value(avgMarket))
+        -- Calculate market offer averages: (sell offers average + buy offers average) / 2
+        -- TODO: Here we set Average Market Price
+        local marketOfferAverages = Cyclopedia.Items.getMarketOfferAverages(itemId)
+		UI.InfoBase.MarketGoldPriceBase.Value:setText(comma_value(marketOfferAverages))
 	end
 
 	local itemId = thingType:getId()
@@ -330,18 +368,7 @@ function Cyclopedia.Items.showItemPriceFromThingType(thingType)
 	end
 
 	-- Get NPC value
-	local npcValue = 0
-	if thingType and thingType.getNpcSaleData then
-		local success, npcSaleData = pcall(function() return thingType:getNpcSaleData() end)
-		if success and npcSaleData and #npcSaleData > 0 then
-			-- Get the highest buy price from NPCs (what NPCs will pay us for the item)
-			for _, npcData in ipairs(npcSaleData) do
-				if npcData.buyPrice and npcData.buyPrice > npcValue then
-					npcValue = npcData.buyPrice
-				end
-			end
-		end
-	end
+	local npcValue = Cyclopedia.Items.getNpcValue(thingType, true)
 	
 	-- If no NPC buy price found, fallback to market average price
 	if npcValue == 0 then
