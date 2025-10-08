@@ -525,8 +525,11 @@ end
 forgeController.conversion = {}
 forgeController.general = {}
 
+local RED_COLOR = "#BB4648"
+local GREEN_COLOR = "#4BB543"
+
 function forgeController:getColorByStatus(status)
-    return status and "red" or "white"
+    return status and RED_COLOR or "white"
 end
 
 function forgeController:applyForgeConfiguration(config)
@@ -623,8 +626,8 @@ function forgeController:applyForgeConfiguration(config)
 
     forgeController.mustDisableConvertDustToSliverButton = forgeController.currentDust <
         forgeController.conversionNecessaryDustToSliver
-    forgeController.conversionNecessaryDustToSliverLabel = forgeController.mustDisableConvertDustToSliverButton and "red" or
-        "white"
+    forgeController.conversionNecessaryDustToSliverLabel = forgeController:getColorByStatus(forgeController
+        .mustDisableConvertDustToSliverButton)
 
     forgeController.mustDisableIncreaseDustLimitButton = forgeController.currentDust <
         forgeController.conversionNecessaryDustToIncrease
@@ -691,19 +694,19 @@ function forgeController:onFusionImproveChanceChange(improveType)
         if self.fusionChanceImprovedIsChecked then
             if self.currentExaltedCores == 1 then
                 self.fusionDisableReduceTierLossButton = true
-                self.fusionPlayerHasExaltedCoreToReduceTierLoss = "red"
+                self.fusionPlayerHasExaltedCoreToReduceTierLoss = RED_COLOR
             end
             self.fusionChanceBaseLabel = ("%d%%"):format(self.fusionChanceBase +
                 self.fusionChanceImproved)
-            self.fusionPlayerHasExaltedCoreToImproveRateSuccess = "green"
+            self.fusionPlayerHasExaltedCoreToImproveRateSuccess = GREEN_COLOR
         else
-            self.fusionPlayerHasExaltedCoreToImproveRateSuccess = (self.currentExaltedCores >= 1) and
-                "white" or "red"
+            self.fusionPlayerHasExaltedCoreToImproveRateSuccess = self:getColorByStatus(self.currentExaltedCores < 1)
 
             self.fusionChanceBaseLabel = ("%d%%"):format(self.fusionChanceBase)
 
             if self.fusionDisableReduceTierLossButton and not self.fusionReduceTierLossIsChecked then
                 self.fusionDisableReduceTierLossButton = false
+                self.fusionPlayerHasExaltedCoreToReduceTierLoss = self:getColorByStatus(self.currentExaltedCores < 1)
             end
         end
     end
@@ -713,21 +716,21 @@ function forgeController:onFusionImproveChanceChange(improveType)
         if self.fusionReduceTierLossIsChecked then
             if self.currentExaltedCores == 1 then
                 self.fusionDisableImproveRateSuccessButton = true
-                self.fusionPlayerHasExaltedCoreToImproveRateSuccess = "red"
+                self.fusionPlayerHasExaltedCoreToImproveRateSuccess = RED_COLOR
             end
 
-            self.fusionPlayerHasExaltedCoreToReduceTierLoss = "green"
+            self.fusionPlayerHasExaltedCoreToReduceTierLoss = GREEN_COLOR
 
             self.fusionTierLossChanceBaseLabel = ("%d%%"):format(self.fusionTierLossChanceBase -
                 self.fusionReduceTierLoss)
         else
-            self.fusionPlayerHasExaltedCoreToReduceTierLoss = (self.currentExaltedCores >= 1) and
-                "white" or "red"
+            self.fusionPlayerHasExaltedCoreToReduceTierLoss = self:getColorByStatus(self.currentExaltedCores < 1)
 
             self.fusionTierLossChanceBaseLabel = ("%d%%"):format(self.fusionTierLossChanceBase)
 
             if self.fusionDisableImproveRateSuccessButton and not self.fusionChanceImprovedIsChecked then
                 self.fusionDisableImproveRateSuccessButton = false
+                self.fusionPlayerHasExaltedCoreToImproveRateSuccess = self:getColorByStatus(self.currentExaltedCores < 1)
             end
         end
     end
