@@ -397,6 +397,13 @@ function Cyclopedia.Items.getCurrentItemValue(item)
 end
 
 -- Function to update ResultGoldBase.Value based on conditions
+-- Priority logic:
+-- 1. If OwnValueEdit has content: Use custom value
+-- 2. If OwnValueEdit is empty and "NPC Buy Value" selected: Use getNpcValue (buyPrice)
+-- 3. If OwnValueEdit is empty and "Market Average Value" selected:
+--    a. If MarketGoldPriceBase.Value > 0: Use market value
+--    b. If MarketGoldPriceBase.Value = 0: Fallback to getNpcValue (buyPrice)
+-- 4. If none of the above applies or all values are 0/nil: Set to 0
 function Cyclopedia.Items.updateResultGoldValue(itemId, customValue, avgMarket, npcValue)
 	if not UI.InfoBase.ResultGoldBase or not UI.InfoBase.ResultGoldBase.Value then
 		return
@@ -421,17 +428,27 @@ function Cyclopedia.Items.updateResultGoldValue(itemId, customValue, avgMarket, 
 		
 		if isMarketPrice then
 			-- Use Market Average Value (MarketGoldPriceBase.Value)
+			local marketValue = 0
 			if UI.InfoBase.MarketGoldPriceBase and UI.InfoBase.MarketGoldPriceBase.Value then
 				local marketValueText = UI.InfoBase.MarketGoldPriceBase.Value:getText() or "0"
 				marketValueText = marketValueText:gsub(",", "") -- Remove commas
-				local marketValue = tonumber(marketValueText) or avgMarket
-				finalValue = marketValue
+				marketValue = tonumber(marketValueText) or 0
+			end
+			
+			-- Enhancement: If market value is 0 or nil, fallback to NPC value
+			if marketValue == 0 then
+				finalValue = npcValue
 			else
-				finalValue = avgMarket
+				finalValue = marketValue
 			end
 		else
 			-- Use NPC Buy Value (getNpcValue function output, buyPrice)
 			finalValue = npcValue
+		end
+		
+		-- Final fallback: if all values are 0 or nil, set to 0
+		if not finalValue or finalValue == 0 then
+			finalValue = 0
 		end
 	end
 	
