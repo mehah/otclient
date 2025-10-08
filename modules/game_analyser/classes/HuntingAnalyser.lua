@@ -687,27 +687,27 @@ function HuntingAnalyser:addLootedItems(item, name)
 	HuntingAnalyser.lootedItemsName[name] = HuntingAnalyser.lootedItemsName[name] + count
 end
 
--- Function to get supply price based on user's Cyclopedia preference (similar to loot values)
-local function getNpcSupplyPrice(item)
-	if not item then
+-- Function to get supply price based on user's Cyclopedia preference (same as SupplyAnalyser)
+local function getCurrentPrice(itemPtr)
+	if not itemPtr then
 		return 0
 	end
 	
 	-- Try to get price from Cyclopedia module if available (respects user preference)
-	if modules.game_cyclopedia and modules.game_cyclopedia.Cyclopedia and modules.game_cyclopedia.Cyclopedia.Items and modules.game_cyclopedia.Cyclopedia.Items.getCurrentItemValue then
+	if Cyclopedia and Cyclopedia.Items and Cyclopedia.Items.getCurrentItemValue then
 		-- For supplies, we need to modify the logic slightly:
 		-- When user selects "NPC Buy Value", we should use NPC sale price (what we pay for supplies)
 		-- When user selects "Market Average Value", we should use market average price
 		
 		-- Get market average price
 		local avgMarket = 0
-		if item.getMeanPrice then
-			local success, result = pcall(function() return item:getMeanPrice() end)
+		if itemPtr.getMeanPrice then
+			local success, result = pcall(function() return itemPtr:getMeanPrice() end)
 			if success and result then
 				avgMarket = result
 			end
-		elseif item.getAverageMarketValue then
-			local success, result = pcall(function() return item:getAverageMarketValue() end)
+		elseif itemPtr.getAverageMarketValue then
+			local success, result = pcall(function() return itemPtr:getAverageMarketValue() end)
 			if success and result then
 				avgMarket = result
 			end
@@ -715,8 +715,8 @@ local function getNpcSupplyPrice(item)
 		
 		-- Get NPC sale price (what NPCs charge us for supplies)
 		local npcSalePrice = 0
-		if item.getNpcSaleData then
-			local success, npcSaleData = pcall(function() return item:getNpcSaleData() end)
+		if itemPtr.getNpcSaleData then
+			local success, npcSaleData = pcall(function() return itemPtr:getNpcSaleData() end)
 			if success and npcSaleData and #npcSaleData > 0 then
 				-- Get the highest sale price from NPCs (most expensive option for supplies)
 				for _, npcData in ipairs(npcSaleData) do
@@ -733,7 +733,7 @@ local function getNpcSupplyPrice(item)
 		end
 		
 		-- Use getCurrentItemValue to check user preference, then adapt for supplies
-		local currentValue = modules.game_cyclopedia.Cyclopedia.Items.getCurrentItemValue(item)
+		local currentValue = Cyclopedia.Items.getCurrentItemValue(itemPtr)
 		
 		-- If the current value equals market price, user prefers market pricing
 		if currentValue == avgMarket then
@@ -747,8 +747,8 @@ local function getNpcSupplyPrice(item)
 		local npcSalePrice = 0
 		
 		-- Try to get NPC sale data (what NPCs sell to players)
-		if item.getNpcSaleData then
-			local success, npcSaleData = pcall(function() return item:getNpcSaleData() end)
+		if itemPtr.getNpcSaleData then
+			local success, npcSaleData = pcall(function() return itemPtr:getNpcSaleData() end)
 			if success and npcSaleData and #npcSaleData > 0 then
 				-- Get the highest sale price from NPCs (most expensive option that NPCs charge us for the item)
 				for _, npcData in ipairs(npcSaleData) do
@@ -761,13 +761,13 @@ local function getNpcSupplyPrice(item)
 		
 		-- If no NPC sale price found, try market price as fallback
 		if npcSalePrice == 0 then
-			if item.getMeanPrice then
-				local success, result = pcall(function() return item:getMeanPrice() end)
+			if itemPtr.getMeanPrice then
+				local success, result = pcall(function() return itemPtr:getMeanPrice() end)
 				if success and result then
 					npcSalePrice = result
 				end
-			elseif item.getAverageMarketValue then
-				local success, result = pcall(function() return item:getAverageMarketValue() end)
+			elseif itemPtr.getAverageMarketValue then
+				local success, result = pcall(function() return itemPtr:getAverageMarketValue() end)
 				if success and result then
 					npcSalePrice = result
 				end
@@ -783,10 +783,10 @@ function HuntingAnalyser:addSuppliesItems(itemId)
 	if not HuntingAnalyser.suppliesItems[itemId] then
 		-- only at the first time a supply item is added, it will
 		-- have to create a dummy item in order to retrieve the
-		-- item NPC sale price value
+		-- item price value
 
 		local itemPtr = Item.create(itemId, 1)
-		local price = getNpcSupplyPrice(itemPtr)
+		local price = getCurrentPrice(itemPtr)
 		HuntingAnalyser.suppliesItems[itemId] = { count = 0, price = price }
 		supplyItemInfo = HuntingAnalyser.suppliesItems[itemId]
 		itemPtr = nil
