@@ -10,7 +10,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr style="height: 29px" *for="local row in (self.historyList or {})">
+          <tr style="height: 30px" *for="local row in (self.historyList or {})">
             <td style="width: 145px">{{row.createdAt}}</td>
             <td style="width: 85px">{{row.actionType}}</td>
             <td style="width: 230px">{{row.description}}</td>
@@ -21,6 +21,7 @@
 
     <div class="history-footer">
       <button
+        *visible="not self.historyMustDisablePreviousButton"
         *disabled="self.historyMustDisablePreviousButton"
         class="history-footer-previous"
         onclick="self:onHistoryPreviousPage()"
@@ -31,6 +32,7 @@
         {{self.historyCurrentPage}}/{{self.historyLastPage}}
       </div>
       <button
+        *visible="not self.historyMustDisableNextButton"
         *disabled="self.historyMustDisableNextButton"
         class="history-footer-next"
         onclick="self:onHistoryNextPage()"

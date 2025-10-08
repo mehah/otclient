@@ -1,5 +1,5 @@
 .history-container {
-  height: 100%;
+  height: 260px;
   background-color: #404040;
   --border-width-top: 1;
   --border-color-top: black;
@@ -14,16 +14,33 @@
 }
 
 .history-list {
-  height: 260px;
+  height: 100%;
   width: 100%;
   display: block;
+  overflow: scroll;
+}
+
+.history-table {
+  width: 100%;
+  text-align: left;
+  height: 100%;
+}
+
+.history-table tbody tr:nth-child(odd) {
+  background-color: #484848;
+  color: white;
+}
+
+.history-table tbody tr:nth-child(even) {
+  background-color: #414141;
+  color: white;
 }
 
 .history-footer {
   background-color: #363636;
   height: 36px;
   align-items: center;
-  margin-top: 16px;
+  margin-top: 20px;
   position: relative;
   width: 465px;
 }
@@ -43,21 +60,4 @@
 .history-page-label {
   text-align: center;
   align-items: center;
-}
-
-.history-table {
-  width: 100%;
-  text-align: left;
-  height: 100%;
-}
-
-.history-table tbody tr:nth-child(odd) {
-  background-color: #484848;
-  color: white; /* para contraste */
-}
-
-/* Linhas pares */
-.history-table tbody tr:nth-child(even) {
-  background-color: #414141;
-  color: white;
 }

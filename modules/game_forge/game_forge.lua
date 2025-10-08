@@ -305,7 +305,7 @@ function SelectWindow(type, isBackButtonPress)
 
     if type == "historyMenu" then
         if not isBackButtonPress then
-            g_game.sendForgeBrowseHistoryRequest(1)
+            g_game.sendForgeBrowseHistoryRequest(0)
         end
     end
 
@@ -341,10 +341,10 @@ function forgeController:getCurrentWindow()
     return self.currentWindowType and windowTypes[self.currentWindowType]
 end
 
-forgeController.historyCurrentPage = 1
+forgeController.historyCurrentPage = 0
 forgeController.historyLastPage = 1
 function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
-    page = math.max(tonumber(page) or 1, 1)
+    page = math.max(tonumber(page) or 0, 1)
     lastPage = math.max(tonumber(lastPage) or page, 1)
     currentCount = tonumber(currentCount) or 0
     lastPage = lastPage > 1 and lastPage - 1 or lastPage
@@ -360,16 +360,22 @@ function onBrowseForgeHistory(page, lastPage, currentCount, historyList)
         return
     end
 
-    for index, entry in ipairs(historyList) do
+    for _, entry in ipairs(historyList) do
         entry.createdAt = formatHistoryDate(entry.createdAt)
         entry.actionType = historyActionLabels[entry.actionType]
         entry.description = entry.description or '-'
+        if entry.actionType == historyActionLabels[0] or entry.actionType == historyActionLabels[1] then
+            local firstSpaceIndex = string.find(entry.description, " ")
+            if firstSpaceIndex then
+                entry.description = string.sub(entry.description, 1, firstSpaceIndex - 1)
+            end
+        end
     end
     forgeController.historyList = historyList or {}
 end
 
 function forgeController:onHistoryPreviousPage()
-    local currentPage = forgeController.historyCurrentPage or 1
+    local currentPage = forgeController.historyCurrentPage or 0
     if currentPage <= 1 then
         return
     end
@@ -378,7 +384,7 @@ function forgeController:onHistoryPreviousPage()
 end
 
 function forgeController:onHistoryNextPage()
-    local currentPage = forgeController.historyCurrentPage or 1
+    local currentPage = forgeController.historyCurrentPage or 0
     local lastPage = forgeController.historyLastPage or currentPage
 
     if currentPage >= lastPage then
