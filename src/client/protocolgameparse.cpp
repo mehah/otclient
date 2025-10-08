@@ -2018,7 +2018,6 @@ void ProtocolGame::parseTrappers(const InputMessagePtr& msg)
 void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
 {
     ForgeOpenData data;
-    g_logger.info("parseOpenForge");
 
     const uint16_t fusionCount = msg->getU16();
     data.fusionItems.reserve(fusionCount);
@@ -2029,7 +2028,6 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
         item.tier = msg->getU8();
         item.count = msg->getU16();
         data.fusionItems.emplace_back(item);
-        g_logger.info("fusion item: id {}, tier {}, count {}", item.id, item.tier, item.count);
     }
 
     const uint16_t convergenceFusionCount = msg->getU16();
@@ -2044,7 +2042,6 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
             item.tier = msg->getU8();
             item.count = msg->getU16();
             slotItems.emplace_back(item);
-            g_logger.info("convergence fusion item: id {}, tier {}, count {}", item.id, item.tier, item.count);
         }
         data.convergenceFusion.emplace_back(slotItems);
     }
@@ -2061,7 +2058,6 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
             donor.tier = msg->getU8();
             donor.count = msg->getU16();
             transfer.donors.emplace_back(donor);
-            g_logger.info("transfer donor item: id {}, tier {}, count {}", donor.id, donor.tier, donor.count);
         }
         const uint16_t receiverCount = msg->getU16();
         transfer.receivers.reserve(receiverCount);
@@ -2071,7 +2067,6 @@ void ProtocolGame::parseOpenForge(const InputMessagePtr& msg)
             receiver.count = msg->getU16();
             receiver.tier = 0;
             transfer.receivers.emplace_back(receiver);
-            g_logger.info("transfer receiver item: id {}, count {}", receiver.id, receiver.count);
         }
         data.transfers.emplace_back(transfer);
     }
