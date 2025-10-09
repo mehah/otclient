@@ -99,6 +99,7 @@ MiniWindow
       margin-top: 2
       box-text-padding: 27
       @onTextChange: modules.game_analyser.checkBossSearch(self:getText())
+      @onFocusChange: modules.game_analyser.onBossSearchFocusChange(self, focused)
       !placeholder: tr('Type to search')
 
       Button
