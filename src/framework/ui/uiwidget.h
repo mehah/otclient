@@ -75,8 +75,7 @@ enum FlagProp : uint64_t
     PropUpdateChildrenIndexStates = 1 << 24,
     PropDisableUpdateTemporarily = 1 << 25,
     PropApplyAnchorAlignment = 1 << 26,
-    PropUpdateSize = 1 << 27,
-    PropIgnoreMouseEvent = 1 << 28
+    PropUpdateSize = 1 << 27
 };
 
 enum class DisplayType : uint8_t
@@ -313,7 +312,6 @@ public:
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
     void setOverflow(OverflowType type);
-    void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
     void setPositionType(PositionType t) {
         m_positionType = t;
 
@@ -523,7 +521,6 @@ public:
     bool isClipping() { return hasProp(PropClipping) || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll); }
     bool isDestroyed() { return hasProp(PropDestroyed); }
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
-    bool isIgnoreEvent() { return hasProp(PropIgnoreMouseEvent); }
     bool isEffectivelyVisible() { return isVisible() || m_displayType != DisplayType::None; }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }

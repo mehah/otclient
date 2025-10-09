@@ -2096,7 +2096,7 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
         }
     }
 
-    if (!isIgnoreEvent() && (!checkContainsPoint || containsPoint(mousePos))) {
+    if (!checkContainsPoint || containsPoint(mousePos)) {
         widgetList.emplace_back(static_self_cast<UIWidget>());
 
         if (!isPhantom() && !isOnHtml() || isDraggable())
