@@ -55,9 +55,10 @@ cancelNextRelease = nil
 sellAllWithDelayEvent = nil
 
 function saveData()
-  if not LoadedPlayer:isLoaded() then return end
+  local player = g_game.getLocalPlayer()
+  if not player:isLoaded() then return end
 
-  local file = "/characterdata/" .. LoadedPlayer:getId() .. "/sellAllWhitelist.json"
+  local file = "/characterdata/" .. player:getId() .. "/sellAllWhitelist.json"
   local status, result = pcall(function() return json.encode(sellAllWhitelist, 2) end)
   if not status then
     return g_logger.error("Error while saving profile sellAllWhitelist. Data won't be saved. Details: " .. result)
@@ -70,9 +71,10 @@ function saveData()
 end
 
 function loadData()
-  if not LoadedPlayer:isLoaded() then return end
+  local player = g_game.getLocalPlayer()
+  if not player:isLoaded() then return end
 
-  local file = "/characterdata/" .. LoadedPlayer:getId() .. "/sellAllWhitelist.json"
+  local file = "/characterdata/" .. player:getId() .. "/sellAllWhitelist.json"
   if g_resources.fileExists(file) then
     local status, result = pcall(function()
       return json.decode(g_resources.readFileContents(file))
