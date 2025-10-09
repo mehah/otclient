@@ -28,6 +28,24 @@ input[type="password"] {
   --text-hidden: true;
 }
 
+input {
+  width: 80;
+  height: 14;
+}
+
+input:disabled {
+  color: #c0c0c0ff;
+  opacity: 0.5;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 14;
+  height: 14;
+  padding: 0;
+  margin: 0;
+}
+
 textarea {
   white-space: pre;
   width: 128;
@@ -47,6 +65,10 @@ br {
 
 div {
   display: block;
+}
+
+img {
+  display: inline-block;
 }
 
 pre {

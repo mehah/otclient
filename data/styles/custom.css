@@ -22,6 +22,8 @@ SmallReversedQtPanel {
 Item,
 Creature {
   padding: 1;
+  width: 32;
+  height: 32;
 }
 
 Creature {
@@ -74,11 +76,6 @@ InputBoxComboBoxPopupMenu,
 InputBoxComboBoxPopupMenuButton,
 InputBoxButton {
   margin-left: 10;
-}
-
-input {
-  padding: 4;
-  padding-bottom: 1;
 }
 
 TextQtEdit {
