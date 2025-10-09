@@ -442,14 +442,6 @@ function onExperienceChange(localPlayer, value)
 end
 
 function onUpdateExperience(rawExp, exp)
-  -- This function might be called with the XP gain amount directly
-  -- If rawExp and exp represent gains (not totals), we should use them directly
-  
-  -- TEMPORARILY DISABLED: Testing if onExperienceChange is sufficient
-  -- HuntingAnalyser:addRawXPGain(exp)  -- This will be processed by calculateRawXP() internally
-  -- HuntingAnalyser:addXpGain(exp)
-  -- XPAnalyser:addRawXPGain(exp)       -- This will be processed by calculateRawXP() internally  
-  -- XPAnalyser:addXpGain(exp)
 end
 
 function onLootStats(item, name)
