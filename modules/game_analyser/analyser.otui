@@ -2,7 +2,7 @@ MiniWindow
   id: analyserMiniWindow
   &type: 'analyticsSelector'
   !text: tr('Analytics Selector')
-  height: 247
+  height: 237
   @onClose: modules.game_analyser.hide();
   @onOpen: modules.game_analyser.onOpen();
   &save: true
@@ -178,22 +178,6 @@ MiniWindow
       $on:
         image-clip: 0 20 158 20
       @onClick: toggleAnalysers('bossButton')
-    
-    Button
-      id: miscButton
-      size: 158 20
-      anchors.top: prev.bottom
-      anchors.left: parent.left
-      margin-top: 3
-      image-source: /images/game/analyzer/miscButton
-      image-clip: 0 0 158 20
-      $hover !on:
-        image-clip: 0 0 158 20
-      $pressed:
-        image-clip: 0 20 158 20
-      $on:
-        image-clip: 0 20 158 20
-      @onClick: toggleAnalysers('miscButton')
 
   ResizeBorder
     id: bottomResizeBorder

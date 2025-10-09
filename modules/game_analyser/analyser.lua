@@ -20,8 +20,7 @@ local analyserWindows = {
   xpButton = 'styles/xp',
   dropButton = 'styles/droptracker',
   partyButton = 'styles/partyhunt',
-  bossButton = 'styles/boss',
-  miscButton = 'styles/misc'
+  bossButton = 'styles/boss'
 }
 
 -- Utility function to get combat name from effect ID
@@ -125,7 +124,6 @@ function init()
   dropButton = analyserMiniWindow:recursiveGetChildById("dropButton")
   partyButton = analyserMiniWindow:recursiveGetChildById("partyButton")
   bossButton = analyserMiniWindow:recursiveGetChildById("bossButton")
-  miscButton = analyserMiniWindow:recursiveGetChildById("miscButton")
 
   for id, style in pairs(analyserWindows) do
     openedWindows[id] = g_ui.loadUI(style)
@@ -165,9 +163,6 @@ function init()
   BossCooldown:create()
   BossCooldown:updateWindow()
 
-  MiscAnalyzer:create()
-  MiscAnalyzer:updateWindow()
-
   connect(g_game, {
     onGameStart = onlineAnalyser,
     onGameEnd = offlineAnalyser,
@@ -178,9 +173,6 @@ function init()
     onPartyAnalyzer = onPartyAnalyzer,
     onBossCooldown = onBossCooldown,
     onUpdateExperience = onUpdateExperience,
-    onCharmActivated = onCharmActivated,
-    onImbuementActivated = onImbuementActivated,
-    onSpecialSkillActivated = onSpecialSkillActivated,
   })
 
   connect(LocalPlayer, {
@@ -232,9 +224,6 @@ function terminate()
     onPartyAnalyzer = onPartyAnalyzer,
     onBossCooldown = onBossCooldown,
     onUpdateExperience = onUpdateExperience,
-    onCharmActivated = onCharmActivated,
-    onImbuementActivated = onImbuementActivated,
-    onSpecialSkillActivated = onSpecialSkillActivated,
   })
   disconnect(LocalPlayer, {
     onExperienceChange = onExperienceChange,
@@ -293,10 +282,6 @@ function startNewSession(login)
     DropTrackerAnalyser:loadConfigJson()
   end
   DropTrackerAnalyser:updateWindow(true)
-
-  MiscAnalyzer:reset()
-  MiscAnalyzer:resetSessionData()
-  MiscAnalyzer:updateWindow(true)
 
   PartyHuntAnalyser:reset()
   PartyHuntAnalyser:updateWindow(true, true)
@@ -358,7 +343,7 @@ function hide()
 end
 
 function onOpen()
-  analyserMiniWindow:setHeight(247)
+  analyserMiniWindow:setHeight(237)
   analyserMiniWindow.isOpen = true
 end
 
@@ -609,8 +594,8 @@ function moveAnalyser(panel, height, minimzed)
     analyserMiniWindow:minimize()
   else
     -- Hardcoded height
-    if height < 247 then
-      height = 247
+    if height < 237 then
+      height = 237
     end
 
     analyserMiniWindow:maximize()
@@ -630,8 +615,7 @@ function moveChildAnalyser(type, panel, height, minimzed)
     ['lootAnalyser'] = 'lootButton',
     ['partyHuntAnalyser'] = 'partyButton',
     ['wasteAnalyser'] = 'supplyButton',
-    ['xpAnalyser'] = 'xpButton',
-    ['miscAnalyzer'] = 'miscButton'
+    ['xpAnalyser'] = 'xpButton'
   }
 
   local widget = openedWindows[window[type]]
@@ -659,16 +643,4 @@ function moveChildAnalyser(type, panel, height, minimzed)
   end
 
   return widget
-end
-
-function onCharmActivated(charmId)
-  MiscAnalyzer:onCharmActivated(charmId)
-end
-
-function onImbuementActivated(imbuementId, amount)
-  MiscAnalyzer:onImbuementActivated(imbuementId, amount)
-end
-
-function onSpecialSkillActivated(skillId)
-  MiscAnalyzer:onSpecialSkillActivated(skillId)
 end
