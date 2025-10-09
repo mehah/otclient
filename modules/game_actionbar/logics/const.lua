@@ -98,4 +98,13 @@ UseTypesTip = {
     [UseTypeEquip] = "%s %s",
     [UseTypeUse] = "Use %s"
 }
+
+PassiveAbilities = {
+    [1] = {
+        name = "Gift of Life",
+        exhaustion = 60 * 60 * 30 * 1000, --ms
+        type = 'Passive',
+        icon = '/images/game/spells/passiveability-icons-32x32'
+    }
+}
 -- LuaFormatter on

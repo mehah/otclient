@@ -437,14 +437,7 @@ end
 -- /*=============================================
 -- =            Passive html Windows          =
 -- =============================================*/
-local PassiveAbilities = {
-    [1] = {
-        name = "Gift of Life",
-        exhaustion = 60 * 60 * 30 * 1000, --ms
-        type = 'Passive',
-        icon = '/images/game/spells/passiveability-icons-32x32'
-    }
-}
+
 function assignPassive(button)
     local actionbar = button:getParent():getParent()
     if actionbar.locked then
