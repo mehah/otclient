@@ -94,14 +94,14 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             Point maxPoint(dest.left() - 10, dest.top() + 0);
             g_drawPool.rotate(maxPoint, rotationAngle);
             Rect maxRect(maxPoint.x - 50, maxPoint.y - 8, 100, 16);
-            m_font->drawText(m_maxValue, Rect(maxRect.x()-1, maxRect.y()-1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_maxValue, Rect(maxRect.x()+1, maxRect.y()-1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_maxValue, Rect(maxRect.x()-1, maxRect.y()+1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_maxValue, Rect(maxRect.x()+1, maxRect.y()+1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y()-1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y()+1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_maxValue, Rect(maxRect.x()-1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_maxValue, Rect(maxRect.x()+1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() - 1, maxRect.y() - 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() + 1, maxRect.y() - 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() - 1, maxRect.y() + 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() + 1, maxRect.y() + 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y() - 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y() + 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() - 1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() + 1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
             m_font->drawText(m_maxValue, maxRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
             
@@ -109,14 +109,14 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             Point minPoint(dest.left() - 10, dest.bottom() - 0);
             g_drawPool.rotate(minPoint, rotationAngle);
             Rect minRect(minPoint.x - 50, minPoint.y - 8, 100, 16);
-            m_font->drawText(m_minValue, Rect(minRect.x()-1, minRect.y()-1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_minValue, Rect(minRect.x()+1, minRect.y()-1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_minValue, Rect(minRect.x()-1, minRect.y()+1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_minValue, Rect(minRect.x()+1, minRect.y()+1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y()-1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y()+1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_minValue, Rect(minRect.x()-1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_minValue, Rect(minRect.x()+1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() - 1, minRect.y() - 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() + 1, minRect.y() - 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() - 1, minRect.y() + 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() + 1, minRect.y() + 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y() - 1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y() + 1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() - 1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() + 1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
             m_font->drawText(m_minValue, minRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
             
@@ -124,14 +124,14 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             Point avgPoint(dest.left() - 10, dest.verticalCenter());
             g_drawPool.rotate(avgPoint, rotationAngle);
             Rect avgRect(avgPoint.x - 50, avgPoint.y - 8, 100, 16);
-            m_font->drawText(m_avgValue, Rect(avgRect.x()-1, avgRect.y()-1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_avgValue, Rect(avgRect.x()+1, avgRect.y()-1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_avgValue, Rect(avgRect.x()-1, avgRect.y()+1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_avgValue, Rect(avgRect.x()+1, avgRect.y()+1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
-            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y()-1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y()+1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_avgValue, Rect(avgRect.x()-1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
-            m_font->drawText(m_avgValue, Rect(avgRect.x()+1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() - 1, avgRect.y() - 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() + 1, avgRect.y() - 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() - 1, avgRect.y() + 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() + 1, avgRect.y() + 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y() - 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y() + 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() - 1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() + 1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
             m_font->drawText(m_avgValue, avgRect, Color::lightGray, Fw::AlignCenter);
             g_drawPool.popTransformMatrix();
         }

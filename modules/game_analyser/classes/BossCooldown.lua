@@ -94,6 +94,65 @@ function BossCooldown.create()
 	if cl then
 		cl.onMouseWheel = scrollUIPanel
 	end
+	
+	-- Set up the event handlers for the search text
+	local searchText = BossCooldown.window.contentsPanel.searchText
+	if searchText then
+		-- Store original handlers
+		BossCooldown.originalOnKeyPress = searchText.onKeyPress
+		BossCooldown.originalOnTextChange = searchText.onTextChange
+		
+		-- Override onKeyPress to unbind movement keys immediately when typing
+		searchText.onKeyPress = function(widget, keyCode, keyboardModifiers)
+			-- Unbind movement keys when user starts typing
+			local gameWalk = modules.game_walk
+			if gameWalk then
+				gameWalk.unbindWalkKey('W')
+				gameWalk.unbindWalkKey('D')
+				gameWalk.unbindWalkKey('S')
+				gameWalk.unbindWalkKey('A')
+				gameWalk.unbindWalkKey('E')
+				gameWalk.unbindWalkKey('Q')
+				gameWalk.unbindWalkKey('C')
+				gameWalk.unbindWalkKey('Z')
+				gameWalk.unbindTurnKey('Ctrl+W')
+				gameWalk.unbindTurnKey('Ctrl+D')
+				gameWalk.unbindTurnKey('Ctrl+S')
+				gameWalk.unbindTurnKey('Ctrl+A')
+			end
+			
+			-- Handle Escape key to clear focus and restore movement
+			if keyCode == KeyEscape then
+				-- Re-bind movement keys
+				local gameWalk = modules.game_walk
+				if gameWalk then
+					gameWalk.bindWalkKey('W', North)
+					gameWalk.bindWalkKey('D', East)
+					gameWalk.bindWalkKey('S', South)
+					gameWalk.bindWalkKey('A', West)
+					gameWalk.bindWalkKey('E', NorthEast)
+					gameWalk.bindWalkKey('Q', NorthWest)
+					gameWalk.bindWalkKey('C', SouthEast)
+					gameWalk.bindWalkKey('Z', SouthWest)
+					gameWalk.bindTurnKey('Ctrl+W', North)
+					gameWalk.bindTurnKey('Ctrl+D', East)
+					gameWalk.bindTurnKey('Ctrl+S', South)
+					gameWalk.bindTurnKey('Ctrl+A', West)
+				end
+				widget:clearFocus()
+				return false
+			end
+			
+			-- Call original handler if it exists
+			if BossCooldown.originalOnKeyPress then
+				return BossCooldown.originalOnKeyPress(widget, keyCode, keyboardModifiers)
+			end
+			return false
+		end
+		
+		-- Set up focus change handler
+		searchText.onFocusChange = onBossSearchFocusChange
+	end
 end
 
 function BossCooldown:reset()
@@ -315,6 +374,61 @@ function checkBossSearch(text)
 	else
 		BossCooldown.search = text
 	end
+	
+	-- Immediately apply the search filter
+	if BossCooldown.window and BossCooldown.window.contentsPanel and BossCooldown.window.contentsPanel.bosses then
+		local layout = BossCooldown.window.contentsPanel.bosses:getLayout()
+		if layout then
+			layout:enableUpdates()
+			for _, widget in ipairs(BossCooldown.widgets) do
+				if BossCooldown.search == '' or string.find(widget.name:lower(), BossCooldown.search:lower()) then
+					widget:setVisible(true)
+				else
+					widget:setVisible(false)
+				end
+			end
+			layout:disableUpdates()
+			layout:update()
+		end
+	end
+end
+
+function onBossSearchFocusChange(widget, focused)
+	if focused then
+		-- When gaining focus, unbind movement keys
+		local gameWalk = modules.game_walk
+		if gameWalk then
+			gameWalk.unbindWalkKey('W')
+			gameWalk.unbindWalkKey('D')
+			gameWalk.unbindWalkKey('S')
+			gameWalk.unbindWalkKey('A')
+			gameWalk.unbindWalkKey('E')
+			gameWalk.unbindWalkKey('Q')
+			gameWalk.unbindWalkKey('C')
+			gameWalk.unbindWalkKey('Z')
+			gameWalk.unbindTurnKey('Ctrl+W')
+			gameWalk.unbindTurnKey('Ctrl+D')
+			gameWalk.unbindTurnKey('Ctrl+S')
+			gameWalk.unbindTurnKey('Ctrl+A')
+		end
+	else
+		-- When losing focus, bind movement keys back
+		local gameWalk = modules.game_walk
+		if gameWalk then
+			gameWalk.bindWalkKey('W', North)
+			gameWalk.bindWalkKey('D', East)
+			gameWalk.bindWalkKey('S', South)
+			gameWalk.bindWalkKey('A', West)
+			gameWalk.bindWalkKey('E', NorthEast)
+			gameWalk.bindWalkKey('Q', NorthWest)
+			gameWalk.bindWalkKey('C', SouthEast)
+			gameWalk.bindWalkKey('Z', SouthWest)
+			gameWalk.bindTurnKey('Ctrl+W', North)
+			gameWalk.bindTurnKey('Ctrl+D', East)
+			gameWalk.bindTurnKey('Ctrl+S', South)
+			gameWalk.bindTurnKey('Ctrl+A', West)
+		end
+	end
 end
 function clearSearch()
 	BossCooldown.search = ''
@@ -354,15 +468,50 @@ function toggleBossCDFocus(visible)
 		widget:setPhantom(true)
 	elseif widget then
 		widget:setPhantom(false)
-		widget.onClick = function() 
-			toggleBossCDFocus(not visible) 
+		widget.onClick = function()
+			modules.game_interface.toggleInternalFocus();
+			toggleBossCDFocus(not visible)
 		end
 	end
+
+	modules.game_interface.toggleFocus(visible, "bosscooldown")
 
 	if visible then
 		local text = BossCooldown.window.contentsPanel.searchText
 		text:focus()
+		-- Immediately unbind movement keys when search becomes active
+		local gameWalk = modules.game_walk
+		if gameWalk then
+			gameWalk.unbindWalkKey('W')
+			gameWalk.unbindWalkKey('D')
+			gameWalk.unbindWalkKey('S')
+			gameWalk.unbindWalkKey('A')
+			gameWalk.unbindWalkKey('E')
+			gameWalk.unbindWalkKey('Q')
+			gameWalk.unbindWalkKey('C')
+			gameWalk.unbindWalkKey('Z')
+			gameWalk.unbindTurnKey('Ctrl+W')
+			gameWalk.unbindTurnKey('Ctrl+D')
+			gameWalk.unbindTurnKey('Ctrl+S')
+			gameWalk.unbindTurnKey('Ctrl+A')
+		end
 	else
+		-- Re-bind movement keys when search becomes inactive
+		local gameWalk = modules.game_walk
+		if gameWalk then
+			gameWalk.bindWalkKey('W', North)
+			gameWalk.bindWalkKey('D', East)
+			gameWalk.bindWalkKey('S', South)
+			gameWalk.bindWalkKey('A', West)
+			gameWalk.bindWalkKey('E', NorthEast)
+			gameWalk.bindWalkKey('Q', NorthWest)
+			gameWalk.bindWalkKey('C', SouthEast)
+			gameWalk.bindWalkKey('Z', SouthWest)
+			gameWalk.bindTurnKey('Ctrl+W', North)
+			gameWalk.bindTurnKey('Ctrl+D', East)
+			gameWalk.bindTurnKey('Ctrl+S', South)
+			gameWalk.bindTurnKey('Ctrl+A', West)
+		end
 		BossCooldown.window:setBorderWidth(0)
 	end
 end
