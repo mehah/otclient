@@ -1,0 +1,111 @@
+QuickSellItemBox < UIWidget
+  background-color: #484848
+  height: 38
+  Label
+    id: itemName
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 3
+    text-auto-resize: true
+    font: Verdana Bold-11px
+    color: #C0C0C0
+  UIButton
+    id: buttonItemClear
+    size: 20 20
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 14
+    image-source: /images/game/quickloot/button-clear-up
+  UIWidget
+    size: 34 34
+    image-source: /images/ui/item
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: buttonItemClear.left
+    margin-right: 6
+  UIItem
+    id: itemId
+    size: 32 32
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: buttonItemClear.left
+    margin-right: 7
+    priceable: true
+    virtual: true
+    draggable: false
+    phantom: true
+
+NewHeadlessWindow
+  id: blackListWindow
+  anchors.horizontalCenter: parent.horizontalCenter
+  size: 360 330
+  @onEscape: hide()
+  UIWidget
+    size: 145 56
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: -33
+    image-source: /images/game/tutorial/backdrop_crestr
+    phantom: true
+  Panel
+    id: contentPanel
+    anchors.fill: parent
+    margin: 15 13 17 13
+    Panel
+      id: infoPanel
+      height: 60
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 11
+      image-source: /images/ui/t2pixel-up-frame-borderimage
+      image-border: 18
+      Label
+        id: title
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-top: 2
+        !text: tr('Quick Sell Blacklist')
+        font: Verdana Bold-11px
+        color: #909090
+        text-auto-resize: true
+      Label
+        id: blacklistLabel
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        text-auto-resize: true
+        text-wrap: true
+        margin-top: 5
+        margin-left: 8
+        !text: tr('Refine your Quick Sell Items by setting objects\nyou do not want to Quick Sell.')
+        font: Verdana Bold-11px
+        color: #C0C0C0
+    TextList
+      id: itemsList
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: separator.top
+      margin-top: 7
+      margin-bottom: 10
+      padding: 1
+      focusable: true
+      vertical-scrollbar: itemsListScrollBar
+    VerticalScrollBar
+      id: itemsListScrollBar
+      anchors.top: prev.top
+      anchors.right: prev.right
+      anchors.bottom: prev.bottom
+      margin: 1 1 1 0
+      step: 34
+      pixels-scroll: true
+    HorizontalSeparator
+      id: separator
+      anchors.bottom: closeButton.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 9
+    Button
+      id: closeButton
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      !text: tr('Close')
+      size: 43 20
