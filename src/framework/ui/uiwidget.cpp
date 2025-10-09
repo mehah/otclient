@@ -1149,6 +1149,12 @@ bool UIWidget::setRect(const Rect& rect)
         clampedRect = rect.clamp(minSize, maxSize);
     }
 
+    if (!isOnHtml()) {
+        if (m_width.unit == Unit::Px)
+            m_width.valueCalculed = clampedRect.width();
+        if (m_height.unit == Unit::Px)
+            m_height.valueCalculed = clampedRect.height();
+    }
     /*
     if(rect.width() > 8192 || rect.height() > 8192) {
         g_logger.error("attempt to set huge rect size ({}) for {}", stdext::to_string(rect), m_id);
