@@ -299,7 +299,6 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);
-        widget->setIgnoreEvent(true);
         widget->setFocusable(false);
         widget->setPhantom(true);
     }
@@ -493,7 +492,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     }
 
     if (isDynamic) {
-        parent->refreshHtml(insertWithOrder);
+        widget->refreshHtml(insertWithOrder);
     }
 
     return widget;

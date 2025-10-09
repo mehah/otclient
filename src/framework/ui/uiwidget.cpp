@@ -1250,8 +1250,7 @@ void UIWidget::setVisible(const bool visible)
     else
         g_ui.onWidgetDisappear(static_self_cast<UIWidget>());
 
-    if (m_parent)
-        m_parent->refreshHtml(true);
+    refreshHtml(true);
 }
 
 void UIWidget::setOn(const bool on)

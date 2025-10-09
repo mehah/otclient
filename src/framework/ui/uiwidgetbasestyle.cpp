@@ -187,9 +187,12 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 setPhantom(node->value<std::string>() == "none");
             else
                 setPhantom(node->value<bool>());
-        } else if (node->tag() == "size")
+        } else if (node->tag() == "size") {
+            // Skip the "size" attribute when the widget comes from HTML,
+            // since dimensions are managed by CSS (width/height) in that context.
+            if (isOnHtml()) return;
             setSize(node->value<Size>());
-        else if (node->tag() == "fixed-size")
+        } else if (node->tag() == "fixed-size")
             setFixedSize(node->value<bool>());
         else if (node->tag() == "min-size")
             setMinSize(node->value<Size>());

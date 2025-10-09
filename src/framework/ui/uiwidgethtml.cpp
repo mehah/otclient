@@ -749,14 +749,14 @@ namespace {
     }
 }
 
-void UIWidget::refreshHtml(bool childrenTo) {
-    if (!isOnHtml())
+void UIWidget::refreshHtml(bool siblingsTo) {
+    if (!isOnHtml() || !m_parent)
         return;
 
     UIWidget* parent_fitWidth = nullptr;
     UIWidget* parent_fitHeight = nullptr;
 
-    auto parent = this;
+    auto parent = m_parent.get();
     while (parent && parent->isOnHtml()) {
         if (parent->m_width.unit == Unit::FitContent)
             parent_fitWidth = parent;
@@ -772,8 +772,8 @@ void UIWidget::refreshHtml(bool childrenTo) {
     if (parent_fitHeight)
         parent_fitHeight->applyDimension(false, parent_fitHeight->m_height.unit, parent_fitHeight->m_height.value);
 
-    if (childrenTo) {
-        for (const auto& child : m_children) {
+    if (siblingsTo) {
+        for (const auto& child : m_parent->m_children) {
             child->scheduleHtmlTask(PropApplyAnchorAlignment);
         }
     }
@@ -858,16 +858,7 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         scheduleHtmlTask(PropUpdateSize);
     }
 
-    refreshAnchorAlignment(true);
-}
-
-void UIWidget::refreshAnchorAlignment(bool onlyChild) {
-    if (!onlyChild)
-        scheduleHtmlTask(PropApplyAnchorAlignment);
-
-    for (const auto& child : m_children) {
-        child->refreshAnchorAlignment();
-    }
+    refreshHtml(true);
 }
 
 void UIWidget::updateTableLayout()
@@ -1277,8 +1268,6 @@ void UIWidget::setOverflow(OverflowType type) {
 
     m_overflowType = type;
 
-    scheduleHtmlTask(PropApplyAnchorAlignment);
-
     if (type == OverflowType::Scroll) {
         auto scrollWidget = g_ui.createWidget("VerticalScrollBar", nullptr);
         scrollWidget->setDisplay(m_displayType);
@@ -1365,7 +1354,7 @@ UIWidgetPtr UIWidget::getVirtualParent() const {
 void UIWidget::updateSize() {
     if (!isAnchorable()) return;
 
-    if (m_htmlNode && m_htmlNode->getType() == NodeType::Text) {
+    if (m_htmlNode && (m_htmlNode->getType() == NodeType::Text || m_htmlNode->getStyle("inherit-text") == "true")) {
         const auto& parentSize = m_parent->m_width.unit == Unit::FitContent ? m_textSizeNowrap : m_parent->getSize();
 
         auto height = m_textSizeNowrap.height();
@@ -1377,8 +1366,8 @@ void UIWidget::updateSize() {
         }
 
         setSize({
-            std::min<int>(parentSize.width(), m_textSizeNowrap.width()),
-            height
+            std::min<int>(parentSize.width() , m_textSizeNowrap.width()) + getPaddingLeft() + getPaddingRight() + m_textOffset.x,
+            height + getPaddingTop() + getPaddingBottom() + m_textOffset.y
         });
         return;
     }

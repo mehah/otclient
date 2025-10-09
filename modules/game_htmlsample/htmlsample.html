@@ -23,6 +23,7 @@
     position: absolute;
     right: 0;
     bottom: 0;
+    background-color: red;
   }
 
   .equalizerEffect {
@@ -70,6 +71,19 @@
 
   #players .buttonRemovePlayer {
     width: 5;
+  }
+
+  button {
+    text-align: center !important;
+    padding: 0;
+  }
+
+  button > :first {
+  }
+
+  button > :first:pressed {
+    --text-offset: 1 1;
+    background-color: red;
   }
 </style>
 <script type="text">

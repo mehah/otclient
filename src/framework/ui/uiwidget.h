@@ -316,13 +316,13 @@ public:
     void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
     void setPositionType(PositionType t) {
         m_positionType = t;
+
         if (m_positionType == PositionType::Absolute) {
             applyDimension(true, m_width.unit, m_width.value);
             applyDimension(false, m_height.unit, m_height.value);
         }
 
-        if (m_parent)
-            m_parent->refreshAnchorAlignment();
+        refreshHtml();
     }
     void setPositions(std::string_view type, std::string_view value);
 
@@ -445,7 +445,6 @@ private:
     void updateTableLayout();
     void applyAnchorAlignment();
     void scheduleHtmlTask(FlagProp prop);
-    void refreshAnchorAlignment(bool onlyChild = false);
 
     OTMLNodePtr m_stateStyle;
     int32_t m_states{ Fw::DefaultState };
@@ -721,7 +720,7 @@ private:
     void parseImageStyle(const OTMLNodePtr& styleNode);
     void applyDimension(bool isWidth, std::string valueStr);
     void applyDimension(bool isWidth, Unit unit, int16_t value);
-    void refreshHtml(bool childrenTo = false);
+    void refreshHtml(bool siblingsTo = false);
 
     void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
     void configureBorderImage() { setProp(PropImageBordered, true); updateImageCache(); }

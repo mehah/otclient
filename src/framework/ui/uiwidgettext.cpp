@@ -242,10 +242,8 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         onTextChange(m_text, oldText);
     }
 
-    if (isOnHtml() && m_parent) {
-        scheduleHtmlTask(PropUpdateSize);
-        m_parent->refreshHtml(true);
-    }
+    scheduleHtmlTask(PropUpdateSize);
+    refreshHtml(true);
 }
 
 void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireLuaCall)
