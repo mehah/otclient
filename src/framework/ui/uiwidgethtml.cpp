@@ -707,8 +707,8 @@ namespace {
                 if (subH > 0) childContentH = std::max<int>(childContentH, subH);
             }
 
-            const int childOuterW = std::max<int>(0, childContentW) + c->getPaddingLeft() + c->getPaddingRight();
-            const int childOuterH = std::max<int>(0, childContentH) + c->getPaddingTop() + c->getPaddingBottom();
+            const int childOuterW = std::max<int>(0, childContentW);
+            const int childOuterH = std::max<int>(0, childContentH);
 
             if (breakLine(c->getDisplay())) {
                 flushLine();
@@ -834,13 +834,17 @@ void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
         case Unit::Px:
         case Unit::Invalid:
         default: {
-            if (isOnHtml())
-                value += getPaddingLeft() + getPaddingRight();
-
             valueCalculed = value;
 
-            if (isWidth) setWidth_px(value);
-            else         setHeight_px(value);
+            if (isWidth) {
+                if (isOnHtml())
+                    value += getPaddingLeft() + getPaddingRight();
+                setWidth_px(value);
+            } else {
+                if (isOnHtml())
+                    value += getPaddingTop() + getPaddingBottom();
+                setHeight_px(value);
+            }
             break;
         }
     }

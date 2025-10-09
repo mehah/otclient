@@ -26,10 +26,6 @@ Creature {
   height: 32;
 }
 
-Creature {
-  padding: 1;
-}
-
 CheckBoxButton {
   padding: 5 10 5 10;
 }

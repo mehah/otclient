@@ -293,6 +293,7 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     node->setWidget(widget);
 
+    widget->setSize(0); // Resets the size of widgets created from OTML to (0, 0)
     widget->setHtmlNode(node);
     widget->setHtmlRootId(htmlId);
     widget->ensureUniqueId();

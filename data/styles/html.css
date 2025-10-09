@@ -22,6 +22,11 @@
 
 button {
   text-align: center !important;
+  padding: 5 10 5 10;
+}
+
+button > :pressed {
+  padding: 8 10;
 }
 
 input[type="password"] {
@@ -31,6 +36,7 @@ input[type="password"] {
 input {
   width: 80;
   height: 14;
+  padding: 2;
 }
 
 input:disabled {
