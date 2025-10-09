@@ -120,9 +120,7 @@ UIWidget
     image-border: 1
     margin-bottom: 16
     padding-left: 3
-    $mobile:
-      visible: false
-      
+
     layout:
       type: horizontalBox
       fit-children: true
@@ -306,8 +304,6 @@ UIWidget
         self:setMarginBottom(math.min(math.max(parentHeight - 150, maxHeight), self:getMarginBottom()))
       end
 
-    $mobile:
-      visible: false
   UIWidget
     id: mouseGrabber
     focusable: false

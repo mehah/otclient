@@ -1752,7 +1752,8 @@ function testExtendedView(mode)
         gameBottomPanel:getChildById('rightResizeBorder'):enable()
         gameMainRightPanel:setHeight(0)
         gameMainRightPanel:setImageColor('alpha')
-
+        gameBottomPanel:addAnchor(AnchorTop, 'gameBottomActionPanel', AnchorBottom)
+        gameBottomPanel:addAnchor(AnchorBottom, 'parent', AnchorBottom)
     else
         -- Reset to normal view
         gameMainRightPanel:setHeight(200)
