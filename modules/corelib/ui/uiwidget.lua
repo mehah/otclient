@@ -94,6 +94,10 @@ end
 function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
+    if attr == 'image-source' and not value:starts('/') and not value:starts('\\') then
+        value = '/modules/' .. controller.name .. '/' .. value
+    end
+
     local setterName = ''
     for _, _name in pairs(attr:trim():split('-')) do
         setterName = setterName .. _name:gsub("^%l", string.upper)
