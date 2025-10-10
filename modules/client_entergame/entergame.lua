@@ -26,6 +26,75 @@ local function onError(protocol, message, errorCode)
     })
 end
 
+local function onTokenRequired(protocol)
+    if loadBox then
+        loadBox:destroy()
+        loadBox = nil
+    end
+
+    local function promptForToken()
+        displayInputBox(
+            tr('Authenticator Required'),
+            tr('Please enter your authenticator token:'),
+            function(text)
+                local token = text and text:trim() or ''
+                G.authenticatorToken = token
+
+                if token == '' then
+                    EnterGame.show()
+                    return
+                end
+
+                if token:len() < 6 or token:len() > 8 or not token:match('^%d+$') then
+                    local errorBox = displayErrorBox(
+                        tr('Invalid Token'),
+                        tr('The authenticator token must be a 6 to 8 digit number.')
+                    )
+                    connect(errorBox, {
+                        onOk = function()
+                            promptForToken()
+                        end
+                    })
+                    return
+                end
+
+                protocolLogin = ProtocolLogin.create()
+                protocolLogin.onLoginError = onError
+                protocolLogin.onMotd = onMotd
+                protocolLogin.onSessionKey = onSessionKey
+                protocolLogin.onCharacterList = onCharacterList
+                protocolLogin.onUpdateNeeded = onUpdateNeeded
+                protocolLogin.onTokenRequired = onTokenRequired
+
+                loadBox = displayCancelBox(tr('Please wait'), tr('Authenticating...'))
+                connect(loadBox, {
+                    onCancel = function(msgbox)
+                        loadBox = nil
+                        protocolLogin:cancelLogin()
+                        EnterGame.show()
+                    end
+                })
+
+                if G.clientVersion then
+                    g_game.setClientVersion(G.clientVersion)
+                    g_game.setProtocolVersion(g_game.getClientProtocolVersion(G.clientVersion))
+                end
+                g_game.chooseRsa(G.host)
+
+                protocolLogin:login(G.host, G.port, G.account, G.password, G.authenticatorToken, G.stayLogged)
+            end,
+            function()
+                G.authenticatorToken = ''
+                EnterGame.show()
+            end,
+            G.authenticatorToken or '',
+            8
+        )
+    end
+
+    promptForToken()
+end
+
 local function onMotd(protocol, motd)
     G.motdNumber = tonumber(motd:sub(0, motd:find('\n')))
     G.motdMessage = motd:sub(motd:find('\n') + 1, #motd)
@@ -722,11 +791,13 @@ end
 function EnterGame.doLogin()
     G.account = enterGame:getChildById('accountNameTextEdit'):getText()
     G.password = enterGame:getChildById('accountPasswordTextEdit'):getText()
-    G.authenticatorToken = enterGame:getChildById('authenticatorTokenTextEdit'):getText()
+    local initialToken = enterGame:getChildById('authenticatorTokenTextEdit'):getText()
+    G.authenticatorToken = initialToken and initialToken:trim() or ''
     G.stayLogged = enterGame:getChildById('stayLoggedBox'):isChecked()
     G.host = enterGame:getChildById('serverHostTextEdit'):getText()
     G.port = tonumber(enterGame:getChildById('serverPortTextEdit'):getText())
     local clientVersion = tonumber(clientBox:getText())
+    G.clientVersion = clientVersion
     local httpLogin = enterGame:getChildById('httpLoginBox'):isChecked()
     EnterGame.hide()
 
@@ -751,6 +822,7 @@ function EnterGame.doLogin()
         protocolLogin.onSessionKey = onSessionKey
         protocolLogin.onCharacterList = onCharacterList
         protocolLogin.onUpdateNeeded = onUpdateNeeded
+        protocolLogin.onTokenRequired = onTokenRequired
 
         loadBox = displayCancelBox(tr('Please wait'), tr('Connecting to login server...'))
         connect(loadBox, {
