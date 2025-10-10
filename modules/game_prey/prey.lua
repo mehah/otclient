@@ -327,7 +327,7 @@ local function resetPreyWindowState()
     preyWindow.wildCards:setText('0')
 
     for slot = 0, 2 do
-        onPreyInactive(slot, 0, 0)
+        onPreyInactive(slot, 0, 0, 0)
 
         local prey = preyWindow['slot' .. (slot + 1)]
         if prey then
@@ -519,7 +519,7 @@ function setTimeUntilFreeReroll(slot, timeUntilFreeReroll) -- minutes
     refreshRerollButtonState(slot)
 end
 
-function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
+function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards, option)
     setPickSpecificPreyBonus(slot)
 
     -- tracker
@@ -540,7 +540,7 @@ function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
     prey.locked:show()
 end
 
-function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
+function onPreyInactive(slot, timeUntilFreeReroll, wildcards, option)
     -- tracker
     local tracker = preyTracker.contentsPanel['slot' .. (slot + 1)]
     if tracker then
@@ -1625,6 +1625,13 @@ end
 
 function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, bonusValue, bonusGrade, timeLeft,
                       timeUntilFreeReroll, wildcards, option) -- locktype always 0 for protocols <12
+    -- Handle parameter parsing: server doesn't send wildcards for Active state
+    -- So if option is nil, it means wildcards is actually the option value
+    if option == nil and wildcards ~= nil then
+        option = wildcards
+        wildcards = nil
+    end
+    
     local tracker = preyTracker.contentsPanel['slot' .. (slot + 1)]
     currentHolderName = capitalFormatStr(currentHolderName)
     local percent = (timeLeft / (2 * 60 * 60)) * 100
@@ -1690,7 +1697,7 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
     updatePickSpecificPreyButton(slot, wildcards)
 end
 
-function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
+function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards, option)
     -- tracker
     local tracker = preyTracker.contentsPanel['slot' .. (slot + 1)]
     if tracker then
@@ -1752,7 +1759,7 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
 end
 
 function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValue, bonusGrade, timeUntilFreeReroll,
-                                      wildcards)
+                                      wildcards, option)
     -- tracker
     local tracker = preyTracker.contentsPanel['slot' .. (slot + 1)]
     if tracker then
@@ -1813,7 +1820,7 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
     updatePickSpecificPreyButton(slot, wildcards)
 end
 
-function onPreyListSelection(slot, races, nextFreeReroll, wildcards)
+function onPreyListSelection(slot, races, nextFreeReroll, wildcards, option)
     setTimeUntilFreeReroll(slot, nextFreeReroll)
 
     local prey = getPreySlotWidget(slot)
@@ -1883,7 +1890,7 @@ function onPreyListSelection(slot, races, nextFreeReroll, wildcards)
     updatePickSpecificPreyButton(slot, wildcards)
 end
 
-function onPreyWildcardSelection(slot, races, nextFreeReroll, wildcards)
+function onPreyWildcardSelection(slot, races, nextFreeReroll, wildcards, option)
     updatePickSpecificPreyButton(slot, wildcards)
 end
 

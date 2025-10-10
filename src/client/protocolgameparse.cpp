@@ -5261,6 +5261,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
                 nextFreeReroll = msg->getU32();
                 wildcards = msg->getU8();
+                option = msg->getU8();
             } else {
                 nextFreeReroll = msg->getU16();
             }
@@ -5271,6 +5272,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
                 nextFreeReroll = msg->getU32();
                 wildcards = msg->getU8();
+                option = msg->getU8();
             } else {
                 nextFreeReroll = msg->getU16();
             }
@@ -5306,6 +5308,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
                 nextFreeReroll = msg->getU32();
                 wildcards = msg->getU8();
+                option = msg->getU8();
             } else {
                 nextFreeReroll = msg->getU16();
             }
@@ -5329,6 +5332,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
                 nextFreeReroll = msg->getU32();
                 wildcards = msg->getU8();
+                option = msg->getU8();
             } else {
                 nextFreeReroll = msg->getU16();
             }
@@ -5346,6 +5350,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
                 nextFreeReroll = msg->getU32();
                 wildcards = msg->getU8();
+                option = msg->getU8();
             } else {
                 nextFreeReroll = msg->getU16();
             }
@@ -5367,6 +5372,7 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             if (g_game.getClientVersion() > 1149) { // correct unconfirmed version
                 nextFreeReroll = msg->getU32();
                 wildcards = msg->getU8();
+                option = msg->getU8();
             } else {
                 nextFreeReroll = msg->getU16();
             }
