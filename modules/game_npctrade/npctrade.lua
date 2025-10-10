@@ -251,7 +251,6 @@ end
 function start()
   local benchmark = g_clock.millis()
   loadData()
-  --consoleln("Sell All Whitelist Loot loaded in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds.")
 end
 
 function hide()
@@ -264,7 +263,26 @@ function hide()
   npcWindow:hide()
 
   toggleNPCFocus(false)
-  modules.game_console.getConsole():focus()
+  
+  -- Focus the Server Log tab in the console
+  -- Use the established pattern from other modules
+  local function focusServerLog()
+    if modules.game_console.getTab then
+      local serverTab = modules.game_console.getTab(tr('Server Log'))
+      if serverTab then
+        -- Try to select the tab if consoleTabBar is accessible
+        if modules.game_console.consoleTabBar then
+          modules.game_console.consoleTabBar:selectTab(serverTab)
+        end
+      end
+    end
+  end
+  
+  -- Try the focus operation, fall back to map focus if it fails
+  local success = pcall(focusServerLog)
+  if not success and modules.game_interface.getMapPanel then
+    modules.game_interface.getMapPanel():focus()
+  end
 
   local layout = itemsPanel:getLayout()
   layout:disableUpdates()
