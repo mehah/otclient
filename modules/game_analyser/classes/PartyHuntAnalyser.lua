@@ -360,8 +360,8 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	if membersName then
 		for i, memberInfo in ipairs(membersName) do
 			if type(memberInfo) == "table" then
-				local memberId = memberInfo[1]  -- First element is the ID
-				local memberName = memberInfo[2]  -- Second element is the name
+				local memberId = memberInfo.memberID  -- Use struct field
+				local memberName = memberInfo.memberName  -- Use struct field
 				newMembersName[memberId] = memberName
 			end
 		end
@@ -376,7 +376,7 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 		-- Try to match positions in membersData with IDs from membersName
 		for i, memberInfo in ipairs(membersName) do
 			if type(memberInfo) == "table" then
-				local playerId = memberInfo[1]
+				local playerId = memberInfo.memberID  -- Use struct field
 				local memberData = newMembersData[memberIndex]
 				if memberData then
 					remappedData[playerId] = memberData
@@ -396,7 +396,22 @@ function PartyHuntAnalyser:onPartyAnalyzer(startTime, leaderID, lootType, member
 	local serverMemberIds = {}
 	for playerId, serverData in pairs(newMembersData) do
 		serverMemberIds[playerId] = true
-		PartyHuntAnalyser.membersData[playerId] = serverData
+		
+		-- Convert struct format to expected array format if needed
+		local convertedData = serverData
+		if type(serverData) == "table" and serverData.memberID then
+			-- This is a PartyMemberData struct, convert to array format
+			convertedData = {
+				serverData.memberID,    -- [1] = memberID
+				serverData.highlight,   -- [2] = highlight
+				serverData.loot,        -- [3] = loot
+				serverData.supply,      -- [4] = supply (supplies)
+				serverData.damage,      -- [5] = damage
+				serverData.healing      -- [6] = healing
+			}
+		end
+		
+		PartyHuntAnalyser.membersData[playerId] = convertedData
 		if newMembersName[playerId] then
 			PartyHuntAnalyser.membersName[playerId] = newMembersName[playerId]
 		end

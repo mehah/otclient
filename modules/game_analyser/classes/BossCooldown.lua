@@ -351,12 +351,12 @@ end
 function BossCooldown:setupCooldown(cooldown)
 	BossCooldown.cooldown = {}
 	
-	for i, cooldown in pairs(cooldown) do
-		local raceData = g_things.getRaceData(cooldown[1])
+	for i, cooldownData in pairs(cooldown) do
+		local raceData = g_things.getRaceData(cooldownData.bossRaceId)
 		
 		local bossEntry = {
-			bossId = cooldown[1], 
-			cooldown = cooldown[2], 
+			bossId = cooldownData.bossRaceId, 
+			cooldown = cooldownData.cooldownTime, 
 			name = raceData and raceData.name or "", 
 			outfit = raceData and raceData.outfit or nil
 		}
