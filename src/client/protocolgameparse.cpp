@@ -4312,7 +4312,7 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
     const uint8_t lootType = msg->getU8(); // price type
 
     const uint8_t partyMembersSize = msg->getU8();
-    std::vector<std::tuple<uint32_t, uint8_t, uint64_t, uint64_t, uint64_t, uint64_t>> membersData;
+    std::vector<PartyMemberData> membersData;
     for (auto i = 0; i < partyMembersSize; ++i) {
         const uint32_t memberID = msg->getU32(); // party member id
         const uint8_t highlight = msg->getU8(); // highlight
@@ -4326,7 +4326,7 @@ void ProtocolGame::parsePartyAnalyzer(const InputMessagePtr& msg)
         }
     }
 
-    std::vector<std::tuple<uint32_t, std::string>> membersName;
+    std::vector<PartyMemberName> membersName;
     const bool hasNamesBool = static_cast<bool>(msg->getU8());
     if (hasNamesBool) {
         const uint8_t membersNameSize = msg->getU8();
@@ -5820,13 +5820,13 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
 void ProtocolGame::parseBosstiaryCooldownTimer(const InputMessagePtr& msg)
 {
     const uint16_t bossesOnTrackerSize = msg->getU16();
-    std::vector<std::tuple<uint32_t, uint64_t, Outfit>> cooldownData;
+    std::vector<BossCooldownData> cooldownData;
     
     for (auto i = 0; i < bossesOnTrackerSize; ++i) {
         const uint32_t bossRaceId = msg->getU32(); // bossRaceId
         const uint64_t cooldownTime = msg->getU64(); // Boss cooldown in seconds
         
-        cooldownData.emplace_back(bossRaceId, cooldownTime, Outfit());
+        cooldownData.emplace_back(bossRaceId, cooldownTime);
     }
     
     // Call the Lua callback with the cooldown data
