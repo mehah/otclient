@@ -216,11 +216,11 @@ end
 -- =            SetObject html Windows             =
 -- =============================================*/
 local function canEquipItem(item)
-    if not g_game.getFeature(GameEnterGameShowAppearance) then -- old protocol
-        return true
-    end
     if item:isContainer() then
         return false
+    end
+    if not g_game.getFeature(GameEnterGameShowAppearance) then -- old protocol
+        return true
     end
     if item:getClothSlot() == 0 and (item:getClassification() > 0 or item:isAmmo()) then
         return true

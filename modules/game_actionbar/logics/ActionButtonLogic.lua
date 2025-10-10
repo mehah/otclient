@@ -185,10 +185,14 @@ function onExecuteAction(button, isPress)
     end
 
     if action == UseTypes["Equip"] and button.item then
-        if player:getInventoryCount(button.cache.itemId, button.cache.upgradeTier) == 0 then
+        local tier = 0
+        if g_game.getFeature(GameThingUpgradeClassification) then
+            tier = button.cache.upgradeTier
+        end
+        if player:getInventoryCount(button.cache.itemId, tier) == 0 then
             return
         end
-        g_game.equipItemId(button.cache.itemId, button.cache.upgradeTier)
+        g_game.equipItemId(button.cache.itemId, tier)
     end
 
     if action == UseTypes["Use"] and button.item then
@@ -201,7 +205,7 @@ function onExecuteAction(button, isPress)
 
     if action == UseTypes["UseOnYourself"] and button.item then
         g_game.useInventoryItemWith(button.item:getItemId(), player, button.item:getItemSubType() or -1)
-        if not g_game.getFeature(GameEnterGameShowAppearance) then -- old protocol
+        if not g_game.getFeature(GameEnterGameShowAppearance) then -- temp old protocol
             updateInventoryItems()
         end
     end
@@ -235,6 +239,7 @@ function onExecuteAction(button, isPress)
         modules.game_console.getConsole():setCursorPos(#button.cache.param)
     end
 end
+
 local function translateDisplayHotkey(text)
     if HotkeyShortcuts[text] then
         text = HotkeyShortcuts[text]
@@ -243,6 +248,7 @@ local function translateDisplayHotkey(text)
     end
     return text
 end
+
 function clearButton(button, removeAction)
     local hotkey = button.cache.hotkey
 
@@ -624,6 +630,13 @@ function configureButtonMouseRelease(button)
                 menu:addOption(tr('Clear Action'), function()
                     clearButton(button, true)
                 end)
+            end
+            if button.item and button.item:getItemId() > 100 then
+                if modules.game_bot then
+                    menu:addSeparator()
+                    local useThingId = button.item:getItemId()
+                    menu:addOption("ID: " .. useThingId, function() g_window.setClipboardText(useThingId) end)
+                end
             end
             menu:display(mousePos)
         end
