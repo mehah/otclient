@@ -1677,7 +1677,7 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
         showListRerollConfirmation(slot)
     end
 
-    setOptionCheckedSilently(prey.active.autoReroll.autoRerollCheck, option == PREY_ACTION_BONUSREROLL)
+    setOptionCheckedSilently(prey.active.autoReroll.autoRerollCheck, option == PREY_OPTION_TOGGLE_AUTOREROLL)
     prey.active.autoReroll.autoRerollCheck.onCheckChange = function(widget, checked)
         handleToggleOptions(widget, slot, PREY_OPTION_TOGGLE_AUTOREROLL, checked)
     end
