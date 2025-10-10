@@ -2,13 +2,13 @@
   position: relative;
   background-color: red;
   width: 500;
-  height: 300;
+  height: 350;
 }
 
 .form {
   display: inline-block;
   width: 50%;
-  height: 40%;
+  height: 30%;
   margin-top: 30;
 }
 
@@ -64,5 +64,13 @@
 }
 
 #players uicreature {
-  --creature-size: 16;
+  --creature-size: 32;
+}
+
+img.shield {
+  width: 64;
+  height: 64;
+  position: absolute;
+  right: 0;
+  --shader: Map - Party;
 }

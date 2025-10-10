@@ -5,7 +5,9 @@
 </script>
 <html>
   <window class="content" anchor="parent" *title="self.title">
-    <div style="margin: 10px; text-align: center">{{self.msg}}</div>
+    <img class="shield" src="/data/images/ui/character/offhand" />
+
+    <div style="padding: 15px; text-align: center">{{self.msg}}</div>
     <div class="form">
       <div style="width: 70%; display: inline-block">
         <div>
@@ -39,7 +41,7 @@
             *for="local player in self.players"
             onclick="print('Player: '.. player.name)"
           >
-            <td style="text-align: center">{{index}}</td>
+            <td style="vertical-align: center">{{index}}</td>
             <td>
               <uicreature *outfit="{type = player.lookType}"></uicreature>
             </td>
@@ -56,7 +58,7 @@
         </tbody>
       </table>
     </div>
-    <div>
+    <div style="margin-top: 5">
       <input
         id="showEqualizerEffect"
         type="checkbox"

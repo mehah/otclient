@@ -293,10 +293,12 @@ namespace {
 
     static inline void applyGridOrTable(UIWidget* self, const FlowContext& ctx, bool topCleared) {
         if (!ctx.lastNormalWidget) {
-            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft); self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+            self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
+            self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         } else {
             self->addAnchor(Fw::AnchorLeft, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorRight);
-            if (!topCleared) self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
+            if (!topCleared)
+                self->addAnchor(Fw::AnchorTop, ctx.lastNormalWidget->getId().c_str(), Fw::AnchorTop);
         }
     }
 
@@ -341,6 +343,7 @@ namespace {
     static inline void applyTableColumnLike(UIWidget* self) {
         self->addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
         self->addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
+        self->addAnchor(Fw::AnchorBottom, "parent", Fw::AnchorBottom);
     }
 
     static inline void applyInline(UIWidget* self, const FlowContext& ctx, bool topCleared) {
@@ -1161,6 +1164,23 @@ void UIWidget::updateTableLayout()
     }
 
     for (std::size_t rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
+        const int tallestInRow = rowContentHeights[rowIndex];
+        auto& cells = rowCellInfo[rowIndex];
+        for (auto& info : cells) {
+            if (!info.widget || tallestInRow <= 0) continue;
+
+            UIWidget* cell = info.widget;
+            const int padY = cell->getPaddingTop() + cell->getPaddingBottom();
+            const int contentH = std::max(0, tallestInRow - padY);
+
+            if (cell->m_height.unit == Unit::Auto || cell->m_height.unit == Unit::FitContent) {
+                cell->setHeight_px(contentH);
+                cell->m_height.applyUpdate(cell->getHeight(), SIZE_VERSION_COUNTER);
+            }
+        }
+    }
+
+    for (std::size_t rowIndex = 0; rowIndex < rows.size(); ++rowIndex) {
         UIWidget* row = rows[rowIndex];
         const int rowContentHeight = rowContentHeights[rowIndex];
 
@@ -1469,6 +1489,7 @@ void UIWidget::updateSize() {
 
     if (m_displayType == DisplayType::Table) {
         updateTableLayout();
+        computeAndApplyTableColumns(this);
     } else if (isTableBox(m_displayType)) {
         UIWidget* tableAncestor = m_parent.get();
         while (tableAncestor && tableAncestor->m_displayType != DisplayType::Table) {
@@ -1496,10 +1517,6 @@ void UIWidget::applyAnchorAlignment() {
         addAnchor(Fw::AnchorLeft, "parent", Fw::AnchorLeft);
         addAnchor(Fw::AnchorTop, "parent", Fw::AnchorTop);
         return;
-    }
-
-    if (m_displayType == DisplayType::Table) {
-        computeAndApplyTableColumns(this);
     }
 
     if (m_parent && m_parent->getDisplay() == DisplayType::TableCell) {
