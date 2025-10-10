@@ -75,8 +75,7 @@ enum FlagProp : uint64_t
     PropUpdateChildrenIndexStates = 1 << 24,
     PropDisableUpdateTemporarily = 1 << 25,
     PropApplyAnchorAlignment = 1 << 26,
-    PropUpdateSize = 1 << 27,
-    PropIgnoreMouseEvent = 1 << 28
+    PropUpdateSize = 1 << 27
 };
 
 enum class DisplayType : uint8_t
@@ -313,8 +312,16 @@ public:
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
     void setOverflow(OverflowType type);
-    void setIgnoreEvent(bool v) { setProp(PropIgnoreMouseEvent, v); }
-    void setPositionType(PositionType t) { m_positionType = t;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setPositionType(PositionType t) {
+        m_positionType = t;
+
+        if (m_positionType == PositionType::Absolute) {
+            applyDimension(true, m_width.unit, m_width.value);
+            applyDimension(false, m_height.unit, m_height.value);
+        }
+
+        refreshHtml();
+    }
     void setPositions(std::string_view type, std::string_view value);
 
     auto& getPositions() { return m_positions; }
@@ -408,6 +415,8 @@ public:
     void setTextDrawOrder(const uint8_t order) { m_textDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
     void setBorderDrawOrder(const uint8_t order) { m_borderDrawOrder = static_cast<DrawOrder>(std::min<uint8_t>(order, LAST - 1)); }
     void ensureUniqueId();
+
+    void updateSize();
 private:
     uint64_t m_flagsProp{ 0 };
     PainterShaderProgramPtr m_shader;
@@ -418,6 +427,7 @@ private:
     DrawOrder m_borderDrawOrder{ DrawOrder::FIRST };
 
     // state managment
+
 protected:
     void repaint();
     bool setState(Fw::WidgetState state, bool on);
@@ -430,11 +440,9 @@ private:
     void updateChildrenIndexStates();
     void updateStyle();
 
-    void updateSize();
     void updateTableLayout();
     void applyAnchorAlignment();
     void scheduleHtmlTask(FlagProp prop);
-    void refreshAnchorAlignment(bool onlyChild = false);
 
     OTMLNodePtr m_stateStyle;
     int32_t m_states{ Fw::DefaultState };
@@ -475,10 +483,6 @@ protected:
     // function shortcuts
 public:
     void resize(const int width, const int height) {
-        if (m_width.unit == Unit::Px)
-            m_width.valueCalculed = width;
-        if (m_height.unit == Unit::Px)
-            m_height.valueCalculed = height;
         setRect(Rect(getPosition(), Size(width, height)));
     }
     void move(int x, int y);
@@ -513,7 +517,6 @@ public:
     bool isClipping() { return hasProp(PropClipping) || isOnHtml() && (m_overflowType == OverflowType::Clip || m_overflowType == OverflowType::Scroll); }
     bool isDestroyed() { return hasProp(PropDestroyed); }
     bool isFirstOnStyle() { return hasProp(PropFirstOnStyle); }
-    bool isIgnoreEvent() { return hasProp(PropIgnoreMouseEvent); }
     bool isEffectivelyVisible() { return isVisible() || m_displayType != DisplayType::None; }
 
     bool isFirstChild() { return m_parent && m_childIndex == 1; }
@@ -589,15 +592,7 @@ public:
     void setWidth(std::string widthStr) { applyDimension(true, std::move(widthStr)); }
     void setWidth_px(const int width) { resize(width, getHeight()); }
     void setHeight_px(const int height) { resize(getWidth(), height); }
-    void setSize(const Size& size) {
-        if (m_width.unit == Unit::Px)
-            m_width.valueCalculed = size.width();
-
-        if (m_height.unit == Unit::Px)
-            m_height.valueCalculed = size.height();
-
-        resize(size.width(), size.height());
-    }
+    void setSize(const Size& size) { resize(size.width(), size.height()); }
     void setMinWidth(const int minWidth) { m_minSize.setWidth(minWidth); setRect(m_rect); }
     void setMaxWidth(const int maxWidth) { m_maxSize.setWidth(maxWidth); setRect(m_rect); }
     void setMinHeight(const int minHeight) { m_minSize.setHeight(minHeight); setRect(m_rect); }
@@ -711,7 +706,7 @@ private:
     void parseImageStyle(const OTMLNodePtr& styleNode);
     void applyDimension(bool isWidth, std::string valueStr);
     void applyDimension(bool isWidth, Unit unit, int16_t value);
-    void refreshHtml(bool childrenTo = false);
+    void refreshHtml(bool siblingsTo = false);
 
     void updateImageCache() { if (!m_imageCachedScreenCoords.isNull()) m_imageCachedScreenCoords = {}; }
     void configureBorderImage() { setProp(PropImageBordered, true); updateImageCache(); }
@@ -779,6 +774,8 @@ public:
     int getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
     int getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
 
+    const auto& getTextSizeNoWrap() const { return m_textSizeNowrap; }
+
     // text related
 private:
     void initText();
@@ -786,6 +783,7 @@ private:
 
     Rect m_textCachedScreenCoords;
     Size m_textSize;
+    Size m_textSizeNowrap;
 
 protected:
     virtual void updateText();
@@ -818,14 +816,54 @@ public:
 
     void setText(std::string_view text, bool dontFireLuaCall = false);
     void setColoredText(std::string_view coloredText, bool dontFireLuaCall = false);
-    void setTextAlign(const Fw::AlignmentFlag align) { m_textAlign = align; updateText(); }
-    void setTextOffset(const Point& offset) { m_textOffset = offset; updateText(); }
-    void setTextWrap(const bool textWrap) { setProp(PropTextWrap, textWrap); updateText(); }
-    void setTextAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
-    bool isTextAutoResize() { return hasProp(PropTextHorizontalAutoResize) && hasProp(PropTextVerticalAutoResize); }
+    void setTextAlign(const Fw::AlignmentFlag align) {
+        if (m_textAlign == align)
+            return;
+        m_textAlign = align;
+        updateText();
+    }
 
-    void setTextHorizontalAutoResize(const bool textAutoResize) { setProp(PropTextHorizontalAutoResize, textAutoResize); updateText(); }
-    void setTextVerticalAutoResize(const bool textAutoResize) { setProp(PropTextVerticalAutoResize, textAutoResize); updateText(); }
+    void setTextOffset(const Point& offset) {
+        if (m_textOffset == offset)
+            return;
+        m_textOffset = offset;
+        updateText();
+    }
+
+    void setTextWrap(const bool textWrap) {
+        if (hasProp(PropTextWrap) == textWrap)
+            return;
+        setProp(PropTextWrap, textWrap);
+        updateText();
+    }
+
+    void setTextAutoResize(const bool textAutoResize) {
+        bool changed = (hasProp(PropTextHorizontalAutoResize) != textAutoResize) ||
+            (hasProp(PropTextVerticalAutoResize) != textAutoResize);
+        if (!changed)
+            return;
+        setProp(PropTextHorizontalAutoResize, textAutoResize);
+        setProp(PropTextVerticalAutoResize, textAutoResize);
+        updateText();
+    }
+
+    bool isTextAutoResize() {
+        return hasProp(PropTextHorizontalAutoResize) && hasProp(PropTextVerticalAutoResize);
+    }
+
+    void setTextHorizontalAutoResize(const bool textAutoResize) {
+        if (hasProp(PropTextHorizontalAutoResize) == textAutoResize)
+            return;
+        setProp(PropTextHorizontalAutoResize, textAutoResize);
+        updateText();
+    }
+
+    void setTextVerticalAutoResize(const bool textAutoResize) {
+        if (hasProp(PropTextVerticalAutoResize) == textAutoResize)
+            return;
+        setProp(PropTextVerticalAutoResize, textAutoResize);
+        updateText();
+    }
     void setTextOnlyUpperCase(const bool textOnlyUpperCase) { setProp(PropTextOnlyUpperCase, textOnlyUpperCase); setText(m_text); }
     void setFont(std::string_view fontName);
     void setFontScale(const float scale) { m_fontScale = scale; m_textCachedScreenCoords = {}; updateText(); }

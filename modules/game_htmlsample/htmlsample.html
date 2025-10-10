@@ -1,96 +1,13 @@
-<style>
-  .content {
-    position: relative;
-    background-color: red;
-    width: 500;
-    height: 300;
-  }
-
-  .form {
-    display: inline-block;
-    width: 50%;
-    height: 40%;
-    margin-top: 30;
-  }
-
-  .form > div > uicreature {
-    --creature-size: 64;
-    background-color: blue;
-    border: 1px red;
-  }
-
-  .footer {
-    position: absolute;
-    bottom: 0;
-  }
-
-  .equalizerEffect {
-    position: absolute;
-    bottom: 0;
-    text-align: center;
-    height: 100px;
-  }
-
-  .equalizerEffect > .line {
-    position: relative;
-    width: 15;
-    top: 80;
-    margin-left: 30;
-    background-color: yellow;
-    bottom: 0;
-    display: inline-block;
-  }
-
-  .equalizerEffect > .line:nth-child(odd) {
-    background-color: rgb(202, 75, 202);
-  }
-
-  #players > :nth-child(odd) {
-    background-color: rgb(134, 127, 134);
-  }
-
-  #players {
-    background-color: black;
-    overflow: scroll;
-  }
-
-  #players div uicreature {
-    --creature-size: 32;
-    padding-left: 5px;
-  }
-
-  #players > div:hover {
-    background-color: rgb(104, 106, 241);
-  }
-
-  #players > div {
-    height: 32px;
-  }
-
-  #players div div {
-    display: inline-block;
-    width: 20%;
-    height: 100%;
-    align-items: center;
-  }
-
-  #players .playerName {
-    width: 60%;
-  }
-
-  #players .buttonRemovePlayer {
-    width: 10;
-    height: 100%;
-    line-height: 3;
-  }
-</style>
+<link href="htmlsample.css" />
 <script type="text">
   self.title = "HTML/CSS";
   self.msg = "Welcome to HTML/CSS";
 </script>
 <html>
   <window class="content" anchor="parent" *title="self.title">
-    <div style="margin: 10px; text-align: center">{{self.msg}}</div>
+    <img class="shield" src="/data/images/ui/character/offhand" />
+
+    <div style="padding: 15px; text-align: center">{{self.msg}}</div>
     <div class="form">
       <div style="width: 70%; display: inline-block">
         <div>
@@ -110,23 +27,48 @@
       </div>
     </div>
     <div id="players" class="form">
-      <div
-        *for="local player in self.players"
-        onclick="print('Player: '.. player.name)"
-      >
-        <div>
-          <uicreature
-            *outfit="{type = player.lookType}"
-            center="true"
-          ></uicreature>
-        </div>
-        <div class="playerName">{{player.name}}</div>
-        <button class="buttonRemovePlayer" onclick="self:removePlayer(index)">
-          X
-        </button>
-      </div>
+      <table style="width: 100%">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Outfit</th>
+            <th>Name</th>
+            <th>Remove</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *for="local player in self.players"
+            onclick="print('Player: '.. player.name)"
+          >
+            <td style="text-align: center; vertical-align: center">
+              {{index}}
+            </td>
+            <td>
+              <uicreature *outfit="{type = player.lookType}"></uicreature>
+            </td>
+            <td class="playerName">{{player.name}}</td>
+            <td>
+              <button
+                class="buttonRemovePlayer"
+                onclick="self:removePlayer(index)"
+              >
+                X
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <div class="equalizerEffect">
+    <div style="margin-top: 5">
+      <input
+        id="showEqualizerEffect"
+        type="checkbox"
+        *checked="self.showEqualizerEffect"
+      />
+      <label for="showEqualizerEffect">Show equalizer effect</label>
+    </div>
+    <div class="equalizerEffect" *visible="self.showEqualizerEffect">
       <div class="line"></div>
       <div class="line"></div>
       <div class="line"></div>
