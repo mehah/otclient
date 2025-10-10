@@ -129,7 +129,7 @@ std::string HtmlNode::getStyle(std::string_view styleName) const {
     for (const auto& [key, styles] : m_styles) {
         auto it = styles.find(name);
         if (it != styles.end())
-            return it->second.first;
+            return it->second.value;
     }
 
     return "";
@@ -403,7 +403,7 @@ void HtmlNode::clear() {
 std::string HtmlNode::toString(bool recursive) const {
     switch (type) {
         case NodeType::Text:
-            return "{{" + text + "}}";
+            return isExpression() ? "{{" + text + "}}" : text;
 
         case NodeType::Comment:
             return "<!--" + text + "-->";

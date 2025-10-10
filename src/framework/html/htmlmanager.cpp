@@ -113,9 +113,14 @@ namespace {
     void setChildrenStyles(std::string_view htmlId, HtmlNode* n, const std::string& style, const std::string& prop, const std::string& value) {
         if (n->getType() == NodeType::Element)
             n->getInheritableStyles()[style][prop] = value;
+
         for (const auto& child : n->getChildren()) {
-            child->getStyles()[style][prop] = { value , std::string{htmlId} };
-            setChildrenStyles(htmlId, child.get(), style, prop, value);
+            auto& styleMap = child->getStyles()[style];
+            auto it = styleMap.find(prop);
+            if (it == styleMap.end() || !it->second.important) {
+                child->getStyles()[style][prop] = { value , std::string{htmlId} };
+                setChildrenStyles(htmlId, child.get(), style, prop, value);
+            }
         }
     }
 
@@ -223,9 +228,13 @@ namespace {
                                     style += "!";
                                 style += state.name;
 
-                                node->getStyles()[style][decl.property] = { decl.value , "" };
-                                if (!is_all && isInheritable(decl.property)) {
-                                    setChildrenStyles(widget->getHtmlId(), node.get(), style, decl.property, decl.value);
+                                auto& styleMap = node->getStyles()[style];
+                                auto it = styleMap.find(decl.property);
+                                if (it == styleMap.end() || !it->second.important) {
+                                    styleMap[decl.property] = { decl.value , "", decl.important };
+                                    if (!is_all && isInheritable(decl.property)) {
+                                        setChildrenStyles(widget->getHtmlId(), node.get(), style, decl.property, decl.value);
+                                    }
                                 }
                             }
                             hasMeta = true;
@@ -236,9 +245,13 @@ namespace {
                         continue;
 
                     for (const auto& decl : rule.decls) {
-                        node->getStyles()["styles"][decl.property] = { decl.value , "" };
-                        if (!is_all && isInheritable(decl.property)) {
-                            setChildrenStyles(widget->getHtmlId(), node.get(), "styles", decl.property, decl.value);
+                        auto& styleMap = node->getStyles()["styles"];
+                        auto it = styleMap.find(decl.property);
+                        if (it == styleMap.end() || !it->second.important) {
+                            styleMap[decl.property] = { decl.value , "", decl.important };
+                            if (!is_all && isInheritable(decl.property)) {
+                                setChildrenStyles(widget->getHtmlId(), node.get(), "styles", decl.property, decl.value);
+                            }
                         }
                     }
                 }
@@ -280,13 +293,13 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
 
     node->setWidget(widget);
 
+    widget->setSize(0); // Resets the size of widgets created from OTML to (0, 0)
     widget->setHtmlNode(node);
     widget->setHtmlRootId(htmlId);
     widget->ensureUniqueId();
 
     if (node->getType() == NodeType::Text) {
         textNodes.emplace_back(node);
-        widget->setIgnoreEvent(true);
         widget->setFocusable(false);
         widget->setPhantom(true);
     }
@@ -322,7 +335,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
 
     auto styles = std::make_shared<OTMLNode>();
 
-    std::map<std::string, std::pair<std::string, std::string>> stylesMerge;
+    std::map<std::string, StyleValue> stylesMerge;
 
     for (const auto [key, stylesMap] : node->getStyles()) {
         if (key != "styles") {
@@ -333,7 +346,7 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
             for (const auto [prop, value] : stylesMap) {
                 auto nodeAttr = std::make_shared<OTMLNode>();
                 nodeAttr->setTag(prop);
-                nodeAttr->setValue(value.first);
+                nodeAttr->setValue(value.value);
                 meta->addChild(nodeAttr);
             }
         } else for (const auto [prop, value] : stylesMap) {
@@ -342,13 +355,13 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
     }
 
     for (const auto& [prop, value] : node->getAttrStyles()) {
-        stylesMerge[prop] = { value , "" };
+        stylesMerge[prop] = { value , "", false };
     }
 
     for (const auto [prop, value] : stylesMerge) {
         auto nodeAttr = std::make_shared<OTMLNode>();
         nodeAttr->setTag(prop);
-        nodeAttr->setValue(value.first);
+        nodeAttr->setValue(value.value);
         styles->addChild(nodeAttr);
     }
 
@@ -397,8 +410,8 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
     std::unordered_map<std::string, std::string> inheritedStyles;
     inheritedStyles.reserve(stylesMerge.size());
     for (const auto& [prop, value] : stylesMerge)
-        if (isInheritable(prop) && !value.second.empty())
-            inheritedStyles[prop] = value.second;
+        if (isInheritable(prop) && !value.inheritedFromId.empty())
+            inheritedStyles[prop] = value.inheritedFromId;
 
     widget->callLuaField("__onHtmlProcessFinished", inheritedStyles);
 
@@ -480,7 +493,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     }
 
     if (isDynamic) {
-        parent->refreshHtml(insertWithOrder);
+        widget->refreshHtml(insertWithOrder);
     }
 
     return widget;
