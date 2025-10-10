@@ -513,6 +513,12 @@ function EnterGame.show()
         return
     end
 
+    local tokenEdit = enterGame and enterGame:getChildById('authenticatorTokenTextEdit')
+    if tokenEdit then
+        tokenEdit:setText('')
+    end
+    G.authenticatorToken = ''
+
     enterGame:show()
     enterGame:raise()
     enterGame:focus()
@@ -767,7 +773,12 @@ function EnterGame.loginFailed(requestId, msg, result)
     if G.requestId ~= requestId then
         return
     end
+
+    if msg and (msg:find("Two-factor") or msg:find("authentication required") or msg:find("valid token")) then
+        onTokenRequired(nil)
+    else
     onError(nil, msg, result)
+    end
 end
 
 function EnterGame.doLogin()
