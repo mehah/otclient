@@ -1564,9 +1564,18 @@ void UIWidget::applyAnchorAlignment() {
             } else anchored = false;
         } else anchored = false;
 
-        if (m_parent->getHtmlNode()->getStyle("align-items") == "center" && m_positionType != PositionType::Absolute) {
-            addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
-            return;
+        if (m_positionType != PositionType::Absolute) {
+            bool addVertical = false;
+
+            if (parentDisplay == DisplayType::InlineBlock) {
+                addVertical = m_parent->getHtmlNode()->getStyle("vertical-align") == "center";
+            } else
+                addVertical = m_parent->getHtmlNode()->getStyle("align-items") == "center";
+
+            if (addVertical) {
+                addAnchor(Fw::AnchorVerticalCenter, "parent", Fw::AnchorVerticalCenter);
+                return;
+            }
         }
 
         if (anchored) {

@@ -41,7 +41,9 @@
             *for="local player in self.players"
             onclick="print('Player: '.. player.name)"
           >
-            <td style="vertical-align: center">{{index}}</td>
+            <td style="text-align: center; vertical-align: center">
+              {{index}}
+            </td>
             <td>
               <uicreature *outfit="{type = player.lookType}"></uicreature>
             </td>
