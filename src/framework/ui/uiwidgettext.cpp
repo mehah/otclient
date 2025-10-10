@@ -114,10 +114,6 @@ void UIWidget::drawText(const Rect& screenCoords)
         updateText();
     }
 
-    if (isOnHtml() && m_htmlNode->getType() == NodeType::Text && !isTextAutoResize() && getSize() != m_parent->getSize()) {
-        setSize(m_parent->getSize());
-    }
-
     if (screenCoords != m_textCachedScreenCoords) {
         m_textCachedScreenCoords = screenCoords;
 
@@ -154,6 +150,28 @@ void UIWidget::onTextChange(const std::string_view text, const std::string_view 
 
 void UIWidget::onFontChange(const std::string_view font) { callLuaField("onFontChange", font); }
 
+static inline void trimSpacesAndNewlines(std::string& s) {
+    if (s.empty()) return;
+
+    const unsigned char* data = reinterpret_cast<const unsigned char*>(s.data());
+    size_t start = 0;
+    size_t end = s.size();
+
+    while (start < end && std::isspace(data[start]))
+        ++start;
+
+    while (end > start && std::isspace(data[end - 1]))
+        --end;
+
+    if (start > 0 || end < s.size()) {
+        const size_t newSize = end - start;
+        if (start > 0)
+            s.erase(0, start);
+        if (newSize < s.size())
+            s.resize(newSize);
+    }
+}
+
 void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 {
     std::string _text{ text.data() };
@@ -175,26 +193,25 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         if (whiteSpace.empty())
             whiteSpace = "normal";
 
-        setTextAutoResize(false);
+        setProp(PropTextHorizontalAutoResize, false);
+        setProp(PropTextVerticalAutoResize, false);
+
+        auto originalText = m_text;
+        { // get text size without wrap
+            m_textAlign = Fw::AlignTopLeft;
+            trimSpacesAndNewlines(m_text);
+            setProp(PropTextWrap, false);
+            updateText();
+            m_textSizeNowrap = m_textSize;
+        }
+
         setProp(PropTextWrap, true);
         if (whiteSpace == "normal") {
-            // remove line breaks at the beginning and end of the text
-            auto* p = m_text.data();
-            size_t n = m_text.size();
-
-            size_t start = 0;
-            while (start < n && (p[start] == '\n' || p[start] == '\r')) ++start;
-
-            size_t end = n;
-            while (end > start && (p[end - 1] == '\n' || p[end - 1] == '\r')) --end;
-
-            const size_t len = end - start;
-            if (start) std::memmove(p, p + start, len);
-            m_text.resize(len);
-
             stdext::trim(m_text);
         } else if (whiteSpace == "nowrap") {
-            setTextAutoResize(true);
+            setProp(PropTextHorizontalAutoResize, true);
+            setProp(PropTextVerticalAutoResize, true);
+
             std::string out;
             out.reserve(m_text.size());
             bool lastWasSpace = false;
@@ -215,7 +232,8 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 
             m_text.swap(out);
             setProp(PropTextWrap, false);
-        }
+        } else
+            m_text = originalText; // pre, pre-wrap
     }
 
     updateText();
@@ -224,8 +242,8 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         onTextChange(m_text, oldText);
     }
 
-    if (m_parent)
-        m_parent->refreshHtml(true);
+    scheduleHtmlTask(PropUpdateSize);
+    refreshHtml(true);
 }
 
 void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireLuaCall)
