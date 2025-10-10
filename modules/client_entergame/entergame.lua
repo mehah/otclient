@@ -58,30 +58,12 @@ local function onTokenRequired(protocol)
                     return
                 end
 
-                protocolLogin = ProtocolLogin.create()
-                protocolLogin.onLoginError = onError
-                protocolLogin.onMotd = onMotd
-                protocolLogin.onSessionKey = onSessionKey
-                protocolLogin.onCharacterList = onCharacterList
-                protocolLogin.onUpdateNeeded = onUpdateNeeded
-                protocolLogin.onTokenRequired = onTokenRequired
-
-                loadBox = displayCancelBox(tr('Please wait'), tr('Authenticating...'))
-                connect(loadBox, {
-                    onCancel = function(msgbox)
-                        loadBox = nil
-                        protocolLogin:cancelLogin()
-                        EnterGame.show()
-                    end
-                })
-
-                if G.clientVersion then
-                    g_game.setClientVersion(G.clientVersion)
-                    g_game.setProtocolVersion(g_game.getClientProtocolVersion(G.clientVersion))
+                local tokenEdit = enterGame and enterGame:getChildById('authenticatorTokenTextEdit')
+                if tokenEdit then
+                    tokenEdit:setText(token)
                 end
-                g_game.chooseRsa(G.host)
 
-                protocolLogin:login(G.host, G.port, G.account, G.password, G.authenticatorToken, G.stayLogged)
+                EnterGame.doLogin()
             end,
             function()
                 G.authenticatorToken = ''
@@ -702,7 +684,7 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     G.requestId = math.random(1)
 
     local http = LoginHttp.create()
-        http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
+        http:httpLogin(host, path, G.port, G.account, G.password, G.authenticatorToken or '', G.requestId, httpLogin)
         connect(loadBox, {
             onCancel = function(msgbox)
                 loadBox = nil
