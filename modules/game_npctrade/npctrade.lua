@@ -56,7 +56,7 @@ sellAllWithDelayEvent = nil
 
 function saveData()
   local player = g_game.getLocalPlayer()
-  if not player:isLoaded() then return end
+  if not player then return end
 
   local file = "/characterdata/" .. player:getId() .. "/sellAllWhitelist.json"
   local status, result = pcall(function() return json.encode(sellAllWhitelist, 2) end)
@@ -72,7 +72,7 @@ end
 
 function loadData()
   local player = g_game.getLocalPlayer()
-  if not player:isLoaded() then return end
+  if not player then return end
 
   local file = "/characterdata/" .. player:getId() .. "/sellAllWhitelist.json"
   if g_resources.fileExists(file) then
