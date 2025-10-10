@@ -40,24 +40,6 @@ local function onTokenRequired(protocol)
                 local token = text and text:trim() or ''
                 G.authenticatorToken = token
 
-                if token == '' then
-                    EnterGame.show()
-                    return
-                end
-
-                if token:len() < 6 or token:len() > 8 or not token:match('^%d+$') then
-                    local errorBox = displayErrorBox(
-                        tr('Invalid Token'),
-                        tr('The authenticator token must be a 6 to 8 digit number.')
-                    )
-                    connect(errorBox, {
-                        onOk = function()
-                            promptForToken()
-                        end
-                    })
-                    return
-                end
-
                 local tokenEdit = enterGame and enterGame:getChildById('authenticatorTokenTextEdit')
                 if tokenEdit then
                     tokenEdit:setText(token)
@@ -774,7 +756,17 @@ function EnterGame.loginFailed(requestId, msg, result)
         return
     end
 
-    if msg and (msg:find("Two-factor") or msg:find("authentication required") or msg:find("valid token")) then
+    local shouldRequestToken = false
+
+    if msg then
+        local lowerMsg = msg:lower()
+        if lowerMsg:find('two%-factor') then
+            shouldRequestToken = true
+        end
+    end
+
+    if shouldRequestToken then
+        G.authenticatorToken = ''
         onTokenRequired(nil)
     else
     onError(nil, msg, result)
