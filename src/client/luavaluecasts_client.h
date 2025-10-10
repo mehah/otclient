@@ -106,3 +106,8 @@ int push_luavalue(const DailyRewardData& data);
 int push_luavalue(const ForgeOpenData& data);
 int push_luavalue(const ForgeTransferData& data);
 int push_luavalue(const ForgeItemInfo& data);
+
+// Game Analysers Structs
+int push_luavalue(const BossCooldownData& data);
+int push_luavalue(const PartyMemberData& data);
+int push_luavalue(const PartyMemberName& data);
