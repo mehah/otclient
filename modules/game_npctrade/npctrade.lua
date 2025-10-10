@@ -51,6 +51,22 @@ selectedItem = nil
 
 quickSellButton = nil
 
+-- Utility function to truncate text to a specified length
+function short_text(text, maxLength)
+  if not text then return "" end
+  if string.len(text) <= maxLength then
+    return text
+  end
+  return string.sub(text, 1, maxLength)
+end
+
+-- Utility function to escape special pattern characters for safe string searching
+function string.searchEscape(str)
+  if not str then return "" end
+  -- Escape special Lua pattern characters: ( ) . % + - * ? [ ] ^ $
+  return str:gsub("([%(%)%.%+%-%*%?%[%]%^%$%%])", "%%%1")
+end
+
 cancelNextRelease = nil
 sellAllWithDelayEvent = nil
 
@@ -215,8 +231,12 @@ function show()
     end
 
     npcWindow:show()
-    if not m_interface.addToPanels(npcWindow) then
-      return false
+    if not npcWindow:getParent() then
+      local panel = modules.game_interface.findContentPanelAvailable(npcWindow, npcWindow:getMinimumHeight())
+      if not panel then
+        return false
+      end
+      panel:addChild(npcWindow)
     end
 
     if npcWindow and npcWindow:isVisible() then
@@ -231,7 +251,7 @@ end
 function start()
   local benchmark = g_clock.millis()
   loadData()
-  consoleln("Sell All Whitelist Loot loaded in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds.")
+  --consoleln("Sell All Whitelist Loot loaded in " .. (g_clock.millis() - benchmark) / 1000 .. " seconds.")
 end
 
 function hide()
@@ -746,6 +766,12 @@ end
 
 function onPlayerGoods(items)
   playerItems = {}
+  
+  -- Ensure items is a table before using pairs
+  if type(items) ~= 'table' then
+    return
+  end
+  
   for id, amount in pairs(items) do
     if not playerItems[id] then
       playerItems[id] = amount
@@ -880,11 +906,11 @@ function sellAll(delayed, exceptions)
 end
 
 function getPlayerMoney()
-  playerMoney = g_game.getLocalPlayer():getResourceValue(ResourceBank) + g_game.getLocalPlayer():getResourceValue(ResourceInventary)
+  playerMoney = g_game.getLocalPlayer():getResourceBalance(ResourceBank) + g_game.getLocalPlayer():getResourceBalance(ResourceInventary)
   if CURRENCYID ~= GOLD_COINS and CURRENCYID > 0 then
-    playerMoney = g_game.getLocalPlayer():getResourceValue(ResourceNpcTrade)
+    playerMoney = g_game.getLocalPlayer():getResourceBalance(ResourceNpcTrade)
   elseif CURRENCYID == 0 then
-    playerMoney = g_game.getLocalPlayer():getResourceValue(ResourceNpcStorageTrade)
+    playerMoney = g_game.getLocalPlayer():getResourceBalance(ResourceNpcStorageTrade)
   end
 
   return playerMoney
@@ -924,17 +950,19 @@ function onTypeFieldsHover(widget, hovered)
     return
   end
 
-  m_interface.toggleFocus(hovered, "npctrade")
+  -- Focus handling is typically managed automatically by the UI system
+  -- modules.game_interface.toggleFocus(hovered, "npctrade")
 end
 
 function toggleNPCFocus(visible)
-  m_interface.toggleFocus(visible, "npctrade")
+  -- Focus handling is typically managed automatically by the UI system
+  -- modules.game_interface.toggleFocus(visible, "npctrade")
   if visible then
     npcWindow:setBorderWidth(2)
     npcWindow:setBorderColor('white')
   else
     npcWindow:setBorderWidth(0)
-    m_interface.toggleInternalFocus()
+    -- modules.game_interface.toggleInternalFocus()
   end
 end
 
