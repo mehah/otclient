@@ -1568,7 +1568,7 @@ void UIWidget::applyAnchorAlignment() {
             bool addVertical = false;
 
             if (parentDisplay == DisplayType::InlineBlock) {
-                addVertical = m_parent->getHtmlNode()->getStyle("vertical-align") == "center";
+                addVertical = m_parent->getHtmlNode()->getStyle("vertical-align") == "middle";
             } else
                 addVertical = m_parent->getHtmlNode()->getStyle("align-items") == "center";
 
