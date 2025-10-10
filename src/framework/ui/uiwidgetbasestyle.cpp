@@ -76,8 +76,9 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
 
                 if (!m_htmlNode->getChildren().empty()) {
                     bool isExpression = m_htmlNode->getChildren()[0]->isExpression();
-                    if (const auto root = g_html.getRoot(m_htmlRootId))
-                        callLuaField("__applyOrBindHtmlAttribute", std::string{ "*text" }, m_htmlNode->textContent(), false, root->moduleName, m_htmlNode->toString());
+                    if (isExpression)
+                        if (const auto root = g_html.getRoot(m_htmlRootId))
+                            callLuaField("__applyOrBindHtmlAttribute", std::string{ "*text" }, m_htmlNode->textContent(), false, root->moduleName, m_htmlNode->toString());
                 }
 
                 if (!isExpression)
@@ -186,9 +187,12 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                 setPhantom(node->value<std::string>() == "none");
             else
                 setPhantom(node->value<bool>());
-        } else if (node->tag() == "size")
+        } else if (node->tag() == "size") {
+            // Skip the "size" attribute when the widget comes from HTML,
+            // since dimensions are managed by CSS (width/height) in that context.
+            if (isOnHtml()) return;
             setSize(node->value<Size>());
-        else if (node->tag() == "fixed-size")
+        } else if (node->tag() == "fixed-size")
             setFixedSize(node->value<bool>());
         else if (node->tag() == "min-size")
             setMinSize(node->value<Size>());
