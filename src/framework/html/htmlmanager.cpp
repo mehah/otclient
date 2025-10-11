@@ -523,7 +523,7 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIW
     }
 
     auto rootCopy = it->second;
-    rootCopy.dynamicNode = parseHtml("<html>" + html + "</html>");
+    rootCopy.dynamicNode = parseHtml(html.starts_with("<html>") ? html : "<html>" + html + "</html>");
     return readNode(rootCopy, parent, it->second.moduleName, "", false, htmlId);
 }
 

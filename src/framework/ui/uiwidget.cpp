@@ -183,6 +183,11 @@ UIWidgetPtr UIWidget::prepend(const std::string& html) {
     return insert(1, html);
 }
 
+UIWidgetPtr UIWidget::html(const std::string& html) {
+    destroyChildren();
+    return append(html);
+}
+
 size_t UIWidget::remove(const std::string& queryString) {
     if (!isOnHtml()) return 0;
 

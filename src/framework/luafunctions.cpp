@@ -797,6 +797,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("append", &UIWidget::append);
     g_lua.bindClassMemberFunction<UIWidget>("prepend", &UIWidget::prepend);
     g_lua.bindClassMemberFunction<UIWidget>("insert", &UIWidget::insert);
+    g_lua.bindClassMemberFunction<UIWidget>("html", &UIWidget::html);
     g_lua.bindClassMemberFunction<UIWidget>("remove", &UIWidget::remove);
     g_lua.bindClassMemberFunction<UIWidget>("getHtmlId", &UIWidget::getHtmlId);
 
