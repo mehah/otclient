@@ -117,8 +117,16 @@ function UIStatsBar:setValue(value, total)
 
     -- Bar dimension
     if self.statsOrientation == 'horizontal' then
+        g_logger.info(">>> self.statsType: " ..
+            self.statsType .. " horizontal stats bar: " .. ((self:getWidth() - 2) * value) / total) -- debug
         self.bar:setWidth(((self:getWidth() - 2) * value) / total)
+
+        if self.statsType == 'manashield' then
+            self.bar:setHeight(6)
+        end
     elseif self.statsOrientation == 'vertical' then
+        g_logger.info(">>> self.statsType: " ..
+            self.statsType .. " vertical stats bar: " .. ((self:getHeight() - 2) * value) / total) -- debug
         self.bar:setHeight(((self:getHeight() - 2) * value) / total)
     else
         return

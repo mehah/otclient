@@ -239,6 +239,7 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
 
     bar.health:setValue(player:getHealth(), player:getMaxHealth())
     bar.mana:setValue(player:getMana(), player:getMaxMana())
+
     local manashield = player:getManaShield()
     local manashieldHeight = 7
 
@@ -250,7 +251,7 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
     }
     if manashield > 0 then
         bar.manashield:show()
-
+        bar.mana.showText = false
         bar.mana:setImageHeight(manashieldHeight)
         bar.mana:setImageClip(imgClip)
 
@@ -260,11 +261,21 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
         })
 
         bar.manashield:setValue(player:getManaShield(), player:getMaxManaShield())
+
+        local customText = string.format("%d/%d (%d/%d)",
+            player:getMana(),
+            player:getMaxMana(),
+            player:getManaShield(),
+            player:getMaxManaShield()
+        )
+        bar.manashield.text:setWidth(400)
+        bar.manashield.text:setMarginBottom(2)
+        bar.manashield.text:setText(customText)
     else
         bar.manashield:hide()
         bar.mana:setImageHeight(manashieldHeight * 2)
-        -- imgClip.height = manashieldHeight * 2
         bar.mana:setImageClip(imgClip)
+        bar.mana.showText = true
     end
 end
 
