@@ -1,6 +1,9 @@
 BlessingController = Controller:new()
 
 function BlessingController:onInit()
+    BlessingController:registerEvents(g_game, {
+        onBlessingsChange = onBlessingsChange
+    })
 end
 
 function BlessingController:onTerminate()
@@ -9,6 +12,7 @@ end
 
 function BlessingController:onGameStart()
     if g_game.getClientVersion() >= 1000 then
+        BlessingController.historyButtonText = "Back"
         BlessingController:registerEvents(g_game, {
             onUpdateBlessDialog = onUpdateBlessDialog
         })
@@ -31,6 +35,7 @@ function BlessingController:showHistory()
     local ui = BlessingController.ui
     if ui.historyPanel:isVisible() then
         setBlessingView()
+        BlessingController.historyButtonText = "Back"
     else
         setHistoryView()
     end
@@ -43,7 +48,6 @@ function setHistoryView()
     ui.promotionPanel:hide()
     ui.deathPenaltyPanel:hide()
     ui.historyPanel:show()
-    ui.buttonsPanel.historyButton:setText("Back")
 end
 
 function setBlessingView()
@@ -52,7 +56,6 @@ function setBlessingView()
     ui.promotionPanel:show()
     ui.deathPenaltyPanel:show()
     ui.historyPanel:hide()
-    ui.buttonsPanel.historyButton:setText("History")
 end
 
 function show()
@@ -126,4 +129,8 @@ end
 function BlessingController:onClickSendStore()
     modules.game_store.toggle()
     g_game.sendRequestStorePremiumBoost()
+end
+
+function onBlessingsChange(blessings, blessVisualState)
+    modules.game_inventory.onBlessingsChange(blessings, blessVisualState)
 end

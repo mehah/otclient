@@ -17,17 +17,23 @@
     <table class="filter-table">
       <tr>
         <td class="col1">
-          <input type="checkbox" id="checkboxShowComplete" checked text="Show completed" onchange="self:filterQuestListShowComplete(event)">
+          <label>
+            <input type="checkbox" id="checkboxShowComplete" checked onchange="filterQuestListShowComplete(event)">
+            Show completed
+          </label>
         </td>
-        <td class="col2" text="Quests completed:"></td>
+        <td class="col2">Quests completed:</td>
         <td class="col3" id="lblCompleteNumber"></td>
       </tr>
       <tr>
         <td class="col1">
-          <input type="checkbox" id="checkboxShowHidden" text="Show hidden" onchange="self:filterQuestListShowHidden(event)">
+          <label>
+            <input type="checkbox" id="checkboxShowHidden" onchange="filterQuestListShowHidden(event)">
+            Show hidden
+          </label>
         </td>
-        <td class="col2" text="Quests hidden:"></td>
-        <td class="col3" id="lblHiddenNumber" ></td>
+        <td class="col2">Quests hidden:</td>
+        <td class="col3" id="lblHiddenNumber"></td>
       </tr>
     </table>
   </div>
@@ -40,7 +46,7 @@
       onchange="self:onCheckChangeQuestTracker(event)" text="Show in quest tracker" />
   </div>
 
-  <HorizontalSeparator class="separator"></HorizontalSeparator>
+  <hr class="separator"/>
 
   <div id="buttonsPanel" class="buttons" focusable="false">
     <button id="trackerButton" onclick="self:toggleMiniWindowsTracker()" text="Quest Tracker"></button>

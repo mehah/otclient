@@ -41,8 +41,8 @@
 }
 
 .resting-area-time {
-  size: 22 20;
-  text-align: center;
+  width: 22px;
+  height: 28px;
   margin-left: 30;
   --image-border: 3;
   --image-source: /images/ui/test/button-verydarkgrey-down;
@@ -180,6 +180,7 @@
 
 .footer-separator {
   width: 540px;
+  height: 2px;
 }
 
 .footer-gold-1 {
@@ -207,9 +208,15 @@
 .close-button {
   margin-left: 5px;
   float: right;
-
+  text-align: center;
+  vertical-align: center;
 }
 .history-button {
   float: right;
   margin-right: 10px;
+}
+
+imgBonuses {
+  width: 60px;
+  height: 70px;
 }
