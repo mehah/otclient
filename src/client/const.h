@@ -420,7 +420,13 @@ namespace Otc
         PREY_ACTION_MONSTERSELECTION = 2,
         PREY_ACTION_REQUEST_ALL_MONSTERS = 3,
         PREY_ACTION_CHANGE_FROM_ALL = 4,
-        PREY_ACTION_LOCK_PREY = 5,
+        PREY_ACTION_OPTION = 5,
+    };
+    enum PreyOption_t : uint8_t
+    {
+        PREY_OPTION_UNTOGGLE = 0,
+        PREY_OPTION_TOGGLE_AUTOREROLL = 1,
+        PREY_OPTION_TOGGLE_LOCK_PREY = 2,
     };
     enum PreyConfigState : uint8_t
     {
