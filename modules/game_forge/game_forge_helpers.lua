@@ -173,7 +173,7 @@ function Helpers.loadTabFragment(controller, tabName)
 
     local fragment = io.content(('modules/%s/tab/%s/%s.html'):format(controller.name, tabName, tabName))
     local container = controller.ui.content:prepend(fragment)
-    local panel = container and container[tabName]
+    local panel = container
     if panel and panel.hide then
         panel:hide()
     end
