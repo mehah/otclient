@@ -168,37 +168,6 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
     }
 }
 
-UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
-    if (!isOnHtml()) return nullptr;
-    m_insertChildIndex = index;
-    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
-}
-
-UIWidgetPtr UIWidget::append(const std::string& html) {
-    if (!isOnHtml()) return nullptr;
-    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
-}
-
-UIWidgetPtr UIWidget::prepend(const std::string& html) {
-    return insert(1, html);
-}
-
-UIWidgetPtr UIWidget::html(const std::string& html) {
-    destroyChildren();
-    return append(html);
-}
-
-size_t UIWidget::remove(const std::string& queryString) {
-    if (!isOnHtml()) return 0;
-
-    const auto& nodes = querySelectorAll(queryString);
-    for (const auto& node : nodes) {
-        node->destroy();
-    }
-
-    return nodes.size();
-}
-
 void UIWidget::addChild(const UIWidgetPtr& child)
 {
     if (!child) {
@@ -2212,4 +2181,35 @@ UIWidgetPtr UIWidget::querySelector(const std::string& selector) {
             return widget;
     }
     return nullptr;
+}
+
+UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
+    if (!isOnHtml()) return nullptr;
+    m_insertChildIndex = index;
+    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
+}
+
+UIWidgetPtr UIWidget::append(const std::string& html) {
+    if (!isOnHtml()) return nullptr;
+    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
+}
+
+UIWidgetPtr UIWidget::prepend(const std::string& html) {
+    return insert(1, html);
+}
+
+UIWidgetPtr UIWidget::html(const std::string& html) {
+    destroyChildren();
+    return append(html);
+}
+
+size_t UIWidget::remove(const std::string& queryString) {
+    if (!isOnHtml()) return 0;
+
+    const auto& nodes = querySelectorAll(queryString);
+    for (const auto& node : nodes) {
+        node->destroy();
+    }
+
+    return nodes.size();
 }

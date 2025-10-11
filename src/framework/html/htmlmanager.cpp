@@ -516,14 +516,18 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
     return ID;
 }
 
-UIWidgetPtr HtmlManager::createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId) {
+UIWidgetPtr HtmlManager::createWidgetFromHTML(std::string html, const UIWidgetPtr& parent, uint32_t htmlId) {
     auto it = m_nodes.find(htmlId);
     if (it == m_nodes.end()) {
         return nullptr;
     }
 
+    stdext::trimSpacesAndNewlines(html);
+    if (!html.starts_with("<html>"))
+        html = "<html>" + html + "</html>";
+
     auto rootCopy = it->second;
-    rootCopy.dynamicNode = parseHtml(html.starts_with("<html>") ? html : "<html>" + html + "</html>");
+    rootCopy.dynamicNode = parseHtml(html);
     return readNode(rootCopy, parent, it->second.moduleName, "", false, htmlId);
 }
 
