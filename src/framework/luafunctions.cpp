@@ -606,6 +606,7 @@ void Application::registerLuaFunctions()
     g_lua.bindClassMemberFunction<UIWidget>("getFocusedChild", &UIWidget::getFocusedChild);
     g_lua.bindClassMemberFunction<UIWidget>("getHoveredChild", &UIWidget::getHoveredChild);
     g_lua.bindClassMemberFunction<UIWidget>("getChildren", &UIWidget::getChildren);
+    g_lua.bindClassMemberFunction<UIWidget>("getReverseChildren", &UIWidget::getReverseChildren);
     g_lua.bindClassMemberFunction<UIWidget>("getFirstChild", &UIWidget::getFirstChild);
     g_lua.bindClassMemberFunction<UIWidget>("getLastChild", &UIWidget::getLastChild);
     g_lua.bindClassMemberFunction<UIWidget>("getLayout", &UIWidget::getLayout);

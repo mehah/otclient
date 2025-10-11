@@ -52,6 +52,7 @@ public:
     void setKnown(const bool known) { m_known = known; }
     void setPendingGame(const bool pending) { m_pending = pending; }
     void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item);
+    void setInventoryCountCache(std::map<std::pair<uint16_t, uint8_t>, uint16_t> counts);
     void setVocation(uint8_t vocation);
     void setPremium(bool premium);
     void setRegenerationTime(uint16_t regenerationTime);
@@ -99,6 +100,8 @@ public:
 
     const std::vector<uint16_t>& getSpells() { return m_spells; }
     ItemPtr getInventoryItem(const Otc::InventorySlot inventory) { return m_inventoryItems[inventory]; }
+    bool hasEquippedItemId(uint16_t itemId, uint8_t tier);
+    uint16_t getInventoryCount(uint16_t itemId, uint8_t tier);
 
     uint64_t getResourceBalance(const Otc::ResourceTypes_t type)
     {
@@ -175,6 +178,7 @@ private:
     stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
     std::map<uint8_t, double> m_combatAbsorbValues;
     std::map<Otc::ExperienceRate_t, uint16_t> m_experienceRates;
+    std::map<std::pair<uint16_t, uint8_t>, uint16_t> m_inventoryCountCache;
 
     uint8_t m_autoWalkRetries{ 0 };
 

@@ -7,12 +7,11 @@ SpellGroupIcon < UIWidget
 
 
 SpellIcon < UIWidget
-  size: 24 24
-  image-size: 24 24
+  size: 20 20
+  image-size: 20 20
   focusable: false
-
   $!first:
-    margin-left: 1
+    margin-left: 5
 
 SpellProgressRect < UIProgressRect
   background: #585858AA
@@ -34,6 +33,7 @@ Panel
   Panel
     id:contentsPanel2
     anchors.fill: parent
+    margin-left: 5
     SpellGroupIcon
       id: groupIconAttack
       image-clip: 0 0 20 20
@@ -160,14 +160,24 @@ Panel
       anchors.fill: groupIconBurstOfNature
       !tooltip: tr('Burst of Nature')
 
+    VerticalSeparator
+      id: separator
+      anchors.top: parent.top
+      anchors.left: prev.right
+      margin-left: 5
+      margin-top: 2
+      height: 22
+
     Panel
+      height: 22
       id: cooldownPanel
+      margin-top: 4
+      margin-bottom: 5
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: prev.right
+      anchors.right: parent.right
       layout:
         type: horizontalBox
 
-      margin-top: 3
-      padding: 3
-      anchors.top: groupIconSpecial.bottom
-      anchors.left: parent.left
-      anchors.right: parent.right
 

@@ -505,12 +505,6 @@ return {
             modules.game_interface.getRightExtraPanel():setOn(value)
         end
     },
-    showActionbar                     = {
-        value = false,
-        action = function(value, options, controller, panels, extraWidgets)
-            modules.game_actionbar.setActionBarVisible(value)
-        end
-    },
     showSpellGroupCooldowns           = {
         value = true,
         action = function(value, options, controller, panels, extraWidgets)
@@ -634,4 +628,152 @@ return {
             listKeybindsComboBox(value)
         end
     },
+    graphicalCooldown = {
+        value = true,
+        action = function(value)
+            modules.game_actionbar.toggleCooldownOption()
+        end,
+    },
+    cooldownSecond = {
+        value = true,
+        action = function(value)
+            modules.game_actionbar.toggleCooldownOption()
+        end,
+    },
+    actionBarShowBottom1 = {
+        value = true,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar13") or false
+            modules.game_actionbar.configureActionBar('actionBarShowBottom1', allBox and value)
+        end,
+    },
+    actionBarShowBottom2 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar13") or false
+            modules.game_actionbar.configureActionBar('actionBarShowBottom2', allBox and value)
+        end,
+    },
+    actionBarShowBottom3 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar13") or false
+            modules.game_actionbar.configureActionBar('actionBarShowBottom3', allBox and value)
+        end,
+    },
+    actionBarShowLeft1 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar46") or false
+            modules.game_actionbar.configureActionBar('actionBarShowLeft1', allBox and value)
+        end,
+    },
+    actionBarShowLeft2 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar46") or false
+            modules.game_actionbar.configureActionBar('actionBarShowLeft2', allBox and value)
+        end,
+    },
+    actionBarShowLeft3 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar46") or false
+            modules.game_actionbar.configureActionBar('actionBarShowLeft3', allBox and value)
+        end,
+    },
+    actionBarShowRight1 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar79") or false
+            modules.game_actionbar.configureActionBar('actionBarShowRight1', allBox and value)
+            return true
+        end,
+    },
+    actionBarShowRight2 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar79") or false
+            modules.game_actionbar.configureActionBar('actionBarShowRight2', allBox and value)
+        end,
+    },
+    actionBarShowRight3 = {
+        value = false,
+        action = function(value)
+            local allBox = modules.client_options.getOption("allActionBar79") or false
+            modules.game_actionbar.configureActionBar('actionBarShowRight3', allBox and value)
+        end,
+    },
+    allActionBar46 = {
+        value = false,
+        action = function(value)
+            local huds = {"actionBarShowLeft1", "actionBarShowLeft2", "actionBarShowLeft3"}
+            for _, actionBar in pairs(huds) do
+                local hud =  panels.actionbars:recursiveGetChildById(actionBar)
+                if value then
+                    hud:enable()
+                else
+                    hud:disable()
+                end
+                modules.game_actionbar.configureActionBar(actionBar, (value and hud:isChecked()))
+            end
+        end,
+    },
+    allActionBar13 = {
+        value = true,
+        action = function(value)
+            local huds = {"actionBarShowBottom1", "actionBarShowBottom2", "actionBarShowBottom3"}
+            for _, actionBar in pairs(huds) do
+                local hud =  panels.actionbars:recursiveGetChildById(actionBar)
+                if value then
+                    hud:enable()
+                else
+                    hud:disable()
+                end
+                modules.game_actionbar.configureActionBar(actionBar, (value and hud:isChecked()))
+            end
+        end,
+    },
+    allActionBar79 = {
+        value = false,
+        action = function(value)
+            local huds = {"actionBarShowRight1", "actionBarShowRight2", "actionBarShowRight3"}
+            for _, actionBar in pairs(huds) do
+                local hud = panels.actionbars:recursiveGetChildById(actionBar)
+                if value then
+                    hud:enable()
+                else
+                    hud:disable()
+                end
+                modules.game_actionbar.configureActionBar(actionBar, (value and hud:isChecked()))
+            end
+        end,
+    },
+    actionTooltip = {
+        value = true,
+        action = function(value)
+            modules.game_actionbar.updateVisibleOptions('tooltip', value)
+        end,
+    },
+    showSpellParameters = {
+        value = true,
+        action = function(value)
+            modules.game_actionbar.updateVisibleOptions('parameter', value)
+        end,
+    },
+    showHKObjectsBars = {
+        value = true,
+        action = function(value)
+            modules.game_actionbar.updateVisibleOptions('amount', value)
+        end,
+    },
+    showAssignedHKButton = {
+        value = true,
+        action = function(value)
+            modules.game_actionbar.updateVisibleOptions('hotkey', value)
+        end,
+    },
+    actionBarBottomLocked = false,
+    actionBarLeftLocked = false,
+    actionBarRightLocked = false    
 }
