@@ -327,7 +327,7 @@ local function resetPreyWindowState()
     preyWindow.wildCards:setText('0')
 
     for slot = 0, 2 do
-        onPreyInactive(slot, 0, 0, 0)
+        onPreyInactive(slot, 0, 0)
 
         local prey = preyWindow['slot' .. (slot + 1)]
         if prey then
@@ -519,7 +519,7 @@ function setTimeUntilFreeReroll(slot, timeUntilFreeReroll) -- minutes
     refreshRerollButtonState(slot)
 end
 
-function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards, option)
+function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
     setPickSpecificPreyBonus(slot)
 
     -- tracker
@@ -540,7 +540,7 @@ function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards, option)
     prey.locked:show()
 end
 
-function onPreyInactive(slot, timeUntilFreeReroll, wildcards, option)
+function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
     -- tracker
     local tracker = preyTracker.contentsPanel['slot' .. (slot + 1)]
     if tracker then
@@ -1625,12 +1625,6 @@ end
 
 function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, bonusValue, bonusGrade, timeLeft,
                       timeUntilFreeReroll, wildcards, option) -- locktype always 0 for protocols <12
-    -- Handle parameter parsing: server doesn't send wildcards for Active state
-    -- So if option is nil, it means wildcards is actually the option value
-    if option == nil and wildcards ~= nil then
-        option = wildcards
-        wildcards = nil
-    end
     
     local tracker = preyTracker.contentsPanel['slot' .. (slot + 1)]
     currentHolderName = capitalFormatStr(currentHolderName)
