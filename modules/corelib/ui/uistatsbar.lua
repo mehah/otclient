@@ -117,22 +117,12 @@ function UIStatsBar:setValue(value, total)
 
     -- Bar dimension
     if self.statsOrientation == 'horizontal' then
-        g_logger.info(">>> self.statsType: " ..
-            self.statsType .. " horizontal stats bar: " .. ((self:getWidth() - 2) * value) / total) -- debug
         self.bar:setWidth(((self:getWidth() - 2) * value) / total)
-
-        if self.statsType == 'manashield' then
-            self.bar:setHeight(6)
-        end
     elseif self.statsOrientation == 'vertical' then
-        g_logger.info(">>> self.statsType: " ..
-            self.statsType .. " vertical stats bar: " .. ((self:getHeight() - 2) * value) / total) -- debug
         self.bar:setHeight(((self:getHeight() - 2) * value) / total)
     else
         return
     end
-
-    g_logger.info(">>> self.statsType: " .. self.statsType)
 
     -- Bar color
     local percent = (value * 100) / total
@@ -160,8 +150,6 @@ function UIStatsBar:setValue(value, total)
         self.bar:setImageSource('/images/bars/' .. self.statsOrientation .. '_mana_progressbar_' .. self.statsSize)
     elseif self.statsType == 'manashield' then
         self.bar:setImageSource('/images/bars/' .. self.statsOrientation .. '_manashield_progressbar_' .. self.statsSize)
-        g_logger.info("mana shieldstats size: " .. self.statsSize) -- debug
-        self.bar:setImageHeight(self:getHeight() / 2)
     elseif self.statsType == 'experience' then
         self.bar:setImageSource('/images/bars/' .. self.statsOrientation .. '_experience_progressbar_' .. self.statsSize)
     elseif self.statsType == 'skill' then

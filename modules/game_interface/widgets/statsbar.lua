@@ -237,45 +237,76 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
         return
     end
 
+    local mana = player:getMana()
+    local maxMana = player:getMaxMana()
+
     bar.health:setValue(player:getHealth(), player:getMaxHealth())
-    bar.mana:setValue(player:getMana(), player:getMaxMana())
 
     local manashield = player:getManaShield()
-    local manashieldHeight = 7
+    if not bar.mana.defaultHeight then
+        bar.mana.defaultHeight = bar.mana:getHeight()
+    end
 
-    local imgClip = {
-        x = 0,
-        y = 0,
-        width = bar.mana:getImageWidth(),
-        height = manashieldHeight
-    }
-    if manashield > 0 then
-        bar.manashield:show()
+    bar.mana:setValue(mana, maxMana)
+    local maxManaShield = player:getMaxManaShield()
+    local shouldShowManaShield = manashield > 0 and maxManaShield > 0
+    if shouldShowManaShield then
+        local fullHeight = bar.mana.defaultHeight
+        local manaHeight = math.floor(fullHeight / 2)
+        local shieldHeight = math.max(1, fullHeight - manaHeight)
+
         bar.mana.showText = false
-        bar.mana:setImageHeight(manashieldHeight)
-        bar.mana:setImageClip(imgClip)
+        if bar.mana.text then
+            bar.mana.text:hide()
+        end
 
-        bar.manashield:setImageHeight(manashieldHeight)
-        bar.manashield:setImageClip({
-            x = 0, y = 0, width = bar.manashield:getImageWidth(), height = manashieldHeight
-        })
+        bar.mana:setHeight(manaHeight)
 
-        bar.manashield:setValue(player:getManaShield(), player:getMaxManaShield())
+        bar.manashield:show()
+        bar.manashield.showText = false
+        bar.manashield:setMarginTop(0)
+        bar.manashield:setHeight(shieldHeight)
+        bar.manashield:setValue(manashield, maxManaShield)
+        if bar.manashield.text then
+            bar.manashield.text:setWidth(400)
+            local textOffset = math.floor(manaHeight / 2)
+            local manaText = string.format('%d/%d (%d/%d)', mana, maxMana, manashield, maxManaShield)
+            local function applyShieldText()
+                if not bar.manashield or not bar.manashield.text then
+                    return
+                end
 
-        local customText = string.format("%d/%d (%d/%d)",
-            player:getMana(),
-            player:getMaxMana(),
-            player:getManaShield(),
-            player:getMaxManaShield()
-        )
-        bar.manashield.text:setWidth(400)
-        bar.manashield.text:setMarginBottom(2)
-        bar.manashield.text:setText(customText)
+                bar.manashield.text:setText(manaText)
+                bar.manashield.text:setMarginTop(-textOffset)
+                bar.manashield.text:setMarginBottom(0)
+                bar.manashield.text:show()
+                bar.manashield.text:raise()
+            end
+
+            applyShieldText()
+            addEvent(applyShieldText)
+        end
     else
-        bar.manashield:hide()
-        bar.mana:setImageHeight(manashieldHeight * 2)
-        bar.mana:setImageClip(imgClip)
         bar.mana.showText = true
+
+
+        if bar.mana.defaultHeight then
+            bar.mana:setHeight(bar.mana.defaultHeight)
+        end
+
+        bar.manashield:setMarginTop(0)
+        bar.manashield:setHeight(0)
+        bar.manashield:hide()
+        bar.manashield.showText = true
+        if bar.manashield.text then
+            bar.manashield.text:hide()
+            bar.manashield.text:setMarginTop(0)
+            bar.manashield.text:setMarginBottom(0)
+        end
+    end
+
+    if not shouldShowManaShield and bar.mana.text then
+        bar.mana.text:show()
     end
 end
 
@@ -552,7 +583,6 @@ end
 
 local function getSettingOrDefault(setting, default)
     local value = g_settings.getString(setting)
-    g_logger.info(("Setting %s, default: %s"):format(tostring(setting), tostring(default)))
     return value ~= "" and value or default
 end
 
@@ -640,6 +670,7 @@ function StatsBar.init()
         onLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onHealthChange = StatsBar.reloadCurrentStatsBarQuickInfo,
         onManaChange = StatsBar.reloadCurrentStatsBarQuickInfo,
+        onManaShieldChange = StatsBar.reloadCurrentStatsBarQuickInfo,
         onMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onBaseMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
