@@ -104,5 +104,8 @@ int push_luavalue(const DailyRewardData& data);
 
 // forge
 int push_luavalue(const ForgeOpenData& data);
+int push_luavalue(const ForgeResultData& data);
+int push_luavalue(const ForgeConfigData& data);
 int push_luavalue(const ForgeTransferData& data);
 int push_luavalue(const ForgeItemInfo& data);
+int push_luavalue(const ForgeHistory& item);
