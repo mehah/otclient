@@ -33,6 +33,8 @@
     margin-top: 4px;
     height: 20px;
     display: block;
+    width: 100%;
+
   }
 
   /* === FOOTER === */
@@ -48,8 +50,6 @@
     float: right;
     margin-right: 5px;
     font: cipsoftFont;
-    --text-auto-resize: false;
-
   }
 </style>
 
@@ -68,9 +68,9 @@
   <hr style="height: 2px;" />
 
   <div class="text-footer">
-    <button id="buttonClose" text="Cancel" onclick="self:unloadHtml()"></button>
-    <button id="buttonApply" text="Apply" enabled="false"></button>
-    <button id="buttonOk" text="Ok" enabled="false"></button>
+    <button id="buttonClose" onclick="self:unloadHtml()">Cancel</button>
+    <button id="buttonApply" enabled="false">Apply</button>
+    <button id="buttonOk" enabled="false">Ok</button>
   </div>
 
 </Window>

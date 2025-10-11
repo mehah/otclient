@@ -39,6 +39,7 @@
   .object-checkbox-group input[type="checkbox"] {
     display: block;
     margin-top: 2px;
+    width: 100%;
   }
 
   .object-checkbox-group input[type="checkbox"]:first-child {
@@ -73,7 +74,6 @@
     float: right;
     margin-right: 5px;
     font: cipsoftFont;
-    --text-auto-resize: false;
   }
 </style>
 
@@ -97,9 +97,9 @@
   <hr style="height:2px; margin-top:5px;">
 
   <div id="checks" class="object-footer">
-    <button id="buttonClose" text="Cancel" onclick="self:unloadHtml()"></button>
-    <button id="buttonApply" text="Apply" enabled="false"></button>
-    <button id="buttonOk" text="Ok" enabled="false"></button>
+    <button id="buttonClose" onclick="self:unloadHtml()">Cancel</button>
+    <button id="buttonApply" enabled="false">Apply</button>
+    <button id="buttonOk" enabled="false">Ok</button>
   </div>
 
 </Window>
