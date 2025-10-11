@@ -37,7 +37,7 @@ local forgeActions = {
     INCREASELIMIT = 4,
 }
 
-local helpers = require('modules.game_forge.game_forge_helpers')
+local helpers = require('game_forge_helpers')
 local cloneValue = helpers.cloneValue
 local normalizeTierPriceEntries = helpers.normalizeTierPriceEntries
 local normalizeClassPriceEntries = helpers.normalizeClassPriceEntries
