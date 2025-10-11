@@ -44,7 +44,7 @@ public:
     const DataRoot* getRoot(uint32_t htmlId);
     UIWidgetPtr getRootWidget(uint32_t htmlId);
     void terminate() { m_nodes.clear(); }
-    UIWidgetPtr createWidgetFromHTML(const std::string& html, const UIWidgetPtr& parent, uint32_t htmlId);
+    UIWidgetPtr createWidgetFromHTML(std::string html, const UIWidgetPtr& parent, uint32_t htmlId);
 
 private:
     UIWidgetPtr readNode(DataRoot& root, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId);
