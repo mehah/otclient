@@ -225,7 +225,9 @@ function onSpellGroupCooldown(groupId, duration)
         return
     end
 
+    --print('onSpellGroupCooldown: ' .. groupId)
     local icon = contentsPanel:getChildById('groupIcon' .. SpellGroups[groupId])
+    --print("Progress Rect: " .. 'progressRect' .. SpellGroups[groupId])
     local progressRect = contentsPanel:getChildById('progressRect' .. SpellGroups[groupId])
     if icon then
         icon:setOn(true)

@@ -774,7 +774,11 @@ public:
     void partyPassLeadership(uint32_t creatureId);
     void partyLeave();
     void partyShareExperience(bool active);
-
+    void sendPartyAnalyzerReset();
+    void sendPartyAnalyzerPriceType();
+    void sendPartyAnalyzerPriceValue(); // For action 3, will get items from cyclopedia
+    void sendPartyAnalyzerAction(uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items = {});
+    
     // outfit related
     void requestOutfit();
     void changeOutfit(const Outfit& outfit);

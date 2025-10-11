@@ -354,9 +354,9 @@ public:
     const std::vector<NPCData>& getNpcSaleData() { return m_npcData; }
     int getMeanPrice() {
         static constexpr std::array<std::pair<uint32_t, uint32_t>, 3> forcedPrices = { {
-            {3043, 10000},
-            {3031, 50},
-            {3035, 50 }
+            {3043, 10000},// Crystal Coin
+            {3031, 1}, // Gold Coin
+            {3035, 100} // Platinum Coin
         } };
 
         const uint32_t itemId = getId();
