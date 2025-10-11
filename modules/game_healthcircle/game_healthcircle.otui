@@ -1,5 +1,5 @@
 HealthCircle < UIProgressBar
-  image-source: /data/images/game/healthcircle/left_empty
+  image-source: /data/images/game/healthcircle/left_empty_test
   opacity: 0.7
   phantom: true
 
@@ -19,7 +19,7 @@ SkillCircle < UIProgressBar
   phantom: true
 
 HealthCircleFront < UIProgressBar
-  image-source: /data/images/game/healthcircle/left_full
+  image-source: /data/images/game/healthcircle/left_full_test
   opacity: 0.7
   phantom: true
 
@@ -40,3 +40,20 @@ SkillCircleFront < UIProgressBar
   opacity: 0.7
   image-color: #FC8CFF
   phantom: true
+
+HealthCircleExtra < UIProgressBar
+  image-source: /data/images/game/healthcircle/left_extra_empy
+  opacity: 0.7
+  phantom: true
+
+HealthCircleExtraFront < UIProgressBar
+  image-source: /data/images/game/healthcircle/left_extra_full
+  opacity: 0.7
+  phantom: true
+
+HealthCircleVirtue < UIWidget
+  image-source: /data/images/game/healthcircle/virtue_test
+  size: 21 21
+  opacity: 0.7
+  phantom: true
+  image-color: #FC8CFF
