@@ -132,7 +132,7 @@ public:
     int getDrawElevation();
 
     Otc::Direction getDirection() { return m_direction; }
-    Outfit getOutfit() { return m_outfit; }
+    const auto& getOutfit() { return m_outfit; }
     const Light& getLight() const override;
     bool hasLight() const override { return Thing::hasLight() || getLight().intensity > 0; }
     bool hasMountShader() const { return m_mountShaderId > 0; }

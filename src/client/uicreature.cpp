@@ -30,7 +30,7 @@ void UICreature::drawSelf(const DrawPoolType drawPane)
     UIWidget::drawSelf(drawPane);
 
     if (m_creature) {
-        if (m_creature->getClientId() == 0) {
+        if (m_creature->getOutfit() != m_outfit) {
             m_creature->setOutfit(m_outfit, false);
         }
 
