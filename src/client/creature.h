@@ -66,7 +66,7 @@ public:
     void setHealthPercent(uint8_t healthPercent);
     void setManaPercent(uint8_t value) { m_manaPercent = value; }
     void setDirection(Otc::Direction direction);
-    void setOutfit(const Outfit& outfit);
+    void setOutfit(const Outfit& outfit, bool fireEvent = true);
     void setLight(const Light& light) { m_light = light; }
     void setSpeed(uint16_t speed);
     void setBaseSpeed(uint16_t baseSpeed);

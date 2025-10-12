@@ -31,7 +31,7 @@ void UICreature::drawSelf(const DrawPoolType drawPane)
 
     if (m_creature) {
         if (m_creature->getClientId() == 0) {
-            m_creature->setOutfit(m_outfit);
+            m_creature->setOutfit(m_outfit, false);
         }
 
         m_creature->setMarked(m_imageColor);
