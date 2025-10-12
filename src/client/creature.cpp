@@ -220,8 +220,6 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
         if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
             if (const auto& player = g_game.getLocalPlayer()) {
                 if (player->isMage() && player->getMaxManaShield() > 0) {
-                    static const Color manaShieldColor(90, 198, 255);
-
                     barsRect.moveTop(barsRect.bottom());
                     g_drawPool.addFilledRect(barsRect, Color::black);
 
@@ -229,7 +227,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
                     const double maxManaShield = player->getMaxManaShield();
                     manaShieldRect.setWidth((maxManaShield ? player->getManaShield() / maxManaShield : 1) * 25);
 
-                    g_drawPool.addFilledRect(manaShieldRect, manaShieldColor);
+                    g_drawPool.addFilledRect(manaShieldRect, Color::darkPink);
                 }
 
                 barsRect.moveTop(barsRect.bottom());
