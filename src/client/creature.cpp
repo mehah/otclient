@@ -211,23 +211,39 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     Rect healthRect = backgroundRect.expanded(-1);
     healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
+    Rect barsRect = backgroundRect;
+
     if (drawFlags & Otc::DrawBars) {
         g_drawPool.addFilledRect(backgroundRect, Color::black);
         g_drawPool.addFilledRect(healthRect, fillColor);
 
         if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
             if (const auto& player = g_game.getLocalPlayer()) {
-                backgroundRect.moveTop(backgroundRect.bottom());
+                if (player->isMage() && player->getMaxManaShield() > 0) {
+                    static const Color manaShieldColor(90, 198, 255);
 
-                g_drawPool.addFilledRect(backgroundRect, Color::black);
+                    barsRect.moveTop(barsRect.bottom());
+                    g_drawPool.addFilledRect(barsRect, Color::black);
 
-                Rect manaRect = backgroundRect.expanded(-1);
+                    Rect manaShieldRect = barsRect.expanded(-1);
+                    const double maxManaShield = player->getMaxManaShield();
+                    manaShieldRect.setWidth((maxManaShield ? player->getManaShield() / maxManaShield : 1) * 25);
+
+                    g_drawPool.addFilledRect(manaShieldRect, manaShieldColor);
+                }
+
+                barsRect.moveTop(barsRect.bottom());
+                g_drawPool.addFilledRect(barsRect, Color::black);
+
+                Rect manaRect = barsRect.expanded(-1);
                 const double maxMana = player->getMaxMana();
                 manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
 
                 g_drawPool.addFilledRect(manaRect, Color::blue);
             }
         }
+
+        backgroundRect = barsRect;
     }
 
     g_drawPool.setDrawOrder(DrawOrder::SECOND);
