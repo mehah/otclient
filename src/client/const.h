@@ -847,4 +847,19 @@ namespace Otc
         OPEN_OFFER = 4,
         OPEN_SEARCH = 5,
     };
+
+    enum Vocations_t : uint8_t
+    {
+        NONE = 0,
+        KNIGHT = 1,
+        PALADIN = 2,
+        SORCERER = 3,
+        DRUID = 4,
+        ELITE_KNIGHT = 11,
+        ROYAL_PALADIN = 12,
+        MASTER_SORCERER = 13,
+        ELDER_DRUID = 14,
+        FIRST = KNIGHT,
+        LAST = DRUID,
+    };
 }

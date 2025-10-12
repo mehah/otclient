@@ -22,6 +22,8 @@
 
 #pragma once
 
+#include "game.h"
+#include "localplayer.h"
 #include "creature.h"
 
  // @bindclass
@@ -33,4 +35,5 @@ public:
 
     PlayerPtr asPlayer() { return static_self_cast<Player>(); }
     bool isPlayer() override { return true; }
+    bool isMage() const;
 };
