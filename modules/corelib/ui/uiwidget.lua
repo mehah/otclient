@@ -47,7 +47,7 @@ end
 
 local FOR_CTX = {
     __keys = '',
-    __values = nil
+    __values = {}
 }
 
 local function ExprHandlerError(runtime, error, widget, controller, nodeStr, onError)
@@ -94,8 +94,10 @@ end
 function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
-    if attr == 'image-source' and not value:starts('/') and not value:starts('\\') then
-        value = '/modules/' .. controller.name .. '/' .. value
+    if attr == 'image-source' then
+        if not value:starts('/') and not value:starts('base64:') then
+            value = '/modules/' .. controller.name .. '/' .. value
+        end
     end
 
     local setterName = ''
@@ -115,8 +117,7 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             end)
 
         if self:isVisible() then
-            value, success = execFnc(fnc, { controller, self, FOR_CTX.__values and unpack(FOR_CTX.__values) }, self,
-                roller, NODE_STR,
+            value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR,
                 function()
                     return ('Attribute Error[%s]: %s'):format(attr, value)
                 end)
@@ -132,11 +133,11 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             method = nil,
             methodName = setterName:lower(),
             attr = attr:sub(2),
+            values = FOR_CTX.__values,
             isInheritable = isInheritable,
             htmlId = self:getHtmlId(),
-            valueExpr = FOR_CTX.__values or {},
             fnc = function(self)
-                local value = fnc(controller, self.widget, unpack(self.valueExpr))
+                local value = fnc(controller, self.widget, self.values and unpack(self.values))
                 if value ~= self.res then
                     self.method(self.widget, value)
                     if self.isInheritable then
@@ -163,9 +164,7 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
 
     local method = self['set' .. setterName]
     if method then
-        if value ~= nil then
-            method(self, value)
-        end
+        method(self, value)
 
         if watchObj then
             watchObj.method = method
@@ -223,7 +222,7 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
     local event = { target = widget }
     local forCtx = FOR_CTX.__values
     local function execEventCall()
-        execFnc(fnc, { controller, event, widget, forCtx and unpack(forCtx) }, widget, controller, NODE_STR, function()
+        execFnc(fnc, { controller, event, widget, unpack(forCtx) }, widget, controller, NODE_STR, function()
             return ('Event Error[%s]: %s'):format(eventName, callStr)
         end)
     end
@@ -308,6 +307,7 @@ function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
             parseEvents(self, attr:lower(), v, controller, NODE_STR)
         elseif attr == "for" then
             if tagName == 'label' then
+                print(tagName, v)
                 local widgetRef = self:getParent():getChildById(v)
                 if widgetRef then
                     controller:registerUIEvents(self, {
@@ -509,7 +509,7 @@ function UIWidget:__childFor(moduleName, expr, html, index)
             FOR_CTX.__values                             = c.__values
             widget:insert(childindex, html).__for_values = FOR_CTX.__values
             FOR_CTX.__keys                               = ''
-            FOR_CTX.__values                             = nil
+            FOR_CTX.__values                             = {}
         end)
 
         if isFirst then
@@ -519,7 +519,7 @@ function UIWidget:__childFor(moduleName, expr, html, index)
                     FOR_CTX.__values                            = { it, i }
                     widget:insert(index + i, html).__for_values = FOR_CTX.__values
                     FOR_CTX.__keys                              = ''
-                    FOR_CTX.__values                            = nil
+                    FOR_CTX.__values                            = {}
                 end,
                 onRemove = function(i)
                     local child = widget:getChildByIndex(index + i)

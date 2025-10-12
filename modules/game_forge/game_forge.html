@@ -1,0 +1,78 @@
+﻿<link href="game_forge.css" />
+<link href="tab/conversion/conversion.css" />
+<link href="tab/fusion/fusion.css" />
+<link href="tab/history/history.css" />
+<link href="tab/transfer/transfer.css" />
+<html>
+  <window class="forge-window" title="Exaltation Forge" onescape="self:close()">
+    <!-- Navigation buttons -->
+    <div
+      id="buttonPanel"
+      class="button-panel"
+      layout="type: horizontalBox;spacing:0"
+    >
+      <button
+        id="fusionBtn"
+        class="forge-btn btn-fusion"
+        onclick="self:loadMenu('fusionMenu')"
+      ></button>
+
+      <button
+        id="transferBtn"
+        class="forge-btn btn-transfer"
+        onclick="self:loadMenu('transferMenu')"
+      ></button>
+
+      <button
+        id="conversionBtn"
+        class="forge-btn btn-conversion"
+        onclick="self:loadMenu('conversionMenu')"
+      ></button>
+
+      <button
+        id="historyBtn"
+        class="forge-btn btn-history"
+        onclick="self:loadMenu('historyMenu')"
+      ></button>
+    </div>
+
+    <!-- Main content area -->
+    <div id="content" class="content-area"></div>
+
+    <!-- Separator -->
+    <hr class="separator HorizontalSeparator" />
+
+    <!-- Status bar with resources -->
+    <div class="status-bar">
+      <div class="status-item status-primary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="/images/game/prey/prey_gold" />
+          {{self.currentGold}}
+        </div>
+      </div>
+
+      <div class="status-item status-secondary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="images/icon-currency-dust" />
+          {{self.currentDustLevel}}
+        </div>
+      </div>
+
+      <div class="status-item status-tertiary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="images/icon-currency-sliver" />
+          {{self.currentSlivers}}
+        </div>
+      </div>
+
+      <div class="status-item status-tertiary resource-bottom-container">
+        <div class="resource-bottom">
+          <img src="images/icon-currency-exaltedcore" />
+          {{self.currentExaltedCores}}
+        </div>
+      </div>
+
+      <button class="close-btn" onclick="self:close()">Close</button>
+    </div>
+  </window>
+</html>
