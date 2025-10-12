@@ -263,7 +263,6 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
         bar.mana:setHeight(manaHeight)
 
         bar.manashield:show()
-        bar.manashield.showText = false
         bar.manashield:setMarginTop(0)
         bar.manashield:setHeight(shieldHeight)
         bar.manashield:setValue(manashield, maxManaShield)
@@ -271,24 +270,18 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
             bar.manashield.text:setWidth(400)
             local textOffset = math.floor(manaHeight / 2)
             local manaText = string.format('%d/%d (%d/%d)', mana, maxMana, manashield, maxManaShield)
-            local function applyShieldText()
-                if not bar.manashield or not bar.manashield.text then
-                    return
-                end
-
-                bar.manashield.text:setText(manaText)
-                bar.manashield.text:setMarginTop(-textOffset)
-                bar.manashield.text:setMarginBottom(0)
-                bar.manashield.text:show()
-                bar.manashield.text:raise()
+            if not bar.manashield or not bar.manashield.text then
+                return
             end
-
-            applyShieldText()
-            addEvent(applyShieldText)
+            bar.manashield.text:setMarginTop(-textOffset)
+            bar.manashield.text:setMarginBottom(0)
+            bar.manashield.text:show()
+            bar.manashield.text:raise()
+            bar.manashield.showText = true
+            bar.manashield.manaShieldText = manaText
         end
     else
         bar.mana.showText = true
-
 
         if bar.mana.defaultHeight then
             bar.mana:setHeight(bar.mana.defaultHeight)
