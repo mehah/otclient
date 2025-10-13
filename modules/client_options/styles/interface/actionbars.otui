@@ -1,5 +1,4 @@
 UIWidget
-// fast version
   anchors.fill: parent
   visible: false
 
@@ -7,7 +6,7 @@ UIWidget
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.top: parent.top
-    height: 86
+    height: 67
 
     Label
       !text: tr('Show Bottom Action Bars:')
@@ -29,6 +28,7 @@ UIWidget
       !text: tr('Bar 1')
       anchors.left: prev.left
       anchors.top: parent.top
+      text-offset: 14 0
       margin-top: 5
       margin-left: 53
 
@@ -39,7 +39,7 @@ UIWidget
       anchors.top: parent.top
       margin-top: 5
       margin-left: 53
-
+      text-offset: 14 0
     OptionCheckBox
       id: actionBarShowBottom3
       !text: tr('Bar 3')
@@ -47,9 +47,7 @@ UIWidget
       anchors.top: parent.top
       margin-top: 5
       margin-left: 53
-
-
-
+      text-offset: 14 0
     Label
       id: leftActionLabel
       !text: tr('Show Left Action Bars:')
@@ -68,12 +66,10 @@ UIWidget
     OptionCheckBox
       id: actionBarShowLeft1
       !text: tr('Bar 1')
-      text-offset: 14 -2
+      text-offset: 14 0
       anchors.left: prev.left
       anchors.top: prev.top
       margin-left: 53
-
-
 
     OptionCheckBox
       id: actionBarShowLeft2
@@ -81,16 +77,14 @@ UIWidget
       anchors.left: prev.left
       anchors.top: prev.top
       margin-left: 53
-
-
+      text-offset: 14 0
     OptionCheckBox
       id: actionBarShowLeft3
       !text: tr('Bar 3')
       anchors.left: prev.left
       anchors.top: prev.top
       margin-left: 53
-
-
+      text-offset: 14 0
     Label
       id: rightActionLabel
       !text: tr('Show Right Action Bars:')
@@ -109,7 +103,7 @@ UIWidget
     OptionCheckBox
       id: actionBarShowRight1
       !text: tr('Bar 1')
-      text-offset: 14 -2
+      text-offset: 14 0
       anchors.left: prev.left
       anchors.top: prev.top
       margin-left: 53
@@ -118,26 +112,19 @@ UIWidget
     OptionCheckBox
       id: actionBarShowRight2
       !text: tr('Bar 2')
-      text-offset: 14 -2
+      text-offset: 14 0
       anchors.left: prev.left
       anchors.top: prev.top
-      margin-left: 53
+      margin-left: 54
 
 
     OptionCheckBox
       id: actionBarShowRight3
       !text: tr('Bar 3')
-      text-offset: 14 -2
+      text-offset: 14 0
       anchors.left: prev.left
       anchors.top: prev.top
       margin-left: 53
-
-    Label
-      text: "Quick version, the style will be improved..."
-      anchors.left: parent.left
-      anchors.top: rightActionLabel.bottom
-      margin-top: 5
-      color: #f50000ff
 
   SmallReversedQtPanel
     anchors.left: parent.left
@@ -216,7 +203,7 @@ UIWidget
     anchors.right: parent.right
     anchors.top: prev.bottom
     margin-top: 7
-    height: 86
+    height: 75
 
     Label
       !text: tr('Clear Bottom Action Bars:')
@@ -342,7 +329,6 @@ UIWidget
       margin-right: 0
       margin-top: 3
       @onClick: modules.game_actionbar.resetAction(7)
-
 
   QtButton
     id: clearRightBar3
