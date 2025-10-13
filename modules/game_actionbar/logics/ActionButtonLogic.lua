@@ -294,8 +294,12 @@ function updateButtonState(button)
         local spellId = 0
         button:recursiveGetChildById('activeSpell'):setVisible(button.cache.spellData.id == spellId)
     elseif button.cache.itemId ~= 0 then
-        local isItemEquipped = player:hasEquippedItemId(button.cache.itemId, button.cache.upgradeTier)
-        local itemCount = player:getInventoryCount(button.cache.itemId, button.cache.upgradeTier)
+        local tier = 0
+        if g_game.getFeature(GameThingUpgradeClassification) then
+            tier = button.cache.upgradeTier
+        end
+        local isItemEquipped = player:hasEquippedItemId(button.cache.itemId, tier)
+        local itemCount = player:getInventoryCount(button.cache.itemId, tier)
 
         if g_game.getFeature(GameEnterGameShowAppearance) then -- fix old protocol
             if button.cache.actionType == UseTypes["Equip"] then
@@ -1025,4 +1029,3 @@ function onDragItemLeave(self, mousePos, button)
     end
     self:setBorderColor('alpha')
 end
-
