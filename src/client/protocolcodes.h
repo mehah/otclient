@@ -237,6 +237,7 @@ namespace Proto
         ClientPingBack = 30,
         ClientUseStash = 40,
         ClientBestiaryTrackerStatus = 42,
+        ClientPartyAnalyzerAction = 43,
 
         // all in game opcodes must be equal or greater than 50
         ClientFirstGameOpcode = 50,

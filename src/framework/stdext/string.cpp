@@ -163,7 +163,29 @@ namespace stdext
 
     void rtrim(std::string& s) { s.erase(std::ranges::find_if(s | std::views::reverse, [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end()); }
 
-    void trim(std::string& s) { ltrim(s);       rtrim(s); }
+    void trim(std::string& s) { ltrim(s); rtrim(s); }
+
+    void trimSpacesAndNewlines(std::string& s) {
+        if (s.empty()) return;
+
+        const unsigned char* data = reinterpret_cast<const unsigned char*>(s.data());
+        size_t start = 0;
+        size_t end = s.size();
+
+        while (start < end && std::isspace(data[start]))
+            ++start;
+
+        while (end > start && std::isspace(data[end - 1]))
+            --end;
+
+        if (start > 0 || end < s.size()) {
+            const size_t newSize = end - start;
+            if (start > 0)
+                s.erase(0, start);
+            if (newSize < s.size())
+                s.resize(newSize);
+        }
+    }
 
     void ucwords(std::string& str) {
         bool capitalize = true;

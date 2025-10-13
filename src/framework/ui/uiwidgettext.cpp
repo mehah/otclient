@@ -150,28 +150,6 @@ void UIWidget::onTextChange(const std::string_view text, const std::string_view 
 
 void UIWidget::onFontChange(const std::string_view font) { callLuaField("onFontChange", font); }
 
-static inline void trimSpacesAndNewlines(std::string& s) {
-    if (s.empty()) return;
-
-    const unsigned char* data = reinterpret_cast<const unsigned char*>(s.data());
-    size_t start = 0;
-    size_t end = s.size();
-
-    while (start < end && std::isspace(data[start]))
-        ++start;
-
-    while (end > start && std::isspace(data[end - 1]))
-        --end;
-
-    if (start > 0 || end < s.size()) {
-        const size_t newSize = end - start;
-        if (start > 0)
-            s.erase(0, start);
-        if (newSize < s.size())
-            s.resize(newSize);
-    }
-}
-
 void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 {
     std::string _text{ text.data() };
@@ -199,7 +177,7 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         auto originalText = m_text;
         { // get text size without wrap
             m_textAlign = Fw::AlignTopLeft;
-            trimSpacesAndNewlines(m_text);
+            stdext::trimSpacesAndNewlines(m_text);
             setProp(PropTextWrap, false);
             updateText();
             m_textSizeNowrap = m_textSize;

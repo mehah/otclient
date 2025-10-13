@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <vector>
 #include <framework/core/eventdispatcher.h>
 #include <framework/html/htmlmanager.h>
 #include <framework/html/htmlnode.h>
@@ -1171,7 +1172,7 @@ void UIWidget::updateTableLayout()
 
             UIWidget* cell = info.widget;
             const int padY = cell->getPaddingTop() + cell->getPaddingBottom();
-            const int contentH = std::max(0, tallestInRow - padY);
+            const int contentH = std::max<int>(0, tallestInRow - padY);
 
             if (cell->m_height.unit == Unit::Auto || cell->m_height.unit == Unit::FitContent) {
                 cell->setHeight_px(contentH);
@@ -1376,7 +1377,8 @@ UIWidgetPtr UIWidget::getVirtualParent() const {
     return parent;
 }
 void UIWidget::updateSize() {
-    if (!isAnchorable()) return;
+    if (!isAnchorable() || !m_parent)
+        return;
 
     if (m_htmlNode && (m_htmlNode->getType() == NodeType::Text || m_htmlNode->getStyle("inherit-text") == "true")) {
         const auto& parentSize = m_parent->m_width.unit == Unit::FitContent ? m_textSizeNowrap : m_parent->getSize();
@@ -1501,7 +1503,7 @@ void UIWidget::updateSize() {
 }
 
 void UIWidget::applyAnchorAlignment() {
-    if (!isOnHtml() || !isAnchorable())
+    if (!isOnHtml() || !isAnchorable() || !m_parent)
         return;
 
     resetAnchors();

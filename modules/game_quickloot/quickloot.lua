@@ -204,7 +204,15 @@ function QuickLoot.Define()
             return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
         end
 
-        g_resources.writeFileContents(file, result)
+        -- Safely attempt to write the file, ignoring errors during logout
+        local writeStatus, writeError = pcall(function()
+            return g_resources.writeFileContents(file, result)
+        end)
+        
+        if not writeStatus then
+            -- Log the error but don't spam the console during normal logout
+            g_logger.debug("Could not save QuickLoot settings during logout: " .. tostring(writeError))
+        end
     end
 
     function QuickLoot.start(quickLootFallbackToMainContainer, lootContainers)

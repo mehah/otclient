@@ -44,6 +44,7 @@ namespace stdext
     void ltrim(std::string& s);
     void rtrim(std::string& s);
     void trim(std::string& s);
+    void trimSpacesAndNewlines(std::string& s);
     void ucwords(std::string& str);
     void eraseWhiteSpace(std::string& str);
     void replace_all(std::string& str, std::string_view search, std::string_view replacement);
