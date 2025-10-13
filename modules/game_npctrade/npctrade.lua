@@ -152,6 +152,35 @@ function init()
   npcWindow:setContentHeight(175)
   npcWindow:setup()
 
+  -- Hide toggleFilterButton and newWindowButton, reposition contextMenuButton
+  local toggleFilterButton = npcWindow:recursiveGetChildById('toggleFilterButton')
+  if toggleFilterButton then
+    toggleFilterButton:setVisible(false)
+    toggleFilterButton:setOn(false)
+  end
+
+  local newWindowButton = npcWindow:recursiveGetChildById('newWindowButton')
+  if newWindowButton then
+    newWindowButton:setVisible(false)
+  end
+
+  local contextMenuButton = npcWindow:recursiveGetChildById('contextMenuButton')
+  local minimizeButton = npcWindow:recursiveGetChildById('minimizeButton')
+  if contextMenuButton and minimizeButton then
+    contextMenuButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+    contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+    contextMenuButton:setMarginRight(7)
+    contextMenuButton:setMarginTop(0)
+  end
+
+  -- Adjust lockButton anchors to be at the left of contextMenuButton
+  local lockButton = npcWindow:recursiveGetChildById('lockButton')
+  if lockButton and contextMenuButton then
+    lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
+    lockButton:addAnchor(AnchorRight, contextMenuButton:getId(), AnchorLeft)
+    lockButton:setMarginRight(2)
+  end
+
   itemsPanel = npcWindow:recursiveGetChildById('contentsPanel')
   searchText = npcWindow:recursiveGetChildById('searchText')
 
@@ -742,11 +771,11 @@ function onOpenNpcTrade(items, currencyId, currencyName)
   if currencyId ~= GOLD_COINS and currencyName == '' then
     currencyName = getItemServerName(currencyId)
     buyWithBackpack = false
-    currencyMoneyLabel:setText('Stock:')
+    currencyMoneyLabel:setText('Gold:')
   elseif currencyName ~= '' then
     currencyItem:setVisible(false)
     itemBorder:setVisible(false)
-    currencyMoneyLabel:setText('Stock:')
+    currencyMoneyLabel:setText('Gold:')
   end
 
   local currencyName = currencyName ~= '' and currencyName or 'Gold Coin'
