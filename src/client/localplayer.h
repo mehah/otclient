@@ -36,7 +36,7 @@ public:
     bool autoWalk(const Position& destination, bool retry = false);
     bool canWalk(bool ignoreLock = false);
 
-    void setStates(uint32_t states);
+    void setStates(uint64_t states);
     void setSkill(Otc::Skill skillId, uint16_t level, uint16_t levelPercent);
     void setBaseSkill(Otc::Skill skill, uint16_t baseLevel);
     void setHealth(uint32_t health, uint32_t maxHealth);
@@ -90,7 +90,7 @@ public:
     uint16_t getOfflineTrainingTime() { return m_offlineTrainingTime; }
     uint16_t getStoreExpBoostTime() { return m_storeExpBoostTime; }
 
-    uint32_t getStates() { return m_states; }
+    auto getStates() { return m_states; }
     uint32_t getMana() { return m_mana; }
     uint32_t getMaxMana() { return m_maxMana; }
     uint32_t getHealth() { return m_health; }
@@ -178,7 +178,7 @@ private:
 
     uint8_t m_autoWalkRetries{ 0 };
 
-    uint32_t m_states{ 0 };
+    uint64_t m_states{ 0 };
     uint8_t m_vocation{ 0 };
     uint16_t m_blessings{ Otc::BlessingNone };
 

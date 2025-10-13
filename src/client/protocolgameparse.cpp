@@ -2493,7 +2493,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
 void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
 {
-    uint32_t states;
+    uint64_t states;
     if (g_game.getClientVersion() >= 1281) {
         states = g_game.getClientVersion() >= 1405 ? msg->getU64() : msg->getU32();
         if (g_game.getFeature(Otc::GamePlayerStateCounter)) {
