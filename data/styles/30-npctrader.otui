@@ -1,100 +1,14 @@
-NpcWindow < UIMiniWindow
-  font: verdana-11px-antialised
-  color: #959595
-  icon-rect: 4 4 12 12
+NpcWindow < MiniWindow
   width: 175
   height: 365
-  text-offset: 20 1
-  text-align: topLeft
-  image-source: /images/ui/window
-  image-border: 4
-  image-border-top: 19
-  image-border-bottom: 4
-  focusable: true
-  &minimizedHeight: 19
-  icon-offset-y: -2
-
-  $on:
-    image-border-top: 19
-    image-border-bottom: 10
-    image-border: 4
-
-  UIWidget
-    id: miniwindowTopBar
-    anchors.top: parent.top
-    anchors.right: parent.right
-    anchors.left: parent.left
-    margin-right: 3
-    margin-left: 3
-    margin-top: 3
-    size: 258 14
-    phantom: true
-
-  UIButton
-    id: closeButton
-    anchors.top: parent.top
-    anchors.right: parent.right
-    margin-top: 2
-    margin-right: 3
-    size: 12 12
-    image-source: /images/ui/miniwindow_buttons
-    image-clip: 29 1 12 12
-
-    $hover:
-      image-clip: 29 15 12 12
-
-    $pressed:
-      image-clip: 29 29 12 12
-
-  UIButton
-    id: minimizeButton
-    anchors.top: closeButton.top
-    anchors.right: closeButton.left
-    margin-right: 1
-    size: 12 12
-    image-source: /images/ui/miniwindow_buttons
-    image-clip: 1 1 12 12
-
-    $hover:
-      image-clip: 1 15 12 12
-
-    $pressed:
-      image-clip: 1 29 12 12
-
-    $on:
-      image-clip: 15 1 12 12
-
-    $on hover:
-      image-clip: 15 15 12 12
-
-    $on pressed:
-      image-clip: 15 29 12 12
-
-  UIButton
-    id: extraButton
-    anchors.top: minimizeButton.top
-    anchors.right: minimizeButton.left
-    margin-right: 10
-    size: 12 12
-    image-source: /images/ui/miniwindow_buttons
-    image-clip: 113 1 12 12
-
-    $hover:
-      image-clip: 113 15 12 12
-
-    $pressed:
-      image-clip: 113 29 12 12
-
-    $on:
-      image-clip: 113 29 12 12
+  &minimizedHeight: 20
 
   FlatPanel
     id: headPanel
-    anchors.top: prev.bottom
+    anchors.top: miniwindowHeaderBorder.bottom
     anchors.left: parent.left
     anchors.right: parent.right
     height: 64
-    width: 168
     margin-left: 3
     margin-right: 3
     margin-top: 2
@@ -360,11 +274,11 @@ NpcWindow < UIMiniWindow
 
 NpcWindowContents < TextList
   id: contentsPanel
-  size: 168 214
-  anchors.fill: parent
+  anchors.top: headPanel.bottom
+  anchors.left: parent.left
   anchors.right: miniwindowScrollBar.left
   anchors.bottom: setupPanel.top
-  margin-left: 4
+  margin-left: 1
   margin-bottom: 2
-  margin-top: 78
+  margin-top: 2
   vertical-scrollbar: miniwindowScrollBar

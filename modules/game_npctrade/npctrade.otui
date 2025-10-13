@@ -45,19 +45,35 @@ NPCItemBox < UICheckBox
 
 NpcWindow
   id: tradeWindow
-  !text: tr('NPC Trade')
   height: 175
-  icon: /images/icons/icon-trade
-  @onEscape: hide()
-  @onExtra: onExtraMenu()
-  focusable: true
   @onEscape: modules.game_npctrade.toggleNPCFocus(false)
+  focusable: true
+  &save: true
+
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    image-source: /images/icons/icon-trade
+    image-rect: 0 0 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    !text: tr('NPC Trade')
+    color: #9d9d9dff
 
   NpcWindowContents
-    padding-top: 1
-    padding-bottom: 1
-    padding-left: 1
-    layout: verticalBox
 
   UIWidget
     id: miniborder

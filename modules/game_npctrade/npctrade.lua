@@ -285,7 +285,9 @@ function hide()
   end
 
   local layout = itemsPanel:getLayout()
-  layout:disableUpdates()
+  if layout then
+    layout:disableUpdates()
+  end
 
   clearSelectedItem()
 
@@ -298,8 +300,10 @@ function hide()
     radioItems = nil
   end
 
-  layout:enableUpdates()
-  layout:update()
+  if layout then
+    layout:enableUpdates()
+    layout:update()
+  end
 end
 
 function onItemBoxChecked(widget)
@@ -550,6 +554,10 @@ function getSellQuantity(item)
 end
 
 function canTradeItem(item)
+  if not item then
+    return false
+  end
+  
   if getCurrentTradeType() == BUY then
     return (ignoreCapacity or (not ignoreCapacity and playerFreeCapacity >= item.weight)) and
     getPlayerMoney() >= getItemPrice(item, true)
@@ -597,7 +605,9 @@ function refreshTradeItems()
   end
 
   local layout = itemsPanel:getLayout()
-  layout:disableUpdates()
+  if layout then
+    layout:disableUpdates()
+  end
 
   clearSelectedItem()
 
@@ -645,8 +655,10 @@ function refreshTradeItems()
     ::continue::
   end
 
-  layout:enableUpdates()
-  layout:update()
+  if layout then
+    layout:enableUpdates()
+    layout:update()
+  end
 end
 
 function refreshPlayerGoods()
@@ -662,18 +674,23 @@ function refreshPlayerGoods()
   local items = itemsPanel:getChildCount()
   for i = 1, items do
     local itemWidget = itemsPanel:getChildByIndex(i)
-    table.insert(itemWidgets, itemWidget)
+    if itemWidget and itemWidget.item then
+      table.insert(itemWidgets, itemWidget)
+    end
   end
 
   local function sortByName(a, b)
+    if not a.item or not b.item then return false end
     return a.item.name:lower() < b.item.name:lower()
   end
 
   local function sortByPrice(a, b)
+    if not a.item or not b.item then return false end
     return a.item.price < b.item.price
   end
 
   local function sortByWeight(a, b)
+    if not a.item or not b.item then return false end
     return a.item.weight < b.item.weight
   end
 
@@ -697,7 +714,7 @@ function refreshPlayerGoods()
     itemWidget.nameLabel:setEnabled(canTrade)
     local searchFilterEscaped = string.searchEscape(searchFilter)
     local searchCondition = (searchFilterEscaped == '') or
-    (searchFilterEscaped ~= '' and string.find(item.name:lower(), searchFilterEscaped) ~= nil)
+    (searchFilterEscaped ~= '' and item and item.name and string.find(item.name:lower(), searchFilterEscaped) ~= nil)
     local showAllItemsCondition = (currentTradeType == BUY) or (currentTradeType == SELL and canTrade)
     itemWidget:setVisible(searchCondition and showAllItemsCondition)
 
@@ -772,9 +789,7 @@ function onOpenNpcTrade(items, currencyId, currencyName)
 end
 
 function closeNpcTrade()
-  g_game.doThing(false)
   g_game.closeNpcTrade()
-  g_game.doThing(true)
   addEvent(hide)
 end
 
