@@ -102,6 +102,7 @@ NpcWindow < MiniWindow
       virtual: true
       priceable: false
       draggable: false
+      phantom: true
       visible: true
 
   VerticalScrollBar
