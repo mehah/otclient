@@ -218,9 +218,9 @@ SpellGroups = {
     [5] = 'Conjure',
     [6] = 'Crippling',
     [7] = 'Focus',
-    [8] = 'Ultimate Strikes',
-    [9] = 'Great Beams',
-    [10] = 'Bursts of Nature'
+    [8] = 'UltimateStrikes',
+    [9] = 'GreatBeams',
+    [10] = 'BurstsOfNature'
 }
 
 SpellRunesData = {
