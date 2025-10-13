@@ -46,8 +46,10 @@ NPCItemBox < UICheckBox
 NpcWindow
   id: tradeWindow
   height: 175
-  @onEscape: modules.game_npctrade.toggleNPCFocus(false)
-  focusable: true
+  @onEscape: |
+    function()
+      modules.game_npctrade.hide()
+    end
   &save: true
 
   UIWidget
