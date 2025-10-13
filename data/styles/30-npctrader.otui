@@ -45,28 +45,6 @@ NpcWindow < MiniWindow
       color: #C0C0C0
       text-auto-resize: true
 
-    UIWidget
-      id: itemBorder
-      size: 34 34
-      anchors.top: parent.top
-      anchors.right: parent.right
-      margin-right: 48
-      margin-top: 3
-      border-width: 1
-      border-color-top: #181818
-      border-color-left: #181818
-      border-color-bottom: #757575
-      border-color-right: #757575
-    UIItem
-      id: currencyItem
-      size: 32 32
-      anchors.top: parent.top
-      anchors.right: next.left
-      margin-right: 4
-      margin-top: 3
-      virtual: true
-      priceable: false
-      virtual-count: false
     Button
       id: buyTab
       size: 43 16
@@ -102,6 +80,29 @@ NpcWindow < MiniWindow
       margin-top: 4
       image-source: /images/skin/show-gui-help-red
       !tooltip: tr('Sell all items with one click')
+
+  UIWidget
+    id: itemBorder
+    size: 34 34
+    anchors.top: headPanel.top
+    anchors.right: headPanel.right
+    margin-right: 50
+    margin-top: 3
+    border-width: 1
+    border-color-top: #181818
+    border-color-left: #181818
+    border-color-bottom: #757575
+    border-color-right: #757575
+    visible: true
+
+    UIItem
+      id: currencyItem
+      size: 32 32
+      anchors.centerIn: parent
+      virtual: true
+      priceable: false
+      draggable: false
+      visible: true
 
   VerticalScrollBar
     id: miniwindowScrollBar

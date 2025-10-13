@@ -199,9 +199,19 @@ function init()
   itemButton = setupPanel:getChildById('item')
   tradeButton = npcWindow:recursiveGetChildById('tradeButton')
   headPanel = npcWindow:recursiveGetChildById('headPanel')
-  currencyItem = headPanel:getChildById('currencyItem')
-  itemBorder = headPanel:getChildById('itemBorder')
+  itemBorder = npcWindow:getChildById('itemBorder') -- Now direct child of npcWindow
+  currencyItem = npcWindow:recursiveGetChildById('currencyItem') -- Try recursive search
   currencyLabel = headPanel:getChildById('currencyLabel')
+
+  -- Debug: Check if elements were found
+  if not itemBorder then
+    print("ERROR: itemBorder not found")
+  end
+  if not currencyItem then
+    print("ERROR: currencyItem not found")
+  end
+
+  -- Currency setup moved to show() function when window is visible
 
   buyTab = npcWindow:recursiveGetChildById('buyTab')
   sellTab = npcWindow:recursiveGetChildById('sellTab')
@@ -278,6 +288,20 @@ function show()
       npcWindow.close = function() closeNpcTrade() end
       npcWindow:focus()
       setupPanel:enable()
+      
+      -- Set up default currency display (Gold Coins) - now that window is visible
+      if currencyItem and itemBorder then
+        -- Make sure both elements are explicitly visible
+        itemBorder:setVisible(true)
+        itemBorder:show()
+        currencyItem:setVisible(true)
+        currencyItem:show()
+        
+        -- Set up the gold coin
+        currencyItem:setItemId(3031) -- Gold coin item ID
+        currencyItem:setItemCount(100)
+        currencyItem:setShowCount(false)
+      end
     end
   end
 end
@@ -812,13 +836,20 @@ function onOpenNpcTrade(items, currencyId, currencyName)
   currencyItem:setShowCount(false)
   currencyMoneyLabel:setText('Gold:')
 
-  if currencyId ~= GOLD_COINS and currencyName == '' then
+  if currencyId ~= 3031 and currencyName == '' then -- 3031 is GOLD_COINS
     currencyName = getItemServerName(currencyId)
     buyWithBackpack = false
-    currencyMoneyLabel:setText('Gold:')
-  elseif currencyName ~= '' then
+    currencyMoneyLabel:setText('Stock:')
+  elseif currencyName ~= '' and currencyId ~= 3031 then
+    -- Only hide for non-gold currencies with custom names
     currencyItem:setVisible(false)
     itemBorder:setVisible(false)
+    currencyMoneyLabel:setText('Stock:')
+  else
+    -- For gold coins, always show the currency item and border
+    currencyItem:setVisible(true)
+    itemBorder:setVisible(true)
+    currencyItem:setShowCount(false)
     currencyMoneyLabel:setText('Gold:')
   end
 
