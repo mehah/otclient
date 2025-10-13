@@ -339,6 +339,10 @@ function selectAll(consoleBuffer)
 end
 
 function toggleChat()
+    if modules.game_interface.isInternalLocked() then
+        return
+    end
+    
     consoleToggleChat.isChecked = not consoleToggleChat.isChecked
     if consoleToggleChat.isChecked then
         consoleToggleChat:setText(tr('Chat Off'))
