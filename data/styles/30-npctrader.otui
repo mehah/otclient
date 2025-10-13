@@ -137,7 +137,6 @@ NpcWindow < MiniWindow
       padding-left: 4
       padding-top: 2
       box-text-padding: 30
-      @onClick: modules.game_npctrade.toggleNPCFocus(true)
       @onHoverChange: modules.game_npctrade.onTypeFieldsHover(self, self:isHovered())
       @onTextChange: modules.game_npctrade.onSearchTextChange()
       !placeholder: tr('Type to search')
@@ -189,8 +188,7 @@ NpcWindow < MiniWindow
       margin-left: 3
       margin-top: 5
       text-align: right
-      @onNotifyTextSelect: modules.game_npctrade.onTypeFieldsHover(self, true); modules.game_npctrade.toggleNPCFocus(true)
-      @onClick: modules.game_npctrade.toggleNPCFocus(true)
+      @onNotifyTextSelect: modules.game_npctrade.onTypeFieldsHover(self, true)
       @onHoverChange: modules.game_npctrade.onTypeFieldsHover(self, self:isHovered())
       @onTextChange: modules.game_npctrade.onAmountEdit(self)
       only-number: true

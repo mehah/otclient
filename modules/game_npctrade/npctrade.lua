@@ -261,8 +261,6 @@ function hide()
   saveData()
 
   npcWindow:hide()
-
-  toggleNPCFocus(false)
   
   -- Focus the Server Log tab in the console
   -- Use the established pattern from other modules
@@ -975,29 +973,10 @@ function clearSearch()
 end
 
 function onTypeFieldsHover(widget, hovered)
-  if not npcWindow then
-    return true
-  end
-
-  if not hovered and npcWindow:getBorderTopWidth() > 0 then
-    return
-  end
-
-  -- Focus handling is typically managed automatically by the UI system
-  -- modules.game_interface.toggleFocus(hovered, "npctrade")
+  -- Hover handling for type fields
 end
 
-function toggleNPCFocus(visible)
-  -- Focus handling is typically managed automatically by the UI system
-  -- modules.game_interface.toggleFocus(visible, "npctrade")
-  if visible then
-    npcWindow:setBorderWidth(2)
-    npcWindow:setBorderColor('white')
-  else
-    npcWindow:setBorderWidth(0)
-    -- modules.game_interface.toggleInternalFocus()
-  end
-end
+
 
 function checkItemToSell(self)
   local parent = self:getParent()
