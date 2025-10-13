@@ -168,32 +168,6 @@ void UIWidget::drawChildren(const Rect& visibleRect, const DrawPoolType drawPane
     }
 }
 
-UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
-    if (!isOnHtml()) return nullptr;
-    m_insertChildIndex = index;
-    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
-}
-
-UIWidgetPtr UIWidget::append(const std::string& html) {
-    if (!isOnHtml()) return nullptr;
-    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
-}
-
-UIWidgetPtr UIWidget::prepend(const std::string& html) {
-    return insert(1, html);
-}
-
-size_t UIWidget::remove(const std::string& queryString) {
-    if (!isOnHtml()) return 0;
-
-    const auto& nodes = querySelectorAll(queryString);
-    for (const auto& node : nodes) {
-        node->destroy();
-    }
-
-    return nodes.size();
-}
-
 void UIWidget::addChild(const UIWidgetPtr& child)
 {
     if (!child) {
@@ -1149,6 +1123,12 @@ bool UIWidget::setRect(const Rect& rect)
         clampedRect = rect.clamp(minSize, maxSize);
     }
 
+    if (!isOnHtml()) {
+        if (m_width.unit == Unit::Px)
+            m_width.valueCalculed = clampedRect.width();
+        if (m_height.unit == Unit::Px)
+            m_height.valueCalculed = clampedRect.height();
+    }
     /*
     if(rect.width() > 8192 || rect.height() > 8192) {
         g_logger.error("attempt to set huge rect size ({}) for {}", stdext::to_string(rect), m_id);
@@ -1249,6 +1229,8 @@ void UIWidget::setVisible(const bool visible)
         g_ui.onWidgetAppear(static_self_cast<UIWidget>());
     else
         g_ui.onWidgetDisappear(static_self_cast<UIWidget>());
+
+    refreshHtml(true);
 }
 
 void UIWidget::setOn(const bool on)
@@ -2094,7 +2076,7 @@ bool UIWidget::propagateOnMouseEvent(const Point& mousePos, UIWidgetList& widget
         }
     }
 
-    if (!isIgnoreEvent() && (!checkContainsPoint || containsPoint(mousePos))) {
+    if (!checkContainsPoint || containsPoint(mousePos)) {
         widgetList.emplace_back(static_self_cast<UIWidget>());
 
         if (!isPhantom() && !isOnHtml() || isDraggable())
@@ -2199,4 +2181,35 @@ UIWidgetPtr UIWidget::querySelector(const std::string& selector) {
             return widget;
     }
     return nullptr;
+}
+
+UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
+    if (!isOnHtml()) return nullptr;
+    m_insertChildIndex = index;
+    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
+}
+
+UIWidgetPtr UIWidget::append(const std::string& html) {
+    if (!isOnHtml()) return nullptr;
+    return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
+}
+
+UIWidgetPtr UIWidget::prepend(const std::string& html) {
+    return insert(1, html);
+}
+
+UIWidgetPtr UIWidget::html(const std::string& html) {
+    destroyChildren();
+    return append(html);
+}
+
+size_t UIWidget::remove(const std::string& queryString) {
+    if (!isOnHtml()) return 0;
+
+    const auto& nodes = querySelectorAll(queryString);
+    for (const auto& node : nodes) {
+        node->destroy();
+    }
+
+    return nodes.size();
 }

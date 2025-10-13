@@ -172,6 +172,15 @@ HtmlNodePtr parseHtml(const std::string& html) {
     auto push_node = [&](HtmlNodePtr node) {
         auto parent = st.top();
 
+        // merge consecutive non-expression text nodes
+        if (node->type == NodeType::Text && !node->isExpression() && !parent->children.empty()) {
+            auto last = parent->children.back();
+            if (last->type == NodeType::Text && !last->isExpression()) {
+                last->text += node->text;
+                return;
+            }
+        }
+
         if (!parent->children.empty()) {
             auto last = parent->children.back();
             last->next = node;
@@ -220,6 +229,35 @@ HtmlNodePtr parseHtml(const std::string& html) {
 
     std::vector<HtmlNodePtr> hoistedRaw;
     hoistedRaw.reserve(10);
+
+    auto append_or_drop_whitespace_literal = [&](const std::string& literal) {
+        if (literal.empty()) return;
+
+        bool onlyWhitespace = true;
+        for (char c : literal) {
+            if (!is_space((unsigned char)c)) { onlyWhitespace = false; break; }
+        }
+
+        auto parent = st.top();
+        if (onlyWhitespace) {
+            // If there's a previous text node, append whitespace to it;
+            // otherwise, drop it (do not create a standalone whitespace node).
+            if (!parent->children.empty()) {
+                auto last = parent->children.back();
+                if (last->type == NodeType::Text && !last->isExpression()) {
+                    last->text += literal;
+                    return;
+                }
+            }
+            return; // drop standalone whitespace
+        }
+
+        auto t = std::make_shared<HtmlNode>();
+        t->type = NodeType::Text;
+        t->text = literal;
+        t->setExpression(false);
+        push_node(t);
+    };
 
     while (i < N) {
         if (s[i] == '<') {
@@ -314,72 +352,44 @@ HtmlNodePtr parseHtml(const std::string& html) {
             if (!txt.empty()) {
                 std::string decoded = html_entity_decode(txt);
 
-                bool onlyWhitespace = true;
-                for (char c : decoded) {
-                    if (!is_space((unsigned char)c)) { onlyWhitespace = false; break; }
-                }
-
-                if (!decoded.empty() && !onlyWhitespace) {
-                    auto parent = st.top();
-
-                    if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
-                        parent->text += decoded;
-                    } else {
-                        size_t p = 0;
-                        while (p < decoded.size()) {
-                            size_t open = decoded.find("{{", p);
-                            if (open == std::string::npos) {
-                                std::string literal = decoded.substr(p);
-                                if (!literal.empty()) {
-                                    auto t = std::make_shared<HtmlNode>();
-                                    t->type = NodeType::Text;
-                                    t->text = literal;
-                                    t->setExpression(false);
-                                    push_node(t);
-                                }
-                                break;
-                            }
-
-                            if (open > p) {
-                                std::string literal = decoded.substr(p, open - p);
-                                if (!literal.empty()) {
-                                    auto t = std::make_shared<HtmlNode>();
-                                    t->type = NodeType::Text;
-                                    t->text = literal;
-                                    t->setExpression(false);
-                                    push_node(t);
-                                }
-                            }
-
-                            size_t close = decoded.find("}}", open + 2);
-                            if (close == std::string::npos) {
-                                std::string literal = decoded.substr(open);
-                                if (!literal.empty()) {
-                                    auto t = std::make_shared<HtmlNode>();
-                                    t->type = NodeType::Text;
-                                    t->text = literal;
-                                    t->setExpression(false);
-                                    push_node(t);
-                                }
-                                break;
-                            }
-
-                            std::string expr = decoded.substr(open + 2, close - (open + 2));
-                            size_t l = 0, r = expr.size();
-                            while (l < r && (unsigned char)expr[l] <= ' ') ++l;
-                            while (r > l && (unsigned char)expr[r - 1] <= ' ') --r;
-                            expr = expr.substr(l, r - l);
-
-                            if (!expr.empty()) {
-                                auto t = std::make_shared<HtmlNode>();
-                                t->type = NodeType::Text;
-                                t->text = expr;
-                                t->setExpression(true);
-                                push_node(t);
-                            }
-
-                            p = close + 2;
+                // Fast path: if we are inside a text-only element, append verbatim
+                auto parent = st.top();
+                if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
+                    parent->text += decoded;
+                } else {
+                    // Split by expressions {{...}}; literals follow the whitespace policy.
+                    size_t p = 0;
+                    while (p < decoded.size()) {
+                        size_t open = decoded.find("{{", p);
+                        if (open == std::string::npos) {
+                            append_or_drop_whitespace_literal(decoded.substr(p));
+                            break;
                         }
+                        if (open > p) {
+                            append_or_drop_whitespace_literal(decoded.substr(p, open - p));
+                        }
+                        size_t close = decoded.find("}}", open + 2);
+                        if (close == std::string::npos) {
+                            // Treat the rest as literal (likely user error); still apply whitespace policy.
+                            append_or_drop_whitespace_literal(decoded.substr(open));
+                            break;
+                        }
+
+                        // expression node
+                        std::string expr = decoded.substr(open + 2, close - (open + 2));
+                        size_t l = 0, r = expr.size();
+                        while (l < r && (unsigned char)expr[l] <= ' ') ++l;
+                        while (r > l && (unsigned char)expr[r - 1] <= ' ') --r;
+                        expr = expr.substr(l, r - l);
+
+                        if (!expr.empty()) {
+                            auto t = std::make_shared<HtmlNode>();
+                            t->type = NodeType::Text;
+                            t->text = expr;
+                            t->setExpression(true);
+                            push_node(t);
+                        }
+                        p = close + 2;
                     }
                 }
             }

@@ -810,7 +810,7 @@ void Creature::setDirection(const Otc::Direction direction)
     setAttachedEffectDirection(static_cast<Otc::Direction>(m_numPatternX));
 }
 
-void Creature::setOutfit(const Outfit& outfit)
+void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
 {
     if (m_outfit == outfit)
         return;
@@ -843,7 +843,8 @@ void Creature::setOutfit(const Outfit& outfit)
     if (const auto& tile = getTile())
         tile->checkForDetachableThing();
 
-    callLuaField("onOutfitChange", m_outfit, oldOutfit);
+    if (fireEvent)
+        callLuaField("onOutfitChange", m_outfit, oldOutfit);
 }
 
 void Creature::setSpeed(uint16_t speed)

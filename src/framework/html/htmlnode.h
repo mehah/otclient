@@ -30,6 +30,13 @@ inline std::string ascii_tolower_copy(std::string s) { ascii_tolower_inplace(s);
 
 enum class NodeType { Element, Text, Comment, Doctype };
 
+struct StyleValue
+{
+    std::string value;
+    std::string inheritedFromId;
+    bool important{ false };
+};
+
 class HtmlNode : public std::enable_shared_from_this<HtmlNode>
 {
 public:
@@ -147,7 +154,7 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    std::unordered_map <std::string, std::map<std::string, std::pair<std::string, std::string>>> m_styles; // value, inheritable
+    std::unordered_map< std::string, std::map<std::string, StyleValue>> m_styles; // value, inheritable
     std::unordered_map<std::string, std::map<std::string, std::string>> m_inheritableStyles;
 
     std::map<std::string, std::string> m_attrStyles;

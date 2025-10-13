@@ -47,7 +47,7 @@ end
 
 local FOR_CTX = {
     __keys = '',
-    __values = {}
+    __values = nil
 }
 
 local function ExprHandlerError(runtime, error, widget, controller, nodeStr, onError)
@@ -94,7 +94,7 @@ end
 function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
-    if attr == 'image-source' then
+    if attr == 'image-source' and not value:starts('/') and not value:starts('\\') then
         value = '/modules/' .. controller.name .. '/' .. value
     end
 
@@ -115,7 +115,8 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             end)
 
         if self:isVisible() then
-            value, success = execFnc(fnc, { controller, self, unpack(FOR_CTX.__values) }, self, controller, NODE_STR,
+            value, success = execFnc(fnc, { controller, self, FOR_CTX.__values and unpack(FOR_CTX.__values) }, self,
+                roller, NODE_STR,
                 function()
                     return ('Attribute Error[%s]: %s'):format(attr, value)
                 end)
@@ -131,11 +132,11 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             method = nil,
             methodName = setterName:lower(),
             attr = attr:sub(2),
-            values = FOR_CTX.__values,
             isInheritable = isInheritable,
             htmlId = self:getHtmlId(),
+            valueExpr = FOR_CTX.__values or {},
             fnc = function(self)
-                local value = fnc(controller, self.widget, self.values and unpack(self.values))
+                local value = fnc(controller, self.widget, unpack(self.valueExpr))
                 if value ~= self.res then
                     self.method(self.widget, value)
                     if self.isInheritable then
@@ -162,7 +163,9 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
 
     local method = self['set' .. setterName]
     if method then
-        method(self, value)
+        if value ~= nil then
+            method(self, value)
+        end
 
         if watchObj then
             watchObj.method = method
@@ -220,7 +223,7 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
     local event = { target = widget }
     local forCtx = FOR_CTX.__values
     local function execEventCall()
-        execFnc(fnc, { controller, event, widget, unpack(forCtx) }, widget, controller, NODE_STR, function()
+        execFnc(fnc, { controller, event, widget, forCtx and unpack(forCtx) }, widget, controller, NODE_STR, function()
             return ('Event Error[%s]: %s'):format(eventName, callStr)
         end)
     end
@@ -298,6 +301,35 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
     controller:registerUIEvents(widget, data)
 end
 
+function UIWidget:onClick(mousePos)
+    -- handle click in searchText box
+    if self and type(self.onClick) == "table" then
+        for _, func in pairs(self.onClick) do
+            if type(func) == "function" and func ~= UIWidget.onClick then
+                func(self, mousePos)
+            end
+        end
+    end
+
+    -- handle click outsite of the widge
+    local focusedWidgets = modules.game_interface.focusReason
+    if not focusedWidgets or table.empty(focusedWidgets) then
+        return true
+    end
+
+    local clickedWidget = g_ui.getRootWidget():recursiveGetChildByPos(mousePos, false)
+    if not clickedWidget then
+        return true
+    end
+
+    local ignorableWidgets = { "searchText" }
+    if table.contains(ignorableWidgets, clickedWidget:getId()) then
+        return true
+    end
+
+    return true
+end
+
 function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
     for attr, v in pairs(attrs) do
@@ -305,7 +337,6 @@ function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
             parseEvents(self, attr:lower(), v, controller, NODE_STR)
         elseif attr == "for" then
             if tagName == 'label' then
-                print(tagName, v)
                 local widgetRef = self:getParent():getChildById(v)
                 if widgetRef then
                     controller:registerUIEvents(self, {
@@ -507,7 +538,7 @@ function UIWidget:__childFor(moduleName, expr, html, index)
             FOR_CTX.__values                             = c.__values
             widget:insert(childindex, html).__for_values = FOR_CTX.__values
             FOR_CTX.__keys                               = ''
-            FOR_CTX.__values                             = {}
+            FOR_CTX.__values                             = nil
         end)
 
         if isFirst then
@@ -517,7 +548,7 @@ function UIWidget:__childFor(moduleName, expr, html, index)
                     FOR_CTX.__values                            = { it, i }
                     widget:insert(index + i, html).__for_values = FOR_CTX.__values
                     FOR_CTX.__keys                              = ''
-                    FOR_CTX.__values                            = {}
+                    FOR_CTX.__values                            = nil
                 end,
                 onRemove = function(i)
                     local child = widget:getChildByIndex(index + i)
