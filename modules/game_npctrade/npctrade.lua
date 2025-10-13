@@ -171,6 +171,11 @@ function init()
     contextMenuButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
     contextMenuButton:setMarginRight(7)
     contextMenuButton:setMarginTop(0)
+    
+    -- Add onClick handler for context menu
+    contextMenuButton.onClick = function(widget, mousePos, mouseButton)
+      return onExtraMenu()
+    end
   end
 
   -- Adjust lockButton anchors to be at the left of contextMenuButton
@@ -386,48 +391,84 @@ function onSearchTextChange()
   clearSelectedItem()
 end
 
+function getNPCTradeOptionState(choiceId)
+  if choiceId == 'buyInShoppingBags' then
+    return buyWithBackpack
+  elseif choiceId == 'ignoreCapacity' then
+    return ignoreCapacity
+  elseif choiceId == 'sellEquipped' then
+    return not ignoreEquipped
+  elseif choiceId == 'showSearchField' then
+    return true -- Always shown for now
+  end
+  return false
+end
+
+function onNPCTradeMenuAction(choiceId)
+  if choiceId == 'sortByName' then
+    SORT_BY = 'name'
+    refreshPlayerGoods()
+  elseif choiceId == 'sortByPrice' then
+    SORT_BY = 'price'
+    refreshPlayerGoods()
+  elseif choiceId == 'sortByWeight' then
+    SORT_BY = 'weight'
+    refreshPlayerGoods()
+  elseif choiceId == 'buyInShoppingBags' then
+    buyWithBackpack = not buyWithBackpack
+    refreshPlayerGoods()
+  elseif choiceId == 'ignoreCapacity' then
+    ignoreCapacity = not ignoreCapacity
+    refreshPlayerGoods()
+  elseif choiceId == 'sellEquipped' then
+    ignoreEquipped = not ignoreEquipped
+    refreshTradeItems()
+    refreshPlayerGoods()
+  end
+end
+
 function onExtraMenu()
-  local mousePosition = g_window.getMousePosition()
-  if cancelNextRelease then
-    cancelNextRelease = false
+  local menu = g_ui.createWidget('NPCTradeSubMenu')
+  if not menu then
     return false
   end
-
-  local menu = g_ui.createWidget('PopupMenu')
   menu:setGameMenu(true)
-  menu:addCheckBoxOption(tr('Sort by name'), function()
-    SORT_BY = 'name'; refreshPlayerGoods()
-  end, "", SORT_BY == 'name')
-  menu:addCheckBoxOption(tr('Sort by price'), function()
-    SORT_BY = 'price'; refreshPlayerGoods()
-  end, "", SORT_BY == 'price')
-  menu:addCheckBoxOption(tr('Sort by weight'), function()
-    SORT_BY = 'weight'; refreshPlayerGoods()
-  end, "", SORT_BY == 'weight')
-  menu:addSeparator()
-  if getCurrentTradeType() == BUY then
-    if CURRENCYID == GOLD_COINS then
-      menu:addCheckBoxOption(tr('Buy in shopping bags'),
-        function()
-          buyWithBackpack = not buyWithBackpack; refreshPlayerGoods()
-        end, "", buyWithBackpack)
+  
+  for _, choice in ipairs(menu:getChildren()) do
+    local choiceId = choice:getId()
+    if choiceId and choiceId ~= 'HorizontalSeparator' then
+      local widgetClass = choice:getClassName()
+      
+      -- Handle sorting options (buttons)
+      if choiceId == 'sortByName' or choiceId == 'sortByPrice' or choiceId == 'sortByWeight' then
+        choice.onClick = function()
+          onNPCTradeMenuAction(choiceId)
+          menu:destroy()
+        end
+      else
+        -- Handle checkbox options
+        local currentState = getNPCTradeOptionState(choiceId)
+        choice:setChecked(currentState)
+        choice.onCheckChange = function()
+          onNPCTradeMenuAction(choiceId)
+          menu:destroy()
+        end
+        
+        -- Show/hide options based on trade type
+        if choiceId == 'buyInShoppingBags' then
+          choice:setVisible(getCurrentTradeType() == BUY and CURRENCYID == GOLD_COINS)
+        elseif choiceId == 'ignoreCapacity' then
+          choice:setVisible(getCurrentTradeType() == BUY)
+        elseif choiceId == 'sellEquipped' then
+          choice:setVisible(getCurrentTradeType() == SELL)
+        elseif choiceId == 'showSearchField' then
+          choice:setChecked(true) -- Always shown for now
+        end
+      end
     end
-    menu:addCheckBoxOption(tr('Ignore capacity'), function()
-      ignoreCapacity = not ignoreCapacity; refreshPlayerGoods()
-    end, "", ignoreCapacity)
-  else
-    local equippedState = true
-    if ignoreEquipped then
-      equippedState = false
-    end
-    menu:addCheckBoxOption(tr('Sell equipped'),
-      function()
-        ignoreEquipped = not ignoreEquipped; refreshTradeItems(); refreshPlayerGoods()
-      end, "", equippedState)
   end
-  menu:addSeparator()
-  menu:addCheckBoxOption(tr('Show search field'), function() end, "", true)
-  menu:addCheckBoxOption(tr('Do not show a warning when trading large amounts'), function() end, "", false)
+  
+  local mousePosition = g_window.getMousePosition()
   menu:display(mousePosition)
   return true
 end
@@ -449,41 +490,44 @@ function itemPopup(self, mousePosition, mouseButton)
     menu:addOption(tr('Look'), function() return g_game.inspectNpcTrade(itemWidget:getItem()) end)
     menu:addOption(tr('Inspect'), function() g_game.sendInspectionObject(3, itemWidget:getItem():getId(), 1) end)
     menu:addSeparator()
-    menu:addCheckBoxOption(tr('Sort by name'), function()
-      SORT_BY = 'name'; refreshPlayerGoods()
-    end, "", SORT_BY == 'name')
-    menu:addCheckBoxOption(tr('Sort by price'), function()
-      SORT_BY = 'price'; refreshPlayerGoods()
-    end, "", SORT_BY == 'price')
-    menu:addCheckBoxOption(tr('Sort by weight'), function()
-      SORT_BY = 'weight'; refreshPlayerGoods()
-    end, "", SORT_BY == 'weight')
-    menu:addSeparator()
-    if getCurrentTradeType() == BUY then
-      if CURRENCYID == GOLD_COINS then
-        menu:addCheckBoxOption(tr('Buy in shopping bags'),
-          function()
-            buyWithBackpack = not buyWithBackpack; refreshPlayerGoods()
-          end, "", buyWithBackpack)
+    
+    -- Use the same menu as the context button but with item-specific options at the top
+    local subMenu = g_ui.createWidget('NPCTradeSubMenu')
+    if subMenu then
+      -- Copy the submenu items to the current menu
+      for _, choice in ipairs(subMenu:getChildren()) do
+        local choiceId = choice:getId()
+        if choiceId and choiceId ~= 'HorizontalSeparator' then
+          if choiceId == 'sortByName' or choiceId == 'sortByPrice' or choiceId == 'sortByWeight' then
+            local optionText = choice:getText()
+            menu:addOption(optionText, function()
+              onNPCTradeMenuAction(choiceId)
+            end)
+          else
+            -- Add checkable options only if they're relevant to current trade type
+            local shouldShow = true
+            if choiceId == 'buyInShoppingBags' then
+              shouldShow = (getCurrentTradeType() == BUY and CURRENCYID == GOLD_COINS)
+            elseif choiceId == 'ignoreCapacity' then
+              shouldShow = (getCurrentTradeType() == BUY)
+            elseif choiceId == 'sellEquipped' then
+              shouldShow = (getCurrentTradeType() == SELL)
+            end
+            
+            if shouldShow then
+              local currentState = getNPCTradeOptionState(choiceId)
+              local optionText = choice:getText() .. (currentState and ' ✓' or '')
+              menu:addOption(optionText, function()
+                onNPCTradeMenuAction(choiceId)
+              end)
+            end
+          end
+        else
+          menu:addSeparator()
+        end
       end
-      menu:addCheckBoxOption(tr('Ignore capacity'),
-        function()
-          ignoreCapacity = not ignoreCapacity; refreshPlayerGoods()
-        end, "", ignoreCapacity)
-    else
-      local equippedState = true
-      if ignoreEquipped then
-        equippedState = false
-      end
-
-      menu:addCheckBoxOption(tr('Sell equipped'),
-        function()
-          ignoreEquipped = not ignoreEquipped; refreshTradeItems(); refreshPlayerGoods()
-        end, "", equippedState)
+      subMenu:destroy()
     end
-    menu:addSeparator()
-    menu:addCheckBoxOption(tr('Show search field'), function() end, "", true)
-    menu:addCheckBoxOption(tr('Do not show a warning when trading large amounts'), function() end, "", false)
     menu:display(mousePosition)
     return true
   elseif ((g_mouse.isPressed(MouseLeftButton) and mouseButton == MouseRightButton)
