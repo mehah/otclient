@@ -371,6 +371,19 @@ void LocalPlayer::setMana(const uint32_t mana, const uint32_t maxMana)
     callLuaField("onManaChange", mana, maxMana, oldMana, oldMaxMana);
 }
 
+void LocalPlayer::setManaShield(const uint32_t manaShield, const uint32_t maxManaShield)
+{
+    if (m_manaShield == manaShield && m_maxManaShield == maxManaShield)
+        return;
+
+    const uint32_t oldManaShield = m_manaShield;
+    const uint32_t oldMaxManaShield = m_maxManaShield;
+    m_manaShield = manaShield;
+    m_maxManaShield = maxManaShield;
+
+    callLuaField("onManaShieldChange", manaShield, maxManaShield, oldManaShield, oldMaxManaShield);
+}
+
 void LocalPlayer::setMagicLevel(const uint16_t magicLevel, const uint16_t magicLevelPercent)
 {
     if (m_magicLevel == magicLevel && m_magicLevelPercent == magicLevelPercent)

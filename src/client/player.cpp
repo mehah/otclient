@@ -21,3 +21,13 @@
  */
 
 #include "player.h"
+
+
+bool Player::isMage() const {
+    static const std::set<uint8_t> mageVocations = { Otc::Vocations_t::SORCERER, Otc::Vocations_t::DRUID, Otc::Vocations_t::MASTER_SORCERER, Otc::Vocations_t::ELDER_DRUID };
+    if (const auto& player = g_game.getLocalPlayer()) {
+        const uint8_t vocationId = player->getVocation();
+        return mageVocations.find(vocationId) != mageVocations.end();
+    }
+    return false;
+}
