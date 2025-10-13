@@ -565,9 +565,8 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 |---|---|---|
 | wheel of destiny | ![](https://geps.dev/progress/10) | [#1311](https://github.com/mehah/otclient/pull/1311) |
 | Forge | ![](https://geps.dev/progress/1) | None |
-| Analyzer | ![](https://geps.dev/progress/99) | [#1310](https://github.com/mehah/otclient/pull/1310) |
 | Sound tibia 13 | ![](https://geps.dev/progress/80) | [#1098](https://github.com/mehah/otclient/pull/1098) |
-| Prey and Taks | ![](https://geps.dev/progress/0) | None |
+| Prey and tasks | ![](https://geps.dev/progress/0) | None |
 | compendium | ![](https://geps.dev/progress/0) | None |
 | Party List | ![](https://geps.dev/progress/0) | None |
 
