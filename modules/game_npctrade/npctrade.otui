@@ -85,3 +85,71 @@ NpcWindow
     size: 14 14
     margin-left: 2
     margin-bottom: 2
+
+NPCTradeSubMenuOption < ThickCheckBox
+  text-offset: 18 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+NPCTradeListOption < UIButton
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+  margin-left: 5
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+NPCTradeSubMenu < PopupMenu
+  id: npcTradeSubMenu
+  width: 285
+
+  NPCTradeListOption
+    id: sortByName
+    !text: tr('Sort by Name')
+  
+  NPCTradeListOption
+    id: sortByPrice
+    !text: tr('Sort by Price')
+  
+  NPCTradeListOption
+    id: sortByWeight
+    !text: tr('Sort by Weight')
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  NPCTradeSubMenuOption
+    id: buyInShoppingBags
+    !text: tr('Buy in Shopping Bags')
+
+  NPCTradeSubMenuOption
+    id: ignoreCapacity
+    !text: tr('Ignore Capacity')
+
+  NPCTradeSubMenuOption
+    id: sellEquipped
+    !text: tr('Sell Equipped')
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  NPCTradeSubMenuOption
+    id: showSearchField
+    !text: tr('Show Search Field')
