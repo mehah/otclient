@@ -1042,7 +1042,7 @@ local function getExperienceTooltip(localPlayer)
     end
     
     local states = localPlayer:getStates()
-    local isInBattle = bit.band(states, PlayerStates.Swords) > 0 or bit.band(states, PlayerStates.RedSwords) > 0
+    local isInBattle = Player.isStateActive(states, PlayerStates.Swords) or Player.isStateActive(states, PlayerStates.RedSwords)
     
     if not isInBattle then
         return tr('%s XP for next level', comma_value(expNeeded))
