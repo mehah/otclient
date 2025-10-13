@@ -152,7 +152,7 @@ function init()
   npcWindow:setContentHeight(175)
   npcWindow:setup()
 
-  -- Hide toggleFilterButton and newWindowButton, reposition contextMenuButton
+
   local toggleFilterButton = npcWindow:recursiveGetChildById('toggleFilterButton')
   if toggleFilterButton then
     toggleFilterButton:setVisible(false)
@@ -172,13 +172,13 @@ function init()
     contextMenuButton:setMarginRight(7)
     contextMenuButton:setMarginTop(0)
     
-    -- Add onClick handler for context menu
+
     contextMenuButton.onClick = function(widget, mousePos, mouseButton)
       return onExtraMenu()
     end
   end
 
-  -- Adjust lockButton anchors to be at the left of contextMenuButton
+
   local lockButton = npcWindow:recursiveGetChildById('lockButton')
   if lockButton and contextMenuButton then
     lockButton:addAnchor(AnchorTop, contextMenuButton:getId(), AnchorTop)
@@ -199,19 +199,9 @@ function init()
   itemButton = setupPanel:getChildById('item')
   tradeButton = npcWindow:recursiveGetChildById('tradeButton')
   headPanel = npcWindow:recursiveGetChildById('headPanel')
-  itemBorder = npcWindow:getChildById('itemBorder') -- Now direct child of npcWindow
-  currencyItem = npcWindow:recursiveGetChildById('currencyItem') -- Try recursive search
+  itemBorder = npcWindow:getChildById('itemBorder')
+  currencyItem = npcWindow:recursiveGetChildById('currencyItem')
   currencyLabel = headPanel:getChildById('currencyLabel')
-
-  -- Debug: Check if elements were found
-  if not itemBorder then
-    print("ERROR: itemBorder not found")
-  end
-  if not currencyItem then
-    print("ERROR: currencyItem not found")
-  end
-
-  -- Currency setup moved to show() function when window is visible
 
   buyTab = npcWindow:recursiveGetChildById('buyTab')
   sellTab = npcWindow:recursiveGetChildById('sellTab')
@@ -289,18 +279,18 @@ function show()
       npcWindow:focus()
       setupPanel:enable()
       
-      -- Set up default currency display (Gold Coins) - now that window is visible
       if currencyItem and itemBorder then
-        -- Make sure both elements are explicitly visible
         itemBorder:setVisible(true)
         itemBorder:show()
         currencyItem:setVisible(true)
         currencyItem:show()
         
-        -- Set up the gold coin
-        currencyItem:setItemId(3031) -- Gold coin item ID
-        currencyItem:setItemCount(100)
-        currencyItem:setShowCount(false)
+        local goldCoinItem = Item.create(3031)
+        if goldCoinItem then
+          currencyItem:setItem(goldCoinItem)
+        else
+          currencyItem:setItemId(3031)
+        end
       end
     end
   end
@@ -320,13 +310,10 @@ function hide()
 
   npcWindow:hide()
   
-  -- Focus the Server Log tab in the console
-  -- Use the established pattern from other modules
   local function focusServerLog()
     if modules.game_console.getTab then
       local serverTab = modules.game_console.getTab(tr('Server Log'))
       if serverTab then
-        -- Try to select the tab if consoleTabBar is accessible
         if modules.game_console.consoleTabBar then
           modules.game_console.consoleTabBar:selectTab(serverTab)
         end
@@ -334,7 +321,6 @@ function hide()
     end
   end
   
-  -- Try the focus operation, fall back to map focus if it fails
   local success = pcall(focusServerLog)
   if not success and modules.game_interface.getMapPanel then
     modules.game_interface.getMapPanel():focus()
@@ -423,7 +409,7 @@ function getNPCTradeOptionState(choiceId)
   elseif choiceId == 'sellEquipped' then
     return not ignoreEquipped
   elseif choiceId == 'showSearchField' then
-    return true -- Always shown for now
+    return true
   end
   return false
 end
@@ -463,14 +449,14 @@ function onExtraMenu()
     if choiceId and choiceId ~= 'HorizontalSeparator' then
       local widgetClass = choice:getClassName()
       
-      -- Handle sorting options (buttons)
+
       if choiceId == 'sortByName' or choiceId == 'sortByPrice' or choiceId == 'sortByWeight' then
         choice.onClick = function()
           onNPCTradeMenuAction(choiceId)
           menu:destroy()
         end
       else
-        -- Handle checkbox options
+
         local currentState = getNPCTradeOptionState(choiceId)
         choice:setChecked(currentState)
         choice.onCheckChange = function()
@@ -478,7 +464,7 @@ function onExtraMenu()
           menu:destroy()
         end
         
-        -- Show/hide options based on trade type
+
         if choiceId == 'buyInShoppingBags' then
           choice:setVisible(getCurrentTradeType() == BUY and CURRENCYID == GOLD_COINS)
         elseif choiceId == 'ignoreCapacity' then
@@ -486,7 +472,7 @@ function onExtraMenu()
         elseif choiceId == 'sellEquipped' then
           choice:setVisible(getCurrentTradeType() == SELL)
         elseif choiceId == 'showSearchField' then
-          choice:setChecked(true) -- Always shown for now
+          choice:setChecked(true)
         end
       end
     end
@@ -515,10 +501,10 @@ function itemPopup(self, mousePosition, mouseButton)
     menu:addOption(tr('Inspect'), function() g_game.sendInspectionObject(3, itemWidget:getItem():getId(), 1) end)
     menu:addSeparator()
     
-    -- Use the same menu as the context button but with item-specific options at the top
+
     local subMenu = g_ui.createWidget('NPCTradeSubMenu')
     if subMenu then
-      -- Copy the submenu items to the current menu
+
       for _, choice in ipairs(subMenu:getChildren()) do
         local choiceId = choice:getId()
         if choiceId and choiceId ~= 'HorizontalSeparator' then
@@ -528,7 +514,7 @@ function itemPopup(self, mousePosition, mouseButton)
               onNPCTradeMenuAction(choiceId)
             end)
           else
-            -- Add checkable options only if they're relevant to current trade type
+
             local shouldShow = true
             if choiceId == 'buyInShoppingBags' then
               shouldShow = (getCurrentTradeType() == BUY and CURRENCYID == GOLD_COINS)
@@ -829,29 +815,19 @@ end
 
 function onOpenNpcTrade(items, currencyId, currencyName)
   CURRENCYID = currencyId
-  currencyItem:setItemId(currencyId)
+  local currencyItemObj = Item.create(currencyId)
+  if currencyItemObj then
+    currencyItem:setItem(currencyItemObj)
+  else
+    currencyItem:setItemId(currencyId)
+  end
   currencyItem:setVisible(true)
   itemBorder:setVisible(true)
-  currencyItem:setItemCount(100)
-  currencyItem:setShowCount(false)
   currencyMoneyLabel:setText('Gold:')
 
-  if currencyId ~= 3031 and currencyName == '' then -- 3031 is GOLD_COINS
-    currencyName = getItemServerName(currencyId)
-    buyWithBackpack = false
-    currencyMoneyLabel:setText('Stock:')
-  elseif currencyName ~= '' and currencyId ~= 3031 then
-    -- Only hide for non-gold currencies with custom names
-    currencyItem:setVisible(false)
-    itemBorder:setVisible(false)
-    currencyMoneyLabel:setText('Stock:')
-  else
-    -- For gold coins, always show the currency item and border
-    currencyItem:setVisible(true)
-    itemBorder:setVisible(true)
-    currencyItem:setShowCount(false)
-    currencyMoneyLabel:setText('Gold:')
-  end
+  currencyItem:setVisible(true)
+  itemBorder:setVisible(true)
+  currencyMoneyLabel:setText('Gold:')
 
   local currencyName = currencyName ~= '' and currencyName or 'Gold Coin'
   currencyLabel:setText(short_text(currencyName, 11))
@@ -882,7 +858,7 @@ function onOpenNpcTrade(items, currencyId, currencyName)
     end
   end
 
-  addEvent(show) -- player goods has not been parsed yet
+  addEvent(show)
   scheduleEvent(refreshTradeItems, 50)
   scheduleEvent(refreshPlayerGoods, 50)
   if tradeButton:getText() == "Ok" then
@@ -902,7 +878,7 @@ end
 function onPlayerGoods(items)
   playerItems = {}
   
-  -- Ensure items is a table before using pairs
+
   if type(items) ~= 'table' then
     return
   end
@@ -1011,7 +987,7 @@ function getMaxAmount(item)
 end
 
 function sellAll(delayed, exceptions)
-  -- backward support
+
   if type(delayed) == "table" then
     exceptions = delayed
     delayed = false
@@ -1077,7 +1053,7 @@ function clearSearch()
 end
 
 function onTypeFieldsHover(widget, hovered)
-  -- Hover handling for type fields
+
 end
 
 
