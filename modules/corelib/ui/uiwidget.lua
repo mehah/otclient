@@ -94,6 +94,10 @@ end
 function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
 
+    if attr == 'image-source' and not value:starts('/') and not value:starts('\\') then
+        value = '/modules/' .. controller.name .. '/' .. value
+    end
+
     local setterName = ''
     for _, _name in pairs(attr:trim():split('-')) do
         setterName = setterName .. _name:gsub("^%l", string.upper)
@@ -295,6 +299,35 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
     end
 
     controller:registerUIEvents(widget, data)
+end
+
+function UIWidget:onClick(mousePos)
+    -- handle click in searchText box
+    if self and type(self.onClick) == "table" then
+        for _, func in pairs(self.onClick) do
+            if type(func) == "function" and func ~= UIWidget.onClick then
+                func(self, mousePos)
+            end
+        end
+    end
+
+    -- handle click outsite of the widge
+    local focusedWidgets = modules.game_interface.focusReason
+    if not focusedWidgets or table.empty(focusedWidgets) then
+        return true
+    end
+
+    local clickedWidget = g_ui.getRootWidget():recursiveGetChildByPos(mousePos, false)
+    if not clickedWidget then
+        return true
+    end
+
+    local ignorableWidgets = { "searchText" }
+    if table.contains(ignorableWidgets, clickedWidget:getId()) then
+        return true
+    end
+
+    return true
 end
 
 function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)

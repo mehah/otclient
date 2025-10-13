@@ -34,6 +34,7 @@ gameRightLockPanel = nil
 gameLeftLockPanel = nil
 
 hookedMenuOptions = {}
+focusReason = {}
 local lastStopAction = 0
 local mobileConfig = {
     mobileWidthJoystick = 0,
@@ -139,6 +140,13 @@ function init()
 
     logoutButton = modules.client_topmenu.addTopRightToggleButton('logoutButton', tr('Exit'), '/images/topbuttons/logout',
         tryLogout, true)
+
+    gameMapPanel.onClick = toggleInternalFocus
+    gameRightPanel.onClick = toggleInternalFocus
+    gameRightExtraPanel.onClick = toggleInternalFocus
+    gameLeftExtraPanel.onClick = toggleInternalFocus
+    gameLeftPanel.onClick = toggleInternalFocus
+    gameBottomPanel.onClick = toggleInternalFocus
 
     showTopMenuButton = gameMapPanel:getChildById('showTopMenuButton')
     showTopMenuButton.onClick = function()
@@ -1798,4 +1806,44 @@ function testExtendedView(mode)
         modules.client_topmenu.extendedView(extendedView)
         modules.game_mainpanel.toggleExtendedViewButtons(extendedView)
     end)
+end
+
+function toggleInternalFocus()
+    for reason, _ in pairs(focusReason) do
+        if reason == 'bosscooldown' then
+            modules.game_analyser.toggleBossCDFocus(false)
+        end
+    end
+end
+
+function isInternalLocked()
+    if not focusReason or table.empty(focusReason) then
+        return false
+    end
+    return true
+end
+
+function toggleFocus(value, reason)
+    if not reason then
+        reason = ''
+    end
+    if not value then
+        getBottomPanel():focus()
+        if not reason then
+            reason = ''
+        end
+
+        focusReason[reason] = nil
+    else
+        focusReason[reason] = true
+    end
+
+    if not value and #focusReason ~= 0 then
+        return
+    end
+
+    gameRightPanel:setFocusable(value)
+    gameLeftPanel:setFocusable(value)
+    gameRightExtraPanel:setFocusable(value)
+    gameLeftExtraPanel:setFocusable(value)
 end

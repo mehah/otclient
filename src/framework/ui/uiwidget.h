@@ -245,6 +245,8 @@ public:
     UIWidgetPtr insert(int32_t index, const std::string& html);
     UIWidgetPtr append(const std::string& html);
     UIWidgetPtr prepend(const std::string& queryString);
+    UIWidgetPtr html(const std::string& html);
+
     size_t remove(const std::string& html);
     void addChild(const UIWidgetPtr& child);
     void insertChild(int32_t index, const UIWidgetPtr& child);
