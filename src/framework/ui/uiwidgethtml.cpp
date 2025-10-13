@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <vector>
 #include <framework/core/eventdispatcher.h>
 #include <framework/html/htmlmanager.h>
 #include <framework/html/htmlnode.h>
@@ -1171,7 +1172,7 @@ void UIWidget::updateTableLayout()
 
             UIWidget* cell = info.widget;
             const int padY = cell->getPaddingTop() + cell->getPaddingBottom();
-            const int contentH = std::max(0, tallestInRow - padY);
+            const int contentH = std::max<int>(0, tallestInRow - padY);
 
             if (cell->m_height.unit == Unit::Auto || cell->m_height.unit == Unit::FitContent) {
                 cell->setHeight_px(contentH);
