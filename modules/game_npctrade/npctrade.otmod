@@ -1,7 +1,7 @@
 Module
   name: game_npctrade
   description: NPC trade interface
-  author: andrefaramir, baxnie
+  author: andrefaramir, baxnie, libergod
   website: https://github.com/edubart/otclient
   sandboxed: true
   scripts: [ npctrade ]
