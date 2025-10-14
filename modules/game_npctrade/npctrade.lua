@@ -150,7 +150,36 @@ function init()
 
   npcWindow:setContentMinimumHeight(175)
   npcWindow:setContentHeight(175)
+  
+  -- Get references early for minimize/maximize handlers
+  headPanel = npcWindow:recursiveGetChildById('headPanel')
+  itemsPanel = npcWindow:recursiveGetChildById('contentsPanel')
+  setupPanel = npcWindow:recursiveGetChildById('setupPanel')
+  
   npcWindow:setup()
+
+  -- Override minimize/maximize handlers to ensure proper hiding of content
+  npcWindow.onMinimize = function(self)
+    -- Hide all content panels when minimized
+    if itemsPanel then itemsPanel:setVisible(false) end
+    if setupPanel then setupPanel:setVisible(false) end
+    if headPanel then headPanel:setVisible(false) end
+    local scrollBar = self:getChildById('miniwindowScrollBar')
+    if scrollBar then scrollBar:setVisible(false) end
+    local bottomBorder = self:getChildById('bottomResizeBorder')  
+    if bottomBorder then bottomBorder:setVisible(false) end
+  end
+
+  npcWindow.onMaximize = function(self)
+    -- Show all content panels when maximized
+    if itemsPanel then itemsPanel:setVisible(true) end
+    if setupPanel then setupPanel:setVisible(true) end
+    if headPanel then headPanel:setVisible(true) end
+    local scrollBar = self:getChildById('miniwindowScrollBar')
+    if scrollBar then scrollBar:setVisible(true) end
+    local bottomBorder = self:getChildById('bottomResizeBorder')
+    if bottomBorder then bottomBorder:setVisible(true) end
+  end
 
 
   local toggleFilterButton = npcWindow:recursiveGetChildById('toggleFilterButton')
@@ -186,10 +215,8 @@ function init()
     lockButton:setMarginRight(2)
   end
 
-  itemsPanel = npcWindow:recursiveGetChildById('contentsPanel')
   searchText = npcWindow:recursiveGetChildById('searchText')
 
-  setupPanel = npcWindow:recursiveGetChildById('setupPanel')
   quantityScroll = setupPanel:getChildById('quantityScroll')
   amountText = setupPanel:getChildById('amountText')
 
@@ -198,7 +225,6 @@ function init()
   moneyLabel = setupPanel:getChildById('money')
   itemButton = setupPanel:getChildById('item')
   tradeButton = npcWindow:recursiveGetChildById('tradeButton')
-  headPanel = npcWindow:recursiveGetChildById('headPanel')
   itemBorder = npcWindow:getChildById('itemBorder')
   currencyItem = npcWindow:recursiveGetChildById('currencyItem')
   currencyLabel = headPanel:getChildById('currencyLabel')
