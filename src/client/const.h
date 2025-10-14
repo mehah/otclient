@@ -268,7 +268,7 @@ namespace Otc
         NpcIconTradeQuest
     };
 
-    enum PlayerStates : uint32_t
+    enum PlayerStates : uint64_t
     {
         IconNone = 0,
         IconPoison = 1,
