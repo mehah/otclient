@@ -65,7 +65,7 @@ function assignSpell(button)
             local primaryGroup = Spells.getPrimaryGroup(spellData)
             if primaryGroup ~= -1 then
                 local offSet = (primaryGroup == 2 and 23) or (primaryGroup == 3 and 40) or 1
-                widget.imageGroup:setImageClip(offSet .. " 25 20 20")
+                widget.imageGroup:setImageClip(offSet .. " 0 20 20")
                 widget.imageGroup:setVisible(true)
             end
         end

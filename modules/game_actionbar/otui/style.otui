@@ -47,7 +47,7 @@ SpellPreview < UICheckBox
     margin-right: 99
     phantom: true
     visible: false
-    image-source: /images/game/spells/cooldowns
+    image-source: /images/game/spells/spellgroup-icons-20x20
     image-clip: 1 25 20 20
 
   Label
