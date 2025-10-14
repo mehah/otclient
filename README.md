@@ -425,7 +425,7 @@ If it doesn't work, enable **curl**:
 <tr>
 <td align="center">Interface</td>
 <td align="center">Density Pixel</td>
-<td align="center">Joystick (patrykq)</td>
+<td align="center">Joystick</td>
 </tr>
 </table>
 </p>
@@ -563,10 +563,12 @@ Found a bug? Please create an issue in our **[bug tracker](https://github.com/me
 ## ❤️ Roadmap
 | TO-DO list | Status | PR |
 |---|---|---|
-| wheel of destiny | ![](https://geps.dev/progress/1) | None |
+| wheel of destiny | ![](https://geps.dev/progress/10) | [#1311](https://github.com/mehah/otclient/pull/1311) |
 | Forge | ![](https://geps.dev/progress/1) | None |
-| Analyzer | ![](https://geps.dev/progress/10) | [#802](https://github.com/mehah/otclient/pull/802) |
 | Sound tibia 13 | ![](https://geps.dev/progress/80) | [#1098](https://github.com/mehah/otclient/pull/1098) |
+| Prey and tasks | ![](https://geps.dev/progress/0) | None |
+| compendium | ![](https://geps.dev/progress/0) | None |
+| Party List | ![](https://geps.dev/progress/0) | None |
 
 ---
 

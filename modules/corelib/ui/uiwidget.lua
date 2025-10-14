@@ -62,12 +62,10 @@ end
 local function getFncByExpr(exp, nodeStr, widget, controller, onError)
     local f, syntaxErr = load(exp,
         ("Controller: %s | %s"):format(controller.name, controller.dataUI.name))
-
     if not f then
         ExprHandlerError(false, syntaxErr, widget, controller, nodeStr, onError)
         return
     end
-
     return f()
 end
 
@@ -75,15 +73,12 @@ local function execFnc(f, args, widget, controller, nodeStr, onError)
     if not f or not args then
         return
     end
-
     local success, value = xpcall(function()
         return f(unpack(args))
     end, function(e) return "Erro: " .. tostring(e) end)
-
     if not success then
         ExprHandlerError(true, value, widget, controller, nodeStr, onError)
     end
-
     return value, success
 end
 
@@ -302,7 +297,6 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
 end
 
 function UIWidget:onClick(mousePos)
-    -- handle click in searchText box
     if self and type(self.onClick) == "table" then
         for _, func in pairs(self.onClick) do
             if type(func) == "function" and func ~= UIWidget.onClick then
@@ -311,7 +305,6 @@ function UIWidget:onClick(mousePos)
         end
     end
 
-    -- handle click outsite of the widge
     local focusedWidgets = modules.game_interface.focusReason
     if not focusedWidgets or table.empty(focusedWidgets) then
         return true
@@ -403,7 +396,6 @@ function UIWidget:__scriptHtml(moduleName, script, NODE_STR)
     local controller = G_CONTROLLER_CALLED[moduleName]
     local fnc = getFncByExpr('return function(self) ' .. script .. ' end',
         NODE_STR, self, controller)
-
     execFnc(fnc, { controller }, self, controller, NODE_STR)
 end
 
@@ -434,7 +426,7 @@ function ngfor_exec(content, env, fn)
     end
     if not variable or not iterable then return end
 
-    local order = { variable, "index" --[[, "first", "last", "even", "odd"]] }
+    local order = { variable, "index" }
     for i = 1, #aliases do order[#order + 1] = aliases[i].name end
     local keys_str = ',' .. table.concat(order, ",")
 
@@ -505,17 +497,24 @@ function ngfor_exec(content, env, fn)
             pass = ok and cond
         end
 
-
         if pass then
             local values = {}
             for idx = 1, #order do
                 values[idx] = locals[order[idx]]
             end
+
+            local old_keys, old_values = FOR_CTX.__keys, FOR_CTX.__values
+            FOR_CTX.__keys             = keys_str
+            FOR_CTX.__values           = values
+            FOR_CTX.__key              = evalKey and (pcall(evalKey, menv) and evalKey(menv) or nil) or nil
+
             fn({
                 __keys   = keys_str,
                 __values = values,
-                __key    = evalKey and (pcall(evalKey, menv) and evalKey(menv) or nil) or nil
+                __key    = FOR_CTX.__key
             })
+
+            FOR_CTX.__keys, FOR_CTX.__values = old_keys, old_values
         end
     end
 
@@ -525,30 +524,59 @@ end
 function UIWidget:__childFor(moduleName, expr, html, index)
     local controller = G_CONTROLLER_CALLED[moduleName]
     local scan = function(self)
-        local env = { self = controller }
+        local baseEnv = { self = controller }
+        setmetatable(baseEnv, { __index = _G })
+
         local widget = self.widget
+
+        local function merge_parent_for_env(base, w)
+            if not w.__for_keys or not w.__for_values then return base end
+            local names = {}
+            for name in string.gmatch(w.__for_keys, "[^,%s]+") do
+                if name ~= "" then
+                    names[#names + 1] = name
+                end
+            end
+            local e = {}
+            local maxn = math.min(#names, #w.__for_values)
+            for i = 1, maxn do
+                e[names[i]] = w.__for_values[i]
+            end
+            setmetatable(e, { __index = base })
+            return e
+        end
+
+        local env = merge_parent_for_env(baseEnv, widget)
 
         local isFirst = (self.watchList == nil)
         local childindex = index
 
         local list, keys = ngfor_exec(expr, env, function(c)
             if not isFirst then return end
-            childindex                                   = childindex + 1
-            FOR_CTX.__keys                               = c.__keys
-            FOR_CTX.__values                             = c.__values
-            widget:insert(childindex, html).__for_values = FOR_CTX.__values
-            FOR_CTX.__keys                               = ''
-            FOR_CTX.__values                             = nil
+            childindex       = childindex + 1
+            FOR_CTX.__keys   = c.__keys
+            FOR_CTX.__values = c.__values
+            do
+                local __w        = widget:insert(childindex, html)
+                __w.__for_values = FOR_CTX.__values
+                __w.__for_keys   = FOR_CTX.__keys
+            end
+            FOR_CTX.__keys   = ''
+            FOR_CTX.__values = nil
         end)
 
         if isFirst then
             local watch = table.watchList(list, {
                 onInsert = function(i, it)
-                    FOR_CTX.__keys                              = keys
-                    FOR_CTX.__values                            = { it, i }
-                    widget:insert(index + i, html).__for_values = FOR_CTX.__values
-                    FOR_CTX.__keys                              = ''
-                    FOR_CTX.__values                            = nil
+                    FOR_CTX.__keys   = keys
+                    FOR_CTX.__values = { it, i }
+                    do
+                        local __w        = widget:insert(index + i, html)
+                        __w.__for_values = FOR_CTX.__values
+                        __w.__for_keys   = FOR_CTX.__keys
+                    end
+                    FOR_CTX.__keys   = ''
+                    FOR_CTX.__values = nil
                 end,
                 onRemove = function(i)
                     local child = widget:getChildByIndex(index + i)

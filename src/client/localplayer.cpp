@@ -242,12 +242,12 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
     m_serverWalk = false;
 }
 
-void LocalPlayer::setStates(const uint32_t states)
+void LocalPlayer::setStates(const uint64_t states)
 {
     if (m_states == states)
         return;
 
-    const uint32_t oldStates = m_states;
+    const uint64_t oldStates = m_states;
     m_states = states;
 
     if (isParalyzed())
@@ -369,6 +369,19 @@ void LocalPlayer::setMana(const uint32_t mana, const uint32_t maxMana)
     m_maxMana = maxMana;
 
     callLuaField("onManaChange", mana, maxMana, oldMana, oldMaxMana);
+}
+
+void LocalPlayer::setManaShield(const uint32_t manaShield, const uint32_t maxManaShield)
+{
+    if (m_manaShield == manaShield && m_maxManaShield == maxManaShield)
+        return;
+
+    const uint32_t oldManaShield = m_manaShield;
+    const uint32_t oldMaxManaShield = m_maxManaShield;
+    m_manaShield = manaShield;
+    m_maxManaShield = maxManaShield;
+
+    callLuaField("onManaShieldChange", manaShield, maxManaShield, oldManaShield, oldMaxManaShield);
 }
 
 void LocalPlayer::setMagicLevel(const uint16_t magicLevel, const uint16_t magicLevelPercent)
@@ -503,17 +516,6 @@ uint16_t LocalPlayer::getInventoryCount(const uint16_t itemId, const uint8_t tie
         total = maxUint16;
     }
     return static_cast<uint16_t>(total);
-}
-
-void LocalPlayer::setVocation(const uint8_t vocation)
-{
-    if (m_vocation == vocation)
-        return;
-
-    const uint8_t oldVocation = m_vocation;
-    m_vocation = vocation;
-
-    callLuaField("onVocationChange", vocation, oldVocation);
 }
 
 void LocalPlayer::setPremium(const bool premium)

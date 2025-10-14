@@ -727,11 +727,13 @@ void ProtocolGame::parseSetStoreDeepLink(const InputMessagePtr& msg)
 
 void ProtocolGame::parseBlessings(const InputMessagePtr& msg) const
 {
-    const uint16_t blessings = msg->getU16();
+    const uint16_t blessings = msg->getU16(); // glowing effect indicator
+    uint8_t blessVisualState = 0;
     if (g_game.getClientVersion() >= 1200) {
-        msg->getU8(); // Blessing count
+        blessVisualState = msg->getU8(); // 1 = Disabled | 2 = normal | 3 = green
     }
     m_localPlayer->setBlessings(blessings);
+    g_lua.callGlobalField("g_game", "onBlessingsChange", blessings, blessVisualState);
 }
 
 void ProtocolGame::parsePreset(const InputMessagePtr& msg)
@@ -1560,7 +1562,9 @@ void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg)
         boss.category = msg->getU8();
         boss.kills = msg->getU32();
         msg->getU8();
-        boss.isTrackerActived = msg->getU8();
+        if (g_game.getClientVersion() >= 1320) {
+            boss.isTrackerActived = msg->getU8();
+        }
         bossData.emplace_back(boss);
     }
 
@@ -2323,6 +2327,8 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 
     const uint32_t mana = g_game.getFeature(Otc::GameDoubleHealth) ? msg->getU32() : msg->getU16();
     const uint32_t maxMana = g_game.getFeature(Otc::GameDoubleHealth) ? msg->getU32() : msg->getU16();
+    uint32_t manaShield = 0;
+    uint32_t maxManaShield = 0;
 
     if (g_game.getClientVersion() < 1281) {
         const uint8_t magicLevel = msg->getU8();
@@ -2346,11 +2352,11 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
 
     if (g_game.getClientVersion() >= 1281) {
         if (g_game.getFeature(Otc::GameDoubleHealth)) {
-            msg->getU32(); // remaining mana shield
-            msg->getU32(); // total mana shield
+            manaShield = msg->getU32(); // remaining mana shield
+            maxManaShield = msg->getU32(); // total mana shield
         } else {
-            msg->getU16(); // remaining mana shield
-            msg->getU16(); // total mana shield
+            manaShield = msg->getU16(); // remaining mana shield
+            maxManaShield = msg->getU16(); // total mana shield
         }
     }
 
@@ -2360,6 +2366,10 @@ void ProtocolGame::parsePlayerStats(const InputMessagePtr& msg) const
     m_localPlayer->setExperience(experience);
     m_localPlayer->setLevel(level, levelPercent);
     m_localPlayer->setMana(mana, maxMana);
+    if (g_game.getClientVersion() >= 1281)
+        m_localPlayer->setManaShield(manaShield, maxManaShield);
+    else
+        m_localPlayer->setManaShield(0, 0);
     m_localPlayer->setStamina(stamina);
     m_localPlayer->setSoul(soul);
     m_localPlayer->setBaseSpeed(baseSpeed);
@@ -2494,7 +2504,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
 void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
 {
-    uint32_t states;
+    uint64_t states;
     if (g_game.getClientVersion() >= 1281) {
         states = g_game.getClientVersion() >= 1405 ? msg->getU64() : msg->getU32();
         if (g_game.getFeature(Otc::GamePlayerStateCounter)) {
