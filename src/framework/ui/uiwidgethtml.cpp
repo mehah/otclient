@@ -28,6 +28,7 @@
 #include <framework/html/htmlnode.h>
 #include "uimanager.h"
 #include "uiwidget.h"
+#include "layout_flex.h"
 
 namespace {
     inline uint32_t SIZE_VERSION_COUNTER = 1;
@@ -1487,6 +1488,13 @@ void UIWidget::updateSize() {
         int width = 0;
         int height = 0;
         applyFitContentRecursive(this, width, height);
+    }
+
+    if (m_displayType == DisplayType::Flex || m_displayType == DisplayType::InlineFlex) {
+        layoutFlex(*this);
+        m_width.pendingUpdate = false;
+        m_height.pendingUpdate = false;
+        return;
     }
 
     if (m_displayType == DisplayType::Table) {
