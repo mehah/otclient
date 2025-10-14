@@ -53,7 +53,6 @@ public:
     void setKnown(const bool known) { m_known = known; }
     void setPendingGame(const bool pending) { m_pending = pending; }
     void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item);
-    void setVocation(uint8_t vocation);
     void setPremium(bool premium);
     void setRegenerationTime(uint16_t regenerationTime);
     void setOfflineTrainingTime(uint16_t offlineTrainingTime);
@@ -74,7 +73,6 @@ public:
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
 
-    uint8_t getVocation() { return m_vocation; }
     uint16_t getMagicLevel() { return m_magicLevel; }
     uint16_t getMagicLevelPercent() { return m_magicLevelPercent; }
     uint16_t getBaseMagicLevel() { return m_baseMagicLevel; }
@@ -182,7 +180,6 @@ private:
     uint8_t m_autoWalkRetries{ 0 };
 
     uint64_t m_states{ 0 };
-    uint8_t m_vocation{ 0 };
     uint16_t m_blessings{ Otc::BlessingNone };
 
     uint32_t m_freeCapacity{ 0 };

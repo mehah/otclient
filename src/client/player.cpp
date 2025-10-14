@@ -21,13 +21,26 @@
  */
 
 #include "player.h"
-
+#include "game.h"
 
 bool Player::isMage() const {
-    static const std::set<uint8_t> mageVocations = { Otc::Vocations_t::SORCERER, Otc::Vocations_t::DRUID, Otc::Vocations_t::MASTER_SORCERER, Otc::Vocations_t::ELDER_DRUID };
-    if (const auto& player = g_game.getLocalPlayer()) {
-        const uint8_t vocationId = player->getVocation();
-        return mageVocations.find(vocationId) != mageVocations.end();
+    switch (m_vocation) {
+        case Otc::Vocations_t::SORCERER:
+        case Otc::Vocations_t::DRUID:
+        case Otc::Vocations_t::MASTER_SORCERER:
+        case Otc::Vocations_t::ELDER_DRUID:
+            return true;
+        default: return false;
     }
-    return false;
+}
+
+void Player::setVocation(const uint8_t vocation)
+{
+    if (m_vocation == vocation)
+        return;
+
+    const uint8_t oldVocation = m_vocation;
+    m_vocation = vocation;
+
+    callLuaField("onVocationChange", vocation, oldVocation);
 }

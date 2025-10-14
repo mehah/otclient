@@ -447,17 +447,6 @@ void LocalPlayer::setInventoryItem(const Otc::InventorySlot inventory, const Ite
     callLuaField("onInventoryChange", inventory, item, oldItem);
 }
 
-void LocalPlayer::setVocation(const uint8_t vocation)
-{
-    if (m_vocation == vocation)
-        return;
-
-    const uint8_t oldVocation = m_vocation;
-    m_vocation = vocation;
-
-    callLuaField("onVocationChange", vocation, oldVocation);
-}
-
 void LocalPlayer::setPremium(const bool premium)
 {
     if (m_premium == premium)
