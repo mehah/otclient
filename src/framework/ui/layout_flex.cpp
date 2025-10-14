@@ -43,6 +43,7 @@ namespace {
     {
         std::vector<size_t> itemIndices;
         double crossSize{ 0.0 };
+        double mainSize{ 0.0 };
     };
 
     inline Axis mainAxisForDirection(FlexDirection direction)
@@ -141,6 +142,24 @@ namespace {
             freeSpace = 0.0;
     }
 
+    AlignSelf alignSelfFromAlignItems(AlignItems alignItems)
+    {
+        switch (alignItems) {
+            case AlignItems::Stretch:
+                return AlignSelf::Stretch;
+            case AlignItems::FlexStart:
+                return AlignSelf::FlexStart;
+            case AlignItems::FlexEnd:
+                return AlignSelf::FlexEnd;
+            case AlignItems::Center:
+                return AlignSelf::Center;
+            case AlignItems::Baseline:
+                return AlignSelf::Baseline;
+            default:
+                return AlignSelf::Stretch;
+        }
+    }
+
     void distributeNegativeSpace(std::vector<FlexItemData*>& items, double& freeSpace)
     {
         if (freeSpace >= 0.0)
@@ -211,7 +230,7 @@ void layoutFlex(UIWidget& container)
     const int containerCrossSize = (mainAxis == Axis::Horizontal) ? container.getHeight() : container.getWidth();
 
     const double innerMainSize = std::max(0, containerMainSize - paddingStart - paddingEnd);
-    const double innerCrossSize = std::max(0, containerCrossSize - paddingCrossStart - paddingCrossEnd);
+    double innerCrossSize = std::max(0, containerCrossSize - paddingCrossStart - paddingCrossEnd);
 
     const double mainGap = (mainAxis == Axis::Horizontal) ? style.columnGap : style.rowGap;
     const double crossGap = (mainAxis == Axis::Horizontal) ? style.rowGap : style.columnGap;
@@ -356,6 +375,20 @@ void layoutFlex(UIWidget& container)
         line.crossSize = lineCross;
     }
 
+    double contentCross = 0.0;
+    for (size_t i = 0; i < lines.size(); ++i) {
+        contentCross += lines[i].crossSize;
+        if (i + 1 < lines.size())
+            contentCross += crossGap;
+    }
+
+    const bool crossAuto = (mainAxis == Axis::Horizontal)
+        ? (container.getHeightHtml().needsUpdate(Unit::Auto) || container.getHeightHtml().needsUpdate(Unit::FitContent))
+        : (container.getWidthHtml().needsUpdate(Unit::Auto) || container.getWidthHtml().needsUpdate(Unit::FitContent));
+
+    if (crossAuto)
+        innerCrossSize = contentCross;
+
     for (auto& line : lines) {
         std::vector<FlexItemData*> lineItems;
         lineItems.reserve(line.itemIndices.size());
@@ -398,6 +431,7 @@ void layoutFlex(UIWidget& container)
                 totalOuter += mainGap;
         }
         freeSpace = innerMainSize - totalOuter;
+        line.mainSize = totalOuter;
 
         double betweenSpacing = mainGap;
         double leadingSpace = 0.0;
@@ -527,7 +561,7 @@ void layoutFlex(UIWidget& container)
             auto& item = items[itemIdx];
             AlignSelf align = item.alignSelf;
             if (align == AlignSelf::Auto)
-                align = style.alignSelf;
+                align = alignSelfFromAlignItems(style.alignItems);
 
             double available = lineCrossSize - item.marginCrossStart - item.marginCrossEnd;
             available = std::max(0.0, available);
@@ -567,6 +601,30 @@ void layoutFlex(UIWidget& container)
         const int y = container.getPaddingTop() + ((mainAxis == Axis::Horizontal) ? roundi(item.crossPos) : roundi(item.mainPos));
 
         item.widget->setRect(Rect(Point(x, y), Size(width, height)));
+    }
+
+    if (crossAuto) {
+        const double totalCrossWithPadding = contentCross + paddingCrossStart + paddingCrossEnd;
+        int desired = std::max(0, roundi(totalCrossWithPadding));
+        if (mainAxis == Axis::Horizontal) {
+            const int minH = container.getMinHeight();
+            const int maxH = container.getMaxHeight();
+            if (minH >= 0)
+                desired = std::max(desired, minH);
+            if (maxH >= 0)
+                desired = std::min(desired, maxH);
+            if (container.getHeight() != desired)
+                container.setHeight_px(desired);
+        } else {
+            const int minW = container.getMinWidth();
+            const int maxW = container.getMaxWidth();
+            if (minW >= 0)
+                desired = std::max(desired, minW);
+            if (maxW >= 0)
+                desired = std::min(desired, maxW);
+            if (container.getWidth() != desired)
+                container.setWidth_px(desired);
+        }
     }
 
     for (const auto& childPtr : container.getChildren()) {
