@@ -28,7 +28,7 @@
 #include <framework/html/htmlnode.h>
 #include "uimanager.h"
 #include "uiwidget.h"
-#include "layout_flex.h"
+#include "uilayoutflexbox.h"
 
 namespace {
     inline uint32_t SIZE_VERSION_COUNTER = 1;
