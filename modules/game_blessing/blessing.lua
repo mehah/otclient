@@ -12,7 +12,6 @@ end
 
 function BlessingController:onGameStart()
     if g_game.getClientVersion() >= 1000 then
-        BlessingController.historyButtonText = "Back"
         BlessingController:registerEvents(g_game, {
             onUpdateBlessDialog = onUpdateBlessDialog
         })
@@ -34,16 +33,16 @@ end
 function BlessingController:showHistory()
     local ui = BlessingController.ui
     if ui.historyPanel:isVisible() then
+        BlessingController.historyButtonText = "History"
         setBlessingView()
-        BlessingController.historyButtonText = "Back"
     else
+        BlessingController.historyButtonText = "Back"
         setHistoryView()
     end
 end
 
 function setHistoryView()
     local ui = BlessingController.ui
-    BlessingController.historyButtonText = "History"
     ui.blessingsRecordPanel:hide()
     ui.promotionPanel:hide()
     ui.deathPenaltyPanel:hide()
@@ -59,6 +58,7 @@ function setBlessingView()
 end
 
 function show()
+    BlessingController.historyButtonText = "History"
     g_ui.importStyle("style.otui")
     BlessingController:loadHtml('blessing.html')
     g_game.requestBless()
