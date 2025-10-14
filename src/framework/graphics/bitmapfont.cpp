@@ -27,11 +27,10 @@
 #include "textureatlas.h"
 
 #include <framework/otml/otml.h>
-
 #include "drawpoolmanager.h"
 
 static thread_local std::vector<Point> s_glyphsPositions(1);
-static thread_local std::vector<int> s_lineWidths(1);
+static thread_local std::vector<int>   s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
@@ -45,7 +44,6 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     m_firstGlyph = fontNode->valueAt("first-glyph", 32);
     m_glyphSpacing = fontNode->valueAt("spacing", Size(0));
 
-    // load font texture
     m_texture = g_textures.getTexture(textureFile, false);
     if (!m_texture)
         return;
@@ -60,25 +58,11 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
         calculateGlyphsWidthsAutomatically(Image::load(textureFile), glyphSize);
     }
 
-    // 32 and 160 are spaces (&nbsp;)
     m_glyphsSize[32].setWidth(spaceWidth);
     m_glyphsSize[160].setWidth(spaceWidth);
-
-    // use 127 as spacer [Width: 1], Important for the current NPC highlighting system
     m_glyphsSize[127].setWidth(1);
-
-    // new line actually has a size that will be useful in multiline algorithm
     m_glyphsSize[static_cast<uint8_t>('\n')] = { 1, m_glyphHeight };
 
-    // read custom widths
-    /*
-    if(const auto& node = fontNode->get("glyph-widths")) {
-            for(const OTMLNodePtr& child : node->children())
-                    m_glyphsSize[stdext::safe_cast<int>(child->tag())].setWidth(child->value<int>());
-    }
-    */
-
-    // calculate glyphs texture coords
     const int numHorizontalGlyphs = textureSize.width() / glyphSize.width();
     for (int glyph = m_firstGlyph; glyph < 256; ++glyph) {
         m_glyphsTextureCoords[glyph].setRect(((glyph - m_firstGlyph) % numHorizontalGlyphs) * glyphSize.width(),
@@ -99,80 +83,87 @@ void BitmapFont::drawText(const std::string_view text, const Rect& screenCoords,
 {
     Size textBoxSize;
     calculateGlyphsPositions(text, align, s_glyphsPositions, &textBoxSize);
-    for (const auto& [dest, src] : getDrawTextCoords(text, textBoxSize, align, screenCoords, s_glyphsPositions)) {
-        g_drawPool.addTexturedRect(dest, m_texture, src, color);
+
+    auto pairs = getDrawTextCoords(text, textBoxSize, align, screenCoords, s_glyphsPositions);
+    for (const auto& p : pairs) {
+        g_drawPool.addTexturedRect(p.first, m_texture, p.second, color);
     }
 }
 
-std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text, const Size& textBoxSize, const Fw::AlignmentFlag align, const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const
+inline bool BitmapFont::clipAndTranslateGlyph(Rect& glyphScreenCoords, Rect& glyphTextureCoords, const Rect& screenCoords) const noexcept
+{
+    if (glyphScreenCoords.bottom() < 0 || glyphScreenCoords.right() < 0)
+        return false;
+
+    if (glyphScreenCoords.top() < 0) {
+        glyphTextureCoords.setTop(glyphTextureCoords.top() - glyphScreenCoords.top());
+        glyphScreenCoords.setTop(0);
+    }
+    if (glyphScreenCoords.left() < 0) {
+        glyphTextureCoords.setLeft(glyphTextureCoords.left() - glyphScreenCoords.left());
+        glyphScreenCoords.setLeft(0);
+    }
+
+    glyphScreenCoords.translate(screenCoords.topLeft());
+
+    if (!screenCoords.intersects(glyphScreenCoords))
+        return false;
+
+    if (glyphScreenCoords.bottom() > screenCoords.bottom()) {
+        glyphTextureCoords.setBottom(glyphTextureCoords.bottom() + (screenCoords.bottom() - glyphScreenCoords.bottom()));
+        glyphScreenCoords.setBottom(screenCoords.bottom());
+    }
+    if (glyphScreenCoords.right() > screenCoords.right()) {
+        glyphTextureCoords.setRight(glyphTextureCoords.right() + (screenCoords.right() - glyphScreenCoords.right()));
+        glyphScreenCoords.setRight(screenCoords.right());
+    }
+
+    return true;
+}
+
+std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::string_view text,
+                                                                 const Size& textBoxSize,
+                                                                 const Fw::AlignmentFlag align,
+                                                                 const Rect& screenCoords,
+                                                                 const std::vector<Point>& glyphsPositions) const noexcept
 {
     std::vector<std::pair<Rect, Rect>> list;
-    // prevent glitches from invalid rects
     if (!screenCoords.isValid() || !m_texture)
         return list;
 
-    const int textLength = text.length();
+    const int textLength = static_cast<int>(text.length());
+    list.reserve(textLength);
+
+    int dx = 0;
+    int dy = 0;
+
+    if (align & Fw::AlignBottom) {
+        dy = screenCoords.height() - textBoxSize.height();
+    } else if (align & Fw::AlignVerticalCenter) {
+        dy = (screenCoords.height() - textBoxSize.height()) / 2;
+    }
+
+    if (align & Fw::AlignRight) {
+        dx = screenCoords.width() - textBoxSize.width();
+    } else if (align & Fw::AlignHorizontalCenter) {
+        dx = (screenCoords.width() - textBoxSize.width()) / 2;
+    }
+
+    const AtlasRegion* region = m_texture->getAtlasRegion();
 
     for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
+        if (glyph < 32) continue;
 
-        // skip invalid glyphs
-        if (glyph < 32)
-            continue;
-
-        // calculate initial glyph rect and texture coords
-        Rect glyphScreenCoords(glyphsPositions[i], m_glyphsSize[glyph]);
+        Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy), m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
 
-        // first translate to align position
-        if (align & Fw::AlignBottom) {
-            glyphScreenCoords.translate(0, screenCoords.height() - textBoxSize.height());
-        } else if (align & Fw::AlignVerticalCenter) {
-            glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
-        } else { // AlignTop
-            // nothing to do
-        }
-
-        if (align & Fw::AlignRight) {
-            glyphScreenCoords.translate(screenCoords.width() - textBoxSize.width(), 0);
-        } else if (align & Fw::AlignHorizontalCenter) {
-            glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
-        } else { // AlignLeft
-            // nothing to do
-        }
-
-        // only render glyphs that are after 0, 0
-        if (glyphScreenCoords.bottom() < 0 || glyphScreenCoords.right() < 0)
+        if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
             continue;
 
-        // bound glyph topLeft to 0,0 if needed
-        if (glyphScreenCoords.top() < 0) {
-            glyphTextureCoords.setTop(glyphTextureCoords.top() - glyphScreenCoords.top());
-            glyphScreenCoords.setTop(0);
-        }
-        if (glyphScreenCoords.left() < 0) {
-            glyphTextureCoords.setLeft(glyphTextureCoords.left() - glyphScreenCoords.left());
-            glyphScreenCoords.setLeft(0);
-        }
+        if (region)
+            glyphTextureCoords.translate(region->x, region->y);
 
-        // translate rect to screen coords
-        glyphScreenCoords.translate(screenCoords.topLeft());
-
-        // only render if glyph rect is visible on screenCoords
-        if (!screenCoords.intersects(glyphScreenCoords))
-            continue;
-
-        // bound glyph bottomRight to screenCoords bottomRight
-        if (glyphScreenCoords.bottom() > screenCoords.bottom()) {
-            glyphTextureCoords.setBottom(glyphTextureCoords.bottom() + (screenCoords.bottom() - glyphScreenCoords.bottom()));
-            glyphScreenCoords.setBottom(screenCoords.bottom());
-        }
-        if (glyphScreenCoords.right() > screenCoords.right()) {
-            glyphTextureCoords.setRight(glyphTextureCoords.right() + (screenCoords.right() - glyphScreenCoords.right()));
-            glyphScreenCoords.setRight(screenCoords.right());
-        }
-
-        // add glyph
         list.emplace_back(glyphScreenCoords, glyphTextureCoords);
     }
 
@@ -181,102 +172,66 @@ std::vector<std::pair<Rect, Rect>> BitmapFont::getDrawTextCoords(const std::stri
 
 void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string_view text,
                                 const Size& textBoxSize, const Fw::AlignmentFlag align, const Rect& screenCoords,
-                                const std::vector<Point>& glyphsPositions) const
+                                const std::vector<Point>& glyphsPositions) const noexcept
 {
     coords->clear();
-
-    // prevent glitches from invalid rects
     if (!screenCoords.isValid() || !m_texture)
         return;
 
-    const int textLength = text.length();
+    const int textLength = static_cast<int>(text.length());
+
+    int dx = 0;
+    int dy = 0;
+
+    if (align & Fw::AlignBottom) {
+        dy = screenCoords.height() - textBoxSize.height();
+    } else if (align & Fw::AlignVerticalCenter) {
+        dy = (screenCoords.height() - textBoxSize.height()) / 2;
+    }
+
+    if (align & Fw::AlignRight) {
+        dx = screenCoords.width() - textBoxSize.width();
+    } else if (align & Fw::AlignHorizontalCenter) {
+        dx = (screenCoords.width() - textBoxSize.width()) / 2;
+    }
+
+    const AtlasRegion* region = m_texture->getAtlasRegion();
 
     for (int i = 0; i < textLength; ++i) {
         const int glyph = static_cast<uint8_t>(text[i]);
+        if (glyph < 32) continue;
 
-        // skip invalid glyphs
-        if (glyph < 32)
-            continue;
-
-        // calculate initial glyph rect and texture coords
-        Rect glyphScreenCoords(glyphsPositions[i], m_glyphsSize[glyph]);
+        Rect glyphScreenCoords(glyphsPositions[i] + Point(dx, dy), m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
 
-        // first translate to align position
-        if (align & Fw::AlignBottom) {
-            glyphScreenCoords.translate(0, screenCoords.height() - textBoxSize.height());
-        } else if (align & Fw::AlignVerticalCenter) {
-            glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
-        } else { // AlignTop
-            // nothing to do
-        }
-
-        if (align & Fw::AlignRight) {
-            glyphScreenCoords.translate(screenCoords.width() - textBoxSize.width(), 0);
-        } else if (align & Fw::AlignHorizontalCenter) {
-            glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
-        } else { // AlignLeft
-            // nothing to do
-        }
-
-        // only render glyphs that are after 0, 0
-        if (glyphScreenCoords.bottom() < 0 || glyphScreenCoords.right() < 0)
+        if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
             continue;
 
-        // bound glyph topLeft to 0,0 if needed
-        if (glyphScreenCoords.top() < 0) {
-            glyphTextureCoords.setTop(glyphTextureCoords.top() - glyphScreenCoords.top());
-            glyphScreenCoords.setTop(0);
-        }
-        if (glyphScreenCoords.left() < 0) {
-            glyphTextureCoords.setLeft(glyphTextureCoords.left() - glyphScreenCoords.left());
-            glyphScreenCoords.setLeft(0);
-        }
-
-        // translate rect to screen coords
-        glyphScreenCoords.translate(screenCoords.topLeft());
-
-        // only render if glyph rect is visible on screenCoords
-        if (!screenCoords.intersects(glyphScreenCoords))
-            continue;
-
-        // bound glyph bottomRight to screenCoords bottomRight
-        if (glyphScreenCoords.bottom() > screenCoords.bottom()) {
-            glyphTextureCoords.setBottom(glyphTextureCoords.bottom() + (screenCoords.bottom() - glyphScreenCoords.bottom()));
-            glyphScreenCoords.setBottom(screenCoords.bottom());
-        }
-        if (glyphScreenCoords.right() > screenCoords.right()) {
-            glyphTextureCoords.setRight(glyphTextureCoords.right() + (screenCoords.right() - glyphScreenCoords.right()));
-            glyphScreenCoords.setRight(screenCoords.right());
-        }
-
-        if (const auto region = m_texture->getAtlasRegion())
+        if (region)
             glyphTextureCoords.translate(region->x, region->y);
 
-        // add glyph
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
     }
 }
 
 void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, const std::string_view text,
-                        const std::vector<std::pair<int, Color>> textColors,
-                        const Size& textBoxSize, const Fw::AlignmentFlag align,
-                        const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const
+                                     const std::vector<std::pair<int, Color>> textColors,
+                                     const Size& textBoxSize, const Fw::AlignmentFlag align,
+                                     const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const noexcept
 {
     colorCoords.clear();
-
-    // prevent glitches from invalid rects
     if (!screenCoords.isValid() || !m_texture)
         return;
 
-    const int textLength = text.length();
-    const int textColorsSize = textColors.size();
+    const int textLength = static_cast<int>(text.length());
+    const int textColorsSize = static_cast<int>(textColors.size());
 
-    std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
-    uint32_t curColorRgba;
+    std::unordered_map<uint32_t, CoordsBufferPtr> colorCoordsMap;
+    uint32_t curColorRgba = 0;
     int32_t nextColorIndex = 0;
     int32_t colorIndex = -1;
     CoordsBufferPtr coords;
+
     for (int i = 0; i < textLength; ++i) {
         if (i >= nextColorIndex) {
             colorIndex = colorIndex + 1;
@@ -289,115 +244,77 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
                 nextColorIndex = textLength;
             }
 
-            if (!colorCoordsMap.contains(curColorRgba)) {
-                colorCoordsMap.insert(std::make_pair(curColorRgba, std::make_shared<CoordsBuffer>()));
+            auto it = colorCoordsMap.find(curColorRgba);
+            if (it == colorCoordsMap.end()) {
+                coords = std::make_shared<CoordsBuffer>();
+                colorCoordsMap.emplace(curColorRgba, coords);
+            } else {
+                coords = it->second;
             }
-
-            coords = colorCoordsMap[curColorRgba];
         }
 
         const int glyph = static_cast<uint8_t>(text[i]);
+        if (glyph < 32) continue;
 
-        // skip invalid glyphs
-        if (glyph < 32)
-            continue;
-
-        // calculate initial glyph rect and texture coords
         Rect glyphScreenCoords(glyphsPositions[i], m_glyphsSize[glyph]);
         Rect glyphTextureCoords = m_glyphsTextureCoords[glyph];
 
-        // first translate to align position
+        int dx = 0, dy = 0;
         if (align & Fw::AlignBottom) {
-            glyphScreenCoords.translate(0, screenCoords.height() - textBoxSize.height());
+            dy = screenCoords.height() - textBoxSize.height();
         } else if (align & Fw::AlignVerticalCenter) {
-            glyphScreenCoords.translate(0, (screenCoords.height() - textBoxSize.height()) / 2);
-        } else { // AlignTop
-            // nothing to do
+            dy = (screenCoords.height() - textBoxSize.height()) / 2;
         }
-
         if (align & Fw::AlignRight) {
-            glyphScreenCoords.translate(screenCoords.width() - textBoxSize.width(), 0);
+            dx = screenCoords.width() - textBoxSize.width();
         } else if (align & Fw::AlignHorizontalCenter) {
-            glyphScreenCoords.translate((screenCoords.width() - textBoxSize.width()) / 2, 0);
-        } else { // AlignLeft
-            // nothing to do
+            dx = (screenCoords.width() - textBoxSize.width()) / 2;
         }
 
-        // only render glyphs that are after 0, 0
-        if (glyphScreenCoords.bottom() < 0 || glyphScreenCoords.right() < 0)
+        glyphScreenCoords.translate(dx, dy);
+
+        if (!clipAndTranslateGlyph(glyphScreenCoords, glyphTextureCoords, screenCoords))
             continue;
 
-        // bound glyph topLeft to 0,0 if needed
-        if (glyphScreenCoords.top() < 0) {
-            glyphTextureCoords.setTop(glyphTextureCoords.top() - glyphScreenCoords.top());
-            glyphScreenCoords.setTop(0);
-        }
-        if (glyphScreenCoords.left() < 0) {
-            glyphTextureCoords.setLeft(glyphTextureCoords.left() - glyphScreenCoords.left());
-            glyphScreenCoords.setLeft(0);
-        }
-
-        // translate rect to screen coords
-        glyphScreenCoords.translate(screenCoords.topLeft());
-
-        // only render if glyph rect is visible on screenCoords
-        if (!screenCoords.intersects(glyphScreenCoords))
-            continue;
-
-        // bound glyph bottomRight to screenCoords bottomRight
-        if (glyphScreenCoords.bottom() > screenCoords.bottom()) {
-            glyphTextureCoords.setBottom(glyphTextureCoords.bottom() + (screenCoords.bottom() - glyphScreenCoords.bottom()));
-            glyphScreenCoords.setBottom(screenCoords.bottom());
-        }
-        if (glyphScreenCoords.right() > screenCoords.right()) {
-            glyphTextureCoords.setRight(glyphTextureCoords.right() + (screenCoords.right() - glyphScreenCoords.right()));
-            glyphScreenCoords.setRight(screenCoords.right());
-        }
-
-        if (const auto region = m_texture->getAtlasRegion())
+        if (const AtlasRegion* region = m_texture->getAtlasRegion())
             glyphTextureCoords.translate(region->x, region->y);
 
-        // add glyph to color
         coords->addRect(glyphScreenCoords, glyphTextureCoords);
     }
 
-    for (auto& [rgba, crds] : colorCoordsMap) {
-        colorCoords.emplace_back(Color(rgba), crds);
+    colorCoords.reserve(colorCoordsMap.size());
+    for (auto& kv : colorCoordsMap) {
+        colorCoords.emplace_back(Color(kv.first), kv.second);
     }
 }
 
-void BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, std::vector<Point>& glyphsPositions, Size* textBoxSize) const
+void BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, std::vector<Point>& glyphsPositions, Size* textBoxSize) const noexcept
 {
-    const int textLength = text.length();
+    const int textLength = static_cast<int>(text.length());
     int maxLineWidth = 0;
     int lines = 0;
-    int glyph;
 
-    // return if there is no text
-    if (textLength == 0) {
-        if (textBoxSize)
-            textBoxSize->resize(0, m_glyphHeight);
+    if (textBoxSize && textLength == 0) {
+        textBoxSize->resize(0, m_glyphHeight);
     }
 
-    // resize s_glyphsPositions vector when needed
     if (textLength > static_cast<int>(glyphsPositions.size()))
         glyphsPositions.resize(textLength);
+    if (glyphsPositions.capacity() < static_cast<size_t>(textLength))
+        glyphsPositions.reserve(std::max<int>(textLength, 1024));
 
-    // calculate lines width
     if ((align & Fw::AlignRight || align & Fw::AlignHorizontalCenter) || textBoxSize) {
+        if (s_lineWidths.size() < 1) s_lineWidths.resize(1);
         s_lineWidths[0] = 0;
         for (int i = 0; i < textLength; ++i) {
-            glyph = static_cast<uint8_t>(text[i]);
-
+            const int glyph = static_cast<uint8_t>(text[i]);
             if (glyph == static_cast<uint8_t>('\n')) {
                 ++lines;
-                // resize s_lineWidths vector when needed
                 if (lines + 1 > static_cast<int>(s_lineWidths.size()))
                     s_lineWidths.resize(lines + 1);
                 s_lineWidths[lines] = 0;
             } else if (glyph >= 32) {
                 s_lineWidths[lines] += m_glyphsSize[glyph].width();
-                // only add space if letter is not the last or before a \n
                 if ((i + 1 != textLength && text[i + 1] != '\n'))
                     s_lineWidths[lines] += m_glyphSpacing.width();
                 maxLineWidth = std::max<int>(maxLineWidth, s_lineWidths[lines]);
@@ -406,32 +323,28 @@ void BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw:
     }
 
     Point virtualPos(0, m_yOffset);
-
     lines = 0;
-    for (int i = 0; i < textLength; ++i) {
-        glyph = static_cast<uint8_t>(text[i]);
 
-        // new line or first glyph
+    for (int i = 0; i < textLength; ++i) {
+        const int glyph = static_cast<uint8_t>(text[i]);
+
         if (glyph == static_cast<uint8_t>('\n') || i == 0) {
             if (glyph == static_cast<uint8_t>('\n')) {
                 virtualPos.y += m_glyphHeight + m_glyphSpacing.height();
                 ++lines;
             }
 
-            // calculate start x pos
             if (align & Fw::AlignRight) {
                 virtualPos.x = (maxLineWidth - s_lineWidths[lines]);
             } else if (align & Fw::AlignHorizontalCenter) {
                 virtualPos.x = (maxLineWidth - s_lineWidths[lines]) / 2;
-            } else { // AlignLeft
+            } else {
                 virtualPos.x = 0;
             }
         }
 
-        // store current glyph topLeft
         glyphsPositions[i] = virtualPos;
 
-        // render only if the glyph is valid
         if (glyph >= 32 && glyph != static_cast<uint8_t>('\n')) {
             virtualPos.x += m_glyphsSize[glyph].width() + m_glyphSpacing.width();
         }
@@ -459,29 +372,30 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
     const auto& texturePixels = image->getPixels();
     const int numHorizontalGlyphs = imageSize.width() / glyphSize.width();
 
-    // small AI to auto calculate pixels widths
     for (int glyph = m_firstGlyph; glyph < 256; ++glyph) {
         Rect glyphCoords(((glyph - m_firstGlyph) % numHorizontalGlyphs) * glyphSize.width(),
                          ((glyph - m_firstGlyph) / numHorizontalGlyphs) * glyphSize.height(),
                          glyphSize.width(),
                          m_glyphHeight);
+
         int width = glyphSize.width();
         for (int x = glyphCoords.left(); x <= glyphCoords.right(); ++x) {
-            int filledPixels = 0;
-            // check if all vertical pixels are alpha
+            bool anyFilled = false;
+            const int base = x * 4;
             for (int y = glyphCoords.top(); y <= glyphCoords.bottom(); ++y) {
-                if (texturePixels[(y * imageSize.width() * 4) + (x * 4) + 3] != 0)
-                    ++filledPixels;
+                if (texturePixels[(y * imageSize.width() * 4) + base + 3] != 0) {
+                    anyFilled = true;
+                    break;
+                }
             }
-            if (filledPixels > 0)
+            if (anyFilled)
                 width = x - glyphCoords.left() + 1;
         }
-        // store glyph size
         m_glyphsSize[glyph].resize(width, m_glyphHeight);
     }
 }
 
-std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth, std::vector<std::pair<int, Color>>* colors)
+std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth, std::vector<std::pair<int, Color>>* colors) noexcept
 {
     if (text.empty() || maxWidth <= 0) return "";
 
@@ -495,7 +409,7 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
     int lineW = 0;
     bool pendingSpace = false;
 
-    const auto emit_space_if_fits = [&](std::string& dst) {
+    auto emit_space_if_fits = [&](std::string& dst) -> bool {
         if (!pendingSpace) return true;
         const int need = (lineW > 0 ? spacing : 0) + spaceW;
         if (lineW + need > maxWidth) return false;
@@ -506,7 +420,7 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
         return true;
     };
 
-    const auto emit_hyphen_break = [&](std::string& dst) {
+    auto emit_hyphen_break = [&](std::string& dst) {
         const int pos = static_cast<int>(dst.size());
         dst.push_back('-');
         dst.push_back('\n');
@@ -526,7 +440,7 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
             ++i;
             continue;
         }
-        if (std::isspace(c)) {
+        if (isSpace(c)) {
             pendingSpace = true;
             ++i;
             continue;
@@ -537,7 +451,7 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
         int glyphs = 0;
         while (i < n) {
             const unsigned char ch = static_cast<unsigned char>(text[i]);
-            if (ch == '\n' || std::isspace(ch)) break;
+            if (ch == '\n' || isSpace(ch)) break;
             if (ch >= 32) {
                 if (glyphs > 0) wordW += spacing;
                 wordW += m_glyphsSize[ch].width();
@@ -555,17 +469,15 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
                 lineW = 0;
                 pendingSpace = false;
             }
-            emit_space_if_fits(out);
+            (void)emit_space_if_fits(out);
             if (glyphs > 0) {
-                out.append(text.substr(wordStart, wordEnd - wordStart));
+                out.append(text.data() + wordStart, wordEnd - wordStart);
                 lineW += wordW;
             }
             continue;
         }
 
         size_t segStart = wordStart;
-        int segW = 0;
-        int segGlyphs = 0;
         if (pendingSpace && lineW == 0) pendingSpace = false;
 
         while (segStart < wordEnd) {
@@ -583,13 +495,13 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
             }
 
             size_t k = segStart;
-            segW = 0;
-            segGlyphs = 0;
+            int segW = 0;
+            int segGlyphs = 0;
 
             while (k < wordEnd) {
-                const unsigned char ch = static_cast<unsigned char>(text[k]);
-                if (ch < 32) { ++k; continue; }
-                const int gw = m_glyphsSize[ch].width();
+                const unsigned char ch2 = static_cast<unsigned char>(text[k]);
+                if (ch2 < 32) { ++k; continue; }
+                const int gw = m_glyphsSize[ch2].width();
                 const int next = segW + (segGlyphs > 0 ? spacing + gw : gw);
                 const bool needHyphen = (k + 1 < wordEnd);
                 const int tail = needHyphen ? (segGlyphs > 0 ? spacing : 0) + hyphW : 0;
@@ -603,17 +515,17 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
             }
 
             if (segGlyphs == 0) {
-                const unsigned char ch = static_cast<unsigned char>(text[segStart]);
+                const unsigned char ch3 = static_cast<unsigned char>(text[segStart]);
                 size_t one = segStart + 1;
-                while (one <= wordEnd && text[one - 1] < 32) ++one;
-                out.append(text.substr(segStart, one - segStart));
+                while (one <= wordEnd && static_cast<unsigned char>(text[one - 1]) < 32) ++one;
+                out.append(text.data() + segStart, one - segStart);
                 emit_hyphen_break(out);
                 segStart = one;
                 continue;
             }
 
             const size_t segEnd = k;
-            out.append(text.substr(segStart, segEnd - segStart));
+            out.append(text.data() + segStart, segEnd - segStart);
             lineW += segW;
 
             if (segEnd < wordEnd) {
@@ -628,7 +540,7 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
     return out;
 }
 
-void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const int pos, const int newTextLen)
+void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const int pos, const int newTextLen) noexcept
 {
     if (!colors) return;
     for (auto& it : *colors) {
@@ -638,6 +550,6 @@ void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const 
     }
 }
 
-const AtlasRegion* BitmapFont::getAtlasRegion() const {
+const AtlasRegion* BitmapFont::getAtlasRegion() const noexcept {
     return m_texture ? m_texture->getAtlasRegion() : nullptr;
 }
