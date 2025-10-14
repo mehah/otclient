@@ -288,71 +288,83 @@ void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPt
     }
 }
 
-void BitmapFont::calculateGlyphsPositions(const std::string_view text, const Fw::AlignmentFlag align, std::vector<Point>& glyphsPositions, Size* textBoxSize) const noexcept
+void BitmapFont::calculateGlyphsPositions(std::string_view text,
+                                          Fw::AlignmentFlag align,
+                                          std::vector<Point>& glyphsPositions,
+                                          Size* textBoxSize) const noexcept
 {
-    const int textLength = static_cast<int>(text.length());
+    const int textLength = static_cast<int>(text.size());
     int maxLineWidth = 0;
     int lines = 0;
 
     if (textBoxSize && textLength == 0) {
         textBoxSize->resize(0, m_glyphHeight);
+        return;
     }
 
-    if (textLength > static_cast<int>(glyphsPositions.size()))
+    if (static_cast<int>(glyphsPositions.size()) < textLength)
         glyphsPositions.resize(textLength);
-    if (glyphsPositions.capacity() < static_cast<size_t>(textLength))
-        glyphsPositions.reserve(std::max<int>(textLength, 1024));
+    if (static_cast<int>(glyphsPositions.capacity()) < textLength)
+        glyphsPositions.reserve(std::max(1024, textLength));
 
-    if ((align & Fw::AlignRight || align & Fw::AlignHorizontalCenter) || textBoxSize) {
-        if (s_lineWidths.size() < 1) s_lineWidths.resize(1);
+    const unsigned char* p = reinterpret_cast<const unsigned char*>(text.data());
+    const Size* __restrict widths = m_glyphsSize;
+
+    const bool needLines =
+        (align & Fw::AlignRight) || (align & Fw::AlignHorizontalCenter) || (textBoxSize != nullptr);
+
+    if (needLines) {
+        if (s_lineWidths.empty()) s_lineWidths.resize(1);
         s_lineWidths[0] = 0;
+
         for (int i = 0; i < textLength; ++i) {
-            const int glyph = static_cast<uint8_t>(text[i]);
-            if (glyph == static_cast<uint8_t>('\n')) {
+            const unsigned char g = p[i];
+            if (g == static_cast<unsigned char>('\n')) {
                 ++lines;
                 if (lines + 1 > static_cast<int>(s_lineWidths.size()))
                     s_lineWidths.resize(lines + 1);
                 s_lineWidths[lines] = 0;
-            } else if (glyph >= 32) {
-                s_lineWidths[lines] += m_glyphsSize[glyph].width();
-                if ((i + 1 != textLength && text[i + 1] != '\n'))
+                continue;
+            }
+            if (g >= 32) {
+                s_lineWidths[lines] += widths[g].width();
+                if (i + 1 != textLength && p[i + 1] != static_cast<unsigned char>('\n'))
                     s_lineWidths[lines] += m_glyphSpacing.width();
-                maxLineWidth = std::max<int>(maxLineWidth, s_lineWidths[lines]);
+                if (s_lineWidths[lines] > maxLineWidth)
+                    maxLineWidth = s_lineWidths[lines];
             }
         }
     }
 
-    Point virtualPos(0, m_yOffset);
+    Point vpos(0, m_yOffset);
     lines = 0;
 
     for (int i = 0; i < textLength; ++i) {
-        const int glyph = static_cast<uint8_t>(text[i]);
+        const unsigned char g = p[i];
 
-        if (glyph == static_cast<uint8_t>('\n') || i == 0) {
-            if (glyph == static_cast<uint8_t>('\n')) {
-                virtualPos.y += m_glyphHeight + m_glyphSpacing.height();
+        if (g == static_cast<unsigned char>('\n') || i == 0) {
+            if (g == static_cast<unsigned char>('\n')) {
+                vpos.y += m_glyphHeight + m_glyphSpacing.height();
                 ++lines;
             }
-
             if (align & Fw::AlignRight) {
-                virtualPos.x = (maxLineWidth - s_lineWidths[lines]);
+                vpos.x = (maxLineWidth - (needLines ? s_lineWidths[lines] : 0));
             } else if (align & Fw::AlignHorizontalCenter) {
-                virtualPos.x = (maxLineWidth - s_lineWidths[lines]) / 2;
+                vpos.x = (maxLineWidth - (needLines ? s_lineWidths[lines] : 0)) / 2;
             } else {
-                virtualPos.x = 0;
+                vpos.x = 0;
             }
         }
 
-        glyphsPositions[i] = virtualPos;
-
-        if (glyph >= 32 && glyph != static_cast<uint8_t>('\n')) {
-            virtualPos.x += m_glyphsSize[glyph].width() + m_glyphSpacing.width();
+        if (g >= 32 && g != static_cast<unsigned char>('\n')) {
+            glyphsPositions[i] = vpos;
+            vpos.x += widths[g].width() + m_glyphSpacing.width();
         }
     }
 
     if (textBoxSize) {
         textBoxSize->setWidth(maxLineWidth);
-        textBoxSize->setHeight(virtualPos.y + m_glyphHeight);
+        textBoxSize->setHeight(vpos.y + m_glyphHeight);
     }
 }
 
