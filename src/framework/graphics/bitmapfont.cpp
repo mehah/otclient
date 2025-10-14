@@ -483,64 +483,149 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
 
 std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth, std::vector<std::pair<int, Color>>* colors)
 {
-    if (text.empty())
-        return "";
+    if (text.empty() || maxWidth <= 0) return "";
 
-    std::string outText;
-    std::vector<std::string> words;
-    const std::vector<std::string> wordsSplit = stdext::split(text);
+    const int spacing = m_glyphSpacing.width();
+    const int spaceW = m_glyphsSize[static_cast<uint8_t>(' ')].width();
+    const int hyphW = m_glyphsSize[static_cast<uint8_t>('-')].width();
 
-    auto currentSize = 0;
-    // break huge words into small ones
-    for (const auto& word : wordsSplit) {
-        const int wordWidth = calculateTextRectSize(word).width();
-        if (wordWidth > maxWidth) {
-            std::string newWord;
-            for (uint32_t j = 0; j < word.length(); ++j) {
-                std::string candidate = newWord + word[j];
-                if (j != word.length() - 1)
-                    candidate += '-';
+    std::string out;
+    out.reserve(text.size() + text.size() / 8);
 
-                const int candidateWidth = calculateTextRectSize(candidate).width();
-                if (candidateWidth > maxWidth) {
-                    newWord += '-';
-                    words.push_back(newWord);
-                    currentSize += newWord.size() + 2; // each word break adds 2 characters: '-' and '\n'
-                    newWord.clear();
+    int lineW = 0;
+    bool pendingSpace = false;
 
-                    updateColors(colors, currentSize - 2, 2);
+    const auto emit_space_if_fits = [&](std::string& dst) {
+        if (!pendingSpace) return true;
+        const int need = (lineW > 0 ? spacing : 0) + spaceW;
+        if (lineW + need > maxWidth) return false;
+        if (lineW > 0) lineW += spacing;
+        dst.push_back(' ');
+        lineW += spaceW;
+        pendingSpace = false;
+        return true;
+    };
+
+    const auto emit_hyphen_break = [&](std::string& dst) {
+        const int pos = static_cast<int>(dst.size());
+        dst.push_back('-');
+        dst.push_back('\n');
+        if (colors) updateColors(colors, pos, 2);
+        lineW = 0;
+        pendingSpace = false;
+    };
+
+    size_t i = 0, n = text.size();
+    while (i < n) {
+        const unsigned char c = static_cast<unsigned char>(text[i]);
+
+        if (c == '\n') {
+            out.push_back('\n');
+            lineW = 0;
+            pendingSpace = false;
+            ++i;
+            continue;
+        }
+        if (std::isspace(c)) {
+            pendingSpace = true;
+            ++i;
+            continue;
+        }
+
+        const size_t wordStart = i;
+        int wordW = 0;
+        int glyphs = 0;
+        while (i < n) {
+            const unsigned char ch = static_cast<unsigned char>(text[i]);
+            if (ch == '\n' || std::isspace(ch)) break;
+            if (ch >= 32) {
+                if (glyphs > 0) wordW += spacing;
+                wordW += m_glyphsSize[ch].width();
+                ++glyphs;
+            }
+            ++i;
+        }
+        const size_t wordEnd = i;
+
+        int addW = wordW;
+        if (pendingSpace && lineW > 0) addW += spacing + spaceW;
+        if (lineW + addW <= maxWidth) {
+            if (!emit_space_if_fits(out)) {
+                out.push_back('\n');
+                lineW = 0;
+                pendingSpace = false;
+            }
+            emit_space_if_fits(out);
+            if (glyphs > 0) {
+                out.append(text.substr(wordStart, wordEnd - wordStart));
+                lineW += wordW;
+            }
+            continue;
+        }
+
+        size_t segStart = wordStart;
+        int segW = 0;
+        int segGlyphs = 0;
+        if (pendingSpace && lineW == 0) pendingSpace = false;
+
+        while (segStart < wordEnd) {
+            if (pendingSpace) {
+                const int need = (lineW > 0 ? spacing : 0) + spaceW;
+                if (lineW + need > maxWidth) {
+                    out.push_back('\n');
+                    lineW = 0;
+                } else {
+                    if (lineW > 0) lineW += spacing;
+                    out.push_back(' ');
+                    lineW += spaceW;
+                    pendingSpace = false;
                 }
-
-                newWord += word[j];
             }
 
-            words.push_back(newWord);
-            currentSize += newWord.size() + 1;
-        } else {
-            words.push_back(word);
-            currentSize += word.size() + 1;
+            size_t k = segStart;
+            segW = 0;
+            segGlyphs = 0;
+
+            while (k < wordEnd) {
+                const unsigned char ch = static_cast<unsigned char>(text[k]);
+                if (ch < 32) { ++k; continue; }
+                const int gw = m_glyphsSize[ch].width();
+                const int next = segW + (segGlyphs > 0 ? spacing + gw : gw);
+                const bool needHyphen = (k + 1 < wordEnd);
+                const int tail = needHyphen ? (segGlyphs > 0 ? spacing : 0) + hyphW : 0;
+                if (lineW + next + tail <= maxWidth) {
+                    segW = next;
+                    ++segGlyphs;
+                    ++k;
+                } else {
+                    break;
+                }
+            }
+
+            if (segGlyphs == 0) {
+                const unsigned char ch = static_cast<unsigned char>(text[segStart]);
+                size_t one = segStart + 1;
+                while (one <= wordEnd && text[one - 1] < 32) ++one;
+                out.append(text.substr(segStart, one - segStart));
+                emit_hyphen_break(out);
+                segStart = one;
+                continue;
+            }
+
+            const size_t segEnd = k;
+            out.append(text.substr(segStart, segEnd - segStart));
+            lineW += segW;
+
+            if (segEnd < wordEnd) {
+                emit_hyphen_break(out);
+                segStart = segEnd;
+            } else {
+                segStart = wordEnd;
+            }
         }
     }
 
-    // compose lines
-    std::string line(words[0]);
-    for (size_t i = 1; i < words.size(); ++i) {
-        const auto& word = words[i];
-
-        line.push_back(' ');
-        const size_t lineSize = line.size();
-        line.append(word);
-
-        if (calculateTextRectSize(line).width() > maxWidth) {
-            line.resize(lineSize);
-            line.back() = '\n';
-            outText.append(line);
-            line.assign(word);
-        }
-    }
-    outText.append(line);
-
-    return outText;
+    return out;
 }
 
 void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const int pos, const int newTextLen)
