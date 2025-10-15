@@ -409,6 +409,7 @@ if (TOGGLE_FRAMEWORK_GRAPHICS)
           framework/ui/uiboxlayout.cpp
           framework/ui/uigridlayout.cpp
           framework/ui/uihorizontallayout.cpp
+          framework/ui/uilayoutflexbox.cpp
           framework/ui/uilayout.cpp
           framework/ui/uimanager.cpp
           framework/ui/uiparticles.cpp

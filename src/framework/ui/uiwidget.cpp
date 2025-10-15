@@ -2213,3 +2213,147 @@ size_t UIWidget::remove(const std::string& queryString) {
 
     return nodes.size();
 }
+
+const UIWidgetStyle& UIWidget::style() const
+{
+    m_styleCache.display = m_displayType;
+    m_styleCache.position = m_positionType;
+    m_styleCache.flexDirection = m_flexContainer.direction;
+    m_styleCache.flexWrap = m_flexContainer.wrap;
+    m_styleCache.justifyContent = m_flexContainer.justify;
+    m_styleCache.alignItems = m_flexContainer.alignItems;
+    m_styleCache.alignContent = m_flexContainer.alignContent;
+    m_styleCache.rowGap = m_flexContainer.rowGap;
+    m_styleCache.columnGap = m_flexContainer.columnGap;
+    m_styleCache.order = m_flexItem.order;
+    m_styleCache.flexGrow = m_flexItem.flexGrow;
+    m_styleCache.flexShrink = m_flexItem.flexShrink;
+    m_styleCache.flexBasis = m_flexItem.basis;
+    m_styleCache.alignSelf = m_flexItem.alignSelf;
+    m_styleCache.width = m_width;
+    m_styleCache.height = m_height;
+    m_styleCache.minWidth = m_minSize.width();
+    m_styleCache.minHeight = m_minSize.height();
+    m_styleCache.maxWidth = m_maxSize.width();
+    m_styleCache.maxHeight = m_maxSize.height();
+    m_styleCache.marginLeftAuto = m_marginLeftAuto;
+    m_styleCache.marginRightAuto = m_marginRightAuto;
+    return m_styleCache;
+}
+
+void UIWidget::setFlexDirection(FlexDirection direction)
+{
+    if (m_flexContainer.direction == direction)
+        return;
+    m_flexContainer.direction = direction;
+    updateLayout();
+}
+
+void UIWidget::setFlexWrap(FlexWrap wrap)
+{
+    if (m_flexContainer.wrap == wrap)
+        return;
+    m_flexContainer.wrap = wrap;
+    updateLayout();
+}
+
+void UIWidget::setJustifyContent(JustifyContent justify)
+{
+    if (m_flexContainer.justify == justify)
+        return;
+    m_flexContainer.justify = justify;
+    updateLayout();
+}
+
+void UIWidget::setAlignItems(AlignItems align)
+{
+    if (m_flexContainer.alignItems == align)
+        return;
+    m_flexContainer.alignItems = align;
+    updateLayout();
+}
+
+void UIWidget::setAlignContent(AlignContent align)
+{
+    if (m_flexContainer.alignContent == align)
+        return;
+    m_flexContainer.alignContent = align;
+    updateLayout();
+}
+
+void UIWidget::setRowGap(int gap)
+{
+    gap = std::max(0, gap);
+    if (m_flexContainer.rowGap == gap)
+        return;
+    m_flexContainer.rowGap = gap;
+    updateLayout();
+}
+
+void UIWidget::setColumnGap(int gap)
+{
+    gap = std::max(0, gap);
+    if (m_flexContainer.columnGap == gap)
+        return;
+    m_flexContainer.columnGap = gap;
+    updateLayout();
+}
+
+void UIWidget::setGap(int rowGap, int columnGap)
+{
+    rowGap = std::max(0, rowGap);
+    columnGap = std::max(0, columnGap);
+    bool changed = false;
+    if (m_flexContainer.rowGap != rowGap) {
+        m_flexContainer.rowGap = rowGap;
+        changed = true;
+    }
+    if (m_flexContainer.columnGap != columnGap) {
+        m_flexContainer.columnGap = columnGap;
+        changed = true;
+    }
+    if (changed)
+        updateLayout();
+}
+
+void UIWidget::setFlexOrder(int order)
+{
+    if (m_flexItem.order == order)
+        return;
+    m_flexItem.order = order;
+    updateParentLayout();
+}
+
+void UIWidget::setFlexGrow(float grow)
+{
+    grow = std::max(0.f, grow);
+    if (std::abs(m_flexItem.flexGrow - grow) < 1e-6f)
+        return;
+    m_flexItem.flexGrow = grow;
+    updateParentLayout();
+}
+
+void UIWidget::setFlexShrink(float shrink)
+{
+    shrink = std::max(0.f, shrink);
+    if (std::abs(m_flexItem.flexShrink - shrink) < 1e-6f)
+        return;
+    m_flexItem.flexShrink = shrink;
+    updateParentLayout();
+}
+
+void UIWidget::setFlexBasis(const FlexBasis& basis)
+{
+    if (m_flexItem.basis.type == basis.type && std::abs(m_flexItem.basis.value - basis.value) < 1e-6f)
+        return;
+    m_flexItem.basis = basis;
+    updateParentLayout();
+}
+
+void UIWidget::setAlignSelf(AlignSelf align)
+{
+    if (m_flexItem.alignSelf == align)
+        return;
+    m_flexItem.alignSelf = align;
+    updateParentLayout();
+}
