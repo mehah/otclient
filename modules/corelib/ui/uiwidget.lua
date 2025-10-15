@@ -50,6 +50,17 @@ local FOR_CTX = {
     __values = nil
 }
 
+local function apply_for_ctx_to_new_tree(controller, html_insert_fn)
+    if not controller then return html_insert_fn() end
+    controller.__current_for_ctx = {
+        keys   = FOR_CTX.__keys,
+        values = FOR_CTX.__values
+    }
+    local w = html_insert_fn()
+    controller.__current_for_ctx = nil
+    return w
+end
+
 local function ExprHandlerError(runtime, error, widget, controller, nodeStr, onError)
     if runtime then
         error = "[Script runtime error]\n" .. error
@@ -110,7 +121,8 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             end)
 
         if self:isVisible() then
-            value, success = execFnc(fnc, { controller, self, FOR_CTX.__values and unpack(FOR_CTX.__values) }, self,
+            local valueExpr = FOR_CTX.__values or {}
+            value, success = execFnc(fnc, { controller, self, unpack(valueExpr) }, self,
                 roller, NODE_STR,
                 function()
                     return ('Attribute Error[%s]: %s'):format(attr, value)
@@ -216,9 +228,9 @@ local parseEvents = function(widget, eventName, callStr, controller, NODE_STR)
         end)
 
     local event = { target = widget }
-    local forCtx = FOR_CTX.__values
+    local forCtx = FOR_CTX.__values or {}
     local function execEventCall()
-        execFnc(fnc, { controller, event, widget, forCtx and unpack(forCtx) }, widget, controller, NODE_STR, function()
+        execFnc(fnc, { controller, event, widget, unpack(forCtx) }, widget, controller, NODE_STR, function()
             return ('Event Error[%s]: %s'):format(eventName, callStr)
         end)
     end
@@ -325,6 +337,13 @@ end
 
 function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
     local controller = G_CONTROLLER_CALLED[controllerName]
+
+    local cur = controller and controller.__current_for_ctx
+    if cur and not self.__for_values then
+        self.__for_keys   = cur.keys
+        self.__for_values = cur.values
+    end
+
     for attr, v in pairs(attrs) do
         if attr:starts('on') then
             parseEvents(self, attr:lower(), v, controller, NODE_STR)
@@ -356,7 +375,8 @@ function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
         if set then
             controller:registerUIEvents(self, {
                 onCheckChange = function(widget, value)
-                    execFnc(set, { controller, value, widget, widget.__for_values and unpack(widget.__for_values) }, self,
+                    local forCtx = widget.__for_values or {}
+                    execFnc(set, { controller, value, widget, unpack(forCtx) }, self,
                         controller, NODE_STR, function()
                             return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
                         end)
@@ -372,7 +392,8 @@ function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
             if self.getCurrentOption then
                 controller:registerUIEvents(self, {
                     onOptionChange = function(widget, text, data)
-                        execFnc(set, { controller, data, widget, widget.__for_values and unpack(widget.__for_values) },
+                        local forCtx = widget.__for_values or {}
+                        execFnc(set, { controller, data, widget, unpack(forCtx) },
                             self, controller, NODE_STR, function()
                                 return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
                             end)
@@ -381,7 +402,8 @@ function UIWidget:onCreateByHTML(tagName, attrs, controllerName, NODE_STR)
             else
                 controller:registerUIEvents(self, {
                     onTextChange = function(widget, value)
-                        execFnc(set, { controller, value, widget, widget.__for_values and unpack(widget.__for_values) },
+                        local forCtx = widget.__for_values or {}
+                        execFnc(set, { controller, value, widget, unpack(forCtx) },
                             self, controller, NODE_STR, function()
                                 return ('Attribute error[%s]: %s'):format(attrName, attrs[attrName])
                             end)
@@ -546,21 +568,47 @@ function UIWidget:__childFor(moduleName, expr, html, index)
             return e
         end
 
-        local env = merge_parent_for_env(baseEnv, widget)
+        local env          = merge_parent_for_env(baseEnv, widget)
 
-        local isFirst = (self.watchList == nil)
-        local childindex = index
+        local isFirst      = (self.watchList == nil)
+        local childindex   = index
 
-        local list, keys = ngfor_exec(expr, env, function(c)
+        local outer_keys   = widget.__for_keys or ''
+        local outer_values = widget.__for_values
+
+        local list, keys   = ngfor_exec(expr, env, function(c)
             if not isFirst then return end
-            childindex       = childindex + 1
-            FOR_CTX.__keys   = c.__keys
-            FOR_CTX.__values = c.__values
+            childindex = childindex + 1
+
+            local combined_keys = (outer_keys or '') .. (c.__keys or '')
+            local combined_vals = {}
+
             do
-                local __w        = widget:insert(childindex, html)
+                local pos = 0
+                if outer_values and type(outer_values) == 'table' then
+                    for i = 1, #outer_values do
+                        pos = pos + 1
+                        combined_vals[pos] = outer_values[i]
+                    end
+                end
+                local inner_vals = c.__values or {}
+                for i = 1, #inner_vals do
+                    pos = pos + 1
+                    combined_vals[pos] = inner_vals[i]
+                end
+            end
+
+            FOR_CTX.__keys   = combined_keys
+            FOR_CTX.__values = combined_vals
+
+            do
+                local __w        = apply_for_ctx_to_new_tree(controller, function()
+                    return widget:insert(childindex, html)
+                end)
                 __w.__for_values = FOR_CTX.__values
                 __w.__for_keys   = FOR_CTX.__keys
             end
+
             FOR_CTX.__keys   = ''
             FOR_CTX.__values = nil
         end)
@@ -568,10 +616,29 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         if isFirst then
             local watch = table.watchList(list, {
                 onInsert = function(i, it)
-                    FOR_CTX.__keys   = keys
-                    FOR_CTX.__values = { it, i }
+                    local outer_keys    = widget.__for_keys or ''
+                    local outer_values  = widget.__for_values
+                    local combined_keys = (outer_keys or '') .. keys
+                    local combined_vals = {}
                     do
-                        local __w        = widget:insert(index + i, html)
+                        local pos = 0
+                        if outer_values and type(outer_values) == 'table' then
+                            for j = 1, #outer_values do
+                                pos = pos + 1
+                                combined_vals[pos] = outer_values[j]
+                            end
+                        end
+                        pos = pos + 1; combined_vals[pos] = it
+                        pos = pos + 1; combined_vals[pos] = i
+                    end
+
+                    FOR_CTX.__keys   = combined_keys
+                    FOR_CTX.__values = combined_vals
+
+                    do
+                        local __w        = apply_for_ctx_to_new_tree(controller, function()
+                            return widget:insert(index + i, html)
+                        end)
                         __w.__for_values = FOR_CTX.__values
                         __w.__for_keys   = FOR_CTX.__keys
                     end

@@ -66,8 +66,7 @@ public:
     inline const TexturePtr& getTexture() const noexcept { return m_texture; }
     inline int getYOffset() const noexcept { return m_yOffset; }
     inline Size getGlyphSpacing() const noexcept { return m_glyphSpacing; }
-
-    inline const AtlasRegion* getAtlasRegion() const noexcept;
+    const AtlasRegion* getAtlasRegion() const noexcept;
 
 private:
     void calculateGlyphsWidthsAutomatically(const ImagePtr& image, const Size& glyphSize);
