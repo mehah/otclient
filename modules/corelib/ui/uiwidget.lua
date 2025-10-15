@@ -530,20 +530,25 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         local widget = self.widget
 
         local function merge_parent_for_env(base, w)
-            if not w.__for_keys or not w.__for_values then return base end
-            local names = {}
-            for name in string.gmatch(w.__for_keys, "[^,%s]+") do
-                if name ~= "" then
-                    names[#names + 1] = name
+            while w do
+                if w.__for_keys and w.__for_values then
+                    local names = {}
+                    for name in string.gmatch(w.__for_keys, "[^,%s]+") do
+                        if name ~= "" then
+                            names[#names + 1] = name
+                        end
+                    end
+                    local e = {}
+                    local maxn = math.min(#names, #w.__for_values)
+                    for i = 1, maxn do
+                        e[names[i]] = w.__for_values[i]
+                    end
+                    setmetatable(e, { __index = base })
+                    base = e
                 end
+                w = w:getParent()
             end
-            local e = {}
-            local maxn = math.min(#names, #w.__for_values)
-            for i = 1, maxn do
-                e[names[i]] = w.__for_values[i]
-            end
-            setmetatable(e, { __index = base })
-            return e
+            return base
         end
 
         local env = merge_parent_for_env(baseEnv, widget)
