@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,20 @@ void UIParticles::onStyleApply(const std::string_view styleName, const OTMLNodeP
 
 void UIParticles::addEffect(const std::string_view name)
 {
-    const ParticleEffectPtr effect = g_particles.createEffect(name);
-    if (effect)
+    if (const auto& effect = g_particles.createEffect(name))
         m_effects.emplace_back(effect);
+}
+
+void UIParticles::setEffect(const std::string_view name)
+{
+    clearEffects();
+    addEffect(name);
+}
+
+void UIParticles::clearEffects()
+{
+    for (const auto& effect : m_effects) {
+        g_particles.removeEffect(effect);
+    }
+    m_effects.clear();
 }

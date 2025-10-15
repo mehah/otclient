@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -250,5 +250,9 @@ using Matrix2x2 = Matrix<2, 2>;
 using Matrix4 = Matrix4x4;
 using Matrix3 = Matrix3x3;
 using Matrix2 = Matrix2x2;
+
+using Matrix4Ptr = std::shared_ptr<Matrix4x4>;
+using Matrix3Ptr = std::shared_ptr<Matrix3x3>;
+using Matrix2Ptr = std::shared_ptr<Matrix2x2>;
 
 const static Matrix3 DEFAULT_MATRIX3;

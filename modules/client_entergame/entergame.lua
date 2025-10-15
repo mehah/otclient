@@ -310,28 +310,35 @@ end
 
 function EnterGame.postCacheInfo()
     local requestType = 'cacheinfo'
+
     local onRecvInfo = function(message, err)
+        -- Guard: if UI is destroyed, do nothing
+        if not enterGame then return end
 
         if err then
-            -- onError(nil, 'Bad Request. Game_entergame postCacheInfo1 ', 400)
             reportRequestWarning(requestType, "Bad Request. Game_entergame postCacheInfo1")
             return
         end
 
-        local _, bodyStart = message:find('{')
-        local _, bodyEnd = message:find('.*}')
-        if not bodyStart or not bodyEnd then
-            -- onError(nil, 'Bad Request.Game_entergame postCacheInfo2', 400)
-            reportRequestWarning(requestType, "Bad Request.Game_entergame postCacheInfo2")
+        local jsonString = message:match("{.*}")
+        if not jsonString then
+            reportRequestWarning(requestType, "Invalid JSON response format")
             return
         end
 
-        local response = json.decode(message:sub(bodyStart, bodyEnd))
+        local success, response = pcall(function() return json.decode(jsonString) end)
+        if not success or not response then
+            reportRequestWarning(requestType, "Failed to parse JSON response")
+            return
+        end
+
         if response.errorMessage then
-            -- onError(nil, response.errorMessage, response.errorCode)
             reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
         end
+
+        -- Guard: check modules.client_topmenu still exists
+        if not modules or not modules.client_topmenu then return end
 
         modules.client_topmenu.setPlayersOnline(response.playersonline)
         modules.client_topmenu.setDiscordStreams(response.discord_online)
@@ -339,7 +346,6 @@ function EnterGame.postCacheInfo()
         modules.client_topmenu.setYoutubeViewers(response.gamingyoutubeviewer)
         modules.client_topmenu.setLinkYoutube(response.youtube_link)
         modules.client_topmenu.setLinkDiscord(response.discord_link)
-
     end
 
     HTTP.post(Services.status, json.encode({
@@ -355,12 +361,18 @@ function EnterGame.postEventScheduler()
             return
         end
 
-        local bodyStart, _ = message:find('{')
-        local _, bodyEnd = message:find('%}%b{}')
+        local jsonString = message:match("{.*}")
+        if not jsonString then
+            reportRequestWarning(requestType, "Invalid JSON response format")
+            return
+        end
 
-        local jsonString = message:sub(bodyStart, bodyEnd)
+        local success, response = pcall(function() return json.decode(jsonString) end)
+        if not success or not response then
+            reportRequestWarning(requestType, "Failed to parse JSON response")
+            return
+        end
 
-        local response = json.decode(jsonString)
         if response.errorMessage then
             reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
@@ -382,14 +394,18 @@ function EnterGame.postShowOff()
             return
         end
 
-        local _, bodyStart = message:find('{')
-        local _, bodyEnd = message:find('.*}')
-        if not bodyStart or not bodyEnd then
-            reportRequestWarning(requestType, "Bad Request.Game_entergame postShowOff")
+        local jsonString = message:match("{.*}")
+        if not jsonString then
+            reportRequestWarning(requestType, "Invalid JSON response format")
             return
         end
 
-        local response = json.decode(message:sub(bodyStart, bodyEnd))
+        local success, response = pcall(function() return json.decode(jsonString) end)
+        if not success or not response then
+            reportRequestWarning(requestType, "Failed to parse JSON response")
+            return
+        end
+
         if response.errorMessage then
             reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
@@ -412,17 +428,19 @@ function EnterGame.postShowCreatureBoost()
             return
         end
 
-        local _, bodyStart = message:find('{')
-        local _, bodyEnd = message:find('.*}')
-        if not bodyStart or not bodyEnd then
-            -- onError(nil, 'Bad Request. 2 Game_entergame postShowCreatureBoost', 400)
-            reportRequestWarning(requestType, "Bad Request.Game_entergame postShowCreatureBoost2")
+        local jsonString = message:match("{.*}")
+        if not jsonString then
+            reportRequestWarning(requestType, "Invalid JSON response format")
             return
         end
 
-        local response = json.decode(message:sub(bodyStart, bodyEnd))
+        local success, response = pcall(function() return json.decode(jsonString) end)
+        if not success or not response then
+            reportRequestWarning(requestType, "Failed to parse JSON response")
+            return
+        end
+
         if response.errorMessage then
-            -- onError(nil, response.errorMessage, response.errorCode)
             reportRequestWarning(requestType, response.errorMessage, response.errorCode)
             return
         end
@@ -615,7 +633,17 @@ function EnterGame.tryHttpLogin(clientVersion, httpLogin)
     G.requestId = math.random(1)
 
     local http = LoginHttp.create()
-    http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
+        http:httpLogin(host, path, G.port, G.account, G.password, G.requestId, httpLogin)
+        connect(loadBox, {
+            onCancel = function(msgbox)
+                loadBox = nil
+                G.requestId = 0
+                if http and http.cancel then
+                    http:cancel()
+                end
+                EnterGame.show()
+            end
+        })
 end
 
 function printTable(t)

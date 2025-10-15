@@ -216,8 +216,10 @@ GameAllowCustomBotScripts = 120
 GameColorizedLootValue = 121
 GameAllowPreWalk = 122
 GamePlayerFamiliars = 123
-GameLatencyAdaptiveCamera = 124
+-- = 124
 GameMapCache = 125
+GameForgeSkillStats = 126
+GameCharacterSkillStats = 127
 
 TextColors = {
     red = '#f55e5e',    -- '#c83200'
@@ -293,8 +295,9 @@ MessageModes = {
     OfflineTrainning = 54,
     Transaction = 55,
     Potion = 56,
+    ValuableLoot = 57,
 
-    Last = 57,
+    Last = 58,
     Invalid = 255
 }
 
@@ -417,10 +420,22 @@ ChannelEvent = {
 ResourceTypes = {
     BANK_BALANCE = 0,
     GOLD_EQUIPPED = 1,
+    CURRENCY_CUSTOM_EQUIPPED = 2,
     PREY_WILDCARDS = 10,
     DAILYREWARD_STREAK = 20,
     DAILYREWARD_JOKERS = 21,
+    CHARM = 30,
+    MINOR_CHARM = 31,
+    MAX_CHARM = 32,
+    MAX_MINOR_CHARM = 33,
     TASK_HUNTING = 50,
+    FORGE_DUST = 70,
+    FORGE_SLIVER = 71,
+    FORGE_CORES = 72,
+    LESSER_GEMS = 81,
+    REGULAR_GEMS = 82,
+    GREATER_GEMS = 83,
+    WHEEL_OF_DESTINY = 86,
     COIN_NORMAL = 90,
     COIN_TRANSFERRABLE = 91,
     COIN_AUCTION = 92,
@@ -439,10 +454,37 @@ CyclopediaCharacterInfoTypes = {
     StoreSummary = 8,
     Ispection = 9,
     Badges = 10,
-    Titles = 11
+    Titles = 11,
+    Wheel = 12,
+    Offencestats = 13,
+    Defencestats = 14,
+    Miscstats = 15
 }
 
 StoreConst = {
-   InstantRewardAccess = 233,
+    InstantRewardAccess = 233,
 }
+
+ExperienceRate = {
+    BASE = 0,
+    VOUCHER = 1,
+    LOW_LEVEL = 2,
+    XP_BOOST = 3,
+    STAMINA_MULTIPLIER = 4
+}
+
+PriceTypeEnum = {
+    Market = 0,
+	Leader = 1
+}
+
+-- Analyzer constants
+ANALYZER_HEAL = 0
+ANALYZER_DAMAGE_DEALT = 1
+ANALYZER_DAMAGE_RECEIVED = 2
+-- Party Analyser constants
+PARTYANALYZERACTION_RESET = 0
+PARTYANALYZERACTION_PRICETYPE = 1
+PARTYANALYZERACTION_PRICEVALUE = 2
+
 -- @}

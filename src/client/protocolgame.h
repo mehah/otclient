@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,35 @@
 #include "declarations.h"
 #include "protocolcodes.h"
 #include <framework/net/protocol.h>
+#include <string>
+
+struct BossCooldownData {
+    uint32_t bossRaceId;
+    uint64_t cooldownTime;
+    
+    BossCooldownData(uint32_t raceId, uint64_t cooldown)
+        : bossRaceId(raceId), cooldownTime(cooldown) {}
+};
+
+struct PartyMemberData {
+    uint32_t memberID;
+    uint8_t highlight;
+    uint64_t loot;
+    uint64_t supply;
+    uint64_t damage;
+    uint64_t healing;
+    
+    PartyMemberData(uint32_t id, uint8_t highlightValue, uint64_t lootValue, uint64_t supplyValue, uint64_t damageValue, uint64_t healingValue)
+        : memberID(id), highlight(highlightValue), loot(lootValue), supply(supplyValue), damage(damageValue), healing(healingValue) {}
+};
+
+struct PartyMemberName {
+    uint32_t memberID;
+    std::string memberName;
+    
+    PartyMemberName(uint32_t id, const std::string& name)
+        : memberID(id), memberName(name) {}
+};
 
 class ProtocolGame final : public Protocol
 {
@@ -93,6 +122,7 @@ public:
     void sendPassLeadership(uint32_t creatureId);
     void sendLeaveParty();
     void sendShareExperience(bool active);
+    void sendPartyAnalyzerAction(uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items = {});
     void sendOpenOwnChannel();
     void sendInviteToOwnChannel(std::string_view name);
     void sendExcludeFromOwnChannel(std::string_view name);
@@ -207,7 +237,7 @@ private:
     void parseSessionEnd(const InputMessagePtr& msg);
     void parsePing(const InputMessagePtr& msg);
     void parsePingBack(const InputMessagePtr& msg);
-    void parseChallenge(const InputMessagePtr& msg);
+    void parseLoginChallenge(const InputMessagePtr& msg);
     void parseDeath(const InputMessagePtr& msg);
     void parseFloorDescription(const InputMessagePtr& msg);
     void parseMapDescription(const InputMessagePtr& msg);
@@ -244,7 +274,9 @@ private:
     void parseItemClasses(const InputMessagePtr& msg);
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
-    void addCreatureIcon(const InputMessagePtr& msg) const;
+    void parseOpenForge(const InputMessagePtr& msg);
+    void setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const;
+    void addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const;
     void parseCloseForgeWindow(const InputMessagePtr& msg);
     void parseCreatureData(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);
@@ -383,6 +415,8 @@ private:
     bool m_mapKnown{ false };
     bool m_firstRecv{ true };
     bool m_record {false};
+
+    ticks_t m_lastPartyAnalyzerCall{ 0 };
 
     std::string m_accountName;
     std::string m_accountPassword;

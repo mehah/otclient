@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,8 +64,7 @@ void House::addDoor(const ItemPtr& door)
 void House::removeDoorById(uint32_t doorId)
 {
     if (doorId >= m_lastDoorId)
-        throw Exception("Failed to remove door of id %d (would overflow), max id: %d",
-                        doorId, m_lastDoorId);
+        throw Exception("Failed to remove door of id {} (would overflow), max id: {}", doorId, m_lastDoorId);
     m_doors[doorId] = nullptr;
 }
 
@@ -73,7 +72,7 @@ void House::load(const pugi::xml_node& node)
 {
     std::string name = node.attribute("name").as_string();
     if (name.empty())
-        name = stdext::format("Unnamed house #%lu", getId());
+        name = fmt::format("Unnamed house #{}", getId());
 
     setName(name);
     setRent(node.attribute("rent").as_uint());
@@ -152,7 +151,7 @@ void HouseManager::load(const std::string& fileName)
             house->load(elem);
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to load '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to load '{}': {}", fileName, e.what());
     }
     sort();
 }
@@ -174,10 +173,10 @@ void HouseManager::save(const std::string& fileName)
         }
 
         if (!doc.save_file(("data" + fileName).c_str(), "\t", pugi::format_default, pugi::encoding_utf8)) {
-            throw Exception("failed to save houses XML %s", fileName);
+            throw Exception("failed to save houses XML {}", fileName);
         }
     } catch (const std::exception& e) {
-        g_logger.error(stdext::format("Failed to save '%s': %s", fileName, e.what()));
+        g_logger.error("Failed to save '{}': {}", fileName, e.what());
     }
 }
 

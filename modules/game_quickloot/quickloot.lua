@@ -51,9 +51,9 @@ function quickLootController:onGameStart()
     if not g_game.getFeature(GameThingQuickLoot) then
         return
     end
-
-    QuickLoot.mouseGrabberWidget = g_ui.createWidget("UIWidget")
-
+    if not QuickLoot.mouseGrabberWidget then
+        QuickLoot.mouseGrabberWidget = g_ui.createWidget("UIWidget")
+    end
     QuickLoot.mouseGrabberWidget:setVisible(false)
     QuickLoot.mouseGrabberWidget:setFocusable(false)
 
@@ -204,7 +204,15 @@ function QuickLoot.Define()
             return g_logger.error("Something went wrong, file is above 100MB, won't be saved")
         end
 
-        g_resources.writeFileContents(file, result)
+        -- Safely attempt to write the file, ignoring errors during logout
+        local writeStatus, writeError = pcall(function()
+            return g_resources.writeFileContents(file, result)
+        end)
+        
+        if not writeStatus then
+            -- Log the error but don't spam the console during normal logout
+            g_logger.debug("Could not save QuickLoot settings during logout: " .. tostring(writeError))
+        end
     end
 
     function QuickLoot.start(quickLootFallbackToMainContainer, lootContainers)
@@ -212,6 +220,15 @@ function QuickLoot.Define()
         local vipPanel = quickLootController.ui.information.vipPanel
         local loots = lootContainers
         local fallback = quickLootFallbackToMainContainer
+
+        -- Store lootContainers globally so other modules can access it
+        -- Store a copy to avoid interfering with the local variable
+        QuickLoot.lootContainers = {}
+        if lootContainers then
+            for i, container in ipairs(lootContainers) do
+                QuickLoot.lootContainers[i] = {container[1], container[2], container[3]}
+            end
+        end
 
         QuickLoot.loadFilterItems()
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ public:
     bool autoWalk(const Position& destination, bool retry = false);
     bool canWalk(bool ignoreLock = false);
 
-    void setStates(uint32_t states);
+    void setStates(uint64_t states);
     void setSkill(Otc::Skill skillId, uint16_t level, uint16_t levelPercent);
     void setBaseSkill(Otc::Skill skill, uint16_t baseLevel);
     void setHealth(uint32_t health, uint32_t maxHealth);
@@ -45,6 +45,7 @@ public:
     void setExperience(uint64_t experience);
     void setLevel(uint16_t level, uint8_t levelPercent);
     void setMana(uint32_t mana, uint32_t maxMana);
+    void setManaShield(uint32_t manaShield, uint32_t maxManaShield);
     void setMagicLevel(uint16_t magicLevel, uint16_t magicLevelPercent);
     void setBaseMagicLevel(uint16_t baseMagicLevel);
     void setSoul(uint8_t soul);
@@ -52,7 +53,6 @@ public:
     void setKnown(const bool known) { m_known = known; }
     void setPendingGame(const bool pending) { m_pending = pending; }
     void setInventoryItem(Otc::InventorySlot inventory, const ItemPtr& item);
-    void setVocation(uint8_t vocation);
     void setPremium(bool premium);
     void setRegenerationTime(uint16_t regenerationTime);
     void setOfflineTrainingTime(uint16_t offlineTrainingTime);
@@ -60,11 +60,19 @@ public:
     void setBlessings(uint16_t blessings);
     void setResourceBalance(Otc::ResourceTypes_t type, uint64_t value);
     void takeScreenshot(uint8_t type);
+    void setFlatDamageHealing(uint16_t flatBonus);
+    void setAttackInfo(uint16_t attackValue, uint8_t attackElement);
+    void setConvertedDamage(double convertedDamage, uint8_t convertedElement);
+    void setImbuements(double lifeLeech, double manaLeech, double critChance, double critDamage, double onslaught);
+    void setDefenseInfo(uint16_t defense, uint16_t armor, double mitigation, double dodge, uint16_t damageReflection);
+    void setCombatAbsorbValues(const std::map<uint8_t, double>& absorbValues);
+    void setForgeBonuses(double momentum, double transcendence, double amplification);
+    void setExperienceRate(Otc::ExperienceRate_t type, uint16_t value);
+    void setStoreExpBoostTime(uint16_t value);
 
     uint32_t getFreeCapacity() { return m_freeCapacity; }
     uint32_t getTotalCapacity() { return m_totalCapacity; }
 
-    uint8_t getVocation() { return m_vocation; }
     uint16_t getMagicLevel() { return m_magicLevel; }
     uint16_t getMagicLevelPercent() { return m_magicLevelPercent; }
     uint16_t getBaseMagicLevel() { return m_baseMagicLevel; }
@@ -79,10 +87,13 @@ public:
     uint16_t getBlessings() { return m_blessings; }
     uint16_t getRegenerationTime() { return m_regenerationTime; }
     uint16_t getOfflineTrainingTime() { return m_offlineTrainingTime; }
+    uint16_t getStoreExpBoostTime() { return m_storeExpBoostTime; }
 
-    uint32_t getStates() { return m_states; }
+    auto getStates() { return m_states; }
     uint32_t getMana() { return m_mana; }
     uint32_t getMaxMana() { return m_maxMana; }
+    uint32_t getManaShield() { return m_manaShield; }
+    uint32_t getMaxManaShield() { return m_maxManaShield; }
     uint32_t getHealth() { return m_health; }
     uint32_t getMaxHealth() { return m_maxHealth; }
     uint64_t getExperience() { return m_experience; }
@@ -122,6 +133,7 @@ public:
 
     Position getPosition() override { return isPreWalking() ? m_preWalks.back() : m_position; }
     void resetPreWalk() { m_preWalks.clear(); }
+    auto getPreWalkingSize() { return m_preWalks.size(); }
 
 private:
     struct Skill
@@ -136,7 +148,8 @@ private:
     void walk(const Position& oldPos, const Position& newPos) override;
     void terminateWalk() override;
     void cancelWalk(Otc::Direction direction = Otc::InvalidDirection);
-    void cancelAjustInvalidPosEvent();
+    void cancelAdjustInvalidPosEvent();
+    void registerAdjustInvalidPosEvent();
 
     bool retryAutoWalk();
 
@@ -145,7 +158,7 @@ private:
     Position m_autoWalkDestination;
     std::deque<Position> m_preWalks;
 
-    ScheduledEventPtr m_ajustInvalidPosEvent;
+    ScheduledEventPtr m_adjustInvalidPosEvent;
     ScheduledEventPtr m_autoWalkContinueEvent;
     ticks_t m_walkLockExpiration{ 0 };
 
@@ -161,11 +174,12 @@ private:
     std::vector<uint16_t> m_spells;
 
     stdext::map<Otc::ResourceTypes_t, uint64_t> m_resourcesBalance;
+    std::map<uint8_t, double> m_combatAbsorbValues;
+    std::map<Otc::ExperienceRate_t, uint16_t> m_experienceRates;
 
     uint8_t m_autoWalkRetries{ 0 };
 
-    uint32_t m_states{ 0 };
-    uint8_t m_vocation{ 0 };
+    uint64_t m_states{ 0 };
     uint16_t m_blessings{ Otc::BlessingNone };
 
     uint32_t m_freeCapacity{ 0 };
@@ -178,6 +192,8 @@ private:
     uint8_t m_levelPercent{ 0 };
     uint32_t m_mana{ 0 };
     uint32_t m_maxMana{ 0 };
+    uint32_t m_manaShield{ 0 };
+    uint32_t m_maxManaShield{ 0 };
     uint16_t m_magicLevel{ 0 };
     uint16_t m_magicLevelPercent{ 0 };
     uint16_t m_baseMagicLevel{ 0 };
@@ -185,6 +201,29 @@ private:
     uint16_t m_stamina{ 0 };
     uint16_t m_regenerationTime{ 0 };
     uint16_t m_offlineTrainingTime{ 0 };
+    uint16_t m_storeExpBoostTime{ 0 };
+
+    uint8_t m_attackElement{ 0 };
+    uint8_t m_convertedElement{ 0 };
+
+    uint16_t m_flatDamageHealing{ 0 };
+    uint16_t m_attackValue{ 0 };
+    uint16_t m_defense{ 0 };
+    uint16_t m_armor{ 0 };
+    uint16_t m_damageReflection{ 0 };
+
+    double m_convertedDamage{ 0 };
+    double m_lifeLeech{ 0 };
+    double m_manaLeech{ 0 };
+    double m_critChance{ 0 };
+    double m_critDamage{ 0 };
+    double m_onslaught{ 0 };
+    double m_mitigation{ 0 };
+    double m_dodge{ 0 };
+    double m_momentum{ 0 };
+    double m_transcendence{ 0 };
+    double m_amplification{ 0 };
 
     friend class Game;
+    friend class Creature;
 };

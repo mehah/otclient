@@ -112,9 +112,9 @@ end
 
 --- Adds a walk event with an optional delay.
 local function addWalkEvent(dir, delay)
-    if os.time() - lastCancelWalkTime > 20 then
+    if g_clock.millis() - lastCancelWalkTime > 20 then
         cancelWalkEvent()
-        lastCancelWalkTime = os.time()
+        lastCancelWalkTime = g_clock.millis()
     end
 
     local action = function()
@@ -277,7 +277,7 @@ function bindWalkKey(key, dir)
     local gameRootPanel = modules.game_interface.getRootPanel()
 
     g_keyboard.bindKeyDown(key, function()
-        g_keyboard.setKeyDelay(key, 10)
+        g_keyboard.setKeyDelay(key, 1)
         changeWalkDir(dir)
     end, gameRootPanel, true)
 

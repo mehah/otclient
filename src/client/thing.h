@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ public:
     bool isThing() override { return true; }
 
     virtual void setId(uint32_t /*id*/) {}
-    virtual void setPosition(const Position& position, uint8_t stackPos = 0, bool hasElevation = false);
+    virtual void setPosition(const Position& position, uint8_t stackPos = 0);
 
     virtual uint32_t getId() { return m_clientId; }
     uint16_t getClientId() const { return m_clientId; }
@@ -145,6 +145,7 @@ public:
     bool isTopEffect() { return getThingType()->isTopEffect(); }
     bool isPodium() const { return getThingType()->isPodium(); }
     bool isOpaque() const { return getThingType()->isOpaque(); }
+    bool isLoading() const { return getThingType()->isLoading(); }
     bool isSingleDimension() const { return getThingType()->isSingleDimension(); }
     bool isTall(const bool useRealSize = false) const { return getThingType()->isTall(useRealSize); }
 
@@ -175,8 +176,6 @@ public:
     PainterShaderProgramPtr getShader() const;
 
     bool hasShader() const { return m_shaderId > 0; }
-
-    void ungroup() { m_drawConductor.agroup = false; }
 
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
@@ -222,7 +221,7 @@ public:
         m_scale.speed = ms;
         m_scale.timer.restart();
     }
-	
+
     bool canAnimate() { return m_animate; }
     void setAnimate(bool aniamte) { m_animate = aniamte; }
 
@@ -250,7 +249,6 @@ protected:
     } m_scale;
 
     Position m_position;
-    DrawConductor m_drawConductor{ .agroup = false, .order = THIRD };
 
     uint16_t m_clientId{ 0 };
 

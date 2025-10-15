@@ -100,6 +100,9 @@ local function onWidgetKeyPress(widget, keyCode, keyboardModifiers, autoRepeatTi
     if keyCode == KeyUnknown then
         return false
     end
+    if not widget.boundKeyPressCombos then
+        return false
+    end
     local callback = widget.boundKeyPressCombos[determineKeyComboDesc(keyCode, keyboardModifiers)]
     return signalcall(callback, widget, keyCode, autoRepeatTicks)
 end

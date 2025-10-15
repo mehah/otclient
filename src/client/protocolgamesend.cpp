@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ void ProtocolGame::sendExtendedOpcode(const uint8_t opcode, const std::string& b
         msg->addString(buffer);
         send(msg);
     } else {
-        g_logger.error(stdext::format("Unable to send extended opcode %d, extended opcodes are not enabled", opcode));
+        g_logger.error("Unable to send extended opcode {}, extended opcodes are not enabled", opcode);
     }
 }
 
@@ -54,8 +54,11 @@ void ProtocolGame::sendLoginPacket(const uint32_t challengeTimestamp, const uint
         msg->addString(std::to_string(g_game.getClientVersion()));
     }
 
-    if (g_game.getFeature(Otc::GameContentRevision))
+    if (g_game.getClientVersion() >= 1334) {
+        msg->addString("appearancesHash");
+    } else if (g_game.getFeature(Otc::GameContentRevision)) {
         msg->addU16(g_things.getContentRevision());
+    }
 
     if (g_game.getFeature(Otc::GamePreviewState))
         msg->addU8(0);
@@ -696,6 +699,24 @@ void ProtocolGame::sendShareExperience(const bool active)
     send(msg);
 }
 
+void ProtocolGame::sendPartyAnalyzerAction(const uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items)
+{
+    const auto& msg = std::make_shared<OutputMessage>();
+    msg->addU8(Proto::ClientPartyAnalyzerAction); // 43
+    msg->addU8(action);
+    
+    // Only add items data for PARTYANALYZERACTION_PRICEVALUE (action 3)
+    if (action == 3) { // PARTYANALYZERACTION_PRICEVALUE
+        msg->addU16(static_cast<uint16_t>(items.size()));
+        for (const auto& [itemId, price] : items) {
+            msg->addU16(itemId);
+            msg->addU64(price);
+        }
+    }
+    
+    send(msg);
+}
+
 void ProtocolGame::sendOpenOwnChannel()
 {
     const auto& msg = std::make_shared<OutputMessage>();
@@ -1205,7 +1226,7 @@ void ProtocolGame::sendRequestStorePremiumBoost()
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);
     msg->addU8(Otc::Store_Type_Actions_t::OPEN_PREMIUM_BOOST);
-    msg->addU8(0);
+    msg->addU8(1);
     send(msg);
 }
 
@@ -1258,7 +1279,7 @@ void ProtocolGame::sendTransferCoins(const std::string_view recipient, const uin
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientTransferCoins);
     msg->addString(recipient);
-    msg->addU16(amount);
+    msg->addU32(amount); // the server receive in unit32
     send(msg);
 }
 
@@ -1358,8 +1379,8 @@ void ProtocolGame::sendPreyAction(const uint8_t slot, const uint8_t actionType, 
         msg->addU8(static_cast<uint8_t>(index));
     } else if (actionType == 4) {
         msg->addU16(index); // raceid
-        send(msg);
     }
+    send(msg);
 }
 
 void ProtocolGame::sendPreyRequest()

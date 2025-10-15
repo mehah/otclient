@@ -600,24 +600,7 @@ ProgressBackground < UIWidget
     image-border: 5
     anchors.fill: parent
     phantom: true
-CheckBoxButton < UICheckBox
-  size: 106 23
-  image-source: /images/ui/button-9grid-idle
-  image-border: 3
-  text-align: center
-  padding: 5 10 5 10
-  change-cursor-image: true
-  cursor: pointer
-  color: #BDBDBD
-  $checked:
-    image-source: /images/ui/button-9grid-pressed
-    text-offset: 1 1
-  $!checked:
-    text-offset: 0 0
-  $disabled:
-    color: #dfdfdf88
-    opacity: 0.8
-    change-cursor-image: false
+
 BorderBox < UIWidget
   border-width-top: 1
   border-color-top: black
@@ -727,6 +710,10 @@ CharmItem < UICheckBox
     image-source: /images/ui/item
     image-border: 10
     phantom: true
+    @onSetup: |
+      if g_game.getClientVersion() >= 1410 then
+        self:setVisible(false)
+      end
     Label
       id: Value
       anchors.centerIn: parent
@@ -753,8 +740,14 @@ CharmItem < UICheckBox
     margin-bottom: 7
     image-source: /images/ui/panel_flat
     image-border: 10
-    size: 37 37
     phantom: true
+    @onSetup: |
+      if g_game.getClientVersion() >= 1410 then
+        self:setSize("46 46")
+        self:setMarginBottom(-5)
+        else
+        self:setSize("37 37")
+      end
     UIWidget
       size: 32 32
       id: image
@@ -766,6 +759,22 @@ CharmItem < UICheckBox
       anchors.centerIn: parent
       image-source: /images/ui/ditherpattern
       phantom: true
+      @onSetup: |
+        if g_game.getClientVersion() >= 1410 then
+          self:setSize("43 43")
+        else
+          self:setSize("35 35")
+        end
+    UIWidget
+      id: border
+      anchors.centerIn: parent
+      phantom: true
+      @onSetup: |
+        if g_game.getClientVersion() >= 1410 then
+          self:setVisible(true)
+        else
+          self:setVisible(false)
+        end
 MarkListItem < ButtonBox
   icon-size: 11 11
   icon-offset: 3 3
@@ -1283,50 +1292,40 @@ TrackerButton < Panel
 
 BestiaryTracker < MiniWindow
   id: BestiaryTracker
-  !text: tr('Bestiary Tracker')
-  icon: /images/topbuttons/bestiaryTracker
-  icon-offset: 4 2
-  icon-size: 12 12
   @onClose: modules.game_cyclopedia.Cyclopedia.onTrackerClose(self:getText())
 
-  UIButton
-    id: menuButton
-    anchors.top: prev.top
-    anchors.right: prev.left
-    margin-right: 2
-    size: 14 14
-    image-source: /images/ui/miniwindow_buttons
-    image-clip: 112 0 14 14
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    size: 12 12
+    image-source: /images/icons/icon-bestiarytracker-widget
+    image-smooth: false
 
-    $hover:
-      image-clip: 112 14 14 14
-
-    $pressed:
-      image-clip: 112 28 14 14
-
-    $on:
-      image-clip: 112 0 14 14
-
-  UIButton
-    id: cyclopediaButton
-    anchors.top: prev.top
-    anchors.right: prev.left
-    margin-right: 2
-    size: 14 14
-    image-source: /images/ui/miniwindow_buttons
-    image-clip: 126 0 14 14
-
-    $hover:
-      image-clip: 126 14 14 14
-
-    $pressed:
-      image-clip: 126 28 14 14
-
-    $on:
-      image-clip: 126 0 14 14
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    color: #9d9d9dff
 
   MiniWindowContents
     id: contentsPanel
+    anchors.top: miniwindowTopBar.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: parent.bottom
+    margin-left: 3
+    margin-top: -2
+    margin-right: 1
+    vertical-scrollbar: miniwindowScrollBar
     padding-left: 5
     padding-right: 5
     padding-bottom: 3

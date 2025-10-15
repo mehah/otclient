@@ -1,18 +1,38 @@
-PageButton < Button
-  size: 30 18
-  margin: 1
+PageButton < UIButton
+  size: 18 18
 
 
 ContainerWindow < MiniWindow
   height: 150
 
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    size: 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    color: #9d9d9dff
+
   UIItem
     id: containerItemWidget
     virtual: true
-    size: 16 16
+    size: 15 15
     anchors.top: parent.top
     anchors.left: parent.left
-    margin-top: 4
+    margin-top: 2
     margin-left: 4
 
   UIButton
@@ -30,14 +50,43 @@ ContainerWindow < MiniWindow
     $pressed:
       image-clip: 42 28 14 14
 
+  MiniWindowContents
+    id: contentsPanel
+    anchors.top: miniwindowTopBar.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: next.top
+    margin-left: 3
+    margin-bottom: 1
+    margin-top: -2
+    margin-right: 1
+    vertical-scrollbar: miniwindowScrollBar
+    padding-left: 6
+    padding-top: 6
+    padding-right: 6
+    padding-bottom: 6
+    layout:
+      type: grid
+      cell-size: 34 34
+      cell-spacing: 3
+      flow: true
+  
+  HorizontalSeparator
+    id: separator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: next.top
+    margin-left: 3
+    margin-right: 3
+    margin-bottom: 3
+
   Panel
     id: pagePanel
     anchors.left: parent.left
     anchors.right: parent.right
-    anchors.top: miniwindowTopBar.bottom
+    anchors.bottom: parent.bottom
     height: 20
-    margin: 2 3 0 3
-    background: #00000066
+    margin: 2 2 4 3
     visible: false
 
     Label
@@ -45,24 +94,127 @@ ContainerWindow < MiniWindow
       anchors.top: parent.top
       anchors.horizontalCenter: parent.horizontalCenter
       margin-top: 2
+      margin-left: -8
       text-auto-resize: true
 
     PageButton
       id: prevPageButton
-      text: <
       anchors.top: parent.top
       anchors.left: parent.left
+      margin-left: 5
+      image-source: /images/ui/container-browse-left-up
+
+      $pressed:
+        image-source: /images/ui/container-browse-left-down
+
+      $pressed disabled:
+        image-source: /images/ui/container-browse-left-up
 
     PageButton
       id: nextPageButton
-      text: >
       anchors.top: parent.top
       anchors.right: parent.right
+      margin-right: 5
+      image-source: /images/ui/container-browse-right-up
 
-  MiniWindowContents
-    padding-left: 5
-    layout:
-      type: grid
-      cell-size: 34 34
-      cell-spacing: 3
-      flow: true
+      $pressed:
+        image-source: /images/ui/container-browse-right-down
+
+      $pressed disabled:
+        image-source: /images/ui/container-browse-right-up
+
+
+  UIWidget
+    id: miniborder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    image-source: /images/ui/miniborder
+    size: 14 14
+    margin-left: 4
+    margin-bottom: 4
+
+ContainersSubMenuOption < ThickCheckBox
+  text-offset: 18 1
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+ContainersListOption < UIButton
+  text-align: left
+  color: white
+  background-color: alpha
+  font: verdana-11px-rounded
+  padding: 3 6
+  margin-left: 5
+
+  $hover:
+    background-color: #ffffff1a
+
+  $disabled:
+    color: #c0c0c0ff
+
+ContainersSubMenu < PopupMenu
+  id: containersSubMenu
+  width: 285
+
+  ContainersListOption
+    id: sortAscByName
+    !text: tr('Sort Ascending by Name')
+  ContainersListOption
+    id: sortDescByName
+    !text: tr('Sort Descending by Name')
+  ContainersListOption
+    id: sortAscByWeight
+    !text: tr('Sort Ascending by Weight')
+  ContainersListOption
+    id: sortDescByWeight
+    !text: tr('Sort Descending by Weight')
+  ContainersListOption
+    id: sortAscByExpiry
+    !text: tr('Sort Ascending by Expiry')
+  ContainersListOption
+    id: sortDescByExpiry
+    !text: tr('Sort Descending by Expiry')
+  ContainersListOption
+    id: sortAscByStackSize
+    !text: tr('Sort Ascending by Stack Size')
+  ContainersListOption
+    id: sortDescByStackSize
+    !text: tr('Sort Descending by Stack Size')
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  ContainersSubMenuOption
+    id: sortContainersFirst
+    !text: tr('Sort Containers First')
+
+  ContainersSubMenuOption
+    id: sortNestedContainers
+    !text: tr('Sort Nested Containers')
+
+  ContainersSubMenuOption
+    id: useManualSortMode
+    !text: tr('Use Manual Sort Mode')
+
+  HorizontalSeparator
+    margin-top: 2
+    margin-bottom: 3
+
+  ContainersListOption
+    id: moveToObtainContainers
+    !text: tr('Move Contents to \'Obtain\' Containers')
+
+  ContainersSubMenuOption
+    id: moveNestedContainers
+    !text: tr('Move Nested Containers')
+  

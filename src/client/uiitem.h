@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,10 +49,15 @@ public:
     bool isVirtual() { return m_virtual; }
     bool isItemVisible() { return m_itemVisible; }
 
+    void setShader(std::string_view name) override;
+    bool hasShader() override;
+
 protected:
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;
 
+    std::string m_shaderName;
     ItemPtr m_item;
+    uint32_t m_itemId{ 0 };
     bool m_virtual{ false };
     bool m_showId{ false };
     bool m_itemVisible{ true };

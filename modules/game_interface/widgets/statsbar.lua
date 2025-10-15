@@ -5,15 +5,15 @@ local statsBars = {}
 local statsBarDeepInfo = {}
 
 -- If you want to add more placements/dimensions, you'll need to add them here.
--- This is used in getStatsBarMenuOptions(), createStatsBarWidgets(), 
+-- This is used in getStatsBarMenuOptions(), createStatsBarWidgets(),
 --                         hideAll() and destroyAllIcons() functions.
 local statsBarsPlacements = {
     "Top",
     "Bottom"
 }
 
--- This is used in constructStatsBar(), getStatsBarMenuOptions(), 
---                   reloadCurrentTab(), createStatsBarWidgets(), 
+-- This is used in constructStatsBar(), getStatsBarMenuOptions(),
+--                   reloadCurrentTab(), createStatsBarWidgets(),
 --                       hideAll() and destroyALlIcons functions.
 local statsBarsDimensions = {
     Large = {
@@ -39,15 +39,15 @@ local currentStats = {
 
 local skillsLineHeight = 20
 local skillsTuples = {
-    {skill = nil,               key = 'experience', icon = '/images/icons/icon_experience',  placement = 'center',   order = 0,  name = "Level"},
-    {skill = nil,               key = 'magic',      icon = '/images/icons/icon_magic',       placement = 'left',     order = 1,  name = "Magic Level"},
-    {skill = Skill.Axe,         key = 'axe',        icon = '/images/icons/icon_axe',         placement = 'right',    order = 1,  name = "Axe Fighting Skill"},
-    {skill = Skill.Club,        key = 'club',       icon = '/images/icons/icon_club',        placement = 'left',     order = 2,  name = "Club Fighting Skill"},
-    {skill = Skill.Distance,    key = 'distance',   icon = '/images/icons/icon_distance',    placement = 'right',    order = 2,  name = "Distance Fighting Skill"},
-    {skill = Skill.Fist,        key = 'fist',       icon = '/images/icons/icon_fist',        placement = 'left',     order = 3,  name = "Fist Fighting Skill"},
-    {skill = Skill.Shielding,   key = 'shielding',  icon = '/images/icons/icon_shielding',   placement = 'right',    order = 3,  name = "Shielding Fighting Skill"},
-    {skill = Skill.Sword,       key = 'sword',      icon = '/images/icons/icon_sword',       placement = 'left',     order = 4,  name = "Sword Fighting Skill"},
-    {skill = Skill.Fishing,     key = 'fishing',    icon = '/images/icons/icon_fishing',     placement = 'right',    order = 4,  name = "Fishing Fighting Skill"},
+    { skill = nil,             key = 'experience', icon = '/images/icons/icon_experience', placement = 'center', order = 0, name = "Level" },
+    { skill = nil,             key = 'magic',      icon = '/images/icons/icon_magic',      placement = 'left',   order = 1, name = "Magic Level" },
+    { skill = Skill.Axe,       key = 'axe',        icon = '/images/icons/icon_axe',        placement = 'right',  order = 1, name = "Axe Fighting Skill" },
+    { skill = Skill.Club,      key = 'club',       icon = '/images/icons/icon_club',       placement = 'left',   order = 2, name = "Club Fighting Skill" },
+    { skill = Skill.Distance,  key = 'distance',   icon = '/images/icons/icon_distance',   placement = 'right',  order = 2, name = "Distance Fighting Skill" },
+    { skill = Skill.Fist,      key = 'fist',       icon = '/images/icons/icon_fist',       placement = 'left',   order = 3, name = "Fist Fighting Skill" },
+    { skill = Skill.Shielding, key = 'shielding',  icon = '/images/icons/icon_shielding',  placement = 'right',  order = 3, name = "Shielding Fighting Skill" },
+    { skill = Skill.Sword,     key = 'sword',      icon = '/images/icons/icon_sword',      placement = 'left',   order = 4, name = "Sword Fighting Skill" },
+    { skill = Skill.Fishing,   key = 'fishing',    icon = '/images/icons/icon_fishing',    placement = 'right',  order = 4, name = "Fishing Fighting Skill" },
 }
 
 StatsBar = {}
@@ -149,7 +149,6 @@ local function reloadSkillsTab(skills, parent)
             widget.level:setText(player:getSkillLevel(skillTuple.skill))
             widget.bar:setValue(player:getSkillLevelPercent(skillTuple.skill), 100)
         end
-
     end
 
     skills:setHeight((lines * skillsLineHeight) + 5)
@@ -166,7 +165,7 @@ function StatsBar.getAllStatsBarWithPosition()
             for dimension, _ in pairs(statsBarsDimensions) do
                 local dimensionOnPlacement = tostring(dimension):lower() .. "On" .. placement
                 if statsBar[dimensionOnPlacement] then
-                    statsBarsWithPosition[#statsBarsWithPosition+1] = statsBar[dimensionOnPlacement]
+                    statsBarsWithPosition[#statsBarsWithPosition + 1] = statsBar[dimensionOnPlacement]
                 end
             end
         end
@@ -184,7 +183,7 @@ function StatsBar.getCurrentStatsBarWithPosition()
     if currentStats.dimension == 'hide' or currentStats.placement == 'hide' then
         return nil
     end
-    -- -- Get full position as a single string. 
+    -- -- Get full position as a single string.
     -- -- i.e. largeOnTop // parallelOnBottom
     local placement = currentStats.placement:gsub("^%l", string.upper)
     local fullPosition = currentStats.dimension .. "On" .. placement
@@ -194,8 +193,8 @@ function StatsBar.getCurrentStatsBarWithPosition()
     end
 
     if statsBar[fullPosition] then
-    -- Return the stats bar based on the full position.
-    -- i.e. statsBarTop.largeOnTop
+        -- Return the stats bar based on the full position.
+        -- i.e. statsBarTop.largeOnTop
         return statsBar[fullPosition]
     else
         print("No stats bar with position found for:", statsBar)
@@ -210,7 +209,7 @@ function StatsBar.getCurrentStatsBar()
     if currentStats.dimension == 'hide' or currentStats.placement == 'hide' then
         return nil
     end
-    -- -- Get full placement. 
+    -- -- Get full placement.
     -- -- i.e. Top // Bottom
     local placement = currentStats.placement:gsub("^%l", string.upper)
 
@@ -238,8 +237,70 @@ function StatsBar.reloadCurrentStatsBarQuickInfo()
         return
     end
 
+    local mana = player:getMana()
+    local maxMana = player:getMaxMana()
+
     bar.health:setValue(player:getHealth(), player:getMaxHealth())
-    bar.mana:setValue(player:getMana(), player:getMaxMana())
+
+    local manashield = player:getManaShield()
+    if not bar.mana.defaultHeight then
+        bar.mana.defaultHeight = bar.mana:getHeight()
+    end
+
+    bar.mana:setValue(mana, maxMana)
+    local maxManaShield = player:getMaxManaShield()
+    local shouldShowManaShield = manashield > 0 and maxManaShield > 0
+    if shouldShowManaShield then
+        local fullHeight = bar.mana.defaultHeight
+        local manaHeight = math.floor(fullHeight / 2)
+        local shieldHeight = math.max(1, fullHeight - manaHeight)
+
+        bar.mana.showText = false
+        if bar.mana.text then
+            bar.mana.text:hide()
+        end
+
+        bar.mana:setHeight(manaHeight)
+
+        bar.manashield:show()
+        bar.manashield:setMarginTop(0)
+        bar.manashield:setHeight(shieldHeight)
+        bar.manashield:setValue(manashield, maxManaShield)
+        if bar.manashield.text then
+            bar.manashield.text:setWidth(400)
+            local textOffset = math.floor(manaHeight / 2)
+            local manaText = string.format('%d/%d (%d/%d)', mana, maxMana, manashield, maxManaShield)
+            if not bar.manashield or not bar.manashield.text then
+                return
+            end
+            bar.manashield.text:setMarginTop(-textOffset)
+            bar.manashield.text:setMarginBottom(0)
+            bar.manashield.text:show()
+            bar.manashield.text:raise()
+            bar.manashield.showText = true
+            bar.manashield.manaShieldText = manaText
+        end
+    else
+        bar.mana.showText = true
+
+        if bar.mana.defaultHeight then
+            bar.mana:setHeight(bar.mana.defaultHeight)
+        end
+
+        bar.manashield:setMarginTop(0)
+        bar.manashield:setHeight(0)
+        bar.manashield:hide()
+        bar.manashield.showText = true
+        if bar.manashield.text then
+            bar.manashield.text:hide()
+            bar.manashield.text:setMarginTop(0)
+            bar.manashield.text:setMarginBottom(0)
+        end
+    end
+
+    if not shouldShowManaShield and bar.mana.text then
+        bar.mana.text:show()
+    end
 end
 
 local function loadIcon(bitChanged, content, topmenu)
@@ -250,14 +311,15 @@ local function loadIcon(bitChanged, content, topmenu)
     local tooltip = Icons[bitChanged].tooltip
     if tooltip == "You are GoshnarTaint" then
         tooltip = "Goshnar's Lairs Penalties:\n" ..
-                  "- 10% chance of creature teleportation to you\n" ..
-                  "- 0.5% chance of new creature spawn when hitting another\n" ..
-                  "- 15% increased damage received\n" ..
-                  "- 10% chance of creature full heal instead of dying\n" ..
-                  "- Lose 10% of current HP and mana every 10 seconds"
+            "- 10% chance of creature teleportation to you\n" ..
+            "- 0.5% chance of new creature spawn when hitting another\n" ..
+            "- 15% increased damage received\n" ..
+            "- 10% chance of creature full heal instead of dying\n" ..
+            "- Lose 10% of current HP and mana every 10 seconds"
     end
     icon:setTooltip(tooltip)
     icon:setImageSize(tosize("9 9"))
+    icon:setMarginRight(-1)
     if topmenu then
         icon:setMarginTop(5)
         icon:setMarginLeft(2)
@@ -271,11 +333,11 @@ local function getStatsBarsIconContent()
     local statsBars = StatsBar.getAllStatsBarWithPosition()
 
     for _, statsBar in ipairs(statsBars) do
-        iconContents[#iconContents+1] = { content = statsBar.icons, loadIconTransparent = true }
+        iconContents[#iconContents + 1] = { content = statsBar.icons, loadIconTransparent = true }
     end
 
-    iconContents[#iconContents+1] = { content = modules.game_inventory.getIconsPanelOn(), loadIconTransparent = false }
-    iconContents[#iconContents+1] = { content = modules.game_inventory.getIconsPanelOff(), loadIconTransparent = false }
+    iconContents[#iconContents + 1] = { content = modules.game_inventory.getIconsPanelOn(), loadIconTransparent = false }
+    iconContents[#iconContents + 1] = { content = modules.game_inventory.getIconsPanelOff(), loadIconTransparent = false }
 
     return iconContents
 end
@@ -285,7 +347,8 @@ local function toggleIcon(bitChanged)
 
     local iconId = Icons[bitChanged]
     if not iconId then
-        g_logger.warning(string.format("No icon ID %s (%s)  found. Check Icons array in modules/gamelib/player.lua.", tostring(bitChanged), tostring(math.log(bitChanged) / math.log(2))))
+        g_logger.warning(string.format("No icon ID %s (%s)  found. Check Icons array in modules/gamelib/player.lua.",
+            tostring(bitChanged), tostring(math.log(bitChanged) / math.log(2))))
         return
     end
     for _, contentData in ipairs(contents) do
@@ -322,17 +385,9 @@ function StatsBar.reloadCurrentStatsBarQuickInfo_state(localPlayer, now, old)
     if now == old then
         return
     end
-    local bitsChanged = Bit.bxor(now, old)
-    for i = 1, 32 do
-        local pow = math.pow(2, i - 1)
-        if pow > bitsChanged then
-            break
-        end
-        local bitChanged = Bit.band(bitsChanged, pow)
-        if bitChanged ~= 0 then
-            toggleIcon(bitChanged)
-        end
-    end
+    Player.iterateChangedStates(now, old, function(bitChanged)
+        toggleIcon(bitChanged)
+    end)
 end
 
 function StatsBar.reloadCurrentStatsBarDeepInfo()
@@ -377,13 +432,14 @@ function constructStatsBar(dimension, placement)
         statsBar[dimensionOnPlacement]:setPhantom(false)
         statsBar[dimensionOnPlacement].health = statsBar[dimensionOnPlacement]:getChildById('health')
         statsBar[dimensionOnPlacement].mana = statsBar[dimensionOnPlacement]:getChildById('mana')
+        statsBar[dimensionOnPlacement].manashield = statsBar[dimensionOnPlacement]:getChildById('manashield')
         statsBar[dimensionOnPlacement].skills = statsBar[dimensionOnPlacement]:getChildById('skills')
 
-    reloadSkillsTab(statsBar[dimensionOnPlacement].skills, statsBar[dimensionOnPlacement])
-    StatsBar.reloadCurrentStatsBarQuickInfo()
+        reloadSkillsTab(statsBar[dimensionOnPlacement].skills, statsBar[dimensionOnPlacement])
+        StatsBar.reloadCurrentStatsBarQuickInfo()
 
-    modules.game_healthcircle.setStatsBarOption()
-    else 
+        modules.game_healthcircle.setStatsBarOption()
+    else
         print("No stats bar found for:", dimensionOnPlacement .. " on constructStatsBar()")
     end
 end
@@ -452,7 +508,7 @@ function getStatsBarMenuOptions(current)
         for dimension, _ in pairs(statsBarsDimensions) do
             local style = tostring(dimension):gsub("^%u", string.lower) .. 'On' .. placement
             if shouldAddStatsBarOption(current, placement, style) then
-                optionsMenu[#optionsMenu+1] = { 
+                optionsMenu[#optionsMenu + 1] = {
                     label = 'Switch to ' .. tostring(dimension) .. ' Style',
                     dimension = dimension,
                     placement = placement:gsub("^%u", string.lower),
@@ -461,12 +517,12 @@ function getStatsBarMenuOptions(current)
             end
         end
     end
-    
+
     -- Create options available to switch placements keeping the same style
     -- i.e. from bottom to top // from top to bottom
     for _, placement in ipairs(statsBarsPlacements) do
         if not string.find(current:getId(), placement) then
-            optionsMenu[#optionsMenu+1] = {
+            optionsMenu[#optionsMenu + 1] = {
                 label = 'Switch to ' .. placement .. ' Style',
                 dimension = currentStats.dimension:gsub("^%l", string.upper),
                 placement = placement:gsub("^%u", string.lower),
@@ -495,7 +551,7 @@ function StatsBar.reloadCurrentTab()
 
     if statsBarsDimensions[dimension] then
         return constructStatsBar(dimension, currentStats.placement)
-    else 
+    else
         print("No stats bars dimensions found: ", dimension, " on reloadCurrentTab()")
         return
     end
@@ -511,12 +567,12 @@ function StatsBar.updateStatsBarOption(dimension)
 end
 
 local function getSettingOrDefault(setting, default)
-  local value = g_settings.getString(setting)
-  return value ~= "" and value or default
+    local value = g_settings.getString(setting)
+    return value ~= "" and value or default
 end
 
 local function setSetting(setting, value)
-  g_settings.set(setting, value)
+    g_settings.set(setting, value)
 end
 
 function StatsBar.loadSettings()
@@ -563,10 +619,10 @@ function createStatsBarWidgets(statsBar)
     -- This method will create the widgets based on the statsBar, statsBarsPlacements and statsBarsDimensions tables.
     local widget = statsBar
     for _, placement in ipairs(statsBarsPlacements) do
-      for dimension, _ in pairs(statsBarsDimensions) do
-        local elementName = tostring(dimension):gsub("^%u", string.lower) .. "On" .. placement
-        widget[elementName] = statsBar:getChildById(elementName)
-      end
+        for dimension, _ in pairs(statsBarsDimensions) do
+            local elementName = tostring(dimension):gsub("^%u", string.lower) .. "On" .. placement
+            widget[elementName] = statsBar:getChildById(elementName)
+        end
     end
     widget.onMousePress = onStatsMousePress
     return widget
@@ -599,6 +655,7 @@ function StatsBar.init()
         onLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onHealthChange = StatsBar.reloadCurrentStatsBarQuickInfo,
         onManaChange = StatsBar.reloadCurrentStatsBarQuickInfo,
+        onManaShieldChange = StatsBar.reloadCurrentStatsBarQuickInfo,
         onMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onBaseMagicLevelChange = StatsBar.reloadCurrentStatsBarDeepInfo,
         onSkillChange = StatsBar.reloadCurrentStatsBarDeepInfo,
@@ -659,12 +716,41 @@ end
 
 function StatsBar.terminate()
     StatsBar.saveSettings()
-    
+
     disconnect(LocalPlayer, statsBarDeepInfo)
     disconnect(g_game, {
         onGameStart = StatsBar.OnGameStart,
         OnGameEnd = StatsBar.OnGameEnd
     })
-    
+
     StatsBar.destroyAllBars()
+end
+
+function StatsBar.onHungryChange(regenerationTime, alert)
+    local contents = getStatsBarsIconContent()
+    local info = Icons[PlayerStates.Hungry]
+    if regenerationTime <= alert then
+        for _, contentData in ipairs(contents) do
+            local icon = contentData.content:getChildById(info.id)
+            if not icon then
+                icon = g_ui.createWidget('ConditionWidget', contentData.content)
+                icon:setId(info.id)
+                icon:setImageSource("/images/game/states/player-state-flags")
+                icon:setImageClip(((info.clip - 1) * 9) .. ' 0 9 9')
+                icon:setTooltip(info.tooltip)
+                icon:setImageSize(tosize("9 9"))
+                if contentData.loadIconTransparent then
+                    icon:setMarginTop(5)
+                end
+            end
+        end
+    else
+        for _, contentData in ipairs(contents) do
+            local icon = contentData.content:getChildById(info.id)
+            if icon then
+                icon:destroy()
+                icon = nil
+            end
+        end
+    end
 end

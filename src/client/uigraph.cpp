@@ -81,16 +81,59 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
             if (m_showInfo && isHovered()) {
                 g_drawPool.addFilledRect(graph.infoRectBg, graph.infoTextBg);
                 g_drawPool.addFilledRect(graph.infoRectIcon, graph.lineColor);
-                m_font->drawText(graph.infoValue, graph.infoRect, Color::black, Fw::AlignLeftCenter);
+                m_font->drawText(graph.infoValue, graph.infoRect, Color::lightGray, Fw::AlignLeftCenter);
             }
         }
 
         if (!m_title.empty())
-            m_font->drawText(m_title, dest, Color::white, Fw::AlignTopCenter);
+            m_font->drawText(m_title, dest, Color::lightGray, Fw::AlignTopCenter);
         if (m_showLabes) {
-            m_font->drawText(m_lastValue, dest, Color::white, Fw::AlignTopRight);
-            m_font->drawText(m_maxValue, dest, Color::white, Fw::AlignTopLeft);
-            m_font->drawText(m_minValue, dest, Color::white, Fw::AlignBottomLeft);
+            const float rotationAngle = -1.5707963267948966f;
+            
+            g_drawPool.pushTransformMatrix();
+            Point maxPoint(dest.left() - 10, dest.top() + 0);
+            g_drawPool.rotate(maxPoint, rotationAngle);
+            Rect maxRect(maxPoint.x - 50, maxPoint.y - 8, 100, 16);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() - 1, maxRect.y() - 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() + 1, maxRect.y() - 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() - 1, maxRect.y() + 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() + 1, maxRect.y() + 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y() - 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x(), maxRect.y() + 1, maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() - 1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, Rect(maxRect.x() + 1, maxRect.y(), maxRect.width(), maxRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_maxValue, maxRect, Color::lightGray, Fw::AlignCenter);
+            g_drawPool.popTransformMatrix();
+            
+            g_drawPool.pushTransformMatrix();
+            Point minPoint(dest.left() - 10, dest.bottom() - 0);
+            g_drawPool.rotate(minPoint, rotationAngle);
+            Rect minRect(minPoint.x - 50, minPoint.y - 8, 100, 16);
+            m_font->drawText(m_minValue, Rect(minRect.x() - 1, minRect.y() - 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() + 1, minRect.y() - 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() - 1, minRect.y() + 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() + 1, minRect.y() + 1, minRect.width(), minRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y() - 1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x(), minRect.y() + 1, minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() - 1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, Rect(minRect.x() + 1, minRect.y(), minRect.width(), minRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_minValue, minRect, Color::lightGray, Fw::AlignCenter);
+            g_drawPool.popTransformMatrix();
+            
+            g_drawPool.pushTransformMatrix();
+            Point avgPoint(dest.left() - 10, dest.verticalCenter());
+            g_drawPool.rotate(avgPoint, rotationAngle);
+            Rect avgRect(avgPoint.x - 50, avgPoint.y - 8, 100, 16);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() - 1, avgRect.y() - 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() + 1, avgRect.y() - 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() - 1, avgRect.y() + 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() + 1, avgRect.y() + 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 200), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y() - 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x(), avgRect.y() + 1, avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() - 1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, Rect(avgRect.x() + 1, avgRect.y(), avgRect.width(), avgRect.height()), Color(0, 0, 0, 150), Fw::AlignCenter);
+            m_font->drawText(m_avgValue, avgRect, Color::lightGray, Fw::AlignCenter);
+            g_drawPool.popTransformMatrix();
         }
     }
 
@@ -102,11 +145,12 @@ void UIGraph::drawSelf(const DrawPoolType drawPane)
 void UIGraph::clear()
 {
     m_graphs.clear();
+    m_needsUpdate = true;
 }
 
 void UIGraph::setLineWidth(const size_t index, const int width) {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setLineWidth (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setLineWidth ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -150,15 +194,16 @@ size_t UIGraph::createGraph()
 void UIGraph::addValue(const size_t index, const int value, const bool ignoreSmallValues)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format(
-            "[UIGraph::addValue (%s)] Graph of index %d out of bounds. Use:\n"
+        g_logger.warning(
+            "[UIGraph::addValue ({})] Graph of index {} out of bounds. Use:\n"
             "    if graph:getGraphsCount() == 0 then\n"
             "        graph:createGraph()\n"
             "        graph:setLineWidth(1, 1)\n"
             "        graph:setLineColor(1, \"#FF0000\")\n"
             "    end\n"
             "    graph:addValue(1,value)",
-            getId(), index));
+            getId(), index
+        );
 
         return;
     }
@@ -181,7 +226,7 @@ void UIGraph::addValue(const size_t index, const int value, const bool ignoreSma
 void UIGraph::setLineColor(const size_t index, const Color& color)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setLineColor (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setLineColor ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -192,7 +237,7 @@ void UIGraph::setLineColor(const size_t index, const Color& color)
 void UIGraph::setInfoText(const size_t index, const std::string& text)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setInfoText (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setInfoText ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -203,7 +248,7 @@ void UIGraph::setInfoText(const size_t index, const std::string& text)
 void UIGraph::setGraphVisible(const size_t index, const bool visible)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setGraphVisible (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setGraphVisible ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -214,7 +259,7 @@ void UIGraph::setGraphVisible(const size_t index, const bool visible)
 void UIGraph::setInfoLineColor(const size_t index, const Color& color)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setInfoLineColor (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setInfoLineColor ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -225,7 +270,7 @@ void UIGraph::setInfoLineColor(const size_t index, const Color& color)
 void UIGraph::setTextBackground(const size_t index, const Color& color)
 {
     if (m_graphs.size() <= index - 1) {
-        g_logger.warning(stdext::format("[UIGraph::setTextBackground (%s)] Graph of index %d out of bounds.", getId(), index));
+        g_logger.warning("[UIGraph::setTextBackground ({})] Graph of index {} out of bounds.", getId(), index);
         return;
     }
 
@@ -248,12 +293,15 @@ void UIGraph::cacheGraphs()
             const auto graphHeight = static_cast<float>(rect.height());
 
             float minValue = 0.0f;
-            float maxValue = 0.0f;
+            float maxValue = 1.0f;
+            bool hasValues = false;
+            
             for (auto& graph : m_graphs) {
                 if (graph.values.empty())
                     continue;
 
                 graph.points.clear();
+                hasValues = true;
 
                 auto [minValueIter, maxValueIter] = std::ranges::minmax_element(graph.values);
                 minValue = *minValueIter;
@@ -270,12 +318,33 @@ void UIGraph::cacheGraphs()
                 }
             }
 
-            m_minValue = std::to_string(static_cast<int>(minValue));
-            m_maxValue = std::to_string(static_cast<int>(maxValue));
-            if (!m_graphs[0].values.empty())
-                m_lastValue = std::to_string(m_graphs[0].values.back());
-            else
+            if (hasValues) {
+                m_minValue = formatNumber(static_cast<int>(minValue));
+                m_maxValue = formatNumber(static_cast<int>(maxValue));
+            } else {
+                m_minValue = "0";
+                m_maxValue = "1";
+            }
+            if (!m_graphs[0].values.empty()) {
+                m_lastValue = formatNumber(m_graphs[0].values.back());
+                
+                // Calculate average from all values in the first graph
+                float sum = 0.0f;
+                for (const auto& value : m_graphs[0].values) {
+                    sum += value;
+                }
+                float avgValue = sum / static_cast<float>(m_graphs[0].values.size());
+                m_avgValue = formatNumber(static_cast<int>(avgValue));
+            } else {
                 m_lastValue = "0";
+                m_avgValue = "0.5";
+            }
+        } else {
+            // Set default values when no graphs exist
+            m_minValue = "0";
+            m_maxValue = "1";
+            m_lastValue = "0";
+            m_avgValue = "0.5";
         }
 
         m_needsUpdate = false;
@@ -305,7 +374,7 @@ void UIGraph::updateGraph(Graph& graph, bool& updated)
         graph.infoLine[0] = Point(snappedX, dest.top());
         graph.infoLine[1] = Point(snappedX, dest.bottom());
 
-        graph.infoValue = stdext::format("%s %d", graph.infoText, value);
+        graph.infoValue = fmt::format("{} {}", graph.infoText, formatNumber(value));
 
         auto [minValueIter, maxValueIter] = std::ranges::minmax_element(graph.values);
         const auto minValue = static_cast<float>(*minValueIter);
@@ -427,4 +496,38 @@ void UIGraph::onVisibilityChange(const bool visible)
 {
     UIWidget::onVisibilityChange(visible);
     m_needsUpdate = visible;
+}
+
+std::string UIGraph::formatNumber(const int value)
+{
+    const int absValue = std::abs(value);
+    const bool isNegative = value < 0;
+    const std::string prefix = isNegative ? "-" : "";
+    
+    if (absValue >= 1000000) {
+        // Values 1,000,000+ use KK notation with max 1 decimal for maximum compactness
+        // Example: 1,500,000 = 1.5KK, 5,000,000 = 5KK, 28,424,000 = 28.4KK
+        const float kkValue = static_cast<float>(absValue) / 1000000.0f;
+        if (kkValue >= 100.0f) {
+            return prefix + std::to_string(static_cast<int>(kkValue)) + "KK";
+        } else if (kkValue == static_cast<int>(kkValue)) {
+            // No decimal needed for whole numbers
+            return prefix + std::to_string(static_cast<int>(kkValue)) + "KK";
+        } else {
+            return prefix + fmt::format("{:.1f}KK", kkValue);
+        }
+    } else if (absValue >= 1000) {
+        // Values 1,000 to 999,999 use K notation with max 1 decimal
+        // Example: 1,500 = 1.5K, 15,000 = 15K
+        const float kValue = static_cast<float>(absValue) / 1000.0f;
+        if (kValue == static_cast<int>(kValue)) {
+            // No decimal needed for whole numbers
+            return prefix + std::to_string(static_cast<int>(kValue)) + "K";
+        } else {
+            return prefix + fmt::format("{:.1f}K", kValue);
+        }
+    } else {
+        // Values under 1,000 show as is
+        return prefix + std::to_string(absValue);
+    }
 }

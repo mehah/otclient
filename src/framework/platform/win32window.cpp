@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,31 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/resourcemanager.h>
 #include <framework/graphics/image.h>
+#include <framework/util/color.h>
 #include "framework/core/graphicalapplication.h"
 
 #ifdef NDEBUG
 #include <timeapi.h>
 #endif
 
+// Include for DWM API
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
+
 #define HSB_BIT_SET(p, n) (p[(n)/8] |= (128 >>((n)%8)))
 
 constexpr auto WINDOW_NAME = "BASED_ON_TIBIA_GAME_ENGINE";
+
+// DWM constants (these may not be defined in older Windows SDKs)
+#ifndef DWMWA_CAPTION_COLOR
+#define DWMWA_CAPTION_COLOR 35
+#endif
+#ifndef DWMWA_TEXT_COLOR  
+#define DWMWA_TEXT_COLOR 36
+#endif
+
+constexpr COLORREF DWMWINDOWCOLOR = RGB(0, 0, 0);
+constexpr COLORREF DWMACCENTCOLOR = RGB(255, 255, 255);
 
 WIN32Window::WIN32Window()
 {
@@ -349,11 +365,11 @@ void WIN32Window::internalCreateGLContext()
 
     m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_window, NULL);
     if (m_eglSurface == EGL_NO_SURFACE)
-        g_logger.fatal(stdext::format("Unable to create EGL surface: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL surface: {}", eglGetError());
 
     m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, EGL_NO_CONTEXT, contextAtrrList);
     if (m_eglContext == EGL_NO_CONTEXT)
-        g_logger.fatal(stdext::format("Unable to create EGL context: %s", eglGetError()));
+        g_logger.fatal("Unable to create EGL context: {}", eglGetError());
 
 #else
     static PIXELFORMATDESCRIPTOR pfd = { sizeof(PIXELFORMATDESCRIPTOR),
@@ -963,7 +979,7 @@ void WIN32Window::setIcon(const std::string& file)
         const auto& image = Image::load(file);
 
         if (!image) {
-            g_logger.traceError(stdext::format("unable to load icon file %s", file));
+            g_logger.traceError("unable to load icon file {}", file);
             return;
         }
 
@@ -1021,6 +1037,44 @@ void WIN32Window::setClipboardText(const std::string_view text)
         EmptyClipboard();
         SetClipboardData(CF_UNICODETEXT, hglb);
         CloseClipboard();
+    });
+}
+
+void WIN32Window::setTitleBarColor(const Color& color)
+{
+    g_mainDispatcher.addEvent([this, color] {
+        if (!m_window) {
+            g_logger.warning("Window not created yet, cannot set title bar color");
+            return;
+        }
+
+        // Convert Color to COLORREF (BGR format)
+        // Color uses RGBA format, Windows expects BGR
+        const COLORREF dwmColor = RGB(
+            static_cast<BYTE>(color.r() * 255),
+            static_cast<BYTE>(color.g() * 255), 
+            static_cast<BYTE>(color.b() * 255)
+        );
+
+        // Set the caption (title bar) color using DWM
+        HRESULT hr = DwmSetWindowAttribute(
+            m_window,
+            DWMWA_CAPTION_COLOR,
+            &dwmColor,
+            sizeof(dwmColor)
+        );
+
+        if (FAILED(hr)) {
+            // DWM might not be available or the feature might not be supported
+            // This is normal on older Windows versions
+            g_logger.debug("Failed to set title bar color: HRESULT = 0x{:08X}", static_cast<uint32_t>(hr));
+        } else {
+            g_logger.debug("Successfully set title bar color to RGB({}, {}, {})", 
+                static_cast<int>(color.r() * 255),
+                static_cast<int>(color.g() * 255),
+                static_cast<int>(color.b() * 255)
+            );
+        }
     });
 }
 

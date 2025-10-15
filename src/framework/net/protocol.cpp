@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
 #include "inputmessage.h"
 #include "outputmessage.h"
 #include "framework/core/graphicalapplication.h"
+#include "client/game.h"
 #ifdef __EMSCRIPTEN__
 #include "webconnection.h"
 #else
@@ -67,8 +68,19 @@ void Protocol::connect(const std::string_view host, const uint16_t port)
     }
 
     m_connection = std::make_shared<Connection>();
-    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
-    m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); });
+    std::weak_ptr<Protocol> weakSelf = asProtocol();
+    m_connection->setErrorCallback([weakSelf](auto&& err) {
+        if (auto self = weakSelf.lock()) {
+            self->onError(std::forward<decltype(err)>(err));
+        }
+    });
+    m_connection->connect(host, port, [weakSelf] {
+        if (auto self = weakSelf.lock()) {
+            if (!self->m_disconnected) {
+                self->onConnect();
+            }
+        }
+    });
 }
 #else
 void Protocol::connect(const std::string_view host, uint16_t port, bool gameWorld)
@@ -120,19 +132,29 @@ void Protocol::send(const OutputMessagePtr& outputMessage)
         m_recorder->addOutputPacket(outputMessage);
     }
 
+    // padding
+    if (g_game.getClientVersion() >= 1405) {
+        outputMessage->writePaddingAmount();
+    }
 
     // encrypt
-    if (m_xteaEncryptionEnabled)
+    if (m_xteaEncryptionEnabled) {
         xteaEncrypt(outputMessage);
+    }
 
     // write checksum
-    if (m_sequencedPackets)
+    if (m_sequencedPackets) {
         outputMessage->writeSequence(m_packetNumber++);
-    else if (m_checksumEnabled)
+    } else if (m_checksumEnabled) {
         outputMessage->writeChecksum();
+    }
 
     // write message size
-    outputMessage->writeMessageSize();
+    if (g_game.getClientVersion() >= 1405) {
+        outputMessage->writeHeaderSize();
+    } else {
+        outputMessage->writeMessageSize();
+    }
 
     onSend();
 
@@ -163,8 +185,11 @@ void Protocol::recv()
     int headerSize = 2; // 2 bytes for message size
     if (m_checksumEnabled)
         headerSize += 4; // 4 bytes for checksum
-    if (m_xteaEncryptionEnabled)
+    if (g_game.getClientVersion() >= 1405) {
+        headerSize += 1; // 1 bytes for padding size
+    } else if (m_xteaEncryptionEnabled) {
         headerSize += 2; // 2 bytes for XTEA encrypted message size
+    }
     m_inputMessage->setHeaderSize(headerSize);
 
     // read the first 2 bytes which contain the message size
@@ -179,7 +204,16 @@ void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
 {
     // read message size
     m_inputMessage->fillBuffer(buffer, size);
-    const uint16_t remainingSize = m_inputMessage->readSize();
+    uint16_t remainingSize = m_inputMessage->readSize();
+    if (g_game.getClientVersion() >= 1405) {
+        remainingSize = remainingSize * 8 + 4;
+    }
+
+    constexpr uint32_t MAX_PACKET = InputMessage::BUFFER_MAXSIZE;
+    if (remainingSize == 0 || remainingSize > MAX_PACKET) {
+        g_logger.error(fmt::format("invalid packet size = {}", remainingSize));
+        return;
+    }
 
     // read remaining message data
     if (m_connection)
@@ -203,7 +237,14 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
     if (m_sequencedPackets) {
         decompress = (m_inputMessage->getU32() & 1 << 31);
     } else if (m_checksumEnabled && !m_inputMessage->readChecksum()) {
-        g_logger.traceError(stdext::format("got a network message with invalid checksum, size: %i", static_cast<int>(m_inputMessage->getMessageSize())));
+        std::string headerHex;
+        headerHex.reserve(m_inputMessage->getHeaderSize() * 3); // 2 chars + space por byte
+
+        for (size_t i = 0; i < m_inputMessage->getHeaderSize(); ++i) {
+            fmt::format_to(std::back_inserter(headerHex), "{:02X} ", static_cast<uint8_t>(m_inputMessage->getBuffer()[i]));
+        }
+
+        g_logger.traceError(fmt::format("got a network message with invalid checksum, header: {}, size: {}", headerHex, static_cast<int>(m_inputMessage->getMessageSize())));
         return;
     }
 
@@ -224,14 +265,14 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 
         const int32_t ret = inflate(&m_zstream, Z_FINISH);
         if (ret != Z_OK && ret != Z_STREAM_END) {
-            g_logger.traceError(stdext::format("failed to decompress message - %s", m_zstream.msg));
+            g_logger.traceError("failed to decompress message - {}", m_zstream.msg);
             return;
         }
 
         const uint32_t totalSize = m_zstream.total_out;
         inflateReset(&m_zstream);
         if (totalSize == 0) {
-            g_logger.traceError(stdext::format("invalid size of decompressed message - %i", totalSize));
+            g_logger.traceError("invalid size of decompressed message - %i", totalSize);
             return;
         }
 
@@ -292,20 +333,31 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage) const
         });
     }
 
-    const uint16_t decryptedSize = inputMessage->getU16() + 2;
-    const int sizeDelta = decryptedSize - encryptedSize;
-    if (sizeDelta > 0 || -sizeDelta > encryptedSize) {
-        g_logger.traceError("invalid decrypted network message");
-        return false;
+    uint16_t decryptedSize;
+    if (g_game.getClientVersion() >= 1405) {
+        const uint8_t paddingSize = inputMessage->getU8();
+        inputMessage->setPaddingSize(paddingSize);
+        decryptedSize = encryptedSize - paddingSize - 1;
+        inputMessage->setMessageSize(inputMessage->getHeaderSize() + decryptedSize);
+    } else {
+        decryptedSize = inputMessage->getU16() + 2;
+        const int sizeDelta = decryptedSize - encryptedSize;
+        if (sizeDelta > 0 || -sizeDelta > encryptedSize) {
+            g_logger.traceError("invalid decrypted network message");
+            return false;
+        }
+        inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
     }
 
-    inputMessage->setMessageSize(inputMessage->getMessageSize() + sizeDelta);
     return true;
 }
 
 void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
 {
-    outputMessage->writeMessageSize();
+    if (g_game.getClientVersion() < 1405) {
+        outputMessage->writeMessageSize();
+    }
+
     uint16_t encryptedSize = outputMessage->getMessageSize();
 
     //add bytes until reach 8 multiple
@@ -316,7 +368,7 @@ void Protocol::xteaEncrypt(const OutputMessagePtr& outputMessage) const
     }
 
     for (uint32_t i = 0, sum = 0, next_sum = sum + delta; i < 32; ++i, sum = next_sum, next_sum += delta) {
-        apply_rounds(outputMessage->getDataBuffer() - 2, encryptedSize, [&](uint32_t& left, uint32_t& right) {
+        apply_rounds(outputMessage->getXteaEncryptionBuffer(), encryptedSize, [&, sum, next_sum, this](uint32_t& left, uint32_t& right) mutable {
             left += ((right << 4 ^ right >> 5) + right) ^ (sum + m_xteaKey[sum & 3]);
             right += ((left << 4 ^ left >> 5) + left) ^ (next_sum + m_xteaKey[(next_sum >> 11) & 3]);
         });
@@ -350,8 +402,11 @@ void Protocol::onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet
         int headerSize = 2; // 2 bytes for message size
         if (m_checksumEnabled)
             headerSize += 4; // 4 bytes for checksum
-        if (m_xteaEncryptionEnabled)
+        if (g_game.getClientVersion() >= 1405) {
+            headerSize += 1; // 1 bytes for padding size
+        } else if (m_xteaEncryptionEnabled) {
             headerSize += 2; // 2 bytes for XTEA encrypted message size
+        }
         m_inputMessage->setHeaderSize(headerSize);
         m_inputMessage->fillBuffer(packet->data(), 2);
         m_inputMessage->readSize();

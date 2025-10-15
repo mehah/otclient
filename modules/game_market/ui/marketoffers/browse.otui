@@ -85,6 +85,37 @@ Panel
 
     $disabled:
       color: #aaaaaa44
+      
+  MarketComboBox
+    id: classComboBox
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    width: 85
+    margin-right: 3
+    margin-left: 3
+    margin-top: 3
+    $disabled:
+      color: #aaaaaa44
+    @onSetup: |
+      self:addOption("All", -1)
+      self:addOption("None", 0)
+      for i = 1, 4 do
+          self:addOption("Class " .. i, i)
+      end
+
+  MarketComboBox
+    id: tierComboBox
+    anchors.top: prev.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-right: 3
+    margin-left: 3
+    $disabled:
+      color: #aaaaaa44
+    @onSetup: |
+      for tier = 0, 10 do
+        self:addOption("Tier " .. tier, tier)
+      end
 
   MarketButtonBox
     id: filterDepot

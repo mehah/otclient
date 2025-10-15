@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,4 +33,10 @@ public:
 
     PlayerPtr asPlayer() { return static_self_cast<Player>(); }
     bool isPlayer() override { return true; }
+    bool isMage() const;
+    void setVocation(uint8_t vocation);
+    uint8_t getVocation() { return m_vocation; }
+
+private:
+    uint8_t m_vocation{ 0 };
 };

@@ -1792,3 +1792,125 @@ UIWidget
 
         step: 80
         pixel-scroll: true
+
+  BorderBox
+    id: OffenceStats
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+
+    VerticalSeparator
+      id: separator
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-bottom: 5
+
+
+    Panel
+      id: leftPanel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      margin-left: 5
+      height: 350
+      layout:
+        type: verticalBox
+        spacing: 2
+
+    Panel
+      id: rightPanel
+      anchors.top: prev.top
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 1
+      height: 350
+      layout:
+        type: verticalBox
+        spacing: 2
+
+
+  BorderBox
+    id: DeffenceStats
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    VerticalSeparator
+      id: separator
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-bottom: 5
+
+
+    Panel
+      id: leftPanel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      margin-left: 5
+      height: 350
+      layout:
+        type: verticalBox
+        spacing: 2
+
+    Panel
+      id: rightPanel
+      anchors.top: prev.top
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 1
+      height: 350
+      layout:
+        type: verticalBox
+        spacing: 2
+
+  BorderBox
+    id: MiscStats
+    anchors.top: CharacterBase.top
+    anchors.left: CharacterBase.right
+    anchors.bottom: OptionsBase.bottom
+    anchors.right: parent.right
+    margin-left: 10
+    visible: false
+    VerticalSeparator
+      id: separator
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-bottom: 5
+
+
+    Panel
+      id: leftPanel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: separator.right
+      margin-top: 5
+      margin-left: 5
+      height: 350
+      layout:
+        type: verticalBox
+        spacing: 2
+
+    Panel
+      id: rightPanel
+      anchors.top: prev.top
+      anchors.left: separator.left
+      anchors.right: parent.right
+      margin-top: 1
+      height: 350
+      layout:
+        type: verticalBox
+        spacing: 2

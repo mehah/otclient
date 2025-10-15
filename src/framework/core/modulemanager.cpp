@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -87,7 +87,7 @@ ModulePtr ModuleManager::discoverModule(const std::string& moduleFile)
         if (push)
             m_modules.emplace_back(module);
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Unable to discover module from file '%s': %s", moduleFile, e.what()));
+        g_logger.error("Unable to discover module from file '{}': {}", moduleFile, e.what());
     }
     return module;
 }
@@ -96,7 +96,7 @@ void ModuleManager::ensureModuleLoaded(const std::string_view moduleName)
 {
     const auto& module = g_modules.getModule(moduleName);
     if (!module || !module->load())
-        g_logger.fatal(stdext::format("Unable to load '%s' module", moduleName));
+        g_logger.fatal("Unable to load '{}' module", moduleName);
 }
 
 void ModuleManager::unloadModules()

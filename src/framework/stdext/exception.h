@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,10 @@
 
 #pragma once
 
-#include "format.h"
 #include <exception>
 #include <string>
+
+#include <fmt/format.h>
 
 namespace stdext
 {
@@ -36,7 +37,7 @@ namespace stdext
         exception(const std::string_view what) : m_what(std::string(what)) {}
 
         template<typename... Args>
-        exception(std::string_view what, const Args&... args) : m_what(stdext::format({ what }, args...)) {}
+        exception(fmt::format_string<Args...> fmtStr, Args&&... args) : m_what(fmt::format(fmtStr, std::forward<Args>(args)...)) {}
 
         ~exception() noexcept override = default;
         const char* what() const noexcept override { return m_what.data(); }

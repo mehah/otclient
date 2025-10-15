@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -67,7 +67,7 @@ void LocalPlayer::walk(const Position& oldPos, const Position& newPos)
         return;
     }
 
-    cancelAjustInvalidPosEvent();
+    cancelAdjustInvalidPosEvent();
     m_preWalks.clear();
     m_serverWalk = true;
 
@@ -80,13 +80,7 @@ void LocalPlayer::preWalk(Otc::Direction direction)
 
     const auto& oldPos = getPosition();
     Creature::walk(oldPos, m_preWalks.emplace_back(oldPos.translatedToDirection(direction)));
-
-    cancelAjustInvalidPosEvent();
-    m_ajustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
-        m_preWalks.clear();
-        g_game.resetMapUpdatedAt();
-        m_ajustInvalidPosEvent = nullptr;
-    }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
+    registerAdjustInvalidPosEvent();
 }
 
 void LocalPlayer::onWalking() {
@@ -104,10 +98,19 @@ void LocalPlayer::onWalking() {
     }
 }
 
-void LocalPlayer::cancelAjustInvalidPosEvent() {
-    if (!m_ajustInvalidPosEvent) return;
-    m_ajustInvalidPosEvent->cancel();
-    m_ajustInvalidPosEvent = nullptr;
+void LocalPlayer::registerAdjustInvalidPosEvent() {
+    cancelAdjustInvalidPosEvent();
+    m_adjustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
+        m_preWalks.clear();
+        g_game.resetMapUpdatedAt();
+        m_adjustInvalidPosEvent = nullptr;
+    }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
+}
+
+void LocalPlayer::cancelAdjustInvalidPosEvent() {
+    if (!m_adjustInvalidPosEvent) return;
+    m_adjustInvalidPosEvent->cancel();
+    m_adjustInvalidPosEvent = nullptr;
 }
 
 bool LocalPlayer::retryAutoWalk()
@@ -143,8 +146,8 @@ void LocalPlayer::cancelWalk(const Otc::Direction direction)
 
     g_map.notificateCameraMove(m_walkOffset);
 
-    if (m_ajustInvalidPosEvent) {
-        m_ajustInvalidPosEvent->execute();
+    if (m_adjustInvalidPosEvent) {
+        m_adjustInvalidPosEvent->execute();
     }
 
     lockWalk();
@@ -239,12 +242,12 @@ void LocalPlayer::onPositionChange(const Position& newPos, const Position& oldPo
     m_serverWalk = false;
 }
 
-void LocalPlayer::setStates(const uint32_t states)
+void LocalPlayer::setStates(const uint64_t states)
 {
     if (m_states == states)
         return;
 
-    const uint32_t oldStates = m_states;
+    const uint64_t oldStates = m_states;
     m_states = states;
 
     if (isParalyzed())
@@ -368,6 +371,19 @@ void LocalPlayer::setMana(const uint32_t mana, const uint32_t maxMana)
     callLuaField("onManaChange", mana, maxMana, oldMana, oldMaxMana);
 }
 
+void LocalPlayer::setManaShield(const uint32_t manaShield, const uint32_t maxManaShield)
+{
+    if (m_manaShield == manaShield && m_maxManaShield == maxManaShield)
+        return;
+
+    const uint32_t oldManaShield = m_manaShield;
+    const uint32_t oldMaxManaShield = m_maxManaShield;
+    m_manaShield = manaShield;
+    m_maxManaShield = maxManaShield;
+
+    callLuaField("onManaShieldChange", manaShield, maxManaShield, oldManaShield, oldMaxManaShield);
+}
+
 void LocalPlayer::setMagicLevel(const uint16_t magicLevel, const uint16_t magicLevelPercent)
 {
     if (m_magicLevel == magicLevel && m_magicLevelPercent == magicLevelPercent)
@@ -429,17 +445,6 @@ void LocalPlayer::setInventoryItem(const Otc::InventorySlot inventory, const Ite
     m_inventoryItems[inventory] = item;
 
     callLuaField("onInventoryChange", inventory, item, oldItem);
-}
-
-void LocalPlayer::setVocation(const uint8_t vocation)
-{
-    if (m_vocation == vocation)
-        return;
-
-    const uint8_t oldVocation = m_vocation;
-    m_vocation = vocation;
-
-    callLuaField("onVocationChange", vocation, oldVocation);
 }
 
 void LocalPlayer::setPremium(const bool premium)
@@ -514,4 +519,129 @@ void LocalPlayer::setResourceBalance(const Otc::ResourceTypes_t type, const uint
 bool LocalPlayer::hasSight(const Position& pos)
 {
     return m_position.isInRange(pos, g_map.getAwareRange().left - 1, g_map.getAwareRange().top - 1);
+}
+
+void LocalPlayer::setFlatDamageHealing(uint16_t flatBonus)
+{
+    if (m_flatDamageHealing == flatBonus)
+        return;
+
+    const uint16_t oldFlatBonus = m_flatDamageHealing;
+    m_flatDamageHealing = flatBonus;
+
+    callLuaField("onFlatDamageHealingChange", flatBonus);
+}
+
+void LocalPlayer::setAttackInfo(uint16_t attackValue, uint8_t attackElement)
+{
+    if (m_attackValue == attackValue && m_attackElement == attackElement)
+        return;
+
+    const uint16_t oldAttackValue = m_attackValue;
+    const uint8_t oldAttackElement = m_attackElement;
+    m_attackValue = attackValue;
+    m_attackElement = attackElement;
+
+    callLuaField("onAttackInfoChange", attackValue, attackElement);
+}
+
+void LocalPlayer::setConvertedDamage(double convertedDamage, uint8_t convertedElement)
+{
+    if (m_convertedDamage == convertedDamage && m_convertedElement == convertedElement)
+        return;
+
+    const double oldConvertedDamage = m_convertedDamage;
+    const uint8_t oldConvertedElement = m_convertedElement;
+    m_convertedDamage = convertedDamage;
+    m_convertedElement = convertedElement;
+
+    callLuaField("onConvertedDamageChange", convertedDamage, convertedElement);
+}
+
+void LocalPlayer::setImbuements(double lifeLeech, double manaLeech, double critChance, double critDamage, double onslaught)
+{
+    if (m_lifeLeech == lifeLeech && m_manaLeech == manaLeech && m_critChance == critChance &&
+        m_critDamage == critDamage && m_onslaught == onslaught)
+        return;
+
+    const double oldLifeLeech = m_lifeLeech;
+    const double oldManaLeech = m_manaLeech;
+    const double oldCritChance = m_critChance;
+    const double oldCritDamage = m_critDamage;
+    const double oldOnslaught = m_onslaught;
+
+    m_lifeLeech = lifeLeech;
+    m_manaLeech = manaLeech;
+    m_critChance = critChance;
+    m_critDamage = critDamage;
+    m_onslaught = onslaught;
+
+    callLuaField("onImbuementsChange", lifeLeech, manaLeech, critChance, critDamage, onslaught);
+}
+
+void LocalPlayer::setDefenseInfo(uint16_t defense, uint16_t armor, double mitigation, double dodge, uint16_t damageReflection)
+{
+    if (m_defense == defense && m_armor == armor && m_mitigation == mitigation &&
+        m_dodge == dodge && m_damageReflection == damageReflection)
+        return;
+
+    const uint16_t oldDefense = m_defense;
+    const uint16_t oldArmor = m_armor;
+    const double oldMitigation = m_mitigation;
+    const double oldDodge = m_dodge;
+    const uint16_t oldDamageReflection = m_damageReflection;
+
+    m_defense = defense;
+    m_armor = armor;
+    m_mitigation = mitigation;
+    m_dodge = dodge;
+    m_damageReflection = damageReflection;
+
+    callLuaField("onDefenseInfoChange", defense, armor, mitigation, dodge, damageReflection);
+}
+
+void LocalPlayer::setCombatAbsorbValues(const std::map<uint8_t, double>& absorbValues)
+{
+    if (m_combatAbsorbValues == absorbValues)
+        return;
+
+    const auto oldAbsorbValues = m_combatAbsorbValues;
+    m_combatAbsorbValues = absorbValues;
+
+    callLuaField("onCombatAbsorbValuesChange", absorbValues);
+}
+
+void LocalPlayer::setForgeBonuses(double momentum, double transcendence, double amplification)
+{
+    if (m_momentum == momentum && m_transcendence == transcendence && m_amplification == amplification)
+        return;
+
+    const double oldMomentum = m_momentum;
+    const double oldTranscendence = m_transcendence;
+    const double oldAmplification = m_amplification;
+
+    m_momentum = momentum;
+    m_transcendence = transcendence;
+    m_amplification = amplification;
+
+    callLuaField("onForgeBonusesChange", momentum, transcendence, amplification);
+}
+
+void LocalPlayer::setExperienceRate(Otc::ExperienceRate_t type, uint16_t value)
+{
+    if (m_experienceRates[type] == value)
+        return;
+
+    const uint16_t oldValue = m_experienceRates[type];
+    m_experienceRates[type] = value;
+
+    callLuaField("onExperienceRateChange", type, value);
+}
+
+void LocalPlayer::setStoreExpBoostTime(uint16_t value)
+{
+    if (m_storeExpBoostTime == value)
+        return;
+
+    m_storeExpBoostTime = value;
 }

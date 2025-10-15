@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,10 @@ public:
     bool isDrawingInformationByWidget() { return m_drawInformationByWidget; }
     bool isForcingNewWalkingFormula() const { return m_forceNewWalkingFormula; }
     bool isAdjustCreatureInformationBasedCropSize() { return m_adjustCreatureInformationBasedCropSize; }
+    bool isUseCropSizeForUIDraw() { return m_useCropSizeForUIDraw; }
     uint16_t getShieldBlinkTicks() { return m_shieldBlinkTicks; }
     uint16_t getVolatileSquareDuration() const { return m_volatileSquareDuration; }
 
-    bool isDrawingCoveredThings() const { return m_drawCoveredThings; }
     uint16_t getInvisibleTicksPerFrame() const { return m_invisibleTicksPerFrame; }
     uint16_t getItemTicksPerFrame() const { return m_itemTicksPerFrame; }
     uint16_t getEffectTicksPerFrame() const { return m_effectTicksPerFrame; }
@@ -110,6 +110,7 @@ private:
     bool m_drawInformationByWidget{ false };
     bool m_forceNewWalkingFormula{ true };
     bool m_adjustCreatureInformationBasedCropSize{ false };
+    bool m_useCropSizeForUIDraw{ true };
     uint16_t m_shieldBlinkTicks{ 500 };
     uint16_t m_volatileSquareDuration{ 1000 };
     double m_creatureDiagonalWalkSpeed{ 3 };
@@ -118,7 +119,6 @@ private:
     double m_playerDiagonalWalkSpeed{ 3 };
 
     // Render
-    bool m_drawCoveredThings{ false };
     uint16_t m_invisibleTicksPerFrame{ 500 };
     uint16_t m_itemTicksPerFrame{ 500 };
     uint16_t m_effectTicksPerFrame{ 75 };

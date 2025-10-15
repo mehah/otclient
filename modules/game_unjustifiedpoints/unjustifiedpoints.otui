@@ -1,81 +1,162 @@
 SkullProgressBar < ProgressBar
-  height: 13
-  margin: 4 18 0 10
+  height: 5
+  margin: 13 23 0 10
   anchors.top: prev.bottom
   anchors.left: parent.left
   anchors.right: parent.right
+  background-image: /images/ui/unjustified-points-bar-background
+  image-source: /images/ui/unjustified-points-bar-background
+  image-border: 1
+  image-border-top: 1
+  image-border-bottom: 1
+
+SkullProgressBarBackground < UIWidget
+  height: 4
+  margin: 13 23 0 10
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  image-source: /images/ui/unjustified-points-bar-background
+  image-border: 1
+  image-border-top: 1
+  image-border-bottom: 1
+
+SkullProgressBarForeground < ProgressBar
+  height: 4
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  image-border: 1
+  image-border-top: 1
+  image-border-bottom: 1
 
 SkullWidget < UIWidget
-  size: 13 13
-  margin-right: 2
+  size: 15 15
+  anchors.left: parent.left
+  image-source: /images/game/skull_socket
+
+SkullWidgetInLine < UIWidget
+  size: 15 15
   anchors.right: parent.right
   image-source: /images/game/skull_socket
+  margin-right: 5
 
 MiniWindow
   id: unjustifiedPointsWindow
-  !text: tr('Unjustified Points')
-  height: 114
-  icon: /images/topbuttons/unjustifiedpoints
+  height: 80
   @onOpen: modules.game_unjustifiedpoints.onMiniWindowOpen()
   @onClose: modules.game_unjustifiedpoints.onMiniWindowClose()
   &save: true
 
+  UIWidget
+    id: miniwindowIcon
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    margin-top: 2
+    margin-left: 4
+    size: 12 12
+    image-smooth: false
+
+  Label
+    id: miniwindowTitle
+    anchors.top: miniwindowHeader.top
+    anchors.left: miniwindowHeader.left
+    anchors.right: miniwindowHeader.right
+    margin-top: 2
+    margin-left: 20
+    margin-right: 50
+    font: verdana-11px-monochrome
+    height: 13
+    color: #9d9d9dff
+
   MiniWindowContents
-    Label
-      anchors.top: parent.top
-      anchors.left: parent.left
-      !text: tr('Open PvP')
-      !tooltip: tr('Open PvP Situations')
-      phantom: false
-      margin-top: 2
-      margin-left: 10
+    id: contentsPanel
+    anchors.top: miniwindowTopBar.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: parent.bottom
+    margin-left: 3
+    margin-bottom: 3
+    margin-top: -2
+    margin-right: 1
+    vertical-scrollbar: miniwindowScrollBar
 
     Label
       id: openPvpSituationsLabel
-      anchors.top: prev.bottom
-      anchors.left: parent.left
-      font: verdana-11px-rounded
-      margin-left: 12
-      phantom: false
-
-    Label
       anchors.top: parent.top
-      anchors.right: parent.right
-      !text: tr('Skull Time')
-      margin-top: 2
-      margin-right: 10
+      anchors.left: parent.left
+      font: verdana-11px-monochrome
+      margin-top: 5
+      margin-left: 5
+      phantom: false
+      !tooltip: tr('Open PvP Situations')
+      color: #b9b7b7ff
 
     SkullWidget
       id: currentSkullWidget
       anchors.top: prev.bottom
-      margin-right: 10
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-top: 5
 
     Label
       id: skullTimeLabel
-      anchors.top: prev.top
-      anchors.right: prev.left
-      font: verdana-11px-rounded
-      margin-right: 6
+      anchors.top: prev.bottom
+      anchors.left: openPvpSituationsLabel.left
+      font: verdana-11px-monochrome
       phantom: false
+      color: #b9b7b7ff
+      margin-top: 5
 
-    SkullProgressBar
-      id: dayProgressBar
+    SkullProgressBarBackground
+      id: dayProgressBarBackground
+      anchors.top: parent.top
+      anchors.left: parent.left
       margin-top: 10
+      margin-left: 70
 
-    SkullWidget
+    SkullProgressBarForeground
+      id: dayProgressBar
+      anchors.top: prev.top
+      anchors.left: prev.left
+      anchors.right: prev.right
+
+    SkullWidgetInLine
       id: daySkullWidget
-      anchors.top: prev.top
+      anchors.top: dayProgressBarBackground.top
+      margin-top: -5
 
-    SkullProgressBar
+    SkullProgressBarBackground
+      id: weekProgressBarBackground
+      anchors.top: dayProgressBarBackground.bottom
+      anchors.left: parent.left
+      margin-top: 15
+      margin-left: 70
+
+    SkullProgressBarForeground
       id: weekProgressBar
+      anchors.top: prev.top
+      anchors.left: prev.left
+      anchors.right: prev.right
 
-    SkullWidget
+    SkullWidgetInLine
       id: weekSkullWidget
-      anchors.top: prev.top
+      anchors.top: weekProgressBarBackground.top
+      margin-top: -5
 
-    SkullProgressBar
+    SkullProgressBarBackground
+      id: monthProgressBarBackground
+      anchors.top: weekProgressBarBackground.bottom
+      anchors.left: parent.left
+      margin-top: 15
+      margin-left: 70
+
+    SkullProgressBarForeground
       id: monthProgressBar
-
-    SkullWidget
-      id: monthSkullWidget
       anchors.top: prev.top
+      anchors.left: prev.left
+      anchors.right: prev.right
+
+    SkullWidgetInLine
+      id: monthSkullWidget
+      anchors.top: monthProgressBarBackground.top
+      margin-top: -5

@@ -4,6 +4,7 @@ local inventoryShrink = false
 local itemSlotsWithDuration = {}
 local updateSlotsDurationEvent = nil
 local DURATION_UPDATE_INTERVAL = 1000
+local pvpModeRadioGroup = nil 
 
 local function getInventoryUi()
     if inventoryShrink then
@@ -366,6 +367,13 @@ function inventoryController:onTerminate()
         iconTopMenu:destroy()
         iconTopMenu = nil
     end
+    if pvpModeRadioGroup then
+        disconnect(pvpModeRadioGroup, {
+            onSelectionChange = onSetPVPMode
+        })
+        pvpModeRadioGroup:destroy()
+        pvpModeRadioGroup = nil
+    end
 end
 
 function onSetSafeFight(self, checked)
@@ -507,7 +515,7 @@ function extendedView(extendedView)
         if not mainRightPanel:hasChild(inventoryController.ui) then
             mainRightPanel:insertChild(3, inventoryController.ui)
         end
-        inventoryController.ui:show(true)
+        inventoryController.ui:show()
     end
     inventoryController.ui.moveOnlyToMain = not extendedView
 
@@ -520,5 +528,37 @@ function toggle()
     else
         inventoryController.ui:show()
         iconTopMenu:setOn(true)
+    end
+end
+
+function toggleAdventurerStyle(hasBlessing)
+    for slot, getSlotInfo in pairs(getSlotPanelBySlot) do
+        local ui = getInventoryUi()
+        local slotPanel, toggler = getSlotInfo(ui)
+        if slotPanel then
+            slotPanel:setOn(hasBlessing)
+        end
+    end
+end
+
+function onBlessingsChange(blessings, blessVisualState)
+    toggleAdventurerStyle(blessings == 1)
+    local blessedButton = getInventoryUi().blessings
+--[[     local tooltip = 'You are protected by the following blessings:'
+        tooltip = tooltip .. '\nTwist of Fate'
+        tooltip = tooltip .. '\nWisdom of Solitude'
+        tooltip = tooltip .. '\nSpark of the Phoenix'
+        tooltip = tooltip .. '\nFire of the Suns'
+        tooltip = tooltip .. '\nSpiritual Shielding'
+        tooltip = tooltip .. '\nEmbrace of Tibia'
+        tooltip = tooltip .. '\nHeart of the Mountain'
+        tooltip = tooltip .. '\nBlood of the Mountain'
+        blessedButton:setTooltip(tooltip) ]]
+    if blessVisualState == 1 then
+        blessedButton:setImageSource('/images/inventory/button_blessings_grey')
+    elseif blessVisualState == 2 then
+        blessedButton:setImageSource('/images/inventory/button_blessings_gold')
+    elseif blessVisualState == 3 then
+        blessedButton:setImageSource('/images/inventory/button_blessings_green')
     end
 end

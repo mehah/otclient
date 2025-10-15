@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,6 @@ public:
 
     void setGlobalLight(const Light& light)
     {
-        std::scoped_lock l(m_pool->getMutex());
         m_isDark = light.intensity < 250;
         m_globalLightColor = Color::from8bit(light.color, light.intensity / static_cast<float>(UINT8_MAX));
     }
@@ -49,6 +48,10 @@ public:
     bool isDark() const { return m_isDark; }
     bool isEnabled() const { return m_pool->isEnabled(); }
     void setEnabled(const bool v) { m_pool->setEnable(v); }
+    void clear() {
+        m_lightData.lights.clear();
+        m_lightData.tiles.assign(m_mapSize.area(), {});
+    }
 
 private:
     struct TileLight : Light
@@ -80,5 +83,5 @@ private:
     CoordsBuffer m_coords;
     TexturePtr m_texture;
     LightData m_lightData;
-    std::vector<uint8_t> m_pixels;
+    std::array<std::vector<uint8_t>, 2> m_pixels;
 };

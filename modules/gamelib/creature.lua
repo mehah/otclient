@@ -13,6 +13,21 @@ CreatureTypeSummonOwn = 3
 CreatureTypeSummonOther = 4
 CreatureTypeHidden = 5
 
+VocationsClient = {
+    None = 0,
+    Knight = 1,
+    Paladin = 2,
+    Sorcerer = 3,
+    Druid = 4,
+    Monk = 5,
+
+    EliteKnight = 11,
+    RoyalPaladin = 12,
+    MasterSorcerer = 13,
+    ElderDruid = 14,
+    ExaltedMonk = 15,
+
+}
 -- @}
 
 function getNextSkullId(skullId)
@@ -108,6 +123,21 @@ function getIconImagePath(iconId)
     return path
 end
 
+function getIconsImagePath(category)
+    if category == 1 then
+        return '/images/game/creatureicons/monsterIcons'
+    end
+    return '/images/game/creatureicons/CreatureIcons'
+end
+
+function Creature:onIconsChange(icon, category, count)
+    local imagePath = getIconsImagePath(category)
+    if imagePath then
+        local clipX = (icon - 1) * 11
+        self:setIconsTexture(imagePath, torect(clipX .. ' 0 11 11'), count)
+    end
+end
+
 function Creature:onSkullChange(skullId)
     local imagePath = getSkullImagePath(skullId)
     if imagePath then
@@ -141,4 +171,29 @@ function Creature:onIconChange(iconId)
     if imagePath then
         self:setIconTexture(imagePath)
     end
+end
+
+function Creature.isDruid(self)
+    local vocation = self:getVocation()
+    return vocation == VocationsClient.Druid or vocation == VocationsClient.ElderDruid
+end
+
+function Creature.isSorcerer(self)
+    local vocation = self:getVocation()
+    return vocation == VocationsClient.Sorcerer or vocation == VocationsClient.MasterSorcerer
+end
+
+function Creature.isPaladin(self)
+    local vocation = self:getVocation()
+    return vocation == VocationsClient.Paladin or vocation == VocationsClient.RoyalPaladin
+end
+
+function Creature.isKnight(self)
+    local vocation = self:getVocation()
+    return vocation == VocationsClient.Knight or vocation == VocationsClient.EliteKnight
+end
+
+function Creature.isMonk(self)
+    local vocation = self:getVocation()
+    return vocation == VocationsClient.Monk  or vocation == VocationsClient.ExaltedMonk
 end

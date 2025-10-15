@@ -1,6 +1,6 @@
 game
   sprite-size: 32
-  last-supported-version: 1340
+  last-supported-version: 1412
   draw-typing: false
   typing-icon: /images/game/console/typing
   
@@ -22,13 +22,13 @@ game
     shield-blink-ticks: 500
     volatile-square-duration: 1000
     adjust-creature-information-based-crop-size: false
+    use-crop-size-for-ui-draw: true
     diagonal-walk-speed: 3
 
   player
     diagonal-walk-speed: 3
 
   render
-    draw-covered-things: false
     invisible-ticks-per-frame: 75
     item-ticks-per-frame: 75
     effect-ticks-per-frame: 75

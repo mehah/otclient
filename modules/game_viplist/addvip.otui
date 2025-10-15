@@ -1,39 +1,86 @@
-MainWindow
-  size: 256 128
-  !text: tr('Add to VIP list')
+FloatingInputWindow 
+  id: addVipWindow
+  size: 359 115
+  padding: 3
+  visible: false
+  anchors.centerIn: parent
+  margin-left: 100
+  margin-top: 20
   @onEnter: modules.game_viplist.addVip()
   @onEscape: modules.game_viplist.destroyAddWindow()
 
   Label
-    !text: tr('Please enter a character name') .. ':'
+    id: headerLabel
+    !text: tr('Add to VIP list')
+    text-align: center
+    font: verdana-11px-antialised
+    color: #909090
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
+    margin-top: -5
+    height: 20
+  
+  Label
+    id: descriptionText
+    !text: tr('Please enter a character name') .. ':'
+    text-wrap: true
+    text-auto-resize:true
+    anchors.top: headerLabel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 10
+    margin-left: 13
 
   TextEdit
     id: name
-    anchors.top: prev.bottom
+    size: 150 16
+    anchors.top: descriptionText.bottom
+    anchors.right: parent.right
+    anchors.left: parent.left
+    margin: 7
+    margin-right: 13
+    margin-left: 13
+    text-align: left
+    text-offset: -18 0
+
+  Label
+    height: 38
+    anchors.bottom: parent.bottom
     anchors.left: parent.left
     anchors.right: parent.right
-    margin-top: 4
 
   HorizontalSeparator
+    id: separatorBox 
     anchors.left: parent.left
     anchors.right: parent.right
-    anchors.bottom: next.top
-    margin-bottom: 10
+    anchors.top: name.bottom
+    margin-top: 13
+    margin-right: 13
+    margin-left: 13
 
-  Button
-    !text: tr('Ok')
-    width: 64
-    anchors.right: next.left
-    anchors.bottom: parent.bottom
-    margin-right: 10
-    @onClick: modules.game_viplist.addVip()
-
-  Button
-    !text: tr('Cancel')
-    width: 64
+  StoreButton
+    id: closeButton
     anchors.right: parent.right
     anchors.bottom: parent.bottom
+    margin-right: 12
+    margin-bottom: 7
+    margin-top: 10
+    !text: tr('Cancel')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff
     @onClick: modules.game_viplist.destroyAddWindow()
+
+  StoreButton
+    id: buttonOk
+    anchors.right: closeButton.left
+    anchors.bottom: parent.bottom
+    margin-right: 10
+    margin-bottom: 7
+    margin-top: 10
+    !text: tr('Ok')
+    font: cipsoftFont
+    size: 43 20
+    color: #ffffff
+    @onClick: modules.game_viplist.addVip()

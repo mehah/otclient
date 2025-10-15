@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -268,7 +268,7 @@ namespace Otc
         NpcIconTradeQuest
     };
 
-    enum PlayerStates : uint32_t
+    enum PlayerStates : uint64_t
     {
         IconNone = 0,
         IconPoison = 1,
@@ -420,7 +420,13 @@ namespace Otc
         PREY_ACTION_MONSTERSELECTION = 2,
         PREY_ACTION_REQUEST_ALL_MONSTERS = 3,
         PREY_ACTION_CHANGE_FROM_ALL = 4,
-        PREY_ACTION_LOCK_PREY = 5,
+        PREY_ACTION_OPTION = 5,
+    };
+    enum PreyOption_t : uint8_t
+    {
+        PREY_OPTION_UNTOGGLE = 0,
+        PREY_OPTION_TOGGLE_AUTOREROLL = 1,
+        PREY_OPTION_TOGGLE_LOCK_PREY = 2,
     };
     enum PreyConfigState : uint8_t
     {
@@ -558,8 +564,10 @@ namespace Otc
         GameColorizedLootValue = 121,
         GameAllowPreWalk = 122,
         GamePlayerFamiliars = 123,
-        GameLatencyAdaptiveCamera = 124,
+        // = 124,
         GameMapCache = 125,
+        GameForgeSkillStats = 126,
+        GameCharacterSkillStats = 127,
         LastGameFeature
     };
 
@@ -673,6 +681,10 @@ namespace Otc
         RESOURCE_PREY_WILDCARDS = 10,
         RESOURCE_DAILYREWARD_STREAK = 20,
         RESOURCE_DAILYREWARD_JOKERS = 21,
+        RESOURCE_CHARM = 30,
+        RESOURCE_MINOR_CHARM = 31,
+        RESOURCE_MAX_CHARM = 32,
+        RESOURCE_MAX_MINOR_CHARM = 33,
         RESOURCE_TASK_HUNTING = 50,
         RESOURCE_FORGE_DUST = 70,
         RESOURCE_FORGE_SLIVER = 71,
@@ -685,6 +697,15 @@ namespace Otc
         RESOURE_COIN_TRANSFERRABLE = 91,
         RESOURE_COIN_AUCTION = 92,
         RESOURE_COIN_TOURNAMENT = 93,
+    };
+
+    enum ExperienceRate_t : uint8_t
+    {
+        EXP_BASE = 0,
+        EXP_VOUCHER = 1,
+        EXP_LOWLEVEL = 2,
+        EXP_XPBOOST = 3,
+        EXP_STANINAMULTIPLIER = 4
     };
 
     enum MarketItemDescription : uint8_t
@@ -783,7 +804,11 @@ namespace Otc
         CYCLOPEDIA_CHARACTERINFO_STORESUMMARY = 8,
         CYCLOPEDIA_CHARACTERINFO_INSPECTION = 9,
         CYCLOPEDIA_CHARACTERINFO_BADGES = 10,
-        CYCLOPEDIA_CHARACTERINFO_TITLES = 11
+        CYCLOPEDIA_CHARACTERINFO_TITLES = 11,
+        CYCLOPEDIA_CHARACTERINFO_WHEEL = 12,
+        CYCLOPEDIA_CHARACTERINFO_OFFENCESTATS = 13,
+        CYCLOPEDIA_CHARACTERINFO_DEFENCESTATS = 14,
+        CYCLOPEDIA_CHARACTERINFO_MISCSTATS = 15
     };
 
     enum InspectObjectTypes : uint8_t
@@ -828,4 +853,26 @@ namespace Otc
         OPEN_OFFER = 4,
         OPEN_SEARCH = 5,
     };
+
+    enum Vocations_t : uint8_t
+    {
+        NONE = 0,
+        KNIGHT = 1,
+        PALADIN = 2,
+        SORCERER = 3,
+        DRUID = 4,
+        ELITE_KNIGHT = 11,
+        ROYAL_PALADIN = 12,
+        MASTER_SORCERER = 13,
+        ELDER_DRUID = 14,
+        FIRST = KNIGHT,
+        LAST = DRUID,
+    };
+  
+    enum PartyAnalyzerAction_t : uint8_t {
+        PARTYANALYZERACTION_RESET = 0,
+        PARTYANALYZERACTION_PRICETYPE = 1,
+        PARTYANALYZERACTION_PRICEVALUE = 2,
+    };
+
 }

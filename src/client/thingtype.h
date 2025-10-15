@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -266,6 +266,7 @@ struct ImbuementTrackerItem
     ImbuementTrackerItem(const uint8_t slot) : slot(slot) {}
 
     uint8_t slot;
+    uint8_t totalSlots = 0;
     ItemPtr item;
     std::map<uint8_t, ImbuementSlot> slots;
 };
@@ -301,6 +302,7 @@ struct MarketOffer
     std::string playerName;
     uint8_t state = 0;
     uint16_t var = 0;
+    uint8_t itemTier = 0;
 };
 
 struct Light
@@ -317,14 +319,16 @@ public:
     void unserializeAppearance(uint16_t clientId, ThingCategory category, const appearances::Appearance& appearance);
     void unserialize(uint16_t clientId, ThingCategory category, const FileStreamPtr& fin);
     void unserializeOtml(const OTMLNodePtr& node);
+    void applyAppearanceFlags(const appearances::AppearanceFlags& flags);
 
 #ifdef FRAMEWORK_EDITOR
     void serialize(const FileStreamPtr& fin);
     void exportImage(const std::string& fileName);
 #endif
 
-    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, const LightViewPtr& lightView = nullptr, const DrawConductor& conductor = DEFAULT_DRAW_CONDUCTOR);
-    void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color, const DrawConductor& conductor);
+    void draw(const Point& dest, int layer, int xPattern, int yPattern, int zPattern, int animationPhase, const Color& color, bool drawThings = true, const LightViewPtr& lightView = nullptr);
+
+    void drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color);
 
     uint16_t getId() { return m_id; }
     ThingCategory getCategory() { return m_category; }
@@ -350,9 +354,9 @@ public:
     const std::vector<NPCData>& getNpcSaleData() { return m_npcData; }
     int getMeanPrice() {
         static constexpr std::array<std::pair<uint32_t, uint32_t>, 3> forcedPrices = { {
-            {3043, 10000},
-            {3031, 50},
-            {3035, 50 }
+            {3043, 10000},// Crystal Coin
+            {3031, 1}, // Gold Coin
+            {3035, 100} // Platinum Coin
         } };
 
         const uint32_t itemId = getId();
@@ -437,8 +441,9 @@ public:
     bool isPodium() { return (m_flags & ThingFlagAttrPodium); }
     bool isTopEffect() { return (m_flags & ThingFlagAttrTopEffect); }
     bool hasAction() { return (m_flags & ThingFlagAttrDefaultAction); }
-    bool isOpaque() { if (m_opaque == -1) getTexture(0); return m_opaque == 1; }
+    bool isOpaque() { return m_opaque == 1; }
     bool isDecoKit() { return (m_flags & ThingFlagAttrDecoKit); }
+    bool isLoading() const { return m_loading.load(std::memory_order_acquire); }
 
     bool isItem() const { return m_category == ThingCategoryItem; }
     bool isEffect() const { return m_category == ThingCategoryEffect; }
@@ -449,20 +454,21 @@ public:
     const Timer getLastTimeUsage() const { return m_lastTimeUsage; }
 
     void unload() {
-        m_textureData.clear();
-        m_textureData.resize(m_animationPhases);
+        for (auto& data : m_textureData) {
+            data.source = nullptr;
+        }
     }
 
     PLAYER_ACTION getDefaultAction() { return m_defaultAction; }
 
     uint16_t getClassification() { return m_upgradeClassification; }
-    std::vector<uint32_t> getSprites() { return m_spritesIndex; }
+    const auto& getSprites() { return m_spritesIndex; }
 
     // additional
     float getOpacity() { return m_opacity; }
     void setPathable(bool var);
     int getExactHeight();
-    TexturePtr getTexture(int animationPhase);
+    const TexturePtr& getTexture(int animationPhase);
 
     std::string getName() { return m_name; }
     std::string getDescription() { return m_description; }

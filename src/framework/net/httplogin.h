@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,8 @@ public:
                                   const std::string& email,
                                   const std::string& password);
 
+    void cancel();
+
     enum Result : int { Success = 200, Error = -1 };
 
 private:
@@ -66,4 +68,5 @@ private:
     std::string worlds;
     std::string session;
     std::string errorMessage;
+    std::atomic<bool> cancelled;
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 #include <client/client.h>
 #include <framework/core/eventdispatcher.h>
 #include <framework/core/graphicalapplication.h>
+#include <framework/graphics/shadermanager.h>
 
 void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
@@ -76,16 +77,14 @@ void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& 
     }
 
     if (g_drawPool.getCurrentType() == DrawPoolType::MAP) {
-        if (g_app.isDrawingEffectsOnTop() && !m_drawConductor.agroup) {
-            m_drawConductor.agroup = true;
-            m_drawConductor.order = FOURTH;
-        }
-
         if (drawThings && g_client.getEffectAlpha() < 1.f)
             g_drawPool.setOpacity(g_client.getEffectAlpha(), true);
     }
 
-    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView, m_drawConductor);
+    if (hasShader())
+        g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
+
+    getThingType()->draw(dest, 0, xPattern, yPattern, 0, animationPhase, Color::white, drawThings, lightView);
 }
 
 void Effect::onAppear()
@@ -136,16 +135,16 @@ void Effect::setId(const uint32_t id)
     m_clientId = id;
 }
 
-void Effect::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
+void Effect::setPosition(const Position& position, const uint8_t stackPos)
 {
     if (m_clientId == 0)
         return;
 
-    Thing::setPosition(position, stackPos, hasElevation);
+    Thing::setPosition(position, stackPos);
     int pattern_x = getNumPatternX();
     int pattern_y = getNumPatternY();
     if (pattern_x == 0 || pattern_y == 0) {
-        g_logger.warning(stdext::format("Failed to send magic effect %d. No sprites declared.", m_clientId));
+        g_logger.warning("Failed to send magic effect {}. No sprites declared.", m_clientId);
         return;
     }
 
@@ -154,5 +153,5 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos, const
 }
 
 ThingType* Effect::getThingType() const {
-    return g_things.getThingType(m_clientId, ThingCategoryEffect).get();
+    return g_things.getRawThingType(m_clientId, ThingCategoryEffect);
 }

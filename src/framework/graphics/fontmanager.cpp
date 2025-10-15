@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,7 @@ bool FontManager::importFont(const std::string& file)
 
         return true;
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Unable to load font from file '%s': %s", path, e.what()));
+        g_logger.error("Unable to load font from file '{}': {}", path, e.what());
         return false;
     }
 }
@@ -87,6 +87,6 @@ BitmapFontPtr FontManager::getFont(const std::string_view fontName)
     }
 
     // when not found, fallback to default font
-    g_logger.error(stdext::format("font '%s' not found", fontName));
+    g_logger.error("font '{}' not found", fontName);
     return m_defaultFont;
 }

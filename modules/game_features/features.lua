@@ -9,7 +9,6 @@ controller:registerEvents(g_game, {
         g_game.enableFeature(GameFormatCreatureName)
 
         -- For Walk
-        --g_game.enableFeature(GameLatencyAdaptiveCamera)
         g_game.enableFeature(GameAllowPreWalk)
         g_game.enableFeature(GameMapCache)
         -- g_game.enableFeature(GameSmoothWalkElevation)
@@ -210,6 +209,7 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1281 then
+            g_game.enableFeature(GameForgeSkillStats)
             g_game.enableFeature(GamePlayerFamiliars)
             g_game.disableFeature(GameEnvironmentEffect)
             g_game.disableFeature(GameItemAnimationPhase)
@@ -252,7 +252,13 @@ controller:registerEvents(g_game, {
         end
 
         if version >= 1332 then
-            g_game.enableFeature(GameForgeConvergence);
+            g_game.enableFeature(GameForgeConvergence)
+        end
+
+        if version >= 1410 then
+            g_game.disableFeature(GameAdditionalSkills)
+            g_game.disableFeature(GameForgeSkillStats)
+            g_game.enableFeature(GameCharacterSkillStats)
         end
     end
 })

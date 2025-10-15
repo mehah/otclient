@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -89,6 +89,9 @@ int push_luavalue(const OutfitColorStruct& currentOutfit);
 int push_luavalue(const CharacterInfoOutfits& outfit);
 int push_luavalue(const CharacterInfoMounts& mount);
 int push_luavalue(const CharacterInfoFamiliar& familiar);
+int push_luavalue(const CyclopediaCharacterOffenceStats& data);
+int push_luavalue(const CyclopediaCharacterDefenceStats& data);
+int push_luavalue(const CyclopediaCharacterMiscStats& data);
 
 // bestiary
 int push_luavalue(const RaceType& raceData);
@@ -98,3 +101,13 @@ int push_luavalue(const DailyRewardItem& item);
 int push_luavalue(const DailyRewardBundle& bundle);
 int push_luavalue(const DailyRewardDay& day);
 int push_luavalue(const DailyRewardData& data);
+
+// forge
+int push_luavalue(const ForgeOpenData& data);
+int push_luavalue(const ForgeTransferData& data);
+int push_luavalue(const ForgeItemInfo& data);
+
+// Game Analysers Structs
+int push_luavalue(const BossCooldownData& data);
+int push_luavalue(const PartyMemberData& data);
+int push_luavalue(const PartyMemberName& data);

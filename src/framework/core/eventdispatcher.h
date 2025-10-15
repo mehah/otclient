@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,11 @@
 #pragma once
 
 #include "scheduledevent.h"
+#include <framework/util/spinlock.h>
 
 enum class TaskGroup : int8_t
 {
-    None = -1, // is outside the context of the dispatcher
+    NoGroup = -1, // is outside the context of the dispatcher
     Serial,
     GenericParallel,
     Last
@@ -34,7 +35,7 @@ enum class TaskGroup : int8_t
 
 enum class DispatcherType : uint8_t
 {
-    None,
+    NoType,
     Event,
     AsyncEvent,
     ScheduledEvent,
@@ -62,12 +63,12 @@ struct DispatcherContext
 
 private:
     void reset() {
-        group = TaskGroup::None;
-        type = DispatcherType::None;
+        group = TaskGroup::NoGroup;
+        type = DispatcherType::NoType;
     }
 
-    DispatcherType type = DispatcherType::None;
-    TaskGroup group = TaskGroup::None;
+    DispatcherType type = DispatcherType::NoType;
+    TaskGroup group = TaskGroup::NoGroup;
 
     friend class EventDispatcher;
 };
@@ -76,19 +77,16 @@ private:
 class EventDispatcher
 {
 public:
-    EventDispatcher();
+    EventDispatcher() = default;
 
     void init();
     void shutdown();
     void poll();
 
     EventPtr addEvent(const std::function<void()>& callback);
-    void asyncEvent(std::function<void()>&& callback);
     void deferEvent(const std::function<void()>& callback);
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
-
-    void startEvent(const ScheduledEventPtr& event);
 
     const auto& context() const {
         return dispacherContext;
@@ -96,6 +94,14 @@ public:
 
 private:
     thread_local static DispatcherContext dispacherContext;
+
+    enum class ThreadTaskEventState
+    {
+        ADDING,
+        ADDED,
+        MERGING,
+        MERGED,
+    };
 
     // Thread Events
     struct ThreadTask
@@ -107,17 +113,12 @@ private:
 
         std::vector<EventPtr> events;
         std::vector<Event> deferEvents;
-        std::vector<Event> asyncEvents;
         std::vector<ScheduledEventPtr> scheduledEventList;
-        std::mutex mutex;
-
-        void try_lock();
-        void try_unlock();
+        SpinLock lock;
     };
 
     inline void mergeEvents();
     inline void executeEvents();
-    inline void executeAsyncEvents();
     inline void executeDeferEvents();
     inline void executeScheduledEvents();
 
@@ -125,15 +126,26 @@ private:
         return m_threads[stdext::getThreadId() % m_threads.size()];
     }
 
+    template<typename Result = void, typename Inserter>
+    Result pushThreadTask(Inserter inserter) {
+        const auto& thread = getThreadTask();
+        SpinLock::Guard guard(thread->lock);
+        if constexpr (std::is_void_v<Result>) {
+            inserter(thread);
+        } else {
+            Result result = inserter(thread);
+            return result;
+        }
+    }
+
     size_t m_pollEventsSize{};
     bool m_disabled{ false };
 
-    mutable std::vector<std::unique_ptr<ThreadTask>> m_threads;
+    std::vector<std::unique_ptr<ThreadTask>> m_threads;
 
     // Main Events
     std::vector<EventPtr> m_eventList;
     std::vector<Event> m_deferEventList;
-    std::vector<Event> m_asyncEventList;
     phmap::btree_multiset<ScheduledEventPtr, ScheduledEvent::Compare> m_scheduledEventList;
 };
 

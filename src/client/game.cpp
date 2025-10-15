@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -505,11 +505,6 @@ void Game::processModalDialog(const uint32_t id, const std::string_view title, c
 void Game::processItemDetail(const uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions)
 {
     g_lua.callGlobalField("g_game", "onParseItemDetail", itemId, descriptions);
-}
-
-void Game::processBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& bestiaryRaces)
-{
-    g_lua.callGlobalField("g_game", "onParseBestiaryRaces", bestiaryRaces);
 }
 
 void Game::processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
@@ -1145,6 +1140,41 @@ void Game::partyShareExperience(const bool active)
     m_protocolGame->sendShareExperience(active);
 }
 
+void Game::sendPartyAnalyzerReset()
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPartyAnalyzerAction(Otc::PartyAnalyzerAction_t::PARTYANALYZERACTION_RESET);
+}
+
+void Game::sendPartyAnalyzerPriceType()
+{
+    if (!canPerformGameAction())
+        return;
+
+    // server just toggles between Market/Leader
+    m_protocolGame->sendPartyAnalyzerAction(Otc::PartyAnalyzerAction_t::PARTYANALYZERACTION_PRICETYPE);
+}
+
+void Game::sendPartyAnalyzerPriceValue()
+{
+    if (!canPerformGameAction())
+        return;
+
+    // For now, send empty items vector - the server will handle getting the prices
+    // This matches what the server code expects for PARTYANALYZERACTION_PRICEVALUE
+    m_protocolGame->sendPartyAnalyzerAction(Otc::PartyAnalyzerAction_t::PARTYANALYZERACTION_PRICEVALUE);
+}
+
+void Game::sendPartyAnalyzerAction(const uint8_t action, const std::vector<std::tuple<uint16_t, uint64_t>>& items)
+{
+    if (!canPerformGameAction())
+        return;
+
+    m_protocolGame->sendPartyAnalyzerAction(action, items);
+}
+
 void Game::requestOutfit()
 {
     if (!canPerformGameAction())
@@ -1627,7 +1657,7 @@ void Game::setProtocolVersion(const uint16_t version)
         throw Exception("Unable to change protocol version while online");
 
     if (version != 0 && (version < 740 || version > g_gameConfig.getLastSupportedVersion()))
-        throw Exception("Protocol version %d not supported", version);
+        throw Exception("Protocol version {} not supported", version);
 
     m_protocolVersion = version;
 
@@ -1645,7 +1675,7 @@ void Game::setClientVersion(const uint16_t version)
         throw Exception("Unable to change client version while online");
 
     if (version != 0 && (version < 740 || version > g_gameConfig.getLastSupportedVersion()))
-        throw Exception("Client version %d not supported", version);
+        throw Exception("Client version {} not supported", version);
 
     m_features.reset();
 
@@ -1999,3 +2029,19 @@ void Game::sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& que
 
     m_protocolGame->sendRequestTrackerQuestLog(quests);
 }
+
+void Game::processCyclopediaCharacterOffenceStats(const CyclopediaCharacterOffenceStats& data)
+{
+    g_lua.callGlobalField("g_game", "onCyclopediaCharacterOffenceStats", data);
+}
+
+void Game::processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefenceStats& data)
+{
+    g_lua.callGlobalField("g_game", "onCyclopediaCharacterDefenceStats", data);
+}
+
+void Game::processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStats& data)
+{
+    g_lua.callGlobalField("g_game", "onCyclopediaCharacterMiscStats", data);
+}
+

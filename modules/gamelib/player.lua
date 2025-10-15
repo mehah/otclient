@@ -67,6 +67,84 @@ Icons[PlayerStates.GoshnarTaint5] = { clip = 26, tooltip = tr('You are GoshnarTa
 Icons[PlayerStates.NewManaShield] = {  clip = 27, tooltip = tr('You are NewManaShield'), id = 'condition_NewManaShield' }
 Icons[PlayerStates.Agony] = { clip = 28, tooltip = tr('You are Agony'),  id = 'condition_Agony' }
 Icons[PlayerStates.Rewards] = { clip = 30, tooltip = tr('Rewards'),  id = 'condition_Rewards' }
+Icons[PlayerStates.Hungry] = { clip = 32, tooltip = tr('You are hungry'),  id = 'condition_hungry' }
+
+local PLAYER_STATE_SEGMENT = 4294967296
+
+local function isStateBitActive(states, mask)
+    if not states or mask == 0 then
+        return false
+    end
+
+    if mask < PLAYER_STATE_SEGMENT then
+        local low = states % PLAYER_STATE_SEGMENT
+        return math.floor(low / mask) % 2 == 1
+    end
+
+    local highMask = math.floor(mask / PLAYER_STATE_SEGMENT)
+    local high = math.floor(states / PLAYER_STATE_SEGMENT)
+    return highMask > 0 and math.floor(high / highMask) % 2 == 1
+end
+
+function Player.iterateChangedStates(now, old, callback)
+    if now == old then
+        return
+    end
+
+    local lowNow = now % PLAYER_STATE_SEGMENT
+    local lowOld = old % PLAYER_STATE_SEGMENT
+    local maxLow = math.max(lowNow, lowOld)
+    local mask = 1
+
+    while mask <= maxLow do
+        local nowActive = math.floor(lowNow / mask) % 2 == 1
+        local oldActive = math.floor(lowOld / mask) % 2 == 1
+        if nowActive ~= oldActive then
+            callback(mask)
+        end
+        mask = mask * 2
+    end
+
+    local highNow = math.floor(now / PLAYER_STATE_SEGMENT)
+    local highOld = math.floor(old / PLAYER_STATE_SEGMENT)
+    local maxHigh = math.max(highNow, highOld)
+    mask = 1
+
+    while mask <= maxHigh do
+        local nowActive = math.floor(highNow / mask) % 2 == 1
+        local oldActive = math.floor(highOld / mask) % 2 == 1
+        if nowActive ~= oldActive then
+            callback(mask * PLAYER_STATE_SEGMENT)
+        end
+        mask = mask * 2
+    end
+end
+
+combatStates= {
+	CLIENT_COMBAT_PHYSICAL = 0,
+	CLIENT_COMBAT_FIRE = 1,
+	CLIENT_COMBAT_EARTH = 2,
+	CLIENT_COMBAT_ENERGY = 3,
+	CLIENT_COMBAT_ICE = 4,
+	CLIENT_COMBAT_HOLY = 5,
+	CLIENT_COMBAT_DEATH = 6,
+	CLIENT_COMBAT_HEALING = 7,
+	CLIENT_COMBAT_DROWN = 8,
+	CLIENT_COMBAT_LIFEDRAIN = 9,
+	CLIENT_COMBAT_MANADRAIN = 10,
+}
+clientCombat ={}
+clientCombat[combatStates.CLIENT_COMBAT_PHYSICAL] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-physical-resist', id = 'Physical' }
+clientCombat[combatStates.CLIENT_COMBAT_FIRE] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-fire-resist', id = 'Fire' }
+clientCombat[combatStates.CLIENT_COMBAT_EARTH] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-earth-resist', id = 'Earth' }
+clientCombat[combatStates.CLIENT_COMBAT_ENERGY] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-energy-resist', id = 'Energy' }
+clientCombat[combatStates.CLIENT_COMBAT_ICE] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-ice-resist', id = 'Ice' }
+clientCombat[combatStates.CLIENT_COMBAT_HOLY] = {path = '/game_cyclopedia/images/bestiary/icons/monster-icon-holy-resist', id = 'Holy' }
+clientCombat[combatStates.CLIENT_COMBAT_DEATH] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-death-resist', id = 'Death' }
+clientCombat[combatStates.CLIENT_COMBAT_HEALING] = { path = '/game_cyclopedia/images/bestiary/icons/monster-icon-healing-resist', id = 'Healing' }
+clientCombat[combatStates.CLIENT_COMBAT_DROWN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-drowning-resist', id = 'Drown' }
+clientCombat[combatStates.CLIENT_COMBAT_LIFEDRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-lifedrain-resist', id = 'Lifedrain ' }
+clientCombat[combatStates.CLIENT_COMBAT_MANADRAIN] = {  path = '/game_cyclopedia/images/bestiary/icons/monster-icon-manadrain-resist', id = 'Manadrain' }
 
 InventorySlotOther = 0
 InventorySlotHead = 1
@@ -183,22 +261,11 @@ function Player:getItemsCount(itemId)
 end
 
 function Player:hasState(state, states)
-    if not states then
-        states = self:getStates()
-    end
+    return isStateBitActive(states or self:getStates(), state)
+end
 
-    for i = 1, 32 do
-        local pow = math.pow(2, i - 1)
-        if pow > states then
-            break
-        end
-
-        local states = Bit.band(states, pow)
-        if states == state then
-            return true
-        end
-    end
-    return false
+function Player.isStateActive(states, state)
+    return isStateBitActive(states, state)
 end
 
 function Player:getVocationNameByClientId()

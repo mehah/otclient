@@ -197,6 +197,28 @@ MainWindow
         image-clip: 0 34 34 34
         image-source: /images/game/cyclopedia/bossSlot_off
 
+    UIButton
+      id: magicalArchives
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 1
+      @onClick: SelectWindow("magicalArchives")
+
+      $on:
+        size: 150 34
+        image-clip: 0 0 150 34
+        image-source: /images/game/cyclopedia/magical_on
+
+      $!on:
+        size: 34 34
+        image-clip: 0 0 34 34
+        image-source: /images/game/cyclopedia/magical_off
+
+      $pressed:
+        size: 34 34
+        image-clip: 0 34 34 34
+        image-source: /images/game/cyclopedia/magical_off
+        
   UIWidget
     id: contentContainer
     anchors.top: prev.bottom
@@ -277,11 +299,36 @@ MainWindow
       !text: tr('0')
       text-auto-resize: true
       color: #BDBDBD
+
+  UIWidget
+    id: CharmsBase1410
+    visible: false
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 5
+    image-source: /images/ui/item
+    image-border: 10
+    size: 100 20
+    !tooltip: tr("Minor Charm echoes\nEarned by unlocking or upgrading major charm and promotion your character")
+    UIWidget
+      id: Icon
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 4
+      image-source: /game_cyclopedia/images/minor-charm-echoes
+    Label
+      id: Value
+      anchors.right: Icon.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 4
+      !text: tr('0 / 0')
+      text-auto-resize: true
+      color: #BDBDBD
   Button
     id: BestiaryTrackerButton
     size: 90 20
     anchors.bottom: parent.bottom
-    anchors.left: CharmsBase.right
+    anchors.left: prev.right
     margin-left: 5
     !text: tr('Bestiary Tracker')
     font: small-9px

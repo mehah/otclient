@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,8 +52,19 @@ void drawThing(const ThingPtr& thing, const Point& dest, const int flags, uint8_
     if (flags == Otc::DrawLights)
         thing->drawLight(newDest, lightView);
     else {
+        if (thing->isSingleGround())
+            g_drawPool.setDrawOrder(DrawOrder::FIRST);
+        else if (thing->isSingleGroundBorder())
+            g_drawPool.setDrawOrder(DrawOrder::SECOND);
+        else if (thing->isEffect() && g_app.isDrawingEffectsOnTop())
+            g_drawPool.setDrawOrder(DrawOrder::FOURTH);
+        else
+            g_drawPool.setDrawOrder(DrawOrder::THIRD);
+
         thing->draw(newDest, flags & Otc::DrawThings, lightView);
         updateElevation(thing, drawElevation);
+
+        g_drawPool.resetDrawOrder();
     }
 }
 
@@ -111,8 +122,8 @@ void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawCreature(dest, Otc::DrawLights, true, drawElevation, lightView);
 
     if (m_effects) {
-        for (const auto& effet : *m_effects)
-            effet->draw(dest - drawElevation * g_drawPool.getScaleFactor(), false, lightView);
+        for (const auto& effect : *m_effects)
+            effect->draw(dest - drawElevation * g_drawPool.getScaleFactor(), false, lightView);
     }
 
     drawAttachedLightEffect(dest, lightView);
@@ -122,6 +133,8 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
 {
     if (!forceDraw && !m_drawTopAndCreature)
         return;
+
+    const auto& newDest = dest - drawElevation * g_drawPool.getScaleFactor();
 
     bool localPlayerDrawed = false;
     if (hasCreatures()) {
@@ -137,6 +150,7 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
         }
     }
 
+    g_drawPool.setDrawOrder(DrawOrder::THIRD);
     for (const auto& creature : m_walkingCreatures) {
         const auto& cDest = Point(
             dest.x + ((creature->getPosition().x - m_position.x) * g_gameConfig.getSpriteSize() - creature->getDrawElevation()) * g_drawPool.getScaleFactor(),
@@ -148,6 +162,7 @@ void Tile::drawCreature(const Point& dest, const int flags, const bool forceDraw
         else
             creature->draw(cDest, flags & Otc::DrawThings);
     }
+    g_drawPool.resetDrawOrder();
 
     // draw the local character if he is on a virtual tile, that is, his visual position is not the same as the server.
     if (!localPlayerDrawed && g_game.getLocalPlayer() && !g_game.getLocalPlayer()->isWalking() && g_game.getLocalPlayer()->getPosition() == m_position) {
@@ -160,6 +175,8 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
     if (!forceDraw && !m_drawTopAndCreature)
         return;
 
+    drawElevation = 0;
+
     if (m_effects) {
         for (const auto& effect : *m_effects)
             drawThing(effect, dest, flags & Otc::DrawThings, drawElevation);
@@ -168,7 +185,7 @@ void Tile::drawTop(const Point& dest, const int flags, const bool forceDraw, uin
     if (hasTopItem()) {
         for (const auto& item : m_things) {
             if (!item->isOnTop()) continue;
-            item->draw(dest, flags & Otc::DrawThings);
+            drawThing(item, dest, flags & Otc::DrawThings, drawElevation);
         }
     }
 }
@@ -248,7 +265,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
             }
         }
 
-        if (newEffect->isTopEffect())
+        if (!newEffect->isTopEffect())
             m_effects->insert(m_effects->begin(), newEffect);
         else
             m_effects->emplace_back(newEffect);
@@ -298,27 +315,13 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
 
     m_things.insert(m_things.begin() + stackPos, thing);
 
-    // get the elevation status before analyze the new item.
-    const bool hasElev = hasElevation();
-
     setThingFlag(thing);
 
     if (size > g_gameConfig.getTileMaxThings())
         removeThing(m_things[g_gameConfig.getTileMaxThings()]);
 
-    // Do not change if you do not understand what is being done.
-    {
-        if (const auto& ground = getGround()) {
-            stackPos = std::max<int>(stackPos - 1, 0);
-            if (ground->isTopGround()) {
-                ground->ungroup();
-                thing->ungroup();
-            }
-        }
-    }
-
     updateThingStackPos();
-    thing->setPosition(m_position, stackPos, hasElev);
+    thing->setPosition(m_position, stackPos);
     thing->onAppear();
 
     updateElevation(thing, m_drawElevation);
@@ -620,10 +623,18 @@ bool Tile::isCompletelyCovered(const uint8_t firstFloor, const bool resetCache)
     const uint32_t idState = 1 << (firstFloor + g_gameConfig.getMapMaxZ());
     if ((m_isCompletelyCovered & idChecked) == 0) {
         m_isCompletelyCovered |= idChecked;
-        if (g_map.isCompletelyCovered(m_position, firstFloor)) {
+        bool isLoading = false;
+        if (g_map.isCompletelyCovered(m_position, isLoading, firstFloor)) {
             m_isCompletelyCovered |= idState;
             m_isCovered |= idChecked; // Set covered is Checked
             m_isCovered |= idState;
+        }
+
+        if (isLoading) {
+            m_isCompletelyCovered &= ~idState;
+            m_isCovered &= ~idChecked;
+            m_isCovered &= ~idState;
+            return false;
         }
     }
 
@@ -639,8 +650,15 @@ bool Tile::isCovered(const int8_t firstFloor)
 
     if ((m_isCovered & idChecked) == 0) {
         m_isCovered |= idChecked;
-        if (g_map.isCovered(m_position, firstFloor))
+        bool isLoading = false;
+        if (g_map.isCovered(m_position, isLoading, firstFloor))
             m_isCovered |= idState;
+
+        if (isLoading) {
+            m_isCovered &= ~idChecked;
+            m_isCovered &= ~idState;
+            return false;
+        }
     }
 
     return (m_isCovered & idState) == idState;
@@ -875,9 +893,6 @@ void Tile::setThingFlag(const ThingPtr& thing)
     if (thing->isFullGround())
         m_thingTypeFlag |= FULL_GROUND;
 
-    if (thing->isOpaque())
-        m_thingTypeFlag |= IS_OPAQUE;
-
     if (thing->hasElevation())
         ++m_elevation;
 }
@@ -936,7 +951,7 @@ void Tile::drawTexts(Point dest)
     if (m_timerText && g_clock.millis() < m_timer) {
         if (m_text && m_text->hasText())
             dest.y -= 8;
-        m_timerText->setText(stdext::format("%.01f", (m_timer - g_clock.millis()) / 1000.));
+        m_timerText->setText(fmt::format("{:.1f}", (m_timer - g_clock.millis()) / 1000.));
         m_timerText->drawText(dest, Rect(dest.x - 64, dest.y - 64, 128, 128));
         dest.y += 16;
     }
@@ -1001,4 +1016,25 @@ bool Tile::canShoot(int distance)
     if (distance > 0 && std::max<int>(std::abs(m_position.x - playerPos.x), std::abs(m_position.y - playerPos.y)) > distance)
         return false;
     return g_map.isSightClear(playerPos, m_position);
+}
+
+bool Tile::isFullyOpaque() {
+    if (isFullGround())
+        return true;
+
+    for (const auto& thing : m_things) {
+        if (thing->isOpaque())
+            return true;
+    }
+
+    return false;
+}
+
+bool Tile::isLoading() const {
+    for (const auto& thing : m_things) {
+        if (thing->isLoading())
+            return true;
+    }
+
+    return false;
 }

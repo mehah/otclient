@@ -321,6 +321,7 @@ function CharacterList.create(characters, account, otui)
             creature:setOutfit(outfit)
             creature:setDirection(2)
             creatureDisplay:setCreature(creature)
+            creatureDisplay:setPadding(0)
 
             local mainCharacter = widget:getChildById('mainCharacter', characterList)
             if characterInfo.main then

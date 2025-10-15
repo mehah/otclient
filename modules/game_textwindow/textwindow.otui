@@ -1,12 +1,13 @@
 TextWindow < MainWindow
   id: textWindow
-  size: 300 280
+  size: 300 450
 
   Item
     id: textItem
     virtual: true
     anchors.top: parent.top
     anchors.left: parent.left
+    background-color: #00000000
 
   Label
     id: description
@@ -14,40 +15,55 @@ TextWindow < MainWindow
     anchors.left: textItem.right
     anchors.right: parent.right
     margin-left: 8
+    margin-top: 5
     text-auto-resize: true
     text-align: left
     text-wrap: true
 
   MultilineTextEdit
     id: text
-    anchors.top: textScroll.top
+    anchors.top: description.bottom
     anchors.left: parent.left
     anchors.right: textScroll.left
-    anchors.bottom: textScroll.bottom
+    anchors.bottom: separator.top
+    margin-top: 10
+    margin-bottom: 10
     vertical-scrollbar: textScroll
     text-wrap: true
 
   VerticalScrollBar
     id: textScroll
     anchors.top: description.bottom
-    anchors.bottom: okButton.top
+    anchors.bottom: separator.top
     anchors.right: parent.right
     margin-top: 10
     margin-bottom: 10
     step: 16
     pixels-scroll: true
 
+  HorizontalSeparator
+    id: separator
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-bottom: 40
+
   Button
     id: okButton
     !text: tr('Ok')
     anchors.bottom: parent.bottom
-    anchors.right: next.left
+    anchors.right: cancelButton.left
     margin-right: 10
-    width: 60
+    margin-bottom: 10
+    width: 50
+    height: 25
 
   Button
     id: cancelButton
     !text: tr('Cancel')
     anchors.bottom: parent.bottom
     anchors.right: parent.right
-    width: 60
+    margin-bottom: 10
+    margin-right: 10
+    width: 80
+    height: 25

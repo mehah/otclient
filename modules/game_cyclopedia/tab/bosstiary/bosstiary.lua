@@ -23,6 +23,9 @@ function showBosstiary()
     controllerCyclopedia.ui.CharmsBase:setVisible(false)
     controllerCyclopedia.ui.GoldBase:setVisible(false)
     controllerCyclopedia.ui.BestiaryTrackerButton:setVisible(false)
+    if g_game.getClientVersion() >= 1410 then
+        controllerCyclopedia.ui.CharmsBase1410:setVisible(false)
+    end
 end
 
 Cyclopedia.Bosstiary = {}
@@ -139,17 +142,21 @@ function Cyclopedia.CreateBosstiaryCreature(data)
     widget.ProgressValue:setText(data.kills)
 
     Cyclopedia.SetBestiaryProgress(46,widget.ProgressBack, widget.ProgressBack33, widget.ProgressBack55,  data.kills, CONFIG[data.category].PROWESS, CONFIG[data.category].EXPERTISE, CONFIG[data.category].MASTERY)
-   
+
     widget.Sprite:setOutfit(raceData.outfit)
     widget.Sprite:getCreature():setStaticWalking(1000)
     if data.unlocked then
         widget.Sprite:getCreature():setShader("")
         widget:setText(format(data.name))
-        widget.TrackCheck:enable()
-        if data.isTrackerActived == 1 then
-            widget.TrackCheck:setChecked(true)
+        if g_game.getClientVersion() >= 1320 then
+            widget.TrackCheck:enable()
+            if data.isTrackerActived == 1 then
+                widget.TrackCheck:setChecked(true)
+            else
+                widget.TrackCheck:setChecked(false)
+            end
         else
-            widget.TrackCheck:setChecked(false)
+            widget.TrackCheck:hide()
         end
     else
         widget.Sprite:getCreature():setShader("Outfit - cyclopedia-black")

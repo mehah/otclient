@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,3 +21,26 @@
  */
 
 #include "player.h"
+#include "game.h"
+
+bool Player::isMage() const {
+    switch (m_vocation) {
+        case Otc::Vocations_t::SORCERER:
+        case Otc::Vocations_t::DRUID:
+        case Otc::Vocations_t::MASTER_SORCERER:
+        case Otc::Vocations_t::ELDER_DRUID:
+            return true;
+        default: return false;
+    }
+}
+
+void Player::setVocation(const uint8_t vocation)
+{
+    if (m_vocation == vocation)
+        return;
+
+    const uint8_t oldVocation = m_vocation;
+    m_vocation = vocation;
+
+    callLuaField("onVocationChange", vocation, oldVocation);
+}

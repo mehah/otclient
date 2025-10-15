@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,10 @@
 
 #pragma once
 
-#include "../pch.h"
+#include <parallel_hashmap/phmap.h>
 
 namespace stdext
 {
-    template <class _Kty>
-    using hash = phmap::Hash<_Kty>;
-
     // Robin Hood lib
     constexpr size_t hash_int(uint64_t x) noexcept
     {
@@ -47,7 +44,7 @@ namespace stdext
     template <class T>
     void hash_combine(size_t& seed, const T& v)
     {
-        hash<T> hasher;
+        std::hash<T> hasher;
         hash_union(seed, hasher(v));
     }
 }

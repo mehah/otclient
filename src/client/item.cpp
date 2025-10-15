@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,9 @@
 #include <framework/core/clock.h>
 #include <framework/core/filestream.h>
 #include <framework/graphics/shadermanager.h>
+#ifdef FRAMEWORK_EDITOR
+#include <framework/core/binarytree.h>
+#endif
 
 ItemPtr Item::create(const int id)
 {
@@ -72,7 +75,7 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
             g_drawPool.setShaderProgram(g_shaders.getShaderById(m_shaderId), true/*, shaderAction*/);
     }
 
-    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, color, drawThings, lightView, m_drawConductor);
+    getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, animationPhase, color, drawThings, lightView);
     g_drawPool.resetShaderProgram();
 
     if (!replaceColorShader) {
@@ -87,23 +90,9 @@ void Item::drawLight(const Point& dest, const LightViewPtr& lightView) {
     drawAttachedLightEffect(dest, lightView);
 }
 
-void Item::setConductor()
-{
-    if (isSingleGround()) {
-        m_drawConductor.agroup = true;
-        m_drawConductor.order = FIRST;
-    } else if (isSingleGroundBorder() && !hasElevation()) {
-        m_drawConductor.agroup = true;
-        m_drawConductor.order = SECOND;
-    }
-}
-
-void Item::setPosition(const Position& position, const uint8_t stackPos, const bool hasElevation)
+void Item::setPosition(const Position& position, const uint8_t stackPos)
 {
     Thing::setPosition(position, stackPos);
-
-    if (hasElevation || (m_drawConductor.agroup && stackPos > 0))
-        m_drawConductor.agroup = false;
 }
 
 int Item::getSubType()
@@ -185,10 +174,10 @@ void Item::updatePatterns()
                     color = Otc::FluidPurple;
                     break;
                 case Otc::FluidBeer:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidOil:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidBlood:
                     color = Otc::FluidRed;
@@ -197,7 +186,7 @@ void Item::updatePatterns()
                     color = Otc::FluidGreen;
                     break;
                 case Otc::FluidMud:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidLemonade:
                     color = Otc::FluidYellow;
@@ -215,7 +204,7 @@ void Item::updatePatterns()
                     color = Otc::FluidYellow;
                     break;
                 case Otc::FluidRum:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidFruitJuice:
                     color = Otc::FluidYellow;
@@ -224,7 +213,7 @@ void Item::updatePatterns()
                     color = Otc::FluidWhite;
                     break;
                 case Otc::FluidTea:
-                    color = Otc::FluidBrown;
+                    color = Otc::FluidOrange;
                     break;
                 case Otc::FluidMead:
                     color = Otc::FluidOrange;
@@ -281,7 +270,6 @@ void Item::setId(uint32_t id)
 #endif
 
     m_clientId = id;
-    setConductor();
 
     // Shader example on only items that can be marketed.
     /*
@@ -292,7 +280,7 @@ void Item::setId(uint32_t id)
 }
 
 ThingType* Item::getThingType() const {
-    return g_things.getThingType(m_clientId, ThingCategoryItem).get();
+    return g_things.getRawThingType(m_clientId, ThingCategoryItem);
 }
 
 #ifdef FRAMEWORK_EDITOR
@@ -323,7 +311,6 @@ void Item::setOtbId(uint16_t id)
         id = 0;
 
     m_clientId = id;
-    setConductor();
 }
 
 void Item::unserializeItem(const BinaryTreePtr& in)
@@ -384,11 +371,11 @@ void Item::unserializeItem(const BinaryTreePtr& in)
                     m_attribs.set(attrib, in->getString());
                     break;
                 default:
-                    throw Exception("invalid item attribute %d", attrib);
+                    throw Exception("invalid item attribute {}", attrib);
             }
         }
     } catch (const stdext::exception& e) {
-        g_logger.error(stdext::format("Failed to unserialize OTBM item: %s", e.what()));
+        g_logger.error("Failed to unserialize OTBM item: {}", e.what());
     }
 }
 

@@ -12,6 +12,7 @@
         FRAMEWORK_NET;
         FRAMEWORK_SOUND;
         BUILD_TYPE="RelWithDebInfo";
+        NOMINMAX;
     </PREPROCESSOR_DEFS>
 
     <OTCLIENT_LIBDEPS>
@@ -78,6 +79,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>framework\pch.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>framework\pch.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(OTCLIENT_LIBDEPS)</AdditionalDependencies>

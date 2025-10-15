@@ -42,6 +42,36 @@ function init()
   botWindow = g_ui.loadUI('bot', modules.game_interface.getLeftPanel())
   botWindow:setup()
 
+  -- Hide unwanted miniwindow buttons
+  local toggleFilterButton = botWindow:recursiveGetChildById('toggleFilterButton')
+  if toggleFilterButton then
+    toggleFilterButton:setVisible(false)
+  end
+  
+  local contextMenuButton = botWindow:recursiveGetChildById('contextMenuButton')
+  if contextMenuButton then
+    contextMenuButton:setVisible(false)
+  end
+  
+  local newWindowButton = botWindow:recursiveGetChildById('newWindowButton')
+  if newWindowButton then
+    newWindowButton:setVisible(false)
+  end
+  
+  -- Position lockButton where toggleFilterButton would be (to the left of minimize button)
+  local lockButton = botWindow:recursiveGetChildById('lockButton')
+  local minimizeButton = botWindow:recursiveGetChildById('minimizeButton')
+  
+  if lockButton and minimizeButton then
+    lockButton:setVisible(true)
+    lockButton:breakAnchors()
+    lockButton:addAnchor(AnchorTop, minimizeButton:getId(), AnchorTop)
+    lockButton:addAnchor(AnchorRight, minimizeButton:getId(), AnchorLeft)
+    lockButton:setMarginRight(7)  -- Same margin as toggleFilterButton would have
+    lockButton:setMarginTop(0)
+    lockButton:setSize({width = 12, height = 12})
+  end
+
   contentsPanel = botWindow.contentsPanel
   configList = contentsPanel.config
   enableButton = contentsPanel.enableButton
@@ -182,6 +212,10 @@ function refresh()
   if not g_game.isOnline() or not settings[index].enabled then
     statusLabel:setOn(true)
     statusLabel:setText("Status: disabled\nPress off button to enable")
+    analyzerButton = modules.game_mainpanel.getButton("botAnalyzersButton")
+    if analyzerButton then
+      analyzerButton:destroy()
+    end
     return
   end
 
@@ -292,42 +326,39 @@ function edit()
   editWindow:raise()
 end
 
-function createDefaultConfigs()
-  local defaultConfigFiles = g_resources.listDirectoryFiles("default_configs", false, false)
-  for i, config_name in ipairs(defaultConfigFiles) do
-    if not g_resources.directoryExists("/bot/" .. config_name) then
-      g_resources.makeDir("/bot/" .. config_name)
-      if not g_resources.directoryExists("/bot/" .. config_name) then
-        return onError("Can't create /bot/" .. config_name .. " directory in " .. g_resources.getWriteDir())
-      end
-
-      local defaultConfigFiles = g_resources.listDirectoryFiles("default_configs/" .. config_name, true, false)
-      for i, file in ipairs(defaultConfigFiles) do
+local function copyFilesRecursively(sourcePath, targetPath)
+    local files = g_resources.listDirectoryFiles(sourcePath, true, false, false)
+    for _, file in ipairs(files) do
         local baseName = file:split("/")
         baseName = baseName[#baseName]
+        local targetFilePath = targetPath .. "/" .. baseName
         if g_resources.directoryExists(file) then
-          g_resources.makeDir("/bot/" .. config_name .. "/" .. baseName)
-          if not g_resources.directoryExists("/bot/" .. config_name .. "/" .. baseName) then
-            return onError("Can't create /bot/" .. config_name  .. "/" .. baseName .. " directory in " .. g_resources.getWriteDir())
-          end
-          local defaultConfigFiles2 = g_resources.listDirectoryFiles("default_configs/" .. config_name .. "/" .. baseName, true, false)
-          for i, file in ipairs(defaultConfigFiles2) do
-            local baseName2 = file:split("/")
-            baseName2 = baseName2[#baseName2]
+            g_resources.makeDir(targetFilePath)
+            if not g_resources.directoryExists(targetFilePath) then
+                return onError("Can't create directory: " .. targetFilePath)
+            end
+            copyFilesRecursively(file, targetFilePath)
+        else
             local contents = g_resources.fileExists(file) and g_resources.readFileContents(file) or ""
             if contents:len() > 0 then
-              g_resources.writeFileContents("/bot/" .. config_name .. "/" .. baseName .. "/" .. baseName2, contents)
+                g_resources.writeFileContents(targetFilePath, contents)
             end
-          end
-        else
-          local contents = g_resources.fileExists(file) and g_resources.readFileContents(file) or ""
-          if contents:len() > 0 then
-            g_resources.writeFileContents("/bot/" .. config_name .. "/" .. baseName, contents)
-          end
         end
-      end
     end
-  end
+end
+
+function createDefaultConfigs()
+    local defaultConfigFiles = g_resources.listDirectoryFiles("default_configs", false, false)
+    for _, configName in ipairs(defaultConfigFiles) do
+        local targetDir = "/bot/" .. configName
+        if not g_resources.directoryExists(targetDir) then
+            g_resources.makeDir(targetDir)
+            if not g_resources.directoryExists(targetDir) then
+                return onError("Can't create directory: " .. targetDir)
+            end
+            copyFilesRecursively("default_configs/" .. configName, targetDir)
+        end
+    end
 end
 
 function uploadConfig()

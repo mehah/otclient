@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2024 OTClient <https://github.com/edubart/otclient>
+ * Copyright (c) 2010-2025 OTClient <https://github.com/edubart/otclient>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,6 +39,7 @@ X11Window window;
 
 #include <framework/core/clock.h>
 #include <framework/graphics/image.h>
+#include <framework/util/color.h>
 
 PlatformWindow& g_window = window;
 
@@ -46,7 +47,7 @@ int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpo
 {
     const auto& image = Image::load(file);
     if (!image) {
-        g_logger.traceError(stdext::format("unable to load cursor image file %s", file));
+        g_logger.traceError("unable to load cursor image file {}", file);
         return -1;
     }
 
@@ -61,6 +62,21 @@ int PlatformWindow::loadMouseCursor(const std::string& file, const Point& hotSpo
     }
 
     return internalLoadMouseCursor(image, hotSpot);
+}
+
+void PlatformWindow::setTitleBarColor(int r, int g, int b)
+{
+    setTitleBarColor(Color(r, g, b));
+}
+
+void PlatformWindow::setTitleBarColor(float r, float g, float b)
+{
+    setTitleBarColor(Color(r, g, b));
+}
+
+void PlatformWindow::setTitleBarColorRGB(uint8_t r, uint8_t g, uint8_t b)
+{
+    setTitleBarColor(Color(r, g, b));
 }
 
 void PlatformWindow::updateUnmaximizedCoords()
@@ -175,10 +191,12 @@ void PlatformWindow::releaseAllKeys()
 void PlatformWindow::fireKeysPress()
 {
     // avoid massive checks
-    if (m_keyPressTimer.ticksElapsed() < 10)
+    if (m_keyPressTimer.ticksElapsed() < 2)
         return;
+
     m_keyPressTimer.restart();
 
+    const auto now = g_clock.millis();
     for (size_t keyCode = 0; keyCode < Fw::KeyLast; ++keyCode) {
         auto& keyInfo = m_keyInfo[keyCode];
 
@@ -189,14 +207,14 @@ void PlatformWindow::fireKeysPress()
 
         const ticks_t lastPressTicks = keyInfo.lastTicks;
         const ticks_t firstKeyPress = keyInfo.firstTicks;
-        if (g_clock.millis() - lastPressTicks >= keyInfo.delay) {
+        if (now - lastPressTicks >= keyInfo.delay) {
             if (m_onInputEvent) {
                 m_inputEvent.reset(Fw::KeyPressInputEvent);
                 m_inputEvent.keyCode = static_cast<Fw::Key>(keyCode);
-                m_inputEvent.autoRepeatTicks = g_clock.millis() - firstKeyPress;
+                m_inputEvent.autoRepeatTicks = now - firstKeyPress;
                 m_onInputEvent(m_inputEvent);
             }
-            keyInfo.lastTicks = g_clock.millis();
+            keyInfo.lastTicks = now;
         }
     }
 }
