@@ -874,10 +874,6 @@ function updateScrollbarVisibility()
   -- Ensure scrollbar is properly connected to the content panel
   itemsPanel:setVerticalScrollBar(scrollBar)
   
-  -- Force scrollbar to reset its position and range
-  scrollBar:setValue(0)
-  scrollBar:setMaximum(0)
-  
   -- Count only visible items to get accurate content height
   local visibleItemCount = 0
   for i = 1, itemsPanel:getChildCount() do
@@ -891,14 +887,24 @@ function updateScrollbarVisibility()
   local contentHeight = visibleItemCount * 35 -- Each NPCItemBox is 35 height
   local availableHeight = itemsPanel:getHeight()
   
-  -- Show scrollbar only if content is greater than 50 height and exceeds available space
-  if contentHeight > 50 and contentHeight > availableHeight then
+  -- Always show scrollbar when there's content
+  if contentHeight > 0 then
     scrollBar:setVisible(true)
     scrollBar:show()
-    -- Set proper scrollbar range
-    scrollBar:setMaximum(math.max(0, contentHeight - availableHeight))
-    scrollBar:setValue(0) -- Reset to top when content changes
+    
+    -- Set scrollbar maximum based on whether scrolling is needed
+    if contentHeight > availableHeight then
+      -- Scrolling needed - set proper range
+      scrollBar:setMaximum(math.max(0, contentHeight - availableHeight))
+    else
+      -- No scrolling needed - set maximum to 0 to disable scrolling
+      scrollBar:setMaximum(0)
+    end
+    
+    -- Always reset to top
+    scrollBar:setValue(0)
   else
+    -- No content at all, hide scrollbar
     scrollBar:setVisible(false)
     scrollBar:hide()
   end
