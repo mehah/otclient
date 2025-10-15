@@ -116,6 +116,9 @@ NpcWindow < MiniWindow
     margin-top: 2
     pixels-scroll: true
 
+    $!on:
+      width: 0
+
   FlatPanel
     id: setupPanel
     anchors.bottom: parent.bottom

@@ -467,8 +467,18 @@ function onTradeTypeChange(radioTabs, selected, deselected)
   refreshTradeItems()
   refreshPlayerGoods()
   
-  -- Ensure scrollbar is properly connected after mode change
-  scheduleEvent(updateScrollbarVisibility, 50)
+  -- Ensure scrollbar is properly reset and connected after mode change
+  scheduleEvent(function()
+    local scrollBar = npcWindow:recursiveGetChildById('miniwindowScrollBar')
+    if scrollBar and itemsPanel then
+      -- Completely disconnect and reconnect the scrollbar
+      itemsPanel:setVerticalScrollBar(nil)
+      scrollBar:setValue(0)
+      scrollBar:setMaximum(0)
+      itemsPanel:setVerticalScrollBar(scrollBar)
+      updateScrollbarVisibility()
+    end
+  end, 100)
 end
 
 function onTradeClick()
