@@ -92,7 +92,7 @@ function check()
     end
 end
 
-function PreyController:onInit()
+function PreyController:init()
     check()
     PreyController:registerEvents(g_game, {
         onPreyActive = onPreyActive,
