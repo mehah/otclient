@@ -34,9 +34,9 @@ input[type="password"] {
 }
 
 input {
-  width: 80;
-  height: 20;
-  padding: 2;
+  width: 80px;
+  height: 20px;
+  padding: 2px;
 }
 
 input:disabled {
