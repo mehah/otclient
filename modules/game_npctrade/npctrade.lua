@@ -296,6 +296,26 @@ function init()
   radioTabs:selectWidget(buyTab)
   radioTabs.onSelectionChange = onTradeTypeChange
 
+  -- Add resize handler to update scrollbar when window is resized
+  npcWindow.onGeometryChange = function(self, oldRect, newRect)
+    if oldRect.height ~= newRect.height or oldRect.width ~= newRect.width then
+      -- Window was resized, update scrollbar after a brief delay
+      scheduleEvent(function()
+        if npcWindow and itemsPanel then
+          local scrollBar = npcWindow:recursiveGetChildById('miniwindowScrollBar')
+          if scrollBar then
+            -- Reset scrollbar completely
+            itemsPanel:setVerticalScrollBar(nil)
+            scrollBar:setValue(0)
+            scrollBar:setMaximum(0)
+            itemsPanel:setVerticalScrollBar(scrollBar)
+            updateScrollbarVisibility()
+          end
+        end
+      end, 100)
+    end
+  end
+
   cancelNextRelease = false
   if g_game.isOnline() then
     playerFreeCapacity = g_game.getLocalPlayer():getFreeCapacity()
