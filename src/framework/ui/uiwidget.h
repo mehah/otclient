@@ -131,6 +131,61 @@ enum class JustifyItemsType : uint8_t
     Right
 };
 
+enum class FlexDirection : uint8_t
+{
+    Row,
+    RowReverse,
+    Column,
+    ColumnReverse
+};
+
+enum class FlexWrap : uint8_t
+{
+    NoWrap,
+    Wrap,
+    WrapReverse
+};
+
+enum class JustifyContent : uint8_t
+{
+    FlexStart,
+    FlexEnd,
+    Center,
+    SpaceBetween,
+    SpaceAround,
+    SpaceEvenly
+};
+
+enum class AlignItems : uint8_t
+{
+    Stretch,
+    FlexStart,
+    FlexEnd,
+    Center,
+    Baseline
+};
+
+enum class AlignContent : uint8_t
+{
+    Stretch,
+    FlexStart,
+    FlexEnd,
+    Center,
+    SpaceBetween,
+    SpaceAround,
+    SpaceEvenly
+};
+
+enum class AlignSelf : uint8_t
+{
+    Auto,
+    Stretch,
+    FlexStart,
+    FlexEnd,
+    Center,
+    Baseline
+};
+
 enum class Unit { Auto, FitContent, Px, Em, Percent, Invalid };
 
 enum class OverflowType : uint8_t
@@ -178,6 +233,60 @@ enum class PositionType : uint8_t
     Relative
 };
 
+struct FlexBasis
+{
+    enum class Type : uint8_t { Auto, Px, Percent, Content };
+
+    Type type{ Type::Auto };
+    float value{ 0.f };
+};
+
+struct FlexContainerStyle
+{
+    FlexDirection direction{ FlexDirection::Row };
+    FlexWrap wrap{ FlexWrap::NoWrap };
+    JustifyContent justify{ JustifyContent::FlexStart };
+    AlignItems alignItems{ AlignItems::Stretch };
+    AlignContent alignContent{ AlignContent::Stretch };
+    int rowGap{ 0 };
+    int columnGap{ 0 };
+};
+
+struct FlexItemStyle
+{
+    int order{ 0 };
+    float flexGrow{ 0.f };
+    float flexShrink{ 1.f };
+    FlexBasis basis{};
+    AlignSelf alignSelf{ AlignSelf::Auto };
+};
+
+struct UIWidgetStyle
+{
+    DisplayType display{ DisplayType::Inline };
+    PositionType position{ PositionType::Static };
+    FlexDirection flexDirection{ FlexDirection::Row };
+    FlexWrap flexWrap{ FlexWrap::NoWrap };
+    JustifyContent justifyContent{ JustifyContent::FlexStart };
+    AlignItems alignItems{ AlignItems::Stretch };
+    AlignContent alignContent{ AlignContent::Stretch };
+    int rowGap{ 0 };
+    int columnGap{ 0 };
+    int order{ 0 };
+    float flexGrow{ 0.f };
+    float flexShrink{ 1.f };
+    FlexBasis flexBasis{};
+    AlignSelf alignSelf{ AlignSelf::Auto };
+    SizeUnit width{};
+    SizeUnit height{};
+    int minWidth{ 0 };
+    int minHeight{ 0 };
+    int maxWidth{ 0 };
+    int maxHeight{ 0 };
+    bool marginLeftAuto{ false };
+    bool marginRightAuto{ false };
+};
+
 // @bindclass
 class UIWidget : public LuaObject
 {
@@ -187,6 +296,8 @@ public:
     ~UIWidget() override;
     virtual void drawSelf(DrawPoolType drawPane);
     virtual void draw(const Rect& visibleRect, DrawPoolType drawPane);
+    const UIWidgetStyle& style() const;
+
 protected:
     virtual void drawChildren(const Rect& visibleRect, DrawPoolType drawPane);
 
@@ -215,11 +326,15 @@ protected:
     JustifyItemsType m_JustifyItems = JustifyItemsType::Normal;
     OverflowType m_overflowType = OverflowType::Hidden;
     PositionType m_positionType = PositionType::Static;
+    uint32_t m_flexLayoutVersion = 0;
 
     SizeUnit m_width;
     SizeUnit m_height;
     SizeUnit m_lineHeight;
     EdgeGroup<SizeUnit> m_positions;
+    FlexContainerStyle m_flexContainer;
+    FlexItemStyle m_flexItem;
+    mutable UIWidgetStyle m_styleCache;
 
     UILayoutPtr m_layout;
 
@@ -312,6 +427,31 @@ public:
     void setFloat(FloatType type) { m_floatType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setClear(ClearType type) { m_clearType = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
     void setJustifyItems(JustifyItemsType type) { m_JustifyItems = type;  scheduleHtmlTask(PropApplyAnchorAlignment); }
+    void setFlexDirection(FlexDirection direction);
+    void setFlexWrap(FlexWrap wrap);
+    void setJustifyContent(JustifyContent justify);
+    void setAlignItems(AlignItems align);
+    void setAlignContent(AlignContent align);
+    void setRowGap(int gap);
+    void setColumnGap(int gap);
+    void setGap(int rowGap, int columnGap);
+    void setFlexOrder(int order);
+    void setFlexGrow(float grow);
+    void setFlexShrink(float shrink);
+    void setFlexBasis(const FlexBasis& basis);
+    void setAlignSelf(AlignSelf align);
+    FlexDirection getFlexDirection() const { return m_flexContainer.direction; }
+    FlexWrap getFlexWrap() const { return m_flexContainer.wrap; }
+    JustifyContent getJustifyContent() const { return m_flexContainer.justify; }
+    AlignItems getAlignItems() const { return m_flexContainer.alignItems; }
+    AlignContent getAlignContent() const { return m_flexContainer.alignContent; }
+    int getRowGap() const { return m_flexContainer.rowGap; }
+    int getColumnGap() const { return m_flexContainer.columnGap; }
+    int getFlexOrder() const { return m_flexItem.order; }
+    float getFlexGrow() const { return m_flexItem.flexGrow; }
+    float getFlexShrink() const { return m_flexItem.flexShrink; }
+    const FlexBasis& getFlexBasis() const { return m_flexItem.basis; }
+    AlignSelf getAlignSelf() const { return m_flexItem.alignSelf; }
     void setHtmlNode(const HtmlNodePtr& node) { m_htmlNode = node; }
     void setOverflow(OverflowType type);
     void setPositionType(PositionType t) {
@@ -444,6 +584,7 @@ private:
 
     void updateTableLayout();
     void applyAnchorAlignment();
+    void layoutFlexChildren();
     void scheduleHtmlTask(FlagProp prop);
 
     OTMLNodePtr m_stateStyle;
@@ -574,6 +715,8 @@ protected:
     EdgeGroup<> m_borderWidth;
     EdgeGroup<> m_margin;
     EdgeGroup<> m_padding;
+    bool m_marginLeftAuto{ false };
+    bool m_marginRightAuto{ false };
     float m_opacity{ 1.f };
     float m_rotation{ 0.f };
     uint16_t m_autoRepeatDelay{ 500 };
@@ -632,13 +775,15 @@ public:
     void setBorderColorRight(const Color& color) { m_borderColor.right = color; repaint(); }
     void setBorderColorBottom(const Color& color) { m_borderColor.bottom = color; repaint(); }
     void setBorderColorLeft(const Color& color) { m_borderColor.left = color; repaint(); }
-    void setMargin(const int margin) { m_margin.set(margin); updateParentLayout(); }
-    void setMarginHorizontal(const int margin) { m_margin.right = m_margin.left = margin; updateParentLayout(); }
+    void setMargin(const int margin) { m_margin.set(margin); m_marginLeftAuto = m_marginRightAuto = false; updateParentLayout(); }
+    void setMarginHorizontal(const int margin) { m_margin.right = m_margin.left = margin; m_marginLeftAuto = m_marginRightAuto = false; updateParentLayout(); }
     void setMarginVertical(const int margin) { m_margin.bottom = m_margin.top = margin; updateParentLayout(); }
     void setMarginTop(const int margin) { m_margin.top = margin; updateParentLayout(); }
-    void setMarginRight(const int margin) { m_margin.right = margin; updateParentLayout(); }
+    void setMarginRight(const int margin) { m_margin.right = margin; m_marginRightAuto = false; updateParentLayout(); }
     void setMarginBottom(const int margin) { m_margin.bottom = margin; updateParentLayout(); }
-    void setMarginLeft(const int margin) { m_margin.left = margin; updateParentLayout(); }
+    void setMarginLeft(const int margin) { m_margin.left = margin; m_marginLeftAuto = false; updateParentLayout(); }
+    void setMarginLeftAuto(bool v = true) { m_marginLeftAuto = v; updateParentLayout(); }
+    void setMarginRightAuto(bool v = true) { m_marginRightAuto = v; updateParentLayout(); }
     void setPadding(const int padding) { m_padding.top = m_padding.right = m_padding.bottom = m_padding.left = padding; updateLayout(); }
     void setPaddingHorizontal(const int padding) { m_padding.right = m_padding.left = padding; updateLayout(); }
     void setPaddingVertical(const int padding) { m_padding.bottom = m_padding.top = padding; updateLayout(); }
@@ -694,6 +839,8 @@ public:
     int getMarginRight() { return m_margin.right; }
     int getMarginBottom() { return m_margin.bottom; }
     int getMarginLeft() { return m_margin.left; }
+    bool isMarginLeftAuto() const { return m_marginLeftAuto; }
+    bool isMarginRightAuto() const { return m_marginRightAuto; }
     int getPaddingTop() { return m_padding.top; }
     int getPaddingRight() { return m_padding.right; }
     int getPaddingBottom() { return m_padding.bottom; }
