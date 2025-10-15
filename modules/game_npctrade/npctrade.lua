@@ -158,27 +158,83 @@ function init()
   
   npcWindow:setup()
 
-  -- Override minimize/maximize handlers to ensure proper hiding of content
-  npcWindow.onMinimize = function(self)
-    -- Hide all content panels when minimized
-    if itemsPanel then itemsPanel:setVisible(false) end
-    if setupPanel then setupPanel:setVisible(false) end
-    if headPanel then headPanel:setVisible(false) end
-    local scrollBar = self:getChildById('miniwindowScrollBar')
-    if scrollBar then scrollBar:setVisible(false) end
-    local bottomBorder = self:getChildById('bottomResizeBorder')  
-    if bottomBorder then bottomBorder:setVisible(false) end
+  -- Store original minimize/maximize methods
+  local originalMinimize = npcWindow.minimize
+  local originalMaximize = npcWindow.maximize
+  
+  -- Store references to elements that should be hidden during minimize
+  local elementsToHide = {}
+  
+  npcWindow.minimize = function(self, dontSave)
+    -- First call original minimize to handle basic window sizing
+    originalMinimize(self, dontSave)
+    
+    -- Hide ALL content elements - be very aggressive
+    local allElements = {
+      'headPanel',
+      'contentsPanel', 
+      'setupPanel',
+      'miniwindowScrollBar',
+      'bottomResizeBorder',
+      'itemBorder',
+      'currencyItem'
+    }
+    
+    elementsToHide = {}
+    for _, elementId in ipairs(allElements) do
+      local element = self:recursiveGetChildById(elementId)
+      if element and element:isVisible() then
+        table.insert(elementsToHide, element)
+        element:setVisible(false)
+        element:hide()
+      end
+    end
+    
+    -- Hide all dynamic content in itemsPanel (both BUY and SELL items)
+    if itemsPanel then
+      local itemChildren = itemsPanel:getChildren()
+      for _, itemChild in ipairs(itemChildren) do
+        if itemChild:isVisible() then
+          table.insert(elementsToHide, itemChild)
+          itemChild:setVisible(false)
+          itemChild:hide()
+        end
+      end
+    end
+    
+    -- Also hide any direct children that might be panels
+    local children = self:getChildren()
+    for _, child in ipairs(children) do
+      local className = child:getClassName()
+      if className == 'FlatPanel' or className == 'UIScrollArea' or className == 'VerticalScrollBar' then
+        if child:isVisible() and child:getId() ~= 'miniwindowHeader' and child:getId() ~= 'miniwindowHeaderBorder' then
+          table.insert(elementsToHide, child)
+          child:setVisible(false)
+          child:hide()
+        end
+      end
+    end
   end
-
-  npcWindow.onMaximize = function(self)
-    -- Show all content panels when maximized
-    if itemsPanel then itemsPanel:setVisible(true) end
-    if setupPanel then setupPanel:setVisible(true) end
-    if headPanel then headPanel:setVisible(true) end
-    local scrollBar = self:getChildById('miniwindowScrollBar')
-    if scrollBar then scrollBar:setVisible(true) end
-    local bottomBorder = self:getChildById('bottomResizeBorder')
-    if bottomBorder then bottomBorder:setVisible(true) end
+  
+  npcWindow.maximize = function(self, dontSave)
+    -- First call original maximize
+    originalMaximize(self, dontSave)
+    
+    -- Restore all hidden elements
+    for _, element in ipairs(elementsToHide) do
+      if element then
+        element:setVisible(true)
+        element:show()
+      end
+    end
+    elementsToHide = {}
+    
+    -- Refresh the trade items to ensure correct content is shown for current trade type
+    scheduleEvent(function()
+      refreshTradeItems()
+      refreshPlayerGoods()
+      updateScrollbarVisibility()
+    end, 100)
   end
 
 
@@ -410,6 +466,9 @@ function onTradeTypeChange(radioTabs, selected, deselected)
 
   refreshTradeItems()
   refreshPlayerGoods()
+  
+  -- Ensure scrollbar is properly connected after mode change
+  scheduleEvent(updateScrollbarVisibility, 50)
 end
 
 function onTradeClick()
@@ -728,9 +787,6 @@ function refreshTradeItems()
 
   local currentTradeItems = tradeItems[getCurrentTradeType()]
   for key, item in ipairs(currentTradeItems) do
-    if getCurrentTradeType() == SELL and not canTradeItem(item) then
-      goto continue
-    end
     local itemBox = g_ui.createWidget('NPCItemBox', itemsPanel)
     itemBox:setId("itemBox_" .. item.name)
     itemBox.item = item
@@ -759,12 +815,62 @@ function refreshTradeItems()
     end
 
     radioItems:addWidget(itemBox)
-    ::continue::
   end
 
   if layout then
     layout:enableUpdates()
     layout:update()
+  end
+  
+  -- Control scrollbar visibility based on content height
+  updateScrollbarVisibility()
+end
+
+function updateScrollbarVisibility()
+  if not npcWindow or not itemsPanel then
+    return
+  end
+  
+  -- Don't show scrollbar if window is minimized
+  if npcWindow:isOn() then
+    return
+  end
+  
+  local scrollBar = npcWindow:recursiveGetChildById('miniwindowScrollBar')
+  if not scrollBar then
+    return
+  end
+  
+  -- Ensure scrollbar is properly connected to the content panel
+  itemsPanel:setVerticalScrollBar(scrollBar)
+  
+  -- Force scrollbar to reset its position and range
+  scrollBar:setValue(0)
+  scrollBar:setMaximum(0)
+  
+  -- Count only visible items to get accurate content height
+  local visibleItemCount = 0
+  for i = 1, itemsPanel:getChildCount() do
+    local child = itemsPanel:getChildByIndex(i)
+    if child and child:isVisible() then
+      visibleItemCount = visibleItemCount + 1
+    end
+  end
+  
+  -- Get the content height and available height
+  local contentHeight = visibleItemCount * 35 -- Each NPCItemBox is 35 height
+  local availableHeight = itemsPanel:getHeight()
+  
+  -- Show scrollbar only if content is greater than 50 height and exceeds available space
+  if contentHeight > 50 and contentHeight > availableHeight then
+    scrollBar:setVisible(true)
+    scrollBar:show()
+    -- Set proper scrollbar range
+    scrollBar:setMaximum(math.max(0, contentHeight - availableHeight))
+    scrollBar:setValue(0) -- Reset to top when content changes
+  else
+    scrollBar:setVisible(false)
+    scrollBar:hide()
   end
 end
 
@@ -822,7 +928,7 @@ function refreshPlayerGoods()
     local searchFilterEscaped = string.searchEscape(searchFilter)
     local searchCondition = (searchFilterEscaped == '') or
     (searchFilterEscaped ~= '' and item and item.name and string.find(item.name:lower(), searchFilterEscaped) ~= nil)
-    local showAllItemsCondition = (currentTradeType == BUY) or (currentTradeType == SELL and canTrade)
+    local showAllItemsCondition = (currentTradeType == BUY) or (currentTradeType == SELL)
     itemWidget:setVisible(searchCondition and showAllItemsCondition)
 
     if selectedItem == item and itemWidget:isEnabled() and itemWidget:isVisible() then
@@ -837,6 +943,9 @@ function refreshPlayerGoods()
   if selectedItem then
     refreshItem(selectedItem)
   end
+  
+  -- Control scrollbar visibility based on content height
+  updateScrollbarVisibility()
 end
 
 function onOpenNpcTrade(items, currencyId, currencyName)
