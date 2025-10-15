@@ -1,4 +1,4 @@
-WarningQuickWindow < NewMainWindow
+WarningQuickWindow < MainWindow
   id: textWindow
   !text: tr('Quick Sell Warning')
   size: 313 445
@@ -140,7 +140,7 @@ ItemQuickSell < UIWidget
     image-clip: 0 0 12 12
     @onCheckChange:
 
-NewMainWindow
+MainWindow
   id: window
   anchors.horizontalCenter: parent.horizontalCenter
   !text: tr('Quick Sell Items List')

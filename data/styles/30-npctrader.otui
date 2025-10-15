@@ -107,14 +107,13 @@ NpcWindow < MiniWindow
 
   VerticalScrollBar
     id: miniwindowScrollBar
-    height: 214
     anchors.top: headPanel.bottom
-    anchors.bottom: next.top
+    anchors.bottom: setupPanel.top
     anchors.right: parent.right
     step: 15
     margin-right: 5
-    margin-bottom: 1
-    margin-top: 1
+    margin-bottom: 2
+    margin-top: 2
     pixels-scroll: true
 
   FlatPanel
@@ -278,7 +277,8 @@ NpcWindowContents < TextList
   anchors.left: parent.left
   anchors.right: miniwindowScrollBar.left
   anchors.bottom: setupPanel.top
-  margin-left: 1
+  margin-left: 3
+  margin-right: 2
   margin-bottom: 2
   margin-top: 2
   vertical-scrollbar: miniwindowScrollBar
