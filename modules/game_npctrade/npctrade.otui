@@ -75,8 +75,6 @@ NpcWindow
     !text: tr('NPC Trade')
     color: #9d9d9dff
 
-  NpcWindowContents
-
   UIWidget
     id: miniborder
     anchors.bottom: parent.bottom
