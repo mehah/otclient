@@ -935,6 +935,7 @@ private:
 
 protected:
     virtual void updateText();
+    virtual bool isTextEdit() { return false; }
     void drawText(const Rect& screenCoords);
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);

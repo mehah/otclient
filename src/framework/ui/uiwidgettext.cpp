@@ -166,7 +166,7 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
     const std::string oldText = m_text;
     m_text = _text;
 
-    if (isOnHtml()) {
+    if (isOnHtml() && !isTextEdit()) {
         auto whiteSpace = m_htmlNode->getStyle("white-space");
         if (whiteSpace.empty())
             whiteSpace = "normal";
@@ -174,7 +174,6 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         setProp(PropTextHorizontalAutoResize, false);
         setProp(PropTextVerticalAutoResize, false);
 
-        auto originalText = m_text;
         { // get text size without wrap
             m_textAlign = Fw::AlignTopLeft;
             stdext::trimSpacesAndNewlines(m_text);
@@ -182,6 +181,7 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
             updateText();
             m_textSizeNowrap = m_textSize;
         }
+        m_text = _text;
 
         setProp(PropTextWrap, true);
         if (whiteSpace == "normal") {
@@ -210,8 +210,9 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 
             m_text.swap(out);
             setProp(PropTextWrap, false);
-        } else
-            m_text = originalText; // pre, pre-wrap
+        } else {
+            setProp(PropTextWrap, whiteSpace == "pre-wrap"); // pre, pre-wrap
+        }
     }
 
     updateText();
