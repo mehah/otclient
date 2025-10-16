@@ -281,6 +281,7 @@
                 id="auto-reroll"
                 type="checkbox"
                 *checked="slot.autoReroll"
+                onchange="self:autoOptions(slot.slotId, 1)"
               />
               <label for="auto-reroll">Automatic Bonus Reroll</label></span
             >
@@ -295,7 +296,12 @@
           </div>
           <div class="options-container">
             <span class="options-wrapper">
-              <input id="lock-prey" type="checkbox" *checked="slot.lockPrey" />
+              <input
+                id="lock-prey"
+                type="checkbox"
+                *checked="slot.lockPrey"
+                onchange="self:autoOptions(slot.slotId, 2)"
+              />
               <label for="lock-prey">Lock Prey</label></span
             >
             <span class="options-cost">
@@ -340,8 +346,8 @@
             onclick="self:openStore(1)"
           />
         </div>
-        <button onclick="self:hide()" style="width: 40px">Close</button>
       </div>
+      <button class="close-btn">Close</button>
     </div>
   </window>
 </html>

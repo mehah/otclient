@@ -385,6 +385,7 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
 
     for i = 1, #PreyController.preyData[slotId].raceListOriginal do
         local data = PreyController.preyData[slotId].raceListOriginal[i]
+        data.index = i
         if i <= 50 then -- show only first 50 initially to not LAG UI
             table.insert(PreyController.preyData[slotId].raceList, data)
         end
@@ -558,11 +559,14 @@ function PreyController:onMouseWheel(slotId)
 end
 
 local confirmWindow
-local function showPreyConfirmationWindow(title, description, confirmAction, afterCloseAction)
+local function showPreyConfirmationWindow(title, description, confirmAction, afterCloseAction, cancelAction)
     -- toggle()
 
 
     local function closeWindow()
+        if cancelAction and type(cancelAction) == "function" then
+            cancelAction()
+        end
         if confirmWindow then
             confirmWindow:destroy()
             confirmWindow = nil
@@ -713,4 +717,57 @@ function PreyController:listReroll(slotId)
     showPreyConfirmationWindow('Confirmation of Using List Reroll', description, function()
         g_game.preyAction(slotId, PREY_ACTION_LISTREROLL, 0)
     end, restorePreyWindow)
+end
+
+function PreyController:autoOptions(slotId, option)
+    local field = ""
+    if option == PREY_OPTION_TOGGLE_AUTOREROLL then
+        field = "autoReroll"
+    else
+        field = "lockPrey"
+    end
+
+    if self.preyData[slotId + 1][field] then
+        self.preyData[slotId + 1][field] = false
+        g_game.preyAction(slotId, PREY_ACTION_OPTION, PREY_OPTION_UNTOGGLE)
+        return
+    end
+
+    local description = ""
+
+    if option == PREY_OPTION_TOGGLE_AUTOREROLL then
+        description = string.format(
+            "Do you want to enable the Automatic Bonus Reroll?\nEach time the Automatic Bonus Reroll is triggered, %d of your Prey Wildcards will be consumed.",
+            self.rerollBonusPrice, self.wildcards)
+    elseif option == PREY_OPTION_TOGGLE_LOCK_PREY then
+        description = string.format(
+            "Do you want to enable the Lock Prey?\nEach time the Lock Prey is triggered, %d of your Prey Wildcards will be consumed.",
+            self.lockPreyPrice, self.wildcards)
+    end
+
+    local shouldRestoreWindow = self.ui and self.ui:isVisible()
+    if shouldRestoreWindow then
+        self:hide()
+    end
+
+    local function restorePreyWindow()
+        if shouldRestoreWindow then
+            show()
+        end
+    end
+
+    showPreyConfirmationWindow('Confirmation of Using List Reroll', description, function()
+        self.preyData[slotId + 1][field] = not self.preyData[slotId + 1][field]
+
+        if self.preyData[slotId + 1][field] then
+            if field == "autoReroll" then
+                self.preyData[slotId + 1]["lockPrey"] = false
+            else
+                self.preyData[slotId + 1]["autoReroll"] = false
+            end
+        end
+        g_game.preyAction(slotId, PREY_ACTION_OPTION, option)
+    end, restorePreyWindow, function()
+        self.preyData[slotId + 1][field] = self.preyData[slotId + 1][field]
+    end)
 end
