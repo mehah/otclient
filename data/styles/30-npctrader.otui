@@ -11,7 +11,7 @@ NpcWindow < MiniWindow
     height: 64
     margin-left: 3
     margin-right: 3
-    margin-top: 2
+    margin-top: 0
 
     Label
       font: verdana-11px-monochrome
@@ -111,13 +111,26 @@ NpcWindow < MiniWindow
     anchors.bottom: setupPanel.top
     anchors.right: parent.right
     step: 15
-    margin-right: 5
-    margin-bottom: 2
-    margin-top: 2
+    margin-right: 3
+    margin-bottom: 0
+    margin-top: 0
     pixels-scroll: true
 
     $!on:
       width: 0
+
+  TextList
+    id: contentsPanel
+    anchors.top: headPanel.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: setupPanel.top
+    margin-left: 3
+    margin-right: 0
+    margin-bottom: 0
+    margin-top: 0
+    vertical-scrollbar: miniwindowScrollBar
+    focusable: false
 
   FlatPanel
     id: setupPanel
@@ -273,15 +286,3 @@ NpcWindow < MiniWindow
     minimum: 192
     margin-left: 3
     margin-right: 3
-
-NpcWindowContents < TextList
-  id: contentsPanel
-  anchors.top: headPanel.bottom
-  anchors.left: parent.left
-  anchors.right: miniwindowScrollBar.left
-  anchors.bottom: setupPanel.top
-  margin-left: 3
-  margin-right: 2
-  margin-bottom: 2
-  margin-top: 2
-  vertical-scrollbar: miniwindowScrollBar
