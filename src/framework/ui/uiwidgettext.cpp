@@ -174,14 +174,7 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         setProp(PropTextHorizontalAutoResize, false);
         setProp(PropTextVerticalAutoResize, false);
 
-        { // get text size without wrap
-            m_textAlign = Fw::AlignTopLeft;
-            stdext::trimSpacesAndNewlines(m_text);
-            setProp(PropTextWrap, false);
-            updateText();
-            m_textSizeNowrap = m_textSize;
-        }
-        m_text = _text;
+        updateHtmlTextSize();
 
         setProp(PropTextWrap, true);
         if (whiteSpace == "normal") {
@@ -268,9 +261,26 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     }
 }
 
+void UIWidget::updateHtmlTextSize() {
+    if (isOnHtml()) {
+        auto text = m_text;
+        auto textAlign = m_textAlign;
+        { // get text size without wrap
+            m_textAlign = Fw::AlignTopLeft;
+            stdext::trimSpacesAndNewlines(m_text);
+            setProp(PropTextWrap, false);
+            updateText();
+            m_textSizeNowrap = m_textSize;
+        }
+        m_text = text;
+        m_textAlign = textAlign;
+    }
+}
+
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
+    updateHtmlTextSize();
     updateText();
     onFontChange(fontName);
 }
