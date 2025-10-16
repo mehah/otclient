@@ -37,6 +37,7 @@ input {
   width: 80;
   height: 20;
   padding: 2;
+  white-space: pre;
 }
 
 input:disabled {
