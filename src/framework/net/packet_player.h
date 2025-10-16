@@ -29,7 +29,7 @@
 class PacketPlayer : public LuaObject {
 public:
     PacketPlayer(const std::string_view& file);
-    virtual ~PacketPlayer();
+    ~PacketPlayer() override;
 
     void start(std::function<void(std::shared_ptr<std::vector<uint8_t>>)> recvCallback, std::function<void(std::error_code)> disconnectCallback);
     void stop();

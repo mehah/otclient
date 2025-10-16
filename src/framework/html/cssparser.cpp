@@ -34,10 +34,10 @@ namespace css {
         };
 
         static inline bool isNthLike(const std::string& name) {
-            return name.rfind("nth-child", 0) == 0
-                || name.rfind("nth-last-child", 0) == 0
-                || name.rfind("nth-of-type", 0) == 0
-                || name.rfind("nth-last-of-type", 0) == 0;
+            return name.starts_with("nth-child")
+                || name.starts_with("nth-last-child")
+                || name.starts_with("nth-of-type")
+                || name.starts_with("nth-last-of-type");
         }
 
         static inline bool isStructuralPseudo(const std::string& name) {
@@ -81,10 +81,10 @@ namespace css {
             };
 
             auto isNthLike = [](const std::string& name) {
-                return name.rfind("nth-child", 0) == 0
-                    || name.rfind("nth-last-child", 0) == 0
-                    || name.rfind("nth-of-type", 0) == 0
-                    || name.rfind("nth-last-of-type", 0) == 0;
+                return name.starts_with("nth-child")
+                    || name.starts_with("nth-last-child")
+                    || name.starts_with("nth-of-type")
+                    || name.starts_with("nth-last-of-type");
             };
 
             for (size_t i = 0; i < sel.size();) {
@@ -142,11 +142,11 @@ namespace css {
                                 for (const auto& part : parts) collect_pseudos(part, outPseudos, negated);
                             } else {
                                 if (kEventPseudos.count(name))
-                                    outPseudos.push_back({ name, negated });
+                                    outPseudos.push_back({.name = name, .negated = negated });
                             }
                         } else {
                             if (kEventPseudos.count(name))
-                                outPseudos.push_back({ name, negated });
+                                outPseudos.push_back({.name = name, .negated = negated });
                         }
                     }
                     continue;
@@ -199,8 +199,9 @@ namespace css {
             auto parts = split_selector_list(inside);
             std::string out;
             bool any = false;
-            for (size_t k = 0; k < parts.size(); ++k) {
-                std::string p = strip_pseudos_for_filter(parts[k]);
+            for (const auto& part : parts)
+            {
+                std::string p = strip_pseudos_for_filter(part);
                 detail::trim_inplace(p);
                 if (p == "*") p.clear();
                 if (!p.empty()) {
@@ -219,10 +220,10 @@ namespace css {
             };
 
             auto isNthLike = [](const std::string& name) {
-                return name.rfind("nth-child", 0) == 0
-                    || name.rfind("nth-last-child", 0) == 0
-                    || name.rfind("nth-of-type", 0) == 0
-                    || name.rfind("nth-last-of-type", 0) == 0;
+                return name.starts_with("nth-child")
+                    || name.starts_with("nth-last-child")
+                    || name.starts_with("nth-of-type")
+                    || name.starts_with("nth-last-of-type");
             };
             auto isStructural = [&](const std::string& name) {
                 if (isNthLike(name)) return true;
@@ -373,7 +374,7 @@ namespace css {
                         else if (c == '}') { if (--depth == 0) { ++i; break; } }
                     }
                     std::string inner = s.substr(blockStart, (i - blockStart - 1));
-                    items.push_back({ "", inner, true, prelude });
+                    items.push_back({.selectors = "", .block = inner, .is_at_media = true, .at_prelude = prelude });
                     continue;
                 }
                 size_t selStart = i;
@@ -391,7 +392,7 @@ namespace css {
                     else if (c == '}') { if (--depth == 0) { ++i; break; } }
                 }
                 std::string block = s.substr(blockStart, (i - blockStart - 1));
-                items.push_back({ selectors, block, false, {} });
+                items.push_back({.selectors = selectors, .block = block, .is_at_media = false, .at_prelude = {} });
             }
             return items;
         }
@@ -443,7 +444,7 @@ namespace css {
                     if (prop.starts_with("--"))
                         prop.erase(0, 2);
 
-                    out.push_back({ prop, val, important });
+                    out.push_back({.property = prop, .value = val, .important = important });
                 }
                 if (i < N && s[i] == ';') ++i;
             }

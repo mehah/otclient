@@ -52,8 +52,8 @@ struct PartyMemberName {
     uint32_t memberID;
     std::string memberName;
     
-    PartyMemberName(uint32_t id, const std::string& name)
-        : memberID(id), memberName(name) {}
+    PartyMemberName(uint32_t id, std::string name)
+        : memberID(id), memberName(std::move(name)) {}
 };
 
 class ProtocolGame final : public Protocol

@@ -303,12 +303,12 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
                 append = !append;
         }
 
-        for (stackPos = 0; stackPos < size; ++stackPos) {
+        for (stackPos = 0; std::cmp_less(stackPos, size); ++stackPos) {
             const int otherPriority = m_things[stackPos]->getStackPriority();
             if ((append && otherPriority > priority) || (!append && otherPriority >= priority))
                 break;
         }
-    } else if (stackPos > static_cast<int>(size))
+    } else if (std::cmp_greater(stackPos, size))
         stackPos = size;
 
     markHighlightedThing(Color::white);
@@ -381,7 +381,7 @@ bool Tile::removeThing(const ThingPtr thing)
 
 ThingPtr Tile::getThing(const int stackPos)
 {
-    if (stackPos >= 0 && stackPos < static_cast<int>(m_things.size()))
+    if (stackPos >= 0 && std::cmp_less(stackPos, m_things.size()))
         return m_things[stackPos];
 
     return nullptr;
@@ -643,7 +643,7 @@ bool Tile::isCompletelyCovered(const uint8_t firstFloor, const bool resetCache)
 
 bool Tile::isCovered(const int8_t firstFloor)
 {
-    if (m_position.z == 0 || m_position.z == firstFloor) return false;
+    if (m_position.z == 0 || std::cmp_equal(m_position.z, firstFloor)) return false;
 
     const uint32_t idChecked = 1 << firstFloor;
     const uint32_t idState = 1 << (firstFloor + g_gameConfig.getMapMaxZ());

@@ -27,6 +27,8 @@
 #include "textureatlas.h"
 
 #include <framework/otml/otml.h>
+
+
 #include "drawpoolmanager.h"
 
 static thread_local std::vector<Point> s_glyphsPositions(1);
@@ -302,9 +304,9 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
         return;
     }
 
-    if (static_cast<int>(glyphsPositions.size()) < textLength)
+    if (std::cmp_less(glyphsPositions.size(), textLength))
         glyphsPositions.resize(textLength);
-    if (static_cast<int>(glyphsPositions.capacity()) < textLength)
+    if (std::cmp_less(glyphsPositions.capacity(), textLength))
         glyphsPositions.reserve(std::max(1024, textLength));
 
     const unsigned char* p = reinterpret_cast<const unsigned char*>(text.data());

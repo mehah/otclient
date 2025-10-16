@@ -127,14 +127,15 @@ void MapView::drawFloor()
 
     const uint32_t flags = Otc::DrawThings;
 
-    for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
+    for (int_fast8_t z = m_floorMax; std::cmp_greater_equal(z, m_floorMin); --z) {
         const float fadeLevel = getFadeLevel(z);
         if (fadeLevel == 0.f) break;
         if (fadeLevel < .99f)
             g_drawPool.setOpacity(fadeLevel);
 
         Position _camera = cameraPosition;
-        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
+        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && std::cmp_less(z, m_cachedFirstVisibleFloor)
+            && _camera.coveredUp(cameraPosition.z - z);
 
         const auto& map = m_floors[z].cachedVisibleTiles;
 
@@ -186,12 +187,13 @@ void MapView::drawFloor()
 void MapView::drawLights() {
     const auto& cameraPosition = m_posInfo.camera;
 
-    for (int_fast8_t z = m_floorMax; z >= m_floorMin; --z) {
+    for (int_fast8_t z = m_floorMax; std::cmp_greater_equal(z, m_floorMin); --z) {
         const float fadeLevel = getFadeLevel(z);
         if (fadeLevel == 0.f) break;
 
         Position _camera = cameraPosition;
-        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && z < m_cachedFirstVisibleFloor && _camera.coveredUp(cameraPosition.z - z);
+        const bool alwaysTransparent = m_floorViewMode == ALWAYS_WITH_TRANSPARENCY && std::cmp_less(z, m_cachedFirstVisibleFloor)
+            && _camera.coveredUp(cameraPosition.z - z);
 
         const auto& map = m_floors[z].cachedVisibleTiles;
 
@@ -320,19 +322,19 @@ void MapView::updateVisibleTiles()
     // Fading System by Kondra https://github.com/OTCv8/otclientv8
     if (!m_lastCameraPosition.isValid() || m_lastCameraPosition.z != m_posInfo.camera.z || m_lastCameraPosition.distance(m_posInfo.camera) >= 3) {
         m_fadeType = FadeType::NONE;
-        for (int iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (int iz = m_cachedLastVisibleFloor; std::cmp_greater_equal(iz, cachedFirstVisibleFloor); --iz) {
             m_floors[iz].fadingTimers.restart(m_floorFading);
         }
     } else if (prevFirstVisibleFloor < m_cachedFirstVisibleFloor) { // hiding new floor
         m_fadeType = FadeType::FADE_OUT;
-        for (int iz = prevFirstVisibleFloor; iz < m_cachedFirstVisibleFloor; ++iz) {
+        for (int iz = prevFirstVisibleFloor; std::cmp_less(iz, m_cachedFirstVisibleFloor); ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
             m_floors[iz].fadingTimers.restart(shift);
         }
     } else if (prevFirstVisibleFloor > m_cachedFirstVisibleFloor) { // showing floor
         m_fadeType = FadeType::FADE_IN;
         m_fadeFinish = false;
-        for (int iz = m_cachedFirstVisibleFloor; iz < prevFirstVisibleFloor; ++iz) {
+        for (int iz = m_cachedFirstVisibleFloor; std::cmp_less(iz, prevFirstVisibleFloor); ++iz) {
             const int shift = std::max<int>(0, m_floorFading - m_floors[iz].fadingTimers.ticksElapsed());
             m_floors[iz].fadingTimers.restart(shift);
         }
@@ -348,11 +350,12 @@ void MapView::updateVisibleTiles()
     const uint32_t numDiagonals = m_drawDimension.width() + m_drawDimension.height() - 1;
 
     auto processDiagonalRange = [&](std::vector<FloorData>& floors, uint32_t start, uint32_t end) {
-        for (int_fast32_t iz = m_cachedLastVisibleFloor; iz >= cachedFirstVisibleFloor; --iz) {
+        for (int_fast32_t iz = m_cachedLastVisibleFloor; std::cmp_greater_equal(iz, cachedFirstVisibleFloor); --iz) {
             auto& floor = floors[iz].cachedVisibleTiles;
 
             for (uint_fast32_t diagonal = start; diagonal < end; ++diagonal) {
-                const auto advance = (static_cast<size_t>(diagonal) >= static_cast<size_t>(m_drawDimension.height())) ? diagonal - static_cast<size_t>(m_drawDimension.height()) : 0;
+                const auto advance = (std::cmp_greater_equal(diagonal, m_drawDimension.height()))
+                    ? diagonal - static_cast<size_t>(m_drawDimension.height()) : 0;
                 for (int iy = diagonal - advance, ix = advance; iy >= 0 && ix < m_drawDimension.width(); --iy, ++ix) {
                     auto tilePos = m_posInfo.camera.translated(ix - m_virtualCenterOffset.x, iy - m_virtualCenterOffset.y);
                     tilePos.coveredUp(m_posInfo.camera.z - iz);
@@ -378,9 +381,9 @@ void MapView::updateVisibleTiles()
                         }
 
                         if (addTile || !floor.shades.empty()) {
-                            if (iz < m_floorMin)
+                            if (std::cmp_less(iz, m_floorMin))
                                 m_floorMin = iz;
-                            else if (iz > m_floorMax)
+                            else if (std::cmp_greater(iz, m_floorMax))
                                 m_floorMax = iz;
                         }
                     }

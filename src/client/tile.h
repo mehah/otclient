@@ -24,6 +24,8 @@
 
 #include <framework/luaengine/luaobject.h>
 
+
+
 #include "attachableobject.h"
 #include "declarations.h"
 #include "item.h"
@@ -183,7 +185,7 @@ public:
             ;
     }
 
-    bool hasElevation(const int elevation = 1) { return m_elevation >= elevation; }
+    bool hasElevation(const int elevation = 1) { return std::cmp_greater_equal(m_elevation, elevation); }
 
 #ifdef FRAMEWORK_EDITOR
     void overwriteMinimapColor(uint8_t color) { m_minimapColor = color; }

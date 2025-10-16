@@ -203,13 +203,13 @@ namespace {
             if (lower == "auto") {
                 widget->setFlexGrow(1.f);
                 widget->setFlexShrink(1.f);
-                widget->setFlexBasis({ FlexBasis::Type::Auto, 0.f });
+                widget->setFlexBasis({.type = FlexBasis::Type::Auto, .value = 0.f });
                 return;
             }
             if (lower == "none") {
                 widget->setFlexGrow(0.f);
                 widget->setFlexShrink(0.f);
-                widget->setFlexBasis({ FlexBasis::Type::Auto, 0.f });
+                widget->setFlexBasis({.type = FlexBasis::Type::Auto, .value = 0.f });
                 return;
             }
         }

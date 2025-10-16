@@ -212,7 +212,7 @@ public:
     bool wsClose(int operationId);
     bool cancel(int id);
 
-    const std::unordered_map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
+    [[nodiscard]] const std::unordered_map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
 
     void clearDownloads() { m_downloads.clear(); }
 

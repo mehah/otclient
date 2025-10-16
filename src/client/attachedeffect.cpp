@@ -30,6 +30,8 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/graphics/texturemanager.h>
 
+
+
 AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
     if (!g_things.isValidDatId(thingId, category)) {
         g_logger.error("AttachedEffectManager::getInstance({}, {}): invalid thing with id or category.", thingId, static_cast<uint8_t>(category));
@@ -85,7 +87,7 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
             return;
 
         const int animation = getCurrentAnimationPhase();
-        if (m_loop > -1 && animation != m_lastAnimation) {
+        if (m_loop > -1 && std::cmp_not_equal(animation, m_lastAnimation)) {
             m_lastAnimation = animation;
             if (animation == 0 && --m_loop == 0)
                 return;

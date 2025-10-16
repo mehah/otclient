@@ -122,7 +122,7 @@ public:
     bool isFullscreen() { return m_fullscreen; }
     bool hasFocus() { return m_focused; }
 
-    bool vsyncEnabled() const { return m_vsync; }
+    [[nodiscard]] bool vsyncEnabled() const { return m_vsync; }
 
     void setOnClose(const std::function<void()>& onClose) { m_onClose = onClose; }
     void setOnResize(const OnResizeCallback& onResize) { m_onResize = onResize; }
