@@ -525,21 +525,18 @@ function ngfor_exec(content, env, fn)
                 values[idx] = locals[order[idx]]
             end
 
-            local old_keys, old_values, old_key  = FOR_CTX.__keys, FOR_CTX.__values, FOR_CTX.__key
-            local combined_keys, combined_values = combine_for_context(old_keys, old_values, keys_str, values)
-            FOR_CTX.__keys                       = combined_keys
-            FOR_CTX.__values                     = combined_values
-            FOR_CTX.__key                        = evalKey and (pcall(evalKey, menv) and evalKey(menv) or nil) or nil
+            local old_keys, old_values = FOR_CTX.__keys, FOR_CTX.__values
+            FOR_CTX.__keys             = keys_str
+            FOR_CTX.__values           = values
+            FOR_CTX.__key              = evalKey and (pcall(evalKey, menv) and evalKey(menv) or nil) or nil
 
             fn({
-                __keys         = combined_keys,
-                __values       = combined_values,
-                __key          = FOR_CTX.__key,
-                __scope_keys   = keys_str,
-                __scope_values = values
+                __keys   = keys_str,
+                __values = values,
+                __key    = FOR_CTX.__key
             })
 
-            FOR_CTX.__keys, FOR_CTX.__values, FOR_CTX.__key = old_keys, old_values, old_key
+            FOR_CTX.__keys, FOR_CTX.__values = old_keys, old_values
         end
     end
 
@@ -555,37 +552,20 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         local widget = self.widget
 
         local function merge_parent_for_env(base, w)
-            while w do
-                local scope_keys = w.__for_scope_keys or w.__for_keys
-                local scope_values = w.__for_scope_values or w.__for_values
-                if scope_keys and scope_values then
-                    local names = parse_for_names(scope_keys)
-                    if #names > 0 then
-                        local e = {}
-                        local maxn = math.min(#names, scope_values and #scope_values or 0)
-                        for i = 1, maxn do
-                            e[names[i]] = scope_values[i]
-                        end
-                        setmetatable(e, { __index = base })
-                        base = e
-                    end
+            if not w.__for_keys or not w.__for_values then return base end
+            local names = {}
+            for name in string.gmatch(w.__for_keys, "[^,%s]+") do
+                if name ~= "" then
+                    names[#names + 1] = name
                 end
-                w = w:getParent()
             end
-            return base
-        end
-
-        local function collect_parent_for_context(w)
-            local keys, values = '', nil
-            while w do
-                local scope_keys = w.__for_scope_keys or w.__for_keys
-                local scope_values = w.__for_scope_values or w.__for_values
-                if scope_keys and scope_values then
-                    keys, values = combine_for_context(scope_keys, scope_values, keys, values)
-                end
-                w = w:getParent()
+            local e = {}
+            local maxn = math.min(#names, #w.__for_values)
+            for i = 1, maxn do
+                e[names[i]] = w.__for_values[i]
             end
-            return keys, values
+            setmetatable(e, { __index = base })
+            return e
         end
 
         local env          = merge_parent_for_env(baseEnv, widget)
@@ -662,9 +642,8 @@ function UIWidget:__childFor(moduleName, expr, html, index)
                         __w.__for_values = FOR_CTX.__values
                         __w.__for_keys   = FOR_CTX.__keys
                     end
-                    FOR_CTX.__keys   = prev_keys
-                    FOR_CTX.__values = prev_values
-                    FOR_CTX.__key    = prev_key
+                    FOR_CTX.__keys   = ''
+                    FOR_CTX.__values = nil
                 end,
                 onRemove = function(i)
                     local child = widget:getChildByIndex(index + i)
@@ -680,9 +659,6 @@ function UIWidget:__childFor(moduleName, expr, html, index)
                     while nextChild do
                         if not nextChild.__for_values then break end
                         nextChild.__for_values[2] = childIndex
-                        if nextChild.__for_scope_values then
-                            nextChild.__for_scope_values[2] = childIndex
-                        end
                         childIndex = childIndex + 1
                         nextChild = nextChild:getNextWidget()
                     end
@@ -694,8 +670,6 @@ function UIWidget:__childFor(moduleName, expr, html, index)
         end
 
         self.watchList:scan()
-
-        FOR_CTX.__keys, FOR_CTX.__values, FOR_CTX.__key = prev_ctx_keys, prev_ctx_values, prev_ctx_key
     end
 
     WidgetWatch.register({
