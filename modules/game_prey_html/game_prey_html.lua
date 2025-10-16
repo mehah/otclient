@@ -170,6 +170,7 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
             outfit = outfits[i],
             raceId = outfits[i].type,
             slotId = slot,
+            index = i,
         })
     end
 
@@ -239,7 +240,10 @@ end
 
 function PreyController:handleSelect(slot, race)
     PreyController.preyData[slot + 1].previewMonster = {
-        raceId = race.raceId, outfit = race.outfit, name = race.name,
+        raceId = race.raceId,
+        outfit = race.outfit,
+        name = race.name,
+        index = race.index
     }
     self.preyData[slot + 1].monsterName = ("Selected: %s"):format(race.name)
 
@@ -357,7 +361,6 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
 
     for i = 1, #PreyController.preyData[slotId].raceListOriginal do
         local data = PreyController.preyData[slotId].raceListOriginal[i]
-        data.index = i
         if i <= 50 then -- show only first 50 initially to not LAG UI
             table.insert(PreyController.preyData[slotId].raceList, data)
         end
@@ -366,6 +369,7 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
     PreyController.preyData[slotId].type = SLOT_STATE_LIST_SELECTION
+    PreyController:handleResources()
 end
 
 local function clamp(x, a, b) return math.max(a, math.min(b, x)) end
@@ -383,6 +387,7 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
             outfit = outfits[i],
             raceId = outfits[i].type,
             slotId = slot,
+            index = i,
         })
     end
 
@@ -537,7 +542,9 @@ function PreyController:onMouseWheel(slotId)
     local currentCount = #currentRaceList
     local toAdd = 5
     for i = currentCount + 1, math.min(currentCount + toAdd, #originalRaceList) do
-        table.insert(currentRaceList, originalRaceList[i])
+        local data = originalRaceList[i]
+        data.index = i
+        table.insert(currentRaceList, data)
     end
 end
 
@@ -600,8 +607,8 @@ end
 
 function PreyController:handleRerollBonus(slotId)
     local description = tr(string.format(
-        'Are you sure you want to use 1 of your remaining %s Prey Wildcards?',
-        tostring(self.wildcards)
+        'Are you sure you want to use %s of your remaining %s Prey Wildcards?',
+        self.rerollBonusPrice, self.wildcards
     ))
 
     local shouldRestoreWindow = self.ui and self.ui:isVisible()
@@ -620,6 +627,28 @@ function PreyController:handleRerollBonus(slotId)
     end, restorePreyWindow)
 end
 
+function PreyController:handlePickSpecific(slotId)
+    local description = tr(string.format(
+        'Are you sure you want to use %s of your remaining %s Prey Wildcards?',
+        self.pickSpecificPrice, self.wildcards
+    ))
+
+    local shouldRestoreWindow = self.ui and self.ui:isVisible()
+    if shouldRestoreWindow then
+        self:hide()
+    end
+
+    local function restorePreyWindow()
+        if shouldRestoreWindow then
+            show()
+        end
+    end
+
+    showPreyConfirmationWindow('Confirmation of Using Prey Wildcards', description, function()
+        g_game.preyAction(slotId, PREY_ACTION_REQUEST_ALL_MONSTERS, 0)
+    end, restorePreyWindow)
+end
+
 function PreyController:openStore(offerId)
     if self.ui and self.ui:isVisible() then
         self:hide()
@@ -632,4 +661,16 @@ function PreyController:openStore(offerId)
     PreyController:scheduleEvent(function()
         g_game.sendRequestUsefulThings(offerId)
     end, 25, "LazyHtml")
+end
+
+function PreyController:onChooseMonster(slotId)
+    local slot = self.preyData[slotId + 1]
+    local previewMonster = slot.previewMonster
+    if not previewMonster or not previewMonster.raceId then return end
+
+    if slot.type == SLOT_STATE_LIST_SELECTION then
+        g_game.preyAction(slotId, PREY_ACTION_CHANGE_FROM_ALL, previewMonster.raceId)
+    elseif slot.type == SLOT_STATE_SELECTION then
+        g_game.preyAction(slotId, PREY_ACTION_MONSTERSELECTION, previewMonster.index - 1)
+    end
 end

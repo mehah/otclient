@@ -214,6 +214,7 @@
               class="base-img-clip"
               src="/modules/game_prey_html/images/prey-pick-button.png"
               *disabled="self.pickSpecificPrice > self.wildcards"
+              onclick="self:handlePickSpecific(slot.slotId)"
             />
             <div
               class="prey-reroll-cost"
@@ -266,6 +267,7 @@
               *disabled="not slot.previewMonster or not slot.previewMonster.raceId"
               class="prey-choose-button"
               src="/modules/game_prey_html/images/prey-choose-button.png"
+              onclick="self:onChooseMonster(slot.slotId)"
             />
           </div>
         </div>
