@@ -938,6 +938,8 @@ protected:
     virtual bool isTextEdit() { return false; }
     void drawText(const Rect& screenCoords);
 
+    void updateHtmlTextSize();
+
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
 
