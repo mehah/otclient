@@ -683,3 +683,34 @@ function PreyController:onChooseMonster(slotId)
         g_game.preyAction(slotId, PREY_ACTION_MONSTERSELECTION, previewMonster.index - 1)
     end
 end
+
+function PreyController:listReroll(slotId)
+    local slot = self.preyData[slotId + 1]
+
+    local description = ""
+
+    if slot.timeUntilFreeReroll == "Free" then
+        description = "Are you sure you want to use the Free List Reroll?"
+    else
+        description = string.format(
+            "Do you want to spend %s gold for a List Reroll?\nYou currently have %s gold available for the purchase.",
+            comma_value(self.rawRerollGoldPrice),
+            self.playerGold
+        )
+    end
+
+    local shouldRestoreWindow = self.ui and self.ui:isVisible()
+    if shouldRestoreWindow then
+        self:hide()
+    end
+
+    local function restorePreyWindow()
+        if shouldRestoreWindow then
+            show()
+        end
+    end
+
+    showPreyConfirmationWindow('Confirmation of Using List Reroll', description, function()
+        g_game.preyAction(slotId, PREY_ACTION_LISTREROLL, 0)
+    end, restorePreyWindow)
+end
