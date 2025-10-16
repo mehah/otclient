@@ -139,23 +139,12 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
             method = nil,
             methodName = setterName:lower(),
             attr = attr:sub(2),
-            isInheritable = isInheritable,
             htmlId = self:getHtmlId(),
             valueExpr = FOR_CTX.__values or {},
             fnc = function(self)
                 local value = fnc(controller, self.widget, unpack(self.valueExpr))
                 if value ~= self.res then
                     self.method(self.widget, value)
-                    if self.isInheritable then
-                        local children = self.widget:querySelectorAll(':node-all')
-                        for i = 1, #children do
-                            local child = children[i]
-                            local inheritedFromId = child.inheritedStyles[self.attr]
-                            if not inheritedFromId or inheritedFromId == self.htmlId then
-                                self.method(child, value)
-                            end
-                        end
-                    end
                     self.res = value
                 end
             end
@@ -168,9 +157,28 @@ function UIWidget:__applyOrBindHtmlAttribute(attr, value, isInheritable, control
         value = tonumber(value) or toboolean(value) or value
     end
 
-    local method = self['set' .. setterName]
-    if method then
-        if value ~= nil then
+    local setMethod = self['set' .. setterName]
+    if setMethod then
+        local method = setMethod
+        if isInheritable then
+            method = function(self, value)
+                setMethod(self, value)
+                local children = self:querySelectorAll(':node-all')
+                for i = 1, #children do
+                    local child = children[i]
+                    if child.inheritedStyles then
+                        local inheritedFromId = child.inheritedStyles[self.attr]
+                        if not inheritedFromId or inheritedFromId == self.htmlId then
+                            setMethod(child, value)
+                        end
+                    end
+                end
+            end
+
+            g_dispatcher.deferEvent(function()
+                method(self, value)
+            end)
+        elseif value ~= nil then
             method(self, value)
         end
 
