@@ -37,11 +37,18 @@
         <div
           class="race-container"
           *onhoverchange="self:onHover(slot.slotId, isHovered)"
-          *if="slot.type == 2"
+          *if="slot.type == 0 or slot.type == 2"
         >
           <div class="race-monster">
             <uicreature
+              *if="slot.type == 2"
               *outfit="{type = slot.outfit.type, head = slot.outfit.head, body = slot.outfit.body, legs = slot.outfit.legs, feet = slot.outfit.feet}"
+            />
+            <img
+              *if="slot.type == 0"
+              src="/images/game/prey/prey_biginactive.png"
+              width="57"
+              height="91"
             />
           </div>
           <div class="prey-current-bonus">
@@ -52,7 +59,7 @@
               layout="type: grid; cell-size: 9 10;cell-spacing:2;num-columns:5"
             >
               <img
-                *image-source="slot.stars>1 and '/images/game/prey/prey_star.png' or '/images/game/prey/prey_nostar.png'"
+                *image-source="slot.stars > 1 and '/images/game/prey/prey_star.png' or '/images/game/prey/prey_nostar.png'"
                 width="9"
                 height="10"
               />
@@ -104,11 +111,23 @@
             </div>
           </div>
         </div>
-        <div class="progress" *if="slot.type == 2">
-          <div class="progress-bar" *width="slot.percent"></div>
-          <div class="progress-value">{{slot.timeleft}}</div>
+        <div class="progress" *if="slot.type == 0 or slot.type == 2">
+          <div
+            class="progress-bar"
+            *if="slot.type == 2"
+            *width="slot.percent"
+          ></div>
+          <div class="progress-value" *if="slot.type == 2">
+            {{slot.timeleft}}
+          </div>
         </div>
-        <div class="choose-monster-list" *if="slot.type == 4">
+        <img
+          class="prey-unlock-perm-button"
+          *if="slot.type == 0"
+          src="/images/game/prey/prey_perm_test.png"
+          onclick="self:openStore(0)"
+        />
+        <div class="choose-monster-list" *if="slot.type == 3 or slot.type == 4">
           <div
             class="monster-list"
             layout="type: grid; cell-size: 66 66;num-columns:3"
@@ -121,7 +140,7 @@
               >
                 <uicreature
                   *outfit="{type = race.outfit.type, head = race.outfit.head, body = race.outfit.body, legs = race.outfit.legs, feet = race.outfit.feet}"
-                  onclick="self:handleSelect(slot.slotId, race)"
+                  onclick="self:handleSelect(race.slotId, race)"
                 />
               </div>
             </div>
@@ -133,7 +152,7 @@
               <div
                 class="monster-name"
                 *for="local race in (slot.raceList or {})"
-                onclick="self:handleSelect(slot.slotId, race)"
+                onclick="self:handleSelect(race.slotId, race)"
                 *background-color="race.selected == true and '#757575' or race.index % 2 == 0 and '#414141' or '#484848'"
                 onmousewheel="self:onMouseWheel(race.slotId)"
               >
@@ -152,24 +171,33 @@
           </div>
         </div>
 
-        <div
-          class="buttons"
-          *if="slot.type == 2 or slot.type == 4 or slot.type == 5"
-        >
+        <div class="buttons" *if="slot.type >= 2">
           <div
             class="prey-reroll-container"
-            *if="slot.type == 2 or slot.type == 4"
+            *if="slot.type == 2 or slot.type == 3 or slot.type == 4"
             style="margin-left: 6px"
           >
             <div class="prey-reroll-wrapper">
               <img
                 class="base-img-clip"
+                *disabled="self.rerollGoldPrice > self.playerGold"
                 src="/modules/game_prey_html/images/prey-reroll-button.png"
               />
-              <div class="prey-reroll-timeleft">Free</div>
+              <div
+                class="progress-bar-time-next-reroll"
+                *if="slot.type == 3"
+                *width="slot.percent"
+              ></div>
+              <div class="prey-reroll-timeleft">
+                {{slot.timeUntilFreeReroll}}
+              </div>
             </div>
-            <div class="prey-reroll-cost">
-              <span>{{self.rerollGoldPrice}}</span>
+            <div
+              class="prey-pick-cost"
+              *margin-top="slot and (slot.type == 3 or slot.type == 4) and 5 or 1"
+              *disabled="self.rerollGoldPrice > self.playerGold"
+            >
+              <p>{{self.rerollGoldPrice}}</p>
               <img
                 class="prey-reroll-cost-img"
                 src="/modules/game_prey_html/images/icon-gold.png"
@@ -180,14 +208,19 @@
           </div>
           <div
             class="prey-pick-container"
-            *if="slot.type == 2 or slot.type == 4"
+            *if="slot.type == 2 or slot.type == 3 or slot.type == 4"
           >
             <img
               class="base-img-clip"
               src="/modules/game_prey_html/images/prey-pick-button.png"
+              *disabled="self.pickSpecificPrice > self.wildcards"
             />
-            <div class="prey-pick-cost">
-              <span>{{self.pickSpecificPrice}}</span>
+            <div
+              class="prey-reroll-cost"
+              *margin-top="slot and (slot.type == 3 or slot.type == 4) and 5 or 1"
+              *disabled="self.pickSpecificPrice > self.wildcards"
+            >
+              <p>{{self.pickSpecificPrice}}</p>
               <img
                 class="prey-pick-cost-img"
                 src="/modules/game_prey_html/images/prey-wildcard"
@@ -201,9 +234,13 @@
               class="base-img-clip"
               src="/modules/game_prey_html/images/prey-bonus-button.png"
               onclick="self:handleRerollBonus(slot.slotId)"
+              *disabled="self.rerollBonusPrice > self.wildcards"
             />
-            <div class="prey-bonus-cost">
-              <span>{{self.rerollBonusPrice}}</span>
+            <div
+              class="prey-bonus-cost"
+              *disabled="self.rerollBonusPrice > self.wildcards"
+            >
+              <p>{{self.rerollBonusPrice}}</p>
               <img
                 src="/modules/game_prey_html/images/prey-wildcard"
                 height="12"
@@ -224,7 +261,7 @@
               />
             </span>
           </div>
-          <div class="button-choose" *if="slot.type == 4 or slot.type == 5">
+          <div class="button-choose" *if="slot.type >= 3">
             <img
               *disabled="not slot.previewMonster or not slot.previewMonster.raceId"
               class="prey-choose-button"
@@ -274,7 +311,7 @@
     <div class="footer">
       <div class="footer-content">
         <div class="gold-container">
-          <span>{{self.playerGold}}</span>
+          <p>{{self.playerGold}}</p>
           <img
             src="/modules/game_prey_html/images/icon-gold.png"
             height="9"
@@ -295,6 +332,7 @@
             src="/modules/game_prey_html/images/store-icon.png"
             height="20"
             width="26"
+            onclick="self:openStore(1)"
           />
         </div>
         <button onclick="self:hide()" style="width: 40px">Close</button>

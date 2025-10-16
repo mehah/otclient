@@ -3,6 +3,8 @@
   background-color: red;
   width: 668px;
   height: 563px;
+  font-family: "pVerdana Bold-11px";
+  font: "pVerdana Bold-11px";
 }
 
 .tab-container {
@@ -141,6 +143,15 @@
   position: relative;
 }
 
+.progress-bar-time-next-reroll {
+  height: 12px;
+  max-width: 60px;
+  --image-source: "/modules/game_prey_html/images/prey-timer-progress.png";
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+}
+
 .base-img-clip {
   width: 66px;
   height: 66px;
@@ -171,6 +182,10 @@
   color: #c0c0c0;
 }
 
+.prey-reroll-cost:disabled {
+  color: #d33c3c;
+}
+
 .prey-reroll-cost img {
   margin-left: 6px;
 }
@@ -190,6 +205,10 @@
   color: #c0c0c0;
   --image-source: "/modules/game_prey_html/images/prey-info-bg.png";
   align-items: center;
+}
+
+.prey-pick-cost:disabled {
+  color: #d33c3c;
 }
 
 .prey-pick-cost img {
@@ -224,6 +243,10 @@
 
   --image-source: "/modules/game_prey_html/images/prey-info-bg.png";
   align-items: center;
+}
+
+.prey-bonus-cost:disabled {
+  color: #d33c3c;
 }
 
 .prey-bonus-cost img {
@@ -374,7 +397,7 @@
 
 .gold-container {
   --image-source: "/modules/game_prey_html/images/player-gold-bg.png";
-  width: 130px;
+  width: 200px;
   height: 20px;
   text-align: center;
   align-items: center;
@@ -383,6 +406,7 @@
 
 .gold-container img {
   margin-left: 4px;
+  margin-top: 4px;
 }
 
 .wildcard-container {
@@ -422,4 +446,16 @@
 
 .choose-monster-list uicreature {
   --creature-size: 65;
+}
+
+.prey-unlock-perm-button {
+  height: 67px;
+  width: 204px;
+  margin-top: 8px;
+  margin-left: 6px;
+  --image-clip: 0 0 204 67;
+}
+
+.prey-unlock-perm-button:pressed {
+  --image-clip: 0 67 204 67;
 }

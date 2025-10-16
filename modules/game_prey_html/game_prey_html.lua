@@ -77,30 +77,37 @@ function PreyController:onHover(slotId, isHovered)
 end
 
 function check()
+    g_logger.info("check")
     if g_game.getFeature(GamePrey) then
         if not preyButton then
+            g_logger.info("adding prey button")
             preyButton = modules.game_mainpanel.addToggleButton('preyButton', tr('Prey Dialog'),
                 '/images/options/button_preydialog', toggle)
         end
-        if not preyTrackerButton then
-            preyTrackerButton = modules.game_mainpanel.addToggleButton('preyTrackerButton', tr('Prey Tracker'),
-                '/images/options/button_prey', toggleTracker)
-        end
+        -- if not preyTrackerButton then
+        --     preyTrackerButton = modules.game_mainpanel.addToggleButton('preyTrackerButton', tr('Prey Tracker'),
+        --         '/images/options/button_prey', toggleTracker)
+        -- end
     elseif preyButton then
+        g_logger.info("removing prey button")
         preyButton:destroy()
         preyButton = nil
     end
 end
 
 function PreyController:init()
+    g_logger.info("init")
+    g_game.preyRequest()
     check()
-    PreyController:registerEvents(g_game, {
+
+    connect(g_game, {
         onPreyActive = onPreyActive,
         onPreyRerollPrice = onPreyRerollPrice,
         onPreyListSelection = onPreyListSelection,
         onPreySelection = onPreySelection,
         onPreyInactive = onPreyInactive,
         onPreySelectionChangeMonster = onPreySelectionChangeMonster,
+        onPreyLocked = onPreyLocked,
     })
 end
 
@@ -137,11 +144,21 @@ function Helper.handleFormatPrice(price)
     return priceText
 end
 
+function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
+    local slotId = slot + 1
+    PreyController.preyData[slotId].type = SLOT_STATE_LOCKED
+    PreyController.preyData[slotId].stars = 0
+    PreyController.preyData[slotId].monsterName = "Locked"
+    PreyController.preyData[slotId].preyType = getBigIconPath(nil, true)
+end
+
 function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValue, bonusGrade, timeUntilFreeReroll,
                                       wildcards, option)
     g_logger.info(("SLOT_STATE_SELECTION_CHANGE_MONSTER > Slot %d, timeUntilFreeReroll %d, wildcards %d, monsterNames %d, monsterLookTypes %d")
         :format(slot, timeUntilFreeReroll,
             wildcards, #names, #outfits))
+
+    -- slot, monsterNames, monsterLooktypes, nextFreeReroll, wildcards
 
 
     local slotId = slot + 1
@@ -152,6 +169,7 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
             name = names[i],
             outfit = outfits[i],
             raceId = outfits[i].type,
+            slotId = slot,
         })
     end
 
@@ -173,7 +191,7 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
 
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].percent = percent .. "%"
-    PreyController.preyData[slotId].timeleft = timeleft
+    PreyController.preyData[slotId].timeUntilFreeReroll = timeleft
 end
 
 function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
@@ -183,6 +201,7 @@ end
 
 function onPreyRerollPrice(rerollGoldPrice, rerollBonusPrice, pickSpecificPrice)
     PreyController.rerollGoldPrice = Helper.handleFormatPrice(rerollGoldPrice)
+    PreyController.rawRerollGoldPrice = rerollGoldPrice
     PreyController.rerollBonusPrice = rerollBonusPrice
     PreyController.pickSpecificPrice = pickSpecificPrice
     PreyController.lockPreyPrice = pickSpecificPrice
@@ -249,16 +268,41 @@ end
 
 -- clear timers on terminate to prevent leaks
 function PreyController:terminate()
+    disconnect(g_game, {
+        onPreyActive = onPreyActive,
+        onPreyRerollPrice = onPreyRerollPrice,
+        onPreyListSelection = onPreyListSelection,
+        onPreySelection = onPreySelection,
+        onPreyInactive = onPreyInactive,
+        onPreySelectionChangeMonster = onPreySelectionChangeMonster,
+    })
+
     if self._debounceTimers then
         for _, ev in pairs(self._debounceTimers) do
             if ev then removeEvent(ev) end
         end
         self._debounceTimers = {}
     end
+
+    if preyButton then
+        preyButton:destroy()
+        preyButton = nil
+    end
+    if preyTrackerButton then
+        preyTrackerButton:destroy()
+        preyTrackerButton = nil -- to be safely garbage collected
+    end
+
+    if self.ui then
+        self:unloadHtml()
+    end
 end
 
-function PreyController:onSearchMonster(slot, value)
+function PreyController:onSearchMonster(value, slot)
     value = value or ''
+    g_logger.info("onSearchMonster: " .. slot .. " value: " .. value .. ' length: ' .. #value)
+
+    if true then return end
     PreyController.preyData[slot + 1].previewMonster = {
         raceId = nil, outfit = nil
     }
@@ -324,34 +368,58 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
     PreyController.preyData[slotId].type = SLOT_STATE_LIST_SELECTION
 end
 
-function onPreySelection(slot, monsterNames, monsterLooktypes, nextFreeReroll, wildcards)
+local function clamp(x, a, b) return math.max(a, math.min(b, x)) end
+local function round(x) return math.floor(x + 0.5) end
+function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
     g_logger.info(("SLOT_STATE_SELECTION > Slot %d, nextFreeReroll %d, wildcards %d, monsterNames %d, monsterLookTypes %d")
-        :format(slot, nextFreeReroll,
-            wildcards, #monsterNames, #monsterLooktypes))
-
-    for i, name in ipairs(monsterNames) do
-        g_logger.info("Monster Name: " .. name)
-    end
-    for i, look in ipairs(monsterLooktypes) do
-        g_logger.info("Monster LookType: " .. look.type)
-    end
-
+        :format(slot, timeUntilFreeReroll,
+            wildcards, #names, #outfits))
     local slotId = slot + 1
+    PreyController.preyData[slotId].raceList = {}
+
+    for i = 1, 9 do
+        table.insert(PreyController.preyData[slotId].raceList, {
+            name = names[i],
+            outfit = outfits[i],
+            raceId = outfits[i].type,
+            slotId = slot,
+        })
+    end
+
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
+
+    -- local description = ("Creature %s\nDuration %s\nValue: %d/10\nType: %s\n%s\n\nClick in this window to open the prey dialog.")
+    --     :format(
+    --         currentHolderName,
+    --         timeleft,
+    --         bonusGrade,
+    --         getBonusDescription(bonusType),
+    --         getTooltipBonusDescription(bonusType, bonusValue)
+    --     )
+
+    local maxWidth = 60
+    local total = 20 * 60 * 60
+    timeUntilFreeReroll = timeUntilFreeReroll > 720000 and 0 or timeUntilFreeReroll
+    local timeleft = timeleftTranslation(timeUntilFreeReroll)
+    PreyController.preyData[slotId].slotId = slot
+    local pxRemaining = clamp((timeUntilFreeReroll / total) * maxWidth, 0, maxWidth)
+    pxRemaining = round(pxRemaining) -- ≈ 48 px
+    PreyController.preyData[slotId].percent = pxRemaining
+    PreyController.preyData[slotId].timeUntilFreeReroll = timeleft
     PreyController.preyData[slotId].type = SLOT_STATE_SELECTION
+    PreyController.preyData[slotId].monsterName = "Select your prey creature"
 end
 
 function PreyController:onGameStart()
     if g_game.getClientVersion() >= 1149 then
-        PreyController:registerEvents(g_game, {
-            check = check
-        })
+        check()
     else
         PreyController:scheduleEvent(function()
             g_modules.getModule("game_prey_html"):unload()
         end, 100, "unloadModule")
     end
+    g_logger.info("onGameStart")
 end
 
 function capitalFormatStr(str)
@@ -377,7 +445,7 @@ end
 
 function timeleftTranslation(timeleft)
     if timeleft == 0 then
-        return tr('Free')
+        return "Free"
     end
     local hours = string.format('%02.f', math.floor(timeleft / 3600))
     local mins = string.format('%02.f', math.floor(timeleft / 60 - (hours * 60)))
@@ -398,8 +466,13 @@ end
 
 PreyController.description = "-"
 
-function getBigIconPath(bonusType)
+function getBigIconPath(bonusType, locked)
     local path = '/images/game/prey/'
+
+    if locked then
+        return path .. 'prey_bignobonus'
+    end
+
     if bonusType == PREY_BONUS_DAMAGE_BOOST then
         return path .. 'prey_bigdamage'
     elseif bonusType == PREY_BONUS_DAMAGE_REDUCTION then
@@ -411,23 +484,13 @@ function getBigIconPath(bonusType)
     end
 end
 
-local function getSmallIconPath(bonusType)
-    local path = '/images/game/prey/'
-    if bonusType == PREY_BONUS_DAMAGE_BOOST then
-        return path .. 'prey_damage'
-    elseif bonusType == PREY_BONUS_DAMAGE_REDUCTION then
-        return path .. 'prey_defense'
-    elseif bonusType == PREY_BONUS_XP_BONUS then
-        return path .. 'prey_xp'
-    elseif bonusType == PREY_BONUS_IMPROVED_LOOT then
-        return path .. 'prey_loot'
-    end
-end
-
-function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, bonusValue, bonusGrade, timeLeft,
-                      timeUntilFreeReroll, wildcards, option)
+function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, bonusValue, bonusGrade, rawTimeleft,
+                      rawTimeUntilFreeReroll, wildcards, option)
     local slotId = slot + 1
-    local timeleft = timeleftTranslation(timeLeft)
+    g_logger.info("VSF?")
+    local timeleft = timeleftTranslation(rawTimeleft)
+    rawTimeUntilFreeReroll = rawTimeUntilFreeReroll > 720000 and 0 or rawTimeUntilFreeReroll
+
     local description = ("Creature %s\nDuration %s\nValue: %d/10\nType: %s\n%s\n\nClick in this window to open the prey dialog.")
         :format(
             currentHolderName,
@@ -437,7 +500,12 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
             getTooltipBonusDescription(bonusType, bonusValue)
         )
 
-    local percent = (timeLeft / (2 * 60 * 60)) * 100
+    local maxWidth = 202
+    local total = 2 * 60 * 60
+    PreyController.preyData[slotId].slotId = slot
+    rawTimeleft = rawTimeleft / 60
+    local pxRemaining = clamp((1 - (rawTimeleft / total)) * maxWidth, 0, maxWidth)
+
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].monsterName = capitalFormatStr(currentHolderName)
     PreyController.preyData[slotId].raceId = currentHolderOutfit.type
@@ -446,10 +514,12 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
     PreyController.preyData[slotId].lockPrey = option == 2
     PreyController.preyData[slotId].description = description
     PreyController.preyData[slotId].stars = bonusGrade
-    PreyController.preyData[slotId].percent = percent .. "%"
+    PreyController.preyData[slotId].percent = pxRemaining
     PreyController.preyData[slotId].timeleft = timeleft
     PreyController.preyData[slotId].type = SLOT_STATE_ACTIVE
     PreyController.preyData[slotId].preyType = getBigIconPath(bonusType)
+    PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(rawTimeUntilFreeReroll)
+    PreyController:handleResources()
 end
 
 local lastOnMouseWheel = 0
@@ -472,7 +542,7 @@ function PreyController:onMouseWheel(slotId)
 end
 
 local confirmWindow
-local function showPreyConfirmationWindow(title, description, confirmAction)
+local function showPreyConfirmationWindow(title, description, confirmAction, afterCloseAction)
     -- toggle()
 
 
@@ -482,6 +552,10 @@ local function showPreyConfirmationWindow(title, description, confirmAction)
             confirmWindow = nil
             PreyController:handleResources()
             -- toggle()
+            if afterCloseAction then
+                afterCloseAction()
+                afterCloseAction = nil
+            end
         end
     end
     if confirmWindow then
@@ -507,10 +581,20 @@ local function showPreyConfirmationWindow(title, description, confirmAction)
     }, confirm, closeWindow)
 
     if confirmWindow then
-        confirmWindow.onDestroy = function() PreyController:handleResources() end
+        confirmWindow.onDestroy = function()
+            PreyController:handleResources()
+            if afterCloseAction then
+                afterCloseAction()
+                afterCloseAction = nil
+            end
+        end
     else
         -- toggle()
         PreyController:handleResources()
+        if afterCloseAction then
+            afterCloseAction()
+            afterCloseAction = nil
+        end
     end
 end
 
@@ -520,7 +604,32 @@ function PreyController:handleRerollBonus(slotId)
         tostring(self.wildcards)
     ))
 
+    local shouldRestoreWindow = self.ui and self.ui:isVisible()
+    if shouldRestoreWindow then
+        self:hide()
+    end
+
+    local function restorePreyWindow()
+        if shouldRestoreWindow then
+            show()
+        end
+    end
+
     showPreyConfirmationWindow('Confirmation of Using Prey Wildcards', description, function()
         g_game.preyAction(slotId, PREY_ACTION_BONUSREROLL, 0)
-    end)
+    end, restorePreyWindow)
+end
+
+function PreyController:openStore(offerId)
+    if self.ui and self.ui:isVisible() then
+        self:hide()
+    end
+
+    -- offerId = 0 > Permanent slot
+    -- offerId = 1 > wildcards
+
+    modules.game_mainpanel.toggleStore()
+    PreyController:scheduleEvent(function()
+        g_game.sendRequestUsefulThings(offerId)
+    end, 25, "LazyHtml")
 end
