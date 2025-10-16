@@ -29,7 +29,8 @@ function PreyController:handleResources()
 
     local player = g_game.getLocalPlayer()
     if not player then return end
-    self.playerGold = comma_value(player:getTotalMoney())
+    self.rawPlayerGold = player:getTotalMoney() or 0
+    self.playerGold = comma_value(self.rawPlayerGold)
     self.wildcards = player:getResourceBalance(ResourceTypes.PREY_WILDCARDS)
 end
 
@@ -97,7 +98,7 @@ end
 
 function PreyController:init()
     g_logger.info("init")
-    g_game.preyRequest()
+    PreyController:handleResources()
     check()
 
     connect(g_game, {
@@ -144,12 +145,43 @@ function Helper.handleFormatPrice(price)
     return priceText
 end
 
+local function clamp(x, a, b) return math.max(a, math.min(b, x)) end
+local function round(x) return math.floor(x + 0.5) end
+Helper.freeRerollBarWidth = 60
+Helper.freeRerollHours = 20
+Helper.activePreyBarWidth = 205
+Helper.activePreyHours = 2
+function Helper.getProgress(timeleft, hours, maxWidth)
+    if timeleft == 0 then return 0 end
+    local total = hours * 60 * 60
+    timeleft = timeleft > total and 0 or timeleft
+    local width = clamp((timeleft / total) * maxWidth, 0, maxWidth)
+
+    return round(width)
+end
+
 function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
     local slotId = slot + 1
     PreyController.preyData[slotId].type = SLOT_STATE_LOCKED
     PreyController.preyData[slotId].stars = 0
     PreyController.preyData[slotId].monsterName = "Locked"
     PreyController.preyData[slotId].preyType = getBigIconPath(nil, true)
+end
+
+function Helper.fillTinyMonsterList(slotId, names, outfits)
+    local raceList = {}
+
+    for i = 1, 9 do
+        table.insert(raceList, {
+            name = names[i],
+            outfit = outfits[i],
+            raceId = outfits[i].type,
+            slotId = slotId,
+            index = i,
+        })
+    end
+
+    return raceList
 end
 
 function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValue, bonusGrade, timeUntilFreeReroll,
@@ -162,25 +194,8 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
 
 
     local slotId = slot + 1
-    PreyController.preyData[slotId].raceList = {}
+    PreyController.preyData[slotId].raceList = Helper.fillTinyMonsterList(slot, names, outfits)
 
-    for i = 1, 9 do
-        table.insert(PreyController.preyData[slotId].raceList, {
-            name = names[i],
-            outfit = outfits[i],
-            raceId = outfits[i].type,
-            slotId = slot,
-            index = i,
-        })
-    end
-
-    PreyController.preyData[slotId].slotId = slot
-    PreyController.preyData[slotId].monsterName = "Select your prey creature"
-    PreyController.preyData[slotId].type = SLOT_STATE_SELECTION_CHANGE_MONSTER
-    timeUntilFreeReroll = timeUntilFreeReroll > 720000 and 0 or timeUntilFreeReroll
-    local percent = (timeUntilFreeReroll / (20 * 60)) * 100
-
-    local timeleft = timeleftTranslation(timeUntilFreeReroll)
     -- local description = ("Creature %s\nDuration %s\nValue: %d/10\nType: %s\n%s\n\nClick in this window to open the prey dialog.")
     --     :format(
     --         currentHolderName,
@@ -190,9 +205,16 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
     --         getTooltipBonusDescription(bonusType, bonusValue)
     --     )
 
+
     PreyController.preyData[slotId].slotId = slot
-    PreyController.preyData[slotId].percent = percent .. "%"
-    PreyController.preyData[slotId].timeUntilFreeReroll = timeleft
+    PreyController.preyData[slotId].monsterName = "Select your prey creature"
+    PreyController.preyData[slotId].type = SLOT_STATE_SELECTION_CHANGE_MONSTER
+    timeUntilFreeReroll = timeUntilFreeReroll > 720000 and 0 or timeUntilFreeReroll
+    PreyController.preyData[slotId].percentFreeReroll = Helper.getProgress(timeUntilFreeReroll, Helper.freeRerollHours,
+        Helper.freeRerollBarWidth)
+    PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(timeUntilFreeReroll)
+    PreyController.preyData[slotId].isFreeReroll = timeUntilFreeReroll == 0
+    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold
 end
 
 function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
@@ -201,9 +223,11 @@ function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
 end
 
 function onPreyRerollPrice(rerollGoldPrice, rerollBonusPrice, pickSpecificPrice)
+    rerollGoldPrice = rerollGoldPrice or 0
+    pickSpecificPrice = pickSpecificPrice or 5
+    PreyController.rawRerollGoldPrice = rerollGoldPrice or 0
     PreyController.rerollGoldPrice = Helper.handleFormatPrice(rerollGoldPrice)
-    PreyController.rawRerollGoldPrice = rerollGoldPrice
-    PreyController.rerollBonusPrice = rerollBonusPrice
+    PreyController.rerollBonusPrice = rerollBonusPrice or 1
     PreyController.pickSpecificPrice = pickSpecificPrice
     PreyController.lockPreyPrice = pickSpecificPrice
 end
@@ -372,27 +396,12 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
     PreyController:handleResources()
 end
 
-local function clamp(x, a, b) return math.max(a, math.min(b, x)) end
-local function round(x) return math.floor(x + 0.5) end
 function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
     g_logger.info(("SLOT_STATE_SELECTION > Slot %d, nextFreeReroll %d, wildcards %d, monsterNames %d, monsterLookTypes %d")
         :format(slot, timeUntilFreeReroll,
             wildcards, #names, #outfits))
     local slotId = slot + 1
-    PreyController.preyData[slotId].raceList = {}
 
-    for i = 1, 9 do
-        table.insert(PreyController.preyData[slotId].raceList, {
-            name = names[i],
-            outfit = outfits[i],
-            raceId = outfits[i].type,
-            slotId = slot,
-            index = i,
-        })
-    end
-
-    PreyController.preyData[slotId].slotId = slot
-    PreyController.preyData[slotId].monsterName = "Select your prey creature"
 
     -- local description = ("Creature %s\nDuration %s\nValue: %d/10\nType: %s\n%s\n\nClick in this window to open the prey dialog.")
     --     :format(
@@ -403,17 +412,17 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
     --         getTooltipBonusDescription(bonusType, bonusValue)
     --     )
 
-    local maxWidth = 60
-    local total = 20 * 60 * 60
     timeUntilFreeReroll = timeUntilFreeReroll > 720000 and 0 or timeUntilFreeReroll
-    local timeleft = timeleftTranslation(timeUntilFreeReroll)
+    PreyController.preyData[slotId].raceList = Helper.fillTinyMonsterList(slot, names, outfits)
+    PreyController.preyData[slotId].monsterName = "Select your prey creature"
     PreyController.preyData[slotId].slotId = slot
-    local pxRemaining = clamp((timeUntilFreeReroll / total) * maxWidth, 0, maxWidth)
-    pxRemaining = round(pxRemaining) -- ≈ 48 px
-    PreyController.preyData[slotId].percent = pxRemaining
-    PreyController.preyData[slotId].timeUntilFreeReroll = timeleft
+    PreyController.preyData[slotId].percentFreeReroll = Helper.getProgress(timeUntilFreeReroll, Helper.freeRerollHours,
+        Helper.freeRerollBarWidth)
+    PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(timeUntilFreeReroll)
     PreyController.preyData[slotId].type = SLOT_STATE_SELECTION
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
+    PreyController.preyData[slotId].isFreeReroll = timeUntilFreeReroll == 0
+    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold
 end
 
 function PreyController:onGameStart()
@@ -492,7 +501,6 @@ end
 function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, bonusValue, bonusGrade, rawTimeleft,
                       rawTimeUntilFreeReroll, wildcards, option)
     local slotId = slot + 1
-    g_logger.info("VSF?")
     local timeleft = timeleftTranslation(rawTimeleft)
     rawTimeUntilFreeReroll = rawTimeUntilFreeReroll > 720000 and 0 or rawTimeUntilFreeReroll
 
@@ -505,12 +513,6 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
             getTooltipBonusDescription(bonusType, bonusValue)
         )
 
-    local maxWidth = 202
-    local total = 2 * 60 * 60
-    PreyController.preyData[slotId].slotId = slot
-    rawTimeleft = rawTimeleft / 60
-    local pxRemaining = clamp((1 - (rawTimeleft / total)) * maxWidth, 0, maxWidth)
-
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].monsterName = capitalFormatStr(currentHolderName)
     PreyController.preyData[slotId].raceId = currentHolderOutfit.type
@@ -519,12 +521,19 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
     PreyController.preyData[slotId].lockPrey = option == 2
     PreyController.preyData[slotId].description = description
     PreyController.preyData[slotId].stars = bonusGrade
-    PreyController.preyData[slotId].percent = pxRemaining
+    PreyController.preyData[slotId].percent = Helper.getProgress(rawTimeleft, Helper.activePreyHours,
+        Helper.activePreyBarWidth)
+    PreyController.preyData[slotId].percentFreeReroll = Helper.getProgress(rawTimeUntilFreeReroll, Helper
+        .freeRerollHours,
+        Helper.freeRerollBarWidth)
     PreyController.preyData[slotId].timeleft = timeleft
     PreyController.preyData[slotId].type = SLOT_STATE_ACTIVE
     PreyController.preyData[slotId].preyType = getBigIconPath(bonusType)
     PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(rawTimeUntilFreeReroll)
     PreyController:handleResources()
+    PreyController.preyData[slotId].isFreeReroll = rawTimeUntilFreeReroll == 0
+    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice >
+        PreyController.rawPlayerGold
 end
 
 local lastOnMouseWheel = 0
@@ -670,7 +679,7 @@ function PreyController:onChooseMonster(slotId)
 
     if slot.type == SLOT_STATE_LIST_SELECTION then
         g_game.preyAction(slotId, PREY_ACTION_CHANGE_FROM_ALL, previewMonster.raceId)
-    elseif slot.type == SLOT_STATE_SELECTION then
+    elseif slot.type == SLOT_STATE_SELECTION or slot.type == SLOT_STATE_SELECTION_CHANGE_MONSTER then
         g_game.preyAction(slotId, PREY_ACTION_MONSTERSELECTION, previewMonster.index - 1)
     end
 end

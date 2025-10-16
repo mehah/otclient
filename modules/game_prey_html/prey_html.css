@@ -198,6 +198,30 @@
   color: #c0c0c0;
 }
 
+.base-button-cost {
+  height: 20px;
+  width: 66px;
+  margin-top: 1px;
+  color: #c0c0c0;
+  --image-source: "/modules/game_prey_html/images/prey-info-bg.png";
+  align-items: center;
+}
+.base-button-cost:disabled {
+  color: #d33c3c;
+}
+
+.base-button-cost img {
+  margin-left: 6px;
+}
+
+.base-button-cost-label {
+  font: "verdana-11px-rounded";
+}
+.base-button-cost-label:disabled {
+  font: "Verdana-Strikethrough-11px";
+  color: #707070 !important;
+}
+
 .prey-pick-cost {
   height: 20px;
   width: 66px;

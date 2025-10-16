@@ -180,24 +180,26 @@
             <div class="prey-reroll-wrapper">
               <img
                 class="base-img-clip"
-                *disabled="self.rerollGoldPrice > self.playerGold"
+                *disabled="self.rawRerollGoldPrice > self.rawPlayerGold"
                 src="/modules/game_prey_html/images/prey-reroll-button.png"
               />
               <div
                 class="progress-bar-time-next-reroll"
-                *if="slot.type == 3"
-                *width="slot.percent"
+                *if="slot.type == 2 or slot.type == 3"
+                *width="slot.percentFreeReroll"
               ></div>
               <div class="prey-reroll-timeleft">
                 {{slot.timeUntilFreeReroll}}
               </div>
             </div>
             <div
-              class="prey-pick-cost"
+              class="base-button-cost"
               *margin-top="slot and (slot.type == 3 or slot.type == 4) and 5 or 1"
-              *disabled="self.rerollGoldPrice > self.playerGold"
+              *disabled="slot.disableFreeReroll"
             >
-              <p>{{self.rerollGoldPrice}}</p>
+              <p *disabled="slot.isFreeReroll" class="base-button-cost-label">
+                {{self.rerollGoldPrice}}
+              </p>
               <img
                 class="prey-reroll-cost-img"
                 src="/modules/game_prey_html/images/icon-gold.png"
