@@ -326,11 +326,10 @@ function PreyController:terminate()
     end
 end
 
-function PreyController:onSearchMonster(value, slot)
+function PreyController:onSearchMonster(slot, value)
     value = value or ''
     g_logger.info("onSearchMonster: " .. slot .. " value: " .. value .. ' length: ' .. #value)
 
-    if true then return end
     PreyController.preyData[slot + 1].previewMonster = {
         raceId = nil, outfit = nil
     }
@@ -339,6 +338,7 @@ function PreyController:onSearchMonster(value, slot)
 
     if #value <= 0 then
         self.preyData[slot + 1].searchValue = false
+        self.preyData[slot + 1].searchValueText = ''
         local k = 'search:' .. tostring(slot)
         local t = self._debounceTimers[k]
         if t then
@@ -356,8 +356,10 @@ function PreyController:onSearchMonster(value, slot)
     self.preyData[slot + 1].searchValue = true
     self:debounce('search:' .. tostring(slot), 300, function()
         local searchValue = value:lower()
+        self.preyData[slot + 1].searchValueText = searchValue
         local filtered = {}
-        for _, race in ipairs(raceListOriginal) do
+        for i, race in ipairs(raceListOriginal) do
+            if i > 50 then break end -- safety net
             local name = (race.name or ''):lower()
             if name:find(searchValue, 1, true) then
                 table.insert(filtered, race)

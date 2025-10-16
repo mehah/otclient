@@ -255,12 +255,17 @@
 }
 
 .monster-names {
-  --image-source: "/modules/game_prey_html/images/panel_flat";
-  height: 170px;
-  width: 202px;
-  max-height: 175px;
+  --image-size: 202 170;
+  --image-source: "/modules/game_prey_html/images/_panel_map";
   margin-left: 6px;
   margin-top: 4px;
+  border: 1px transparent;
+  --border-color-top: #181818;
+  --border-color-left: #181818;
+  --border-color-bottom: #757575;
+  --border-color-right: #757575;
+  height: 170px;
+  width: 202px;
 }
 
 .monster-names-wrapper {
