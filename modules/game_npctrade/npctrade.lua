@@ -206,8 +206,9 @@ function init()
     local children = self:getChildren()
     for _, child in ipairs(children) do
       local className = child:getClassName()
-      if className == 'FlatPanel' or className == 'UIScrollArea' or className == 'VerticalScrollBar' then
-        if child:isVisible() and child:getId() ~= 'miniwindowHeader' and child:getId() ~= 'miniwindowHeaderBorder' then
+      local childId = child:getId()
+      if className == 'FlatPanel' or className == 'UIScrollArea' or className == 'VerticalScrollBar' or className == 'UITextList' then
+        if child:isVisible() and childId ~= 'miniwindowHeader' and childId ~= 'miniwindowHeaderBorder' then
           table.insert(elementsToHide, child)
           child:setVisible(false)
           child:hide()
