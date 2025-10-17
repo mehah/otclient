@@ -10,15 +10,37 @@ import com.google.androidgamesdk.GameActivity
 
 class MainActivity : GameActivity() {
 
+    private lateinit var androidManager: AndroidManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         findViewById<ViewGroup>(contentViewId).addView(binding.root)
-        AndroidManager(
+
+        androidManager = AndroidManager(
             context = this,
             editText = binding.editText,
-        ).apply { nativeInit() }
+        ).apply {
+            nativeInit()
+            nativeSetAudioEnabled(true)
+        }
+
         hideSystemBars()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        androidManager.nativeSetAudioEnabled(true)
+    }
+
+    override fun onPause() {
+        androidManager.nativeSetAudioEnabled(false)
+        super.onPause()
+    }
+
+    override fun onDestroy() {
+        androidManager.nativeSetAudioEnabled(false)
+        super.onDestroy()
     }
 
     private fun hideSystemBars() {
