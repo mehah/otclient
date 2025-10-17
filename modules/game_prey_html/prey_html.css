@@ -1,7 +1,7 @@
 .content {
   position: relative;
   width: 668px;
-  height: 563px;
+  height: 500px;
 }
 
 .tab-container {
@@ -42,21 +42,21 @@
 }
 
 .race-container {
-  display: flex;
   max-height: 133px;
   max-width: 216px;
+  width: 216px;
   margin-top: 4px;
   padding-left: 6px;
   padding-right: 6px;
 }
 
 .race-monster {
-  width: 133px;
-  height: 133px;
-  text-align: center;
-  align-items: center;
   --image-size: 133 133;
   --image-source: "/modules/game_prey_html/images/panel_flat";
+  width: 133px;
+  display: inline-block;
+  height: 133px;
+  text-align: center;
 }
 
 .race-monster uicreature {
@@ -64,11 +64,12 @@
 }
 
 .prey-current-bonus {
+  --image-source: "/modules/game_prey_html/images/panel_flat";
+  display: inline-block;
   height: 133px;
+  text-align: center;
   width: 65px;
   margin-left: 6px;
-  text-align: center;
-  --image-source: "/modules/game_prey_html/images/panel_flat";
 }
 
 .prey-current-bonus img {
@@ -390,6 +391,8 @@
   --image-border: 3;
   margin-top: 7px;
   color: #c0c0c0;
+  text-align: left;
+  padding: 4px;
 }
 
 .gold-container {
@@ -403,7 +406,6 @@
 
 .gold-container img {
   margin-left: 4px;
-  margin-top: 4px;
 }
 
 .wildcard-container {

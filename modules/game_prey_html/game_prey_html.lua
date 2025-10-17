@@ -68,13 +68,76 @@ PreyController.preyData = {
 preyTrackerButton = nil
 preyButton = nil
 
-function PreyController:onHover(slotId, isHovered)
-    g_logger.info("onHover: " .. slotId)
-    -- if not isHovered then
-    --     self.description = "-"
-    --     return
-    -- end
-    self.description = PreyController.preyData[slotId + 1].description
+local descriptionTable = {
+    ["shopPermButton"] =
+    "Go to the Store to purchase the Permanent Prey Slot. Once you have completed the purchase, you can activate a prey here, no matter if your character is on a free or a Premium account.",
+    ["shopTempButton"] = "You can activate this prey whenever your account has Premium Status.",
+    ["preyWindow"] = "",
+    ["noBonusIcon"] =
+    "This prey is not available for your character yet.\nCheck the large blue button(s) to learn how to unlock this prey slot",
+    ["selectPrey"] =
+    "Click here to get a bonus with a higher value. The bonus for your prey will be selected randomly from one of the following: damage boost, damage reduction, bonus XP, improved loot. Your prey will be active for 2 hours hunting time again. Your prey creature will stay the same.",
+    ["pickSpecificPrey"] =
+    "If you like to select another prey creature, click here to choose from all available creatures.\nThe newly selected prey will be active for 2 hours hunting time again.",
+    ["rerollButton"] =
+    "If you like to select another prey creature, click here to get a new list with 9 creatures to choose from.\nThe newly selected prey will be active for 2 hours hunting time again.",
+    ["rerollButtonBonus"] =
+    "If you like to select another prey crature, click here to get a new list with 9 creatures to choose from.\nThe newly selected prey will be active for 2 hours hunting time again.",
+    ["preyCandidate"] = "Select a new prey creature for the next 2 hours hunting time.",
+    ["choosePreyButton"] =
+    "Click on this button to confirm selected monsters as your prey creature for the next 2 hours hunting time.",
+    ["choosePreyButtonBonus"] =
+    "Click on this button to confirm %s as your prey creature for the next 2 hours hunting time.\nYou will benefit from the following bonus: %s",
+    ["selectionList"] =
+    "Select a new prey creature for the next 2 hours hunting time.\nYou will benefit from the following bonus: %s",
+    ["rerollBonus"] =
+    "Click here to get a bonus with a higher value. The bonus for your prey will be selected randomly from one of the following: damage boost, damage reduction, bonus XP, improved loot. Your prey will be active for 2 hours hunting time again. Your prey creature will stay the same.",
+    ["autoRerollCheck"] =
+    "If you tick this option, you will automatically roll for a new prey bonus whenever your prey is about to expire.\nThis will also extend the hunting time of your active prey creature for another 2 hours.",
+    ["lockPreyCheck"] =
+    "If you tick this option, you will lock your prey creature and prey bonus.\nThis means whenever your prey is about to expire its hunting time is simply extended by another 2 hours.",
+    ["time"] = "You will get your next Free List Reroll in %s.\nYou get a Free List Reroll every 20 hours for each slot.",
+    ["time_free"] = "Your next List Reroll is free of charge.\nYou get a Free List Reroll every 20 hours for each slot.",
+    ["bonusMessage"] = "damage boost, damage reduction, bonus XP, improved loot."
+}
+
+function PreyController:clearDescription()
+    self.description = ""
+end
+
+function PreyController:onHover(slotId, currentType)
+    g_logger.info("onHover: " .. slotId .. " type: " .. tostring(currentType))
+    local slot = PreyController.preyData[slotId + 1]
+
+
+    local description = ""
+
+
+    if currentType == "pickSpecificPrey" or currentType == "rerollButton" or currentType == "preyCandidate" then
+        description = descriptionTable[currentType]
+        local footer = string.format("\nYour current bonus +%d%% %s will not be affected.",
+            slot.bonusValue or 0,
+            getBonusDescription(slot.bonusType) or "")
+        description = description .. footer
+    elseif currentType == "time" then
+        description = string.format(description, slot.timeUntilFreeReroll or "00:00")
+    elseif currentType == "selectionList" then
+        description = string.format(descriptionTable[currentType], descriptionTable["bonusMessage"])
+    elseif currentType == "choosePreyButtonBonus" then
+        if slot.previewMonster and slot.previewMonster.name then
+            description = string.format(descriptionTable[currentType], slot.previewMonster.name,
+                descriptionTable["bonusMessage"])
+        end
+    elseif descriptionTable[currentType] then
+        description = descriptionTable[currentType]
+    end
+
+    if slotId and not currentType then
+        self.description = PreyController.preyData[slotId + 1].description
+        return
+    end
+
+    self.description = description
 end
 
 function check()
@@ -96,7 +159,7 @@ function check()
     end
 end
 
-function PreyController:init()
+function PreyController:onInit()
     g_logger.info("init")
     PreyController:handleResources()
     check()
@@ -295,7 +358,7 @@ function PreyController:debounce(key, waitMs, fn)
 end
 
 -- clear timers on terminate to prevent leaks
-function PreyController:terminate()
+function PreyController:onTerminate()
     disconnect(g_game, {
         onPreyActive = onPreyActive,
         onPreyRerollPrice = onPreyRerollPrice,
@@ -326,19 +389,19 @@ function PreyController:terminate()
     end
 end
 
-function PreyController:onSearchMonster(slot, value)
+function PreyController:onSearchMonster(slotId, value)
     value = value or ''
-    g_logger.info("onSearchMonster: " .. slot .. " value: " .. value .. ' length: ' .. #value)
-
-    PreyController.preyData[slot + 1].previewMonster = {
-        raceId = nil, outfit = nil
-    }
-    self.preyData[slot + 1].monsterName = "Select your prey creature"
-    local raceListOriginal = self.preyData[slot + 1].raceListOriginal
+    local slot = self.preyData[slotId + 1]
+    if slot.previewMonster and slot.previewMonster.index then
+        self.preyData[slotId + 1].raceList[slot.previewMonster.index].selected = false
+    end
+    self.preyData[slotId + 1].previewMonster = {}
+    self.preyData[slotId + 1].monsterName = "Select your prey creature"
+    local raceListOriginal = self.preyData[slotId + 1].raceListOriginal
 
     if #value <= 0 then
-        self.preyData[slot + 1].searchValue = false
-        self.preyData[slot + 1].searchValueText = ''
+        self.preyData[slotId + 1].searchValue = false
+        self.preyData[slotId + 1].searchValueText = ''
         local k = 'search:' .. tostring(slot)
         local t = self._debounceTimers[k]
         if t then
@@ -349,14 +412,14 @@ function PreyController:onSearchMonster(slot, value)
         for i = 1, math.min(50, #raceListOriginal) do
             table.insert(out, raceListOriginal[i])
         end
-        self.preyData[slot + 1].raceList = out
-        self.preyData[slot + 1].clearButton = false
+        self.preyData[slotId + 1].raceList = out
+        self.preyData[slotId + 1].clearButton = false
         return
     end
-    self.preyData[slot + 1].searchValue = true
+    self.preyData[slotId + 1].searchValue = true
     self:debounce('search:' .. tostring(slot), 300, function()
         local searchValue = value:lower()
-        self.preyData[slot + 1].searchValueText = searchValue
+        self.preyData[slotId + 1].searchValueText = searchValue
         local filtered = {}
         for i, race in ipairs(raceListOriginal) do
             if i > 50 then break end -- safety net
@@ -365,7 +428,7 @@ function PreyController:onSearchMonster(slot, value)
                 table.insert(filtered, race)
             end
         end
-        self.preyData[slot + 1].raceList = filtered
+        self.preyData[slotId + 1].raceList = filtered
     end)
 end
 
@@ -507,7 +570,7 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
     local timeleft = timeleftTranslation(rawTimeleft)
     rawTimeUntilFreeReroll = rawTimeUntilFreeReroll > 720000 and 0 or rawTimeUntilFreeReroll
 
-    local description = ("Creature %s\nDuration %s\nValue: %d/10\nType: %s\n%s\n\nClick in this window to open the prey dialog.")
+    local description = ("Creature: %s\nDuration: %s\nValue: %d/10\nType: %s\n%s")
         :format(
             currentHolderName,
             timeleft,
@@ -532,6 +595,8 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
     PreyController.preyData[slotId].timeleft = timeleft
     PreyController.preyData[slotId].type = SLOT_STATE_ACTIVE
     PreyController.preyData[slotId].preyType = getBigIconPath(bonusType)
+    PreyController.preyData[slotId].bonusValue = bonusValue
+    PreyController.preyData[slotId].bonusType = bonusType
     PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(rawTimeUntilFreeReroll)
     PreyController:handleResources()
     PreyController.preyData[slotId].isFreeReroll = rawTimeUntilFreeReroll == 0
@@ -541,10 +606,8 @@ end
 
 local lastOnMouseWheel = 0
 function PreyController:onMouseWheel(slotId)
-    if self.preyData[slotId + 1].searchValue then return end
     if os.clock() < lastOnMouseWheel then return end
     lastOnMouseWheel = os.clock() + 0.5
-
 
     local currentRaceList = PreyController.preyData[slotId + 1].raceList
     local originalRaceList = PreyController.preyData[slotId + 1].raceListOriginal
@@ -553,10 +616,13 @@ function PreyController:onMouseWheel(slotId)
     -- every time the scroll happens, add + 5
     local currentCount = #currentRaceList
     local toAdd = 5
+
+    local searchValue = self.preyData[slotId + 1].searchValueText or ''
     for i = currentCount + 1, math.min(currentCount + toAdd, #originalRaceList) do
         local data = originalRaceList[i]
         data.index = i
         table.insert(currentRaceList, data)
+        ::continue::
     end
 end
 

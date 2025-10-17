@@ -8,6 +8,7 @@
     class="content"
     anchor="parent"
     *title="self.title"
+    onhover="self:clearDescription()"
   >
     <div class="tab-container">
       <img
@@ -34,12 +35,8 @@
         <div class="header">
           <span>{{slot.monsterName}}</span>
         </div>
-        <div
-          class="race-container"
-          *onhoverchange="self:onHover(slot.slotId, isHovered)"
-          *if="slot.type == 0 or slot.type == 2"
-        >
-          <div class="race-monster">
+        <div class="race-container" *if="slot.type == 0 or slot.type == 2">
+          <div class="race-monster" onhover="self:onHover(slot.slotId)">
             <uicreature
               *if="slot.type == 2"
               *outfit="{type = slot.outfit.type, head = slot.outfit.head, body = slot.outfit.body, legs = slot.outfit.legs, feet = slot.outfit.feet}"
@@ -127,7 +124,11 @@
           src="/images/game/prey/prey_perm_test.png"
           onclick="self:openStore(0)"
         />
-        <div class="choose-monster-list" *if="slot.type == 3 or slot.type == 4">
+        <div
+          class="choose-monster-list"
+          *if="slot.type == 3 or slot.type == 4"
+          onhover="self:onHover(slot.slotId, 'preyCandidate')"
+        >
           <div
             class="monster-list"
             layout="type: grid; cell-size: 66 66;num-columns:3"
@@ -137,6 +138,7 @@
                 style="width: 64px; height: 64px"
                 *border-width="race.selected == true and 1 or 0"
                 *border-color="race.selected == true and 'white' or 'transparent'"
+                *tooltip="race.name"
               >
                 <uicreature
                   *outfit="{type = race.outfit.type, head = race.outfit.head, body = race.outfit.body, legs = race.outfit.legs, feet = race.outfit.feet}"
@@ -146,7 +148,11 @@
             </div>
           </div>
         </div>
-        <div class="monster-list-name-container" *if="slot.type == 5">
+        <div
+          class="monster-list-name-container"
+          *if="slot.type == 5"
+          onhover="self:onHover(slot.slotId, 'selectionList')"
+        >
           <div class="monster-names">
             <div class="monster-names-wrapper">
               <div
@@ -179,21 +185,27 @@
           >
             <div class="prey-reroll-wrapper">
               <img
+                onhover="self:onHover(slot.slotId, 'rerollButton')"
                 class="base-img-clip"
                 *disabled="self.rawRerollGoldPrice > self.rawPlayerGold"
                 src="/modules/game_prey_html/images/prey-reroll-button.png"
                 onclick="self:listReroll(slot.slotId)"
               />
               <div
+                onhover="self:onHover(slot.slotId, 'time')"
                 class="progress-bar-time-next-reroll"
                 *if="slot.type == 2 or slot.type == 3 or slot.type == 4"
                 *width="slot.percentFreeReroll"
               ></div>
-              <div class="prey-reroll-timeleft">
+              <div
+                class="prey-reroll-timeleft"
+                onhover="self:onHover(slot.slotId, 'time')"
+              >
                 {{slot.timeUntilFreeReroll}}
               </div>
             </div>
             <div
+              onhover="self:clearDescription()"
               class="base-button-cost"
               *margin-top="slot and (slot.type == 3 or slot.type == 4) and 5 or 1"
               *disabled="slot.disableFreeReroll"
@@ -214,6 +226,7 @@
             *if="slot.type == 2 or slot.type == 3 or slot.type == 4"
           >
             <img
+              onhover="self:onHover(slot.slotId, 'pickSpecificPrey')"
               class="base-img-clip"
               src="/modules/game_prey_html/images/prey-pick-button.png"
               *disabled="self.pickSpecificPrice > self.wildcards"
@@ -223,6 +236,7 @@
               class="prey-reroll-cost"
               *margin-top="slot and (slot.type == 3 or slot.type == 4) and 5 or 1"
               *disabled="self.pickSpecificPrice > self.wildcards"
+              onhover="self:clearDescription()"
             >
               <p>{{self.pickSpecificPrice}}</p>
               <img
@@ -239,8 +253,10 @@
               src="/modules/game_prey_html/images/prey-bonus-button.png"
               onclick="self:handleRerollBonus(slot.slotId)"
               *disabled="self.rerollBonusPrice > self.wildcards"
+              onhover="self:onHover(slot.slotId, 'selectPrey')"
             />
             <div
+              onhover="self:clearDescription()"
               class="prey-bonus-cost"
               *disabled="self.rerollBonusPrice > self.wildcards"
             >
@@ -267,6 +283,7 @@
           </div>
           <div class="button-choose" *if="slot.type >= 3">
             <img
+              onhover="self:onHover(slot.slotId, 'choosePreyButtonBonus')"
               *disabled="not slot.previewMonster or not slot.previewMonster.raceId"
               class="prey-choose-button"
               src="/modules/game_prey_html/images/prey-choose-button.png"
@@ -275,7 +292,10 @@
           </div>
         </div>
         <div class="options" *if="slot.type == 2">
-          <div class="options-container">
+          <div
+            class="options-container"
+            onhover="self:onHover(slot.slotId, 'autoRerollCheck')"
+          >
             <span class="options-wrapper">
               <input
                 id="auto-reroll"
@@ -285,7 +305,7 @@
               />
               <label for="auto-reroll">Automatic Bonus Reroll</label></span
             >
-            <span class="options-cost">
+            <span class="options-cost" onhover="self:clearDescription()">
               <span>{{self.rerollBonusPrice}}</span>
               <img
                 src="/modules/game_prey_html/images/prey-wildcard"
@@ -294,7 +314,10 @@
               />
             </span>
           </div>
-          <div class="options-container">
+          <div
+            class="options-container"
+            onhover="self:onHover(slot.slotId, 'lockPreyCheck')"
+          >
             <span class="options-wrapper">
               <input
                 id="lock-prey"
@@ -304,7 +327,7 @@
               />
               <label for="lock-prey">Lock Prey</label></span
             >
-            <span class="options-cost">
+            <span class="options-cost" onhover="self:clearDescription()">
               <span>{{self.lockPreyPrice}}</span>
               <img
                 src="/modules/game_prey_html/images/prey-wildcard"
@@ -347,7 +370,7 @@
           />
         </div>
       </div>
-      <button class="close-btn">Close</button>
+      <button class="close-btn" onclick="self:hide()">Close</button>
     </div>
   </window>
 </html>
