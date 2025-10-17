@@ -23,6 +23,7 @@
 #pragma once
 
 #include "declarations.h"
+#include "bitmapfontwrapoptions.h"
 #include <framework/otml/declarations.h>
 
 class BitmapFont
@@ -57,7 +58,17 @@ public:
 
     Size calculateTextRectSize(std::string_view text);
 
-    std::string wrapText(std::string_view text, int maxWidth, std::vector<std::pair<int, Color>>* colors = nullptr) noexcept;
+    std::string wrapText(std::string_view text,
+                     int maxWidth,
+                     std::vector<std::pair<int, Color>>* colors = nullptr) {
+        WrapOptions opt;
+        return wrapText(text, maxWidth, opt, colors);
+    }
+
+    std::string wrapText(std::string_view text,
+                     int maxWidth,
+                     const WrapOptions& options,
+                     std::vector<std::pair<int, Color>>* colors = nullptr);
 
     inline const std::string& getName() const noexcept { return m_name; }
     inline int getGlyphHeight() const noexcept { return m_glyphHeight; }
