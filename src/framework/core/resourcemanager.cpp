@@ -785,7 +785,7 @@ bool ResourceManager::launchCorrect(const std::vector<std::string>& args) { // c
 
 std::string ResourceManager::createArchive(const std::unordered_map<std::string, std::string>& /*files*/) { return ""; }
 
-std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(std::string /*dataOrPath*/)
+std::unordered_map<std::string, std::string> ResourceManager::decompressArchive(const std::string& /*dataOrPath*/)
 {
     std::unordered_map<std::string, std::string> ret;
     return ret;

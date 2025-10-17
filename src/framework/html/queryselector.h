@@ -23,5 +23,5 @@
 #pragma once
 #include "declarations.h"
 
-std::vector<HtmlNodePtr> querySelectorAll(HtmlNodePtr root, const std::string& selector);
-HtmlNodePtr querySelector(HtmlNodePtr root, const std::string& selector);
+std::vector<HtmlNodePtr> querySelectorAll(const HtmlNodePtr& root, const std::string& selector);
+HtmlNodePtr querySelector(const HtmlNodePtr& root, const std::string& selector);

@@ -76,10 +76,10 @@ void Logger::log(Fw::LogLevel level, const std::string_view message)
     __android_log_print(ANDROID_LOG_INFO, "OTClientMobile", "%s", outmsg.c_str());
 #endif // ANDROID
 
-    std::cout << outmsg << std::endl;
+    std::cout << outmsg << '\n';
 
     if (m_outFile.good()) {
-        m_outFile << outmsg << std::endl;
+        m_outFile << outmsg << '\n';
         m_outFile.flush();
     }
 

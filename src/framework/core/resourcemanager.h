@@ -90,7 +90,7 @@ public:
     void updateExecutable(std::string fileName);
     bool launchCorrect(const std::vector<std::string>& args);
     std::string createArchive(const std::unordered_map<std::string, std::string>& files);
-    std::unordered_map<std::string, std::string> decompressArchive(std::string dataOrPath);
+    std::unordered_map<std::string, std::string> decompressArchive(const std::string& dataOrPath);
 
     std::string getBinaryPath() { return m_binaryPath.string(); }
 

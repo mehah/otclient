@@ -53,7 +53,7 @@ public:
     void init();
     void terminate();
 
-    bool loadSpr(std::string file);
+    bool loadSpr(const std::string& file);
     bool loadRegularSpr(std::string file);
     bool loadCwmSpr(std::string file);
     void reload();

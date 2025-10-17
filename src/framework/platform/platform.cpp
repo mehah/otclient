@@ -60,7 +60,7 @@ std::string Platform::getOsShortName(OperatingSystem os)
     return it->second;
 }
 
-Platform::DeviceType Platform::getDeviceTypeByName(std::string shortName)
+Platform::DeviceType Platform::getDeviceTypeByName(const std::string& shortName)
 {
     for (const auto& [type, name] : m_deviceShortNames) {
         if (name == shortName)
@@ -69,7 +69,7 @@ Platform::DeviceType Platform::getDeviceTypeByName(std::string shortName)
     return DeviceUnknown;
 }
 
-Platform::OperatingSystem Platform::getOsByName(std::string shortName)
+Platform::OperatingSystem Platform::getOsByName(const std::string& shortName)
 {
     for (const auto& [type, name] : m_osShortNames) {
         if (name == shortName)

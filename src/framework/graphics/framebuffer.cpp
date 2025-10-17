@@ -176,7 +176,7 @@ TexturePtr FrameBuffer::extractTexture() {
     return texture;
 }
 
-void FrameBuffer::doScreenshot(std::string file, const uint16_t x, const uint16_t y)
+void FrameBuffer::doScreenshot(const std::string& file, const uint16_t x, const uint16_t y)
 {
     if (file.empty()) {
         return;

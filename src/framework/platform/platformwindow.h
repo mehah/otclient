@@ -128,7 +128,7 @@ public:
     void setOnResize(const OnResizeCallback& onResize) { m_onResize = onResize; }
     void setOnInputEvent(const OnInputEventCallback& onInputEvent) { m_onInputEvent = onInputEvent; }
 
-    void addKeyListener(std::function<void(const InputEvent&)> listener) { m_keyListeners.push_back(listener); }
+    void addKeyListener(const std::function<void(const InputEvent&)>& listener) { m_keyListeners.push_back(listener); }
 
     void setKeyDelay(const Fw::Key key, const uint8_t delay) { if (key < Fw::KeyLast) m_keyInfo[key].delay = delay; }
 

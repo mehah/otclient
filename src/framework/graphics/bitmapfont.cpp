@@ -216,7 +216,7 @@ void BitmapFont::fillTextCoords(const CoordsBufferPtr& coords, const std::string
 }
 
 void BitmapFont::fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, const std::string_view text,
-                                     const std::vector<std::pair<int, Color>> textColors,
+                                     const std::vector<std::pair<int, Color>>& textColors,
                                      const Size& textBoxSize, const Fw::AlignmentFlag align,
                                      const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const noexcept
 {

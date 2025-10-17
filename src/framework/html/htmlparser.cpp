@@ -170,7 +170,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
     const std::string& s = html;
     size_t i = 0, N = s.size();
 
-    auto push_node = [&](HtmlNodePtr node) {
+    auto push_node = [&](const HtmlNodePtr& node) {
         auto parent = st.top();
 
         // merge consecutive non-expression text nodes
@@ -202,7 +202,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
         }
     };
 
-    auto attach_front = [&](HtmlNodePtr parent, HtmlNodePtr node) {
+    auto attach_front = [&](const HtmlNodePtr& parent, const HtmlNodePtr& node) {
         node->parent.reset();
         node->prev.reset();
         node->next.reset();

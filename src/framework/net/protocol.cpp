@@ -21,9 +21,7 @@
  */
 
 #include "protocol.h"
-#include <algorithm>
 #include <framework/core/application.h>
-#include <random>
 
 #include "inputmessage.h"
 #include "outputmessage.h"
@@ -451,7 +449,7 @@ void Protocol::onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packe
 void Protocol::playRecord(PacketPlayerPtr player)
 {
     m_disconnected = false;
-    m_player = player;
+    m_player = std::move(player);
     m_player->start([capture0 = asProtocol()](auto&& PH1) {
         capture0->onPlayerPacket(std::forward<decltype(PH1)>(PH1));
     },
@@ -463,5 +461,5 @@ void Protocol::playRecord(PacketPlayerPtr player)
 
 void Protocol::setRecorder(PacketRecorderPtr recorder)
 {
-    m_recorder = recorder;
+    m_recorder = std::move(recorder);
 }

@@ -57,7 +57,7 @@ public:
     void setSpriteSize(const uint8_t size) { m_spriteSize = size; }
     uint8_t getSpriteSize() { return m_spriteSize; }
 
-    void setDrawEvents(ApplicationDrawEventsPtr drawEvents) { m_drawEvents = drawEvents; }
+    void setDrawEvents(ApplicationDrawEventsPtr drawEvents) { m_drawEvents = std::move(drawEvents); }
     ApplicationDrawEventsPtr getDrawEvents() { return m_drawEvents; }
 
 protected:

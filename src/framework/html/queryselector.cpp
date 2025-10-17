@@ -368,7 +368,7 @@ static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx);
 
 static inline bool isUniversal(const std::string& tag) { return tag.empty() || tag == "*"; }
 
-static void seedCandidates(HtmlNodePtr root, const Selector& sel, std::vector<HtmlNodePtr>& out) {
+static void seedCandidates(const HtmlNodePtr& root, const Selector& sel, std::vector<HtmlNodePtr>& out) {
     if (sel.steps.empty()) return;
     const auto& right = sel.steps[0].simple;
     auto doc = root->documentRoot();
@@ -474,7 +474,7 @@ static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx) 
     return false;
 }
 
-std::vector<HtmlNodePtr> querySelectorAll(HtmlNodePtr root, const std::string& selectorStr) {
+std::vector<HtmlNodePtr> querySelectorAll(const HtmlNodePtr& root, const std::string& selectorStr) {
     std::vector<HtmlNodePtr> results;
     std::unordered_set<const HtmlNode*, PtrHash, PtrEq> seen;
     auto lists = Selector::splitSelectorList(selectorStr);
@@ -497,7 +497,7 @@ std::vector<HtmlNodePtr> querySelectorAll(HtmlNodePtr root, const std::string& s
     return results;
 }
 
-HtmlNodePtr querySelector(HtmlNodePtr root, const std::string& selectorStr) {
+HtmlNodePtr querySelector(const HtmlNodePtr& root, const std::string& selectorStr) {
     auto lists = Selector::splitSelectorList(selectorStr);
     if (lists.empty()) return nullptr;
 

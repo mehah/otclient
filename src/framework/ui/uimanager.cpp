@@ -429,7 +429,7 @@ bool UIManager::importStyle(const std::string& fl, const bool checkDeviceStyles)
 
     if (checkDeviceStyles) {
         // check for device styles
-        const auto fileName = fl.substr(0, fl.find("."));
+        const auto fileName = fl.substr(0, fl.find('.'));
 
         const auto deviceName = g_platform.getDeviceShortName();
         if (!deviceName.empty())
@@ -559,7 +559,7 @@ OTMLNodePtr UIManager::findMainWidgetNode(const OTMLDocumentPtr& doc)
 
 OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::OperatingSystem os)
 {
-    const auto rawName = file.substr(0, file.find("."));
+    const auto rawName = file.substr(0, file.find('.'));
     const auto osName = g_platform.getOsShortName(os);
 
     const auto& doc = OTMLDocument::parse(g_resources.guessFilePath(rawName + "." + osName, "otui"));
@@ -573,7 +573,7 @@ OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::Ope
 
 OTMLNodePtr UIManager::loadDeviceUI(const std::string& file, const Platform::DeviceType deviceType)
 {
-    const auto rawName = file.substr(0, file.find("."));
+    const auto rawName = file.substr(0, file.find('.'));
     const auto deviceName = g_platform.getDeviceShortName(deviceType);
 
     const auto& doc = OTMLDocument::parse(g_resources.guessFilePath(rawName + "." + deviceName, "otui"));
@@ -646,7 +646,7 @@ UIWidgetPtr UIManager::loadUIFromString(const std::string& data, const UIWidgetP
             std::string tag = node->tag();
 
             // import styles in these files too
-            if (tag.find("<") != std::string::npos)
+            if (tag.find('<') != std::string::npos)
                 importStyleFromOTML(node);
             else {
                 if (widget)

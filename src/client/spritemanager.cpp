@@ -53,7 +53,7 @@ void SpriteManager::load() {
     } else (m_spritesFiles[0] = std::make_unique<FileStream_m>(g_resources.openFile(m_lastFileName)))->file->cache(true);
 }
 
-bool SpriteManager::loadSpr(std::string file)
+bool SpriteManager::loadSpr(const std::string& file)
 {
     m_spritesCount = 0;
     m_signature = 0;

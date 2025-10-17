@@ -67,7 +67,8 @@ int Http::get(const std::string& url, int timeout)
         result->operationId = operationId;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     false, true, result, [this, operationId](HttpResult_ptr result) {
+                                                     false, true, result, [this, operationId](const HttpResult_ptr&
+                                                     result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -104,7 +105,8 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
         result->postData = data;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     isJson, checkContentLength, result, [this, operationId](HttpResult_ptr result) {
+                                                     isJson, checkContentLength, result, [this, operationId](
+                                                     const HttpResult_ptr& result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -135,7 +137,7 @@ int Http::download(const std::string& url, const std::string& path, int timeout)
         result->operationId = operationId;
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
-                                                     false, true, result, [&, path](HttpResult_ptr result) {
+                                                     false, true, result, [&, path](const HttpResult_ptr& result) {
             if (!result->finished) {
                 g_dispatcher.addEvent([result] {
                     g_lua.callGlobalField("g_http", "onDownloadProgress", result->operationId, result->url, result->progress, result->speed);
@@ -174,7 +176,8 @@ int Http::ws(const std::string& url, int timeout)
         result->url = url;
         result->operationId = operationId;
         m_operations[operationId] = result;
-        const auto& session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type, std::string message) {
+        const auto& session = std::make_shared<WebsocketSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, timeout, result, [&, result](WebsocketCallbackType type,
+                                                                 const std::string& message) {
             g_dispatcher.addEvent([result, type, message] {
                 if (type == WebsocketCallbackType::OPEN) {
                     g_lua.callGlobalField("g_http", "onWsOpen", result->operationId, message);
@@ -283,7 +286,7 @@ void HttpSession::start()
     });
 }
 
-void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver::iterator iterator)
+void HttpSession::on_resolve(const std::error_code& ec, const asio::ip::tcp::resolver::iterator& iterator)
 {
     if (ec) {
         onError("HttpSession unable to resolve " + m_url + ": " + ec.message());

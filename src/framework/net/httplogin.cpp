@@ -49,8 +49,8 @@ void LoginHttp::cancel() {
 }
 
 void LoginHttp::Logger(const auto& req, const auto& res) {
-    std::cout << "======= LOG ======= " << std::endl;
-    std::cout << "-- REQUEST --" << std::endl;
+    std::cout << "======= LOG ======= " << '\n';
+    std::cout << "-- REQUEST --" << '\n';
     std::cout << req.method << std::endl;
     std::cout << req.path << std::endl;
     std::cout << req.body << std::endl;
@@ -58,7 +58,7 @@ void LoginHttp::Logger(const auto& req, const auto& res) {
     for (auto itr = req.headers.begin(); itr != req.headers.end(); ++itr) {
         std::cout << itr->first << '\t' << itr->second << '\n';
     }
-    std::cout << "-- RESPONSE --" << std::endl;
+    std::cout << "-- RESPONSE --" << '\n';
     std::cout << res.version << std::endl;
     std::cout << res.status << std::endl;
     std::cout << res.reason << std::endl;
@@ -69,7 +69,7 @@ void LoginHttp::Logger(const auto& req, const auto& res) {
         std::cout << itr->first << '\t' << itr->second << '\n';
     }
 
-    std::cout << "========= " << std::endl;
+    std::cout << "========= " << '\n';
 }
 
 void LoginHttp::startHttpLogin(const std::string& host, const std::string& path,
@@ -86,13 +86,13 @@ void LoginHttp::startHttpLogin(const std::string& host, const std::string& path,
     if (auto res = cli.Post(path, headers, body.dump(1), "application/json")) {
         if (res->status == 200) {
             const json bodyResponse = json::parse(res->body);
-            std::cout << bodyResponse.dump() << std::endl;
+            std::cout << bodyResponse.dump() << '\n';
 
-            std::cout << std::boolalpha << json::accept(res->body) << std::endl;
+            std::cout << std::boolalpha << json::accept(res->body) << '\n';
         }
     } else {
         const auto err = res.error();
-        std::cout << "HTTP error: " << to_string(err) << std::endl;
+        std::cout << "HTTP error: " << to_string(err) << '\n';
     }
 }
 
@@ -240,13 +240,13 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string& host,
     httplib::Result response =
         client.Post(path, headers, body.dump(), "application/json");
     if (!response) {
-        std::cout << "HTTPS error: unknown" << std::endl;
+        std::cout << "HTTPS error: unknown" << '\n';
     } else if (response->status != Success) {
         std::cout << "HTTPS error: " << to_string(response.error())
-            << std::endl;
+            << '\n';
     } else {
         std::cout << "HTTPS status: " << to_string(response.error())
-            << std::endl;
+            << '\n';
     }
 
     if (response && response->status == Success &&
@@ -272,13 +272,13 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
     httplib::Result response =
         client.Post(path, headers, body.dump(), "application/json");
     if (!response) {
-        std::cout << "HTTP error: unknown" << std::endl;
+        std::cout << "HTTP error: unknown" << '\n';
     } else if (response->status != Success) {
         std::cout << "HTTP error: " << to_string(response.error())
-            << std::endl;
+            << '\n';
     } else {
         std::cout << "HTTP status: " << to_string(response.error())
-            << std::endl;
+            << '\n';
     }
     if (response && response->status == Success &&
            !parseJsonResponse(response->body)) {

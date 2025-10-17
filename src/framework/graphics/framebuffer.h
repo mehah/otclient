@@ -55,7 +55,7 @@ public:
 
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }
     void disableBlend() { m_disableBlend = true; }
-    void doScreenshot(std::string file, uint16_t x = 0, uint16_t y = 0);
+    void doScreenshot(const std::string& file, uint16_t x = 0, uint16_t y = 0);
     Size getSize();
 
 protected:

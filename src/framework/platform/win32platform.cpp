@@ -169,7 +169,7 @@ bool Platform::openUrl(std::string url, const bool now)
     return true;
 }
 
-bool Platform::openDir(std::string path, const bool now)
+bool Platform::openDir(const std::string& path, const bool now)
 {
     const auto& action = [path] {
         return reinterpret_cast<size_t>(ShellExecuteW(nullptr, L"open", L"explorer.exe", stdext::utf8_to_utf16(path).c_str(), nullptr, SW_SHOWNORMAL)) >= 32;

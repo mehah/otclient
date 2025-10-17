@@ -76,7 +76,7 @@ public:
     bool removeFile(std::string file);
     ticks_t getFileModificationTime(std::string file);
     bool openUrl(std::string url, bool now = false);
-    bool openDir(std::string path, bool now = false);
+    bool openDir(const std::string& path, bool now = false);
     std::string getCPUName();
     double getTotalSystemMemory();
     std::string getOSName();
@@ -97,10 +97,10 @@ public:
     std::string getDeviceShortName(DeviceType type = DeviceUnknown);
     std::string getOsShortName(OperatingSystem os = OsUnknown);
     std::string traceback(std::string_view where, int level = 1, int maxDepth = 32);
-    void addKeyListener(std::function<void(const InputEvent&)> /*listener*/) {}
+    void addKeyListener(const std::function<void(const InputEvent&)>& /*listener*/) {}
 
-    static DeviceType getDeviceTypeByName(std::string shortName);
-    static OperatingSystem getOsByName(std::string shortName);
+    static DeviceType getDeviceTypeByName(const std::string& shortName);
+    static OperatingSystem getOsByName(const std::string& shortName);
 
 private:
     Device m_device{ Device(Desktop, Windows) };

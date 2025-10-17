@@ -102,7 +102,8 @@ void ProxyManager::removeProxy(const std::string& host, const uint16_t port)
     }
 }
 
-uint32_t ProxyManager::addSession(uint16_t port, std::function<void(ProxyPacketPtr)> recvCallback, std::function<void(std::error_code)> disconnectCallback)
+uint32_t ProxyManager::addSession(uint16_t port, const std::function<void(ProxyPacketPtr)>& recvCallback, const std::function<void(std::error_code)>
+                                  & disconnectCallback)
 {
     assert(recvCallback && disconnectCallback);
     const auto session = std::make_shared<Session>(m_io, port, recvCallback, disconnectCallback);
@@ -127,7 +128,7 @@ void ProxyManager::removeSession(const uint32_t sessionId)
     }
 }
 
-void ProxyManager::send(const uint32_t sessionId, ProxyPacketPtr packet)
+void ProxyManager::send(const uint32_t sessionId, const ProxyPacketPtr& packet)
 {
     SessionPtr session = nullptr;
     for (auto& session_weak : m_sessions) {

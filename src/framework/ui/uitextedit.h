@@ -21,7 +21,6 @@
  */
 
 #pragma once
-
 #include "uiwidget.h"
 
  // @bindclass
@@ -51,7 +50,7 @@ public:
     void setSelectionColor(const Color& color) { m_selectionColor = color; }
     void setSelectionBackgroundColor(const Color& color) { m_selectionBackgroundColor = color; }
     void setAutoScroll(const bool autoScroll) { setProp(PropAutoScroll, autoScroll); }
-    void setPlaceholder(std::string placeholder) { m_placeholder = placeholder; }
+    void setPlaceholder(std::string placeholder) { m_placeholder = std::move(placeholder); }
     void setPlaceholderColor(const Color& color) { m_placeholderColor = color; }
     void setPlaceholderAlign(const Fw::AlignmentFlag align) { m_placeholderAlign = align; }
     void setPlaceholderFont(std::string_view fontName);

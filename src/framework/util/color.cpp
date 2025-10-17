@@ -183,7 +183,7 @@ namespace {
         return clamp255(std::stoi(s));
     }
 
-    static inline std::vector<std::string> split_commas(std::string s) {
+    static inline std::vector<std::string> split_commas(const std::string& s) {
         std::vector<std::string> parts; parts.reserve(4);
         size_t pos = 0;
         while (true) {
@@ -250,7 +250,7 @@ std::istream& operator>>(std::istream& in, Color& color)
                 [](unsigned char c) { return std::isspace(c); }), s.end());
     };
 
-    auto split_commas = [](std::string s) {
+    auto split_commas = [](const std::string& s) {
         std::vector<std::string> parts; parts.reserve(4);
         size_t pos = 0;
         while (true) {

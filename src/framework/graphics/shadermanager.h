@@ -64,7 +64,7 @@ public:
     }
 
 private:
-    void putShader(std::string name, const PainterShaderProgramPtr& shader);
+    void putShader(const std::string& name, const PainterShaderProgramPtr& shader);
 
     stdext::map<std::string, PainterShaderProgramPtr> m_shaders;
     std::vector<PainterShaderProgramPtr> m_shadersVector;

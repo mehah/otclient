@@ -345,7 +345,7 @@ void GraphicalApplication::doScreenshot(std::string file)
 
 void GraphicalApplication::doMapScreenshot(std::string fileName)
 {
-    if (m_drawEvents) m_drawEvents->doMapScreenshot(fileName);
+    if (m_drawEvents) m_drawEvents->doMapScreenshot(std::move(fileName));
 }
 
 float GraphicalApplication::getHUDScale() const { return g_window.getDisplayDensity(); }

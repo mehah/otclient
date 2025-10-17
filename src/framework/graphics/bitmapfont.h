@@ -46,7 +46,7 @@ public:
                         const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const noexcept;
 
     void fillTextColorCoords(std::vector<std::pair<Color, CoordsBufferPtr>>& colorCoords, std::string_view text,
-                             std::vector<std::pair<int, Color>> textColors,
+                             const std::vector<std::pair<int, Color>>& textColors,
                              const Size& textBoxSize, Fw::AlignmentFlag align,
                              const Rect& screenCoords, const std::vector<Point>& glyphsPositions) const noexcept;
 

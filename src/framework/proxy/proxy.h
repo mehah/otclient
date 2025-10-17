@@ -50,9 +50,10 @@ public:
     bool isActive();
     void addProxy(const std::string& host, uint16_t port, int priority);
     void removeProxy(const std::string& host, uint16_t port);
-    uint32_t addSession(uint16_t port, std::function<void(ProxyPacketPtr)> recvCallback, std::function<void(std::error_code)> disconnectCallback);
+    uint32_t addSession(uint16_t port, const std::function<void(ProxyPacketPtr)>& recvCallback, const std::function<void(std::error_code)>
+                        & disconnectCallback);
     void removeSession(uint32_t sessionId);
-    void send(uint32_t sessionId, ProxyPacketPtr packet);
+    void send(uint32_t sessionId, const ProxyPacketPtr& packet);
     // tools
     std::map<std::string, uint32_t> getProxies();
     std::map<std::string, std::string> getProxiesDebugInfo();

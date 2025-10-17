@@ -22,7 +22,6 @@
 
 #include <framework/global.h>
 #include <framework/core/clock.h>
-#include <filesystem>
 
 #include "packet_player.h"
 
@@ -64,8 +63,8 @@ void PacketPlayer::start(std::function<void(std::shared_ptr<std::vector<uint8_t>
                          std::function<void(std::error_code)> disconnectCallback)
 {
     m_start = g_clock.millis();
-    m_recvCallback = recvCallback;
-    m_disconnectCallback = disconnectCallback;
+    m_recvCallback = std::move(recvCallback);
+    m_disconnectCallback = std::move(disconnectCallback);
     m_event = g_dispatcher.scheduleEvent([this] { process(); }, 50);
 }
 

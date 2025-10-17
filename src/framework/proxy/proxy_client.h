@@ -22,16 +22,7 @@
 
 #pragma once
 
-#include <asio.hpp>
-#include <list>
-#include <map>
-#include <set>
-
-using ProxyPacket = std::vector<uint8_t>;
-using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;
-
-class Session;
-using SessionPtr = std::shared_ptr<Session>;
+#include <framework/net/declarations.h>
 
 class Proxy : public std::enable_shared_from_this<Proxy>
 {
@@ -139,8 +130,8 @@ public:
         if (m_id == 0) m_id = 1;
         m_port = port;
         m_useSocket = false;
-        m_recvCallback = recvCallback;
-        m_disconnectCallback = disconnectCallback;
+        m_recvCallback = std::move(recvCallback);
+        m_disconnectCallback = std::move(disconnectCallback);
     }
 
     // thread safe

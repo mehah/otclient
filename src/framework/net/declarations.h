@@ -38,6 +38,12 @@ class Server;
 class PacketPlayer;
 class PacketRecorder;
 
+class Session;
+using SessionPtr = std::shared_ptr<Session>;
+
+using ProxyPacket = std::vector<uint8_t>;
+using ProxyPacketPtr = std::shared_ptr<ProxyPacket>;
+
 using InputMessagePtr = std::shared_ptr<InputMessage>;
 using OutputMessagePtr = std::shared_ptr<OutputMessage>;
 #ifdef __EMSCRIPTEN__
