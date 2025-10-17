@@ -45,23 +45,23 @@ public:
     bool detachEffect(const AttachedEffectPtr& obj);
     AttachedEffectPtr getAttachedEffectById(uint16_t id);
 
-    virtual void onStartAttachEffect(const AttachedEffectPtr& /*effect*/) {};
-    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& /*effect*/) {};
-    virtual void onStartDetachEffect(const AttachedEffectPtr& /*effect*/) {};
+    virtual void onStartAttachEffect(const AttachedEffectPtr& /*effect*/) {}
+    virtual void onDispatcherAttachEffect(const AttachedEffectPtr& /*effect*/) {}
+    virtual void onStartDetachEffect(const AttachedEffectPtr& /*effect*/) {}
 
     bool isOwnerHidden() { return m_ownerHidden > 0; }
 
-    const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_data ? m_data->attachedEffects : EMPTY_ATTACHED_EFFECTS; };
+    const std::vector<AttachedEffectPtr>& getAttachedEffects() { return m_data ? m_data->attachedEffects : EMPTY_ATTACHED_EFFECTS; }
 
     void attachParticleEffect(const std::string& name);
     void clearAttachedParticlesEffect();
     bool detachParticleEffectByName(const std::string& name);
     void updateAndAttachParticlesEffects(std::vector<std::string>& newElements);
 
-    const std::vector<UIWidgetPtr>& getAttachedWidgets() { return m_data ? m_data->attachedWidgets : EMPTY_ATTACHED_WIDGETS; };
-    bool hasAttachedWidgets() const { return m_data && !m_data->attachedWidgets.empty(); };
-    bool hasAttachedEffects()  const { return m_data && !m_data->attachedEffects.empty(); };
-    bool hasAttachedParticles()  const { return m_data && !m_data->attachedParticles.empty(); };
+    const std::vector<UIWidgetPtr>& getAttachedWidgets() { return m_data ? m_data->attachedWidgets : EMPTY_ATTACHED_WIDGETS; }
+    bool hasAttachedWidgets() const { return m_data && !m_data->attachedWidgets.empty(); }
+    bool hasAttachedEffects()  const { return m_data && !m_data->attachedEffects.empty(); }
+    bool hasAttachedParticles()  const { return m_data && !m_data->attachedParticles.empty(); }
 
     bool isWidgetAttached(const UIWidgetPtr& widget);
     void attachWidget(const UIWidgetPtr& widget);
@@ -76,7 +76,7 @@ protected:
         std::vector<AttachedEffectPtr> attachedEffects;
         std::vector<ParticleEffectPtr> attachedParticles;
         std::vector<UIWidgetPtr> attachedWidgets;
-    };
+    } ;
 
     void drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, bool isOnTop);
     void drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView);

@@ -81,7 +81,9 @@ void Application::registerLuaFunctions()
     g_lua.bindGlobalFunction("iptostring", [](const uint32_t v) { return stdext::ip_to_string(v); });
     g_lua.bindGlobalFunction("stringtoip", [](const std::string_view v) { return stdext::string_to_ip(v); });
     g_lua.bindGlobalFunction("listSubnetAddresses", [](const uint32_t a, const uint8_t b) { return stdext::listSubnetAddresses(a, b); });
-    g_lua.bindGlobalFunction("ucwords", [](std::string s) { return stdext::ucwords(s); });
+    g_lua.bindGlobalFunction("ucwords", [](std::string s) { stdext::ucwords(s);
+                                 return;
+                             });
     g_lua.bindGlobalFunction("regexMatch", [](std::string s, const std::string& exp) {
         int limit = 10000;
         std::vector<std::vector<std::string>> ret;

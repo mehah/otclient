@@ -31,4 +31,4 @@ namespace Fw
     AnchorEdge translateAnchorEdge(std::string anchorEdge);
     WidgetState translateState(std::string state);
     AutoFocusPolicy translateAutoFocusPolicy(std::string policy);
-};
+} // namespace Fw;

@@ -724,7 +724,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
                     if (split.size() != 2)
                         throw OTMLException(node, "invalid anchor description");
 
-                    std::string hookedWidgetId = split[0];
+                    const std::string& hookedWidgetId = split[0];
                     Fw::AnchorEdge hookedEdge = Fw::translateAnchorEdge(split[1]);
 
                     if (anchoredEdge == Fw::AnchorNone)

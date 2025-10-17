@@ -84,7 +84,7 @@ public:
     void setPassable(const bool passable) { m_passable = passable; }
     void setMountShader(std::string_view name);
     void setStaticWalking(uint16_t v);
-    void setIconsTexture(const std::string& filename, const Rect& clip, const uint16_t count);
+    void setIconsTexture(const std::string& filename, const Rect& clip, uint16_t count);
 
     void onStartAttachEffect(const AttachedEffectPtr& effect) override;
     void onDispatcherAttachEffect(const AttachedEffectPtr& effect) override;
@@ -207,7 +207,7 @@ minHeight,
 
 protected:
     virtual void terminateWalk();
-    virtual void onWalking() {};
+    virtual void onWalking() {}
     void updateWalkOffset(uint8_t totalPixelsWalked);
     void updateWalk();
 
@@ -302,7 +302,8 @@ private:
         uint8_t minHeight{ 0 };
         uint8_t height{ 0 };
         uint16_t speed{ 0 };
-    } m_bounce;
+    }
+    m_bounce;
 
     // jump related
     Timer m_jumpTimer;

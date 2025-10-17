@@ -151,14 +151,15 @@ public:
     void sendAnswerModalDialog(uint32_t dialog, uint8_t button, uint8_t choice);
     void sendBrowseField(const Position& position);
     void sendSeekInContainer(uint8_t containerId, uint16_t index);
-    void sendBuyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location);
+    void sendBuyStoreOffer(uint32_t offerId, uint8_t action, const std::string_view& name, uint8_t type, const std::string_view& location);
     void sendRequestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
-    void sendRequestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder = 0, const uint8_t serviceType = 0);
+    void sendRequestStoreOffers(std::string_view categoryName, std::string_view subCategory, uint8_t sortOrder = 0,
+                                uint8_t serviceType = 0);
     void sendRequestStoreHome();
     void sendRequestStorePremiumBoost();
-    void sendRequestUsefulThings(const uint8_t offerId);
+    void sendRequestUsefulThings(uint8_t offerId);
     void sendRequestStoreOfferById(uint32_t offerId, uint8_t sortOrder = 0, uint8_t serviceType = 0);
-    void sendRequestStoreSearch(const std::string_view searchText, uint8_t sortOrder = 0, uint8_t serviceType = 0);
+    void sendRequestStoreSearch(std::string_view searchText, uint8_t sortOrder = 0, uint8_t serviceType = 0);
     void sendOpenStore(uint8_t serviceType, std::string_view category);
     void sendTransferCoins(std::string_view recipient, uint16_t amount);
     void sendOpenTransactionHistory(uint8_t entriesPerPage);
@@ -174,7 +175,7 @@ public:
     void sendCloseImbuingWindow();
     void sendOpenRewardWall();
     void sendOpenRewardHistory();
-    void sendGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
+    void sendGetRewardDaily(uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
     void sendStashWithdraw(uint16_t itemId, uint32_t count, uint8_t stackpos);
     void sendHighscoreInfo(uint8_t action, uint8_t category, uint32_t vocation, std::string_view world, uint8_t worldType, uint8_t battlEye, uint16_t page, uint8_t totalPages);
     void sendImbuementDurations(bool isOpen = false);
@@ -188,7 +189,7 @@ public:
     void sendRequestBossSlootInfo();
     void sendRequestBossSlotAction(uint8_t action, uint32_t raceId);
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
-    void sendQuickLoot(const uint8_t variant, const Position& pos, const uint16_t itemId, const uint8_t stackpos);
+    void sendQuickLoot(uint8_t variant, const Position& pos, uint16_t itemId, uint8_t stackpos);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
     void sendInspectionNormalObject(const Position& position);
@@ -278,8 +279,8 @@ private:
     void parseCreatureMark(const InputMessagePtr& msg);
     void parseTrappers(const InputMessagePtr& msg);
     void parseOpenForge(const InputMessagePtr& msg);
-    void setCreatureVocation(const InputMessagePtr& msg, const uint32_t creatureId) const;
-    void addCreatureIcon(const InputMessagePtr& msg, const uint32_t creatureId) const;
+    void setCreatureVocation(const InputMessagePtr& msg, uint32_t creatureId) const;
+    void addCreatureIcon(const InputMessagePtr& msg, uint32_t creatureId) const;
     void parseCloseForgeWindow(const InputMessagePtr& msg);
     void parseCreatureData(const InputMessagePtr& msg);
     void parseCreatureHealth(const InputMessagePtr& msg);

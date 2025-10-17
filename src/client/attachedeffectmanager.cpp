@@ -55,7 +55,7 @@ AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std:
     obj->m_thingId = thingId;
     obj->m_thingCategory = category;
 
-    obj->m_name = { name.data() };
+    obj->m_name = name.data();
 
     m_effects.emplace(id, obj);
     return obj;
@@ -79,7 +79,7 @@ AttachedEffectPtr AttachedEffectManager::registerByImage(uint16_t id, const std:
     obj->m_texturePath = path;
     obj->m_smooth = smooth;
     obj->m_id = id;
-    obj->m_name = { name.data() };
+    obj->m_name = name.data();
 
     m_effects.emplace(id, obj);
     return obj;

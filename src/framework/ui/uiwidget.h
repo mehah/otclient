@@ -44,7 +44,9 @@ struct EdgeGroup
     T right;
     T bottom;
     T left;
-};
+}
+
+;
 
 enum FlagProp : uint64_t
 {
@@ -1033,5 +1035,5 @@ public:
 
     // custom style
 protected:
-    virtual void parseCustomStyle(const OTMLNodePtr& /*styleNode*/) {};
+    virtual void parseCustomStyle(const OTMLNodePtr& /*styleNode*/) {}
 };

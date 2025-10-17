@@ -106,7 +106,7 @@ protected:
 
     uint16_t m_props{ 0 };
     void setProp(const Prop prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
-    [[nodiscard]] bool getProp(const Prop prop) const { return m_props & prop; };
+    [[nodiscard]] bool getProp(const Prop prop) const { return m_props & prop; }
 
     friend class GarbageCollection;
     friend class TextureManager;

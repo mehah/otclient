@@ -47,7 +47,7 @@ namespace
 #else
     bool s_ignoreLogs = false;
 #endif
-}
+} // namespace
 
 void Logger::log(Fw::LogLevel level, const std::string_view message)
 {

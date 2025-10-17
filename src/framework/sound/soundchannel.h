@@ -58,13 +58,14 @@ protected:
 private:
     struct QueueEntry
     {
-        QueueEntry(std::string fn, const float ft, const float g, const float p) : filename(std::move(fn)), fadetime(ft), gain(g), pitch(p) {};
+        QueueEntry(std::string fn, const float ft, const float g, const float p) : filename(std::move(fn)), fadetime(ft), gain(g), pitch(p) {}
 
         std::string filename;
         float fadetime;
         float gain;
         float pitch;
     };
+
     std::deque<QueueEntry> m_queue;
     SoundSourcePtr m_currentSource;
     bool m_enabled{ true };

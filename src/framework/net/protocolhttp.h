@@ -49,7 +49,7 @@ struct HttpResult
     std::string response;
     std::string error;
     std::weak_ptr<HttpSession> session;
-};
+} ;
 
 using HttpResult_ptr = std::shared_ptr<HttpResult>;
 using HttpResult_cb = std::function<void(HttpResult_ptr)>;
@@ -88,7 +88,8 @@ public:
                               asio::ssl::context::no_sslv2 |
                               asio::ssl::context::no_sslv3 |
                               asio::ssl::context::single_dh_use);
-    };
+    }
+
     void start();
     void cancel() const { onError("canceled"); }
     void close();
@@ -153,7 +154,7 @@ public:
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
-    };
+    }
 
     void start();
     void send(const std::string& data, uint8_t ws_opcode = 0);

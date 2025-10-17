@@ -7,7 +7,7 @@ constexpr uint8_t SMOOTH_PADDING = 2;
 
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
     m_type(type),
-    m_size({ std::min<int>(size, 8192) }) {
+    m_size(std::min<int>(size, 8192)) {
     createNewLayer(false);
     if (smoothSupport)
         createNewLayer(true);
@@ -64,7 +64,8 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     auto bestRegionOpt = findBestRegion(allocW, allocH, texture->isSmooth());
     if (!bestRegionOpt.has_value()) {
         createNewLayer(texture->isSmooth());
-        return addTexture(texture);
+        addTexture(texture);
+        return;
     }
 
     FreeRegion region = bestRegionOpt.value();

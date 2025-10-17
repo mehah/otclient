@@ -40,7 +40,7 @@ struct InputEvent
         keyText = "";
         autoRepeatTicks = 0;
         mouseMoved = {};
-    };
+    }
 
     Fw::InputEventType type;
     Fw::MouseWheelDirection wheelDirection;

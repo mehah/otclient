@@ -141,7 +141,7 @@ private:
 
     uint32_t m_props{ 0 };
     void setProp(const Props prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
-    bool getProp(const Props prop) const { return m_props & prop; };
+    bool getProp(const Props prop) const { return m_props & prop; }
 
     int m_selectionReference{ 0 };
     int m_selectionStart{ 0 };

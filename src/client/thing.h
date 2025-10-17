@@ -179,7 +179,8 @@ public:
 
     virtual void onPositionChange(const Position& /*newPos*/, const Position& /*oldPos*/) {}
     virtual void onAppear() {}
-    virtual void onDisappear() {};
+    virtual void onDisappear() {}
+
     const Color& getMarkedColor() {
         if (m_markedColor == Color::white)
             return Color::white;
@@ -246,7 +247,8 @@ protected:
         Timer timer;
         uint16_t speed{ 0 };
         uint16_t value{ 100 };
-    } m_scale;
+    } 
+    m_scale;
 
     Position m_position;
 

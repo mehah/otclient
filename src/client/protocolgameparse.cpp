@@ -2981,7 +2981,8 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
                 const std::string& missionDesc = msg->getString();
                 missions.emplace_back(questId, missionId, questName, missionName, missionDesc);
             }
-            return g_lua.callGlobalField("g_game", "onQuestTracker", remainingQuests, missions);
+            g_lua.callGlobalField("g_game", "onQuestTracker", remainingQuests, missions);
+            return;
         }
         case 0: {
             uint8_t questId = 0;
@@ -2995,7 +2996,8 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
             }
             const std::string& missionName = msg->getString();
             const std::string& missionDesc = msg->getString();
-            return g_lua.callGlobalField("g_game", "onUpdateQuestTracker", questId, missionId, questName, missionName, missionDesc);
+            g_lua.callGlobalField("g_game", "onUpdateQuestTracker", questId, missionId, questName, missionName, missionDesc);
+            return;
         }
     }
 }
@@ -5309,7 +5311,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             } else {
                 nextFreeReroll = msg->getU16();
             }
-            return g_lua.callGlobalField("g_game", "onPreyLocked", slot, unlockState, nextFreeReroll, wildcards);
+            g_lua.callGlobalField("g_game", "onPreyLocked", slot, unlockState, nextFreeReroll, wildcards);
+            return;
         }
         case Otc::PREY_STATE_INACTIVE:
         {
@@ -5319,7 +5322,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             } else {
                 nextFreeReroll = msg->getU16();
             }
-            return g_lua.callGlobalField("g_game", "onPreyInactive", slot, nextFreeReroll, wildcards);
+            g_lua.callGlobalField("g_game", "onPreyInactive", slot, nextFreeReroll, wildcards);
+            return;
         }
         case Otc::PREY_STATE_ACTIVE:
         {
@@ -5336,7 +5340,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
                 nextFreeReroll = msg->getU16();
             }
 
-            return g_lua.callGlobalField("g_game", "onPreyActive", slot, monster.name, monster.outfit, bonusType, bonusValue, bonusGrade, timeLeft, nextFreeReroll, wildcards, option);
+            g_lua.callGlobalField("g_game", "onPreyActive", slot, monster.name, monster.outfit, bonusType, bonusValue, bonusGrade, timeLeft, nextFreeReroll, wildcards, option);
+            return;
         }
         case Otc::PREY_STATE_SELECTION:
         {
@@ -5355,7 +5360,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             } else {
                 nextFreeReroll = msg->getU16();
             }
-            return g_lua.callGlobalField("g_game", "onPreySelection", slot, monsterNames, monsterLooktypes, nextFreeReroll, wildcards);
+            g_lua.callGlobalField("g_game", "onPreySelection", slot, monsterNames, monsterLooktypes, nextFreeReroll, wildcards);
+            return;
         }
         case Otc::PREY_STATE_SELECTION_CHANGE_MONSTER:
         {
@@ -5378,7 +5384,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             } else {
                 nextFreeReroll = msg->getU16();
             }
-            return g_lua.callGlobalField("g_game", "onPreySelectionChangeMonster", slot, names, outfits, bonusType, bonusValue, bonusGrade, nextFreeReroll, wildcards);
+            g_lua.callGlobalField("g_game", "onPreySelectionChangeMonster", slot, names, outfits, bonusType, bonusValue, bonusGrade, nextFreeReroll, wildcards);
+            return;
         }
         case Otc::PREY_STATE_LIST_SELECTION:
         {
@@ -5395,7 +5402,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             } else {
                 nextFreeReroll = msg->getU16();
             }
-            return g_lua.callGlobalField("g_game", "onPreyListSelection", slot, raceList, nextFreeReroll, wildcards);
+            g_lua.callGlobalField("g_game", "onPreyListSelection", slot, raceList, nextFreeReroll, wildcards);
+            return;
         }
         case Otc::PREY_STATE_WILDCARD_SELECTION:
         {
@@ -5416,7 +5424,8 @@ void ProtocolGame::parsePreyData(const InputMessagePtr& msg)
             } else {
                 nextFreeReroll = msg->getU16();
             }
-            return g_lua.callGlobalField("g_game", "onPreyWildcardSelection", slot, raceList, nextFreeReroll, wildcards);
+            g_lua.callGlobalField("g_game", "onPreyWildcardSelection", slot, raceList, nextFreeReroll, wildcards);
+            return;
         }
     }
 }

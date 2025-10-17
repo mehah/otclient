@@ -221,7 +221,8 @@ void Proxy::onHeader(const std::error_code& ec, const std::size_t bytes_transfer
 #ifdef PROXY_DEBUG
         std::clog << "[Proxy " << m_host << "] onHeader error " << ec.message() << std::endl;
 #endif
-        return disconnect();
+        disconnect();
+        return;
     }
 
     m_packetsRecived += 1;
@@ -232,7 +233,8 @@ void Proxy::onHeader(const std::error_code& ec, const std::size_t bytes_transfer
 #ifdef PROXY_DEBUG
         std::clog << "[Proxy " << m_host << "] onHeader wrong packet size " << packetSize << std::endl;
 #endif
-        return disconnect();
+        disconnect();
+        return;
     }
 
     async_read(m_socket, asio::buffer(m_buffer, packetSize), [capture0 = shared_from_this()](auto&& PH1, auto&& PH2) {
@@ -246,7 +248,8 @@ void Proxy::onPacket(const std::error_code& ec, const std::size_t bytes_transfer
 #ifdef PROXY_DEBUG
         std::clog << "[Proxy " << m_host << "] onPacket error " << ec.message() << std::endl;
 #endif
-        return disconnect();
+        disconnect();
+        return;
     }
     m_bytesRecived += static_cast<int>(bytes_transferred);
 
@@ -256,7 +259,8 @@ void Proxy::onPacket(const std::error_code& ec, const std::size_t bytes_transfer
 
     if (sessionId == 0) {
         readHeader();
-        return onPing(packetId);
+        onPing(packetId);
+        return;
     }
     if (packetId == 0xFFFFFFFFu) {
 #ifdef PROXY_DEBUG
@@ -306,7 +310,8 @@ void Proxy::onSent(const std::error_code& ec, const std::size_t bytes_transferre
 #ifdef PROXY_DEBUG
         std::clog << "[Proxy " << m_host << "] onSent error " << ec.message() << std::endl;
 #endif
-        return disconnect();
+        disconnect();
+        return;
     }
     m_packetsSent += 1;
     m_bytesSent += static_cast<int>(bytes_transferred);
@@ -374,7 +379,8 @@ void Session::check(const std::error_code& ec)
     const uint32_t lastPacket = static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::high_resolution_clock::now() - m_lastPacket).count());
     if (lastPacket > TIMEOUT) {
-        return terminate(asio::error::timed_out);
+        terminate(asio::error::timed_out);
+        return;
     }
 
     selectProxies();
@@ -476,13 +482,15 @@ void Session::readTibia12Header()
     async_read(m_socket, asio::buffer(m_buffer, 1),
                             [self](const std::error_code& ec, std::size_t /*bytes_transferred*/) {
         if (ec) {
-            return self->terminate();
+            self->terminate();
+            return;
         }
         if (self->m_buffer[0] == 0x0A) {
 #ifdef PROXY_DEBUG
             std::clog << "[Session " << self->m_id << "] Tibia 12 read header finished" << std::endl;
 #endif
-            return self->readHeader();
+            self->readHeader();
+            return;
         }
         self->readTibia12Header();
     });
@@ -502,19 +510,22 @@ void Session::onHeader(const std::error_code& ec, std::size_t /*bytes_transferre
 #ifdef PROXY_DEBUG
         std::clog << "[Session " << m_id << "] onHeader error: " << ec.message() << std::endl;
 #endif
-        return terminate();
+        terminate();
+        return;
     }
 
     uint16_t packetSize = *(uint16_t*)(m_buffer);
     if (packetSize > 1024 && m_outputPacketId == 1) {
-        return readTibia12Header();
+        readTibia12Header();
+        return;
     }
 
     if (packetSize == 0 || packetSize + 16 > BUFFER_SIZE) {
 #ifdef PROXY_DEBUG
         std::clog << "[Session " << m_id << "] onHeader invalid packet size: " << packetSize << std::endl;
 #endif
-        return terminate();
+        terminate();
+        return;
     }
 
     async_read(m_socket, asio::buffer(m_buffer + 2, packetSize),
@@ -529,7 +540,8 @@ void Session::onBody(const std::error_code& ec, const std::size_t bytes_transfer
 #ifdef PROXY_DEBUG
         std::clog << "[Session " << m_id << "] onBody error: " << ec.message() << std::endl;
 #endif
-        return terminate();
+        terminate();
+        return;
     }
 
     const auto packet = std::make_shared<ProxyPacket>(m_buffer, m_buffer + bytes_transferred + 2);
@@ -544,7 +556,8 @@ void Session::onPacket(const ProxyPacketPtr& packet)
 #ifdef PROXY_DEBUG
         std::clog << "[Session " << m_id << "] onPacket error: missing packet or wrong size" << std::endl;
 #endif
-        return terminate();
+        terminate();
+        return;
     }
 
     auto self(shared_from_this());
@@ -571,7 +584,8 @@ void Session::onSent(const std::error_code& ec, std::size_t /*bytes_transferred*
 #ifdef PROXY_DEBUG
         std::clog << "[Session " << m_id << "] onSent error: " << ec.message() << std::endl;
 #endif
-        return terminate();
+        terminate();
+        return;
     }
 
     m_inputPacketId += 1;

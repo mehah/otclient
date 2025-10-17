@@ -149,7 +149,7 @@ public:
     bool hasBlockingCreature() const;
 
     bool hasEffect() const { return m_effects && !m_effects->empty(); }
-    bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; };
+    bool hasGround() { return (getGround() && getGround()->isSingleGround()) || m_thingTypeFlag & HAS_GROUND_BORDER; }
     bool hasTopGround(const bool ignoreBorder = false) { return (getGround() && getGround()->isTopGround()) || (!ignoreBorder && m_thingTypeFlag & HAS_TOP_GROUND_BORDER); }
 
     bool hasCreatures() { return m_thingTypeFlag & HAS_CREATURE; }

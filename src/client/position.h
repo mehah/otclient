@@ -133,7 +133,7 @@ public:
         return positions;
     }
 
-    static bool isDiagonal(const Otc::Direction dir) { return dir == Otc::NorthWest || dir == Otc::NorthEast || dir == Otc::SouthWest || dir == Otc::SouthEast; };
+    static bool isDiagonal(const Otc::Direction dir) { return dir == Otc::NorthWest || dir == Otc::NorthEast || dir == Otc::SouthWest || dir == Otc::SouthEast; }
 
     static double getAngleFromPositions(const Position& fromPos, const Position& toPos)
     {
@@ -296,4 +296,6 @@ struct fmt::formatter<Position> : fmt::formatter<std::string>
     auto format(const Position& pos, fmt::format_context& ctx) const {
         return fmt::formatter<std::string>::format(pos.toString(), ctx);
     }
-};
+}
+
+ ;

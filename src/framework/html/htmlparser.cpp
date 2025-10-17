@@ -171,7 +171,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
     size_t i = 0, N = s.size();
 
     auto push_node = [&](const HtmlNodePtr& node) {
-        auto parent = st.top();
+        const auto& parent = st.top();
 
         // merge consecutive non-expression text nodes
         if (node->type == NodeType::Text && !node->isExpression() && !parent->children.empty()) {
@@ -191,7 +191,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
         node->parent = parent;
         parent->children.push_back(node);
 
-        auto doc = root;
+        const auto& doc = root;
         if (node->type == NodeType::Element) {
             if (!node->tag.empty() && node->tag != "root")
                 doc->tagIndex[node->tag].push_back(node);
@@ -217,7 +217,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
         }
         node->parent = parent;
 
-        auto doc = root;
+        const auto& doc = root;
         if (node->type == NodeType::Element) {
             if (!node->tag.empty() && node->tag != "root")
                 doc->tagIndex[node->tag].push_back(node);
@@ -239,7 +239,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
             if (!is_space((unsigned char)c)) { onlyWhitespace = false; break; }
         }
 
-        auto parent = st.top();
+        const auto& parent = st.top();
         if (onlyWhitespace) {
             // If there's a previous text node, append whitespace to it;
             // otherwise, drop it (do not create a standalone whitespace node).
@@ -354,7 +354,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
                 std::string decoded = html_entity_decode(txt);
 
                 // Fast path: if we are inside a text-only element, append verbatim
-                auto parent = st.top();
+                const auto& parent = st.top();
                 if (parent->getType() == NodeType::Element && kTextOnly.count(parent->getTag())) {
                     parent->text += decoded;
                 } else {

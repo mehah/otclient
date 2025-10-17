@@ -79,7 +79,7 @@ protected:
     virtual void onConnect();
     virtual void onRecv(const InputMessagePtr& inputMessage);
     virtual void onError(const std::error_code& err);
-    virtual void onSend() {};
+    virtual void onSend() {}
 
     void onProxyPacket(const std::shared_ptr<std::vector<uint8_t>>& packet);
     void onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packet);

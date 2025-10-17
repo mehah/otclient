@@ -62,7 +62,8 @@ void Protocol::connect(const std::string_view host, const uint16_t port)
                                      [capture0 = asProtocol()](auto&& PH1) {
             capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
         });
-        return onConnect();
+        onConnect();
+        return;
     }
 
     m_connection = std::make_shared<Connection>();
@@ -456,7 +457,7 @@ void Protocol::playRecord(PacketPlayerPtr player)
     [capture0 = asProtocol()](auto&& PH1) {
         capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
     });
-    return onConnect();
+    onConnect();
 }
 
 void Protocol::setRecorder(PacketRecorderPtr recorder)

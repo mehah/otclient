@@ -55,7 +55,7 @@ public:
     void addAction(const std::function<void()>& action) const { getCurrentPool()->addAction(action); }
 
     void bindFrameBuffer(const Size& size, const Color& color = Color::white) const { getCurrentPool()->bindFrameBuffer(size, color); }
-    void releaseFrameBuffer(const Rect& dest) const { getCurrentPool()->releaseFrameBuffer(dest); };
+    void releaseFrameBuffer(const Rect& dest) const { getCurrentPool()->releaseFrameBuffer(dest); }
 
     void setOpacity(const float opacity, const bool onlyOnce = false) const { getCurrentPool()->setOpacity(opacity, onlyOnce); }
     void setClipRect(const Rect& clipRect, const bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }

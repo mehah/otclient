@@ -152,7 +152,8 @@ struct HomeOffer
     uint16_t mountClientId;
     uint16_t itemType;
     uint16_t sexId;
-    struct { uint8_t lookHead, lookBody, lookLegs, lookFeet; } outfit;
+    struct { uint8_t lookHead, lookBody, lookLegs, lookFeet; }
+    outfit;
     uint8_t tryOnType;
     uint16_t collection;
     uint16_t popularityScore;
@@ -802,7 +803,7 @@ public:
 
     // pvp related
     void setUnjustifiedPoints(UnjustifiedPoints unjustifiedPoints);
-    UnjustifiedPoints getUnjustifiedPoints() { return m_unjustifiedPoints; };
+    UnjustifiedPoints getUnjustifiedPoints() { return m_unjustifiedPoints; }
     void setOpenPvpSituations(uint8_t openPvpSituations);
     int getOpenPvpSituations() { return m_openPvpSituations; }
 
@@ -851,14 +852,14 @@ public:
     void seekInContainer(uint8_t containerId, uint16_t index);
 
     // >= 1080 ingame store
-    void buyStoreOffer(const uint32_t offerId, const uint8_t action, const std::string_view& name, const uint8_t type, const std::string_view& location);
+    void buyStoreOffer(uint32_t offerId, uint8_t action, const std::string_view& name, uint8_t type, const std::string_view& location);
     void requestTransactionHistory(uint32_t page, uint32_t entriesPerPage);
-    void requestStoreOffers(const std::string_view categoryName, const std::string_view subCategory, const uint8_t sortOrder, const uint8_t serviceType);
+    void requestStoreOffers(std::string_view categoryName, std::string_view subCategory, uint8_t sortOrder, uint8_t serviceType);
     void sendRequestStoreHome();
     void sendRequestStorePremiumBoost();
-    void sendRequestUsefulThings(const uint8_t serviceType);
-    void sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortOrder, const uint8_t serviceType);
-    void sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType);
+    void sendRequestUsefulThings(uint8_t serviceType);
+    void sendRequestStoreOfferById(uint32_t offerId, uint8_t sortOrder, uint8_t serviceType);
+    void sendRequestStoreSearch(std::string_view searchText, uint8_t sortOrder, uint8_t serviceType);
     void openStore(uint8_t serviceType = 0, std::string_view category = "");
     void transferCoins(std::string_view recipient, uint16_t amount);
     void openTransactionHistory(uint8_t entriesPerPage);
@@ -953,7 +954,7 @@ public:
     void requestBless();
 
     // quickLoot related
-    void sendQuickLoot(const uint8_t variant, const ItemPtr& item);
+    void sendQuickLoot(uint8_t variant, const ItemPtr& item);
     void requestQuickLootBlackWhiteList(uint8_t filter, uint16_t size, const std::vector<uint16_t>& listedItems);
     void openContainerQuickLoot(uint8_t action, uint8_t category, const Position& pos, uint16_t itemId, uint8_t stackpos, bool useMainAsFallback);
 
@@ -974,7 +975,7 @@ public:
     void sendStatusTrackerBestiary(uint16_t raceId, bool status);
     void sendOpenRewardWall();
     void requestOpenRewardHistory();
-    void requestGetRewardDaily(const uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
+    void requestGetRewardDaily(uint8_t bonusShrine, const std::map<uint16_t, uint8_t>& items);
     void sendRequestTrackerQuestLog(const std::map<uint16_t, std::string>& quests);
     void processCyclopediaCharacterOffenceStats(const CyclopediaCharacterOffenceStats& data);
     void processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefenceStats& data);

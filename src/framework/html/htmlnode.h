@@ -35,7 +35,7 @@ struct StyleValue
     std::string value;
     std::string inheritedFromId;
     bool important{ false };
-};
+} ;
 
 class HtmlNode : public std::enable_shared_from_this<HtmlNode>
 {
