@@ -48,7 +48,6 @@ function show()
 end
 
 function toggle()
-    g_logger.info("TOGGLE PREY DIALOG")
     if PreyController.ui and PreyController.ui:isVisible() then
         PreyController:hide()
     else
@@ -108,13 +107,8 @@ function PreyController:clearDescription()
 end
 
 function PreyController:onHover(slotId, currentType)
-    g_logger.info("onHover: " .. slotId .. " type: " .. tostring(currentType))
     local slot = PreyController.preyData[slotId + 1]
-
-
     local description = ""
-
-
     if currentType == "pickSpecificPrey" or currentType == "rerollButton" or currentType == "preyCandidate" then
         description = descriptionTable[currentType]
         local footer = string.format("\nYour current bonus +%d%% %s will not be affected.",
@@ -143,10 +137,8 @@ function PreyController:onHover(slotId, currentType)
 end
 
 function check()
-    g_logger.info("check")
     if g_game.getFeature(GamePrey) then
         if not preyButton then
-            g_logger.info("adding prey button")
             preyButton = modules.game_mainpanel.addToggleButton('preyButton', tr('Prey Dialog'),
                 '/images/options/button_preydialog', toggle)
         end
@@ -155,14 +147,12 @@ function check()
         --         '/images/options/button_prey', toggleTracker)
         -- end
     elseif preyButton then
-        g_logger.info("removing prey button")
         preyButton:destroy()
         preyButton = nil
     end
 end
 
 function PreyController:onInit()
-    g_logger.info("init")
     PreyController:handleResources()
     check()
 
@@ -255,21 +245,8 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
         :format(slot, timeUntilFreeReroll,
             wildcards, #names, #outfits))
 
-    -- slot, monsterNames, monsterLooktypes, nextFreeReroll, wildcards
-
-
     local slotId = slot + 1
     PreyController.preyData[slotId].raceList = Helper.fillTinyMonsterList(slot, names, outfits)
-
-    -- local description = ("Creature %s\nDuration %s\nValue: %d/10\nType: %s\n%s\n\nClick in this window to open the prey dialog.")
-    --     :format(
-    --         currentHolderName,
-    --         timeleft,
-    --         bonusGrade,
-    --         getBonusDescription(bonusType),
-    --         getTooltipBonusDescription(bonusType, bonusValue)
-    --     )
-
 
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
@@ -561,16 +538,6 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
             wildcards, #names, #outfits))
     local slotId = slot + 1
 
-
-    -- local description = ("Creature %s\nDuration %s\nValue: %d/10\nType: %s\n%s\n\nClick in this window to open the prey dialog.")
-    --     :format(
-    --         currentHolderName,
-    --         timeleft,
-    --         bonusGrade,
-    --         getBonusDescription(bonusType),
-    --         getTooltipBonusDescription(bonusType, bonusValue)
-    --     )
-
     timeUntilFreeReroll = timeUntilFreeReroll > 720000 and 0 or timeUntilFreeReroll
     PreyController.preyData[slotId].raceList = Helper.fillTinyMonsterList(slot, names, outfits)
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
@@ -709,9 +676,6 @@ end
 
 local confirmWindow
 local function showPreyConfirmationWindow(title, description, confirmAction, afterCloseAction, cancelAction)
-    -- toggle()
-
-
     local function closeWindow()
         if cancelAction and type(cancelAction) == "function" then
             cancelAction()
@@ -720,7 +684,6 @@ local function showPreyConfirmationWindow(title, description, confirmAction, aft
             confirmWindow:destroy()
             confirmWindow = nil
             PreyController:handleResources()
-            -- toggle()
             if afterCloseAction then
                 afterCloseAction()
                 afterCloseAction = nil
@@ -758,7 +721,6 @@ local function showPreyConfirmationWindow(title, description, confirmAction, aft
             end
         end
     else
-        -- toggle()
         PreyController:handleResources()
         if afterCloseAction then
             afterCloseAction()
