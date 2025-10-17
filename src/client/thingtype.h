@@ -285,9 +285,9 @@ struct NPCData
 {
     std::string name;
     std::string location;
-    uint32_t salePrice;
-    uint32_t buyPrice;
-    uint32_t currencyObjectTypeId;
+    uint32_t salePrice{};
+    uint32_t buyPrice{};
+    uint32_t currencyObjectTypeId{};
     std::string currencyQuestFlagDisplayName;
 };
 

@@ -99,7 +99,7 @@ void LightView::draw(const Rect& dest, const Rect& src)
     }
     m_pool->getHashController().reset();
 
-    g_drawPool.addAction([=, this] {
+    g_drawPool.addAction([dest, src, this] {
         if (updatePixel.load(std::memory_order_acquire)) {
             SpinLock::Guard guard(m_pool->getThreadLock());
             m_texture->updatePixels(m_pixels[1].data());

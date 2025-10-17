@@ -751,7 +751,7 @@ void ProtocolGame::parseRequestPurchaseData(const InputMessagePtr& msg)
 void ProtocolGame::parseResourceBalance(const InputMessagePtr& msg) const
 {
     const auto type = static_cast<Otc::ResourceTypes_t>(msg->getU8());
-    uint64_t value;
+    uint64_t value = 0;
     switch (type) {
         case Otc::RESOURCE_CHARM:
         case Otc::RESOURCE_MINOR_CHARM:
@@ -904,8 +904,8 @@ void ProtocolGame::parseCompleteStorePurchase(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) const
 {
-    uint32_t currentPage;
-    uint32_t pageCount;
+    uint32_t currentPage = 0;
+    uint32_t pageCount = 0;
     if (g_game.getClientVersion() <= 1096) {
         msg->getU16(); // currentPage
         msg->getU8(); // hasNextPage (bool)
@@ -922,7 +922,7 @@ void ProtocolGame::parseStoreTransactionHistory(const InputMessagePtr& msg) cons
             const uint32_t time = msg->getU32();
             const uint8_t mode = msg->getU8(); //0 = normal, 1 = gift, 2 = refund
             const uint32_t rawAmount = msg->getU32();
-            int32_t amount;
+            int32_t amount = 0;
             if (rawAmount > INT32_MAX) {
                 amount = -static_cast<int32_t>(UINT32_MAX - rawAmount + 1);
             } else {
@@ -1214,7 +1214,7 @@ void ProtocolGame::parsePlayerHelpers(const InputMessagePtr& msg) const
 
 void ProtocolGame::parseGMActions(const InputMessagePtr& msg)
 {
-    uint8_t numViolationReasons;
+    uint8_t numViolationReasons = 0;
     if (g_game.getClientVersion() >= 850) {
         numViolationReasons = 20;
     } else if (g_game.getClientVersion() >= 840) {
@@ -1535,7 +1535,7 @@ void ProtocolGame::parseContainerUpdateItem(const InputMessagePtr& msg)
 void ProtocolGame::parseContainerRemoveItem(const InputMessagePtr& msg)
 {
     const uint8_t containerId = msg->getU8();
-    uint16_t slot;
+    uint16_t slot = 0;
 
     ItemPtr lastItem;
     if (g_game.getFeature(Otc::GameContainerPagination)) {
@@ -1558,7 +1558,7 @@ void ProtocolGame::parseBosstiaryInfo(const InputMessagePtr& msg)
     std::vector<BosstiaryData> bossData;
 
     for (auto i = 0; std::cmp_less(i, bosstiaryRaceLast); ++i) {
-        BosstiaryData boss;
+        BosstiaryData boss{};
         boss.raceId = msg->getU32();
         boss.category = msg->getU8();
         boss.kills = msg->getU32();
@@ -2208,7 +2208,7 @@ void ProtocolGame::parseEditText(const InputMessagePtr& msg)
 {
     const uint32_t id = msg->getU32();
 
-    uint32_t itemId;
+    uint32_t itemId = 0;
     if (g_game.getClientVersion() >= 1010 || g_game.getFeature(Otc::GameItemShader)) {
         // TODO: processEditText with ItemPtr as parameter
         const auto& item = getItem(msg);
@@ -2394,7 +2394,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
     for (int_fast32_t skill = Otc::Fist; skill <= Otc::Fishing; ++skill) {
         const uint16_t level = g_game.getFeature(Otc::GameDoubleSkills) ? msg->getU16() : msg->getU8();
 
-        uint16_t baseLevel;
+        uint16_t baseLevel = 0;
         if (g_game.getFeature(Otc::GameSkillsBase)) {
             baseLevel = g_game.getFeature(Otc::GameBaseSkillU16) ? msg->getU16() : msg->getU8();
         } else {
@@ -2505,7 +2505,7 @@ void ProtocolGame::parsePlayerSkills(const InputMessagePtr& msg) const
 
 void ProtocolGame::parsePlayerState(const InputMessagePtr& msg) const
 {
-    uint64_t states;
+    uint64_t states = 0;
     if (g_game.getClientVersion() >= 1281) {
         states = g_game.getClientVersion() >= 1405 ? msg->getU64() : msg->getU32();
         if (g_game.getFeature(Otc::GamePlayerStateCounter)) {
@@ -2818,8 +2818,8 @@ void ProtocolGame::parseFloorChangeDown(const InputMessagePtr& msg)
 
     int skip = 0;
     if (pos.z == g_gameConfig.getMapUndergroundFloorRange()) {
-        int j;
-        int i;
+        int j = 0;
+        int i = 0;
         for (i = pos.z, j = -1; i <= pos.z + g_gameConfig.getMapAwareUndergroundFloorRange(); ++i, --j) {
             skip = setFloorDescription(msg, pos.x - range.left, pos.y - range.top, i, range.horizontal(), range.vertical(), j, skip);
         }
@@ -2870,8 +2870,8 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
             outfitList.emplace_back(outfitId, outfitName, outfitAddons, outfitMode);
         }
     } else {
-        uint16_t outfitStart;
-        uint16_t outfitEnd;
+        uint16_t outfitStart = 0;
+        uint16_t outfitEnd = 0;
         if (g_game.getFeature(Otc::GameLooktypeU16)) {
             outfitStart = msg->getU16();
             outfitEnd = msg->getU16();
@@ -3108,7 +3108,7 @@ void ProtocolGame::parseBestiaryOverview(const InputMessagePtr& msg)
         if (g_game.getClientVersion() >= 1340) {
             creatureAnimusMasteryBonus = msg->getU16(); // Creature Animous Bonus
         }
-        BestiaryOverviewMonsters monster;
+        BestiaryOverviewMonsters monster{};
         monster.id = raceId;
         monster.currentLevel = progress;
         monster.occurrence = occurrence;
@@ -3256,7 +3256,7 @@ void ProtocolGame::parseBestiaryCharmsData(const InputMessagePtr& msg)
     charmData.finishedMonsters.reserve(finishedMonstersSize);
 
     for (auto i = 0; std::cmp_less(i, finishedMonstersSize); ++i) {
-        uint32_t raceId;
+        uint32_t raceId = 0;
         if (g_game.getClientVersion() >= 1410) {
             raceId = msg->getU32();
         } else {
@@ -3382,8 +3382,8 @@ void ProtocolGame::parseModalDialog(const InputMessagePtr& msg)
         choiceList.emplace_back(choideId, value);
     }
 
-    uint8_t enterButton;
-    uint8_t escapeButton;
+    uint8_t enterButton = 0;
+    uint8_t escapeButton = 0;
     if (g_game.getClientVersion() > 970) {
         escapeButton = msg->getU8();
         enterButton = msg->getU8();
@@ -3465,9 +3465,9 @@ void ProtocolGame::parseCreatureType(const InputMessagePtr& msg)
 
 void ProtocolGame::setMapDescription(const InputMessagePtr& msg, const int x, const int y, const int z, const int width, const int height)
 {
-    int startz;
-    int endz;
-    int zstep;
+    int startz = 0;
+    int endz = 0;
+    int zstep = 0;
 
     if (std::cmp_greater(z, g_gameConfig.getMapSeaFloor())) {
         startz = z - g_gameConfig.getMapAwareUndergroundFloorRange();
@@ -3668,7 +3668,7 @@ CreaturePtr ProtocolGame::getCreature(const InputMessagePtr& msg, int type) cons
                 g_map.removeCreatureById(removeId);
             }
 
-            uint8_t creatureType;
+            uint8_t creatureType = 0;
             if (g_game.getClientVersion() >= 910) {
                 creatureType = msg->getU8();
             } else {
@@ -4566,7 +4566,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
         }
         case Otc::CYCLOPEDIA_CHARACTERINFO_GENERALSTATS:
         {
-            CyclopediaCharacterGeneralStats stats;
+            CyclopediaCharacterGeneralStats stats{};
             stats.experience = msg->getU64();
             stats.level = msg->getU16();
             stats.levelPercent = msg->getU8();
@@ -4666,7 +4666,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             msg->getU16(); // Damage reflection
 
-            CyclopediaCharacterCombatStats data;
+            CyclopediaCharacterCombatStats data{};
             data.haveBlessings = msg->getU8();
             msg->getU8(); // total blessings
 
@@ -4744,7 +4744,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint16_t inventoryItemsCount = msg->getU16();
             for (auto i = 0; std::cmp_less(i, inventoryItemsCount); ++i) {
-                ItemSummary item;
+                ItemSummary item{};
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
@@ -4762,7 +4762,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint16_t storeItemsCount = msg->getU16();
             for (auto i = 0; std::cmp_less(i, storeItemsCount); ++i) {
-                ItemSummary item;
+                ItemSummary item{};
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
@@ -4780,7 +4780,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint16_t stashItemsCount = msg->getU16();
             for (auto i = 0; std::cmp_less(i, stashItemsCount); ++i) {
-                ItemSummary item;
+                ItemSummary item{};
                 const uint16_t itemId = msg->getU16();
                 const auto& thing = g_things.getThingType(itemId, ThingCategoryItem);
                 if (!thing) {
@@ -4801,7 +4801,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint16_t depotItemsCount = msg->getU16();
             for (auto i = 0; std::cmp_less(i, depotItemsCount); ++i) {
-                ItemSummary item;
+                ItemSummary item{};
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
@@ -4819,7 +4819,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint16_t inboxItemsCount = msg->getU16();
             for (auto i = 0; std::cmp_less(i, inboxItemsCount); ++i) {
-                ItemSummary item;
+                ItemSummary item{};
                 const uint16_t itemId = msg->getU16();
                 const auto& itemCreated = Item::create(itemId);
                 const uint16_t classification = itemCreated->getClassification();
@@ -4853,7 +4853,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
                 outfits.emplace_back(outfit);
             }
 
-            OutfitColorStruct currentOutfit;
+            OutfitColorStruct currentOutfit{};
             if (outfitsSize > 0) {
                 currentOutfit.lookHead = msg->getU8();
                 currentOutfit.lookBody = msg->getU8();
@@ -5072,7 +5072,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
             for (int i = 0; std::cmp_less(i, combatsCount); ++i) {
                 uint8_t elementType = msg->getU8();
                 if (elementType == 0x04) {
-                    CyclopediaCharacterDefenceStats::ElementalResistance resistance;
+                    CyclopediaCharacterDefenceStats::ElementalResistance resistance{};
                     resistance.element = msg->getU8();
                     resistance.value = msg->getDouble();
                     data.resistances.push_back(resistance);
@@ -5106,7 +5106,7 @@ void ProtocolGame::parseCyclopediaCharacterInfo(const InputMessagePtr& msg)
 
             const uint8_t concoctionsCount = msg->getU8();
             for (int i = 0; std::cmp_less(i, concoctionsCount); ++i) {
-                CyclopediaCharacterMiscStats::Concoction concoction;
+                CyclopediaCharacterMiscStats::Concoction concoction{};
                 concoction.id = msg->getU16();
                 msg->getU8(); // unused
                 msg->getU8(); // unused
@@ -5780,7 +5780,7 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
     BosstiarySlotsData data;
 
     auto getBosstiarySlot = [&msg]() -> BosstiarySlot {
-        BosstiarySlot slot;
+        BosstiarySlot slot{};
         slot.bossRace = msg->getU8();
         slot.killCount = msg->getU32();
         slot.lootBonus = msg->getU16();
@@ -5818,7 +5818,7 @@ void ProtocolGame::parseBosstiarySlots(const InputMessagePtr& msg)
     if (data.bossesUnlocked) {
         const uint16_t bossesUnlockedSize = msg->getU16();
         for (auto i = 0; std::cmp_less(i, bossesUnlockedSize); ++i) {
-            BossUnlocked boss;
+            BossUnlocked boss{};
             boss.bossId = msg->getU32();
             boss.bossRace = msg->getU8();
             data.bossesUnlockedData.emplace_back(boss);

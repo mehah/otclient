@@ -41,9 +41,9 @@ struct Graph
     Color infoLineColor;
     Color infoTextBg;
     Color lineColor;
-    int width;
-    int infoIndex;
-    bool visible;
+    int width{};
+    int infoIndex{};
+    bool visible{};
 };
 
 class UIGraph final : public UIWidget

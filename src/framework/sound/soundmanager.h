@@ -150,8 +150,8 @@ private:
 
     ALCdevice* m_device{};
     ALCcontext* m_context{};
-    ALuint m_effect;
-    ALuint m_effectSlot;
+    ALuint m_effect{};
+    ALuint m_effectSlot{};
 
     std::unordered_map<StreamSoundSourcePtr, std::shared_future<SoundFilePtr>> m_streamFiles;
     std::unordered_map<std::string, SoundBufferPtr> m_buffers;

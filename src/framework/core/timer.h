@@ -40,6 +40,6 @@ public:
     [[nodiscard]] bool running() const { return !m_stopped; }
 
 private:
-    ticks_t m_startTicks;
+    ticks_t m_startTicks{};
     bool m_stopped{ false };
 };

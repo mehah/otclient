@@ -40,7 +40,7 @@ void Platform::init(std::vector<std::string>& args)
 
 void Platform::processArgs(std::vector<std::string>& args)
 {
-    int nargs;
+    int nargs = 0;
     wchar_t** wchar_argv = CommandLineToArgvW(GetCommandLineW(), &nargs);
     if (!wchar_argv)
         return;
@@ -186,7 +186,7 @@ std::string Platform::getCPUName()
     char buf[1024];
     memset(buf, 0, sizeof(buf));
     DWORD bufSize = sizeof(buf);
-    HKEY hKey;
+    HKEY hKey = nullptr;
     if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, R"(HARDWARE\DESCRIPTION\System\CentralProcessor\0)", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
         return "";
     RegQueryValueExA(hKey, "ProcessorNameString", nullptr, nullptr, (LPBYTE)buf, &bufSize);
@@ -268,10 +268,10 @@ std::string Platform::getOSName()
     std::string ret;
     OSVERSIONINFOEX osvi;
     SYSTEM_INFO si;
-    PGNSI pGNSI;
-    PGPI pGPI;
-    BOOL bOsVersionInfoEx;
-    DWORD dwType;
+    PGNSI pGNSI = nullptr;
+    PGPI pGPI = nullptr;
+    BOOL bOsVersionInfoEx = 0;
+    DWORD dwType = 0;
 
     ZeroMemory(&si, sizeof(SYSTEM_INFO));
     ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));

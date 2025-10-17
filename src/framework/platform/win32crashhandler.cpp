@@ -76,10 +76,10 @@ const char* getExceptionName(const DWORD exceptionCode)
 void Stacktrace(LPEXCEPTION_POINTERS e, std::stringstream& ss)
 {
     STACKFRAME sf;
-    HANDLE process, thread;
-    ULONG_PTR dwModBase, Disp;
+    HANDLE process = nullptr, thread = nullptr;
+    ULONG_PTR dwModBase = 0, Disp = 0;
     BOOL more = FALSE;
-    DWORD machineType;
+    DWORD machineType = 0;
     int count = 0;
     char modname[MAX_PATH];
     char symBuffer[sizeof(IMAGEHLP_SYMBOL) + 255];

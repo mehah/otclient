@@ -21,7 +21,6 @@
  */
 
 #include "color.h"
-#include <framework/stdext/hash.h>
 #include <iomanip>
 
 #include "framework/stdext/string.h"
@@ -207,7 +206,7 @@ namespace {
             if (t < 2.0 / 3) return p + (q - p) * (2.0 / 3 - t) * 6;
             return p;
         };
-        double rF, gF, bF;
+        double rF = NAN, gF = NAN, bF = NAN;
         if (s == 0) { rF = gF = bF = l; } else {
             const double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
             const double p = 2 * l - q;
@@ -295,7 +294,7 @@ std::istream& operator>>(std::istream& in, Color& color)
             if (t < 2.0 / 3) return p + (q - p) * (2.0 / 3 - t) * 6;
             return p;
         };
-        double rF, gF, bF;
+        double rF = NAN, gF = NAN, bF = NAN;
         if (s == 0) { rF = gF = bF = l; } else {
             const double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
             const double p = 2 * l - q;
@@ -382,7 +381,7 @@ std::istream& operator>>(std::istream& in, Color& color)
                     };
                     const double s = pct(parts[1]);
                     const double l = pct(parts[2]);
-                    int r, g, b; hsl_to_rgb(h, s, l, r, g, b);
+                    int r = 0, g = 0, b = 0; hsl_to_rgb(h, s, l, r, g, b);
                     const int a = hasA ? parse_alpha_any(parts[3]) : 255;
                     color.setRed(static_cast<uint8_t>(r));
                     color.setGreen(static_cast<uint8_t>(g));
@@ -398,7 +397,7 @@ std::istream& operator>>(std::istream& in, Color& color)
             return in;
         }
 
-        uint32_t abgr;
+        uint32_t abgr = 0;
         if (css_lookup(tmp, abgr)) {
             color = Color(abgr);
         } else {

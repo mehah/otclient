@@ -31,11 +31,8 @@ class FileMetadata
 {
 public:
     FileMetadata() = default;
-    FileMetadata(const FileStreamPtr& file) {
-        offset = file->getU32();
-        fileSize = file->getU32();
+    FileMetadata(const FileStreamPtr& file) : offset(file->getU32()), fileSize(file->getU32()), spriteId(std::stoi(fileName)) {
         fileName = file->getString();
-        spriteId = std::stoi(fileName);
     }
 
     [[nodiscard]] uint32_t getSpriteId() const { return spriteId; }

@@ -92,7 +92,7 @@ private:
     HINSTANCE m_instance;
     HDC m_deviceContext;
     HCURSOR m_cursor;
-    HCURSOR m_defaultCursor;
+    HCURSOR m_defaultCursor{};
     bool m_hidden;
 
 #ifdef OPENGL_ES

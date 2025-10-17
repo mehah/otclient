@@ -26,13 +26,7 @@
 #include <framework/const.h>
 #include <framework/util/point.h>
 
-#include <array>
-#include <istream>
 #include <math.h>
-#include <ostream>
-#include <string>
-
-#include <vector>
 
 #include <fmt/format.h>
 
@@ -285,9 +279,9 @@ inline std::ostream& operator<<(std::ostream& out, const Position& pos)
 
 inline std::istream& operator>>(std::istream& in, Position& pos)
 {
-    int32_t x;
-    int32_t y;
-    uint8_t z;
+    int32_t x = 0;
+    int32_t y = 0;
+    uint8_t z = 0;
     in >> x >> y >> z;
     pos.x = x;
     pos.y = y;

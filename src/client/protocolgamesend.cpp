@@ -162,7 +162,7 @@ void ProtocolGame::sendAutoWalk(const std::vector<Otc::Direction>& path)
     msg->addU8(Proto::ClientAutoWalk);
     msg->addU8(path.size());
     for (const Otc::Direction dir : path) {
-        uint8_t byte;
+        uint8_t byte = 0;
         switch (dir) {
             case Otc::East:
                 byte = 1;

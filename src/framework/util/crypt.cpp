@@ -42,7 +42,7 @@ constexpr std::size_t CHECKSUM_BYTES = sizeof(uint32_t);
 
 Crypt g_crypt;
 
-Crypt::Crypt()
+Crypt::Crypt() : m_rsa(RSA_new())
 {
 #ifdef USE_GMP
     mpz_init(m_p);
@@ -51,7 +51,7 @@ Crypt::Crypt()
     mpz_init(m_e);
     mpz_init(m_n);
 #else
-    m_rsa = RSA_new();
+
 #endif
 }
 

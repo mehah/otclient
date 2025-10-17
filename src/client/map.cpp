@@ -184,7 +184,7 @@ void Map::addStaticText(const StaticTextPtr& txt, const Position& pos) {
     if (!g_app.isDrawingTexts())
         return;
 
-    g_textDispatcher.addEvent([=, this] {
+    g_textDispatcher.addEvent([pos, txt, this] {
         for (const auto& other : m_staticTexts) {
             // try to combine messages
             if (other->getPosition() == pos && other->addMessage(txt->getName(), txt->getMessageMode(), txt->getFirstMessage())) {
@@ -201,7 +201,7 @@ void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos) {
     if (!g_app.isDrawingTexts())
         return;
 
-    g_textDispatcher.addEvent([=, this] {
+    g_textDispatcher.addEvent([pos, txt, this] {
         // this code will stack animated texts of the same color
         AnimatedTextPtr prevAnimatedText;
 
@@ -418,7 +418,7 @@ void Map::cleanTile(const Position& pos)
         }
     }
 
-    g_textDispatcher.addEvent([=, this] {
+    g_textDispatcher.addEvent([pos, this] {
         for (auto itt = m_staticTexts.begin(); itt != m_staticTexts.end();) {
             const auto& staticText = *itt;
             if (staticText->getPosition() == pos && staticText->getMessageMode() == Otc::MessageNone)
@@ -533,7 +533,7 @@ void Map::removeUnawareThings()
             removeThing(creature);
     }
 
-    g_textDispatcher.addEvent([=, this] {
+    g_textDispatcher.addEvent([this] {
         // remove static texts from tiles that we are not aware anymore
         for (auto it = m_staticTexts.begin(); it != m_staticTexts.end();) {
             const auto& staticText = *it;
@@ -924,7 +924,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
 
                 const float cost = currentNode->cost + (speed * walkFactor) / 100.0f;
 
-                SNode* neighborNode;
+                SNode* neighborNode = nullptr;
                 if (!nodes.contains(neighborPos)) {
                     neighborNode = new SNode(neighborPos);
                     nodes[neighborPos] = neighborNode;

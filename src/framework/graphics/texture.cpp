@@ -49,13 +49,14 @@ Texture::Texture(const Size& size) : m_uniqueId(UID.fetch_add(1))
     setupFilters();
 }
 
-Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(UID.fetch_add(1))
+Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(UID.fetch_add(1)),
+    m_image(image)
 {
     generateHash();
 
     setProp(Prop::compress, compress);
     setProp(Prop::buildMipmaps, buildMipmaps);
-    m_image = image;
+
     setupSize(image->getSize());
 }
 
@@ -213,8 +214,8 @@ void Texture::setupFilters() const
 {
     if (!m_id) return;
 
-    GLenum minFilter;
-    GLenum magFilter;
+    GLenum minFilter = 0;
+    GLenum magFilter = 0;
     if (getProp(smooth)) {
         minFilter = getProp(hasMipMaps) ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
         magFilter = GL_LINEAR;

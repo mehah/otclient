@@ -77,7 +77,7 @@ public:
     }
 
 private:
-    uint8_t m_id;
+    uint8_t m_id{};
 
     bool m_useFramebuffer{ false };
 

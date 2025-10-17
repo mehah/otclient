@@ -11,7 +11,7 @@
 class SpinLock
 {
     alignas(64) std::atomic_bool m_flag{ false };
-    char m_padding[64 - sizeof(std::atomic_bool)];
+    char m_padding[64 - sizeof(std::atomic_bool)]{};
 
 public:
     SpinLock() noexcept = default;

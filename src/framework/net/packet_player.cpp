@@ -42,7 +42,7 @@ PacketPlayer::PacketPlayer(const std::string_view& file)
     if (!f.is_open())
         return;
     std::string type, packetHex;
-    ticks_t time;
+    ticks_t time = 0;
     while (f >> type >> time >> packetHex) {
         // Convert hex string to binary data manually
         std::string packetStr;

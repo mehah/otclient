@@ -64,7 +64,7 @@ namespace qrcodegen {
     private: int modeBits;
 
            // Number of character count bits for three different version ranges.
-           int numBitsCharCount[3];
+           int numBitsCharCount[3]{};
 
            /*-- Constructor --*/
 

@@ -62,7 +62,7 @@ MapView::~MapView()
 
 void MapView::registerEvents() {
     g_drawPool.addAction([this, camera = m_posInfo.camera, srcRect = m_posInfo.srcRect] {
-        m_pool->onBeforeDraw([=, this] {
+        m_pool->onBeforeDraw([srcRect, camera, this] {
             float fadeOpacity = 1.f;
             if (!m_shaderSwitchDone && m_fadeOutTime > 0) {
                 fadeOpacity = 1.f - (m_fadeTimer.timeElapsed() / m_fadeOutTime);
@@ -406,7 +406,7 @@ void MapView::updateVisibleTiles()
             for (auto& floor : m_floorThreads[i])
                 floor.cachedVisibleTiles.clear();
 
-            tasks.emplace_back(g_asyncDispatcher.submit_task([=, this] {
+            tasks.emplace_back(g_asyncDispatcher.submit_task([processDiagonalRange, i, start, end, this] {
                 processDiagonalRange(m_floorThreads[i], start, end);
             }));
         }
@@ -634,7 +634,7 @@ void MapView::setAntiAliasingMode(const AntialiasingMode mode)
 {
     m_antiAliasingMode = mode;
 
-    g_mainDispatcher.addEvent([=, this] {
+    g_mainDispatcher.addEvent([mode, this] {
         m_pool->getFrameBuffer()->setSmooth(mode != ANTIALIASING_DISABLED);
     });
 
@@ -860,7 +860,7 @@ void MapView::setShader(const std::string_view name, const float fadein, const f
     if (m_shader == shader)
         return;
 
-    g_mainDispatcher.addEvent([=, this] {
+    g_mainDispatcher.addEvent([fadeout, shader, fadein, this] {
         if (fadeout > 0.0f && m_shader) {
             m_nextShader = shader;
             m_shaderSwitchDone = false;

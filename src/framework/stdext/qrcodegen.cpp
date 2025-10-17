@@ -238,7 +238,7 @@ namespace qrcodegen {
             throw std::invalid_argument("Invalid value");
 
         // Find the minimal version number to use
-        int version, dataUsedBits;
+        int version = 0, dataUsedBits = 0;
         for (version = minVersion; ; version++) {
             const int dataCapacityBits = getNumDataCodewords(version, ecl) * 8;  // Number of data bits available
             dataUsedBits = QrSegment::getTotalBits(segs, version);
@@ -526,7 +526,7 @@ namespace qrcodegen {
         const auto sz = static_cast<size_t>(size);
         for (size_t y = 0; y < sz; y++) {
             for (size_t x = 0; x < sz; x++) {
-                bool invert;
+                bool invert = false;
                 switch (msk) {
                     case 0:  invert = (x + y) % 2 == 0;                    break;
                     case 1:  invert = y % 2 == 0;                          break;

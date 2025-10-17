@@ -157,7 +157,7 @@ TexturePtr TextureManager::loadTexture(std::stringstream& file)
 {
     TexturePtr texture;
 
-    apng_data apng;
+    apng_data apng{};
     if (load_apng(file, &apng) == 0) {
         const Size imageSize(apng.width, apng.height);
         if (apng.num_frames > 1) { // animated texture

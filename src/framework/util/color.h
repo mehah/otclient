@@ -29,7 +29,8 @@ class Color
 {
 public:
     constexpr Color(const Color& color) = default;
-    constexpr Color() { m_hash = white.hash(); };
+    constexpr Color() : m_hash(white.hash()) {
+    };
     constexpr Color(const int r, const int g, const int b, const int a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f), m_hash(rgba()) {}
     constexpr Color(const float r, const float g, const float b, const float a = 1.0f) : m_r(r), m_g(g), m_b(b), m_a(a), m_hash(rgba()) {}
     constexpr Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 0xFF) : m_r(r / 255.f), m_g(g / 255.f), m_b(b / 255.f), m_a(a / 255.f), m_hash(rgba()) {}

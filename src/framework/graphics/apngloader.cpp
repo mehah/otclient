@@ -90,7 +90,7 @@ uint16_t  trns1, trns2, trns3;
 #endif
 uint32_t read32(std::istream& f1)
 {
-    uint8_t a, b, c, d;
+    uint8_t a = 0, b = 0, c = 0, d = 0;
     f1.read((char*)&a, 1);
     f1.read((char*)&b, 1);
     f1.read((char*)&c, 1);
@@ -100,7 +100,7 @@ uint32_t read32(std::istream& f1)
 
 uint16_t read16(std::istream& f1)
 {
-    uint8_t a, b;
+    uint8_t a = 0, b = 0;
     f1.read((char*)&a, 1);
     f1.read((char*)&b, 1);
     return (static_cast<uint16_t>(a) << 8) + static_cast<uint16_t>(b);
@@ -126,7 +126,7 @@ void read_up_row(uint8_t* row, const uint8_t* prev_row, const uint32_t rowbytes,
 
 void read_average_row(uint8_t* row, const uint8_t* prev_row, const uint32_t rowbytes, const uint32_t bpp)
 {
-    uint32_t i;
+    uint32_t i = 0;
 
     if (prev_row) {
         for (i = 0; i < bpp; i++)
@@ -141,7 +141,7 @@ void read_average_row(uint8_t* row, const uint8_t* prev_row, const uint32_t rowb
 
 void read_paeth_row(uint8_t* row, const uint8_t* prev_row, const uint32_t rowbytes, const uint32_t bpp)
 {
-    uint32_t i;
+    uint32_t i = 0;
 
     if (prev_row) {
         for (i = 0; i < bpp; i++)
@@ -190,7 +190,7 @@ void unpack(z_stream& zstream, uint8_t* dst, const uint32_t dst_size, uint8_t* s
 
 void compose0(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i, g, a;
+    uint32_t    i = 0, g = 0, a = 0;
 
     for (uint32_t j = 0; j < h; j++) {
         uint8_t* sp = src + 1;
@@ -224,8 +224,8 @@ void compose0(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 
 void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i;
-    uint32_t    r, g, b, a;
+    uint32_t    i = 0;
+    uint32_t    r = 0, g = 0, b = 0, a = 0;
 
     for (uint32_t j = 0; j < h; j++) {
         uint8_t* sp = src + 1;
@@ -280,7 +280,7 @@ void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 
 void compose3(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, const uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t a2;
+    uint32_t a2 = 0;
     uint8_t   col = 0;
 
     for (uint32_t j = 0; j < h; j++) {
@@ -340,8 +340,8 @@ void compose3(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 
 void compose4(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i;
-    uint32_t    g, a, a2;
+    uint32_t    i = 0;
+    uint32_t    g = 0, a = 0, a2 = 0;
 
     const uint32_t step = (depth + 7) / 8;
 
@@ -387,9 +387,9 @@ void compose4(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_
 
 void compose6(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i;
-    uint32_t    r, g, b, a;
-    uint32_t a2;
+    uint32_t    i = 0;
+    uint32_t    r = 0, g = 0, b = 0, a = 0;
+    uint32_t a2 = 0;
 
     const uint32_t step = (depth + 7) / 8;
 
@@ -440,17 +440,17 @@ void compose6(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_
 
 int load_apng(std::stringstream& file, apng_data* apng)
 {
-    uint32_t i, j;
-    uint32_t rowbytes;
-    int      imagesize, zbuf_size, zsize, trns_idx;
-    uint32_t len, chunk/*, crc, seq*/;
-    uint32_t w, h, w0, h0, x0, y0;
-    uint32_t frames, loops, first_frame, cur_frame;
-    uint32_t outrow1, outrow2, outimg1, outimg2;
-    uint16_t d1, d2;
-    uint8_t  c, dop = PNG_DISPOSE_OP_NONE, bop;
-    uint8_t  channels, depth, pixeldepth, bpp;
-    uint8_t  coltype, compr, filter, interl;
+    uint32_t i = 0, j = 0;
+    uint32_t rowbytes = 0;
+    int      imagesize = 0, zbuf_size = 0, zsize = 0, trns_idx = 0;
+    uint32_t len = 0, chunk/*, crc, seq*/ = 0;
+    uint32_t w = 0, h = 0, w0 = 0, h0 = 0, x0 = 0, y0 = 0;
+    uint32_t frames = 0, loops = 0, first_frame = 0, cur_frame = 0;
+    uint32_t outrow1 = 0, outrow2 = 0, outimg1 = 0, outimg2 = 0;
+    uint16_t d1 = 0, d2 = 0;
+    uint8_t  c = 0, dop = PNG_DISPOSE_OP_NONE, bop = 0;
+    uint8_t  channels = 0, depth = 0, pixeldepth = 0, bpp = 0;
+    uint8_t  coltype = 0, compr = 0, filter = 0, interl = 0;
     z_stream        zstream;
     memset(apng, 0, sizeof(apng_data));
 
@@ -478,15 +478,15 @@ int load_apng(std::stringstream& file, apng_data* apng)
     bop = PNG_BLEND_OP_SOURCE;
 
     uint8_t sig[8];
-    uint8_t* pOut1;
-    uint8_t* pOut2;
-    uint8_t* pTemp;
-    uint8_t* pData;
-    uint8_t* pImg1;
-    uint8_t* pImg2;
-    uint8_t* pDst1;
-    uint8_t* pDst2;
-    uint16_t* frames_delay;
+    uint8_t* pOut1 = nullptr;
+    uint8_t* pOut2 = nullptr;
+    uint8_t* pTemp = nullptr;
+    uint8_t* pData = nullptr;
+    uint8_t* pImg1 = nullptr;
+    uint8_t* pImg2 = nullptr;
+    uint8_t* pDst1 = nullptr;
+    uint8_t* pDst2 = nullptr;
+    uint16_t* frames_delay = nullptr;
 
     file.read((char*)sig, 8);
     if (!file.eof() && memcmp(sig, png_sign, 8) == 0) {
@@ -550,7 +550,7 @@ int load_apng(std::stringstream& file, apng_data* apng)
 
                 if (chunk == 0x504C5445) /* PLTE */
                 {
-                    uint32_t col;
+                    uint32_t col = 0;
                     for (i = 0; i < len; i++) {
                         file.read((char*)&c, 1);
                         col = i / 3;
@@ -844,7 +844,7 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
 
     z_stream zstream1;
     z_stream        zstream2;
-    uint32_t    i, j;
+    uint32_t    i = 0, j = 0;
 
     uint32_t rowbytes = width * bpp;
     uint32_t idat_size = (rowbytes + 1) * height;
@@ -888,9 +888,9 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
     zstream2.opaque = nullptr;
     deflateInit2(&zstream2, Z_BEST_COMPRESSION, 8, 15, 8, Z_FILTERED);
 
-    int a, b, c, pa, pb, pc, p, v;
-    uint8_t* prev;
-    uint8_t* row;
+    int a = 0, b = 0, c = 0, pa = 0, pb = 0, pc = 0, p = 0, v = 0;
+    uint8_t* prev = nullptr;
+    uint8_t* row = nullptr;
 
     f.write((char*)png_sign, 8);
     write_chunk(f, "IHDR", (uint8_t*)(&ihdr), 13);
@@ -910,7 +910,7 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
     row = pixels;
 
     for (j = 0; j < height; j++) {
-        uint8_t* out;
+        uint8_t* out = nullptr;
         uint32_t    sum = 0;
         uint8_t* best_row = row_buf;
         uint32_t    mins = static_cast<uint32_t>(-1) >> 1;

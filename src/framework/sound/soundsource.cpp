@@ -93,7 +93,7 @@ void SoundSource::setReferenceDistance(const float distance)
 
 float SoundSource::getReferenceDistance()
 {
-    float distance;
+    float distance = NAN;
     alGetSourcef(m_sourceId, AL_REFERENCE_DISTANCE, &distance);
     return distance;
 }
@@ -129,7 +129,7 @@ void SoundSource::setFading(const FadeState state, const float fadeTime)
     const float now = stdext::millis() / 1000.0f;
     if (m_fadeState != NoFading) {
         const float elapsed = now - m_fadeStartTime;
-        float add;
+        float add = NAN;
         if (m_fadeState == FadingOn)
             add = -(1 - (elapsed / m_fadeTime)) * fadeTime;
         else

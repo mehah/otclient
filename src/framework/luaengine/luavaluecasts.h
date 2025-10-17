@@ -28,9 +28,6 @@
 #include <framework/otml/declarations.h>
 #include <framework/platform/platform.h>
 
-#include <set>
-#include <type_traits>
-
 template<typename T>
 int push_internal_luavalue(T v);
 
@@ -50,7 +47,7 @@ bool luavalue_cast(int index, double& d);
 inline int push_luavalue(const float f) { push_luavalue(static_cast<double>(f)); return 1; }
 inline bool luavalue_cast(const int index, float& f)
 {
-    double d;
+    double d = NAN;
     const bool r = luavalue_cast(index, d); f = d; return r;
 }
 
@@ -58,42 +55,42 @@ inline bool luavalue_cast(const int index, float& f)
 inline int push_luavalue(const int8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
 inline bool luavalue_cast(const int index, int8_t& v)
 {
-    int i;
+    int i = 0;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // uint8_t
 inline int push_luavalue(const uint8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
 inline bool luavalue_cast(const int index, uint8_t& v)
 {
-    int i;
+    int i = 0;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // int16
 inline int push_luavalue(const int16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
 inline bool luavalue_cast(const int index, int16_t& v)
 {
-    int i;
+    int i = 0;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // uint16
 inline int push_luavalue(const uint16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
 inline bool luavalue_cast(const int index, uint16_t& v)
 {
-    int i;
+    int i = 0;
     const bool r = luavalue_cast(index, i); v = i; return r;
 }
 // uint32
 inline int push_luavalue(const uint32_t v) { push_luavalue(static_cast<double>(v)); return 1; }
 inline bool luavalue_cast(const int index, uint32_t& v)
 {
-    double d;
+    double d = NAN;
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 // int64
 inline int push_luavalue(const int64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
 inline bool luavalue_cast(const int index, int64_t& v)
 {
-    double d;
+    double d = NAN;
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 
@@ -115,13 +112,13 @@ inline int push_luavalue(const unsigned long v)
 inline bool luavalue_cast(const int index, unsigned long& v)
 {
     if constexpr (sizeof(unsigned long) <= sizeof(uint32_t)) {
-        uint32_t temp;
+        uint32_t temp = 0;
         const bool r = luavalue_cast(index, temp);
         v = static_cast<unsigned long>(temp);
         return r;
     }
 
-    double temp;
+    double temp = NAN;
     const bool r = luavalue_cast(index, temp);
     v = static_cast<unsigned long>(temp);
     return r;
@@ -139,7 +136,7 @@ template<typename T = lua_u64>
 inline bool luavalue_cast(const int idx, lua_u64& v)
     requires (!std::is_same_v<T, unsigned long>)
 {
-    double d;
+    double d = NAN;
     const bool r = luavalue_cast(idx, d);
     v = static_cast<lua_u64>(d);
     return r;
@@ -275,7 +272,7 @@ template<class T>
 std::enable_if_t<std::is_enum_v<T>, bool>
 luavalue_cast(const int index, T& myenum)
 {
-    if (int i; luavalue_cast(index, i)) {
+    if (int i = 0; luavalue_cast(index, i)) {
         myenum = static_cast<T>(i);
         return true;
     }

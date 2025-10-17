@@ -43,5 +43,5 @@ private:
     static int cb_close(void* source);
     static long cb_tell(void* source);
 
-    OggVorbis_File m_vorbisFile;
+    OggVorbis_File m_vorbisFile{};
 };

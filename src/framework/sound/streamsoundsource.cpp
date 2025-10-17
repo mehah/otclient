@@ -24,11 +24,10 @@
 #include "soundbuffer.h"
 #include "soundfile.h"
 
-StreamSoundSource::StreamSoundSource()
+StreamSoundSource::StreamSoundSource() : m_downMix(NoDownMix)
 {
     for (auto& buffer : m_buffers)
         buffer = std::make_shared<SoundBuffer>();
-    m_downMix = NoDownMix;
 }
 
 StreamSoundSource::~StreamSoundSource()
@@ -92,7 +91,7 @@ void StreamSoundSource::stop()
 
 void StreamSoundSource::queueBuffers()
 {
-    int queued;
+    int queued = 0;
     alGetSourcei(m_sourceId, AL_BUFFERS_QUEUED, &queued);
     for (int i = 0; i < STREAM_FRAGMENTS - queued; ++i) {
         if (!fillBufferAndQueue(m_buffers[i]->getBufferId()))
@@ -102,10 +101,10 @@ void StreamSoundSource::queueBuffers()
 
 void StreamSoundSource::unqueueBuffers() const
 {
-    int queued;
+    int queued = 0;
     alGetSourcei(m_sourceId, AL_BUFFERS_QUEUED, &queued);
     for (int i = 0; i < queued; ++i) {
-        uint32_t buffer;
+        uint32_t buffer = 0;
         alSourceUnqueueBuffers(m_sourceId, 1, &buffer);
     }
 }
@@ -120,7 +119,7 @@ void StreamSoundSource::update()
     int processed = 0;
     alGetSourcei(m_sourceId, AL_BUFFERS_PROCESSED, &processed);
     for (int i = 0; i < processed; ++i) {
-        uint32_t buffer;
+        uint32_t buffer = 0;
         alSourceUnqueueBuffers(m_sourceId, 1, &buffer);
 
         if (!fillBufferAndQueue(buffer))

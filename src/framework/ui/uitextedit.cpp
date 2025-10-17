@@ -37,7 +37,7 @@
 #include <emscripten/emscripten.h>
 #endif
 
-UITextEdit::UITextEdit()
+UITextEdit::UITextEdit() : m_placeholder(""), m_placeholderColor(Color::gray), m_placeholderAlign(Fw::AlignLeftCenter)
 {
     setProp(PropCursorInRange, true);
     setProp(PropCursorVisible, true);
@@ -49,10 +49,10 @@ UITextEdit::UITextEdit()
     setProp(PropGlyphsMustRecache, true);
 
     m_textAlign = Fw::AlignTopLeft;
-    m_placeholder = "";
-    m_placeholderColor = Color::gray;
+
+
     m_placeholderFont = g_fonts.getDefaultFont();
-    m_placeholderAlign = Fw::AlignLeftCenter;
+
     blinkCursor();
 }
 
@@ -157,7 +157,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     m_font->calculateGlyphsPositions(text, m_textAlign, m_glyphsPositionsCache, &textBoxSize);
     const Rect* glyphsTextureCoords = m_font->getGlyphsTextureCoords();
     const Size* glyphsSize = m_font->getGlyphsSize();
-    int glyph;
+    int glyph = 0;
 
     // update rect size
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
@@ -272,7 +272,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     }
 
     std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
-    uint32_t curColorRgba;
+    uint32_t curColorRgba = 0;
     int32_t nextColorIndex = 0;
     int32_t colorIndex = -1;
     CoordsBufferPtr coords;

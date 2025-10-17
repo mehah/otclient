@@ -860,7 +860,7 @@ void WebsocketSession::on_read(const std::error_code& ec, const size_t bytes_tra
                 size_t payload_start = frame_start + header_size;
 
                 if (masked) {
-                    std::array<uint8_t, 4> mask;
+                    std::array<uint8_t, 4> mask{};
                     for (int i = 0; i < 4; i++) {
                         mask[i] = static_cast<uint8_t>(m_read_buffer[frame_start + header_size - 4 + i]);
                     }
@@ -961,7 +961,7 @@ void WebsocketSession::send(const std::string& data, const uint8_t ws_opcode)
     }
 
     std::vector<uint8_t> ws_frame;
-    std::array<unsigned char, 4> mask;
+    std::array<unsigned char, 4> mask{};
     std::uniform_int_distribution<unsigned short> dist(0, 255);
     std::random_device rd;
     for (auto c = 0; c < 4; c++)
@@ -1023,7 +1023,7 @@ void WebsocketSession::send(const std::string& data, const uint8_t ws_opcode)
         */
         ws_frame.push_back(length + 128);
     } else {
-        size_t num_bytes;
+        size_t num_bytes = 0;
         if (length < 65535) {    // 16 bit length
             /*
                 7 bit length, 1 bit is to mask

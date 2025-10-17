@@ -26,13 +26,11 @@
 #include "mapview.h"
 #include <framework/graphics/drawpoolmanager.h>
 
-UIMap::UIMap()
+UIMap::UIMap() : m_keepAspectRatio(true), m_limitVisibleRange(false), m_maxZoomIn(3), m_maxZoomOut(513)
 {
     setProp(PropDraggable, true, false);
-    m_keepAspectRatio = true;
-    m_limitVisibleRange = false;
-    m_maxZoomIn = 3;
-    m_maxZoomOut = 513;
+
+
     m_mapView = std::make_shared<MapView>();
     m_zoom = m_mapView->getVisibleDimension().height();
     m_aspectRatio = m_mapView->getVisibleDimension().ratio();

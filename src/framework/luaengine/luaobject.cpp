@@ -100,7 +100,7 @@ void LuaObject::luaGetMetatable()
     const auto& tinfo = typeid(*this);
     const auto it = metatableMap.find(&tinfo);
 
-    int metatableRef;
+    int metatableRef = 0;
     if (it == metatableMap.end()) {
         g_lua.getGlobal(getClassName() + "_mt");
         metatableRef = g_lua.ref();

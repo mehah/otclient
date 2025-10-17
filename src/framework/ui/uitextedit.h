@@ -138,7 +138,7 @@ private:
     Point m_textVirtualOffset;
     Size m_textVirtualSize;
     Size m_textTotalSize;
-    ticks_t m_cursorTicks;
+    ticks_t m_cursorTicks{};
 
     uint32_t m_props{ 0 };
     void setProp(const Props prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }

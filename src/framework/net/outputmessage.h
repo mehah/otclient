@@ -83,5 +83,5 @@ private:
     uint16_t m_headerPos{ m_maxHeaderSize };
     uint16_t m_writePos{ m_maxHeaderSize };
     uint16_t m_messageSize{ 0 };
-    uint8_t m_buffer[BUFFER_MAXSIZE];
+    uint8_t m_buffer[BUFFER_MAXSIZE]{};
 };

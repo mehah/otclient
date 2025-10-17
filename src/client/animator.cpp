@@ -108,7 +108,7 @@ int Animator::getPhase()
     if (ticks != m_lastPhaseTicks && !m_isComplete) {
         const int elapsedTicks = static_cast<int>(ticks - m_lastPhaseTicks);
         if (std::cmp_greater_equal(elapsedTicks, m_currentDuration)) {
-            int phase;
+            int phase = 0;
             if (m_loopCount < 0)
                 phase = getPingPongPhase();
             else

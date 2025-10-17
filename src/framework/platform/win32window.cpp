@@ -54,15 +54,11 @@ constexpr auto WINDOW_NAME = "BASED_ON_TIBIA_GAME_ENGINE";
 constexpr COLORREF DWMWINDOWCOLOR = RGB(0, 0, 0);
 constexpr COLORREF DWMACCENTCOLOR = RGB(255, 255, 255);
 
-WIN32Window::WIN32Window()
+WIN32Window::WIN32Window() : m_window(nullptr), m_instance(nullptr), m_deviceContext(nullptr), m_cursor(nullptr), m_hidden(true), m_wglContext(nullptr)
 {
-    m_window = nullptr;
-    m_instance = nullptr;
-    m_deviceContext = nullptr;
-    m_cursor = nullptr;
     m_minimumSize = Size(600, 480);
     m_size = Size(600, 480);
-    m_hidden = true;
+
 
 #ifdef OPENGL_ES
     m_eglConfig = 0;
@@ -70,7 +66,7 @@ WIN32Window::WIN32Window()
     m_eglDisplay = 0;
     m_eglSurface = 0;
 #else
-    m_wglContext = nullptr;
+
 #endif
 
     m_keyMap[VK_ESCAPE] = Fw::KeyEscape;
@@ -275,7 +271,7 @@ struct WindowProcProxy
 {
     static LRESULT CALLBACK call(const HWND hWnd, const uint32_t uMsg, const WPARAM wParam, const LPARAM lParam)
     {
-        auto* const ww = static_cast<WIN32Window*>(&g_window);
+        auto* const ww = dynamic_cast<WIN32Window*>(&g_window);
         return ww->windowProc(hWnd, uMsg, wParam, lParam);
     }
 };
@@ -1136,8 +1132,8 @@ Rect WIN32Window::getWindowRect()
 Rect WIN32Window::adjustWindowRect(const Rect& clientRect) const
 {
     Rect rect;
-    DWORD dwStyle;
-    DWORD dwExStyle;
+    DWORD dwStyle = 0;
+    DWORD dwExStyle = 0;
     RECT windowRect = { clientRect.left(), clientRect.top(), clientRect.right(), clientRect.bottom() };
     if (m_window) {
         dwStyle = GetWindowLong(m_window, GWL_STYLE);

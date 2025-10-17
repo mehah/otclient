@@ -26,10 +26,9 @@
 
 struct InputEvent
 {
-    InputEvent()
+    InputEvent() : keyboardModifiers(0)
     {
         reset();
-        keyboardModifiers = 0;
     }
 
     void reset(const Fw::InputEventType eventType = Fw::NoInputEvent)
@@ -51,5 +50,5 @@ struct InputEvent
     int keyboardModifiers;
     Point mousePos;
     Point mouseMoved;
-    int autoRepeatTicks;
+    int autoRepeatTicks{};
 };

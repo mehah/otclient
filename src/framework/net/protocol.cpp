@@ -333,7 +333,7 @@ bool Protocol::xteaDecrypt(const InputMessagePtr& inputMessage) const
         });
     }
 
-    uint16_t decryptedSize;
+    uint16_t decryptedSize = 0;
     if (g_game.getClientVersion() >= 1405) {
         const uint8_t paddingSize = inputMessage->getU8();
         inputMessage->setPaddingSize(paddingSize);

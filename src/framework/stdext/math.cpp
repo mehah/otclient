@@ -20,11 +20,7 @@
  * THE SOFTWARE.
  */
 
-#include <algorithm>
-#include <climits>
-#include <cmath>
-#include <random>
-#include <stdexcept>
+#include <math.h>
 
 #ifdef _MSC_VER
 #pragma warning(disable:4267) // '?' : conversion from 'A' to 'B', possible loss of data
@@ -80,7 +76,7 @@ namespace stdext
 
         thread_local static std::normal_distribution<float> normalRand(0.5f, 0.25f);
 
-        float v;
+        float v = NAN;
         do {
             v = normalRand(random_gen());
         } while (v < 0.0f || v > 1.0f);

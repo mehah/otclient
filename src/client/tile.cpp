@@ -292,7 +292,7 @@ void Tile::addThing(const ThingPtr& thing, int stackPos)
         // -1 or 255 => auto detect position
         // -2        => append
 
-        bool append;
+        bool append = false;
         if (stackPos == -2)
             append = true;
         else {

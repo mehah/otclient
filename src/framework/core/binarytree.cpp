@@ -24,9 +24,8 @@
 #include "filestream.h"
 
 BinaryTree::BinaryTree(const FileStreamPtr& fin) :
-    m_fin(fin), m_pos(0xFFFFFFFF)
+    m_fin(fin), m_pos(0xFFFFFFFF), m_startPos(fin->tell())
 {
-    m_startPos = fin->tell();
 }
 
 void BinaryTree::skipNodes()

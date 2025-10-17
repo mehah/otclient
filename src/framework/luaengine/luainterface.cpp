@@ -1327,7 +1327,7 @@ std::string LuaInterface::toString(const int index)
 {
     assert(hasIndex(index));
     std::string str;
-    size_t len;
+    size_t len = 0;
     const char* data = lua_tolstring(L, index, &len);
     if (data && len > 0)
         str.assign(data, len);

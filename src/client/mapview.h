@@ -48,9 +48,9 @@ struct MapPosInfo
     Rect rect;
     Rect srcRect;
     Point drawOffset;
-    float horizontalStretchFactor;
-    float verticalStretchFactor;
-    float scaleFactor;
+    float horizontalStretchFactor{};
+    float verticalStretchFactor{};
+    float scaleFactor{};
 
     [[nodiscard]] bool isInRange(const Position& pos, const bool ignoreZ = false) const
     {

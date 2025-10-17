@@ -52,6 +52,11 @@
 #include <span>
 #include <utility>
 #include <zlib.h>
+#include <set>
+#include <type_traits>
+#include <filesystem>
+#include <stdexcept>
+#include <random>
 
 #include <parallel_hashmap/btree.h>
 #include <parallel_hashmap/phmap.h>

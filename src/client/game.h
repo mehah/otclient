@@ -1007,7 +1007,7 @@ private:
     Otc::ChaseModes m_chaseMode{ Otc::DontChase };
     Otc::PVPModes m_pvpMode{ Otc::WhiteDove };
     Otc::OperatingSystem_t m_clientCustomOs{ Otc::CLIENTOS_NONE };
-    UnjustifiedPoints m_unjustifiedPoints;
+    UnjustifiedPoints m_unjustifiedPoints{};
     ScheduledEventPtr m_pingEvent;
     ScheduledEventPtr m_checkConnectionEvent;
 

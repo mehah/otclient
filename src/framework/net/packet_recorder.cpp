@@ -26,9 +26,8 @@
 
 #include "packet_recorder.h"
 
-PacketRecorder::PacketRecorder(const std::string_view& file)
+PacketRecorder::PacketRecorder(const std::string_view& file) : m_start(g_clock.millis())
 {
-    m_start = g_clock.millis();
 #ifdef ANDROID
     g_resources.makeDir("records");
     m_stream = std::ofstream(std::string("records/") + std::string(file));

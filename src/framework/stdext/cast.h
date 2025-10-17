@@ -93,7 +93,7 @@ namespace stdext
     // special cast from string to int
     inline bool cast(const std::string& in, int& i)
     {
-        if (long l; cast(in, l)) {
+        if (long l = 0; cast(in, l)) {
             i = l;
             return true;
         }
@@ -118,7 +118,7 @@ namespace stdext
     // special cast from string to float
     inline bool cast(const std::string& in, float& f)
     {
-        if (double d; cast(in, d)) {
+        if (double d = NAN; cast(in, d)) {
             f = static_cast<float>(d);
             return true;
         }
