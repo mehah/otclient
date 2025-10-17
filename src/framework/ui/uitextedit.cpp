@@ -566,7 +566,7 @@ std::string UITextEdit::cut()
 
 void UITextEdit::wrapText()
 {
-    setText(m_font->wrapText(m_text, getPaddingRect().width() - m_textOffset.x));
+    setText(m_font->wrapText(m_text, getPaddingRect().width() - m_textOffset.x, m_textWrapOptions));
 }
 
 void UITextEdit::moveCursorHorizontally(const bool right)
@@ -641,7 +641,7 @@ void UITextEdit::updateDisplayedText()
     m_drawTextColors = m_textColors;
 
     if (isTextWrap() && m_rect.isValid()) {
-        text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x);
+        text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x, m_textWrapOptions);
     }
 
     m_displayedText = text;
