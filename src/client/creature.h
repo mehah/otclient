@@ -244,7 +244,7 @@ private:
         uint16_t walkDuration{ 0 };
         uint16_t diagonalDuration{ 0 };
 
-        uint16_t getDuration(const Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
+        [[nodiscard]] uint16_t getDuration(const Otc::Direction dir) const { return Position::isDiagonal(dir) ? diagonalDuration : duration; }
     };
 
     struct IconRenderData

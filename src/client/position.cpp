@@ -21,14 +21,18 @@
  */
 
 #include "position.h"
+
 #include "gameconfig.h"
 
-bool Position::isMapPosition() const { return ((x >= 0) && (y >= 0) && (x < UINT16_MAX) && (y < UINT16_MAX) && (z <= g_gameConfig.getMapMaxZ())); }
+bool Position::isMapPosition() const {
+    return ((x >= 0) && (y >= 0) && (std::cmp_less(x, UINT16_MAX)) && (
+        std::cmp_less(y, UINT16_MAX)) && (z <= g_gameConfig.getMapMaxZ()));
+}
 
 bool Position::up(const int8_t n)
 {
     const int8_t nz = z - n;
-    if (nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+    if (nz >= 0 && std::cmp_less_equal(nz, g_gameConfig.getMapMaxZ())) {
         z = nz;
         return true;
     }
@@ -38,7 +42,7 @@ bool Position::up(const int8_t n)
 bool Position::down(const int8_t n)
 {
     const int8_t nz = z + n;
-    if (nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+    if (nz >= 0 && std::cmp_less_equal(nz, g_gameConfig.getMapMaxZ())) {
         z = nz;
         return true;
     }
@@ -50,7 +54,8 @@ bool Position::coveredUp(const int8_t n)
 {
     const int32_t nx = x + n, ny = y + n;
     const int8_t nz = z - n;
-    if (nx >= 0 && nx <= UINT16_MAX && ny >= 0 && ny <= UINT16_MAX && nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+    if (nx >= 0 && std::cmp_less_equal(nx, UINT16_MAX) && ny >= 0 && std::cmp_less_equal(ny, UINT16_MAX) && nz >= 0 &&
+        std::cmp_less_equal(nz, g_gameConfig.getMapMaxZ())) {
         x = nx; y = ny; z = nz;
         return true;
     }
@@ -62,7 +67,8 @@ bool Position::coveredDown(const int8_t n)
 {
     const int32_t nx = x - n, ny = y - n;
     const int8_t nz = z + n;
-    if (nx >= 0 && nx <= UINT16_MAX && ny >= 0 && ny <= UINT16_MAX && nz >= 0 && nz <= g_gameConfig.getMapMaxZ()) {
+    if (nx >= 0 && std::cmp_less_equal(nx, UINT16_MAX) && ny >= 0 && std::cmp_less_equal(ny, UINT16_MAX) && nz >= 0 &&
+        std::cmp_less_equal(nz, g_gameConfig.getMapMaxZ())) {
         x = nx; y = ny; z = nz;
         return true;
     }

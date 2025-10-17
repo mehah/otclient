@@ -43,7 +43,7 @@ public:
     void render() const;
     void update(float elapsedTime);
 
-    bool hasFinished() const { return m_finished; }
+    [[nodiscard]] bool hasFinished() const { return m_finished; }
 
     PointF getPosition() { return m_position; }
     PointF getVelocity() { return m_velocity; }

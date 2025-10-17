@@ -1531,7 +1531,7 @@ void Game::buyStoreOffer(const uint32_t offerId, const uint8_t action, const std
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendBuyStoreOffer(offerId, action, name, type,location);
+    m_protocolGame->sendBuyStoreOffer(offerId, action, name, type, location);
 }
 
 void Game::requestTransactionHistory(const uint32_t page, const uint32_t entriesPerPage)
@@ -1579,7 +1579,7 @@ void Game::sendRequestStoreOfferById(const uint32_t offerId, const uint8_t sortO
     if (!canPerformGameAction())
         return;
 
-    m_protocolGame->sendRequestStoreOfferById(offerId, sortOrder , serviceType);
+    m_protocolGame->sendRequestStoreOfferById(offerId, sortOrder, serviceType);
 }
 
 void Game::sendRequestStoreSearch(const std::string_view searchText, const uint8_t sortOrder, const uint8_t serviceType)
@@ -2044,4 +2044,3 @@ void Game::processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStat
 {
     g_lua.callGlobalField("g_game", "onCyclopediaCharacterMiscStats", data);
 }
-

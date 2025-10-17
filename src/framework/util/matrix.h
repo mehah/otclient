@@ -37,16 +37,16 @@ public:
     Matrix(const U* values) { *this = values; }
 
     void setIdentity();
-    bool isIdentity() const;
+    [[nodiscard]] bool isIdentity() const;
     void fill(T value);
 
-    size_t hash() const { return m_hash; }
+    [[nodiscard]] size_t hash() const { return m_hash; }
 
-    Matrix<M, N, T> transposed() const;
+    [[nodiscard]] Matrix<M, N, T> transposed() const;
     std::enable_if_t<N == M> transpose() { *this = transposed(); }
 
     T* data() { return m[0]; }
-    const T* data() const { return m[0]; }
+    [[nodiscard]] const T* data() const { return m[0]; }
 
     T& operator()(const int row, const int column) { return m[row - 1][column - 1]; }
     T operator()(const int row, const int column) const { return m[row - 1][column - 1]; }

@@ -83,9 +83,9 @@ protected:
     int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) override;
 
 private:
-    Rect getClientRect() const;
+    [[nodiscard]] Rect getClientRect() const;
     Rect getWindowRect();
-    Rect adjustWindowRect(const Rect& rect) const;
+    [[nodiscard]] Rect adjustWindowRect(const Rect& rect) const;
 
     std::vector<HCURSOR> m_cursors;
     HWND m_window;

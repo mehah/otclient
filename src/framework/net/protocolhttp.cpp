@@ -23,7 +23,6 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/util/crypt.h>
 
-#include <utility>
 #include <openssl/ssl.h>
 
 #include "protocolhttp.h"
@@ -310,7 +309,7 @@ void HttpSession::on_resolve(const std::error_code& ec, asio::ip::tcp::resolver:
     const auto& endpoint_to_use = (ipv4_it != end) ? ipv4_it : iterator;
 
     g_logger.debug("Attempting connection to: {}:{}", instance_uri.domain, instance_uri.port);
-    
+
     if (instance_uri.port == "443") {
         // For HTTPS, use the SSL stream's underlying socket
         m_ssl.lowest_layer().async_connect(*endpoint_to_use, [sft = shared_from_this()](
@@ -342,7 +341,7 @@ void HttpSession::on_connect(const std::error_code& ec)
         m_ssl.set_verify_callback([](bool, const asio::ssl::verify_context&) {
             return true;
         });
-        
+
         // Set SNI (Server Name Indication)
         if (!SSL_set_tlsext_host_name(m_ssl.native_handle(), instance_uri.domain.c_str())) {
             const std::error_code _ec{ static_cast<int>(ERR_get_error()), asio::error::get_ssl_category() };
@@ -350,7 +349,7 @@ void HttpSession::on_connect(const std::error_code& ec)
             onError("HttpSession on SSL_set_tlsext_host_name unable to handshake " + m_url + ": " + _ec.message());
             return;
         }
-        
+
         g_logger.debug("SNI hostname set to: {}", instance_uri.domain);
 
         m_ssl.async_handshake(asio::ssl::stream_base::client,
@@ -376,7 +375,7 @@ void HttpSession::on_write()
 {
     g_logger.debug("Sending HTTP request to: {}:{}", instance_uri.domain, instance_uri.port);
     g_logger.debug("Request headers: {}", m_request.substr(0, std::min<size_t>(m_request.length(), size_t(200))));
-    
+
     if (instance_uri.port == "443") {
         async_write(m_ssl, asio::buffer(m_request), [sft = shared_from_this()]
         (const std::error_code& ec, const size_t bytes) { sft->on_request_sent(ec, bytes); });
@@ -484,7 +483,7 @@ void HttpSession::on_read(const std::error_code& ec, const size_t bytes_transfer
         m_timer.cancel();
         const auto& data = m_response.data();
         m_result->response.append(buffers_begin(data), buffers_end(data));
-		g_logger.debug("HTTP response received ({} bytes): {}", m_result->response.size(), m_result->response);
+        g_logger.debug("HTTP response received ({} bytes): {}", m_result->response.size(), m_result->response);
         m_result->finished = true;
         m_callback(m_result);
     };
@@ -1051,7 +1050,7 @@ void WebsocketSession::send(const std::string& data, const uint8_t ws_opcode)
             ws_frame.push_back(127 + 128);
         }
 
-        for (auto c = num_bytes - 1; c != static_cast<size_t>(-1); c--)
+        for (auto c = num_bytes - 1; std::cmp_not_equal(c, -1); c--)
             ws_frame.push_back((static_cast<unsigned long long>(length) >> (8 * c)) % 256);
     }
 
@@ -1127,7 +1126,7 @@ void WebsocketSession::close()
                     });
                 }
             } catch (...) {
-                // 
+                //
             }
         } else {
             try {

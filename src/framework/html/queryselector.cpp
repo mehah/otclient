@@ -94,8 +94,7 @@ struct Selector
     static std::vector<std::string> tokenize(const std::string& s) {
         std::vector<std::string> tokens; std::string cur; int paren = 0, bracket = 0;
         auto flush = [&] { if (!cur.empty()) { tokens.push_back(cur); cur.clear(); } };
-        for (size_t i = 0; i < s.size(); ++i) {
-            char ch = s[i];
+        for (char ch : s) {
             if (ch == '(') ++paren; else if (ch == ')') --paren;
             else if (ch == '[') ++bracket; else if (ch == ']') --bracket;
             if (paren == 0 && bracket == 0 && (ch == '>' || ch == '+' || ch == '~')) { flush(); tokens.emplace_back(1, ch); } else if (paren == 0 && bracket == 0 && isSpace((unsigned char)ch)) { flush(); } else cur.push_back(ch);
@@ -135,7 +134,7 @@ struct Selector
                     }
                 }
                 while (i < tok.size() && tok[i] != ']') ++i; if (i < tok.size()) ++i;
-                s.attrs.push_back({ key,val,op });
+                s.attrs.push_back({ .key = key, .val = val, .op = op });
             } else if (c == ':') {
                 ++i; size_t ps = i; while (i < tok.size() && tok[i] != ':') ++i; s.pseudos.push_back(tok.substr(ps, i - ps));
             } else ++i;
@@ -196,15 +195,15 @@ struct Selector
                     if (s < i && v.substr(s, i - s) == a.val) return true;
                 } return false;
             }
-            case AttrTest::Op::Prefix:   return v.rfind(a.val, 0) == 0;
-            case AttrTest::Op::Suffix:   return v.size() >= a.val.size() && v.compare(v.size() - a.val.size(), a.val.size(), a.val) == 0;
+            case AttrTest::Op::Prefix:   return v.starts_with(a.val);
+            case AttrTest::Op::Suffix:   return v.size() >= a.val.size() && v.ends_with(a.val);
             case AttrTest::Op::Substr:   return v.find(a.val) != std::string::npos;
-            case AttrTest::Op::DashMatch:return v == a.val || (v.size() > a.val.size() && v.rfind(a.val + "-", 0) == 0);
+            case AttrTest::Op::DashMatch:return v == a.val || (v.size() > a.val.size() && v.starts_with(a.val + "-"));
         }
         return false;
     }
 
-    bool matchesSimple(const HtmlNodePtr& node, const SimpleSelector& s) const {
+    [[nodiscard]] bool matchesSimple(const HtmlNodePtr& node, const SimpleSelector& s) const {
         if (!node) return false;
 
         const bool isElem = node->getType() == NodeType::Element;
@@ -267,12 +266,12 @@ struct Selector
                     }
                     return true;
                 }
-                if (pseudo.rfind("nth-child(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("nth-child(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(10, pseudo.size() - 11);
                     int idx = node->indexAmongElements() + 1;
                     return matchesNth(idx, inside);
                 }
-                if (pseudo.rfind("nth-last-child(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("nth-last-child(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(15, pseudo.size() - 16);
                     int idx = 0, total = 0;
                     if (auto p = node->getParent()) {
@@ -295,12 +294,12 @@ struct Selector
                         for (auto it = p->getChildren().rbegin(); it != p->getChildren().rend(); ++it) if ((*it)->getType() == NodeType::Element && (*it)->getTag() == node->getTag()) return (*it).get() == node.get();
                     } return false;
                 }
-                if (pseudo.rfind("nth-of-type(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("nth-of-type(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(12, pseudo.size() - 13);
                     int idx = node->indexAmongType() + 1;
                     return matchesNth(idx, inside);
                 }
-                if (pseudo.rfind("nth-last-of-type(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("nth-last-of-type(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(17, pseudo.size() - 18);
                     int idx = 0, total = 0;
                     if (auto p = node->getParent()) {
@@ -313,7 +312,7 @@ struct Selector
                     int lastIdx = (total - idx) + 1;
                     return matchesNth(lastIdx, inside);
                 }
-                if (pseudo.rfind("not(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("not(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(4, pseudo.size() - 5);
                     for (const auto& part : splitSelectorList(inside)) {
                         const Selector& neg = getOrParseSelector(part);
@@ -321,21 +320,21 @@ struct Selector
                     }
                     return true;
                 }
-                if (pseudo.rfind("is(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("is(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(3, pseudo.size() - 4);
                     for (const auto& part : splitSelectorList(inside)) {
                         const Selector& tmp = getOrParseSelector(part);
                         if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
                     } return false;
                 }
-                if (pseudo.rfind("where(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("where(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(6, pseudo.size() - 7);
                     for (const auto& part : splitSelectorList(inside)) {
                         const Selector& tmp = getOrParseSelector(part);
                         if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
                     } return false;
                 }
-                if (pseudo.rfind("has(", 0) == 0 && pseudo.back() == ')') {
+                if (pseudo.starts_with("has(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(4, pseudo.size() - 5);
                     const Selector& inner = getOrParseSelector(inside);
                     if (inner.steps.empty()) return false;

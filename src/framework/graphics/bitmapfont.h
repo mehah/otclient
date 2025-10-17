@@ -35,11 +35,11 @@ public:
     void drawText(std::string_view text, const Point& startPos, const Color& color = Color::white);
     void drawText(std::string_view text, const Rect& screenCoords, const Color& color = Color::white, Fw::AlignmentFlag align = Fw::AlignTopLeft);
 
-    std::vector<std::pair<Rect, Rect>> getDrawTextCoords(std::string_view text,
-                                                         const Size& textBoxSize,
-                                                         Fw::AlignmentFlag align,
-                                                         const Rect& screenCoords,
-                                                         const std::vector<Point>& glyphsPositions) const noexcept;
+    [[nodiscard]] std::vector<std::pair<Rect, Rect>> getDrawTextCoords(std::string_view text,
+                                                                       const Size& textBoxSize,
+                                                                       Fw::AlignmentFlag align,
+                                                                       const Rect& screenCoords,
+                                                                       const std::vector<Point>& glyphsPositions) const noexcept;
 
     void fillTextCoords(const CoordsBufferPtr& coords, std::string_view text,
                         const Size& textBoxSize, Fw::AlignmentFlag align,
@@ -59,14 +59,14 @@ public:
 
     std::string wrapText(std::string_view text, int maxWidth, std::vector<std::pair<int, Color>>* colors = nullptr) noexcept;
 
-    inline const std::string& getName() const noexcept { return m_name; }
-    inline int getGlyphHeight() const noexcept { return m_glyphHeight; }
+    [[nodiscard]] inline const std::string& getName() const noexcept { return m_name; }
+    [[nodiscard]] inline int getGlyphHeight() const noexcept { return m_glyphHeight; }
     inline const Rect* getGlyphsTextureCoords() noexcept { return m_glyphsTextureCoords; }
     inline const Size* getGlyphsSize() noexcept { return m_glyphsSize; }
-    inline const TexturePtr& getTexture() const noexcept { return m_texture; }
-    inline int getYOffset() const noexcept { return m_yOffset; }
-    inline Size getGlyphSpacing() const noexcept { return m_glyphSpacing; }
-    const AtlasRegion* getAtlasRegion() const noexcept;
+    [[nodiscard]] inline const TexturePtr& getTexture() const noexcept { return m_texture; }
+    [[nodiscard]] inline int getYOffset() const noexcept { return m_yOffset; }
+    [[nodiscard]] inline Size getGlyphSpacing() const noexcept { return m_glyphSpacing; }
+    [[nodiscard]] const AtlasRegion* getAtlasRegion() const noexcept;
 
 private:
     void calculateGlyphsWidthsAutomatically(const ImagePtr& image, const Size& glyphSize);

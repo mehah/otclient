@@ -29,7 +29,7 @@
 class DrawPoolManager
 {
 public:
-    DrawPool* get(const DrawPoolType type) const { return m_pools[static_cast<uint8_t>(type)]; }
+    [[nodiscard]] DrawPool* get(const DrawPoolType type) const { return m_pools[static_cast<uint8_t>(type)]; }
 
     void select(DrawPoolType type);
     void preDraw(const DrawPoolType type, const std::function<void()>& f, const bool alwaysDraw = false) { preDraw(type, f, nullptr, {}, {}, Color::alpha, alwaysDraw); }
@@ -63,12 +63,12 @@ public:
     void setCompositionMode(const CompositionMode mode, const bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
     void setDrawOrder(DrawOrder order)const { getCurrentPool()->setDrawOrder(order); }
 
-    bool shaderNeedFramebuffer() const { return getCurrentPool()->getCurrentState().shaderProgram && getCurrentPool()->getCurrentState().shaderProgram->useFramebuffer(); }
+    [[nodiscard]] bool shaderNeedFramebuffer() const { return getCurrentPool()->getCurrentState().shaderProgram && getCurrentPool()->getCurrentState().shaderProgram->useFramebuffer(); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const bool onlyOnce = false, const std::function<void()>& action = nullptr) const { getCurrentPool()->setShaderProgram(shaderProgram, onlyOnce, action); }
 
-    float getOpacity() const { return getCurrentPool()->getOpacity(); }
-    Rect getClipRect() const { return getCurrentPool()->getClipRect(); }
+    [[nodiscard]] float getOpacity() const { return getCurrentPool()->getOpacity(); }
+    [[nodiscard]] Rect getClipRect() const { return getCurrentPool()->getClipRect(); }
 
     void resetState() const { getCurrentPool()->resetState(); }
     void resetOpacity() const { getCurrentPool()->resetOpacity(); }
@@ -87,12 +87,12 @@ public:
     void rotate(const Point& p, const float angle) const { getCurrentPool()->rotate(p, angle); }
 
     void setScaleFactor(const float scale) const { getCurrentPool()->setScaleFactor(scale); }
-    float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
-    bool isScaled() const { return getCurrentPool()->isScaled(); }
-    uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
-    const auto getAtlas() const { return getCurrentPool()->getAtlas(); }
-    bool isValid() const;
-    auto getDrawOrder() const { return getCurrentPool()->getDrawOrder(); }
+    [[nodiscard]] float getScaleFactor() const { return getCurrentPool()->getScaleFactor(); }
+    [[nodiscard]] bool isScaled() const { return getCurrentPool()->isScaled(); }
+    [[nodiscard]] uint16_t getScaledSpriteSize() const { return m_spriteSize * getScaleFactor(); }
+    [[nodiscard]] const auto getAtlas() const { return getCurrentPool()->getAtlas(); }
+    [[nodiscard]] bool isValid() const;
+    [[nodiscard]] auto getDrawOrder() const { return getCurrentPool()->getDrawOrder(); }
 
     template<typename T>
     void setParameter(std::string_view name, T&& value) { getCurrentPool()->setParameter(name, value); }
@@ -104,18 +104,18 @@ public:
 
     void flush() const { if (getCurrentPool()) getCurrentPool()->flush(); }
 
-    DrawPoolType getCurrentType() const;
+    [[nodiscard]] DrawPoolType getCurrentType() const;
 
     void repaint(const DrawPoolType drawPool) const {
         get(drawPool)->repaint();
     }
 
-    bool isPreDrawing() const;
+    [[nodiscard]] bool isPreDrawing() const;
 
     void removeTextureFromAtlas(uint32_t id, bool smooth);
 
 private:
-    DrawPool* getCurrentPool() const;
+    [[nodiscard]] DrawPool* getCurrentPool() const;
 
     void draw();
     void init(uint16_t spriteSize);

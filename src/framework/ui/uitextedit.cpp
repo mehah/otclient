@@ -171,7 +171,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     }
 
     // resize just on demand
-    if (textLength > static_cast<int>(m_glyphsCoords.size())) {
+    if (std::cmp_greater(textLength, m_glyphsCoords.size())) {
         m_glyphsCoords.resize(textLength);
     }
 
@@ -656,7 +656,8 @@ std::string UITextEdit::getSelection()
 
 void UITextEdit::updateText()
 {
-    if (m_cursorPos > static_cast<int>(m_text.length()))
+    if (std::cmp_greater(m_cursorPos, m_text.length()))
+
         m_cursorPos = m_text.length();
 
     // any text changes reset the selection
@@ -778,7 +779,7 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
                 return true;
             }
         } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
-            if (m_cursorPos != static_cast<int>(m_text.length())) {
+            if (std::cmp_not_equal(m_cursorPos, m_text.length())) {
                 clearSelection();
                 setCursorPos(m_text.length());
                 return true;
@@ -869,7 +870,7 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
                 return true;
             }
         } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
-            if (m_cursorPos != static_cast<int>(m_text.length())) {
+            if (std::cmp_not_equal(m_cursorPos, m_text.length())) {
                 setSelection(m_cursorPos, m_text.length());
                 setCursorPos(m_text.length());
                 return true;

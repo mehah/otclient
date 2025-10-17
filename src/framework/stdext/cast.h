@@ -146,7 +146,7 @@ namespace stdext
             m_what = ss.str();
         }
 
-        const char* what() const noexcept override { return m_what.c_str(); }
+        [[nodiscard]] const char* what() const noexcept override { return m_what.c_str(); }
     private:
         std::string m_what;
     };

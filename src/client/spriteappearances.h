@@ -89,12 +89,12 @@ public:
     void unload();
 
     void setSpritesCount(const int count) { m_spritesCount = count; }
-    int getSpritesCount() const { return m_spritesCount; }
+    [[nodiscard]] int getSpritesCount() const { return m_spritesCount; }
 
     void setPath(const std::string& path) { m_path = path; }
-    std::string getPath() const { return m_path; }
+    [[nodiscard]] std::string getPath() const { return m_path; }
 
-    bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
+    [[nodiscard]] bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
     void saveSheetToFileBySprite(int id, const std::string& file);
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
     SpriteSheetPtr getSheetBySpriteId(int id, bool load = true) {
