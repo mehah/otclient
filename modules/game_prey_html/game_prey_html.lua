@@ -66,6 +66,38 @@ PreyController.preyData = {
     { previewMonster = { raceId = nil, outfit = nil }, slotId = 1, monsterName = "Hydra", raceId = 34, rerollCost = "197 k", pickCost = "5", bonusCost = "1", autoRerollCost = "1", lockCost = "5", preyType = "/images/game/prey/prey_bigdamage.png", stars = 3 },
     { previewMonster = { raceId = nil, outfit = nil }, slotId = 2, monsterName = "Hydra", raceId = 34, rerollCost = "197 k", pickCost = "5", bonusCost = "1", autoRerollCost = "1", lockCost = "5", preyType = "/images/game/prey/prey_bigloot.png",   stars = 10 },
 }
+
+function PreyController:clearSlotTypeHistory(slotIndex)
+    local slot = self.preyData[slotIndex]
+    if not slot then return end
+
+    slot.type = nil
+    slot.previewMonster = {}
+    slot.raceList = {}
+    slot.raceListOriginal = {}
+    slot.searchValue = false
+    slot.searchValueText = ''
+    slot.clearButton = false
+    slot.percent = nil
+    slot.percentFreeReroll = nil
+    slot.timeleft = nil
+    slot.timeUntilFreeReroll = nil
+    slot.isFreeReroll = nil
+    slot.disableFreeReroll = false
+    slot.preyType = nil
+    slot.bonusValue = nil
+    slot.bonusType = nil
+    slot.description = ''
+    slot.stars = 0
+    slot.outfit = nil
+    slot.raceId = nil
+    slot.autoReroll = false
+    slot.lockPrey = false
+
+    if self._raceListPagination then
+        self._raceListPagination[slotIndex] = nil
+    end
+end
 preyTrackerButton = nil
 preyButton = nil
 
@@ -217,6 +249,7 @@ end
 
 function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
     local slotId = slot + 1
+    PreyController:clearSlotTypeHistory(slotId)
     PreyController.preyData[slotId].type = SLOT_STATE_LOCKED
     PreyController.preyData[slotId].stars = 0
     PreyController.preyData[slotId].monsterName = "Locked"
@@ -246,6 +279,7 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
             wildcards, #names, #outfits))
 
     local slotId = slot + 1
+    PreyController:clearSlotTypeHistory(slotId)
     PreyController.preyData[slotId].raceList = Helper.fillTinyMonsterList(slot, names, outfits)
 
     PreyController.preyData[slotId].slotId = slot
@@ -494,13 +528,7 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
         wildcards))
 
     local slotId = slot + 1
-    PreyController.preyData[slotId].raceList = {}
-    PreyController.preyData[slotId].raceListOriginal = {}
-    PreyController.preyData[slotId].searchValue = false
-    PreyController.preyData[slotId].searchValueText = ''
-    if PreyController._raceListPagination then
-        PreyController._raceListPagination[slotId] = nil
-    end
+    PreyController:clearSlotTypeHistory(slotId)
     local activeRaceIds = {}
     for _, preySlot in ipairs(PreyController.preyData) do
         if preySlot and preySlot.type == SLOT_STATE_ACTIVE and preySlot.monsterName then
@@ -537,6 +565,7 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
         :format(slot, timeUntilFreeReroll,
             wildcards, #names, #outfits))
     local slotId = slot + 1
+    PreyController:clearSlotTypeHistory(slotId)
 
     timeUntilFreeReroll = timeUntilFreeReroll > 720000 and 0 or timeUntilFreeReroll
     PreyController.preyData[slotId].raceList = Helper.fillTinyMonsterList(slot, names, outfits)
@@ -627,6 +656,7 @@ end
 function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, bonusValue, bonusGrade, rawTimeleft,
                       rawTimeUntilFreeReroll, wildcards, option)
     local slotId = slot + 1
+    PreyController:clearSlotTypeHistory(slotId)
     local timeleft = timeleftTranslation(rawTimeleft)
     rawTimeUntilFreeReroll = rawTimeUntilFreeReroll > 720000 and 0 or rawTimeUntilFreeReroll
 
