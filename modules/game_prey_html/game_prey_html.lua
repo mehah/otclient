@@ -337,7 +337,7 @@ function PreyController:handleSelect(slot, race)
     self.preyData[slot + 1].monsterName = ("Selected: %s"):format(race.name)
 
     for i = 1, #self.preyData[slot + 1].raceList do
-        if self.preyData[slot + 1].raceList[i].raceId == race.raceId then
+        if self.preyData[slot + 1].raceList[i].index == race.index then
             self.preyData[slot + 1].raceList[i].selected = true
         else
             self.preyData[slot + 1].raceList[i].selected = false
@@ -688,7 +688,7 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
         PreyController.rawPlayerGold
 end
 
-function PreyController:onMouseWheel(slotId, hoveredIndex, delta)
+function PreyController:onMouseWheel(slotId, hoveredIndex)
     if not self:shouldLoadMoreRaces(slotId, hoveredIndex) then
         return
     end
