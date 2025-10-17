@@ -138,10 +138,6 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     if (!getProp(PropUpdatesEnabled))
         return;
 
-    std::string text = getDisplayedText();
-    m_drawText = text;
-    const int textLength = text.length();
-
     // prevent glitches
     if (m_rect.isEmpty())
         return;
@@ -149,9 +145,12 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     // recache coords buffers
     recacheGlyphs();
 
+    m_drawText = getDisplayedText();
+    const int textLength = m_drawText.length();
+
     // map glyphs positions
     Size textBoxSize;
-    m_font->calculateGlyphsPositions(text, m_textAlign, m_glyphsPositionsCache, &textBoxSize);
+    m_font->calculateGlyphsPositions(m_drawText, m_textAlign, m_glyphsPositionsCache, &textBoxSize);
     const Rect* glyphsTextureCoords = m_font->getGlyphsTextureCoords();
     const Size* glyphsSize = m_font->getGlyphsSize();
     int glyph;
@@ -186,7 +185,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
             assert(m_cursorPos <= textLength);
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
             int pos = m_cursorPos - 1; // element before cursor
-            glyph = static_cast<uint8_t>(text[pos]); // glyph of the element before cursor
+            glyph = static_cast<uint8_t>(m_drawText[pos]); // glyph of the element before cursor
             Rect glyphRect(m_glyphsPositionsCache[pos], glyphsSize[glyph]);
 
             // if the cursor is not on the previous rendered virtual rect we need to update it
@@ -198,7 +197,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 
                 // find that glyph
                 for (pos = 0; pos < textLength; ++pos) {
-                    glyph = static_cast<uint8_t>(text[pos]);
+                    glyph = static_cast<uint8_t>(m_drawText[pos]);
                     glyphRect = Rect(m_glyphsPositionsCache[pos], glyphsSize[glyph]);
                     glyphRect.setTop(std::max<int>(glyphRect.top() - m_font->getYOffset() - m_font->getGlyphSpacing().height(), 0));
                     glyphRect.setLeft(std::max<int>(glyphRect.left() - m_font->getGlyphSpacing().width(), 0));
@@ -219,7 +218,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
         if (m_cursorPos > 0 && textLength > 0) {
             const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(2 * m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
             const int pos = m_cursorPos - 1; // element before cursor
-            glyph = static_cast<uint8_t>(text[pos]); // glyph of the element before cursor
+            glyph = static_cast<uint8_t>(m_drawText[pos]); // glyph of the element before cursor
             const Rect glyphRect(m_glyphsPositionsCache[pos], glyphsSize[glyph]);
             if (virtualRect.contains(glyphRect.topLeft()) && virtualRect.contains(glyphRect.bottomRight()))
                 setProp(PropCursorInRange, true);
@@ -297,7 +296,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
             coords = colorCoordsMap[curColorRgba];
         }
 
-        glyph = static_cast<uint8_t>(text[i]);
+        glyph = static_cast<uint8_t>(m_drawText[i]);
         m_glyphsCoords[i].first.clear();
 
         // skip invalid glyphs
