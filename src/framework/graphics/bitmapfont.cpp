@@ -59,7 +59,6 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     }
 
     m_glyphsSize[32].setWidth(spaceWidth);
-    m_glyphsSize[160].setWidth(spaceWidth);
     m_glyphsSize[127].setWidth(1);
     m_glyphsSize[static_cast<uint8_t>('\n')] = { 1, m_glyphHeight };
 
@@ -468,7 +467,7 @@ std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const Wrap
             }
             out.insert(out.begin() + lastBreakOut, '\n');
             if (colors) updateColors(colors, lastBreakOut, 1);
-            lineW = 0;
+            lineW = std::max(0, lineW - lastBreakLineW);
         } else {
             if (forced && options.hyphenationMode == HyphenationMode::Auto) {
                 out.push_back('-');
@@ -477,31 +476,23 @@ std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const Wrap
             newline();
             return;
         }
-        lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0; lineW = 0;
+        lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0;
     };
 
     while (cur < end) {
-        if (*cur == '\n') {
-            pushChar('\n'); lineW = 0; lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0; ++cur; continue;
-        }
+        if (*cur == '\n') { pushChar('\n'); lineW = 0; lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0; ++cur; continue; }
 
         uint32_t cp; int len; _utf8(cur, end, cp, len);
 
         if (cp == 0x00A0 && options.allowNoBreakSpace) {
             int w = measure(cur, len, cp);
-            if (lineW + w > maxW) {
-                bool forced = (options.overflowWrapMode != OverflowWrapMode::Normal) || (options.wordBreakMode != WordBreakMode::KeepAll);
-                commitBreak(true);
-            }
+            if (lineW + w > maxW) { commitBreak(true); }
             pushSlice(cur, len); lineW += w; cur += len; continue;
         }
 
         if (cp == 0x2060 && options.allowWordJoiner) {
             int w = measure(cur, len, cp);
-            if (lineW + w > maxW) {
-                bool forced = (options.overflowWrapMode != OverflowWrapMode::Normal) || (options.wordBreakMode != WordBreakMode::KeepAll);
-                commitBreak(true);
-            }
+            if (lineW + w > maxW) { commitBreak(true); }
             pushSlice(cur, len); lineW += w; cur += len; continue;
         }
 
@@ -516,7 +507,7 @@ std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const Wrap
             unsigned char ch = (unsigned char)*cur;
             if (_isSpace(ch)) {
                 int w = _gw(m_glyphsSize, ' ', sx);
-                if (lineW + w > maxW) commitBreak(false);
+                if (lineW + w > maxW) { commitBreak(false); ++cur; markBreak(false, 0); continue; }
                 pushChar(' '); lineW += w; markBreak(false, 0); ++cur; continue;
             }
             if (_isHyphen(ch)) {
