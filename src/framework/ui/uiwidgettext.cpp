@@ -261,8 +261,7 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     }
 }
 
-void UIWidget::updateHtmlTextSize()
-{
+void UIWidget::updateHtmlTextSize() {
     if (isOnHtml()) {
         auto text = m_text;
         auto textAlign = m_textAlign;
@@ -284,4 +283,6 @@ void UIWidget::setFont(const std::string_view fontName)
     updateHtmlTextSize();
     updateText();
     onFontChange(fontName);
+    scheduleHtmlTask(PropUpdateSize);
+    refreshHtml(true);
 }
