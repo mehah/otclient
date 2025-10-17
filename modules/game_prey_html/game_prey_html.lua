@@ -1,5 +1,4 @@
 PreyController = Controller:new()
-PreyController.showEqualizerEffect = true
 
 local RACE_LIST_CHUNK_SIZE = 30
 
