@@ -160,7 +160,7 @@
                 *for="local race in (slot.raceList or {})"
                 onclick="self:handleSelect(race.slotId, race)"
                 *background-color="race.selected == true and '#757575' or race.index % 2 == 0 and '#414141' or '#484848'"
-                onmousewheel="self:onMouseWheel(race.slotId)"
+                onmousewheel="self:onMouseWheel(race.slotId, race.index, event.delta)"
               >
                 {{race.name}}
               </div>

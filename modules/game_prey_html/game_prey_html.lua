@@ -1,6 +1,8 @@
 PreyController = Controller:new()
 PreyController.showEqualizerEffect = true
 
+local RACE_LIST_CHUNK_SIZE = 30
+
 local PREY_BONUS_DAMAGE_BOOST = 0
 local PREY_BONUS_DAMAGE_REDUCTION = 1
 local PREY_BONUS_XP_BONUS = 2
@@ -346,6 +348,8 @@ end
 -- a unique table for all debounce timers in the module
 PreyController._debounceTimers = PreyController._debounceTimers or {}
 
+PreyController._raceListPagination = PreyController._raceListPagination or {}
+
 -- simple key-based debounce utility
 function PreyController:debounce(key, waitMs, fn)
     waitMs = waitMs or 300
@@ -357,6 +361,88 @@ function PreyController:debounce(key, waitMs, fn)
     end, waitMs)
 end
 
+local function getSlotIndex(slotId)
+    return (slotId or 0) + 1
+end
+
+function PreyController:getRaceListPagination(slotId)
+    local slotIndex = getSlotIndex(slotId)
+    self._raceListPagination[slotIndex] = self._raceListPagination[slotIndex] or {
+        chunkSize = RACE_LIST_CHUNK_SIZE,
+        loaded = 0,
+        source = nil
+    }
+    local pagination = self._raceListPagination[slotIndex]
+    pagination.chunkSize = pagination.chunkSize or RACE_LIST_CHUNK_SIZE
+    return pagination
+end
+
+function PreyController:resetRaceListView(slotId, sourceList)
+    local slotIndex = getSlotIndex(slotId)
+    local slot = self.preyData[slotIndex]
+    if not slot then return end
+
+    local pagination = self:getRaceListPagination(slotId)
+    pagination.loaded = 0
+    pagination.source = sourceList or slot.raceListOriginal or {}
+
+    slot.raceList = {}
+    self:appendRaceListChunk(slotId)
+end
+
+function PreyController:appendRaceListChunk(slotId)
+    local slotIndex = getSlotIndex(slotId)
+    local slot = self.preyData[slotIndex]
+    if not slot then return false end
+
+    local pagination = self:getRaceListPagination(slotId)
+    local source = pagination.source or slot.raceListOriginal or {}
+    local current = slot.raceList or {}
+
+    if pagination.loaded >= #source then
+        slot.raceList = current
+        return false
+    end
+
+    local chunkSize = pagination.chunkSize or RACE_LIST_CHUNK_SIZE
+    local startIndex = pagination.loaded + 1
+    local endIndex = math.min(startIndex + chunkSize - 1, #source)
+
+    for i = startIndex, endIndex do
+        local data = source[i]
+        if data then
+            data.index = i
+            table.insert(current, data)
+        end
+    end
+
+    pagination.loaded = endIndex
+    slot.raceList = current
+
+    return pagination.loaded < #source
+end
+
+function PreyController:shouldLoadMoreRaces(slotId, hoveredIndex)
+    local slotIndex = getSlotIndex(slotId)
+    local slot = self.preyData[slotIndex]
+    if not slot then return false end
+
+    local pagination = self:getRaceListPagination(slotId)
+    local source = pagination.source or slot.raceListOriginal or {}
+
+    if pagination.loaded >= #source then
+        return false
+    end
+
+    if not hoveredIndex then
+        return true
+    end
+
+    local chunkSize = pagination.chunkSize or RACE_LIST_CHUNK_SIZE
+    local threshold = math.max(1, pagination.loaded - math.floor(chunkSize / 2))
+    return hoveredIndex >= threshold
+end
+
 -- clear timers on terminate to prevent leaks
 function PreyController:onTerminate()
     if self._debounceTimers then
@@ -365,6 +451,8 @@ function PreyController:onTerminate()
         end
         self._debounceTimers = {}
     end
+
+    self._raceListPagination = {}
 
     if preyButton then
         preyButton:destroy()
@@ -384,7 +472,13 @@ function PreyController:onSearchMonster(slotId, value)
     value = value or ''
     local slot = self.preyData[slotId + 1]
     if slot.previewMonster and slot.previewMonster.index then
-        self.preyData[slotId + 1].raceList[slot.previewMonster.index].selected = false
+        local previewIndex = slot.previewMonster.index
+        local currentList = self.preyData[slotId + 1].raceList or {}
+        if currentList[previewIndex] then
+            currentList[previewIndex].selected = false
+        elseif slot.raceListOriginal and slot.raceListOriginal[previewIndex] then
+            slot.raceListOriginal[previewIndex].selected = false
+        end
     end
     self.preyData[slotId + 1].previewMonster = {}
     self.preyData[slotId + 1].monsterName = "Select your prey creature"
@@ -393,33 +487,28 @@ function PreyController:onSearchMonster(slotId, value)
     if #value <= 0 then
         self.preyData[slotId + 1].searchValue = false
         self.preyData[slotId + 1].searchValueText = ''
-        local k = 'search:' .. tostring(slot)
+        local k = 'search:' .. tostring(slotId)
         local t = self._debounceTimers[k]
         if t then
             removeEvent(t); self._debounceTimers[k] = nil
         end
 
-        local out = {}
-        for i = 1, math.min(50, #raceListOriginal) do
-            table.insert(out, raceListOriginal[i])
-        end
-        self.preyData[slotId + 1].raceList = out
+        self:resetRaceListView(slotId, raceListOriginal)
         self.preyData[slotId + 1].clearButton = false
         return
     end
     self.preyData[slotId + 1].searchValue = true
-    self:debounce('search:' .. tostring(slot), 300, function()
+    self:debounce('search:' .. tostring(slotId), 300, function()
         local searchValue = value:lower()
         self.preyData[slotId + 1].searchValueText = searchValue
         local filtered = {}
-        for i, race in ipairs(raceListOriginal) do
-            if i > 50 then break end -- safety net
+        for _, race in ipairs(raceListOriginal) do
             local name = (race.name or ''):lower()
             if name:find(searchValue, 1, true) then
                 table.insert(filtered, race)
             end
         end
-        self.preyData[slotId + 1].raceList = filtered
+        self:resetRaceListView(slotId, filtered)
     end)
 end
 
@@ -430,6 +519,11 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
     local slotId = slot + 1
     PreyController.preyData[slotId].raceList = {}
     PreyController.preyData[slotId].raceListOriginal = {}
+    PreyController.preyData[slotId].searchValue = false
+    PreyController.preyData[slotId].searchValueText = ''
+    if PreyController._raceListPagination then
+        PreyController._raceListPagination[slotId] = nil
+    end
     for i, raceId in ipairs(raceList) do
         local race = buildRaceEntry(raceId, slot, i)
         table.insert(PreyController.preyData[slotId].raceListOriginal, race)
@@ -442,10 +536,9 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
     for i = 1, #PreyController.preyData[slotId].raceListOriginal do
         local data = PreyController.preyData[slotId].raceListOriginal[i]
         data.index = i
-        if i <= 50 then -- show only first 50 initially to not LAG UI
-            table.insert(PreyController.preyData[slotId].raceList, data)
-        end
     end
+
+    PreyController:resetRaceListView(slot, PreyController.preyData[slotId].raceListOriginal)
 
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
@@ -595,26 +688,14 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
         PreyController.rawPlayerGold
 end
 
-local lastOnMouseWheel = 0
-function PreyController:onMouseWheel(slotId)
-    if os.clock() < lastOnMouseWheel then return end
-    lastOnMouseWheel = os.clock() + 0.5
-
-    local currentRaceList = PreyController.preyData[slotId + 1].raceList
-    local originalRaceList = PreyController.preyData[slotId + 1].raceListOriginal
-
-    if #currentRaceList >= #originalRaceList then return end
-    -- every time the scroll happens, add + 5
-    local currentCount = #currentRaceList
-    local toAdd = 5
-
-    local searchValue = self.preyData[slotId + 1].searchValueText or ''
-    for i = currentCount + 1, math.min(currentCount + toAdd, #originalRaceList) do
-        local data = originalRaceList[i]
-        data.index = i
-        table.insert(currentRaceList, data)
-        ::continue::
+function PreyController:onMouseWheel(slotId, hoveredIndex, delta)
+    if not self:shouldLoadMoreRaces(slotId, hoveredIndex) then
+        return
     end
+
+    self:debounce(('scroll:' .. tostring(slotId)), 60, function()
+        self:appendRaceListChunk(slotId)
+    end)
 end
 
 local confirmWindow
