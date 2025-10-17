@@ -283,4 +283,6 @@ void UIWidget::setFont(const std::string_view fontName)
     updateHtmlTextSize();
     updateText();
     onFontChange(fontName);
+    scheduleHtmlTask(PropUpdateSize);
+    refreshHtml(true);
 }
