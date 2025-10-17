@@ -97,15 +97,29 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     }
 
     if (hasSelection()) {
+        const int textLength = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
+
+        int a = std::clamp(m_selectionStart, 0, static_cast<int>(m_text.length()));
+        int b = std::clamp(m_selectionEnd, 0, static_cast<int>(m_text.length()));
+        if (a > b) std::swap(a, b);
+
+        const int visStart = m_srcToVis.empty() ? a : std::clamp(m_srcToVis[a], 0, textLength);
+        const int visEnd = m_srcToVis.empty() ? b : std::clamp(m_srcToVis[b], 0, textLength);
+
         if (glyphsMustRecache) {
             m_glyphsSelectRectCache.clear();
-            for (int i = m_selectionStart; i < m_selectionEnd; ++i)
-                m_glyphsSelectRectCache.emplace_back(m_glyphsCoords[i].first, m_glyphsCoords[i].second);
+            for (int i = visStart; i < visEnd; ++i) {
+                const auto& dest = m_glyphsCoords[i].first;
+                const auto& src = m_glyphsCoords[i].second;
+                if (dest.isValid()) m_glyphsSelectRectCache.emplace_back(dest, src);
+            }
         }
-        for (const auto& [dest, src] : m_glyphsSelectRectCache)
-            g_drawPool.addFilledRect(dest, m_selectionBackgroundColor);
-        for (const auto& [dest, src] : m_glyphsSelectRectCache)
-            g_drawPool.addTexturedRect(dest, texture, src, m_selectionColor);
+
+        for (const auto& it : m_glyphsSelectRectCache)
+            g_drawPool.addFilledRect(it.first, m_selectionBackgroundColor);
+
+        for (const auto& it : m_glyphsSelectRectCache)
+            g_drawPool.addTexturedRect(it.first, texture, it.second, m_selectionColor);
     }
 
     if (isExplicitlyEnabled() && getProp(PropCursorVisible) && getProp(PropCursorInRange) && isActive() && m_cursorPos >= 0) {
