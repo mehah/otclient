@@ -407,6 +407,7 @@ void UITextEdit::setCursorPos(int pos)
     else
         m_cursorPos = pos;
 
+    m_cursorPreferredX = -1;
     update(true);
 }
 
@@ -587,13 +588,91 @@ void UITextEdit::moveCursorHorizontally(const bool right)
     else
         m_cursorPos = m_text.length();
 
+    m_cursorPreferredX = -1;
     blinkCursor();
     update(true);
 }
 
-void UITextEdit::moveCursorVertically(bool)
+void UITextEdit::moveCursorVertically(bool up)
 {
-    //TODO
+    const int visLen = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
+    const int srcLen = static_cast<int>(m_text.length());
+    if (visLen <= 0) return;
+
+    const int curVis = m_srcToVis.empty()
+        ? std::clamp(m_cursorPos, 0, visLen)
+        : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+
+    int desiredX = m_cursorPreferredX;
+    if (desiredX < 0) {
+        if (curVis > 0 && curVis - 1 < (int)m_glyphsCoords.size() && m_glyphsCoords[curVis - 1].first.isValid())
+            desiredX = m_glyphsCoords[curVis - 1].first.right();
+        else
+            desiredX = m_rect.left() + m_padding.left;
+        m_cursorPreferredX = desiredX;
+    }
+
+    std::vector<int> lineStarts, lineEnds;
+    int i = 0;
+    while (i < visLen && !m_glyphsCoords[i].first.isValid()) ++i;
+    if (i >= visLen) { setCursorPos(0); return; }
+    int currentTop = m_glyphsCoords[i].first.top();
+    lineStarts.push_back(i);
+    for (; i < visLen; ++i) {
+        const Rect& r = m_glyphsCoords[i].first;
+        if (!r.isValid()) continue;
+        if (r.top() != currentTop) {
+            lineEnds.push_back(i);
+            currentTop = r.top();
+            lineStarts.push_back(i);
+        }
+    }
+    lineEnds.push_back(visLen);
+
+    int curLine = 0;
+    for (int ln = 0; ln < (int)lineStarts.size(); ++ln) {
+        const int L = lineStarts[ln];
+        const int R = lineEnds[ln];
+        if (curVis >= L && curVis <= R) { curLine = ln; break; }
+    }
+
+    const int targetLine = up ? curLine - 1 : curLine + 1;
+    if (targetLine < 0) { setCursorPos(0); return; }
+    if (targetLine >= (int)lineStarts.size()) { setCursorPos(srcLen); return; }
+
+    const int L = lineStarts[targetLine];
+    const int R = lineEnds[targetLine];
+
+    int xStart = m_rect.left() + m_padding.left;
+    for (int k = L; k < R; ++k) {
+        const Rect& r = m_glyphsCoords[k].first;
+        if (r.isValid()) { xStart = r.left(); break; }
+    }
+
+    std::vector<int> boundariesX;
+    boundariesX.reserve((R - L) + 1);
+    boundariesX.push_back(xStart);
+    for (int k = L; k < R; ++k) {
+        const Rect& r = m_glyphsCoords[k].first;
+        if (!r.isValid()) continue;
+        boundariesX.push_back(r.right());
+    }
+    if (boundariesX.empty()) boundariesX.push_back(xStart);
+
+    int bestB = 0;
+    int bestDist = std::numeric_limits<int>::max();
+    for (int b = 0; b < (int)boundariesX.size(); ++b) {
+        const int d = std::abs(boundariesX[b] - desiredX);
+        if (d < bestDist) { bestDist = d; bestB = b; }
+        if (desiredX < boundariesX[b]) break;
+    }
+
+    const int targetVis = std::clamp(L + bestB, 0, visLen);
+    const int targetSrc = m_visToSrc.empty()
+        ? std::clamp(targetVis, 0, srcLen)
+        : std::clamp(m_visToSrc[std::clamp(targetVis, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
+
+    setCursorPos(targetSrc);
 }
 
 int UITextEdit::getTextPos(const Point& pos)

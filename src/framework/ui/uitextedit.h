@@ -148,6 +148,7 @@ private:
     int m_selectionStart{ 0 };
     int m_selectionEnd{ 0 };
     int m_cursorPos{ 0 };
+    int m_cursorPreferredX{ -1 };
 
     std::vector<int> m_srcToVis;
     std::vector<int> m_visToSrc;;
