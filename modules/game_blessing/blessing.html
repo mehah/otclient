@@ -3,7 +3,7 @@
   .blessings-window {
     position: relative;
     width: 615px;
-    height: 430px;
+    height: 410px;
   }
 
   /* Layout containers */
@@ -44,6 +44,7 @@
 
   #promotionStatusLabel {
     text-align: right;
+    height: 50px;
   }
 
   #premium_only {
@@ -55,24 +56,20 @@
   .full-separator {
     width: 100%;
     margin-top: 5px;
+    height: 2px;
   }
 
-  /* Button styling */
-  .buttons {
-    height: 20px;
-    margin-top: 5px;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-  }
 
   .buttons button {
     float: right;
-    margin-right: 6px;
+    margin-right: 5px;
+    width: 40px;
   }
+
   .history-panel {
     height: 370px;
   }
+
   /* History scroll area */
   .history-scroll {
     border: 1px #00000077;
@@ -89,13 +86,39 @@
     text-align: justify;
     margin-bottom: 2px;
   }
+
+  .big-premium-button {
+    width: 128px;
+    height: 37px;
+    --image-source: /images/ui/getpremium;
+    --image-clip: 0 0 128 37;
+    --image-border: 3;
+    display: inline-block;
+    background-repeat: no-repeat;
+  }
+
+  .big-premium-button:active {
+    --image-clip: 0 37 128 37;
+  }
+
+  .big-premium-button[on="false"],
+  .big-premium-button[on="0"],
+  .big-premium-button:not([on]) {
+    --image-clip: 0 74 128 37;
+  }
+
+  .big-premium-button:disabled {
+    opacity: 0.8;
+    color: #c0c0c0;
+  }
 </style>
 
 <html>
 <Window id="main" class="blessings-window" title="Blessings" onescape="self:close()">
 
   <!-- History Panel (initially hidden) -->
-  <div id="historyPanel" anchor="parent" class="history-panel minipanel" title="History" *if="self.historyButtonText == 'History'">
+  <div id="historyPanel" anchor="parent" class="history-panel minipanel" title="History"
+    *if="self.historyButtonText == 'Back'">
     <div id="historyScrollArea" class="history-scroll">
     </div>
   </div>
@@ -108,8 +131,9 @@
   <!-- Promotion Status Panel -->
   <div id="promotionPanel" class="promo-panel minipanel" title="Promotion and Premium Status">
     <label id="promotionStatusLabel"></label>
-    <BigPremiumButton id="premium_only" onclick="self:onClickSendStore()" *on="(g_game:getLocalPlayer() and not g_game:getLocalPlayer():isPremium()) or false">
-    </BigPremiumButton>
+    <UIbutton id="premium_only" class="big-premium-button" onclick="self:onClickSendStore()"
+      *on="(g_game:getLocalPlayer() and not g_game:getLocalPlayer():isPremium()) or false">
+    </UIbutton>
   </div>
 
   <!-- Death Penalty Panel -->
@@ -123,8 +147,8 @@
   <hr class="full-separator" />
   <!-- Action Buttons -->
   <div id="buttonsPanel" class="buttons" focusable="false">
-    <button id="historyButton" onclick="self:showHistory()" *text="self.historyButtonText or 'History'"></button>
-    <button onclick="self:close()" text="Close"></button>
+    <button id="historyButton" onclick="self:showHistory()">{{self.historyButtonText}}</button>
+    <button onclick="self:close()">Close</button>
   </div>
 </Window>
 

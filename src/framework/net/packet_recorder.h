@@ -25,10 +25,11 @@
 #include <framework/net/inputmessage.h>
 #include <framework/net/outputmessage.h>
 
-class PacketRecorder : public LuaObject {
+class PacketRecorder : public LuaObject
+{
 public:
     PacketRecorder(const std::string_view& file);
-    virtual ~PacketRecorder();
+    ~PacketRecorder() override;
 
     void addInputPacket(const InputMessagePtr& packet);
     void addOutputPacket(const OutputMessagePtr& packet);

@@ -80,7 +80,7 @@ public:
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
-        
+
         // Configure SSL context properly
         m_context.set_default_verify_paths();
         m_context.set_verify_mode(asio::ssl::verify_none);
@@ -212,7 +212,7 @@ public:
     bool wsClose(int operationId);
     bool cancel(int id);
 
-    const std::unordered_map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
+    [[nodiscard]] const std::unordered_map<std::string, HttpResult_ptr>& downloads() const { return m_downloads; }
 
     void clearDownloads() { m_downloads.clear(); }
 

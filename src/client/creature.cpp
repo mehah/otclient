@@ -211,23 +211,37 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
     Rect healthRect = backgroundRect.expanded(-1);
     healthRect.setWidth((m_healthPercent / 100.0) * 25);
 
+    Rect barsRect = backgroundRect;
+
     if (drawFlags & Otc::DrawBars) {
         g_drawPool.addFilledRect(backgroundRect, Color::black);
         g_drawPool.addFilledRect(healthRect, fillColor);
 
         if (drawFlags & Otc::DrawManaBar && isLocalPlayer()) {
             if (const auto& player = g_game.getLocalPlayer()) {
-                backgroundRect.moveTop(backgroundRect.bottom());
+                if (player->isMage() && player->getMaxManaShield() > 0) {
+                    barsRect.moveTop(barsRect.bottom());
+                    g_drawPool.addFilledRect(barsRect, Color::black);
 
-                g_drawPool.addFilledRect(backgroundRect, Color::black);
+                    Rect manaShieldRect = barsRect.expanded(-1);
+                    const double maxManaShield = player->getMaxManaShield();
+                    manaShieldRect.setWidth((maxManaShield ? player->getManaShield() / maxManaShield : 1) * 25);
 
-                Rect manaRect = backgroundRect.expanded(-1);
+                    g_drawPool.addFilledRect(manaShieldRect, Color::darkPink);
+                }
+
+                barsRect.moveTop(barsRect.bottom());
+                g_drawPool.addFilledRect(barsRect, Color::black);
+
+                Rect manaRect = barsRect.expanded(-1);
                 const double maxMana = player->getMaxMana();
                 manaRect.setWidth((maxMana ? player->getMana() / maxMana : 1) * 25);
 
                 g_drawPool.addFilledRect(manaRect, Color::blue);
             }
         }
+
+        backgroundRect = barsRect;
     }
 
     g_drawPool.setDrawOrder(DrawOrder::SECOND);
@@ -610,7 +624,7 @@ void Creature::updateWalkAnimation()
     const int footDelay = std::clamp<int>(walkSpeed / footAnimDelay, minFootDelay, maxFootDelay);
 
     if (m_footTimer.ticksElapsed() >= footDelay) {
-        if (m_walkAnimationPhase == footAnimPhases) m_walkAnimationPhase = 1;
+        if (std::cmp_equal(m_walkAnimationPhase, footAnimPhases)) m_walkAnimationPhase = 1;
         else ++m_walkAnimationPhase;
 
         m_footTimer.restart();
@@ -796,7 +810,7 @@ void Creature::setDirection(const Otc::Direction direction)
     setAttachedEffectDirection(static_cast<Otc::Direction>(m_numPatternX));
 }
 
-void Creature::setOutfit(const Outfit& outfit)
+void Creature::setOutfit(const Outfit& outfit, bool fireEvent)
 {
     if (m_outfit == outfit)
         return;
@@ -829,7 +843,8 @@ void Creature::setOutfit(const Outfit& outfit)
     if (const auto& tile = getTile())
         tile->checkForDetachableThing();
 
-    callLuaField("onOutfitChange", m_outfit, oldOutfit);
+    if (fireEvent)
+        callLuaField("onOutfitChange", m_outfit, oldOutfit);
 }
 
 void Creature::setSpeed(uint16_t speed)
@@ -901,7 +916,8 @@ void Creature::setIconsTexture(const std::string& filename, const Rect& clip, co
         m_icons->numberText.setAlign(Fw::AlignCenter);
     }
 
-    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ g_textures.getTexture(filename), clip, count });
+    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ .texture = g_textures.getTexture(filename),
+        .clip = clip, .count = count });
 }
 void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
 void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
@@ -999,7 +1015,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
     if (groundSpeed == 0)
         groundSpeed = 150;
 
-    if (groundSpeed != m_stepCache.groundSpeed || m_speed != m_stepCache.speed) {
+    if (std::cmp_not_equal(groundSpeed, m_stepCache.groundSpeed) || m_speed != m_stepCache.speed) {
         m_stepCache.speed = m_speed;
         m_stepCache.groundSpeed = groundSpeed;
 

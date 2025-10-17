@@ -78,7 +78,7 @@ ContainerPtr Thing::getParentContainer()
 
 int Thing::getStackPos()
 {
-    if (m_position.x == UINT16_MAX && isItem()) // is inside a container
+    if (std::cmp_equal(m_position.x, UINT16_MAX) && isItem()) // is inside a container
         return m_position.z;
 
     if (m_stackPos >= 0)

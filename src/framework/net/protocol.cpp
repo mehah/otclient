@@ -419,14 +419,14 @@ void Protocol::onLocalDisconnected(std::error_code ec)
     if (m_disconnected)
         return;
     auto self(asProtocol());
-    #ifndef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
     post(g_ioService, [&, ec] {
         if (m_disconnected)
             return;
         m_disconnected = true;
         onError(ec);
     });
-    #endif
+#endif
 }
 
 void Protocol::onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packet)
@@ -434,7 +434,7 @@ void Protocol::onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packe
     if (m_disconnected)
         return;
     auto self(asProtocol());
-    #ifndef __EMSCRIPTEN__
+#ifndef __EMSCRIPTEN__
     post(g_ioService, [&, packet] {
         if (m_disconnected)
             return;
@@ -445,7 +445,7 @@ void Protocol::onPlayerPacket(const std::shared_ptr<std::vector<uint8_t>>& packe
         m_inputMessage->setMessageSize(packet->size());
         onRecv(m_inputMessage);
     });
-    #endif
+#endif
 }
 
 void Protocol::playRecord(PacketPlayerPtr player)

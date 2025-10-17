@@ -22,11 +22,13 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <vector>
 #include <framework/core/eventdispatcher.h>
 #include <framework/html/htmlmanager.h>
 #include <framework/html/htmlnode.h>
 #include "uimanager.h"
 #include "uiwidget.h"
+#include "uilayoutflexbox.h"
 
 namespace {
     inline uint32_t SIZE_VERSION_COUNTER = 1;
@@ -801,7 +803,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
     applyDimension(isWidth, unit, num);
     if (m_htmlNode)
-        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { valueStr , "" };
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { .value = valueStr , .inheritedFromId = "" };
 }
 
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
@@ -1025,13 +1027,13 @@ void UIWidget::updateTableLayout()
             const int outerHeight = std::max<int>(0, cellHeight) + cell->m_padding.top + cell->m_padding.bottom;
 
             rowCellInfo[rowIndex].push_back(TableCellInfo{
-                cell,
-                columnIndex,
-                colSpan,
-                effectiveRowSpan,
-                candidate,
-                fixedWidth,
-                outerHeight,
+                .widget = cell,
+                .column = columnIndex,
+                .columnSpan = colSpan,
+                .rowSpan = effectiveRowSpan,
+                .requiredOuterWidth = candidate,
+                .widthFixed = fixedWidth,
+                .outerHeight = outerHeight,
             });
 
             const std::size_t occupancyValue = effectiveRowSpan;
@@ -1053,8 +1055,8 @@ void UIWidget::updateTableLayout()
     std::vector<int> columnWidths(columnCount, 0);
     std::vector<bool> columnFixed(columnCount, false);
 
-    for (std::size_t rowIndex = 0; rowIndex < rowCellInfo.size(); ++rowIndex) {
-        for (const auto& info : rowCellInfo[rowIndex]) {
+    for (auto& rowIndex : rowCellInfo) {
+        for (const auto& info : rowIndex) {
             const std::size_t span = std::min<std::size_t>(info.columnSpan, columnCount - info.column);
             if (span == 0)
                 continue;
@@ -1171,7 +1173,7 @@ void UIWidget::updateTableLayout()
 
             UIWidget* cell = info.widget;
             const int padY = cell->getPaddingTop() + cell->getPaddingBottom();
-            const int contentH = std::max(0, tallestInRow - padY);
+            const int contentH = std::max<int>(0, tallestInRow - padY);
 
             if (cell->m_height.unit == Unit::Auto || cell->m_height.unit == Unit::FitContent) {
                 cell->setHeight_px(contentH);
@@ -1376,7 +1378,8 @@ UIWidgetPtr UIWidget::getVirtualParent() const {
     return parent;
 }
 void UIWidget::updateSize() {
-    if (!isAnchorable()) return;
+    if (!isAnchorable() || !m_parent)
+        return;
 
     if (m_htmlNode && (m_htmlNode->getType() == NodeType::Text || m_htmlNode->getStyle("inherit-text") == "true")) {
         const auto& parentSize = m_parent->m_width.unit == Unit::FitContent ? m_textSizeNowrap : m_parent->getSize();
@@ -1487,6 +1490,13 @@ void UIWidget::updateSize() {
         applyFitContentRecursive(this, width, height);
     }
 
+    if (m_displayType == DisplayType::Flex || m_displayType == DisplayType::InlineFlex) {
+        layoutFlex(*this);
+        m_width.pendingUpdate = false;
+        m_height.pendingUpdate = false;
+        return;
+    }
+
     if (m_displayType == DisplayType::Table) {
         updateTableLayout();
         computeAndApplyTableColumns(this);
@@ -1501,7 +1511,7 @@ void UIWidget::updateSize() {
 }
 
 void UIWidget::applyAnchorAlignment() {
-    if (!isOnHtml() || !isAnchorable())
+    if (!isOnHtml() || !isAnchorable() || !m_parent)
         return;
 
     resetAnchors();

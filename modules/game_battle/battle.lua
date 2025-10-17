@@ -2321,6 +2321,12 @@ function onCreatureHealthPercentChange(creature, healthPercent, oldHealthPercent
         local battleButton = instance.battleButtons[creatureId]
         if battleButton then
             local sortType = instance:getSortType()
+            if battleButton.setLifeBarPercent then
+                battleButton:setLifeBarPercent(healthPercent)
+            end
+            if battleButton.data then
+                battleButton.data.healthpercent = healthPercent
+            end
             if sortType == 'health' then
                 if healthPercent == oldHealthPercent then
                     goto continue -- Skip this instance

@@ -96,6 +96,7 @@ public:
 
 protected:
     void updateText() override;
+    bool isTextEdit() override { return true; }
 
     void onHoverChange(bool hovered) override;
     void onStyleApply(std::string_view styleName, const OTMLNodePtr& styleNode) override;

@@ -150,28 +150,6 @@ void UIWidget::onTextChange(const std::string_view text, const std::string_view 
 
 void UIWidget::onFontChange(const std::string_view font) { callLuaField("onFontChange", font); }
 
-static inline void trimSpacesAndNewlines(std::string& s) {
-    if (s.empty()) return;
-
-    const unsigned char* data = reinterpret_cast<const unsigned char*>(s.data());
-    size_t start = 0;
-    size_t end = s.size();
-
-    while (start < end && std::isspace(data[start]))
-        ++start;
-
-    while (end > start && std::isspace(data[end - 1]))
-        --end;
-
-    if (start > 0 || end < s.size()) {
-        const size_t newSize = end - start;
-        if (start > 0)
-            s.erase(0, start);
-        if (newSize < s.size())
-            s.resize(newSize);
-    }
-}
-
 void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 {
     std::string _text{ text.data() };
@@ -188,7 +166,7 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
     const std::string oldText = m_text;
     m_text = _text;
 
-    if (isOnHtml()) {
+    if (isOnHtml() && !isTextEdit()) {
         auto whiteSpace = m_htmlNode->getStyle("white-space");
         if (whiteSpace.empty())
             whiteSpace = "normal";
@@ -196,14 +174,7 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
         setProp(PropTextHorizontalAutoResize, false);
         setProp(PropTextVerticalAutoResize, false);
 
-        auto originalText = m_text;
-        { // get text size without wrap
-            m_textAlign = Fw::AlignTopLeft;
-            trimSpacesAndNewlines(m_text);
-            setProp(PropTextWrap, false);
-            updateText();
-            m_textSizeNowrap = m_textSize;
-        }
+        updateHtmlTextSize();
 
         setProp(PropTextWrap, true);
         if (whiteSpace == "normal") {
@@ -232,8 +203,9 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
 
             m_text.swap(out);
             setProp(PropTextWrap, false);
-        } else
-            m_text = originalText; // pre, pre-wrap
+        } else {
+            setProp(PropTextWrap, whiteSpace == "pre-wrap"); // pre, pre-wrap
+        }
     }
 
     updateText();
@@ -289,9 +261,28 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     }
 }
 
+void UIWidget::updateHtmlTextSize() {
+    if (isOnHtml()) {
+        auto text = m_text;
+        auto textAlign = m_textAlign;
+        { // get text size without wrap
+            m_textAlign = Fw::AlignTopLeft;
+            stdext::trimSpacesAndNewlines(m_text);
+            setProp(PropTextWrap, false);
+            updateText();
+            m_textSizeNowrap = m_textSize;
+        }
+        m_text = text;
+        m_textAlign = textAlign;
+    }
+}
+
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
+    updateHtmlTextSize();
     updateText();
     onFontChange(fontName);
+    scheduleHtmlTask(PropUpdateSize);
+    refreshHtml(true);
 }

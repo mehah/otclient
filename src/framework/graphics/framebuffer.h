@@ -41,17 +41,17 @@ public:
     void setSmooth(const bool enabled) { m_smooth = enabled; m_texture = nullptr; }
 
     bool resize(const Size& size);
-    bool isValid() const { return m_texture != nullptr; }
-    bool canDraw() const;
-    bool isAutoClear() const { return m_autoClear; }
+    [[nodiscard]] bool isValid() const { return m_texture != nullptr; }
+    [[nodiscard]] bool canDraw() const;
+    [[nodiscard]] bool isAutoClear() const { return m_autoClear; }
     void setAutoClear(bool v) { m_autoClear = v; }
     void setAlphaWriting(bool v) { m_useAlphaWriting = v; }
     void setAutoResetState(bool v) { m_isScene = v; }
 
-    TexturePtr getTexture() const { return m_texture; }
+    [[nodiscard]] TexturePtr getTexture() const { return m_texture; }
     TexturePtr extractTexture();
 
-    Size getSize() const { return m_texture->getSize(); }
+    [[nodiscard]] Size getSize() const { return m_texture->getSize(); }
 
     void setCompositionMode(const CompositionMode mode) { m_compositeMode = mode; }
     void disableBlend() { m_disableBlend = true; }
