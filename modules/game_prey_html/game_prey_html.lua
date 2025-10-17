@@ -31,9 +31,11 @@ function PreyController:handleResources()
 
     local player = g_game.getLocalPlayer()
     if not player then return end
+    self.wildcards = player:getResourceBalance(ResourceTypes.PREY_WILDCARDS)
+    self.bankGold = player:getResourceBalance(ResourceTypes.BANK_BALANCE)
+    self.inventoryGold = player:getResourceBalance(ResourceTypes.GOLD_EQUIPPED)
     self.rawPlayerGold = player:getTotalMoney() or 0
     self.playerGold = comma_value(self.rawPlayerGold)
-    self.wildcards = player:getResourceBalance(ResourceTypes.PREY_WILDCARDS)
 end
 
 function show()
@@ -56,6 +58,7 @@ function toggle()
 end
 
 function PreyController:hide()
+    PreyController:handleResources()
     if PreyController.ui then
         PreyController:unloadHtml()
     end
@@ -289,8 +292,10 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
     PreyController.preyData[slotId].percentFreeReroll = Helper.getProgress(timeUntilFreeReroll, Helper.freeRerollHours,
         Helper.freeRerollBarWidth)
     PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(timeUntilFreeReroll)
-    PreyController.preyData[slotId].isFreeReroll = timeUntilFreeReroll == 0
-    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold
+    local isFreeReroll = timeUntilFreeReroll == 0
+    PreyController.preyData[slotId].isFreeReroll = isFreeReroll
+    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold and
+        not isFreeReroll
 end
 
 function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
@@ -576,8 +581,10 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
     PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(timeUntilFreeReroll)
     PreyController.preyData[slotId].type = SLOT_STATE_SELECTION
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
-    PreyController.preyData[slotId].isFreeReroll = timeUntilFreeReroll == 0
-    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold
+    local isFreeReroll = timeUntilFreeReroll == 0
+    PreyController.preyData[slotId].isFreeReroll = isFreeReroll
+    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold and
+        not isFreeReroll
 end
 
 function PreyController:onGameStart()
@@ -689,9 +696,10 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
     PreyController.preyData[slotId].bonusType = bonusType
     PreyController.preyData[slotId].timeUntilFreeReroll = timeleftTranslation(rawTimeUntilFreeReroll)
     PreyController:handleResources()
-    PreyController.preyData[slotId].isFreeReroll = rawTimeUntilFreeReroll == 0
-    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice >
-        PreyController.rawPlayerGold
+    local isFreeReroll = rawTimeUntilFreeReroll == 0
+    PreyController.preyData[slotId].isFreeReroll = isFreeReroll
+    PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold and
+        not isFreeReroll
 end
 
 function PreyController:onMouseWheel(slotId, hoveredIndex)
