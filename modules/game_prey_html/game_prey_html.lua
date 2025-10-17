@@ -764,14 +764,13 @@ function PreyController:handleRerollBonus(slotId)
         self.rerollBonusPrice, self.wildcards
     ))
 
-    local shouldRestoreWindow = self.ui and self.ui:isVisible()
-    if shouldRestoreWindow then
-        self:hide()
-    end
+    local wasVisible = self.ui and self.ui:isVisible()
 
     local function restorePreyWindow()
-        if shouldRestoreWindow then
-            show()
+        if wasVisible and self.ui then
+            self.ui:show()
+            self.ui:raise()
+            self.ui:focus()
         end
     end
 
@@ -786,14 +785,13 @@ function PreyController:handlePickSpecific(slotId)
         self.pickSpecificPrice, self.wildcards
     ))
 
-    local shouldRestoreWindow = self.ui and self.ui:isVisible()
-    if shouldRestoreWindow then
-        self:hide()
-    end
+    local wasVisible = self.ui and self.ui:isVisible()
 
     local function restorePreyWindow()
-        if shouldRestoreWindow then
-            show()
+        if wasVisible and self.ui then
+            self.ui:show()
+            self.ui:raise()
+            self.ui:focus()
         end
     end
 
@@ -843,14 +841,13 @@ function PreyController:listReroll(slotId)
         )
     end
 
-    local shouldRestoreWindow = self.ui and self.ui:isVisible()
-    if shouldRestoreWindow then
-        self:hide()
-    end
+    local wasVisible = self.ui and self.ui:isVisible()
 
     local function restorePreyWindow()
-        if shouldRestoreWindow then
-            show()
+        if wasVisible and self.ui then
+            self.ui:show()
+            self.ui:raise()
+            self.ui:focus()
         end
     end
 
