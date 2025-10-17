@@ -34,8 +34,9 @@
 #include <timeapi.h>
 #endif
 
-// Include for DWM API
+ // Include for DWM API
 #include <dwmapi.h>
+
 #pragma comment(lib, "dwmapi.lib")
 
 #define HSB_BIT_SET(p, n) (p[(n)/8] |= (128 >>((n)%8)))
@@ -46,7 +47,7 @@ constexpr auto WINDOW_NAME = "BASED_ON_TIBIA_GAME_ENGINE";
 #ifndef DWMWA_CAPTION_COLOR
 #define DWMWA_CAPTION_COLOR 35
 #endif
-#ifndef DWMWA_TEXT_COLOR  
+#ifndef DWMWA_TEXT_COLOR
 #define DWMWA_TEXT_COLOR 36
 #endif
 
@@ -893,7 +894,8 @@ int WIN32Window::internalLoadMouseCursor(const ImagePtr& image, const Point& hot
 void WIN32Window::setMouseCursor(int cursorId)
 {
     g_mainDispatcher.addEvent([&, cursorId] {
-        if (cursorId >= static_cast<int>(m_cursors.size()) || cursorId < 0)
+        if (std::cmp_greater_equal(cursorId, m_cursors.size())
+        || cursorId < 0)
             return;
 
         m_cursor = m_cursors[cursorId];
@@ -1052,7 +1054,7 @@ void WIN32Window::setTitleBarColor(const Color& color)
         // Color uses RGBA format, Windows expects BGR
         const COLORREF dwmColor = RGB(
             static_cast<BYTE>(color.r() * 255),
-            static_cast<BYTE>(color.g() * 255), 
+            static_cast<BYTE>(color.g() * 255),
             static_cast<BYTE>(color.b() * 255)
         );
 
@@ -1069,7 +1071,7 @@ void WIN32Window::setTitleBarColor(const Color& color)
             // This is normal on older Windows versions
             g_logger.debug("Failed to set title bar color: HRESULT = 0x{:08X}", static_cast<uint32_t>(hr));
         } else {
-            g_logger.debug("Successfully set title bar color to RGB({}, {}, {})", 
+            g_logger.debug("Successfully set title bar color to RGB({}, {}, {})",
                 static_cast<int>(color.r() * 255),
                 static_cast<int>(color.g() * 255),
                 static_cast<int>(color.b() * 255)

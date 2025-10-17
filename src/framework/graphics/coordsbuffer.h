@@ -83,12 +83,12 @@ public:
         m_textureCoordArray.append(&buffer->m_textureCoordArray);
     }
 
-    const float* getVertexArray() const { return m_vertexArray.vertices(); }
-    const float* getTextureCoordArray() const { return m_textureCoordArray.vertices(); }
-    int getVertexCount() const { return m_vertexArray.vertexCount(); }
-    int getTextureCoordCount() const { return m_textureCoordArray.vertexCount(); }
+    [[nodiscard]] const float* getVertexArray() const { return m_vertexArray.vertices(); }
+    [[nodiscard]] const float* getTextureCoordArray() const { return m_textureCoordArray.vertices(); }
+    [[nodiscard]] int getVertexCount() const { return m_vertexArray.vertexCount(); }
+    [[nodiscard]] int getTextureCoordCount() const { return m_textureCoordArray.vertexCount(); }
 
-    size_t size() const {
+    [[nodiscard]] size_t size() const {
         return  std::max<size_t>(m_vertexArray.size(), m_textureCoordArray.size());
     }
 

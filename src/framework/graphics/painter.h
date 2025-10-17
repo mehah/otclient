@@ -63,21 +63,21 @@ public:
     void drawCoords(const CoordsBuffer& coordsBuffer, DrawMode drawMode = DrawMode::TRIANGLES);
     void drawLine(const std::vector<float>& vertex, int size, int width) const;
 
-    float getOpacity() const { return m_opacity; }
-    bool getAlphaWriting() const { return m_alphaWriting; }
+    [[nodiscard]] float getOpacity() const { return m_opacity; }
+    [[nodiscard]] bool getAlphaWriting() const { return m_alphaWriting; }
 
-    const auto& getTextureMatrix() const { return m_textureMatrix; }
-    Matrix3 getTransformMatrix(const Size& size) const;
-    Matrix3 getTransformMatrix() const { return m_transformMatrix; }
-    Matrix3 getProjectionMatrix() const { return m_projectionMatrix; }
+    [[nodiscard]] const auto& getTextureMatrix() const { return m_textureMatrix; }
+    [[nodiscard]] Matrix3 getTransformMatrix(const Size& size) const;
+    [[nodiscard]] Matrix3 getTransformMatrix() const { return m_transformMatrix; }
+    [[nodiscard]] Matrix3 getProjectionMatrix() const { return m_projectionMatrix; }
 
-    Color getColor() const { return m_color; }
-    Rect getClipRect() const { return m_clipRect; }
-    Size getResolution() const { return m_resolution; }
-    BlendEquation getBlendEquation() const { return m_blendEquation; }
-    CompositionMode getCompositionMode() const { return m_compositionMode; }
-    PainterShaderProgram* getShaderProgram() const { return m_shaderProgram; }
-    PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
+    [[nodiscard]] Color getColor() const { return m_color; }
+    [[nodiscard]] Rect getClipRect() const { return m_clipRect; }
+    [[nodiscard]] Size getResolution() const { return m_resolution; }
+    [[nodiscard]] BlendEquation getBlendEquation() const { return m_blendEquation; }
+    [[nodiscard]] CompositionMode getCompositionMode() const { return m_compositionMode; }
+    [[nodiscard]] PainterShaderProgram* getShaderProgram() const { return m_shaderProgram; }
+    [[nodiscard]] PainterShaderProgramPtr getReplaceColorShader() const { return m_drawReplaceColorProgram; }
 
     void setColor(const Color& color) { if (m_color != color) m_color = color; }
     void setTexture(const TexturePtr&);

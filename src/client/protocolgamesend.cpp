@@ -704,7 +704,7 @@ void ProtocolGame::sendPartyAnalyzerAction(const uint8_t action, const std::vect
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientPartyAnalyzerAction); // 43
     msg->addU8(action);
-    
+
     // Only add items data for PARTYANALYZERACTION_PRICEVALUE (action 3)
     if (action == 3) { // PARTYANALYZERACTION_PRICEVALUE
         msg->addU16(static_cast<uint16_t>(items.size()));
@@ -713,7 +713,7 @@ void ProtocolGame::sendPartyAnalyzerAction(const uint8_t action, const std::vect
             msg->addU64(price);
         }
     }
-    
+
     send(msg);
 }
 
@@ -1214,7 +1214,7 @@ void ProtocolGame::sendRequestStoreOffers(const std::string_view categoryName, c
     send(msg);
 }
 
-void ProtocolGame::sendRequestStoreHome() 
+void ProtocolGame::sendRequestStoreHome()
 {
     const auto& msg = std::make_shared<OutputMessage>();
     msg->addU8(Proto::ClientRequestStoreOffers);

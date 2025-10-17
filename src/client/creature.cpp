@@ -624,7 +624,7 @@ void Creature::updateWalkAnimation()
     const int footDelay = std::clamp<int>(walkSpeed / footAnimDelay, minFootDelay, maxFootDelay);
 
     if (m_footTimer.ticksElapsed() >= footDelay) {
-        if (m_walkAnimationPhase == footAnimPhases) m_walkAnimationPhase = 1;
+        if (std::cmp_equal(m_walkAnimationPhase, footAnimPhases)) m_walkAnimationPhase = 1;
         else ++m_walkAnimationPhase;
 
         m_footTimer.restart();
@@ -916,7 +916,8 @@ void Creature::setIconsTexture(const std::string& filename, const Rect& clip, co
         m_icons->numberText.setAlign(Fw::AlignCenter);
     }
 
-    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ g_textures.getTexture(filename), clip, count });
+    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ .texture = g_textures.getTexture(filename),
+        .clip = clip, .count = count });
 }
 void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }
 void Creature::setEmblemTexture(const std::string& filename) { m_emblemTexture = g_textures.getTexture(filename); }
@@ -1014,7 +1015,7 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
     if (groundSpeed == 0)
         groundSpeed = 150;
 
-    if (groundSpeed != m_stepCache.groundSpeed || m_speed != m_stepCache.speed) {
+    if (std::cmp_not_equal(groundSpeed, m_stepCache.groundSpeed) || m_speed != m_stepCache.speed) {
         m_stepCache.speed = m_speed;
         m_stepCache.groundSpeed = groundSpeed;
 

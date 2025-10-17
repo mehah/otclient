@@ -35,26 +35,26 @@ public:
     void init() { m_timer.restart(); }
     bool update();
 
-    uint16_t getFps() const { return m_fps; }
-    uint16_t getMaxFps() const { return m_maxFps; }
-    uint16_t getTargetFps() const { return m_targetFps; }
+    [[nodiscard]] uint16_t getFps() const { return m_fps; }
+    [[nodiscard]] uint16_t getMaxFps() const { return m_maxFps; }
+    [[nodiscard]] uint16_t getTargetFps() const { return m_targetFps; }
 
     void setMaxFps(const uint16_t max) { m_maxFps = max; }
     void setTargetFps(const uint16_t target) { if (m_targetFps != target) m_targetFps = target; }
 
     void resetTargetFps() { m_targetFps = 0; }
 
-    float getPercent() const {
+    [[nodiscard]] float getPercent() const {
         const float maxFps = std::clamp<uint16_t>(m_targetFps, 1, std::max<uint16_t>(m_maxFps, m_targetFps));
         return ((maxFps - m_fps) / maxFps) * 100.f;
     }
 
-    float getFpsPercent(const float percent) const {
+    [[nodiscard]] float getFpsPercent(const float percent) const {
         return getFps() * (percent / 100);
     }
 
 private:
-    uint32_t getMaxPeriod(const uint16_t fps) const { return 1000000u / fps; }
+    [[nodiscard]] uint32_t getMaxPeriod(const uint16_t fps) const { return 1000000u / fps; }
 
     uint16_t m_maxFps{};
     uint16_t m_targetFps{ 60u };
