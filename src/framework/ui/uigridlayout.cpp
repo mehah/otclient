@@ -25,8 +25,6 @@
 
 #include <framework/core/eventdispatcher.h>
 
-
-
 UIGridLayout::UIGridLayout(UIWidgetPtr parentWidget) : UILayout(std::move(parentWidget)) {}
 
 void UIGridLayout::applyStyle(const OTMLNodePtr& styleNode)

@@ -482,7 +482,6 @@ int push_luavalue(const SubOffer& subOffer) {
         g_lua.setField("basePrice");
     }
     if (g_game.getClientVersion() < 1310) {
-
         g_lua.pushString(subOffer.name);
         g_lua.setField("name");
         g_lua.pushString(subOffer.description);
@@ -532,7 +531,7 @@ int push_luavalue(const StoreOffer& offer) {
             g_lua.pushString(offer.reasonIdDisable);
             g_lua.setField("reasonIdDisable");
         }
-    } else{
+    } else {
         g_lua.pushBoolean(offer.configurable);
         g_lua.setField("configurable");
     }
@@ -833,11 +832,11 @@ int push_luavalue(const CharmData& charm) {
     g_lua.pushInteger(charm.removeRuneCost);
     g_lua.setField("removeRuneCost");
     //if (g_game.getClientVersion() >= 1410) {
-        g_lua.pushInteger(charm.availableCharmSlots);
-        g_lua.setField("availableCharmSlots");
-        g_lua.pushInteger(charm.tier);
-        g_lua.setField("tier");
-   // }
+    g_lua.pushInteger(charm.availableCharmSlots);
+    g_lua.setField("availableCharmSlots");
+    g_lua.pushInteger(charm.tier);
+    g_lua.setField("tier");
+    // }
 
     return 1;
 }

@@ -402,8 +402,7 @@ HtmlNodePtr parseHtml(const std::string& html) {
     while (st.size() > 1) st.pop();
 
     if (!hoistedRaw.empty()) {
-        for (auto& it : std::ranges::reverse_view(hoistedRaw))
-        {
+        for (auto& it : std::ranges::reverse_view(hoistedRaw)) {
             attach_front(root, it);
         }
     }

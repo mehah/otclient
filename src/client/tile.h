@@ -24,8 +24,6 @@
 
 #include <framework/luaengine/luaobject.h>
 
-
-
 #include "attachableobject.h"
 #include "declarations.h"
 #include "item.h"

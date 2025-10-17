@@ -37,7 +37,6 @@
 #include <framework/ui/uiwidget.h>
 #include <queue>
 
-
 #ifdef FRAMEWORK_EDITOR
 #include "houses.h"
 #include "towns.h"
@@ -1322,7 +1321,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
     std::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
-    Node* initNode = new Node{.cost = 1, .totalCost = 0, .pos = start, .prev = nullptr, .distance = 0, .unseen = 0 };
+    Node* initNode = new Node{ .cost = 1, .totalCost = 0, .pos = start, .prev = nullptr, .distance = 0, .unseen = 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 
@@ -1388,7 +1387,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
                                                                        node->pos.toString());
                         }
                     } else {
-                        it = nodes.emplace(neighbor, new Node{.cost = (float)speed, .totalCost = 10000000.0f,
+                        it = nodes.emplace(neighbor, new Node{ .cost = (float)speed, .totalCost = 10000000.0f,
                                                .pos = neighbor, .prev = node, .distance = node->distance + 1,
                                                .unseen = wasSeen ? 0 : 1 }).first;
                     }

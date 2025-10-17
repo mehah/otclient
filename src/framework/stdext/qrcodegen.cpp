@@ -31,7 +31,6 @@
 #include <cstring>
 #include <sstream>
 
-
 using std::int8_t;
 using std::uint8_t;
 using std::size_t;

@@ -23,8 +23,6 @@
 #ifdef FRAMEWORK_EDITOR
 #include "towns.h"
 
-
-
 TownManager g_towns;
 
 Town::Town(uint32_t tid, std::string name, const Position& pos) : m_id(tid), m_name(std::move(name))

@@ -111,7 +111,7 @@ private:
 
         auto insertRegion = [&](int x, int y, int w, int h) {
             if (w > 0 && h > 0) {
-                FreeRegion r = {.x = x, .y = y, .width = w, .height = h, .layer = region.layer };
+                FreeRegion r = { .x = x, .y = y, .width = w, .height = h, .layer = region.layer };
                 m_filterGroups[smooth].freeRegions.insert(r);
                 m_filterGroups[smooth].freeRegionsBySize[w * h].insert(r);
             }

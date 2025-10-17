@@ -94,8 +94,7 @@ struct Selector
     static std::vector<std::string> tokenize(const std::string& s) {
         std::vector<std::string> tokens; std::string cur; int paren = 0, bracket = 0;
         auto flush = [&] { if (!cur.empty()) { tokens.push_back(cur); cur.clear(); } };
-        for (char ch : s)
-        {
+        for (char ch : s) {
             if (ch == '(') ++paren; else if (ch == ')') --paren;
             else if (ch == '[') ++bracket; else if (ch == ']') --bracket;
             if (paren == 0 && bracket == 0 && (ch == '>' || ch == '+' || ch == '~')) { flush(); tokens.emplace_back(1, ch); } else if (paren == 0 && bracket == 0 && isSpace((unsigned char)ch)) { flush(); } else cur.push_back(ch);
@@ -135,7 +134,7 @@ struct Selector
                     }
                 }
                 while (i < tok.size() && tok[i] != ']') ++i; if (i < tok.size()) ++i;
-                s.attrs.push_back({.key = key, .val = val, .op = op });
+                s.attrs.push_back({ .key = key, .val = val, .op = op });
             } else if (c == ':') {
                 ++i; size_t ps = i; while (i < tok.size() && tok[i] != ':') ++i; s.pseudos.push_back(tok.substr(ps, i - ps));
             } else ++i;

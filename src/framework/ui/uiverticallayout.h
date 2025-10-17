@@ -22,8 +22,6 @@
 
 #pragma once
 
-
-
 #include "uiboxlayout.h"
 
  // @bindclass

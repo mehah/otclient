@@ -26,8 +26,6 @@
 #include <framework/core/clock.h>
 #include <framework/core/filestream.h>
 
-
-
 void Animator::unserializeAppearance(const appearances::SpriteAnimation& animation)
 {
     m_animationPhases = animation.sprite_phase_size();

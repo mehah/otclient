@@ -27,10 +27,10 @@
 #include <framework/global.h>
 #include <framework/graphics/declarations.h>
 
-// Forward declaration
+ // Forward declaration
 class Color;
 
- //@bindsingleton g_window
+//@bindsingleton g_window
 class PlatformWindow
 {
     enum
@@ -92,7 +92,7 @@ public:
     void setTitleBarColor(int r, int g, int b);
     void setTitleBarColor(float r, float g, float b);
     void setTitleBarColorRGB(uint8_t r, uint8_t g, uint8_t b);
-    
+
     virtual Size getDisplaySize() = 0;
     virtual std::string getClipboardText() = 0;
     virtual std::string getPlatformType() = 0;

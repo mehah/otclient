@@ -22,11 +22,12 @@
 
 #include "position.h"
 
-
 #include "gameconfig.h"
 
-bool Position::isMapPosition() const { return ((x >= 0) && (y >= 0) && (std::cmp_less(x, UINT16_MAX)) && (
-    std::cmp_less(y, UINT16_MAX)) && (z <= g_gameConfig.getMapMaxZ())); }
+bool Position::isMapPosition() const {
+    return ((x >= 0) && (y >= 0) && (std::cmp_less(x, UINT16_MAX)) && (
+        std::cmp_less(y, UINT16_MAX)) && (z <= g_gameConfig.getMapMaxZ()));
+}
 
 bool Position::up(const int8_t n)
 {

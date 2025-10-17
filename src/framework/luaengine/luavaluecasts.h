@@ -97,7 +97,7 @@ inline bool luavalue_cast(const int index, int64_t& v)
     const bool r = luavalue_cast(index, d); v = d; return r;
 }
 
-using lua_u64 = std::conditional_t<sizeof(unsigned long)==8, unsigned long, std::uint64_t>;
+using lua_u64 = std::conditional_t<sizeof(unsigned long) == 8, unsigned long, std::uint64_t>;
 using lua_unsigned_long = lua_u64;
 
 static_assert(sizeof(lua_u64) == 8, "lua_u64 must be 64-bit");

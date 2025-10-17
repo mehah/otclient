@@ -26,8 +26,6 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
-
-
 AnimatedTexture::AnimatedTexture(const Size& size, const std::vector<ImagePtr>& frames, std::vector<uint16_t> framesDelay, const uint16_t numPlays, bool buildMipmaps, bool compress)
 {
     if (!setupSize(size))

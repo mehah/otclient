@@ -37,8 +37,6 @@
 #include <framework/graphics/texture.h>
 #include <framework/otml/otml.h>
 
-
-
 const static TexturePtr m_textureNull;
 
 void ThingType::unserializeAppearance(const uint16_t clientId, const ThingCategory category, const appearances::Appearance& appearance)

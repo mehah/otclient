@@ -80,7 +80,7 @@ public:
     {
         assert(m_callback != nullptr);
         assert(m_result != nullptr);
-        
+
         // Configure SSL context properly
         m_context.set_default_verify_paths();
         m_context.set_verify_mode(asio::ssl::verify_none);

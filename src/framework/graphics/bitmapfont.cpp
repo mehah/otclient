@@ -28,7 +28,6 @@
 
 #include <framework/otml/otml.h>
 
-
 #include "drawpoolmanager.h"
 
 static thread_local std::vector<Point> s_glyphsPositions(1);

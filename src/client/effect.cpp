@@ -28,8 +28,6 @@
 #include <framework/core/graphicalapplication.h>
 #include <framework/graphics/shadermanager.h>
 
-
-
 void Effect::draw(const Point& dest, const bool drawThings, const LightViewPtr& lightView)
 {
     if (!canDraw() || isHided())

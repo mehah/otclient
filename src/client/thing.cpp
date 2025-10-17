@@ -26,8 +26,6 @@
 
 #include <framework/graphics/shadermanager.h>
 
-
-
 void Thing::setPosition(const Position& position, uint8_t /*stackPos*/)
 {
     if (m_position == position)

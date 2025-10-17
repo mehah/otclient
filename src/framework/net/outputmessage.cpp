@@ -23,8 +23,6 @@
 #include <framework/net/outputmessage.h>
 #include <framework/util/crypt.h>
 
-
-
 #include "client/game.h"
 
 OutputMessage::OutputMessage() {

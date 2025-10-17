@@ -37,8 +37,6 @@
 #include <framework/graphics/texturemanager.h>
 #include <framework/ui/uiwidget.h>
 
-
-
 #include "statictext.h"
 
 double Creature::speedA = 0;
@@ -918,7 +916,7 @@ void Creature::setIconsTexture(const std::string& filename, const Rect& clip, co
         m_icons->numberText.setAlign(Fw::AlignCenter);
     }
 
-    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{.texture = g_textures.getTexture(filename),
+    m_icons->atlasGroups.emplace_back(IconRenderData::AtlasIconGroup{ .texture = g_textures.getTexture(filename),
         .clip = clip, .count = count });
 }
 void Creature::setSkullTexture(const std::string& filename) { m_skullTexture = g_textures.getTexture(filename); }

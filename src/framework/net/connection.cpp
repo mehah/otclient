@@ -29,7 +29,6 @@
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
 
-
 #include <asio/io_service.hpp>
 
 asio::io_service g_ioService;

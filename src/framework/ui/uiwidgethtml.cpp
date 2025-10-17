@@ -803,7 +803,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
     applyDimension(isWidth, unit, num);
     if (m_htmlNode)
-        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = {.value = valueStr , .inheritedFromId = "" };
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { .value = valueStr , .inheritedFromId = "" };
 }
 
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
@@ -1055,8 +1055,7 @@ void UIWidget::updateTableLayout()
     std::vector<int> columnWidths(columnCount, 0);
     std::vector<bool> columnFixed(columnCount, false);
 
-    for (auto& rowIndex : rowCellInfo)
-    {
+    for (auto& rowIndex : rowCellInfo) {
         for (const auto& info : rowIndex) {
             const std::size_t span = std::min<std::size_t>(info.columnSpan, columnCount - info.column);
             if (span == 0)

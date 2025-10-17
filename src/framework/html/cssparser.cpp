@@ -142,11 +142,11 @@ namespace css {
                                 for (const auto& part : parts) collect_pseudos(part, outPseudos, negated);
                             } else {
                                 if (kEventPseudos.count(name))
-                                    outPseudos.push_back({.name = name, .negated = negated });
+                                    outPseudos.push_back({ .name = name, .negated = negated });
                             }
                         } else {
                             if (kEventPseudos.count(name))
-                                outPseudos.push_back({.name = name, .negated = negated });
+                                outPseudos.push_back({ .name = name, .negated = negated });
                         }
                     }
                     continue;
@@ -199,8 +199,7 @@ namespace css {
             auto parts = split_selector_list(inside);
             std::string out;
             bool any = false;
-            for (const auto& part : parts)
-            {
+            for (const auto& part : parts) {
                 std::string p = strip_pseudos_for_filter(part);
                 detail::trim_inplace(p);
                 if (p == "*") p.clear();
@@ -374,7 +373,7 @@ namespace css {
                         else if (c == '}') { if (--depth == 0) { ++i; break; } }
                     }
                     std::string inner = s.substr(blockStart, (i - blockStart - 1));
-                    items.push_back({.selectors = "", .block = inner, .is_at_media = true, .at_prelude = prelude });
+                    items.push_back({ .selectors = "", .block = inner, .is_at_media = true, .at_prelude = prelude });
                     continue;
                 }
                 size_t selStart = i;
@@ -392,7 +391,7 @@ namespace css {
                     else if (c == '}') { if (--depth == 0) { ++i; break; } }
                 }
                 std::string block = s.substr(blockStart, (i - blockStart - 1));
-                items.push_back({.selectors = selectors, .block = block, .is_at_media = false, .at_prelude = {} });
+                items.push_back({ .selectors = selectors, .block = block, .is_at_media = false, .at_prelude = {} });
             }
             return items;
         }
@@ -444,7 +443,7 @@ namespace css {
                     if (prop.starts_with("--"))
                         prop.erase(0, 2);
 
-                    out.push_back({.property = prop, .value = val, .important = important });
+                    out.push_back({ .property = prop, .value = val, .important = important });
                 }
                 if (i < N && s[i] == ';') ++i;
             }
