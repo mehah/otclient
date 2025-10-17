@@ -49,7 +49,7 @@ struct HttpResult
     std::string response;
     std::string error;
     std::weak_ptr<HttpSession> session;
-} ;
+};
 
 using HttpResult_ptr = std::shared_ptr<HttpResult>;
 using HttpResult_cb = std::function<void(HttpResult_ptr)>;

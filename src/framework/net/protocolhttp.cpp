@@ -68,7 +68,7 @@ int Http::get(const std::string& url, int timeout)
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      false, true, result, [this, operationId](const HttpResult_ptr&
-                                                     result) {
+                                                            result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {
@@ -106,7 +106,7 @@ int Http::post(const std::string& url, const std::string& data, int timeout, boo
         m_operations[operationId] = result;
         const auto& session = std::make_shared<HttpSession>(m_ios, url, m_userAgent, m_enable_time_out_on_read_write, m_custom_header, timeout,
                                                      isJson, checkContentLength, result, [this, operationId](
-                                                     const HttpResult_ptr& result) {
+                                                            const HttpResult_ptr& result) {
             bool finished = result->finished;
             g_dispatcher.addEvent([result, finished] {
                 if (!finished) {

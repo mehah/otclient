@@ -50,7 +50,7 @@ Texture::Texture(const Size& size) : m_uniqueId(UID.fetch_add(1))
 }
 
 Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(UID.fetch_add(1)),
-    m_image(image)
+m_image(image)
 {
     generateHash();
 

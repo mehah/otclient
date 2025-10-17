@@ -50,7 +50,6 @@ UITextEdit::UITextEdit() : m_placeholder(""), m_placeholderColor(Color::gray), m
 
     m_textAlign = Fw::AlignTopLeft;
 
-
     m_placeholderFont = g_fonts.getDefaultFont();
 
     blinkCursor();

@@ -298,4 +298,4 @@ struct fmt::formatter<Position> : fmt::formatter<std::string>
     }
 }
 
- ;
+;

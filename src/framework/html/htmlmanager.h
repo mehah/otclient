@@ -33,7 +33,7 @@ struct DataRoot
     std::string moduleName;
     std::vector<css::StyleSheet> sheets;
     std::unordered_map<std::string, UIWidgetPtr> groups;
-} ;
+};
 
 class HtmlManager
 {

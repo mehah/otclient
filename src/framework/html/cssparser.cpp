@@ -347,7 +347,7 @@ namespace css {
         }
 
         struct RawBlock { std::string selectors; std::string block; bool is_at_media{ false }; std::string at_prelude; }
-            ;
+        ;
 
         static std::vector<RawBlock> extract_blocks(const std::string& css) {
             std::vector<RawBlock> items;

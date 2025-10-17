@@ -30,7 +30,6 @@ UIMap::UIMap() : m_keepAspectRatio(true), m_limitVisibleRange(false), m_maxZoomI
 {
     setProp(PropDraggable, true, false);
 
-
     m_mapView = std::make_shared<MapView>();
     m_zoom = m_mapView->getVisibleDimension().height();
     m_aspectRatio = m_mapView->getVisibleDimension().ratio();

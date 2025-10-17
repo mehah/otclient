@@ -59,7 +59,6 @@ WIN32Window::WIN32Window() : m_window(nullptr), m_instance(nullptr), m_deviceCon
     m_minimumSize = Size(600, 480);
     m_size = Size(600, 480);
 
-
 #ifdef OPENGL_ES
     m_eglConfig = 0;
     m_eglContext = 0;

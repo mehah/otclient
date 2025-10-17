@@ -247,7 +247,7 @@ protected:
         Timer timer;
         uint16_t speed{ 0 };
         uint16_t value{ 100 };
-    } 
+    }
     m_scale;
 
     Position m_position;

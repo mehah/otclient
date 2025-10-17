@@ -113,7 +113,7 @@ void Proxy::connect()
     m_resolver = asio::ip::tcp::resolver(m_io);
     auto self(shared_from_this());
     m_resolver.async_resolve(m_host, "http", [self](const std::error_code& ec,
-                                                    const asio::ip::tcp::resolver::results_type& results) {
+                             const asio::ip::tcp::resolver::results_type& results) {
         auto endpoint = asio::ip::tcp::endpoint();
         if (ec || results.empty()) {
 #ifdef PROXY_DEBUG

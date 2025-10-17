@@ -76,7 +76,7 @@ protected:
         std::vector<AttachedEffectPtr> attachedEffects;
         std::vector<ParticleEffectPtr> attachedParticles;
         std::vector<UIWidgetPtr> attachedWidgets;
-    } ;
+    };
 
     void drawAttachedEffect(const Point& dest, const LightViewPtr& lightView, bool isOnTop);
     void drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView);
