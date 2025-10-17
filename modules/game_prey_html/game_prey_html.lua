@@ -683,7 +683,7 @@ function getTooltipBonusDescription(bonusType, bonusValue)
     end
 end
 
-PreyController.description = "-"
+PreyController.description = ""
 
 function getBigIconPath(bonusType, locked)
     local path = '/images/game/prey/'
@@ -959,4 +959,31 @@ function PreyController:autoOptions(slotId, option)
     end, restorePreyWindow, function()
         self.preyData[slotId + 1][field] = self.preyData[slotId + 1][field]
     end)
+end
+
+function PreyController:getColor(slot, currentType)
+    if currentType == "gold" then
+        if slot.isFreeReroll then
+            return "#707070"
+        end
+
+        if slot.disableFreeReroll then
+            return "#d33c3c"
+        end
+        return "#c0c0c0"
+    end
+
+    if currentType == "pickSpecificPrice" then
+        if self.pickSpecificPrice > self.wildcards then
+            return "#d33c3c"
+        end
+    end
+
+    if currentType == "rerollBonusPrice" then
+        if self.rerollBonusPrice > self.wildcards then
+            return "#d33c3c"
+        end
+    end
+
+    return "#c0c0c0"
 end

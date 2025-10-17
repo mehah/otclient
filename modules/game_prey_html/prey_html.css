@@ -4,6 +4,10 @@
   height: 500px;
 }
 
+.content p {
+  font: "verdana-11px-rounded";
+}
+
 .tab-container {
   display: flex;
   width: 664px;
@@ -203,14 +207,6 @@
 
 .base-button-cost img {
   margin-left: 6px;
-}
-
-.base-button-cost-label {
-  font: "verdana-11px-rounded";
-}
-.base-button-cost-label:disabled {
-  font: "Verdana-Strikethrough-11px";
-  color: #707070 !important;
 }
 
 .prey-pick-cost {
