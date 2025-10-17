@@ -164,7 +164,7 @@ function PreyController:onInit()
     PreyController:handleResources()
     check()
 
-    connect(g_game, {
+    self:registerEvents(g_game, {
         onPreyActive = onPreyActive,
         onPreyRerollPrice = onPreyRerollPrice,
         onPreyListSelection = onPreyListSelection,
@@ -359,15 +359,6 @@ end
 
 -- clear timers on terminate to prevent leaks
 function PreyController:onTerminate()
-    disconnect(g_game, {
-        onPreyActive = onPreyActive,
-        onPreyRerollPrice = onPreyRerollPrice,
-        onPreyListSelection = onPreyListSelection,
-        onPreySelection = onPreySelection,
-        onPreyInactive = onPreyInactive,
-        onPreySelectionChangeMonster = onPreySelectionChangeMonster,
-    })
-
     if self._debounceTimers then
         for _, ev in pairs(self._debounceTimers) do
             if ev then removeEvent(ev) end
