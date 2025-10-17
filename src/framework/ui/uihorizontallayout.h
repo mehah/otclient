@@ -31,7 +31,11 @@ public:
 
     void applyStyle(const OTMLNodePtr& styleNode) override;
 
-    void setAlignRight(const bool aliginRight) { m_alignRight = aliginRight; update(); }
+    void setAlignRight(const bool aliginRight)
+    {
+        m_alignRight = aliginRight;
+        update();
+    }
 
     bool isUIHorizontalLayout() override { return true; }
 

@@ -32,8 +32,8 @@
 
 #include "lzma.h"
 
- // warnings related to protobuf
- // https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
+// warnings related to protobuf
+// https://android.googlesource.com/platform/external/protobuf/+/brillo-m9-dev/vsprojects/readme.txt
 
 using json = nlohmann::json;
 
@@ -105,8 +105,8 @@ bool SpriteAppearances::loadSpriteSheet(const SpriteSheetPtr& sheet) const
         lzma_stream stream = LZMA_STREAM_INIT;
 
         const lzma_filter filters[2] = {
-            lzma_filter{LZMA_FILTER_LZMA1, &options},
-            lzma_filter{LZMA_VLI_UNKNOWN, nullptr}
+            lzma_filter{ LZMA_FILTER_LZMA1, &options },
+            lzma_filter{ LZMA_VLI_UNKNOWN, nullptr }
         };
 
         lzma_ret ret = lzma_raw_decoder(&stream, filters);

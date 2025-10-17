@@ -22,7 +22,7 @@
 
 #pragma once
 
- // this file is and must be included only from luainterface.h
+// this file is and must be included only from luainterface.h
 
 #include "declarations.h"
 #include <framework/otml/declarations.h>
@@ -44,54 +44,96 @@ int push_luavalue(double d);
 bool luavalue_cast(int index, double& d);
 
 // float
-inline int push_luavalue(const float f) { push_luavalue(static_cast<double>(f)); return 1; }
+inline int push_luavalue(const float f)
+{
+    push_luavalue(static_cast<double>(f));
+    return 1;
+}
 inline bool luavalue_cast(const int index, float& f)
 {
     double d = NAN;
-    const bool r = luavalue_cast(index, d); f = d; return r;
+    const bool r = luavalue_cast(index, d);
+    f = d;
+    return r;
 }
 
 // int8
-inline int push_luavalue(const int8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline int push_luavalue(const int8_t v)
+{
+    push_luavalue(static_cast<int>(v));
+    return 1;
+}
 inline bool luavalue_cast(const int index, int8_t& v)
 {
     int i = 0;
-    const bool r = luavalue_cast(index, i); v = i; return r;
+    const bool r = luavalue_cast(index, i);
+    v = i;
+    return r;
 }
 // uint8_t
-inline int push_luavalue(const uint8_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline int push_luavalue(const uint8_t v)
+{
+    push_luavalue(static_cast<int>(v));
+    return 1;
+}
 inline bool luavalue_cast(const int index, uint8_t& v)
 {
     int i = 0;
-    const bool r = luavalue_cast(index, i); v = i; return r;
+    const bool r = luavalue_cast(index, i);
+    v = i;
+    return r;
 }
 // int16
-inline int push_luavalue(const int16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline int push_luavalue(const int16_t v)
+{
+    push_luavalue(static_cast<int>(v));
+    return 1;
+}
 inline bool luavalue_cast(const int index, int16_t& v)
 {
     int i = 0;
-    const bool r = luavalue_cast(index, i); v = i; return r;
+    const bool r = luavalue_cast(index, i);
+    v = i;
+    return r;
 }
 // uint16
-inline int push_luavalue(const uint16_t v) { push_luavalue(static_cast<int>(v)); return 1; }
+inline int push_luavalue(const uint16_t v)
+{
+    push_luavalue(static_cast<int>(v));
+    return 1;
+}
 inline bool luavalue_cast(const int index, uint16_t& v)
 {
     int i = 0;
-    const bool r = luavalue_cast(index, i); v = i; return r;
+    const bool r = luavalue_cast(index, i);
+    v = i;
+    return r;
 }
 // uint32
-inline int push_luavalue(const uint32_t v) { push_luavalue(static_cast<double>(v)); return 1; }
+inline int push_luavalue(const uint32_t v)
+{
+    push_luavalue(static_cast<double>(v));
+    return 1;
+}
 inline bool luavalue_cast(const int index, uint32_t& v)
 {
     double d = NAN;
-    const bool r = luavalue_cast(index, d); v = d; return r;
+    const bool r = luavalue_cast(index, d);
+    v = d;
+    return r;
 }
 // int64
-inline int push_luavalue(const int64_t v) { push_luavalue(static_cast<double>(v)); return 1; }
+inline int push_luavalue(const int64_t v)
+{
+    push_luavalue(static_cast<double>(v));
+    return 1;
+}
 inline bool luavalue_cast(const int index, int64_t& v)
 {
     double d = NAN;
-    const bool r = luavalue_cast(index, d); v = d; return r;
+    const bool r = luavalue_cast(index, d);
+    v = d;
+    return r;
 }
 
 using lua_u64 = std::conditional_t<sizeof(unsigned long) == 8, unsigned long, std::uint64_t>;
@@ -645,7 +687,7 @@ struct push_tuple_luavalue
     template<typename Tuple>
     static void call(const Tuple& tuple)
     {
-        push_internal_luavalue(std::get<std::tuple_size_v<Tuple> -N>(tuple));
+        push_internal_luavalue(std::get<std::tuple_size_v<Tuple> - N>(tuple));
         push_tuple_luavalue<N - 1>::call(tuple);
     }
 };

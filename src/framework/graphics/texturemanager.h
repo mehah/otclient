@@ -54,8 +54,7 @@ private:
     {
         std::unordered_map<uint64_t, uint16_t> indexMap;
         std::vector<std::unique_ptr<Matrix3>> objects;
-    }
-    m_matrixCache;
+    } m_matrixCache;
 
     friend class GarbageCollection;
 };

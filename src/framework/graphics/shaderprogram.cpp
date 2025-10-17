@@ -31,7 +31,7 @@
 
 uint32_t ShaderProgram::m_currentProgram = 0;
 
-ShaderProgram::ShaderProgram() :m_programId(glCreateProgram())
+ShaderProgram::ShaderProgram() : m_programId(glCreateProgram())
 {
     m_uniformLocations.fill(-1);
     if (!m_programId)
@@ -151,7 +151,8 @@ std::string ShaderProgram::log() const
 
 int ShaderProgram::getAttributeLocation(const char* name) const { return glGetAttribLocation(m_programId, name); }
 
-void ShaderProgram::bindAttributeLocation(const int location, const char* name) const {
+void ShaderProgram::bindAttributeLocation(const int location, const char* name) const
+{
     glBindAttribLocation(m_programId, location, name);
 }
 

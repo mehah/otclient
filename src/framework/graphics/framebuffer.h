@@ -35,10 +35,18 @@ public:
     void release() const;
     void bind();
     void draw();
-    void draw(const Rect& dest) { prepare(dest, Rect(0, 0, getSize())); draw(); }
+    void draw(const Rect& dest)
+    {
+        prepare(dest, Rect(0, 0, getSize()));
+        draw();
+    }
 
     void reset() { m_texture = nullptr; }
-    void setSmooth(const bool enabled) { m_smooth = enabled; m_texture = nullptr; }
+    void setSmooth(const bool enabled)
+    {
+        m_smooth = enabled;
+        m_texture = nullptr;
+    }
 
     bool resize(const Size& size);
     [[nodiscard]] bool isValid() const { return m_texture != nullptr; }

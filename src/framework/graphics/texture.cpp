@@ -32,7 +32,7 @@
 #include <framework/core/graphicalapplication.h>
 #include "drawpoolmanager.h"
 
- // UINT16_MAX = just to avoid conflicts with GL generated ID.
+// UINT16_MAX = just to avoid conflicts with GL generated ID.
 static std::atomic_uint32_t UID(UINT16_MAX);
 
 Texture::Texture() : m_uniqueId(UID.fetch_add(1)) { generateHash(); }
@@ -50,7 +50,7 @@ Texture::Texture(const Size& size) : m_uniqueId(UID.fetch_add(1))
 }
 
 Texture::Texture(const ImagePtr& image, const bool buildMipmaps, const bool compress) : m_uniqueId(UID.fetch_add(1)),
-m_image(image)
+    m_image(image)
 {
     generateHash();
 
@@ -82,9 +82,14 @@ void Texture::create()
     }
 }
 
-void Texture::updateImage(const ImagePtr& image) { m_image = image; setupSize(image->getSize()); }
+void Texture::updateImage(const ImagePtr& image)
+{
+    m_image = image;
+    setupSize(image->getSize());
+}
 
-void Texture::updatePixels(uint8_t* pixels, const int level, const int channels, const bool compress) {
+void Texture::updatePixels(uint8_t* pixels, const int level, const int channels, const bool compress)
+{
     bind();
     setupPixels(level, m_size, pixels, channels, compress);
 }
@@ -140,7 +145,8 @@ void Texture::setSmooth(const bool smooth)
         g_drawPool.removeTextureFromAtlas(m_id, !smooth);
 }
 
-void Texture::allowAtlasCache() {
+void Texture::allowAtlasCache()
+{
     bool smooth = isSmooth();
     if (smooth) setSmooth(false);
     setProp(Prop::_allowAtlasCache, true);
@@ -232,7 +238,8 @@ void Texture::setupTranformMatrix()
     m_transformMatrixId = g_textures.getMatrixId(m_size, getProp(upsideDown));
 }
 
-const AtlasRegion* Texture::getAtlasRegion() const {
+const AtlasRegion* Texture::getAtlasRegion() const
+{
     if (g_drawPool.isValid() && g_drawPool.getAtlas()) {
         if (const auto region = m_atlas[g_drawPool.getAtlas()->getType()]) {
             return region->isEnabled() ? region : nullptr;

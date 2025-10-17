@@ -15,37 +15,40 @@ public:
     Texture* atlas;
     std::atomic_bool enabled;
 
-    bool isEnabled() const {
+    bool isEnabled() const
+    {
         return enabled.load(std::memory_order_acquire);
     }
 
     AtlasRegion(uint32_t tid, int16_t x, int16_t y, int8_t layer,
                 int16_t width, int16_t height, uint16_t transformId, Texture* atlas)
         : textureID(tid), x(x), y(y), layer(layer),
-        width(width), height(height), transformMatrixId(transformId), atlas(atlas) {
-    }
+        width(width), height(height), transformMatrixId(transformId), atlas(atlas) {}
 };
 
 struct FreeRegion
 {
     int x, y, width, height, layer;
 
-    bool operator<(const FreeRegion& other) const {
+    bool operator<(const FreeRegion& other) const
+    {
         if (layer != other.layer) return layer < other.layer;
         if (width * height != other.width * other.height)
             return (width * height) < (other.width * other.height);
         return (y != other.y) ? (y < other.y) : (x < other.x);
     }
 
-    [[nodiscard]] bool canFit(int texWidth, int texHeight) const {
+    [[nodiscard]] bool canFit(int texWidth, int texHeight) const
+    {
         return width >= texWidth && height >= texHeight;
     }
 };
 
 struct PairHash
 {
-    template <typename T1, typename T2>
-    std::size_t operator()(const std::pair<T1, T2>& pair) const {
+    template<typename T1, typename T2>
+    std::size_t operator()(const std::pair<T1, T2>& pair) const
+    {
         auto hash = stdext::hash_int(pair.first);
         stdext::hash_combine(hash, stdext::hash_int(pair.second));
         return hash;
@@ -81,7 +84,8 @@ private:
     };
     void createNewLayer(bool smooth);
 
-    std::optional<FreeRegion> findBestRegion(int width, int height, bool smooth) {
+    std::optional<FreeRegion> findBestRegion(int width, int height, bool smooth)
+    {
         auto sizeIt = m_filterGroups[smooth].freeRegionsBySize.lower_bound(width * height);
         while (sizeIt != m_filterGroups[smooth].freeRegionsBySize.end()) {
             for (const auto& region : sizeIt->second) {
@@ -94,7 +98,8 @@ private:
         return std::nullopt;
     }
 
-    void splitRegion(const FreeRegion& region, int width, int height, bool smooth) {
+    void splitRegion(const FreeRegion& region, int width, int height, bool smooth)
+    {
         m_filterGroups[smooth].freeRegions.erase(region);
         m_filterGroups[smooth].freeRegionsBySize[region.width * region.height].erase(region);
 

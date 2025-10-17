@@ -25,8 +25,7 @@
 
 #include "client/game.h"
 
-InputMessage::InputMessage() : m_maxHeaderSize(g_game.getClientVersion() >= 1405 ? 7 : 8), m_headerPos(m_maxHeaderSize), m_readPos(m_maxHeaderSize) {
-}
+InputMessage::InputMessage() : m_maxHeaderSize(g_game.getClientVersion() >= 1405 ? 7 : 8), m_headerPos(m_maxHeaderSize), m_readPos(m_maxHeaderSize) {}
 
 void InputMessage::reset()
 {

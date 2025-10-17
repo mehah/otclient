@@ -45,7 +45,8 @@ public:
     virtual void close();
     virtual void restart();
 
-    void setName(const std::string_view name) {
+    void setName(const std::string_view name)
+    {
         m_appName = name;
 #ifndef NDEBUG
         m_appName += " (DEBUG MODE)";

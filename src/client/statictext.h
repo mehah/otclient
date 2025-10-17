@@ -25,7 +25,7 @@
 #include "thing.h"
 #include <framework/graphics/cachedtext.h>
 
- // @bindclass
+// @bindclass
 class StaticText final : public LuaObject
 {
 public:

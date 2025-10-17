@@ -37,13 +37,19 @@ public:
     void preDraw(DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear = Color::alpha, bool alwaysDraw = false);
 
     void addTexturedPoint(const TexturePtr& texture, const Point& point, const Color& color = Color::white) const
-    { addTexturedRect(Rect(point, texture->getSize()), texture, color); }
+    {
+        addTexturedRect(Rect(point, texture->getSize()), texture, color);
+    }
 
     void addTexturedPos(const TexturePtr& texture, const int x, const int y, const Color& color = Color::white) const
-    { addTexturedRect(Rect(x, y, texture->getSize()), texture, color); }
+    {
+        addTexturedRect(Rect(x, y, texture->getSize()), texture, color);
+    }
 
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Color& color = Color::white) const
-    { addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color); }
+    {
+        addTexturedRect(dest, texture, Rect(Point(), texture->getSize()), color);
+    }
 
     void addTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color = Color::white) const;
     void addTexturedCoordsBuffer(const TexturePtr& texture, const CoordsBufferPtr& coords, const Color& color = Color::white) const;
@@ -61,7 +67,7 @@ public:
     void setClipRect(const Rect& clipRect, const bool onlyOnce = false) const { getCurrentPool()->setClipRect(clipRect, onlyOnce); }
     void setBlendEquation(const BlendEquation equation, const bool onlyOnce = false) const { getCurrentPool()->setBlendEquation(equation, onlyOnce); }
     void setCompositionMode(const CompositionMode mode, const bool onlyOnce = false) const { getCurrentPool()->setCompositionMode(mode, onlyOnce); }
-    void setDrawOrder(DrawOrder order)const { getCurrentPool()->setDrawOrder(order); }
+    void setDrawOrder(DrawOrder order) const { getCurrentPool()->setDrawOrder(order); }
 
     [[nodiscard]] bool shaderNeedFramebuffer() const { return getCurrentPool()->getCurrentState().shaderProgram && getCurrentPool()->getCurrentState().shaderProgram->useFramebuffer(); }
     void setShaderProgram(const PainterShaderProgramPtr& shaderProgram, const std::function<void()>& action) const { getCurrentPool()->setShaderProgram(shaderProgram, false, action); }
@@ -106,7 +112,8 @@ public:
 
     [[nodiscard]] DrawPoolType getCurrentType() const;
 
-    void repaint(const DrawPoolType drawPool) const {
+    void repaint(const DrawPoolType drawPool) const
+    {
         get(drawPool)->repaint();
     }
 

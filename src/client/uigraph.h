@@ -58,7 +58,8 @@ public:
     size_t getGraphsCount() { return m_graphs.size(); }
     void addValue(size_t index, int value, bool ignoreSmallValues = false);
 
-    void setCapacity(const int capacity) {
+    void setCapacity(const int capacity)
+    {
         m_capacity = capacity;
         m_needsUpdate = true;
     }

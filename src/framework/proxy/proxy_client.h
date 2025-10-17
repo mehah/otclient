@@ -35,6 +35,7 @@ class Proxy : public std::enable_shared_from_this<Proxy>
         STATE_CONNECTING_WAIT_FOR_PING,
         STATE_CONNECTED
     };
+
 public:
     Proxy(asio::io_context& io, const std::string& host, const uint16_t port, const int priority)
         : m_io(io), m_timer(io), m_socket(io), m_resolver(io)
@@ -113,6 +114,7 @@ class Session : public std::enable_shared_from_this<Session>
     static constexpr int CHECK_INTERVAL = 500;
     static constexpr int BUFFER_SIZE = 65535;
     static constexpr int TIMEOUT = 30000;
+
 public:
     Session(asio::io_context& io, asio::ip::tcp::socket socket, const int port)
         : m_io(io), m_timer(io), m_socket(std::move(socket))

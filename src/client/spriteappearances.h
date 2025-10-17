@@ -49,8 +49,7 @@ public:
 
     SpriteSheet(const int firstId, const int lastId, const SpriteLayout spriteLayout, std::string file) : firstId(firstId), lastId(lastId), spriteLayout(spriteLayout), file(std::move(
         file))
-    {
-    }
+    {}
 
     Size getSpriteSize() const
     {
@@ -58,9 +57,12 @@ public:
 
         switch (spriteLayout) {
             case SpriteLayout::ONE_BY_ONE: break;
-            case SpriteLayout::ONE_BY_TWO: size.setHeight(64); break;
-            case SpriteLayout::TWO_BY_ONE: size.setWidth(64); break;
-            case SpriteLayout::TWO_BY_TWO: size.resize(64, 64); break;
+            case SpriteLayout::ONE_BY_TWO: size.setHeight(64);
+                break;
+            case SpriteLayout::TWO_BY_ONE: size.setWidth(64);
+                break;
+            case SpriteLayout::TWO_BY_TWO: size.resize(64, 64);
+                break;
             default: break;
         }
 
@@ -97,7 +99,8 @@ public:
     [[nodiscard]] bool loadSpriteSheet(const SpriteSheetPtr& sheet) const;
     void saveSheetToFileBySprite(int id, const std::string& file);
     void saveSheetToFile(const SpriteSheetPtr& sheet, const std::string& file);
-    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true) {
+    SpriteSheetPtr getSheetBySpriteId(int id, bool load = true)
+    {
         bool isLoading = false;
         return getSheetBySpriteId(id, isLoading, load);
     }
@@ -105,7 +108,8 @@ public:
 
     void addSpriteSheet(const SpriteSheetPtr& sheet) { m_sheets.emplace_back(sheet); }
 
-    ImagePtr getSpriteImage(int id) {
+    ImagePtr getSpriteImage(int id)
+    {
         bool isLoading = false;
         return getSpriteImage(id, isLoading);
     }

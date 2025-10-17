@@ -47,7 +47,6 @@ public:
     void setReverbReflectionsDelay(float reflectionsDelay) const;
 
 private:
-
     friend class SoundManager;
     friend class SoundSource;
 

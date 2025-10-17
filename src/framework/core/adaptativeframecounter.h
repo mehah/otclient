@@ -24,9 +24,9 @@
 
 #include <framework/global.h>
 
- /**
-  * Class that help counting and limiting frames per second in a application,
-  */
+/**
+ * Class that help counting and limiting frames per second in a application,
+ */
 class AdaptativeFrameCounter
 {
 public:
@@ -44,12 +44,14 @@ public:
 
     void resetTargetFps() { m_targetFps = 0; }
 
-    [[nodiscard]] float getPercent() const {
+    [[nodiscard]] float getPercent() const
+    {
         const float maxFps = std::clamp<uint16_t>(m_targetFps, 1, std::max<uint16_t>(m_maxFps, m_targetFps));
         return ((maxFps - m_fps) / maxFps) * 100.f;
     }
 
-    [[nodiscard]] float getFpsPercent(const float percent) const {
+    [[nodiscard]] float getFpsPercent(const float percent) const
+    {
         return getFps() * (percent / 100);
     }
 

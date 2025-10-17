@@ -43,7 +43,7 @@ void ParticleType::load(const OTMLNodePtr& node)
         else if (childNode->tag() == "max-position-angle")
             pMaxPositionAngle = childNode->value<float>() * DEG_TO_RAD;
 
-        // velocity
+            // velocity
         else if (childNode->tag() == "velocity") {
             pMinVelocity = childNode->value<float>();
             pMaxVelocity = childNode->value<float>();
@@ -76,7 +76,7 @@ void ParticleType::load(const OTMLNodePtr& node)
         else if (childNode->tag() == "max-acceleration-angle")
             pMaxAccelerationAngle = childNode->value<float>() * DEG_TO_RAD;
 
-        // duration
+            // duration
         else if (childNode->tag() == "duration") {
             pMinDuration = childNode->value<float>();
             pMaxDuration = childNode->value<float>();
@@ -87,7 +87,7 @@ void ParticleType::load(const OTMLNodePtr& node)
         else if (childNode->tag() == "ignore-physics-after")
             pIgnorePhysicsAfter = childNode->value<float>();
 
-        // visual
+            // visual
         else if (childNode->tag() == "size") {
             pStartSize = childNode->value<Size>();
             pFinalSize = childNode->value<Size>();
@@ -108,9 +108,7 @@ void ParticleType::load(const OTMLNodePtr& node)
 
             if (texture && texture->isAnimatedTexture())
                 pAnimatedTexture = std::static_pointer_cast<AnimatedTexture>(texture);
-        }
-
-        else if (childNode->tag() == "composition-mode") {
+        } else if (childNode->tag() == "composition-mode") {
             if (childNode->value() == "normal")
                 pCompositionMode = CompositionMode::NORMAL;
             else if (childNode->value() == "multiply")

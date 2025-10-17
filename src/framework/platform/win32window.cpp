@@ -34,7 +34,7 @@
 #include <timeapi.h>
 #endif
 
- // Include for DWM API
+// Include for DWM API
 #include <dwmapi.h>
 
 #pragma comment(lib, "dwmapi.lib")
@@ -369,21 +369,21 @@ void WIN32Window::internalCreateGLContext()
 
 #else
     static PIXELFORMATDESCRIPTOR pfd = { sizeof(PIXELFORMATDESCRIPTOR),
-                                         1,
-                                         PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-                                         PFD_TYPE_RGBA,
-                                         32,                         // Select Our Color Depth
-                                         8, 0, 8, 0, 8, 0,           // Color Bits Ignored
-                                         8,                          // Alpha Buffer Bits
-                                         0,                          // Shift Bit Ignored
-                                         0,                          // No Accumulation Buffer
-                                         0, 0, 0, 0,                 // Accumulation Bits Ignored
-                                         0,                          // Z-Buffer (Depth Buffer)
-                                         0,                          // No Stencil Buffer
-                                         0,                          // No Auxiliary Buffer
-                                         PFD_MAIN_PLANE,             // Main Drawing Layer
-                                         0,                          // Reserved
-                                         0, 0, 0
+        1,
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+        PFD_TYPE_RGBA,
+        32,                         // Select Our Color Depth
+        8, 0, 8, 0, 8, 0,           // Color Bits Ignored
+        8,                          // Alpha Buffer Bits
+        0,                          // Shift Bit Ignored
+        0,                          // No Accumulation Buffer
+        0, 0, 0, 0,                 // Accumulation Bits Ignored
+        0,                          // Z-Buffer (Depth Buffer)
+        0,                          // No Stencil Buffer
+        0,                          // No Auxiliary Buffer
+        PFD_MAIN_PLANE,             // Main Drawing Layer
+        0,                          // Reserved
+        0, 0, 0
     };                  // Layer Masks Ignored
 
     const uint32_t pixelFormat = ChoosePixelFormat(m_deviceContext, &pfd);
@@ -890,7 +890,7 @@ void WIN32Window::setMouseCursor(int cursorId)
 {
     g_mainDispatcher.addEvent([&, cursorId] {
         if (std::cmp_greater_equal(cursorId, m_cursors.size())
-        || cursorId < 0)
+            || cursorId < 0)
             return;
 
         m_cursor = m_cursors[cursorId];
@@ -986,7 +986,7 @@ void WIN32Window::setIcon(const std::string& file)
         }
 
         const int n = image->getWidth() * image->getHeight();
-        std::vector<uint32_t > iconData(n);
+        std::vector<uint32_t> iconData(n);
         for (int i = 0; i < n; ++i) {
             auto* const pixel = (uint8_t*)&iconData[i];
             pixel[2] = *(image->getPixelData() + (i * 4) + 0);
@@ -1067,9 +1067,9 @@ void WIN32Window::setTitleBarColor(const Color& color)
             g_logger.debug("Failed to set title bar color: HRESULT = 0x{:08X}", static_cast<uint32_t>(hr));
         } else {
             g_logger.debug("Successfully set title bar color to RGB({}, {}, {})",
-                static_cast<int>(color.r() * 255),
-                static_cast<int>(color.g() * 255),
-                static_cast<int>(color.b() * 255)
+                           static_cast<int>(color.r() * 255),
+                           static_cast<int>(color.g() * 255),
+                           static_cast<int>(color.b() * 255)
             );
         }
     });
@@ -1111,7 +1111,7 @@ std::string WIN32Window::getPlatformType()
 Rect WIN32Window::getClientRect() const
 {
     if (m_window) {
-        RECT clientRect = { 0,0,0,0 };
+        RECT clientRect = { 0, 0, 0, 0 };
         GetClientRect(m_window, &clientRect);
         return Rect(Point(clientRect.left, clientRect.top), Point(clientRect.right, clientRect.bottom));
     }
@@ -1121,7 +1121,7 @@ Rect WIN32Window::getClientRect() const
 Rect WIN32Window::getWindowRect()
 {
     if (m_window) {
-        RECT windowRect = { 0,0,0,0 };
+        RECT windowRect = { 0, 0, 0, 0 };
         GetWindowRect(m_window, &windowRect);
         return Rect(Point(windowRect.left, windowRect.top), Point(windowRect.right, windowRect.bottom));
     }

@@ -31,7 +31,7 @@
 #include "drawpoolmanager.h"
 
 static thread_local std::vector<Point> s_glyphsPositions(1);
-static thread_local std::vector<int>   s_lineWidths(1);
+static thread_local std::vector<int> s_lineWidths(1);
 
 void BitmapFont::load(const OTMLNodePtr& fontNode)
 {
@@ -308,7 +308,7 @@ void BitmapFont::calculateGlyphsPositions(std::string_view text,
     if (std::cmp_less(glyphsPositions.capacity(), textLength))
         glyphsPositions.reserve(std::max(1024, textLength));
 
-    const unsigned char* p = reinterpret_cast<const unsigned char*>(text.data());
+    auto p = reinterpret_cast<const unsigned char*>(text.data());
     const Size* __restrict widths = m_glyphsSize;
 
     const bool needLines =
@@ -513,7 +513,10 @@ std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth
 
             while (k < wordEnd) {
                 const unsigned char ch2 = static_cast<unsigned char>(text[k]);
-                if (ch2 < 32) { ++k; continue; }
+                if (ch2 < 32) {
+                    ++k;
+                    continue;
+                }
                 const int gw = m_glyphsSize[ch2].width();
                 const int next = segW + (segGlyphs > 0 ? spacing + gw : gw);
                 const bool needHyphen = (k + 1 < wordEnd);
@@ -563,6 +566,7 @@ void BitmapFont::updateColors(std::vector<std::pair<int, Color>>* colors, const 
     }
 }
 
-const AtlasRegion* BitmapFont::getAtlasRegion() const noexcept {
+const AtlasRegion* BitmapFont::getAtlasRegion() const noexcept
+{
     return m_texture ? m_texture->getAtlasRegion() : nullptr;
 }

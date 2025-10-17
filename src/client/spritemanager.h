@@ -31,7 +31,8 @@ class FileMetadata
 {
 public:
     FileMetadata() = default;
-    FileMetadata(const FileStreamPtr& file) : offset(file->getU32()), fileSize(file->getU32()), spriteId(std::stoi(fileName)) {
+    FileMetadata(const FileStreamPtr& file) : offset(file->getU32()), fileSize(file->getU32()), spriteId(std::stoi(fileName))
+    {
         fileName = file->getString();
     }
 
@@ -39,6 +40,7 @@ public:
     [[nodiscard]] const std::string& getFileName() const { return fileName; }
     [[nodiscard]] uint32_t getOffset() const { return offset; }
     [[nodiscard]] uint32_t getFileSize() const { return fileSize; }
+
 private:
     std::string fileName;
     uint32_t offset = 0;
@@ -66,9 +68,10 @@ public:
     uint32_t getSignature() { return m_signature; }
     int getSpritesCount() { return m_spritesCount; }
 
-    ImagePtr getSpriteImage(int id) {
+    ImagePtr getSpriteImage(int id)
+    {
         bool isLoading = false;
-        return  getSpriteImage(id, isLoading);
+        return getSpriteImage(id, isLoading);
     }
 
     ImagePtr getSpriteImage(int id, bool& isLoading);
@@ -92,7 +95,8 @@ private:
 
     void load();
 
-    [[nodiscard]] FileStreamPtr getSpriteFile() const {
+    [[nodiscard]] FileStreamPtr getSpriteFile() const
+    {
         return m_spritesFiles[0]->file;
     }
 

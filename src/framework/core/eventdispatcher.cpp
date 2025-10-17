@@ -31,7 +31,8 @@ EventDispatcher g_dispatcher, g_textDispatcher, g_mainDispatcher;
 int16_t g_mainThreadId = stdext::getThreadId();
 int16_t g_eventThreadId = -1;
 
-void EventDispatcher::init() {
+void EventDispatcher::init()
+{
     for (size_t i = 0; i < g_asyncDispatcher.get_thread_count(); ++i) {
         m_threads.emplace_back(std::make_unique<ThreadTask>());
     }
@@ -98,7 +99,8 @@ EventPtr EventDispatcher::addEvent(const std::function<void()>& callback)
     });
 }
 
-void EventDispatcher::deferEvent(const std::function<void()>& callback) {
+void EventDispatcher::deferEvent(const std::function<void()>& callback)
+{
     if (m_disabled)
         return;
 
@@ -107,7 +109,8 @@ void EventDispatcher::deferEvent(const std::function<void()>& callback) {
     });
 }
 
-void EventDispatcher::executeEvents() {
+void EventDispatcher::executeEvents()
+{
     if (m_eventList.empty()) {
         return;
     }
@@ -122,7 +125,8 @@ void EventDispatcher::executeEvents() {
     dispacherContext.reset();
 }
 
-void EventDispatcher::executeDeferEvents() {
+void EventDispatcher::executeDeferEvents()
+{
     dispacherContext.group = TaskGroup::Serial;
     dispacherContext.type = DispatcherType::DeferEvent;
 
@@ -145,7 +149,8 @@ void EventDispatcher::executeDeferEvents() {
     dispacherContext.reset();
 }
 
-void EventDispatcher::executeScheduledEvents() {
+void EventDispatcher::executeScheduledEvents()
+{
     auto& threadScheduledTasks = getThreadTask()->scheduledEventList;
 
     auto it = m_scheduledEventList.begin();
@@ -172,7 +177,8 @@ void EventDispatcher::executeScheduledEvents() {
     dispacherContext.reset();
 }
 
-void EventDispatcher::mergeEvents() {
+void EventDispatcher::mergeEvents()
+{
     for (const auto& thread : m_threads) {
         SpinLock::Guard guard(thread->lock);
         if (!thread->events.empty()) {

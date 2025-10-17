@@ -87,8 +87,9 @@ bool UIVerticalLayout::internalUpdate()
     if (m_alignBottom) {
         for (auto& it : std::ranges::reverse_view(parentWidget->m_children))
             action(it);
-    } else for (const auto& widget : parentWidget->m_children)
-        action(widget);
+    } else
+        for (const auto& widget : parentWidget->m_children)
+            action(widget);
 
     preferredHeight -= m_spacing;
     preferredHeight += parentWidget->getPaddingTop() + parentWidget->getPaddingBottom();

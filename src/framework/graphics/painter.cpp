@@ -137,7 +137,8 @@ void Painter::resetState()
     resetTransformMatrix();
 }
 
-void Painter::refreshState() const {
+void Painter::refreshState() const
+{
     updateGlViewport();
     updateGlCompositionMode();
     updateGlBlendEquation();
@@ -188,7 +189,8 @@ void Painter::setClipRect(const Rect& clipRect)
     updateGlClipRect();
 }
 
-void Painter::setTexture(const TexturePtr& texture) {
+void Painter::setTexture(const TexturePtr& texture)
+{
     if (texture) setTexture(texture->getId(), texture->getTransformMatrixId());
     else resetTexture();
 }
@@ -242,9 +244,9 @@ Matrix3 Painter::getTransformMatrix(const Size& resolution) const
     //   |  x  y  1  |  *  |     0.0      | -2.0 / height |      0.0      |  =  |  x'  y'  1  |
     //   -------------     |    -1.0      |      1.0      |      1.0      |     ---------------
 
-    return { 2.0f / resolution.width(),  0.0f,                       0.0f,
-                                  0.0f, -2.0f / resolution.height(), 0.0f,
-                                 -1.0f,  1.0f,                       1.0f };
+    return { 2.0f / resolution.width(), 0.0f, 0.0f,
+        0.0f, -2.0f / resolution.height(), 0.0f,
+        -1.0f, 1.0f, 1.0f };
 }
 
 void Painter::updateGlCompositionMode() const
@@ -282,6 +284,9 @@ void Painter::updateGlClipRect() const
     }
 }
 void Painter::updateGlTexture() const { if (m_glTextureId != 0) glBindTexture(GL_TEXTURE_2D, m_glTextureId); }
-void Painter::updateGlBlendEquation() const { glBlendEquation(static_cast<GLenum>(m_blendEquation)); }
+void Painter::updateGlBlendEquation() const
+{
+    glBlendEquation(static_cast<GLenum>(m_blendEquation));
+}
 void Painter::updateGlAlphaWriting() const { glColorMask(1, 1, 1, m_alphaWriting); }
 void Painter::updateGlViewport() const { glViewport(0, 0, m_resolution.width(), m_resolution.height()); }

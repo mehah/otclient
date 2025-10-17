@@ -24,7 +24,7 @@
 
 #include "config.h"
 
- // @bindsingleton g_configs
+// @bindsingleton g_configs
 class ConfigManager
 {
 public:

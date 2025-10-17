@@ -22,7 +22,7 @@
 
 #pragma once
 
- // this file is and must be included only from luainterface.h
+// this file is and must be included only from luainterface.h
 #include "luaexception.h"
 
 #include <framework/stdext/traits.h>
@@ -59,7 +59,7 @@ namespace luabinder
     /// C++ function caller that can push results to lua
     template<typename Ret, typename F, typename... Args>
     int
-        call_fun_and_push_result(const F& f, LuaInterface* lua, const Args&... args)
+    call_fun_and_push_result(const F& f, LuaInterface* lua, const Args&... args)
         requires (!std::is_void_v<Ret>)
     {
         Ret ret = f(args...);
@@ -70,7 +70,7 @@ namespace luabinder
     /// C++ void function caller
     template<typename Ret, typename F, typename... Args>
     int
-        call_fun_and_push_result(const F& f, LuaInterface* /*lua*/, const Args&... args)
+    call_fun_and_push_result(const F& f, LuaInterface* /*lua*/, const Args&... args)
         requires (std::is_void_v<Ret>)
     {
         f(args...);
@@ -117,7 +117,7 @@ namespace luabinder
 
     /// Bind a customized function
     inline
-        LuaCppFunction bind_fun(const std::function<int(LuaInterface*)>& f)
+    LuaCppFunction bind_fun(const std::function<int(LuaInterface*)>& f)
     {
         return f;
     }
@@ -158,14 +158,14 @@ namespace luabinder
 
     /// Convert to C++ functions pointers to std::function then bind
     template<typename Ret, typename... Args>
-    LuaCppFunction bind_fun(Ret(*f)(Args...))
+    LuaCppFunction bind_fun(Ret (* f)(Args...))
     {
         return bind_fun(std::function<Ret(Args...)>(f));
     }
 
     /// Create member function lambdas
     template<typename Ret, typename C, typename... Args>
-    std::function<Ret(const std::shared_ptr<C>&, const Args&...)> make_mem_func(Ret(C::* f)(Args...))
+    std::function<Ret(const std::shared_ptr<C>&, const Args&...)> make_mem_func(Ret (C::* f)(Args...))
     {
         auto mf = std::mem_fn(f);
         return [=](const std::shared_ptr<C>& obj, const Args&... args) mutable -> Ret {
@@ -187,7 +187,7 @@ namespace luabinder
 
     /// Create member function lambdas for singleton classes
     template<typename Ret, typename C, typename... Args>
-    std::function<Ret(const Args&...)> make_mem_func_singleton(Ret(C::* f)(Args...), C* instance)
+    std::function<Ret(const Args&...)> make_mem_func_singleton(Ret (C::* f)(Args...), C* instance)
     {
         auto mf = std::mem_fn(f);
         return [=](Args... args) mutable -> Ret { return mf(instance, args...); };
@@ -201,7 +201,7 @@ namespace luabinder
 
     /// Bind member functions
     template<typename C, typename Ret, class FC, typename... Args>
-    LuaCppFunction bind_mem_fun(Ret(FC::* f)(Args...))
+    LuaCppFunction bind_mem_fun(Ret (FC::* f)(Args...))
     {
         using Tuple = std::tuple<std::shared_ptr<FC>, typename stdext::remove_const_ref<Args>::type...>;
         auto lambda = make_mem_func<Ret, FC>(f);
@@ -212,7 +212,7 @@ namespace luabinder
 
     /// Bind singleton member functions
     template<typename C, typename Ret, class FC, typename... Args>
-    LuaCppFunction bind_singleton_mem_fun(Ret(FC::* f)(Args...), C* instance)
+    LuaCppFunction bind_singleton_mem_fun(Ret (FC::* f)(Args...), C* instance)
     {
         using Tuple = std::tuple<typename stdext::remove_const_ref<Args>::type...>;
         assert(instance);

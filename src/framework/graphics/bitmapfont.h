@@ -72,7 +72,8 @@ private:
     void calculateGlyphsWidthsAutomatically(const ImagePtr& image, const Size& glyphSize);
     void updateColors(std::vector<std::pair<int, Color>>* colors, int pos, int newTextLen) noexcept;
 
-    static inline bool isSpace(unsigned char c) noexcept {
+    static inline bool isSpace(unsigned char c) noexcept
+    {
         return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\v' || c == '\f';
     }
 

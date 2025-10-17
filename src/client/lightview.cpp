@@ -27,14 +27,16 @@
 #include <framework/core/eventdispatcher.h>
 #include <framework/graphics/drawpoolmanager.h>
 
-LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT)) {
+LightView::LightView(const Size& size) : m_pool(g_drawPool.get(DrawPoolType::LIGHT))
+{
     g_mainDispatcher.addEvent([this, size] {
         m_texture = std::make_shared<Texture>(size);
         m_texture->setSmooth(true);
     });
 }
 
-void LightView::resize(const Size& size, const uint16_t tileSize) {
+void LightView::resize(const Size& size, const uint16_t tileSize)
+{
     if (!m_texture || (m_mapSize == size && m_tileSize == tileSize))
         return;
 
@@ -116,7 +118,8 @@ void LightView::draw(const Rect& dest, const Rect& src)
     });
 }
 
-void LightView::updateCoords(const Rect& dest, const Rect& src) {
+void LightView::updateCoords(const Rect& dest, const Rect& src)
+{
     if (m_dest == dest && m_src == src)
         return;
 
@@ -128,8 +131,8 @@ void LightView::updateCoords(const Rect& dest, const Rect& src) {
 
     m_coords.clear();
     m_coords.addRect(RectF(m_dest.left(), m_dest.top(), m_dest.width(), m_dest.height()),
-               RectF(static_cast<float>(offset.x) / m_tileSize, static_cast<float>(offset.y) / m_tileSize,
-                     static_cast<float>(size.width()) / m_tileSize, static_cast<float>(size.height()) / m_tileSize));
+                     RectF(static_cast<float>(offset.x) / m_tileSize, static_cast<float>(offset.y) / m_tileSize,
+                           static_cast<float>(size.width()) / m_tileSize, static_cast<float>(size.height()) / m_tileSize));
 }
 
 void LightView::updatePixels()

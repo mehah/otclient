@@ -83,7 +83,8 @@ void LocalPlayer::preWalk(Otc::Direction direction)
     registerAdjustInvalidPosEvent();
 }
 
-void LocalPlayer::onWalking() {
+void LocalPlayer::onWalking()
+{
     if (isPreWalking()) {
         if (const auto& tile = g_map.getTile(getPosition())) {
             for (const auto& creature : tile->getWalkingCreatures()) {
@@ -98,7 +99,8 @@ void LocalPlayer::onWalking() {
     }
 }
 
-void LocalPlayer::registerAdjustInvalidPosEvent() {
+void LocalPlayer::registerAdjustInvalidPosEvent()
+{
     cancelAdjustInvalidPosEvent();
     m_adjustInvalidPosEvent = g_dispatcher.scheduleEvent([this, self = asLocalPlayer()] {
         m_preWalks.clear();
@@ -107,7 +109,8 @@ void LocalPlayer::registerAdjustInvalidPosEvent() {
     }, std::min<int>(std::max<int>(getStepDuration(), g_game.getPing()) + 100, 1000));
 }
 
-void LocalPlayer::cancelAdjustInvalidPosEvent() {
+void LocalPlayer::cancelAdjustInvalidPosEvent()
+{
     if (!m_adjustInvalidPosEvent) return;
     m_adjustInvalidPosEvent->cancel();
     m_adjustInvalidPosEvent = nullptr;

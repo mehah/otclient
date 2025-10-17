@@ -32,10 +32,11 @@ namespace stdext
     {
         const uInt n = static_cast<uInt>(data.size());
         return ::adler32(::adler32(0L, Z_NULL, 0),
-                        reinterpret_cast<const Bytef*>(data.data()), n);
+                         reinterpret_cast<const Bytef*>(data.data()), n);
     }
 
-    std::mt19937& random_gen() {
+    std::mt19937& random_gen()
+    {
         thread_local static std::mt19937 generator([] {
             std::random_device rd;
             std::seed_seq seq{ rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd() };

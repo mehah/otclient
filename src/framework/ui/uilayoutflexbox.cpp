@@ -2,7 +2,8 @@
 
 #include <algorithm>
 
-namespace {
+namespace
+{
     enum class Axis { Horizontal, Vertical };
 
     struct FlexItemData

@@ -7,13 +7,15 @@ constexpr uint8_t SMOOTH_PADDING = 2;
 
 TextureAtlas::TextureAtlas(Fw::TextureAtlasType type, int size, bool smoothSupport) :
     m_type(type),
-    m_size(std::min<int>(size, 8192)) {
+    m_size(std::min<int>(size, 8192))
+{
     createNewLayer(false);
     if (smoothSupport)
         createNewLayer(true);
 }
 
-void TextureAtlas::removeTexture(uint32_t id, bool smooth) {
+void TextureAtlas::removeTexture(uint32_t id, bool smooth)
+{
     auto it = m_texturesCached.find(id);
     if (it == m_texturesCached.end()) {
         return;
@@ -27,7 +29,8 @@ void TextureAtlas::removeTexture(uint32_t id, bool smooth) {
     m_texturesCached.erase(it);
 }
 
-void TextureAtlas::addTexture(const TexturePtr& texture) {
+void TextureAtlas::addTexture(const TexturePtr& texture)
+{
     const auto textureID = texture->getId();
     const auto width = texture->getWidth();
     const auto height = texture->getHeight();
@@ -87,7 +90,8 @@ void TextureAtlas::addTexture(const TexturePtr& texture) {
     m_texturesCached.emplace(textureID, std::move(info));
 }
 
-void TextureAtlas::createNewLayer(bool smooth) {
+void TextureAtlas::createNewLayer(bool smooth)
+{
     auto fbo = std::make_unique<FrameBuffer>();
     fbo->setAutoClear(false);
     fbo->setAutoResetState(true);
@@ -101,7 +105,8 @@ void TextureAtlas::createNewLayer(bool smooth) {
     m_filterGroups[smooth].freeRegionsBySize[m_size.width() * m_size.height()].insert(newRegion);
 }
 
-void TextureAtlas::flush() {
+void TextureAtlas::flush()
+{
     static CoordsBuffer buffer;
     for (auto i = -1; ++i < AtlasFilter::ATLAS_FILTER_COUNT;) {
         auto& group = m_filterGroups[i];

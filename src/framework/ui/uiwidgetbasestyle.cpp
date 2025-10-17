@@ -37,7 +37,8 @@
 #include <atomic>
 #include <framework/html/htmlmanager.h>
 
-namespace {
+namespace
+{
     inline std::string toLower(std::string value)
     {
         stdext::tolower(value);
@@ -231,7 +232,7 @@ namespace {
 
 void UIWidget::initBaseStyle()
 {
-    static std::atomic<uint32_t > UID(0);
+    static std::atomic<uint32_t> UID(0);
     m_borderColor.set(Color::black);
 
     // generate an unique id, this is need because anchored layouts find widgets by id
@@ -427,7 +428,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         } else if (node->tag() == "display") {
             auto v = node->value<std::string>();
             stdext::tolower(v);
-            DisplayType display = DisplayType::Initial;
+            auto display = DisplayType::Initial;
             if (v == "none") display = DisplayType::None;
             else if (v == "block") display = DisplayType::Block;
             else if (v == "inline") display = DisplayType::Inline;
@@ -508,7 +509,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         } else if (node->tag() == "overflow") {
             auto v = node->value<std::string>();
             stdext::tolower(v);
-            OverflowType type = OverflowType::Visible;
+            auto type = OverflowType::Visible;
             if (v == "hidden") type = OverflowType::Hidden;
             else if (v == "scroll") type = OverflowType::Scroll;
             else if (v == "auto") type = OverflowType::Auto;
@@ -519,7 +520,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             auto v = node->value<std::string>();
             stdext::tolower(v);
 
-            PositionType type = PositionType::Static;
+            auto type = PositionType::Static;
             if (v == "absolute") type = PositionType::Absolute;
             else if (v == "relative") type = PositionType::Relative;
 
@@ -527,7 +528,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
         } else if (node->tag() == "float") {
             auto v = node->value<std::string>();
             stdext::tolower(v);
-            FloatType type = FloatType::None;
+            auto type = FloatType::None;
             if (v == "left") type = FloatType::Left;
             else if (v == "right") type = FloatType::Right;
             else if (v == "inline-start") type = FloatType::InlineStart;
@@ -535,7 +536,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             setFloat(type);
         } else if (node->tag() == "clear") {
             auto v = node->value<std::string>();
-            ClearType clear = ClearType::None;
+            auto clear = ClearType::None;
             if (v == "left") clear = ClearType::Left;
             else if (v == "right") clear = ClearType::Right;
             else if (v == "both") clear = ClearType::Both;
@@ -543,7 +544,7 @@ void UIWidget::parseBaseStyle(const OTMLNodePtr& styleNode)
             else if (v == "inline-end") clear = ClearType::InlineEnd;
         } else if (node->tag() == "justify-items") {
             auto v = node->value<std::string>();
-            JustifyItemsType justify = JustifyItemsType::Normal;
+            auto justify = JustifyItemsType::Normal;
 
             if (v == "center") justify = JustifyItemsType::Center;
             else if (v == "left" || v == "flex-start" || v == "start" || v == "inline-start")

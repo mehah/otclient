@@ -27,7 +27,8 @@
 
 AttachedEffectManager g_attachedEffects;
 
-AttachedEffectPtr AttachedEffectManager::getById(const uint16_t id) {
+AttachedEffectPtr AttachedEffectManager::getById(const uint16_t id)
+{
     const auto it = m_effects.find(id);
     if (it == m_effects.end()) {
         g_logger.error("AttachedEffectManager::getById({}): not found.", id);
@@ -43,7 +44,8 @@ AttachedEffectPtr AttachedEffectManager::getById(const uint16_t id) {
     return obj->clone();
 }
 
-AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std::string_view name, const uint16_t thingId, const ThingCategory category) {
+AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std::string_view name, const uint16_t thingId, const ThingCategory category)
+{
     const auto it = m_effects.find(id);
     if (it != m_effects.end()) {
         g_logger.error("AttachedEffectManager::registerByThing({}, {}): has already been registered.", id, name);
@@ -61,7 +63,8 @@ AttachedEffectPtr AttachedEffectManager::registerByThing(uint16_t id, const std:
     return obj;
 }
 
-AttachedEffectPtr AttachedEffectManager::registerByImage(uint16_t id, const std::string_view name, const std::string_view path, const bool smooth) {
+AttachedEffectPtr AttachedEffectManager::registerByImage(uint16_t id, const std::string_view name, const std::string_view path, const bool smooth)
+{
     const auto it = m_effects.find(id);
     if (it != m_effects.end()) {
         g_logger.error("AttachedEffectManager::registerByImage({}, {}): has already been registered.", id, name);

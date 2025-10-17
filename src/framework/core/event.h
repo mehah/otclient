@@ -24,7 +24,7 @@
 
 #include <framework/luaengine/luaobject.h>
 
- // @bindclass
+// @bindclass
 class Event : public LuaObject
 {
 public:

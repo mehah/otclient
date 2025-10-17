@@ -43,7 +43,8 @@ UIMap::~UIMap()
     g_map.removeMapView(m_mapView);
 }
 
-void UIMap::draw(const DrawPoolType drawPane) {
+void UIMap::draw(const DrawPoolType drawPane)
+{
     if (drawPane == DrawPoolType::MAP) {
         g_drawPool.preDraw(drawPane, [this] {
             m_mapView->drawFloor();
@@ -73,13 +74,14 @@ void UIMap::drawSelf(const DrawPoolType drawPane)
 
     if (drawPane == DrawPoolType::FOREGROUND) {
         g_drawPool.addBoundingRect(m_mapRect.expanded(1), Color::black);
-        g_drawPool.addAction([] {glDisable(GL_BLEND); });
+        g_drawPool.addAction([] { glDisable(GL_BLEND); });
         g_drawPool.addFilledRect(m_mapRect, Color::alpha);
-        g_drawPool.addAction([] {glEnable(GL_BLEND); });
+        g_drawPool.addAction([] { glEnable(GL_BLEND); });
     }
 }
 
-void UIMap::updateMapRect() {
+void UIMap::updateMapRect()
+{
     m_mapView->updateRect(m_mapviewRect);
 }
 

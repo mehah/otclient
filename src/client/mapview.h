@@ -37,10 +37,12 @@ struct AwareRange
     [[nodiscard]] uint8_t horizontal() const { return left + right + 1; }
     [[nodiscard]] uint8_t vertical() const { return top + bottom + 1; }
 
-    [[nodiscard]] Size dimension() const { return { left * 2 + 1 , top * 2 + 1 }; }
+    [[nodiscard]] Size dimension() const { return { left * 2 + 1, top * 2 + 1 }; }
 
     bool operator==(const AwareRange& other) const
-    { return left == other.left && top == other.top && right == other.right && bottom == other.bottom; }
+    {
+        return left == other.left && top == other.top && right == other.right && bottom == other.bottom;
+    }
 };
 
 struct MapPosInfo
@@ -57,7 +59,7 @@ struct MapPosInfo
         return camera.isInRange(pos, awareRange.left - 1, awareRange.right - 2, awareRange.top - 1, awareRange.bottom - 2, ignoreZ);
     }
 
-    [[nodiscard]] bool isInRangeEx(const Position& pos, const bool ignoreZ = false)  const
+    [[nodiscard]] bool isInRangeEx(const Position& pos, const bool ignoreZ = false) const
     {
         return camera.isInRange(pos, awareRange.left, awareRange.right, awareRange.top, awareRange.bottom, ignoreZ);
     }
@@ -120,10 +122,18 @@ public:
     Position getCameraPosition();
     void setCameraPosition(const Position& pos);
 
-    void setMinimumAmbientLight(const float intensity) { m_minimumAmbientLight = intensity; updateLight(); }
+    void setMinimumAmbientLight(const float intensity)
+    {
+        m_minimumAmbientLight = intensity;
+        updateLight();
+    }
     float getMinimumAmbientLight() const { return m_minimumAmbientLight; }
 
-    void setShadowFloorIntensity(const float intensity) { m_shadowFloorIntensity = intensity; updateLight(); }
+    void setShadowFloorIntensity(const float intensity)
+    {
+        m_shadowFloorIntensity = intensity;
+        updateLight();
+    }
     float getShadowFloorIntensity() const { return m_shadowFloorIntensity; }
 
     void setDrawNames(const bool enable) { m_drawNames = enable; }
@@ -211,7 +221,11 @@ private:
     {
         std::vector<TilePtr> shades;
         std::vector<TilePtr> tiles;
-        void clear() { shades.clear(); tiles.clear(); }
+        void clear()
+        {
+            shades.clear();
+            tiles.clear();
+        }
     };
 
     struct FloorData
@@ -261,7 +275,8 @@ private:
 
     Rect calcFramebufferSource(const Size& destSize);
 
-    Point transformPositionTo2D(const Position& position) const {
+    Point transformPositionTo2D(const Position& position) const
+    {
         return transformPositionTo2D(position, m_posInfo.camera);
     }
 
@@ -269,7 +284,7 @@ private:
     {
         return {
             (m_virtualCenterOffset.x + (position.x - relativePosition.x) - (relativePosition.z - position.z)) * m_tileSize,
-                     (m_virtualCenterOffset.y + (position.y - relativePosition.y) - (relativePosition.z - position.z)) * m_tileSize
+            (m_virtualCenterOffset.y + (position.y - relativePosition.y) - (relativePosition.z - position.z)) * m_tileSize
         };
     }
 

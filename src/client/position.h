@@ -75,7 +75,7 @@ public:
         return pos;
     }
 
-    [[nodiscard]] Position translatedToReverseDirection(const Otc::Direction direction)  const
+    [[nodiscard]] Position translatedToReverseDirection(const Otc::Direction direction) const
     {
         Position pos = *this;
         switch (direction) {
@@ -190,8 +190,20 @@ public:
     [[nodiscard]] double distance(const Position& pos) const { return sqrt(pow<int32_t>(pos.x - x, 2) + pow<int32_t>(pos.y - y, 2)); }
     [[nodiscard]] uint16_t manhattanDistance(const Position& pos) const { return static_cast<uint16_t>(std::abs(pos.x - x) + std::abs(pos.y - y)); }
 
-    void translate(const int32_t dx, const int32_t dy, const int8_t dz = 0) { x += dx; y += dy; z += dz; }
-    [[nodiscard]] Position translated(const int32_t dx, const int32_t dy, const int8_t dz = 0) const { Position pos = *this; pos.x += dx; pos.y += dy; pos.z += dz; return pos; }
+    void translate(const int32_t dx, const int32_t dy, const int8_t dz = 0)
+    {
+        x += dx;
+        y += dy;
+        z += dz;
+    }
+    [[nodiscard]] Position translated(const int32_t dx, const int32_t dy, const int8_t dz = 0) const
+    {
+        Position pos = *this;
+        pos.x += dx;
+        pos.y += dy;
+        pos.z += dz;
+        return pos;
+    }
 
     [[nodiscard]] std::array<Position, 8> getPositionsAround() const
     {
@@ -211,12 +223,29 @@ public:
     }
 
     Position operator+(const Position& other) const { return { x + other.x, y + other.y, static_cast<uint8_t>(z + other.z) }; }
-    Position& operator+=(const Position& other) { x += other.x; y += other.y; z += other.z; return *this; }
+    Position& operator+=(const Position& other)
+    {
+        x += other.x;
+        y += other.y;
+        z += other.z;
+        return *this;
+    }
     Position operator-(const Position& other) const { return { x - other.x, y - other.y, static_cast<uint8_t>(z - other.z) }; }
-    Position& operator-=(const Position& other) { x -= other.x; y -= other.y; z -= other.z; return *this; }
+    Position& operator-=(const Position& other)
+    {
+        x -= other.x;
+        y -= other.y;
+        z -= other.z;
+        return *this;
+    }
     // Point conversion(s)
     Position operator+(const Point& other) const { return { x + other.x, y + other.y, z }; }
-    Position& operator+=(const Point& other) { x += other.x; y += other.y; return *this; }
+    Position& operator+=(const Point& other)
+    {
+        x += other.x;
+        y += other.y;
+        return *this;
+    }
 
     Position& operator=(const Position& other) = default;
     bool operator==(const Position& other) const { return other.x == x && other.y == y && other.z == z; }
@@ -264,7 +293,7 @@ public:
     // NOTE: This does not increase the size of the struct.
     struct Hasher
     {
-        std::size_t operator() (const Position& pos) const
+        std::size_t operator()(const Position& pos) const
         {
             return (((pos.x * 8192) + pos.y) * 16) + pos.z;
         }
@@ -290,12 +319,11 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
 }
 
 // Auto format Position
-template <>
+template<>
 struct fmt::formatter<Position> : fmt::formatter<std::string>
 {
-    auto format(const Position& pos, fmt::format_context& ctx) const {
+    auto format(const Position& pos, fmt::format_context& ctx) const
+    {
         return fmt::formatter<std::string>::format(pos.toString(), ctx);
     }
-}
-
-;
+};

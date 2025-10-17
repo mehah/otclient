@@ -68,7 +68,8 @@ void Client::terminate()
     g_gameConfig.terminate();
 }
 
-void Client::preLoad() {
+void Client::preLoad()
+{
     if (m_mapWidget) {
         if (m_mapWidget->isDestroyed())
             m_mapWidget = nullptr;

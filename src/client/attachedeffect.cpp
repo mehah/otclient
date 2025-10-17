@@ -30,7 +30,8 @@
 #include <framework/graphics/shadermanager.h>
 #include <framework/graphics/texturemanager.h>
 
-AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category) {
+AttachedEffectPtr AttachedEffect::create(const uint16_t thingId, const ThingCategory category)
+{
     if (!g_things.isValidDatId(thingId, category)) {
         g_logger.error("AttachedEffectManager::getInstance({}, {}): invalid thing with id or category.", thingId, static_cast<uint8_t>(category));
         return nullptr;
@@ -66,13 +67,15 @@ AttachedEffectPtr AttachedEffect::clone()
     return obj;
 }
 
-int getBounce(const AttachedEffect::Bounce bounce, const ticks_t ticks) {
+int getBounce(const AttachedEffect::Bounce bounce, const ticks_t ticks)
+{
     const auto minHeight = bounce.minHeight * g_drawPool.getScaleFactor();
     const auto height = bounce.height * g_drawPool.getScaleFactor();
     return minHeight + (height - std::abs(height - static_cast<int>(ticks / (bounce.speed / 100.f)) % static_cast<int>(height * 2)));
 }
 
-void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightViewPtr& lightView, const bool drawThing) {
+void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightViewPtr& lightView, const bool drawThing)
+{
     if (m_transform)
         return;
 
@@ -150,7 +153,8 @@ void AttachedEffect::draw(const Point& dest, const bool isOnTop, const LightView
     }
 }
 
-void AttachedEffect::drawLight(const Point& dest, const LightViewPtr& lightView) {
+void AttachedEffect::drawLight(const Point& dest, const LightViewPtr& lightView)
+{
     if (!lightView) return;
 
     const auto& dirControl = m_offsetDirections[m_direction];
@@ -194,11 +198,13 @@ int AttachedEffect::getCurrentAnimationPhase()
 
 void AttachedEffect::setShader(const std::string_view name) { m_shader = g_shaders.getShader(name); }
 
-void AttachedEffect::move(const Position& fromPosition, const Position& toPosition) {
+void AttachedEffect::move(const Position& fromPosition, const Position& toPosition)
+{
     m_toPoint = Point(toPosition.x - fromPosition.x, toPosition.y - fromPosition.y) * g_gameConfig.getSpriteSize();
     m_animationTimer.restart();
 }
 
-ThingType* AttachedEffect::getThingType() const {
+ThingType* AttachedEffect::getThingType() const
+{
     return m_thingId > 0 ? g_things.getRawThingType(m_thingId, m_thingCategory) : nullptr;
 }

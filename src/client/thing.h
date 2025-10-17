@@ -31,12 +31,12 @@
 #include <framework/graphics/drawpool.h>
 #include <framework/luaengine/luaobject.h>
 
- // @bindclass
+// @bindclass
 #pragma pack(push,1) // disable memory alignment
 class Thing : public AttachableObject
 {
 public:
-    virtual void draw(const Point& /*dest*/, bool /*drawThings*/ = true, const LightViewPtr & = nullptr) {}
+    virtual void draw(const Point& /*dest*/, bool /*drawThings*/  = true, const LightViewPtr& = nullptr) {}
     virtual void drawLight(const Point& /*dest*/, const LightViewPtr&) {}
 
     LuaObjectPtr attachedObjectToLuaObject() override { return asLuaObject(); }
@@ -87,14 +87,14 @@ public:
     int getHeight() const { return getThingType()->getHeight(); }
     int getRealSize() const { return getThingType()->getRealSize(); }
     int getLayers() const { return getThingType()->getLayers(); }
-    int getNumPatternX()const { return getThingType()->getNumPatternX(); }
-    int getNumPatternY()const { return getThingType()->getNumPatternY(); }
-    int getNumPatternZ()const { return getThingType()->getNumPatternZ(); }
-    int getAnimationPhases()const { return getThingType()->getAnimationPhases(); }
+    int getNumPatternX() const { return getThingType()->getNumPatternX(); }
+    int getNumPatternY() const { return getThingType()->getNumPatternY(); }
+    int getNumPatternZ() const { return getThingType()->getNumPatternZ(); }
+    int getAnimationPhases() const { return getThingType()->getAnimationPhases(); }
     int getGroundSpeed() const { return getThingType()->getGroundSpeed(); }
-    int getMaxTextLength()const { return getThingType()->getMaxTextLength(); }
-    int getMinimapColor()const { return getThingType()->getMinimapColor(); }
-    int getLensHelp()const { return getThingType()->getLensHelp(); }
+    int getMaxTextLength() const { return getThingType()->getMaxTextLength(); }
+    int getMinimapColor() const { return getThingType()->getMinimapColor(); }
+    int getLensHelp() const { return getThingType()->getLensHelp(); }
     int getElevation() const { return getThingType()->getElevation(); }
 
     int getClothSlot() { return getThingType()->getClothSlot(); }
@@ -167,7 +167,8 @@ public:
 
     void canDraw(const bool canDraw) { m_canDraw = canDraw; }
 
-    bool canDraw(const Color& color = Color::white) const {
+    bool canDraw(const Color& color = Color::white) const
+    {
         return m_canDraw && m_clientId > 0 && color.aF() > Fw::MIN_ALPHA && getThingType() && getThingType()->getOpacity() > Fw::MIN_ALPHA;
     }
 
@@ -181,7 +182,8 @@ public:
     virtual void onAppear() {}
     virtual void onDisappear() {}
 
-    const Color& getMarkedColor() {
+    const Color& getMarkedColor()
+    {
         if (m_markedColor == Color::white)
             return Color::white;
 
@@ -192,7 +194,8 @@ public:
     bool isMarked() { return m_markedColor != Color::white; }
     void setMarked(const Color& color) { if (m_markedColor != color) m_markedColor = color; }
 
-    const Color& getHighlightColor() {
+    const Color& getHighlightColor()
+    {
         if (m_highlightColor == Color::white)
             return Color::white;
 
@@ -205,11 +208,12 @@ public:
 
     bool isHided() { return isOwnerHidden(); }
 
-    uint8_t getPatternX()const { return m_numPatternX; }
-    uint8_t getPatternY()const { return m_numPatternY; }
-    uint8_t getPatternZ()const { return m_numPatternZ; }
+    uint8_t getPatternX() const { return m_numPatternX; }
+    uint8_t getPatternY() const { return m_numPatternY; }
+    uint8_t getPatternZ() const { return m_numPatternZ; }
 
-    float getScaleFactor() {
+    float getScaleFactor()
+    {
         if (m_scale.value == 100)
             return 1.f;
 
@@ -217,7 +221,8 @@ public:
         return std::min<float>(scale, m_scale.value) / 100.f;
     }
 
-    void setScaleFactor(float v, uint16_t ms = 0) {
+    void setScaleFactor(float v, uint16_t ms = 0)
+    {
         m_scale.value = v * 100;
         m_scale.speed = ms;
         m_scale.timer.restart();
@@ -247,8 +252,7 @@ protected:
         Timer timer;
         uint16_t speed{ 0 };
         uint16_t value{ 100 };
-    }
-    m_scale;
+    } m_scale;
 
     Position m_position;
 

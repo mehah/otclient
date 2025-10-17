@@ -27,7 +27,7 @@
 #include <framework/global.h>
 #include <framework/graphics/declarations.h>
 
- // Forward declaration
+// Forward declaration
 class Color;
 
 //@bindsingleton g_window
@@ -116,7 +116,10 @@ public:
 
     bool isKeyPressed(const Fw::Key keyCode) { return m_keyInfo[keyCode].state; }
     bool isMouseButtonPressed(const Fw::MouseButton mouseButton)
-    { if (mouseButton == Fw::MouseNoButton) return m_mouseButtonStates != 0; return (m_mouseButtonStates & (1u << mouseButton)) == (1u << mouseButton); }
+    {
+        if (mouseButton == Fw::MouseNoButton) return m_mouseButtonStates != 0;
+        return (m_mouseButtonStates & (1u << mouseButton)) == (1u << mouseButton);
+    }
     bool isVisible() { return m_visible; }
     bool isMaximized() { return m_maximized; }
     bool isFullscreen() { return m_fullscreen; }
@@ -133,7 +136,6 @@ public:
     void setKeyDelay(const Fw::Key key, const uint8_t delay) { if (key < Fw::KeyLast) m_keyInfo[key].delay = delay; }
 
 protected:
-
     virtual int internalLoadMouseCursor(const ImagePtr& image, const Point& hotSpot) = 0;
 
     void updateUnmaximizedCoords();

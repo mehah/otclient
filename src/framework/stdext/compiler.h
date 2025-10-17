@@ -53,9 +53,9 @@
 #error "Compiler not supported."
 #endif
 
- /// Branch Prediction.  See the GCC Manual for more information.
- /// NB: These are used when speed is need most; do not use in normal
- /// code, they may slow down stuff.
+/// Branch Prediction.  See the GCC Manual for more information.
+/// NB: These are used when speed is need most; do not use in normal
+/// code, they may slow down stuff.
 #if defined(__clang__) || defined(__GNUC__)
 #define likely(x)     __builtin_expect(!!(x), 1)
 #define unlikely(x)    __builtin_expect(!!(x), 0)
