@@ -26,7 +26,7 @@
 #include <framework/net/declarations.h>
 #include <framework/ui/declarations.h>
 
- // core
+// core
 class Map;
 class Game;
 class MapView;

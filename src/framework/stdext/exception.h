@@ -41,6 +41,7 @@ namespace stdext
 
         ~exception() noexcept override = default;
         [[nodiscard]] const char* what() const noexcept override { return m_what.data(); }
+
     protected:
         std::string m_what;
     };

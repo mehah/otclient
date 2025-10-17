@@ -33,52 +33,53 @@
 
 HtmlManager g_html;
 
-namespace {
+namespace
+{
     static std::vector<css::StyleSheet> GLOBAL_STYLES;
 
     static const std::unordered_map<std::string, std::string> IMG_ATTR_TRANSLATED = {
-        {"offset-x", "image-offset-x"},
-        {"offset-y", "image-offset-y"},
-        {"offset", "image-offset"},
-        {"width", "image-width"},
-        {"height", "image-height"},
-        {"size", "image-size"},
-        {"rect", "image-rect"},
-        {"clip", "image-clip"},
-        {"fixed-ratio", "image-fixed-ratio"},
-        {"repeated", "image-repeated"},
-        {"smooth", "image-smooth"},
-        {"color", "image-color"},
-        {"border-top", "image-border-top"},
-        {"border-right", "image-border-right"},
-        {"border-bottom", "image-border-bottom"},
-        {"border-left", "image-border-left"},
-        {"border", "image-border"},
-        {"auto-resize", "image-auto-resize"},
-        {"individual-animation", "image-individual-animation"},
-        {"src", "image-source"}
+        { "offset-x", "image-offset-x" },
+        { "offset-y", "image-offset-y" },
+        { "offset", "image-offset" },
+        { "width", "image-width" },
+        { "height", "image-height" },
+        { "size", "image-size" },
+        { "rect", "image-rect" },
+        { "clip", "image-clip" },
+        { "fixed-ratio", "image-fixed-ratio" },
+        { "repeated", "image-repeated" },
+        { "smooth", "image-smooth" },
+        { "color", "image-color" },
+        { "border-top", "image-border-top" },
+        { "border-right", "image-border-right" },
+        { "border-bottom", "image-border-bottom" },
+        { "border-left", "image-border-left" },
+        { "border", "image-border" },
+        { "auto-resize", "image-auto-resize" },
+        { "individual-animation", "image-individual-animation" },
+        { "src", "image-source" }
     };
 
     static const std::unordered_map<std::string, std::string> cssMap = {
-        {"active", "active"},
-        {"focus", "focus"},
-        {"hover", "hover"},
-        {"pressed", "pressed"},
-        {"checked", "checked"},
-        {"disabled", "disabled"},
-        {"first-child", "first"},
-        {"middle", "middle"},
-        {"last-child", "last"},
-        {"nth-child(even)", "alternate"},
-        {"nth-child(odd)", "alternate"},
-        {"on", "on"},
-        {"[aria-pressed='true']", "on"},
-        {"[data-on]", "on"},
-        {"dragging", "dragging"},
-        {"hidden", "hidden"},
-        {"[hidden]", "hidden"},
-        {"mobile", "mobile"},
-        {"@media", "mobile"}
+        { "active", "active" },
+        { "focus", "focus" },
+        { "hover", "hover" },
+        { "pressed", "pressed" },
+        { "checked", "checked" },
+        { "disabled", "disabled" },
+        { "first-child", "first" },
+        { "middle", "middle" },
+        { "last-child", "last" },
+        { "nth-child(even)", "alternate" },
+        { "nth-child(odd)", "alternate" },
+        { "on", "on" },
+        { "[aria-pressed='true']", "on" },
+        { "[data-on]", "on" },
+        { "dragging", "dragging" },
+        { "hidden", "hidden" },
+        { "[hidden]", "hidden" },
+        { "mobile", "mobile" },
+        { "@media", "mobile" }
     };
 
     static const std::unordered_set<std::string_view> kProps = {
@@ -104,13 +105,15 @@ namespace {
         "writing-mode"
     };
 
-    static inline bool isInheritable(std::string_view prop) noexcept {
+    static inline bool isInheritable(std::string_view prop) noexcept
+    {
         if (prop.starts_with("*"))
             prop.remove_prefix(1);
         return kProps.find(prop) != kProps.end();
     }
 
-    void setChildrenStyles(std::string_view htmlId, HtmlNode* n, const std::string& style, const std::string& prop, const std::string& value) {
+    void setChildrenStyles(std::string_view htmlId, HtmlNode* n, const std::string& style, const std::string& prop, const std::string& value)
+    {
         if (n->getType() == NodeType::Element)
             n->getInheritableStyles()[style][prop] = value;
 
@@ -118,19 +121,21 @@ namespace {
             auto& styleMap = child->getStyles()[style];
             auto it = styleMap.find(prop);
             if (it == styleMap.end() || !it->second.important) {
-                child->getStyles()[style][prop] = { .value = value , .inheritedFromId = std::string{htmlId} };
+                child->getStyles()[style][prop] = { .value = value, .inheritedFromId = std::string{ htmlId } };
                 setChildrenStyles(htmlId, child.get(), style, prop, value);
             }
         }
     }
 
-    std::string cssToState(const std::string& css) {
+    std::string cssToState(const std::string& css)
+    {
         if (auto it = cssMap.find(css); it != cssMap.end())
             return it->second;
         return "";
     }
 
-    void parseAttrPropList(std::string_view attrsStr, std::map<std::string, std::string>& attrsMap) {
+    void parseAttrPropList(std::string_view attrsStr, std::map<std::string, std::string>& attrsMap)
+    {
         for (auto& data : stdext::split(attrsStr, ";")) {
             stdext::trim(data);
             auto attr = stdext::split(data, ":");
@@ -142,7 +147,8 @@ namespace {
         }
     }
 
-    void translateAttribute(std::string_view styleName, std::string_view tagName, std::string& attr, std::string& value) {
+    void translateAttribute(std::string_view styleName, std::string_view tagName, std::string& attr, std::string& value)
+    {
         if (attr == "*style") {
             attr = "*mergeStyle";
         } else if (attr == "*if") {
@@ -165,7 +171,8 @@ namespace {
         }
     }
 
-    std::string_view translateStyleName(std::string_view styleName, const HtmlNodePtr& el) {
+    std::string_view translateStyleName(std::string_view styleName, const HtmlNodePtr& el)
+    {
         if (styleName == "select") {
             return "QtComboBox";
         }
@@ -189,7 +196,8 @@ namespace {
         return styleName;
     }
 
-    void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups) {
+    void createRadioGroup(const HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups)
+    {
         const auto& name = node->getAttr("name");
         if (name.empty())
             return;
@@ -205,7 +213,8 @@ namespace {
         group->callLuaField("addWidget", node->getWidget());
     }
 
-    void applyStyleSheet(HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist) {
+    void applyStyleSheet(HtmlNode* mainNode, std::string_view htmlPath, const css::StyleSheet& sheet, bool checkRuleExist)
+    {
         for (const auto& rule : sheet.rules) {
             const auto& selectors = stdext::join(rule.selectors);
             const auto& nodes = mainNode->querySelectorAll(selectors);
@@ -231,7 +240,7 @@ namespace {
                                 auto& styleMap = node->getStyles()[style];
                                 auto it = styleMap.find(decl.property);
                                 if (it == styleMap.end() || !it->second.important) {
-                                    styleMap[decl.property] = { .value = decl.value , .inheritedFromId = "",
+                                    styleMap[decl.property] = { .value = decl.value, .inheritedFromId = "",
                                         .important = decl.important };
                                     if (!is_all && isInheritable(decl.property)) {
                                         setChildrenStyles(widget->getHtmlId(), node.get(), style, decl.property, decl.value);
@@ -249,7 +258,7 @@ namespace {
                         auto& styleMap = node->getStyles()["styles"];
                         auto it = styleMap.find(decl.property);
                         if (it == styleMap.end() || !it->second.important) {
-                            styleMap[decl.property] = { .value = decl.value , .inheritedFromId = "", .important = decl.important };
+                            styleMap[decl.property] = { .value = decl.value, .inheritedFromId = "", .important = decl.important };
                             if (!is_all && isInheritable(decl.property)) {
                                 setChildrenStyles(widget->getHtmlId(), node.get(), "styles", decl.property, decl.value);
                             }
@@ -261,7 +270,8 @@ namespace {
     };
 }
 
-bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName) {
+bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent, const std::string& moduleName)
+{
     if (!parent || !parent->getHtmlNode())
         return true;
 
@@ -280,7 +290,8 @@ bool checkSpecialCase(const HtmlNodePtr& node, const UIWidgetPtr& parent, const 
     return true;
 }
 
-UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName, std::vector<UIWidgetPtr>& widgets) {
+UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& parent, std::vector<HtmlNodePtr>& textNodes, uint32_t htmlId, const std::string& moduleName, std::vector<UIWidgetPtr>& widgets)
+{
     if (!checkSpecialCase(node, parent, moduleName))
         return nullptr;
 
@@ -317,7 +328,8 @@ UIWidgetPtr createWidgetFromNode(const HtmlNodePtr& node, const UIWidgetPtr& par
     return widget;
 }
 
-void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups, const std::string& moduleName) {
+void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_map<std::string, UIWidgetPtr>& groups, const std::string& moduleName)
+{
     const auto& styleValue = node->getAttr("style");
     if (!styleValue.empty()) {
         parseAttrPropList(styleValue, node->getAttrStyles());
@@ -349,13 +361,14 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
                 nodeAttr->setValue(value.value);
                 meta->addChild(nodeAttr);
             }
-        } else for (const auto [prop, value] : stylesMap) {
-            stylesMerge[prop] = value;
-        }
+        } else
+            for (const auto [prop, value] : stylesMap) {
+                stylesMerge[prop] = value;
+            }
     }
 
     for (const auto& [prop, value] : node->getAttrStyles()) {
-        stylesMerge[prop] = { .value = value , .inheritedFromId = "", .important = false };
+        stylesMerge[prop] = { .value = value, .inheritedFromId = "", .important = false };
     }
 
     for (const auto [prop, value] : stylesMerge) {
@@ -418,7 +431,8 @@ void applyAttributesAndStyles(UIWidget* widget, HtmlNode* node, std::unordered_m
     node->setStyleResolved(true);
 }
 
-UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId) {
+UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, const std::string& moduleName, const std::string& htmlPath, bool checkRuleExist, uint32_t htmlId)
+{
     auto path = "/modules/" + moduleName + "/";
 
     std::string script;
@@ -449,7 +463,7 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
                     n->getInheritableStyles() = parent->getHtmlNode()->getInheritableStyles();
                     for (const auto& [styleName, styleMap] : n->getInheritableStyles()) {
                         for (auto& [style, value] : styleMap)
-                            n->getStyles()[styleName][style] = { .value = value , .inheritedFromId = parent->getHtmlId() };
+                            n->getStyles()[styleName][style] = { .value = value, .inheritedFromId = parent->getHtmlId() };
                     }
                 }
                 widget = createWidgetFromNode(n, parent, textNodes, htmlId, moduleName, widgets);
@@ -499,7 +513,8 @@ UIWidgetPtr HtmlManager::readNode(DataRoot& root, const UIWidgetPtr& parent, con
     return widget;
 }
 
-uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent) {
+uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htmlPath, UIWidgetPtr parent)
+{
     auto path = "/modules/" + moduleName + "/";
     auto htmlContent = g_resources.readFileContents(path + htmlPath);
 
@@ -517,7 +532,8 @@ uint32_t HtmlManager::load(const std::string& moduleName, const std::string& htm
     return ID;
 }
 
-UIWidgetPtr HtmlManager::createWidgetFromHTML(std::string html, const UIWidgetPtr& parent, uint32_t htmlId) {
+UIWidgetPtr HtmlManager::createWidgetFromHTML(std::string html, const UIWidgetPtr& parent, uint32_t htmlId)
+{
     auto it = m_nodes.find(htmlId);
     if (it == m_nodes.end()) {
         return nullptr;
@@ -532,7 +548,8 @@ UIWidgetPtr HtmlManager::createWidgetFromHTML(std::string html, const UIWidgetPt
     return readNode(rootCopy, parent, it->second.moduleName, "", false, htmlId);
 }
 
-void HtmlManager::destroy(uint32_t id) {
+void HtmlManager::destroy(uint32_t id)
+{
     auto it = m_nodes.find(id);
     if (it == m_nodes.end())
         return;
@@ -557,11 +574,13 @@ void HtmlManager::destroy(uint32_t id) {
     m_nodes.erase(it);
 }
 
-void HtmlManager::addGlobalStyle(const std::string& stylePath) {
+void HtmlManager::addGlobalStyle(const std::string& stylePath)
+{
     GLOBAL_STYLES.emplace_back(css::parse(g_resources.readFileContents(stylePath)));
 }
 
-const DataRoot* HtmlManager::getRoot(uint32_t id) {
+const DataRoot* HtmlManager::getRoot(uint32_t id)
+{
     auto it = m_nodes.find(id);
     if (it != m_nodes.end()) {
         return &it->second;
@@ -570,7 +589,8 @@ const DataRoot* HtmlManager::getRoot(uint32_t id) {
     return nullptr;
 }
 
-UIWidgetPtr HtmlManager::getRootWidget(uint32_t id) {
+UIWidgetPtr HtmlManager::getRootWidget(uint32_t id)
+{
     if (const auto root = getRoot(id)) {
         if (const auto& firstNode = root->node->querySelector("html > :first")) {
             return firstNode->getWidget();

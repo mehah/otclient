@@ -92,7 +92,11 @@ public:
 
     void addTimedSquare(uint8_t color);
     void removeTimedSquare() { m_showTimedSquare = false; }
-    void showStaticSquare(const Color& color) { m_showStaticSquare = true; m_staticSquareColor = color; }
+    void showStaticSquare(const Color& color)
+    {
+        m_showStaticSquare = true;
+        m_staticSquareColor = color;
+    }
     void hideStaticSquare() { m_showStaticSquare = false; }
 
     // walk related
@@ -163,8 +167,10 @@ public:
     void setCovered(bool covered);
 
     bool isDisabledWalkAnimation() { return m_disableWalkAnimation > 0; }
-    void setDisableWalkAnimation(const bool v) {
-        if (v) ++m_disableWalkAnimation; else {
+    void setDisableWalkAnimation(const bool v)
+    {
+        if (v) ++m_disableWalkAnimation;
+        else {
             if (m_disableWalkAnimation <= 1) m_disableWalkAnimation = 0;
             else --m_disableWalkAnimation;
         }
@@ -174,10 +180,11 @@ public:
     void sendTyping();
     bool getTyping() { return m_typing; }
     void setTypingIconTexture(const std::string& filename);
-    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed) {
+    void setBounce(const uint8_t minHeight, const uint8_t height, const uint16_t speed)
+    {
         m_bounce = { .minHeight =
-minHeight,
-.height = height, .speed = speed
+            minHeight,
+            .height = height, .speed = speed
         };
     }
 
@@ -189,16 +196,19 @@ minHeight,
     void clearText() { setText("", Color::white); }
     bool canShoot(int distance);
 
-    const auto& getIcons() {
+    const auto& getIcons()
+    {
         static std::vector<std::tuple<uint8_t, uint8_t, uint16_t>> vec;
         return m_icons ? m_icons->iconEntries : vec;
     }
 
-    bool isCameraFollowing() const {
+    bool isCameraFollowing() const
+    {
         return m_cameraFollowing;
     }
 
-    void setCameraFollowing(bool v) {
+    void setCameraFollowing(bool v)
+    {
         m_cameraFollowing = v;
     }
 

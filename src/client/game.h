@@ -152,7 +152,10 @@ struct HomeOffer
     uint16_t mountClientId;
     uint16_t itemType;
     uint16_t sexId;
-    struct { uint8_t lookHead, lookBody, lookLegs, lookFeet; } outfit;
+    struct
+    {
+        uint8_t lookHead, lookBody, lookLegs, lookFeet;
+    } outfit;
     uint8_t tryOnType;
     uint16_t collection;
     uint16_t popularityScore;
@@ -655,12 +658,12 @@ protected:
 
     // outfit
     void processOpenOutfitWindow(const Outfit& currentOutfit, const std::vector<std::tuple<uint16_t, std::string, uint8_t, uint8_t>>& outfitList,
-                                const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& familiarList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& effectsList,
-                                const std::vector<std::tuple<uint16_t, std::string>>& shaderList);
+                                 const std::vector<std::tuple<uint16_t, std::string, uint8_t>>& mountList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& familiarList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& wingsList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& aurasList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& effectsList,
+                                 const std::vector<std::tuple<uint16_t, std::string>>& shaderList);
 
     // npc trade
     static void processOpenNpcTrade(const std::vector<std::tuple<ItemPtr, std::string, uint32_t, uint32_t, uint32_t>>& items);
@@ -688,18 +691,18 @@ protected:
     // cyclopedia
     static void processItemDetail(uint32_t itemId, const std::vector<std::tuple<std::string, std::string>>& descriptions);
     static void processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
-                                                    const std::vector<std::tuple<uint8_t, uint16_t>>& combats);
+                                                       const std::vector<std::tuple<uint8_t, uint16_t>>& combats);
     static void processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, double mitigation,
-                                                    const std::vector<std::vector<uint16_t>>& additionalSkillsArray,
-                                                    const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
-                                                    const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray,
-                                                    const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray);
+                                                      const std::vector<std::vector<uint16_t>>& additionalSkillsArray,
+                                                      const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
+                                                      const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray,
+                                                      const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray);
     static void processCyclopediaCharacterGeneralStatsBadge(uint8_t showAccountInformation, uint8_t playerOnline, uint8_t playerPremium,
                                                             std::string_view loyaltyTitle,
                                                             const std::vector<std::tuple<uint32_t, std::string>>& badgesVector);
     static void processCyclopediaCharacterItemSummary(const CyclopediaCharacterItemSummary& data);
     static void processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits,
-                                                    const std::vector<CharacterInfoMounts>& mounts, const std::vector<CharacterInfoFamiliar>& familiars);
+                                                      const std::vector<CharacterInfoMounts>& mounts, const std::vector<CharacterInfoFamiliar>& familiars);
     static void processCyclopediaCharacterRecentDeaths(const CyclopediaCharacterRecentDeaths& data);
     static void processCyclopediaCharacterRecentPvpKills(const CyclopediaCharacterRecentPvPKills& data);
     static void processParseBestiaryRaces(const std::vector<CyclopediaBestiaryRace>& bestiaryData);
@@ -914,7 +917,7 @@ public:
     ProtocolGamePtr getProtocolGame() { return m_protocolGame; }
     std::string getCharacterName() { return m_characterName; }
     std::string getWorldName() { return m_worldName; }
-    std::vector<uint8_t > getGMActions() { return m_gmActions; }
+    std::vector<uint8_t> getGMActions() { return m_gmActions; }
     bool isGM() { return !m_gmActions.empty(); }
 
     std::string formatCreatureName(std::string_view name);
@@ -980,7 +983,8 @@ public:
     void processCyclopediaCharacterDefenceStats(const CyclopediaCharacterDefenceStats& data);
     void processCyclopediaCharacterMiscStats(const CyclopediaCharacterMiscStats& data);
 
-    void updateMapLatency() {
+    void updateMapLatency()
+    {
         if (!m_mapUpdateTimer.first) {
             m_mapUpdatedAt = m_mapUpdateTimer.second.ticksElapsed();
             m_mapUpdateTimer.first = true;
@@ -1037,7 +1041,7 @@ private:
     std::string m_characterName;
     std::string m_worldName;
     std::string m_clientSignature;
-    std::vector<uint8_t > m_gmActions;
+    std::vector<uint8_t> m_gmActions;
     std::bitset<Otc::LastGameFeature> m_features;
 
     stdext::map<int, ContainerPtr> m_containers;

@@ -62,20 +62,63 @@ public:
     [[nodiscard]] constexpr uint32_t rgba() const { return static_cast<uint32_t>(a() << 24 | b() << 16 | g() << 8 | r()); }
     [[nodiscard]] constexpr size_t hash() const { return m_hash; }
 
-    void setRed(const int r) { m_r = static_cast<uint8_t>(r) / 255.f; update(); }
-    void setGreen(const int g) { m_g = static_cast<uint8_t>(g) / 255.f; update(); }
-    void setBlue(const int b) { m_b = static_cast<uint8_t>(b) / 255.f; update(); }
-    void setAlpha(const int a) { m_a = static_cast<uint8_t>(a) / 255.f; update(); }
+    void setRed(const int r)
+    {
+        m_r = static_cast<uint8_t>(r) / 255.f;
+        update();
+    }
+    void setGreen(const int g)
+    {
+        m_g = static_cast<uint8_t>(g) / 255.f;
+        update();
+    }
+    void setBlue(const int b)
+    {
+        m_b = static_cast<uint8_t>(b) / 255.f;
+        update();
+    }
+    void setAlpha(const int a)
+    {
+        m_a = static_cast<uint8_t>(a) / 255.f;
+        update();
+    }
 
-    void setRed(const float r) { m_r = r; update(); }
-    void setGreen(const float g) { m_g = g; update(); }
-    void setBlue(const float b) { m_b = b; update(); }
-    void setAlpha(const float a) { m_a = a; update(); }
+    void setRed(const float r)
+    {
+        m_r = r;
+        update();
+    }
+    void setGreen(const float g)
+    {
+        m_g = g;
+        update();
+    }
+    void setBlue(const float b)
+    {
+        m_b = b;
+        update();
+    }
+    void setAlpha(const float a)
+    {
+        m_a = a;
+        update();
+    }
 
-    void setRGBA(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 0xFF) { m_r = r / 255.f; m_g = g / 255.f; m_b = b / 255.f; m_a = a / 255.f; update(); }
+    void setRGBA(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a = 0xFF)
+    {
+        m_r = r / 255.f;
+        m_g = g / 255.f;
+        m_b = b / 255.f;
+        m_a = a / 255.f;
+        update();
+    }
     void setRGBA(const uint32_t rgba) { setRGBA((rgba >> 0) & 0xff, (rgba >> 8) & 0xff, (rgba >> 16) & 0xff, (rgba >> 24) & 0xff); }
 
-    Color& operator=(const uint32_t rgba) { setRGBA(rgba); return *this; }
+    Color& operator=(const uint32_t rgba)
+    {
+        setRGBA(rgba);
+        return *this;
+    }
     constexpr Color& operator=(const Color& other) = default;
 
     void blend(const Color& color)

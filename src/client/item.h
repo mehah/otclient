@@ -80,9 +80,21 @@ public:
 
     void setId(uint32_t id) override;
 
-    void setCountOrSubType(const int value) { m_countOrSubType = value; updatePatterns(); }
-    void setCount(const int count) { m_countOrSubType = count; updatePatterns(); }
-    void setSubType(const int subType) { m_countOrSubType = subType; updatePatterns(); }
+    void setCountOrSubType(const int value)
+    {
+        m_countOrSubType = value;
+        updatePatterns();
+    }
+    void setCount(const int count)
+    {
+        m_countOrSubType = count;
+        updatePatterns();
+    }
+    void setSubType(const int subType)
+    {
+        m_countOrSubType = subType;
+        updatePatterns();
+    }
     void setColor(const Color& c) { if (m_color != c) m_color = c; }
     void setPosition(const Position& position, uint8_t stackPos = 0) override;
     void setTooltip(const std::string& str) { m_tooltip = str; }
@@ -108,7 +120,8 @@ public:
 
     void updatePatterns();
     int calculateAnimationPhase();
-    int getExactSize(const int layer = 0, int /*xPattern*/ = 0, int /*yPattern*/ = 0, int /*zPattern*/ = 0, int /*animationPhase*/ = 0) override {
+    int getExactSize(const int layer = 0, int /*xPattern*/  = 0, int /*yPattern*/  = 0, int /*zPattern*/  = 0, int /*animationPhase*/  = 0) override
+    {
         return Thing::getExactSize(layer, m_numPatternX, m_numPatternY, m_numPatternZ, calculateAnimationPhase());
     }
 
@@ -126,7 +139,7 @@ public:
     uint16_t getDepotId() { return m_attribs.get<uint16_t>(ATTR_DEPOT_ID, 0); }
 
     void setDoorId(uint8_t doorId) { m_attribs.set(ATTR_HOUSEDOORID, doorId); }
-    uint8_t getDoorId() { return m_attribs.get<uint8_t >(ATTR_HOUSEDOORID, 0); }
+    uint8_t getDoorId() { return m_attribs.get<uint8_t>(ATTR_HOUSEDOORID, 0); }
 
     uint16_t getUniqueId() { return m_attribs.get<uint16_t>(ATTR_UNIQUE_ID, 0); }
     uint16_t getActionId() { return m_attribs.get<uint16_t>(ATTR_ACTION_ID, 0); }

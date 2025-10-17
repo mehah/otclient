@@ -46,7 +46,8 @@ static bool matchFrom(const HtmlNodePtr&, const Selector&, size_t);
 
 thread_local const HtmlNode* g_qs_scope = nullptr;
 
-static inline bool isDescendantOf(const HtmlNodePtr& node, const HtmlNode* scope) {
+static inline bool isDescendantOf(const HtmlNodePtr& node, const HtmlNode* scope)
+{
     auto p = node;
     while (p) {
         if (p.get() == scope) return true;
@@ -55,7 +56,8 @@ static inline bool isDescendantOf(const HtmlNodePtr& node, const HtmlNode* scope
     return false;
 }
 
-static inline bool wantsNodeAll(const SimpleSelector& s) {
+static inline bool wantsNodeAll(const SimpleSelector& s)
+{
     for (const auto& p : s.pseudos)
         if (p == "node-all" || p == "all-node" || p == "nodes")
             return true;
@@ -66,8 +68,14 @@ static inline bool isSpace(unsigned char c) { return std::isspace(c); }
 static inline bool isAlphaNum_(unsigned char c) { return std::isalnum(c) || c == '-' || c == '_'; }
 static inline bool isElement(const HtmlNodePtr& n) { return n && n->getType() == NodeType::Element; }
 
-struct PtrHash { size_t operator()(const HtmlNode* p) const noexcept { return std::hash<const void*>{}(p); } };
-struct PtrEq { bool operator()(const HtmlNode* a, const HtmlNode* b) const noexcept { return a == b; } };
+struct PtrHash
+{
+    size_t operator()(const HtmlNode* p) const noexcept { return std::hash<const void*>{}(p); }
+};
+struct PtrEq
+{
+    bool operator()(const HtmlNode* a, const HtmlNode* b) const noexcept { return a == b; }
+};
 
 struct SelectorStep
 {
@@ -80,45 +88,99 @@ struct Selector
 {
     std::vector<SelectorStep> steps;
 
-    static std::vector<std::string> splitSelectorList(const std::string& s) {
-        std::vector<std::string> parts; std::string cur; int paren = 0, bracket = 0;
+    static std::vector<std::string> splitSelectorList(const std::string& s)
+    {
+        std::vector<std::string> parts;
+        std::string cur;
+        int paren = 0, bracket = 0;
         for (char ch : s) {
-            if (ch == '(') ++paren; else if (ch == ')') --paren;
-            else if (ch == '[') ++bracket; else if (ch == ']') --bracket;
-            if (ch == ',' && paren == 0 && bracket == 0) { if (!cur.empty()) { parts.push_back(cur); cur.clear(); } } else cur.push_back(ch);
+            if (ch == '(') ++paren;
+            else if (ch == ')') --paren;
+            else if (ch == '[') ++bracket;
+            else if (ch == ']') --bracket;
+            if (ch == ',' && paren == 0 && bracket == 0) {
+                if (!cur.empty()) {
+                    parts.push_back(cur);
+                    cur.clear();
+                }
+            } else cur.push_back(ch);
         }
         if (!cur.empty()) parts.push_back(cur);
         return parts;
     }
 
-    static std::vector<std::string> tokenize(const std::string& s) {
-        std::vector<std::string> tokens; std::string cur; int paren = 0, bracket = 0;
-        auto flush = [&] { if (!cur.empty()) { tokens.push_back(cur); cur.clear(); } };
+    static std::vector<std::string> tokenize(const std::string& s)
+    {
+        std::vector<std::string> tokens;
+        std::string cur;
+        int paren = 0, bracket = 0;
+        auto flush = [&] {
+            if (!cur.empty()) {
+                tokens.push_back(cur);
+                cur.clear();
+            }
+        };
         for (char ch : s) {
-            if (ch == '(') ++paren; else if (ch == ')') --paren;
-            else if (ch == '[') ++bracket; else if (ch == ']') --bracket;
-            if (paren == 0 && bracket == 0 && (ch == '>' || ch == '+' || ch == '~')) { flush(); tokens.emplace_back(1, ch); } else if (paren == 0 && bracket == 0 && isSpace((unsigned char)ch)) { flush(); } else cur.push_back(ch);
+            if (ch == '(') ++paren;
+            else if (ch == ')') --paren;
+            else if (ch == '[') ++bracket;
+            else if (ch == ']') --bracket;
+            if (paren == 0 && bracket == 0 && (ch == '>' || ch == '+' || ch == '~')) {
+                flush();
+                tokens.emplace_back(1, ch);
+            } else if (paren == 0 && bracket == 0 && isSpace((unsigned char)ch)) { flush(); } else cur.push_back(ch);
         }
-        flush(); return tokens;
+        flush();
+        return tokens;
     }
 
-    static SimpleSelector parseCompound(const std::string& tok) {
-        SimpleSelector s; size_t i = 0;
-        auto readIdent = [&](std::string& out) { size_t st = i; while (i < tok.size() && isAlphaNum_((unsigned char)tok[i])) ++i; out = tok.substr(st, i - st); };
+    static SimpleSelector parseCompound(const std::string& tok)
+    {
+        SimpleSelector s;
+        size_t i = 0;
+        auto readIdent = [&](std::string& out) {
+            size_t st = i;
+            while (i < tok.size() && isAlphaNum_((unsigned char)tok[i])) ++i;
+            out = tok.substr(st, i - st);
+        };
         if (i < tok.size()) {
-            if (tok[i] == '*') { ++i; } else if (std::isalpha((unsigned char)tok[i])) { readIdent(s.tag); ascii_tolower_inplace(s.tag); }
+            if (tok[i] == '*') { ++i; } else if (std::isalpha((unsigned char)tok[i])) {
+                readIdent(s.tag);
+                ascii_tolower_inplace(s.tag);
+            }
         }
         while (i < tok.size()) {
             char c = tok[i];
-            if (c == '.') { ++i; std::string cls; readIdent(cls); if (!cls.empty()) s.classes.push_back(cls); } else if (c == '#') { ++i; std::string id; readIdent(id); s.id = id; } else if (c == '[') {
-                ++i; while (i < tok.size() && isSpace((unsigned char)tok[i])) ++i;
-                size_t ks = i; while (i < tok.size() && !isSpace((unsigned char)tok[i]) && tok[i] != ']' && tok[i] != '=' && tok[i] != '~' && tok[i] != '^' && tok[i] != '$' && tok[i] != '*' && tok[i] != '|') ++i;
-                std::string key = tok.substr(ks, i - ks); ascii_tolower_inplace(key);
+            if (c == '.') {
+                ++i;
+                std::string cls;
+                readIdent(cls);
+                if (!cls.empty()) s.classes.push_back(cls);
+            } else if (c == '#') {
+                ++i;
+                std::string id;
+                readIdent(id);
+                s.id = id;
+            } else if (c == '[') {
+                ++i;
                 while (i < tok.size() && isSpace((unsigned char)tok[i])) ++i;
-                AttrTest::Op op = AttrTest::Op::Present; std::string val;
+                size_t ks = i;
+                while (i < tok.size() && !isSpace((unsigned char)tok[i]) && tok[i] != ']' && tok[i] != '=' && tok[i] != '~' && tok[i] != '^' && tok[i] != '$' && tok[i] != '*' && tok[i] != '|') ++i;
+                std::string key = tok.substr(ks, i - ks);
+                ascii_tolower_inplace(key);
+                while (i < tok.size() && isSpace((unsigned char)tok[i])) ++i;
+                auto op = AttrTest::Op::Present;
+                std::string val;
                 if (i < tok.size() && (tok[i] == '=' || tok[i] == '~' || tok[i] == '^' || tok[i] == '$' || tok[i] == '*' || tok[i] == '|')) {
-                    std::string opStr; if (i + 1 < tok.size() && tok[i + 1] == '=') { opStr = tok.substr(i, 2); i += 2; } else if (tok[i] == '=') { opStr = "="; ++i; }
-                    if (opStr == "=")  op = AttrTest::Op::Equals;
+                    std::string opStr;
+                    if (i + 1 < tok.size() && tok[i + 1] == '=') {
+                        opStr = tok.substr(i, 2);
+                        i += 2;
+                    } else if (tok[i] == '=') {
+                        opStr = "=";
+                        ++i;
+                    }
+                    if (opStr == "=") op = AttrTest::Op::Equals;
                     if (opStr == "~=") op = AttrTest::Op::Includes;
                     if (opStr == "^=") op = AttrTest::Op::Prefix;
                     if (opStr == "$=") op = AttrTest::Op::Suffix;
@@ -126,57 +188,89 @@ struct Selector
                     if (opStr == "|=") op = AttrTest::Op::DashMatch;
                     while (i < tok.size() && isSpace((unsigned char)tok[i])) ++i;
                     if (i < tok.size() && (tok[i] == '\"' || tok[i] == '\'')) {
-                        char q = tok[i++]; size_t vs = i; while (i < tok.size() && tok[i] != q) ++i;
-                        val = tok.substr(vs, i - vs); if (i < tok.size()) ++i;
+                        char q = tok[i++];
+                        size_t vs = i;
+                        while (i < tok.size() && tok[i] != q) ++i;
+                        val = tok.substr(vs, i - vs);
+                        if (i < tok.size()) ++i;
                     } else {
-                        size_t vs = i; while (i < tok.size() && tok[i] != ']') ++i;
-                        val = tok.substr(vs, i - vs); while (!val.empty() && isSpace((unsigned char)val.back())) val.pop_back();
+                        size_t vs = i;
+                        while (i < tok.size() && tok[i] != ']') ++i;
+                        val = tok.substr(vs, i - vs);
+                        while (!val.empty() && isSpace((unsigned char)val.back())) val.pop_back();
                     }
                 }
-                while (i < tok.size() && tok[i] != ']') ++i; if (i < tok.size()) ++i;
+                while (i < tok.size() && tok[i] != ']') ++i;
+                if (i < tok.size()) ++i;
                 s.attrs.push_back({ .key = key, .val = val, .op = op });
             } else if (c == ':') {
-                ++i; size_t ps = i; while (i < tok.size() && tok[i] != ':') ++i; s.pseudos.push_back(tok.substr(ps, i - ps));
+                ++i;
+                size_t ps = i;
+                while (i < tok.size() && tok[i] != ':') ++i;
+                s.pseudos.push_back(tok.substr(ps, i - ps));
             } else ++i;
         }
         return s;
     }
 
-    static Selector parse(const std::string& selectorStr) {
+    static Selector parse(const std::string& selectorStr)
+    {
         auto tokens = tokenize(selectorStr);
-        struct LStep { SimpleSelector ss; char comb = ' '; };
-        std::vector<LStep> left; char lastComb = ' ';
+        struct LStep
+        {
+            SimpleSelector ss;
+            char comb = ' ';
+        };
+        std::vector<LStep> left;
+        char lastComb = ' ';
         for (const auto& t : tokens) {
-            if (t == ">" || t == "+" || t == "~") { lastComb = t[0]; continue; }
-            LStep ls; ls.ss = parseCompound(t); ls.comb = lastComb; lastComb = ' '; left.push_back(std::move(ls));
+            if (t == ">" || t == "+" || t == "~") {
+                lastComb = t[0];
+                continue;
+            }
+            LStep ls;
+            ls.ss = parseCompound(t);
+            ls.comb = lastComb;
+            lastComb = ' ';
+            left.push_back(std::move(ls));
         }
         Selector sel;
         for (int i = (int)left.size() - 1; i >= 0; --i) {
-            SelectorStep step; step.simple = std::move(left[i].ss);
+            SelectorStep step;
+            step.simple = std::move(left[i].ss);
             char c = left[i].comb;
             switch (c) {
-                case '>': step.combinatorToPrev = SelectorStep::Combinator::Child; break;
-                case '+': step.combinatorToPrev = SelectorStep::Combinator::Adjacent; break;
-                case '~': step.combinatorToPrev = SelectorStep::Combinator::Sibling; break;
-                default:  step.combinatorToPrev = SelectorStep::Combinator::Descendant; break;
+                case '>': step.combinatorToPrev = SelectorStep::Combinator::Child;
+                    break;
+                case '+': step.combinatorToPrev = SelectorStep::Combinator::Adjacent;
+                    break;
+                case '~': step.combinatorToPrev = SelectorStep::Combinator::Sibling;
+                    break;
+                default: step.combinatorToPrev = SelectorStep::Combinator::Descendant;
+                    break;
             }
             sel.steps.push_back(std::move(step));
         }
         return sel;
     }
 
-    static bool matchesNth(int idx1Based, const std::string& expr) {
-        std::string s; for (char c : expr) if (!isSpace((unsigned char)c)) s.push_back(c);
+    static bool matchesNth(int idx1Based, const std::string& expr)
+    {
+        std::string s;
+        for (char c : expr) if (!isSpace((unsigned char)c)) s.push_back(c);
         ascii_tolower_inplace(s);
         if (s == "odd") return (idx1Based % 2) == 1;
         if (s == "even") return (idx1Based % 2) == 0;
-        int a = 0, b = 0; auto npos = s.find('n');
+        int a = 0, b = 0;
+        auto npos = s.find('n');
         if (npos == std::string::npos) {
             try { b = std::stoi(s); } catch (...) { return false; }
             return idx1Based == b;
         }
         std::string aStr = s.substr(0, npos), bStr = s.substr(npos + 1);
-        if (aStr.empty() || aStr == "+") a = 1; else if (aStr == "-") a = -1; else { try { a = std::stoi(aStr); } catch (...) { return false; } }
+        if (aStr.empty() || aStr == "+") a = 1;
+        else if (aStr == "-") a = -1;
+        else { try { a = std::stoi(aStr); } catch (...) { return false; } }
         if (!bStr.empty()) { try { b = std::stoi(bStr); } catch (...) { return false; } }
         if (a == 0) return idx1Based == b;
         int diff = idx1Based - b;
@@ -184,26 +278,32 @@ struct Selector
         return diff / a >= 0;
     }
 
-    static bool attrMatch(const std::string& v, const AttrTest& a) {
+    static bool attrMatch(const std::string& v, const AttrTest& a)
+    {
         switch (a.op) {
-            case AttrTest::Op::Present:  return !v.empty();
-            case AttrTest::Op::Equals:   return v == a.val;
-            case AttrTest::Op::Includes: {
-                size_t i = 0; while (i < v.size()) {
+            case AttrTest::Op::Present: return !v.empty();
+            case AttrTest::Op::Equals: return v == a.val;
+            case AttrTest::Op::Includes:
+            {
+                size_t i = 0;
+                while (i < v.size()) {
                     while (i < v.size() && isSpace((unsigned char)v[i])) ++i;
-                    size_t s = i; while (i < v.size() && !isSpace((unsigned char)v[i])) ++i;
+                    size_t s = i;
+                    while (i < v.size() && !isSpace((unsigned char)v[i])) ++i;
                     if (s < i && v.substr(s, i - s) == a.val) return true;
-                } return false;
+                }
+                return false;
             }
-            case AttrTest::Op::Prefix:   return v.starts_with(a.val);
-            case AttrTest::Op::Suffix:   return v.size() >= a.val.size() && v.ends_with(a.val);
-            case AttrTest::Op::Substr:   return v.find(a.val) != std::string::npos;
-            case AttrTest::Op::DashMatch:return v == a.val || (v.size() > a.val.size() && v.starts_with(a.val + "-"));
+            case AttrTest::Op::Prefix: return v.starts_with(a.val);
+            case AttrTest::Op::Suffix: return v.size() >= a.val.size() && v.ends_with(a.val);
+            case AttrTest::Op::Substr: return v.find(a.val) != std::string::npos;
+            case AttrTest::Op::DashMatch: return v == a.val || (v.size() > a.val.size() && v.starts_with(a.val + "-"));
         }
         return false;
     }
 
-    [[nodiscard]] bool matchesSimple(const HtmlNodePtr& node, const SimpleSelector& s) const {
+    [[nodiscard]] bool matchesSimple(const HtmlNodePtr& node, const SimpleSelector& s) const
+    {
         if (!node) return false;
 
         const bool isElem = node->getType() == NodeType::Element;
@@ -224,7 +324,13 @@ struct Selector
         if (!s.tag.empty() && s.tag != "*" && node->getTag() != s.tag) return false;
         if (!s.id.empty() && node->getAttr("id") != s.id) return false;
         for (const auto& cls : s.classes) {
-            bool ok = false; for (const auto& t : node->getClassList()) { if (t == cls) { ok = true; break; } }
+            bool ok = false;
+            for (const auto& t : node->getClassList()) {
+                if (t == cls) {
+                    ok = true;
+                    break;
+                }
+            }
             if (!ok) return false;
         }
         for (const auto& a : s.attrs) {
@@ -232,32 +338,67 @@ struct Selector
         }
 
         if (!s.pseudos.empty()) {
-            auto testPseudo = [&](const std::string& pseudo)->bool {
+            auto testPseudo = [&](const std::string& pseudo)-> bool {
                 if (pseudo == "node-all" || pseudo == "all-node" || pseudo == "nodes") return true;
-                if (pseudo == "hover") { return node->isHovered; } if (pseudo == "focus") { return node->isFocused; } if (pseudo == "active") { return node->isActive; } if (pseudo == "focus-visible") { return node->isFocused; } if (pseudo == "focus-within") { if (node->isFocused) return true;     std::vector<HtmlNodePtr> st; for (auto& c : node->getChildren()) if (isElement(c)) st.push_back(c);     while (!st.empty()) { auto cur = st.back(); st.pop_back(); if (cur->isFocused) return true; for (auto& c : cur->getChildren()) if (isElement(c)) st.push_back(c); }     return false; } if (pseudo == "disabled") { std::string aria = node->getAttr("aria-disabled"); return node->hasAttr("disabled") || aria == "true" || aria == "1"; } if (pseudo == "enabled") { std::string aria = node->getAttr("aria-disabled"); bool dis = node->hasAttr("disabled") || aria == "true" || aria == "1"; return !dis; } if (pseudo == "checked") { std::string aria = node->getAttr("aria-checked"); if (aria == "true" || aria == "1") return true; return node->hasAttr("checked"); }
+                if (pseudo == "hover") { return node->isHovered; }
+                if (pseudo == "focus") { return node->isFocused; }
+                if (pseudo == "active") { return node->isActive; }
+                if (pseudo == "focus-visible") { return node->isFocused; }
+                if (pseudo == "focus-within") {
+                    if (node->isFocused) return true;
+                    std::vector<HtmlNodePtr> st;
+                    for (auto& c : node->getChildren()) if (isElement(c)) st.push_back(c);
+                    while (!st.empty()) {
+                        auto cur = st.back();
+                        st.pop_back();
+                        if (cur->isFocused) return true;
+                        for (auto& c : cur->getChildren()) if (isElement(c)) st.push_back(c);
+                    }
+                    return false;
+                }
+                if (pseudo == "disabled") {
+                    std::string aria = node->getAttr("aria-disabled");
+                    return node->hasAttr("disabled") || aria == "true" || aria == "1";
+                }
+                if (pseudo == "enabled") {
+                    std::string aria = node->getAttr("aria-disabled");
+                    bool dis = node->hasAttr("disabled") || aria == "true" || aria == "1";
+                    return !dis;
+                }
+                if (pseudo == "checked") {
+                    std::string aria = node->getAttr("aria-checked");
+                    if (aria == "true" || aria == "1") return true;
+                    return node->hasAttr("checked");
+                }
                 if (pseudo == "root") { return !node->getParent(); }
                 if (pseudo == "scope") { return g_qs_scope && node.get() == g_qs_scope; }
                 if (pseudo == "first-child") {
                     if (auto p = node->getParent()) {
                         for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element) return c.get() == node.get();
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo == "last-child") {
                     if (auto p = node->getParent()) {
                         for (auto it = p->getChildren().rbegin(); it != p->getChildren().rend(); ++it) if ((*it)->getType() == NodeType::Element) return (*it).get() == node.get();
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo == "only-child") {
                     if (auto p = node->getParent()) {
-                        int cnt = 0; for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element) ++cnt;
+                        int cnt = 0;
+                        for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element) ++cnt;
                         return cnt == 1;
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo == "only-of-type") {
                     if (auto p = node->getParent()) {
-                        int cnt = 0; for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element && c->getTag() == node->getTag()) ++cnt;
+                        int cnt = 0;
+                        for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element && c->getTag() == node->getTag()) ++cnt;
                         return cnt == 1;
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo == "empty") {
                     for (const auto& c : node->getChildren()) {
@@ -276,10 +417,11 @@ struct Selector
                     int idx = 0, total = 0;
                     if (auto p = node->getParent()) {
                         for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element) ++total;
-                        for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element) {
-                            ++idx;
-                            if (c.get() == node.get()) break;
-                        }
+                        for (const auto& c : p->getChildren())
+                            if (c->getType() == NodeType::Element) {
+                                ++idx;
+                                if (c.get() == node.get()) break;
+                            }
                     }
                     int lastIdx = (total - idx) + 1;
                     return matchesNth(lastIdx, inside);
@@ -287,12 +429,14 @@ struct Selector
                 if (pseudo == "first-of-type") {
                     if (auto p = node->getParent()) {
                         for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element && c->getTag() == node->getTag()) return c.get() == node.get();
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo == "last-of-type") {
                     if (auto p = node->getParent()) {
                         for (auto it = p->getChildren().rbegin(); it != p->getChildren().rend(); ++it) if ((*it)->getType() == NodeType::Element && (*it)->getTag() == node->getTag()) return (*it).get() == node.get();
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo.starts_with("nth-of-type(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(12, pseudo.size() - 13);
@@ -304,10 +448,11 @@ struct Selector
                     int idx = 0, total = 0;
                     if (auto p = node->getParent()) {
                         for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element && c->getTag() == node->getTag()) ++total;
-                        for (const auto& c : p->getChildren()) if (c->getType() == NodeType::Element && c->getTag() == node->getTag()) {
-                            ++idx;
-                            if (c.get() == node.get()) break;
-                        }
+                        for (const auto& c : p->getChildren())
+                            if (c->getType() == NodeType::Element && c->getTag() == node->getTag()) {
+                                ++idx;
+                                if (c.get() == node.get()) break;
+                            }
                     }
                     int lastIdx = (total - idx) + 1;
                     return matchesNth(lastIdx, inside);
@@ -325,14 +470,16 @@ struct Selector
                     for (const auto& part : splitSelectorList(inside)) {
                         const Selector& tmp = getOrParseSelector(part);
                         if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo.starts_with("where(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(6, pseudo.size() - 7);
                     for (const auto& part : splitSelectorList(inside)) {
                         const Selector& tmp = getOrParseSelector(part);
                         if (!tmp.steps.empty() && matchesSimple(node, tmp.steps[0].simple)) return true;
-                    } return false;
+                    }
+                    return false;
                 }
                 if (pseudo.starts_with("has(") && pseudo.back() == ')') {
                     std::string inside = pseudo.substr(4, pseudo.size() - 5);
@@ -341,7 +488,8 @@ struct Selector
                     std::vector<HtmlNodePtr> stack;
                     for (auto& c : node->getChildren()) if (isElement(c)) stack.push_back(c);
                     while (!stack.empty()) {
-                        auto cur = stack.back(); stack.pop_back();
+                        auto cur = stack.back();
+                        stack.pop_back();
                         if (matchFrom(cur, inner, 0)) return true;
                         for (auto& c : cur->getChildren()) if (isElement(c)) stack.push_back(c);
                     }
@@ -355,7 +503,8 @@ struct Selector
     }
 };
 
-static const Selector& getOrParseSelector(const std::string& s) {
+static const Selector& getOrParseSelector(const std::string& s)
+{
     static std::unordered_map<std::string, Selector> cache;
     auto it = cache.find(s);
     if (it != cache.end()) return it->second;
@@ -368,7 +517,8 @@ static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx);
 
 static inline bool isUniversal(const std::string& tag) { return tag.empty() || tag == "*"; }
 
-static void seedCandidates(HtmlNodePtr root, const Selector& sel, std::vector<HtmlNodePtr>& out) {
+static void seedCandidates(HtmlNodePtr root, const Selector& sel, std::vector<HtmlNodePtr>& out)
+{
     if (sel.steps.empty()) return;
     const auto& right = sel.steps[0].simple;
     auto doc = root->documentRoot();
@@ -376,7 +526,8 @@ static void seedCandidates(HtmlNodePtr root, const Selector& sel, std::vector<Ht
     if (wantsNodeAll(right)) {
         std::vector<HtmlNodePtr> st{ root };
         while (!st.empty()) {
-            auto cur = st.back(); st.pop_back();
+            auto cur = st.back();
+            st.pop_back();
             if (!g_qs_scope || isDescendantOf(cur, g_qs_scope)) {
                 auto t = cur->getType();
                 if (t == NodeType::Element || t == NodeType::Text)
@@ -421,27 +572,35 @@ static void seedCandidates(HtmlNodePtr root, const Selector& sel, std::vector<Ht
 
     std::vector<HtmlNodePtr> st{ root };
     while (!st.empty()) {
-        auto cur = st.back(); st.pop_back();
+        auto cur = st.back();
+        st.pop_back();
         if (isElement(cur)) out.push_back(cur);
         for (auto& c : cur->getChildren()) st.push_back(c);
     }
 }
 
-static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx) {
+static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx)
+{
     if (!node || idx >= sel.steps.size()) return false;
     const auto& step = sel.steps[idx];
     if (!sel.matchesSimple(node, step.simple)) return false;
     if (idx + 1 == sel.steps.size()) return true;
     switch (step.combinatorToPrev) {
-        case SelectorStep::Combinator::Descendant: {
+        case SelectorStep::Combinator::Descendant:
+        {
             auto p = node->getParent();
-            while (p) { if (matchFrom(p, sel, idx + 1)) return true; p = p->getParent(); }
+            while (p) {
+                if (matchFrom(p, sel, idx + 1)) return true;
+                p = p->getParent();
+            }
             return false;
         }
-        case SelectorStep::Combinator::Child: {
+        case SelectorStep::Combinator::Child:
+        {
             return matchFrom(node->getParent(), sel, idx + 1);
         }
-        case SelectorStep::Combinator::Adjacent: {
+        case SelectorStep::Combinator::Adjacent:
+        {
             if (auto p = node->getParent()) {
                 const auto& kids = p->getChildren();
                 for (size_t i = 0; i < kids.size(); ++i) {
@@ -455,7 +614,8 @@ static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx) 
             }
             return false;
         }
-        case SelectorStep::Combinator::Sibling: {
+        case SelectorStep::Combinator::Sibling:
+        {
             if (auto p = node->getParent()) {
                 const auto& kids = p->getChildren();
                 for (size_t i = 0; i < kids.size(); ++i) {
@@ -474,7 +634,8 @@ static bool matchFrom(const HtmlNodePtr& node, const Selector& sel, size_t idx) 
     return false;
 }
 
-std::vector<HtmlNodePtr> querySelectorAll(HtmlNodePtr root, const std::string& selectorStr) {
+std::vector<HtmlNodePtr> querySelectorAll(HtmlNodePtr root, const std::string& selectorStr)
+{
     std::vector<HtmlNodePtr> results;
     std::unordered_set<const HtmlNode*, PtrHash, PtrEq> seen;
     auto lists = Selector::splitSelectorList(selectorStr);
@@ -497,7 +658,8 @@ std::vector<HtmlNodePtr> querySelectorAll(HtmlNodePtr root, const std::string& s
     return results;
 }
 
-HtmlNodePtr querySelector(HtmlNodePtr root, const std::string& selectorStr) {
+HtmlNodePtr querySelector(HtmlNodePtr root, const std::string& selectorStr)
+{
     auto lists = Selector::splitSelectorList(selectorStr);
     if (lists.empty()) return nullptr;
 

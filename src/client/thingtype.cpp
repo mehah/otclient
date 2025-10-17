@@ -468,14 +468,22 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
                 m_market.requiredLevel = fin->getU16();
                 break;
             }
-            case ThingAttrElevation: m_elevation = fin->getU16(); break;
-            case ThingAttrGround: m_groundSpeed = fin->getU16(); break;
-            case ThingAttrWritable: m_maxTextLength = fin->getU16(); break;
-            case ThingAttrWritableOnce:m_maxTextLength = fin->getU16(); break;
-            case ThingAttrMinimapColor: m_minimapColor = fin->getU16(); break;
-            case ThingAttrCloth: m_clothSlot = fin->getU16(); break;
-            case ThingAttrLensHelp: m_lensHelp = fin->getU16(); break;
-            case ThingAttrDefaultAction: m_defaultAction = static_cast<PLAYER_ACTION>(fin->getU16()); break;
+            case ThingAttrElevation: m_elevation = fin->getU16();
+                break;
+            case ThingAttrGround: m_groundSpeed = fin->getU16();
+                break;
+            case ThingAttrWritable: m_maxTextLength = fin->getU16();
+                break;
+            case ThingAttrWritableOnce: m_maxTextLength = fin->getU16();
+                break;
+            case ThingAttrMinimapColor: m_minimapColor = fin->getU16();
+                break;
+            case ThingAttrCloth: m_clothSlot = fin->getU16();
+                break;
+            case ThingAttrLensHelp: m_lensHelp = fin->getU16();
+                break;
+            case ThingAttrDefaultAction: m_defaultAction = static_cast<PLAYER_ACTION>(fin->getU16());
+                break;
         }
     }
 
@@ -597,17 +605,20 @@ void ThingType::unserializeOtml(const OTMLNodePtr& node)
     }
 }
 
-void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color) {
+void ThingType::drawWithFrameBuffer(const TexturePtr& texture, const Rect& screenRect, const Rect& textureRect, const Color& color)
+{
     const int size = static_cast<int>(g_gameConfig.getSpriteSize() * std::max<int>(m_size.area(), 2) * g_drawPool.getScaleFactor());
     const auto& p = (Point(size) - screenRect.size().toPoint()) / 2;
     const auto& destDiff = Rect(screenRect.topLeft() - p, Size{ size });
 
-    g_drawPool.bindFrameBuffer(destDiff.size()); {
+    g_drawPool.bindFrameBuffer(destDiff.size());
+    {
         // Debug
         // g_drawPool.addBoundingRect(Rect(Point(0), destDiff.size()), Color::red);
 
         g_drawPool.addTexturedRect(Rect(p, screenRect.size()), texture, textureRect, color);
-    } g_drawPool.releaseFrameBuffer(destDiff);
+    }
+    g_drawPool.releaseFrameBuffer(destDiff);
     g_drawPool.resetShaderProgram();
 }
 
@@ -719,7 +730,7 @@ void ThingType::loadTexture(const int animationPhase)
                     const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
 
                     const auto& framePos = Point(frameIndex % (textureSize.width() / m_size.width()) * m_size.width(),
-                        frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * g_gameConfig.getSpriteSize();
+                                                 frameIndex / (textureSize.width() / m_size.width()) * m_size.height()) * g_gameConfig.getSpriteSize();
 
                     if (!useCustomImage) {
                         if (protobufSupported) {
@@ -842,18 +853,18 @@ Size ThingType::getBestTextureDimension(int w, int h, const int count)
 uint32_t ThingType::getSpriteIndex(const int w, const int h, const int l, const int x, const int y, const int z, const int a) const
 {
     uint32_t index = ((((((a % m_animationPhases)
-                      * m_numPatternZ + z)
-                      * m_numPatternY + y)
-                      * m_numPatternX + x)
-                      * m_layers + l)
-        * m_size.height() + h)
+                            * m_numPatternZ + z)
+                        * m_numPatternY + y)
+                    * m_numPatternX + x)
+                * m_layers + l)
+            * m_size.height() + h)
         * m_size.width() + w;
 
     if (w == -1 && h == -1) { // protobuf does not use width and height, because sprite image is the exact sprite size, not split by 32x32, so -1 is passed instead
         index = ((((a % m_animationPhases)
-                 * m_numPatternZ + z)
-                 * m_numPatternY + y)
-            * m_numPatternX + x)
+                        * m_numPatternZ + z)
+                    * m_numPatternY + y)
+                * m_numPatternX + x)
             * m_layers + l;
     }
 
@@ -864,7 +875,7 @@ uint32_t ThingType::getSpriteIndex(const int w, const int h, const int l, const 
 uint32_t ThingType::getTextureIndex(const int l, const int x, const int y, const int z) const
 {
     return ((l * m_numPatternZ + z)
-        * m_numPatternY + y)
+            * m_numPatternY + y)
         * m_numPatternX + x;
 }
 
@@ -908,7 +919,8 @@ int ThingType::getExactHeight()
     return m_exactHeight = size.height();
 }
 
-ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr) {
+ThingFlagAttr ThingType::thingAttrToThingFlagAttr(const ThingAttr attr)
+{
     switch (attr) {
         case ThingAttrDisplacement: return ThingFlagAttrDisplacement;
         case ThingAttrLight: return ThingFlagAttrLight;
@@ -1008,14 +1020,22 @@ void ThingType::serialize(const FileStreamPtr& fin)
                 break;
             }
 
-            case ThingAttrElevation: fin->addU16(m_elevation); break;
-            case ThingAttrMinimapColor: fin->add16(m_minimapColor); break;
-            case ThingAttrCloth: fin->add16(m_clothSlot); break;
-            case ThingAttrLensHelp: fin->add16(m_lensHelp); break;
-            case ThingAttrUsable: fin->add16(isUsable()); break;
-            case ThingAttrGround:  fin->add16(isGround()); break;
-            case ThingAttrWritable:   fin->add16(isWritable()); break;
-            case ThingAttrWritableOnce:   fin->add16(isWritableOnce()); break;
+            case ThingAttrElevation: fin->addU16(m_elevation);
+                break;
+            case ThingAttrMinimapColor: fin->add16(m_minimapColor);
+                break;
+            case ThingAttrCloth: fin->add16(m_clothSlot);
+                break;
+            case ThingAttrLensHelp: fin->add16(m_lensHelp);
+                break;
+            case ThingAttrUsable: fin->add16(isUsable());
+                break;
+            case ThingAttrGround: fin->add16(isGround());
+                break;
+            case ThingAttrWritable: fin->add16(isWritable());
+                break;
+            case ThingAttrWritableOnce: fin->add16(isWritableOnce());
+                break;
                 break;
 
             default:
@@ -1067,8 +1087,8 @@ void ThingType::exportImage(const std::string& fileName)
                         for (int w = 0; w < m_size.width(); ++w) {
                             for (int h = 0; h < m_size.height(); ++h) {
                                 image->blit(Point(g_gameConfig.getSpriteSize() * (m_size.width() - w - 1 + m_size.width() * x + m_size.width() * m_numPatternX * l),
-                                            g_gameConfig.getSpriteSize() * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
-                                    g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
+                                                  g_gameConfig.getSpriteSize() * (m_size.height() - h - 1 + m_size.height() * y + m_size.height() * m_numPatternY * a + m_size.height() * m_numPatternY * m_animationPhases * z)),
+                                            g_sprites.getSpriteImage(m_spritesIndex[getSpriteIndex(w, h, l, x, y, z, a)]));
                             }
                         }
                     }

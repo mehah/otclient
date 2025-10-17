@@ -44,7 +44,8 @@ public:
     [[nodiscard]] constexpr float distanceFrom(const TPoint& other) const noexcept { return (*this - other).length(); }
     [[nodiscard]] constexpr TPoint translated(T dx, T dy) const noexcept { return { x + dx, y + dy }; }
     [[nodiscard]] constexpr TSize<T> toSize() const noexcept { return { x, y }; }
-    constexpr TPoint scale(float v) noexcept {
+    constexpr TPoint scale(float v) noexcept
+    {
         if (v != 1.f) {
             float factor = (1.f - (1.f / v));
             x -= x * factor;
@@ -56,25 +57,70 @@ public:
     constexpr TPoint operator-() const noexcept { return { -x, -y }; }
 
     constexpr TPoint operator+(const TPoint& other) const { return { x + other.x, y + other.y }; }
-    constexpr TPoint& operator+=(const TPoint& other) { x += other.x; y += other.y; return *this; }
+    constexpr TPoint& operator+=(const TPoint& other)
+    {
+        x += other.x;
+        y += other.y;
+        return *this;
+    }
     constexpr TPoint operator-(const TPoint& other) const { return { x - other.x, y - other.y }; }
-    constexpr TPoint& operator-=(const TPoint& other) { x -= other.x; y -= other.y; return *this; }
+    constexpr TPoint& operator-=(const TPoint& other)
+    {
+        x -= other.x;
+        y -= other.y;
+        return *this;
+    }
     constexpr TPoint operator*(const TPoint& other) const { return { x * other.x, y * other.y }; }
-    constexpr TPoint& operator*=(const TPoint& other) { x *= other.x; y *= other.y; return *this; }
+    constexpr TPoint& operator*=(const TPoint& other)
+    {
+        x *= other.x;
+        y *= other.y;
+        return *this;
+    }
     constexpr TPoint operator/(const TPoint& other) const { return { x / other.x, y / other.y }; }
-    constexpr TPoint& operator/=(const TPoint& other) { x /= other.x; y /= other.y; return *this; }
+    constexpr TPoint& operator/=(const TPoint& other)
+    {
+        x /= other.x;
+        y /= other.y;
+        return *this;
+    }
 
     constexpr TPoint operator+(T other) const { return { x + other, y + other }; }
-    constexpr TPoint& operator+=(T other) { x += other; y += other; return *this; }
+    constexpr TPoint& operator+=(T other)
+    {
+        x += other;
+        y += other;
+        return *this;
+    }
     constexpr TPoint operator-(T other) const { return { x - other, y - other }; }
-    constexpr TPoint& operator-=(T other) { x -= other; y -= other; return *this; }
+    constexpr TPoint& operator-=(T other)
+    {
+        x -= other;
+        y -= other;
+        return *this;
+    }
     constexpr TPoint operator*(float v) const { return TPoint(x * v, y * v); }
-    constexpr TPoint& operator*=(float v) { x *= v; y *= v; return *this; }
+    constexpr TPoint& operator*=(float v)
+    {
+        x *= v;
+        y *= v;
+        return *this;
+    }
     constexpr TPoint operator/(float v) const { return TPoint(x / v, y / v); }
-    constexpr TPoint& operator/=(float v) { x /= v; y /= v; return *this; }
+    constexpr TPoint& operator/=(float v)
+    {
+        x /= v;
+        y /= v;
+        return *this;
+    }
 
     constexpr TPoint operator&(int a) const { return { x & a, y & a }; }
-    constexpr TPoint& operator&=(int a) { x &= a; y &= a; return *this; }
+    constexpr TPoint& operator&=(int a)
+    {
+        x &= a;
+        y &= a;
+        return *this;
+    }
 
     constexpr bool operator<=(const TPoint& other) const { return x <= other.x && y <= other.y; }
     constexpr bool operator>=(const TPoint& other) const { return x >= other.x && y >= other.y; }
@@ -88,11 +134,13 @@ public:
 
     [[nodiscard]] constexpr std::size_t hash() const noexcept { return (7 * 15 + x) * 15 + y; }
 
-    friend std::ostream& operator<<(std::ostream& out, const TPoint& point) {
+    friend std::ostream& operator<<(std::ostream& out, const TPoint& point)
+    {
         return out << point.x << " " << point.y;
     }
 
-    friend std::istream& operator>>(std::istream& in, TPoint& point) {
+    friend std::istream& operator>>(std::istream& in, TPoint& point)
+    {
         return in >> point.x >> point.y;
     }
 };

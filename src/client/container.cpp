@@ -27,7 +27,7 @@
 ItemPtr Container::getItem(const int slot)
 {
     if (slot < 0 || std::cmp_greater_equal(slot, m_items.size())
-        )
+    )
         return nullptr;
     return m_items[slot];
 }
@@ -86,7 +86,7 @@ void Container::onUpdateItem(int slot, const ItemPtr& item)
 {
     slot -= m_firstIndex;
     if (slot < 0 || std::cmp_greater_equal(slot, m_items.size())
-        ) {
+    ) {
         g_logger.traceError("slot not found");
         return;
     }

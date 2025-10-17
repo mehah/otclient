@@ -30,7 +30,7 @@
 #include <asio.hpp>
 #include <asio/ssl.hpp>
 
- //  result
+//  result
 class HttpSession;
 
 struct HttpResult
@@ -59,7 +59,6 @@ using HttpResult_cb = std::function<void(HttpResult_ptr)>;
 class HttpSession : public std::enable_shared_from_this<HttpSession>
 {
 public:
-
     HttpSession(asio::io_service& service, std::string url, std::string agent,
                 const bool& enable_time_out_on_read_write,
                 const std::unordered_map<std::string, std::string>& custom_header,
@@ -85,9 +84,9 @@ public:
         m_context.set_default_verify_paths();
         m_context.set_verify_mode(asio::ssl::verify_none);
         m_context.set_options(asio::ssl::context::default_workarounds |
-                              asio::ssl::context::no_sslv2 |
-                              asio::ssl::context::no_sslv3 |
-                              asio::ssl::context::single_dh_use);
+            asio::ssl::context::no_sslv2 |
+            asio::ssl::context::no_sslv3 |
+            asio::ssl::context::single_dh_use);
     };
     void start();
     void cancel() const { onError("canceled"); }
@@ -137,7 +136,6 @@ using WebsocketSession_cb = std::function<void(WebsocketCallbackType, const std:
 class WebsocketSession : public std::enable_shared_from_this<WebsocketSession>
 {
 public:
-
     WebsocketSession(asio::io_service& service, std::string url, std::string agent,
                      const bool& enable_time_out_on_read_write, const int timeout, HttpResult_ptr result, WebsocketSession_cb callback) :
         m_service(service),

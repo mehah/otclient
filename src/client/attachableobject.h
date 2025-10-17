@@ -60,8 +60,8 @@ public:
 
     const std::vector<UIWidgetPtr>& getAttachedWidgets() { return m_data ? m_data->attachedWidgets : EMPTY_ATTACHED_WIDGETS; };
     bool hasAttachedWidgets() const { return m_data && !m_data->attachedWidgets.empty(); };
-    bool hasAttachedEffects()  const { return m_data && !m_data->attachedEffects.empty(); };
-    bool hasAttachedParticles()  const { return m_data && !m_data->attachedParticles.empty(); };
+    bool hasAttachedEffects() const { return m_data && !m_data->attachedEffects.empty(); };
+    bool hasAttachedParticles() const { return m_data && !m_data->attachedParticles.empty(); };
 
     bool isWidgetAttached(const UIWidgetPtr& widget);
     void attachWidget(const UIWidgetPtr& widget);
@@ -84,7 +84,8 @@ protected:
     void onDetachEffect(const AttachedEffectPtr& effect, bool callEvent = true);
     void drawAttachedParticlesEffect(const Point& dest);
 
-    auto getData() {
+    auto getData()
+    {
         if (!m_data)
             m_data = std::make_shared<Data>();
         return m_data;

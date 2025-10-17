@@ -104,7 +104,8 @@ void FrameBuffer::bind()
     }
 }
 
-bool FrameBuffer::canDraw() const {
+bool FrameBuffer::canDraw() const
+{
     return m_texture && m_coordsBuffer.getVertexCount() > 0;
 }
 
@@ -161,7 +162,8 @@ Size FrameBuffer::getSize()
     return m_texture->getSize();
 }
 
-TexturePtr FrameBuffer::extractTexture() {
+TexturePtr FrameBuffer::extractTexture()
+{
     internalBind();
     const auto& size = getSize();
     const int width = size.width();

@@ -30,7 +30,8 @@ FontManager g_fonts;
 
 void FontManager::terminate() { clearFonts(); }
 
-void FontManager::clearFonts() {
+void FontManager::clearFonts()
+{
     m_fonts.clear();
     m_defaultFont = nullptr;
     m_defaultWidgetFont = nullptr;

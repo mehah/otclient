@@ -35,7 +35,8 @@ SpriteManager g_sprites;
 void SpriteManager::init() {}
 void SpriteManager::terminate() { unload(); }
 
-void SpriteManager::reload() {
+void SpriteManager::reload()
+{
     if (g_app.isEncrypted())
         return;
 
@@ -45,7 +46,8 @@ void SpriteManager::reload() {
     load();
 }
 
-void SpriteManager::load() {
+void SpriteManager::load()
+{
     m_spritesFiles.resize(g_asyncDispatcher.get_thread_count());
     if (g_app.isLoadingAsyncTexture()) {
         for (auto& file : m_spritesFiles)
@@ -244,7 +246,8 @@ ImagePtr SpriteManager::getSpriteImageHd(const int id, const FileStreamPtr& file
     return Image::loadPNG(buffer.data(), buffer.size());
 }
 
-uint16_t readU16FromBuffer(const uint8_t* data, size_t& offset) {
+uint16_t readU16FromBuffer(const uint8_t* data, size_t& offset)
+{
     uint16_t val = data[offset] | (data[offset + 1] << 8);
     offset += 2;
     return val;

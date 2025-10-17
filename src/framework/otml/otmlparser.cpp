@@ -28,8 +28,7 @@ OTMLParser::OTMLParser(const OTMLDocumentPtr& doc, std::istream& in) :
     currentDepth(0), currentLine(0),
     doc(doc), currentParent(doc), previousNode(nullptr),
     in(in)
-{
-}
+{}
 
 void OTMLParser::parse()
 {
@@ -59,7 +58,8 @@ int OTMLParser::getLineDepth(const std::string_view line, const bool multilining
     std::size_t spaces = 0;
     while (line[spaces] == ' ') {
         if (++spaces == line.length()) {
-            --spaces; break;
+            --spaces;
+            break;
         }
     }
 

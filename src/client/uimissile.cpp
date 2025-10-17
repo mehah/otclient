@@ -89,7 +89,8 @@ void UIMissile::onStyleApply(const std::string_view styleName, const OTMLNodePtr
     UIWidget::onStyleApply(styleName, styleNode);
 }
 
-void UIMissile::setShader(std::string_view name) {
+void UIMissile::setShader(std::string_view name)
+{
     m_shaderName = name;
     if (getMissile()) getMissile()->setShader(name);
 }

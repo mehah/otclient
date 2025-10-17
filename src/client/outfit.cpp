@@ -125,28 +125,32 @@ void Outfit::resetClothes()
     setShader("Outfit - Default");
 }
 
-void Outfit::setHead(const uint8_t head) {
+void Outfit::setHead(const uint8_t head)
+{
     if (m_head == head)
         return;
 
     m_head = head;
     m_headColor = getColor(head);
 }
-void Outfit::setBody(const uint8_t body) {
+void Outfit::setBody(const uint8_t body)
+{
     if (m_body == body)
         return;
 
     m_body = body;
     m_bodyColor = getColor(body);
 }
-void Outfit::setLegs(const uint8_t legs) {
+void Outfit::setLegs(const uint8_t legs)
+{
     if (m_legs == legs)
         return;
 
     m_legs = legs;
     m_legsColor = getColor(legs);
 }
-void Outfit::setFeet(const uint8_t feet) {
+void Outfit::setFeet(const uint8_t feet)
+{
     if (m_feet == feet)
         return;
 

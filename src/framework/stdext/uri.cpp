@@ -3,7 +3,8 @@
 
 #include "uri.h"
 
-ParsedURI parseURI(const std::string& url) {
+ParsedURI parseURI(const std::string& url)
+{
     // Regular expression pattern to match URL components
     static const std::regex PARSE_URL{
         R"((([httpsw]{2,5})://)?([^/ :]+)(:(\d+))?(/(.+)?))",

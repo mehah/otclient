@@ -31,7 +31,7 @@
 
 uint32_t ShaderProgram::m_currentProgram = 0;
 
-ShaderProgram::ShaderProgram() :m_programId(glCreateProgram())
+ShaderProgram::ShaderProgram() : m_programId(glCreateProgram())
 {
     m_uniformLocations.fill(-1);
     if (!m_programId)
