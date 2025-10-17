@@ -84,7 +84,8 @@ void Item::internalDraw(const int animationPhase, const Point& dest, const Color
     }
 }
 
-void Item::drawLight(const Point& dest, const LightViewPtr& lightView) {
+void Item::drawLight(const Point& dest, const LightViewPtr& lightView)
+{
     if (!lightView) return;
     getThingType()->draw(dest, 0, m_numPatternX, m_numPatternY, m_numPatternZ, 0, Color::white, false, lightView);
     drawAttachedLightEffect(dest, lightView);
@@ -279,7 +280,8 @@ void Item::setId(uint32_t id)
     */
 }
 
-ThingType* Item::getThingType() const {
+ThingType* Item::getThingType() const
+{
     return g_things.getRawThingType(m_clientId, ThingCategoryItem);
 }
 

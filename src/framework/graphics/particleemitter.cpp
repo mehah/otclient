@@ -90,10 +90,10 @@ void ParticleEmitter::update(const float elapsedTime, const ParticleSystemPtr& s
             Size finalSize = type->pFinalSize * multiplier;
 
             system->addParticle(std::make_shared<Particle>(pPosition, startSize, finalSize,
-                                pVelocity, pAcceleration,
-                                pDuration, type->pIgnorePhysicsAfter,
-                                type->pColors, type->pColorsStops,
-                                type->pCompositionMode, type->pTexture, type->pAnimatedTexture));
+                                                           pVelocity, pAcceleration,
+                                                           pDuration, type->pIgnorePhysicsAfter,
+                                                           type->pColors, type->pColorsStops,
+                                                           type->pCompositionMode, type->pTexture, type->pAnimatedTexture));
         }
     }
 

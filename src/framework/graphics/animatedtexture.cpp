@@ -71,7 +71,8 @@ void AnimatedTexture::setRepeat(bool repeat)
     });
 }
 
-TexturePtr AnimatedTexture::get(uint32_t& frame, Timer& timer) {
+TexturePtr AnimatedTexture::get(uint32_t& frame, Timer& timer)
+{
     if (timer.ticksElapsed() >= m_framesDelay[frame]) {
         timer.restart();
 
@@ -83,16 +84,19 @@ TexturePtr AnimatedTexture::get(uint32_t& frame, Timer& timer) {
     return m_frames[frame];
 }
 
-TexturePtr AnimatedTexture::getCurrentFrame() {
+TexturePtr AnimatedTexture::getCurrentFrame()
+{
     return m_frames[m_currentFrame];
 }
 
-void AnimatedTexture::allowAtlasCache() {
+void AnimatedTexture::allowAtlasCache()
+{
     for (const auto& frame : m_frames)
         frame->allowAtlasCache();
 }
 
-void AnimatedTexture::create() {
+void AnimatedTexture::create()
+{
     if (getCurrentFrame()->isEmpty()) {
         for (const auto& frame : m_frames)
             frame->create();

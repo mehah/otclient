@@ -85,8 +85,9 @@ bool UIHorizontalLayout::internalUpdate()
     if (m_alignRight) {
         for (auto& it : std::ranges::reverse_view(parentWidget->m_children))
             action(it);
-    } else for (const auto& widget : parentWidget->m_children)
-        action(widget);
+    } else
+        for (const auto& widget : parentWidget->m_children)
+            action(widget);
 
     preferredWidth -= m_spacing;
     preferredWidth += parentWidget->getPaddingLeft() + parentWidget->getPaddingRight();

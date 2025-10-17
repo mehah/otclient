@@ -27,7 +27,6 @@
 class CoordsBuffer
 {
 public:
-
     CoordsBuffer(const size_t size = 64) : m_vertexArray(size), m_textureCoordArray(size) {}
 
     void clear()
@@ -88,8 +87,9 @@ public:
     [[nodiscard]] int getVertexCount() const { return m_vertexArray.vertexCount(); }
     [[nodiscard]] int getTextureCoordCount() const { return m_textureCoordArray.vertexCount(); }
 
-    [[nodiscard]] size_t size() const {
-        return  std::max<size_t>(m_vertexArray.size(), m_textureCoordArray.size());
+    [[nodiscard]] size_t size() const
+    {
+        return std::max<size_t>(m_vertexArray.size(), m_textureCoordArray.size());
     }
 
 private:

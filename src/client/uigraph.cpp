@@ -148,7 +148,8 @@ void UIGraph::clear()
     m_needsUpdate = true;
 }
 
-void UIGraph::setLineWidth(const size_t index, const int width) {
+void UIGraph::setLineWidth(const size_t index, const int width)
+{
     if (m_graphs.size() <= index - 1) {
         g_logger.warning("[UIGraph::setLineWidth ({})] Graph of index {} out of bounds.", getId(), index);
         return;

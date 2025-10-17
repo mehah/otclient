@@ -66,23 +66,23 @@ enum
 ((width) * (((uint32_t )(pixel_bits)) >> 3)) : \
 (( ((width) * ((uint32_t )(pixel_bits))) + 7) >> 3) )
 
-uint8_t   png_sign[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
+uint8_t png_sign[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
 
-int mask4[2] = { 240,15 };
-int shift4[2] = { 4,0 };
+int mask4[2] = { 240, 15 };
+int shift4[2] = { 4, 0 };
 
-int mask2[4] = { 192,48,12,3 };
-int shift2[4] = { 6,4,2,0 };
+int mask2[4] = { 192, 48, 12, 3 };
+int shift2[4] = { 6, 4, 2, 0 };
 
-int mask1[8] = { 128,64,32,16,8,4,2,1 };
-int shift1[8] = { 7,6,5,4,3,2,1,0 };
+int mask1[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
+int shift1[8] = { 7, 6, 5, 4, 3, 2, 1, 0 };
 
-uint32_t    keep_original = 1;
-uint8_t   pal[256][3];
-uint8_t   trns[256];
-uint32_t    palsize, trnssize;
-uint32_t    hasTRNS;
-uint16_t  trns1, trns2, trns3;
+uint32_t keep_original = 1;
+uint8_t pal[256][3];
+uint8_t trns[256];
+uint32_t palsize, trnssize;
+uint32_t hasTRNS;
+uint16_t trns1, trns2, trns3;
 
 #ifdef _MSC_VER
 #pragma warning( push )
@@ -178,10 +178,14 @@ void unpack(z_stream& zstream, uint8_t* dst, const uint32_t dst_size, uint8_t* s
     for (uint32_t j = 0; j < h; j++) {
         switch (*row++) {
             case 0: break;
-            case 1: read_sub_row(row, rowbytes, bpp); break;
-            case 2: read_up_row(row, prev_row, rowbytes, bpp); break;
-            case 3: read_average_row(row, prev_row, rowbytes, bpp); break;
-            case 4: read_paeth_row(row, prev_row, rowbytes, bpp); break;
+            case 1: read_sub_row(row, rowbytes, bpp);
+                break;
+            case 2: read_up_row(row, prev_row, rowbytes, bpp);
+                break;
+            case 3: read_average_row(row, prev_row, rowbytes, bpp);
+                break;
+            case 4: read_paeth_row(row, prev_row, rowbytes, bpp);
+                break;
         }
         prev_row = row;
         row += rowbytes;
@@ -190,7 +194,7 @@ void unpack(z_stream& zstream, uint8_t* dst, const uint32_t dst_size, uint8_t* s
 
 void compose0(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i, g, a;
+    uint32_t i, g, a;
 
     for (uint32_t j = 0; j < h; j++) {
         uint8_t* sp = src + 1;
@@ -199,20 +203,90 @@ void compose0(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             switch (depth) {
-                case 16: for (i = 0; i < w; i++) { a = 0xFF; if (hasTRNS && readshort(sp) == trns1) a = 0; *dp1++ = *sp; *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp; sp += 2; }  break;
-                case 8:  for (i = 0; i < w; i++) { a = 0xFF; if (hasTRNS && *sp == trns1)           a = 0; *dp1++ = *sp; *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp; sp++; }  break;
-                case 4:  for (i = 0; i < w; i++) { g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0x11; *dp2++ = (a << 24) + g * 0x111111; } break;
-                case 2:  for (i = 0; i < w; i++) { g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0x55; *dp2++ = (a << 24) + g * 0x555555; } break;
-                case 1:  for (i = 0; i < w; i++) { g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; a = 0xFF; if (hasTRNS && g == trns1) a = 0; *dp1++ = g * 0xFF; *dp2++ = (a << 24) + g * 0xFFFFFF; } break;
+                case 16: for (i = 0; i < w; i++) {
+                        a = 0xFF;
+                        if (hasTRNS && readshort(sp) == trns1) a = 0;
+                        *dp1++ = *sp;
+                        *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp;
+                        sp += 2;
+                    }
+                    break;
+                case 8: for (i = 0; i < w; i++) {
+                        a = 0xFF;
+                        if (hasTRNS && *sp == trns1) a = 0;
+                        *dp1++ = *sp;
+                        *dp2++ = (a << 24) + (*sp << 16) + (*sp << 8) + *sp;
+                        sp++;
+                    }
+                    break;
+                case 4: for (i = 0; i < w; i++) {
+                        g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1];
+                        a = 0xFF;
+                        if (hasTRNS && g == trns1) a = 0;
+                        *dp1++ = g * 0x11;
+                        *dp2++ = (a << 24) + g * 0x111111;
+                    }
+                    break;
+                case 2: for (i = 0; i < w; i++) {
+                        g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3];
+                        a = 0xFF;
+                        if (hasTRNS && g == trns1) a = 0;
+                        *dp1++ = g * 0x55;
+                        *dp2++ = (a << 24) + g * 0x555555;
+                    }
+                    break;
+                case 1: for (i = 0; i < w; i++) {
+                        g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7];
+                        a = 0xFF;
+                        if (hasTRNS && g == trns1) a = 0;
+                        *dp1++ = g * 0xFF;
+                        *dp2++ = (a << 24) + g * 0xFFFFFF;
+                    }
+                    break;
             }
         } else /* PNG_BLEND_OP_OVER */
         {
             switch (depth) {
-                case 16: for (i = 0; i < w; i++, dp1++, dp2++) { if (readshort(sp) != trns1) { *dp1 = *sp; *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp; } sp += 2; } break;
-                case 8:  for (i = 0; i < w; i++, dp1++, dp2++) { if (*sp != trns1) { *dp1 = *sp; *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp; } sp++; } break;
-                case 4:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; if (g != trns1) { *dp1 = g * 0x11; *dp2 = 0xFF000000 + g * 0x111111; } } break;
-                case 2:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; if (g != trns1) { *dp1 = g * 0x55; *dp2 = 0xFF000000 + g * 0x555555; } } break;
-                case 1:  for (i = 0; i < w; i++, dp1++, dp2++) { g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; if (g != trns1) { *dp1 = g * 0xFF; *dp2 = 0xFF000000 + g * 0xFFFFFF; } } break;
+                case 16: for (i = 0; i < w; i++, dp1++, dp2++) {
+                        if (readshort(sp) != trns1) {
+                            *dp1 = *sp;
+                            *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp;
+                        }
+                        sp += 2;
+                    }
+                    break;
+                case 8: for (i = 0; i < w; i++, dp1++, dp2++) {
+                        if (*sp != trns1) {
+                            *dp1 = *sp;
+                            *dp2 = 0xFF000000 + (*sp << 16) + (*sp << 8) + *sp;
+                        }
+                        sp++;
+                    }
+                    break;
+                case 4: for (i = 0; i < w; i++, dp1++, dp2++) {
+                        g = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1];
+                        if (g != trns1) {
+                            *dp1 = g * 0x11;
+                            *dp2 = 0xFF000000 + g * 0x111111;
+                        }
+                    }
+                    break;
+                case 2: for (i = 0; i < w; i++, dp1++, dp2++) {
+                        g = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3];
+                        if (g != trns1) {
+                            *dp1 = g * 0x55;
+                            *dp2 = 0xFF000000 + g * 0x555555;
+                        }
+                    }
+                    break;
+                case 1: for (i = 0; i < w; i++, dp1++, dp2++) {
+                        g = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7];
+                        if (g != trns1) {
+                            *dp1 = g * 0xFF;
+                            *dp2 = 0xFF000000 + g * 0xFFFFFF;
+                        }
+                    }
+                    break;
             }
         }
 
@@ -224,8 +298,8 @@ void compose0(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 
 void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i;
-    uint32_t    r, g, b, a;
+    uint32_t i;
+    uint32_t r, g, b, a;
 
     for (uint32_t j = 0; j < h; j++) {
         uint8_t* sp = src + 1;
@@ -241,7 +315,9 @@ void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
                     a = 0xFF;
                     if (hasTRNS && b == trns1 && g == trns2 && r == trns3)
                         a = 0;
-                    *dp1++ = b; *dp1++ = g; *dp1++ = r;
+                    *dp1++ = b;
+                    *dp1++ = g;
+                    *dp1++ = r;
                     *dp2++ = (a << 24) + (r << 16) + (g << 8) + b;
                 }
             } else {
@@ -252,7 +328,9 @@ void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
                     a = 0xFF;
                     if (hasTRNS && readshort(sp) == trns1 && readshort(sp + 2) == trns2 && readshort(sp + 4) == trns3)
                         a = 0;
-                    *dp1++ = b; *dp1++ = g; *dp1++ = r;
+                    *dp1++ = b;
+                    *dp1++ = g;
+                    *dp1++ = r;
                     *dp2++ = (a << 24) + (r << 16) + (g << 8) + b;
                 }
             }
@@ -261,13 +339,17 @@ void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
             if (depth == 8) {
                 for (i = 0; i < w; i++, sp += 3, dp1 += 3, dp2++)
                     if ((*sp != trns1) || (*(sp + 1) != trns2) || (*(sp + 2) != trns3)) {
-                        *dp1 = *sp; *(dp1 + 1) = *(sp + 1); *(dp1 + 2) = *(sp + 2);
+                        *dp1 = *sp;
+                        *(dp1 + 1) = *(sp + 1);
+                        *(dp1 + 2) = *(sp + 2);
                         *dp2 = 0xFF000000 + (*(sp + 2) << 16) + (*(sp + 1) << 8) + *sp;
                     }
             } else {
                 for (i = 0; i < w; i++, sp += 6, dp1 += 3, dp2++)
                     if ((readshort(sp) != trns1) || (readshort(sp + 2) != trns2) || (readshort(sp + 4) != trns3)) {
-                        *dp1 = *sp; *(dp1 + 1) = *(sp + 2); *(dp1 + 2) = *(sp + 4);
+                        *dp1 = *sp;
+                        *(dp1 + 1) = *(sp + 2);
+                        *(dp1 + 2) = *(sp + 4);
                         *dp2 = 0xFF000000 + (*(sp + 4) << 16) + (*(sp + 2) << 8) + *sp;
                     }
             }
@@ -281,7 +363,7 @@ void compose2(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 void compose3(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint32_t dstbytes2, const uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
     uint32_t a2;
-    uint8_t   col = 0;
+    uint8_t col = 0;
 
     for (uint32_t j = 0; j < h; j++) {
         const uint8_t* sp = src + 1;
@@ -290,10 +372,14 @@ void compose3(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 
         for (uint32_t i = 0; i < w; i++) {
             switch (depth) {
-                case 8: col = sp[i]; break;
-                case 4: col = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1]; break;
-                case 2: col = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3]; break;
-                case 1: col = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7]; break;
+                case 8: col = sp[i];
+                    break;
+                case 4: col = (sp[i >> 1] & mask4[i & 1]) >> shift4[i & 1];
+                    break;
+                case 2: col = (sp[i >> 2] & mask2[i & 3]) >> shift2[i & 3];
+                    break;
+                case 1: col = (sp[i >> 3] & mask1[i & 7]) >> shift1[i & 7];
+                    break;
             }
 
             uint32_t b = pal[col][0];
@@ -309,27 +395,26 @@ void compose3(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
                 if (a == 255) {
                     *dp1++ = col;
                     *dp2++ = (a << 24) + (r << 16) + (g << 8) + b;
-                } else
-                    if (a != 0) {
-                        if ((a2 = (*dp2) >> 24) != 0) {
-                            keep_original = 0;
-                            const int u = a * 255;
-                            const int v = (255 - a) * a2;
-                            const int al = 255 * 255 - (255 - a) * (255 - a2);
-                            const uint32_t b2 = ((*dp2) & 255);
-                            const uint32_t g2 = (((*dp2) >> 8) & 255);
-                            const uint32_t r2 = (((*dp2) >> 16) & 255);
-                            b = (b * u + b2 * v) / al;
-                            g = (g * u + g2 * v) / al;
-                            r = (r * u + r2 * v) / al;
-                            a = al / 255;
-                        }
-                        *dp1++ = col;
-                        *dp2++ = (a << 24) + (r << 16) + (g << 8) + b;
-                    } else {
-                        dp1++;
-                        dp2++;
+                } else if (a != 0) {
+                    if ((a2 = (*dp2) >> 24) != 0) {
+                        keep_original = 0;
+                        const int u = a * 255;
+                        const int v = (255 - a) * a2;
+                        const int al = 255 * 255 - (255 - a) * (255 - a2);
+                        const uint32_t b2 = ((*dp2) & 255);
+                        const uint32_t g2 = (((*dp2) >> 8) & 255);
+                        const uint32_t r2 = (((*dp2) >> 16) & 255);
+                        b = (b * u + b2 * v) / al;
+                        g = (g * u + g2 * v) / al;
+                        r = (r * u + r2 * v) / al;
+                        a = al / 255;
                     }
+                    *dp1++ = col;
+                    *dp2++ = (a << 24) + (r << 16) + (g << 8) + b;
+                } else {
+                    dp1++;
+                    dp2++;
+                }
             }
         }
         src += srcbytes;
@@ -340,8 +425,8 @@ void compose3(uint8_t* dst1, const uint32_t dstbytes1, uint8_t* dst2, const uint
 
 void compose4(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i;
-    uint32_t    g, a, a2;
+    uint32_t i;
+    uint32_t g, a, a2;
 
     const uint32_t step = (depth + 7) / 8;
 
@@ -351,33 +436,36 @@ void compose4(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             for (i = 0; i < w; i++) {
-                g = *sp; sp += step;
-                a = *sp; sp += step;
+                g = *sp;
+                sp += step;
+                a = *sp;
+                sp += step;
                 *dp++ = g;
                 *dp++ = a;
             }
         } else /* PNG_BLEND_OP_OVER */
         {
             for (i = 0; i < w; i++) {
-                g = *sp; sp += step;
-                a = *sp; sp += step;
+                g = *sp;
+                sp += step;
+                a = *sp;
+                sp += step;
                 if (a == 255) {
                     *dp++ = g;
                     *dp++ = a;
+                } else if (a != 0) {
+                    if ((a2 = *(dp + 1)) != 0) {
+                        const int u = a * 255;
+                        const int v = (255 - a) * a2;
+                        const int al = 255 * 255 - (255 - a) * (255 - a2);
+                        const uint32_t g2 = ((*dp) & 255);
+                        g = (g * u + g2 * v) / al;
+                        a = al / 255;
+                    }
+                    *dp++ = g;
+                    *dp++ = a;
                 } else
-                    if (a != 0) {
-                        if ((a2 = *(dp + 1)) != 0) {
-                            const int u = a * 255;
-                            const int v = (255 - a) * a2;
-                            const int al = 255 * 255 - (255 - a) * (255 - a2);
-                            const uint32_t g2 = ((*dp) & 255);
-                            g = (g * u + g2 * v) / al;
-                            a = al / 255;
-                        }
-                        *dp++ = g;
-                        *dp++ = a;
-                    } else
-                        dp += 2;
+                    dp += 2;
             }
         }
         src += srcbytes;
@@ -387,8 +475,8 @@ void compose4(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_
 
 void compose6(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_t srcbytes, const uint32_t w, const uint32_t h, const uint32_t bop, const uint8_t depth)
 {
-    uint32_t    i;
-    uint32_t    r, g, b, a;
+    uint32_t i;
+    uint32_t r, g, b, a;
     uint32_t a2;
 
     const uint32_t step = (depth + 7) / 8;
@@ -399,38 +487,45 @@ void compose6(uint8_t* dst, const uint32_t dstbytes, uint8_t* src, const uint32_
 
         if (bop == PNG_BLEND_OP_SOURCE) {
             for (i = 0; i < w; i++) {
-                b = *sp; sp += step;
-                g = *sp; sp += step;
-                r = *sp; sp += step;
-                a = *sp; sp += step;
+                b = *sp;
+                sp += step;
+                g = *sp;
+                sp += step;
+                r = *sp;
+                sp += step;
+                a = *sp;
+                sp += step;
                 *dp++ = (a << 24) + (r << 16) + (g << 8) + b;
             }
         } else /* PNG_BLEND_OP_OVER */
         {
             for (i = 0; i < w; i++) {
-                b = *sp; sp += step;
-                g = *sp; sp += step;
-                r = *sp; sp += step;
-                a = *sp; sp += step;
+                b = *sp;
+                sp += step;
+                g = *sp;
+                sp += step;
+                r = *sp;
+                sp += step;
+                a = *sp;
+                sp += step;
                 if (a == 255)
                     *dp++ = (a << 24) + (r << 16) + (g << 8) + b;
-                else
-                    if (a != 0) {
-                        if ((a2 = (*dp) >> 24) != 0) {
-                            const int u = a * 255;
-                            const int v = (255 - a) * a2;
-                            const int al = 255 * 255 - (255 - a) * (255 - a2);
-                            const uint32_t b2 = ((*dp) & 255);
-                            const uint32_t g2 = (((*dp) >> 8) & 255);
-                            const uint32_t r2 = (((*dp) >> 16) & 255);
-                            b = (b * u + b2 * v) / al;
-                            g = (g * u + g2 * v) / al;
-                            r = (r * u + r2 * v) / al;
-                            a = al / 255;
-                        }
-                        *dp++ = (a << 24) + (r << 16) + (g << 8) + b;
-                    } else
-                        dp++;
+                else if (a != 0) {
+                    if ((a2 = (*dp) >> 24) != 0) {
+                        const int u = a * 255;
+                        const int v = (255 - a) * a2;
+                        const int al = 255 * 255 - (255 - a) * (255 - a2);
+                        const uint32_t b2 = ((*dp) & 255);
+                        const uint32_t g2 = (((*dp) >> 8) & 255);
+                        const uint32_t r2 = (((*dp) >> 16) & 255);
+                        b = (b * u + b2 * v) / al;
+                        g = (g * u + g2 * v) / al;
+                        r = (r * u + r2 * v) / al;
+                        a = al / 255;
+                    }
+                    *dp++ = (a << 24) + (r << 16) + (g << 8) + b;
+                } else
+                    dp++;
             }
         }
         src += srcbytes;
@@ -442,16 +537,16 @@ int load_apng(std::stringstream& file, apng_data* apng)
 {
     uint32_t i, j;
     uint32_t rowbytes;
-    int      imagesize, zbuf_size, zsize, trns_idx;
+    int imagesize, zbuf_size, zsize, trns_idx;
     uint32_t len, chunk/*, crc, seq*/;
     uint32_t w, h, w0, h0, x0, y0;
     uint32_t frames, loops, first_frame, cur_frame;
     uint32_t outrow1, outrow2, outimg1, outimg2;
     uint16_t d1, d2;
-    uint8_t  c, dop = PNG_DISPOSE_OP_NONE, bop;
-    uint8_t  channels, depth, pixeldepth, bpp;
-    uint8_t  coltype, compr, filter, interl;
-    z_stream        zstream;
+    uint8_t c, dop = PNG_DISPOSE_OP_NONE, bop;
+    uint8_t channels, depth, pixeldepth, bpp;
+    uint8_t coltype, compr, filter, interl;
+    z_stream zstream;
     memset(apng, 0, sizeof(apng_data));
 
     for (i = 0; i < 256; i++) {
@@ -502,7 +597,8 @@ int load_apng(std::stringstream& file, apng_data* apng)
             file.read((char*)&compr, 1);
             file.read((char*)&filter, 1);
             file.read((char*)&interl, 1);
-            /*crc = */read32(file);
+            /*crc = */
+            read32(file);
 
             channels = 1;
             if (coltype == 2)
@@ -559,7 +655,8 @@ int load_apng(std::stringstream& file, apng_data* apng)
                             palsize = col + 1;
                         }
                     }
-                    /*crc = */read32(file);
+                    /*crc = */
+                    read32(file);
                 } else if (chunk == 0x74524E53) /* tRNS */
                 {
                     hasTRNS = 1;
@@ -575,20 +672,24 @@ int load_apng(std::stringstream& file, apng_data* apng)
                     if (coltype == 0) {
                         trns1 = readshort(&trns[0]);
                         if (depth == 16) {
-                            trns[1] = trns[0]; trns[0] = 0;
+                            trns[1] = trns[0];
+                            trns[0] = 0;
                         }
-                    } else
-                        if (coltype == 2) {
-                            trns1 = readshort(&trns[0]);
-                            trns2 = readshort(&trns[2]);
-                            trns3 = readshort(&trns[4]);
-                            if (depth == 16) {
-                                trns[1] = trns[0]; trns[0] = 0;
-                                trns[3] = trns[2]; trns[2] = 0;
-                                trns[5] = trns[4]; trns[4] = 0;
-                            }
+                    } else if (coltype == 2) {
+                        trns1 = readshort(&trns[0]);
+                        trns2 = readshort(&trns[2]);
+                        trns3 = readshort(&trns[4]);
+                        if (depth == 16) {
+                            trns[1] = trns[0];
+                            trns[0] = 0;
+                            trns[3] = trns[2];
+                            trns[2] = 0;
+                            trns[5] = trns[4];
+                            trns[4] = 0;
                         }
-                    /*crc = */read32(file);
+                    }
+                    /*crc = */
+                    read32(file);
                 } else if (chunk == 0x6163544C) /* acTL */
                 {
                     frames = read32(file);
@@ -596,7 +697,8 @@ int load_apng(std::stringstream& file, apng_data* apng)
                         free(frames_delay);
                     frames_delay = static_cast<uint16_t*>(malloc(frames * sizeof(uint16_t)));
                     loops = read32(file);
-                    /*crc = */read32(file);
+                    /*crc = */
+                    read32(file);
                     if (pOut1)
                         free(pOut1);
                     if (pOut2)
@@ -623,11 +725,16 @@ int load_apng(std::stringstream& file, apng_data* apng)
                         pDst2 = pImg2 + y0 * outrow2 + x0 * 4;
                         unpack(zstream, pTemp, imagesize, pData, zsize, h0, rowbytes, bpp);
                         switch (coltype) {
-                            case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                            case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                            case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                            case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                            case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                            case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                                break;
+                            case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                                break;
+                            case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                                break;
+                            case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                                break;
+                            case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                                break;
                         }
                         zsize = 0;
 
@@ -643,11 +750,26 @@ int load_apng(std::stringstream& file, apng_data* apng)
 
                                 for (j = 0; j < h0; j++) {
                                     switch (coltype) {
-                                        case 0:  memset(pDst2, 0, w0 * 4); if (hasTRNS) memset(pDst1, trns[1], w0); else keep_original = 0; break;
-                                        case 2:  memset(pDst2, 0, w0 * 4); if (hasTRNS) for (i = 0; i < w0; i++) { pDst1[i * 3] = trns[1]; pDst1[i * 3 + 1] = trns[3]; pDst1[i * 3 + 2] = trns[5]; } else keep_original = 0; break;
-                                        case 3:  memset(pDst2, 0, w0 * 4); if (trns_idx >= 0) memset(pDst1, trns_idx, w0); else keep_original = 0; break;
-                                        case 4:  memset(pDst1, 0, w0 * 2); break;
-                                        case 6:  memset(pDst2, 0, w0 * 4); break;
+                                        case 0: memset(pDst2, 0, w0 * 4);
+                                            if (hasTRNS) memset(pDst1, trns[1], w0);
+                                            else keep_original = 0;
+                                            break;
+                                        case 2: memset(pDst2, 0, w0 * 4);
+                                            if (hasTRNS) for (i = 0; i < w0; i++) {
+                                                pDst1[i * 3] = trns[1];
+                                                pDst1[i * 3 + 1] = trns[3];
+                                                pDst1[i * 3 + 2] = trns[5];
+                                            }
+                                            else keep_original = 0;
+                                            break;
+                                        case 3: memset(pDst2, 0, w0 * 4);
+                                            if (trns_idx >= 0) memset(pDst1, trns_idx, w0);
+                                            else keep_original = 0;
+                                            break;
+                                        case 4: memset(pDst1, 0, w0 * 2);
+                                            break;
+                                        case 6: memset(pDst2, 0, w0 * 4);
+                                            break;
                                     }
                                     pDst1 += outrow1;
                                     pDst2 += outrow2;
@@ -656,7 +778,8 @@ int load_apng(std::stringstream& file, apng_data* apng)
                         }
                     }
 
-                    /*seq = */read32(file);
+                    /*seq = */
+                    read32(file);
                     w0 = read32(file);
                     h0 = read32(file);
                     x0 = read32(file);
@@ -665,7 +788,8 @@ int load_apng(std::stringstream& file, apng_data* apng)
                     d2 = read16(file);
                     file.read((char*)&dop, 1);
                     file.read((char*)&bop, 1);
-                    /*crc = */read32(file);
+                    /*crc = */
+                    read32(file);
 
                     if (d2 == 0)
                         d2 = 100;
@@ -688,25 +812,33 @@ int load_apng(std::stringstream& file, apng_data* apng)
                 {
                     file.read((char*)(pData + zsize), len);
                     zsize += len;
-                    /*crc = */read32(file);
+                    /*crc = */
+                    read32(file);
                 } else if (chunk == 0x66644154) /* fdAT */
                 {
-                    /*seq = */read32(file);
+                    /*seq = */
+                    read32(file);
                     len -= 4;
                     file.read((char*)(pData + zsize), len);
                     zsize += len;
-                    /*crc = */read32(file);
+                    /*crc = */
+                    read32(file);
                 } else if (chunk == 0x49454E44) /* IEND */
                 {
                     pDst1 = pImg1 + y0 * outrow1 + x0 * channels;
                     pDst2 = pImg2 + y0 * outrow2 + x0 * 4;
                     unpack(zstream, pTemp, imagesize, pData, zsize, h0, rowbytes, bpp);
                     switch (coltype) {
-                        case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
-                        case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth); break;
+                        case 0: compose0(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                            break;
+                        case 2: compose2(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                            break;
+                        case 3: compose3(pDst1, outrow1, pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                            break;
+                        case 4: compose4(pDst1, outrow1, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                            break;
+                        case 6: compose6(pDst2, outrow2, pTemp, rowbytes + 1, w0, h0, bop, depth);
+                            break;
                     }
                     break;
                 } else {
@@ -720,16 +852,20 @@ int load_apng(std::stringstream& file, apng_data* apng)
                     if (notabc(c)) break;
 
                     file.seekg(len, std::ios_base::cur);
-                    /*crc = */read32(file);
+                    /*crc = */
+                    read32(file);
                 }
             }
             /* apng decoding - end */
 
             if (coltype == 0) {
                 switch (depth) {
-                    case 4: trns[1] *= 0x11; break;
-                    case 2: trns[1] *= 0x55; break;
-                    case 1: trns[1] *= 0xFF; break;
+                    case 4: trns[1] *= 0x11;
+                        break;
+                    case 2: trns[1] *= 0x55;
+                        break;
+                    case 1: trns[1] *= 0xFF;
+                        break;
                 }
             }
 
@@ -831,20 +967,20 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
 
     struct IHDR
     {
-        uint32_t    mWidth;
-        uint32_t    mHeight;
-        uint8_t   mDepth;
-        uint8_t   mColorType;
-        uint8_t   mCompression;
-        uint8_t   mFilterMethod;
-        uint8_t   mInterlaceMethod;
+        uint32_t mWidth;
+        uint32_t mHeight;
+        uint8_t mDepth;
+        uint8_t mColorType;
+        uint8_t mCompression;
+        uint8_t mFilterMethod;
+        uint8_t mInterlaceMethod;
     } ihdr = { .mWidth = swap32(width), .mHeight = swap32(height), .mDepth = 8, .mColorType = coltype, .mCompression = 0,
             .mFilterMethod = 0, .mInterlaceMethod = 0
-    };
+        };
 
     z_stream zstream1;
-    z_stream        zstream2;
-    uint32_t    i, j;
+    z_stream zstream2;
+    uint32_t i, j;
 
     uint32_t rowbytes = width * bpp;
     uint32_t idat_size = (rowbytes + 1) * height;
@@ -911,9 +1047,9 @@ void save_png(std::stringstream& f, uint32_t width, uint32_t height, int channel
 
     for (j = 0; j < height; j++) {
         uint8_t* out;
-        uint32_t    sum = 0;
+        uint32_t sum = 0;
         uint8_t* best_row = row_buf;
-        uint32_t    mins = static_cast<uint32_t>(-1) >> 1;
+        uint32_t mins = static_cast<uint32_t>(-1) >> 1;
 
         out = row_buf + 1;
 

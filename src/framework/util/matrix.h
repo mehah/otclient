@@ -232,16 +232,36 @@ Matrix<M, Q, T> operator*(const Matrix<M, N, T>& a, const Matrix<P, Q, T>& b)
 }
 
 template<int M, int N, typename T>
-Matrix<M, N, T> operator+(const Matrix<M, N, T>& a, const Matrix<M, N, T>& b) { Matrix<M, N, T> c(a); c += b; return c.generateHash(); }
+Matrix<M, N, T> operator+(const Matrix<M, N, T>& a, const Matrix<M, N, T>& b)
+{
+    Matrix<M, N, T> c(a);
+    c += b;
+    return c.generateHash();
+}
 
 template<int M, int N, typename T>
-Matrix<M, N, T> operator-(const Matrix<M, N, T>& a, const Matrix<M, N, T>& b) { Matrix<M, N, T> c(a); c -= b; return c.generateHash(); }
+Matrix<M, N, T> operator-(const Matrix<M, N, T>& a, const Matrix<M, N, T>& b)
+{
+    Matrix<M, N, T> c(a);
+    c -= b;
+    return c.generateHash();
+}
 
 template<int M, int N, typename T>
-Matrix<M, N, T> operator*(const Matrix<M, N, T>& a, float b) { Matrix<M, N, T> c(a); c *= b; return c.generateHash(); }
+Matrix<M, N, T> operator*(const Matrix<M, N, T>& a, float b)
+{
+    Matrix<M, N, T> c(a);
+    c *= b;
+    return c.generateHash();
+}
 
 template<int M, int N, typename T>
-Matrix<M, N, T> operator/(const Matrix<M, N, T>& a, float b) { Matrix<M, N, T> c = a; c /= b; return c.generateHash(); }
+Matrix<M, N, T> operator/(const Matrix<M, N, T>& a, float b)
+{
+    Matrix<M, N, T> c = a;
+    c /= b;
+    return c.generateHash();
+}
 
 using Matrix4x4 = Matrix<4, 4>;
 using Matrix3x3 = Matrix<3, 3>;

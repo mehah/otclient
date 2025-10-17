@@ -152,6 +152,7 @@ void Effect::setPosition(const Position& position, const uint8_t stackPos)
     m_numPatternY = m_position.y % pattern_y;
 }
 
-ThingType* Effect::getThingType() const {
+ThingType* Effect::getThingType() const
+{
     return g_things.getRawThingType(m_clientId, ThingCategoryEffect);
 }

@@ -34,7 +34,8 @@
 
 namespace stdext
 {
-    [[nodiscard]] std::string resolve_path(std::string_view filePath, std::string_view sourcePath) {
+    [[nodiscard]] std::string resolve_path(std::string_view filePath, std::string_view sourcePath)
+    {
         if (filePath.starts_with("/"))
             return std::string(filePath);
 
@@ -45,7 +46,8 @@ namespace stdext
         return std::string(sourcePath.substr(0, slashPos + 1)) + std::string(filePath);
     }
 
-    [[nodiscard]] std::string date_time_string(const char* format) {
+    [[nodiscard]] std::string date_time_string(const char* format)
+    {
         std::time_t tnow = std::time(nullptr);
         std::tm ts{};
 
@@ -63,14 +65,16 @@ namespace stdext
         return std::string(date);
     }
 
-    [[nodiscard]] std::string dec_to_hex(uint64_t num) {
+    [[nodiscard]] std::string dec_to_hex(uint64_t num)
+    {
         char buffer[17];
         auto [ptr, ec] = std::to_chars(buffer, buffer + sizeof(buffer) - 1, num, 16);
         *ptr = '\0';
         return std::string(buffer);
     }
 
-    [[nodiscard]] uint64_t hex_to_dec(std::string_view str) {
+    [[nodiscard]] uint64_t hex_to_dec(std::string_view str)
+    {
         uint64_t num = 0;
         auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), num, 16);
         if (ec != std::errc())
@@ -78,7 +82,8 @@ namespace stdext
         return num;
     }
 
-    [[nodiscard]] bool is_valid_utf8(std::string_view src) {
+    [[nodiscard]] bool is_valid_utf8(std::string_view src)
+    {
         for (size_t i = 0; i < src.size();) {
             unsigned char c = src[i];
             size_t bytes = (c < 0x80) ? 1 : (c < 0xE0) ? 2 : (c < 0xF0) ? 3 : (c < 0xF5) ? 4 : 0;
@@ -89,7 +94,8 @@ namespace stdext
         return true;
     }
 
-    [[nodiscard]] std::string utf8_to_latin1(std::string_view src) {
+    [[nodiscard]] std::string utf8_to_latin1(std::string_view src)
+    {
         std::string out;
         out.reserve(src.size());
         for (size_t i = 0; i < src.size(); ++i) {
@@ -110,7 +116,8 @@ namespace stdext
         return out;
     }
 
-    [[nodiscard]] std::string latin1_to_utf8(std::string_view src) {
+    [[nodiscard]] std::string latin1_to_utf8(std::string_view src)
+    {
         std::string out;
         out.reserve(src.size() * 2);
         for (uint8_t c : src) {
@@ -163,12 +170,17 @@ namespace stdext
 
     void rtrim(std::string& s) { s.erase(std::ranges::find_if(s | std::views::reverse, [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end()); }
 
-    void trim(std::string& s) { ltrim(s); rtrim(s); }
+    void trim(std::string& s)
+    {
+        ltrim(s);
+        rtrim(s);
+    }
 
-    void trimSpacesAndNewlines(std::string& s) {
+    void trimSpacesAndNewlines(std::string& s)
+    {
         if (s.empty()) return;
 
-        const unsigned char* data = reinterpret_cast<const unsigned char*>(s.data());
+        auto data = reinterpret_cast<const unsigned char*>(s.data());
         size_t start = 0;
         size_t end = s.size();
 
@@ -187,7 +199,8 @@ namespace stdext
         }
     }
 
-    void ucwords(std::string& str) {
+    void ucwords(std::string& str)
+    {
         bool capitalize = true;
         for (char& c : str) {
             if (std::isspace(static_cast<unsigned char>(c)))
@@ -199,7 +212,8 @@ namespace stdext
         }
     }
 
-    void replace_all(std::string& str, std::string_view search, std::string_view replacement) {
+    void replace_all(std::string& str, std::string_view search, std::string_view replacement)
+    {
         size_t pos = 0;
         while ((pos = str.find(search, pos)) != std::string::npos) {
             str.replace(pos, search.length(), replacement);
@@ -207,7 +221,8 @@ namespace stdext
         }
     }
 
-    std::string join(const std::vector<std::string>& vec, const std::string& sep) {
+    std::string join(const std::vector<std::string>& vec, const std::string& sep)
+    {
         if (vec.empty()) return {};
 
         size_t total_size = (vec.size() - 1) * sep.size();
@@ -225,7 +240,8 @@ namespace stdext
 
     void eraseWhiteSpace(std::string& str) { std::erase_if(str, isspace); }
 
-    [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators) {
+    [[nodiscard]] std::vector<std::string> split(std::string_view str, std::string_view separators)
+    {
         std::vector<std::string> result;
 
         const char* begin = str.data();
@@ -247,7 +263,8 @@ namespace stdext
         return result;
     }
 
-    long long to_number(std::string_view s) {
+    long long to_number(std::string_view s)
+    {
         const char* p = s.data();
         const char* end = p + s.size();
 
@@ -282,7 +299,8 @@ namespace stdext
         return negative ? -num : num;
     }
 
-    std::vector<long long> extractNumbers(std::string_view s) {
+    std::vector<long long> extractNumbers(std::string_view s)
+    {
         std::vector<long long> out;
         out.reserve(s.size() / 3);
 
@@ -297,7 +315,10 @@ namespace stdext
             unsigned char c = static_cast<unsigned char>(*p);
 
             if (c >= '0' && c <= '9') {
-                if (!building) { building = true; val = 0; }
+                if (!building) {
+                    building = true;
+                    val = 0;
+                }
                 val = val * 10 + (c - '0');
             } else {
                 if (building) {

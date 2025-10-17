@@ -101,7 +101,8 @@ void DrawPool::addCoords(CoordsBuffer& buffer, const DrawMethod& method)
     }
 }
 
-bool DrawPool::updateHash(const DrawMethod& method, const Texture* texture, const Color& color, const bool hasCoord) {
+bool DrawPool::updateHash(const DrawMethod& method, const Texture* texture, const Color& color, const bool hasCoord)
+{
     auto& state = getCurrentState();
     state.hash = 0;
 
@@ -253,18 +254,18 @@ void DrawPool::scale(const float factor)
 
     m_scale = factor;
     getCurrentState().transformMatrix = DEFAULT_MATRIX3 * Matrix3{
-      factor,   0.0f,  0.0f,
-        0.0f, factor,  0.0f,
-        0.0f,   0.0f,  1.0f
+        factor, 0.0f, 0.0f,
+        0.0f, factor, 0.0f,
+        0.0f, 0.0f, 1.0f
     }.transposed();
 }
 
 void DrawPool::translate(const float x, const float y)
 {
     const Matrix3 translateMatrix = {
-            1.0f,  0.0f,     x,
-            0.0f,  1.0f,     y,
-            0.0f,  0.0f,  1.0f
+        1.0f, 0.0f, x,
+        0.0f, 1.0f, y,
+        0.0f, 0.0f, 1.0f
     };
 
     getCurrentState().transformMatrix = getCurrentState().transformMatrix * translateMatrix.transposed();
@@ -273,9 +274,9 @@ void DrawPool::translate(const float x, const float y)
 void DrawPool::rotate(const float angle)
 {
     const Matrix3 rotationMatrix = {
-            std::cos(angle), -std::sin(angle),  0.0f,
-            std::sin(angle),  std::cos(angle),  0.0f,
-                       0.0f,             0.0f,  1.0f
+        std::cos(angle), -std::sin(angle), 0.0f,
+        std::sin(angle), std::cos(angle), 0.0f,
+        0.0f, 0.0f, 1.0f
     };
 
     getCurrentState().transformMatrix = getCurrentState().transformMatrix * rotationMatrix.transposed();
@@ -301,7 +302,8 @@ void DrawPool::popTransformMatrix()
     m_transformMatrixStack.pop_back();
 }
 
-void DrawPool::PoolState::execute(DrawPool* pool) const {
+void DrawPool::PoolState::execute(DrawPool* pool) const
+{
     g_painter->setColor(color);
     g_painter->setOpacity(opacity);
     g_painter->setCompositionMode(compositionMode);
@@ -320,7 +322,8 @@ void DrawPool::PoolState::execute(DrawPool* pool) const {
         g_painter->setTexture(textureId, textureMatrixId);
 }
 
-void DrawPool::setFramebuffer(const Size& size) {
+void DrawPool::setFramebuffer(const Size& size)
+{
     if (!m_framebuffer) {
         m_framebuffer = std::make_shared<FrameBuffer>();
         m_framebuffer->m_isScene = true;
@@ -332,7 +335,8 @@ void DrawPool::setFramebuffer(const Size& size) {
     }
 }
 
-void DrawPool::removeFramebuffer() {
+void DrawPool::removeFramebuffer()
+{
     m_hashCtrl.reset();
     m_framebuffer = nullptr;
 }
@@ -378,7 +382,8 @@ void DrawPool::releaseFrameBuffer(const Rect& dest)
     --m_bindedFramebuffers;
 }
 
-const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
+const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index)
+{
     if (index < m_temporaryFramebuffers.size()) {
         return m_temporaryFramebuffers[index];
     }
@@ -388,7 +393,8 @@ const FrameBufferPtr& DrawPool::getTemporaryFrameBuffer(const uint8_t index) {
     return tempfb;
 }
 
-std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer() {
+std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer()
+{
     CoordsBuffer* coordsBuffer = nullptr;
 
     if (!m_coordsCache.empty()) {
@@ -399,12 +405,12 @@ std::shared_ptr<CoordsBuffer> DrawPool::getCoordsBuffer() {
 
     return {
         coordsBuffer, [this](CoordsBuffer* ptr) {
-        if (m_enabled) {
-            ptr->clear();
-            m_coordsCache.emplace_back(ptr);
-        } else {
-            delete ptr;
+            if (m_enabled) {
+                ptr->clear();
+                m_coordsCache.emplace_back(ptr);
+            } else {
+                delete ptr;
+            }
         }
-    }
     };
 }

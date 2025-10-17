@@ -39,7 +39,11 @@ public:
     void seek(uint32_t pos);
     void skip(uint32_t len);
     [[nodiscard]] uint32_t tell() const { return m_pos; }
-    uint32_t size() { unserialize(); return m_buffer.size(); }
+    uint32_t size()
+    {
+        unserialize();
+        return m_buffer.size();
+    }
 
     uint8_t getU8();
     uint16_t getU16();
@@ -49,7 +53,11 @@ public:
     Point getPoint();
 
     BinaryTreeVec getChildren();
-    bool canRead() { unserialize(); return m_pos < m_buffer.size(); }
+    bool canRead()
+    {
+        unserialize();
+        return m_pos < m_buffer.size();
+    }
 
 private:
     void unserialize();

@@ -1707,7 +1707,7 @@ void ProtocolGame::parseWorldLight(const InputMessagePtr& msg)
     const auto intensity = msg->getU8();
     const auto color = msg->getU8();
 
-    g_map.setLight({ intensity , color });
+    g_map.setLight({ intensity, color });
 
     if (oldLight.color != color || oldLight.intensity != intensity) {
         g_lua.callGlobalField("g_game", "onWorldLightChange", g_map.getLight(), oldLight);
@@ -1722,13 +1722,15 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
         while (effectType != Otc::MAGIC_EFFECTS_END_LOOP) {
             switch (effectType) {
                 case Otc::MAGIC_EFFECTS_DELAY:
-                case Otc::MAGIC_EFFECTS_DELTA: {
+                case Otc::MAGIC_EFFECTS_DELTA:
+                {
                     msg->getU8(); // ?
                     break;
                 }
 
                 case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT:
-                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED: {
+                case Otc::MAGIC_EFFECTS_CREATE_DISTANCEEFFECT_REVERSED:
+                {
                     const uint16_t shotId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
                     const auto offsetX = static_cast<int8_t>(msg->getU8());
                     const auto offsetY = static_cast<int8_t>(msg->getU8());
@@ -1750,7 +1752,8 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                     break;
                 }
 
-                case Otc::MAGIC_EFFECTS_CREATE_EFFECT: {
+                case Otc::MAGIC_EFFECTS_CREATE_EFFECT:
+                {
                     const uint16_t effectId = g_game.getFeature(Otc::GameEffectU16) ? msg->getU16() : msg->getU8();
                     if (!g_things.isValidDatId(effectId, ThingCategoryEffect)) {
                         g_logger.traceError("invalid effect id {}", effectId);
@@ -1763,13 +1766,15 @@ void ProtocolGame::parseMagicEffect(const InputMessagePtr& msg)
                     break;
                 }
 
-                case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT: {
+                case Otc::MAGIC_EFFECTS_CREATE_SOUND_MAIN_EFFECT:
+                {
                     msg->getU8(); // Source
                     msg->getU16(); // Sound ID
                     break;
                 }
 
-                case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT: {
+                case Otc::MAGIC_EFFECTS_CREATE_SOUND_SECONDARY_EFFECT:
+                {
                     msg->getU8(); // ENUM
                     msg->getU8(); // Source
                     msg->getU16(); // Sound ID
@@ -2904,7 +2909,7 @@ void ProtocolGame::parseOpenOutfitWindow(const InputMessagePtr& msg) const
         }
     }
 
-    std::vector<std::tuple<uint16_t, std::string> > familiarList;
+    std::vector<std::tuple<uint16_t, std::string>> familiarList;
     if (g_game.getFeature(Otc::GamePlayerFamiliars)) {
         const uint16_t familiarCount = msg->getU16();
         for (auto i = 0; std::cmp_less(i, familiarCount); ++i) {
@@ -2966,7 +2971,8 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
 {
     const uint8_t messageType = msg->getU8();
     switch (messageType) {
-        case 1: {
+        case 1:
+        {
             const uint8_t remainingQuests = msg->getU8();
             const uint8_t missionCount = msg->getU8();
             std::vector<std::tuple<uint16_t, uint16_t, std::string, std::string, std::string>> missions;
@@ -2983,7 +2989,8 @@ void ProtocolGame::parseQuestTracker(const InputMessagePtr& msg)
             }
             return g_lua.callGlobalField("g_game", "onQuestTracker", remainingQuests, missions);
         }
-        case 0: {
+        case 0:
+        {
             uint8_t questId = 0;
             if (g_game.getClientVersion() >= 1410) {
                 questId = msg->getU16();
@@ -3421,7 +3428,7 @@ void ProtocolGame::parseChangeMapAwareRange(const InputMessagePtr& msg)
         .top = static_cast<uint8_t>(yRange / 2 - (yRange + 1) % 2),
         .right = static_cast<uint8_t>(xRange / 2),
         .bottom = static_cast<uint8_t>(yRange / 2)
-                        });
+    });
 
     g_lua.callGlobalField("g_game", "onMapChangeAwareRange", xRange, yRange);
 }
@@ -4216,7 +4223,8 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
 
         const auto type = static_cast<Otc::CyclopediaHouseState_t>(msg->getU8());
         switch (type) {
-            case Otc::CYCLOPEDIA_HOUSE_STATE_AVAILABLE: {
+            case Otc::CYCLOPEDIA_HOUSE_STATE_AVAILABLE:
+            {
                 std::string bidderName = msg->getString();
                 const auto isBidder = static_cast<bool>(msg->getU8());
                 msg->getU8(); // disableIndex
@@ -4230,7 +4238,8 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
                 }
                 break;
             }
-            case Otc::CYCLOPEDIA_HOUSE_STATE_RENTED: {
+            case Otc::CYCLOPEDIA_HOUSE_STATE_RENTED:
+            {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
 
@@ -4241,7 +4250,8 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
                 }
                 break;
             }
-            case Otc::CYCLOPEDIA_HOUSE_STATE_TRANSFER: {
+            case Otc::CYCLOPEDIA_HOUSE_STATE_TRANSFER:
+            {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
                 const auto isOwner = static_cast<bool>(msg->getU8());
@@ -4265,7 +4275,8 @@ void ProtocolGame::parseCyclopediaHouseList(const InputMessagePtr& msg)
                 }
                 break;
             }
-            case Otc::CYCLOPEDIA_HOUSE_STATE_MOVEOUT: {
+            case Otc::CYCLOPEDIA_HOUSE_STATE_MOVEOUT:
+            {
                 msg->getString(); // ownerName
                 msg->getU32(); // paidUntil
 
@@ -5157,7 +5168,8 @@ void ProtocolGame::parseOpenRewardWall(const InputMessagePtr& msg)
                           wasDailyRewardTaken, errorMessage, tokens, timeLeft, dayStreakLevel);
 }
 
-namespace {
+namespace
+{
     DailyRewardDay parseRewardDay(const InputMessagePtr& msg)
     {
         DailyRewardDay day;
@@ -5183,21 +5195,24 @@ namespace {
                 bundle.bundleType = bundleType;
 
                 switch (bundleType) {
-                    case 1: {
+                    case 1:
+                    {
                         // Items
                         bundle.itemId = msg->getU16(); // Item ID
                         bundle.name = msg->getString(); // Item name
                         bundle.count = msg->getU8(); // Item Count
                         break;
                     }
-                    case 2: {
+                    case 2:
+                    {
                         // Prey Wildcards
                         bundle.itemId = 0;
                         bundle.name = "Prey Wildcards";
                         bundle.count = msg->getU8(); // Prey Wildcards Count
                         break;
                     }
-                    case 3: {
+                    case 3:
+                    {
                         // XP Boost
                         bundle.itemId = msg->getU16(); // XP Boost Minutes
                         bundle.name = "XP Boost";

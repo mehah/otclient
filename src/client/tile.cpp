@@ -40,7 +40,8 @@
 
 Tile::Tile(const Position& position) : m_position(position) {}
 
-void updateElevation(const ThingPtr& thing, uint8_t& drawElevation) {
+void updateElevation(const ThingPtr& thing, uint8_t& drawElevation)
+{
     if (thing->hasElevation())
         drawElevation = std::min<uint8_t>(drawElevation + thing->getElevation(), g_gameConfig.getTileMaxElevation());
 }
@@ -109,7 +110,8 @@ void Tile::draw(const Point& dest, const int flags, const LightViewPtr& lightVie
     drawAttachedParticlesEffect(dest);
 }
 
-void Tile::drawLight(const Point& dest, const LightViewPtr& lightView) {
+void Tile::drawLight(const Point& dest, const LightViewPtr& lightView)
+{
     uint8_t drawElevation = 0;
 
     for (const auto& thing : m_things) {
@@ -232,7 +234,8 @@ void Tile::removeWalkingCreature(const CreaturePtr& creature)
     recalculateThingFlag();
 }
 
-void Tile::updateThingStackPos() {
+void Tile::updateThingStackPos()
+{
     for (int stackpos = -1, s = m_things.size(); ++stackpos < s;) {
         m_things[stackpos]->m_stackPos = stackpos;
     }
@@ -1018,7 +1021,8 @@ bool Tile::canShoot(int distance)
     return g_map.isSightClear(playerPos, m_position);
 }
 
-bool Tile::isFullyOpaque() {
+bool Tile::isFullyOpaque()
+{
     if (isFullGround())
         return true;
 
@@ -1030,7 +1034,8 @@ bool Tile::isFullyOpaque() {
     return false;
 }
 
-bool Tile::isLoading() const {
+bool Tile::isLoading() const
+{
     for (const auto& thing : m_things) {
         if (thing->isLoading())
             return true;

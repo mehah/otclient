@@ -22,7 +22,7 @@
 
 #pragma once
 
- // common C headers
+// common C headers
 #include <cassert>
 #include <cmath>
 #include <cstddef>
@@ -65,7 +65,7 @@
 #include <fmt/ranges.h>
 
 // FMT Custom Formatter for Enums
-template <typename E>
+template<typename E>
 std::underlying_type_t<E>
 format_as(E e) requires (std::is_enum_v<E>)
 {

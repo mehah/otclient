@@ -77,7 +77,8 @@ void MinimapBlock::updateTile(const int x, const int y, const MinimapTile& tile)
     m_tiles[getTileIndex(x, y)] = tile;
 }
 
-void Minimap::init() {
+void Minimap::init()
+{
     m_tileBlocks.resize(g_gameConfig.getMapMaxZ() + 1);
 }
 
@@ -230,18 +231,18 @@ bool Minimap::loadImage(const std::string& fileName, const Position& topLeft, fl
 {
     // non pathable colors
     static Color nonPathableColors[] = {
-       "#ffff00"sv, // yellow
+        "#ffff00"sv, // yellow
     };
 
     // non walkable colors
     static Color nonWalkableColors[] = {
-       "#000000"sv, // oil, black
-       "#006600"sv, // trees, dark green
-       "#ff3300"sv, // walls, red
-       "#666666"sv, // mountain, grey
-       "#ff6600"sv, // lava, orange
-       "#00ff00"sv, // positon
-       "#ccffff"sv, // ice, very light blue
+        "#000000"sv, // oil, black
+        "#006600"sv, // trees, dark green
+        "#ff3300"sv, // walls, red
+        "#666666"sv, // mountain, grey
+        "#ff6600"sv, // lava, orange
+        "#00ff00"sv, // positon
+        "#ccffff"sv, // ice, very light blue
     };
 
     if (colorFactor <= .01f)

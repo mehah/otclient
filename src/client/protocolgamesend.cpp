@@ -895,20 +895,24 @@ void ProtocolGame::sendEditVipGroups(const Otc::GroupsEditInfoType_t action, con
     msg->addU8(Proto::ClientEditVipGroups);
     msg->addU8(action);
     switch (action) {
-        case Otc::VIP_GROUP_ADD: {
+        case Otc::VIP_GROUP_ADD:
+        {
             msg->addString(groupName);
             break;
         }
-        case Otc::VIP_GROUP_EDIT: {
+        case Otc::VIP_GROUP_EDIT:
+        {
             msg->addU8(groupId);
             msg->addString(groupName);
             break;
         }
-        case Otc::VIP_GROUP_REMOVE: {
+        case Otc::VIP_GROUP_REMOVE:
+        {
             msg->addU8(groupId);
             break;
         }
-        default: {
+        default:
+        {
             return;
         }
     }

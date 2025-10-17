@@ -22,7 +22,8 @@
 
 #include "asyncdispatcher.h"
 
-uint8_t getThreadCount() {
+uint8_t getThreadCount()
+{
     /*
     * -1 = Graphic (Main Thread)
     * 1 = Map and (Connection, Particle and Sound) Pool

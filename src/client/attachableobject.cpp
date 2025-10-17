@@ -67,7 +67,8 @@ void AttachableObject::attachEffect(const AttachedEffectPtr& obj)
     });
 }
 
-bool AttachableObject::detachEffect(const AttachedEffectPtr& obj) {
+bool AttachableObject::detachEffect(const AttachedEffectPtr& obj)
+{
     if (!hasAttachedEffects()) return false;
     const auto it = std::find(m_data->attachedEffects.begin(), m_data->attachedEffects.end(), obj);
 
@@ -119,12 +120,12 @@ void AttachableObject::clearTemporaryAttachedEffects()
     if (!hasAttachedEffects()) return;
     std::erase_if(m_data->attachedEffects,
                   [this](const AttachedEffectPtr& obj) {
-        if (!obj->isPermanent()) {
-            onDetachEffect(obj);
-            return true;
-        }
-        return false;
-    });
+                      if (!obj->isPermanent()) {
+                          onDetachEffect(obj);
+                          return true;
+                      }
+                      return false;
+                  });
 }
 
 void AttachableObject::clearPermanentAttachedEffects()
@@ -132,12 +133,12 @@ void AttachableObject::clearPermanentAttachedEffects()
     if (!hasAttachedEffects()) return;
     std::erase_if(m_data->attachedEffects,
                   [this](const AttachedEffectPtr& obj) {
-        if (obj->isPermanent()) {
-            onDetachEffect(obj);
-            return true;
-        }
-        return false;
-    });
+                      if (obj->isPermanent()) {
+                          onDetachEffect(obj);
+                          return true;
+                      }
+                      return false;
+                  });
 }
 
 AttachedEffectPtr AttachableObject::getAttachedEffectById(uint16_t id)
@@ -165,7 +166,8 @@ void AttachableObject::drawAttachedEffect(const Point& dest, const LightViewPtr&
     }
 }
 
-void AttachableObject::drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView) {
+void AttachableObject::drawAttachedLightEffect(const Point& dest, const LightViewPtr& lightView)
+{
     if (!hasAttachedEffects()) return;
     for (const auto& effect : m_data->attachedEffects)
         effect->drawLight(dest, lightView);
@@ -242,13 +244,15 @@ void AttachableObject::updateAndAttachParticlesEffects(std::vector<std::string>&
         attachParticleEffect(name);
 }
 
-bool AttachableObject::isWidgetAttached(const UIWidgetPtr& widget) {
+bool AttachableObject::isWidgetAttached(const UIWidgetPtr& widget)
+{
     if (!hasAttachedWidgets()) return false;
     return std::find_if(m_data->attachedWidgets.begin(), m_data->attachedWidgets.end(),
                         [widget](const UIWidgetPtr& obj) { return obj == widget; }) != m_data->attachedWidgets.end();
 }
 
-void AttachableObject::attachWidget(const UIWidgetPtr& widget) {
+void AttachableObject::attachWidget(const UIWidgetPtr& widget)
+{
     if (!widget || isWidgetAttached(widget))
         return;
 

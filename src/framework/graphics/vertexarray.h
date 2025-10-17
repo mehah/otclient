@@ -141,7 +141,8 @@ public:
         m_buffer.insert(m_buffer.end(), &arr[0], &arr[size]);
     }
 
-    void append(const VertexArray* buffer) {
+    void append(const VertexArray* buffer)
+    {
         m_buffer.insert(m_buffer.end(), buffer->m_buffer.begin(), buffer->m_buffer.end());
     }
 

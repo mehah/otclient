@@ -23,7 +23,7 @@
 #include "scheduledevent.h"
 
 ScheduledEvent::ScheduledEvent(const std::function<void()>& callback, const int delay, const int maxCycles) : Event(callback),
-m_ticks(g_clock.millis() + delay), m_delay(delay), m_maxCycles(maxCycles) {}
+    m_ticks(g_clock.millis() + delay), m_delay(delay), m_maxCycles(maxCycles) {}
 
 void ScheduledEvent::execute()
 {

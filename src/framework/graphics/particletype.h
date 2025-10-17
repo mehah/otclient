@@ -34,7 +34,6 @@ public:
     [[nodiscard]] std::string getName() const { return pName; }
 
 protected:
-
     // name
     std::string pName;
 

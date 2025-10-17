@@ -78,7 +78,8 @@ int OggSoundFile::cb_seek(void* source, const ogg_int64_t offset, const int when
     return -1;
 }
 
-int OggSoundFile::cb_close(void* source) {
+int OggSoundFile::cb_close(void* source)
+{
     static_cast<FileStream*>(source)->close();
     return 0;
 }

@@ -24,7 +24,8 @@
 #include "declarations.h"
 #include <cstdint>
 
-namespace css {
+namespace css
+{
     struct PseudoInfo
     {
         std::string name;

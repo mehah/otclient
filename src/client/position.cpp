@@ -24,7 +24,8 @@
 
 #include "gameconfig.h"
 
-bool Position::isMapPosition() const {
+bool Position::isMapPosition() const
+{
     return ((x >= 0) && (y >= 0) && (std::cmp_less(x, UINT16_MAX)) && (
         std::cmp_less(y, UINT16_MAX)) && (z <= g_gameConfig.getMapMaxZ()));
 }
@@ -56,7 +57,9 @@ bool Position::coveredUp(const int8_t n)
     const int8_t nz = z - n;
     if (nx >= 0 && std::cmp_less_equal(nx, UINT16_MAX) && ny >= 0 && std::cmp_less_equal(ny, UINT16_MAX) && nz >= 0 &&
         std::cmp_less_equal(nz, g_gameConfig.getMapMaxZ())) {
-        x = nx; y = ny; z = nz;
+        x = nx;
+        y = ny;
+        z = nz;
         return true;
     }
 
@@ -69,7 +72,9 @@ bool Position::coveredDown(const int8_t n)
     const int8_t nz = z + n;
     if (nx >= 0 && std::cmp_less_equal(nx, UINT16_MAX) && ny >= 0 && std::cmp_less_equal(ny, UINT16_MAX) && nz >= 0 &&
         std::cmp_less_equal(nz, g_gameConfig.getMapMaxZ())) {
-        x = nx; y = ny; z = nz;
+        x = nx;
+        y = ny;
+        z = nz;
         return true;
     }
 

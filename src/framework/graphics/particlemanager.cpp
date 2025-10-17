@@ -65,7 +65,8 @@ ParticleEffectPtr ParticleManager::createEffect(const std::string_view name)
     }
 }
 
-bool ParticleManager::removeEffect(const ParticleEffectPtr& particle) {
+bool ParticleManager::removeEffect(const ParticleEffectPtr& particle)
+{
     return m_effects.remove(particle) > 0;
 }
 
