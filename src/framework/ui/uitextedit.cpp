@@ -74,17 +74,15 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
     if (glyphsMustRecache)
         setProp(PropGlyphsMustRecache, false);
 
-    // Hack to fix font rendering in atlas
     if (m_font->getAtlasRegion() != m_atlasRegion) {
         m_atlasRegion = m_font->getAtlasRegion();
         update(false, true);
     }
 
-    const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
+    const int textLength = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
     if (textLength == 0) {
-        if (m_placeholderColor != Color::alpha && !m_placeholder.empty()) {
+        if (m_placeholderColor != Color::alpha && !m_placeholder.empty())
             m_placeholderFont->drawText(m_placeholder, m_drawArea, m_placeholderColor, m_placeholderAlign);
-        }
     }
 
     if (m_color != Color::alpha) {
@@ -92,9 +90,8 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         if (m_drawTextColors.empty() || m_colorCoordsBuffer.empty()) {
             g_drawPool.addTexturedCoordsBuffer(texture, m_coordsBuffer, m_color);
         } else {
-            for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer) {
+            for (const auto& [color, coordsBuffer] : m_colorCoordsBuffer)
                 g_drawPool.addTexturedCoordsBuffer(texture, coordsBuffer, color);
-            }
         }
         g_drawPool.resetDrawOrder();
     }
@@ -107,22 +104,21 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         }
         for (const auto& [dest, src] : m_glyphsSelectRectCache)
             g_drawPool.addFilledRect(dest, m_selectionBackgroundColor);
-
         for (const auto& [dest, src] : m_glyphsSelectRectCache)
             g_drawPool.addTexturedRect(dest, texture, src, m_selectionColor);
     }
 
-    // render cursor
     if (isExplicitlyEnabled() && getProp(PropCursorVisible) && getProp(PropCursorInRange) && isActive() && m_cursorPos >= 0) {
-        assert(m_cursorPos <= textLength);
-        // draw every 333ms
+        const int cursorVis = m_srcToVis.empty()
+            ? std::clamp(m_cursorPos, 0, textLength)
+            : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, static_cast<int>(m_text.length()))], 0, textLength);
+
         constexpr int delay = 333;
         const ticks_t elapsed = g_clock.millis() - m_cursorTicks;
         if (elapsed <= delay) {
-            auto cursorRect = m_cursorPos > 0 ?
-                Rect(m_glyphsCoords[m_cursorPos - 1].first.right(), m_glyphsCoords[m_cursorPos - 1].first.top(), 1, m_font->getGlyphHeight())
-                :
-                Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
+            auto cursorRect = cursorVis > 0
+                ? Rect(m_glyphsCoords[cursorVis - 1].first.right(), m_glyphsCoords[cursorVis - 1].first.top(), 1, m_font->getGlyphHeight())
+                : Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
 
             const bool useSelectionColor = hasSelection() && m_cursorPos >= m_selectionStart && m_cursorPos <= m_selectionEnd;
             const auto& color = useSelectionColor ? m_selectionColor : m_color;
@@ -588,12 +584,11 @@ void UITextEdit::moveCursorVertically(bool)
 
 int UITextEdit::getTextPos(const Point& pos)
 {
-    const int textLength = std::min<int>(m_glyphsCoords.size(), m_text.length());
+    const int visLen = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
 
-    // find any glyph that is actually on the
-    int candidatePos = -1;
+    int candidateVis = -1;
     Rect firstGlyphRect, lastGlyphRect;
-    for (int i = 0; i < textLength; ++i) {
+    for (int i = 0; i < visLen; ++i) {
         Rect clickGlyphRect = m_glyphsCoords[i].first;
         if (!clickGlyphRect.isValid())
             continue;
@@ -602,45 +597,63 @@ int UITextEdit::getTextPos(const Point& pos)
         lastGlyphRect = clickGlyphRect;
         clickGlyphRect.expandTop(m_font->getYOffset() + m_font->getGlyphSpacing().height());
         clickGlyphRect.expandLeft(m_font->getGlyphSpacing().width() + 1);
-        if (clickGlyphRect.contains(pos)) {
-            candidatePos = i;
-            break;
-        }
+        if (clickGlyphRect.contains(pos)) { candidateVis = i; break; }
         if (pos.y >= clickGlyphRect.top() && pos.y <= clickGlyphRect.bottom()) {
-            if (pos.x <= clickGlyphRect.left()) {
-                candidatePos = i;
-                break;
-            }
-            if (pos.x >= clickGlyphRect.right())
-                candidatePos = i + 1;
+            if (pos.x <= clickGlyphRect.left()) { candidateVis = i; break; }
+            if (pos.x >= clickGlyphRect.right()) candidateVis = i + 1;
         }
     }
 
-    if (textLength > 0) {
+    if (visLen > 0) {
         if (pos.y < firstGlyphRect.top())
             return 0;
         if (pos.y > lastGlyphRect.bottom())
-            return textLength;
+            return static_cast<int>(m_text.length());
     }
 
-    return candidatePos;
+    if (candidateVis < 0)
+        return -1;
+
+    int clampedVis = std::clamp(candidateVis, 0, static_cast<int>(m_visToSrc.size()) - 1);
+    return std::clamp(m_visToSrc.empty() ? candidateVis : m_visToSrc[clampedVis], 0, static_cast<int>(m_text.length()));
 }
 
 void UITextEdit::updateDisplayedText()
 {
-    std::string text;
-    if (getProp(PropTextHidden))
-        text = std::string(m_text.length(), '*');
-    else
-        text = m_text;
-
+    std::string src = getProp(PropTextHidden) ? std::string(m_text.length(), '*') : m_text;
     m_drawTextColors = m_textColors;
 
+    std::string vis = src;
     if (isTextWrap() && m_rect.isValid()) {
-        text = m_font->wrapText(text, getPaddingRect().width() - m_textOffset.x, m_textWrapOptions);
+        vis = m_font->wrapText(vis, getPaddingRect().width() - m_textOffset.x, m_textWrapOptions);
+    }
+    m_displayedText = vis;
+
+    m_srcToVis.assign(src.size() + 1, 0);
+    m_visToSrc.assign(vis.size() + 1, 0);
+
+    if (src.empty() && vis.empty()) {
+        m_srcToVis[0] = 0;
+        m_visToSrc[0] = 0;
+        return;
     }
 
-    m_displayedText = text;
+    size_t i = 0, j = 0;
+    while (i < src.size() || j < vis.size()) {
+        if (i <= src.size()) m_srcToVis[i] = static_cast<int>(j);
+        if (j <= vis.size()) m_visToSrc[j] = static_cast<int>(i);
+
+        if (i < src.size() && j < vis.size() && src[i] == vis[j]) { ++i; ++j; continue; }
+        if (j < vis.size() && (vis[j] == '\n' || vis[j] == '-')) { ++j; continue; }
+        if (i < src.size() && src[i] == ' ' && (j >= vis.size() || vis[j] != ' ')) { ++i; continue; }
+
+        if (i < src.size() && j < vis.size()) { ++i; ++j; continue; }
+        if (i < src.size()) { ++i; continue; }
+        if (j < vis.size()) { ++j; continue; }
+    }
+
+    m_srcToVis[src.size()] = static_cast<int>(j);
+    m_visToSrc[vis.size()] = static_cast<int>(i);
 }
 
 std::string UITextEdit::getSelection()

@@ -149,6 +149,9 @@ private:
     int m_selectionEnd{ 0 };
     int m_cursorPos{ 0 };
 
+    std::vector<int> m_srcToVis;
+    std::vector<int> m_visToSrc;;
+
     Color m_selectionColor{ Color::white };
     Color m_selectionBackgroundColor{ Color::black };
 
