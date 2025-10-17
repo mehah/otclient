@@ -208,9 +208,11 @@
               onhover="self:clearDescription()"
               class="base-button-cost"
               *margin-top="slot and (slot.type == 3 or slot.type == 4) and 5 or 1"
-              *disabled="slot.disableFreeReroll"
             >
-              <p *disabled="slot.isFreeReroll" class="base-button-cost-label">
+              <p
+                *font="slot.isFreeReroll and 'Verdana-Strikethrough-11px' or 'verdana-11px-rounded'"
+                *color="self:getColor(slot, 'gold')"
+              >
                 {{self.rerollGoldPrice}}
               </p>
               <img
@@ -235,10 +237,11 @@
             <div
               class="prey-reroll-cost"
               *margin-top="slot and (slot.type == 3 or slot.type == 4) and 5 or 1"
-              *disabled="self.pickSpecificPrice > self.wildcards"
               onhover="self:clearDescription()"
             >
-              <p>{{self.pickSpecificPrice}}</p>
+              <p *color="self:getColor(slot, 'pickSpecificPrice')">
+                {{self.pickSpecificPrice}}
+              </p>
               <img
                 class="prey-pick-cost-img"
                 src="/modules/game_prey_html/images/prey-wildcard"
@@ -255,12 +258,10 @@
               *disabled="self.rerollBonusPrice > self.wildcards"
               onhover="self:onHover(slot.slotId, 'selectPrey')"
             />
-            <div
-              onhover="self:clearDescription()"
-              class="prey-bonus-cost"
-              *disabled="self.rerollBonusPrice > self.wildcards"
-            >
-              <p>{{self.rerollBonusPrice}}</p>
+            <div onhover="self:clearDescription()" class="prey-bonus-cost">
+              <p *color="self:getColor(slot, 'rerollBonusPrice')">
+                {{self.rerollBonusPrice}}
+              </p>
               <img
                 src="/modules/game_prey_html/images/prey-wildcard"
                 height="12"
