@@ -26,16 +26,51 @@ local SLOT_STATE_SELECTION = 3
 local SLOT_STATE_SELECTION_CHANGE_MONSTER = 4
 local SLOT_STATE_LIST_SELECTION = 5
 
-function PreyController:handleResources()
-    g_game.preyRequest()
+function PreyController:handleResources(options)
+    options = options or {}
+
+    if not options.skipRequest then
+        g_game.preyRequest()
+    end
 
     local player = g_game.getLocalPlayer()
     if not player then return end
-    self.wildcards = player:getResourceBalance(ResourceTypes.PREY_WILDCARDS)
+
+    if options.wildcards ~= nil then
+        self.wildcards = options.wildcards
+    else
+        self.wildcards = player:getResourceBalance(ResourceTypes.PREY_WILDCARDS)
+    end
     self.bankGold = player:getResourceBalance(ResourceTypes.BANK_BALANCE)
     self.inventoryGold = player:getResourceBalance(ResourceTypes.GOLD_EQUIPPED)
     self.rawPlayerGold = player:getTotalMoney() or 0
     self.playerGold = comma_value(self.rawPlayerGold)
+
+    self:updateSlotResourceAvailability()
+end
+
+function PreyController:updateSlotResourceAvailability()
+    if not self.preyData then
+        return
+    end
+
+    local rawPlayerGold = self.rawPlayerGold or 0
+    local wildcards = self.wildcards or 0
+    local rerollCost = self.rawRerollGoldPrice or 0
+    local hasWildcardsAvailable = wildcards > 0
+
+    for _, slot in ipairs(self.preyData) do
+        if type(slot) == "table" then
+            if slot.isFreeReroll ~= nil then
+                local shouldDisable = not slot.isFreeReroll and rerollCost > rawPlayerGold
+                if slot.disableFreeReroll ~= shouldDisable then
+                    slot.disableFreeReroll = shouldDisable
+                end
+            end
+
+            slot.hasWildcards = hasWildcardsAvailable
+        end
+    end
 end
 
 function show()
@@ -261,7 +296,7 @@ function onPreyLocked(slot, unlockState, timeUntilFreeReroll, wildcards)
     PreyController.preyData[slotId].stars = 0
     PreyController.preyData[slotId].monsterName = "Locked"
     PreyController.preyData[slotId].preyType = getBigIconPath(nil, true)
-    PreyController:handleResources()
+    PreyController:handleResources({ skipRequest = true, wildcards = wildcards })
 end
 
 function Helper.fillTinyMonsterList(slotId, names, outfits)
@@ -301,11 +336,13 @@ function onPreySelectionChangeMonster(slot, names, outfits, bonusType, bonusValu
     PreyController.preyData[slotId].isFreeReroll = isFreeReroll
     PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold and
         not isFreeReroll
+    PreyController:handleResources({ skipRequest = true, wildcards = wildcards })
 end
 
 function onPreyInactive(slot, timeUntilFreeReroll, wildcards)
     g_logger.info("SLOT_STATE_INACTIVE > Slot " ..
         slot .. ", timeUntilFreeReroll " .. timeUntilFreeReroll .. ", wildcards " .. wildcards)
+    PreyController:handleResources({ skipRequest = true, wildcards = wildcards })
 end
 
 function onPreyRerollPrice(rerollGoldPrice, rerollBonusPrice, pickSpecificPrice)
@@ -316,6 +353,7 @@ function onPreyRerollPrice(rerollGoldPrice, rerollBonusPrice, pickSpecificPrice)
     PreyController.rerollBonusPrice = rerollBonusPrice or 1
     PreyController.pickSpecificPrice = pickSpecificPrice
     PreyController.lockPreyPrice = pickSpecificPrice
+    PreyController:handleResources({ skipRequest = true })
 end
 
 local function buildRaceEntry(raceId, slotId, index)
@@ -567,7 +605,7 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
     PreyController.preyData[slotId].slotId = slot
     PreyController.preyData[slotId].monsterName = "Select your prey creature"
     PreyController.preyData[slotId].type = SLOT_STATE_LIST_SELECTION
-    PreyController:handleResources()
+    PreyController:handleResources({ skipRequest = true, wildcards = wildcards })
 end
 
 function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
@@ -590,7 +628,7 @@ function onPreySelection(slot, names, outfits, timeUntilFreeReroll, wildcards)
     PreyController.preyData[slotId].isFreeReroll = isFreeReroll
     PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold and
         not isFreeReroll
-    PreyController:handleResources()
+    PreyController:handleResources({ skipRequest = true, wildcards = wildcards })
 end
 
 function PreyController:onGameStart()
@@ -704,7 +742,7 @@ function onPreyActive(slot, currentHolderName, currentHolderOutfit, bonusType, b
     PreyController.preyData[slotId].isFreeReroll = isFreeReroll
     PreyController.preyData[slotId].disableFreeReroll = PreyController.rawRerollGoldPrice > PreyController.rawPlayerGold and
         not isFreeReroll
-    PreyController:handleResources()
+    PreyController:handleResources({ skipRequest = true, wildcards = wildcards })
 end
 
 function PreyController:onMouseWheel(slotId, hoveredIndex)
