@@ -120,7 +120,7 @@ public:
 
     uint32_t getTileIndex(const Position& pos) { return ((pos.y % BLOCK_SIZE) * BLOCK_SIZE) + (pos.x % BLOCK_SIZE); }
 
-    [[nodiscard]] const std::array<TilePtr, BLOCK_SIZE* BLOCK_SIZE>& getTiles() const { return m_tiles; }
+    const std::array<TilePtr, BLOCK_SIZE* BLOCK_SIZE>& getTiles() const { return m_tiles; }
 
 private:
     std::array<TilePtr, BLOCK_SIZE* BLOCK_SIZE> m_tiles;
@@ -217,7 +217,7 @@ public:
     void addAnimatedText(const AnimatedTextPtr& txt, const Position& pos);
     bool removeAnimatedText(const AnimatedTextPtr& txt);
 
-    [[nodiscard]] bool isWidgetAttached(const UIWidgetPtr& widget) const;
+    bool isWidgetAttached(const UIWidgetPtr& widget) const;
     void addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object);
     bool removeAttachedWidgetFromObject(const UIWidgetPtr& widget);
     void updateAttachedWidgets(const MapViewPtr& mapView);
@@ -225,7 +225,7 @@ public:
     void colorizeThing(const ThingPtr& thing, const Color& color);
     void removeThingColor(const ThingPtr& thing);
 
-    [[nodiscard]] StaticTextPtr getStaticText(const Position& pos) const;
+    StaticTextPtr getStaticText(const Position& pos) const;
 
     // tile related
     const TilePtr& createTile(const Position& pos);
@@ -279,19 +279,19 @@ public:
 
     bool isCovered(const Position& pos, bool& isLoading, uint8_t firstFloor = 0);
     bool isCompletelyCovered(const Position& pos, bool& isLoading, uint8_t firstFloor = 0);
-    [[nodiscard]] bool isAwareOfPosition(const Position& pos) const { return isAwareOfPosition(pos, m_awareRange); }
-    [[nodiscard]] bool isAwareOfPosition(const Position& pos, const AwareRange& awareRange) const;
+    bool isAwareOfPosition(const Position& pos) const { return isAwareOfPosition(pos, m_awareRange); }
+    bool isAwareOfPosition(const Position& pos, const AwareRange& awareRange) const;
 
     void resetLastCamera() const;
 
     void setAwareRange(const AwareRange& range);
     void resetAwareRange();
-    [[nodiscard]] AwareRange getAwareRange() const { return m_awareRange; }
+    AwareRange getAwareRange() const { return m_awareRange; }
 
-    [[nodiscard]] Light getLight() const { return m_light; }
+    Light getLight() const { return m_light; }
     Position getCentralPosition() { return m_centralPosition; }
-    [[nodiscard]] uint8_t getFirstAwareFloor() const;
-    [[nodiscard]] uint8_t getLastAwareFloor() const;
+    uint8_t getFirstAwareFloor() const;
+    uint8_t getLastAwareFloor() const;
     const std::vector<MissilePtr>& getFloorMissiles(const uint8_t z) { return m_floors[z].missiles; }
 
     std::vector<AnimatedTextPtr> getAnimatedTexts() { return m_animatedTexts; }
@@ -312,7 +312,7 @@ public:
     int getMinimapColor(const Position& pos);
     bool isSightClear(const Position& fromPos, const Position& toPos);
 
-    [[nodiscard]] const auto& getCreatures() const { return m_knownCreatures; }
+    const auto& getCreatures() const { return m_knownCreatures; }
 
 private:
     struct FloorData

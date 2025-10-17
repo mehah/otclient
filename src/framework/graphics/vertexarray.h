@@ -147,9 +147,9 @@ public:
 
     void clear() { m_buffer.clear(); }
 
-    [[nodiscard]] const float* vertices() const { return m_buffer.data(); }
-    [[nodiscard]] int vertexCount() const { return m_buffer.size() / 2; }
-    [[nodiscard]] int size() const { return m_buffer.size(); }
+    const float* vertices() const { return m_buffer.data(); }
+    int vertexCount() const { return m_buffer.size() / 2; }
+    int size() const { return m_buffer.size(); }
 
 private:
     std::vector<float> m_buffer;

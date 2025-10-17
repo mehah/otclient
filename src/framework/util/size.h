@@ -36,13 +36,13 @@ public:
 
     constexpr TPoint<T> toPoint() const { return { wd, ht }; }
 
-    [[nodiscard]] constexpr bool isNull() const { return wd == 0 && ht == 0; }
-    [[nodiscard]] constexpr bool isEmpty() const { return wd < 1 || ht < 1; }
-    [[nodiscard]] constexpr bool isValid() const { return wd >= 0 && ht >= 0; }
-    [[nodiscard]] constexpr bool isUnset() const { return wd == -1 && ht == -1; }
+    constexpr bool isNull() const { return wd == 0 && ht == 0; }
+    constexpr bool isEmpty() const { return wd < 1 || ht < 1; }
+    constexpr bool isValid() const { return wd >= 0 && ht >= 0; }
+    constexpr bool isUnset() const { return wd == -1 && ht == -1; }
 
-    [[nodiscard]] constexpr T width() const { return wd; }
-    [[nodiscard]] constexpr T height() const { return ht; }
+    constexpr T width() const { return wd; }
+    constexpr T height() const { return ht; }
 
     constexpr void resize(T w, T h) { wd = w; ht = h; }
     constexpr void setWidth(T w) { wd = w; }
@@ -108,9 +108,9 @@ public:
     constexpr T smaller() const { return std::min<T>(ht, wd); }
     constexpr T bigger() const { return std::max<T>(ht, wd); }
 
-    [[nodiscard]] constexpr float ratio() const { return static_cast<float>(wd) / ht; }
-    [[nodiscard]] constexpr T area() const { return wd * ht; }
-    [[nodiscard]] constexpr T dimension() const { return wd + ht; }
+    constexpr float ratio() const { return static_cast<float>(wd) / ht; }
+    constexpr T area() const { return wd * ht; }
+    constexpr T dimension() const { return wd + ht; }
 
     friend std::ostream& operator<<(std::ostream& out, const TSize& size) {
         out << size.width() << " " << size.height();

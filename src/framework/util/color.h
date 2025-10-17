@@ -49,18 +49,18 @@ public:
         update();
     }
 
-    [[nodiscard]] constexpr uint8_t a() const { return static_cast<uint8_t>(m_a * 255.f); }
-    [[nodiscard]] constexpr uint8_t b() const { return static_cast<uint8_t>(m_b * 255.f); }
-    [[nodiscard]] constexpr uint8_t g() const { return static_cast<uint8_t>(m_g * 255.f); }
-    [[nodiscard]] constexpr uint8_t r() const { return static_cast<uint8_t>(m_r * 255.f); }
+    constexpr uint8_t a() const { return static_cast<uint8_t>(m_a * 255.f); }
+    constexpr uint8_t b() const { return static_cast<uint8_t>(m_b * 255.f); }
+    constexpr uint8_t g() const { return static_cast<uint8_t>(m_g * 255.f); }
+    constexpr uint8_t r() const { return static_cast<uint8_t>(m_r * 255.f); }
 
-    [[nodiscard]] constexpr float aF() const { return m_a; }
-    [[nodiscard]] constexpr float bF() const { return m_b; }
-    [[nodiscard]] constexpr float gF() const { return m_g; }
-    [[nodiscard]] constexpr float rF() const { return m_r; }
+    constexpr float aF() const { return m_a; }
+    constexpr float bF() const { return m_b; }
+    constexpr float gF() const { return m_g; }
+    constexpr float rF() const { return m_r; }
 
-    [[nodiscard]] constexpr uint32_t rgba() const { return static_cast<uint32_t>(a() << 24 | b() << 16 | g() << 8 | r()); }
-    [[nodiscard]] constexpr size_t hash() const { return m_hash; }
+    constexpr uint32_t rgba() const { return static_cast<uint32_t>(a() << 24 | b() << 16 | g() << 8 | r()); }
+    constexpr size_t hash() const { return m_hash; }
 
     void setRed(const int r) { m_r = static_cast<uint8_t>(r) / 255.f; update(); }
     void setGreen(const int g) { m_g = static_cast<uint8_t>(g) / 255.f; update(); }

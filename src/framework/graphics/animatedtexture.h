@@ -40,17 +40,17 @@ public:
     void setSmooth(bool smooth) override;
     void setRepeat(bool repeat) override;
 
-    [[nodiscard]] uint32_t getNumPlays() const { return m_numPlays; }
+    uint32_t getNumPlays() const { return m_numPlays; }
     void setNumPlays(const uint32_t n) { m_numPlays = n; }
 
-    [[nodiscard]] bool isOnMap() const { return m_onMap; }
+    bool isOnMap() const { return m_onMap; }
     void setOnMap(const bool v) { m_onMap = v; }
 
     void update();
     void restart() { m_animTimer.restart(); m_currentPlay = 0; m_currentFrame = 0; }
 
-    [[nodiscard]] bool isAnimatedTexture() const override { return true; }
-    [[nodiscard]] bool running() const { return m_animTimer.running(); }
+    bool isAnimatedTexture() const override { return true; }
+    bool running() const { return m_animTimer.running(); }
 
     void allowAtlasCache() override;
 

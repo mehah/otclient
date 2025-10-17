@@ -35,7 +35,7 @@ protected:
     virtual void preLoad() = 0;
     virtual void draw(DrawPoolType type) = 0;
 
-    [[nodiscard]] virtual bool canDraw(DrawPoolType type) const = 0;
+    virtual bool canDraw(DrawPoolType type) const = 0;
     virtual bool isLoadingAsyncTexture() = 0;
     virtual bool isUsingProtobuf() = 0;
     virtual void onLoadingAsyncTextureChanged(bool loadingAsync) = 0;
@@ -104,16 +104,16 @@ public:
     void setDrawTexts(const bool v) { m_drawText = v; }
     bool isDrawingTexts() { return m_drawText; }
 
-    [[nodiscard]] float getHUDScale() const;
+    float getHUDScale() const;
     void setHUDScale(float v);
 
-    [[nodiscard]] float getCreatureInformationScale() const { return m_creatureInformationScale; }
+    float getCreatureInformationScale() const { return m_creatureInformationScale; }
     void setCreatureInformationScale(const float v) { m_creatureInformationScale = v; }
 
-    [[nodiscard]] float getAnimatedTextScale() const { return m_animatedTextScale; }
+    float getAnimatedTextScale() const { return m_animatedTextScale; }
     void setAnimatedTextScale(const float v) { m_animatedTextScale = v; }
 
-    [[nodiscard]] float getStaticTextScale() const { return m_staticTextScale; }
+    float getStaticTextScale() const { return m_staticTextScale; }
     void setStaticTextScale(const float v) { m_staticTextScale = v; }
 
     bool isLoadingAsyncTexture();

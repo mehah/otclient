@@ -37,12 +37,12 @@ public:
     Shader(ShaderType shaderType);
     ~Shader();
 
-    [[nodiscard]] bool compileSourceCode(std::string_view sourceCode) const;
-    [[nodiscard]] bool compileSourceFile(std::string_view sourceFile) const;
-    [[nodiscard]] std::string log() const;
+    bool compileSourceCode(std::string_view sourceCode) const;
+    bool compileSourceFile(std::string_view sourceFile) const;
+    std::string log() const;
 
-    [[nodiscard]] uint32_t getShaderId() const { return m_shaderId; }
-    [[nodiscard]] ShaderType getShaderType() const { return m_shaderType; }
+    uint32_t getShaderId() const { return m_shaderId; }
+    ShaderType getShaderType() const { return m_shaderType; }
 
 private:
     uint32_t m_shaderId{ 0 };

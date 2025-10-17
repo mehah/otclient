@@ -228,7 +228,7 @@ public:
     template<typename R, typename... T>
     R callGlobalField(std::string_view global, std::string_view field, const T&... args);
 
-    [[nodiscard]] bool isInCppCallback() const { return m_cppCallbackDepth != 0; }
+    bool isInCppCallback() const { return m_cppCallbackDepth != 0; }
 
 private:
     /// Load scripts requested by lua 'require'
@@ -277,7 +277,7 @@ public:
     void useValue() { pushValue(); ref(); }
 
     const char* typeName(int index = -1);
-    [[nodiscard]] std::string functionSourcePath() const;
+    std::string functionSourcePath() const;
 
     void insert(int index);
     void remove(int index);
@@ -289,7 +289,7 @@ public:
     void getRef(int ref) const;
     void getWeakRef(int weakRef);
 
-    [[nodiscard]] int getGlobalEnvironment() const { return m_globalEnv; }
+    int getGlobalEnvironment() const { return m_globalEnv; }
     void setGlobalEnvironment(int env);
     void resetGlobalEnvironment() { setGlobalEnvironment(m_globalEnv); }
 
@@ -317,7 +317,7 @@ public:
 
     void newTable() const;
     void createTable(int narr, int nrec) const;
-    [[nodiscard]] void* newUserdata(int size) const;
+    void* newUserdata(int size) const;
 
     void pop(int n = 1);
     long popInteger();
@@ -325,7 +325,7 @@ public:
     bool popBoolean();
     std::string popString();
     void* popUserdata();
-    [[nodiscard]] void* popUpvalueUserdata() const;
+    void* popUpvalueUserdata() const;
     LuaObjectPtr popObject();
 
     void pushNil();
@@ -358,8 +358,8 @@ public:
     void* toUserdata(int index = -1);
     LuaObjectPtr toObject(int index = -1);
 
-    [[nodiscard]] int getTop() const;
-    [[nodiscard]] int stackSize() const { return getTop(); }
+    int getTop() const;
+    int stackSize() const { return getTop(); }
     void clearStack() { pop(stackSize()); }
     bool hasIndex(const int index) { return (stackSize() >= (index < 0 ? -index : index) && index != 0); }
 

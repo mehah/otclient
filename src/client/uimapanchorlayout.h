@@ -25,6 +25,8 @@
 #include "declarations.h"
 #include <framework/ui/uianchorlayout.h>
 
+#include <utility>
+
 class UIPositionAnchor final : public UIAnchor
 {
 public:

@@ -34,7 +34,7 @@ public:
     virtual void load(const OTMLNodePtr& node);
     virtual void updateParticle(const ParticlePtr&, float) const = 0;
 
-    [[nodiscard]] bool hasFinished() const { return m_finished; }
+    bool hasFinished() const { return m_finished; }
 
 protected:
     bool m_finished{ false };

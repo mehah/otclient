@@ -45,8 +45,8 @@ struct MinimapTile
     uint8_t flags{ 0 };
     uint8_t color{ 255 };
     uint8_t speed{ 10 };
-    [[nodiscard]] bool hasFlag(const MinimapTileFlags flag) const { return flags & flag; }
-    [[nodiscard]] int getSpeed() const { return speed * 10; }
+    bool hasFlag(const MinimapTileFlags flag) const { return flags & flag; }
+    int getSpeed() const { return speed * 10; }
     bool operator==(const MinimapTile& other) const { return color == other.color && flags == other.flags && speed == other.speed; }
     bool operator!=(const MinimapTile& other) const { return !(*this == other); }
 };
@@ -64,7 +64,7 @@ public:
     std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE>& getTiles() { return m_tiles; }
     void mustUpdate() { m_mustUpdate = true; }
     void justSaw() { m_wasSeen = true; }
-    [[nodiscard]] bool wasSeen() const { return m_wasSeen; }
+    bool wasSeen() const { return m_wasSeen; }
 private:
     TexturePtr m_texture;
     ImagePtr m_image;

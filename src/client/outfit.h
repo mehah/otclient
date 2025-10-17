@@ -56,34 +56,34 @@ public:
 
     void resetClothes();
 
-    [[nodiscard]] uint16_t getId() const { return m_id; }
-    [[nodiscard]] uint16_t getAuxId() const { return m_auxId; }
-    [[nodiscard]] uint16_t getMount() const { return m_mount; }
-    [[nodiscard]] uint16_t getFamiliar() const { return m_familiar; }
-    [[nodiscard]] uint16_t getWing() const { return m_wing; }
-    [[nodiscard]] uint16_t getAura() const { return m_aura; }
-    [[nodiscard]] uint16_t getEffect() const { return m_effect; }
-    [[nodiscard]] std::string getShader() const { return m_shader; }
+    uint16_t getId() const { return m_id; }
+    uint16_t getAuxId() const { return m_auxId; }
+    uint16_t getMount() const { return m_mount; }
+    uint16_t getFamiliar() const { return m_familiar; }
+    uint16_t getWing() const { return m_wing; }
+    uint16_t getAura() const { return m_aura; }
+    uint16_t getEffect() const { return m_effect; }
+    std::string getShader() const { return m_shader; }
 
-    [[nodiscard]] uint8_t getHead() const { return m_head; }
-    [[nodiscard]] uint8_t getBody() const { return m_body; }
-    [[nodiscard]] uint8_t getLegs() const { return m_legs; }
-    [[nodiscard]] uint8_t getFeet() const { return m_feet; }
-    [[nodiscard]] uint8_t getAddons() const { return m_addons; }
+    uint8_t getHead() const { return m_head; }
+    uint8_t getBody() const { return m_body; }
+    uint8_t getLegs() const { return m_legs; }
+    uint8_t getFeet() const { return m_feet; }
+    uint8_t getAddons() const { return m_addons; }
 
-    [[nodiscard]] bool hasMount() const { return m_mount > 0; }
+    bool hasMount() const { return m_mount > 0; }
 
-    [[nodiscard]] ThingCategory getCategory() const { return m_category; }
-    [[nodiscard]] bool isCreature() const { return m_category == ThingCategoryCreature; }
-    [[nodiscard]] bool isInvalid() const { return m_category == ThingInvalidCategory; }
-    [[nodiscard]] bool isEffect() const { return m_category == ThingCategoryEffect; }
-    [[nodiscard]] bool isItem() const { return m_category == ThingCategoryItem; }
-    [[nodiscard]] bool isTemp() const { return m_temp; }
+    ThingCategory getCategory() const { return m_category; }
+    bool isCreature() const { return m_category == ThingCategoryCreature; }
+    bool isInvalid() const { return m_category == ThingInvalidCategory; }
+    bool isEffect() const { return m_category == ThingCategoryEffect; }
+    bool isItem() const { return m_category == ThingCategoryItem; }
+    bool isTemp() const { return m_temp; }
 
-    [[nodiscard]] Color getHeadColor() const { return m_headColor; }
-    [[nodiscard]] Color getBodyColor() const { return m_bodyColor; }
-    [[nodiscard]] Color getLegsColor() const { return m_legsColor; }
-    [[nodiscard]] Color getFeetColor() const { return m_feetColor; }
+    Color getHeadColor() const { return m_headColor; }
+    Color getBodyColor() const { return m_bodyColor; }
+    Color getLegsColor() const { return m_legsColor; }
+    Color getFeetColor() const { return m_feetColor; }
 
     bool operator==(const Outfit& other) const
     {

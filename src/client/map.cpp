@@ -110,7 +110,7 @@ void Map::clean()
 {
     cleanDynamicThings();
 
-    for (auto i = -1; std::cmp_less_equal(++i, g_gameConfig.getMapMaxZ());)
+    for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].tileBlocks.clear();
 
 #ifdef FRAMEWORK_EDITOR
@@ -144,7 +144,7 @@ void Map::cleanDynamicThings()
     for (const auto& widget : widgets)
         widget->destroy();
 
-    for (auto i = -1; std::cmp_less_equal(++i, g_gameConfig.getMapMaxZ());)
+    for (auto i = -1; ++i <= g_gameConfig.getMapMaxZ();)
         m_floors[i].missiles.clear();
 
     for (auto& floor : m_floors) {
@@ -374,12 +374,12 @@ const TilePtr& Map::getTile(const Position& pos)
 TileList Map::getTiles(const int8_t floor/* = -1*/)
 {
     TileList tiles;
-    if (std::cmp_greater(floor, g_gameConfig.getMapMaxZ()))
+    if (floor > g_gameConfig.getMapMaxZ())
         return tiles;
 
     if (floor < 0) {
         // Search all floors
-        for (auto z = -1; std::cmp_less_equal(++z, g_gameConfig.getMapMaxZ());) {
+        for (auto z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
             for (const auto& [key, block] : m_floors[z].tileBlocks) {
                 for (const auto& tile : block.getTiles()) {
                     if (tile != nullptr)
@@ -553,7 +553,7 @@ void Map::removeUnawareThings()
         } : m_awareRange;
 
         // remove tiles that we are not aware anymore
-        for (auto z = -1; std::cmp_less_equal(++z, g_gameConfig.getMapMaxZ());) {
+        for (auto z = -1; ++z <= g_gameConfig.getMapMaxZ();) {
             auto& tileBlocks = m_floors[z].tileBlocks;
             for (auto it = tileBlocks.begin(); it != tileBlocks.end();) {
                 auto& block = it->second;
@@ -640,7 +640,7 @@ std::vector<CreaturePtr> Map::getSpectatorsInRangeEx(const Position& centerPos, 
 
     //TODO: optimize
     //TODO: delivery creatures in distance order
-    for (int iz = -minZRange; std::cmp_less_equal(iz, maxZRange); ++iz) {
+    for (int iz = -minZRange; iz <= maxZRange; ++iz) {
         for (int iy = -minYRange; iy <= maxYRange; ++iy) {
             for (int ix = -minXRange; ix <= maxXRange; ++ix) {
                 if (const auto& tile = getTile(centerPos.translated(ix, iy, iz))) {
@@ -744,7 +744,7 @@ bool Map::isAwareOfPosition(const Position& pos, const AwareRange& awareRange) c
     Position groundedPos = pos;
     while (groundedPos.z != m_centralPosition.z) {
         if (groundedPos.z > m_centralPosition.z) {
-            if (std::cmp_equal(groundedPos.x, UINT16_MAX) || std::cmp_equal(groundedPos.y, UINT16_MAX)) // When pos == 65535,65535,15 we cant go up to 65536,65536,14
+            if (groundedPos.x == UINT16_MAX || groundedPos.y == UINT16_MAX) // When pos == 65535,65535,15 we cant go up to 65536,65536,14
                 break;
             groundedPos.coveredUp();
         } else {
@@ -851,7 +851,7 @@ std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const
     nodes[startPos] = currentNode;
     SNode* foundNode = nullptr;
     while (currentNode) {
-        if (std::cmp_greater(nodes.size(), maxComplexity)) {
+        if (static_cast<int>(nodes.size()) > maxComplexity) {
             result = Otc::PathFindResultTooFar;
             break;
         }
@@ -1321,7 +1321,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
     std::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
-    Node* initNode = new Node{ .cost = 1, .totalCost = 0, .pos = start, .prev = nullptr, .distance = 0, .unseen = 0 };
+    Node* initNode = new Node{ 1, 0, start, nullptr, 0, 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 
@@ -1387,9 +1387,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
                                                                        node->pos.toString());
                         }
                     } else {
-                        it = nodes.emplace(neighbor, new Node{ .cost = (float)speed, .totalCost = 10000000.0f,
-                                               .pos = neighbor, .prev = node, .distance = node->distance + 1,
-                                               .unseen = wasSeen ? 0 : 1 }).first;
+                        it = nodes.emplace(neighbor, new Node{ (float)speed, 10000000.0f, neighbor, node, node->distance + 1, wasSeen ? 0 : 1 }).first;
                     }
                 }
 

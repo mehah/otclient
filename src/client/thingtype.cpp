@@ -490,7 +490,7 @@ void ThingType::unserialize(const uint16_t clientId, const ThingCategory categor
     std::vector<Size> sizes;
     std::vector<int> total_sprites;
 
-    for (int i = 0; std::cmp_less(i, groupCount); ++i) {
+    for (int i = 0; i < groupCount; ++i) {
         uint8_t frameGroupType = FrameGroupDefault;
         if (hasFrameGroups)
             frameGroupType = fin->getU8();
@@ -616,7 +616,7 @@ void ThingType::draw(const Point& dest, const int layer, const int xPattern, con
     if (m_null)
         return;
 
-    if (std::cmp_greater_equal(animationPhase, m_animationPhases))
+    if (animationPhase >= m_animationPhases)
         return;
 
     TexturePtr texture;
@@ -676,7 +676,7 @@ const TexturePtr& ThingType::getTexture(const int animationPhase)
         m_loading = true;
 
         auto action = [this] {
-            for (int_fast8_t i = -1; std::cmp_less(++i, m_animationPhases);)
+            for (int_fast8_t i = -1; ++i < m_animationPhases;)
                 loadTexture(i);
             m_loading = false;
         };
@@ -711,9 +711,9 @@ void ThingType::loadTexture(const int animationPhase)
     static Color maskColors[] = { Color::red, Color::green, Color::blue, Color::yellow };
 
     textureData.pos.resize(indexSize);
-    for (int z = 0; std::cmp_less(z, m_numPatternZ); ++z) {
-        for (int y = 0; std::cmp_less(y, m_numPatternY); ++y) {
-            for (int x = 0; std::cmp_less(x, m_numPatternX); ++x) {
+    for (int z = 0; z < m_numPatternZ; ++z) {
+        for (int y = 0; y < m_numPatternY; ++y) {
+            for (int x = 0; x < m_numPatternX; ++x) {
                 for (int l = 0; l < numLayers; ++l) {
                     const bool spriteMask = m_category == ThingCategoryCreature && l > 0;
                     const int frameIndex = getTextureIndex(l % textureLayers, x, y, z);
@@ -825,8 +825,8 @@ Size ThingType::getBestTextureDimension(int w, int h, const int count)
     assert(h <= g_gameConfig.getSpriteSize());
 
     Size bestDimension = { g_gameConfig.getSpriteSize() };
-    for (int i = w; std::cmp_less_equal(i, g_gameConfig.getSpriteSize()); i <<= 1) {
-        for (int j = h; std::cmp_less_equal(j, g_gameConfig.getSpriteSize()); j <<= 1) {
+    for (int i = w; i <= g_gameConfig.getSpriteSize(); i <<= 1) {
+        for (int j = h; j <= g_gameConfig.getSpriteSize(); j <<= 1) {
             Size candidateDimension = { i, j };
             if (candidateDimension.area() < numSprites)
                 continue;

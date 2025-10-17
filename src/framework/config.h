@@ -24,29 +24,17 @@
 #include <obfuscate.h>
 
  // APPEARANCES
-enum
-{
-    BYTES_IN_SPRITE_SHEET = 384 * 384 * 4
-};
-
+#define BYTES_IN_SPRITE_SHEET 384 * 384 * 4
 #define LZMA_UNCOMPRESSED_SIZE BYTES_IN_SPRITE_SHEET + 122
 #define LZMA_HEADER_SIZE LZMA_PROPS_SIZE + 8
-
-enum
-{
-    SPRITE_SHEET_WIDTH_BYTES = 384 * 4
-};
+#define SPRITE_SHEET_WIDTH_BYTES 384 * 4
 
 // ENCRYPTION SYSTEM
 // Enable client encryption
-enum
-{
-    ENABLE_ENCRYPTION = 0,
-    // Enable client encryption maker/builder.
+#define ENABLE_ENCRYPTION 0
+// Enable client encryption maker/builder.
 // You can compile it once and use this executable to only encrypt client files once with command --encrypt which will be using password below.
-ENABLE_ENCRYPTION_BUILDER = 0
-};
-
+#define ENABLE_ENCRYPTION_BUILDER 0
 // for security reasons make sure you are using password with at last 100+ characters
 #define ENCRYPTION_PASSWORD AY_OBFUSCATE("SET_YOUR_PASSWORD_HERE")
 // do not insert special characters in the header (ONLY UPPERCASE LETTERS, LOWERCASE LETTERS AND NUMBERS) | example: #define ENCRYPTION_HEADER AY_OBFUSCATE("21UsO5ARfRnIScs415BNMab")
@@ -55,17 +43,13 @@ ENABLE_ENCRYPTION_BUILDER = 0
 // DISCORD RPC (https://discord.com/developers/applications)
 // Enable Discord Rich Presence
 #ifndef ENABLE_DISCORD_RPC
-#define ENABLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
+    #define ENABLE_DISCORD_RPC 0 // 1 to enable | 0 to disable
 #endif
 #define RPC_API_KEY "1060650448522051664" // Your API Key
 // RPC Configs (https://youtu.be/zCHYtRlD58g) step by step to config your rich presence
-enum
-{
-    SHOW_CHARACTER_NAME_RPC = 1, // 1 to enable | 0 to disable
-    SHOW_CHARACTER_LEVEL_RPC = 1, // 1 to enable | 0 to disable
-    SHOW_CHARACTER_WORLD_RPC = 1 // 1 to enable | 0 to disable
-};
-
+#define SHOW_CHARACTER_NAME_RPC 1 // 1 to enable | 0 to disable
+#define SHOW_CHARACTER_LEVEL_RPC 1 // 1 to enable | 0 to disable
+#define SHOW_CHARACTER_WORLD_RPC 1 // 1 to enable | 0 to disable
 #define OFFLINE_RPC_TEXT "Selecting Character..." // Message at client startup | offline character
 #define STATE_RPC_TEXT "github.com/mehah/otclient" // State Text
 #define RPC_LARGE_IMAGE "rpc-logo" // Large Image Name (Imported to API)

@@ -50,7 +50,7 @@
 #include <vector>
 #include <ranges>
 #include <span>
-#include <utility>
+
 #include <zlib.h>
 
 #include <parallel_hashmap/btree.h>
@@ -66,9 +66,8 @@
 
 // FMT Custom Formatter for Enums
 template <typename E>
-std::underlying_type_t<E>
-format_as(E e) requires (std::is_enum_v<E>)
-{
+std::enable_if_t<std::is_enum_v<E>, std::underlying_type_t<E>>
+format_as(E e) {
     return static_cast<std::underlying_type_t<E>>(e);
 }
 
