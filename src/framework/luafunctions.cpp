@@ -98,7 +98,8 @@ void Application::registerLuaFunctions()
                 if (--limit == 0)
                     return ret;
             }
-        } catch (...) {}
+        } catch (...) {
+        }
         return ret;
     });
 

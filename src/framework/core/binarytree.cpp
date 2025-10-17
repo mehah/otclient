@@ -34,11 +34,9 @@ void BinaryTree::skipNodes()
     while (true) {
         const uint8_t byte = m_fin->getU8();
         switch (byte) {
-            case static_cast<uint8_t>(Node::START): skipNodes();
-                break;
+            case static_cast<uint8_t>(Node::START): skipNodes(); break;
             case static_cast<uint8_t>(Node::END): return;
-            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_fin->getU8();
-                break;
+            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_fin->getU8(); break;
             default: break;
         }
     }
@@ -54,13 +52,10 @@ void BinaryTree::unserialize()
     while (true) {
         uint8_t byte = m_fin->getU8();
         switch (byte) {
-            case static_cast<uint8_t>(Node::START): skipNodes();
-                break;
+            case static_cast<uint8_t>(Node::START): skipNodes(); break;
             case static_cast<uint8_t>(Node::END): return;
-            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_buffer.push_back(m_fin->getU8());
-                break;
-            default: m_buffer.push_back(byte);
-                break;
+            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_buffer.push_back(m_fin->getU8()); break;
+            default: m_buffer.push_back(byte); break;
         }
     }
 }
@@ -81,8 +76,7 @@ BinaryTreeVec BinaryTree::getChildren()
             }
 
             case static_cast<uint8_t>(Node::END): return children;
-            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_fin->getU8();
-                break;
+            case static_cast<uint8_t>(Node::ESCAPE_CHAR): m_fin->getU8(); break;
             default: break;
         }
     }

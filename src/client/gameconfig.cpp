@@ -49,16 +49,14 @@ void GameConfig::init()
     }
 }
 
-void GameConfig::terminate()
-{
+void GameConfig::terminate() {
     m_creatureNameFont = nullptr;
     m_animatedTextFont = nullptr;
     m_staticTextFont = nullptr;
     m_widgetTextFont = nullptr;
 }
 
-void GameConfig::loadFonts()
-{
+void GameConfig::loadFonts() {
     m_creatureNameFont = g_fonts.getFont(m_creatureNameFontName);
     m_animatedTextFont = g_fonts.getFont(m_animatedTextFontName);
     m_staticTextFont = g_fonts.getFont(m_staticTextFontName);
@@ -68,8 +66,7 @@ void GameConfig::loadFonts()
         g_fonts.setDefaultWidgetFont(m_widgetTextFont);
 }
 
-void GameConfig::loadGameNode(const OTMLNodePtr& mainNode)
-{
+void GameConfig::loadGameNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
         if (node->tag() == "sprite-size")
             m_spriteSize = node->value<int>();
@@ -92,8 +89,7 @@ void GameConfig::loadGameNode(const OTMLNodePtr& mainNode)
     }
 }
 
-void GameConfig::loadFontNode(const OTMLNodePtr& mainNode)
-{
+void GameConfig::loadFontNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
         if (node->tag() == "widget")
             m_widgetTextFontName = node->value();
@@ -106,8 +102,7 @@ void GameConfig::loadFontNode(const OTMLNodePtr& mainNode)
     }
 }
 
-void GameConfig::loadMapNode(const OTMLNodePtr& mainNode)
-{
+void GameConfig::loadMapNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
         if (node->tag() == "viewport")
             m_mapViewPort = node->value<Size>();
@@ -122,8 +117,7 @@ void GameConfig::loadMapNode(const OTMLNodePtr& mainNode)
     }
 }
 
-void GameConfig::loadTileNode(const OTMLNodePtr& mainNode)
-{
+void GameConfig::loadTileNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
         if (node->tag() == "max-elevation")
             m_tileMaxElevation = node->value<int>();
@@ -134,8 +128,7 @@ void GameConfig::loadTileNode(const OTMLNodePtr& mainNode)
     }
 }
 
-void GameConfig::loadCreatureNode(const OTMLNodePtr& mainNode)
-{
+void GameConfig::loadCreatureNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
         if (node->tag() == "force-new-walking-formula")
             m_forceNewWalkingFormula = node->value<bool>();
@@ -154,16 +147,14 @@ void GameConfig::loadCreatureNode(const OTMLNodePtr& mainNode)
     }
 }
 
-void GameConfig::loadPlayerNode(const OTMLNodePtr& mainNode)
-{
+void GameConfig::loadPlayerNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
         if (node->tag() == "diagonal-walk-speed")
             m_playerDiagonalWalkSpeed = node->value<double>();
     }
 }
 
-void GameConfig::loadRenderNode(const OTMLNodePtr& mainNode)
-{
+void GameConfig::loadRenderNode(const OTMLNodePtr& mainNode) {
     for (const auto& node : mainNode->children()) {
         if (node->tag() == "invisible-ticks-per-frame")
             m_invisibleTicksPerFrame = node->value<int>();

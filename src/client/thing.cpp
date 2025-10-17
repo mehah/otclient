@@ -88,13 +88,11 @@ int Thing::getStackPos()
     return -1;
 }
 
-PainterShaderProgramPtr Thing::getShader() const
-{
+PainterShaderProgramPtr Thing::getShader() const {
     return g_shaders.getShaderById(m_shaderId);
 }
 
-void Thing::setShader(const std::string_view name)
-{
+void Thing::setShader(const std::string_view name) {
     m_shaderId = 0;
     if (name.empty())
         return;

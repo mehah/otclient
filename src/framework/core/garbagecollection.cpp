@@ -35,8 +35,7 @@ constexpr uint32_t THINGTYPE_TIME = 2 * 1000; // 2seg
 
 Timer lua_timer, texture_timer, drawpool_timer, thingtype_timer;
 
-void GarbageCollection::poll()
-{
+void GarbageCollection::poll() {
     if (canCheck(thingtype_timer, THINGTYPE_TIME))
         thingType();
 
@@ -47,13 +46,11 @@ void GarbageCollection::poll()
         lua();
 }
 
-void GarbageCollection::lua()
-{
+void GarbageCollection::lua() {
     g_lua.collectGarbage();
 }
 
-void GarbageCollection::texture()
-{
+void GarbageCollection::texture() {
     static constexpr uint32_t IDLE_TIME = 25 * 60 * 1000; // 25min
 
     std::erase_if(g_textures.m_textures, [](const auto& item) {
@@ -66,8 +63,7 @@ void GarbageCollection::texture()
     });
 }
 
-void GarbageCollection::thingType()
-{
+void GarbageCollection::thingType() {
     static constexpr uint16_t
         IDLE_TIME = 60 * 1000, // Maximum time it can be idle, default 60 seconds.
         AMOUNT_PER_CHECK = 500; // maximum number of objects to be checked.

@@ -451,7 +451,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
                                              .volumeMax = volume.max_value(),
                                              .soundId = protobufSoundEffect.has_simple_sound_effect() ? protobufSoundEffect.simple_sound_effect().sound_id() : 0,
                                              .randomSoundId = std::move(randomSounds)
-                                         });
+            });
         }
 
         // deserialize location ambients
@@ -466,7 +466,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
                                                .clientId = effectId,
                                                .loopedAudioFileId = protobufLocationAmbient.looping_sound_id(),
                                                .delayedSoundEffects = std::move(effects)
-                                           });
+            });
         }
 
         // deserialize item ambients
@@ -486,7 +486,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
                                                    .id = effectId,
                                                    .clientIds = std::move(itemClientIds),
                                                    .itemCountSoundEffects = std::move(soundEffects)
-                                               });
+            });
         }
 
         // deserialize music
@@ -496,7 +496,7 @@ bool SoundManager::loadFromProtobuf(const std::string& directory, const std::str
                                       .id = effectId,
                                       .audioFileId = protobufMusicTemplate.sound_id(),
                                       .musicType = static_cast<ClientMusicType>(protobufMusicTemplate.music_type())
-                                  });
+            });
         }
 
         return true;

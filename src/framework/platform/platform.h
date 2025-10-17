@@ -83,14 +83,13 @@ public:
     Device getDevice() { return m_device; }
     void setDevice(const Device device) { m_device = device; }
     bool isDesktop() { return m_device.type == Desktop; }
-    bool isMobile()
-    {
+    bool isMobile() {
 #ifndef __EMSCRIPTEN__
         return m_device.type == Mobile;
 #else
         return MAIN_THREAD_EM_ASM_INT({
             return (/ iphone | ipod | ipad | android / i).test(navigator.userAgent);
-                }) == 1;
+        }) == 1;
 #endif
     }
     bool isBrowser() { return m_device.type == Browser; }

@@ -40,7 +40,7 @@ UIWidget::UIWidget()
     m_source = g_lua.getSource(2);
     int level = 3;
     while ((m_source.find("corelib") != std::string::npos || m_source.find("gamelib") != std::string::npos
-        || m_source.find("game_bot/functions/ui") != std::string::npos || m_source.find("[C]") != std::string::npos) && level < 8) {
+           || m_source.find("game_bot/functions/ui") != std::string::npos || m_source.find("[C]") != std::string::npos) && level < 8) {
         std::string tmp_src = g_lua.getSource(level);
         if (tmp_src.length() <= 3) break;
         m_source = tmp_src;
@@ -281,8 +281,7 @@ void UIWidget::insertChild(int32_t index, const UIWidgetPtr& child)
     g_ui.onWidgetAppear(child);
 }
 
-void UIWidget::removeChildByIndex(uint32_t index)
-{
+void UIWidget::removeChildByIndex(uint32_t index) {
     if (const auto& child = getChildByIndex(index)) {
         removeChild(child);
     }
@@ -582,8 +581,7 @@ void UIWidget::moveChildToIndex(const UIWidgetPtr& child, const int index)
     updateLayout();
 }
 
-void UIWidget::reorderChildren(const std::vector<UIWidgetPtr>& childrens)
-{
+void UIWidget::reorderChildren(const std::vector<UIWidgetPtr>& childrens) {
     if (m_children.size() != childrens.size()) {
         g_logger.error("Invalid parameter for reorderChildren");
         return;
@@ -722,7 +720,7 @@ void UIWidget::applyStyle(const OTMLNodePtr& styleNode)
             const auto& parent = getParent();
             if (isFocusable() && isExplicitlyVisible() && isExplicitlyEnabled() &&
                 parent && ((!parent->getFocusedChild() && parent->getAutoFocusPolicy() == Fw::AutoFocusFirst) ||
-                    parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
+                parent->getAutoFocusPolicy() == Fw::AutoFocusLast)) {
                 focus();
             }
         }
@@ -1374,8 +1372,7 @@ UIAnchorLayoutPtr UIWidget::getAnchoredLayout()
     return nullptr;
 }
 
-UIAnchorList UIWidget::getAnchorsGroup()
-{
+UIAnchorList UIWidget::getAnchorsGroup() {
     if (const auto& layout = getAnchoredLayout()) {
         auto it = layout->getAnchorsGroup().find(static_self_cast<UIWidget>());
         if (it != layout->getAnchorsGroup().end())
@@ -1385,8 +1382,7 @@ UIAnchorList UIWidget::getAnchorsGroup()
     return {};
 }
 
-std::vector<Fw::AnchorEdge> UIWidget::getAnchors()
-{
+std::vector<Fw::AnchorEdge> UIWidget::getAnchors() {
     const auto& anchors = getAnchorsGroup();
     std::vector<Fw::AnchorEdge> anchorsVec;
     anchorsVec.reserve(anchors.size());
@@ -1397,8 +1393,7 @@ std::vector<Fw::AnchorEdge> UIWidget::getAnchors()
     return anchorsVec;
 }
 
-Fw::AnchorEdge UIWidget::getAnchorType(Fw::AnchorEdge anchorType)
-{
+Fw::AnchorEdge UIWidget::getAnchorType(Fw::AnchorEdge anchorType) {
     const auto& anchors = getAnchorsGroup();
     for (const auto& anchor : anchors) {
         if (anchor->getAnchoredEdge() == anchorType) {
@@ -1564,8 +1559,7 @@ UIWidgetList UIWidget::recursiveGetChildrenByMarginPos(const Point& childPos)
     return children;
 }
 
-UIWidgetPtr UIWidget::getChildByStyleName(const std::string_view styleName)
-{
+UIWidgetPtr UIWidget::getChildByStyleName(const std::string_view styleName) {
     for (auto& child : std::ranges::reverse_view(m_children)) {
         if (child->getStyleName() == styleName)
             return child;
@@ -1623,8 +1617,7 @@ void UIWidget::setProp(const FlagProp prop, const bool v, const bool callEvent)
             callLuaField("onPropertyChange", prop, v, lastProp);
     }
 
-    if (v) m_flagsProp |= prop;
-    else m_flagsProp &= ~prop;
+    if (v) m_flagsProp |= prop; else m_flagsProp &= ~prop;
 }
 
 bool UIWidget::setState(const Fw::WidgetState state, const bool on)
@@ -1663,46 +1656,14 @@ void UIWidget::updateState(const Fw::WidgetState state, bool newState)
     bool updateChildren = false;
 
     switch (state) {
-        case Fw::FirstState:
-        {
-            newStatus = isFirstChild();
-            break;
-        }
-        case Fw::MiddleState:
-        {
-            newStatus = isMiddleChild();
-            break;
-        }
-        case Fw::LastState:
-        {
-            newStatus = isLastChild();
-            break;
-        }
-        case Fw::AlternateState:
-        {
-            newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1);
-            break;
-        }
-        case Fw::FocusState:
-        {
-            newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>());
-            break;
-        }
-        case Fw::HoverState:
-        {
-            newStatus = isOnHtml() ? newState : (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled());
-            break;
-        }
-        case Fw::PressedState:
-        {
-            newStatus = isOnHtml() ? newState : (g_ui.getPressedWidget() == static_self_cast<UIWidget>());
-            break;
-        }
-        case Fw::DraggingState:
-        {
-            newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>());
-            break;
-        }
+        case Fw::FirstState: { newStatus = isFirstChild(); break; }
+        case Fw::MiddleState: { newStatus = isMiddleChild(); break; }
+        case Fw::LastState: { newStatus = isLastChild(); break; }
+        case Fw::AlternateState: { newStatus = (getParent() && (getParent()->getChildIndex(static_self_cast<UIWidget>()) % 2) == 1); break; }
+        case Fw::FocusState: { newStatus = (getParent() && getParent()->getFocusedChild() == static_self_cast<UIWidget>()); break; }
+        case Fw::HoverState: { newStatus = isOnHtml() ? newState : (g_ui.getHoveredWidget() == static_self_cast<UIWidget>() && isEnabled()); break; }
+        case Fw::PressedState: { newStatus = isOnHtml() ? newState : (g_ui.getPressedWidget() == static_self_cast<UIWidget>()); break; }
+        case Fw::DraggingState: { newStatus = (g_ui.getDraggingWidget() == static_self_cast<UIWidget>()); break; }
         case Fw::ActiveState:
         {
             UIWidgetPtr widget = static_self_cast<UIWidget>();
@@ -2140,8 +2101,7 @@ bool UIWidget::propagateOnMouseMove(const Point& mousePos, const Point& mouseMov
     return true;
 }
 
-void UIWidget::move(int x, int y)
-{
+void UIWidget::move(int x, int y) {
     if (getX() == x && getY() == y)
         return;
 
@@ -2158,8 +2118,7 @@ void UIWidget::move(int x, int y)
     m_rect = { x, y, getSize() };
 }
 
-void UIWidget::setShader(const std::string_view name)
-{
+void UIWidget::setShader(const std::string_view name) {
     if (name.empty()) {
         m_shader = nullptr;
         return;
@@ -2172,8 +2131,7 @@ void UIWidget::setShader(const std::string_view name)
 
 void UIWidget::repaint() { g_drawPool.repaint(DrawPoolType::FOREGROUND); }
 
-void UIWidget::disableUpdateTemporarily()
-{
+void UIWidget::disableUpdateTemporarily() {
     if (hasProp(PropDisableUpdateTemporarily) || !m_layout)
         return;
 
@@ -2202,8 +2160,7 @@ void UIWidget::removeOnDestroyCallback(const std::string& id)
         m_onDestroyCallbacks.erase(it);
 }
 
-std::vector<UIWidgetPtr> UIWidget::querySelectorAll(const std::string& selector)
-{
+std::vector<UIWidgetPtr> UIWidget::querySelectorAll(const std::string& selector) {
     std::vector<UIWidgetPtr> list;
     if (!m_htmlNode)
         return list;
@@ -2218,8 +2175,7 @@ std::vector<UIWidgetPtr> UIWidget::querySelectorAll(const std::string& selector)
     return list;
 }
 
-UIWidgetPtr UIWidget::querySelector(const std::string& selector)
-{
+UIWidgetPtr UIWidget::querySelector(const std::string& selector) {
     const auto& node = m_htmlNode->querySelector(selector);
     if (node) {
         if (const auto& widget = node->getWidget())
@@ -2228,32 +2184,27 @@ UIWidgetPtr UIWidget::querySelector(const std::string& selector)
     return nullptr;
 }
 
-UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html)
-{
+UIWidgetPtr UIWidget::insert(int32_t index, const std::string& html) {
     if (!isOnHtml()) return nullptr;
     m_insertChildIndex = index;
     return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
 }
 
-UIWidgetPtr UIWidget::append(const std::string& html)
-{
+UIWidgetPtr UIWidget::append(const std::string& html) {
     if (!isOnHtml()) return nullptr;
     return g_html.createWidgetFromHTML(html, static_self_cast<UIWidget>(), m_htmlRootId);
 }
 
-UIWidgetPtr UIWidget::prepend(const std::string& html)
-{
+UIWidgetPtr UIWidget::prepend(const std::string& html) {
     return insert(1, html);
 }
 
-UIWidgetPtr UIWidget::html(const std::string& html)
-{
+UIWidgetPtr UIWidget::html(const std::string& html) {
     destroyChildren();
     return append(html);
 }
 
-size_t UIWidget::remove(const std::string& queryString)
-{
+size_t UIWidget::remove(const std::string& queryString) {
     if (!isOnHtml()) return 0;
 
     const auto& nodes = querySelectorAll(queryString);

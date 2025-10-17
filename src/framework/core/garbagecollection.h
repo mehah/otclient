@@ -34,8 +34,7 @@ public:
     static void thingType();
 
 private:
-    static bool canCheck(Timer& timer, const uint32_t delay)
-    {
+    static bool canCheck(Timer& timer, const uint32_t delay) {
         if (timer.ticksElapsed() < delay)
             return false;
         timer.restart();

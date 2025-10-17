@@ -120,10 +120,10 @@ public:
 
     uint32_t getTileIndex(const Position& pos) { return ((pos.y % BLOCK_SIZE) * BLOCK_SIZE) + (pos.x % BLOCK_SIZE); }
 
-    [[nodiscard]] const std::array<TilePtr, BLOCK_SIZE * BLOCK_SIZE>& getTiles() const { return m_tiles; }
+    [[nodiscard]] const std::array<TilePtr, BLOCK_SIZE* BLOCK_SIZE>& getTiles() const { return m_tiles; }
 
 private:
-    std::array<TilePtr, BLOCK_SIZE * BLOCK_SIZE> m_tiles;
+    std::array<TilePtr, BLOCK_SIZE* BLOCK_SIZE> m_tiles;
 };
 
 struct PathFindResult
@@ -203,11 +203,7 @@ public:
 
     void clean();
     void cleanDynamicThings();
-    void cleanTexts()
-    {
-        m_animatedTexts.clear();
-        m_staticTexts.clear();
-    }
+    void cleanTexts() { m_animatedTexts.clear(); m_staticTexts.clear(); }
 
     // thing related
     ThingPtr getThing(const Position& pos, int16_t stackPos);
@@ -233,7 +229,7 @@ public:
 
     // tile related
     const TilePtr& createTile(const Position& pos);
-    template<typename... Items>
+    template <typename... Items>
     const TilePtr& createTileEx(const Position& pos, const Items&... items);
     const TilePtr& getOrCreateTile(const Position& pos);
     const TilePtr& getTile(const Position& pos);
@@ -271,14 +267,12 @@ public:
     void setCentralPosition(const Position& centralPosition);
 
     bool isLookPossible(const Position& pos);
-    bool isCovered(const Position& pos, uint8_t firstFloor = 0)
-    {
+    bool isCovered(const Position& pos, uint8_t firstFloor = 0) {
         bool isLoading = false;
         return isCovered(pos, isLoading, firstFloor);
     }
 
-    bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0)
-    {
+    bool isCompletelyCovered(const Position& pos, uint8_t firstFloor = 0) {
         bool isLoading = false;
         return isCompletelyCovered(pos, isLoading, firstFloor);
     }
@@ -324,7 +318,7 @@ private:
     struct FloorData
     {
         std::vector<MissilePtr> missiles;
-        std::unordered_map<uint32_t, TileBlock> tileBlocks;
+        std::unordered_map<uint32_t, TileBlock > tileBlocks;
     };
 
     void removeUnawareThings();

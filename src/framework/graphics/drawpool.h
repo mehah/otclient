@@ -56,8 +56,7 @@ struct DrawHashController
 {
     DrawHashController(bool agroup = false) : m_agroup(agroup) {}
 
-    bool put(size_t hash)
-    {
+    bool put(size_t hash) {
         if ((m_agroup && m_hashs.emplace(hash).second) || m_lastObjectHash != hash) {
             m_lastObjectHash = hash;
             stdext::hash_union(m_currentHash, hash);
@@ -67,23 +66,19 @@ struct DrawHashController
         return false;
     }
 
-    [[nodiscard]] bool isLast(const size_t hash) const
-    {
+    [[nodiscard]] bool isLast(const size_t hash) const {
         return m_lastObjectHash == hash;
     }
 
-    void forceUpdate()
-    {
+    void forceUpdate() {
         m_currentHash = 1;
     }
 
-    [[nodiscard]] bool wasModified() const
-    {
+    [[nodiscard]] bool wasModified() const {
         return m_currentHash != m_lastHash;
     }
 
-    void reset()
-    {
+    void reset() {
         m_hashs.clear();
         m_lastHash = m_currentHash;
         m_currentHash = 0;
@@ -121,11 +116,7 @@ public:
     FrameBufferPtr getFrameBuffer() const { return m_framebuffer; }
 
     bool canRepaint();
-    void repaint()
-    {
-        if (hasFrameBuffer()) m_hashCtrl.forceUpdate();
-        m_refreshTimer.update(-1000);
-    }
+    void repaint() { if (hasFrameBuffer()) m_hashCtrl.forceUpdate(); m_refreshTimer.update(-1000); }
     void resetState();
     void scale(float factor);
 
@@ -141,23 +132,19 @@ public:
     void onBeforeDraw(std::function<void()>&& f) { m_beforeDraw = std::move(f); }
     void onAfterDraw(std::function<void()>&& f) { m_afterDraw = std::move(f); }
 
-    auto& getHashController()
-    {
+    auto& getHashController() {
         return m_hashCtrl;
     }
 
-    const auto getAtlas() const
-    {
+    const auto getAtlas() const {
         return m_atlas.get();
     }
 
-    bool shouldRepaint() const
-    {
+    bool shouldRepaint() const {
         return m_shouldRepaint.load(std::memory_order_acquire);
     }
 
-    void release()
-    {
+    void release() {
         SpinLock::Guard guard(m_threadLock);
 
         if (!canRepaint()) {
@@ -215,6 +202,7 @@ public:
     auto& getThreadLock() { return m_threadLock; }
 
 protected:
+
     enum class DrawMethodType
     {
         RECT,
@@ -271,6 +259,7 @@ protected:
     };
 
 private:
+
     static DrawPool* create(DrawPoolType type);
     static void addCoords(CoordsBuffer& buffer, const DrawMethod& method);
 
@@ -310,11 +299,7 @@ private:
 
     void resetOpacity() { getCurrentState().opacity = 1.f; }
     void resetClipRect() { getCurrentState().clipRect = {}; }
-    void resetShaderProgram()
-    {
-        getCurrentState().shaderProgram = nullptr;
-        getCurrentState().action = nullptr;
-    }
+    void resetShaderProgram() { getCurrentState().shaderProgram = nullptr; getCurrentState().action = nullptr; }
     void resetCompositionMode() { getCurrentState().compositionMode = CompositionMode::NORMAL; }
     void resetBlendEquation() { getCurrentState().blendEquation = BlendEquation::ADD; }
     void resetTransformMatrix() { getCurrentState().transformMatrix = DEFAULT_MATRIX3; }
@@ -331,13 +316,11 @@ private:
     std::shared_ptr<CoordsBuffer> getCoordsBuffer();
 
     template<typename T>
-    void setParameter(std::string_view name, T&& value)
-    {
+    void setParameter(std::string_view name, T&& value) {
         m_parameters.emplace(name, value);
     }
     template<typename T>
-    T getParameter(const std::string_view name)
-    {
+    T getParameter(const std::string_view name) {
         const auto it = m_parameters.find(name);
         if (it != m_parameters.end()) {
             return std::any_cast<T>(it->second);
@@ -345,12 +328,10 @@ private:
 
         return T();
     }
-    bool containsParameter(const std::string_view name)
-    {
+    bool containsParameter(const std::string_view name) {
         return m_parameters.contains(name);
     }
-    void removeParameter(const std::string_view name)
-    {
+    void removeParameter(const std::string_view name) {
         const auto& it = m_parameters.find(name);
         if (it != m_parameters.end())
             m_parameters.erase(it);
@@ -381,8 +362,7 @@ private:
         }
     }
 
-    void resetOnlyOnceParameters()
-    {
+    void resetOnlyOnceParameters() {
         if (m_onlyOnceStateFlag > 0) { // Only Once State
             if (m_onlyOnceStateFlag & STATE_OPACITY)
                 resetOpacity();
@@ -403,13 +383,11 @@ private:
         }
     }
 
-    void nextStateAndReset()
-    {
+    void nextStateAndReset() {
         m_states[++m_lastStateIndex] = {};
     }
 
-    void backState()
-    {
+    void backState() {
         --m_lastStateIndex;
     }
 

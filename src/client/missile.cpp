@@ -72,8 +72,7 @@ void Missile::setPath(const Position& fromPosition, const Position& toPosition)
     g_dispatcher.scheduleEvent([self = asMissile()] { g_map.removeThing(self); }, m_duration);
 }
 
-void Missile::setDirection(const Otc::Direction dir)
-{
+void Missile::setDirection(const Otc::Direction dir) {
     m_direction = dir;
 
     if (m_direction == Otc::NorthWest) {
@@ -114,7 +113,6 @@ void Missile::setId(uint32_t id)
     m_clientId = id;
 }
 
-ThingType* Missile::getThingType() const
-{
+ThingType* Missile::getThingType() const {
     return g_things.getRawThingType(m_clientId, ThingCategoryMissile);
 }

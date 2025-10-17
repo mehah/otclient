@@ -39,8 +39,7 @@
 
 extern asio::io_service g_ioService;
 
-Protocol::Protocol() : m_inputMessage(std::make_shared<InputMessage>())
-{
+Protocol::Protocol() :m_inputMessage(std::make_shared<InputMessage>()) {
     inflateInit2(&m_zstream, -15);
 }
 
@@ -60,11 +59,11 @@ void Protocol::connect(const std::string_view host, const uint16_t port)
         m_disconnected = false;
         m_proxy = g_proxy.addSession(port,
                                      [capture0 = asProtocol()](auto&& PH1) {
-                                         capture0->onProxyPacket(std::forward<decltype(PH1)>(PH1));
-                                     },
+            capture0->onProxyPacket(std::forward<decltype(PH1)>(PH1));
+        },
                                      [capture0 = asProtocol()](auto&& PH1) {
-                                         capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
-                                     });
+            capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
+        });
         return onConnect();
     }
 
@@ -87,7 +86,7 @@ void Protocol::connect(const std::string_view host, const uint16_t port)
 void Protocol::connect(const std::string_view host, uint16_t port, bool gameWorld)
 {
     m_connection = std::make_shared<WebConnection>();
-    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1)); });
+    m_connection->setErrorCallback([capture0 = asProtocol()](auto&& PH1) { capture0->onError(std::forward<decltype(PH1)>(PH1));    });
     m_connection->connect(host, port, [capture0 = asProtocol()] { capture0->onConnect(); }, gameWorld);
 }
 #endif
@@ -196,9 +195,9 @@ void Protocol::recv()
     // read the first 2 bytes which contain the message size
     if (m_connection)
         m_connection->read(2, [capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
-            capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
-                                         std::forward<decltype(PH2)>(PH2));
-        });
+        capture0->internalRecvHeader(std::forward<decltype(PH1)>(PH1),
+        std::forward<decltype(PH2)>(PH2));
+    });
 }
 
 void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
@@ -219,9 +218,9 @@ void Protocol::internalRecvHeader(const uint8_t* buffer, const uint16_t size)
     // read remaining message data
     if (m_connection)
         m_connection->read(remainingSize, [capture0 = asProtocol()](auto&& PH1, auto&& PH2) {
-            capture0->internalRecvData(std::forward<decltype(PH1)>(PH1),
-                                       std::forward<decltype(PH2)>(PH2));
-        });
+        capture0->internalRecvData(std::forward<decltype(PH1)>(PH1),
+        std::forward<decltype(PH2)>(PH2));
+    });
 }
 
 void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
@@ -290,7 +289,7 @@ void Protocol::internalRecvData(const uint8_t* buffer, const uint16_t size)
 void Protocol::generateXteaKey()
 {
     std::random_device rd;
-    std::uniform_int_distribution<uint32_t> unif;
+    std::uniform_int_distribution<uint32_t > unif;
     std::ranges::generate(m_xteaKey, [&unif, &rd] { return unif(rd); });
 }
 
@@ -454,11 +453,11 @@ void Protocol::playRecord(PacketPlayerPtr player)
     m_disconnected = false;
     m_player = player;
     m_player->start([capture0 = asProtocol()](auto&& PH1) {
-                        capture0->onPlayerPacket(std::forward<decltype(PH1)>(PH1));
-                    },
-                    [capture0 = asProtocol()](auto&& PH1) {
-                        capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
-                    });
+        capture0->onPlayerPacket(std::forward<decltype(PH1)>(PH1));
+    },
+    [capture0 = asProtocol()](auto&& PH1) {
+        capture0->onLocalDisconnected(std::forward<decltype(PH1)>(PH1));
+    });
     return onConnect();
 }
 

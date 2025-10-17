@@ -64,10 +64,10 @@ bool ResourceManager::discoverWorkDir(const std::string& existentFile)
 {
     // search for modules directory
     std::string possiblePaths[] = { g_platform.getCurrentDir(),
-        g_resources.getBaseDir(),
-        g_resources.getBaseDir() + "/game_data/",
-        g_resources.getBaseDir() + "../",
-        g_resources.getBaseDir() + "../share/" + g_app.getCompactName() + "/" };
+                                    g_resources.getBaseDir(),
+                                    g_resources.getBaseDir() + "/game_data/",
+                                    g_resources.getBaseDir() + "../",
+                                    g_resources.getBaseDir() + "../share/" + g_app.getCompactName() + "/" };
 
     bool found = false;
     for (const auto& dir : possiblePaths) {
@@ -245,7 +245,7 @@ std::string ResourceManager::readFileContents(const std::string& fileName)
 #if ENABLE_ENCRYPTION == 1
     const auto headerSize = std::string(ENCRYPTION_HEADER).size();
     const bool hasHeader = (buffer.size() >= headerSize &&
-        buffer.compare(0, headerSize, ENCRYPTION_HEADER) == 0);
+                            buffer.compare(0, headerSize, ENCRYPTION_HEADER) == 0);
 
     if (hasHeader) {
         buffer = buffer.substr(headerSize);
@@ -573,7 +573,7 @@ uint8_t* ResourceManager::decrypt(uint8_t* data, const int32_t size)
 
 void ResourceManager::runEncryption(const std::string& password)
 {
-    std::vector<std::string> excludedExtensions = { ".rar", ".ogg", ".xml", ".dll", ".exe", ".log", ".otb" };
+    std::vector<std::string> excludedExtensions = { ".rar",".ogg",".xml",".dll",".exe", ".log",".otb" };
     for (const auto& entry : std::filesystem::recursive_directory_iterator("./")) {
         if (std::string ext = entry.path().extension().string();
             std::ranges::find(excludedExtensions, ext) != excludedExtensions.end())
@@ -596,8 +596,7 @@ void ResourceManager::save_string_into_file(const std::string& contents, const s
     datFile.close();
 }
 
-std::string ResourceManager::fileChecksum(const std::string& path)
-{
+std::string ResourceManager::fileChecksum(const std::string& path) {
     static stdext::map<std::string, std::string> cache;
 
     const auto it = cache.find(path);
@@ -640,8 +639,7 @@ std::unordered_map<std::string, std::string> ResourceManager::filesChecksums()
     return ret;
 }
 
-std::string ResourceManager::selfChecksum()
-{
+std::string ResourceManager::selfChecksum() {
 #ifdef ANDROID
     return "";
 #else
@@ -661,8 +659,7 @@ std::string ResourceManager::selfChecksum()
 #endif
 }
 
-void ResourceManager::updateFiles(const std::set<std::string>& files)
-{
+void ResourceManager::updateFiles(const std::set<std::string>& files) {
     g_logger.info("Updating client, {} files", files.size());
 
     const auto& oldWriteDir = getWriteDir();
@@ -728,8 +725,7 @@ void ResourceManager::updateExecutable(std::string fileName)
 #endif
 }
 
-bool ResourceManager::launchCorrect(const std::vector<std::string>& args)
-{ // curently works only on windows
+bool ResourceManager::launchCorrect(const std::vector<std::string>& args) { // curently works only on windows
 #if (defined(ANDROID) || defined(FREE_VERSION))
     return false;
 #else

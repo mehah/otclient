@@ -299,10 +299,11 @@ std::string Platform::getOSName()
             if (osvi.dwMinorVersion == 1 || osvi.dwMinorVersion == 2) {
                 if (osvi.wProductType == VER_NT_WORKSTATION && osvi.dwMinorVersion == 1)
                     ret += "Windows 7 ";
-                else if (osvi.wProductType == VER_NT_WORKSTATION && osvi.dwMinorVersion == 2)
-                    ret += "Windows 8 ";
                 else
-                    ret += "Windows Server 2008 R2 ";
+                    if (osvi.wProductType == VER_NT_WORKSTATION && osvi.dwMinorVersion == 2)
+                        ret += "Windows 8 ";
+                    else
+                        ret += "Windows Server 2008 R2 ";
             }
 
             pGPI = (PGPI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetProductInfo");
@@ -385,7 +386,9 @@ std::string Platform::getOSName()
                         ret += "Datacenter Edition for Itanium-based Systems";
                     else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
                         ret += "Enterprise Edition for Itanium-based Systems";
-                } else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
+                }
+
+                else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64) {
                     if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
                         ret += "Datacenter x64 Edition";
                     else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)

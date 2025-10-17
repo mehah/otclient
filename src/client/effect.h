@@ -25,11 +25,11 @@
 #include "thing.h"
 #include <framework/core/timer.h>
 
-// @bindclass
+ // @bindclass
 class Effect final : public Thing
 {
 public:
-    void draw(const Point& /*dest*/, bool drawThings = true, const LightViewPtr& = nullptr) override;
+    void draw(const Point& /*dest*/, bool drawThings = true, const LightViewPtr & = nullptr) override;
     void setId(uint32_t id) override;
     void setPosition(const Position& position, uint8_t stackPos = 0) override;
 

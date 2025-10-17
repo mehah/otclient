@@ -26,7 +26,7 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/otml.h>
 
-// @bindclass
+ // @bindclass
 class UILayout : public LuaObject
 {
 public:

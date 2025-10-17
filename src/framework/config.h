@@ -23,7 +23,7 @@
 #pragma once
 #include <obfuscate.h>
 
-// APPEARANCES
+ // APPEARANCES
 enum
 {
     BYTES_IN_SPRITE_SHEET = 384 * 384 * 4
@@ -44,7 +44,7 @@ enum
     ENABLE_ENCRYPTION = 0,
     // Enable client encryption maker/builder.
 // You can compile it once and use this executable to only encrypt client files once with command --encrypt which will be using password below.
-    ENABLE_ENCRYPTION_BUILDER = 0
+ENABLE_ENCRYPTION_BUILDER = 0
 };
 
 // for security reasons make sure you are using password with at last 100+ characters

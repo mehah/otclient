@@ -27,8 +27,7 @@
 
 #include <physfs.h>
 
-inline void grow(std::vector<uint8_t>& data, const size_t size)
-{
+inline void grow(std::vector<uint8_t>& data, const size_t size) {
     if (size > data.size())
         data.resize(size);
 }
@@ -39,7 +38,8 @@ FileStream::FileStream(std::string name, PHYSFS_File* fileHandle, const bool wri
     m_pos(0),
     m_writeable(writeable),
     m_caching(false)
-{}
+{
+}
 
 FileStream::FileStream(std::string name, const std::string_view buffer) :
     m_name(std::move(name)),
@@ -63,7 +63,7 @@ FileStream::~FileStream()
 
 void FileStream::cache(bool
 #if ENABLE_ENCRYPTION == 1
-    useEnc
+                       useEnc
 #endif
 )
 {
@@ -356,7 +356,7 @@ BinaryTreePtr FileStream::getBinaryTree()
     if (const uint8_t byte = getU8(); byte != static_cast<uint8_t>(BinaryTree::Node::START))
         throw Exception("failed to read node start (getBinaryTree): {}", byte);
 
-    return std::make_shared<BinaryTree>(shared_from_this());
+    return  std::make_shared<BinaryTree>(shared_from_this());
 }
 
 void FileStream::startNode(const uint8_t n)

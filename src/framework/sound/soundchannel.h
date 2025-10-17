@@ -24,7 +24,7 @@
 
 #include "soundsource.h"
 
-// @bindclass
+ // @bindclass
 class SoundChannel final : public LuaObject
 {
 public:

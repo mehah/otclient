@@ -31,7 +31,7 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/proxy/proxy.h>
 
-// @bindclass
+ // @bindclass
 class Protocol : public LuaObject
 {
 public:
@@ -64,7 +64,7 @@ public:
 
     void generateXteaKey();
     void setXteaKey(const uint32_t a, const uint32_t b, const uint32_t c, const uint32_t d) { m_xteaKey = { a, b, c, d }; }
-    std::vector<uint32_t> getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
+    std::vector<uint32_t > getXteaKey() { return { m_xteaKey.begin(), m_xteaKey.end() }; }
     void enableXteaEncryption() { m_xteaEncryptionEnabled = true; }
 
     void enableChecksum() { m_checksumEnabled = true; }
@@ -92,7 +92,6 @@ protected:
 
     PacketPlayerPtr m_player;
     PacketRecorderPtr m_recorder;
-
 private:
     void internalRecvHeader(const uint8_t* buffer, uint16_t size);
     void internalRecvData(const uint8_t* buffer, uint16_t size);

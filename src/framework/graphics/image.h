@@ -40,8 +40,7 @@ public:
     void overwrite(const Color& color);
     void blit(const Point& dest, const ImagePtr& other);
     void paste(const ImagePtr& other);
-    void resize(const Size& size)
-    {
+    void resize(const Size& size) {
         if (m_size == size)
             return;
 
@@ -54,8 +53,7 @@ public:
 
     void reverseChannels(); // argb -> bgra or bgra -> argb
 
-    void setPixel(const int x, const int y, const uint8_t* pixel)
-    {
+    void setPixel(const int x, const int y, const uint8_t* pixel) {
         const auto index = static_cast<size_t>(y * m_size.width() + x) * m_bpp;
         if (index < m_pixels.size())
             memcpy(&m_pixels[index], pixel, m_bpp);
@@ -76,7 +74,7 @@ public:
     void setTransparentPixel(const bool value) { m_transparentPixel = value; }
 
 private:
-    std::vector<uint8_t> m_pixels;
+    std::vector<uint8_t > m_pixels;
     Size m_size;
 
     int m_bpp;

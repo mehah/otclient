@@ -26,8 +26,7 @@
 
 namespace stdext
 {
-    inline int16_t getThreadId()
-    {
+    inline int16_t getThreadId() {
         static std::atomic_int16_t lastId = -1;
         thread_local int16_t id = -1;
 

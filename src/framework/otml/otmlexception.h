@@ -24,7 +24,7 @@
 
 #include "declarations.h"
 
-/// All OTML errors throw this exception
+ /// All OTML errors throw this exception
 class OTMLException final : public stdext::exception
 {
 public:

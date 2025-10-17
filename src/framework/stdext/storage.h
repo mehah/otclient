@@ -26,17 +26,17 @@
 
 namespace stdext
 {
-    template<class K, class V,
+    template <class K, class V,
         class Hash = phmap::priv::hash_default_hash<K>,
         class Eq = phmap::priv::hash_default_eq<K>,
         class Alloc = phmap::priv::Allocator<phmap::priv::Pair<const K, V>>>
     using map = phmap::flat_hash_map<K, V, Hash, Eq, Alloc>;
 
-    template<class T,
+    template <class T,
         class Hash = phmap::priv::hash_default_hash<T>,
         class Eq = phmap::priv::hash_default_eq<T>,
         class Alloc = phmap::priv::Allocator<T>>
-    using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
+        using set = phmap::flat_hash_set<T, Hash, Eq, Alloc>;
 
     template<typename T>
     concept OnlyEnum = std::is_enum_v<T>;

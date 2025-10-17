@@ -26,11 +26,7 @@
 #include <framework/otml/declarations.h>
 
 inline void ascii_tolower_inplace(std::string& s) { for (auto& c : s) if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a'); }
-inline std::string ascii_tolower_copy(std::string s)
-{
-    ascii_tolower_inplace(s);
-    return s;
-}
+inline std::string ascii_tolower_copy(std::string s) { ascii_tolower_inplace(s); return s; }
 
 enum class NodeType { Element, Text, Comment, Doctype };
 
@@ -52,15 +48,13 @@ public:
     const auto& getRawText() const { return text; }
     const auto getParent() const { return parent.lock(); }
 
-    HtmlNodePtr getById(const std::string& id) const
-    {
+    HtmlNodePtr getById(const std::string& id) const {
         auto root = documentRoot();
         auto it = root->idIndex.find(id);
         if (it == root->idIndex.end()) return nullptr;
         return it->second.lock();
     }
-    std::vector<HtmlNodePtr> getByClass(const std::string& cls) const
-    {
+    std::vector<HtmlNodePtr> getByClass(const std::string& cls) const {
         std::vector<HtmlNodePtr> out;
         auto root = documentRoot();
         auto it = root->classIndex.find(cls);
@@ -69,8 +63,7 @@ public:
         for (auto& w : it->second) { if (auto sp = w.lock()) out.push_back(sp); }
         return out;
     }
-    std::vector<HtmlNodePtr> getByTag(const std::string& t) const
-    {
+    std::vector<HtmlNodePtr> getByTag(const std::string& t) const {
         std::vector<HtmlNodePtr> out;
         auto root = documentRoot();
         auto key = ascii_tolower_copy(t);
@@ -121,8 +114,7 @@ public:
     std::string getStyle(std::string_view style) const;
     auto& getAttrStyles() { return m_attrStyles; }
 
-    auto& getInheritableStyles()
-    {
+    auto& getInheritableStyles() {
         return m_inheritableStyles;
     }
 
@@ -162,7 +154,7 @@ private:
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> classIndex;
     std::unordered_map<std::string, std::vector<std::weak_ptr<HtmlNode>>> tagIndex;
 
-    std::unordered_map<std::string, std::map<std::string, StyleValue>> m_styles; // value, inheritable
+    std::unordered_map< std::string, std::map<std::string, StyleValue>> m_styles; // value, inheritable
     std::unordered_map<std::string, std::map<std::string, std::string>> m_inheritableStyles;
 
     std::map<std::string, std::string> m_attrStyles;
@@ -183,8 +175,7 @@ private:
     void detachFromCurrentParent(const HtmlNodePtr& child);
 };
 
-inline void invalidateIndexCachesUp(HtmlNode* n)
-{
+inline void invalidateIndexCachesUp(HtmlNode* n) {
     while (n) {
         n->cacheIndexAmongElements = -1;
         n->cacheIndexAmongType = -1;

@@ -43,20 +43,18 @@ double Creature::speedA = 0;
 double Creature::speedB = 0;
 double Creature::speedC = 0;
 
-Creature::Creature() : m_type(Proto::CreatureTypeUnknown)
+Creature::Creature() :m_type(Proto::CreatureTypeUnknown)
 {
     m_name.setFont(g_gameConfig.getCreatureNameFont());
     m_name.setAlign(Fw::AlignTopCenter);
     m_typingIconTexture = g_textures.getTexture(g_gameConfig.getTypingIcon());
 }
 
-Creature::~Creature()
-{
+Creature::~Creature() {
     setWidgetInformation(nullptr);
 }
 
-void Creature::onCreate()
-{
+void Creature::onCreate() {
     callLuaField("onCreate");
 }
 
@@ -97,8 +95,7 @@ void Creature::draw(const Point& dest, const bool drawThings, const LightViewPtr
     // drawLight(dest, lightView);
 }
 
-void Creature::drawLight(const Point& dest, const LightViewPtr& lightView)
-{
+void Creature::drawLight(const Point& dest, const LightViewPtr& lightView) {
     if (!lightView) return;
 
     auto light = getLight();
@@ -130,14 +127,13 @@ void Creature::draw(const Rect& destRect, const uint8_t size, const bool center)
     const int tileCount = 2;
     const int fbSize = tileCount * baseSprite;
 
-    g_drawPool.bindFrameBuffer(fbSize);
-    {
+    g_drawPool.bindFrameBuffer(fbSize); {
         Point p = center
             ? Point((fbSize - nativeSize) / 2 + (nativeSize - baseSprite)) + getDisplacement()
             : Point(fbSize - baseSprite) + getDisplacement();
 
         internalDraw(p);
-        if (isMarked()) internalDraw(p, getMarkedColor());
+        if (isMarked())           internalDraw(p, getMarkedColor());
         else if (isHighlighted()) internalDraw(p, getHighlightColor());
     }
 
@@ -255,7 +251,7 @@ void Creature::drawInformation(const MapPosInfo& mapRect, const Point& dest, con
 
         if (m_text) {
             auto extraTextSize = m_text->getTextSize();
-            auto extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
+            Rect extraTextRect = Rect(p.x - extraTextSize.width() / 2.0, p.y + 15, extraTextSize);
             m_text->drawText(extraTextRect.center(), extraTextRect);
         }
     }
@@ -658,8 +654,8 @@ void Creature::updateWalkingTile()
     const auto displacementY = g_game.getFeature(Otc::GameNegativeOffset) ? 0 : getDisplacementY();
 
     const Rect virtualCreatureRect(g_gameConfig.getSpriteSize() + (m_walkOffset.x - displacementX),
-                                   g_gameConfig.getSpriteSize() + (m_walkOffset.y - displacementY),
-                                   g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
+        g_gameConfig.getSpriteSize() + (m_walkOffset.y - displacementY),
+        g_gameConfig.getSpriteSize(), g_gameConfig.getSpriteSize());
 
     for (int xi = -1; xi <= 1 && !newWalkingTile; ++xi) {
         for (int yi = -1; yi <= 1 && !newWalkingTile; ++yi) {
@@ -966,8 +962,7 @@ void Creature::updateShield()
         m_showShieldTexture = true;
 }
 
-int getSmoothedElevation(const Creature* creature, const int currentElevation, const float factor)
-{
+int getSmoothedElevation(const Creature* creature, const int currentElevation, const float factor) {
     const auto& fromPos = creature->getLastStepFromPosition();
     const auto& toPos = creature->getLastStepToPosition();
     const auto& fromTile = g_map.getTile(fromPos);
@@ -983,8 +978,7 @@ int getSmoothedElevation(const Creature* creature, const int currentElevation, c
     return fromElevation != toElevation ? fromElevation + factor * (toElevation - fromElevation) : currentElevation;
 }
 
-int Creature::getDrawElevation()
-{
+int Creature::getDrawElevation() {
     if (m_walkingTile) {
         int elevation = m_walkingTile->getDrawElevation();
 
@@ -1039,9 +1033,9 @@ uint16_t Creature::getStepDuration(const bool ignoreDiagonal, const Otc::Directi
         m_stepCache.walkDuration = std::min<int>(stepDuration / g_gameConfig.getSpriteSize(), DrawPool::FPS60);
 
         m_stepCache.diagonalDuration = stepDuration *
-        (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula()
-            ? (isPlayer() ? g_gameConfig.getPlayerDiagonalWalkSpeed() : g_gameConfig.getCreatureDiagonalWalkSpeed())
-            : 2);
+            (g_game.getClientVersion() > 810 || g_gameConfig.isForcingNewWalkingFormula()
+                ? (isPlayer() ? g_gameConfig.getPlayerDiagonalWalkSpeed() : g_gameConfig.getCreatureDiagonalWalkSpeed())
+                : 2);
     }
 
     auto duration = ignoreDiagonal ? m_stepCache.duration : m_stepCache.getDuration(m_lastStepDirection);
@@ -1099,13 +1093,11 @@ const Light& Creature::getLight() const
     return m_light.color > 0 && m_light.intensity >= light.intensity ? m_light : light;
 }
 
-ThingType* Creature::getThingType() const
-{
+ThingType* Creature::getThingType() const {
     return g_things.getRawThingType(m_outfit.isCreature() ? m_outfit.getId() : m_outfit.getAuxId(), m_outfit.getCategory());
 }
 
-ThingType* Creature::getMountThingType() const
-{
+ThingType* Creature::getMountThingType() const {
     return m_outfit.hasMount() ? g_things.getRawThingType(m_outfit.getMount(), ThingCategoryCreature) : nullptr;
 }
 
@@ -1158,8 +1150,7 @@ int Creature::getExactSize(int layer, int /*xPattern*/, int yPattern, int zPatte
     return m_exactSize = std::max<uint8_t>(exactSize, g_gameConfig.getSpriteSize());
 }
 
-void Creature::setMountShader(const std::string_view name)
-{
+void Creature::setMountShader(const std::string_view name) {
     m_mountShaderId = 0;
     if (name.empty())
         return;
@@ -1178,13 +1169,11 @@ void Creature::setTyping(const bool typing)
     m_typing = typing;
 }
 
-void Creature::sendTyping()
-{
+void Creature::sendTyping() {
     g_game.sendTyping(m_typing);
 }
 
-void Creature::onStartAttachEffect(const AttachedEffectPtr& effect)
-{
+void Creature::onStartAttachEffect(const AttachedEffectPtr& effect) {
     if (effect->isDisabledWalkAnimation()) {
         setDisableWalkAnimation(true);
     }
@@ -1193,8 +1182,7 @@ void Creature::onStartAttachEffect(const AttachedEffectPtr& effect)
         effect->m_direction = getDirection();
 }
 
-void Creature::onDispatcherAttachEffect(const AttachedEffectPtr& effect)
-{
+void Creature::onDispatcherAttachEffect(const AttachedEffectPtr& effect) {
     if (effect->isTransform() && effect->getThingType()) {
         const auto& outfit = getOutfit();
         if (outfit.isTemp())
@@ -1214,8 +1202,7 @@ void Creature::onDispatcherAttachEffect(const AttachedEffectPtr& effect)
     }
 }
 
-void Creature::onStartDetachEffect(const AttachedEffectPtr& effect)
-{
+void Creature::onStartDetachEffect(const AttachedEffectPtr& effect) {
     if (effect->isDisabledWalkAnimation())
         setDisableWalkAnimation(false);
 
@@ -1224,8 +1211,7 @@ void Creature::onStartDetachEffect(const AttachedEffectPtr& effect)
     }
 }
 
-void Creature::setStaticWalking(const uint16_t v)
-{
+void Creature::setStaticWalking(const uint16_t v) {
     if (!canDraw())
         return;
 
@@ -1249,8 +1235,7 @@ void Creature::setStaticWalking(const uint16_t v)
     }, std::min<int>(v / g_gameConfig.getSpriteSize(), DrawPool::FPS60));
 }
 
-void Creature::setWidgetInformation(const UIWidgetPtr& info)
-{
+void Creature::setWidgetInformation(const UIWidgetPtr& info) {
     if (m_widgetInformation == info)
         return;
 
@@ -1267,8 +1252,7 @@ void Creature::setWidgetInformation(const UIWidgetPtr& info)
     g_map.addAttachedWidgetToObject(info, std::static_pointer_cast<AttachableObject>(shared_from_this()));
 }
 
-void Creature::setName(const std::string_view name)
-{
+void Creature::setName(const std::string_view name) {
     if (name == m_name.getText())
         return;
 
@@ -1277,8 +1261,7 @@ void Creature::setName(const std::string_view name)
     callLuaField("onChangeName", name, oldName);
 }
 
-void Creature::setCovered(bool covered)
-{
+void Creature::setCovered(bool covered) {
     if (m_isCovered == covered)
         return;
 

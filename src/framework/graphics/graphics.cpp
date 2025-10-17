@@ -29,8 +29,7 @@
 
 Graphics g_graphics;
 
-inline std::string_view glString(GLenum name)
-{
+inline std::string_view glString(GLenum name) {
     const GLubyte* str = glGetString(name);
     return str ? reinterpret_cast<const char*>(str) : "";
 }

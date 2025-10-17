@@ -23,7 +23,7 @@
 #pragma once
 
 #if defined(OPENGL_ES) || defined(__EMSCRIPTEN__)
-// for static linking
+ // for static linking
 #define GL_APICALL
 #define EGLAPI
 #include <GLES3/gl3.h>

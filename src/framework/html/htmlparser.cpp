@@ -27,49 +27,38 @@
 
 static inline bool is_space(unsigned char c) { return c == ' ' || c == '\n' || c == '\t' || c == '\r' || c == '\f'; }
 static inline bool is_name_char(unsigned char c) { return std::isalnum(c) || c == '-' || c == ':' || c == '_'; }
-static inline bool is_attr_name_char(unsigned char c)
-{
+static inline bool is_attr_name_char(unsigned char c) {
     return std::isalnum(c) || c == '-' || c == ':' || c == '_' ||
         c == '*' || c == '@' || c == '.' || c == '[' || c == ']' ||
         c == '(' || c == ')' || c == '#';
 }
 
 static const std::unordered_set<std::string> kVoid = {
-    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"
+    "area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"
 };
 
 static const std::unordered_set<std::string> kPCloseOn = {
-    "address", "article", "aside", "blockquote", "div", "dl", "fieldset", "footer", "form",
-    "h1", "h2", "h3", "h4", "h5", "h6", "header", "hgroup", "hr", "main", "nav", "ol", "p",
-    "pre", "section", "table", "ul", "figure", "figcaption", "menu"
+    "address","article","aside","blockquote","div","dl","fieldset","footer","form",
+    "h1","h2","h3","h4","h5","h6","header","hgroup","hr","main","nav","ol","p",
+    "pre","section","table","ul","figure","figcaption","menu"
 };
 
-static void skip_ws(const std::string& s, size_t& i)
-{
+static void skip_ws(const std::string& s, size_t& i) {
     while (i < s.size() && is_space((unsigned char)s[i])) ++i;
 }
 
-static std::string read_until(const std::string& s, size_t& i, char end)
-{
+static std::string read_until(const std::string& s, size_t& i, char end) {
     size_t start = i;
     while (i < s.size() && s[i] != end) ++i;
     return s.substr(start, i - start);
 }
 
-static std::string html_entity_decode(const std::string& s)
-{
-    std::string out;
-    out.reserve(s.size());
+static std::string html_entity_decode(const std::string& s) {
+    std::string out; out.reserve(s.size());
     for (size_t i = 0; i < s.size();) {
-        if (s[i] != '&') {
-            out.push_back(s[i++]);
-            continue;
-        }
+        if (s[i] != '&') { out.push_back(s[i++]); continue; }
         size_t semi = s.find(';', i + 1);
-        if (semi == std::string::npos) {
-            out.push_back(s[i++]);
-            continue;
-        }
+        if (semi == std::string::npos) { out.push_back(s[i++]); continue; }
         std::string ent = s.substr(i + 1, semi - (i + 1));
         std::string rep;
         if (ent == "amp") rep = "&";
@@ -87,34 +76,18 @@ static std::string html_entity_decode(const std::string& s)
             if (code > 0 && code <= 0x10FFFF) {
                 unsigned int c = (unsigned int)code;
                 if (c <= 0x7F) rep.push_back(char(c));
-                else if (c <= 0x7FF) {
-                    rep.push_back(char(0xC0 | (c >> 6)));
-                    rep.push_back(char(0x80 | (c & 0x3F)));
-                } else if (c <= 0xFFFF) {
-                    rep.push_back(char(0xE0 | (c >> 12)));
-                    rep.push_back(char(0x80 | ((c >> 6) & 0x3F)));
-                    rep.push_back(char(0x80 | (c & 0x3F)));
-                } else {
-                    rep.push_back(char(0xF0 | (c >> 18)));
-                    rep.push_back(char(0x80 | ((c >> 12) & 0x3F)));
-                    rep.push_back(char(0x80 | ((c >> 6) & 0x3F)));
-                    rep.push_back(char(0x80 | (c & 0x3F)));
-                }
+                else if (c <= 0x7FF) { rep.push_back(char(0xC0 | (c >> 6))); rep.push_back(char(0x80 | (c & 0x3F))); } else if (c <= 0xFFFF) { rep.push_back(char(0xE0 | (c >> 12))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); } else { rep.push_back(char(0xF0 | (c >> 18))); rep.push_back(char(0x80 | ((c >> 12) & 0x3F))); rep.push_back(char(0x80 | ((c >> 6) & 0x3F))); rep.push_back(char(0x80 | (c & 0x3F))); }
             }
         }
-        if (rep.empty()) {
-            out.push_back(s[i++]);
-            continue;
-        }
-        out += rep;
-        i = semi + 1;
+        if (rep.empty()) { out.push_back(s[i++]); continue; }
+        out += rep; i = semi + 1;
     }
     return out;
 }
 
 static void parseAttributes(std::unordered_map<std::string, std::string>& out,
-                            std::vector<std::string>& classList,
-                            const std::string& s, size_t& i)
+    std::vector<std::string>& classList,
+    const std::string& s, size_t& i)
 {
     while (i < s.size()) {
         skip_ws(s, i);
@@ -122,18 +95,14 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
 
         size_t keyStart = i;
         while (i < s.size() && is_attr_name_char((unsigned char)s[i])) ++i;
-        if (i == keyStart) {
-            ++i;
-            continue;
-        }
+        if (i == keyStart) { ++i; continue; }
         std::string key = s.substr(keyStart, i - keyStart);
         ascii_tolower_inplace(key);
 
         skip_ws(s, i);
         std::string value;
         if (i < s.size() && s[i] == '=') {
-            ++i;
-            skip_ws(s, i);
+            ++i; skip_ws(s, i);
             if (i < s.size() && (s[i] == '\"' || s[i] == '\'')) {
                 char q = s[i++];
                 value = read_until(s, i, q);
@@ -161,52 +130,32 @@ static void parseAttributes(std::unordered_map<std::string, std::string>& out,
     }
 }
 
-static void impliedEndOnStart(const std::string& newTag, std::stack<HtmlNodePtr>& st)
-{
+static void impliedEndOnStart(const std::string& newTag, std::stack<HtmlNodePtr>& st) {
     bool popped = true;
     int guard = 0;
     while (popped && st.size() > 1 && guard++ < 32) {
         popped = false;
         if (st.top()->getType() != NodeType::Element) break;
         const std::string& open = st.top()->getTag();
-        if (open == "p" && kPCloseOn.count(newTag)) {
-            st.pop();
-            popped = true;
-            continue;
-        }
-        if (open == "li" && newTag == "li") {
-            st.pop();
-            popped = true;
-            continue;
-        }
+        if (open == "p" && kPCloseOn.count(newTag)) { st.pop(); popped = true; continue; }
+        if (open == "li" && newTag == "li") { st.pop(); popped = true; continue; }
         if ((open == "dt" && (newTag == "dt" || newTag == "dd")) ||
             (open == "dd" && (newTag == "dt" || newTag == "dd"))) {
-            st.pop();
-            popped = true;
-            continue;
+            st.pop(); popped = true; continue;
         }
-        if (open == "tr" && (newTag == "tr" || newTag == "tbody" || newTag == "thead" || newTag == "tfoot")) {
-            st.pop();
-            popped = true;
-            continue;
-        }
+        if (open == "tr" && (newTag == "tr" || newTag == "tbody" || newTag == "thead" || newTag == "tfoot")) { st.pop(); popped = true; continue; }
         if ((open == "th" && (newTag == "th" || newTag == "td")) ||
             (open == "td" && (newTag == "td" || newTag == "th"))) {
-            st.pop();
-            popped = true;
-            continue;
+            st.pop(); popped = true; continue;
         }
         if ((open == "option" && (newTag == "option" || newTag == "optgroup")) ||
             (open == "optgroup" && newTag == "optgroup")) {
-            st.pop();
-            popped = true;
-            continue;
+            st.pop(); popped = true; continue;
         }
     }
 }
 
-HtmlNodePtr parseHtml(const std::string& html)
-{
+HtmlNodePtr parseHtml(const std::string& html) {
     static const std::unordered_set<std::string> kTextOnly = {
         "script", "style", "title", "textarea", "option"
     };
@@ -287,10 +236,7 @@ HtmlNodePtr parseHtml(const std::string& html)
 
         bool onlyWhitespace = true;
         for (char c : literal) {
-            if (!is_space((unsigned char)c)) {
-                onlyWhitespace = false;
-                break;
-            }
+            if (!is_space((unsigned char)c)) { onlyWhitespace = false; break; }
         }
 
         auto parent = st.top();
@@ -345,10 +291,7 @@ HtmlNodePtr parseHtml(const std::string& html)
                 if (i < N) ++i;
                 while (st.size() > 1) {
                     auto top = st.top();
-                    if (top->type == NodeType::Element && top->tag == tag) {
-                        st.pop();
-                        break;
-                    }
+                    if (top->type == NodeType::Element && top->tag == tag) { st.pop(); break; }
                     st.pop();
                 }
                 continue;
@@ -371,11 +314,8 @@ HtmlNodePtr parseHtml(const std::string& html)
 
             bool isRaw = (tag == "script" || tag == "style");
             bool selfClosing = false;
-            if (i < N && s[i] == '/') {
-                selfClosing = true;
-                ++i;
-            }
-            if (i < N && s[i] == '>') ++i;
+            if (i < N && s[i] == '/') { selfClosing = true; ++i; }
+            if (i < N&& s[i] == '>') ++i;
 
             bool isVoid = kVoid.count(tag) > 0;
             if (!selfClosing && !isVoid) {

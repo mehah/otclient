@@ -45,29 +45,24 @@ enum class DispatcherType : uint8_t
 
 struct DispatcherContext
 {
-    [[nodiscard]] bool isGroup(const TaskGroup _group) const
-    {
+    [[nodiscard]] bool isGroup(const TaskGroup _group) const {
         return group == _group;
     }
 
-    [[nodiscard]] bool isAsync() const
-    {
+    [[nodiscard]] bool isAsync() const {
         return type == DispatcherType::AsyncEvent;
     }
 
-    [[nodiscard]] auto getGroup() const
-    {
+    [[nodiscard]] auto getGroup() const {
         return group;
     }
 
-    [[nodiscard]] auto getType() const
-    {
+    [[nodiscard]] auto getType() const {
         return type;
     }
 
 private:
-    void reset()
-    {
+    void reset() {
         group = TaskGroup::NoGroup;
         type = DispatcherType::NoType;
     }
@@ -93,8 +88,7 @@ public:
     ScheduledEventPtr scheduleEvent(const std::function<void()>& callback, int delay);
     ScheduledEventPtr cycleEvent(const std::function<void()>& callback, int delay);
 
-    [[nodiscard]] const auto& context() const
-    {
+    [[nodiscard]] const auto& context() const {
         return dispacherContext;
     }
 
@@ -112,8 +106,7 @@ private:
     // Thread Events
     struct ThreadTask
     {
-        ThreadTask()
-        {
+        ThreadTask() {
             events.reserve(2000);
             scheduledEventList.reserve(2000);
         }
@@ -129,14 +122,12 @@ private:
     inline void executeDeferEvents();
     inline void executeScheduledEvents();
 
-    [[nodiscard]] const std::unique_ptr<ThreadTask>& getThreadTask() const
-    {
+    [[nodiscard]] const std::unique_ptr<ThreadTask>& getThreadTask() const {
         return m_threads[stdext::getThreadId() % m_threads.size()];
     }
 
     template<typename Result = void, typename Inserter>
-    Result pushThreadTask(Inserter inserter)
-    {
+    Result pushThreadTask(Inserter inserter) {
         const auto& thread = getThreadTask();
         SpinLock::Guard guard(thread->lock);
         if constexpr (std::is_void_v<Result>) {

@@ -916,7 +916,7 @@ bool UITextEdit::onMousePress(const Point& mousePos, const Fw::MouseButton butto
                 if (navigator && "virtualKeyboard" in navigator) {
                     document.getElementById("title-text").focus();
                     navigator.virtualKeyboard.show();
-                                }
+                }
             });
         }
 #endif

@@ -27,7 +27,7 @@
 #include <framework/graphics/bitmapfont.h>
 #include <framework/otml/declarations.h>
 
-// @bindclass
+ // @bindclass
 class GameConfig
 {
 public:
@@ -67,10 +67,10 @@ public:
     [[nodiscard]] double getPlayerDiagonalWalkSpeed() const { return m_playerDiagonalWalkSpeed; }
     [[nodiscard]] double getCreatureDiagonalWalkSpeed() const { return m_creatureDiagonalWalkSpeed; }
 
-    [[nodiscard]] BitmapFontPtr getCreatureNameFont() const { return m_creatureNameFont; }
-    [[nodiscard]] BitmapFontPtr getAnimatedTextFont() const { return m_animatedTextFont; }
-    [[nodiscard]] BitmapFontPtr getStaticTextFont() const { return m_staticTextFont; }
-    [[nodiscard]] BitmapFontPtr getWidgetTextFont() const { return m_widgetTextFont; }
+    [[nodiscard]] BitmapFontPtr getCreatureNameFont()  const { return m_creatureNameFont; }
+    [[nodiscard]] BitmapFontPtr getAnimatedTextFont()  const { return m_animatedTextFont; }
+    [[nodiscard]] BitmapFontPtr getStaticTextFont()  const { return m_staticTextFont; }
+    [[nodiscard]] BitmapFontPtr getWidgetTextFont()  const { return m_widgetTextFont; }
 
     std::string getCreatureNameFontName() { return m_creatureNameFont->getName(); }
     std::string getAnimatedTextFontName() { return m_animatedTextFont->getName(); }
@@ -95,7 +95,7 @@ private:
     std::string m_typingIcon{ "/images/game/console/typing" };
 
     // Map
-    Size m_mapViewPort{ 8, 6 };
+    Size m_mapViewPort{ 8,6 };
     uint8_t m_mapMaxZ{ 15 };
     uint8_t m_mapSeaFloor{ 7 };
     uint8_t m_mapUndergroundFloorRange{ 2 };

@@ -27,7 +27,7 @@
 #include <framework/luaengine/luaobject.h>
 #include <framework/otml/declarations.h>
 
-// @bindclass
+ // @bindclass
 class Config final : public LuaObject
 {
 public:

@@ -27,13 +27,12 @@
 #include <framework/graphics/cachedtext.h>
 #include <framework/luaengine/luaobject.h>
 
-// @bindclass
+ // @bindclass
 class AnimatedText final : public LuaObject
 {
 public:
     AnimatedText();
-    AnimatedText(const std::string_view text, const int color) : AnimatedText()
-    {
+    AnimatedText(const std::string_view text, const int color) : AnimatedText() {
         setText(text);
         setColor(color);
     }

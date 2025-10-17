@@ -36,8 +36,7 @@
 
 using json = nlohmann::json;
 
-LoginHttp::LoginHttp()
-{
+LoginHttp::LoginHttp() {
     this->characters.clear();
     this->worlds.clear();
     this->session.clear();
@@ -45,13 +44,11 @@ LoginHttp::LoginHttp()
     this->cancelled.store(false);
 }
 
-void LoginHttp::cancel()
-{
+void LoginHttp::cancel() {
     cancelled.store(true);
 }
 
-void LoginHttp::Logger(const auto& req, const auto& res)
-{
+void LoginHttp::Logger(const auto& req, const auto& res) {
     std::cout << "======= LOG ======= " << std::endl;
     std::cout << "-- REQUEST --" << std::endl;
     std::cout << req.method << std::endl;
@@ -77,15 +74,14 @@ void LoginHttp::Logger(const auto& req, const auto& res)
 
 void LoginHttp::startHttpLogin(const std::string& host, const std::string& path,
                                const uint16_t port, const std::string& email,
-                               const std::string& password)
-{
+                               const std::string& password) {
     httplib::SSLClient cli(host, port);
 
     cli.set_logger(
         [this](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
 
-    const auto body = json{ { "email", email }, { "password", password }, { "stayloggedin", true }, { "type", "login" } };
-    const httplib::Headers headers = { { "User-Agent", "Mozilla/5.0" } };
+    const auto body = json{ {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    const httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
 
     if (auto res = cli.Post(path, headers, body.dump(1), "application/json")) {
         if (res->status == 200) {
@@ -109,119 +105,118 @@ std::string LoginHttp::getSession() { return this->session; }
 void LoginHttp::httpLogin(const std::string& host, const std::string& path,
                           uint16_t port, const std::string& email,
                           const std::string& password, int request_id,
-                          bool httpLogin)
-{
+                          bool httpLogin) {
 #ifndef __EMSCRIPTEN__
     g_asyncDispatcher.detach_task(
         [this, host, path, port, email, password, request_id, httpLogin] {
+        if (cancelled.load()) return;
+        httplib::Result result =
+            this->loginHttpsJson(host, path, port, email, password);
+        if (httpLogin && (!result || result->status != Success)) {
             if (cancelled.load()) return;
-            httplib::Result result =
-                this->loginHttpsJson(host, path, port, email, password);
-            if (httpLogin && (!result || result->status != Success)) {
+            result = loginHttpJson(host, path, port, email, password);
+        }
+
+        if (cancelled.load()) return;
+        if (result && result->status == Success) {
+            g_dispatcher.addEvent([this, request_id] {
                 if (cancelled.load()) return;
-                result = loginHttpJson(host, path, port, email, password);
-            }
-
-            if (cancelled.load()) return;
-            if (result && result->status == Success) {
-                g_dispatcher.addEvent([this, request_id] {
-                    if (cancelled.load()) return;
-                    g_lua.callGlobalField("EnterGame", "loginSuccess", request_id,
-                                          this->getSession(), this->getWorldList(),
-                                          this->getCharacterList());
-                });
-            } else {
-                int status = 0;
-                std::string msg = "";
-                if (result) {
-                    status = result->status;
-                    try {
-                        const auto body = json::parse(result->body);
-                        if (body.contains("errorMessage")) {
-                            msg = body["errorMessage"];
-                        } else {
-                            msg = "Unexpected JSON format.";
-                        }
-                    } catch (const std::exception&) {
-                        msg = to_string(result.error());
+                g_lua.callGlobalField("EnterGame", "loginSuccess", request_id,
+                this->getSession(), this->getWorldList(),
+                this->getCharacterList());
+            });
+        } else {
+            int status = 0;
+            std::string msg = "";
+            if (result) {
+                status = result->status;
+                try {
+                    const auto body = json::parse(result->body);
+                    if (body.contains("errorMessage")) {
+                        msg = body["errorMessage"];
+                    } else {
+                        msg = "Unexpected JSON format.";
                     }
-                } else {
-                    status = -1;
-                    msg = "Unknown error.\nCheck: \n-Enable Http login\n-Check Apache\n-Check login.php\n-check port 80/8080\n-Check Cloudflare";
+                } catch (const std::exception&) {
+                    msg = to_string(result.error());
                 }
-
-                g_dispatcher.addEvent([this, request_id, status, msg] {
-                    if (cancelled.load()) return;
-                    g_lua.callGlobalField("EnterGame", "loginFailed", request_id, msg,
-                                          status);
-                });
+            } else {
+                status = -1;
+                msg = "Unknown error.\nCheck: \n-Enable Http login\n-Check Apache\n-Check login.php\n-check port 80/8080\n-Check Cloudflare";
             }
-        });
+
+            g_dispatcher.addEvent([this, request_id, status, msg] {
+                if (cancelled.load()) return;
+                g_lua.callGlobalField("EnterGame", "loginFailed", request_id, msg,
+                status);
+            });
+        }
+    });
 #else
     g_asyncDispatcher.detach_task(
         [this, host, path, port, email, password, request_id, httpLogin] {
-            if (cancelled.load()) return;
-            emscripten_fetch_attr_t attr;
-            emscripten_fetch_attr_init(&attr);
-            strcpy(attr.requestMethod, "POST");
-            static const char* const headers[] = {
-                "Content-Type", "application/json; charset=utf-8",
-                0,
-            };
-            attr.requestHeaders = headers;
-            attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
-            json body = json{ { "email", email }, { "password", password }, { "stayloggedin", true }, { "type", "login" } };
-            std::string bodyStr = body.dump(1);
-            attr.requestData = bodyStr.data();
-            attr.requestDataSize = bodyStr.length();
+        if (cancelled.load()) return;
+        emscripten_fetch_attr_t attr;
+        emscripten_fetch_attr_init(&attr);
+        strcpy(attr.requestMethod, "POST");
+        static const char* const headers[] = {
+            "Content-Type", "application/json; charset=utf-8",
+            0,
+        };
+        attr.requestHeaders = headers;
+        attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
+        json body = json{ {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+        std::string bodyStr = body.dump(1);
+        attr.requestData = bodyStr.data();
+        attr.requestDataSize = bodyStr.length();
 
-            std::string url = "https://" + (host.length() > 0 ? host : "127.0.0.1") + ":" + std::to_string(port) + path;
-            emscripten_fetch_t* fetch = emscripten_fetch(&attr, url.c_str());
+        std::string url = "https://" + (host.length() > 0 ? host : "127.0.0.1") + ":" + std::to_string(port) + path;
+        emscripten_fetch_t* fetch = emscripten_fetch(&attr, url.c_str());
 
-            if (fetch->status != 200 && httpLogin) {
-                std::string url = "http://" + (host.length() > 0 ? host : "127.0.0.1") + ":" + std::to_string(port) + path;
-                fetch = emscripten_fetch(&attr, url.c_str());
-            }
+        if (fetch->status != 200 && httpLogin) {
+            std::string url = "http://" + (host.length() > 0 ? host : "127.0.0.1") + ":" + std::to_string(port) + path;
+            fetch = emscripten_fetch(&attr, url.c_str());
+        }
 
-            if (cancelled.load()) {
-                emscripten_fetch_close(fetch);
-                return;
-            }
-            if (fetch && fetch->status == 200 &&
-                !parseJsonResponse(std::string(fetch->data, fetch->numBytes))) {
-                fetch->status = -1;
-            }
-
+        if (cancelled.load()) {
             emscripten_fetch_close(fetch);
-            if (cancelled.load()) return;
-            if (fetch && fetch->status == 200) {
-                g_dispatcher.addEvent([this, request_id] {
-                    if (cancelled.load()) return;
-                    g_lua.callGlobalField("EnterGame", "loginSuccess", request_id,
-                                          this->getSession(), this->getWorldList(),
-                                          this->getCharacterList());
-                });
-            } else {
-                int status = 0;
-                std::string msg = "";
-                if (fetch) {
-                    status = fetch->status;
-                } else {
-                    status = -1;
-                }
-                if (this->errorMessage.length() == 0) {
-                    msg = "Unknown error";
-                } else {
-                    msg = this->errorMessage;
-                }
+            return;
+        }
+        if (fetch && fetch->status == 200 &&
+               !parseJsonResponse(std::string(fetch->data, fetch->numBytes))) {
+            fetch->status = -1;
+        }
 
-                g_dispatcher.addEvent([this, request_id, status, msg] {
-                    if (cancelled.load()) return;
-                    g_lua.callGlobalField("EnterGame", "loginFailed", request_id, msg,
-                                          status);
-                });
+        emscripten_fetch_close(fetch);
+        if (cancelled.load()) return;
+        if (fetch && fetch->status == 200) {
+            g_dispatcher.addEvent([this, request_id] {
+                if (cancelled.load()) return;
+                g_lua.callGlobalField("EnterGame", "loginSuccess", request_id,
+                this->getSession(), this->getWorldList(),
+                this->getCharacterList());
+            });
+        } else {
+            int status = 0;
+            std::string msg = "";
+            if (fetch) {
+                status = fetch->status;
+            } else {
+                status = -1;
             }
-        });
+            if (this->errorMessage.length() == 0) {
+                msg = "Unknown error";
+            } else {
+                msg = this->errorMessage;
+            }
+
+            g_dispatcher.addEvent([this, request_id, status, msg] {
+                if (cancelled.load()) return;
+                g_lua.callGlobalField("EnterGame", "loginFailed", request_id, msg,
+                status);
+            });
+        }
+    });
 #endif
 }
 
@@ -229,8 +224,7 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string& host,
                                           const std::string& path,
                                           const uint16_t port,
                                           const std::string& email,
-                                          const std::string& password)
-{
+                                          const std::string& password) {
     httplib::SSLClient client(host, port);
 
     client.set_logger(
@@ -240,8 +234,8 @@ httplib::Result LoginHttp::loginHttpsJson(const std::string& host,
     client.enable_server_certificate_verification(false);
     client.enable_server_hostname_verification(false);
 
-    const json body = { { "email", email }, { "password", password }, { "stayloggedin", true }, { "type", "login" } };
-    const httplib::Headers headers = { { "User-Agent", "Mozilla/5.0" } };
+    const json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
+    const httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
 
     httplib::Result response =
         client.Post(path, headers, body.dump(), "application/json");
@@ -267,14 +261,13 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
                                          const std::string& path,
                                          const uint16_t port,
                                          const std::string& email,
-                                         const std::string& password)
-{
+                                         const std::string& password) {
     httplib::Client client(host, port);
     client.set_logger(
         [this](const auto& req, const auto& res) { LoginHttp::Logger(req, res); });
 
-    const httplib::Headers headers = { { "User-Agent", "Mozilla/5.0" } };
-    const json body = { { "email", email }, { "password", password }, { "stayloggedin", true }, { "type", "login" } };
+    const httplib::Headers headers = { {"User-Agent", "Mozilla/5.0"} };
+    const json body = { {"email", email}, {"password", password}, {"stayloggedin", true}, {"type", "login"} };
 
     httplib::Result response =
         client.Post(path, headers, body.dump(), "application/json");
@@ -288,15 +281,14 @@ httplib::Result LoginHttp::loginHttpJson(const std::string& host,
             << std::endl;
     }
     if (response && response->status == Success &&
-        !parseJsonResponse(response->body)) {
+           !parseJsonResponse(response->body)) {
         response->status = -1;
     }
 
     return response;
 }
 
-bool LoginHttp::parseJsonResponse(const std::string& body)
-{
+bool LoginHttp::parseJsonResponse(const std::string& body) {
     if (cancelled.load()) return false;
     json responseJson;
     try {

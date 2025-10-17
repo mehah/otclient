@@ -132,11 +132,10 @@ void GraphicalApplication::terminate()
 }
 
 #ifdef __EMSCRIPTEN__
-void GraphicalApplication::mainLoop()
-{
+void GraphicalApplication::mainLoop() {
     if (m_stopping) {
         emscripten_cancel_main_loop();
-        MAIN_THREAD_EM_ASM({ window.location.reload();  });
+        MAIN_THREAD_EM_ASM({ window.location.reload(); });
         return;
     }
     mainPoll();
@@ -198,7 +197,7 @@ void GraphicalApplication::run()
             if (m_drawEvents->canDraw(DrawPoolType::MAP)) {
                 m_drawEvents->preLoad();
 
-                for (const auto type : { DrawPoolType::LIGHT, DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {
+                for (const auto type : { DrawPoolType::LIGHT , DrawPoolType::FOREGROUND, DrawPoolType::FOREGROUND_MAP }) {
                     if (m_drawEvents->canDraw(type)) {
                         tasks.emplace_back(g_asyncDispatcher.submit_task([this, type] {
                             m_drawEvents->draw(type);
@@ -306,8 +305,7 @@ void GraphicalApplication::inputEvent(const InputEvent& event)
 
 bool GraphicalApplication::isLoadingAsyncTexture() { return m_loadingAsyncTexture || (m_drawEvents && m_drawEvents->isLoadingAsyncTexture()); }
 
-void GraphicalApplication::setLoadingAsyncTexture(bool v)
-{
+void GraphicalApplication::setLoadingAsyncTexture(bool v) {
     if (m_drawEvents && m_drawEvents->isUsingProtobuf())
         v = true;
     else if (isEncrypted())
@@ -351,8 +349,7 @@ void GraphicalApplication::doMapScreenshot(std::string fileName)
 }
 
 float GraphicalApplication::getHUDScale() const { return g_window.getDisplayDensity(); }
-void GraphicalApplication::setHUDScale(const float v)
-{
+void GraphicalApplication::setHUDScale(const float v) {
     g_window.setDisplayDensity(v);
     resize(g_graphics.getViewportSize());
 }

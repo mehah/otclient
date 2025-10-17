@@ -24,7 +24,7 @@
 
 #include "uiboxlayout.h"
 
-// @bindclass
+ // @bindclass
 class UIVerticalLayout final : public UIBoxLayout
 {
 public:
@@ -32,11 +32,7 @@ public:
 
     void applyStyle(const OTMLNodePtr& styleNode) override;
 
-    void setAlignBottom(const bool aliginBottom)
-    {
-        m_alignBottom = aliginBottom;
-        update();
-    }
+    void setAlignBottom(const bool aliginBottom) { m_alignBottom = aliginBottom; update(); }
     bool isAlignBottom() { return m_alignBottom; }
 
     bool isUIVerticalLayout() override { return true; }

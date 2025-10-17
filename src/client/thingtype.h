@@ -352,12 +352,11 @@ public:
     const Light& getLight() { return m_light; }
     const MarketData& getMarketData() { return m_market; }
     const std::vector<NPCData>& getNpcSaleData() { return m_npcData; }
-    int getMeanPrice()
-    {
+    int getMeanPrice() {
         static constexpr std::array<std::pair<uint32_t, uint32_t>, 3> forcedPrices = { {
-            { 3043, 10000 },// Crystal Coin
-            { 3031, 1 }, // Gold Coin
-            { 3035, 100 } // Platinum Coin
+            {3043, 10000},// Crystal Coin
+            {3031, 1}, // Gold Coin
+            {3035, 100} // Platinum Coin
         } };
 
         const uint32_t itemId = getId();
@@ -374,7 +373,7 @@ public:
         }
 
         const int totalBuyPrice = std::accumulate(m_npcData.begin(), m_npcData.end(), 0,
-                                                  [](int sum, const auto& npc) { return sum + npc.buyPrice; });
+            [](int sum, const auto& npc) { return sum + npc.buyPrice; });
 
         return totalBuyPrice / static_cast<int>(npcCount);
     }
@@ -454,8 +453,7 @@ public:
     bool hasTexture() const { return !m_textureData.empty() && m_textureData[0].source != nullptr; }
     const Timer getLastTimeUsage() const { return m_lastTimeUsage; }
 
-    void unload()
-    {
+    void unload() {
         for (auto& data : m_textureData) {
             data.source = nullptr;
         }

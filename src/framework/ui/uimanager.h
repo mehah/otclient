@@ -27,7 +27,7 @@
 #include <framework/otml/declarations.h>
 #include <framework/platform/platform.h>
 
-//@bindsingleton g_ui
+ //@bindsingleton g_ui
 class UIManager
 {
 public:

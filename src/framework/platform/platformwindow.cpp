@@ -97,8 +97,8 @@ void PlatformWindow::processKeyDown(Fw::Key keyCode)
         return;
 #if defined(__APPLE__)
     } else if (keyCode == Fw::KeyMeta) {
-            m_inputEvent.keyboardModifiers |= Fw::KeyboardAltModifier;
-            return;
+        m_inputEvent.keyboardModifiers |= Fw::KeyboardAltModifier;
+        return;
 #else
     }
     if (keyCode == Fw::KeyAlt) {
@@ -142,8 +142,8 @@ void PlatformWindow::processKeyUp(Fw::Key keyCode)
         return;
 #if defined(__APPLE__)
     } else if (keyCode == Fw::KeyMeta) {
-            m_inputEvent.keyboardModifiers &= ~Fw::KeyboardAltModifier;
-            return;
+        m_inputEvent.keyboardModifiers &= ~Fw::KeyboardAltModifier;
+        return;
 #else
     }
     if (keyCode == Fw::KeyAlt) {

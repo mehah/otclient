@@ -59,11 +59,7 @@ public:
 
     void sort();
     TownList getTowns() { return m_towns; }
-    void clear()
-    {
-        m_towns.clear();
-        m_nullTown = nullptr;
-    }
+    void clear() { m_towns.clear(); m_nullTown = nullptr; }
 
 private:
     TownList m_towns;

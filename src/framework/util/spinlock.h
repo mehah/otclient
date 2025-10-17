@@ -18,8 +18,7 @@ public:
     SpinLock(const SpinLock&) = delete;
     SpinLock& operator=(const SpinLock&) = delete;
 
-    void lock() noexcept
-    {
+    void lock() noexcept {
         for (;;) {
             if (!m_flag.exchange(true, std::memory_order_acquire))
                 return;
@@ -28,13 +27,11 @@ public:
         }
     }
 
-    void unlock() noexcept
-    {
+    void unlock() noexcept {
         m_flag.store(false, std::memory_order_release);
     }
 
-    bool try_lock() noexcept
-    {
+    bool try_lock() noexcept {
         return !m_flag.exchange(true, std::memory_order_acquire);
     }
 
@@ -52,8 +49,7 @@ public:
     };
 
 private:
-    static inline void cpu_relax()
-    {
+    static inline void cpu_relax() {
 #if defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86)
         _mm_pause();
 #elif defined(__aarch64__) || defined(__arm__)

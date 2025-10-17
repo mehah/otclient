@@ -30,7 +30,8 @@ class UIPositionAnchor final : public UIAnchor
 public:
     UIPositionAnchor(const Fw::AnchorEdge anchoredEdge, const Position& hookedPosition, const Fw::AnchorEdge hookedEdge) :
         UIAnchor(anchoredEdge, {}, hookedEdge), m_hookedPosition(hookedPosition)
-    {}
+    {
+    }
 
     UIWidgetPtr getHookedWidget(const UIWidgetPtr& /*widget*/, const UIWidgetPtr& parentWidget) override { return parentWidget; }
     int getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr& parentWidget) override;

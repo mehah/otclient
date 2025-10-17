@@ -56,7 +56,7 @@ extern "C" {
 #endif
 
 struct lua_State;
-using LuaCFunction = int(*)(lua_State* L);
+using LuaCFunction = int(*) (lua_State* L);
 
 /// Class that manages LUA stuff
 class LuaInterface
@@ -274,11 +274,7 @@ public:
     int ref() const;
     int weakRef();
     void unref(int ref) const;
-    void useValue()
-    {
-        pushValue();
-        ref();
-    }
+    void useValue() { pushValue(); ref(); }
 
     const char* typeName(int index = -1);
     [[nodiscard]] std::string functionSourcePath() const;
@@ -383,12 +379,7 @@ public:
 
     /// Same as castValue but also pops
     template<class T>
-    T polymorphicPop()
-    {
-        T v = castValue<T>();
-        pop(1);
-        return v;
-    }
+    T polymorphicPop() { T v = castValue<T>(); pop(1); return v; }
 
 private:
     lua_State* L{ nullptr };

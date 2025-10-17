@@ -189,7 +189,7 @@ bool Image::nextMipmap()
     const int ow = iw > 1 ? iw / 2 : 1;
     const int oh = ih > 1 ? ih / 2 : 1;
 
-    std::vector<uint8_t> pixels(ow * oh * 4, 0xFF);
+    std::vector<uint8_t > pixels(ow * oh * 4, 0xFF);
 
     //FIXME: calculate mipmaps for 8x1, 4x1, 2x1 ...
     if (iw != 1 && ih != 1) {
@@ -245,8 +245,7 @@ void Image::flipVertically()
     }
 }
 
-void Image::setOpacity(const uint8_t v)
-{
+void Image::setOpacity(const uint8_t v) {
     for (size_t i = 3, s = m_pixels.size(); i < s; i += 4)
         m_pixels[i] = v;
 }

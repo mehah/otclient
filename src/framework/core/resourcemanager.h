@@ -26,7 +26,7 @@
 #include <filesystem>
 #include <set>
 
-// @bindsingleton g_resources
+ // @bindsingleton g_resources
 class ResourceManager
 {
 public:

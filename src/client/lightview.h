@@ -48,8 +48,7 @@ public:
     bool isDark() const { return m_isDark; }
     bool isEnabled() const { return m_pool->isEnabled(); }
     void setEnabled(const bool v) { m_pool->setEnable(v); }
-    void clear()
-    {
+    void clear() {
         m_lightData.lights.clear();
         m_lightData.tiles.assign(m_mapSize.area(), {});
     }

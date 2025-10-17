@@ -80,7 +80,7 @@ protected:
 
     const uint32_t m_uniqueId;
 
-    std::array<AtlasRegion*, Fw::TextureAtlasType::LAST> m_atlas{};
+    std::array<AtlasRegion*, Fw::TextureAtlasType::LAST> m_atlas{ };
 
     uint32_t m_id{ 0 };
     ticks_t m_time{ 0 };
@@ -105,11 +105,7 @@ protected:
     };
 
     uint16_t m_props{ 0 };
-    void setProp(const Prop prop, const bool v)
-    {
-        if (v) m_props |= prop;
-        else m_props &= ~prop;
-    }
+    void setProp(const Prop prop, const bool v) { if (v) m_props |= prop; else m_props &= ~prop; }
     [[nodiscard]] bool getProp(const Prop prop) const { return m_props & prop; };
 
     friend class GarbageCollection;

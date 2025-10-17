@@ -60,8 +60,7 @@ MapView::~MapView()
 #endif
 }
 
-void MapView::registerEvents()
-{
+void MapView::registerEvents() {
     g_drawPool.addAction([this, camera = m_posInfo.camera, srcRect = m_posInfo.srcRect] {
         m_pool->onBeforeDraw([=, this] {
             float fadeOpacity = 1.f;
@@ -106,8 +105,7 @@ void MapView::registerEvents()
     });
 }
 
-void MapView::preLoad()
-{
+void MapView::preLoad() {
     // update visible tiles cache when needed
     if (m_updateVisibleTiles)
         updateVisibleTiles();
@@ -186,8 +184,7 @@ void MapView::drawFloor()
     }
 }
 
-void MapView::drawLights()
-{
+void MapView::drawLights() {
     const auto& cameraPosition = m_posInfo.camera;
 
     for (int_fast8_t z = m_floorMax; std::cmp_greater_equal(z, m_floorMin); --z) {
@@ -217,8 +214,7 @@ void MapView::drawLights()
     }
 }
 
-void MapView::drawCreatureInformation()
-{
+void MapView::drawCreatureInformation() {
     g_drawPool.scale(g_app.getCreatureInformationScale());
 
     uint32_t flags = Otc::DrawThings;
@@ -436,8 +432,7 @@ void MapView::updateVisibleTiles()
     updateHighlightTile(m_mousePosition);
 }
 
-void MapView::updateRect(const Rect& rect)
-{
+void MapView::updateRect(const Rect& rect) {
     if (m_posInfo.camera != getCameraPosition()) {
         m_posInfo.camera = getCameraPosition();
         requestUpdateVisibleTiles();
@@ -541,7 +536,7 @@ void MapView::onGlobalLightChange(const Light&)
 void MapView::updateLight()
 {
     Light ambientLight = getCameraPosition().z > g_gameConfig.getMapSeaFloor() ? Light() : g_map.getLight();
-    ambientLight.intensity = std::max<uint8_t>(m_minimumAmbientLight * 255, ambientLight.intensity);
+    ambientLight.intensity = std::max<uint8_t >(m_minimumAmbientLight * 255, ambientLight.intensity);
     m_lightView->setGlobalLight(ambientLight);
     m_lightView->setEnabled(isDrawingLights());
 }
@@ -773,7 +768,7 @@ uint8_t MapView::calcFirstVisibleFloor(const bool checkLimitsFloorsView) const
 
             // limits to underground floors while under sea level
             if (m_posInfo.camera.z > g_gameConfig.getMapSeaFloor())
-                firstFloor = std::max<uint8_t>(m_posInfo.camera.z - g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapUndergroundFloorRange());
+                firstFloor = std::max<uint8_t >(m_posInfo.camera.z - g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapUndergroundFloorRange());
 
             // loop in 3x3 tiles around the camera
             for (int ix = -1; checkLimitsFloorsView && ix <= 1 && firstFloor < m_posInfo.camera.z; ++ix) {
@@ -958,29 +953,25 @@ void MapView::setCrosshairTexture(const std::string& texturePath)
     m_crosshairTexture = texturePath.empty() ? nullptr : g_textures.getTexture(texturePath);
 }
 
-void MapView::updateHighlightTile(const Position& mousePos)
-{
+void MapView::updateHighlightTile(const Position& mousePos) {
     if (m_drawHighlightTarget) {
         if ((m_lastHighlightTile = (m_shiftPressed ? getTopTile(mousePos) : g_map.getTile(mousePos))))
             m_lastHighlightTile->select(m_shiftPressed ? TileSelectType::NO_FILTERED : TileSelectType::FILTERED);
     }
 }
 
-void MapView::destroyHighlightTile()
-{
+void MapView::destroyHighlightTile() {
     if (m_lastHighlightTile) {
         m_lastHighlightTile->unselect();
         m_lastHighlightTile = nullptr;
     }
 }
 
-void MapView::addForegroundTile(const TilePtr& tile)
-{
+void MapView::addForegroundTile(const TilePtr& tile) {
     if (std::ranges::find(m_foregroundTiles, tile) == m_foregroundTiles.end())
         m_foregroundTiles.emplace_back(tile);
 }
-void MapView::removeForegroundTile(const TilePtr& tile)
-{
+void MapView::removeForegroundTile(const TilePtr& tile) {
     const auto it = std::ranges::find(m_foregroundTiles, tile);
     if (it == m_foregroundTiles.end())
         return;

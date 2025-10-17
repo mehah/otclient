@@ -496,8 +496,8 @@ void Game::processQuestLine(const uint16_t questId, const std::vector<std::tuple
 }
 
 void Game::processModalDialog(const uint32_t id, const std::string_view title, const std::string_view message, const std::vector<std::tuple<uint8_t, std::string>>
-                              & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string>>
-                              & choiceList, const bool priority)
+                                & buttonList, const uint8_t enterButton, const uint8_t escapeButton, const std::vector<std::tuple<uint8_t, std::string>>
+                                & choiceList, const bool priority)
 {
     g_lua.callGlobalField("g_game", "onModalDialog", id, title, message, buttonList, enterButton, escapeButton, choiceList, priority);
 }
@@ -508,20 +508,20 @@ void Game::processItemDetail(const uint32_t itemId, const std::vector<std::tuple
 }
 
 void Game::processCyclopediaCharacterGeneralStats(const CyclopediaCharacterGeneralStats& stats, const std::vector<std::vector<uint16_t>>& skills,
-                                                  const std::vector<std::tuple<uint8_t, uint16_t>>& combats)
+                                                const std::vector<std::tuple<uint8_t, uint16_t>>& combats)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterGeneralStats", stats, skills, combats);
 }
 
 void Game::processCyclopediaCharacterCombatStats(const CyclopediaCharacterCombatStats& data, const double mitigation, const std::vector<std::vector<uint16_t>>& additionalSkillsArray,
-                                                 const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
-                                                 const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray, const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray)
+                                                const std::vector<std::vector<uint16_t>>& forgeSkillsArray, const std::vector<uint16_t>& perfectShotDamageRangesArray,
+                                                const std::vector<std::tuple<uint8_t, uint16_t>>& combatsArray, const std::vector<std::tuple<uint16_t, uint16_t>>& concoctionsArray)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterCombatStats", data, mitigation, additionalSkillsArray, forgeSkillsArray, perfectShotDamageRangesArray, combatsArray, concoctionsArray);
 }
 
 void Game::processCyclopediaCharacterGeneralStatsBadge(const uint8_t showAccountInformation, const uint8_t playerOnline, const uint8_t playerPremium,
-                                                       const std::string_view loyaltyTitle, const std::vector<std::tuple<uint32_t, std::string>>& badgesVector)
+                                                const std::string_view loyaltyTitle, const std::vector<std::tuple<uint32_t, std::string>>& badgesVector)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterBadges", showAccountInformation, playerOnline, playerPremium, loyaltyTitle, badgesVector);
 }
@@ -532,7 +532,7 @@ void Game::processCyclopediaCharacterItemSummary(const CyclopediaCharacterItemSu
 }
 
 void Game::processCyclopediaCharacterAppearances(const OutfitColorStruct& currentOutfit, const std::vector<CharacterInfoOutfits>& outfits,
-                                                 const std::vector<CharacterInfoMounts>& mounts, const std::vector<CharacterInfoFamiliar>& familiars)
+                                                const std::vector<CharacterInfoMounts>& mounts, const std::vector<CharacterInfoFamiliar>& familiars)
 {
     g_lua.callGlobalField("g_game", "onParseCyclopediaCharacterAppearances", currentOutfit, outfits, mounts, familiars);
 }

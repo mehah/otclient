@@ -71,7 +71,7 @@ void UIManager::render(DrawPoolType drawPane) const
 
     g_drawPool.preDraw(drawPane, [this, drawPane] {
         m_rootWidget->draw(m_rootWidget->getRect(), drawPane);
-    }, { 0, 0, g_graphics.getViewportSize() }, {});
+    }, { 0,0, g_graphics.getViewportSize() }, {});
 }
 
 void UIManager::resize(const Size& size) const { m_rootWidget->setSize(size); }
@@ -194,8 +194,7 @@ void UIManager::inputEvent(const InputEvent& event)
     }
 }
 
-void UIManager::updatePressedWidgetHTML(const UIWidgetList& newPressed, const Point& clickedPos, bool fireClicks)
-{
+void  UIManager::updatePressedWidgetHTML(const UIWidgetList& newPressed, const Point& clickedPos, bool fireClicks) {
     auto oldPressedWidgets = std::move(m_pressedWidgets);
     m_pressedWidgets = newPressed;
     m_pressedWidget = !newPressed.empty() ? newPressed.front() : nullptr;

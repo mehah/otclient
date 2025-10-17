@@ -27,10 +27,11 @@
 
 #include <framework/luaengine/luaobject.h>
 
-// @bindclass
+ // @bindclass
 class Container final : public LuaObject
 {
 public:
+
     ItemPtr getItem(int slot);
     std::deque<ItemPtr> getItems() { return m_items; }
     int getItemsCount() { return m_items.size(); }
@@ -49,8 +50,9 @@ public:
 
 protected:
     Container(const uint8_t id, const uint8_t capacity, const std::string_view name, ItemPtr containerItem, const bool hasParent, const bool isUnlocked, const bool hasPages, const uint16_t containerSize, const uint16_t firstIndex)
-        : m_id(id), m_capacity(capacity), m_containerItem(std::move(containerItem)), m_name(name), m_hasParent(hasParent), m_unlocked(isUnlocked), m_hasPages(hasPages), m_size(containerSize), m_firstIndex(firstIndex)
-    {}
+        :m_id(id), m_capacity(capacity), m_containerItem(std::move(containerItem)), m_name(name), m_hasParent(hasParent), m_unlocked(isUnlocked), m_hasPages(hasPages), m_size(containerSize), m_firstIndex(firstIndex)
+    {
+    }
 
     void onOpen(const ContainerPtr& previousContainer);
     void onClose();

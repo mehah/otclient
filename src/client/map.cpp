@@ -180,8 +180,7 @@ void Map::addThing(const ThingPtr& thing, const Position& pos, const int16_t sta
     }
 }
 
-void Map::addStaticText(const StaticTextPtr& txt, const Position& pos)
-{
+void Map::addStaticText(const StaticTextPtr& txt, const Position& pos) {
     if (!g_app.isDrawingTexts())
         return;
 
@@ -198,8 +197,7 @@ void Map::addStaticText(const StaticTextPtr& txt, const Position& pos)
     });
 }
 
-void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos)
-{
+void Map::addAnimatedText(const AnimatedTextPtr& txt, const Position& pos) {
     if (!g_app.isDrawingTexts())
         return;
 
@@ -278,8 +276,7 @@ bool Map::removeThingByPos(const Position& pos, const int16_t stackPos)
     return false;
 }
 
-bool Map::removeStaticText(const StaticTextPtr& txt)
-{
+bool Map::removeStaticText(const StaticTextPtr& txt) {
     const auto it = std::ranges::find(m_staticTexts, txt);
     if (it == m_staticTexts.end())
         return false;
@@ -288,8 +285,7 @@ bool Map::removeStaticText(const StaticTextPtr& txt)
     return true;
 }
 
-bool Map::removeAnimatedText(const AnimatedTextPtr& txt)
-{
+bool Map::removeAnimatedText(const AnimatedTextPtr& txt) {
     const auto it = std::ranges::find(m_animatedTexts, txt);
     if (it == m_animatedTexts.end())
         return false;
@@ -348,7 +344,7 @@ StaticTextPtr Map::getStaticText(const Position& pos) const
 const TilePtr& Map::createTile(const Position& pos) { return pos.isMapPosition() ? m_floors[pos.z].tileBlocks[getBlockIndex(pos)].create(pos) : m_nulltile; }
 const TilePtr& Map::getOrCreateTile(const Position& pos) { return pos.isMapPosition() ? m_floors[pos.z].tileBlocks[getBlockIndex(pos)].getOrCreate(pos) : m_nulltile; }
 
-template<typename... Items>
+template <typename... Items>
 const TilePtr& Map::createTileEx(const Position& pos, const Items&... items)
 {
     if (!pos.isValid())
@@ -489,10 +485,10 @@ void Map::setShowAnimations(bool show)
 void Map::beginGhostMode(const float opacity) { g_painter->setOpacity(opacity); }
 void Map::endGhostMode() { g_painter->resetOpacity(); }
 
-stdext::map<Position, ItemPtr, Position::Hasher> Map::findItemsById(const uint16_t clientId, const uint32_t max)
+stdext::map<Position, ItemPtr, Position::Hasher> Map::findItemsById(const uint16_t clientId, const uint32_t  max)
 {
     stdext::map<Position, ItemPtr, Position::Hasher> ret;
-    uint32_t count = 0;
+    uint32_t  count = 0;
     for (uint8_t z = 0; z <= g_gameConfig.getMapMaxZ(); ++z) {
         for (const auto& [uid, block] : m_floors[z].tileBlocks) {
             for (const auto& tile : block.getTiles()) {
@@ -512,14 +508,14 @@ stdext::map<Position, ItemPtr, Position::Hasher> Map::findItemsById(const uint16
     return ret;
 }
 
-CreaturePtr Map::getCreatureById(const uint32_t id)
+CreaturePtr Map::getCreatureById(const uint32_t  id)
 {
     const auto it = m_knownCreatures.find(id);
     return it != m_knownCreatures.end() ? it->second : nullptr;
 }
 
 void Map::addCreature(const CreaturePtr& creature) { m_knownCreatures[creature->getId()] = creature; }
-void Map::removeCreatureById(const uint32_t id)
+void Map::removeCreatureById(const uint32_t  id)
 {
     if (id == 0)
         return;
@@ -770,10 +766,9 @@ void Map::setAwareRange(const AwareRange& range)
     removeUnawareThings();
 }
 
-void Map::resetAwareRange()
-{
+void Map::resetAwareRange() {
     setAwareRange({
-        .left = static_cast<uint8_t>(g_gameConfig.getMapViewPort().width()),
+        .left = static_cast<uint8_t>(g_gameConfig.getMapViewPort().width()) ,
         .top = static_cast<uint8_t>(g_gameConfig.getMapViewPort().height()),
         .right = static_cast<uint8_t>(g_gameConfig.getMapViewPort().width() + 1),
         .bottom = static_cast<uint8_t>(g_gameConfig.getMapViewPort().height() + 1)
@@ -793,7 +788,7 @@ uint8_t Map::getLastAwareFloor() const
     if (m_centralPosition.z <= g_gameConfig.getMapSeaFloor())
         return g_gameConfig.getMapSeaFloor();
 
-    return std::min<uint8_t>(m_centralPosition.z + g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapMaxZ());
+    return std::min<uint8_t >(m_centralPosition.z + g_gameConfig.getMapAwareUndergroundFloorRange(), g_gameConfig.getMapMaxZ());
 }
 
 std::tuple<std::vector<Otc::Direction>, Otc::PathFindResult> Map::findPath(const Position& startPos, const Position& goalPos, const int maxComplexity, const int flags)
@@ -1122,8 +1117,7 @@ void Map::findPathAsync(const Position& start, const Position& goal, const std::
             });
         } else {
             visibleNodes->push_back(new Node{ .cost = speed, .totalCost = 10000000.0f, .pos = tile->getPosition(), .prev =
-                nullptr,
-                .distance = 0, .unseen = 0
+                nullptr, .distance = 0, .unseen = 0
             });
         }
     }
@@ -1193,21 +1187,18 @@ bool Map::isSightClear(const Position& fromPos, const Position& toPos)
     return true;
 }
 
-bool Map::isWidgetAttached(const UIWidgetPtr& widget) const
-{
+bool Map::isWidgetAttached(const UIWidgetPtr& widget) const {
     return m_attachedObjectWidgetMap.contains(widget);
 }
 
-void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object)
-{
+void Map::addAttachedWidgetToObject(const UIWidgetPtr& widget, const AttachableObjectPtr& object) {
     if (isWidgetAttached(widget))
         return;
 
     m_attachedObjectWidgetMap.emplace(widget, object);
 }
 
-bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget)
-{
+bool Map::removeAttachedWidgetFromObject(const UIWidgetPtr& widget) {
     // remove elemnt form unordered map
     const auto it = m_attachedObjectWidgetMap.find(widget);
     if (it == m_attachedObjectWidgetMap.end())
@@ -1330,7 +1321,7 @@ std::map<std::string, std::tuple<int, int, int, std::string>> Map::findEveryPath
     std::unordered_map<Position, Node*, Position::Hasher> nodes;
     std::priority_queue<Node*, std::vector<Node*>, LessNode> searchList;
 
-    auto initNode = new Node{ .cost = 1, .totalCost = 0, .pos = start, .prev = nullptr, .distance = 0, .unseen = 0 };
+    Node* initNode = new Node{ .cost = 1, .totalCost = 0, .pos = start, .prev = nullptr, .distance = 0, .unseen = 0 };
     nodes[start] = initNode;
     searchList.push(initNode);
 

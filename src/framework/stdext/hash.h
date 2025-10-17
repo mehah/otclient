@@ -41,7 +41,7 @@ namespace stdext
         seed ^= h + 0x9e3779b9 + (seed << 6) + (seed >> 2);
     }
 
-    template<class T>
+    template <class T>
     void hash_combine(size_t& seed, const T& v)
     {
         std::hash<T> hasher;

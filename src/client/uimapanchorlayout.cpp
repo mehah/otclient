@@ -33,7 +33,7 @@ int UIPositionAnchor::getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWi
         switch (m_hookedEdge) {
             case Fw::AnchorTop: return hookedRect.top();
             case Fw::AnchorLeft: return hookedRect.left();
-            case Fw::AnchorRight: return hookedRect.right();
+            case Fw::AnchorRight:return hookedRect.right();
             case Fw::AnchorBottom: return hookedRect.bottom();
             case Fw::AnchorVerticalCenter: return hookedRect.verticalCenter();
             case Fw::AnchorHorizontalCenter: return hookedRect.horizontalCenter();

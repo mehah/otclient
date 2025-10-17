@@ -51,8 +51,7 @@ protected:
 public:
     PainterShaderProgram();
 
-    uint8_t getId() const
-    {
+    uint8_t getId() const {
         return m_id;
     }
 
@@ -69,13 +68,11 @@ public:
     void addMultiTexture(const std::string& file);
     void bindMultiTextures() const;
 
-    void setUseFramebuffer(const bool v)
-    {
+    void setUseFramebuffer(const bool v) {
         m_useFramebuffer = v;
     }
 
-    bool useFramebuffer() const
-    {
+    bool useFramebuffer() const {
         return m_useFramebuffer;
     }
 

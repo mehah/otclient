@@ -130,8 +130,7 @@ void UIItem::onStyleApply(const std::string_view styleName, const OTMLNodePtr& s
     UIWidget::onStyleApply(styleName, styleNode);
 }
 
-void UIItem::setShader(std::string_view name)
-{
+void UIItem::setShader(std::string_view name) {
     m_shaderName = name;
     if (getItem()) getItem()->setShader(name);
 }

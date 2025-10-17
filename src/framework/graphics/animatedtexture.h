@@ -47,12 +47,7 @@ public:
     void setOnMap(const bool v) { m_onMap = v; }
 
     void update();
-    void restart()
-    {
-        m_animTimer.restart();
-        m_currentPlay = 0;
-        m_currentFrame = 0;
-    }
+    void restart() { m_animTimer.restart(); m_currentPlay = 0; m_currentFrame = 0; }
 
     [[nodiscard]] bool isAnimatedTexture() const override { return true; }
     [[nodiscard]] bool running() const { return m_animTimer.running(); }

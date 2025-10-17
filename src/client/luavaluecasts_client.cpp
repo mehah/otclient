@@ -137,8 +137,7 @@ bool luavalue_cast(const int index, Position& pos)
     return true;
 }
 
-int push_luavalue(const std::vector<NPCData>& data)
-{
+int push_luavalue(const std::vector<NPCData>& data) {
     g_lua.createTable(data.size(), 0);
     for (size_t i = 0; i < data.size(); ++i) {
         g_lua.createTable(0, 6);
@@ -358,8 +357,7 @@ bool luavalue_cast(const int index, UnjustifiedPoints& unjustifiedPoints)
     return true;
 }
 
-int push_luavalue(const BlessData& bless)
-{
+int push_luavalue(const BlessData& bless) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(bless.blessBitwise);
     g_lua.setField("blessBitwise");
@@ -370,8 +368,7 @@ int push_luavalue(const BlessData& bless)
     return 1;
 }
 
-int push_luavalue(const LogData& log)
-{
+int push_luavalue(const LogData& log) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(log.timestamp);
     g_lua.setField("timestamp");
@@ -382,8 +379,7 @@ int push_luavalue(const LogData& log)
     return 1;
 }
 
-int push_luavalue(const BlessDialogData& data)
-{
+int push_luavalue(const BlessDialogData& data) {
     g_lua.createTable(0, 11);
     g_lua.pushInteger(data.totalBless);
     g_lua.setField("totalBless");
@@ -424,8 +420,7 @@ int push_luavalue(const BlessDialogData& data)
     return 1;
 }
 
-int push_luavalue(const StoreCategory& category)
-{
+int push_luavalue(const StoreCategory& category) {
     g_lua.createTable(0, 5);
     g_lua.pushString(category.name);
     g_lua.setField("name");
@@ -460,8 +455,7 @@ int push_luavalue(const StoreCategory& category)
     return 1;
 }
 
-int push_luavalue(const SubOffer& subOffer)
-{
+int push_luavalue(const SubOffer& subOffer) {
     g_lua.createTable(0, 14);
     g_lua.pushInteger(subOffer.id);
     g_lua.setField("id");
@@ -506,8 +500,7 @@ int push_luavalue(const SubOffer& subOffer)
     return 1;
 }
 
-int push_luavalue(const StoreOffer& offer)
-{
+int push_luavalue(const StoreOffer& offer) {
     g_lua.createTable(0, 20);
     g_lua.pushString(offer.name);
     g_lua.setField("name");
@@ -596,8 +589,7 @@ int push_luavalue(const StoreOffer& offer)
     return 1;
 }
 
-int push_luavalue(const HomeOffer& homeOffer)
-{
+int push_luavalue(const HomeOffer& homeOffer) {
     g_lua.createTable(0, 16);
     g_lua.pushString(homeOffer.name);
     g_lua.setField("name");
@@ -658,8 +650,7 @@ int push_luavalue(const HomeOffer& homeOffer)
     return 1;
 }
 
-int push_luavalue(const Banner& banner)
-{
+int push_luavalue(const Banner& banner) {
     g_lua.createTable(0, 5);
     g_lua.pushString(banner.image);
     g_lua.setField("image");
@@ -674,8 +665,7 @@ int push_luavalue(const Banner& banner)
     return 1;
 }
 
-int push_luavalue(const StoreData& storeData)
-{
+int push_luavalue(const StoreData& storeData) {
     g_lua.createTable(0, 8);
     g_lua.pushString(storeData.categoryName);
     g_lua.setField("categoryName");
@@ -732,8 +722,7 @@ int push_luavalue(const StoreData& storeData)
 }
 
 // cyclopedia
-int push_luavalue(const CyclopediaBestiaryRace& race)
-{
+int push_luavalue(const CyclopediaBestiaryRace& race) {
     g_lua.createTable(0, 4);
     g_lua.pushInteger(race.race);
     g_lua.setField("race");
@@ -746,8 +735,7 @@ int push_luavalue(const CyclopediaBestiaryRace& race)
     return 1;
 }
 
-int push_luavalue(const LootItem& lootItem)
-{
+int push_luavalue(const LootItem& lootItem) {
     g_lua.createTable(0, 5);
     g_lua.pushInteger(lootItem.itemId);
     g_lua.setField("itemId");
@@ -762,8 +750,7 @@ int push_luavalue(const LootItem& lootItem)
     return 1;
 }
 
-int push_luavalue(const BestiaryMonsterData& data)
-{
+int push_luavalue(const BestiaryMonsterData& data) {
     g_lua.createTable(0, 16);
     g_lua.pushInteger(data.id);
     g_lua.setField("id");
@@ -826,8 +813,7 @@ int push_luavalue(const BestiaryMonsterData& data)
     return 1;
 }
 
-int push_luavalue(const CharmData& charm)
-{
+int push_luavalue(const CharmData& charm) {
     g_lua.createTable(0, 10);
     g_lua.pushInteger(charm.id);
     g_lua.setField("id");
@@ -855,8 +841,7 @@ int push_luavalue(const CharmData& charm)
     return 1;
 }
 
-int push_luavalue(const BestiaryCharmsData& charmData)
-{
+int push_luavalue(const BestiaryCharmsData& charmData) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(charmData.points);
     g_lua.setField("points");
@@ -877,8 +862,7 @@ int push_luavalue(const BestiaryCharmsData& charmData)
     return 1;
 }
 
-int push_luavalue(const BestiaryOverviewMonsters& monster)
-{
+int push_luavalue(const BestiaryOverviewMonsters& monster) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(monster.id);
     g_lua.setField("id");
@@ -891,8 +875,7 @@ int push_luavalue(const BestiaryOverviewMonsters& monster)
     return 1;
 }
 
-int push_luavalue(const CyclopediaCharacterGeneralStats& stats)
-{
+int push_luavalue(const CyclopediaCharacterGeneralStats& stats) {
     g_lua.createTable(0, 26);
     g_lua.pushInteger(stats.experience);
     g_lua.setField("xperiencee");
@@ -950,8 +933,7 @@ int push_luavalue(const CyclopediaCharacterGeneralStats& stats)
     return 1;
 }
 
-int push_luavalue(const CyclopediaCharacterCombatStats& data)
-{
+int push_luavalue(const CyclopediaCharacterCombatStats& data) {
     g_lua.createTable(0, 7);
     g_lua.pushInteger(data.weaponElement);
     g_lua.setField("weaponElement");
@@ -970,8 +952,7 @@ int push_luavalue(const CyclopediaCharacterCombatStats& data)
     return 1;
 }
 
-int push_luavalue(const BosstiaryData& boss)
-{
+int push_luavalue(const BosstiaryData& boss) {
     g_lua.createTable(0, 4);
     g_lua.pushInteger(boss.raceId);
     g_lua.setField("raceId");
@@ -984,8 +965,7 @@ int push_luavalue(const BosstiaryData& boss)
     return 1;
 }
 
-int push_luavalue(const BosstiarySlot& slot)
-{
+int push_luavalue(const BosstiarySlot& slot) {
     g_lua.createTable(0, 7);
     g_lua.pushInteger(slot.bossRace);
     g_lua.setField("bossRace");
@@ -1004,8 +984,7 @@ int push_luavalue(const BosstiarySlot& slot)
     return 1;
 }
 
-int push_luavalue(const BossUnlocked& boss)
-{
+int push_luavalue(const BossUnlocked& boss) {
     g_lua.createTable(0, 2);
     g_lua.pushInteger(boss.bossId);
     g_lua.setField("bossId");
@@ -1014,8 +993,7 @@ int push_luavalue(const BossUnlocked& boss)
     return 1;
 }
 
-int push_luavalue(const BosstiarySlotsData& data)
-{
+int push_luavalue(const BosstiarySlotsData& data) {
     g_lua.createTable(0, 13);
     g_lua.pushInteger(data.playerPoints);
     g_lua.setField("playerPoints");
@@ -1065,8 +1043,7 @@ int push_luavalue(const BosstiarySlotsData& data)
     return 1;
 }
 
-int push_luavalue(const ItemSummary& item)
-{
+int push_luavalue(const ItemSummary& item) {
     g_lua.createTable(0, 2);
     g_lua.pushInteger(item.itemId);
     g_lua.setField("itemId");
@@ -1077,8 +1054,7 @@ int push_luavalue(const ItemSummary& item)
     return 1;
 }
 
-int push_luavalue(const CyclopediaCharacterItemSummary& data)
-{
+int push_luavalue(const CyclopediaCharacterItemSummary& data) {
     g_lua.createTable(0, 5);
 
     g_lua.createTable(data.inventory.size(), 0);
@@ -1119,8 +1095,7 @@ int push_luavalue(const CyclopediaCharacterItemSummary& data)
     return 1;
 }
 
-int push_luavalue(const RecentPvPKillEntry& entry)
-{
+int push_luavalue(const RecentPvPKillEntry& entry) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(entry.timestamp);
     g_lua.setField("timestamp");
@@ -1131,8 +1106,7 @@ int push_luavalue(const RecentPvPKillEntry& entry)
     return 1;
 }
 
-int push_luavalue(const CyclopediaCharacterRecentPvPKills& data)
-{
+int push_luavalue(const CyclopediaCharacterRecentPvPKills& data) {
     g_lua.createTable(data.entries.size(), 0);
     for (size_t i = 0; i < data.entries.size(); ++i) {
         push_luavalue(data.entries[i]);
@@ -1141,8 +1115,7 @@ int push_luavalue(const CyclopediaCharacterRecentPvPKills& data)
     return 1;
 }
 
-int push_luavalue(const RecentDeathEntry& entry)
-{
+int push_luavalue(const RecentDeathEntry& entry) {
     g_lua.createTable(0, 2);
     g_lua.pushInteger(entry.timestamp);
     g_lua.setField("timestamp");
@@ -1151,8 +1124,7 @@ int push_luavalue(const RecentDeathEntry& entry)
     return 1;
 }
 
-int push_luavalue(const CyclopediaCharacterRecentDeaths& data)
-{
+int push_luavalue(const CyclopediaCharacterRecentDeaths& data) {
     g_lua.createTable(data.entries.size(), 0);
     for (size_t i = 0; i < data.entries.size(); ++i) {
         push_luavalue(data.entries[i]);
@@ -1161,8 +1133,7 @@ int push_luavalue(const CyclopediaCharacterRecentDeaths& data)
     return 1;
 }
 
-int push_luavalue(const OutfitColorStruct& currentOutfit)
-{
+int push_luavalue(const OutfitColorStruct& currentOutfit) {
     g_lua.createTable(0, 8);
     g_lua.pushInteger(currentOutfit.lookHead);
     g_lua.setField("lookHead");
@@ -1183,8 +1154,7 @@ int push_luavalue(const OutfitColorStruct& currentOutfit)
     return 1;
 }
 
-int push_luavalue(const CharacterInfoOutfits& outfit)
-{
+int push_luavalue(const CharacterInfoOutfits& outfit) {
     g_lua.createTable(0, 5);
     g_lua.pushInteger(outfit.lookType);
     g_lua.setField("lookType");
@@ -1199,8 +1169,7 @@ int push_luavalue(const CharacterInfoOutfits& outfit)
     return 1;
 }
 
-int push_luavalue(const CharacterInfoMounts& mount)
-{
+int push_luavalue(const CharacterInfoMounts& mount) {
     g_lua.createTable(0, 4);
     g_lua.pushInteger(mount.mountId);
     g_lua.setField("mountId");
@@ -1213,8 +1182,7 @@ int push_luavalue(const CharacterInfoMounts& mount)
     return 1;
 }
 
-int push_luavalue(const CharacterInfoFamiliar& familiar)
-{
+int push_luavalue(const CharacterInfoFamiliar& familiar) {
     g_lua.createTable(0, 4);
     g_lua.pushInteger(familiar.lookType);
     g_lua.setField("lookType");
@@ -1241,8 +1209,7 @@ int push_luavalue(const RaceType& raceData)
     return 1;
 }
 
-int push_luavalue(const DailyRewardItem& item)
-{
+int push_luavalue(const DailyRewardItem& item) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(item.itemId);
     g_lua.setField("itemId");
@@ -1253,8 +1220,7 @@ int push_luavalue(const DailyRewardItem& item)
     return 1;
 }
 
-int push_luavalue(const DailyRewardBundle& bundle)
-{
+int push_luavalue(const DailyRewardBundle& bundle) {
     g_lua.createTable(0, 4);
     g_lua.pushInteger(bundle.bundleType);
     g_lua.setField("bundleType");
@@ -1267,8 +1233,7 @@ int push_luavalue(const DailyRewardBundle& bundle)
     return 1;
 }
 
-int push_luavalue(const DailyRewardDay& day)
-{
+int push_luavalue(const DailyRewardDay& day) {
     g_lua.createTable(0, 4);
     g_lua.pushInteger(day.redeemMode);
     g_lua.setField("redeemMode");
@@ -1291,8 +1256,7 @@ int push_luavalue(const DailyRewardDay& day)
     return 1;
 }
 
-int push_luavalue(const DailyRewardData& data)
-{
+int push_luavalue(const DailyRewardData& data) {
     g_lua.createTable(0, 5);
     g_lua.pushInteger(data.days);
     g_lua.setField("days");
@@ -1568,8 +1532,7 @@ int push_luavalue(const CyclopediaCharacterMiscStats& data)
     return 1;
 }
 
-int push_luavalue(const ForgeItemInfo& item)
-{
+int push_luavalue(const ForgeItemInfo& item) {
     g_lua.createTable(0, 3);
     g_lua.pushInteger(item.id);
     g_lua.setField("id");
@@ -1580,8 +1543,7 @@ int push_luavalue(const ForgeItemInfo& item)
     return 1;
 }
 
-int push_luavalue(const ForgeTransferData& data)
-{
+int push_luavalue(const ForgeTransferData& data) {
     g_lua.createTable(0, 2);
     g_lua.createTable(data.donors.size(), 0);
     for (size_t i = 0; i < data.donors.size(); ++i) {
@@ -1599,8 +1561,7 @@ int push_luavalue(const ForgeTransferData& data)
     return 1;
 }
 
-int push_luavalue(const ForgeOpenData& data)
-{
+int push_luavalue(const ForgeOpenData& data) {
     g_lua.createTable(0, 5);
 
     g_lua.createTable(data.fusionItems.size(), 0);
@@ -1641,8 +1602,7 @@ int push_luavalue(const ForgeOpenData& data)
 }
 
 // Custom structs implementations
-int push_luavalue(const BossCooldownData& data)
-{
+int push_luavalue(const BossCooldownData& data) {
     g_lua.createTable(0, 2);
     g_lua.pushInteger(data.bossRaceId);
     g_lua.setField("bossRaceId");
@@ -1651,8 +1611,7 @@ int push_luavalue(const BossCooldownData& data)
     return 1;
 }
 
-int push_luavalue(const PartyMemberData& data)
-{
+int push_luavalue(const PartyMemberData& data) {
     g_lua.createTable(0, 6);
     g_lua.pushInteger(data.memberID);
     g_lua.setField("memberID");
@@ -1669,8 +1628,7 @@ int push_luavalue(const PartyMemberData& data)
     return 1;
 }
 
-int push_luavalue(const PartyMemberName& data)
-{
+int push_luavalue(const PartyMemberName& data) {
     g_lua.createTable(0, 2);
     g_lua.pushInteger(data.memberID);
     g_lua.setField("memberID");

@@ -51,7 +51,8 @@ public:
         ApplicationContext(),
         m_spriteSize(spriteSize),
         m_drawEvents(std::move(drawEvents))
-    {}
+    {
+    }
 
     void setSpriteSize(const uint8_t size) { m_spriteSize = size; }
     uint8_t getSpriteSize() { return m_spriteSize; }
@@ -85,8 +86,7 @@ public:
     void resetTargetFps() { m_graphicFrameCounter.resetTargetFps(); }
 
     bool isOnInputEvent() { return m_onInputEvent; }
-    bool mustOptimize()
-    {
+    bool mustOptimize() {
 #ifdef NDEBUG
         return m_optimize && getMaxFps() >= getFps() && getFps() < 58u;
 #else
@@ -121,8 +121,7 @@ public:
 
     bool isScaled() { return g_window.getDisplayDensity() != 1.f; }
 
-    bool isEncrypted()
-    {
+    bool isEncrypted() {
 #if ENABLE_ENCRYPTION == 1
         return true;
 #else

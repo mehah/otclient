@@ -24,7 +24,7 @@
 
 #include "uilayout.h"
 
-// @bindclass
+ // @bindclass
 class UIGridLayout final : public UILayout
 {
 public:
@@ -34,51 +34,15 @@ public:
     void removeWidget(const UIWidgetPtr& widget) override;
     void addWidget(const UIWidgetPtr& widget) override;
 
-    void setCellSize(const Size& size)
-    {
-        m_cellSize = size;
-        update();
-    }
-    void setCellWidth(const int width)
-    {
-        m_cellSize.setWidth(width);
-        update();
-    }
-    void setCellHeight(const int height)
-    {
-        m_cellSize.setHeight(height);
-        update();
-    }
-    void setCellSpacing(const uint8_t spacing)
-    {
-        m_cellSpacing = spacing;
-        update();
-    }
-    void setNumColumns(const uint8_t columns)
-    {
-        m_numColumns = columns;
-        update();
-    }
-    void setNumLines(const uint16_t lines)
-    {
-        m_numLines = lines;
-        update();
-    }
-    void setAutoSpacing(const bool enable)
-    {
-        m_autoSpacing = enable;
-        update();
-    }
-    void setFitChildren(const bool enable)
-    {
-        m_fitChildren = enable;
-        update();
-    }
-    void setFlow(const bool enable)
-    {
-        m_flow = enable;
-        update();
-    }
+    void setCellSize(const Size& size) { m_cellSize = size; update(); }
+    void setCellWidth(const int width) { m_cellSize.setWidth(width); update(); }
+    void setCellHeight(const int height) { m_cellSize.setHeight(height); update(); }
+    void setCellSpacing(const uint8_t spacing) { m_cellSpacing = spacing; update(); }
+    void setNumColumns(const uint8_t columns) { m_numColumns = columns; update(); }
+    void setNumLines(const uint16_t lines) { m_numLines = lines; update(); }
+    void setAutoSpacing(const bool enable) { m_autoSpacing = enable; update(); }
+    void setFitChildren(const bool enable) { m_fitChildren = enable; update(); }
+    void setFlow(const bool enable) { m_flow = enable; update(); }
 
     Size getCellSize() { return m_cellSize; }
     uint8_t getCellSpacing() { return m_cellSpacing; }

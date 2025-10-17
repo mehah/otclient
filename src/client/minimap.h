@@ -61,18 +61,17 @@ public:
     void resetTile(const int x, const int y) { m_tiles[getTileIndex(x, y)] = MinimapTile(); }
     uint32_t getTileIndex(const int x, const int y) { return ((y % MMBLOCK_SIZE) * MMBLOCK_SIZE) + (x % MMBLOCK_SIZE); }
     const TexturePtr& getTexture() { return m_texture; }
-    std::array<MinimapTile, MMBLOCK_SIZE * MMBLOCK_SIZE>& getTiles() { return m_tiles; }
+    std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE>& getTiles() { return m_tiles; }
     void mustUpdate() { m_mustUpdate = true; }
     void justSaw() { m_wasSeen = true; }
     [[nodiscard]] bool wasSeen() const { return m_wasSeen; }
-
 private:
     TexturePtr m_texture;
     ImagePtr m_image;
 
     Size m_size{ MMBLOCK_SIZE, MMBLOCK_SIZE };
 
-    std::array<MinimapTile, MMBLOCK_SIZE * MMBLOCK_SIZE> m_tiles;
+    std::array<MinimapTile, MMBLOCK_SIZE* MMBLOCK_SIZE> m_tiles;
 
     bool m_mustUpdate{ true };
     bool m_wasSeen{ false };
@@ -119,14 +118,14 @@ private:
     {
         return {
             pos.x - pos.x % MMBLOCK_SIZE,
-            pos.y - pos.y % MMBLOCK_SIZE
+                     pos.y - pos.y % MMBLOCK_SIZE
         };
     }
     Position getIndexPosition(const int index, const int z)
     {
         return {
             (index % (65536 / MMBLOCK_SIZE)) * MMBLOCK_SIZE,
-            (index / (65536 / MMBLOCK_SIZE)) * MMBLOCK_SIZE, static_cast<uint8_t>(z)
+                        (index / (65536 / MMBLOCK_SIZE)) * MMBLOCK_SIZE, static_cast<uint8_t>(z)
         };
     }
     uint32_t getBlockIndex(const Position& pos) { return ((pos.y / MMBLOCK_SIZE) * (65536 / MMBLOCK_SIZE)) + (pos.x / MMBLOCK_SIZE); }

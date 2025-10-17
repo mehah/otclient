@@ -71,17 +71,8 @@ public:
     void add32(int32_t v);
     void add64(int64_t v);
     void addString(std::string_view v);
-    void addPos(const uint16_t x, const uint16_t y, const uint8_t z)
-    {
-        addU16(x);
-        addU16(y);
-        addU8(z);
-    }
-    void addPoint(const Point& p)
-    {
-        addU8(p.x);
-        addU8(p.y);
-    }
+    void addPos(const uint16_t x, const uint16_t y, const uint8_t z) { addU16(x); addU16(y); addU8(z); }
+    void addPoint(const Point& p) { addU8(p.x); addU8(p.y); }
 
     std::vector<uint8_t> m_data;
 

@@ -705,8 +705,8 @@ int LuaInterface::luaBitNot(lua_State* L_STATE)
 
 int LuaInterface::luaBitAnd(lua_State* L_STATE)
 {
-    int n = lua_gettop(L_STATE);
-    uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
+    int n = lua_gettop(L_STATE); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
     for (int i = 1; i < n; ++i)
         number &= static_cast<uint32_t>(lua_tonumber(L_STATE, i));
     lua_pushnumber(L_STATE, number);
@@ -715,8 +715,8 @@ int LuaInterface::luaBitAnd(lua_State* L_STATE)
 
 int LuaInterface::luaBitOr(lua_State* L_STATE)
 {
-    int n = lua_gettop(L_STATE);
-    uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
+    int n = lua_gettop(L_STATE); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
     for (int i = 1; i < n; ++i)
         number |= static_cast<uint32_t>(lua_tonumber(L_STATE, i));
     lua_pushnumber(L_STATE, number);
@@ -725,8 +725,8 @@ int LuaInterface::luaBitOr(lua_State* L_STATE)
 
 int LuaInterface::luaBitXor(lua_State* L_STATE)
 {
-    int n = lua_gettop(L_STATE);
-    uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
+    int n = lua_gettop(L_STATE); \
+        uint32_t number = static_cast<uint32_t>(lua_tonumber(L_STATE, -1));
     for (int i = 1; i < n; ++i)
         number ^= static_cast<uint32_t>(lua_tonumber(L_STATE, i));
     lua_pushnumber(L_STATE, number);

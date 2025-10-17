@@ -26,7 +26,7 @@
 #include <framework/core/clock.h>
 #include <framework/platform/platformwindow.h>
 
-PainterShaderProgram::PainterShaderProgram() : m_startTime(g_clock.seconds()) {}
+PainterShaderProgram::PainterShaderProgram() :m_startTime(g_clock.seconds()) {}
 
 void PainterShaderProgram::setupUniforms()
 {

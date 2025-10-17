@@ -23,8 +23,7 @@
 #include "player.h"
 #include "game.h"
 
-bool Player::isMage() const
-{
+bool Player::isMage() const {
     switch (m_vocation) {
         case Otc::Vocations_t::SORCERER:
         case Otc::Vocations_t::DRUID:

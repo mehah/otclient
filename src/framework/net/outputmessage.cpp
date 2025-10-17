@@ -25,8 +25,7 @@
 
 #include "client/game.h"
 
-OutputMessage::OutputMessage()
-{
+OutputMessage::OutputMessage() {
     m_maxHeaderSize = g_game.getClientVersion() >= 1405 ? 7 : 8;
     m_writePos = m_maxHeaderSize;
     m_headerPos = m_maxHeaderSize;

@@ -25,8 +25,8 @@
 #include "declarations.h"
 #include <unordered_map>
 
-/// LuaObject, all script-able classes have it as base
-// @bindclass
+ /// LuaObject, all script-able classes have it as base
+ // @bindclass
 class LuaObject : public std::enable_shared_from_this<LuaObject>
 {
 public:

@@ -38,7 +38,7 @@ static bool isInZone(const Position& pos/* placePos*/,
         return true;
 
     return ((pos.x >= centerPos.x - radius) && (pos.x <= centerPos.x + radius) &&
-        (pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius));
+            (pos.y >= centerPos.y - radius) && (pos.y <= centerPos.y + radius));
 }
 
 void CreatureManager::terminate()

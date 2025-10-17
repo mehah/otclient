@@ -49,26 +49,13 @@ public:
     void setDrawNames(const bool enable) { m_mapView->setDrawNames(enable); }
     void setDrawHealthBars(const bool enable) { m_mapView->setDrawHealthBars(enable); }
     void setDrawLights(const bool enable) { m_mapView->setDrawLights(enable); }
-    void setLimitVisibleDimension(const bool enable)
-    {
-        m_mapView->setLimitVisibleDimension(enable);
-        updateVisibleDimension();
-    }
+    void setLimitVisibleDimension(const bool enable) { m_mapView->setLimitVisibleDimension(enable); updateVisibleDimension(); }
     void setDrawManaBar(const bool enable) { m_mapView->setDrawManaBar(enable); }
     void setKeepAspectRatio(bool enable);
     void setShader(const std::string_view name, const float fadein, const float fadeout) { m_mapView->setShader(name, fadein, fadeout); }
     void setMinimumAmbientLight(const float intensity) { m_mapView->setMinimumAmbientLight(intensity); }
-    void setLimitVisibleRange(const bool limitVisibleRange)
-    {
-        m_limitVisibleRange = limitVisibleRange;
-        updateVisibleDimension();
-    }
-    void setDrawViewportEdge(const bool force)
-    {
-        m_mapView->m_forceDrawViewportEdge = force;
-        m_mapView->m_visibleDimension = {};
-        updateVisibleDimension();
-    }
+    void setLimitVisibleRange(const bool limitVisibleRange) { m_limitVisibleRange = limitVisibleRange; updateVisibleDimension(); }
+    void setDrawViewportEdge(const bool force) { m_mapView->m_forceDrawViewportEdge = force; m_mapView->m_visibleDimension = {}; updateVisibleDimension(); }
 
     bool zoomIn();
     bool zoomOut();
@@ -108,8 +95,7 @@ public:
     void setAntiAliasingMode(const MapView::AntialiasingMode mode) { m_mapView->setAntiAliasingMode(mode); }
     void setFloorFading(const uint16_t v) { m_mapView->setFloorFading(v); }
     MapViewPtr getMapView() const { return m_mapView; }
-    void clearTiles()
-    {
+    void clearTiles() {
         m_mapView->m_foregroundTiles.clear();
     }
 

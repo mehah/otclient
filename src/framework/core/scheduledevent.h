@@ -25,7 +25,7 @@
 #include "clock.h"
 #include "event.h"
 
-// @bindclass
+ // @bindclass
 class ScheduledEvent final : public Event
 {
 public:
@@ -42,7 +42,7 @@ public:
 
     struct Compare
     {
-        bool operator()(const ScheduledEventPtr& a, const ScheduledEventPtr& b) const
+        bool operator() (const ScheduledEventPtr& a, const ScheduledEventPtr& b) const
         {
             return b->ticks() > a->ticks();
         }

@@ -33,6 +33,7 @@ enum class ShaderType
 class Shader
 {
 public:
+
     Shader(ShaderType shaderType);
     ~Shader();
 

@@ -44,57 +44,23 @@ public:
     [[nodiscard]] constexpr T width() const { return wd; }
     [[nodiscard]] constexpr T height() const { return ht; }
 
-    constexpr void resize(T w, T h)
-    {
-        wd = w;
-        ht = h;
-    }
+    constexpr void resize(T w, T h) { wd = w; ht = h; }
     constexpr void setWidth(T w) { wd = w; }
     constexpr void setHeight(T h) { ht = h; }
 
     constexpr TSize operator-() const { return TSize(-wd, -ht); }
     constexpr TSize operator+(const TSize& other) const { return TSize(wd + other.wd, ht + other.ht); }
-    constexpr TSize& operator+=(const TSize& other)
-    {
-        wd += other.wd;
-        ht += other.ht;
-        return *this;
-    }
+    constexpr TSize& operator+=(const TSize& other) { wd += other.wd; ht += other.ht; return *this; }
     constexpr TSize operator-(const TSize& other) const { return TSize(wd - other.wd, ht - other.ht); }
-    constexpr TSize& operator-=(const TSize& other)
-    {
-        wd -= other.wd;
-        ht -= other.ht;
-        return *this;
-    }
+    constexpr TSize& operator-=(const TSize& other) { wd -= other.wd; ht -= other.ht; return *this; }
     constexpr TSize operator*(const TSize& other) const { return TSize(static_cast<T>(other.wd) * wd, static_cast<T>(ht) * other.ht); }
-    constexpr TSize& operator*=(const TSize& other)
-    {
-        wd = static_cast<T>(other.wd) * wd;
-        ht = static_cast<T>(ht) * other.ht;
-        return *this;
-    }
+    constexpr TSize& operator*=(const TSize& other) { wd = static_cast<T>(other.wd) * wd; ht = static_cast<T>(ht) * other.ht; return *this; }
     constexpr TSize operator/(const TSize& other) const { return TSize(static_cast<T>(wd) / other.wd, static_cast<T>(ht) / other.ht); }
-    constexpr TSize& operator/=(const TSize& other)
-    {
-        static_cast<T>(wd) /= other.wd;
-        static_cast<T>(ht) /= other.ht;
-        return *this;
-    }
+    constexpr TSize& operator/=(const TSize& other) { static_cast<T>(wd) /= other.wd; static_cast<T>(ht) /= other.ht; return *this; }
     constexpr TSize operator*(const float v) const { return TSize(static_cast<T>(wd) * v, static_cast<T>(ht) * v); }
-    constexpr TSize& operator*=(const float v)
-    {
-        wd = static_cast<T>(wd) * v;
-        ht = static_cast<T>(ht) * v;
-        return *this;
-    }
+    constexpr TSize& operator*=(const float v) { wd = static_cast<T>(wd) * v; ht = static_cast<T>(ht) * v; return *this; }
     constexpr TSize operator/(const float v) const { return TSize(static_cast<T>(wd) / v, static_cast<T>(ht) / v); }
-    constexpr TSize& operator/=(const float v)
-    {
-        wd /= v;
-        ht /= v;
-        return *this;
-    }
+    constexpr TSize& operator/=(const float v) { wd /= v; ht /= v; return *this; }
 
     constexpr bool operator<=(const TSize& other) const { return wd <= other.wd || ht <= other.ht; }
     constexpr bool operator>=(const TSize& other) const { return wd >= other.wd || ht >= other.ht; }
@@ -110,12 +76,7 @@ public:
     constexpr bool operator<(const T other) const { return wd < other || ht < other; }
     constexpr bool operator>(const T other) const { return wd > other || ht > other; }
 
-    constexpr TSize& operator=(const T other)
-    {
-        wd = other;
-        ht = other;
-        return *this;
-    }
+    constexpr TSize& operator=(const T other) { wd = other; ht = other; return *this; }
     constexpr bool operator==(const T other) const { return other == wd && other == ht; }
     constexpr bool operator!=(const T other) const { return other != wd || other != ht; }
 
@@ -142,7 +103,7 @@ public:
         }
     }
 
-    constexpr void scale(int w, int h, const Fw::AspectRatioMode mode) const { scale(TSize(w, h), mode); }
+    constexpr void scale(int w, int h, const Fw::AspectRatioMode mode)const { scale(TSize(w, h), mode); }
 
     constexpr T smaller() const { return std::min<T>(ht, wd); }
     constexpr T bigger() const { return std::max<T>(ht, wd); }
@@ -151,14 +112,12 @@ public:
     [[nodiscard]] constexpr T area() const { return wd * ht; }
     [[nodiscard]] constexpr T dimension() const { return wd + ht; }
 
-    friend std::ostream& operator<<(std::ostream& out, const TSize& size)
-    {
+    friend std::ostream& operator<<(std::ostream& out, const TSize& size) {
         out << size.width() << " " << size.height();
         return out;
     }
 
-    friend std::istream& operator>>(std::istream& in, TSize& size)
-    {
+    friend std::istream& operator>>(std::istream& in, TSize& size) {
         T w, h;
         in >> w >> h;
         size.resize(w, h);

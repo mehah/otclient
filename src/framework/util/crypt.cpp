@@ -68,13 +68,11 @@ Crypt::~Crypt()
 #endif
 }
 
-std::string Crypt::base64Encode(const std::string& decoded_string)
-{
+std::string Crypt::base64Encode(const std::string& decoded_string) {
     return cppcodec::base64_rfc4648::encode(decoded_string);
 }
 
-std::string Crypt::base64Decode(const std::string_view& encoded_string)
-{
+std::string Crypt::base64Decode(const std::string_view& encoded_string) {
     try {
         return cppcodec::base64_rfc4648::decode<std::string>(encoded_string);
     } catch (const std::invalid_argument&) {
@@ -92,8 +90,7 @@ void Crypt::xorCrypt(std::string& buffer, const std::string& key)
         buffer[i] ^= key[i % keySize];
 }
 
-std::string Crypt::genUUID()
-{
+std::string Crypt::genUUID() {
     return uuids::to_string(uuids::uuid_random_generator{ stdext::random_gen() }());
 }
 
@@ -138,7 +135,7 @@ std::string Crypt::_encrypt(const std::string& decrypted_string, const bool useM
 {
     const uint32_t sum = stdext::computeChecksum(
         { reinterpret_cast<const uint8_t*>(decrypted_string.data()),
-            decrypted_string.size() });
+          decrypted_string.size() });
 
     std::string tmp(CHECKSUM_BYTES, '\0');
     tmp.append(decrypted_string);
@@ -175,7 +172,7 @@ void Crypt::rsaSetPublicKey(const std::string& n, const std::string& e)
     mpz_set_str(m_n, n.c_str(), 10);
     mpz_set_str(m_e, e.c_str(), 10);
 #else
-    BIGNUM * bn = nullptr, * be = nullptr;
+    BIGNUM* bn = nullptr, * be = nullptr;
     BN_dec2bn(&bn, n.c_str());
     BN_dec2bn(&be, e.c_str());
     RSA_set0_key(m_rsa, bn, be, nullptr);
@@ -206,7 +203,7 @@ void Crypt::rsaSetPrivateKey(const std::string& p, const std::string& q, const s
         m_rsa->_method_mod_q = nullptr;
     }
 #else
-    BIGNUM * bp = nullptr, * bq = nullptr, * bd = nullptr;
+    BIGNUM* bp = nullptr, * bq = nullptr, * bd = nullptr;
     BN_dec2bn(&bp, p.c_str());
     BN_dec2bn(&bq, q.c_str());
     BN_dec2bn(&bd, d.c_str());
@@ -293,8 +290,7 @@ std::string Crypt::crc32(const std::string& decoded_string, const bool upperCase
 }
 
 // NOSONAR - Intentional use of SHA-1 as there is no security impact in this context
-std::string Crypt::sha1Encrypt(const std::string& input)
-{
+std::string Crypt::sha1Encrypt(const std::string& input) {
     unsigned char hash[SHA_DIGEST_LENGTH];
     SHA1(reinterpret_cast<const unsigned char*>(input.data()), input.size(), hash);
 

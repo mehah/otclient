@@ -28,8 +28,7 @@
 
 thread_local static uint8_t CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 
-void resetSelectedPool()
-{
+void resetSelectedPool() {
     CURRENT_POOL = static_cast<uint8_t>(DrawPoolType::LAST);
 }
 
@@ -52,9 +51,9 @@ void DrawPoolManager::init(const uint16_t spriteSize)
                 pool->m_atlas = atlasMap;
                 break;
 
-            // for now atlas in the UI will be disabled,
-            // there are some rendering bugs.
-            // case DrawPoolType::FOREGROUND:
+                // for now atlas in the UI will be disabled,
+                // there are some rendering bugs.
+                // case DrawPoolType::FOREGROUND:
             case DrawPoolType::FOREGROUND_MAP:
             case DrawPoolType::CREATURE_INFORMATION:
                 pool->m_atlas = atlasForeground;
@@ -113,9 +112,9 @@ void DrawPoolManager::addTexturedRect(const Rect& dest, const TexturePtr& textur
     }
 
     getCurrentPool()->add(color, texture, DrawPool::DrawMethod{
-                              .type = DrawPool::DrawMethodType::RECT,
-                              .dest = dest, .src = src
-                          });
+        .type = DrawPool::DrawMethodType::RECT,
+        .dest = dest, .src = src
+    });
 }
 
 void DrawPoolManager::addUpsideDownTexturedRect(const Rect& dest, const TexturePtr& texture, const Rect& src, const Color& color) const
@@ -162,11 +161,11 @@ void DrawPoolManager::addFilledTriangle(const Point& a, const Point& b, const Po
     }
 
     getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{
-                              .type = DrawPool::DrawMethodType::TRIANGLE,
-                              .a = a,
-                              .b = b,
-                              .c = c
-                          });
+            .type = DrawPool::DrawMethodType::TRIANGLE,
+            .a = a,
+            .b = b,
+            .c = c
+     });
 }
 
 void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, const uint16_t innerLineWidth) const
@@ -177,10 +176,10 @@ void DrawPoolManager::addBoundingRect(const Rect& dest, const Color& color, cons
     }
 
     getCurrentPool()->add(color, nullptr, DrawPool::DrawMethod{
-                              .type = DrawPool::DrawMethodType::BOUNDING_RECT,
-                              .dest = dest,
-                              .intValue = innerLineWidth
-                          });
+        .type = DrawPool::DrawMethodType::BOUNDING_RECT,
+        .dest = dest,
+        .intValue = innerLineWidth
+    });
 }
 
 void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void()>& f, const std::function<void()>& beforeRelease, const Rect& dest, const Rect& src, const Color& colorClear, const bool alwaysDraw)
@@ -209,8 +208,7 @@ void DrawPoolManager::preDraw(const DrawPoolType type, const std::function<void(
     resetSelectedPool();
 }
 
-void DrawPoolManager::drawObjects(DrawPool* pool)
-{
+void DrawPoolManager::drawObjects(DrawPool* pool) {
     const auto hasFramebuffer = pool->hasFrameBuffer();
 
     const auto shouldRepaint = pool->shouldRepaint();
@@ -238,8 +236,7 @@ void DrawPoolManager::drawObjects(DrawPool* pool)
         pool->m_atlas->flush();
 }
 
-void DrawPoolManager::drawPool(const DrawPoolType type)
-{
+void DrawPoolManager::drawPool(const DrawPoolType type) {
     const auto pool = get(type);
 
     if (!pool->isEnabled())
@@ -256,8 +253,7 @@ void DrawPoolManager::drawPool(const DrawPoolType type)
     }
 }
 
-void DrawPoolManager::removeTextureFromAtlas(uint32_t id, bool smooth)
-{
+void DrawPoolManager::removeTextureFromAtlas(uint32_t id, bool smooth) {
     for (auto pool : m_pools) {
         if (pool->m_atlas)
             pool->m_atlas->removeTexture(id, smooth);

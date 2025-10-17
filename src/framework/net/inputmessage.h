@@ -25,7 +25,7 @@
 #include "declarations.h"
 #include <framework/luaengine/luaobject.h>
 
-// @bindclass
+ // @bindclass
 class InputMessage final : public LuaObject
 {
 public:
@@ -57,27 +57,19 @@ public:
 
     uint8_t peekU8()
     {
-        const uint8_t v = getU8();
-        m_readPos -= 1;
-        return v;
+        const uint8_t v = getU8(); m_readPos -= 1; return v;
     }
     uint16_t peekU16()
     {
-        const uint16_t v = getU16();
-        m_readPos -= 2;
-        return v;
+        const uint16_t v = getU16(); m_readPos -= 2; return v;
     }
     uint32_t peekU32()
     {
-        const uint32_t v = getU32();
-        m_readPos -= 4;
-        return v;
+        const uint32_t v = getU32(); m_readPos -= 4; return v;
     }
     uint64_t peekU64()
     {
-        const uint64_t v = getU64();
-        m_readPos -= 8;
-        return v;
+        const uint64_t v = getU64(); m_readPos -= 8; return v;
     }
 
     bool decryptRsa(int size);
@@ -88,8 +80,7 @@ public:
     uint16_t getMessageSize() { return m_messageSize; }
 
     void setPaddingSize(uint8_t padding) { m_padding = padding; }
-    uint8_t getPaddingSize() const
-    {
+    uint8_t getPaddingSize() const {
         return m_padding;
     }
 

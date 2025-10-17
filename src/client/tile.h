@@ -128,11 +128,7 @@ public:
     std::vector<CreaturePtr> getCreatures();
 
     std::vector<ItemPtr> getItems();
-    ItemPtr getGround()
-    {
-        const auto& ground = getThing(0);
-        return ground && ground->isGround() ? ground->static_self_cast<Item>() : nullptr;
-    }
+    ItemPtr getGround() { const auto& ground = getThing(0); return ground && ground->isGround() ? ground->static_self_cast<Item>() : nullptr; }
     int getGroundSpeed();
     uint8_t getMinimapColorByte();
     int getThingCount() { return m_things.size(); }
@@ -235,8 +231,7 @@ private:
     }
 
     bool hasThingWithElevation() { return hasElevation() && m_thingTypeFlag & HAS_THING_WITH_ELEVATION; }
-    void markHighlightedThing(const Color& color)
-    {
+    void markHighlightedThing(const Color& color) {
         if (m_highlightThingStackPos > -1 && m_highlightThingStackPos < static_cast<int8_t>(m_things.size())) {
             m_things[m_highlightThingStackPos]->setMarked(color);
         }

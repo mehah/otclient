@@ -88,7 +88,7 @@ void ProxyManager::addProxy(const std::string& host, uint16_t port, int priority
 
 void ProxyManager::removeProxy(const std::string& host, const uint16_t port)
 {
-    for (auto it = m_proxies.begin(); it != m_proxies.end();) {
+    for (auto it = m_proxies.begin(); it != m_proxies.end(); ) {
         if (const auto proxy = it->lock()) {
             if (proxy->getHost() == host && proxy->getPort() == port) {
                 proxy->terminate();
@@ -113,7 +113,7 @@ uint32_t ProxyManager::addSession(uint16_t port, std::function<void(ProxyPacketP
 
 void ProxyManager::removeSession(const uint32_t sessionId)
 {
-    for (auto it = m_sessions.begin(); it != m_sessions.end();) {
+    for (auto it = m_sessions.begin(); it != m_sessions.end(); ) {
         if (const auto session = it->lock()) {
             if (session->getId() == sessionId) {
                 session->terminate();

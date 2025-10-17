@@ -144,8 +144,7 @@ void ModuleManager::updateModuleLoadOrder(const ModulePtr& module)
         m_modules.emplace_back(module);
 }
 
-void ModuleManager::enableAutoReload()
-{
+void ModuleManager::enableAutoReload() {
     if (m_reloadEnable)
         return;
 

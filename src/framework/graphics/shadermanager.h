@@ -25,7 +25,7 @@
 #include "declarations.h"
 #include <framework/graphics/paintershaderprogram.h>
 
-//@bindsingleton g_shaders
+ //@bindsingleton g_shaders
 class ShaderManager
 {
 public:
@@ -59,8 +59,7 @@ public:
 
     PainterShaderProgramPtr getShader(std::string_view name);
 
-    [[nodiscard]] PainterShaderProgramPtr getShaderById(const uint8_t id) const
-    {
+    [[nodiscard]] PainterShaderProgramPtr getShaderById(const uint8_t id) const {
         return id > 0 && id <= m_shadersVector.size() ? m_shadersVector[id - 1] : nullptr;
     }
 

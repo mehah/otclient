@@ -28,8 +28,7 @@
 #include <framework/graphics/textureatlas.h>
 #include <framework/util/crypt.h>
 
-void UIWidget::initImage()
-{
+void UIWidget::initImage() {
     m_imageCoordsCache = std::make_shared<CoordsBuffer>();
 }
 
@@ -91,8 +90,7 @@ void UIWidget::parseImageStyle(const OTMLNodePtr& styleNode)
     }
 }
 
-void addImageRect(const AtlasRegion* region, const CoordsBufferPtr& coords, bool useRepeated, const Rect& dest, Rect src)
-{
+void addImageRect(const AtlasRegion* region, const CoordsBufferPtr& coords, bool useRepeated, const Rect& dest, Rect src) {
     if (region)
         src.translate(region->x, region->y);
 

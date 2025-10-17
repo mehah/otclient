@@ -29,6 +29,7 @@
 class ParticleEmitter
 {
 public:
+
     void load(const OTMLNodePtr& node);
 
     void update(float elapsedTime, const ParticleSystemPtr& system);

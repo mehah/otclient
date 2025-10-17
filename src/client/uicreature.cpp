@@ -79,8 +79,7 @@ void UICreature::onStyleApply(const std::string_view styleName, const OTMLNodePt
     UIWidget::onStyleApply(styleName, styleNode);
 }
 
-void UICreature::setShader(std::string_view name)
-{
+void UICreature::setShader(std::string_view name) {
     m_shaderName = name;
     if (getCreature()) getCreature()->setShader(name);
 }

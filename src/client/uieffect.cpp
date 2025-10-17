@@ -86,8 +86,7 @@ void UIEffect::onStyleApply(const std::string_view styleName, const OTMLNodePtr&
     UIWidget::onStyleApply(styleName, styleNode);
 }
 
-void UIEffect::setShader(std::string_view name)
-{
+void UIEffect::setShader(std::string_view name) {
     m_shaderName = name;
     if (getEffect()) getEffect()->setShader(name);
 }

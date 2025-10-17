@@ -38,13 +38,11 @@ public:
     virtual UIWidgetPtr getHookedWidget(const UIWidgetPtr& widget, const UIWidgetPtr& parentWidget);
     virtual int getHookedPoint(const UIWidgetPtr& hookedWidget, const UIWidgetPtr& parentWidget);
 
-    const auto& getHookdWidgetId() const
-    {
+    const auto& getHookdWidgetId() const {
         return m_hookedWidgetId;
     }
 
-    void setHook(Fw::AnchorEdge hookedEdge, std::string_view hookedWidgetId)
-    {
+    void setHook(Fw::AnchorEdge hookedEdge, std::string_view hookedWidgetId) {
         m_hookedEdge = hookedEdge;
         m_hookedWidgetId = hookedWidgetId;
     }

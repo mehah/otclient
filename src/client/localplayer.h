@@ -24,7 +24,7 @@
 
 #include "player.h"
 
-// @bindclass
+ // @bindclass
 class LocalPlayer final : public Player
 {
 public:

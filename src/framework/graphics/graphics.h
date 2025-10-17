@@ -24,7 +24,7 @@
 
 #include "declarations.h"
 
-// @bindsingleton g_graphics
+ // @bindsingleton g_graphics
 class Graphics
 {
 public:
