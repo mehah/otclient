@@ -30,7 +30,7 @@ UIWidget
     text: Information  
       
   UIWidget  
-    id: rightWindow1  
+    id: dedicationPerksPanel
     anchors.left: backdropWheel.right  
     anchors.top: backdropWheel.top  
     size: 213 89  
@@ -42,10 +42,124 @@ UIWidget
     text-align: top  
     text: Dedication Perks  
       
+    UIWidget  
+      id: dedicationHitPoints  
+      anchors.top: parent.top  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: 25  
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Hit Points:  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+      
+    UIWidget  
+      id: dedicationMana  
+      anchors.top: dedicationHitPoints.bottom  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: 2  
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Mana:  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+      
+    UIWidget  
+      id: dedicationCapacity  
+      anchors.top: dedicationMana.bottom  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: 2  
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Capacity:  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+      
+    UIWidget  
+      id: dedicationMitigation  
+      anchors.top: dedicationCapacity.bottom  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: 2  
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Mitigation Mult.:  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: infoDedicationMitigation.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        margin-right: 3  
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+        
+      UIWidget  
+        id: infoDedicationMitigation
+        size: 12 12  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter  
+        margin-right: 5  
+        image-source: /images/game/wheel/show-gui-help-grey  
+        visible: true
+      
   UIWidget  
     id: rightWindow2  
     anchors.left: backdropWheel.right  
-    anchors.top: rightWindow1.bottom  
+    anchors.top: dedicationPerksPanel.bottom  
     size: 213 159  
     margin-left: 10  
     margin-top: 5  
@@ -83,6 +197,26 @@ UIWidget
     text-offset: 0 3  
     text-align: top  
     text: Revelation Perks
+
+    UIWidget
+      id: infoDamage
+      size: 12 12
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-top: 30
+      margin-right: 6
+      image-source: /images/game/wheel/show-gui-help-grey
+      visible: true
+
+    UIWidget
+      id: infoAvatar
+      size: 12 12
+      anchors.top: infoDamage.bottom
+      anchors.right: parent.right
+      margin-top: 3
+      margin-right: 6
+      image-source: /images/game/wheel/show-gui-help-grey
+      visible: true       
     
   UIWidget  
     id: backdropWheel  

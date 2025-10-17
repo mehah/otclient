@@ -1,4 +1,8 @@
+local VocationInformation = dofile('wod_information.lua')
+
 WheelOfDestiny = {}
+
+local currentWodUI = nil 
 
 -- ============================================================================
 -- CONFIGURATION AND CONSTANTS
@@ -33,51 +37,7 @@ local VocationConfig = {
         [4] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_druid',
         [5] = '/images/game/wheel/wheel-vocations/backdrop_skillwheel_monk'
     },
-    
-    -- Icon clips by vocation
-    iconClips = {
-        [1] = { -- Knight
-            topLeft = "0 0 34 34",
-            topRight = "34 0 34 34",
-            bottomLeft = "68 0 34 34",
-            bottomRight = "102 0 34 34"
-        },
-        [2] = { -- Paladin
-            topLeft = "0 0 34 34",
-            topRight = "136 0 34 34",
-            bottomLeft = "170 0 34 34",
-            bottomRight = "204 0 34 34"
-        },
-        [3] = { -- Sorcerer
-            topLeft = "0 0 34 34",
-            topRight = "238 0 34 34",
-            bottomLeft = "272 0 34 34",
-            bottomRight = "306 0 34 34"
-        },
-        [4] = { -- Druid
-            topLeft = "0 0 34 34",
-            topRight = "374 0 34 34",
-            bottomLeft = "340 0 34 34",
-            bottomRight = "408 0 34 34"
-        },
-        [5] = { -- Monk
-            topLeft = "0 0 34 34",
-            topRight = "442 0 34 34",
-            bottomLeft = "476 0 34 34",
-            bottomRight = "510 0 34 34"
-        }
-    },
-    
-    -- Bonus per step by vocation
-    bonusSteps = {
-        [1] = {life = 3, mana = 1, capacity = 5}, -- Knight
-        [2] = {life = 2, mana = 3, capacity = 4}, -- Paladin
-        [3] = {life = 1, mana = 6, capacity = 2}, -- Sorcerer
-        [4] = {life = 1, mana = 6, capacity = 2}, -- Druid
-        [5] = {life = 2, mana = 2, capacity = 4}  -- Monk
-    }
 }
-
 -- ============================================================================
 -- VOCATION UTILITIES
 -- ============================================================================
@@ -170,22 +130,7 @@ local UIConfigurator = {
         end
     end,
     
-    -- Configures vocation-specific icons
-    setupVocationIcons = function(ui, basicVocationId)
-        local clips = VocationConfig.iconClips[basicVocationId]
-        if not clips then return end
-        
-        local iconIds = {"perkIconTopLeft", "perkIconTopRight", "perkIconBottomLeft", "perkIconBottomRight"}
-        local clipKeys = {"topLeft", "topRight", "bottomLeft", "bottomRight"}
-        
-        for i, iconId in ipairs(iconIds) do
-            local icon = ui:recursiveGetChildById(iconId)
-            if icon then
-                icon:setImageClip(clips[clipKeys[i]])
-            end
-        end
-    end,
-    
+   
     -- Configures bonus overlays
     setupBonusOverlays = function(ui, showBonuses)
         local bonusWidgets = {'largeBonusTL', 'largeBonusTR', 'largeBonusBL', 'largeBonusBR'}
@@ -199,45 +144,107 @@ local UIConfigurator = {
     end,
     
     -- Configures data windows
-    setupDataWindows = function(ui)
-        local windowTitles = {
-            leftWindow1 = "Selection",
-            leftWindow2 = "Information",
-            rightWindow1 = "Dedication Perks",
-            rightWindow2 = "Conviction Perks",
-            rightWindow3 = "Vessels",
-            rightWindow4 = "Revelation Perks"
-        }
+    setupDataWindows = function(ui)  
+        local windowTitles = {  
+            leftWindow1 = "Selection",  
+            leftWindow2 = "Information",  
+            dedicationPerksPanel = "Dedication Perks",  -- MUDOU DE rightWindow1  
+            rightWindow2 = "Conviction Perks",  
+            rightWindow3 = "Vessels",  
+            rightWindow4 = "Revelation Perks"  
+        }  
         
-        for windowId, title in pairs(windowTitles) do
-            local window = ui:getChildById(windowId)
-            if window then
-                local titleLabel = window:getChildById(windowId:gsub("Window", "Title"))
-                if titleLabel then
-                    titleLabel:setText(title)
-                end
-                window:setVisible(true)
-            end
-        end
+        for windowId, title in pairs(windowTitles) do  
+            local window = ui:getChildById(windowId)  
+            if window then  
+                local titleLabel = window:getChildById(windowId:gsub("Window", "Title"))  
+                if titleLabel then  
+                    titleLabel:setText(title)  
+                end  
+                window:setVisible(true)  
+            end  
+        end  
+    end,
+
+    setupVocationInformation = function(ui, basicVocationId)  
+        -- Dedication Perks  
+        local infoDedicationMitigation = ui:recursiveGetChildById('infoDedicationMitigation')    
+        if infoDedicationMitigation and VocationInformation.dedication[1][basicVocationId] then    
+            infoDedicationMitigation:setTooltip(VocationInformation.dedication[1][basicVocationId])    
+        end   
+        
+        -- Conviction Perks (6 icons)  
+        for i = 1, 6 do  
+            local infoConviction = ui:recursiveGetChildById('infoConviction' .. i)  
+            if infoConviction and VocationInformation.conviction[i] and   
+            VocationInformation.conviction[i][basicVocationId] then  
+                infoConviction:setTooltip(VocationInformation.conviction[i][basicVocationId])  
+            end  
+        end  
+        
+        -- Vessels  
+        local infoVessel1 = ui:recursiveGetChildById('infoVessel1')  
+        if infoVessel1 and VocationInformation.vessels[1][basicVocationId] then  
+            infoVessel1:setTooltip(VocationInformation.vessels[1][basicVocationId])  
+        end  
+        
+        -- Summary (11 icons)  
+        for i = 1, 11 do  
+            local infoSummary = ui:recursiveGetChildById('infoSummary' .. i)  
+            if infoSummary and VocationInformation.summary[i] and   
+            VocationInformation.summary[i][basicVocationId] then  
+                infoSummary:setTooltip(VocationInformation.summary[i][basicVocationId])  
+            end  
+        end  
+        
+        -- Revelation Perks (5 icons)  
+        for i = 1, 5 do  
+            local infoRevelation = ui:recursiveGetChildById('infoRevelation' .. i)  
+            if infoRevelation and VocationInformation.revelation[i] and   
+            VocationInformation.revelation[i][basicVocationId] then  
+                infoRevelation:setTooltip(VocationInformation.revelation[i][basicVocationId])  
+            end  
+        end  
+    end,
+
+    updateDedicationStats = function(ui, hitPoints, mana, capacity, mitigationMult)  
+        local hpWidget = ui:recursiveGetChildById('dedicationHitPoints')  
+        if hpWidget then  
+            local valueLabel = hpWidget:getChildById('value')  
+            if valueLabel then  
+                valueLabel:setText(tostring(hitPoints))  
+            end  
+        end  
+        
+        local manaWidget = ui:recursiveGetChildById('dedicationMana')  
+        if manaWidget then  
+            local valueLabel = manaWidget:getChildById('value')  
+            if valueLabel then  
+                valueLabel:setText(tostring(mana))  
+            end  
+        end  
+        
+        local capacityWidget = ui:recursiveGetChildById('dedicationCapacity')  
+        if capacityWidget then  
+            local valueLabel = capacityWidget:getChildById('value')  
+            if valueLabel then  
+                valueLabel:setText(tostring(capacity))  
+            end  
+        end  
+        
+        local mitigationWidget = ui:recursiveGetChildById('dedicationMitigation')  
+        if mitigationWidget then  
+            local valueLabel = mitigationWidget:getChildById('value')  
+            if valueLabel then  
+                valueLabel:setText(string.format("%.2f%%", mitigationMult))  
+            end  
+        end  
     end
 }
 
 -- ============================================================================
 -- BONUS SYSTEM
 -- ============================================================================
-
-local BonusCalculator = {
-    -- Gets bonus steps for a vocation
-    getBonusSteps = function(basicVocationId)
-        return VocationConfig.bonusSteps[basicVocationId] or {life = 1, mana = 1, capacity = 1}
-    end,
-    
-    -- Calculates bonus based on vocation and number of steps
-    calculateBonus = function(basicVocationId, bonusType, steps)
-        local stepValues = BonusCalculator.getBonusSteps(basicVocationId)
-        return (stepValues[bonusType] or 0) * (steps or 0)
-    end
-}
 
 -- ============================================================================
 -- PUBLIC API
@@ -255,7 +262,9 @@ function WheelOfDestiny.show(container)
     -- Load UI
     local wodUI = g_ui.loadUI('wod', container)
     if not wodUI then return end
-    
+
+    currentWodUI = wodUI    
+
     wodUI:fill('parent')
     
     -- Get player vocation
@@ -263,10 +272,10 @@ function WheelOfDestiny.show(container)
     local basicVocation = VocationUtils.getBasicVocation(player:getVocation())
     
     -- Configure UI based on vocation
-    UIConfigurator.setupVocationOverlay(wodUI, basicVocation)
-    UIConfigurator.setupVocationIcons(wodUI, basicVocation)
-    UIConfigurator.setupBonusOverlays(wodUI, true)
-    UIConfigurator.setupDataWindows(wodUI)
+    UIConfigurator.setupVocationOverlay(wodUI, basicVocation)  
+    UIConfigurator.setupBonusOverlays(wodUI, true)  
+    UIConfigurator.setupDataWindows(wodUI)  
+    UIConfigurator.setupVocationInformation(wodUI, basicVocation)
 end
 
 -- Function to check if can access the wheel
@@ -274,13 +283,10 @@ function WheelOfDestiny.canAccessWheel()
     return AccessValidator.validateAccess()
 end
 
--- Function to calculate bonus by vocation
-function WheelOfDestiny.calculateVocationBonus(bonusType, steps)
-    local player = g_game.getLocalPlayer()
-    if not player then return 0 end
-    
-    local basicVocation = VocationUtils.getBasicVocation(player:getVocation())
-    return BonusCalculator.calculateBonus(basicVocation, bonusType, steps)
+function WheelOfDestiny.updateDedicationStats(hitPoints, mana, capacity, mitigationMult)    
+    if currentWodUI then    
+        UIConfigurator.updateDedicationStats(currentWodUI, hitPoints, mana, capacity, mitigationMult)    
+    end    
 end
 
 -- Function to get player's basic vocation
