@@ -524,9 +524,18 @@ function onPreyListSelection(slot, raceList, nextFreeReroll, wildcards)
     if PreyController._raceListPagination then
         PreyController._raceListPagination[slotId] = nil
     end
+    local activeRaceIds = {}
+    for _, preySlot in ipairs(PreyController.preyData) do
+        if preySlot and preySlot.type == SLOT_STATE_ACTIVE and preySlot.monsterName then
+            activeRaceIds[preySlot.monsterName] = true
+        end
+    end
+
     for i, raceId in ipairs(raceList) do
         local race = buildRaceEntry(raceId, slot, i)
-        table.insert(PreyController.preyData[slotId].raceListOriginal, race)
+        if not activeRaceIds[race.name] then
+            table.insert(PreyController.preyData[slotId].raceListOriginal, race)
+        end
     end
 
     table.sort(PreyController.preyData[slotId].raceListOriginal, function(a, b)
