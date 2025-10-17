@@ -139,9 +139,6 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
         return;
 
     std::string text = getDisplayedText();
-    if (m_text.ends_with(" "))
-        text += " ";
-
     m_drawText = text;
     const int textLength = text.length();
 
