@@ -75,13 +75,14 @@ namespace qrcodegen {
            /*
             * (Package-private) Returns the mode indicator bits, which is an unsigned 4-bit value (range 0 to 15).
             */
-    public: int getModeBits() const;
+    public:
+        [[nodiscard]] int getModeBits() const;
 
-          /*
-           * (Package-private) Returns the bit width of the character count field for a segment in
-           * this mode in a QR Code at the given version number. The result is in the range [0, 16].
-           */
-          int numCharCountBits(int ver) const;
+        /*
+         * (Package-private) Returns the bit width of the character count field for a segment in
+         * this mode in a QR Code at the given version number. The result is in the range [0, 16].
+         */
+        [[nodiscard]] int numCharCountBits(int ver) const;
     };
 
           /*---- Static factory functions (mid level) ----*/
@@ -167,17 +168,17 @@ namespace qrcodegen {
           /*
            * Returns the mode field of this segment.
            */
-          const Mode& getMode() const;
+          [[nodiscard]] const Mode& getMode() const;
 
           /*
            * Returns the character count field of this segment.
            */
-          int getNumChars() const;
+          [[nodiscard]] int getNumChars() const;
 
           /*
            * Returns the data bits of this segment.
            */
-          const std::vector<bool>& getData() const;
+          [[nodiscard]] const std::vector<bool>& getData() const;
 
           // (Package-private) Calculates the number of bits needed to encode the given segments at
           // the given version. Returns a non-negative number if successful. Otherwise returns -1 if a
@@ -304,29 +305,29 @@ namespace qrcodegen {
           /*
            * Returns this QR Code's version, in the range [1, 40].
            */
-          int getVersion() const;
+          [[nodiscard]] int getVersion() const;
 
           /*
            * Returns this QR Code's size, in the range [21, 177].
            */
-          int getSize() const;
+          [[nodiscard]] int getSize() const;
 
           /*
            * Returns this QR Code's error correction level.
            */
-          Ecc getErrorCorrectionLevel() const;
+          [[nodiscard]] Ecc getErrorCorrectionLevel() const;
 
           /*
            * Returns this QR Code's mask, in the range [0, 7].
            */
-          int getMask() const;
+          [[nodiscard]] int getMask() const;
 
           /*
            * Returns the color of the module (pixel) at the given coordinates, which is false
            * for light or true for dark. The top left corner has the coordinates (x=0, y=0).
            * If the given coordinates are out of bounds, then false (light) is returned.
            */
-          bool getModule(int x, int y) const;
+          [[nodiscard]] bool getModule(int x, int y) const;
 
           /*---- Private helper methods for constructor: Drawing function modules ----*/
 
@@ -354,13 +355,13 @@ namespace qrcodegen {
            void setFunctionModule(int x, int y, bool isDark);
 
            // Returns the color of the module at the given coordinates, which must be in range.
-           bool module(int x, int y) const;
+           [[nodiscard]] bool module(int x, int y) const;
 
            /*---- Private helper methods for constructor: Codewords and masking ----*/
 
            // Returns a new byte string representing the given data with the appropriate error correction
            // codewords appended to it, based on this object's version and error correction level.
-           std::vector<std::uint8_t> addEccAndInterleave(const std::vector<std::uint8_t>& data) const;
+           [[nodiscard]] std::vector<std::uint8_t> addEccAndInterleave(const std::vector<std::uint8_t>& data) const;
 
            // Draws the given sequence of 8-bit codewords (data and error correction) onto the entire
            // data area of this QR Code. Function modules need to be marked off before this is called.
@@ -375,14 +376,14 @@ namespace qrcodegen {
 
            // Calculates and returns the penalty score based on state of this QR Code's current modules.
            // This is used by the automatic mask choice algorithm to find the mask pattern that yields the lowest score.
-           long getPenaltyScore() const;
+           [[nodiscard]] long getPenaltyScore() const;
 
            /*---- Private helper functions ----*/
 
            // Returns an ascending list of positions of alignment patterns for this version number.
            // Each position is in the range [0,177), and are used on both the x and y axes.
            // This could be implemented as lookup table of 40 variable-length lists of unsigned bytes.
-           std::vector<int> getAlignmentPatternPositions() const;
+           [[nodiscard]] std::vector<int> getAlignmentPatternPositions() const;
 
            // Returns the number of data bits that can be stored in a QR Code of the given version number, after
            // all function modules are excluded. This includes remainder bits, so it might not be a multiple of 8.
@@ -407,7 +408,7 @@ namespace qrcodegen {
 
            // Can only be called immediately after a light run is added, and
            // returns either 0, 1, or 2. A helper function for getPenaltyScore().
-           int finderPenaltyCountPatterns(const std::array<int, 7>& runHistory) const;
+           [[nodiscard]] int finderPenaltyCountPatterns(const std::array<int, 7>& runHistory) const;
 
            // Must be called at the end of a line (row or column) of modules. A helper function for getPenaltyScore().
            int finderPenaltyTerminateAndCount(bool currentRunColor, int currentRunLength, std::array<int, 7>& runHistory) const;

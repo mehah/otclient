@@ -41,14 +41,23 @@
 #define swap32(data) ((swap16(data) << 16) | swap16(data >> 16))
 #endif
 
-#define PNG_ZBUF_SIZE  32768
+enum
+{
+    PNG_ZBUF_SIZE = 32768
+};
 
-#define PNG_DISPOSE_OP_NONE        0x00
-#define PNG_DISPOSE_OP_BACKGROUND  0x01
-#define PNG_DISPOSE_OP_PREVIOUS    0x02
+enum
+{
+    PNG_DISPOSE_OP_NONE = 0x00,
+    PNG_DISPOSE_OP_BACKGROUND = 0x01,
+    PNG_DISPOSE_OP_PREVIOUS = 0x02
+};
 
-#define PNG_BLEND_OP_SOURCE        0x00
-#define PNG_BLEND_OP_OVER          0x01
+enum
+{
+    PNG_BLEND_OP_SOURCE = 0x00,
+    PNG_BLEND_OP_OVER = 0x01
+};
 
 #define notabc(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
 

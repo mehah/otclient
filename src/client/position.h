@@ -31,6 +31,7 @@
 #include <math.h>
 #include <ostream>
 #include <string>
+
 #include <vector>
 
 #include <fmt/format.h>
@@ -42,7 +43,7 @@ public:
     Position(const int32_t x, const int32_t y, const uint8_t z) : x(x), y(y), z(z) {}
     Position(const Position& position) = default;
 
-    Position translatedToDirection(const Otc::Direction direction) const
+    [[nodiscard]] Position translatedToDirection(const Otc::Direction direction) const
     {
         Position pos = *this;
         switch (direction) {
@@ -80,7 +81,7 @@ public:
         return pos;
     }
 
-    Position translatedToReverseDirection(const Otc::Direction direction)  const
+    [[nodiscard]] Position translatedToReverseDirection(const Otc::Direction direction)  const
     {
         Position pos = *this;
         switch (direction) {
@@ -118,7 +119,7 @@ public:
         return pos;
     }
 
-    std::vector<Position> translatedToDirections(const std::vector<Otc::Direction>& dirs) const
+    [[nodiscard]] std::vector<Position> translatedToDirections(const std::vector<Otc::Direction>& dirs) const
     {
         Position lastPos = *this;
         std::vector<Position> positions;
@@ -155,7 +156,7 @@ public:
         return angle;
     }
 
-    double getAngleFromPosition(const Position& position) const { return getAngleFromPositions(*this, position); }
+    [[nodiscard]] double getAngleFromPosition(const Position& position) const { return getAngleFromPositions(*this, position); }
 
     static Otc::Direction getDirectionFromPositions(const Position& fromPos, const Position& toPos)
     {
@@ -188,17 +189,17 @@ public:
         return Otc::InvalidDirection;
     }
 
-    Otc::Direction getDirectionFromPosition(const Position& position) const { return getDirectionFromPositions(*this, position); }
+    [[nodiscard]] Otc::Direction getDirectionFromPosition(const Position& position) const { return getDirectionFromPositions(*this, position); }
 
-    bool isMapPosition() const;
-    bool isValid() const { return !(x == UINT16_MAX && y == UINT16_MAX && z == UINT8_MAX); }
-    double distance(const Position& pos) const { return sqrt(pow<int32_t>(pos.x - x, 2) + pow<int32_t>(pos.y - y, 2)); }
-    uint16_t manhattanDistance(const Position& pos) const { return static_cast<uint16_t>(std::abs(pos.x - x) + std::abs(pos.y - y)); }
+    [[nodiscard]] bool isMapPosition() const;
+    [[nodiscard]] bool isValid() const { return !(std::cmp_equal(x, UINT16_MAX) && std::cmp_equal(y, UINT16_MAX) && z == UINT8_MAX); }
+    [[nodiscard]] double distance(const Position& pos) const { return sqrt(pow<int32_t>(pos.x - x, 2) + pow<int32_t>(pos.y - y, 2)); }
+    [[nodiscard]] uint16_t manhattanDistance(const Position& pos) const { return static_cast<uint16_t>(std::abs(pos.x - x) + std::abs(pos.y - y)); }
 
     void translate(const int32_t dx, const int32_t dy, const int8_t dz = 0) { x += dx; y += dy; z += dz; }
-    Position translated(const int32_t dx, const int32_t dy, const int8_t dz = 0) const { Position pos = *this; pos.x += dx; pos.y += dy; pos.z += dz; return pos; }
+    [[nodiscard]] Position translated(const int32_t dx, const int32_t dy, const int8_t dz = 0) const { Position pos = *this; pos.x += dx; pos.y += dy; pos.z += dz; return pos; }
 
-    std::array<Position, 8> getPositionsAround() const
+    [[nodiscard]] std::array<Position, 8> getPositionsAround() const
     {
         std::array<Position, 8> positions;
         int_fast8_t i = -1;
@@ -227,7 +228,7 @@ public:
     bool operator==(const Position& other) const { return other.x == x && other.y == y && other.z == z; }
     bool operator!=(const Position& other) const { return other.x != x || other.y != y || other.z != z; }
 
-    bool isInRange(const Position& pos, const uint16_t xRange, const uint16_t yRange, const bool ignoreZ = false) const
+    [[nodiscard]] bool isInRange(const Position& pos, const uint16_t xRange, const uint16_t yRange, const bool ignoreZ = false) const
     {
         auto _pos = pos;
         if (pos.z != z) {
@@ -238,7 +239,7 @@ public:
         return std::abs(x - _pos.x) <= xRange && std::abs(y - _pos.y) <= yRange && z == pos.z;
     }
 
-    bool isInRange(const Position& pos, const uint16_t minXRange, const uint16_t maxXRange, const uint16_t minYRange, const uint16_t maxYRange, const bool ignoreZ = false) const
+    [[nodiscard]] bool isInRange(const Position& pos, const uint16_t minXRange, const uint16_t maxXRange, const uint16_t minYRange, const uint16_t maxYRange, const bool ignoreZ = false) const
     {
         auto _pos = pos;
         if (pos.z != z) {
@@ -257,7 +258,7 @@ public:
     bool coveredUp(int8_t n = 1);
     bool coveredDown(int8_t n = 1);
 
-    std::string toString() const
+    [[nodiscard]] std::string toString() const
     {
         return std::to_string(x) + "," + std::to_string(y) + "," + std::to_string(z);
     }
@@ -296,7 +297,8 @@ inline std::istream& operator>>(std::istream& in, Position& pos)
 
 // Auto format Position
 template <>
-struct fmt::formatter<Position> : fmt::formatter<std::string> {
+struct fmt::formatter<Position> : fmt::formatter<std::string>
+{
     auto format(const Position& pos, fmt::format_context& ctx) const {
         return fmt::formatter<std::string>::format(pos.toString(), ctx);
     }

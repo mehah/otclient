@@ -28,7 +28,6 @@
 
 #include <asio/read.hpp>
 #include <asio/read_until.hpp>
-#include <utility>
 
 #include <asio/io_service.hpp>
 

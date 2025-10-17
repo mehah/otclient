@@ -803,7 +803,7 @@ void UIWidget::applyDimension(bool isWidth, std::string valueStr) {
     int16_t num = stdext::to_number(std::string(numericPart(sv)));
     applyDimension(isWidth, unit, num);
     if (m_htmlNode)
-        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { valueStr , "" };
+        m_htmlNode->getStyles()["styles"][isWidth ? "width" : "height"] = { .value = valueStr , .inheritedFromId = "" };
 }
 
 void UIWidget::applyDimension(bool isWidth, Unit unit, int16_t value) {
@@ -1027,13 +1027,13 @@ void UIWidget::updateTableLayout()
             const int outerHeight = std::max<int>(0, cellHeight) + cell->m_padding.top + cell->m_padding.bottom;
 
             rowCellInfo[rowIndex].push_back(TableCellInfo{
-                cell,
-                columnIndex,
-                colSpan,
-                effectiveRowSpan,
-                candidate,
-                fixedWidth,
-                outerHeight,
+                .widget = cell,
+                .column = columnIndex,
+                .columnSpan = colSpan,
+                .rowSpan = effectiveRowSpan,
+                .requiredOuterWidth = candidate,
+                .widthFixed = fixedWidth,
+                .outerHeight = outerHeight,
             });
 
             const std::size_t occupancyValue = effectiveRowSpan;
@@ -1055,8 +1055,8 @@ void UIWidget::updateTableLayout()
     std::vector<int> columnWidths(columnCount, 0);
     std::vector<bool> columnFixed(columnCount, false);
 
-    for (std::size_t rowIndex = 0; rowIndex < rowCellInfo.size(); ++rowIndex) {
-        for (const auto& info : rowCellInfo[rowIndex]) {
+    for (auto& rowIndex : rowCellInfo) {
+        for (const auto& info : rowIndex) {
             const std::size_t span = std::min<std::size_t>(info.columnSpan, columnCount - info.column);
             if (span == 0)
                 continue;

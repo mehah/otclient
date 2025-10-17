@@ -112,7 +112,7 @@ TexturePtr TextureManager::getTexture(const std::string& fileName, const bool sm
 
 #ifdef FRAMEWORK_NET
     // load texture from "virtual directory"
-    if (filePath.substr(0, 11) == "/downloads/") {
+    if (filePath.starts_with("/downloads/")) {
         std::string _filePath = filePath;
         const auto& fileDownload = g_http.getFile(_filePath.erase(0, 11));
         if (fileDownload) {

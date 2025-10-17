@@ -113,7 +113,7 @@ struct ClientMusic
     ClientMusicType musicType;
 };
 
- //@bindsingleton g_sounds
+//@bindsingleton g_sounds
 class SoundManager
 {
     enum

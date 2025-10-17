@@ -48,7 +48,7 @@ struct FreeRegion
         return (y != other.y) ? (y < other.y) : (x < other.x);
     }
 
-    bool canFit(int texWidth, int texHeight) const {
+    [[nodiscard]] bool canFit(int texWidth, int texHeight) const {
         return width >= texWidth && height >= texHeight;
     }
 };
@@ -78,11 +78,11 @@ public:
     void addTexture(const TexturePtr& texture);
     void removeTexture(uint32_t id, bool smooth);
 
-    Size getSize() const { return m_size; }
+    [[nodiscard]] Size getSize() const { return m_size; }
 
     void flush();
 
-    auto getType() const { return m_type; }
+    [[nodiscard]] auto getType() const { return m_type; }
 
 private:
     struct Layer
@@ -111,7 +111,7 @@ private:
 
         auto insertRegion = [&](int x, int y, int w, int h) {
             if (w > 0 && h > 0) {
-                FreeRegion r = { x, y, w, h, region.layer };
+                FreeRegion r = { .x = x, .y = y, .width = w, .height = h, .layer = region.layer };
                 m_filterGroups[smooth].freeRegions.insert(r);
                 m_filterGroups[smooth].freeRegionsBySize[w * h].insert(r);
             }

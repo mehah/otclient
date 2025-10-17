@@ -79,7 +79,7 @@ private:
     bool canWrite(int bytes) const;
     void checkWrite(int bytes);
 
-    uint8_t m_maxHeaderSize { 8 };
+    uint8_t m_maxHeaderSize{ 8 };
     uint16_t m_headerPos{ m_maxHeaderSize };
     uint16_t m_writePos{ m_maxHeaderSize };
     uint16_t m_messageSize{ 0 };
