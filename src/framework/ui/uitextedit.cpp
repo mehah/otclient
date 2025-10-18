@@ -709,23 +709,15 @@ void UITextEdit::moveCursorVertically(bool up)
 int UITextEdit::getTextPos(const Point& pos)
 {
     const int visLen = std::min<int>(m_glyphsCoords.size(), static_cast<int>(m_displayedText.length()));
+    if (visLen <= 0)
+        return -1;
 
-    int candidateVis = -1;
     Rect firstGlyphRect, lastGlyphRect;
     for (int i = 0; i < visLen; ++i) {
-        Rect clickGlyphRect = m_glyphsCoords[i].first;
-        if (!clickGlyphRect.isValid())
-            continue;
-        if (!firstGlyphRect.isValid())
-            firstGlyphRect = clickGlyphRect;
-        lastGlyphRect = clickGlyphRect;
-        clickGlyphRect.expandTop(m_font->getYOffset() + m_font->getGlyphSpacing().height());
-        clickGlyphRect.expandLeft(m_font->getGlyphSpacing().width() + 1);
-        if (clickGlyphRect.contains(pos)) { candidateVis = i; break; }
-        if (pos.y >= clickGlyphRect.top() && pos.y <= clickGlyphRect.bottom()) {
-            if (pos.x <= clickGlyphRect.left()) { candidateVis = i; break; }
-            if (pos.x >= clickGlyphRect.right()) candidateVis = i + 1;
-        }
+        const Rect r = m_glyphsCoords[i].first;
+        if (!r.isValid()) continue;
+        if (!firstGlyphRect.isValid()) firstGlyphRect = r;
+        lastGlyphRect = r;
     }
 
     if (visLen > 0) {
@@ -735,11 +727,62 @@ int UITextEdit::getTextPos(const Point& pos)
             return static_cast<int>(m_text.length());
     }
 
+    int candidateVis = -1;
+
+    for (int i = 0; i < visLen; ++i) {
+        const Rect g = m_glyphsCoords[i].first;
+        if (!g.isValid()) continue;
+
+        const int lineTop = g.top();
+
+        int lineStart = i;
+        int lineEnd = i;
+        while (lineEnd + 1 < visLen) {
+            const Rect& next = m_glyphsCoords[lineEnd + 1].first;
+            if (!next.isValid() || next.top() != lineTop)
+                break;
+            ++lineEnd;
+        }
+
+        const int lineLeft = m_glyphsCoords[lineStart].first.left();
+        int lineRight = lineLeft;
+        for (int j = lineStart; j <= lineEnd; ++j) {
+            const Rect& r = m_glyphsCoords[j].first;
+            if (r.isValid())
+                lineRight = std::max(lineRight, r.right());
+        }
+
+        if (pos.y >= m_glyphsCoords[lineStart].first.top() &&
+            pos.y <= m_glyphsCoords[lineStart].first.bottom()) {
+            if (pos.x < lineLeft) {
+                candidateVis = lineStart;
+            } else if (pos.x > lineRight) {
+                candidateVis = lineEnd; // Fica no fim da linha atual
+            } else {
+                for (int j = lineStart; j <= lineEnd; ++j) {
+                    const Rect& r = m_glyphsCoords[j].first;
+                    if (pos.x < r.right()) {
+                        candidateVis = j;
+                        break;
+                    }
+                }
+                if (candidateVis < 0)
+                    candidateVis = lineEnd;
+            }
+            break;
+        }
+
+        i = lineEnd;
+    }
+
     if (candidateVis < 0)
         return -1;
 
-    int clampedVis = std::clamp(candidateVis, 0, static_cast<int>(m_visToSrc.size()) - 1);
-    return std::clamp(m_visToSrc.empty() ? candidateVis : m_visToSrc[clampedVis], 0, static_cast<int>(m_text.length()));
+    const int visIdx = std::clamp(candidateVis, 0, static_cast<int>(m_visToSrc.size()) - 1);
+    return std::clamp(
+        m_visToSrc.empty() ? candidateVis : m_visToSrc[visIdx],
+        0,
+        static_cast<int>(m_text.length()));
 }
 
 void UITextEdit::updateDisplayedText()
