@@ -130,9 +130,22 @@ void UITextEdit::drawSelf(const DrawPoolType drawPane)
         constexpr int delay = 333;
         const ticks_t elapsed = g_clock.millis() - m_cursorTicks;
         if (elapsed <= delay) {
-            auto cursorRect = cursorVis > 0
-                ? Rect(m_glyphsCoords[cursorVis - 1].first.right(), m_glyphsCoords[cursorVis - 1].first.top(), 1, m_font->getGlyphHeight())
-                : Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
+            Rect cursorRect;
+
+            if (cursorVis < textLength && m_glyphsCoords[cursorVis].first.isValid()) {
+                const Rect& cur = m_glyphsCoords[cursorVis].first;
+                const bool hasPrev = cursorVis > 0 && m_glyphsCoords[cursorVis - 1].first.isValid();
+                const bool sameLineAsPrev = hasPrev && (m_glyphsCoords[cursorVis - 1].first.top() == cur.top());
+
+                if (!hasPrev || !sameLineAsPrev)
+                    cursorRect = Rect(cur.left(), cur.top(), 1, m_font->getGlyphHeight());
+                else
+                    cursorRect = Rect(m_glyphsCoords[cursorVis - 1].first.right(), m_glyphsCoords[cursorVis - 1].first.top(), 1, m_font->getGlyphHeight());
+            } else if (cursorVis > 0 && m_glyphsCoords[cursorVis - 1].first.isValid()) {
+                cursorRect = Rect(m_glyphsCoords[cursorVis - 1].first.right(), m_glyphsCoords[cursorVis - 1].first.top(), 1, m_font->getGlyphHeight());
+            } else {
+                cursorRect = Rect(m_rect.left() + m_padding.left, m_rect.top() + m_padding.top, 1, m_font->getGlyphHeight());
+            }
 
             const bool useSelectionColor = hasSelection() && m_cursorPos >= m_selectionStart && m_cursorPos <= m_selectionEnd;
             const auto& color = useSelectionColor ? m_selectionColor : m_color;
