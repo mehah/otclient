@@ -40,21 +40,28 @@
               <div
                 *for="local item in (self.transfer.currentList.donors or {})"
                 onclick="self.transfer:handleSelect(item)"
-                *border="self.transfer.selected and self.transfer.selected.id == item.id and 1 or 0"
-                *border-color="self.transfer.selected and self.transfer.selected.id == item.id and 'white' or 'transparent'"
               >
-                <div class="item-to-select">
+                <div
+                  class="item-to-select"
+                  *border-width="1"
+                  *border-color="red"
+                >
                   <img
                     *if="item.imagePath"
                     *image-source="item.imagePath"
                     *image-clip="item.rarityClipObject"
                     *border-width="1"
-                    *border-color="self.selectedFusionItem and self.selectedFusionItem.key == item.key and 'white' or 'transparent'"
+                    *border-color="self.transfer.selected and self.transfer.selected.key == item.key and 'white' or 'transparent'"
                     class="item-rarity"
                   />
                   <UIItem
                     *item-id="item.id"
-                    style="height: 32px; width: 32px; align-items: center"
+                    style="
+                      height: 32px;
+                      width: 32px;
+                      align-items: center;
+                      padding-left: 2px;
+                    "
                   />
                   <img
                     *if="item.tier>0"
@@ -87,14 +94,55 @@
                 />
               </div>
               <div class="transfer-select-convergence">
-                <input id="transfer_convergence" type="checkbox" /><label
-                  style="margin-left: 2px"
-                  for="transfer_convergence"
+                <input
+                  id="transfer_convergence"
+                  type="checkbox"
+                  *checked="self.transfer.isConvergence"
+                  onclick="self.transfer:toggleConvergence()"
+                /><label style="margin-left: 2px" for="transfer_convergence"
                   >Convergence</label
                 >
               </div>
             </div>
-            <div class="transfer-select-donnor-container"></div>
+            <div
+              *if="self.transfer.selected and self.transfer.selected.key"
+              class="transfer-select-donnor-container"
+              layout="type: grid; cell-size: 34 34;cell-spacing:2;num-columns:4"
+            >
+              <div
+                *for="local item in (self.transfer.currentList.receivers or {})"
+                *if="self.transfer.selected and self.transfer.selected.id ~= item.id and self.transfer.selected.slot == item.slot"
+                onclick="self.transfer:handleSelectTarget(item)"
+                *border-width="1"
+                *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
+              >
+                <div class="item-to-select">
+                  <img
+                    *image-source="item.imagePath"
+                    *image-clip="item.rarityClipObject"
+                    *border-width="1"
+                    *border-color="self.transfer.selectedTarget.key == item.key and 'white' or 'transparent'"
+                    class="item-rarity"
+                  />
+                  <UIItem
+                    *item-id="item.id"
+                    style="
+                      height: 32px;
+                      width: 32px;
+                      align-items: center;
+                      padding-left: 2px;
+                    "
+                  />
+                  <img
+                    *if="item.tier>0"
+                    class="item-tier-strip"
+                    src="/images/inventory/tiers-strip.png"
+                    *image-clip="item.clip"
+                  />
+                  <label class="item-count">{{item.count}}</label>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -104,13 +152,36 @@
             <div class="transfer-requirement-item-container">
               <div class="transfer-requirement">
                 <img
+                  *if="self.transfer.selected.id == -1"
                   style="margin-top: 22px; margin-left: 30px"
                   src="/images/ui/icon-questionmark.png"
                   width="8"
                   height="21"
                 />
+                <div *if="self.transfer.selected ~= -1" class="preview-item">
+                  <UIItem
+                    *item-id="self.transfer.selected.id"
+                    style="
+                      height: 64px;
+                      width: 64px;
+                      align-items: center;
+                      padding-left: 2px;
+                    "
+                  />
+                  <img
+                    *if="self.transfer.selected.tier>0"
+                    class="item-tier-strip"
+                    src="/images/inventory/tiers-strip.png"
+                    *image-clip="self.transfer.selected.clip"
+                  />
+                </div>
               </div>
-              <div class="transfer-requirement-item-cost">0/1</div>
+              <div
+                class="transfer-requirement-item-cost"
+                *color="self:getColor('transfer-preview-count-label')"
+              >
+                {{self.transfer.selected.countLabel}}
+              </div>
             </div>
             <div
               class="transfer-requirement-item-container"
@@ -120,7 +191,9 @@
                 <UIItem style="item-id: 37160" />
               </div>
               <div class="transfer-requirement-item-cost">
-                {{self.transfer.dustLabel}}
+                <p *color="self:getColor('transfer-dust')">
+                  {{self.transfer.dustLabel}}
+                </p>
                 <img
                   style="margin-left: 2px"
                   src="/modules/game_forge/images/icon-currency-dust.png"
@@ -137,7 +210,9 @@
                 <UIItem style="item-id: 37110" />
               </div>
               <div class="transfer-requirement-item-cost">
-                {{self.transfer.exaltedCoresLabel }}
+                <p *color="self:getColor('transfer-exalted')">
+                  {{self.transfer.exaltedCoresLabel }}
+                </p>
                 <img
                   style="margin-left: 2px"
                   src="/modules/game_forge/images/icon-currency-exaltedcore.png"
@@ -154,33 +229,88 @@
               />
             </div>
             <div class="transfer-button-container">
-              <div class="transfer-button">
+              <div
+                class="transfer-button"
+                *disabled="self.transfer.canTransfer == false"
+                onclick="self:forgeAction(true)"
+              >
                 <div class="transfer-button-items">
-                  <span style="margin-left: 30px">
+                  <span style="width: 50px; height: 66px">
                     <img
+                      *if="self.transfer.selected.id == -1"
                       src="/images/ui/icon-questionmark.png"
+                      style="margin-left: 28px; margin-top: 20px"
                       width="8"
                       height="21"
                     />
+                    <div
+                      *if="self.transfer.selected ~= -1"
+                      class="item-to-select"
+                      style="margin-top: 15px; margin-left: 10px"
+                    >
+                      <UIItem
+                        *item-id="self.transfer.selected.id"
+                        style="height: 34px; width: 34px"
+                      />
+                      <img
+                        *if="self.transfer.selected.tier > 0"
+                        class="item-tier-strip"
+                        src="/images/inventory/tiers-strip.png"
+                        *image-clip="self.transfer.selected.clip"
+                        style="margin-left: 12px"
+                      />
+                    </div>
                   </span>
-                  <span style="padding-top: 8px; margin-left: 20px">
+                  <span
+                    style="
+                      padding-top: 30px;
+                      padding-left: 5px;
+                      padding-right: 5px;
+                      height: 66px;
+                      width: 18px;
+                    "
+                  >
                     <img
                       src="/modules/game_forge/images/arrows/icon-arrows.png"
                       width="15"
                       height="7"
                     />
                   </span>
-                  <span style="margin-left: 20px">
+                  <span style="width: 50px; height: 66px">
                     <img
+                      *if="self.transfer.selectedTarget.id == -1"
                       src="/images/ui/icon-questionmark.png"
                       width="8"
                       height="21"
+                      style="margin-left: 18px; margin-top: 20px"
                     />
+                    <div
+                      *if="self.transfer.selectedTarget ~= -1"
+                      class="item-to-select"
+                      style="margin-top: 15px; margin-left: 8px"
+                    >
+                      <UIItem
+                        *item-id="self.transfer.selectedTarget.id"
+                        style="
+                          height: 34px;
+                          width: 34px;
+                          align-items: center;
+                          padding-left: 2px;
+                        "
+                      />
+                      <img
+                        *if="self.transfer.selectedTarget.targetTier > 0"
+                        class="item-tier-strip"
+                        src="/images/inventory/tiers-strip.png"
+                        *image-clip="self.transfer.selectedTarget.clip"
+                        style="margin-left: 12px"
+                      />
+                    </div>
                   </span>
                 </div>
               </div>
               <div class="base-gold-bg" style="margin-top: 2px; width: 128px">
-                <p>{{self.currentGold}}</p>
+                <p *color="self:getColor('price')">{{self.formattedPrice}}</p>
                 <img
                   src="/images/game/prey/prey_gold.png"
                   width="10"

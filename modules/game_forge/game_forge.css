@@ -39,6 +39,12 @@
   position: relative;
   align-items: center;
 }
+.preview-item {
+  height: 64px;
+  width: 64px;
+  position: relative;
+  align-items: center;
+}
 .item-rarity {
   width: 34px;
   height: 34px;
@@ -163,13 +169,13 @@
 .transfer-button:pressed {
   --image-clip: 0 66 128 66;
 }
+.transfer-button:disabled {
+  opacity: 0.5;
+}
 .transfer-button-items {
   display: flex;
   height: 66px;
   width: 128px;
-  text-align: center;
-  align-items: center;
-  padding-top: 25px;
 }
 .transfer-description {
   --image-size: 465 75;

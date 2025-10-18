@@ -16,18 +16,12 @@ local baseSelectedFusionItem = {
     slot = -1
 }
 local function resetInfo()
-    -- ForgeController.fusionPrice = "???"
-    -- ForgeController.currentExaltedCoresPrice = "???"
-    -- ForgeController.fusionChanceImprovedIsChecked = false
-    -- ForgeController.fusionReduceTierLossIsChecked = false
-    -- ForgeController.selectedFusionItem = cloneValue(baseSelectedFusionItem)
-    -- ForgeController.selectedFusionConvergenceItem = cloneValue(baseSelectedFusionItem)
-    -- ForgeController.selectedFusionItemTarget = cloneValue(baseSelectedFusionItem)
-    -- ForgeController.fusionConvergence = false
-    -- ForgeController.transferConvergence = false
-    -- ForgeController.fusionConvergenceTitle = nil
-    -- ForgeController.fusionConvergenceList = {}
-    -- ForgeController.transferDustAmount = 100
+    ForgeController.transfer.exaltedCoresLabel = "???"
+    ForgeController.transfer.selected = cloneValue(ForgeController.baseSelected)
+    ForgeController.transfer.selectedTarget = cloneValue(ForgeController.baseSelected)
+    ForgeController.rawPrice = 0
+    ForgeController.formattedPrice = "???"
+    ForgeController.transfer.canTransfer = false
 end
 
 local TAB_ORDER = { 'fusion', 'transfer', 'conversion', 'history' }
@@ -40,6 +34,7 @@ function ForgeController:hideAllPanels()
 end
 
 function ForgeController:show(skipRequest)
+    resetInfo()
     local needsReload = not self.ui or self.ui:isDestroyed()
     if needsReload then
         self:loadHtml('game_forge.html')
@@ -87,6 +82,7 @@ function ForgeController:show(skipRequest)
 end
 
 function ForgeController:hide()
+    resetInfo()
     if not self.ui then
         return
     end
@@ -142,6 +138,18 @@ function ForgeController:updateResourceBalances()
     g_logger.info("Current Gold format: " .. tostring(self.currentGold))
 end
 
+ForgeController.baseSelected = {
+    id = -1,
+    tier = 0,
+    clip = {},
+    imagePath = nil,
+    rarityClipObject = nil,
+    count = 0,
+    countLabel = "0 / 1",
+    key = "",
+    targetTier = 0
+}
+
 function ForgeController:onInit()
     self:updateResourceBalances()
     self:registerEvents(g_game, {
@@ -160,6 +168,85 @@ function ForgeController:onInit()
     g_game.sendForgeBrowseHistoryRequest(0)
 end
 
+function ForgeController:getPrice(prices, itemId, currentTier, isConvergence, isTransfer)
+    local price = 0
+    local tierIndex = (tonumber(currentTier) or 0) + 1
+
+    if isTransfer and isConvergence then
+        for tier, _price in pairs(prices) do
+            if isConvergence then
+                tier = tier > 1 and (tier - 1) or tier
+            end
+            if currentTier == tier then
+                price = tonumber(_price) or 0
+                break
+            end
+        end
+    elseif isConvergence then
+        for tier, _price in pairs(prices) do
+            if tierIndex == tier then
+                price = tonumber(_price) or 0
+                break
+            end
+        end
+    else
+        local itemPtr = Item.create(itemId, 1)
+
+        local classification = itemPtr and itemPtr.getClassification and itemPtr:getClassification() or 0
+        if classification <= 0 then return 0 end
+
+        for class, tiers in pairs(prices) do
+            if class == classification then
+                for tier, _price in pairs(tiers) do
+                    if tier == tierIndex or (isTransfer and tier == currentTier) then
+                        price = tonumber(_price) or 0
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    self.rawPrice = price
+    self.formattedPrice = comma_value(price)
+    return self.formattedPrice
+end
+
+local forgeActions = {
+    FUSION = 0,
+    TRANSFER = 1
+}
+
+function ForgeController:forgeAction(isTransfer)
+    local data = isTransfer and ForgeController.transfer or ForgeController.fusion
+    if data.selected.id == -1 then return end
+    if data.selectedTarget.id == -1 then return end
+    if not data.canTransfer then return end
+
+    if ForgeController.rawPrice <= 0 then return end
+    if ForgeController.rawCurrentGold < ForgeController.rawPrice then return end
+    if ForgeController.currentDust < data.dust then return end
+
+    if isTransfer then
+        if ForgeController.currentExaltedCores < data.necessaryExaltedCores then return end
+    end
+
+    local actionType = isTransfer and forgeActions.TRANSFER or forgeActions.FUSION
+
+    local chanceImproved = false
+    local reduceTierLoss = false
+
+    if not isTransfer then
+        chanceImproved = data.chanceImprovedChecked
+        reduceTierLoss = data.reduceTierLossChecked
+    end
+
+    g_game.forgeRequest(actionType, data.isConvergence, data.selected.id, data.selected.tier,
+        data.selectedTarget.id, chanceImproved, reduceTierLoss)
+
+    ForgeController:hide()
+end
+
 -- FUSION MENU
 ForgeController.fusion = {
     prices = {},
@@ -168,6 +255,8 @@ ForgeController.fusion = {
     dust = 100,
     convergenceDust = 130,
     reduceTierLoss = 50,
+    reduceTierLossChecked = false,
+    chanceImprovedChecked = false,
     chanceImproved = 15,
     chanceBase = 50,
     hasConvergence = false,
@@ -185,7 +274,9 @@ ForgeController.transfer = {
     hasConvergence = false,
     dustLabel = 100,
     exaltedCoresLabel = "???",
+    necessaryExaltedCores = 0,
     clip = { x = 0, y = 0, width = 116, height = 34 },
+    isConvergence = false,
     items = {
         donors = {},
         receivers = {}
@@ -198,7 +289,9 @@ ForgeController.transfer = {
         donors = {},
         receivers = {}
     },
-    selected = nil
+    selected = cloneValue(ForgeController.baseSelected),
+    selectedTarget = cloneValue(ForgeController.baseSelected),
+    canTransfer = false
 }
 function ForgeController:toggleTransferMenu()
     self:resetTabsClip()
@@ -207,29 +300,80 @@ function ForgeController:toggleTransferMenu()
 end
 
 function ForgeController.transfer:handleSelect(item)
+    ForgeController.transfer.exaltedCoresLabel = "???"
+    ForgeController.transfer.selected = cloneValue(ForgeController.baseSelected)
+    ForgeController.transfer.selectedTarget = cloneValue(ForgeController.baseSelected)
+    ForgeController.transfer.canTransfer = false
     if not item then
         return
     end
 
+    local targetTier = ForgeController.transfer.isConvergence and item.tier or (item.tier - 1)
+    for _, values in pairs(ForgeController.transfer.grades) do
+        if values.tier == targetTier then
+            ForgeController.transfer.exaltedCoresLabel = values.exaltedCores
+            ForgeController.transfer.necessaryExaltedCores = values.exaltedCores
+            break
+        end
+    end
+
     ForgeController.transfer.selected = item
-    g_logger.info("Selected Transfer Item ID: " .. tostring(item.id) .. " Slot: " .. tostring(item.slot))
+    local receivers = {}
+    for _, _item in pairs(ForgeController.transfer.items.receivers) do
+        if item.id ~= _item.id then
+            table.insert(receivers, _item)
+        end
+    end
+
+    ForgeController.transfer.currentList.receivers = receivers
+    local transfer = ForgeController.transfer
+    ForgeController:getPrice(transfer.prices, item.id, transfer.selected.tier, transfer.isConvergence, true)
+end
+
+function ForgeController.transfer:handleSelectTarget(item)
+    ForgeController.transfer.selectedTarget = cloneValue(ForgeController.baseSelected)
+    ForgeController.transfer.canTransfer = false
+    if not item then
+        return
+    end
+
+    ForgeController.transfer.selectedTarget = cloneValue(item)
+    local targetTier = ForgeController.transfer.isConvergence and ForgeController.transfer.selected.tier or
+        (ForgeController.transfer.selected.tier - 1)
+    ForgeController.transfer.selectedTarget.targetTier = targetTier
+    ForgeController.transfer.selectedTarget.clip = ItemsDatabase.getTierClip(ForgeController.transfer.selectedTarget
+        .targetTier)
+    -- ForgeController.transfer.selectedTarget.key = string.format("%d_%d", item.id, targetTier)
+    local _, imagePath, rarityClipObject = ItemsDatabase.getClipAndImagePath(item.id)
+    if imagePath then
+        ForgeController.transfer.selectedTarget.imagePath = imagePath
+        ForgeController.transfer.selectedTarget.rarityClipObject = rarityClipObject
+    end
+
+    if ForgeController.rawPrice > 0 and ForgeController.rawCurrentGold >= ForgeController.rawPrice then
+        if ForgeController.currentExaltedCores >= ForgeController.transfer.necessaryExaltedCores then
+            if ForgeController.currentDust >= ForgeController.transfer.dust then
+                ForgeController.transfer.canTransfer = true
+            end
+        end
+    end
+end
+
+function ForgeContrller.transfer:toggleConvergence()
+
 end
 
 -- TRANSFER MENU
 
-function onOpenForge(data)
-    ForgeController.conversion.dustMax = data.dustLevel or ForgeController.conversion.dustMax or 100
-
-    -- TRANSFER ITEMS
-    local transfers = cloneValue(data.transfers or {})
-    local transferItems = {
+local function handleTransferItems(data)
+    local currentList = {
         donors = {},
         receivers = {}
     }
-
-    for slot, currentType in pairs(transfers) do
+    for slot, currentType in pairs(data) do
         for transferType in pairs(currentType) do
             for __, item in pairs(currentType[transferType]) do
+                item.key = string.format("%d_%d", item.id, item.tier)
                 item.slot = slot
                 if item.tier > 0 then
                     item.clip = ItemsDatabase.getTierClip(item.tier)
@@ -239,29 +383,46 @@ function onOpenForge(data)
                     item.imagePath = imagePath
                     item.rarityClipObject = rarityClipObject
                 end
-                table.insert(transferItems[transferType], item)
+                item.countLabel = string.format("%d / %d", item.count, 1)
+                table.insert(currentList[transferType], item)
             end
         end
     end
 
+    table.sort(currentList.donors, function(a, b)
+        if a.tier == b.tier then
+            return a.id < b.id
+        end
+        return a.tier > b.tier
+    end)
+
+
+    return currentList
+end
+
+function onOpenForge(data)
+    ForgeController.conversion.dustMax = data.dustLevel or ForgeController.conversion.dustMax or 100
+
+    -- TRANSFER ITEMS
+    local transfers = cloneValue(data.transfers or {})
+    local transferItems = handleTransferItems(transfers)
     ForgeController.transfer.items = transferItems
     ForgeController.transfer.currentList = cloneValue(transferItems)
 
-    local convergenceTransferItems = {
-        donors = {},
-        receivers = {}
-    }
+    local convergenceTransfers = cloneValue(data.convergenceTransfers or {})
+    local convergenceTransferItems = handleTransferItems(convergenceTransfers)
+    ForgeController.transfer.convergenceItems = convergenceTransferItems
     -- TRANSFER ITEMS
 
-    for k, v in pairs(data) do
-        if k == "fusionGrades" then
-            for kk, vv in pairs(v) do
-                g_logger.info("Fusion Grade - " .. tostring(kk) .. ": " .. tostring(vv))
-            end
-        else
-            g_logger.info("Forge Data - " .. tostring(k) .. ": " .. tostring(v))
-        end
-    end
+    -- for k, v in pairs(data) do
+    --     if k == "fusionGrades" then
+    --         for kk, vv in pairs(v) do
+    --             g_logger.info("Fusion Grade - " .. tostring(kk) .. ": " .. tostring(vv))
+    --         end
+    --     else
+    --         g_logger.info("Forge Data - " .. tostring(k) .. ": " .. tostring(v))
+    --     end
+    -- end
 
     local shouldShow = not ForgeController.ui or ForgeController.ui:isDestroyed() or not ForgeController.ui:isVisible()
     if shouldShow then
@@ -293,7 +454,7 @@ function forgeData(data)
     -- FUSION
 
     -- TRANSFER
-    ForgeController.transfer.prices = data.transferPrices or {}
+    ForgeController.transfer.prices = ForgeController.fusion.prices or {}
     local convergenceTransfer = normalizeTierPriceEntries(data.convergenceTransferPrices)
     if next(convergenceTransfer) then
         ForgeController.transfer.convergencePrices = convergenceTransfer
@@ -302,6 +463,7 @@ function forgeData(data)
     ForgeController.transfer.dust = data.normalDustTransfer or 100
     ForgeController.transfer.hasConvergence = data.hasConvergence or false
     ForgeController.transfer.dustLabel = ForgeController.transfer.dust
+    ForgeController.transfer.grades = data.fusionGrades or {}
     -- TRANSFER
 
     -- CONVERSION
@@ -353,6 +515,39 @@ function ForgeController:getColor(currentType)
             return "#d33c3c"
         end
     end
+
+    if currentType == "transfer-preview-count-label" then
+        if self.transfer.selected.id == -1 then
+            return "#d33c3c"
+        end
+    end
+
+    if currentType == "transfer-dust" or currentType == "transfer-exalted" then
+        if self.transfer.selected.id == -1 then
+            return "#d33c3c"
+        end
+
+        if currentType == "transfer-dust" then
+            local necessaryDust = self.transfer.isConvergence and self.transfer.convergenceDust or self.transfer.dust
+
+            if self.currentDust < necessaryDust then
+                return "#d33c3c"
+            end
+        end
+        if currentType == "transfer-exalted" then
+            if self.currentExaltedCores < self.transfer.necessaryExaltedCores then
+                return "#d33c3c"
+            end
+        end
+    end
+
+    if currentType == "price" then
+        if self.rawPrice == 0 or self.rawPrice > self.rawCurrentGold then
+            return "#d33c3c"
+        end
+    end
+
+    return "#c0c0c0"
 end
 
 -- CONVERSION MENU
