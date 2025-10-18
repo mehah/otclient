@@ -362,37 +362,27 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 
         Rect caretRect(caretX, L.top, 1, lineH);
 
-        const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0));
-        bool caretInView =
-            caretRect.top() >= virtualRect.top() &&
-            caretRect.bottom() <= virtualRect.bottom() &&
-            caretRect.left() >= virtualRect.left() &&
-            caretRect.right() <= virtualRect.right();
+        const Rect viewport(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0));
+        const int vpad = 0;
+        const int hpad = 0;
 
-        if (!caretInView) {
-            Point startPos;
-            startPos.y = std::max<int>(caretRect.bottom() - virtualRect.height(), 0);
-            startPos.x = std::max<int>(caretRect.right() - virtualRect.width(), 0);
+        const int topDelta = caretRect.top() - (viewport.top() + vpad);
+        const int bottomDelta = caretRect.bottom() - (viewport.bottom() - vpad);
+        const int leftDelta = caretRect.left() - (viewport.left() + hpad);
+        const int rightDelta = caretRect.right() - (viewport.right() - hpad);
 
-            bool found = false;
-            for (int pos = 0; pos < textLength; ++pos) {
-                uint8_t g = static_cast<uint8_t>(m_drawText[pos]);
-                if (g < 32) continue;
-                Rect r(m_glyphsPositionsCache[pos], glyphsSize[g]);
-                r.setTop(std::max<int>(r.top() - m_font->getYOffset() - m_font->getGlyphSpacing().height(), 0));
-                r.setLeft(std::max<int>(r.left() - m_font->getGlyphSpacing().width(), 0));
-                if (r.topLeft() >= startPos) {
-                    m_textVirtualOffset.x = m_glyphsPositionsCache[pos].x;
-                    m_textVirtualOffset.y = m_glyphsPositionsCache[pos].y - m_font->getYOffset();
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                m_textVirtualOffset.y = startPos.y;
-                if (m_textVirtualOffset.y < 0) m_textVirtualOffset.y = 0;
-            }
+        if (topDelta < 0) {
+            m_textVirtualOffset.y = std::max(0, m_textVirtualOffset.y + topDelta);
+        } else if (bottomDelta > 0) {
+            m_textVirtualOffset.y += bottomDelta;
         }
+
+        if (leftDelta < 0) {
+            m_textVirtualOffset.x = std::max(0, m_textVirtualOffset.x + leftDelta);
+        } else if (rightDelta > 0) {
+            m_textVirtualOffset.x += rightDelta;
+        }
+
         setProp(PropCursorInRange, true);
     } else {
         if (m_cursorPos > 0 && textLength > 0) {
