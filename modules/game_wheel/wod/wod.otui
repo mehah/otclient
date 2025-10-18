@@ -1,0 +1,312 @@
+UIWidget  
+  id: wodContainer  
+  margin-top: -50  
+    
+  UIWidget  
+    id: leftWindow1  
+    anchors.right: backdropWheel.left  
+    anchors.top: backdropWheel.top  
+    size: 213 250  
+    margin-right: 10  
+    image-source: /images/ui/window  
+    image-border: 20  
+    color: #929292  
+    text-offset: 0 3  
+    text-align: top  
+    text: Selection  
+      
+  UIWidget  
+    id: leftWindow2  
+    anchors.right: backdropWheel.left  
+    anchors.top: leftWindow1.bottom  
+    size: 213 267  
+    margin-right: 10  
+    margin-top: 5  
+    image-source: /images/ui/window  
+    image-border: 20  
+    color: #929292  
+    text-offset: 0 3  
+    text-align: top  
+    text: Information  
+      
+  UIWidget  
+    id: dedicationPerksPanel
+    anchors.left: backdropWheel.right  
+    anchors.top: backdropWheel.top  
+    size: 213 89  
+    margin-left: 10  
+    image-source: /images/ui/window  
+    image-border: 20  
+    color: #929292  
+    text-offset: 0 3  
+    text-align: top  
+    text: Dedication Perks  
+
+    UIWidget  
+      id: summaryButton  
+      size: 12 12  
+      anchors.top: parent.top  
+      anchors.right: parent.right  
+      margin-top: 6  
+      margin-right: 6  
+      image-source: /images/game/wheel/show-gui-help-grey  
+      visible: true  
+      enabled: true  
+      focusable: false  
+      @onClick: modules.game_wheel.WheelOfDestiny.toggleSummaryPanel()  
+        
+      $on:  
+        image-clip: 0 12 12 12
+
+    UIWidget  
+      id: dedicationHitPoints  
+      anchors.top: parent.top  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: 27  
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Hit Points:  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter  
+        margin-right: 15
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+      
+    UIWidget  
+      id: dedicationMana  
+      anchors.top: dedicationHitPoints.bottom  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: -1 
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Mana:  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 15
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+      
+    UIWidget  
+      id: dedicationCapacity  
+      anchors.top: dedicationMana.bottom  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: -1  
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Capacity:  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter  
+        margin-right: 15
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+      
+    UIWidget  
+      id: dedicationMitigation  
+      anchors.top: dedicationCapacity.bottom  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      height: 15  
+      margin-top: -1  
+      margin-left: 5  
+      margin-right: 5  
+        
+      Label  
+        id: label  
+        anchors.left: parent.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        text: Mitigation Mult. 
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+          
+      Label  
+        id: value  
+        anchors.right: infoDedicationMitigation.left  
+        anchors.verticalCenter: parent.verticalCenter  
+        margin-right: 3  
+        text: 0  
+        font: verdana-11px-rounded  
+        color: #C0C0C0  
+        
+      UIWidget  
+        id: infoDedicationMitigation
+        size: 12 12  
+        anchors.right: parent.right  
+        anchors.verticalCenter: parent.verticalCenter  
+        margin-right: 1  
+        image-source: /images/game/wheel/show-gui-help-grey  
+        visible: true
+      
+  UIWidget
+    id: convictionPerksPanel  
+    anchors.left: backdropWheel.right
+    anchors.top: dedicationPerksPanel.bottom
+    size: 213 159
+    margin-left: 10
+    margin-top: 5
+    image-source: /images/ui/window
+    image-border: 20
+    color: #929292
+    text-offset: 0 3
+    text-align: top
+    text: Conviction Perks
+      
+    UIWidget  
+      id: infoConvictionPerks  
+      size: 12 12  
+      anchors.top: parent.top  
+      anchors.right: parent.right  
+      margin-top: 6  
+      margin-right: 6  
+      image-source: /images/game/wheel/show-gui-help-grey  
+      visible: true  
+      
+  UIWidget  
+    id: rightWindow3  
+    anchors.left: backdropWheel.right  
+    anchors.top: convictionPerksPanel.bottom 
+    size: 213 159  
+    margin-left: 10  
+    margin-top: 5  
+    image-source: /images/ui/window  
+    image-border: 20  
+    color: #929292  
+    text-offset: 0 3  
+    text-align: top  
+    text: Vessels  
+      
+  UIWidget  
+    id: rightWindow4  
+    anchors.left: backdropWheel.right  
+    anchors.top: rightWindow3.bottom  
+    size: 213 102  
+    margin-left: 10  
+    margin-top: 5  
+    image-source: /images/ui/window  
+    image-border: 20  
+    color: #929292  
+    text-offset: 0 3  
+    text-align: top  
+    text: Revelation Perks
+
+    UIWidget
+      id: infoDamage
+      size: 12 12
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-top: 30
+      margin-right: 6
+      image-source: /images/game/wheel/show-gui-help-grey
+      visible: true
+
+    UIWidget
+      id: infoAvatar
+      size: 12 12
+      anchors.top: infoDamage.bottom
+      anchors.right: parent.right
+      margin-top: 3
+      margin-right: 6
+      image-source: /images/game/wheel/show-gui-help-grey
+      visible: true       
+    
+  UIWidget  
+    id: backdropWheel  
+    anchors.centerIn: parent  
+    size: 522 522  
+    image-source: /images/game/wheel/backdrop_skillwheel
+      
+    UIWidget  
+      id: largeBonusTL  
+      anchors.top: parent.top  
+      anchors.left: parent.left  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TL.png  
+        
+    UIWidget  
+      id: largeBonusTR  
+      anchors.top: parent.top  
+      anchors.right: parent.right  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_TR.png  
+        
+    UIWidget  
+      id: largeBonusBL  
+      anchors.bottom: parent.bottom  
+      anchors.left: parent.left  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BL.png  
+        
+    UIWidget  
+      id: largeBonusBR  
+      anchors.bottom: parent.bottom  
+      anchors.right: parent.right  
+      image-source: /images/game/wheel/backdrop_skillwheel_largebonus_front0_BR.png  
+        
+  UIWidget  
+    id: vocationOverlay  
+    anchors.centerIn: parent  
+    size: 522 522  
+    visible: false
+
+  UIWidget  
+    id: summaryPanel  
+    anchors.left: backdropWheel.right  
+    anchors.top: backdropWheel.top  
+    size: 213 522  
+    margin-left: 10  
+    image-source: /images/ui/window  
+    image-border: 20  
+    color: #929292  
+    text-offset: 0 3  
+    text-align: top  
+    text: Summary  
+    visible: false  
+      
+    Panel  
+      id: summaryContent  
+      anchors.top: parent.top  
+      anchors.left: parent.left  
+      anchors.right: parent.right  
+      anchors.bottom: parent.bottom  
+      margin-top: 25  
+      margin-left: 5  
+      margin-right: 5  
+      margin-bottom: 5  
+      layout:  
+        type: verticalBox  
+        spacing: 2
