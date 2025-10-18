@@ -929,11 +929,13 @@ private:
 
     Rect m_textCachedScreenCoords;
     Size m_textSize;
+    Size m_realTextSize;
 
 protected:
     virtual void updateText();
     virtual bool isTextEdit() { return false; }
     void drawText(const Rect& screenCoords);
+    void computeHtmlTextIntrinsicSize();
     void applyWhiteSpace();
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);
