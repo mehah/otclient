@@ -2,22 +2,22 @@ local VocationInformation = {
     -- Dedication Perks (1 info icon)  
     dedication = {  
         [1] = {  
-            [1] = tr('Knight Dedication Info:\nIncreases your defensive capabilities'),  
-            [2] = tr('Paladin Dedication Info:\nIncreases your ranged attack precision'),  
-            [3] = tr('Sorcerer Dedication Info:\nIncreases your elemental spell power'),  
-            [4] = tr('Druid Dedication Info:\nIncreases your healing and nature magic'),  
-            [5] = tr('Monk Dedication Info:\nBalances your offensive and defensive abilities')  
+            [1] = tr('Increases your mitigation multiplicatively.'),  
+            [2] = tr('Increases your mitigation multiplicatively.'),  
+            [3] = tr('Increases your mitigation multiplicatively.'),  
+            [4] = tr('Increases your mitigation multiplicatively.'),  
+            [5] = tr('Increases your mitigation multiplicatively.')  
         }  
     },  
      
     -- Conviction Perks (6 info icons)  
     conviction = {  
         [1] = {  
-            [1] = tr('Knight Conviction 1:\nMelee combat enhancement'),  
-            [2] = tr('Paladin Conviction 1:\nDistance combat enhancement'),  
-            [3] = tr('Sorcerer Conviction 1:\nFire magic enhancement'),  
-            [4] = tr('Druid Conviction 1:\nEarth magic enhancement'),  
-            [5] = tr('Monk Conviction 1:\nCombat balance enhancement')  
+            [1] = tr('Note: The cooldown of a spell cannot be reduced to less than 50%% of its base cooldown by any means.'),  
+            [2] = tr('Note: The cooldown of a spell cannot be reduced to less than 50%% of its base cooldown by any means.'),  
+            [3] = tr('Note: The cooldown of a spell cannot be reduced to less than 50%% of its base cooldown by any means.'),  
+            [4] = tr('Note: The cooldown of a spell cannot be reduced to less than 50%% of its base cooldown by any means.'),  
+            [5] = tr('Note: The cooldown of a spell cannot be reduced to less than 50%% of its base cooldown by any means.'),  
         },  
         [2] = {  
             [1] = tr('Knight Conviction 2:\nShield mastery bonus'),  

@@ -148,8 +148,8 @@ local UIConfigurator = {
         local windowTitles = {  
             leftWindow1 = "Selection",  
             leftWindow2 = "Information",  
-            dedicationPerksPanel = "Dedication Perks",  -- MUDOU DE rightWindow1  
-            rightWindow2 = "Conviction Perks",  
+            dedicationPerksPanel = "Dedication Perks",
+            convictionPerksPanel = "Conviction Perks",  
             rightWindow3 = "Vessels",  
             rightWindow4 = "Revelation Perks"  
         }  
@@ -172,15 +172,25 @@ local UIConfigurator = {
         if infoDedicationMitigation and VocationInformation.dedication[1][basicVocationId] then    
             infoDedicationMitigation:setTooltip(VocationInformation.dedication[1][basicVocationId])    
         end   
-        
-        -- Conviction Perks (6 icons)  
-        for i = 1, 6 do  
-            local infoConviction = ui:recursiveGetChildById('infoConviction' .. i)  
-            if infoConviction and VocationInformation.conviction[i] and   
-            VocationInformation.conviction[i][basicVocationId] then  
-                infoConviction:setTooltip(VocationInformation.conviction[i][basicVocationId])  
+
+        -- Conviction Perks Panel Info Icon  
+        local convictionPanel = ui:getChildById('convictionPerksPanel')  
+        if convictionPanel then  
+            local infoConvictionPerks = convictionPanel:getChildById('infoConvictionPerks')  
+            if infoConvictionPerks and VocationInformation.conviction[1] and   
+            VocationInformation.conviction[1][basicVocationId] then  
+                infoConvictionPerks:setTooltip(VocationInformation.conviction[1][basicVocationId])  
             end  
-        end  
+        end         
+
+        -- Conviction Perks (6 icons)  
+        for i = 2, 6 do      
+            local infoConviction = ui:recursiveGetChildById('infoConviction' .. i)      
+            if infoConviction and VocationInformation.conviction[i] and       
+            VocationInformation.conviction[i][basicVocationId] then      
+                infoConviction:setTooltip(VocationInformation.conviction[i][basicVocationId])      
+            end      
+        end    
         
         -- Vessels  
         local infoVessel1 = ui:recursiveGetChildById('infoVessel1')  
@@ -297,3 +307,42 @@ function WheelOfDestiny.getPlayerBasicVocation()
     return VocationUtils.getBasicVocation(player:getVocation())
 end
 
+function WheelOfDestiny.toggleSummaryPanel()    
+    print("DEBUG: toggleSummaryPanel called")    
+        
+    if not currentWodUI then     
+        print("DEBUG: currentWodUI is nil")    
+        return     
+    end    
+        
+    local summaryButton = currentWodUI:recursiveGetChildById('summaryButton')    
+    local summaryPanel = currentWodUI:getChildById('summaryPanel')    
+        
+    print("DEBUG: summaryButton found:", summaryButton ~= nil)    
+    print("DEBUG: summaryPanel found:", summaryPanel ~= nil)    
+        
+    if not summaryButton or not summaryPanel then return end    
+        
+    -- Verificar estado atual do painel  
+    local isVisible = summaryPanel:isVisible()  
+    print("DEBUG: current panel visibility:", isVisible)  
+      
+    -- Toggle da visibilidade do painel    
+    summaryPanel:setVisible(not isVisible)    
+    print("DEBUG: panel visibility set to:", not isVisible)    
+        
+    -- Ocultar/mostrar outros painéis    
+    local panelsToToggle = {    
+        'dedicationPerksPanel',    
+        'convictionPerksPanel',    
+        'rightWindow3',    
+        'rightWindow4'    
+    }    
+        
+    for _, panelId in ipairs(panelsToToggle) do    
+        local panel = currentWodUI:getChildById(panelId)    
+        if panel then    
+            panel:setVisible(isVisible)  -- Se summary estava visível, mostra os outros  
+        end    
+    end    
+end
