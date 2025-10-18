@@ -306,7 +306,9 @@ void ThingType::applyAppearanceFlags(const appearances::AppearanceFlags& flags)
     // player_corpse
     // cyclopediaitem
     // ammo
-
+    if (flags.has_ammo() && flags.ammo()) {
+        m_flags |= ThingFlagAttrAmmo;
+    }
     if (flags.has_show_off_socket() && flags.show_off_socket()) {
         m_flags |= ThingFlagAttrPodium;
     }

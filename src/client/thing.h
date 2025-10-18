@@ -160,6 +160,7 @@ public:
     bool hasExpireStop() const { return getThingType()->hasExpireStop(); }
     bool hasAnimationPhases() const { return getThingType()->getAnimationPhases() > 1; }
     bool isDecoKit() const { return getThingType()->isDecoKit(); }
+    bool isAmmo() { return getThingType()->isAmmo(); }
 
     PLAYER_ACTION getDefaultAction() { return getThingType()->getDefaultAction(); }
 

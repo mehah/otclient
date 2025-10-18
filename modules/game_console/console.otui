@@ -201,6 +201,7 @@ Panel
     margin-right: 1
     size: 16 16
     visible: false
+    checked: true
 
     @onClick: |
       self:setChecked(not self:isChecked())
