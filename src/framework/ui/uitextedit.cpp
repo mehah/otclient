@@ -385,16 +385,95 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 
         setProp(PropCursorInRange, true);
     } else {
-        if (m_cursorPos > 0 && textLength > 0) {
-            const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(2 * m_padding.left + m_padding.right, 0));
-            const int pos = m_cursorPos - 1;
-            const uint8_t glyph = static_cast<uint8_t>(m_drawText[pos]);
-            const Rect glyphRect(m_glyphsPositionsCache[pos], glyphsSize[glyph]);
-            if (virtualRect.contains(glyphRect.topLeft()) && virtualRect.contains(glyphRect.bottomRight()))
-                setProp(PropCursorInRange, true);
-        } else {
-            setProp(PropCursorInRange, true);
+        const int visLen = std::min<int>(static_cast<int>(m_glyphsPositionsCache.size()), static_cast<int>(m_drawText.size()));
+        const int srcLen = static_cast<int>(m_text.length());
+        const int cursorVis = m_srcToVis.empty()
+            ? std::clamp(m_cursorPos, 0, visLen)
+            : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+
+        struct LineInfo { int visStart, visEnd; int top, bottom, left, right; bool hasGlyphs; };
+        std::vector<LineInfo> lines;
+        {
+            int start = 0;
+            const int n = static_cast<int>(m_drawText.size());
+            for (int i = 0; i <= n; ++i) {
+                const bool br = (i == n) || (m_drawText[i] == '\n');
+                if (!br) continue;
+                lines.push_back({ start, i, std::numeric_limits<int>::min(), std::numeric_limits<int>::min(),
+                                  std::numeric_limits<int>::max(), std::numeric_limits<int>::min(), false });
+                start = i + 1;
+            }
+            if (lines.empty()) lines.push_back({ 0, n, 0, 0, 0, 0, false });
         }
+
+        const int lineH = m_font->getGlyphHeight();
+        const int lineDy = m_font->getGlyphSpacing().height();
+
+        for (auto& li : lines) {
+            for (int v = li.visStart; v < li.visEnd && v < visLen; ++v) {
+                uint8_t g = static_cast<uint8_t>(m_drawText[v]);
+                if (g < 32) continue;
+                const Point& p = m_glyphsPositionsCache[v];
+                const Rect r(p, glyphsSize[g]);
+                li.hasGlyphs = true;
+                li.top = (li.top == std::numeric_limits<int>::min()) ? r.top() : std::min(li.top, r.top());
+                li.bottom = (li.bottom == std::numeric_limits<int>::min()) ? r.bottom() : std::max(li.bottom, r.bottom());
+                li.left = std::min(li.left, r.left());
+                li.right = std::max(li.right, r.right());
+            }
+        }
+
+        int yCursor = 0;
+        for (size_t i = 0; i < lines.size(); ++i) {
+            auto& li = lines[i];
+            if (li.hasGlyphs) {
+                if (li.top == std::numeric_limits<int>::min()) li.top = yCursor;
+                if (li.bottom == std::numeric_limits<int>::min()) li.bottom = li.top + lineH;
+                yCursor = li.bottom;
+            } else {
+                if (i > 0) {
+                    const auto& prev = lines[i - 1];
+                    const int base = (prev.top != std::numeric_limits<int>::min()) ? prev.bottom : yCursor;
+                    li.top = base + lineDy;
+                    li.bottom = li.top + lineH;
+                } else {
+                    li.top = 0;
+                    li.bottom = li.top + lineH;
+                }
+                if (li.left == std::numeric_limits<int>::max()) li.left = 0;
+                if (li.right == std::numeric_limits<int>::min()) li.right = li.left;
+            }
+        }
+
+        int lineIdx = (int)lines.size() - 1;
+        for (int i = 0; i < (int)lines.size(); ++i) {
+            if (cursorVis >= lines[i].visStart && cursorVis <= lines[i].visEnd) { lineIdx = i; break; }
+        }
+        const auto& L = lines[lineIdx];
+
+        int caretX = L.left;
+        if (L.hasGlyphs) {
+            if (cursorVis < visLen) {
+                uint8_t g = static_cast<uint8_t>(m_drawText[std::max(0, cursorVis)]);
+                if (g >= 32) caretX = m_glyphsPositionsCache[cursorVis].x;
+                else if (cursorVis > 0) {
+                    int pv = cursorVis - 1;
+                    while (pv >= L.visStart && static_cast<uint8_t>(m_drawText[pv]) < 32) --pv;
+                    if (pv >= L.visStart) caretX = m_glyphsPositionsCache[pv].x + glyphsSize[static_cast<uint8_t>(m_drawText[pv])].width();
+                    else caretX = L.left;
+                }
+            } else if (visLen > 0) {
+                int pv = visLen - 1;
+                while (pv >= L.visStart && static_cast<uint8_t>(m_drawText[pv]) < 32) --pv;
+                caretX = (pv >= L.visStart)
+                    ? m_glyphsPositionsCache[pv].x + glyphsSize[static_cast<uint8_t>(m_drawText[pv])].width()
+                    : L.left;
+            }
+        }
+
+        Rect caretRect(caretX, L.top, 1, lineH);
+        const Rect viewport(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0));
+        setProp(PropCursorInRange, viewport.intersects(caretRect));
     }
 
     bool fireAreaUpdate = (oldTextAreaOffset != m_textVirtualOffset);
