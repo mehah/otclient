@@ -755,12 +755,7 @@ void UITextEdit::moveCursorVertically(bool up)
         m_cursorPreferredX = desiredX;
     }
 
-    struct LineInfo
-    {
-        int visStart, visEnd;
-        int top, bottom, left, right;
-        bool hasGlyphs;
-    };
+    struct LineInfo { int visStart, visEnd; int top, bottom, left, right; bool hasGlyphs; };
     std::vector<LineInfo> lines;
     {
         int start = 0;
@@ -778,6 +773,7 @@ void UITextEdit::moveCursorVertically(bool up)
     const int lineDy = m_font->getGlyphSpacing().height();
     const int areaTop = m_drawArea.top();
     const int areaLeft = m_drawArea.left();
+    const int y0 = areaTop - m_textVirtualOffset.y;
 
     std::vector<int> visToLine(visLen + 1, 0);
     for (size_t k = 0; k < lines.size(); ++k)
@@ -804,13 +800,13 @@ void UITextEdit::moveCursorVertically(bool up)
 
         if (!L.hasGlyphs) {
             const int lineIdx = static_cast<int>(k);
-            const int baseTop = areaTop + lineIdx * (glyphH + lineDy);
+            const int baseTop = y0 + lineIdx * (glyphH + lineDy);
             L.top = baseTop;
             L.bottom = baseTop + glyphH;
             L.left = areaLeft;
             L.right = areaLeft;
         } else {
-            L.top = (top == std::numeric_limits<int>::max()) ? areaTop : top;
+            L.top = (top == std::numeric_limits<int>::max()) ? (y0 + (int)k * (glyphH + lineDy)) : top;
             L.bottom = (bottom == std::numeric_limits<int>::min()) ? (L.top + glyphH) : bottom;
             L.left = (left == std::numeric_limits<int>::max()) ? areaLeft : left;
             L.right = (right == std::numeric_limits<int>::min()) ? areaLeft : right;
@@ -872,14 +868,7 @@ int UITextEdit::getTextPos(const Point& pos)
     if (visLen <= 0)
         return 0;
 
-    struct VLine
-    {
-        int visStart;
-        int visEnd;
-        int top, bottom;
-        int left, right;
-        bool hasGlyphs;
-    };
+    struct VLine { int visStart; int visEnd; int top, bottom; int left, right; bool hasGlyphs; };
     std::vector<VLine> lines;
     lines.reserve(64);
 
@@ -897,6 +886,7 @@ int UITextEdit::getTextPos(const Point& pos)
     const int lineDy = m_font->getGlyphSpacing().height();
     const int areaTop = m_drawArea.top();
     const int areaLeft = m_drawArea.left();
+    const int y0 = areaTop - m_textVirtualOffset.y;
 
     std::vector<int> visToLine(visLen + 1, 0);
     for (size_t k = 0; k < lines.size(); ++k)
@@ -925,7 +915,7 @@ int UITextEdit::getTextPos(const Point& pos)
         if (!L.hasGlyphs) {
             if (k > 0) {
                 const auto& P = lines[k - 1];
-                const int base = (P.bottom > 0 ? P.bottom : (areaTop + (int)(k - 1) * (glyphH + lineDy)));
+                const int base = (P.bottom > 0 ? P.bottom : (y0 + (int)(k - 1) * (glyphH + lineDy)));
                 L.top = base + lineDy;
                 L.bottom = L.top + glyphH;
             } else {
@@ -937,14 +927,14 @@ int UITextEdit::getTextPos(const Point& pos)
                     L.bottom = nextTop - lineDy;
                     L.top = L.bottom - glyphH;
                 } else {
-                    L.top = areaTop;
+                    L.top = y0;
                     L.bottom = L.top + glyphH;
                 }
             }
             L.left = areaLeft;
             L.right = areaLeft;
         } else {
-            L.top = (top == std::numeric_limits<int>::max()) ? (areaTop + (int)k * (glyphH + lineDy)) : top;
+            L.top = (top == std::numeric_limits<int>::max()) ? (y0 + (int)k * (glyphH + lineDy)) : top;
             L.bottom = (bottom == std::numeric_limits<int>::min()) ? (L.top + glyphH) : bottom;
             L.left = (left == std::numeric_limits<int>::max()) ? areaLeft : left;
             L.right = (right == std::numeric_limits<int>::min()) ? areaLeft : right;
