@@ -1151,7 +1151,6 @@ void UITextEdit::updateText()
     }
 
     blinkCursor();
-
     updateDisplayedText();
     update(true);
 }

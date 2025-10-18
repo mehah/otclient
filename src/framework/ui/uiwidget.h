@@ -922,8 +922,6 @@ public:
     int getImageTextureWidth() { return m_imageTexture ? m_imageTexture->getWidth() : 0; }
     int getImageTextureHeight() { return m_imageTexture ? m_imageTexture->getHeight() : 0; }
 
-    const auto& getTextSizeNoWrap() const { return m_textSizeNowrap; }
-
     // text related
 private:
     void initText();
@@ -931,14 +929,12 @@ private:
 
     Rect m_textCachedScreenCoords;
     Size m_textSize;
-    Size m_textSizeNowrap;
 
 protected:
     virtual void updateText();
     virtual bool isTextEdit() { return false; }
     void drawText(const Rect& screenCoords);
-
-    void computeHtmlTextIntrinsicSize();
+    void applyWhiteSpace();
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
