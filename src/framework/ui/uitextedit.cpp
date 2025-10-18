@@ -867,18 +867,18 @@ int UITextEdit::getTextPos(const Point& pos)
     const int visLen = static_cast<int>(m_displayedText.length());
     if (visLen <= 0) return 0;
 
-    struct VLine { int vs, ve; int top, bottom, left, right; bool has; };
+    struct VLine { int visStart; int visEnd; int top, bottom; int left, right; bool hasGlyphs; };
     std::vector<VLine> lines;
-    {
-        int s = 0;
-        for (int j = 0; j <= visLen; ++j) {
-            const bool br = (j == visLen) || (m_displayedText[j] == '\n');
-            if (!br) continue;
-            lines.push_back({ s, j, 0, 0, 0, 0, false });
-            s = j + 1;
-        }
-        if (lines.empty()) lines.push_back({ 0, visLen, 0, 0, 0, 0, false });
+    lines.reserve(64);
+
+    int lineStart = 0;
+    for (int j = 0; j <= visLen; ++j) {
+        const bool br = (j == visLen) || (m_displayedText[j] == '\n');
+        if (!br) continue;
+        lines.push_back({ lineStart, j, 0, 0, 0, 0, false });
+        lineStart = j + 1;
     }
+    if (lines.empty()) lines.push_back({ 0, visLen, 0, 0, 0, 0, false });
 
     const int glyphH = m_font->getGlyphHeight();
     const int lineDy = m_font->getGlyphSpacing().height();
@@ -888,9 +888,10 @@ int UITextEdit::getTextPos(const Point& pos)
 
     std::vector<int> visToLine(visLen + 1, 0);
     for (size_t k = 0; k < lines.size(); ++k)
-        for (int v = lines[k].vs; v <= lines[k].ve; ++v)
+        for (int v = lines[k].visStart; v <= lines[k].visEnd; ++v)
             visToLine[std::clamp(v, 0, visLen)] = static_cast<int>(k);
 
+    const int vmax = std::min(visLen, (int)m_glyphsCoords.size());
     for (size_t k = 0; k < lines.size(); ++k) {
         auto& L = lines[k];
         int top = std::numeric_limits<int>::max();
@@ -898,20 +899,19 @@ int UITextEdit::getTextPos(const Point& pos)
         int left = std::numeric_limits<int>::max();
         int right = std::numeric_limits<int>::min();
 
-        const int vmax = std::min(visLen, (int)m_glyphsCoords.size());
         for (int i = 0; i < vmax; ++i) {
             const int ln = visToLine[std::clamp(i, 0, visLen)];
             if (ln != (int)k) continue;
             const Rect& r = m_glyphsCoords[i].first;
             if (!r.isValid()) continue;
-            L.has = true;
+            L.hasGlyphs = true;
             top = std::min(top, r.top());
             bottom = std::max(bottom, r.bottom());
             left = std::min(left, r.left());
             right = std::max(right, r.right());
         }
 
-        if (!L.has) {
+        if (!L.hasGlyphs) {
             if (k > 0) {
                 const auto& P = lines[k - 1];
                 const int base = (P.bottom > 0 ? P.bottom : (y0 + (int)(k - 1) * (glyphH + lineDy)));
@@ -920,7 +920,7 @@ int UITextEdit::getTextPos(const Point& pos)
             } else {
                 int nextTop = std::numeric_limits<int>::min();
                 for (size_t j = k + 1; j < lines.size(); ++j) {
-                    if (lines[j].has) { nextTop = lines[j].top; break; }
+                    if (lines[j].hasGlyphs) { nextTop = lines[j].top; break; }
                 }
                 if (nextTop != std::numeric_limits<int>::min()) {
                     L.bottom = nextTop - lineDy;
@@ -940,49 +940,94 @@ int UITextEdit::getTextPos(const Point& pos)
         }
     }
 
-    if (pos.y < lines.front().top) return 0;
+    if (pos.y < lines.front().top)   return 0;
     if (pos.y > lines.back().bottom) return srcLen;
 
-    int lnClick = -1;
+    int clickedLine = -1;
     for (size_t k = 0; k < lines.size(); ++k) {
-        if (pos.y >= lines[k].top && pos.y <= lines[k].bottom) { lnClick = (int)k; break; }
+        if (pos.y >= lines[k].top && pos.y <= lines[k].bottom) { clickedLine = (int)k; break; }
         if (k + 1 < lines.size() && pos.y > lines[k].bottom && pos.y < lines[k + 1].top) {
-            lnClick = (pos.y - lines[k].bottom <= lines[k + 1].top - pos.y) ? (int)k : (int)k + 1;
+            clickedLine = (pos.y - lines[k].bottom <= lines[k + 1].top - pos.y) ? (int)k : (int)k + 1;
             break;
         }
     }
-    if (lnClick < 0) lnClick = (int)lines.size() - 1;
+    if (clickedLine < 0) clickedLine = (int)lines.size() - 1;
 
-    const auto& L = lines[lnClick];
+    const auto& L = lines[clickedLine];
 
-    int targetVis;
-    if (!L.has) {
-        targetVis = L.vs;
-    } else if (pos.x <= L.left) {
-        targetVis = L.vs;
-    } else if (pos.x >= L.right) {
-        bool isRealBreak = false;
-        if (L.ve < visLen && m_displayedText[L.ve] == '\n' && !m_visToSrc.empty()) {
-            const int vPrev = std::max(L.ve - 1, L.vs);
-            const int sEnd = std::clamp(m_visToSrc[L.ve], 0, srcLen);
-            const int sPrev = std::clamp(m_visToSrc[vPrev], 0, srcLen);
-            if (sEnd > sPrev && sPrev >= 0 && sPrev < srcLen && m_text[sPrev] == '\n') isRealBreak = true;
-        }
-        targetVis = isRealBreak ? L.ve : std::max(L.ve - 1, L.vs);
-    } else {
-        int best = L.vs;
-        for (int j = L.vs; j < L.ve; ++j) {
-            const Rect& r = m_glyphsCoords[j].first;
-            if (!r.isValid()) continue;
-            if (pos.x < r.right()) { best = j; break; }
-            best = j;
-        }
-        targetVis = best;
+    // Início/antes da linha
+    if (!L.hasGlyphs || pos.x <= L.left) {
+        const int visIdx = std::clamp(L.visStart, 0, (int)m_visToSrc.size() - 1);
+        return std::clamp(m_visToSrc.empty() ? L.visStart : m_visToSrc[visIdx], 0, srcLen);
     }
 
-    targetVis = std::clamp(targetVis, 0, visLen);
-    const int visIdx = std::clamp(targetVis, 0, (int)m_visToSrc.size() - 1);
-    return std::clamp(m_visToSrc.empty() ? targetVis : m_visToSrc[visIdx], 0, srcLen);
+    // Fim da linha: tratar WRAP vs ENTER usando apenas os mapas vis?src
+    if (pos.x >= L.right) {
+        const bool hasVisualNewline = (L.visEnd < visLen) && (m_displayedText[L.visEnd] == '\n');
+        if (!m_visToSrc.empty() && hasVisualNewline) {
+            const int vPrev = std::max(L.visEnd - 1, L.visStart);
+            const int sEnd = std::clamp(m_visToSrc[std::clamp(L.visEnd, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
+            const int sPrev = std::clamp(m_visToSrc[std::clamp(vPrev, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
+            const bool isRealBreak = (sEnd > sPrev); // avanço em src => \n real
+
+            if (isRealBreak) {
+                // Maior src tal que src->vis <= L.visEnd  (igual KeyEnd)
+                int bestSrc = sPrev;
+                if (!m_srcToVis.empty()) {
+                    const int svMax = (int)m_srcToVis.size();
+                    for (int s = sPrev; s <= sEnd && s < svMax; ++s) {
+                        if (m_srcToVis[s] <= L.visEnd) bestSrc = s;
+                        else break;
+                    }
+                } else bestSrc = sEnd;
+                return std::clamp(bestSrc, 0, srcLen);
+            } else {
+                // Wrap: maior src tal que src->vis <= L.visEnd-1
+                const int vTarget = std::max(L.visEnd - 1, L.visStart);
+                // faixa de src correspondente a essa linha visual
+                const int sLineStart = std::clamp(m_visToSrc[std::clamp(L.visStart, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
+                const int sLineEnd = std::clamp(m_visToSrc[std::clamp(L.visEnd, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
+                int bestSrc = sLineStart;
+                if (!m_srcToVis.empty()) {
+                    const int svMax = (int)m_srcToVis.size();
+                    for (int s = sLineStart; s <= sLineEnd && s < svMax; ++s) {
+                        if (m_srcToVis[s] <= vTarget) bestSrc = s;
+                        else break;
+                    }
+                } else {
+                    bestSrc = sLineEnd;
+                }
+                return std::clamp(bestSrc, 0, srcLen);
+            }
+        } else {
+            // Não há '\n' visual ao fim: trate como wrap
+            const int vTarget = std::max(L.visEnd - 1, L.visStart);
+            const int sLineStart = m_visToSrc.empty() ? 0 :
+                std::clamp(m_visToSrc[std::clamp(L.visStart, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
+            const int sLineEnd = m_visToSrc.empty() ? srcLen :
+                std::clamp(m_visToSrc[std::clamp(L.visEnd, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
+            int bestSrc = sLineStart;
+            if (!m_srcToVis.empty()) {
+                const int svMax = (int)m_srcToVis.size();
+                for (int s = sLineStart; s <= sLineEnd && s < svMax; ++s) {
+                    if (m_srcToVis[s] <= vTarget) bestSrc = s;
+                    else break;
+                }
+            } else bestSrc = sLineEnd;
+            return std::clamp(bestSrc, 0, srcLen);
+        }
+    }
+
+    // Meio da linha: primeiro glifo cujo right ultrapassa X
+    int bestVis = L.visStart;
+    for (int j = L.visStart; j < L.visEnd; ++j) {
+        const Rect& r = m_glyphsCoords[j].first;
+        if (!r.isValid()) continue;
+        if (pos.x < r.right()) { bestVis = j; break; }
+        bestVis = j;
+    }
+    const int visIdx = std::clamp(bestVis, 0, (int)m_visToSrc.size() - 1);
+    return std::clamp(m_visToSrc.empty() ? bestVis : m_visToSrc[visIdx], 0, srcLen);
 }
 
 void UITextEdit::updateDisplayedText()
