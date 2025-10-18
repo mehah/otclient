@@ -1136,36 +1136,64 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
         return true;
 
     if (keyboardModifiers == Fw::KeyboardNoModifier) {
-        if (keyCode == Fw::KeyDelete && getProp(PropEditable)) { // erase right character
+        if (keyCode == Fw::KeyDelete && getProp(PropEditable)) {
             if (hasSelection() || !m_text.empty()) {
                 del(true);
                 return true;
             }
-        } else if (keyCode == Fw::KeyBackspace && getProp(PropEditable)) { // erase left character
+        } else if (keyCode == Fw::KeyBackspace && getProp(PropEditable)) {
             if (hasSelection() || !m_text.empty()) {
                 del(false);
                 return true;
             }
-        } else if (keyCode == Fw::KeyRight && !getProp(PropShiftNavigation)) { // move cursor right
+        } else if (keyCode == Fw::KeyRight && !getProp(PropShiftNavigation)) {
             clearSelection();
             moveCursorHorizontally(true);
             return true;
-        } else if (keyCode == Fw::KeyLeft && !getProp(PropShiftNavigation)) { // move cursor left
+        } else if (keyCode == Fw::KeyLeft && !getProp(PropShiftNavigation)) {
             clearSelection();
             moveCursorHorizontally(false);
             return true;
-        } else if (keyCode == Fw::KeyHome) { // move cursor to first character
-            if (m_cursorPos != 0) {
-                clearSelection();
-                setCursorPos(0);
-                return true;
+        } else if (keyCode == Fw::KeyHome) {
+            clearSelection();
+            const int srcLen = static_cast<int>(m_text.length());
+            const int visLen = static_cast<int>(m_displayedText.length());
+            if (visLen <= 0) return true;
+            const int curVis = m_srcToVis.empty()
+                ? std::clamp(m_cursorPos, 0, visLen)
+                : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+            int lineStart = 0;
+            for (int i = curVis - 1; i >= 0; --i) { if (m_displayedText[i] == '\n') { lineStart = i + 1; break; } }
+            const int srcTarget = m_visToSrc.empty()
+                ? std::clamp(lineStart, 0, srcLen)
+                : std::clamp(m_visToSrc[std::clamp(lineStart, 0, visLen)], 0, srcLen);
+            setCursorPos(srcTarget);
+            return true;
+        } else if (keyCode == Fw::KeyEnd) {
+            clearSelection();
+            const int srcLen = static_cast<int>(m_text.length());
+            const int visLen = static_cast<int>(m_displayedText.length());
+            if (visLen <= 0) return true;
+            const int curVis = m_srcToVis.empty()
+                ? std::clamp(m_cursorPos, 0, visLen)
+                : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+            int ls = 0;
+            for (int i = curVis - 1; i >= 0; --i) { if (m_displayedText[i] == '\n') { ls = i + 1; break; } }
+            int le = visLen;
+            for (int i = curVis; i < visLen; ++i) { if (m_displayedText[i] == '\n') { le = i; break; } }
+            int lastVis = ls - 1;
+            const int gcSize = static_cast<int>(m_glyphsCoords.size());
+            for (int v = le - 1; v >= ls; --v) {
+                const uint8_t g = static_cast<uint8_t>(m_displayedText[v]);
+                if (g >= 32 && v < gcSize && m_glyphsCoords[v].first.isValid()) { lastVis = v; break; }
             }
-        } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
-            if (m_cursorPos != static_cast<int>(m_text.length())) {
-                clearSelection();
-                setCursorPos(m_text.length());
-                return true;
-            }
+            int targetVis = (lastVis >= ls) ? (lastVis + 1) : ls;
+            targetVis = std::clamp(targetVis, 0, visLen);
+            const int srcTarget = m_visToSrc.empty()
+                ? std::clamp(targetVis, 0, srcLen)
+                : std::clamp(m_visToSrc[targetVis], 0, srcLen);
+            setCursorPos(srcTarget);
+            return true;
         } else if (keyCode == Fw::KeyTab && !getProp(PropShiftNavigation)) {
             clearSelection();
             if (const auto& parent = getParent())
@@ -1186,7 +1214,6 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             paste(g_window.getClipboardText());
             return true;
         }
-
         if (keyCode == Fw::KeyX && getProp(PropEditable) && getProp(PropSelectable)) {
             if (hasSelection()) {
                 cut();
@@ -1206,7 +1233,6 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             if (hasSelection()) {
                 deleteSelection();
             } else if (m_text.length() > 0) {
-                // delete last word
                 std::string tmp = m_text;
                 if (m_cursorPos == 0) {
                     tmp.erase(tmp.begin());
@@ -1230,12 +1256,10 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
         }
         if (keyCode == Fw::KeyRight || keyCode == Fw::KeyLeft) {
             const size_t oldCursorPos = m_cursorPos;
-
-            if (keyCode == Fw::KeyRight) // move cursor right
+            if (keyCode == Fw::KeyRight)
                 moveCursorHorizontally(true);
-            else if (keyCode == Fw::KeyLeft) // move cursor left
+            else if (keyCode == Fw::KeyLeft)
                 moveCursorHorizontally(false);
-
             if (getProp(PropShiftNavigation))
                 clearSelection();
             else {
@@ -1245,18 +1269,46 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             }
             return true;
         }
-        if (keyCode == Fw::KeyHome) { // move cursor to first character
-            if (m_cursorPos != 0) {
-                setSelection(m_cursorPos, 0);
-                setCursorPos(0);
-                return true;
+        if (keyCode == Fw::KeyHome) {
+            const int srcLen = static_cast<int>(m_text.length());
+            const int visLen = static_cast<int>(m_displayedText.length());
+            if (visLen <= 0) return true;
+            const int curVis = m_srcToVis.empty()
+                ? std::clamp(m_cursorPos, 0, visLen)
+                : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+            int lineStart = 0;
+            for (int i = curVis - 1; i >= 0; --i) { if (m_displayedText[i] == '\n') { lineStart = i + 1; break; } }
+            const int srcTarget = m_visToSrc.empty()
+                ? std::clamp(lineStart, 0, srcLen)
+                : std::clamp(m_visToSrc[std::clamp(lineStart, 0, visLen)], 0, srcLen);
+            setSelection(m_cursorPos, srcTarget);
+            setCursorPos(srcTarget);
+            return true;
+        } else if (keyCode == Fw::KeyEnd) {
+            const int srcLen = static_cast<int>(m_text.length());
+            const int visLen = static_cast<int>(m_displayedText.length());
+            if (visLen <= 0) return true;
+            const int curVis = m_srcToVis.empty()
+                ? std::clamp(m_cursorPos, 0, visLen)
+                : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+            int ls = 0;
+            for (int i = curVis - 1; i >= 0; --i) { if (m_displayedText[i] == '\n') { ls = i + 1; break; } }
+            int le = visLen;
+            for (int i = curVis; i < visLen; ++i) { if (m_displayedText[i] == '\n') { le = i; break; } }
+            int lastVis = ls - 1;
+            const int gcSize = static_cast<int>(m_glyphsCoords.size());
+            for (int v = le - 1; v >= ls; --v) {
+                const uint8_t g = static_cast<uint8_t>(m_displayedText[v]);
+                if (g >= 32 && v < gcSize && m_glyphsCoords[v].first.isValid()) { lastVis = v; break; }
             }
-        } else if (keyCode == Fw::KeyEnd) { // move cursor to last character
-            if (m_cursorPos != static_cast<int>(m_text.length())) {
-                setSelection(m_cursorPos, m_text.length());
-                setCursorPos(m_text.length());
-                return true;
-            }
+            int targetVis = (lastVis >= ls) ? (lastVis + 1) : ls;
+            targetVis = std::clamp(targetVis, 0, visLen);
+            const int srcTarget = m_visToSrc.empty()
+                ? std::clamp(targetVis, 0, srcLen)
+                : std::clamp(m_visToSrc[targetVis], 0, srcLen);
+            setSelection(m_cursorPos, srcTarget);
+            setCursorPos(srcTarget);
+            return true;
         }
     }
 
