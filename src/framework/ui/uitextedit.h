@@ -130,6 +130,7 @@ private:
     void disableUpdates() { setProp(PropUpdatesEnabled, false); }
     void enableUpdates() { setProp(PropUpdatesEnabled, true); }
     void recacheGlyphs() { setProp(PropGlyphsMustRecache, true); }
+    void setCursorPosEx(int pos, bool preservePreferredX);
 
     std::string m_validCharacters;
     uint32_t m_maxLength{ 0 };

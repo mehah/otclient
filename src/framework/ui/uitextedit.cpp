@@ -394,6 +394,11 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 
 void UITextEdit::setCursorPos(int pos)
 {
+    setCursorPosEx(pos, false);
+}
+
+void UITextEdit::setCursorPosEx(int pos, bool preservePreferredX)
+{
     if (pos < 0)
         pos = m_text.length();
 
@@ -407,7 +412,9 @@ void UITextEdit::setCursorPos(int pos)
     else
         m_cursorPos = pos;
 
-    m_cursorPreferredX = -1;
+    if (!preservePreferredX)
+        m_cursorPreferredX = -1;
+
     update(true);
 }
 
@@ -605,7 +612,9 @@ void UITextEdit::moveCursorVertically(bool up)
 
     int desiredX = m_cursorPreferredX;
     if (desiredX < 0) {
-        if (curVis > 0 && curVis - 1 < (int)m_glyphsCoords.size() && m_glyphsCoords[curVis - 1].first.isValid())
+        if (curVis < visLen && m_glyphsCoords[curVis].first.isValid())
+            desiredX = m_glyphsCoords[curVis].first.left();
+        else if (curVis > 0 && m_glyphsCoords[curVis - 1].first.isValid())
             desiredX = m_glyphsCoords[curVis - 1].first.right();
         else
             desiredX = m_rect.left() + m_padding.left;
@@ -615,7 +624,7 @@ void UITextEdit::moveCursorVertically(bool up)
     std::vector<int> lineStarts, lineEnds;
     int i = 0;
     while (i < visLen && !m_glyphsCoords[i].first.isValid()) ++i;
-    if (i >= visLen) { setCursorPos(0); return; }
+    if (i >= visLen) { setCursorPosEx(0, true); return; }
     int currentTop = m_glyphsCoords[i].first.top();
     lineStarts.push_back(i);
     for (; i < visLen; ++i) {
@@ -637,8 +646,8 @@ void UITextEdit::moveCursorVertically(bool up)
     }
 
     const int targetLine = up ? curLine - 1 : curLine + 1;
-    if (targetLine < 0) { setCursorPos(0); return; }
-    if (targetLine >= (int)lineStarts.size()) { setCursorPos(srcLen); return; }
+    if (targetLine < 0) { setCursorPosEx(0, true); return; }
+    if (targetLine >= (int)lineStarts.size()) { setCursorPosEx(srcLen, true); return; }
 
     const int L = lineStarts[targetLine];
     const int R = lineEnds[targetLine];
@@ -661,10 +670,19 @@ void UITextEdit::moveCursorVertically(bool up)
 
     int bestB = 0;
     int bestDist = std::numeric_limits<int>::max();
-    for (int b = 0; b < (int)boundariesX.size(); ++b) {
-        const int d = std::abs(boundariesX[b] - desiredX);
-        if (d < bestDist) { bestDist = d; bestB = b; }
-        if (desiredX < boundariesX[b]) break;
+    const int lastB = (int)boundariesX.size() - 1;
+
+    if (desiredX >= boundariesX[lastB]) {
+        bestB = std::max(0, lastB - 1);
+    } else {
+        for (int b = 0; b < (int)boundariesX.size(); ++b) {
+            const int d = std::abs(boundariesX[b] - desiredX);
+            if (d < bestDist) { bestDist = d; bestB = b; }
+            if (desiredX < boundariesX[b]) break;
+        }
+
+        if (bestB >= lastB)
+            bestB = std::max(0, lastB - 1);
     }
 
     const int targetVis = std::clamp(L + bestB, 0, visLen);
@@ -672,7 +690,7 @@ void UITextEdit::moveCursorVertically(bool up)
         ? std::clamp(targetVis, 0, srcLen)
         : std::clamp(m_visToSrc[std::clamp(targetVis, 0, (int)m_visToSrc.size() - 1)], 0, srcLen);
 
-    setCursorPos(targetSrc);
+    setCursorPosEx(targetSrc, true);
 }
 
 int UITextEdit::getTextPos(const Point& pos)
