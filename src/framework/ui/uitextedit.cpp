@@ -239,25 +239,19 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
 {
     if (!getProp(PropUpdatesEnabled))
         return;
-
-    // prevent glitches
     if (m_rect.isEmpty())
         return;
 
-    // recache coords buffers
     recacheGlyphs();
 
     m_drawText = getDisplayedText();
-    const int textLength = m_drawText.length();
+    const int textLength = static_cast<int>(m_drawText.length());
 
-    // map glyphs positions
     Size textBoxSize;
     m_font->calculateGlyphsPositions(m_drawText, m_textAlign, m_glyphsPositionsCache, &textBoxSize);
     const Rect* glyphsTextureCoords = m_font->getGlyphsTextureCoords();
     const Size* glyphsSize = m_font->getGlyphsSize();
-    int glyph;
 
-    // update rect size
     if (!m_rect.isValid() || hasProp(PropTextHorizontalAutoResize) || hasProp(PropTextVerticalAutoResize)) {
         textBoxSize += Size(m_padding.left + m_padding.right, m_padding.top + m_padding.bottom) + m_textOffset.toSize();
         Size size = getSize();
@@ -268,10 +262,8 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
         setSize(size);
     }
 
-    // resize just on demand
-    if (textLength > static_cast<int>(m_glyphsCoords.size())) {
+    if (textLength > static_cast<int>(m_glyphsCoords.size()))
         m_glyphsCoords.resize(textLength);
-    }
 
     const Point oldTextAreaOffset = m_textVirtualOffset;
 
@@ -280,47 +272,133 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
     if (textBoxSize.height() <= getPaddingRect().height())
         m_textVirtualOffset.y = 0;
 
-    // readjust start view area based on cursor position
     setProp(PropCursorInRange, false);
     if (focusCursor && getProp(PropAutoScroll)) {
-        if (m_cursorPos > 0 && textLength > 0) {
-            assert(m_cursorPos <= textLength);
-            const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
-            int pos = m_cursorPos - 1; // element before cursor
-            glyph = static_cast<uint8_t>(m_drawText[pos]); // glyph of the element before cursor
-            Rect glyphRect(m_glyphsPositionsCache[pos], glyphsSize[glyph]);
+        const int visLen = std::min<int>(static_cast<int>(m_glyphsPositionsCache.size()), static_cast<int>(m_drawText.size()));
+        const int srcLen = static_cast<int>(m_text.length());
+        const int cursorVis = m_srcToVis.empty()
+            ? std::clamp(m_cursorPos, 0, visLen)
+            : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
 
-            // if the cursor is not on the previous rendered virtual rect we need to update it
-            if (!virtualRect.contains(glyphRect.topLeft()) || !virtualRect.contains(glyphRect.bottomRight())) {
-                // calculate where is the first glyph visible
-                Point startGlyphPos;
-                startGlyphPos.y = std::max<int>(glyphRect.bottom() - virtualRect.height(), 0);
-                startGlyphPos.x = std::max<int>(glyphRect.right() - virtualRect.width(), 0);
+        struct LineInfo { int visStart, visEnd; int top, bottom, left, right; bool hasGlyphs; };
+        std::vector<LineInfo> lines;
+        {
+            int start = 0;
+            const int n = static_cast<int>(m_drawText.size());
+            for (int i = 0; i <= n; ++i) {
+                const bool br = (i == n) || (m_drawText[i] == '\n');
+                if (!br) continue;
+                lines.push_back({ start, i, std::numeric_limits<int>::min(), std::numeric_limits<int>::min(),
+                                  std::numeric_limits<int>::max(), std::numeric_limits<int>::min(), false });
+                start = i + 1;
+            }
+            if (lines.empty()) lines.push_back({ 0, n, 0, 0, 0, 0, false });
+        }
 
-                // find that glyph
-                for (pos = 0; pos < textLength; ++pos) {
-                    glyph = static_cast<uint8_t>(m_drawText[pos]);
-                    glyphRect = Rect(m_glyphsPositionsCache[pos], glyphsSize[glyph]);
-                    glyphRect.setTop(std::max<int>(glyphRect.top() - m_font->getYOffset() - m_font->getGlyphSpacing().height(), 0));
-                    glyphRect.setLeft(std::max<int>(glyphRect.left() - m_font->getGlyphSpacing().width(), 0));
+        const int lineH = m_font->getGlyphHeight();
+        const int lineDy = m_font->getGlyphSpacing().height();
 
-                    // first glyph entirely visible found
-                    if (glyphRect.topLeft() >= startGlyphPos) {
-                        m_textVirtualOffset.x = m_glyphsPositionsCache[pos].x;
-                        m_textVirtualOffset.y = m_glyphsPositionsCache[pos].y - m_font->getYOffset();
-                        break;
-                    }
+        for (auto& li : lines) {
+            for (int v = li.visStart; v < li.visEnd && v < visLen; ++v) {
+                uint8_t g = static_cast<uint8_t>(m_drawText[v]);
+                if (g < 32) continue;
+                const Point& p = m_glyphsPositionsCache[v];
+                const Rect r(p, glyphsSize[g]);
+                li.hasGlyphs = true;
+                li.top = (li.top == std::numeric_limits<int>::min()) ? r.top() : std::min(li.top, r.top());
+                li.bottom = (li.bottom == std::numeric_limits<int>::min()) ? r.bottom() : std::max(li.bottom, r.bottom());
+                li.left = std::min(li.left, r.left());
+                li.right = std::max(li.right, r.right());
+            }
+        }
+
+        int yCursor = 0;
+        for (size_t i = 0; i < lines.size(); ++i) {
+            auto& li = lines[i];
+            if (li.hasGlyphs) {
+                if (li.top == std::numeric_limits<int>::min()) li.top = yCursor;
+                if (li.bottom == std::numeric_limits<int>::min()) li.bottom = li.top + lineH;
+                yCursor = li.bottom;
+            } else {
+                if (i > 0) {
+                    const auto& prev = lines[i - 1];
+                    const int base = (prev.top != std::numeric_limits<int>::min()) ? prev.bottom : yCursor;
+                    li.top = base + lineDy;
+                    li.bottom = li.top + lineH;
+                } else {
+                    li.top = 0;
+                    li.bottom = li.top + lineH;
+                }
+                if (li.left == std::numeric_limits<int>::max()) li.left = 0;
+                if (li.right == std::numeric_limits<int>::min()) li.right = li.left;
+            }
+        }
+
+        int lineIdx = (int)lines.size() - 1;
+        for (int i = 0; i < (int)lines.size(); ++i) {
+            if (cursorVis >= lines[i].visStart && cursorVis <= lines[i].visEnd) { lineIdx = i; break; }
+        }
+        const auto& L = lines[lineIdx];
+
+        int caretX = L.left;
+        if (L.hasGlyphs) {
+            if (cursorVis < visLen) {
+                uint8_t g = static_cast<uint8_t>(m_drawText[std::max(0, cursorVis)]);
+                if (g >= 32) caretX = m_glyphsPositionsCache[cursorVis].x;
+                else if (cursorVis > 0) {
+                    int pv = cursorVis - 1;
+                    while (pv >= L.visStart && static_cast<uint8_t>(m_drawText[pv]) < 32) --pv;
+                    if (pv >= L.visStart) caretX = m_glyphsPositionsCache[pv].x + glyphsSize[static_cast<uint8_t>(m_drawText[pv])].width();
+                    else caretX = L.left;
+                } else caretX = L.left;
+            } else if (visLen > 0) {
+                int pv = visLen - 1;
+                while (pv >= L.visStart && static_cast<uint8_t>(m_drawText[pv]) < 32) --pv;
+                caretX = (pv >= L.visStart)
+                    ? m_glyphsPositionsCache[pv].x + glyphsSize[static_cast<uint8_t>(m_drawText[pv])].width()
+                    : L.left;
+            }
+        }
+
+        Rect caretRect(caretX, L.top, 1, lineH);
+
+        const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(m_padding.left + m_padding.right, 0));
+        bool caretInView =
+            caretRect.top() >= virtualRect.top() &&
+            caretRect.bottom() <= virtualRect.bottom() &&
+            caretRect.left() >= virtualRect.left() &&
+            caretRect.right() <= virtualRect.right();
+
+        if (!caretInView) {
+            Point startPos;
+            startPos.y = std::max<int>(caretRect.bottom() - virtualRect.height(), 0);
+            startPos.x = std::max<int>(caretRect.right() - virtualRect.width(), 0);
+
+            bool found = false;
+            for (int pos = 0; pos < textLength; ++pos) {
+                uint8_t g = static_cast<uint8_t>(m_drawText[pos]);
+                if (g < 32) continue;
+                Rect r(m_glyphsPositionsCache[pos], glyphsSize[g]);
+                r.setTop(std::max<int>(r.top() - m_font->getYOffset() - m_font->getGlyphSpacing().height(), 0));
+                r.setLeft(std::max<int>(r.left() - m_font->getGlyphSpacing().width(), 0));
+                if (r.topLeft() >= startPos) {
+                    m_textVirtualOffset.x = m_glyphsPositionsCache[pos].x;
+                    m_textVirtualOffset.y = m_glyphsPositionsCache[pos].y - m_font->getYOffset();
+                    found = true;
+                    break;
                 }
             }
-        } else {
-            m_textVirtualOffset = {};
+            if (!found) {
+                m_textVirtualOffset.y = startPos.y;
+                if (m_textVirtualOffset.y < 0) m_textVirtualOffset.y = 0;
+            }
         }
         setProp(PropCursorInRange, true);
     } else {
         if (m_cursorPos > 0 && textLength > 0) {
-            const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(2 * m_padding.left + m_padding.right, 0)); // previous rendered virtual rect
-            const int pos = m_cursorPos - 1; // element before cursor
-            glyph = static_cast<uint8_t>(m_drawText[pos]); // glyph of the element before cursor
+            const Rect virtualRect(m_textVirtualOffset, m_rect.size() - Size(2 * m_padding.left + m_padding.right, 0));
+            const int pos = m_cursorPos - 1;
+            const uint8_t glyph = static_cast<uint8_t>(m_drawText[pos]);
             const Rect glyphRect(m_glyphsPositionsCache[pos], glyphsSize[glyph]);
             if (virtualRect.contains(glyphRect.topLeft()) && virtualRect.contains(glyphRect.bottomRight()))
                 setProp(PropCursorInRange, true);
@@ -329,9 +407,7 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
         }
     }
 
-    bool fireAreaUpdate = false;
-    if (oldTextAreaOffset != m_textVirtualOffset)
-        fireAreaUpdate = true;
+    bool fireAreaUpdate = (oldTextAreaOffset != m_textVirtualOffset);
 
     Rect textScreenCoords = m_rect;
     textScreenCoords.expandLeft(-m_padding.left);
@@ -359,78 +435,61 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
         m_drawArea.translate(0, textScreenCoords.height() - textBoxSize.height());
     } else if (m_textAlign & Fw::AlignVerticalCenter) {
         m_drawArea.translate(0, (textScreenCoords.height() - textBoxSize.height()) / 2);
-    } else { // AlignTop
     }
 
     if (m_textAlign & Fw::AlignRight) {
         m_drawArea.translate(textScreenCoords.width() - textBoxSize.width(), 0);
     } else if (m_textAlign & Fw::AlignHorizontalCenter) {
         m_drawArea.translate((textScreenCoords.width() - textBoxSize.width()) / 2, 0);
-    } else { // AlignLeft
     }
 
     std::map<uint32_t, CoordsBufferPtr> colorCoordsMap;
-    uint32_t curColorRgba;
+    uint32_t curColorRgba = 0;
     int32_t nextColorIndex = 0;
     int32_t colorIndex = -1;
     CoordsBufferPtr coords;
 
-    const int textColorsSize = m_drawTextColors.size();
+    const int textColorsSize = static_cast<int>(m_drawTextColors.size());
     m_colorCoordsBuffer.clear();
     m_coordsBuffer->clear();
 
     for (int i = 0; i < textLength; ++i) {
         if (i >= nextColorIndex) {
             colorIndex = colorIndex + 1;
-            if (colorIndex < textColorsSize) {
+            if (colorIndex < textColorsSize)
                 curColorRgba = m_drawTextColors[colorIndex].second.rgba();
-            }
-            if (colorIndex + 1 < textColorsSize) {
+            if (colorIndex + 1 < textColorsSize)
                 nextColorIndex = m_drawTextColors[colorIndex + 1].first;
-            } else {
+            else
                 nextColorIndex = textLength;
-            }
 
-            if (!colorCoordsMap.contains(curColorRgba)) {
+            if (!colorCoordsMap.contains(curColorRgba))
                 colorCoordsMap.insert(std::make_pair(curColorRgba, std::make_shared<CoordsBuffer>()));
-            }
-
             coords = colorCoordsMap[curColorRgba];
         }
 
-        glyph = static_cast<uint8_t>(m_drawText[i]);
+        const uint8_t glyph = static_cast<uint8_t>(m_drawText[i]);
         m_glyphsCoords[i].first.clear();
-
-        // skip invalid glyphs
         if (glyph < 32)
             continue;
 
-        // calculate initial glyph rect and texture coords
         Rect glyphScreenCoords(m_glyphsPositionsCache[i], glyphsSize[glyph]);
         Rect glyphTextureCoords = glyphsTextureCoords[glyph];
 
-        // first translate to align position
         if (m_textAlign & Fw::AlignBottom) {
             glyphScreenCoords.translate(0, textScreenCoords.height() - textBoxSize.height());
         } else if (m_textAlign & Fw::AlignVerticalCenter) {
             glyphScreenCoords.translate(0, (textScreenCoords.height() - textBoxSize.height()) / 2);
-        } else { // AlignTop
-            // nothing to do
         }
-
         if (m_textAlign & Fw::AlignRight) {
             glyphScreenCoords.translate(textScreenCoords.width() - textBoxSize.width(), 0);
         } else if (m_textAlign & Fw::AlignHorizontalCenter) {
             glyphScreenCoords.translate((textScreenCoords.width() - textBoxSize.width()) / 2, 0);
-        } else { // AlignLeft
-            // nothing to do
         }
 
-        // only render glyphs that are after startRenderPosition
         if (glyphScreenCoords.bottom() < m_textVirtualOffset.y || glyphScreenCoords.right() < m_textVirtualOffset.x)
             continue;
 
-        // bound glyph topLeft to startRenderPosition
         if (glyphScreenCoords.top() < m_textVirtualOffset.y) {
             glyphTextureCoords.setTop(glyphTextureCoords.top() + (m_textVirtualOffset.y - glyphScreenCoords.top()));
             glyphScreenCoords.setTop(m_textVirtualOffset.y);
@@ -440,17 +499,12 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
             glyphScreenCoords.setLeft(m_textVirtualOffset.x);
         }
 
-        // subtract startInternalPos
         glyphScreenCoords.translate(-m_textVirtualOffset);
-
-        // translate rect to screen coords
         glyphScreenCoords.translate(textScreenCoords.topLeft());
 
-        // only render if glyph rect is visible on screenCoords
         if (!textScreenCoords.intersects(glyphScreenCoords))
             continue;
 
-        // bound glyph bottomRight to screenCoords bottomRight
         if (glyphScreenCoords.bottom() > textScreenCoords.bottom()) {
             glyphTextureCoords.setBottom(glyphTextureCoords.bottom() + (textScreenCoords.bottom() - glyphScreenCoords.bottom()));
             glyphScreenCoords.setBottom(textScreenCoords.bottom());
@@ -460,7 +514,6 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
             glyphScreenCoords.setRight(textScreenCoords.right());
         }
 
-        // render glyph
         m_glyphsCoords[i].first = glyphScreenCoords;
         m_glyphsCoords[i].second = glyphTextureCoords;
 
@@ -474,9 +527,8 @@ void UITextEdit::update(const bool focusCursor, bool disableAreaUpdate)
         }
     }
 
-    for (auto& [rgba, crds] : colorCoordsMap) {
+    for (auto& [rgba, crds] : colorCoordsMap)
         m_colorCoordsBuffer.emplace_back(Color(rgba), crds);
-    }
 
     if (!disableAreaUpdate && fireAreaUpdate)
         onTextAreaUpdate(m_textVirtualOffset, m_textVirtualSize, m_textTotalSize);
