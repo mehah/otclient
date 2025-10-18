@@ -50,7 +50,7 @@
 #include <vector>
 #include <ranges>
 #include <span>
-
+#include <regex>
 #include <zlib.h>
 
 #include <parallel_hashmap/btree.h>
