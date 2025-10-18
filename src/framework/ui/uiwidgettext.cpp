@@ -39,7 +39,7 @@ void UIWidget::updateText()
 {
     if (isTextWrap() && m_rect.isValid()) {
         m_drawTextColors = m_textColors;
-        m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x);
+        m_drawText = m_font->wrapText(m_text, getWidth() - m_textOffset.x, m_textWrapOptions);
     } else {
         m_drawText = m_text;
         m_drawTextColors = m_textColors;
@@ -75,31 +75,71 @@ void UIWidget::resizeToText()
     setSize(textSize * std::max<float>(m_fontScale, 1.f));
 }
 
+namespace {
+    WordBreakMode parseWordBreakMode(const std::string& v) {
+        if (v == "break-all") return WordBreakMode::BreakAll;
+        if (v == "keep-all")  return WordBreakMode::KeepAll;
+        return WordBreakMode::Normal;
+    }
+
+    OverflowWrapMode parseOverflowWrapMode(const std::string& v) {
+        if (v == "anywhere")   return OverflowWrapMode::Anywhere;
+        if (v == "break-word") return OverflowWrapMode::BreakWord;
+        return OverflowWrapMode::Normal;
+    }
+
+    HyphenationMode parseHyphenationMode(const std::string& v) {
+        if (v == "none")   return HyphenationMode::None;
+        if (v == "auto")   return HyphenationMode::Auto;
+        return HyphenationMode::Manual;
+    }
+
+    void applyWhiteSpaceToOptions(const std::string& v, WrapOptions& opt, UIWidget* w) {
+        if (v == "nowrap") {
+            if (w) w->setTextWrap(false);
+        } else if (v == "normal" || v == "pre-wrap") {
+            if (w) w->setTextWrap(true);
+        }
+    }
+}
+
 void UIWidget::parseTextStyle(const OTMLNodePtr& styleNode)
 {
     for (const auto& node : styleNode->children()) {
-        if (node->tag() == "text")
+        const std::string tag = node->tag();
+
+        if (tag == "text")
             setText(node->value());
-        else if (node->tag() == "text-align")
+        else if (tag == "text-align")
             setTextAlign(Fw::translateAlignment(node->value()));
-        else if (node->tag() == "text-offset")
+        else if (tag == "text-offset")
             setTextOffset(node->value<Point>());
-        else if (node->tag() == "text-wrap")
+        else if (tag == "text-wrap")
             setTextWrap(node->value<bool>());
-        else if (node->tag() == "text-auto-resize")
+        else if (tag == "text-auto-resize")
             setTextAutoResize(node->value<bool>());
-        else if (node->tag() == "text-horizontal-auto-resize")
+        else if (tag == "text-horizontal-auto-resize")
             setTextHorizontalAutoResize(node->value<bool>());
-        else if (node->tag() == "text-vertical-auto-resize")
+        else if (tag == "text-vertical-auto-resize")
             setTextVerticalAutoResize(node->value<bool>());
-        else if (node->tag() == "text-only-upper-case")
+        else if (tag == "text-only-upper-case")
             setTextOnlyUpperCase(node->value<bool>());
-        else if (node->tag() == "font")
+        else if (tag == "font")
             setFont(node->value());
-        else if (node->tag() == "font-scale")
+        else if (tag == "font-scale")
             setFontScale(node->value<float>());
-        else if (node->tag() == "font-size")
+        else if (tag == "font-size")
             setFontScale(node->value<int>() / 10.f);
+        else if (tag == "word-break")
+            m_textWrapOptions.wordBreakMode = parseWordBreakMode(node->value());
+        else if (tag == "overflow-wrap")
+            m_textWrapOptions.overflowWrapMode = parseOverflowWrapMode(node->value());
+        else if (tag == "hyphens")
+            m_textWrapOptions.hyphenationMode = parseHyphenationMode(node->value());
+        else if (tag == "white-space")
+            applyWhiteSpaceToOptions(node->value(), m_textWrapOptions, this);
+        else if (tag == "text-lang")
+            m_textWrapOptions.language = node->value();
     }
 }
 
@@ -166,46 +206,8 @@ void UIWidget::setText(const std::string_view text, const bool dontFireLuaCall)
     const std::string oldText = m_text;
     m_text = _text;
 
-    if (isOnHtml() && !isTextEdit()) {
-        auto whiteSpace = m_htmlNode->getStyle("white-space");
-        if (whiteSpace.empty())
-            whiteSpace = "normal";
-
-        setProp(PropTextHorizontalAutoResize, false);
-        setProp(PropTextVerticalAutoResize, false);
-
-        updateHtmlTextSize();
-
-        setProp(PropTextWrap, true);
-        if (whiteSpace == "normal") {
-            stdext::trim(m_text);
-        } else if (whiteSpace == "nowrap") {
-            setProp(PropTextHorizontalAutoResize, true);
-            setProp(PropTextVerticalAutoResize, true);
-
-            std::string out;
-            out.reserve(m_text.size());
-            bool lastWasSpace = false;
-            for (char c : m_text) {
-                if (c == '\n' || c == '\r' || c == '\t') {
-                    c = ' ';
-                }
-
-                if (c == ' ') {
-                    if (lastWasSpace) continue;
-                    lastWasSpace = true;
-                } else {
-                    lastWasSpace = false;
-                }
-
-                out.push_back(c);
-            }
-
-            m_text.swap(out);
-            setProp(PropTextWrap, false);
-        } else {
-            setProp(PropTextWrap, whiteSpace == "pre-wrap"); // pre, pre-wrap
-        }
+    if (!isTextEdit()) {
+        computeHtmlTextIntrinsicSize();
     }
 
     updateText();
@@ -261,26 +263,30 @@ void UIWidget::setColoredText(const std::string_view coloredText, bool dontFireL
     }
 }
 
-void UIWidget::updateHtmlTextSize() {
-    if (isOnHtml()) {
-        auto text = m_text;
-        auto textAlign = m_textAlign;
-        { // get text size without wrap
-            m_textAlign = Fw::AlignTopLeft;
-            stdext::trimSpacesAndNewlines(m_text);
-            setProp(PropTextWrap, false);
-            updateText();
-            m_textSizeNowrap = m_textSize;
-        }
-        m_text = text;
-        m_textAlign = textAlign;
+void UIWidget::computeHtmlTextIntrinsicSize() {
+    if (!isOnHtml())return;
+
+    bool hasTextWrap = isTextWrap();
+    auto text = m_text;
+    auto textAlign = m_textAlign;
+
+    { // discovery text size without wrap
+        m_textAlign = Fw::AlignTopLeft;
+        stdext::trimSpacesAndNewlines(m_text);
+        setProp(PropTextWrap, false);
+        updateText();
+        m_textSizeNowrap = m_textSize;
     }
+
+    m_text = text;
+    m_textAlign = textAlign;
+    setProp(PropTextWrap, hasTextWrap);
 }
 
 void UIWidget::setFont(const std::string_view fontName)
 {
     m_font = g_fonts.getFont(fontName);
-    updateHtmlTextSize();
+    computeHtmlTextIntrinsicSize();
     updateText();
     onFontChange(fontName);
     scheduleHtmlTask(PropUpdateSize);

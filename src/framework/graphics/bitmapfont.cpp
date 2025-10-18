@@ -59,7 +59,6 @@ void BitmapFont::load(const OTMLNodePtr& fontNode)
     }
 
     m_glyphsSize[32].setWidth(spaceWidth);
-    m_glyphsSize[160].setWidth(spaceWidth);
     m_glyphsSize[127].setWidth(1);
     m_glyphsSize[static_cast<uint8_t>('\n')] = { 1, m_glyphHeight };
 
@@ -407,146 +406,133 @@ void BitmapFont::calculateGlyphsWidthsAutomatically(const ImagePtr& image, const
     }
 }
 
-std::string BitmapFont::wrapText(const std::string_view text, const int maxWidth, std::vector<std::pair<int, Color>>* colors) noexcept
+namespace {
+    bool _isAscii(uint8_t c) { return c < 0x80; }
+    bool _isSpace(uint8_t c) { return c == ' ' || c == '\t'; }
+    bool _isHyphen(uint8_t c) { return c == '-'; }
+    int _gw(const Size s[256], uint8_t ch, int sx) { return s[ch].width() + sx; }
+    bool _utf8(const char* s, const char* e, uint32_t& cp, int& len) {
+        if (s >= e)return false; unsigned char c0 = (unsigned char)s[0];
+        if (c0 < 0x80) { cp = c0; len = 1; return true; }
+        if ((c0 & 0xE0) == 0xC0 && s + 1 <= e) { cp = ((c0 & 0x1F) << 6) | ((unsigned char)s[1] & 0x3F); len = 2; return true; }
+        if ((c0 & 0xF0) == 0xE0 && s + 2 <= e) { cp = ((c0 & 0x0F) << 12) | (((unsigned char)s[1] & 0x3F) << 6) | ((unsigned char)s[2] & 0x3F); len = 3; return true; }
+        if ((c0 & 0xF8) == 0xF0 && s + 3 <= e) { cp = ((c0 & 0x07) << 18) | (((unsigned char)s[1] & 0x3F) << 12) | (((unsigned char)s[2] & 0x3F) << 6) | ((unsigned char)s[3] & 0x3F); len = 4; return true; }
+        cp = c0; len = 1; return true;
+    }
+    bool _isCJK(uint32_t cp) {
+        return (cp >= 0x4E00 && cp <= 0x9FFF) || (cp >= 0x3400 && cp <= 0x4DBF) || (cp >= 0x3040 && cp <= 0x309F) || (cp >= 0x30A0 && cp <= 0x30FF) || (cp >= 0xAC00 && cp <= 0xD7AF);
+    }
+}
+
+std::string BitmapFont::wrapText(std::string_view text, int maxWidth, const WrapOptions& options, std::vector<std::pair<int, Color>>* colors)
 {
-    if (text.empty() || maxWidth <= 0) return "";
+    if (text.empty() || maxWidth <= 0) return std::string(text);
 
-    const int spacing = m_glyphSpacing.width();
-    const int spaceW = m_glyphsSize[static_cast<uint8_t>(' ')].width();
-    const int hyphW = m_glyphsSize[static_cast<uint8_t>('-')].width();
-
-    std::string out;
-    out.reserve(text.size() + text.size() / 8);
+    std::string out; out.reserve(text.size() + text.size() / 8);
+    const char* cur = text.data(); const char* end = text.data() + text.size();
+    const int sx = m_glyphSpacing.width(); const int maxW = std::max(0, maxWidth);
 
     int lineW = 0;
-    bool pendingSpace = false;
+    int lastBreakOut = -1;
+    int lastBreakLineW = 0;
+    bool lastBreakHy = false;
+    int lastBreakHyCount = 0;
 
-    auto emit_space_if_fits = [&](std::string& dst) -> bool {
-        if (!pendingSpace) return true;
-        const int need = (lineW > 0 ? spacing : 0) + spaceW;
-        if (lineW + need > maxWidth) return false;
-        if (lineW > 0) lineW += spacing;
-        dst.push_back(' ');
-        lineW += spaceW;
-        pendingSpace = false;
-        return true;
+    auto pushChar = [&](char ch) {
+        out.push_back(ch);
+        if (colors) updateColors(colors, (int)out.size() - 1, 1);
+    };
+    auto pushSlice = [&](const char* s, int n) {
+        size_t o = out.size(); out.append(s, s + n);
+        if (colors) updateColors(colors, (int)o, n);
+    };
+    auto newline = [&]() {
+        out.push_back('\n');
+        if (colors) updateColors(colors, (int)out.size() - 1, 1);
+        lineW = 0; lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0;
+    };
+    auto measure = [&](const char* s, int len, uint32_t cp)->int {
+        if (len == 1 && cp < 256) return _gw(m_glyphsSize, (uint8_t)cp, sx);
+        return calculateTextRectSize(std::string_view(s, len)).width();
+    };
+    auto markBreak = [&](bool hy, int hyc) {
+        lastBreakOut = (int)out.size(); lastBreakLineW = lineW; lastBreakHy = hy; lastBreakHyCount = hyc;
+    };
+    auto commitBreak = [&](bool forced) {
+        if (lastBreakOut >= 0) {
+            if (lastBreakHy && lastBreakHyCount > 0) {
+                out.insert(out.begin() + lastBreakOut, '-');
+                if (colors) updateColors(colors, lastBreakOut, 1);
+                lastBreakOut += 1;
+            }
+            out.insert(out.begin() + lastBreakOut, '\n');
+            if (colors) updateColors(colors, lastBreakOut, 1);
+            lineW = std::max(0, lineW - lastBreakLineW);
+        } else {
+            if (forced && options.hyphenationMode == HyphenationMode::Auto) {
+                out.push_back('-');
+                if (colors) updateColors(colors, (int)out.size() - 1, 1);
+            }
+            newline();
+            return;
+        }
+        lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0;
     };
 
-    auto emit_hyphen_break = [&](std::string& dst) {
-        const int pos = static_cast<int>(dst.size());
-        dst.push_back('-');
-        dst.push_back('\n');
-        if (colors) updateColors(colors, pos, 2);
-        lineW = 0;
-        pendingSpace = false;
-    };
+    while (cur < end) {
+        if (*cur == '\n') { pushChar('\n'); lineW = 0; lastBreakOut = -1; lastBreakLineW = 0; lastBreakHy = false; lastBreakHyCount = 0; ++cur; continue; }
 
-    size_t i = 0, n = text.size();
-    while (i < n) {
-        const unsigned char c = static_cast<unsigned char>(text[i]);
+        uint32_t cp; int len; _utf8(cur, end, cp, len);
 
-        if (c == '\n') {
-            out.push_back('\n');
-            lineW = 0;
-            pendingSpace = false;
-            ++i;
-            continue;
-        }
-        if (isSpace(c)) {
-            pendingSpace = true;
-            ++i;
-            continue;
+        if (cp == 0x00A0 && options.allowNoBreakSpace) {
+            int w = measure(cur, len, cp);
+            if (lineW + w > maxW) { commitBreak(true); }
+            pushSlice(cur, len); lineW += w; cur += len; continue;
         }
 
-        const size_t wordStart = i;
-        int wordW = 0;
-        int glyphs = 0;
-        while (i < n) {
-            const unsigned char ch = static_cast<unsigned char>(text[i]);
-            if (ch == '\n' || isSpace(ch)) break;
-            if (ch >= 32) {
-                if (glyphs > 0) wordW += spacing;
-                wordW += m_glyphsSize[ch].width();
-                ++glyphs;
-            }
-            ++i;
-        }
-        const size_t wordEnd = i;
-
-        int addW = wordW;
-        if (pendingSpace && lineW > 0) addW += spacing + spaceW;
-        if (lineW + addW <= maxWidth) {
-            if (!emit_space_if_fits(out)) {
-                out.push_back('\n');
-                lineW = 0;
-                pendingSpace = false;
-            }
-            (void)emit_space_if_fits(out);
-            if (glyphs > 0) {
-                out.append(text.data() + wordStart, wordEnd - wordStart);
-                lineW += wordW;
-            }
-            continue;
+        if (cp == 0x2060 && options.allowWordJoiner) {
+            int w = measure(cur, len, cp);
+            if (lineW + w > maxW) { commitBreak(true); }
+            pushSlice(cur, len); lineW += w; cur += len; continue;
         }
 
-        size_t segStart = wordStart;
-        if (pendingSpace && lineW == 0) pendingSpace = false;
+        if (cp == 0x200B && options.allowZeroWidthBreak) { markBreak(false, 0); cur += len; continue; }
 
-        while (segStart < wordEnd) {
-            if (pendingSpace) {
-                const int need = (lineW > 0 ? spacing : 0) + spaceW;
-                if (lineW + need > maxWidth) {
-                    out.push_back('\n');
-                    lineW = 0;
-                } else {
-                    if (lineW > 0) lineW += spacing;
-                    out.push_back(' ');
-                    lineW += spaceW;
-                    pendingSpace = false;
-                }
-            }
-
-            size_t k = segStart;
-            int segW = 0;
-            int segGlyphs = 0;
-
-            while (k < wordEnd) {
-                const unsigned char ch2 = static_cast<unsigned char>(text[k]);
-                if (ch2 < 32) { ++k; continue; }
-                const int gw = m_glyphsSize[ch2].width();
-                const int next = segW + (segGlyphs > 0 ? spacing + gw : gw);
-                const bool needHyphen = (k + 1 < wordEnd);
-                const int tail = needHyphen ? (segGlyphs > 0 ? spacing : 0) + hyphW : 0;
-                if (lineW + next + tail <= maxWidth) {
-                    segW = next;
-                    ++segGlyphs;
-                    ++k;
-                } else {
-                    break;
-                }
-            }
-
-            if (segGlyphs == 0) {
-                const unsigned char ch3 = static_cast<unsigned char>(text[segStart]);
-                size_t one = segStart + 1;
-                while (one <= wordEnd && static_cast<unsigned char>(text[one - 1]) < 32) ++one;
-                out.append(text.data() + segStart, one - segStart);
-                emit_hyphen_break(out);
-                segStart = one;
-                continue;
-            }
-
-            const size_t segEnd = k;
-            out.append(text.data() + segStart, segEnd - segStart);
-            lineW += segW;
-
-            if (segEnd < wordEnd) {
-                emit_hyphen_break(out);
-                segStart = segEnd;
-            } else {
-                segStart = wordEnd;
-            }
+        if (cp == 0x00AD && options.allowSoftHyphen) {
+            bool show = (options.hyphenationMode == HyphenationMode::Manual || options.hyphenationMode == HyphenationMode::Auto);
+            markBreak(show, show ? 1 : 0); cur += len; continue;
         }
+
+        if (len == 1 && _isAscii((uint8_t)*cur)) {
+            unsigned char ch = (unsigned char)*cur;
+            if (_isSpace(ch)) {
+                int w = _gw(m_glyphsSize, ' ', sx);
+                if (lineW + w > maxW) { commitBreak(false); ++cur; markBreak(false, 0); continue; }
+                pushChar(' '); lineW += w; markBreak(false, 0); ++cur; continue;
+            }
+            if (_isHyphen(ch)) {
+                int w = _gw(m_glyphsSize, ch, sx);
+                if (lineW + w > maxW) commitBreak(false);
+                pushChar((char)ch); lineW += w; markBreak(false, 0); ++cur; continue;
+            }
+            int w = _gw(m_glyphsSize, ch, sx);
+            if (lineW + w > maxW) {
+                bool anywhere = (options.overflowWrapMode == OverflowWrapMode::Anywhere) || (options.wordBreakMode == WordBreakMode::BreakAll);
+                if (lastBreakOut >= 0) commitBreak(false);
+                else if (options.overflowWrapMode == OverflowWrapMode::BreakWord || anywhere) commitBreak(true);
+                else newline();
+            }
+            pushChar((char)ch); lineW += w; ++cur; continue;
+        }
+
+        int w = measure(cur, len, cp);
+        if (lineW + w > maxW) {
+            bool anywhere = (options.overflowWrapMode == OverflowWrapMode::Anywhere) || (options.wordBreakMode == WordBreakMode::BreakAll) || (!options.keepCJKWordsTogether && _isCJK(cp));
+            if (lastBreakOut >= 0) commitBreak(false);
+            else if (options.overflowWrapMode == OverflowWrapMode::BreakWord || anywhere) commitBreak(true);
+            else newline();
+        }
+        pushSlice(cur, len); lineW += w; cur += len;
     }
 
     return out;

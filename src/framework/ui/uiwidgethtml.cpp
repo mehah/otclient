@@ -1387,7 +1387,7 @@ void UIWidget::updateSize() {
         auto height = m_textSizeNowrap.height();
         if (parentSize.width() < m_textSizeNowrap.width()) {
             if (isTextWrap() && m_rect.isValid()) {
-                const auto& text = m_font->wrapText(m_text, parentSize.width() - m_textOffset.x);
+                const auto& text = m_font->wrapText(m_text, parentSize.width() - m_textOffset.x, m_textWrapOptions);
                 height *= std::count(text.begin(), text.end(), '\n') + 1;
             }
         }

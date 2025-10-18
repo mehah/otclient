@@ -938,11 +938,12 @@ protected:
     virtual bool isTextEdit() { return false; }
     void drawText(const Rect& screenCoords);
 
-    void updateHtmlTextSize();
+    void computeHtmlTextIntrinsicSize();
 
     virtual void onTextChange(std::string_view text, std::string_view oldText);
     virtual void onFontChange(std::string_view font);
 
+    WrapOptions m_textWrapOptions;
     std::vector<Point> m_glyphsPositionsCache;
 
     std::string m_text;
