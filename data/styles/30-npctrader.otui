@@ -1,0 +1,291 @@
+NpcWindow < MiniWindow
+  width: 175
+  height: 365
+  &minimizedHeight: 20
+
+  FlatPanel
+    id: headPanel
+    anchors.top: miniwindowHeaderBorder.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 64
+    margin-left: 3
+    margin-right: 3
+    margin-top: 0
+
+    $on:
+      visible: false
+
+    Label
+      font: verdana-11px-monochrome
+      anchors.left: parent.left
+      anchors.top: parent.top
+      margin-top: 4
+      margin-left: 4
+      !text: tr('Currency:')
+      color: #C0C0C0
+
+    UIWidget
+      id: currencyLabel
+      font: verdana-11px-monochrome
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      margin-top: 5
+      margin-left: 4
+      !text: tr('Gold Coin')
+      color: #C0C0C0
+      text-auto-resize: true
+      tooltip-delayed: true
+
+    Label
+      id: quickSellLabel
+      font: verdana-11px-monochrome
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      margin-top: 10
+      margin-left: 4
+      !text: tr('Quick Sell Items')
+      color: #C0C0C0
+      text-auto-resize: true
+
+    Button
+      id: buyTab
+      size: 43 16
+      !text: tr('Buy')
+      anchors.top: parent.top
+      anchors.right: parent.right 
+      margin-right: 3
+      margin-top: 3
+    Button
+      id: sellTab
+      size: 43 16
+      !text: tr('Sell')
+      margin-top: 3
+      margin-right: 3
+      anchors.top: prev.bottom
+      anchors.right: parent.right
+    Button
+      id: quickSellButton
+      size: 43 20
+      !text: tr('Sell All')
+      anchors.top: prev.bottom
+      anchors.right: parent.right
+      image-source: /images/ui/buttons-blue
+      margin-right: 3
+      margin-top: 3
+      visible: true
+      @onClick: modules.game_npctrade.onTradeAllClick()
+    UIWidget
+      size: 12 12
+      anchors.top: prev.top
+      anchors.right: prev.left
+      margin-right: 2
+      margin-top: 4
+      image-source: /images/skin/show-gui-help-red
+      !tooltip: tr('Sell all items with one click')
+
+  UIWidget
+    id: itemBorder
+    size: 34 34
+    anchors.top: headPanel.top
+    anchors.right: headPanel.right
+    margin-right: 50
+    margin-top: 3
+    border-width: 1
+    border-color-top: #181818
+    border-color-left: #181818
+    border-color-bottom: #757575
+    border-color-right: #757575
+    visible: true
+
+    UIItem
+      id: currencyItem
+      size: 32 32
+      anchors.centerIn: parent
+      virtual: true
+      priceable: false
+      draggable: false
+      phantom: true
+      visible: true
+
+  VerticalScrollBar
+    id: miniwindowScrollBar
+    anchors.top: headPanel.bottom
+    anchors.bottom: setupPanel.top
+    anchors.right: parent.right
+    step: 15
+    margin-right: 3
+    margin-bottom: 0
+    margin-top: 0
+    pixels-scroll: true
+
+  TextList
+    id: contentsPanel
+    anchors.top: headPanel.bottom
+    anchors.left: parent.left
+    anchors.right: miniwindowScrollBar.left
+    anchors.bottom: setupPanel.top
+    margin-left: 3
+    margin-right: 0
+    margin-bottom: 0
+    margin-top: 0
+    vertical-scrollbar: miniwindowScrollBar
+    focusable: false
+
+  FlatPanel
+    id: setupPanel
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 91
+    margin-left: 3
+    margin-right: 3
+    margin-bottom: 3
+
+    $on:
+      visible: false
+
+    TextEdit
+      id: searchText
+      size: 164 20
+      focusable: true
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: prev.right
+      margin-left: 3
+      margin-top: 5
+      padding-left: 4
+      padding-top: 2
+      box-text-padding: 30
+      @onHoverChange: modules.game_npctrade.onTypeFieldsHover(self, self:isHovered())
+      @onTextChange: modules.game_npctrade.onSearchTextChange()
+      !placeholder: tr('Type to search')
+      UIButton
+        id: clearSearchButton
+        anchors.top: parent.top
+        anchors.right: parent.right
+        margin-top: -1
+        margin-right: 1
+        size: 18 18
+        image-source: /images/store/button-erase-small-up
+        image-clip: 0 0 18 18
+        $hover !pressed:
+          image-source: /images/store/button-erase-small-up
+          image-clip: 0 0 18 18
+        $pressed:
+          image-source: /images/store/button-erase-small-down
+          image-clip: 0 0 18 18
+        @onClick: modules.game_npctrade.clearSearch()
+
+    HorizontalScrollBar
+      id: quantityScroll
+      width: 116
+      anchors.top: searchText.bottom
+      anchors.left: parent.left
+      step: 1
+      margin-left: 3
+      margin-top: 3
+      default-scroll: true
+      @onValueChange: modules.game_npctrade.onQuantityValueChange(self:getValue())
+    
+    Label
+      id: amount
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      margin-top: 4
+      margin-left: 2
+      !text: tr('Amount:')
+
+    TextEdit
+      id: amountText
+      size: 60 15
+      focusable: true
+      anchors.top: quantityScroll.bottom
+      anchors.left: prev.right
+      margin-left: 3
+      margin-top: 5
+      text-align: right
+      @onNotifyTextSelect: modules.game_npctrade.onTypeFieldsHover(self, true)
+      @onHoverChange: modules.game_npctrade.onTypeFieldsHover(self, self:isHovered())
+      @onTextChange: modules.game_npctrade.onAmountEdit(self)
+      only-number: true
+      !placeholder: tr('0')
+
+    Label
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      margin-top: 1
+      margin-left: 2
+      !text: tr('Price:')
+
+    Label
+      id: price
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      anchors.right: item.left
+      anchors.top: amountText.bottom
+      margin-top: 1
+      margin-right: 13
+      text-align: right
+      !text: tr('0')
+
+    Label
+      id: currencyMoneyLabel
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      margin-top: 1
+      margin-left: 2
+      !text: tr('Gold:')
+
+    Label
+      id: money
+      text-auto-resize: true
+      font: Verdana Bold-11px
+      color: #C0C0C0
+      anchors.right: item.left
+      anchors.top: price.bottom
+      margin-top: 1
+      margin-right: 13
+      text-align: right
+      !text: tr('0')
+
+    Item
+      id: item
+      size: 34 34
+      anchors.right: parent.right
+      anchors.top: searchText.bottom
+      margin-right: 4
+      margin-top: 3
+      virtual: true
+      phantom: true
+
+    Button
+      id: tradeButton
+      size: 43 20
+      !text: tr('Ok')
+      anchors.top: prev.bottom
+      anchors.right: parent.right 
+      margin-right: 4
+      margin-top: 5
+      @onClick: modules.game_npctrade.onTradeClick()
+
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 3
+    minimum: 192
+    margin-left: 3
+    margin-right: 3
