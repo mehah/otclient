@@ -1274,11 +1274,50 @@ bool UITextEdit::onDoubleClick(const Point& mousePos)
 {
     if (UIWidget::onDoubleClick(mousePos))
         return true;
-    if (getProp(PropSelectable) && m_text.length() > 0) {
-        selectAll();
-        return true;
+
+    if (!getProp(PropSelectable) || m_text.empty())
+        return false;
+
+    int pos = getTextPos(mousePos);
+    if (pos < 0)
+        return false;
+    if (pos >= static_cast<int>(m_text.size()))
+        pos = static_cast<int>(m_text.size()) - 1;
+
+    auto isSpace = [](unsigned char c) -> bool {
+        return std::isspace(c) != 0;
+    };
+    auto isWord = [](unsigned char c) -> bool {
+        return std::isalnum(c) != 0 || c == '_' || c >= 128;
+    };
+
+    int start = pos;
+    int end = pos + 1;
+
+    const auto ch = static_cast<unsigned char>(m_text[pos]);
+
+    if (isSpace(ch)) {
+        while (start > 0 && isSpace(static_cast<unsigned char>(m_text[start - 1]))) --start;
+        while (end < static_cast<int>(m_text.size()) && isSpace(static_cast<unsigned char>(m_text[end]))) ++end;
+    } else if (isWord(ch)) {
+        while (start > 0 && isWord(static_cast<unsigned char>(m_text[start - 1]))) --start;
+        while (end < static_cast<int>(m_text.size()) && isWord(static_cast<unsigned char>(m_text[end]))) ++end;
+    } else {
+        while (start > 0) {
+            unsigned char c = static_cast<unsigned char>(m_text[start - 1]);
+            if (isWord(c) || isSpace(c)) break;
+            --start;
+        }
+        while (end < static_cast<int>(m_text.size())) {
+            unsigned char c = static_cast<unsigned char>(m_text[end]);
+            if (isWord(c) || isSpace(c)) break;
+            ++end;
+        }
     }
-    return false;
+
+    setSelection(start, end);
+    setCursorPos(end);
+    return true;
 }
 
 void UITextEdit::onTextAreaUpdate(const Point& offset, const Size& visibleSize, const Size& totalSize)
