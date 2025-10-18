@@ -894,6 +894,7 @@ int UITextEdit::getTextPos(const Point& pos)
     }
 
     const int glyphH = m_font->getGlyphHeight();
+    const int lineDy = m_font->getGlyphSpacing().height();
     const int areaTop = m_drawArea.top();
     const int areaLeft = m_drawArea.left();
 
@@ -922,13 +923,28 @@ int UITextEdit::getTextPos(const Point& pos)
         }
 
         if (!L.hasGlyphs) {
-            const int t = areaTop + static_cast<int>(k) * glyphH;
-            L.top = t;
-            L.bottom = t + glyphH;
+            if (k > 0) {
+                const auto& P = lines[k - 1];
+                const int base = (P.bottom > 0 ? P.bottom : (areaTop + (int)(k - 1) * (glyphH + lineDy)));
+                L.top = base + lineDy;
+                L.bottom = L.top + glyphH;
+            } else {
+                int nextTop = std::numeric_limits<int>::min();
+                for (size_t j = k + 1; j < lines.size(); ++j) {
+                    if (lines[j].hasGlyphs) { nextTop = lines[j].top; break; }
+                }
+                if (nextTop != std::numeric_limits<int>::min()) {
+                    L.bottom = nextTop - lineDy;
+                    L.top = L.bottom - glyphH;
+                } else {
+                    L.top = areaTop;
+                    L.bottom = L.top + glyphH;
+                }
+            }
             L.left = areaLeft;
             L.right = areaLeft;
         } else {
-            L.top = (top == std::numeric_limits<int>::max()) ? (areaTop + (int)k * glyphH) : top;
+            L.top = (top == std::numeric_limits<int>::max()) ? (areaTop + (int)k * (glyphH + lineDy)) : top;
             L.bottom = (bottom == std::numeric_limits<int>::min()) ? (L.top + glyphH) : bottom;
             L.left = (left == std::numeric_limits<int>::max()) ? areaLeft : left;
             L.right = (right == std::numeric_limits<int>::min()) ? areaLeft : right;
