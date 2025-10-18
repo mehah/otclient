@@ -1171,28 +1171,35 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             return true;
         } else if (keyCode == Fw::KeyEnd) {
             clearSelection();
+
             const int srcLen = static_cast<int>(m_text.length());
             const int visLen = static_cast<int>(m_displayedText.length());
             if (visLen <= 0) return true;
+
             const int curVis = m_srcToVis.empty()
                 ? std::clamp(m_cursorPos, 0, visLen)
                 : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+
             int ls = 0;
             for (int i = curVis - 1; i >= 0; --i) { if (m_displayedText[i] == '\n') { ls = i + 1; break; } }
             int le = visLen;
             for (int i = curVis; i < visLen; ++i) { if (m_displayedText[i] == '\n') { le = i; break; } }
-            int lastVis = ls - 1;
-            const int gcSize = static_cast<int>(m_glyphsCoords.size());
-            for (int v = le - 1; v >= ls; --v) {
-                const uint8_t g = static_cast<uint8_t>(m_displayedText[v]);
-                if (g >= 32 && v < gcSize && m_glyphsCoords[v].first.isValid()) { lastVis = v; break; }
+
+            int srcBegin = m_visToSrc.empty() ? ls : std::clamp(m_visToSrc[std::clamp(ls, 0, visLen)], 0, srcLen);
+            int srcEnd = m_visToSrc.empty() ? le : std::clamp(m_visToSrc[std::clamp(le, 0, visLen)], 0, srcLen);
+
+            int bestSrc = srcBegin;
+            if (!m_srcToVis.empty()) {
+                for (int s = srcBegin; s <= srcEnd && s < (int)m_srcToVis.size(); ++s) {
+                    const int v = m_srcToVis[s];
+                    if (v <= le) bestSrc = s;
+                    else break;
+                }
+            } else {
+                bestSrc = std::clamp(le, 0, srcLen);
             }
-            int targetVis = (lastVis >= ls) ? (lastVis + 1) : ls;
-            targetVis = std::clamp(targetVis, 0, visLen);
-            const int srcTarget = m_visToSrc.empty()
-                ? std::clamp(targetVis, 0, srcLen)
-                : std::clamp(m_visToSrc[targetVis], 0, srcLen);
-            setCursorPos(srcTarget);
+
+            setCursorPos(bestSrc);
             return true;
         } else if (keyCode == Fw::KeyTab && !getProp(PropShiftNavigation)) {
             clearSelection();
@@ -1291,23 +1298,28 @@ bool UITextEdit::onKeyPress(const uint8_t keyCode, const int keyboardModifiers, 
             const int curVis = m_srcToVis.empty()
                 ? std::clamp(m_cursorPos, 0, visLen)
                 : std::clamp(m_srcToVis[std::clamp(m_cursorPos, 0, srcLen)], 0, visLen);
+
             int ls = 0;
             for (int i = curVis - 1; i >= 0; --i) { if (m_displayedText[i] == '\n') { ls = i + 1; break; } }
             int le = visLen;
             for (int i = curVis; i < visLen; ++i) { if (m_displayedText[i] == '\n') { le = i; break; } }
-            int lastVis = ls - 1;
-            const int gcSize = static_cast<int>(m_glyphsCoords.size());
-            for (int v = le - 1; v >= ls; --v) {
-                const uint8_t g = static_cast<uint8_t>(m_displayedText[v]);
-                if (g >= 32 && v < gcSize && m_glyphsCoords[v].first.isValid()) { lastVis = v; break; }
+
+            int srcBegin = m_visToSrc.empty() ? ls : std::clamp(m_visToSrc[std::clamp(ls, 0, visLen)], 0, srcLen);
+            int srcEnd = m_visToSrc.empty() ? le : std::clamp(m_visToSrc[std::clamp(le, 0, visLen)], 0, srcLen);
+
+            int bestSrc = srcBegin;
+            if (!m_srcToVis.empty()) {
+                for (int s = srcBegin; s <= srcEnd && s < (int)m_srcToVis.size(); ++s) {
+                    const int v = m_srcToVis[s];
+                    if (v <= le) bestSrc = s;
+                    else break;
+                }
+            } else {
+                bestSrc = std::clamp(le, 0, srcLen);
             }
-            int targetVis = (lastVis >= ls) ? (lastVis + 1) : ls;
-            targetVis = std::clamp(targetVis, 0, visLen);
-            const int srcTarget = m_visToSrc.empty()
-                ? std::clamp(targetVis, 0, srcLen)
-                : std::clamp(m_visToSrc[targetVis], 0, srcLen);
-            setSelection(m_cursorPos, srcTarget);
-            setCursorPos(srcTarget);
+
+            setSelection(m_cursorPos, bestSrc);
+            setCursorPos(bestSrc);
             return true;
         }
     }
